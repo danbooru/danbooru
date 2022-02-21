@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ArtistUrlTest < ActiveSupport::TestCase
+class ArtistURLTest < ActiveSupport::TestCase
   def assert_search_equals(results, conditions)
     assert_equal(results.map(&:id), subject.search(conditions).map(&:id))
   end
@@ -196,7 +196,7 @@ class ArtistUrlTest < ActiveSupport::TestCase
     end
 
     context "#search method" do
-      subject { ArtistUrl }
+      subject { ArtistURL }
 
       should "work" do
         @bkub = create(:artist, name: "bkub", is_deleted: false, url_string: "https://bkub.com")

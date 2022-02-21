@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ArtistUrlsControllerTest < ActionDispatch::IntegrationTest
+class ArtistURLsControllerTest < ActionDispatch::IntegrationTest
   context "The artist urls controller" do
     setup do
       @artist = create(:artist, name: "bkub", url_string: "-http://bkub.com")

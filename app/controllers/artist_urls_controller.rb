@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-class ArtistUrlsController < ApplicationController
+class ArtistURLsController < ApplicationController
   respond_to :js, :json, :xml, :html
 
   def index
-    @artist_urls = ArtistUrl.paginated_search(params)
+    @artist_urls = ArtistURL.paginated_search(params)
     @artist_urls = @artist_urls.includes(:artist) if request.format.html?
 
     respond_with(@artist_urls)

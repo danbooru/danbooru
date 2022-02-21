@@ -6,6 +6,8 @@
 ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable "general"
   inflect.acronym "FFmpeg"
+  inflect.acronym "URL"
+  inflect.acronym "URLs"
 #   inflect.plural /^(ox)$/i, '\1en'
 #   inflect.singular /^(ox)en/i, '\1'
 #   inflect.irregular 'person', 'people'

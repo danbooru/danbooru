@@ -21,7 +21,7 @@ class Artist < ApplicationRecord
   after_save :clear_url_string_changed
 
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
-  has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl", :autosave => true
+  has_many :urls, dependent: :destroy, class_name: "ArtistURL", autosave: true
   has_many :versions, -> {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
   has_one :wiki_page, -> { active }, foreign_key: "title", primary_key: "name"
   has_one :tag_alias, -> { active }, foreign_key: "antecedent_name", primary_key: "name"
@@ -51,7 +51,7 @@ class Artist < ApplicationRecord
       url_string_was = url_string
 
       self.urls = string.to_s.scan(/[^[:space:]]+/).map do |url|
-        is_active, url = ArtistUrl.parse_prefix(url)
+        is_active, url = ArtistURL.parse_prefix(url)
         self.urls.find_or_initialize_by(url: url, is_active: is_active)
       end.uniq(&:url)
 
@@ -238,13 +238,13 @@ class Artist < ApplicationRecord
       query = query.strip
 
       if query =~ %r{\A/(.*)/\z}
-        where(id: ArtistUrl.where_regex(:url, $1).select(:artist_id))
+        where(id: ArtistURL.where_regex(:url, $1).select(:artist_id))
       elsif query.include?("*")
-        where(id: ArtistUrl.where_like(:url, query).select(:artist_id))
+        where(id: ArtistURL.where_like(:url, query).select(:artist_id))
       elsif query =~ %r{\Ahttps?://}i
         ArtistFinder.find_artists(query)
       else
-        where(id: ArtistUrl.where_like(:url, "*#{query}*").select(:artist_id))
+        where(id: ArtistURL.where_like(:url, "*#{query}*").select(:artist_id))
       end
     end
 

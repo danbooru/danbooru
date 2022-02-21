@@ -152,10 +152,10 @@ class ArtistTest < ActiveSupport::TestCase
 
     should "not delete urls that have not changed" do
       artist = FactoryBot.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
-      old_url_ids = ArtistUrl.order("id").pluck(&:id)
+      old_url_ids = ArtistURL.order("id").pluck(&:id)
       artist.url_string = "http://rembrandt.com/test.jpg"
       artist.save
-      assert_equal(old_url_ids, ArtistUrl.order("id").pluck(&:id))
+      assert_equal(old_url_ids, ArtistURL.order("id").pluck(&:id))
     end
 
     should "normalize urls before removing duplicates" do

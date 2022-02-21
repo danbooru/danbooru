@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ArtistUrl < ApplicationRecord
+class ArtistURL < ApplicationRecord
   normalize :url, :normalize_url
 
   validates :url, presence: true, uniqueness: { scope: :artist_id }
