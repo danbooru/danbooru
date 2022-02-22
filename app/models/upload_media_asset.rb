@@ -12,6 +12,10 @@ class UploadMediaAsset < ApplicationRecord
   after_create :async_process_upload!
   after_save :update_upload_status, if: :saved_change_to_status?
 
+  # XXX there are ~150 old assets with blank source urls because the source went bad id before the image url could be saved.
+  validates :source_url, format: { with: %r{\A(https?|file)://}i, message: "is not a valid URL" }
+  validates :page_url, format: { with: %r{\A(https?)://}i, message: "is not a valid URL" }, allow_nil: true
+
   enum status: {
     pending: 0,
     processing: 100,

@@ -6,6 +6,8 @@
 # Page URLs
 #
 # * https://foundation.app/@mochiiimo/~/97376
+# * https://foundation.app/@mochiiimo/foundation/97376
+# * https://foundation.app/@KILLERGF/kgfgen/4
 # * https://foundation.app/@huwari/~/88982 (video)
 #
 # Even if the username is wrong, the ID is still fetched correctly. Example:
@@ -24,7 +26,7 @@ module Sources
     class Foundation < Base
       BASE_URL    = %r{\Ahttps?://(www\.)?foundation\.app}i
       PROFILE_URL = %r{#{BASE_URL}/@(?<artist_name>[^/]+)/?}i
-      PAGE_URL    = %r{#{PROFILE_URL}/~/(?<illust_id>\d+)}i
+      PAGE_URL    = %r{#{PROFILE_URL}/[^/]+/(?<illust_id>\d+)}i
 
       IMAGE_HOST  = /f8n-ipfs-production\.imgix\.net/
       IMAGE_URL   = %r{\Ahttps?://#{IMAGE_HOST}/\w+/nft.\w+}i
@@ -50,7 +52,7 @@ module Sources
           image = "https://f8n-ipfs-production.imgix.net/#{$1}/nft.#{$2}"
         end
 
-        [image]
+        [image].compact
       end
 
       def preview_urls

@@ -50,6 +50,25 @@ module Sources
       end
     end
 
+    context "for a collection" do
+      should "get the image urls" do
+        assert_equal(
+          ["https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png"],
+          Sources::Strategies.find("https://foundation.app/@mochiiimo/~/97376").image_urls,
+        )
+
+        assert_equal(
+          ["https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png"],
+          Sources::Strategies.find("https://foundation.app/@mochiiimo/foundation/97376").image_urls,
+        )
+
+        assert_equal(
+          ["https://f8n-production-collection-assets.imgix.net/0xFb0a8e1bB97fD7231Cd73c489dA4732Ae87995F0/4/nft.png"],
+          Sources::Strategies.find("https://foundation.app/@KILLERGF/kgfgen/4").image_urls,
+        )
+      end
+    end
+
     context "non-alphanumeric usernames" do
       should "still work" do
         case1 = Sources::Strategies.find("https://foundation.app/@brandon.dalmer/~/6792")
