@@ -12,7 +12,6 @@ class ModerationReport < ApplicationRecord
   validates :model_type, inclusion: { in: MODEL_TYPES }
   validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }
 
-  after_create :create_forum_post!
   after_create :autoban_reported_user
   after_save :notify_reporter
   after_save :create_modaction
@@ -38,43 +37,6 @@ class ModerationReport < ApplicationRecord
     else
       where(creator: user)
     end
-  end
-
-  def forum_topic_title
-    "Reports requiring moderation"
-  end
-
-  def forum_topic_body
-    "This topic deals with moderation events as reported by Builders. Reports can be filed against users, comments, or forum posts."
-  end
-
-  def forum_topic
-    topic = ForumTopic.find_by_title(forum_topic_title)
-    if topic.nil?
-      CurrentUser.scoped(User.system) do
-        topic = ForumTopic.create!(creator: User.system, title: forum_topic_title, category_id: 0, min_level: User::Levels::MODERATOR)
-        ForumPost.create!(creator: User.system, body: forum_topic_body, topic: topic)
-      end
-    end
-    topic
-  end
-
-  def forum_post_message
-    <<~EOS
-      [b]Report[/b] modreport ##{id}
-      [b]Submitted by[/b] <@#{creator.name}>
-      [b]Submitted against[/b] #{model.dtext_shortlink(key: true)} by <@#{reported_user.name}>
-      [b]Reason[/b] #{reason}
-
-      [quote]
-      #{model.body}
-      [/quote]
-    EOS
-  end
-
-  def create_forum_post!
-    updater = ForumUpdater.new(forum_topic)
-    updater.update(forum_post_message)
   end
 
   def autoban_reported_user
