@@ -580,7 +580,8 @@ class ArtistTest < ActiveSupport::TestCase
 
       should "not save invalid urls" do
         assert_no_difference("ArtistVersion.count") do
-          @artist.update(:url_string => "http://foo.com www.example.com")
+          @artist.update(url_string: "http://foo.com :42")
+
           assert_equal(%w[http://foo.com], @artist.versions.last.urls)
         end
       end

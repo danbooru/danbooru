@@ -72,8 +72,7 @@ class ArtistURL < ApplicationRecord
   end
 
   def domain
-    uri = Addressable::URI.parse(normalized_url)
-    uri.domain
+    Danbooru::URL.parse(normalized_url)&.domain
   end
 
   def site_name
@@ -119,11 +118,7 @@ class ArtistURL < ApplicationRecord
   end
 
   def self.normalize_url(url)
-    uri = Addressable::URI.parse(url)
-    uri.site = uri.normalized_site
-    uri.to_s
-  rescue Addressable::URI::InvalidURIError
-    url
+    Danbooru::URL.parse(url)&.to_s.presence || url
   end
 
   def url=(url)

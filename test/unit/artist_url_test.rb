@@ -25,26 +25,29 @@ class ArtistURLTest < ActiveSupport::TestCase
 
     should "disallow invalid urls" do
       urls = [
-        FactoryBot.build(:artist_url, url: "www.example.com"),
-        FactoryBot.build(:artist_url, url: ":www.example.com"),
-        FactoryBot.build(:artist_url, url: "http://http://www.example.com"),
+        build(:artist_url, url: ":www.example.com"),
+        build(:artist_url, url: "http://http://www.example.com"),
       ]
 
       assert_equal(false, urls[0].valid?)
-      assert_match(/must begin with http/, urls[0].errors.full_messages.join)
+      assert_match(/is malformed/, urls[0].errors.full_messages.join)
       assert_equal(false, urls[1].valid?)
-      assert_match(/is malformed/, urls[1].errors.full_messages.join)
-      assert_equal(false, urls[2].valid?)
-      assert_match(/that does not contain a dot/, urls[2].errors.full_messages.join)
+      assert_match(/that does not contain a dot/, urls[1].errors.full_messages.join)
     end
 
-    should "always add a trailing slash when normalized" do
-      url = FactoryBot.create(:artist_url, :url => "http://monet.com")
+    should "automatically add http:// if missing" do
+      url = create(:artist_url, url: "example.com")
+      assert_equal("http://example.com", url.url)
+      assert_equal("http://example.com/", url.normalized_url)
+    end
+
+    should "normalize trailing slashes" do
+      url = create(:artist_url, url: "http://monet.com")
       assert_equal("http://monet.com", url.url)
       assert_equal("http://monet.com/", url.normalized_url)
 
-      url = FactoryBot.create(:artist_url, :url => "http://monet.com/")
-      assert_equal("http://monet.com/", url.url)
+      url = create(:artist_url, url: "http://monet.com/")
+      assert_equal("http://monet.com", url.url)
       assert_equal("http://monet.com/", url.normalized_url)
     end
 
