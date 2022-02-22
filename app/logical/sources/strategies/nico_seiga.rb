@@ -53,7 +53,7 @@ module Sources
       PROFILE_PAGE = %r{\Ahttps?://seiga\.nicovideo\.jp/user/illust/(?<artist_id>\d+)}i
 
       def self.enabled?
-        Danbooru.config.nico_seiga_login.present? && Danbooru.config.nico_seiga_password.present?
+        Danbooru.config.nico_seiga_user_session.present?
       end
 
       def domains
@@ -79,7 +79,7 @@ module Sources
       def image_url_for(url)
         return url if api_client.blank?
 
-        resp = api_client.login.head(url)
+        resp = api_client.head(url)
         if resp.uri.to_s =~ %r{https?://.+/(\w+/\d+/\d+)\z}i
           "https://lohas.nicoseiga.jp/priv/#{$1}"
         else

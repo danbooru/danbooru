@@ -265,11 +265,9 @@ module Danbooru
       nil
     end
 
-    def nico_seiga_login
-      nil
-    end
-
-    def nico_seiga_password
+    # Your NicoSeiga "user_session" cookie. Login to NicoSeiga then use the
+    # devtools to find the "user_session" cookie.
+    def nico_seiga_user_session
       nil
     end
 

@@ -5,11 +5,12 @@ class NicoSeigaApiClient
   extend Memoist
   XML_API = "https://seiga.nicovideo.jp/api"
 
-  attr_reader :http
+  attr_reader :http, :user_session
 
-  def initialize(work_id:, type:, http: Danbooru::Http.new)
+  def initialize(work_id:, type:, user_session: Danbooru.config.nico_seiga_user_session, http: Danbooru::Http.new)
     @work_id = work_id
     @work_type = type
+    @user_session = user_session
     @http = http
   end
 
@@ -60,7 +61,7 @@ class NicoSeigaApiClient
       api_response = JSON.parse(resp)["target_image"]
 
     when "manga"
-      resp = http.cache(1.minute).get("#{XML_API}/theme/info?id=#{@work_id}")
+      resp = get("#{XML_API}/theme/info?id=#{@work_id}")
       return {} if resp.blank? || resp.code.to_i == 404
       api_response = Hash.from_xml(resp.to_s)["response"]["theme"]
     end
@@ -79,26 +80,24 @@ class NicoSeigaApiClient
   end
 
   def user_api_response(user_id)
-    resp = http.cache(1.minute).get("#{XML_API}/user/info?id=#{user_id}")
+    resp = get("#{XML_API}/user/info?id=#{user_id}")
     return {} if resp.blank? || resp.code.to_i == 404
     Hash.from_xml(resp.to_s)["response"]["user"]
   end
 
-  def login
-    form = {
-      mail_tel: Danbooru.config.nico_seiga_login,
-      password: Danbooru.config.nico_seiga_password
+  def cookies
+    {
+      skip_fetish_warning: "1",
+      user_session: user_session,
     }
-
-    # XXX should fail gracefully instead of raising exception
-    resp = http.cache(1.hour).post("https://account.nicovideo.jp/login/redirector?site=seiga", form: form)
-    raise "NicoSeiga login failed (status=#{resp.status})" if resp.status != 200
-
-    http
   end
 
   def get(url)
-    login.cache(1.minute).get(url)
+    http.cookies(cookies).cache(1.minute).get(url)
+  end
+
+  def head(url)
+    http.cookies(cookies).cache(1.minute).head(url)
   end
 
   memoize :api_response, :manga_api_response, :user_api_response
