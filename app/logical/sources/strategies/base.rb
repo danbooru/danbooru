@@ -46,8 +46,8 @@ module Sources
         @referer_url = referer_url&.to_s
         @urls = [@url, @referer_url].select(&:present?)
 
-        @parsed_url = Addressable::URI.heuristic_parse(url) rescue nil
-        @parsed_referer = Addressable::URI.heuristic_parse(referer_url) rescue nil
+        @parsed_url = Danbooru::URL.parse(url)
+        @parsed_referer = Danbooru::URL.parse(referer_url)
         @parsed_urls = [parsed_url, parsed_referer].select(&:present?)
       end
 
@@ -65,7 +65,7 @@ module Sources
       end
 
       def site_name
-        host = Addressable::URI.heuristic_parse(url)&.host
+        host = parsed_url&.host
 
         # XXX should go in dedicated strategies.
         case host
@@ -134,8 +134,6 @@ module Sources
         else
           host
         end
-      rescue Addressable::URI::InvalidURIError
-        nil
       end
 
       # Whatever <tt>url</tt> is, this method should return the direct links

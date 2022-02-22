@@ -70,8 +70,7 @@ class Upload < ApplicationRecord
     class_methods do
       # percent-encode unicode characters in the URL
       def normalize_source(url)
-        return nil if url.nil?
-        Addressable::URI.normalized_encode(url)
+        Danbooru::URL.parse(url)&.to_s.presence || url
       end
     end
   end

@@ -314,10 +314,7 @@ class Post < ApplicationRecord
     def source_domain
       return "" unless source =~ %r{\Ahttps?://}i
 
-      url = Addressable::URI.parse(normalized_source)
-      url.domain
-    rescue StandardError
-      ""
+      Danbooru::URL.parse(normalized_source)&.domain.to_s
     end
   end
 
