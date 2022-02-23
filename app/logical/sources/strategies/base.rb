@@ -46,8 +46,8 @@ module Sources
         @referer_url = referer_url&.to_s
         @urls = [@url, @referer_url].select(&:present?)
 
-        @parsed_url = Danbooru::URL.parse(url)
-        @parsed_referer = Danbooru::URL.parse(referer_url)
+        @parsed_url = Source::URL.parse(url)
+        @parsed_referer = Source::URL.parse(referer_url) if referer_url.present?
         @parsed_urls = [parsed_url, parsed_referer].select(&:present?)
       end
 

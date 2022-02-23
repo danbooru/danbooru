@@ -4,29 +4,42 @@ module Danbooru
   class URL
     class Error < StandardError; end
 
+    # @return [String] The original URL as a string.
     attr_reader :original_url, :url
-    delegate_missing_to :url
 
-    # Parse a string into an URL, or raise an exception if the string is not a valid HTTPS or HTTPS URL.
+    # @return [Addressable:URI] The parsed and normalized URL.
+    attr_reader :url
+
+    delegate :domain, :host, :site, :path, to: :url
+
+    # Parse a string into a URL, or raise an exception if the string is not a valid HTTPS or HTTPS URL.
     #
-    # @param string [String]
-    # @return [Danbooru::URL]
-    def initialize(string)
-      @original_url = string
-      @url = Addressable::URI.heuristic_parse(string).display_uri
+    # @param url [String, Danbooru::URL]
+    def initialize(url)
+      @original_url = url.to_s
+      @url = Addressable::URI.heuristic_parse(original_url).display_uri
       @url.path = nil if @url.path == "/"
-      raise Error, "#{string} is not an http:// URL" if !@url.normalized_scheme.in?(["http", "https"])
+
+      raise Error, "#{original_url} is not an http:// URL" if !@url.normalized_scheme.in?(["http", "https"])
     rescue Addressable::URI::InvalidURIError => e
       raise Error, e
     end
 
-    # Parse a string into an URL, or return nil if the string is not a valid HTTP or HTTPS URL.
+    # Parse a string into a URL, or raise an exception if the string is not a valid HTTPS or HTTPS URL.
     #
-    # @param string [String]
+    # @param url [String, Danbooru::URL]
     # @return [Danbooru::URL]
-    def self.parse(string)
-      new(string)
-    rescue StandardError => e
+    def self.parse!(url)
+      new(url)
+    end
+
+    # Parse a string into a URL, or return nil if the string is not a valid HTTP or HTTPS URL.
+    #
+    # @param url [String, Danbooru::URL]
+    # @return [Danbooru::URL]
+    def self.parse(url)
+      parse!(url)
+    rescue Error
       nil
     end
 
@@ -42,7 +55,7 @@ module Danbooru
 
     # @return [Hash] the URL's query parameters
     def params
-      url.query_values.with_indifferent_access
+      url.query_values.to_h.with_indifferent_access
     end
   end
 end

@@ -1,28 +1,8 @@
 # frozen_string_literal: true
 
+# @see Source::URL::Twitter
 module Sources::Strategies
   class Twitter < Base
-    PAGE = %r{\Ahttps?://(?:mobile\.)?twitter\.com}i
-    PROFILE = %r{\Ahttps?://(?:mobile\.)?twitter.com/(?<username>[a-z0-9_]+)}i
-
-    # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg
-    # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=900x900
-    # https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg
-    # https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
-    # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg
-    BASE_IMAGE_URL = %r{\Ahttps?://pbs\.twimg\.com/(?<media_type>media|tweet_video_thumb|ext_tw_video_thumb|amplify_video_thumb)}i
-    FILENAME1 = /(?<file_name>[a-zA-Z0-9_-]+)\.(?<file_ext>\w+)/i
-    FILENAME2 = /(?<file_name>[a-zA-Z0-9_-]+)\?.*format=(?<file_ext>\w+)/i
-    FILEPATH1 = %r{(?<file_path>\d+/[\w_-]+/img)}i
-    FILEPATH2 = %r{(?<file_path>\d+/img)}i
-    IMAGE_URL1 = %r{#{BASE_IMAGE_URL}/#{Regexp.union(FILENAME1, FILENAME2)}}i
-    IMAGE_URL2 = %r{#{BASE_IMAGE_URL}/#{Regexp.union(FILEPATH1, FILEPATH2)}/#{FILENAME1}}i
-
-    # Twitter provides a list but it's inaccurate; some names ('intent') aren't
-    # included and other names in the list aren't actually reserved.
-    # https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration
-    RESERVED_USERNAMES = %w[home i intent search]
-
     # List of hashtag suffixes attached to tag other names
     # Ex: 西住みほ生誕祭2019 should be checked as 西住みほ
     # The regexes will not match if there is nothing preceding
@@ -43,24 +23,6 @@ module Sources::Strategies
       Danbooru.config.twitter_api_key.present? && Danbooru.config.twitter_api_secret.present?
     end
 
-    # https://twitter.com/i/web/status/943446161586733056
-    # https://twitter.com/motty08111213/status/943446161586733056
-    def self.status_id_from_url(url)
-      if url =~ %r{\Ahttps?://(?:(?:www|mobile)\.)?twitter\.com/(?:i/web|\w+)/status/(\d+)}i
-        return $1
-      end
-
-      nil
-    end
-
-    def self.tag_name_from_url(url)
-      if url =~ PROFILE && !$~[:username].in?(RESERVED_USERNAMES)
-        $~[:username]
-      else
-        nil
-      end
-    end
-
     def domains
       ["twitter.com", "twimg.com"]
     end
@@ -70,10 +32,9 @@ module Sources::Strategies
     end
 
     def image_urls
-      if url =~ IMAGE_URL1
-        ["https://pbs.twimg.com/#{$~[:media_type]}/#{$~[:file_name]}.#{$~[:file_ext]}:orig"]
-      elsif url =~ IMAGE_URL2
-        ["https://pbs.twimg.com/#{$~[:media_type]}/#{$~[:file_path]}/#{$~[:file_name]}.#{$~[:file_ext]}:orig"]
+      # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
+      if parsed_url.image_url?
+        [parsed_url.orig_image_url]
       elsif api_response.present?
         api_response.dig(:extended_entities, :media).to_a.map do |media|
           if media[:type] == "photo"
@@ -217,11 +178,11 @@ module Sources::Strategies
     end
 
     def status_id
-      [url, referer_url].map {|x| self.class.status_id_from_url(x)}.compact.first
+      parsed_url.status_id || parsed_referer&.status_id
     end
 
     def tag_name_from_url
-      [url, referer_url].map {|x| self.class.tag_name_from_url(x)}.compact.first
+      parsed_url.twitter_username || parsed_referer&.twitter_username
     end
 
     memoize :api_response
