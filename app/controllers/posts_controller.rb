@@ -80,10 +80,8 @@ class PostsController < ApplicationController
       flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
       redirect_to @original_post
     else
-      @upload = @upload_media_asset.upload
-      @media_asset = @upload_media_asset.media_asset
       flash[:notice] = @post.errors.full_messages.join("; ")
-      respond_with(@post, render: { template: "uploads/show" })
+      respond_with(@post, render: { template: "upload_media_assets/show" })
     end
   end
 
