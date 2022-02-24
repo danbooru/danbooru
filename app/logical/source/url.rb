@@ -19,6 +19,7 @@ module Source
   class URL < Danbooru::URL
     SUBCLASSES = [
       Source::URL::Twitter,
+      Source::URL::TwitPic,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.

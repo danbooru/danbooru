@@ -22,6 +22,7 @@ module Sources
         Strategies::Lofter,
         Strategies::Foundation,
         Strategies::Plurk,
+        Strategies::TwitPic,
       ]
     end
 

@@ -29,11 +29,6 @@ module Sources
     end
 
     context "normalizing for source" do
-      should "normalize twitpic links" do
-        source = "http://d3j5vwomefv46c.cloudfront.net/photos/large/820960031.jpg?1384107199"
-        assert_equal("https://twitpic.com/dks0tb", Sources::Strategies.normalize_source(source))
-      end
-
       should "normalize karabako links" do
         source = "http://www.karabako.net/images/karabako_38835.jpg"
         assert_equal("http://www.karabako.net/post/view/38835", Sources::Strategies.normalize_source(source))

@@ -321,11 +321,6 @@ module Sources
         assert_equal(source2, Sources::Strategies.normalize_source(source3))
         assert_equal(source2, Sources::Strategies.normalize_source(source4))
       end
-
-      should "normalize twimg twitpic correctly" do
-        source = "https://o.twimg.com/2/proxy.jpg?t=HBgpaHR0cHM6Ly90d2l0cGljLmNvbS9zaG93L2xhcmdlL2R0bnVydS5qcGcUsAkU0ggAFgASAA&s=dnN4DHCdnojC-iCJWdvZ-UZinrlWqAP7k7lmll2fTxs"
-        assert_equal("https://twitpic.com/dtnuru", Sources::Strategies.normalize_source(source))
-      end
     end
   end
 end

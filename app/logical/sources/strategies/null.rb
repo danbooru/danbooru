@@ -17,11 +17,6 @@ module Sources
 
       def normalize_for_source
         case url
-        when %r{\Ahttps?://(?:d3j5vwomefv46c|dn3pm25xmtlyu)\.cloudfront\.net/photos/large/(\d+)\.}i
-          base_10_id = $1.to_i
-          base_36_id = base_10_id.to_s(36)
-          "https://twitpic.com/#{base_36_id}"
-
         when %r{\Ahttp://www\.karabako\.net/images(?:ub)?/karabako_(\d+)(?:_\d+)?\.}i
           "http://www.karabako.net/post/view/#{$1}"
 

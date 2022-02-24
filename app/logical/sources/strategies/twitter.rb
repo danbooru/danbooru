@@ -23,12 +23,12 @@ module Sources::Strategies
       Danbooru.config.twitter_api_key.present? && Danbooru.config.twitter_api_secret.present?
     end
 
-    def domains
-      ["twitter.com", "twimg.com"]
+    def match?
+      parsed_url&.site_name == "Twitter"
     end
 
     def site_name
-      "Twitter"
+      parsed_url.site_name
     end
 
     def image_urls
@@ -118,18 +118,6 @@ module Sources::Strategies
         "https://twitter.com/#{tag_name_from_url}/status/#{status_id}"
       elsif status_id.present?
         "https://twitter.com/i/web/status/#{status_id}"
-      elsif url =~ %r{\Ahttps?://(?:o|image-proxy-origin)\.twimg\.com/\d/proxy\.jpg\?t=(\w+)&}i
-        str = Base64.decode64($1)
-        source = URI.extract(str, %w[http https])
-        if source.any?
-          source = source[0]
-          if source =~ %r{^https?://twitpic.com/show/large/[a-z0-9]+}i
-            source.gsub!(%r{show/large/}, "")
-            index = source.rindex(".")
-            source = source[0..index - 1]
-          end
-          source
-        end
       end
     end
 
