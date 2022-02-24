@@ -20,6 +20,7 @@ module Source
     SUBCLASSES = [
       Source::URL::Twitter,
       Source::URL::TwitPic,
+      Source::URL::Foundation,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.

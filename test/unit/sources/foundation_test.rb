@@ -24,7 +24,10 @@ module Sources
 
       should "get profile url" do
         assert_equal("https://foundation.app/@dadachyo", @image1.profile_url)
+        assert_equal(["https://foundation.app/@dadachyo", "https://foundation.app/0xb4D9073800c7935351ACDC1e46F0CF670853eA99"], @image1.profile_urls)
+
         assert_equal("https://foundation.app/@huwari", @image3.profile_url)
+        assert_equal(["https://foundation.app/@huwari", "https://foundation.app/0xaa2f2eDE4D502F59b3706d2E2dA873C8A00A3d4d"], @image3.profile_urls)
       end
 
       should "get the image url" do
@@ -47,6 +50,31 @@ module Sources
         assert_nothing_raised { @image1.to_h }
         assert_nothing_raised { @image2.to_h }
         assert_nothing_raised { @image3.to_h }
+      end
+    end
+
+    context "for a foundation.app/@username/foo-bar-1234 URL" do
+      should "work" do
+        page_url = "https://foundation.app/@asuka111art/dinner-with-cats-82426"
+        image_url = "https://f8n-ipfs-production.imgix.net/Qma7Lz2LfFb4swoqzr1V43oRGh9xikgigM11g3EukdU61R/nft.png"
+        source = Sources::Strategies.find(page_url)
+
+        assert_equal("asuka111art", source.artist_name)
+        assert_equal(["https://foundation.app/@asuka111art", "https://foundation.app/0x9A94f94626352566e0A9105F1e3DA0439E3e3783"], source.profile_urls)
+        assert_equal([image_url], source.image_urls)
+        assert_equal(%w[2d anime illustration digital fantasy], source.tags.map(&:first))
+      end
+    end
+
+    context "for a f8n-production-collection-assets.imgix.net URL" do
+      should "work" do
+        image_url = "https://f8n-production-collection-assets.imgix.net/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/128711/QmcBfbeCMSxqYB3L1owPAxFencFx3jLzCPFx6xUBxgSCkH/nft.png?q=80&auto=format%2Ccompress&cs=srgb&h=640"
+        source = Sources::Strategies.find(image_url)
+
+        assert_equal("mochiiimo", source.artist_name)
+        assert_equal(["https://foundation.app/@mochiiimo", "https://foundation.app/0x7E2ef75C0C09b2fc6BCd1C68B6D409720CcD58d2"], source.profile_urls)
+        assert_equal(["https://f8n-ipfs-production.imgix.net/QmcBfbeCMSxqYB3L1owPAxFencFx3jLzCPFx6xUBxgSCkH/nft.png"], source.image_urls)
+        assert_equal(%w[anime landscape girl cat 2d illustration matcrewnft], source.tags.map(&:first))
       end
     end
 

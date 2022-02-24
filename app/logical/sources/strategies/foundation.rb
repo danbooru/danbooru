@@ -1,43 +1,13 @@
 # frozen_string_literal: true
 
-# Image URLs
-# * https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png
-#
-# Page URLs
-#
-# * https://foundation.app/@mochiiimo/~/97376
-# * https://foundation.app/@mochiiimo/foundation/97376
-# * https://foundation.app/@KILLERGF/kgfgen/4
-# * https://foundation.app/@huwari/~/88982 (video)
-#
-# Even if the username is wrong, the ID is still fetched correctly. Example:
-# * https://foundation.app/@asdasdasd/~/97376
-#
-# Profile URLs
-#
-# Profile urls seem to accept any character in them, even no character at all:
-# * https://foundation.app/@mochiiimo
-# * https://foundation.app/@ <- This seems to be a novelty account.
-#                               Probably not worth supporting it given its
-#                               uniqueness and chance for headaches
-
+# @see Source::URL::Foundation
 module Sources
   module Strategies
     class Foundation < Base
-      BASE_URL    = %r{\Ahttps?://(www\.)?foundation\.app}i
-      PROFILE_URL = %r{#{BASE_URL}/@(?<artist_name>[^/]+)/?}i
-      PAGE_URL    = %r{#{PROFILE_URL}/[^/]+/(?<illust_id>\d+)}i
-
-      IMAGE_HOST  = /f8n-ipfs-production\.imgix\.net/
-      IMAGE_URL   = %r{\Ahttps?://#{IMAGE_HOST}/\w+/nft.\w+}i
-
-      def domains
-        ["foundation.app"]
-      end
+      extend Memoist
 
       def match?
-        return false if parsed_url.nil?
-        parsed_url.domain.in?(domains) || parsed_url.host =~ IMAGE_HOST
+        parsed_url&.site_name == "Foundation"
       end
 
       def site_name
@@ -45,14 +15,13 @@ module Sources
       end
 
       def image_urls
-        return [url.gsub(/\?.*/, "")] if url =~ IMAGE_URL
-        image = page&.at(".fullscreen img, .fullscreen video")&.[](:src)&.gsub(/\?.*/, "")
-
-        if image =~ %r{assets\.foundation\.app/(?:\w+/)+(\w+)/nft_\w+\.(\w+)}i
-          image = "https://f8n-ipfs-production.imgix.net/#{$1}/nft.#{$2}"
+        if parsed_url.full_image_url.present?
+          [parsed_url.full_image_url]
+        elsif image_url = page&.at(".fullscreen img, .fullscreen video")&.attr(:src)
+          [Source::URL.parse(image_url).full_image_url].compact
+        else
+          []
         end
-
-        [image].compact
       end
 
       def preview_urls
@@ -62,7 +31,7 @@ module Sources
       end
 
       def page_url
-        urls.select { |url| url[PAGE_URL]}.compact.first
+        parsed_url.page_url || parsed_referer&.page_url
       end
 
       def page
@@ -75,20 +44,33 @@ module Sources
       end
 
       def tags
-        tags = page&.search("a[href^='/tags/']").to_a
+        tags = api_response.dig("props", "pageProps", "artwork", "tags").to_a
 
         tags.map do |tag|
-          [tag.text, URI.join(page_url, tag.attr("href")).to_s]
+          [tag, "https://foundation.app/tags/#{tag}"]
         end
       end
 
       def artist_name
-        urls.map { |u| u[PROFILE_URL, :artist_name] }.compact.first
+        parsed_url.username || parsed_referer&.username || api_response.dig("props", "pageProps", "artwork", "creator", "username")
       end
 
       def profile_url
         return nil if artist_name.blank?
         "https://foundation.app/@#{artist_name}"
+      end
+
+      def profile_urls
+        [profile_url, creator_public_key_url].compact
+      end
+
+      def creator_public_key_url
+        return nil if creator_public_key.nil?
+        "https://foundation.app/#{creator_public_key}"
+      end
+
+      def creator_public_key
+        api_response.dig("props", "pageProps", "artwork", "creator", "publicKey")
       end
 
       def artist_commentary_title
@@ -109,6 +91,17 @@ module Sources
       def normalize_for_source
         page_url
       end
+
+      def api_response
+        return {} if page.nil?
+
+        data = page.at("#__NEXT_DATA__")&.text
+        return {} if data.blank?
+
+        JSON.parse(data).with_indifferent_access
+      end
+
+      memoize :api_response
     end
   end
 end
