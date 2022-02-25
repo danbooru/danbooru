@@ -1,24 +1,10 @@
 # frozen_string_literal: true
 
-# Image URLs
-#
-# * https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg
-#
-# Page URLs
-#
-# * https://www.plurk.com/p/om6zv4
-#
-# Profile URLs
-#
-# * https://www.plurk.com/redeyehare
-
+# @see Source::URL::Plurk
 module Sources
   module Strategies
     class Plurk < Base
-      BASE_URL    = %r{\Ahttps?://(?:www\.)?plurk\.com}i
-      PAGE_URL    = %r{#{BASE_URL}(?:/m)?/p/(?<illust_id>\w+)}i
-      PROFILE_URL = %r{#{BASE_URL}/\w+}i
-      IMAGE_URL =   %r{https?://images\.plurk\.com/\w+\.\w+}i
+      extend Memoist
 
       def domains
         ["plurk.com"]
@@ -29,26 +15,23 @@ module Sources
       end
 
       def image_urls
-        return [url] if url =~ IMAGE_URL
-        images = page&.search(".bigplurk .content a img, .response.highlight_owner .content a img").to_a.map { |img| img["alt"] }
-        # the above returns both the "main" images, and any other art the artist might have posted in the replies
-
-        if images.empty?
-          # in case of adult posts, we fall back to the internal api, which doesn't show replies
-          images = images_from_internal_api
+        if parsed_url.image_url?
+          [url]
+        elsif page_json["porn"]
+          # in case of adult posts, we get the main images and the replies separately
+          images_from_script_tag + images_from_replies
+        else
+          images_from_page
         end
-
-        images
       end
 
       def page_url
         return nil if illust_id.blank?
-
         "https://plurk.com/p/#{illust_id}"
       end
 
       def illust_id
-        urls.map { |u| u[PAGE_URL, :illust_id] }.compact.first
+        parsed_url.work_id || parsed_referer&.work_id
       end
 
       def page
@@ -60,10 +43,38 @@ module Sources
         response.parse
       end
 
-      def images_from_internal_api
-        internal_api = page&.search("body script")&.select {|s| s.text =~ /plurk =/ }.to_a.compact.first&.text
-        return [] unless internal_api.present?
-        internal_api.scan(/(#{IMAGE_URL})/).flatten.compact.uniq.filter { |img| img !~ %r{/mx_\w+}i }
+      # For non-adult works, returns both the main images and the images posted by the artist in the replies.
+      # For adult works, returns only the main images.
+      def images_from_page
+        page&.search(".bigplurk .content a img, .response.highlight_owner .content a img").to_a.pluck("alt")
+      end
+
+      # Returns only the main images, not the images posted in the replies. Used for adult works.
+      def images_from_script_tag
+        URI.extract(page_json["content_raw"])
+      end
+
+      # Returns images posted by the artist in the replies. Used for adult works.
+      def images_from_replies
+        artist_responses = api_replies["responses"].to_a.select { _1["user_id"].to_i == artist_id.to_i }
+        urls = artist_responses.pluck("content_raw").flat_map { URI.extract(_1) }
+        urls.select { Source::URL.parse(_1)&.image_url? }.uniq
+      end
+
+      def page_json
+        script_text = page&.search("body script").to_a.map(&:text).grep(/plurk =/).first.to_s
+        json = script_text.strip.delete_prefix("plurk = ").delete_suffix(";").gsub(/new Date\((.*?)\)/) { $1 }
+        return {} if json.blank?
+        JSON.parse(json)
+      end
+
+      def api_replies
+        return {} if illust_id.blank?
+
+        response = http.cache(1.minute).post("https://www.plurk.com/Responses/get", form: { plurk_id: illust_id.to_i(36), from_response_id: 0 })
+        return {} unless response.status == 200
+
+        response.parse
       end
 
       def tag_name
@@ -72,6 +83,10 @@ module Sources
 
       def artist_name
         page&.at(".bigplurk .user a")&.text
+      end
+
+      def artist_id
+        page&.at("a[data-uid]")&.attr("data-uid").to_i
       end
 
       def profile_url
@@ -94,6 +109,8 @@ module Sources
       def normalize_for_source
         page_url
       end
+
+      memoize :page, :page_json, :api_replies
     end
   end
 end

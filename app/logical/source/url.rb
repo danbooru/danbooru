@@ -19,6 +19,7 @@ module Source
   class URL < Danbooru::URL
     SUBCLASSES = [
       Source::URL::Twitter,
+      Source::URL::Plurk,
       Source::URL::Skeb,
       Source::URL::TwitPic,
       Source::URL::Foundation,
