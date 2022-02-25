@@ -338,6 +338,10 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://foundation.app/@mochiiimo/~/97376")
         should_upload_successfully("https://foundation.app/@mochiiimo/foundation/97376")
         should_upload_successfully("https://foundation.app/@KILLERGF/kgfgen/4")
+
+        should_upload_successfully("https://skeb.jp/@kokuzou593/works/45")
+        should_upload_successfully("https://skeb.jp/@LambOic029/works/146")
+        should_upload_successfully("https://skeb.imgix.net/uploads/origins/307941e9-dbe0-4e4b-93d4-94accdaff9a0?bg=%23fff&auto=format&w=800&s=e0ddfb1fa0d9f23797b338598aae78fa")
       end
     end
   end

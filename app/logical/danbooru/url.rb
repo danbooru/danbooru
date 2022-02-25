@@ -43,8 +43,13 @@ module Danbooru
       nil
     end
 
-    # @return [String] the URL in normalized form
+    # @return [String] the URL in unnormalized form
     def to_s
+      original_url
+    end
+
+    # @return [String] the URL in normalized form
+    def to_normalized_s
       url.to_str
     end
 

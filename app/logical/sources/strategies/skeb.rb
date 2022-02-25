@@ -1,70 +1,52 @@
 # frozen_string_literal: true
 
-# Image URLS
-## Non-watermarked:
-# * https://skeb.imgix.net/requests/199886_0?bg=%23fff&auto=format&w=800&s=5a6a908ab964fcdfc4713fad179fe715
-## Watermarked:
-# * https://skeb.imgix.net/requests/73290_0?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&w=800&s=4843435cff85d623b1f657209d131526
-# * https://skeb.imgix.net/uploads/origins/04d62c2f-e396-46f9-903a-3ca8bd69fc7c?bg=%23fff&auto=format&w=800&s=966c5d0389c3b94dc36ac970f812bef4 (new format)
-## Full Size (found in commissioner_upload):
-# * https://skeb.imgix.net/requests/53269_1?bg=%23fff&fm=png&dl=53269.png&w=1.0&h=1.0&s=44588ea9c41881049e392adb1df21cce
-#
-# The signature is required and tied to the parameters. Doesn't seem like it's possible to reverse engineer it to remove the watermark, unfortunately.
-#
-# Page URLS
-# * https://skeb.jp/@OrvMZ/works/3 (non-watermarked)
-# * https://skeb.jp/@OrvMZ/works/1 (separated request and client's message after delivery. We can't get the latter)
-# * https://skeb.jp/@asanagi/works/16 (age-restricted, watermarked)
-# * https://skeb.jp/@asanagi/works/6 (private, returns 404)
-# * https://skeb.jp/@nasuno42/works/30 (multi-image post)
-#
-# Profile URLS
-# Since skeb forces login through twitter, usernames are the same as twitter
-# * https://skeb.jp/@asanagi
-
+# @see Source::URL::Skeb
 module Sources
   module Strategies
     class Skeb < Base
-      PROFILE_URL = %r{https?://(?:www\.)?skeb\.jp/@(?<artist_name>\w+)}i
-      PAGE_URL    = %r{#{PROFILE_URL}/works/(?<illust_id>\d+)}i
-      IMAGE_URL   = %r{https?://(?:(?:www\.)?skeb\.imgix\.net|skeb-production.s3.ap-northeast-1.amazonaws.com/)/.+}i
-      UUID_REGEX  = %r{/(?<uuid>(?:(?:\w+-)+\w+|(?:\d+_\d+))).*(?:fm=(?<type>\w+))?.*}
-
-      def domains
-        ["skeb.jp"]
-      end
-
-      def image_domains
-        ["skeb.imgix.net", "skeb-production.s3.ap-northeast-1.amazonaws.com"]
-      end
+      extend Memoist
 
       def match?
-        return false if parsed_url.nil?
-        parsed_url.domain.in?(domains) || parsed_url.host.in?(image_domains)
+        parsed_url&.site_name == "Skeb"
       end
 
       def site_name
-        "Skeb"
+        parsed_url.site_name
       end
 
       def image_urls
-        if url =~ IMAGE_URL
+        if parsed_url.image_url?
           [url]
-        elsif api_response.present?
-          previews = api_response["previews"].to_a.map { |preview| preview&.dig("url") }.compact.uniq
-
-          unwatermarked = api_response["article_image_url"]
-          return previews unless unwatermarked.present?
-          previews.map do |p|
-            next p unless p[UUID_REGEX, :uuid].present? && p[UUID_REGEX, :uuid] == unwatermarked[UUID_REGEX, :uuid]
-            next p if p[/fm=(\w+)/, 1].in?(["gif", "mp4"])
-            next p unless p.include?("&txt=")
-
-            unwatermarked
-          end
+        elsif unwatermarked_url.present?
+          # If the unwatermarked URL is present, then find and replace the watermarked URL
+          # with the unwatermarked version (unless the watermarked version is a video or
+          # gif, in which case the unwatermarked URL is not used because it's a still image).
+          #
+          # https://skeb.jp/@goma_feet/works/1: https://skeb.imgix.net/uploads/origins/78ca23dc-a053-4ebe-894f-d5a06e228af8?bg=%23fff&auto=format&w=800&s=3de55b04236059113659f99fd6900d7d
+          # https://skeb.jp/@2gi0gi_/works/13: https://skeb.imgix.net/requests/191942_0?bg=%23fff&fm=jpg&q=45&w=696&s=5783ee951cc55d183713395926389453
+          # https://skeb.jp/@tontaro_/works/316: https://skeb.imgix.net/uploads/origins/5097b1e1-18ce-418e-82f0-e7e2cdab1cea?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=fcff06871e114b3dbf505c04f27b5ed1
+          sample_urls.map do |sample_url|
+            if sample_url.path == unwatermarked_url.path && sample_url.watermarked? && !sample_url.animated?
+              unwatermarked_url
+            else
+              sample_url
+            end
+          end.map(&:to_s)
         else
-          []
+          sample_urls.map(&:to_s)
         end
+      end
+
+      def sample_urls
+        api_response["previews"].to_a.pluck("url").compact.map { |url| Source::URL.parse(url) }
+      end
+
+      # Some posts have an unwatermarked version of the image. Usually it's lower
+      # resolution and lower JPEG quality than the watermarked image. Multi-image posts
+      # will have only one unwatermarked URL.
+      def unwatermarked_url
+        return nil if api_response["article_image_url"].nil?
+        Source::URL.parse(api_response["article_image_url"])
       end
 
       def page_url
@@ -76,13 +58,19 @@ module Sources
         page_url
       end
 
+      def api_url
+        return nil unless artist_name.present? && illust_id.present?
+        "https://skeb.jp/api/users/#{artist_name}/works/#{illust_id}"
+      end
+
       def api_response
-        return {} unless artist_name.present? && illust_id.present?
+        return {} unless api_url.present?
+
         headers = {
           Referer: profile_url,
           Authorization: "Bearer null",
         }
-        api_url = "https://skeb.jp/api/users/#{artist_name}/works/#{illust_id}"
+
         response = http.cache(1.minute).headers(headers).get(api_url)
         return {} unless response.status == 200
         # The status check is required for private commissions, which return 404
@@ -96,7 +84,7 @@ module Sources
       end
 
       def artist_name
-        urls.map { |u| u[PROFILE_URL, :artist_name] }.compact.first
+        parsed_url.username || parsed_referer&.username
       end
 
       def display_name
@@ -104,7 +92,7 @@ module Sources
       end
 
       def illust_id
-        urls.map { |u| u[PAGE_URL, :illust_id] }.compact.first
+        parsed_url.work_id || parsed_referer&.work_id
       end
 
       def other_names
@@ -127,6 +115,8 @@ module Sources
           artist_commentary_desc
         end
       end
+
+      memoize :api_response
     end
   end
 end

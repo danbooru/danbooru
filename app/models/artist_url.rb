@@ -118,7 +118,7 @@ class ArtistURL < ApplicationRecord
   end
 
   def self.normalize_url(url)
-    Danbooru::URL.parse(url)&.to_s.presence || url
+    Danbooru::URL.parse(url)&.to_normalized_s.presence || url
   end
 
   def url=(url)
