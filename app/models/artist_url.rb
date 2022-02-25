@@ -72,7 +72,7 @@ class ArtistURL < ApplicationRecord
   end
 
   def domain
-    Danbooru::URL.parse(normalized_url)&.domain
+    Danbooru::URL.parse(normalized_url)&.domain.to_s
   end
 
   def site_name
