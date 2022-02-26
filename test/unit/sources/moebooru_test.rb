@@ -27,9 +27,9 @@ module Sources
         end
       end
 
-      context "A 'https://assets.yande.re/preview/:hh/:hh/:file.jpg' preview url" do
+      context "A 'https://files.yande.re/preview/:hh/:hh/:file.jpg' preview url" do
         should "return a non-empty list of preview_urls" do
-          url = "https://assets.yande.re/data/preview/7c/d1/7cd124fc28203233cce3bade26651d43.jpg"
+          url = "https://files.yande.re/data/preview/7c/d1/7cd124fc28203233cce3bade26651d43.jpg"
           site = Sources::Strategies.find(url)
 
           assert_equal([url], site.preview_urls)
@@ -45,7 +45,7 @@ module Sources
           @tags = ["bayashiko", "journey_to_the_west", "sun_wukong"]
           @size = 362_554
           @profile_url = "https://twitter.com/apononori"
-          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }
+          @data = { site_name: "Yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }
 
           assert_source_data_equals(@samp, **@data)
           assert_source_data_equals(@full, **@data)
@@ -62,7 +62,7 @@ module Sources
           @page = "https://yande.re/post/show/398018"
           @tags = ["misaki_kurehito", "saenai_heroine_no_sodatekata", "sawamura_spencer_eriri", "detexted", "thighhighs"]
           @size = 9_118_998
-          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: nil }
+          @data = { site_name: "Yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: nil }
 
           assert_source_data_equals(@samp, **@data)
           assert_source_data_equals(@jpeg, **@data)
@@ -79,7 +79,7 @@ module Sources
           @full = "https://files.yande.re/image/fb27a7ea6c48b2ef76fe915e378b9098.png"
           @tags = []
           @size = 9_118_998
-          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: nil }
+          @data = { site_name: "Yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: nil }
 
           assert_source_data_equals(@samp, **@data)
           assert_source_data_equals(@jpeg, **@data)
@@ -104,7 +104,7 @@ module Sources
           ]
           @profile_url = "https://www.pixiv.net/users/22528152"
 
-          @data = { site_name: "konachan.com", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }
+          @data = { site_name: "Konachan", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }
           assert_source_data_equals(@samp, **@data)
           assert_source_data_equals(@jpeg, **@data)
           assert_source_data_equals(@full, **@data)
