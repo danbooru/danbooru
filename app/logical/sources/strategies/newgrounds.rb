@@ -1,37 +1,19 @@
 # frozen_string_literal: true
 
-# Image Urls
-# * https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg
-# * https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181
-# * https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg
-#
-# Page URLs
-# * https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat
-# * https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic (multiple)
-#
-# Profile URLs
-# * https://natthelich.newgrounds.com/
-
+# @see Source::URL::Newgrounds
 module Sources
   module Strategies
     class Newgrounds < Base
-      IMAGE_URL   = %r{\Ahttps?://art\.ngfiles\.com/images/\d+/\d+_(?<user_name>[0-9a-z-]+)_(?<illust_title>[0-9a-z-]+)\.\w+}i
-      COMMENT_URL = %r{\Ahttps?://art\.ngfiles\.com/comments/\d+/\w+\.\w+}i
-
-      PAGE_URL    = %r{\Ahttps?://(?:www\.)?newgrounds\.com/art/view/(?<user_name>[0-9a-z-]+)/(?<illust_title>[0-9a-z-]+)(?:\?.*)?}i
-
-      PROFILE_URL = %r{\Ahttps?://(?<artist_name>(?!www)[0-9a-z-]+)\.newgrounds\.com(?:/.*)?}i
-
-      def domains
-        ["newgrounds.com", "ngfiles.com"]
+      def match?
+        parsed_url&.site_name == "Newgrounds"
       end
 
       def site_name
-        "NewGrounds"
+        "Newgrounds"
       end
 
       def image_urls
-        if url =~ COMMENT_URL || url =~ IMAGE_URL
+        if parsed_url.image_url?
           [url]
         else
           urls = []
@@ -97,16 +79,25 @@ module Sources
         DText.from_html(artist_commentary_desc)
       end
 
+      # The image url should be the post source, if we can generate the page url from the image url.
+      def canonical_url
+        if page_url.present?
+          url
+        else
+          page_url
+        end
+      end
+
       def normalize_for_source
         page_url
       end
 
       def user_name
-        urls.map { |u| url[PROFILE_URL, :artist_name] || u[IMAGE_URL, :user_name] || u[PAGE_URL, :user_name] }.compact.first
+        parsed_url.username || parsed_referer&.username
       end
 
       def illust_title
-        urls.map { |u| u[IMAGE_URL, :illust_title] || u[PAGE_URL, :illust_title] }.compact.first
+        parsed_url.work_title || parsed_referer&.work_title
       end
     end
   end

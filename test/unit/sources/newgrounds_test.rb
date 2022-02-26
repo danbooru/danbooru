@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Sources
-  class NewGroundsTest < ActiveSupport::TestCase
+  class NewgroundsTest < ActiveSupport::TestCase
     context "The source for a newgrounds picture" do
       setup do
         @url = "https://www.newgrounds.com/art/view/hcnone/sephiroth"
@@ -32,7 +32,7 @@ module Sources
 
       should "get the canonical url" do
         assert_equal(@url, @image_1.canonical_url)
-        assert_equal(@url, @image_2.canonical_url)
+        assert_equal(@image_url, @image_2.canonical_url)
       end
 
       should "download an image" do
@@ -59,6 +59,18 @@ module Sources
         assert_equal([artist_1, artist_2], @image_2.artists)
 
         assert_not_equal([artist_3], @image_1.artists)
+      end
+    end
+
+    context "A multi-image Newgrounds post" do
+      should "get all the images" do
+        source = Sources::Strategies.find("https://www.newgrounds.com/art/view/natthelich/weaver")
+        image_urls = [
+          "https://art.ngfiles.com/images/1520000/1520217_natthelich_weaver.jpg?f1606365031",
+          "https://art.ngfiles.com/comments/199000/iu_199826_7115981.jpg",
+        ]
+
+        assert_equal(image_urls, source.image_urls)
       end
     end
 

@@ -20,6 +20,7 @@ module Source
     SUBCLASSES = [
       Source::URL::Twitter,
       Source::URL::HentaiFoundry,
+      Source::URL::Newgrounds,
       Source::URL::Plurk,
       Source::URL::Skeb,
       Source::URL::TwitPic,
