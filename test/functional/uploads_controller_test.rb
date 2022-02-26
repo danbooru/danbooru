@@ -345,6 +345,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://www.plurk.com/p/omc64y")
         should_upload_successfully("https://www.plurk.com/p/om6zv4")
+
+        should_upload_successfully("https://gengar563.lofter.com/post/1e82da8c_1c98dae1b")
       end
     end
   end

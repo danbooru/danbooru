@@ -1,57 +1,26 @@
 # frozen_string_literal: true
 
-# Image URLs
-#
-# # sample
-# * https://imglf3.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJSzFCWFlnUWgzb01DcUdpT1lreG5yQjJVMkhGS09HNGR3PT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0
-#
-# # full size
-# * https://imglf3.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJSzFCWFlnUWgzb01DcUdpT1lreG5yQjJVMkhGS09HNGR3PT0.png
-# * http://imglf0.nosdn.127.net/img/cHl3bXNZdDRaaHBnNWJuN1Y4OXBqR01CeVBZSVNmU2FWZWtHc1h4ZTZiUGxlRzMwZnFDM1JnPT0.jpg (404)
-#
-# Page URLs
-#
-# * https://gengar563.lofter.com/post/1e82da8c_1c98dae1b
-# * https://yuli031458.lofter.com/post/3163d871_1cbdc5f6d (different theme/css selectors)
-# * https://ssucrose.lofter.com/post/1d30f3e4_1cc58e9f0 (another different theme)
-# * https://zuodaoxing.lofter.com/post/30b9c9c3_1cd15b686 (another theme)
-#
-# Profile URLs
-#
-# * http://gengar563.lofter.com/
-
+# @see Source::URL::Lofter
 module Sources
   module Strategies
     class Lofter < Base
-      PROFILE_URL = %r{\Ahttps?://(?<artist_name>[\w-]+).lofter.com}i
-      PAGE_URL =    %r{#{PROFILE_URL}/post/(?<illust_id>[\w-]+)}i
-      IMAGE_HOST =  %r{\Ahttps?://imglf\d\.(?:nosdn\d?\.12\d|lf127)\.net}i
+      extend Memoist
 
-      def domains
-        ["lofter.com", "lf127.net"]
+      def match?
+        parsed_url&.site_name == "Lofter"
       end
 
       def site_name
-        "Lofter"
-      end
-
-      def match?
-        return false if parsed_url.nil?
-        parsed_url.domain.in?(domains) || parsed_url.host =~ IMAGE_HOST
+        parsed_url.site_name
       end
 
       def image_urls
-        if url =~ IMAGE_HOST
-          [get_full_version(url)]
+        if parsed_url.image_url?
+          [parsed_url.full_image_url]
         else
           images = page&.search(".imgclasstag img")
-          images.to_a.map { |img| get_full_version(img["src"]) }
+          images.to_a.pluck("src").map { |url| Source::URL.parse(url).full_image_url }
         end
-      end
-
-      def get_full_version(url)
-        parsed = URI.parse(url)
-        "https://#{parsed.host}#{parsed.path}"
       end
 
       def profile_url
@@ -97,12 +66,14 @@ module Sources
       end
 
       def illust_id
-        urls.map { |u| u[PAGE_URL, :illust_id] }.compact.first
+        parsed_url.work_id || parsed_referer&.work_id
       end
 
       def artist_name
-        urls.map { |u| u[PROFILE_URL, :artist_name] || u[PAGE_URL, :artist_name] }.compact.first
+        parsed_url.username || parsed_referer&.username
       end
+
+      memoize :page
     end
   end
 end
