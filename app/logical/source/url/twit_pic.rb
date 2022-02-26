@@ -28,6 +28,10 @@ class Source::URL::TwitPic < Source::URL
     url.host.in?(%w[twitpic.com o.twimg.com dn3pm25xmtlyu.cloudfront.net d3j5vwomefv46c.cloudfront.net])
   end
 
+  def site_name
+    "TwitPic"
+  end
+
   def parse
     case [domain, *path_segments]
 

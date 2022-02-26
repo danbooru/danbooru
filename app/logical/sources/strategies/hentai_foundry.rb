@@ -1,42 +1,17 @@
 # frozen_string_literal: true
 
-# Image URLs
-#
-# * https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png
-#
-# Page URLs
-#
-# * https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda
-# * https://www.hentai-foundry.com/pictures/user/Afrobull/795025
-# * http://www.hentai-foundry.com/pic-795025
-# * http://www.hentai-foundry.com/pictures/user/Ganassa/457176/LOL-Swimsuit---Caitlyn-reworked-nude-ver.
-#
-# Preview URLs
-#
-# * https://thumbs.hentai-foundry.com/thumb.php?pid=795025&size=350
-#
-# Profile URLs
-#
-# * https://www.hentai-foundry.com/user/kajinman/profile
-# * https://www.hentai-foundry.com/pictures/user/kajinman
-# * https://www.hentai-foundry.com/pictures/user/kajinman/scraps
-# * https://www.hentai-foundry.com/user/J-likes-to-draw/profile
-
+# @see Source::URL::HentaiFoundry
 module Sources
   module Strategies
     class HentaiFoundry < Base
-      BASE_URL =    %r{\Ahttps?://(?:www\.)?hentai-foundry\.com}i
-      PAGE_URL =    %r{#{BASE_URL}/pictures/user/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:/[\w.-]*)?(\?[\w=]*)?\z}i
-      OLD_PAGE =    %r{#{BASE_URL}/pic-(?<illust_id>\d+)(?:\.html)?\z}i
-      PROFILE_URL = %r{#{BASE_URL}/(?:pictures/)?user/(?<artist_name>[\w-]+)(?:/[a-z]*)?\z}i
-      IMAGE_URL =   %r{\Ahttps?://pictures\.hentai-foundry\.com/+\w/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:(?:/[\w.-]+)?\.\w+)?\z}i
+      extend Memoist
 
-      def domains
-        ["hentai-foundry.com"]
+      def match?
+        parsed_url&.site_name == "Hentai Foundry"
       end
 
       def site_name
-        "Hentai Foundry"
+        parsed_url.site_name
       end
 
       def image_urls
@@ -81,7 +56,7 @@ module Sources
       end
 
       def artist_name
-        urls.map { |url| url[PROFILE_URL, :artist_name] || url[PAGE_URL, :artist_name] || url[IMAGE_URL, :artist_name] }.compact.first
+        parsed_url.username || parsed_referer&.username
       end
 
       def canonical_url
@@ -110,8 +85,10 @@ module Sources
       end
 
       def illust_id
-        url[PAGE_URL, :illust_id] || url[IMAGE_URL, :illust_id] || url[OLD_PAGE, :illust_id]
+        parsed_url.work_id || parsed_referer&.work_id
       end
+
+      memoize :page
     end
   end
 end

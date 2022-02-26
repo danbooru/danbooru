@@ -19,6 +19,7 @@ module Source
   class URL < Danbooru::URL
     SUBCLASSES = [
       Source::URL::Twitter,
+      Source::URL::HentaiFoundry,
       Source::URL::Plurk,
       Source::URL::Skeb,
       Source::URL::TwitPic,
@@ -54,7 +55,7 @@ module Source
 
     # @return [String, nil] The name of the site this URL belongs to, or possibly nil if unknown.
     def site_name
-      self.class.name.demodulize
+      self.class.name.demodulize.titleize
     end
 
     protected def initialize(...)
