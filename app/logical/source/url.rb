@@ -21,6 +21,7 @@ module Source
       Source::URL::Twitter,
       Source::URL::HentaiFoundry,
       Source::URL::Lofter,
+      Source::URL::Mastodon,
       Source::URL::Newgrounds,
       Source::URL::Plurk,
       Source::URL::Skeb,

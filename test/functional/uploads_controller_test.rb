@@ -311,6 +311,9 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://pawoo.net/web/statuses/1202176") if Danbooru.config.pawoo_client_id.present? # XXX
         should_upload_successfully("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png") if Danbooru.config.pawoo_client_id.present? # XXX
 
+        should_upload_successfully("https://baraag.net/@danbooru/107866090743238456")
+        should_upload_successfully("https://baraag.net/system/media_attachments/files/107/866/084/749/942/932/original/a9e0f553e332f303.mp4")
+
         should_upload_successfully("https://www.pixiv.net/en/artworks/64476642")
         should_upload_successfully("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
         should_upload_successfully("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg")
