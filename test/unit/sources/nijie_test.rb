@@ -128,7 +128,7 @@ module Sources
 
       should "get the preview urls" do
         assert_equal("https://pic.nijie.net/03/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg", @site.preview_url)
-        assert_equal(["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"], @site.preview_urls)
+        assert_equal(["https://pic.nijie.net/03/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg"], @site.preview_urls)
       end
 
       should "get the canonical url" do
@@ -221,9 +221,8 @@ module Sources
         assert_equal("https://nijie.info/view.php?id=218856", site.canonical_url)
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
         assert_equal("名無しのチンポップ", site.artist_name)
-        assert_equal(site.url, site.image_url)
-        assert_equal(6, site.image_urls.size)
-        assert_equal(6, site.preview_urls.size)
+        assert_equal([site.url], site.image_urls)
+        assert_equal(["https://pic.nijie.net/03/__rs_l170x170/nijie_picture/diff/main/218856_4_236014_20170620101333.png"], site.preview_urls)
       end
     end
 
@@ -235,8 +234,7 @@ module Sources
         assert_equal("https://nijie.info/view.php?id=287736", site.canonical_url)
         assert_equal("https://nijie.info/members.php?id=161475", site.profile_url)
         assert_equal("みな本", site.artist_name)
-        assert_equal(site.url, site.image_url)
-        assert_equal(3, site.image_urls.size)
+        assert_equal([site.url], site.image_urls)
       end
     end
 
@@ -321,11 +319,6 @@ module Sources
         page = "https://nijie.info/view.php?id=53023"
         site = Sources::Strategies.find(image, page)
 
-        images = %w[
-          https://pic.nijie.net/06/nijie/12/34/334/illust/0_0_f16b3c9eac5b1c03_bbe7a0.jpg
-          https://pic.nijie.net/06/nijie/12/34/334/illust/53023_1_76769657f10e5d57_3e00d7.jpg
-          https://pic.nijie.net/06/nijie/12/34/334/illust/53023_2_9cb4d9bdf9cc75a6_872020.jpg
-        ]
         tags = [%w[中出し https://nijie.info/search_dojin.php?word=%E4%B8%AD%E5%87%BA%E3%81%97],
                 %w[フェラ https://nijie.info/search_dojin.php?word=%E3%83%95%E3%82%A7%E3%83%A9],
                 %w[TS https://nijie.info/search_dojin.php?word=TS],
@@ -333,7 +326,7 @@ module Sources
 
         assert(true, site.doujin?)
         assert_equal(image, site.image_url)
-        assert_equal(images, site.image_urls)
+        assert_equal([image], site.image_urls)
         assert_equal("作品情報", site.artist_commentary_title)
         assert_equal("<p>ある日目がさめると女の子になっていたいつき<br>\nそこへ幼馴染の小梅が現れて…<br>\n2010年コミックマーケット78で販売したコピー本のDL版で<br>\n本編18Pの短編マンガです <br>\n</p>", site.artist_commentary_desc)
         assert_equal(tags, site.tags)

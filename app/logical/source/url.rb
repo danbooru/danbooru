@@ -25,6 +25,7 @@ module Source
       Source::URL::Lofter,
       Source::URL::Mastodon,
       Source::URL::Moebooru,
+      Source::URL::Nijie,
       Source::URL::Newgrounds,
       Source::URL::Plurk,
       Source::URL::Skeb,
