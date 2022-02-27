@@ -1,47 +1,14 @@
 # frozen_string_literal: true
 
-# Page URLs:
-#
-# * https://www.artstation.com/artwork/04XA4
-# * https://www.artstation.com/artwork/cody-from-sf
-# * https://sa-dui.artstation.com/projects/DVERn
-# * https://dudeunderscore.artstation.com/projects/NoNmD?album_id=23041
-#
-# Profile URLs:
-#
-# * https://www.artstation.com/artist/sa-dui
-# * https://www.artstation.com/sa-dui
-# * https://sa-dui.artstation.com/
-# * https://hosi_na.artstation.com
-#
-# Image URLs
-#
-# * https://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236
-# * https://cdnb.artstation.com/p/assets/images/images/014/410/217/smaller_square/bart-osz-bartosz1812041.jpg?1543866276
-# * https://cdna.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833
-#
-# * https://cdna.artstation.com/p/assets/covers/images/007/262/828/small/monica-kyrie-1.jpg?1504865060
-
+# @see Source::URL::ArtStation
 module Sources::Strategies
   class ArtStation < Base
-    PROJECT1 = %r{\Ahttps?://www\.artstation\.com/artwork/(?<project_id>[a-z0-9-]+)/?\z}i
-    PROJECT2 = %r{\Ahttps?://(?<artist_name>[\w-]+)\.artstation\.com/projects/(?<project_id>[a-z0-9-]+)(?:/|\?[\w=-]+)?\z}i
-    PROJECT = Regexp.union(PROJECT1, PROJECT2)
-    ARTIST1 = %r{\Ahttps?://(?<artist_name>[\w-]+)(?<!www)\.artstation\.com/?\z}i
-    ARTIST2 = %r{\Ahttps?://www\.artstation\.com/artist/(?<artist_name>[\w-]+)/?\z}i
-    ARTIST3 = %r{\Ahttps?://www\.artstation\.com/(?<artist_name>[\w-]+)/?\z}i
-    ARTIST = Regexp.union(ARTIST1, ARTIST2, ARTIST3)
-
-    ASSET = %r{\Ahttps?://cdn\w*\.artstation\.com/p/assets/(?<type>images|covers)/images/(?<id>\d+/\d+/\d+)/(?<size>[^/]+)/(?<filename>.+)\z}i
-
-    attr_reader :json
-
-    def domains
-      ["artstation.com"]
+    def match?
+      Source::URL::ArtStation === parsed_url
     end
 
     def site_name
-      "ArtStation"
+      parsed_url.site_name
     end
 
     def image_urls
@@ -100,25 +67,19 @@ module Sources::Strategies
     end
 
     def image_urls_sub
-      if url.match?(ASSET)
-        return [url]
+      if parsed_url.image_url?
+        [url]
+      else
+        api_response[:assets].to_a.select { |asset| asset[:asset_type] == "image" }.pluck(:image_url)
       end
-
-      api_response[:assets]
-        .to_a
-        .select { |asset| asset[:asset_type] == "image" }
-        .map { |asset| asset[:image_url] }
     end
 
-    # these are de facto private methods but are public for testing
-    # purposes
-
     def artist_name_from_url
-      urls.map { |url| url[PROJECT, :artist_name] || url[ARTIST, :artist_name] }.compact.first
+      parsed_url.username || parsed_referer&.username
     end
 
     def project_id
-      urls.map { |url| url[PROJECT, :project_id]  }.compact.first
+      parsed_url.work_id || parsed_referer&.work_id
     end
 
     def api_response
@@ -131,23 +92,12 @@ module Sources::Strategies
     end
     memoize :api_response
 
-    def image_url_sizes(type, id, filename)
-      [
-        "https://cdn.artstation.com/p/assets/#{type}/images/#{id}/original/#{filename}",
-        "https://cdn.artstation.com/p/assets/#{type}/images/#{id}/4k/#{filename}",
-        "https://cdn.artstation.com/p/assets/#{type}/images/#{id}/large/#{filename}",
-        "https://cdn.artstation.com/p/assets/#{type}/images/#{id}/medium/#{filename}",
-        "https://cdn.artstation.com/p/assets/#{type}/images/#{id}/small/#{filename}",
-      ]
-    end
-
     def asset_url(url, size)
-      return url unless url =~ ASSET
+      parsed_url = Source::URL.parse(url)
 
-      urls = image_url_sizes($~[:type], $~[:id], $~[:filename])
-      if size == :smallest
-        urls = urls.reverse
-      end
+      image_sizes = %w[original 4k large medium small]
+      urls = image_sizes.map { |size| parsed_url.full_image_url(size) }
+      urls = urls.reverse if size == :smallest
 
       chosen_url = urls.find { |url| http_exists?(url) }
       chosen_url || url

@@ -10,7 +10,7 @@ module Danbooru
     # @return [Addressable:URI] The parsed and normalized URL.
     attr_reader :url
 
-    delegate :domain, :host, :site, :path, to: :url
+    delegate :domain, :host, :site, :path, :query, to: :url
 
     # Parse a string into a URL, or raise an exception if the string is not a valid HTTPS or HTTPS URL.
     #
@@ -61,6 +61,19 @@ module Danbooru
     # @return [Hash] the URL's query parameters
     def params
       url.query_values.to_h.with_indifferent_access
+    end
+
+    # Return the subdomain of the URL, or nil if absent. For example, for "http://senpenbankashiki.hp.infoseek.co.jp", the
+    # subdomain is "senpenbankashiki.hp", the domain is "infoseek.co.jp", the SLD is "infoseek", and the TLD is "co.jp".
+    #
+    # @return [String, nil]
+    def subdomain
+      parsed_domain.trd
+    end
+
+    # @return [PublicSuffix::Domain]
+    def parsed_domain
+      @parsed_domain ||= PublicSuffix.parse(host)
     end
   end
 end
