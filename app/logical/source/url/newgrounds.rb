@@ -62,20 +62,18 @@ class Source::URL::Newgrounds < Source::URL
 
     # https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg
     # https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181
-    in "art.ngfiles.com", "images", _, /^(\d+)_([^_]+)_(.*)\.\w+$/ => filename
+    in "art.ngfiles.com", "images", _, /^(\d+)_([^_]+)_(.*)\.\w+$/
       @work_id = $1
       @username = $2
       @work_title = $3
-      @filename = filename
 
     # https://art.ngfiles.com/thumbnails/1254000/1254985.png?f1588263349
-    in "art.ngfiles.com", "thumbnails", _, /^(\d+)\.\w+$/ => filename
+    in "art.ngfiles.com", "thumbnails", _, /^(\d+)\.\w+$/
       @work_id = $1
-      @filename = filename
 
     # https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg
-    in "art.ngfiles.com", "comments", _, /^iu/ => filename
-      @filename = filename
+    in "art.ngfiles.com", "comments", _, /^iu/
+      nil
 
     # https://natthelich.newgrounds.com
     # https://natthelich.newgrounds.com/art/

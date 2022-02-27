@@ -48,14 +48,14 @@ class Source::URL::HentaiFoundry < Source::URL
       @work_id = work_id
 
     # http://pictures.hentai-foundry.com//s/soranamae/363663.jpg
-    in "pictures.hentai-foundry.com", _, username, /^\d+\.\w+$/ => filename
+    in "pictures.hentai-foundry.com", _, username, /^(\d+)\.\w+$/
       @username = username
-      @work_id, @file_ext = filename.split(".")
+      @work_id = $1
 
     # http://www.hentai-foundry.com/piccies/d/dmitrys/1183.jpg
-    in "www.hentai-foundry.com", "piccies", _, username, /^\d+\.\w+$/ => filename
+    in "www.hentai-foundry.com", "piccies", _, username, /^(\d+)\.\w+$/
       @username = username
-      @work_id, @file_ext = filename.split(".")
+      @work_id = $1
 
     # https://www.hentai-foundry.com/pictures/user/Afrobull/795025
     # https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda

@@ -40,7 +40,7 @@ class Source::URL::Plurk < Source::URL
     # https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg
     # https://images.plurk.com/mx_5wj6WD0r6y4rLN0DL3sqag.jpg
     in "plurk.com", /^(mx_)?(\w{22})\.(\w+)$/
-      @filename, @file_ext = $2, $3
+      @image_id = $2
 
     # https://www.plurk.com/p/om6zv4
     in "plurk.com", "p", work_id

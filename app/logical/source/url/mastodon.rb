@@ -56,17 +56,17 @@ class Source::URL::Mastodon < Source::URL
     # Page: https://pawoo.net/@evazion/19451018
     # https://img.pawoo.net/media_attachments/files/001/297/997/small/c4272a09570757c2.png
     # https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png
-    in "img.pawoo.net", "media_attachments", "files", *subdirs, file_size, filename
+    in "img.pawoo.net", "media_attachments", "files", *subdirs, file_size, file
       @file_size = file_size
-      @full_image_url = "#{site}/media_attachments/files/#{subdirs.join("/")}/original/#{filename}"
+      @full_image_url = "#{site}/media_attachments/files/#{subdirs.join("/")}/original/#{file}"
 
     # Page: https://baraag.net/@danbooru/107866090743238456
     # https://baraag.net/system/media_attachments/files/107/866/084/749/942/932/original/a9e0f553e332f303.mp4
     # https://baraag.net/system/media_attachments/files/107/866/084/754/127/256/original/3895a14ce3736f13.mp4
     # https://baraag.net/system/media_attachments/files/107/866/084/754/651/925/original/8f3df857681a1639.png
-    in "baraag.net", "system", "media_attachments", "files", *subdirs, file_size, filename
+    in "baraag.net", "system", "media_attachments", "files", *subdirs, file_size, file
       @file_size = file_size
-      @full_image_url = "#{site}/system/media_attachments/files/#{subdirs.join("/")}/original/#{filename}"
+      @full_image_url = "#{site}/system/media_attachments/files/#{subdirs.join("/")}/original/#{file}"
 
     # https://pawoo.net/media/lU2uV7C1MMQSb1czwvg
     in "pawoo.net", "media", media_hash

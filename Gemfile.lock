@@ -587,6 +587,7 @@ DEPENDENCIES
   pg
   pry-byebug
   pry-rails
+  public_suffix
   puma
   puma-metrics
   puma_worker_killer

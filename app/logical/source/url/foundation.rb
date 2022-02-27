@@ -55,7 +55,7 @@
 # * https://foundation.app/mochiiimo
 #
 class Source::URL::Foundation < Source::URL
-  attr_reader :username, :token_id, :work_id, :hash, :file_ext
+  attr_reader :username, :token_id, :work_id, :hash
 
   def self.match?(url)
     url.host.in?(%w[foundation.app assets.foundation.app f8n-ipfs-production.imgix.net f8n-production-collection-assets.imgix.net])
@@ -88,27 +88,23 @@ class Source::URL::Foundation < Source::URL
 
     # https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png
     # https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png?q=80&auto=format%2Ccompress&cs=srgb&max-w=1680&max-h=1680
-    in "f8n-ipfs-production.imgix.net", hash, filename
+    in "f8n-ipfs-production.imgix.net", hash, file
       @hash = hash
-      @filename, @file_ext = filename.split(".")
 
     # https://f8n-production-collection-assets.imgix.net/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/128711/QmcBfbeCMSxqYB3L1owPAxFencFx3jLzCPFx6xUBxgSCkH/nft.png
-    in "f8n-production-collection-assets.imgix.net", token_id, work_id, hash, filename
+    in "f8n-production-collection-assets.imgix.net", token_id, work_id, hash, file
       @token_id = token_id
       @work_id = work_id
       @hash = hash
-      @filename, @file_ext = filename.split(".")
 
     # https://f8n-production-collection-assets.imgix.net/0xFb0a8e1bB97fD7231Cd73c489dA4732Ae87995F0/4/nft.png
-    in "f8n-production-collection-assets.imgix.net", token_id, work_id, filename
+    in "f8n-production-collection-assets.imgix.net", token_id, work_id, file
       @token_id = token_id
       @work_id = work_id
-      @filename, @file_ext = filename.split(".")
 
     # https://assets.foundation.app/7i/gs/QmU8bbsjaVQpEKMDWbSZdDD6GsPmRYBhQtYRn8bEGv7igs/nft_q4.mp4
-    in "assets.foundation.app", *subdirs, hash, filename
+    in "assets.foundation.app", *subdirs, hash, file
       @hash = hash
-      @filename, @file_ext = filename.split(".")
 
     else
     end

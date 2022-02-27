@@ -32,7 +32,7 @@
 # * https://konachan.com/post/show/270803/banishment-bicycle-grass-group-male-night-original
 
 class Source::URL::Moebooru < Source::URL
-  attr_reader :work_id, :md5, :sample_type, :original_file_ext
+  attr_reader :work_id, :md5, :original_file_ext
 
   def self.match?(url)
     url.domain.in?(%w[yande.re konachan.com])
@@ -65,38 +65,33 @@ class Source::URL::Moebooru < Source::URL
     # https://konachan.com/image/5d633771614e4bf5c17df19a0f0f333f/Konachan.com%20-%20270807%20black_hair%20bokuden%20clouds%20grass%20landscape%20long_hair%20original%20phone%20rope%20scenic%20seifuku%20skirt%20sky%20summer%20torii%20tree.jpg
     #
     # https://files.yande.re/image/e4c2ba38de88ff1640aaebff84c84e81/469784.jpg
-    in _, ("sample" | "jpeg" | "image") => sample_type, /^\h{32}$/ => md5, filename
+    in _, ("sample" | "jpeg" | "image") => sample_type, /^\h{32}$/ => md5, file
       @md5 = md5
-      @work_id = parse_filename(filename)
-
-      case sample_type
-      when "image"
-        @original_file_ext = File.extname(filename).delete_prefix(".")
-      when "jpeg"
-        @original_file_ext = "png"
-      end
+      @work_id = work_id_from_filename
+      @original_file_ext = file_ext_for(sample_type)
 
     # https://yande.re/jpeg/22577d2344fe694cf47f80563031b3cd.jpg
     # https://files.yande.re/image/22577d2344fe694cf47f80563031b3cd.png
     # https://files.yande.re/sample/fb27a7ea6c48b2ef76fe915e378b9098.jpg
-    in _, ("sample" | "jpeg" | "image") => sample_type, /^(\h{32})\.\w+$/ => filename
+    in _, ("sample" | "jpeg" | "image") => sample_type, /^(\h{32})\.\w+$/
       @md5 = $1
-
-      case sample_type
-      when "image"
-        @original_file_ext = File.extname(filename).delete_prefix(".")
-      when "jpeg"
-        @original_file_ext = "png"
-      end
+      @original_file_ext = file_ext_for(sample_type)
 
     else
     end
   end
 
-  def parse_filename(filename)
-    basename = File.basename(filename, ".*")
+  def file_ext_for(sample_type)
+    case sample_type
+    when "image"
+      file_ext
+    when "jpeg"
+      "png"
+    end
+  end
 
-    case CGI.unescape(basename).split
+  def work_id_from_filename
+    case CGI.unescape(filename).split
     # yande.re 290757 sample seifuku thighhighs tsukudani_norio
     # yande.re 290757
     in "yande.re", /^\d+$/ => work_id, *rest

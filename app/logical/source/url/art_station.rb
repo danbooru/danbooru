@@ -46,10 +46,10 @@ class Source::URL::ArtStation < Source::URL
     # https://cdnb.artstation.com/p/assets/images/images/014/410/217/smaller_square/bart-osz-bartosz1812041.jpg?1543866276
     # https://cdna.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833
     # https://cdna.artstation.com/p/assets/covers/images/007/262/828/small/monica-kyrie-1.jpg?1504865060
-    in _, "p", "assets", ("images" | "covers") => asset_type, "images", *subdirs, size, filename
+    in _, "p", "assets", ("images" | "covers") => asset_type, "images", *subdirs, size, file
       @asset_type = asset_type
       @asset_subdir = subdirs.join("/")
-      @filename = filename
+      @file = file
       @timestamp = query if query&.match?(/^\d+$/)
 
     # https://www.artstation.com/artwork/04XA4
@@ -78,16 +78,16 @@ class Source::URL::ArtStation < Source::URL
   end
 
   def image_url?
-    @filename.present?
+    @file.present?
   end
 
   def full_image_url(size = "original")
     return nil unless image_url?
 
     if @timestamp.present?
-      "https://cdn.artstation.com/p/assets/#{@asset_type}/images/#{@asset_subdir}/#{size}/#{@filename}?#{@timestamp}"
+      "https://cdn.artstation.com/p/assets/#{@asset_type}/images/#{@asset_subdir}/#{size}/#{@file}?#{@timestamp}"
     else
-      "https://cdn.artstation.com/p/assets/#{@asset_type}/images/#{@asset_subdir}/#{size}/#{@filename}"
+      "https://cdn.artstation.com/p/assets/#{@asset_type}/images/#{@asset_subdir}/#{size}/#{@file}"
     end
   end
 end

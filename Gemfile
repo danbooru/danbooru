@@ -56,6 +56,7 @@ gem "ffi"
 gem "rbtrace"
 gem "good_job"
 gem "crass"
+gem "public_suffix"
 
 group :development do
   gem 'rubocop', require: false

@@ -87,10 +87,10 @@ class Source::URL::Twitter < Source::URL
     # https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg
     # https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
     # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg
-    in "twimg.com", ("media" | "tweet_video_thumb" | "ext_tw_video_thumb" | "amplify_video_thumb") => media_type, *subdirs, filename
+    in "twimg.com", ("media" | "tweet_video_thumb" | "ext_tw_video_thumb" | "amplify_video_thumb") => media_type, *subdirs, file
       # EBGbJe_U8AA4Ekb.jpg:small
-      @filename, @file_size = filename.split(":")
-      @filename, @file_ext = @filename.split(".")
+      @file, @file_size = file.split(":")
+      @file, @file_ext = @file.split(".")
 
       # EBGbJe_U8AA4Ekb?format=jpg&name=900x900
       @file_size = params[:name] if params[:name].present?
@@ -98,7 +98,7 @@ class Source::URL::Twitter < Source::URL
 
       # /media/EBGbJe_U8AA4Ekb.jpg
       # /ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
-      @file_path = File.join(media_type, subdirs.join("/"), "#{@filename}.#{@file_ext}")
+      @file_path = File.join(media_type, subdirs.join("/"), "#{@file}.#{@file_ext}")
     else
     end
   end

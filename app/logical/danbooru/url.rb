@@ -1,5 +1,29 @@
 # frozen_string_literal: true
 
+# A utility class representing a HTTP URL. A wrapper around Addressable::URI that adds
+# extra utility methods. Anything dealing with URLs inside Danbooru should use this class
+# instead of using `Addressable::URI` or the Ruby `URI` class directly,
+#
+# Source::URL is a subclass that adds further methods for parsing URLs from source sites,
+# such as Twitter, Pixiv, etc.
+#
+# @example
+#   url = Danbooru::URL.parse("https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
+#   url.path          # => "/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
+#   url.path_segments # => ["original", "d3", "43", "d34e4cf0a437a5d65f8e82b7bcd02606.jpg"]
+#   url.basename      # => "d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
+#   url.filename      # => "d34e4cf0a437a5d65f8e82b7bcd02606"
+#   url.file_ext      # => "jpg"
+#   url.host          # => "cdn.donmai.us"
+#   url.domain        # => "donmai.us"
+#   url.subdomain     # => "cdn"
+#   url.site          # => "https://cdn.donmai.us"
+#
+#   url = Danbooru::URL.parse("https://danbooru.donmai.us/posts?tags=touhou")
+#   url.params        # => { tags: "touhou" }
+#   url.query         # => "tags=touhou"
+#
+# @see Source::URL
 module Danbooru
   class URL
     class Error < StandardError; end
@@ -12,7 +36,7 @@ module Danbooru
 
     delegate :domain, :host, :site, :path, :query, to: :url
 
-    # Parse a string into a URL, or raise an exception if the string is not a valid HTTPS or HTTPS URL.
+    # Parse a string into a URL, or raise an exception if the string is not a valid HTTP or HTTPS URL.
     #
     # @param url [String, Danbooru::URL]
     def initialize(url)
@@ -25,7 +49,7 @@ module Danbooru
       raise Error, e
     end
 
-    # Parse a string into a URL, or raise an exception if the string is not a valid HTTPS or HTTPS URL.
+    # Parse a string into a URL, or raise an exception if the string is not a valid HTTP or HTTPS URL.
     #
     # @param url [String, Danbooru::URL]
     # @return [Danbooru::URL]
@@ -63,7 +87,22 @@ module Danbooru
       url.query_values.to_h.with_indifferent_access
     end
 
-    # Return the subdomain of the URL, or nil if absent. For example, for "http://senpenbankashiki.hp.infoseek.co.jp", the
+    # @return [String, nil] The name of the file with the file extension, or nil if not present.
+    def basename
+      path_segments.last
+    end
+    #
+    # @return [String, nil] The name of the file without the file extension, or nil if not present.
+    def filename
+      basename&.slice(/^(.*)\./, 1)
+    end
+
+    # @return [String, nil] The file extension (without the dot), or nil if not present.
+    def file_ext
+      basename&.slice(/\.([[:alnum:]]+)$/, 1)
+    end
+
+    # The subdomain of the URL, or nil if absent. For example, for "http://senpenbankashiki.hp.infoseek.co.jp", the
     # subdomain is "senpenbankashiki.hp", the domain is "infoseek.co.jp", the SLD is "infoseek", and the TLD is "co.jp".
     #
     # @return [String, nil]
