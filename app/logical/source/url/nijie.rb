@@ -75,7 +75,7 @@ class Source::URL::Nijie < Source::URL
       @user_id = params[:id]
 
     # https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg
-    in _, "nijie_picture", /^\d{2}$/, "nijie", /^\d{2}$/, /^\d{2}$/, user_id, "illust", _ if image_url?
+    in _, /^\d{2}$/, "nijie", /^\d{2}$/, /^\d{2}$/, user_id, "illust", _ if image_url?
       @user_id = user_id
 
     # https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png (page: http://nijie.info/view.php?id=218856)
