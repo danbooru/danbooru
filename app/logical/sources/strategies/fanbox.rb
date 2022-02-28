@@ -1,68 +1,20 @@
 # frozen_string_literal: true
 
-# Image URLs #############################################################
-#
-# * OLD DOMAIN
-# ** https://fanbox.pixiv.net/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png
-#
-# * NEW DOMAIN
-# ** https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png (full res)
-# ** https://downloads.fanbox.cc/images/post/39714/c/1200x630/JvjJal8v1yLgc5DPyEI05YpT.jpeg (sample)
-# ** https://downloads.fanbox.cc/images/post/39714/w/1200/JvjJal8v1yLgc5DPyEI05YpT.jpeg (sample)
-#
-# * POST COVERS
-# * https://pixiv.pximg.net/c/1200x630_90_a2_g5/fanbox/public/images/post/186919/cover/VCI1Mcs2rbmWPg0mmiTisovn.jpeg
-#
-# * PROFILE IMAGES
-# * https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg
-# * https://pixiv.pximg.net/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg (dead URL type)
-# * https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/WPqKsvKVGRq4qUjKFAMi23Z5.jpeg
-# * https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg
-#
-# Page URLs ##############################################################
-#
-# *  OLD
-# ** https://www.pixiv.net/fanbox/creator/1566167/post/39714
-#
-# *  NEW
-# ** https://omu001.fanbox.cc/posts/39714
-# ** https://www.fanbox.cc/@tsukiori/posts/1080657
-# ** https://brllbrll.fanbox.cc/posts/626093 (R-18)
-#
-#
-# Profile URLs ###########################################################
-#
-# *  OLD
-# ** https://www.pixiv.net/fanbox/creator/1566167
-#
-# * NEW
-# ** https://omu001.fanbox.cc/
-#
-
+# @see Source::URL::Fanbox
 module Sources
   module Strategies
     class Fanbox < Base
-      PROFILE_OLD = %r{\Ahttps?://(?:www\.)?pixiv\.net/fanbox/creator/(?<artist_id>\d+)}i
-      PROFILE_NEW = %r{\Ahttps?://(?:(?!www|downloads)(?<artist_name>[\w-]+)\.fanbox\.cc|(?:www\.)?fanbox\.cc/@(?<artist_name>[\w-]+))}i
-
-      PAGE_OLD    = %r{#{PROFILE_OLD}/post/(?<illust_id>\d+)}i
-      PAGE_NEW    = %r{#{PROFILE_NEW}/posts/(?<illust_id>\d+)}i
-
-      IMAGE        = %r{\Ahttps?://(?:fanbox\.pixiv\.net|downloads\.fanbox\.cc)/images/post/(?<illust_id>\d+)/(?:\w+/)*\w+\.\w+}i
-
-      OTHER_IMAGES = %r{\Ahttps?://pixiv\.pximg\.net/.*/fanbox/.*?/(?:(?:creator|user)/(?<artist_id>\d+)|post/(?<illust_id>\d+))?/(?:.*/)?\w+\.\w+}i
-
-      def domains
-        ["fanbox.cc", "pixiv.net", "pximg.net"]
+      def match?
+        Source::URL::Fanbox === parsed_url
       end
 
       def site_name
-        "Pixiv Fanbox"
+        parsed_url.site_name
       end
 
       def image_urls
-        if url =~ IMAGE || url =~ OTHER_IMAGES
-          [url.gsub(%r{/w/\d+/}, "/")]
+        if parsed_url.image_url?
+          [parsed_url.full_image_url]
         elsif api_response.present?
           # There's two ways pics are returned via api:
           # Pics in proper array: https://yanmi0308.fanbox.cc/posts/1141325
@@ -71,16 +23,16 @@ module Sources
           # The following is needed because imageMap is sorted alphabetically rather than by image order
           sort_order = api_response.dig("body", "blocks").to_a.map { |b| b["imageId"] if b["type"] == "image" }.compact.uniq
           images = images.sort_by { |img| sort_order.index(img["id"]) } if sort_order.present?
-          images.map { |img| img["originalUrl"] }
+          images.pluck("originalUrl")
         else
-          [url.gsub(%r{/w/\d+/}, "/")]
+          []
         end
       end
 
       def page_url
-        if illust_id.present?
+        if artist_name.present? && illust_id.present?
           "https://#{artist_name}.fanbox.cc/posts/#{illust_id}"
-        elsif url =~ OTHER_IMAGES && artist_name.present?
+        elsif parsed_url.image_url? && artist_name.present?
           # Cover images
           "https://#{artist_name}.fanbox.cc"
         end
@@ -147,15 +99,15 @@ module Sources
       end
 
       def illust_id
-        urls.map { |url| url[PAGE_NEW, :illust_id] || url[IMAGE, :illust_id] || url[PAGE_OLD, :illust_id] || url[OTHER_IMAGES, :illust_id] }.compact.first
+        parsed_url.work_id || parsed_referer&.work_id
       end
 
       def artist_id_from_url
-        urls.map { |url| url[PAGE_OLD, :artist_id] || url[OTHER_IMAGES, :artist_id] }.compact.first
+        parsed_url.user_id || parsed_referer&.user_id
       end
 
       def artist_name_from_url
-        urls.map { |url| url[PROFILE_NEW, :artist_name] }.compact.first
+        parsed_url.username || parsed_referer&.username
       end
 
       def api_response

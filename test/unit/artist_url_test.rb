@@ -163,7 +163,7 @@ class ArtistURLTest < ActiveSupport::TestCase
     should "normalize pixiv fanbox account urls" do
       url = FactoryBot.create(:artist_url, :url => "http://www.pixiv.net/fanbox/creator/3113804")
       assert_equal("http://www.pixiv.net/fanbox/creator/3113804", url.url)
-      assert_equal("http://www.pixiv.net/fanbox/creator/3113804/", url.normalized_url)
+      assert_equal("http://drw24olf.fanbox.cc/", url.normalized_url)
     end
 
     should "normalize pixiv.net/user/123 urls" do

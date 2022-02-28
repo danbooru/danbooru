@@ -20,6 +20,7 @@ module Source
     SUBCLASSES = [
       Source::URL::Twitter,
       Source::URL::ArtStation,
+      Source::URL::Fanbox,
       Source::URL::Foundation,
       Source::URL::HentaiFoundry,
       Source::URL::Lofter,
