@@ -1,4 +1,6 @@
 <article id="comment_<%= comment.id %>" class="comment message"
+          x-data="{ showThresholded: false }"
+          x-bind:data-show-thresholded="String(showThresholded)"
           data-id="<%= comment.id %>"
           data-post-id="<%= comment.post_id %>"
           data-creator-id="<%= comment.creator_id unless redact_deleted? %>"
@@ -11,7 +13,8 @@
           data-is-thresholded="<%= thresholded? %>"
           data-is-reported="<%= reported? %>"
           data-is-upvoted="<%= upvoted? %>"
-          data-is-downvoted="<%= downvoted? %>">
+          data-is-downvoted="<%= downvoted? %>"
+          data-show-thresholded="false">
 
   <div class="author">
     <div class="author-name">
@@ -28,11 +31,9 @@
   </div>
 
   <div class="content">
-    <% if thresholded? %>
-      <%= link_to "[hidden]", "javascript:void(0)", class: "unhide-comment-link" %>
-    <% end %>
+    <%= link_to "[hidden]", "javascript:void(0)", class: "unhide-comment-link", "x-on:click": "showThresholded = true" %>
 
-    <%= tag.div class: "body prose", style: ("display: none;" if thresholded?) do %>
+    <%= tag.div class: "body prose" do %>
       <% if redact_deleted? %>
         <p>[deleted]</p>
       <% else %>

@@ -17,6 +17,14 @@ article.comment {
     }
   }
 
+  &[data-is-thresholded="true"][data-show-thresholded="false"] {
+    .body { display: none; }
+  }
+
+  &[data-is-thresholded="false"], &[data-is-thresholded="true"][data-show-thresholded="true"] {
+    .unhide-comment-link { display: none; }
+  }
+
   .unhide-comment-link {
     margin-bottom: 0.75rem;
     display: block;

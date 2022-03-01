@@ -1,6 +1,7 @@
 {
   "license": "MIT",
   "dependencies": {
+    "@alpinejs/morph": "^3.9.0",
     "@babel/plugin-proposal-decorators": "^7.16.7",
     "@fontsource/anton": "^4.0.0",
     "@fontsource/archivo-narrow": "^4.0.0",
@@ -14,6 +15,7 @@
     "@rails/ujs": "^7.0.1",
     "@rails/webpacker": "=6.0.0-rc.6",
     "@ruffle-rs/ruffle": "0.1.0-nightly.2022.1.31",
+    "alpinejs": "^3.9.0",
     "core-js": "^3.20.3",
     "css-loader": "^6.5.1",
     "dropzone": "^6.0.0-beta.2",

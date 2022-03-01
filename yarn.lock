@@ -5,6 +5,13 @@ __metadata:
   version: 4
   cacheKey: 7
 
+"@alpinejs/morph@npm:^3.9.0":
+  version: 3.9.0
+  resolution: "@alpinejs/morph@npm:3.9.0"
+  checksum: 8c338eaa902dfe5bb5c80023ee00e579401de02080f4fafa4455d44ddb6a4949178e8fbe6146b312b44c0876ca6da5606d9f94f45e77fa0338ea45d71b3b2baa
+  languageName: node
+  linkType: hard
+
 "@ampproject/remapping@npm:^2.0.0":
   version: 2.1.1
   resolution: "@ampproject/remapping@npm:2.1.1"
@@ -1891,6 +1898,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vue/reactivity@npm:~3.1.1":
+  version: 3.1.5
+  resolution: "@vue/reactivity@npm:3.1.5"
+  dependencies:
+    "@vue/shared": 3.1.5
+  checksum: 045103ae77f32b02e0d3d0b3b2503388e0282f07d1bdabff5a2dc01db05d0ff8b259069c17c060124658933146e47e6c7c8155e4923f1c0cf045e1e29e29c592
+  languageName: node
+  linkType: hard
+
+"@vue/shared@npm:3.1.5":
+  version: 3.1.5
+  resolution: "@vue/shared@npm:3.1.5"
+  checksum: 1f4395e246942486a50f0f9ba3955d81012753104d015b3be62797ed723aa39b62453ba6c50ae189fcab64945a53354e5f255613b3bb7c1a0f5261374d5e11f4
+  languageName: node
+  linkType: hard
+
 "@webassemblyjs/ast@npm:1.11.1":
   version: 1.11.1
   resolution: "@webassemblyjs/ast@npm:1.11.1"
@@ -2218,6 +2241,15 @@ __metadata:
     require-from-string: ^2.0.2
     uri-js: ^4.2.2
   checksum: 4eb44b84050549e8e33dadb6388da8442647e45f72b44d504e4a6001ebc5f579ca23438d61f830b9111748893f8f0278a519335221ca295d8a0c6aceb7b1643a
+  languageName: node
+  linkType: hard
+
+"alpinejs@npm:^3.9.0":
+  version: 3.9.0
+  resolution: "alpinejs@npm:3.9.0"
+  dependencies:
+    "@vue/reactivity": ~3.1.1
+  checksum: 6ece3b07330e78944d8cca8ef0536e681017a238d3084a47c0d5d93156e3f9bc1affed518799b23131fba58961f4bd3192676d2400704de1b3f265379f068548
   languageName: node
   linkType: hard
 
@@ -7083,6 +7115,7 @@ fsevents@~2.3.2:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
+    "@alpinejs/morph": ^3.9.0
     "@babel/cli": ^7.16.8
     "@babel/eslint-parser": ^7.16.5
     "@babel/plugin-proposal-decorators": ^7.16.7
@@ -7099,6 +7132,7 @@ fsevents@~2.3.2:
     "@rails/webpacker": =6.0.0-rc.6
     "@ruffle-rs/ruffle": 0.1.0-nightly.2022.1.31
     "@webpack-cli/serve": ^1.6.0
+    alpinejs: ^3.9.0
     core-js: ^3.20.3
     css-loader: ^6.5.1
     dropzone: ^6.0.0-beta.2

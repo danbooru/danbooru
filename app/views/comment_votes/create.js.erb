@@ -2,5 +2,8 @@
   Danbooru.Utility.notice("<%= j flash[:notice] %>");
 <% end %>
 
-var $comment = $("article#comment_<%= @comment_vote.comment_id %>");
-$comment.replaceWith("<%= j render_comment(@comment_vote.comment, current_user: CurrentUser.user) %>");
+$(function() {
+  let $comment = $("article#comment_<%= @comment_vote.comment_id %>").get(0);
+  let html = "<%= j render_comment(@comment_vote.comment, current_user: CurrentUser.user) %>";
+  Alpine.morph($comment, html);
+});
