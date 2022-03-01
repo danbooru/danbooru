@@ -76,3 +76,11 @@ table.table-sm {
 table.table-md {
   th, td { padding: 0.5rem; }
 }
+
+td > .user {
+  display: inline-block;
+  max-width: max(15vw, 150px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
