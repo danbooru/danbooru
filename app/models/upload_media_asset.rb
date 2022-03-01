@@ -23,6 +23,9 @@ class UploadMediaAsset < ApplicationRecord
     failed: 300,
   }
 
+  scope :unfinished, -> { where(status: %w[pending processing]) }
+  scope :finished, -> { where(status: %w[active failed]) }
+
   def self.visible(user)
     if user.is_admin?
       all

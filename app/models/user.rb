@@ -109,6 +109,7 @@ class User < ApplicationRecord
   validate  :validate_custom_css, if: :custom_style_changed?
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_owner_if_first_user
+
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
   has_many :comments, foreign_key: :creator_id
@@ -131,7 +132,6 @@ class User < ApplicationRecord
   has_many :purchased_upgrades, class_name: "UserUpgrade", foreign_key: :purchaser_id, dependent: :destroy
   has_many :user_events, dependent: :destroy
   has_one :active_ban, -> { active }, class_name: "Ban"
-
   has_one :email_address, dependent: :destroy
   has_many :api_keys, dependent: :destroy
   has_many :note_versions, :foreign_key => "updater_id"
@@ -145,6 +145,8 @@ class User < ApplicationRecord
   has_many :ip_bans, foreign_key: :creator_id
   has_many :tag_aliases, foreign_key: :creator_id
   has_many :tag_implications, foreign_key: :creator_id
+  has_many :uploads, foreign_key: :uploader_id, dependent: :destroy
+  has_many :upload_media_assets, through: :uploads, dependent: :destroy
   belongs_to :inviter, class_name: "User", optional: true
 
   accepts_nested_attributes_for :email_address, reject_if: :all_blank, allow_destroy: true

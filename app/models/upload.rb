@@ -6,6 +6,9 @@ class Upload < ApplicationRecord
 
   MAX_FILES_PER_UPLOAD = 100
 
+  # The maximum number of 'pending' or 'processing' media assets a single user can have at once.
+  MAX_QUEUED_ASSETS = 250
+
   attr_accessor :files
 
   belongs_to :uploader, class_name: "User"
@@ -19,6 +22,7 @@ class Upload < ApplicationRecord
   validates :source, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { source.present? }
   validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { referer_url.present? }
   validate :validate_file_and_source, on: :create
+  validate :uploader_is_not_limited, on: :create
 
   after_create :async_process_upload!
 
@@ -62,6 +66,14 @@ class Upload < ApplicationRecord
         errors.add(:base, "Can't give both a file and a source")
       elsif files.blank? && source.blank?
         errors.add(:base, "No file or source given")
+      end
+    end
+
+    def uploader_is_not_limited
+      queued_asset_count = uploader.upload_media_assets.unfinished.count
+
+      if queued_asset_count > MAX_QUEUED_ASSETS
+        errors.add(:base, "You have too many images queued for upload (queued: #{queued_asset_count}; limit: #{MAX_QUEUED_ASSETS}). Try again later.")
       end
     end
   end
