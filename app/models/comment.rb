@@ -65,7 +65,7 @@ class Comment < ApplicationRecord
   end
 
   def update_last_commented_at_on_destroy
-    other_comments = Comment.where("post_id = ? and id <> ?", post_id, id).order("id DESC")
+    other_comments = Comment.where("post_id = ? and id <> ?", post_id, id).order(id: :desc)
     if other_comments.count == 0
       Post.where(:id => post_id).update_all(:last_commented_at => nil)
     else

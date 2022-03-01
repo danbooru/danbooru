@@ -657,13 +657,13 @@ class User < ApplicationRecord
 
       case params[:order]
       when "name"
-        q = q.order("name")
+        q = q.order(name: :asc)
       when "post_upload_count"
-        q = q.order("post_upload_count desc")
+        q = q.order(post_upload_count: :desc)
       when "note_count"
-        q = q.order("note_update_count desc")
+        q = q.order(note_update_count: :desc)
       when "post_update_count"
-        q = q.order("post_update_count desc")
+        q = q.order(post_update_count: :desc)
       else
         q = q.apply_default_order(params)
       end

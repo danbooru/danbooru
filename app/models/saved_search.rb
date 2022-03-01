@@ -90,7 +90,7 @@ class SavedSearch < ApplicationRecord
       def labels_for(user_id)
         SavedSearch
           .where(user_id: user_id)
-          .order("label")
+          .order(label: :asc)
           .pluck(Arel.sql("distinct unnest(labels) as label"))
       end
     end

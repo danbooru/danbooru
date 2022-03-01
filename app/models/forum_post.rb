@@ -127,7 +127,7 @@ class ForumPost < ApplicationRecord
   end
 
   def update_topic_updated_at_on_delete
-    max = ForumPost.where(:topic_id => topic.id, :is_deleted => false).order("updated_at desc").first
+    max = ForumPost.where(topic_id: topic.id, is_deleted: false).order(updated_at: :desc).first
     if max
       ForumTopic.where(:id => topic.id).update_all(["updated_at = ?, updater_id = ?", max.updated_at, max.updater_id])
     end
@@ -140,7 +140,7 @@ class ForumPost < ApplicationRecord
   end
 
   def update_topic_updated_at_on_destroy
-    max = ForumPost.where(:topic_id => topic.id, :is_deleted => false).order("updated_at desc").first
+    max = ForumPost.where(topic_id: topic.id, is_deleted: false).order(updated_at: :desc).first
     if max
       ForumTopic.where(:id => topic.id).update_all(["response_count = response_count - 1, updated_at = ?, updater_id = ?", max.updated_at, max.updater_id])
     else

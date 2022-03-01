@@ -94,7 +94,7 @@ class WikiPage < ApplicationRecord
 
       case params[:order]
       when "title"
-        q = q.order("title")
+        q = q.order(title: :asc)
       when "post_count"
         q = q.includes(:tag).order("tags.post_count desc nulls last").references(:tags)
       else

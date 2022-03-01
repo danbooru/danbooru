@@ -295,11 +295,11 @@ class Tag < ApplicationRecord
 
       case params[:order]
       when "name"
-        q = q.order("name")
+        q = q.order(name: :asc)
       when "date"
-        q = q.order("id desc")
+        q = q.order(id: :desc)
       when "count"
-        q = q.order("post_count desc")
+        q = q.order(post_count: :desc)
       when "similarity"
         q = q.order_similarity(params[:fuzzy_name_matches]) if params[:fuzzy_name_matches].present?
       else
