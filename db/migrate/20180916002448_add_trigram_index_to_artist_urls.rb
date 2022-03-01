@@ -1,4 +1,4 @@
-class AddTrigramIndexToArtistUrls < ActiveRecord::Migration[5.2]
+class AddTrigramIndexToArtistURLs < ActiveRecord::Migration[5.2]
   def change
     execute "set statement_timeout = 0"
 
