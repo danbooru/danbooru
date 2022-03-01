@@ -264,9 +264,18 @@ module ApplicationHelper
     render "table_builder/table", table: table
   end
 
-  def body_attributes(current_user, params, current_item = nil)
-    controller_param = params[:controller].parameterize.dasherize
-    action_param = params[:action].parameterize.dasherize
+  def body_attributes(current_user, params, current_item, exception)
+    if exception
+      controller_param = "static"
+      action_param = "error"
+      layout = nil
+      extra_attributes = {}
+    else
+      controller_param = params[:controller].parameterize.dasherize
+      action_param = params[:action].parameterize.dasherize
+      layout = controller.class.send(:_layout)
+      extra_attributes = current_item_data_attributes(current_item)
+    end
 
     {
       lang: "en",
@@ -275,12 +284,12 @@ module ApplicationHelper
       data: {
         controller: controller_param,
         action: action_param,
-        layout: controller.class.send(:_layout),
+        layout: layout,
         "current-user-ip-addr": request.remote_ip,
         "current-user-save-data": CurrentUser.save_data,
         **current_user_data_attributes(current_user),
         **cookie_data_attributes,
-        **current_item_data_attributes(current_item),
+        **extra_attributes,
       }
     }
   end
