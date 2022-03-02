@@ -23,9 +23,9 @@
 
   <%# XXX hack to only load Ruffle on Flash posts %>
   <% if controller_name == "posts" && action_name == "show" && @post&.is_flash? %>
-    <%= javascript_pack_tag "application", "flash", defer: false %>
+    <%= javascript_pack_tag "application", "alpine", "flash", defer: false %>
   <% else %>
-    <%= javascript_pack_tag "application", defer: false %>
+    <%= javascript_pack_tag "application", "alpine", defer: false %>
   <% end %>
 
   <%= stylesheet_pack_tag "application" %>
