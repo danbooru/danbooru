@@ -273,7 +273,7 @@ GEM
       llhttp-ffi (~> 0.4.0)
     http-form_data (2.3.0)
     httpclient (2.8.3)
-    i18n (1.9.1)
+    i18n (1.10.0)
       concurrent-ruby (~> 1.0)
     io-wait (0.2.1)
     ipaddress_2 (0.14.0)
@@ -518,7 +518,7 @@ GEM
       unf_ext
     unf_ext (0.0.8)
     unicode-display_width (2.1.0)
-    view_component (2.49.0)
+    view_component (2.49.1)
       activesupport (>= 5.0.0, < 8.0)
       method_source (~> 1.0)
     webpacker (6.0.0.rc.6)
