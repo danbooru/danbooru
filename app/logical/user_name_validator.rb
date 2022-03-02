@@ -11,7 +11,8 @@ class UserNameValidator < ActiveModel::EachValidator
     name = value
 
     rec.errors.add(attr, "already exists") if User.find_by_name(name).present?
-    rec.errors.add(attr, "must be 2 to 100 characters long") if !name.length.between?(2, 100)
+    rec.errors.add(attr, "must be more than 1 character long") if name.length <= 1
+    rec.errors.add(attr, "must be less than 25 characters long") if name.length >= 25
     rec.errors.add(attr, "cannot have whitespace or colons") if name =~ /[[:space:]]|:/
     rec.errors.add(attr, "cannot begin or end with an underscore") if name =~ /\A_|_\z/
     rec.errors.add(attr, "is not allowed") if name =~ Regexp.union(Danbooru.config.user_name_blacklist)

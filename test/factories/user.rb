@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory(:user, aliases: [:creator, :updater]) do
-    name { SecureRandom.uuid }
+    name { SecureRandom.uuid.first(20) }
     password {"password"}
     level {20}
     last_logged_in_at {Time.now}
