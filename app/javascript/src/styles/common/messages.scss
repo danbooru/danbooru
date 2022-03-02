@@ -16,10 +16,6 @@ div.list-of-messages {
       width: 12em;
       margin-right: 1em;
 
-      div.author-name {
-        font-weight: bold;
-      }
-
       a.message-timestamp {
         font-style: italic;
         font-size: var(--text-sm);
