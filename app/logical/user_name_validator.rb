@@ -7,14 +7,33 @@
 #
 # @see https://guides.rubyonrails.org/active_record_validations.html#custom-validators
 class UserNameValidator < ActiveModel::EachValidator
-  def validate_each(rec, attr, value)
-    name = value
+  ALLOWED_PUNCTUATION = "_.-" # All other punctuation characters are forbidden
 
-    rec.errors.add(attr, "already exists") if User.find_by_name(name).present?
-    rec.errors.add(attr, "must be more than 1 character long") if name.length <= 1
-    rec.errors.add(attr, "must be less than 25 characters long") if name.length >= 25
-    rec.errors.add(attr, "cannot have whitespace or colons") if name =~ /[[:space:]]|:/
-    rec.errors.add(attr, "cannot begin or end with an underscore") if name =~ /\A_|_\z/
-    rec.errors.add(attr, "is not allowed") if name =~ Regexp.union(Danbooru.config.user_name_blacklist)
+  def validate_each(rec, attr, name)
+    forbidden_characters = name.delete(ALLOWED_PUNCTUATION).chars.grep(/[[:punct:]]/).uniq
+
+    if rec.new_record? && User.find_by_name(name).present?
+      rec.errors.add(attr, "already exists")
+    elsif name.length <= 1
+      rec.errors.add(attr, "must be more than 1 character long")
+    elsif name.length >= 25
+      rec.errors.add(attr, "must be less than 25 characters long")
+    elsif name =~ /[[:space:]]/
+      rec.errors.add(attr, "can't contain whitespace")
+    elsif name =~ /\A[[:punct:]]/
+      rec.errors.add(attr, "can't start with '#{name.first}'")
+    elsif name =~ /[[:punct:]]\z/
+      rec.errors.add(attr, "can't end with '#{name.last}'")
+    elsif name =~ /__/
+      rec.errors.add(attr, "can't contain multiple underscores in a row")
+    elsif forbidden_characters.present?
+      rec.errors.add(attr, "can't contain #{forbidden_characters.map { |c| "'#{c}'" }.to_sentence}")
+    elsif name !~ /\A([a-zA-Z0-9]|\p{Han}|\p{Hangul}|\p{Hiragana}|\p{Katakana}|[#{ALLOWED_PUNCTUATION}])+\z/
+      rec.errors.add(attr, "must contain only basic letters or numbers")
+    elsif name =~ /\Auser_\d+\z/i
+      rec.errors.add(attr, "can't be the same as a deleted user")
+    elsif name =~ Regexp.union(Danbooru.config.user_name_blacklist)
+      rec.errors.add(attr, "is not allowed")
+    end
   end
 end

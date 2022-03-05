@@ -148,27 +148,51 @@ class UserTest < ActiveSupport::TestCase
     context "name" do
       should "not contain whitespace" do
         # U+2007: https://en.wikipedia.org/wiki/Figure_space
-        user = FactoryBot.build(:user, :name => "foo\u2007bar")
+        user = build(:user, name: "foo\u2007bar")
         user.save
-        assert_equal(["Name cannot have whitespace or colons"], user.errors.full_messages)
+        assert_equal(["Name can't contain whitespace"], user.errors.full_messages)
+      end
+
+      should "be less than 25 characters long" do
+        user = build(:user, name: "a"*25)
+        user.save
+        assert_equal(["Name must be less than 25 characters long"], user.errors.full_messages)
       end
 
       should "not contain a colon" do
-        user = FactoryBot.build(:user, :name => "a:b")
+        user = build(:user, name: "a:b")
         user.save
-        assert_equal(["Name cannot have whitespace or colons"], user.errors.full_messages)
+        assert_equal(["Name can't contain ':'"], user.errors.full_messages)
       end
 
       should "not begin with an underscore" do
-        user = FactoryBot.build(:user, :name => "_x")
+        user = build(:user, name: "_x")
         user.save
-        assert_equal(["Name cannot begin or end with an underscore"], user.errors.full_messages)
+        assert_equal(["Name can't start with '_'"], user.errors.full_messages)
       end
 
       should "not end with an underscore" do
-        user = FactoryBot.build(:user, :name => "x_")
+        user = build(:user, name: "x_")
         user.save
-        assert_equal(["Name cannot begin or end with an underscore"], user.errors.full_messages)
+        assert_equal(["Name can't end with '_'"], user.errors.full_messages)
+      end
+
+      should "not contain consecutive underscores" do
+        user = build(:user, name: "x__y")
+        user.save
+        assert_equal(["Name can't contain multiple underscores in a row"], user.errors.full_messages)
+      end
+
+      should "not allow non-ASCII characters" do
+        user = build(:user, name: "Pokémon")
+        user.save
+        assert_equal(["Name must contain only basic letters or numbers"], user.errors.full_messages)
+      end
+
+      should "not be in the same format as a deleted user" do
+        user = build(:user, name: "user_1234")
+        user.save
+        assert_equal(["Name can't be the same as a deleted user"], user.errors.full_messages)
       end
 
       should "not allow blacklisted names" do
@@ -176,11 +200,6 @@ class UserTest < ActiveSupport::TestCase
         user = build(:user, name: "voldemort42")
         user.save
         assert_equal(["Name is not allowed"], user.errors.full_messages)
-      end
-
-      should "be updated" do
-        @user = FactoryBot.create(:user)
-        @user.update_attribute(:name, "danzig")
       end
     end
 
@@ -206,10 +225,14 @@ class UserTest < ActiveSupport::TestCase
         assert_nil(User.name_to_id("does_not_exist"))
       end
 
-      should "work for names containing asterisks or backlashes" do
-        @user1 = create(:user, name: "user*1")
-        @user2 = create(:user, name: "user*2")
-        @user3 = create(:user, name: "user\*3")
+      should "work for names containing asterisks or backslashes" do
+        @user1 = build(:user, name: "user*1")
+        @user2 = build(:user, name: "user*2")
+        @user3 = build(:user, name: "user\*3")
+
+        @user1.save(validate: false)
+        @user2.save(validate: false)
+        @user3.save(validate: false)
 
         assert_equal(@user1.id, User.find_by_name("user*1").id)
         assert_equal(@user2.id, User.find_by_name("user*2").id)
@@ -259,9 +282,13 @@ class UserTest < ActiveSupport::TestCase
 
     context "when searched by name" do
       should "match wildcards" do
-        user1 = FactoryBot.create(:user, :name => "foo")
-        user2 = FactoryBot.create(:user, :name => "foo*bar")
-        user3 = FactoryBot.create(:user, :name => "bar\*baz")
+        user1 = build(:user, name: "foo")
+        user2 = build(:user, name: "foo*bar")
+        user3 = build(:user, name: "bar\*baz")
+
+        user1.save(validate: false)
+        user2.save(validate: false)
+        user3.save(validate: false)
 
         assert_equal([user2.id, user1.id], User.search(name: "foo*").map(&:id))
         assert_equal([user2.id], User.search(name: "foo\*bar").map(&:id))

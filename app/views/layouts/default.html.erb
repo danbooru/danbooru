@@ -104,6 +104,13 @@
       <%= render "users/dmail_notice" %>
     <% end %>
 
+    <% if !CurrentUser.user.is_anonymous? && CurrentUser.user.name_invalid? %>
+      <div class="notice notice-error notice-large" id="invalid-name-notice">
+        <h2>Action required </h2>
+        <div>You must <%= link_to "change your username", new_user_name_change_request_path %> to continue using <%= Danbooru.config.canonical_app_name %>.</div>
+      </div>
+    <% end %>
+
     <div class="notice notice-info" id="notice" style="<%= "display: none;" unless flash[:notice] %>">
       <span class="prose"><%= format_text(flash[:notice], inline: true) %>.</span>
       <a href="#" id="close-notice-link">close</a>

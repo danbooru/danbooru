@@ -1,13 +1,32 @@
 <div id="c-user-name-change-requests">
-  <div id="a-new">
-    <h1>Name Change Request</h1>
+  <div id="a-new" class="fixed-width-container">
+    <h1>Change Name</h1>
 
-    <p>You can request a name change once per week. Your previous names will still
-    be visible on your profile to other Danbooru members, but they won't be visible
-    to search engines.</p>
+    <% if CurrentUser.user.name_invalid? %>
+      <p> Your current username is invalid. You must change your username to continue
+      using <%= Danbooru.config.canonical_app_name %>.</p>
+
+      <p>
+        Current name: <b><%= CurrentUser.user.name %></b>.<br>
+        Error: <%= CurrentUser.user.name_errors.full_messages.join(". ").html_safe %>.
+      </p>
+    <% end %>
+
+    <div class="prose mt-4 mb-4">
+      <h6>Rules</h6>
+      <ul>
+        <li>Names can contain only letters, numbers, underscore ('_'), period ('.'), and dash ('-') characters.</li>
+        <li>Names must start and end with a letter or number.</li>
+        <li>Names must be less than 25 characters long.</li>
+        <li>Names can't insult or impersonate other users.</li>
+        <li>Names are case-insensitive.</li>
+        <li>Your previous names will be visible on your profile to other Danbooru members, but they won't be visible to search engines.</li>
+        <li>You can't change your name more than once per week.</li>
+      </ul>
+    </div>
 
     <%= edit_form_for(@change_request) do |f| %>
-      <%= f.input :desired_name, label: "Name" %>
+      <%= f.input :desired_name, label: "New name" %>
       <%= f.input :desired_name_confirmation, label: "Confirm name" %>
       <%= f.submit "Submit", "data-confirm": "Are you sure you want to change your name?" %>
     <% end %>

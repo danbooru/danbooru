@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  extend Memoist
+
   class PrivilegeError < StandardError; end
 
   module Levels
@@ -203,6 +205,18 @@ class User < ApplicationRecord
       if enable_private_favorites_was == false && enable_private_favorites == true && !Pundit.policy!(self, self).can_enable_private_favorites?
         errors.add(:base, "Can't enable privacy mode without a Gold account")
       end
+    end
+
+    def name_errors
+      User.validators_on(:name).each do |validator|
+        validator.validate_each(self, :name, name)
+      end
+
+      errors
+    end
+
+    def name_invalid?
+      name_errors.present?
     end
   end
 
@@ -695,4 +709,6 @@ class User < ApplicationRecord
   def self.available_includes
     [:inviter]
   end
+
+  memoize :name_errors
 end

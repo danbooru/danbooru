@@ -12,6 +12,13 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         get_auth new_user_name_change_request_path, @user
         assert_response :success
       end
+
+      should "render when the current user's name is invalid" do
+        @user.update_columns(name: "foo__bar")
+        get_auth new_user_name_change_request_path, @user
+
+        assert_response :success
+      end
     end
 
     context "create action" do
