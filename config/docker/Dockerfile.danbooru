@@ -27,7 +27,8 @@ RUN \
   asdf plugin add nodejs && \
   asdf install nodejs "$NODE_VERSION" && \
   asdf global nodejs "$NODE_VERSION" && \
-  npm install --unsafe-perm=true -g yarn
+  npm install --unsafe-perm=true -g yarn && \
+  chmod -R go+rx /root/.config # make Yarn config dir readable for non-root
 
 COPY Gemfile Gemfile.lock ./
 RUN \

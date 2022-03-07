@@ -139,6 +139,10 @@ install_postgresql_client() {
   apt_install postgresql-client-${POSTGRESQL_CLIENT_VERSION}
 }
 
+install_foreman() {
+  gem install foreman
+}
+
 install_busybox() {
   busybox --install -s
 }
@@ -172,5 +176,6 @@ install_vips
 install_ruby
 install_openresty
 install_postgresql_client
+install_foreman
 cleanup
 install_busybox # after cleanup so we can install some utils removed by cleanup
