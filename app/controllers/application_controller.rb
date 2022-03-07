@@ -15,6 +15,7 @@ class ApplicationController < ActionController::Base
   before_action :set_variant
   before_action :add_headers
   before_action :cause_error
+  before_action :redirect_if_name_invalid?
   after_action :skip_session_if_publicly_cached
   after_action :reset_current_user
   layout "default"
@@ -196,6 +197,13 @@ class ApplicationController < ActionController::Base
     error.set_backtrace(caller)
 
     render_error_page(status, error)
+  end
+
+  def redirect_if_name_invalid?
+    if request.format.html? && CurrentUser.user.name_invalid?
+      flash[:notice] = "You must change your username to continue using #{Danbooru.config.app_name}"
+      redirect_to new_user_name_change_request_path
+    end
   end
 
   def ip_ban_check

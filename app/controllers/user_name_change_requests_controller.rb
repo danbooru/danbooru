@@ -3,6 +3,8 @@
 class UserNameChangeRequestsController < ApplicationController
   respond_to :html, :json, :xml
 
+  skip_before_action :redirect_if_name_invalid?
+
   def new
     @change_request = authorize UserNameChangeRequest.new(permitted_attributes(UserNameChangeRequest))
     respond_with(@change_request)

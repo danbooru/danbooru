@@ -76,13 +76,12 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "when a user has an invalid username" do
-      should "show a warning banner" do
+      should "redirect to the name change page" do
         @user = create(:user)
         @user.update_columns(name: "foo__bar")
 
         get_auth posts_path, @user
-        assert_response :success
-        assert_select "#invalid-name-notice"
+        assert_redirected_to new_user_name_change_request_path
       end
     end
 
