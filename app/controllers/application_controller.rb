@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
-  include Pundit
+  include Pundit::Authorization
   helper_method :search_params, :permitted_attributes
 
   self.responder = ApplicationResponder
@@ -207,7 +207,7 @@ class ApplicationController < ActionController::Base
   end
 
   def pundit_params_for(record)
-    params.fetch(PolicyFinder.new(record).param_key, {})
+    params.fetch(Pundit::PolicyFinder.new(record).param_key, {})
   end
 
   def requires_reauthentication

@@ -31,7 +31,7 @@ gem 'puma'
 gem 'scenic'
 gem 'ipaddress_2'
 gem 'http'
-gem 'activerecord-hierarchical_query', git: "https://github.com/danbooru/activerecord-hierarchical_query"
+gem 'activerecord-hierarchical_query'
 gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
 gem 'mail'
