@@ -189,6 +189,12 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(["Name must contain only basic letters or numbers"], user.errors.full_messages)
       end
 
+      should "not allow names ending in file extensions" do
+        user = build(:user, name: "evazion.json")
+        user.save
+        assert_equal(["Name can't end with a file extension"], user.errors.full_messages)
+      end
+
       should "not be in the same format as a deleted user" do
         user = build(:user, name: "user_1234")
         user.save
