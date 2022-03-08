@@ -30,6 +30,7 @@ module Source
       Source::URL::Newgrounds,
       Source::URL::Plurk,
       Source::URL::Skeb,
+      Source::URL::Tumblr,
       Source::URL::TwitPic,
       Source::URL::Weibo,
     ]

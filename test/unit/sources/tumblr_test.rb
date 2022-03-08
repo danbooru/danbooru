@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class TumblrTest < ActiveSupport::TestCase
@@ -114,7 +114,7 @@ module Sources
       end
 
       context "with a referer" do
-        should "get all the images and metadata" do
+        should "get all the metadata" do
           site = Sources::Strategies.find(@url, @ref)
 
           assert_equal("noizave", site.artist_name)
@@ -122,26 +122,18 @@ module Sources
           assert_equal(["tag1", "tag2"], site.tags.map(&:first))
           assert_equal(@ref, site.canonical_url)
           assert_equal("https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg", site.image_url)
-          assert_equal(%w[
-            https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_orwwptNBCE1wsfqepo1_1280.png
-            https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg
-            https://media.tumblr.com/d2ed224f135b0c81f812df81a0a8692d/tumblr_orwwptNBCE1wsfqepo3_640.gif
-            https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_inline_os3134mABB1v11u29_1280.png
-            https://media.tumblr.com/34ed9d0ff4a21625981372291cb53040/tumblr_nv3hwpsZQY1uft51jo1_1280.gif
-          ], site.image_urls)
         end
       end
 
       context "without a referer" do
-        should "get the original image" do
+        should "still find all the relevant information" do
           site = Sources::Strategies.find(@url)
 
-          assert_nil(site.artist_name)
-          assert_nil(site.profile_url)
-          assert_nil(site.canonical_url)
-          assert_equal([], site.tags)
+          assert_equal("noizave", site.artist_name)
+          assert_equal("https://noizave.tumblr.com", site.profile_url)
+          assert_equal(["tag1", "tag2"], site.tags.map(&:first))
+          assert_equal(@ref, site.canonical_url)
           assert_equal("https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg", site.image_url)
-          assert_equal(["https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"], site.image_urls)
         end
       end
     end
@@ -161,40 +153,24 @@ module Sources
       end
 
       should "get the commentary" do
-        desc = %r!<p>description</p><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://\d+.media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os2zhkfhY01v11u29_540.png" data-orig-height="3000" data-orig-width="3000"/></figure><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://\d+.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_inline_os2zkg02xH1v11u29_540.jpg" data-orig-height="3000" data-orig-width="3000"/></figure>!
+        desc = %r{<p>description</p><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://\d+.media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os2zhkfhY01v11u29_540.png" data-orig-height="3000" data-orig-width="3000"/></figure><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://\d+.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_inline_os2zkg02xH1v11u29_540.jpg" data-orig-height="3000" data-orig-width="3000"/></figure>}
         assert_equal("test post", @site.artist_commentary_title)
         assert_match(desc, @site.artist_commentary_desc)
       end
     end
 
-    context "The source for a 'http://ve.media.tumblr.com/*' video post with inline images" do
-      setup do
-        @url = "https://va.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4"
-        @ref = "https://noizave.tumblr.com/post/162222617101"
-      end
+    context "A video post with inline images" do
+      should "get the video and inline images" do
+        url = "https://noizave.tumblr.com/post/162222617101"
+        site = Sources::Strategies.find(url)
+        urls = %w[
+          https://va.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
+          https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_1280.png
+        ]
 
-      context "with a referer" do
-        should "get the video and inline images" do
-          site = Sources::Strategies.find(@url, @ref)
-          urls = %w[
-            https://va.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
-            https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_1280.png
-          ]
-
-          assert_equal(@url, site.image_url)
-          assert_equal(urls, site.image_urls)
-          assert_equal(@ref, site.canonical_url)
-        end
-      end
-
-      context "without a referer" do
-        should "get the video" do
-          site = Sources::Strategies.find(@url)
-
-          assert_equal(@url, site.image_url)
-          assert_equal([@url], site.image_urls)
-          assert_nil(site.canonical_url)
-        end
+        assert_equal("https://va.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4", site.image_url)
+        assert_equal(urls, site.image_urls)
+        assert_equal(url, site.canonical_url)
       end
     end
 
@@ -254,7 +230,6 @@ module Sources
           site = Sources::Strategies.find(image, page)
 
           assert_equal(full, site.image_url)
-          assert_equal(full, site.image_urls.second)
         end
       end
     end
