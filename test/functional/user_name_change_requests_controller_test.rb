@@ -23,7 +23,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "work" do
-        post_auth user_name_change_requests_path, @user, params: { user_name_change_request: { desired_name: "zun", desired_name_confirmation: "zun" }}
+        post_auth user_name_change_requests_path, @user, params: { user_name_change_request: { desired_name: "zun" }}
 
         assert_redirected_to profile_path
         assert_equal("zun", @user.reload.name)

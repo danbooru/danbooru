@@ -10,6 +10,6 @@ class UserNameChangeRequestPolicy < ApplicationPolicy
   end
 
   def permitted_attributes
-    [:desired_name, :desired_name_confirmation]
+    [:desired_name]
   end
 end

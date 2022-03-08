@@ -27,8 +27,7 @@
 
     <%= edit_form_for(@change_request) do |f| %>
       <%= f.input :desired_name, label: "New name" %>
-      <%= f.input :desired_name_confirmation, label: "Confirm name" %>
-      <%= f.submit "Submit", "data-confirm": "Are you sure you want to change your name?" %>
+      <%= f.submit "Submit" %>
     <% end %>
   </div>
 </div>
