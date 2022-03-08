@@ -31,6 +31,8 @@ class UserNameChangeRequest < ApplicationRecord
   end
 
   def not_limited
+    return if user.name_invalid?
+
     if UserNameChangeRequest.unscoped.where(user: user).exists?(["created_at >= ?", 1.week.ago])
       errors.add(:base, "You can only submit one name change request per week")
     end
