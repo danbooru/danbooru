@@ -42,19 +42,11 @@ module Sources
       end
 
       def tags
-        tags = page&.search(".info .tag, .main .tag a, .tagarea, .m-info .tags .tag")
-
-        tags.to_a.map do |tag|
-          [tag.text.gsub(/^● /, ""), tag.attr("href")]
+        return [] if artist_name.blank?
+        page&.search("[href*='#{artist_name}.lofter.com/tag/']").to_a.map do |tag|
+          href = tag.attr("href")
+          [Source::URL.parse(href).unescaped_tag, href]
         end
-
-        if tags.blank?
-          tags = page&.search(".main .tags a").to_a.map do |tag|
-            [tag.text.gsub(/^#/, ""), tag.attr("href")]
-          end
-        end
-
-        tags
       end
 
       def artist_commentary_desc
