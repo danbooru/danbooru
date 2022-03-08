@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class WeiboTest < ActiveSupport::TestCase
@@ -40,7 +40,7 @@ module Sources
       should "get the tags" do
         tags = [
           %w[fgo https://s.weibo.com/weibo/fgo],
-          %w[Alter组 https://s.weibo.com/weibo/Alter组]
+          %w[Alter组 https://s.weibo.com/weibo/Alter组],
         ]
         assert_equal(tags, @site.tags)
       end
@@ -76,18 +76,10 @@ module Sources
       end
     end
 
-    context "An album url for a post with multiple pictures" do
-      should "upload the right picture rather than just the first" do
-        site = Sources::Strategies.find("http://photo.weibo.com/2125874520/wbphotos/large/mid/4194742441135220/pid/7eb64558gy1fnbryb5nzoj20dw10419t")
-
-        assert_equal("https://wx4.sinaimg.cn/large/7eb64558gy1fnbryb5nzoj20dw10419t.jpg", site.image_url)
-      end
-    end
-
-    context "An upload from the batch bookmarklet" do
+    context "A multi-page upload" do
       should "set the right source" do
         url = "https://wx1.sinaimg.cn/large/7eb64558gy1fnbryriihwj20dw104wtu.jpg"
-        ref = "http://photo.weibo.com/2125874520/wbphotos/large/mid/4194742441135220/pid/7eb64558gy1fnbryb5nzoj20dw10419t"
+        ref = "https://photo.weibo.com/2125874520/wbphotos/large/mid/4194742441135220/pid/7eb64558gy1fnbryb5nzoj20dw10419t"
         site = Sources::Strategies.find(url, ref)
 
         assert_equal("https://www.weibo.com/2125874520/FDKGo4Lk0", site.canonical_url)
@@ -97,12 +89,12 @@ module Sources
     context "normalizing for source" do
       should "normalize correctly" do
         source1 = "https://www.weibo.com/3150932560/H4cFbeKKA?from=page_1005053150932560_profile&wvr=6&mod=weibotime"
-        source2 = "http://photo.weibo.com/2125874520/wbphotos/large/mid/4242129997905387/pid/7eb64558ly1friyzhj44lj20dw2qxe81"
+        source2 = "https://photo.weibo.com/2125874520/wbphotos/large/mid/4242129997905387/pid/7eb64558ly1friyzhj44lj20dw2qxe81"
         source3 = "https://m.weibo.cn/status/4173757483008088?luicode=20000061&lfid=4170879204256635"
         source4 = "https://tw.weibo.com/SEINEN/4098035921690224"
 
         assert_equal("https://www.weibo.com/3150932560/H4cFbeKKA", Sources::Strategies.normalize_source(source1))
-        assert_equal(source2, Sources::Strategies.normalize_source(source2))
+        assert_equal("https://m.weibo.cn/detail/4242129997905387", Sources::Strategies.normalize_source(source2))
         assert_equal("https://m.weibo.cn/status/4173757483008088", Sources::Strategies.normalize_source(source3))
         assert_equal("https://m.weibo.cn/detail/4098035921690224", Sources::Strategies.normalize_source(source4))
       end
