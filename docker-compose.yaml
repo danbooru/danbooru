@@ -39,7 +39,7 @@ services:
       - /tmp
     depends_on:
       - postgres
-    command: ["bash", "-c", "bin/rails db:prepare && bin/rails server -b 0.0.0.0"]
+    command: ["bash", "-c", "bin/rails db:prepare && bin/rails db:seed && bin/rails server -b 0.0.0.0"]
 
   cron:
     user: root
