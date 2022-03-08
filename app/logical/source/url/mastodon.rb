@@ -1,26 +1,10 @@
 # frozen_string_literal: true
 
-# Image URLs
-#
-# * https://img.pawoo.net/media_attachments/files/001/297/997/small/c4272a09570757c2.png (page: https://pawoo.net/@evazion/19451018)
-# * https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png
-#
-# * https://pawoo.net/media/lU2uV7C1MMQSb1czwvg (=> https://img.pawoo.net/media_attachments/files/001/300/923/original/cd18271f0077e789.png)
-#
-# Page URLs
-#
-# * https://pawoo.net/@evazion/19451018
-# * https://pawoo.net/web/statuses/19451018
-#
-# Account URLs
-#
-# * https://pawoo.net/@evazion
-# * https://pawoo.net/web/accounts/47806
+# Unparsed:
 #
 # OAuth URL: (Note: ID is different from account URL ID)
-#
 # * https://pawoo.net/oauth_authentications/17230064
-#
+
 class Source::URL::Mastodon < Source::URL
   attr_reader :username, :user_id, :work_id, :full_image_url
 

@@ -1,18 +1,5 @@
 # frozen_string_literal: true
 
-# Image URLs:
-#
-# * https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg (page: https://www.nijie.info/view.php?id=64240)
-# * https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png (page: https://www.nijie.info/view.php?id=218856)
-# * https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png (page: http://nijie.info/view.php?id=218856)
-# * https://pic01.nijie.info/nijie_picture/diff/main/218856_1_236014_20170620101330.png
-# * https://pic05.nijie.info/nijie_picture/diff/main/559053_20180604023346_1.png (page: http://nijie.info/view_popup.php?id=265428#diff_2)
-# * https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png (page: http://nijie.info/view_popup.php?id=287736#diff_2)
-# * https://pic.nijie.net/03/nijie_picture/236014_20170620101426_0.png (page: https://www.nijie.info/view.php?id=218856)
-#
-# * https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg
-# * https://pic.nijie.net/06/nijie/17/14/236014/illust/218856_1_7646cf57f6f1c695_f2ed81.png (page: https://nijie.info/view.php?id=218856)
-#
 # Unhandled:
 #
 # * https://pic01.nijie.info/nijie_picture/20120211210359.jpg
@@ -21,35 +8,6 @@
 # * https://pic05.nijie.info/dojin_main/dojin_sam/1_2768_20180429004232.png
 # * https://pic04.nijie.info/horne_picture/diff/main/56095_20160403221810_0.jpg
 # * https://pic04.nijie.info/omata/4829_20161128012012.png (page: http://nijie.info/view_popup.php?id=33224#diff_3)
-#
-# Preview URLs:
-#
-# * https://pic01.nijie.info/__rs_l120x120/nijie_picture/diff/main/218856_0_236014_20170620101329.png
-# * https://pic03.nijie.info/__rs_l120x120/nijie_picture/236014_20170620101426_0.png
-# * https://pic03.nijie.info/__rs_l170x170/nijie_picture/236014_20170620101426_0.png
-# * https://pic03.nijie.info/__rs_l650x650/nijie_picture/236014_20170620101426_0.png
-# * https://pic03.nijie.info/__rs_cns350x350/nijie_picture/236014_20170620101426_0.png
-# * https://pic03.nijie.info/small_light(dh=150,dw=150,q=100)/nijie_picture/236014_20170620101426_0.png
-#
-# Page URLs:
-#
-# * https://nijie.info/view.php?id=167755 (deleted post)
-# * https://nijie.info/view.php?id=218856
-# * https://nijie.info/view_popup.php?id=218856
-# * https://nijie.info/view_popup.php?id=218856#diff_1
-# * https://www.nijie.info/view.php?id=218856
-# * https://sp.nijie.info/view.php?id=218856
-#
-# Profile URLs
-#
-# * https://nijie.info/members.php?id=236014
-# * https://nijie.info/members_illust.php?id=236014
-#
-# Doujin
-#
-# * http://nijie.info/view.php?id=384548
-# * http://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700%E3%82%B3%E3%83%94%E3%83%BC%20%EF%BD%9E%200011%E3%81%AE%E3%82%B3%E3%83%94%E3%83%BC.jpg (NSFW)
-# * http://pic.nijie.net/01/__rs_l120x120/dojin_main/dojin_sam/20120213044700%E3%82%B3%E3%83%94%E3%83%BC%20%EF%BD%9E%200011%E3%81%AE%E3%82%B3%E3%83%94%E3%83%BC.jpg
 
 class Source::URL::Nijie < Source::URL
   attr_reader :work_id, :user_id

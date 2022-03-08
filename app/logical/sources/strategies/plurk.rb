@@ -15,6 +15,16 @@ module Sources
       end
 
       def image_urls
+        # * Posts can have up to 10 images.
+        # * Artists commonly post extra images by replying to their own post.
+        # * Adult posts are hidden for logged out users. The main images can be found by
+        #   scraping a <script> tag, but an API call is needed to get the images in the replies.
+        #
+        # Examples:
+        # * https://www.plurk.com/p/om6zv4 (non-adult, single image)
+        # * https://www.plurk.com/p/okxzae (non-adult, multiple images, with replies)
+        # * https://www.plurk.com/p/omc64y (adult, multiple images, with replies)
+
         if parsed_url.image_url?
           [url]
         elsif page_json["porn"]
