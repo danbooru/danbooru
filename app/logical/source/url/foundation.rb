@@ -112,6 +112,8 @@ class Source::URL::Foundation < Source::URL
 
   def page_url
     return nil unless work_id.present?
+    return nil if host == "f8n-production-collection-assets.imgix.net" && @hash.blank?
+    # https://f8n-production-collection-assets.imgix.net/0xAcf67a11D93D22bbB51fddD9B039d43d5Db484Bc/3/nft.png cannot be normalized to a correct page url
 
     username = @username || "foundation"
     collection = @collection || "foundation"
