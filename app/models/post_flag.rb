@@ -8,6 +8,8 @@ class PostFlag < ApplicationRecord
 
   belongs_to :creator, class_name: "User"
   belongs_to :post
+
+  before_validation { post.lock! }
   validates :reason, presence: true, length: { in: 1..140 }
   validate :validate_creator_is_not_limited, on: :create
   validate :validate_post, on: :create
