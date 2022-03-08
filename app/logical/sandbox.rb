@@ -362,13 +362,13 @@ class Sandbox
     # https://github.com/torvalds/linux/blob/master/include/uapi/linux/sched.h
     bitmask :unshare_flags, [
       :clone_time,      7,  # 0x00000080, New time namespace
-      :clone_newns,	    17, # 0x00020000,	New mount (filesystem) namespace
+      :clone_newns,     17, # 0x00020000, New mount (filesystem) namespace
       :clone_newcgroup, 25, # 0x02000000, New cgroup namespace
-      :clone_newuts,	  26, # 0x04000000,	New utsname (hostname) namespace
-      :clone_newipc,	  27, # 0x08000000,	New ipc namespace
-      :clone_newuser,	  28, # 0x10000000, New user namespace
-      :clone_newpid,	  29, # 0x20000000,	New pid namespace
-      :clone_newnet,	  30, # 0x40000000,	New network namespace
+      :clone_newuts,    26, # 0x04000000, New utsname (hostname) namespace
+      :clone_newipc,    27, # 0x08000000, New ipc namespace
+      :clone_newuser,   28, # 0x10000000, New user namespace
+      :clone_newpid,    29, # 0x20000000, New pid namespace
+      :clone_newnet,    30, # 0x40000000, New network namespace
     ]
 
     # https://github.com/torvalds/linux/blob/master/include/uapi/linux/mount.h
