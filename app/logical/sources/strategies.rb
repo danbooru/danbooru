@@ -16,6 +16,7 @@ module Sources
         Strategies::HentaiFoundry,
         Strategies::Fanbox,
         Strategies::Mastodon,
+        Strategies::PixivSketch,
         Strategies::Weibo,
         Strategies::Newgrounds,
         Strategies::Skeb,

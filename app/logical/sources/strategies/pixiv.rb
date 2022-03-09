@@ -88,16 +88,12 @@ module Sources
       def match?
         return false if parsed_url.nil?
         return false if url.include? "/fanbox/"
+        return false if Source::URL::PixivSketch === parsed_url
         parsed_url.domain.in?(domains) || parsed_url.host == "tc-pximg01.techorus-cdn.com"
       end
 
       def site_name
-        # XXX pixiv sketch should be in a separate strategy
-        if parsed_url.host.in?(%w[sketch.pixiv.net img-sketch.pixiv.net img-sketch.pximg.net])
-          "Pixiv Sketch"
-        else
-          "Pixiv"
-        end
+        "Pixiv"
       end
 
       def image_urls

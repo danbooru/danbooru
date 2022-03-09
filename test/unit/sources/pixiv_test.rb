@@ -344,12 +344,6 @@ module Sources
           assert_illust_id(46323924, "http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip")
         end
 
-        should "not misparse ids from sketch urls" do
-          assert_nil_illust_id("https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg")
-          assert_nil_illust_id("https://img-sketch.pximg.net/c!/w=540,f=webp:jpeg/uploads/medium/file/4463372/8906921629213362989.jpg")
-          assert_nil_illust_id("https://sketch.pixiv.net/items/1588346448904706151")
-        end
-
         should "not misparse ids from novel urls" do
           assert_nil_illust_id("https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg")
           assert_nil_illust_id("https://i.pximg.net/c/600x600/novel-cover-master/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42_master1200.jpg")

@@ -28,6 +28,7 @@ module Source
       Source::URL::Moebooru,
       Source::URL::Nijie,
       Source::URL::Newgrounds,
+      Source::URL::PixivSketch,
       Source::URL::Plurk,
       Source::URL::Skeb,
       Source::URL::TwitPic,
