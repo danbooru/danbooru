@@ -43,7 +43,7 @@ module Sources
       def image_urls
         if is_ugoira?
           [api_ugoira[:originalSrc]]
-        elsif parsed_url.image_url? && parsed_url.page
+        elsif parsed_url.image_url? && parsed_url.page && original_urls.present?
           [original_urls[parsed_url.page]]
         elsif parsed_url.image_url?
           [parsed_url.to_s]
