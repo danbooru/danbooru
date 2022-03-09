@@ -86,6 +86,13 @@ module Sources
       end
     end
 
+    context "A deleted url" do
+      should "not raise errors" do
+        url = "https://weibo.com/5265069929/LiLnMENgs"
+        assert_nothing_raised { Sources::Strategies.find(url).to_h }
+      end
+    end
+
     context "normalizing for source" do
       should "normalize correctly" do
         source1 = "https://www.weibo.com/3150932560/H4cFbeKKA?from=page_1005053150932560_profile&wvr=6&mod=weibotime"

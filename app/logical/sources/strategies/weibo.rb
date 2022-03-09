@@ -30,6 +30,8 @@ module Sources
             end
             [largest_video]
           end
+        else
+          [url]
         end
       end
 
