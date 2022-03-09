@@ -274,7 +274,7 @@ module IconHelper
       image_icon_tag("picarto-logo.png", **options)
     when "Pixiv"
       image_icon_tag("pixiv-logo.png", **options)
-    when "Pixiv Fanbox"
+    when "Fanbox"
       image_icon_tag("pixiv-fanbox-logo.png", **options)
     when "Pixiv Sketch"
       image_icon_tag("pixiv-sketch-logo.png", **options)
