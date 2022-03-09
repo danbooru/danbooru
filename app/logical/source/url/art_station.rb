@@ -1,30 +1,5 @@
 # frozen_string_literal: true
 
-# Page URLs:
-#
-# * https://www.artstation.com/artwork/04XA4
-# * https://www.artstation.com/artwork/cody-from-sf (old; redirects to https://www.artstation.com/artwork/3JJA)
-# * https://sa-dui.artstation.com/projects/DVERn
-# * https://dudeunderscore.artstation.com/projects/NoNmD?album_id=23041
-#
-# Profile URLs:
-#
-# * https://www.artstation.com/artist/sa-dui
-# * https://www.artstation.com/sa-dui
-# * https://sa-dui.artstation.com/
-# * https://hosi_na.artstation.com
-#
-# Image URLs
-#
-# * https://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236
-# * https://cdnb.artstation.com/p/assets/images/images/014/410/217/smaller_square/bart-osz-bartosz1812041.jpg?1543866276
-# * https://cdna.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833
-# * https://cdna.artstation.com/p/assets/covers/images/007/262/828/small/monica-kyrie-1.jpg?1504865060
-#
-# API URLs
-#
-# * https://www.artstation.com/projects/04XA4.json
-
 class Source::URL::ArtStation < Source::URL
   RESERVED_SUBDOMAINS = %w[www cdn cdna cdnb]
   IMAGE_SUBDOMAINS = %w[cdn cdna cdnb]

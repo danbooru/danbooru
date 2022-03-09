@@ -20,7 +20,7 @@
 # Profile URLs:
 #
 # * http://twitpic.com/photos/Type10TK (dead)
-#
+
 class Source::URL::TwitPic < Source::URL
   attr_reader :base36_id
 
