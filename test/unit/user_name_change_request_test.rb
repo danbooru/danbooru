@@ -15,11 +15,9 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
 
       should "not validate if the desired name already exists" do
         assert_difference("UserNameChangeRequest.count", 0) do
-          req = UserNameChangeRequest.create(
-            :user_id => @requester.id,
-            :original_name => @requester.name,
-            :desired_name => @requester.name
-          )
+          req = build(:user_name_change_request, user: @requester, original_name: @requester.name, desired_name: @requester.name)
+          req.valid?
+
           assert_equal(["Desired name already exists"], req.errors.full_messages)
         end
       end

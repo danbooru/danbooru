@@ -28,6 +28,14 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to profile_path
         assert_equal("zun", @user.reload.name)
       end
+
+      should "fail if the new name is invalid" do
+        assert_no_changes(-> { @user.reload.name }) do
+          post_auth user_name_change_requests_path, @user, params: { user_name_change_request: { desired_name: "foo__bar" }}
+
+          assert_response :success
+        end
+      end
     end
 
     context "show action" do

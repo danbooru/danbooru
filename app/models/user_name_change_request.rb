@@ -6,7 +6,7 @@ class UserNameChangeRequest < ApplicationRecord
 
   validate :not_limited, on: :create
   validates :original_name, presence: true
-  validates :desired_name, presence: true
+  validates :desired_name, user_name: true, presence: true, on: :create
 
   after_create :update_name!
 
