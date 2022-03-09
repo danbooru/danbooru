@@ -43,7 +43,6 @@ class CommentComponentTest < ViewComponent::TestCase
         render_comment(@deleted_comment, current_user: create(:moderator_user))
 
         assert_css("article[data-is-dimmed=true]")
-        assert_no_css("article .unhide-comment-link")
         assert_css("article .author-name", text: @deleted_comment.creator.pretty_name)
         assert_css("article .body p", text: @deleted_comment.body)
       end
@@ -88,7 +87,6 @@ class CommentComponentTest < ViewComponent::TestCase
 
           assert_css("article.comment[data-is-thresholded=false]")
           assert_css("article.comment[data-is-dimmed=true]")
-          assert_no_css("article.comment .unhide-comment-link")
         end
       end
     end
