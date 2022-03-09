@@ -266,7 +266,7 @@ module IconHelper
       image_icon_tag("nijie-logo.png", **options)
     when "Patreon"
       image_icon_tag("patreon-logo.png", **options)
-    when "pawoo.net"
+    when "Pawoo"
       image_icon_tag("pawoo-logo.png", **options)
     when "Piapro.jp"
       image_icon_tag("piapro-jp-logo.png", **options)
