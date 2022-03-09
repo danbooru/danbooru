@@ -18,6 +18,7 @@
 module Source
   class URL < Danbooru::URL
     SUBCLASSES = [
+      Source::URL::Pixiv,
       Source::URL::Twitter,
       Source::URL::ArtStation,
       Source::URL::Fanbox,
