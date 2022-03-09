@@ -58,10 +58,10 @@ module Downloads
 
           assert_rewritten(@p0_full_size_image, @medium_page)
           assert_rewritten(@p0_full_size_image, @manga_page)
-          assert_rewritten(@p1_full_size_image, @manga_big_p1_page)
+          assert_rewritten(@p0_full_size_image, @manga_big_p1_page)
           assert_downloaded(@p0_file_size, @medium_page)
           assert_downloaded(@p0_file_size, @manga_page)
-          assert_downloaded(@p1_file_size, @manga_big_p1_page)
+          assert_downloaded(@p0_file_size, @manga_big_p1_page)
         end
 
         should "download the full size image instead of the thumbnail" do

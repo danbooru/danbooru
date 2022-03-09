@@ -2,7 +2,7 @@
 
 module Source
   class URL::Pixiv < Source::URL
-    attr_reader :work_id, :page, :username, :user_id, :full_image_url
+    attr_reader :work_id, :page, :username, :user_id
 
     def self.match?(url)
       return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url)
@@ -30,19 +30,12 @@ module Source
       in *, ("img-original" | "img-master" | "img-zip-ugoira" | "img-inf" | "custom-thumb"), "img", year, month, day, hour, min, sec, file if image_url?
         parse_filename
 
-        if work_id.present? && is_ugoira?
-          @full_image_url = "https://i.pximg.net/img-zip-ugoira/img/#{year}/#{month}/#{day}/#{hour}/#{min}/#{sec}/#{work_id}_ugoira1920x1080.zip"
-        elsif work_id.present? && page.present? && file_ext.present?
-          @full_image_url = "https://i.pximg.net/img-original/img/#{year}/#{month}/#{day}/#{hour}/#{min}/#{sec}/#{work_id}_p#{page}.#{file_ext}"
-        end
-
       # http://img18.pixiv.net/img/evazion/14901720.png
       # http://i2.pixiv.net/img18/img/evazion/14901720.png
       # http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png
       in *, "img", username, file if image_url?
         parse_filename
         @username = username
-        @full_image_url = url # XXX these URLs all return 404, so we can't convert them to a working full image URL.
 
       # https://www.pixiv.net/en/artworks/46324488
       # https://www.pixiv.net/artworks/46324488
@@ -90,7 +83,7 @@ module Source
       # http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png
       in /^\d+$/ => work_id, /^p\d+$/ => page, *rest
         @work_id = work_id
-        @page = page.delete_prefix("p")
+        @page = page.delete_prefix("p").to_i
 
       # https://i.pximg.net/img-original/img/2019/05/27/17/59/33/74932152_ugoira0.jpg
       # https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip

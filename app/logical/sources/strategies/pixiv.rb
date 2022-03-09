@@ -41,10 +41,12 @@ module Sources
       end
 
       def image_urls
-        if parsed_url.image_url?
-          [parsed_url.full_image_url]
-        elsif is_ugoira?
+        if is_ugoira?
           [api_ugoira[:originalSrc]]
+        elsif parsed_url.image_url? && parsed_url.page
+          [original_urls[parsed_url.page]]
+        elsif parsed_url.image_url?
+          [parsed_url.to_s]
         else
           original_urls
         end
@@ -122,7 +124,7 @@ module Sources
 
       def download_file!(url = image_url)
         file = super(url)
-        file.frame_data = ugoira_frame_data
+        file.frame_data = ugoira_frame_data if is_ugoira?
         file
       end
 
@@ -169,7 +171,6 @@ module Sources
       end
 
       def ugoira_frame_data
-        return nil unless is_ugoira?
         api_ugoira[:frames]
       end
 
