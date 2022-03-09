@@ -1,58 +1,9 @@
 # frozen_string_literal: true
 
-# Pixiv
-#
-# * https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
-# * https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png
-#
-# * https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg
-# * https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
-#
-# * https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png
-#
-# * https://www.pixiv.net/member_illust.php?mode=medium&illust_id=46324488
-# * https://www.pixiv.net/member_illust.php?mode=manga&illust_id=46324488
-# * https://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46324488&page=0
-# * https://www.pixiv.net/en/artworks/46324488
-#
-# * https://www.pixiv.net/member.php?id=339253
-# * https://www.pixiv.net/member_illust.php?id=339253&type=illust
-# * https://www.pixiv.net/u/9202877
-# * https://www.pixiv.net/stacc/noizave
-# * http://www.pixiv.me/noizave
-#
-# Novels
-#
-# * https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg
-# * https://i.pximg.net/c/600x600/novel-cover-master/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42_master1200.jpg
-# * https://img-novel.pximg.net/img-novel/work_main/XtFbt7gsymsvyaG45lZ8/1554.jpg?20190107110435
-#
-# * https://www.pixiv.net/novel/show.php?id=10617324
-# * https://novel.pixiv.net/works/1554
-#
-# Sketch
-#
-# * https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg
-# * https://img-sketch.pximg.net/c!/w=540,f=webp:jpeg/uploads/medium/file/4463372/8906921629213362989.jpg
-# * https://sketch.pixiv.net/items/1588346448904706151
-# * https://sketch.pixiv.net/@0125840
-#
-
+# @see Source::URL::Pixiv
 module Sources
   module Strategies
     class Pixiv < Base
-      MONIKER = /(?:[a-zA-Z0-9_-]+)/
-      PROFILE = %r{\Ahttps?://www\.pixiv\.net/member\.php\?id=[0-9]+\z}
-      DATE =    %r{(?<date>\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2})}i
-      EXT =     /(?:jpg|jpeg|png|gif)/i
-
-      WEB =     %r{(?:\A(?:https?://)?www\.pixiv\.net)}
-      I12 =     %r{(?:\A(?:https?://)?i[0-9]+\.pixiv\.net)}
-      IMG =     %r{(?:\A(?:https?://)?img[0-9]*\.pixiv\.net)}
-      PXIMG =   %r{(?:\A(?:https?://)?[^.]+\.pximg\.net)}
-      UGOIRA =  %r{#{PXIMG}/img-zip-ugoira/img/#{DATE}/(?<illust_id>\d+)_ugoira1920x1080\.zip\z}i
-      ORIG_IMAGE = %r{#{PXIMG}/img-original/img/#{DATE}/(?<illust_id>\d+)_p(?<page>\d+)\.#{EXT}\z}i
-
       def self.enabled?
         Danbooru.config.pixiv_phpsessid.present?
       end
@@ -81,48 +32,26 @@ module Sources
         end
       end
 
-      def domains
-        ["pixiv.net", "pximg.net"]
-      end
-
       def match?
-        return false if parsed_url.nil?
-        return false if url.include? "/fanbox/"
-        return false if Source::URL::PixivSketch === parsed_url
-        parsed_url.domain.in?(domains) || parsed_url.host == "tc-pximg01.techorus-cdn.com"
+        Source::URL::Pixiv === parsed_url
       end
 
       def site_name
-        "Pixiv"
+        parsed_url.site_name
       end
 
       def image_urls
-        if is_ugoira?
+        if parsed_url.image_url?
+          [parsed_url.full_image_url]
+        elsif is_ugoira?
           [api_ugoira[:originalSrc]]
-        elsif manga_page.present? && original_urls.present?
-          [original_urls[manga_page]]
-        elsif original_urls.present?
-          original_urls
         else
-          [url]
+          original_urls
         end
       end
 
       def original_urls
-        api_pages.map { |page| page.dig("urls", "original") }
-      end
-
-      def preview_urls
-        image_urls.map do |url|
-          case url
-          when ORIG_IMAGE
-            "https://i.pximg.net/c/240x240/img-master/img/#{$~[:date]}/#{$~[:illust_id]}_p#{$~[:page]}_master1200.jpg"
-          when UGOIRA
-            "https://i.pximg.net/c/240x240/img-master/img/#{$~[:date]}/#{$~[:illust_id]}_master1200.jpg"
-          else
-            url
-          end
-        end
+        api_pages.pluck("urls").pluck("original").to_a
       end
 
       def page_url
@@ -135,10 +64,8 @@ module Sources
       end
 
       def profile_url
-        url = urls.find { |url| url.match?(PROFILE) }
-
-        if url.present?
-          url
+        if parsed_url.profile_url.present?
+          parsed_url.profile_url
         elsif api_illust[:userId].present?
           "https://www.pixiv.net/users/#{api_illust[:userId]}"
         else
@@ -195,7 +122,7 @@ module Sources
 
       def download_file!(url = image_url)
         file = super(url)
-        file.frame_data = ugoira_frame_data if is_ugoira?
+        file.frame_data = ugoira_frame_data
         file
       end
 
@@ -214,58 +141,11 @@ module Sources
       end
 
       def is_ugoira?
-        # https://i.pximg.net/img-original/img/2019/05/27/17/59/33/74932152_ugoira0.jpg
-        url.match?(UGOIRA) || original_urls&.any?(/ugoira/)
+        original_urls.any? { |url| Source::URL.parse(url).is_ugoira? }
       end
 
       def illust_id
-        parsed_urls.each do |url|
-          # http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054
-          # http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
-          # http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054
-          # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
-          if url.host == "www.pixiv.net" && url.path == "/member_illust.php" && url.params.has_key?("illust_id")
-            return url.params[:illust_id].to_i
-
-          # http://www.pixiv.net/en/artworks/46324488
-          elsif url.host == "www.pixiv.net" && url.path =~ %r{\A/(?:en/)?artworks/(?<illust_id>\d+)}i
-            return $~[:illust_id].to_i
-
-          # http://www.pixiv.net/i/18557054
-          elsif url.host == "www.pixiv.net" && url.path =~ %r{\A/i/(?<illust_id>\d+)\z}i
-            return $~[:illust_id].to_i
-
-          # http://img18.pixiv.net/img/evazion/14901720.png
-          # http://i2.pixiv.net/img18/img/evazion/14901720.png
-          # http://i2.pixiv.net/img18/img/evazion/14901720_m.png
-          # http://i2.pixiv.net/img18/img/evazion/14901720_s.png
-          # http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png
-          # http://i1.pixiv.net/img07/img/pasirism/18557054_big_p1.png
-          elsif url.host =~ /\A(?:i\d+|img\d+)\.pixiv\.net\z/i &&
-              url.path =~ %r{\A(?:/img\d+)?/img/#{MONIKER}/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)}i
-            return $~[:illust_id].to_i
-
-          # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg
-          # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_s.png
-          # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p0_master1200.jpg
-          # http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p0.png
-          # http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip
-          # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
-          # https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
-          # https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png
-          # https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png
-          #
-          # but not:
-          #
-          # https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg
-          # https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg
-          elsif url.host =~ /\A(?:[^.]+\.pximg\.net|i\d+\.pixiv\.net|tc-pximg01\.techorus-cdn\.com)\z/i &&
-              url.path =~ %r{\A(/c/\w+)?/img-[a-z-]+/img/#{DATE}/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)}i
-            return $~[:illust_id].to_i
-          end
-        end
-
-        nil
+        parsed_url.work_id || parsed_referer&.work_id
       end
 
       def api_client
@@ -285,45 +165,12 @@ module Sources
       end
 
       def moniker
-        # we can sometimes get the moniker from the url
-        if url =~ %r{#{IMG}/img/(#{MONIKER})}i
-          $1
-        elsif url =~ %r{#{I12}/img[0-9]+/img/(#{MONIKER})}i
-          $1
-        elsif url =~ %r{#{WEB}/stacc/(#{MONIKER})/?$}i
-          $1
-        else
-          api_illust[:userAccount]
-        end
+        parsed_url.username || api_illust[:userAccount]
       end
 
       def ugoira_frame_data
         return nil unless is_ugoira?
         api_ugoira[:frames]
-      end
-
-      def ugoira_content_type
-        api_ugoira[:mime_type]
-      end
-
-      # Returns the current page number of the manga. This will not
-      # make any api calls and only looks at (url, referer_url).
-      def manga_page
-        # http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_p0.jpg
-        # http://i1.pixiv.net/c/600x600/img-master/img/2014/09/24/23/25/08/46168376_p0_master1200.jpg
-        # http://i1.pixiv.net/img-original/img/2014/09/25/23/09/29/46183440_p0.jpg
-        if url =~ %r{/\d+_p(\d+)(?:_\w+)?\.#{EXT}}i
-          return $1.to_i
-        end
-
-        # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46170939&page=0
-        [url, referer_url].each do |x|
-          if x =~ /page=(\d+)/i
-            return $1.to_i
-          end
-        end
-
-        nil
       end
 
       memoize :illust_id, :api_client, :api_illust, :api_pages, :api_ugoira

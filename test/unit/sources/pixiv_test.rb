@@ -8,7 +8,7 @@ module Sources
 
     def assert_illust_id(illust_id, url)
       site = Sources::Strategies.find(url)
-      assert_equal(illust_id, site.illust_id)
+      assert_equal(illust_id, site.illust_id.to_i)
       assert_nothing_raised { site.to_h }
     end
 
@@ -41,10 +41,6 @@ module Sources
 
         should "get the file url" do
           assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @site.file_url)
-        end
-
-        should "get the preview url" do
-          assert_equal("https://i.pximg.net/c/240x240/img-master/img/2017/04/04/08/57/38/62247364_master1200.jpg", @site.preview_url)
         end
 
         should "capture the frame data" do
@@ -101,10 +97,6 @@ module Sources
 
         should "get the full size image url" do
           assert_equal("https://i.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg", @site.image_url)
-        end
-
-        should "get the preview size image url" do
-          assert_equal("https://i.pximg.net/c/240x240/img-master/img/2017/11/21/05/12/37/65981735_p0_master1200.jpg", @site.preview_url)
         end
 
         should "get the page count" do
