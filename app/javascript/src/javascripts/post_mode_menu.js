@@ -64,7 +64,7 @@ PostModeMenu.initialize_selector = function() {
 }
 
 PostModeMenu.initialize_preview_link = function() {
-  $(document).on("click.danbooru", ".post-preview a", PostModeMenu.click);
+  $(document).on("click.danbooru", ".post-preview-container a", PostModeMenu.click);
 }
 
 PostModeMenu.initialize_edit_form = function() {
