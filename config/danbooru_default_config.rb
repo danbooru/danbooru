@@ -311,6 +311,11 @@ module Danbooru
       nil
     end
 
+    # Your Fantia "_session_id" cookie. Login to Fantia then use the
+    # devtools to find the "_session_id" cookie.
+    def fantia_session_id
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch

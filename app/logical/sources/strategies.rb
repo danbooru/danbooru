@@ -24,6 +24,7 @@ module Sources
         Strategies::Foundation,
         Strategies::Plurk,
         Strategies::TwitPic,
+        Strategies::Fantia,
       ]
     end
 

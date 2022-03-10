@@ -46,6 +46,8 @@ module ArtistFinder
     "facebook.com", # https://www.facebook.com/LuutenantsLoot
     "fantia.jp", # http://fantia.jp/no100
     "fantia.jp/fanclubs", # https://fantia.jp/fanclubs/1711
+    "fantia.jp/posts", # https://fantia.jp/posts/20000
+    "fantia.jp/products", # https://fantia.jp/products/10000
     "fav.me", # http://fav.me/d9y1njg
     /blog-imgs-\d+(?:-origin)?\.fc2\.com/i,
     %r{blog\.fc2\.com(/\w)+/?}i, # http://blog71.fc2.com/a/abk00/file/20080220194219.jpg

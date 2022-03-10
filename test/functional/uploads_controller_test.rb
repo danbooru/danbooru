@@ -352,6 +352,10 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://www.plurk.com/p/om6zv4")
 
         should_upload_successfully("https://gengar563.lofter.com/post/1e82da8c_1c98dae1b")
+
+        should_upload_successfully("https://c.fantia.jp/uploads/post/file/1070093/16faf0b1-58d8-4aac-9e86-b243063eaaf1.jpeg")
+        should_upload_successfully("https://fantia.jp/posts/1132267")
+        should_upload_successfully("https://fantia.jp/products/249638")
       end
     end
   end
