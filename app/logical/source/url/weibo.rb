@@ -36,7 +36,7 @@ class Source::URL::Weibo < Source::URL
 
     # https://m.weibo.cn/detail/4506950043618873
     in "m.weibo.cn", "detail", /\d+/ => illust_long_id
-      @illust_base62_id = illust_base62_id
+      @illust_long_id = illust_long_id
 
     # https://m.weibo.cn/status/J33G4tH1B
     in "m.weibo.cn", "status", /\w+/ => illust_base62_id
