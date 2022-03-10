@@ -28,6 +28,7 @@ module Source
       Source::URL::Lofter,
       Source::URL::Mastodon,
       Source::URL::Moebooru,
+      Source::URL::NicoSeiga,
       Source::URL::Nijie,
       Source::URL::Newgrounds,
       Source::URL::PixivSketch,

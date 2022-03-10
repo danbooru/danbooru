@@ -14,9 +14,9 @@ module Sources
       end
 
       should "get the profile" do
-        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777", @site_1.profile_url)
-        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777", @site_2.profile_url)
-        assert_equal("http://seiga.nicovideo.jp/user/illust/20797022", @site_3.profile_url)
+        assert_equal("https://seiga.nicovideo.jp/user/illust/7017777", @site_1.profile_url)
+        assert_equal("https://seiga.nicovideo.jp/user/illust/7017777", @site_2.profile_url)
+        assert_equal("https://seiga.nicovideo.jp/user/illust/20797022", @site_3.profile_url)
       end
 
       should "get the artist name" do
