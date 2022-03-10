@@ -21,6 +21,8 @@ class ModqueueController < ApplicationController
     @copyright_tags = @tags.select(&:copyright?).sort_by(&:overlap_count).reverse.take(10)
     @character_tags = @tags.select(&:character?).sort_by(&:overlap_count).reverse.take(10)
 
+    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostPreviewComponent::DEFAULT_SIZE
+
     respond_with(@posts)
   end
 end

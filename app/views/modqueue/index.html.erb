@@ -11,7 +11,10 @@
 <% end %>
 
 <% content_for(:top_content) do %>
-  <h1>Moderation Queue</h1>
+  <div class="flex mb-4">
+    <h1 class="flex-grow-1">Moderation Queue</h1>
+    <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+  </div>
 
   <div id="moderation-guideline" class="fixed-width-container">
     <h2>Deletion Guidelines</h2>
