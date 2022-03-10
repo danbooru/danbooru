@@ -93,6 +93,23 @@ module Sources
       end
     end
 
+    context "A m.weibo.cn/detail url" do
+      should "work" do
+        @site = Sources::Strategies.find("https://m.weibo.cn/detail/4506950043618873")
+
+        assert_equal(%w[
+          https://wx1.sinaimg.cn/large/0060kO5aly1gezsyt5xvhj30ok0sgtc9.jpg
+          https://wx3.sinaimg.cn/large/0060kO5aly1gezsyuaas1j30go0sgjtj.jpg
+          https://wx3.sinaimg.cn/large/0060kO5aly1gezsys1ai9j30gi0sg0v9.jpg
+        ], @site.image_urls)
+
+        assert_equal("https://www.weibo.com/5501756072/J2UNKfbqV", @site.page_url)
+        assert_equal("https://www.weibo.com/5501756072/J2UNKfbqV", @site.canonical_url)
+        assert_equal(%w[fgo Alter组], @site.tags.map(&:first))
+        assert_equal("阿尔托莉雅厨", @site.artist_name)
+      end
+    end
+
     context "normalizing for source" do
       should "normalize correctly" do
         source1 = "https://www.weibo.com/3150932560/H4cFbeKKA?from=page_1005053150932560_profile&wvr=6&mod=weibotime"
