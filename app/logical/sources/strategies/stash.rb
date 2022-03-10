@@ -15,14 +15,8 @@
 module Sources
   module Strategies
     class Stash < DeviantArt
-      STASH = %r{\Ahttps?://sta\.sh/(?<post_id>[0-9a-zA-Z]+)}i
-
-      def domains
-        ["deviantart.net", "sta.sh"]
-      end
-
       def match?
-        parsed_urls.map(&:domain).any?("sta.sh")
+        Source::URL::Stash === parsed_url || Source::URL::Stash === parsed_referer
       end
 
       def site_name
@@ -38,19 +32,11 @@ module Sources
       end
 
       def page_url_from_image_url
-        "https://sta.sh/#{stash_id}"
-      end
-
-      def self.stash_id_from_url(url)
-        if url =~ STASH
-          $~[:post_id].downcase
-        else
-          nil
+        if Source::URL::Stash === parsed_url
+          parsed_url.page_url
+        elsif Source::URL::Stash === parsed_referer
+          parsed_referer.page_url
         end
-      end
-
-      def stash_id
-        [url, referer_url].map { |x| self.class.stash_id_from_url(x) }.compact.first
       end
     end
   end
