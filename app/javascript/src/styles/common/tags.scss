@@ -62,3 +62,16 @@
     color: var(--meta-tag-hover-color);
   }
 }
+
+.tag-type-6 a, a.tag-type-6 {
+  color: var(--deprecated-tag-color);
+  color: var(--deprecated-tag-hover-color);
+
+  &:link, &:visited {
+    color: var(--deprecated-tag-color);
+  }
+
+  &:hover {
+    color: var(--deprecated-tag-hover-color);
+  }
+}

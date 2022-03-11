@@ -137,7 +137,7 @@ class Tag < ApplicationRecord
       end
     end
 
-    # define artist?, general?, character?, copyright?, meta?
+    # define artist?, general?, character?, copyright?, meta?, deprecated?
     TagCategory.categories.each do |category_name|
       define_method("#{category_name}?") do
         category == Tag.categories.send(category_name)
@@ -200,7 +200,7 @@ class Tag < ApplicationRecord
             # next few lines if the category is changed.
             tag.update_category_cache
 
-            if Pundit.policy!(creator, tag).can_change_category?
+            if Pundit.policy!(creator, tag).can_change_category? && !(category_id == TagCategory.mapping["deprecated"] && tag.post_count > 0 && !creator.is_admin?)
               tag.update(category: category_id)
             end
           end

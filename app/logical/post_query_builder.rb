@@ -31,7 +31,7 @@ class PostQueryBuilder
   # allow e.g. `deleted_comments` as a synonym for `deleted_comment_count`
   COUNT_METATAG_SYNONYMS = COUNT_METATAGS.map { |str| str.delete_suffix("_count").pluralize }
 
-  # gentags, arttags, copytags, chartags, metatags
+  # gentags, arttags, copytags, chartags, metatags, depretags
   CATEGORY_COUNT_METATAGS = TagCategory.short_name_list.map { |category| "#{category}tags" }
 
   METATAGS = %w[

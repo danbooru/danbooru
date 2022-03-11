@@ -47,7 +47,7 @@ class DiscordSlashCommand
         search = "#{tag.name} rating:safe everyone copytags:<5 -parody -crossover"
       elsif tag.character?
         search = "#{tag.name} rating:safe solo chartags:<5"
-      else # meta or general
+      else # meta, deprecated or general
         search = "#{tag.name} rating:safe -animated -6+girls -comic"
       end
 

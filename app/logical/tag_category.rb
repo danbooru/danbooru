@@ -9,28 +9,31 @@ module TagCategory
   # Returns a hash mapping various tag categories to a numerical value.
   def mapping
     {
-      "ch" => 4,
-      "co" => 3,
-      "gen" => 0,
-      "char" => 4,
-      "copy" => 3,
-      "art" => 1,
-      "meta" => 5,
       "general" => 0,
-      "character" => 4,
-      "copyright" => 3,
+      "gen" => 0,
       "artist" => 1,
+      "art" => 1,
+      "copyright" => 3,
+      "copy" => 3,
+      "co" => 3,
+      "character" => 4,
+      "char" => 4,
+      "ch" => 4,
+      "meta" => 5,
+      "deprecated" => 6,
+      "depre" => 6,
     }
   end
 
   # The order of tags in dropdown lists.
   def canonical_mapping
     {
-      "Artist"    => 1,
-      "Copyright" => 3,
-      "Character" => 4,
-      "General"   => 0,
-      "Meta"      => 5,
+      "Artist"      => 1,
+      "Copyright"   => 3,
+      "Character"   => 4,
+      "General"     => 0,
+      "Meta"        => 5,
+      "Deprecated"  => 6,
     }
   end
 
@@ -38,36 +41,40 @@ module TagCategory
   def reverse_mapping
     {
       0 => "general",
-      4 => "character",
-      3 => "copyright",
       1 => "artist",
+      3 => "copyright",
+      4 => "character",
       5 => "meta",
+      6 => "deprecated",
     }
   end
 
   def short_name_mapping
     {
-      "art"  => "artist",
-      "copy" => "copyright",
-      "char" => "character",
-      "gen"  => "general",
-      "meta" => "meta",
+      "art"   => "artist",
+      "copy"  => "copyright",
+      "char"  => "character",
+      "gen"   => "general",
+      "meta"  => "meta",
+      "depre" => "deprecated",
     }
   end
 
-  # Returns a hash mapping for related tag buttons (javascripts/related_tag.js.erb)
-  def related_button_mapping
+  # Returns a hash mapping for titleization of a category name.
+  # This is needed because pluralize thinks the plural of "deprecated" is "deprecateds"
+  def title_map
     {
       "general" => "General",
       "character" => "Characters",
       "copyright" => "Copyrights",
       "artist" => "Artists",
-      "meta" => nil,
+      "meta" => "Meta",
+      "deprecated" => "Deprecated",
     }
   end
 
   def categories
-    %w[general character copyright artist meta]
+    %w[general character copyright artist meta deprecated]
   end
 
   def category_ids
@@ -75,17 +82,17 @@ module TagCategory
   end
 
   def short_name_list
-    %w[art copy char gen meta]
+    %w[art copy char gen meta depre]
   end
 
   # The order of tags on the post page tag list.
   def split_header_list
-    %w[artist copyright character general meta]
+    %w[artist copyright character general deprecated meta]
   end
 
   # The order of tags inside the tag edit box, and on the comments page.
   def categorized_list
-    %w[artist copyright character meta general]
+    %w[artist copyright character meta deprecated general]
   end
 
   # The order of tags in the related tag buttons.

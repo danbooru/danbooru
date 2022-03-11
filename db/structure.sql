@@ -888,7 +888,8 @@ CREATE TABLE public.posts (
     last_commented_at timestamp without time zone,
     has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL
+    tag_count_meta integer DEFAULT 0 NOT NULL,
+    tag_count_deprecated integer DEFAULT 0 NOT NULL
 );
 
 
@@ -5779,6 +5780,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220207195123'),
 ('20220210171310'),
 ('20220210200157'),
-('20220211075129');
+('20220211075129'),
+('20220311093552');
 
 

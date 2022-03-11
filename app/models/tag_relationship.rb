@@ -18,8 +18,8 @@ class TagRelationship < ApplicationRecord
   scope :deleted, -> {where(status: "deleted")}
   scope :retired, -> {where(status: "retired")}
 
-  # TagAlias.artist, TagAlias.general, TagAlias.character, TagAlias.copyright, TagAlias.meta
-  # TagImplication.artist, TagImplication.general, TagImplication.character, TagImplication.copyright, TagImplication.meta
+  # TagAlias.artist, TagAlias.general, TagAlias.character, TagAlias.copyright, TagAlias.meta, TagAlias.deprecated
+  # TagImplication.artist, TagImplication.general, TagImplication.character, TagImplication.copyright, TagImplication.meta, TagImplication.deprecated
   TagCategory.categories.each do |category|
     scope category, -> { joins(:consequent_tag).where(consequent_tag: { category: TagCategory.mapping[category] }) }
   end

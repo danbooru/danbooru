@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class TagTest < ActiveSupport::TestCase
   setup do
@@ -34,6 +34,7 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(3, Tag.categories.copyright)
       assert_equal(4, Tag.categories.character)
       assert_equal(5, Tag.categories.meta)
+      assert_equal(6, Tag.categories.deprecated)
     end
 
     should "have a regular expression for matching category names and shortcuts" do
@@ -48,6 +49,8 @@ class TagTest < ActiveSupport::TestCase
       assert_match(regexp, "char")
       assert_match(regexp, "ch")
       assert_match(regexp, "meta")
+      assert_match(regexp, "depre")
+      assert_match(regexp, "deprecated")
       assert_no_match(regexp, "c")
       assert_no_match(regexp, "woodle")
     end
@@ -58,6 +61,8 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(1, Tag.categories.value_for("artist"))
       assert_equal(1, Tag.categories.value_for("art"))
       assert_equal(5, Tag.categories.value_for("meta"))
+      assert_equal(6, Tag.categories.value_for("depre"))
+      assert_equal(6, Tag.categories.value_for("deprecated"))
       assert_equal(0, Tag.categories.value_for("unknown"))
     end
   end
@@ -111,6 +116,34 @@ class TagTest < ActiveSupport::TestCase
       Tag.find_or_create_by_name("artist:#{tag.name}", creator: FactoryBot.create(:member_user))
 
       assert_equal(0, tag.reload.category)
+    end
+
+    should "not change category to deprecated when the tag exists" do
+      tag = FactoryBot.create(:tag, post_count: 1)
+      Tag.find_or_create_by_name("deprecated:#{tag.name}", creator: FactoryBot.create(:member_user))
+
+      assert_equal(0, tag.reload.category)
+    end
+
+    should "change category to deprecated when the tag exists but is empty" do
+      tag = FactoryBot.create(:tag, post_count: 0)
+      Tag.find_or_create_by_name("deprecated:#{tag.name}", creator: FactoryBot.create(:member_user))
+
+      assert_equal(Tag.categories.deprecated, tag.reload.category)
+    end
+
+    should "not remove deprecated status from an existing tag" do
+      tag = FactoryBot.create(:tag, post_count: 10, category: 6)
+      Tag.find_or_create_by_name("gen:#{tag.name}", creator: FactoryBot.create(:member_user))
+
+      assert_equal(6, tag.reload.category)
+    end
+
+    should "not remove deprecated status from an existing empty tag" do
+      tag = FactoryBot.create(:tag, post_count: 0, category: 6)
+      Tag.find_or_create_by_name("gen:#{tag.name}", creator: FactoryBot.create(:member_user))
+
+      assert_equal(6, tag.reload.category)
     end
 
     should "update post tag counts when the category is changed" do

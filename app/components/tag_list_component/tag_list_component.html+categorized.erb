@@ -1,7 +1,7 @@
 <div class="tag-list categorized-tag-list">
   <% categorized_tags(TagCategory.split_header_list).each do |category_name, tags| %>
     <h3 class="<%= category_name %>-tag-list">
-      <%= category_name.capitalize.pluralize(tags) %>
+      <%= TagCategory.title_map[category_name] %>
     </h3>
 
     <ul class="<%= category_name %>-tag-list">
