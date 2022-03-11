@@ -12,7 +12,7 @@ module Sources
       end
 
       def canonical_url
-        image_url
+        url
       end
 
       def normalize_for_source

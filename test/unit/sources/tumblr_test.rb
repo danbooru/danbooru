@@ -67,7 +67,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png", @site.image_url)
+        assert_equal(["https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png"], @site.image_urls)
       end
 
       should "get the preview url" do
@@ -93,7 +93,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png", @site.image_url)
+        assert_equal(["https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png"], @site.image_urls)
       end
 
       should "get the canonical url" do
@@ -121,7 +121,7 @@ module Sources
           assert_equal("https://noizave.tumblr.com", site.profile_url)
           assert_equal(["tag1", "tag2"], site.tags.map(&:first))
           assert_equal(@ref, site.canonical_url)
-          assert_equal("https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg", site.image_url)
+          assert_equal(["https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"], site.image_urls)
         end
       end
 
@@ -133,7 +133,7 @@ module Sources
           assert_equal("https://noizave.tumblr.com", site.profile_url)
           assert_equal(["tag1", "tag2"], site.tags.map(&:first))
           assert_equal(@ref, site.canonical_url)
-          assert_equal("https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg", site.image_url)
+          assert_equal(["https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"], site.image_urls)
         end
       end
     end
@@ -168,7 +168,6 @@ module Sources
           https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_1280.png
         ]
 
-        assert_equal("https://va.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4", site.image_url)
         assert_equal(urls, site.image_urls)
         assert_equal(url, site.canonical_url)
       end
@@ -202,7 +201,7 @@ module Sources
 
         assert_match(%r{/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s\d+x\d+/}i, image_url)
         assert_equal(page_url, strategy.canonical_url)
-        assert_downloaded(7_428_704, strategy.image_url)
+        assert_downloaded(7_428_704, strategy.image_urls.sole)
       end
     end
 
@@ -215,7 +214,6 @@ module Sources
         assert_equal("https://shimetsukage.tumblr.com", site.profile_url)
         assert_equal("https://shimetsukage.tumblr.com/post/176805588268", site.page_url)
         assert_equal("https://shimetsukage.tumblr.com/post/176805588268", site.canonical_url)
-        assert_nil(site.image_url)
         assert_equal([], site.image_urls)
         assert_equal([], site.tags)
       end
@@ -229,7 +227,7 @@ module Sources
           full = "https://media.tumblr.com/b9395771b2d0435fe4efee926a5a7d9c/tumblr_pg2wu1L9DM1trd056o2_1280.png"
           site = Sources::Strategies.find(image, page)
 
-          assert_equal(full, site.image_url)
+          assert_equal([full], site.image_urls)
         end
       end
     end

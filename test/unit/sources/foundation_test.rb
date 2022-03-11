@@ -31,14 +31,14 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal(@image_url, @image1.image_url)
-        assert_equal(@image_url, @image2.image_url)
+        assert_equal([@image_url], @image1.image_urls)
+        assert_equal([@image_url], @image2.image_urls)
       end
 
       should "download an image" do
-        assert_downloaded(13_908_349, @image1.image_url)
-        assert_downloaded(13_908_349, @image2.image_url)
-        assert_downloaded(13_391_766, @image3.image_url)
+        assert_downloaded(13_908_349, @image1.image_urls.sole)
+        assert_downloaded(13_908_349, @image2.image_urls.sole)
+        assert_downloaded(13_391_766, @image3.image_urls.sole)
       end
 
       should "find the correct artist" do
@@ -104,8 +104,8 @@ module Sources
         image = "https://f8n-ipfs-production.imgix.net/QmVnpe39qodMjTe8v3fijPfB1tjwhT8hgobtgLPtsangqc/nft.png"
         assert_nothing_raised { case1.to_h }
         assert_nothing_raised { case2.to_h }
-        assert_equal(image, case1.image_url)
-        assert_equal(image, case2.image_url)
+        assert_equal([image], case1.image_urls)
+        assert_equal([image], case2.image_urls)
       end
     end
 

@@ -26,8 +26,8 @@ module Sources
       end
 
       should "get the image urls" do
-        assert_match(@image_url, @image_1.image_url)
-        assert_equal(@image_url, @image_2.image_url)
+        assert_equal([@image_url], @image_1.image_urls)
+        assert_equal([@image_url], @image_2.image_urls)
       end
 
       should "get the canonical url" do
@@ -36,8 +36,8 @@ module Sources
       end
 
       should "download an image" do
-        assert_downloaded(4224, @image_1.image_url)
-        assert_downloaded(4224, @image_2.image_url)
+        assert_downloaded(4224, @image_1.image_urls.sole)
+        assert_downloaded(4224, @image_2.image_urls.sole)
       end
 
       should "get the tags" do

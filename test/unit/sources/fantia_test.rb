@@ -78,7 +78,7 @@ module Sources
         url = "https://fantia.jp/posts/1143951/download/1830956"
         source = Sources::Strategies.find(url)
 
-        assert_match(%r{1830956/cbcdfcbe_20220224_120_040_100.png}, source.image_url)
+        assert_match(%r{1830956/cbcdfcbe_20220224_120_040_100.png}, source.image_urls.sole)
         assert_equal("松永紅葉", source.other_names.first)
         assert_equal("https://fantia.jp/fanclubs/322", source.profile_url)
         assert_equal("https://fantia.jp/posts/1143951", source.page_url)
@@ -95,7 +95,7 @@ module Sources
         url = "https://fantia.jp/posts/1143951"
         source = Sources::Strategies.find(url)
 
-        assert_equal("https://c.fantia.jp/uploads/post/file/1143951/47491020-a6c6-47db-b09e-815b0530c0bc.png", source.image_url)
+        assert_equal("https://c.fantia.jp/uploads/post/file/1143951/47491020-a6c6-47db-b09e-815b0530c0bc.png", source.image_urls.first)
         assert_match(%r{1830956/cbcdfcbe_20220224_120_040_100.png}, source.image_urls.second)
         assert_equal("松永紅葉", source.other_names.first)
         assert_equal("https://fantia.jp/fanclubs/322", source.profile_url)
@@ -103,7 +103,8 @@ module Sources
         assert_equal([], source.tags)
         assert_equal("今日の一枚3186 (1:20+0:40+1:00)", source.artist_commentary_title)
         assert_equal("今日の一枚3186 (1:20+0:40+1:00)", source.artist_commentary_desc)
-        assert_downloaded(1_157_953, url)
+        assert_downloaded(1_157_953, source.image_urls[0])
+        assert_downloaded(14_371_816, source.image_urls[1])
         assert_nothing_raised { source.to_h }
       end
     end
@@ -123,7 +124,13 @@ module Sources
         assert_equal(image_urls, source.image_urls)
         assert_equal("https://fantia.jp/fanclubs/7", source.profile_url)
         assert_equal("https://fantia.jp/products/249638", source.page_url)
-        assert_downloaded(288_801, url)
+
+        assert_downloaded(288_801, source.image_urls[0])
+        assert_downloaded(515_598, source.image_urls[1])
+        assert_downloaded(613_103, source.image_urls[2])
+        assert_downloaded(146_837, source.image_urls[3])
+        assert_downloaded(78_316, source.image_urls[4])
+
         assert_nothing_raised { source.to_h }
       end
     end

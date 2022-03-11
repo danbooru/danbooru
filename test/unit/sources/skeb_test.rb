@@ -58,7 +58,11 @@ module Sources
     context "An animated post with a smaller static unwatermarked version" do
       should "still get the watermarked gif" do
         site = Sources::Strategies.find("https://skeb.jp/@tontaro_/works/316")
-        assert_equal("https://skeb.imgix.net/uploads/origins/5097b1e1-18ce-418e-82f0-e7e2cdab1cea?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=fcff06871e114b3dbf505c04f27b5ed1", site.image_url)
+        assert_equal(%w[
+          https://skeb.imgix.net/uploads/origins/5097b1e1-18ce-418e-82f0-e7e2cdab1cea?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=fcff06871e114b3dbf505c04f27b5ed1
+          https://skeb.imgix.net/uploads/origins/23123cfd-9b03-40f6-a8ae-7d74f9118c6f?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=984626d69b45c040d295e357a67f281e
+          https://skeb.imgix.net/uploads/origins/38a00949-a726-45c8-82b3-9aec4e8255ba?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=29689f451cd70fa97c806b4c2145bf6b
+        ], site.image_urls)
       end
     end
 
@@ -84,7 +88,7 @@ module Sources
     context "A post with a video" do
       should "get it correctly" do
         site = Sources::Strategies.find("https://skeb.jp/@kaisouafuro/works/112")
-        assert_match(%r{\Ahttps://skeb-production.s3.ap-northeast-1.amazonaws.com/uploads/outputs/20f9d68f-50ec-44ae-8630-173fc38a2d6a\?response-content-disposition=attachment%3B%20filename%3D%22458093-1.output.mp4%22%3B%20filename%2A%3DUTF-8%27%27458093-1.output.mp4&response-content-type=video%2Fmp4&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=.*&X-Amz-Date=.*&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=.*}, site.image_url)
+        assert_match(%r{\Ahttps://skeb-production.s3.ap-northeast-1.amazonaws.com/uploads/outputs/20f9d68f-50ec-44ae-8630-173fc38a2d6a\?response-content-disposition=attachment%3B%20filename%3D%22458093-1.output.mp4%22%3B%20filename%2A%3DUTF-8%27%27458093-1.output.mp4&response-content-type=video%2Fmp4&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=.*&X-Amz-Date=.*&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=.*}, site.image_urls.sole)
       end
     end
 

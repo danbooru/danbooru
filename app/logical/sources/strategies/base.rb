@@ -129,10 +129,6 @@ module Sources
         []
       end
 
-      def image_url
-        image_urls.first
-      end
-
       # A smaller representation of the image that's suitable for
       # displaying previews.
       def preview_urls
@@ -154,7 +150,7 @@ module Sources
       # This will be the url stored in posts. Typically this is the page
       # url, but on some sites it may be preferable to store the image url.
       def canonical_url
-        page_url || image_url
+        page_url || image_urls.first
       end
 
       # A name to suggest as the artist's tag name when creating a new artist.
@@ -194,8 +190,11 @@ module Sources
         nil
       end
 
-      # Download the file at the given url, or at the main image url by default.
-      def download_file!(download_url = image_url)
+      # Download the file at the given url. Raises Danbooru::Http::DownloadError if the download fails, or
+      # Danbooru::Http::FileTooLargeError if the file is too large.
+      #
+      # @return [MediaFile] the downloaded file
+      def download_file!(download_url)
         response, file = http_downloader.download_media(download_url)
         file
       end
@@ -310,7 +309,6 @@ module Sources
             :profile_urls => profile_urls
           },
           :artists => artists.as_json(include: :sorted_urls),
-          :image_url => image_url,
           :image_urls => image_urls,
           :preview_url => preview_url,
           :preview_urls => preview_urls,

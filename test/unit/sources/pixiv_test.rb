@@ -40,11 +40,11 @@ module Sources
         end
 
         should "get the file url" do
-          assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @site.file_url)
+          assert_equal(["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"], @site.image_urls)
         end
 
         should "capture the frame data" do
-          media_file = @site.download_file!
+          media_file = @site.download_file!(@site.image_urls.sole)
 
           assert_equal(2, media_file.frame_data.size)
           assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], media_file.frame_data)
@@ -63,7 +63,7 @@ module Sources
         should "get the metadata" do
           @site = Sources::Strategies.find("https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png")
 
-          assert_equal("https://i.pximg.net/img-original/img/2017/09/18/03/18/24/65015428_p4.png", @site.image_url)
+          assert_equal(["https://i.pximg.net/img-original/img/2017/09/18/03/18/24/65015428_p4.png"], @site.image_urls)
           assert_equal("赤井さしみ", @site.artist_name)
         end
       end
@@ -72,12 +72,12 @@ module Sources
         should "work" do
           @site = Sources::Strategies.find("https://www.pixiv.net/en/artworks/64476642")
 
-          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
+          assert_equal(["https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg"], @site.image_urls)
           assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.canonical_url)
           assert_equal("https://www.pixiv.net/artworks/64476642", @site.page_url)
 
           @site = Sources::Strategies.find("https://www.pixiv.net/artworks/64476642")
-          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
+          assert_equal(["https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg"], @site.image_urls)
           assert_equal("https://www.pixiv.net/artworks/64476642", @site.page_url)
         end
       end
@@ -96,7 +96,7 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("https://i.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg", @site.image_url)
+          assert_equal(["https://i.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg"], @site.image_urls)
         end
 
         should "get the page count" do
@@ -135,7 +135,7 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("https://i.pximg.net/img-original/img/2014/10/29/09/27/19/46785915_p0.jpg", @site.image_url)
+          assert_equal(["https://i.pximg.net/img-original/img/2014/10/29/09/27/19/46785915_p0.jpg"], @site.image_urls)
         end
       end
 
@@ -149,7 +149,7 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
+          assert_equal(["https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg"], @site.image_urls)
         end
 
         should "get the full size image url for the canonical url" do

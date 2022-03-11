@@ -18,10 +18,6 @@ module Sources::Strategies
       end
     end
 
-    def image_url
-      image_urls.first
-    end
-
     def image_urls
       if parsed_url.image_url?
         [parsed_url.full_image_url]

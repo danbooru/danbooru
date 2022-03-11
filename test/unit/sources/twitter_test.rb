@@ -29,7 +29,7 @@ module Sources
     context "A video" do
       should "get the correct urls" do
         @site = Sources::Strategies.find("https://twitter.com/CincinnatiZoo/status/859073537713328129")
-        assert_equal("https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4", @site.image_url)
+        assert_equal(["https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4"], @site.image_urls)
         assert_equal(["https://pbs.twimg.com/ext_tw_video_thumb/859073467769126913/pu/img/VKHGdXPsqKASBTvm.jpg:small"], @site.preview_urls)
         assert_equal("https://twitter.com/CincinnatiZoo/status/859073537713328129", @site.canonical_url)
       end
@@ -37,19 +37,19 @@ module Sources
       should "work when given a video thumbnail" do
         # https://twitter.com/Kekeflipnote/status/1241038667898118144
         @site = Sources::Strategies.find("https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:small")
-        assert_equal("https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig"], @site.image_urls)
       end
 
       should "work when given an external video thumbnail" do
         # https://twitter.com/chivedips/status/1243850897056133121
         @site = Sources::Strategies.find("https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:small")
-        assert_equal("https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:orig", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:orig"], @site.image_urls)
       end
 
       should "work when given an amplify video thumbnail" do
         # https://twitter.com/UNITED_CINEMAS/status/1223138847417978881
         @site = Sources::Strategies.find("https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:small")
-        assert_equal("https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:orig", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:orig"], @site.image_urls)
       end
     end
 
@@ -59,7 +59,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4", @site.image_url)
+        assert_equal(["https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4"], @site.image_urls)
       end
 
       should "get the preview urls" do
@@ -73,7 +73,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://pbs.twimg.com/media/C1kt72yVEAEGpOv.jpg:orig", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/media/C1kt72yVEAEGpOv.jpg:orig"], @site.image_urls)
       end
 
       should "get the preview url" do
@@ -91,7 +91,7 @@ module Sources
       end
 
       should "get the urls" do
-        assert_equal("https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:orig", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:orig"], @site.image_urls)
         assert_equal("https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:small", @site.preview_url)
         assert_equal("https://twitter.com/Strangestone/status/556440271961858051", @site.page_url)
         assert_equal("https://twitter.com/Strangestone/status/556440271961858051", @site.canonical_url)
@@ -102,7 +102,7 @@ module Sources
       should "not fail" do
         @site = Sources::Strategies.find("https://twitter.com/teruyo/status/1058452066060853248")
 
-        assert_nil(@site.image_url)
+        assert_equal([], @site.image_urls)
         assert_nothing_raised { @site.to_h }
       end
     end
@@ -126,7 +126,7 @@ module Sources
       end
 
       should "get the image urls" do
-        assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"], @site.image_urls)
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:small", @site.preview_url)
       end
 
@@ -157,7 +157,7 @@ module Sources
       should "get the source data" do
         assert_equal("nounproject", @site.tag_name)
         assert_equal("Noun Project", @site.artist_name)
-        assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"], @site.image_urls)
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:small", @site.preview_url)
       end
     end
@@ -168,7 +168,6 @@ module Sources
       end
 
       should "work" do
-        assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
         assert_equal(["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"], @site.image_urls)
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:small", @site.preview_url)
         assert_equal(["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:small"], @site.preview_urls)
@@ -188,7 +187,6 @@ module Sources
       end
 
       should "work" do
-        assert_equal("https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig", @site.image_url)
         assert_equal(["https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig"], @site.image_urls)
         assert_equal("https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:small", @site.preview_url)
         assert_equal(["https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:small"], @site.preview_urls)
@@ -197,7 +195,7 @@ module Sources
 
       should "work for filenames containing dashes" do
         @site = Sources::Strategies.find("https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg", "https://twitter.com/asteroid_ill/status/1155420330128625664")
-        assert_equal("https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg:orig", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg:orig"], @site.image_urls)
       end
     end
 
@@ -249,7 +247,7 @@ module Sources
     context "A profile banner image" do
       should "work" do
         @site = Sources::Strategies.find("https://pbs.twimg.com/profile_banners/1225702850002468864/1588597370/1500x500")
-        assert_equal(@site.image_url, @site.url)
+        assert_equal([@site.url], @site.image_urls)
         assert_nothing_raised { @site.to_h }
       end
     end
@@ -279,7 +277,7 @@ module Sources
         site = Sources::Strategies.find("https://twitter.com/Mityubi/status/849630665603665920", "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=56735489")
 
         assert_equal(site.site_name, "Twitter")
-        assert_equal("https://pbs.twimg.com/media/C8p-gPhVoAMZupS.png:orig", site.image_url)
+        assert_equal(["https://pbs.twimg.com/media/C8p-gPhVoAMZupS.png:orig"], site.image_urls)
       end
     end
 
@@ -290,7 +288,7 @@ module Sources
         assert_equal(site.site_name, "Twitter")
         assert_equal("tanso_panz", site.tag_name)
         assert_equal("https://twitter.com/tanso_panz", site.profile_url)
-        assert_nil(site.image_url)
+        assert_equal([], site.image_urls)
       end
     end
 

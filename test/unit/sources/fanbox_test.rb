@@ -55,9 +55,16 @@ module Sources
       end
 
       should "correctly download the right image" do
-        assert_downloaded(431_225, @post1.image_url)
-        assert_downloaded(245_678, @post2.image_url)
-        assert_downloaded(320_056, @post3.image_url)
+        assert_downloaded(431_225, @post1.image_urls[0])
+        assert_downloaded(753_048, @post1.image_urls[1])
+        assert_downloaded(589_327, @post1.image_urls[2])
+        assert_downloaded(178_739, @post1.image_urls[3])
+
+        assert_downloaded(245_678, @post2.image_urls[0])
+        assert_downloaded(320_056, @post2.image_urls[1])
+        assert_downloaded(666_681, @post2.image_urls[2])
+
+        assert_downloaded(320_056, @post3.image_urls.sole)
       end
 
       should "get the tags" do
@@ -92,7 +99,7 @@ module Sources
 
         assert_nothing_raised { @source.to_h }
         assert_equal("mfr", @source.artist_name)
-        assert_equal("https://downloads.fanbox.cc/images/post/1306390/VOXblkyvltL5fRhMoR7RdSkk.png", @source.image_url)
+        assert_equal(["https://downloads.fanbox.cc/images/post/1306390/VOXblkyvltL5fRhMoR7RdSkk.png"], @source.image_urls)
       end
     end
 
@@ -111,7 +118,7 @@ module Sources
       should "still work" do
         post = Sources::Strategies.find("https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/QqxYtuWdy4XWQx1ZLIqr4wvA.jpeg")
         assert_nothing_raised { post.to_h }
-        assert_downloaded(750_484, post.image_url)
+        assert_downloaded(750_484, post.image_urls.sole)
         assert_equal("https://omu001.fanbox.cc", post.profile_url)
         assert_equal(post.profile_url, post.canonical_url)
         artist = FactoryBot.create(:artist, name: "omu", url_string: "https://omu001.fanbox.cc")

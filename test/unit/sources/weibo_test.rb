@@ -34,7 +34,9 @@ module Sources
       end
 
       should "download an image" do
-        assert_downloaded(134_721, @site.image_url)
+        assert_downloaded(134_721, @site.image_urls[0])
+        assert_downloaded(84_124, @site.image_urls[1])
+        assert_downloaded(97_878, @site.image_urls[2])
       end
 
       should "get the tags" do
@@ -64,7 +66,7 @@ module Sources
       should "get the correct video" do
         site = Sources::Strategies.find("https://www.weibo.com/5501756072/IF9fugHzj")
 
-        assert_downloaded(7_676_656, site.image_url)
+        assert_downloaded(7_676_656, site.image_urls.sole)
       end
     end
 
@@ -72,7 +74,7 @@ module Sources
       should "get the largest version" do
         sample = Sources::Strategies.find("https://wx3.sinaimg.cn/mw690/a00fa34cly1gf62g2n8z3j21yu2jo1ky.jpg")
 
-        assert_equal("https://wx3.sinaimg.cn/large/a00fa34cly1gf62g2n8z3j21yu2jo1ky.jpg", sample.image_url)
+        assert_equal(["https://wx3.sinaimg.cn/large/a00fa34cly1gf62g2n8z3j21yu2jo1ky.jpg"], sample.image_urls)
       end
     end
 

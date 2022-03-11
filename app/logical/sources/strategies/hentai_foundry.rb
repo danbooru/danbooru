@@ -58,7 +58,7 @@ module Sources
       end
 
       def canonical_url
-        image_url
+        image_urls.first
       end
 
       def profile_url

@@ -47,8 +47,8 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg", @site.image_url)
-        assert_downloaded(132_555, @site.image_url)
+        assert_equal(["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"], @site.image_urls)
+        assert_downloaded(132_555, @site.image_urls.sole)
       end
 
       should "get the canonical url" do
@@ -123,7 +123,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+        assert_equal(["https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg"], @site.image_urls)
       end
 
       should "get the preview urls" do
@@ -150,7 +150,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg", @site.image_url)
+        assert_equal(["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"], @site.image_urls)
       end
 
       should "get the preview urls" do
@@ -206,7 +206,7 @@ module Sources
         site = Sources::Strategies.find(image_url)
 
         assert_nil(site.page_url)
-        assert_equal(image_url, site.image_url)
+        assert_equal([image_url], site.image_urls)
         assert_equal(image_url, site.canonical_url)
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
         assert_nothing_raised { site.to_h }
@@ -242,7 +242,10 @@ module Sources
       should "find the mp4 file" do
         site = Sources::Strategies.find("http://nijie.info/view.php?id=324604")
 
-        assert_equal("https://pic.nijie.net/01/nijie/19/69/1349569/illust/0_0_a20b709587eb7713_30b409.mp4", site.image_urls[0])
+        assert_equal(%w[
+          https://pic.nijie.net/01/nijie/19/69/1349569/illust/0_0_a20b709587eb7713_30b409.mp4
+          https://pic.nijie.net/03/nijie/19/69/1349569/illust/324604_0_baebdf6d2bf26239_435649.gif
+        ], site.image_urls)
       end
     end
 
@@ -268,7 +271,6 @@ module Sources
 
           assert_nothing_raised { site.to_h }
           assert_equal("https://nijie.info/members.php?id=196201", site.profile_url)
-          assert_equal(site.url, site.image_url)
           assert_equal([site.url], site.image_urls)
           assert_equal(1, site.preview_urls.size)
         end
@@ -325,7 +327,6 @@ module Sources
                 %w[ほのぼの https://nijie.info/search_dojin.php?word=%E3%81%BB%E3%81%AE%E3%81%BC%E3%81%AE]]
 
         assert(true, site.doujin?)
-        assert_equal(image, site.image_url)
         assert_equal([image], site.image_urls)
         assert_equal("作品情報", site.artist_commentary_title)
         assert_equal("<p>ある日目がさめると女の子になっていたいつき<br>\nそこへ幼馴染の小梅が現れて…<br>\n2010年コミックマーケット78で販売したコピー本のDL版で<br>\n本編18Pの短編マンガです <br>\n</p>", site.artist_commentary_desc)
@@ -360,7 +361,7 @@ module Sources
         ref = "https://nijie.info/view_popup.php?id=18858&#diff_1"
         source = Sources::Strategies.find(image_url, ref)
 
-        assert_equal(image_url, source.image_url)
+        assert_equal([image_url], source.image_urls)
       end
     end
   end

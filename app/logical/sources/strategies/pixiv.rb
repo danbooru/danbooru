@@ -62,7 +62,7 @@ module Sources
       end
 
       def canonical_url
-        image_url
+        image_urls.first
       end
 
       def profile_url
@@ -122,7 +122,7 @@ module Sources
         tag.gsub(/\d+users入り\z/i, "")
       end
 
-      def download_file!(url = image_url)
+      def download_file!(url)
         file = super(url)
         file.frame_data = ugoira_frame_data if is_ugoira?
         file

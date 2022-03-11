@@ -67,6 +67,9 @@ class PostReplacementProcessor
     strategy = Sources::Strategies.find(source_url, referer_url)
     raise NotImplementedError, "No login credentials configured for #{strategy.site_name}." unless strategy.class.enabled?
 
-    strategy.download_file!
+    image_urls = strategy.image_urls
+    raise "#{source_url} contains multiple images" if image_urls.size > 1
+
+    strategy.download_file!(image_urls.first)
   end
 end

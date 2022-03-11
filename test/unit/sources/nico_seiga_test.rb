@@ -34,8 +34,8 @@ module Sources
       end
 
       should "get the image url(s)" do
-        assert_match(%r{^https?://lohas\.nicoseiga\.jp/priv/}, @site_1.image_url)
-        assert_match(%r{^https?://lohas\.nicoseiga\.jp/priv/}, @site_2.image_url)
+        assert_match(%r{^https?://lohas\.nicoseiga\.jp/priv/}, @site_1.image_urls.sole)
+        assert_match(%r{^https?://lohas\.nicoseiga\.jp/priv/}, @site_2.image_urls.sole)
 
         expected = [
           %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315315},
@@ -82,7 +82,7 @@ module Sources
       should "work for a https://lohas.nicoseiga.jp/thumb/${id}i url" do
         site = Sources::Strategies.find("https://lohas.nicoseiga.jp/thumb/6844226i")
 
-        assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/6844226!, site.image_url)
+        assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/6844226!, site.image_urls.sole)
         assert_match("https://seiga.nicovideo.jp/seiga/im6844226", site.canonical_url)
       end
     end
@@ -95,7 +95,7 @@ module Sources
       end
 
       should "get the correct pic" do
-        assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/9146749!, @site.image_url)
+        assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/9146749!, @site.image_urls.sole)
       end
 
       should "set the correct source" do
@@ -122,7 +122,7 @@ module Sources
       should "still work" do
         site = Sources::Strategies.find("http://seiga.nicovideo.jp/seiga/im9208126")
 
-        assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/9208126!, site.image_url)
+        assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/9208126!, site.image_urls.sole)
         assert_nothing_raised { site.to_h }
       end
     end

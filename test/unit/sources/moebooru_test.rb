@@ -6,7 +6,6 @@ module Sources
       site = Sources::Strategies.find(url)
 
       assert_equal(site_name, site.site_name)
-      assert_equal(image_url, site.image_url)
       assert_equal([image_url], site.image_urls)
       assert_equal(image_url, site.canonical_url)
       assert_equal(preview_url, site.preview_url)

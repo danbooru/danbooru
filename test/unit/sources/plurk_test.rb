@@ -32,8 +32,8 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal(@image_url, @post1.image_url)
-        assert_equal(@image_url, @post2.image_url)
+        assert_equal([@image_url], @post1.image_urls)
+        assert_equal([@image_url], @post2.image_urls)
       end
 
       should "get the image urls for an adult post" do
@@ -91,9 +91,8 @@ module Sources
       end
 
       should "download an image" do
-        assert_downloaded(627_697, @post1.image_url)
-        assert_downloaded(627_697, @post2.image_url)
-        assert_downloaded(520_122, @post4.image_url)
+        assert_downloaded(627_697, @post1.image_urls.sole)
+        assert_downloaded(627_697, @post2.image_urls.sole)
       end
 
       should "find the correct artist" do

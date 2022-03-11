@@ -36,7 +36,7 @@ module Sources
       end
 
       should "download the full-size image" do
-        assert_downloaded(2_739_443, @source.image_url)
+        assert_downloaded(2_739_443, @source.image_urls.sole)
       end
 
       should "find the correct artist" do
@@ -57,7 +57,7 @@ module Sources
     context "A bad link" do
       should "correctly get the full size" do
         source = Sources::Strategies.find("https://imglf4.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJUFczb2RKSVlpMHJkNy9kc3BSQVQvQm5DNzB4eVhxay9nPT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0")
-        assert_equal("https://imglf4.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJUFczb2RKSVlpMHJkNy9kc3BSQVQvQm5DNzB4eVhxay9nPT0.png", source.image_url)
+        assert_equal(["https://imglf4.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJUFczb2RKSVlpMHJkNy9kc3BSQVQvQm5DNzB4eVhxay9nPT0.png"], source.image_urls)
         assert_nothing_raised { source.to_h }
       end
     end
