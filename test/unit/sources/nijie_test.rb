@@ -55,12 +55,6 @@ module Sources
         assert_equal("https://nijie.info/view.php?id=213043", @site.canonical_url)
       end
 
-      should "get the preview url" do
-        assert_equal("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg", @site.preview_url)
-        assert_equal([@site.preview_url], @site.preview_urls)
-        assert_downloaded(132_555, @site.preview_url)
-      end
-
       should "get the profile" do
         assert_equal("https://nijie.info/members.php?id=728995", @site.profile_url)
       end
@@ -126,11 +120,6 @@ module Sources
         assert_equal(["https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg"], @site.image_urls)
       end
 
-      should "get the preview urls" do
-        assert_equal("https://pic.nijie.net/03/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg", @site.preview_url)
-        assert_equal(["https://pic.nijie.net/03/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg"], @site.preview_urls)
-      end
-
       should "get the canonical url" do
         assert_equal("https://nijie.info/view.php?id=213043", @site.canonical_url)
       end
@@ -151,11 +140,6 @@ module Sources
 
       should "get the image url" do
         assert_equal(["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"], @site.image_urls)
-      end
-
-      should "get the preview urls" do
-        assert_equal("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg", @site.preview_url)
-        assert_equal([@site.preview_url], @site.preview_urls)
       end
 
       should "get the canonical url" do
@@ -222,7 +206,6 @@ module Sources
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
         assert_equal("名無しのチンポップ", site.artist_name)
         assert_equal([site.url], site.image_urls)
-        assert_equal(["https://pic.nijie.net/03/__rs_l170x170/nijie_picture/diff/main/218856_4_236014_20170620101333.png"], site.preview_urls)
       end
     end
 
@@ -272,7 +255,6 @@ module Sources
           assert_nothing_raised { site.to_h }
           assert_equal("https://nijie.info/members.php?id=196201", site.profile_url)
           assert_equal([site.url], site.image_urls)
-          assert_equal(1, site.preview_urls.size)
         end
       end
 

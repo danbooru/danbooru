@@ -85,15 +85,6 @@ class Source::URL::Moebooru < Source::URL
     end
   end
 
-  def self.preview_image_url(site_name, md5)
-    case site_name
-    when "Yande.re"
-      "https://files.yande.re/data/preview/#{md5[0..1]}/#{md5[2..3]}/#{md5}.jpg"
-    when "Konachan"
-      "https://konachan.com/data/preview/#{md5[0..1]}/#{md5[2..3]}/#{md5}.jpg"
-    end
-  end
-
   def self.full_image_url(site_name, md5, file_ext, post_id = nil)
     case site_name
     when "Yande.re"

@@ -70,10 +70,6 @@ module Sources
         assert_equal(["https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png"], @site.image_urls)
       end
 
-      should "get the preview url" do
-        assert_equal("https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_250.png", @site.preview_url)
-      end
-
       should "get the canonical url" do
         assert_equal("https://noizave.tumblr.com/post/162206271767", @site.canonical_url)
       end

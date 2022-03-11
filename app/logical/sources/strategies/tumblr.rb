@@ -36,12 +36,6 @@ module Sources::Strategies
       assets.map { |url| find_largest(url) }
     end
 
-    def preview_urls
-      image_urls.map do |x|
-        x.sub(/_1280\.(jpg|png|gif|jpeg)\z/, '_250.\1')
-      end
-    end
-
     def page_url
       parsed_url.page_url || parsed_referer&.page_url || post_url_from_image_html&.page_url
     end

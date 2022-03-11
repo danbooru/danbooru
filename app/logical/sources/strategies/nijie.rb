@@ -35,10 +35,6 @@ module Sources
         images.map { |img| Source::URL.parse("https:#{img}").full_image_url }
       end
 
-      def preview_urls
-        image_urls.map { |url| Source::URL.parse(url).preview_image_url }
-      end
-
       def page_url
         return nil if illust_id.blank?
         "https://nijie.info/view.php?id=#{illust_id}"

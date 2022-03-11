@@ -129,16 +129,6 @@ module Sources
         []
       end
 
-      # A smaller representation of the image that's suitable for
-      # displaying previews.
-      def preview_urls
-        image_urls
-      end
-
-      def preview_url
-        preview_urls.first
-      end
-
       # Whatever <tt>url</tt> is, this method should return a link to the HTML
       # page containing the resource. It should not be a binary file. It will
       # eventually be assigned as the source for the post, but it does not
@@ -237,10 +227,6 @@ module Sources
         )
       end
 
-      def file_url
-        image_url
-      end
-
       def tags
         (@tags || []).uniq
       end
@@ -310,8 +296,6 @@ module Sources
           },
           :artists => artists.as_json(include: :sorted_urls),
           :image_urls => image_urls,
-          :preview_url => preview_url,
-          :preview_urls => preview_urls,
           :page_url => page_url,
           :canonical_url => canonical_url,
           :normalized_for_artist_finder_url => normalize_for_artist_finder,

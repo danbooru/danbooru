@@ -39,14 +39,6 @@ module Sources
         end
       end
 
-      def preview_urls
-        if illust_id.present?
-          ["https://lohas.nicoseiga.jp/thumb/#{illust_id}i"]
-        else
-          image_urls
-        end
-      end
-
       def page_url
         # XXX what if referer isn't from NicoSeiga?
         parsed_referer&.page_url || parsed_url.page_url

@@ -90,10 +90,6 @@ class Source::URL::Nijie < Source::URL
     subdomain.to_s.starts_with?("pic")
   end
 
-  def preview_image_url
-    to_s.gsub(/nijie_picture/, "__rs_l170x170/nijie_picture") if image_url?
-  end
-
   def full_image_url
     to_s.remove(%r{__rs_\w+/}i).gsub("http:", "https:") if image_url?
   end

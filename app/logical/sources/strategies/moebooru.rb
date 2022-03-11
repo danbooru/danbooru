@@ -16,11 +16,6 @@ module Sources
         [Source::URL::Moebooru.full_image_url(site_name, post_md5, file_ext, post_id)]
       end
 
-      def preview_urls
-        return image_urls if post_md5.blank?
-        [Source::URL::Moebooru.preview_image_url(site_name, post_md5)]
-      end
-
       def page_url
         return nil if post_id.blank?
         "https://#{domain}/post/show/#{post_id}"

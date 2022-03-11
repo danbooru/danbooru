@@ -20,12 +20,6 @@ module Sources
         image.to_a.map { |img| URI.join(page_url, img["src"]).to_s }
       end
 
-      def preview_urls
-        image_urls.map do
-          "https://thumbs.hentai-foundry.com/thumb.php?pid=#{illust_id}&size=250"
-        end
-      end
-
       def page_url
         return nil if illust_id.blank?
 

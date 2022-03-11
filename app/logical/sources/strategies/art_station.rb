@@ -15,10 +15,6 @@ module Sources::Strategies
       @image_urls ||= image_urls_sub.map { |asset| asset_url(asset, :largest) }
     end
 
-    def preview_urls
-      @preview_urls ||= image_urls_sub.map { |asset| asset_url(asset, :smallest) }
-    end
-
     def page_url
       return nil if project_id.blank?
 

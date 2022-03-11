@@ -22,12 +22,6 @@ module Sources
         end
       end
 
-      def preview_urls
-        previews = [page&.at("meta[property='og:image']")&.[](:content)].compact
-
-        previews.presence || image_urls
-      end
-
       def page_url
         parsed_url.page_url || parsed_referer&.page_url
       end

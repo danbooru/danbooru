@@ -30,11 +30,15 @@ class IqdbClient
       if file.present?
         file = file.tempfile
       elsif url.present?
-        file = download(url, :preview_url)
+        strategy = Sources::Strategies.find(url)
+        raise Error, "Can't do reverse image search: #{url} has multiple images. Enter the URL of a single image." if strategy.image_urls.size > 1
+
+        download_url = strategy.image_urls.first
+        file = Sources::Strategies.find(download_url).download_file!(download_url)
       elsif image_url.present?
-        file = download(image_url, :url)
+        file = Sources::Strategies.find(image_url).download_file!(image_url)
       elsif file_url.present?
-        file = download(file_url, :image_url)
+        file = Sources::Strategies.find(file_url).download_file!(file_url)
       elsif post_id.present?
         file = Post.find(post_id).file(:preview)
       elsif media_asset_id.present?
@@ -52,17 +56,6 @@ class IqdbClient
       process_results(results, similarity, high_similarity)
     ensure
       file.try(:close)
-    end
-
-    # Download an URL to a file.
-    # @param url [String] the URL to download
-    # @param type [Symbol] the type of URL to download (:preview_url or full :image_url)
-    # @return [MediaFile] the downloaded file
-    def download(url, type)
-      strategy = Sources::Strategies.find(url)
-      download_url = strategy.send(type)
-      file = strategy.download_file!(download_url)
-      file
     end
 
     # Transform the JSON returned by IQDB to add the full post data for each

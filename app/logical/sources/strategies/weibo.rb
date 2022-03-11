@@ -35,10 +35,6 @@ module Sources
         end
       end
 
-      def preview_urls
-        image_urls.map { |img| img.gsub(%r{.cn/\w+/(\w+)}, '.cn/orj360/\1') }
-      end
-
       def page_url
         return nil unless api_response.present?
 
