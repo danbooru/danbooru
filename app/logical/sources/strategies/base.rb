@@ -16,14 +16,12 @@
 module Sources
   module Strategies
     class Base
-      class DownloadError < StandardError; end
+      extend Memoist
 
       # The http timeout to download a file.
       DOWNLOAD_TIMEOUT = 60
 
-      attr_reader :url, :referer_url, :urls, :parsed_url, :parsed_referer, :parsed_urls
-
-      extend Memoist
+      attr_reader :url, :referer_url, :parsed_url, :parsed_referer
 
       # Should return true if all prerequisites for using the strategy are met.
       # Return false if the strategy requires api keys that have not been configured.
@@ -44,24 +42,15 @@ module Sources
       def initialize(url, referer_url = nil)
         @url = url.to_s
         @referer_url = referer_url&.to_s
-        @urls = [@url, @referer_url].select(&:present?)
 
         @parsed_url = Source::URL.parse(url)
         @parsed_referer = Source::URL.parse(referer_url) if referer_url.present?
-        @parsed_urls = [parsed_url, parsed_referer].select(&:present?)
       end
 
       # Should return true if this strategy should be used. By default, checks
       # if the main url belongs to any of the domains associated with this site.
       def match?
-        return false if parsed_url.nil?
-        parsed_url.domain.in?(domains)
-      end
-
-      # The list of base domains belonging to this site. Subdomains are
-      # automatically included (i.e. "pixiv.net" matches "fanbox.pixiv.net").
-      def domains
-        []
+        false
       end
 
       def site_name
@@ -87,8 +76,6 @@ module Sources
           "Erogamescape"
         when /facebook\.com\z/i
           "Facebook"
-        when /fantia\.jp\z/i
-          "Fantia"
         when /fc2\.com\z/i
           "FC2"
         when /gumroad\.com\z/i
@@ -99,8 +86,6 @@ module Sources
           "Ko-fi"
         when /livedoor\.(jp|com)\z/i
           "Livedoor"
-        when /lofter\.com\z/i
-          "Lofter"
         when /mangaupdates\.com\z/i
           "Mangaupdates"
         when /melonbooks\.co\.jp\z/i
@@ -141,7 +126,7 @@ module Sources
       # be a list of JPEG, PNG, GIF, WEBM, MP4, ZIP, etc. It is what the
       # downloader will fetch and save to disk.
       def image_urls
-        raise NotImplementedError
+        []
       end
 
       def image_url

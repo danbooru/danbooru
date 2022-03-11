@@ -4,8 +4,6 @@
 module Sources
   module Strategies
     class HentaiFoundry < Base
-      extend Memoist
-
       def match?
         parsed_url&.site_name == "Hentai Foundry"
       end

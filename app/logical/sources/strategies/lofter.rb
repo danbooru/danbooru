@@ -4,8 +4,6 @@
 module Sources
   module Strategies
     class Lofter < Base
-      extend Memoist
-
       def match?
         parsed_url&.site_name == "Lofter"
       end

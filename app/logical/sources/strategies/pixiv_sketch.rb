@@ -4,8 +4,6 @@
 module Sources
   module Strategies
     class PixivSketch < Base
-      extend Memoist
-
       def match?
         Source::URL::PixivSketch === parsed_url
       end

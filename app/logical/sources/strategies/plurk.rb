@@ -4,14 +4,12 @@
 module Sources
   module Strategies
     class Plurk < Base
-      extend Memoist
-
-      def domains
-        ["plurk.com"]
+      def match?
+        Source::URL::Plurk === parsed_url
       end
 
       def site_name
-        "Plurk"
+        parsed_url.site_name
       end
 
       def image_urls
