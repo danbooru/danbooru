@@ -3,7 +3,7 @@ require "test_helper"
 module Sources
   class MoebooruTest < ActiveSupport::TestCase
     def assert_source_data_equals(url, referer = nil, site_name: nil, image_url: nil, page_url: nil, size: nil, tags: [], profile_url: nil, **params)
-      site = Sources::Strategies.find(url)
+      site = Sources::Strategies.find(url, referer)
 
       assert_equal(site_name, site.site_name)
       assert_equal([image_url], site.image_urls)
@@ -69,6 +69,20 @@ module Sources
           assert_source_data_equals(@samp, **@data)
           assert_source_data_equals(@jpeg, **@data)
           assert_source_data_equals(@full, **@data)
+        end
+      end
+
+      context "When the referer URL is SauceNao" do
+        should "ignore the referer" do
+          @url = "https://yande.re/post/show/469929"
+          @ref = "https://saucenao.com/"
+
+          assert_source_data_equals(@url, @ref,
+            site_name: "Yande.re",
+            image_url: "https://files.yande.re/image/36b031b266605d89aed2b62d479e64b1/yande.re%20469929.jpg",
+            page_url: "https://yande.re/post/show/469929",
+            tags: %w[anchovy bandages darjeeling girls_und_panzer katyusha kay_(girls_und_panzer) mika_(girls_und_panzer) nishi_kinuyo nishizumi_maho nishizumi_miho shimada_arisu uniform],
+          )
         end
       end
     end

@@ -30,22 +30,25 @@ module Sources
         true
       end
 
-      # * <tt>url</tt> - Should point to a resource suitable for
-      #   downloading. This may sometimes point to the binary file.
-      #   It may also point to the artist's profile page, in cases
-      #   where this class is being used to normalize artist urls.
-      #   Implementations should be smart enough to detect this and
-      #   behave accordingly.
-      # * <tt>referer_url</tt> - Sometimes the HTML page cannot be
-      #   determined from <tt>url</tt>. You should generally pass in a
-      #   <tt>referrer_url</tt> so the strategy can discover the HTML
-      #   page and other information.
+      # Extract information from a target URL. The target URL may be either a
+      # direct image URL, or the URL of a HTML page containing one or more
+      # images.
+      #
+      # The referer URL is optionally provided when uploading direct image URLs
+      # with the bookmarklet. This lets us find the page containing the image
+      # for sites like Twitter, where the image URL by itself doesn't have
+      # enough information to find the page containing the image.
+      #
+      # @param url [String] The target URL
+      # @param referer_url [String] If the the target URL is an image URL, this
+      #   should be the HTML page containing the image.
       def initialize(url, referer_url = nil)
         @url = url.to_s
         @referer_url = referer_url&.to_s
 
         @parsed_url = Source::URL.parse(url)
         @parsed_referer = Source::URL.parse(referer_url) if referer_url.present?
+        @parsed_referer = nil if parsed_url&.site_name != parsed_referer&.site_name
       end
 
       # Should return true if this strategy should be used. By default, checks

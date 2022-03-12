@@ -36,7 +36,6 @@ module Sources
       end
 
       def page_url
-        # XXX what if referer isn't from NicoSeiga?
         parsed_referer&.page_url || parsed_url.page_url
       end
 
