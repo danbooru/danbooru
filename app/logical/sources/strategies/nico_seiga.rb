@@ -12,10 +12,6 @@ module Sources
         Source::URL::NicoSeiga === parsed_url
       end
 
-      def site_name
-        parsed_url.site_name
-      end
-
       def image_urls
         if image_id.present?
           [image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}")]

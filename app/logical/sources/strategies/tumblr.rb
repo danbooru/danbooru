@@ -11,10 +11,6 @@ module Sources::Strategies
       Source::URL::Tumblr === parsed_url
     end
 
-    def site_name
-      parsed_url.site_name
-    end
-
     def image_urls
       return [find_largest(parsed_url)].compact if parsed_url.asset_url?
 

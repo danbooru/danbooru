@@ -8,10 +8,6 @@ module Sources
         parsed_url&.site_name == "Newgrounds"
       end
 
-      def site_name
-        "Newgrounds"
-      end
-
       def image_urls
         if parsed_url.image_url?
           [url]

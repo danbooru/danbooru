@@ -8,10 +8,6 @@ module Sources
         parsed_url&.site_name == "Foundation"
       end
 
-      def site_name
-        "Foundation"
-      end
-
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]

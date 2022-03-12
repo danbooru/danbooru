@@ -7,10 +7,6 @@ module Sources::Strategies
       Source::URL::Mastodon === parsed_url
     end
 
-    def site_name
-      parsed_url.site_name
-    end
-
     def domain
       case site_name
       when "Pawoo" then "pawoo.net"

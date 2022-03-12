@@ -8,10 +8,6 @@ module Sources
         Source::URL::Plurk === parsed_url
       end
 
-      def site_name
-        parsed_url.site_name
-      end
-
       def image_urls
         # * Posts can have up to 10 images.
         # * Artists commonly post extra images by replying to their own post.

@@ -72,12 +72,11 @@ class ArtistURL < ApplicationRecord
   end
 
   def domain
-    Danbooru::URL.parse(normalized_url)&.domain.to_s
+    parsed_url&.domain.to_s
   end
 
   def site_name
-    source = Sources::Strategies.find(normalized_url)
-    source.site_name
+    parsed_url&.site_name.to_s
   end
 
   # A secondary URL is an artist URL that we don't normally want to display,
@@ -123,7 +122,12 @@ class ArtistURL < ApplicationRecord
 
   def url=(url)
     super(url)
+    @parsed_url = Source::URL.parse(url)
     self.normalized_url = self.class.normalize_normalized_url(self.url)
+  end
+
+  def parsed_url
+    @parsed_url ||= Source::URL.parse(url)
   end
 
   def to_s

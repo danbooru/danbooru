@@ -7,10 +7,6 @@ module Sources::Strategies
       parsed_url&.site_name == "TwitPic"
     end
 
-    def site_name
-      parsed_url.site_name
-    end
-
     def normalize_for_source
       parsed_url.page_url || url
     end

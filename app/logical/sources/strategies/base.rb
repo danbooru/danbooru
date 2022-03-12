@@ -22,6 +22,7 @@ module Sources
       DOWNLOAD_TIMEOUT = 60
 
       attr_reader :url, :referer_url, :parsed_url, :parsed_referer
+      delegate :site_name, to: :parsed_url
 
       # Should return true if all prerequisites for using the strategy are met.
       # Return false if the strategy requires api keys that have not been configured.
@@ -51,74 +52,6 @@ module Sources
       # if the main url belongs to any of the domains associated with this site.
       def match?
         false
-      end
-
-      def site_name
-        host = parsed_url&.host
-
-        # XXX should go in dedicated strategies.
-        case host
-        when /amazon\.(com|jp|co\.jp)\z/i
-          "Amazon"
-        when /ask\.fm\z/i
-          "Ask.fm"
-        when /bcy\.net\z/i
-          "BCY"
-        when /booth\.pm\z/i
-          "Booth.pm"
-        when /circle\.ms\z/i
-          "Circle.ms"
-        when /dlsite\.(com|net)\z/i
-          "DLSite"
-        when /doujinshi\.mugimugi\.org\z/i, /doujinshi\.org\z/i
-          "Doujinshi.org"
-        when /erogamescape\.dyndns\.org\z/i
-          "Erogamescape"
-        when /facebook\.com\z/i
-          "Facebook"
-        when /fc2\.com\z/i
-          "FC2"
-        when /gumroad\.com\z/i
-          "Gumroad"
-        when /instagram\.com\z/i
-          "Instagram"
-        when /ko-fi\.com\z/i
-          "Ko-fi"
-        when /livedoor\.(jp|com)\z/i
-          "Livedoor"
-        when /mangaupdates\.com\z/i
-          "Mangaupdates"
-        when /melonbooks\.co\.jp\z/i
-          "Melonbooks"
-        when /mihuashi\.com\z/i
-          "Mihuashi"
-        when /mixi\.jp\z/i
-          "Mixi.jp"
-        when /patreon\.com\z/i
-          "Patreon"
-        when /piapro\.jp\z/i
-          "Piapro.jp"
-        when /picarto\.tv\z/i
-          "Picarto"
-        when /privatter\.net\z/i
-          "Privatter"
-        when /sakura\.ne\.jp\z/i
-          "Sakura.ne.jp"
-        when /stickam\.jp\z/i
-          "Stickam"
-        when /tinami\.com\z/i
-          "Tinami"
-        when /toranoana\.(jp|shop)\z/i
-          "Toranoana"
-        when /twitch\.tv\z/i
-          "Twitch"
-        when /wikipedia\.org\z/i
-          "Wikipedia"
-        when /youtube\.com\z/i
-          "Youtube"
-        else
-          host
-        end
       end
 
       # Whatever <tt>url</tt> is, this method should return the direct links

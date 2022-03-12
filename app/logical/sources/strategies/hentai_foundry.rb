@@ -8,10 +8,6 @@ module Sources
         parsed_url&.site_name == "Hentai Foundry"
       end
 
-      def site_name
-        parsed_url.site_name
-      end
-
       def image_urls
         image = page&.search("#picBox img")
 

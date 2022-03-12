@@ -7,10 +7,6 @@ module Sources::Strategies
       Source::URL::ArtStation === parsed_url
     end
 
-    def site_name
-      parsed_url.site_name
-    end
-
     def image_urls
       @image_urls ||= image_urls_sub.map { |asset| asset_url(asset, :largest) }
     end

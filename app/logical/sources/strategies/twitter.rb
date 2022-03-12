@@ -27,10 +27,6 @@ module Sources::Strategies
       parsed_url&.site_name == "Twitter"
     end
 
-    def site_name
-      parsed_url.site_name
-    end
-
     def image_urls
       # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
       if parsed_url.image_url?

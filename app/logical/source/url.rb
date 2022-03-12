@@ -3,6 +3,9 @@
 # A Source::URL is a URL from a source site, such as Twitter, Pixiv, etc. Each site has a
 # subclass responsible for parsing and extracting information from URLs for that site.
 #
+# Sources::Strategies are the main user of Source::URLs. Each Source::URL subclass usually
+# has a corresponding strategy for extracting data from that site.
+#
 # To add a new site, create a subclass of Source::URL and implement `#match?` to define
 # which URLs belong to the site, and `#parse` to parse and extract information from the URL.
 #
@@ -15,6 +18,7 @@
 #   url.status_id        # => "1496123903290314755"
 #   url.twitter_username # => "yasunavert"
 #
+# @see Danbooru::URL
 module Source
   class URL < Danbooru::URL
     SUBCLASSES = [
@@ -68,9 +72,43 @@ module Source
       raise NotImplementedError
     end
 
-    # @return [String, nil] The name of the site this URL belongs to, or possibly nil if unknown.
+    # The name of the site this URL belongs to.
+    #
+    # @return [String]
     def site_name
-      self.class.name.demodulize.titleize
+      # XXX should go in dedicated subclasses.
+      case host
+      when /ask\.fm\z/i
+        "Ask.fm"
+      when /bcy\.net\z/i
+        "BCY"
+      when /booth\.pm\z/i
+        "Booth.pm"
+      when /circle\.ms\z/i
+        "Circle.ms"
+      when /dlsite\.(com|net)\z/i
+        "DLSite"
+      when /doujinshi\.mugimugi\.org\z/i
+        "Doujinshi.org"
+      when /fc2\.com\z/i
+        "FC2"
+      when /ko-fi\.com\z/i
+        "Ko-fi"
+      when /mixi\.jp\z/i
+        "Mixi.jp"
+      when /piapro\.jp\z/i
+        "Piapro.jp"
+      when /sakura\.ne\.jp\z/i
+        "Sakura.ne.jp"
+      else
+        if self.class == Source::URL
+          # "www.melonbooks.co.jp" => "Melonbooks"
+          parsed_domain.sld.titleize
+        else
+          # "Source::URL::NicoSeiga" => "Nico Seiga"
+          self.class.name.demodulize.titleize
+        end
+      end
     end
 
     protected def initialize(...)

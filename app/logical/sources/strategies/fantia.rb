@@ -10,10 +10,6 @@ module Sources::Strategies
       Source::URL::Fantia === parsed_url
     end
 
-    def site_name
-      parsed_url.site_name
-    end
-
     def image_urls
       return [parsed_url.full_image_url] if parsed_url.image_url?
       return [image_from_downloadable(parsed_url)] if parsed_url.downloadable?

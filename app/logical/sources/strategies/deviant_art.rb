@@ -11,10 +11,6 @@ module Sources
         Source::URL::DeviantArt === parsed_url
       end
 
-      def site_name
-        parsed_url.site_name
-      end
-
       def image_urls
         [image_url]
       end
