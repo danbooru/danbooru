@@ -18,10 +18,10 @@ module Source
   class URL::DeviantArt < Source::URL
     RESERVED_SUBDOMAINS = %w[www]
 
-    attr_reader :username, :work_id, :title
+    attr_reader :username, :work_id, :stash_id, :title
 
     def self.match?(url)
-      url.domain.in?(%w[deviantart.net deviantart.com fav.me]) || url.host.in?(%w[images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com wixmp-ed30a86b8c4ca887773594c2.wixmp.com api-da.wixmp.com])
+      url.domain.in?(%w[deviantart.net deviantart.com fav.me sta.sh]) || url.host.in?(%w[images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com wixmp-ed30a86b8c4ca887773594c2.wixmp.com api-da.wixmp.com])
     end
 
     def parse
@@ -78,6 +78,18 @@ module Source
       in "fav.me", base36_id
         @work_id = base36_id.delete_prefix("d").to_i(36)
 
+      # https://sta.sh/21leo8mz87ue (folder)
+      # https://sta.sh/2uk0v5wabdt (subfolder)
+      # https://sta.sh/0wxs31o7nn2 (single image)
+      # Ref: https://www.deviantartsupport.com/en/article/what-is-stash-3391708
+      # Ref: https://www.deviantart.com/developers/http/v1/20160316/stash_item/4662dd8b10e336486ea9a0b14da62b74
+      in "sta.sh", stash_id
+        @stash_id = stash_id
+
+      # https://sta.sh/zip/21leo8mz87ue
+      in "sta.sh", "zip", stash_id
+        @stash_id = stash_id
+
       else
       end
     end
@@ -119,7 +131,9 @@ module Source
     end
 
     def page_url
-      if username.present? && pretty_title.present? && work_id.present?
+      if stash_id.present?
+        "https://sta.sh/#{stash_id}"
+      elsif username.present? && pretty_title.present? && work_id.present?
         "https://www.deviantart.com/#{username}/art/#{pretty_title}-#{work_id}"
       elsif work_id.present?
         "https://www.deviantart.com/deviation/#{work_id}"

@@ -38,7 +38,9 @@ module Sources
       end
 
       def page_url
-        if api_deviation.present?
+        if stash_page.present?
+          stash_page
+        elsif api_deviation.present?
           api_deviation[:url]
         elsif deviation_id.present?
           page_url_from_image_url
@@ -48,7 +50,19 @@ module Sources
       end
 
       def page_url_from_image_url
-        parsed_url.page_url || parsed_referer&.page_url
+        stash_page || parsed_url.page_url || parsed_referer&.page_url
+      end
+
+      # Sta.sh posts have the same image URLs as DeviantArt but different page URLs. We use the Sta.sh page if we have one.
+      #
+      # Image: https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dcmjs1s-389a7505-142d-4b34-a790-ab4ea1ec9eaa.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzgzZDNlYjRkLTEzZTUtNGFlYS1hMDhmLThkNDMzMWQwMzNjNFwvZGNtanMxcy0zODlhNzUwNS0xNDJkLTRiMzQtYTc5MC1hYjRlYTFlYzllYWEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.pIddc32BoLpAJt6D8YcRFonoVy9nC8RgROlYwMp3huo
+      # Page: https://sta.sh/01pwva4zzf98
+      def stash_page
+        if parsed_url.stash_id.present?
+          parsed_url.page_url
+        elsif parsed_referer&.stash_id.present?
+          parsed_referer.page_url
+        end
       end
 
       def normalize_for_source

@@ -8,7 +8,6 @@ module Sources
         Strategies::Twitter,
         Strategies::Tumblr,
         Strategies::NicoSeiga,
-        Strategies::Stash, # must come before DeviantArt
         Strategies::DeviantArt,
         Strategies::Moebooru,
         Strategies::Nijie,
