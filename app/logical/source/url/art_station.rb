@@ -65,4 +65,8 @@ class Source::URL::ArtStation < Source::URL
       "https://cdn.artstation.com/p/assets/#{@asset_type}/images/#{@asset_subdir}/#{size}/#{@file}"
     end
   end
+
+  def profile_url
+    "https://www.artstation.com/#{username}" if username.present?
+  end
 end

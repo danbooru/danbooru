@@ -49,7 +49,7 @@ module Sources
       end
 
       def profile_urls
-        (parsed_url.profile_urls + parsed_referer&.profile_urls.to_a).uniq
+        [parsed_url.profile_url, parsed_referer&.profile_url].compact.uniq
       end
 
       def profile_url

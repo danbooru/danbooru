@@ -76,6 +76,10 @@ class Source::URL::Fantia < Source::URL
     end
   end
 
+  def profile_url
+    "https://fantia.jp/fanclubs/#{fanclub_id}" if fanclub_id.present?
+  end
+
   def work_id
     @post_id || @product_id
   end

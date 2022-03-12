@@ -26,7 +26,7 @@ class Source::URL::Twitter < Source::URL
   # https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration
   RESERVED_USERNAMES = %w[home i intent search]
 
-  attr_reader :status_id, :twitter_username
+  attr_reader :status_id, :twitter_username, :user_id
 
   def self.match?(url)
     url.host.in?(%w[twitter.com mobile.twitter.com pic.twitter.com pbs.twimg.com video.twimg.com t.co])
@@ -50,6 +50,18 @@ class Source::URL::Twitter < Source::URL
     # https://twitter.com/motty08111213
     in "twitter.com", username, *rest
       @twitter_username = username unless username.in?(RESERVED_USERNAMES)
+
+    # https://twitter.com/intent/user?user_id=1485229827984531457
+    in "twitter.com", "intent", "user" if params[:user_id].present?
+      @user_id = params[:user_id]
+
+    # https://twitter.com/intent/user?screen_name=ryuudog_NFT
+    in "twitter.com", "intent", "user" if params[:screen_name].present?
+      @twitter_username = params[:screen_name]
+
+    # https://twitter.com/i/user/889592953
+    in "twitter.com", "i", "user", user_id
+      @user_id = user_id
 
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:small
@@ -86,5 +98,14 @@ class Source::URL::Twitter < Source::URL
   def orig_image_url
     return nil unless @file_path.present?
     "#{site}/#{@file_path}:orig"
+  end
+
+  def profile_url
+    if twitter_username.present?
+      "https://twitter.com/#{twitter_username}"
+    elsif user_id.present?
+      # "https://twitter.com/i/user/#{user_id}
+      "https://twitter.com/intent/user?user_id=#{user_id}"
+    end
   end
 end

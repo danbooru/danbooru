@@ -38,4 +38,8 @@ class Source::URL::Plurk < Source::URL
   def image_url?
     host == "images.plurk.com"
   end
+
+  def profile_url
+    "https://www.plurk.com/#{username}" if username.present?
+  end
 end

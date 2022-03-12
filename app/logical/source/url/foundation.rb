@@ -63,6 +63,14 @@ class Source::URL::Foundation < Source::URL
     end
   end
 
+  def profile_url
+    if username.present?
+      "https://foundation.app/@#{username}"
+    elsif user_id.present?
+      "https://foundation.app/#{user_id}"
+    end
+  end
+
   def page_url
     return nil unless work_id.present?
     return nil if host == "f8n-production-collection-assets.imgix.net" && @hash.blank?

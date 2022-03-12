@@ -58,4 +58,8 @@ class Source::URL::Newgrounds < Source::URL
   def image_url?
     url.host == "art.ngfiles.com"
   end
+
+  def profile_url
+    "https://#{username}.newgrounds.com" if username.present?
+  end
 end

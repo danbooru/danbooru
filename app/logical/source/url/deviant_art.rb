@@ -142,6 +142,10 @@ module Source
       end
     end
 
+    def profile_url
+      "https://www.deviantart.com/#{username}" if username.present?
+    end
+
     def pretty_title
       title.titleize.strip.squeeze(" ").tr(" ", "-") if title.present?
     end

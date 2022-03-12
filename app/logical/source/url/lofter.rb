@@ -42,4 +42,8 @@ class Source::URL::Lofter < Source::URL
   def full_image_url
     "#{site}#{path}" if image_url?
   end
+
+  def profile_url
+    "https://#{username}.lofter.com" if username.present?
+  end
 end

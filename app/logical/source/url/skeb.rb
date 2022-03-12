@@ -42,6 +42,10 @@ class Source::URL::Skeb < Source::URL
     end
   end
 
+  def profile_url
+    "https://skeb.jp/@#{username}" if username.present?
+  end
+
   def image_url?
     domain.in?(%[imgix.net amazonaws.com])
   end

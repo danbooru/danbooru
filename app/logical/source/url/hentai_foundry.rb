@@ -62,4 +62,8 @@ class Source::URL::HentaiFoundry < Source::URL
     else
     end
   end
+
+  def profile_url
+    "https://www.hentai-foundry.com/user/#{username}" if username.present?
+  end
 end

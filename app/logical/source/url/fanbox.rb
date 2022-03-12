@@ -41,7 +41,12 @@ class Source::URL::Fanbox < Source::URL
       @work_id = work_id
 
     # https://www.pixiv.net/fanbox/creator/1566167
-    in "www.pixiv.net", "fanbox", "creator", user_id
+    # http://www.pixiv.net/fanbox/user/3410642
+    in "www.pixiv.net", "fanbox", ("creator" | "user"), user_id
+      @user_id = user_id
+
+    # http://www.pixiv.net/fanbox/member.php?user_id=3410642
+    in "www.pixiv.net", "fanbox", "member.php" if params[:user_id].present?
       @user_id = user_id
 
     # https://omu001.fanbox.cc/posts/39714
@@ -70,5 +75,13 @@ class Source::URL::Fanbox < Source::URL
     # https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg
     # https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/BtxSp9MImFhnEZtjEZs2RPqL.jpeg
     to_s.gsub(%r{/[cw]/\w+/}, "/") if image_url?
+  end
+
+  def profile_url
+    if username.present?
+      "https://#{username}.fanbox.cc"
+    elsif user_id.present?
+      "https://www.pixiv.net/fanbox/creator/#{user_id}"
+    end
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Weibo < Source::URL
-  attr_reader :full_image_url
+  attr_reader :full_image_url, :artist_short_id, :artist_long_id
 
   def self.match?(url)
     url.domain.in?(["weibo.com", "weibo.cn", "sinaimg.cn"])
@@ -63,18 +63,12 @@ class Source::URL::Weibo < Source::URL
     full_image_url.present?
   end
 
-  def profile_urls
-    [profile_short_url, profile_long_url].compact
-  end
-
-  def profile_short_url
-    return if @artist_short_id.blank?
-    "https://www.weibo.com/u/#{@artist_short_id}"
-  end
-
-  def profile_long_url
-    return if @artist_long_id.blank?
-    "https://www.weibo.com/p/#{@artist_long_id}"
+  def profile_url
+    if artist_short_id.present?
+      "https://www.weibo.com/u/#{artist_short_id}"
+    elsif artist_long_id.present?
+      "https://www.weibo.com/p/#{artist_long_id}"
+    end
   end
 
   def mobile_url

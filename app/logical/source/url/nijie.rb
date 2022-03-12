@@ -93,4 +93,8 @@ class Source::URL::Nijie < Source::URL
   def full_image_url
     to_s.remove(%r{__rs_\w+/}i).gsub("http:", "https:") if image_url?
   end
+
+  def profile_url
+    "https://nijie.info/members.php?id=#{user_id}" if user_id.present?
+  end
 end

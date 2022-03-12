@@ -70,4 +70,12 @@ class Source::URL::Mastodon < Source::URL
   def image_url?
     full_image_url.present?
   end
+
+  def profile_url
+    if username.present?
+      "https://#{host}/@#{username}"
+    elsif user_id.present?
+      "https://#{host}/web/accounts/#{user_id}"
+    end
+  end
 end

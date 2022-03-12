@@ -110,6 +110,27 @@ module Source
       end
     end
 
+    # Convert the current URL into a profile URL, or return nil if it's not
+    # possible to get the profile URL from the current URL.
+    #
+    # URLs in artist entries will be normalized into this form.
+    #
+    # Some sites may have multiple profile URLs, for example if the site has
+    # both usernames and user IDs. This may return different profile URLs,
+    # depending on whether the current URL has the username or the user ID.
+    #
+    # Examples:
+    #
+    # * https://www.pixiv.net/member.php?id=9948
+    # * https://www.pixiv.net/stacc/bkubb
+    # * https://twitter.com/bkub_comic
+    # * https://twitter.com/intent/user?user_id=889592953
+    #
+    # @return [String, nil]
+    def profile_url
+      nil
+    end
+
     protected def initialize(...)
       super(...)
       parse

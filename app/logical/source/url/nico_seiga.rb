@@ -88,7 +88,20 @@ module Source
         # unhandled
 
       # https://seiga.nicovideo.jp/user/illust/456831
-      in "seiga.nicovideo.jp", "user", "illust", user_id
+      # https://sp.seiga.nicovideo.jp/user/illust/20542122
+      # https://ext.seiga.nicovideo.jp/user/illust/20542122
+      in /seiga\.nicovideo\.jp$/, "user", "illust", user_id
+        @user_id = user_id
+
+      # http://seiga.nicovideo.jp/manga/list?user_id=23839737
+      # http://sp.seiga.nicovideo.jp/manga/list?user_id=23839737
+      in /seiga\.nicovideo\.jp$/, "manga", "list" if params[:user_id].present?
+        @user_id = params[:user_id]
+
+      # https://www.nicovideo.jp/user/4572975
+      # https://www.nicovideo.jp/user/20446930/mylist/28674289
+      # https://commons.nicovideo.jp/user/696839
+      in ("commons.nicovideo.jp" | "www.nicovideo.jp"), "user", /^\d+$/ => user_id, *rest
         @user_id = user_id
 
       else
@@ -103,6 +116,10 @@ module Source
       elsif image_id.present?
         "https://seiga.nicovideo.jp/image/source/#{image_id}"
       end
+    end
+
+    def profile_url
+      "https://seiga.nicovideo.jp/user/illust/#{user_id}" if user_id.present?
     end
   end
 end

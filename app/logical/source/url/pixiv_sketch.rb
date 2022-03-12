@@ -39,6 +39,10 @@ module Source
       "https://sketch.pixiv.net/items/#{work_id}" if work_id.present?
     end
 
+    def profile_url
+      "https://sketch.pixiv.net/@#{username}" if username.present?
+    end
+
     def api_url
       # https://sketch.pixiv.net/api/items/5835314698645024323.json (won't work in the browser; use curl)
       "https://sketch.pixiv.net/api/items/#{work_id}.json" if work_id.present?

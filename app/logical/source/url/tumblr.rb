@@ -65,7 +65,6 @@ class Source::URL::Tumblr < Source::URL
   end
 
   def profile_url
-    return nil unless @blog_name.present?
-    "https://#{@blog_name}.tumblr.com"
+    "https://#{blog_name}.tumblr.com" if blog_name.present?
   end
 end

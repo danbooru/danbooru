@@ -54,13 +54,19 @@ module Source
         @work_id = params[:illust_id]
 
       # https://www.pixiv.net/member.php?id=339253
-      in "www.pixiv.net", "member.php" if params[:id].present?
+      # http://www.pixiv.net/novel/member.php?id=76567
+      in "www.pixiv.net", *, "member.php" if params[:id].present?
         @user_id = params[:id]
 
       # https://www.pixiv.net/u/9202877
       # https://www.pixiv.net/users/9202877
+      # https://www.pixiv.net/users/76567/novels
+      in "www.pixiv.net", ("u" | "users"), user_id, *rest
+        @user_id = user_id
+
       # https://www.pixiv.net/en/users/9202877
-      in "www.pixiv.net", *, ("u" | "users"), user_id
+      # https://www.pixiv.net/en/users/76567/novels
+      in "www.pixiv.net", _, ("u" | "users"), user_id, *rest
         @user_id = user_id
 
       # https://www.pixiv.net/stacc/noizave
@@ -123,11 +129,12 @@ module Source
     end
 
     def profile_url
-      "https://www.pixiv.net/users/#{user_id}" if user_id.present?
-    end
-
-    def stacc_url
-      "https://www.pixiv.net/stacc/#{username}" if username.present?
+      if user_id.present?
+        # "https://www.pixiv.net/users/#{user_id}"
+        "https://www.pixiv.net/member.php?id=#{user_id}"
+      elsif username.present?
+        "https://www.pixiv.net/stacc/#{username}"
+      end
     end
   end
 end
