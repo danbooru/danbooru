@@ -93,10 +93,6 @@ module Sources::Strategies
       api_response[:full_text].to_s
     end
 
-    def normalize_for_artist_finder
-      profile_url.try(:downcase).presence || url
-    end
-
     def normalize_for_source
       if tag_name_from_url.present? && status_id.present?
         "https://twitter.com/#{tag_name_from_url}/status/#{status_id}"

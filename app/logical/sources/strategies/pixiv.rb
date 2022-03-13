@@ -62,12 +62,10 @@ module Sources
       end
 
       def profile_url
-        if parsed_url.profile_url.present?
-          parsed_url.profile_url
-        elsif api_illust[:userId].present?
+        if api_illust[:userId].present?
           "https://www.pixiv.net/users/#{api_illust[:userId]}"
-        else
-          nil
+        elsif parsed_url.profile_url.present?
+          parsed_url.profile_url
         end
       end
 

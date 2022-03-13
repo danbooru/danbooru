@@ -97,7 +97,8 @@ module Sources
         [artist_name, tag_name].compact.uniq
       end
 
-      # A link to the artist's profile page on the site.
+      # A link to the artist's profile page on the site. This will be used for
+      # artist finding purposes, so it needs to match the URL in the artist entry.
       def profile_url
         nil
       end
@@ -137,12 +138,6 @@ module Sources
       end
       memoize :http_downloader
 
-      # The url to use for artist finding purposes. This will be stored in the
-      # artist entry. Normally this will be the profile url.
-      def normalize_for_artist_finder
-        profile_url.presence || url
-      end
-
       # Given a post/image url, this is the normalized url that will be displayed in a post's page in its stead.
       # This function should never make any network call, even indirectly. Return nil to never normalize.
       def normalize_for_source
@@ -150,7 +145,7 @@ module Sources
       end
 
       def artists
-        ArtistFinder.find_artists(normalize_for_artist_finder.to_s)
+        ArtistFinder.find_artists(profile_url.to_s)
       end
 
       # A new artist entry with suggested defaults for when the artist doesn't
@@ -234,7 +229,6 @@ module Sources
           :image_urls => image_urls,
           :page_url => page_url,
           :canonical_url => canonical_url,
-          :normalized_for_artist_finder_url => normalize_for_artist_finder,
           :tags => tags,
           :normalized_tags => normalized_tags,
           :translated_tags => translated_tags,

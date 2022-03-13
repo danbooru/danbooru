@@ -242,7 +242,8 @@ class Artist < ApplicationRecord
       elsif query.include?("*")
         where(id: ArtistURL.where_like(:url, query).select(:artist_id))
       elsif query =~ %r{\Ahttps?://}i
-        ArtistFinder.find_artists(query)
+        url = Sources::Strategies.find(query).profile_url || query
+        ArtistFinder.find_artists(url)
       else
         where(id: ArtistURL.where_like(:url, "*#{query}*").select(:artist_id))
       end

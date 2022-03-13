@@ -40,10 +40,7 @@ module Sources
       end
 
       def profile_url
-        user_id = api_client&.user_id
-        return if user_id.blank? # artists can be anonymous
-
-        "https://seiga.nicovideo.jp/user/illust/#{api_client.user_id}"
+        "https://seiga.nicovideo.jp/user/illust/#{api_client.user_id}" if api_client.user_id.present?
       end
 
       def artist_name

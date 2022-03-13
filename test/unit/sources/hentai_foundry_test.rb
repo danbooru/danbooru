@@ -67,10 +67,6 @@ module Sources
       should "get the artist name" do
         assert_equal("Afrobull", @site.artist_name)
       end
-
-      should "get the normalized url" do
-        assert_equal("https://www.hentai-foundry.com/user/Afrobull", @site.normalize_for_artist_finder)
-      end
     end
 
     context "A deleted picture" do
