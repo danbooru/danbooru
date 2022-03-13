@@ -125,9 +125,12 @@ module ArtistFinder
     "ustream.tv/channel", # http://www.ustream.tv/channel/633b
     "ustream.tv/user", # http://www.ustream.tv/user/kazaputi
     "vk.com", # https://vk.com/id425850679
-    "weibo.com", # http://www.weibo.com/5536681649
-    "weibo.com/u",
-    "weibo.com/p",
+    "weibo.com", # https://weibo.com/kisinSheya
+    "weibo.com/u", # https://weibo.com/u/2904950533
+    "weibo.com/p", # https://weibo.com/p/1005057075896216
+    "weibo.cn", # https://weibo.cn/kisinSheya
+    "weibo.cn/u", # https://m.weibo.cn/u/6531786273
+    "weibo.cn/p", # https://m.weibo.cn/p/1005055921792975
     "wp.com",
     "yande.re",
     "youtube.com",
