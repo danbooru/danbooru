@@ -98,7 +98,7 @@ module Source
       # http://sp.seiga.nicovideo.jp/manga/list?user_id=23839737
       in /seiga\.nicovideo\.jp$/, "manga", "list" if params[:user_id].present?
         @user_id = params[:user_id]
-        @profile_url = "https://seiga.nicovideo.jp/manga/list?user_id=#{user_id}"
+        @profile_url = "https://seiga.nicovideo.jp/manga/list?user_id=#{params[:user_id]}"
 
       # https://www.nicovideo.jp/user/4572975
       # https://www.nicovideo.jp/user/20446930/mylist/28674289

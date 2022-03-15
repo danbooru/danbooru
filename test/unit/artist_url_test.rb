@@ -90,10 +90,10 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("http://seiga.nicovideo.jp/user/illust/7017777/", url.normalized_url)
 
       url = create(:artist_url, url: "http://seiga.nicovideo.jp/manga/list?user_id=23839737")
-      assert_equal("http://seiga.nicovideo.jp/user/illust/23839737/", url.normalized_url)
+      assert_equal("http://seiga.nicovideo.jp/manga/list?user_id=23839737/", url.normalized_url)
 
       url = create(:artist_url, url: "https://www.nicovideo.jp/user/20446930/mylist/28674289")
-      assert_equal("http://seiga.nicovideo.jp/user/illust/20446930/", url.normalized_url)
+      assert_equal("http://www.nicovideo.jp/user/20446930/", url.normalized_url)
     end
 
     should "normalize hentai foundry artist urls" do
