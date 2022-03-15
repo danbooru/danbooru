@@ -40,7 +40,8 @@ class Source::URL::ArtStation < Source::URL
       @username = username
 
     # https://www.artstation.com/sa-dui
-    in "www.artstation.com", username
+    # https://www.artstation.com/felipecartin/profile
+    in "www.artstation.com", username, *rest
       @username = username
 
     # https://sa-dui.artstation.com

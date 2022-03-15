@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-# Unparsed:
-# https://fantia.jp/asanagi
+# Unhandled:
+#
+# https://fantia.jp/commissions/64988
+# https://fantia.jp/profiles/tus_2n9n0fm05fizg
 
 class Source::URL::Fantia < Source::URL
   attr_reader :full_image_url
@@ -56,6 +58,11 @@ class Source::URL::Fantia < Source::URL
     in _, "fanclubs", /\d+/ => fanclub_id, *rest
       @fanclub_id = fanclub_id
 
+    # https://fantia.jp/asanagi
+    # https://fantia.jp/koruri
+    in _, username
+      @username = username
+
     else
     end
   end
@@ -77,7 +84,11 @@ class Source::URL::Fantia < Source::URL
   end
 
   def profile_url
-    "https://fantia.jp/fanclubs/#{fanclub_id}" if fanclub_id.present?
+    if fanclub_id.present?
+      "https://fantia.jp/fanclubs/#{fanclub_id}"
+    elsif username.present?
+      "https://fantia.jp/#{username}"
+    end
   end
 
   def work_id

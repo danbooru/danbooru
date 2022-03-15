@@ -12,11 +12,10 @@ class Source::URL::Tumblr < Source::URL
 
     # https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
     # https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s500x750/4f92bbaaf95c0b4e7970e62b1d2e1415859dd659.png
-    in /(\d+\.)?media\.tumblr\.com/ => host, *directories, /s\d+x\d+/ => dimensions, file
+    in _, *directories, /s\d+x\d+/ => dimensions, file if asset_url?
       @directory = directories.first
       max_size = Integer.sqrt(Danbooru.config.max_image_resolution)
       @full_image_url = url.to_s.gsub(%r{/s\d+x\d+/\w+\.\w+\z}i, "/s#{max_size}x#{max_size}/#{file}")
-      @file = file
 
     # http://data.tumblr.com/07e7bba538046b2b586433976290ee1f/tumblr_o3gg44HcOg1r9pi29o1_raw.jpg
     # https://40.media.tumblr.com/de018501416a465d898d24ad81d76358/tumblr_nfxt7voWDX1rsd4umo1_r23_1280.jpg
@@ -30,25 +29,51 @@ class Source::URL::Tumblr < Source::URL
     # https://media.tumblr.com/0DNBGJovY5j3smfeQs8nB53z_500.jpg
     # https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
     # https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4
-    in /^(data|(?:\d+\.)?media|(?:vtt|ve|va\.media))\.tumblr\.com/, *directory, file
+    in _, *directory, file if asset_url?
       @directory = directory.first
-      @file = file
-      @filename, @old_variant_size, @extension = @file.match(/(\w+?)(?:_(\d+h?|raw))?\.(\w+)\z/).captures
+      @filename, @old_variant_size, @extension = file.match(/(\w+?)(?:_(\d+h?|raw))?\.(\w+)\z/).captures
 
     # https://marmaladica.tumblr.com/post/188237914346/saved
     # https://emlan.tumblr.com/post/189469423572/kuro-attempts-to-buy-a-racy-book-at-comiket-but
     # https://superboin.tumblr.com/post/141169066579/photoset_iframe/superboin/tumblr_o45miiAOts1u6rxu8/500/false
     # https://make-do5.tumblr.com/post/619663949657423872
-    in _, ("post" | "image"), /\d+/ => work_id, *rest
+    # http://raspdraws.tumblr.com/image/70021467381
+    in _, ("post" | "image"), /^\d+$/ => work_id, *rest
       @blog_name = subdomain unless subdomain == "www"
       @work_id = work_id
+
+    # https://www.tumblr.com/blog/view/artofelaineho/187614935612
+    in ("www.tumblr.com" | "tumblr.com"), "blog", "view", blog_name, /^\d+$/ => work_id
+      @blog_name = blog_name
+      @work_id = work_id
+
+    # https://www.tumblr.com/blog/view/artofelaineho
+    # https://tumblr.com/blog/view/artofelaineho
+    in ("www.tumblr.com" | "tumblr.com"), "blog", "view", blog_name
+      @blog_name = blog_name
+
+    # https://www.tumblr.com/blog/artofelaineho
+    # http://tumblr.com/blog/kervalchan
+    in ("www.tumblr.com" | "tumblr.com"), "blog", blog_name
+      @blog_name = blog_name
+
+    # https://www.tumblr.com/dashboard/blog/dankwartart
+    # https://tumblr.com/dashboard/blog/dankwartart
+    in ("www.tumblr.com" | "tumblr.com"), "dashboard", "blog", blog_name
+      @blog_name = blog_name
+
+    # https://rosarrie.tumblr.com/archive
+    # https://solisnotte.tumblr.com/about
+    # http://whereisnovember.tumblr.com/tagged/art
+    in _, *rest unless asset_url? || subdomain == "www"
+      @blog_name = subdomain
 
     else
     end
   end
 
   def asset_url?
-    @file.present?
+    host.ends_with?("media.tumblr.com") || host == "data.tumblr.com"
   end
 
   def variants

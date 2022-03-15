@@ -10,10 +10,6 @@ class Source::URL::Skeb < Source::URL
   def parse
     case [domain, *path_segments]
 
-    # https://skeb.jp/@asanagi
-    in "skeb.jp", /^@/ => username
-      @username = username.delete_prefix("@")
-
     # https://skeb.jp/@OrvMZ/works/3 (non-watermarked)
     # https://skeb.jp/@OrvMZ/works/1 (separated request and client's message after delivery)
     # https://skeb.jp/@asanagi/works/16 (age-restricted, watermarked)
@@ -22,6 +18,11 @@ class Source::URL::Skeb < Source::URL
     in "skeb.jp", /^@/ => username, "works", work_id
       @username = username.delete_prefix("@")
       @work_id = work_id
+
+    # https://skeb.jp/@asanagi
+    # https://skeb.jp/@okku_oxn/works
+    in "skeb.jp", /^@/ => username, *rest
+      @username = username.delete_prefix("@")
 
     # https://skeb.imgix.net/requests/199886_0?bg=%23fff&auto=format&w=800&s=5a6a908ab964fcdfc4713fad179fe715
     # https://skeb.imgix.net/requests/73290_0?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&w=800&s=4843435cff85d623b1f657209d131526

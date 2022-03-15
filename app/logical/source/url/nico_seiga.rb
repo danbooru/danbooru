@@ -24,7 +24,7 @@
 #
 module Source
   class URL::NicoSeiga < Source::URL
-    attr_reader :illust_id, :manga_id, :image_id, :user_id
+    attr_reader :illust_id, :manga_id, :image_id, :user_id, :username, :profile_url
 
     def self.match?(url)
       url.domain.in?(%w[nicovideo.jp nicoseiga.jp nicomanga.jp nimg.jp])
@@ -92,17 +92,50 @@ module Source
       # https://ext.seiga.nicovideo.jp/user/illust/20542122
       in /seiga\.nicovideo\.jp$/, "user", "illust", user_id
         @user_id = user_id
+        @profile_url = "https://seiga.nicovideo.jp/user/illust/#{user_id}"
 
       # http://seiga.nicovideo.jp/manga/list?user_id=23839737
       # http://sp.seiga.nicovideo.jp/manga/list?user_id=23839737
       in /seiga\.nicovideo\.jp$/, "manga", "list" if params[:user_id].present?
         @user_id = params[:user_id]
+        @profile_url = "https://seiga.nicovideo.jp/manga/list?user_id=#{user_id}"
 
       # https://www.nicovideo.jp/user/4572975
       # https://www.nicovideo.jp/user/20446930/mylist/28674289
-      # https://commons.nicovideo.jp/user/696839
-      in ("commons.nicovideo.jp" | "www.nicovideo.jp"), "user", /^\d+$/ => user_id, *rest
+      in ("www.nicovideo.jp"), "user", /^\d+$/ => user_id, *rest
         @user_id = user_id
+        @profile_url = "https://www.nicovideo.jp/user/#{user_id}"
+
+      # https://commons.nicovideo.jp/user/696839
+      in "commons.nicovideo.jp", "user", /^\d+$/ => user_id, *rest
+        @user_id = user_id
+        @profile_url = "https://commons.nicovideo.jp/user/#{user_id}"
+
+      # https://q.nicovideo.jp/users/18700356
+      in "q.nicovideo.jp", "users", /^\d+$/ => user_id, *rest
+        @user_id = user_id
+        @profile_url = "https://q.nicovideo.jp/users/#{user_id}"
+
+      # https://dic.nicovideo.jp/u/11141663
+      in "dic.nicovideo.jp", "u", /^\d+$/ => user_id, *rest
+        @user_id = user_id
+        @profile_url = "https://dic.nicovideo.jp/u/#{user_id}"
+
+      # https://3d.nicovideo.jp/users/109584
+      # https://3d.nicovideo.jp/users/29626631/works
+      in "3d.nicovideo.jp", "users", /^\d+$/ => user_id, *rest
+        @user_id = user_id
+        @profile_url = "https://3d.nicovideo.jp/users/#{user_id}"
+
+      # https://3d.nicovideo.jp/u/siobi
+      in "3d.nicovideo.jp", "u", username, *rest
+        @username = username
+        @profile_url = "https://3d.nicovideo.jp/u/#{username}"
+
+      # http://game.nicovideo.jp/atsumaru/users/7757217
+      in "game.nicovideo.jp", "atsumaru", "users", /^\d+$/ => user_id, *rest
+        @user_id = user_id
+        @profile_url = "https://game.nicovideo.jp/atsumaru/users/#{user_id}"
 
       else
       end
@@ -116,10 +149,6 @@ module Source
       elsif image_id.present?
         "https://seiga.nicovideo.jp/image/source/#{image_id}"
       end
-    end
-
-    def profile_url
-      "https://seiga.nicovideo.jp/user/illust/#{user_id}" if user_id.present?
     end
   end
 end

@@ -12,7 +12,7 @@ class Source::URL::Plurk < Source::URL
 
     # https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg
     # https://images.plurk.com/mx_5wj6WD0r6y4rLN0DL3sqag.jpg
-    in "plurk.com", /^(mx_)?(\w{22})\.(\w+)$/
+    in "plurk.com", /^(mx_)?(\w{22})\.(\w+)$/ if image_url?
       @image_id = $2
 
     # https://www.plurk.com/p/om6zv4
@@ -23,12 +23,25 @@ class Source::URL::Plurk < Source::URL
     in "plurk.com", "m", "p", work_id
       @work_id = work_id
 
-    # https://www.plurk.com/redeyehare
-    in "plurk.com", username
-      @username = username
-
     # https://www.plurk.com/m/redeyehare
     in "plurk.com", "m", username
+      @username = username
+
+    # https://www.plurk.com/u/ddks2923
+    in "plurk.com", "u", username
+      @username = username
+
+    # https://www.plurk.com/m/u/leiy1225
+    in "plurk.com", "m", "u", username
+      @username = username
+
+    # https://www.plurk.com/s/u/salmonroe13
+    in "plurk.com", "s", "u", username
+      @username = username
+
+    # https://www.plurk.com/redeyehare
+    # https://www.plurk.com/RSSSww/invite/4
+    in "plurk.com", username, *rest
       @username = username
 
     else

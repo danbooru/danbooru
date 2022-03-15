@@ -3,6 +3,10 @@
 # Unhandled:
 #
 # http://t.cn/A6c3ZAE1 -> https://m.weibo.cn/status/4623322346685004
+# http://weibo.sina.com/malson
+# https://www.weibo.com/n/Windtalker10 (not the same as https://www.weibo.com/Windtalker10)
+# http://blog.sina.com.cn/ayayayayayaya
+# http://blog.sina.com.cn/u/1299088063
 
 class Source::URL::Weibo < Source::URL
   attr_reader :full_image_url, :artist_short_id, :artist_long_id, :username
@@ -40,7 +44,8 @@ class Source::URL::Weibo < Source::URL
       @illust_long_id = illust_long_id
 
     # https://m.weibo.cn/detail/4506950043618873
-    in "m.weibo.cn", "detail", /^\d+$/ => illust_long_id
+    # https://www.weibo.com/detail/4676597657371957
+    in _, "detail", /^\d+$/ => illust_long_id
       @illust_long_id = illust_long_id
 
     # https://m.weibo.cn/status/J33G4tH1B
@@ -48,9 +53,10 @@ class Source::URL::Weibo < Source::URL
       @illust_base62_id = illust_base62_id
 
     # https://www.weibo.com/u/5501756072
+    # https://www.weibo.com/u/5957640693/home?wvr=5
     # https://m.weibo.cn/profile/5501756072
     # https://m.weibo.cn/u/5501756072
-    in _, ("u" | "profile"), /^\d+$/ => artist_short_id
+    in _, ("u" | "profile"), /^\d+$/ => artist_short_id, *rest
       @artist_short_id = artist_short_id
 
     # https://www.weibo.com/p/1005055399876326 (short id: https://www.weibo.com/u/5399876326; username: https://www.weibo.com/chengziyou666)
@@ -68,7 +74,8 @@ class Source::URL::Weibo < Source::URL
 
     # https://www.weibo.com/endlessnsmt (short id: https://www.weibo.com/u/1879370780)
     # https://www.weibo.cn/endlessnsmt
-    in _, /^\w+$/ => artist_short_id
+    # https://www.weibo.com/lvxiuzi0/home
+    in _, /^\w+$/ => artist_short_id, *rest
       @username = username
 
     else

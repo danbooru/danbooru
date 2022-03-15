@@ -18,6 +18,15 @@ class Source::URL::Lofter < Source::URL
     in /127\.net$/, "img", _
       nil
 
+    # https://www.lofter.com/front/blog/home-page/noshiqian
+    in "www.lofter.com", "front", "blog", "home-page", username
+      @username = username
+
+    # http://www.lofter.com/app/xiaokonggedmx
+    # http://www.lofter.com/blog/semblance
+    in "www.lofter.com", ("app" | "blog"), username
+      @username = username
+
     # https://gengar563.lofter.com/post/1e82da8c_1c98dae1b
     in /^([a-z0-9-]+)\.lofter\.com$/, "post", work_id unless host.in?(RESERVED_SUBDOMAINS)
       @username = $1

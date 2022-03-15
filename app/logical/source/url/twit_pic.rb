@@ -22,7 +22,7 @@
 # * http://twitpic.com/photos/Type10TK (dead)
 
 class Source::URL::TwitPic < Source::URL
-  attr_reader :base36_id
+  attr_reader :base36_id, :username
 
   def self.match?(url)
     url.host.in?(%w[twitpic.com o.twimg.com dn3pm25xmtlyu.cloudfront.net d3j5vwomefv46c.cloudfront.net])
@@ -42,6 +42,10 @@ class Source::URL::TwitPic < Source::URL
     # https://twitpic.com/show/large/carwkf.jpg
     in "twitpic.com", "show", size, _
       @base36_id = filename
+
+    # http://twitpic.com/photos/Type10TK (dead)
+    in "twitpic.com", "photos", username
+      @username = username
 
     # https://o.twimg.com/1/proxy.jpg?t=FQQVBBgpaHR0cHM6Ly90d2l0cGljLmNvbS9zaG93L2xhcmdlL2NhcndrZi5qcGcUBBYAEgA&s=y8haxddqxJYpWql9uVnP3aoFFS7rA10vOGPdTO5HXvk
     # https://o.twimg.com/2/proxy.jpg?t=HBgpaHR0cHM6Ly90d2l0cGljLmNvbS9zaG93L2xhcmdlL2R0bnVydS5qcGcUsAkU0ggAFgASAA&s=dnN4DHCdnojC-iCJWdvZ-UZinrlWqAP7k7lmll2fTxs
@@ -70,5 +74,9 @@ class Source::URL::TwitPic < Source::URL
   def page_url
     return nil unless base36_id.present?
     "https://twitpic.com/#{base36_id}"
+  end
+
+  def profile_url
+    "http://twitpic.com/photos/#{username}" if uesrname.present?
   end
 end

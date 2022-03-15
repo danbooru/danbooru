@@ -66,7 +66,8 @@ module Source
 
       # https://www.deviantart.com/noizave
       # https://deviantart.com/noizave
-      in "deviantart.com", username
+      # https://www.deviantart.com/nlpsllp/gallery
+      in "deviantart.com", username, *rest
         @username = username
 
       # https://noizave.deviantart.com

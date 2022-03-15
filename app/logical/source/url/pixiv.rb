@@ -7,7 +7,7 @@ module Source
     def self.match?(url)
       return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url)
 
-      url.domain.in?(%w[pximg.net pixiv.net pixiv.me]) || url.host == "tc-pximg01.techorus-cdn.com"
+      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc]) || url.host == "tc-pximg01.techorus-cdn.com"
     end
 
     def parse
@@ -61,7 +61,9 @@ module Source
       # https://www.pixiv.net/u/9202877
       # https://www.pixiv.net/users/9202877
       # https://www.pixiv.net/users/76567/novels
-      in "www.pixiv.net", ("u" | "users"), user_id, *rest
+      # https://www.pixiv.net/users/39598149/illustrations?p=1
+      # https://www.pixiv.net/user/13569921/series/81967
+      in "www.pixiv.net", ("u" | "user" | "users"), user_id, *rest
         @user_id = user_id
 
       # https://www.pixiv.net/en/users/9202877
@@ -75,6 +77,10 @@ module Source
 
       # http://www.pixiv.me/noizave
       in "www.pixiv.me", username
+        @username = username
+
+      # https://pixiv.cc/zerousagi/
+      in "www.pixiv.cc", username
         @username = username
 
       else
