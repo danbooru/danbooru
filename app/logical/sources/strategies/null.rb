@@ -15,6 +15,10 @@ module Sources
         url
       end
 
+      def artists
+        ArtistFinder.find_artists(url)
+      end
+
       def normalize_for_source
         case url
         when %r{\Ahttp://www\.karabako\.net/images(?:ub)?/karabako_(\d+)(?:_\d+)?\.}i

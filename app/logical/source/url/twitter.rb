@@ -88,15 +88,15 @@ class Source::URL::Twitter < Source::URL
   end
 
   def image_url?
-    orig_image_url.present?
+    domain == "twimg.com"
   end
 
   # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
   # https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig
   # https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:orig
   # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:orig
-  def orig_image_url
-    return nil unless @file_path.present?
+  def full_image_url
+    return to_s unless @file_path.present?
     "#{site}/#{@file_path}:orig"
   end
 

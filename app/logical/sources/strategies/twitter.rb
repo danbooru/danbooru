@@ -30,7 +30,7 @@ module Sources::Strategies
     def image_urls
       # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
       if parsed_url.image_url?
-        [parsed_url.orig_image_url]
+        [parsed_url.full_image_url]
       elsif api_response.present?
         api_response.dig(:extended_entities, :media).to_a.map do |media|
           if media[:type] == "photo"
@@ -43,7 +43,7 @@ module Sources::Strategies
           end
         end
       else
-        [url]
+        []
       end
     end
 

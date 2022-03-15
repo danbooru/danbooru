@@ -40,7 +40,7 @@ module Sources
       end
 
       def profile_url
-        "https://seiga.nicovideo.jp/user/illust/#{api_client.user_id}" if api_client.user_id.present?
+        "https://seiga.nicovideo.jp/user/illust/#{api_client.user_id}" if api_client&.user_id.present?
       end
 
       def artist_name

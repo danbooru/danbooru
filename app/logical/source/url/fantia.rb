@@ -6,7 +6,7 @@
 # https://fantia.jp/profiles/tus_2n9n0fm05fizg
 
 class Source::URL::Fantia < Source::URL
-  attr_reader :full_image_url
+  attr_reader :full_image_url, :fanclub_id, :username, :post_id, :product_id
 
   def self.match?(url)
     url.domain == "fantia.jp"
