@@ -39,7 +39,8 @@ form.simple_form {
       padding-left: 1em;
 
       @media (max-width: 660px) {
-        display: none;
+        padding-left: 0;
+        display: block;
       }
     }
 
@@ -124,6 +125,11 @@ form.inline-form {
     label, input {
       display: table-cell;
       line-height: 1em;
+    }
+
+    span.hint {
+      line-height: 1em;
+      padding-bottom: 0.5em;
     }
   }
 }
