@@ -65,10 +65,8 @@ class Artist < ApplicationRecord
     class_methods do
       # Find all artist URLs matching `regex`, and replace the `from` regex with the `to` string.
       def rewrite_urls(regex, from, to)
-        Artist.transaction do
-          Artist.joins(:urls).where_regex("artist_urls.url", regex).find_each do |artist|
-            artist.update!(url_string: artist.url_string.gsub(from, to))
-          end
+        Artist.joins(:urls).where_regex("artist_urls.url", regex).find_each do |artist|
+          artist.update!(url_string: artist.url_string.gsub(from, to))
         end
       end
     end
