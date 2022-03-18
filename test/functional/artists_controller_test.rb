@@ -183,7 +183,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(has_tag: "false").with { [@banned, @deleted, @artgerm, @artist] }
           should respond_to_search(has_urls: "true").with { [@artgerm, @masao] }
           should respond_to_search(has_urls: "false").with { [@banned, @deleted, @artist] }
-          should respond_to_search(urls: {url: "http://www.pixiv.net/member.php?id=32777"}).with { @masao }
+          should respond_to_search(urls: {url: "https://www.pixiv.net/users/32777"}).with { @masao }
           should respond_to_search(urls: {normalized_url: "http://www.deviantart.com/artgerm/"}).with { @artgerm }
         end
       end

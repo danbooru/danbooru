@@ -24,7 +24,7 @@ class ArtistVersionsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(name: "masao").with { [@versions[2], @versions[0]] }
       should respond_to_search(name_matches: "(deleted)").with { @versions[1] }
       should respond_to_search(group_name_matches: "the_best").with { @versions[2] }
-      should respond_to_search(urls_include_any: "https://www.deviantart.com/masao").with { @versions[2] }
+      should respond_to_search(urls_include_any: "https://www.deviantart.com/masao").with { [@versions[2], @versions[1], @versions[0]] }
       should respond_to_search(is_deleted: "true").with { @versions[1] }
 
       context "using includes" do

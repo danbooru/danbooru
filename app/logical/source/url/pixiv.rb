@@ -136,8 +136,7 @@ module Source
 
     def profile_url
       if user_id.present?
-        # "https://www.pixiv.net/users/#{user_id}"
-        "https://www.pixiv.net/member.php?id=#{user_id}"
+        "https://www.pixiv.net/users/#{user_id}"
       elsif username.present?
         "https://www.pixiv.net/stacc/#{username}"
       end
