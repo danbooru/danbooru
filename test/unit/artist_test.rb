@@ -388,6 +388,8 @@ class ArtistTest < ActiveSupport::TestCase
 
       should "find the artist" do
         assert_artist_found("awa", "http://blog71.fc2.com/a/abk00/file/20080220194219.jpg")
+        assert_artist_found("awa", "http://blog-imgs-71.fc2.com/a/b/k/abk00/20080220194219.jpg")
+        assert_artist_found("awa", "http://abk00.blog71.fc2.com/file/20080220194219.jpg")
       end
 
       should "return nothing for an unknown artist" do
