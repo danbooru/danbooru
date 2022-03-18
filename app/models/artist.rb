@@ -15,6 +15,7 @@ class Artist < ApplicationRecord
 
   validate :validate_artist_name
   validates :name, tag_name: true, uniqueness: true
+  after_validation :add_url_warnings
 
   before_save :update_tag_category
   after_save :create_version
@@ -299,6 +300,12 @@ class Artist < ApplicationRecord
       end
 
       q
+    end
+  end
+
+  def add_url_warnings
+    urls.each do |url|
+      warnings.add(:base, url.warnings.full_messages.join("; ")) if url.warnings.any?
     end
   end
 

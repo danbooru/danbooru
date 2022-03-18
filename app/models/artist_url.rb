@@ -5,6 +5,7 @@ class ArtistURL < ApplicationRecord
 
   validates :url, presence: true, uniqueness: { scope: :artist_id }
   validate :validate_url_format
+  validate :validate_url_is_not_duplicate
   belongs_to :artist, :touch => true
 
   scope :url_matches, ->(url) { url_attribute_matches(:url, url) }
@@ -138,6 +139,14 @@ class ArtistURL < ApplicationRecord
     validate_hostname(uri)
   rescue Addressable::URI::InvalidURIError => e
     errors.add(:url, "'#{uri}' is malformed: #{e}")
+  end
+
+  def validate_url_is_not_duplicate
+    artists = ArtistFinder.find_artists(url).without(artist)
+
+    artists.each do |a|
+      warnings.add(:base, "Duplicate of [[#{a.name}]]")
+    end
   end
 
   def self.available_includes

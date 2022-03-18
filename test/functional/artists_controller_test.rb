@@ -197,6 +197,15 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("test", Artist.last.name)
         end
       end
+
+      should "warn about duplicate artists" do
+        create(:artist, name: "artist1", url_string: "https://www.pixiv.net/users/1234")
+        post_auth artists_path, @user, params: { artist: { name: "artist2", url_string: "https://www.pixiv.net/users/1234" }}
+
+        assert_response :redirect
+        assert_equal("artist2", Artist.last.name)
+        assert_equal("Duplicate of [[artist1]]", flash[:notice])
+      end
     end
 
     context "destroy action" do
@@ -212,6 +221,15 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         put_auth artist_path(@artist.id), create(:builder_user), params: {artist: {is_deleted: false}}
         assert_redirected_to(artist_path(@artist.id))
         assert_equal(false, @artist.reload.is_deleted)
+      end
+
+      should "warn about duplicate artists" do
+        @artist1 = create(:artist, name: "artist1", url_string: "https://www.pixiv.net/users/1234")
+        @artist2 = create(:artist, name: "artist2")
+        put_auth artist_path(@artist2), @user, params: { artist: { url_string: "https://www.pixiv.net/users/1234" }}
+
+        assert_redirected_to @artist2
+        assert_equal("Duplicate of [[artist1]]", flash[:notice])
       end
     end
 
