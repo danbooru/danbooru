@@ -53,11 +53,15 @@ module Sources
       end
 
       def profile_url
-        profile_urls.first
+        "https://www.weibo.com/u/#{artist_id}" if artist_id.present?
       end
 
       def artist_name
         api_response&.dig("user", "screen_name")
+      end
+
+      def artist_id
+        parsed_url.artist_short_id || parsed_referer&.artist_short_id || api_response&.dig("user", "id")
       end
 
       def artist_commentary_desc

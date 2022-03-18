@@ -107,6 +107,7 @@ module Sources
 
         assert_equal("https://www.weibo.com/5501756072/J2UNKfbqV", @site.page_url)
         assert_equal("https://www.weibo.com/5501756072/J2UNKfbqV", @site.canonical_url)
+        assert_equal("https://www.weibo.com/u/5501756072", @site.profile_url)
         assert_equal(%w[fgo Alter组], @site.tags.map(&:first))
         assert_equal("阿尔托莉雅厨", @site.artist_name)
       end
