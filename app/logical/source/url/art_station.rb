@@ -2,7 +2,6 @@
 
 class Source::URL::ArtStation < Source::URL
   RESERVED_SUBDOMAINS = %w[www cdn cdna cdnb]
-  IMAGE_SUBDOMAINS = %w[cdn cdna cdnb]
 
   attr_reader :username, :work_id
 
@@ -35,17 +34,24 @@ class Source::URL::ArtStation < Source::URL
       @work_id = work_id
       @username = subdomain unless subdomain.in?(RESERVED_SUBDOMAINS)
 
+    # https://artstation.com/artist/sa-dui
     # https://www.artstation.com/artist/sa-dui
-    in "www.artstation.com", "artist", username
+    # https://www.artstation.com/artist/chicle/albums/all/
+    in _, "artist", username, *rest
       @username = username
 
+    # http://artstation.com/sha_sha
     # https://www.artstation.com/sa-dui
     # https://www.artstation.com/felipecartin/profile
-    in "www.artstation.com", username, *rest
+    # https://www.artstation.com/chicle/albums/all
+    # https://www.artstation.com/h-battousai/albums/1480261
+    # http://www.artstation.com/envie_dai/prints
+    in ("www.artstation.com" | "artstation.com"), username, *rest
       @username = username
 
     # https://sa-dui.artstation.com
     # https://hosi_na.artstation.com
+    # https://heyjay.artstation.com/store/art_posters
     in *rest unless subdomain.in?(RESERVED_SUBDOMAINS)
       @username = subdomain
 
@@ -54,7 +60,7 @@ class Source::URL::ArtStation < Source::URL
   end
 
   def image_url?
-    @file.present?
+    subdomain.starts_with?("cdn")
   end
 
   def full_image_url(size = "original")

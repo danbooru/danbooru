@@ -64,11 +64,15 @@ class ArtistURLTest < ActiveSupport::TestCase
     end
 
     should "normalize ArtStation urls" do
-      url = create(:artist_url, url: "https://www.artstation.com/koyorin")
+      url = create(:artist_url, url: "https://artstation.com/koyorin")
       assert_equal("https://www.artstation.com/koyorin", url.url)
       assert_equal("http://www.artstation.com/koyorin/", url.normalized_url)
 
       url = create(:artist_url, url: "https://koyorin.artstation.com")
+      assert_equal("https://www.artstation.com/koyorin", url.url)
+      assert_equal("http://www.artstation.com/koyorin/", url.normalized_url)
+
+      url = create(:artist_url, url: "https://www.artstation.com/artist/koyorin/albums/all/")
       assert_equal("https://www.artstation.com/koyorin", url.url)
       assert_equal("http://www.artstation.com/koyorin/", url.normalized_url)
     end
