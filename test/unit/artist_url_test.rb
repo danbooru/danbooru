@@ -116,7 +116,7 @@ class ArtistURLTest < ActiveSupport::TestCase
     end
 
     should "normalize pixiv fanbox account urls" do
-      url = create(:artist_url, url: "http://www.pixiv.net/fanbox/creator/3113804")
+      url = create(:artist_url, url: "http://www.pixiv.net/fanbox/creator/3113804/post")
 
       assert_equal("https://www.pixiv.net/fanbox/creator/3113804", url.url)
       assert_equal("http://www.pixiv.net/fanbox/creator/3113804/", url.normalized_url)

@@ -42,7 +42,8 @@ class Source::URL::Fanbox < Source::URL
 
     # https://www.pixiv.net/fanbox/creator/1566167
     # http://www.pixiv.net/fanbox/user/3410642
-    in "www.pixiv.net", "fanbox", ("creator" | "user"), user_id
+    # https://www.pixiv.net/fanbox/creator/18915237/post
+    in "www.pixiv.net", "fanbox", ("creator" | "user"), user_id, *rest
       @user_id = user_id
 
     # http://www.pixiv.net/fanbox/member.php?user_id=3410642
