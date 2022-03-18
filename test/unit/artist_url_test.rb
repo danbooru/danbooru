@@ -188,6 +188,12 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("http://baraag.net/@curator/", url.normalized_url)
     end
 
+    should "normalize Instagram urls" do
+      url = create(:artist_url, url: "http://instagram.com/itomugi")
+      assert_equal("https://www.instagram.com/itomugi/", url.url)
+      assert_equal("http://www.instagram.com/itomugi/", url.normalized_url)
+    end
+
     context "#search method" do
       subject { ArtistURL }
 

@@ -31,6 +31,7 @@ module Source
       Source::URL::Fc2,
       Source::URL::Foundation,
       Source::URL::HentaiFoundry,
+      Source::URL::Instagram,
       Source::URL::Lofter,
       Source::URL::Mastodon,
       Source::URL::Moebooru,
