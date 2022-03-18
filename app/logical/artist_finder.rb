@@ -142,7 +142,7 @@ module ArtistFinder
 
   SITE_BLACKLIST_REGEXP = Regexp.union(SITE_BLACKLIST.map do |domain|
     domain = Regexp.escape(domain) if domain.is_a?(String)
-    %r{\Ahttps?://(?:[a-zA-Z0-9_-]+\.)*#{domain}/\z}i
+    %r{\A(?:[a-zA-Z0-9_-]+\.)*#{domain}}i
   end)
 
   # Find the artist for a given artist profile URL. May return multiple Artists
@@ -155,17 +155,22 @@ module ArtistFinder
   # @return [Array<Artist>] the list of matching artists
   def find_artists(url)
     url = ArtistURL.normalize_normalized_url(url)
-    artists = []
 
-    while artists.empty? && url.size > 10
-      u = url.sub(%r{/+$}, "") + "/"
-      u = u.to_escaped_for_sql_like.gsub(/\*/, '%') + '%'
-      artists += Artist.joins(:urls).where(["artists.is_deleted = FALSE AND artist_urls.normalized_url LIKE ? ESCAPE E'\\\\'", u]).limit(10).order("artists.name").all
-      url = File.dirname(url) + "/"
+    # First try an exact match
+    artists = Artist.active.joins(:urls).where(urls: { url: url })
+
+    # If that fails, try removing the rightmost path component until we find an artist URL that matches the current URL.
+    url = url.downcase.gsub(%r{\Ahttps?://|/\z}, "") # "https://example.com/A/B/C/" => "example.com/a/b/c"
+    while artists.empty? && url != "."
+      u = url.gsub("*", '\*') + "/*"
+      artists += Artist.active.joins(:urls).where_like("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'", u).limit(10)
+
+      # File.dirname("example.com/a/b/c") => "example.com/a/b"; File.dirname("example.com") => "."
+      url = File.dirname(url)
 
       break if url =~ SITE_BLACKLIST_REGEXP
     end
 
-    Artist.where(id: artists.uniq(&:name).take(20))
+    Artist.where(id: artists.uniq.take(20))
   end
 end

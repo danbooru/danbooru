@@ -3140,6 +3140,13 @@ CREATE INDEX index_artist_urls_on_normalized_url_trgm ON public.artist_urls USIN
 
 
 --
+-- Name: index_artist_urls_on_regexp_replace_lower_url; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artist_urls_on_regexp_replace_lower_url ON public.artist_urls USING btree (((regexp_replace(lower(url), '^https?://|/$'::text, ''::text, 'g'::text) || '/'::text)) text_pattern_ops);
+
+
+--
 -- Name: index_artist_urls_on_url_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5779,6 +5786,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220207195123'),
 ('20220210171310'),
 ('20220210200157'),
-('20220211075129');
+('20220211075129'),
+('20220318082614');
 
 
