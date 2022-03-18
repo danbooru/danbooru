@@ -155,7 +155,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         response = Danbooru::Http.use(:spoof_referrer).get(httpbin_url("anything"))
 
         assert_equal(200, response.status)
-        assert_equal("https://nghttp2.org", response.parse.dig("headers", "Referer"))
+        assert_equal(httpbin_url("anything"), response.parse.dig("headers", "Referer"))
       end
     end
 
