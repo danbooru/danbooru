@@ -15,16 +15,22 @@ class Source::URL::Mastodon < Source::URL
   def parse
     case [host, *path_segments]
 
-    # https://pawoo.net/@evazion
-    # https://baraag.net/@danbooru
-    in _, /^@/ => username
-      @username = username.delete_prefix("@")
-
     # https://pawoo.net/@evazion/19451018
     # https://baraag.net/@curator/102270656480174153
     in _, /^@/ => username, /^\d+$/ => work_id, *rest
       @username = username.delete_prefix("@")
       @work_id = work_id
+
+    # https://pawoo.net/@evazion
+    # https://baraag.net/@danbooru
+    # https://baraag.net/@quietvice/media
+    in _, /^@/ => username, *rest
+      @username = username.delete_prefix("@")
+
+    # https://pawoo.net/users/esoraneko
+    # https://pawoo.net/users/khurata/media
+    in _, "users", username, *rest
+      @username = username
 
     # https://pawoo.net/web/statuses/19451018
     # https://pawoo.net/web/statuses/19451018/favorites

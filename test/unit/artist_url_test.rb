@@ -168,6 +168,22 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("http://nijie.info/invalid.php/", url.normalized_url)
     end
 
+    should "normalize pawoo.net urls" do
+      url = create(:artist_url, url: "http://pawoo.net/@evazion/19451018")
+      assert_equal("https://pawoo.net/@evazion", url.url)
+      assert_equal("http://pawoo.net/@evazion/", url.normalized_url)
+
+      url = create(:artist_url, url: "http://pawoo.net/users/evazion/media")
+      assert_equal("https://pawoo.net/@evazion", url.url)
+      assert_equal("http://pawoo.net/@evazion/", url.normalized_url)
+    end
+
+    should "normalize baraag.net urls" do
+      url = create(:artist_url, url: "http://baraag.net/@curator/102270656480174153")
+      assert_equal("https://baraag.net/@curator", url.url)
+      assert_equal("http://baraag.net/@curator/", url.normalized_url)
+    end
+
     context "#search method" do
       subject { ArtistURL }
 
