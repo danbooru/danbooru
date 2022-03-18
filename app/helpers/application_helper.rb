@@ -252,7 +252,11 @@ module ApplicationHelper
 
     simple_form_for(model, **options) do |form|
       if model.try(:errors).try(:any?)
-        concat tag.div(model.errors.full_messages.join("; "), class: "notice notice-error notice-small")
+        concat tag.div(format_text(model.errors.full_messages.join("; ")), class: "notice notice-error notice-small prose")
+      end
+
+      if model.try(:warnings).try(:any?)
+        concat tag.div(format_text(model.warnings.full_messages.join("; ")), class: "notice notice-info notice-small prose")
       end
 
       block.call(form)
