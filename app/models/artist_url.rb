@@ -23,10 +23,6 @@ class ArtistURL < ApplicationRecord
 
     url = Source::URL.parse(url)&.profile_url || url
     url = url.sub(%r{^https://}, "http://")
-    url = url.sub(%r{^http://blog-imgs-\d+\.fc2}, "http://blog.fc2")
-    url = url.sub(%r{^http://blog-imgs-\d+-\w+\.fc2}, "http://blog.fc2")
-    url = url.sub(%r{^http://blog\d*\.fc2\.com/(?:\w/){,3}(\w+)}, "http://\\1.blog.fc2.com")
-
     url = url.gsub(%r{/+\Z}, "")
     url + "/"
   end

@@ -71,13 +71,8 @@ class ArtistURLTest < ActiveSupport::TestCase
     end
 
     should "normalize fc2 urls" do
-      url = create(:artist_url, url: "http://blog55.fc2.com/monet")
-      assert_equal("http://blog55.fc2.com/monet", url.url)
-      assert_equal("http://monet.blog.fc2.com/", url.normalized_url)
-
-      url = create(:artist_url, url: "http://blog-imgs-55.fc2.com/monet")
-      assert_equal("http://blog-imgs-55.fc2.com/monet", url.url)
-      assert_equal("http://monet.blog.fc2.com/", url.normalized_url)
+      url = create(:artist_url, url: "http://silencexs.blog106.fc2.com/")
+      assert_equal("http://silencexs.blog.fc2.com/", url.normalized_url)
     end
 
     should "normalize deviant art artist urls" do

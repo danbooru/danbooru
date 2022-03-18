@@ -28,6 +28,7 @@ module Source
       Source::URL::DeviantArt,
       Source::URL::Fanbox,
       Source::URL::Fantia,
+      Source::URL::Fc2,
       Source::URL::Foundation,
       Source::URL::HentaiFoundry,
       Source::URL::Lofter,
