@@ -154,6 +154,8 @@ module ArtistFinder
   # @param url [String] the artist profile URL
   # @return [Array<Artist>] the list of matching artists
   def find_artists(url)
+    return Artist.none if url.blank?
+
     url = ArtistURL.normalize_normalized_url(url)
 
     # First try an exact match

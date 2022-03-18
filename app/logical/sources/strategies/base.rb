@@ -145,7 +145,7 @@ module Sources
       end
 
       def artists
-        ArtistFinder.find_artists(profile_url.to_s)
+        ArtistFinder.find_artists(profile_url)
       end
 
       # A new artist entry with suggested defaults for when the artist doesn't
