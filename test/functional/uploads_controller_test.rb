@@ -356,6 +356,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://c.fantia.jp/uploads/post/file/1070093/16faf0b1-58d8-4aac-9e86-b243063eaaf1.jpeg")
         should_upload_successfully("https://fantia.jp/posts/1132267")
         should_upload_successfully("https://fantia.jp/products/249638")
+
+        should_upload_successfully("http://wwwew.web.fc2.com/e/405.jpg")
       end
     end
   end

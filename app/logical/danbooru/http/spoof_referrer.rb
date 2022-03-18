@@ -6,7 +6,7 @@ module Danbooru
       HTTP::Options.register_feature :spoof_referrer, self
 
       def perform(request, &block)
-        request.headers["Referer"] = request.uri.origin unless request.headers["Referer"].present?
+        request.headers["Referer"] = request.uri unless request.headers["Referer"].present?
         response = yield request
         response
       end
