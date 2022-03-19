@@ -358,6 +358,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://fantia.jp/products/249638")
 
         should_upload_successfully("http://wwwew.web.fc2.com/e/405.jpg")
+
+        should_upload_successfully("http://www.tinami.com/view/1087268")
       end
     end
   end
