@@ -7,7 +7,7 @@
     <%= search_form_for(notes_path) do |f| %>
       <%= f.hidden_field :group_by, value: "note" %>
 
-      <%= f.input :body_matches, label: "Note", hint: "Use * for wildcard", input_html: { value: params[:search][:body_matches] } %>
+      <%= f.input :body_matches, label: "Note", input_html: { value: params[:search][:body_matches] } %>
       <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], "data-autocomplete": "tag-query" } %>
       <%= f.submit "Search" %>
     <% end %>

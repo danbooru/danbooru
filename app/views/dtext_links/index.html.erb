@@ -1,7 +1,7 @@
 <div id="c-dtext-links">
   <div id="a-index">
     <%= search_form_for(dtext_links_path) do |f| %>
-      <%= f.input :link_target_ilike, label: "Link", hint: "Use * for wildcard", input_html: { value: params[:search][:link_target_ilike], data: { autocomplete: "wiki-page" } } %>
+      <%= f.input :link_target_ilike, label: "Link", input_html: { value: params[:search][:link_target_ilike], data: { autocomplete: "wiki-page" } } %>
       <%= f.input :model_type, label: "Page Type", collection: DtextLink.model_types.map { [_1.titleize, _1] }, include_blank: true, selected: params[:search][:model_type] %>
       <%= f.input :link_type, label: "Link Type", collection: [["Wiki", "0"], ["External", "1"]], include_blank: true, selected: params[:search][:link_type] %>
       <%= f.input :has_linked_wiki, label: "Wiki Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:has_linked_wiki] %>

@@ -5,8 +5,8 @@
         <%= fa.input :name, label: "User Name", input_html: { value: params.dig(:search, :user, :name), "data-autocomplete": "user" } %>
       <% end %>
 
-      <%= f.input :address_ilike, label: "Address", input_html: { value: params[:search][:address_ilike] }, hint: "Use * for wildcard" %>
-      <%= f.input :normalized_address_ilike, label: "Normalized Address", input_html: { value: params[:search][:normalized_address_ilike] }, hint: "Use * for wildcard" %>
+      <%= f.input :address_ilike, label: "Address", input_html: { value: params[:search][:address_ilike] } %>
+      <%= f.input :normalized_address_ilike, label: "Normalized Address", input_html: { value: params[:search][:normalized_address_ilike] } %>
       <%= f.input :is_verified, label: "Verified?", as: :select, include_blank: true, selected: params[:search][:is_verified] %>
       <%= f.input :is_restricted, label: "Restricted?", as: :select, include_blank: true, selected: params[:search][:is_restricted] %>
       <%= f.submit "Search" %>

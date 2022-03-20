@@ -10,7 +10,7 @@
 
     <%= search_form_for(ip_addresses_path) do |f| %>
       <%= f.input :user_id, label: "User ID", input_html: { value: params[:search][:user_id] }, hint: "Separate with spaces" %>
-      <%= f.input :user_name, label: "User Name", input_html: { "data-autocomplete": "user", value: params[:search][:user_name] }, hint: "Use * for wildcard" %>
+      <%= f.input :user_name, label: "User Name", input_html: { "data-autocomplete": "user", value: params[:search][:user_name] } %>
       <%= f.input :ip_addr, label: "IP Address", input_html: { value: params[:search][:ip_addr] }, hint: '<a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation">CIDR notation</a> supported.'.html_safe %>
       <%= f.input :created_at, label: "Date", input_html: { value: params[:search][:created_at] } %>
       <%= f.input :model_type, label: "Source", collection: IpAddress.model_types, include_blank: true, selected: params[:search][:model_type] %>

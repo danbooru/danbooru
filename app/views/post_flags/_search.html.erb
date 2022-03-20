@@ -1,5 +1,5 @@
 <%= search_form_for(post_flags_path) do |f| %>
-  <%= f.input :reason_matches, label: "Reason", hint: "Use * for wildcard searches", input_html: { value: params[:search][:reason_matches] } %>
+  <%= f.input :reason_matches, label: "Reason", input_html: { value: params[:search][:reason_matches] } %>
   <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], data: { autocomplete: "tag-query" } } %>
   <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
   <% if policy(PostFlag).can_search_flagger? %>

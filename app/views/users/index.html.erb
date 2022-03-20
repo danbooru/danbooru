@@ -3,7 +3,7 @@
     <h1>Users</h1>
 
     <%= search_form_for(users_path) do |f| %>
-      <%= f.input :name_matches, label: "Name", hint: "Use * for wildcard", input_html: { value: params[:search][:name_matches], data: { autocomplete: "user" } } %>
+      <%= f.input :name_matches, label: "Name", input_html: { value: params[:search][:name_matches], data: { autocomplete: "user" } } %>
       <%= f.input :level, collection: User.level_hash.to_a, include_blank: true, selected: params[:search][:level] %>
       <%= f.input :can_upload_free, label: "Contributor?", as: :select, include_blank: true, selected: params[:search][:can_upload_free] %>
       <%= f.input :can_approve_posts, label: "Approver?", as: :select, include_blank: true, selected: params[:search][:can_approve_posts] %>
