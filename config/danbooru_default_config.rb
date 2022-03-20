@@ -305,6 +305,11 @@ module Danbooru
       nil
     end
 
+    # Your Tinami "Tinami2SESSID" cookie. Login to Tinami then use the devtools to find the "Tinami2SESSID" cookie.
+    def tinami_session_id
+      nil
+    end
+
     # 1. Register app at https://www.tumblr.com/oauth/register.
     # 2. Copy "OAuth Consumer Key" from https://www.tumblr.com/oauth/apps.
     def tumblr_consumer_key

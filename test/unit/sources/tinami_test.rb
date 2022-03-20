@@ -9,7 +9,7 @@ module Sources
 
           assert_equal("みぐめ", source.artist_name)
           assert_equal("https://www.tinami.com/view/1087268", source.page_url)
-          assert_equal(["https://img.tinami.com/illust2/img/647/6234fe5588e97.jpg"], source.image_urls)
+          assert_equal(["https://img.tinami.com/illust2/img/49/6234fe552348b.jpg"], source.image_urls)
           assert_equal("https://www.tinami.com/creator/profile/66493", source.profile_url)
           assert_equal(%w[横顔 アナログ ボールペン SP], source.tags.map(&:first))
           assert_equal("横顔", source.artist_commentary_title)
@@ -42,13 +42,13 @@ module Sources
           assert_equal("セラ箱", source.artist_name)
           assert_equal("https://www.tinami.com/view/1087270", source.page_url)
           assert_equal(%w[
-            https://img.tinami.com/illust2/img/934/623503bb9891b.jpg
-            https://img.tinami.com/illust2/img/398/623503bd481bb.jpg
-            https://img.tinami.com/illust2/img/698/623503bec2105.jpg
-            https://img.tinami.com/illust2/img/981/623503c029fbf.jpg
-            https://img.tinami.com/illust2/img/769/623503c187eab.jpg
-            https://img.tinami.com/illust2/img/847/623503c2dd8d6.jpg
-            https://img.tinami.com/illust2/img/252/623503c434204.jpg
+            https://img.tinami.com/illust2/img/399/623503bb2c686.jpg
+            https://img.tinami.com/illust2/img/505/623503bdd064e.jpg
+            https://img.tinami.com/illust2/img/140/623503bf50d20.jpg
+            https://img.tinami.com/illust2/img/986/623503c0940f5.jpg
+            https://img.tinami.com/illust2/img/954/623503c219ee9.jpg
+            https://img.tinami.com/illust2/img/655/623503c3646c0.jpg
+            https://img.tinami.com/illust2/img/401/623503c4b8171.jpg
           ], source.image_urls)
           assert_equal("https://www.tinami.com/creator/profile/38168", source.profile_url)
           assert_equal(%w[Re:ゼロから始める異世界生活 レム リゼロ セラ箱 rizero フィギュア リペイント], source.tags.map(&:first))
