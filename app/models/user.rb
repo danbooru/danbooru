@@ -67,7 +67,7 @@ class User < ApplicationRecord
     is_verified
   ]
 
-  DEFAULT_BLACKLIST = ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")
+  DEFAULT_BLACKLIST = ["guro", "scat", "furry -rating:s"].join("\n")
 
   attribute :id
   attribute :created_at
