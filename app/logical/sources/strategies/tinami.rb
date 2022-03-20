@@ -15,11 +15,11 @@ module Sources
 
         # http://www.tinami.com/view/1087268 (single image)
         elsif page&.css("img.captify")&.size.to_i == 1
-          [full_image_url]
+          [full_image_url].compact
 
         # http://www.tinami.com/view/1087270 (multiple images)
         elsif image_sub_ids.present?
-          image_sub_ids.map { |sub_id| full_image_url(sub_id) }
+          image_sub_ids.map { |sub_id| full_image_url(sub_id) }.compact
 
         # http://www.tinami.com/view/1087271 (multiple images)
         elsif nv_body_image_urls.present?
