@@ -4,7 +4,7 @@
 module Sources::Strategies
   class TwitPic < Base
     def match?
-      parsed_url&.site_name == "TwitPic"
+      Source::URL::TwitPic === parsed_url
     end
 
     def normalize_for_source

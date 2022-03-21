@@ -5,7 +5,7 @@ module Sources
   module Strategies
     class Skeb < Base
       def match?
-        parsed_url&.site_name == "Skeb"
+        Source::URL::Skeb === parsed_url
       end
 
       def image_urls

@@ -5,7 +5,7 @@ module Sources
   module Strategies
     class Lofter < Base
       def match?
-        parsed_url&.site_name == "Lofter"
+        Source::URL::Lofter === parsed_url
       end
 
       def image_urls

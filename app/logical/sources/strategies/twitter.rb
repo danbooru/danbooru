@@ -24,7 +24,7 @@ module Sources::Strategies
     end
 
     def match?
-      parsed_url&.site_name == "Twitter"
+      Source::URL::Twitter === parsed_url
     end
 
     def image_urls

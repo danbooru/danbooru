@@ -5,7 +5,7 @@ module Sources
   module Strategies
     class HentaiFoundry < Base
       def match?
-        parsed_url&.site_name == "Hentai Foundry"
+        Source::URL::HentaiFoundry === parsed_url
       end
 
       def image_urls

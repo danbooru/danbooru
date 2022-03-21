@@ -302,6 +302,7 @@ module Sources
         assert_equal(source2, Sources::Strategies.normalize_source(source2))
         assert_equal(source2, Sources::Strategies.normalize_source(source3))
         assert_equal(source2, Sources::Strategies.normalize_source(source4))
+        assert_equal("https://www.twitter.com/irt_5433", Sources::Strategies.normalize_source("https://www.twitter.com/irt_5433"))
       end
     end
   end

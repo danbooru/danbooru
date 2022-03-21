@@ -5,7 +5,7 @@ module Sources
   module Strategies
     class Newgrounds < Base
       def match?
-        parsed_url&.site_name == "Newgrounds"
+        Source::URL::Newgrounds === parsed_url
       end
 
       def image_urls

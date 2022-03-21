@@ -5,7 +5,7 @@ module Sources
   module Strategies
     class Foundation < Base
       def match?
-        parsed_url&.site_name == "Foundation"
+        Source::URL::Foundation === parsed_url
       end
 
       def image_urls
