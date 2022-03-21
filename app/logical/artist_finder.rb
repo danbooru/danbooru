@@ -77,6 +77,7 @@ module ArtistFinder
     "monappy.jp",
     "monappy.jp/u", # https://monappy.jp/u/abara_bone
     "mstdn.jp", # https://mstdn.jp/@oneb
+    "naver.com", # https://blog.naver.com/yanusunya
     "www.newgrounds.com", # https://jessxjess.newgrounds.com/
     "newgrounds.com/art/view/", # https://www.newgrounds.com/art/view/jessxjess/avatar-korra
     "nicoseiga.jp",
