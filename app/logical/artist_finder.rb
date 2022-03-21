@@ -7,6 +7,7 @@ module ArtistFinder
   # Subdomains are automatically included. e.g., "twitter.com" matches "www.twitter.com",
   # "mobile.twitter.com" and any other subdomain of "twitter.com".
   SITE_BLACKLIST = [
+    "ameblo.jp", # https://ameblo.jp/g8set55679
     "artstation.com/artist", # http://www.artstation.com/artist/serafleur/
     "www.artstation.com", # http://www.artstation.com/serafleur/
     %r{cdn[ab]?\.artstation\.com/p/assets/images/images}i, # https://cdna.artstation.com/p/assets/images/images/001/658/068/large/yang-waterkuma-b402.jpg?1450269769
@@ -18,6 +19,7 @@ module ArtistFinder
     "bcy.net/illust/detail", # https://bcy.net/illust/detail/32360/1374683
     "bcy.net/u", # http://bcy.net/u/1390261
     "behance.net", # "https://www.behance.net/webang111
+    "bilibili.com", # https://space.bilibili.com/1500665980
     "booru.org",
     "booru.org/drawfriends", # http://img.booru.org/drawfriends//images/36/de65da5f588b76bc1d9de8af976b540e2dff17e2.jpg
     "donmai.us",
@@ -120,6 +122,8 @@ module ArtistFinder
     "twitpic.com/photos", # http://twitpic.com/photos/Type10TK
     "twitter.com", # https://twitter.com/akkij0358
     "twitter.com/i/web/status", # https://twitter.com/i/web/status/943446161586733056
+    "twitter.com/i/user", # https://twitter.com/i/user/1099260120263880705
+    "twitter.com/intent/user", # https://twitter.com/intent/user?user_id=1099260120263880705
     "twimg.com/media", # https://pbs.twimg.com/media/DUUUdD5VMAEuURz.jpg:orig
     "ustream.tv",
     "ustream.tv/channel", # http://www.ustream.tv/channel/633b
