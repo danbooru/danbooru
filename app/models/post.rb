@@ -308,11 +308,12 @@ class Post < ApplicationRecord
     end
 
     def normalized_source
+      return source unless web_source?
       Sources::Strategies.normalize_source(source)
     end
 
     def source_domain
-      return "" unless source =~ %r{\Ahttps?://}i
+      return "" unless web_source?
 
       Danbooru::URL.parse(normalized_source)&.domain.to_s
     end
@@ -475,7 +476,7 @@ class Post < ApplicationRecord
         tags << "ugoira"
       end
 
-      if source.present? && source !~ %r{\Ahttps?://}i
+      if source.present? && !web_source?
         tags << "non-web_source"
       end
 
@@ -643,6 +644,10 @@ class Post < ApplicationRecord
 
         end
       end
+    end
+
+    def web_source?
+      source.match?(%r{\Ahttps?://}i)
     end
 
     def has_tag?(tag)
@@ -1149,6 +1154,7 @@ class Post < ApplicationRecord
   module PixivMethods
     def parse_pixiv_id
       self.pixiv_id = nil
+      return unless web_source?
 
       site = Sources::Strategies::Pixiv.new(source)
       if site.match?
@@ -1255,7 +1261,7 @@ class Post < ApplicationRecord
 
     def has_artist_tag
       return if !new_record?
-      return if source !~ %r{\Ahttps?://}
+      return if !web_source?
       return if has_tag?("artist_request") || has_tag?("official_art")
       return if tags.any?(&:artist?)
       return if Sources::Strategies.find(source).is_a?(Sources::Strategies::Null)

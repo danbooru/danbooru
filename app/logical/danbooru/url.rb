@@ -45,6 +45,7 @@ module Danbooru
       @url.path = nil if @url.path == "/"
 
       raise Error, "#{original_url} is not an http:// URL" if !@url.normalized_scheme.in?(["http", "https"])
+      raise Error, "#{original_url} is not a valid hostname" if parsed_domain.nil?
     rescue Addressable::URI::InvalidURIError => e
       raise Error, e
     end
@@ -113,6 +114,8 @@ module Danbooru
     # @return [PublicSuffix::Domain]
     def parsed_domain
       @parsed_domain ||= PublicSuffix.parse(host)
+    rescue PublicSuffix::DomainNotAllowed
+      nil
     end
   end
 end

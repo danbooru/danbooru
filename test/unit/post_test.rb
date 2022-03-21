@@ -1368,6 +1368,13 @@ class PostTest < ActiveSupport::TestCase
             @post.pixiv_id = nil
           end
         end
+
+        context "like 'Blog.'" do
+          should "not raise an exception" do
+            @post.update!(source: "Blog.")
+            assert_equal("Blog.", @post.source)
+          end
+        end
       end
 
       context "when validating tags" do

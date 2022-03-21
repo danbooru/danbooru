@@ -646,6 +646,15 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "with a non-web source" do
+        should "render" do
+          @post.update!(source: "Blog.")
+          get post_path(@post)
+
+          assert_response :success
+        end
+      end
+
       should "respect the disable tagged filenames option in the Download link" do
         @user.update!(disable_tagged_filenames: true)
         get_auth post_path(@post), @user
