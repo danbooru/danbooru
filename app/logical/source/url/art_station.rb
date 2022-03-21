@@ -26,6 +26,10 @@ class Source::URL::ArtStation < Source::URL
       @file = file
       @timestamp = query if query&.match?(/^\d+$/)
 
+    # https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4
+    in "cdn-animation.artstation.com", "p", "video_sources", *subdirs, file
+      # pass
+
     # https://www.artstation.com/artwork/04XA4
     # https://www.artstation.com/artwork/cody-from-sf (old; redirects to https://www.artstation.com/artwork/3JJA)
     # https://sa-dui.artstation.com/projects/DVERn
@@ -66,10 +70,12 @@ class Source::URL::ArtStation < Source::URL
   def full_image_url(size = "original")
     return nil unless image_url?
 
-    if @timestamp.present?
+    if @asset_type.present? && @asset_subdir.present? && @file.present? && @timestamp.present?
       "https://cdn.artstation.com/p/assets/#{@asset_type}/images/#{@asset_subdir}/#{size}/#{@file}?#{@timestamp}"
-    else
+    elsif @asset_type.present? && @asset_subdir.present? && @file.present?
       "https://cdn.artstation.com/p/assets/#{@asset_type}/images/#{@asset_subdir}/#{size}/#{@file}"
+    else
+      to_s
     end
   end
 

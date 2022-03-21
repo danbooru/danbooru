@@ -146,6 +146,30 @@ module Sources
       end
     end
 
+    context "A work that includes video clips" do
+      should_eventually "include the video clips in the image urls" do
+        @source = Sources::Strategies.find("https://www.artstation.com/artwork/0nP1e8")
+
+        assert_equal(%w[
+          https://cdn.artstation.com/p/assets/images/images/040/979/418/original/yusuf-umar-workout-10mb.gif?1630425406
+          https://cdn.artstation.com/p/assets/images/images/040/979/435/4k/yusuf-umar-1.jpg?1630425420
+          https://cdn.artstation.com/p/assets/images/images/040/979/470/4k/yusuf-umar-2.jpg?1630425483
+          https://cdn.artstation.com/p/assets/images/images/040/979/494/4k/yusuf-umar-3.jpg?1630425530
+          https://cdn.artstation.com/p/assets/images/images/040/979/503/4k/yusuf-umar-4.jpg?1630425547
+          https://cdn.artstation.com/p/assets/images/images/040/979/659/4k/yusuf-umar-5.jpg?1630425795
+          https://cdn.artstation.com/p/assets/images/images/040/980/932/4k/yusuf-umar-tpose.jpg?1630427748
+          https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4
+          https://cdn-animation.artstation.com/p/video_sources/000/466/623/workout-clay.mp4
+        ], @source.image_urls)
+      end
+
+      should "work for the video itself" do
+        @source = Sources::Strategies.find("https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4")
+
+        assert_equal(["https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4"], @source.image_urls)
+      end
+    end
+
     context "A work that has been deleted" do
       should "work" do
         url = "https://fiship.artstation.com/projects/x8n8XT"

@@ -8,7 +8,11 @@ module Sources::Strategies
     end
 
     def image_urls
-      @image_urls ||= image_urls_sub.map { |asset| asset_url(asset, :largest) }
+      if parsed_url.image_url?
+        [asset_url(url)]
+      else
+        image_urls_from_api
+      end
     end
 
     def page_url
@@ -58,12 +62,22 @@ module Sources::Strategies
       end
     end
 
-    def image_urls_sub
-      if parsed_url.image_url?
-        [url]
-      else
-        api_response[:assets].to_a.select { |asset| asset[:asset_type] == "image" }.pluck(:image_url)
-      end
+    def image_urls_from_api
+      api_response[:assets].to_a.map do |asset|
+        if asset[:asset_type] == "image"
+          asset_url(asset[:image_url])
+        elsif asset[:asset_type] == "video_clip"
+          next # XXX Skip for now; actually downloading these videos requires bypassing a Cloudflare captcha.
+
+          url = Nokogiri::HTML5.parse(asset[:player_embedded]).at("iframe").attr("src")
+          next if url.nil?
+
+          response = http.cache(1.minute).get(url)
+          next if response.status != 200
+
+          response.parse.at("video source").attr("src")
+        end
+      end.compact
     end
 
     def artist_name_from_url
@@ -84,12 +98,11 @@ module Sources::Strategies
     end
     memoize :api_response
 
-    def asset_url(url, size)
+    def asset_url(url)
       parsed_url = Source::URL.parse(url)
 
       image_sizes = %w[original 4k large medium small]
       urls = image_sizes.map { |size| parsed_url.full_image_url(size) }
-      urls = urls.reverse if size == :smallest
 
       chosen_url = urls.find { |url| http_exists?(url) }
       chosen_url || url
