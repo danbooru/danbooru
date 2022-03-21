@@ -8,9 +8,10 @@ class ModerationReport < ApplicationRecord
   belongs_to :model, polymorphic: true
   belongs_to :creator, class_name: "User"
 
+  before_validation { model.lock! }
   validates :reason, presence: true
   validates :model_type, inclusion: { in: MODEL_TYPES }
-  validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }
+  validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }, on: :create
 
   after_create :autoban_reported_user
   after_save :notify_reporter
