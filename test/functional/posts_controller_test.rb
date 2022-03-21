@@ -323,6 +323,9 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "order:random" }
           assert_response :success
 
+          get posts_path(tags: "random:1")
+          assert_response :success
+
           get posts_path(random: "1")
           assert_redirected_to posts_path(tags: "random:20", format: :html)
 

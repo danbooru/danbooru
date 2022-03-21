@@ -542,7 +542,9 @@ class PostQueryBuilder
   # better.
   def optimize_search(relation, small_search_threshold)
     return relation unless small_search_threshold.present?
-    return relation unless relation.order_values.map(&:downcase).in?([["posts.id desc"], ["posts.id asc"]])
+
+    order_values = relation.order_values.map { |order| order.try(:to_sql) || order.to_s }.map(&:downcase)
+    return relation unless order_values.in?([["posts.id desc"], ["posts.id asc"]])
 
     if post_count.nil?
       # If post_count is nil, then the search took too long to count and we don't
