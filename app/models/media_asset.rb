@@ -4,7 +4,7 @@ class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
   VARIANTS = %i[preview 180x180 360x360 720x720 sample original]
-  MAX_VIDEO_DURATION = 140 # 2:20
+  MAX_VIDEO_DURATION = Danbooru.config.max_video_duration.to_i
   MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
   MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
   MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height

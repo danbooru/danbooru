@@ -171,6 +171,12 @@ module Danbooru
       40000
     end
 
+    # Maximum duration of an video in seconds.
+    def max_video_duration
+      # 2:20m
+      140
+    end
+
     # How long pending posts stay in the modqueue before being deleted.
     def moderation_period
       3.days
