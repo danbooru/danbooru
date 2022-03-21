@@ -29,7 +29,7 @@ class Source::URL::Twitter < Source::URL
   attr_reader :status_id, :twitter_username, :user_id
 
   def self.match?(url)
-    url.host.in?(%w[twitter.com mobile.twitter.com pic.twitter.com pbs.twimg.com video.twimg.com t.co])
+    url.host.in?(%w[twitter.com mobile.twitter.com pic.twitter.com pbs.twimg.com video.twimg.com www.twitter.com t.co])
   end
 
   def parse
