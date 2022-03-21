@@ -107,7 +107,7 @@ module Sources
         super.cookies(Tinami2SESSID: Danbooru.config.tinami_session_id).use(:spoof_referrer)
       end
 
-      memoize :http, :page, :user_id, :work_id, :ethna_csrf, :image_urls, :image_sub_ids, :nv_body_image_urls
+      memoize :page, :user_id, :work_id, :ethna_csrf, :image_urls, :image_sub_ids, :nv_body_image_urls
     end
   end
 end
