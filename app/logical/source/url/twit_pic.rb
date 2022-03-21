@@ -77,6 +77,6 @@ class Source::URL::TwitPic < Source::URL
   end
 
   def profile_url
-    "http://twitpic.com/photos/#{username}" if uesrname.present?
+    "http://twitpic.com/photos/#{username}" if username.present?
   end
 end

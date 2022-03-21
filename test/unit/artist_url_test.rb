@@ -154,6 +154,12 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("http://twitter.com/intent/user?user_id=2784590030/", url.normalized_url)
     end
 
+    should "normalize twitpic urls" do
+      url = create(:artist_url, url: "http://twitpic.com/photos/mirakichi")
+      assert_equal("http://twitpic.com/photos/mirakichi", url.url)
+      assert_equal("http://twitpic.com/photos/mirakichi/", url.normalized_url)
+    end
+
     should "normalize nijie urls" do
       url = create(:artist_url, url: "https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png")
       assert_equal("https://nijie.info/members.php?id=236014", url.url)
