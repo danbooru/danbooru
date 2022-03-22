@@ -32,6 +32,8 @@ footer#page-footer {
   #sidebar {
     flex: 0;
 
+    min-width: 230px;
+
     @media (min-width: 1080px) {
       min-width: 245px;
     }
