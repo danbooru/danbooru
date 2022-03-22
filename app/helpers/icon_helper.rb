@@ -254,6 +254,8 @@ module IconHelper
       image_icon_tag("lofter-logo.png", **options)
     when "Mangaupdates"
       image_icon_tag("mangaupdates-logo.png", **options)
+    when "Marshmallow Qa"
+      image_icon_tag("marshmallow-qa-logo.png", **options)
     when "Melonbooks"
       image_icon_tag("melonbooks-logo.png", **options)
     when "Mihuashi"
@@ -268,6 +270,8 @@ module IconHelper
       image_icon_tag("patreon-logo.png", **options)
     when "Pawoo"
       image_icon_tag("pawoo-logo.png", **options)
+    when "Photozou"
+      image_icon_tag("photozou-logo.png", **options)
     when "Piapro.jp"
       image_icon_tag("piapro-jp-logo.png", **options)
     when "Picarto"
@@ -288,6 +292,10 @@ module IconHelper
       image_icon_tag("stickam-logo.png", **options)
     when "Skeb"
       image_icon_tag("skeb-logo.png", **options)
+    when "Skima"
+      image_icon_tag("skima-logo.png", **options)
+    when "Theinterviews"
+      image_icon_tag("the-interviews-logo.png", **options)
     when "Tinami"
       image_icon_tag("tinami-logo.png", **options)
     when "Tumblr"
@@ -296,12 +304,24 @@ module IconHelper
       image_icon_tag("twitter-logo.png", **options)
     when "Toranoana"
       image_icon_tag("toranoana-logo.png", **options)
+    when "Twipple"
+      image_icon_tag("twipple-logo.png", **options)
     when "Twitch"
       image_icon_tag("twitch-logo.png", **options)
+    when "Twitcasting"
+      image_icon_tag("twitcasting-logo.png", **options)
+    when "TwitPic"
+      image_icon_tag("twitpic-logo.png", **options)
+    when "Twpf"
+      image_icon_tag("twpf-logo.png", **options)
+    when "Ustream"
+      image_icon_tag("ustream-logo.png", **options)
     when "Weibo"
       image_icon_tag("weibo-logo.png", **options)
     when "Wikipedia"
       image_icon_tag("wikipedia-logo.png", **options)
+    when "Yfrog"
+      image_icon_tag("yfrog-logo.png", **options)
     when "Youtube"
       image_icon_tag("youtube-logo.png", **options)
     else
