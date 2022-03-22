@@ -17,11 +17,17 @@ class Source::URL::Instagram < Source::URL
 
     # https://www.instagram.com/p/CbDW9mVuEnn/
     # https://www.instagram.com/reel/CV7mHEwgbeF/?utm_medium=copy_link
-    in "instagram.com", ("p" | "reel"), work_id
+    # https://www.instagram.com/tv/CMjUD1epVWW/
+    in "instagram.com", ("p" | "reel" | "tv"), work_id
       @work_id = work_id
 
     # https://www.instagram.com/itomugi/
+    # https://www.instagram.com/itomugi/tagged/
     in "instagram.com", username, *rest
+      @username = username
+
+    # https://www.instagram.com/stories/itomugi/
+    in "instagram.com", "stories", username, *rest
       @username = username
 
     else
