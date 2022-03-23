@@ -98,16 +98,10 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "normalize correctly" do
-        source = "https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181"
-
-        assert_equal("https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic", Sources::Strategies.normalize_source(source))
-      end
-
-      should "avoid normalizing unnormalizable urls" do
-        bad_source = "https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg"
-        assert_equal(bad_source, Sources::Strategies.normalize_source(bad_source))
+    context "generating page urls" do
+      should "work" do
+        assert_equal("https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic", Source::URL.page_url("https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181"))
+        assert_nil(Source::URL.page_url("https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg"))
       end
     end
   end

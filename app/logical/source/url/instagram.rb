@@ -34,6 +34,10 @@ class Source::URL::Instagram < Source::URL
     end
   end
 
+  def page_url
+    "https://www.instagram.com/p/#{work_id}/" if work_id.present?
+  end
+
   def profile_url
     # Instagram URLs canonically end with "/"
     "https://www.instagram.com/#{username}/" if username.present?

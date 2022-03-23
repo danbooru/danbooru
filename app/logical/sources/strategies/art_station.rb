@@ -52,16 +52,6 @@ module Sources::Strategies
       end
     end
 
-    def normalize_for_source
-      return if project_id.blank?
-
-      if artist_name_from_url.present?
-        "https://#{artist_name_from_url}.artstation.com/projects/#{project_id}"
-      else
-        "https://www.artstation.com/artwork/#{project_id}"
-      end
-    end
-
     def image_urls_from_api
       api_response[:assets].to_a.map do |asset|
         if asset[:asset_type] == "image"

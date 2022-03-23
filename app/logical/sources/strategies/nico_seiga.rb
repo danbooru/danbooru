@@ -66,10 +66,6 @@ module Sources
         end.gsub(/[^\w]im(\d+)/, ' seiga #\1 ').chomp
       end
 
-      def normalize_for_source
-        page_url
-      end
-
       def tag_name
         return if api_client&.user_id.blank?
         "nicoseiga#{api_client.user_id}"

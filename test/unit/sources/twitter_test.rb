@@ -291,18 +291,18 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "normalize correctly" do
+    context "generating page urls" do
+      should "work" do
         source1 = "https://twitter.com/i/web/status/1261877313349640194"
         source2 = "https://twitter.com/BOW999/status/1261877313349640194"
         source3 = "https://twitter.com/BOW999/status/1261877313349640194/photo/1"
         source4 = "https://twitter.com/BOW999/status/1261877313349640194?s=19"
 
-        assert_equal(source1, Sources::Strategies.normalize_source(source1))
-        assert_equal(source2, Sources::Strategies.normalize_source(source2))
-        assert_equal(source2, Sources::Strategies.normalize_source(source3))
-        assert_equal(source2, Sources::Strategies.normalize_source(source4))
-        assert_equal("https://www.twitter.com/irt_5433", Sources::Strategies.normalize_source("https://www.twitter.com/irt_5433"))
+        assert_equal(source1, Source::URL.page_url(source1))
+        assert_equal(source2, Source::URL.page_url(source2))
+        assert_equal(source2, Source::URL.page_url(source3))
+        assert_equal(source2, Source::URL.page_url(source4))
+        assert_nil(Source::URL.page_url("https://www.twitter.com/irt_5433"))
       end
     end
   end

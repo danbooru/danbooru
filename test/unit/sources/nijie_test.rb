@@ -317,23 +317,23 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "normalize correctly" do
+    context "generating page urls" do
+      should "work" do
         source1 = "https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png"
         source2 = "https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png"
 
-        assert_equal("https://nijie.info/view.php?id=218856", Sources::Strategies.normalize_source(source1))
-        assert_equal("https://nijie.info/view.php?id=287736", Sources::Strategies.normalize_source(source2))
+        assert_equal("https://nijie.info/view.php?id=218856", Source::URL.page_url(source1))
+        assert_equal("https://nijie.info/view.php?id=287736", Source::URL.page_url(source2))
       end
 
-      should "avoid normalizing unnormalizable urls" do
+      should "handle inconvertible urls" do
         bad_source1 = "https://pic01.nijie.info/nijie_picture/20120211210359.jpg"
         bad_source2 = "https://pic04.nijie.info/omata/4829_20161128012012.png"
         bad_source3 = "https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg"
 
-        assert_equal(bad_source1, Sources::Strategies.normalize_source(bad_source1))
-        assert_equal(bad_source2, Sources::Strategies.normalize_source(bad_source2))
-        assert_equal(bad_source3, Sources::Strategies.normalize_source(bad_source3))
+        assert_nil(Source::URL.page_url(bad_source1))
+        assert_nil(Source::URL.page_url(bad_source2))
+        assert_nil(Source::URL.page_url(bad_source3))
       end
     end
 

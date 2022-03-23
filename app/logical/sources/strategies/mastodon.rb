@@ -79,10 +79,6 @@ module Sources::Strategies
       api_response.tags
     end
 
-    def normalize_for_source
-      page_url
-    end
-
     def dtext_artist_commentary_desc
       DText.from_html(artist_commentary_desc) do |element|
         if element.name == "a"

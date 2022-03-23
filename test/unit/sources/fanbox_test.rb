@@ -135,17 +135,15 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "normalize cover images to the profile link" do
+    context "generating page urls" do
+      should "convert cover images to the profile url" do
         cover = "https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg"
-        assert_equal("https://www.pixiv.net/fanbox/creator/1566167", Sources::Strategies.normalize_source(cover))
+        assert_equal("https://www.pixiv.net/fanbox/creator/1566167", Source::URL.page_url(cover))
       end
 
-      should "avoid normalizing unnormalizable urls" do
-        bad_source1 = "https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg"
-        bad_source2 = "https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png"
-        assert_equal(bad_source1, Sources::Strategies.normalize_source(bad_source1))
-        assert_equal(bad_source2, Sources::Strategies.normalize_source(bad_source2))
+      should "handle inconvertible urls" do
+        assert_nil(Source::URL.page_url("https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg"))
+        assert_nil(Source::URL.page_url("https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png"))
       end
     end
   end

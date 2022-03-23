@@ -68,10 +68,6 @@ module Sources
         DText.from_html(artist_commentary_desc).gsub(/\A[[:space:]]+|[[:space:]]+\z/, "").gsub(/\n+/, "\n")
       end
 
-      def normalize_for_source
-        page_url
-      end
-
       def illust_id
         parsed_url.work_id || parsed_referer&.work_id
       end

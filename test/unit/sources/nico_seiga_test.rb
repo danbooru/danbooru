@@ -159,22 +159,18 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "normalize correctly" do
+    context "generating page urls" do
+      should "work" do
         source1 = "http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf"
         source2 = "http://lohas.nicoseiga.jp/priv/b80f86c0d8591b217e7513a9e175e94e00f3c7a1/1384936074/3583893"
         source3 = "http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663"
         source4 = "http://seiga.nicovideo.jp/image/source?id=3312222"
 
-        assert_equal("https://seiga.nicovideo.jp/image/source/3521156", Sources::Strategies.normalize_source(source1))
-        assert_equal("https://seiga.nicovideo.jp/image/source/3583893", Sources::Strategies.normalize_source(source2))
-        assert_equal("https://seiga.nicovideo.jp/image/source/4937663", Sources::Strategies.normalize_source(source3))
-        assert_equal("https://seiga.nicovideo.jp/image/source/3312222", Sources::Strategies.normalize_source(source4))
-      end
-
-      should "avoid normalizing unnormalizable urls" do
-        bad_source = "https://seiga.nicovideo.jp"
-        assert_equal(bad_source, Sources::Strategies.normalize_source(bad_source))
+        assert_equal("https://seiga.nicovideo.jp/image/source/3521156", Source::URL.page_url(source1))
+        assert_equal("https://seiga.nicovideo.jp/image/source/3583893", Source::URL.page_url(source2))
+        assert_equal("https://seiga.nicovideo.jp/image/source/4937663", Source::URL.page_url(source3))
+        assert_equal("https://seiga.nicovideo.jp/image/source/3312222", Source::URL.page_url(source4))
+        assert_nil(Source::URL.page_url("https://seiga.nicovideo.jp"))
       end
     end
 

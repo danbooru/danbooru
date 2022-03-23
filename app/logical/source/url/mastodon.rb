@@ -77,6 +77,14 @@ class Source::URL::Mastodon < Source::URL
     full_image_url.present?
   end
 
+  def page_url
+    if username.present? && work_id.present?
+      "https://#{host}/@#{username}/#{work_id}"
+    elsif work_id.present?
+      "https://#{host}/web/statuses/#{work_id}"
+    end
+  end
+
   def profile_url
     if username.present?
       "https://#{host}/@#{username}"

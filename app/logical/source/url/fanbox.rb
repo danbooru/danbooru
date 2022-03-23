@@ -78,6 +78,17 @@ class Source::URL::Fanbox < Source::URL
     to_s.gsub(%r{/[cw]/\w+/}, "/") if image_url?
   end
 
+  def page_url
+    if username.present? && work_id.present?
+      "https://#{username}.fanbox.cc/posts/#{work_id}"
+    elsif user_id.present? && work_id.present?
+      "https://www.pixiv.net/fanbox/creator/#{user_id}/post/#{work_id}"
+    elsif user_id.present? && image_url?
+      # Use profile url as page url for cover images (XXX may cause problems with bad_source detection)
+      "https://www.pixiv.net/fanbox/creator/#{user_id}"
+    end
+  end
+
   def profile_url
     if username.present?
       "https://#{username}.fanbox.cc"

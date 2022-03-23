@@ -128,10 +128,6 @@ module Sources::Strategies
       DText.from_html(artist_commentary_desc)
     end
 
-    def normalize_for_source
-      page_url
-    end
-
     def work_type
       parsed_url.work_type || parsed_referer&.work_type
     end

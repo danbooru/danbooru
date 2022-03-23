@@ -25,17 +25,6 @@ module Sources
         image_urls.first
       end
 
-      def normalize_for_source
-        id = post_id_from_url
-        md5 = post_md5_from_url
-
-        if id.present?
-          "https://#{domain}/post/show/#{id}"
-        elsif md5.present?
-          "https://#{domain}/post?tags=md5:#{md5}"
-        end
-      end
-
       def tags
         api_response[:tags].to_s.split.map do |tag|
           [tag, "https://#{domain}/post?tags=#{CGI.escape(tag)}"]

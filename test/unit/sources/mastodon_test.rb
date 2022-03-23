@@ -122,25 +122,17 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "normalize correctly" do
-        source1 = "https://pawoo.net/@evazion/19451018/"
-        source2 = "https://pawoo.net/web/statuses/19451018/favorites"
-        source3 = "https://baraag.net/@bardbot/105732813175612920/"
-
-        assert_equal("https://pawoo.net/@evazion/19451018", Sources::Strategies.normalize_source(source1))
-        assert_equal("https://pawoo.net/web/statuses/19451018", Sources::Strategies.normalize_source(source2))
-        assert_equal("https://baraag.net/@bardbot/105732813175612920", Sources::Strategies.normalize_source(source3))
+    context "generating page urls" do
+      should "work" do
+        assert_equal("https://pawoo.net/@evazion/19451018", Source::URL.page_url("https://pawoo.net/@evazion/19451018/"))
+        assert_equal("https://pawoo.net/web/statuses/19451018", Source::URL.page_url("https://pawoo.net/web/statuses/19451018/favorites"))
+        assert_equal("https://baraag.net/@bardbot/105732813175612920", Source::URL.page_url("https://baraag.net/@bardbot/105732813175612920/"))
       end
 
-      should "avoid normalizing unnormalizable urls" do
-        bad_source1 = "https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png"
-        bad_source2 = "https://pawoo.net/@evazion/media"
-        bad_source3 = "https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"
-
-        assert_equal(bad_source1, Sources::Strategies.normalize_source(bad_source1))
-        assert_equal(bad_source2, Sources::Strategies.normalize_source(bad_source2))
-        assert_equal(bad_source3, Sources::Strategies.normalize_source(bad_source3))
+      should "handle inconvertible urls" do
+        assert_nil(Source::URL.page_url("https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png"))
+        assert_nil(Source::URL.page_url("https://pawoo.net/@evazion/media"))
+        assert_nil(Source::URL.page_url("https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"))
       end
     end
 

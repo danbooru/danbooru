@@ -26,7 +26,7 @@ class Source::URL::Twitter < Source::URL
   # https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration
   RESERVED_USERNAMES = %w[home i intent search]
 
-  attr_reader :status_id, :twitter_username, :user_id
+  attr_reader :status_id, :username, :user_id
 
   def self.match?(url)
     return false if Source::URL::TwitPic.match?(url) # TwitPic uses https://o.twimg.com/ URLs
@@ -45,12 +45,12 @@ class Source::URL::Twitter < Source::URL
     # https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
     # https://twitter.com/sato_1_11/status/1496489742791475201/photo/2
     in "twitter.com", username, "status", status_id, *rest
-      @twitter_username = username
+      @username = username
       @status_id = status_id
 
     # https://twitter.com/motty08111213
     in "twitter.com", username, *rest
-      @twitter_username = username unless username.in?(RESERVED_USERNAMES)
+      @username = username unless username.in?(RESERVED_USERNAMES)
 
     # https://twitter.com/intent/user?user_id=1485229827984531457
     in "twitter.com", "intent", "user" if params[:user_id].present?
@@ -58,7 +58,7 @@ class Source::URL::Twitter < Source::URL
 
     # https://twitter.com/intent/user?screen_name=ryuudog_NFT
     in "twitter.com", "intent", "user" if params[:screen_name].present?
-      @twitter_username = params[:screen_name]
+      @username = params[:screen_name]
 
     # https://twitter.com/i/user/889592953
     in "twitter.com", "i", "user", user_id
@@ -101,9 +101,17 @@ class Source::URL::Twitter < Source::URL
     "#{site}/#{@file_path}:orig"
   end
 
+  def page_url
+    if username.present? && status_id.present?
+      "https://twitter.com/#{username}/status/#{status_id}"
+    elsif status_id.present?
+      "https://twitter.com/i/web/status/#{status_id}"
+    end
+  end
+
   def profile_url
-    if twitter_username.present?
-      "https://twitter.com/#{twitter_username}"
+    if username.present?
+      "https://twitter.com/#{username}"
     elsif user_id.present?
       # "https://twitter.com/i/user/#{user_id}
       "https://twitter.com/intent/user?user_id=#{user_id}"

@@ -52,6 +52,10 @@ class Source::URL::Plurk < Source::URL
     host == "images.plurk.com"
   end
 
+  def page_url
+    "https://www.plurk.com/p/#{work_id}" if work_id.present?
+  end
+
   def profile_url
     "https://www.plurk.com/#{username}" if username.present?
   end

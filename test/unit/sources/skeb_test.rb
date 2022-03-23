@@ -99,10 +99,10 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "avoid normalizing unnormalizable urls" do
+    context "generating page urls" do
+      should "handle inconvertible urls" do
         bad_source = "https://skeb.imgix.net/requests/229088_2?bg=%23fff&auto=format&w=800&s=9cac8b76c0838f2df4f19ebc41c1ae0a"
-        assert_equal(bad_source, Sources::Strategies.normalize_source(bad_source))
+        assert_nil(Source::URL.page_url(bad_source))
       end
     end
   end

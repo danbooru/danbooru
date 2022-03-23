@@ -16,7 +16,7 @@
 #   url = Source::URL.parse("https://twitter.com/yasunavert/status/1496123903290314755")
 #   url.site_name        # => "Twitter"
 #   url.status_id        # => "1496123903290314755"
-#   url.twitter_username # => "yasunavert"
+#   url.username         # => "yasunavert"
 #
 # @see Danbooru::URL
 module Source
@@ -53,7 +53,7 @@ module Source
     # @return [Source::URL]
     def self.parse!(url)
       url = Danbooru::URL.new(url)
-      subclass = SUBCLASSES.find { |c| c.match?(url) } || Source::URL
+      subclass = SUBCLASSES.find { |c| c.match?(url) } || Source::URL::Null
       subclass.new(url)
     end
 
@@ -78,39 +78,30 @@ module Source
     #
     # @return [String]
     def site_name
-      # XXX should go in dedicated subclasses.
-      case host
-      when /ask\.fm\z/i
-        "Ask.fm"
-      when /bcy\.net\z/i
-        "BCY"
-      when /booth\.pm\z/i
-        "Booth.pm"
-      when /circle\.ms\z/i
-        "Circle.ms"
-      when /dlsite\.(com|net)\z/i
-        "DLSite"
-      when /doujinshi\.mugimugi\.org\z/i
-        "Doujinshi.org"
-      when /fc2\.com\z/i
-        "FC2"
-      when /ko-fi\.com\z/i
-        "Ko-fi"
-      when /mixi\.jp\z/i
-        "Mixi.jp"
-      when /piapro\.jp\z/i
-        "Piapro.jp"
-      when /sakura\.ne\.jp\z/i
-        "Sakura.ne.jp"
-      else
-        if self.class == Source::URL
-          # "www.melonbooks.co.jp" => "Melonbooks"
-          parsed_domain.sld.titleize
-        else
-          # "Source::URL::NicoSeiga" => "Nico Seiga"
-          self.class.name.demodulize.titleize
-        end
-      end
+      # "Source::URL::NicoSeiga" => "Nico Seiga"
+      self.class.name.demodulize.titleize
+    end
+
+    # Convert an image URL to the URL of the page containing the image, or
+    # return nil if it's not possible to convert the current URL to a page URL.
+    #
+    # When viewing a post, the source will be shown as the page URL if it's
+    # possible to convert the source from an image URL to a page URL.
+    #
+    # Examples:
+    #
+    # * https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
+    #   => https://www.pixiv.net/artworks/46324488
+    #
+    # * https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg
+    #   => https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896
+    #
+    # * https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
+    #   => nil
+    #
+    # @return [String, nil]
+    def page_url
+      nil
     end
 
     # Convert the current URL into a profile URL, or return nil if it's not
@@ -132,6 +123,14 @@ module Source
     # @return [String, nil]
     def profile_url
       nil
+    end
+
+    def self.page_url(url)
+      Source::URL.parse(url)&.page_url
+    end
+
+    def self.profile_url(url)
+      Source::URL.parse(url)&.profile_url
     end
 
     protected def initialize(...)

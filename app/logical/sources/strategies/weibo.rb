@@ -87,10 +87,6 @@ module Sources
         end
       end
 
-      def normalize_for_source
-        parsed_url.normalized_url
-      end
-
       def api_response
         return {} if (mobile_url = parsed_url.mobile_url || parsed_referer&.mobile_url).blank?
 

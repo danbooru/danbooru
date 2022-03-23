@@ -48,10 +48,6 @@ module Sources
         "https://skeb.jp/@#{artist_name}/works/#{illust_id}"
       end
 
-      def normalize_for_source
-        page_url
-      end
-
       def api_url
         return nil unless artist_name.present? && illust_id.present?
         "https://skeb.jp/api/users/#{artist_name}/works/#{illust_id}"

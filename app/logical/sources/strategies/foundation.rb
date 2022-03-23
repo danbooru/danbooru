@@ -76,10 +76,6 @@ module Sources
         DText.from_html(artist_commentary_desc)
       end
 
-      def normalize_for_source
-        page_url
-      end
-
       def api_response
         return {} if page.nil?
 

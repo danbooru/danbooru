@@ -85,6 +85,14 @@ class Source::URL::Moebooru < Source::URL
     end
   end
 
+  def page_url
+    if work_id.present?
+      "https://#{domain}/post/show/#{work_id}"
+    elsif md5.present?
+      "https://#{domain}/post/show?md5=#{md5}"
+    end
+  end
+
   def self.full_image_url(site_name, md5, file_ext, post_id = nil)
     case site_name
     when "Yande.re"

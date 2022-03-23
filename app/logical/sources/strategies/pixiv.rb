@@ -96,11 +96,6 @@ module Sources
         api_illust[:description]
       end
 
-      def normalize_for_source
-        return nil if illust_id.blank?
-        "https://www.pixiv.net/artworks/#{illust_id}"
-      end
-
       def tag_name
         moniker
       end

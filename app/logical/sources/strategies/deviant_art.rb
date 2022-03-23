@@ -65,10 +65,6 @@ module Sources
         end
       end
 
-      def normalize_for_source
-        page_url_from_image_url
-      end
-
       def profile_url
         return nil if artist_name.blank?
         "https://www.deviantart.com/#{artist_name.downcase}"

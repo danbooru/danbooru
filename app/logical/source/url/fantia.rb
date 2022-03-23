@@ -55,6 +55,7 @@ class Source::URL::Fantia < Source::URL
 
     # https://fantia.jp/fanclubs/64496
     # https://fantia.jp/fanclubs/1654/posts
+    # https://job.fantia.jp/fanclubs/5734
     in _, "fanclubs", /\d+/ => fanclub_id, *rest
       @fanclub_id = fanclub_id
 

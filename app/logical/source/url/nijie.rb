@@ -94,6 +94,10 @@ class Source::URL::Nijie < Source::URL
     to_s.remove(%r{__rs_\w+/}i).gsub("http:", "https:") if image_url?
   end
 
+  def page_url
+    "https://nijie.info/view.php?id=#{work_id}" if work_id.present?
+  end
+
   def profile_url
     "https://nijie.info/members.php?id=#{user_id}" if user_id.present?
   end

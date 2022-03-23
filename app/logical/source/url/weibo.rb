@@ -104,7 +104,7 @@ class Source::URL::Weibo < Source::URL
     end
   end
 
-  def normalized_url
+  def page_url
     if @artist_short_id.present? && @illust_base62_id.present?
       "https://www.weibo.com/#{@artist_short_id}/#{@illust_base62_id}"
     elsif mobile_url.present?

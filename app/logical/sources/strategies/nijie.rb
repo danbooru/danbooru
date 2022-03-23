@@ -109,12 +109,6 @@ module Sources
         artist_id_from_url || artist_id_from_page
       end
 
-      def normalize_for_source
-        return if illust_id.blank?
-
-        "https://nijie.info/view.php?id=#{illust_id}"
-      end
-
       def doujin?
         page&.at("#dojin_left").present?
       end

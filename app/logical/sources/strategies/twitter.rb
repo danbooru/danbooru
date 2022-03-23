@@ -93,14 +93,6 @@ module Sources::Strategies
       api_response[:full_text].to_s
     end
 
-    def normalize_for_source
-      if tag_name_from_url.present? && status_id.present?
-        "https://twitter.com/#{tag_name_from_url}/status/#{status_id}"
-      elsif status_id.present?
-        "https://twitter.com/i/web/status/#{status_id}"
-      end
-    end
-
     def tags
       api_response.dig(:entities, :hashtags).to_a.map do |hashtag|
         [hashtag[:text], "https://twitter.com/hashtag/#{hashtag[:text]}"]
@@ -150,7 +142,7 @@ module Sources::Strategies
     end
 
     def tag_name_from_url
-      parsed_url.twitter_username || parsed_referer&.twitter_username
+      parsed_url.username || parsed_referer&.username
     end
 
     memoize :api_response

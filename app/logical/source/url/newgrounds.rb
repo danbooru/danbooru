@@ -59,6 +59,12 @@ class Source::URL::Newgrounds < Source::URL
     url.host == "art.ngfiles.com"
   end
 
+  def page_url
+    if username.present? && work_title.present?
+      "https://www.newgrounds.com/art/view/#{username}/#{work_title}"
+    end
+  end
+
   def profile_url
     "https://#{username}.newgrounds.com" if username.present?
   end

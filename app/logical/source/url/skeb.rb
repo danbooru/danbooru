@@ -43,6 +43,10 @@ class Source::URL::Skeb < Source::URL
     end
   end
 
+  def page_url
+    "https://skeb.jp/@#{username}/works/#{work_id}" if username.present? && work_id.present?
+  end
+
   def profile_url
     "https://skeb.jp/@#{username}" if username.present?
   end

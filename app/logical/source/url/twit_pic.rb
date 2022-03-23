@@ -72,8 +72,7 @@ class Source::URL::TwitPic < Source::URL
   end
 
   def page_url
-    return nil unless base36_id.present?
-    "https://twitpic.com/#{base36_id}"
+    "https://twitpic.com/#{base36_id}" if base36_id.present?
   end
 
   def profile_url

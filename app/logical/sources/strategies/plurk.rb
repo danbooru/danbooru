@@ -110,10 +110,6 @@ module Sources
         end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
       end
 
-      def normalize_for_source
-        page_url
-      end
-
       memoize :page, :page_json, :api_replies
     end
   end

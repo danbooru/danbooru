@@ -84,10 +84,6 @@ module Sources
         end
       end
 
-      def normalize_for_source
-        page_url
-      end
-
       def user_name
         parsed_url.username || parsed_referer&.username
       end

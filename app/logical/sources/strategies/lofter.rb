@@ -47,10 +47,6 @@ module Sources
         page&.search(".ct .text, .content .text, .posts .photo .text").to_a.compact.first&.to_html
       end
 
-      def normalize_for_source
-        page_url
-      end
-
       def illust_id
         parsed_url.work_id || parsed_referer&.work_id
       end

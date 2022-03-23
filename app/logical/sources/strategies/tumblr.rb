@@ -83,10 +83,6 @@ module Sources::Strategies
       super(tag)
     end
 
-    def normalize_for_source
-      parsed_url.page_url
-    end
-
     def dtext_artist_commentary_desc
       DText.from_html(artist_commentary_desc).strip
     end

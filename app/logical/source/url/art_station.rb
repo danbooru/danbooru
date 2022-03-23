@@ -79,6 +79,10 @@ class Source::URL::ArtStation < Source::URL
     end
   end
 
+  def page_url
+    "https://www.artstation.com/artwork/#{work_id}" if work_id.present?
+  end
+
   def profile_url
     "https://www.artstation.com/#{username}" if username.present?
   end

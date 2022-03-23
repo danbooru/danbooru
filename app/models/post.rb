@@ -307,15 +307,16 @@ class Post < ApplicationRecord
       end
     end
 
+    def parsed_source
+      Source::URL.parse(source) if web_source?
+    end
+
     def normalized_source
-      return source unless web_source?
-      Sources::Strategies.normalize_source(source)
+      parsed_source&.page_url || source
     end
 
     def source_domain
-      return "" unless web_source?
-
-      Danbooru::URL.parse(normalized_source)&.domain.to_s
+      parsed_source&.domain.to_s
     end
   end
 

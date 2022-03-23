@@ -34,19 +34,6 @@ module Sources
         end
       end
 
-      def normalize_for_source
-        if illust_id.present?
-          if artist_name_from_url.present?
-            "https://#{artist_name_from_url}.fanbox.cc/posts/#{illust_id}"
-          elsif artist_id_from_url.present?
-            "https://www.pixiv.net/fanbox/creator/#{artist_id_from_url}/post/#{illust_id}"
-          end
-        elsif artist_id_from_url.present?
-          # Cover images
-          "https://www.pixiv.net/fanbox/creator/#{artist_id_from_url}"
-        end
-      end
-
       def profile_url
         return if artist_name.blank?
 

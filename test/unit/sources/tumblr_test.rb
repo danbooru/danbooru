@@ -228,22 +228,18 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "normalize correctly" do
+    context "generating page urls" do
+      should "work" do
         source1 = "https://octrain1020.tumblr.com/post/190713122589"
         source2 = "https://octrain1020.tumblr.com/image/190713122589"
         source3 = "https://octrain1020.tumblr.com/image/190713122589#asd"
         source4 = "https://superboin.tumblr.com/post/141169066579/photoset_iframe/superboin/tumblr_o45miiAOts1u6rxu8/500/false"
 
-        assert_equal(source1, Sources::Strategies.normalize_source(source1))
-        assert_equal(source1, Sources::Strategies.normalize_source(source2))
-        assert_equal(source1, Sources::Strategies.normalize_source(source3))
-        assert_equal("https://superboin.tumblr.com/post/141169066579", Sources::Strategies.normalize_source(source4))
-      end
-
-      should "avoid normalizing unnormalizable urls" do
-        bad_source = "https://octrain1020.tumblr.com/"
-        assert_equal(bad_source, Sources::Strategies.normalize_source(bad_source))
+        assert_equal(source1, Source::URL.page_url(source1))
+        assert_equal(source1, Source::URL.page_url(source2))
+        assert_equal(source1, Source::URL.page_url(source3))
+        assert_equal("https://superboin.tumblr.com/post/141169066579", Source::URL.page_url(source4))
+        assert_nil(Source::URL.page_url("https://octrain1020.tumblr.com/"))
       end
     end
   end

@@ -85,8 +85,7 @@ class Source::URL::Tumblr < Source::URL
   end
 
   def page_url
-    return nil unless @blog_name.present? && @work_id.present?
-    "https://#{@blog_name}.tumblr.com/post/#{@work_id}"
+    "https://#{blog_name}.tumblr.com/post/#{work_id}" if blog_name.present? && work_id.present?
   end
 
   def profile_url

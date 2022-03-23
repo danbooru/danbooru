@@ -6,6 +6,7 @@
 # Unsupported patterns:
 # * https://foundation.app/@ <- This seems to be a novelty account.
 # * https://foundation.app/mochiiimo <- no @
+# * https://foundation.app/collection/kgfgen
 
 class Source::URL::Foundation < Source::URL
   attr_reader :username, :token_id, :work_id, :hash

@@ -194,22 +194,13 @@ module Sources
       assert_equal("sa-dui", site.artist_name)
     end
 
-    context "normalizing for source" do
-      should "normalize correctly" do
-        source1 = "https://www.artstation.com/artwork/ghost-in-the-shell-fandom"
-        source2 = "https://anubis1982918.artstation.com/projects/qPVGP/"
-        source3 = "https://dudeunderscore.artstation.com/projects/NoNmD?album_id=23041"
-
-        assert_equal(source1, Sources::Strategies.normalize_source(source1))
-        assert_equal("https://anubis1982918.artstation.com/projects/qPVGP", Sources::Strategies.normalize_source(source2))
-        assert_equal("https://dudeunderscore.artstation.com/projects/NoNmD", Sources::Strategies.normalize_source(source3))
-      end
-
-      should "avoid normalizing unnormalizable urls" do
-        bad_source1 = "http://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236"
-        bad_source2 = "https://www.artstation.com"
-        assert_equal(bad_source1, Sources::Strategies.normalize_source(bad_source1))
-        assert_equal(bad_source2, Sources::Strategies.normalize_source(bad_source2))
+    context "generating page urls" do
+      should "work" do
+        assert_equal("https://www.artstation.com/artwork/ghost-in-the-shell-fandom", Source::URL.page_url("https://www.artstation.com/artwork/ghost-in-the-shell-fandom"))
+        assert_equal("https://www.artstation.com/artwork/qPVGP", Source::URL.page_url("https://anubis1982918.artstation.com/projects/qPVGP/"))
+        assert_equal("https://www.artstation.com/artwork/NoNmD", Source::URL.page_url("https://dudeunderscore.artstation.com/projects/NoNmD?album_id=23041"))
+        assert_nil(Source::URL.page_url("http://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236"))
+        assert_nil(Source::URL.page_url("https://www.artstation.com"))
       end
     end
   end

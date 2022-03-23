@@ -138,12 +138,6 @@ module Sources
       end
       memoize :http_downloader
 
-      # Given a post/image url, this is the normalized url that will be displayed in a post's page in its stead.
-      # This function should never make any network call, even indirectly. Return nil to never normalize.
-      def normalize_for_source
-        nil
-      end
-
       def artists
         ArtistFinder.find_artists(profile_url)
       end

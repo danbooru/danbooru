@@ -111,29 +111,29 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "normalize yande.re sources correctly" do
+    context "generating page urls" do
+      should "generate yande.re urls correctly" do
         source1 = "https://files.yande.re/image/b66909b940e8d77accab7c9b25aa4dc3/yande.re%20377828.png"
         source2 = "https://files.yande.re/image/2a5d1d688f565cb08a69ecf4e35017ab/yande.re%20349790%20breast_hold%20kurashima_tomoyasu%20mahouka_koukou_no_rettousei%20naked%20nipples.jpg"
         source3 = "https://files.yande.re/image/e4c2ba38de88ff1640aaebff84c84e81/469784.jpg"
         source4 = "https://yande.re/image/b4b1d11facd1700544554e4805d47bb6/.png"
         source5 = "https://yande.re/jpeg/22577d2344fe694cf47f80563031b3cd.jpg"
 
-        assert_equal("https://yande.re/post/show/377828", Sources::Strategies.normalize_source(source1))
-        assert_equal("https://yande.re/post/show/349790", Sources::Strategies.normalize_source(source2))
-        assert_equal("https://yande.re/post/show/469784", Sources::Strategies.normalize_source(source3))
-        assert_equal("https://yande.re/post?tags=md5:b4b1d11facd1700544554e4805d47bb6", Sources::Strategies.normalize_source(source4))
-        assert_equal("https://yande.re/post?tags=md5:22577d2344fe694cf47f80563031b3cd", Sources::Strategies.normalize_source(source5))
+        assert_equal("https://yande.re/post/show/377828", Source::URL.page_url(source1))
+        assert_equal("https://yande.re/post/show/349790", Source::URL.page_url(source2))
+        assert_equal("https://yande.re/post/show/469784", Source::URL.page_url(source3))
+        assert_equal("https://yande.re/post/show?md5=b4b1d11facd1700544554e4805d47bb6", Source::URL.page_url(source4))
+        assert_equal("https://yande.re/post/show?md5=22577d2344fe694cf47f80563031b3cd", Source::URL.page_url(source5))
       end
 
-      should "normalize konachan.com sources correctly" do
+      should "generate konachan.com urls correctly" do
         source1 = "https://konachan.com/image/5d633771614e4bf5c17df19a0f0f333f/Konachan.com%20-%20270807%20black_hair%20bokuden%20clouds%20grass%20landscape%20long_hair%20original%20phone%20rope%20scenic%20seifuku%20skirt%20sky%20summer%20torii%20tree.jpg"
         source2 = "https://konachan.com/sample/e2e2994bae738ff52fff7f4f50b069d5/Konachan.com%20-%20270803%20sample.jpg"
         source3 = "https://konachan.com/image/99a3c4f10c327d54486259a74173fc0b.jpg"
 
-        assert_equal("https://konachan.com/post/show/270807", Sources::Strategies.normalize_source(source1))
-        assert_equal("https://konachan.com/post/show/270803", Sources::Strategies.normalize_source(source2))
-        assert_equal("https://konachan.com/post?tags=md5:99a3c4f10c327d54486259a74173fc0b", Sources::Strategies.normalize_source(source3))
+        assert_equal("https://konachan.com/post/show/270807", Source::URL.page_url(source1))
+        assert_equal("https://konachan.com/post/show/270803", Source::URL.page_url(source2))
+        assert_equal("https://konachan.com/post/show?md5=99a3c4f10c327d54486259a74173fc0b", Source::URL.page_url(source3))
       end
     end
   end

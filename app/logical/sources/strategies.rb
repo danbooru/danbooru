@@ -23,7 +23,6 @@ module Sources
         Strategies::Foundation,
         Strategies::Plurk,
         Strategies::Tinami,
-        Strategies::TwitPic,
         Strategies::Fantia,
       ]
     end
@@ -35,10 +34,6 @@ module Sources
 
     def self.canonical(url, referer)
       find(url, referer).canonical_url
-    end
-
-    def self.normalize_source(url)
-      find(url).normalize_for_source || url
     end
   end
 end

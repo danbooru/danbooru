@@ -82,20 +82,16 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "normalize correctly" do
+    context "generating page urls" do
+      should "work" do
         source1 = "http://pictures.hentai-foundry.com//a/AnimeFlux/219123.jpg"
         source2 = "http://pictures.hentai-foundry.com/a/AnimeFlux/219123/Mobile-Suit-Equestria-rainbow-run.jpg"
         source3 = "http://www.hentai-foundry.com/pictures/user/Ganassa/457176/LOL-Swimsuit---Caitlyn-reworked-nude-ver."
 
-        assert_equal("https://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", Sources::Strategies.normalize_source(source1))
-        assert_equal("https://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", Sources::Strategies.normalize_source(source2))
-        assert_equal("https://www.hentai-foundry.com/pictures/user/Ganassa/457176", Sources::Strategies.normalize_source(source3))
-      end
-
-      should "avoid normalizing unnormalizable urls" do
-        bad_source = "https://pictures.hentai-foundry.com/a/AnimeFlux"
-        assert_equal(bad_source, Sources::Strategies.normalize_source(bad_source))
+        assert_equal("https://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", Source::URL.page_url(source1))
+        assert_equal("https://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", Source::URL.page_url(source2))
+        assert_equal("https://www.hentai-foundry.com/pictures/user/Ganassa/457176", Source::URL.page_url(source3))
+        assert_nil(Source::URL.page_url("https://pictures.hentai-foundry.com/a/AnimeFlux"))
       end
     end
 

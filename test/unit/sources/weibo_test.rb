@@ -113,25 +113,19 @@ module Sources
       end
     end
 
-    context "normalizing for source" do
-      should "normalize correctly" do
+    context "generating page urls" do
+      should "work" do
         source1 = "https://www.weibo.com/3150932560/H4cFbeKKA?from=page_1005053150932560_profile&wvr=6&mod=weibotime"
         source2 = "https://photo.weibo.com/2125874520/wbphotos/large/mid/4242129997905387/pid/7eb64558ly1friyzhj44lj20dw2qxe81"
         source3 = "https://m.weibo.cn/status/4173757483008088?luicode=20000061&lfid=4170879204256635"
         source4 = "https://tw.weibo.com/SEINEN/4098035921690224"
 
-        assert_equal("https://www.weibo.com/3150932560/H4cFbeKKA", Sources::Strategies.normalize_source(source1))
-        assert_equal("https://m.weibo.cn/detail/4242129997905387", Sources::Strategies.normalize_source(source2))
-        assert_equal("https://m.weibo.cn/status/4173757483008088", Sources::Strategies.normalize_source(source3))
-        assert_equal("https://m.weibo.cn/detail/4098035921690224", Sources::Strategies.normalize_source(source4))
-      end
-
-      should "avoid normalizing unnormalizable urls" do
-        bad_source1 = "https://weibo.com/u/"
-        bad_source2 = "https://www.weibo.com/4ubergine/photos"
-
-        assert_equal(bad_source1, Sources::Strategies.normalize_source(bad_source1))
-        assert_equal(bad_source2, Sources::Strategies.normalize_source(bad_source2))
+        assert_equal("https://www.weibo.com/3150932560/H4cFbeKKA", Source::URL.page_url(source1))
+        assert_equal("https://m.weibo.cn/detail/4242129997905387", Source::URL.page_url(source2))
+        assert_equal("https://m.weibo.cn/status/4173757483008088", Source::URL.page_url(source3))
+        assert_equal("https://m.weibo.cn/detail/4098035921690224", Source::URL.page_url(source4))
+        assert_nil(Source::URL.page_url("https://weibo.com/u/"))
+        assert_nil(Source::URL.page_url("https://www.weibo.com/4ubergine/photos"))
       end
     end
   end

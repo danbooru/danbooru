@@ -52,6 +52,10 @@ class Source::URL::Lofter < Source::URL
     "#{site}#{path}" if image_url?
   end
 
+  def page_url
+    "https://#{username}.lofter.com/post/#{work_id}" if username.present? && work_id.present?
+  end
+
   def profile_url
     "https://#{username}.lofter.com" if username.present?
   end

@@ -63,6 +63,14 @@ class Source::URL::HentaiFoundry < Source::URL
     end
   end
 
+  def page_url
+    if username.present? && work_id.present?
+      "https://www.hentai-foundry.com/pictures/user/#{username}/#{work_id}"
+    elsif work_id.present?
+      "https://www.hentai-foundry.com/pic-#{work_id}"
+    end
+  end
+
   def profile_url
     "https://www.hentai-foundry.com/user/#{username}" if username.present?
   end
