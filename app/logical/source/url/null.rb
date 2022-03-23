@@ -19,7 +19,7 @@ class Source::URL::Null < Source::URL
       "Circle.ms"
     when /dlsite\.(com|net)\z/i
       "DLSite"
-    when /doujinshi\.mugimugi\.org\z/i
+    when /doujinshi\.org\z/i, /doujinshi\.mugimugi\.org\z/i
       "Doujinshi.org"
     when /ko-fi\.com\z/i
       "Ko-fi"

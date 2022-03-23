@@ -214,12 +214,16 @@ module IconHelper
     case site_name
     when "Amazon"
       image_icon_tag("amazon-logo.png", **options)
+    when "Ameblo"
+      image_icon_tag("ameblo-logo.png", **options)
     when "ArtStation"
       image_icon_tag("artstation-logo.png", **options)
     when "Ask.fm"
       image_icon_tag("ask-fm-logo.png", **options)
     when "BCY"
       image_icon_tag("bcy-logo.png", **options)
+    when "Biglobe"
+      image_icon_tag("biglobe-logo.png", **options)
     when "Booth.pm"
       image_icon_tag("booth-pm-logo.png", **options)
     when "Circle.ms"
@@ -240,10 +244,16 @@ module IconHelper
       image_icon_tag("fc2-logo.png", **options)
     when "Foundation"
       image_icon_tag("foundation-logo.png", **options)
+    when "Geocities"
+      image_icon_tag("geocities-logo.png", **options)
+    when "Google"
+      image_icon_tag("google-logo.png", **options)
     when "Gumroad"
       image_icon_tag("gumroad-logo.png", **options)
     when "Hentai Foundry"
       image_icon_tag("hentai-foundry-logo.png", **options)
+    when "Infoseek"
+      image_icon_tag("infoseek-logo.png", **options)
     when "Instagram"
       image_icon_tag("instagram-logo.png", **options)
     when "Ko-fi"
@@ -256,12 +266,18 @@ module IconHelper
       image_icon_tag("mangaupdates-logo.png", **options)
     when "Marshmallow Qa"
       image_icon_tag("marshmallow-qa-logo.png", **options)
+    when "Mastodon", "Mstdn" # https://mastodon.cloud, https://mstdn.jp
+      image_icon_tag("mastodon-logo.png", **options)
     when "Melonbooks"
       image_icon_tag("melonbooks-logo.png", **options)
     when "Mihuashi"
       image_icon_tag("mihuashi-logo.png", **options)
     when "Mixi.jp"
       image_icon_tag("mixi-jp-logo.png", **options)
+    when "Naver"
+      image_icon_tag("naver-logo.png", **options)
+    when "Newgrounds"
+      image_icon_tag("newgrounds-logo.png", **options)
     when "Nico Seiga"
       image_icon_tag("nicoseiga-logo.png", **options)
     when "Nijie"
@@ -286,6 +302,8 @@ module IconHelper
       image_icon_tag("plurk-logo.png", **options)
     when "Privatter"
       image_icon_tag("privatter-logo.png", **options)
+    when "Reddit"
+      image_icon_tag("reddit-logo.png", **options)
     when "Sakura.ne.jp"
       image_icon_tag("sakura-ne-jp-logo.png", **options)
     when "Stickam"
