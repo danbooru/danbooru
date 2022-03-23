@@ -7,6 +7,8 @@ module ArtistFinder
   # Subdomains are automatically included. e.g., "twitter.com" matches "www.twitter.com",
   # "mobile.twitter.com" and any other subdomain of "twitter.com".
   SITE_BLACKLIST = [
+    "about.me", # http://about.me/rig22
+    "allmylinks.com", # https://allmylinks.com/hieumayart
     "ameblo.jp", # https://ameblo.jp/g8set55679
     "ameba.jp", # https://profile.ameba.jp/ameba/kbnr32rbfs
     "anidb.net", # https://anidb.net/creator/65313
@@ -26,6 +28,9 @@ module ArtistFinder
     "bilibili.com", # https://space.bilibili.com/1500665980
     "booru.org",
     "booru.org/drawfriends", # http://img.booru.org/drawfriends//images/36/de65da5f588b76bc1d9de8af976b540e2dff17e2.jpg
+    "comiczin.jp", # https://shop.comiczin.jp/products/list.php?category_id=3394
+    "curiouscat.me", # https://curiouscat.me/azurane
+    "crepu.net", # https://crepu.net/user/Mizunouchilucia
     "donmai.us",
     "donmai.us/users", # http://danbooru.donmai.us/users/507162/
     "derpibooru.org",
@@ -65,8 +70,10 @@ module ArtistFinder
     "furaffinity.net/user", # http://www.furaffinity.net/user/achthenuts
     "gelbooru.com", # http://gelbooru.com/index.php?page=account&s=profile&uname=junou
     "geocities.jp", # http://www.geocities.jp/nanp002001
+    "inprnt.com", # https://www.inprnt.com/gallery/zuyuancesartoo/
     "inkbunny.net", # https://inkbunny.net/achthenuts
-    "plus.google.com", # https://plus.google.com/111509637967078773143/posts
+    "itaku.ee", # https://itaku.ee/profile/lewdcactus64
+    "google.com", # https://plus.google.com/111509637967078773143/posts
     "hentai-foundry.com",
     "hentai-foundry.com/pictures/user", # http://www.hentai-foundry.com/pictures/user/aaaninja/
     "hentai-foundry.com/user", # http://www.hentai-foundry.com/user/aaaninja/profile
@@ -84,12 +91,14 @@ module ArtistFinder
     "mangaupdates.com", # http://www.mangaupdates.com/authors.html?id=15780
     "marshmallow-qa.com", # https://marshmallow-qa.com/nlo74593630
     "medibang.com", # https://medibang.com/u/reionemorelight/
+    "melonbooks.co.jp", # https://www.melonbooks.co.jp/circle/index.php?circle_id=15547
     "melonbooks.com", # http://www.melonbooks.com/index.php?main_page=maker_info&makers_id=MK0000016413
     "mega.nz", # https://mega.nz/file/9zxwxCDD#TJn7S7sPag30wDVD-kaVhFkeROzz-fE7_ZOb3gIZPTA
     "mega.nz/file", # https://mega.nz/file/9zxwxCDD#TJn7S7sPag30wDVD-kaVhFkeROzz-fE7_ZOb3gIZPTA
     "mega.nz/folder", # https://mega.nz/folder/8d4E0LxK#yzYqKHoGFu92RzMNWnoZEw/file/tUgAQZJA
     "mihuashi.com", # https://www.mihuashi.com/profiles/75614
     "mixi.jp", #http://mixi.jp/show_friend.pl?id=310102
+    "mlbg.tv", # http://mblg.tv/ikusanin01/
     "monappy.jp",
     "monappy.jp/u", # https://monappy.jp/u/abara_bone
     "mstdn.jp", # https://mstdn.jp/@oneb
@@ -105,6 +114,8 @@ module ArtistFinder
     "nijie.info", # http://nijie.info/members.php?id=15235
     %r{nijie\.info/nijie_picture}i, # http://pic03.nijie.info/nijie_picture/32243_20150609224803_0.png
     "odaibako.net", # https://odaibako.net/u/NLO74593630
+    "onlyfans.com", # https://onlyfans.com/evviart
+    "opensea.io", # https://opensea.io/hebitsukai
     "patreon.com", # http://patreon.com/serafleur
     "pawoo.net", # https://pawoo.net/@148nasuka
     "pawoo.net/web/accounts", # https://pawoo.net/web/accounts/228341
@@ -127,6 +138,7 @@ module ArtistFinder
     "poipiku.com", # https://poipiku.com/1776623/
     "plala.or.jp", # http://www7.plala.or.jp/reirei
     "plurk.com", # http://www.plurk.com/a1amorea1a1
+    "pornhub.com", # https://www.pornhub.com/model/mizzpeachy
     "privatter.net",
     "privatter.net/u", # http://privatter.net/u/saaaatonaaaa
     "redbubble.com", # https://www.redbubble.com/people/limb
@@ -135,16 +147,23 @@ module ArtistFinder
     "rule34.paheal.net",
     "rule34.paheal.net/post/list", # http://rule34.paheal.net/post/list/Reach025/
     "sankakucomplex.com", # https://chan.sankakucomplex.com/?tags=user%3ASubridet
+    "smutba.se", # https://smutba.se/project/431/
     "society6.com", # http://society6.com/serafleur/
     "soundcloud.com", # https://soundcloud.com/uwmx4hwforgm
+    "soundgasm.net", # https://soundgasm.net/MilkteaMomoko
     "skeb.jp", # https://skeb.jp/@212kisaragi
     "steamcommunity.com", # https://steamcommunity.com/id/sobchan
     "stickam.jp", # https://www.stickam.jp/profile/gyroscope
     "subscribestar.adult", # https://subscribestar.adult/daivijohn
+    "superrare.com", # https://superrare.com/mcbess
+    "t.me", # https://t.me/lystrahut
+    "tapas.io", # https://tapas.io/Paroro
+    "teepublic.com", # https://www.teepublic.com/user/ejsu28
     "theinterviews.jp", # http://theinterviews.jp/ruixiang
     "tinami.com",
     "tinami.com/creator/profile", # http://www.tinami.com/creator/profile/29024
     "toranoana.jp", # https://ec.toranoana.jp/tora_r/ec/cot/circle/2UPAD06P8V73dC69d687/all/
+    "toyhou.se", # https://toyhou.se/Dreaming-Witch
     "data.tumblr.com",
     /\d+\.media\.tumblr\.com/i,
     "twipple.jp",
@@ -164,6 +183,7 @@ module ArtistFinder
     "ustream.tv/user", # http://www.ustream.tv/user/kazaputi
     "vk.com", # https://vk.com/id425850679
     "webclap.com", # http://spibal.webclap.com
+    "webtoons.com", # https://www.webtoons.com/en/creator/37u4n
     "weibo.com", # https://weibo.com/kisinSheya
     "weibo.com/u", # https://weibo.com/u/2904950533
     "weibo.com/p", # https://weibo.com/p/1005057075896216
