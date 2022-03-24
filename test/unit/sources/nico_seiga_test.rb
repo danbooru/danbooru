@@ -103,6 +103,31 @@ module Sources
       end
     end
 
+    context "A manga image" do
+      should "work" do
+        @source = Sources::Strategies.find("https://drm.cdn.nicomanga.jp/image/d4a2faa68ec34f95497db6601a4323fde2ccd451_9537/8017978p?1570012695")
+
+        assert_match(%r{\Ahttps://lohas\.nicoseiga\.jp/priv/\h{40}/\d+/8017978\z}, @source.image_urls.sole)
+      end
+    end
+
+    context "A nico.ms illust URL" do
+      should "work" do
+        @source = Sources::Strategies.find("https://nico.ms/im10922621")
+
+        assert_match(%r{\Ahttps://lohas\.nicoseiga\.jp/priv/\h{40}/\d+/10922621\z}, @source.image_urls.sole)
+      end
+    end
+
+    context "A nico.ms manga URL" do
+      should "work" do
+        @source = Sources::Strategies.find("https://nico.ms/mg310193")
+
+        assert_equal(19, @source.image_urls.size)
+        assert_equal("https://seiga.nicovideo.jp/watch/mg310193", @source.page_url)
+      end
+    end
+
     context "A nicoseiga video" do
       should "not raise anything" do
         site = Sources::Strategies.find("https://www.nicovideo.jp/watch/sm36465441")
