@@ -54,7 +54,7 @@ module Sources
       end
 
       should "get the page url" do
-        assert_equal("https://seiga.nicovideo.jp/image/source/4937663", @site_1.page_url)
+        assert_equal("https://seiga.nicovideo.jp/seiga/im4937663", @site_1.page_url)
         assert_equal("https://seiga.nicovideo.jp/seiga/im4937663", @site_2.page_url)
         assert_equal("https://seiga.nicovideo.jp/watch/mg470189", @site_3.page_url)
       end
@@ -166,10 +166,10 @@ module Sources
         source3 = "http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663"
         source4 = "http://seiga.nicovideo.jp/image/source?id=3312222"
 
-        assert_equal("https://seiga.nicovideo.jp/image/source/3521156", Source::URL.page_url(source1))
-        assert_equal("https://seiga.nicovideo.jp/image/source/3583893", Source::URL.page_url(source2))
-        assert_equal("https://seiga.nicovideo.jp/image/source/4937663", Source::URL.page_url(source3))
-        assert_equal("https://seiga.nicovideo.jp/image/source/3312222", Source::URL.page_url(source4))
+        assert_nil(Source::URL.page_url(source1))
+        assert_nil(Source::URL.page_url(source2))
+        assert_equal("https://seiga.nicovideo.jp/seiga/im4937663", Source::URL.page_url(source3))
+        assert_nil(Source::URL.page_url(source4))
         assert_nil(Source::URL.page_url("https://seiga.nicovideo.jp"))
       end
     end
