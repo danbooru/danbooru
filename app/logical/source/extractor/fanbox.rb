@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Fanbox
-module Sources
-  module Strategies
-    class Fanbox < Base
+module Source
+  class Extractor
+    class Fanbox < Source::Extractor
       def match?
         Source::URL::Fanbox === parsed_url
       end

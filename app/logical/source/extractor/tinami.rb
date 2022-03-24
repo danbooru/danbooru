@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Tinami
-module Sources
-  module Strategies
-    class Tinami < Base
+module Source
+  class Extractor
+    class Tinami < Source::Extractor
 
       def match?
         Source::URL::Tinami === parsed_url

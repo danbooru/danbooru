@@ -5,7 +5,7 @@ module Sources
     context "Tinami:" do
       context "A 'http://www.tinami.com/view/:id' post with one image" do
         should "work" do
-          source = Sources::Strategies.find("http://www.tinami.com/view/1087268")
+          source = Source::Extractor.find("http://www.tinami.com/view/1087268")
 
           assert_equal("みぐめ", source.artist_name)
           assert_equal("https://www.tinami.com/view/1087268", source.page_url)
@@ -19,7 +19,7 @@ module Sources
 
       context "A 'http://www.tinami.com/view/:id' post with multiple images (type one)" do
         should "work" do
-          source = Sources::Strategies.find("http://www.tinami.com/view/1087271")
+          source = Source::Extractor.find("http://www.tinami.com/view/1087271")
 
           assert_equal("Shimaken", source.artist_name)
           assert_equal("https://www.tinami.com/view/1087271", source.page_url)
@@ -37,7 +37,7 @@ module Sources
 
       context "A 'http://www.tinami.com/view/:id' post with multiple images (type two)" do
         should "work" do
-          source = Sources::Strategies.find("http://www.tinami.com/view/1087270")
+          source = Source::Extractor.find("http://www.tinami.com/view/1087270")
 
           assert_equal("セラ箱", source.artist_name)
           assert_equal("https://www.tinami.com/view/1087270", source.page_url)
@@ -56,7 +56,7 @@ module Sources
           assert_equal(<<~EOS.chomp, source.artist_commentary_desc)
             リゼロのレムのプライズをクリアドレス仕様にリペイント。透け透けキラキラな感じに改装してみたものです。
 
-            >https://youtu.be/nkjZkEALg94 
+            >https://youtu.be/nkjZkEALg94
 
             製作日記的な動画です( ´∀｀ )
 
@@ -67,7 +67,7 @@ module Sources
 
       context "A Tinami image URL without a referer" do
         should "work" do
-          source = Sources::Strategies.find("https://img.tinami.com/illust2/img/647/6234fe5588e97.jpg")
+          source = Source::Extractor.find("https://img.tinami.com/illust2/img/647/6234fe5588e97.jpg")
 
           assert_nil(source.artist_name)
           assert_nil(source.page_url)
@@ -81,7 +81,7 @@ module Sources
 
       context "A Tinami image URL with a referer" do
         should "work" do
-          source = Sources::Strategies.find("https://img.tinami.com/illust2/img/647/6234fe5588e97.jpg", "http://www.tinami.com/view/1087268")
+          source = Source::Extractor.find("https://img.tinami.com/illust2/img/647/6234fe5588e97.jpg", "http://www.tinami.com/view/1087268")
 
           assert_equal("みぐめ", source.artist_name)
           assert_equal("https://www.tinami.com/view/1087268", source.page_url)
@@ -95,7 +95,7 @@ module Sources
 
       context "A deleted Tinami post" do
         should "work" do
-          source = Sources::Strategies.find("http://www.tinami.com/view/774077")
+          source = Source::Extractor.find("http://www.tinami.com/view/774077")
 
           assert_nil(source.artist_name)
           assert_equal("https://www.tinami.com/view/774077", source.page_url)

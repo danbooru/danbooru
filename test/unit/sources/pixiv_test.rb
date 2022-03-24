@@ -3,29 +3,29 @@ require 'test_helper'
 module Sources
   class PixivTest < ActiveSupport::TestCase
     setup do
-      skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
+      skip "Pixiv credentials not configured" unless Source::Extractor::Pixiv.enabled?
     end
 
     def assert_illust_id(illust_id, url)
-      site = Sources::Strategies.find(url)
+      site = Source::Extractor.find(url)
       assert_equal(illust_id, site.illust_id.to_i)
       assert_nothing_raised { site.to_h }
     end
 
     def assert_nil_illust_id(url)
-      site = Sources::Strategies.find(url)
+      site = Source::Extractor.find(url)
       assert_nil(site.illust_id)
     end
 
     def get_source(source)
-      @site = Sources::Strategies.find(source)
+      @site = Source::Extractor.find(source)
       @site
     end
 
     context "in all cases" do
       context "A gallery page" do
         setup do
-          @site = Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482")
+          @site = Source::Extractor.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482")
           @image_urls = @site.image_urls
         end
 
@@ -36,7 +36,7 @@ module Sources
 
       context "An ugoira source site for pixiv" do
         setup do
-          @site = Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+          @site = Source::Extractor.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
         end
 
         should "get the file url" do
@@ -53,7 +53,7 @@ module Sources
 
       context "A https://i.pximg.net/img-zip/ugoira/* source" do
         should "get the metadata" do
-          @site = Sources::Strategies.find("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip")
+          @site = Source::Extractor.find("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip")
 
           assert_equal("uroobnad2", @site.artist_name)
         end
@@ -61,7 +61,7 @@ module Sources
 
       context "A https://tc-pximg01.techorus-cdn.com/img-original/img/* source" do
         should "get the metadata" do
-          @site = Sources::Strategies.find("https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png")
+          @site = Source::Extractor.find("https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png")
 
           assert_equal(["https://i.pximg.net/img-original/img/2017/09/18/03/18/24/65015428_p4.png"], @site.image_urls)
           assert_equal("赤井さしみ", @site.artist_name)
@@ -70,12 +70,12 @@ module Sources
 
       context "A https://www.pixiv.net/*/artworks/* source" do
         should "work" do
-          @site = Sources::Strategies.find("https://www.pixiv.net/en/artworks/64476642")
+          @site = Source::Extractor.find("https://www.pixiv.net/en/artworks/64476642")
 
           assert_equal(["https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg"], @site.image_urls)
           assert_equal("https://www.pixiv.net/artworks/64476642", @site.page_url)
 
-          @site = Sources::Strategies.find("https://www.pixiv.net/artworks/64476642")
+          @site = Source::Extractor.find("https://www.pixiv.net/artworks/64476642")
           assert_equal(["https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg"], @site.image_urls)
           assert_equal("https://www.pixiv.net/artworks/64476642", @site.page_url)
         end

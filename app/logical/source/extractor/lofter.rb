@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Lofter
-module Sources
-  module Strategies
-    class Lofter < Base
+module Source
+  class Extractor
+    class Lofter < Source::Extractor
       def match?
         Source::URL::Lofter === parsed_url
       end

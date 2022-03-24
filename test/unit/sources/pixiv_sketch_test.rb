@@ -4,7 +4,7 @@ module Sources
   class PixivSketchTest < ActiveSupport::TestCase
     context "A Pixiv Sketch source" do
       should "work for a post with a single image" do
-        source = Sources::Strategies.find("https://sketch.pixiv.net/items/5835314698645024323")
+        source = Source::Extractor.find("https://sketch.pixiv.net/items/5835314698645024323")
 
         assert_equal("Pixiv Sketch", source.site_name)
         assert_equal(["https://img-sketch.pixiv.net/uploads/medium/file/9986983/8431631593768139653.jpg"], source.image_urls)
@@ -20,7 +20,7 @@ module Sources
 
       should "work for an image url without a referer" do
         # page: https://sketch.pixiv.net/items/8052785510155853613
-        source = Sources::Strategies.find("https://img-sketch.pixiv.net/uploads/medium/file/9988973/7216948861306830496.jpg")
+        source = Source::Extractor.find("https://img-sketch.pixiv.net/uploads/medium/file/9988973/7216948861306830496.jpg")
 
         assert_equal(["https://img-sketch.pixiv.net/uploads/medium/file/9988973/7216948861306830496.jpg"], source.image_urls)
         assert_nil(source.page_url)
@@ -34,7 +34,7 @@ module Sources
       end
 
       should "work for an image url with a referer" do
-        source = Sources::Strategies.find("https://img-sketch.pixiv.net/uploads/medium/file/9988973/7216948861306830496.jpg", "https://sketch.pixiv.net/items/8052785510155853613")
+        source = Source::Extractor.find("https://img-sketch.pixiv.net/uploads/medium/file/9988973/7216948861306830496.jpg", "https://sketch.pixiv.net/items/8052785510155853613")
 
         assert_equal("https://sketch.pixiv.net/items/8052785510155853613", source.page_url)
         assert_equal("https://sketch.pixiv.net/@op-one", source.profile_url)
@@ -47,7 +47,7 @@ module Sources
       end
 
       should "work for a NSFW post" do
-        source = Sources::Strategies.find("https://sketch.pixiv.net/items/193462611994864256")
+        source = Source::Extractor.find("https://sketch.pixiv.net/items/193462611994864256")
 
         assert_equal(["https://img-sketch.pixiv.net/uploads/medium/file/884876/4909517173982299587.jpg"], source.image_urls)
         assert_equal("https://sketch.pixiv.net/items/193462611994864256", source.page_url)
@@ -61,7 +61,7 @@ module Sources
       end
 
       should "work for a post with a multiple images" do
-        source = Sources::Strategies.find("https://sketch.pixiv.net/items/8052785510155853613")
+        source = Source::Extractor.find("https://sketch.pixiv.net/items/8052785510155853613")
 
         assert_equal(%w[
           https://img-sketch.pixiv.net/uploads/medium/file/9988964/1564052114639195387.png

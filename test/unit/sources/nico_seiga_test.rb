@@ -3,14 +3,14 @@ require 'test_helper'
 module Sources
   class NicoSeigaTest < ActiveSupport::TestCase
     setup do
-      skip "NicoSeiga credentials not configured" unless Sources::Strategies::NicoSeiga.enabled?
+      skip "NicoSeiga credentials not configured" unless Source::Extractor::NicoSeiga.enabled?
     end
 
     context "The source site for nico seiga" do
       setup do
-        @site_1 = Sources::Strategies.find("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
-        @site_2 = Sources::Strategies.find("http://seiga.nicovideo.jp/seiga/im4937663")
-        @site_3 = Sources::Strategies.find("https://seiga.nicovideo.jp/watch/mg470189?track=ct_episode")
+        @site_1 = Source::Extractor.find("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
+        @site_2 = Source::Extractor.find("http://seiga.nicovideo.jp/seiga/im4937663")
+        @site_3 = Source::Extractor.find("https://seiga.nicovideo.jp/watch/mg470189?track=ct_episode")
       end
 
       should "get the profile" do
@@ -80,7 +80,7 @@ module Sources
       end
 
       should "work for a https://lohas.nicoseiga.jp/thumb/${id}i url" do
-        site = Sources::Strategies.find("https://lohas.nicoseiga.jp/thumb/6844226i")
+        site = Source::Extractor.find("https://lohas.nicoseiga.jp/thumb/6844226i")
 
         assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/6844226!, site.image_urls.sole)
         assert_match("https://seiga.nicovideo.jp/seiga/im6844226", site.page_url)
@@ -91,7 +91,7 @@ module Sources
       setup do
         @url = "https://seiga.nicovideo.jp/image/source/9146749"
         @ref = "https://seiga.nicovideo.jp/watch/mg389884"
-        @site = Sources::Strategies.find(@url, @ref)
+        @site = Source::Extractor.find(@url, @ref)
       end
 
       should "get the correct pic" do
@@ -105,7 +105,7 @@ module Sources
 
     context "A manga image" do
       should "work" do
-        @source = Sources::Strategies.find("https://drm.cdn.nicomanga.jp/image/d4a2faa68ec34f95497db6601a4323fde2ccd451_9537/8017978p?1570012695")
+        @source = Source::Extractor.find("https://drm.cdn.nicomanga.jp/image/d4a2faa68ec34f95497db6601a4323fde2ccd451_9537/8017978p?1570012695")
 
         assert_match(%r{\Ahttps://lohas\.nicoseiga\.jp/priv/\h{40}/\d+/8017978\z}, @source.image_urls.sole)
       end
@@ -113,7 +113,7 @@ module Sources
 
     context "A nico.ms illust URL" do
       should "work" do
-        @source = Sources::Strategies.find("https://nico.ms/im10922621")
+        @source = Source::Extractor.find("https://nico.ms/im10922621")
 
         assert_match(%r{\Ahttps://lohas\.nicoseiga\.jp/priv/\h{40}/\d+/10922621\z}, @source.image_urls.sole)
       end
@@ -121,7 +121,7 @@ module Sources
 
     context "A nico.ms manga URL" do
       should "work" do
-        @source = Sources::Strategies.find("https://nico.ms/mg310193")
+        @source = Source::Extractor.find("https://nico.ms/mg310193")
 
         assert_equal(19, @source.image_urls.size)
         assert_equal("https://seiga.nicovideo.jp/watch/mg310193", @source.page_url)
@@ -130,14 +130,14 @@ module Sources
 
     context "A nicoseiga video" do
       should "not raise anything" do
-        site = Sources::Strategies.find("https://www.nicovideo.jp/watch/sm36465441")
+        site = Source::Extractor.find("https://www.nicovideo.jp/watch/sm36465441")
         assert_nothing_raised { site.to_h }
       end
     end
 
     context "An anonymous picture" do
       should "still work" do
-        site = Sources::Strategies.find("https://seiga.nicovideo.jp/seiga/im520647")
+        site = Source::Extractor.find("https://seiga.nicovideo.jp/seiga/im520647")
 
         assert_nothing_raised { site.to_h }
       end
@@ -145,7 +145,7 @@ module Sources
 
     context "An age-restricted picture" do
       should "still work" do
-        site = Sources::Strategies.find("http://seiga.nicovideo.jp/seiga/im9208126")
+        site = Source::Extractor.find("http://seiga.nicovideo.jp/seiga/im9208126")
 
         assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/9208126!, site.image_urls.sole)
         assert_nothing_raised { site.to_h }
@@ -154,14 +154,14 @@ module Sources
 
     context "An oekaki picture" do
       should "still work" do
-        site = Sources::Strategies.find("https://dic.nicovideo.jp/oekaki/52833.png")
+        site = Source::Extractor.find("https://dic.nicovideo.jp/oekaki/52833.png")
         assert_nothing_raised { site.to_h }
       end
     end
 
     context "A commentary with spoiler" do
       should "correctly add spoiler tags" do
-        site = Sources::Strategies.find("https://seiga.nicovideo.jp/seiga/im8992650")
+        site = Source::Extractor.find("https://seiga.nicovideo.jp/seiga/im8992650")
 
         commentary = <<~COMM.chomp
           SLVN大好き。ホントニアコガレテル。

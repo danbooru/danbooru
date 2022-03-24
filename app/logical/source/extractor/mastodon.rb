@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Mastodon
-module Sources::Strategies
-  class Mastodon < Base
+class Source::Extractor
+  class Mastodon < Source::Extractor
     def match?
       Source::URL::Mastodon === parsed_url
     end

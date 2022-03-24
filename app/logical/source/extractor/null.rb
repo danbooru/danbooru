@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-module Sources
-  module Strategies
-    class Null < Base
+module Source
+  class Extractor
+    class Null < Source::Extractor
       def image_urls
         [url]
       end

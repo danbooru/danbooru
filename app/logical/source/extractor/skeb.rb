@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Skeb
-module Sources
-  module Strategies
-    class Skeb < Base
+module Source
+  class Extractor
+    class Skeb < Extractor
       def match?
         Source::URL::Skeb === parsed_url
       end

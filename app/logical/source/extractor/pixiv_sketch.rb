@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::PixivSketch
-module Sources
-  module Strategies
-    class PixivSketch < Base
+module Source
+  class Extractor
+    class PixivSketch < Source::Extractor
       def match?
         Source::URL::PixivSketch === parsed_url
       end

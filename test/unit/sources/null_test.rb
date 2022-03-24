@@ -4,11 +4,11 @@ module Sources
   class NullTest < ActiveSupport::TestCase
     context "A source from an unknown site" do
       setup do
-        @site = Sources::Strategies.find("http://oremuhax.x0.com/yoro1603.jpg", "http://oremuhax.x0.com/yo125.htm")
+        @site = Source::Extractor.find("http://oremuhax.x0.com/yoro1603.jpg", "http://oremuhax.x0.com/yo125.htm")
       end
 
       should "be handled by the null strategy" do
-        assert(@site.is_a?(Sources::Strategies::Null))
+        assert(@site.is_a?(Source::Extractor::Null))
       end
 
       should "find the metadata" do

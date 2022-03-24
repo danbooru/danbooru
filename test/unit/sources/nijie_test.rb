@@ -3,7 +3,7 @@ require 'test_helper'
 module Sources
   class NijieTest < ActiveSupport::TestCase
     setup do
-      skip "Nijie credentials not configured" unless Sources::Strategies::Nijie.enabled?
+      skip "Nijie credentials not configured" unless Source::Extractor::Nijie.enabled?
       skip if ENV["CI"].present?
     end
 
@@ -43,7 +43,7 @@ module Sources
         CurrentUser.user = FactoryBot.create(:user)
         CurrentUser.ip_addr = "127.0.0.1"
 
-        @site = Sources::Strategies.find("https://nijie.info/view.php?id=213043")
+        @site = Source::Extractor.find("https://nijie.info/view.php?id=213043")
       end
 
       should "get the image url" do
@@ -79,7 +79,7 @@ module Sources
         FactoryBot.create(:tag, :name => "kaga")
         FactoryBot.create(:wiki_page, :title => "kaga", :other_names => "加賀(艦これ)")
 
-        @site = Sources::Strategies.find("https://nijie.info/view.php?id=208316")
+        @site = Source::Extractor.find("https://nijie.info/view.php?id=208316")
 
         assert_includes(@site.tags.map(&:first), "加賀（艦これ）")
         assert_includes(@site.translated_tags.map(&:name), "kaga")
@@ -96,7 +96,7 @@ module Sources
 
     context "For long commentaries that may be truncated" do
       should "get the full commentary" do
-        site = Sources::Strategies.find("http://nijie.info/view.php?id=266532")
+        site = Source::Extractor.find("http://nijie.info/view.php?id=266532")
         title = "ラミアの里"
         desc = <<~EOS.chomp
           サークルaskot様より販売されました「ラミアの里 ～ラミアはぁれむで搾られて～」にて前回に引き続きフラウのイラストを担当させて頂きました。
@@ -113,7 +113,7 @@ module Sources
 
     context "The source site for a nijie referer url" do
       setup do
-        @site = Sources::Strategies.find("http://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg", "https://nijie.info/view_popup.php?id=213043")
+        @site = Source::Extractor.find("http://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg", "https://nijie.info/view_popup.php?id=213043")
       end
 
       should "get the image url" do
@@ -135,7 +135,7 @@ module Sources
 
     context "The source site for a nijie popup" do
       setup do
-        @site = Sources::Strategies.find("https://nijie.info/view_popup.php?id=213043")
+        @site = Source::Extractor.find("https://nijie.info/view_popup.php?id=213043")
       end
 
       should "get the image url" do
@@ -157,7 +157,7 @@ module Sources
 
     context "The source site for a nijie gallery" do
       setup do
-        @site = Sources::Strategies.find("https://nijie.info/view.php?id=218856")
+        @site = Source::Extractor.find("https://nijie.info/view.php?id=218856")
       end
 
       should "get the image urls" do
@@ -187,7 +187,7 @@ module Sources
     context "The source site for a nijie image url without referer" do
       should "get the correct urls" do
         image_url = "https://pic.nijie.net/03/nijie_picture/236014_20170620101426_0.png"
-        site = Sources::Strategies.find(image_url)
+        site = Source::Extractor.find(image_url)
 
         assert_nil(site.page_url)
         assert_equal([image_url], site.image_urls)
@@ -198,7 +198,7 @@ module Sources
 
     context "An image url that contains the illust id and artist id (format 1)" do
       should "fetch all the data" do
-        site = Sources::Strategies.find("https://pic.nijie.net/03/nijie_picture/diff/main/218856_4_236014_20170620101333.png")
+        site = Source::Extractor.find("https://pic.nijie.net/03/nijie_picture/diff/main/218856_4_236014_20170620101333.png")
 
         assert_equal("https://nijie.info/view.php?id=218856", site.page_url)
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
@@ -209,7 +209,7 @@ module Sources
 
     context "An image url that contains the illust id and artist id (format 2)" do
       should "fetch all the data" do
-        site = Sources::Strategies.find("https://pic.nijie.net/04/nijie_picture/diff/main/287736_161475_20181112032855_1.png")
+        site = Source::Extractor.find("https://pic.nijie.net/04/nijie_picture/diff/main/287736_161475_20181112032855_1.png")
 
         assert_equal("https://nijie.info/view.php?id=287736", site.page_url)
         assert_equal("https://nijie.info/members.php?id=161475", site.profile_url)
@@ -220,7 +220,7 @@ module Sources
 
     context "An mp4 post" do
       should "find the mp4 file" do
-        site = Sources::Strategies.find("http://nijie.info/view.php?id=324604")
+        site = Source::Extractor.find("http://nijie.info/view.php?id=324604")
 
         assert_equal(%w[
           https://pic.nijie.net/01/nijie/19/69/1349569/illust/0_0_a20b709587eb7713_30b409.mp4
@@ -231,7 +231,7 @@ module Sources
 
     context "An artist profile url" do
       should "not fail" do
-        site = Sources::Strategies.find("https://nijie.info/members_illust.php?id=236014")
+        site = Source::Extractor.find("https://nijie.info/members_illust.php?id=236014")
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
         assert_nothing_raised { site.to_h }
       end
@@ -239,7 +239,7 @@ module Sources
 
     context "An url that is invalid" do
       should "not fail" do
-        site = Sources::Strategies.find("http://nijie.info/index.php")
+        site = Source::Extractor.find("http://nijie.info/index.php")
         assert_nothing_raised { site.to_h }
       end
     end
@@ -247,7 +247,7 @@ module Sources
     context "A deleted work" do
       context "for an image url" do
         should "find the profile url" do
-          site = Sources::Strategies.find("https://pic.nijie.net/01/nijie_picture/diff/main/196201_20150201033106_0.jpg")
+          site = Source::Extractor.find("https://pic.nijie.net/01/nijie_picture/diff/main/196201_20150201033106_0.jpg")
 
           assert_nothing_raised { site.to_h }
           assert_equal("https://nijie.info/members.php?id=196201", site.profile_url)
@@ -257,7 +257,7 @@ module Sources
 
       context "for a page url" do
         should "not fail" do
-          site = Sources::Strategies.find("http://www.nijie.info/view_popup.php?id=212355")
+          site = Source::Extractor.find("http://www.nijie.info/view_popup.php?id=212355")
 
           assert_equal("https://nijie.info/view.php?id=212355", site.page_url)
           assert_nil(site.profile_url)
@@ -272,7 +272,7 @@ module Sources
 
     context "a post requiring login" do
       should "not fail" do
-        site = Sources::Strategies.find("https://nijie.info/view.php?id=203688")
+        site = Source::Extractor.find("https://nijie.info/view.php?id=203688")
 
         urls = %w[
           https://pic.nijie.net/07/nijie/17/27/676327/illust/0_0_2e46f254324c90c8_dbfc1a.jpg
@@ -284,7 +284,7 @@ module Sources
 
     context "when the cached session cookie is invalid" do
       should "clear the cached cookie after failing to fetch the data" do
-        site = Sources::Strategies.find("https://nijie.info/view.php?id=203688")
+        site = Source::Extractor.find("https://nijie.info/view.php?id=203688")
 
         Cache.put("nijie-session-cookie", { "NIJIEIJIEID" => "fake", "nijie_tok" => "fake" })
         assert_equal({ "NIJIEIJIEID" => "fake", "nijie_tok" => "fake" }, site.cached_session_cookie)
@@ -298,7 +298,7 @@ module Sources
       should "work" do
         image = "https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700%E3%82%B3%E3%83%94%E3%83%BC%20%EF%BD%9E%200011%E3%81%AE%E3%82%B3%E3%83%94%E3%83%BC.jpg"
         page = "https://nijie.info/view.php?id=53023"
-        site = Sources::Strategies.find(image, page)
+        site = Source::Extractor.find(image, page)
 
         tags = [%w[中出し https://nijie.info/search_dojin.php?word=%E4%B8%AD%E5%87%BA%E3%81%97],
                 %w[フェラ https://nijie.info/search_dojin.php?word=%E3%83%95%E3%82%A7%E3%83%A9],
@@ -338,7 +338,7 @@ module Sources
       should "not break the bookmarklet" do
         image_url = "https://pic.nijie.net/01/nijie_picture/diff/main/201207181053373205_0.jpg"
         ref = "https://nijie.info/view_popup.php?id=18858&#diff_1"
-        source = Sources::Strategies.find(image_url, ref)
+        source = Source::Extractor.find(image_url, ref)
 
         assert_equal([image_url], source.image_urls)
       end

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Pixiv
-module Sources
-  module Strategies
-    class Pixiv < Base
+module Source
+  class Extractor
+    class Pixiv < Source::Extractor
       def self.enabled?
         Danbooru.config.pixiv_phpsessid.present?
       end

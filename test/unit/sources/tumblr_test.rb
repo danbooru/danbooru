@@ -3,12 +3,12 @@ require "test_helper"
 module Sources
   class TumblrTest < ActiveSupport::TestCase
     def setup
-      skip "Tumblr key is not configured" unless Sources::Strategies::Tumblr.enabled?
+      skip "Tumblr key is not configured" unless Source::Extractor::Tumblr.enabled?
     end
 
     context "The source for a 'http://*.tumblr.com/post/*' photo post with a single image" do
       setup do
-        @site = Sources::Strategies.find("https://noizave.tumblr.com/post/162206271767")
+        @site = Source::Extractor.find("https://noizave.tumblr.com/post/162206271767")
       end
 
       should "get the artist name" do
@@ -85,7 +85,7 @@ module Sources
 
     context "The source for a 'http://*.tumblr.com/image/*' image page" do
       setup do
-        @site = Sources::Strategies.find("https://noizave.tumblr.com/image/162206271767")
+        @site = Source::Extractor.find("https://noizave.tumblr.com/image/162206271767")
       end
 
       should "get the image url" do
@@ -111,7 +111,7 @@ module Sources
 
       context "with a referer" do
         should "get all the metadata" do
-          site = Sources::Strategies.find(@url, @ref)
+          site = Source::Extractor.find(@url, @ref)
 
           assert_equal("noizave", site.artist_name)
           assert_equal("https://noizave.tumblr.com", site.profile_url)
@@ -123,7 +123,7 @@ module Sources
 
       context "without a referer" do
         should "still find all the relevant information" do
-          site = Sources::Strategies.find(@url)
+          site = Source::Extractor.find(@url)
 
           assert_equal("noizave", site.artist_name)
           assert_equal("https://noizave.tumblr.com", site.profile_url)
@@ -136,7 +136,7 @@ module Sources
 
     context "The source for a 'http://*.tumblr.com/post/*' text post with inline images" do
       setup do
-        @site = Sources::Strategies.find("https://noizave.tumblr.com/post/162221502947")
+        @site = Source::Extractor.find("https://noizave.tumblr.com/post/162221502947")
       end
 
       should "get the image urls" do
@@ -158,7 +158,7 @@ module Sources
     context "A video post with inline images" do
       should "get the video and inline images" do
         url = "https://noizave.tumblr.com/post/162222617101"
-        site = Sources::Strategies.find(url)
+        site = Source::Extractor.find(url)
         urls = %w[
           https://va.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
           https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_1280.png
@@ -171,7 +171,7 @@ module Sources
 
     context "The source for a 'http://*.tumblr.com/post/*' answer post with inline images" do
       setup do
-        @site = Sources::Strategies.find("https://noizave.tumblr.com/post/171237880542/test-ask")
+        @site = Source::Extractor.find("https://noizave.tumblr.com/post/171237880542/test-ask")
       end
 
       should "get the image urls" do
@@ -193,7 +193,7 @@ module Sources
       should "return the correct image url" do
         image_url = "https://64.media.tumblr.com/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s1280x1920/46f4af7ec94456f8fef380ee6311eb81178ce7e9.jpg"
         page_url = "https://make-do5.tumblr.com/post/619663949657423872"
-        strategy = Sources::Strategies.find(image_url, page_url)
+        strategy = Source::Extractor.find(image_url, page_url)
 
         assert_match(%r{/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s\d+x\d+/}i, image_url)
         assert_equal(page_url, strategy.page_url)
@@ -203,7 +203,7 @@ module Sources
 
     context "A deleted tumblr post" do
       should "extract the info from the url" do
-        site = Sources::Strategies.find("http://shimetsukage.tumblr.com/post/176805588268/20180809-ssb-coolboy")
+        site = Source::Extractor.find("http://shimetsukage.tumblr.com/post/176805588268/20180809-ssb-coolboy")
 
         assert_nothing_raised { site.to_h }
         assert_equal("shimetsukage", site.artist_name)
@@ -220,7 +220,7 @@ module Sources
           page = "https://natsuki-teru.tumblr.com/post/178728919271"
           image = "https://66.media.tumblr.com/b9395771b2d0435fe4efee926a5a7d9c/tumblr_pg2wu1L9DM1trd056o2_#{size}.png"
           full = "https://media.tumblr.com/b9395771b2d0435fe4efee926a5a7d9c/tumblr_pg2wu1L9DM1trd056o2_1280.png"
-          site = Sources::Strategies.find(image, page)
+          site = Source::Extractor.find(image, page)
 
           assert_equal([full], site.image_urls)
         end

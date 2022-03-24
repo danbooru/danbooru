@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Newgrounds
-module Sources
-  module Strategies
-    class Newgrounds < Base
+module Source
+  class Extractor
+    class Newgrounds < Source::Extractor
       def match?
         Source::URL::Newgrounds === parsed_url
       end

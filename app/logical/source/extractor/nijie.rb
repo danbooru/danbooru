@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Nijie
-module Sources
-  module Strategies
-    class Nijie < Base
+module Source
+  class Extractor
+    class Nijie < Source::Extractor
       def self.enabled?
         Danbooru.config.nijie_login.present? && Danbooru.config.nijie_password.present?
       end

@@ -117,8 +117,8 @@ class Upload < ApplicationRecord
         UploadMediaAsset.new(file: file.tempfile, source_url: "file://#{file.original_filename}")
       end
     elsif source.present?
-      page_url = source_strategy.page_url
-      image_urls = source_strategy.image_urls
+      page_url = source_extractor.page_url
+      image_urls = source_extractor.image_urls
 
       if image_urls.empty?
         raise Error, "#{source} doesn't contain any images"
@@ -136,14 +136,14 @@ class Upload < ApplicationRecord
     update!(status: "error", error: e.message)
   end
 
-  def source_strategy
+  def source_extractor
     return nil if source.blank?
-    Sources::Strategies.find(source, referer_url)
+    Source::Extractor.find(source, referer_url)
   end
 
   def self.available_includes
     [:uploader, :upload_media_assets, :media_assets, :posts]
   end
 
-  memoize :source_strategy
+  memoize :source_extractor
 end

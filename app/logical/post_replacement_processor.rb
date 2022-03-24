@@ -66,14 +66,14 @@ class PostReplacementProcessor
     return MediaFile.open(file) if file.present?
     raise "No file or source URL provided" if source_url.blank?
 
-    strategy = Sources::Strategies.find(source_url, referer_url)
-    raise NotImplementedError, "No login credentials configured for #{strategy.site_name}." unless strategy.class.enabled?
+    extractor = Source::Extractor.find(source_url, referer_url)
+    raise NotImplementedError, "No login credentials configured for #{extractor.site_name}." unless extractor.class.enabled?
 
-    image_urls = strategy.image_urls
+    image_urls = extractor.image_urls
     raise "#{source_url} contains multiple images" if image_urls.size > 1
 
     image_url = image_urls.first
-    file = strategy.download_file!(image_url)
+    file = extractor.download_file!(image_url)
 
     [file, image_url]
   end

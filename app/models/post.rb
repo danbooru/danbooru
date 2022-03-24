@@ -87,7 +87,7 @@ class Post < ApplicationRecord
     )
 
     if add_artist_tag
-      tag_string = "#{tag_string} #{upload_media_asset.source_strategy&.artists.to_a.map(&:tag).map(&:name).join(" ")}".strip
+      tag_string = "#{tag_string} #{upload_media_asset.source_extractor&.artists.to_a.map(&:tag).map(&:name).join(" ")}".strip
       tag_string += " " if tag_string.present?
     end
 
@@ -1157,7 +1157,7 @@ class Post < ApplicationRecord
       self.pixiv_id = nil
       return unless web_source?
 
-      site = Sources::Strategies::Pixiv.new(source)
+      site = Source::Extractor::Pixiv.new(source)
       if site.match?
         self.pixiv_id = site.illust_id
       end
@@ -1265,7 +1265,7 @@ class Post < ApplicationRecord
       return if !web_source?
       return if has_tag?("artist_request") || has_tag?("official_art")
       return if tags.any?(&:artist?)
-      return if Sources::Strategies.find(source).is_a?(Sources::Strategies::Null)
+      return if Source::Extractor.find(source).is_a?(Source::Extractor::Null)
 
       new_artist_path = Routes.new_artist_path(artist: { source: source })
       warnings.add(:base, "Artist tag is required. \"Create new artist tag\":[#{new_artist_path}]. Ask on the forum if you need naming help")

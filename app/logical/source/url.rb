@@ -3,8 +3,8 @@
 # A Source::URL is a URL from a source site, such as Twitter, Pixiv, etc. Each site has a
 # subclass responsible for parsing and extracting information from URLs for that site.
 #
-# Sources::Strategies are the main user of Source::URLs. Each Source::URL subclass usually
-# has a corresponding strategy for extracting data from that site.
+# Source::Extractors are the main user of Source::URLs. Each Source::URL subclass usually
+# has a corresponding extractor for extracting data from that site.
 #
 # To add a new site, create a subclass of Source::URL and implement `#match?` to define
 # which URLs belong to the site, and `#parse` to parse and extract information from the URL.

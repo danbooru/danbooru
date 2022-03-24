@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Sources::Strategies
-  class Fantia < Base
+class Source::Extractor
+  class Fantia < Source::Extractor
     def self.enabled?
       Danbooru.config.fantia_session_id.present?
     end

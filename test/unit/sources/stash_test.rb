@@ -9,7 +9,7 @@ module Sources
 
     context "A https://sta.sh/:id page url" do
       should "work" do
-        @site = Sources::Strategies.find("https://sta.sh/0wxs31o7nn2")
+        @site = Source::Extractor.find("https://sta.sh/0wxs31o7nn2")
 
         assert_equal("noizave", @site.artist_name)
         assert_equal("https://www.deviantart.com/noizave", @site.profile_url)
@@ -25,7 +25,7 @@ module Sources
     context "A https://orig00.deviantart.net/* image url" do
       context "with a https://sta.sh/:id referer" do
         should "work" do
-          @site = Sources::Strategies.find("https://orig00.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png", "https://sta.sh/0wxs31o7nn2")
+          @site = Source::Extractor.find("https://orig00.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png", "https://sta.sh/0wxs31o7nn2")
 
           assert_equal("noizave", @site.artist_name)
           assert_equal("https://www.deviantart.com/noizave", @site.profile_url)
@@ -40,7 +40,7 @@ module Sources
 
       context "without a referer" do
         should "use the base deviantart strategy" do
-          @site = Sources::Strategies.find("https://orig00.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png")
+          @site = Source::Extractor.find("https://orig00.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png")
 
           # if all we have is the image url, then we can't tell that this is really a sta.sh image.
           assert_equal("Deviant Art", @site.site_name)

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # @see Source::URL::ArtStation
-module Sources::Strategies
-  class ArtStation < Base
+class Source::Extractor
+  class ArtStation < Source::Extractor
     def match?
       Source::URL::ArtStation === parsed_url
     end

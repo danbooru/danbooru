@@ -5,7 +5,7 @@ module Sources
     context "The source site for a https://pawoo.net/web/status/$id url" do
       setup do
         skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
-        @site = Sources::Strategies.find("https://pawoo.net/web/statuses/1202176")
+        @site = Source::Extractor.find("https://pawoo.net/web/statuses/1202176")
       end
 
       should "get the profile" do
@@ -34,7 +34,7 @@ module Sources
     context "The source site for a https://pawoo.net/$user/$id url" do
       setup do
         skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
-        @site = Sources::Strategies.find("https://pawoo.net/@evazion/19451018")
+        @site = Source::Extractor.find("https://pawoo.net/@evazion/19451018")
       end
 
       should "get the profile" do
@@ -89,7 +89,7 @@ module Sources
         skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
         @url = "https://img.pawoo.net/media_attachments/files/001/298/028/original/55a6fd252778454b.mp4"
         @ref = "https://pawoo.net/@evazion/19451018"
-        @site = Sources::Strategies.find(@url, @ref)
+        @site = Source::Extractor.find(@url, @ref)
       end
 
       should "fetch the source data" do
@@ -105,11 +105,11 @@ module Sources
       setup do
         skip "Baraag keys not set" unless Danbooru.config.baraag_client_id
         @url = "https://baraag.net/@bardbot/105732813175612920"
-        @site1 = Sources::Strategies.find(@url)
+        @site1 = Source::Extractor.find(@url)
 
         @img = "https://baraag.net/system/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"
         @ref = "https://baraag.net/@Nakamura/105803949565505009"
-        @site2 = Sources::Strategies.find(@img, @ref)
+        @site2 = Source::Extractor.find(@img, @ref)
       end
 
       should "work" do
@@ -140,8 +140,8 @@ module Sources
       setup do
         skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
 
-        @site1 = Sources::Strategies.find("https://pawoo.net/@nantokakun/105643037682139899") # 404
-        @site2 = Sources::Strategies.find("https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png")
+        @site1 = Source::Extractor.find("https://pawoo.net/@nantokakun/105643037682139899") # 404
+        @site2 = Source::Extractor.find("https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png")
 
         assert_nothing_raised { @site1.to_h }
         assert_nothing_raised { @site2.to_h }

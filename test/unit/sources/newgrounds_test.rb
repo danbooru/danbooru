@@ -6,8 +6,8 @@ module Sources
       setup do
         @url = "https://www.newgrounds.com/art/view/hcnone/sephiroth"
         @image_url = "https://art.ngfiles.com/images/1539000/1539538_hcnone_sephiroth.png?f1607668234"
-        @image_1 = Sources::Strategies.find(@url)
-        @image_2 = Sources::Strategies.find(@image_url)
+        @image_1 = Source::Extractor.find(@url)
+        @image_2 = Source::Extractor.find(@image_url)
       end
 
       should "get the artist name" do
@@ -64,7 +64,7 @@ module Sources
 
     context "A multi-image Newgrounds post" do
       should "get all the images" do
-        source = Sources::Strategies.find("https://www.newgrounds.com/art/view/natthelich/weaver")
+        source = Source::Extractor.find("https://www.newgrounds.com/art/view/natthelich/weaver")
         image_urls = [
           "https://art.ngfiles.com/images/1520000/1520217_natthelich_weaver.jpg?f1606365031",
           "https://art.ngfiles.com/comments/199000/iu_199826_7115981.jpg",
@@ -76,13 +76,13 @@ module Sources
 
     context "A deleted or not existing picture" do
       setup do
-        @fake_1 = Sources::Strategies.find("https://www.newgrounds.com/art/view/ThisUser/DoesNotExist")
+        @fake_1 = Source::Extractor.find("https://www.newgrounds.com/art/view/ThisUser/DoesNotExist")
         @artist_1 = create(:artist, name: "thisuser", url_string: "https://thisuser.newgrounds.com")
 
-        @fake_2 = Sources::Strategies.find("https://www.newgrounds.com/art/view/natthelich/nopicture")
+        @fake_2 = Source::Extractor.find("https://www.newgrounds.com/art/view/natthelich/nopicture")
         @artist_2 = create(:artist, name: "natthelich", url_string: "https://natthelich.newgrounds.com")
 
-        @fake_3 = Sources::Strategies.find("https://www.newgrounds.com/art/view/theolebrave/sensitive-pochaco")
+        @fake_3 = Source::Extractor.find("https://www.newgrounds.com/art/view/theolebrave/sensitive-pochaco")
         @artist_3 = create(:artist, name: "taffytoad", url_string: "https://taffytoad.newgrounds.com")
       end
 

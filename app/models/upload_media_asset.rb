@@ -79,9 +79,9 @@ class UploadMediaAsset < ApplicationRecord
     end
   end
 
-  def source_strategy
+  def source_extractor
     return nil if source_url.blank?
-    Sources::Strategies.find(source_url, page_url)
+    Source::Extractor.find(source_url, page_url)
   end
 
   def async_process_upload!
@@ -98,7 +98,7 @@ class UploadMediaAsset < ApplicationRecord
     if file.present?
       media_file = MediaFile.open(file)
     else
-      media_file = source_strategy.download_file!(source_url)
+      media_file = source_extractor.download_file!(source_url)
     end
 
     MediaAsset.upload!(media_file) do |media_asset|
@@ -120,5 +120,5 @@ class UploadMediaAsset < ApplicationRecord
     end
   end
 
-  memoize :source_strategy
+  memoize :source_extractor
 end

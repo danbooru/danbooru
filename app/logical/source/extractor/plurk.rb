@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Plurk
-module Sources
-  module Strategies
-    class Plurk < Base
+module Source
+  class Extractor
+    class Plurk < Source::Extractor
       def match?
         Source::URL::Plurk === parsed_url
       end

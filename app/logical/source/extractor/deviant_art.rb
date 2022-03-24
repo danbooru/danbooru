@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-module Sources
-  module Strategies
-    class DeviantArt < Base
+module Source
+  class Extractor
+    class DeviantArt < Source::Extractor
       def self.enabled?
         Danbooru.config.deviantart_client_id.present? && Danbooru.config.deviantart_client_secret.present?
       end

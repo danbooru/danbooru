@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Twitter
-module Sources::Strategies
-  class Twitter < Base
+class Source::Extractor
+  class Twitter < Source::Extractor
     # List of hashtag suffixes attached to tag other names
     # Ex: 西住みほ生誕祭2019 should be checked as 西住みほ
     # The regexes will not match if there is nothing preceding

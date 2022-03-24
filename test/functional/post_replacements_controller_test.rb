@@ -108,7 +108,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
       context "replacing a post with a Pixiv ugoira" do
         should "save the frame data" do
-          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
+          skip "Pixiv credentials not configured" unless Source::Extractor::Pixiv.enabled?
 
           @post = create(:post)
           post_auth post_replacements_path, create(:moderator_user), params: {
@@ -134,7 +134,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
       context "replacing a post with notes" do
         should "rescale the notes" do
-          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
+          skip "Pixiv credentials not configured" unless Source::Extractor::Pixiv.enabled?
 
           as(create(:user)) do
             @post = create(:post, image_width: 160, image_height: 164)

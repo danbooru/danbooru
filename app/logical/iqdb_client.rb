@@ -30,15 +30,15 @@ class IqdbClient
       if file.present?
         file = file.tempfile
       elsif url.present?
-        strategy = Sources::Strategies.find(url)
-        raise Error, "Can't do reverse image search: #{url} has multiple images. Enter the URL of a single image." if strategy.image_urls.size > 1
+        extractor = Source::Extractor.find(url)
+        raise Error, "Can't do reverse image search: #{url} has multiple images. Enter the URL of a single image." if extractor.image_urls.size > 1
 
-        download_url = strategy.image_urls.first
-        file = Sources::Strategies.find(download_url).download_file!(download_url)
+        download_url = extractor.image_urls.first
+        file = Source::Extractor.find(download_url).download_file!(download_url)
       elsif image_url.present?
-        file = Sources::Strategies.find(image_url).download_file!(image_url)
+        file = Source::Extractor.find(image_url).download_file!(image_url)
       elsif file_url.present?
-        file = Sources::Strategies.find(file_url).download_file!(file_url)
+        file = Source::Extractor.find(file_url).download_file!(file_url)
       elsif post_id.present?
         file = Post.find(post_id).file(:preview)
       elsif media_asset_id.present?

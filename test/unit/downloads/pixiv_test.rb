@@ -54,7 +54,7 @@ module Downloads
         end
 
         should "download the full size image instead of the thumbnail" do
-          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
+          skip "Pixiv credentials not configured" unless Source::Extractor::Pixiv.enabled?
 
           assert_rewritten(@p0_full_size_image, @p0_large_thumbnail)
           assert_rewritten(@p1_full_size_image, @p1_large_thumbnail)
@@ -119,7 +119,7 @@ module Downloads
 
     context "An ugoira site for pixiv" do
       should "capture the data" do
-        @strategy = Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+        @strategy = Source::Extractor.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
         media_file = @strategy.download_file!(@strategy.image_urls.sole)
 
         assert_equal(2, media_file.frame_data.size)

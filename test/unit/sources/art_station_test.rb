@@ -4,7 +4,7 @@ module Sources
   class ArtStationTest < ActiveSupport::TestCase
     context "The source site for an art station artwork page" do
       setup do
-        @site = Sources::Strategies.find("https://www.artstation.com/artwork/04XA4")
+        @site = Source::Extractor.find("https://www.artstation.com/artwork/04XA4")
       end
 
       should "get the image url" do
@@ -35,7 +35,7 @@ module Sources
 
     context "The source site for an art station projects page" do
       setup do
-        @site = Sources::Strategies.find("https://dantewontdie.artstation.com/projects/YZK5q")
+        @site = Source::Extractor.find("https://dantewontdie.artstation.com/projects/YZK5q")
       end
 
       should "get the image url" do
@@ -68,7 +68,7 @@ module Sources
 
     context "The source site for a www.artstation.com/artwork/$slug page" do
       setup do
-        @site = Sources::Strategies.find("https://www.artstation.com/artwork/cody-from-sf")
+        @site = Source::Extractor.find("https://www.artstation.com/artwork/cody-from-sf")
       end
 
       should "get the image url" do
@@ -90,7 +90,7 @@ module Sources
 
       context "with a referer" do
         should "work" do
-          site = Sources::Strategies.find(@url, @ref)
+          site = Source::Extractor.find(@url, @ref)
 
           assert_equal(["https://cdn.artstation.com/p/assets/images/images/006/029/978/4k/amama-l-z.jpg"], site.image_urls)
           assert_equal("https://amama.artstation.com/projects/4BWW2", site.page_url)
@@ -102,7 +102,7 @@ module Sources
 
       context "without a referer" do
         should "work" do
-          site = Sources::Strategies.find(@url)
+          site = Source::Extractor.find(@url)
 
           assert_equal(["https://cdn.artstation.com/p/assets/images/images/006/029/978/4k/amama-l-z.jpg"], site.image_urls)
           assert_nil(site.page_url)
@@ -117,7 +117,7 @@ module Sources
     context "A 4k asset url" do
       context "without a referer" do
         should "work" do
-          site = Sources::Strategies.find("https://cdna.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833")
+          site = Source::Extractor.find("https://cdna.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833")
 
           assert_equal(["https://cdn.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833"], site.image_urls)
           assert_nothing_raised { site.to_h }
@@ -128,7 +128,7 @@ module Sources
     context "A cover url" do
       should "work" do
         url = "https://cdna.artstation.com/p/assets/covers/images/007/262/828/large/monica-kyrie-1.jpg?1504865060"
-        site = Sources::Strategies.find(url)
+        site = Source::Extractor.find(url)
 
         assert_equal(["https://cdn.artstation.com/p/assets/covers/images/007/262/828/original/monica-kyrie-1.jpg?1504865060"], site.image_urls)
       end
@@ -136,7 +136,7 @@ module Sources
 
     context "The source site for an ArtStation gallery" do
       setup do
-        @site = Sources::Strategies.find("https://www.artstation.com/artwork/BDxrA")
+        @site = Source::Extractor.find("https://www.artstation.com/artwork/BDxrA")
       end
 
       should "get only image urls, not video urls" do
@@ -147,7 +147,7 @@ module Sources
 
     context "A work that includes video clips" do
       should_eventually "include the video clips in the image urls" do
-        @source = Sources::Strategies.find("https://www.artstation.com/artwork/0nP1e8")
+        @source = Source::Extractor.find("https://www.artstation.com/artwork/0nP1e8")
 
         assert_equal(%w[
           https://cdn.artstation.com/p/assets/images/images/040/979/418/original/yusuf-umar-workout-10mb.gif?1630425406
@@ -163,7 +163,7 @@ module Sources
       end
 
       should "work for the video itself" do
-        @source = Sources::Strategies.find("https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4")
+        @source = Source::Extractor.find("https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4")
 
         assert_equal(["https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4"], @source.image_urls)
       end
@@ -172,7 +172,7 @@ module Sources
     context "A work that has been deleted" do
       should "work" do
         url = "https://fiship.artstation.com/projects/x8n8XT"
-        site = Sources::Strategies.find(url)
+        site = Source::Extractor.find(url)
 
         assert_equal("fiship", site.artist_name)
         assert_equal("https://www.artstation.com/fiship", site.profile_url)
@@ -183,12 +183,12 @@ module Sources
     end
 
     should "work for artists with underscores in their name" do
-      site = Sources::Strategies.find("https://hosi_na.artstation.com/projects/3oEk3B")
+      site = Source::Extractor.find("https://hosi_na.artstation.com/projects/3oEk3B")
       assert_equal("hosi_na", site.artist_name)
     end
 
     should "work for artists with dashes in their name" do
-      site = Sources::Strategies.find("https://sa-dui.artstation.com/projects/DVERn")
+      site = Source::Extractor.find("https://sa-dui.artstation.com/projects/DVERn")
       assert_equal("sa-dui", site.artist_name)
     end
 

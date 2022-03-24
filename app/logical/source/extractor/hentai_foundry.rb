@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::HentaiFoundry
-module Sources
-  module Strategies
-    class HentaiFoundry < Base
+module Source
+  class Extractor
+    class HentaiFoundry < Source::Extractor
       def match?
         Source::URL::HentaiFoundry === parsed_url
       end

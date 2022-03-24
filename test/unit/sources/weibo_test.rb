@@ -9,7 +9,7 @@ module Sources
 
     context "A post with multiple pictures" do
       setup do
-        @site = Sources::Strategies.find("https://www.weibo.com/5501756072/J2UNKfbqV?type=comment#_rnd1590548401855")
+        @site = Source::Extractor.find("https://www.weibo.com/5501756072/J2UNKfbqV?type=comment#_rnd1590548401855")
       end
 
       should "extract all the image urls" do
@@ -55,7 +55,7 @@ module Sources
 
     context "A deleted or not existing picture" do
       should "still find the artist name" do
-        site = Sources::Strategies.find("https://www.weibo.com/5501756072/AsdAsdAsd")
+        site = Source::Extractor.find("https://www.weibo.com/5501756072/AsdAsdAsd")
         artist = FactoryBot.create(:artist, name: "nipi27", url_string: "https://www.weibo.com/u/5501756072")
 
         assert_equal([artist], site.artists)
@@ -64,7 +64,7 @@ module Sources
 
     context "A post with video" do
       should "get the correct video" do
-        site = Sources::Strategies.find("https://www.weibo.com/5501756072/IF9fugHzj")
+        site = Source::Extractor.find("https://www.weibo.com/5501756072/IF9fugHzj")
 
         assert_downloaded(7_676_656, site.image_urls.sole)
       end
@@ -72,7 +72,7 @@ module Sources
 
     context "A direct image sample upload" do
       should "get the largest version" do
-        sample = Sources::Strategies.find("https://wx3.sinaimg.cn/mw690/a00fa34cly1gf62g2n8z3j21yu2jo1ky.jpg")
+        sample = Source::Extractor.find("https://wx3.sinaimg.cn/mw690/a00fa34cly1gf62g2n8z3j21yu2jo1ky.jpg")
 
         assert_equal(["https://wx3.sinaimg.cn/large/a00fa34cly1gf62g2n8z3j21yu2jo1ky.jpg"], sample.image_urls)
       end
@@ -82,7 +82,7 @@ module Sources
       should "get the page url" do
         url = "https://wx1.sinaimg.cn/large/7eb64558gy1fnbryriihwj20dw104wtu.jpg"
         ref = "https://photo.weibo.com/2125874520/wbphotos/large/mid/4194742441135220/pid/7eb64558gy1fnbryb5nzoj20dw10419t"
-        site = Sources::Strategies.find(url, ref)
+        site = Source::Extractor.find(url, ref)
 
         assert_equal("https://www.weibo.com/2125874520/FDKGo4Lk0", site.page_url)
       end
@@ -91,13 +91,13 @@ module Sources
     context "A deleted url" do
       should "not raise errors" do
         url = "https://weibo.com/5265069929/LiLnMENgs"
-        assert_nothing_raised { Sources::Strategies.find(url).to_h }
+        assert_nothing_raised { Source::Extractor.find(url).to_h }
       end
     end
 
     context "A m.weibo.cn/detail url" do
       should "work" do
-        @site = Sources::Strategies.find("https://m.weibo.cn/detail/4506950043618873")
+        @site = Source::Extractor.find("https://m.weibo.cn/detail/4506950043618873")
 
         assert_equal(%w[
           https://wx1.sinaimg.cn/large/0060kO5aly1gezsyt5xvhj30ok0sgtc9.jpg

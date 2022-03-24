@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Tumblr
-module Sources::Strategies
-  class Tumblr < Base
+class Source::Extractor
+  class Tumblr < Source::Extractor
     def self.enabled?
       Danbooru.config.tumblr_consumer_key.present?
     end

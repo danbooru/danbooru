@@ -7,9 +7,9 @@ module Sources
         @post_url = "https://foundation.app/@dadachyo/~/103724"
         @post_with_video = "https://foundation.app/@huwari/~/88982"
         @image_url = "https://f8n-ipfs-production.imgix.net/QmPhpz6E9TFRpvdVTviM8Hy9o9rxrnPW5Ywj471NnSNkpi/nft.jpg"
-        @image1 = Sources::Strategies.find(@post_url)
-        @image2 = Sources::Strategies.find(@image_url)
-        @image3 = Sources::Strategies.find(@post_with_video)
+        @image1 = Source::Extractor.find(@post_url)
+        @image2 = Source::Extractor.find(@image_url)
+        @image3 = Source::Extractor.find(@post_with_video)
       end
 
       should "get the artist name" do
@@ -57,7 +57,7 @@ module Sources
       should "work" do
         page_url = "https://foundation.app/@asuka111art/dinner-with-cats-82426"
         image_url = "https://f8n-ipfs-production.imgix.net/Qma7Lz2LfFb4swoqzr1V43oRGh9xikgigM11g3EukdU61R/nft.png"
-        source = Sources::Strategies.find(page_url)
+        source = Source::Extractor.find(page_url)
 
         assert_equal("asuka111art", source.artist_name)
         assert_equal(["https://foundation.app/@asuka111art", "https://foundation.app/0x9A94f94626352566e0A9105F1e3DA0439E3e3783"], source.profile_urls)
@@ -69,7 +69,7 @@ module Sources
     context "for a f8n-production-collection-assets.imgix.net URL" do
       should "work" do
         image_url = "https://f8n-production-collection-assets.imgix.net/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/128711/QmcBfbeCMSxqYB3L1owPAxFencFx3jLzCPFx6xUBxgSCkH/nft.png?q=80&auto=format%2Ccompress&cs=srgb&h=640"
-        source = Sources::Strategies.find(image_url)
+        source = Source::Extractor.find(image_url)
 
         assert_equal("mochiiimo", source.artist_name)
         assert_equal(["https://foundation.app/@mochiiimo", "https://foundation.app/0x7E2ef75C0C09b2fc6BCd1C68B6D409720CcD58d2"], source.profile_urls)
@@ -82,25 +82,25 @@ module Sources
       should "get the image urls" do
         assert_equal(
           ["https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png"],
-          Sources::Strategies.find("https://foundation.app/@mochiiimo/~/97376").image_urls,
+          Source::Extractor.find("https://foundation.app/@mochiiimo/~/97376").image_urls,
         )
 
         assert_equal(
           ["https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png"],
-          Sources::Strategies.find("https://foundation.app/@mochiiimo/foundation/97376").image_urls,
+          Source::Extractor.find("https://foundation.app/@mochiiimo/foundation/97376").image_urls,
         )
 
         assert_equal(
           ["https://f8n-production-collection-assets.imgix.net/0xFb0a8e1bB97fD7231Cd73c489dA4732Ae87995F0/4/nft.png"],
-          Sources::Strategies.find("https://foundation.app/@KILLERGF/kgfgen/4").image_urls,
+          Source::Extractor.find("https://foundation.app/@KILLERGF/kgfgen/4").image_urls,
         )
       end
     end
 
     context "non-alphanumeric usernames" do
       should "still work" do
-        case1 = Sources::Strategies.find("https://foundation.app/@brandon.dalmer/~/6792")
-        case2 = Sources::Strategies.find("https://foundation.app/@~/~/6792")
+        case1 = Source::Extractor.find("https://foundation.app/@brandon.dalmer/~/6792")
+        case2 = Source::Extractor.find("https://foundation.app/@~/~/6792")
         image = "https://f8n-ipfs-production.imgix.net/QmVnpe39qodMjTe8v3fijPfB1tjwhT8hgobtgLPtsangqc/nft.png"
         assert_nothing_raised { case1.to_h }
         assert_nothing_raised { case2.to_h }
@@ -110,7 +110,7 @@ module Sources
     end
 
     should "parse UTF-8 commentaries correctly" do
-      source = Sources::Strategies.find("https://foundation.app/@SimaEnaga/~/107338")
+      source = Source::Extractor.find("https://foundation.app/@SimaEnaga/~/107338")
 
       assert_equal(<<~EOS, source.dtext_artist_commentary_desc)
         【須佐之男尊/Susanoo-no-Mikoto】

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Foundation
-module Sources
-  module Strategies
-    class Foundation < Base
+module Source
+  class Extractor
+    class Foundation < Source::Extractor
       def match?
         Source::URL::Foundation === parsed_url
       end

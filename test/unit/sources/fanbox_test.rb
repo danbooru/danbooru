@@ -4,9 +4,9 @@ module Sources
   class FanboxTest < ActiveSupport::TestCase
     context "A free Pixiv Fanbox post" do
       setup do
-        @post1 = Sources::Strategies.find("https://yanmi0308.fanbox.cc/posts/1141325")
-        @post2 = Sources::Strategies.find("https://chanxco.fanbox.cc/posts/209386")
-        @post3 = Sources::Strategies.find("https://downloads.fanbox.cc/images/post/209386/w/1200/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg")
+        @post1 = Source::Extractor.find("https://yanmi0308.fanbox.cc/posts/1141325")
+        @post2 = Source::Extractor.find("https://chanxco.fanbox.cc/posts/209386")
+        @post3 = Source::Extractor.find("https://downloads.fanbox.cc/images/post/209386/w/1200/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg")
 
         assert_nothing_raised { @post1.to_h }
         assert_nothing_raised { @post2.to_h }
@@ -95,7 +95,7 @@ module Sources
 
     context "an age-restricted fanbox post" do
       should "work" do
-        @source = Sources::Strategies.find("https://mfr.fanbox.cc/posts/1306390")
+        @source = Source::Extractor.find("https://mfr.fanbox.cc/posts/1306390")
 
         assert_nothing_raised { @source.to_h }
         assert_equal("mfr", @source.artist_name)
@@ -105,7 +105,7 @@ module Sources
 
     context "A link in the old format" do
       should "still work" do
-        post = Sources::Strategies.find("https://www.pixiv.net/fanbox/creator/1566167/post/39714")
+        post = Source::Extractor.find("https://www.pixiv.net/fanbox/creator/1566167/post/39714")
         assert_nothing_raised { post.to_h }
         assert_equal("https://omu001.fanbox.cc", post.profile_url)
         assert_equal("https://omu001.fanbox.cc/posts/39714", post.page_url)
@@ -116,7 +116,7 @@ module Sources
 
     context "A cover image" do
       should "still work" do
-        post = Sources::Strategies.find("https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/QqxYtuWdy4XWQx1ZLIqr4wvA.jpeg")
+        post = Source::Extractor.find("https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/QqxYtuWdy4XWQx1ZLIqr4wvA.jpeg")
         assert_nothing_raised { post.to_h }
         assert_downloaded(750_484, post.image_urls.sole)
         assert_equal("https://omu001.fanbox.cc", post.profile_url)
@@ -128,7 +128,7 @@ module Sources
 
     context "A dead profile picture from the old domain" do
       should "still find the artist" do
-        post = Sources::Strategies.find("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg")
+        post = Source::Extractor.find("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg")
         assert_equal("https://omu001.fanbox.cc", post.profile_url)
         artist = FactoryBot.create(:artist, name: "omu", url_string: "https://omu001.fanbox.cc")
         assert_equal([artist], post.artists)

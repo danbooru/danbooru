@@ -8,10 +8,10 @@ module Sources
         @adult_post_url = "https://www.plurk.com/p/omc64y"
         @image_url = "https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg"
         @profile_url = "https://www.plurk.com/redeyehare"
-        @post1 = Sources::Strategies.find(@post_url)
-        @post2 = Sources::Strategies.find(@image_url)
-        @post3 = Sources::Strategies.find(@profile_url)
-        @post4 = Sources::Strategies.find(@adult_post_url)
+        @post1 = Source::Extractor.find(@post_url)
+        @post2 = Source::Extractor.find(@image_url)
+        @post3 = Source::Extractor.find(@profile_url)
+        @post4 = Source::Extractor.find(@adult_post_url)
       end
 
       should "not raise errors" do

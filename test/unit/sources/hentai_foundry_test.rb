@@ -4,8 +4,8 @@ module Sources
   class HentaiFoundryTest < ActiveSupport::TestCase
     context "The source for a hentai foundry picture" do
       setup do
-        @image_1 = Sources::Strategies.find("https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda")
-        @image_2 = Sources::Strategies.find("https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png")
+        @image_1 = Source::Extractor.find("https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda")
+        @image_2 = Source::Extractor.find("https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png")
       end
 
       should "get the illustration id" do
@@ -52,7 +52,7 @@ module Sources
 
     context "An artist profile url" do
       setup do
-        @site = Sources::Strategies.find("https://www.hentai-foundry.com/user/Afrobull/profile")
+        @site = Source::Extractor.find("https://www.hentai-foundry.com/user/Afrobull/profile")
       end
 
       should "get the profile url" do
@@ -66,7 +66,7 @@ module Sources
 
     context "A deleted picture" do
       setup do
-        @image = Sources::Strategies.find("https://www.hentai-foundry.com/pictures/user/faustsketcher/279498")
+        @image = Source::Extractor.find("https://www.hentai-foundry.com/pictures/user/faustsketcher/279498")
         @artist = FactoryBot.create(:artist, name: "faustsketcher", url_string: @image.url)
       end
 
@@ -92,7 +92,7 @@ module Sources
 
     context "a post with a deeply nested commentary" do
       should "work" do
-        @source = Sources::Strategies.find("https://hentai-foundry.com/pictures/user/LumiNyu/867562/Mona-patreon-winner")
+        @source = Source::Extractor.find("https://hentai-foundry.com/pictures/user/LumiNyu/867562/Mona-patreon-winner")
         assert_nothing_raised { @source.to_h }
       end
     end

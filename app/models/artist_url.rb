@@ -53,7 +53,7 @@ class ArtistURL < ApplicationRecord
     elsif url.include?("*")
       where_ilike(attr, url)
     else
-      profile_url = Sources::Strategies.find(url).profile_url || url
+      profile_url = Source::Extractor.find(url).profile_url || url
       where(attr => normalize_normalized_url(profile_url))
     end
   end

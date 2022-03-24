@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Weibo
-module Sources
-  module Strategies
-    class Weibo < Base
-
+module Source
+  class Extractor
+    class Weibo < Source::Extractor
       def match?
         Source::URL::Weibo === parsed_url
       end

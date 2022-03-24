@@ -3,7 +3,7 @@ require "test_helper"
 module Sources
   class MoebooruTest < ActiveSupport::TestCase
     def assert_source_data_equals(url, referer = nil, site_name: nil, image_url: nil, page_url: nil, size: nil, tags: [], profile_url: nil, **params)
-      site = Sources::Strategies.find(url, referer)
+      site = Source::Extractor.find(url, referer)
 
       assert_equal(site_name, site.site_name)
       assert_equal([image_url], site.image_urls)

@@ -156,7 +156,7 @@ class Artist < ApplicationRecord
       end
 
       if source.present?
-        artist = Sources::Strategies.find(source).new_artist
+        artist = Source::Extractor.find(source).new_artist
         artist.attributes = params
       else
         artist = Artist.new(params)
@@ -252,7 +252,7 @@ class Artist < ApplicationRecord
       elsif query.include?("*")
         where(id: ArtistURL.where_like(:url, query).select(:artist_id))
       elsif query =~ %r{\Ahttps?://}i
-        url = Sources::Strategies.find(query).profile_url || query
+        url = Source::Extractor.find(query).profile_url || query
         ArtistFinder.find_artists(url)
       else
         where(id: ArtistURL.where_like(:url, "*#{query}*").select(:artist_id))

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # @see Source::URL::NicoSeiga
-module Sources
-  module Strategies
-    class NicoSeiga < Base
+module Source
+  class Extractor
+    class NicoSeiga < Source::Extractor
       def self.enabled?
         Danbooru.config.nico_seiga_user_session.present?
       end

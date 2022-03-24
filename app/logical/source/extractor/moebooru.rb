@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Moebooru
-module Sources
-  module Strategies
-    class Moebooru < Base
-      delegate :artist_name, :profile_url, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_strategy, allow_nil: true
+module Source
+  class Extractor
+    class Moebooru < Source::Extractor
+      delegate :artist_name, :profile_url, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
       delegate :site_name, :domain, to: :parsed_url
 
       def match?
@@ -27,7 +27,7 @@ module Sources
         end
       end
 
-      # XXX the base strategy excludes artist tags from the translated tags; we don't want that for moebooru.
+      # XXX the base extractor excludes artist tags from the translated tags; we don't want that for moebooru.
       def translated_tags
         tags.map(&:first).flat_map(&method(:translate_tag)).uniq.sort
       end
@@ -50,8 +50,8 @@ module Sources
       memoize :api_response
 
       concerning :HelperMethods do
-        def sub_strategy
-          @sub_strategy ||= Sources::Strategies.find(api_response[:source], default: nil)
+        def sub_extractor
+          @sub_extractor ||= Source::Extractor.find(api_response[:source], default: nil)
         end
 
         def file_ext
