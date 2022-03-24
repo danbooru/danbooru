@@ -181,7 +181,7 @@ class Source::URL::Null < Source::URL
     in _, "nocookie.net", wiki, "images", /^\h$/, /^\h\h$/, file, *rest
       @wiki = wiki
       @file = file
-      @page_url = "https://#{wiki}.fandom.com/wiki/File:#{file}"
+      @page_url = "https://#{wiki}.fandom.com/?file=#{file}"
 
     # https://static.zerochan.net/Fullmetal.Alchemist.full.2831797.png
     # https://s1.zerochan.net/Cocoa.Cookie.600.2957938.jpg
