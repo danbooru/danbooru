@@ -9,7 +9,6 @@ module Sources
         assert_equal("Pixiv Sketch", source.site_name)
         assert_equal(["https://img-sketch.pixiv.net/uploads/medium/file/9986983/8431631593768139653.jpg"], source.image_urls)
         assert_equal("https://sketch.pixiv.net/items/5835314698645024323", source.page_url)
-        assert_equal("https://sketch.pixiv.net/items/5835314698645024323", source.canonical_url)
         assert_equal("https://sketch.pixiv.net/@user_ejkv8372", source.profile_url)
         assert_equal(["https://sketch.pixiv.net/@user_ejkv8372", "https://www.pixiv.net/users/44772126"], source.profile_urls)
         assert_equal("user_ejkv8372", source.artist_name)
@@ -25,7 +24,6 @@ module Sources
 
         assert_equal(["https://img-sketch.pixiv.net/uploads/medium/file/9988973/7216948861306830496.jpg"], source.image_urls)
         assert_nil(source.page_url)
-        assert_equal(source.url, source.canonical_url)
         assert_nil(source.profile_url)
         assert_equal([], source.profile_urls)
         assert_nil(source.artist_name)
@@ -39,7 +37,6 @@ module Sources
         source = Sources::Strategies.find("https://img-sketch.pixiv.net/uploads/medium/file/9988973/7216948861306830496.jpg", "https://sketch.pixiv.net/items/8052785510155853613")
 
         assert_equal("https://sketch.pixiv.net/items/8052785510155853613", source.page_url)
-        assert_equal("https://sketch.pixiv.net/items/8052785510155853613", source.canonical_url)
         assert_equal("https://sketch.pixiv.net/@op-one", source.profile_url)
         assert_equal(["https://sketch.pixiv.net/@op-one", "https://www.pixiv.net/users/5903369"], source.profile_urls)
         assert_equal("op-one", source.artist_name)
@@ -54,7 +51,6 @@ module Sources
 
         assert_equal(["https://img-sketch.pixiv.net/uploads/medium/file/884876/4909517173982299587.jpg"], source.image_urls)
         assert_equal("https://sketch.pixiv.net/items/193462611994864256", source.page_url)
-        assert_equal("https://sketch.pixiv.net/items/193462611994864256", source.canonical_url)
         assert_equal("https://sketch.pixiv.net/@lithla", source.profile_url)
         assert_equal(["https://sketch.pixiv.net/@lithla", "https://www.pixiv.net/users/4957"], source.profile_urls)
         assert_equal("lithla", source.artist_name)
@@ -80,7 +76,6 @@ module Sources
           https://img-sketch.pixiv.net/uploads/medium/file/9988973/7216948861306830496.jpg
         ], source.image_urls)
         assert_equal("https://sketch.pixiv.net/items/8052785510155853613", source.page_url)
-        assert_equal("https://sketch.pixiv.net/items/8052785510155853613", source.canonical_url)
         assert_equal("https://sketch.pixiv.net/@op-one", source.profile_url)
         assert_equal("op-one", source.artist_name)
         assert_equal(<<~EOS.normalize_whitespace, source.artist_commentary_desc)

@@ -20,7 +20,6 @@ module Sources
         assert_equal("aeror404", @site.artist_name)
         assert_equal("https://www.deviantart.com/aeror404", @site.profile_url)
         assert_equal("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484", @site.page_url)
-        assert_equal("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484", @site.canonical_url)
         assert_equal("Holiday Elincia", @site.artist_commentary_title)
       end
     end
@@ -31,7 +30,6 @@ module Sources
         @artist = create(:artist, name: "nickbeja", url_string: "https://nickbeja.deviantart.com")
 
         assert_equal(["https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png"], @site.image_urls)
-        assert_equal(@site.page_url, @site.canonical_url)
         assert_equal("nickbeja", @site.artist_name)
         assert_equal("https://www.deviantart.com/nickbeja", @site.profile_url)
         assert_equal("https://www.deviantart.com/nickbeja/art/Mindflayer-Girl01-708675884", @site.page_url)
@@ -53,7 +51,6 @@ module Sources
         assert_equal("https://www.deviantart.com/noizave", @site.profile_url)
         assert_equal("test, no download", @site.artist_commentary_title)
         assert_equal("https://www.deviantart.com/noizave/art/test-no-download-697415967", @site.page_url)
-        assert_equal("https://www.deviantart.com/noizave/art/test-no-download-697415967", @site.canonical_url)
       end
     end
 
@@ -69,7 +66,6 @@ module Sources
         assert_equal("https://www.deviantart.com/len1", @site.profile_url)
         assert_equal("All that Glitters II", @site.artist_commentary_title)
         assert_equal("https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781", @site.page_url)
-        assert_equal("https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781", @site.canonical_url)
       end
     end
 
@@ -84,7 +80,6 @@ module Sources
         assert_equal("hideyoshi", @site.artist_name)
         assert_equal("https://www.deviantart.com/hideyoshi", @site.profile_url)
         assert_equal("https://www.deviantart.com/hideyoshi/art/Legend-of-Galactic-Heroes-635721022", @site.page_url)
-        assert_equal("https://www.deviantart.com/hideyoshi/art/Legend-of-Galactic-Heroes-635721022", @site.canonical_url)
         assert_equal(%w[barbarossa bay brunhild flare hangar odin planet ship spaceship sun sunset brünhild legendsofgalacticheroes].sort, @site.tags.map(&:first).sort)
       end
     end
@@ -98,7 +93,6 @@ module Sources
         assert_downloaded(3619, @site.image_urls.sole)
 
         assert_equal("https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408", @site.page_url)
-        assert_equal("https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408", @site.canonical_url)
 
         assert_equal("noizave", @site.artist_name)
         assert_equal("https://www.deviantart.com/noizave", @site.profile_url)
@@ -156,7 +150,6 @@ module Sources
           assert_equal("47ness", @site.artist_name)
           assert_equal("https://www.deviantart.com/47ness", @site.profile_url)
           assert_nil(@site.page_url)
-          assert_equal(@site.image_urls.sole, @site.canonical_url)
           assert_equal([@artist], @site.artists)
           assert_nothing_raised { @site.to_h }
         end
@@ -173,7 +166,6 @@ module Sources
           assert_equal("47ness", @site.artist_name)
           assert_equal("https://www.deviantart.com/47ness", @site.profile_url)
           assert_equal("https://www.deviantart.com/47ness/art/Cool-Like-Me-54339311", @site.page_url)
-          assert_equal(@site.page_url, @site.canonical_url)
           assert_equal([@artist], @site.artists)
           assert_nothing_raised { @site.to_h }
         end
@@ -195,7 +187,6 @@ module Sources
           assert_nil(@site.artist_name)
           assert_nil(@site.profile_url)
           assert_nil(@site.page_url)
-          assert_equal(@site.image_urls.sole, @site.canonical_url)
           assert_equal([], @site.artists)
           assert_nothing_raised { @site.to_h }
         end
@@ -209,7 +200,6 @@ module Sources
           assert_equal("edsfox", @site.artist_name)
           assert_equal("https://www.deviantart.com/edsfox", @site.profile_url)
           assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", @site.page_url)
-          assert_equal(@site.page_url, @site.canonical_url)
           assert_equal([@artist], @site.artists)
           assert_nothing_raised { @site.to_h }
         end
@@ -231,7 +221,6 @@ module Sources
           assert_equal("edsfox", @site.artist_name)
           assert_equal("https://www.deviantart.com/edsfox", @site.profile_url)
           assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", @site.page_url)
-          assert_equal(@site.page_url, @site.canonical_url)
           assert_equal([@artist], @site.artists)
           assert_nothing_raised { @site.to_h }
         end
@@ -250,7 +239,6 @@ module Sources
           @site = Sources::Strategies.find(@url, @ref)
 
           assert_equal(@ref, @site.page_url)
-          assert_equal(@ref, @site.canonical_url)
           assert_equal([@artist], @site.artists)
           assert_nothing_raised { @site.to_h }
         end

@@ -11,10 +11,6 @@ module Sources
         nil
       end
 
-      def canonical_url
-        url
-      end
-
       def artists
         ArtistFinder.find_artists(url)
       end

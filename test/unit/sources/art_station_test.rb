@@ -11,8 +11,8 @@ module Sources
         assert_equal(["https://cdn.artstation.com/p/assets/images/images/000/705/368/4k/jey-rain-one1.jpg?1443931773"], @site.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://jeyrain.artstation.com/projects/04XA4", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://jeyrain.artstation.com/projects/04XA4", @site.page_url)
       end
 
       should "get the profile" do
@@ -43,8 +43,8 @@ module Sources
         assert_equal([url], @site.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://dantewontdie.artstation.com/projects/YZK5q", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://dantewontdie.artstation.com/projects/YZK5q", @site.page_url)
       end
 
       should "get the profile" do
@@ -94,7 +94,6 @@ module Sources
 
           assert_equal(["https://cdn.artstation.com/p/assets/images/images/006/029/978/4k/amama-l-z.jpg"], site.image_urls)
           assert_equal("https://amama.artstation.com/projects/4BWW2", site.page_url)
-          assert_equal("https://amama.artstation.com/projects/4BWW2", site.canonical_url)
           assert_equal("https://www.artstation.com/amama", site.profile_url)
           assert_equal("amama", site.artist_name)
           assert_nothing_raised { site.to_h }
@@ -178,7 +177,6 @@ module Sources
         assert_equal("fiship", site.artist_name)
         assert_equal("https://www.artstation.com/fiship", site.profile_url)
         assert_equal(url, site.page_url)
-        assert_equal(url, site.canonical_url)
         assert_equal([], site.image_urls)
         assert_nothing_raised { site.to_h }
       end

@@ -103,7 +103,6 @@ class Source::URL::Moebooru < Source::URL
       filename_prefix = "Konachan.com%20-%20"
     end
 
-    # try to include the post_id so that it's saved for posterity in the canonical_url.
     if post_id.present?
       "https://#{file_host}/image/#{md5}/#{filename_prefix}#{post_id}.#{file_ext}"
     else

@@ -120,7 +120,7 @@ module Sources
         assert_nothing_raised { post.to_h }
         assert_downloaded(750_484, post.image_urls.sole)
         assert_equal("https://omu001.fanbox.cc", post.profile_url)
-        assert_equal(post.profile_url, post.canonical_url)
+        assert_equal(post.profile_url, post.page_url)
         artist = FactoryBot.create(:artist, name: "omu", url_string: "https://omu001.fanbox.cc")
         assert_equal([artist], post.artists)
       end

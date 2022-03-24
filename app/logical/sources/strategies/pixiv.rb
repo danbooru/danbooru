@@ -57,10 +57,6 @@ module Sources
         "https://www.pixiv.net/artworks/#{illust_id}"
       end
 
-      def canonical_url
-        image_urls.first
-      end
-
       def profile_url
         if api_illust[:userId].present?
           "https://www.pixiv.net/users/#{api_illust[:userId]}"
@@ -128,7 +124,7 @@ module Sources
       end
 
       def related_posts_search_query
-        illust_id.present? ? "pixiv:#{illust_id}" : "source:#{canonical_url}"
+        illust_id.present? ? "pixiv:#{illust_id}" : "source:#{url}"
       end
 
       def is_ugoira?

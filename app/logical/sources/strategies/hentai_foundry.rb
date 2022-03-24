@@ -47,10 +47,6 @@ module Sources
         parsed_url.username || parsed_referer&.username
       end
 
-      def canonical_url
-        image_urls.first
-      end
-
       def profile_url
         return nil if artist_name.blank?
         "https://www.hentai-foundry.com/user/#{artist_name}"

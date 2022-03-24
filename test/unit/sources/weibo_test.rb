@@ -29,8 +29,8 @@ module Sources
         assert_equal("https://www.weibo.com/u/5501756072", @site.profile_url)
       end
 
-      should "set the right source" do
-        assert_equal("https://www.weibo.com/5501756072/J2UNKfbqV", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://www.weibo.com/5501756072/J2UNKfbqV", @site.page_url)
       end
 
       should "download an image" do
@@ -79,12 +79,12 @@ module Sources
     end
 
     context "A multi-page upload" do
-      should "set the right source" do
+      should "get the page url" do
         url = "https://wx1.sinaimg.cn/large/7eb64558gy1fnbryriihwj20dw104wtu.jpg"
         ref = "https://photo.weibo.com/2125874520/wbphotos/large/mid/4194742441135220/pid/7eb64558gy1fnbryb5nzoj20dw10419t"
         site = Sources::Strategies.find(url, ref)
 
-        assert_equal("https://www.weibo.com/2125874520/FDKGo4Lk0", site.canonical_url)
+        assert_equal("https://www.weibo.com/2125874520/FDKGo4Lk0", site.page_url)
       end
     end
 
@@ -106,7 +106,6 @@ module Sources
         ], @site.image_urls)
 
         assert_equal("https://www.weibo.com/5501756072/J2UNKfbqV", @site.page_url)
-        assert_equal("https://www.weibo.com/5501756072/J2UNKfbqV", @site.canonical_url)
         assert_equal("https://www.weibo.com/u/5501756072", @site.profile_url)
         assert_equal(%w[fgo Alter组], @site.tags.map(&:first))
         assert_equal("阿尔托莉雅厨", @site.artist_name)

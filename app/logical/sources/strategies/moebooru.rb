@@ -21,10 +21,6 @@ module Sources
         "https://#{domain}/post/show/#{post_id}"
       end
 
-      def canonical_url
-        image_urls.first
-      end
-
       def tags
         api_response[:tags].to_s.split.map do |tag|
           [tag, "https://#{domain}/post?tags=#{CGI.escape(tag)}"]

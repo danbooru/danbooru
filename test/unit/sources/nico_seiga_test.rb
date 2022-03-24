@@ -53,10 +53,10 @@ module Sources
         9.times { |n| assert_match(expected[n], @site_3.image_urls[n]) }
       end
 
-      should "get the canonical url" do
-        assert_equal("https://seiga.nicovideo.jp/image/source/4937663", @site_1.canonical_url)
-        assert_equal("https://seiga.nicovideo.jp/seiga/im4937663", @site_2.canonical_url)
-        assert_equal("https://seiga.nicovideo.jp/watch/mg470189", @site_3.canonical_url)
+      should "get the page url" do
+        assert_equal("https://seiga.nicovideo.jp/image/source/4937663", @site_1.page_url)
+        assert_equal("https://seiga.nicovideo.jp/seiga/im4937663", @site_2.page_url)
+        assert_equal("https://seiga.nicovideo.jp/watch/mg470189", @site_3.page_url)
       end
 
       should "get the tags" do
@@ -83,7 +83,7 @@ module Sources
         site = Sources::Strategies.find("https://lohas.nicoseiga.jp/thumb/6844226i")
 
         assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/6844226!, site.image_urls.sole)
-        assert_match("https://seiga.nicovideo.jp/seiga/im6844226", site.canonical_url)
+        assert_match("https://seiga.nicovideo.jp/seiga/im6844226", site.page_url)
       end
     end
 
@@ -98,8 +98,8 @@ module Sources
         assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/9146749!, @site.image_urls.sole)
       end
 
-      should "set the correct source" do
-        assert_equal(@ref, @site.canonical_url)
+      should "get the page url" do
+        assert_equal(@ref, @site.page_url)
       end
     end
 

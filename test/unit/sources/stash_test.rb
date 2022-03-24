@@ -18,7 +18,6 @@ module Sources
         assert_equal("This is a test.", @site.artist_commentary_desc)
 
         assert_equal("https://sta.sh/0wxs31o7nn2", @site.page_url)
-        assert_equal("https://sta.sh/0wxs31o7nn2", @site.canonical_url)
         assert_match("https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dcmga0s-a345a815-2436-4ab5-8941-492011e1bff6.png", @site.image_urls.sole)
       end
     end
@@ -35,7 +34,6 @@ module Sources
           assert_equal("This is a test.", @site.artist_commentary_desc)
 
           assert_equal("https://sta.sh/0wxs31o7nn2", @site.page_url)
-          assert_equal("https://sta.sh/0wxs31o7nn2", @site.canonical_url)
           assert_match("https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dcmga0s-a345a815-2436-4ab5-8941-492011e1bff6.png", @site.image_urls.sole)
         end
       end

@@ -70,8 +70,8 @@ module Sources
         assert_equal(["https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png"], @site.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://noizave.tumblr.com/post/162206271767", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://noizave.tumblr.com/post/162206271767", @site.page_url)
       end
 
       should "get the artist" do
@@ -92,8 +92,8 @@ module Sources
         assert_equal(["https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png"], @site.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://noizave.tumblr.com/post/162206271767", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://noizave.tumblr.com/post/162206271767", @site.page_url)
       end
 
       should "get the tags" do
@@ -116,7 +116,7 @@ module Sources
           assert_equal("noizave", site.artist_name)
           assert_equal("https://noizave.tumblr.com", site.profile_url)
           assert_equal(["tag1", "tag2"], site.tags.map(&:first))
-          assert_equal(@ref, site.canonical_url)
+          assert_equal(@ref, site.page_url)
           assert_equal(["https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"], site.image_urls)
         end
       end
@@ -128,7 +128,7 @@ module Sources
           assert_equal("noizave", site.artist_name)
           assert_equal("https://noizave.tumblr.com", site.profile_url)
           assert_equal(["tag1", "tag2"], site.tags.map(&:first))
-          assert_equal(@ref, site.canonical_url)
+          assert_equal(@ref, site.page_url)
           assert_equal(["https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"], site.image_urls)
         end
       end
@@ -165,7 +165,7 @@ module Sources
         ]
 
         assert_equal(urls, site.image_urls)
-        assert_equal(url, site.canonical_url)
+        assert_equal(url, site.page_url)
       end
     end
 
@@ -184,8 +184,8 @@ module Sources
         assert_match("test answer", @site.artist_commentary_desc)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://noizave.tumblr.com/post/171237880542", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://noizave.tumblr.com/post/171237880542", @site.page_url)
       end
     end
 
@@ -196,7 +196,7 @@ module Sources
         strategy = Sources::Strategies.find(image_url, page_url)
 
         assert_match(%r{/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s\d+x\d+/}i, image_url)
-        assert_equal(page_url, strategy.canonical_url)
+        assert_equal(page_url, strategy.page_url)
         assert_downloaded(7_428_704, strategy.image_urls.sole)
       end
     end
@@ -209,7 +209,6 @@ module Sources
         assert_equal("shimetsukage", site.artist_name)
         assert_equal("https://shimetsukage.tumblr.com", site.profile_url)
         assert_equal("https://shimetsukage.tumblr.com/post/176805588268", site.page_url)
-        assert_equal("https://shimetsukage.tumblr.com/post/176805588268", site.canonical_url)
         assert_equal([], site.image_urls)
         assert_equal([], site.tags)
       end

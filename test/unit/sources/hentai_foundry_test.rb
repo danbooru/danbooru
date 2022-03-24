@@ -33,11 +33,6 @@ module Sources
         assert_equal(["https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png"], @image_2.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png", @image_1.canonical_url)
-        assert_equal("https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png", @image_2.canonical_url)
-      end
-
       should "download an image" do
         assert_downloaded(1_349_887, @image_1.image_urls.sole)
         assert_downloaded(1_349_887, @image_2.image_urls.sole)

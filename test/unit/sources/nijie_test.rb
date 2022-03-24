@@ -51,8 +51,8 @@ module Sources
         assert_downloaded(132_555, @site.image_urls.sole)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://nijie.info/view.php?id=213043", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://nijie.info/view.php?id=213043", @site.page_url)
       end
 
       should "get the profile" do
@@ -120,8 +120,8 @@ module Sources
         assert_equal(["https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg"], @site.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://nijie.info/view.php?id=213043", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://nijie.info/view.php?id=213043", @site.page_url)
       end
 
       should "get the profile" do
@@ -142,8 +142,8 @@ module Sources
         assert_equal(["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"], @site.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://nijie.info/view.php?id=213043", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://nijie.info/view.php?id=213043", @site.page_url)
       end
 
       should "get the profile" do
@@ -191,7 +191,6 @@ module Sources
 
         assert_nil(site.page_url)
         assert_equal([image_url], site.image_urls)
-        assert_equal(image_url, site.canonical_url)
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
         assert_nothing_raised { site.to_h }
       end
@@ -202,7 +201,6 @@ module Sources
         site = Sources::Strategies.find("https://pic.nijie.net/03/nijie_picture/diff/main/218856_4_236014_20170620101333.png")
 
         assert_equal("https://nijie.info/view.php?id=218856", site.page_url)
-        assert_equal("https://nijie.info/view.php?id=218856", site.canonical_url)
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
         assert_equal("名無しのチンポップ", site.artist_name)
         assert_equal([site.url], site.image_urls)
@@ -214,7 +212,6 @@ module Sources
         site = Sources::Strategies.find("https://pic.nijie.net/04/nijie_picture/diff/main/287736_161475_20181112032855_1.png")
 
         assert_equal("https://nijie.info/view.php?id=287736", site.page_url)
-        assert_equal("https://nijie.info/view.php?id=287736", site.canonical_url)
         assert_equal("https://nijie.info/members.php?id=161475", site.profile_url)
         assert_equal("みな本", site.artist_name)
         assert_equal([site.url], site.image_urls)

@@ -30,7 +30,7 @@ module Sources
       should "get the correct urls" do
         @site = Sources::Strategies.find("https://twitter.com/CincinnatiZoo/status/859073537713328129")
         assert_equal(["https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4"], @site.image_urls)
-        assert_equal("https://twitter.com/CincinnatiZoo/status/859073537713328129", @site.canonical_url)
+        assert_equal("https://twitter.com/CincinnatiZoo/status/859073537713328129", @site.page_url)
       end
 
       should "work when given a video thumbnail" do
@@ -71,8 +71,8 @@ module Sources
         assert_equal(["https://pbs.twimg.com/media/C1kt72yVEAEGpOv.jpg:orig"], @site.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://twitter.com/aranobu/status/817736083567820800", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://twitter.com/aranobu/status/817736083567820800", @site.page_url)
       end
     end
 
@@ -84,7 +84,6 @@ module Sources
       should "get the urls" do
         assert_equal(["https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:orig"], @site.image_urls)
         assert_equal("https://twitter.com/Strangestone/status/556440271961858051", @site.page_url)
-        assert_equal("https://twitter.com/Strangestone/status/556440271961858051", @site.canonical_url)
       end
     end
 
@@ -119,8 +118,8 @@ module Sources
         assert_equal(["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"], @site.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://twitter.com/nounproject/status/540944400767922176", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://twitter.com/nounproject/status/540944400767922176", @site.page_url)
       end
 
       should "get the tags" do
@@ -174,7 +173,6 @@ module Sources
 
       should "work" do
         assert_equal(["https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig"], @site.image_urls)
-        assert_equal("https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig", @site.canonical_url)
       end
 
       should "work for filenames containing dashes" do
@@ -192,8 +190,8 @@ module Sources
         assert_equal("https://twitter.com/motty08111213", @site.profile_url)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://twitter.com/motty08111213/status/943446161586733056", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://twitter.com/motty08111213/status/943446161586733056", @site.page_url)
       end
     end
 

@@ -73,7 +73,6 @@ module Sources
           @site = Sources::Strategies.find("https://www.pixiv.net/en/artworks/64476642")
 
           assert_equal(["https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg"], @site.image_urls)
-          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.canonical_url)
           assert_equal("https://www.pixiv.net/artworks/64476642", @site.page_url)
 
           @site = Sources::Strategies.find("https://www.pixiv.net/artworks/64476642")
@@ -152,8 +151,8 @@ module Sources
           assert_equal(["https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg"], @site.image_urls)
         end
 
-        should "get the full size image url for the canonical url" do
-          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.canonical_url)
+        should "get the page url" do
+          assert_equal("https://www.pixiv.net/artworks/64476642", @site.page_url)
         end
       end
 

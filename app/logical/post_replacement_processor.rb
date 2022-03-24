@@ -9,7 +9,7 @@ class PostReplacementProcessor
   end
 
   def process!
-    media_file = get_file_for_upload(replacement.replacement_url, nil, replacement.replacement_file&.tempfile)
+    media_file, image_url = get_file_for_upload(replacement.replacement_url, nil, replacement.replacement_file&.tempfile)
 
     if Post.where.not(id: post.id).exists?(md5: media_file.md5)
       raise "Duplicate of post ##{Post.find_by_md5(media_file.md5).id}"
@@ -23,8 +23,10 @@ class PostReplacementProcessor
 
     if replacement.replacement_file.present?
       canonical_url = "file://#{replacement.replacement_file.original_filename}"
+    elsif Source::URL.page_url(image_url).present?
+      canonical_url = image_url
     else
-      canonical_url = Sources::Strategies.find(replacement.replacement_url).canonical_url
+      canonical_url = replacement.replacement_url
     end
 
     replacement.replacement_url = canonical_url
@@ -70,6 +72,9 @@ class PostReplacementProcessor
     image_urls = strategy.image_urls
     raise "#{source_url} contains multiple images" if image_urls.size > 1
 
-    strategy.download_file!(image_urls.first)
+    image_url = image_urls.first
+    file = strategy.download_file!(image_url)
+
+    [file, image_url]
   end
 end

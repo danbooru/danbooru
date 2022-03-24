@@ -19,8 +19,8 @@ module Sources
         assert_equal(["https://skeb.imgix.net/uploads/origins/307941e9-dbe0-4e4b-93d4-94accdaff9a0?bg=%23fff&auto=format&w=800&s=e0ddfb1fa0d9f23797b338598aae78fa"], @site.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal("https://skeb.jp/@kokuzou593/works/45", @site.canonical_url)
+      should "get the page url" do
+        assert_equal("https://skeb.jp/@kokuzou593/works/45", @site.page_url)
       end
 
       should "find the correct artist" do

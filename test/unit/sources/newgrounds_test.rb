@@ -30,9 +30,9 @@ module Sources
         assert_equal([@image_url], @image_2.image_urls)
       end
 
-      should "get the canonical url" do
-        assert_equal(@url, @image_1.canonical_url)
-        assert_equal(@image_url, @image_2.canonical_url)
+      should "get the page url" do
+        assert_equal(@url, @image_1.page_url)
+        assert_equal(@url, @image_2.page_url)
       end
 
       should "download an image" do

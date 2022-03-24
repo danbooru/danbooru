@@ -65,18 +65,21 @@ module Sources
         []
       end
 
-      # Whatever <tt>url</tt> is, this method should return a link to the HTML
-      # page containing the resource. It should not be a binary file. It will
-      # eventually be assigned as the source for the post, but it does not
-      # represent what the downloader will fetch.
+      # The URL of the page containing the image, or nil if it can't be found.
+      #
+      # The source of the post will be set to the page URL if it's not possible
+      # to convert the image URL to a page URL for this site.
+      #
+      # For example, for sites like Twitter and Tumblr, it's not possible to
+      # convert image URLs to page URLs, so the page URL will be used as the
+      # source for these sites. For sites like Pixiv and DeviantArt, it is
+      # possible to convert image URLs to page URLs, so the image URL will be
+      # used as the source for these sites. This is determined by whether
+      # `Source::URL#page_url` returns a URL or nil.
+      #
+      # @return [String, nil]
       def page_url
         nil
-      end
-
-      # This will be the url stored in posts. Typically this is the page
-      # url, but on some sites it may be preferable to store the image url.
-      def canonical_url
-        page_url || image_urls.first
       end
 
       # A name to suggest as the artist's tag name when creating a new artist.
@@ -197,7 +200,7 @@ module Sources
       # uploaded from the same source. These may be duplicates, or they may be
       # other posts from the same gallery.
       def related_posts_search_query
-        "source:#{canonical_url}"
+        "source:#{url}"
       end
 
       def related_posts(limit = 5)
@@ -222,7 +225,6 @@ module Sources
           :artists => artists.as_json(include: :sorted_urls),
           :image_urls => image_urls,
           :page_url => page_url,
-          :canonical_url => canonical_url,
           :tags => tags,
           :normalized_tags => normalized_tags,
           :translated_tags => translated_tags,

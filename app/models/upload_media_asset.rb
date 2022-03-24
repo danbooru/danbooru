@@ -65,6 +65,20 @@ class UploadMediaAsset < ApplicationRecord
     source_url.starts_with?("file://")
   end
 
+  # The source of the post after upload.
+  def canonical_url
+    return source_url if file_upload?
+
+    # If the image URL is convertible to a page URL, or the page URL couldn't
+    # be found, then use the image URL as the source of the post. Otherwise,
+    # use the page URL.
+    if Source::URL.page_url(source_url).present? || page_url.blank?
+      source_url
+    else
+      page_url
+    end
+  end
+
   def source_strategy
     return nil if source_url.blank?
     Sources::Strategies.find(source_url, page_url)

@@ -88,6 +88,9 @@ module Source
     # When viewing a post, the source will be shown as the page URL if it's
     # possible to convert the source from an image URL to a page URL.
     #
+    # When uploading a post, the source will be set to the image URL if the
+    # image URL is convertible to a page URL. Otherwise, it's set to the page URL.
+    #
     # Examples:
     #
     # * https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png

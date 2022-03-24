@@ -31,7 +31,7 @@
               <th>Artist</th>
               <td>
                 <%= external_link_to @source.profile_url, @source.artist_name %>
-                (<%= link_to "Create new artist", new_artist_path(artist: { source: @source.canonical_url }) %>)
+                (<%= link_to "Create new artist", new_artist_path(artist: { source: @source.page_url || @source.url }) %>)
               </td>
             </tr>
           <% end %>

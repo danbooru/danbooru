@@ -7,7 +7,6 @@ module Sources
 
       assert_equal(site_name, site.site_name)
       assert_equal([image_url], site.image_urls)
-      assert_equal(image_url, site.canonical_url)
       assert_equal(page_url, site.page_url) if page_url.present?
       assert_equal(tags.sort, site.tags.map(&:first).sort)
       assert_equal(profile_url.to_s, site.profile_url.to_s)

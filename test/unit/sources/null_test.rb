@@ -13,7 +13,6 @@ module Sources
 
       should "find the metadata" do
         assert_equal(["http://oremuhax.x0.com/yoro1603.jpg"], @site.image_urls)
-        assert_equal("http://oremuhax.x0.com/yoro1603.jpg", @site.canonical_url)
         assert_nil(@site.artist_name)
         assert_nil(@site.profile_url)
         assert_nothing_raised { @site.to_h }

@@ -31,9 +31,5 @@ module Sources
       strategy = all.lazy.map { |s| s.new(url, referer) }.detect(&:match?)
       strategy || default&.new(url, referer)
     end
-
-    def self.canonical(url, referer)
-      find(url, referer).canonical_url
-    end
   end
 end

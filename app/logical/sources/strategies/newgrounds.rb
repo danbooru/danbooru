@@ -75,15 +75,6 @@ module Sources
         DText.from_html(artist_commentary_desc)
       end
 
-      # The image url should be the post source, if we can generate the page url from the image url.
-      def canonical_url
-        if page_url.present?
-          url
-        else
-          page_url
-        end
-      end
-
       def user_name
         parsed_url.username || parsed_referer&.username
       end
