@@ -25,7 +25,7 @@ class TagNameValidator < ActiveModel::EachValidator
       record.errors.add(attribute, "'#{value}' cannot contain asterisks ('*')")
     when /,/
       record.errors.add(attribute, "'#{value}' cannot contain commas (',')")
-    when /\A[-~_`%){}\]\/]/
+    when /\A[-~_`%(){}\[\]\/]/
       record.errors.add(attribute, "'#{value}' cannot begin with a '#{value[0]}'")
     when /_\z/
       record.errors.add(attribute, "'#{value}' cannot end with an underscore")
@@ -39,7 +39,7 @@ class TagNameValidator < ActiveModel::EachValidator
       record.errors.add(attribute, "'#{value}' cannot begin with '#{$1}:'")
     when /\A(#{Tag.categories.regexp}):(.+)\z/i
       record.errors.add(attribute, "'#{value}' cannot begin with '#{$1}:'")
-    when "new", "search"
+    when "new", "search", "and", "or", "not"
       record.errors.add(attribute, "'#{value}' is a reserved name and cannot be used")
     when /\A(.+)_\(cosplay\)\z/i
       # XXX don't allow aliases here?
