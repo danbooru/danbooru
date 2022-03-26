@@ -200,6 +200,11 @@ class ArtistTest < ActiveSupport::TestCase
       assert_artist_found("warhol", "http://warhol.com/x/test.jpg")
     end
 
+    should "not return duplicates if too many artists found" do
+      create_list(:artist, 5, url_string: "https://www.example.com")
+      assert_artist_not_found("https://www.example.com/image.jpg")
+    end
+
     should "not include duplicate urls" do
       artist = FactoryBot.create(:artist, :url_string => "http://foo.com http://foo.com")
       assert_equal(["http://foo.com"], artist.url_array)

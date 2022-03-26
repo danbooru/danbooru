@@ -235,6 +235,9 @@ module ArtistFinder
       break if url =~ SITE_BLACKLIST_REGEXP
     end
 
+    # Assume no matches if we found too may duplicates.
+    return Artist.none if artists.size >= 4
+
     Artist.where(id: artists.uniq.take(20))
   end
 end
