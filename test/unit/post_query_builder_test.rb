@@ -60,13 +60,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "\\")
     end
 
-    should "return posts for the ( tag" do
-      post1 = create(:post, tag_string: "(")
-      post2 = create(:post, tag_string: "aaa bbb")
-
-      assert_tag_match([post1], "(")
-    end
-
     should "return posts for the ? tag" do
       post1 = create(:post, tag_string: "?")
       post2 = create(:post, tag_string: "aaa bbb")
