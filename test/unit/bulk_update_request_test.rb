@@ -326,7 +326,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         end
 
         should "update the tags" do
-          assert_equal("bar baz", @post.reload.tag_string)
+          assert_equal("bar baz foo", @post.reload.tag_string)
           assert_equal("approved", @bur.reload.status)
           assert_equal(User.system, @post.versions.last.updater)
         end
@@ -575,7 +575,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
 
       should "process mass updates" do
-        assert_equal("bar baz bbb blah", @post.reload.tag_string)
+        assert_equal("aaa bar baz bbb blah", @post.reload.tag_string)
       end
 
       should "set the alias/implication approvers" do

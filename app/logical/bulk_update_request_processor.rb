@@ -264,14 +264,11 @@ class BulkUpdateRequestProcessor
   end
 
   def self.mass_update(antecedent, consequent, user: User.system)
-    normalized_antecedent = PostQueryBuilder.new(antecedent).split_query
-    normalized_consequent = PostQueryBuilder.new(consequent).parse_tag_edit
-
     CurrentUser.scoped(user) do
-      Post.anon_tag_match(normalized_antecedent.join(" ")).reorder(nil).parallel_each do |post|
+      Post.anon_tag_match(antecedent).reorder(nil).parallel_each do |post|
         post.with_lock do
-          tags = (post.tag_array - normalized_antecedent + normalized_consequent).join(" ")
-          post.update(tag_string: tags)
+          post.tag_string += " " + consequent
+          post.save
         end
       end
     end
