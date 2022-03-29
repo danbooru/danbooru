@@ -43,7 +43,7 @@ class PostNavbarComponent < ApplicationComponent
   end
 
   def query
-    @query ||= PostQueryBuilder.new(search)
+    @query ||= PostQuery.new(search)
   end
 
   memoize :favgroups

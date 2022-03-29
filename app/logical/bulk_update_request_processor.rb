@@ -116,10 +116,10 @@ class BulkUpdateRequestProcessor
           end
 
         when :mass_update
-          lhs = PostQueryBuilder.new(args[0])
-          rhs = PostQueryBuilder.new(args[1])
+          lhs = PostQuery.new(args[0])
+          rhs = PostQuery.new(args[1])
 
-          if lhs.is_simple_tag? && rhs.is_simple_tag?
+          if lhs.is_single_tag? && rhs.is_single_tag?
             errors.add(:base, "Can't mass update #{args[0]} -> #{args[1]} (use an alias or a rename instead for tag moves)")
           end
 
@@ -236,9 +236,8 @@ class BulkUpdateRequestProcessor
       when :mass_update
         "mass update {{#{args[0]}}} -> {{#{args[1]}}}"
       when :nuke
-        query = PostQueryBuilder.new(args[0])
 
-        if query.is_simple_tag?
+        if PostQuery.new(args[0]).is_single_tag?
           "nuke [[#{args[0]}]]"
         else
           "nuke {{#{args[0]}}}"
@@ -255,7 +254,7 @@ class BulkUpdateRequestProcessor
   def self.nuke(tag_name)
     # Reject existing implications from any other tag to the one we're nuking
     # otherwise the tag won't be removed from posts that have those other tags
-    if PostQueryBuilder.new(tag_name).is_simple_tag?
+    if PostQuery.new(tag_name).is_single_tag?
       TagImplication.active.where(consequent_name: tag_name).each { |ti| ti.reject!(User.system) }
       TagImplication.active.where(antecedent_name: tag_name).each { |ti| ti.reject!(User.system) }
     end
