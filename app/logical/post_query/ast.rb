@@ -242,6 +242,11 @@ class PostQuery
         nodes.select(&:metatag?).uniq.sort
       end
 
+      # @return [Array<AST>] A list of all unique wildcard nodes in the AST.
+      def wildcards
+        nodes.select(&:wildcard?).uniq.sort
+      end
+
       # @return [Array<String>] The names of all unique tags in the AST.
       def tag_names
         tags.map(&:name)

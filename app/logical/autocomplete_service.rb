@@ -45,7 +45,7 @@ class AutocompleteService
   def autocomplete_results
     case type
     when :tag_query
-      autocomplete_tag_query(query)
+      autocomplete_tag_query
     when :tag
       autocomplete_tag(query)
     when :artist
@@ -70,17 +70,20 @@ class AutocompleteService
   end
 
   # Complete a tag search (a regular tag or a metatag)
-  # @param string [String] the string to complete
+  #
   # @return [Array<Hash>] the autocomplete results
-  def autocomplete_tag_query(string)
-    term = PostQueryBuilder.new(string).terms.first
-    return [] if term.nil?
-
-    case term.type
-    when :tag
-      autocomplete_tag(term.name)
-    when :metatag
-      autocomplete_metatag(term.name, term.value)
+  def autocomplete_tag_query
+    if parsed_query.tag?
+      tag = parsed_query.tag_names.first
+      autocomplete_tag(tag)
+    elsif parsed_query.wildcard?
+      wildcard = parsed_query.wildcards.first
+      autocomplete_tag(wildcard.name)
+    elsif parsed_query.metatag?
+      metatag = parsed_query.metatags.first
+      autocomplete_metatag(metatag.name, metatag.value)
+    else
+      []
     end
   end
 
@@ -330,7 +333,7 @@ class AutocompleteService
   # Whether the results can be safely cached with `Cache-Control: public`.
   # Queries that don't depend on the current user are safe to cache publicly.
   def cache_publicly?
-    if type == :tag_query && parsed_search&.type == :tag
+    if type == :tag_query && parsed_query.tag?
       true
     elsif type.in?(%i[tag artist wiki_page pool opensearch])
       true
@@ -339,9 +342,9 @@ class AutocompleteService
     end
   end
 
-  def parsed_search
-    PostQueryBuilder.new(query).terms.first
+  def parsed_query
+    PostQuery.new(query.delete_prefix("-").delete_prefix("~"))
   end
 
-  memoize :autocomplete_results
+  memoize :autocomplete_results, :parsed_query
 end

@@ -4,7 +4,7 @@ class PostQuery
   extend Memoist
 
   attr_reader :search, :parser, :builder, :ast
-  delegate :tag_names, :metatags, to: :ast
+  delegate :tag?, :metatag?, :wildcard?, :metatags, :wildcards, :tag_names, :metatags, to: :ast
 
   def initialize(search, current_user: User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
     @search = search
