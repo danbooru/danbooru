@@ -116,11 +116,10 @@ class BulkUpdateRequestProcessor
           end
 
         when :mass_update
-          lhs = PostQuery.new(args[0])
-          rhs = PostQuery.new(args[1])
+          query = PostQuery.new(args[0])
 
-          if lhs.is_single_tag? && rhs.is_single_tag?
-            errors.add(:base, "Can't mass update #{args[0]} -> #{args[1]} (use an alias or a rename instead for tag moves)")
+          if query.is_null_search?
+            errors.add(:base, "Can't mass update #{args[0]} -> #{args[1]} (the search `#{args[0]}` has a syntax error)")
           end
 
         when :nuke

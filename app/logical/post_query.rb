@@ -16,6 +16,16 @@ class PostQuery
     Tag.where(name: tag_names)
   end
 
+  # True if this search would return all posts (normally because the search is the empty string).
+  def is_empty_search?
+    ast.all?
+  end
+
+  # True if this search would return nothing (normally because there was a syntax error).
+  def is_null_search?
+    ast.none?
+  end
+
   def is_single_tag?
     ast.tag?
   end
