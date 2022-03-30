@@ -135,6 +135,15 @@ module Sources
       end
     end
 
+    context "A deleted /fanbox/creator/:id profile url" do
+      should "not raise an exception" do
+        source = Source::Extractor.find("https://www.pixiv.net/fanbox/creator/40684196")
+
+        assert_equal("https://www.pixiv.net/fanbox/creator/40684196", source.profile_url)
+        assert_nothing_raised { source.to_h }
+      end
+    end
+
     context "generating page urls" do
       should "convert cover images to the profile url" do
         cover = "https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg"

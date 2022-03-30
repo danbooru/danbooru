@@ -35,17 +35,19 @@ module Source
       end
 
       def profile_url
-        return if artist_name.blank?
-
-        "https://#{artist_name}.fanbox.cc"
+        if artist_name.present?
+          "https://#{artist_name}.fanbox.cc"
+        elsif artist_id_from_url.present?
+          "https://www.pixiv.net/fanbox/creator/#{artist_id_from_url}"
+        end
       end
 
       def artist_name
-        artist_name_from_url || api_response["creatorId"] || artist_api_response["creatorId"]
+        artist_name_from_url || api_response["creatorId"] || artist_api_response.dig("body", "creatorId")
       end
 
       def display_name
-        api_response.dig("user", "name") || artist_api_response.dig("user", "name")
+        api_response.dig("user", "name") || artist_api_response.dig("body", "user", "name")
       end
 
       def other_names
@@ -110,10 +112,11 @@ module Source
       def artist_api_response
         # Needed to fetch artist from cover pages
         return {} if artist_id_from_url.blank?
+
         resp = client.get("https://api.fanbox.cc/creator.get?userId=#{artist_id_from_url}")
-        JSON.parse(resp)["body"]
-      rescue JSON::ParserError
-        {}
+        return {} if resp.status != 200
+
+        resp.parse
       end
 
       def client
