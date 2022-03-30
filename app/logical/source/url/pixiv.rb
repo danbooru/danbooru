@@ -5,7 +5,7 @@ module Source
     attr_reader :work_id, :page, :username, :user_id
 
     def self.match?(url)
-      return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url)
+      return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url) || Source::URL::Booth.match?(url)
 
       url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc]) || url.host == "tc-pximg01.techorus-cdn.com"
     end

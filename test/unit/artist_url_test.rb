@@ -200,6 +200,12 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("http://www.instagram.com/itomugi/", url.normalized_url)
     end
 
+    should "normalize Booth.pm urls" do
+      url = create(:artist_url, url: "http://mesh-mesh.booth.pm/items/746971")
+      assert_equal("https://mesh-mesh.booth.pm", url.url)
+      assert_equal("http://mesh-mesh.booth.pm/", url.normalized_url)
+    end
+
     context "#search method" do
       subject { ArtistURL }
 

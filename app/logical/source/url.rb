@@ -25,6 +25,7 @@ module Source
       Source::URL::Pixiv,
       Source::URL::Twitter,
       Source::URL::ArtStation,
+      Source::URL::Booth,
       Source::URL::DeviantArt,
       Source::URL::Fanbox,
       Source::URL::Fantia,
