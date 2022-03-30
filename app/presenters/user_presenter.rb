@@ -70,7 +70,7 @@ class UserPresenter
   end
 
   def commented_posts_count(template)
-    count = PostQueryBuilder.new("commenter:#{user.name}").fast_count
+    count = PostQuery.new("commenter:#{user.name}").fast_count
     count = "?" if count.nil?
     template.link_to(count, template.posts_path(tags: "commenter:#{user.name} order:comment_bumped"), rel: "nofollow")
   end
@@ -84,7 +84,7 @@ class UserPresenter
   end
 
   def noted_posts_count(template)
-    count = PostQueryBuilder.new("noteupdater:#{user.name}").fast_count
+    count = PostQuery.new("noteupdater:#{user.name}").fast_count
     count = "?" if count.nil?
     template.link_to(count, template.posts_path(tags: "noteupdater:#{user.name} order:note"), rel: "nofollow")
   end

@@ -3,13 +3,18 @@
 class PostQuery
   extend Memoist
 
-  attr_reader :search, :parser, :ast
+  attr_reader :search, :parser, :builder, :ast
   delegate :tag_names, :metatags, to: :ast
 
-  def initialize(search)
+  def initialize(search, current_user: User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
     @search = search
     @parser = Parser.new(search)
+    @builder = PostQueryBuilder.new(search, current_user, tag_limit: tag_limit, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
     @ast = parser.parse.simplify
+  end
+
+  def fast_count(...)
+    builder.normalized_query.fast_count(...)
   end
 
   def tags
