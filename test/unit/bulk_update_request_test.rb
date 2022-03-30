@@ -546,7 +546,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_equal(%w[aaa bbb], @bur.tags)
 
         @bur.update!(script: @script)
-        assert_equal(%w(000 111 222 333 444 aaa bbb ccc ddd eee iii), @bur.tags)
+        assert_equal(%w(000 111 222 333 444 555 aaa bbb ccc ddd eee fff ggg iii), @bur.tags)
       end
     end
 

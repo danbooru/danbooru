@@ -196,18 +196,17 @@ class BulkUpdateRequestProcessor
     end
   end
 
-  # The list of tags in the script. Used for search BURs by tag.
-  # @return [Tag] the list of tags
+  # The list of tags in the script. Used to search BURs by tag.
+  # @return [Array<String>] the list of tags
   def affected_tags
     commands.flat_map do |command, *args|
       case command
       when :create_alias, :remove_alias, :create_implication, :remove_implication, :rename
         [args[0], args[1]]
       when :mass_update
-        tags = PostQueryBuilder.new(args[0]).tags + PostQueryBuilder.new(args[1]).tags
-        tags.reject(&:negated).reject(&:optional).reject(&:wildcard).map(&:name)
+        PostQuery.new(args[0]).tag_names + PostQuery.new(args[1]).tag_names
       when :nuke
-        PostQueryBuilder.new(args[0]).tags.map(&:name)
+        PostQuery.new(args[0]).tag_names
       when :change_category
         args[0]
       end

@@ -1,11 +1,14 @@
 #!/usr/bin/env ruby
 
-require_relative "../../config/environment"
+require_relative "base"
 
-BulkUpdateRequest.transaction do
+with_confirmation do
   BulkUpdateRequest.find_each do |request|
     request.tags = request.processor.affected_tags
-    request.save!(validate: false)
-    puts "bur id=#{request.id} tags=#{request.tags}"
+
+    if request.changed?
+      request.save!(validate: false)
+      puts "bur id=#{request.id} added_tags=#{request.tags - request.tags_before_last_save} removed_tags=#{request.tags_before_last_save - request.tags}"
+    end
   end
 end
