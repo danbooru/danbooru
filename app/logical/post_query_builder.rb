@@ -118,11 +118,7 @@ class PostQueryBuilder
 
   def metatags_match(metatags, relation)
     metatags.each do |metatag|
-      if metatag.negated
-        metatag.name = "fav" if metatag.name == "ordfav"
-        metatag.name = "favgroup" if metatag.name == "ordfavgroup"
-        metatag.name = "pool" if metatag.name == "ordpool"
-      end
+      metatag.name = metatags_without_ord[metatag.name] if metatag.negated && metatags_without_ord.key?(metatag.name)
 
       clause = metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted)
       clause = clause.negate_relation if metatag.negated
@@ -130,6 +126,14 @@ class PostQueryBuilder
     end
 
     relation
+  end
+
+  def metatags_without_ord
+    {
+      "ordfav" => "fav",
+      "ordfavgroup" => "favgroup",
+      "ordpool" => "pool",
+    }
   end
 
   def metatag_matches(name, value, quoted: false)
