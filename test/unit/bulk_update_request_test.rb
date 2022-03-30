@@ -339,11 +339,11 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal("approved", @bur.reload.status)
         end
 
-        should "not allow mass update for simple A -> B moves" do
-          @bur = build(:bulk_update_request, script: "mass update bunny -> rabbit")
+        should "not allow invalid searches in mass updates" do
+          @bur = build(:bulk_update_request, script: "mass update (foo -> bar")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't mass update bunny -> rabbit (use an alias or a rename instead for tag moves)"], @bur.errors.full_messages)
+          assert_equal(["Can't mass update (foo -> bar (the search `(foo` has a syntax error)"], @bur.errors.full_messages)
         end
       end
 
@@ -546,7 +546,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_equal(%w[aaa bbb], @bur.tags)
 
         @bur.update!(script: @script)
-        assert_equal(%w(000 111 222 333 444 aaa bbb ccc ddd eee iii), @bur.tags)
+        assert_equal(%w(000 111 222 333 444 555 aaa bbb ccc ddd eee fff ggg iii), @bur.tags)
       end
     end
 

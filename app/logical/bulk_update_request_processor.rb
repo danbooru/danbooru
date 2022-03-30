@@ -116,11 +116,10 @@ class BulkUpdateRequestProcessor
           end
 
         when :mass_update
-          lhs = PostQueryBuilder.new(args[0])
-          rhs = PostQueryBuilder.new(args[1])
+          query = PostQuery.new(args[0])
 
-          if lhs.is_simple_tag? && rhs.is_simple_tag?
-            errors.add(:base, "Can't mass update #{args[0]} -> #{args[1]} (use an alias or a rename instead for tag moves)")
+          if query.is_null_search?
+            errors.add(:base, "Can't mass update #{args[0]} -> #{args[1]} (the search `#{args[0]}` has a syntax error)")
           end
 
         when :nuke
@@ -196,18 +195,17 @@ class BulkUpdateRequestProcessor
     end
   end
 
-  # The list of tags in the script. Used for search BURs by tag.
-  # @return [Tag] the list of tags
+  # The list of tags in the script. Used to search BURs by tag.
+  # @return [Array<String>] the list of tags
   def affected_tags
     commands.flat_map do |command, *args|
       case command
       when :create_alias, :remove_alias, :create_implication, :remove_implication, :rename
         [args[0], args[1]]
       when :mass_update
-        tags = PostQueryBuilder.new(args[0]).tags + PostQueryBuilder.new(args[1]).tags
-        tags.reject(&:negated).reject(&:optional).reject(&:wildcard).map(&:name)
+        PostQuery.new(args[0]).tag_names + PostQuery.new(args[1]).tag_names
       when :nuke
-        PostQueryBuilder.new(args[0]).tags.map(&:name)
+        PostQuery.new(args[0]).tag_names
       when :change_category
         args[0]
       end
@@ -236,9 +234,8 @@ class BulkUpdateRequestProcessor
       when :mass_update
         "mass update {{#{args[0]}}} -> {{#{args[1]}}}"
       when :nuke
-        query = PostQueryBuilder.new(args[0])
 
-        if query.is_simple_tag?
+        if PostQuery.new(args[0]).is_single_tag?
           "nuke [[#{args[0]}]]"
         else
           "nuke {{#{args[0]}}}"
@@ -255,7 +252,7 @@ class BulkUpdateRequestProcessor
   def self.nuke(tag_name)
     # Reject existing implications from any other tag to the one we're nuking
     # otherwise the tag won't be removed from posts that have those other tags
-    if PostQueryBuilder.new(tag_name).is_simple_tag?
+    if PostQuery.new(tag_name).is_single_tag?
       TagImplication.active.where(consequent_name: tag_name).each { |ti| ti.reject!(User.system) }
       TagImplication.active.where(antecedent_name: tag_name).each { |ti| ti.reject!(User.system) }
     end
