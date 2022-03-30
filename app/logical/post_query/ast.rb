@@ -168,7 +168,7 @@ class PostQuery
         in [:tag, name]
           name
         in [:metatag, name, value]
-          "#{name}:#{value}"
+          "#{name}:#{quoted_value}"
         in [:wildcard, name]
           "(wildcard #{name})"
         in [type, *args]
@@ -180,7 +180,7 @@ class PostQuery
       def to_infix
         case self
         in [:all]
-          "all"
+          ""
         in [:none]
           "none"
         in [:wildcard, name]
@@ -188,19 +188,15 @@ class PostQuery
         in [:tag, name]
           name
         in [:metatag, name, value]
-          "#{name}:#{value}"
-        in [:not, a]
-          "-#{a.to_infix}"
-        in [:opt, a]
-          "~#{a.to_infix}"
-        in [:and, a]
-          a.to_infix
-        in [:or, a]
-          a.to_infix
-        in [:and, *a]
-          "(#{a.map(&:to_infix).join(" ")})"
-        in [:or, *a]
-          "(#{a.map(&:to_infix).join(" or ")})"
+          "#{name}:#{quoted_value}"
+        in :not, child
+          child.term? ? "-#{child.to_infix}" : "-(#{child.to_infix})"
+        in :opt, child
+          child.term? ? "~#{child.to_infix}" : "~(#{child.to_infix})"
+        in :and, *children
+          children.map { _1.children.many? ? "(#{_1.to_infix})" : _1.to_infix }.join(" ")
+        in :or, *children
+          children.map { _1.children.many? ? "(#{_1.to_infix})" : _1.to_infix }.join(" or ")
         end
       end
 
@@ -264,6 +260,17 @@ class PostQuery
       # @return [String, nil] The value of the metatag, if a metatag node.
       def value
         args.second if metatag?
+      end
+
+      # @return [String, nil] The value of the metatag as a quoted string, if a metatag node.
+      def quoted_value
+        return nil unless metatag?
+
+        if value.include?(" ") || value.starts_with?('"') || value.empty?
+          %Q{"#{value.gsub(/"/, '\\"')}"}
+        else
+          value
+        end
       end
 
       # @return [Array<AST>] The child nodes, if the node has children.

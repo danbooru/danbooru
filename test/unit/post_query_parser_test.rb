@@ -5,6 +5,10 @@ class PostQueryParserTest < ActiveSupport::TestCase
     assert_equal(expected, PostQuery::Parser.parse(input).simplify.to_sexp)
   end
 
+  def to_infix(string)
+    PostQuery::Parser.parse(string).to_infix
+  end
+
   context "PostQueryParser:" do
     should "parse empty queries correctly" do
       assert_parse_equals("all", "")
@@ -60,10 +64,11 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("fav:(a)", "fav:(a)")
       assert_parse_equals("fav:(a", "(fav:(a)")
 
-      assert_parse_equals('source:foo bar', 'source:"foo bar"')
+      assert_parse_equals('source:"foo bar"', 'source:"foo bar"')
       assert_parse_equals('source:foobar"(', 'source:foobar"(')
-      assert_parse_equals('source:', 'source:""')
-      assert_parse_equals(%q{source:don't say "lazy" okay}, %q{source:"don't say \"lazy\" okay"})
+      assert_parse_equals('source:""', 'source:""')
+      assert_parse_equals('source:"\""', 'source:"\""')
+      assert_parse_equals(%q{source:"don't say \"lazy\" okay"}, %q{source:"don't say \"lazy\" okay"})
       assert_parse_equals(%q{(and source:foo)bar a)}, %q{(a (source:"foo)bar"))})
     end
 
@@ -292,6 +297,46 @@ class PostQueryParserTest < ActiveSupport::TestCase
 
       assert_parse_equals("none", 'source:"foo')
       assert_parse_equals("none", 'source:"foo bar')
+    end
+
+    context "#to_infix" do
+      should "work" do
+        assert_equal("", to_infix(""))
+        assert_equal("", to_infix(" "))
+
+        assert_equal("a", to_infix("a"))
+        assert_equal("a b", to_infix("a b"))
+        assert_equal("a b c", to_infix("a b c"))
+
+        assert_equal("-a", to_infix("-a"))
+        assert_equal("-(-a)", to_infix("-(-a)"))
+        assert_equal("-(-(-a))", to_infix("-(-(-a))"))
+
+        assert_equal("~a", to_infix("~a"))
+        assert_equal("~a ~b", to_infix("~a ~b"))
+        assert_equal("~a ~(b ~c)", to_infix("~a ~(b ~c)"))
+
+        assert_equal("a b", to_infix("a and b"))
+        assert_equal("a (b c)", to_infix("a and b and c"))
+        assert_equal("a (b (c d))", to_infix("a and b and c and d"))
+
+        assert_equal("a or b", to_infix("a or b"))
+        assert_equal("a or (b or c)", to_infix("a or b or c"))
+        assert_equal("a or (b or (c or d))", to_infix("a or b or c or d"))
+
+        assert_equal("(a b) or (c d)", to_infix("a b or c d"))
+        assert_equal("(~a ~b) (~c ~d)", to_infix("~a ~b and ~c ~d"))
+        assert_equal("(a or b) (c or d)", to_infix("(a or b) and (c or d)"))
+
+        assert_equal("a source:b", to_infix("a source:b"))
+        assert_equal('a source:"b c"', to_infix('a source:"b c"'))
+        assert_equal('a source:"\\""', to_infix('a source:"\\""'))
+        assert_equal('a source:""', to_infix('a source:""'))
+
+        assert_equal("a* b", to_infix("a* b"))
+
+        assert_equal("none", to_infix("("))
+      end
     end
   end
 end

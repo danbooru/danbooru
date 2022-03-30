@@ -33,6 +33,8 @@ require "strscan"
 
 class PostQuery
   class Parser
+    extend Memoist
+
     class Error < StandardError; end
 
     METATAG_NAME_REGEX = /(#{PostQueryBuilder::METATAGS.join("|")}):/i
@@ -265,5 +267,7 @@ class PostQuery
         AST.new(type, args)
       end
     end
+
+    memoize :parse, :parse!
   end
 end
