@@ -86,6 +86,8 @@ module ComponentsHelper
   # The <link rel="next"> / <link rel="prev"> links in the <meta> element of the <head>.
   def render_meta_links(records)
     render PaginatorComponent.new(records: records, params: params).with_variant(:meta_links)
+  rescue ActiveRecord::StatementInvalid
+    # Swallow any exceptions when loading records so that the page load doesn't fail.
   end
 
   def numbered_paginator(records)
