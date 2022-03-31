@@ -118,9 +118,13 @@ class PostQueryBuilder
 
   def metatags_match(metatags, relation)
     metatags.each do |metatag|
-      metatag.name = metatags_without_ord[metatag.name] if metatag.negated && metatags_without_ord.key?(metatag.name)
+      metatag_name = if metatag.negated && metatags_without_ord.key?(metatag.name)
+        metatags_without_ord[metatag.name]
+      else
+        metatag.name
+      end
 
-      clause = metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted)
+      clause = metatag_matches(metatag_name, metatag.value, quoted: metatag.quoted)
       clause = clause.negate_relation if metatag.negated
       relation = relation.and_relation(clause)
     end
