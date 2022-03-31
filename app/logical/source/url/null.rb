@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Null < Source::URL
-  attr_reader :work_id, :page_url
+  attr_reader :work_id, :page_url, :profile_url
 
   def self.match?(url)
     true
@@ -39,6 +39,56 @@ class Source::URL::Null < Source::URL
 
   def parse
     case [subdomain, domain, *path_segments]
+
+    # http://about.me/rig22
+    in _, "about.me", username
+      @username = username
+      @profile_url = "https://about.me/#{username}"
+
+    # http://marilyn77.ameblo.jp/
+    in username, "ameblo.jp", *rest unless subdomain.in?(["www", "s", nil])
+      @username = username
+      @profile_url = "https://ameblo.jp/#{username}"
+
+    # https://ameblo.jp/g8set55679
+    # http://ameblo.jp/hanauta-os/entry-11860045489.html
+    # http://s.ameblo.jp/ma-chi-no/
+    in _, "ameblo.jp", username, *rest
+      @username = username
+      @profile_url = "https://ameblo.jp/#{username}"
+
+    # http://stat.ameba.jp/user_images/20130802/21/moment1849/38/bd/p
+    # http://stat001.ameba.jp/user_images/20100212/15/weekend00/74/31/j/
+    in /^stat\d*$/, "ameba.jp", "user_images", _, _, username, *rest
+      @username = username
+      @profile_url = "https://ameblo.jp/#{username}"
+
+    # https://profile.ameba.jp/ameba/kbnr32rbfs
+    in "profile", "ameba.jp", "ameba", username
+      @username = username
+      @profile_url = "https://ameblo.jp/#{username}"
+
+    # https://anidb.net/creator/65313
+    in _, "anidb.net", "creator", user_id
+      @user_id = user_id
+      @profile_url = "https://anidb.net/creator/#{user_id}"
+
+    # https://anidb.net/perl-bin/animedb.pl?show=creator&creatorid=3903
+    in _, "anidb.net", "perl-bin", "animedb.pl" if params[:show] == "creator" and params[:creatorid].present?
+      @user_id = params[:creatorid]
+      @profile_url = "https://anidb.net/creator/#{user_id}"
+
+    # https://www.animenewsnetwork.com/encyclopedia/people.php?id=17056
+    in _, ("animenewsnetwork.com" | "animenewsnetwork.cc"), "encyclopedia", "people.php" if params[:id].present?
+      @user_id = params[:id]
+      @profile_url = "https://www.animenewsnetwork.com/encyclopedia/people.php?id=#{params[:id]}"
+
+    # https://ask.fm/kiminaho
+    # https://m.ask.fm/kiminaho
+    # http://ask.fm/cyoooooon/best
+    in _, "ask.fm", username, *rest
+      @username = username
+      @profile_url = "https://ask.fm/#{username}"
 
     # http://nekomataya.net/diarypro/data/upfile/66-1.jpg
     # http://www117.sakura.ne.jp/~cat_rice/diarypro/data/upfile/31-1.jpg
