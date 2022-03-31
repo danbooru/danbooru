@@ -24,7 +24,7 @@ class Source::URL::Instagram < Source::URL
     # https://www.instagram.com/itomugi/
     # https://www.instagram.com/itomugi/tagged/
     in "instagram.com", username, *rest
-      @username = username
+      @username = username.delete_prefix("@")
 
     # https://www.instagram.com/stories/itomugi/
     in "instagram.com", "stories", username, *rest
