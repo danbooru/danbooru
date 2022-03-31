@@ -179,11 +179,11 @@ class ArtistURLTest < ActiveSupport::TestCase
     end
 
     should "normalize pawoo.net urls" do
-      url = create(:artist_url, url: "http://pawoo.net/@evazion/19451018")
+      url = create(:artist_url, url: "http://www.pawoo.net/@evazion/19451018")
       assert_equal("https://pawoo.net/@evazion", url.url)
       assert_equal("http://pawoo.net/@evazion/", url.normalized_url)
 
-      url = create(:artist_url, url: "http://pawoo.net/users/evazion/media")
+      url = create(:artist_url, url: "http://www.pawoo.net/users/evazion/media")
       assert_equal("https://pawoo.net/@evazion", url.url)
       assert_equal("http://pawoo.net/@evazion/", url.normalized_url)
     end
