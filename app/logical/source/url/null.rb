@@ -13,8 +13,8 @@ class Source::URL::Null < Source::URL
       "Ask.fm"
     when /bcy\.net\z/i
       "BCY"
-    when /booth\.pm\z/i
-      "Booth.pm"
+    when /carrd\.co\z/i
+      "Carrd"
     when /circle\.ms\z/i
       "Circle.ms"
     when /dlsite\.(com|net)\z/i
@@ -23,6 +23,8 @@ class Source::URL::Null < Source::URL
       "Doujinshi.org"
     when /ko-fi\.com\z/i
       "Ko-fi"
+    when /lit\.link\z/i
+      "Lit.link"
     when /mixi\.jp\z/i
       "Mixi.jp"
     when /piapro\.jp\z/i

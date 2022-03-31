@@ -224,10 +224,16 @@ module IconHelper
       image_icon_tag("bcy-logo.png", **options)
     when "Biglobe"
       image_icon_tag("biglobe-logo.png", **options)
-    when "Booth.pm"
+    when "Bilibili"
+      image_icon_tag("bilibili-logo.png", **options)
+    when "Booth"
       image_icon_tag("booth-pm-logo.png", **options)
+    when "Carrd"
+      image_icon_tag("carrd-logo.png", **options)
     when "Circle.ms"
       image_icon_tag("circle-ms-logo.png", **options)
+    when "Coconala"
+      image_icon_tag("coconala-logo.png", **options)
     when "Deviant Art"
       image_icon_tag("deviantart-logo.png", **options)
     when "DLSite"
@@ -242,8 +248,12 @@ module IconHelper
       image_icon_tag("fantia-logo.png", **options)
     when "FC2"
       image_icon_tag("fc2-logo.png", **options)
+    when "Fiverr"
+      image_icon_tag("fiverr-logo.png", **options)
     when "Foundation"
       image_icon_tag("foundation-logo.png", **options)
+    when "Furaffinity"
+      image_icon_tag("furaffinity-logo.png", **options)
     when "Geocities"
       image_icon_tag("geocities-logo.png", **options)
     when "Google"
@@ -254,10 +264,16 @@ module IconHelper
       image_icon_tag("hentai-foundry-logo.png", **options)
     when "Infoseek"
       image_icon_tag("infoseek-logo.png", **options)
+    when "Inprnt"
+      image_icon_tag("inprnt-logo.png", **options)
     when "Instagram"
       image_icon_tag("instagram-logo.png", **options)
     when "Ko-fi"
       image_icon_tag("ko-fi-logo.png", **options)
+    when "Linktr" # https://linktr.ee
+      image_icon_tag("linktree-logo.png", **options)
+    when "Lit.link"
+      image_icon_tag("lit-link-logo.png", **options)
     when "Livedoor"
       image_icon_tag("livedoor-logo.png", **options)
     when "Lofter"
@@ -268,6 +284,8 @@ module IconHelper
       image_icon_tag("marshmallow-qa-logo.png", **options)
     when "Mastodon", "Mstdn" # https://mastodon.cloud, https://mstdn.jp
       image_icon_tag("mastodon-logo.png", **options)
+    when "Mblg"
+      image_icon_tag("mblg-tv-logo.png", **options)
     when "Melonbooks"
       image_icon_tag("melonbooks-logo.png", **options)
     when "Mihuashi"
@@ -282,6 +300,8 @@ module IconHelper
       image_icon_tag("nicoseiga-logo.png", **options)
     when "Nijie"
       image_icon_tag("nijie-logo.png", **options)
+    when "Ocn"
+      image_icon_tag("ocn-ne-jp-logo.png", **options)
     when "Patreon"
       image_icon_tag("patreon-logo.png", **options)
     when "Pawoo"
@@ -300,8 +320,14 @@ module IconHelper
       image_icon_tag("pixiv-sketch-logo.png", **options)
     when "Plurk"
       image_icon_tag("plurk-logo.png", **options)
+    when "Poipiku"
+      image_icon_tag("poipiku-logo.png", **options)
     when "Privatter"
       image_icon_tag("privatter-logo.png", **options)
+    when "Profcard"
+      image_icon_tag("profcard-logo.png", **options)
+    when "Redbubble"
+      image_icon_tag("redbubble-logo.png", **options)
     when "Reddit"
       image_icon_tag("reddit-logo.png", **options)
     when "Sakura.ne.jp"
@@ -314,6 +340,8 @@ module IconHelper
       image_icon_tag("skima-logo.png", **options)
     when "Theinterviews"
       image_icon_tag("the-interviews-logo.png", **options)
+    when "Tiktok"
+      image_icon_tag("tiktok-logo.png", **options)
     when "Tinami"
       image_icon_tag("tinami-logo.png", **options)
     when "Tumblr"
@@ -334,10 +362,16 @@ module IconHelper
       image_icon_tag("twpf-logo.png", **options)
     when "Ustream"
       image_icon_tag("ustream-logo.png", **options)
+    when "Vk"
+      image_icon_tag("vk-logo.png", **options)
+    when "Weebly", "Weeblysite"
+      image_icon_tag("weebly-logo.png", **options)
     when "Weibo"
       image_icon_tag("weibo-logo.png", **options)
     when "Wikipedia"
       image_icon_tag("wikipedia-logo.png", **options)
+    when "Wixsite"
+      image_icon_tag("wixsite-logo.png", **options)
     when "Yfrog"
       image_icon_tag("yfrog-logo.png", **options)
     when "Youtube"
