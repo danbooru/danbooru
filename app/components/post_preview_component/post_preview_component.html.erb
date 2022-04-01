@@ -16,7 +16,7 @@
 
       <picture>
         <% if uoh? %>
-          <%= tag.img src: "images/uoh.png", width: 180, height: 180, class: "post-preview-image", title: tooltip, alt: "post ##{post.id}", crossorigin: "anonymous", draggable: "false" -%>
+          <%= tag.img src: "/images/uoh.png", width: 180, height: 180, class: "post-preview-image", title: tooltip, alt: "post ##{post.id}", crossorigin: "anonymous", draggable: "false" -%>
         <% else %>
           <% unless save_data %>
             <% case size %>
