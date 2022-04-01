@@ -39,6 +39,7 @@ class UploadLimit
 
   # @return [Boolean] true if the user can't upload because they're out of upload slots.
   def limited?
+    return false
     !user.can_upload_free? && used_upload_slots >= upload_slots
   end
 
