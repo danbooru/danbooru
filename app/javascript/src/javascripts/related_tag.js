@@ -92,7 +92,7 @@ RelatedTag.update_selected = function(e) {
   var current_tags = RelatedTag.current_tags();
 
   $(".related-tags li").each((_, li) => {
-    let tag_name = $(li).text().trim().replace(/ /g, "_");
+    let tag_name = $(li).find("a").attr("data-tag-name");
 
     if (current_tags.includes(tag_name)) {
       $(li).addClass("selected");
@@ -111,7 +111,7 @@ RelatedTag.current_tags = function() {
 
 RelatedTag.toggle_tag = function(e) {
   var $field = $("#post_tag_string");
-  var tag = $(e.target).closest("li").text().trim().replace(/ /g, "_");
+  var tag = $(e.target).closest("li").find("a").attr("data-tag-name");
 
   if (RelatedTag.current_tags().includes(tag)) {
     var escaped_tag = Utility.regexp_escape(tag);
