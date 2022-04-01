@@ -39,6 +39,8 @@ class CommentsController < ApplicationController
   end
 
   def create
+    CurrentUser.user = User.find_by_name("MD Anonymous") || User.anonymous if CurrentUser.user.is_anonymous?
+
     @comment = authorize Comment.new(creator: CurrentUser.user, creator_ip_addr: CurrentUser.ip_addr)
     @comment.update(permitted_attributes(@comment))
     flash[:notice] = @comment.valid? ? "Comment posted" : @comment.errors.full_messages.join("; ")

@@ -2,7 +2,7 @@
 
 class CommentPolicy < ApplicationPolicy
   def create?
-    unbanned?
+    true
   end
 
   def update?
