@@ -1366,4 +1366,8 @@ class Post < ApplicationRecord
       artist_commentary
     ]
   end
+
+  def uoh?
+    has_tag?("loli")
+  end
 end

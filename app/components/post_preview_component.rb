@@ -49,7 +49,11 @@ class PostPreviewComponent < ApplicationComponent
   end
 
   def render?
-    post.present? && post.visible?(current_user) && (!post.is_deleted? || show_deleted)
+    post.present? && (post.visible?(current_user) || uoh?) && (!post.is_deleted? || show_deleted)
+  end
+
+  def uoh?
+    post.uoh? && !current_user.is_gold?
   end
 
   def article_attrs(classes = nil)

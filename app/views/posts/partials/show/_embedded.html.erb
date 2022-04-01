@@ -1,5 +1,8 @@
 <% if post.banblocked? -%>
   <p>The artist requested removal of this image.</p>
+<% elsif post.levelblocked? && post.uoh? -%>
+  <%= tag.img width: 360, height: 360, id: "image", class: "fit-width", src: "/images/uoh.png" %>
+  <p class="mt-4" style="font-size: 0.875rem"><%= link_to("You need a #{uoh_icon(class: "h-4")} account to see this image".html_safe, new_user_upgrade_path) %></p>
 <% elsif post.levelblocked? -%>
   <p><%= link_to("You need a gold account to see this image", new_user_upgrade_path) %>.</p>
 <% elsif post.safeblocked? -%>

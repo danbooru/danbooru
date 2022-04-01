@@ -29,7 +29,11 @@
   <% end %>
 
   <%= link_to "#{@post.rating.upcase}", posts_path(tags: "rating:#{@post.pretty_rating}"), class: "post-tooltip-rating post-tooltip-info" %>
-  <%= link_to "#{@post.image_width}x#{@post.image_height}", @post.file_url, class: "post-tooltip-dimensions post-tooltip-info" %>
+  <% if @post.visible? %>
+    <%= link_to "#{@post.image_width}x#{@post.image_height}", @post.file_url, class: "post-tooltip-dimensions post-tooltip-info" %>
+  <% else %>
+    <%= tag.span "#{@post.image_width}x#{@post.image_height}", class: "post-tooltip-dimensions post-tooltip-info" %>
+  <% end %>
 
   <%= render PopupMenuComponent.new do |menu| %>
     <% menu.item do %>

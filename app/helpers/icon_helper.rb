@@ -210,6 +210,10 @@ module IconHelper
     image_icon_tag("twitter-logo.png", **options)
   end
 
+  def uoh_icon(**options)
+    image_icon_tag("uoh.png", **options)
+  end
+
   def external_site_icon(site_name, **options)
     case site_name
     when "Amazon"
