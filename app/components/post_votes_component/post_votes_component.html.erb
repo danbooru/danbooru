@@ -8,14 +8,6 @@
   <% end %>
 
   <span class="post-score">
-    <%= link_to post.score, post_votes_path(search: { post_id: post.id }, variant: :compact), rel: "nofollow" %>
+    <%= link_to post.score.clamp(0..), post_votes_path(search: { post_id: post.id }, variant: :compact), rel: "nofollow" %>
   </span>
-
-  <% if current_user.is_anonymous? %>
-    <%= link_to downvote_icon, login_path(url: request.fullpath), class: "post-downvote-link inactive-link" %>
-  <% elsif downvoted? %>
-    <%= link_to downvote_icon, post_post_votes_path(post), class: "post-downvote-link post-unvote-link active-link", method: :delete, remote: true %>
-  <% else %>
-    <%= link_to downvote_icon, post_post_votes_path(post_id: post.id, score: -1), class: "post-downvote-link inactive-link", method: :post, remote: true %>
-  <% end %>
 </span>
