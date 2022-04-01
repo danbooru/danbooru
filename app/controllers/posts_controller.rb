@@ -58,7 +58,7 @@ class PostsController < ApplicationController
   def update
     @post = authorize Post.find(params[:id])
     @post.update(permitted_attributes(@post))
-    @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
+    @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "true").truthy?
     @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
     respond_with_post_after_update(@post)
   end
@@ -140,7 +140,7 @@ class PostsController < ApplicationController
   def post_set
     @post_set ||= begin
       tag_query = params[:tags] || params.dig(:post, :tags)
-      show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
+      show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "true").truthy?
       PostSets::Post.new(tag_query, params[:page], params[:limit], format: request.format.symbol, show_votes: show_votes)
     end
   end
