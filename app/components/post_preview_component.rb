@@ -80,9 +80,9 @@ class PostPreviewComponent < ApplicationComponent
   def preview_class
     klass = ["post-preview"]
     klass << "captioned" if pool || show_size || similarity || recommended
-    klass << "post-status-pending" if post.is_pending?
-    klass << "post-status-flagged" if post.is_flagged?
-    klass << "post-status-deleted" if post.is_deleted?
+    klass << "post-status-pending" if post.is_pending? && current_user.is_approver?
+    klass << "post-status-flagged" if post.is_flagged? && current_user.is_approver?
+    #klass << "post-status-deleted" if post.is_deleted?
     klass << "post-status-has-parent" if post.parent_id
     klass << "post-status-has-children" if post.has_visible_children?
     klass << "post-preview-show-votes" if show_votes

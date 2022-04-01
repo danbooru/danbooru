@@ -29,22 +29,24 @@
       <%= link_to post.fav_count, post_favorites_path(post), rel: "nofollow" %>
     <% end %>
   </li>
-  <li id="post-info-status">
-    Status:
-    <% if post.is_pending? %>
-      Pending
-    <% elsif post.is_flagged? %>
-      Flagged
-    <% elsif post.is_appealed? %>
-      Appealed
-    <% elsif post.is_deleted? %>
-      Deleted
-    <% else %>
-      Active
-    <% end %>
+  <% if CurrentUser.user.is_approver? %>
+    <li id="post-info-status">
+      Status:
+      <% if post.is_pending? %>
+        Pending
+      <% elsif post.is_flagged? %>
+        Flagged
+      <% elsif post.is_appealed? %>
+        Appealed
+      <% elsif post.is_deleted? %>
+        Deleted
+      <% else %>
+        Active
+      <% end %>
 
-    <% if post.is_banned? %>
-      Banned
-    <% end %>
-  </li>
+      <% if post.is_banned? %>
+        Banned
+      <% end %>
+    </li>
+  <% end %>
 </ul>
