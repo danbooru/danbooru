@@ -1,10 +1,10 @@
 <span class="post-votes" data-id="<%= post.id %>">
   <% if current_user.is_anonymous? %>
-    <%= link_to upvote_icon, login_path(url: request.fullpath), class: "post-upvote-link inactive-link" %>
+    <%= link_to upvote_icon(post: post), login_path(url: request.fullpath), class: "post-upvote-link inactive-link" %>
   <% elsif upvoted? %>
-    <%= link_to upvote_icon, post_post_votes_path(post), class: "post-upvote-link post-unvote-link active-link", method: :delete, remote: true %>
+    <%= link_to upvote_icon(post: post, upvoted: true), post_post_votes_path(post), class: "post-upvote-link post-unvote-link active-link", method: :delete, remote: true %>
   <% else %>
-    <%= link_to upvote_icon, post_post_votes_path(post_id: post.id, score: 1), class: "post-upvote-link inactive-link", method: :post, remote: true %>
+    <%= link_to upvote_icon(post: post), post_post_votes_path(post_id: post.id, score: 1), class: "post-upvote-link inactive-link", method: :post, remote: true %>
   <% end %>
 
   <span class="post-score">

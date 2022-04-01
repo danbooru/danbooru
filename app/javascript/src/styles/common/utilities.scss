@@ -66,6 +66,7 @@ $spacer: 0.25rem; /* 4px */
 
 .border, %border { border-width: 1px; }
 
+.border-none { border: none !important; }
 .border-b   { border-bottom-width: 1px; }
 .border-b-2 { border-bottom-width: 0.5 * $spacer; }
 
@@ -149,6 +150,7 @@ $spacer: 0.25rem; /* 4px */
 .h-1    { height: 1  * $spacer; }
 .h-3    { height: 3  * $spacer; }
 .h-4    { height: 4  * $spacer; }
+.h-6    { height: 6  * $spacer; }
 .h-8    { height: 8  * $spacer; }
 .h-10   { height: 10 * $spacer; }
 .h-12   { height: 12 * $spacer; }
