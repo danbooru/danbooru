@@ -35,7 +35,7 @@ class PostPreviewComponent < ApplicationComponent
     @post = post
     @tags = tags.presence
     @size = size.presence || DEFAULT_SIZE
-    @show_deleted = show_deleted
+    @show_deleted = true
     @show_votes = show_votes
     @link_target = link_target
     @pool = pool
