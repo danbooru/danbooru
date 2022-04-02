@@ -271,6 +271,12 @@ module Danbooru
       nil
     end
 
+    # Your Newgrounds "vmkIdu5l8m" cookie. Login to Newgrounds then use the
+    # devtools to find the "vmkIdu5l8m" cookie.
+    def newgrounds_session_cookie
+      nil
+    end
+
     # Your NicoSeiga "user_session" cookie. Login to NicoSeiga then use the
     # devtools to find the "user_session" cookie.
     def nico_seiga_user_session
