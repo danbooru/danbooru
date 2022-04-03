@@ -98,6 +98,21 @@ module Sources
       end
     end
 
+    context "A post with links to other illustrations in the commentary" do
+      should "not include the links in the commentary" do
+        @source = Source::Extractor.find("https://www.newgrounds.com/art/view/boxofwant/annie-hughes-1")
+
+        assert_equal(<<~EOS.chomp, @source.artist_commentary_desc)
+          <div class="padded-top  ql-body " id="author_comments"><p>Commission of Annie Hughes, the mom from The Iron Giant, for <a href="https://twitter.com/ManStawberry" target="_blank" rel="noopener noreferrer nofollow">@ManStawberry</a>.</p><p><br></p>
+          </div>
+        EOS
+
+        assert_equal(<<~EOS.chomp, @source.dtext_artist_commentary_desc)
+          Commission of Annie Hughes, the mom from The Iron Giant, for "@ManStawberry":[https://twitter.com/ManStawberry].
+        EOS
+      end
+    end
+
     context "generating page urls" do
       should "work" do
         assert_equal("https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic", Source::URL.page_url("https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181"))

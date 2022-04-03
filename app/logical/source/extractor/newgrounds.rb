@@ -68,11 +68,12 @@ module Source
       end
 
       def artist_commentary_desc
-        page&.css("#author_comments")&.to_html
+        return "" if page.nil?
+        page.dup.css("#author_comments").tap { _1.css("ul.itemlist").remove }.to_html
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc)
+        DText.from_html(artist_commentary_desc).strip
       end
 
       def user_name
