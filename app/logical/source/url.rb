@@ -41,6 +41,7 @@ module Source
       Source::URL::Newgrounds,
       Source::URL::PixivSketch,
       Source::URL::Plurk,
+      Source::URL::Reddit,
       Source::URL::Skeb,
       Source::URL::Tinami,
       Source::URL::Tumblr,
