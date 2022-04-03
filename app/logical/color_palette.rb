@@ -14,7 +14,7 @@
 # @see https://en.wikipedia.org/wiki/HSLuv
 # @see https://github.com/hsluv/hsluv
 # @see https://danbooru.donmai.us/static/colors
-# @see app/javascript/src/styles/base/040_colors.css
+# @see app/javascript/src/styles/base/040_colors.scss
 module ColorPalette
   module_function
 
