@@ -218,7 +218,7 @@ module ArtistFinder
   def find_artists(url)
     return Artist.none if url.blank?
 
-    url = ArtistURL.normalize_normalized_url(url)
+    url = ArtistURL.normalize_url(url)
 
     # First try an exact match
     artists = Artist.active.joins(:urls).where(urls: { url: url })

@@ -5,7 +5,6 @@
         <%= fa.input :name, label: "Artist Name", input_html: { value: params.dig(:search, :artist, :name), "data-autocomplete": "artist" } %>
       <% end %>
       <%= f.input :url_matches, label: "URL", input_html: { value: params[:search][:url_matches] } %>
-      <%= f.input :normalized_url_matches, label: "Normalized URL", input_html: { value: params[:search][:normalized_url_matches] } %>
       <%= f.input :is_active, label: "Active?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:is_active] %>
       <%= f.input :order, collection: [["ID", "id"], ["Created", "created_at"], ["Updated", "updated_at"]], selected: params[:search][:order] %>
       <%= f.submit "Search" %>
@@ -18,9 +17,6 @@
       <% end %>
       <% t.column "URL" do |artist_url| %>
         <%= external_link_to(artist_url.url.to_s) %>
-      <% end %>
-      <% t.column "Normalized URL" do |artist_url| %>
-        <%= external_link_to(artist_url.normalized_url) %>
       <% end %>
       <% t.column "Active?" do |artist_url| %>
         <%= artist_url.is_active.to_s %>

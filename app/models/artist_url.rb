@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ArtistURL < ApplicationRecord
+  self.ignored_columns = [:normalized_url]
+
   normalize :url, :normalize_url
 
   validates :url, presence: true, uniqueness: { scope: :artist_id }
@@ -8,8 +10,6 @@ class ArtistURL < ApplicationRecord
   validate :validate_url_is_not_duplicate
   belongs_to :artist, :touch => true
 
-  scope :url_matches, ->(url) { url_attribute_matches(:url, url) }
-  scope :normalized_url_matches, ->(url) { url_attribute_matches(:normalized_url, url) }
   scope :active, -> { where(is_active: true) }
 
   def self.parse_prefix(url)
@@ -19,23 +19,12 @@ class ArtistURL < ApplicationRecord
     [is_active, url]
   end
 
-  def self.normalize_normalized_url(url)
-    return nil if url.nil?
-
-    url = Source::URL.parse(url)&.profile_url || url
-    url = url.sub(%r{^https://}, "http://")
-    url = url.gsub(%r{/+\Z}, "")
-    url + "/"
-  end
-
   def self.search(params = {})
-    q = search_attributes(params, :id, :created_at, :updated_at, :url, :normalized_url, :is_active, :artist)
-
+    q = search_attributes(params, :id, :created_at, :updated_at, :url, :is_active, :artist)
     q = q.url_matches(params[:url_matches])
-    q = q.normalized_url_matches(params[:normalized_url_matches])
 
     case params[:order]
-    when /\A(id|artist_id|url|normalized_url|is_active|created_at|updated_at)(?:_(asc|desc))?\z/i
+    when /\A(id|artist_id|url|is_active|created_at|updated_at)(?:_(asc|desc))?\z/i
       dir = $2 || :desc
       q = q.order($1 => dir).order(id: :desc)
     else
@@ -45,16 +34,16 @@ class ArtistURL < ApplicationRecord
     q
   end
 
-  def self.url_attribute_matches(attr, url)
+  def self.url_matches(url)
     if url.blank?
       all
     elsif url =~ %r{\A/(.*)/\z}
-      where_regex(attr, $1)
+      where_regex(:url, $1)
     elsif url.include?("*")
-      where_ilike(attr, url)
+      where_ilike(:url, url)
     else
-      profile_url = Source::Extractor.find(url).profile_url || url
-      where(attr => normalize_normalized_url(profile_url))
+      profile_url = Source::Extractor.find(url).profile_url || normalize_url(url)
+      where(url: profile_url)
     end
   end
 
@@ -110,7 +99,6 @@ class ArtistURL < ApplicationRecord
   def url=(url)
     super(url)
     @parsed_url = Source::URL.parse(url)
-    self.normalized_url = self.class.normalize_normalized_url(self.url)
   end
 
   def parsed_url

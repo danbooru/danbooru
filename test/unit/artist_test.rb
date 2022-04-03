@@ -134,7 +134,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     should "allow fixing invalid urls" do
       artist = FactoryBot.build(:artist)
-      artist.urls << FactoryBot.build(:artist_url, url: "www.example.com", normalized_url: "www.example.com")
+      artist.urls << FactoryBot.build(:artist_url, url: "www.example.com")
       artist.save(validate: false)
 
       artist.update(url_string: "http://www.example.com")
