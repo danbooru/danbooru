@@ -11,7 +11,7 @@ module Source
     end
 
     def parse
-      case [host, *path_segments]
+      case [subdomain, domain, *path_segments]
 
       # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
       # https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
@@ -39,23 +39,23 @@ module Source
 
       # https://www.pixiv.net/en/artworks/46324488
       # https://www.pixiv.net/artworks/46324488
-      in "www.pixiv.net", *, "artworks", work_id
+      in _, "pixiv.net", *, "artworks", work_id
         @work_id = work_id
 
       # http://www.pixiv.net/i/18557054
-      in "www.pixiv.net", "i", work_id
+      in _, "pixiv.net", "i", work_id
         @work_id = work_id
 
       # http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
-      in "www.pixiv.net", "member_illust.php" if params[:illust_id].present?
+      in _, "pixiv.net", "member_illust.php" if params[:illust_id].present?
         @work_id = params[:illust_id]
 
       # https://www.pixiv.net/member.php?id=339253
       # http://www.pixiv.net/novel/member.php?id=76567
-      in "www.pixiv.net", *, "member.php" if params[:id].present?
+      in _, "pixiv.net", *, "member.php" if params[:id].present?
         @user_id = params[:id]
 
       # https://www.pixiv.net/u/9202877
@@ -63,24 +63,24 @@ module Source
       # https://www.pixiv.net/users/76567/novels
       # https://www.pixiv.net/users/39598149/illustrations?p=1
       # https://www.pixiv.net/user/13569921/series/81967
-      in "www.pixiv.net", ("u" | "user" | "users"), user_id, *rest
+      in _, "pixiv.net", ("u" | "user" | "users"), user_id, *rest
         @user_id = user_id
 
       # https://www.pixiv.net/en/users/9202877
       # https://www.pixiv.net/en/users/76567/novels
-      in "www.pixiv.net", _, ("u" | "users"), user_id, *rest
+      in _, "pixiv.net", _, ("u" | "users"), user_id, *rest
         @user_id = user_id
 
       # https://www.pixiv.net/stacc/noizave
-      in "www.pixiv.net", "stacc", username
+      in _, "pixiv.net", "stacc", username
         @username = username
 
       # http://www.pixiv.me/noizave
-      in "www.pixiv.me", username
+      in _, "pixiv.me", username
         @username = username
 
       # https://pixiv.cc/zerousagi/
-      in "www.pixiv.cc", username
+      in _, "pixiv.cc", username
         @username = username
 
       else
