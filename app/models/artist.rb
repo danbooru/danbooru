@@ -244,18 +244,23 @@ class Artist < ApplicationRecord
       end
     end
 
+    def urls_match(urls)
+      urls = Array.wrap(urls).flat_map(&:split)
+      return all if urls.empty?
+
+      urls.map do |url|
+        url_matches(url)
+      end.reduce(&:or)
+    end
+
     def url_matches(query)
       query = query.strip
 
-      if query =~ %r{\A/(.*)/\z}
-        where(id: ArtistURL.where_regex(:url, $1).select(:artist_id))
-      elsif query.include?("*")
-        where(id: ArtistURL.where_like(:url, query).select(:artist_id))
-      elsif query =~ %r{\Ahttps?://}i
+      if query =~ %r{\Ahttps?://}i
         url = Source::Extractor.find(query).profile_url || query
         ArtistFinder.find_artists(url)
       else
-        where(id: ArtistURL.where_like(:url, "*#{query}*").select(:artist_id))
+        where(id: ArtistURL.url_matches(query).select(:artist_id))
       end
     end
 
@@ -285,7 +290,7 @@ class Artist < ApplicationRecord
       end
 
       if params[:url_matches].present?
-        q = q.url_matches(params[:url_matches])
+        q = q.urls_match(params[:url_matches])
       end
 
       case params[:order]

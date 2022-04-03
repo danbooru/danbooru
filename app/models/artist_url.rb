@@ -21,7 +21,7 @@ class ArtistURL < ApplicationRecord
 
   def self.search(params = {})
     q = search_attributes(params, :id, :created_at, :updated_at, :url, :is_active, :artist)
-    q = q.url_matches(params[:url_matches])
+    q = q.urls_match(params[:url_matches])
 
     case params[:order]
     when /\A(id|artist_id|url|is_active|created_at|updated_at)(?:_(asc|desc))?\z/i
@@ -34,6 +34,15 @@ class ArtistURL < ApplicationRecord
     q
   end
 
+  def self.urls_match(urls)
+    urls = Array.wrap(urls).flat_map(&:split)
+    return all if urls.empty?
+
+    urls.map do |url|
+      url_matches(url)
+    end.reduce(&:or)
+  end
+
   def self.url_matches(url)
     if url.blank?
       all
@@ -41,9 +50,11 @@ class ArtistURL < ApplicationRecord
       where_regex(:url, $1)
     elsif url.include?("*")
       where_ilike(:url, url)
-    else
-      profile_url = Source::Extractor.find(url).profile_url || normalize_url(url)
+    elsif url =~ %r{\Ahttps?://}i
+      profile_url = Source::URL.profile_url(url) || Source::Extractor.find(url).profile_url || normalize_url(url)
       where(url: profile_url)
+    else
+      where_ilike(:url, "*#{url}*")
     end
   end
 
