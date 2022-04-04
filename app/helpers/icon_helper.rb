@@ -15,7 +15,7 @@ module IconHelper
 
   def image_icon_tag(filename, class: nil, **options)
     klass = binding.local_variable_get(:class)
-    tag.img(src: "/images/#{filename}", class: "icon #{klass}", **options)
+    image_pack_tag("static/#{filename}", class: "icon #{klass}", **options)
   end
 
   # fontawesome.com/icons/arrow-alt-up
