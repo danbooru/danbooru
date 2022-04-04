@@ -10,9 +10,9 @@ class TagAlias < TagRelationship
 
   scope :empty, -> { joins(:consequent_tag).merge(Tag.empty) }
 
-  def self.to_aliased(names)
-    names = Array(names).map(&:to_s)
-    return [] if names.empty?
+  # Given a list of tag names, return a hash mapping aliased names to real names.
+  def self.aliases_for(names)
+    return {} if names.empty?
 
     aliases = active.where(antecedent_name: names).map { |ta| [ta.antecedent_name, ta.consequent_name] }.to_h
 
@@ -22,7 +22,14 @@ class TagAlias < TagRelationship
       aliases[abbrev] = tag.name if tag.present?
     end
 
-    names.map { |name| aliases[name] || name }
+    aliases
+  end
+
+  # Given a list of tag names, return a new list with aliased tag names replaced by real tag names.
+  def self.to_aliased(names)
+    names = Array.wrap(names).map(&:to_s)
+    aliases = aliases_for(names)
+    names.map { |name| aliases.fetch(name, name) }
   end
 
   def process!

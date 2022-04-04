@@ -254,6 +254,20 @@ class PostQuery
         end
       end
 
+      # Replace tags according to a hash mapping old tag names to new tag names.
+      #
+      # @param replacements [Hash<String, String>] A hash mapping old tag names to new tag names.
+      # @return [AST] A new AST with the tags replaced.
+      def replace_tags(replacements)
+        rewrite do |node|
+          if node.tag? && replacements.has_key?(node.name)
+            node(:tag, replacements[node.name])
+          else
+            node
+          end
+        end
+      end
+
       # Call the block on the AST repeatedly until the output stops changing.
       #
       # `ast.repeat_until_unchanged(&:trim)` is like doing `ast.trim.trim.trim...`

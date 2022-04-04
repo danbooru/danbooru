@@ -47,5 +47,15 @@ class PostQuery
     select_metatags(*names).first&.value
   end
 
-  memoize :tags
+  # Return a new query AST, with aliased tags replaced with real tags.
+  def replace_aliases
+    ast.replace_tags(aliases)
+  end
+
+  # A hash mapping aliased tag names to real tag names.
+  def aliases
+    TagAlias.aliases_for(tag_names)
+  end
+
+  memoize :tags, :aliases
 end
