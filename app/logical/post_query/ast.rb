@@ -54,9 +54,37 @@ class PostQuery
       @args = args
     end
 
-    # Create an AST node.
-    def node(type, *args)
-      AST.new(type, args)
+    concerning :ConstructorMethods do
+      class_methods do
+        def tag(name)
+          AST.new(:tag, [name])
+        end
+
+        def metatag(name, value)
+          AST.new(:metatag, [name, value])
+        end
+      end
+
+      def &(other)
+        AST.new(:and, [self, other])
+      end
+
+      def |(other)
+        AST.new(:or, [self, other])
+      end
+
+      def ~
+        AST.new(:opt, [self])
+      end
+
+      def -@
+        AST.new(:not, [self])
+      end
+
+      # Create an AST node.
+      def node(type, *args)
+        AST.new(type, args)
+      end
     end
 
     concerning :SimplificationMethods do
