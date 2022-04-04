@@ -6,14 +6,14 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
   end
 
   def assert_fast_count(count, query, query_options = {}, fast_count_options = {})
-    assert_equal(count, PostQueryBuilder.new(query, **query_options).normalized_query.fast_count(**fast_count_options))
+    assert_equal(count, PostQuery.normalize(query, **query_options).with_implicit_metatags.fast_count(**fast_count_options))
   end
 
   def assert_parse_equals(expected, query)
     assert_equal(expected, PostQueryBuilder.new(query).split_query)
 
     # parsing, serializing, then parsing again should produce the same result.
-    assert_equal(PostQueryBuilder.new(query).to_s, PostQueryBuilder.new(PostQueryBuilder.new(query).to_s).to_s)
+    assert_equal(PostQuery.new(query).to_s, PostQuery.new(PostQuery.new(query).to_s).to_s)
   end
 
   setup do
@@ -1322,75 +1322,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
       assert_equal(%w(favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%), PostQueryBuilder.new("favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%").split_query)
     end
-
-    should "parse single tags correctly" do
-      assert_equal(true, PostQueryBuilder.new("foo").is_single_tag?)
-      assert_equal(true, PostQueryBuilder.new("-foo").is_single_tag?)
-      assert_equal(true, PostQueryBuilder.new("~foo").is_single_tag?)
-      assert_equal(true, PostQueryBuilder.new("foo*").is_single_tag?)
-      assert_equal(false, PostQueryBuilder.new("fav:1234").is_single_tag?)
-      assert_equal(false, PostQueryBuilder.new("pool:1234").is_single_tag?)
-      assert_equal(false, PostQueryBuilder.new('source:"foo bar baz"').is_single_tag?)
-      assert_equal(false, PostQueryBuilder.new("foo bar").is_single_tag?)
-    end
-
-    should "parse simple tags correctly" do
-      assert_equal(true, PostQueryBuilder.new("foo").is_simple_tag?)
-      assert_equal(false, PostQueryBuilder.new("-foo").is_simple_tag?)
-      assert_equal(false, PostQueryBuilder.new("~foo").is_simple_tag?)
-      assert_equal(false, PostQueryBuilder.new("foo*").is_simple_tag?)
-      assert_equal(false, PostQueryBuilder.new("fav:1234").is_simple_tag?)
-      assert_equal(false, PostQueryBuilder.new("FAV:1234").is_simple_tag?)
-      assert_equal(false, PostQueryBuilder.new("pool:1234").is_simple_tag?)
-      assert_equal(false, PostQueryBuilder.new('source:"foo bar baz"').is_simple_tag?)
-      assert_equal(false, PostQueryBuilder.new("foo bar").is_simple_tag?)
-    end
-
-    should "parse quoted metatags correctly" do
-      assert_parse_equals(%w[status:"active" source:"https"], %q(status:'active' source:'https'))
-      assert_parse_equals(%w[source:"https" status:"active"], %q(source:'https' status:'active'))
-      assert_parse_equals(%w[status:"active" source:"https"], %q(status:"active" source:'https'))
-      assert_parse_equals(%w[status:"active" source:"https"], %q(status:'active' source:"https"))
-      assert_parse_equals(%w[status:"active" source:https], %q(status:'active' source:https))
-      assert_parse_equals(%w[status:active source:"https"], %q(status:active source:'https'))
-
-      assert_parse_equals(%w[limit:"5" status:"active" source:"x"], %q(limit:"5" status:"active" source:"x"))
-      assert_parse_equals(%w[source:"" limit:"1" status:"deleted"], %q(source:"" limit:'1' status:'deleted'))
-
-      assert_parse_equals(['source:"bar baz"', 'don\'t_say_"lazy"'], %q(source:"bar baz" don't_say_"lazy"))
-      assert_parse_equals(['source:"bar baz"', 'don\'t_say_"lazy"'], %q(source:"bar baz" don't_say_"lazy"))
-      assert_parse_equals(['source:"bar baz"', 'don\'t_say_"lazy"'], %q(source:'bar baz' don't_say_"lazy"))
-
-      assert_parse_equals([%q(source:"foo")], %q(source:"\f\o\o"))
-      assert_parse_equals([%q(source:"foo")], %q(source:'\f\o\o'))
-      assert_parse_equals([%q(source:foo\bar)], %q(source:foo\bar))
-      assert_parse_equals([%q(source:"foo)], %q(source:"foo))
-      assert_parse_equals([%q(source:'foo)], %q(source:'foo))
-      assert_parse_equals([%q(source:"foo bar")], %q(source:foo\ bar))
-      assert_parse_equals([%q(source:"\"foo bar\\\\")], %q(source:"foo\ bar\\))
-
-      assert_parse_equals(['source:"don\'t_say_\\"lazy\\""', 'don\'t_say_"lazy"'], %q(source:"don't_say_\"lazy\"" don't_say_"lazy"))
-      assert_parse_equals(['source:"don\'t_say_\\"lazy\\""', 'don\'t_say_"lazy"'], %q(source:'don\'t_say_"lazy"' don't_say_"lazy"))
-    end
-  end
-
-  context "The normalized_query method" do
-    should "work" do
-      create(:tag_alias, antecedent_name: "gray", consequent_name: "grey")
-
-      assert_equal("foo", PostQueryBuilder.new("foo").normalized_query.to_s)
-      assert_equal("foo", PostQueryBuilder.new(" foo ").normalized_query.to_s)
-      assert_equal("foo", PostQueryBuilder.new("FOO").normalized_query.to_s)
-      assert_equal("foo", PostQueryBuilder.new("foo foo").normalized_query.to_s)
-      assert_equal("grey", PostQueryBuilder.new("gray").normalized_query.to_s)
-      assert_equal("aaa bbb", PostQueryBuilder.new("bbb aaa").normalized_query.to_s)
-      assert_equal("-aaa bbb", PostQueryBuilder.new("bbb -aaa").normalized_query.to_s)
-      assert_equal("~aaa ~bbb", PostQueryBuilder.new("~bbb ~aaa").normalized_query.to_s)
-      assert_equal("commentary:true bbb", PostQueryBuilder.new("bbb commentary:true").normalized_query.to_s)
-      assert_equal('commentary:"true" bbb', PostQueryBuilder.new("bbb commentary:'true'").normalized_query.to_s)
-      assert_equal('-commentary:true bbb', PostQueryBuilder.new("bbb -commentary:true").normalized_query.to_s)
-      assert_equal('-commentary:"true" bbb', PostQueryBuilder.new("bbb -commentary:'true'").normalized_query.to_s)
-    end
   end
 
   context "#fast_count" do
@@ -1452,7 +1383,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for a multi-tag search" do
       should "return the cached count, if it exists" do
-        Cache.put("pfc:score:42 aaa", 100)
+        Cache.put("pfc:aaa score:42", 100)
         assert_fast_count(100, "aaa score:42")
       end
 
@@ -1470,7 +1401,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     context "a blank search" do
       should "should execute a search" do
         assert_fast_count(1, "", {}, { estimate_count: false })
-        assert_nothing_raised { PostQueryBuilder.new("").normalized_query.fast_count(estimate_count: true) }
+        assert_nothing_raised { PostQuery.new("").fast_count(estimate_count: true) }
       end
 
       should "return 0 for a nonexisting tag" do
@@ -1480,12 +1411,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       context "in safe mode" do
         should "work for a blank search" do
           assert_fast_count(0, "", { safe_mode: true }, { estimate_count: false })
-          assert_nothing_raised { PostQueryBuilder.new("", safe_mode: true).normalized_query.fast_count(estimate_count: true) }
+          assert_nothing_raised { PostQuery.new("", safe_mode: true).fast_count(estimate_count: true) }
         end
 
         should "work for a nil search" do
           assert_fast_count(0, nil, { safe_mode: true }, { estimate_count: false })
-          assert_nothing_raised { PostQueryBuilder.new("", safe_mode: true).normalized_query.fast_count(estimate_count: true) }
+          assert_nothing_raised { PostQuery.new("", safe_mode: true).fast_count(estimate_count: true) }
         end
 
         should "not fail for a two tag search by a member" do
@@ -1502,8 +1433,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         @user = create(:user, enable_private_favorites: true)
         @post = as(@user) { create(:post, tag_string: "fav:#{@user.name}") }
 
-        assert_equal(1, PostQueryBuilder.new("fav:#{@user.name}", @user).fast_count)
-        assert_equal(0, PostQueryBuilder.new("fav:#{@user.name}").fast_count)
+        assert_equal(1, PostQuery.new("fav:#{@user.name}", current_user: @user).fast_count)
+        assert_equal(0, PostQuery.new("fav:#{@user.name}").fast_count)
       end
     end
   end

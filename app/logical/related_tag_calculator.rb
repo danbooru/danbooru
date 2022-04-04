@@ -19,7 +19,7 @@
 # @see https://en.wikipedia.org/wiki/Cosine_similarity
 module RelatedTagCalculator
   # Return the set of tags similar to the given search.
-  # @param post_query [PostQueryBuilder] the search to find similar tags for.
+  # @param post_query [PostQuery] the search to find similar tags for.
   # @param search_sample_size [Integer] the number of posts to sample from the search
   # @param tag_sample_size [Integer] the number of tags to calculate similarity for
   # @param category [Integer] an optional tag category, to restrict the tags to a given category.
@@ -41,12 +41,12 @@ module RelatedTagCalculator
   end
 
   # Return the set of tags most frequently appearing in the given search.
-  # @param post_query [PostQueryBuilder] the search to find frequent tags for.
+  # @param post_query [PostQuery] the search to find frequent tags for.
   # @param search_sample_size [Integer] the number of posts to sample from the search
   # @param category [Integer] an optional tag category, to restrict the tags to a given category.
   # @return [Array<Tag>] the set of frequent tags, ordered by most frequent
   def self.frequent_tags_for_search(post_query, search_sample_size: 1000, category: nil)
-    sample_posts = post_query.build.reorder(:md5).limit(search_sample_size)
+    sample_posts = post_query.posts.reorder(:md5).limit(search_sample_size)
     frequent_tags_for_post_relation(sample_posts, category: category)
   end
 
@@ -74,7 +74,7 @@ module RelatedTagCalculator
   end
 
   # Return a cached set of tags similar to the given search.
-  # @param post_query [PostQueryBuilder] the search to find similar tags for.
+  # @param post_query [PostQuery] the search to find similar tags for.
   # @param max_tags [Integer] the maximum number of tags to return
   # @param search_timeout [Integer] the database timeout for the search
   # @param cache_timeout [Integer] the length of time to cache the results
@@ -90,7 +90,7 @@ module RelatedTagCalculator
   # Return a cache key for the given search. Some searches are cached on a
   # per-user basis because they depend on the current user (for example,
   # searches for private favorites, favgroups, or saved searches).
-  # @param post_query [PostQueryBuilder] the post search
+  # @param post_query [PostQuery] the post search
   # @return [String] the cache key
   def self.cache_key(post_query)
     if post_query.is_user_dependent_search?

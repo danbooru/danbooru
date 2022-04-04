@@ -13,7 +13,9 @@ module Searchable
   end
 
   def negate_relation
-    unscoped.where(all.where_clause.invert.ast)
+    relation = unscoped
+    relation = relation.from(all.from_clause.value) if all.from_clause.value.present?
+    relation.where(all.where_clause.invert.ast)
   end
 
   # XXX hacky method to AND two relations together.

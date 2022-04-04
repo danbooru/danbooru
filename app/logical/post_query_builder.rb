@@ -93,49 +93,6 @@ class PostQueryBuilder
     @hide_deleted_posts = hide_deleted_posts
   end
 
-  def tags_match(tags, relation)
-    negated_wildcard_tags, negated_tags = tags.select(&:negated).partition(&:wildcard)
-    optional_wildcard_tags, optional_tags = tags.select(&:optional).partition(&:wildcard)
-    required_wildcard_tags, required_tags = tags.reject(&:negated).reject(&:optional).partition(&:wildcard)
-
-    negated_tags = negated_tags.map(&:name)
-    optional_tags = optional_tags.map(&:name)
-    required_tags = required_tags.map(&:name)
-
-    matched_negated_wildcard_tags = negated_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
-    matched_optional_wildcard_tags = optional_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
-    matched_required_wildcard_tags = required_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
-
-    negated_tags += (matched_negated_wildcard_tags.empty? && !negated_wildcard_tags.empty?) ? negated_wildcard_tags.map(&:name) : matched_negated_wildcard_tags
-    optional_tags += (matched_optional_wildcard_tags.empty? && !optional_wildcard_tags.empty?) ? optional_wildcard_tags.map(&:name) : matched_optional_wildcard_tags
-    optional_tags += (matched_required_wildcard_tags.empty? && !required_wildcard_tags.empty?) ? required_wildcard_tags.map(&:name) : matched_required_wildcard_tags
-
-    relation = relation.where_array_includes_all("string_to_array(posts.tag_string, ' ')", required_tags) if required_tags.present?
-    relation = relation.where_array_includes_any("string_to_array(posts.tag_string, ' ')", optional_tags) if optional_tags.present?
-    relation = relation.where_array_includes_none("string_to_array(posts.tag_string, ' ')", negated_tags) if negated_tags.present?
-    relation
-  end
-
-  def metatags_match(metatags, relation)
-    metatags.each do |metatag|
-      metatag_name = metatags_without_ord[metatag.name] if metatag.negated && metatags_without_ord.key?(metatag.name)
-
-      clause = metatag_matches(metatag_name || metatag.name, metatag.value, quoted: metatag.quoted)
-      clause = clause.negate_relation if metatag.negated
-      relation = relation.and_relation(clause)
-    end
-
-    relation
-  end
-
-  def metatags_without_ord
-    {
-      "ordfav" => "fav",
-      "ordfavgroup" => "favgroup",
-      "ordpool" => "pool",
-    }
-  end
-
   def metatag_matches(name, value, relation = Post.all, quoted: false)
     case name
     when "id"
@@ -256,53 +213,77 @@ class PostQueryBuilder
     end
   end
 
-  def tables_for_query
-    metatag_names = metatags.map(&:name)
-    metatag_names << find_metatag(:order).remove(/_(asc|desc)\z/i) if has_metatag?(:order)
+  def tables_for_query(post_query)
+    metatag_names = post_query.metatags.map(&:name)
+    metatag_names << post_query.find_metatag(:order).remove(/_(asc|desc)\z/i) if post_query.has_metatag?(:order)
 
     tables = metatag_names.map { |metatag| table_for_metatag(metatag.to_s) }
     tables.compact.uniq
   end
 
-  def add_joins(relation)
-    tables = tables_for_query
+  def add_joins(post_query, relation)
+    tables = tables_for_query(post_query)
     relation = relation.with_stats(tables)
     relation
   end
 
-  def build(includes: nil)
-    validate!
 
-    relation = Post.includes(includes)
-    relation = add_joins(relation)
-    relation = metatags_match(metatags, relation)
-    relation = tags_match(tags, relation)
+  # Generate a SQL relation from a PostQuery.
+  def build_relation(post_query, relation = Post.all)
+    post_query.ast.visit do |node, *children|
+      case node.type
+      in :all
+        relation.all
+      in :none
+        relation.none
+      in :tag
+        relation.tags_include(node.name)
+      in :metatag
+        metatag_matches(node.name, node.value, relation, quoted: node.quoted?)
+      in :wildcard
+        tag_names = Tag.wildcard_matches(node.name).limit(MAX_WILDCARD_TAGS).pluck(:name)
+        relation.where_array_includes_any("string_to_array(posts.tag_string, ' ')", tag_names)
+      in :not
+        children.first.negate_relation
+      in :and
+        children.reduce(&:and)
+      in :or
+        children.reduce(&:or)
+      end
+    end
+  end
+
+  def posts(post_query, includes: nil)
+    relation = Post.all
+    relation = add_joins(post_query, relation)
+    relation = build_relation(post_query, relation)
 
     # HACK: if we're using a date: or age: metatag, default to ordering by
     # created_at instead of id so that the query will use the created_at index.
-    if has_metatag?(:date, :age) && find_metatag(:order).in?(["id", "id_asc"])
+    if post_query.has_metatag?(:date, :age) && post_query.find_metatag(:order).in?(["id", "id_asc"])
       relation = search_order(relation, "created_at_asc")
-    elsif has_metatag?(:date, :age) && find_metatag(:order).in?(["id_desc", nil])
+    elsif post_query.has_metatag?(:date, :age) && post_query.find_metatag(:order).in?(["id_desc", nil])
       relation = search_order(relation, "created_at_desc")
-    elsif find_metatag(:order) == "custom"
-      relation = search_order_custom(relation, select_metatags(:id).map(&:value))
-    elsif has_metatag?(:ordfav)
+    elsif post_query.find_metatag(:order) == "custom"
+      relation = search_order_custom(relation, post_query.select_metatags(:id).map(&:value))
+    elsif post_query.has_metatag?(:ordfav)
       # no-op
     else
-      relation = search_order(relation, find_metatag(:order))
+      relation = search_order(relation, post_query.find_metatag(:order))
     end
 
-    if count = find_metatag(:random)
+    if count = post_query.find_metatag(:random)
       count = Integer(count).clamp(0, PostSets::Post::MAX_PER_PAGE)
       relation = relation.random(count)
     end
 
+    relation = relation.includes(includes)
     relation
   end
 
-  def paginated_posts(page, small_search_threshold: Danbooru.config.small_search_threshold.to_i, includes: nil, **options)
-    posts = build(includes: includes).paginate(page, **options)
-    posts = optimize_search(posts, small_search_threshold)
+  def paginated_posts(post_query, page, count:, small_search_threshold: Danbooru.config.small_search_threshold.to_i, includes: nil, **options)
+    posts = posts(post_query, includes: includes).paginate(page, count: count, **options)
+    posts = optimize_search(posts, count, small_search_threshold)
     posts.load
   end
 
@@ -315,7 +296,7 @@ class PostQueryBuilder
   # tags, Postgres sometimes assumes tags in the 10k-50k range are large enough
   # for a post id index scan, when in reality a tag index bitmap scan would be
   # better.
-  def optimize_search(relation, small_search_threshold)
+  def optimize_search(relation, post_count, small_search_threshold)
     return relation unless small_search_threshold.present?
 
     order_values = relation.order_values.map { |order| order.try(:to_sql) || order.to_s }.map(&:downcase)
@@ -745,131 +726,6 @@ class PostQueryBuilder
     end
   end
 
-  concerning :CountMethods do
-    def post_count
-      @post_count ||= fast_count
-    end
-
-    # Return an estimate of the number of posts returned by the search.  By
-    # default, we try to use an estimated or cached count before doing an exact
-    # count.
-    #
-    # @param timeout [Integer] the database timeout
-    # @param estimate_count [Boolean] if true, estimate the count with inexact methods
-    # @param skip_cache [Boolean] if true, don't use the cached count
-    # @return [Integer, nil] the number of posts, or nil on timeout
-    def fast_count(timeout: 1_000, estimate_count: true, skip_cache: false)
-      count = nil
-      count = estimated_count if estimate_count
-      count = cached_count(timeout) if count.nil? && !skip_cache
-      count = exact_count(timeout) if count.nil? && skip_cache
-      count
-    end
-
-    def estimated_count
-      if is_empty_search?
-        estimated_row_count
-      elsif is_simple_tag?
-        Tag.find_by(name: tags.first.name).try(:post_count)
-      elsif is_metatag?(:rating)
-        estimated_row_count
-      elsif is_metatag?(:pool) || is_metatag?(:ordpool)
-        name = find_metatag(:pool, :ordpool)
-        Pool.find_by_name(name)&.post_count || 0
-      elsif is_metatag?(:fav) || is_metatag?(:ordfav)
-        name = find_metatag(:fav, :ordfav)
-        user = User.find_by_name(name)
-
-        if user.nil?
-          0
-        elsif Pundit.policy!(current_user, user).can_see_favorites?
-          user.favorite_count
-        else
-          nil
-        end
-      end
-    end
-
-    # Estimate the count by parsing the Postgres EXPLAIN output.
-    def estimated_row_count
-      ExplainParser.new(build).row_count
-    end
-
-    def cached_count(timeout, duration: 5.minutes)
-      Cache.get(count_cache_key, duration) do
-        exact_count(timeout)
-      end
-    end
-
-    def exact_count(timeout)
-      Post.with_timeout(timeout) do
-        build.count
-      end
-    end
-
-    def count_cache_key
-      if is_user_dependent_search?
-        "pfc[#{current_user.id.to_i}]:#{to_s}"
-      else
-        "pfc:#{to_s}"
-      end
-    end
-
-    # @return [Boolean] true if the search depends on the current user because
-    #   of permissions or privacy settings.
-    def is_user_dependent_search?
-      metatags.any? do |metatag|
-        metatag.name.in?(%w[upvoter upvote downvoter downvote search flagger fav ordfav favgroup ordfavgroup]) ||
-        metatag.name == "status" && metatag.value == "unmoderated" ||
-        metatag.name == "disapproved" && !metatag.value.downcase.in?(PostDisapproval::REASONS)
-      end
-    end
-  end
-
-  concerning :NormalizationMethods do
-    # Normalize a search by sorting tags and applying aliases.
-    # @return [PostQueryBuilder] the normalized query
-    def normalized_query(implicit: true, sort: true)
-      post_query = dup
-      post_query.terms.concat(implicit_metatags) if implicit
-      post_query.normalize_aliases!
-      post_query.normalize_order! if sort
-      post_query
-    end
-
-    # Apply aliases to all tags in the query.
-    def normalize_aliases!
-      tag_names = tags.map(&:name)
-      tag_aliases = tag_names.zip(TagAlias.to_aliased(tag_names)).to_h
-
-      terms.map! do |term|
-        term.name = tag_aliases[term.name] if term.type == :tag
-        term
-      end
-    end
-
-    # Normalize the tag order.
-    def normalize_order!
-      terms.sort_by!(&:to_s).uniq!
-    end
-
-    # Implicit metatags are metatags added by the user's account settings.
-    # rating:s is implicit under safe mode. -status:deleted is implicit when the
-    # "hide deleted posts" setting is on.
-    def implicit_metatags
-      metatags = []
-      metatags << OpenStruct.new(type: :metatag, name: "rating", value: "s") if safe_mode?
-      metatags << OpenStruct.new(type: :metatag, name: "status", value: "deleted", negated: true) if hide_deleted?
-      metatags
-    end
-
-    # XXX unify with PostSets::Post#show_deleted?
-    def hide_deleted?
-      has_status_metatag = select_metatags(:status).any? { |metatag| metatag.value.downcase.in?(%w[deleted active any all unmoderated modqueue appealed]) }
-      hide_deleted_posts? && !has_status_metatag
-    end
-  end
-
   concerning :UtilityMethods do
     def to_s
       split_query.join(" ")
@@ -879,78 +735,7 @@ class PostQueryBuilder
     def terms
       @terms ||= scan_query
     end
-
-    # The list of regular tags in the search.
-    def tags
-      terms.select { |term| term.type == :tag }
-    end
-
-    # The list of metatags in the search.
-    def metatags
-      terms.select { |term| term.type == :metatag }
-    end
-
-    # Find all metatags with the given names.
-    def select_metatags(*names)
-      metatags.select { |term| term.name.in?(names.map(&:to_s)) }
-    end
-
-    # Find the first metatag with any of the given names.
-    def find_metatag(*metatags)
-      select_metatags(*metatags).first.try(:value)
-    end
-
-    # @return [Boolean] true if the search has a metatag with any of the given names.
-    def has_metatag?(*metatag_names)
-      metatags.any? { |term| term.name.in?(metatag_names.map(&:to_s).map(&:downcase)) }
-    end
-
-    # @return [Boolean] true if the search has a single regular tag, with any number of metatags.
-    def has_single_tag?
-      tags.size == 1 && !tags.first.wildcard
-    end
-
-    # @return [Boolean] true if the search is a single metatag search for the given metatag.
-    def is_metatag?(name, value = nil)
-      if value.nil?
-        is_single_term? && has_metatag?(name)
-      else
-        is_single_term? && find_metatag(name) == value.to_s
-      end
-    end
-
-    # @return [Boolean] true if the search doesn't have any tags or metatags.
-    def is_empty_search?
-      terms.size == 0
-    end
-
-    # @return [Boolean] true if the search consists of a single tag or metatag.
-    def is_single_term?
-      terms.size == 1
-    end
-
-    # @return [Boolean] true if the search has a single tag, possibly with wildcards or negation.
-    def is_single_tag?
-      is_single_term? && tags.size == 1
-    end
-
-    # @return [Boolean] true if the search has a single tag, without any wildcards or operators.
-    def is_simple_tag?
-      tag = tags.first
-      is_single_tag? && !tag.negated && !tag.optional && !tag.wildcard
-    end
-
-    # @return [Boolean] true if the search has a single tag with a wildcard
-    def is_wildcard_search?
-      is_single_tag? && tags.first.wildcard
-    end
-
-    # @return [Tag, nil] the tag if the search is for a simple tag, otherwise nil
-    def simple_tag
-      return nil if !is_simple_tag?
-      Tag.find_by_name(tags.first.name)
-    end
   end
 
-  memoize :split_query, :post_count
+  memoize :split_query
 end

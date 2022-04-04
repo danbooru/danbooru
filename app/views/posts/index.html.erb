@@ -46,9 +46,9 @@
 
       <li><%= link_to "Deleted", posts_path(tags: "#{params[:tags]} status:deleted"), rel: "nofollow" %></li>
       <li><%= link_to "Random", random_posts_path(tags: params[:tags]), id: "random-post", "data-shortcut": "r", rel: "nofollow" %></li>
-      <% if @post_set.normalized_query.has_single_tag? %>
-        <li><%= link_to "History", post_versions_path(search: { changed_tags: @post_set.normalized_query.tags.first.name }), rel: "nofollow" %></li>
-        <li><%= link_to "Discussions", forum_posts_path(search: { linked_to: @post_set.normalized_query.tags.first.name }), rel: "nofollow" %></li>
+      <% if @post_set.post_query.has_single_tag? %>
+        <li><%= link_to "History", post_versions_path(search: { changed_tags: @post_set.post_query.tag_name }), rel: "nofollow" %></li>
+        <li><%= link_to "Discussions", forum_posts_path(search: { linked_to: @post_set.post_query.tag_name }), rel: "nofollow" %></li>
       <% end %>
       <li><%= link_to "Count", posts_counts_path(tags: params[:tags]), rel: "nofollow" %></li>
     </ul>
@@ -222,7 +222,7 @@
 <% end %>
 
 <% content_for(:html_header) do %>
-  <% if @post_set.query.is_empty_search? %>
+  <% if @post_set.post_query.is_empty_search? %>
     <% page_title("#{Danbooru.config.app_name}: Anime Image Board", suffix: nil) %>
     <% meta_description site_description %>
 

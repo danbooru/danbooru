@@ -10,7 +10,7 @@ class RelatedTagQuery
 
   def initialize(query:, user: User.anonymous, category: nil, type: nil, limit: nil)
     @user = user
-    @post_query = PostQueryBuilder.new(query, user).normalized_query
+    @post_query = PostQuery.normalize(query, current_user: user) # XXX This query does not include implicit metatags (rating:s, -status:deleted)
     @query = @post_query.to_s
     @category = category
     @type = type
@@ -75,7 +75,7 @@ class RelatedTagQuery
   end
 
   def other_wiki_pages
-    tag = post_query.simple_tag
+    tag = post_query.tag
     return [] if tag.nil?
 
     if tag.copyright?

@@ -1384,8 +1384,8 @@ class Post < ApplicationRecord
       # @param hide_deleted_posts [Boolean] if true, automatically add -status:deleted to the search
       # @return [ActiveRecord::Relation<Post>] the set of resulting posts
       def user_tag_match(query, user = CurrentUser.user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
-        post_query = PostQueryBuilder.new(query, user, tag_limit: tag_limit, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
-        post_query.normalized_query.build
+        post_query = PostQuery.normalize(query, current_user: user, tag_limit: tag_limit, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
+        post_query.with_implicit_metatags.posts
       end
 
       def search(params)
