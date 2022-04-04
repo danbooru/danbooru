@@ -73,13 +73,13 @@ class AutocompleteService
   #
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_tag_query
-    if parsed_query.tag?
+    if parsed_query.tag_names.one?
       tag = parsed_query.tag_names.first
       autocomplete_tag(tag)
-    elsif parsed_query.wildcard?
+    elsif parsed_query.wildcards.one?
       wildcard = parsed_query.wildcards.first
       autocomplete_tag(wildcard.name)
-    elsif parsed_query.metatag?
+    elsif parsed_query.metatags.one?
       metatag = parsed_query.metatags.first
       autocomplete_metatag(metatag.name, metatag.value)
     else
@@ -333,7 +333,7 @@ class AutocompleteService
   # Whether the results can be safely cached with `Cache-Control: public`.
   # Queries that don't depend on the current user are safe to cache publicly.
   def cache_publicly?
-    if type == :tag_query && parsed_query.tag?
+    if type == :tag_query && parsed_query.tag_names.one?
       true
     elsif type.in?(%i[tag artist wiki_page pool opensearch])
       true
