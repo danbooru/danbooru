@@ -358,7 +358,7 @@ class PostQuery
       def quoted_value
         return nil unless metatag?
 
-        if value.include?(" ") || value.starts_with?('"') || value.empty?
+        if value.include?(" ") || value.starts_with?('"') || value.starts_with?("'") || value.empty?
           %Q{"#{value.gsub(/"/, '\\"')}"}
         else
           value

@@ -24,6 +24,7 @@ require "strscan"
 # metatag       = metatag_name ":" quoted_string
 # metatag_name  = "user" | "fav" | "pool" | "order" | ...
 # quoted_string = '"' /[^"]+/ '"'
+#               | "'" /[^']+/ "'"
 # tag           = /[^ *]+/
 # wildcard      = /[^ ]+/
 #
@@ -171,6 +172,10 @@ class PostQuery
         if accept('"')
           a = accept(/([^"\\]|\\")*/).gsub(/\\"/, '"') # handle backslash escaped quotes
           expect('"')
+          a
+        elsif accept("'")
+          a = accept(/([^'\\]|\\')*/).gsub(/\\'/, "'") # handle backslash escaped quotes
+          expect("'")
           a
         else
           string(/[^ ]+/)
