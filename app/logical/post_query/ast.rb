@@ -16,12 +16,13 @@
 # * :not (a unary NOT clause)
 # * :opt (the unary `~`, or 'optional' operator)
 #
-# The AST returned by the parser is normally simplified with `#simplify` before
+# The AST returned by the parser is normally rewritten with `#to_cnf` before
 # it's used. This is for several reasons:
 #
 # * To replace the `~` operator with `or` clauses.
 # * To remove redundant `and` and `or` nodes.
-# * To normalize the AST to conjunctive normal form.
+# * To transform the AST to conjunctive normal form.
+# * To sort the AST into alphabetical order.
 #
 # @example
 #
@@ -31,7 +32,7 @@
 #   PostQuery::Parser.parse("cat_girl or (cat_ears tail)").to_sexp
 #   => "(or (and cat_girl) (and (and cat_ears tail)))"
 #
-#   PostQuery::Parser.parse("cat_girl or (cat_ears tail)").simplify.to_sexp
+#   PostQuery::Parser.parse("cat_girl or (cat_ears tail)").to_cnf.to_sexp
 #   => "(and (or cat_ears cat_girl) (or cat_girl tail))"
 
 class PostQuery
@@ -53,103 +54,118 @@ class PostQuery
       @args = args
     end
 
+    # Create an AST node.
+    def node(type, *args)
+      AST.new(type, args)
+    end
+
     concerning :SimplificationMethods do
-      # Simplify the AST by rewriting `~` to `or` clauses, and by reducing it to
-      # conjunctive normal form (that is, product-of-sums form, or an AND of ORs).
+      # Convert the AST to conjunctive normal form, that is, product-of-sums
+      # form, or an AND of ORs. The result is a single top-level AND clause,
+      # containing a series of tags, metatags, and OR clauses, with no deeply
+      # nested subexpressions.
       #
-      # The algorithm is to repeatedly apply the rules of Boolean algebra, one
-      # at a time in a top-down fashion, until the AST can't be simplified any more.
-      #
-      # @return [AST] A new simplified AST
-      def simplify
-        old_ast = nil
-        new_ast = rewrite_opts
-
-        until new_ast == old_ast
-          old_ast = new_ast
-          new_ast = old_ast.simplify_once
-        end
-
-        new_ast
-      end
-
-      # Simplify the AST once by applying the rules of Boolean algebra in a single top-down pass.
-      #
-      # @return [AST] A new simplified AST
-      def simplify_once
-        case self
-
-        # (and A) = A
-        in [:and, a]
-          a
-
-        # (or A) = A
-        in [:or, a]
-          a
-
-        # Double negation: -(-A) = A
-        in [:not, [:not, a]]
-          a
-
-        # DeMorgan's law: -(A and B) = -A or -B
-        in [:not, [:and, *args]]
-          node(:or, *args.map { node(:not, _1) })
-
-        # DeMorgan's law: -(A or B) = -A and -B
-        in [:not, [:or, *args]]
-          node(:and, *args.map { node(:not, _1) })
-
-        # Associative law: (or (or A B) C) = (or A B C)
-        in [:or, *args] if args.any?(&:or?)
-          ors, others = args.partition(&:or?)
-          node(:or, *ors.flat_map(&:args), *others)
-
-        # Associative law: (and (and A B) C) = (and A B C)
-        in [:and, *args] if args.any?(&:and?)
-          ands, others = args.partition(&:and?)
-          node(:and, *ands.flat_map(&:args), *others)
-
-        # Distributive law: A or (B and C) = (A or B) and (A or C)
-        # (or A (and B C ...) ... = (and (or A B ...) (or A C ...) ...
-        in [:or, *args] if args.any?(&:and?)
-          ands, others = args.partition(&:and?)
-          first, rest = ands.first, ands[1..] + others
-          node(:and, *first.args.map { node(:or, _1, *rest) })
-
-        in [:not, arg]
-          node(:not, arg.simplify_once)
-
-        in [:and, *args]
-          node(:and, *args.map(&:simplify_once))
-
-        in [:or, *args]
-          node(:or, *args.map(&:simplify_once))
-
-        else
-          self
-        end
+      # @return [AST] A new AST in conjunctive normal form.
+      def to_cnf
+        rewrite_opts.simplify.sort
       end
 
       # Rewrite the `~` operator to `or` clauses.
       #
       # @return [AST] A new AST with `:opt` nodes replaced with `:or` nodes.
       def rewrite_opts
-        # ... ~A ~B ... = ... (or A B) ...
-        # ... ~A ... = ... (or A) ... = ... A ...
-        if children.any?(&:opt?)
-          opts, non_opts = children.partition(&:opt?)
-          or_node = node(:or, *opts.flat_map(&:children))
-          node(type, or_node, *non_opts).rewrite_opts
-        elsif children.any?
-          node(type, *children.map(&:rewrite_opts))
-        else
-          self
+        rewrite do |ast|
+          # ... ~A ~B ... = ... (or A B) ...
+          # ... ~A ... = ... (or A) ... = ... A ...
+          if ast.children.any?(&:opt?)
+            opts, non_opts = ast.children.partition(&:opt?)
+            or_node = node(:or, *opts.flat_map(&:children))
+            node(ast.type, or_node, *non_opts)
+          else
+            ast
+          end
         end
       end
 
-      # Create a new AST node, sorting the child nodes so that the AST is normalized to a consistent form.
-      def node(type, *args)
-        AST.new(type, args.sort)
+      # Simplify the AST by eliminating unnecessary AND and OR nodes, and by
+      # expanding out deeply nested subexpressions. The result is an AST in
+      # conjunctive normal form.
+      #
+      # @return [AST] A new AST in conjunctive normal form.
+      def simplify
+        repeat_until_unchanged do |ast|
+          ast.trim_once.simplify_once
+        end
+      end
+
+      # Simplify the AST once in a single top-down pass by applying the double
+      # negation law, DeMorgan's law, and the distributive law. This expands
+      # out deeply nested subexpressions.
+      #
+      # @return [AST] A new simplified AST
+      def simplify_once
+        rewrite do |ast|
+          case ast
+
+          # Double negation: -(-A) = A
+          in [:not, [:not, a]]
+            a
+
+          # DeMorgan's law: -(A and B) = -A or -B
+          in [:not, [:and, *children]]
+            node(:or, *children.map { node(:not, _1) })
+
+          # DeMorgan's law: -(A or B) = -A and -B
+          in [:not, [:or, *children]]
+            node(:and, *children.map { node(:not, _1) })
+
+          # Distributive law: A or (B and C) = (A or B) and (A or C)
+          # (or A (and B C ...) ... = (and (or A B ...) (or A C ...) ...
+          in [:or, *children] if children.any?(&:and?)
+            ands, non_ands = children.partition(&:and?)
+            first_and, rest = ands.first, ands[1..] + non_ands
+            node(:and, *first_and.children.map { node(:or, _1, *rest) })
+
+          else
+            ast
+          end
+        end
+      end
+
+      # Trim the AST by eliminating redundant AND and OR clauses.
+      def trim
+        repeat_until_unchanged(&:trim_once)
+      end
+
+      def trim_once
+        rewrite do |ast|
+          case ast
+
+          # (and A) = A; (or A) = A
+          in :and | :or, a
+            a
+
+          # Associative law: (and (and A B) C) = (and A B C)
+          in :and, *children
+            node(:and, *children.flat_map { _1.and? ? _1.children : _1 })
+
+          # Associative law: (or (or A B) C) = (or A B C)
+          in :or, *children
+            node(:or, *children.flat_map { _1.or? ? _1.children : _1 })
+
+          else
+            ast
+          end
+        end
+      end
+
+      # Sort the AST into alphabetical order.
+      def sort
+        if children.present?
+          node(type, *children.map(&:sort).sort)
+        else
+          self
+        end
       end
     end
 
@@ -210,7 +226,7 @@ class PostQuery
       end
     end
 
-    concerning :UtilityMethods do
+    concerning :TraversalMethods do
       # Traverse the AST in depth-first left-to-right order, calling the block on each
       # node and passing it the current node and the results from visiting each subtree.
       def visit(&block)
@@ -227,6 +243,35 @@ class PostQuery
         self
       end
 
+      # Rewrite the AST by calling the block on each node and replacing the node with the result.
+      def rewrite(&block)
+        ast = yield self
+
+        if ast.children.any?
+          node(ast.type, *ast.children.map { _1.rewrite(&block) } )
+        else
+          ast
+        end
+      end
+
+      # Call the block on the AST repeatedly until the output stops changing.
+      #
+      # `ast.repeat_until_unchanged(&:trim)` is like doing `ast.trim.trim.trim...`
+      # until the AST can't be trimmed any more.
+      def repeat_until_unchanged(&block)
+        old = nil
+        new = self
+
+        until new == old
+          old = new
+          new = yield old
+        end
+
+        new
+      end
+    end
+
+    concerning :UtilityMethods do
       # @return [Array<AST>] A flat list of all the nodes in the AST, in depth-first left-to-right order.
       def nodes
         each.map
@@ -298,6 +343,6 @@ class PostQuery
       end
     end
 
-    memoize :simplify, :simplify_once, :rewrite_opts, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_tree, :nodes, :tags, :metatags, :tag_names
+    memoize :to_cnf, :simplify, :simplify_once, :rewrite_opts, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_tree, :nodes, :tags, :metatags, :tag_names
   end
 end

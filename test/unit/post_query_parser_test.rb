@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PostQueryParserTest < ActiveSupport::TestCase
   def assert_parse_equals(expected, input)
-    assert_equal(expected, PostQuery::Parser.parse(input).simplify.to_sexp)
+    assert_equal(expected, PostQuery::Parser.parse(input).to_cnf.to_sexp)
   end
 
   def to_infix(string)
