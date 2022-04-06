@@ -60,8 +60,8 @@ class PostQuery
           AST.new(:tag, [name])
         end
 
-        def metatag(name, value)
-          AST.new(:metatag, [name, value])
+        def metatag(name, value, quoted = false)
+          AST.new(:metatag, [name, value, quoted])
         end
       end
 
@@ -211,7 +211,7 @@ class PostQuery
           "none"
         in [:tag, name]
           name
-        in [:metatag, name, value]
+        in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
         in [:wildcard, name]
           "(wildcard #{name})"
@@ -231,7 +231,7 @@ class PostQuery
           name
         in [:tag, name]
           name
-        in [:metatag, name, value]
+        in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
         in :not, child
           child.term? ? "-#{child.to_infix}" : "-(#{child.to_infix})"
@@ -354,11 +354,16 @@ class PostQuery
         args.second if metatag?
       end
 
+      # @return [String, nil] True if the metatag's value was enclosed in quotes.
+      def quoted?
+        args.third if metatag?
+      end
+
       # @return [String, nil] The value of the metatag as a quoted string, if a metatag node.
       def quoted_value
         return nil unless metatag?
 
-        if value.include?(" ") || value.starts_with?('"') || value.starts_with?("'") || value.empty?
+        if quoted?
           %Q{"#{value.gsub(/"/, '\\"')}"}
         else
           value

@@ -69,14 +69,14 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals('source:""', 'source:""')
       assert_parse_equals('source:"\""', 'source:"\""')
       assert_parse_equals(%q{source:"don't say \"lazy\" okay"}, %q{source:"don't say \"lazy\" okay"})
-      assert_parse_equals(%q{(and source:foo)bar a)}, %q{(a (source:"foo)bar"))})
+      assert_parse_equals(%q{(and source:"foo)bar" a)}, %q{(a (source:"foo)bar"))})
 
       assert_parse_equals('source:"foo bar"', "source:'foo bar'")
       assert_parse_equals("source:foobar'(", "source:foobar'(")
       assert_parse_equals('source:""', "source:''")
       assert_parse_equals('source:"\'"', "source:'\\''")
       assert_parse_equals(%q{source:"don't say \"lazy\" okay"}, %q{source:'don\'t say "lazy" okay'})
-      assert_parse_equals(%q{(and source:foo)bar a)}, %q{(a (source:'foo)bar'))})
+      assert_parse_equals(%q{(and source:"foo)bar" a)}, %q{(a (source:'foo)bar'))})
     end
 
     should "parse metatag synonyms correctly" do

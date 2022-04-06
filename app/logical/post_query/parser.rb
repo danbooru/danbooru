@@ -164,8 +164,8 @@ class PostQuery
         if accept(METATAG_NAME_REGEX)
           name = @scanner.matched.delete_suffix(":").downcase
           name = name.singularize + "_count" if name.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
-          value = quoted_string
-          node(:metatag, name, value)
+          quoted, value = quoted_string
+          node(:metatag, name, value, quoted)
         end
       end
 
@@ -173,13 +173,13 @@ class PostQuery
         if accept('"')
           a = accept(/([^"\\]|\\")*/).gsub(/\\"/, '"') # handle backslash escaped quotes
           expect('"')
-          a
+          [true, a]
         elsif accept("'")
           a = accept(/([^'\\]|\\')*/).gsub(/\\'/, "'") # handle backslash escaped quotes
           expect("'")
-          a
+          [true, a]
         else
-          string(/[^ ]+/)
+          [false, string(/[^ ]+/)]
         end
       end
 
