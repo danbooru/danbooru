@@ -79,6 +79,27 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals(%q{(and source:foo)bar a)}, %q{(a (source:'foo)bar'))})
     end
 
+    should "parse metatag synonyms correctly" do
+      assert_parse_equals("comment_count:0", "comments:0")
+      assert_parse_equals("deleted_comment_count:0", "deleted_comments:0")
+      assert_parse_equals("active_comment_count:0", "active_comments:0")
+      assert_parse_equals("note_count:0", "notes:0")
+      assert_parse_equals("deleted_note_count:0", "deleted_notes:0")
+      assert_parse_equals("active_note_count:0", "active_notes:0")
+      assert_parse_equals("flag_count:0", "flags:0")
+      assert_parse_equals("child_count:0", "children:0")
+      assert_parse_equals("deleted_child_count:0", "deleted_children:0")
+      assert_parse_equals("active_child_count:0", "active_children:0")
+      assert_parse_equals("pool_count:0", "pools:0")
+      assert_parse_equals("deleted_pool_count:0", "deleted_pools:0")
+      assert_parse_equals("active_pool_count:0", "active_pools:0")
+      assert_parse_equals("series_pool_count:0", "series_pools:0")
+      assert_parse_equals("collection_pool_count:0", "collection_pools:0")
+      assert_parse_equals("appeal_count:0", "appeals:0")
+      assert_parse_equals("approval_count:0", "approvals:0")
+      assert_parse_equals("replacement_count:0", "replacements:0")
+    end
+
     should "parse wildcard tags correctly" do
       assert_parse_equals("(wildcard *)", "*")
       assert_parse_equals("(wildcard *a)", "*a")

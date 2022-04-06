@@ -162,9 +162,10 @@ class PostQuery
       # metatag_name = "user" | "fav" | "pool" | "order" | ...
       def metatag
         if accept(METATAG_NAME_REGEX)
-          name = @scanner.matched.delete_suffix(":")
+          name = @scanner.matched.delete_suffix(":").downcase
+          name = name.singularize + "_count" if name.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
           value = quoted_string
-          node(:metatag, name.downcase, value)
+          node(:metatag, name, value)
         end
       end
 
