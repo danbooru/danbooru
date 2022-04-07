@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Danbooru
   module Extensions
     module String
@@ -54,6 +56,22 @@ module Danbooru
         text = text.gsub(/\r?\n|\r|\v|\f|\u0085|\u2028|\u2029/, "\r\n")
 
         text
+      end
+
+      # @return [Boolean] True if the string contains only balanced parentheses; false if the string contains unbalanced parentheses.
+      def has_balanced_parens?(open = "(", close = ")")
+        parens = 0
+
+        chars.each do |char|
+          if char == open
+            parens += 1
+          elsif char == close
+            parens -= 1
+            return false if parens < 0
+          end
+        end
+
+        parens == 0
       end
     end
   end

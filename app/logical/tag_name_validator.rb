@@ -18,6 +18,10 @@ class TagNameValidator < ActiveModel::EachValidator
       record.errors.add(attribute, "'#{value}' cannot be more than #{MAX_TAG_LENGTH} characters long")
     end
 
+    if !value.in?(Tag::PERMITTED_UNBALANCED_TAGS) && !value.has_balanced_parens?
+      record.errors.add(attribute, "'#{value}' cannot have unbalanced parentheses")
+    end
+
     case value
     when /\A_*\z/
       record.errors.add(attribute, "cannot be blank")

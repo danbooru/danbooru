@@ -3,6 +3,9 @@
 class Tag < ApplicationRecord
   ABBREVIATION_REGEXP = /([a-z0-9])[a-z0-9']*($|[^a-z0-9']+)/
 
+  # Tags that are permitted to have unbalanced parentheses, as a special exception to the normal rule that parentheses in tags must balanced.
+  PERMITTED_UNBALANCED_TAGS = %w[:) :( ;) ;( >:) >:(]
+
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
   has_one :antecedent_alias, -> {active}, :class_name => "TagAlias", :foreign_key => "antecedent_name", :primary_key => "name"

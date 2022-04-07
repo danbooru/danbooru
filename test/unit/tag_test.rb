@@ -147,6 +147,16 @@ class TagTest < ActiveSupport::TestCase
       should allow_value("foo bar").for(:name).on(:create)
       should allow_value("FOO").for(:name).on(:create)
 
+      should allow_value(":)").for(:name).on(:create)
+      should allow_value(":(").for(:name).on(:create)
+      should allow_value(";)").for(:name).on(:create)
+      should allow_value(";(").for(:name).on(:create)
+      should allow_value(">:)").for(:name).on(:create)
+      should allow_value(">:(").for(:name).on(:create)
+
+      should allow_value("foo_(bar)").for(:name).on(:create)
+      should allow_value("foo_(bar_(baz))").for(:name).on(:create)
+
       should_not allow_value("").for(:name).on(:create)
       should_not allow_value("___").for(:name).on(:create)
       should_not allow_value("~foo").for(:name).on(:create)
@@ -154,6 +164,7 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("/foo").for(:name).on(:create)
       should_not allow_value("`foo").for(:name).on(:create)
       should_not allow_value("%foo").for(:name).on(:create)
+      should_not allow_value("(foo").for(:name).on(:create)
       should_not allow_value(")foo").for(:name).on(:create)
       should_not allow_value("{foo").for(:name).on(:create)
       should_not allow_value("}foo").for(:name).on(:create)
@@ -168,6 +179,12 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("東方").for(:name).on(:create)
       should_not allow_value("FAV:blah").for(:name).on(:create)
       should_not allow_value("X"*171).for(:name).on(:create)
+
+      should_not allow_value("foo)").for(:name).on(:create)
+      should_not allow_value("foo(").for(:name).on(:create)
+      should_not allow_value("foo)(").for(:name).on(:create)
+      should_not allow_value("foo(()").for(:name).on(:create)
+      should_not allow_value("foo())").for(:name).on(:create)
 
       metatags = PostQueryBuilder::METATAGS + TagCategory.mapping.keys
       metatags.each do |metatag|
