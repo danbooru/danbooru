@@ -213,11 +213,11 @@
   <%= render "posts/partials/common/secondary_links" %>
 <% end %>
 
-<% if reportbooru_enabled? && @post_set.query.is_simple_tag? && @post_set.current_page == 1 %>
+<% if reportbooru_enabled? && @post_set.post_query.is_simple_tag? && @post_set.current_page == 1 %>
   <% if @post_set.post_count == 0 %>
-    <%= missed_post_search_count_js(@post_set.query.to_s) %>
+    <%= missed_post_search_count_js(@post_set.post_query.to_s) %>
   <% else %>
-    <%= post_search_count_js(@post_set.query.to_s) %>
+    <%= post_search_count_js(@post_set.post_query.to_s) %>
   <% end %>
 <% end %>
 
