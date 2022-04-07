@@ -98,6 +98,15 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("appeal_count:0", "appeals:0")
       assert_parse_equals("approval_count:0", "approvals:0")
       assert_parse_equals("replacement_count:0", "replacements:0")
+
+      assert_parse_equals("order:comment_count", "order:comments")
+      assert_parse_equals("order:note_count", "order:notes")
+      assert_parse_equals("order:flag_count", "order:flags")
+      assert_parse_equals("order:child_count", "order:children")
+      assert_parse_equals("order:pool_count", "order:pools")
+      assert_parse_equals("order:appeal_count", "order:appeals")
+      assert_parse_equals("order:approval_count", "order:approvals")
+      assert_parse_equals("order:replacement_count", "order:replacements")
     end
 
     should "parse wildcard tags correctly" do

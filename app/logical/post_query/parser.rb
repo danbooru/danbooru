@@ -165,6 +165,14 @@ class PostQuery
           name = @scanner.matched.delete_suffix(":").downcase
           name = name.singularize + "_count" if name.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
           quoted, value = quoted_string
+
+          if name == "order"
+            attribute, direction, _tail = value.to_s.downcase.partition(/_(asc|desc)\z/i)
+            if attribute.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
+              value = attribute.singularize + "_count" + direction
+            end
+          end
+
           node(:metatag, name, value, quoted)
         end
       end
