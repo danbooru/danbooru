@@ -108,9 +108,7 @@ class Post < ApplicationRecord
     )
   end
 
-  module FileMethods
-    extend ActiveSupport::Concern
-
+  concerning :FileMethods do
     def seo_tags
       presenter.humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "_").gsub(/(?:^_+)|(?:_+$)/, "").gsub(/_{2,}/, "_")
     end
@@ -191,7 +189,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module ImageMethods
+  concerning :ImageMethods do
     def twitter_card_supported?
       image_width.to_i >= 280 && image_height.to_i >= 150
     end
@@ -248,7 +246,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module ApprovalMethods
+  concerning :ApprovalMethods do
     def in_modqueue?
       is_pending? || is_flagged? || is_appealed?
     end
@@ -280,7 +278,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module PresenterMethods
+  concerning :PresenterMethods do
     def presenter
       @presenter ||= PostPresenter.new(self)
     end
@@ -320,7 +318,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module TagMethods
+  concerning :TagMethods do
     def tag_array
       tag_string.split
     end
@@ -683,7 +681,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module FavoriteMethods
+  concerning :FavoriteMethods do
     def favorited_by?(user)
       return false if user.is_anonymous?
       Favorite.exists?(post: self, user: user)
@@ -700,7 +698,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module PoolMethods
+  concerning :PoolMethods do
     def pools
       Pool.where("pools.post_ids && array[?]", id)
     end
@@ -716,7 +714,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module VoteMethods
+  concerning :VoteMethods do
     def vote!(score, voter)
       # Ignore vote if user doesn't have permission to vote.
       return unless Pundit.policy!(voter, PostVote).create?
@@ -728,7 +726,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module ParentMethods
+  concerning :ParentMethods do
     # A parent has many children. A child belongs to a parent.
     # A parent cannot have a parent.
     #
@@ -799,7 +797,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module DeletionMethods
+  concerning :DeletionMethods do
     def expunge!
       transaction do
         Post.without_timeout do
@@ -850,7 +848,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module VersionMethods
+  concerning :VersionMethods do
     def create_version(force = false)
       if new_record? || saved_change_to_watched_attributes? || force
         create_new_version
@@ -888,7 +886,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module NoteMethods
+  concerning :NoteMethods do
     def has_notes?
       last_noted_at.present?
     end
@@ -930,7 +928,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module ApiMethods
+  concerning :ApiMethods do
     def legacy_attributes
       hash = {
         "has_comments" => last_commented_at.present?,
@@ -973,186 +971,188 @@ class Post < ApplicationRecord
     end
   end
 
-  module SearchMethods
-    # Return a set of up to N random posts. May return less if there aren't
-    # enough posts.
-    #
-    # @param n [Integer] The maximum number of posts to return
-    # @return [ActiveRecord::Relation<Post>]
-    def random(n = 1)
-      posts = n.times.map do
-        key = SecureRandom.hex(16)
-        random_up(key) || random_down(key)
-      end.compact.uniq
+  concerning :SearchMethods do
+    class_methods do
+      # Return a set of up to N random posts. May return less if there aren't
+      # enough posts.
+      #
+      # @param n [Integer] The maximum number of posts to return
+      # @return [ActiveRecord::Relation<Post>]
+      def random(n = 1)
+        posts = n.times.map do
+          key = SecureRandom.hex(16)
+          random_up(key) || random_down(key)
+        end.compact.uniq
 
-      reorder(nil).in_order_of(:id, posts.map(&:id))
-    end
-
-    def random_up(key)
-      where("md5 < ?", key).reorder(md5: :desc).first
-    end
-
-    def random_down(key)
-      where("md5 >= ?", key).reorder(md5: :asc).first
-    end
-
-    def sample(query, sample_size)
-      user_tag_match(query, safe_mode: false, hide_deleted_posts: false).reorder(:md5).limit(sample_size)
-    end
-
-    # unflattens the tag_string into one tag per row.
-    def with_unflattened_tags
-      joins("CROSS JOIN unnest(string_to_array(tag_string, ' ')) AS tag")
-    end
-
-    def with_comment_stats
-      relation = left_outer_joins(:comments).group(:id).select("posts.*")
-      relation = relation.select("COUNT(comments.id) AS comment_count")
-      relation = relation.select("COUNT(comments.id) FILTER (WHERE comments.is_deleted = TRUE)  AS deleted_comment_count")
-      relation = relation.select("COUNT(comments.id) FILTER (WHERE comments.is_deleted = FALSE) AS active_comment_count")
-      relation
-    end
-
-    def with_note_stats
-      relation = left_outer_joins(:notes).group(:id).select("posts.*")
-      relation = relation.select("COUNT(notes.id) AS note_count")
-      relation = relation.select("COUNT(notes.id) FILTER (WHERE notes.is_active = TRUE)  AS active_note_count")
-      relation = relation.select("COUNT(notes.id) FILTER (WHERE notes.is_active = FALSE) AS deleted_note_count")
-      relation
-    end
-
-    def with_flag_stats
-      relation = left_outer_joins(:flags).group(:id).select("posts.*")
-      relation.select("COUNT(post_flags.id) AS flag_count")
-    end
-
-    def with_appeal_stats
-      relation = left_outer_joins(:appeals).group(:id).select("posts.*")
-      relation = relation.select("COUNT(post_appeals.id) AS appeal_count")
-      relation
-    end
-
-    def with_approval_stats
-      relation = left_outer_joins(:approvals).group(:id).select("posts.*")
-      relation = relation.select("COUNT(post_approvals.id) AS approval_count")
-      relation
-    end
-
-    def with_replacement_stats
-      relation = left_outer_joins(:replacements).group(:id).select("posts.*")
-      relation = relation.select("COUNT(post_replacements.id) AS replacement_count")
-      relation
-    end
-
-    def with_child_stats
-      relation = left_outer_joins(:children).group(:id).select("posts.*")
-      relation = relation.select("COUNT(children_posts.id) AS child_count")
-      relation = relation.select("COUNT(children_posts.id) FILTER (WHERE children_posts.is_deleted = TRUE)  AS deleted_child_count")
-      relation = relation.select("COUNT(children_posts.id) FILTER (WHERE children_posts.is_deleted = FALSE) AS active_child_count")
-      relation
-    end
-
-    def with_pool_stats
-      pool_posts = Pool.joins("CROSS JOIN unnest(post_ids) AS post_id").select(:id, :is_deleted, :category, "post_id")
-      relation = joins("LEFT OUTER JOIN (#{pool_posts.to_sql}) pools ON pools.post_id = posts.id").group(:id).select("posts.*")
-
-      relation = relation.select("COUNT(pools.id) AS pool_count")
-      relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = TRUE) AS deleted_pool_count")
-      relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = FALSE) AS active_pool_count")
-      relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'series') AS series_pool_count")
-      relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'collection') AS collection_pool_count")
-      relation
-    end
-
-    def with_queued_at
-      relation = group(:id)
-      relation = relation.left_outer_joins(:flags, :appeals)
-      relation = relation.select("posts.*")
-      relation = relation.select(Arel.sql("MAX(GREATEST(posts.created_at, post_flags.created_at, post_appeals.created_at)) AS queued_at"))
-      relation
-    end
-
-    def with_stats(tables)
-      return all if tables.empty?
-
-      relation = all
-      tables.each do |table|
-        relation = relation.send("with_#{table}_stats")
+        reorder(nil).in_order_of(:id, posts.map(&:id))
       end
 
-      from(relation.arel.as("posts"))
-    end
-
-    def available_for_moderation(user, hidden: false)
-      return none if user.is_anonymous?
-
-      approved_posts = user.post_approvals.select(:post_id)
-      disapproved_posts = user.post_disapprovals.select(:post_id)
-
-      if hidden.present?
-        where("posts.uploader_id = ? OR posts.id IN (#{approved_posts.to_sql}) OR posts.id IN (#{disapproved_posts.to_sql})", user.id)
-      else
-        where.not(uploader: user).where.not(id: approved_posts).where.not(id: disapproved_posts)
-      end
-    end
-
-    def raw_tag_match(tag)
-      Post.where_array_includes_all("string_to_array(posts.tag_string, ' ')", [tag])
-    end
-
-    # Perform a tag search as an anonymous user. No tag limit is enforced.
-    def anon_tag_match(query)
-      user_tag_match(query, User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
-    end
-
-    # Perform a tag search as the system user, DanbooruBot. The search will
-    # have moderator-level permissions. No tag limit is enforced.
-    def system_tag_match(query)
-      user_tag_match(query, User.system, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
-    end
-
-    # Perform a tag search as the current user, or as another user.
-    #
-    # @param query [String] the tag search to perform
-    # @param user [User] the user to perform the search as
-    # @param tag_limit [Integer] the maximum number of tags allowed per search.
-    #   An exception will be raised if the search has too many tags.
-    # @param safe_mode [Boolean] if true, automatically add rating:s to the search
-    # @param hide_deleted_posts [Boolean] if true, automatically add -status:deleted to the search
-    # @return [ActiveRecord::Relation<Post>] the set of resulting posts
-    def user_tag_match(query, user = CurrentUser.user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
-      post_query = PostQueryBuilder.new(query, user, tag_limit: tag_limit, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
-      post_query.normalized_query.build
-    end
-
-    def search(params)
-      q = search_attributes(
-        params,
-        :id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
-        :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
-        :image_height, :tag_count, :has_children, :has_active_children,
-        :is_pending, :is_flagged, :is_deleted, :is_banned,
-        :last_comment_bumped_at, :last_commented_at, :last_noted_at,
-        :uploader_ip_addr, :uploader, :approver, :parent,
-        :artist_commentary, :flags, :appeals, :notes, :comments, :children,
-        :approvals, :replacements, :pixiv_ugoira_frame_data
-      )
-
-      if params[:tags].present?
-        q = q.user_tag_match(params[:tags])
+      def random_up(key)
+        where("md5 < ?", key).reorder(md5: :desc).first
       end
 
-      if params[:order].present?
-        q = PostQueryBuilder.new(nil).search_order(q, params[:order])
-      else
-        q = q.apply_default_order(params)
+      def random_down(key)
+        where("md5 >= ?", key).reorder(md5: :asc).first
       end
 
-      q
+      def sample(query, sample_size)
+        user_tag_match(query, safe_mode: false, hide_deleted_posts: false).reorder(:md5).limit(sample_size)
+      end
+
+      # unflattens the tag_string into one tag per row.
+      def with_unflattened_tags
+        joins("CROSS JOIN unnest(string_to_array(tag_string, ' ')) AS tag")
+      end
+
+      def with_comment_stats
+        relation = left_outer_joins(:comments).group(:id).select("posts.*")
+        relation = relation.select("COUNT(comments.id) AS comment_count")
+        relation = relation.select("COUNT(comments.id) FILTER (WHERE comments.is_deleted = TRUE)  AS deleted_comment_count")
+        relation = relation.select("COUNT(comments.id) FILTER (WHERE comments.is_deleted = FALSE) AS active_comment_count")
+        relation
+      end
+
+      def with_note_stats
+        relation = left_outer_joins(:notes).group(:id).select("posts.*")
+        relation = relation.select("COUNT(notes.id) AS note_count")
+        relation = relation.select("COUNT(notes.id) FILTER (WHERE notes.is_active = TRUE)  AS active_note_count")
+        relation = relation.select("COUNT(notes.id) FILTER (WHERE notes.is_active = FALSE) AS deleted_note_count")
+        relation
+      end
+
+      def with_flag_stats
+        relation = left_outer_joins(:flags).group(:id).select("posts.*")
+        relation.select("COUNT(post_flags.id) AS flag_count")
+      end
+
+      def with_appeal_stats
+        relation = left_outer_joins(:appeals).group(:id).select("posts.*")
+        relation = relation.select("COUNT(post_appeals.id) AS appeal_count")
+        relation
+      end
+
+      def with_approval_stats
+        relation = left_outer_joins(:approvals).group(:id).select("posts.*")
+        relation = relation.select("COUNT(post_approvals.id) AS approval_count")
+        relation
+      end
+
+      def with_replacement_stats
+        relation = left_outer_joins(:replacements).group(:id).select("posts.*")
+        relation = relation.select("COUNT(post_replacements.id) AS replacement_count")
+        relation
+      end
+
+      def with_child_stats
+        relation = left_outer_joins(:children).group(:id).select("posts.*")
+        relation = relation.select("COUNT(children_posts.id) AS child_count")
+        relation = relation.select("COUNT(children_posts.id) FILTER (WHERE children_posts.is_deleted = TRUE)  AS deleted_child_count")
+        relation = relation.select("COUNT(children_posts.id) FILTER (WHERE children_posts.is_deleted = FALSE) AS active_child_count")
+        relation
+      end
+
+      def with_pool_stats
+        pool_posts = Pool.joins("CROSS JOIN unnest(post_ids) AS post_id").select(:id, :is_deleted, :category, "post_id")
+        relation = joins("LEFT OUTER JOIN (#{pool_posts.to_sql}) pools ON pools.post_id = posts.id").group(:id).select("posts.*")
+
+        relation = relation.select("COUNT(pools.id) AS pool_count")
+        relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = TRUE) AS deleted_pool_count")
+        relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = FALSE) AS active_pool_count")
+        relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'series') AS series_pool_count")
+        relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'collection') AS collection_pool_count")
+        relation
+      end
+
+      def with_queued_at
+        relation = group(:id)
+        relation = relation.left_outer_joins(:flags, :appeals)
+        relation = relation.select("posts.*")
+        relation = relation.select(Arel.sql("MAX(GREATEST(posts.created_at, post_flags.created_at, post_appeals.created_at)) AS queued_at"))
+        relation
+      end
+
+      def with_stats(tables)
+        return all if tables.empty?
+
+        relation = all
+        tables.each do |table|
+          relation = relation.send("with_#{table}_stats")
+        end
+
+        from(relation.arel.as("posts"))
+      end
+
+      def available_for_moderation(user, hidden: false)
+        return none if user.is_anonymous?
+
+        approved_posts = user.post_approvals.select(:post_id)
+        disapproved_posts = user.post_disapprovals.select(:post_id)
+
+        if hidden.present?
+          where("posts.uploader_id = ? OR posts.id IN (#{approved_posts.to_sql}) OR posts.id IN (#{disapproved_posts.to_sql})", user.id)
+        else
+          where.not(uploader: user).where.not(id: approved_posts).where.not(id: disapproved_posts)
+        end
+      end
+
+      def raw_tag_match(tag)
+        Post.where_array_includes_all("string_to_array(posts.tag_string, ' ')", [tag])
+      end
+
+      # Perform a tag search as an anonymous user. No tag limit is enforced.
+      def anon_tag_match(query)
+        user_tag_match(query, User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
+      end
+
+      # Perform a tag search as the system user, DanbooruBot. The search will
+      # have moderator-level permissions. No tag limit is enforced.
+      def system_tag_match(query)
+        user_tag_match(query, User.system, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
+      end
+
+      # Perform a tag search as the current user, or as another user.
+      #
+      # @param query [String] the tag search to perform
+      # @param user [User] the user to perform the search as
+      # @param tag_limit [Integer] the maximum number of tags allowed per search.
+      #   An exception will be raised if the search has too many tags.
+      # @param safe_mode [Boolean] if true, automatically add rating:s to the search
+      # @param hide_deleted_posts [Boolean] if true, automatically add -status:deleted to the search
+      # @return [ActiveRecord::Relation<Post>] the set of resulting posts
+      def user_tag_match(query, user = CurrentUser.user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
+        post_query = PostQueryBuilder.new(query, user, tag_limit: tag_limit, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
+        post_query.normalized_query.build
+      end
+
+      def search(params)
+        q = search_attributes(
+          params,
+          :id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
+          :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
+          :image_height, :tag_count, :has_children, :has_active_children,
+          :is_pending, :is_flagged, :is_deleted, :is_banned,
+          :last_comment_bumped_at, :last_commented_at, :last_noted_at,
+          :uploader_ip_addr, :uploader, :approver, :parent,
+          :artist_commentary, :flags, :appeals, :notes, :comments, :children,
+          :approvals, :replacements, :pixiv_ugoira_frame_data
+        )
+
+        if params[:tags].present?
+          q = q.user_tag_match(params[:tags])
+        end
+
+        if params[:order].present?
+          q = PostQueryBuilder.new(nil).search_order(q, params[:order])
+        else
+          q = q.apply_default_order(params)
+        end
+
+        q
+      end
     end
   end
 
-  module PixivMethods
+  concerning :PixivMethods do
     def parse_pixiv_id
       self.pixiv_id = nil
       return unless web_source?
@@ -1221,7 +1221,7 @@ class Post < ApplicationRecord
     end
   end
 
-  module ValidationMethods
+  concerning :ValidationMethods do
     def post_is_not_its_own_parent
       if !new_record? && id == parent_id
         errors.add(:base, "Post cannot have itself as a parent")
@@ -1286,23 +1286,6 @@ class Post < ApplicationRecord
       end
     end
   end
-
-  include FileMethods
-  include ImageMethods
-  include ApprovalMethods
-  include PresenterMethods
-  include TagMethods
-  include FavoriteMethods
-  include PoolMethods
-  include VoteMethods
-  include ParentMethods
-  include DeletionMethods
-  include VersionMethods
-  include NoteMethods
-  include ApiMethods
-  extend SearchMethods
-  include PixivMethods
-  include ValidationMethods
 
   has_bit_flags ["has_embedded_notes"]
 
