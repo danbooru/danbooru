@@ -123,6 +123,17 @@ div.prose {
     color: var(--dtext-spoiler-hover-color);
   }
 
+  // Prevent accidentally opening a link when tapping a spoiler to reveal it
+  .spoiler:hover a {
+    animation: delay-pointer-events 50ms;
+  }
+
+  @keyframes delay-pointer-events {
+    0%, 99% {
+      pointer-events: none;
+    }
+  }
+
   .spoiler {
     background: var(--dtext-spoiler-background-color);
   }
