@@ -1,8 +1,8 @@
 require 'test_helper'
 
 class PostQueryBuilderTest < ActiveSupport::TestCase
-  def assert_tag_match(posts, query, **options)
-    assert_equal(posts.map(&:id), Post.user_tag_match(query, CurrentUser.user, **options).pluck(:id))
+  def assert_tag_match(posts, query, current_user: CurrentUser.user, **options)
+    assert_equal(posts.map(&:id), Post.user_tag_match(query, current_user, **options).pluck(:id))
   end
 
   def assert_fast_count(count, query, query_options = {}, fast_count_options = {})
@@ -449,6 +449,22 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[2]], "approver:none")
       assert_tag_match([posts[2]], "approver:NONE")
       assert_tag_match([], "approver:does_not_exist")
+    end
+
+    should "return posts for the flagger:<name> metatag" do
+      posts = create_list(:post, 2)
+      flag = create(:post_flag, post: posts[0])
+
+      assert_tag_match([posts[0]], "flagger:#{flag.creator.name}", current_user: flag.creator)
+      assert_tag_match([posts[1]], "-flagger:#{flag.creator.name}", current_user: flag.creator)
+
+      assert_tag_match([], "flagger:#{flag.creator.name}", current_user: User.anonymous)
+      assert_tag_match([posts[1], posts[0]], "-flagger:#{flag.creator.name}", current_user: User.anonymous)
+
+      assert_tag_match([posts[0]], "flagger:any")
+      assert_tag_match([posts[1]], "flagger:none")
+      assert_tag_match([posts[1]], "flagger:NONE")
+      assert_tag_match([], "flagger:does_not_exist")
     end
 
     should "return posts for the commenter:<name> metatag" do

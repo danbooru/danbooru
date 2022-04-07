@@ -1311,7 +1311,7 @@ class Post < ApplicationRecord
         end
       end
 
-      def flagger_matches(username)
+      def flagger_matches(username, current_user)
         flags = PostFlag.unscoped.category_matches("normal")
 
         user_subquery_matches(flags, username) do |username|
@@ -1323,9 +1323,9 @@ class Post < ApplicationRecord
       def user_subquery_matches(subquery, username, field: :creator, &block)
         subquery = subquery.where("post_id = posts.id").select(1)
 
-        if username == "any"
+        if username.downcase == "any"
           where("EXISTS (#{subquery.to_sql})")
-        elsif username == "none"
+        elsif username.downcase == "none"
           where("NOT EXISTS (#{subquery.to_sql})")
         elsif block.nil?
           user = User.find_by_name(username)

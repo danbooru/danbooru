@@ -215,7 +215,7 @@ class PostQueryBuilder
     when "approver"
       relation.approver_matches(value)
     when "flagger"
-      relation.flagger_matches(value)
+      relation.flagger_matches(value, current_user)
     when "appealer"
       relation.user_subquery_matches(PostAppeal.unscoped, value)
     when "commenter", "comm"
