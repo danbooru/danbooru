@@ -50,6 +50,10 @@ class BulkUpdateRequestProcessor
         [:change_category, Tag.normalize_name($1), $2.downcase]
       when /\Anuke (\S+)\z/i
         [:nuke, $1]
+      when /\Adeprecate (\S+)\z/i
+        [:deprecate, $1]
+      when /\Aundeprecate (\S+)\z/i
+        [:undeprecate, $1]
       else
         [:invalid_line, line]
       end
@@ -125,6 +129,18 @@ class BulkUpdateRequestProcessor
         when :nuke
           # okay
 
+        when :deprecate
+          tag = Tag.find_by_name(args[0])
+          if tag.is_deprecated?
+            errors.add(:base, "Can't deprecate #{args[0]} (tag is already deprecated)")
+          end
+
+        when :undeprecate
+          tag = Tag.find_by_name(args[0])
+          if !tag.is_deprecated?
+            errors.add(:base, "Can't undeprecate #{args[0]} (tag is not deprecated)")
+          end
+
         when :invalid_line
           errors.add(:base, "Invalid line: #{args[0]}")
 
@@ -182,6 +198,16 @@ class BulkUpdateRequestProcessor
           tag = Tag.find_or_create_by_name(args[0])
           tag.update!(category: Tag.categories.value_for(args[1]))
 
+        when :deprecate
+          tag = Tag.find_or_create_by_name(args[0])
+          tag.update!(is_deprecated: true)
+          TagImplication.active.where(consequent_name: tag.name).each { |ti| ti.reject!(User.system) }
+          TagImplication.active.where(antecedent_name: tag.name).each { |ti| ti.reject!(User.system) }
+
+        when :undeprecate
+          tag = Tag.find_or_create_by_name(args[0])
+          tag.update!(is_deprecated: false)
+
         else
           # should never happen
           raise Error, "Unknown command: #{command}"
@@ -204,7 +230,7 @@ class BulkUpdateRequestProcessor
         [args[0], args[1]]
       when :mass_update
         PostQuery.new(args[0]).tag_names + PostQuery.new(args[1]).tag_names
-      when :nuke
+      when :nuke, :deprecate, :undeprecate
         PostQuery.new(args[0]).tag_names
       when :change_category
         args[0]
@@ -240,6 +266,8 @@ class BulkUpdateRequestProcessor
         else
           "nuke {{#{args[0]}}}"
         end
+      when :deprecate, :undeprecate
+        "#{command.to_s} [[#{args[0]}]]"
       when :change_category
         "category [[#{args[0]}]] -> #{args[1]}"
       else

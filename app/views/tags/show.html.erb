@@ -8,6 +8,9 @@
     <ul>
       <li>Count: <%= @tag.post_count %></li>
       <li>Category: <%= @tag.category_name %></li>
+      <% if @tag.is_deprecated? %>
+        <li> This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</li>
+      <% end %>
     </ul>
   </div>
 </div>

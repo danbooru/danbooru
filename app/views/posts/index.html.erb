@@ -121,6 +121,10 @@
           <%= format_text(wiki_page.body) %>
           <%= render "tag_relationships/alias_and_implication_list", tag: wiki_page.tag %>
 
+          <% if wiki_page.tag&.is_deprecated? %>
+            <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</p>
+          <% end %>
+
           <p class="mt-4">
             <%= link_to_wiki "View wiki", wiki_page.title, id: "view-wiki-link" %>
           </p>
@@ -154,6 +158,10 @@
       <p>There is no wiki page yet for the tag <%= link_to_wiki @post_set.tag.pretty_name %>. <%= link_to "Create new wiki page", new_wiki_page_path(wiki_page: { title: @post_set.tag.name }), rel: "nofollow" %>.</p>
 
       <%= render "tag_relationships/alias_and_implication_list", tag: @post_set.tag %>
+
+      <% if @post_set.tag&.is_deprecated? %>
+        <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</p>
+      <% end %>
     <% end %>
   </div>
 
