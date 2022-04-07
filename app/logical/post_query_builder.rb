@@ -136,350 +136,115 @@ class PostQueryBuilder
     }
   end
 
-  def metatag_matches(name, value, quoted: false)
+  def metatag_matches(name, value, relation = Post.all, quoted: false)
     case name
     when "id"
-      attribute_matches(value, :id)
+      relation.attribute_matches(value, :id)
     when "md5"
-      attribute_matches(value, :md5, :md5)
+      relation.attribute_matches(value, :md5, :md5)
     when "width"
-      attribute_matches(value, :image_width)
+      relation.attribute_matches(value, :image_width)
     when "height"
-      attribute_matches(value, :image_height)
+      relation.attribute_matches(value, :image_height)
     when "mpixels"
-      attribute_matches(value, "posts.image_width * posts.image_height / 1000000.0", :float)
+      relation.attribute_matches(value, "posts.image_width * posts.image_height / 1000000.0", :float)
     when "ratio"
-      attribute_matches(value, "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", :ratio)
+      relation.attribute_matches(value, "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", :ratio)
     when "score"
-      attribute_matches(value, :score)
+      relation.attribute_matches(value, :score)
     when "upvotes"
-      attribute_matches(value, :up_score)
+      relation.attribute_matches(value, :up_score)
     when "downvotes"
-      attribute_matches(value, "ABS(posts.down_score)")
+      relation.attribute_matches(value, "ABS(posts.down_score)")
     when "favcount"
-      attribute_matches(value, :fav_count)
+      relation.attribute_matches(value, :fav_count)
     when "filesize"
-      attribute_matches(value, :file_size, :filesize)
+      relation.attribute_matches(value, :file_size, :filesize)
     when "filetype"
-      attribute_matches(value, :file_ext, :enum)
+      relation.attribute_matches(value, :file_ext, :enum)
     when "date"
-      attribute_matches(value, :created_at, :date)
+      relation.attribute_matches(value, :created_at, :date)
     when "age"
-      attribute_matches(value, :created_at, :age)
+      relation.attribute_matches(value, :created_at, :age)
     when "pixiv", "pixiv_id"
-      attribute_matches(value, :pixiv_id)
+      relation.attribute_matches(value, :pixiv_id)
     when "tagcount"
-      attribute_matches(value, :tag_count)
+      relation.attribute_matches(value, :tag_count)
     when "duration"
-      attribute_matches(value, "media_assets.duration", :float).joins(:media_asset)
+      relation.attribute_matches(value, "media_assets.duration", :float).joins(:media_asset)
     when "status"
-      status_matches(value)
+      relation.status_matches(value, current_user)
     when "parent"
-      parent_matches(value)
+      relation.parent_matches(value)
     when "child"
-      child_matches(value)
+      relation.child_matches(value)
     when "rating"
-      Post.where(rating: value.first.downcase)
+      relation.where(rating: value.first.downcase)
     when "embedded"
-      embedded_matches(value)
+      relation.embedded_matches(value)
     when "source"
-      source_matches(value, quoted)
+      relation.source_matches(value, quoted)
     when "disapproved"
-      disapproved_matches(value)
+      relation.disapproved_matches(value, current_user)
     when "commentary"
-      commentary_matches(value, quoted)
+      relation.commentary_matches(value, quoted)
     when "note"
-      note_matches(value)
+      relation.note_matches(value)
     when "comment"
-      comment_matches(value)
+      relation.comment_matches(value)
     when "search"
-      saved_search_matches(value)
+      relation.saved_search_matches(value, current_user)
     when "pool"
-      pool_matches(value)
+      relation.pool_matches(value)
     when "ordpool"
-      ordpool_matches(value)
+      relation.ordpool_matches(value)
     when "favgroup"
-      favgroup_matches(value)
+      relation.favgroup_matches(value, current_user)
     when "ordfavgroup"
-      ordfavgroup_matches(value)
+      relation.ordfavgroup_matches(value, current_user)
     when "fav"
-      favorites_include(value)
+      relation.favorites_include(value, current_user)
     when "ordfav"
-      ordfav_matches(value)
+      relation.ordfav_matches(value, current_user)
     when "unaliased"
-      tags_include(value)
+      relation.tags_include(value)
     when "exif"
-      exif_matches(value)
+      relation.exif_matches(value)
     when "user"
-      user_matches(:uploader, value)
+      relation.uploader_matches(value)
     when "approver"
-      user_matches(:approver, value)
+      relation.approver_matches(value)
     when "flagger"
-      flagger_matches(value)
+      relation.flagger_matches(value)
     when "appealer"
-      user_subquery_matches(PostAppeal.unscoped, value)
+      relation.user_subquery_matches(PostAppeal.unscoped, value)
     when "commenter", "comm"
-      user_subquery_matches(Comment.unscoped, value)
+      relation.user_subquery_matches(Comment.unscoped, value)
     when "commentaryupdater", "artcomm"
-      user_subquery_matches(ArtistCommentaryVersion.unscoped, value, field: :updater)
+      relation.user_subquery_matches(ArtistCommentaryVersion.unscoped, value, field: :updater)
     when "noter"
-      user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, field: :updater)
+      relation.user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, field: :updater)
     when "noteupdater"
-      user_subquery_matches(NoteVersion.unscoped, value, field: :updater)
+      relation.user_subquery_matches(NoteVersion.unscoped, value, field: :updater)
     when "upvoter", "upvote"
-      user_subquery_matches(PostVote.active.positive.visible(current_user), value, field: :user)
+      relation.user_subquery_matches(PostVote.active.positive.visible(current_user), value, field: :user)
     when "downvoter", "downvote"
-      user_subquery_matches(PostVote.active.negative.visible(current_user), value, field: :user)
+      relation.user_subquery_matches(PostVote.active.negative.visible(current_user), value, field: :user)
     when "random"
-      Post.all # handled in the `build` method
+      relation # handled in the `build` method
     when *CATEGORY_COUNT_METATAGS
       short_category = name.delete_suffix("tags")
       category = TagCategory.short_name_mapping[short_category]
       attribute = "tag_count_#{category}"
-      attribute_matches(value, attribute.to_sym)
+      relation.attribute_matches(value, attribute.to_sym)
     when *COUNT_METATAGS
-      attribute_matches(value, name.to_sym)
+      relation.attribute_matches(value, name.to_sym)
     when "limit"
-      Post.all
+      relation
     when "order"
-      Post.all
+      relation
     else
       raise NotImplementedError, "metatag not implemented"
-    end
-  end
-
-  def tags_include(*tags)
-    Post.where_array_includes_all("string_to_array(posts.tag_string, ' ')", tags)
-  end
-
-  def exif_matches(string)
-    # string = exif:File:ColorComponents=3
-    if string.include?("=")
-      key, value = string.split(/=/, 2)
-      hash = { key => value }
-      metadata = MediaMetadata.joins(:media_asset).where_json_contains(:metadata, hash)
-    # string = exif:File:ColorComponents
-    else
-      metadata = MediaMetadata.joins(:media_asset).where_json_has_key(:metadata, string)
-    end
-
-    Post.where(md5: metadata.select(:md5))
-  end
-
-  def attribute_matches(value, field, type = :integer)
-    operator, *args = parse_metatag_value(value, type)
-    Post.where_operator(field, operator, *args)
-  rescue ParseError
-    Post.none
-  end
-
-  def user_matches(field, username)
-    case username.downcase
-    when "any"
-      Post.where.not(field => nil)
-    when "none"
-      Post.where(field => nil)
-    else
-      user = User.find_by_name(username)
-      return Post.none if user.nil?
-      Post.where(field => user)
-    end
-  end
-
-  def user_subquery_matches(subquery, username, field: :creator, &block)
-    subquery = subquery.where("post_id = posts.id").select(1)
-
-    if username == "any"
-      Post.where("EXISTS (#{subquery.to_sql})")
-    elsif username == "none"
-      Post.where("NOT EXISTS (#{subquery.to_sql})")
-    elsif block.nil?
-      user = User.find_by_name(username)
-      return Post.none if user.nil?
-      subquery = subquery.where(field => user)
-      Post.where("EXISTS (#{subquery.to_sql})")
-    else
-      subquery = subquery.merge(block.call(username))
-      return Post.none if subquery.to_sql.blank?
-      Post.where("EXISTS (#{subquery.to_sql})")
-    end
-  end
-
-  def flagger_matches(username)
-    flags = PostFlag.unscoped.category_matches("normal")
-
-    user_subquery_matches(flags, username) do |username|
-      flagger = User.find_by_name(username)
-      PostFlag.unscoped.creator_matches(flagger, current_user)
-    end
-  end
-
-  def saved_search_matches(label)
-    case label.downcase
-    when "all"
-      Post.where(id: SavedSearch.post_ids_for(current_user.id))
-    else
-      Post.where(id: SavedSearch.post_ids_for(current_user.id, label: label))
-    end
-  end
-
-  def status_matches(status)
-    case status.downcase
-    when "pending"
-      Post.pending
-    when "flagged"
-      Post.flagged
-    when "appealed"
-      Post.appealed
-    when "modqueue"
-      Post.in_modqueue
-    when "deleted"
-      Post.deleted
-    when "banned"
-      Post.banned
-    when "active"
-      Post.active
-    when "unmoderated"
-      Post.in_modqueue.available_for_moderation(current_user, hidden: false)
-    when "all", "any"
-      Post.where("TRUE")
-    else
-      Post.none
-    end
-  end
-
-  def disapproved_matches(query)
-    if query.downcase.in?(PostDisapproval::REASONS)
-      Post.where(disapprovals: PostDisapproval.where(reason: query.downcase))
-    else
-      user = User.find_by_name(query)
-      Post.where(disapprovals: PostDisapproval.creator_matches(user, current_user))
-    end
-  end
-
-  def parent_matches(parent)
-    case parent.downcase
-    when "none"
-      Post.where(parent: nil)
-    when "any"
-      Post.where.not(parent: nil)
-    when "pending", "flagged", "appealed", "modqueue", "deleted", "banned", "active", "unmoderated"
-      Post.where.not(parent: nil).where(parent: status_matches(parent))
-    when /\A\d+\z/
-      Post.where(id: parent).or(Post.where(parent: parent))
-    else
-      Post.none
-    end
-  end
-
-  def child_matches(child)
-    case child.downcase
-    when "none"
-      Post.where(has_children: false)
-    when "any"
-      Post.where(has_children: true)
-    when "pending", "flagged", "appealed", "modqueue", "deleted", "banned", "active", "unmoderated"
-      Post.where(has_children: true).where(children: status_matches(child))
-    else
-      Post.none
-    end
-  end
-
-  def source_matches(source, quoted = false)
-    if source.empty?
-      Post.where_like(:source, "")
-    elsif source.downcase == "none" && !quoted
-      Post.where_like(:source, "")
-    else
-      Post.where_ilike(:source, source + "*")
-    end
-  end
-
-  def embedded_matches(embedded)
-    if embedded.truthy?
-      Post.bit_flags_match(:has_embedded_notes, true)
-    elsif embedded.falsy?
-      Post.bit_flags_match(:has_embedded_notes, false)
-    else
-      Post.none
-    end
-  end
-
-  def pool_matches(pool_name)
-    case pool_name.downcase
-    when "none"
-      Post.where.not(id: Pool.select("unnest(post_ids)"))
-    when "any"
-      Post.where(id: Pool.select("unnest(post_ids)"))
-    when "series"
-      Post.where(id: Pool.series.select("unnest(post_ids)"))
-    when "collection"
-      Post.where(id: Pool.collection.select("unnest(post_ids)"))
-    when /\*/
-      Post.where(id: Pool.name_matches(pool_name).select("unnest(post_ids)"))
-    else
-      Post.where(id: Pool.named(pool_name).select("unnest(post_ids)"))
-    end
-  end
-
-  def ordpool_matches(pool_name)
-    # XXX unify with Pool#posts
-    pool_posts = Pool.named(pool_name).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index)
-    Post.joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
-  end
-
-  def ordfavgroup_matches(query)
-    # XXX unify with FavoriteGroup#posts
-    favgroup = FavoriteGroup.visible(current_user).name_or_id_matches(query, current_user)
-    favgroup_posts = favgroup.joins("CROSS JOIN unnest(favorite_groups.post_ids) WITH ORDINALITY AS row(post_id, favgroup_index)").select(:post_id, :favgroup_index)
-    Post.joins("JOIN (#{favgroup_posts.to_sql}) favgroup_posts ON favgroup_posts.post_id = posts.id").order("favgroup_posts.favgroup_index ASC")
-  end
-
-  def favgroup_matches(query)
-    favgroup = FavoriteGroup.visible(current_user).name_or_id_matches(query, current_user)
-    Post.where(id: favgroup.select("unnest(post_ids)"))
-  end
-
-  def favorites_include(username)
-    favuser = User.find_by_name(username)
-
-    if favuser.present? && Pundit.policy!(current_user, favuser).can_see_favorites?
-      Post.where(id: favuser.favorites.select(:post_id))
-    else
-      Post.none
-    end
-  end
-
-  def ordfav_matches(username)
-    user = User.find_by_name(username)
-
-    if user.present? && Pundit.policy!(current_user, user).can_see_favorites?
-      Post.joins(:favorites).merge(Favorite.where(user: user)).order("favorites.id DESC")
-    else
-      Post.none
-    end
-  end
-
-  def note_matches(query)
-    Post.where(notes: Note.search(body_matches: query).reorder(nil))
-  end
-
-  def comment_matches(query)
-    Post.where(comments: Comment.search(body_matches: query).reorder(nil))
-  end
-
-  def commentary_matches(query, quoted = false)
-    case query.downcase
-    in "none" | "false" unless quoted
-      Post.where.not(artist_commentary: ArtistCommentary.all).or(Post.where(artist_commentary: ArtistCommentary.deleted))
-    in "any" | "true" unless quoted
-      Post.where(artist_commentary: ArtistCommentary.undeleted)
-    in "translated" unless quoted
-      Post.where(artist_commentary: ArtistCommentary.translated)
-    in "untranslated" unless quoted
-      Post.where(artist_commentary: ArtistCommentary.untranslated)
-    else
-      Post.where(artist_commentary: ArtistCommentary.text_matches(query))
     end
   end
 
@@ -745,7 +510,7 @@ class PostQueryBuilder
   def search_order_custom(relation, id_metatags)
     return relation.none unless id_metatags.present? && id_metatags.size == 1
 
-    operator, ids = parse_range(id_metatags.first, :integer)
+    operator, ids = PostQueryBuilder.parse_range(id_metatags.first, :integer)
     return relation.none unless operator == :in
 
     relation.in_order_of(:id, ids)
@@ -853,127 +618,129 @@ class PostQueryBuilder
       split_query
     end
 
-    # Parse a simple string value into a Ruby type.
-    # @param string [String] the value to parse
-    # @param type [Symbol] the value's type
-    # @return [Object] the parsed value
-    def parse_cast(string, type)
-      case type
-      when :enum
-        string.downcase
+    class_methods do
+      # Parse a simple string value into a Ruby type.
+      # @param string [String] the value to parse
+      # @param type [Symbol] the value's type
+      # @return [Object] the parsed value
+      def parse_cast(string, type)
+        case type
+        when :enum
+          string.downcase
 
-      when :integer
-        Integer(string) # raises ArgumentError if string is invalid
+        when :integer
+          Integer(string) # raises ArgumentError if string is invalid
 
-      when :float
-        Float(string) # raises ArgumentError if string is invalid
+        when :float
+          Float(string) # raises ArgumentError if string is invalid
 
-      when :md5
-        raise ParseError, "#{string} is not a valid MD5" unless string.match?(/\A[0-9a-fA-F]{32}\z/)
-        string.downcase
+        when :md5
+          raise ParseError, "#{string} is not a valid MD5" unless string.match?(/\A[0-9a-fA-F]{32}\z/)
+          string.downcase
 
-      when :date, :datetime
-        date = Time.zone.parse(string)
-        raise ParseError, "#{string} is not a valid date" if date.nil?
-        date
+        when :date, :datetime
+          date = Time.zone.parse(string)
+          raise ParseError, "#{string} is not a valid date" if date.nil?
+          date
 
-      when :age
-        DurationParser.parse(string).ago
+        when :age
+          DurationParser.parse(string).ago
 
-      when :interval
-        DurationParser.parse(string)
+        when :interval
+          DurationParser.parse(string)
 
-      when :ratio
-        string = string.tr(":", "/") # "2:3" => "2/3"
-        Rational(string).to_f.round(2) # raises ArgumentError or ZeroDivisionError if string is invalid
+        when :ratio
+          string = string.tr(":", "/") # "2:3" => "2/3"
+          Rational(string).to_f.round(2) # raises ArgumentError or ZeroDivisionError if string is invalid
 
-      when :filesize
-        raise ParseError, "#{string} is not a valid filesize" unless string =~ /\A(\d+(?:\.\d*)?|\d*\.\d+)([kKmM]?)[bB]?\Z/
+        when :filesize
+          raise ParseError, "#{string} is not a valid filesize" unless string =~ /\A(\d+(?:\.\d*)?|\d*\.\d+)([kKmM]?)[bB]?\Z/
 
-        size = Float($1)
-        unit = $2
+          size = Float($1)
+          unit = $2
 
-        conversion_factor = case unit
-        when /m/i
-          1024 * 1024
-        when /k/i
-          1024
+          conversion_factor = case unit
+          when /m/i
+            1024 * 1024
+          when /k/i
+            1024
+          else
+            1
+          end
+
+          (size * conversion_factor).to_i
+
         else
-          1
+          raise NotImplementedError, "unrecognized type #{type} for #{string}"
         end
 
-        (size * conversion_factor).to_i
-
-      else
-        raise NotImplementedError, "unrecognized type #{type} for #{string}"
+      rescue ArgumentError, ZeroDivisionError => e
+        raise ParseError, e.message
       end
 
-    rescue ArgumentError, ZeroDivisionError => e
-      raise ParseError, e.message
-    end
-
-    def parse_metatag_value(string, type)
-      if type == :enum
-        [:in, string.split(/[, ]+/).map { |x| parse_cast(x, type) }]
-      else
-        parse_range(string, type)
-      end
-    end
-
-    # Parse a metatag range value of the given type. For example: 1..10.
-    # @param string [String] the metatag value
-    # @param type [Symbol] the value's type
-    def parse_range(string, type)
-      range = case string
-      when /\A(.+?)\.\.\.(.+)/ # A...B
-        lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
-        [:between, (lo...hi)]
-      when /\A(.+?)\.\.(.+)/
-        lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
-        [:between, (lo..hi)]
-      when /\A<=(.+)/, /\A\.\.(.+)/
-        [:lteq, parse_cast($1, type)]
-      when /\A<(.+)/
-        [:lt, parse_cast($1, type)]
-      when /\A>=(.+)/, /\A(.+)\.\.\Z/
-        [:gteq, parse_cast($1, type)]
-      when /\A>(.+)/
-        [:gt, parse_cast($1, type)]
-      when /[, ]/
-        [:in, string.split(/[, ]+/).map {|x| parse_cast(x, type)}]
-      when "any"
-        [:not_eq, nil]
-      when "none"
-        [:eq, nil]
-      else
-        # add a 5% tolerance for float and filesize values
-        if type == :float || (type == :filesize && string =~ /[km]b?\z/i)
-          value = parse_cast(string, type)
-          [:between, (value * 0.95..value * 1.05)]
-        elsif type.in?([:date, :age])
-          value = parse_cast(string, type)
-          [:between, (value.beginning_of_day..value.end_of_day)]
+      def parse_metatag_value(string, type)
+        if type == :enum
+          [:in, string.split(/[, ]+/).map { |x| parse_cast(x, type) }]
         else
-          [:eq, parse_cast(string, type)]
+          parse_range(string, type)
         end
       end
 
-      range = reverse_range(range) if type == :age
-      range
-    end
+      # Parse a metatag range value of the given type. For example: 1..10.
+      # @param string [String] the metatag value
+      # @param type [Symbol] the value's type
+      def parse_range(string, type)
+        range = case string
+        when /\A(.+?)\.\.\.(.+)/ # A...B
+          lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
+          [:between, (lo...hi)]
+        when /\A(.+?)\.\.(.+)/
+          lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
+          [:between, (lo..hi)]
+        when /\A<=(.+)/, /\A\.\.(.+)/
+          [:lteq, parse_cast($1, type)]
+        when /\A<(.+)/
+          [:lt, parse_cast($1, type)]
+        when /\A>=(.+)/, /\A(.+)\.\.\Z/
+          [:gteq, parse_cast($1, type)]
+        when /\A>(.+)/
+          [:gt, parse_cast($1, type)]
+        when /[, ]/
+          [:in, string.split(/[, ]+/).map {|x| parse_cast(x, type)}]
+        when "any"
+          [:not_eq, nil]
+        when "none"
+          [:eq, nil]
+        else
+          # add a 5% tolerance for float and filesize values
+          if type == :float || (type == :filesize && string =~ /[km]b?\z/i)
+            value = parse_cast(string, type)
+            [:between, (value * 0.95..value * 1.05)]
+          elsif type.in?([:date, :age])
+            value = parse_cast(string, type)
+            [:between, (value.beginning_of_day..value.end_of_day)]
+          else
+            [:eq, parse_cast(string, type)]
+          end
+        end
 
-    def reverse_range(range)
-      case range
-      in [:lteq, value]
-        [:gteq, value]
-      in [:lt, value]
-        [:gt, value]
-      in [:gteq, value]
-        [:lteq, value]
-      in [:gt, value]
-        [:lt, value]
-      else
+        range = reverse_range(range) if type == :age
         range
+      end
+
+      def reverse_range(range)
+        case range
+        in [:lteq, value]
+          [:gteq, value]
+        in [:lt, value]
+          [:gt, value]
+        in [:gteq, value]
+          [:lteq, value]
+        in [:gt, value]
+          [:lt, value]
+        else
+          range
+        end
       end
     end
   end

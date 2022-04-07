@@ -1095,6 +1095,254 @@ class Post < ApplicationRecord
         end
       end
 
+      def attribute_matches(value, field, type = :integer)
+        operator, *args = PostQueryBuilder.parse_metatag_value(value, type)
+        where_operator(field, operator, *args)
+      rescue PostQueryBuilder::ParseError
+        none
+      end
+
+      def status_matches(status, current_user = User.anonymous)
+        case status.downcase
+        when "pending"
+          pending
+        when "flagged"
+          flagged
+        when "appealed"
+          appealed
+        when "modqueue"
+          in_modqueue
+        when "deleted"
+          deleted
+        when "banned"
+          banned
+        when "active"
+          active
+        when "unmoderated"
+          in_modqueue.available_for_moderation(current_user, hidden: false)
+        when "all", "any"
+          where("TRUE")
+        else
+          none
+        end
+      end
+
+      def parent_matches(parent)
+        case parent.downcase
+        when "none"
+          where(parent: nil)
+        when "any"
+          where.not(parent: nil)
+        when "pending", "flagged", "appealed", "modqueue", "deleted", "banned", "active", "unmoderated"
+          where.not(parent: nil).where(parent: status_matches(parent))
+        when /\A\d+\z/
+          where(id: parent).or(where(parent: parent))
+        else
+          none
+        end
+      end
+
+      def child_matches(child)
+        case child.downcase
+        when "none"
+          where(has_children: false)
+        when "any"
+          where(has_children: true)
+        when "pending", "flagged", "appealed", "modqueue", "deleted", "banned", "active", "unmoderated"
+          where(has_children: true).where(children: status_matches(child))
+        else
+          none
+        end
+      end
+
+      def source_matches(source, quoted = false)
+        if source.empty?
+          where(source: "")
+        elsif source.downcase == "none" && !quoted
+          where(source: "")
+        else
+          where_ilike(:source, source + "*")
+        end
+      end
+
+      def embedded_matches(embedded)
+        if embedded.truthy?
+          bit_flags_match(:has_embedded_notes, true)
+        elsif embedded.falsy?
+          bit_flags_match(:has_embedded_notes, false)
+        else
+          none
+        end
+      end
+
+      def commentary_matches(query, quoted = false)
+        case query.downcase
+        in "none" | "false" unless quoted
+          where.not(artist_commentary: ArtistCommentary.all).or(where(artist_commentary: ArtistCommentary.deleted))
+        in "any" | "true" unless quoted
+          where(artist_commentary: ArtistCommentary.undeleted)
+        in "translated" unless quoted
+          where(artist_commentary: ArtistCommentary.translated)
+        in "untranslated" unless quoted
+          where(artist_commentary: ArtistCommentary.untranslated)
+        else
+          where(artist_commentary: ArtistCommentary.text_matches(query))
+        end
+      end
+
+      def disapproved_matches(query, current_user = User.anonymous)
+        if query.downcase.in?(PostDisapproval::REASONS)
+          where(disapprovals: PostDisapproval.where(reason: query.downcase))
+        else
+          user = User.find_by_name(query)
+          where(disapprovals: PostDisapproval.creator_matches(user, current_user))
+        end
+      end
+
+      def note_matches(query)
+        where(notes: Note.search(body_matches: query).reorder(nil))
+      end
+
+      def comment_matches(query)
+        where(comments: Comment.search(body_matches: query).reorder(nil))
+      end
+
+      def saved_search_matches(label, current_user = User.anonymous)
+        case label.downcase
+        when "all"
+          where(id: SavedSearch.post_ids_for(current_user.id))
+        else
+          where(id: SavedSearch.post_ids_for(current_user.id, label: label))
+        end
+      end
+
+      def pool_matches(pool_name)
+        case pool_name.downcase
+        when "none"
+          where.not(id: Pool.select("unnest(post_ids)"))
+        when "any"
+          where(id: Pool.select("unnest(post_ids)"))
+        when "series"
+          where(id: Pool.series.select("unnest(post_ids)"))
+        when "collection"
+          where(id: Pool.collection.select("unnest(post_ids)"))
+        when /\*/
+          where(id: Pool.name_matches(pool_name).select("unnest(post_ids)"))
+        else
+          where(id: Pool.named(pool_name).select("unnest(post_ids)"))
+        end
+      end
+
+      def ordpool_matches(pool_name)
+        # XXX unify with Pool#posts
+        pool_posts = Pool.named(pool_name).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index)
+        joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
+      end
+
+      def favgroup_matches(query, current_user)
+        favgroup = FavoriteGroup.visible(current_user).name_or_id_matches(query, current_user)
+        where(id: favgroup.select("unnest(post_ids)"))
+      end
+
+      def ordfavgroup_matches(query, current_user)
+        # XXX unify with FavoriteGroup#posts
+        favgroup = FavoriteGroup.visible(current_user).name_or_id_matches(query, current_user)
+        favgroup_posts = favgroup.joins("CROSS JOIN unnest(favorite_groups.post_ids) WITH ORDINALITY AS row(post_id, favgroup_index)").select(:post_id, :favgroup_index)
+        joins("JOIN (#{favgroup_posts.to_sql}) favgroup_posts ON favgroup_posts.post_id = posts.id").order("favgroup_posts.favgroup_index ASC")
+      end
+
+      def favorites_include(username, current_user = User.anonymous)
+        favuser = User.find_by_name(username)
+
+        if favuser.present? && Pundit.policy!(current_user, favuser).can_see_favorites?
+          where(id: favuser.favorites.select(:post_id))
+        else
+          none
+        end
+      end
+
+      def ordfav_matches(username, current_user = User.anonymous)
+        user = User.find_by_name(username)
+
+        if user.present? && Pundit.policy!(current_user, user).can_see_favorites?
+          joins(:favorites).merge(Favorite.where(user: user)).order("favorites.id DESC")
+        else
+          none
+        end
+      end
+
+      def exif_matches(string)
+        # string = exif:File:ColorComponents=3
+        if string.include?("=")
+          key, value = string.split(/=/, 2)
+          hash = { key => value }
+          metadata = MediaMetadata.joins(:media_asset).where_json_contains(:metadata, hash)
+        # string = exif:File:ColorComponents
+        else
+          metadata = MediaMetadata.joins(:media_asset).where_json_has_key(:metadata, string)
+        end
+
+        where(md5: metadata.select(:md5))
+      end
+
+      def uploader_matches(username)
+        case username.downcase
+        when "any"
+          where.not(uploader: nil)
+        when "none"
+          where(uploader: nil)
+        else
+          user = User.find_by_name(username)
+          return none if user.nil?
+          where(uploader: user)
+        end
+      end
+
+      def approver_matches(username)
+        case username.downcase
+        when "any"
+          where.not(approver: nil)
+        when "none"
+          where(approver: nil)
+        else
+          user = User.find_by_name(username)
+          return none if user.nil?
+          where(approver: user)
+        end
+      end
+
+      def flagger_matches(username)
+        flags = PostFlag.unscoped.category_matches("normal")
+
+        user_subquery_matches(flags, username) do |username|
+          flagger = User.find_by_name(username)
+          PostFlag.unscoped.creator_matches(flagger, current_user)
+        end
+      end
+
+      def user_subquery_matches(subquery, username, field: :creator, &block)
+        subquery = subquery.where("post_id = posts.id").select(1)
+
+        if username == "any"
+          where("EXISTS (#{subquery.to_sql})")
+        elsif username == "none"
+          where("NOT EXISTS (#{subquery.to_sql})")
+        elsif block.nil?
+          user = User.find_by_name(username)
+          return none if user.nil?
+          subquery = subquery.where(field => user)
+          where("EXISTS (#{subquery.to_sql})")
+        else
+          subquery = subquery.merge(block.call(username))
+          return none if subquery.to_sql.blank?
+          where("EXISTS (#{subquery.to_sql})")
+        end
+      end
+
+      def tags_include(*tags)
+        where_array_includes_all("string_to_array(posts.tag_string, ' ')", tags)
+      end
+
       def raw_tag_match(tag)
         Post.where_array_includes_all("string_to_array(posts.tag_string, ' ')", [tag])
       end
