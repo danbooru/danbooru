@@ -13,7 +13,7 @@ class PostQuery
 
   # Return a new PostQuery with aliases replaced.
   def self.normalize(...)
-    PostQuery.new(...).replace_aliases.trim
+    PostQuery.new(...).replace_aliases.rewrite_opts.trim
   end
 
   def initialize(search_or_ast, current_user: User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
@@ -127,6 +127,11 @@ class PostQuery
   # Return a new PostQuery with unnecessary AND and OR clauses eliminated.
   def trim
     build(ast.trim)
+  end
+
+  # Return a new PostQuery with the '~' operator replaced with OR clauses.
+  def rewrite_opts
+    build(ast.rewrite_opts)
   end
 
   # Return a new PostQuery with aliases replaced.

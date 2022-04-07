@@ -1311,6 +1311,40 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "-aaa id:>0")
       assert_tag_match([], "-a* rating:s")
     end
+
+    should "succeed for nested OR clauses" do
+      post1 = create(:post, tag_string: "a c")
+      post2 = create(:post, tag_string: "b d")
+      post3 = create(:post, tag_string: "a")
+      post4 = create(:post, tag_string: "d")
+
+      assert_tag_match([post3, post2, post1], "~a ~b")
+      assert_tag_match([post3, post2, post1], "a or b")
+
+      assert_tag_match([post4, post2, post1], "~c ~d")
+      assert_tag_match([post4, post2, post1], "c or d")
+
+      assert_tag_match([post2, post1], "(a or b) (c or d)")
+      assert_tag_match([post2, post1], "(~a ~b) (~c ~d)")
+
+      assert_tag_match([post2, post1], "a c or b d")
+      assert_tag_match([post2, post1], "(a c) or (b d)")
+      assert_tag_match([post2, post1], "~(a c) or ~(b d)")
+    end
+
+    should "succeed for metatags combined with OR clauses" do
+      post1 = create(:post, rating: "s")
+      post2 = create(:post, rating: "q")
+      post3 = create(:post, rating: "e")
+
+      assert_tag_match([post2, post1], "~rating:s ~rating:q")
+      assert_tag_match([post3, post2, post1], "~rating:s ~rating:q ~rating:e")
+
+      assert_tag_match([post2, post1], "rating:s or rating:q")
+      assert_tag_match([post3, post2, post1], "rating:s or rating:q or rating:e")
+
+      assert_tag_match([post2, post1], "id:#{post1.id} or rating:q")
+    end
   end
 
   context "Parsing:" do
