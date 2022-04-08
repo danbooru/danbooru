@@ -154,27 +154,32 @@ class PostQuery
         end
       end
 
+      # term = metatag | tag | wildcard
       def term
-        metatag || wildcard || tag
+        one_of [
+          method(:tag),
+          method(:metatag),
+          method(:wildcard),
+        ]
       end
 
       # metatag = metatag_name ":" quoted_string
       # metatag_name = "user" | "fav" | "pool" | "order" | ...
       def metatag
-        if accept(METATAG_NAME_REGEX)
-          name = @scanner.matched.delete_suffix(":").downcase
-          name = name.singularize + "_count" if name.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
-          quoted, value = quoted_string
+        name = expect(METATAG_NAME_REGEX)
+        quoted, value = quoted_string
 
-          if name == "order"
-            attribute, direction, _tail = value.to_s.downcase.partition(/_(asc|desc)\z/i)
-            if attribute.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
-              value = attribute.singularize + "_count" + direction
-            end
+        name = name.delete_suffix(":").downcase
+        name = name.singularize + "_count" if name.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
+
+        if name == "order"
+          attribute, direction, _tail = value.to_s.downcase.partition(/_(asc|desc)\z/i)
+          if attribute.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
+            value = attribute.singularize + "_count" + direction
           end
-
-          node(:metatag, name, value, quoted)
         end
+
+        node(:metatag, name, value, quoted)
       end
 
       def quoted_string
@@ -193,26 +198,27 @@ class PostQuery
 
       # A wildcard is a string that contains a '*' character and that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
       def wildcard
-        if t = accept(/(?=[^ ]*\*)[^ \)~-][^ ]*/)
-          space
-          node(:wildcard, t.downcase)
-        end
+        t = string(/(?=[^ ]*\*)[^ \)~-][^ ]*/, skip_balanced_parens: true)
+        raise Error if t.match?(/\A#{METATAG_NAME_REGEX}/)
+        space
+        node(:wildcard, t.downcase)
       end
 
       # A tag is a string that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
       def tag
-        t = string(/[^ \)~-][^ ]*/)
-        raise Error if t.downcase.in?(%w[and or])
+        t = string(/[^ \)~-][^ ]*/, skip_balanced_parens: true)
+        raise Error if t.downcase.in?(%w[and or]) || t.include?("*") || t.match?(/\A#{METATAG_NAME_REGEX}/)
         space
         node(:tag, t.downcase)
       end
 
-      def string(pattern)
+      def string(pattern, skip_balanced_parens: false)
         str = expect(pattern)
 
         # XXX: Now put back any trailing right parens we mistakenly consumed.
         n = @unclosed_parens
         while n > 0 && str.ends_with?(")")
+          break if skip_balanced_parens && (str.has_balanced_parens? || str.in?(Tag::PERMITTED_UNBALANCED_TAGS))
           str.chop!
           scanner.pos -= 1
           n -= 1
@@ -274,6 +280,17 @@ class PostQuery
         first = yield
         rest = zero_or_more(&block)
         [first, *rest]
+      end
+
+      # Given a list of parsers, return the first one that succeeds.
+      def one_of(parsers)
+        parsers.each do |parser|
+          return backtrack { parser.call }
+        rescue Error
+          next
+        end
+
+        raise Error, "expected one of: #{parsers}"
       end
 
       # Build an AST node of the given type.

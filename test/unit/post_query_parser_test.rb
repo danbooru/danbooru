@@ -19,14 +19,62 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("a", "a")
       assert_parse_equals("a", "A")
 
+      assert_parse_equals(";)", ";)")
+      assert_parse_equals("9", "(9)")
+    end
+
+    should "parse parentheses correctly" do
       assert_parse_equals("foo_(bar)", "foo_(bar)")
       assert_parse_equals("foo_(bar)", "(foo_(bar))")
+      assert_parse_equals("foo_(bar)", "((foo_(bar)))")
 
       assert_parse_equals("foo_(bar_(baz))", "foo_(bar_(baz))")
       assert_parse_equals("foo_(bar_(baz))", "(foo_(bar_(baz)))")
+      assert_parse_equals("foo_(bar_baz))", "(foo_(bar_baz)))")
 
-      assert_parse_equals(";)", ";)")
-      assert_parse_equals("9", "(9)")
+      assert_parse_equals("(and abc_(def) ghi)", "abc_(def) ghi")
+      assert_parse_equals("(and abc_(def) ghi)", "(abc_(def) ghi)")
+      assert_parse_equals("(and abc_(def) ghi)", "((abc_(def)) ghi)")
+
+      assert_parse_equals("(and abc def_(ghi))", "abc def_(ghi)")
+      assert_parse_equals("(and abc def_(ghi))", "(abc def_(ghi))")
+      assert_parse_equals("(and abc def_(ghi))", "(abc (def_(ghi)))")
+
+      assert_parse_equals("(and abc_(def) ghi_(jkl))", "abc_(def) ghi_(jkl)")
+      assert_parse_equals("(and abc_(def) ghi_(jkl))", "(abc_(def) ghi_(jkl))")
+
+      assert_parse_equals(":)", ":)")
+      assert_parse_equals(":)", "(:))")
+      assert_parse_equals("none", "(:)")
+
+      assert_parse_equals("(and :) >:))", "(:) >:))")
+      assert_parse_equals("none", "(:) >:)")
+
+      assert_parse_equals("(wildcard *))", "*)")
+      assert_parse_equals("(wildcard *)", "(*)")
+
+      assert_parse_equals("(wildcard foo*)", "(foo*)")
+      assert_parse_equals("(wildcard foo*))", "foo*)")
+
+      assert_parse_equals("(and bar (wildcard foo*)))", "foo*) bar")
+      assert_parse_equals("(and bar (wildcard foo*))", "(foo*) bar")
+      assert_parse_equals("(and bar) (wildcard foo*))", "(foo*) bar)")
+
+      assert_parse_equals("(wildcard *_(foo))", "*_(foo)")
+      assert_parse_equals("(wildcard *_(foo))", "(*_(foo))")
+
+      assert_parse_equals("(and bar (wildcard *_(foo)))", "(*_(foo) bar)")
+      assert_parse_equals("(and bar (wildcard *_(foo)))", "((*_(foo)) bar)")
+      assert_parse_equals("(and bar (wildcard *_(foo)))", "(bar *_(foo))")
+      assert_parse_equals("(and bar (wildcard *_(foo)))", "(bar (*_(foo)))")
+
+      assert_parse_equals("note:a", "(note:a)")
+      assert_parse_equals("note:(a", "(note:(a)")
+      assert_parse_equals("note:(a)", "(note:(a))")
+
+      assert_parse_equals("(and note:a note:b)", "(note:a note:b)")
+      assert_parse_equals("(and note:a note:b))", "(note:a) note:b)")
+      assert_parse_equals('(and note:"a)" note:b)', '(note:"a)" note:b)')
     end
 
     should "parse basic queries correctly" do
