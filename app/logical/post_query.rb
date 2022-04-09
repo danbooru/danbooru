@@ -275,13 +275,14 @@ class PostQuery
     def validate_metatags!
       return if metatags.empty?
 
-      raise Error, "Can't have multiple order metatags" if select_metatags(*ORDER_METATAGS).size > 1
+      order_metatags = select_metatags(*ORDER_METATAGS)
+      raise Error, "#{order_metatags.to_sentence} can't be used together." if order_metatags.size > 1
 
       SINGLETON_METATAGS.each do |name|
         metatag = select_metatags(name).first
-        raise Error, "'#{name}:' can't be used more than once" if select_metatags(name).size > 1
-        raise Error, "#{metatag} can't be negated" if metatag&.parents&.any?(&:not?)
-        raise Error, "#{metatag} can't be used in an 'or' clause" if metatag&.parents&.any?(&:or?)
+        raise Error, "'#{name}:' can't be used more than once." if select_metatags(name).size > 1
+        raise Error, "'#{metatag}' can't be negated." if metatag&.parents&.any?(&:not?)
+        raise Error, "'#{metatag}' can't be used with the 'or' operator." if metatag&.parents&.any?(&:or?)
       end
     end
 

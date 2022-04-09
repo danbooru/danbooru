@@ -3,7 +3,7 @@
 <h1>Error</h1>
 
 <% if @message.present? %>
-  <p><%= @message %></p>
+  <p>Error: <%= @message %></p>
 <% else %>
   <p>Unexpected error: <%= @exception.class %>.</p>
 
