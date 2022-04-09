@@ -24,8 +24,17 @@ class PostQuery
   alias_method :to_s, :to_infix
 
   # Return a new PostQuery with aliases replaced.
-  def self.normalize(...)
-    PostQuery.new(...).replace_aliases.rewrite_opts.trim
+  def self.normalize(search, ...)
+    search = search.to_s.strip
+
+    # Optimize zero tag and single tag searches
+    if search.blank?
+      PostQuery.new(AST.all, ...)
+    elsif search.match?(%r{\A[a-zA-Z0-9][a-zA-Z0-9();/+!?&'._~-]*\z}) && !search.downcase.in?(["and", "or"])
+      PostQuery.new(AST.tag(search), ...).replace_aliases
+    else
+      PostQuery.new(search, ...).replace_aliases.rewrite_opts.trim
+    end
   end
 
   # Perform a search and return the resulting posts

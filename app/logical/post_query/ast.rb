@@ -64,6 +64,10 @@ class PostQuery
 
     concerning :ConstructorMethods do
       class_methods do
+        def all
+          AST.new(:all, [])
+        end
+
         def tag(name)
           AST.new(:tag, [name])
         end
