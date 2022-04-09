@@ -41,7 +41,8 @@ class PostQuery
     include Comparable
     include Enumerable
 
-    attr_reader :type, :args
+    attr_reader :type, :args, :parent
+    protected attr_writer :parent
     delegate :all?, :none?, :and?, :or?, :not?, :opt?, :tag?, :metatag?, :wildcard?, to: :inquirer
 
     # Create an AST node.
@@ -51,7 +52,14 @@ class PostQuery
     #   AND/OR/NOT/OPT nodes, or the name and/or value for tag, metatag, or wildcard nodes).
     def initialize(type, args)
       @type = type
-      @args = args
+      @parent = nil
+
+      if term?
+        @args = args
+      else
+        @args = args.deep_dup
+        @args.each { _1.parent = self }
+      end
     end
 
     concerning :ConstructorMethods do
@@ -198,6 +206,10 @@ class PostQuery
     end
 
     concerning :OutputMethods do
+      def to_s
+        to_infix
+      end
+
       def inspect
         to_sexp
       end
@@ -339,6 +351,19 @@ class PostQuery
         tags.map(&:name)
       end
 
+      # @return [Array<AST>] The list of all parent nodes of this node.
+      def parents
+        parents = []
+
+        node = self
+        until node.parent.nil?
+          parents << node.parent
+          node = node.parent
+        end
+
+        parents
+      end
+
       # True if the AST is a simple node, that is a leaf node with no child nodes.
       def term?
         type.in?(%i[tag metatag wildcard all none])
@@ -390,6 +415,6 @@ class PostQuery
       end
     end
 
-    memoize :to_cnf, :simplify, :simplify_once, :rewrite_opts, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_tree, :nodes, :tags, :metatags, :tag_names
+    memoize :to_cnf, :simplify, :simplify_once, :rewrite_opts, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_tree, :nodes, :tags, :metatags, :tag_names, :parents
   end
 end

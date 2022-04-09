@@ -12,8 +12,6 @@ require "strscan"
 class PostQueryBuilder
   extend Memoist
 
-  # Raised when the number of tags exceeds the user's tag limit.
-  class TagLimitError < StandardError; end
   class ParseError < StandardError; end
 
   # How many tags a `blah*` search should match.
@@ -71,9 +69,6 @@ class PostQueryBuilder
     COUNT_METATAGS +
     COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
     CATEGORY_COUNT_METATAGS.flat_map { |str| [str, "#{str}_asc"] }
-
-  # Tags that don't count against the user's tag limit.
-  UNLIMITED_METATAGS = %w[status rating limit]
 
   attr_reader :query_string, :current_user, :tag_limit, :safe_mode, :hide_deleted_posts
   alias_method :safe_mode?, :safe_mode
@@ -495,20 +490,6 @@ class PostQueryBuilder
     return relation.none unless operator == :in
 
     relation.in_order_of(:id, ids)
-  end
-
-  # @raise [TagLimitError] if the number of tags exceeds the user's tag limit
-  def validate!
-    tag_count = terms.count { |term| !is_unlimited_tag?(term) }
-
-    if tag_limit.present? && tag_count > tag_limit
-      raise TagLimitError
-    end
-  end
-
-  # @return [Boolean] true if the metatag doesn't count against the user's tag limit
-  def is_unlimited_tag?(term)
-    term.type == :metatag && term.name.in?(UNLIMITED_METATAGS)
   end
 
   concerning :ParseMethods do

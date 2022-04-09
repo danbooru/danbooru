@@ -5,6 +5,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     assert_equal(posts.map(&:id), Post.user_tag_match(query, current_user, **options).pluck(:id))
   end
 
+  def assert_search_error(query, current_user: CurrentUser.user, **options)
+    assert_raises(PostQuery::Error) { PostQuery.search(query, current_user: current_user, **options) }
+  end
+
   def assert_fast_count(count, query, query_options = {}, fast_count_options = {})
     assert_equal(count, PostQuery.normalize(query, **query_options).with_implicit_metatags.fast_count(**fast_count_options))
   end
@@ -1285,11 +1289,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "-/hr")
     end
 
-    should "fail for more than 6 tags" do
+    should "fail if the search exceeds the tag limit" do
       post1 = create(:post, rating: "s")
 
-      assert_raise(PostQueryBuilder::TagLimitError) do
-        Post.user_tag_match("a b c rating:s width:10 height:10 user:bob")
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search("a b c rating:s width:10 height:10 user:bob", tag_limit: 5)
       end
     end
 
@@ -1344,6 +1348,40 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post3, post2, post1], "rating:s or rating:q or rating:e")
 
       assert_tag_match([post2, post1], "id:#{post1.id} or rating:q")
+    end
+
+    should "not allow conflicting order metatags" do
+      assert_search_error("order:score ordfav:a")
+      assert_search_error("order:score ordfavgroup:a")
+      assert_search_error("order:score ordpool:a")
+      assert_search_error("ordfav:a ordpool:b")
+    end
+
+    should "not allow metatags that can't be used more than once" do
+      assert_search_error("order:score order:favcount")
+      assert_search_error("ordfav:a ordfav:b")
+      assert_search_error("ordfavgroup:a ordfavgroup:b")
+      assert_search_error("ordpool:a ordpool:b")
+      assert_search_error("limit:5 limit:10")
+      assert_search_error("random:5 random:10")
+    end
+
+    should "not allow non-negatable metatags to be negated" do
+      assert_search_error("-order:score")
+      assert_search_error("-ordfav:a")
+      assert_search_error("-ordfavgroup:a")
+      assert_search_error("-ordpool:a")
+      assert_search_error("-limit:20")
+      assert_search_error("-random:20")
+    end
+
+    should "not allow non-OR'able metatags to be OR'd" do
+      assert_search_error("a or order:score")
+      assert_search_error("a or ordfav:a")
+      assert_search_error("a or ordfavgroup:a")
+      assert_search_error("a or ordpool:a")
+      assert_search_error("a or limit:20")
+      assert_search_error("a or random:20")
     end
   end
 

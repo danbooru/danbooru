@@ -3,10 +3,22 @@
 class PostQuery
   extend Memoist
 
+  class Error < StandardError; end
+  class TagLimitError < Error; end
+
+  # Metatags that don't count against the user's tag limit.
+  UNLIMITED_METATAGS = %w[status rating limit]
+
+  # Metatags that define the order of search results. These metatags can't be used more than once per query.
+  ORDER_METATAGS = %w[order ordfav ordfavgroup ordpool]
+
+  # Metatags that can't be used more than once per query, and that can't be used with OR or NOT operators.
+  SINGLETON_METATAGS = ORDER_METATAGS + %w[limit random]
+
   attr_reader :current_user
   private attr_reader :tag_limit, :safe_mode, :hide_deleted_posts, :builder
 
-  delegate :tag?, :metatag?, :wildcard?, :metatags, :wildcards, :tag_names, :metatags, :to_infix, to: :ast
+  delegate :tag?, :metatag?, :wildcard?, :metatags, :wildcards, :tag_names, :to_infix, to: :ast
   alias_method :safe_mode?, :safe_mode
   alias_method :hide_deleted_posts?, :hide_deleted_posts
   alias_method :to_s, :to_infix
@@ -14,6 +26,11 @@ class PostQuery
   # Return a new PostQuery with aliases replaced.
   def self.normalize(...)
     PostQuery.new(...).replace_aliases.rewrite_opts.trim
+  end
+
+  # Perform a search and return the resulting posts
+  def self.search(search, ...)
+    PostQuery.normalize(search, ...).with_implicit_metatags.posts
   end
 
   def initialize(search_or_ast, current_user: User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
@@ -47,10 +64,12 @@ class PostQuery
   end
 
   def posts
+    validate!
     builder.posts(to_cnf)
   end
 
   def paginated_posts(...)
+    validate!
     builder.paginated_posts(to_cnf, ...)
   end
 
@@ -241,5 +260,36 @@ class PostQuery
     end
   end
 
-  memoize :tags, :replace_aliases, :with_implicit_metatags, :to_cnf, :aliases, :implicit_metatags, :hide_deleted?
+  concerning :ValidationMethods do
+    def validate!
+      return if is_empty_search? || is_simple_tag?
+
+      validate_tag_limit!
+      validate_metatags!
+    end
+
+    def validate_tag_limit!
+      raise TagLimitError if tag_limit.present? && term_count > tag_limit
+    end
+
+    def validate_metatags!
+      return if metatags.empty?
+
+      raise Error, "Can't have multiple order metatags" if select_metatags(*ORDER_METATAGS).size > 1
+
+      SINGLETON_METATAGS.each do |name|
+        metatag = select_metatags(name).first
+        raise Error, "'#{name}:' can't be used more than once" if select_metatags(name).size > 1
+        raise Error, "#{metatag} can't be negated" if metatag&.parents&.any?(&:not?)
+        raise Error, "#{metatag} can't be used in an 'or' clause" if metatag&.parents&.any?(&:or?)
+      end
+    end
+
+    # The number of unique tags, wildcards, and metatags in the search, excluding metatags that don't count against the user's tag limit.
+    def term_count
+      tag_names.size + wildcards.size + metatags.count { !_1.name.in?(UNLIMITED_METATAGS) }
+    end
+  end
+
+  memoize :tags, :replace_aliases, :with_implicit_metatags, :to_cnf, :aliases, :implicit_metatags, :hide_deleted?, :term_count
 end

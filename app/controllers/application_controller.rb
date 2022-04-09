@@ -130,7 +130,7 @@ class ApplicationController < ActionController::Base
       render_error_page(406, exception, message: "#{request.format} is not a supported format for this page")
     when PaginationExtension::PaginationError
       render_error_page(410, exception, template: "static/pagination_error", message: "You cannot go beyond page #{CurrentUser.user.page_limit}.")
-    when PostQueryBuilder::TagLimitError
+    when PostQuery::TagLimitError
       render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
     when RateLimiter::RateLimitError
       render_error_page(429, exception, message: "Rate limit exceeded. You're doing that too fast")
