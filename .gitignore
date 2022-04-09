@@ -14,6 +14,7 @@ public/data/
 public/packs-test/
 public/packs/
 test/reports/
+/vendor/
 
 # https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
 .yarn/*
