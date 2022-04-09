@@ -104,7 +104,7 @@ html {
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-html {
+html, body[data-current-user-theme="light"] {
   --body-background-color: var(--white);
   --text-color: var(--black);
 
@@ -322,7 +322,7 @@ html {
 }
 
 /* variables that aren't defined in the dark theme fall back to the :root theme */
-body[data-current-user-theme="dark"] {
+@mixin dark-theme {
   --body-background-color: var(--grey-9);
   --text-color: var(--grey-2);
 
@@ -525,3 +525,14 @@ body[data-current-user-theme="dark"] {
   --banned-artist-label-color: var(--red-5);
   --deleted-artist-label-color: var(--grey-6);
 }
+
+body[data-current-user-theme="dark"] {
+  @include dark-theme;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    @include dark-theme;
+  }
+}
+

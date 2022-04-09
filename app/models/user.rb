@@ -91,12 +91,12 @@ class User < ApplicationRecord
   attribute :unread_dmail_count, default: 0
   attribute :favorite_count, default: 0
   attribute :per_page, default: 20
-  attribute :theme, default: :light
+  attribute :theme, default: :auto
   attribute :upload_points, default: Danbooru.config.initial_upload_points.to_i
   attribute :bit_prefs, default: 0
 
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
-  enum theme: { light: 0, dark: 100 }, _suffix: true
+  enum theme: { auto: 0, light: 50, dark: 100 }, _suffix: true
 
   attr_reader :password
 
