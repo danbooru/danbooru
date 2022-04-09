@@ -479,6 +479,23 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "tagged with a deprecated tag" do
+        should "not remove the tag if the tag was already in the post" do
+          bad_tag = create(:tag, name: "bad_tag")
+          old_post = FactoryBot.create(:post, tag_string: "bad_tag")
+          bad_tag.update!(is_deprecated: true)
+          old_post.update!(tag_string: "asd bad_tag")
+          assert_equal("asd bad_tag", old_post.reload.tag_string)
+
+        end
+
+        should "not add the tag if it is being added" do
+          create(:tag, name: "a_bad_tag", is_deprecated: true)
+          @post.update!(tag_string: "asd a_bad_tag")
+          assert_equal("asd", @post.reload.tag_string)
+        end
+      end
+
       context "tagged with a metatag" do
         context "for typing a tag" do
           setup do

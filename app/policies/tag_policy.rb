@@ -7,7 +7,14 @@ class TagPolicy < ApplicationPolicy
       (user.is_member? && record.post_count < 50)
   end
 
+  def can_change_deprecated_status?
+    user.is_admin? || (record.post_count == 0 && !record.is_deprecated?)
+  end
+
   def permitted_attributes
-    [(:category if can_change_category?)].compact
+    [
+      (:category if can_change_category?),
+      (:is_deprecated if can_change_deprecated_status?),
+    ].compact
   end
 end

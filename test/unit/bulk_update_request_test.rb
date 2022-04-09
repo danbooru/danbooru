@@ -446,6 +446,34 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         end
       end
 
+      context "the deprecate command" do
+        should "deprecate the tag" do
+          @tag = create(:tag, name: "silver_hair")
+          @bur = create_bur!("deprecate silver_hair", @admin)
+
+          assert_equal(true, @tag.reload.is_deprecated?)
+        end
+
+        should "remove implications" do
+          @ti1 = create(:tag_implication, antecedent_name: "silver_hair", consequent_name: "old_woman")
+          @ti2 = create(:tag_implication, antecedent_name: "my_literal_dog", consequent_name: "silver_hair")
+          @bur = create_bur!("deprecate silver_hair", @admin)
+
+          assert_equal("deleted", @ti1.reload.status)
+          assert_equal("deleted", @ti2.reload.status)
+          assert_equal("approved", @bur.reload.status)
+        end
+      end
+
+      context "the undeprecate command" do
+        should "undeprecate the tag" do
+          @tag = create(:tag, name: "silver_hair", is_deprecated: true)
+          @bur = create_bur!("undeprecate silver_hair", @admin)
+
+          assert_equal(false, @tag.reload.is_deprecated?)
+        end
+      end
+
       context "that contains a mass update followed by an alias" do
         should "make the alias take effect after the mass update" do
           @p1 = create(:post, tag_string: "maid_dress")

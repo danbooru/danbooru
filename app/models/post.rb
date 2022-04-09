@@ -411,6 +411,7 @@ class Post < ApplicationRecord
       normalized_tags = Tag.convert_cosplay_tags(normalized_tags)
       normalized_tags += Tag.create_for_list(Tag.automatic_tags_for(normalized_tags))
       normalized_tags += TagImplication.tags_implied_by(normalized_tags).map(&:name)
+      normalized_tags -= added_deprecated_tags
       normalized_tags = normalized_tags.compact.uniq.sort
       normalized_tags = Tag.create_for_list(normalized_tags)
       self.tag_string = normalized_tags.join(" ")
@@ -426,6 +427,16 @@ class Post < ApplicationRecord
       end
 
       tag_names - invalid_tags.map(&:name)
+    end
+
+    def added_deprecated_tags
+      added_deprecated_tags = added_tags.select(&:is_deprecated)
+      if added_deprecated_tags.present?
+        added_deprecated_tags_list = added_deprecated_tags.map { |t| "[[#{t.name}]]" }.to_sentence
+        warnings.add(:base, "The following tags are deprecated and could not be added: #{added_deprecated_tags_list}")
+      end
+
+      added_deprecated_tags.pluck(:name)
     end
 
     def remove_negated_tags(tags)

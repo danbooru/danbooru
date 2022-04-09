@@ -60,6 +60,8 @@ class ModAction < ApplicationRecord
     tag_implication_create: 140,
     tag_implication_update: 141, # XXX unused
     tag_implication_delete: 142,
+    tag_deprecate: 240,
+    tag_undeprecate: 242,
     ip_ban_create: 160,
     ip_ban_delete: 162,
     ip_ban_undelete: 163,

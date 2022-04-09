@@ -18,6 +18,11 @@
   <% end %>
 
   <%= render "tag_relationships/alias_and_implication_list", tag: @wiki_page.tag %>
+
+  <% if @wiki_page.tag&.is_deprecated? %>
+    <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</p>
+  <% end %>
+
   <%= render "wiki_pages/posts", wiki_page: @wiki_page %>
 <% end %>
 

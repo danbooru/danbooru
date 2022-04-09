@@ -119,6 +119,51 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for deprecation" do
+        setup do
+          @deprecated_tag = create(:tag, name: "bad_tag", category: Tag.categories.general, post_count: 0, is_deprecated: true)
+          @nondeprecated_tag = create(:tag, name: "log", category: Tag.categories.general, post_count: 0)
+          @normal_tag = create(:tag, name: "random", category: Tag.categories.general, post_count: 1000)
+          @normal_user = create(:user)
+          @admin = create(:admin_user)
+        end
+
+        should "not remove deprecated status if the user is not an admin" do
+          put_auth tag_path(@deprecated_tag), @normal_user, params: {tag: { is_deprecated: false }}
+
+          assert_response 403
+          assert(true, @deprecated_tag.reload.is_deprecated?)
+        end
+
+        should "remove the deprecated status if the user is admin" do
+          put_auth tag_path(@deprecated_tag), @admin, params: {tag: { is_deprecated: false }}
+
+          assert_redirected_to @deprecated_tag
+          assert(false, @deprecated_tag.reload.is_deprecated?)
+        end
+
+        should "allow marking a tag as deprecated if it's empty" do
+          put_auth tag_path(@nondeprecated_tag), @normal_user, params: {tag: { is_deprecated: true }}
+
+          assert_redirected_to @nondeprecated_tag
+          assert(true, @nondeprecated_tag.reload.is_deprecated?)
+        end
+
+        should "not allow marking a tag as deprecated if it's not empty" do
+          put_auth tag_path(@normal_tag), @normal_user, params: {tag: { is_deprecated: true }}
+
+          assert_response 403
+          assert(false, @normal_tag.reload.is_deprecated?)
+        end
+
+        should "allow admins to mark tags as deprecated" do
+          put_auth tag_path(@normal_tag), @admin, params: {tag: { is_deprecated: true }}
+
+          assert_redirected_to @normal_tag
+          assert(true, @normal_tag.reload.is_deprecated?)
+        end
+      end
+
       should "not change category when the tag is too large to be changed by a builder" do
         @tag.update(category: Tag.categories.general, post_count: 1001)
         put_auth tag_path(@tag), @user, params: {:tag => {:category => Tag.categories.artist}}
