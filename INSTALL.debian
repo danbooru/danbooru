@@ -83,12 +83,12 @@ export PG_VERSION=`pg_config --version | egrep -o '[0-9]{1,}\.[0-9]{1,}[^-]'`
 # Install rbenv
 echo "* Installing rbenv..."
 cd /tmp
-sudo -u danbooru git clone git://github.com/sstephenson/rbenv.git ~danbooru/.rbenv
+sudo -u danbooru git clone https://github.com/sstephenson/rbenv.git ~danbooru/.rbenv
 sudo -u danbooru touch ~danbooru/.bash_profile
 echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~danbooru/.bash_profile
 echo 'eval "$(rbenv init -)"' >> ~danbooru/.bash_profile
 sudo -u danbooru mkdir -p ~danbooru/.rbenv/plugins
-sudo -u danbooru git clone git://github.com/sstephenson/ruby-build.git ~danbooru/.rbenv/plugins/ruby-build
+sudo -u danbooru git clone https://github.com/sstephenson/ruby-build.git ~danbooru/.rbenv/plugins/ruby-build
 sudo -u danbooru bash -l -c "RUBY_CONFIGURE_OPTS=--disable-install-doc rbenv install --verbose $RUBY_VERSION"
 sudo -u danbooru bash -l -c "rbenv global $RUBY_VERSION"
 
