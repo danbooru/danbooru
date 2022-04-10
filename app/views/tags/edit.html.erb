@@ -13,9 +13,9 @@
         <%= f.input :is_deprecated, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
       <% else %>
         <% if @tag.is_deprecated? %>
-        <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "deprecate #{@tag.name}" }) %> to mark this tag as not deprecated.</p>
+        <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "undeprecate #{@tag.name}" }) %> to mark this tag as not deprecated.</p>
         <% else %>
-        <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "undeprecate #{@tag.name}" }) %> to mark this tag as deprecated.</p>
+        <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "deprecate #{@tag.name}" }) %> to mark this tag as deprecated.</p>
         <% end %>
       <% end %>
       <%= f.button :submit, "Submit" %>
