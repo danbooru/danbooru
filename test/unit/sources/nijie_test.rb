@@ -305,7 +305,7 @@ module Sources
                 %w[TS https://nijie.info/search_dojin.php?word=TS],
                 %w[ほのぼの https://nijie.info/search_dojin.php?word=%E3%81%BB%E3%81%AE%E3%81%BC%E3%81%AE]]
 
-        assert(true, site.doujin?)
+        assert(site.doujin?)
         assert_equal([image], site.image_urls)
         assert_equal("作品情報", site.artist_commentary_title)
         assert_equal("<p>ある日目がさめると女の子になっていたいつき<br>\nそこへ幼馴染の小梅が現れて…<br>\n2010年コミックマーケット78で販売したコピー本のDL版で<br>\n本編18Pの短編マンガです <br>\n</p>", site.artist_commentary_desc)
