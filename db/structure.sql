@@ -1882,7 +1882,8 @@ CREATE TABLE public.tags (
     category integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    is_locked boolean DEFAULT false NOT NULL
+    is_locked boolean DEFAULT false NOT NULL,
+    is_deprecated boolean DEFAULT false NOT NULL
 );
 
 
@@ -4506,6 +4507,13 @@ CREATE INDEX index_tag_implications_on_forum_post_id ON public.tag_implications 
 
 
 --
+-- Name: index_tags_on_is_deprecated; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tags_on_is_deprecated ON public.tags USING btree (is_deprecated) WHERE (is_deprecated = true);
+
+
+--
 -- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5797,6 +5805,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220318082614'),
 ('20220403042706'),
 ('20220403220558'),
-('20220407203236');
+('20220407203236'),
+('20220410050628');
 
 
