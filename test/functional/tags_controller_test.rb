@@ -124,7 +124,13 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           @deprecated_tag = create(:tag, name: "bad_tag", category: Tag.categories.general, post_count: 0, is_deprecated: true)
           @nondeprecated_tag = create(:tag, name: "log", category: Tag.categories.general, post_count: 0)
           @normal_tag = create(:tag, name: "random", category: Tag.categories.general, post_count: 1000)
-          @normal_user = create(:user)
+          create(:wiki_page, title: "bad_tag", body: "[[bad_tag]]")
+          create(:wiki_page, title: "log", body: "[[log]]")
+          create(:wiki_page, title: "random", body: "[[random]]")
+
+          @tag_without_wiki = create(:tag, name: "no_wiki", category: Tag.categories.general, post_count: 0)
+
+          @normal_user = create(:member_user)
           @admin = create(:admin_user)
         end
 
@@ -132,35 +138,42 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           put_auth tag_path(@deprecated_tag), @normal_user, params: {tag: { is_deprecated: false }}
 
           assert_response 403
-          assert(true, @deprecated_tag.reload.is_deprecated?)
+          assert_equal(true, @deprecated_tag.reload.is_deprecated?)
         end
 
         should "remove the deprecated status if the user is admin" do
           put_auth tag_path(@deprecated_tag), @admin, params: {tag: { is_deprecated: false }}
 
           assert_redirected_to @deprecated_tag
-          assert(false, @deprecated_tag.reload.is_deprecated?)
+          assert_equal(false, @deprecated_tag.reload.is_deprecated?)
         end
 
         should "allow marking a tag as deprecated if it's empty" do
           put_auth tag_path(@nondeprecated_tag), @normal_user, params: {tag: { is_deprecated: true }}
 
           assert_redirected_to @nondeprecated_tag
-          assert(true, @nondeprecated_tag.reload.is_deprecated?)
+          assert_equal(true, @nondeprecated_tag.reload.is_deprecated?)
         end
 
         should "not allow marking a tag as deprecated if it's not empty" do
           put_auth tag_path(@normal_tag), @normal_user, params: {tag: { is_deprecated: true }}
 
           assert_response 403
-          assert(false, @normal_tag.reload.is_deprecated?)
+          assert_equal(false, @normal_tag.reload.is_deprecated?)
         end
 
         should "allow admins to mark tags as deprecated" do
           put_auth tag_path(@normal_tag), @admin, params: {tag: { is_deprecated: true }}
 
           assert_redirected_to @normal_tag
-          assert(true, @normal_tag.reload.is_deprecated?)
+          assert_equal(true, @normal_tag.reload.is_deprecated?)
+        end
+
+        should "not allow deprecation of a tag with no wiki" do
+          put_auth tag_path(@tag_without_wiki), @user, params: {tag: { is_deprecated: true }}
+
+          assert_response 403
+          assert_equal(false, @tag_without_wiki.reload.is_deprecated?)
         end
       end
 
