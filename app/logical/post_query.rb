@@ -174,6 +174,11 @@ class PostQuery
     build(AST.new(:and, [ast, *implicit_metatags]))
   end
 
+  # Return a new PostQuery with terms sorted into alphabetical order.
+  def sort
+    build(ast.sort)
+  end
+
   # Return a new PostQuery converted to conjunctive normal form.
   def to_cnf
     build(ast.to_cnf)

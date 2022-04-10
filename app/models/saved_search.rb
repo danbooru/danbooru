@@ -146,7 +146,7 @@ class SavedSearch < ApplicationRecord
   concerning :Queries do
     class_methods do
       def normalize_query(query)
-        PostQueryBuilder.new(query.to_s).normalized_query(sort: false).to_s
+        PostQuery.new(query.to_s).replace_aliases.to_infix
       end
 
       def queries_for(user_id, label: nil)
@@ -166,7 +166,7 @@ class SavedSearch < ApplicationRecord
     end
 
     def normalized_query
-      @normalized_query ||= PostQueryBuilder.new(query).normalized_query.to_s
+      @normalized_query ||= PostQuery.normalize(query).sort.to_s
     end
 
     def rewrite_query(old_name, new_name)
