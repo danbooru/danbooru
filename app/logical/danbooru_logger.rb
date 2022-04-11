@@ -42,10 +42,10 @@ class DanbooruLogger
   # @param session the Rails session
   # @param user [User] the current user
   def self.add_session_attributes(request, session, user)
-    add_attributes("request", { path: request.path })
-    add_attributes("request.headers", header_params(request))
-    add_attributes("request.params", request_params(request))
-    add_attributes("session.params", session_params(session))
+    #add_attributes("request", { path: request.path })
+    #add_attributes("request.headers", header_params(request))
+    add_attributes("param", request_params(request))
+    add_attributes("session", session_params(session))
     add_attributes("user", user_params(request, user))
   end
 
@@ -70,10 +70,10 @@ class DanbooruLogger
       id: user&.id,
       name: user&.name,
       level: user&.level_string,
-      ip: request.remote_ip,
-      country: CurrentUser.country,
-      safe_mode: CurrentUser.safe_mode?,
-      bot: UserAgent.new(request.headers["HTTP_USER_AGENT"]).is_bot?,
+      #ip: request.remote_ip,
+      #country: CurrentUser.country,
+      #safe_mode: CurrentUser.safe_mode?,
+      #bot: UserAgent.new(request.headers["HTTP_USER_AGENT"]).is_bot?,
     }
   end
 
@@ -86,12 +86,18 @@ class DanbooruLogger
   private_class_method
 
   def self.log_attributes(attributes)
+    attributes.each do |key, value|
+      ElasticAPM.set_label(key, value)
+    end
   end
 
   def self.log_exception(exception, expected: false, custom_params: {})
+    ElasticAPM.report(exception, handled: expected)
   end
 
   def self.log_event(level, message: nil, **params)
+    ElasticAPM.set_custom_context(params)
+    ElasticAPM.report_message(message)
   end
 
   # flatten_hash({ foo: { bar: { baz: 42 } } })

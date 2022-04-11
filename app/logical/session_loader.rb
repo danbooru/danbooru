@@ -117,7 +117,7 @@ class SessionLoader
   def authenticate_basic_auth
     credentials = ::Base64.decode64(request.authorization.split(' ', 2).last || '')
     login, api_key = credentials.split(/:/, 2)
-    DanbooruLogger.add_attributes("request.params", login: login)
+    DanbooruLogger.add_attributes("param", login: login)
     authenticate_api_key(login, api_key)
   end
 

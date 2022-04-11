@@ -56,6 +56,7 @@ gem "rbtrace"
 gem "good_job"
 gem "crass"
 gem "public_suffix"
+gem "elastic-apm"
 
 group :development do
   gem 'rubocop', require: false

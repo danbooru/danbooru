@@ -547,6 +547,13 @@ module Danbooru
       # "redis://localhost:6379"
     end
 
+    # Optional. The URL of the Elastic APM server. Used for application performance monitoring.
+    #
+    # https://www.elastic.co/observability/application-performance-monitoring
+    def elastic_apm_server_url
+      # "http://localhost:8200"
+    end
+
     # True if the Winter Sale is active.
     def is_promotion?
       false
