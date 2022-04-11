@@ -49,9 +49,9 @@ module Danbooru
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
 
-    # Hide sensitive model attributes and request params in exception messages,
-    # log files, and in NewRelic. These are substring matches, so they match
-    # any attribute or request param containing the word 'password' etc.
+    # Hide sensitive model attributes and request params in exception messages
+    # and logs. These are substring matches, so they match any attribute or
+    # request param containing the word 'password' etc.
     #
     # https://guides.rubyonrails.org/configuring.html#config-filter-parameters
     config.filter_parameters += [:password, :api_key, :secret, :ip_addr, :address, :email_verification_key, :signed_user_id] if Rails.env.production?

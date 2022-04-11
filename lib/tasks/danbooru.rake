@@ -1,6 +1,3 @@
-require "newrelic_rpm"
-require "tasks/newrelic"
-
 # This file contains commands for running various routine maintenance tasks on
 # a Danbooru instance. Run `bin/rails -T` to see a list of all available tasks.
 #

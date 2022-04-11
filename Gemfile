@@ -44,7 +44,6 @@ gem 'google-cloud-storage', require: "google/cloud/storage"
 gem 'ed25519'
 gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
 gem 'terminal-table'
-gem 'newrelic_rpm', require: false
 gem 'clockwork'
 gem 'puma-metrics'
 gem 'puma_worker_killer'

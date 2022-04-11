@@ -59,7 +59,6 @@ import Upload from "../src/javascripts/uploads.js";
 import UserTooltip from "../src/javascripts/user_tooltips.js";
 import Utility from "../src/javascripts/utility.js";
 import Ugoira from "../src/javascripts/ugoira.js"
-import NewRelic from "../src/javascripts/new_relic.js";
 
 let Danbooru = {};
 Danbooru.Autocomplete = Autocomplete;
@@ -87,7 +86,6 @@ Danbooru.Upload = Upload;
 Danbooru.UserTooltip = UserTooltip;
 Danbooru.Utility = Utility;
 Danbooru.Ugoira = Ugoira;
-Danbooru.NewRelic = NewRelic;
 
 Danbooru.notice = Utility.notice;
 Danbooru.error = Utility.error;

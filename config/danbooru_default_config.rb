@@ -547,12 +547,6 @@ module Danbooru
       # "redis://localhost:6379"
     end
 
-    # Optional. The license key for your New Relic account.
-    # https://newrelic.com/
-    # https://docs.newrelic.com/docs/accounts/accounts-billing/account-setup/new-relic-license-key/
-    def new_relic_license_key
-    end
-
     # True if the Winter Sale is active.
     def is_promotion?
       false
