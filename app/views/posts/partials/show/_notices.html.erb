@@ -18,7 +18,7 @@
 
     <%= render "post_disapprovals/counts", disapprovals: post.disapprovals.order(id: :asc), post: post %>
 
-    <% if policy(PostDisapproval).create? && !post.disapproved_by?(CurrentUser.user) %>
+    <% if CurrentUser.user.is_approver? %>
       <%= render "modqueue/quick_mod", post: post %>
       <%= render "post_disapprovals/detailed_rejection_dialog" %>
     <% end %>

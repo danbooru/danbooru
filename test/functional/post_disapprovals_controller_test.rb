@@ -85,5 +85,28 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(user_name: "eiki").with { @user_disapproval }
       end
     end
+
+    context "update action" do
+      setup do
+        @post = create(:post, is_pending: true)
+        @approver = create(:approver, name: "alice-san")
+        @another_approver = create(:approver, name: "bob-kun")
+        @post_disapproval = create(:post_disapproval, post: @post, user: @approver, reason: "poor_quality")
+      end
+
+      should "allow editing of disapprovals" do
+        put_auth post_disapproval_path(@post_disapproval), @approver, params: {post_disapproval: {reason: "breaks_rules"}}
+
+        assert_redirected_to(@post)
+        assert_equal("breaks_rules", @post_disapproval.reload.reason)
+      end
+
+      should "not allow editing by another user" do
+        put_auth post_disapproval_path(@post_disapproval), @another_approver, params: {post_disapproval: {reason: "disinterest"}}
+
+        assert_response 403
+        assert_equal("poor_quality", @post_disapproval.reload.reason)
+      end
+    end
   end
 end

@@ -267,10 +267,6 @@ class Post < ApplicationRecord
       !is_active? && uploader != user
     end
 
-    def disapproved_by?(user)
-      PostDisapproval.exists?(user_id: user.id, post_id: id)
-    end
-
     def autoban
       if has_tag?("banned_artist") || has_tag?("paid_reward")
         self.is_banned = true
