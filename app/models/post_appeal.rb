@@ -8,6 +8,7 @@ class PostAppeal < ApplicationRecord
   validate :validate_post_is_appealable, on: :create
   validate :validate_creator_is_not_limited, on: :create
   validates :creator, uniqueness: { scope: :post, message: "have already appealed this post" }, on: :create
+  after_create :prune_disapprovals
 
   enum status: {
     pending: 0,
@@ -16,6 +17,10 @@ class PostAppeal < ApplicationRecord
   }
 
   scope :expired, -> { pending.where("post_appeals.created_at < ?", Danbooru.config.moderation_period.ago) }
+
+  def prune_disapprovals
+    PostDisapproval.where(post: post).delete_all
+  end
 
   module SearchMethods
     def search(params)
