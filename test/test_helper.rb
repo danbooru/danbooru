@@ -26,6 +26,7 @@ class ActiveSupport::TestCase
   include DownloadTestHelper
   include IqdbTestHelper
   include UploadTestHelper
+  extend SourceTestHelper
   extend StripeTestHelper
   extend NormalizeAttributeHelper
 
