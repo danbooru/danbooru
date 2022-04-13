@@ -387,11 +387,14 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post1], "favgroup:#{favgroup1.id}")
       assert_tag_match([post2], "favgroup:#{favgroup2.name}")
+      assert_tag_match([post2, post1], "favgroup:any")
       assert_tag_match([], "favgroup:#{favgroup3.name}")
       assert_tag_match([], "favgroup:dne")
 
       assert_tag_match([post3, post2], "-favgroup:#{favgroup1.id}")
       assert_tag_match([post3, post1], "-favgroup:#{favgroup2.name}")
+      assert_tag_match([post3], "-favgroup:any")
+      assert_tag_match([post3], "favgroup:none")
       assert_tag_match([post3, post2, post1], "-favgroup:#{favgroup3.name}")
       assert_tag_match([post3, post2, post1], "-favgroup:dne")
 
@@ -405,6 +408,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         assert_tag_match([], "favgroup:#{favgroup1.name}")
         assert_tag_match([], "favgroup:#{favgroup2.name}")
         assert_tag_match([post3], "favgroup:#{favgroup3.name}")
+        assert_tag_match([post3], "favgroup:any")
       end
     end
 
