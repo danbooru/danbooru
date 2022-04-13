@@ -22,6 +22,8 @@ class Tag < ApplicationRecord
 
   scope :empty, -> { where("tags.post_count <= 0") }
   scope :nonempty, -> { where("tags.post_count > 0") }
+  scope :deprecated, -> { where(is_deprecated: true) }
+  scope :undeprecated, -> { where(is_deprecated: false) }
 
   module ApiMethods
     def to_legacy_json

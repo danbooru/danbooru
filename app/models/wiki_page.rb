@@ -206,7 +206,7 @@ class WikiPage < ApplicationRecord
 
   def tags
     titles = DText.parse_wiki_titles(body).uniq
-    tags = Tag.nonempty.where(name: titles).pluck(:name)
+    tags = Tag.nonempty.undeprecated.where(name: titles).pluck(:name)
     tags += TagAlias.active.where(antecedent_name: titles).pluck(:antecedent_name)
     TagAlias.to_aliased(titles & tags)
   end
