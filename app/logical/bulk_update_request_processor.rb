@@ -131,7 +131,10 @@ class BulkUpdateRequestProcessor
 
         when :deprecate
           tag = Tag.find_by_name(args[0])
-          if tag.nil?
+
+          if validation_context == :approval
+            # ignore already deprecated tags and missing wikis when approving a tag deprecation.
+          elsif tag.nil?
             errors.add(:base, "Can't deprecate #{args[0]} (tag doesn't exist)")
           elsif tag.is_deprecated?
             errors.add(:base, "Can't deprecate #{args[0]} (tag is already deprecated)")
@@ -141,7 +144,10 @@ class BulkUpdateRequestProcessor
 
         when :undeprecate
           tag = Tag.find_by_name(args[0])
-          if tag.nil?
+
+          if validation_context == :approval
+            # ignore already deprecated tags and missing wikis when removing a tag deprecation.
+          elsif tag.nil?
             errors.add(:base, "Can't undeprecate #{args[0]} (tag doesn't exist)")
           elsif !tag.is_deprecated?
             errors.add(:base, "Can't undeprecate #{args[0]} (tag is not deprecated)")
