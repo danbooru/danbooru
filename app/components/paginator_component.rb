@@ -13,10 +13,6 @@ class PaginatorComponent < ApplicationComponent
     @params = params
   end
 
-  def use_sequential_paginator?
-    paginator_mode != :numbered
-  end
-
   def pages
     last_page = total_pages.clamp(1..)
     left = (current_page - window).clamp(2..)

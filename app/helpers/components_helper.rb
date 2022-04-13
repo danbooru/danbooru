@@ -56,47 +56,45 @@ module ComponentsHelper
   end
 
   # A simple vertical tag list with no post counts. Used in related tags.
-  def render_simple_tag_list(tag_names, **options)
-    tags = TagListComponent.tags_from_names(tag_names)
-    render TagListComponent.new(tags: tags, **options).with_variant(:simple)
+  def render_related_tag_list(tag_names, **options)
+    tags = RelatedTagListComponent.tags_from_names(tag_names)
+    render RelatedTagListComponent.new(tags: tags, **options)
   end
 
   # A horizontal tag list, with tags grouped by category. Used in post
   # tooltips, on the comments index, and in the modqueue.
   def render_inline_tag_list(post, **options)
-    render TagListComponent.new(tags: post.tags, **options).with_variant(:inline)
+    render InlineTagListComponent.new(tags: post.tags, **options)
   end
 
   def render_inline_tag_list_from_names(tag_names, **options)
-    tags = TagListComponent.tags_from_names(tag_names)
-    render TagListComponent.new(tags: tags, **options).with_variant(:inline)
+    tags = InlineTagListComponent.tags_from_names(tag_names)
+    render InlineTagListComponent.new(tags: tags, **options)
   end
 
   # A vertical tag list, with tags split into categories. Used on post show pages.
   def render_categorized_tag_list(post, **options)
-    render TagListComponent.new(tags: post.tags, **options).with_variant(:categorized)
+    render CategorizedTagListComponent.new(tags: post.tags, **options)
   end
 
   # A vertical tag list, used in the post index sidebar.
   def render_search_tag_list(tag_names, **options)
-    tags = TagListComponent.tags_from_names(tag_names)
-    render TagListComponent.new(tags: tags, **options).with_variant(:search)
+    tags = SearchTagListComponent.tags_from_names(tag_names)
+    render SearchTagListComponent.new(tags: tags, **options)
   end
 
   # The <link rel="next"> / <link rel="prev"> links in the <meta> element of the <head>.
   def render_meta_links(records)
-    render PaginatorComponent.new(records: records, params: params).with_variant(:meta_links)
+    render MetaLinksComponent.new(records: records, params: params)
   rescue ActiveRecord::StatementInvalid
     # Swallow any exceptions when loading records so that the page load doesn't fail.
   end
 
   def numbered_paginator(records)
-    paginator = PaginatorComponent.new(records: records, params: params)
-
-    if paginator.use_sequential_paginator?
-      render paginator.with_variant(:sequential)
+    if records.paginator_mode == :numbered
+      render NumberedPaginatorComponent.new(records: records, params: params)
     else
-      render paginator.with_variant(:numbered)
+      render SequentialPaginatorComponent.new(records: records, params: params)
     end
   end
 end

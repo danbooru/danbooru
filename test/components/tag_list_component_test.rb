@@ -1,12 +1,6 @@
 require "test_helper"
 
 class TagListComponentTest < ViewComponent::TestCase
-  def render_tag_list(tags, variant, **options)
-    with_variant(variant) do
-      render_inline(TagListComponent.new(tags: tags, **options))
-    end
-  end
-
   context "The TagListComponent" do
     setup do
       @arttag = create(:artist_tag)
@@ -17,9 +11,9 @@ class TagListComponentTest < ViewComponent::TestCase
       @tags = Tag.all
     end
 
-    context "for a simple tag list" do
+    context "for a related tag list" do
       should "render" do
-        render_tag_list(@tags, :simple)
+        render_inline(RelatedTagListComponent.new(tags: @tags))
 
         assert_css(".simple-tag-list a.search-tag", count: 5)
       end
@@ -27,7 +21,7 @@ class TagListComponentTest < ViewComponent::TestCase
 
     context "for an inline tag list" do
       should "render" do
-        render_tag_list(@tags, :inline)
+        render_inline(InlineTagListComponent.new(tags: @tags))
 
         assert_css(".inline-tag-list a.search-tag", count: 5)
       end
@@ -36,7 +30,7 @@ class TagListComponentTest < ViewComponent::TestCase
     context "for a search tag list" do
       context "with +/- links" do
         should "render" do
-          render_tag_list(@tags, :search, current_query: "touhou", show_extra_links: true)
+          render_inline(SearchTagListComponent.new(tags: @tags, current_query: "touhou", show_extra_links: true))
 
           assert_css(".search-tag-list li a.search-tag", count: 5)
         end
@@ -44,7 +38,7 @@ class TagListComponentTest < ViewComponent::TestCase
 
       context "without +/- links" do
         should "render" do
-          render_tag_list(@tags, :search)
+          render_inline(SearchTagListComponent.new(tags: @tags))
 
           assert_css(".search-tag-list li a.search-tag", count: 5)
         end
@@ -53,7 +47,7 @@ class TagListComponentTest < ViewComponent::TestCase
 
     context "for a categorized tag list" do
       should "render" do
-        render_tag_list(@tags, :categorized)
+        render_inline(CategorizedTagListComponent.new(tags: @tags))
 
         assert_css(".categorized-tag-list li a.search-tag", count: 5)
         assert_css(".categorized-tag-list h3", count: 5)
