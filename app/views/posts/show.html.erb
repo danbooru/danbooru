@@ -16,12 +16,160 @@
 
   <section id="post-information">
     <h2>Information</h2>
-    <%= render "posts/partials/show/information", :post => @post %>
+
+    <ul>
+      <li id="post-info-id">ID: <%= @post.id %></li>
+
+      <li id="post-info-uploader">
+        Uploader: <%= link_to_user(@post.uploader) %>
+        <%= link_to "»", posts_path(tags: "user:#{@post.uploader.name}") %>
+      </li>
+
+      <li id="post-info-date">
+        Date: <%= link_to time_ago_in_words_tagged(@post.created_at), posts_path(tags: "date:#{@post.created_at.to_date}") %>
+      </li>
+
+      <% if @post.approver %>
+        <li id="post-info-approver">
+          Approver: <%= link_to_user(@post.approver) %>
+          <%= link_to "»", posts_path(tags: "approver:#{@post.approver.name}") %>
+        </li>
+      <% end %>
+
+      <li id="post-info-size">
+        Size: <%= link_to_if policy(@post).visible?, "#{number_to_human_size(@post.file_size)} .#{@post.file_ext}", @post.tagged_file_url %>
+        (<%= @post.image_width %>x<%= @post.image_height %>)
+        <%= link_to "»", @post.media_asset %>
+      </li>
+
+      <li id="post-info-source">Source: <%= post_source_tag(@post.source, @post.normalized_source) %></li>
+      <li id="post-info-rating">Rating: <%= @post.pretty_rating %></li>
+
+      <li id="post-info-score">
+        Score: <%= render_post_votes @post, current_user: CurrentUser.user %>
+      </li>
+
+      <li id="post-info-favorites">
+        Favorites:
+        <%= tag.span class: "post-favcount", "data-id": @post.id do %>
+          <%= link_to @post.fav_count, post_favorites_path(@post), rel: "nofollow" %>
+        <% end %>
+      </li>
+
+      <li id="post-info-status">
+        Status:
+        <% if @post.is_pending? %>
+          Pending
+        <% elsif @post.is_flagged? %>
+          Flagged
+        <% elsif @post.is_appealed? %>
+          Appealed
+        <% elsif @post.is_deleted? %>
+          Deleted
+        <% else %>
+          Active
+        <% end %>
+
+        <% if @post.is_banned? %>
+          Banned
+        <% end %>
+      </li>
+    </ul>
   </section>
 
   <section id="post-options">
     <h2>Options</h2>
-    <%= render "posts/partials/show/options", :post => @post %>
+
+    <ul>
+      <% if policy(@post).visible? %>
+        <li id="post-option-resize-to-window">
+          <%= link_to "Resize to window", "#", class: "image-resize-to-window-link", "data-shortcut": "z" %>
+        </li>
+      <% end %>
+
+      <% if policy(@post).visible? && @post.has_large? && !@post.is_ugoira? %>
+        <li id="post-option-view-large">
+          <%= link_to "View smaller", @post.tagged_large_file_url, class: "image-view-large-link" %>
+        </li>
+
+        <li id="post-option-view-original">
+          <%= link_to "View original", @post.tagged_file_url, class: "image-view-original-link" %>
+        </li>
+      <% end %>
+
+      <li id="post-option-find-similar">
+        <%= link_to "Find similar", iqdb_queries_path(post_id: @post.id), ref: "nofollow" %>
+      </li>
+
+      <% if policy(@post).visible? %>
+        <li id="post-option-download">
+          <%= link_to "Download", @post.tagged_file_url + "?download=1", download: @post.presenter.filename_for_download(CurrentUser.user) %>
+        </li>
+      <% end %>
+
+      <% if policy(Favorite).create? %>
+        <li id="post-option-add-to-favorites">
+          <%= link_to "Favorite", favorites_path(post_id: @post.id), remote: true, method: :post, id: "add-to-favorites", "data-shortcut": "f", style: ("display: none;" if @post.favorited_by?(CurrentUser.user)) %>
+        </li>
+
+        <li id="post-option-remove-from-favorites">
+          <%= link_to "Unfavorite", favorite_path(@post), remote: true, method: :delete, id: "remove-from-favorites", "data-shortcut": "shift+f", "data-shortcut-when": ":visible", style: ("display: none;" if !@post.favorited_by?(CurrentUser.user)) %>
+        </li>
+      <% end %>
+
+      <% if policy(@post).update? %>
+        <li id="post-option-edit"><%= link_to "Edit", "#edit", id: "side-edit-link" %></li>
+        <li id="post-option-add-to-pool"><%= link_to "Add to pool", "#", id: "pool" %></li>
+
+        <li id="post-option-add-note">
+          <%= link_to "Add note", "#", id: "translate", "data-shortcut": "n" %>
+        </li>
+
+        <% if @post.has_notes? %>
+          <li id="post-option-copy-notes"><%= link_to "Copy notes", "#", id: "copy-notes" %></li>
+        <% end %>
+
+        <li id="post-option-add-commentary"><%= link_to "Add commentary", "#", id: "add-commentary" %></li>
+      <% end %>
+
+      <% if policy(FavoriteGroup).create? %>
+        <li id="post-option-add-fav-group"><%= link_to "Add to fav group", "#", id: "open-favgroup-dialog-link", "data-shortcut": "g" %></li>
+      <% end %>
+
+      <% if @post.is_active? && policy(PostFlag).create? %>
+        <li id="post-option-flag"><%= link_to "Flag", new_post_flag_path(post_flag: { post_id: @post.id }), remote: true %></li>
+      <% elsif @post.is_appealable? && policy(PostAppeal).create? %>
+        <li id="post-option-appeal"><%= link_to "Appeal", new_post_appeal_path(post_appeal: { post_id: @post.id }), remote: true %></li>
+      <% end %>
+
+      <% if policy(PostApproval).create? %>
+        <% if @post.is_deleted? && policy(@post).move_favorites? %>
+          <li id="post-option-move-favorites"><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(post_id: @post.id) %></li>
+        <% end %>
+
+        <% if !@post.is_deleted? && policy(@post).delete? %>
+          <li id="post-option-delete"><%= link_to "Delete", @post, method: :delete, remote: true %></li>
+        <% end %>
+
+        <% if policy(@post).unban? %>
+          <li id="post-option-unban"><%= link_to "Unban", unban_moderator_post_post_path(@post), method: :post, "data-confirm": "Are you sure you want to unban this post?" %></li>
+        <% elsif policy(@post).ban? %>
+          <li id="post-option-ban"><%= link_to "Ban", ban_moderator_post_post_path(@post), method: :post, "data-confirm": "Are you sure you want to ban this post?" %></li>
+        <% end %>
+
+        <% if policy(@post).expunge? %>
+          <li id="post-option-expunge"><%= link_to "Expunge", expunge_moderator_post_post_path(post_id: @post.id), remote: true, method: :post, "data-confirm": "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?" %></li>
+        <% end %>
+      <% end %>
+
+      <% if policy(PostReplacement).create? %>
+        <li id="post-option-replace-image"><%= link_to "Replace image", new_post_replacement_path(post_id: @post.id), remote: true %></li>
+      <% end %>
+
+      <% if policy(@post).regenerate? %>
+        <li id="post-option-regenerate-preview"><%= link_to "Regenerate image", post_regenerations_path(post_id: @post.id, category: "resizes"), method: :post, "data-confirm": "This will regenerate the posts's thumbnail images. Are you sure?" %></li>
+      <% end %>
+    </ul>
   </section>
 
   <section id="post-history">
@@ -42,10 +190,89 @@
     <%= render_post_navbar(@post, current_user: CurrentUser.user, search: params[:q]) %>
   <% end %>
 
-  <%= render "posts/partials/show/notices", :post => @post %>
+  <% if @post.is_banned? %>
+    <div class="notice notice-small post-notice post-notice-banned">
+      The artist requested removal of this page
+    </div>
+  <% end %>
+
+  <% if @post.in_modqueue? %>
+    <div class="notice notice-small post-notice post-notice-pending">
+      <% if @post.is_pending? %>
+        This post is pending approval. (<%= link_to_wiki "learn more", "about:mod_queue" %>)
+      <% elsif @post.is_flagged? %>
+        This post was flagged and is pending approval (<%= link_to_wiki "learn more", "howto:flag" %>)
+        <%= render "post_flags/reasons", flag: @post.flags.select(&:pending?).last %>
+      <% elsif @post.is_appealed? %>
+        This post was appealed and is pending approval (<%= link_to_wiki "learn more", "about:mod_queue" %>)
+        <%= render "post_appeals/reasons", appeal: @post.appeals.select(&:pending?).last %>
+      <% end %>
+
+      <%= render "post_disapprovals/counts", disapprovals: @post.disapprovals.order(id: :asc), post: @post %>
+
+      <% if CurrentUser.user.is_approver? %>
+        <%= render "modqueue/quick_mod", post: @post %>
+        <%= render "post_disapprovals/detailed_rejection_dialog" %>
+      <% end %>
+    </div>
+  <% elsif @post.is_deleted? %>
+    <div class="notice notice-small post-notice post-notice-deleted">
+      <% if @post.flags.succeeded.last.present? %>
+        <p>This post was deleted for the following reason: </p>
+        <%= render "post_flags/reasons", flag: @post.flags.succeeded.last %>
+      <% else %>
+        <p>This post was deleted</p>
+      <% end %>
+
+      <%= render "post_disapprovals/counts", disapprovals: @post.disapprovals.order(id: :asc), post: @post %>
+
+      <% if CurrentUser.id == @post.uploader_id %>
+        <p>If you don't understand why your upload was deleted, you can ask for
+        advice in the Upload Feedback Thread on the forum.</p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @post.parent.present? %>
+    <div class="notice notice-small post-notice post-notice-child">
+      <%= render "posts/partials/show/parent_notice", parent: @post.parent, children: @sibling_posts.to_a %>
+    </div>
+  <% end %>
+
+  <% if @post.has_visible_children? %>
+    <div class="notice notice-small post-notice post-notice-parent">
+      <%= render "posts/partials/show/child_notice", parent: @post, children: @child_posts.to_a %>
+    </div>
+  <% end %>
+
+  <% if policy(@post).visible? && @post.has_large? && !@post.is_ugoira? && @post.resize_percentage.floor < 100 %>
+    <div class="notice notice-small post-notice post-notice-resized" id="image-resize-notice">
+      Resized to <%= number_to_percentage @post.resize_percentage.floor, precision: 0 %> of original (<%= link_to "view original", @post.tagged_file_url, class: "image-view-original-link" %>)
+    </div>
+  <% end %>
 
   <%= tag.section class: ["image-container", "note-container", ("danbirthday" if is_danbirthday?(@post))], **image_container_data_attributes(@post, CurrentUser.user) do -%>
-    <%= render "posts/partials/show/embedded", post: @post %>
+    <% if @post.banblocked? -%>
+      <p>The artist requested removal of this image.</p>
+    <% elsif @post.levelblocked? -%>
+      <p><%= link_to "You need a gold account to see this image", new_user_upgrade_path %>.</p>
+    <% elsif @post.safeblocked? -%>
+      <p>This image is unavailable on <%= Danbooru.config.app_name %>. Go to <%= link_to "Danbooru", "https://danbooru.donmai.us" %> or disable safe mode to view (<%= link_to_wiki "learn more", "help:safe_mode" %>).</p>
+    <% elsif @post.is_flash? -%>
+      <%= render("posts/partials/show/flash", post: @post) -%>
+    <% elsif @post.is_video? -%>
+      <%= render("posts/partials/show/video", post: @post) -%>
+    <% elsif @post.is_ugoira? -%>
+      <%= render("posts/partials/show/ugoira", post: @post) -%>
+    <% elsif !@post.is_image? -%>
+      <%= render("posts/partials/show/download", post: @post) -%>
+    <% elsif @post.is_image? -%>
+      <picture>
+        <%= tag.source media: "(max-width: 660px)", srcset: @post.tagged_large_file_url %>
+        <%= tag.img width: @post.image_width_for(CurrentUser.user), height: @post.image_height_for(CurrentUser.user), id: "image", class: "fit-width", alt: @post.presenter.humanized_essential_tag_string, src: @post.file_url_for(CurrentUser.user) %>
+      </picture>
+    <% end %>
+
     <div id="note-preview"></div>
   <% end -%>
 
@@ -139,7 +366,15 @@
   </div>
 <% end %>
 
-<%= post_view_count_js %>
+<% if reportbooru_enabled? %>
+  <script type="text/javascript">
+    $(function() {
+      $.post("<%= Danbooru.config.reportbooru_server %>/post_views", {
+        msg: "<%= generate_reportbooru_signature(params[:id]) %>"
+      });
+    });
+  </script>
+<% end %>
 
 <% content_for(:html_header) do %>
   <meta name="post-id" content="<%= @post.id %>">

@@ -19,13 +19,6 @@ module PostsHelper
     render "posts/partials/index/search_count", sig: sig
   end
 
-  def post_view_count_js
-    return unless reportbooru_enabled?
-
-    msg = generate_reportbooru_signature(params[:id])
-    render "posts/partials/show/view_count", msg: msg
-  end
-
   def generate_reportbooru_signature(value)
     verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256")
     verifier.generate("#{value},#{session[:session_id]}")
