@@ -56,8 +56,19 @@
   <%= yield :html_header %>
   <%= raw Danbooru.config.custom_html_header_content %>
 </head>
+
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item, @exception) do %>
-  <%= render "news_updates/listing" %>
+  <% if NewsUpdate.recent.present? %>
+    <div id="news-updates" data-id="<%= NewsUpdate.recent.first.try(:id) %>" style="display: none;">
+      <ul>
+        <% NewsUpdate.recent.each do |news_update| %>
+          <li><%= news_update.message.html_safe %></li>
+        <% end %>
+      </ul>
+
+      <a href="#" id="close-news-ticker-link"><%= close_icon %></a>
+    </div>
+  <% end %>
 
   <header id="top" class="mb-4">
     <%= link_to Danbooru.config.app_name, root_path, id: "app-name-header", class: "font-bold font-header leading-normal" %>
@@ -68,7 +79,30 @@
     </div>
 
     <nav id="nav">
-      <%= render "layouts/main_links" %>
+      <menu id="main-menu" class="main">
+        <% if CurrentUser.is_anonymous? %>
+          <%= nav_link_to("Login", login_path(url: request.fullpath), rel: "nofollow") %>
+        <% else %>
+          <%= nav_link_to("My Account #{unread_dmail_indicator(CurrentUser.user)}", profile_path) %>
+        <% end %>
+
+        <%= nav_link_to("Posts", posts_path) %>
+        <%= nav_link_to("Comments", comments_path) %>
+        <%= nav_link_to("Notes", notes_path) %>
+        <%= nav_link_to("Artists", artists_path) %>
+        <%= nav_link_to("Tags", tags_path) %>
+        <%= nav_link_to("Pools", gallery_pools_path) %>
+        <%= nav_link_to("Wiki", wiki_page_path("help:home")) %>
+        <%= nav_link_to("Forum", forum_topics_path, :class => (CurrentUser.has_forum_been_updated? ? "forum-updated" : nil)) %>
+
+        <% if CurrentUser.is_moderator? %>
+          <%= nav_link_to("Reports", moderation_reports_path, :class => (ModerationReport.where(status: "pending").present? ? "reports-pending" : nil)) %>
+          <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
+        <% end %>
+
+        <%= nav_link_to("More »", site_map_path) %>
+      </menu>
+
       <% if content_for(:secondary_links).present? %>
         <menu id="subnav-menu">
           <%= yield :secondary_links %>
@@ -78,7 +112,16 @@
   </header>
 
   <div id="page" class="flex-1">
-    <%= render "users/verification_notice" %>
+    <% if CurrentUser.user.is_restricted? && (params[:controller] == "users" || cookies[:hide_verify_account_notice].blank?) %>
+      <div class="notice notice-info notice-large" id="verify-account-notice">
+        <h2>Your account is restricted.</h2>
+        <div>
+          You must verify your account because you signed up from a proxy or a VPN.
+          <%= link_to "Verify your account now", verify_user_email_path(CurrentUser.user) %>.
+        </div>
+        <div><%= link_to "Close this", "#", id: "hide-verify-account-notice" %></div>
+      </div>
+    <% end %>
 
     <% if Danbooru.config.is_promotion? && cookies[:hide_winter_sale_notice].blank? %>
       <div class="notice notice-info notice-small flex text-center items-center justify-center gap-2" id="promotion-notice">
@@ -97,7 +140,15 @@
       <%= render "users/upgrade_notice" %>
     <% end %>
 
-    <%= render "users/ban_notice" %>
+    <% if CurrentUser.user.is_banned? %>
+      <div class="notice notice-error notice-large" id="ban-notice">
+        <h2>You have been banned <%= humanized_duration CurrentUser.user.active_ban.duration %></h2>
+
+        <div>
+          Reason: <span class="prose"><%= format_text CurrentUser.user.active_ban.reason, inline: true %></span>
+        </div>
+      </div>
+    <% end %>
 
     <% if params[:controller] != "dmails" && has_unread_dmails?(CurrentUser.user) %>
       <%= render "users/dmail_notice" %>
@@ -128,6 +179,28 @@
     <div id="popup-menus"></div>
   </div>
 
-  <%= render "static/footer" %>
+  <footer id="page-footer" class="text-sm flex-initial">
+    <span class="page-footer-app-name"><%= Danbooru.config.app_name %></span>
+    / <%= link_to "Rules", terms_of_service_path %>
+    / <%= link_to "Contact", contact_path %>
+    /
+    <span class="social-icons">
+      <% if Danbooru.config.source_code_url.present? %>
+        <%= link_to Danbooru.config.source_code_url, title: "Running commit: #{Rails.application.config.x.git_hash&.first(9)}", class: "social-icon" do %>
+          <%= github_icon %>
+        <% end %>
+      <% end %>
+      <% if Danbooru.config.twitter_username.present? %>
+        <%= link_to "https://twitter.com/#{Danbooru.config.twitter_username}", class: "social-icon" do %>
+          <%= twitter_icon %>
+        <% end %>
+      <% end %>
+      <% if Danbooru.config.discord_server_url.present? %>
+        <%= link_to Danbooru.config.discord_server_url, class: "social-icon" do %>
+          <%= discord_icon %>
+        <% end %>
+      <% end %>
+    </span>
+  </footer>
 <% end %>
 </html>
