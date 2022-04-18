@@ -27,6 +27,7 @@ module Source
     DOWNLOAD_TIMEOUT = 60
 
     attr_reader :url, :referer_url, :parsed_url, :parsed_referer
+
     delegate :site_name, to: :parsed_url
 
     SUBCLASSES = [
@@ -50,6 +51,7 @@ module Source
       Source::Extractor::Plurk,
       Source::Extractor::Tinami,
       Source::Extractor::Fantia,
+      Source::Extractor::Booth,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
