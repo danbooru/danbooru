@@ -9,6 +9,7 @@ class FavoriteGroup < ApplicationRecord
   validates :name, presence: true
   validates :name, uniqueness: { case_sensitive: false, scope: :creator_id }
   validates :name, format: { without: /,/, message: "cannot have commas" }
+  validates :name, exclusion: { in: %w[any none], message: "can't be '%{value}'" }
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
   validate :validate_posts
