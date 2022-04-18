@@ -23,6 +23,8 @@ class PostNavbarComponent < ApplicationComponent
   end
 
   def favgroups
+    return [] if current_user.is_anonymous? && favgroup_id.nil?
+
     favgroups = FavoriteGroup.visible(current_user).for_post(post.id)
     favgroups = favgroups.where(creator: current_user).or(favgroups.where(id: favgroup_id))
     favgroups.sort_by do |favgroup|
