@@ -38,6 +38,10 @@ class PostsController < ApplicationController
       @child_posts = @post.children
       @child_posts = @child_posts.undeleted unless include_deleted
       @sibling_posts = @sibling_posts.includes(:media_asset)
+
+      if CurrentUser.user.is_approver?
+        @previous_disapproval = @post.disapprovals.select { |disapproval| disapproval.user_id == CurrentUser.user.id }.first
+      end
     end
 
     respond_with(@post) do |format|

@@ -214,7 +214,7 @@ Rails.application.routes.draw do
   resources :post_appeals
   resources :post_flags
   resources :post_approvals, only: [:create, :index]
-  resources :post_disapprovals, only: [:create, :show, :index]
+  resources :post_disapprovals
   resources :post_versions, :only => [:index, :search] do
     member do
       put :undo

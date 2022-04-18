@@ -17,4 +17,17 @@ class PostDisapprovalsController < ApplicationController
 
     respond_with(@post_disapprovals)
   end
+
+  def edit
+    @post_disapproval = authorize PostDisapproval.find(params[:id])
+    respond_with(@post_disapproval)
+  end
+
+  def update
+    @post_disapproval = authorize PostDisapproval.find(params[:id])
+    @post_disapproval.update(permitted_attributes(@post_disapproval))
+    respond_with(@post_disapproval) do |fmt|
+      fmt.html { redirect_to post_path(@post_disapproval.post) }
+    end
+  end
 end
