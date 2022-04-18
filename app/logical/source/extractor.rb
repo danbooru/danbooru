@@ -52,6 +52,7 @@ module Source
       Source::Extractor::Tinami,
       Source::Extractor::Fantia,
       Source::Extractor::Booth,
+      Source::Extractor::Anifty,
     ]
 
     # Should return true if the extractor is configured correctly. Return false

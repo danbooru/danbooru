@@ -216,6 +216,8 @@ module IconHelper
       image_icon_tag("amazon-logo.png", **options)
     when "Ameblo"
       image_icon_tag("ameblo-logo.png", **options)
+    when "Anifty"
+      image_icon_tag("anifty-logo.png", **options)
     when "ArtStation"
       image_icon_tag("artstation-logo.png", **options)
     when "Ask.fm"
