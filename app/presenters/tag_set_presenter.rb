@@ -44,7 +44,7 @@ class TagSetPresenter
   private
 
   def tags
-    Tag.where(name: tag_names).select(:name, :post_count, :category)
+    Tag.where(name: tag_names)
   end
 
   def tags_by_category
