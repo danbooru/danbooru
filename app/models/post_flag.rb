@@ -15,6 +15,7 @@ class PostFlag < ApplicationRecord
   validate :validate_post, on: :create
   validates :creator_id, uniqueness: { scope: :post_id, on: :create, unless: :is_deletion, message: "have already flagged this post" }
   before_save :update_post
+  after_create :prune_disapprovals
   attr_accessor :is_deletion
 
   enum status: {
@@ -88,6 +89,11 @@ class PostFlag < ApplicationRecord
     else
       :normal
     end
+  end
+
+  def prune_disapprovals
+    return if is_deletion
+    PostDisapproval.where(post: post).delete_all
   end
 
   def update_post

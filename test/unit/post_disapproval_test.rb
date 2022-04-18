@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostDisapprovalTest < ActiveSupport::TestCase
   context "In all cases" do
@@ -13,7 +13,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "A post disapproval" do
+    context "a post disapproval" do
       setup do
         @post_1 = FactoryBot.create(:post, :is_pending => true)
         @post_2 = FactoryBot.create(:post, :is_pending => true)
@@ -35,7 +35,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
           end
 
           should "remove the associated post from alice's moderation queue" do
-            assert(!Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_1.id))
+            assert_not(Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_1.id))
             assert(Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_2.id))
           end
         end
@@ -53,15 +53,21 @@ class PostDisapprovalTest < ActiveSupport::TestCase
         end
       end
 
-      context "for a post that has been approved" do
-        setup do
-          @post = FactoryBot.create(:post, is_pending: true)
+      context "when pruning" do
+        should "prune old disapprovals" do
           @user = FactoryBot.create(:user)
-          @disapproval = create(:post_disapproval, user: @user, post: @post, created_at: 2.months.ago)
+          @post = FactoryBot.create(:post, is_pending: true)
+          create(:post_disapproval, user: @user, post: @post, created_at: 2.months.ago)
+          assert_difference("PostDisapproval.count", -1) do
+            PostDisapproval.prune!
+          end
         end
 
-        should "be pruned" do
-          assert_difference("PostDisapproval.count", -1) do
+        should "not prune recent disapprovals" do
+          @user = FactoryBot.create(:user)
+          @post = FactoryBot.create(:post, is_pending: true)
+          @disapproval = create(:post_disapproval, user: @user, post: @post, created_at: 7.days.ago)
+          assert_no_difference("PostDisapproval.count") do
             PostDisapproval.prune!
           end
         end
@@ -69,13 +75,55 @@ class PostDisapprovalTest < ActiveSupport::TestCase
 
       context "#search" do
         should "work" do
-          disapproval1 = FactoryBot.create(:post_disapproval, user: @alice, post: @post_1, reason: "breaks_rules")
-          disapproval2 = FactoryBot.create(:post_disapproval, user: @alice, post: @post_2, reason: "poor_quality", message: "bad anatomy")
+          @approver = create(:approver)
+          @post1 = create(:post, is_pending: true)
+          @post2 = create(:post, is_pending: true)
+          disapproval1 = FactoryBot.create(:post_disapproval, user: @approver, post: @post1, reason: "breaks_rules")
+          disapproval2 = FactoryBot.create(:post_disapproval, user: @approver, post: @post2, reason: "poor_quality", message: "bad anatomy")
 
           assert_equal([disapproval1.id], PostDisapproval.search(reason: "breaks_rules").pluck(:id))
           assert_equal([disapproval2.id], PostDisapproval.search(message: "bad anatomy").pluck(:id))
-          assert_equal([disapproval2.id, disapproval1.id], PostDisapproval.search(creator_name: "alice").pluck(:id))
+          assert_equal([disapproval1.id, disapproval2.id], PostDisapproval.where(user: @approver).pluck(:id))
         end
+      end
+    end
+
+    context "post deletions" do
+      should "not prune disapprovals" do
+        @post = create(:post, is_pending: true)
+        @user = create(:moderator_user)
+        create(:post_disapproval, user: @user, post: @post, message: "test")
+        assert_equal(1, PostDisapproval.where(post: @post).size)
+        @post.delete!("blah", user: @user)
+        assert_equal(1, PostDisapproval.where(post: @post).size)
+      end
+    end
+
+    context "post appeals" do
+      should "prune disapprovals" do
+        @post = create(:post, is_pending: true)
+        @user = create(:moderator_user)
+        create(:post_disapproval, user: @user, post: @post, message: "test")
+        assert_equal(1, PostDisapproval.where(post: @post).size)
+        @post.delete!("blah", user: @user)
+
+        create(:post_appeal, post: @post, creator: @user)
+
+        assert_equal(0, PostDisapproval.where(post: @post).size)
+      end
+    end
+
+    context "post flags" do
+      should "prune disapprovals" do
+        @post = create(:post, is_pending: true)
+        @user = create(:moderator_user)
+        create(:post_disapproval, user: @user, post: @post, message: "test")
+        assert_equal(1, PostDisapproval.where(post: @post).size)
+
+        create(:post_approval, post: @post, user: @user)
+        create(:post_flag, post: @post, creator: @user)
+
+        assert_equal(0, PostDisapproval.where(post: @post).size)
       end
     end
   end
