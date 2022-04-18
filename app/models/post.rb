@@ -1247,8 +1247,17 @@ class Post < ApplicationRecord
       end
 
       def favgroup_matches(query, current_user)
-        favgroup = FavoriteGroup.visible(current_user).name_or_id_matches(query, current_user)
-        where(id: favgroup.select("unnest(post_ids)"))
+        case query.downcase
+        when "none"
+          favgroups = FavoriteGroup.where(creator: current_user)
+          where.not(id: favgroups.select("unnest(post_ids)"))
+        when "any"
+          favgroups = FavoriteGroup.where(creator: current_user)
+          where(id: favgroups.select("unnest(post_ids)"))
+        else
+          favgroup = FavoriteGroup.visible(current_user).name_or_id_matches(query, current_user)
+          where(id: favgroup.select("unnest(post_ids)"))
+        end
       end
 
       def ordfavgroup_matches(query, current_user)
