@@ -339,7 +339,9 @@
 
   <section id="notes" style="display: none;">
     <% if @post.has_notes? %>
-      <%= render partial: "notes/note", collection: @post.notes.active %>
+      <% @post.notes.active.each do |note| %>
+        <article data-width="<%= note.width %>" data-height="<%= note.height %>" data-x="<%= note.x %>" data-y="<%= note.y %>" data-id="<%= note.id %>" data-body="<%= note.body %>"><%= raw NoteSanitizer.sanitize(note.body) %></article>
+      <% end %>
     <% end %>
   </section>
 
