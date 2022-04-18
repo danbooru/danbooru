@@ -571,7 +571,9 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
 
       should "not work for tags without a wiki page" do
+        create(:tag, name: "no_wiki")
         @bur = build(:bulk_update_request, script: "deprecate no_wiki")
+
         assert_equal(false, @bur.valid?)
         assert_equal(["Can't deprecate no_wiki (tag must have a wiki page)"], @bur.errors[:base])
       end
