@@ -12,6 +12,8 @@ module ArtistFinder
     "ameblo.jp", # https://ameblo.jp/g8set55679
     "ameba.jp", # https://profile.ameba.jp/ameba/kbnr32rbfs
     "anidb.net", # https://anidb.net/creator/65313
+    "anifty.jp", # https://anifty.jp/@unagi189
+    %r{anifty.jp/(?:ja|zh|en)}, # https://anifty.jp/ja/@unagi189
     "animenewsnetwork.com", # http://www.animenewsnetwork.com/encyclopedia/people.php?id=46869
     "artstation.com/artist", # http://www.artstation.com/artist/serafleur/
     "www.artstation.com", # http://www.artstation.com/serafleur/

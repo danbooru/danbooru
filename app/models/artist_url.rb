@@ -95,7 +95,7 @@ class ArtistURL < ApplicationRecord
   def priority
     sites = %w[
       Pixiv Twitter
-      ArtStation Baraag BCY Booth Deviant\ Art Hentai\ Foundry Fantia Foundation Lofter Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Tinami Tumblr Weibo
+      Anifty ArtStation Baraag BCY Booth Deviant\ Art Hentai\ Foundry Fantia Foundation Lofter Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Tinami Tumblr Weibo
       Ask.fm Facebook FC2 Gumroad Instagram Ko-fi Livedoor Mihuashi Mixi.jp Patreon Piapro.jp Picarto Privatter Sakura.ne.jp Stickam Skeb Twitch Youtube
       Amazon Circle.ms DLSite Doujinshi.org Erogamescape Mangaupdates Melonbooks Toranoana Wikipedia
     ]
