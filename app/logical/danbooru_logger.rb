@@ -42,10 +42,9 @@ class DanbooruLogger
   # @param session the Rails session
   # @param user [User] the current user
   def self.add_session_attributes(request, session, user)
-    #add_attributes("request", { path: request.path })
-    #add_attributes("request.headers", header_params(request))
     add_attributes("param", request_params(request))
     add_attributes("session", session_params(session))
+    add_attributes("cookie", cookie_params(request.cookies))
     add_attributes("user", user_params(request, user))
   end
 
@@ -65,7 +64,16 @@ class DanbooruLogger
   end
 
   def self.session_params(session)
-    session.to_h.with_indifferent_access.slice(:session_id, :started_at)
+    session.to_h.with_indifferent_access.slice(:session_id, :started_at, :last_authenticated_at)
+  end
+
+  def self.cookie_params(cookies)
+    # XXX see also ApplicationHelper#cookie_data_attributes
+    cookies.slice(*%w[
+      news-ticker hide_upgrade_account_notice hide_verify_account_notice
+      hide_dmail_notice dab show-relationship-previews post_preview_size
+      post_preview_show_votes
+    ])
   end
 
   def self.user_params(request, user)
