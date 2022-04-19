@@ -58,7 +58,10 @@ class DanbooruLogger
   end
 
   def self.request_params(request)
-    request.parameters.with_indifferent_access.except(:controller, :action)
+    request.parameters.with_indifferent_access.except(:controller, :action).reject do |key, value|
+      # exclude strange URL params that don't come from our app.
+      !key.match?(/\A[a-z._]+\z/) || key.match?(/\A_|_\z/)
+    end
   end
 
   def self.session_params(session)
