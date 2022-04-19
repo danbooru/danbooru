@@ -824,11 +824,13 @@ class Post < ApplicationRecord
     end
 
     def ban!
+      return if is_banned?
       update_column(:is_banned, true)
       ModAction.log("banned post ##{id}", :post_ban)
     end
 
     def unban!
+      return unless is_banned?
       update_column(:is_banned, false)
       ModAction.log("unbanned post ##{id}", :post_unban)
     end
