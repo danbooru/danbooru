@@ -287,9 +287,11 @@ class UserUpgrade < ApplicationRecord
         webhook = Stripe::WebhookEndpoint.create({
           url: Routes.webhook_user_upgrade_url(source: "stripe"),
           enabled_events: [
-            "payment_intent.created",
-            "payment_intent.payment_failed",
             "checkout.session.completed",
+            "checkout.session.async_payment_failed",
+            "checkout.session.async_payment_succeeded",
+            "charge.dispute.created",
+            "radar.early_fraud_warning.created",
           ],
         })
 
@@ -299,8 +301,13 @@ class UserUpgrade < ApplicationRecord
       def receive_webhook(request)
         event = build_event(request)
 
-        if event.type == "checkout.session.completed"
+        case event.type
+        when "checkout.session.completed"
           checkout_session_completed(event.data.object)
+        when "charge.dispute.created"
+          charge_dispute_created(event.data.object)
+        when "radar.early_fraud_warning.created"
+          radar_early_fraud_warning_created(event.data.object)
         end
       end
 
@@ -313,6 +320,18 @@ class UserUpgrade < ApplicationRecord
       def checkout_session_completed(checkout)
         user_upgrade = UserUpgrade.find(checkout.metadata.user_upgrade_id)
         user_upgrade.process_upgrade!(checkout.payment_status)
+      end
+
+      def charge_dispute_created(dispute)
+        Dmail.create_automated(to: User.owner, title: "Stripe Dispute", body: <<~EOS)
+          Dispute: https://stripe.com/payments/#{dispute.charge}
+        EOS
+      end
+
+      def radar_early_fraud_warning_created(fraud_warning)
+        Dmail.create_automated(to: User.owner, title: "Stripe Early Fraud Warning", body: <<~EOS)
+          Charge: https://stripe.com/payments/#{fraud_warning.charge}
+        EOS
       end
     end
   end
