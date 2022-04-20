@@ -153,7 +153,9 @@
           <% else %>
             <li id="post-option-approve"><%= link_to "Approve", post_approvals_path(post_id: @post.id), remote: true, method: :post, "data-shortcut": "shift+o", "data-confirm": "Are you sure you want to approve this post?" %></li>
           <% end %>
-        <% elsif !@post.is_deleted? && policy(@post).delete? %>
+        <% end %>
+
+        <% if !@post.is_deleted? && policy(@post).delete? %>
           <li id="post-option-delete"><%= link_to "Delete", @post, method: :delete, remote: true %></li>
         <% end %>
 
