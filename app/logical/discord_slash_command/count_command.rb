@@ -13,7 +13,7 @@ class DiscordSlashCommand
 
     def call
       tags = params[:tags]
-      count = PostQuery.new(tags).fast_count(timeout: 9_000, estimate_count: false, skip_cache: true)
+      count = PostQuery.normalize(tags).fast_count(timeout: 9_000, estimate_count: false, skip_cache: true)
 
       respond_with("`#{tags}`: #{count} posts")
     end
