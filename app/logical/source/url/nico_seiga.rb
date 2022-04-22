@@ -153,6 +153,7 @@ module Source
         @profile_url = "https://game.nicovideo.jp/atsumaru/users/#{user_id}"
 
       else
+        nil
       end
     end
 

@@ -62,6 +62,7 @@ module Source
         @username = username
 
       else
+        nil
       end
     end
 

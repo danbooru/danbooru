@@ -41,6 +41,7 @@ class Source::URL::Anifty < Source::URL
       @username = $1
 
     else
+      nil
     end
   end
 

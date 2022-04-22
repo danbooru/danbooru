@@ -61,6 +61,7 @@ class Source::URL::Foundation < Source::URL
       @hash = hash
 
     else
+      nil
     end
   end
 

@@ -92,6 +92,7 @@ module Source
         @stash_id = stash_id
 
       else
+        nil
       end
     end
 
@@ -128,6 +129,7 @@ module Source
         @username = $2.dasherize
 
       else
+        nil
       end
     end
 

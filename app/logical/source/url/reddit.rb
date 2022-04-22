@@ -52,6 +52,7 @@ module Source
           @work_id = work_id
 
         else
+          nil
         end
       end
 

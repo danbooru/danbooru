@@ -60,6 +60,7 @@ class Source::URL::ArtStation < Source::URL
       @username = subdomain
 
     else
+      nil
     end
   end
 

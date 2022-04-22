@@ -63,6 +63,7 @@ class Source::URL::Mastodon < Source::URL
       @media_hash = media_hash
 
     else
+      nil
     end
   end
 

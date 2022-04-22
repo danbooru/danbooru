@@ -65,6 +65,7 @@ class Source::URL::Fantia < Source::URL
       @username = username
 
     else
+      nil
     end
   end
 

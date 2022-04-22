@@ -47,6 +47,7 @@ class Source::URL::Moebooru < Source::URL
       @original_file_ext = file_ext_for(sample_type)
 
     else
+      nil
     end
   end
 
@@ -75,6 +76,7 @@ class Source::URL::Moebooru < Source::URL
       work_id
 
     else
+      nil
     end
   end
 

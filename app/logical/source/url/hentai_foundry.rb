@@ -60,6 +60,7 @@ class Source::URL::HentaiFoundry < Source::URL
       @username = $1
 
     else
+      nil
     end
   end
 
