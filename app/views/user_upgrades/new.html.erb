@@ -29,7 +29,7 @@
     <% if Danbooru.config.is_promotion? %>
       <p>
         <%= tag.img src: "/images/padoru.gif", width: 24, height: 24 %>
-        <b>Danbooru Winter Sale! Gold and Platinum upgrades are 25% off. Sale ends <%= time_ago_in_words_tagged(Time.utc("2022-01-01")) %>.</b>
+        <b>Danbooru Winter Sale! Gold and Platinum upgrades are 25% off. Sale ends <%= time_ago_in_words_tagged(Danbooru.config.winter_sale_end_date) %>.</b>
         <%= tag.img src: "/images/padoru.gif", width: 24, height: 24 %>
       </p>
     <% end %>
