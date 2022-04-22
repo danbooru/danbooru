@@ -11,8 +11,10 @@
 class Source::URL::Foundation < Source::URL
   attr_reader :username, :token_id, :work_id, :hash
 
+  IMAGE_HOSTS = %w[assets.foundation.app f8n-ipfs-production.imgix.net f8n-production-collection-assets.imgix.net d2ybmb80bbm9ts.cloudfront.net]
+
   def self.match?(url)
-    url.host.in?(%w[foundation.app assets.foundation.app f8n-ipfs-production.imgix.net f8n-production-collection-assets.imgix.net])
+    url.host.in?(%w[foundation.app assets.foundation.app]) || url.host.in?(IMAGE_HOSTS)
   end
 
   def parse
@@ -52,12 +54,14 @@ class Source::URL::Foundation < Source::URL
       @hash = hash
 
     # https://f8n-production-collection-assets.imgix.net/0xFb0a8e1bB97fD7231Cd73c489dA4732Ae87995F0/4/nft.png
-    in "f8n-production-collection-assets.imgix.net", token_id, work_id, file
+    # https://assets.foundation.app/0x21Afa9aB02B6Fb7cb483ff3667c39eCdd6D9Ea73/4/nft.mp4
+    in ("f8n-production-collection-assets.imgix.net" | "assets.foundation.app"), /^0x\w{40}$/ => token_id, work_id, file
       @token_id = token_id
       @work_id = work_id
 
     # https://assets.foundation.app/7i/gs/QmU8bbsjaVQpEKMDWbSZdDD6GsPmRYBhQtYRn8bEGv7igs/nft_q4.mp4
-    in "assets.foundation.app", *subdirs, hash, file
+    # https://d2ybmb80bbm9ts.cloudfront.net/zd/BD/QmXiCEoBLcpfvpEwAEanLXe3Tjr5ykYJFzCVfpzDDQzdBD/nft_q4.mp4
+    in ("assets.foundation.app" | "d2ybmb80bbm9ts.cloudfront.net"), *subdirs, hash, file
       @hash = hash
 
     else
@@ -75,7 +79,7 @@ class Source::URL::Foundation < Source::URL
 
   def page_url
     return nil unless work_id.present?
-    return nil if host == "f8n-production-collection-assets.imgix.net" && @hash.blank?
+    return nil if host.in?(IMAGE_HOSTS) && @hash.blank?
     # https://f8n-production-collection-assets.imgix.net/0xAcf67a11D93D22bbB51fddD9B039d43d5Db484Bc/3/nft.png cannot be normalized to a correct page url
 
     username = @username || "foundation"
@@ -88,6 +92,8 @@ class Source::URL::Foundation < Source::URL
       "https://f8n-ipfs-production.imgix.net/#{hash}/nft.#{file_ext}"
     elsif host == "f8n-production-collection-assets.imgix.net" && token_id.present? && work_id.present? && file_ext.present?
       "https://f8n-production-collection-assets.imgix.net/#{token_id}/#{work_id}/nft.#{file_ext}"
+    elsif file_ext.present?
+      url.omit(:query).to_s
     end
   end
 

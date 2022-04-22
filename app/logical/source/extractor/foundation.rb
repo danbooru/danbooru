@@ -11,7 +11,7 @@ module Source
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]
-        elsif image_url = page&.at(".fullscreen img, .fullscreen video")&.attr(:src)
+        elsif (image_url = page&.at(".fullscreen img, .fullscreen video")&.attr(:src))
           [Source::URL.parse(image_url).full_image_url].compact
         else
           []
