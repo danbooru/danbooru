@@ -84,7 +84,7 @@ module Sources
 
       should "normalize wikia links" do
         source = "https://vignette.wikia.nocookie.net/valkyriecrusade/images/c/c5/Crimson_Hatsune_H.png/revision/latest?cb=20180702031954"
-        assert_equal("https://valkyriecrusade.fandom.com/?file=Crimson_Hatsune_H.png", Source::URL.page_url(source))
+        assert_equal("https://valkyriecrusade.fandom.com/wiki/Gallery?file=Crimson_Hatsune_H.png", Source::URL.page_url(source))
       end
 
       should "normalize e-shuushuu links" do
