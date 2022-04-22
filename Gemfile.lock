@@ -597,4 +597,4 @@ DEPENDENCIES
   webpacker (= 6.0.0.rc.6)
 
 BUNDLED WITH
-   2.2.32
+   2.3.12
