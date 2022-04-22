@@ -28,6 +28,7 @@ module Source
       Source::URL::Booth,
       Source::URL::DeviantArt,
       Source::URL::Fanbox,
+      Source::URL::Fandom,
       Source::URL::Fantia,
       Source::URL::Fc2,
       Source::URL::Foundation,

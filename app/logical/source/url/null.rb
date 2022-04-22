@@ -227,14 +227,6 @@ class Source::URL::Null < Source::URL
       @work_id = work_id
       @page_url = "http://p.twipple.jp/#{work_id}"
 
-    # https://vignette.wikia.nocookie.net/queensblade/images/3/33/WGAIRI1.jpg/
-    # https://vignette1.wikia.nocookie.net/valkyriecrusade/images/b/bf/Joan_Of_Arc_H.png/revision/latest?cb=20170801081004
-    # https://static.wikia.nocookie.net/valkyriecrusade/images/3/3f/Joan_Of_Arc.png/revision/latest/scale-to-width-down/270?cb=20170801081000
-    in _, "nocookie.net", wiki, "images", /^\h$/, /^\h\h$/, file, *rest
-      @wiki = wiki
-      @file = file
-      @page_url = "https://#{wiki}.fandom.com/wiki/Gallery?file=#{file}"
-
     # https://static.zerochan.net/Fullmetal.Alchemist.full.2831797.png
     # https://s1.zerochan.net/Cocoa.Cookie.600.2957938.jpg
     # http://static.zerochan.net/full/24/13/90674.jpg

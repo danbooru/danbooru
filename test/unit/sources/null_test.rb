@@ -82,11 +82,6 @@ module Sources
         assert_equal("https://gelbooru.com/index.php?page=post&s=list&tags=md5:0b3ae5e225072b8e391c827cb470d29c", Source::URL.page_url(source3))
       end
 
-      should "normalize wikia links" do
-        source = "https://vignette.wikia.nocookie.net/valkyriecrusade/images/c/c5/Crimson_Hatsune_H.png/revision/latest?cb=20180702031954"
-        assert_equal("https://valkyriecrusade.fandom.com/wiki/Gallery?file=Crimson_Hatsune_H.png", Source::URL.page_url(source))
-      end
-
       should "normalize e-shuushuu links" do
         source = "http://e-shuushuu.net/images/2014-07-22-662472.png"
         assert_equal("https://e-shuushuu.net/image/662472", Source::URL.page_url(source))
