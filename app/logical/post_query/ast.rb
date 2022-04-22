@@ -68,11 +68,37 @@ class PostQuery
           AST.new(:all, [])
         end
 
+        def none
+          AST.new(:none, [])
+        end
+
+        def not(ast)
+          AST.new(:not, [ast])
+        end
+
+        def opt(ast)
+          AST.new(:opt, [ast])
+        end
+
         def tag(name)
-          AST.new(:tag, [name])
+          AST.new(:tag, [name.downcase])
+        end
+
+        def wildcard(name)
+          AST.new(:wildcard, [name.downcase])
         end
 
         def metatag(name, value, quoted = false)
+          name = name.downcase
+          name = name.singularize + "_count" if name.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
+
+          if name == "order"
+            attribute, direction, _tail = value.to_s.downcase.partition(/_(asc|desc)\z/i)
+            if attribute.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
+              value = attribute.singularize + "_count" + direction
+            end
+          end
+
           AST.new(:metatag, [name, value, quoted])
         end
       end

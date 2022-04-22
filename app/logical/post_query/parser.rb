@@ -65,7 +65,7 @@ class PostQuery
       def parse
         parse!
       rescue Error
-        node(:none)
+        AST.none
       end
 
       # Parse the search and return the AST, or raise an error if the parse failed.
@@ -86,11 +86,11 @@ class PostQuery
         space
 
         if a.empty?
-          node(:all)
+          AST.all
         elsif a.size == 1
           a.first
         else
-          node(:and, *a)
+          AST.new(:and, a)
         end
       end
 
@@ -101,7 +101,7 @@ class PostQuery
         space
         if accept(/or +/i)
           b = or_clause
-          node(:or, a, b)
+          AST.new(:or, [a, b])
         else
           a
         end
@@ -114,7 +114,7 @@ class PostQuery
         space
         if accept(/and +/i)
           b = and_clause
-          node(:and, a, b)
+          AST.new(:and, [a, b])
         else
           a
         end
@@ -123,7 +123,7 @@ class PostQuery
       # factor_list = factor [factor_list]
       def factor_list
         a = one_or_more { factor }
-        node(:and, *a)
+        AST.new(:and, a)
       end
 
       # factor = "-" expr | "~" expr | expr
@@ -131,9 +131,9 @@ class PostQuery
         space
 
         if accept("-")
-          node(:not, expr)
+          AST.not(expr)
         elsif accept("~")
-          node(:opt, expr)
+          AST.opt(expr)
         else
           expr
         end
@@ -166,20 +166,10 @@ class PostQuery
       # metatag = metatag_name ":" quoted_string
       # metatag_name = "user" | "fav" | "pool" | "order" | ...
       def metatag
-        name = expect(METATAG_NAME_REGEX)
+        name = expect(METATAG_NAME_REGEX).delete_suffix(":")
         quoted, value = quoted_string
 
-        name = name.delete_suffix(":").downcase
-        name = name.singularize + "_count" if name.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
-
-        if name == "order"
-          attribute, direction, _tail = value.to_s.downcase.partition(/_(asc|desc)\z/i)
-          if attribute.in?(PostQueryBuilder::COUNT_METATAG_SYNONYMS)
-            value = attribute.singularize + "_count" + direction
-          end
-        end
-
-        node(:metatag, name, value, quoted)
+        AST.metatag(name, value, quoted)
       end
 
       def quoted_string
@@ -201,7 +191,7 @@ class PostQuery
         t = string(/(?=[^ ]*\*)[^ \)~-][^ ]*/, skip_balanced_parens: true)
         raise Error if t.match?(/\A#{METATAG_NAME_REGEX}/)
         space
-        node(:wildcard, t.downcase)
+        AST.wildcard(t)
       end
 
       # A tag is a string that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
@@ -209,7 +199,7 @@ class PostQuery
         t = string(/[^ \)~-][^ ]*/, skip_balanced_parens: true)
         raise Error if t.downcase.in?(%w[and or]) || t.include?("*") || t.match?(/\A#{METATAG_NAME_REGEX}/)
         space
-        node(:tag, t.downcase)
+        AST.tag(t)
       end
 
       def string(pattern, skip_balanced_parens: false)
@@ -291,11 +281,6 @@ class PostQuery
         end
 
         raise Error, "expected one of: #{parsers}"
-      end
-
-      # Build an AST node of the given type.
-      def node(type, *args)
-        AST.new(type, args)
       end
     end
 

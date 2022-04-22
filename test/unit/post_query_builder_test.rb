@@ -85,6 +85,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post3 = create(:post, tag_string: "bbb ccc")
 
       assert_tag_match([post2, post1], "aaa")
+      assert_tag_match([post2, post1], "AAA")
       assert_tag_match([post2, post1], " aaa ")
     end
 
