@@ -67,6 +67,7 @@ class Source::URL::Fc2 < Source::URL
       @profile_url = "http://diary.fc2.com/cgi-sys/ed.cgi/#{username}"
 
     else
+      nil
     end
   end
 end

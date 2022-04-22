@@ -31,6 +31,7 @@ class Source::URL::Instagram < Source::URL
       @username = username
 
     else
+      nil
     end
   end
 

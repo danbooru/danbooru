@@ -45,6 +45,7 @@ class Source::URL::Plurk < Source::URL
       @username = username
 
     else
+      nil
     end
   end
 

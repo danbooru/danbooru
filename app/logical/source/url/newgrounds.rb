@@ -52,6 +52,7 @@ class Source::URL::Newgrounds < Source::URL
       @username = $1
 
     else
+      nil
     end
   end
 

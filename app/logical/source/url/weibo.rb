@@ -79,6 +79,7 @@ class Source::URL::Weibo < Source::URL
       @username = username
 
     else
+      nil
     end
   end
 

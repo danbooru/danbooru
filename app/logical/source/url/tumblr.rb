@@ -69,6 +69,7 @@ class Source::URL::Tumblr < Source::URL
       @blog_name = subdomain
 
     else
+      nil
     end
   end
 

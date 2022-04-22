@@ -27,6 +27,7 @@ module Source
         @username = username.delete_prefix("@")
 
       else
+        nil
       end
     end
 

@@ -68,6 +68,7 @@ class Source::URL::TwitPic < Source::URL
       @base36_id = filename.to_i.to_s(36)
 
     else
+      nil
     end
   end
 

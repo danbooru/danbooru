@@ -85,6 +85,7 @@ class Source::URL::Twitter < Source::URL
       # /ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
       @file_path = File.join(media_type, subdirs.join("/"), "#{@file}.#{@file_ext}")
     else
+      nil
     end
   end
 

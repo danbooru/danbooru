@@ -248,6 +248,7 @@ class Source::URL::Null < Source::URL
       @page_url = "https://www.zerochan.net/#{@work_id}#full"
 
     else
+      nil
     end
   end
 end

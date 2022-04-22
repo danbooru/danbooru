@@ -40,6 +40,7 @@ class Source::URL::Skeb < Source::URL
       @image_uuid = image_uuid
 
     else
+      nil
     end
   end
 

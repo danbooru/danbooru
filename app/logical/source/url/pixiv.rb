@@ -84,6 +84,7 @@ module Source
         @username = username
 
       else
+        nil
       end
     end
 
@@ -114,6 +115,7 @@ module Source
         @work_id = work_id
 
       else
+        nil
       end
     end
 

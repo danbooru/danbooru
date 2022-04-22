@@ -50,6 +50,7 @@ class Source::URL::Tinami < Source::URL
       @work_id = work_id
 
     else
+      nil
     end
   end
 

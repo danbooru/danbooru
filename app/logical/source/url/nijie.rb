@@ -56,6 +56,7 @@ class Source::URL::Nijie < Source::URL
       nil
 
     else
+      nil
     end
   end
 
@@ -83,6 +84,7 @@ class Source::URL::Nijie < Source::URL
       @work_id = work_id if work_id.to_i != 0
 
     else
+      nil
     end
   end
 

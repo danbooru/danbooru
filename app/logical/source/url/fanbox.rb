@@ -63,6 +63,7 @@ class Source::URL::Fanbox < Source::URL
       @username = subdomain
 
     else
+      nil
     end
   end
 
