@@ -60,7 +60,7 @@ module Source
       def profile_url
         # user names are not mutable, artist names are.
         # However we need the latest name for normalization
-        "https://#{artist_name}.newgrounds.com"
+        "https://#{artist_name}.newgrounds.com" if artist_name.present?
       end
 
       def artist_commentary_title

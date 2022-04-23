@@ -98,6 +98,15 @@ module Sources
       end
     end
 
+    context "A www.newgrounds.com/dump/item URL" do
+      strategy_should_work(
+        "https://www.newgrounds.com/dump/item/a1f417d20f5eaef31e26ac3c4956b3d4",
+        image_urls: [],
+        artist_name: nil,
+        profile_url: nil,
+      )
+    end
+
     context "A post with links to other illustrations in the commentary" do
       should "not include the links in the commentary" do
         @source = Source::Extractor.find("https://www.newgrounds.com/art/view/boxofwant/annie-hughes-1")

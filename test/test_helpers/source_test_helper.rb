@@ -20,7 +20,7 @@ module SourceTestHelper
       assert_not(strategy.image_urls.include?(nil))
     end
 
-    should_download_successfully(strategy, download_size) unless deleted
+    should_download_successfully(strategy, download_size) unless deleted || strategy.image_urls.empty?
 
     # {profile_url: nil}[:profile_url].present? -> false
     # Doing it this way instead we can check profile_url even if it's passed as a nil.
@@ -49,6 +49,7 @@ module SourceTestHelper
   def should_handle_artists_correctly(strategy, profile_url)
     if profile_url.present?
       should "correctly match a strategy to an artist with the same profile url" do
+        assert_not_nil(Danbooru::URL.parse(strategy.profile_url))
         assert_equal(profile_url, strategy.profile_url)
         artist = FactoryBot.create(:artist, name: strategy.artist_name, url_string: profile_url)
         assert_equal([artist], strategy.artists)

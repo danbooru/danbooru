@@ -402,6 +402,16 @@ class ArtistTest < ActiveSupport::TestCase
       end
     end
 
+    context "when finding Newgrounds artists" do
+      should "find the correct artist" do
+        create(:artist, name: "lasterk", url_string: "http://lasterk.newgrounds.com")
+        create(:artist, name: "merunyaa",  url_string: "https://merunyaa.newgrounds.com")
+
+        assert_artist_found("lasterk", "https://www.newgrounds.com/art/view/lasterk/booette")
+        assert_artist_not_found("https://www.newgrounds.com/dump/item/a1f417d20f5eaef31e26ac3c4956b3d4")
+      end
+    end
+
     context "the #normalize_other_names method" do
       subject { build(:artist) }
 
