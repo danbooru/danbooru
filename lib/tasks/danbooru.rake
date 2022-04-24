@@ -104,11 +104,22 @@ namespace :danbooru do
   namespace :docker do
     # Usage: bin/rails danbooru:docker:build
     #
-    # Build a Docker image. Note that uncommited changes won't be included in
-    # the image; commit changes first before building the image.
-    desc "Build a Docker image based on latest commit"
+    # Build a Docker image. Note that uncommited changes won't be included in the image; commit changes to Git first before building the image.
+    desc "Build a Docker image"
     task :build do
-      system("git archive HEAD | docker buildx build - --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) -t danbooru -f Dockerfile")
+      system("git archive HEAD | docker buildx build - --platform linux/amd64 --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --tag danbooru --tag danbooru:x86 --file Dockerfile --load")
+    end
+
+    # Usage: bin/rails danbooru:docker:build-arm
+    #
+    # Build a Docker image for ARM. You may need to install QEMU first if building on x86.
+    #
+    # * sudo apt-get install qemu binfmt-support qemu-user-static       # Install QEMU
+    # * docker run --rm -it --platform linux/arm64 ubuntu               # Test that QEMU works
+    # * docker run --rm -it --platform linux/arm64 danbooru:arm -- bash # Test that the Danbooru image works
+    desc "Build a Docker image for ARM"
+    task :"build-arm" do
+      system("git archive HEAD | docker buildx build - --platform linux/arm64 --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --tag danbooru --tag danbooru:arm --file Dockerfile --load")
     end
   end
 
