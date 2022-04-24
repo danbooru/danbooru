@@ -151,7 +151,7 @@ cleanup() {
   apt-get purge -y $RUBY_BUILD_DEPS $VIPS_BUILD_DEPS $FFMPEG_BUILD_DEPS
   apt-get purge -y --allow-remove-essential \
     build-essential pkg-config e2fsprogs git libglib2.0-bin libglib2.0-doc \
-    mount procps python3 shared-mime-info tzdata
+    mount procps python3 tzdata
   apt-get autoremove -y
 
   rm -rf \
