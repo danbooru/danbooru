@@ -49,14 +49,13 @@ gem 'puma-metrics'
 gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
 gem "parallel"
-gem "pry-byebug"
-gem "pry-rails"
 gem "ffi"
 gem "rbtrace"
 gem "good_job"
 gem "crass"
 gem "public_suffix"
 gem "elastic-apm"
+gem "debug"
 
 group :development do
   gem 'rubocop', require: false
