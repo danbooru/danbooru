@@ -1,5 +1,5 @@
 <% page_title "Account Upgrade" %>
-<% meta_description "Upgrade to a Gold or Platinum account." %>
+<% meta_description "Upgrade to a Gold account." %>
 <script src="https://js.stripe.com/v3/"></script>
 
 <%= render "users/secondary_links" %>
@@ -11,7 +11,9 @@
       <h1 class="text-center mb-4">Gift Account Upgrade</h1>
 
       <% if @user_upgrade.recipient.is_platinum? %>
-        <p><%= link_to_user @recipient %> is already above Platinum level and can't be upgraded!</p>
+        <p><%= link_to_user @recipient %> is already above Gold and can't be upgraded!</p>
+      <% elsif @user_upgrade.recipient.is_gold? %>
+        <p><%= link_to_user @recipient %> is already Gold and can't be upgraded!</p>
       <% else %>
         <h6>You are gifting this upgrade to <%= link_to_user @user_upgrade.recipient %>.</h6>
       <% end %>
@@ -29,7 +31,7 @@
     <% if Danbooru.config.is_promotion? %>
       <p>
         <%= tag.img src: "/images/padoru.gif", width: 24, height: 24 %>
-        <b>Danbooru Winter Sale! Gold and Platinum upgrades are 25% off. Sale ends <%= time_ago_in_words_tagged(Danbooru.config.winter_sale_end_date) %>.</b>
+        <b>Danbooru Winter Sale! Gold upgrades are 25% off. Sale ends <%= time_ago_in_words_tagged(Danbooru.config.winter_sale_end_date) %>.</b>
         <%= tag.img src: "/images/padoru.gif", width: 24, height: 24 %>
       </p>
     <% end %>
@@ -40,14 +42,12 @@
           <th></th>
           <th>Basic</th>
           <th>Gold</th>
-          <th>Platinum</th>
         </tr>
       </thead>
       <tbody>
         <colgroup id="labels" class="w-1/4"></colgroup>
         <colgroup id="basic" class="w-1/4"></colgroup>
         <colgroup id="gold" class="w-1/4"></colgroup>
-        <colgroup id="platinum" class="w-1/4"></colgroup>
         <tr>
           <td></td>
           <td>Free</td>
@@ -58,74 +58,53 @@
             <%= cents_to_usd(UserUpgrade.gold_price) %>
             <div class="fineprint">One time fee</div>
           </td>
-          <td>
-            <% if Danbooru.config.is_promotion? %>
-              <s>$40</s>
-            <% end %>
-            <%= cents_to_usd(UserUpgrade.platinum_price) %>
-            <div class="fineprint">One time fee</div>
-          </td>
         </tr>
         <tr>
           <td>Tag Limit</td>
           <td>2</td>
           <td>6</td>
-          <td>12</td>
         </tr>
         <tr>
           <td>See Hidden Tags</td>
           <td>No</td>
-          <td>Yes</td>
           <td>Yes</td>
         </tr>
         <tr>
           <td>Page Limit</td>
           <td>1,000</td>
           <td>2,000</td>
-          <td>5,000</td>
         </tr>
         <tr>
           <td>Private Favorites</td>
           <td>no</td>
-          <td>yes</td>
           <td>yes</td>
         </tr>
         <tr>
           <td>Favorite Groups</td>
           <td>3</td>
           <td>5</td>
-          <td>10</td>
         </tr>
         <tr>
           <td>Saved Searches</td>
           <td>250</td>
           <td>250</td>
-          <td>1,000</td>
         </tr>
         <tr>
           <td>Search Timeout</td>
           <td>3 sec</td>
           <td>6 sec</td>
-          <td>9 sec</td>
         </tr>
         <tr>
           <td></td>
           <% if @user_upgrade.purchaser.is_anonymous? %>
             <td><%= link_to "Login", login_path(url: new_user_upgrade_path), class: "login-button button-primary" %></td>
             <td><%= link_to "Get #{Danbooru.config.canonical_app_name} Gold", login_path(url: new_user_upgrade_path), class: "login-button button-primary" %></td>
-            <td><%= link_to "Get #{Danbooru.config.canonical_app_name} Platinum", login_path(url: new_user_upgrade_path), class: "login-button button-primary" %></td>
           <% elsif @recipient.level == User::Levels::MEMBER %>
             <td></td>
             <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo]), class: "button-primary", remote: true, disable_with: "Redirecting..." %></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "platinum", country: params[:country], promo: params[:promo]), class: "button-primary", remote: true, disable_with: "Redirecting..." %></td>
-          <% elsif @recipient.level == User::Levels::GOLD %>
-            <td></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold_to_platinum", country: params[:country], promo: params[:promo]), class: "button-primary", remote: true, disable_with: "Redirecting..." %></td>
           <% else %>
             <td></td>
             <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", nil, class: "button-primary", disabled: true %></td>
           <% end %>
         </tr>
       </tbody>
@@ -144,13 +123,6 @@
       </details>
 
       <details>
-        <summary>What are the benefits of <%= Danbooru.config.canonical_app_name %> Platinum?</summary>
-
-        <p>Platinum is like Gold, but it lets you search even more tags at once,
-        and keep even more favorite groups and saved searches.</p>
-      </details>
-
-      <details>
         <summary>What payment methods do you support?</summary>
 
         <p>We support all major credit and debit cards, including international
@@ -166,14 +138,6 @@
 
         <p>No, this is not a subscription. This is a one-time payment. You pay
         only once and keep the upgrade forever.</p>
-      </details>
-
-      <details>
-        <summary>If I upgrade to Gold first, can I upgrade to Platinum later?</summary>
-
-        <p>Yes, if you have a Gold account, you can always upgrade to a Platinum
-        account later. You don't have to pay full price to upgrade from Gold to
-        Platinum. You only have to pay the difference.</p>
       </details>
 
       <details>

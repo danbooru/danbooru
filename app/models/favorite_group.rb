@@ -61,7 +61,7 @@ class FavoriteGroup < ApplicationRecord
   def creator_can_create_favorite_groups
     if creator.favorite_groups.count >= creator.favorite_group_limit
       error = "You can only keep up to #{creator.favorite_group_limit} favorite groups."
-      if !creator.is_platinum?
+      if !creator.is_gold?
         error += " Upgrade your account to create more."
       end
       errors.add(:base, error)

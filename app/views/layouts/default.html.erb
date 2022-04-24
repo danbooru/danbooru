@@ -131,7 +131,7 @@
         <span>
           <%= link_to "Danbooru Winter Sale", forum_topic_path(Danbooru.config.winter_sale_forum_topic_id) %> ends <%= time_ago_in_words_tagged(Danbooru.config.winter_sale_end_date) %>!
           <br>
-          <%= link_to "Get 25% off Gold & Platinum", new_user_upgrade_path %>
+          <%= link_to "Get 25% off Gold", new_user_upgrade_path %>
         </span>
 
         <span>(<%= link_to "hide", "#", id: "hide-promotion-notice" %>)</span>

@@ -52,7 +52,7 @@
         <% end %>
       <% end %>
 
-      <% if !@user.is_platinum? %>
+      <% if !@user.is_gold? %>
         <% menu.item do %>
           <%= link_to new_user_upgrade_path(user_id: @user.id) do %>
             <%= gift_icon %> Gift Upgrade
