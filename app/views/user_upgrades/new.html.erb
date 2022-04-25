@@ -86,8 +86,8 @@
         </tr>
         <tr>
           <td>Saved Searches</td>
-          <td>250</td>
-          <td>250</td>
+          <td><%= User.max_saved_searches(User::Levels::MEMBER) %></td>
+          <td><%= User.max_saved_searches(User::Levels::GOLD) %></td>
         </tr>
         <tr>
           <td>Search Timeout</td>
