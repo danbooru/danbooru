@@ -464,14 +464,10 @@ class User < ApplicationRecord
       end
 
       def favorite_group_limit(level)
-        if level >= User::Levels::BUILDER
+        if level >= User::Levels::GOLD
           Float::INFINITY
-        elsif level == User::Levels::PLATINUM
-          10
-        elsif level == User::Levels::GOLD
-          5
         else
-          3
+          10
         end
       end
 

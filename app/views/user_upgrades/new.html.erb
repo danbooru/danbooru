@@ -81,8 +81,8 @@
         </tr>
         <tr>
           <td>Favorite Groups</td>
-          <td>3</td>
-          <td>5</td>
+          <td><%= User.favorite_group_limit(User::Levels::MEMBER) %></td>
+          <td>Unlimited</td>
         </tr>
         <tr>
           <td>Saved Searches</td>
