@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "strscan"
-
 # A PostQuery::Parser parses a search string into a PostQuery::AST.
 #
 # @example
@@ -27,27 +25,19 @@ require "strscan"
 #               | "'" /[^']+/ "'"
 # tag           = /[^ *]+/
 # wildcard      = /[^ ]+/
-#
-# Ref:
-#
-# * https://hmac.dev/posts/2019-05-19-ruby-parser-combinators.html
 
 class PostQuery
   class Parser
     extend Memoist
 
-    class Error < StandardError; end
-
     METATAG_NAME_REGEX = /(#{PostQueryBuilder::METATAGS.join("|")}):/i
 
-    attr_reader :input
-    private attr_reader :scanner, :unclosed_parens
+    attr_reader :parser
+    delegate :error, :rest, :eos?, :accept, :expect, :rewind, :zero_or_more, :one_or_more, :one_of, to: :parser
 
     # @param input [String] The search string to parse.
     def initialize(input)
-      @input = input.to_s.clone.freeze
-      @scanner = StringScanner.new(@input)
-      @unclosed_parens = 0
+      @parser = StringParser.new(input, state: 0) # 0 is the initial number of unclosed parens.
     end
 
     # Parse a search and return the AST.
@@ -64,7 +54,7 @@ class PostQuery
       # @return [PostQuery::AST] The AST of the parsed search.
       def parse
         parse!
-      rescue Error
+      rescue StringParser::Error
         AST.none
       end
 
@@ -73,8 +63,8 @@ class PostQuery
       # @return [PostQuery::AST] The AST of the parsed search.
       def parse!
         ast = root
-        raise Error, "Unexpected EOS (rest: '#{scanner.rest}')" unless scanner.eos?
-        raise Error, "Unclosed parentheses (#{@unclosed_parens})" unless @unclosed_parens == 0
+        error("Unexpected EOS (rest: '#{rest}')") unless eos?
+        error("Unclosed parentheses (#{unclosed_parens})") unless unclosed_parens == 0
         ast
       end
 
@@ -144,10 +134,10 @@ class PostQuery
         space
 
         if accept("(")
-          @unclosed_parens += 1
+          self.unclosed_parens += 1
           a = or_clause
           expect(")")
-          @unclosed_parens -= 1
+          self.unclosed_parens -= 1
           a
         else
           term
@@ -189,7 +179,7 @@ class PostQuery
       # A wildcard is a string that contains a '*' character and that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
       def wildcard
         t = string(/(?=[^ ]*\*)[^ \)~-][^ ]*/, skip_balanced_parens: true)
-        raise Error if t.match?(/\A#{METATAG_NAME_REGEX}/)
+        error("Invalid tag name: #{t}") if t.match?(/\A#{METATAG_NAME_REGEX}/)
         space
         AST.wildcard(t)
       end
@@ -197,7 +187,7 @@ class PostQuery
       # A tag is a string that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
       def tag
         t = string(/[^ \)~-][^ ]*/, skip_balanced_parens: true)
-        raise Error if t.downcase.in?(%w[and or]) || t.include?("*") || t.match?(/\A#{METATAG_NAME_REGEX}/)
+        error("Invalid tag name: #{t}") if t.downcase.in?(%w[and or]) || t.include?("*") || t.match?(/\A#{METATAG_NAME_REGEX}/)
         space
         AST.tag(t)
       end
@@ -206,11 +196,11 @@ class PostQuery
         str = expect(pattern)
 
         # XXX: Now put back any trailing right parens we mistakenly consumed.
-        n = @unclosed_parens
+        n = unclosed_parens
         while n > 0 && str.ends_with?(")")
           break if skip_balanced_parens && (str.has_balanced_parens? || str.in?(Tag::PERMITTED_UNBALANCED_TAGS))
           str.chop!
-          scanner.pos -= 1
+          rewind
           n -= 1
         end
 
@@ -222,66 +212,14 @@ class PostQuery
       end
     end
 
-    concerning :HelperMethods do
-      private
+    # The current number of '(' characters without a matching ')'. Used for
+    # determining whether a trailing ')' is part of a tag or not.
+    private def unclosed_parens
+      parser.state
+    end
 
-      # Try to match `pattern`, returning the string if it matched or nil if it didn't.
-      #
-      # @param pattern [Regexp, String] The pattern to match.
-      # @return [String, nil] The matched string, or nil
-      def accept(pattern)
-        @scanner.scan(pattern)
-      end
-
-      # Try to match `pattern`, returning the string if it matched or raising an Error if it didn't.
-      #
-      # @param pattern [Regexp, String] The pattern to match.
-      # @return [String] The matched string
-      def expect(pattern)
-        str = accept(pattern)
-        raise Error, "Expected '#{pattern}'; got '#{str}'" if str.nil?
-        str
-      end
-
-      # Try to parse the given block, backtracking to the original state if the parse failed.
-      def backtrack(&block)
-        saved_pos = @scanner.pos
-        saved_unclosed_parens = @unclosed_parens
-        raise Error if @scanner.eos?
-        yield
-      rescue Error
-        @scanner.pos = saved_pos
-        @unclosed_parens = saved_unclosed_parens
-        raise
-      end
-
-      # Parse the block zero or more times, returning an array of parse results.
-      def zero_or_more(&block)
-        matches = []
-        loop do
-          matches << backtrack { yield }
-        end
-      rescue Error
-        matches
-      end
-
-      # Parse the block one or more times, returning an array of parse results.
-      def one_or_more(&block)
-        first = yield
-        rest = zero_or_more(&block)
-        [first, *rest]
-      end
-
-      # Given a list of parsers, return the first one that succeeds.
-      def one_of(parsers)
-        parsers.each do |parser|
-          return backtrack { parser.call }
-        rescue Error
-          next
-        end
-
-        raise Error, "expected one of: #{parsers}"
-      end
+    private def unclosed_parens=(n)
+      parser.state = n
     end
 
     memoize :parse, :parse!
