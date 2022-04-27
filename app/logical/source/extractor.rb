@@ -53,6 +53,7 @@ module Source
       Source::Extractor::Fantia,
       Source::Extractor::Booth,
       Source::Extractor::Anifty,
+      Source::Extractor::Furaffinity,
     ]
 
     # Should return true if the extractor is configured correctly. Return false

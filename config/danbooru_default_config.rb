@@ -333,6 +333,17 @@ module Danbooru
     def fantia_session_id
     end
 
+    # Your Furaffinity "a" cookie. Login to Furaffinity then use the
+    # devtools to find the "a" cookie.
+    # !!WARNING!! logging out of furaffinity will expire this cookie too!
+    def furaffinity_cookie_a
+    end
+
+    # Your Furaffinity "b" cookie. Login to Furaffinity then use the
+    # devtools to find the "b" cookie.
+    def furaffinity_cookie_b
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
