@@ -17,7 +17,9 @@ Rails.application.configure do
   config.action_controller.perform_caching = true
 
   # Enable server timing
-  config.server_timing = true
+  # XXX Re-enable after the fix for rails 44167 is released
+  #config.server_timing = true
+  config.server_timing = false
 
   # Ensures that a master key has been made available in either ENV["RAILS_MASTER_KEY"]
   # or in config/master.key. This key is used to decrypt credentials (and other encrypted files).
