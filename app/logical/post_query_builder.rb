@@ -574,12 +574,6 @@ class PostQueryBuilder
       end
     end
 
-    # Parse a tag edit string into a list of strings, one per search term.
-    # @return [Array<String>] the list of terms
-    def parse_tag_edit
-      split_query
-    end
-
     class_methods do
       # Parse a simple string value into a Ruby type.
       # @param string [String] the value to parse

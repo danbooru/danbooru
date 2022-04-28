@@ -3,7 +3,7 @@ require 'test_helper'
 class RelatedTagsControllerTest < ActionDispatch::IntegrationTest
   context "The related tags controller" do
     setup do
-      create(:post, tag_string: "copy:touhou")
+      as(create(:user)) { create(:post, tag_string: "copy:touhou") }
     end
 
     context "show action" do

@@ -33,6 +33,14 @@ class StringParser
     scanner.scan(pattern)
   end
 
+  # Skip over `pattern`, returning true if it was skipped or false if it wasn't.
+  #
+  # @param pattern [Regexp, String] The pattern to match.
+  # @return [Boolean] True if the pattern was skipped, false otherwise.
+  def skip(pattern)
+    scanner.scan(pattern) != nil
+  end
+
   # Try to match `pattern`, returning the string if it matched or raising an Error if it didn't.
   #
   # @param pattern [Regexp, String] The pattern to match.

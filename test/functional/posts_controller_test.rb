@@ -90,7 +90,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "render for an artist tag" do
-          create(:post, tag_string: "artist:bkub", rating: "s")
+          as(@user) { create(:post, tag_string: "artist:bkub", rating: "s") }
           get posts_path, params: { tags: "bkub" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 1, text: "Artist"
@@ -131,7 +131,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "render for a tag with a wiki page" do
-          create(:post, tag_string: "char:fumimi", rating: "s")
+          as(@user) { create(:post, tag_string: "char:fumimi", rating: "s") }
           get posts_path, params: { tags: "fumimi" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 1, text: "Wiki"

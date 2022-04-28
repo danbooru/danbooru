@@ -15,20 +15,21 @@ class Post < ApplicationRecord
   normalize :source, :normalize_source
   before_validation :merge_old_changes
   before_validation :normalize_tags
-  before_validation :parse_pixiv_id
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
   validates :rating, presence: { message: "not selected" }
   validates :rating, inclusion: { in: %w[s q e], message: "must be S, Q, or E" }, if: -> { rating.present? }
   validates :source, length: { maximum: 1200 }
-  validate :added_tags_are_valid
-  validate :removed_tags_are_valid
-  validate :has_artist_tag
-  validate :has_copyright_tag
-  validate :has_enough_tags
   validate :post_is_not_its_own_parent
   validate :uploader_is_not_limited, on: :create
+  before_save :apply_pre_metatags
+  before_save :parse_pixiv_id
+  before_save :added_tags_are_valid
+  before_save :removed_tags_are_valid
+  before_save :has_artist_tag
+  before_save :has_copyright_tag
+  before_save :has_enough_tags
   before_save :update_tag_post_counts
   before_save :update_tag_category_counts
   before_create :autoban
@@ -55,7 +56,7 @@ class Post < ApplicationRecord
   has_many :favorites, dependent: :destroy
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
-  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning
+  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :post_edit
 
   scope :pending, -> { where(is_pending: true) }
   scope :flagged, -> { where(is_flagged: true) }
@@ -320,7 +321,7 @@ class Post < ApplicationRecord
     end
 
     def tag_array_was
-      (tag_string_in_database.presence || tag_string_before_last_save || "").split
+      tag_string_was.split
     end
 
     def tags
@@ -362,21 +363,6 @@ class Post < ApplicationRecord
     end
 
     def merge_old_changes
-      @removed_tags = []
-
-      if old_tag_string
-        # If someone else committed changes to this post before we did,
-        # then try to merge the tag changes together.
-        current_tags = tag_string_was.split
-        new_tags = PostQueryBuilder.new(tag_string).parse_tag_edit
-        old_tags = old_tag_string.split
-
-        kept_tags = current_tags & new_tags
-        @removed_tags = old_tags - kept_tags
-
-        self.tag_string = ((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.sort.join(" ")
-      end
-
       if old_parent_id == ""
         old_parent_id = nil
       else
@@ -396,50 +382,8 @@ class Post < ApplicationRecord
     end
 
     def normalize_tags
-      normalized_tags = PostQueryBuilder.new(tag_string).parse_tag_edit
-      normalized_tags = apply_casesensitive_metatags(normalized_tags)
-      normalized_tags = normalized_tags.map(&:downcase)
-      normalized_tags = filter_metatags(normalized_tags)
-      normalized_tags = TagAlias.to_aliased(normalized_tags)
-      normalized_tags = remove_negated_tags(normalized_tags)
-      normalized_tags = add_automatic_tags(normalized_tags)
-      normalized_tags = remove_invalid_tags(normalized_tags)
-      normalized_tags = Tag.convert_cosplay_tags(normalized_tags)
-      normalized_tags += Tag.create_for_list(Tag.automatic_tags_for(normalized_tags))
-      normalized_tags += TagImplication.tags_implied_by(normalized_tags).map(&:name)
-      normalized_tags -= added_deprecated_tags
-      normalized_tags = normalized_tags.compact.uniq.sort
-      normalized_tags = Tag.create_for_list(normalized_tags)
-      self.tag_string = normalized_tags.join(" ")
-    end
-
-    def remove_invalid_tags(tag_names)
-      invalid_tags = tag_names.map { |name| Tag.new(name: name) }.select { |tag| tag.invalid?(:name) }
-
-      invalid_tags.each do |tag|
-        tag.errors.messages.each do |_attribute, messages|
-          warnings.add(:base, "Couldn't add tag: #{messages.join(';')}")
-        end
-      end
-
-      tag_names - invalid_tags.map(&:name)
-    end
-
-    def added_deprecated_tags
-      added_deprecated_tags = added_tags.select(&:is_deprecated)
-      if added_deprecated_tags.present?
-        added_deprecated_tags_list = added_deprecated_tags.map { |t| "[[#{t.name}]]" }.to_sentence
-        warnings.add(:base, "The following tags are deprecated and could not be added: #{added_deprecated_tags_list}")
-      end
-
-      added_deprecated_tags.pluck(:name)
-    end
-
-    def remove_negated_tags(tags)
-      @negated_tags, tags = tags.partition {|x| x =~ /\A-/i}
-      @negated_tags = @negated_tags.map {|x| x[1..-1]}
-      @negated_tags = TagAlias.to_aliased(@negated_tags)
-      tags - @negated_tags
+      @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
+      self.tag_string = Tag.create_for_list(post_edit.tag_names).uniq.sort.join(" ")
     end
 
     def add_automatic_tags(tags)
@@ -499,126 +443,87 @@ class Post < ApplicationRecord
       tags
     end
 
-    def apply_casesensitive_metatags(tags)
-      casesensitive_metatags, tags = tags.partition {|x| x =~ /\A(?:source):/i}
-      # Reuse the following metatags after the post has been saved
-      casesensitive_metatags += tags.select {|x| x =~ /\A(?:newpool):/i}
-      if !casesensitive_metatags.empty?
-        case casesensitive_metatags[-1]
-        when /^source:none$/i
-          self.source = ""
-
-        when /^source:"(.*)"$/i
-          self.source = $1
-
-        when /^source:(.*)$/i
-          self.source = $1
-
-        when /^newpool:(.+)$/i
-          pool = Pool.find_by_name($1)
-          if pool.nil?
-            Pool.create(name: $1, description: "This pool was automatically generated")
-          end
-        end
-      end
-
-      tags
-    end
-
-    def filter_metatags(tags)
-      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent):/i}
-      tags = apply_categorization_metatags(tags)
-      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-child|-favgroup|favgroup|upvote|downvote|status|-status|disapproved):/i}
-      apply_pre_metatags
-      tags
-    end
-
-    def apply_categorization_metatags(tags)
-      tags.map do |x|
-        if x =~ Tag.categories.regexp
-          tag = Tag.find_or_create_by_name(x)
-          tag.name
-        else
-          x
-        end
-      end
-    end
-
     def apply_post_metatags
-      return unless @post_metatags
-
-      @post_metatags.each do |tag|
-        case tag
-        when /^-pool:(\d+)$/i
-          pool = Pool.find_by_id($1.to_i)
+      post_edit.post_metatag_terms.each do |metatag|
+        case [metatag.name, metatag.value]
+        in "-pool", /^\d+$/ => pool_id
+          pool = Pool.find_by_id(pool_id)
           pool&.remove!(self)
 
-        when /^-pool:(.+)$/i
-          pool = Pool.find_by_name($1)
+        in "-pool", name
+          pool = Pool.find_by_name(name)
           pool&.remove!(self)
 
-        when /^pool:(\d+)$/i
-          pool = Pool.find_by_id($1.to_i)
+        in "pool", /^\d+$/ => pool_id
+          pool = Pool.find_by_id(pool_id)
           pool&.add!(self)
 
-        when /^pool:(.+)$/i
-          pool = Pool.find_by_name($1)
+        in "pool", name
+          pool = Pool.find_by_name(name)
           pool&.add!(self)
 
-        when /^newpool:(.+)$/i
-          pool = Pool.find_by_name($1)
-          pool&.add!(self)
+        in "newpool", name
+          pool = Pool.find_by_name(name)
 
-        when /^fav:(.+)$/i
+          # XXX race condition
+          if pool.nil?
+            Pool.create!(name: name, description: "This pool was automatically generated", post_ids: [id])
+          else
+            pool.add!(self)
+          end
+
+        in "fav", name
           raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
           Favorite.create(post: self, user: CurrentUser.user)
 
-        when /^-fav:(.+)$/i
+        in "-fav", name
           raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
           Favorite.destroy_by(post: self, user: CurrentUser.user)
 
-        when /^(up|down)vote:(.+)$/i
-          score = ($1 == "up" ? 1 : -1)
-          vote!(score, CurrentUser.user)
+        in "upvote", name
+          vote!(1, CurrentUser.user)
 
-        when /^status:active$/i
+        in "downvote", name
+          vote!(-1, CurrentUser.user)
+
+        in "status", "active"
           raise User::PrivilegeError unless CurrentUser.is_approver?
           approvals.create!(user: CurrentUser.user)
 
-        when /^status:banned$/i
+        in "status", "banned"
           raise User::PrivilegeError unless CurrentUser.is_approver?
           ban!
 
-        when /^-status:banned$/i
+        in "-status", "banned"
           raise User::PrivilegeError unless CurrentUser.is_approver?
           unban!
 
-        when /^disapproved:(.+)$/i
+        in "disapproved", reason
           raise User::PrivilegeError unless CurrentUser.is_approver?
-          disapprovals.create!(user: CurrentUser.user, reason: $1.downcase)
+          disapprovals.create!(user: CurrentUser.user, reason: reason.downcase)
 
-        when /^child:none$/i
+        in "child", "none"
           children.each do |post|
             post.update!(parent_id: nil)
           end
 
-        when /^-child:(.+)$/i
-          children.search(id: $1).each do |post|
+        in "-child", ids
+          children.search(id: ids).each do |post|
             post.update!(parent_id: nil)
           end
 
-        when /^child:(.+)$/i
-          Post.search(id: $1).where.not(id: id).limit(10).each do |post|
+        in "child", ids
+          Post.search(id: ids).where.not(id: id).limit(10).each do |post|
             post.update!(parent_id: id)
           end
 
-        when /^-favgroup:(.+)$/i
-          favgroup = FavoriteGroup.find_by_name_or_id!($1, CurrentUser.user)
+        in "-favgroup", name
+          favgroup = FavoriteGroup.find_by_name_or_id!(name, CurrentUser.user)
           raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
           favgroup&.remove!(self)
 
-        when /^favgroup:(.+)$/i
-          favgroup = FavoriteGroup.find_by_name_or_id!($1, CurrentUser.user)
+        in "favgroup", name
+          favgroup = FavoriteGroup.find_by_name_or_id!(name, CurrentUser.user)
           raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
           favgroup&.add!(self)
 
@@ -627,26 +532,36 @@ class Post < ApplicationRecord
     end
 
     def apply_pre_metatags
-      return unless @pre_metatags
-
-      @pre_metatags.each do |tag|
-        case tag
-        when /^parent:none$/i, /^parent:0$/i
+      post_edit.pre_metatag_terms.each do |metatag|
+        case [metatag.name, metatag.value]
+        in "parent", ("none" | "0")
           self.parent_id = nil
 
-        when /^-parent:(\d+)$/i
-          if parent_id == $1.to_i
+        in "-parent", /^\d+$/ => new_parent_id
+          if parent_id == new_parent_id.to_i
             self.parent_id = nil
           end
 
-        when /^parent:(\d+)$/i
-          if $1.to_i != id && Post.exists?(["id = ?", $1.to_i])
-            self.parent_id = $1.to_i
+        in "parent", /^\d+$/ => new_parent_id
+          if new_parent_id.to_i != id && Post.exists?(new_parent_id)
+            self.parent_id = new_parent_id.to_i
             remove_parent_loops
           end
 
-        when /^rating:([qse])/i
-          self.rating = $1
+        in "rating", /\A([qse])/i
+          self.rating = $1.downcase
+
+        in "source", "none"
+          self.source = ""
+
+        in "source", value
+          self.source = value
+
+        in category, name if category.in?(PostEdit::CATEGORIZATION_METATAGS)
+          Tag.find_or_create_by_name("#{category}:#{name}", creator: CurrentUser.user)
+
+        else
+          nil
 
         end
       end
@@ -1514,10 +1429,22 @@ class Post < ApplicationRecord
           warnings.add(:base, "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[#{new_artist_path}]")
         end
       end
+
+      post_edit.invalid_added_tags.each do |tag|
+        tag.errors.messages.each do |_attribute, messages|
+          warnings.add(:base, "Couldn't add tag: #{messages.join(';')}")
+        end
+      end
+
+      deprecated_tags = post_edit.deprecated_added_tag_names
+      if deprecated_tags.present?
+        tag_list = deprecated_tags.map { |tag| "[[#{tag}]]" }.to_sentence
+        warnings.add(:base, "The following tags are deprecated and could not be added: #{tag_list}")
+      end
     end
 
     def removed_tags_are_valid
-      attempted_removed_tags = @removed_tags + @negated_tags
+      attempted_removed_tags = post_edit.user_removed_tag_names
       unremoved_tags = tag_array & attempted_removed_tags
 
       if unremoved_tags.present?

@@ -3,9 +3,8 @@ require 'test_helper'
 class PostTest < ActiveSupport::TestCase
   def self.assert_invalid_tag(tag_name)
     should "not allow '#{tag_name}' to be tagged" do
-      post = build(:post, tag_string: "touhou #{tag_name}")
+      post = create(:post, tag_string: "touhou #{tag_name}")
 
-      assert(post.valid?)
       assert_equal("touhou", post.tag_string)
       assert_equal(1, post.warnings[:base].grep(/Couldn't add tag/).count)
     end
@@ -479,20 +478,47 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "tagged with a tag string containing newlines" do
+        should "not include the newlines in the tags" do
+          @post.update!(tag_string: "bkub\r\ntouhou\r\nchen  inaba_tewi\nhonk_honk\n")
+
+          assert_equal("bkub chen honk_honk inaba_tewi touhou", @post.tag_string)
+        end
+      end
+
       context "tagged with a deprecated tag" do
         should "not remove the tag if the tag was already in the post" do
           bad_tag = create(:tag, name: "bad_tag")
-          old_post = FactoryBot.create(:post, tag_string: "bad_tag")
+          old_post = create(:post, tag_string: "bad_tag")
           bad_tag.update!(is_deprecated: true)
           old_post.update!(tag_string: "asd bad_tag")
-          assert_equal("asd bad_tag", old_post.reload.tag_string)
 
+          assert_equal("asd bad_tag", old_post.reload.tag_string)
+          assert_no_match(/The following tags are deprecated and could not be added: \[\[a_bad_tag\]\]/, @post.warnings.full_messages.join)
         end
 
         should "not add the tag if it is being added" do
           create(:tag, name: "a_bad_tag", is_deprecated: true)
           @post.update!(tag_string: "asd a_bad_tag")
+
           assert_equal("asd", @post.reload.tag_string)
+          assert_match(/The following tags are deprecated and could not be added: \[\[a_bad_tag\]\]/, @post.warnings.full_messages.join)
+        end
+
+        should "not add the tag when it contains a category prefix" do
+          create(:tag, name: "a_bad_tag", is_deprecated: true)
+          @post.update!(tag_string: "asd char:a_bad_tag")
+
+          assert_equal("asd", @post.reload.tag_string)
+          assert_match(/The following tags are deprecated and could not be added: \[\[a_bad_tag\]\]/, @post.warnings.full_messages.join)
+        end
+
+        should "not warn about the tag being deprecated when the tag is added and removed in the same edit" do
+          create(:tag, name: "a_bad_tag", is_deprecated: true)
+          @post.update!(tag_string: "asd a_bad_tag -a_bad_tag")
+
+          assert_equal("asd", @post.reload.tag_string)
+          assert_no_match(/The following tags are deprecated and could not be added: \[\[a_bad_tag\]\]/, @post.warnings.full_messages.join)
         end
       end
 
@@ -591,6 +617,14 @@ class PostTest < ActiveSupport::TestCase
             assert_nil(@post.parent_id)
           end
 
+          should "clear the parent with parent:0" do
+            @post.update(parent_id: @parent.id)
+            assert_equal(@parent.id, @post.parent_id)
+
+            @post.update(tag_string: "parent:0")
+            assert_nil(@post.parent_id)
+          end
+
           should "clear the parent with -parent:1234" do
             @post.update(:parent_id => @parent.id)
             assert_equal(@parent.id, @post.parent_id)
@@ -620,78 +654,74 @@ class PostTest < ActiveSupport::TestCase
         end
 
         context "for a pool" do
-          context "on creation" do
-            setup do
-              @pool = FactoryBot.create(:pool)
-              @post = FactoryBot.create(:post, :tag_string => "aaa pool:#{@pool.id}")
-            end
-
-            should "add the post to the pool" do
-              @post.reload
-              @pool.reload
-              assert_equal([@post.id], @pool.post_ids)
-            end
+          should "add the post to the pool by id" do
+            @pool = create(:pool)
+            @post = create(:post, tag_string: "aaa pool:#{@pool.id}")
+            assert_equal([@post.id], @pool.reload.post_ids)
           end
 
-          context "negated" do
-            setup do
-              @pool = FactoryBot.create(:pool)
-              @post = FactoryBot.create(:post, :tag_string => "aaa")
-              @pool.add!(@post)
-              @post.tag_string = "aaa -pool:#{@pool.id}"
-              @post.save
-            end
+          should "remove the post from the pool by id" do
+            @pool = create(:pool, post_ids: [@post.id])
+            @post.update!(tag_string: "aaa -pool:#{@pool.id}")
 
-            should "remove the post from the pool" do
-              @post.reload
-              @pool.reload
-              assert_equal([], @pool.post_ids)
-            end
+            assert_equal([], @pool.reload.post_ids)
           end
 
-          context "id" do
-            setup do
-              @pool = FactoryBot.create(:pool)
-              @post.update(tag_string: "aaa pool:#{@pool.id}")
-            end
+          should "add the post to the pool by name" do
+            @pool = create(:pool, name: "abc")
+            @post.update(tag_string: "aaa pool:abc")
 
-            should "add the post to the pool" do
-              @post.reload
-              @pool.reload
-              assert_equal([@post.id], @pool.post_ids)
-            end
+            assert_equal([@post.id], @pool.reload.post_ids)
           end
 
-          context "name" do
-            context "that exists" do
-              setup do
-                @pool = FactoryBot.create(:pool, :name => "abc")
-                @post.update(tag_string: "aaa pool:abc")
-              end
+          should "remove the post from the pool by name" do
+            @pool = create(:pool, name: "abc", post_ids: [@post.id])
+            @post.update(tag_string: "aaa -pool:abc")
 
-              should "add the post to the pool" do
-                @post.reload
-                @pool.reload
-                assert_equal([@post.id], @pool.post_ids)
-              end
-            end
+            assert_equal([], @pool.reload.post_ids)
+          end
+        end
 
-            context "that doesn't exist" do
-              should "create a new pool and add the post to that pool" do
-                @post.update(tag_string: "aaa newpool:abc")
-                @pool = Pool.find_by_name("abc")
-                @post.reload
-                assert_not_nil(@pool)
-                assert_equal([@post.id], @pool.post_ids)
-              end
-            end
+        context "for the newpool: metatag" do
+          should "create a new pool and add the post to that pool" do
+            @post.update(tag_string: "aaa newpool:abc")
+            @pool = Pool.find_by_name("abc")
 
-            context "with special characters" do
-              should "not strip '%' from the name" do
-                @post.update(tag_string: "aaa newpool:ichigo_100%")
-                assert(Pool.exists?(name: "ichigo_100%"))
-              end
-            end
+            assert_not_nil(@pool)
+            assert_equal([@post.id], @pool.post_ids)
+          end
+
+          should "not strip special characters from the name" do
+            @post.update(tag_string: "aaa newpool:ichigo_100%")
+
+            assert(Pool.exists?(name: "ichigo_100%"))
+          end
+
+          should "parse a double-quoted name" do
+            @post.update(tag_string: 'aaa newpool:"foo bar baz" bbb')
+            @pool = Pool.find_by_name("foo_bar_baz")
+
+            assert_not_nil(@pool)
+            assert_equal([@post.id], @pool.post_ids)
+            assert_equal("aaa bbb", @post.tag_string)
+          end
+
+          should "parse a single-quoted name" do
+            @post.update(tag_string: "aaa newpool:'foo bar baz' bbb")
+            @pool = Pool.find_by_name("foo_bar_baz")
+
+            assert_not_nil(@pool)
+            assert_equal([@post.id], @pool.post_ids)
+            assert_equal("aaa bbb", @post.tag_string)
+          end
+
+          should "parse a name with backslash-escaped spaces" do
+            @post.update(tag_string: "aaa newpool:foo\\ bar\\ baz bbb")
+            @pool = Pool.find_by_name("foo_bar_baz")
+
+            assert_not_nil(@pool)
+            assert_equal([@post.id], @pool.post_ids)
+            assert_equal("aaa bbb", @post.tag_string)
           end
         end
 
@@ -876,8 +906,21 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should 'set the source with source:"foo bar baz"' do
-            @post.update(:tag_string => 'source:"foo bar baz"')
+            @post.update(tag_string: 'aaa source:"foo bar baz" bbb')
             assert_equal("foo bar baz", @post.source)
+            assert_equal("aaa bbb", @post.tag_string)
+          end
+
+          should "set the source with source:'foo bar baz'" do
+            @post.update(tag_string: "aaa source:'foo bar baz' bbb")
+            assert_equal("foo bar baz", @post.source)
+            assert_equal("aaa bbb", @post.tag_string)
+          end
+
+          should "set the source with source:foo\\ bar\\ baz" do
+            @post.update(tag_string: "aaa source:foo\\ bar\\ baz bbb")
+            assert_equal("foo bar baz", @post.source)
+            assert_equal("aaa bbb", @post.tag_string)
           end
 
           should 'strip the source with source:"  foo bar baz  "' do
@@ -893,6 +936,7 @@ class PostTest < ActiveSupport::TestCase
 
           should "set the pixiv id with source:https://img18.pixiv.net/img/evazion/14901720.png" do
             @post.update(:tag_string => "source:https://img18.pixiv.net/img/evazion/14901720.png")
+            assert_equal("https://img18.pixiv.net/img/evazion/14901720.png", @post.source)
             assert_equal(14901720, @post.pixiv_id)
           end
 

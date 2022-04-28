@@ -45,7 +45,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
       end
 
       should "calculate the most frequent tags with a category constraint" do
-        create(:post, tag_string: "aaa bbb art:ccc copy:ddd")
+        as(@user) { create(:post, tag_string: "aaa bbb art:ccc copy:ddd") }
         create(:post, tag_string: "aaa bbb ccc")
         create(:post, tag_string: "aaa bbb")
 
