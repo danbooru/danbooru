@@ -474,7 +474,7 @@ class User < ApplicationRecord
       def max_saved_searches(level)
         if level >= User::Levels::BUILDER
           Float::INFINITY
-        elsif level == User::Levels::GOLD
+        elsif level >= User::Levels::GOLD
           1_000
         else
           250
