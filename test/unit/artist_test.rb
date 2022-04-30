@@ -549,6 +549,14 @@ class ArtistTest < ActiveSupport::TestCase
         assert_equal(true, artist.invalid?)
         assert_match(/'foo' is aliased to 'bar'/, artist.errors.full_messages.join)
       end
+
+      should "not allow creating artist entries for deprecated tags" do
+        create(:tag, name: "orange", is_deprecated: true)
+        artist = build(:artist, name: "orange")
+
+        assert_equal(true, artist.invalid?)
+        assert_match(/'orange' is an ambiguous tag/, artist.errors.full_messages.join)
+      end
     end
 
     context "when renaming" do

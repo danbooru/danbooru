@@ -174,6 +174,10 @@ class Artist < ApplicationRecord
         errors.add(:name, "'#{name}' is a #{tag.category_name.downcase} tag; artist entries can only be created for artist tags")
       end
 
+      if tag&.is_deprecated?
+        errors.add(:name, "'#{name}' is an ambiguous tag; try another name")
+      end
+
       if tag_alias.present?
         errors.add(:name, "'#{name}' is aliased to '#{tag_alias.consequent_name}'")
       end
