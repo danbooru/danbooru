@@ -95,8 +95,9 @@ Autocomplete.initialize_tag_autocomplete = function() {
 Autocomplete.current_term = function($input) {
   let query = $input.get(0).value;
   let caret = $input.get(0).selectionStart;
-  let match = query.substring(0, caret).match(/\S*$/);
-  return match[0];
+  let regexp = new RegExp(`^[-~(]*(${Autocomplete.tag_prefixes().join("|")})?`);
+  let match = query.substring(0, caret).match(/\S*$/)[0].replace(regexp, "");
+  return match;
 };
 
 // Update the input field with the item currently focused in the
@@ -106,7 +107,7 @@ Autocomplete.insert_completion = function(input, completion) {
   var before_caret_text = input.value.substring(0, input.selectionStart).replace(/^[ \t]+|[ \t]+$/gm, "");
   var after_caret_text = input.value.substring(input.selectionStart).replace(/^[ \t]+|[ \t]+$/gm, "");
 
-  var regexp = new RegExp("(" + Autocomplete.tag_prefixes().join("|") + ")?\\S+$", "g");
+  var regexp = new RegExp(`([-~(]*(?:${Autocomplete.tag_prefixes().join("|")})?)\\S+$`, "g");
   before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
 
   input.value = before_caret_text + after_caret_text;

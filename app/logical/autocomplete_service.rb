@@ -24,7 +24,7 @@ class AutocompleteService
     order: PostQueryBuilder::ORDER_METATAGS
   }
 
-  TAG_PREFIXES = ["-", "~"] + TagCategory.mapping.keys.map { |prefix| prefix + ":" }
+  TAG_PREFIXES = TagCategory.mapping.keys.map { |prefix| prefix + ":" }
 
   attr_reader :query, :type, :limit, :current_user
 
