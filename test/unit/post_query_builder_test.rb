@@ -896,6 +896,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post3], "source:NONE")
       assert_tag_match([post3], 'source:""')
       assert_tag_match([post3], "source:''")
+      assert_tag_match([post3], "source:")
       assert_tag_match([post2, post1], "-source:none")
       assert_tag_match([post2, post1], "-source:''")
       assert_tag_match([post2, post1], '-source:""')

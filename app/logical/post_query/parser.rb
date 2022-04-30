@@ -172,7 +172,7 @@ class PostQuery
           expect("'")
           [true, a]
         else
-          [false, string(/[^ ]+/)]
+          [false, string(/[^ ]*/)]
         end
       end
 
