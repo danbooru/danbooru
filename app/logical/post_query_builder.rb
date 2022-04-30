@@ -493,87 +493,6 @@ class PostQueryBuilder
   end
 
   concerning :ParseMethods do
-    # Parse the search into a list of search terms. A search term is a tag or a metatag.
-    # @return [Array<OpenStruct>] a list of terms
-    def scan_query
-      terms = []
-      query = query_string.to_s.gsub(/[[:space:]]/, " ")
-      scanner = StringScanner.new(query)
-
-      until scanner.eos?
-        scanner.skip(/ +/)
-
-        if scanner.scan(/(-)?(#{METATAGS.join("|")}):/io)
-          operator = scanner.captures.first
-          metatag = scanner.captures.second.downcase
-          value, quoted = scan_string(scanner)
-
-          if metatag.in?(COUNT_METATAG_SYNONYMS)
-            metatag = metatag.singularize + "_count"
-          elsif metatag == "order"
-            attribute, direction, _tail = value.to_s.downcase.partition(/_(asc|desc)\z/i)
-            if attribute.in?(COUNT_METATAG_SYNONYMS)
-              value = attribute.singularize + "_count" + direction
-            end
-          end
-
-          terms << OpenStruct.new(type: :metatag, name: metatag, value: value, negated: (operator == "-"), quoted: quoted)
-        elsif scanner.scan(/([-~])?([^ ]+)/)
-          operator = scanner.captures.first
-          tag = scanner.captures.second
-          terms << OpenStruct.new(type: :tag, name: tag.downcase, negated: (operator == "-"), optional: (operator == "~"), wildcard: tag.include?("*"))
-        elsif scanner.scan(/[^ ]+/)
-          terms << OpenStruct.new(type: :tag, name: scanner.matched.downcase)
-        end
-      end
-
-      terms
-    end
-
-    # Parse a single-quoted, double-quoted, or unquoted string. Used for parsing metatag values.
-    # @param scanner [StringScanner] the current parser state
-    # @return [Array<(String, Boolean)>] the string and whether it was quoted
-    def scan_string(scanner)
-      if scanner.scan(/"((?:\\"|[^"])*)"/)
-        value = scanner.captures.first.gsub(/\\(.)/) { $1 }
-        quoted = true
-      elsif scanner.scan(/'((?:\\'|[^'])*)'/)
-        value = scanner.captures.first.gsub(/\\(.)/) { $1 }
-        quoted = true
-      else
-        value = scanner.scan(/(\\ |[^ ])*/)
-        value = value.gsub(/\\ /) { " " }
-        quoted = false
-      end
-
-      [value, quoted]
-    end
-
-    # Split the search query into a list of strings, one per search term.
-    # Roughly the same as splitting on spaces, but accounts for quoted strings.
-    # @return [Array<String>] the list of terms
-    def split_query
-      terms.map do |term|
-        type, name, value = term.type, term.name, term.value
-
-        str = ""
-        str += "-" if term.negated
-        str += "~" if term.optional
-
-        if type == :tag
-          str += name
-        elsif type == :metatag && (term.quoted || value.include?(" "))
-          value = value.gsub(/\\/) { '\\\\' }
-          value = value.gsub(/"/) { '\\"' }
-          str += "#{name}:\"#{value}\""
-        elsif type == :metatag
-          str += "#{name}:#{value}"
-        end
-
-        str
-      end
-    end
-
     class_methods do
       # Parse a simple string value into a Ruby type.
       # @param string [String] the value to parse
@@ -700,17 +619,4 @@ class PostQueryBuilder
       end
     end
   end
-
-  concerning :UtilityMethods do
-    def to_s
-      split_query.join(" ")
-    end
-
-    # The list of search terms. This includes regular tags and metatags.
-    def terms
-      @terms ||= scan_query
-    end
-  end
-
-  memoize :split_query
 end

@@ -228,10 +228,9 @@
 
     <% atom_feed_tag "Posts", posts_url(format: :atom) %>
   <% else %>
-    <% page_title("#{@post_set.humanized_tag_string} Art") %>
-    <% meta_description("See over #{number_with_delimiter(@post_set.post_count)} #{@post_set.humanized_tag_string} images on #{Danbooru.config.app_name}. #{DText.excerpt(@post_set.wiki_page&.body)}") %>
-
-    <% atom_feed_tag "Posts: #{@post_set.tag_string}", posts_url(tags: @post_set.tag_string, format: :atom) %>
+    <% page_title(@post_set.page_title) %>
+    <% meta_description @post_set.meta_description %>
+    <% atom_feed_tag "Posts: #{@post_set.page_title}", posts_url(tags: @post_set.tag_string, format: :atom) %>
   <% end %>
 
   <% if params[:tags].blank? && @post_set.current_page == 1 %>

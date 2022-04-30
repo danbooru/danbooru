@@ -6,6 +6,8 @@
 # @see PostsController#index
 module PostSets
   class Post
+    extend Memoist
+
     MAX_PER_PAGE = 200
     MAX_SIDEBAR_TAGS = 25
     MAX_WILDCARD_TAGS = PostQueryBuilder::MAX_WILDCARD_TAGS
@@ -25,8 +27,21 @@ module PostSets
       @show_votes = show_votes
     end
 
-    def humanized_tag_string
-      query.split_query.map { |tag| tag.tr("_", " ").titleize }.to_sentence
+    # The title of the page for the <title> tag.
+    def page_title
+      post_query.to_pretty_string
+    end
+
+    # The description of the page for the <meta name="description"> tag.
+    def meta_description
+      if post_query.is_simple_tag?
+        humanized_count = ApplicationController.helpers.humanized_number(post_count, million: " million", thousand: " thousand")
+        humanized_count = "over #{humanized_count}" if post_count >= 1_000
+
+        "See #{humanized_count} #{page_title} images on #{Danbooru.config.app_name}. #{DText.excerpt(wiki_page&.body)}"
+      else
+        ApplicationController.helpers.site_description
+      end
     end
 
     def has_blank_wiki?
@@ -170,5 +185,7 @@ module PostSets
         searches.take(MAX_SIDEBAR_TAGS)
       end
     end
+
+    memoize :page_title
   end
 end

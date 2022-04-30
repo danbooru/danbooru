@@ -123,13 +123,13 @@ module ApplicationHelper
     end
   end
 
-  def humanized_number(number)
+  def humanized_number(number, million: "M", thousand: "k")
     if number >= 1_000_000
-      format("%.1fM", number / 1_000_000.0)
+      format("%.1f#{million}", number / 1_000_000.0)
     elsif number >= 10_000
-      "#{number / 1_000}k"
+      "#{number / 1_000}#{thousand}"
     elsif number >= 1_000
-      format("%.1fk", number / 1_000.0)
+      format("%.1f#{thousand}", number / 1_000.0)
     else
       number.to_s
     end

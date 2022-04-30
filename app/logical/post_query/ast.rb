@@ -286,6 +286,30 @@ class PostQuery
         end
       end
 
+      # Display the search in "pretty" form, with capitalized tags.
+      def to_pretty_string
+        case self
+        in [:all]
+          ""
+        in [:none]
+          "none"
+        in [:wildcard, name]
+          name
+        in [:tag, name]
+          name.tr("_", " ").gsub(/\b([a-z])/, &:capitalize)
+        in [:metatag, name, value, quoted]
+          "#{name}:#{quoted_value}"
+        in :not, child
+          child.term? ? "-#{child.to_pretty_string}" : "-(#{child.to_pretty_string})"
+        in :opt, child
+          child.term? ? "~#{child.to_pretty_string}" : "~(#{child.to_pretty_string})"
+        in :and, *children
+          children.map { _1.children.many? ? "(#{_1.to_pretty_string})" : _1.to_pretty_string }.to_sentence
+        in :or, *children
+          children.map { _1.children.many? ? "(#{_1.to_pretty_string})" : _1.to_pretty_string }.to_sentence(two_words_connector: " or ", last_word_connector: ", or ")
+        end
+      end
+
       # Convert the AST to a series of nested arrays.
       def to_tree
         if term?
@@ -445,6 +469,6 @@ class PostQuery
       end
     end
 
-    memoize :to_cnf, :simplify, :simplify_once, :rewrite_opts, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_tree, :nodes, :tags, :metatags, :tag_names, :parents
+    memoize :to_cnf, :simplify, :simplify_once, :rewrite_opts, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_pretty_string, :to_tree, :nodes, :tags, :metatags, :tag_names, :parents
   end
 end

@@ -13,13 +13,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     assert_equal(count, PostQuery.normalize(query, **query_options).with_implicit_metatags.fast_count(**fast_count_options))
   end
 
-  def assert_parse_equals(expected, query)
-    assert_equal(expected, PostQueryBuilder.new(query).split_query)
-
-    # parsing, serializing, then parsing again should produce the same result.
-    assert_equal(PostQuery.new(query).to_s, PostQuery.new(PostQuery.new(query).to_s).to_s)
-  end
-
   setup do
     CurrentUser.user = create(:user)
     CurrentUser.ip_addr = "127.0.0.1"
@@ -1384,17 +1377,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_search_error("a or ordpool:a")
       assert_search_error("a or limit:20")
       assert_search_error("a or random:20")
-    end
-  end
-
-  context "Parsing:" do
-    should "split a query" do
-      assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
-    end
-
-    should "not strip out valid characters when scanning" do
-      assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
-      assert_equal(%w(favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%), PostQueryBuilder.new("favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%").split_query)
     end
   end
 
