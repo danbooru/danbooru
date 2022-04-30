@@ -362,7 +362,7 @@ class Tag < ApplicationRecord
 
   def self.automatic_tags_for(names)
     tags = []
-    tags += names.grep(/\A(.+)_\(cosplay\)\z/i) { TagAlias.to_aliased([$1]).first }
+    tags += names.grep(/\A(.+)_\(cosplay\)\z/i) { $1 }
     tags << "cosplay" if names.any?(/_\(cosplay\)\z/i)
     tags << "school_uniform" if names.any?(/_school_uniform\z/i)
     tags << "meme" if names.any?(/_\(meme\)\z/i)
@@ -370,13 +370,6 @@ class Tag < ApplicationRecord
   end
 
   concerning :CosplayTagMethods do
-    class_methods do
-      def convert_cosplay_tags(tags)
-        cosplay_tags, other_tags = tags.partition {|tag| tag.match(/\A(.+)_\(cosplay\)\Z/) }
-        cosplay_tags.grep(/\A(.+)_\(cosplay\)\Z/) { "#{TagAlias.to_aliased([$1]).first}_(cosplay)" } + other_tags
-      end
-    end
-
     def create_character_tag_for_cosplay_tag
       character_name = name.delete_suffix("_(cosplay)")
       Tag.find_or_create_by_name("char:#{character_name}")

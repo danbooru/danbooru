@@ -392,9 +392,20 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           should "move the *_(cosplay) tag as well" do
             @post = create(:post, tag_string: "toosaka_rin_(cosplay)")
             @wiki = create(:wiki_page, title: "toosaka_rin_(cosplay)")
-            @ta = create(:tag_alias, antecedent_name: "toosaka_rin", consequent_name: "tohsaka_rin")
 
             create_bur!("rename toosaka_rin -> tohsaka_rin", @admin)
+
+            assert_equal("cosplay tohsaka_rin tohsaka_rin_(cosplay)", @post.reload.tag_string)
+            assert_equal("tohsaka_rin_(cosplay)", @wiki.reload.title)
+          end
+        end
+
+        context "when aliasing a character tag with a *_(cosplay) tag" do
+          should "move the *_(cosplay) tag as well" do
+            @post = create(:post, tag_string: "toosaka_rin_(cosplay)")
+            @wiki = create(:wiki_page, title: "toosaka_rin_(cosplay)")
+
+            create_bur!("alias toosaka_rin -> tohsaka_rin", @admin)
 
             assert_equal("cosplay tohsaka_rin tohsaka_rin_(cosplay)", @post.reload.tag_string)
             assert_equal("tohsaka_rin_(cosplay)", @wiki.reload.title)

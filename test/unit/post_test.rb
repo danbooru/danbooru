@@ -577,7 +577,11 @@ class PostTest < ActiveSupport::TestCase
             @post.add_tag("jim_(cosplay)")
             @post.save
 
-            assert(@post.has_tag?("james"), "expected 'jim' to be aliased to 'james'")
+            assert_equal(false, @post.has_tag?("jim_(cosplay)"))
+            assert_equal(false, @post.has_tag?("james_(cosplay)"))
+            assert_equal(false, @post.has_tag?("jim"))
+            assert_equal(false, @post.has_tag?("james"))
+            assert_match(/'jim_\(cosplay\)' is not allowed because 'jim' is aliased to 'james'/, @post.warnings.full_messages.join)
           end
 
           should "apply implications after the character tag is added" do
@@ -1213,6 +1217,7 @@ class PostTest < ActiveSupport::TestCase
           refute(@post.has_tag?("little_red_riding_hood"))
           refute(@post.has_tag?("cosplay"))
           assert(@post.warnings[:base].grep(/Couldn't add tag/).present?)
+          assert_match(/'little_red_riding_hood_\(cosplay\)' is not allowed because 'little_red_riding_hood' is not a character tag/, @post.warnings.full_messages.join)
         end
 
         should "allow creating a _(cosplay) tag for an empty general tag" do

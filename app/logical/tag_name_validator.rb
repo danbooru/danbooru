@@ -46,12 +46,13 @@ class TagNameValidator < ActiveModel::EachValidator
     when "new", "search", "and", "or", "not"
       record.errors.add(attribute, "'#{value}' is a reserved name and cannot be used")
     when /\A(.+)_\(cosplay\)\z/i
-      # XXX don't allow aliases here?
-      tag_name = TagAlias.to_aliased([$1]).first
-      tag = Tag.find_by_name(tag_name)
+      tag_name = $1;
+      char_tag = Tag.find_by_name(tag_name)
 
-      if tag.present? && !tag.empty? && !tag.character?
-        record.errors.add(attribute, "#{tag_name} must be a character tag")
+      if char_tag.present? && char_tag.antecedent_alias.present?
+        record.errors.add(attribute, "'#{value}' is not allowed because '#{tag_name}' is aliased to '#{char_tag.antecedent_alias.consequent_name}'")
+      elsif char_tag.present? && !char_tag.empty? && !char_tag.character?
+        record.errors.add(attribute, "'#{value}' is not allowed because '#{tag_name}' is not a character tag")
       end
     end
   end

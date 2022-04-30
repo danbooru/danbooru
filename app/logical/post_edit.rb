@@ -42,7 +42,6 @@ class PostEdit
     def tag_names
       tag_names = current_tag_names + effective_added_tag_names - user_removed_tag_names
       tag_names = post.add_automatic_tags(tag_names)
-      tag_names = ::Tag.convert_cosplay_tags(tag_names)
       tag_names += ::Tag.automatic_tags_for(tag_names)
       tag_names += TagImplication.tags_implied_by(tag_names).map(&:name)
       tag_names.uniq.sort
