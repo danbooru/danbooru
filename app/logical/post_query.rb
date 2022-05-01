@@ -16,11 +16,10 @@ class PostQuery
   SINGLETON_METATAGS = ORDER_METATAGS + %w[limit random]
 
   attr_reader :current_user
-  private attr_reader :tag_limit, :safe_mode, :hide_deleted_posts, :builder
+  private attr_reader :tag_limit, :safe_mode, :builder
 
   delegate :tag?, :metatag?, :wildcard?, :metatags, :wildcards, :tag_names, :to_infix, :to_pretty_string, to: :ast
   alias_method :safe_mode?, :safe_mode
-  alias_method :hide_deleted_posts?, :hide_deleted_posts
   alias_method :to_s, :to_infix
 
   # Return a new PostQuery with aliases replaced.
@@ -42,7 +41,7 @@ class PostQuery
     PostQuery.normalize(search, ...).with_implicit_metatags.posts
   end
 
-  def initialize(search_or_ast, current_user: User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
+  def initialize(search_or_ast, current_user: User.anonymous, tag_limit: nil, safe_mode: false)
     if search_or_ast.is_a?(AST)
       @ast = search_or_ast
     else
@@ -52,16 +51,15 @@ class PostQuery
     @current_user = current_user
     @tag_limit = tag_limit
     @safe_mode = safe_mode
-    @hide_deleted_posts = hide_deleted_posts
   end
 
   # Build a new PostQuery from the given AST and the current settings.
   def build(ast)
-    PostQuery.new(ast, current_user: current_user, tag_limit: tag_limit, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
+    PostQuery.new(ast, current_user: current_user, tag_limit: tag_limit, safe_mode: safe_mode)
   end
 
   def builder
-    @builder ||= PostQueryBuilder.new(search, current_user, tag_limit: tag_limit, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
+    @builder ||= PostQueryBuilder.new(search, current_user, tag_limit: tag_limit, safe_mode: safe_mode)
   end
 
   def search
@@ -189,19 +187,17 @@ class PostQuery
     TagAlias.aliases_for(tag_names)
   end
 
-  # Implicit metatags are metatags added by the user's account settings. rating:s is implicit
-  # under safe mode. -status:deleted is implicit when the "hide deleted posts" setting is on.
+  # Implicit metatags are metatags added by the user's account settings. rating:s is implicit under safe mode.
   def implicit_metatags
     metatags = []
     metatags << AST.metatag("rating", "s") if safe_mode?
-    metatags << -AST.metatag("status", "deleted") if hide_deleted?
     metatags
   end
 
   # XXX unify with PostSets::Post#show_deleted?
   def hide_deleted?
     has_status_metatag = select_metatags(:status).any? { |metatag| metatag.value.downcase.in?(%w[deleted active any all unmoderated modqueue appealed]) }
-    hide_deleted_posts? && !has_status_metatag
+    !has_status_metatag
   end
 
   concerning :CountMethods do

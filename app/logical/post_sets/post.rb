@@ -17,8 +17,8 @@ module PostSets
     alias_method :show_votes?, :show_votes
 
     def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, format: "html", show_votes: false)
-      @query = PostQueryBuilder.new(tags, user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
-      @post_query = PostQuery.normalize(tags, current_user: user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
+      @query = PostQueryBuilder.new(tags, user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?)
+      @post_query = PostQuery.normalize(tags, current_user: user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?)
       @normalized_query = post_query.with_implicit_metatags
       @tag_string = tags
       @page = page

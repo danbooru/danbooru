@@ -789,34 +789,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "-status:all")
     end
 
-    should "respect the 'Deleted post filter' option when using the status: metatag" do
-      deleted = create(:post, is_deleted: true, is_banned: true)
-      undeleted = create(:post, is_banned: true)
-
-      CurrentUser.hide_deleted_posts = true
-      assert_tag_match([undeleted], "status:banned")
-      assert_tag_match([undeleted], "status:active")
-      assert_tag_match([deleted], "status:deleted")
-      assert_tag_match([undeleted, deleted], "status:any")
-      assert_tag_match([undeleted, deleted], "status:all")
-      assert_tag_match([deleted], "status:banned status:deleted")
-
-      assert_tag_match([], "-status:banned")
-      assert_tag_match([deleted], "-status:active")
-      assert_tag_match([undeleted], "-status:deleted")
-      #assert_tag_match([deleted], "-status:any") # XXX Broken
-      #assert_tag_match([deleted], "-status:all")
-
-      CurrentUser.hide_deleted_posts = false
-      assert_tag_match([undeleted, deleted], "status:banned")
-      assert_tag_match([undeleted], "status:active")
-      assert_tag_match([deleted], "status:deleted")
-      assert_tag_match([undeleted, deleted], "status:any")
-      assert_tag_match([undeleted, deleted], "status:all")
-
-      assert_fast_count(2, "status:banned")
-    end
-
     should "return posts for the filetype:<ext> metatag" do
       png = create(:post, file_ext: "png")
       jpg = create(:post, file_ext: "jpg")
@@ -1444,12 +1416,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       should "return the true count, if not cached" do
         assert_fast_count(1, "aaa score:42")
-      end
-
-      should "work with the hide_deleted_posts option turned on" do
-        create(:post, tag_string: "aaa", score: 42, is_deleted: true)
-        assert_fast_count(1, "aaa score:42", { hide_deleted_posts: true })
-        assert_fast_count(2, "aaa score:42", { hide_deleted_posts: false })
       end
     end
 

@@ -70,22 +70,19 @@ class PostQueryBuilder
     COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
     CATEGORY_COUNT_METATAGS.flat_map { |str| [str, "#{str}_asc"] }
 
-  attr_reader :query_string, :current_user, :tag_limit, :safe_mode, :hide_deleted_posts
+  attr_reader :query_string, :current_user, :tag_limit, :safe_mode
   alias_method :safe_mode?, :safe_mode
-  alias_method :hide_deleted_posts?, :hide_deleted_posts
 
   # Initialize a post query.
   # @param query_string [String] the tag search
   # @param current_user [User] the user performing the search
   # @param tag_limit [Integer] the user's tag limit
   # @param safe_mode [Boolean] whether safe mode is enabled. if true, return only rating:s posts.
-  # @param hide_deleted_posts [Boolean] if true, filter out status:deleted posts.
-  def initialize(query_string, current_user = User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
+  def initialize(query_string, current_user = User.anonymous, tag_limit: nil, safe_mode: false)
     @query_string = query_string
     @current_user = current_user
     @tag_limit = tag_limit
     @safe_mode = safe_mode
-    @hide_deleted_posts = hide_deleted_posts
   end
 
   def metatag_matches(name, value, relation = Post.all, quoted: false)

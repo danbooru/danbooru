@@ -57,7 +57,6 @@ class UserDeletion
     user.last_forum_read_at = nil
     user.favorite_tags = ""
     user.blacklisted_tags = ""
-    user.hide_deleted_posts = false
     user.show_deleted_children = false
     user.time_zone = "Eastern Time (US & Canada)"
     user.save!
