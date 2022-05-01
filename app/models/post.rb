@@ -15,6 +15,7 @@ class Post < ApplicationRecord
   normalize :source, :normalize_source
   before_validation :merge_old_changes
   before_validation :normalize_tags
+  before_validation :apply_pre_metatags
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
@@ -23,7 +24,6 @@ class Post < ApplicationRecord
   validates :source, length: { maximum: 1200 }
   validate :post_is_not_its_own_parent
   validate :uploader_is_not_limited, on: :create
-  before_save :apply_pre_metatags
   before_save :parse_pixiv_id
   before_save :added_tags_are_valid
   before_save :removed_tags_are_valid

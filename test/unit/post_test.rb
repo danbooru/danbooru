@@ -745,6 +745,14 @@ class PostTest < ActiveSupport::TestCase
               assert_equal("q", @post.rating)
             end
           end
+
+          context "when a post is created" do
+            should "set the rating" do
+              @post = create(:post, tag_string: "tagme rating:e", rating: nil)
+
+              assert_equal("e", @post.rating)
+            end
+          end
         end
 
         context "for a fav" do
