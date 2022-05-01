@@ -1005,13 +1005,6 @@ class PostTest < ActiveSupport::TestCase
           assert_equal("aaa ccc", @post.tag_string)
         end
 
-        should "resolve aliases" do
-          FactoryBot.create(:tag_alias, :antecedent_name => "/tr", :consequent_name => "translation_request")
-          @post.update(:tag_string => "aaa translation_request -/tr")
-
-          assert_equal("aaa", @post.tag_string)
-        end
-
         should "resolve aliases before removing negated tags" do
           create(:tag_alias, antecedent_name: "female_focus", consequent_name: "female")
 

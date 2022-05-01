@@ -148,11 +148,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "render for an aliased tag" do
-          create(:tag_alias, antecedent_name: "/lav", consequent_name: "looking_at_viewer")
+          create(:tag_alias, antecedent_name: "lav", consequent_name: "looking_at_viewer")
           as(@user) { create(:wiki_page, title: "looking_at_viewer") }
           @post = create(:post, tag_string: "looking_at_viewer", rating: "s")
 
-          get posts_path, params: { tags: "/lav" }
+          get posts_path, params: { tags: "lav" }
           assert_response :success
           assert_select "#post_#{@post.id}", count: 1
           assert_select "#excerpt .wiki-link[href='/wiki_pages/looking_at_viewer']", count: 1

@@ -26,8 +26,8 @@ class TagRelationship < ApplicationRecord
 
   before_validation :normalize_names
   validates :status, inclusion: { in: STATUSES }
-  validates :antecedent_name, presence: true
-  validates :consequent_name, presence: true
+  validates :antecedent_name, presence: true, tag_name: true, if: :antecedent_name_changed?
+  validates :consequent_name, presence: true, tag_name: true, if: :consequent_name_changed?
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }
   validates :forum_topic, presence: { message: "must exist" }, if: -> { forum_topic_id.present? }
   validate :antecedent_and_consequent_are_different

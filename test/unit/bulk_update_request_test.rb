@@ -151,6 +151,20 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(["Can't create alias aaa -> bbb (bbb is already aliased to ccc)"], @bur.errors.full_messages)
         end
 
+        should "fail if the antecedent name is invalid" do
+          @bur = build(:bulk_update_request, script: "create alias tag_ -> tag")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create alias tag_ -> tag ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+        end
+
+        should "fail if the consequent name is invalid" do
+          @bur = build(:bulk_update_request, script: "create alias tag -> tag_")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create alias tag -> tag_ ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+        end
+
         should "be case-insensitive" do
           @bur = create_bur!("CREATE ALIAS AAA -> BBB", @admin)
 
@@ -220,6 +234,20 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @t1.update!(post_count: 99)
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't create implication white_shirt -> shirt ('white_shirt' must have at least 100 posts)"], @bur.errors.full_messages)
+        end
+
+        should "fail if the antecedent name is invalid" do
+          @bur = build(:bulk_update_request, script: "imply tag_ -> tag")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create implication tag_ -> tag ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+        end
+
+        should "fail if the consequent name is invalid" do
+          @bur = build(:bulk_update_request, script: "imply tag -> tag_")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create implication tag -> tag_ ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
         end
       end
 
@@ -380,6 +408,14 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't rename aaa -> bbb ('aaa' has more than 200 posts, use an alias instead)"], @bur.errors.full_messages)
+        end
+
+        should "fail if the consequent name is invalid" do
+          create(:tag, name: "tag")
+          @bur = build(:bulk_update_request, script: "rename tag -> tag_")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't rename tag -> tag_ ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
         end
 
         context "when moving an artist" do

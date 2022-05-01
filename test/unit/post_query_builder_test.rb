@@ -1276,12 +1276,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "resolve abbreviations to the actual tag" do
       tag1 = create(:tag, name: "hair_ribbon", post_count: 300_000)
       tag2 = create(:tag, name: "hakurei_reimu", post_count: 50_000)
-      ta1 = create(:tag_alias, antecedent_name: "/hr", consequent_name: "hakurei_reimu")
       post1 = create(:post, tag_string: "hair_ribbon")
       post2 = create(:post, tag_string: "hakurei_reimu")
 
-      assert_tag_match([post2], "/hr")
-      assert_tag_match([post1], "-/hr")
+      assert_tag_match([post1], "/hr")
+      assert_tag_match([post2], "-/hr")
     end
 
     should "fail if the search exceeds the tag limit" do

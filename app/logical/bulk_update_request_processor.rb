@@ -112,11 +112,15 @@ class BulkUpdateRequestProcessor
           end
 
         when :rename
-          tag = Tag.find_by_name(args[0])
-          if tag.nil?
+          old_tag = Tag.find_by_name(args[0])
+          new_tag = Tag.find_by_name(args[1]) || Tag.new(name: args[1])
+
+          if old_tag.nil?
             errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)")
-          elsif tag.post_count > MAXIMUM_RENAME_COUNT
+          elsif old_tag.post_count > MAXIMUM_RENAME_COUNT
             errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} ('#{args[0]}' has more than #{MAXIMUM_RENAME_COUNT} posts, use an alias instead)")
+          elsif new_tag.invalid?(:name)
+            errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} (#{new_tag.errors.full_messages.join("; ")})")
           end
 
         when :mass_update

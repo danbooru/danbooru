@@ -80,8 +80,20 @@ en:
       messages:
         record_invalid: "%{errors}"
       models:
+        tag:
+          attributes:
+            name:
+              format: "%{message}"
+        tag_alias:
+          attributes:
+            antecedent_name:
+              format: "%{message}"
+            consequent_name:
+              format: "%{message}"
         tag_implication:
           attributes:
             antecedent_name:
               taken: "Implication already exists"
+              format: "%{message}"
+            consequent_name:
               format: "%{message}"

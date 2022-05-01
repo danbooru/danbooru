@@ -83,11 +83,10 @@ class TagAliasTest < ActiveSupport::TestCase
       create(:tag, name: "hakurei_reimu", post_count: 50_000)
       create(:tag, name: "kirisama_marisa", post_count: 50_000)
       create(:tag, name: "kaname_madoka", post_count: 20_000)
-      create(:tag_alias, antecedent_name: "/hr", consequent_name: "hakurei_reimu")
 
-      assert_equal(["hakurei_reimu"], TagAlias.to_aliased(["/hr"]))
+      assert_equal(["hair_ribbon"], TagAlias.to_aliased(["/hr"]))
       assert_equal(["kirisama_marisa"], TagAlias.to_aliased(["/km"]))
-      assert_equal(["hakurei_reimu", "kirisama_marisa"], TagAlias.to_aliased(["/hr", "/km"]))
+      assert_equal(["hair_ribbon", "kirisama_marisa"], TagAlias.to_aliased(["/hr", "/km"]))
     end
 
     context "saved searches" do
