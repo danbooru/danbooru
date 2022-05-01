@@ -192,14 +192,24 @@ module Sources
       assert_equal("sa-dui", site.artist_name)
     end
 
-    context "generating page urls" do
-      should "work" do
-        assert_equal("https://www.artstation.com/artwork/ghost-in-the-shell-fandom", Source::URL.page_url("https://www.artstation.com/artwork/ghost-in-the-shell-fandom"))
-        assert_equal("https://www.artstation.com/artwork/qPVGP", Source::URL.page_url("https://anubis1982918.artstation.com/projects/qPVGP/"))
-        assert_equal("https://www.artstation.com/artwork/NoNmD", Source::URL.page_url("https://dudeunderscore.artstation.com/projects/NoNmD?album_id=23041"))
-        assert_nil(Source::URL.page_url("http://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236"))
-        assert_nil(Source::URL.page_url("https://www.artstation.com"))
-      end
+    should "Parse ArtStation URLs correctly" do
+      assert_equal("https://www.artstation.com/artwork/ghost-in-the-shell-fandom", Source::URL.page_url("https://www.artstation.com/artwork/ghost-in-the-shell-fandom"))
+      assert_equal("https://www.artstation.com/artwork/qPVGP", Source::URL.page_url("https://anubis1982918.artstation.com/projects/qPVGP/"))
+      assert_equal("https://www.artstation.com/artwork/NoNmD", Source::URL.page_url("https://dudeunderscore.artstation.com/projects/NoNmD?album_id=23041"))
+
+      assert(Source::URL.page_url?("https://www.artstation.com/artwork/ghost-in-the-shell-fandom"))
+      assert(Source::URL.page_url?("https://artstation.com/artwork/04XA4"))
+
+      assert(Source::URL.image_url?("http://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236"))
+      assert(Source::URL.image_url?("https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4"))
+
+      assert(Source::URL.profile_url?("https://www.artstation.com/sa-dui"))
+      assert(Source::URL.profile_url?("https://artstation.com/artist/sa-dui"))
+      assert(Source::URL.profile_url?("https://anubis1982918.artstation.com"))
+
+      refute(Source::URL.profile_url?("https://anubis1982918.artstation.com/projects/qPVGP"))
+      refute(Source::URL.profile_url?("https://www.artstation.com"))
+      refute(Source::URL.profile_url?("https://artstation.com"))
     end
   end
 end

@@ -6,7 +6,7 @@
 # * https://pawoo.net/oauth_authentications/17230064
 
 class Source::URL::Mastodon < Source::URL
-  attr_reader :username, :user_id, :work_id, :full_image_url
+  attr_reader :username, :user_id, :work_id, :full_image_url, :media_hash
 
   def self.match?(url)
     url.domain.in?(%w[pawoo.net baraag.net])
@@ -61,6 +61,7 @@ class Source::URL::Mastodon < Source::URL
     # https://pawoo.net/media/lU2uV7C1MMQSb1czwvg
     in _, "pawoo.net", "media", media_hash
       @media_hash = media_hash
+      @full_image_url = "#{site}/media/#{media_hash}"
 
     else
       nil

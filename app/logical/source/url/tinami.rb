@@ -55,7 +55,7 @@ class Source::URL::Tinami < Source::URL
   end
 
   def image_url?
-    host == "img.tinami.com"
+    host == "img.tinami.com" || path.starts_with?("/view/tweet/card/")
   end
 
   def page_url

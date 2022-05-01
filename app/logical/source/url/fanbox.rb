@@ -48,7 +48,7 @@ class Source::URL::Fanbox < Source::URL
 
     # http://www.pixiv.net/fanbox/member.php?user_id=3410642
     in "www.pixiv.net", "fanbox", "member.php" if params[:user_id].present?
-      @user_id = user_id
+      @user_id = params[:user_id]
 
     # https://omu001.fanbox.cc/posts/39714
     # https://brllbrll.fanbox.cc/posts/626093 (R-18)

@@ -144,16 +144,22 @@ module Sources
       end
     end
 
-    context "generating page urls" do
-      should "convert cover images to the profile url" do
-        cover = "https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg"
-        assert_equal("https://www.pixiv.net/fanbox/creator/1566167", Source::URL.page_url(cover))
-      end
+    should "Parse Fanbox URLs correctly" do
+      assert_equal("https://www.pixiv.net/fanbox/creator/1566167", Source::URL.page_url("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg"))
 
-      should "handle inconvertible urls" do
-        assert_nil(Source::URL.page_url("https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg"))
-        assert_nil(Source::URL.page_url("https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png"))
-      end
+      assert(Source::URL.image_url?("https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg"))
+      assert(Source::URL.image_url?("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg"))
+      assert(Source::URL.image_url?("https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png"))
+
+      assert(Source::URL.page_url?("https://www.fanbox.cc/@tsukiori/posts/1080657"))
+      assert(Source::URL.page_url?("https://www.pixiv.net/fanbox/creator/1566167/post/39714"))
+      assert(Source::URL.page_url?("https://omu001.fanbox.cc/posts/39714"))
+
+      assert(Source::URL.profile_url?("https://www.pixiv.net/fanbox/creator/1566167"))
+      assert(Source::URL.profile_url?("https://www.pixiv.net/fanbox/member.php?user_id=3410642"))
+      assert(Source::URL.profile_url?("https://omu001.fanbox.cc"))
+      refute(Source::URL.profile_url?("https://www.fanbox.cc"))
+      refute(Source::URL.profile_url?("https://fanbox.cc"))
     end
   end
 end

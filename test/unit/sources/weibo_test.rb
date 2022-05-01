@@ -112,20 +112,34 @@ module Sources
       end
     end
 
-    context "generating page urls" do
-      should "work" do
-        source1 = "https://www.weibo.com/3150932560/H4cFbeKKA?from=page_1005053150932560_profile&wvr=6&mod=weibotime"
-        source2 = "https://photo.weibo.com/2125874520/wbphotos/large/mid/4242129997905387/pid/7eb64558ly1friyzhj44lj20dw2qxe81"
-        source3 = "https://m.weibo.cn/status/4173757483008088?luicode=20000061&lfid=4170879204256635"
-        source4 = "https://tw.weibo.com/SEINEN/4098035921690224"
+    should "Parse Weibo URLs correctly" do
+      assert_equal("https://www.weibo.com/3150932560/H4cFbeKKA", Source::URL.page_url("https://www.weibo.com/3150932560/H4cFbeKKA?from=page_1005053150932560_profile&wvr=6&mod=weibotime"))
+      assert_equal("https://m.weibo.cn/detail/4242129997905387", Source::URL.page_url("https://photo.weibo.com/2125874520/wbphotos/large/mid/4242129997905387/pid/7eb64558ly1friyzhj44lj20dw2qxe81"))
+      assert_equal("https://m.weibo.cn/status/4173757483008088", Source::URL.page_url("https://m.weibo.cn/status/4173757483008088?luicode=20000061&lfid=4170879204256635"))
+      assert_equal("https://m.weibo.cn/detail/4098035921690224", Source::URL.page_url("https://tw.weibo.com/SEINEN/4098035921690224"))
 
-        assert_equal("https://www.weibo.com/3150932560/H4cFbeKKA", Source::URL.page_url(source1))
-        assert_equal("https://m.weibo.cn/detail/4242129997905387", Source::URL.page_url(source2))
-        assert_equal("https://m.weibo.cn/status/4173757483008088", Source::URL.page_url(source3))
-        assert_equal("https://m.weibo.cn/detail/4098035921690224", Source::URL.page_url(source4))
-        assert_nil(Source::URL.page_url("https://weibo.com/u/"))
-        assert_nil(Source::URL.page_url("https://www.weibo.com/4ubergine/photos"))
-      end
+      assert(Source::URL.image_url?("http://ww1.sinaimg.cn/large/69917555gw1f6ggdghk28j20c87lbhdt.jpg"))
+      assert(Source::URL.image_url?("http://ww4.sinaimg.cn/mw690/77a2d531gw1f4u411ws3aj20m816fagg.jpg"))
+      assert(Source::URL.image_url?("https://wx4.sinaimg.cn/orj360/e3930166gy1g546bz86cij20u00u040y.jpg"))
+      assert(Source::URL.image_url?("https://wx1.sinaimg.cn/original/7004ec1cly1ge9dcbsw4lj20jg2ir7wh.jpg"))
+
+      assert(Source::URL.page_url?("http://tw.weibo.com/1300957955/3786333853668537"))
+      assert(Source::URL.page_url?("http://photo.weibo.com/2125874520/wbphotos/large/mid/4194742441135220/pid/7eb64558gy1fnbryb5nzoj20dw10419t"))
+      assert(Source::URL.page_url?("http://weibo.com/3357910224/EEHA1AyJP"))
+      assert(Source::URL.page_url?("https://www.weibo.com/5501756072/IF9fugHzj?from=page_1005055501756072_profile&wvr=6&mod=weibotime"))
+      assert(Source::URL.page_url?("https://www.weibo.com/detail/4676597657371957"))
+      assert(Source::URL.page_url?("https://m.weibo.cn/detail/4506950043618873"))
+      assert(Source::URL.page_url?("https://m.weibo.cn/status/J33G4tH1B"))
+
+      assert(Source::URL.profile_url?("https://www.weibo.com/u/5501756072"))
+      assert(Source::URL.profile_url?("https://m.weibo.cn/u/5501756072"))
+      assert(Source::URL.profile_url?("https://m.weibo.cn/profile/5501756072"))
+      assert(Source::URL.profile_url?("https://www.weibo.com/p/1005055399876326"))
+      assert(Source::URL.profile_url?("https://www.weibo.com/5501756072"))
+      assert(Source::URL.profile_url?("https://www.weibo.com/endlessnsmt"))
+      assert(Source::URL.profile_url?("https://www.weibo.com/4ubergine/photos"))
+
+      refute(Source::URL.profile_url?("https://weibo.com/u/"))
     end
   end
 end

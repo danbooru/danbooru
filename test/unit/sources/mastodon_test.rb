@@ -152,5 +152,27 @@ module Sources
         assert_equal([@artist], @site1.artists)
       end
     end
+
+    should "Parse Pawoo URLs correctly" do
+      assert(Source::URL.image_url?("https://img.pawoo.net/media_attachments/files/001/297/997/small/c4272a09570757c2.png"))
+      assert(Source::URL.image_url?("https://pawoo.net/media/lU2uV7C1MMQSb1czwvg"))
+
+      assert(Source::URL.page_url?("https://pawoo.net/@evazion/19451018"))
+      assert(Source::URL.page_url?("https://pawoo.net/web/statuses/19451018"))
+
+      assert(Source::URL.profile_url?("https://pawoo.net/@evazion"))
+      assert(Source::URL.profile_url?("https://pawoo.net/users/esoraneko"))
+      assert(Source::URL.profile_url?("https://pawoo.net/web/accounts/47806"))
+    end
+
+    should "Parse Baraag URLs correctly" do
+      assert(Source::URL.image_url?("https://baraag.net/system/media_attachments/files/107/866/084/749/942/932/original/a9e0f553e332f303.mp4"))
+
+      assert(Source::URL.page_url?("https://baraag.net/@curator/102270656480174153"))
+      assert(Source::URL.page_url?("https://baraag.net/web/statuses/102270656480174153"))
+
+      assert(Source::URL.profile_url?("https://baraag.net/@danbooru"))
+      assert(Source::URL.profile_url?("https://baraag.net/web/accounts/107862785324786980"))
+    end
   end
 end

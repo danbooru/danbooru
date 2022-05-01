@@ -12,7 +12,7 @@ class Source::URL::Tumblr < Source::URL
 
     # https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
     # https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s500x750/4f92bbaaf95c0b4e7970e62b1d2e1415859dd659.png
-    in _, *directories, /s\d+x\d+/ => dimensions, file if asset_url?
+    in _, *directories, /s\d+x\d+/ => dimensions, file if image_url?
       @directory = directories.first
       max_size = Integer.sqrt(Danbooru.config.max_image_resolution)
       @full_image_url = url.to_s.gsub(%r{/s\d+x\d+/\w+\.\w+\z}i, "/s#{max_size}x#{max_size}/#{file}")
@@ -29,7 +29,7 @@ class Source::URL::Tumblr < Source::URL
     # https://media.tumblr.com/0DNBGJovY5j3smfeQs8nB53z_500.jpg
     # https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
     # https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4
-    in _, *directory, file if asset_url?
+    in _, *directory, file if image_url?
       @directory = directory.first
       @filename, @old_variant_size, @extension = file.match(/(\w+?)(?:_(\d+h?|raw))?\.(\w+)\z/).captures
 
@@ -65,7 +65,7 @@ class Source::URL::Tumblr < Source::URL
     # https://rosarrie.tumblr.com/archive
     # https://solisnotte.tumblr.com/about
     # http://whereisnovember.tumblr.com/tagged/art
-    in _, *rest unless asset_url? || subdomain == "www"
+    in _, *rest unless image_url? || subdomain == "www"
       @blog_name = subdomain
 
     else
@@ -73,7 +73,7 @@ class Source::URL::Tumblr < Source::URL
     end
   end
 
-  def asset_url?
+  def image_url?
     host.ends_with?("media.tumblr.com") || host == "data.tumblr.com"
   end
 

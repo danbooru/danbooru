@@ -44,6 +44,10 @@ class Source::URL::Fandom < Source::URL
     end
   end
 
+  def image_url?
+    full_image_url.present?
+  end
+
   def wiki
     WIKI_DB_NAMES.fetch(wiki_db_name, wiki_db_name)
   end

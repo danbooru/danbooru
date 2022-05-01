@@ -157,6 +157,10 @@ module Source
       end
     end
 
+    def image_url?
+      host.in?(%w[lohas.nicoseiga.jp dcdn.cdn.nimg.jp drm.cdn.nicomanga.jp]) || (host == "seiga.nicovideo.jp" && path.starts_with?("/image/"))
+    end
+
     def page_url
       if illust_id.present?
         "https://seiga.nicovideo.jp/seiga/im#{illust_id}"

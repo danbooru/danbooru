@@ -9,7 +9,7 @@
 # * https://foundation.app/collection/kgfgen
 
 class Source::URL::Foundation < Source::URL
-  attr_reader :username, :token_id, :work_id, :hash
+  attr_reader :username, :user_id, :token_id, :work_id, :hash
 
   IMAGE_HOSTS = %w[assets.foundation.app f8n-ipfs-production.imgix.net f8n-production-collection-assets.imgix.net d2ybmb80bbm9ts.cloudfront.net]
 
@@ -67,6 +67,10 @@ class Source::URL::Foundation < Source::URL
     else
       nil
     end
+  end
+
+  def image_url?
+    host.in?(IMAGE_HOSTS)
   end
 
   def profile_url

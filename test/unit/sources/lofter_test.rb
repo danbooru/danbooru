@@ -68,5 +68,17 @@ module Sources
         assert_nothing_raised { source.to_h }
       end
     end
+
+    should "Parse Lofter URLs correctly" do
+      assert(Source::URL.image_url?("https://imglf3.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJSzFCWFlnUWgzb01DcUdpT1lreG5yQjJVMkhGS09HNGR3PT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0"))
+      assert(Source::URL.image_url?("http://imglf0.nosdn.127.net/img/cHl3bXNZdDRaaHBnNWJuN1Y4OXBqR01CeVBZSVNmU2FWZWtHc1h4ZTZiUGxlRzMwZnFDM1JnPT0.jpg "))
+
+      assert(Source::URL.page_url?("https://gengar563.lofter.com/post/1e82da8c_1c98dae1b"))
+
+      assert(Source::URL.profile_url?("https://www.lofter.com/front/blog/home-page/noshiqian"))
+      assert(Source::URL.profile_url?("http://www.lofter.com/app/xiaokonggedmx"))
+      assert(Source::URL.profile_url?("http://www.lofter.com/blog/semblance"))
+      assert(Source::URL.profile_url?("http://gengar563.lofter.com"))
+    end
   end
 end

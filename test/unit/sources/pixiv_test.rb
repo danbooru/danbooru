@@ -347,20 +347,38 @@ module Sources
       end
     end
 
-    context "generating page urls" do
-      should "work" do
-        source1 = "http://i2.pixiv.net/img12/img/zenze/39749565.png"
-        source2 = "http://i1.pixiv.net/img53/img/themare/39735353_big_p1.jpg"
-        source3 = "http://i1.pixiv.net/c/150x150/img-master/img/2010/11/30/08/39/58/14901720_p0_master1200.jpg"
-        source4 = "http://i1.pixiv.net/img-original/img/2010/11/30/08/39/58/14901720_p0.png"
-        source5 = "http://i2.pixiv.net/img-zip-ugoira/img/2014/08/05/06/01/10/44524589_ugoira1920x1080.zip"
+    should "Parse Pixiv URLs correctly" do
+      assert_equal("https://www.pixiv.net/artworks/39749565", Source::URL.page_url("http://i2.pixiv.net/img12/img/zenze/39749565.png"))
+      assert_equal("https://www.pixiv.net/artworks/39735353", Source::URL.page_url("http://i1.pixiv.net/img53/img/themare/39735353_big_p1.jpg"))
+      assert_equal("https://www.pixiv.net/artworks/14901720", Source::URL.page_url("http://i1.pixiv.net/c/150x150/img-master/img/2010/11/30/08/39/58/14901720_p0_master1200.jpg"))
+      assert_equal("https://www.pixiv.net/artworks/14901720", Source::URL.page_url("http://i1.pixiv.net/img-original/img/2010/11/30/08/39/58/14901720_p0.png"))
+      assert_equal("https://www.pixiv.net/artworks/44524589", Source::URL.page_url("http://i2.pixiv.net/img-zip-ugoira/img/2014/08/05/06/01/10/44524589_ugoira1920x1080.zip"))
 
-        assert_equal("https://www.pixiv.net/artworks/39749565", Source::URL.page_url(source1))
-        assert_equal("https://www.pixiv.net/artworks/39735353", Source::URL.page_url(source2))
-        assert_equal("https://www.pixiv.net/artworks/14901720", Source::URL.page_url(source3))
-        assert_equal("https://www.pixiv.net/artworks/14901720", Source::URL.page_url(source4))
-        assert_equal("https://www.pixiv.net/artworks/44524589", Source::URL.page_url(source5))
-      end
+      assert(Source::URL.image_url?("https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png"))
+      assert(Source::URL.image_url?("https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg"))
+      assert(Source::URL.image_url?("https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip"))
+      assert(Source::URL.image_url?("https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg"))
+      assert(Source::URL.image_url?("https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png"))
+      assert(Source::URL.image_url?("http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg"))
+      assert(Source::URL.image_url?("https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png"))
+      assert(Source::URL.image_url?("http://img18.pixiv.net/img/evazion/14901720.png"))
+      assert(Source::URL.image_url?("http://i2.pixiv.net/img18/img/evazion/14901720.png"))
+
+      assert(Source::URL.page_url?("https://www.pixiv.net/en/artworks/46324488"))
+      assert(Source::URL.page_url?("https://www.pixiv.net/artworks/46324488"))
+      assert(Source::URL.page_url?("http://www.pixiv.net/i/18557054"))
+      assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054"))
+      assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054"))
+      assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054"))
+      assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1"))
+
+      assert(Source::URL.profile_url?("https://www.pixiv.net/member.php?id=339253"))
+      assert(Source::URL.profile_url?("https://www.pixiv.net/u/9202877"))
+      assert(Source::URL.profile_url?("https://www.pixiv.net/users/9202877"))
+      assert(Source::URL.profile_url?("https://www.pixiv.net/en/users/9202877"))
+      assert(Source::URL.profile_url?("https://www.pixiv.net/stacc/noizave"))
+      assert(Source::URL.profile_url?("http://www.pixiv.me/noizave"))
+      assert(Source::URL.profile_url?("https://pixiv.cc/zerousagi/"))
     end
   end
 end

@@ -96,5 +96,19 @@ module Sources
         assert_nothing_raised { @source.to_h }
       end
     end
+
+    should "Parse HentaiFoundry URLs correctly" do
+      assert(Source::URL.image_url?("https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png"))
+      assert(Source::URL.image_url?("http://pictures.hentai-foundry.com//s/soranamae/363663.jpg"))
+      assert(Source::URL.image_url?("http://www.hentai-foundry.com/piccies/d/dmitrys/1183.jpg"))
+      assert(Source::URL.image_url?("https://thumbs.hentai-foundry.com/thumb.php?pid=795025&size=350"))
+
+      assert(Source::URL.page_url?("https://www.hentai-foundry.com/pictures/user/Afrobull/795025"))
+      assert(Source::URL.page_url?("http://www.hentai-foundry.com/pic-795025"))
+
+      assert(Source::URL.profile_url?("https://www.hentai-foundry.com/user/kajinman"))
+      assert(Source::URL.profile_url?("https://www.hentai-foundry.com/pictures/user/kajinman"))
+      assert(Source::URL.profile_url?("http://www.hentai-foundry.com/profile-sawao.php"))
+    end
   end
 end

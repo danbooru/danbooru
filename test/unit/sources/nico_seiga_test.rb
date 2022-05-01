@@ -184,19 +184,38 @@ module Sources
       end
     end
 
-    context "generating page urls" do
-      should "work" do
-        source1 = "http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf"
-        source2 = "http://lohas.nicoseiga.jp/priv/b80f86c0d8591b217e7513a9e175e94e00f3c7a1/1384936074/3583893"
-        source3 = "http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663"
-        source4 = "http://seiga.nicovideo.jp/image/source?id=3312222"
+    should "Parse NicoSeiga URLs correctly" do
+      assert_equal("https://seiga.nicovideo.jp/seiga/im4937663", Source::URL.page_url("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663"))
 
-        assert_nil(Source::URL.page_url(source1))
-        assert_nil(Source::URL.page_url(source2))
-        assert_equal("https://seiga.nicovideo.jp/seiga/im4937663", Source::URL.page_url(source3))
-        assert_nil(Source::URL.page_url(source4))
-        assert_nil(Source::URL.page_url("https://seiga.nicovideo.jp"))
-      end
+      assert(Source::URL.image_url?("http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf"))
+      assert(Source::URL.image_url?("http://lohas.nicoseiga.jp/priv/b80f86c0d8591b217e7513a9e175e94e00f3c7a1/1384936074/3583893"))
+      assert(Source::URL.image_url?("https://lohas.nicoseiga.jp/o/971eb8af9bbcde5c2e51d5ef3a2f62d6d9ff5552/1589933964/3583893"))
+      assert(Source::URL.image_url?("http://seiga.nicovideo.jp/image/source?id=3312222"))
+      assert(Source::URL.image_url?("https://seiga.nicovideo.jp/image/source/3521156"))
+      assert(Source::URL.image_url?("https://seiga.nicovideo.jp/image/redirect?id=3583893"))
+      assert(Source::URL.image_url?("https://lohas.nicoseiga.jp/thumb/2163478i"))
+      assert(Source::URL.image_url?("https://lohas.nicoseiga.jp/thumb/4744553p"))
+      assert(Source::URL.image_url?("https://dcdn.cdn.nimg.jp/priv/62a56a7f67d3d3746ae5712db9cac7d465f4a339/1592186183/10466669"))
+      assert(Source::URL.image_url?("https://drm.cdn.nicomanga.jp/image/d4a2faa68ec34f95497db6601a4323fde2ccd451_9537/8017978p?1570012695"))
+
+      assert(Source::URL.page_url?("https://seiga.nicovideo.jp/seiga/im520647"))
+      assert(Source::URL.page_url?("https://sp.seiga.nicovideo.jp/seiga/im3521156"))
+      assert(Source::URL.page_url?("https://seiga.nicovideo.jp/watch/mg316708"))
+      assert(Source::URL.page_url?("https://nico.ms/im10922621"))
+      assert(Source::URL.page_url?("https://nico.ms/mg310193"))
+
+      assert(Source::URL.profile_url?("https://seiga.nicovideo.jp/user/illust/456831"))
+      assert(Source::URL.profile_url?("https://ext.seiga.nicovideo.jp/user/illust/20542122"))
+      assert(Source::URL.profile_url?("http://seiga.nicovideo.jp/manga/list?user_id=23839737"))
+      assert(Source::URL.profile_url?("https://www.nicovideo.jp/user/4572975"))
+      assert(Source::URL.profile_url?("https://commons.nicovideo.jp/user/696839"))
+      assert(Source::URL.profile_url?("https://q.nicovideo.jp/users/18700356"))
+      assert(Source::URL.profile_url?("https://dic.nicovideo.jp/u/11141663"))
+      assert(Source::URL.profile_url?("https://3d.nicovideo.jp/users/109584"))
+      assert(Source::URL.profile_url?("https://3d.nicovideo.jp/u/siobi"))
+      assert(Source::URL.profile_url?("http://game.nicovideo.jp/atsumaru/users/7757217"))
+
+      refute(Source::URL.profile_url?("https://seiga.nicovideo.jp"))
     end
 
     context "downloading a 'http://seiga.nicovideo.jp/seiga/:id' url" do

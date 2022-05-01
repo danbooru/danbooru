@@ -130,6 +130,14 @@ module Sources
         assert_equal(%w[制作過程 このすば この素晴らしい世界に祝福を セナ バニー 3月3日 巨乳 黒髪巨乳 タイツ], source.tags.map(&:first))
         assert_nothing_raised { source.to_h }
       end
+
+      should "Parse Pixiv Sketch URLs correctly" do
+        assert(Source::URL.image_url?("https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg "))
+        assert(Source::URL.image_url?("https://img-sketch.pximg.net/c!/w=540,f=webp:jpeg/uploads/medium/file/4463372/8906921629213362989.jpg"))
+        assert(Source::URL.image_url?("https://img-sketch.pixiv.net/c/f_540/uploads/medium/file/9986983/8431631593768139653.jpg"))
+        assert(Source::URL.page_url?("https://sketch.pixiv.net/items/5835314698645024323"))
+        assert(Source::URL.profile_url?("https://sketch.pixiv.net/@user_ejkv8372"))
+      end
     end
   end
 end

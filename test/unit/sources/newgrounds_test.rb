@@ -122,11 +122,18 @@ module Sources
       end
     end
 
-    context "generating page urls" do
-      should "work" do
-        assert_equal("https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic", Source::URL.page_url("https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181"))
-        assert_nil(Source::URL.page_url("https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg"))
-      end
+    should "Parse Newgrounds URLs correctly" do
+      assert_equal("https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic", Source::URL.page_url("https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181"))
+
+      assert(Source::URL.image_url?("https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg"))
+      assert(Source::URL.image_url?("https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg"))
+      assert(Source::URL.image_url?("https://art.ngfiles.com/thumbnails/1254000/1254985.png?f1588263349"))
+
+      assert(Source::URL.page_url?("https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat"))
+
+      assert(Source::URL.profile_url?("https://natthelich.newgrounds.com"))
+      refute(Source::URL.profile_url?("https://www.newgrounds.com"))
+      refute(Source::URL.profile_url?("https://newgrounds.com"))
     end
   end
 end

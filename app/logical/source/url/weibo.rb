@@ -9,6 +9,8 @@
 # http://blog.sina.com.cn/u/1299088063
 
 class Source::URL::Weibo < Source::URL
+  RESERVED_USERNAMES = %w[u p profile status detail]
+
   attr_reader :full_image_url, :artist_short_id, :artist_long_id, :username
 
   def self.match?(url)
@@ -75,7 +77,7 @@ class Source::URL::Weibo < Source::URL
     # https://www.weibo.com/endlessnsmt (short id: https://www.weibo.com/u/1879370780)
     # https://www.weibo.cn/endlessnsmt
     # https://www.weibo.com/lvxiuzi0/home
-    in _, /^\w+$/ => artist_short_id, *rest
+    in _, /^\w+$/ => username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username
 
     else

@@ -41,5 +41,14 @@ module Sources
     context "A deleted or non-existing furaffinity post" do
       strategy_should_work("https://www.furaffinity.net/view/3404111", deleted: true, profile_url: nil)
     end
+
+    should "Parse Furaffinity URLs correctly" do
+      assert(Source::URL.image_url?("https://d.furaffinity.net/art/iwbitu/1650222955/1650222955.iwbitu_yubi.jpg"))
+      assert(Source::URL.page_url?("https://www.furaffinity.net/view/46821705/"))
+      assert(Source::URL.page_url?("https://www.furaffinity.net/full/46821705/"))
+      assert(Source::URL.profile_url?("https://www.furaffinity.net/user/iwbitu"))
+      assert(Source::URL.profile_url?("https://www.furaffinity.net/gallery/iwbitu"))
+      assert(Source::URL.profile_url?("https://www.furaffinity.net/gallery/iwbitu/folder/133763/Regular-commissions"))
+    end
   end
 end

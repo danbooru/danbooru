@@ -47,5 +47,12 @@ module Sources
     context "A deleted or non-existing anifty post" do
       strategy_should_work("https://anifty.jp/zh/creations/373123123", deleted: true, profile_url: nil)
     end
+
+    should "Parse Anifty URLs correctly" do
+      assert(Source::URL.image_url?("https://anifty.imgix.net/creation/0x961d09077b4a9f7a27f6b7ee78cb4c26f0e72c18/20d5ce5b5163a71258e1d0ee152a0347bf40c7da.png?w=660&h=660&fit=crop&crop=focalpoint&fp-x=0.76&fp-y=0.5&fp-z=1&auto=compress"))
+      assert(Source::URL.image_url?("https://storage.googleapis.com/anifty-media/creation/0x961d09077b4a9f7a27f6b7ee78cb4c26f0e72c18/20d5ce5b5163a71258e1d0ee152a0347bf40c7da.png"))
+      assert(Source::URL.page_url?("https://anifty.jp/creations/373"))
+      assert(Source::URL.profile_url?("https://anifty.jp/@hightree"))
+    end
   end
 end

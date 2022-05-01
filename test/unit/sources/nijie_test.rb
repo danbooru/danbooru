@@ -314,31 +314,33 @@ module Sources
       end
     end
 
-    context "generating page urls" do
-      should "work" do
-        source1 = "https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png"
-        source2 = "https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png"
 
-        assert_equal("https://nijie.info/view.php?id=218856", Source::URL.page_url(source1))
-        assert_equal("https://nijie.info/view.php?id=287736", Source::URL.page_url(source2))
-      end
+    should "Parse Nijie URLs correctly" do
+      assert_equal("https://nijie.info/view.php?id=218856", Source::URL.page_url("https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png"))
+      assert_equal("https://nijie.info/view.php?id=287736", Source::URL.page_url("https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png"))
 
-      should "handle inconvertible urls" do
-        bad_source1 = "https://pic01.nijie.info/nijie_picture/20120211210359.jpg"
-        bad_source2 = "https://pic04.nijie.info/omata/4829_20161128012012.png"
-        bad_source3 = "https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg"
+      assert(Source::URL.image_url?("https://pic04.nijie.info/omata/4829_20161128012012.png"))
+      assert(Source::URL.image_url?("https://pic01.nijie.info/nijie_picture/20120211210359.jpg"))
+      assert(Source::URL.image_url?("https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg"))
+      assert(Source::URL.image_url?("https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png "))
+      assert(Source::URL.image_url?("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"))
+      assert(Source::URL.image_url?("https://pic.nijie.net/06/nijie/17/14/236014/illust/218856_1_7646cf57f6f1c695_f2ed81.png"))
+      assert(Source::URL.image_url?("https://pic.nijie.net/03/nijie_picture/236014_20170620101426_0.png "))
+      assert(Source::URL.image_url?("https://pic.nijie.net/01/nijie_picture/diff/main/196201_20150201033106_0.jpg"))
 
-        assert_nil(Source::URL.page_url(bad_source1))
-        assert_nil(Source::URL.page_url(bad_source2))
-        assert_nil(Source::URL.page_url(bad_source3))
-      end
+      assert(Source::URL.page_url?("https://nijie.info/view.php?id=218856"))
+      assert(Source::URL.page_url?("https://nijie.info/view_popup.php?id=218856"))
+      assert(Source::URL.page_url?("https://www.nijie.info/view.php?id=218856"))
+      assert(Source::URL.page_url?("https://sp.nijie.info/view.php?id=218856"))
+
+      assert(Source::URL.profile_url?("https://nijie.info/members.php?id=236014"))
+      assert(Source::URL.profile_url?("https://nijie.info/members_illust.php?id=236014"))
     end
 
     context "an unsupported image url" do
       should "not break the bookmarklet" do
         image_url = "https://pic.nijie.net/01/nijie_picture/diff/main/201207181053373205_0.jpg"
-        ref = "https://nijie.info/view_popup.php?id=18858&#diff_1"
-        source = Source::Extractor.find(image_url, ref)
+        source = Source::Extractor.find(image_url, "https://nijie.info/view_popup.php?id=18858&#diff_1")
 
         assert_equal([image_url], source.image_urls)
       end

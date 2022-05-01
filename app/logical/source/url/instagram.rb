@@ -9,7 +9,7 @@ class Source::URL::Instagram < Source::URL
   attr_reader :username, :work_id
 
   def self.match?(url)
-    url.domain.in?(%w[instagram.com])
+    url.domain.in?(%w[instagram.com cdninstagram.com]) || (url.domain == "fbcdn.net" && url.subdomain.include?("instagram"))
   end
 
   def parse
@@ -33,6 +33,10 @@ class Source::URL::Instagram < Source::URL
     else
       nil
     end
+  end
+
+  def image_url?
+    domain.in?(%w[cdninstagram.com fbcdn.net])
   end
 
   def page_url

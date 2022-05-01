@@ -48,10 +48,6 @@ class Source::URL::Twitter < Source::URL
       @username = username
       @status_id = status_id
 
-    # https://twitter.com/motty08111213
-    in "twitter.com", username, *rest
-      @username = username unless username.in?(RESERVED_USERNAMES)
-
     # https://twitter.com/intent/user?user_id=1485229827984531457
     in "twitter.com", "intent", "user" if params[:user_id].present?
       @user_id = params[:user_id]
@@ -84,6 +80,12 @@ class Source::URL::Twitter < Source::URL
       # /media/EBGbJe_U8AA4Ekb.jpg
       # /ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
       @file_path = File.join(media_type, subdirs.join("/"), "#{@file}.#{@file_ext}")
+
+    # https://twitter.com/motty08111213
+    # https://twitter.com/motty08111213/likes
+    in "twitter.com", username, *rest unless username.in?(RESERVED_USERNAMES)
+      @username = username
+
     else
       nil
     end

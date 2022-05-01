@@ -67,7 +67,7 @@ module Source
     end
 
     def image_url?
-      url.host.in?(["booth.pximg.net", "s2.booth.pm"])
+      host.in?(%w[booth.pximg.net s.booth.pm s2.booth.pm])
     end
 
     def full_image_url?

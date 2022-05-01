@@ -106,6 +106,19 @@ module Sources
           assert_equal("", source.artist_commentary_desc)
         end
       end
+
+      should "Parse Tinami URLs correctly" do
+        assert(Source::URL.image_url?("https://img.tinami.com/illust/img/287/497c8a9dc60e6.jpg"))
+        assert(Source::URL.image_url?("https://img.tinami.com/comic/naomao/naomao_001_01.jpg"))
+        assert(Source::URL.image_url?("https://www.tinami.com/view/tweet/card/461459"))
+
+        assert(Source::URL.page_url?("https://www.tinami.com/view/461459"))
+
+        assert(Source::URL.profile_url?("http://www.tinami.com/creator/profile/1624"))
+        assert(Source::URL.profile_url?("https://www.tinami.com/search/list?prof_id=1624"))
+
+        refute(Source::URL.profile_url?("http://www.tinami.com/profile/1182"))
+      end
     end
   end
 end

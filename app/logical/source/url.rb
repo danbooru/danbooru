@@ -87,6 +87,43 @@ module Source
       self.class.name.demodulize.titleize
     end
 
+    # True if the URL is a direct image URL.
+    #
+    # Examples:
+    #
+    # * https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
+    # * https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg
+    # * https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
+    #
+    # @return [Boolean]
+    def image_url?
+      file_ext.in?(%w[jpg jpeg png gif webp webm mp4 swf])
+    end
+
+    # True if the URL is a work page URL.
+    #
+    # Examples:
+    #
+    # * https://www.pixiv.net/artworks/46324488
+    # * https://twitter.com/motty08111213/status/943446161586733056
+    #
+    # @return [Boolean]
+    def page_url?
+      page_url.present? && !image_url?
+    end
+
+    # True if the URL is a profile page URL.
+    #
+    # Examples:
+    #
+    # * https://www.pixiv.net/users/9948
+    # * https://twitter.com/intent/user?user_id=889592953
+    #
+    # @return [Boolean]
+    def profile_url?
+      profile_url.present? && !page_url? && !image_url?
+    end
+
     # Convert an image URL to the URL of the page containing the image, or
     # return nil if it's not possible to convert the current URL to a page URL.
     #
@@ -131,6 +168,18 @@ module Source
     # @return [String, nil]
     def profile_url
       nil
+    end
+
+    def self.image_url?(url)
+      Source::URL.parse(url)&.image_url?
+    end
+
+    def self.page_url?(url)
+      Source::URL.parse(url)&.page_url?
+    end
+
+    def self.profile_url?(url)
+      Source::URL.parse(url)&.profile_url?
     end
 
     def self.page_url(url)

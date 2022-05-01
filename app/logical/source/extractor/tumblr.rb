@@ -12,7 +12,7 @@ class Source::Extractor
     end
 
     def image_urls
-      return [find_largest(parsed_url)].compact if parsed_url.asset_url?
+      return [find_largest(parsed_url)].compact if parsed_url.image_url?
 
       assets = []
 

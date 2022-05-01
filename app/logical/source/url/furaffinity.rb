@@ -12,7 +12,8 @@ class Source::URL::Furaffinity < Source::URL
 
     # https://www.furaffinity.net/view/46821705/
     # https://www.furaffinity.net/view/46802202/ (scrap)
-    in _, "view", /^\d+$/ => work_id
+    # https://www.furaffinity.net/full/46821705/
+    in _, ("view" | "full"), /^\d+$/ => work_id
       @work_id = work_id
 
     # https://d.furaffinity.net/art/iwbitu/1650222955/1650222955.iwbitu_yubi.jpg

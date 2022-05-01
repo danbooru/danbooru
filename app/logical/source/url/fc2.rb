@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Fc2 < Source::URL
-  attr_reader :username, :profile_url, :page_url
+  attr_reader :username, :profile_url, :page_url, :file
 
   def self.match?(url)
     url.domain.in?(%w[fc2.com fc2blog.net fc2blog.us])
@@ -40,6 +40,7 @@ class Source::URL::Fc2 < Source::URL
     # http://blog23.fc2.com/m/mosha2/file/uru.jpg
     # http://blog.fc2.com/g/genshi/file/20070612a.jpg
     in /^blog\d*$/, "fc2", "com", /^\w$/, username, "file", file
+      @file = file
       @username = username
       @profile_url = "http://#{username}.blog.fc2.com"
 
@@ -47,6 +48,7 @@ class Source::URL::Fc2 < Source::URL
     # http://blog-imgs-61.fc2.com/o/m/o/omochi6262/20130402080220583.jpg
     # http://blog.fc2.com/g/b/o/gbot/20071023195141.jpg
     in (/^blog-imgs-\d+(-origin)?$/ | "blog"), "fc2", "com", /^\w$/, /^\w$/, /^\w$/, username, file
+      @file = file
       @username = username
       @page_url = "http://#{username}.blog.fc2.com/img/#{file}"
       @profile_url = "http://#{username}.blog.fc2.com"
@@ -55,6 +57,7 @@ class Source::URL::Fc2 < Source::URL
     # http://diary1.fc2.com/user/kou_48/img/2006_8/14.jpg
     # http://diary.fc2.com/user/kazuharoom/img/2015_5/22.jpg
     in /diary\d*$/, "fc2", "com", "user", username, "img", date, file
+      @file = file
       @username = username
       @year, @month = date.split("_")
       @day = filename

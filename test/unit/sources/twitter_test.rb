@@ -289,19 +289,26 @@ module Sources
       end
     end
 
-    context "generating page urls" do
-      should "work" do
-        source1 = "https://twitter.com/i/web/status/1261877313349640194"
-        source2 = "https://twitter.com/BOW999/status/1261877313349640194"
-        source3 = "https://twitter.com/BOW999/status/1261877313349640194/photo/1"
-        source4 = "https://twitter.com/BOW999/status/1261877313349640194?s=19"
+    should "Parse Twitter URLs correctly" do
+      assert(Source::URL.image_url?("https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg"))
+      assert(Source::URL.image_url?("https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:small"))
+      assert(Source::URL.image_url?("https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=900x900"))
+      assert(Source::URL.image_url?("https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg"))
+      assert(Source::URL.image_url?("https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg"))
+      assert(Source::URL.image_url?("https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg"))
 
-        assert_equal(source1, Source::URL.page_url(source1))
-        assert_equal(source2, Source::URL.page_url(source2))
-        assert_equal(source2, Source::URL.page_url(source3))
-        assert_equal(source2, Source::URL.page_url(source4))
-        assert_nil(Source::URL.page_url("https://www.twitter.com/irt_5433"))
-      end
+      assert(Source::URL.page_url?("https://twitter.com/i/web/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194/photo/1"))
+      assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194?s=19"))
+
+      assert(Source::URL.profile_url?("https://www.twitter.com/irt_5433"))
+      assert(Source::URL.profile_url?("https://www.twitter.com/irt_5433/likes"))
+      assert(Source::URL.profile_url?("https://twitter.com/intent/user?user_id=1485229827984531457"))
+      assert(Source::URL.profile_url?("https://twitter.com/intent/user?screen_name=ryuudog_NFT"))
+      assert(Source::URL.profile_url?("https://twitter.com/i/user/889592953"))
+
+      refute(Source::URL.profile_url?("https://twitter.com/home"))
     end
   end
 end

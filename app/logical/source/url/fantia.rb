@@ -70,7 +70,7 @@ class Source::URL::Fantia < Source::URL
   end
 
   def image_url?
-    @full_image_url.present?
+    @full_image_url.present? || downloadable?
   end
 
   def downloadable?

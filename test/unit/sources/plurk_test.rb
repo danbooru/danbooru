@@ -102,5 +102,19 @@ module Sources
         assert_equal([@adult_artist], @post4.artists)
       end
     end
+
+    should "Parse Plurk URLs correctly" do
+      assert(Source::URL.image_url?("https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg"))
+      assert(Source::URL.image_url?("https://images.plurk.com/mx_5wj6WD0r6y4rLN0DL3sqag.jpg"))
+
+      assert(Source::URL.page_url?("https://www.plurk.com/p/om6zv4"))
+      assert(Source::URL.page_url?("https://www.plurk.com/m/p/okxzae"))
+
+      assert(Source::URL.profile_url?("https://www.plurk.com/m/redeyehare"))
+      assert(Source::URL.profile_url?("https://www.plurk.com/u/ddks2923"))
+      assert(Source::URL.profile_url?("https://www.plurk.com/m/u/leiy1225"))
+      assert(Source::URL.profile_url?("https://www.plurk.com/s/u/salmonroe13"))
+      assert(Source::URL.profile_url?("https://www.plurk.com/redeyehare"))
+    end
   end
 end

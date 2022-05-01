@@ -65,7 +65,7 @@ class Source::URL::ArtStation < Source::URL
   end
 
   def image_url?
-    subdomain.starts_with?("cdn")
+    subdomain.to_s.starts_with?("cdn")
   end
 
   def full_image_url(size = "original")

@@ -11,14 +11,14 @@ class Source::Extractor
     end
 
     def image_urls
-      return [parsed_url.full_image_url] if parsed_url.image_url?
+      return [parsed_url.full_image_url] if parsed_url.full_image_url.present?
       return [image_from_downloadable(parsed_url)] if parsed_url.downloadable?
 
       images = images_for_post.presence || images_for_product.presence || []
 
       full_images = images.compact.map do |image|
         parsed = Source::URL.parse(image)
-        if parsed&.image_url?
+        if parsed&.full_image_url.present?
           parsed.full_image_url
         elsif parsed&.downloadable?
           image_from_downloadable(parsed)

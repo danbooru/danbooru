@@ -87,6 +87,10 @@ class Source::URL::Moebooru < Source::URL
     end
   end
 
+  def image_url?
+    md5.present?
+  end
+
   def page_url
     if work_id.present?
       "https://#{domain}/post/show/#{work_id}"

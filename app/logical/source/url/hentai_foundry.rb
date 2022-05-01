@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::HentaiFoundry < Source::URL
-  attr_reader :username, :work_id
+  attr_reader :username, :work_id, :file
 
   def self.match?(url)
     url.domain == "hentai-foundry.com"
@@ -12,17 +12,20 @@ class Source::URL::HentaiFoundry < Source::URL
 
     # https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png
     # https://pictures.hentai-foundry.com/_/-MadKaiser-/532792/-MadKaiser--532792-FFXIV_Miqote.png
-    in "pictures.hentai-foundry.com", _, username, /^\d+$/ => work_id, slug
+    in "pictures.hentai-foundry.com", _, username, /^\d+$/ => work_id, file
+      @file = file
       @username = username
       @work_id = work_id
 
     # http://pictures.hentai-foundry.com//s/soranamae/363663.jpg
-    in "pictures.hentai-foundry.com", _, username, /^(\d+)\.\w+$/
+    in "pictures.hentai-foundry.com", _, username, /^(\d+)\.\w+$/ => file
+      @file = file
       @username = username
       @work_id = $1
 
     # http://www.hentai-foundry.com/piccies/d/dmitrys/1183.jpg
-    in "www.hentai-foundry.com", "piccies", _, username, /^(\d+)\.\w+$/
+    in "www.hentai-foundry.com", "piccies", _, username, /^(\d+)\.\w+$/ => file
+      @file = file
       @username = username
       @work_id = $1
 
@@ -62,6 +65,10 @@ class Source::URL::HentaiFoundry < Source::URL
     else
       nil
     end
+  end
+
+  def image_url?
+    file.present? || host == "thumbs.hentai-foundry.com"
   end
 
   def page_url
