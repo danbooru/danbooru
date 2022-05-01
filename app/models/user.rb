@@ -65,6 +65,7 @@ class User < ApplicationRecord
     no_feedback
     requires_verification
     is_verified
+    show_deleted_posts
   ]
 
   DEFAULT_BLACKLIST = ["guro", "scat", "furry -rating:s"].join("\n")
