@@ -3,6 +3,8 @@
 class PasswordResetsController < ApplicationController
   respond_to :html, :xml, :json
 
+  rate_limit :create, rate: 1.0/1.hour, burst: 3
+
   def create
     @user = User.find_by_name(params.dig(:user, :name))
 
