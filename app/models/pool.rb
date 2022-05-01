@@ -129,7 +129,7 @@ class Pool < ApplicationRecord
   end
 
   def normalize_post_ids
-    self.post_ids = post_ids.uniq if is_collection?
+    self.post_ids = post_ids.uniq
   end
 
   def revert_to!(version)

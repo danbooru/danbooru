@@ -233,8 +233,11 @@ class PoolTest < ActiveSupport::TestCase
       assert_equal("A_B", @pool.name)
     end
 
-    should "normalize its post ids" do
+    should "not allow duplicate posts" do
       @pool.update(category: "collection", post_ids: [1, 2, 2, 3, 1])
+      assert_equal([1, 2, 3], @pool.post_ids)
+
+      @pool.update(category: "series", post_ids: [1, 2, 2, 3, 1])
       assert_equal([1, 2, 3], @pool.post_ids)
     end
 
