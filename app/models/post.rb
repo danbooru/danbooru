@@ -546,6 +546,11 @@ class Post < ApplicationRecord
 
         end
       end
+    rescue
+      # XXX Silently ignore errors so that the edit doesn't fail. We can't let
+      # the edit fail because then it will create a new post version even if
+      # the edit didn't go through.
+      nil
     end
 
     def apply_pre_metatags
@@ -709,6 +714,11 @@ class Post < ApplicationRecord
 
       parent.update_has_children_flag if parent.present?
       Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
+    rescue
+      # XXX Silently ignore errors so that the edit doesn't fail. We can't let
+      # the edit fail because then it will create a new post version even if
+      # the edit didn't go through.
+      nil
     end
 
     def give_favorites_to_parent
@@ -790,6 +800,9 @@ class Post < ApplicationRecord
   end
 
   concerning :VersionMethods do
+    # XXX `create_version` must be called before `apply_post_metatags` because
+    # `apply_post_metatags` may update the post itself, which will clear all
+    # changes to the post and make saved_change_to_*? return false.
     def create_version(force = false)
       if new_record? || saved_change_to_watched_attributes? || force
         create_new_version

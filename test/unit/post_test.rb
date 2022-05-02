@@ -769,21 +769,21 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not allow banned users to fav" do
-            assert_raises(User::PrivilegeError) do
+            assert_no_difference("@post.favorites.count") do
               as(create(:banned_user)) { @post.update(tag_string: "aaa fav:self") }
             end
 
-            assert_raises(User::PrivilegeError) do
+            assert_no_difference("@post.favorites.count") do
               as(create(:banned_user)) { @post.update(tag_string: "aaa -fav:self") }
             end
           end
 
           should "not allow restricted users to fav" do
-            assert_raises(User::PrivilegeError) do
+            assert_no_difference("@post.favorites.count") do
               as(create(:restricted_user)) { @post.update(tag_string: "aaa fav:self") }
             end
 
-            assert_raises(User::PrivilegeError) do
+            assert_no_difference("@post.favorites.count") do
               as(create(:restricted_user)) { @post.update(tag_string: "aaa -fav:self") }
             end
           end
@@ -832,8 +832,9 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not approve the post if the user is doesn't have permission" do
-            assert_raises(User::PrivilegeError) do
-              @post.update!(is_pending: true)
+            @post.update!(is_pending: true)
+
+            assert_no_difference("@post.approvals.count") do
               @post.update(tag_string: "aaa status:active")
             end
 
@@ -851,7 +852,7 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not ban the post if the user doesn't have permission" do
-            assert_raises(User::PrivilegeError) do
+            assert_no_changes("@post.reload.is_banned?") do
               @post.update(tag_string: "aaa status:banned")
             end
 
@@ -870,9 +871,10 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not unban the post if the user doesn't have permission" do
-            assert_raises(User::PrivilegeError) do
-              @post.update!(is_banned: true)
-              @post.update(tag_string: "aaa status:banned")
+            @post.update!(is_banned: true)
+
+            assert_no_changes("@post.reload.is_banned?") do
+              @post.update(tag_string: "aaa -status:banned")
             end
 
             assert_equal(true, @post.reload.is_banned?)
@@ -894,7 +896,7 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not disapprove the post if the user is doesn't have permission" do
-            assert_raises(User::PrivilegeError) do
+            assert_no_difference("@post.disapprovals.count") do
               @post.update!(is_pending: true)
               @post.update(tag_string: "aaa disapproved:disinterest")
             end
@@ -903,7 +905,7 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not allow disapproving active posts" do
-            assert_raises(User::PrivilegeError) do
+            assert_no_difference("@post.disapprovals.count") do
               @post.update(tag_string: "aaa disapproved:disinterest")
             end
 
@@ -1284,25 +1286,57 @@ class PostTest < ActiveSupport::TestCase
       context "that has been updated" do
         should "create a new version if it's the first version" do
           assert_difference("PostVersion.count", 1) do
-            post = FactoryBot.create(:post)
+            post = create(:post, tag_string: "foo")
+
+            assert_equal("foo", post.versions.last.tags)
+            assert_equal(["foo"], post.versions.last.added_tags)
           end
         end
 
         should "create a new version if it's been over an hour since the last update" do
-          post = FactoryBot.create(:post)
+          post = create(:post, tag_string: "foo")
+
           travel(6.hours) do
             assert_difference("PostVersion.count", 1) do
-              post.update(tag_string: "zzz")
+              post.update(tag_string: "bar foo")
             end
           end
+
+          assert_equal("bar foo", post.versions.last.tags)
+          assert_equal(["bar"], post.versions.last.added_tags)
         end
 
         should "merge with the previous version if the updater is the same user and it's been less than an hour" do
-          post = FactoryBot.create(:post)
+          post = create(:post, tag_string: "foo")
+
           assert_difference("PostVersion.count", 0) do
-            post.update(tag_string: "zzz")
+            post.update(tag_string: "foo bar")
           end
-          assert_equal("zzz", post.versions.last.tags)
+
+          assert_equal("bar foo", post.versions.last.tags)
+          # assert_equal(%w[bar foo], post.versions.last.added_tags)
+        end
+
+        should "create a new version even if adding a metatag fails" do
+          travel(2.hours) do
+            @post.update!(tag_string: "foo status:banned")
+          end
+
+          assert_equal(false, @post.reload.is_banned?)
+          assert_equal(2, @post.versions.last.version)
+          assert_equal("foo", @post.tag_string)
+          assert_equal("foo", @post.versions.last.tags)
+        end
+
+        should "record the changes correctly when using a metatag that modifies the post itself" do
+          travel(2.hours) do
+            @post.update!(tag_string: "foo fav:me")
+          end
+
+          assert_equal(1, @post.reload.score)
+          assert_equal(2, @post.versions.last.version)
+          assert_equal("foo", @post.tag_string)
+          assert_equal("foo", @post.versions.last.tags)
         end
 
         should "increment the updater's post_update_count" do
