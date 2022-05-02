@@ -3,6 +3,9 @@
   <%= f.input :other_names_match, label: "Other names", input_html: { value: params[:search][:other_names_match] } %>
   <%= f.input :title_or_body_matches, label: "Text", input_html: { value: params[:search][:title_or_body_matches] } %>
   <%= f.input :linked_to, hint: "Find wikis linking to this wiki", input_html: { value: params[:search][:linked_to], "data-autocomplete": "wiki-page" } %>
+  <%= f.simple_fields_for :tag do |fa| %>
+    <%= fa.input :category, collection: TagCategory.canonical_mapping.to_a, include_blank: true, selected: params.dig(:search, :tag, :category) %>
+  <% end %>
   <%= f.input :is_deleted, label: "Deleted?", as: :select, include_blank: true, selected: params[:search][:is_deleted] %>
   <%= f.input :order, collection: [%w[Newest created_at], %w[Title title], %w[Posts post_count]], include_blank: true, selected: params[:search][:order] %>
   <%= f.submit "Search" %>
