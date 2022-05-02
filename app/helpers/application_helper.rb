@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  USER_DATA_ATTRIBUTES = %i[
+    id name level level_string theme comment_threshold default_image_size time_zone per_page
+  ] + User::ACTIVE_BOOLEAN_ATTRIBUTES + User::Roles.map { |role| :"is_#{role}?" }
+
+  COOKIE_DATA_ATTRIBUTES = %i[
+    news-ticker hide_upgrade_account_notice hide_verify_account_notice
+    hide_dmail_notice dab show-relationship-previews post_preview_size
+    post_preview_show_votes
+  ]
+
   def listing_type(*fields, member_check: true, types: [:revert, :standard])
     (fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?) ? types[0] : types[1])
   end
@@ -291,33 +301,11 @@ module ApplicationHelper
         layout: layout,
         "current-user-ip-addr": request.remote_ip,
         "current-user-save-data": CurrentUser.save_data,
-        **current_user_data_attributes(current_user),
-        **cookie_data_attributes,
+        **data_attributes_for(current_user, "current-user", USER_DATA_ATTRIBUTES),
+        **data_attributes_for(cookies, "cookie", COOKIE_DATA_ATTRIBUTES),
         **extra_attributes,
       }
     }
-  end
-
-  def current_user_data_attributes(user)
-    attributes = %i[
-      id name level level_string theme always_resize_images can_upload_free
-      can_approve_posts disable_categorized_saved_searches
-      disable_mobile_gestures disable_post_tooltips enable_safe_mode
-      show_deleted_posts show_deleted_children style_usernames
-      default_image_size
-    ] + User::Roles.map { |role| :"is_#{role}?" }
-
-    data_attributes_for(user, "current-user", attributes)
-  end
-
-  def cookie_data_attributes
-    attributes = %i[
-      news-ticker hide_upgrade_account_notice hide_verify_account_notice
-      hide_dmail_notice dab show-relationship-previews post_preview_size
-      post_preview_show_votes
-    ]
-
-    data_attributes_for(cookies, "cookie", attributes)
   end
 
   def current_item_data_attributes(current_item)

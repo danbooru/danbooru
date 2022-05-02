@@ -45,7 +45,7 @@ class UserPolicy < ApplicationPolicy
     %i[
       comment_threshold default_image_size favorite_tags
       blacklisted_tags time_zone per_page custom_style theme
-      receive_email_notifications always_resize_images
+      receive_email_notifications
       new_post_navigation_layout enable_private_favorites
       style_usernames show_deleted_posts show_deleted_children
       disable_categorized_saved_searches disable_tagged_filenames

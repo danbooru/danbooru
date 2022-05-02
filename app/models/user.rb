@@ -20,53 +20,41 @@ class User < ApplicationRecord
   # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
   Roles = Levels.constants.map(&:downcase) + %i[banned approver]
 
-  # candidates for removal:
-  # - enable_post_navigation (disabled by 700)
-  # - new_post_navigation_layout (disabled by 1364)
-  # - enable_sequential_post_navigation (disabled by 680)
-  # - hide_deleted_posts (enabled by 1904)
-  # - disable_categorized_saved_searches (enabled by 2291)
-  # - disable_tagged_filenames (enabled by 387)
-  # - enable_recent_searches (enabled by 499)
-  # - disable_cropped_thumbnails (enabled by 22)
-  # - has_saved_searches
-  # - opt_out_tracking
-  # - enable_recommended_posts
-  # - has_mail
-  # - is_super_voter
   BOOLEAN_ATTRIBUTES = %w[
     is_banned
-    has_mail
+    _unused_has_mail
     receive_email_notifications
-    always_resize_images
-    enable_post_navigation
+    _unused_always_resize_images
+    _unused_enable_post_navigation
     new_post_navigation_layout
     enable_private_favorites
-    enable_sequential_post_navigation
-    hide_deleted_posts
+    _unused_enable_sequential_post_navigation
+    _unused_hide_deleted_posts
     style_usernames
-    enable_auto_complete
+    _unused_enable_auto_complete
     show_deleted_children
-    has_saved_searches
+    _unused_has_saved_searches
     can_approve_posts
     can_upload_free
     disable_categorized_saved_searches
-    is_super_voter
+    _unused_is_super_voter
     disable_tagged_filenames
-    enable_recent_searches
-    disable_cropped_thumbnails
+    _unused_enable_recent_searches
+    _unused_disable_cropped_thumbnails
     disable_mobile_gestures
     enable_safe_mode
     enable_desktop_mode
     disable_post_tooltips
-    enable_recommended_posts
-    opt_out_tracking
-    no_flagging
-    no_feedback
+    _unused_enable_recommended_posts
+    _unused_opt_out_tracking
+    _unused_no_flagging
+    _unused_no_feedback
     requires_verification
     is_verified
     show_deleted_posts
   ]
+
+  ACTIVE_BOOLEAN_ATTRIBUTES = BOOLEAN_ATTRIBUTES.grep_v(/unused/)
 
   DEFAULT_BLACKLIST = ["guro", "scat", "furry -rating:s"].join("\n")
 
@@ -690,7 +678,6 @@ class User < ApplicationRecord
 
   def initialize_attributes
     self.new_post_navigation_layout = true
-    self.always_resize_images = true
   end
 
   def presenter
