@@ -49,6 +49,7 @@ module Source
       Source::URL::TwitPic,
       Source::URL::Weibo,
       Source::URL::Anifty,
+      Source::URL::Furaffinity,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
