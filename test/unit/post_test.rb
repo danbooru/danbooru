@@ -1115,8 +1115,59 @@ class PostTest < ActiveSupport::TestCase
       context "a post with a non-web source" do
         should "automatically add the non-web_source tag" do
           @post.update!(source: "this was once revealed to me in a dream")
-          @post.save!
           assert_equal("non-web_source tag1 tag2", @post.tag_string)
+        end
+      end
+
+      context "a post with a bad_link source" do
+        should "add the bad_link tag for known bad sources" do
+          @post.update!(source: "https://pbs.twimg.com/media/FQjQA1mVgAMcHLv.jpg:orig")
+          assert_equal("bad_link tag1 tag2", @post.tag_string)
+
+          @post.update!(source: "https://media.tumblr.com/570edf684c7eb195d391115f8b18ca55/tumblr_pen2zwt3bK1uh1m9xo1_1280.png")
+          assert_equal("bad_link tag1 tag2", @post.tag_string)
+        end
+
+        should "remove the bad_link tag for known good sources" do
+          @post.update!(tag_string: "bad_link tag1 tag2")
+          @post.update!(source: "https://i.pximg.net/img-original/img/2022/04/25/08/03/14/97867015_p0.png")
+          assert_equal("tag1 tag2", @post.tag_string)
+        end
+
+        should "not add the bad_link tag for unknown sources" do
+          @post.update!(source: "https://www.example.com/image.jpg")
+          assert_equal("tag1 tag2", @post.tag_string)
+        end
+
+        should "not remove the bad_link tag for unknown sources" do
+          @post.update!(tag_string: "bad_link tag1 tag2", source: "https://www.example.com/image.jpg")
+          assert_equal("bad_link tag1 tag2", @post.tag_string)
+        end
+      end
+
+      context "a post with a bad source" do
+        should "add the bad_source tag for known bad sources" do
+          @post.update!(source: "https://twitter.com/danboorubot/")
+          assert_equal("bad_source tag1 tag2", @post.tag_string)
+
+          @post.update!(source: "https://www.pixiv.net/en/users/6210796")
+          assert_equal("bad_source tag1 tag2", @post.tag_string)
+        end
+
+        should "remove the bad_source tag for known good sources" do
+          @post.update!(tag_string: "bad_source tag1 tag2")
+          @post.update!(source: "https://twitter.com/kafun/status/1520766650907521024")
+          assert_equal("tag1 tag2", @post.tag_string)
+        end
+
+        should "not add the bad_source tag for unknown sources" do
+          @post.update!(source: "https://www.example.com/image.html")
+          assert_equal("tag1 tag2", @post.tag_string)
+        end
+
+        should "not remove the bad_source tag for unknown sources" do
+          @post.update!(tag_string: "bad_source tag1 tag2", source: "https://www.example.com/image.html")
+          assert_equal("bad_source tag1 tag2", @post.tag_string)
         end
       end
 

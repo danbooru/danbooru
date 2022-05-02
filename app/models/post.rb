@@ -430,6 +430,23 @@ class Post < ApplicationRecord
         tags << "non-web_source"
       end
 
+      source_url = parsed_source
+      if source_url.present? && source_url.recognized?
+        # A bad_link is an image URL from a recognized site that can't be converted to a page URL.
+        if source_url.image_url? && source_url.page_url.nil?
+          tags << "bad_link"
+        else
+          tags -= ["bad_link"]
+        end
+
+        # A bad_source is a source from a recognized site that isn't an image url or a page url.
+        if !source_url.image_url? && !source_url.page_url?
+          tags << "bad_source"
+        else
+          tags -= ["bad_source"]
+        end
+      end
+
       # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, videos, and ugoiras are automatically tagged.
       tags -= ["animated"] unless is_flash?
       tags << "animated" if media_asset.is_animated?

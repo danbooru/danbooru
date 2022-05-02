@@ -38,6 +38,8 @@ class Source::URL::Null < Source::URL
   end
 
   def parse
+    @recognized = true
+
     case [subdomain, domain, *path_segments]
 
     # http://about.me/rig22
@@ -240,7 +242,12 @@ class Source::URL::Null < Source::URL
       @page_url = "https://www.zerochan.net/#{@work_id}#full"
 
     else
-      nil
+      @recognized = false
+
     end
+  end
+
+  def recognized?
+    @recognized
   end
 end

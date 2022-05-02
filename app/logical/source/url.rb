@@ -9,6 +9,14 @@
 # To add a new site, create a subclass of Source::URL and implement `#match?` to define
 # which URLs belong to the site, and `#parse` to parse and extract information from the URL.
 #
+# The following methods should be implemented by subclasses:
+#
+# * match?
+# * parse
+# * image_url?
+# * page_url
+# * profile_url
+#
 # Source::URL is a subclass of Danbooru::URL, so it inherits some common utility methods
 # from there.
 #
@@ -85,6 +93,13 @@ module Source
     def site_name
       # "Source::URL::NicoSeiga" => "Nico Seiga"
       self.class.name.demodulize.titleize
+    end
+
+    # True if the URL is from a recognized site. False if the URL is from an unrecognized site.
+    #
+    # @return [Boolean]
+    def recognized?
+      true # overridden in Source::URL::Null to return false for unknown sites
     end
 
     # True if the URL is a direct image URL.
