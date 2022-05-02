@@ -125,6 +125,7 @@ Rails.application.routes.draw do
   resources :favorite_groups do
     member do
       put :add_post
+      put :remove_post
     end
     resource :order, :only => [:edit], :controller => "favorite_group_orders"
   end

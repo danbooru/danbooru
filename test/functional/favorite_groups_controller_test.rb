@@ -116,6 +116,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         @post = create(:post)
         put_auth add_post_favorite_group_path(@favgroup), @user, params: {post_id: @post.id, format: "js"}
+
         assert_response :success
         assert_equal([@post.id], @favgroup.reload.post_ids)
       end
@@ -123,7 +124,33 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       should "not add posts to favgroups belonging to other users" do
         @post = create(:post)
         put_auth add_post_favorite_group_path(@favgroup), create(:user), params: {post_id: @post.id, format: "js"}
+
         assert_response 403
+        assert_equal([], @favgroup.reload.post_ids)
+      end
+    end
+
+    context "remove_post action" do
+      should "render" do
+        @post = create(:post)
+        @favgroup.add(@post)
+        assert_equal([@post.id], @favgroup.reload.post_ids)
+
+        put_auth remove_post_favorite_group_path(@favgroup), @user, params: { post_id: @post.id, format: "js" }
+
+        assert_response :success
+        assert_equal([], @favgroup.reload.post_ids)
+      end
+
+      should "not remove posts from favgroups belonging to other users" do
+        @post = create(:post)
+        @favgroup.add(@post)
+        assert_equal([@post.id], @favgroup.reload.post_ids)
+
+        put_auth remove_post_favorite_group_path(@favgroup), create(:user), params: { post_id: @post.id, format: "js" }
+
+        assert_response 403
+        assert_equal([@post.id], @favgroup.reload.post_ids)
       end
     end
 

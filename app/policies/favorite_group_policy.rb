@@ -17,6 +17,10 @@ class FavoriteGroupPolicy < ApplicationPolicy
     update?
   end
 
+  def remove_post?
+    update?
+  end
+
   def can_enable_privacy?
     record.creator.is_gold?
   end

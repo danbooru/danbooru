@@ -59,4 +59,12 @@ class FavoriteGroupsController < ApplicationController
 
     respond_with(@favorite_group)
   end
+
+  def remove_post
+    @favorite_group = authorize FavoriteGroup.find(params[:id])
+    @post = Post.find(params[:post_id])
+    @favorite_group.remove(@post)
+
+    respond_with(@favorite_group)
+  end
 end
