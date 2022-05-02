@@ -537,12 +537,12 @@ class Post < ApplicationRecord
         in "-favgroup", name
           favgroup = FavoriteGroup.find_by_name_or_id!(name, CurrentUser.user)
           raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
-          favgroup&.remove!(self)
+          favgroup&.remove(self)
 
         in "favgroup", name
           favgroup = FavoriteGroup.find_by_name_or_id!(name, CurrentUser.user)
           raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
-          favgroup&.add!(self)
+          favgroup&.add(self)
 
         end
       end
@@ -632,7 +632,7 @@ class Post < ApplicationRecord
 
     def remove_from_fav_groups
       FavoriteGroup.for_post(id).find_each do |favgroup|
-        favgroup.remove!(self)
+        favgroup.remove(self)
       end
     end
   end

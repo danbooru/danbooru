@@ -132,15 +132,15 @@ class FavoriteGroup < ApplicationRecord
     Post.joins("JOIN (#{favgroup_posts.to_sql}) favgroup_posts ON favgroup_posts.post_id = posts.id").order("favgroup_posts.favgroup_index ASC")
   end
 
-  def add!(post)
+  def add(post)
     with_lock do
-      update!(post_ids: post_ids + [post.id])
+      update(post_ids: post_ids + [post.id])
     end
   end
 
-  def remove!(post)
+  def remove(post)
     with_lock do
-      update!(post_ids: post_ids - [post.id])
+      update(post_ids: post_ids - [post.id])
     end
   end
 

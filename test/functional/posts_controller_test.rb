@@ -534,8 +534,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
             @pool = create(:pool)
             @pool.add!(@post)
 
-            @favgroup = create(:favorite_group)
-            @favgroup.add!(@post)
+            @favgroup = create(:favorite_group, post_ids: [@post.id])
 
             @comment = create(:comment, post: @post, creator: @admin)
             create(:comment_vote, comment: @comment, user: @user)

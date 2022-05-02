@@ -9,13 +9,13 @@ class FavoriteTest < ActiveSupport::TestCase
     should "return the fav group" do
       posts = create_list(:post, 3)
 
-      @fav_group.add!(posts[0])
+      @fav_group.add(posts[0])
       assert_equal(@fav_group.id, FavoriteGroup.for_post(posts[0].id).first.id)
 
-      @fav_group.add!(posts[1])
+      @fav_group.add(posts[1])
       assert_equal(@fav_group.id, FavoriteGroup.for_post(posts[1].id).first.id)
 
-      @fav_group.add!(posts[2])
+      @fav_group.add(posts[2])
       assert_equal(@fav_group.id, FavoriteGroup.for_post(posts[2].id).first.id)
     end
   end
@@ -24,7 +24,7 @@ class FavoriteTest < ActiveSupport::TestCase
     should "remove it from all favorite groups" do
       @post = FactoryBot.create(:post)
 
-      @fav_group.add!(@post)
+      @fav_group.add(@post)
       assert_equal([@post.id], @fav_group.post_ids)
 
       @post.expunge!
@@ -36,11 +36,14 @@ class FavoriteTest < ActiveSupport::TestCase
     should "not allow adding duplicate posts" do
       post = create(:post)
 
-      @fav_group.add!(post)
+      @fav_group.add(post)
       assert(@fav_group.valid?)
       assert_equal([post.id], @fav_group.reload.post_ids)
 
-      assert_raise(ActiveRecord::RecordInvalid) { @fav_group.add!(post) }
+      @fav_group.add(post)
+      assert_equal(false, @fav_group.valid?)
+      assert_match(/Favgroup already contains post #{post.id}/, @fav_group.errors.full_messages.join)
+
       assert_equal([post.id], @fav_group.reload.post_ids)
 
       @fav_group.reload.update(post_ids: [post.id, post.id])
