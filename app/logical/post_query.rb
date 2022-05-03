@@ -201,6 +201,7 @@ class PostQuery
   end
 
   concerning :CountMethods do
+    # @return [Integer, nil] The number of posts returned by the search, or nil on timeout.
     def post_count
       @post_count ||= fast_count
     end

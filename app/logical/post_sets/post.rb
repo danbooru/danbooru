@@ -35,7 +35,8 @@ module PostSets
 
     # The description of the page for the <meta name="description"> tag.
     def meta_description
-      if post_query.is_simple_tag?
+      # XXX post_count may be nil if the search times out because of safe mode
+      if normalized_query.is_simple_tag? && post_count.present?
         humanized_count = ApplicationController.helpers.humanized_number(post_count, million: " million", thousand: " thousand")
         humanized_count = "over #{humanized_count}" if post_count >= 1_000
 
@@ -108,6 +109,7 @@ module PostSets
       @posts ||= normalized_query.paginated_posts(page, includes: includes, count: post_count, search_count: !post_count.nil?, limit: per_page, max_limit: max_per_page).load
     end
 
+    # @return [Integer, nil] The number of posts returned by the search, or nil if unknown.
     def post_count
       normalized_query.post_count
     end

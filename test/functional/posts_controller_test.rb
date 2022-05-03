@@ -234,6 +234,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response 410
           assert_select "h1", "Search Error"
         end
+
+        should "render if the search count times out" do
+          PostQuery.any_instance.stubs(:exact_count).returns(nil)
+          get posts_path, params: { tags: "1girl", safe_mode: "true" }
+
+          assert_response :success
+        end
       end
 
       context "with a pool: search" do
