@@ -146,6 +146,10 @@ module PostSets
       end
     end
 
+    def banned_artist?
+      artist.present? && artist.is_banned? && !artist.policy(current_user).can_view_banned?
+    end
+
     def includes
       if show_votes?
         [:media_asset, :vote_by_current_user]

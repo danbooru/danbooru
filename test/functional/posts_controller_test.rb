@@ -104,8 +104,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
           artist.update(is_banned: true)
           get posts_path, params: { tags: "bkub" }
-          assert_response :success
-          assert_select "#show-excerpt-link", count: 1, text: "Artist"
+          assert_response 451
 
           artist.update(is_banned: false, is_deleted: true)
           get posts_path, params: { tags: "bkub" }
@@ -125,9 +124,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           create(:post, tag_string: artist.name)
           get posts_path, params: { tags: artist.name }
 
-          assert_response :success
-          assert_select "#show-excerpt-link", count: 1, text: "Artist"
-          assert_select "meta[name=robots][content=noindex]"
+          assert_response 451
         end
 
         should "render for a tag with a wiki page" do

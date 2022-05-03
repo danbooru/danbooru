@@ -18,6 +18,8 @@ class PostsController < ApplicationController
       query = "#{post_set.normalized_query.to_s} random:#{post_set.per_page}".strip
       redirect_to posts_path(tags: query, page: params[:page], limit: params[:limit], format: request.format.symbol)
     else
+      raise PageRemovedError if request.format.html? && post_set.banned_artist?
+
       @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
       @posts = authorize post_set.posts, policy_class: PostPolicy
       respond_with(@posts) do |format|
@@ -28,6 +30,7 @@ class PostsController < ApplicationController
 
   def show
     @post = authorize Post.eager_load(:uploader, :media_asset).find(params[:id])
+    raise PageRemovedError if request.format.html? && @post.banblocked?(CurrentUser.user)
 
     if request.format.html?
       include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?

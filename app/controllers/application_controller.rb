@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  class PageRemovedError < StandardError; end
+
   include Pundit::Authorization
   helper_method :search_params, :permitted_attributes
 
@@ -136,6 +138,8 @@ class ApplicationController < ActionController::Base
       render_error_page(422, exception, message: exception.message)
     when RateLimiter::RateLimitError
       render_error_page(429, exception, message: "Rate limit exceeded. You're doing that too fast")
+    when PageRemovedError
+      render_error_page(451, exception, template: "static/page_removed_error", message: "This page has been removed because of a takedown request")
     when Rack::Timeout::RequestTimeoutException
       render_error_page(500, exception, message: "Your request took too long to complete and was canceled.")
     when NotImplementedError
