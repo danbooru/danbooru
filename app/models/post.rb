@@ -11,7 +11,7 @@ class Post < ApplicationRecord
   RESTRICTED_TAGS_REGEX = /(?:^| )(?:#{Danbooru.config.restricted_tags.join("|")})(?:$| )/o
 
   deletable
-  has_bit_flags %w[has_embedded_notes is_taken_down]
+  has_bit_flags %w[has_embedded_notes _unused_has_cropped is_taken_down]
 
   normalize :source, :normalize_source
   before_validation :merge_old_changes
