@@ -201,8 +201,12 @@ module Sources
       assert(Source::URL.page_url?("https://seiga.nicovideo.jp/seiga/im520647"))
       assert(Source::URL.page_url?("https://sp.seiga.nicovideo.jp/seiga/im3521156"))
       assert(Source::URL.page_url?("https://seiga.nicovideo.jp/watch/mg316708"))
+      assert(Source::URL.page_url?("https://www.nicovideo.jp/watch/sm36465441"))
+      assert(Source::URL.page_url?("https://www.nicovideo.jp/watch/nm36465441"))
       assert(Source::URL.page_url?("https://nico.ms/im10922621"))
       assert(Source::URL.page_url?("https://nico.ms/mg310193"))
+      assert(Source::URL.page_url?("https://nico.ms/sm36465441"))
+      assert(Source::URL.page_url?("https://nico.ms/nm36465441"))
 
       assert(Source::URL.profile_url?("https://seiga.nicovideo.jp/user/illust/456831"))
       assert(Source::URL.profile_url?("https://ext.seiga.nicovideo.jp/user/illust/20542122"))

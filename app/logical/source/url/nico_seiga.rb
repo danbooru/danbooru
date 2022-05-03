@@ -17,14 +17,12 @@
 #
 # Unhandled URLs
 #
-# * https://www.nicovideo.jp/watch/sm36465441
-# * https://www.nicovideo.jp/watch/nm20676560
 # * https://lohas.nicoseiga.jp/material/5746c5/4459092
 # * https://dic.nicovideo.jp/oekaki/52833.png
 #
 module Source
   class URL::NicoSeiga < Source::URL
-    attr_reader :illust_id, :manga_id, :image_id, :user_id, :username, :profile_url
+    attr_reader :illust_id, :manga_id, :image_id, :sm_video_id, :nm_video_id, :user_id, :username, :profile_url
 
     def self.match?(url)
       url.domain.in?(%w[nicovideo.jp nicoseiga.jp nicomanga.jp nimg.jp nico.ms])
@@ -48,6 +46,14 @@ module Source
       # https://sp.seiga.nicovideo.jp/watch/mg316708
       in /seiga\.nicovideo\.jp$/, "watch", /^mg(\d+)/ => manga_id
         @manga_id = $1
+
+      # https://www.nicovideo.jp/watch/sm36465441
+      in "www.nicovideo.jp", "watch", /^sm(\d+)/
+        @sm_video_id = $1
+
+      # https://www.nicovideo.jp/watch/nm36465441
+      in "www.nicovideo.jp", "watch", /^nm(\d+)/
+        @nm_video_id = $1
 
       # https://seiga.nicovideo.jp/image/source/3521156 (single image; page: https://seiga.nicovideo.jp/seiga/im3312222)
       # https://seiga.nicovideo.jp/image/source/4744553 (manga image; page: https://seiga.nicovideo.jp/watch/mg122274)
@@ -101,6 +107,14 @@ module Source
       # https://nico.ms/mg310193
       in "nico.ms", /^mg(\d+)$/
         @manga_id = $1
+
+      # https://nico.ms/sm36465441
+      in "nico.ms", /^sm(\d+)$/
+        @sm_video_id = $1
+
+      # https://nico.ms/nm36465441
+      in "nico.ms", /^nm(\d+)$/
+        @nm_video_id = $1
 
       # https://seiga.nicovideo.jp/user/illust/456831
       # https://sp.seiga.nicovideo.jp/user/illust/20542122
@@ -166,6 +180,10 @@ module Source
         "https://seiga.nicovideo.jp/seiga/im#{illust_id}"
       elsif manga_id.present?
         "https://seiga.nicovideo.jp/watch/mg#{manga_id}"
+      elsif nm_video_id.present?
+        "https://www.nicovideo.jp/watch/nm#{nm_video_id}"
+      elsif sm_video_id.present?
+        "https://www.nicovideo.jp/watch/sm#{sm_video_id}"
       #elsif image_id.present?
       #  "https://seiga.nicovideo.jp/image/source/#{image_id}"
       end
