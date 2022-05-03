@@ -11,6 +11,7 @@ class Post < ApplicationRecord
   RESTRICTED_TAGS_REGEX = /(?:^| )(?:#{Danbooru.config.restricted_tags.join("|")})(?:$| )/o
 
   deletable
+  has_bit_flags %w[has_embedded_notes is_taken_down]
 
   normalize :source, :normalize_source
   before_validation :merge_old_changes
@@ -1509,8 +1510,6 @@ class Post < ApplicationRecord
     end
   end
 
-  has_bit_flags ["has_embedded_notes"]
-
   def safeblocked?
     CurrentUser.safe_mode? && (rating != "s" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
   end
@@ -1521,8 +1520,10 @@ class Post < ApplicationRecord
   end
 
   def banblocked?(user = CurrentUser.user)
-    return false unless is_banned?
-    (has_tag?("paid_reward") && !user.is_approver?) || !user.is_gold?
+    return true if is_taken_down? && !user.is_moderator?
+    return true if is_banned? && has_tag?("paid_reward") && !user.is_approver?
+    return true if is_banned? && !user.is_gold?
+    false
   end
 
   def visible?(user = CurrentUser.user)
