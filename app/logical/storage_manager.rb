@@ -50,6 +50,24 @@ class StorageManager
     raise NotImplementedError, "open not implemented"
   end
 
+  # Copy the file from src_path to dest_path.
+  #
+  # @param src_path [String] The file to copy.
+  # @param dest_path [String] The location to copy the file to.
+  def copy(src_path, dest_path)
+    file = open(src_path)
+    store(file, dest_path)
+  end
+
+  # Move the file from src_path to dest_path.
+  #
+  # @param src_path [String] The file to move.
+  # @param dest_path [String] The location to move the file to.
+  def move(src_path, dest_path)
+    copy(src_path, dest_path)
+    delete(src_path)
+  end
+
   # Return the full URL of the file at the given path, or nil if the file
   # doesn't have an URL.
   # @return [String, nil] the file URL

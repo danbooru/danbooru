@@ -46,10 +46,10 @@ class PostTest < ActiveSupport::TestCase
         assert_raise(StandardError) { @post.file(:original) }
       end
 
-      should "mark the media asset as expunged" do
+      should "mark the media asset as deleted" do
         @post.expunge!
 
-        assert_equal("expunged", @post.media_asset.status)
+        assert_equal("deleted", @post.media_asset.status)
       end
 
       should "remove all favorites" do
@@ -199,16 +199,16 @@ class PostTest < ActiveSupport::TestCase
     context "Expunging a post with" do
       context "a parent" do
         should "reset the has_children flag of the parent" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
+          p1 = create(:post)
+          c1 = create(:post_with_file, parent_id: p1.id)
           c1.expunge!
           p1.reload
           assert_equal(false, p1.has_children?)
         end
 
         should "update the parent's has_children flag" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
+          p1 = create(:post)
+          c1 = create(:post_with_file, parent_id: p1.id)
           c1.expunge!
           p1.reload
           assert(!p1.has_children?, "Parent should not have children")
@@ -217,8 +217,8 @@ class PostTest < ActiveSupport::TestCase
 
       context "one child" do
         should "remove the parent of that child" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
+          p1 = create(:post_with_file)
+          c1 = create(:post, parent_id: p1.id)
           p1.expunge!
           c1.reload
           assert_nil(c1.parent)
@@ -229,10 +229,10 @@ class PostTest < ActiveSupport::TestCase
         setup do
           # ensure initial post versions won't be merged.
           travel_to(1.day.ago) do
-            @p1 = FactoryBot.create(:post)
-            @c1 = FactoryBot.create(:post, :parent_id => @p1.id)
-            @c2 = FactoryBot.create(:post, :parent_id => @p1.id)
-            @c3 = FactoryBot.create(:post, :parent_id => @p1.id)
+            @p1 = create(:post_with_file)
+            @c1 = create(:post, parent_id: @p1.id)
+            @c2 = create(:post, parent_id: @p1.id)
+            @c3 = create(:post, parent_id: @p1.id)
           end
         end
 

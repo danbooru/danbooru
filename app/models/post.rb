@@ -756,7 +756,7 @@ class Post < ApplicationRecord
           decrement_tag_post_counts
           remove_from_all_pools
           remove_from_fav_groups
-          media_asset.expunge!
+          media_asset.trash!
           destroy
           update_parent_on_destroy
         end

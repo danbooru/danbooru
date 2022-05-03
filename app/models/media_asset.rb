@@ -24,8 +24,7 @@ class MediaAsset < ApplicationRecord
 
   # Processing: The asset's files are currently being resized and distributed to the backend servers.
   # Active: The asset has been successfully uploaded and is ready to use.
-  # Deleted: The asset's files have been deleted by moving them to a trash folder. They can be undeleted
-  #          by moving them out of the trash folder. (Not implemented yet).
+  # Deleted: The asset's files have been deleted by moving them to a trash folder. They can be undeleted by moving them out of the trash folder.
   # Expunged: The asset's files have been permanently deleted.
   # Failed: The asset failed to upload. The asset may be in a partially uploaded state, with some
   #         files missing or incompletely transferred.
@@ -60,6 +59,11 @@ class MediaAsset < ApplicationRecord
       file = convert_file(original_file)
       storage_service.store(file, file_path)
       backup_storage_service.store(file, file_path)
+    end
+
+    def trash_file!
+      storage_service.move(file_path, "/trash/#{file_path}")
+      backup_storage_service.move(file_path, "/trash/#{file_path}")
     end
 
     def delete_file!
@@ -271,6 +275,14 @@ class MediaAsset < ApplicationRecord
     def expunge!
       delete_files!
       update!(status: :expunged)
+    rescue
+      update!(status: :failed)
+      raise
+    end
+
+    def trash!
+      variants.each(&:trash_file!)
+      update!(status: :deleted)
     rescue
       update!(status: :failed)
       raise
