@@ -13,7 +13,7 @@ class MediaAssetPolicy < ApplicationPolicy
     if can_see_image?
       super
     else
-      super.excluding(:md5)
+      super.excluding(:md5, :file_key)
     end
   end
 end

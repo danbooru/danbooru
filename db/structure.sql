@@ -1102,7 +1102,9 @@ CREATE TABLE public.media_assets (
     image_width integer NOT NULL,
     image_height integer NOT NULL,
     duration double precision,
-    status integer DEFAULT 200 NOT NULL
+    status integer DEFAULT 200 NOT NULL,
+    file_key character varying,
+    is_public boolean DEFAULT true NOT NULL
 );
 
 
@@ -3806,6 +3808,13 @@ CREATE INDEX index_media_assets_on_file_ext ON public.media_assets USING btree (
 
 
 --
+-- Name: index_media_assets_on_file_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_media_assets_on_file_key ON public.media_assets USING btree (file_key);
+
+
+--
 -- Name: index_media_assets_on_file_size; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3824,6 +3833,13 @@ CREATE INDEX index_media_assets_on_image_height ON public.media_assets USING btr
 --
 
 CREATE INDEX index_media_assets_on_image_width ON public.media_assets USING btree (image_width);
+
+
+--
+-- Name: index_media_assets_on_is_public; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_assets_on_is_public ON public.media_assets USING btree (is_public) WHERE (is_public = false);
 
 
 --
@@ -5806,6 +5822,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220403042706'),
 ('20220403220558'),
 ('20220407203236'),
-('20220410050628');
+('20220410050628'),
+('20220504235329');
 
 

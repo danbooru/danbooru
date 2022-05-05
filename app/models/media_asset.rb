@@ -3,6 +3,7 @@
 class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
+  FILE_KEY_LENGTH = 9
   VARIANTS = %i[preview 180x180 360x360 720x720 sample original]
   MAX_VIDEO_DURATION = Danbooru.config.max_video_duration.to_i
   MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
@@ -22,6 +23,9 @@ class MediaAsset < ApplicationRecord
   delegate :metadata, to: :media_metadata
   delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, to: :metadata
 
+  scope :public_only, -> { where(is_public: true) }
+  scope :private_only, -> { where(is_public: false) }
+
   # Processing: The asset's files are currently being resized and distributed to the backend servers.
   # Active: The asset has been successfully uploaded and is ready to use.
   # Deleted: The asset's files have been deleted by moving them to a trash folder. They can be undeleted by moving them out of the trash folder.
@@ -39,8 +43,11 @@ class MediaAsset < ApplicationRecord
   validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }
   validates :file_ext, inclusion: { in: %w[jpg png gif mp4 webm swf zip], message: "File is not an image or video" }
   validates :file_size, numericality: { less_than_or_equal_to: Danbooru.config.max_file_size, message: ->(asset, _) { "too large (size: #{asset.file_size.to_formatted_s(:human_size)}; max size: #{Danbooru.config.max_file_size.to_formatted_s(:human_size)})" } }
+  validates :file_key, length: { is: FILE_KEY_LENGTH }, uniqueness: true, if: :file_key_changed?
   validates :duration, numericality: { less_than_or_equal_to: MAX_VIDEO_DURATION, message: "must be less than #{MAX_VIDEO_DURATION} seconds", allow_nil: true }, on: :create # XXX should allow admins to bypass
   validate :validate_resolution, on: :create
+
+  before_create :initialize_file_key
 
   class Variant
     extend Memoist
@@ -186,7 +193,7 @@ class MediaAsset < ApplicationRecord
   concerning :SearchMethods do
     class_methods do
       def search(params)
-        q = search_attributes(params, :id, :created_at, :updated_at, :md5, :file_ext, :file_size, :image_width, :image_height)
+        q = search_attributes(params, :id, :created_at, :updated_at, :md5, :file_ext, :file_size, :image_width, :image_height, :file_key, :is_public)
 
         if params[:metadata].present?
           q = q.joins(:media_metadata).merge(MediaMetadata.search(metadata: params[:metadata]))
@@ -367,5 +374,16 @@ class MediaAsset < ApplicationRecord
         errors.add(:image_height, "is too large (height: #{image_height}; max height: #{MAX_IMAGE_HEIGHT})")
       end
     end
+  end
+
+  def self.generate_file_key
+    loop do
+      key = SecureRandom.send(:choose, [*"0".."9", *"A".."Z", *"a".."z"], FILE_KEY_LENGTH) # base62
+      return key unless MediaAsset.exists?(file_key: key)
+    end
+  end
+
+  def initialize_file_key
+    self.file_key = MediaAsset.generate_file_key
   end
 end
