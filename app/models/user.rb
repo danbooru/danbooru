@@ -429,10 +429,8 @@ class User < ApplicationRecord
       end
 
       def page_limit(level)
-        if level >= User::Levels::PLATINUM
+        if level >= User::Levels::GOLD
           5000
-        elsif level == User::Levels::GOLD
-          2000
         else
           1000
         end
