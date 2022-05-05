@@ -526,11 +526,15 @@ class Post < ApplicationRecord
           end
 
         in "-child", ids
+          next if ids.blank?
+
           children.search(id: ids).each do |post|
             post.update!(parent_id: nil)
           end
 
         in "child", ids
+          next if ids.blank?
+
           Post.search(id: ids).where.not(id: id).limit(10).each do |post|
             post.update!(parent_id: id)
           end

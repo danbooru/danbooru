@@ -798,26 +798,54 @@ class PostTest < ActiveSupport::TestCase
         end
 
         context "for a child" do
-          should "add and remove children" do
-            @children = FactoryBot.create_list(:post, 3, parent_id: nil)
-
+          should "add children with child:ids" do
+            @children = create_list(:post, 3, parent: nil)
             @post.update(tag_string: "aaa child:#{@children.first.id}..#{@children.last.id}")
+
             assert_equal(true, @post.reload.has_children?)
             assert_equal(@post.id, @children[0].reload.parent_id)
             assert_equal(@post.id, @children[1].reload.parent_id)
             assert_equal(@post.id, @children[2].reload.parent_id)
+          end
 
+          should "remove children with -child:ids" do
+            @children = create_list(:post, 3, parent: @post)
             @post.update(tag_string: "aaa -child:#{@children.first.id}")
+
             assert_equal(true, @post.reload.has_children?)
             assert_nil(@children[0].reload.parent_id)
             assert_equal(@post.id, @children[1].reload.parent_id)
             assert_equal(@post.id, @children[2].reload.parent_id)
+          end
 
-            @post.update(tag_string: "aaa child:none")
+          should "remove all children with child:none" do
+            @children = create_list(:post, 3, parent: @post)
+            @post.update!(tag_string: "aaa child:none")
+
             assert_equal(false, @post.reload.has_children?)
             assert_nil(@children[0].reload.parent_id)
             assert_nil(@children[1].reload.parent_id)
             assert_nil(@children[2].reload.parent_id)
+          end
+
+          should "not add children with child:" do
+            @children = create_list(:post, 3, parent: nil)
+            @post.update(tag_string: "aaa child:")
+
+            assert_equal(false, @post.reload.has_children?)
+            assert_nil(@children[0].reload.parent_id)
+            assert_nil(@children[1].reload.parent_id)
+            assert_nil(@children[2].reload.parent_id)
+          end
+
+          should "not remove children with -child:" do
+            @children = create_list(:post, 3, parent: @post)
+            @post.update!(tag_string: "aaa -child:")
+
+            assert_equal(true, @post.reload.has_children?)
+            assert_equal(@post, @children[0].reload.parent)
+            assert_equal(@post, @children[1].reload.parent)
+            assert_equal(@post, @children[2].reload.parent)
           end
         end
 
