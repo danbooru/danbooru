@@ -6,7 +6,7 @@ let RelatedTag = {};
 RelatedTag.initialize_all = function() {
   $(document).on("click.danbooru", ".related-tags-button", RelatedTag.on_click_related_tags_button);
   $(document).on("change.danbooru", ".related-tags input", RelatedTag.toggle_tag);
-  $(document).on("click.danbooru", ".related-tags a", RelatedTag.toggle_tag);
+  $(document).on("click.danbooru", ".related-tags a.search-tag", RelatedTag.toggle_tag);
   $(document).on("click.danbooru", "#show-related-tags-link", RelatedTag.show);
   $(document).on("click.danbooru", "#hide-related-tags-link", RelatedTag.hide);
   $(document).on("keyup.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_selected);
