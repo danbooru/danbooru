@@ -61,8 +61,13 @@
         </tr>
         <tr>
           <td>Tag Limit</td>
-          <td>2</td>
-          <td>6</td>
+          <td><%= User.tag_query_limit(User::Levels::MEMBER) %></td>
+          <td><%= User.tag_query_limit(User::Levels::GOLD) %></td>
+        </tr>
+        <tr>
+          <td>Page Limit</td>
+          <td><%= User.page_limit(User::Levels::MEMBER) %></td>
+          <td><%= User.page_limit(User::Levels::GOLD) %></td>
         </tr>
         <tr>
           <td>See Hidden Tags</td>
@@ -70,14 +75,9 @@
           <td>Yes</td>
         </tr>
         <tr>
-          <td>Page Limit</td>
-          <td>1,000</td>
-          <td>2,000</td>
-        </tr>
-        <tr>
           <td>Private Favorites</td>
-          <td>no</td>
-          <td>yes</td>
+          <td>No</td>
+          <td>Yes</td>
         </tr>
         <tr>
           <td>Favorite Groups</td>
@@ -90,9 +90,9 @@
           <td><%= User.max_saved_searches(User::Levels::GOLD) %></td>
         </tr>
         <tr>
-          <td>Search Timeout</td>
-          <td>3 sec</td>
-          <td>6 sec</td>
+          <td>Max Search Duration</td>
+          <td>3 seconds</td>
+          <td>6 seconds</td>
         </tr>
         <tr>
           <td></td>
@@ -116,21 +116,58 @@
       <details>
         <summary>What are the benefits of <%= Danbooru.config.canonical_app_name %> Gold?</summary>
 
-        <p><%= Danbooru.config.canonical_app_name %> Gold lets you do more
-        complicated searches, and it lets you see hidden tags that non-Gold users
-        can't see. You can search more tags at once, browse deeper in search
-        results, and also keep more favorite groups and saved searches.</p>
+        <p><%= Danbooru.config.canonical_app_name %> Gold lets you search for more tags at once, browse
+        deeper in search results, see tags non-Gold users can't see, keep your favorites private,
+        and keep more favorite groups and saved searches.</p>
+      </details>
+
+      <details>
+        <summary>What is the tag limit?</summary>
+
+        <p>Normal users can only search for <%= User.tag_query_limit(User::Levels::MEMBER) %> tags at
+        once. Gold users can search for up to <%= User.tag_query_limit(User::Levels::GOLD) %> tags at once.</p>
+      </details>
+
+      <details>
+        <summary>What is the page limit?</summary>
+
+        <p>Normal users can only browse tags up to page 1000. Gold users can browse tags up to page 5000.</p>
+      </details>
+
+      <details>
+        <summary>What are private favorites?</summary>
+
+        <p>Normally your favorites are public to everyone. Gold users can make their favorites
+        private in their <%= link_to "account settings", settings_path %>.</p>
+      </details>
+
+      <details>
+        <summary>What are favorite groups?</summary>
+
+        <p>Favorite groups are like personal tags or pools. They let your organize your favorites
+        in groups however you wish. See <%= link_to_wiki "help:favorite groups" %> for more details.</p>
+      </details>
+
+      <details>
+        <summary>What are saved searches?</summary>
+
+        <p>Saved searches let you save your favorite tags and searches. They let easily check for
+        new posts under your favorite tags. Gold users can keep up to 1000 saved searches. See
+        <%= link_to_wiki "help:saved searches" %> for more details.</p>
+      </details>
+
+      <details>
+        <summary>What is the max search duration?</summary>
+
+        <p>Complicated tag searches may take longer to execute. Normal users can only do
+        searches that take up to 3 seconds long. Gold users can do searches that take up to 6
+        seconds long. This means Gold users can do more complicated tag searches.</p>
       </details>
 
       <details>
         <summary>What payment methods do you support?</summary>
 
-        <p>We support all major credit and debit cards, including international
-        cards. We also support bank payments in several European countries,
-        including Austria, Belgium, Germany, the Netherlands, and Poland.</p>
-
-        <p>Payments are securely handled by <a href="https://www.stripe.com">Stripe</a>.
-        We don't support PayPal or Bitcoin at this time.</p>
+        <p>We support all major credit and debit cards. We don't support PayPal or Bitcoin at this time.</p>
       </details>
 
       <details>
