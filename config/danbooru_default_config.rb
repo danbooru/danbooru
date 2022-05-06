@@ -66,6 +66,11 @@ module Danbooru
       Socket.gethostname
     end
 
+    # A list of alternate hostnames where safe mode will automatically be enabled.
+    def safe_mode_hostnames
+      ["safebooru.donmai.us"]
+    end
+
     # The URL of your site, e.g. https://danbooru.donmai.us.
     #
     # If you support HTTPS, change this to "https://www.mybooru.com". If you set

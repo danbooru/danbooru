@@ -23,8 +23,8 @@ class SessionLoaderTest < ActiveSupport::TestCase
     end
 
     context ".safe_mode?" do
-      should "return true if the host contains the string safebooru" do
-        @request.stubs(:host).returns("safebooru")
+      should "return true if the hostname is safebooru.donmai.us" do
+        @request.stubs(:host).returns("safebooru.donmai.us")
         SessionLoader.new(@request).load
 
         assert_equal(true, CurrentUser.safe_mode?)
