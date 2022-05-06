@@ -123,34 +123,38 @@
       <details>
         <summary>What is the tag limit?</summary>
 
-        <p>Normal users can only search for <%= User.tag_query_limit(User::Levels::MEMBER) %> tags at
-        once. Gold users can search for up to <%= User.tag_query_limit(User::Levels::GOLD) %> tags at once.</p>
+        <p>The tag limit is how many tags you can search for at once. Normal users can only search for
+        <%= User.tag_query_limit(User::Levels::MEMBER) %> tags at once. Gold users can search for up
+        to <%= User.tag_query_limit(User::Levels::GOLD) %> tags at once.</p>
+
+        <p>See <%= link_to_wiki "help:cheatsheet" %> for more information on searches.</p>
       </details>
 
       <details>
         <summary>What is the page limit?</summary>
 
-        <p>Normal users can only browse tags up to page 1000. Gold users can browse tags up to page 5000.</p>
+        <p>Normal users can only browse up to page 1000. Gold users can browse up to page 5000.</p>
       </details>
 
       <details>
         <summary>What are private favorites?</summary>
 
-        <p>Normally your favorites are public to everyone. Gold users can make their favorites
+        <p>Normally your favorites are visible to everyone. Gold users can make their favorites
         private in their <%= link_to "account settings", settings_path %>.</p>
       </details>
 
       <details>
         <summary>What are favorite groups?</summary>
 
-        <p>Favorite groups are like personal tags or pools. They let your organize your favorites
-        in groups however you wish. See <%= link_to_wiki "help:favorite groups" %> for more details.</p>
+        <p>Favorite groups are like personal tags or pools. They let you organize your favorites
+        in groups however you wish. Gold users can have an unlimited number of favorite groups. See
+        <%= link_to_wiki "help:favorite groups" %> for more details.</p>
       </details>
 
       <details>
         <summary>What are saved searches?</summary>
 
-        <p>Saved searches let you save your favorite tags and searches. They let easily check for
+        <p>Saved searches let you save your favorite tags and searches. They let you easily check for
         new posts under your favorite tags. Gold users can keep up to 1000 saved searches. See
         <%= link_to_wiki "help:saved searches" %> for more details.</p>
       </details>
