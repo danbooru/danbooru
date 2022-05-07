@@ -9,8 +9,8 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
     StripeMock.stop
   end
 
-  def post_webhook(*args, metadata: {}, payment_status: "paid")
-    skip unless UserUpgrade.enabled?
+  def post_stripe_webhook(*args, metadata: {}, payment_status: "paid")
+    skip unless PaymentTransaction::Stripe.enabled?
     event = StripeMock.mock_webhook_event(*args, payment_status: payment_status, metadata: metadata)
     signature = generate_stripe_signature(event)
     headers = { "Stripe-Signature": signature }
@@ -22,7 +22,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
   # https://stripe.com/docs/webhooks/signatures
   def generate_stripe_signature(event)
     time = Time.now
-    secret = UserUpgrade.stripe_webhook_secret
+    secret = Danbooru.config.stripe_webhook_secret
     signature = Stripe::Webhook::Signature.compute_signature(time, event.to_json, secret)
     Stripe::Webhook::Signature.generate_header(time, signature, scheme: Stripe::Webhook::Signature::EXPECTED_SCHEME)
   end
@@ -58,7 +58,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
 
         context "for a payment_intent.created event" do
           should "work" do
-            post_webhook("payment_intent.created")
+            post_stripe_webhook("payment_intent.created")
 
             assert_response 200
           end
@@ -68,7 +68,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
           context "for completed event with an unpaid payment status" do
             should "not upgrade the user" do
               @user_upgrade = create(:self_gold_upgrade)
-              post_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id }, payment_status: "unpaid")
+              post_stripe_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id }, payment_status: "unpaid")
 
               assert_response 200
               assert_equal("processing", @user_upgrade.reload.status)
@@ -80,7 +80,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
             context "to Gold" do
               should "upgrade the user" do
                 @user_upgrade = create(:self_gold_upgrade)
-                post_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
+                post_stripe_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
                 assert_equal("complete", @user_upgrade.reload.status)
@@ -91,7 +91,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
             context "to Platinum" do
               should "upgrade the user" do
                 @user_upgrade = create(:self_platinum_upgrade)
-                post_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
+                post_stripe_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
                 assert_equal("complete", @user_upgrade.reload.status)
@@ -102,7 +102,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
             context "from Gold to Platinum" do
               should "upgrade the user" do
                 @user_upgrade = create(:self_gold_to_platinum_upgrade)
-                post_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
+                post_stripe_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
                 assert_equal("complete", @user_upgrade.reload.status)
@@ -115,7 +115,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
             context "to Gold" do
               should "upgrade the user" do
                 @user_upgrade = create(:gift_gold_upgrade)
-                post_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
+                post_stripe_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
                 assert_equal("complete", @user_upgrade.reload.status)
@@ -126,7 +126,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
             context "to Platinum" do
               should "upgrade the user" do
                 @user_upgrade = create(:gift_platinum_upgrade)
-                post_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
+                post_stripe_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
                 assert_equal("complete", @user_upgrade.reload.status)
@@ -137,7 +137,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
             context "from Gold to Platinum" do
               should "upgrade the user" do
                 @user_upgrade = create(:gift_gold_to_platinum_upgrade)
-                post_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
+                post_stripe_webhook("checkout.session.completed", metadata: { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
                 assert_equal("complete", @user_upgrade.reload.status)

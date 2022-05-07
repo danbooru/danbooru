@@ -4,6 +4,8 @@ class UserUpgrade < ApplicationRecord
   belongs_to :recipient, class_name: "User"
   belongs_to :purchaser, class_name: "User"
 
+  delegate :payment_url, :receipt_url, to: :transaction
+
   enum upgrade_type: {
     gold: 0,
     platinum: 10,
@@ -21,19 +23,7 @@ class UserUpgrade < ApplicationRecord
   scope :self_upgrade, -> { where("recipient_id = purchaser_id") }
 
   def self.enabled?
-    stripe_secret_key.present? && stripe_publishable_key.present? && stripe_webhook_secret.present?
-  end
-
-  def self.stripe_secret_key
-    Danbooru.config.stripe_secret_key
-  end
-
-  def self.stripe_publishable_key
-    Danbooru.config.stripe_publishable_key
-  end
-
-  def self.stripe_webhook_secret
-    Danbooru.config.stripe_webhook_secret
+    Danbooru.config.user_upgrades_enabled?
   end
 
   def self.gold_price
@@ -147,74 +137,23 @@ class UserUpgrade < ApplicationRecord
     end
   end
 
-  concerning :StripeMethods do
+  concerning :TransactionMethods do
     def create_checkout!(country: "US", allow_promotion_codes: false)
-      methods = payment_method_types(country)
-      currency = preferred_currency(country)
-      price_id = upgrade_price_id(currency)
-
-      checkout = Stripe::Checkout::Session.create(
-        mode: "payment",
-        success_url: Routes.user_upgrade_url(self),
-        cancel_url: Routes.new_user_upgrade_url(user_id: recipient.id),
-        client_reference_id: "user_upgrade_#{id}",
-        customer_email: purchaser.email_address&.address,
-        payment_method_types: methods,
-        allow_promotion_codes: allow_promotion_codes.presence,
-        line_items: [{
-          price: price_id,
-          quantity: 1,
-        }],
-        discounts: [{
-          coupon: promotion_discount_id,
-        }],
-        metadata: {
-          user_upgrade_id: id,
-          purchaser_id: purchaser.id,
-          recipient_id: recipient.id,
-          purchaser_name: purchaser.name,
-          recipient_name: recipient.name,
-          upgrade_type: upgrade_type,
-          country: country,
-          is_gift: is_gift?,
-          level: level,
-        }
-      )
-
-      update!(stripe_id: checkout.id)
-      checkout
+      transaction.create!(country: country, allow_promotion_codes: allow_promotion_codes)
     end
 
     def refund!(reason: nil)
       with_lock do
         return if refunded?
 
-        Stripe::Refund.create(payment_intent: payment_intent.id, reason: reason)
+        transaction.refund!(reason)
         recipient.update!(level: previous_level)
         update!(status: "refunded")
       end
     end
 
-    def receipt_url
-      return nil if pending? || stripe_id.nil?
-      charge.receipt_url
-    end
-
-    def payment_url
-      return nil if pending? || stripe_id.nil?
-      "https://dashboard.stripe.com/payments/#{payment_intent.id}"
-    end
-
-    def checkout_session
-      @checkout_session ||= Stripe::Checkout::Session.retrieve(stripe_id)
-    end
-
-    def payment_intent
-      @payment_intent ||= Stripe::PaymentIntent.retrieve(checkout_session.payment_intent)
-    end
-
-    def charge
-      payment_intent.charges.data.first
+    def transaction
+      PaymentTransaction::Stripe.new(self)
     end
 
     def has_receipt?
@@ -223,116 +162,6 @@ class UserUpgrade < ApplicationRecord
 
     def has_payment?
       !pending?
-    end
-
-    def promotion_discount_id
-      if Danbooru.config.is_promotion?
-        Danbooru.config.stripe_promotion_discount_id
-      end
-    end
-
-    def upgrade_price_id(currency)
-      case [upgrade_type, currency]
-      when ["gold", "usd"]
-        Danbooru.config.stripe_gold_usd_price_id
-      when ["gold", "eur"]
-        Danbooru.config.stripe_gold_eur_price_id
-      when ["platinum", "usd"]
-        Danbooru.config.stripe_platinum_usd_price_id
-      when ["platinum", "eur"]
-        Danbooru.config.stripe_platinum_eur_price_id
-      when ["gold_to_platinum", "usd"]
-        Danbooru.config.stripe_gold_to_platinum_usd_price_id
-      when ["gold_to_platinum", "eur"]
-        Danbooru.config.stripe_gold_to_platinum_eur_price_id
-      else
-        raise NotImplementedError
-      end
-    end
-
-    def payment_method_types(country)
-      case country.to_s.upcase
-      # Austria, https://stripe.com/docs/payments/bancontact
-      when "AT"
-        ["card", "eps"]
-      # Belgium, https://stripe.com/docs/payments/eps
-      when "BE"
-        ["card", "bancontact"]
-      # Germany, https://stripe.com/docs/payments/giropay
-      when "DE"
-        ["card", "giropay"]
-      # Netherlands, https://stripe.com/docs/payments/ideal
-      when "NL"
-        ["card", "ideal"]
-      # Poland, https://stripe.com/docs/payments/p24
-      when "PL"
-        ["card", "p24"]
-      else
-        ["card"]
-      end
-    end
-
-    def preferred_currency(country)
-      case country.to_s.upcase
-      # Austria, Belgium, Germany, Netherlands, Poland
-      when "AT", "BE", "DE", "NL", "PL"
-        "eur"
-      else
-        "usd"
-      end
-    end
-
-    class_methods do
-      def register_webhook
-        webhook = Stripe::WebhookEndpoint.create({
-          url: Routes.webhook_user_upgrade_url(source: "stripe"),
-          enabled_events: [
-            "checkout.session.completed",
-            "checkout.session.async_payment_failed",
-            "checkout.session.async_payment_succeeded",
-            "charge.dispute.created",
-            "radar.early_fraud_warning.created",
-          ],
-        })
-
-        webhook.secret
-      end
-
-      def receive_webhook(request)
-        event = build_event(request)
-
-        case event.type
-        when "checkout.session.completed"
-          checkout_session_completed(event.data.object)
-        when "charge.dispute.created"
-          charge_dispute_created(event.data.object)
-        when "radar.early_fraud_warning.created"
-          radar_early_fraud_warning_created(event.data.object)
-        end
-      end
-
-      def build_event(request)
-        payload = request.body.read
-        signature = request.headers["Stripe-Signature"]
-        Stripe::Webhook.construct_event(payload, signature, stripe_webhook_secret)
-      end
-
-      def checkout_session_completed(checkout)
-        user_upgrade = UserUpgrade.find(checkout.metadata.user_upgrade_id)
-        user_upgrade.process_upgrade!(checkout.payment_status)
-      end
-
-      def charge_dispute_created(dispute)
-        Dmail.create_automated(to: User.owner, title: "Stripe Dispute", body: <<~EOS)
-          Dispute: https://stripe.com/payments/#{dispute.charge}
-        EOS
-      end
-
-      def radar_early_fraud_warning_created(fraud_warning)
-        Dmail.create_automated(to: User.owner, title: "Stripe Early Fraud Warning", body: <<~EOS)
-          Charge: https://stripe.com/payments/#{fraud_warning.charge}
-        EOS
-      end
     end
   end
 end

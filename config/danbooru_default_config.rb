@@ -363,6 +363,11 @@ module Danbooru
       resolution_mismatch source_larger source_smaller]
     end
 
+    # Whether the Gold account upgrade page should be enabled.
+    def user_upgrades_enabled?
+      true
+    end
+
     def stripe_secret_key
     end
 

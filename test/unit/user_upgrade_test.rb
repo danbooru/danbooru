@@ -44,7 +44,7 @@ class UserUpgradeTest < ActiveSupport::TestCase
       context "for a gifted upgrade" do
         context "to Gold" do
           should "prefill the Stripe checkout page with the purchaser's email address" do
-            skip "Stripe API keys not configured" unless UserUpgrade.enabled?
+            skip "Stripe API keys not configured" unless PaymentTransaction::Stripe.enabled?
 
             @user = create(:user, email_address: build(:email_address))
             @user_upgrade = create(:gift_gold_upgrade, purchaser: @user)
@@ -64,48 +64,48 @@ class UserUpgradeTest < ActiveSupport::TestCase
           @user_upgrade = create(:self_gold_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "US")
 
-          assert_equal(UserUpgrade.gold_price, @user_upgrade.payment_intent.amount)
-          assert_equal("usd", @user_upgrade.payment_intent.currency)
+          assert_equal(UserUpgrade.gold_price, @user_upgrade.transaction.amount)
+          assert_equal("usd", @user_upgrade.transaction.currency)
         end
 
         should "choose the right price in USD for a platinum upgrade" do
           @user_upgrade = create(:self_platinum_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "US")
 
-          assert_equal(UserUpgrade.platinum_price, @user_upgrade.payment_intent.amount)
-          assert_equal("usd", @user_upgrade.payment_intent.currency)
+          assert_equal(UserUpgrade.platinum_price, @user_upgrade.transaction.amount)
+          assert_equal("usd", @user_upgrade.transaction.currency)
         end
 
         should "choose the right price in USD for a gold to platinum upgrade" do
           @user_upgrade = create(:self_gold_to_platinum_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "US")
 
-          assert_equal(UserUpgrade.gold_to_platinum_price, @user_upgrade.payment_intent.amount)
-          assert_equal("usd", @user_upgrade.payment_intent.currency)
+          assert_equal(UserUpgrade.gold_to_platinum_price, @user_upgrade.transaction.amount)
+          assert_equal("usd", @user_upgrade.transaction.currency)
         end
 
         should "choose the right price in EUR for a gold upgrade" do
           @user_upgrade = create(:self_gold_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "DE")
 
-          assert_equal(0.8 * UserUpgrade.gold_price, @user_upgrade.payment_intent.amount)
-          assert_equal("eur", @user_upgrade.payment_intent.currency)
+          assert_equal(0.8 * UserUpgrade.gold_price, @user_upgrade.transaction.amount)
+          assert_equal("eur", @user_upgrade.transaction.currency)
         end
 
         should "choose the right price in EUR for a platinum upgrade" do
           @user_upgrade = create(:self_platinum_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "DE")
 
-          assert_equal(0.8 * UserUpgrade.platinum_price, @user_upgrade.payment_intent.amount)
-          assert_equal("eur", @user_upgrade.payment_intent.currency)
+          assert_equal(0.8 * UserUpgrade.platinum_price, @user_upgrade.transaction.amount)
+          assert_equal("eur", @user_upgrade.transaction.currency)
         end
 
         should "choose the right price in EUR for a gold to platinum upgrade" do
           @user_upgrade = create(:self_gold_to_platinum_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "DE")
 
-          assert_equal(0.8 * UserUpgrade.gold_to_platinum_price, @user_upgrade.payment_intent.amount)
-          assert_equal("eur", @user_upgrade.payment_intent.currency)
+          assert_equal(0.8 * UserUpgrade.gold_to_platinum_price, @user_upgrade.transaction.amount)
+          assert_equal("eur", @user_upgrade.transaction.currency)
         end
       end
 
@@ -119,49 +119,49 @@ class UserUpgradeTest < ActiveSupport::TestCase
           @checkout = @user_upgrade.create_checkout!(country: "US")
 
           assert_equal(["card"], @checkout.payment_method_types)
-          assert_equal("usd", @user_upgrade.payment_intent.currency)
+          assert_equal("usd", @user_upgrade.transaction.currency)
         end
 
         should "choose the right payment methods for AT" do
           @checkout = @user_upgrade.create_checkout!(country: "AT")
 
           assert_equal(["card", "eps"], @checkout.payment_method_types)
-          assert_equal("eur", @user_upgrade.payment_intent.currency)
+          assert_equal("eur", @user_upgrade.transaction.currency)
         end
 
         should "choose the right payment methods for BE" do
           @checkout = @user_upgrade.create_checkout!(country: "BE")
 
           assert_equal(["card", "bancontact"], @checkout.payment_method_types)
-          assert_equal("eur", @user_upgrade.payment_intent.currency)
+          assert_equal("eur", @user_upgrade.transaction.currency)
         end
 
         should "choose the right payment methods for DE" do
           @checkout = @user_upgrade.create_checkout!(country: "DE")
 
           assert_equal(["card", "giropay"], @checkout.payment_method_types)
-          assert_equal("eur", @user_upgrade.payment_intent.currency)
+          assert_equal("eur", @user_upgrade.transaction.currency)
         end
 
         should "choose the right payment methods for NL" do
           @checkout = @user_upgrade.create_checkout!(country: "NL")
 
           assert_equal(["card", "ideal"], @checkout.payment_method_types)
-          assert_equal("eur", @user_upgrade.payment_intent.currency)
+          assert_equal("eur", @user_upgrade.transaction.currency)
         end
 
         should "choose the right payment methods for PL" do
           @checkout = @user_upgrade.create_checkout!(country: "PL")
 
           assert_equal(["card", "p24"], @checkout.payment_method_types)
-          assert_equal("eur", @user_upgrade.payment_intent.currency)
+          assert_equal("eur", @user_upgrade.transaction.currency)
         end
 
         should "choose the right payment methods for an unsupported country" do
           @checkout = @user_upgrade.create_checkout!(country: "MX")
 
           assert_equal(["card"], @checkout.payment_method_types)
-          assert_equal("usd", @user_upgrade.payment_intent.currency)
+          assert_equal("usd", @user_upgrade.transaction.currency)
         end
       end
     end
