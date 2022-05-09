@@ -270,6 +270,8 @@ Rails.application.routes.draw do
       get :custom_style
     end
   end
+  get "/upgrade", to: "user_upgrades#new", as: "new_user_upgrade"
+  get "/user_upgrades/new", to: redirect("/upgrade")
   resources :user_upgrades, only: [:new, :create, :show, :index] do
     get :receipt, on: :member
     get :payment, on: :member
@@ -333,14 +335,16 @@ Rails.application.routes.draw do
   get "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   get "/404" => "static#not_found", :as => "not_found"
   get "/2257" => "static#2257", :as => "usc_2257"
+  get "/contact" => "static#contact", :as => "contact"
+
   get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   get "/static/site_map" => "static#site_map", :as => "site_map"
   get "/static/colors" => "static#colors", :as => "colors"
-  get "/static/contact" => "static#contact", :as => "contact"
   get "/static/dtext_help" => "static#dtext_help", :as => "dtext_help"
   get "/static/terms_of_service", to: redirect("/terms_of_service")
-  get "/user_upgrade/new", to: redirect("/user_upgrades/new")
+  get "/static/contact", to: redirect("/contact")
+  get "/user_upgrade/new", to: redirect("/upgrade")
   get "/delayed_jobs", to: redirect("/jobs")
 
   get "/mock/recommender/recommend/:user_id" => "mock_services#recommender_recommend", as: "mock_recommender_recommend"
