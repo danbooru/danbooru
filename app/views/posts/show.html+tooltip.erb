@@ -24,6 +24,8 @@
 
   <% if @post.source_domain.present? %>
     <%= link_to @post.source_domain, @post.normalized_source, class: "post-tooltip-source post-tooltip-info" %>
+  <% elsif @post.source.present? %>
+    <%= link_to "non-web source", posts_path(tags: "non-web_source"), title: @post.source, class: "post-tooltip-source post-tooltip-info" %>
   <% else %>
     <%= link_to "no source", posts_path(tags: "source:none"), class: "post-tooltip-source post-tooltip-info" %>
   <% end %>
