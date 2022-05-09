@@ -23,8 +23,8 @@
       <%= Danbooru.config.canonical_app_name %>. Your support helps keep the
       site ad-free for everyone!</p>
 
-      <p>You can also gift an account upgrade to someone else. Just go to
-      their profile page and look for a "Gift Upgrade" link.</p>
+      <p><%= Danbooru.config.canonical_app_name %> Gold is a lifetime upgrade,
+      not a subscription. You pay only once and keep the upgrade forever!</p>
 
       <p><b>Notice: Gold upgrades are temporarily disabled while we change our payment system.</b></p>
     <% end %>
@@ -56,7 +56,7 @@
             <% if Danbooru.config.is_promotion? %>
               <s>$20</s>
             <% end %>
-            <%= cents_to_usd(UserUpgrade.gold_price) %>
+            <b><%= cents_to_usd(UserUpgrade.gold_price) %></b>
             <div class="fineprint">One time fee</div>
           </td>
         </tr>
@@ -69,11 +69,6 @@
           <td>Page Limit</td>
           <td><%= User.page_limit(User::Levels::MEMBER) %></td>
           <td><%= User.page_limit(User::Levels::GOLD) %></td>
-        </tr>
-        <tr>
-          <td>See Hidden Tags</td>
-          <td>No</td>
-          <td>Yes</td>
         </tr>
         <tr>
           <td>Private Favorites</td>
@@ -100,12 +95,17 @@
           <% if @user_upgrade.purchaser.is_anonymous? %>
             <td><%= link_to "Login", login_path(url: new_user_upgrade_path), class: "login-button button-primary" %></td>
             <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %></td>
-          <% elsif @recipient.level == User::Levels::MEMBER %>
+            <% else %>
             <td></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %></td>
-          <% else %>
-            <td></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %></td>
+            <td>
+              <div class="mb-2">
+                <%= image_pack_tag("static/mastercard-logo.svg", width: 28, class: "icon") %>
+                <%= image_pack_tag("static/visa-logo.svg", width: 28, class: "icon") %>
+                <%= image_pack_tag("static/discover-logo.svg", width: 28, class: "icon") %>
+              </div>
+
+              <%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %>
+            </td>
           <% end %>
         </tr>
       </tbody>
@@ -135,7 +135,7 @@
       <details>
         <summary>What is the page limit?</summary>
 
-        <p>Normal users can only browse up to page 1000. Gold users can browse up to page 5000.</p>
+        <p>Normal users can only browse posts up to page 1000. Gold users can browse posts up to page 5000.</p>
       </details>
 
       <details>
@@ -170,6 +170,12 @@
       </details>
 
       <details>
+        <summary>Can I gift an upgrade to someone else?</summary>
+
+        <p>Sure. Just go to their profile page and look for the "Gift Upgrade" link.</p>
+      </details>
+
+      <details>
         <summary>What payment methods do you support?</summary>
 
         <p>We support all major credit and debit cards. We don't support PayPal or Bitcoin at this time.</p>
@@ -178,15 +184,18 @@
       <details>
         <summary>Is this a subscription?</summary>
 
-        <p>No, this is not a subscription. This is a one-time payment. You pay
-        only once and keep the upgrade forever.</p>
+        <p>No, this is not a subscription. This is a one-time payment only. You pay only once and keep the upgrade forever.</p>
       </details>
 
       <details>
         <summary>What is your refund policy?</summary>
 
-        <p>You can <%= link_to "contact us", contact_path %> to request a refund
-        for any reason within 48 hours of your purchase.</p>
+        <p>You can request a refund for any reason within 48 hours of your purchase. To request a refund,
+        <%= link_to "contact us", contact_path %> or send an email to <%= link_to Danbooru.config.contact_email, "mailto:#{Danbooru.config.contact_email}" %>.
+        Please include your username in your request.</p>
+
+        <p>Refund requests will be responded to within 1 business day. Please note that it may take up to 10 business days for refunds
+        to be processed by your bank or credit card company.</p>
       </details>
     </div>
   </div>
