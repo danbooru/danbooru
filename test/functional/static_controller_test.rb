@@ -46,6 +46,13 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  context "2257 action" do
+    should "work" do
+      get usc_2257_path
+      assert_response :success
+    end
+  end
+
   context "not_found action" do
     should "return the 404 page for GET requests" do
       get "/qwoiqogieqg"

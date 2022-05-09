@@ -1,0 +1,47 @@
+<% page_title "18 U.S.C. §2257 Compliance Statement" %>
+
+<% @app_name = Danbooru.config.canonical_app_name %>
+
+<div id="c-static">
+  <div id="a-2257" class="prose fixed-width-container">
+    <h1>18 U.S.C. §2257 Compliance Statement</h1>
+
+    <p><%= @app_name %> is an image hosting website which allows for the
+    uploading, sharing, and viewing of illustrations, drawings, and
+    computer-generated artwork.</p>
+
+    <p><%= @app_name %> is exempt from the record keeping requirements of 18
+    U.S.C. §2257 because the site does not publish sexually explicit
+    photographs or videos of real people. Any photographs or videos of any real
+    people that may be published on this website are not sexually explicit (as
+    defined in 18 U.S.C section 2256) or totally non-nude.</p>
+
+    <p><%= @app_name %> is not a producer (whether primary or secondary as
+    defined in 18 U.S.C. § 2257) of any of the content found on this website.
+    The website's activities, with respect to such content, are limited to the
+    transmission, storage, retrieval, and/or hosting of content on behalf of
+    third party users.</p>
+
+    <p>Please direct any requests you may have regarding §2257 records in
+    relation to any content found on <%= @app_name %> directly to the
+    respective uploader, artist, or producer of said content.</p>
+
+    <p><%= @app_name %> abides by the following procedures regarding uploaded content to ensure compliance:</p>
+
+    <ul>
+      <li>Requiring all users to be over 18 years old to use the site, register an account, or upload content.</li>
+      <li>Requiring all uploaded content to be drawn or computer generated artwork.</li>
+      <li>Prohibiting the upload of any nude or sexually-explicit photographs or videos of any real person.</li>
+      <li>Prohibiting the upload of any photographs or videos of any real person who is or appears to be under the age of 18.</li>
+      <li>Moderating all uploaded content and expeditiously removing any content found to be in violation of these policies.</li>
+    </ul>
+
+    <p><%= @app_name %> allows content to be flagged as inappropriate by users.
+    Should any content be flagged as illegal or in violation of these policies,
+    it shall be removed from the site without delay.</p>
+
+    <p>For further assistance in contacting the uploader or producer of any
+    content, in removing content from the site, or for any questions regarding
+    this notice, please <%= link_to "contact us", contact_path %>.
+  </div>
+</div>

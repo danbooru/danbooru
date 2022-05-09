@@ -332,6 +332,7 @@ Rails.application.routes.draw do
   get "/privacy" => "static#privacy_policy", :as => "privacy_policy"
   get "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   get "/404" => "static#not_found", :as => "not_found"
+  get "/2257" => "static#2257", :as => "usc_2257"
   get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   get "/static/site_map" => "static#site_map", :as => "site_map"
