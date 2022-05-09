@@ -4,11 +4,6 @@
   <div id="a-contact">
     <h1>Contact</h1>
 
-    <p>
-      You can contact the administrator of this site by
-      <%= link_to "sending a private message", new_dmail_path(dmail: { to_name: User.owner.name }) %> to <%= link_to_user User.owner, "@#{User.owner.name}" %>,
-      by messaging @<%= User.owner.name %> on the <%= link_to "#{Danbooru.config.canonical_app_name} Discord", Danbooru.config.discord_server_url %>,
-      or by sending an email to <%= mail_to Danbooru.config.contact_email, nil, encode: :hex %>.
-    </p>
+    <%= raw Danbooru.config.contact_page_html %>
   </div>
 </div>

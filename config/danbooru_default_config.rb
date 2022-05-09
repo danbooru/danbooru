@@ -242,6 +242,10 @@ module Danbooru
       nil
     end
 
+    # The HTML that should go on the contact page.
+    def contact_page_html
+    end
+
     # The number of posts displayed per page.
     def posts_per_page
       20
