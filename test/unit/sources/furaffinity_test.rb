@@ -42,6 +42,13 @@ module Sources
       strategy_should_work("https://www.furaffinity.net/view/3404111", deleted: true, profile_url: nil)
     end
 
+    context "A furaffinity post with non-ascii image url" do
+      strategy_should_work(
+        "https://www.furaffinity.net/view/20762907/",
+        image_urls: ["https://d.furaffinity.net/art/fhedge/1470365580/1470365580.fhedge_ミストランサーまとめアートボード_1.jpg"]
+      )
+    end
+
     should "Parse Furaffinity URLs correctly" do
       assert(Source::URL.image_url?("https://d.furaffinity.net/art/iwbitu/1650222955/1650222955.iwbitu_yubi.jpg"))
       assert(Source::URL.page_url?("https://www.furaffinity.net/view/46821705/"))

@@ -19,7 +19,7 @@ class Source::Extractor
         download_button = html_response&.css(".submission-content .auto_link .button").to_a.find { |el| el.text == "Download" }
         partial_image = download_button&.[]("href")
         return [] unless partial_image.present?
-        [URI.join("https://d.furaffinity.net", partial_image).to_s].compact
+        [Addressable::URI.join("https://d.furaffinity.net", partial_image).to_s].compact
       end
     end
 
