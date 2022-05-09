@@ -1,205 +1,206 @@
-require 'set'
+#!/usr/bin/env ruby
+#
+# This script populates the database with random data for testing or development purposes.
+#
+# Usage: POSTS=100 bin/rails runner db/populate.rb
 
-CurrentUser.ip_addr = "127.0.0.1"
-used_names = Set.new([""])
+# The number of random posts to generate. By default, we generate 100 random
+# posts and scale the size of other tables based on the number of posts.
+POSTS = ENV.fetch("POSTS", 100).to_i
 
-def rand_string(n, unique = false)
-  string = ""
+USERS        = ENV.fetch("USERS",        POSTS * 0.2).to_i
+NOTES        = ENV.fetch("NOTES",        POSTS * 0.1).to_i
+ARTISTS      = ENV.fetch("ARTISTS",      POSTS * 0.1).to_i
+ALIASES      = ENV.fetch("ALIASES",      POSTS * 0.1).to_i
+IMPLICATIONS = ENV.fetch("IMPLICATIONS", POSTS * 0.1).to_i
+POOLS        = ENV.fetch("POOLS",        POSTS * 0.1).to_i
+TOPICS       = ENV.fetch("TOPICS",       POSTS * 0.1).to_i
+WIKI_PAGES   = ENV.fetch("WIKI_PAGES",   POSTS * 0.1).to_i
+COMMENTS     = ENV.fetch("COMMENTS",     POSTS * 0.2).to_i
+COMMENTARIES = ENV.fetch("COMMENTARIES", POSTS * 0.5).to_i
+FAVORITES    = ENV.fetch("FAVORITES",    POSTS * 5.0).to_i
 
-  n = rand(n) + 1
+# The default password for all user accounts. The default is `password`.
+DEFAULT_PASSWORD = ENV.fetch("DEFAULT_PASSWORD", "password")
 
-  while used_names.include?(string)
-    consonants = "bcdfghjklmnpqrstvwxz".scan(/./)
-    vowels = "aeiouy".scan(/./)
-    string = ""
-    n.times do
-      string << consonants[rand(consonants.size)]
-      string << vowels[rand(vowels.size)]
-    end
-    return string unless unique
-  end
-
-  used_names.add(string)
-  string
-end
-
-def rand_sentence(n, unique = false)
-  (0..n).map {rand_string(n, unique)}.join(" ") + "."
-end
-
-def rand_paragraph(n, unique = false)
-  (0..n).map {rand_sentence(n, unique)}.join(" ")
-end
-
-def rand_document(n, unique = false)
-  (0..n).map {rand_paragraph(n, unique)}.join("\n\n")
-end
-
-if User.count == 0
-  puts "Creating users"
-
-  begin
-    user = User.create(
-      :name => "admin",
-      :password => "password1",
-      :password_confirmation => "password1"
-    )
-
-    CurrentUser.user = user
-    User::Levels.constants.reject { |x| x == :ADMIN }.each do |level|
-      newuser = User.create(
-        name: level.to_s.downcase,
-        password: "password1",
-        password_confirmation: "password1"
-      )
-      newuser.promote_to!(User::Levels.const_get(level), user)
-    end
-
-    newuser = User.create(
-      :name => "banned",
-      :password => "password1",
-      :password_confirmation => "password1"
-    )
-    Ban.create(:user_id => newuser.id, :reason => "from the start", :duration => 99999)
-
-    newuser = User.create(
-      :name => "uploader",
-      :password => "password1",
-      :password_confirmation => "password1"
-    )
-    newuser.promote_to!(User::Levels::BUILDER, :can_upload_free => true, :skip_dmail => true)
-
-    newuser = User.create(
-      :name => "approver",
-      :password => "password1",
-      :password_confirmation => "password1"
-    )
-    newuser.promote_to!(User::Levels::BUILDER, :can_approve_posts => true, :skip_dmail => true)
-  end
-
-  0.upto(10) do |i|
-    User.create(
-      :name => rand_string(8, true),
-      :password => "password1",
-      :password_confirmation => "password1"
-    )
-  end
-  used_names = Set.new([""])
-else
-  puts "Skipping users"
-  user = User.find_by_name("albert")
-end
-
-CurrentUser.user = User.admins.first
+CurrentUser.user = User.system
 CurrentUser.ip_addr = "127.0.0.1"
 
-if Upload.count == 0
-  puts "Creating uploads"
-  1.upto(50) do |i|
-    color1 = rand(4096).to_s(16)
-    color2 = rand(4096).to_s(16)
-    width = rand(100..2099)
-    height = (width * (rand(0.5) + 1)).to_i
-    url = "http://ipsumimage.appspot.com/#{width}x#{height},#{color1}"
-    tags = rand(1_000_000_000).to_s.scan(/../).join(" ")
-    puts url
-    service = UploadService.new(source: url, tag_string: tags, rating: "s")
-    service.start!
+def populate_users(n, password: DEFAULT_PASSWORD)
+  puts "*** Creating users ***"
+
+  User::Levels.constants.without(:ANONYMOUS).each do |level|
+    user = User.create(name: level.to_s.downcase, password: password, password_confirmation: password, level: User::Levels.const_get(level))
+    puts "Created user ##{user.id} (#{user.name})"
   end
-else
-  puts "Skipping uploads"
+
+  user = User.create(name: "contributor", password: password, password_confirmation: password, level: User::Levels::BUILDER, can_upload_free: true)
+  puts "Created user ##{user.id} (#{user.name})"
+
+  user = User.create(name: "approver", password: password, password_confirmation: password, level: User::Levels::BUILDER, can_upload_free: true, can_approve_posts: true)
+  puts "Created user ##{user.id} (#{user.name})"
+
+  n.times do |i|
+    user = User.create(name: FFaker::Internet.user_name, password: password, password_confirmation: password, level: User::Levels::MEMBER)
+    puts "Created user ##{user.id}"
+  end
 end
 
-if Comment.count == 0
-  puts "Creating comments"
-  Post.all.each do |post|
-    rand(100).times do
-      Comment.create(:post_id => post.id, :body => rand_paragraph(6))
-    end
-  end
-else
-  puts "Skipping comments"
-end
+def populate_posts(n, search: "rating:s", batch_size: 200, timeout: 30.seconds)
+  puts "*** Creating posts ***"
 
-if Note.count == 0
-  puts "Creating notes"
-  Post.order("random()").limit(10).each do |post|
-    rand(5).times do
-      note = Note.create(:post_id => post.id, :x => rand(post.image_width), :y => rand(post.image_height), :width => 100, :height => 100, :body => Time.now.to_f.to_s)
+  # Generate posts in batches of 200 (by default)
+  n.times.each_slice(batch_size).map(&:size).each do |count|
+    posts = Danbooru::Http.get("https://danbooru.donmai.us/posts.json?tags=#{search}+random:#{count}&limit=#{count}").parse
 
-      rand(20).times do |i|
-        note.update(body: rand_sentence(6))
+    posts.each do |danbooru_post|
+      Timeout.timeout(timeout) do
+        user = User.order("random()").first
+        ip_addr = FFaker::Internet.ip_v4_address
+        upload = Upload.create(uploader: user, uploader_ip_addr: ip_addr, source: danbooru_post["file_url"])
+        sleep 1 until upload.reload.is_finished? # wait for the job worker to process the upload in the background
+
+        post = Post.new_from_upload(upload.upload_media_assets.first, tag_string: danbooru_post["tag_string"], source: danbooru_post["source"], rating: danbooru_post["rating"])
+        post.save
+
+        puts "Created post ##{post.id}"
       end
+    rescue
+      # ignore errors
     end
   end
-else
-  puts "Skipping notes"
 end
 
-if Artist.count == 0
-  puts "Creating artists"
-  20.times do |i|
-    Artist.create(:name => rand_string(9, true))
-  end
-  used_names = Set.new([""])
-else
-  puts "Skipping artists"
-end
+def populate_comments(n)
+  puts "*** Creating comments ***"
 
-if TagAlias.count == 0
-  puts "Creating tag aliases"
-
-  20.times do |i|
-    TagAlias.create(:antecedent_name => rand_string(9, true), :consequent_name => rand_string(9, true))
-  end
-  used_names = Set.new([""])
-else
-  puts "Skipping tag aliases"
-end
-
-if TagImplication.count == 0
-  puts "Creating tag implictions"
-
-  20.times do |i|
-    TagImplication.create(:antecedent_name => rand_string(9, true), :consequent_name => rand_string(9, true))
-  end
-  used_names = Set.new([""])
-else
-  puts "Skipping tag implications"
-end
-
-if Pool.count == 0
-  puts "Creating pools"
-
-  1.upto(20) do |i|
-    pool = Pool.create(:name => rand_string(9, true))
-    rand(33).times do |j|
-      pool.add!(Post.order("random()").first)
-    end
-  end
-  used_names = Set.new([""])
-end
-
-if Favorite.count == 0
-  puts "Creating favorites"
-
-  Post.order("random()").limit(50).each do |post|
+  n.times do |i|
     user = User.order("random()").first
-    Favorite.create!(post: post, user: user)
-    Favorite.create!(post: post, user: Currentuser.user)
+    post = Post.order("random()").first
+    ip_addr = FFaker::Internet.ip_v4_address
+    comment = CurrentUser.scoped(user) { Comment.create(creator: user, creator_ip_addr: ip_addr, post: post, body: FFaker::Lorem.paragraph) }
+
+    puts "Created comment ##{comment.id}"
   end
-else
-  puts "Skipping favorites"
 end
 
-if ForumTopic.count == 0
-  puts "Creating forum posts"
+def populate_commentaries(n)
+  puts "*** Creating artist commentaries ***"
 
-  20.times do |i|
-    topic = ForumTopic.create(:title => rand_sentence(6))
+  n.times do |i|
+    user = User.order("random()").first
+    post = Post.order("random()").first
+    artcomm = CurrentUser.scoped(user) { ArtistCommentary.create(post: post, original_title: FFaker::Lorem.sentence, original_description: FFaker::Lorem.paragraphs.join("\n\n")) }
 
-    rand(100).times do |j|
-      post = ForumPost.create(:topic_id => topic.id, :body => rand_document(6))
+    puts "Created commentary ##{artcomm.id}"
+  end
+end
+
+def populate_notes(n)
+  puts "*** Creating notes ***"
+
+  n.times do |i|
+    user = User.order("random()").first
+    post = Post.order("random()").first
+    x = rand(post.image_width).clamp(0..post.image_width - 100)
+    y = rand(post.image_height).clamp(0..post.image_height - 100)
+    w = rand(post.image_width - x).clamp(100..post.image_width)
+    h = rand(post.image_height - y).clamp(100..post.image_height)
+
+    note = Note.create(post: post, x: x, y: y, width: w, height: h, body: FFaker::Lorem.paragraph)
+
+    puts "Created note ##{note.id}"
+  end
+end
+
+def populate_artists(n)
+  puts "*** Creating artists ***"
+
+  n.times do |i|
+    url_string = rand(5).times.map { FFaker::Internet.http_url }.join("\n")
+    artist = Artist.create(name: FFaker::Internet.user_name, url_string: url_string)
+
+    puts "Created artist ##{artist.id}"
+  end
+end
+
+def populate_aliases(n)
+  puts "*** Creating tag aliases ***"
+
+  n.times do |i|
+    tag_alias = TagAlias.create(antecedent_name: FFaker::Internet.user_name, consequent_name: FFaker::Internet.user_name)
+    puts "Created tag alias ##{tag_alias.id}"
+  end
+end
+
+def populate_implications(n)
+  puts "*** Creating tag implications ***"
+
+  n.times do |i|
+    tag_implication = TagImplication.create(antecedent_name: FFaker::Internet.user_name, consequent_name: FFaker::Internet.user_name)
+    puts "Created tag implication ##{tag_implication.id}"
+  end
+end
+
+def populate_pools(n, posts_per_pool: 20)
+  puts "*** Creating pools ***"
+
+  n.times do |i|
+    posts = Post.order("random()").take(rand(posts_per_pool))
+    pool = Pool.create(name: FFaker::Lorem.sentence, description: FFaker::Lorem.paragraph, post_ids: posts.pluck(:id))
+    puts "Created pool ##{pool.id}"
+  end
+end
+
+def populate_favorites(n)
+  puts "*** Creating pools ***"
+
+  n.times do |i|
+    user = User.order("random()").first
+    post = Post.order("random()").first
+    favorite = Favorite.create(user: user, post: post)
+
+    puts "Created favorite ##{favorite.id}"
+  end
+end
+
+def populate_wiki_pages(n)
+  puts "*** Creating wiki pages ***"
+
+  n.times do |i|
+    user = User.order("random()").first
+    other_names = rand(5).times.map { FFaker::Internet.user_name }
+    wiki = CurrentUser.scoped(user) { WikiPage.create(title: FFaker::Internet.user_name, other_names: other_names, body: FFaker::Lorem.paragraphs.join("\n\n")) }
+
+    puts "Created wiki ##{wiki.id}"
+  end
+end
+
+def populate_forum(n, posts_per_topic: 20)
+  puts "*** Creating forum topics ***"
+
+  n.times do |i|
+    user = User.order("random()").first
+    topic = CurrentUser.scoped(user) { ForumTopic.create(creator: user, title: FFaker::Lorem.sentence, original_post_attributes: { creator: user, body: FFaker::Lorem.paragraphs.join("\n\n") }) }
+
+    rand(posts_per_topic).times do
+      user = User.order("random()").first
+      CurrentUser.scoped(user) { ForumPost.create(creator: user, topic: topic, body: FFaker::Lorem.paragraphs.join("\n\n")) }
     end
+
+    puts "Created topic ##{topic.id}"
   end
 end
+
+populate_users(USERS)
+populate_posts(POSTS)
+populate_notes(NOTES)
+populate_artists(ARTISTS)
+populate_aliases(ALIASES)
+populate_implications(IMPLICATIONS)
+populate_pools(POOLS)
+populate_forum(TOPICS)
+populate_wiki_pages(WIKI_PAGES)
+populate_comments(COMMENTS)
+populate_commentaries(COMMENTARIES)
+populate_favorites(FAVORITES)

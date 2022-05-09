@@ -56,6 +56,7 @@ gem "crass"
 gem "public_suffix"
 gem "elastic-apm"
 gem "debug"
+gem "ffaker"
 
 group :development do
   gem 'rubocop', require: false
@@ -78,7 +79,6 @@ group :test do
   gem "shoulda-matchers"
   gem "factory_bot"
   gem "mocha", require: "mocha/minitest"
-  gem "ffaker"
   gem "simplecov", require: false
   gem "minitest-ci"
   gem "minitest-reporters", require: "minitest/reporters"
