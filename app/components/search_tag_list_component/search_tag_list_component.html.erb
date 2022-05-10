@@ -1,6 +1,6 @@
 <ul class="tag-list search-tag-list">
   <% tags.each do |t| %>
-    <li class="tag-type-<%= t.category %>" data-tag-name="<%= t.name %>">
+    <li class="tag-type-<%= t.category %>" data-tag-name="<%= t.name %>" data-is-deprecated="<%= t.is_deprecated? %>">
       <%# ignore search:foo metatags %>
       <% if t.artist? %>
         <%= link_to "?", show_or_new_artists_path(name: t.name, z: 2), class: "wiki-link" %>

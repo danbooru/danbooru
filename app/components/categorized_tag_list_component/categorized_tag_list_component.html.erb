@@ -6,7 +6,7 @@
 
     <ul class="<%= category_name %>-tag-list">
       <% tags.each do |t| %>
-        <li class="tag-type-<%= t.category %>" data-tag-name="<%= t.name %>">
+        <li class="tag-type-<%= t.category %>" data-tag-name="<%= t.name %>" data-is-deprecated="<%= t.is_deprecated? %>">
           <% if t.artist? %>
             <%= link_to "?", show_or_new_artists_path(name: t.name, z: 1), class: "wiki-link" %>
           <% elsif t.name =~ /\A\d+\z/ %>
