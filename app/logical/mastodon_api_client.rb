@@ -5,22 +5,18 @@
 # @see https://docs.joinmastodon.org/api
 class MastodonApiClient
   extend Memoist
-  attr_reader :json
+  attr_reader :json, :id
 
   def initialize(site_name, id)
     @site_name = site_name
+    @id = id
+  end
 
-    return if access_token.blank?
-
-    if id.blank?
-      @json = {}
-    else
-      begin
-        @json = JSON.parse(access_token.get("/api/v1/statuses/#{id}").body)
-      rescue StandardError
-        @json = {}
-      end
-    end
+  def json
+    return {} if id.blank? || access_token.blank?
+    JSON.parse(access_token.get("/api/v1/statuses/#{id}").body)
+  rescue
+    {}
   end
 
   def profile_url
@@ -89,5 +85,5 @@ class MastodonApiClient
     OAuth2::Client.new(client_id, client_secret, :site => "https://#{@site_name}")
   end
 
-  memoize :client
+  memoize :client, :json
 end
