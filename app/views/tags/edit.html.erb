@@ -13,9 +13,11 @@
         <%= f.input :is_deprecated, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
       <% else %>
         <% if @tag.is_deprecated? %>
-        <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "undeprecate #{@tag.name}" }) %> to mark this tag as not deprecated.</p>
+          <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "undeprecate #{@tag.name}" }) %> to mark this tag as not deprecated.</p>
+        <% elsif @tag.wiki_page.blank? %>
+          <p>This tag needs a wiki page to be marked as deprecated. <%= link_to "Click here", new_wiki_page_path(wiki_page: { title: @tag.name} ) %> to create one.</p>
         <% else %>
-        <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "deprecate #{@tag.name}" }) %> to mark this tag as deprecated.</p>
+          <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "deprecate #{@tag.name}" }) %> to mark this tag as deprecated.</p>
         <% end %>
       <% end %>
       <%= f.button :submit, "Submit" %>
