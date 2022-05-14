@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PaymentTransaction::Stripe < PaymentTransaction
-  delegate :stripe_id, to: :user_upgrade
+  delegate :transaction_id, to: :user_upgrade
 
   def self.enabled?
     Danbooru.config.stripe_secret_key.present? && Danbooru.config.stripe_publishable_key.present? && Danbooru.config.stripe_webhook_secret.present?
@@ -36,7 +36,7 @@ class PaymentTransaction::Stripe < PaymentTransaction
       }
     )
 
-    user_upgrade.update!(stripe_id: checkout_session.id)
+    user_upgrade.update!(payment_processor: :stripe, transaction_id: checkout_session.id)
     checkout_session
   end
 
@@ -100,12 +100,12 @@ class PaymentTransaction::Stripe < PaymentTransaction
   end
 
   def receipt_url
-    return nil if pending? || stripe_id.nil?
+    return nil if pending? || transaction_id.nil?
     charge.receipt_url
   end
 
   def payment_url
-    return nil if pending? || stripe_id.nil?
+    return nil if pending? || transaction_id.nil?
     "https://dashboard.stripe.com/payments/#{payment_intent.id}"
   end
 
@@ -118,8 +118,8 @@ class PaymentTransaction::Stripe < PaymentTransaction
   end
 
   private def checkout_session
-    return nil if stripe_id.nil?
-    @checkout_session ||= ::Stripe::Checkout::Session.retrieve(stripe_id)
+    return nil if transaction_id.nil?
+    @checkout_session ||= ::Stripe::Checkout::Session.retrieve(transaction_id)
   end
 
   private def payment_intent

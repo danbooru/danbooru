@@ -2131,7 +2131,8 @@ CREATE TABLE public.user_upgrades (
     purchaser_id bigint NOT NULL,
     upgrade_type integer NOT NULL,
     status integer NOT NULL,
-    stripe_id character varying
+    transaction_id character varying,
+    payment_processor integer DEFAULT 0 NOT NULL
 );
 
 
@@ -4733,6 +4734,13 @@ CREATE INDEX index_user_sessions_on_updated_at ON public.user_sessions USING btr
 
 
 --
+-- Name: index_user_upgrades_on_payment_processor; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_upgrades_on_payment_processor ON public.user_upgrades USING btree (payment_processor);
+
+
+--
 -- Name: index_user_upgrades_on_purchaser_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4754,10 +4762,10 @@ CREATE INDEX index_user_upgrades_on_status ON public.user_upgrades USING btree (
 
 
 --
--- Name: index_user_upgrades_on_stripe_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_user_upgrades_on_transaction_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_user_upgrades_on_stripe_id ON public.user_upgrades USING btree (stripe_id);
+CREATE INDEX index_user_upgrades_on_transaction_id ON public.user_upgrades USING btree (transaction_id);
 
 
 --
@@ -5823,6 +5831,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220403220558'),
 ('20220407203236'),
 ('20220410050628'),
-('20220504235329');
+('20220504235329'),
+('20220514175125');
 
 

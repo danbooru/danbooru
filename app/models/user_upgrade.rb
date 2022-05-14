@@ -19,6 +19,10 @@ class UserUpgrade < ApplicationRecord
     refunded: 30,
   }
 
+  enum payment_processor: {
+    stripe: 0,
+  }
+
   scope :gifted, -> { where("recipient_id != purchaser_id") }
   scope :self_upgrade, -> { where("recipient_id = purchaser_id") }
 
@@ -85,7 +89,7 @@ class UserUpgrade < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :upgrade_type, :status, :stripe_id, :recipient, :purchaser)
+    q = search_attributes(params, :id, :created_at, :updated_at, :upgrade_type, :status, :transaction_id, :payment_processor, :recipient, :purchaser)
 
     if params[:is_gifted].to_s.truthy?
       q = q.gifted

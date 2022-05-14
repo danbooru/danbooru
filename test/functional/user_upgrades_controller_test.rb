@@ -269,7 +269,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
             assert_equal(@user, @user_upgrade.recipient)
             assert_equal("gold", @user_upgrade.upgrade_type)
             assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.stripe_id)
+            assert_not_nil(@user_upgrade.transaction_id)
             assert_match(/redirectToCheckout/, response.body)
           end
         end
@@ -286,7 +286,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
             assert_equal(@user, @user_upgrade.recipient)
             assert_equal("platinum", @user_upgrade.upgrade_type)
             assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.stripe_id)
+            assert_not_nil(@user_upgrade.transaction_id)
             assert_match(/redirectToCheckout/, response.body)
           end
         end
@@ -303,7 +303,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
             assert_equal(@user, @user_upgrade.recipient)
             assert_equal("gold_to_platinum", @user_upgrade.upgrade_type)
             assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.stripe_id)
+            assert_not_nil(@user_upgrade.transaction_id)
             assert_match(/redirectToCheckout/, response.body)
           end
         end
@@ -323,7 +323,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
             assert_equal(@recipient, @user_upgrade.recipient)
             assert_equal("gold", @user_upgrade.upgrade_type)
             assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.stripe_id)
+            assert_not_nil(@user_upgrade.transaction_id)
             assert_match(/redirectToCheckout/, response.body)
           end
         end
@@ -341,7 +341,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
             assert_equal(@recipient, @user_upgrade.recipient)
             assert_equal("platinum", @user_upgrade.upgrade_type)
             assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.stripe_id)
+            assert_not_nil(@user_upgrade.transaction_id)
             assert_match(/redirectToCheckout/, response.body)
           end
         end
@@ -359,7 +359,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
             assert_equal(@recipient, @user_upgrade.recipient)
             assert_equal("gold_to_platinum", @user_upgrade.upgrade_type)
             assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.stripe_id)
+            assert_not_nil(@user_upgrade.transaction_id)
             assert_match(/redirectToCheckout/, response.body)
           end
         end

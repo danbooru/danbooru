@@ -4,7 +4,7 @@ FactoryBot.define do
     purchaser { recipient }
     upgrade_type { "gold" }
     status { "pending" }
-    stripe_id { nil }
+    transaction_id { nil }
 
     factory(:self_gold_upgrade) do
       upgrade_type { "gold" }
