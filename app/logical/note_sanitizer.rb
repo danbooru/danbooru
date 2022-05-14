@@ -46,6 +46,8 @@ module NoteSanitizer
     text-indent
     text-shadow
     transform transform-origin
+    -webkit-text-fill-color
+    -webkit-text-stroke -webkit-text-stroke-color -webkit-text-stroke-width
     white-space
     word-break
     word-spacing
