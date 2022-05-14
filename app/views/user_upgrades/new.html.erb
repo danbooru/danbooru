@@ -92,24 +92,38 @@
         </tr>
         <tr>
           <td></td>
-          <% if @user_upgrade.purchaser.is_anonymous? %>
-            <td><%= link_to "Login", login_path(url: new_user_upgrade_path), class: "login-button button-primary" %></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %></td>
+          <td></td>
+          <td>
+            <%= image_pack_tag("static/mastercard-logo.svg", width: 28, class: "icon") %>
+            <%= image_pack_tag("static/visa-logo.svg", width: 28, class: "icon") %>
+            <%= image_pack_tag("static/discover-logo.svg", width: 28, class: "icon") %>
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>
+            <% if @user_upgrade.purchaser.is_anonymous? %>
+              <%= link_to "Create free account", new_user_path(url: new_user_upgrade_path), class: "button-outline-primary" %>
+            <% end %>
+          </td>
+          <td>
+            <% if @user_upgrade.purchaser.is_anonymous? %>
+              <%= link_to "Get #{Danbooru.config.canonical_app_name} Gold", new_user_path(url: new_user_upgrade_path), class: "button-primary" %>
+            <% elsif @user_upgrade.recipient.level <= User::Levels::MEMBER %>
+              <%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo]), class: "button-primary", remote: true, disable_with: "Redirecting..." %>
             <% else %>
-            <td></td>
-            <td>
-              <div class="mb-2">
-                <%= image_pack_tag("static/mastercard-logo.svg", width: 28, class: "icon") %>
-                <%= image_pack_tag("static/visa-logo.svg", width: 28, class: "icon") %>
-                <%= image_pack_tag("static/discover-logo.svg", width: 28, class: "icon") %>
-              </div>
-
-              <%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %>
-            </td>
-          <% end %>
+              <%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id), class: "button-primary", disabled: true %>
+            <% end %>
+          </td>
         </tr>
       </tbody>
     </table>
+
+    <% if @user_upgrade.purchaser.is_anonymous? %>
+      <p class="text-center">
+        Already have an account? <%= link_to "Log in", login_path(url: new_user_upgrade_path) %>.
+      </p>
+    <% end %>
 
     <h2 class="mb-4">Frequently Asked Questions</h2>
 
