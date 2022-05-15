@@ -21,6 +21,7 @@ class UserUpgrade < ApplicationRecord
 
   enum payment_processor: {
     stripe: 0,
+    authorize_net: 100,
   }
 
   scope :gifted, -> { where("recipient_id != purchaser_id") }
@@ -32,9 +33,9 @@ class UserUpgrade < ApplicationRecord
 
   def self.gold_price
     if Danbooru.config.is_promotion?
-      1500
+      15.00
     else
-      2000
+      20.00
     end
   end
 
@@ -44,6 +45,17 @@ class UserUpgrade < ApplicationRecord
 
   def self.gold_to_platinum_price
     platinum_price - gold_price
+  end
+
+  def price
+    case upgrade_type
+    in "gold"
+      UserUpgrade.gold_price
+    in "platinum"
+      UserUpgrade.platinum_price
+    in "gold_to_platinum"
+      UserUpgrade.gold_to_platinum_price
+    end
   end
 
   def level
@@ -157,7 +169,12 @@ class UserUpgrade < ApplicationRecord
     end
 
     def transaction
-      PaymentTransaction::Stripe.new(self)
+      case payment_processor
+      in "stripe"
+        PaymentTransaction::Stripe.new(self)
+      in "authorize_net"
+        PaymentTransaction::AuthorizeNet.new(self)
+      end
     end
 
     def has_receipt?

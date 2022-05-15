@@ -1,2 +1,15 @@
-var stripe = Stripe("<%= j Danbooru.config.stripe_publishable_key %>");
-stripe.redirectToCheckout({ sessionId: "<%= j @checkout.id %>" });
+<% if @user_upgrade.stripe? %>
+  var stripe = Stripe("<%= j Danbooru.config.stripe_publishable_key %>");
+  stripe.redirectToCheckout({ sessionId: "<%= j @checkout.id %>" });
+<% elsif @user_upgrade.authorize_net? %>
+  $(function() {
+    var url = "<%= j @checkout[0] %>";
+    var token = "<%= j @checkout[1] %>";
+
+    var $form = $('<form method="POST">').attr("action", url)
+    var $input = $('<input type="hidden" name="token">').val(token);
+    $form.append($input).appendTo("body").submit();
+  });
+<% else %>
+  <% raise NotImplementedError, "payment method not implemented" %>
+<% end %>

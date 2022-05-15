@@ -402,6 +402,26 @@ module Danbooru
     def stripe_promotion_discount_id
     end
 
+    # The login ID for Authorize.net. Used for accepting payments for user upgrades.
+    # Signup for a test account at https://developer.authorize.net/hello_world/sandbox.html.
+    def authorize_net_login_id
+    end
+
+    # The transaction key for Authorize.net. This is the API secret for API calls.
+    def authorize_net_transaction_key
+    end
+
+    # The signature key for Authorize.net. Used for verifying webhooks sent by Authorize.net.
+    # Generate at Account > Settings > Security Settings > General Security Settings > API Credentials and Keys
+    def authorize_net_signature_key
+    end
+
+    # Whether to use the test environment or the live environment for Authorize.net. The test environment
+    # allows testing payments without using real credit cards.
+    def authorize_net_test_mode
+      true
+    end
+
     def twitter_api_key
     end
 
