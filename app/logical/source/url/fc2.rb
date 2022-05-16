@@ -14,6 +14,12 @@ class Source::URL::Fc2 < Source::URL
   def parse
     case [*host.split("."), *path_segments]
 
+    # http://hosystem.blog36.fc2.com/blog-entry-37.html
+    in username, /^blog\d*$/, "fc2", "com", /^blog-entry-(\d+)\.html$/ => blog_path
+      @username = username
+      @profile_url = "http://#{username}.blog.fc2.com"
+      @page_url = "http://#{username}.blog.fc2.com/#{blog_path}"
+
     # http://silencexs.blog.fc2.com
     # http://silencexs.blog106.fc2.com
     # http://onidocoro.blog14.fc2.com/file/20071003061150.png
