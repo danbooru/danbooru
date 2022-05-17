@@ -1336,6 +1336,7 @@ class Post < ApplicationRecord
       # @return [ActiveRecord::Relation<Post>] the set of resulting posts
       def user_tag_match(query, user = CurrentUser.user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?)
         post_query = PostQuery.normalize(query, current_user: user, tag_limit: tag_limit, safe_mode: safe_mode)
+        post_query.validate_tag_limit!
         post_query.with_implicit_metatags.posts
       end
 

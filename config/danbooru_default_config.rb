@@ -253,7 +253,7 @@ module Danbooru
 
     # Tags that are not visible in safe mode.
     def safe_mode_restricted_tags
-      restricted_tags + %w[censored condom nipples nude penis pussy sexually_suggestive]
+      []
     end
 
     # If present, the 404 page will show a random post from this pool.

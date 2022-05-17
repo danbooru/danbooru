@@ -38,7 +38,9 @@ class PostQuery
 
   # Perform a search and return the resulting posts
   def self.search(search, ...)
-    PostQuery.normalize(search, ...).with_implicit_metatags.posts
+    post_query = PostQuery.normalize(search, ...)
+    post_query.validate_tag_limit!
+    post_query.with_implicit_metatags.posts
   end
 
   def initialize(search_or_ast, current_user: User.anonymous, tag_limit: nil, safe_mode: false)
@@ -71,12 +73,12 @@ class PostQuery
   end
 
   def posts
-    validate!
+    validate_metatags!
     builder.posts(to_cnf)
   end
 
   def paginated_posts(...)
-    validate!
+    validate_metatags!
     builder.paginated_posts(to_cnf, ...)
   end
 
@@ -189,9 +191,10 @@ class PostQuery
 
   # Implicit metatags are metatags added by the user's account settings. rating:s is implicit under safe mode.
   def implicit_metatags
-    metatags = []
-    metatags << AST.metatag("rating", "s") if safe_mode?
-    metatags
+    return [] unless safe_mode?
+
+    tags = Danbooru.config.safe_mode_restricted_tags.map { |tag| -AST.tag(tag) }
+    [AST.metatag("rating", "s"), *tags]
   end
 
   # XXX unify with PostSets::Post#show_deleted?
@@ -272,18 +275,13 @@ class PostQuery
   end
 
   concerning :ValidationMethods do
-    def validate!
-      return if is_empty_search? || is_simple_tag?
-
-      validate_tag_limit!
-      validate_metatags!
-    end
-
     def validate_tag_limit!
+      return if is_empty_search? || is_simple_tag?
       raise TagLimitError if tag_limit.present? && term_count > tag_limit
     end
 
     def validate_metatags!
+      return if is_empty_search? || is_simple_tag?
       return if metatags.empty?
 
       order_metatags = select_metatags(*ORDER_METATAGS)
