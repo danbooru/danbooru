@@ -161,13 +161,13 @@ module PostSets
 
     concerning :TagListMethods do
       def related_tags
-        if post_query.wildcards.one? && post_query.tags.none?
+        if normalized_query.wildcards.one? && normalized_query.tags.none?
           wildcard_tags
-        elsif post_query.is_metatag?(:search)
+        elsif normalized_query.is_metatag?(:search)
           saved_search_tags
-        elsif post_query.is_empty_search? || post_query.is_metatag?(:order, :rank)
+        elsif normalized_query.is_empty_search? || normalized_query.is_metatag?(:order, :rank)
           popular_tags.presence || frequent_tags
-        elsif post_query.is_single_term?
+        elsif normalized_query.is_single_term?
           similar_tags.presence || frequent_tags
         else
           frequent_tags
