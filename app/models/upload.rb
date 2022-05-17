@@ -114,7 +114,7 @@ class Upload < ApplicationRecord
 
     if files.present?
       upload_media_assets = files.map do |_index, file|
-        UploadMediaAsset.new(file: file.tempfile, source_url: "file://#{file.original_filename}")
+        UploadMediaAsset.new(upload: self, file: file.tempfile, source_url: "file://#{file.original_filename}")
       end
     elsif source.present?
       page_url = source_extractor.page_url
@@ -125,13 +125,16 @@ class Upload < ApplicationRecord
       end
 
       upload_media_assets = image_urls.map do |image_url|
-        UploadMediaAsset.new(source_url: image_url, page_url: page_url, media_asset: nil)
+        UploadMediaAsset.new(upload: self, source_url: image_url, page_url: page_url, media_asset: nil)
       end
     else
       raise Error, "No file or source given" # Should never happen
     end
 
-    update!(upload_media_assets: upload_media_assets, media_asset_count: upload_media_assets.size)
+    transaction do
+      update!(media_asset_count: upload_media_assets.size)
+      upload_media_assets.each(&:save!)
+    end
   rescue Exception => e
     update!(status: "error", error: e.message)
   end
