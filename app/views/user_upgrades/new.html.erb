@@ -107,7 +107,9 @@
             <% end %>
           </td>
           <td>
-            <% if @user_upgrade.purchaser.is_anonymous? %>
+            <% if !UserUpgrade.enabled? %>
+              <%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id), class: "button-primary", disabled: true %>
+            <% elsif @user_upgrade.purchaser.is_anonymous? %>
               <%= link_to "Get #{Danbooru.config.canonical_app_name} Gold", new_user_path(url: new_user_upgrade_path), class: "button-primary" %>
             <% elsif @user_upgrade.recipient.level <= User::Levels::MEMBER %>
               <%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo], payment_processor: "authorize_net"), class: "button-primary", remote: true, disable_with: "Redirecting..." %>

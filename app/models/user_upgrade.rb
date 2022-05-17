@@ -28,7 +28,7 @@ class UserUpgrade < ApplicationRecord
   scope :self_upgrade, -> { where("recipient_id = purchaser_id") }
 
   def self.enabled?
-    Danbooru.config.user_upgrades_enabled?
+    Danbooru.config.user_upgrades_enabled?.to_s.truthy?
   end
 
   def self.gold_price

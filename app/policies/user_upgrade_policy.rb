@@ -6,7 +6,7 @@ class UserUpgradePolicy < ApplicationPolicy
   end
 
   def new?
-    UserUpgrade.enabled?
+    true
   end
 
   def show?
