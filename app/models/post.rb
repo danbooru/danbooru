@@ -1088,17 +1088,17 @@ class Post < ApplicationRecord
         when "source"
           where.not(source: "")
         when "appeals"
-          where(id: PostAppeal.select(:post_id))
+          where(PostAppeal.where("post_appeals.post_id = posts.id").arel.exists)
         when "flags"
-          where(id: PostFlag.by_users.select(:post_id))
+          where(PostFlag.by_users.where("post_flags.post_id = posts.id").arel.exists)
         when "replacements"
-          where(id: PostReplacement.select(:post_id))
+          where(PostReplacement.where("post_replacements.post_id = posts.id").arel.exists)
         when "comments"
-          where(id: Comment.undeleted.select(:post_id))
+          where(Comment.undeleted.where("comments.post_id = posts.id").arel.exists)
         when "commentary"
-          where(id: ArtistCommentary.undeleted.select(:post_id))
+          where(ArtistCommentary.undeleted.where("artist_commentaries.post_id = posts.id").arel.exists)
         when "notes"
-          where(id: Note.active.select(:post_id))
+          where(Note.active.where("notes.post_id = posts.id").arel.exists)
         when "pools"
           where(id: Pool.undeleted.select("unnest(post_ids)"))
         else
