@@ -13,14 +13,16 @@
 class RateLimiter
   class RateLimitError < StandardError; end
 
-  attr_reader :action, :keys, :cost, :rate, :burst
+  attr_reader :action, :keys, :cost, :rate, :burst, :enabled
+  alias_method :enabled?, :enabled
 
-  def initialize(action, keys = ["*"], cost: 1, rate: 1, burst: 1)
+  def initialize(action, keys = ["*"], cost: 1, rate: 1, burst: 1, enabled: Danbooru.config.rate_limits_enabled?)
     @action = action
     @keys = keys
     @cost = cost
     @rate = rate
     @burst = burst
+    @enabled = enabled
   end
 
   # Create a RateLimiter object for the given action. A RateLimiter usually has
@@ -46,7 +48,7 @@ class RateLimiter
 
   # @return [Boolean] true if the action is limited for the user or their IP
   def limited?
-    rate_limits.any?(&:limited?)
+    enabled? && rate_limits.any?(&:limited?)
   end
 
   def as_json(options = {})

@@ -372,6 +372,11 @@ module Danbooru
       true
     end
 
+    # Whether to enable API rate limits.
+    def rate_limits_enabled?
+      true
+    end
+
     def stripe_secret_key
     end
 
