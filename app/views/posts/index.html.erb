@@ -48,7 +48,9 @@
       <li><%= link_to "Random", random_posts_path(tags: params[:tags]), id: "random-post", "data-shortcut": "r", rel: "nofollow" %></li>
       <% if @post_set.post_query.has_single_tag? %>
         <li><%= link_to "History", post_versions_path(search: { changed_tags: @post_set.post_query.tag_name }), rel: "nofollow" %></li>
-        <li><%= link_to "Discussions", forum_posts_path(search: { linked_to: @post_set.post_query.tag_name }), rel: "nofollow" %></li>
+        <% if Danbooru.config.forum_enabled?.to_s.truthy? %>
+          <li><%= link_to "Discussions", forum_posts_path(search: { linked_to: @post_set.post_query.tag_name }), rel: "nofollow" %></li>
+        <% end %>
       <% end %>
       <li><%= link_to "Count", posts_counts_path(tags: params[:tags]), rel: "nofollow" %></li>
     </ul>

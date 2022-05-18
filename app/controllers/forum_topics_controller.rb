@@ -3,7 +3,11 @@
 class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   respond_to :atom, only: [:index, :show]
+
   before_action :normalize_search, :only => :index
+  before_action if: -> { request.format.html? && !Danbooru.config.forum_enabled?.to_s.truthy? } do
+    redirect_to root_path
+  end
 
   rate_limit :create, rate: 1.0/1.minute, burst: 50
 

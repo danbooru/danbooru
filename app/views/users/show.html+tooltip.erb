@@ -111,17 +111,21 @@
         <div class="user-tooltip-stat-name">Favorites</div>
       <% end %>
     </li>
-    <li class="user-tooltip-stat-item">
-      <%= link_to comments_path(search: { creator_id: @user.id }), class: "link-plain" do %>
-        <div class="user-tooltip-stat-value"><%= humanized_number(@user.comment_count) %></div>
-        <div class="user-tooltip-stat-name">Comments</div>
-      <% end %>
-    </li>
-    <li class="user-tooltip-stat-item">
-      <%= link_to forum_posts_path(search: { creator_id: @user.id }), class: "link-plain" do %>
-        <div class="user-tooltip-stat-value"><%= humanized_number(@user.forum_post_count) %></div>
-        <div class="user-tooltip-stat-name">Forum Posts</div>
-      <% end %>
-    </li>
+    <% if Danbooru.config.comments_enabled?.to_s.truthy? %>
+      <li class="user-tooltip-stat-item">
+        <%= link_to comments_path(search: { creator_id: @user.id }), class: "link-plain" do %>
+          <div class="user-tooltip-stat-value"><%= humanized_number(@user.comment_count) %></div>
+          <div class="user-tooltip-stat-name">Comments</div>
+        <% end %>
+      </li>
+    <% end %>
+    <% if Danbooru.config.forum_enabled?.to_s.truthy? %>
+      <li class="user-tooltip-stat-item">
+        <%= link_to forum_posts_path(search: { creator_id: @user.id }), class: "link-plain" do %>
+          <div class="user-tooltip-stat-value"><%= humanized_number(@user.forum_post_count) %></div>
+          <div class="user-tooltip-stat-name">Forum Posts</div>
+        <% end %>
+      </li>
+    <% end %>
   </ul>
 </div>

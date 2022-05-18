@@ -1,7 +1,9 @@
 <% page_title @post.presenter.humanized_essential_tag_string %>
 <% meta_description "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
 <% canonical_url post_url(@post, host: Danbooru.config.hostname) %>
-<% atom_feed_tag "Comments for post ##{@post.id}", comments_url(:atom, search: { post_id: @post.id }) %>
+<% if Danbooru.config.comments_enabled?.to_s.truthy? %>
+  <% atom_feed_tag "Comments for post ##{@post.id}", comments_url(:atom, search: { post_id: @post.id }) %>
+<% end %>
 
 <%= render "posts/partials/common/secondary_links" %>
 
@@ -322,7 +324,9 @@
   <% end %>
 
   <menu id="post-sections" class="mb-4">
-    <li class="active"><a href="#comments">Comments</a></li>
+    <% if Danbooru.config.comments_enabled?.to_s.truthy? %>
+      <li class="active"><a href="#comments">Comments</a></li>
+    <% end %>
 
     <% if RecommenderService.available_for_post?(@post) %>
       <li><a href="#recommended">Recommended</a></li>
@@ -339,9 +343,11 @@
     </section>
   <% end %>
 
-  <section id="comments">
-    <%= render_comment_section(@post, current_user: CurrentUser.user) %>
-  </section>
+  <% if Danbooru.config.comments_enabled?.to_s.truthy? %>
+    <section id="comments">
+      <%= render_comment_section(@post, current_user: CurrentUser.user) %>
+    </section>
+  <% end %>
 
   <section id="notes" style="display: none;">
     <% if @post.has_notes? %>

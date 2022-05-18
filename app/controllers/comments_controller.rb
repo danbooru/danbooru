@@ -4,6 +4,10 @@ class CommentsController < ApplicationController
   respond_to :html, :xml, :json, :atom
   respond_to :js, only: [:new, :update, :destroy, :undelete]
 
+  before_action if: -> { request.format.html? && !Danbooru.config.comments_enabled?.to_s.truthy? } do
+    redirect_to root_path
+  end
+
   rate_limit :create, rate: 1.0/1.minute, burst: 50
 
   def index

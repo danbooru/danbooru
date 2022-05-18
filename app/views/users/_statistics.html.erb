@@ -208,20 +208,24 @@
         </tr>
       <% end %>
 
-      <tr>
-        <th>Forum Posts</th>
-        <td><%= presenter.forum_post_count(self) %></td>
-      </tr>
+      <% if Danbooru.config.forum_enabled?.to_s.truthy? %>
+        <tr>
+          <th>Forum Posts</th>
+          <td><%= presenter.forum_post_count(self) %></td>
+        </tr>
+      <% end %>
 
       <tr>
         <th>Approvals</th>
         <td><%= presenter.approval_count(self) %></td>
       </tr>
 
-      <tr>
-        <th>Comments</th>
-        <td><%= presenter.comment_count(self) %> in <%= presenter.commented_posts_count(self) %> posts</td>
-      </tr>
+      <% if Danbooru.config.comments_enabled?.to_s.truthy? %>
+        <tr>
+          <th>Comments</th>
+          <td><%= presenter.comment_count(self) %> in <%= presenter.commented_posts_count(self) %> posts</td>
+        </tr>
+      <% end %>
 
       <tr>
         <th>Appeals</th>

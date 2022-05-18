@@ -377,6 +377,21 @@ module Danbooru
       true
     end
 
+    # Whether to enable comments.
+    def comments_enabled?
+      true
+    end
+
+    # Whether to enable the forum.
+    def forum_enabled?
+      true
+    end
+
+    # Whether to enable autocomplete.
+    def autocomplete_enabled?
+      true
+    end
+
     def stripe_secret_key
     end
 

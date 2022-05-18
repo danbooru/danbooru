@@ -16,7 +16,7 @@ class RateLimiter
   attr_reader :action, :keys, :cost, :rate, :burst, :enabled
   alias_method :enabled?, :enabled
 
-  def initialize(action, keys = ["*"], cost: 1, rate: 1, burst: 1, enabled: Danbooru.config.rate_limits_enabled?)
+  def initialize(action, keys = ["*"], cost: 1, rate: 1, burst: 1, enabled: Danbooru.config.rate_limits_enabled?.to_s.truthy?)
     @action = action
     @keys = keys
     @cost = cost

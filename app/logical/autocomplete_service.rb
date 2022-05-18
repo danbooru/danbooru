@@ -28,23 +28,27 @@ class AutocompleteService
 
   TAG_PREFIXES = TagCategory.mapping.keys.map { |prefix| prefix + ":" }
 
-  attr_reader :query, :type, :limit, :current_user
+  attr_reader :query, :type, :limit, :current_user, :enabled
+  alias_method :enabled?, :enabled
 
   # Perform completion for the given search type and query.
   # @param query [String] the string being completed
   # @param type [String] the type of completion being performed
   # @param current_user [User] the user we're performing completion for
   # @param limit [Integer] the max number of results to return
-  def initialize(query, type, current_user: User.anonymous, limit: 10)
+  def initialize(query, type, current_user: User.anonymous, limit: 10, enabled: Danbooru.config.autocomplete_enabled?.to_s.truthy?)
     @query = query.to_s
     @type = type.to_s.to_sym
     @current_user = current_user
     @limit = limit
+    @enabled = enabled
   end
 
   # Return the results of the completion.
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_results
+    return [] if !enabled?
+
     case type
     when :tag_query
       autocomplete_tag_query

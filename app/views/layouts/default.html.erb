@@ -87,13 +87,13 @@
         <% end %>
 
         <%= nav_link_to("Posts", posts_path) %>
-        <%= nav_link_to("Comments", comments_path) %>
+        <%= nav_link_to("Comments", comments_path) if Danbooru.config.comments_enabled?.to_s.truthy? %>
         <%= nav_link_to("Notes", notes_path) %>
         <%= nav_link_to("Artists", artists_path) %>
         <%= nav_link_to("Tags", tags_path) %>
         <%= nav_link_to("Pools", gallery_pools_path) %>
         <%= nav_link_to("Wiki", wiki_page_path("help:home")) %>
-        <%= nav_link_to("Forum", forum_topics_path, :class => (CurrentUser.has_forum_been_updated? ? "forum-updated" : nil)) %>
+        <%= nav_link_to("Forum", forum_topics_path, class: ("forum-updated" if CurrentUser.has_forum_been_updated?)) if Danbooru.config.forum_enabled?.to_s.truthy? %>
 
         <% if CurrentUser.is_moderator? %>
           <%= nav_link_to("Reports", moderation_reports_path, :class => (ModerationReport.where(status: "pending").present? ? "reports-pending" : nil)) %>

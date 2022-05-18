@@ -77,22 +77,26 @@
       </ul>
     </section>
     <section class="flex-auto space-y-4">
-      <ul>
-        <li><h2>Comments</h2></li>
-        <li><%= link_to_wiki "Help", "help:comments" %></li>
-        <li><%= link_to("Listing", comments_path) %></li>
-        <li><%= link_to("Search", search_comments_path) %></li>
-        <li><%= link_to("Votes", comment_votes_path) %></li>
-        <li><%= link_to("RSS", comments_path(:atom)) %></li>
-      </ul>
-      <ul>
-        <li><h2>Forum</h2></li>
-        <li><%= link_to_wiki "Help", "help:forum" %></li>
-        <li><%= link_to("Listing", forum_topics_path) %></li>
-        <li><%= link_to("Search", search_forum_posts_path) %></li>
-        <li><%= link_to("Votes", forum_post_votes_path) %></li>
-        <li><%= link_to("RSS", forum_topics_path(:atom)) %></li>
-      </ul>
+      <% if Danbooru.config.comments_enabled?.to_s.truthy? %>
+        <ul>
+          <li><h2>Comments</h2></li>
+          <li><%= link_to_wiki "Help", "help:comments" %></li>
+          <li><%= link_to("Listing", comments_path) %></li>
+          <li><%= link_to("Search", search_comments_path) %></li>
+          <li><%= link_to("Votes", comment_votes_path) %></li>
+          <li><%= link_to("RSS", comments_path(:atom)) %></li>
+        </ul>
+      <% end %>
+      <% if Danbooru.config.forum_enabled?.to_s.truthy? %>
+        <ul>
+          <li><h2>Forum</h2></li>
+          <li><%= link_to_wiki "Help", "help:forum" %></li>
+          <li><%= link_to("Listing", forum_topics_path) %></li>
+          <li><%= link_to("Search", search_forum_posts_path) %></li>
+          <li><%= link_to("Votes", forum_post_votes_path) %></li>
+          <li><%= link_to("RSS", forum_topics_path(:atom)) %></li>
+        </ul>
+      <% end %>
       <ul>
         <li><h2>Wiki</h2></li>
         <li><%= link_to_wiki "Help", "help:wiki" %></li>
