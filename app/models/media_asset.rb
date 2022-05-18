@@ -3,6 +3,7 @@
 class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
+  FILE_TYPES = %w[jpg png gif mp4 webm swf zip]
   FILE_KEY_LENGTH = 9
   VARIANTS = %i[preview 180x180 360x360 720x720 sample original]
   MAX_VIDEO_DURATION = Danbooru.config.max_video_duration.to_i
@@ -41,7 +42,7 @@ class MediaAsset < ApplicationRecord
   }
 
   validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }
-  validates :file_ext, inclusion: { in: %w[jpg png gif mp4 webm swf zip], message: "File is not an image or video" }
+  validates :file_ext, inclusion: { in: FILE_TYPES, message: "File is not an image or video" }
   validates :file_size, numericality: { less_than_or_equal_to: Danbooru.config.max_file_size, message: ->(asset, _) { "too large (size: #{asset.file_size.to_formatted_s(:human_size)}; max size: #{Danbooru.config.max_file_size.to_formatted_s(:human_size)})" } }
   validates :file_key, length: { is: FILE_KEY_LENGTH }, uniqueness: true, if: :file_key_changed?
   validates :duration, numericality: { less_than_or_equal_to: MAX_VIDEO_DURATION, message: "must be less than #{MAX_VIDEO_DURATION} seconds", allow_nil: true }, on: :create # XXX should allow admins to bypass

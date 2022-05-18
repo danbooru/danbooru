@@ -13,12 +13,14 @@ class AutocompleteService
   POST_STATUSES = %w[active deleted pending flagged appealed banned modqueue unmoderated]
 
   STATIC_METATAGS = {
+    is: %w[parent child sfw nsfw] + POST_STATUSES + MediaAsset::FILE_TYPES + Post::RATINGS.values.map(&:downcase),
+    has: %w[parent children source appeals flags replacements comments commentary notes pools],
     status: %w[any] + POST_STATUSES,
     child: %w[any none] + POST_STATUSES,
     parent: %w[any none] + POST_STATUSES,
     rating: Post::RATINGS.values.map(&:downcase),
     embedded: %w[true false],
-    filetype: %w[jpg png gif swf zip webm mp4],
+    filetype: MediaAsset::FILE_TYPES,
     commentary: %w[true false translated untranslated],
     disapproved: PostDisapproval::REASONS,
     order: PostQueryBuilder::ORDER_METATAGS

@@ -1058,6 +1058,54 @@ class Post < ApplicationRecord
         none
       end
 
+      def is_matches(value, current_user = User.anonymous)
+        case value.downcase
+        when "parent"
+          where(has_children: true)
+        when "child"
+          where.not(parent: nil)
+        when "sfw"
+          where.not(rating: ["q", "e"])
+        when "nsfw"
+          where(rating: ["q", "e"])
+        when *AutocompleteService::POST_STATUSES
+          status_matches(value, current_user)
+        when *MediaAsset::FILE_TYPES
+          attribute_matches(value, :file_ext, :enum)
+        when *Post::RATINGS.values.map(&:downcase)
+          rating_matches(value)
+        else
+          none
+        end
+      end
+
+      def has_matches(value)
+        case value.downcase
+        when "parent"
+          where.not(parent: nil)
+        when "child", "children"
+          where(has_children: true)
+        when "source"
+          where.not(source: "")
+        when "appeals"
+          where(id: PostAppeal.select(:post_id))
+        when "flags"
+          where(id: PostFlag.by_users.select(:post_id))
+        when "replacements"
+          where(id: PostReplacement.select(:post_id))
+        when "comments"
+          where(id: Comment.undeleted.select(:post_id))
+        when "commentary"
+          where(id: ArtistCommentary.undeleted.select(:post_id))
+        when "notes"
+          where(id: Note.active.select(:post_id))
+        when "pools"
+          where(id: Pool.undeleted.select("unnest(post_ids)"))
+        else
+          none
+        end
+      end
+
       def status_matches(status, current_user = User.anonymous)
         case status.downcase
         when "pending"

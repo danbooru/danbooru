@@ -38,7 +38,7 @@ class PostQueryBuilder
     ordpool note comment commentary id rating source status filetype
     disapproved parent child search embedded md5 width height mpixels ratio
     score upvotes downvotes favcount filesize date age order limit tagcount pixiv_id pixiv
-    unaliased exif duration random
+    unaliased exif duration random is has
   ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
 
   ORDER_METATAGS = %w[
@@ -121,6 +121,10 @@ class PostQueryBuilder
       relation.attribute_matches(value, :tag_count)
     when "duration"
       relation.attribute_matches(value, "media_assets.duration", :float).joins(:media_asset)
+    when "is"
+      relation.is_matches(value, current_user)
+    when "has"
+      relation.has_matches(value)
     when "status"
       relation.status_matches(value, current_user)
     when "parent"

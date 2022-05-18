@@ -736,6 +736,98 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "duration:>1")
     end
 
+    should "return posts for the is:<status> metatag" do
+      pending = create(:post, is_pending: true)
+      flagged = create(:post, is_flagged: true)
+      deleted = create(:post, is_deleted: true)
+      banned  = create(:post, is_banned: true)
+      appealed = create(:post, is_deleted: true)
+      appeal = create(:post_appeal, post: appealed)
+
+      assert_tag_match([appealed, flagged, pending], "is:modqueue")
+      assert_tag_match([pending], "is:pending")
+      assert_tag_match([flagged], "is:flagged")
+      assert_tag_match([appealed], "is:appealed")
+      assert_tag_match([appealed, deleted], "is:deleted")
+      assert_tag_match([banned],  "is:banned")
+      assert_tag_match([banned], "is:active")
+      assert_tag_match([banned], "is:active is:banned")
+    end
+
+    should "return posts for the is:<rating> metatag" do
+      s = create(:post, rating: "s")
+      q = create(:post, rating: "q")
+      e = create(:post, rating: "e")
+      all = [e, q, s]
+
+      assert_tag_match([s], "is:safe")
+      assert_tag_match([q], "is:questionable")
+      assert_tag_match([e], "is:explicit")
+      assert_tag_match([s], "is:sfw")
+      assert_tag_match([e, q], "is:nsfw")
+    end
+
+    should "return posts for the is:<filetype> metatag" do
+      jpg = create(:post, file_ext: "jpg")
+      png = create(:post, file_ext: "png")
+      gif = create(:post, file_ext: "gif")
+      mp4 = create(:post, file_ext: "mp4")
+      webm = create(:post, file_ext: "webm")
+      swf = create(:post, file_ext: "swf")
+      zip = create(:post, file_ext: "zip")
+
+      assert_tag_match([jpg], "is:jpg")
+      assert_tag_match([png], "is:png")
+      assert_tag_match([gif], "is:gif")
+      assert_tag_match([mp4], "is:mp4")
+      assert_tag_match([webm], "is:webm")
+      assert_tag_match([swf], "is:swf")
+      assert_tag_match([zip], "is:zip")
+    end
+
+    should "return posts for the is:<parent> metatag" do
+      parent = create(:post)
+      child = create(:post, parent: parent)
+
+      assert_tag_match([parent], "is:parent")
+      assert_tag_match([child], "is:child")
+      assert_tag_match([], "is:blah")
+    end
+
+    should "return posts for the has:<value> metatag" do
+      parent = create(:post)
+      child = create(:post, parent: parent)
+
+      appeal = create(:post_appeal)
+      flag = create(:post_flag)
+      replacement = create(:post_replacement)
+      comment = create(:comment)
+      commentary = create(:artist_commentary)
+      note = create(:note)
+
+      pooled = create(:post)
+      pool = create(:pool, post_ids: [pooled.id])
+
+      assert_tag_match([child], "has:parent")
+      assert_tag_match([parent], "has:child")
+      assert_tag_match([parent], "has:children")
+      assert_tag_match([appeal.post], "has:appeals")
+      assert_tag_match([flag.post], "has:flags")
+      assert_tag_match([replacement.post], "has:replacements")
+      assert_tag_match([comment.post], "has:comments")
+      assert_tag_match([commentary.post], "has:commentary")
+      assert_tag_match([note.post], "has:notes")
+      assert_tag_match([pooled], "has:pools")
+      assert_tag_match([], "has:blah")
+    end
+
+    should "return posts for the has:<source> metatag" do
+      post1 = create(:post, source: "blah")
+      post2 = create(:post, source: nil)
+
+      assert_tag_match([post1], "has:source")
+    end
+
     should "return posts for the status:<type> metatag" do
       pending = create(:post, is_pending: true)
       flagged = create(:post, is_flagged: true)
