@@ -10,6 +10,12 @@ class Post < ApplicationRecord
 
   RESTRICTED_TAGS_REGEX = /(?:^| )(?:#{Danbooru.config.restricted_tags.join("|")})(?:$| )/o
 
+  RATINGS = {
+    s: "Safe",
+    q: "Questionable",
+    e: "Explicit",
+  }.with_indifferent_access
+
   deletable
   has_bit_flags %w[has_embedded_notes _unused_has_cropped is_taken_down]
 
@@ -21,7 +27,7 @@ class Post < ApplicationRecord
   before_validation :remove_parent_loops
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
   validates :rating, presence: { message: "not selected" }
-  validates :rating, inclusion: { in: %w[s q e], message: "must be S, Q, or E" }, if: -> { rating.present? }
+  validates :rating, inclusion: { in: RATINGS.keys, message: "must be #{RATINGS.keys.map(&:upcase).to_sentence(last_word_connector: ", or ")}" }, if: -> { rating.present? }
   validates :source, length: { maximum: 1200 }
   validate :post_is_not_its_own_parent
   validate :uploader_is_not_limited, on: :create
@@ -291,16 +297,7 @@ class Post < ApplicationRecord
     end
 
     def pretty_rating
-      case rating
-      when "q"
-        "Questionable"
-
-      when "e"
-        "Explicit"
-
-      when "s"
-        "Safe"
-      end
+      RATINGS.fetch(rating)
     end
 
     def parsed_source
@@ -575,7 +572,7 @@ class Post < ApplicationRecord
             remove_parent_loops
           end
 
-        in "rating", /\A([qse])/i
+        in "rating", /\A([#{RATINGS.keys.join}])/i
           self.rating = $1.downcase
 
         in "source", "none"
@@ -1114,6 +1111,10 @@ class Post < ApplicationRecord
         end
       end
 
+      def rating_matches(rating)
+        where(rating: rating.downcase.split(/,/).map(&:first))
+      end
+
       def source_matches(source, quoted = false)
         if source.empty?
           where(source: "")
@@ -1516,7 +1517,7 @@ class Post < ApplicationRecord
   end
 
   def safeblocked?
-    CurrentUser.safe_mode? && (rating != "s" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
+    CurrentUser.safe_mode? && (rating.in?(["q", "e"]) || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
   end
 
   def levelblocked?(user = CurrentUser.user)

@@ -16,7 +16,7 @@ class AutocompleteService
     status: %w[any] + POST_STATUSES,
     child: %w[any none] + POST_STATUSES,
     parent: %w[any none] + POST_STATUSES,
-    rating: %w[safe questionable explicit],
+    rating: Post::RATINGS.values.map(&:downcase),
     embedded: %w[true false],
     filetype: %w[jpg png gif swf zip webm mp4],
     commentary: %w[true false translated untranslated],

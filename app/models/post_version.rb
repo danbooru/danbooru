@@ -151,16 +151,7 @@ class PostVersion < ApplicationRecord
   end
 
   def pretty_rating
-    case rating
-    when "q"
-      "Questionable"
-
-    when "e"
-      "Explicit"
-
-    when "s"
-      "Safe"
-    end
+    Post::RATINGS.fetch(rating)
   end
 
   def changes

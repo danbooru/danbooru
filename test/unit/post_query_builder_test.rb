@@ -950,6 +950,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([s], "rating:s")
       assert_tag_match([q], "rating:q")
       assert_tag_match([e], "rating:e")
+      assert_tag_match([e, q], "rating:q,e")
       assert_tag_match([], "rating:s rating:q")
 
       assert_tag_match(all - [s], "-rating:s")

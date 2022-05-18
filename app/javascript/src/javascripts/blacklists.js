@@ -33,7 +33,7 @@ Blacklist.parse_entry = function(string) {
 }
 
 Blacklist.parse_entries = function() {
-  var entries = (Utility.meta("blacklisted-tags") || "nozomiisthebestlovelive").replace(/(rating:[qes])\w+/ig, "$1").toLowerCase().split(/,/);
+  var entries = (Utility.meta("blacklisted-tags") || "nozomiisthebestlovelive").replace(/(rating:\w)\w+/ig, "$1").toLowerCase().split(/,/);
   entries = entries.filter(e => e.trim() !== "");
 
   entries.forEach(function(tags) {

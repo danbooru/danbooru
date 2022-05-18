@@ -128,7 +128,7 @@ class PostQueryBuilder
     when "child"
       relation.child_matches(value)
     when "rating"
-      relation.where(rating: value.first.downcase)
+      relation.rating_matches(value)
     when "embedded"
       relation.embedded_matches(value)
     when "source"
