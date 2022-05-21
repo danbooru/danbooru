@@ -687,7 +687,7 @@ class User < ApplicationRecord
   end
 
   def self.available_includes
-    [:inviter]
+    [:inviter, :bans]
   end
 
   memoize :name_errors
