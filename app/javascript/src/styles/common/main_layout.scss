@@ -1,7 +1,7 @@
 div#page {
   overflow: visible;
-  margin: 0 20px;
-  padding: 0 10px;
+  margin-left: 30px;
+  margin-right: 30px;
 
   aside#sidebar > section {
     margin-bottom: 1em;
@@ -14,7 +14,6 @@ div#page {
 
 footer#page-footer {
   width: 100%;
-  margin-top: 1em;
   text-align: center;
   padding: 1em 0 1em;
   border-top: 1px solid var(--footer-border-color);

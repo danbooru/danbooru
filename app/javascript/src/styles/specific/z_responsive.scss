@@ -1,12 +1,13 @@
 @media screen and (max-width: 660px) {
   div#page {
-    margin: 0 0.5rem;
+    margin: 0.5rem 0.5rem 0;
     padding: 0;
   }
 
   header#top {
     position: relative;
     text-align: center;
+    margin-top: 0.25rem;
 
     #maintoggle {
       display: block;

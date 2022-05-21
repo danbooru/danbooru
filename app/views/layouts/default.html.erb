@@ -70,7 +70,7 @@
     </div>
   <% end %>
 
-  <header id="top" class="mb-4">
+  <header id="top">
     <div id="app-name-header" class="font-bold font-header leading-normal inline-flex items-center gap-1">
       <%= link_to image_pack_tag("static/danbooru-logo-128x128.png"), root_path, id: "app-logo" %>
       <%= link_to Danbooru.config.app_name, root_path, id: "app-name" %>
@@ -114,7 +114,7 @@
     </nav>
   </header>
 
-  <div id="page" class="flex-1">
+  <div id="page" class="flex-1 mt-4">
     <% if CurrentUser.user.is_restricted? && (params[:controller] == "users" || cookies[:hide_verify_account_notice].blank?) %>
       <div class="notice notice-info notice-large" id="verify-account-notice">
         <h2>Your account is restricted.</h2>
