@@ -64,7 +64,7 @@ class UserUpgradeTest < ActiveSupport::TestCase
           @user_upgrade = create(:self_gold_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "US")
 
-          assert_equal(UserUpgrade.gold_price, @user_upgrade.transaction.amount)
+          assert_equal(UserUpgrade.gold_price * 100, @user_upgrade.transaction.amount)
           assert_equal("usd", @user_upgrade.transaction.currency)
         end
 
@@ -72,7 +72,7 @@ class UserUpgradeTest < ActiveSupport::TestCase
           @user_upgrade = create(:self_platinum_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "US")
 
-          assert_equal(UserUpgrade.platinum_price, @user_upgrade.transaction.amount)
+          assert_equal(UserUpgrade.platinum_price * 100, @user_upgrade.transaction.amount)
           assert_equal("usd", @user_upgrade.transaction.currency)
         end
 
@@ -80,7 +80,7 @@ class UserUpgradeTest < ActiveSupport::TestCase
           @user_upgrade = create(:self_gold_to_platinum_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "US")
 
-          assert_equal(UserUpgrade.gold_to_platinum_price, @user_upgrade.transaction.amount)
+          assert_equal(UserUpgrade.gold_to_platinum_price * 100, @user_upgrade.transaction.amount)
           assert_equal("usd", @user_upgrade.transaction.currency)
         end
 
@@ -88,7 +88,7 @@ class UserUpgradeTest < ActiveSupport::TestCase
           @user_upgrade = create(:self_gold_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "DE")
 
-          assert_equal(0.8 * UserUpgrade.gold_price, @user_upgrade.transaction.amount)
+          assert_equal(0.8 * UserUpgrade.gold_price * 100, @user_upgrade.transaction.amount)
           assert_equal("eur", @user_upgrade.transaction.currency)
         end
 
@@ -96,7 +96,7 @@ class UserUpgradeTest < ActiveSupport::TestCase
           @user_upgrade = create(:self_platinum_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "DE")
 
-          assert_equal(0.8 * UserUpgrade.platinum_price, @user_upgrade.transaction.amount)
+          assert_equal(0.8 * UserUpgrade.platinum_price * 100, @user_upgrade.transaction.amount)
           assert_equal("eur", @user_upgrade.transaction.currency)
         end
 
@@ -104,7 +104,7 @@ class UserUpgradeTest < ActiveSupport::TestCase
           @user_upgrade = create(:self_gold_to_platinum_upgrade)
           @checkout = @user_upgrade.create_checkout!(country: "DE")
 
-          assert_equal(0.8 * UserUpgrade.gold_to_platinum_price, @user_upgrade.transaction.amount)
+          assert_equal(0.8 * UserUpgrade.gold_to_platinum_price * 100, @user_upgrade.transaction.amount)
           assert_equal("eur", @user_upgrade.transaction.currency)
         end
       end
