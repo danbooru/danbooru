@@ -242,9 +242,15 @@ class PostQueryBuilder
       in :not
         children.first.negate_relation
       in :and
-        children.reduce(&:and)
+        joins = children.flat_map(&:joins_values)
+        orders = children.flat_map(&:order_values)
+        nodes = children.map { |child| child.joins(joins).order(orders) }
+        nodes.reduce(&:and)
       in :or
-        children.reduce(&:or)
+        joins = children.flat_map(&:joins_values)
+        orders = children.flat_map(&:order_values)
+        nodes = children.map { |child| child.joins(joins).order(orders) }
+        nodes.reduce(&:or)
       end
     end
   end

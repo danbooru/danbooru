@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PostQueryBuilderTest < ActiveSupport::TestCase
   def assert_tag_match(posts, query, current_user: CurrentUser.user, tag_limit: nil, **options)
-    assert_equal(posts.map(&:id), Post.user_tag_match(query, current_user, tag_limit: tag_limit, **options).pluck(:id))
+    assert_equal(posts.map(&:id), Post.user_tag_match(query, current_user, tag_limit: tag_limit, **options).pluck("posts.id"))
   end
 
   def assert_search_error(query, current_user: CurrentUser.user, **options)
@@ -284,6 +284,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post2, post1], "ordfav:#{CurrentUser.user.name}")
       assert_tag_match([], "ordfav:does_not_exist")
+
+      assert_tag_match([post2, post1], "ordfav:#{CurrentUser.user.name} commentary:false")
+      assert_tag_match([post2, post1], "ordfav:#{CurrentUser.user.name} favcount:>0")
+      assert_tag_match([post2, post1], "ordfav:#{CurrentUser.user.name} comments:0")
+      assert_tag_match([post2, post1], "ordfav:#{CurrentUser.user.name} -has:comments")
     end
 
     should "return posts for the pool:<name> metatag" do
