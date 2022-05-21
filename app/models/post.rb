@@ -385,7 +385,7 @@ class Post < ApplicationRecord
     end
 
     def add_automatic_tags(tags)
-      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation non-web_source]
+      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation non-web_source wide_image tall_image]
 
       if tags.size >= 30
         tags -= ["tagme"]
