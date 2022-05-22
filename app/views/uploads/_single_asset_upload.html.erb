@@ -46,7 +46,7 @@
     <%= hidden_field_tag :upload_media_asset_id, upload_media_asset.id %>
 
     <%= f.input :source, as: :string, input_html: { value: post.source } %>
-    <%= f.input :rating, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
+    <%= f.input :rating, label: "Rating (#{link_to_wiki "?", "howto:rate"})".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
     <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
 
     <div class="input upload_artist_commentary_container">

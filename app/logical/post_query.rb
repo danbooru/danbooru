@@ -189,12 +189,12 @@ class PostQuery
     TagAlias.aliases_for(tag_names)
   end
 
-  # Implicit metatags are metatags added by the user's account settings. rating:s is implicit under safe mode.
+  # Implicit metatags are metatags added by the user's account settings. rating:g,s is implicit under safe mode.
   def implicit_metatags
     return [] unless safe_mode?
 
     tags = Danbooru.config.safe_mode_restricted_tags.map { |tag| -AST.tag(tag) }
-    [AST.metatag("rating", "s"), *tags]
+    [AST.metatag("rating", "g,s"), *tags]
   end
 
   # XXX unify with PostSets::Post#show_deleted?

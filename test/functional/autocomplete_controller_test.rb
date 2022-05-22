@@ -31,8 +31,8 @@ class AutocompleteControllerTest < ActionDispatch::IntegrationTest
         assert_autocomplete_equals(["azur_lane"], "~azur", "tag_query")
         assert_autocomplete_equals(["azur_lane"], "AZUR", "tag_query")
 
-        assert_autocomplete_equals(["rating:safe"], "rating:s", "tag_query")
-        assert_autocomplete_equals(["rating:safe"], "-rating:s", "tag_query")
+        assert_autocomplete_equals(["rating:sensitive"], "rating:s", "tag_query")
+        assert_autocomplete_equals(["rating:sensitive"], "-rating:s", "tag_query")
       end
 
       should "work for a missing type" do

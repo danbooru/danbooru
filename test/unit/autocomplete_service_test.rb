@@ -162,7 +162,8 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_equals(["parent:active"], "parent:act", :tag_query)
         assert_autocomplete_equals(["child:active"], "child:act", :tag_query)
 
-        assert_autocomplete_equals(["rating:safe"], "rating:s", :tag_query)
+        assert_autocomplete_equals(["rating:general"], "rating:g", :tag_query)
+        assert_autocomplete_equals(["rating:sensitive"], "rating:s", :tag_query)
         assert_autocomplete_equals(["rating:questionable"], "rating:q", :tag_query)
         assert_autocomplete_equals(["rating:explicit"], "rating:e", :tag_query)
 
@@ -190,7 +191,8 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
       end
 
       should "match static metatags case-insensitively" do
-        assert_autocomplete_equals(["rating:safe"], "rating:S", :tag_query)
+        assert_autocomplete_equals(["rating:general"], "rating:G", :tag_query)
+        assert_autocomplete_equals(["rating:sensitive"], "rating:S", :tag_query)
         assert_autocomplete_equals(["rating:questionable"], "rating:Q", :tag_query)
         assert_autocomplete_equals(["rating:explicit"], "rating:E", :tag_query)
       end

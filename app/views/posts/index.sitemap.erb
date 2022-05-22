@@ -21,7 +21,7 @@
             <video:publication_date><%= post.created_at.iso8601 %></video:publication_date>
             <video:title><%= "Post ##{post.id}" %></video:title>
             <video:description><%= post.tag_string %></video:description>
-            <video:family_friendly><%= post.rating == "s" ? "yes" : "no" %></video:family_friendly>
+            <video:family_friendly><%= post.rating == "g" ? "yes" : "no" %></video:family_friendly>
           </video:video>
         <% end %>
       <% end %>

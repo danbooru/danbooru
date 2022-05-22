@@ -42,13 +42,13 @@ class DiscordSlashCommand
       return nil if tag.nil? || tag.empty?
 
       if tag.artist?
-        search = "#{tag.name} rating:safe"
+        search = "#{tag.name} is:sfw"
       elsif tag.copyright?
-        search = "#{tag.name} rating:safe everyone copytags:<5 -parody -crossover"
+        search = "#{tag.name} is:sfw everyone copytags:<5 -parody -crossover"
       elsif tag.character?
-        search = "#{tag.name} rating:safe solo chartags:<5"
+        search = "#{tag.name} is:sfw solo chartags:<5"
       else # meta or general
-        search = "#{tag.name} rating:safe -animated -6+girls -comic"
+        search = "#{tag.name} is:sfw -animated -6+girls -comic"
       end
 
       Post.system_tag_match(search).limit(500).sort_by(&:score).last

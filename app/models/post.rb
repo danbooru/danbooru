@@ -11,9 +11,16 @@ class Post < ApplicationRecord
   RESTRICTED_TAGS_REGEX = /(?:^| )(?:#{Danbooru.config.restricted_tags.join("|")})(?:$| )/o
 
   RATINGS = {
-    s: "Safe",
+    g: "General",
+    s: "Sensitive",
     q: "Questionable",
     e: "Explicit",
+  }.with_indifferent_access
+
+  RATING_ALIASES = {
+    safe: ["s"],
+    nsfw: ["q", "e"],
+    sfw: ["g", "s"],
   }.with_indifferent_access
 
   deletable
@@ -1064,16 +1071,14 @@ class Post < ApplicationRecord
           where(has_children: true)
         when "child"
           where.not(parent: nil)
-        when "sfw"
-          where.not(rating: ["q", "e"])
-        when "nsfw"
-          where(rating: ["q", "e"])
         when *AutocompleteService::POST_STATUSES
           status_matches(value, current_user)
         when *MediaAsset::FILE_TYPES
           attribute_matches(value, :file_ext, :enum)
         when *Post::RATINGS.values.map(&:downcase)
           rating_matches(value)
+        when *Post::RATING_ALIASES.keys
+          where(rating: Post::RATING_ALIASES.fetch(value.downcase))
         else
           none
         end

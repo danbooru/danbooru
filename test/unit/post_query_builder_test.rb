@@ -753,15 +753,18 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the is:<rating> metatag" do
+      g = create(:post, rating: "g")
       s = create(:post, rating: "s")
       q = create(:post, rating: "q")
       e = create(:post, rating: "e")
-      all = [e, q, s]
+      all = [e, q, s, g]
 
+      assert_tag_match([g], "is:general")
       assert_tag_match([s], "is:safe")
+      assert_tag_match([s], "is:sensitive")
       assert_tag_match([q], "is:questionable")
       assert_tag_match([e], "is:explicit")
-      assert_tag_match([s], "is:sfw")
+      assert_tag_match([s, g], "is:sfw")
       assert_tag_match([e, q], "is:nsfw")
     end
 

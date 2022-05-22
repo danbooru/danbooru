@@ -733,8 +733,35 @@ class PostTest < ActiveSupport::TestCase
           context "that is valid" do
             should "update the rating" do
               @post.update(tag_string: "aaa rating:e")
-              @post.reload
-              assert_equal("e", @post.rating)
+              assert_equal("e", @post.reload.rating)
+
+              @post.update(tag_string: "aaa rating:q")
+              assert_equal("q", @post.reload.rating)
+
+              @post.update(tag_string: "aaa rating:s")
+              assert_equal("s", @post.reload.rating)
+
+              @post.update(tag_string: "aaa rating:g")
+              assert_equal("g", @post.reload.rating)
+            end
+
+            should "update the rating for a long name" do
+              @post.update(tag_string: "aaa rating:explicit")
+              assert_equal("e", @post.reload.rating)
+
+              @post.update(tag_string: "aaa rating:questionable")
+              assert_equal("q", @post.reload.rating)
+
+              @post.update(tag_string: "aaa rating:sensitive")
+              assert_equal("s", @post.reload.rating)
+
+              @post.update(tag_string: "aaa rating:general")
+              assert_equal("g", @post.reload.rating)
+            end
+
+            should "update the rating for rating:safe" do
+              @post.update(tag_string: "aaa rating:safe")
+              assert_equal("s", @post.reload.rating)
             end
           end
 
@@ -1623,8 +1650,8 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      should "allow values s, q, e" do
-        ["s", "q", "e"].each do |rating|
+      should "allow values g, s, q, e" do
+        ["g", "s", "q", "e"].each do |rating|
           subject.rating = rating
           assert(subject.valid?)
         end
