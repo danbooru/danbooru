@@ -98,7 +98,7 @@ class PostQueryBuilder
     when "mpixels"
       relation.attribute_matches(value, "posts.image_width * posts.image_height / 1000000.0", :float)
     when "ratio"
-      relation.attribute_matches(value, "posts.image_width::numeric / posts.image_height::numeric", :ratio)
+      relation.attribute_matches(value, "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", :ratio)
     when "score"
       relation.attribute_matches(value, :score)
     when "upvotes"
