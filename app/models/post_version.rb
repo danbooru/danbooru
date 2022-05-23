@@ -151,7 +151,7 @@ class PostVersion < ApplicationRecord
   end
 
   def pretty_rating
-    Post::RATINGS.fetch(rating)
+    Post::RATINGS[rating] # XXX some old post versions have nil ratings.
   end
 
   def changes
