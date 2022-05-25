@@ -1910,6 +1910,41 @@ ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
+-- Name: upgrade_codes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.upgrade_codes (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    code character varying NOT NULL,
+    status integer NOT NULL,
+    creator_id integer NOT NULL,
+    redeemer_id integer,
+    user_upgrade_id integer
+);
+
+
+--
+-- Name: upgrade_codes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.upgrade_codes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: upgrade_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.upgrade_codes_id_seq OWNED BY public.upgrade_codes.id;
+
+
+--
 -- Name: upload_media_assets; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2540,6 +2575,13 @@ ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id
 
 
 --
+-- Name: upgrade_codes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upgrade_codes ALTER COLUMN id SET DEFAULT nextval('public.upgrade_codes_id_seq'::regclass);
+
+
+--
 -- Name: upload_media_assets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2991,6 +3033,14 @@ ALTER TABLE ONLY public.tag_implications
 
 ALTER TABLE ONLY public.tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: upgrade_codes upgrade_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upgrade_codes
+    ADD CONSTRAINT upgrade_codes_pkey PRIMARY KEY (id);
 
 
 --
@@ -4566,6 +4616,41 @@ CREATE INDEX index_tags_on_post_count ON public.tags USING btree (post_count);
 
 
 --
+-- Name: index_upgrade_codes_on_code; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_upgrade_codes_on_code ON public.upgrade_codes USING btree (code);
+
+
+--
+-- Name: index_upgrade_codes_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upgrade_codes_on_creator_id ON public.upgrade_codes USING btree (creator_id);
+
+
+--
+-- Name: index_upgrade_codes_on_redeemer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upgrade_codes_on_redeemer_id ON public.upgrade_codes USING btree (redeemer_id) WHERE (redeemer_id IS NOT NULL);
+
+
+--
+-- Name: index_upgrade_codes_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upgrade_codes_on_status ON public.upgrade_codes USING btree (status);
+
+
+--
+-- Name: index_upgrade_codes_on_user_upgrade_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upgrade_codes_on_user_upgrade_id ON public.upgrade_codes USING btree (user_upgrade_id) WHERE (user_upgrade_id IS NOT NULL);
+
+
+--
 -- Name: index_upload_media_assets_on_error; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5256,11 +5341,27 @@ ALTER TABLE ONLY public.post_approvals
 
 
 --
+-- Name: upgrade_codes fk_rails_778e1e40b5; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upgrade_codes
+    ADD CONSTRAINT fk_rails_778e1e40b5 FOREIGN KEY (redeemer_id) REFERENCES public.users(id);
+
+
+--
 -- Name: favorite_groups fk_rails_796204a5e3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.favorite_groups
     ADD CONSTRAINT fk_rails_796204a5e3 FOREIGN KEY (creator_id) REFERENCES public.users(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: upgrade_codes fk_rails_80bbec9661; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upgrade_codes
+    ADD CONSTRAINT fk_rails_80bbec9661 FOREIGN KEY (user_upgrade_id) REFERENCES public.user_upgrades(id);
 
 
 --
@@ -5429,6 +5530,14 @@ ALTER TABLE ONLY public.favorites
 
 ALTER TABLE ONLY public.uploads
     ADD CONSTRAINT fk_rails_d29b037216 FOREIGN KEY (uploader_id) REFERENCES public.users(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: upgrade_codes fk_rails_d5a4e5e1a6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upgrade_codes
+    ADD CONSTRAINT fk_rails_d5a4e5e1a6 FOREIGN KEY (creator_id) REFERENCES public.users(id);
 
 
 --
@@ -5832,6 +5941,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220407203236'),
 ('20220410050628'),
 ('20220504235329'),
-('20220514175125');
+('20220514175125'),
+('20220525214746');
 
 

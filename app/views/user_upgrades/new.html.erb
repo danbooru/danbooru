@@ -56,7 +56,7 @@
             <% if Danbooru.config.is_promotion? %>
               <s>$20</s>
             <% end %>
-            <b><%= number_to_currency(UserUpgrade.gold_price) %></b>
+            <b><%= number_to_currency(UserUpgrade.gold_price, precision: 0) %></b>
             <div class="fineprint">One time fee</div>
           </td>
         </tr>
@@ -92,15 +92,6 @@
         </tr>
         <tr>
           <td></td>
-          <td></td>
-          <td>
-            <%= image_pack_tag("static/mastercard-logo.svg", width: 28, class: "icon") %>
-            <%= image_pack_tag("static/visa-logo.svg", width: 28, class: "icon") %>
-            <%= image_pack_tag("static/discover-logo.svg", width: 28, class: "icon") %>
-          </td>
-        </tr>
-        <tr>
-          <td></td>
           <td>
             <% if @user_upgrade.purchaser.is_anonymous? %>
               <%= link_to "Create free account", new_user_path(url: new_user_upgrade_path), class: "button-outline-primary" %>
@@ -108,13 +99,15 @@
           </td>
           <td>
             <% if !UserUpgrade.enabled? %>
-              <%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id), class: "button-primary", disabled: true %>
+              <%= link_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id), class: "button-primary", disabled: true %>
             <% elsif @user_upgrade.purchaser.is_anonymous? %>
-              <%= link_to "Get #{Danbooru.config.canonical_app_name} Gold", new_user_path(url: new_user_upgrade_path), class: "button-primary" %>
+              <%= link_to "Upgrade to Gold", new_user_path(url: new_user_upgrade_path), class: "button-primary" %>
+              <%= link_to "Redeem upgrade code", redeem_upgrade_codes_path, class: "text-sm" %>
             <% elsif @user_upgrade.recipient.level <= User::Levels::MEMBER %>
-              <%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo], payment_processor: "authorize_net"), class: "button-primary", remote: true, disable_with: "Redirecting..." %>
+              <%= button_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo], payment_processor: "shopify"), class: "button-primary mb-2", remote: true, disable_with: "Redirecting..." %>
+              <%= link_to "Redeem upgrade code", redeem_upgrade_codes_path, class: "text-sm" %>
             <% else %>
-              <%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id), class: "button-primary", disabled: true %>
+              <%= link_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id), class: "button-primary", disabled: true %>
             <% end %>
           </td>
         </tr>
@@ -130,6 +123,13 @@
     <h2 class="mb-4">Frequently Asked Questions</h2>
 
     <div id="frequently-asked-questions" class="divide-y-1">
+      <details>
+        <summary>How do I buy <%= Danbooru.config.canonical_app_name %> Gold?</summary>
+
+        <p>Click the "Upgrade to Gold" button on this page. After you purchase an upgrade, you will receive a code you can
+        <%= link_to "redeem here", redeem_upgrade_codes_path %> to upgrade your account to Gold.</p>
+      </details>
+
       <details>
         <summary>What are the benefits of <%= Danbooru.config.canonical_app_name %> Gold?</summary>
 

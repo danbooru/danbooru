@@ -248,6 +248,13 @@ Rails.application.routes.draw do
   resources :tags
   resources :tag_aliases, only: [:show, :index, :destroy]
   resources :tag_implications, only: [:show, :index, :destroy]
+
+  get "/redeem", to: "upgrade_codes#redeem", as: "redeem_upgrade_codes"
+  resources :upgrade_codes, only: [:create, :index] do
+    get :redeem, on: :collection
+    post :upgrade, on: :collection
+  end
+
   resources :uploads do
     collection do
       get :batch, to: redirect(path: "/uploads/new")

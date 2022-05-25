@@ -22,6 +22,8 @@ class UserUpgrade < ApplicationRecord
   enum payment_processor: {
     stripe: 0,
     authorize_net: 100,
+    shopify: 200,
+    upgrade_code: 300,
   }
 
   scope :gifted, -> { where("recipient_id != purchaser_id") }
@@ -113,7 +115,7 @@ class UserUpgrade < ApplicationRecord
   end
 
   concerning :UpgradeMethods do
-    def process_upgrade!(payment_status)
+    def process_upgrade!(payment_status = "paid")
       recipient.with_lock do
         return unless pending? || processing?
 
@@ -174,6 +176,8 @@ class UserUpgrade < ApplicationRecord
         PaymentTransaction::Stripe.new(self)
       in "authorize_net"
         PaymentTransaction::AuthorizeNet.new(self)
+      in "shopify"
+        PaymentTransaction::Shopify.new(self)
       end
     end
 

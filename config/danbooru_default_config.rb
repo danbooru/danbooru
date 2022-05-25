@@ -392,6 +392,14 @@ module Danbooru
       true
     end
 
+    # The URL of the Shopify checkout page where account upgrades are sold.
+    def shopify_checkout_url
+    end
+
+    # The secret used to verify webhooks from Shopify. Get it from the https://xxx.myshopify.com/admin/settings/notifications page.
+    def shopify_webhook_secret
+    end
+
     def stripe_secret_key
     end
 

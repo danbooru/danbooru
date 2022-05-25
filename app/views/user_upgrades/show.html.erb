@@ -37,14 +37,10 @@
       <% else %>
         <p>You are now a <%= @user_upgrade.level_string %> user. Thanks for supporting the site! A receipt has been sent to your email.</p>
       <% end %>
-
-      <%= render "stripe_links", user_upgrade: @user_upgrade %>
     <% elsif @user_upgrade.refunded? %>
       <p>This purchase has been refunded. A receipt has been sent to your email. It can take up to
       5-10 days for the refund to appear on your credit card or bank statement. If it takes longer,
       please contact your bank for assistance.</p>
-
-      <%= render "stripe_links", user_upgrade: @user_upgrade %>
     <% else %>
       <%= content_for :html_header do %>
         <meta http-equiv="refresh" content="5">

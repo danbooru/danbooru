@@ -11,6 +11,9 @@ class WebhooksController < ApplicationController
     when "stripe"
       PaymentTransaction::Stripe.receive_webhook(request)
       head 200
+    when "shopify"
+      PaymentTransaction::Shopify.receive_webhook(request)
+      head 200
     when "discord"
       json = DiscordSlashCommand.receive_webhook(request)
       render json: json
