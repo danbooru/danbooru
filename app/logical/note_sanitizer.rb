@@ -19,6 +19,7 @@ module NoteSanitizer
 
   ALLOWED_PROPERTIES = %w[
     align-items
+    background-clip -webkit-background-clip
     background background-color
     border border-color border-image border-radius border-style border-width
     border-bottom border-bottom-color border-bottom-left-radius border-bottom-right-radius border-bottom-style border-bottom-width
