@@ -86,15 +86,22 @@ module SourceTestHelper
     # check any method that is passed as kwargs, in order to hardcode as few things as possible
     # XXX can't use **kwargs because of a bug with shoulda-context, so we're using a hash temporarily
     methods_to_test.each do |method_name, expected_value|
+      actual_value = strategy.try(method_name)
+
       should "make sure that '#{method_name}' matches" do
         if expected_value.instance_of? Regexp
-          assert_match(expected_value, strategy.try(method_name))
+          assert_match(expected_value, actual_value)
         elsif expected_value.instance_of? Array
-          assert_equal(expected_value.sort, strategy.try(method_name).sort)
+          if expected_value.first.instance_of? Regexp
+            actual_values = actual_value.sort
+            expected_value.sort.each_with_index { |each_value, index| assert_match(each_value, actual_values[index]) }
+          else
+            assert_equal(expected_value.sort, actual_value)
+          end
         elsif expected_value.nil?
-          assert_nil(strategy.try(method_name))
+          assert_nil(actual_value)
         else
-          assert_equal(expected_value, strategy.try(method_name))
+          assert_equal(expected_value, actual_value)
         end
       end
     end

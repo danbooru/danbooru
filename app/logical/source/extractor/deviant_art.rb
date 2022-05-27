@@ -18,7 +18,11 @@ module Source
       def image_url
         # work is private, deleted, or the url didn't contain a deviation id; use image url as given by user.
         if api_deviation.blank?
-          url
+          if url =~ %r{\Ahttps://images-wixmp-}
+            extract_largest(url)
+          else
+            url
+          end
         elsif api_deviation[:is_downloadable]
           api_download[:src]
         elsif api_deviation[:flash].present?
@@ -27,13 +31,28 @@ module Source
           api_deviation[:videos].max_by { |x| x[:filesize] }[:src]
         else
           src = api_deviation.dig(:content, :src)
-          if deviation_id && deviation_id.to_i <= 790_677_560 && src =~ %r{\Ahttps://images-wixmp-} && src !~ /\.gif\?/
-            src = src.sub(%r{(/f/[a-f0-9-]+/[a-f0-9-]+)}, '/intermediary\1')
-            src = src.sub(%r{/v1/(fit|fill)/.*\z}i, "")
+          extract_largest(src)
+        end
+      end
+
+      def extract_largest(src)
+        if src =~ %r{\Ahttps://images-wixmp-}
+          sample, separator, * = src.partition("/v1/")
+          if separator.blank?
+            src = src.sub(%r{(/f/[a-f0-9-]+/[a-f0-9-]+)}, '/intermediary\1') unless src =~ /\.gif\?/
+            src
+          else
+            # :^) https://i.imgur.com/KG5bVRU.png
+            # shamelessly aped from:
+            # https://github.com/mikf/gallery-dl/blob/7990fe84f11271bc8e4079db6b0248dbeb79474a/gallery_dl/extractor/deviantart.py#L293
+            *, f_value = sample.split("/f/")
+            data = {sub: "urn:app:", iss: "urn:app:", obj: [[{path: "/f/#{f_value}"}]], aud: ["urn:service:file.download"]}
+            token = Base64.encode64(JSON.generate(data)).gsub("=", "").gsub("\n", "")
+            "#{sample}?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.#{token}."
           end
+        else
           src = src.sub(%r{\Ahttps?://orig\d+\.deviantart\.net}i, "http://origin-orig.deviantart.net")
-          src = src.gsub(/q_\d+,strp/, "q_100")
-          src
+          src.gsub(/q_\d+,strp/, "q_100")
         end
       end
 
