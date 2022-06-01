@@ -6,7 +6,7 @@ class BulkUpdateRequestPolicy < ApplicationPolicy
   end
 
   def update?
-    unbanned? && (user.is_admin? || record.user_id == user.id)
+    unbanned? && !record.is_approved? && (user.is_admin? || record.user_id == user.id)
   end
 
   def approve?
