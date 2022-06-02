@@ -1,6 +1,10 @@
 <% page_title "Account Upgrade" %>
 <% meta_description "Upgrade to a Gold account." %>
 
+<% content_for :html_header do %>
+  <meta name="referrer" content="no-referrer">
+<% end %>
+
 <%= render "users/secondary_links" %>
 
 <div id="c-user-upgrades">
@@ -25,8 +29,6 @@
 
       <p><%= Danbooru.config.canonical_app_name %> Gold is a lifetime upgrade,
       not a subscription. You pay only once and keep the upgrade forever!</p>
-
-      <p><b>Notice: Gold upgrades are temporarily disabled while we change our payment system.</b></p>
     <% end %>
 
     <% if Danbooru.config.is_promotion? %>
@@ -101,8 +103,8 @@
             <% if !UserUpgrade.enabled? %>
               <%= link_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id), class: "button-primary", disabled: true %>
             <% elsif @user_upgrade.purchaser.is_anonymous? %>
-              <%= link_to "Upgrade to Gold", new_user_path(url: new_user_upgrade_path), class: "button-primary" %>
-              <%= link_to "Redeem upgrade code", redeem_upgrade_codes_path, class: "text-sm" %>
+              <%= link_to "Upgrade to Gold", new_user_path(url: new_user_upgrade_path), class: "button-primary block mb-2" %>
+              <%= link_to "Redeem upgrade code", redeem_upgrade_codes_path, class: "text-sm block" %>
             <% elsif @user_upgrade.recipient.level <= User::Levels::MEMBER %>
               <%= button_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo], payment_processor: "shopify"), class: "button-primary mb-2", remote: true, disable_with: "Redirecting..." %>
               <%= link_to "Redeem upgrade code", redeem_upgrade_codes_path, class: "text-sm" %>
@@ -124,10 +126,11 @@
 
     <div id="frequently-asked-questions" class="divide-y-1">
       <details>
-        <summary>How do I buy <%= Danbooru.config.canonical_app_name %> Gold?</summary>
+        <summary>How do I upgrade my account?</summary>
 
         <p>Click the "Upgrade to Gold" button on this page. After you purchase an upgrade, you will receive a code you can
-        <%= link_to "redeem here", redeem_upgrade_codes_path %> to upgrade your account to Gold.</p>
+        <%= link_to "redeem here", redeem_upgrade_codes_path %> to upgrade your account to Gold. Look for the upgrade code
+        in your email or on the order confirmation page. <%= link_to "Contact us", contact_path %> if you have any questions.</p>
       </details>
 
       <details>
@@ -187,13 +190,13 @@
       <details>
         <summary>Can I gift an upgrade to someone else?</summary>
 
-        <p>Sure. Just go to their profile page and look for the "Gift Upgrade" link.</p>
+        <p>Sure. You can buy an upgrade code and give it to someone else.</p>
       </details>
 
       <details>
         <summary>What payment methods do you support?</summary>
 
-        <p>We support all major credit and debit cards. We don't support PayPal or Bitcoin at this time.</p>
+        <p>We support all major credit and debit cards. We don't support Bitcoin at this time.</p>
       </details>
 
       <details>

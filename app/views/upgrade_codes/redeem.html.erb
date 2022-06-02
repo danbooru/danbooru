@@ -7,10 +7,11 @@
     <h1 class="text-center mb-4">Redeem upgrade code</h1>
 
     <% if CurrentUser.user.level <= User::Levels::MEMBER %>
-      <p>Enter your upgrade code below to upgrade your account to Gold.</p>
+      <p>Enter your upgrade code below to upgrade your account to Gold. Look for the code on the order confirmation
+      page or in your email.
 
-      <p>After you purchase a Gold account, you will receive an upgrade code. Enter it here to upgrade your account. If you don't have a code,
-      go to the <%= link_to "upgrade page", new_user_upgrade_path %> first to buy one, then come back here to redeem it.</p>
+      <p>If you don't have a code, go to the <%= link_to "upgrade page", new_user_upgrade_path %> to buy one,
+      then come back here to redeem it. If you have any questions, <%= link_to "contact us", contact_path %>.</p>
 
       <% if CurrentUser.user.is_anonymous? %>
         <p>You must <%= link_to "login", login_path(url: redeem_upgrade_codes_path) %> or
