@@ -56,7 +56,7 @@ class User < ApplicationRecord
 
   ACTIVE_BOOLEAN_ATTRIBUTES = BOOLEAN_ATTRIBUTES.grep_v(/unused/)
 
-  DEFAULT_BLACKLIST = ["guro", "scat", "furry -rating:s"].join("\n")
+  DEFAULT_BLACKLIST = ["guro", "scat", "furry -rating:g"].join("\n")
 
   attribute :id
   attribute :created_at
