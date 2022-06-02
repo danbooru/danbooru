@@ -3568,9 +3568,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.118":
-  version: 1.4.143
-  resolution: "electron-to-chromium@npm:1.4.143"
-  checksum: 8ff8d46d6b8088b9e713412999a12647d8e4225abfd7872c1f7855b5579327754b7aeaaedaae1b6afbb5a2da29dbf0522f57401014d54a2307ddf81f004bc26f
+  version: 1.4.144
+  resolution: "electron-to-chromium@npm:1.4.144"
+  checksum: 3fca08b37d336adc65d2ea4a90b3cc1c02049d15b8d5666af94a68d379f63809678510d505dc6ee08686175df9c43da5b531eef564321012c6229ec8f8f2a0f6
   languageName: node
   linkType: hard
 
@@ -8039,8 +8039,8 @@ fsevents@~2.3.2:
   linkType: hard
 
 "terser-webpack-plugin@npm:^5.1.3, terser-webpack-plugin@npm:^5.2.4":
-  version: 5.3.2
-  resolution: "terser-webpack-plugin@npm:5.3.2"
+  version: 5.3.3
+  resolution: "terser-webpack-plugin@npm:5.3.3"
   dependencies:
     "@jridgewell/trace-mapping": ^0.3.7
     jest-worker: ^27.4.5
@@ -8056,7 +8056,7 @@ fsevents@~2.3.2:
       optional: true
     uglify-js:
       optional: true
-  checksum: 49f8c6cefd4e8c01a6c328ce004527e3a2dabae64bdfae1f980f6e45caa42c1c6bd5745cf313eb74cf8799c922937dbc2d5ef6ca9db3c5b17591138c97d32b3e
+  checksum: b05f720cbaa38b8b270fe1e75fa30dcc463d4ce6289800b76fee42eb524dfdc16d6115ae6e89a353839a263ed90484eed2fb3aa10c3630c7a5fcaee5243c4797
   languageName: node
   linkType: hard
 
