@@ -42,6 +42,13 @@ module Sources
       )
     end
 
+    context "A deviantart post with the intermediary version giving 404" do
+      strategy_should_work(
+        "https://www.deviantart.com/gregmks/art/Rhino-Castle-811778248",
+        image_urls: [%r{\Ahttps://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/8c03bd02-63bf-407e-9c3e-c3fd21ab4bd5/ddfb83s-64c3b1fd-a554-498c-87dd-7ce83721a3d0\.jpg\?token=}]
+      )
+    end
+
     context "A deviantart origin-orig image" do
       desc = <<-EOS.strip_heredoc.chomp
         blah blah
