@@ -22,7 +22,7 @@
 #
 module Source
   class URL::NicoSeiga < Source::URL
-    attr_reader :illust_id, :manga_id, :image_id, :sm_video_id, :nm_video_id, :user_id, :username, :profile_url
+    attr_reader :illust_id, :manga_id, :image_id, :oekaki_id, :sm_video_id, :nm_video_id, :user_id, :username, :profile_url
 
     def self.match?(url)
       url.domain.in?(%w[nicovideo.jp nicoseiga.jp nicomanga.jp nimg.jp nico.ms])
@@ -145,6 +145,11 @@ module Source
         @user_id = user_id
         @profile_url = "https://q.nicovideo.jp/users/#{user_id}"
 
+      # https://dic.nicovideo.jp/oekaki/176310.png
+      # https://dic.nicovideo.jp/oekaki_id/340604
+      in "dic.nicovideo.jp", ("oekaki" | "oekaki_id"), /^(\d+)(?:\.\w+)?$/
+        @oekaki_id = $1
+
       # https://dic.nicovideo.jp/u/11141663
       in "dic.nicovideo.jp", "u", /^\d+$/ => user_id, *rest
         @user_id = user_id
@@ -184,6 +189,8 @@ module Source
         "https://www.nicovideo.jp/watch/nm#{nm_video_id}"
       elsif sm_video_id.present?
         "https://www.nicovideo.jp/watch/sm#{sm_video_id}"
+      elsif oekaki_id.present?
+        "https://dic.nicovideo.jp/oekaki_id/#{oekaki_id}"
       #elsif image_id.present?
       #  "https://seiga.nicovideo.jp/image/source/#{image_id}"
       end
