@@ -2,6 +2,16 @@
   <div id="a-index">
     <h1>Artist Commentary</h1>
 
+    <%= search_form_for(artist_commentaries_path) do |f| %>
+      <%= f.input :text_matches, label: "Text", input_html: { value: params[:search][:text_matches] } %>
+      <%= f.input :post_tags_match, label: "Tags", input_html: { data: { autocomplete: "tag-query" }, value: params[:search][:post_tags_match] } %>
+      <%= f.input :original_present, label: "Original?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:original_present] %>
+      <%= f.input :translated_present, label: "Translated?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:translated_present] %>
+      <%= f.input :is_deleted, label: "Deleted?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:is_deleted] %>
+      <%= f.input :order, collection: [%w[Newest id], %w[Oldest id_asc], %w[Updated updated_at_desc], %w[Uploaded post_id_desc]], include_blank: true, selected: params[:search][:order] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
     <%= render "posts/partials/common/inline_blacklist" %>
 
     <%= table_for @commentaries, width: "100%" do |t| %>

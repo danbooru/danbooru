@@ -227,7 +227,6 @@ Rails.application.routes.draw do
   resources :artist_commentaries, :only => [:index, :show] do
     collection do
       put :create_or_update
-      get :search
     end
     member do
       put :revert

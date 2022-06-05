@@ -25,6 +25,7 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(original_present: "true").with { [@other_commentary, @commentary] }
       should respond_to_search(translated_present: "true").with { @commentary }
       should respond_to_search(is_deleted: "yes").with { @deleted_commentary }
+      should respond_to_search(order: "id_asc").with { [@commentary, @other_commentary, @deleted_commentary] }
 
       context "using includes" do
         should respond_to_search(post_id: 999).with { @commentary }

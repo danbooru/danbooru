@@ -56,10 +56,26 @@ class ArtistCommentary < ApplicationRecord
         q = q.where("(translated_title = '') and (translated_description = '')")
       end
 
-      q = q.deleted if params[:is_deleted] == "yes"
-      q = q.undeleted if params[:is_deleted] == "no"
+      if params[:is_deleted].to_s.truthy?
+        q = q.deleted
+      elsif params[:is_deleted].to_s.falsy?
+        q = q.undeleted
+      end
 
-      q.apply_default_order(params)
+      case params[:order]
+      when "id_asc"
+        q = q.order(id: :asc)
+      when "post_id", "post_id_desc"
+        q = q.order(post_id: :desc)
+      when "post_id_asc"
+        q = q.order(post_id: :asc)
+      when "updated_at", "updated_at_desc"
+        q = q.order(updated_at: :desc, id: :desc)
+      when "updated_at_asc"
+        q = q.order(updated_at: :asc, id: :asc)
+      else
+        q = q.apply_default_order(params)
+      end
     end
   end
 
