@@ -38,10 +38,7 @@ module Source
       def extract_largest(src)
         if src =~ %r{\Ahttps://images-wixmp-}
           sample, separator, * = src.partition("/v1/")
-          if separator.blank?
-            src = src.sub(%r{(/f/[a-f0-9-]+/[a-f0-9-]+)}, '/intermediary\1') unless src =~ /\.gif\?/
-            src
-          else
+          if separator.present?
             # :^) https://i.imgur.com/KG5bVRU.png
             # shamelessly aped from:
             # https://github.com/mikf/gallery-dl/blob/7990fe84f11271bc8e4079db6b0248dbeb79474a/gallery_dl/extractor/deviantart.py#L293
@@ -49,6 +46,11 @@ module Source
             data = {sub: "urn:app:", iss: "urn:app:", obj: [[{path: "/f/#{f_value}"}]], aud: ["urn:service:file.download"]}
             token = Base64.encode64(JSON.generate(data)).gsub("=", "").gsub("\n", "")
             "#{sample}?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.#{token}."
+          elsif deviation_id && deviation_id.to_i <= 790_677_560 && src !~ /\.gif\?/
+            src = src.sub(%r{(/f/[a-f0-9-]+/[a-f0-9-]+)}, '/intermediary\1')
+            src.sub(%r{/v1/(fit|fill)/.*\z}i, "")
+          else
+            src
           end
         else
           src = src.sub(%r{\Ahttps?://orig\d+\.deviantart\.net}i, "http://origin-orig.deviantart.net")
