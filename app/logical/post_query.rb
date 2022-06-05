@@ -7,7 +7,11 @@ class PostQuery
   class TagLimitError < Error; end
 
   # Metatags that don't count against the user's tag limit.
-  UNLIMITED_METATAGS = %w[status rating limit]
+  UNLIMITED_METATAGS = %w[
+    status rating limit is id date age filesize filetype parent child md5 width
+    height duration mpixels ratio score upvote downvotes favcount embedded
+    tagcount pixiv_id pixiv
+  ]
 
   # Metatags that define the order of search results. These metatags can't be used more than once per query.
   ORDER_METATAGS = %w[order ordfav ordfavgroup ordpool]

@@ -1353,7 +1353,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post1 = create(:post, rating: "s")
 
       assert_raise(PostQuery::TagLimitError) do
-        PostQuery.search("a b c rating:s width:10 height:10 user:bob", tag_limit: 5)
+        PostQuery.search("a b c user:bob fav:bob pool:disgustingly_adorable", tag_limit: 5)
       end
     end
 
@@ -1363,6 +1363,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "aaa bbb rating:s")
       assert_tag_match([post1], "aaa bbb status:active")
       assert_tag_match([post1], "aaa bbb limit:20")
+      assert_tag_match([post1], "aaa bbb filesize:<100mb width:<10000 height:<10000 limit:20")
     end
 
     should "succeed for exclusive tag searches with no other tag" do
