@@ -26,6 +26,28 @@ class PostApprovalTest < ActiveSupport::TestCase
           assert_equal(false, @approval2.valid?)
           assert_equal(["You have previously approved this post and cannot approve it again"], @approval2.errors[:base])
         end
+
+        should "allow an admin to approve the same post twice" do
+          @approver = create(:admin_user)
+
+          create(:post_approval, post: @post, user: @approver)
+          assert_equal(1, @post.approvals.count)
+          assert_equal(@approver, @post.approver)
+          assert_equal(false, @post.reload.is_pending?)
+          assert_equal(true, @post.reload.is_active?)
+
+          flag = create(:post_flag, post: @post, creator: create(:user))
+          assert_equal(true, @post.reload.is_flagged?)
+          assert_equal(false, @post.reload.is_active?)
+          assert_equal("pending", flag.reload.status)
+
+          create(:post_approval, post: @post, user: @approver)
+          assert_equal(2, @post.approvals.count)
+          assert_equal(@approver, @post.approver)
+          assert_equal(false, @post.reload.is_flagged?)
+          assert_equal(true, @post.reload.is_active?)
+          assert_equal("rejected", flag.reload.status)
+        end
       end
     end
 

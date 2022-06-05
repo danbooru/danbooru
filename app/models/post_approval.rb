@@ -18,7 +18,7 @@ class PostApproval < ApplicationRecord
       errors.add(:base, "You cannot approve a post you uploaded")
     end
 
-    if post.approver == user || post.approvals.exists?(user: user)
+    if (post.approver == user || post.approvals.exists?(user: user)) && !policy(user).can_bypass_approval_limits?
       errors.add(:base, "You have previously approved this post and cannot approve it again")
     end
   end
