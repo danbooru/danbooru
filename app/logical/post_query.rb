@@ -198,7 +198,7 @@ class PostQuery
     return [] unless safe_mode?
 
     tags = Danbooru.config.safe_mode_restricted_tags.map { |tag| -AST.tag(tag) }
-    [AST.metatag("rating", "g,s"), *tags]
+    [AST.metatag("rating", "g"), *tags]
   end
 
   # XXX unify with PostSets::Post#show_deleted?
