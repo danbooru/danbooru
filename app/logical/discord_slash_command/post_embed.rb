@@ -63,7 +63,7 @@ class DiscordSlashCommand
     end
 
     def is_censored?
-      (post.rating.in?(["q", "e"]) && !is_nsfw_channel?) || !post.visible?(User.anonymous) || censored_tags.any? { |tag| tag.in?(post.tag_array) }
+      (post.rating != 'g' && !is_nsfw_channel?) || !post.visible?(User.anonymous) || censored_tags.any? { |tag| tag.in?(post.tag_array) }
     end
 
     def is_nsfw_channel?
