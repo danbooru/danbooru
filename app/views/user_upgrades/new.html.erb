@@ -29,6 +29,10 @@
 
       <p><%= Danbooru.config.canonical_app_name %> Gold is a lifetime upgrade,
       not a subscription. You pay only once and keep the upgrade forever!</p>
+
+      <% if !UserUpgrade.enabled? %>
+        <p><b>Notice: Gold upgrades are temporarily disabled.</b></p>
+      <% end %>
     <% end %>
 
     <% if Danbooru.config.is_promotion? %>
@@ -101,7 +105,7 @@
           </td>
           <td>
             <% if !UserUpgrade.enabled? %>
-              <%= link_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id), class: "button-primary", disabled: true %>
+              <%= button_to "Upgrade to Gold", nil, class: "button-primary", disabled: true %>
             <% elsif @user_upgrade.purchaser.is_anonymous? %>
               <%= link_to "Upgrade to Gold", new_user_path(url: new_user_upgrade_path), class: "button-primary block mb-2" %>
               <%= link_to "Redeem upgrade code", redeem_upgrade_codes_path, class: "text-sm block" %>
