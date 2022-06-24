@@ -1307,6 +1307,14 @@ class Post < ApplicationRecord
         where(md5: metadata.select(:md5))
       end
 
+      def ai_tags_include(value)
+        tag = Tag.find_by_name_or_alias(value)
+        return none if tag.nil?
+
+        ai_tags = AITag.joins(:media_asset).where(tag: tag, score: (50..))
+        where(ai_tags.where("media_assets.md5 = posts.md5").arel.exists)
+      end
+
       def uploader_matches(username)
         case username.downcase
         when "any"

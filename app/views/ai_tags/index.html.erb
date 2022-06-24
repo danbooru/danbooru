@@ -1,0 +1,37 @@
+<%= render "tags/secondary_links" %>
+
+<div id="c-ai-tags">
+  <div id="a-index">
+    <h1>AI Tags</h1>
+
+    <%= search_form_for(ai_tags_path) do |f| %>
+      <%= f.input :tag_name, label: "AI Tag", input_html: { value: params.dig(:search, :tag_name).presence || Tag.find_by(id: params.dig(:search, :tag_id))&.name, data: { autocomplete: "tag" } } %>
+      <%= f.input :post_tags_match, label: "Post Search", input_html: { value: params.dig(:search, :post_tags_match), data: { autocomplete: "tag-query" } } %>
+      <%= f.input :score, label: "Confidence", input_html: { value: params.dig(:search, :score) } %>
+      <%= f.input :is_posted, as: :hidden, input_html: { value: params.dig(:search, :is_posted) } %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <div class="border-b mb-4 flex flex-wrap gap-4">
+      <%= link_to "All", current_page_path(search: search_params.to_h.without("is_posted")), class: ["inline-block p-1 pb-2", (search_params[:is_posted].nil? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%= link_to "Posted", current_page_path(search: { is_posted: true, **search_params }), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.truthy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%# link_to "Unposted", current_page_path(search: { is_posted: false, **search_params }), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.falsy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <span class="flex-grow-1"></span>
+      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+
+      <% if @mode == "table" %>
+        <%= link_to grid_icon, current_page_path(mode: nil), title: "Gallery", class: "inline-block p-1 pb-2 rounded inactive-link" %>
+      <% else %>
+        <%= link_to list_icon, current_page_path(mode: "table"), title: "Table", class: "inline-block p-1 pb-2 rounded inactive-link" %>
+      <% end %>
+    </div>
+
+    <% if params[:mode] == "table" %>
+      <%= render "ai_tags/table" %>
+    <% else %>
+      <%= render "ai_tags/gallery", ai_tags: @ai_tags, size: @preview_size %>
+    <% end %>
+
+    <%= numbered_paginator(@ai_tags) %>
+  </div>
+</div>

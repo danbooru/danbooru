@@ -211,6 +211,8 @@ class AutocompleteService
       autocomplete_favorite_group(value)
     when :search
       autocomplete_saved_search_label(value)
+    when :ai, :unaliased
+      autocomplete_tag(value)
     when *STATIC_METATAGS.keys
       autocomplete_static_metatag(metatag, value)
     else

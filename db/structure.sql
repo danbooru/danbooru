@@ -90,6 +90,17 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: ai_tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ai_tags (
+    media_asset_id integer NOT NULL,
+    tag_id integer NOT NULL,
+    score smallint NOT NULL
+);
+
+
+--
 -- Name: api_keys; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3124,6 +3135,27 @@ ALTER TABLE ONLY public.wiki_pages
 
 
 --
+-- Name: index_ai_tags_on_media_asset_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ai_tags_on_media_asset_id ON public.ai_tags USING btree (media_asset_id);
+
+
+--
+-- Name: index_ai_tags_on_score; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ai_tags_on_score ON public.ai_tags USING btree (score);
+
+
+--
+-- Name: index_ai_tags_on_tag_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ai_tags_on_tag_id ON public.ai_tags USING btree (tag_id);
+
+
+--
 -- Name: index_api_keys_on_key; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5942,6 +5974,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220410050628'),
 ('20220504235329'),
 ('20220514175125'),
-('20220525214746');
+('20220525214746'),
+('20220623052547');
 
 

@@ -20,6 +20,7 @@ class MediaAsset < ApplicationRecord
   has_many :upload_media_assets, dependent: :destroy
   has_many :uploads, through: :upload_media_assets
   has_many :uploaders, through: :uploads, class_name: "User", foreign_key: :uploader_id
+  has_many :ai_tags
 
   delegate :metadata, to: :media_metadata
   delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, to: :metadata

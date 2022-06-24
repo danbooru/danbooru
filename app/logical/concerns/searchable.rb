@@ -430,7 +430,13 @@ module Searchable
     end
 
     if model == Post && params["#{attr}_tags_match"].present?
-      relation = relation.where(attr => Post.user_tag_match(params["#{attr}_tags_match"], current_user).reorder(nil))
+      posts = Post.user_tag_match(params["#{attr}_tags_match"], current_user).reorder(nil)
+
+      if association.through_reflection?
+        relation = relation.includes(association.through_reflection.name).where(association.through_reflection.name => { attr => posts })
+      else
+        relation = relation.where(attr => posts)
+      end
     end
 
     if params["has_#{attr}"].to_s.truthy? || params["has_#{attr}"].to_s.falsy?

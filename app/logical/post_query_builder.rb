@@ -38,7 +38,7 @@ class PostQueryBuilder
     ordpool note comment commentary id rating source status filetype
     disapproved parent child search embedded md5 width height mpixels ratio
     score upvotes downvotes favcount filesize date age order limit tagcount pixiv_id pixiv
-    unaliased exif duration random is has
+    unaliased exif duration random is has ai
   ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
 
   ORDER_METATAGS = %w[
@@ -163,6 +163,8 @@ class PostQueryBuilder
       relation.tags_include(value)
     when "exif"
       relation.exif_matches(value)
+    when "ai"
+      relation.ai_tags_include(value)
     when "user"
       relation.uploader_matches(value)
     when "approver"

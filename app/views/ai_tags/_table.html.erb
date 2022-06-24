@@ -1,0 +1,24 @@
+<%= table_for @ai_tags, class: "striped autofit" do |t| %>
+  <% t.column :tag do |ai_tag| %>
+    <%= link_to_wiki "?", ai_tag.tag.name %>
+    <%= link_to ai_tag.tag.pretty_name, ai_tags_path(search: { tag_name: ai_tag.tag.name }), class: "tag-type-#{ai_tag.tag.category}", "data-tag-name": ai_tag.tag.name %>
+  <% end %>
+
+  <% t.column :asset do |ai_tag| %>
+    <%= link_to "asset ##{ai_tag.media_asset_id}", ai_tag.media_asset %>
+  <% end %>
+
+  <% t.column :post do |ai_tag| %>
+    <% if ai_tag.post.present? %>
+      <%= link_to "post ##{ai_tag.post.id}", ai_tag.post %>
+    <% end %>
+  <% end %>
+
+  <% t.column :confidence do |ai_tag| %>
+    <%= ai_tag.score %>%
+  <% end %>
+
+  <% t.column "Present?" do |ai_tag| %>
+    <%= "Yes" if ai_tag.correct? %>
+  <% end %>
+<% end %>
