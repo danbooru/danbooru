@@ -9,6 +9,7 @@
       <%= f.input :post_tags_match, label: "Post Search", input_html: { value: params.dig(:search, :post_tags_match), data: { autocomplete: "tag-query" } } %>
       <%= f.input :score, label: "Confidence", input_html: { value: params.dig(:search, :score) } %>
       <%= f.input :is_posted, as: :hidden, input_html: { value: params.dig(:search, :is_posted) } %>
+      <%= f.input :order, collection: [%w[Newest media_asset_id], %w[Oldest media_asset_id_asc], %w[Confidence score_desc]], include_blank: true, selected: params[:search][:order] %>
       <%= f.submit "Search" %>
     <% end %>
 

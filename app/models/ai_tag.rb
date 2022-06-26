@@ -20,7 +20,19 @@ class AITag < ApplicationRecord
       q = q.where.missing(:post)
     end
 
-    q = q.apply_default_order(params)
+    case params[:order]
+    when "score", "score_desc"
+      q = q.order(score: :desc, media_asset_id: :desc, tag_id: :desc)
+    when "score_asc"
+      q = q.order(score: :asc, media_asset_id: :asc, tag_id: :asc)
+    when "media_asset_id", "media_asset_id_desc"
+      q = q.order(media_asset_id: :desc, tag_id: :desc)
+    when "media_asset_id_asc"
+      q = q.order(media_asset_id: :asc, tag_id: :asc)
+    else
+      q = q.apply_default_order(params)
+    end
+
     q
   end
 
