@@ -210,7 +210,7 @@ class Post < ApplicationRecord
     end
 
     def has_large?
-      return false if has_tag?("animated_gif|animated_png")
+      return false if has_tag?("animated_gif") || has_tag?("animated_png")
       return true if is_ugoira?
       is_image? && image_width.present? && image_width > Danbooru.config.large_image_width
     end
@@ -603,7 +603,7 @@ class Post < ApplicationRecord
     end
 
     def has_tag?(tag)
-      tag_string.match?(/(?:^| )(?:#{tag})(?:$| )/)
+      tag_array.include?(tag)
     end
 
     def add_tag(tag)
