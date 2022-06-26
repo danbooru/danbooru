@@ -33,7 +33,7 @@ class MediaAssetPreviewComponent < ApplicationComponent
       media_asset.variant("180x180")
     when 225, 270, 360
       media_asset.variant("360x360")
-    when 720
+    when 540, 720
       media_asset.variant("720x720")
     else
       raise NotImplementedError

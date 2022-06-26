@@ -5,7 +5,7 @@ class PostPreviewComponent < ApplicationComponent
   # PostGalleryComponent::DEFAULT_SIZE for the default size of thumbnails in a gallery.
   DEFAULT_SIZE = "180"
 
-  SIZES = %w[150 180 225 225w 270 270w 360 720]
+  SIZES = %w[150 180 225 225w 270 270w 360 540 720]
 
   with_collection_parameter :post
 
@@ -66,7 +66,7 @@ class PostPreviewComponent < ApplicationComponent
       media_asset.variant("360x360")
     when "360"
       media_asset.variant("360x360")
-    when "720"
+    when "540", "720"
       media_asset.variant("720x720")
     else
       raise NotImplementedError

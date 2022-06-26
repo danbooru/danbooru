@@ -36,6 +36,7 @@ article.post-preview {
   &.post-preview-270  { width: 270px; }
   &.post-preview-270w { width: 270px; }
   &.post-preview-360  { width: 360px; }
+  &.post-preview-540  { width: 540px; }
   &.post-preview-720  { width: 720px; }
 }
 
@@ -46,6 +47,7 @@ article.post-preview {
 .post-preview-270  .post-preview-image { max-height: 270px; width: auto; }
 .post-preview-270w .post-preview-image { max-height: 360px; width: auto; }
 .post-preview-360  .post-preview-image { max-height: 360px; width: auto; }
+.post-preview-540  .post-preview-image { max-height: 540px; width: auto; }
 .post-preview-720  .post-preview-image { max-height: 720px; width: auto; }
 
 .post-preview {
