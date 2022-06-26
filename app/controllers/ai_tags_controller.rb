@@ -7,6 +7,7 @@ class AITagsController < ApplicationController
     limit = params[:limit].presence || CurrentUser.user.per_page
     @mode = params.fetch(:mode, "gallery")
     @preview_size = params[:size].presence || cookies[:post_preview_size].presence || MediaAssetGalleryComponent::DEFAULT_SIZE
+    params[:search][:is_posted] ||= "true" if request.format.html?
 
     @ai_tags = authorize AITag.visible(CurrentUser.user).paginated_search(params, limit: limit, count_pages: false)
     @ai_tags = @ai_tags.includes(:media_asset, :tag, :post) if request.format.html?
