@@ -388,4 +388,8 @@ class MediaAsset < ApplicationRecord
   def initialize_file_key
     self.file_key = MediaAsset.generate_file_key
   end
+
+  def self.available_includes
+    %i[post media_metadata pixiv_ugoira_frame_data ai_tags]
+  end
 end

@@ -50,4 +50,8 @@ class AITag < ApplicationRecord
       post.has_tag?(tag.name)
     end
   end
+
+  def self.available_includes
+    %i[media_asset post tag]
+  end
 end
