@@ -29,4 +29,9 @@
   <% menu.item do %>
     <%= link_to "Gigantic", current_page_path(size: 360), class: ["desktop-only", ("font-bold" if current_size == 360)], rel: "nofollow" %>
   <% end %>
+
+  <%# Desktop only %>
+  <% menu.item do %>
+    <%= link_to "Absurd", current_page_path(size: 720), class: ["desktop-only", ("font-bold" if current_size == 720)], rel: "nofollow" %>
+  <% end %>
 <% end %>
