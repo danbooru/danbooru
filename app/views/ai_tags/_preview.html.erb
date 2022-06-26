@@ -1,14 +1,27 @@
-<%= render(MediaAssetPreviewComponent.new(media_asset: media_asset, size: size, link_target: media_asset.post || media_asset, html: { **data_attributes_for(media_asset) })) do |preview| %>
+<%= render(MediaAssetPreviewComponent.new(media_asset: media_asset, size: size, link_target: media_asset.post || media_asset, classes: "flex flex-col items-center w-full h-full border rounded pb-2", html: { "data-tag-id": ai_tag.tag_id, **data_attributes_for(media_asset) })) do |preview| %>
   <% preview.footer do %>
-    <div class="text-center text-xs h-8">
-      <% if media_asset.post.present? %>
-        <%= link_to "post ##{media_asset.post.id}", media_asset.post %>
-      <% end %>
+    <div class="text-center text-xs flex flex-col px-2 h-full justify-end">
+      <div class="mb-2">
+        <% if media_asset.post.present? %>
+          <div>
+            <%= link_to "post ##{media_asset.post.id}", media_asset.post %>
+            <%= link_to "»", ai_tags_path(search: search_params.merge(media_asset_id: ai_tag.media_asset_id)) %>
+          </div>
+        <% end %>
 
-      <div>
-        <%= link_to ai_tag.tag.pretty_name, ai_tags_path(search: { tag_name: ai_tag.tag.name, **params[:search].except(:tag_name) }), class: "tag-type-#{ai_tag.tag.category}", "data-tag-name": ai_tag.tag.name %>
-        <%= link_to "#{ai_tag.score}%", ai_tags_path(search: { tag_name: ai_tag.tag.name, score: ">=#{ai_tag.score}", **params[:search].except(:tag_name, :score) }), class: "tag-type-#{ai_tag.tag.category}", "data-tag-name": ai_tag.tag.name %>
+        <div class="leading-none">
+          <%= link_to ai_tag.tag.pretty_name, ai_tags_path(search: search_params.merge(tag_name: ai_tag.tag.name)), class: "tag-type-#{ai_tag.tag.category}", "data-tag-name": ai_tag.tag.name %>
+          <%= link_to "#{ai_tag.score}%", ai_tags_path(search: search_params.merge(tag_name: ai_tag.tag.name, score: ">=#{ai_tag.score}")), class: "tag-type-#{ai_tag.tag.category}", "data-tag-name": ai_tag.tag.name %>
+        </div>
       </div>
+
+      <% if ai_tag.post.nil? %>
+        <%= button_to "Add", nil, class: "button-primary button-sm", disabled: true %>
+      <% elsif ai_tag.post_tagged? %>
+        <%= button_to "Remove", tag_ai_tag_path(media_asset_id: ai_tag.media_asset, tag_id: ai_tag.tag), remote: true, method: :put, params: { mode: "remove" }, class: "button-outline-danger button-sm" %>
+      <% else %>
+        <%= button_to "Add", tag_ai_tag_path(media_asset_id: ai_tag.media_asset, tag_id: ai_tag.tag), remote: true, method: :put, params: { mode: "add" }, class: "button-primary button-sm" %>
+      <% end %>
     </div>
   <% end %>
 <% end %>

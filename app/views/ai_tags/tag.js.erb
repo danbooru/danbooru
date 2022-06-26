@@ -1,0 +1,7 @@
+$(function() {
+  let $el = $(".media-asset-preview[data-id=<%= @ai_tag.media_asset_id %>][data-tag-id=<%= @ai_tag.tag_id %>]").get(0);
+  let html = "<%= j render("ai_tags/preview", ai_tag: @ai_tag, media_asset: @ai_tag.media_asset, size: @preview_size) %>";
+  morphdom($el, html);
+
+  Danbooru.Utility.notice("<%= j flash[:notice] %>");
+});

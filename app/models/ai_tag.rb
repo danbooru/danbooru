@@ -40,7 +40,8 @@ class AITag < ApplicationRecord
     order(media_asset_id: :desc, tag_id: :asc)
   end
 
-  def correct?
+  # True if the AI tag is present on the post; false if the AI tag is not on the post, or the asset isn't a post yet.
+  def post_tagged?
     if post.nil?
       false
     elsif tag.name =~ /\Arating:(.)\z/

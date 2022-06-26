@@ -142,7 +142,9 @@ html, body[data-current-user-theme="light"] {
   --button-primary-background-color: var(--link-color);
   --button-primary-hover-background-color: var(--link-hover-color);
   --button-primary-disabled-color: var(--grey-5);
+
   --button-outline-primary-color: var(--link-color);
+  --button-outline-danger-color: var(--red-5);
 
   --quick-search-form-background: var(--body-background-color);
 
@@ -360,7 +362,9 @@ html, body[data-current-user-theme="light"] {
   --button-primary-background-color: var(--link-color);
   --button-primary-hover-background-color: var(--link-hover-color);
   --button-primary-disabled-color: var(--grey-4);
+
   --button-outline-primary-color: var(--azure-4);
+  --button-outline-danger-color: var(--red-4);
 
   --quick-search-form-background: var(--grey-9);
 

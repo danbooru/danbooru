@@ -152,6 +152,8 @@ $spacer: 0.25rem; /* 4px */
 .h-8    { height: 8  * $spacer; }
 .h-10   { height: 10 * $spacer; }
 .h-12   { height: 12 * $spacer; }
+.h-16   { height: 16 * $spacer; }
+.h-full { height: 100%; }
 .h-150px { height: 150px; }
 .h-180px { height: 180px; }
 .h-225px { height: 225px; }
@@ -194,6 +196,10 @@ $spacer: 0.25rem; /* 4px */
 
 .justify-items-center { justify-items: center; }
 .justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+
+.self-start { align-self: flex-start; }
 
 .float-right { float: right; }
 

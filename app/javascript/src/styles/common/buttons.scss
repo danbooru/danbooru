@@ -84,6 +84,27 @@ a, button, input[type="submit"] {
     }
   }
 
+  /* An outlined red button. */
+  &.button-outline-danger {
+    @extend %button;
+
+    color: var(--button-outline-danger-color);
+    background-color: transparent;
+    border: 1px solid var(--button-outline-danger-color);
+
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+    &:hover:not([disabled]) {
+      color: var(--inverse-text-color);
+      background-color: var(--button-outline-danger-color);
+    }
+
+    &[disabled] {
+      color: var(--button-primary-disabled-color);
+      border: 1px solid var(--button-primary-disabled-color);
+    }
+  }
+
   /* A small button. */
   &.button-sm {
     padding: 0.25em 1em;

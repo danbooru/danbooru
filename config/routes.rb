@@ -158,7 +158,10 @@ Rails.application.routes.draw do
   end
   resources :media_assets, only: [:index, :show]
   resources :media_metadata, only: [:index]
+
   resources :ai_tags, only: [:index]
+  put "/ai_tags/:media_asset_id/:tag_id/tag", to: "ai_tags#tag", as: "tag_ai_tag"
+
   resources :mod_actions
   resources :moderation_reports, only: [:new, :create, :index, :show, :update]
   resources :modqueue, only: [:index]

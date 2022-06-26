@@ -18,7 +18,7 @@
     <%= ai_tag.score %>%
   <% end %>
 
-  <% t.column "Present?" do |ai_tag| %>
-    <%= "Yes" if ai_tag.correct? %>
+  <% t.column "Tagged?" do |ai_tag| %>
+    <%= "Yes" if ai_tag.post_tagged? %>
   <% end %>
 <% end %>
