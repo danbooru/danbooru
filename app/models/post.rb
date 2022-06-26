@@ -1307,11 +1307,14 @@ class Post < ApplicationRecord
         where(md5: metadata.select(:md5))
       end
 
-      def ai_tags_include(value)
-        tag = Tag.find_by_name_or_alias(value)
+      def ai_tags_include(value, default_confidence: ">=50")
+        name, confidence = value.split(",")
+        confidence = (confidence || default_confidence).to_s.delete("%")
+
+        tag = Tag.find_by_name_or_alias(name)
         return none if tag.nil?
 
-        ai_tags = AITag.joins(:media_asset).where(tag: tag, score: (50..))
+        ai_tags = AITag.joins(:media_asset).where(tag: tag).where_numeric_matches(:score, confidence)
         where(ai_tags.where("media_assets.md5 = posts.md5").arel.exists)
       end
 
