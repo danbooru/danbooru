@@ -101,10 +101,10 @@ class DiscordSlashCommand
 
     def create_deferred_followup(&block)
       Thread.new do
-        content = block.call
-        create_followup_message(content)
+        params = block.call
+        create_followup_message(**params)
       rescue StandardError => e
-        create_followup_message("`Error: #{e.message}`")
+        create_followup_message(content: "`Error: #{e.message}`")
       end
     end
 
@@ -116,8 +116,8 @@ class DiscordSlashCommand
       discord.trigger_typing_indicator(data[:channel_id])
     end
 
-    def create_followup_message(content)
-      discord.create_followup_message(data[:token], content: content)
+    def create_followup_message(**options)
+      discord.create_followup_message(data[:token], **options)
     end
 
     def channel
