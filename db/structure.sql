@@ -3149,10 +3149,10 @@ CREATE INDEX index_ai_tags_on_score ON public.ai_tags USING btree (score);
 
 
 --
--- Name: index_ai_tags_on_tag_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_ai_tags_on_tag_id_and_score; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_ai_tags_on_tag_id ON public.ai_tags USING btree (tag_id);
+CREATE INDEX index_ai_tags_on_tag_id_and_score ON public.ai_tags USING btree (tag_id, score);
 
 
 --
@@ -5975,6 +5975,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220504235329'),
 ('20220514175125'),
 ('20220525214746'),
-('20220623052547');
+('20220623052547'),
+('20220627211714');
 
 
