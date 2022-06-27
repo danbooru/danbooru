@@ -365,6 +365,7 @@ Rails.application.routes.draw do
   get "/mock/reportbooru/post_views/rank" => "mock_services#reportbooru_post_views", as: "mock_reportbooru_post_views"
   get "/mock/iqdb/query" => "mock_services#iqdb_query", as: "mock_iqdb_query"
   post "/mock/iqdb/query" => "mock_services#iqdb_query"
+  get "/mock/autotagger/evaluate" => "mock_services#autotagger_evaluate", as: "mock_autotagger_evaluate"
 
   match "*other", to: "static#not_found", via: :all
 end

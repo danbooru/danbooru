@@ -542,6 +542,16 @@ module Danbooru
       # "http://localhost:3000/mock/iqdb"
     end
 
+    # The URL for the Danbooru Autotagger service (https://github.com/danbooru/autotagger). Optional.
+    #
+    # Used for the AI tagging feature. Set this to http://localhost:3000/mock/autotagger
+    # to enable a fake server for development purposes, or do
+    # `docker run --rm -p 5000:5000 ghcr.io/danbooru/autotagger` to run a real server.
+    def autotagger_url
+      # "http://localhost:3000/mock/autotagger"
+      # "http://localhost:5000"
+    end
+
     def aws_credentials
       Aws::Credentials.new(Danbooru.config.aws_access_key_id, Danbooru.config.aws_secret_access_key)
     end

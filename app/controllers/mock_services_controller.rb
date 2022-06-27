@@ -38,6 +38,14 @@ class MockServicesController < ApplicationController
     render json: @data
   end
 
+  def autotagger_evaluate
+    limit = params.fetch(:limit, 50)
+    predictions = tags(limit).pluck(:name).map { |name| [name, rand(0.0..1.0)] }.to_h
+    data = { filename: "test.jpg", tags: predictions }
+
+    render json: data
+  end
+
   private
 
   def posts(limit = 10)
