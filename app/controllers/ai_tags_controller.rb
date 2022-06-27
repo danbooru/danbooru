@@ -10,7 +10,7 @@ class AITagsController < ApplicationController
     params[:search][:is_posted] ||= "true" if request.format.html?
 
     @ai_tags = authorize AITag.visible(CurrentUser.user).paginated_search(params, limit: limit, count_pages: false)
-    @ai_tags = @ai_tags.includes(:media_asset, :tag, :post) if request.format.html?
+    @ai_tags = @ai_tags.includes(:tag, media_asset: :post) if request.format.html?
 
     respond_with(@ai_tags)
   end

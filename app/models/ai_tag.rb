@@ -47,12 +47,12 @@ class AITag < ApplicationRecord
 
   # True if the AI tag is present on the post; false if the AI tag is not on the post, or the asset isn't a post yet.
   def post_tagged?
-    if post.nil?
+    if media_asset.post.nil?
       false
     elsif tag.name =~ /\Arating:(.)\z/
-      post.rating == $1
+      media_asset.post.rating == $1
     else
-      post.has_tag?(tag.name)
+      media_asset.post.has_tag?(tag.name)
     end
   end
 
