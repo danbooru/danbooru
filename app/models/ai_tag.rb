@@ -7,11 +7,16 @@ class AITag < ApplicationRecord
 
   validates :score, inclusion: { in: (0.0..1.0) }
 
+  def self.named(name)
+    name = $1.downcase if name =~ /\A(rating:.)/i
+    where(tag: Tag.find_by_name_or_alias(name))
+  end
+
   def self.search(params)
     q = search_attributes(params, :media_asset, :tag, :post, :score)
 
     if params[:tag_name].present?
-      q = q.where(tag_id: Tag.find_by_name_or_alias(params[:tag_name])&.id)
+      q = q.named(params[:tag_name])
     end
 
     if params[:is_posted].to_s.truthy?
