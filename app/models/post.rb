@@ -1315,8 +1315,13 @@ class Post < ApplicationRecord
         tag = Tag.find_by_name_or_alias(name)
         return none if tag.nil?
 
-        ai_tags = AITag.joins(:media_asset).where(tag: tag).where_numeric_matches(:score, confidence)
-        where(ai_tags.where("media_assets.md5 = posts.md5").arel.exists)
+        if confidence == "0"
+          ai_tags = AITag.joins(:media_asset).where(tag: tag)
+          where.not(ai_tags.where("media_assets.md5 = posts.md5").arel.exists)
+        else
+          ai_tags = AITag.joins(:media_asset).where(tag: tag).where_numeric_matches(:score, confidence)
+          where(ai_tags.where("media_assets.md5 = posts.md5").arel.exists)
+        end
       end
 
       def uploader_matches(username)
