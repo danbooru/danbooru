@@ -133,6 +133,8 @@ GEM
     codecov (0.6.0)
       simplecov (>= 0.15, < 0.22)
     coderay (1.1.3)
+    composite_primary_keys (14.0.4)
+      activerecord (~> 7.0.2)
     concurrent-ruby (1.1.10)
     crass (1.0.6)
     daemons (1.4.1)
@@ -528,6 +530,7 @@ DEPENDENCIES
   capybara
   clockwork
   codecov
+  composite_primary_keys
   crass
   daemons
   debug

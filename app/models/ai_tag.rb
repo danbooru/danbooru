@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 class AITag < ApplicationRecord
+  self.primary_keys = :media_asset_id, :tag_id
+
   belongs_to :tag
   belongs_to :media_asset
   has_one :post, through: :media_asset
 
-  validates :score, inclusion: { in: (0.0..1.0) }
+  validates :score, inclusion: { in: (0..100) }
 
   def self.named(name)
     name = $1.downcase if name =~ /\A(rating:.)/i

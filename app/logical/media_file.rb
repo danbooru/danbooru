@@ -189,6 +189,19 @@ class MediaFile
     nil
   end
 
+  # Return a set of AI-inferred tags for this image. Performs an API call to
+  # the Autotagger service. The Autotagger service must be running, otherwise
+  # it will return an empty list of tags.
+  #
+  # @return [Array<AITag>] The list of AI tags.
+  def ai_tags(autotagger: AutotaggerClient.new)
+    tags = autotagger.evaluate(self)
+
+    tags.map do |tag, score|
+      AITag.new(tag: tag, score: (100*score).round)
+    end
+  end
+
   def attributes
     {
       path: path,

@@ -56,6 +56,7 @@ gem "public_suffix"
 gem "elastic-apm"
 gem "debug"
 gem "ffaker"
+gem "composite_primary_keys"
 
 group :development do
   gem 'rubocop', require: false

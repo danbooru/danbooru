@@ -27,6 +27,7 @@ class MediaAsset < ApplicationRecord
 
   scope :public_only, -> { where(is_public: true) }
   scope :private_only, -> { where(is_public: false) }
+  scope :without_ai_tags, -> { where.not(AITag.where("ai_tags.media_asset_id = media_assets.id").select(1).arel.exists) }
 
   # Processing: The asset's files are currently being resized and distributed to the backend servers.
   # Active: The asset has been successfully uploaded and is ready to use.
@@ -279,6 +280,14 @@ class MediaAsset < ApplicationRecord
       self.duration = media_file.duration
       self.media_metadata = MediaMetadata.new(file: media_file)
       self.pixiv_ugoira_frame_data = PixivUgoiraFrameData.new(data: media_file.frame_data, content_type: "image/jpeg") if is_ugoira?
+      self.ai_tags = media_file.preview(360, 360).ai_tags # XXX should do this in parallel with thumbnail generation.
+    end
+
+    def regenerate_ai_tags!
+      with_lock do
+        ai_tags.each(&:destroy!)
+        update!(ai_tags: variant(:"360x360").open_file.ai_tags)
+      end
     end
 
     def expunge!
