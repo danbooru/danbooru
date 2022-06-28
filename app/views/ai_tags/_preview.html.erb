@@ -7,7 +7,9 @@
         <%= link_to "#{ai_tag.score}%", ai_tags_path(search: search_params.merge(tag_name: ai_tag.tag.name, score: ">=#{ai_tag.score}")), class: "tag-type-#{ai_tag.tag.category}", "data-tag-name": ai_tag.tag.name %>
       </div>
 
-      <% if media_asset.post.nil? || !policy(ai_tag).update? %>
+      <% if media_asset.post.nil? %>
+        <% # no button %>
+      <% elsif !policy(ai_tag).update? %>
         <%= button_to "Add", nil, class: "button-primary button-sm", disabled: true %>
       <% elsif ai_tag.post_tagged? %>
         <%= button_to "Remove", tag_ai_tag_path(media_asset_id: ai_tag.media_asset, tag_id: ai_tag.tag), remote: true, method: :put, params: { mode: "remove" }, class: "button-outline-danger button-sm", title: "Remove the tag from the post" %>
