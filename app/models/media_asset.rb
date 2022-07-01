@@ -43,7 +43,7 @@ class MediaAsset < ApplicationRecord
     failed: 500,
   }
 
-  validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }
+  validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }, if: :md5_changed?
   validates :file_ext, inclusion: { in: FILE_TYPES, message: "File is not an image or video" }
   validates :file_size, numericality: { less_than_or_equal_to: Danbooru.config.max_file_size, message: ->(asset, _) { "too large (size: #{asset.file_size.to_formatted_s(:human_size)}; max size: #{Danbooru.config.max_file_size.to_formatted_s(:human_size)})" } }
   validates :file_key, length: { is: FILE_KEY_LENGTH }, uniqueness: true, if: :file_key_changed?
@@ -232,6 +232,13 @@ class MediaAsset < ApplicationRecord
 
         media_asset = create!(file: media_file, status: :processing)
         yield media_asset if block_given?
+
+        # XXX should do this in parallel with thumbnail generation.
+        # XXX shouldn't generate thumbnail twice (very slow for ugoira)
+        media_asset.update!(ai_tags: media_file.preview(360, 360).ai_tags)
+        media_asset.update!(pixiv_ugoira_frame_data: PixivUgoiraFrameData.new(data: media_file.frame_data, content_type: "image/jpeg")) if media_asset.is_ugoira?
+        media_asset.update!(media_metadata: MediaMetadata.new(file: media_file))
+
         media_asset.distribute_files!(media_file)
         media_asset.update!(status: :active)
         media_asset
@@ -278,9 +285,6 @@ class MediaAsset < ApplicationRecord
       self.image_width = media_file.width
       self.image_height = media_file.height
       self.duration = media_file.duration
-      self.media_metadata = MediaMetadata.new(file: media_file)
-      self.pixiv_ugoira_frame_data = PixivUgoiraFrameData.new(data: media_file.frame_data, content_type: "image/jpeg") if is_ugoira?
-      self.ai_tags = media_file.preview(360, 360).ai_tags # XXX should do this in parallel with thumbnail generation.
     end
 
     def regenerate_ai_tags!

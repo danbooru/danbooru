@@ -245,6 +245,19 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(source2, upload.source)
       end
 
+      should "save the AI tags" do
+        mock_autotagger_evaluate({ "1girl": 0.5 })
+        upload = assert_successful_upload("test/files/test.jpg")
+
+        assert_equal(1, upload.media_assets.first.ai_tags.count)
+      end
+
+      should "save the EXIF metadata" do
+        upload = assert_successful_upload("test/files/test.jpg")
+
+        assert_equal(true, upload.media_assets.first.media_metadata.present?)
+      end
+
       context "uploading a file from your computer" do
         should_upload_successfully("test/files/test.jpg")
         should_upload_successfully("test/files/test.png")

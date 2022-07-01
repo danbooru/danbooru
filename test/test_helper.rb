@@ -23,6 +23,7 @@ class ActiveSupport::TestCase
   extend PostArchiveTestHelper
   extend PoolArchiveTestHelper
   include ReportbooruHelper
+  include AutotaggerHelper
   include DownloadTestHelper
   include IqdbTestHelper
   include UploadTestHelper
