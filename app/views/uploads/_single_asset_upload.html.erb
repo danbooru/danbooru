@@ -92,6 +92,6 @@
       <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block" }, input_html: { checked: post.is_pending? } %>
     <% end %>
 
-    <%= render "related_tags/container" %>
+    <%= render "related_tags/container", media_asset: media_asset %>
   <% end %>
 <% end %>

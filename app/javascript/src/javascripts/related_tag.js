@@ -27,7 +27,8 @@ RelatedTag.initialize_all = function() {
 }
 
 RelatedTag.initialize_recent_and_favorite_tags = function(event) {
-  $.get("/related_tag.js", { user_tags: true });
+  let media_asset_id = $("#related-tags-container").attr("data-media-asset-id");
+  $.get("/related_tag.js", { user_tags: true, media_asset_id: media_asset_id });
 }
 
 RelatedTag.on_click_related_tags_button = function (event) {

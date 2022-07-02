@@ -6,12 +6,13 @@ class RelatedTagQuery
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml
 
-  attr_reader :query, :post_query, :category, :type, :user, :limit
+  attr_reader :query, :post_query, :media_asset, :category, :type, :user, :limit
 
-  def initialize(query:, user: User.anonymous, category: nil, type: nil, limit: nil)
+  def initialize(query:, media_asset: nil, user: User.anonymous, category: nil, type: nil, limit: nil)
     @user = user
     @post_query = PostQuery.normalize(query, current_user: user) # XXX This query does not include implicit metatags (rating:s, -status:deleted)
     @query = @post_query.to_s
+    @media_asset = media_asset
     @category = category
     @type = type
     @limit = (limit =~ /^\d+/ ? limit.to_i : 25)
@@ -53,6 +54,11 @@ class RelatedTagQuery
 
   def similar_tags
     @similar_tags ||= RelatedTagCalculator.similar_tags_for_search(post_query, category: category_of).take(limit)
+  end
+
+  def ai_tags
+    return AITag.none if media_asset.nil?
+    media_asset.ai_tags.joins(:tag).undeprecated.nonempty.in_order_of(:"tags.category", TagCategory.canonical_mapping.values).order("ai_tags.score DESC, tags.name ASC").take(limit)
   end
 
   # Returns the top 20 most frequently added tags within the last 20 edits made by the user in the last hour.

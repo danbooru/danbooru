@@ -9,6 +9,13 @@ class AITag < ApplicationRecord
 
   validates :score, inclusion: { in: (0..100) }
 
+  scope :deprecated, -> { where(tag: Tag.deprecated) }
+  scope :undeprecated, -> { where(tag: Tag.undeprecated) }
+  scope :empty, -> { where(tag: Tag.empty) }
+  scope :nonempty, -> { where(tag: Tag.nonempty) }
+
+  delegate :name, :pretty_name, :post_count, :category, :category_name, to: :tag
+
   def self.named(name)
     name = $1.downcase if name =~ /\A(rating:.)/i
     where(tag: Tag.find_by_name_or_alias(name))
