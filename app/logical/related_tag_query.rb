@@ -58,7 +58,11 @@ class RelatedTagQuery
 
   def ai_tags
     return AITag.none if media_asset.nil?
-    media_asset.ai_tags.joins(:tag).undeprecated.nonempty.in_order_of(:"tags.category", TagCategory.canonical_mapping.values).order("ai_tags.score DESC, tags.name ASC").take(limit)
+
+    tags = media_asset.ai_tags.includes(:tag, :aliased_tag)
+    tags = tags.reject(&:is_deprecated?).reject { |t| t.empty? && !t.metatag? }
+    tags = tags.sort_by { |t| [TagCategory.canonical_mapping.keys.index(t.category_name), -t.score, t.name] }
+    tags.take(limit)
   end
 
   # Returns the top 20 most frequently added tags within the last 20 edits made by the user in the last hour.

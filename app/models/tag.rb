@@ -9,6 +9,7 @@ class Tag < ApplicationRecord
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
   has_one :antecedent_alias, -> {active}, :class_name => "TagAlias", :foreign_key => "antecedent_name", :primary_key => "name"
+  has_one :aliased_tag, through: :antecedent_alias, source: :consequent_tag
   has_many :consequent_aliases, -> {active}, :class_name => "TagAlias", :foreign_key => "consequent_name", :primary_key => "name"
   has_many :antecedent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "antecedent_name", :primary_key => "name"
   has_many :consequent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "consequent_name", :primary_key => "name"
@@ -403,6 +404,14 @@ class Tag < ApplicationRecord
     consequent_aliases.find do |tag_alias|
       !name.ilike?(pattern) && tag_alias.antecedent_name.ilike?(pattern)
     end
+  end
+
+  def is_aliased?
+    aliased_tag.present?
+  end
+
+  def metatag?
+    name.match?(/\A#{PostQueryBuilder::METATAGS.join("|")}:/i)
   end
 
   def self.model_restriction(table)

@@ -6,6 +6,7 @@ class AITag < ApplicationRecord
   belongs_to :tag
   belongs_to :media_asset
   has_one :post, through: :media_asset
+  has_one :aliased_tag, through: :tag
 
   validates :score, inclusion: { in: (0..100) }
 
@@ -14,7 +15,7 @@ class AITag < ApplicationRecord
   scope :empty, -> { where(tag: Tag.empty) }
   scope :nonempty, -> { where(tag: Tag.nonempty) }
 
-  delegate :name, :pretty_name, :post_count, :category, :category_name, to: :tag
+  delegate :name, :pretty_name, :post_count, :category, :category_name, :is_deprecated?, :empty?, :is_aliased?, :metatag?, to: :tag
 
   def self.named(name)
     name = $1.downcase if name =~ /\A(rating:.)/i
