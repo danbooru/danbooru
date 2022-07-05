@@ -62,6 +62,10 @@ class DText
       tag = tags.find { |tag| tag.name == name }
       artist = artists.find { |artist| artist.name == name }
 
+      if tag.present?
+        node["class"] += " tag-type-#{tag.category}"
+      end
+
       if tag.present? && tag.artist?
         node["href"] = "/artists/show_or_new?name=#{CGI.escape(name)}"
 
@@ -69,8 +73,6 @@ class DText
           node["class"] += " dtext-artist-does-not-exist"
           node["title"] = "This artist page does not exist"
         end
-
-        node["class"] += " tag-type-#{tag.category}"
       else
         if wiki.blank?
           node["class"] += " dtext-wiki-does-not-exist"
@@ -85,8 +87,6 @@ class DText
         elsif tag.empty?
           node["class"] += " dtext-tag-empty"
           node["title"] = "This wiki page does not have a tag"
-        else
-          node["class"] += " tag-type-#{tag.category}"
         end
       end
     end
