@@ -5,6 +5,8 @@
 #
 # @see https://github.com/bensheldon/good_job/blob/main/lib/good_job/active_job_job.rb
 class BackgroundJob < GoodJob::ActiveJobJob
+  delegate :executions_count, to: :job
+
   concerning :SearchMethods do
     class_methods do
       def default_order
@@ -57,6 +59,10 @@ class BackgroundJob < GoodJob::ActiveJobJob
           q = q.apply_default_order(params)
         end
       end
+    end
+
+    def pretty_name
+      job.job_class.titleize.delete_suffix(" Job")
     end
   end
 end

@@ -11,7 +11,7 @@
 
     <%= table_for @jobs, class: "striped autofit" do |t| %>
       <% t.column "Name" do |job| %>
-        <%= job.job_class.titleize.delete_suffix(" Job") %>
+        <%= job.pretty_name %>
       <% end %>
 
       <% t.column "Details", td: { class: "col-expand" } do |job| %>
