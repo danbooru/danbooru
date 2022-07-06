@@ -2,22 +2,28 @@
   <div id="a-index">
     <h1 class="mb-2">All Uploads</h1>
 
-    <% if search_params[:metadata].present? %>
-      <%= search_form_for(media_assets_path) do |f| %>
+    <%= search_form_for(media_assets_path) do |f| %>
+      <%= f.input :ai_tags_match, label: "Tags", input_html: { value: params.dig(:search, :ai_tags_match), data: { autocomplete: "tag-query" } } %>
+      <%= f.input :status, collection: MediaAsset.statuses.keys.map(&:capitalize), include_blank: true, selected: params.dig(:search, :status) %>
+      <%= f.input :is_posted, as: :hidden, input_html: { value: params.dig(:search, :is_posted) } %>
+      <%= f.input :min_score, as: :hidden, input_html: { value: params.dig(:search, :min_score) } %>
+
+      <% if search_params[:metadata].present? %>
         <%= f.simple_fields_for :metadata do |meta| %>
           <% params.dig(:search, :metadata).to_h.each do |key, value| %>
             <%= meta.input key, label: key, input_html: { value: value } %>
           <% end %>
         <% end %>
-
-        <%= f.submit "Search" %>
       <% end %>
+
+      <%= f.input :order, collection: [%w[Newest id], %w[Oldest id_asc]], include_blank: true, selected: params[:search][:order] %>
+      <%= f.submit "Search" %>
     <% end %>
 
     <div class="border-b mb-4 flex flex-wrap gap-4">
-      <%= link_to "All", current_page_path(search: search_params.to_h.without("is_posted")), class: ["inline-block p-1 pb-2", (search_params[:is_posted].nil? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
-      <%= link_to "Posted", current_page_path(search: { is_posted: true }), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.truthy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
-      <%= link_to "Unposted", current_page_path(search: { is_posted: false }), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.falsy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%= link_to "All", current_page_path(search: search_params.merge(is_posted: nil)), class: ["inline-block p-1 pb-2", (search_params[:is_posted].nil? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%= link_to "Posted", current_page_path(search: search_params.merge(is_posted: true)), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.truthy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%= link_to "Unposted", current_page_path(search: search_params.merge(is_posted: false)), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.falsy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
       <span class="flex-grow-1"></span>
       <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
     </div>

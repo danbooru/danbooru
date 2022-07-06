@@ -195,11 +195,20 @@ class MediaAsset < ApplicationRecord
 
   concerning :SearchMethods do
     class_methods do
+      def ai_tags_match(tag_string, score_range: (50..))
+        AITagQuery.search(tag_string, relation: self, score_range: score_range)
+      end
+
       def search(params)
-        q = search_attributes(params, :id, :created_at, :updated_at, :md5, :file_ext, :file_size, :image_width, :image_height, :file_key, :is_public)
+        q = search_attributes(params, :id, :created_at, :updated_at, :status, :md5, :file_ext, :file_size, :image_width, :image_height, :file_key, :is_public)
 
         if params[:metadata].present?
           q = q.joins(:media_metadata).merge(MediaMetadata.search(metadata: params[:metadata]))
+        end
+
+        if params[:ai_tags_match].present?
+          min_score = params.fetch(:min_score, 50).to_i
+          q = q.ai_tags_match(params[:ai_tags_match], score_range: (min_score..))
         end
 
         if params[:is_posted].to_s.truthy?
@@ -210,7 +219,16 @@ class MediaAsset < ApplicationRecord
           q = q.where.not(Post.where("posts.md5 = media_assets.md5").arel.exists)
         end
 
-        q.apply_default_order(params)
+        case params[:order]
+        when "id", "id_desc"
+          q = q.order(id: :desc)
+        when "id_asc"
+          q = q.order(id: :asc)
+        else
+          q = q.apply_default_order(params)
+        end
+
+        q
       end
     end
   end
