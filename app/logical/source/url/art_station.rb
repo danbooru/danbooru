@@ -2,6 +2,7 @@
 
 class Source::URL::ArtStation < Source::URL
   RESERVED_SUBDOMAINS = %w[www cdn cdna cdnb]
+  RESERVED_USERNAMES = %w[about blogs challenges guides jobs learning marketplace prints schools search studios subscribe]
 
   attr_reader :username, :work_id
 
@@ -50,7 +51,7 @@ class Source::URL::ArtStation < Source::URL
     # https://www.artstation.com/chicle/albums/all
     # https://www.artstation.com/h-battousai/albums/1480261
     # http://www.artstation.com/envie_dai/prints
-    in ("www.artstation.com" | "artstation.com"), username, *rest
+    in ("www.artstation.com" | "artstation.com"), username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username
 
     # https://sa-dui.artstation.com
