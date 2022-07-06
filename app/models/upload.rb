@@ -87,8 +87,18 @@ class Upload < ApplicationRecord
     end
   end
 
+  def self.ai_tags_match(tag_string, score_range: (50..))
+    upload_media_assets = AITagQuery.search(tag_string, relation: UploadMediaAsset.all, foreign_key: :media_asset_id, score_range: score_range)
+    where(upload_media_assets.where("upload_media_assets.upload_id = uploads.id").arel.exists)
+  end
+
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :source, :referer_url, :status, :media_asset_count, :uploader, :upload_media_assets, :media_assets, :posts)
+
+    if params[:ai_tags_match].present?
+      min_score = params.fetch(:min_score, 50).to_i
+      q = q.ai_tags_match(params[:ai_tags_match], score_range: (min_score..))
+    end
 
     if params[:is_posted].to_s.truthy?
       q = q.where.not(id: Upload.where.missing(:posts))
@@ -96,7 +106,16 @@ class Upload < ApplicationRecord
       q = q.where(id: Upload.where.missing(:posts))
     end
 
-    q.apply_default_order(params)
+    case params[:order]
+    when "id", "id_desc"
+      q = q.order(id: :desc)
+    when "id_asc"
+      q = q.order(id: :asc)
+    else
+      q = q.apply_default_order(params)
+    end
+
+    q
   end
 
   def async_process_upload!
