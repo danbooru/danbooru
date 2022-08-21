@@ -74,7 +74,10 @@ class Source::URL::Tumblr < Source::URL
   end
 
   def image_url?
-    host.ends_with?("media.tumblr.com") || host == "data.tumblr.com"
+    # http://data.tumblr.com/07e7bba538046b2b586433976290ee1f/tumblr_o3gg44HcOg1r9pi29o1_raw.jpg
+    # https://40.media.tumblr.com/de018501416a465d898d24ad81d76358/tumblr_nfxt7voWDX1rsd4umo1_r23_1280.jpg
+    # https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4
+    subdomain.ends_with?(".media") || subdomain.in?(%w[data media])
   end
 
   def variants
