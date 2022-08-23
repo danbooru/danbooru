@@ -1112,7 +1112,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an animated gif missing the animated_gif tag" do
         should "automatically add the animated_gif tag" do
-          @media_asset = MediaAsset.create!(file: "test/files/test-animated-86x52.gif")
+          @media_asset = MediaAsset.upload!("test/files/test-animated-86x52.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif tagme", @post.tag_string)
@@ -1121,7 +1121,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an animated png missing the animated_png tag" do
         should "automatically add the animated_png tag" do
-          @media_asset = MediaAsset.create!(file: "test/files/test-animated-256x256.png")
+          @media_asset = MediaAsset.upload!("test/files/test-animated-256x256.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_png tagme", @post.tag_string)
@@ -1130,7 +1130,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a greyscale image missing the greyscale tag" do
         should "automatically add the greyscale tag" do
-          @media_asset = MediaAsset.create!(file: "test/files/test-grey-no-profile.jpg")
+          @media_asset = MediaAsset.upload!("test/files/test-grey-no-profile.jpg")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("greyscale tagme", @post.tag_string)
@@ -1139,7 +1139,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an exif-rotated image missing the exif_rotation tag" do
         should "automatically add the exif_rotation tag" do
-          @media_asset = MediaAsset.create!(file: "test/files/test-rotation-90cw.jpg")
+          @media_asset = MediaAsset.upload!("test/files/test-rotation-90cw.jpg")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("exif_rotation tagme", @post.tag_string)
@@ -1148,7 +1148,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a PNG with the exif orientation flag" do
         should "not add the exif_rotation tag" do
-          @media_asset = MediaAsset.create!(file: "test/files/test-rotation-90cw.png")
+          @media_asset = MediaAsset.upload!("test/files/test-rotation-90cw.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("tagme", @post.tag_string)
@@ -1157,12 +1157,12 @@ class PostTest < ActiveSupport::TestCase
 
       context "a non-repeating GIF missing the non-repeating_animation tag" do
         should "automatically add the non-repeating_animation tag" do
-          @media_asset = MediaAsset.create!(file: "test/files/test-animated-86x52-loop-1.gif")
+          @media_asset = MediaAsset.upload!("test/files/test-animated-86x52-loop-1.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
 
-          @media_asset = MediaAsset.create!(file: "test/files/test-animated-86x52-loop-2.gif")
+          @media_asset = MediaAsset.upload!("test/files/test-animated-86x52-loop-2.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)

@@ -1164,9 +1164,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for an exif:<value> metatag" do
-      jpg = create(:post, media_asset: create(:media_asset, file: "test/files/test.jpg"))
-      gif = create(:post, media_asset: create(:media_asset, file: "test/files/test.gif"))
-      png = create(:post, media_asset: create(:media_asset, file: "test/files/test.png"))
+      jpg = create(:post_with_file, filename: "test.jpg")
+      gif = create(:post_with_file, filename: "test.gif")
+      png = create(:post_with_file, filename: "test.png")
 
       assert_tag_match([jpg], "exif:File:ColorComponents")
       assert_tag_match([jpg], "exif:File:ColorComponents=3")
@@ -1536,7 +1536,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         end
 
         should "not fail for a two tag search by a member" do
-          post1 = create(:post, tag_string: "aaa bbb rating:s")
+          post1 = create(:post, tag_string: "aaa bbb rating:g")
           post2 = create(:post, tag_string: "aaa bbb rating:e")
 
           assert_fast_count(1, "aaa bbb", { safe_mode: true })

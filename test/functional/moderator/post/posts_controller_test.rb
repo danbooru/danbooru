@@ -11,7 +11,7 @@ module Moderator
           end
 
           as(@user) do
-            @post = create(:post)
+            @post = create(:post_with_file)
           end
         end
 

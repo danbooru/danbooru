@@ -56,7 +56,7 @@ module Sources
           assert_equal(<<~EOS.chomp, source.artist_commentary_desc)
             リゼロのレムのプライズをクリアドレス仕様にリペイント。透け透けキラキラな感じに改装してみたものです。
 
-            >https://youtu.be/nkjZkEALg94
+            >https://youtu.be/nkjZkEALg94 
 
             製作日記的な動画です( ´∀｀ )
 

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class FavoriteTest < ActiveSupport::TestCase
+class FavoriteGroupTest < ActiveSupport::TestCase
   def setup
     @fav_group = create(:favorite_group)
   end
@@ -22,7 +22,7 @@ class FavoriteTest < ActiveSupport::TestCase
 
   context "expunging a post" do
     should "remove it from all favorite groups" do
-      @post = FactoryBot.create(:post)
+      @post = create(:post_with_file, filename: "test.jpg")
 
       @fav_group.add(@post)
       assert_equal([@post.id], @fav_group.post_ids)

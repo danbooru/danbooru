@@ -246,6 +246,8 @@ class MediaAsset < ApplicationRecord
       # This can't be called inside a transaction because the transaction will
       # fail if there's a RecordNotUnique error when the asset already exists.
       def upload!(media_file, &block)
+        media_file = MediaFile.open(media_file) unless media_file.is_a?(MediaFile)
+
         raise Error, "File is corrupt" if media_file.is_corrupt?
 
         media_asset = create!(file: media_file, status: :processing)

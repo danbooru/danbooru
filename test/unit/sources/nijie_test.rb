@@ -38,43 +38,20 @@ module Sources
       end
     end
 
-    context "The source site for a nijie page" do
-      setup do
-        CurrentUser.user = FactoryBot.create(:user)
-        CurrentUser.ip_addr = "127.0.0.1"
+    context "A Nijie page" do
+      strategy_should_work(
+        "https://nijie.info/view.php?id=213043",
+        image_urls: ["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"],
+        download_size: 132_555,
+        artist_name: "莚",
+        profile_url: "https://nijie.info/members.php?id=728995",
+        artist_commentary_title: "ジャージの下は",
+        dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です",
+        tags: %w[眼鏡 リトルウィッチアカデミア アーシュラ先生],
+      )
+    end
 
-        @site = Source::Extractor.find("https://nijie.info/view.php?id=213043")
-      end
-
-      should "get the image url" do
-        assert_equal(["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"], @site.image_urls)
-        assert_downloaded(132_555, @site.image_urls.sole)
-      end
-
-      should "get the page url" do
-        assert_equal("https://nijie.info/view.php?id=213043", @site.page_url)
-      end
-
-      should "get the profile" do
-        assert_equal("https://nijie.info/members.php?id=728995", @site.profile_url)
-      end
-
-      should "get the artist name" do
-        assert_equal("莚", @site.artist_name)
-      end
-
-      should "get the tags" do
-        tags = [
-          ["眼鏡", "https://nijie.info/search.php?word=%E7%9C%BC%E9%8F%A1"],
-          ["谷間", "https://nijie.info/search.php?word=%E8%B0%B7%E9%96%93"],
-          ["リトルウィッチアカデミア", "https://nijie.info/search.php?word=%E3%83%AA%E3%83%88%E3%83%AB%E3%82%A6%E3%82%A3%E3%83%83%E3%83%81%E3%82%A2%E3%82%AB%E3%83%87%E3%83%9F%E3%82%A2"],
-          ["アーシュラ先生", "https://nijie.info/search.php?word=%E3%82%A2%E3%83%BC%E3%82%B7%E3%83%A5%E3%83%A9%E5%85%88%E7%94%9F"],
-          ["上着全開", "https://nijie.info/search.php?word=%E4%B8%8A%E7%9D%80%E5%85%A8%E9%96%8B"]
-        ]
-
-        assert_equal(tags, @site.tags)
-      end
-
+    context "A Nijie post" do
       should "normalize （）characters in tags" do
         FactoryBot.create(:tag, :name => "kaga")
         FactoryBot.create(:wiki_page, :title => "kaga", :other_names => "加賀(艦これ)")
@@ -83,14 +60,6 @@ module Sources
 
         assert_includes(@site.tags.map(&:first), "加賀（艦これ）")
         assert_includes(@site.translated_tags.map(&:name), "kaga")
-      end
-
-      should "get the commentary" do
-        title = "ジャージの下は"
-        desc = "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です"
-
-        assert_equal(title, @site.dtext_artist_commentary_title)
-        assert_equal(desc, @site.dtext_artist_commentary_desc)
       end
     end
 

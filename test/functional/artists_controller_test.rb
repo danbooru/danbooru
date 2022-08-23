@@ -70,8 +70,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         @artist = create(:artist, is_banned: true)
         get artist_path(@artist.id)
 
-        assert_response :success
-        assert_select "meta[name=robots][content=noindex]"
+        assert_response 451
       end
     end
 

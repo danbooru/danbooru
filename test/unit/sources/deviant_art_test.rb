@@ -211,9 +211,16 @@ module Sources
 
     context "A source with malformed links in the artist commentary" do
       should "fix the links" do
-        @site = Source::Extractor.find("https://teemutaiga.deviantart.com/art/Kisu-620666655")
+        @site = Source::Extractor.find("https://www.deviantart.com/dishwasher1910/art/Solar-Sisters-792488305")
 
-        assert_match(%r{"Print available at Inprnt":\[http://www.inprnt.com/gallery/teemutaiga/kisu\]}, @site.dtext_artist_commentary_desc)
+        assert_equal(<<~EOS.chomp, @site.dtext_artist_commentary_desc)
+          Solar sisters 
+
+          HD images , Psd file and alternative version available on my Patreon :
+          "www.patreon.com/Dishwasher1910":[https://www.patreon.com/Dishwasher1910]
+          You can buy the print here :
+          "www.inprnt.com/gallery/dishwas…":[https://www.inprnt.com/gallery/dishwasher1910/solar-sisters/]
+        EOS
       end
     end
 

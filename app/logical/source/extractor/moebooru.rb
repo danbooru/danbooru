@@ -66,6 +66,10 @@ module Source
           elsif api_response[:file_url].present?
             api_response[:file_url][/\.(jpg|jpeg|png|gif)\z/i, 1]
 
+          # on yande.re, the file extension doesn't matter, any random string will work. This means we can't guess the true file extension.
+          elsif domain == "yande.re"
+            "png"
+
           # the api_response wasn't available because it's a deleted post.
           elsif post_md5.present?
             %w[jpg png gif].find { |ext| http_exists?("https://#{domain}/image/#{post_md5}.#{ext}") }

@@ -51,7 +51,7 @@ module SourceTestHelper
       should "correctly match a strategy to an artist with the same profile url" do
         assert_not_nil(Danbooru::URL.parse(strategy.profile_url))
         assert_equal(profile_url, strategy.profile_url)
-        artist = FactoryBot.create(:artist, name: strategy.artist_name, url_string: profile_url)
+        artist = FactoryBot.create(:artist, name: strategy.tag_name, url_string: profile_url)
         assert_equal([artist], strategy.artists)
       end
     else

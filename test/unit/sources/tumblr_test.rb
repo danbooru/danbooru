@@ -227,6 +227,24 @@ module Sources
       end
     end
 
+    context "A *.media.tumblr.com/$hash/tumblr_$id_$size.png URL with a referer" do
+      strategy_should_work(
+        "https://64.media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_400.png",
+        referer: "https://noizave.tumblr.com/post/162206271767",
+        image_urls: ["https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png"],
+        download_size: 3655,
+      )
+    end
+
+    context "A *.media.tumblr.com/tumblr_$id_$size.jpg URL with a referer" do
+      strategy_should_work(
+        "http://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_250.jpg",
+        referer: "https://noizave.tumblr.com/post/162206271767",
+        image_urls: ["https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg"],
+        download_size: 105_963,
+      )
+    end
+
     context "generating page urls" do
       should "work" do
         source1 = "https://octrain1020.tumblr.com/post/190713122589"

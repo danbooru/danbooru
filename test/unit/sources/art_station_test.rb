@@ -33,37 +33,18 @@ module Sources
       end
     end
 
-    context "The source site for an art station projects page" do
-      setup do
-        @site = Source::Extractor.find("https://dantewontdie.artstation.com/projects/YZK5q")
-      end
-
-      should "get the image url" do
-        url = "https://cdn.artstation.com/p/assets/images/images/006/066/534/4k/yinan-cui-reika.jpg?1495781565"
-        assert_equal([url], @site.image_urls)
-      end
-
-      should "get the page url" do
-        assert_equal("https://dantewontdie.artstation.com/projects/YZK5q", @site.page_url)
-      end
-
-      should "get the profile" do
-        assert_equal("https://www.artstation.com/dantewontdie", @site.profile_url)
-      end
-
-      should "get the artist name" do
-        assert_equal("dantewontdie", @site.artist_name)
-      end
-
-      should "get the tags" do
-        assert_equal(%w[gantz Reika], @site.tags.map(&:first))
-        assert_equal(%w[gantz reika], @site.normalized_tags)
-      end
-
-      should "get the artist commentary" do
-        assert_equal("Reika ", @site.artist_commentary_title)
-        assert_equal("From Gantz.", @site.dtext_artist_commentary_desc)
-      end
+    context "An ArtStation /projects/ URL" do
+      strategy_should_work(
+        "https://dantewontdie.artstation.com/projects/YZK5q",
+        image_urls: ["https://cdn.artstation.com/p/assets/images/images/006/066/534/4k/yinan-cui-reika.jpg?1495781565"],
+        page_url: "https://dantewontdie.artstation.com/projects/YZK5q",
+        profile_url: "https://www.artstation.com/dantewontdie",
+        artist_name: "dantewontdie",
+        tags: %w[gantz Reika],
+        artist_commentary_title: "Reika ",
+        dtext_artist_commentary_desc: "From Gantz.",
+        download_size: 210_899,
+      )
     end
 
     context "The source site for a www.artstation.com/artwork/$slug page" do
@@ -180,6 +161,30 @@ module Sources
         assert_equal([], site.image_urls)
         assert_nothing_raised { site.to_h }
       end
+    end
+
+    context "A /small/ ArtStation image URL" do
+      strategy_should_work(
+        "https://cdnb3.artstation.com/p/assets/images/images/003/716/071/small/aoi-ogata-hate-city.jpg?1476754974",
+        image_urls: ["https://cdn.artstation.com/p/assets/images/images/003/716/071/4k/aoi-ogata-hate-city.jpg?1476754974"],
+        download_size: 1_816_628,
+      )
+    end
+
+    context "A /large/ ArtStation image URL (1)" do
+      strategy_should_work(
+        "https://cdnb.artstation.com/p/assets/images/images/003/716/071/large/aoi-ogata-hate-city.jpg?1476754974",
+        image_urls: ["https://cdn.artstation.com/p/assets/images/images/003/716/071/4k/aoi-ogata-hate-city.jpg?1476754974"],
+        download_size: 1_816_628,
+      )
+    end
+
+    context "A /large/ ArtStation image URL (2)" do
+      strategy_should_work(
+        "https://cdna.artstation.com/p/assets/images/images/004/730/278/large/mendel-oh-dragonll.jpg",
+        image_urls: ["https://cdn.artstation.com/p/assets/images/images/004/730/278/4k/mendel-oh-dragonll.jpg"],
+        download_size: 452_985,
+      )
     end
 
     should "work for artists with underscores in their name" do

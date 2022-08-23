@@ -61,30 +61,6 @@ module Downloads
       end
     end
 
-    context "a download for a media.tumblr.com/$id_$size image with a larger size" do
-      should "download the best available version" do
-        skip "Tumblr keys are not set" unless Danbooru.config.tumblr_consumer_key
-        @ref = "https://noizave.tumblr.com/post/162206271767"
-        @source = "http://media.tumblr.com/0DNBGJovY5j3smfeQs8nB53z_400.jpg"
-        @rewrite = "https://media.tumblr.com/0DNBGJovY5j3smfeQs8nB53z_1280.jpg"
-        assert_rewritten(@rewrite, @source, @ref)
-        assert_downloaded(125850, @source)
-        # assert_downloaded(153_885, @source)
-      end
-    end
-
-    context "a download for a media.tumblr.com/tumblr_$id_$size.jpg image" do
-      should "download the best available version" do
-        skip "Tumblr keys are not set" unless Danbooru.config.tumblr_consumer_key
-        @ref = "https://noizave.tumblr.com/post/162206271767"
-        @source = "http://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_250.jpg"
-        @rewrite = "https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg"
-        assert_rewritten(@rewrite, @source, @ref)
-        assert_downloaded(105963, @source, @ref)
-        # assert_downloaded(296_399, @source)
-      end
-    end
-
     context "a download for a *.tumblr.com/post/* html page" do
       should "download the best available version" do
         skip "Tumblr keys are not set" unless Danbooru.config.tumblr_consumer_key
