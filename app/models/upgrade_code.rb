@@ -25,6 +25,8 @@ class UpgradeCode < ApplicationRecord
   def self.visible(user)
     if user.is_owner?
       all
+    elsif user.is_anonymous?
+      none
     else
       where(redeemer: user).or(where(creator: user))
     end
