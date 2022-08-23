@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 # A BackgroundJob is a job in the good_jobs table. This class is simply an
-# extension of GoodJob::ActiveJobJob, with a few extra methods for searching jobs.
+# extension of GoodJob::Job, with a few extra methods for searching jobs.
 #
-# @see https://github.com/bensheldon/good_job/blob/main/lib/good_job/active_job_job.rb
-class BackgroundJob < GoodJob::ActiveJobJob
-  delegate :executions_count, to: :job
-
+# @see https://github.com/bensheldon/good_job
+class BackgroundJob < GoodJob::Job
   concerning :SearchMethods do
     class_methods do
       def default_order
@@ -62,7 +60,7 @@ class BackgroundJob < GoodJob::ActiveJobJob
     end
 
     def pretty_name
-      job.job_class.titleize.delete_suffix(" Job")
+      job_class.titleize.delete_suffix(" Job")
     end
   end
 end

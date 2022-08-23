@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :good_job, class: GoodJob::ActiveJobJob do
+  factory :good_job, class: GoodJob::Job do
     transient do
       job { VacuumDatabaseJob.new }
     end

@@ -12,11 +12,16 @@ class JobsControllerTest < ActionDispatch::IntegrationTest
         get jobs_path
         assert_response :success
       end
+
+      should respond_to_search(status: "running").with { [] }
+      should respond_to_search(status: "queued").with { [@job] }
+      should respond_to_search(status: "finished").with { [] }
+      should respond_to_search(status: "discarded").with { [] }
     end
 
     context "cancel action" do
       should "work" do
-        GoodJob::ActiveJobJob.any_instance.stubs(:status).returns(:queued)
+        GoodJob::Job.any_instance.stubs(:status).returns(:queued)
         put_auth cancel_job_path(@job), @user, xhr: true
         assert_response :success
       end
@@ -24,8 +29,8 @@ class JobsControllerTest < ActionDispatch::IntegrationTest
 
     context "retry action" do
       should "work" do
+        @job.discard_job("Canceled")
         @job.head_execution.active_job.class.stubs(:queue_adapter).returns(GoodJob::Adapter.new)
-        GoodJob::ActiveJobJob.any_instance.stubs(:status).returns(:discarded)
         put_auth retry_job_path(@job), @user, xhr: true
         assert_response :success
       end
@@ -33,7 +38,7 @@ class JobsControllerTest < ActionDispatch::IntegrationTest
 
     context "run action" do
       should "work" do
-        GoodJob::ActiveJobJob.any_instance.stubs(:status).returns(:queued)
+        GoodJob::Job.any_instance.stubs(:status).returns(:queued)
         put_auth run_job_path(@job), @user, xhr: true
         assert_response :success
       end
