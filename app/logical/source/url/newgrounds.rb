@@ -16,7 +16,7 @@
 # * https://uploads.ungrounded.net/225000/225625_colormedressup.swf?1111143751 (file)
 #
 class Source::URL::Newgrounds < Source::URL
-  attr_reader :username, :work_id, :work_title
+  attr_reader :username, :work_id, :work_title, :video_id
 
   def self.match?(url)
     url.domain.in?(["newgrounds.com", "ngfiles.com", "ungrounded.net"])
@@ -30,6 +30,11 @@ class Source::URL::Newgrounds < Source::URL
     in "www.newgrounds.com", "art", "view", username, work_title
       @username = username
       @work_title = work_title
+
+    # https://www.newgrounds.com/portal/view/536659
+    # https://www.newgrounds.com/portal/video/536659 (curl 'https://www.newgrounds.com/portal/video/536659' -H 'X-Requested-With: XMLHttpRequest')
+    in "www.newgrounds.com", "portal", ("view" | "video"), video_id
+      @video_id = video_id
 
     # https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg
     # https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181
@@ -63,6 +68,8 @@ class Source::URL::Newgrounds < Source::URL
   def page_url
     if username.present? && work_title.present?
       "https://www.newgrounds.com/art/view/#{username}/#{work_title}"
+    elsif video_id.present?
+      "https://www.newgrounds.com/portal/view/#{video_id}"
     end
   end
 

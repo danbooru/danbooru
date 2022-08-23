@@ -130,6 +130,7 @@ module Sources
       assert(Source::URL.image_url?("https://art.ngfiles.com/thumbnails/1254000/1254985.png?f1588263349"))
 
       assert(Source::URL.page_url?("https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat"))
+      assert(Source::URL.page_url?("https://www.newgrounds.com/portal/view/830293"))
 
       assert(Source::URL.profile_url?("https://natthelich.newgrounds.com"))
       refute(Source::URL.profile_url?("https://www.newgrounds.com"))
