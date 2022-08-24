@@ -9,9 +9,9 @@
 # http://blog.sina.com.cn/u/1299088063
 
 class Source::URL::Weibo < Source::URL
-  RESERVED_USERNAMES = %w[u p profile status detail]
+  RESERVED_USERNAMES = %w[u n p profile status detail]
 
-  attr_reader :full_image_url, :artist_short_id, :artist_long_id, :username
+  attr_reader :full_image_url, :artist_short_id, :artist_long_id, :display_name, :username
 
   def self.match?(url)
     url.domain.in?(["weibo.com", "weibo.cn", "sinaimg.cn"])
@@ -74,6 +74,11 @@ class Source::URL::Weibo < Source::URL
     in _, /^\d+$/ => artist_short_id, *rest
       @artist_short_id = artist_short_id
 
+    # https://weibo.com/n/肆巳4
+    # https://www.weibo.com/n/小小男爵不要坑
+    in _, "n", display_name, *rest
+      @display_name = display_name
+
     # https://www.weibo.com/endlessnsmt (short id: https://www.weibo.com/u/1879370780)
     # https://www.weibo.cn/endlessnsmt
     # https://www.weibo.com/lvxiuzi0/home
@@ -94,6 +99,8 @@ class Source::URL::Weibo < Source::URL
       "https://www.weibo.com/u/#{artist_short_id}"
     elsif artist_long_id.present?
       "https://www.weibo.com/p/#{artist_long_id}"
+    elsif display_name.present?
+      "https://www.weibo.com/n/#{display_name}"
     elsif username.present?
       "https://www.weibo.com/#{username}"
     end

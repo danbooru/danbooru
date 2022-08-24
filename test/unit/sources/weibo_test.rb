@@ -138,6 +138,7 @@ module Sources
       assert(Source::URL.profile_url?("https://www.weibo.com/5501756072"))
       assert(Source::URL.profile_url?("https://www.weibo.com/endlessnsmt"))
       assert(Source::URL.profile_url?("https://www.weibo.com/4ubergine/photos"))
+      assert(Source::URL.profile_url?("https://www.weibo.com/n/小小男爵不要坑"))
 
       refute(Source::URL.profile_url?("https://weibo.com/u/"))
     end
