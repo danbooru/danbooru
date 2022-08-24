@@ -7,7 +7,7 @@ module Source
     def self.match?(url)
       return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url) || Source::URL::Booth.match?(url)
 
-      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc]) || url.host == "tc-pximg01.techorus-cdn.com"
+      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc])
     end
 
     def parse
@@ -22,7 +22,6 @@ module Source
       # https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png
       # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg
       # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_s.png
-      # https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png
       #
       # but not:
       #
@@ -123,10 +122,9 @@ module Source
     def image_url?
       # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
       # https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png
-      # https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png
       # https://i2.pixiv.net/img04/img/syounen_no_uta/46170939_p0.jpg
       # http://img18.pixiv.net/img/evazion/14901720.png
-      host.in?(["i.pximg.net", "i-f.pximg.net", "tc-pximg01.techorus-cdn.com"]) || host.match?(/\A(i\d+|img\d+)\.pixiv\.net\z/)
+      host.in?(%w[i.pximg.net i-f.pximg.net]) || host.match?(/\A(i\d+|img\d+)\.pixiv\.net\z/)
     end
 
     def full_image_url?

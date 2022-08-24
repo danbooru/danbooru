@@ -59,15 +59,6 @@ module Sources
         end
       end
 
-      context "A https://tc-pximg01.techorus-cdn.com/img-original/img/* source" do
-        should "get the metadata" do
-          @site = Source::Extractor.find("https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png")
-
-          assert_equal(["https://i.pximg.net/img-original/img/2017/09/18/03/18/24/65015428_p4.png"], @site.image_urls)
-          assert_equal("赤井さしみ", @site.artist_name)
-        end
-      end
-
       context "A https://www.pixiv.net/*/artworks/* source" do
         should "work" do
           @site = Source::Extractor.find("https://www.pixiv.net/en/artworks/64476642")
@@ -332,8 +323,6 @@ module Sources
 
       context "parsing illust ids" do
         should "parse ids from illust urls" do
-          assert_illust_id(65015428, "https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png")
-
           assert_illust_id(46785915, "https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg")
           assert_illust_id(79584713, "https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png")
 
@@ -389,7 +378,6 @@ module Sources
       assert(Source::URL.image_url?("https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg"))
       assert(Source::URL.image_url?("https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png"))
       assert(Source::URL.image_url?("http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg"))
-      assert(Source::URL.image_url?("https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png"))
       assert(Source::URL.image_url?("http://img18.pixiv.net/img/evazion/14901720.png"))
       assert(Source::URL.image_url?("http://i2.pixiv.net/img18/img/evazion/14901720.png"))
 
