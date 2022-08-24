@@ -150,6 +150,13 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("no", @post_flag.reload.reason)
       end
 
+      should "return an error if the flag is too long" do
+        put_auth post_flag_path(@post_flag), @flagger, params: { post_flag: { reason: "x"*1000 }}
+
+        assert_response :success
+        assert_equal("xxx", @post_flag.reload.reason)
+      end
+
       should "not allow the flagger to update a resolved flag" do
         @post_flag.update!(status: "rejected")
         put_auth post_flag_path(@post_flag), @flagger, params: { post_flag: { reason: "no" }}

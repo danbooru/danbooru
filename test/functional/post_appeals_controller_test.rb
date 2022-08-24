@@ -99,5 +99,42 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
         end
       end
     end
+
+    context "update action" do
+      should "allow the appealer to update the appeal" do
+        @appealer = create(:user)
+        @post_appeal = create(:post_appeal, creator: @appealer, reason: "xxx")
+        put_auth post_appeal_path(@post_appeal), @appealer, params: { post_appeal: { reason: "yes" }}
+
+        assert_redirected_to @post_appeal.post
+        assert_equal("yes", @post_appeal.reload.reason)
+      end
+
+      should "return an error if the appeal is too long" do
+        @appealer = create(:user)
+        @post_appeal = create(:post_appeal, creator: @appealer, reason: "xxx")
+        put_auth post_appeal_path(@post_appeal), @appealer, params: { post_appeal: { reason: "x"*1000 }}
+
+        assert_response :success
+        assert_equal("xxx", @post_appeal.reload.reason)
+      end
+
+      should "not allow the appealer to update a rejected appeal" do
+        @appealer = create(:user)
+        @post_appeal = create(:post_appeal, creator: @appealer, reason: "xxx", status: "rejected")
+        put_auth post_appeal_path(@post_appeal), @appealer, params: { post_appeal: { reason: "no" }}
+
+        assert_response 403
+        assert_equal("xxx", @post_appeal.reload.reason)
+      end
+
+      should "not allow other users to update the appeal" do
+        @post_appeal = create(:post_appeal, reason: "xxx")
+        put_auth post_appeal_path(@post_appeal), create(:mod_user), params: { post_appeal: { reason: "no" }}
+
+        assert_response 403
+        assert_equal("xxx", @post_appeal.reload.reason)
+      end
+    end
   end
 end

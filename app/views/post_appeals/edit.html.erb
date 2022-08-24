@@ -7,7 +7,7 @@
     </p>
 
     <%= edit_form_for(@post_appeal) do |f| %>
-      <%= f.input :reason, as: :dtext, inline: true %>
+      <%= f.input :reason, as: :dtext %>
       <%= f.button :submit, "Submit" %>
       <%= dtext_preview_button "post_appeal_reason" %>
     <% end %>
