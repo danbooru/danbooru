@@ -2,7 +2,7 @@
 
 module Source
   class URL::Pixiv < Source::URL
-    attr_reader :work_id, :page, :username, :user_id
+    attr_reader :work_id, :image_type, :page, :username, :user_id
 
     def self.match?(url)
       return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url) || Source::URL::Booth.match?(url)
@@ -27,7 +27,8 @@ module Source
       # but not:
       #
       # https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg
-      in *, ("img-original" | "img-master" | "img-zip-ugoira" | "img-inf" | "custom-thumb"), "img", year, month, day, hour, min, sec, file if image_url?
+      in *, ("img-original" | "img-master" | "img-zip-ugoira" | "img-inf" | "custom-thumb") => type, "img", year, month, day, hour, min, sec, file if image_url?
+        @image_type = type
         parse_filename
 
       # http://img18.pixiv.net/img/evazion/14901720.png
@@ -126,6 +127,10 @@ module Source
       # https://i2.pixiv.net/img04/img/syounen_no_uta/46170939_p0.jpg
       # http://img18.pixiv.net/img/evazion/14901720.png
       host.in?(["i.pximg.net", "i-f.pximg.net", "tc-pximg01.techorus-cdn.com"]) || host.match?(/\A(i\d+|img\d+)\.pixiv\.net\z/)
+    end
+
+    def full_image_url?
+      image_type.in?(%w[img-original img-zip-ugoira])
     end
 
     def is_ugoira?

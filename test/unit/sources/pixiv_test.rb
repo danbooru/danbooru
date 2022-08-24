@@ -166,6 +166,35 @@ module Sources
         end
       end
 
+      context "A raw image URL that has been revised should get the unrevised image URL" do
+        strategy_should_work(
+          "https://i.pximg.net/img-original/img/2022/08/14/19/23/06/100474393_p0.png",
+          deleted: true,
+          image_urls: ["https://i.pximg.net/img-original/img/2022/08/14/19/23/06/100474393_p0.png"],
+          artist_commentary_title: "シャイリリー",
+          artist_name: "影おじ (隠れエリア)",
+          profile_url: "https://www.pixiv.net/users/6570768",
+          profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
+          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber 両手に茎 乱交],
+        )
+      end
+
+      context "A post has been revised should get the revised image URLs" do
+        strategy_should_work(
+          "https://www.pixiv.net/en/artworks/100474393",
+          image_urls: %w[
+            https://i.pximg.net/img-original/img/2022/08/14/21/21/24/100474393_p0.png
+            https://i.pximg.net/img-original/img/2022/08/14/21/21/24/100474393_p1.png
+            https://i.pximg.net/img-original/img/2022/08/14/21/21/24/100474393_p2.png
+          ],
+          artist_commentary_title: "シャイリリー",
+          artist_name: "影おじ (隠れエリア)",
+          profile_url: "https://www.pixiv.net/users/6570768",
+          profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
+          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber 両手に茎 乱交],
+        )
+      end
+
       context "fetching the commentary" do
         should "work when the description is blank" do
           get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981746")
