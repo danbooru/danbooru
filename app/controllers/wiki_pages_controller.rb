@@ -24,11 +24,6 @@ class WikiPagesController < ApplicationController
     end
   end
 
-  def search
-    authorize WikiPage
-    render layout: "default"
-  end
-
   def show
     @wiki_page, found_by = WikiPage.find_by_id_or_title(params[:id])
     raise PageRemovedError if request.format.html? && @wiki_page&.artist.present? && @wiki_page.artist.is_banned? && !policy(@wiki_page.artist).can_view_banned?

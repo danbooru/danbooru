@@ -1,7 +1,6 @@
 <% content_for(:secondary_links) do %>
   <%= quick_search_form_for(:title_normalize, wiki_pages_path, "wiki pages", autocomplete: "wiki-page", redirect: true) %>
-  <%= subnav_link_to "Listing", wiki_pages_path %>
-  <%= subnav_link_to "Search", search_wiki_pages_path %>
+  <%= subnav_link_to "Search", wiki_pages_path %>
   <% if policy(WikiPage).new? %>
     <%= subnav_link_to "New", new_wiki_page_path %>
   <% end %>

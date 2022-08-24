@@ -66,13 +66,6 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "search action" do
-      should "work" do
-        get search_wiki_pages_path
-        assert_response :success
-      end
-    end
-
     context "show action" do
       setup do
         @wiki_page = as(@user) { create(:wiki_page) }

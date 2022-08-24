@@ -297,7 +297,6 @@ Rails.application.routes.draw do
   end
   resources :wiki_pages, id: /.+?(?=\.json|\.xml|\.html)|.+/ do
     put :revert, on: :member
-    get :search, on: :collection
     get :show_or_new, on: :collection
   end
   resources :wiki_page_versions, :only => [:index, :show, :diff] do
