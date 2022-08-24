@@ -36,10 +36,10 @@ module Source
       end
 
       def tags
-        tags = page&.search(".boxbody [rel='tag']") || []
+        tags = page&.search(".boxbody [rel='tag']").to_a.map(&:text)
 
         tags.map do |tag|
-          [tag.text, URI.join(page_url, tag.attr("href")).to_s]
+          [tag, "https://www.hentai-foundry.com/pictures/tagged/#{CGI.escape(tag)}"]
         end
       end
 

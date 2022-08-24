@@ -39,8 +39,8 @@ module Sources
       end
 
       should "get the tags" do
-        assert_equal([["elf", "https://www.hentai-foundry.com/search/index?query=elf&search_in=keywords"]], @image_1.tags)
-        assert_equal([["elf", "https://www.hentai-foundry.com/search/index?query=elf&search_in=keywords"]], @image_2.tags)
+        assert_equal([["elf", "https://www.hentai-foundry.com/pictures/tagged/elf"]], @image_1.tags)
+        assert_equal([["elf", "https://www.hentai-foundry.com/pictures/tagged/elf"]], @image_2.tags)
       end
 
       should "find the correct artist" do
