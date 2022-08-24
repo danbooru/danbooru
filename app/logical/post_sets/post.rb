@@ -142,7 +142,7 @@ module PostSets
     end
 
     def has_status_metatag?
-      post_query.select_metatags("status").any? do |metatag|
+      post_query.select_metatags("is", "status").any? do |metatag|
         metatag.value.downcase.in?(%w[all any active unmoderated modqueue deleted appealed])
       end
     end

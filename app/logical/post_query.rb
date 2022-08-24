@@ -201,12 +201,6 @@ class PostQuery
     [AST.metatag("rating", "g"), *tags]
   end
 
-  # XXX unify with PostSets::Post#show_deleted?
-  def hide_deleted?
-    has_status_metatag = select_metatags(:status).any? { |metatag| metatag.value.downcase.in?(%w[deleted active any all unmoderated modqueue appealed]) }
-    !has_status_metatag
-  end
-
   concerning :CountMethods do
     # @return [Integer, nil] The number of posts returned by the search, or nil on timeout.
     def post_count
@@ -305,5 +299,5 @@ class PostQuery
     end
   end
 
-  memoize :tags, :replace_aliases, :with_implicit_metatags, :to_cnf, :aliases, :implicit_metatags, :hide_deleted?, :term_count
+  memoize :tags, :replace_aliases, :with_implicit_metatags, :to_cnf, :aliases, :implicit_metatags, :term_count
 end
