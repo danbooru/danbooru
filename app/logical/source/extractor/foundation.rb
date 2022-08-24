@@ -11,8 +11,24 @@ module Source
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]
-        elsif (image_url = page&.at(".fullscreen img, .fullscreen video")&.attr(:src))
-          [Source::URL.parse(image_url).full_image_url].compact
+        elsif api_response.dig("props", "pageProps", "artwork").present?
+          artwork = api_response.dig("props", "pageProps", "artwork")
+          asset_id = artwork["assetId"]
+
+          # Reverse engineered from the Foundation.app Javascript; look for buildVideoUrl in utils/assets.ts.
+          if artwork["mimeType"].starts_with?("video/")
+            if artwork["assetVersion"] == 5
+              url = "#{artwork["assetScheme"]}#{artwork["assetHost"]}#{artwork["assetPath"]}/nft.mp4"
+            elsif artwork["assetVersion"] == 3
+              url = "https://assets.foundation.app/#{asset_id[-4..-3]}/#{asset_id[-2..-1]}/#{asset_id}/nft_q4.mp4"
+            else
+              url = "https://assets.foundation.app/#{asset_id[-4..-3]}/#{asset_id[-2..-1]}/#{asset_id}/nft.mp4"
+            end
+          else
+            url = "#{artwork["assetScheme"]}#{artwork["assetHost"]}/#{artwork["assetPath"]}"
+          end
+
+          [Source::URL.parse(url).full_image_url].compact
         else
           []
         end

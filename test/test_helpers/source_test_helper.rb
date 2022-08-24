@@ -96,7 +96,7 @@ module SourceTestHelper
             actual_values = actual_value.sort
             expected_value.sort.each_with_index { |each_value, index| assert_match(each_value, actual_values[index]) }
           else
-            assert_equal(expected_value.sort, actual_value)
+            assert_equal(expected_value.sort, actual_value.sort)
           end
         elsif expected_value.nil?
           assert_nil(actual_value)

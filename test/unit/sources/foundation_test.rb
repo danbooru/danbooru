@@ -23,6 +23,17 @@ module Sources
       )
     end
 
+    context "A foundation gif" do
+      strategy_should_work(
+        "https://foundation.app/@patch_oxxo/shine/1",
+        artist_name: "patch_oxxo",
+        profile_url: "https://foundation.app/@patch_oxxo",
+        image_urls: ["https://f8n-ipfs-production.imgix.net/QmWQpt9opcue5F7Q2vTT5P5jPYo1xHhEs7RDxgXzWFHcfK/nft.gif"],
+        download_size: 52_352_138,
+        tags: %w[2d animation],
+      )
+    end
+
     context "A foundation.app/@username/foo-bar-1234 URL" do
       strategy_should_work(
         "https://foundation.app/@asuka111art/dinner-with-cats-82426",
