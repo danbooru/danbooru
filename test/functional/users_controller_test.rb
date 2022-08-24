@@ -228,9 +228,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to login_path(url: "/profile")
       end
 
-      should "return 404 for anonymous api calls" do
+      should "return success for anonymous api calls" do
         get profile_path(format: :json)
-        assert_response 404
+        assert_response :success
       end
     end
 

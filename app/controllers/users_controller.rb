@@ -57,7 +57,7 @@ class UsersController < ApplicationController
     elsif request.format.html?
       redirect_to login_path(url: profile_path)
     else
-      raise ActiveRecord::RecordNotFound
+      respond_with(@user, methods: @user.full_attributes, template: "users/show")
     end
   end
 
