@@ -11,4 +11,6 @@ class NotePreviewsController < ApplicationController
       end
     end
   end
+
+  alias_method :create, :show
 end

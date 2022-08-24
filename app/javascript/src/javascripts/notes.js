@@ -526,7 +526,7 @@ class Note {
 
     async preview_text(text) {
       this.display_text("Loading...");
-      let response = await $.getJSON("/note_previews", { body: text });
+      let response = await $.post("/note_previews", { body: text });
 
       this.display_text(response.body);
       this.initialize();
