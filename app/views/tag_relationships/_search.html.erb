@@ -1,8 +1,8 @@
 <%# url %>
 
 <%= search_form_for(url) do |f| %>
-  <%= f.input :antecedent_name_ilike, label: "From", input_html: { value: params[:search][:antecedent_name_ilike], data: { autocomplete: "tag" } } %>
-  <%= f.input :consequent_name_ilike, label: "To", input_html: { value: params[:search][:consequent_name_ilike], data: { autocomplete: "tag" } } %>
+  <%= f.input :antecedent_name_matches, label: "From", input_html: { value: params[:search][:antecedent_name_matches], data: { autocomplete: "tag" } } %>
+  <%= f.input :consequent_name_matches, label: "To", input_html: { value: params[:search][:consequent_name_matches], data: { autocomplete: "tag" } } %>
   <%= f.input :reason_ilike, label: "Reason", input_html: { value: params[:search][:reason_ilike] } %>
   <%= f.simple_fields_for :antecedent_tag do |fa| %>
     <%= fa.input :category, label: "From Category", collection: TagCategory.canonical_mapping.to_a, include_blank: true, selected: params.dig(:search, :antecedent_tag, :category) %>

@@ -70,6 +70,14 @@ class TagRelationship < ApplicationRecord
       where_ilike(:antecedent_name, name).or(where_ilike(:consequent_name, name))
     end
 
+    def consequent_name_matches(name)
+      where_like(:consequent_name, Tag.normalize_name(name))
+    end
+
+    def antecedent_name_matches(name)
+      where_like(:antecedent_name, Tag.normalize_name(name))
+    end
+
     def status_matches(status)
       where(status: status.downcase)
     end
@@ -79,6 +87,14 @@ class TagRelationship < ApplicationRecord
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
+      end
+
+      if params[:consequent_name_matches].present?
+        q = q.consequent_name_matches(params[:consequent_name_matches])
+      end
+
+      if params[:antecedent_name_matches].present?
+        q = q.antecedent_name_matches(params[:antecedent_name_matches])
       end
 
       if params[:status].present?

@@ -19,7 +19,7 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
         @consequent_wiki = create(:wiki_page, title: "weapon")
 
         @other_implication = create(:tag_implication, antecedent_name: "cannon", consequent_name: "weapon", creator: @user, status: "deleted", forum_topic: @forum_topic, forum_post: @forum_post)
-        @unrelated_implication = create(:tag_implication)
+        @unrelated_implication = create(:tag_implication, antecedent_name: "cat_ears", consequent_name: "animal_ears")
       end
 
       should "render" do
@@ -31,6 +31,8 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(antecedent_name: "aaa").with { @tag_implication }
       should respond_to_search(consequent_name: "bbb").with { @tag_implication }
       should respond_to_search(status: "deleted").with { @other_implication }
+      should respond_to_search(antecedent_name_matches: " CAT EARS ").with { @unrelated_implication }
+      should respond_to_search(consequent_name_matches: " animal ears ").with { @unrelated_implication }
 
       context "using includes" do
         should respond_to_search(antecedent_tag: {post_count: 10}).with { @other_implication }
