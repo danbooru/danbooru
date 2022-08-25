@@ -69,8 +69,8 @@ class IpBan < ApplicationRecord
       errors.add(:ip_addr, "may not have a subnet bigger than /24")
     elsif partial_ban? && ip_addr.ipv4? && ip_addr.prefix < 8
       errors.add(:ip_addr, "may not have a subnet bigger than /8")
-    elsif full_ban? && ip_addr.ipv6? && ip_addr.prefix < 64
-      errors.add(:ip_addr, "may not have a subnet bigger than /64")
+    elsif full_ban? && ip_addr.ipv6? && ip_addr.prefix < 48
+      errors.add(:ip_addr, "may not have a subnet bigger than /48")
     elsif partial_ban? && ip_addr.ipv6? && ip_addr.prefix < 20
       errors.add(:ip_addr, "may not have a subnet bigger than /20")
     elsif new_record? && IpBan.active.where(category: category).ip_matches(subnetted_ip).exists?

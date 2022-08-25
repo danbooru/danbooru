@@ -31,6 +31,7 @@ class IpBanTest < ActiveSupport::TestCase
     should allow_value("1.2.3.4/24").for(:ip_addr)
     should allow_value("ABCD::1234").for(:ip_addr)
     should allow_value("ABCD::1234/64").for(:ip_addr)
+    should allow_value("ABCD::1234/48").for(:ip_addr)
 
     should_not allow_value("").for(:ip_addr)
     should_not allow_value("foo").for(:ip_addr)
@@ -39,5 +40,6 @@ class IpBanTest < ActiveSupport::TestCase
     should_not allow_value("127.0.0.1").for(:ip_addr)
     should_not allow_value("1.2.3.4/16").for(:ip_addr)
     should_not allow_value("ABCD::1234/32").for(:ip_addr)
+    should_not allow_value("ABCD::1234/47").for(:ip_addr)
   end
 end
