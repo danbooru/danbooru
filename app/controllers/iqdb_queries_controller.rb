@@ -9,7 +9,7 @@ class IqdbQueriesController < ApplicationController
 
     iqdb_params = search_params.to_h.symbolize_keys
     @high_similarity_matches, @low_similarity_matches, @matches = IqdbClient.new.search(**iqdb_params)
-    respond_with(@matches, template: "iqdb_queries/show")
+    respond_with(@matches, template: "iqdb_queries/show", location: iqdb_queries_path)
   end
 
   alias create show
