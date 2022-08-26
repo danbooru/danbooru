@@ -79,17 +79,12 @@ class AutocompleteService
   #
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_tag_query
-    if parsed_query.tag_names.one?
-      tag = parsed_query.tag_names.first
-      autocomplete_tag(tag)
-    elsif parsed_query.wildcards.one?
-      wildcard = parsed_query.wildcards.first
-      autocomplete_tag(wildcard.name)
-    elsif parsed_query.metatags.one?
+    if parsed_query.metatags.one?
       metatag = parsed_query.metatags.first
       autocomplete_metatag(metatag.name, metatag.value)
     else
-      []
+      tag = Tag.normalize_name(query)
+      autocomplete_tag(tag)
     end
   end
 
@@ -351,7 +346,7 @@ class AutocompleteService
   end
 
   def parsed_query
-    PostQuery.new(query.delete_prefix("-").delete_prefix("~"))
+    PostQuery.new(query)
   end
 
   memoize :autocomplete_results, :parsed_query
