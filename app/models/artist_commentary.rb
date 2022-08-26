@@ -80,10 +80,10 @@ class ArtistCommentary < ApplicationRecord
   end
 
   def trim_whitespace
-    self.original_title = original_title.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
-    self.translated_title = translated_title.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
-    self.original_description = original_description.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
-    self.translated_description = translated_description.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    self.original_title = original_title.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    self.translated_title = translated_title.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    self.original_description = original_description.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    self.translated_description = translated_description.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
   end
 
   def original_present?

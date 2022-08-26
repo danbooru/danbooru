@@ -760,6 +760,21 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("translated desc", @post.artist_commentary.translated_description)
       end
 
+      should "create a commentary record if a single commentary field is present" do
+        assert_difference("ArtistCommentary.count", 1) do
+          @post = create_post!(
+            user: @user,
+            artist_commentary_title: "title",
+          )
+        end
+
+        assert_equal(true, @post.artist_commentary.present?)
+        assert_equal("title", @post.artist_commentary.original_title)
+        assert_equal("", @post.artist_commentary.original_description)
+        assert_equal("", @post.artist_commentary.translated_title)
+        assert_equal("", @post.artist_commentary.translated_description)
+      end
+
       should "not create a commentary record if the commentary is blank" do
         assert_no_difference("ArtistCommentary.count") do
           @post = create_post!(
