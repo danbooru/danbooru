@@ -26,7 +26,7 @@ class ArtistCommentariesController < ApplicationController
   end
 
   def create_or_update
-    post_id = params[:artist_commentary].delete(:post_id)
+    post_id = params[:artist_commentary].delete(:post_id) || params[:post_id]
     @artist_commentary = authorize ArtistCommentary.find_or_initialize_by(post_id: post_id)
     @artist_commentary.update(permitted_attributes(@artist_commentary))
     respond_with(@artist_commentary)

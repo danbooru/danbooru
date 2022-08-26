@@ -10,9 +10,7 @@
   </div>
 </form>
 
-<%= edit_form_for(artist_commentary, url: create_or_update_artist_commentaries_path(format: :js), remote: true, method: :put, html: { id: "edit-commentary" }) do |f| %>
-  <%= f.input :post_id, as: :hidden, input_html: { value: post.id } %>
-
+<%= edit_form_for(artist_commentary, url: create_or_update_post_artist_commentary_path(post_id: post.id, format: :js), remote: true, method: :put, html: { id: "edit-commentary" }) do |f| %>
   <%= f.input :original_title, as: :string, input_html: { value: artist_commentary.try(:original_title) } %>
   <%= f.input :original_description, input_html: { value: artist_commentary.try(:original_description) } %>
 

@@ -49,7 +49,7 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
         params = {
           artist_commentary: {
             original_title: "foo",
-            post_id: FactoryBot.create(:post).id
+            post_id: create(:post).id
           },
           format: "js"
         }
@@ -73,6 +73,19 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
         @commentary.reload
         assert_response :success
         assert_equal("foo", @commentary.reload.original_title)
+      end
+
+      should "work for /posts/:post_id/artist_commentary/create_or_update" do
+        params = {
+          post_id: create(:post).id,
+          artist_commentary: { original_title: "foo" },
+        }
+
+        assert_difference("ArtistCommentary.count", 1) do
+          put_auth create_or_update_post_artist_commentary_path(params), @user, xhr: true
+        end
+
+        assert_response :success
       end
     end
 
