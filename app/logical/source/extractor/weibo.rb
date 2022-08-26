@@ -47,12 +47,12 @@ module Source
         end
       end
 
-      def profile_urls
-        [parsed_url.profile_url, parsed_referer&.profile_url].compact.uniq
-      end
-
       def profile_url
         "https://www.weibo.com/u/#{artist_id}" if artist_id.present?
+      end
+
+      def tag_name
+        "weibo_#{artist_id}" if artist_id.present?
       end
 
       def artist_name
