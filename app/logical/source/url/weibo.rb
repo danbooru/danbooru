@@ -50,6 +50,11 @@ class Source::URL::Weibo < Source::URL
     in _, "detail", /^\d+$/ => illust_long_id
       @illust_long_id = illust_long_id
 
+    # https://share.api.weibo.cn/share/304950356,4767694689143828.html
+    # https://share.api.weibo.cn/share/304950356,4767694689143828
+    in "share.api.weibo.cn", "share", /^(\d+),(\d+)/
+      @illust_long_id = $2
+
     # https://m.weibo.cn/status/J33G4tH1B
     in "m.weibo.cn", "status", /^\w+$/ => illust_base62_id
       @illust_base62_id = illust_base62_id

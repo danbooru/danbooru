@@ -112,6 +112,18 @@ module Sources
       end
     end
 
+    context "A share.api.weibo.cn/share/:id URL" do
+      strategy_should_work(
+        "https://share.api.weibo.cn/share/304950356,4767694689143828.html",
+        image_urls: ["https://wx3.sinaimg.cn/large/007bspzxly1h23na4y0hhj32982pinpd.jpg"],
+        download_size: 1_781_330,
+        artist_name: "号布谷鸟",
+        artist_commentary_desc: "<a  href=\"https://m.weibo.cn/search?containerid=231522type%3D1%26t%3D10%26q%3D%23%E5%BF%AB%E9%80%92%E7%BB%84%23&extparam=%23%E5%BF%AB%E9%80%92%E7%BB%84%23&luicode=20000061&lfid=4767694689143828\" data-hide=\"\"><span class=\"surl-text\">#快递组#</span></a> 摸了 ",
+        profile_url: "https://www.weibo.com/u/6582241007",
+        tags: ["快递组"]
+      )
+    end
+
     should "Parse Weibo URLs correctly" do
       assert_equal("https://www.weibo.com/3150932560/H4cFbeKKA", Source::URL.page_url("https://www.weibo.com/3150932560/H4cFbeKKA?from=page_1005053150932560_profile&wvr=6&mod=weibotime"))
       assert_equal("https://m.weibo.cn/detail/4242129997905387", Source::URL.page_url("https://photo.weibo.com/2125874520/wbphotos/large/mid/4242129997905387/pid/7eb64558ly1friyzhj44lj20dw2qxe81"))
