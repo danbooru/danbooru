@@ -362,7 +362,7 @@ module Danbooru
 
     # Posts with these tags will be highlighted in the modqueue.
     def modqueue_warning_tags
-      %w[hard_translated self_upload nude_filter third-party_edit screenshot
+      %w[hard_translated nude_filter third-party_edit screenshot
       anime_screencap duplicate image_sample md5_mismatch resized upscaled downscaled
       resolution_mismatch source_larger source_smaller]
     end
