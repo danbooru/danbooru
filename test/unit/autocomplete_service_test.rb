@@ -78,8 +78,6 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
 
         assert_autocomplete_includes("touhou", "tou", :tag_query)
         assert_autocomplete_includes("touhou", "TOU", :tag_query)
-        assert_autocomplete_includes("touhou", "-tou", :tag_query)
-        assert_autocomplete_includes("touhou", "~tou", :tag_query)
       end
 
       context "for a tag abbreviation" do
@@ -95,9 +93,6 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
           assert_autocomplete_equals(%w[mole_under_eye], "/mue", :tag_query)
           assert_autocomplete_equals(%w[mole_under_eye], "/*ue", :tag_query)
           assert_autocomplete_equals(%w[mole_under_eye], "/MUE", :tag_query)
-
-          assert_autocomplete_includes("mole_under_eye", "-/mue", :tag_query)
-          assert_autocomplete_includes("mole_under_eye", "~/mue", :tag_query)
 
           assert_autocomplete_equals([], "/xxxxxxxxxx", :tag_query)
           assert_autocomplete_equals([], "/_", :tag_query)
