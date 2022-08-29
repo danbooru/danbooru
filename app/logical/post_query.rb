@@ -111,12 +111,12 @@ class PostQuery
     ast.none?
   end
 
-  # True if the search is a single metatag search for the given metatag.
+  # True if the search is a single, non-negated metatag search for the given metatag. Assumes the query has been normalized.
   def is_metatag?(name, value = nil)
     if value.nil?
-      is_single_term? && has_metatag?(name)
+      metatag? && has_metatag?(name)
     else
-      is_single_term? && find_metatag(name) == value.to_s
+      metatag? && find_metatag(name) == value.to_s
     end
   end
 
