@@ -105,12 +105,9 @@ class AutocompleteService
     if !string.ascii_only?
       results = tag_other_name_matches(string)
     elsif string.starts_with?("/")
-      string = string + "*" unless string.include?("*")
-
-      results = tag_matches(string)
-      results += tag_abbreviation_matches(string)
+      results = tag_abbreviation_matches(string)
       results = results.sort_by do |r|
-        [r[:type] == "tag-alias" ? 0 : 1, r[:antecedent].to_s.size, -r[:post_count]]
+        [r[:antecedent].to_s.size, -r[:post_count]]
       end
 
       results = results.uniq { |r| r[:value] }.take(limit)
@@ -149,6 +146,7 @@ class AutocompleteService
   def tag_abbreviation_matches(string, max_length: 10)
     return [] if string.size > max_length
 
+    string += "*" unless string.include?("*")
     tags = Tag.nonempty.abbreviation_matches(string).order(post_count: :desc).limit(limit)
 
     tags.map do |tag|
