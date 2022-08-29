@@ -62,7 +62,7 @@ class UserPolicy < ApplicationPolicy
     ]
 
     if record.id == user.id
-      attributes += User::BOOLEAN_ATTRIBUTES
+      attributes += User::ACTIVE_BOOLEAN_ATTRIBUTES
       attributes += %i[
         updated_at last_logged_in_at last_forum_read_at
         comment_threshold default_image_size
