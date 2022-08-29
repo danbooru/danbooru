@@ -37,17 +37,19 @@ class PostNavbarComponent < ApplicationComponent
   end
 
   def selected_pool
+    return nil unless query.is_metatag?(:pool) || query.is_metatag?(:ordpool)
     value = query.find_metatag(:pool, :ordpool)
     Pool.find_by_name(value) if value.present?
   end
 
   def selected_favgroup
+    return nil unless query.is_metatag?(:favgroup) || query.is_metatag?(:ordfavgroup)
     value = query.find_metatag(:favgroup, :ordfavgroup)
     FavoriteGroup.find_by_name_or_id(value, current_user) if value.present?
   end
 
   def query
-    @query ||= PostQuery.new(search)
+    @query ||= PostQuery.new(search).trim
   end
 
   memoize :favgroups, :selected_pool, :selected_favgroup

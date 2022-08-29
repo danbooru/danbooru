@@ -24,7 +24,7 @@ class PostNavbarComponentTest < ViewComponent::TestCase
         as(@user) do
           @pool1 = create(:pool, category: "series")
           @pool2 = create(:pool, category: "collection")
-          @post.update(tag_string: "pool:#{@pool1.id} pool:#{@pool2.id}")
+          @post.update(tag_string: "touhou pool:#{@pool1.id} pool:#{@pool2.id}")
         end
       end
 
@@ -46,6 +46,14 @@ class PostNavbarComponentTest < ViewComponent::TestCase
         render_post_navbar(@post, current_user: @user, search: "pool:#{@pool1.name}")
 
         assert_css(".pool-navbar[data-selected=true] .pool-name", text: "Pool: #{@pool1.pretty_name}")
+        assert_css(".pool-navbar[data-selected=false] .pool-name", text: "Pool: #{@pool2.pretty_name}")
+      end
+
+      should "show the search navbar when doing a 'pool:<name> + tag' search" do
+        render_post_navbar(@post, current_user: @user, search: "pool:#{@pool1.name} touhou")
+
+        assert_css(".search-navbar", text: "Search: pool:#{@pool1.name} touhou")
+        assert_css(".pool-navbar[data-selected=false] .pool-name", text: "Pool: #{@pool1.pretty_name}")
         assert_css(".pool-navbar[data-selected=false] .pool-name", text: "Pool: #{@pool2.pretty_name}")
       end
     end
@@ -89,6 +97,14 @@ class PostNavbarComponentTest < ViewComponent::TestCase
         render_post_navbar(@post, current_user: create(:user), search: "favgroup:#{@favgroup2.id}")
 
         assert_css(".favgroup-navbar .favgroup-name", count: 0)
+      end
+
+      should "show the search navbar when doing a 'favgroup:<id> + tag' search" do
+        render_post_navbar(@post, current_user: @user, search: "favgroup:#{@favgroup1.name} touhou")
+
+        assert_css(".search-navbar", text: "Search: favgroup:#{@favgroup1.name} touhou")
+        assert_css(".favgroup-navbar[data-selected=false] .favgroup-name", text: "Favgroup: #{@favgroup1.pretty_name}")
+        assert_css(".favgroup-navbar[data-selected=false] .favgroup-name", text: "Favgroup: #{@favgroup2.pretty_name}")
       end
     end
   end
