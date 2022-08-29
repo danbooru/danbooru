@@ -18,35 +18,37 @@ class PostNavbarComponent < ApplicationComponent
 
   def pools
     @pools ||= post.pools.undeleted.sort_by do |pool|
-      [pool.id == pool_id ? 0 : 1, pool.is_series? ? 0 : 1, pool.name]
+      [pool == selected_pool ? 0 : 1, pool.is_series? ? 0 : 1, pool.name]
     end
   end
 
   def favgroups
-    return [] if current_user.is_anonymous? && favgroup_id.nil?
+    return [] if current_user.is_anonymous? && selected_favgroup.nil?
 
     favgroups = FavoriteGroup.visible(current_user).for_post(post.id)
-    favgroups = favgroups.where(creator: current_user).or(favgroups.where(id: favgroup_id))
+    favgroups = favgroups.where(creator: current_user).or(favgroups.where(id: selected_favgroup))
     favgroups.sort_by do |favgroup|
-      [favgroup.id == favgroup_id ? 0 : 1, favgroup.name]
+      [favgroup == selected_favgroup ? 0 : 1, favgroup.name]
     end
   end
 
   def has_search_navbar?
-    !query.has_metatag?(:order, :ordfav, :ordpool) && pool_id.blank? && favgroup_id.blank?
+    !query.has_metatag?(:order, :ordfav, :ordpool) && selected_pool.blank? && selected_favgroup.blank?
   end
 
-  def pool_id
-    @pool_id ||= query.find_metatag(:pool, :ordpool)&.to_i
+  def selected_pool
+    value = query.find_metatag(:pool, :ordpool)
+    Pool.find_by_name(value) if value.present?
   end
 
-  def favgroup_id
-    @favgroup_id ||= query.find_metatag(:favgroup, :ordfavgroup)&.to_i
+  def selected_favgroup
+    value = query.find_metatag(:favgroup, :ordfavgroup)
+    FavoriteGroup.find_by_name_or_id(value, current_user) if value.present?
   end
 
   def query
     @query ||= PostQuery.new(search)
   end
 
-  memoize :favgroups
+  memoize :favgroups, :selected_pool, :selected_favgroup
 end

@@ -35,8 +35,15 @@ class PostNavbarComponentTest < ViewComponent::TestCase
         assert_css(".pool-name", text: "Pool: #{@pool2.pretty_name}")
       end
 
-      should "highlight the selected pool" do
+      should "highlight the selected pool when doing a pool:<id> search" do
         render_post_navbar(@post, current_user: @user, search: "pool:#{@pool1.id}")
+
+        assert_css(".pool-navbar[data-selected=true] .pool-name", text: "Pool: #{@pool1.pretty_name}")
+        assert_css(".pool-navbar[data-selected=false] .pool-name", text: "Pool: #{@pool2.pretty_name}")
+      end
+
+      should "highlight the selected pool when doing a pool:<name> search" do
+        render_post_navbar(@post, current_user: @user, search: "pool:#{@pool1.name}")
 
         assert_css(".pool-navbar[data-selected=true] .pool-name", text: "Pool: #{@pool1.pretty_name}")
         assert_css(".pool-navbar[data-selected=false] .pool-name", text: "Pool: #{@pool2.pretty_name}")
@@ -58,8 +65,15 @@ class PostNavbarComponentTest < ViewComponent::TestCase
         assert_css(".favgroup-name", text: "Favgroup: #{@favgroup2.pretty_name}")
       end
 
-      should "highlight the selected favgroup" do
+      should "highlight the selected favgroup when doing a favgroup:<id> search" do
         render_post_navbar(@post, current_user: @user, search: "favgroup:#{@favgroup1.id}")
+
+        assert_css(".favgroup-navbar[data-selected=true] .favgroup-name", text: "Favgroup: #{@favgroup1.pretty_name}")
+        assert_css(".favgroup-navbar[data-selected=false] .favgroup-name", text: "Favgroup: #{@favgroup2.pretty_name}")
+      end
+
+      should "highlight the selected favgroup when doing a favgroup:<name> search" do
+        render_post_navbar(@post, current_user: @user, search: "favgroup:#{@favgroup1.name}")
 
         assert_css(".favgroup-navbar[data-selected=true] .favgroup-name", text: "Favgroup: #{@favgroup1.pretty_name}")
         assert_css(".favgroup-navbar[data-selected=false] .favgroup-name", text: "Favgroup: #{@favgroup2.pretty_name}")

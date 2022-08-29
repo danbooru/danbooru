@@ -8,7 +8,7 @@
   <% end %>
 
   <% pools.each do |pool| %>
-    <% selected = pool_id == pool.id %>
+    <% selected = selected_pool == pool %>
     <% first_post_id = pool.post_ids.first %>
     <% last_post_id = pool.post_ids.last %>
     <% previous_post_id = pool.previous_post_id(post.id) %>
@@ -38,7 +38,7 @@
   <% end %>
 
   <% favgroups.each do |favgroup| %>
-    <% selected = favgroup_id == favgroup.id %>
+    <% selected = selected_favgroup == favgroup %>
     <% first_post_id = favgroup.post_ids.first %>
     <% last_post_id = favgroup.post_ids.last %>
     <% previous_post_id = favgroup.previous_post_id(post.id) %>
