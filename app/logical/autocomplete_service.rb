@@ -48,6 +48,7 @@ class AutocompleteService
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_results
     return [] if !enabled?
+    return autocomplete_opensearch(query) if type == :opensearch
 
     case type
     when :tag_query
@@ -68,11 +69,9 @@ class AutocompleteService
       autocomplete_favorite_group(query)
     when :saved_search_label
       autocomplete_saved_search_label(query)
-    when :opensearch
-      autocomplete_opensearch(query)
     else
       []
-    end
+    end.map { |result| OpenStruct.new(result) }
   end
 
   # Complete a tag search (a regular tag or a metatag)
@@ -238,7 +237,7 @@ class AutocompleteService
     pools = Pool.undeleted.name_matches(string).search(order: "post_count").limit(limit)
 
     pools.map do |pool|
-      { type: "pool", label: pool.pretty_name, value: pool.name, post_count: pool.post_count, category: pool.category }
+      { type: "pool", label: pool.pretty_name, value: pool.name, id: pool.id, post_count: pool.post_count, category: pool.category }
     end
   end
 
@@ -298,7 +297,7 @@ class AutocompleteService
     users = User.search(name_matches: string, current_user_first: true, order: "post_upload_count").limit(limit)
 
     users.map do |user|
-      { type: "user", label: user.pretty_name, value: user.name, level: user.level_string }
+      { type: "user", label: user.pretty_name, value: user.name, id: user.id, level: user.level_string.downcase }
     end
   end
 

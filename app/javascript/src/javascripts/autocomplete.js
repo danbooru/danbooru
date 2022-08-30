@@ -1,5 +1,6 @@
 let Autocomplete = {};
 
+Autocomplete.VERSION = 1; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
 Autocomplete.MAX_RESULTS = 10;
 
 Autocomplete.initialize_all = function() {
@@ -138,64 +139,28 @@ Autocomplete.on_tab = function(event) {
 };
 
 Autocomplete.render_item = function(list, item) {
-  var $link = $("<a/>");
-  $link.text(item.label);
-  $link.attr("href", "/posts?tags=" + encodeURIComponent(item.value));
-  $link.on("click.danbooru", function(e) {
-    e.preventDefault();
-  });
-
-  if (item.antecedent) {
-    var antecedent = item.antecedent.replace(/_/g, " ");
-    var arrow = $("<span/>").html(" &rarr; ").addClass("autocomplete-arrow");
-    var antecedent_element = $("<span/>").text(antecedent).addClass("autocomplete-antecedent");
-    $link.prepend([
-      antecedent_element,
-      arrow
-    ]);
-  }
-
-  if (item.post_count !== undefined) {
-    var count = item.post_count;
-
-    if (count >= 1000) {
-      count = Math.floor(count / 1000) + "k";
-    }
-
-    var $post_count = $("<span/>").addClass("post-count").css("float", "right").text(count);
-    $link.append($post_count);
-  }
-
-  if (/^tag/.test(item.type)) {
-    $link.addClass("tag-type-" + item.category);
-  } else if (item.type === "user") {
-    var level_class = "user-" + item.level.toLowerCase();
-    $link.addClass(level_class);
-  } else if (item.type === "pool") {
-    $link.addClass("pool-category-" + item.category);
-  }
-
-  var $menu_item = $("<div/>").append($link);
-  var $list_item = $("<li/>").data("item.autocomplete", item).append($menu_item);
-
-  var data_attributes = ["type", "antecedent", "value", "category", "post_count"];
-  data_attributes.forEach(attr => {
-    $list_item.attr(`data-autocomplete-${attr.replace(/_/g, "-")}`, item[attr]);
-  });
-
-  return $list_item.appendTo(list);
+  item.html.data("ui-autocomplete-item", item);
+  return list.append(item.html);
 };
 
-Autocomplete.autocomplete_source = function(query, type) {
+Autocomplete.autocomplete_source = async function(query, type) {
   if (query === "") {
     return [];
   }
 
-  return $.getJSON("/autocomplete.json", {
+  let html = await $.get("/autocomplete", {
     "search[query]": query,
     "search[type]": type,
+    "version": Autocomplete.VERSION,
     "limit": Autocomplete.MAX_RESULTS
   });
+
+  let items = $(html).find("li").toArray().map(item => {
+    let $item = $(item);
+    return { value: $item.attr("data-autocomplete-value"), html: $item };
+  });
+
+  return items;
 }
 
 Autocomplete.tag_prefixes = function() {

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AutocompleteController < ApplicationController
-  respond_to :xml, :json
+  respond_to :html, :xml, :json
 
   def index
     @query = params.dig(:search, :query)
@@ -14,6 +14,6 @@ class AutocompleteController < ApplicationController
     @public = @autocomplete.cache_publicly?
 
     expires_in @expires_in, public: @public unless response.cache_control.present?
-    respond_with(@results)
+    respond_with(@results, layout: false)
   end
 end
