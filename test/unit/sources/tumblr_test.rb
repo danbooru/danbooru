@@ -259,5 +259,15 @@ module Sources
         assert_nil(Source::URL.page_url("https://octrain1020.tumblr.com/"))
       end
     end
+
+    should "parse Tumblr URLs correctly" do
+      refute(Source::URL.image_url?("https://tumblr.com"))
+      refute(Source::URL.image_url?("https://www.tumblr.com"))
+      refute(Source::URL.image_url?("https://yogurtmedia.tumblr.com/post/45732863347"))
+
+      assert(Source::URL.image_url?("http://data.tumblr.com/07e7bba538046b2b586433976290ee1f/tumblr_o3gg44HcOg1r9pi29o1_raw.jpg"))
+      assert(Source::URL.image_url?("https://40.media.tumblr.com/de018501416a465d898d24ad81d76358/tumblr_nfxt7voWDX1rsd4umo1_r23_1280.jpg"))
+      assert(Source::URL.image_url?("https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4"))
+    end
   end
 end
