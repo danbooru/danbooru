@@ -1896,7 +1896,8 @@ CREATE TABLE public.tags (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_locked boolean DEFAULT false NOT NULL,
-    is_deprecated boolean DEFAULT false NOT NULL
+    is_deprecated boolean DEFAULT false NOT NULL,
+    words character varying[] DEFAULT '{}'::character varying[] NOT NULL
 );
 
 
@@ -4606,6 +4607,13 @@ CREATE INDEX index_tag_implications_on_forum_post_id ON public.tag_implications 
 
 
 --
+-- Name: index_tags_on_array_to_tsvector_words; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tags_on_array_to_tsvector_words ON public.tags USING gin (array_to_tsvector((words)::text[]));
+
+
+--
 -- Name: index_tags_on_is_deprecated; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5976,6 +5984,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220514175125'),
 ('20220525214746'),
 ('20220623052547'),
-('20220627211714');
+('20220627211714'),
+('20220829184824');
 
 
