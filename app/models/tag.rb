@@ -279,6 +279,24 @@ class Tag < ApplicationRecord
       def parsable_into_words?(name)
         name.match?(/[a-zA-Z0-9]{2}/)
       end
+
+      # True if the `string` contains all the words in the `query`.
+      #
+      # Tag.includes_all_words?("holding_hands", ["hand*", "hold*"]) => true
+      def includes_all_words?(string, query)
+        words = parse_words(string)
+        query.all? { |pattern| words.any? { |word| word.ilike?(pattern) }}
+      end
+
+      # Parse a string into a query for performing a word-based search.
+      #
+      # Tag.parse_query("holding_hand") => ["holding", "hand*"]
+      # Tag.parse_query("looking_at_") => ["looking", "at"]
+      def parse_query(string)
+        query = parse_words(string)
+        query[-1] += "*" unless string.match?(/[#{WORD_DELIMITERS}]\z/)
+        query
+      end
     end
   end
 
@@ -449,6 +467,19 @@ class Tag < ApplicationRecord
 
     consequent_aliases.find do |tag_alias|
       !name.ilike?(pattern) && tag_alias.antecedent_name.ilike?(pattern)
+    end
+  end
+
+  # If this tag has aliases, find the shortest alias matching the given pattern.
+  def tag_alias_for_word_pattern(query)
+    query = Tag.parse_query(query)
+    aliases = consequent_aliases.sort_by { |ca| [ca.antecedent_name.size, ca.antecedent_name] }
+
+    aliases.find do |tag_alias|
+      name_matches = Tag.includes_all_words?(name, query)
+      antecedent_matches = Tag.includes_all_words?(tag_alias.antecedent_name, query)
+
+      antecedent_matches && !name_matches
     end
   end
 

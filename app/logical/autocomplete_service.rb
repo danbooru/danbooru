@@ -78,8 +78,7 @@ class AutocompleteService
   #
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_tag_query
-    if parsed_query.metatags.one?
-      metatag = parsed_query.metatags.first
+    if metatag.present?
       autocomplete_metatag(metatag.name, metatag.value)
     else
       tag = Tag.normalize_name(query)
@@ -105,25 +104,67 @@ class AutocompleteService
       results = tag_other_name_matches(string)
     elsif string.starts_with?("/")
       results = tag_abbreviation_matches(string)
-      results = results.sort_by do |r|
-        [r[:antecedent].to_s.size, -r[:post_count]]
-      end
-
-      results = results.uniq { |r| r[:value] }.take(limit)
     elsif string.include?("*")
-      results = tag_matches(string)
-    else
-      results = tag_matches(string + "*")
+      results = tag_wildcard_matches(string)
+    elsif Tag.parsable_into_words?(string) # do a word match if the search contains at least 2 contiguous letters or numbers
+      results = tag_word_matches(string)
       results = tag_autocorrect_matches(string) if results.blank?
+    else
+      results = tag_prefix_matches(string)
     end
 
     results
   end
 
-  # Find tags or tag aliases matching a wildcard search.
+  # Find tags or tag aliases containing all the words in the search string, in any order.
+  # Example: "haruhi_suzumiya" => "suzumiya_haruhi_no_yuuutsu"
+  #
+  # Rank results with exact matches first (unless it's a small tag), then substring matches
+  # next (e.g. tags where the words are in the same order and next to each other), then word
+  # matches last (e.g. tag where the words are in a different order, or not next to each other).
+  #
   # @param string [String] the string to complete
   # @return [Array<Hash>] the autocomplete results
-  def tag_matches(string)
+  def tag_word_matches(string)
+    query = Tag.parse_query(string)
+
+    name_matches = Tag.nonempty.where_all_in_array_like(:words, query)
+    alias_matches = Tag.nonempty.where(name: TagAlias.active.joins(:antecedent_tag).where_all_in_array_like("tags.words", query).select(:consequent_name))
+    union = "((#{name_matches.to_sql}) UNION (#{alias_matches.to_sql})) AS tags"
+    tags = Tag.from(union).includes(:consequent_aliases).order(post_count: :desc, name: :asc).limit(100)
+
+    results = tags.map do |tag|
+      antecedent = tag.tag_alias_for_word_pattern(string)&.antecedent_name
+      { type: "tag-word", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
+    end
+
+    results = results.sort_by do |result|
+      name = result[:antecedent] || result[:value]
+      post_count = result[:post_count]
+
+      large = post_count > 100 ? 1 : 0
+      exact = name == string ? 1 : 0
+      substr = name.include?(string) ? 1 : 0
+
+      [-large, -exact, -substr, -post_count, result[:value]]
+    end
+
+    results.take(limit)
+  end
+
+  # Find tags or tag aliases starting with the given search string.
+  #
+  # @param string [String] the string to complete
+  # @return [Array<Hash>] the autocomplete results
+  def tag_prefix_matches(string)
+    tag_wildcard_matches(string + "*")
+  end
+
+  # Find tags or tag aliases matching a wildcard search.
+  #
+  # @param string [String] the string to complete
+  # @return [Array<Hash>] the autocomplete results
+  def tag_wildcard_matches(string)
     name_matches = Tag.nonempty.name_matches(string).order(post_count: :desc).limit(limit)
     alias_matches = Tag.nonempty.alias_matches(string).order(post_count: :desc).limit(limit)
     union = "((#{name_matches.to_sql}) UNION (#{alias_matches.to_sql})) AS tags"
@@ -148,9 +189,13 @@ class AutocompleteService
     string += "*" unless string.include?("*")
     tags = Tag.nonempty.abbreviation_matches(string).order(post_count: :desc).limit(limit)
 
-    tags.map do |tag|
+    results = tags.map do |tag|
       { type: "tag-abbreviation", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: "/" + tag.abbreviation }
+    end.sort_by do |r|
+      [r[:antecedent].to_s.size, -r[:post_count]]
     end
+
+    results.uniq { |r| r[:value] }.take(limit)
   end
 
   # Find tags matching a mispelled tag.
@@ -346,5 +391,9 @@ class AutocompleteService
     PostQuery.new(query)
   end
 
-  memoize :autocomplete_results, :parsed_query
+  def metatag
+    parsed_query.metatags.first if type == :tag_query && parsed_query.metatags.one?
+  end
+
+  memoize :autocomplete_results, :parsed_query, :metatag
 end

@@ -125,9 +125,24 @@ module Searchable
     where("? ~<< ANY(#{qualified_column_for(attr)})", "(?#{flags})#{regex}")
   end
 
+  # Perform a Postgres full-text search on an array of strings. Assumes the query is already escaped.
   # The column should have a `array_to_tsvector(column) using gin` index for best performance.
+  #
+  # @see https://www.postgresql.org/docs/current/datatype-textsearch.html#DATATYPE-TSQUERY
+  def where_array_to_tsvector_matches(attr, query)
+    where("array_to_tsvector(#{qualified_column_for(attr)}) @@ ?::tsquery", query)
+  end
+
   def where_any_in_array_starts_with(attr, value)
-    where("array_to_tsvector(#{qualified_column_for(attr)}) @@ ?", value.to_escaped_for_tsquery + ":*")
+    where_array_to_tsvector_matches(attr, value.to_escaped_for_tsquery + ":*")
+  end
+
+  def where_all_in_array_like(attr, patterns)
+    where_array_to_tsvector_matches(attr, escape_patterns_for_tsquery(patterns).join(" & "))
+  end
+
+  def where_any_in_array_like(attr, patterns)
+    where_array_to_tsvector_matches(attr, escape_patterns_for_tsquery(patterns).join(" | "))
   end
 
   def where_text_includes_lower(attr, values)
@@ -614,7 +629,19 @@ module Searchable
   private
 
   def qualified_column_for(attr)
+    return attr if attr.to_s.include?(".")
     "#{table_name}.#{column_for_attribute(attr).name}"
+  end
+
+  # @param patterns [Array<String>] An array of wildcard patterns to escape for a tsquery search.
+  def escape_patterns_for_tsquery(patterns)
+    patterns.map do |pattern|
+      if pattern.ends_with?("*")
+        pattern.delete_suffix("*").to_escaped_for_tsquery + ":*"
+      else
+        pattern.to_escaped_for_tsquery
+      end
+    end
   end
 
   # Convert a column name or a raw SQL fragment to an Arel node.
