@@ -4,11 +4,12 @@
       <div class="ui-menu-item-wrapper" tabindex="-1">
         <%= link_to_result result do %>
           <% if result.antecedent.present? %>
-            <span class="autocomplete-antecedent"><%= result.antecedent.tr("_", " ") %></span>
+            <span class="autocomplete-antecedent"><%= highlight_antecedent(result) %></span>
             <span class="autocomplete-arrow">→</span>
+            <%= result.label %>
+          <% else %>
+            <%= highlight_result(result) %>
           <% end %>
-
-          <%= result.label %>
         <% end %>
 
         <% if result.post_count %>
