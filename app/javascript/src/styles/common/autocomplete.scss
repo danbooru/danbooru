@@ -2,14 +2,20 @@
   font-size: var(--text-sm);
   border: 1px solid var(--autocomplete-border-color);
   box-shadow: var(--shadow-lg);
+  max-width: 480px;
 
   div.ui-menu-item-wrapper {
     padding: 0.25em 0.4em;
     border: none;
+    display: flex;
 
     &.ui-state-active {
       cursor: pointer;
       background-color: var(--autocomplete-selected-background-color);
+    }
+
+    > a {
+      flex-grow: 1;
     }
 
     span.autocomplete-arrow {
@@ -18,6 +24,7 @@
 
     span.post-count {
       margin-left: 1em;
+      align-self: center;
     }
   }
 
