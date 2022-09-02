@@ -171,6 +171,11 @@ class Tag < ApplicationRecord
   end
 
   concerning :NameMethods do
+    def name=(name)
+      super(name)
+      self.words = Tag.parse_words(name)
+    end
+
     def pretty_name
       name.tr("_", " ")
     end
@@ -232,6 +237,47 @@ class Tag < ApplicationRecord
         ModAction.log("marked the tag [[#{name}]] as not deprecated", :tag_undeprecate)
       elsif is_deprecated_was == false and is_deprecated == true
         ModAction.log("marked the tag [[#{name}]] as deprecated", :tag_deprecate)
+      end
+    end
+  end
+
+  concerning :WordMethods do
+    # Characters that delimit words in tags.
+    WORD_DELIMITERS = " _+:;!.\/()-"
+    WORD_DELIMITER_REGEX = /([#{WORD_DELIMITERS}]+)/
+
+    class_methods do
+      # Split the tag at word boundaries.
+      #
+      # Tag.split_words("jeanne_d'arc_alter_(fate)") => ["jeanne", "_", "d'arc", "_", "alter", "_(", "fate", ")"]
+      # Tag.split_words("k-on!") => ["k", "-", "on!"]
+      # Tag.split_words("<o>_<o>") => ["<o>_<o>"]
+      def split_words(name)
+        return [name] if !parsable_into_words?(name)
+
+        name.split(WORD_DELIMITER_REGEX).compact_blank
+      end
+
+      # Parse the tag into plain words, removing punctuation and delimiters.
+      #
+      # Tag.parse_words("jeanne_d'arc_alter_(fate)") => ["jeanne", "d'arc", "alter", "fate"]
+      # Tag.parse_words("k-on!") => ["k", "on"]
+      # Tag.parse_words("<o>_<o>") => ["<o>_<o>"]
+      def parse_words(name)
+        return [name] if !parsable_into_words?(name)
+
+        split_words(name).map do |word|
+          word.remove(/\A[^a-zA-Z0-9]+|[^a-zA-Z0-9]+\z/)
+        end.compact_blank
+      end
+
+      # True if the tag can be parsed into words (it contains at least 2 contiguous letters or numbers).
+      #
+      # Tag.parsable_into_words?("k-on!") => true
+      # Tag.parsable_into_words?("<o>_<o>") => false
+      # Tag.parsable_into_words?("m.u.g.e.n") => false
+      def parsable_into_words?(name)
+        name.match?(/[a-zA-Z0-9]{2}/)
       end
     end
   end

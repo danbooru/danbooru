@@ -140,6 +140,40 @@ class TagTest < ActiveSupport::TestCase
       end
     end
 
+    should "parse tag names into words" do
+      assert_equal(%w[very long hair], Tag.new(name: "very_long_hair").words)
+
+      assert_equal(%w[k on], Tag.new(name: "k-on!").words)
+      assert_equal(%w[hack], Tag.new(name: ".hack//").words)
+      assert_equal(%w[re zero], Tag.new(name: "re:zero").words)
+      assert_equal(%w[compass], Tag.new(name: "#compass").words)
+      assert_equal(%w[me me me], Tag.new(name: "me!me!me!").words)
+      assert_equal(%w[d gray man], Tag.new(name: "d.gray-man").words)
+      assert_equal(%w[steins gate], Tag.new(name: "steins;gate").words)
+      assert_equal(%w[ssss gridman], Tag.new(name: "ssss.gridman").words)
+      assert_equal(%w[yu gi oh 5d's], Tag.new(name: "yu-gi-oh!_5d's").words)
+      assert_equal(%w[jack o lantern], Tag.new(name: "jack-o'-lantern").words)
+      assert_equal(%w[d va overwatch], Tag.new(name: "d.va_(overwatch)").words)
+      assert_equal(%w[rosario vampire], Tag.new(name: "rosario+vampire").words)
+      assert_equal(%w[girls frontline], Tag.new(name: "girls'_frontline").words)
+      assert_equal(%w[fate grand order], Tag.new(name: "fate/grand_order").words)
+      assert_equal(%w[yorha no 2 type b], Tag.new(name: "yorha_no._2_type_b").words)
+      assert_equal(%w[love live sunshine], Tag.new(name: "love_live!_sunshine!!").words)
+      assert_equal(%w[jeanne d'arc alter ver shinjuku 1999 fate], Tag.new(name: "jeanne_d'arc_alter_(ver._shinjuku_1999)_(fate)").words)
+
+      assert_equal(%w[:o], Tag.new(name: ":o").words)
+      assert_equal(%w[o_o], Tag.new(name: "o_o").words)
+      assert_equal(%w[^_^], Tag.new(name: "^_^").words)
+      assert_equal(%w[^^^], Tag.new(name: "^^^").words)
+      assert_equal(%w[c.c.], Tag.new(name: "c.c.").words)
+      assert_equal(%w[\||/], Tag.new(name: '\||/').words)
+      assert_equal(%w[\(^o^)/], Tag.new(name: '\(^o^)/').words)
+      assert_equal(%w[<o>_<o>], Tag.new(name: "<o>_<o>").words)
+      assert_equal(%w[<|>_<|>], Tag.new(name: "<|>_<|>").words)
+      assert_equal(%w[k-----s], Tag.new(name: "k-----s").words)
+      assert_equal(%w[m.u.g.e.n], Tag.new(name: "m.u.g.e.n").words)
+    end
+
     context "during name validation" do
       # tags with spaces or uppercase are allowed because they are normalized
       # to lowercase with underscores.
