@@ -1,6 +1,6 @@
 <ul>
   <% autocomplete_results.each do |result| %>
-    <%= tag.li class: "ui-menu-item", "data-autocomplete-type": result.type, "data-autocomplete-antecedent": result.antecedent, "data-autocomplete-value": result.value, "data-autocomplete-category": result.category, "data-autocomplete-post-count": result.post_count do %>
+    <%= tag.li class: "ui-menu-item", "data-autocomplete-type": result.type, "data-autocomplete-value": result.value do %>
       <div class="ui-menu-item-wrapper" tabindex="-1">
         <%= link_to_result result do %>
           <% if result.antecedent.present? %>
