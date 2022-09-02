@@ -270,7 +270,7 @@ class AutocompleteService
     results = values.select { |v| v.starts_with?(value.downcase) }.sort.take(limit)
 
     results.map do |v|
-      { label: metatag + ":" + v, value: v }
+      { type: "static", label: v, value: v }
     end
   end
 
