@@ -24,8 +24,10 @@ class AutocompleteComponent < ApplicationComponent
   def highlight_antecedent(result)
     if result.type == "tag-word"
       highlight_matching_words(result.antecedent, query)
-    else
+    elsif query.include?("*")
       highlight_wildcard_match(result.antecedent, query)
+    else
+      highlight_wildcard_match(result.antecedent, query + "*")
     end
   end
 
@@ -38,8 +40,10 @@ class AutocompleteComponent < ApplicationComponent
       highlight_wildcard_match(result.label, "*" + metatag.value + "*")
     elsif metatag.present?
       highlight_wildcard_match(result.label, metatag.value + "*")
-    else
+    elsif query.include?("*")
       highlight_wildcard_match(result.value, query)
+    else
+      highlight_wildcard_match(result.value, query + "*")
     end
   end
 
