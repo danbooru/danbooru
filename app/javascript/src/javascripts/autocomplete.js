@@ -1,7 +1,7 @@
 let Autocomplete = {};
 
 Autocomplete.VERSION = 1; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
-Autocomplete.MAX_RESULTS = 10;
+Autocomplete.MAX_RESULTS = 20;
 
 Autocomplete.initialize_all = function() {
   $.widget("ui.autocomplete", $.ui.autocomplete, {
