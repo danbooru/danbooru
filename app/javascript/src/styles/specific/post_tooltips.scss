@@ -32,8 +32,13 @@ $tooltip-body-height: $tooltip-line-height * 6; // 4 lines high.
         margin-right: 0;
       }
 
-      .post-tooltip-body-left { flex: 0; }
-      .post-tooltip-body-right { flex: 1; }
+      .post-tooltip-body-left {
+        flex: 0;
+      }
+      .post-tooltip-body-right {
+        flex: 1;
+        min-width: 0;
+      }
     }
 
     div.post-tooltip-header {
