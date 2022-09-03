@@ -31,6 +31,17 @@ class AutocompleteService
   attr_reader :query, :type, :limit, :current_user, :enabled
   alias_method :enabled?, :enabled
 
+  # A Result represents a single autocomplete entry. `label` is the pretty name to
+  # display in the autocomplete menu and `value` is the actual string to insert.
+  class Result < Struct.new(:type, :label, :value, :category, :post_count, :id, :level, :antecedent, keyword_init: true)
+    include ActiveModel::Serializers::JSON
+    include ActiveModel::Serializers::Xml
+
+    def serializable_hash(...)
+      to_h.compact_blank
+    end
+  end
+
   # Perform completion for the given search type and query.
   # @param query [String] the string being completed
   # @param type [String] the type of completion being performed
@@ -71,7 +82,7 @@ class AutocompleteService
       autocomplete_saved_search_label(query)
     else
       []
-    end.map { |result| OpenStruct.new(result) }
+    end.map { |result| Result.new(result) }
   end
 
   # Complete a tag search (a regular tag or a metatag)
