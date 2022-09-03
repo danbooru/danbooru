@@ -243,14 +243,15 @@ class Tag < ApplicationRecord
 
   concerning :WordMethods do
     # Characters that delimit words in tags.
-    WORD_DELIMITERS = " _+:;!.\/()-"
-    WORD_DELIMITER_REGEX = /([#{WORD_DELIMITERS}]+)/
+    WORD_DELIMITERS = " _+:;!./()-"
+    WORD_DELIMITER_REGEX = /([#{WORD_DELIMITERS}]+[^a-zA-Z0-9]*|[^a-zA-Z0-9]*[#{WORD_DELIMITERS}]+|\A[^[a-zA-Z0-9]]+|[^[a-zA-Z0-9]]+\z)/
 
     class_methods do
       # Split the tag at word boundaries.
       #
       # Tag.split_words("jeanne_d'arc_alter_(fate)") => ["jeanne", "_", "d'arc", "_", "alter", "_(", "fate", ")"]
-      # Tag.split_words("k-on!") => ["k", "-", "on!"]
+      # Tag.split_words(%q{don't_say_"lazy"}) => ["don't", "_", "say", '_"', "lazy", '"']
+      # Tag.split_words("jack-o'-lantern") => ["jack", "-", "o", "'-", "lantern"]
       # Tag.split_words("<o>_<o>") => ["<o>_<o>"]
       def split_words(name)
         return [name] if !parsable_into_words?(name)
@@ -261,7 +262,8 @@ class Tag < ApplicationRecord
       # Parse the tag into plain words, removing punctuation and delimiters.
       #
       # Tag.parse_words("jeanne_d'arc_alter_(fate)") => ["jeanne", "d'arc", "alter", "fate"]
-      # Tag.parse_words("k-on!") => ["k", "on"]
+      # Tag.parse_words(%q{don't_say_"lazy"}) => ["don't", "say", "lazy"]
+      # Tag.parse_words("jack-o'-lantern") => ["jack", "o", "lantern"]
       # Tag.parse_words("<o>_<o>") => ["<o>_<o>"]
       def parse_words(name)
         return [name] if !parsable_into_words?(name)
