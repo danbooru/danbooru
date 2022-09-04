@@ -256,7 +256,7 @@ class Tag < ApplicationRecord
       def split_words(name)
         return [name] if !parsable_into_words?(name)
 
-        name.split(WORD_DELIMITER_REGEX).compact_blank
+        name.split(WORD_DELIMITER_REGEX).reject(&:empty?)
       end
 
       # Parse the tag into plain words, removing punctuation and delimiters.
