@@ -362,7 +362,7 @@ class AutocompleteService
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_mention(string)
     autocomplete_user(string).map do |result|
-      { **result, value: "@" + result[:value] }
+      { **result, type: "mention", value: "@" + result[:value] }
     end
   end
 
