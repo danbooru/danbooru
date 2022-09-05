@@ -24,6 +24,7 @@ class Source::URL::Tumblr < Source::URL
     # https://68.media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_250.gif
     # https://media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_500.gif
     # https://66.media.tumblr.com/b9395771b2d0435fe4efee926a5a7d9c/tumblr_pg2wu1L9DM1trd056o2_500h.png
+    # https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj
     in _, directory, file if image_url?
       @directory = directory
       parse_filename
@@ -87,6 +88,7 @@ class Source::URL::Tumblr < Source::URL
     # https://68.media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_250.gif
     # https://media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_500.gif
     # https://66.media.tumblr.com/b9395771b2d0435fe4efee926a5a7d9c/tumblr_pg2wu1L9DM1trd056o2_500h.png
+    # https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj
     # https://25.media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png
     # https://media.tumblr.com/0DNBGJovY5j3smfeQs8nB53z_500.jpg
     in *words, /\A\d+h?|raw\z/ => size

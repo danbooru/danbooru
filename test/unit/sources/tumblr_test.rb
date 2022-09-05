@@ -245,6 +245,26 @@ module Sources
       )
     end
 
+    context "A *.media.tumblr.com/tumblr_$id_$size.pnj URL" do
+      strategy_should_work(
+        "https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj",
+        image_urls: ["https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj"],
+        page_url: nil,
+        artist_name: nil,
+        download_size: 296_595,
+      )
+    end
+
+    context "A va.media.tumblr.com/tumblr_$id.mp4 URL" do
+      strategy_should_work(
+        "https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4",
+        image_urls: ["https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4"],
+        page_url: nil,
+        artist_name: nil,
+        download_size: 7_960_082,
+      )
+    end
+
     context "generating page urls" do
       should "work" do
         source1 = "https://octrain1020.tumblr.com/post/190713122589"
@@ -272,6 +292,7 @@ module Sources
       assert(Source::URL.image_url?("https://68.media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_250.gif"))
       assert(Source::URL.image_url?("https://media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_500.gif"))
       assert(Source::URL.image_url?("https://66.media.tumblr.com/b9395771b2d0435fe4efee926a5a7d9c/tumblr_pg2wu1L9DM1trd056o2_500h.png"))
+      assert(Source::URL.image_url?("https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj"))
 
       assert(Source::URL.image_url?("https://25.media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png"))
       assert(Source::URL.image_url?("https://media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_1280.png"))
