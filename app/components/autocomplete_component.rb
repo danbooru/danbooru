@@ -56,7 +56,7 @@ class AutocompleteComponent < ApplicationComponent
   # highlight_matching_words("very_long_hair", "long_ha*") => "<span>very_</span><b>long</b><span>_</span><b>hair</b>"
   def highlight_matching_words(target, pattern)
     pattern_words = Tag.parse_query(pattern)
-    pattern_words.sort_by! { |word| [word.include?("*") ? 0 : 1, -word.size] }
+    pattern_words.sort_by! { |word| [word.include?("*") ? 1 : 0, -word.size] }
 
     target_words = Tag.split_words(target)
     target_words.map do |word|
