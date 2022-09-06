@@ -101,13 +101,16 @@ class Source::Extractor
     end
 
     def post_url_from_image_html
+      return nil unless parsed_url.image_url? && parsed_url.file_ext&.in?(%w[jpg png pnj gif])
+
       extracted = image_url_html(parsed_url)&.at("[href*='/post/']")&.[](:href)
       Source::URL.parse(extracted)
     end
+    memoize :post_url_from_image_html
 
     def image_url_html(image_url)
       resp = http.cache(1.minute).headers(accept: "text/html").get(image_url)
-      return nil if resp.code != 200
+      return nil if resp.code != 200 || resp.mime_type != "text/html"
       resp.parse
     end
 

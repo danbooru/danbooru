@@ -97,7 +97,7 @@ Autocomplete.current_term = function($input) {
   let query = $input.get(0).value;
   let caret = $input.get(0).selectionStart;
   let regexp = new RegExp(`^[-~(]*(${Autocomplete.tag_prefixes().join("|")})?`);
-  let match = query.substring(0, caret).match(/\S*$/)[0].replace(regexp, "");
+  let match = query.substring(0, caret).match(/\S*$/)[0].replace(regexp, "").toLowerCase();
   return match;
 };
 

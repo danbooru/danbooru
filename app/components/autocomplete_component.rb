@@ -12,7 +12,7 @@ class AutocompleteComponent < ApplicationComponent
 
   def link_to_result(result, &block)
     case result.type
-    when "user"
+    when "user", "mention"
       link_to user_path(result.id), class: "user-#{result.level}", "@click.prevent": "", &block
     when "pool"
       link_to pool_path(result.id), class: "pool-category-#{result.category}", "@click.prevent": "", &block
@@ -32,14 +32,18 @@ class AutocompleteComponent < ApplicationComponent
   end
 
   def highlight_result(result)
-    if result.type == "tag-word"
-      highlight_matching_words(result.value, query)
-    elsif metatag.present? && metatag.value.include?("*")
+    if metatag.present? && metatag.value.include?("*")
       highlight_wildcard_match(result.label, metatag.value)
     elsif metatag.present? && metatag.name.in?(%w[pool favgroup])
       highlight_wildcard_match(result.label, "*" + metatag.value + "*")
+    elsif metatag.present? && metatag.name.in?(%w[ai unaliased])
+      highlight_matching_words(result.label, metatag.value)
     elsif metatag.present?
       highlight_wildcard_match(result.label, metatag.value + "*")
+    elsif result.type == "tag-word"
+      highlight_matching_words(result.value, query)
+    elsif result.type == "mention"
+      highlight_wildcard_match(result.label, query + "*")
     elsif query.include?("*")
       highlight_wildcard_match(result.value, query)
     else

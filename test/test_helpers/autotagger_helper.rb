@@ -1,6 +1,6 @@
 module AutotaggerHelper
   def mock_autotagger_evaluate(tags, http: Danbooru::Http.any_instance)
-    tags.keys.each { |name| create(:tag, name: name) }
+    tags.keys.each { |name| create(:tag, name: name.to_s) }
 
     Danbooru.config.stubs(:autotagger_url).returns("http://localhost:5000")
     body = [{ filename: "test.jpg", tags: tags }]
