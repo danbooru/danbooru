@@ -157,7 +157,14 @@ class AutocompleteService
       exact = name == string ? 1 : 0
       substr = name.include?(string) ? 1 : 0
 
-      [-large, -exact, -substr, -post_count, result[:value]]
+      # If the search contains punctuation, rank exact matches first then substring matches. Otherwise, if it
+      # doesn't contain any punctuation, rank exact matches among large tags before small tags. This is so we
+      # rank exact matches first, but not if they're random small character or artist tags with simple names.
+      if string.match?(/[^a-zA-Z0-9]/)
+        [-exact, -substr, -post_count, result[:value]]
+      else
+        [-large, -exact, -substr, -post_count, result[:value]]
+      end
     end
 
     results.take(limit)
