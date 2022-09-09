@@ -1885,6 +1885,43 @@ ALTER SEQUENCE public.tag_implications_id_seq OWNED BY public.tag_implications.i
 
 
 --
+-- Name: tag_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.tag_versions (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    tag_id bigint NOT NULL,
+    updater_id bigint,
+    previous_version_id bigint,
+    version integer NOT NULL,
+    name character varying NOT NULL,
+    category integer NOT NULL,
+    is_deprecated boolean NOT NULL
+);
+
+
+--
+-- Name: tag_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.tag_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: tag_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.tag_versions_id_seq OWNED BY public.tag_versions.id;
+
+
+--
 -- Name: tags; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2579,6 +2616,13 @@ ALTER TABLE ONLY public.tag_implications ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
+-- Name: tag_versions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tag_versions ALTER COLUMN id SET DEFAULT nextval('public.tag_versions_id_seq'::regclass);
+
+
+--
 -- Name: tags id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3036,6 +3080,14 @@ ALTER TABLE ONLY public.tag_aliases
 
 ALTER TABLE ONLY public.tag_implications
     ADD CONSTRAINT tag_implications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tag_versions tag_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tag_versions
+    ADD CONSTRAINT tag_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -4606,6 +4658,69 @@ CREATE INDEX index_tag_implications_on_forum_post_id ON public.tag_implications 
 
 
 --
+-- Name: index_tag_versions_on_category; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_versions_on_category ON public.tag_versions USING btree (category);
+
+
+--
+-- Name: index_tag_versions_on_is_deprecated; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_versions_on_is_deprecated ON public.tag_versions USING btree (is_deprecated);
+
+
+--
+-- Name: index_tag_versions_on_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_versions_on_name ON public.tag_versions USING btree (name text_pattern_ops);
+
+
+--
+-- Name: index_tag_versions_on_name_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_versions_on_name_trgm ON public.tag_versions USING gin (name public.gin_trgm_ops);
+
+
+--
+-- Name: index_tag_versions_on_previous_version_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_versions_on_previous_version_id ON public.tag_versions USING btree (previous_version_id);
+
+
+--
+-- Name: index_tag_versions_on_tag_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_versions_on_tag_id ON public.tag_versions USING btree (tag_id);
+
+
+--
+-- Name: index_tag_versions_on_tag_id_and_previous_version_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_tag_versions_on_tag_id_and_previous_version_id ON public.tag_versions USING btree (tag_id, previous_version_id);
+
+
+--
+-- Name: index_tag_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_versions_on_updater_id ON public.tag_versions USING btree (updater_id);
+
+
+--
+-- Name: index_tag_versions_on_version; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_versions_on_version ON public.tag_versions USING btree (version);
+
+
+--
 -- Name: index_tags_on_array_to_tsvector_words; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5132,6 +5247,22 @@ ALTER TABLE ONLY public.forum_posts
 
 
 --
+-- Name: tag_versions fk_rails_2e7ebfd4dd; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tag_versions
+    ADD CONSTRAINT fk_rails_2e7ebfd4dd FOREIGN KEY (tag_id) REFERENCES public.tags(id);
+
+
+--
+-- Name: tag_versions fk_rails_2eab2fbb85; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tag_versions
+    ADD CONSTRAINT fk_rails_2eab2fbb85 FOREIGN KEY (previous_version_id) REFERENCES public.tag_versions(id);
+
+
+--
 -- Name: wiki_page_versions fk_rails_2fc7c35d5a; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5153,6 +5284,14 @@ ALTER TABLE ONLY public.comments
 
 ALTER TABLE ONLY public.api_keys
     ADD CONSTRAINT fk_rails_32c28d0dc2 FOREIGN KEY (user_id) REFERENCES public.users(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: tag_versions fk_rails_373a0aa141; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.tag_versions
+    ADD CONSTRAINT fk_rails_373a0aa141 FOREIGN KEY (updater_id) REFERENCES public.users(id);
 
 
 --
@@ -5985,6 +6124,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220623052547'),
 ('20220627211714'),
 ('20220829184824'),
-('20220909205433');
+('20220909205433'),
+('20220909211649');
 
 
