@@ -1895,7 +1895,6 @@ CREATE TABLE public.tags (
     category integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    is_locked boolean DEFAULT false NOT NULL,
     is_deprecated boolean DEFAULT false NOT NULL,
     words character varying[] DEFAULT '{}'::character varying[] NOT NULL
 );
@@ -5985,6 +5984,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220525214746'),
 ('20220623052547'),
 ('20220627211714'),
-('20220829184824');
+('20220829184824'),
+('20220909205433');
 
 
