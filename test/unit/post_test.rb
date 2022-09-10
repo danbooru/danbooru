@@ -345,6 +345,22 @@ class PostTest < ActiveSupport::TestCase
         @post = FactoryBot.create(:post)
       end
 
+      context "with a new tag" do
+        should "create the new tag" do
+          tag1 = create(:tag, name: "foo", post_count: 100, category: Tag.categories.character)
+          create(:post, tag_string: "foo bar")
+          tag2 = Tag.find_by_name("bar")
+
+          assert_equal(101, tag1.reload.post_count)
+          assert_equal(Tag.categories.character, tag1.category)
+          assert_equal(0, tag1.versions.count)
+
+          assert_equal(1, tag2.post_count)
+          assert_equal(Tag.categories.general, tag2.category)
+          assert_equal(0, tag2.versions.count)
+        end
+      end
+
       context "with a banned artist" do
         setup do
           CurrentUser.scoped(FactoryBot.create(:admin_user)) do
@@ -490,7 +506,7 @@ class PostTest < ActiveSupport::TestCase
         should "not remove the tag if the tag was already in the post" do
           bad_tag = create(:tag, name: "bad_tag")
           old_post = create(:post, tag_string: "bad_tag")
-          bad_tag.update!(is_deprecated: true)
+          bad_tag.update!(is_deprecated: true, updater: create(:user))
           old_post.update!(tag_string: "asd bad_tag")
 
           assert_equal("asd bad_tag", old_post.reload.tag_string)
@@ -525,9 +541,30 @@ class PostTest < ActiveSupport::TestCase
       context "tagged with a metatag" do
         context "for a tag category prefix" do
           should "set the category of a new tag" do
-            create(:post, tag_string: "char:hoge")
+            create(:post, tag_string: "char:chen")
+            tag = Tag.find_by_name("chen")
 
-            assert_equal(Tag.categories.character, Tag.find_by_name("hoge").category)
+            assert_equal(Tag.categories.character, tag.category)
+            assert_equal(0, tag.versions.count)
+          end
+
+          should "change the category of an existing tag" do
+            user = create(:user)
+            tag = create(:tag, name: "hoge", post_count: 1)
+            post = as(user) { create(:post, tag_string: "char:hoge") }
+
+            assert_equal(Tag.categories.character, tag.reload.category)
+
+            assert_equal(2, tag.versions.count)
+            assert_equal(1, tag.first_version.version)
+            assert_nil(tag.first_version.updater)
+            assert_nil(tag.first_version.previous_version)
+            assert_equal(Tag.categories.general, tag.first_version.category)
+
+            assert_equal(2, tag.last_version.version)
+            assert_equal(user, tag.last_version.updater)
+            assert_equal(tag.first_version, tag.last_version.previous_version)
+            assert_equal(Tag.categories.character, tag.last_version.category)
           end
 
           should "change the category for an aliased tag" do

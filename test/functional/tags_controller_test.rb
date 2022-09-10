@@ -92,10 +92,24 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         @mod = create(:moderator_user)
       end
 
-      should "update the tag" do
-        put_auth tag_path(@tag), @user, params: {:tag => {:category => Tag.categories.general}}
+      should "update the category for an empty tag" do
+        @tag = create(:tag, category: Tag.categories.copyright, post_count: 0)
+        put_auth tag_path(@tag), @user, params: { tag: { category: Tag.categories.general }}
+
         assert_redirected_to tag_path(@tag)
         assert_equal(Tag.categories.general, @tag.reload.category)
+
+        assert_equal(2, @tag.versions.count)
+
+        assert_equal(1, @tag.first_version.version)
+        assert_equal(@tag.created_at, @tag.first_version.created_at)
+        assert_equal(@tag.created_at, @tag.first_version.updated_at)
+        assert_nil(@tag.first_version.updater)
+        assert_equal(Tag.categories.copyright, @tag.first_version.category)
+
+        assert_equal(2, @tag.last_version.version)
+        assert_equal(@user, @tag.last_version.updater)
+        assert_equal(Tag.categories.general, @tag.last_version.category)
       end
 
       context "for a tag with >50 posts" do
@@ -109,6 +123,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response 403
           assert_not_equal(Tag.categories.general, @tag.reload.category)
+          assert_equal(0, @tag.versions.count)
         end
 
         should "update the category for a builder" do
@@ -116,6 +131,12 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @tag
           assert_equal(Tag.categories.general, @tag.reload.category)
+
+          assert_equal(2, @tag.versions.count)
+          assert_nil(@tag.first_version.updater)
+          assert_equal(@user, @tag.last_version.updater)
+          assert_equal(Tag.categories.copyright, @tag.first_version.category)
+          assert_equal(Tag.categories.general, @tag.last_version.category)
         end
       end
 
@@ -139,6 +160,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response 403
           assert_equal(true, @deprecated_tag.reload.is_deprecated?)
+          assert_equal(0, @tag.versions.count)
         end
 
         should "remove the deprecated status if the user is admin" do
@@ -146,6 +168,12 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @deprecated_tag
           assert_equal(false, @deprecated_tag.reload.is_deprecated?)
+
+          assert_equal(2, @deprecated_tag.versions.count)
+          assert_nil(@deprecated_tag.first_version.updater)
+          assert_equal(@admin, @deprecated_tag.last_version.updater)
+          assert_equal(true, @deprecated_tag.first_version.is_deprecated)
+          assert_equal(false, @deprecated_tag.last_version.is_deprecated)
         end
 
         should "allow marking a tag as deprecated if it's empty" do
@@ -153,6 +181,12 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @nondeprecated_tag
           assert_equal(true, @nondeprecated_tag.reload.is_deprecated?)
+
+          assert_equal(2, @nondeprecated_tag.versions.count)
+          assert_nil(@nondeprecated_tag.first_version.updater)
+          assert_equal(@normal_user, @nondeprecated_tag.last_version.updater)
+          assert_equal(false, @nondeprecated_tag.first_version.is_deprecated)
+          assert_equal(true, @nondeprecated_tag.last_version.is_deprecated)
         end
 
         should "not allow marking a tag as deprecated if it's not empty" do
@@ -160,6 +194,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response 403
           assert_equal(false, @normal_tag.reload.is_deprecated?)
+          assert_equal(0, @normal_tag.versions.count)
         end
 
         should "allow admins to mark tags as deprecated" do
@@ -167,6 +202,12 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @normal_tag
           assert_equal(true, @normal_tag.reload.is_deprecated?)
+
+          assert_equal(2, @normal_tag.versions.count)
+          assert_nil(@normal_tag.first_version.updater)
+          assert_equal(@admin, @normal_tag.last_version.updater)
+          assert_equal(false, @normal_tag.first_version.is_deprecated)
+          assert_equal(true, @normal_tag.last_version.is_deprecated)
         end
 
         should "not allow deprecation of a tag with no wiki" do
@@ -174,15 +215,17 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response 403
           assert_equal(false, @tag_without_wiki.reload.is_deprecated?)
+          assert_equal(0, @tag_without_wiki.versions.count)
         end
       end
 
       should "not change category when the tag is too large to be changed by a builder" do
-        @tag.update(category: Tag.categories.general, post_count: 1001)
+        @tag = create(:tag, category: Tag.categories.general, post_count: 1001)
         put_auth tag_path(@tag), @user, params: {:tag => {:category => Tag.categories.artist}}
 
         assert_response :forbidden
         assert_equal(Tag.categories.general, @tag.reload.category)
+        assert_equal(0, @tag.versions.count)
       end
     end
   end

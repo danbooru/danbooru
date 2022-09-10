@@ -187,7 +187,7 @@ class Artist < ApplicationRecord
       return unless !is_deleted? && name_changed? && tag.present?
 
       if tag.category_name != "Artist" && tag.empty?
-        tag.update!(category: Tag.categories.artist)
+        tag.update!(category: Tag.categories.artist, updater: CurrentUser.user)
       end
     end
   end

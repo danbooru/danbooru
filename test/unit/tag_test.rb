@@ -72,12 +72,76 @@ class TagTest < ActiveSupport::TestCase
       tag = FactoryBot.create(:artist_tag)
       assert_equal(Tag.categories.artist, Cache.get("tc:#{Cache.hash(tag.name)}"))
 
-      tag.update_attribute(:category, Tag.categories.copyright)
+      tag.update!(category: Tag.categories.copyright, updater: create(:user))
       assert_equal(Tag.categories.copyright, Cache.get("tc:#{Cache.hash(tag.name)}"))
     end
 
     context "not be settable to an invalid category" do
       should validate_inclusion_of(:category).in_array(TagCategory.category_ids)
+    end
+  end
+
+  context "When a tag is created" do
+    should "not create a new version" do
+      tag = create(:tag, category: Tag.categories.character)
+
+      assert_equal(0, tag.versions.count)
+    end
+  end
+
+  context "When a tag is updated" do
+    should "create the initial version before the new version" do
+      user = create(:user)
+      tag = create(:tag, created_at: 1.year.ago, updated_at: 6.months.ago)
+      tag.update!(updater: user, category: Tag.categories.character, is_deprecated: true)
+
+      assert_equal(2, tag.versions.count)
+
+      assert_equal(1, tag.first_version.version)
+      assert_equal(tag.updated_at_before_last_save.round(4), tag.first_version.created_at.round(4))
+      assert_equal(tag.updated_at_before_last_save.round(4), tag.first_version.updated_at.round(4))
+      assert_nil(tag.first_version.updater)
+      assert_nil(tag.first_version.previous_version)
+      assert_equal(Tag.categories.general, tag.first_version.category)
+      assert_equal(false, tag.first_version.is_deprecated)
+
+      assert_equal(2, tag.last_version.version)
+      assert_equal(user, tag.last_version.updater)
+      assert_equal(tag.first_version, tag.last_version.previous_version)
+      assert_equal(Tag.categories.character, tag.last_version.category)
+      assert_equal(true, tag.last_version.is_deprecated)
+    end
+  end
+
+  context "When a tag is updated twice by the same user" do
+    should "not merge the edits" do
+      updated_at = 6.months.ago
+      user = create(:user)
+      tag = create(:tag, created_at: 1.year.ago, updated_at: updated_at)
+      travel_to(1.minute.ago) { tag.update!(updater: user, category: Tag.categories.character, is_deprecated: true) }
+      tag.update!(updater: user, category: Tag.categories.copyright)
+
+      assert_equal(3, tag.versions.count)
+
+      assert_equal(1, tag.versions[0].version)
+      assert_equal(updated_at.round(4), tag.versions[0].created_at.round(4))
+      assert_equal(updated_at.round(4), tag.versions[0].updated_at.round(4))
+      assert_nil(tag.versions[0].updater)
+      assert_nil(tag.versions[0].previous_version)
+      assert_equal(Tag.categories.general, tag.versions[0].category)
+      assert_equal(false, tag.versions[0].is_deprecated)
+
+      assert_equal(2, tag.versions[1].version)
+      assert_equal(user, tag.versions[1].updater)
+      assert_equal(tag.versions[0], tag.versions[1].previous_version)
+      assert_equal(Tag.categories.character, tag.versions[1].category)
+      assert_equal(true, tag.versions[1].is_deprecated)
+
+      assert_equal(3, tag.versions[2].version)
+      assert_equal(user, tag.versions[2].updater)
+      assert_equal(tag.versions[1], tag.versions[2].previous_version)
+      assert_equal(Tag.categories.copyright, tag.versions[2].category)
+      assert_equal(true, tag.versions[2].is_deprecated)
     end
   end
 

@@ -212,17 +212,17 @@ class BulkUpdateRequestProcessor
 
         when :change_category
           tag = Tag.find_or_create_by_name(args[0])
-          tag.update!(category: Tag.categories.value_for(args[1]))
+          tag.update!(category: Tag.categories.value_for(args[1]), updater: User.system)
 
         when :deprecate
           tag = Tag.find_or_create_by_name(args[0])
-          tag.update!(is_deprecated: true)
+          tag.update!(is_deprecated: true, updater: User.system)
           TagImplication.active.where(consequent_name: tag.name).each { |ti| ti.reject!(User.system) }
           TagImplication.active.where(antecedent_name: tag.name).each { |ti| ti.reject!(User.system) }
 
         when :undeprecate
           tag = Tag.find_or_create_by_name(args[0])
-          tag.update!(is_deprecated: false)
+          tag.update!(is_deprecated: false, updater: User.system)
 
         else
           # should never happen

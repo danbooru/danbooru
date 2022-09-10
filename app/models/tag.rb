@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
 class Tag < ApplicationRecord
+  include Versionable
+
   ABBREVIATION_REGEXP = /([a-z0-9])[a-z0-9']*($|[^a-z0-9']+)/
 
   # Tags that are permitted to have unbalanced parentheses, as a special exception to the normal rule that parentheses in tags must balanced.
   PERMITTED_UNBALANCED_TAGS = %w[:) :( ;) ;( >:) >:(]
+
+  attr_accessor :updater
 
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
@@ -24,6 +28,8 @@ class Tag < ApplicationRecord
   before_save :create_mod_action
   after_save :update_category_cache, if: :saved_change_to_category?
   after_save :update_category_post_counts, if: :saved_change_to_category?
+
+  versionable :name, :category, :is_deprecated, merge_window: nil, delay_first_version: true
 
   scope :empty, -> { where("tags.post_count <= 0") }
   scope :nonempty, -> { where("tags.post_count > 0") }
@@ -194,10 +200,11 @@ class Tag < ApplicationRecord
       end
 
       def find_or_create_by_name(name, category: nil, current_user: nil)
-        tag = find_or_create_by(name: normalize_name(name))
+        cat_id = categories.value_for(category)
+        tag = create_with(category: cat_id).find_or_create_by(name: normalize_name(name))
 
-        if category.present? && current_user.present? && Pundit.policy!(current_user, tag).can_change_category?
-          tag.update(category: categories.value_for(category))
+        if category.present? && current_user.present? && cat_id != tag.category && Pundit.policy!(current_user, tag).can_change_category?
+          tag.update(category: cat_id, updater: current_user)
         end
 
         tag
