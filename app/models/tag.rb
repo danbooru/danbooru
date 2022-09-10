@@ -193,39 +193,14 @@ class Tag < ApplicationRecord
         names.map {|x| find_or_create_by_name(x).name}
       end
 
-      def find_or_create_by_name(name, creator: CurrentUser.user)
-        name = normalize_name(name)
-        category = nil
+      def find_or_create_by_name(name, category: nil, current_user: nil)
+        tag = find_or_create_by(name: normalize_name(name))
 
-        if name =~ /\A(#{categories.regexp}):(.+)\Z/
-          category = $1
-          name = $2
+        if category.present? && current_user.present? && Pundit.policy!(current_user, tag).can_change_category?
+          tag.update!(category: categories.value_for(category))
         end
 
-        tag = find_by_name(name)
-
-        if tag
-          if category
-            category_id = categories.value_for(category)
-
-            # in case a category change hasn't propagated to this server yet,
-            # force an update the local cache. This may get overwritten in the
-            # next few lines if the category is changed.
-            tag.update_category_cache
-
-            if Pundit.policy!(creator, tag).can_change_category?
-              tag.update(category: category_id)
-            end
-          end
-
-          tag
-        else
-          Tag.new.tap do |t|
-            t.name = name
-            t.category = categories.value_for(category)
-            t.save
-          end
-        end
+        tag
       end
     end
   end
@@ -440,7 +415,7 @@ class Tag < ApplicationRecord
   concerning :CosplayTagMethods do
     def create_character_tag_for_cosplay_tag
       character_name = name.delete_suffix("_(cosplay)")
-      Tag.find_or_create_by_name("char:#{character_name}")
+      Tag.find_or_create_by_name(character_name, category: "character", current_user: CurrentUser.user)
     end
 
     def is_cosplay_tag?

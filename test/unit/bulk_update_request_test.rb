@@ -165,6 +165,13 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(["Can't create alias tag -> tag_ ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
         end
 
+        should "fail if the consequent name contains a tag type prefix" do
+          @bur = build(:bulk_update_request, script: "alias blah -> char:bar")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create alias blah -> char:bar ('char:bar' cannot begin with 'char:')"], @bur.errors.full_messages)
+        end
+
         should "be case-insensitive" do
           @bur = create_bur!("CREATE ALIAS AAA -> BBB", @admin)
 

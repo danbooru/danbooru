@@ -215,7 +215,7 @@ class Artist < ApplicationRecord
 
         # potential race condition but unlikely
         unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
-          Tag.find_or_create_by_name("artist:banned_artist") # ensure the banned_artist exists and is an artist tag.
+          Tag.find_or_create_by_name("banned_artist", category: "artist", current_user: banner)
           TagImplication.approve!(antecedent_name: name, consequent_name: "banned_artist", approver: banner)
         end
 

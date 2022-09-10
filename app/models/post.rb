@@ -590,7 +590,7 @@ class Post < ApplicationRecord
           self.source = value
 
         in category, name if category.in?(PostEdit::CATEGORIZATION_METATAGS)
-          Tag.find_or_create_by_name("#{category}:#{name}", creator: CurrentUser.user)
+          Tag.find_or_create_by_name(name, category: category, current_user: CurrentUser.user)
 
         else
           nil

@@ -98,6 +98,10 @@ class ArtistTest < ActiveSupport::TestCase
         assert_equal("aaa banned_artist", @post.reload.tag_string)
       end
 
+      should "create the banned_artist tag if it doesn't already exist" do
+        assert_equal(true, Tag.exists?(name: "banned_artist", category: Tag.categories.artist))
+      end
+
       should "set the approver of the banned_artist implication" do
         ta = TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").first
         assert_equal(@admin.id, ta.approver.id)

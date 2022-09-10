@@ -93,7 +93,7 @@ class TagTest < ActiveSupport::TestCase
       tag = FactoryBot.create(:tag)
       assert_difference("Tag.count", 0) do
         assert_equal(Tag.categories.general, tag.category)
-        Tag.find_or_create_by_name("artist:#{tag.name}")
+        Tag.find_or_create_by_name(tag.name, category: "artist", current_user: @builder)
         tag.reload
         assert_equal(Tag.categories.artist, tag.category)
       end
@@ -101,14 +101,14 @@ class TagTest < ActiveSupport::TestCase
 
     should "not change category when the tag is too large to be changed by a builder" do
       tag = FactoryBot.create(:tag, post_count: 1001)
-      Tag.find_or_create_by_name("artist:#{tag.name}", creator: @builder)
+      Tag.find_or_create_by_name(tag.name, category: "artist", current_user: @builder)
 
       assert_equal(0, tag.reload.category)
     end
 
     should "not change category when the tag is too large to be changed by a member" do
       tag = FactoryBot.create(:tag, post_count: 51)
-      Tag.find_or_create_by_name("artist:#{tag.name}", creator: FactoryBot.create(:member_user))
+      Tag.find_or_create_by_name(tag.name, category: "artist", current_user: create(:member_user))
 
       assert_equal(0, tag.reload.category)
     end
@@ -118,7 +118,7 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(1, post.tag_count_general)
       assert_equal(0, post.tag_count_character)
 
-      tag = Tag.find_or_create_by_name("char:test")
+      tag = Tag.find_or_create_by_name("test", category: "char", current_user: @builder)
       post.reload
       assert_equal(0, post.tag_count_general)
       assert_equal(1, post.tag_count_character)
@@ -134,7 +134,7 @@ class TagTest < ActiveSupport::TestCase
 
     should "be created with the type when one doesn't exist" do
       assert_difference("Tag.count", 1) do
-        tag = Tag.find_or_create_by_name("artist:hoge")
+        tag = Tag.find_or_create_by_name("hoge", category: "artist", current_user: @builder)
         assert_equal("hoge", tag.name)
         assert_equal(Tag.categories.artist, tag.category)
       end
