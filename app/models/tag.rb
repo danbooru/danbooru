@@ -368,39 +368,6 @@ class Tag < ApplicationRecord
 
       q
     end
-
-    def names_matches_with_aliases(name, limit)
-      name = normalize_name(name)
-      wildcard_name = "#{name}*"
-
-      query1 =
-        Tag
-        .nonempty
-        .select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
-        .name_matches(wildcard_name)
-        .order(post_count: :desc)
-        .limit(limit)
-
-      query2 =
-        TagAlias
-        .select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
-        .joins("INNER JOIN tags ON tags.name = tag_aliases.consequent_name")
-        .where_like(:antecedent_name, wildcard_name)
-        .active
-        .where_not_like("tags.name", wildcard_name)
-        .where("tags.post_count > 0")
-        .order("tags.post_count desc")
-        .limit(limit * 2) # Get extra records in case some duplicates get filtered out.
-
-      sql_query = "((#{query1.to_sql}) UNION ALL (#{query2.to_sql})) AS unioned_query"
-      tags = Tag.select("DISTINCT ON (name, post_count) *").from(sql_query).order("post_count desc").limit(limit)
-
-      if tags.empty?
-        tags = Tag.select("tags.name, tags.post_count, tags.category, null AS antecedent_name").fuzzy_name_matches(name).order_similarity(name).nonempty.limit(limit)
-      end
-
-      tags
-    end
   end
 
   def self.automatic_tags_for(names)
