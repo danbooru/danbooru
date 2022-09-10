@@ -197,7 +197,7 @@ class Tag < ApplicationRecord
         tag = find_or_create_by(name: normalize_name(name))
 
         if category.present? && current_user.present? && Pundit.policy!(current_user, tag).can_change_category?
-          tag.update!(category: categories.value_for(category))
+          tag.update(category: categories.value_for(category))
         end
 
         tag

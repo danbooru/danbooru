@@ -523,28 +523,28 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "tagged with a metatag" do
-        context "for typing a tag" do
-          setup do
-            @post = FactoryBot.create(:post, tag_string: "char:hoge")
-            @tags = @post.tag_array
+        context "for a tag category prefix" do
+          should "set the category of a new tag" do
+            create(:post, tag_string: "char:hoge")
+
+            assert_equal(Tag.categories.character, Tag.find_by_name("hoge").category)
           end
 
-          should "change the type" do
-            assert(Tag.where(name: "hoge", category: 4).exists?, "expected 'moge' tag to be created as a character")
-          end
-        end
+          should "change the category for an aliased tag" do
+            create(:tag_alias, antecedent_name: "hoge", consequent_name: "moge")
+            post = create(:post, tag_string: "char:hoge")
 
-        context "for typing an aliased tag" do
-          setup do
-            @alias = FactoryBot.create(:tag_alias, antecedent_name: "hoge", consequent_name: "moge")
-            @post = FactoryBot.create(:post, tag_string: "char:hoge")
-            @tags = @post.tag_array
+            assert_equal(["moge"], post.tag_array)
+            assert_equal(Tag.categories.general, Tag.find_by_name("moge").category)
+            assert_equal(Tag.categories.character, Tag.find_by_name("hoge").category)
           end
 
-          should "change the type" do
-            assert_equal(["moge"], @tags)
-            assert(Tag.where(name: "moge", category: 0).exists?, "expected 'moge' tag to be created as a character")
-            assert(Tag.where(name: "hoge", category: 4).exists?, "expected 'moge' tag to be created as a character")
+          should "not raise an exception for an invalid tag name" do
+            post = create(:post, tag_string: "tagme char:copy:blah")
+
+            assert_match(/Couldn't add tag: 'copy:blah' cannot begin with 'copy:'/, post.warnings[:base].join("\n"))
+            assert_equal(["tagme"], post.tag_array)
+            assert_equal(false, Tag.exists?(name: "copy:blah"))
           end
         end
 
