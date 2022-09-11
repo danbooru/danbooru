@@ -7,7 +7,8 @@
 
     <ul>
       <% unless @wiki_page.is_meta_wiki? %>
-        <li><%= link_to "Tag History", post_versions_path(search: { changed_tags: @wiki_page.title }) %></li>
+        <li><%= link_to "Tag History", tag_versions_path(search: { tag_id: @wiki_page.tag.id }) %></li>
+        <li><%= link_to "Post History", post_versions_path(search: { changed_tags: @wiki_page.title }) %></li>
       <% end %>
       <li><%= link_to "Wiki History", wiki_page_versions_path(search: { wiki_page_id: @wiki_page.id }) %></li>
       <% if Danbooru.config.forum_enabled?.to_s.truthy? %>

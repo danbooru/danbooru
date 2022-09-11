@@ -78,6 +78,11 @@ module VersionFor
     previous_version.nil?
   end
 
+  # True if this version was updated after it was created (it was a merged edit).
+  def revised?
+    updated_at > created_at
+  end
+
   # Return a hash of changes made by this edit (compared to the previous version, or to another version).
   #
   # The hash looks like `{ attr => [old_value, new_value] }`.

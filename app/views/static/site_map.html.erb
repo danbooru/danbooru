@@ -48,9 +48,10 @@
         <li><h2>Tags</h2></li>
         <li><%= link_to_wiki "Help", "help:tags" %></li>
         <li><%= link_to_wiki "Cheat sheet", "help:cheatsheet" %></li>
+        <li><%= link_to("Listing", tags_path) %></li>
+        <li><%= link_to("History", tag_versions_path) %></li>
         <li><%= link_to("Aliases", tag_aliases_path) %></li>
         <li><%= link_to("Implications", tag_implications_path) %></li>
-        <li><%= link_to("Listing", tags_path) %></li>
         <li><%= link_to("AI Tags", ai_tags_path) %></li>
         <li><%= link_to("Related Tags", related_tag_path) %></li>
       </ul>

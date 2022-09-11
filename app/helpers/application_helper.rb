@@ -198,8 +198,8 @@ module ApplicationHelper
     link_to ip_addr.to_s, ip_addresses_path(search: { ip_addr: ip, group_by: "user" }), **options
   end
 
-  def link_to_search(search)
-    link_to search, posts_path(tags: search)
+  def link_to_search(tag, **options)
+    link_to tag.name, posts_path(tags: tag.name), class: tag_class(tag), **options
   end
 
   def link_to_wiki(text, title = text, **options)

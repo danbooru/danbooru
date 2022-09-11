@@ -251,6 +251,7 @@ Rails.application.routes.draw do
   resources :tags
   resources :tag_aliases, only: [:show, :index, :destroy]
   resources :tag_implications, only: [:show, :index, :destroy]
+  resources :tag_versions, only: [:index, :show]
 
   get "/redeem", to: "upgrade_codes#redeem", as: "redeem_upgrade_codes"
   resources :upgrade_codes, only: [:create, :index] do
