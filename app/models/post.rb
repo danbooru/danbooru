@@ -28,8 +28,8 @@ class Post < ApplicationRecord
 
   normalize :source, :normalize_source
   before_validation :merge_old_changes
-  before_validation :normalize_tags
   before_validation :apply_pre_metatags
+  before_validation :normalize_tags
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
@@ -385,10 +385,11 @@ class Post < ApplicationRecord
       if old_rating == rating
         self.rating = rating_before_last_save || rating_was
       end
+
+      @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
     end
 
     def normalize_tags
-      @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
       self.tag_string = Tag.create_for_list(post_edit.tag_names).uniq.sort.join(" ")
     end
 

@@ -977,19 +977,19 @@ class PostTest < ActiveSupport::TestCase
           should 'set the source with source:"foo bar baz"' do
             @post.update(tag_string: 'aaa source:"foo bar baz" bbb')
             assert_equal("foo bar baz", @post.source)
-            assert_equal("aaa bbb", @post.tag_string)
+            assert_equal("aaa bbb non-web_source", @post.tag_string)
           end
 
           should "set the source with source:'foo bar baz'" do
             @post.update(tag_string: "aaa source:'foo bar baz' bbb")
             assert_equal("foo bar baz", @post.source)
-            assert_equal("aaa bbb", @post.tag_string)
+            assert_equal("aaa bbb non-web_source", @post.tag_string)
           end
 
           should "set the source with source:foo\\ bar\\ baz" do
             @post.update(tag_string: "aaa source:foo\\ bar\\ baz bbb")
             assert_equal("foo bar baz", @post.source)
-            assert_equal("aaa bbb", @post.tag_string)
+            assert_equal("aaa bbb non-web_source", @post.tag_string)
           end
 
           should 'strip the source with source:"  foo bar baz  "' do
@@ -1001,6 +1001,11 @@ class PostTest < ActiveSupport::TestCase
             @post.update(:source => "foobar")
             @post.update(:tag_string => "source:none")
             assert_equal("", @post.source)
+          end
+
+          should "give priority to the source: metatag over the source field" do
+            @post.update(tag_string: "source:me", source: "I made it up")
+            assert_equal("me", @post.source)
           end
 
           should "set the pixiv id with source:https://img18.pixiv.net/img/evazion/14901720.png" do
@@ -1174,6 +1179,14 @@ class PostTest < ActiveSupport::TestCase
           @post.update!(source: "this was once revealed to me in a dream")
           assert_equal("non-web_source tag1 tag2", @post.tag_string)
         end
+
+        should "remove the non-web_source tag when using the source: metatag" do
+          @post.update!(tag_string: "aaa source:me")
+          assert_equal("aaa non-web_source", @post.tag_string)
+
+          @post.update!(tag_string: "aaa source:https://www.example.com")
+          assert_equal("aaa", @post.tag_string)
+        end
       end
 
       context "a post with a bad_link source" do
@@ -1200,6 +1213,14 @@ class PostTest < ActiveSupport::TestCase
           @post.update!(tag_string: "bad_link tag1 tag2", source: "https://www.example.com/image.jpg")
           assert_equal("bad_link tag1 tag2", @post.tag_string)
         end
+
+        should "remove the bad_link tag when using the source: metatag" do
+          @post.update!(tag_string: "aaa source:https://pbs.twimg.com/media/FQjQA1mVgAMcHLv.jpg:orig")
+          assert_equal("aaa bad_link", @post.tag_string)
+
+          @post.update!(tag_string: "aaa source:https://i.pximg.net/img-original/img/2022/04/25/08/03/14/97867015_p0.png")
+          assert_equal("aaa", @post.tag_string)
+        end
       end
 
       context "a post with a bad source" do
@@ -1225,6 +1246,14 @@ class PostTest < ActiveSupport::TestCase
         should "not remove the bad_source tag for unknown sources" do
           @post.update!(tag_string: "bad_source tag1 tag2", source: "https://www.example.com/image.html")
           assert_equal("bad_source tag1 tag2", @post.tag_string)
+        end
+
+        should "remove the bad_source tag when using the source: metatag" do
+          @post.update!(tag_string: "aaa source:https://twitter.com/danboorubot/")
+          assert_equal("aaa bad_source", @post.tag_string)
+
+          @post.update!(tag_string: "aaa source:https://twitter.com/kafun/status/1520766650907521024")
+          assert_equal("aaa", @post.tag_string)
         end
       end
 
