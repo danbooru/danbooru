@@ -25,7 +25,6 @@ class Tag < ApplicationRecord
   validates :category, inclusion: { in: TagCategory.category_ids }
 
   before_create :create_character_tag_for_cosplay_tag, if: :is_cosplay_tag?
-  before_save :create_mod_action
   after_save :update_category_cache, if: :saved_change_to_category?
   after_save :update_category_post_counts, if: :saved_change_to_category?
 
@@ -208,17 +207,6 @@ class Tag < ApplicationRecord
         end
 
         tag
-      end
-    end
-  end
-
-  concerning :DeprecationMethods do
-    def create_mod_action
-      return if CurrentUser.user == User.system
-      if is_deprecated_was == true and is_deprecated == false
-        ModAction.log("marked the tag [[#{name}]] as not deprecated", :tag_undeprecate)
-      elsif is_deprecated_was == false and is_deprecated == true
-        ModAction.log("marked the tag [[#{name}]] as deprecated", :tag_deprecate)
       end
     end
   end
