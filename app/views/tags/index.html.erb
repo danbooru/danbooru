@@ -16,13 +16,69 @@
 
         <%= tag.span humanized_number(t.post_count), class: "post-count", title: t.post_count %>
       <% end %>
+
       <% t.column column: "control" do |tag| %>
-        <% if policy(tag).update? %>
-          <%= link_to "Edit", edit_tag_path(tag) %> |
+        <%= render PopupMenuComponent.new do |menu| %>
+          <% if policy(tag).update? %>
+            <% menu.item do %>
+              <%= link_to "Edit", edit_tag_path(tag) %>
+            <% end %>
+          <% end %>
+
+          <% menu.item do %>
+            <%= link_to "Tag history", tag_versions_path(search: { tag_id: tag.id }) %>
+          <% end %>
+
+          <% menu.item do %>
+            <%= link_to "Post history", post_versions_path(search: { changed_tags: tag.name }) %>
+          <% end %>
+
+          <% menu.item do %>
+            <hr class="border">
+          <% end %>
+
+          <% menu.item do %>
+            <%= link_to "Related tags", related_tag_path(search: { query: tag.name }) %>
+          <% end %>
+
+          <% menu.item do %>
+            <%= link_to "Similar tags", tags_path(search: { fuzzy_name_matches: tag.name, order: :similarity }) %>
+          <% end %>
+
+          <% menu.item do %>
+            <hr class="border">
+          <% end %>
+
+          <% menu.item do %>
+            <%= link_to "Aliases", tag_aliases_path(search: { name_matches: tag.name }) %>
+          <% end %>
+
+          <% menu.item do %>
+            <%= link_to "Implications", tag_implications_path(search: { name_matches: tag.name }) %>
+          <% end %>
+
+          <% menu.item do %>
+            <%= link_to "Comments", comments_path(search: { post_tags_match: tag.name }) %>
+          <% end %>
+
+          <% menu.item do %>
+            <%= link_to "Discussions", forum_posts_path(search: { linked_to: tag.name }) %>
+          <% end %>
+
+          <% if !tag.meta? %>
+            <% menu.item do %>
+              <hr class="border">
+            <% end %>
+
+            <% menu.item do %>
+              <%= link_to "Untagged posts", ai_tags_path(search: { tag_name: tag.name, post_tags_match: "-#{tag.name}", is_posted: true, order: "score_desc" }) %>
+            <% end %>
+
+            <% menu.item do %>
+              <%= link_to "Mistagged posts", posts_path(tags: "#{tag.name} ai:#{tag.name},0%") %>
+            <% end %>
+          <% end %>
         <% end %>
-        <%= link_to "History", post_versions_path(search: { changed_tags: tag.name }) %> |
-        <%= link_to "Related", related_tag_path(search: { query: tag.name }) %> |
-        <%= link_to "Similar", tags_path(search: { fuzzy_name_matches: tag.name, order: :similarity }) %>
       <% end %>
     <% end %>
 
