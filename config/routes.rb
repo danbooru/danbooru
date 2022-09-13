@@ -23,11 +23,6 @@ Rails.application.routes.draw do
   end
   namespace :moderator do
     resource :dashboard, :only => [:show]
-    resources :ip_addrs, :only => [:index] do
-      collection do
-        get :search
-      end
-    end
     namespace :post do
       resources :posts, :only => [:delete, :expunge, :confirm_delete] do
         member do

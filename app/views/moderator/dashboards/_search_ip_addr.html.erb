@@ -1,5 +1,0 @@
-<%= search_form_for(moderator_ip_addrs_path) do |f| %>
-  <%= f.input :ip_addr, label: "IPs ", hint: "Separate with spaces", input_html: { value: params.dig(:search, :ip_addr) } %>
-  <%= f.input :user_name, label: "Users", hint: "Separate with spaces", input_html: { value: params.dig(:search, :user_name), "data-autocomplete": "user" } %>
-  <%= f.submit "Search" %>
-<% end %>
