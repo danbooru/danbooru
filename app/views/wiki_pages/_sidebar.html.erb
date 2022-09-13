@@ -2,19 +2,31 @@
   <%= render "posts/partials/index/blacklist" %>
   <%= render "wiki_pages/recent_changes" %>
 
-  <% if @wiki_page.present? %>
+  <% if @wiki_page.present? && !@wiki_page.new_record? %>
     <h2>Options</h2>
 
     <ul>
       <% unless @wiki_page.is_meta_wiki? %>
-        <li><%= link_to "Tag History", tag_versions_path(search: { tag_id: @wiki_page.tag.id }) %></li>
-        <li><%= link_to "Post History", post_versions_path(search: { changed_tags: @wiki_page.title }) %></li>
+        <% if @wiki_page.tag.present? %>
+          <li><%= link_to "Tag History", tag_versions_path(search: { tag_id: @wiki_page.tag&.id }) %></li>
+        <% end %>
+
+        <% if @wiki_page.title.present? %>
+          <li><%= link_to "Post History", post_versions_path(search: { changed_tags: @wiki_page.title }) %></li>
+        <% end %>
       <% end %>
-      <li><%= link_to "Wiki History", wiki_page_versions_path(search: { wiki_page_id: @wiki_page.id }) %></li>
-      <% if Danbooru.config.forum_enabled?.to_s.truthy? %>
+
+      <% if @wiki_page.id.present? %>
+        <li><%= link_to "Wiki History", wiki_page_versions_path(search: { wiki_page_id: @wiki_page.id }) %></li>
+      <% end %>
+
+      <% if Danbooru.config.forum_enabled?.to_s.truthy? && @wiki_page.title.present? %>
         <li><%= link_to "Discussions", forum_posts_path(search: { linked_to: @wiki_page.title }) %></li>
       <% end %>
-      <li><%= link_to "What Links Here", wiki_pages_path(search: { linked_to: @wiki_page.title }) %></li>
+
+      <% if @wiki_page.title.present? %>
+        <li><%= link_to "What Links Here", wiki_pages_path(search: { linked_to: @wiki_page.title }) %></li>
+      <% end %>
     </ul>
   <% end %>
 <% end %>

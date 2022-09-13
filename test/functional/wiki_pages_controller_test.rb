@@ -97,6 +97,14 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for a wiki without a tag" do
+        @wiki_page = create(:wiki_page, title: "help:foo")
+        get wiki_page_path(@wiki_page)
+
+        assert(@wiki_page.tag.nil?)
+        assert_response :success
+      end
+
       should "show the 'does not exist' page for a nonexistent title" do
         get wiki_page_path("what")
 
