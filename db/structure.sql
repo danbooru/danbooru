@@ -2081,6 +2081,296 @@ CREATE TABLE public.user_events (
 
 
 --
+-- Name: user_feedback; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_feedback (
+    user_id integer NOT NULL,
+    creator_id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    body text NOT NULL,
+    category character varying NOT NULL,
+    id integer NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
+);
+
+
+--
+-- Name: user_name_change_requests; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_name_change_requests (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    original_name character varying NOT NULL,
+    desired_name character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: user_upgrades; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_upgrades (
+    id integer NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    recipient_id integer NOT NULL,
+    purchaser_id integer NOT NULL,
+    upgrade_type integer NOT NULL,
+    status integer NOT NULL,
+    transaction_id character varying,
+    payment_processor integer DEFAULT 0 NOT NULL
+);
+
+
+--
+-- Name: user_actions; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.user_actions AS
+ SELECT 'ArtistVersion'::character varying AS model_type,
+    artist_versions.id AS model_id,
+    artist_versions.updater_id AS user_id,
+    'create'::character varying AS event_type,
+    artist_versions.created_at AS event_at
+   FROM public.artist_versions
+UNION ALL
+ SELECT 'ArtistCommentaryVersion'::character varying AS model_type,
+    artist_commentary_versions.id AS model_id,
+    artist_commentary_versions.updater_id AS user_id,
+    'create'::character varying AS event_type,
+    artist_commentary_versions.created_at AS event_at
+   FROM public.artist_commentary_versions
+UNION ALL
+ SELECT 'Ban'::character varying AS model_type,
+    bans.id AS model_id,
+    bans.user_id,
+    'subject'::character varying AS event_type,
+    bans.created_at AS event_at
+   FROM public.bans
+UNION ALL
+ SELECT 'BulkUpdateRequest'::character varying AS model_type,
+    bulk_update_requests.id AS model_id,
+    bulk_update_requests.user_id,
+    'create'::character varying AS event_type,
+    bulk_update_requests.created_at AS event_at
+   FROM public.bulk_update_requests
+UNION ALL
+ SELECT 'Comment'::character varying AS model_type,
+    comments.id AS model_id,
+    comments.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    comments.created_at AS event_at
+   FROM public.comments
+UNION ALL
+ SELECT 'CommentVote'::character varying AS model_type,
+    comment_votes.id AS model_id,
+    comment_votes.user_id,
+    'create'::character varying AS event_type,
+    comment_votes.created_at AS event_at
+   FROM public.comment_votes
+UNION ALL
+( SELECT 'Dmail'::character varying AS model_type,
+    dmails.id AS model_id,
+    dmails.from_id AS user_id,
+    'create'::character varying AS event_type,
+    dmails.created_at AS event_at
+   FROM public.dmails
+  WHERE (dmails.from_id <> dmails.owner_id)
+  ORDER BY dmails.created_at DESC)
+UNION ALL
+ SELECT 'FavoriteGroup'::character varying AS model_type,
+    favorite_groups.id AS model_id,
+    favorite_groups.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    favorite_groups.created_at AS event_at
+   FROM public.favorite_groups
+UNION ALL
+ SELECT 'ForumPost'::character varying AS model_type,
+    forum_posts.id AS model_id,
+    forum_posts.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    forum_posts.created_at AS event_at
+   FROM public.forum_posts
+UNION ALL
+ SELECT 'ForumPostVote'::character varying AS model_type,
+    forum_post_votes.id AS model_id,
+    forum_post_votes.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    forum_post_votes.created_at AS event_at
+   FROM public.forum_post_votes
+UNION ALL
+ SELECT 'ForumTopic'::character varying AS model_type,
+    forum_topics.id AS model_id,
+    forum_topics.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    forum_topics.created_at AS event_at
+   FROM public.forum_topics
+UNION ALL
+ SELECT 'ModAction'::character varying AS model_type,
+    mod_actions.id AS model_id,
+    mod_actions.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    mod_actions.created_at AS event_at
+   FROM public.mod_actions
+UNION ALL
+ SELECT 'ModerationReport'::character varying AS model_type,
+    moderation_reports.id AS model_id,
+    moderation_reports.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    moderation_reports.created_at AS event_at
+   FROM public.moderation_reports
+UNION ALL
+ SELECT 'NoteVersion'::character varying AS model_type,
+    note_versions.id AS model_id,
+    note_versions.updater_id AS user_id,
+    'create'::character varying AS event_type,
+    note_versions.created_at AS event_at
+   FROM public.note_versions
+UNION ALL
+ SELECT 'Post'::character varying AS model_type,
+    posts.id AS model_id,
+    posts.uploader_id AS user_id,
+    'create'::character varying AS event_type,
+    posts.created_at AS event_at
+   FROM public.posts
+UNION ALL
+ SELECT 'PostAppeal'::character varying AS model_type,
+    post_appeals.id AS model_id,
+    post_appeals.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    post_appeals.created_at AS event_at
+   FROM public.post_appeals
+UNION ALL
+ SELECT 'PostApproval'::character varying AS model_type,
+    post_approvals.id AS model_id,
+    post_approvals.user_id,
+    'create'::character varying AS event_type,
+    post_approvals.created_at AS event_at
+   FROM public.post_approvals
+UNION ALL
+ SELECT 'PostDisapproval'::character varying AS model_type,
+    post_disapprovals.id AS model_id,
+    post_disapprovals.user_id,
+    'create'::character varying AS event_type,
+    post_disapprovals.created_at AS event_at
+   FROM public.post_disapprovals
+UNION ALL
+ SELECT 'PostFlag'::character varying AS model_type,
+    post_flags.id AS model_id,
+    post_flags.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    post_flags.created_at AS event_at
+   FROM public.post_flags
+UNION ALL
+ SELECT 'PostReplacement'::character varying AS model_type,
+    post_replacements.id AS model_id,
+    post_replacements.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    post_replacements.created_at AS event_at
+   FROM public.post_replacements
+UNION ALL
+ SELECT 'PostVote'::character varying AS model_type,
+    post_votes.id AS model_id,
+    post_votes.user_id,
+    'create'::character varying AS event_type,
+    post_votes.created_at AS event_at
+   FROM public.post_votes
+UNION ALL
+ SELECT 'SavedSearch'::character varying AS model_type,
+    saved_searches.id AS model_id,
+    saved_searches.user_id,
+    'create'::character varying AS event_type,
+    saved_searches.created_at AS event_at
+   FROM public.saved_searches
+UNION ALL
+ SELECT 'TagAlias'::character varying AS model_type,
+    tag_aliases.id AS model_id,
+    tag_aliases.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    tag_aliases.created_at AS event_at
+   FROM public.tag_aliases
+UNION ALL
+ SELECT 'TagImplication'::character varying AS model_type,
+    tag_implications.id AS model_id,
+    tag_implications.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    tag_implications.created_at AS event_at
+   FROM public.tag_implications
+UNION ALL
+( SELECT 'TagVersion'::character varying AS model_type,
+    tag_versions.id AS model_id,
+    tag_versions.updater_id AS user_id,
+    'create'::character varying AS event_type,
+    tag_versions.created_at AS event_at
+   FROM public.tag_versions
+  WHERE (tag_versions.updater_id IS NOT NULL)
+  ORDER BY tag_versions.created_at DESC)
+UNION ALL
+ SELECT 'Upload'::character varying AS model_type,
+    uploads.id AS model_id,
+    uploads.uploader_id AS user_id,
+    'create'::character varying AS event_type,
+    uploads.created_at AS event_at
+   FROM public.uploads
+UNION ALL
+ SELECT 'User'::character varying AS model_type,
+    users.id AS model_id,
+    users.id AS user_id,
+    'create'::character varying AS event_type,
+    users.created_at AS event_at
+   FROM public.users
+UNION ALL
+ SELECT 'UserEvent'::character varying AS model_type,
+    user_events.id AS model_id,
+    user_events.user_id,
+    'create'::character varying AS event_type,
+    user_events.created_at AS event_at
+   FROM public.user_events
+UNION ALL
+ SELECT 'UserFeedback'::character varying AS model_type,
+    user_feedback.id AS model_id,
+    user_feedback.creator_id AS user_id,
+    'create'::character varying AS event_type,
+    user_feedback.created_at AS event_at
+   FROM public.user_feedback
+UNION ALL
+ SELECT 'UserFeedback'::character varying AS model_type,
+    user_feedback.id AS model_id,
+    user_feedback.user_id,
+    'subject'::character varying AS event_type,
+    user_feedback.created_at AS event_at
+   FROM public.user_feedback
+UNION ALL
+( SELECT 'UserUpgrade'::character varying AS model_type,
+    user_upgrades.id AS model_id,
+    user_upgrades.purchaser_id AS user_id,
+    'create'::character varying AS event_type,
+    user_upgrades.created_at AS event_at
+   FROM public.user_upgrades
+  WHERE (user_upgrades.status = ANY (ARRAY[20, 30]))
+  ORDER BY user_upgrades.created_at DESC)
+UNION ALL
+ SELECT 'UserNameChangeRequest'::character varying AS model_type,
+    user_name_change_requests.id AS model_id,
+    user_name_change_requests.user_id,
+    'create'::character varying AS event_type,
+    user_name_change_requests.created_at AS event_at
+   FROM public.user_name_change_requests
+UNION ALL
+ SELECT 'WikiPageVersion'::character varying AS model_type,
+    wiki_page_versions.id AS model_id,
+    wiki_page_versions.updater_id AS user_id,
+    'create'::character varying AS event_type,
+    wiki_page_versions.created_at AS event_at
+   FROM public.wiki_page_versions;
+
+
+--
 -- Name: user_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -2097,22 +2387,6 @@ CREATE SEQUENCE public.user_events_id_seq
 --
 
 ALTER SEQUENCE public.user_events_id_seq OWNED BY public.user_events.id;
-
-
---
--- Name: user_feedback; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.user_feedback (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    creator_id integer NOT NULL,
-    category character varying NOT NULL,
-    body text NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    is_deleted boolean DEFAULT false NOT NULL
-);
 
 
 --
@@ -2133,20 +2407,6 @@ CREATE SEQUENCE public.user_feedback_id_seq
 --
 
 ALTER SEQUENCE public.user_feedback_id_seq OWNED BY public.user_feedback.id;
-
-
---
--- Name: user_name_change_requests; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.user_name_change_requests (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    original_name character varying NOT NULL,
-    desired_name character varying NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
 
 
 --
@@ -2200,23 +2460,6 @@ CREATE SEQUENCE public.user_sessions_id_seq
 --
 
 ALTER SEQUENCE public.user_sessions_id_seq OWNED BY public.user_sessions.id;
-
-
---
--- Name: user_upgrades; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.user_upgrades (
-    id integer NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    recipient_id integer NOT NULL,
-    purchaser_id integer NOT NULL,
-    upgrade_type integer NOT NULL,
-    status integer NOT NULL,
-    transaction_id character varying,
-    payment_processor integer DEFAULT 0 NOT NULL
-);
 
 
 --
@@ -3243,6 +3486,13 @@ CREATE INDEX index_artist_commentary_versions_on_post_id ON public.artist_commen
 
 
 --
+-- Name: index_artist_commentary_versions_on_updater_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artist_commentary_versions_on_updater_id_and_created_at ON public.artist_commentary_versions USING btree (updater_id, created_at);
+
+
+--
 -- Name: index_artist_commentary_versions_on_updater_id_and_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3327,6 +3577,13 @@ CREATE INDEX index_artist_versions_on_updater_id ON public.artist_versions USING
 
 
 --
+-- Name: index_artist_versions_on_updater_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artist_versions_on_updater_id_and_created_at ON public.artist_versions USING btree (updater_id, created_at);
+
+
+--
 -- Name: index_artist_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3397,6 +3654,13 @@ CREATE INDEX index_bans_on_banner_id ON public.bans USING btree (banner_id);
 
 
 --
+-- Name: index_bans_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bans_on_created_at ON public.bans USING btree (created_at);
+
+
+--
 -- Name: index_bans_on_duration; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3411,6 +3675,20 @@ CREATE INDEX index_bans_on_user_id ON public.bans USING btree (user_id);
 
 
 --
+-- Name: index_bans_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bans_on_user_id_and_created_at ON public.bans USING btree (user_id, created_at);
+
+
+--
+-- Name: index_bulk_update_requests_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bulk_update_requests_on_created_at ON public.bulk_update_requests USING btree (created_at);
+
+
+--
 -- Name: index_bulk_update_requests_on_forum_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3422,6 +3700,13 @@ CREATE INDEX index_bulk_update_requests_on_forum_post_id ON public.bulk_update_r
 --
 
 CREATE INDEX index_bulk_update_requests_on_tags ON public.bulk_update_requests USING gin (tags);
+
+
+--
+-- Name: index_bulk_update_requests_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bulk_update_requests_on_user_id_and_created_at ON public.bulk_update_requests USING btree (user_id, created_at);
 
 
 --
@@ -3460,6 +3745,13 @@ CREATE UNIQUE INDEX index_comment_votes_on_user_id_and_comment_id ON public.comm
 
 
 --
+-- Name: index_comment_votes_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comment_votes_on_user_id_and_created_at ON public.comment_votes USING btree (user_id, created_at);
+
+
+--
 -- Name: index_comments_on_body_tsvector; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3471,6 +3763,13 @@ CREATE INDEX index_comments_on_body_tsvector ON public.comments USING gin (to_ts
 --
 
 CREATE INDEX index_comments_on_created_at ON public.comments USING btree (created_at);
+
+
+--
+-- Name: index_comments_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comments_on_creator_id_and_created_at ON public.comments USING btree (creator_id, created_at);
 
 
 --
@@ -3492,6 +3791,20 @@ CREATE INDEX index_comments_on_creator_ip_addr ON public.comments USING btree (c
 --
 
 CREATE INDEX index_comments_on_post_id ON public.comments USING btree (post_id);
+
+
+--
+-- Name: index_completed_user_upgrades_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_completed_user_upgrades_on_created_at ON public.user_upgrades USING btree (created_at) WHERE (status = ANY (ARRAY[20, 30]));
+
+
+--
+-- Name: index_completed_user_upgrades_on_updater_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_completed_user_upgrades_on_updater_id_and_created_at ON public.user_upgrades USING btree (purchaser_id, created_at) WHERE (status = ANY (ARRAY[20, 30]));
 
 
 --
@@ -3600,6 +3913,20 @@ CREATE UNIQUE INDEX index_email_addresses_on_user_id ON public.email_addresses U
 
 
 --
+-- Name: index_favorite_groups_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_favorite_groups_on_created_at ON public.favorite_groups USING btree (created_at);
+
+
+--
+-- Name: index_favorite_groups_on_created_at_id_is_public_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_favorite_groups_on_created_at_id_is_public_creator_id ON public.favorite_groups USING btree (created_at, id, is_public, creator_id);
+
+
+--
 -- Name: index_favorite_groups_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3649,6 +3976,20 @@ CREATE UNIQUE INDEX index_favorites_on_user_id_and_post_id ON public.favorites U
 
 
 --
+-- Name: index_forum_post_votes_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_forum_post_votes_on_created_at ON public.forum_post_votes USING btree (created_at);
+
+
+--
+-- Name: index_forum_post_votes_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_forum_post_votes_on_creator_id_and_created_at ON public.forum_post_votes USING btree (creator_id, created_at);
+
+
+--
 -- Name: index_forum_post_votes_on_forum_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3670,6 +4011,13 @@ CREATE INDEX index_forum_posts_on_body_tsvector ON public.forum_posts USING gin 
 
 
 --
+-- Name: index_forum_posts_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_forum_posts_on_created_at ON public.forum_posts USING btree (created_at);
+
+
+--
 -- Name: index_forum_posts_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3677,10 +4025,24 @@ CREATE INDEX index_forum_posts_on_creator_id ON public.forum_posts USING btree (
 
 
 --
+-- Name: index_forum_posts_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_forum_posts_on_creator_id_and_created_at ON public.forum_posts USING btree (creator_id, created_at);
+
+
+--
 -- Name: index_forum_posts_on_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_forum_posts_on_topic_id ON public.forum_posts USING btree (topic_id);
+
+
+--
+-- Name: index_forum_posts_on_topic_id_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_forum_posts_on_topic_id_and_id ON public.forum_posts USING btree (topic_id, id);
 
 
 --
@@ -3712,10 +4074,24 @@ CREATE INDEX index_forum_topic_visits_on_user_id ON public.forum_topic_visits US
 
 
 --
+-- Name: index_forum_topics_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_forum_topics_on_created_at ON public.forum_topics USING btree (created_at);
+
+
+--
 -- Name: index_forum_topics_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_forum_topics_on_creator_id ON public.forum_topics USING btree (creator_id);
+
+
+--
+-- Name: index_forum_topics_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_forum_topics_on_creator_id_and_created_at ON public.forum_topics USING btree (creator_id, created_at);
 
 
 --
@@ -4034,10 +4410,31 @@ CREATE INDEX index_mod_actions_on_creator_id ON public.mod_actions USING btree (
 
 
 --
+-- Name: index_mod_actions_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mod_actions_on_creator_id_and_created_at ON public.mod_actions USING btree (creator_id, created_at);
+
+
+--
+-- Name: index_moderation_reports_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_moderation_reports_on_created_at ON public.moderation_reports USING btree (created_at);
+
+
+--
 -- Name: index_moderation_reports_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_moderation_reports_on_creator_id ON public.moderation_reports USING btree (creator_id);
+
+
+--
+-- Name: index_moderation_reports_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_moderation_reports_on_creator_id_and_created_at ON public.moderation_reports USING btree (creator_id, created_at);
 
 
 --
@@ -4080,6 +4477,13 @@ CREATE INDEX index_note_versions_on_note_id ON public.note_versions USING btree 
 --
 
 CREATE INDEX index_note_versions_on_post_id ON public.note_versions USING btree (post_id);
+
+
+--
+-- Name: index_note_versions_on_updater_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_note_versions_on_updater_id_and_created_at ON public.note_versions USING btree (updater_id, created_at);
 
 
 --
@@ -4244,6 +4648,13 @@ CREATE INDEX index_post_appeals_on_creator_id ON public.post_appeals USING btree
 
 
 --
+-- Name: index_post_appeals_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_appeals_on_creator_id_and_created_at ON public.post_appeals USING btree (creator_id, created_at);
+
+
+--
 -- Name: index_post_appeals_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4265,6 +4676,13 @@ CREATE INDEX index_post_appeals_on_status ON public.post_appeals USING btree (st
 
 
 --
+-- Name: index_post_approvals_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_approvals_on_created_at ON public.post_approvals USING btree (created_at);
+
+
+--
 -- Name: index_post_approvals_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4276,6 +4694,20 @@ CREATE INDEX index_post_approvals_on_post_id ON public.post_approvals USING btre
 --
 
 CREATE INDEX index_post_approvals_on_user_id ON public.post_approvals USING btree (user_id);
+
+
+--
+-- Name: index_post_approvals_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_approvals_on_user_id_and_created_at ON public.post_approvals USING btree (user_id, created_at);
+
+
+--
+-- Name: index_post_disapprovals_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_disapprovals_on_created_at ON public.post_disapprovals USING btree (created_at);
 
 
 --
@@ -4293,6 +4725,13 @@ CREATE INDEX index_post_disapprovals_on_user_id ON public.post_disapprovals USIN
 
 
 --
+-- Name: index_post_disapprovals_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_disapprovals_on_user_id_and_created_at ON public.post_disapprovals USING btree (user_id, created_at);
+
+
+--
 -- Name: index_post_disapprovals_on_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4300,10 +4739,24 @@ CREATE UNIQUE INDEX index_post_disapprovals_on_user_id_and_post_id ON public.pos
 
 
 --
+-- Name: index_post_flags_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_flags_on_created_at ON public.post_flags USING btree (created_at);
+
+
+--
 -- Name: index_post_flags_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_flags_on_creator_id ON public.post_flags USING btree (creator_id);
+
+
+--
+-- Name: index_post_flags_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_flags_on_creator_id_and_created_at ON public.post_flags USING btree (creator_id, created_at);
 
 
 --
@@ -4328,10 +4781,24 @@ CREATE INDEX index_post_flags_on_status ON public.post_flags USING btree (status
 
 
 --
+-- Name: index_post_replacements_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_replacements_on_created_at ON public.post_replacements USING btree (created_at);
+
+
+--
 -- Name: index_post_replacements_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_replacements_on_creator_id ON public.post_replacements USING btree (creator_id);
+
+
+--
+-- Name: index_post_replacements_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_replacements_on_creator_id_and_created_at ON public.post_replacements USING btree (creator_id, created_at);
 
 
 --
@@ -4437,6 +4904,13 @@ CREATE INDEX index_post_votes_on_post_id ON public.post_votes USING btree (post_
 --
 
 CREATE INDEX index_post_votes_on_user_id ON public.post_votes USING btree (user_id);
+
+
+--
+-- Name: index_post_votes_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_votes_on_user_id_and_created_at ON public.post_votes USING btree (user_id, created_at);
 
 
 --
@@ -4574,6 +5048,13 @@ CREATE INDEX index_posts_on_uploader_id ON public.posts USING btree (uploader_id
 
 
 --
+-- Name: index_posts_on_uploader_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_uploader_id_and_created_at ON public.posts USING btree (uploader_id, created_at);
+
+
+--
 -- Name: index_posts_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4585,6 +5066,13 @@ CREATE INDEX index_posts_on_uploader_ip_addr ON public.posts USING btree (upload
 --
 
 CREATE UNIQUE INDEX index_rate_limits_on_key_and_action ON public.rate_limits USING btree (key, action);
+
+
+--
+-- Name: index_saved_searches_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_saved_searches_on_created_at ON public.saved_searches USING btree (created_at);
 
 
 --
@@ -4609,6 +5097,27 @@ CREATE INDEX index_saved_searches_on_user_id ON public.saved_searches USING btre
 
 
 --
+-- Name: index_saved_searches_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_saved_searches_on_user_id_and_created_at ON public.saved_searches USING btree (user_id, created_at);
+
+
+--
+-- Name: index_sent_dmails_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sent_dmails_on_created_at ON public.dmails USING btree (created_at) WHERE (owner_id = from_id);
+
+
+--
+-- Name: index_sent_dmails_on_owner_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sent_dmails_on_owner_id_and_created_at ON public.dmails USING btree (owner_id, created_at) WHERE (owner_id = from_id);
+
+
+--
 -- Name: index_tag_aliases_on_antecedent_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4627,6 +5136,20 @@ CREATE INDEX index_tag_aliases_on_antecedent_name_pattern ON public.tag_aliases 
 --
 
 CREATE INDEX index_tag_aliases_on_consequent_name ON public.tag_aliases USING btree (consequent_name);
+
+
+--
+-- Name: index_tag_aliases_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_aliases_on_created_at ON public.tag_aliases USING btree (created_at);
+
+
+--
+-- Name: index_tag_aliases_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_aliases_on_creator_id_and_created_at ON public.tag_aliases USING btree (creator_id, created_at);
 
 
 --
@@ -4651,6 +5174,20 @@ CREATE INDEX index_tag_implications_on_consequent_name ON public.tag_implication
 
 
 --
+-- Name: index_tag_implications_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_implications_on_created_at ON public.tag_implications USING btree (created_at);
+
+
+--
+-- Name: index_tag_implications_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_implications_on_creator_id_and_created_at ON public.tag_implications USING btree (creator_id, created_at);
+
+
+--
 -- Name: index_tag_implications_on_forum_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4662,6 +5199,13 @@ CREATE INDEX index_tag_implications_on_forum_post_id ON public.tag_implications 
 --
 
 CREATE INDEX index_tag_versions_on_category ON public.tag_versions USING btree (category);
+
+
+--
+-- Name: index_tag_versions_on_created_at_where_updater_id_is_not_null; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_versions_on_created_at_where_updater_id_is_not_null ON public.tag_versions USING btree (created_at) WHERE (updater_id IS NOT NULL);
 
 
 --
@@ -4711,6 +5255,13 @@ CREATE UNIQUE INDEX index_tag_versions_on_tag_id_and_previous_version_id ON publ
 --
 
 CREATE INDEX index_tag_versions_on_updater_id ON public.tag_versions USING btree (updater_id);
+
+
+--
+-- Name: index_tag_versions_on_updater_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_versions_on_updater_id_and_created_at ON public.tag_versions USING btree (updater_id, created_at) WHERE (updater_id IS NOT NULL);
 
 
 --
@@ -4833,6 +5384,13 @@ CREATE INDEX index_upload_media_assets_on_upload_id ON public.upload_media_asset
 
 
 --
+-- Name: index_uploads_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_created_at ON public.uploads USING btree (created_at);
+
+
+--
 -- Name: index_uploads_on_error; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4865,6 +5423,13 @@ CREATE INDEX index_uploads_on_source ON public.uploads USING btree (source);
 --
 
 CREATE INDEX index_uploads_on_uploader_id ON public.uploads USING btree (uploader_id);
+
+
+--
+-- Name: index_uploads_on_uploader_id_and_created_at_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_uploader_id_and_created_at_and_id ON public.uploads USING btree (uploader_id, created_at, id);
 
 
 --
@@ -4903,6 +5468,13 @@ CREATE INDEX index_user_events_on_user_id ON public.user_events USING btree (use
 
 
 --
+-- Name: index_user_events_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_user_id_and_created_at ON public.user_events USING btree (user_id, created_at);
+
+
+--
 -- Name: index_user_events_on_user_session_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4924,10 +5496,31 @@ CREATE INDEX index_user_feedback_on_creator_id ON public.user_feedback USING btr
 
 
 --
+-- Name: index_user_feedback_on_creator_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_feedback_on_creator_id_and_created_at ON public.user_feedback USING btree (creator_id, created_at);
+
+
+--
 -- Name: index_user_feedback_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_feedback_on_user_id ON public.user_feedback USING btree (user_id);
+
+
+--
+-- Name: index_user_feedback_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_feedback_on_user_id_and_created_at ON public.user_feedback USING btree (user_id, created_at);
+
+
+--
+-- Name: index_user_name_change_requests_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_name_change_requests_on_created_at ON public.user_name_change_requests USING btree (created_at);
 
 
 --
@@ -4942,6 +5535,13 @@ CREATE INDEX index_user_name_change_requests_on_original_name ON public.user_nam
 --
 
 CREATE INDEX index_user_name_change_requests_on_user_id ON public.user_name_change_requests USING btree (user_id);
+
+
+--
+-- Name: index_user_name_change_requests_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_name_change_requests_on_user_id_and_created_at ON public.user_name_change_requests USING btree (user_id, created_at);
 
 
 --
@@ -4970,6 +5570,13 @@ CREATE INDEX index_user_sessions_on_session_id ON public.user_sessions USING btr
 --
 
 CREATE INDEX index_user_sessions_on_updated_at ON public.user_sessions USING btree (updated_at);
+
+
+--
+-- Name: index_user_upgrades_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_upgrades_on_created_at ON public.user_upgrades USING btree (created_at);
 
 
 --
@@ -5022,6 +5629,20 @@ CREATE INDEX index_users_on_created_at ON public.users USING btree (created_at);
 
 
 --
+-- Name: index_users_on_enable_private_favorites; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_enable_private_favorites ON public.users USING btree (bit_prefs) WHERE (get_bit((bit_prefs)::bit(31), 24) = 1);
+
+
+--
+-- Name: index_users_on_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_id_and_created_at ON public.users USING btree (id, created_at);
+
+
+--
 -- Name: index_users_on_inviter_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5061,6 +5682,13 @@ CREATE INDEX index_wiki_page_versions_on_created_at ON public.wiki_page_versions
 --
 
 CREATE INDEX index_wiki_page_versions_on_updater_id ON public.wiki_page_versions USING btree (updater_id);
+
+
+--
+-- Name: index_wiki_page_versions_on_updater_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_wiki_page_versions_on_updater_id_and_created_at ON public.wiki_page_versions USING btree (updater_id, created_at);
 
 
 --
@@ -6126,6 +6754,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220829184824'),
 ('20220909205433'),
 ('20220909211649'),
-('20220913191300');
+('20220913191300'),
+('20220913191309');
 
 
