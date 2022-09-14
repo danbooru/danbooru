@@ -664,7 +664,7 @@ ALTER SEQUENCE public.favorites_id_seq OWNED BY public.favorites.id;
 --
 
 CREATE TABLE public.forum_post_votes (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     forum_post_id integer NOT NULL,
     creator_id integer NOT NULL,
     score integer NOT NULL,
@@ -1209,11 +1209,11 @@ ALTER SEQUENCE public.mod_actions_id_seq OWNED BY public.mod_actions.id;
 --
 
 CREATE TABLE public.moderation_reports (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     model_type character varying NOT NULL,
-    model_id bigint NOT NULL,
+    model_id integer NOT NULL,
     creator_id integer NOT NULL,
     reason text NOT NULL,
     status integer DEFAULT 0 NOT NULL
@@ -1889,12 +1889,12 @@ ALTER SEQUENCE public.tag_implications_id_seq OWNED BY public.tag_implications.i
 --
 
 CREATE TABLE public.tag_versions (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    tag_id bigint NOT NULL,
-    updater_id bigint,
-    previous_version_id bigint,
+    tag_id integer NOT NULL,
+    updater_id integer,
+    previous_version_id integer,
     version integer NOT NULL,
     name character varying NOT NULL,
     category integer NOT NULL,
@@ -2071,11 +2071,11 @@ ALTER SEQUENCE public.uploads_id_seq OWNED BY public.uploads.id;
 --
 
 CREATE TABLE public.user_events (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    user_id bigint NOT NULL,
-    user_session_id bigint NOT NULL,
+    user_id integer NOT NULL,
+    user_session_id integer NOT NULL,
     category integer NOT NULL
 );
 
@@ -2207,11 +2207,11 @@ ALTER SEQUENCE public.user_sessions_id_seq OWNED BY public.user_sessions.id;
 --
 
 CREATE TABLE public.user_upgrades (
-    id bigint NOT NULL,
+    id integer NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    recipient_id bigint NOT NULL,
-    purchaser_id bigint NOT NULL,
+    recipient_id integer NOT NULL,
+    purchaser_id integer NOT NULL,
     upgrade_type integer NOT NULL,
     status integer NOT NULL,
     transaction_id character varying,
@@ -6125,6 +6125,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220627211714'),
 ('20220829184824'),
 ('20220909205433'),
-('20220909211649');
+('20220909211649'),
+('20220913191300');
 
 
