@@ -145,6 +145,11 @@
       <ul>
         <li><h2>Admin</h2></li>
         <li><%= link_to("Mod Actions", mod_actions_path) %></li>
+
+        <% if policy(UserAction).index? %>
+          <li><%= link_to("User Actions", user_actions_path) %></li>
+        <% end %>
+
         <li><%= link_to("Bulk Update Requests", bulk_update_requests_path) %></li>
 
         <% if policy(UserNameChangeRequest).index? %>

@@ -39,4 +39,8 @@ class TagVersion < ApplicationRecord
   def category_name
     TagCategory.reverse_mapping[category].capitalize
   end
+
+  def pretty_name
+    name.tr("_", " ")
+  end
 end

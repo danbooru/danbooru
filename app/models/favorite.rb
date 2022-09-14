@@ -8,7 +8,7 @@ class Favorite < ApplicationRecord
   after_create :upvote_post_on_create
   after_destroy :unvote_post_on_destroy
 
-  scope :public_favorites, -> { where(user: User.has_public_favorites) }
+  scope :public_favorites, -> { where.not(user: User.has_private_favorites) }
 
   def self.visible(user)
     if user.is_admin?

@@ -261,7 +261,9 @@ Rails.application.routes.draw do
     resources :upload_media_assets, only: [:show, :index], path: "assets"
   end
   resources :upload_media_assets, only: [:show, :index]
+  resources :user_actions, only: [:index, :show]
   resources :users do
+    resources :actions, only: [:index]
     resources :favorites, only: [:index, :create, :destroy]
     resources :favorite_groups, controller: "favorite_groups", only: [:index], as: "favorite_groups"
     resource :email, only: [:show, :edit, :update] do

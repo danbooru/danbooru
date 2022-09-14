@@ -17,7 +17,7 @@ class PostVote < ApplicationRecord
 
   scope :positive, -> { where("post_votes.score > 0") }
   scope :negative, -> { where("post_votes.score < 0") }
-  scope :public_votes, -> { active.positive.where(user: User.has_public_favorites) }
+  scope :public_votes, -> { active.positive.where.not(user: User.has_private_favorites) }
 
   deletable
 

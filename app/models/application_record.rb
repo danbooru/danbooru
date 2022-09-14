@@ -234,6 +234,10 @@ class ApplicationRecord < ActiveRecord::Base
     end
   end
 
+  def revised?
+    updated_at > created_at
+  end
+
   def warnings
     @warnings ||= ActiveModel::Errors.new(self)
   end

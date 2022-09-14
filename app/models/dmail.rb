@@ -76,7 +76,11 @@ class Dmail < ApplicationRecord
 
   module SearchMethods
     def visible(user)
-      where(owner: user)
+      if user.is_anonymous?
+        none
+      else
+        where(owner: user)
+      end
     end
 
     def sent_by(user)

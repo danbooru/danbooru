@@ -69,6 +69,10 @@ class Ban < ApplicationRecord
     ApplicationController.helpers.humanized_duration(duration)
   end
 
+  def forever?
+    duration.present? && duration >= 100.years
+  end
+
   def expired?
     persisted? && expires_at < Time.zone.now
   end

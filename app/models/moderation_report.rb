@@ -35,8 +35,10 @@ class ModerationReport < ApplicationRecord
   def self.visible(user)
     if user.is_moderator?
       all
-    else
+    elsif !user.is_anonymous?
       where(creator: user)
+    else
+      none
     end
   end
 

@@ -21,6 +21,10 @@ class CommentPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def can_see_creator?
+    !record.is_deleted? || can_see_deleted?
+  end
+
   def reply?
     !record.is_deleted?
   end

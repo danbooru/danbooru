@@ -1,0 +1,161 @@
+<div id="c-user-actions">
+  <div id="a-index">
+    <% if @user %>
+      <h1>User Actions: <%= link_to_user @user %></h1>
+      <%= link_to "« Back", user_actions_path, class: "text-xs" %>
+    <% else %>
+      <h1>User Actions</h1>
+    <% end %>
+
+    <%= search_form_for(user_actions_path) do |f| %>
+      <%= f.input :user_name, label: "User", input_html: { value: @user&.name, "data-autocomplete": "user" } %>
+      <%= f.input :model_type, label: "Category", collection: UserAction.model_types.map { |type| [type.delete_suffix("Version").titleize, type] }, include_blank: true, selected: params[:search][:model_type] %>
+      <%= f.input :order, collection: [%w[Newest event_at], %w[Oldest event_at_asc]], include_blank: true, selected: params[:search][:order] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <div>
+      <%= table_for @user_actions, class: "striped autofit", width: "100%" do |t| %>
+        <% t.column "Event", td: { class: "col-expand" } do |user_action| %>
+          <% model = user_action.model %>
+          <% user = user_action.user %>
+          <% event_type = user_action.event_type %>
+
+          <% case user_action.model_type %>
+          <% when "ArtistVersion" %>
+            <%= link_to_user user %> <%= link_to "updated", model %> the artist <%= link_to model.artist.pretty_name, model.artist, class: "tag-type-#{Tag.categories.artist}" %>.
+          <% when "ArtistCommentaryVersion" %>
+            <%= link_to_user user %> updated the <%= link_to "commentary", model %> for <%= link_to model.post.dtext_shortlink, model.post %>.
+          <% when "NoteVersion" %>
+            <%= link_to_user user %> <%= link_to "updated", model %> a <%= link_to "note", model.note %> on <%= link_to model.post.dtext_shortlink, model.post %>.
+          <% when "TagVersion" %>
+            <%= link_to_user user %> updated the tag <%= link_to model.tag.name, model, class: tag_class(model) %>.
+          <% when "WikiPageVersion" %>
+            <%= link_to_user user %> <%= link_to "updated", model %> the <%= link_to_wiki model.title %> wiki.
+          <% when "Ban" %>
+            <div class="prose">
+              <%= link_to_user user %> was <%= link_to (model.forever? ? "banned forever" : "banned for #{model.humanized_duration}"), model %> by <%= link_to_user model.banner %> (<%= format_text(model.reason.chomp(".").strip, inline: true) %>).
+            </div>
+          <% when "BulkUpdateRequest" %>
+            <%= link_to_user user %> created a <%= link_to "new BUR", model %> in <%= link_to model.forum_topic.title, model.forum_post %>.
+          <% when "Comment" %>
+            <% if model.is_deleted? && !policy(model).can_see_deleted? %>
+              [deleted] posted a <%= link_to "deleted comment", model %> on <%= link_to model.post.dtext_shortlink, model.post %>.
+            <% else %>
+              <%= link_to_user user %> <%= link_to "commented", model %> on <%= link_to model.post.dtext_shortlink, model.post %>.
+            <% end %>
+          <% when "CommentVote" %>
+            <%= link_to_user user %> <%= model.is_positive? ? "upvoted" : "downvoted" %> a <%= link_to "comment", model.comment %> by <%= link_to_user model.comment.creator %> on <%= link_to model.comment.post.dtext_shortlink, model.comment.post %>.
+          <% when "Dmail" %>
+            <%= link_to_user user %> sent a dmail to <%= link_to_user model.to %> (<%= link_to model.title.strip, model %>).
+          <% when "FavoriteGroup" %>
+            <%= link_to_user user %> create <%= model.is_public? ? "public" : "private" %> favgroup <%= link_to model.pretty_name, model %>.
+          <% when "ForumPost" %>
+            <%= link_to_user user %> <%= link_to "posted", model %> in topic <%= link_to model.topic.title.chomp(".").strip, model.topic %>.
+          <% when "ForumTopic" %>
+            <%= link_to_user user %> created topic "<%= link_to model.title.strip, model %>".
+          <% when "ForumPostVote" %>
+            <% if model&.bulk_update_request.present? %>
+              <%= link_to_user user %> <%= model.vote_type %>voted a <%= link_to "BUR", model.bulk_update_request %> in topic <%= link_to model.forum_post.topic.title.strip, model.forum_post %>.
+            <% else %>
+              <%= link_to_user user %> <%= model.vote_type %>voted a <%= link_to "post", model.forum_post %> in topic <%= link_to model.forum_post.topic.title.strip, model.forum_post %>.
+            <% end %>
+          <% when "ModAction" %>
+            <div class="prose">
+              <%= link_to_user user %> <%= format_text(model.description, inline: true) %>.
+            </div>
+          <% when "ModerationReport" %>
+            <div class="prose">
+              <%= link_to_user user %> <%= link_to "reported", model %> a <%= link_to model.model.class.name.titleize.downcase, model.model %> by <%= link_to_user model.reported_user %> (<%= format_text(model.reason.chomp(".").strip, inline: true) %>).
+            </div>
+          <% when "TagAlias" %>
+            <%= link_to_user user %> aliased <%= link_to_search model.antecedent_tag %> to <%= link_to_search model.consequent_tag %>.
+          <% when "TagImplication" %>
+            <%= link_to_user user %> implied <%= link_to_search model.antecedent_tag %> to <%= link_to_search model.consequent_tag %>.
+          <% when "Post" %>
+            <%= link_to_user user %> created <%= link_to model.dtext_shortlink, model %>.
+          <% when "PostAppeal" %>
+            <%= link_to_user user %> appealed <%= link_to model.post.dtext_shortlink, model.post %>.
+          <% when "PostApproval" %>
+            <%= link_to_user user %> approved <%= link_to model.post.dtext_shortlink, model.post %>.
+          <% when "PostDisapproval" %>
+            <div class="prose">
+              <% if policy(model).can_view_creator? %>
+                <%= link_to_user user %> disapproved <%= link_to model.post.dtext_shortlink, model.post %> (<%= model.reason.titleize.downcase %><%= ": ".html_safe + format_text(model.message.chomp(".").strip, inline: true) if model.message.present? %>).
+              <% else %>
+                <%= link_to model.post.dtext_shortlink, model.post %> was disapproved (<%= model.reason.titleize.downcase %><%= ": ".html_safe + format_text(model.message.chomp(".").strip, inline: true) if model.message.present? %>).
+              <% end %>
+            </div>
+          <% when "PostFlag" %>
+            <div class="prose">
+              <% if policy(model).can_view_flagger? %>
+                <%= link_to_user user %> flagged <%= link_to model.post.dtext_shortlink, model.post %> (<%= format_text(model.reason.chomp(".").strip, inline: true) %>).
+              <% else %>
+                <%= link_to model.post.dtext_shortlink, model.post %> was flagged (<%= format_text(model.reason.chomp(".").strip, inline: true) %>).
+              <% end %>
+            </div>
+          <% when "PostReplacement" %>
+            <%= link_to_user user %> replaced <%= link_to model.post.dtext_shortlink, model.post %> with <%= external_link_to Source::URL.page_url(model.replacement_url) || model.replacement_url %>.
+          <% when "PostVote" %>
+            <%= link_to_user user %> <%= model.is_positive? ? "upvoted" : "downvoted" %> <%= link_to model.post.dtext_shortlink, model.post %>.
+          <% when "SavedSearch" %>
+            <%= link_to_user user %> saved search <%= link_to model.query, posts_path(tag: model.query) %>.
+          <% when "Upload" %>
+            <%= link_to_user user %> created <%= link_to model.dtext_shortlink, model %>.
+          <% when "User" %>
+            <%= link_to_user user %> created their account.
+          <% when "UserEvent" %>
+            <% case model.category %>
+            <% when "login" %>
+              <%= link_to_user user %> logged in.
+            <% when "failed_login" %>
+              Failed login attempt for <%= link_to_user user %>.
+            <% when "logout" %>
+              <%= link_to_user user %> logged out.
+            <% when "user_creation" %>
+              <%= link_to_user user %> created their account.
+            <% when "user_deletion" %>
+              <%= link_to_user user %> deleted their account.
+            <% when "password_reset" %>
+              <%= link_to_user user %> reset their password.
+            <% when "password_reset" %>
+              <%= link_to_user user %> changed their password.
+            <% when "email_change" %>
+              <%= link_to_user user %> changed their email address.
+            <% end %>
+          <% when "UserFeedback" %>
+            <% case event_type %>
+            <% when "create" %>
+              <%= link_to_user model.creator %> created a <%= link_to "#{model.category} feedback", model %> for <%= link_to_user model.user %>.
+            <% when "subject" %>
+              <%= link_to_user model.user %> received a <%= link_to "#{model.category} feedback", model %> from <%= link_to_user model.creator %>.
+            <% end %>
+          <% when "UserNameChangeRequest" %>
+            <%= link_to_user model.user %> <%= link_to "changed their name", model %> from <%= model.original_name %> to <%= model.desired_name %>.
+          <% when "UserUpgrade" %>
+            <% if model.complete? %>
+              <%= link_to_user model.purchaser %> <%= link_to "upgraded", model %> <%= link_to_user model.recipient if model.is_gift? %> to <%= model.level_string %>.
+            <% elsif model.refunded? %>
+              <%= link_to_user model.purchaser %> <%= link_to "upgraded", model %> <%= link_to_user model.recipient if model.is_gift? %> to <%= model.level_string %> (refunded).
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <% t.column "Category" do |user_action| %>
+          <%= link_to user_action.model_type.delete_suffix("Version").titleize, user_actions_path(search: { model_type: user_action.model_type }) %>
+        <% end %>
+
+        <% t.column "Date" do |user_action| %>
+          <% if policy(user_action).can_see_user? %>
+            <%= link_to_user user_action.user %> <%= link_to "»", user_actions_path(search: { **search_params, user_id: user_action.user_id }) %>
+          <% end %>
+          <div><%= time_ago_in_words_tagged(user_action.event_at) %></div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= numbered_paginator(@user_actions) %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>

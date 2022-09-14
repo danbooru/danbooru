@@ -3,6 +3,8 @@
 class ForumPostVote < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to :forum_post
+  belongs_to :bulk_update_request, primary_key: :forum_post_id, foreign_key: :forum_post_id, optional: true
+
   validates :creator_id, uniqueness: {scope: :forum_post_id}
   validates :score, inclusion: {in: [-1, 0, 1]}
 

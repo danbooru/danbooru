@@ -1,0 +1,11 @@
+<% content_for(:secondary_links) do %>
+  <%= quick_search_form_for(:user_name, user_actions_path, "users", autocomplete: "user") %>
+  <%= subnav_link_to "Mod Actions", mod_actions_path %>
+  <%= subnav_link_to "User Actions", user_actions_path %>
+  <%= subnav_link_to "User Events", user_events_path %>
+  <%= subnav_link_to "Bans", bans_path %>
+  <%= subnav_link_to "IP Bans", ip_bans_path %>
+  <%= subnav_link_to "Feedbacks", user_feedbacks_path %>
+  <%= subnav_link_to "Mod Reports", moderation_reports_path %>
+  <%= subnav_link_to "Modqueue", modqueue_index_path %>
+<% end %>

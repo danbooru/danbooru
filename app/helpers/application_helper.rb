@@ -199,7 +199,7 @@ module ApplicationHelper
   end
 
   def link_to_search(tag, **options)
-    link_to tag.name, posts_path(tags: tag.name), class: tag_class(tag), **options
+    link_to tag.pretty_name, posts_path(tags: tag.name), class: tag_class(tag), **options
   end
 
   def link_to_wiki(text, title = text, **options)

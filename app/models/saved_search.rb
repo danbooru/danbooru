@@ -18,7 +18,11 @@ class SavedSearch < ApplicationRecord
   scope :has_tag, ->(name) { where_regex(:query, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "i") }
 
   def self.visible(user)
-    where(user: user)
+    if user.is_anonymous?
+      none
+    else
+      where(user: user)
+    end
   end
 
   concerning :Redis do

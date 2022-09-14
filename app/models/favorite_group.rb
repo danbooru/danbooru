@@ -17,6 +17,9 @@ class FavoriteGroup < ApplicationRecord
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
 
+  scope :is_public, -> { where(is_public: true) }
+  scope :is_private, -> { where(is_public: false) }
+
   module SearchMethods
     def for_post(post_id)
       where_array_includes_any(:post_ids, [post_id])
@@ -29,7 +32,13 @@ class FavoriteGroup < ApplicationRecord
     end
 
     def visible(user)
-      where(is_public: true).or(where(creator_id: user.id))
+      if user.is_owner?
+        all
+      elsif user.is_anonymous?
+        is_public
+      else
+        is_public.or(where(creator: user))
+      end
     end
 
     def search(params)
