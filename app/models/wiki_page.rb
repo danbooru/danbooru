@@ -3,7 +3,7 @@
 class WikiPage < ApplicationRecord
   class RevertError < StandardError; end
 
-  META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:"]
+  META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:","api:"]
 
   after_save :create_version
 
