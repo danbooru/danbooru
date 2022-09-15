@@ -101,6 +101,7 @@ class UploadMediaAsset < ApplicationRecord
       media_file = source_extractor.download_file!(source_url)
     end
 
+    MediaAsset.validate_media_file!(media_file, upload.uploader)
     MediaAsset.upload!(media_file) do |media_asset|
       update!(media_asset: media_asset)
     end

@@ -6,6 +6,7 @@ class MediaAsset < ApplicationRecord
   FILE_TYPES = %w[jpg png gif mp4 webm swf zip]
   FILE_KEY_LENGTH = 9
   VARIANTS = %i[preview 180x180 360x360 720x720 sample original]
+  MAX_FILE_SIZE = Danbooru.config.max_file_size.to_i
   MAX_VIDEO_DURATION = Danbooru.config.max_video_duration.to_i
   MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
   MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
@@ -45,10 +46,7 @@ class MediaAsset < ApplicationRecord
 
   validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }, if: :md5_changed?
   validates :file_ext, inclusion: { in: FILE_TYPES, message: "File is not an image or video" }
-  validates :file_size, numericality: { less_than_or_equal_to: Danbooru.config.max_file_size, message: ->(asset, _) { "too large (size: #{asset.file_size.to_formatted_s(:human_size)}; max size: #{Danbooru.config.max_file_size.to_formatted_s(:human_size)})" } }
   validates :file_key, length: { is: FILE_KEY_LENGTH }, uniqueness: true, if: :file_key_changed?
-  validate :validate_duration, on: :create
-  validate :validate_resolution, on: :create
 
   before_create :initialize_file_key
 
@@ -248,8 +246,6 @@ class MediaAsset < ApplicationRecord
       def upload!(media_file, &block)
         media_file = MediaFile.open(media_file) unless media_file.is_a?(MediaFile)
 
-        raise Error, "File is corrupt" if media_file.is_corrupt?
-
         media_asset = create!(file: media_file, status: :processing)
         yield media_asset if block_given?
 
@@ -293,6 +289,24 @@ class MediaAsset < ApplicationRecord
         # failed so the user can try the upload again later.
         media_asset&.update!(status: :failed)
         raise
+      end
+
+      def validate_media_file!(media_file, uploader)
+        if !media_file.file_ext.to_s.in?(FILE_TYPES)
+          raise Error, "File is not an image or video"
+        elsif media_file.is_corrupt?
+          raise Error, "File is corrupt"
+        elsif media_file.file_size > MAX_FILE_SIZE
+          raise Error, "File size too large (size: #{media_file.file_size.to_formatted_s(:human_size)}; max size: #{MAX_FILE_SIZE.to_formatted_s(:human_size)})"
+        elsif media_file.resolution > MAX_IMAGE_RESOLUTION
+          raise Error, "Image resolution is too large (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)"
+        elsif media_file.width > MAX_IMAGE_WIDTH
+          raise Error, "Image width is too large (width: #{media_file.width}; max width: #{MAX_IMAGE_WIDTH})"
+        elsif media_file.height > MAX_IMAGE_HEIGHT
+          raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
+        elsif media_file.duration.to_i > MAX_VIDEO_DURATION && !uploader.is_admin?
+          raise Error, "Duration must be less than #{MAX_VIDEO_DURATION} seconds"
+        end
       end
     end
 
@@ -394,27 +408,6 @@ class MediaAsset < ApplicationRecord
 
     def is_animated_png?
       is_animated? && file_ext == "png"
-    end
-  end
-
-  concerning :ValidationMethods do
-    def validate_resolution
-      resolution = image_width * image_height
-
-      if resolution > MAX_IMAGE_RESOLUTION
-        errors.add(:base, "Image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{image_width}x#{image_height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)")
-      elsif image_width > MAX_IMAGE_WIDTH
-        errors.add(:image_width, "is too large (width: #{image_width}; max width: #{MAX_IMAGE_WIDTH})")
-      elsif image_height > MAX_IMAGE_HEIGHT
-        errors.add(:image_height, "is too large (height: #{image_height}; max height: #{MAX_IMAGE_HEIGHT})")
-      end
-    end
-
-    def validate_duration
-      return if CurrentUser.user.is_admin?
-      if duration.to_i > MAX_VIDEO_DURATION
-        errors.add(:base, "duration must be less than #{MAX_VIDEO_DURATION} seconds")
-      end
     end
   end
 

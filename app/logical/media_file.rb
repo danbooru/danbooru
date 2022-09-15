@@ -105,6 +105,11 @@ class MediaFile
     dimensions.second
   end
 
+  # @return [Integer] the resolution of the file
+  def resolution
+    width * height
+  end
+
   # @return [String] the MD5 hash of the file, as a hex string.
   def md5
     Digest::MD5.file(file.path).hexdigest

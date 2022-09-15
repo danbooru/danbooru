@@ -18,6 +18,7 @@ class PostReplacementProcessor
     if media_file.md5 == post.md5
       media_asset = post.media_asset
     else
+      MediaAsset.validate_media_file!(media_file, replacement.creator)
       media_asset = MediaAsset.upload!(media_file)
     end
 
