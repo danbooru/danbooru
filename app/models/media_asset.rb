@@ -47,7 +47,7 @@ class MediaAsset < ApplicationRecord
   validates :file_ext, inclusion: { in: FILE_TYPES, message: "File is not an image or video" }
   validates :file_size, numericality: { less_than_or_equal_to: Danbooru.config.max_file_size, message: ->(asset, _) { "too large (size: #{asset.file_size.to_formatted_s(:human_size)}; max size: #{Danbooru.config.max_file_size.to_formatted_s(:human_size)})" } }
   validates :file_key, length: { is: FILE_KEY_LENGTH }, uniqueness: true, if: :file_key_changed?
-  validates :duration, numericality: { less_than_or_equal_to: MAX_VIDEO_DURATION, message: "must be less than #{MAX_VIDEO_DURATION} seconds", allow_nil: true }, on: :create # XXX should allow admins to bypass
+  validate :validate_duration, on: :create
   validate :validate_resolution, on: :create
 
   before_create :initialize_file_key
@@ -407,6 +407,13 @@ class MediaAsset < ApplicationRecord
         errors.add(:image_width, "is too large (width: #{image_width}; max width: #{MAX_IMAGE_WIDTH})")
       elsif image_height > MAX_IMAGE_HEIGHT
         errors.add(:image_height, "is too large (height: #{image_height}; max height: #{MAX_IMAGE_HEIGHT})")
+      end
+    end
+
+    def validate_duration
+      return if CurrentUser.user.is_admin?
+      if duration.to_i > MAX_VIDEO_DURATION
+        errors.add(:base, "duration must be less than #{MAX_VIDEO_DURATION} seconds")
       end
     end
   end
