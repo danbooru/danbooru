@@ -253,7 +253,12 @@ module ApplicationHelper
     defaults = { required: false }
     html_options = { autocomplete: "off", class: "search-form #{classes}" }
 
-    simple_form_for(:search, method: method, url: url, defaults: defaults, html: html_options, &block)
+    simple_form_for(:search, method: method, url: url, defaults: defaults, html: html_options) do |f|
+      out = "".html_safe
+      out += tag.input(type: :hidden, name: :limit, value: params[:limit]) if params[:limit].present?
+      out += capture { yield f } if block_given?
+      out
+    end
   end
 
   def edit_form_for(model, **options, &block)
