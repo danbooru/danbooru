@@ -40,6 +40,8 @@ footer#page-footer {
     @media (min-width: 1920px) {
       min-width: 280px;
     }
+
+    overflow-wrap: break-word;
   }
 
   #content {
