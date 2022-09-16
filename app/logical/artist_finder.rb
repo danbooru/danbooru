@@ -138,6 +138,8 @@ module ArtistFinder
     %r{pixiv.net/(?:en/)?artworks}i, # https://www.pixiv.net/en/artworks/85241178
     "i.pximg.net",
     "poipiku.com", # https://poipiku.com/1776623/
+    "pomf.tv", # https://pomf.tv/oozutsucannon
+    "pomf.tv/stream", # https://pomf.tv/stream/Kukseleg
     "plala.or.jp", # http://www7.plala.or.jp/reirei
     "plurk.com", # http://www.plurk.com/a1amorea1a1
     "pornhub.com", # https://www.pornhub.com/model/mizzpeachy
