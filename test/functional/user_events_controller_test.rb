@@ -25,11 +25,11 @@ class UserEventsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
       end
 
-      should "only show mods authorized events" do
+      should "show mods all events" do
         get_auth user_events_path(search: { category: "password_change" }), create(:moderator_user)
 
         assert_response :success
-        assert_select "tbody tr", count: 0
+        assert_select "tbody tr", count: 1
       end
     end
   end
