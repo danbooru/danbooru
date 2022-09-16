@@ -14,7 +14,7 @@ class ForumPostVote < ApplicationRecord
   scope :excluding_user, ->(user_id) { where.not(creator_id: user_id) }
 
   def self.visible(user)
-    where(forum_post: ForumPost.visible(user))
+    all
   end
 
   def self.forum_post_matches(params)
