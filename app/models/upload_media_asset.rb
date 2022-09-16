@@ -29,8 +29,10 @@ class UploadMediaAsset < ApplicationRecord
   def self.visible(user)
     if user.is_admin?
       all
+    elsif user.is_anonymous?
+      none
     else
-      where(upload: { uploader: user })
+      where(upload: user.uploads)
     end
   end
 
