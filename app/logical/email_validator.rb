@@ -121,6 +121,7 @@ module EmailValidator
     "gmx.us" => "gmx.net",
     "pm.me" => "protonmail.com",
     "protonmail.ch" => "protonmail.com",
+    "proton.me"   => "protonmail.com",
     "tuta.io"     => "tutanota.com",
     "email.com"   => "mail.com",
     "me.com"      => "icloud.com",
