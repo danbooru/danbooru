@@ -181,18 +181,52 @@ module Sources
       end
     end
 
-    context "The source site for a https://twitter.com/i/web/status/:id url" do
-      setup do
-        @site = Source::Extractor.find("https://twitter.com/i/web/status/943446161586733056")
-      end
+    context "A https://twitter.com/:username/status/:id url" do
+      strategy_should_work(
+        "https://twitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        image_urls: [
+          "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig"
+        ],
+        profile_url: "https://twitter.com/motty08111213",
+        artist_name: "えのぐマネージャー 丸茂",
+        tag_name: "motty08111213",
+        tags: ["岩本町芸能社", "女優部"],
+      )
+    end
 
-      should "fetch the source data" do
-        assert_equal("https://twitter.com/motty08111213", @site.profile_url)
-      end
+    context "A https://twitter.com/i/web/status/:id url" do
+      strategy_should_work(
+        "https://twitter.com/i/web/status/943446161586733056",
+        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        image_urls: [
+          "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig"
+        ],
+        profile_url: "https://twitter.com/motty08111213",
+        artist_name: "えのぐマネージャー 丸茂",
+        tag_name: "motty08111213",
+        tags: ["岩本町芸能社", "女優部"],
+      )
+    end
 
-      should "get the page url" do
-        assert_equal("https://twitter.com/motty08111213/status/943446161586733056", @site.page_url)
-      end
+    context "A https://twitter.com/i/status/:id url" do
+      strategy_should_work(
+        "https://twitter.com/i/status/943446161586733056",
+        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        image_urls: [
+          "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig"
+        ],
+        profile_url: "https://twitter.com/motty08111213",
+        artist_name: "えのぐマネージャー 丸茂",
+        tag_name: "motty08111213",
+        tags: ["岩本町芸能社", "女優部"],
+      )
     end
 
     context "A deleted tweet" do
@@ -297,6 +331,7 @@ module Sources
       assert(Source::URL.image_url?("https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg"))
       assert(Source::URL.image_url?("https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg"))
 
+      assert(Source::URL.page_url?("https://twitter.com/i/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://twitter.com/i/web/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194/photo/1"))
@@ -309,6 +344,10 @@ module Sources
       assert(Source::URL.profile_url?("https://twitter.com/i/user/889592953"))
 
       refute(Source::URL.profile_url?("https://twitter.com/home"))
+
+      assert_nil(Source::URL.parse("https://twitter.com/i/status/1261877313349640194").username)
+      assert_nil(Source::URL.parse("https://twitter.com/i/web/status/1261877313349640194").username)
+      assert_equal("BOW999", Source::URL.parse("https://twitter.com/BOW999/status/1261877313349640194").username)
     end
   end
 end

@@ -40,12 +40,13 @@ class Source::URL::Twitter < Source::URL
     in "twitter.com", "i", "web", "status", status_id
       @status_id = status_id
 
+    # https://twitter.com/i/status/943446161586733056
     # https://twitter.com/motty08111213/status/943446161586733056
     # https://twitter.com/motty08111213/status/943446161586733056?s=19
     # https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
     # https://twitter.com/sato_1_11/status/1496489742791475201/photo/2
     in "twitter.com", username, "status", status_id, *rest
-      @username = username
+      @username = username unless username.in?(RESERVED_USERNAMES)
       @status_id = status_id
 
     # https://twitter.com/intent/user?user_id=1485229827984531457
