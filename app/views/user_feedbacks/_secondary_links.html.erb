@@ -1,9 +1,6 @@
 <% content_for(:secondary_links) do %>
   <%= quick_search_form_for(:user_name, user_feedbacks_path, "users", autocomplete: "user") %>
   <%= subnav_link_to "Listing", user_feedbacks_path %>
-  <% if policy(IpAddress).index? %>
-    <%= subnav_link_to "IP Addresses", ip_addresses_path %>
-  <% end %>
   <% if policy(IpBan).index? %>
     <%= subnav_link_to "IP Bans", ip_bans_path %>
   <% end %>

@@ -195,7 +195,7 @@ module ApplicationHelper
   def link_to_ip(ip, shorten: false, **options)
     ip_addr = IPAddr.new(ip.to_s)
     ip_addr.prefix = 64 if ip_addr.ipv6? && shorten
-    link_to ip_addr.to_s, ip_addresses_path(search: { ip_addr: ip, group_by: "user" }), **options
+    link_to ip_addr.to_s, user_events_path(search: { user_session: { ip_addr: ip }}), **options
   end
 
   def link_to_search(tag, **options)

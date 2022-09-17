@@ -34,11 +34,6 @@ Rails.application.routes.draw do
         end
       end
     end
-    resources :ip_addrs, :only => [:index, :search] do
-      collection do
-        get :search
-      end
-    end
   end
   namespace :explore do
     resources :posts, :only => [] do
@@ -143,7 +138,7 @@ Rails.application.routes.draw do
   end
   resources :forum_topic_visits, only: [:index]
   resources :ip_bans, only: [:index, :new, :create, :update]
-  resources :ip_addresses, only: [:show, :index], id: /.+?(?=\.json|\.xml|\.html)|.+/
+  resources :ip_addresses, only: [:show], id: /.+?(?=\.json|\.xml|\.html)|.+/
   resources :ip_geolocations, only: [:index]
   resource :iqdb_queries, :only => [:show, :create] do
     collection do

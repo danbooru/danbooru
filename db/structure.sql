@@ -838,187 +838,6 @@ CREATE TABLE public.good_jobs (
 
 
 --
--- Name: note_versions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.note_versions (
-    id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    x integer NOT NULL,
-    y integer NOT NULL,
-    width integer NOT NULL,
-    height integer NOT NULL,
-    body text NOT NULL,
-    updater_ip_addr inet NOT NULL,
-    is_active boolean DEFAULT true NOT NULL,
-    note_id integer NOT NULL,
-    post_id integer NOT NULL,
-    updater_id integer NOT NULL,
-    version integer DEFAULT 0 NOT NULL
-);
-
-
---
--- Name: posts; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.posts (
-    id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    uploader_id integer NOT NULL,
-    score integer DEFAULT 0 NOT NULL,
-    source character varying DEFAULT ''::character varying NOT NULL,
-    md5 character varying NOT NULL,
-    last_comment_bumped_at timestamp without time zone,
-    rating character(1) DEFAULT 'q'::bpchar NOT NULL,
-    image_width integer NOT NULL,
-    image_height integer NOT NULL,
-    uploader_ip_addr inet NOT NULL,
-    tag_string text DEFAULT ''::text NOT NULL,
-    fav_count integer DEFAULT 0 NOT NULL,
-    file_ext character varying NOT NULL,
-    last_noted_at timestamp without time zone,
-    parent_id integer,
-    has_children boolean DEFAULT false NOT NULL,
-    approver_id integer,
-    tag_count_general integer DEFAULT 0 NOT NULL,
-    tag_count_artist integer DEFAULT 0 NOT NULL,
-    tag_count_character integer DEFAULT 0 NOT NULL,
-    tag_count_copyright integer DEFAULT 0 NOT NULL,
-    file_size integer NOT NULL,
-    up_score integer DEFAULT 0 NOT NULL,
-    down_score integer DEFAULT 0 NOT NULL,
-    is_pending boolean DEFAULT false NOT NULL,
-    is_flagged boolean DEFAULT false NOT NULL,
-    is_deleted boolean DEFAULT false NOT NULL,
-    tag_count integer DEFAULT 0 NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    is_banned boolean DEFAULT false NOT NULL,
-    pixiv_id integer,
-    last_commented_at timestamp without time zone,
-    has_active_children boolean DEFAULT false,
-    bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL
-);
-
-
---
--- Name: users; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.users (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    level integer NOT NULL,
-    inviter_id integer,
-    created_at timestamp without time zone NOT NULL,
-    last_logged_in_at timestamp without time zone,
-    last_forum_read_at timestamp without time zone,
-    comment_threshold integer NOT NULL,
-    updated_at timestamp without time zone,
-    default_image_size character varying NOT NULL,
-    favorite_tags text,
-    blacklisted_tags text,
-    time_zone character varying NOT NULL,
-    post_update_count integer NOT NULL,
-    note_update_count integer NOT NULL,
-    favorite_count integer NOT NULL,
-    post_upload_count integer NOT NULL,
-    bcrypt_password_hash text NOT NULL,
-    per_page integer NOT NULL,
-    custom_style text,
-    bit_prefs bigint NOT NULL,
-    last_ip_addr inet,
-    unread_dmail_count integer NOT NULL,
-    theme integer NOT NULL,
-    upload_points integer NOT NULL
-);
-
-
---
--- Name: wiki_page_versions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.wiki_page_versions (
-    id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    title character varying NOT NULL,
-    body text NOT NULL,
-    updater_id integer NOT NULL,
-    updater_ip_addr inet NOT NULL,
-    wiki_page_id integer NOT NULL,
-    is_locked boolean NOT NULL,
-    other_names text[] DEFAULT '{}'::text[] NOT NULL,
-    is_deleted boolean DEFAULT false NOT NULL
-);
-
-
---
--- Name: ip_addresses; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.ip_addresses AS
- SELECT 'ArtistVersion'::text AS model_type,
-    artist_versions.id AS model_id,
-    artist_versions.updater_id AS user_id,
-    artist_versions.updater_ip_addr AS ip_addr,
-    artist_versions.created_at
-   FROM public.artist_versions
-UNION ALL
- SELECT 'ArtistCommentaryVersion'::text AS model_type,
-    artist_commentary_versions.id AS model_id,
-    artist_commentary_versions.updater_id AS user_id,
-    artist_commentary_versions.updater_ip_addr AS ip_addr,
-    artist_commentary_versions.created_at
-   FROM public.artist_commentary_versions
-UNION ALL
- SELECT 'Comment'::text AS model_type,
-    comments.id AS model_id,
-    comments.creator_id AS user_id,
-    comments.creator_ip_addr AS ip_addr,
-    comments.created_at
-   FROM public.comments
-UNION ALL
- SELECT 'Dmail'::text AS model_type,
-    dmails.id AS model_id,
-    dmails.from_id AS user_id,
-    dmails.creator_ip_addr AS ip_addr,
-    dmails.created_at
-   FROM public.dmails
-UNION ALL
- SELECT 'NoteVersion'::text AS model_type,
-    note_versions.id AS model_id,
-    note_versions.updater_id AS user_id,
-    note_versions.updater_ip_addr AS ip_addr,
-    note_versions.created_at
-   FROM public.note_versions
-UNION ALL
- SELECT 'Post'::text AS model_type,
-    posts.id AS model_id,
-    posts.uploader_id AS user_id,
-    posts.uploader_ip_addr AS ip_addr,
-    posts.created_at
-   FROM public.posts
-UNION ALL
- SELECT 'User'::text AS model_type,
-    users.id AS model_id,
-    users.id AS user_id,
-    users.last_ip_addr AS ip_addr,
-    users.created_at
-   FROM public.users
-  WHERE (users.last_ip_addr IS NOT NULL)
-UNION ALL
- SELECT 'WikiPageVersion'::text AS model_type,
-    wiki_page_versions.id AS model_id,
-    wiki_page_versions.updater_id AS user_id,
-    wiki_page_versions.updater_ip_addr AS ip_addr,
-    wiki_page_versions.created_at
-   FROM public.wiki_page_versions;
-
-
---
 -- Name: ip_bans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1271,6 +1090,28 @@ CREATE SEQUENCE public.news_updates_id_seq
 --
 
 ALTER SEQUENCE public.news_updates_id_seq OWNED BY public.news_updates.id;
+
+
+--
+-- Name: note_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.note_versions (
+    id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    x integer NOT NULL,
+    y integer NOT NULL,
+    width integer NOT NULL,
+    height integer NOT NULL,
+    body text NOT NULL,
+    updater_ip_addr inet NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    note_id integer NOT NULL,
+    post_id integer NOT NULL,
+    updater_id integer NOT NULL,
+    version integer DEFAULT 0 NOT NULL
+);
 
 
 --
@@ -1709,6 +1550,50 @@ ALTER SEQUENCE public.post_votes_id_seq OWNED BY public.post_votes.id;
 
 
 --
+-- Name: posts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.posts (
+    id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    uploader_id integer NOT NULL,
+    score integer DEFAULT 0 NOT NULL,
+    source character varying DEFAULT ''::character varying NOT NULL,
+    md5 character varying NOT NULL,
+    last_comment_bumped_at timestamp without time zone,
+    rating character(1) DEFAULT 'q'::bpchar NOT NULL,
+    image_width integer NOT NULL,
+    image_height integer NOT NULL,
+    uploader_ip_addr inet NOT NULL,
+    tag_string text DEFAULT ''::text NOT NULL,
+    fav_count integer DEFAULT 0 NOT NULL,
+    file_ext character varying NOT NULL,
+    last_noted_at timestamp without time zone,
+    parent_id integer,
+    has_children boolean DEFAULT false NOT NULL,
+    approver_id integer,
+    tag_count_general integer DEFAULT 0 NOT NULL,
+    tag_count_artist integer DEFAULT 0 NOT NULL,
+    tag_count_character integer DEFAULT 0 NOT NULL,
+    tag_count_copyright integer DEFAULT 0 NOT NULL,
+    file_size integer NOT NULL,
+    up_score integer DEFAULT 0 NOT NULL,
+    down_score integer DEFAULT 0 NOT NULL,
+    is_pending boolean DEFAULT false NOT NULL,
+    is_flagged boolean DEFAULT false NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
+    tag_count integer DEFAULT 0 NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    is_banned boolean DEFAULT false NOT NULL,
+    pixiv_id integer,
+    last_commented_at timestamp without time zone,
+    has_active_children boolean DEFAULT false,
+    bit_flags bigint DEFAULT 0 NOT NULL,
+    tag_count_meta integer DEFAULT 0 NOT NULL
+);
+
+
+--
 -- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -2124,6 +2009,58 @@ CREATE TABLE public.user_upgrades (
     status integer NOT NULL,
     transaction_id character varying,
     payment_processor integer DEFAULT 0 NOT NULL
+);
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    level integer NOT NULL,
+    inviter_id integer,
+    created_at timestamp without time zone NOT NULL,
+    last_logged_in_at timestamp without time zone,
+    last_forum_read_at timestamp without time zone,
+    comment_threshold integer NOT NULL,
+    updated_at timestamp without time zone,
+    default_image_size character varying NOT NULL,
+    favorite_tags text,
+    blacklisted_tags text,
+    time_zone character varying NOT NULL,
+    post_update_count integer NOT NULL,
+    note_update_count integer NOT NULL,
+    favorite_count integer NOT NULL,
+    post_upload_count integer NOT NULL,
+    bcrypt_password_hash text NOT NULL,
+    per_page integer NOT NULL,
+    custom_style text,
+    bit_prefs bigint NOT NULL,
+    last_ip_addr inet,
+    unread_dmail_count integer NOT NULL,
+    theme integer NOT NULL,
+    upload_points integer NOT NULL
+);
+
+
+--
+-- Name: wiki_page_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.wiki_page_versions (
+    id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    title character varying NOT NULL,
+    body text NOT NULL,
+    updater_id integer NOT NULL,
+    updater_ip_addr inet NOT NULL,
+    wiki_page_id integer NOT NULL,
+    is_locked boolean NOT NULL,
+    other_names text[] DEFAULT '{}'::text[] NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -6755,6 +6692,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220909205433'),
 ('20220909211649'),
 ('20220913191300'),
-('20220913191309');
+('20220913191309'),
+('20220917204044');
 
 
