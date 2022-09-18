@@ -18,7 +18,7 @@
         </tr>
       <% end %>
 
-      <% if policy(IpAddress).show? %>
+      <% if policy(:ip_address).show? %>
         <tr>
           <th>Last IP</th>
           <td>

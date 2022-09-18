@@ -4,8 +4,8 @@ class IpAddressesController < ApplicationController
   respond_to :html, :xml, :json
 
   def show
-    @ip_address = authorize IpAddress.new(ip_addr: params[:id])
-    @ip_info = @ip_address.ip_addr.ip_info
+    @ip_address = authorize Danbooru::IpAddress.new(params[:id]), policy_class: IpAddressPolicy
+    @ip_info = @ip_address.ip_info
     respond_with(@ip_info)
   end
 end

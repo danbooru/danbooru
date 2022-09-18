@@ -41,7 +41,7 @@ class BigqueryExportService
     Rails.application.eager_load!
 
     models = ApplicationRecord.descendants.sort_by(&:name)
-    models -= [GoodJob::BaseRecord, GoodJob::Process, GoodJob::Execution, GoodJob::ActiveJobJob, GoodJob::Job, GoodJob::Setting, IpAddress, TagRelationship, ArtistVersion, ArtistCommentaryVersion, NoteVersion, PoolVersion, PostVersion, WikiPageVersion, Post, PostVote, MediaAsset, Favorite, AITag]
+    models -= [GoodJob::BaseRecord, GoodJob::Process, GoodJob::Execution, GoodJob::ActiveJobJob, GoodJob::Job, GoodJob::Setting, TagRelationship, ArtistVersion, ArtistCommentaryVersion, NoteVersion, PoolVersion, PostVersion, WikiPageVersion, Post, PostVote, MediaAsset, Favorite, AITag]
     models
   end
 

@@ -34,7 +34,7 @@
 
     <div class="user-tooltip-header-bottom">
       <%= time_tag @user.created_at.to_date.iso8601, @user.created_at, class: "user-tooltip-created-at" %>
-      <% if @user.last_ip_addr.present? && policy(IpAddress).show? %>
+      <% if @user.last_ip_addr.present? && policy(:ip_address).show? %>
         · <%= link_to_ip @user.last_ip_addr, shorten: true, class: "link-plain" %>
       <% end %>
 

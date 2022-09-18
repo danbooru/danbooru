@@ -15,7 +15,7 @@
       <% t.column "Name", td: { class: "col-expand" } do |user| %>
         <%= link_to_user user %>
       <% end %>
-      <% if policy(IpAddress).show? %>
+      <% if policy(:ip_address).show? %>
         <% t.column "IP" do |user| %>
           <% if user.last_ip_addr.present? %>
             <%= link_to user.last_ip_addr, ip_address_path(user.last_ip_addr) %>
