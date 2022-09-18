@@ -109,7 +109,7 @@ class PostFlag < ApplicationRecord
     errors.add(:post, "is deleted and cannot be flagged") if post.is_deleted? && !is_deletion
 
     flag = post.flags.in_cooldown.last
-    if !is_deletion && flag.present?
+    if !is_deletion && !creator.is_approver? && flag.present?
       errors.add(:post, "cannot be flagged more than once every #{Danbooru.config.moderation_period.inspect} (last flagged: #{flag.created_at.to_formatted_s(:long)})")
     end
   end

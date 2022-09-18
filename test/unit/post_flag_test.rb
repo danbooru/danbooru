@@ -98,6 +98,21 @@ class PostFlagTest < ActiveSupport::TestCase
           assert(@flag3.errors.empty?)
         end
       end
+
+      should "be able to flag a post in the cooldown period if they're a mod" do
+        @post = create(:post)
+        @flag1 = create(:post_flag, post: @post)
+
+        create(:post_approval, post: @post)
+        assert_equal(false, @post.reload.is_pending?)
+
+        travel_to(Danbooru.config.moderation_period.from_now - 1.minute) do
+          @flag2 = create(:post_flag, post: @post, reason: "something", creator: create(:approver))
+
+          assert_equal(true, @flag2.valid?)
+          assert_equal(true, @post.reload.is_flagged?)
+        end
+      end
     end
   end
 end
