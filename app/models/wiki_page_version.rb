@@ -29,11 +29,6 @@ class WikiPageVersion < ApplicationRecord
     @previous.first
   end
 
-  def subsequent
-    @subsequent ||= WikiPageVersion.where("wiki_page_id = ? and id > ?", wiki_page_id, id).order("id asc").limit(1).to_a
-    @subsequent.first
-  end
-
   def current
     @current ||= WikiPageVersion.where(wiki_page_id: wiki_page_id).order("id desc").limit(1).to_a
     @current.first

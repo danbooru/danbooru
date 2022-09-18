@@ -19,11 +19,6 @@ class NoteVersion < ApplicationRecord
     @previous.first
   end
 
-  def subsequent
-    @subsequent ||= NoteVersion.where("note_id = ? and version > ?", note_id, version).order("updated_at asc").limit(1).to_a
-    @subsequent.first
-  end
-
   def current
     @current ||= NoteVersion.where(note_id: note_id).order("updated_at desc").limit(1).to_a
     @current.first

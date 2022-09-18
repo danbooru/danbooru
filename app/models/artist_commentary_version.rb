@@ -30,11 +30,6 @@ class ArtistCommentaryVersion < ApplicationRecord
     @previous.first
   end
 
-  def subsequent
-    @subsequent ||= ArtistCommentaryVersion.where("post_id = ? and updated_at > ?", post_id, updated_at).order("updated_at asc").limit(1).to_a
-    @subsequent.first
-  end
-
   def current
     @current ||= ArtistCommentaryVersion.where(post_id: post_id).order("updated_at desc").limit(1).to_a
     @current.first

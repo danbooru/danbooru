@@ -40,11 +40,6 @@ class ArtistVersion < ApplicationRecord
     @previous.first
   end
 
-  def subsequent
-    @subsequent ||= ArtistVersion.where("artist_id = ? and created_at > ?", artist_id, created_at).order("created_at asc").limit(1).to_a
-    @subsequent.first
-  end
-
   def current
     @previous ||= ArtistVersion.where(artist_id: artist_id).order("created_at desc").limit(1).to_a
     @previous.first

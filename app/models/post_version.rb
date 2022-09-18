@@ -128,11 +128,6 @@ class PostVersion < ApplicationRecord
     @previous.first
   end
 
-  def subsequent
-    @subsequent ||= PostVersion.where("post_id = ? and version > ?", post_id, version).order("version asc").limit(1).to_a
-    @subsequent.first
-  end
-
   def current
     @current ||= PostVersion.where(post_id: post_id).order("version desc").limit(1).to_a
     @current.first

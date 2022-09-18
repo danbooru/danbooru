@@ -62,7 +62,7 @@ module ApplicationHelper
 
   def version_type_links(params)
     html = []
-    %w[previous subsequent current].each do |type|
+    %w[previous current].each do |type|
       if type == params[:type]
         html << %{<span>#{type}</span>}
       else

@@ -6,8 +6,6 @@ module ArtistVersionsHelper
     this_names = artist_version.other_names
     if other.present?
       other_names = other.other_names
-    elsif type == "subsequent"
-      other_names = this_names
     else
       other_names = []
     end
@@ -24,8 +22,6 @@ module ArtistVersionsHelper
     this_urls = artist_version.urls
     if other.present?
       other_urls = other.urls
-    elsif type == "subsequent"
-      other_urls = this_urls
     else
       other_urls = []
     end

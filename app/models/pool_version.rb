@@ -100,11 +100,6 @@ class PoolVersion < ApplicationRecord
     @previous.first
   end
 
-  def subsequent
-    @subsequent ||= PoolVersion.where("pool_id = ? and version > ?", pool_id, version).order("version asc").limit(1).to_a
-    @subsequent.first
-  end
-
   def current
     @current ||= PoolVersion.where(pool_id: pool_id).order("version desc").limit(1).to_a
     @current.first
