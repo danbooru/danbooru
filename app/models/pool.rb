@@ -220,9 +220,9 @@ class Pool < ApplicationRecord
     post_count > 0 ? Post.find(post_ids.first) : nil
   end
 
-  def create_version(updater: CurrentUser.user, updater_ip_addr: CurrentUser.ip_addr)
+  def create_version(updater: CurrentUser.user)
     if PoolVersion.enabled?
-      PoolVersion.queue(self, updater, updater_ip_addr)
+      PoolVersion.queue(self, updater)
     else
       Rails.logger.warn("Archive service is not configured. Pool versions will not be saved.")
     end

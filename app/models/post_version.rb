@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PostVersion < ApplicationRecord
+  self.ignored_columns = [:updater_ip_addr]
+
   class RevertError < StandardError; end
   extend Memoist
 
@@ -91,7 +93,6 @@ class PostVersion < ApplicationRecord
           "parent_id" => post.parent_id,
           "source" => post.source,
           "updater_id" => CurrentUser.id,
-          "updater_ip_addr" => CurrentUser.ip_addr.to_s,
           "updated_at" => post.updated_at.try(:iso8601),
           "created_at" => post.created_at.try(:iso8601),
           "tags" => post.tag_string,

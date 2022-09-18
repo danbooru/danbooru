@@ -2,6 +2,7 @@
 
 class ForumPost < ApplicationRecord
   attr_readonly :topic_id
+  attr_accessor :creator_ip_addr
 
   belongs_to :creator, class_name: "User"
   belongs_to_updater
@@ -97,7 +98,7 @@ class ForumPost < ApplicationRecord
   end
 
   def autoreport_spam
-    if SpamDetector.new(self, user_ip: CurrentUser.ip_addr).spam?
+    if SpamDetector.new(self, user_ip: creator_ip_addr).spam?
       moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end
   end

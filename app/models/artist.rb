@@ -111,7 +111,6 @@ class Artist < ApplicationRecord
         :artist_id => id,
         :name => name,
         :updater_id => CurrentUser.id,
-        :updater_ip_addr => CurrentUser.ip_addr,
         :urls => url_array,
         :is_deleted => is_deleted,
         :is_banned => is_banned,

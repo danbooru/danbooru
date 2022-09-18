@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ArtistCommentaryVersion < ApplicationRecord
+  self.ignored_columns = [:updater_ip_addr]
+
   belongs_to :post
   belongs_to_updater
 

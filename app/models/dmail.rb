@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Dmail < ApplicationRecord
+  self.ignored_columns = [:creator_ip_addr]
+
+  attr_accessor :creator_ip_addr
+
   validate :validate_sender_is_not_limited, on: :create
   validates :title, presence: true, length: { maximum: 200 }, if: :title_changed?
   validates :body, presence: true, length: { maximum: 50_000 }, if: :body_changed?
@@ -52,7 +56,7 @@ class Dmail < ApplicationRecord
       end
 
       def create_automated(params)
-        dmail = Dmail.new(from: User.system, creator_ip_addr: "127.0.0.1", **params)
+        dmail = Dmail.new(from: User.system, **params)
         dmail.owner = dmail.to
         dmail.save
         dmail
@@ -171,7 +175,7 @@ class Dmail < ApplicationRecord
   end
 
   def autoreport_spam
-    if is_recipient? && !is_sender? && SpamDetector.new(self).spam?
+    if is_recipient? && !is_sender? && SpamDetector.new(self, user_ip: creator_ip_addr).spam?
       self.is_deleted = true
       moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end

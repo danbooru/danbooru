@@ -5,7 +5,6 @@ class DmailTest < ActiveSupport::TestCase
     setup do
       @user = FactoryBot.create(:user)
       CurrentUser.user = @user
-      CurrentUser.ip_addr = "1.2.3.4"
     end
 
     teardown do
@@ -80,7 +79,7 @@ class DmailTest < ActiveSupport::TestCase
     should "create a copy for each user" do
       @new_user = FactoryBot.create(:user)
       assert_difference("Dmail.count", 2) do
-        Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to: @new_user, title: "foo", body: "foo")
+        Dmail.create_split(from: CurrentUser.user, to: @new_user, title: "foo", body: "foo")
       end
     end
 
@@ -118,11 +117,11 @@ class DmailTest < ActiveSupport::TestCase
     context "sending a dmail" do
       should "fail if the user has sent too many dmails recently" do
         10.times do
-          Dmail.create_split(from: @user, to: create(:user), title: "blah", body: "blah", creator_ip_addr: "127.0.0.1")
+          Dmail.create_split(from: @user, to: create(:user), title: "blah", body: "blah")
         end
 
         assert_no_difference("Dmail.count") do
-          @dmail = Dmail.create_split(from: @user, to: create(:user), title: "blah", body: "blah", creator_ip_addr: "127.0.0.1")
+          @dmail = Dmail.create_split(from: @user, to: create(:user), title: "blah", body: "blah")
 
           assert_equal(false, @dmail.valid?)
           assert_equal(["You can't send dmails to more than 10 users per hour"], @dmail.errors[:base])
@@ -133,7 +132,7 @@ class DmailTest < ActiveSupport::TestCase
     context "destroying a dmail" do
       setup do
         @recipient = create(:user)
-        @dmail = Dmail.create_split(from: @user, to: @recipient, creator_ip_addr: "127.0.0.1", title: "foo", body: "foo")
+        @dmail = Dmail.create_split(from: @user, to: @recipient, title: "foo", body: "foo")
         @modreport = create(:moderation_report, model: @dmail)
       end
 

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class WikiPageVersion < ApplicationRecord
+  self.ignored_columns = [:updater_ip_addr]
+
   array_attribute :other_names
   belongs_to :wiki_page
   belongs_to_updater

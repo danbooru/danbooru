@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Post < ApplicationRecord
+  self.ignored_columns = [:uploader_ip_addr]
+
   class RevertError < StandardError; end
   class DeletionError < StandardError; end
 
@@ -109,7 +111,6 @@ class Post < ApplicationRecord
 
     post = Post.new(
       uploader: upload.uploader,
-      uploader_ip_addr: upload.uploader_ip_addr,
       md5: media_asset&.md5,
       file_ext: media_asset&.file_ext,
       file_size: media_asset&.file_size,
@@ -1420,7 +1421,7 @@ class Post < ApplicationRecord
           :image_height, :tag_count, :has_children, :has_active_children,
           :is_pending, :is_flagged, :is_deleted, :is_banned,
           :last_comment_bumped_at, :last_commented_at, :last_noted_at,
-          :uploader_ip_addr, :uploader, :approver, :parent,
+          :uploader, :approver, :parent,
           :artist_commentary, :flags, :appeals, :notes, :comments, :children,
           :approvals, :replacements, :pixiv_ugoira_frame_data
         )

@@ -2,7 +2,6 @@ FactoryBot.define do
   factory(:post) do
     md5 { SecureRandom.hex(32) }
     uploader
-    uploader_ip_addr {"127.0.0.1"}
     tag_string {"tag1 tag2"}
     tag_count {2}
     tag_count_general {2}

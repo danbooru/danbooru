@@ -65,14 +65,14 @@ class SpamDetector
   # Initialize a spam check for a message.
   # @param record [Dmail, ForumPost, Comment] the message to spam check
   # @param user_ip [String] the IP address of the user who posted the message
-  def initialize(record, user_ip: nil)
+  def initialize(record, user_ip:)
     case record
     when Dmail
       @record = record
       @user = record.from
       @content = record.body
       @comment_type = "message"
-      @user_ip = user_ip || record.creator_ip_addr.to_s
+      @user_ip = user_ip
     when ForumPost
       @record = record
       @user = record.creator
@@ -84,7 +84,7 @@ class SpamDetector
       @user = record.creator
       @content = record.body
       @comment_type = "comment"
-      @user_ip = user_ip || record.creator_ip_addr.to_s
+      @user_ip = user_ip
     else
       raise ArgumentError
     end

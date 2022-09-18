@@ -56,8 +56,7 @@ def populate_posts(n, search: "rating:s", batch_size: 200, timeout: 30.seconds)
     posts.each do |danbooru_post|
       Timeout.timeout(timeout) do
         user = User.order("random()").first
-        ip_addr = FFaker::Internet.ip_v4_address
-        upload = Upload.create(uploader: user, uploader_ip_addr: ip_addr, source: danbooru_post["file_url"])
+        upload = Upload.create(uploader: user, source: danbooru_post["file_url"])
         sleep 1 until upload.reload.is_finished? # wait for the job worker to process the upload in the background
 
         post = Post.new_from_upload(upload.upload_media_assets.first, tag_string: danbooru_post["tag_string"], source: danbooru_post["source"], rating: danbooru_post["rating"])
@@ -77,8 +76,7 @@ def populate_comments(n)
   n.times do |i|
     user = User.order("random()").first
     post = Post.order("random()").first
-    ip_addr = FFaker::Internet.ip_v4_address
-    comment = CurrentUser.scoped(user) { Comment.create(creator: user, creator_ip_addr: ip_addr, post: post, body: FFaker::Lorem.paragraph) }
+    comment = CurrentUser.scoped(user) { Comment.create(creator: user, post: post, body: FFaker::Lorem.paragraph) }
 
     puts "Created comment ##{comment.id}"
   end

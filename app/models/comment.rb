@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Comment < ApplicationRecord
+  self.ignored_columns = [:creator_ip_addr, :updater_ip_addr]
+
+  attr_accessor :creator_ip_addr
+
   belongs_to :post
   belongs_to :creator, class_name: "User"
   belongs_to_updater
@@ -52,7 +56,7 @@ class Comment < ApplicationRecord
   extend SearchMethods
 
   def autoreport_spam
-    if SpamDetector.new(self).spam?
+    if SpamDetector.new(self, user_ip: creator_ip_addr).spam?
       moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end
   end

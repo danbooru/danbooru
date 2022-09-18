@@ -5,12 +5,12 @@ class UploadsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:create], if: -> { request.xhr? }
 
   def new
-    @upload = authorize Upload.new(uploader: CurrentUser.user, uploader_ip_addr: CurrentUser.ip_addr, source: params[:url], referer_url: params[:ref], **permitted_attributes(Upload))
+    @upload = authorize Upload.new(uploader: CurrentUser.user, source: params[:url], referer_url: params[:ref], **permitted_attributes(Upload))
     respond_with(@upload)
   end
 
   def create
-    @upload = authorize Upload.new(uploader: CurrentUser.user, uploader_ip_addr: CurrentUser.ip_addr, **permitted_attributes(Upload))
+    @upload = authorize Upload.new(uploader: CurrentUser.user, **permitted_attributes(Upload))
     @upload.save
     respond_with(@upload)
   end

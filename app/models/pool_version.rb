@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PoolVersion < ApplicationRecord
+  self.ignored_columns = [:updater_ip_addr]
+
   belongs_to :updater, :class_name => "User"
   belongs_to :pool
 
@@ -64,7 +66,7 @@ class PoolVersion < ApplicationRecord
     SqsService.new(Danbooru.config.aws_sqs_archives_url)
   end
 
-  def self.queue(pool, updater, updater_ip_addr)
+  def self.queue(pool, updater)
     # queue updates to sqs so that if archives goes down for whatever reason it won't
     # block pool updates
     raise NotImplementedError, "Archive service is not configured." if !enabled?
@@ -73,7 +75,6 @@ class PoolVersion < ApplicationRecord
       pool_id: pool.id,
       post_ids: pool.post_ids,
       updater_id: updater.id,
-      updater_ip_addr: updater_ip_addr.to_s,
       created_at: pool.created_at.try(:iso8601),
       updated_at: pool.updated_at.try(:iso8601),
       description: pool.description,

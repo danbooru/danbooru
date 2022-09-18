@@ -11,7 +11,7 @@ class SearchableTest < ActiveSupport::TestCase
     subject { Post }
 
     setup do
-      @p1 = create(:post, source: "a1", score: 1, is_deleted: true, uploader_ip_addr: "10.0.0.1")
+      @p1 = create(:post, source: "a1", score: 1, is_deleted: true)
       @p2 = create(:post, source: "b2", score: 2, is_deleted: false)
       @p3 = create(:post, source: "c3", score: 3, is_deleted: false)
     end
@@ -108,11 +108,14 @@ class SearchableTest < ActiveSupport::TestCase
     end
 
     context "for an inet attribute" do
+      subject { UserSession }
+
       should "work" do
-        assert_search_equals(@p1, uploader_ip_addr: "10.0.0.1")
-        assert_search_equals(@p1, uploader_ip_addr: "10.0.0.1/24")
-        assert_search_equals(@p1, uploader_ip_addr: "10.0.0.1,1.1.1.1")
-        assert_search_equals(@p1, uploader_ip_addr: "10.0.0.1 1.1.1.1")
+        @us = create(:user_session, ip_addr: "10.0.0.1")
+        assert_search_equals(@us, ip_addr: "10.0.0.1")
+        assert_search_equals(@us, ip_addr: "10.0.0.1/24")
+        assert_search_equals(@us, ip_addr: "10.0.0.1,1.1.1.1")
+        assert_search_equals(@us, ip_addr: "10.0.0.1 1.1.1.1")
       end
     end
 
@@ -258,8 +261,8 @@ class SearchableTest < ActiveSupport::TestCase
 
       should "work" do
         @media_asset = create(:media_asset)
-        @upload1 = create(:upload, media_assets: [@media_asset])
-        @upload2 = create(:upload, media_assets: [@media_asset])
+        @upload1 = create(:upload, upload_media_assets: [build(:upload_media_asset, media_asset: @media_asset)])
+        @upload2 = create(:upload, upload_media_assets: [build(:upload_media_asset, media_asset: @media_asset)])
 
         assert_search_equals([@upload2, @upload1], media_asset: { md5: @media_asset.md5 })
       end

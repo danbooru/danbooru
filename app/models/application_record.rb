@@ -191,7 +191,6 @@ class ApplicationRecord < ActiveRecord::Base
           belongs_to :updater, class_name: "User", **options
           before_validation do |rec|
             rec.updater_id = CurrentUser.id
-            rec.updater_ip_addr = CurrentUser.ip_addr if rec.respond_to?(:updater_ip_addr=)
           end
         end
       end
