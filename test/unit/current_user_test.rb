@@ -3,7 +3,6 @@ require 'test_helper'
 class CurrentUserTest < ActiveSupport::TestCase
   setup do
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   context "The current user" do
@@ -11,14 +10,11 @@ class CurrentUserTest < ActiveSupport::TestCase
       user = FactoryBot.create(:user)
 
       assert_nil(CurrentUser.user)
-      assert_nil(CurrentUser.ip_addr)
 
       CurrentUser.user = user
-      CurrentUser.ip_addr = "1.2.3.4"
 
       assert_not_nil(CurrentUser.user)
       assert_equal(user.id, CurrentUser.user.id)
-      assert_equal("1.2.3.4", CurrentUser.ip_addr)
     end
   end
 
@@ -27,7 +23,7 @@ class CurrentUserTest < ActiveSupport::TestCase
       user1 = FactoryBot.create(:user)
       user2 = FactoryBot.create(:user)
       CurrentUser.user = user1
-      CurrentUser.scoped(user2, nil) do
+      CurrentUser.scoped(user2) do
         assert_equal(user2.id, CurrentUser.user.id)
       end
       assert_equal(user1.id, CurrentUser.user.id)
@@ -38,7 +34,7 @@ class CurrentUserTest < ActiveSupport::TestCase
       user2 = FactoryBot.create(:user)
       CurrentUser.user = user1
       assert_raises(RuntimeError) do
-        CurrentUser.scoped(user2, nil) do
+        CurrentUser.scoped(user2) do
           assert_equal(user2.id, CurrentUser.user.id)
           raise "ERROR"
         end

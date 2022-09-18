@@ -5,13 +5,11 @@ class ForumPostTest < ActiveSupport::TestCase
     setup do
       @user = FactoryBot.create(:user)
       CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
       @topic = FactoryBot.create(:forum_topic)
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "that mentions a user" do

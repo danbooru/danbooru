@@ -28,18 +28,15 @@ class ApplicationRecordTest < ActiveSupport::TestCase
         @user1 = create(:user)
         @user2 = create(:user)
 
-        CurrentUser.scoped(@user1, "1.1.1.1") do
+        CurrentUser.scoped(@user1) do
           Tag.parallel_each do |tag|
             assert_equal(@user1, CurrentUser.user)
-            assert_equal("1.1.1.1", CurrentUser.ip_addr)
 
-            CurrentUser.scoped(@user2, "2.2.2.2") do
+            CurrentUser.scoped(@user2) do
               assert_equal(@user2, CurrentUser.user)
-              assert_equal("2.2.2.2", CurrentUser.ip_addr)
             end
 
             assert_equal(@user1, CurrentUser.user)
-            assert_equal("1.1.1.1", CurrentUser.ip_addr)
           end
         end
       end

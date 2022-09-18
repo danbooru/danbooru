@@ -10,7 +10,6 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "new action" do

@@ -15,12 +15,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
   setup do
     CurrentUser.user = create(:user)
-    CurrentUser.ip_addr = "127.0.0.1"
   end
 
   teardown do
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   context "Searching:" do

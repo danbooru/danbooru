@@ -5,7 +5,6 @@ class SavedSearchTest < ActiveSupport::TestCase
     super
     @user = FactoryBot.create(:user)
     CurrentUser.user = @user
-    CurrentUser.ip_addr = "127.0.0.1"
     @mock_redis = MockRedis.new
     SavedSearch.stubs(:redis).returns(@mock_redis)
   end
@@ -13,7 +12,6 @@ class SavedSearchTest < ActiveSupport::TestCase
   def teardown
     super
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   context ".labels_for" do

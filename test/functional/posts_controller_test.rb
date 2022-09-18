@@ -243,12 +243,10 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       context "with a pool: search" do
         setup do
           CurrentUser.user = create(:user)
-          CurrentUser.ip_addr = "127.0.0.1"
         end
 
         teardown do
           CurrentUser.user = nil
-          CurrentUser.ip_addr = nil
         end
 
         should "render for a pool: search" do
@@ -278,12 +276,10 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       context "with a favgroup: search" do
         setup do
           CurrentUser.user = create(:user)
-          CurrentUser.ip_addr = "127.0.0.1"
         end
 
         teardown do
           CurrentUser.user = nil
-          CurrentUser.ip_addr = nil
         end
 
         should "render for a favgroup: search" do

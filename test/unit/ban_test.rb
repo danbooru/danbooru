@@ -6,13 +6,11 @@ class BanTest < ActiveSupport::TestCase
       setup do
         @banner = FactoryBot.create(:admin_user)
         CurrentUser.user = @banner
-        CurrentUser.ip_addr = "127.0.0.1"
       end
 
       teardown do
         @banner = nil
         CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
       end
 
       should "set the is_banned flag on the user" do
@@ -54,7 +52,6 @@ class BanTest < ActiveSupport::TestCase
   context "Searching for a ban" do
     should "find a given ban" do
       CurrentUser.user = FactoryBot.create(:admin_user)
-      CurrentUser.ip_addr = "127.0.0.1"
 
       user = FactoryBot.create(:user)
       ban = FactoryBot.create(:ban, user: user)
@@ -76,13 +73,11 @@ class BanTest < ActiveSupport::TestCase
       setup do
         @admin = FactoryBot.create(:admin_user)
         CurrentUser.user = @admin
-        CurrentUser.ip_addr = "127.0.0.1"
         @user = FactoryBot.create(:user)
       end
 
       teardown do
         CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
       end
     end
   end

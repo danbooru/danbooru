@@ -8,12 +8,10 @@ class ArtistURLTest < ActiveSupport::TestCase
   context "An artist url" do
     setup do
       CurrentUser.user = FactoryBot.create(:user)
-      CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     should "allow urls to be marked as inactive" do

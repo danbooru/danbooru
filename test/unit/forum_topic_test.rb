@@ -6,13 +6,11 @@ class ForumTopicTest < ActiveSupport::TestCase
       travel_to Time.now
       @user = FactoryBot.create(:user)
       CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
       @topic = create(:forum_topic, title: "xxx", creator: @user)
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "#mark_as_read!" do

@@ -12,12 +12,10 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     setup do
       @admin = FactoryBot.create(:admin_user)
       CurrentUser.user = @admin
-      CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     should_eventually "parse tags with tag type prefixes inside the script" do

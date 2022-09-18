@@ -24,7 +24,6 @@ FAVORITES    = ENV.fetch("FAVORITES",    POSTS * 5.0).to_i
 DEFAULT_PASSWORD = ENV.fetch("DEFAULT_PASSWORD", "password")
 
 CurrentUser.user = User.system
-CurrentUser.ip_addr = "127.0.0.1"
 
 def populate_users(n, password: DEFAULT_PASSWORD)
   puts "*** Creating users ***"

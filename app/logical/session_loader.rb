@@ -66,7 +66,6 @@ class SessionLoader
   # @see CurrentUser
   def load
     CurrentUser.user = User.anonymous
-    CurrentUser.ip_addr = request.remote_ip
 
     if has_api_authentication?
       load_session_for_api

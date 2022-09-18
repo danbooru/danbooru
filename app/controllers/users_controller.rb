@@ -65,7 +65,7 @@ class UsersController < ApplicationController
     user_verifier = UserVerifier.new(CurrentUser.user, request)
 
     @user = authorize User.new(
-      last_ip_addr: CurrentUser.ip_addr,
+      last_ip_addr: request.remote_ip,
       last_logged_in_at: Time.zone.now,
       requires_verification: user_verifier.requires_verification?,
       level: user_verifier.initial_level,

@@ -1,13 +1,8 @@
 require 'test_helper'
 
 class WikiPageTest < ActiveSupport::TestCase
-  setup do
-    CurrentUser.ip_addr = "127.0.0.1"
-  end
-
   teardown do
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   context "A wiki page" do

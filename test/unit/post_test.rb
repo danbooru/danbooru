@@ -17,14 +17,12 @@ class PostTest < ActiveSupport::TestCase
       @user = FactoryBot.create(:user)
     end
     CurrentUser.user = @user
-    CurrentUser.ip_addr = "127.0.0.1"
   end
 
   def teardown
     super
 
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   context "Deletion:" do

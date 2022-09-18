@@ -17,12 +17,10 @@ class ArtistTest < ActiveSupport::TestCase
     setup do
       user = travel_to(1.month.ago) {FactoryBot.create(:user)}
       CurrentUser.user = user
-      CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     should "parse inactive urls" do

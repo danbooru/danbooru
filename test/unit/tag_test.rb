@@ -4,12 +4,10 @@ class TagTest < ActiveSupport::TestCase
   setup do
     @builder = FactoryBot.create(:builder_user)
     CurrentUser.user = @builder
-    CurrentUser.ip_addr = "127.0.0.1"
   end
 
   teardown do
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   context "A tag category fetcher" do

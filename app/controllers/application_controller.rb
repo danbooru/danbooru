@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
 
     before_action(only: action, if: if_proc) do
       key = "#{controller_name}:#{action}"
-      rate_limiter = RateLimiter.build(action: key, rate: rate, burst: burst, user: CurrentUser.user, ip_addr: CurrentUser.ip_addr)
+      rate_limiter = RateLimiter.build(action: key, rate: rate, burst: burst, user: CurrentUser.user, ip_addr: request.remote_ip)
       headers["X-Rate-Limit"] = rate_limiter.to_json
       rate_limiter.limit!
     end
@@ -101,7 +101,7 @@ class ApplicationController < ActionController::Base
       rate: CurrentUser.user.api_regen_multiplier,
       burst: 200,
       user: CurrentUser.user,
-      ip_addr: CurrentUser.ip_addr,
+      ip_addr: request.remote_ip,
     )
 
     headers["X-Rate-Limit"] = rate_limiter.to_json
@@ -178,7 +178,6 @@ class ApplicationController < ActionController::Base
 
   def reset_current_user
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
     CurrentUser.safe_mode = false
   end
 
@@ -215,7 +214,7 @@ class ApplicationController < ActionController::Base
   end
 
   def ip_ban_check
-    raise User::PrivilegeError if !request.get? && IpBan.hit!(:full, CurrentUser.ip_addr)
+    raise User::PrivilegeError if !request.get? && IpBan.hit!(:full, request.remote_ip)
   end
 
   def pundit_user

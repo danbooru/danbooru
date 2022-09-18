@@ -4,7 +4,6 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
   setup do
     user = FactoryBot.create(:user)
     CurrentUser.user = user
-    CurrentUser.ip_addr = "127.0.0.1"
   end
 
   context "#other_wiki_pages" do

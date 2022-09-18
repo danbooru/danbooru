@@ -11,7 +11,7 @@ class ApplicationJob < ActiveJob::Base
   queue_with_priority 0
 
   around_perform do |_job, block|
-    CurrentUser.scoped(User.system, "127.0.0.1") do
+    CurrentUser.scoped(User.system) do
       ApplicationRecord.without_timeout do
         Timeout.timeout(24.hours, JobTimeoutError) do
           block.call

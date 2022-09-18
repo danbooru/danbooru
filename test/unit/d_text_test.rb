@@ -46,12 +46,10 @@ class DTextTest < ActiveSupport::TestCase
     context "#format_text" do
       setup do
         CurrentUser.user = create(:user)
-        CurrentUser.ip_addr = "127.0.0.1"
       end
 
       teardown do
         CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
       end
 
       should "add tag types to wiki links" do

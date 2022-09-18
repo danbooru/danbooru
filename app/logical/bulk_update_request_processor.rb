@@ -184,7 +184,7 @@ class BulkUpdateRequestProcessor
 
   # Process the bulk update request immediately.
   def process!
-    CurrentUser.scoped(User.system, "127.0.0.1") do
+    CurrentUser.scoped(User.system) do
       commands.map do |command, *args|
         case command
         when :create_alias

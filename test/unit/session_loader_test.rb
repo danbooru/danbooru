@@ -18,7 +18,6 @@ class SessionLoaderTest < ActiveSupport::TestCase
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
       CurrentUser.safe_mode = nil
     end
 

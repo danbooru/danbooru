@@ -4,12 +4,10 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
   setup do
     user = FactoryBot.create(:user)
     CurrentUser.user = user
-    CurrentUser.ip_addr = "127.0.0.1"
   end
 
   teardown do
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   should "A post should not have more than one commentary" do

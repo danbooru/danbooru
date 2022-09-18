@@ -43,7 +43,7 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @comment = authorize Comment.new(creator: CurrentUser.user, creator_ip_addr: CurrentUser.ip_addr)
+    @comment = authorize Comment.new(creator: CurrentUser.user, creator_ip_addr: request.remote_ip)
     @comment.update(permitted_attributes(@comment))
     flash[:notice] = @comment.valid? ? "Comment posted" : @comment.errors.full_messages.join("; ")
     respond_with(@comment) do |format|

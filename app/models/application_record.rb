@@ -217,14 +217,13 @@ class ApplicationRecord < ActiveRecord::Base
         end
 
         current_user = CurrentUser.user
-        current_ip = CurrentUser.ip_addr
 
         find_in_batches(batch_size: batch_size, error_on_ignore: true) do |batch|
           Parallel.each(batch, in_processes: in_processes, in_threads: in_threads) do |record|
             # XXX In threaded mode, the current user isn't inherited from the
             # parent thread because the current user is a thread-local
             # variable. Hence, we have to set it explicitly in the child thread.
-            CurrentUser.scoped(current_user, current_ip) do
+            CurrentUser.scoped(current_user) do
               yield record
             end
           end

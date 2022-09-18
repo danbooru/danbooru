@@ -227,7 +227,6 @@ module Sources
       context "translating the tags" do
         setup do
           CurrentUser.user = FactoryBot.create(:user)
-          CurrentUser.ip_addr = "127.0.0.1"
 
           tags = {
             "comic" => "漫画",
