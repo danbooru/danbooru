@@ -7,16 +7,18 @@
 class UserDeletion
   include ActiveModel::Validations
 
-  attr_reader :user, :password, :request
+  attr_reader :user, :deleter, :password, :request
 
   validate :validate_deletion
 
   # Initialize a user deletion.
   # @param user [User] the user to delete
+  # @param user [User] the user performing the deletion
   # @param password [String] the user's password (for confirmation)
   # @param request the HTTP request (for logging the deletion in the user event log)
-  def initialize(user, password, request)
+  def initialize(user:, deleter: user, password: nil, request: nil)
     @user = user
+    @deleter = deleter
     @password = password
     @request = request
   end
@@ -40,11 +42,11 @@ class UserDeletion
   private
 
   def create_mod_action
-    ModAction.log("deleted user ##{user.id}", :user_delete, user)
+    ModAction.log("deleted user ##{user.id}", :user_delete, deleter)
   end
 
   def create_user_event
-    UserEvent.create_from_request!(user, :user_deletion, request)
+    UserEvent.create_from_request!(user, :user_deletion, request) if request.present?
   end
 
   def clear_saved_searches
@@ -79,16 +81,30 @@ class UserDeletion
   end
 
   def validate_deletion
-    if !user.authenticate_password(password)
-      errors.add(:base, "Password is incorrect")
-    end
+    if user == deleter
+      if !user.authenticate_password(password)
+        errors.add(:base, "Password is incorrect")
+      end
 
-    if user.is_admin?
-      errors.add(:base, "Admins cannot delete their account")
-    end
+      if user.is_admin?
+        errors.add(:base, "Admins cannot delete their account")
+      end
 
-    if user.is_banned?
-      errors.add(:base, "You cannot delete your account if you are banned")
+      if user.is_banned?
+        errors.add(:base, "You cannot delete your account if you are banned")
+      end
+    else
+      if !deleter.is_owner?
+        errors.add(:base, "You cannot delete an account belonging to another user")
+      end
+
+      if user.is_gold?
+        errors.add(:base, "You cannot delete a privileged account")
+      end
+
+      if user.created_at.before?(6.months.ago)
+        errors.add(:base, "You cannot delete a recent account")
+      end
     end
   end
 end

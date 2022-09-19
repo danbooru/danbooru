@@ -12,7 +12,7 @@ class UserDeletionTest < ActiveSupport::TestCase
     context "for an invalid password" do
       should "fail" do
         @user = create(:user)
-        @deletion = UserDeletion.new(@user, "wrongpassword", @request)
+        @deletion = UserDeletion.new(user: @user, password: "wrongpassword", request: @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "Password is incorrect")
       end
@@ -21,7 +21,7 @@ class UserDeletionTest < ActiveSupport::TestCase
     context "for an admin" do
       should "fail" do
         @user = create(:admin_user)
-        @deletion = UserDeletion.new(@user, "password", @request)
+        @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "Admins cannot delete their account")
       end
@@ -30,7 +30,7 @@ class UserDeletionTest < ActiveSupport::TestCase
     context "for a banned user" do
       should "fail" do
         @user = create(:banned_user)
-        @deletion = UserDeletion.new(@user, "password", @request)
+        @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "You cannot delete your account if you are banned")
       end
@@ -40,7 +40,7 @@ class UserDeletionTest < ActiveSupport::TestCase
   context "a valid user deletion" do
     setup do
       @user = create(:user, name: "foo", email_address: build(:email_address))
-      @deletion = UserDeletion.new(@user, "password", @request)
+      @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
     end
 
     should "blank out the email" do
@@ -80,6 +80,26 @@ class UserDeletionTest < ActiveSupport::TestCase
 
       assert_equal(0, Favorite.count)
       assert_equal(0, @post.reload.fav_count)
+    end
+  end
+
+  context "deleting another user's account" do
+    should "work for the owner-level user" do
+      @user = create(:user)
+      @deletion = UserDeletion.new(user: @user, deleter: create(:owner_user))
+
+      @deletion.delete!
+      assert_equal("user_#{@user.id}", @user.reload.name)
+      assert_equal(true, ModAction.exists?(description: "deleted user ##{@user.id}", creator: @deletion.deleter))
+    end
+
+    should "not work for other users" do
+      @user = create(:user)
+      @deletion = UserDeletion.new(user: @user, deleter: create(:admin_user))
+
+      @deletion.delete!
+      assert_not_equal("user_#{@user.id}", @user.reload.name)
+      assert_equal(0, ModAction.count)
     end
   end
 end

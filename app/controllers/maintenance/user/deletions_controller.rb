@@ -9,7 +9,7 @@ module Maintenance
       end
 
       def destroy
-        deletion = UserDeletion.new(CurrentUser.user, params.dig(:user, :password), request)
+        deletion = UserDeletion.new(user: CurrentUser.user, deleter: CurrentUser.user, password: params.dig(:user, :password), request: request)
         deletion.delete!
 
         if deletion.errors.none?
