@@ -4333,6 +4333,13 @@ CREATE INDEX index_media_metadata_on_metadata ON public.media_metadata USING gin
 
 
 --
+-- Name: index_mod_actions_on_category; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mod_actions_on_category ON public.mod_actions USING btree (category);
+
+
+--
 -- Name: index_mod_actions_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4351,6 +4358,20 @@ CREATE INDEX index_mod_actions_on_creator_id ON public.mod_actions USING btree (
 --
 
 CREATE INDEX index_mod_actions_on_creator_id_and_created_at ON public.mod_actions USING btree (creator_id, created_at);
+
+
+--
+-- Name: index_mod_actions_on_description; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mod_actions_on_description ON public.mod_actions USING gin (description public.gin_trgm_ops);
+
+
+--
+-- Name: index_mod_actions_on_to_tsvector_pg_catalog_english_description; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mod_actions_on_to_tsvector_pg_catalog_english_description ON public.mod_actions USING gin (to_tsvector('english'::regconfig, description));
 
 
 --
@@ -6694,6 +6715,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220913191300'),
 ('20220913191309'),
 ('20220917204044'),
-('20220918031429');
+('20220918031429'),
+('20220919041622');
 
 
