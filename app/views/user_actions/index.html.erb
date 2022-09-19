@@ -62,7 +62,7 @@
             <% end %>
           <% when "ModAction" %>
             <div class="prose">
-              <%= link_to_user user %> <%= format_text(model.description, inline: true) %>.
+              <%= link_to_user user %> <%= format_text(model.description.chomp(".").strip, inline: true) %>.
             </div>
           <% when "ModerationReport" %>
             <div class="prose">

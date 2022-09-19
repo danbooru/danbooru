@@ -5,14 +5,16 @@
     <%= render "search" %>
 
     <%= table_for @mod_actions, class: "striped autofit" do |t| %>
+      <% t.column "Message", td: {class: "col-expand"} do |mod_action| %>
+        <div class="prose">
+          <%= link_to_user mod_action.creator %> <%= format_text(mod_action.description.chomp(".").strip, inline: true) %>.
+        </div>
+      <% end %>
+
       <% t.column "Category" do |mod_action| %>
         <%= link_to mod_action.category.humanize, mod_actions_path(search: { category: mod_action.category_id }) %>
       <% end %>
-      <% t.column "Message", td: {class: "col-expand"} do |mod_action| %>
-        <div class="prose">
-          <%= format_text(mod_action.description) %>
-        </div>
-      <% end %>
+
       <% t.column "Created" do |mod_action| %>
         <%= link_to_user mod_action.creator %>
         <%= link_to "»", mod_actions_path(search: { creator_name: mod_action.creator.name }) %>

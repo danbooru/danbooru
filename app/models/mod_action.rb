@@ -82,7 +82,14 @@ class ModAction < ApplicationRecord
     q = search_attributes(params, :id, :created_at, :updated_at, :category, :description, :creator)
     q = q.text_attribute_matches(:description, params[:description_matches])
 
-    q.apply_default_order(params)
+    case params[:order]
+    when "created_at_asc"
+      q = q.order(created_at: :asc, id: :asc)
+    else
+      q = q.apply_default_order(params)
+    end
+
+    q
   end
 
   def category_id
