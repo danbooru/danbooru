@@ -101,10 +101,6 @@ class UserDeletion
       if user.is_gold?
         errors.add(:base, "You cannot delete a privileged account")
       end
-
-      if user.created_at.before?(6.months.ago)
-        errors.add(:base, "You cannot delete a recent account")
-      end
     end
   end
 end
