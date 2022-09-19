@@ -19,8 +19,10 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
       context "on a basic user" do
         should "succeed" do
           put_auth admin_user_path(@user), @mod, params: {:user => {:level => "30"}}
+
           assert_redirected_to(edit_admin_user_path(@user))
           assert_equal(30, @user.reload.level)
+          assert_match(/promoted "#{@user.name}":\/users\/#{@user.id} from Member to Gold/, ModAction.last.description)
         end
 
         should "promote the user to unrestricted uploads" do
@@ -30,6 +32,8 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, @user.is_builder?)
           assert_equal(true, @user.can_upload_free?)
           assert_equal(false, @user.can_approve_posts?)
+          assert_match(/granted unlimited upload privileges to "#{@user.name}":\/users\/#{@user.id}/, ModAction.first.description)
+          assert_match(/promoted "#{@user.name}":\/users\/#{@user.id} from Member to Builder/, ModAction.last.description)
         end
 
         should "promote the user to approver" do
@@ -39,6 +43,8 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, @user.is_builder?)
           assert_equal(false, @user.can_upload_free?)
           assert_equal(true, @user.can_approve_posts?)
+          assert_match(/granted approval privileges to "#{@user.name}":\/users\/#{@user.id}/, ModAction.first.description)
+          assert_match(/promoted "#{@user.name}":\/users\/#{@user.id} from Member to Builder/, ModAction.last.description)
         end
 
         context "promoted to an admin" do

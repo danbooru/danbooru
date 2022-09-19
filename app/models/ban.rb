@@ -82,11 +82,11 @@ class Ban < ApplicationRecord
   end
 
   def create_ban_mod_action
-    ModAction.log(%{Banned <@#{user_name}> #{humanized_duration}: #{reason}}, :user_ban)
+    ModAction.log(%{banned <@#{user_name}> #{humanized_duration}: #{reason}}, :user_ban, banner)
   end
 
   def create_unban_mod_action
-    ModAction.log(%{Unbanned <@#{user_name}>}, :user_unban)
+    ModAction.log(%{unbanned <@#{user_name}>}, :user_unban)
   end
 
   def self.available_includes

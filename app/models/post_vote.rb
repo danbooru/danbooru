@@ -81,9 +81,9 @@ class PostVote < ApplicationRecord
     return if new_record? || updater.nil? || updater == user
 
     if is_deleted_changed?(from: false, to: true)
-      ModAction.log("#{updater.name} deleted post vote ##{id} on post ##{post_id}", :post_vote_delete, updater)
+      ModAction.log("deleted post vote ##{id} on post ##{post_id}", :post_vote_delete, updater)
     elsif is_deleted_changed?(from: true, to: false)
-      ModAction.log("#{updater.name} undeleted post vote ##{id} on post ##{post_id}", :post_vote_undelete, updater)
+      ModAction.log("undeleted post vote ##{id} on post ##{post_id}", :post_vote_undelete, updater)
     end
   end
 

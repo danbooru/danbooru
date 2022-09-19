@@ -56,13 +56,13 @@ class CommentVote < ApplicationRecord
         comment.update_columns(score: comment.score - score)
 
         if updater != user
-          ModAction.log("#{updater.name} deleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_delete, updater)
+          ModAction.log("deleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_delete, updater)
         end
       else
         comment.update_columns(score: comment.score + score)
 
         if updater != user
-          ModAction.log("#{updater.name} undeleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_undelete, updater)
+          ModAction.log("undeleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_undelete, updater)
         end
       end
     end

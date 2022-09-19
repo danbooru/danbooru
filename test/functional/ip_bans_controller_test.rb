@@ -18,13 +18,16 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
       should "create a new ip ban" do
         assert_difference("IpBan.count", 1) do
           post_auth ip_bans_path, @admin, params: {:ip_ban => {:ip_addr => "1.2.3.4", :reason => "xyz"}}
+
           assert_response :redirect
         end
       end
 
       should "log a mod action" do
         post_auth ip_bans_path, @admin, params: { ip_ban: { ip_addr: "1.2.3.4", reason: "xyz" }}
+
         assert_equal("ip_ban_create", ModAction.last&.category)
+        assert_match(/created ip ban for 1\.2\.3\.4/, ModAction.last.description)
       end
     end
 
@@ -61,6 +64,17 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_equal(true, @ip_ban.reload.is_deleted)
         assert_equal("ip_ban_delete", ModAction.last.category)
+        assert_match(/deleted ip ban for #{@ip_ban.ip_addr}/, ModAction.last.description)
+      end
+
+      should "mark an ip ban as undeleted" do
+        @ip_ban = create(:ip_ban, ip_addr: "5.6.7.8", is_deleted: true)
+        put_auth ip_ban_path(@ip_ban), @admin, params: { ip_ban: { is_deleted: false }, format: "js" }
+
+        assert_response :success
+        assert_equal(false, @ip_ban.reload.is_deleted?)
+        assert_equal("ip_ban_undelete", ModAction.last.category)
+        assert_match(/undeleted ip ban for #{@ip_ban.ip_addr}/, ModAction.last.description)
       end
     end
   end

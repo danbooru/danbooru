@@ -106,7 +106,7 @@ class PostVoteTest < ActiveSupport::TestCase
         vote = create(:post_vote, post: @post, score: 1)
 
         vote.soft_delete!(updater: admin)
-        assert_match(/admin deleted post vote #\d+ on post #\d+/, ModAction.post_vote_delete.last.description)
+        assert_match(/deleted post vote #\d+ on post #\d+/, ModAction.post_vote_delete.last.description)
       end
     end
 
@@ -128,7 +128,7 @@ class PostVoteTest < ActiveSupport::TestCase
       end
 
       should "leave a mod action" do
-        assert_match(/admin undeleted post vote #\d+ on post #\d+/, ModAction.post_vote_undelete.last.description)
+        assert_match(/undeleted post vote #\d+ on post #\d+/, ModAction.post_vote_undelete.last.description)
       end
     end
   end

@@ -60,6 +60,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to bans_path
           assert_equal(true, @user.reload.is_banned?)
+          assert_match(/banned <@#{@user.name}> 1 day: xxx/, ModAction.last.description)
         end
       end
 
@@ -131,7 +132,9 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
         assert_difference("Ban.count", -1) do
           delete_auth ban_path(@ban.id), @mod
+
           assert_redirected_to bans_path
+          assert_match(/unbanned <@#{@ban.user.name}>/, ModAction.last.description)
         end
       end
     end

@@ -141,7 +141,9 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
       context "when updating another user's comment" do
         should "succeed if updater is a moderator" do
           put_auth comment_path(@comment.id), @user, params: {comment: {body: "abc"}}, xhr: true
+
           assert_equal("abc", @comment.reload.body)
+          assert_match(/updated comment ##{@comment.id}/, ModAction.last.description)
           assert_response :success
         end
 
@@ -156,7 +158,9 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
       context "when stickying a comment" do
         should "succeed if updater is a moderator" do
           put_auth comment_path(@comment.id), @mod, params: {comment: {is_sticky: true}}, xhr: true
+
           assert_equal(true, @comment.reload.is_sticky)
+          assert_match(/updated comment ##{@comment.id}/, ModAction.last.description)
           assert_response :success
         end
 
@@ -179,14 +183,18 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
       should "update the body" do
         put_auth comment_path(@comment.id), @user, params: {comment: {body: "abc"}}, xhr: true
+
         assert_equal("abc", @comment.reload.body)
+        assert_match(/updated comment ##{@comment.id}/, ModAction.last.description)
         assert_response :success
       end
 
       should "allow changing the body and is_deleted" do
         put_auth comment_path(@comment.id), @user, params: {comment: {body: "herp derp", is_deleted: true}}, xhr: true
+
         assert_equal("herp derp", @comment.reload.body)
         assert_equal(true, @comment.is_deleted)
+        assert_match(/deleted comment ##{@comment.id}/, ModAction.last.description)
         assert_response :success
       end
 
@@ -240,6 +248,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
         assert_equal(true, @comment.reload.is_deleted)
         assert_redirected_to @comment
+        assert_match(/deleted comment ##{@comment.id}/, ModAction.last.description)
       end
 
       should "mark all pending moderation reports against the comment as handled" do
@@ -263,6 +272,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to(@comment)
         assert_equal(false, @comment.reload.is_deleted)
+        assert_match(/updated comment ##{@comment.id}/, ModAction.last.description)
       end
 
       should "not allow normal Members to undelete their own comments" do

@@ -1462,7 +1462,7 @@ class Post < ApplicationRecord
       if category == "iqdb"
         update_iqdb
 
-        ModAction.log("<@#{user.name}> regenerated IQDB for post ##{id}", :post_regenerate_iqdb, user)
+        ModAction.log("regenerated IQDB for post ##{id}", :post_regenerate_iqdb, user)
       else
         media_file = media_asset.variant(:original).open_file
         media_asset.distribute_files!(media_file)
@@ -1484,7 +1484,7 @@ class Post < ApplicationRecord
         purge_cached_urls!
         update_iqdb
 
-        ModAction.log("<@#{user.name}> regenerated image samples for post ##{id}", :post_regenerate, user)
+        ModAction.log("regenerated image samples for post ##{id}", :post_regenerate, user)
       end
     end
 

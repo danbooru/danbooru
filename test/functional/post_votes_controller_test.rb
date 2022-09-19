@@ -286,7 +286,7 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(0, @post.up_score)
         assert_equal(0, @post.votes.active.count)
         assert_equal(true, @vote.reload.is_deleted?)
-        assert_match(/#{admin.name} deleted post vote #\d+ on post #\d+/, ModAction.post_vote_delete.last.description)
+        assert_match(/deleted post vote #\d+ on post #\d+/, ModAction.post_vote_delete.last.description)
       end
 
       should "not fail when attempting to remove an already removed vote" do
