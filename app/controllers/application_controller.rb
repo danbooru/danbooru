@@ -2,6 +2,7 @@
 
 class ApplicationController < ActionController::Base
   class PageRemovedError < StandardError; end
+  class RequestBodyNotAllowedError < StandardError; end
 
   include Pundit::Authorization
   helper_method :search_params, :permitted_attributes
@@ -9,6 +10,7 @@ class ApplicationController < ActionController::Base
   self.responder = ApplicationResponder
 
   skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
+  before_action :check_get_body
   before_action :reset_current_user
   before_action :set_current_user
   before_action :normalize_search
@@ -120,6 +122,8 @@ class ApplicationController < ActionController::Base
       render_error_page(401, exception, message: exception.message, template: "sessions/new")
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest, ActionController::Redirecting::UnsafeRedirectError
       render_error_page(403, exception, message: exception.message)
+    when RequestBodyNotAllowedError
+      render_error_page(403, exception, message: "Request body not allowed for #{request.method} request")
     when ActiveSupport::MessageVerifier::InvalidSignature, # raised by `find_signed!`
          User::PrivilegeError,
          Pundit::NotAuthorizedError
@@ -191,6 +195,10 @@ class ApplicationController < ActionController::Base
 
   def set_variant
     request.variant = params[:variant].try(:to_sym)
+  end
+
+  def check_get_body
+    raise RequestBodyNotAllowedError if request.method.in?(%w[GET HEAD OPTIONS]) && request.body.size > 0
   end
 
   # allow api clients to force errors for testing purposes.
