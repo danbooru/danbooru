@@ -232,7 +232,6 @@ CREATE TABLE public.artist_urls (
     id integer NOT NULL,
     artist_id integer NOT NULL,
     url text NOT NULL,
-    normalized_url text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_active boolean DEFAULT true NOT NULL
@@ -3430,20 +3429,6 @@ CREATE INDEX index_artist_commentary_versions_on_updater_id_and_post_id ON publi
 --
 
 CREATE INDEX index_artist_urls_on_artist_id ON public.artist_urls USING btree (artist_id);
-
-
---
--- Name: index_artist_urls_on_normalized_url_pattern; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_artist_urls_on_normalized_url_pattern ON public.artist_urls USING btree (normalized_url text_pattern_ops);
-
-
---
--- Name: index_artist_urls_on_normalized_url_trgm; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_artist_urls_on_normalized_url_trgm ON public.artist_urls USING gin (normalized_url public.gin_trgm_ops);
 
 
 --
@@ -6650,6 +6635,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220917204044'),
 ('20220918031429'),
 ('20220919041622'),
-('20220920224005');
+('20220920224005'),
+('20220921022408');
 
 
