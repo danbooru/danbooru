@@ -195,7 +195,6 @@ CREATE TABLE public.artist_commentary_versions (
     id integer NOT NULL,
     post_id integer NOT NULL,
     updater_id integer NOT NULL,
-    updater_ip_addr inet,
     original_title text DEFAULT ''::text NOT NULL,
     original_description text DEFAULT ''::text NOT NULL,
     translated_title text DEFAULT ''::text NOT NULL,
@@ -269,7 +268,6 @@ CREATE TABLE public.artist_versions (
     artist_id integer NOT NULL,
     name character varying NOT NULL,
     updater_id integer NOT NULL,
-    updater_ip_addr inet,
     is_deleted boolean DEFAULT false NOT NULL,
     other_names text[] DEFAULT '{}'::text[] NOT NULL,
     group_name character varying DEFAULT ''::character varying NOT NULL,
@@ -453,12 +451,10 @@ CREATE TABLE public.comments (
     post_id integer NOT NULL,
     creator_id integer NOT NULL,
     body text NOT NULL,
-    creator_ip_addr inet,
     score integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     updater_id integer,
-    updater_ip_addr inet,
     do_not_bump_post boolean DEFAULT false NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     is_sticky boolean DEFAULT false NOT NULL
@@ -500,7 +496,6 @@ CREATE TABLE public.dmails (
     is_deleted boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    creator_ip_addr inet,
     is_spam boolean DEFAULT false NOT NULL
 );
 
@@ -1105,7 +1100,6 @@ CREATE TABLE public.note_versions (
     width integer NOT NULL,
     height integer NOT NULL,
     body text NOT NULL,
-    updater_ip_addr inet,
     is_active boolean DEFAULT true NOT NULL,
     note_id integer NOT NULL,
     post_id integer NOT NULL,
@@ -1216,7 +1210,6 @@ CREATE TABLE public.pool_versions (
     updated_at timestamp(6) without time zone NOT NULL,
     pool_id bigint NOT NULL,
     updater_id bigint NOT NULL,
-    updater_ip_addr inet,
     version integer DEFAULT 1 NOT NULL,
     name text NOT NULL,
     description text DEFAULT ''::text NOT NULL,
@@ -1481,7 +1474,6 @@ CREATE TABLE public.post_versions (
     updated_at timestamp(6) without time zone NOT NULL,
     post_id bigint NOT NULL,
     updater_id bigint NOT NULL,
-    updater_ip_addr inet,
     version integer DEFAULT 1 NOT NULL,
     parent_changed boolean DEFAULT false NOT NULL,
     rating_changed boolean DEFAULT false NOT NULL,
@@ -1564,7 +1556,6 @@ CREATE TABLE public.posts (
     rating character(1) DEFAULT 'q'::bpchar NOT NULL,
     image_width integer NOT NULL,
     image_height integer NOT NULL,
-    uploader_ip_addr inet,
     tag_string text DEFAULT ''::text NOT NULL,
     fav_count integer DEFAULT 0 NOT NULL,
     file_ext character varying NOT NULL,
@@ -1921,7 +1912,6 @@ CREATE TABLE public.uploads (
     id integer NOT NULL,
     source text,
     uploader_id integer NOT NULL,
-    uploader_ip_addr inet,
     status text DEFAULT 'pending'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2056,7 +2046,6 @@ CREATE TABLE public.wiki_page_versions (
     title character varying NOT NULL,
     body text NOT NULL,
     updater_id integer NOT NULL,
-    updater_ip_addr inet,
     wiki_page_id integer NOT NULL,
     is_locked boolean NOT NULL,
     other_names text[] DEFAULT '{}'::text[] NOT NULL,
@@ -3437,13 +3426,6 @@ CREATE INDEX index_artist_commentary_versions_on_updater_id_and_post_id ON publi
 
 
 --
--- Name: index_artist_commentary_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_artist_commentary_versions_on_updater_ip_addr ON public.artist_commentary_versions USING btree (updater_ip_addr);
-
-
---
 -- Name: index_artist_urls_on_artist_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3518,13 +3500,6 @@ CREATE INDEX index_artist_versions_on_updater_id ON public.artist_versions USING
 --
 
 CREATE INDEX index_artist_versions_on_updater_id_and_created_at ON public.artist_versions USING btree (updater_id, created_at);
-
-
---
--- Name: index_artist_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_artist_versions_on_updater_ip_addr ON public.artist_versions USING btree (updater_ip_addr);
 
 
 --
@@ -3717,13 +3692,6 @@ CREATE INDEX index_comments_on_creator_id_and_post_id ON public.comments USING b
 
 
 --
--- Name: index_comments_on_creator_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_comments_on_creator_ip_addr ON public.comments USING btree (creator_ip_addr);
-
-
---
 -- Name: index_comments_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3749,13 +3717,6 @@ CREATE INDEX index_completed_user_upgrades_on_updater_id_and_created_at ON publi
 --
 
 CREATE INDEX index_dmails_on_created_at ON public.dmails USING btree (created_at);
-
-
---
--- Name: index_dmails_on_creator_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_dmails_on_creator_ip_addr ON public.dmails USING btree (creator_ip_addr);
 
 
 --
@@ -4452,13 +4413,6 @@ CREATE INDEX index_note_versions_on_updater_id_and_post_id ON public.note_versio
 
 
 --
--- Name: index_note_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_note_versions_on_updater_ip_addr ON public.note_versions USING btree (updater_ip_addr);
-
-
---
 -- Name: index_notes_on_body_tsvector; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5013,13 +4967,6 @@ CREATE INDEX index_posts_on_uploader_id_and_created_at ON public.posts USING btr
 
 
 --
--- Name: index_posts_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_uploader_ip_addr ON public.posts USING btree (uploader_ip_addr);
-
-
---
 -- Name: index_rate_limits_on_key_and_action; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5391,13 +5338,6 @@ CREATE INDEX index_uploads_on_uploader_id_and_created_at_and_id ON public.upload
 
 
 --
--- Name: index_uploads_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_uploads_on_uploader_ip_addr ON public.uploads USING btree (uploader_ip_addr);
-
-
---
 -- Name: index_user_events_on_category; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5647,13 +5587,6 @@ CREATE INDEX index_wiki_page_versions_on_updater_id ON public.wiki_page_versions
 --
 
 CREATE INDEX index_wiki_page_versions_on_updater_id_and_created_at ON public.wiki_page_versions USING btree (updater_id, created_at);
-
-
---
--- Name: index_wiki_page_versions_on_updater_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_wiki_page_versions_on_updater_ip_addr ON public.wiki_page_versions USING btree (updater_ip_addr);
 
 
 --
@@ -6716,6 +6649,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220913191309'),
 ('20220917204044'),
 ('20220918031429'),
-('20220919041622');
+('20220919041622'),
+('20220920224005');
 
 
