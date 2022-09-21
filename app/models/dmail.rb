@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Dmail < ApplicationRecord
-  self.ignored_columns = [:creator_ip_addr]
-
   attr_accessor :creator_ip_addr
 
   validate :validate_sender_is_not_limited, on: :create

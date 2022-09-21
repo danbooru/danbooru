@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class PostVersion < ApplicationRecord
-  self.ignored_columns = [:updater_ip_addr]
-
   class RevertError < StandardError; end
   extend Memoist
 

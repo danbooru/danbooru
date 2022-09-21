@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Comment < ApplicationRecord
-  self.ignored_columns = [:creator_ip_addr, :updater_ip_addr]
-
   attr_accessor :creator_ip_addr
 
   belongs_to :post

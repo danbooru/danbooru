@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Upload < ApplicationRecord
-  self.ignored_columns = [:uploader_ip_addr]
-
   extend Memoist
   class Error < StandardError; end
 

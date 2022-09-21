@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class PoolVersion < ApplicationRecord
-  self.ignored_columns = [:updater_ip_addr]
-
   belongs_to :updater, :class_name => "User"
   belongs_to :pool
 

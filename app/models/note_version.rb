@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class NoteVersion < ApplicationRecord
-  self.ignored_columns = [:updater_ip_addr]
-
   belongs_to :post
   belongs_to :note
   belongs_to_updater :counter_cache => "note_update_count"

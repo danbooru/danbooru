@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ArtistVersion < ApplicationRecord
-  self.ignored_columns = [:updater_ip_addr]
-
   array_attribute :urls
   array_attribute :other_names
 

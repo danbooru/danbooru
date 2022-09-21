@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ArtistURL < ApplicationRecord
-  self.ignored_columns = [:normalized_url]
-
   normalize :url, :normalize_url
 
   validates :url, presence: true, uniqueness: { scope: :artist_id }

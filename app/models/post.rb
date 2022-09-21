@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Post < ApplicationRecord
-  self.ignored_columns = [:uploader_ip_addr]
-
   class RevertError < StandardError; end
   class DeletionError < StandardError; end
 
