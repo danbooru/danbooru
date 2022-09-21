@@ -19,7 +19,7 @@ class SearchableTest < ActiveSupport::TestCase
     context "for a nonexistent attribute" do
       should "raise an error" do
         assert_raises(ArgumentError) do
-          Post.search_attribute(:answer, 42, User.anonymous)
+          Post.search_attributes({ answer: 42 }, :answer)
         end
       end
     end
