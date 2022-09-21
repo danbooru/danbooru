@@ -139,7 +139,7 @@
 
         <span>(<%= link_to "hide", "#", id: "hide-promotion-notice" %>)</span>
       </div>
-    <% elsif !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && !CurrentUser.user.is_banned? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
+    <% elsif UserUpgrade.enabled? && !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && !CurrentUser.user.is_banned? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
       <%= render "users/upgrade_notice" %>
     <% end %>
 
