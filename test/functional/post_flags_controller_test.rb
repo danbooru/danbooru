@@ -6,7 +6,7 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
       @user = create(:user)
       @flagger = create(:gold_user, id: 999, created_at: 2.weeks.ago)
       @uploader = create(:mod_user, name: "chen", created_at: 2.weeks.ago)
-      @mod = create(:mod_user)
+      @mod = create(:mod_user, name: "mod")
       @post = create(:post, id: 101, is_flagged: true, uploader: @uploader)
       @post_flag = create(:post_flag, reason: "xxx", post: @post, creator: @flagger)
     end
@@ -65,6 +65,14 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
         assert_select "tr#post-flag-#{@post_flag.id} .flagged-column a.user-gold", true
       end
 
+      should "let mods see the flagger name on self-flagged posts" do
+        @post_flag = create(:post_flag, creator: @mod, post: build(:post, uploader: @mod))
+        get_auth post_flags_path, @mod
+
+        assert_response :success
+        assert_select "tr#post-flag-#{@post_flag.id} .flagged-column a.user-moderator", true
+      end
+
       context "as a normal user" do
         setup do
           CurrentUser.user = @user
@@ -97,6 +105,15 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should respond_to_search(creator_id: 999).with { @post_flag }
+      end
+
+      context "when the user is a mod and flags their own upload" do
+        setup do
+          CurrentUser.user = @mod
+          @post_flag = create(:post_flag, creator: @mod, post: build(:post, uploader: @mod))
+        end
+
+        should respond_to_search(creator_name: "mod").with { @post_flag }
       end
 
       context "when the user is the flagger" do

@@ -59,16 +59,8 @@ class PostFlag < ApplicationRecord
     end
 
     def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :reason, :status, :post)
+      q = search_attributes(params, :id, :created_at, :updated_at, :reason, :status, :post, :creator)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
-
-      if params[:creator_id].present?
-        flagger = User.find(params[:creator_id])
-        q = q.creator_matches(flagger, CurrentUser.user)
-      elsif params[:creator_name].present?
-        flagger = User.find_by_name(params[:creator_name])
-        q = q.creator_matches(flagger, CurrentUser.user)
-      end
 
       if params[:category]
         q = q.category_matches(params[:category])
