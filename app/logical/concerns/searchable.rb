@@ -289,35 +289,35 @@ module Searchable
       relation = self.relation
 
       if params[key].present?
-        relation = relation.where_numeric_matches(attr, params[key], type)
+        relation = visible(relation, attr).where_numeric_matches(attr, params[key], type)
       end
 
       if params[:"#{key}_not"].present?
-        relation = relation.where.not(id: relation.where_numeric_matches(attr, params[:"#{key}_not"], type))
+        relation = visible(relation, attr).where.not(id: visible(relation, attr).where_numeric_matches(attr, params[:"#{key}_not"], type))
       end
 
       if params[:"#{key}_eq"].present?
-        relation = relation.where_operator(attr, :eq, params[:"#{key}_eq"])
+        relation = visible(relation, attr).where_operator(attr, :eq, params[:"#{key}_eq"])
       end
 
       if params[:"#{key}_not_eq"].present?
-        relation = relation.where_operator(attr, :not_eq, params[:"#{key}_not_eq"])
+        relation = visible(relation, attr).where_operator(attr, :not_eq, params[:"#{key}_not_eq"])
       end
 
       if params[:"#{key}_gt"].present?
-        relation = relation.where_operator(attr, :gt, params[:"#{key}_gt"])
+        relation = visible(relation, attr).where_operator(attr, :gt, params[:"#{key}_gt"])
       end
 
       if params[:"#{key}_gteq"].present?
-        relation = relation.where_operator(attr, :gteq, params[:"#{key}_gteq"])
+        relation = visible(relation, attr).where_operator(attr, :gteq, params[:"#{key}_gteq"])
       end
 
       if params[:"#{key}_lt"].present?
-        relation = relation.where_operator(attr, :lt, params[:"#{key}_lt"])
+        relation = visible(relation, attr).where_operator(attr, :lt, params[:"#{key}_lt"])
       end
 
       if params[:"#{key}_lteq"].present?
-        relation = relation.where_operator(attr, :lteq, params[:"#{key}_lteq"])
+        relation = visible(relation, attr).where_operator(attr, :lteq, params[:"#{key}_lteq"])
       end
 
       relation
@@ -327,71 +327,71 @@ module Searchable
       relation = self.relation
 
       if params[attr].present?
-        relation = relation.where(attr => params[attr])
+        relation = visible(relation, attr).where(attr => params[attr])
       end
 
       if params[:"#{attr}_present"].present? && params[:"#{attr}_present"].truthy?
-        relation = relation.where.not(attr => "")
+        relation = visible(relation, attr).where.not(attr => "")
       end
 
       if params[:"#{attr}_present"].present? && params[:"#{attr}_present"].falsy?
-        relation = relation.where(attr => "")
+        relation = visible(relation, attr).where(attr => "")
       end
 
       if params[:"#{attr}_eq"].present?
-        relation = relation.where(attr => params[:"#{attr}_eq"])
+        relation = visible(relation, attr).where(attr => params[:"#{attr}_eq"])
       end
 
       if params[:"#{attr}_not_eq"].present?
-        relation = relation.where.not(attr => params[:"#{attr}_not_eq"])
+        relation = visible(relation, attr).where.not(attr => params[:"#{attr}_not_eq"])
       end
 
       if params[:"#{attr}_like"].present?
-        relation = relation.where_like(attr, params[:"#{attr}_like"])
+        relation = visible(relation, attr).where_like(attr, params[:"#{attr}_like"])
       end
 
       if params[:"#{attr}_ilike"].present?
-        relation = relation.where_ilike(attr, params[:"#{attr}_ilike"])
+        relation = visible(relation, attr).where_ilike(attr, params[:"#{attr}_ilike"])
       end
 
       if params[:"#{attr}_not_like"].present?
-        relation = relation.where_not_like(attr, params[:"#{attr}_not_like"])
+        relation = visible(relation, attr).where_not_like(attr, params[:"#{attr}_not_like"])
       end
 
       if params[:"#{attr}_not_ilike"].present?
-        relation = relation.where_not_ilike(attr, params[:"#{attr}_not_ilike"])
+        relation = visible(relation, attr).where_not_ilike(attr, params[:"#{attr}_not_ilike"])
       end
 
       if params[:"#{attr}_regex"].present?
-        relation = relation.where_regex(attr, params[:"#{attr}_regex"])
+        relation = visible(relation, attr).where_regex(attr, params[:"#{attr}_regex"])
       end
 
       if params[:"#{attr}_not_regex"].present?
-        relation = relation.where_not_regex(attr, params[:"#{attr}_not_regex"])
+        relation = visible(relation, attr).where_not_regex(attr, params[:"#{attr}_not_regex"])
       end
 
       if params[:"#{attr}_array"].present?
-        relation = relation.where(attr => params[:"#{attr}_array"])
+        relation = visible(relation, attr).where(attr => params[:"#{attr}_array"])
       end
 
       if params[:"#{attr}_comma"].present?
-        relation = relation.where(attr => params[:"#{attr}_comma"].split(','))
+        relation = visible(relation, attr).where(attr => params[:"#{attr}_comma"].split(','))
       end
 
       if params[:"#{attr}_space"].present?
-        relation = relation.where(attr => params[:"#{attr}_space"].split(' '))
+        relation = visible(relation, attr).where(attr => params[:"#{attr}_space"].split(' '))
       end
 
       if params[:"#{attr}_lower_array"].present?
-        relation = relation.where_text_includes_lower(attr, params[:"#{attr}_lower_array"])
+        relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_array"])
       end
 
       if params[:"#{attr}_lower_comma"].present?
-        relation = relation.where_text_includes_lower(attr, params[:"#{attr}_lower_comma"].split(','))
+        relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_comma"].split(','))
       end
 
       if params[:"#{attr}_lower_space"].present?
-        relation = relation.where_text_includes_lower(attr, params[:"#{attr}_lower_space"].split(' '))
+        relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_space"].split(' '))
       end
 
       relation
@@ -401,51 +401,55 @@ module Searchable
       relation = self.relation
 
       if params[attr].present?
-        relation = relation.where(attr => params[attr])
+        relation = visible(relation, attr).where(attr => params[attr])
       end
 
       if params[:"#{attr}_eq"].present?
-        relation = relation.where(attr => params[:"#{attr}_eq"])
+        relation = visible(relation, attr).where(attr => params[:"#{attr}_eq"])
       end
 
       if params[:"#{attr}_not_eq"].present?
-        relation = relation.where.not(attr => params[:"#{attr}_not_eq"])
+        relation = visible(relation, attr).where.not(attr => params[:"#{attr}_not_eq"])
       end
 
       relation
     end
 
     def search_boolean_attribute(attr)
+      relation = self.relation
+
       if params[attr].present?
-        relation.where_boolean_matches(attr, params[attr])
-      else
-        relation
+        relation = visible(relation, attr).where_boolean_matches(attr, params[attr])
       end
+
+      relation
     end
 
     def search_inet_attribute(attr)
+      relation = self.relation
+
       if params[attr].present?
-        relation.where_inet_matches(attr, params[attr])
-      else
-        relation
+        relation = visible(relation, attr).where_inet_matches(attr, params[attr])
       end
+
+      relation
     end
 
     def search_jsonb_attribute(name)
       relation = self.relation
 
       if params[name].present?
-        relation = relation.where_json_contains(:metadata, params[name])
+        relation = visible(relation, name).where_json_contains(:metadata, params[name])
       end
 
       if params["#{name}_has_key"]
-        relation = relation.where_json_has_key(:metadata, params["#{name}_has_key"])
+        relation = visible(relation, name).where_json_has_key(:metadata, params["#{name}_has_key"])
       end
 
       if params["has_#{name}"].to_s.truthy?
-        relation = relation.where.not(name => "{}")
+        relation = visible(relation, name).where.not(name => "{}")
       elsif params["has_#{name}"].to_s.falsy?
-        relation = relation.where(name => "{}")
+        relation = visible(relation, name).where(name => "{}")
       end
 
       relation
@@ -456,12 +460,12 @@ module Searchable
 
       if params[name].present?
         value = params[name].split(/[, ]+/).map(&:downcase)
-        relation = relation.where(name => value)
+        relation = visible(relation, name).where(name => value)
       end
 
       if params[:"#{name}_not"].present?
         value = params[:"#{name}_not"].split(/[, ]+/).map(&:downcase)
-        relation = relation.where.not(name => value)
+        relation = visible(relation, name).where.not(name => value)
       end
 
       relation = search_context(relation).search_numeric_attribute(name, key: :"#{name}_id")
@@ -477,52 +481,52 @@ module Searchable
         items = params[:"#{name}_include_any"].to_s.scan(/[^[:space:]]+/)
         items = items.map(&:to_i) if type == :integer
 
-        relation = relation.where_array_includes_any(name, items)
+        relation = visible(relation, name).where_array_includes_any(name, items)
       end
 
       if params[:"#{name}_include_all"]
         items = params[:"#{name}_include_all"].to_s.scan(/[^[:space:]]+/)
         items = items.map(&:to_i) if type == :integer
 
-        relation = relation.where_array_includes_all(name, items)
+        relation = visible(relation, name).where_array_includes_all(name, items)
       end
 
       if params[:"#{name}_include_any_array"]
-        relation = relation.where_array_includes_any(name, params[:"#{name}_include_any_array"])
+        relation = visible(relation, name).where_array_includes_any(name, params[:"#{name}_include_any_array"])
       end
 
       if params[:"#{name}_include_all_array"]
-        relation = relation.where_array_includes_all(name, params[:"#{name}_include_all_array"])
+        relation = visible(relation, name).where_array_includes_all(name, params[:"#{name}_include_all_array"])
       end
 
       if params[:"#{name}_include_any_lower"]
         items = params[:"#{name}_include_any_lower"].to_s.scan(/[^[:space:]]+/)
         items = items.map(&:to_i) if type == :integer
 
-        relation = relation.where_array_includes_any_lower(name, items)
+        relation = visible(relation, name).where_array_includes_any_lower(name, items)
       end
 
       if params[:"#{name}_include_all_lower"]
         items = params[:"#{name}_include_all_lower"].to_s.scan(/[^[:space:]]+/)
         items = items.map(&:to_i) if type == :integer
 
-        relation = relation.where_array_includes_all_lower(name, items)
+        relation = visible(relation, name).where_array_includes_all_lower(name, items)
       end
 
       if params[:"#{name}_include_any_lower_array"]
-        relation = relation.where_array_includes_any_lower(name, params[:"#{name}_include_any_lower_array"])
+        relation = visible(relation, name).where_array_includes_any_lower(name, params[:"#{name}_include_any_lower_array"])
       end
 
       if params[:"#{name}_include_all_lower_array"]
-        relation = relation.where_array_includes_all_lower(name, params[:"#{name}_include_all_lower_array"])
+        relation = visible(relation, name).where_array_includes_all_lower(name, params[:"#{name}_include_all_lower_array"])
       end
 
       if params[:"any_#{singular_name}_matches_regex"]
-        relation = relation.where_any_in_array_matches_regex(name, params[:"any_#{singular_name}_matches_regex"])
+        relation = visible(relation, name).where_any_in_array_matches_regex(name, params[:"any_#{singular_name}_matches_regex"])
       end
 
       if params[:"#{singular_name}_count"]
-        relation = relation.where_array_count(name, params[:"#{singular_name}_count"])
+        relation = visible(relation, name).where_array_count(name, params[:"#{singular_name}_count"])
       end
 
       relation
@@ -544,9 +548,9 @@ module Searchable
       if model == User && params["#{attr}_name"].present?
         name = params["#{attr}_name"]
         if name.include?("*")
-          relation = relation.where(attr => User.search(name_matches: name).reorder(nil))
+          relation = visible(relation, attr).where(attr => User.visible(current_user).search(name_matches: name).reorder(nil))
         else
-          relation = relation.where(attr => User.find_by_name(name))
+          relation = visible(relation, attr).where(attr => User.visible(current_user).find_by_name(name))
         end
       end
 
@@ -554,9 +558,9 @@ module Searchable
         posts = Post.user_tag_match(params["#{attr}_tags_match"], current_user).reorder(nil)
 
         if association.through_reflection?
-          relation = relation.includes(association.through_reflection.name).where(association.through_reflection.name => { attr => posts })
+          relation = visible(relation, attr).includes(association.through_reflection.name).where(association.through_reflection.name => { attr => posts })
         else
-          relation = relation.where(attr => posts)
+          relation = visible(relation, attr).where(attr => posts)
         end
       end
 
@@ -565,7 +569,7 @@ module Searchable
       end
 
       if parameter_hash?(params[attr])
-        relation = relation.includes(attr).references(attr).where(attr => model.visible(current_user).search(params[attr]).reorder(nil))
+        relation = visible(relation, attr).includes(attr).references(attr).where(attr => model.visible(current_user).search(params[attr]).reorder(nil))
       end
 
       relation
@@ -584,7 +588,7 @@ module Searchable
         return none if params["#{attr}_type"].present? && params["#{attr}_type"] != model_key
         model_specified = true
         model = Kernel.const_get(model_key)
-        relation = relation.where(attr => model.visible(current_user).search(params[model_key]))
+        relation = visible(relation, attr).where(attr => model.visible(current_user).search(params[model_key]))
       end
 
       if params["#{attr}_id"].present?
@@ -600,7 +604,7 @@ module Searchable
 
     def search_has_include(name, exists, model)
       if relation.column_names.include?("#{name}_id")
-        return exists ? relation.where.not("#{name}_id" => nil) : relation.where("#{name}_id" => nil)
+        return exists ? visible(relation, name).where.not("#{name}_id" => nil) : visible(relation, name).where("#{name}_id" => nil)
       end
 
       association = relation.reflect_on_association(name)
@@ -614,10 +618,15 @@ module Searchable
       model_table = model.arel_table
       model_exists = model.model_restriction(model_table).where(model_table[foreign_key].eq(self_table[primary_key])).exists
       if exists
-        relation.attribute_restriction(name).where(model_exists)
+        visible(relation, name).attribute_restriction(name).where(model_exists)
       else
-        relation.attribute_restriction(name).where.not(model_exists)
+        visible(relation, name).attribute_restriction(name).where.not(model_exists)
       end
+    end
+
+    # Restrict the results that are visible to the user based on what they're searching for.
+    def visible(relation, attr)
+      relation.policy(current_user).visible_for_search(relation, attr.to_sym)
     end
 
     def parameter_depth(params)
