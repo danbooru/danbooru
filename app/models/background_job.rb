@@ -31,8 +31,8 @@ class BackgroundJob < GoodJob::Job
         where_json_contains(:serialized_params, { job_class: class_name })
       end
 
-      def search(params)
-        q = search_attributes(params, :id, :created_at, :updated_at, :queue_name, :priority, :serialized_params, :scheduled_at, :performed_at, :finished_at, :error, :active_job_id, :concurrency_key, :cron_key, :retried_good_job_id, :cron_at)
+      def search(params, current_user)
+        q = search_attributes(params, [:id, :created_at, :updated_at, :queue_name, :priority, :serialized_params, :scheduled_at, :performed_at, :finished_at, :error, :active_job_id, :concurrency_key, :cron_key, :retried_good_job_id, :cron_at], current_user: current_user)
 
         if params[:name].present?
           q = q.name_matches(params[:name])

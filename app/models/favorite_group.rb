@@ -41,8 +41,8 @@ class FavoriteGroup < ApplicationRecord
       end
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :name, :is_public, :post_ids, :creator)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :name, :is_public, :post_ids, :creator], current_user: current_user)
 
       if params[:name_contains].present?
         q = q.name_contains(params[:name_contains])

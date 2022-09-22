@@ -34,8 +34,8 @@ class IpBan < ApplicationRecord
     true
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :ip_addr, :reason, :is_deleted, :category, :hit_count, :last_hit_at, :creator)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :ip_addr, :reason, :is_deleted, :category, :hit_count, :last_hit_at, :creator], current_user: current_user)
 
     case params[:order]
     when /\A(created_at|updated_at|last_hit_at)(?:_(asc|desc))?\z/i

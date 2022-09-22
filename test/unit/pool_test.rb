@@ -18,11 +18,11 @@ class PoolTest < ActiveSupport::TestCase
 
       assert_equal(@pool.id, Pool.find_by_name("test pool").id)
 
-      assert_equal([@pool.id], Pool.search(name_contains: "test pool").map(&:id))
-      assert_equal([@pool.id], Pool.search(name_contains: "tes").map(&:id))
-      assert_equal([@pool.id], Pool.search(name_matches: "test pool").map(&:id))
-      assert_equal([@pool.id], Pool.search(name_matches: "testing pool").map(&:id))
-      assert_equal([], Pool.search(name_matches: "tes").map(&:id))
+      assert_search_equals(@pool, name_contains: "test pool")
+      assert_search_equals(@pool, name_contains: "tes")
+      assert_search_equals(@pool, name_matches: "test pool")
+      assert_search_equals(@pool, name_matches: "testing pool")
+      assert_search_equals([], name_matches: "tes")
     end
 
     should "find pools by post id" do
@@ -31,8 +31,8 @@ class PoolTest < ActiveSupport::TestCase
       @post1 = create(:post, tag_string: "pool:pool1")
       @post2 = create(:post, tag_string: "pool:pool2")
 
-      assert_equal([@pool1.id], Pool.search(post_ids_include_any: @post1.id).pluck(:id))
-      assert_equal([@pool2.id, @pool1.id], Pool.search(post_ids_include_any: "#{@post1.id} #{@post2.id}").pluck(:id))
+      assert_search_equals(@pool1, post_ids_include_any: @post1.id)
+      assert_search_equals([@pool2, @pool1], post_ids_include_any: "#{@post1.id} #{@post2.id}")
     end
 
     should "find pools by post id count" do
@@ -41,7 +41,7 @@ class PoolTest < ActiveSupport::TestCase
       @post1 = create(:post, tag_string: "pool:pool1")
       @post2 = create(:post, tag_string: "pool:pool1")
 
-      assert_equal([@pool1.id], Pool.search(post_id_count: 2).pluck(:id))
+      assert_search_equals(@pool1, post_id_count: 2)
     end
 
     should "find pools by post tags" do
@@ -51,13 +51,13 @@ class PoolTest < ActiveSupport::TestCase
       @post2 = create(:post, tag_string: "pool:pool1 fumimi")
       @post3 = create(:post, tag_string: "pool:pool2 bkub fumimi")
 
-      assert_equal([@pool2.id, @pool1.id], Pool.search(post_tags_match: "bkub").pluck(:id))
-      assert_equal([@pool2.id, @pool1.id], Pool.search(post_tags_match: "fumimi").pluck(:id))
-      assert_equal([@pool2.id], Pool.search(post_tags_match: "bkub fumimi").pluck(:id))
+      assert_search_equals([@pool2, @pool1], post_tags_match: "bkub")
+      assert_search_equals([@pool2, @pool1], post_tags_match: "fumimi")
+      assert_search_equals(@pool2, post_tags_match: "bkub fumimi")
 
-      assert_equal(2, Pool.search(post_tags_match: "bkub").count)
-      assert_equal(2, Pool.search(post_tags_match: "fumimi").count)
-      assert_equal(1, Pool.search(post_tags_match: "bkub fumimi").count)
+      assert_equal(2, Pool.search({ post_tags_match: "bkub" }, current_user: User.anonymous).count)
+      assert_equal(2, Pool.search({ post_tags_match: "fumimi" }, current_user: User.anonymous).count)
+      assert_equal(1, Pool.search({ post_tags_match: "bkub fumimi" }, current_user: User.anonymous).count)
     end
   end
 

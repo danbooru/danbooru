@@ -95,9 +95,8 @@ class PostApprovalTest < ActiveSupport::TestCase
         CurrentUser.scoped(@approver) do
           @post.update!(tag_string: "touhou")
           @approval = create(:post_approval, post: @post, user: @approver)
-          @approvals = PostApproval.search(user_name: @approver.name, post_tags_match: "touhou", post_id: @post.id)
 
-          assert_equal([@approval.id], @approvals.map(&:id))
+          assert_search_equals(@approval, user_name: @approver.name, post_tags_match: "touhou", post_id: @post.id)
         end
       end
     end

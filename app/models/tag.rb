@@ -319,8 +319,8 @@ class Tag < ApplicationRecord
       abbreviation_matches(abbrev.escape_wildcards).order(post_count: :desc).first
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deprecated, :category, :post_count, :name, :wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deprecated, :category, :post_count, :name, :wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links], current_user: current_user)
 
       if params[:fuzzy_name_matches].present?
         q = q.fuzzy_name_matches(params[:fuzzy_name_matches])

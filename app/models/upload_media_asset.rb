@@ -36,8 +36,8 @@ class UploadMediaAsset < ApplicationRecord
     end
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :status, :source_url, :page_url, :error, :upload, :media_asset, :post)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :status, :source_url, :page_url, :error, :upload, :media_asset, :post], current_user: current_user)
 
     if params[:is_posted].to_s.truthy?
       q = q.where.associated(:post)

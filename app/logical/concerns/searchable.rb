@@ -202,7 +202,7 @@ module Searchable
     end
   end
 
-  def search_attributes(params, *attributes, current_user: CurrentUser.user)
+  def search_attributes(params, attributes, current_user:)
     SearchContext.new(all, params, current_user).search_attributes(attributes)
   end
 
@@ -560,7 +560,7 @@ module Searchable
       if model == User && params["#{attr}_name"].present?
         name = params["#{attr}_name"]
         if name.include?("*")
-          relation = visible(relation, attr).where(attr => User.visible(current_user).search(name_matches: name).reorder(nil))
+          relation = visible(relation, attr).where(attr => User.visible(current_user).search({ name_matches: name }, current_user).reorder(nil))
         else
           relation = visible(relation, attr).where(attr => User.visible(current_user).find_by_name(name))
         end
@@ -581,7 +581,7 @@ module Searchable
       end
 
       if parameter_hash?(params[attr])
-        relation = visible(relation, attr).includes(attr).references(attr).where(attr => model.visible(current_user).search(params[attr]).reorder(nil))
+        relation = visible(relation, attr).includes(attr).references(attr).where(attr => model.visible(current_user).search(params[attr], current_user).reorder(nil))
       end
 
       relation
@@ -600,7 +600,7 @@ module Searchable
         return none if params["#{attr}_type"].present? && params["#{attr}_type"] != model_key
         model_specified = true
         model = Kernel.const_get(model_key)
-        relation = visible(relation, attr).where(attr => model.visible(current_user).search(params[model_key]))
+        relation = visible(relation, attr).where(attr => model.visible(current_user).search(params[model_key], current_user))
       end
 
       if params["#{attr}_id"].present?

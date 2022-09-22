@@ -17,8 +17,8 @@ class ArtistURL < ApplicationRecord
     [is_active, url]
   end
 
-  def self.search(params = {})
-    q = search_attributes(params, :id, :created_at, :updated_at, :url, :is_active, :artist)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :url, :is_active, :artist], current_user: current_user)
     q = q.urls_match(params[:url_matches])
 
     case params[:order]

@@ -7,8 +7,8 @@ class WikiPageVersion < ApplicationRecord
   belongs_to :tag, primary_key: :name, foreign_key: :title, optional: true
 
   module SearchMethods
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :title, :body, :other_names, :is_locked, :is_deleted, :updater, :wiki_page, :tag)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :title, :body, :other_names, :is_locked, :is_deleted, :updater, :wiki_page, :tag], current_user: current_user)
 
       q.apply_default_order(params)
     end

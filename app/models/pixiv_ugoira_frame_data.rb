@@ -11,8 +11,8 @@ class PixivUgoiraFrameData < ApplicationRecord
     [:post]
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :data, :content_type, :post, :md5)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :data, :content_type, :post, :md5], current_user: current_user)
     q.apply_default_order(params)
   end
 

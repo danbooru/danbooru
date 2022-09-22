@@ -32,8 +32,8 @@ class Comment < ApplicationRecord
   )
 
   module SearchMethods
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score, :post, :creator, :updater)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score, :post, :creator, :updater], current_user: current_user)
 
       case params[:order]
       when "post_id", "post_id_desc"

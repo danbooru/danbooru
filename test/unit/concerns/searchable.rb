@@ -1,12 +1,6 @@
 require 'test_helper'
 
 class SearchableTest < ActiveSupport::TestCase
-  def assert_search_equals(results, current_user: User.anonymous, **params)
-    as(current_user) do
-      assert_equal(Array(results).map(&:id), subject.search(**params).ids)
-    end
-  end
-
   context "#search method" do
     subject { Post }
 
@@ -19,7 +13,7 @@ class SearchableTest < ActiveSupport::TestCase
     context "for a nonexistent attribute" do
       should "raise an error" do
         assert_raises(ArgumentError) do
-          Post.search_attributes({ answer: 42 }, :answer)
+          Post.search_attributes({ answer: 42 }, [:answer], current_user: User.anonymous)
         end
       end
     end

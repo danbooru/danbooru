@@ -612,18 +612,19 @@ class User < ApplicationRecord
   end
 
   module SearchMethods
-    def search(params)
+    def search(params, current_user)
       params = params.dup
       params[:name_matches] = params.delete(:name) if params[:name].present?
 
       q = search_attributes(
         params,
-        :id, :created_at, :updated_at, :name, :level, :post_upload_count,
+        [:id, :created_at, :updated_at, :name, :level, :post_upload_count,
         :post_update_count, :note_update_count, :favorite_count, :posts,
         :note_versions, :artist_commentary_versions, :post_appeals,
         :post_approvals, :artist_versions, :comments, :wiki_page_versions,
         :feedback, :forum_topics, :forum_posts, :forum_post_votes,
-        :tag_aliases, :tag_implications, :bans, :inviter
+        :tag_aliases, :tag_implications, :bans, :inviter],
+        current_user: current_user
       )
 
       if params[:name_matches].present?

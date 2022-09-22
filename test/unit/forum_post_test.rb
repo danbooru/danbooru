@@ -142,9 +142,10 @@ class ForumPostTest < ActiveSupport::TestCase
     end
 
     should "be searchable by body content" do
-      post = FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "xxx")
-      assert_equal(1, ForumPost.search(body_matches: "xxx").count)
-      assert_equal(0, ForumPost.search(body_matches: "aaa").count)
+      post = create(:forum_post, topic: @topic, body: "xxx")
+
+      assert_search_equals(post, body_matches: "xxx")
+      assert_search_equals([], body_matches: "aaa")
     end
 
     should "initialize its creator" do

@@ -1,10 +1,6 @@
 require 'test_helper'
 
 class ArtistURLTest < ActiveSupport::TestCase
-  def assert_search_equals(results, conditions)
-    assert_equal(results.map(&:id), subject.search(conditions).map(&:id))
-  end
-
   context "An artist url" do
     setup do
       CurrentUser.user = FactoryBot.create(:user)
@@ -173,8 +169,6 @@ class ArtistURLTest < ActiveSupport::TestCase
     end
 
     context "#search method" do
-      subject { ArtistURL }
-
       should "work" do
         @bkub = create(:artist, name: "bkub", is_deleted: false, url_string: "https://bkub.com")
         @masao = create(:artist, name: "masao", is_deleted: true, url_string: "-https://masao.com")

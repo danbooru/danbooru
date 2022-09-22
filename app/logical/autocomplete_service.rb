@@ -296,7 +296,7 @@ class AutocompleteService
   # @param string [String] the name of the pool
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_pool(string)
-    pools = Pool.undeleted.name_contains(string).search(order: "post_count").limit(limit)
+    pools = Pool.undeleted.name_contains(string).search({ order: "post_count" }, current_user).limit(limit)
 
     pools.map do |pool|
       { type: "pool", label: pool.pretty_name, value: pool.name, id: pool.id, post_count: pool.post_count, category: pool.category }
@@ -307,7 +307,7 @@ class AutocompleteService
   # @param string [String] the name of the favgroup
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_favorite_group(string)
-    favgroups = FavoriteGroup.visible(current_user).where(creator: current_user).name_contains(string).search(order: "post_count").limit(limit)
+    favgroups = FavoriteGroup.visible(current_user).where(creator: current_user).name_contains(string).search({ order: "post_count" }, current_user).limit(limit)
 
     favgroups.map do |favgroup|
       { label: favgroup.pretty_name, value: favgroup.name, post_count: favgroup.post_count }
@@ -331,7 +331,7 @@ class AutocompleteService
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_artist(string)
     string = string + "*" unless string.include?("*")
-    artists = Artist.undeleted.name_matches(string).search(order: "post_count").limit(limit)
+    artists = Artist.undeleted.name_matches(string).search({ order: "post_count" }, current_user).limit(limit)
 
     artists.map do |artist|
       { type: "tag", label: artist.pretty_name, value: artist.name, category: Tag.categories.artist }
@@ -343,7 +343,7 @@ class AutocompleteService
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_wiki_page(string)
     string = string + "*" unless string.include?("*")
-    wiki_pages = WikiPage.undeleted.title_matches(string).search(order: "post_count").limit(limit)
+    wiki_pages = WikiPage.undeleted.title_matches(string).search({ order: "post_count" }, current_user).limit(limit)
 
     wiki_pages.map do |wiki_page|
       { type: "tag", label: wiki_page.pretty_title, value: wiki_page.title, category: wiki_page.tag&.category }
@@ -355,7 +355,7 @@ class AutocompleteService
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_user(string)
     string = string + "*" unless string.include?("*")
-    users = User.search(name_matches: string, current_user_first: true, order: "post_upload_count").limit(limit)
+    users = User.search({ name_matches: string, current_user_first: true, order: "post_upload_count" }, current_user).limit(limit)
 
     users.map do |user|
       { type: "user", label: user.pretty_name, value: user.name, id: user.id, level: user.level_string.downcase }

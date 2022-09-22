@@ -51,22 +51,9 @@ class BanTest < ActiveSupport::TestCase
 
   context "Searching for a ban" do
     should "find a given ban" do
-      CurrentUser.user = FactoryBot.create(:admin_user)
+      ban = create(:ban)
 
-      user = FactoryBot.create(:user)
-      ban = FactoryBot.create(:ban, user: user)
-      params = {
-        user_name: user.name,
-        banner_name: ban.banner.name,
-        reason: ban.reason,
-        expired: false,
-        order: :id_desc
-      }
-
-      bans = Ban.search(params)
-
-      assert_equal(1, bans.length)
-      assert_equal(ban.id, bans.first.id)
+      assert_search_equals(ban, user_name: ban.user.name, banner_name: ban.banner.name, reason: ban.reason, expired: false, order: :id_desc)
     end
 
     context "by user id" do

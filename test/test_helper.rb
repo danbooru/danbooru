@@ -64,6 +64,12 @@ class ActiveSupport::TestCase
   def as(user, &block)
     CurrentUser.scoped(user, &block)
   end
+
+  def assert_search_equals(expected_results, current_user: CurrentUser.user, **params)
+    results = subject.class.search(params, current_user)
+
+    assert_equal(Array(expected_results).map(&:id), results.ids)
+  end
 end
 
 class ActionDispatch::IntegrationTest

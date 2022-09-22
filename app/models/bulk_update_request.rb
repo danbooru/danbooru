@@ -29,8 +29,8 @@ class BulkUpdateRequest < ApplicationRecord
   scope :has_topic, -> { where.not(forum_topic: nil) }
 
   module SearchMethods
-    def search(params = {})
-      q = search_attributes(params, :id, :created_at, :updated_at, :script, :tags, :user, :forum_topic, :forum_post, :approver)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :script, :tags, :user, :forum_topic, :forum_post, :approver], current_user: current_user)
 
       if params[:status].present?
         q = q.where(status: params[:status].split(","))

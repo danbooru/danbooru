@@ -78,8 +78,8 @@ class ModAction < ApplicationRecord
     end
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :category, :description, :creator)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :category, :description, :creator], current_user: current_user)
 
     case params[:order]
     when "created_at_asc"

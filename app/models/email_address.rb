@@ -46,8 +46,8 @@ class EmailAddress < ApplicationRecord
     end
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :user, :address, :normalized_address, :is_verified, :is_deliverable)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :user, :address, :normalized_address, :is_verified, :is_deliverable], current_user: current_user)
 
     q = q.restricted(params[:is_restricted])
 

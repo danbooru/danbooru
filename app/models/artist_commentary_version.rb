@@ -4,8 +4,8 @@ class ArtistCommentaryVersion < ApplicationRecord
   belongs_to :post
   belongs_to_updater
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :original_title, :original_description, :translated_title, :translated_description, :post, :updater)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :original_title, :original_description, :translated_title, :translated_description, :post, :updater], current_user: current_user)
     q = q.where_text_matches(%i[original_title original_description translated_title translated_description], params[:text_matches])
 
     q.apply_default_order(params)

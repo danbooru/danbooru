@@ -44,13 +44,13 @@ class ForumTopicTest < ActiveSupport::TestCase
     end
 
     should "be searchable by title" do
-      assert_equal(1, ForumTopic.search(title: "xxx").count)
-      assert_equal(0, ForumTopic.search(title: "aaa").count)
+      assert_search_equals(@topic, title: "xxx")
+      assert_search_equals([], title: "aaa")
     end
 
     should "be searchable by category id" do
-      assert_equal(1, ForumTopic.search(:category_id => 0).count)
-      assert_equal(0, ForumTopic.search(:category_id => 1).count)
+      assert_search_equals(@topic, category_id: 0)
+      assert_search_equals([], category_id: 1)
     end
 
     should "initialize its creator" do

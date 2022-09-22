@@ -20,8 +20,7 @@ class WikiPageTest < ActiveSupport::TestCase
       end
 
       should "search other names with wildcards" do
-        matches = WikiPage.search(other_names_match: "fo*")
-        assert_equal([@wiki_page.id], matches.map(&:id))
+        assert_search_equals(@wiki_page, other_names_match: "fo*")
       end
 
       should "create versions" do

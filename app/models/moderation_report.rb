@@ -82,8 +82,8 @@ class ModerationReport < ApplicationRecord
     where(model: Comment.where(creator: user)).or(where(model: ForumPost.where(creator: user))).or(where(model: Dmail.received.where(from: user)))
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :reason, :creator, :model, :status)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :reason, :creator, :model, :status], current_user: current_user)
 
     if params[:recipient_id].present?
       q = q.received_by(User.search(id: params[:recipient_id]))

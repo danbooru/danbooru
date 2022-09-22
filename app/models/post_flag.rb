@@ -58,8 +58,8 @@ class PostFlag < ApplicationRecord
       end
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :reason, :status, :post, :creator)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :reason, :status, :post, :creator], current_user: current_user)
 
       if params[:category]
         q = q.category_matches(params[:category])

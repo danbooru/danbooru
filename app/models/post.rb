@@ -533,14 +533,14 @@ class Post < ApplicationRecord
         in "-child", ids
           next if ids.blank?
 
-          children.search(id: ids).each do |post|
+          children.where_numeric_matches(:id, ids).each do |post|
             post.update!(parent_id: nil)
           end
 
         in "child", ids
           next if ids.blank?
 
-          Post.search(id: ids).where.not(id: id).limit(10).each do |post|
+          Post.where_numeric_matches(:id, ids).where.not(id: id).limit(10).each do |post|
             post.update!(parent_id: id)
           end
 
@@ -1214,11 +1214,11 @@ class Post < ApplicationRecord
       end
 
       def note_matches(query)
-        where(notes: Note.search(body_matches: query).reorder(nil))
+        where(notes: Note.where_text_matches(:body, query))
       end
 
       def comment_matches(query)
-        where(comments: Comment.search(body_matches: query).reorder(nil))
+        where(comments: Comment.where_text_matches(:body, query))
       end
 
       def saved_search_matches(label, current_user = User.anonymous)
@@ -1411,17 +1411,18 @@ class Post < ApplicationRecord
         post_query.with_implicit_metatags.posts
       end
 
-      def search(params)
+      def search(params, current_user)
         q = search_attributes(
           params,
-          :id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
+          [:id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
           :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
           :image_height, :tag_count, :has_children, :has_active_children,
           :is_pending, :is_flagged, :is_deleted, :is_banned,
           :last_comment_bumped_at, :last_commented_at, :last_noted_at,
           :uploader, :approver, :parent,
           :artist_commentary, :flags, :appeals, :notes, :comments, :children,
-          :approvals, :replacements, :pixiv_ugoira_frame_data
+          :approvals, :replacements, :pixiv_ugoira_frame_data],
+          current_user: current_user
         )
 
         if params[:tags].present?

@@ -45,7 +45,7 @@ class TagImplication < TagRelationship
 
   concerning :SearchMethods do
     class_methods do
-      def search(params)
+      def search(params, current_user)
         q = super
 
         if params[:implied_from].present?

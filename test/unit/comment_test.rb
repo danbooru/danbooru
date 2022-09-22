@@ -141,17 +141,13 @@ class CommentTest < ActiveSupport::TestCase
         c2 = FactoryBot.create(:comment, :body => "aaa ddd")
         c3 = FactoryBot.create(:comment, :body => "eee")
 
-        matches = Comment.search(body_matches: "aaa")
-        assert_equal(2, matches.count)
-        assert_equal(c2.id, matches.all[0].id)
-        assert_equal(c1.id, matches.all[1].id)
+        assert_search_equals([c2, c1], body_matches: "aaa")
       end
 
       should "default to id_desc order when searched with no options specified" do
         comms = FactoryBot.create_list(:comment, 3)
-        matches = Comment.search({})
 
-        assert_equal([comms[2].id, comms[1].id, comms[0].id], matches.map(&:id))
+        assert_search_equals([comms[2], comms[1], comms[0]])
       end
 
       context "that is edited by a moderator" do

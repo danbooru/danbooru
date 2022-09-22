@@ -79,9 +79,8 @@ class PostDisapprovalTest < ActiveSupport::TestCase
           disapproval1 = FactoryBot.create(:post_disapproval, user: @approver, post: @post1, reason: "breaks_rules")
           disapproval2 = FactoryBot.create(:post_disapproval, user: @approver, post: @post2, reason: "poor_quality", message: "bad anatomy")
 
-          assert_equal([disapproval1.id], PostDisapproval.search(reason: "breaks_rules").pluck(:id))
-          assert_equal([disapproval2.id], PostDisapproval.search(message: "bad anatomy").pluck(:id))
-          assert_equal([disapproval1.id, disapproval2.id], PostDisapproval.where(user: @approver).pluck(:id))
+          assert_search_equals([disapproval1], reason: "breaks_rules")
+          assert_search_equals([disapproval2], message: "bad anatomy")
         end
       end
     end

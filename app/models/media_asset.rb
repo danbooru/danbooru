@@ -197,11 +197,11 @@ class MediaAsset < ApplicationRecord
         AITagQuery.search(tag_string, relation: self, score_range: score_range)
       end
 
-      def search(params)
-        q = search_attributes(params, :id, :created_at, :updated_at, :status, :md5, :file_ext, :file_size, :image_width, :image_height, :file_key, :is_public)
+      def search(params, current_user)
+        q = search_attributes(params, [:id, :created_at, :updated_at, :status, :md5, :file_ext, :file_size, :image_width, :image_height, :file_key, :is_public], current_user: current_user)
 
         if params[:metadata].present?
-          q = q.joins(:media_metadata).merge(MediaMetadata.search(metadata: params[:metadata]))
+          q = q.joins(:media_metadata).merge(MediaMetadata.search({ metadata: params[:metadata] }, current_user))
         end
 
         if params[:ai_tags_match].present?

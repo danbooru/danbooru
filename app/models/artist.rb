@@ -277,8 +277,8 @@ class Artist < ApplicationRecord
       end
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :other_names, :urls, :wiki_page, :tag_alias, :tag)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :other_names, :urls, :wiki_page, :tag_alias, :tag], current_user: current_user)
 
       if params[:any_other_name_like]
         q = q.any_other_name_like(params[:any_other_name_like])

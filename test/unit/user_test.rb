@@ -294,9 +294,9 @@ class UserTest < ActiveSupport::TestCase
         user2.save(validate: false)
         user3.save(validate: false)
 
-        assert_equal([user2.id, user1.id], User.search(name: "foo*").map(&:id))
-        assert_equal([user2.id], User.search(name: "foo\*bar").map(&:id))
-        assert_equal([user3.id], User.search(name: "bar\\\*baz").map(&:id))
+        assert_search_equals([user2, user1], name: "foo*")
+        assert_search_equals(user2, name: "foo\*bar")
+        assert_search_equals(user3, name: "bar\\\*baz")
       end
     end
 
