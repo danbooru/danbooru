@@ -106,9 +106,7 @@ class Dmail < ApplicationRecord
 
     def search(params)
       q = search_attributes(params, :id, :created_at, :updated_at, :is_read, :is_deleted, :title, :body, :to, :from)
-      q = q.text_attribute_matches(:title, params[:title_matches])
-      q = q.text_attribute_matches(:body, params[:body_matches])
-      q = q.text_attribute_matches([:title, :body], params[:message_matches])
+      q = q.where_text_matches([:title, :body], params[:message_matches])
 
       q = q.folder_matches(params[:folder])
 

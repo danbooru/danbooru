@@ -31,7 +31,6 @@ class BulkUpdateRequest < ApplicationRecord
   module SearchMethods
     def search(params = {})
       q = search_attributes(params, :id, :created_at, :updated_at, :script, :tags, :user, :forum_topic, :forum_post, :approver)
-      q = q.text_attribute_matches(:script, params[:script_matches])
 
       if params[:status].present?
         q = q.where(status: params[:status].split(","))

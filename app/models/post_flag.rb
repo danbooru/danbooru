@@ -60,7 +60,6 @@ class PostFlag < ApplicationRecord
 
     def search(params)
       q = search_attributes(params, :id, :created_at, :updated_at, :reason, :status, :post, :creator)
-      q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       if params[:category]
         q = q.category_matches(params[:category])

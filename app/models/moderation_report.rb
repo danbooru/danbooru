@@ -84,7 +84,6 @@ class ModerationReport < ApplicationRecord
 
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :reason, :creator, :model, :status)
-    q = q.text_attribute_matches(:reason, params[:reason_matches])
 
     if params[:recipient_id].present?
       q = q.received_by(User.search(id: params[:recipient_id]))

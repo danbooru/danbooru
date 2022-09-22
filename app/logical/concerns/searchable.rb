@@ -188,7 +188,7 @@ module Searchable
     end
   end
 
-  def text_attribute_matches(columns, query)
+  def where_text_matches(columns, query)
     columns = Array.wrap(columns)
 
     if query.nil?
@@ -264,7 +264,9 @@ module Searchable
       end
 
       case type
-      when :string, :text
+      when :string # :string is for columns of type `character varying` in the database
+        search_string_attribute(name)
+      when :text   # :text is for columns of type `text` in the database
         search_text_attribute(name)
       when :uuid
         search_uuid_attribute(name)
@@ -323,7 +325,7 @@ module Searchable
       relation
     end
 
-    def search_text_attribute(attr)
+    def search_string_attribute(attr)
       relation = self.relation
 
       if params[attr].present?
@@ -392,6 +394,16 @@ module Searchable
 
       if params[:"#{attr}_lower_space"].present?
         relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_space"].split(' '))
+      end
+
+      relation
+    end
+
+    def search_text_attribute(attr)
+      relation = search_string_attribute(attr)
+
+      if params[:"#{attr}_matches"].present?
+        relation = visible(relation, attr).where_text_matches(attr, params[:"#{attr}_matches"])
       end
 
       relation
