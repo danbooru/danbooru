@@ -1241,7 +1241,7 @@ class Post < ApplicationRecord
         when "collection"
           where(id: Pool.collection.select("unnest(post_ids)"))
         when /\*/
-          where(id: Pool.name_matches(pool_name).select("unnest(post_ids)"))
+          where(id: Pool.name_contains(pool_name).select("unnest(post_ids)"))
         else
           where(id: Pool.named(pool_name).select("unnest(post_ids)"))
         end

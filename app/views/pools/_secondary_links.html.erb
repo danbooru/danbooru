@@ -1,5 +1,5 @@
 <% content_for(:secondary_links) do %>
-  <%= quick_search_form_for(:name_matches, pools_path, "pools", autocomplete: "pool", redirect: true) %>
+  <%= quick_search_form_for(:name_contains, pools_path, "pools", autocomplete: "pool", redirect: true) %>
   <%= subnav_link_to "Gallery", gallery_pools_path %>
   <%= subnav_link_to "Listing", pools_path %>
   <% if policy(Pool).create? %>

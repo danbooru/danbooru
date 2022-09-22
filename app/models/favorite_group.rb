@@ -25,7 +25,7 @@ class FavoriteGroup < ApplicationRecord
       where_array_includes_any(:post_ids, [post_id])
     end
 
-    def name_matches(name)
+    def name_contains(name)
       name = normalize_name(name)
       name = "*#{name}*" unless name =~ /\*/
       where_ilike(:name, name)
@@ -44,8 +44,8 @@ class FavoriteGroup < ApplicationRecord
     def search(params)
       q = search_attributes(params, :id, :created_at, :updated_at, :name, :is_public, :post_ids, :creator)
 
-      if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches])
+      if params[:name_contains].present?
+        q = q.name_contains(params[:name_contains])
       end
 
       case params[:order]

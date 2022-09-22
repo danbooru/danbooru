@@ -21,7 +21,7 @@ class Pool < ApplicationRecord
   scope :collection, -> { where(category: "collection") }
 
   module SearchMethods
-    def name_matches(name)
+    def name_contains(name)
       name = normalize_name_for_search(name)
       name = "*#{name}*" unless name =~ /\*/
       where_ilike(:name, name)
@@ -44,8 +44,8 @@ class Pool < ApplicationRecord
         q = q.post_tags_match(params[:post_tags_match])
       end
 
-      if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches])
+      if params[:name_contains].present?
+        q = q.name_contains(params[:name_contains])
       end
 
       if params[:linked_to].present?

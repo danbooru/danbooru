@@ -296,8 +296,7 @@ class AutocompleteService
   # @param string [String] the name of the pool
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_pool(string)
-    string = "*" + string + "*" unless string.include?("*")
-    pools = Pool.undeleted.name_matches(string).search(order: "post_count").limit(limit)
+    pools = Pool.undeleted.name_contains(string).search(order: "post_count").limit(limit)
 
     pools.map do |pool|
       { type: "pool", label: pool.pretty_name, value: pool.name, id: pool.id, post_count: pool.post_count, category: pool.category }
@@ -308,8 +307,7 @@ class AutocompleteService
   # @param string [String] the name of the favgroup
   # @return [Array<Hash>] the autocomplete results
   def autocomplete_favorite_group(string)
-    string = "*" + string + "*" unless string.include?("*")
-    favgroups = FavoriteGroup.visible(current_user).where(creator: current_user).name_matches(string).search(order: "post_count").limit(limit)
+    favgroups = FavoriteGroup.visible(current_user).where(creator: current_user).name_contains(string).search(order: "post_count").limit(limit)
 
     favgroups.map do |favgroup|
       { label: favgroup.pretty_name, value: favgroup.name, post_count: favgroup.post_count }

@@ -17,7 +17,12 @@ class PoolTest < ActiveSupport::TestCase
       @pool = FactoryBot.create(:pool, name: "Test Pool")
 
       assert_equal(@pool.id, Pool.find_by_name("test pool").id)
-      assert_equal(@pool.id, Pool.search(name_matches: "test pool").first.id)
+
+      assert_equal([@pool.id], Pool.search(name_contains: "test pool").map(&:id))
+      assert_equal([@pool.id], Pool.search(name_contains: "tes").map(&:id))
+      assert_equal([@pool.id], Pool.search(name_matches: "test pool").map(&:id))
+      assert_equal([@pool.id], Pool.search(name_matches: "testing pool").map(&:id))
+      assert_equal([], Pool.search(name_matches: "tes").map(&:id))
     end
 
     should "find pools by post id" do

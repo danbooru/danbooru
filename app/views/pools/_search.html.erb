@@ -1,5 +1,5 @@
 <%= search_form_for(path) do |f| %>
-  <%= f.input :name_matches, label: "Name", input_html: { value: params.dig(:search, :name_matches), "data-autocomplete": "pool" } %>
+  <%= f.input :name_contains, label: "Name", input_html: { value: params.dig(:search, :name_contains), "data-autocomplete": "pool" } %>
   <%= f.input :description_matches, label: "Description", input_html: { value: params.dig(:search, :description_matches) } %>
   <%= f.input :post_tags_match, label: "Post tags", input_html: { value: params.dig(:search, :post_tags_match), "data-autocomplete": "tag-query" } %>
   <%= f.input :is_deleted, label: "Deleted?", as: :select, include_blank: true, selected: params[:search][:is_deleted] %>

@@ -27,7 +27,7 @@ class PoolVersion < ApplicationRecord
       where_array_includes_any(:added_post_ids, [post_id]).or(where_array_includes_any(:removed_post_ids, [post_id]))
     end
 
-    def name_matches(name)
+    def name_contains(name)
       name = normalize_name_for_search(name)
       name = "*#{name}*" unless name =~ /\*/
       where_ilike(:name, name)
@@ -40,8 +40,8 @@ class PoolVersion < ApplicationRecord
         q = q.for_post_id(params[:post_id].to_i)
       end
 
-      if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches])
+      if params[:name_contains].present?
+        q = q.name_contains(params[:name_contains])
       end
 
       if params[:updater_name].present?

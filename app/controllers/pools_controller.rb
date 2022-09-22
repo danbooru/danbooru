@@ -84,8 +84,8 @@ class PoolsController < ApplicationController
   private
 
   def item_matches_params(pool)
-    if params[:search][:name_matches]
-      Pool.normalize_name_for_search(pool.name) == Pool.normalize_name_for_search(params[:search][:name_matches])
+    if params[:search][:name_contains]
+      Pool.normalize_name_for_search(pool.name) == Pool.normalize_name_for_search(params[:search][:name_contains])
     else
       true
     end
