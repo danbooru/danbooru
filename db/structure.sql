@@ -231,7 +231,7 @@ ALTER SEQUENCE public.artist_commentary_versions_id_seq OWNED BY public.artist_c
 CREATE TABLE public.artist_urls (
     id integer NOT NULL,
     artist_id integer NOT NULL,
-    url text NOT NULL,
+    url character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_active boolean DEFAULT true NOT NULL
@@ -764,7 +764,7 @@ CREATE TABLE public.forum_topics (
     id integer NOT NULL,
     creator_id integer NOT NULL,
     updater_id integer NOT NULL,
-    title character varying NOT NULL,
+    title text NOT NULL,
     response_count integer DEFAULT 0 NOT NULL,
     is_sticky boolean DEFAULT false NOT NULL,
     is_locked boolean DEFAULT false NOT NULL,
@@ -1248,7 +1248,7 @@ ALTER SEQUENCE public.pool_versions_id_seq OWNED BY public.pool_versions.id;
 
 CREATE TABLE public.pools (
     id integer NOT NULL,
-    name character varying NOT NULL,
+    name text NOT NULL,
     description text,
     is_active boolean DEFAULT true NOT NULL,
     post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
@@ -1426,8 +1426,8 @@ CREATE TABLE public.post_replacements (
     id integer NOT NULL,
     post_id integer NOT NULL,
     creator_id integer NOT NULL,
-    original_url text NOT NULL,
-    replacement_url text NOT NULL,
+    original_url character varying NOT NULL,
+    replacement_url character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     old_file_ext character varying,
@@ -1645,7 +1645,7 @@ ALTER SEQUENCE public.rate_limits_id_seq OWNED BY public.rate_limits.id;
 CREATE TABLE public.saved_searches (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    query text NOT NULL,
+    query character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     labels text[] DEFAULT '{}'::text[] NOT NULL
@@ -1691,7 +1691,7 @@ CREATE TABLE public.tag_aliases (
     consequent_name character varying NOT NULL,
     creator_id integer NOT NULL,
     forum_topic_id integer,
-    status text DEFAULT 'active'::text NOT NULL,
+    status character varying DEFAULT 'active'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     approver_id integer,
@@ -1730,7 +1730,7 @@ CREATE TABLE public.tag_implications (
     consequent_name character varying NOT NULL,
     creator_id integer NOT NULL,
     forum_topic_id integer,
-    status text DEFAULT 'active'::text NOT NULL,
+    status character varying DEFAULT 'active'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     approver_id integer,
@@ -1909,12 +1909,12 @@ ALTER SEQUENCE public.upload_media_assets_id_seq OWNED BY public.upload_media_as
 
 CREATE TABLE public.uploads (
     id integer NOT NULL,
-    source text,
+    source character varying,
     uploader_id integer NOT NULL,
-    status text DEFAULT 'pending'::text NOT NULL,
+    status character varying DEFAULT 'pending'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    referer_url text,
+    referer_url character varying,
     error text,
     media_asset_count integer DEFAULT 0 NOT NULL
 );
@@ -3435,7 +3435,7 @@ CREATE INDEX index_artist_urls_on_artist_id ON public.artist_urls USING btree (a
 -- Name: index_artist_urls_on_regexp_replace_lower_url; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_artist_urls_on_regexp_replace_lower_url ON public.artist_urls USING btree (((regexp_replace(lower(url), '^https?://|/$'::text, ''::text, 'g'::text) || '/'::text)) text_pattern_ops);
+CREATE INDEX index_artist_urls_on_regexp_replace_lower_url ON public.artist_urls USING btree (((regexp_replace(lower((url)::text), '^https?://|/$'::text, ''::text, 'g'::text) || '/'::text)) text_pattern_ops);
 
 
 --
@@ -3988,7 +3988,7 @@ CREATE INDEX index_forum_topics_on_is_sticky_and_updated_at ON public.forum_topi
 -- Name: index_forum_topics_on_title_tsvector; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_forum_topics_on_title_tsvector ON public.forum_topics USING gin (to_tsvector('english'::regconfig, (title)::text));
+CREATE INDEX index_forum_topics_on_title_tsvector ON public.forum_topics USING gin (to_tsvector('english'::regconfig, title));
 
 
 --
@@ -4506,7 +4506,7 @@ CREATE INDEX index_pools_on_is_deleted ON public.pools USING btree (is_deleted);
 -- Name: index_pools_on_lower_name; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_pools_on_lower_name ON public.pools USING btree (lower((name)::text));
+CREATE INDEX index_pools_on_lower_name ON public.pools USING btree (lower(name));
 
 
 --
@@ -6636,6 +6636,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220918031429'),
 ('20220919041622'),
 ('20220920224005'),
-('20220921022408');
+('20220921022408'),
+('20220922014326');
 
 
