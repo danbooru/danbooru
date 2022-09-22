@@ -364,7 +364,7 @@ module Danbooru
     def modqueue_warning_tags
       %w[hard_translated nude_filter third-party_edit screenshot
       anime_screencap duplicate image_sample md5_mismatch resized upscaled downscaled
-      resolution_mismatch source_larger source_smaller]
+      resolution_mismatch source_larger source_smaller ai-generated]
     end
 
     # Whether the Gold account upgrade page should be enabled.
