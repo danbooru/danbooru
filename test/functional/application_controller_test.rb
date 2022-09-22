@@ -10,10 +10,10 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 406
     end
 
-    should "return 403 Bad Request for a GET request with a body" do
+    should "return 400 Bad Request for a GET request with a body" do
       get root_path, headers: { "Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json" }, env: { RAW_POST_DATA: "tags=touhou" }
 
-      assert_response 403
+      assert_response 400
       assert_equal("ApplicationController::RequestBodyNotAllowedError", response.parsed_body["error"])
       assert_equal("Request body not allowed for GET request", response.parsed_body["message"])
     end
