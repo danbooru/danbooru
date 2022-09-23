@@ -31,11 +31,19 @@ class CommentComponentTest < ViewComponent::TestCase
         @deleted_comment = as(create(:user)) { create(:comment, is_deleted: true) }
       end
 
-      should "have the creator and body hidden for a Member" do
-        render_comment(@deleted_comment, current_user: @deleted_comment.creator)
+      should "hide the creator and body for a Member" do
+        render_comment(@deleted_comment, current_user: User.anonymous)
 
         assert_css("article[data-is-dimmed=true]")
         assert_css("article .author-name", text: "[deleted]")
+        assert_css("article .body p", text: "[deleted]")
+      end
+
+      should "show the creator to the commenter themselves" do
+        render_comment(@deleted_comment, current_user: @deleted_comment.creator)
+
+        assert_css("article[data-is-dimmed=true]")
+        assert_css("article .author-name", text: @deleted_comment.creator.name)
         assert_css("article .body p", text: "[deleted]")
       end
 

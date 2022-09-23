@@ -19,6 +19,10 @@ class CommentComponent < ApplicationComponent
     !comment.is_deleted? && !comment.is_sticky? && comment.score <= current_user.comment_threshold
   end
 
+  def can_see_creator?
+    policy(comment).can_see_creator?
+  end
+
   def redact_deleted?
     comment.is_deleted? && !policy(comment).can_see_deleted?
   end

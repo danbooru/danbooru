@@ -22,7 +22,7 @@ class CommentPolicy < ApplicationPolicy
   end
 
   def can_see_creator?
-    !record.is_deleted? || can_see_deleted?
+    !record.is_deleted? || can_see_deleted? || record.creator_id == user.id
   end
 
   def reply?
@@ -39,7 +39,8 @@ class CommentPolicy < ApplicationPolicy
 
   def api_attributes
     attributes = super
-    attributes -= [:creator_id, :updater_id, :body] if record.is_deleted? && !can_see_deleted?
+    attributes -= [:creator_id] unless can_see_creator?
+    attributes -= [:updater_id, :body, :score, :do_not_bump_post, :is_sticky] if record.is_deleted? && !can_see_deleted?
     attributes
   end
 
