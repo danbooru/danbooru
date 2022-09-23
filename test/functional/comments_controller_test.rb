@@ -62,7 +62,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
       context "searching" do
         setup do
-          @user_comment = create(:comment, post: @post, score: 10, do_not_bump_post: true, creator: @user)
+          @user_comment = create(:comment, created_at: 10.minutes.ago, updated_at: 3.minutes.ago, post: @post, score: 10, do_not_bump_post: true, creator: @user)
           @mod_comment = create(:comment, post: build(:post, tag_string: "touhou"), body: "blah", is_sticky: true, creator: @mod)
           @deleted_comment = create(:comment, creator: create(:user, name: "deleted"), is_deleted: true, is_sticky: true, do_not_bump_post: true, score: 10, body: "blah")
         end
@@ -76,6 +76,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(is_sticky: "true").with { @mod_comment }
           should respond_to_search(is_deleted: "true").with { @deleted_comment }
           should respond_to_search(do_not_bump_post: "true").with { @user_comment }
+          should respond_to_search(is_edited: "true").with { @user_comment }
+          should respond_to_search(is_edited: "false").with { [@deleted_comment, @mod_comment] }
           should respond_to_search(creator_name: "deleted").with { [] }
         end
 
@@ -88,6 +90,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(is_sticky: "true").with { @mod_comment }
           should respond_to_search(is_deleted: "true").with { @deleted_comment }
           should respond_to_search(do_not_bump_post: "true").with { @user_comment }
+          should respond_to_search(is_edited: "true").with { @user_comment }
+          should respond_to_search(is_edited: "false").with { [@deleted_comment, @mod_comment] }
           should respond_to_search(creator_name: "deleted").with { @deleted_comment }
         end
 
@@ -100,6 +104,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(is_sticky: "true").with { [@deleted_comment, @mod_comment] }
           should respond_to_search(is_deleted: "true").with { @deleted_comment }
           should respond_to_search(do_not_bump_post: "true").with { [@deleted_comment, @user_comment] }
+          should respond_to_search(is_edited: "true").with { @user_comment }
+          should respond_to_search(is_edited: "false").with { [@deleted_comment, @mod_comment] }
           should respond_to_search(creator_name: "deleted").with { @deleted_comment }
         end
 
@@ -131,9 +137,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
     context "search action" do
       should "render" do
-        @comment = create(:comment, post: @post)
         get search_comments_path
-        assert_response :success
+        assert_redirected_to comments_path(group_by: "comment")
       end
     end
 

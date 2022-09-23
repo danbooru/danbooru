@@ -85,7 +85,7 @@ Rails.application.routes.draw do
       get "/", action: :index
     end
     collection do
-      get :search
+      get :search, to: redirect("/comments?group_by=comment")
     end
     member do
       post :undelete

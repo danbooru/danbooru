@@ -83,7 +83,7 @@
         <ul>
           <li><h2>Comments</h2></li>
           <li><%= link_to("Comments", comments_path) %></li>
-          <li><%= link_to("Search", search_comments_path) %></li>
+          <li><%= link_to("Search", comments_path(group_by: "comment")) %></li>
           <li><%= link_to("Votes", comment_votes_path) %></li>
           <li><%= link_to("RSS", comments_path(:atom)) %></li>
           <li><%= link_to_wiki "Help", "help:comments" %></li>

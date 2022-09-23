@@ -22,9 +22,6 @@ class CommentsController < ApplicationController
     end
   end
 
-  def search
-  end
-
   def new
     if params[:id]
       quoted_comment = Comment.find(params[:id])

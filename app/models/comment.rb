@@ -35,13 +35,29 @@ class Comment < ApplicationRecord
     def search(params, current_user)
       q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score, :post, :creator, :updater], current_user: current_user)
 
+      if params[:is_edited].to_s.truthy?
+        q = q.where("comments.updated_at - comments.created_at > ?", 5.minutes.iso8601)
+      elsif params[:is_edited].to_s.falsy?
+        q = q.where("comments.updated_at - comments.created_at <= ?", 5.minutes.iso8601)
+      end
+
       case params[:order]
+      when "id_asc"
+        q = q.order("comments.id ASC")
+      when "created_at", "created_at_desc"
+        q = q.order("comments.created_at DESC, comments.id DESC")
+      when "created_at_asc"
+        q = q.order("comments.created_at ASC, comments.id ASC")
       when "post_id", "post_id_desc"
         q = q.order("comments.post_id DESC, comments.id DESC")
       when "score", "score_desc"
         q = q.order("comments.score DESC, comments.id DESC")
+      when "score_asc"
+        q = q.order("comments.score ASC, comments.id ASC")
       when "updated_at", "updated_at_desc"
-        q = q.order("comments.updated_at DESC")
+        q = q.order("comments.updated_at DESC, comments.id DESC")
+      when "updated_at_asc"
+        q = q.order("comments.updated_at ASC, comments.id ASC")
       else
         q = q.apply_default_order(params)
       end
