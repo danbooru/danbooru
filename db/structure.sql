@@ -3677,10 +3677,45 @@ CREATE INDEX index_comments_on_creator_id_and_post_id ON public.comments USING b
 
 
 --
+-- Name: index_comments_on_do_not_bump_post; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comments_on_do_not_bump_post ON public.comments USING btree (do_not_bump_post) WHERE (do_not_bump_post = true);
+
+
+--
+-- Name: index_comments_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comments_on_is_deleted ON public.comments USING btree (is_deleted) WHERE (is_deleted = true);
+
+
+--
+-- Name: index_comments_on_is_sticky; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comments_on_is_sticky ON public.comments USING btree (is_sticky) WHERE (is_sticky = true);
+
+
+--
 -- Name: index_comments_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_comments_on_post_id ON public.comments USING btree (post_id);
+
+
+--
+-- Name: index_comments_on_score; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comments_on_score ON public.comments USING btree (score);
+
+
+--
+-- Name: index_comments_on_updater_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comments_on_updater_id ON public.comments USING btree (updater_id) WHERE (updater_id IS NOT NULL);
 
 
 --
@@ -6637,6 +6672,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220919041622'),
 ('20220920224005'),
 ('20220921022408'),
-('20220922014326');
+('20220922014326'),
+('20220923010905');
 
 
