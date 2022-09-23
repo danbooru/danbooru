@@ -220,7 +220,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth profile_path, @user, as: :json
         assert_response :success
 
-        assert_equal(@user.comment_count, response.parsed_body["comment_count"])
+        assert_equal(@user.comments.count, response.parsed_body["comment_count"])
       end
 
       should "redirect anonymous users to the sign in page" do

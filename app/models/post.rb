@@ -1350,30 +1350,17 @@ class Post < ApplicationRecord
         end
       end
 
-      def flagger_matches(username, current_user)
-        flags = PostFlag.unscoped.category_matches("normal")
-
-        user_subquery_matches(flags, username) do |username|
-          flagger = User.find_by_name(username)
-          PostFlag.unscoped.creator_matches(flagger, current_user)
-        end
-      end
-
-      def user_subquery_matches(subquery, username, current_user, field: :creator, &block)
+      def user_subquery_matches(subquery, username, current_user, field: :creator)
         subquery = subquery.where("post_id = posts.id").select(1)
 
         if username.downcase == "any"
           where("EXISTS (#{subquery.to_sql})")
         elsif username.downcase == "none"
           where("NOT EXISTS (#{subquery.to_sql})")
-        elsif block.nil?
+        else
           user = User.find_by_name(username)
           return none if user.nil?
           subquery = subquery.visible_for_search(field, current_user).where(field => user)
-          where("EXISTS (#{subquery.to_sql})")
-        else
-          subquery = subquery.merge(block.call(username))
-          return none if subquery.to_sql.blank?
           where("EXISTS (#{subquery.to_sql})")
         end
       end

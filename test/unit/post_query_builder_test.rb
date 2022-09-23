@@ -465,6 +465,16 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "flagger:does_not_exist")
     end
 
+    should "return self-flagged posts for the flagger:<name> metatag" do
+      flagger = create(:user)
+      posts = create_list(:post, 2, uploader: flagger)
+      flag = create(:post_flag, post: posts[0], creator: flagger)
+
+      assert_tag_match([], "flagger:#{flagger.name} user:#{flagger.name}", current_user: User.anonymous)
+      assert_tag_match([posts[0]], "flagger:#{flagger.name} user:#{flagger.name}", current_user: flagger)
+      assert_tag_match([posts[0]], "flagger:#{flagger.name} user:#{flagger.name}", current_user: create(:mod_user))
+    end
+
     should "return posts for the commenter:<name> metatag" do
       users = create_list(:user, 2, created_at: 2.weeks.ago)
       posts = create_list(:post, 2)

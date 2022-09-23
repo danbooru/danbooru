@@ -31,18 +31,6 @@ class PostFlag < ApplicationRecord
   scope :active, -> { pending.or(rejected.in_cooldown) }
 
   module SearchMethods
-    def creator_matches(creator, searcher)
-      return none if creator.nil?
-
-      policy = Pundit.policy!(searcher, PostFlag.unscoped.new(creator: creator))
-
-      if policy.can_view_flagger?
-        where(creator: creator).where.not(post: searcher.posts)
-      else
-        none
-      end
-    end
-
     def category_matches(category)
       case category
       when "normal"
