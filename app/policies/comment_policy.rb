@@ -43,5 +43,16 @@ class CommentPolicy < ApplicationPolicy
     attributes
   end
 
+  def visible_for_search(comments, attribute)
+    case attribute
+    in :creator | :creator_id if !can_see_deleted?
+      comments.where(creator: user, is_deleted: true).or(comments.undeleted)
+    in :updater | :updater_id | :body | :score | :do_not_bump_post | :is_sticky if !can_see_deleted?
+      comments.undeleted
+    else
+      comments
+    end
+  end
+
   alias_method :undelete?, :update?
 end

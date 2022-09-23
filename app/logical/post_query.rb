@@ -138,7 +138,7 @@ class PostQuery
   # True if the search depends on the current user because of permissions or privacy settings.
   def is_user_dependent_search?
     metatags.any? do |metatag|
-      metatag.name.in?(%w[upvoter upvote downvoter downvote search flagger fav ordfav favgroup ordfavgroup]) ||
+      metatag.name.in?(%w[upvoter upvote downvoter downvote commenter comm search flagger fav ordfav favgroup ordfavgroup]) ||
       metatag.name == "status" && metatag.value == "unmoderated" ||
       metatag.name == "disapproved" && !metatag.value.downcase.in?(PostDisapproval::REASONS)
     end

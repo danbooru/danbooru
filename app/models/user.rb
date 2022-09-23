@@ -561,7 +561,7 @@ class User < ApplicationRecord
     end
 
     def comment_count
-      comments.count
+      comments.visible_for_search(:creator, CurrentUser.user).count
     end
 
     def favorite_group_count

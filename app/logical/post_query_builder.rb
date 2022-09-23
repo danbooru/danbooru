@@ -172,19 +172,19 @@ class PostQueryBuilder
     when "flagger"
       relation.flagger_matches(value, current_user)
     when "appealer"
-      relation.user_subquery_matches(PostAppeal.unscoped, value)
+      relation.user_subquery_matches(PostAppeal.unscoped, value, current_user)
     when "commenter", "comm"
-      relation.user_subquery_matches(Comment.unscoped, value)
+      relation.user_subquery_matches(Comment.unscoped, value, current_user)
     when "commentaryupdater", "artcomm"
-      relation.user_subquery_matches(ArtistCommentaryVersion.unscoped, value, field: :updater)
+      relation.user_subquery_matches(ArtistCommentaryVersion.unscoped, value, current_user, field: :updater)
     when "noter"
-      relation.user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, field: :updater)
+      relation.user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, current_user, field: :updater)
     when "noteupdater"
-      relation.user_subquery_matches(NoteVersion.unscoped, value, field: :updater)
+      relation.user_subquery_matches(NoteVersion.unscoped, value, current_user, field: :updater)
     when "upvoter", "upvote"
-      relation.user_subquery_matches(PostVote.active.positive.visible(current_user), value, field: :user)
+      relation.user_subquery_matches(PostVote.active.positive.visible(current_user), value, current_user, field: :user)
     when "downvoter", "downvote"
-      relation.user_subquery_matches(PostVote.active.negative.visible(current_user), value, field: :user)
+      relation.user_subquery_matches(PostVote.active.negative.visible(current_user), value, current_user, field: :user)
     when "random"
       relation # handled in the `build` method
     when *CATEGORY_COUNT_METATAGS

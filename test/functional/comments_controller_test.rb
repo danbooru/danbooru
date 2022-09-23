@@ -52,23 +52,56 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "grouped by comment" do
-        setup do
-          @user_comment = create(:comment, post: @post, score: 10, do_not_bump_post: true, creator: @user)
-          @mod_comment = create(:comment, post: build(:post, tag_string: "touhou"), body: "blah", is_sticky: true, creator: @mod)
-          @deleted_comment = create(:comment, is_deleted: true)
-        end
-
         should "render" do
+          create(:comment)
+
           get comments_path(group_by: "comment")
           assert_response :success
         end
+      end
 
-        should respond_to_search(other_params: {group_by: "comment"}).with { [@deleted_comment, @mod_comment, @user_comment] }
-        should respond_to_search(body_matches: "blah").with { @mod_comment }
-        should respond_to_search(score: 10).with { @user_comment }
-        should respond_to_search(is_sticky: "true").with { @mod_comment }
-        should respond_to_search(do_not_bump_post: "true").with { @user_comment }
-        should respond_to_search(is_deleted: "true").with { @deleted_comment }
+      context "searching" do
+        setup do
+          @user_comment = create(:comment, post: @post, score: 10, do_not_bump_post: true, creator: @user)
+          @mod_comment = create(:comment, post: build(:post, tag_string: "touhou"), body: "blah", is_sticky: true, creator: @mod)
+          @deleted_comment = create(:comment, creator: create(:user, name: "deleted"), is_deleted: true, is_sticky: true, do_not_bump_post: true, score: 10, body: "blah")
+        end
+
+        context "as a regular user" do
+          setup { CurrentUser.user = @user }
+
+          should respond_to_search(other_params: {group_by: "comment"}).with { [@deleted_comment, @mod_comment, @user_comment] }
+          should respond_to_search(body_matches: "blah").with { @mod_comment }
+          should respond_to_search(score: 10).with { @user_comment }
+          should respond_to_search(is_sticky: "true").with { @mod_comment }
+          should respond_to_search(is_deleted: "true").with { @deleted_comment }
+          should respond_to_search(do_not_bump_post: "true").with { @user_comment }
+          should respond_to_search(creator_name: "deleted").with { [] }
+        end
+
+        context "as the creator of a deleted comment" do
+          setup { CurrentUser.user = @deleted_comment.creator }
+
+          should respond_to_search(other_params: {group_by: "comment"}).with { [@deleted_comment, @mod_comment, @user_comment] }
+          should respond_to_search(body_matches: "blah").with { @mod_comment }
+          should respond_to_search(score: 10).with { @user_comment }
+          should respond_to_search(is_sticky: "true").with { @mod_comment }
+          should respond_to_search(is_deleted: "true").with { @deleted_comment }
+          should respond_to_search(do_not_bump_post: "true").with { @user_comment }
+          should respond_to_search(creator_name: "deleted").with { @deleted_comment }
+        end
+
+        context "as a moderator" do
+          setup { CurrentUser.user = @mod }
+
+          should respond_to_search(other_params: {group_by: "comment"}).with { [@deleted_comment, @mod_comment, @user_comment] }
+          should respond_to_search(body_matches: "blah").with { [@deleted_comment, @mod_comment] }
+          should respond_to_search(score: 10).with { [@deleted_comment, @user_comment] }
+          should respond_to_search(is_sticky: "true").with { [@deleted_comment, @mod_comment] }
+          should respond_to_search(is_deleted: "true").with { @deleted_comment }
+          should respond_to_search(do_not_bump_post: "true").with { [@deleted_comment, @user_comment] }
+          should respond_to_search(creator_name: "deleted").with { @deleted_comment }
+        end
 
         context "using includes" do
           should respond_to_search(post_id: 100).with { @user_comment }

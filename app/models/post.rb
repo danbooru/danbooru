@@ -1359,7 +1359,7 @@ class Post < ApplicationRecord
         end
       end
 
-      def user_subquery_matches(subquery, username, field: :creator, &block)
+      def user_subquery_matches(subquery, username, current_user, field: :creator, &block)
         subquery = subquery.where("post_id = posts.id").select(1)
 
         if username.downcase == "any"
@@ -1369,7 +1369,7 @@ class Post < ApplicationRecord
         elsif block.nil?
           user = User.find_by_name(username)
           return none if user.nil?
-          subquery = subquery.where(field => user)
+          subquery = subquery.visible_for_search(field, current_user).where(field => user)
           where("EXISTS (#{subquery.to_sql})")
         else
           subquery = subquery.merge(block.call(username))

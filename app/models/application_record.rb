@@ -44,6 +44,10 @@ class ApplicationRecord < ActiveRecord::Base
         all
       end
 
+      def visible_for_search(attribute, current_user)
+        policy(current_user).visible_for_search(all, attribute)
+      end
+
       def policy(current_user)
         Pundit.policy(current_user, self)
       end

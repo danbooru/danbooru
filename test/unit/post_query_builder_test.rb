@@ -476,6 +476,16 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[0]], "-commenter:#{users[1].name}")
     end
 
+    should "return posts with deleted comments correctly for the commenter:<name> metatag" do
+      user = create(:user)
+      c1 = create(:comment, creator: user)
+      c2 = create(:comment, creator: user, is_deleted: true)
+
+      assert_tag_match([c1.post], "commenter:#{user.name}", current_user: User.anonymous)
+      assert_tag_match([c2.post, c1.post], "commenter:#{user.name}", current_user: user)
+      assert_tag_match([c2.post, c1.post], "commenter:#{user.name}", current_user: create(:mod_user))
+    end
+
     should "return posts for the commenter:<any|none> metatag" do
       posts = create_list(:post, 2)
       create(:comment, creator: create(:user, created_at: 2.weeks.ago), post: posts[0], is_deleted: false)
@@ -1553,9 +1563,16 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       should "cache the count separately for different users" do
         @user = create(:user, enable_private_favorites: true)
         @post = as(@user) { create(:post, tag_string: "fav:#{@user.name}") }
+        @comment = create(:comment, post: @post, creator: @user, is_deleted: true)
 
         assert_equal(1, PostQuery.new("fav:#{@user.name}", current_user: @user).fast_count)
         assert_equal(0, PostQuery.new("fav:#{@user.name}").fast_count)
+
+        assert_equal(1, PostQuery.new("commenter:#{@user.name}", current_user: @user).fast_count)
+        assert_equal(0, PostQuery.new("commenter:#{@user.name}").fast_count)
+
+        assert_equal(1, PostQuery.new("comm:#{@user.name}", current_user: @user).fast_count)
+        assert_equal(0, PostQuery.new("comm:#{@user.name}").fast_count)
       end
     end
   end
