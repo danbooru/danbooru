@@ -18,6 +18,8 @@ class IpAddressType < ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Inet
   def cast(value)
     return nil if value.blank?
     super(Danbooru::IpAddress.new(value))
+  rescue ArgumentError
+    nil
   end
 
   # Serialize a Danbooru::IpAddress to a String for the database.

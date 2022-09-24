@@ -67,7 +67,7 @@ class User < ApplicationRecord
   attribute :inviter_id
   attribute :last_logged_in_at, default: -> { Time.zone.now }
   attribute :last_forum_read_at, default: "1960-01-01 00:00:00"
-  attribute :last_ip_addr
+  attribute :last_ip_addr, :ip_address
   attribute :comment_threshold, default: -8
   attribute :default_image_size, default: "large"
   attribute :favorite_tags

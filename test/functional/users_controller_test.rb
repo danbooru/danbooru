@@ -127,21 +127,28 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "show hidden attributes to the owner" do
-        get_auth user_path(@user), @user, params: {format: :json}
-        json = JSON.parse(response.body)
+        get_auth user_path(@user), @user, as: :json
 
         assert_response :success
-        assert_not_nil(json["last_logged_in_at"])
+        assert_not_nil(response.parsed_body["last_logged_in_at"])
+      end
+
+      should "show the last_ip_addr to mods" do
+        user = create(:user, last_ip_addr: "1.2.3.4")
+        get_auth user_path(user), create(:mod_user), as: :json
+
+        assert_response :success
+        assert_equal("1.2.3.4", response.parsed_body["last_ip_addr"])
       end
 
       should "not show hidden attributes to others" do
         @another = create(:user)
 
-        get_auth user_path(@another), @user, params: {format: :json}
-        json = JSON.parse(response.body)
+        get_auth user_path(@another), @user, as: :json
 
         assert_response :success
-        assert_nil(json["last_logged_in_at"])
+        assert_nil(response.parsed_body["last_logged_in_at"])
+        assert_nil(response.parsed_body["last_ip_addr"])
       end
 
       should "strip '?' from attributes" do

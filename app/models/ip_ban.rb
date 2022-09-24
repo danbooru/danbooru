@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class IpBan < ApplicationRecord
+  attribute :ip_addr, :ip_address
+
   belongs_to :creator, class_name: "User"
 
   validate :validate_ip_addr
@@ -23,7 +25,7 @@ class IpBan < ApplicationRecord
   end
 
   def self.ip_matches(ip_addr)
-    where("ip_addr >>= ?", ip_addr)
+    where("ip_addr >>= ?", ip_addr.to_s)
   end
 
   def self.hit!(category, ip_addr)
@@ -62,7 +64,7 @@ class IpBan < ApplicationRecord
   def validate_ip_addr
     if ip_addr.blank?
       errors.add(:ip_addr, "is invalid")
-    elsif ip_addr.private? || ip_addr.loopback? || ip_addr.link_local?
+    elsif ip_addr.is_local?
       errors.add(:ip_addr, "must be a public address")
     elsif full_ban? && ip_addr.ipv4? && ip_addr.prefix < 24
       errors.add(:ip_addr, "may not have a subnet bigger than /24")
@@ -72,23 +74,9 @@ class IpBan < ApplicationRecord
       errors.add(:ip_addr, "may not have a subnet bigger than /48")
     elsif partial_ban? && ip_addr.ipv6? && ip_addr.prefix < 20
       errors.add(:ip_addr, "may not have a subnet bigger than /20")
-    elsif new_record? && IpBan.active.where(category: category).ip_matches(subnetted_ip).exists?
+    elsif new_record? && IpBan.active.where(category: category).ip_matches(ip_addr).exists?
       errors.add(:ip_addr, "is already banned")
     end
-  end
-
-  def has_subnet?
-    (ip_addr.ipv4? && ip_addr.prefix < 32) || (ip_addr.ipv6? && ip_addr.prefix < 128)
-  end
-
-  def subnetted_ip
-    str = ip_addr.to_s
-    str += "/" + ip_addr.prefix.to_s if has_subnet?
-    str
-  end
-
-  def ip_addr=(ip_addr)
-    super(ip_addr.strip)
   end
 
   def self.available_includes

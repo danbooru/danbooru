@@ -72,6 +72,8 @@ class UserPolicy < ApplicationPolicy
       ]
     end
 
+    attributes += [:last_ip_addr] if policy(:ip_address).show?
+
     attributes
   end
 
