@@ -68,7 +68,7 @@ class IpGeolocationTest < ActiveSupport::TestCase
       end
 
       should "work for a bogon IP" do
-        @ip = IpGeolocation.create_or_update!("103.10.192.0")
+        @ip = IpGeolocation.create_or_update!("198.51.100.1")
         assert_equal(true, @ip.is_proxy?)
       end
     end

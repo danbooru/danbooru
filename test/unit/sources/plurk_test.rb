@@ -22,7 +22,7 @@ module Sources
       end
 
       should "get the artist name" do
-        assert_equal("紅眼兔", @post1.artist_name)
+        assert_equal("紅眼兔@姑且是個畫圖的", @post1.artist_name)
         assert_equal("redeyehare", @post1.tag_name)
         assert_equal("BOW99", @post4.tag_name)
       end
