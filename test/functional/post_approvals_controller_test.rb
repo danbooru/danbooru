@@ -80,5 +80,23 @@ class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(post: {uploader_name: "komachi"}).with { @post_approval }
       end
     end
+
+    context "show action" do
+      setup do
+        @approval = create(:post_approval)
+      end
+
+      should "render for html" do
+        get post_approval_path(@approval)
+
+        assert_redirected_to post_approvals_path(search: { id: @approval.id })
+      end
+
+      should "render for json" do
+        get post_approval_path(@approval), as: :json
+
+        assert_response :success
+      end
+    end
   end
 end

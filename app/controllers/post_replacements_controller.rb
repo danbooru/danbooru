@@ -35,4 +35,12 @@ class PostReplacementsController < ApplicationController
 
     respond_with(@post_replacements)
   end
+
+  def show
+    @post_replacement = authorize PostReplacement.find(params[:id])
+
+    respond_with(@post_replacement) do |format|
+      format.html { redirect_to post_replacements_path(search: { id: @post_replacement.id }) }
+    end
+  end
 end

@@ -185,6 +185,10 @@ module Source
       nil
     end
 
+    def self.site_name(url)
+      Source::URL.parse(url)&.site_name
+    end
+
     def self.image_url?(url)
       Source::URL.parse(url)&.image_url?
     end

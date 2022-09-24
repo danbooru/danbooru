@@ -184,13 +184,14 @@ Rails.application.routes.draw do
       get :search
     end
   end
+  resources :post_events, only: [:index]
   resources :post_regenerations, :only => [:create]
-  resources :post_replacements, :only => [:index, :new, :create, :update]
+  resources :post_replacements, only: [:index, :show, :new, :create, :update]
   resources :post_votes, only: [:index, :show, :create, :destroy]
 
   # XXX Use `only: []` to avoid redefining post routes defined at top of file.
   resources :posts, only: [] do
-    resources :events, :only => [:index], :controller => "post_events"
+    resources :events, only: [:index], controller: "post_events", as: "post_events"
     resources :favorites, only: [:index, :create, :destroy]
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
     resource :artist_commentary, only: [:show] do
@@ -208,7 +209,7 @@ Rails.application.routes.draw do
   end
   resources :post_appeals
   resources :post_flags
-  resources :post_approvals, only: [:create, :index]
+  resources :post_approvals, only: [:create, :index, :show]
   resources :post_disapprovals
   resources :post_versions, :only => [:index, :search] do
     member do

@@ -224,5 +224,23 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(creator_name: "yukari").with { @post_replacement }
       end
     end
+
+    context "show action" do
+      setup do
+        @replacement = create(:post_replacement)
+      end
+
+      should "render for html" do
+        get post_replacement_path(@replacement)
+
+        assert_redirected_to post_replacements_path(search: { id: @replacement.id })
+      end
+
+      should "render for json" do
+        get post_replacement_path(@replacement), as: :json
+
+        assert_response :success
+      end
+    end
   end
 end

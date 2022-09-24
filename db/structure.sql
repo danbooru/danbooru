@@ -1399,26 +1399,6 @@ CREATE TABLE public.post_flags (
 
 
 --
--- Name: post_flags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.post_flags_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: post_flags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.post_flags_id_seq OWNED BY public.post_flags.id;
-
-
---
 -- Name: post_replacements; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1441,6 +1421,117 @@ CREATE TABLE public.post_replacements (
     image_height integer,
     md5 character varying
 );
+
+
+--
+-- Name: posts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.posts (
+    id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    uploader_id integer NOT NULL,
+    score integer DEFAULT 0 NOT NULL,
+    source character varying DEFAULT ''::character varying NOT NULL,
+    md5 character varying NOT NULL,
+    last_comment_bumped_at timestamp without time zone,
+    rating character(1) DEFAULT 'q'::bpchar NOT NULL,
+    image_width integer NOT NULL,
+    image_height integer NOT NULL,
+    tag_string text DEFAULT ''::text NOT NULL,
+    fav_count integer DEFAULT 0 NOT NULL,
+    file_ext character varying NOT NULL,
+    last_noted_at timestamp without time zone,
+    parent_id integer,
+    has_children boolean DEFAULT false NOT NULL,
+    approver_id integer,
+    tag_count_general integer DEFAULT 0 NOT NULL,
+    tag_count_artist integer DEFAULT 0 NOT NULL,
+    tag_count_character integer DEFAULT 0 NOT NULL,
+    tag_count_copyright integer DEFAULT 0 NOT NULL,
+    file_size integer NOT NULL,
+    up_score integer DEFAULT 0 NOT NULL,
+    down_score integer DEFAULT 0 NOT NULL,
+    is_pending boolean DEFAULT false NOT NULL,
+    is_flagged boolean DEFAULT false NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
+    tag_count integer DEFAULT 0 NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    is_banned boolean DEFAULT false NOT NULL,
+    pixiv_id integer,
+    last_commented_at timestamp without time zone,
+    has_active_children boolean DEFAULT false,
+    bit_flags bigint DEFAULT 0 NOT NULL,
+    tag_count_meta integer DEFAULT 0 NOT NULL
+);
+
+
+--
+-- Name: post_events; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.post_events AS
+ SELECT 'Post'::character varying AS model_type,
+    posts.id AS model_id,
+    posts.id AS post_id,
+    posts.uploader_id AS creator_id,
+    posts.created_at AS event_at
+   FROM public.posts
+UNION ALL
+ SELECT 'PostAppeal'::character varying AS model_type,
+    post_appeals.id AS model_id,
+    post_appeals.post_id,
+    post_appeals.creator_id,
+    post_appeals.created_at AS event_at
+   FROM public.post_appeals
+UNION ALL
+ SELECT 'PostApproval'::character varying AS model_type,
+    post_approvals.id AS model_id,
+    post_approvals.post_id,
+    post_approvals.user_id AS creator_id,
+    post_approvals.created_at AS event_at
+   FROM public.post_approvals
+UNION ALL
+ SELECT 'PostDisapproval'::character varying AS model_type,
+    post_disapprovals.id AS model_id,
+    post_disapprovals.post_id,
+    post_disapprovals.user_id AS creator_id,
+    post_disapprovals.created_at AS event_at
+   FROM public.post_disapprovals
+UNION ALL
+ SELECT 'PostFlag'::character varying AS model_type,
+    post_flags.id AS model_id,
+    post_flags.post_id,
+    post_flags.creator_id,
+    post_flags.created_at AS event_at
+   FROM public.post_flags
+UNION ALL
+ SELECT 'PostReplacement'::character varying AS model_type,
+    post_replacements.id AS model_id,
+    post_replacements.post_id,
+    post_replacements.creator_id,
+    post_replacements.created_at AS event_at
+   FROM public.post_replacements;
+
+
+--
+-- Name: post_flags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.post_flags_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_flags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.post_flags_id_seq OWNED BY public.post_flags.id;
 
 
 --
@@ -1538,49 +1629,6 @@ CREATE SEQUENCE public.post_votes_id_seq
 --
 
 ALTER SEQUENCE public.post_votes_id_seq OWNED BY public.post_votes.id;
-
-
---
--- Name: posts; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.posts (
-    id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    uploader_id integer NOT NULL,
-    score integer DEFAULT 0 NOT NULL,
-    source character varying DEFAULT ''::character varying NOT NULL,
-    md5 character varying NOT NULL,
-    last_comment_bumped_at timestamp without time zone,
-    rating character(1) DEFAULT 'q'::bpchar NOT NULL,
-    image_width integer NOT NULL,
-    image_height integer NOT NULL,
-    tag_string text DEFAULT ''::text NOT NULL,
-    fav_count integer DEFAULT 0 NOT NULL,
-    file_ext character varying NOT NULL,
-    last_noted_at timestamp without time zone,
-    parent_id integer,
-    has_children boolean DEFAULT false NOT NULL,
-    approver_id integer,
-    tag_count_general integer DEFAULT 0 NOT NULL,
-    tag_count_artist integer DEFAULT 0 NOT NULL,
-    tag_count_character integer DEFAULT 0 NOT NULL,
-    tag_count_copyright integer DEFAULT 0 NOT NULL,
-    file_size integer NOT NULL,
-    up_score integer DEFAULT 0 NOT NULL,
-    down_score integer DEFAULT 0 NOT NULL,
-    is_pending boolean DEFAULT false NOT NULL,
-    is_flagged boolean DEFAULT false NOT NULL,
-    is_deleted boolean DEFAULT false NOT NULL,
-    tag_count integer DEFAULT 0 NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    is_banned boolean DEFAULT false NOT NULL,
-    pixiv_id integer,
-    last_commented_at timestamp without time zone,
-    has_active_children boolean DEFAULT false,
-    bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL
-);
 
 
 --
@@ -6673,6 +6721,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220920224005'),
 ('20220921022408'),
 ('20220922014326'),
-('20220923010905');
+('20220923010905'),
+('20220924092056');
 
 

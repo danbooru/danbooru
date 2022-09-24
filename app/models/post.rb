@@ -70,6 +70,7 @@ class Post < ApplicationRecord
   has_many :favorites, dependent: :destroy
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
   has_many :ai_tags, through: :media_asset
+  has_many :events, class_name: "PostEvent"
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :post_edit
 
@@ -1631,7 +1632,7 @@ class Post < ApplicationRecord
   def self.available_includes
     # attributes accessible through the ?only= parameter
     %i[
-      uploader approver flags appeals parent children notes
+      uploader approver flags appeals events parent children notes
       comments approvals disapprovals replacements pixiv_ugoira_frame_data
       artist_commentary media_asset ai_tags
     ]

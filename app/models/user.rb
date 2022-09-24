@@ -115,6 +115,7 @@ class User < ApplicationRecord
   has_many :post_appeals, foreign_key: :creator_id
   has_many :post_approvals, :dependent => :destroy
   has_many :post_disapprovals, :dependent => :destroy
+  has_many :post_events, class_name: "PostEvent", foreign_key: :creator_id
   has_many :post_flags, foreign_key: :creator_id
   has_many :post_votes
   has_many :post_versions, foreign_key: :updater_id
