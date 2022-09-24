@@ -6,12 +6,12 @@ module PostVersionsHelper
 
     other = post_version.send(type)
 
-    added_tags = post_version.added_tags
+    added_tags = post_version.added_tags.compact
     added_tags << "rating:#{post_version_value(post_version.rating)}" if post_version.rating_changed
     added_tags << "parent:#{post_version_value(post_version.parent_id)}" if post_version.parent_changed
     added_tags << "source:#{post_version_value(post_version.source)}" if post_version.source_changed
 
-    removed_tags = post_version.removed_tags
+    removed_tags = post_version.removed_tags.compact
 
     if type == "previous" || other.nil?
       obsolete_added_tags = []
