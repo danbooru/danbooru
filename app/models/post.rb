@@ -1209,7 +1209,7 @@ class Post < ApplicationRecord
           where(disapprovals: PostDisapproval.where(reason: query.downcase))
         else
           user = User.find_by_name(query)
-          where(disapprovals: PostDisapproval.creator_matches(user, current_user))
+          where(disapprovals: PostDisapproval.visible_for_search(:user, current_user).where(user: user))
         end
       end
 
