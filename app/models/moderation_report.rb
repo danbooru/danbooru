@@ -87,9 +87,9 @@ class ModerationReport < ApplicationRecord
     q = search_attributes(params, [:id, :created_at, :updated_at, :reason, :creator, :model, :status], current_user: current_user)
 
     if params[:recipient_id].present?
-      q = q.received_by(User.search(id: params[:recipient_id]))
+      q = q.received_by(User.search({ id: params[:recipient_id] }, current_user))
     elsif params[:recipient_name].present?
-      q = q.received_by(User.search(name_matches: params[:recipient_name]))
+      q = q.received_by(User.search({ name_matches: params[:recipient_name] }, current_user))
     end
 
     q.apply_default_order(params)

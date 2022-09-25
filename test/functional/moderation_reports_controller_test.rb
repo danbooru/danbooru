@@ -4,7 +4,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
   context "The moderation reports controller" do
     setup do
       @user = create(:user, created_at: 2.weeks.ago)
-      @spammer = create(:user, created_at: 2.weeks.ago)
+      @spammer = create(:user, id: 5678, name: "spammer", created_at: 2.weeks.ago)
       @mod = create(:moderator_user, created_at: 2.weeks.ago)
 
       as(@spammer) do
@@ -70,6 +70,8 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
 
         should respond_to_search({}).with { [@dmail_report, @forum_report, @comment_report] }
         should respond_to_search(reason_matches: "spam").with { @dmail_report }
+        should respond_to_search(recipient_id: 5678).with { [@dmail_report, @forum_report, @comment_report] }
+        should respond_to_search(recipient_name: "spammer").with { [@dmail_report, @forum_report, @comment_report] }
 
         context "using includes" do
           should respond_to_search(model_id: 1234).with { @comment_report }
