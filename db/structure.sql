@@ -993,7 +993,9 @@ CREATE TABLE public.mod_actions (
     description text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    category integer NOT NULL
+    category integer NOT NULL,
+    subject_type character varying,
+    subject_id integer
 );
 
 
@@ -4397,6 +4399,20 @@ CREATE INDEX index_mod_actions_on_description ON public.mod_actions USING gin (d
 
 
 --
+-- Name: index_mod_actions_on_subject_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mod_actions_on_subject_id ON public.mod_actions USING btree (subject_id);
+
+
+--
+-- Name: index_mod_actions_on_subject_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mod_actions_on_subject_type ON public.mod_actions USING btree (subject_type);
+
+
+--
 -- Name: index_mod_actions_on_to_tsvector_pg_catalog_english_description; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6722,6 +6738,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220921022408'),
 ('20220922014326'),
 ('20220923010905'),
-('20220924092056');
+('20220924092056'),
+('20220925045236');
 
 
