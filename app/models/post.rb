@@ -789,7 +789,7 @@ class Post < ApplicationRecord
     end
 
     def delete!(reason, move_favorites: false, user: CurrentUser.user)
-      transaction do
+      with_lock do
         automated = (user == User.system)
 
         flags.pending.update!(status: :succeeded)

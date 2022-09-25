@@ -7,7 +7,7 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
       @flagger = create(:gold_user, id: 999, created_at: 2.weeks.ago)
       @uploader = create(:mod_user, name: "chen", created_at: 2.weeks.ago)
       @mod = create(:mod_user, name: "mod")
-      @post = create(:post, id: 101, is_flagged: true, uploader: @uploader)
+      @post = create(:post, id: 101, uploader: @uploader)
       @post_flag = create(:post_flag, reason: "xxx", post: @post, creator: @flagger)
     end
 
@@ -27,7 +27,7 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @other_flag = create(:post_flag, post: build(:post, is_flagged: true, tag_string: "touhou"))
+        @other_flag = create(:post_flag, post: create(:post, tag_string: "touhou"))
         @unrelated_flag = create(:post_flag, reason: "poor quality")
       end
 
@@ -129,12 +129,31 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "create a new flag" do
-        assert_difference("PostFlag.count", 1) do
-          @post = create(:post)
-          post_auth post_flags_path, @flagger, params: { post_flag: { post_id: @post.id, reason: "xxx" }}, as: :javascript
-          assert_redirected_to PostFlag.last
-          assert_equal(true, @post.reload.is_flagged?)
-        end
+        @post = create(:post)
+        post_auth post_flags_path, @flagger, params: { post_flag: { post_id: @post.id, reason: "xxx" }}, as: :javascript
+
+        assert_redirected_to PostFlag.last
+        assert_equal(true, @post.reload.is_flagged?)
+        assert_equal(1, @post.flags.count)
+      end
+
+      should "not allow flagging a flagged post" do
+        @post = create(:post, is_flagged: true)
+        post_auth post_flags_path, @flagger, params: { post_flag: { post_id: @post.id, reason: "xxx" }}, as: :javascript
+
+        assert_response :success
+        assert_equal(true, @post.reload.is_flagged?)
+        assert_equal(0, @post.flags.count)
+      end
+
+      should "not allow flagging a deleted post" do
+        @post = create(:post, is_deleted: true)
+        post_auth post_flags_path, @flagger, params: { post_flag: { post_id: @post.id, reason: "xxx" }}, as: :javascript
+
+        assert_response :success
+        assert_equal(false, @post.reload.is_flagged?)
+        assert_equal(true, @post.reload.is_deleted?)
+        assert_equal(0, @post.flags.count)
       end
     end
 

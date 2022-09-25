@@ -880,7 +880,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the status:unmoderated metatag" do
-      flagged = create(:post, is_flagged: true)
+      flagged = create(:post)
       pending = create(:post, is_pending: true)
       disapproved = create(:post, is_pending: true)
       appealed = create(:post, is_deleted: true)

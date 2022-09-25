@@ -14,7 +14,7 @@ class PostFlag < ApplicationRecord
   validate :validate_creator_is_not_limited, on: :create
   validate :validate_post, on: :create
   validates :creator_id, uniqueness: { scope: :post_id, on: :create, unless: :is_deletion, message: "have already flagged this post" }
-  before_save :update_post
+  after_create :update_post
   after_create :prune_disapprovals
   attr_accessor :is_deletion
 
@@ -76,7 +76,7 @@ class PostFlag < ApplicationRecord
   end
 
   def update_post
-    post.update_column(:is_flagged, true) unless post.is_flagged?
+    post.update_column(:is_flagged, true) if pending?
   end
 
   def validate_creator_is_not_limited
@@ -85,7 +85,8 @@ class PostFlag < ApplicationRecord
 
   def validate_post
     errors.add(:post, "is pending and cannot be flagged") if post.is_pending? && !is_deletion
-    errors.add(:post, "is deleted and cannot be flagged") if post.is_deleted? && !is_deletion
+    errors.add(:post, "is deleted and cannot be flagged") if post.is_deleted? && creator != User.system # DanbooruBot is allowed to prune expired appeals
+    errors.add(:post, "is already flagged") if post.is_flagged? && !is_deletion
 
     flag = post.flags.in_cooldown.last
     if !is_deletion && !creator.is_approver? && flag.present?

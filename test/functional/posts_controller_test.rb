@@ -827,12 +827,34 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("test", @post.flags.last.reason)
       end
 
-      should "delete the post even if the deleter has flagged the post previously" do
-        create(:post_flag, post: @post, creator: @approver)
+      should "delete the post if the post is currently flagged" do
+        create(:post_flag, post: @post, reason: "blah")
         delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
 
         assert_redirected_to @post
         assert_equal(true, @post.reload.is_deleted?)
+        assert_equal("blah", @post.flags.first.reason)
+        assert_equal("test", @post.flags.last.reason)
+        assert_equal(2, @post.flags.count)
+      end
+
+      should "delete the post even if the deleter has flagged the post previously" do
+        create(:post_flag, post: @post, creator: @approver, created_at: 7.days.ago, status: "rejected", reason: "blah")
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+
+        assert_redirected_to @post
+        assert_equal(true, @post.reload.is_deleted?)
+        assert_equal("blah", @post.flags.first.reason)
+        assert_equal("test", @post.flags.last.reason)
+        assert_equal(2, @post.flags.count)
+      end
+
+      should "not delete the post if the post is already deleted" do
+        delete_auth post_path(@post), @user, params: { commit: "Delete" }
+
+        assert_response 403
+        assert_equal(false, @post.is_deleted?)
+        assert_equal(0, @post.flags.count)
       end
 
       should "not delete the post if the user is unauthorized" do
@@ -840,6 +862,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 403
         assert_equal(false, @post.is_deleted?)
+        assert_equal(0, @post.flags.count)
       end
 
       should "render the delete post dialog for an xhr request" do
