@@ -68,6 +68,8 @@ class PostApprovalTest < ActiveSupport::TestCase
           assert_equal(true, @post.reload.is_active?)
           assert_equal("post_undelete", ModAction.last.category)
           assert_equal("undeleted post ##{@post.id}", ModAction.last.description)
+          assert_equal(@post, ModAction.last.subject)
+          assert_equal(@new_approver, ModAction.last.creator)
         end
       end
 

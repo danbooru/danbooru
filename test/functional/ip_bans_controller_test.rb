@@ -28,6 +28,8 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
 
         assert_equal("ip_ban_create", ModAction.last&.category)
         assert_match(/created ip ban for 1\.2\.3\.4/, ModAction.last.description)
+        assert_equal(IpBan.last, ModAction.last.subject)
+        assert_equal(@admin, ModAction.last.creator)
       end
     end
 
@@ -65,6 +67,8 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @ip_ban.reload.is_deleted)
         assert_equal("ip_ban_delete", ModAction.last.category)
         assert_match(/deleted ip ban for #{@ip_ban.ip_addr}/, ModAction.last.description)
+        assert_equal(@ip_ban, ModAction.last.subject)
+        assert_equal(@admin, ModAction.last.creator)
       end
 
       should "mark an ip ban as undeleted" do
@@ -75,6 +79,8 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, @ip_ban.reload.is_deleted?)
         assert_equal("ip_ban_undelete", ModAction.last.category)
         assert_match(/undeleted ip ban for #{@ip_ban.ip_addr}/, ModAction.last.description)
+        assert_equal(@ip_ban, ModAction.last.subject)
+        assert_equal(@admin, ModAction.last.creator)
       end
     end
   end

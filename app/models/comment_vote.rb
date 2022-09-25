@@ -5,6 +5,7 @@ class CommentVote < ApplicationRecord
 
   belongs_to :comment
   belongs_to :user
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   validate :validate_vote_is_unique, if: :is_deleted_changed?
   validates :score, inclusion: { in: [-1, 1], message: "must be 1 or -1" }
@@ -56,13 +57,13 @@ class CommentVote < ApplicationRecord
         comment.update_columns(score: comment.score - score)
 
         if updater != user
-          ModAction.log("deleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_delete, updater)
+          ModAction.log("deleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_delete, subject: self, user: updater)
         end
       else
         comment.update_columns(score: comment.score + score)
 
         if updater != user
-          ModAction.log("undeleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_undelete, updater)
+          ModAction.log("undeleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_undelete, subject: self, user: updater)
         end
       end
     end

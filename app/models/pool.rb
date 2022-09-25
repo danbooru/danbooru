@@ -14,6 +14,8 @@ class Pool < ApplicationRecord
   before_validation :normalize_name
   after_save :create_version
 
+  has_many :mod_actions, as: :subject, dependent: :destroy
+
   deletable
   has_dtext_links :description
 
@@ -157,11 +159,11 @@ class Pool < ApplicationRecord
   end
 
   def create_mod_action_for_delete
-    ModAction.log("deleted pool ##{id} (name: #{name})", :pool_delete)
+    ModAction.log("deleted pool ##{id} (name: #{name})", :pool_delete, subject: self, user: CurrentUser.user)
   end
 
   def create_mod_action_for_undelete
-    ModAction.log("undeleted pool ##{id} (name: #{name})", :pool_undelete)
+    ModAction.log("undeleted pool ##{id} (name: #{name})", :pool_undelete, subject: self, user: CurrentUser.user)
   end
 
   def add!(post)

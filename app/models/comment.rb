@@ -10,6 +10,7 @@ class Comment < ApplicationRecord
   has_many :moderation_reports, as: :model, dependent: :destroy
   has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
   has_many :votes, class_name: "CommentVote", dependent: :destroy
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   validates :body, presence: true, length: { maximum: 15_000 }, if: :body_changed?
 
@@ -17,11 +18,11 @@ class Comment < ApplicationRecord
   before_save :handle_reports_on_deletion
   after_create :update_last_commented_at_on_create
   after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |comment|
-    ModAction.log("updated #{comment.dtext_shortlink}", :comment_update, comment.updater)
+    ModAction.log("updated #{comment.dtext_shortlink}", :comment_update, subject: self, user: comment.updater)
   end
   after_save :update_last_commented_at_on_destroy, :if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted?}
   after_save(:if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |comment|
-    ModAction.log("deleted #{comment.dtext_shortlink}", :comment_delete, comment.updater)
+    ModAction.log("deleted #{comment.dtext_shortlink}", :comment_delete, subject: self, user: comment.updater)
   end
 
   deletable

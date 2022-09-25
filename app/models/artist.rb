@@ -24,6 +24,7 @@ class Artist < ApplicationRecord
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
   has_many :urls, dependent: :destroy, class_name: "ArtistURL", autosave: true
   has_many :versions, -> {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
+  has_many :mod_actions, as: :subject, dependent: :destroy
   has_one :wiki_page, -> { active }, foreign_key: "title", primary_key: "name"
   has_one :tag_alias, -> { active }, foreign_key: "antecedent_name", primary_key: "name"
   belongs_to :tag, foreign_key: "name", primary_key: "name", default: -> { Tag.new(name: name, category: Tag.categories.artist) }
@@ -192,25 +193,25 @@ class Artist < ApplicationRecord
   end
 
   module BanMethods
-    def unban!
+    def unban!(current_user = CurrentUser.user)
       Post.transaction do
         ti = TagImplication.find_by(antecedent_name: name, consequent_name: "banned_artist")
         ti&.destroy
 
         Post.raw_tag_match(name).find_each do |post|
-          post.unban!
+          post.unban!(current_user)
           fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
-          post.update(tag_string: fixed_tags)
+          post.update(tag_string: fixed_tags) # XXX should use current_user
         end
 
-        update!(is_banned: false)
-        ModAction.log("unbanned artist ##{id}", :artist_unban)
+        update!(is_banned: false) # XXX should use current_user
+        ModAction.log("unbanned artist ##{id}", :artist_unban, subject: self, user: current_user)
       end
     end
 
     def ban!(banner: CurrentUser.user)
       Post.transaction do
-        Post.raw_tag_match(name).each(&:ban!)
+        Post.raw_tag_match(name).each { |post| post.ban!(banner) }
 
         # potential race condition but unlikely
         unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
@@ -219,7 +220,7 @@ class Artist < ApplicationRecord
         end
 
         update!(is_banned: true)
-        ModAction.log("banned artist ##{id}", :artist_ban)
+        ModAction.log("banned artist ##{id}", :artist_ban, subject: self, user: banner)
       end
     end
   end

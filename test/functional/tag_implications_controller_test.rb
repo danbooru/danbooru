@@ -72,6 +72,7 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :redirect
         assert_equal("deleted", @tag_implication.reload.status)
+        assert_equal(@tag_implication, ModAction.last.subject)
         assert_equal(user, ModAction.tag_implication_delete.last.creator)
       end
 

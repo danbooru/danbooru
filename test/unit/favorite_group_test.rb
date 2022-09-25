@@ -27,7 +27,7 @@ class FavoriteGroupTest < ActiveSupport::TestCase
       @fav_group.add(@post)
       assert_equal([@post.id], @fav_group.post_ids)
 
-      @post.expunge!
+      @post.expunge!(create(:admin_user))
       assert_equal([], @fav_group.reload.post_ids)
     end
   end

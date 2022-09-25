@@ -11,6 +11,7 @@ class ForumPost < ApplicationRecord
   has_many :moderation_reports, as: :model
   has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
   has_many :votes, class_name: "ForumPostVote"
+  has_many :mod_actions, as: :subject, dependent: :destroy
   has_one :tag_alias
   has_one :tag_implication
   has_one :bulk_update_request
@@ -25,10 +26,10 @@ class ForumPost < ApplicationRecord
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
   after_update(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |forum_post|
-    ModAction.log("updated #{forum_post.dtext_shortlink}", :forum_post_update, forum_post.updater)
+    ModAction.log("updated #{forum_post.dtext_shortlink}", :forum_post_update, subject: self, user: forum_post.updater)
   end
   after_destroy(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |forum_post|
-    ModAction.log("deleted #{forum_post.dtext_shortlink}", :forum_post_delete, forum_post.updater)
+    ModAction.log("deleted #{forum_post.dtext_shortlink}", :forum_post_delete, subject: self, user: forum_post.updater)
   end
   after_create_commit :async_send_discord_notification
 

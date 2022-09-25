@@ -69,7 +69,7 @@ module Moderator
 
         context "unban action" do
           should "render" do
-            @post.ban!
+            @post.ban!(@admin)
             post_auth unban_moderator_post_post_path(@post), @admin
 
             assert_redirected_to(@post)

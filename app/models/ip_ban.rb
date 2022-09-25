@@ -4,11 +4,12 @@ class IpBan < ApplicationRecord
   attribute :ip_addr, :ip_address
 
   belongs_to :creator, class_name: "User"
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   validate :validate_ip_addr
   validates :reason, presence: true
 
-  before_save :create_mod_action
+  after_save :create_mod_action
 
   deletable
   enum category: {
@@ -52,12 +53,12 @@ class IpBan < ApplicationRecord
   end
 
   def create_mod_action
-    if new_record?
-      ModAction.log("created ip ban for #{ip_addr}", :ip_ban_create, creator)
-    elsif is_deleted? == true && is_deleted_was == false
-      ModAction.log("deleted ip ban for #{ip_addr}", :ip_ban_delete)
-    elsif is_deleted? == false && is_deleted_was == true
-      ModAction.log("undeleted ip ban for #{ip_addr}", :ip_ban_undelete)
+    if previously_new_record?
+      ModAction.log("created ip ban for #{ip_addr}", :ip_ban_create, subject: self, user: creator)
+    elsif is_deleted? == true && is_deleted_before_last_save == false
+      ModAction.log("deleted ip ban for #{ip_addr}", :ip_ban_delete, subject: self, user: CurrentUser.user)
+    elsif is_deleted? == false && is_deleted_before_last_save == true
+      ModAction.log("undeleted ip ban for #{ip_addr}", :ip_ban_undelete, subject: self, user: CurrentUser.user)
     end
   end
 

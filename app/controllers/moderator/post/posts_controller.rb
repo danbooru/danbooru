@@ -19,12 +19,12 @@ module Moderator
 
       def expunge
         @post = authorize ::Post.find(params[:id])
-        @post.expunge!
+        @post.expunge!(CurrentUser.user)
       end
 
       def ban
         @post = authorize ::Post.find(params[:id])
-        @post.ban!
+        @post.ban!(CurrentUser.user)
         flash[:notice] = "Post was banned"
 
         respond_with(@post)
@@ -32,7 +32,7 @@ module Moderator
 
       def unban
         @post = authorize ::Post.find(params[:id])
-        @post.unban!
+        @post.unban!(CurrentUser.user)
         flash[:notice] = "Post was unbanned"
 
         respond_with(@post)

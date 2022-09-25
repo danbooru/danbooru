@@ -159,9 +159,12 @@ class CommentTest < ActiveSupport::TestCase
         end
 
         should "create a mod action" do
-          assert_difference("ModAction.count") do
-            @comment.update(body: "nope")
-          end
+          @comment.update(body: "nope")
+
+          assert_equal(1, ModAction.count)
+          assert_equal("comment_update", ModAction.last.category)
+          assert_equal(@comment, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
         end
 
         should "credit the moderator as the updater" do

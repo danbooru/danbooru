@@ -70,6 +70,9 @@ class UserDeletionTest < ActiveSupport::TestCase
     should "generate a modaction" do
       @deletion.delete!
       assert_match(/deleted user ##{@user.id}/, ModAction.last.description)
+      assert_equal(@user, ModAction.last.subject)
+      assert_equal("user_delete", ModAction.last.category)
+      assert_equal(@deletion.deleter, ModAction.last.creator)
     end
 
     should "remove any favorites" do
@@ -90,7 +93,9 @@ class UserDeletionTest < ActiveSupport::TestCase
 
       @deletion.delete!
       assert_equal("user_#{@user.id}", @user.reload.name)
-      assert_equal(true, ModAction.exists?(description: "deleted user ##{@user.id}", creator: @deletion.deleter))
+      assert_equal("deleted user ##{@user.id}", ModAction.last.description)
+      assert_equal(@deletion.deleter, ModAction.last.creator)
+      assert_equal(@user, ModAction.last.subject)
     end
 
     should "not work for other users" do

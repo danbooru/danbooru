@@ -34,6 +34,15 @@ class PostTest < ActiveSupport::TestCase
         perform_enqueued_jobs # perform IqdbAddPostJob
       end
 
+      should "log a modaction" do
+        @post.expunge!(@user)
+
+        assert_equal(1, ModAction.count)
+        assert_equal("post_permanent_delete", ModAction.last.category)
+        assert_equal(@user, ModAction.last.creator)
+        assert_nil(ModAction.last.subject)
+      end
+
       should "delete the files" do
         assert_nothing_raised { @post.file(:preview) }
         assert_nothing_raised { @post.file(:original) }
@@ -62,6 +71,20 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(1, FavoriteGroup.for_post(@post.id).count)
         @post.expunge!
         assert_equal(0, FavoriteGroup.for_post(@post.id).count)
+      end
+
+      should "destroy all modactions belonging to the post" do
+        create(:mod_action, description: "deleted post ##{@post.id}", category: :post_delete, subject: @post)
+        create(:mod_action, description: "undeleted post ##{@post.id}", category: :post_undelete, subject: @post)
+        create(:mod_action, description: "banned post ##{@post.id}", category: :post_ban, subject: @post)
+        create(:mod_action, description: "unbanned post ##{@post.id}", category: :post_unban, subject: @post)
+
+        @post.expunge!(@user)
+
+        assert_equal(1, ModAction.count)
+        assert_equal("post_permanent_delete", ModAction.last.category)
+        assert_equal(@user, ModAction.last.creator)
+        assert_nil(ModAction.last.subject)
       end
 
       should "decrement the uploader's upload count" do

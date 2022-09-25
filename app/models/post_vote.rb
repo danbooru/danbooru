@@ -5,6 +5,7 @@ class PostVote < ApplicationRecord
 
   belongs_to :post
   belongs_to :user
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   validates :score, inclusion: { in: [1, -1], message: "must be 1 or -1" }
 
@@ -81,9 +82,9 @@ class PostVote < ApplicationRecord
     return if new_record? || updater.nil? || updater == user
 
     if is_deleted_changed?(from: false, to: true)
-      ModAction.log("deleted post vote ##{id} on post ##{post_id}", :post_vote_delete, updater)
+      ModAction.log("deleted post vote ##{id} on post ##{post_id}", :post_vote_delete, subject: self, user: updater)
     elsif is_deleted_changed?(from: true, to: false)
-      ModAction.log("undeleted post vote ##{id} on post ##{post_id}", :post_vote_undelete, updater)
+      ModAction.log("undeleted post vote ##{id} on post ##{post_id}", :post_vote_undelete, subject: self, user: updater)
     end
   end
 

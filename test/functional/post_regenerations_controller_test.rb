@@ -34,6 +34,8 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(@mod, ModAction.last.creator)
           assert_equal("post_regenerate_iqdb", ModAction.last.category)
           assert_equal("regenerated IQDB for post ##{@post.id}", ModAction.last.description)
+          assert_equal(@post, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
         end
       end
 
@@ -56,6 +58,8 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(@mod, ModAction.last.creator)
           assert_equal("post_regenerate", ModAction.last.category)
           assert_equal("regenerated image samples for post ##{@post.id}", ModAction.last.description)
+          assert_equal(@post, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
         end
 
         should "fix the width and height of exif-rotated images" do

@@ -61,6 +61,8 @@ class BansControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to bans_path
           assert_equal(true, @user.reload.is_banned?)
           assert_match(/banned <@#{@user.name}> 1 day: xxx/, ModAction.last.description)
+          assert_equal(@user, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
         end
       end
 
@@ -135,6 +137,8 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to bans_path
           assert_match(/unbanned <@#{@ban.user.name}>/, ModAction.last.description)
+          assert_equal(@ban.user, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
         end
       end
     end

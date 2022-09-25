@@ -63,6 +63,7 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
         assert_response :redirect
         assert_equal("deleted", @tag_alias.reload.status)
         assert_equal(user, ModAction.tag_alias_delete.last.creator)
+        assert_equal(@tag_alias, ModAction.tag_alias_delete.last.subject)
       end
 
       should "not allow members to delete aliases" do

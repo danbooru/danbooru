@@ -125,6 +125,8 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to @user_feedback
           assert_equal("blah", @user_feedback.reload.body)
           assert_match(/updated user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_equal(@user, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
         end
 
         should "allow deleting feedbacks given to other users" do
@@ -133,6 +135,8 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to @user_feedback
           assert(@user_feedback.reload.is_deleted?)
           assert_match(/updated user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_equal(@user, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
         end
 
         should "not allow updating feedbacks given to themselves" do

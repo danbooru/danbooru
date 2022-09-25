@@ -107,6 +107,8 @@ class PostVoteTest < ActiveSupport::TestCase
 
         vote.soft_delete!(updater: admin)
         assert_match(/deleted post vote #\d+ on post #\d+/, ModAction.post_vote_delete.last.description)
+        assert_equal(vote, ModAction.post_vote_delete.last.subject)
+        assert_equal(admin, ModAction.post_vote_delete.last.creator)
       end
     end
 
@@ -129,6 +131,8 @@ class PostVoteTest < ActiveSupport::TestCase
 
       should "leave a mod action" do
         assert_match(/undeleted post vote #\d+ on post #\d+/, ModAction.post_vote_undelete.last.description)
+        assert_equal(@vote, ModAction.post_vote_undelete.last.subject)
+        assert_equal(@admin, ModAction.post_vote_undelete.last.creator)
       end
     end
   end

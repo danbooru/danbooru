@@ -178,10 +178,12 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
       context "when updating another user's comment" do
         should "succeed if updater is a moderator" do
-          put_auth comment_path(@comment.id), @user, params: {comment: {body: "abc"}}, xhr: true
+          put_auth comment_path(@comment.id), @mod, params: {comment: {body: "abc"}}, xhr: true
 
           assert_equal("abc", @comment.reload.body)
           assert_match(/updated comment ##{@comment.id}/, ModAction.last.description)
+          assert_equal(@comment, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
           assert_response :success
         end
 
@@ -199,6 +201,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal(true, @comment.reload.is_sticky)
           assert_match(/updated comment ##{@comment.id}/, ModAction.last.description)
+          assert_equal(@comment, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
           assert_response :success
         end
 
@@ -224,6 +228,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
         assert_equal("abc", @comment.reload.body)
         assert_match(/updated comment ##{@comment.id}/, ModAction.last.description)
+        assert_equal(@comment, ModAction.last.subject)
+        assert_equal(@user, ModAction.last.creator)
         assert_response :success
       end
 
@@ -233,6 +239,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("herp derp", @comment.reload.body)
         assert_equal(true, @comment.is_deleted)
         assert_match(/deleted comment ##{@comment.id}/, ModAction.last.description)
+        assert_equal(@comment, ModAction.last.subject)
+        assert_equal(@user, ModAction.last.creator)
         assert_response :success
       end
 
@@ -287,12 +295,14 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @comment.reload.is_deleted)
         assert_redirected_to @comment
         assert_match(/deleted comment ##{@comment.id}/, ModAction.last.description)
+        assert_equal(@comment, ModAction.last.subject)
+        assert_equal(@user, ModAction.last.creator)
       end
 
       should "mark all pending moderation reports against the comment as handled" do
         @comment = create(:comment, post: @post)
         report1 = create(:moderation_report, model: @comment, status: :pending)
-        report2 = create(:moderation_report, model: @comment, status: :rejected)
+        report2 = create(:moderation_report, model: @comment, status: :rejected, updater: create(:user))
         delete_auth comment_path(@comment.id), @mod
 
         assert_redirected_to @comment
@@ -311,6 +321,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(@comment)
         assert_equal(false, @comment.reload.is_deleted)
         assert_match(/updated comment ##{@comment.id}/, ModAction.last.description)
+        assert_equal(@comment, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
 
       should "not allow normal Members to undelete their own comments" do

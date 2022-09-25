@@ -7,6 +7,7 @@ class ModerationReport < ApplicationRecord
 
   belongs_to :model, polymorphic: true
   belongs_to :creator, class_name: "User"
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   before_validation(on: :create) { model.lock! }
   validates :reason, presence: true
@@ -61,9 +62,9 @@ class ModerationReport < ApplicationRecord
     return unless saved_change_to_status? && status != :pending
 
     if handled?
-      ModAction.log("handled modreport ##{id}", :moderation_report_handled, updater)
+      ModAction.log("handled modreport ##{id}", :moderation_report_handled, subject: self, user: updater)
     elsif rejected?
-      ModAction.log("rejected modreport ##{id}", :moderation_report_rejected, updater)
+      ModAction.log("rejected modreport ##{id}", :moderation_report_rejected, subject: self, user: updater)
     end
   end
 

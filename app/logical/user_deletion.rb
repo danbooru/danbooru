@@ -42,7 +42,7 @@ class UserDeletion
   private
 
   def create_mod_action
-    ModAction.log("deleted user ##{user.id}", :user_delete, deleter)
+    ModAction.log("deleted user ##{user.id}", :user_delete, subject: user, user: deleter)
   end
 
   def create_user_event

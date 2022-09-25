@@ -216,6 +216,8 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to(forum_topic_path(@forum_topic, anchor: "forum_post_#{@forum_post.id}"))
         assert_match(/updated forum ##{@forum_post.id}/, ModAction.last.description)
+        assert_equal(@forum_post, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
     end
 
@@ -227,6 +229,8 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(@forum_reply)
         assert_equal(true, @forum_reply.reload.is_deleted?)
         assert_match(/updated forum ##{@forum_reply.id}/, ModAction.last.description)
+        assert_equal(@forum_reply, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
 
       should "not allow users to delete their own posts" do
@@ -247,7 +251,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       should "mark all pending moderation reports against the post as handled" do
         forum_reply = as(@user) { create(:forum_post, topic: @forum_topic, creator: @user) }
         report1 = create(:moderation_report, model: forum_reply, status: :pending)
-        report2 = create(:moderation_report, model: forum_reply, status: :rejected)
+        report2 = create(:moderation_report, model: forum_reply, status: :rejected, updater: @user)
         delete_auth forum_post_path(forum_reply), @mod
 
         assert_redirected_to(forum_post_path(forum_reply))
@@ -266,6 +270,8 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(@forum_reply)
         assert_equal(false, @forum_reply.reload.is_deleted?)
         assert_match(/updated forum ##{@forum_reply.id}/, ModAction.last.description)
+        assert_equal(@forum_reply, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
 
       should "not allow users to undelete their own posts" do

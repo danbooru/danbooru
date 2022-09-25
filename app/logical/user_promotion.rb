@@ -42,21 +42,21 @@ class UserPromotion
 
   def create_mod_actions
     if old_can_approve_posts == false && user.can_approve_posts? == true
-      ModAction.log("granted approval privileges to \"#{user.name}\":#{Routes.user_path(user)}", :user_approval_privilege, promoter)
+      ModAction.log("granted approval privileges to \"#{user.name}\":#{Routes.user_path(user)}", :user_approval_privilege, subject: user, user: promoter)
     elsif old_can_approve_posts == true && user.can_approve_posts? == false
-      ModAction.log("removed approval privileges from \"#{user.name}\":#{Routes.user_path(user)}", :user_approval_privilege, promoter)
+      ModAction.log("removed approval privileges from \"#{user.name}\":#{Routes.user_path(user)}", :user_approval_privilege, subject: user, user: promoter)
     end
 
     if old_can_upload_free == false && user.can_upload_free? == true
-      ModAction.log("granted unlimited upload privileges to \"#{user.name}\":#{Routes.user_path(user)}", :user_upload_privilege, promoter)
+      ModAction.log("granted unlimited upload privileges to \"#{user.name}\":#{Routes.user_path(user)}", :user_upload_privilege, subject: user, user: promoter)
     elsif old_can_upload_free == false && user.can_upload_free? == true
-      ModAction.log("removed unlimited upload privileges from \"#{user.name}\":#{Routes.user_path(user)}", :user_upload_privilege, promoter)
+      ModAction.log("removed unlimited upload privileges from \"#{user.name}\":#{Routes.user_path(user)}", :user_upload_privilege, subject: user, user: promoter)
     end
 
     if user.level_changed? && user.level >= user.level_was
-      ModAction.log(%{promoted "#{user.name}":#{Routes.user_path(user)} from #{user.level_string_was} to #{user.level_string}}, :user_level_change, promoter)
+      ModAction.log(%{promoted "#{user.name}":#{Routes.user_path(user)} from #{user.level_string_was} to #{user.level_string}}, :user_level_change, subject: user, user: promoter)
     elsif user.level_changed? && user.level < user.level_was
-      ModAction.log(%{demoted "#{user.name}":#{Routes.user_path(user)} from #{user.level_string_was} to #{user.level_string}}, :user_level_change, promoter)
+      ModAction.log(%{demoted "#{user.name}":#{Routes.user_path(user)} from #{user.level_string_was} to #{user.level_string}}, :user_level_change, subject: user, user: promoter)
     end
   end
 

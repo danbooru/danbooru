@@ -127,6 +127,8 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("handled", report.reload.status)
         assert_equal(true, @user.dmails.received.exists?(from: User.system, title: "Thank you for reporting comment ##{@comment.id}"))
         assert_equal(true, ModAction.moderation_report_handled.where(creator: @mod).exists?)
+        assert_equal(report, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
 
       should "allow a moderator to mark a moderation report as rejected" do
@@ -137,6 +139,8 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("rejected", report.reload.status)
         assert_equal(false, @user.dmails.received.exists?(from: User.system))
         assert_equal(true, ModAction.moderation_report_rejected.where(creator: @mod).exists?)
+        assert_equal(report, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
     end
   end

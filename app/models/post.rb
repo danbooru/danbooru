@@ -71,6 +71,7 @@ class Post < ApplicationRecord
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
   has_many :ai_tags, through: :media_asset
   has_many :events, class_name: "PostEvent"
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :post_edit
 
@@ -516,11 +517,11 @@ class Post < ApplicationRecord
 
         in "status", "banned"
           raise User::PrivilegeError unless CurrentUser.is_approver?
-          ban!
+          ban!(CurrentUser.user)
 
         in "-status", "banned"
           raise User::PrivilegeError unless CurrentUser.is_approver?
-          unban!
+          unban!(CurrentUser.user)
 
         in "disapproved", reason
           raise User::PrivilegeError unless CurrentUser.is_approver?
@@ -732,7 +733,7 @@ class Post < ApplicationRecord
       nil
     end
 
-    def give_favorites_to_parent
+    def give_favorites_to_parent(current_user = CurrentUser.user)
       return if parent.nil?
 
       transaction do
@@ -742,7 +743,7 @@ class Post < ApplicationRecord
         end
       end
 
-      ModAction.log("moved favorites from post ##{id} to post ##{parent.id}", :post_move_favorites)
+      ModAction.log("moved favorites from post ##{id} to post ##{parent.id}", :post_move_favorites, subject: self, user: current_user)
     end
 
     def has_visible_children?
@@ -758,10 +759,10 @@ class Post < ApplicationRecord
   end
 
   concerning :DeletionMethods do
-    def expunge!
+    def expunge!(current_user = CurrentUser.user)
       transaction do
         Post.without_timeout do
-          ModAction.log("permanently deleted post ##{id} (md5=#{md5})", :post_permanent_delete)
+          ModAction.log("permanently deleted post ##{id} (md5=#{md5})", :post_permanent_delete, subject: nil, user: current_user)
 
           update_children_on_destroy
           decrement_tag_post_counts
@@ -776,16 +777,16 @@ class Post < ApplicationRecord
       remove_iqdb # this is non-transactional
     end
 
-    def ban!
+    def ban!(current_user)
       return if is_banned?
       update_column(:is_banned, true)
-      ModAction.log("banned post ##{id}", :post_ban)
+      ModAction.log("banned post ##{id}", :post_ban, subject: self, user: current_user)
     end
 
-    def unban!
+    def unban!(current_user)
       return unless is_banned?
       update_column(:is_banned, false)
-      ModAction.log("unbanned post ##{id}", :post_unban)
+      ModAction.log("unbanned post ##{id}", :post_unban, subject: self, user: current_user)
     end
 
     def delete!(reason, move_favorites: false, user: CurrentUser.user)
@@ -804,7 +805,7 @@ class Post < ApplicationRecord
         uploader.upload_limit.update_limit!(is_pending?, false)
 
         unless automated
-          ModAction.log("deleted post ##{id}, reason: #{reason}", :post_delete)
+          ModAction.log("deleted post ##{id}, reason: #{reason}", :post_delete, subject: self, user: user)
         end
       end
     end
@@ -1449,7 +1450,7 @@ class Post < ApplicationRecord
       if category == "iqdb"
         update_iqdb
 
-        ModAction.log("regenerated IQDB for post ##{id}", :post_regenerate_iqdb, user)
+        ModAction.log("regenerated IQDB for post ##{id}", :post_regenerate_iqdb, subject: self, user: user)
       else
         media_file = media_asset.variant(:original).open_file
         media_asset.distribute_files!(media_file)
@@ -1471,7 +1472,7 @@ class Post < ApplicationRecord
         purge_cached_urls!
         update_iqdb
 
-        ModAction.log("regenerated image samples for post ##{id}", :post_regenerate, user)
+        ModAction.log("regenerated image samples for post ##{id}", :post_regenerate, subject: self, user: user)
       end
     end
 
