@@ -21,6 +21,14 @@ class IpBansController < ApplicationController
     respond_with(@ip_bans)
   end
 
+  def show
+    @ip_ban = authorize IpBan.find(params[:id])
+
+    respond_with(@ip_ban) do |format|
+      format.html { redirect_to ip_bans_path(search: { id: @ip_ban.id }) }
+    end
+  end
+
   def update
     @ip_ban = authorize IpBan.find(params[:id])
     @ip_ban.update(permitted_attributes(@ip_ban))

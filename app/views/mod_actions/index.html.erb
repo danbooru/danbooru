@@ -5,20 +5,34 @@
     <%= render "search" %>
 
     <%= table_for @mod_actions, class: "striped autofit" do |t| %>
-      <% t.column "Message", td: {class: "col-expand"} do |mod_action| %>
+      <% t.column "Description", td: { class: "col-expand" } do |mod_action| %>
         <div class="prose">
-          <%= link_to_user mod_action.creator %> <%= format_text(mod_action.description.chomp(".").strip, inline: true) %>.
+          <%= link_to_user mod_action.creator %> <%= format_text(mod_action.description.chomp(".").strip, inline: true, data: @dtext_data) %>.
         </div>
       <% end %>
 
       <% t.column "Category" do |mod_action| %>
-        <%= link_to mod_action.category.humanize, mod_actions_path(search: { category: mod_action.category_id }) %>
+        <%= link_to mod_action.category.humanize, mod_actions_path(search: { category: mod_action.category }) %>
       <% end %>
 
       <% t.column "Created" do |mod_action| %>
         <%= link_to_user mod_action.creator %>
         <%= link_to "»", mod_actions_path(search: { creator_name: mod_action.creator.name }) %>
         <div><%= time_ago_in_words_tagged(mod_action.created_at) %></div>
+      <% end %>
+
+      <% t.column column: :control do |mod_action| %>
+        <% if mod_action.subject_id.present? %>
+          <%= render PopupMenuComponent.new do |menu| %>
+            <% menu.item do %>
+              <%= link_to "Details", mod_action.subject %>
+            <% end %>
+
+            <% menu.item do %>
+              <%= link_to "#{mod_action.subject_type.titleize.humanize} history", mod_actions_path(search: { subject_type: mod_action.subject_type, subject_id: mod_action.subject_id }) %>
+            <% end %>
+          <% end %>
+        <% end %>
       <% end %>
     <% end %>
 

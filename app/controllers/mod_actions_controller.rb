@@ -5,7 +5,11 @@ class ModActionsController < ApplicationController
 
   def index
     @mod_actions = ModAction.visible(CurrentUser.user).paginated_search(params)
-    @mod_actions = @mod_actions.includes(:creator) if request.format.html?
+
+    if request.format.html?
+      @mod_actions = @mod_actions.includes(:creator, :subject)
+      @dtext_data = DText.preprocess(@mod_actions.map(&:description))
+    end
 
     respond_with(@mod_actions)
   end

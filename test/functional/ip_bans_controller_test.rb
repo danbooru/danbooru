@@ -60,6 +60,26 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action" do
+      should "redirect for html" do
+        get_auth ip_ban_path(@ip_ban), @admin
+
+        assert_redirected_to ip_bans_path(search: { id: @ip_ban.id })
+      end
+
+      should "render for json" do
+        get_auth ip_ban_path(@ip_ban), @admin, as: :json
+
+        assert_response :success
+      end
+
+      should "render 403 for an unauthorized user" do
+        get ip_ban_path(@ip_ban)
+
+        assert_response 403
+      end
+    end
+
     context "update action" do
       should "mark an ip ban as deleted" do
         put_auth ip_ban_path(@ip_ban), @admin, params: { ip_ban: { is_deleted: true }, format: "js" }

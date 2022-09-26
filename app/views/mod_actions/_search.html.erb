@@ -1,7 +1,11 @@
 <%= search_form_for(mod_actions_path) do |f| %>
   <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name], data: { autocomplete: "user" } } %>
   <%= f.input :description_matches, label: "Description", input_html: { value: params[:search][:description_matches] } %>
-  <%= f.input :category, label: "Category", collection: ModAction.categories.map {|k,v| [k.capitalize.tr("_"," "), v]}, include_blank: true,selected: params[:search][:category] %>
+  <% if params[:search][:subject_id].present? && params[:search][:subject_type] %>
+    <%= f.input :subject_id, label: "#{params[:search][:subject_type].titleize} ID", input_html: { value: params[:search][:subject_id] } %>
+  <% end %>
+  <%= f.input :subject_type, label: "Subject", collection: ModAction.model_types.map { |k, v| [k.titleize, k] }, include_blank: true, selected: params[:search][:subject_type] %>
+  <%= f.input :category, label: "Category", collection: ModAction.categories.map { |k, v| [k.capitalize.tr("_", " "), k] }, include_blank: true, selected: params[:search][:category] %>
   <%= f.input :order, collection: [%w[Newest created_at], %w[Oldest created_at_asc]], include_blank: true, selected: params[:search][:order] %>
   <%= f.submit "Search" %>
 <% end %>
