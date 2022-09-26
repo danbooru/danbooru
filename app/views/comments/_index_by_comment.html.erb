@@ -1,19 +1,21 @@
+<%= search_form_for(comments_path) do |f| %>
+  <%= hidden_field_tag "group_by", "comment", :id => "group_by_full" %>
+  <%= f.input :creator_name, label: "Commenter", input_html: { value: params[:search][:creator_name], "data-autocomplete": "user" } %>
+  <%= f.input :body_matches, label: "Text", input_html: { value: params[:search][:body_matches] } %>
+  <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], "data-autocomplete": "tag-query" } %>
+  <%= f.input :score, input_html: { value: params[:search][:score] } %>
+  <%= f.input :is_edited, label: "Edited?", collection: %w[Yes No], include_blank: true, selected: params[:search][:is_edited] %>
+  <%= f.input :is_deleted, label: "Deleted?", collection: %w[Yes No], include_blank: true, selected: params[:search][:is_deleted] %>
+  <%= f.input :is_sticky, label: "Stickied?", collection: %w[Yes No], include_blank: true, selected: params[:search][:is_sticky] %>
+  <%= f.input :do_not_bump_post, label: "Bumped?", collection: [["Yes", false], ["No", true]], include_blank: true, selected: params[:search][:do_not_bump_post] %>
+  <%= f.input :order, collection: [["Newest", "id_desc"], ["Oldest", "id_asc"], ["Updated", "updated_at_desc"], ["Score (highest)", "score_desc"], ["Score (lowest)", "score_asc"]], include_blank: true, selected: params[:search][:order] %>
+  <%= f.submit "Search" %>
+<% end %>
+
+<%= render "posts/partials/common/inline_blacklist" %>
+
 <div id="p-index-by-comment" class="comments-for-post">
   <div class="list-of-comments list-of-messages">
-    <%= search_form_for(comments_path) do |f| %>
-      <%= hidden_field_tag "group_by", "comment", :id => "group_by_full" %>
-      <%= f.input :creator_name, label: "Commenter", input_html: { value: params[:search][:creator_name], "data-autocomplete": "user" } %>
-      <%= f.input :body_matches, label: "Text", input_html: { value: params[:search][:body_matches] } %>
-      <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], "data-autocomplete": "tag-query" } %>
-      <%= f.input :score, input_html: { value: params[:search][:score] } %>
-      <%= f.input :is_edited, label: "Edited?", collection: %w[Yes No], include_blank: true, selected: params[:search][:is_edited] %>
-      <%= f.input :is_deleted, label: "Deleted?", collection: %w[Yes No], include_blank: true, selected: params[:search][:is_deleted] %>
-      <%= f.input :is_sticky, label: "Stickied?", collection: %w[Yes No], include_blank: true, selected: params[:search][:is_sticky] %>
-      <%= f.input :do_not_bump_post, label: "Bumped?", collection: [["Yes", false], ["No", true]], include_blank: true, selected: params[:search][:do_not_bump_post] %>
-      <%= f.input :order, collection: [["Newest", "id_desc"], ["Oldest", "id_asc"], ["Updated", "updated_at_desc"], ["Score (highest)", "score_desc"], ["Score (lowest)", "score_asc"]], include_blank: true, selected: params[:search][:order] %>
-      <%= f.submit "Search" %>
-    <% end %>
-
     <% dtext_data = DText.preprocess(@comments.map(&:body)) %>
 
     <% @comments.each do |comment| %>
