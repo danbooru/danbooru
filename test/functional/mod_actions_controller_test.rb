@@ -9,6 +9,26 @@ class ModActionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "hide ip ban actions from non-moderators" do
+        ip_ban = create(:ip_ban)
+        create(:mod_action, description: "undeleted ip ban for #{ip_ban.ip_addr}", subject: ip_ban)
+
+        get mod_actions_path(search: { category: "ip_ban_undelete" }), as: :json
+
+        assert_response :success
+        assert_equal(0, response.parsed_body.count)
+      end
+
+      should "hide moderation report actions from non-moderators" do
+        report = as(create(:user)) { create(:moderation_report, model: create(:comment)) }
+        create(:mod_action, description: "handled modreport ##{report.id}", category: "moderation_report_handled", subject: report)
+
+        get mod_actions_path, as: :json
+
+        assert_response :success
+        assert_equal(0, response.parsed_body.count)
+      end
+
       context "searching" do
         setup do
           @mod_action = create(:mod_action, description: "blah")

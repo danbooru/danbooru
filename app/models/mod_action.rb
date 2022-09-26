@@ -77,7 +77,7 @@ class ModAction < ApplicationRecord
     if user.is_moderator?
       all
     else
-      where.not(category: [:ip_ban_create, :ip_ban_delete])
+      where.not(category: [:ip_ban_create, :ip_ban_delete, :ip_ban_undelete, :moderation_report_handled, :moderation_report_rejected])
     end
   end
 
