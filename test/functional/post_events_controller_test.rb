@@ -13,6 +13,18 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
         @appeal = create(:post_appeal, post: @post, creator: @user)
         @disapproval = create(:post_disapproval, post: @post, user: @user)
         @replacement = create(:post_replacement, post: @post, creator: @user)
+
+        create(:mod_action, category: :post_delete, description: "deleted post ##{@post.id}", subject: @post)
+        create(:mod_action, category: :post_undelete, description: "undeleted post ##{@post.id}", subject: @post)
+        create(:mod_action, category: :post_ban, description: "banned post ##{@post.id}", subject: @post)
+        create(:mod_action, category: :post_unban, description: "unbanned post ##{@post.id}", subject: @post)
+        create(:mod_action, category: :post_move_favorites, description: "moved favorites from post ##{@post.id} to post #1234", subject: @post)
+        create(:mod_action, category: :post_regenerate, description: "regenerated post ##{@post.id}", subject: @post)
+        create(:mod_action, category: :post_regenerate_iqdb, description: "regenerated IQDB for post ##{@post.id}", subject: @post)
+        create(:mod_action, category: :post_note_lock_create, description: "locked notes for post ##{@post.id}", subject: @post)
+        create(:mod_action, category: :post_note_lock_delete, description: "unlocked notes for post ##{@post.id}", subject: @post)
+        create(:mod_action, category: :post_rating_lock_create, description: "locked rating for post ##{@post.id}", subject: @post)
+        create(:mod_action, category: :post_rating_lock_delete, description: "unlocked ratineg for post ##{@post.id}", subject: @post)
       end
 
       should "render for a global listing" do
@@ -54,6 +66,11 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_equal(@flag.creator_id, response.parsed_body.find { |event| event["model_type"] == "PostFlag" }["creator_id"])
         end
+
+        should respond_to_search(category: "Upload").with { PostEvent.find_by!(model: @post) }
+        should respond_to_search(category: "Flag").with { PostEvent.find_by!(model: @flag) }
+        should respond_to_search(category: "Delete").with { PostEvent.find_by!(model: ModAction.post_delete.first) }
+        should respond_to_search(category: "Blah").with { [] }
       end
 
       context "for a non-moderator" do
@@ -72,6 +89,11 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_nil(response.parsed_body.find { |event| event["model_type"] == "PostFlag" }["creator_id"])
         end
+
+        should respond_to_search(category: "Upload").with { PostEvent.find_by!(model: @post) }
+        should respond_to_search(category: "Flag").with { PostEvent.find_by!(model: @flag) }
+        should respond_to_search(category: "Delete").with { PostEvent.find_by!(model: ModAction.post_delete.first) }
+        should respond_to_search(category: "Blah").with { [] }
       end
     end
   end

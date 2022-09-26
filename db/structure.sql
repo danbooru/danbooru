@@ -1513,7 +1513,16 @@ UNION ALL
     post_replacements.post_id,
     post_replacements.creator_id,
     post_replacements.created_at AS event_at
-   FROM public.post_replacements;
+   FROM public.post_replacements
+UNION ALL
+( SELECT 'ModAction'::character varying AS model_type,
+    mod_actions.id AS model_id,
+    mod_actions.subject_id AS post_id,
+    mod_actions.creator_id,
+    mod_actions.created_at AS event_at
+   FROM public.mod_actions
+  WHERE ((mod_actions.subject_type)::text = 'Post'::text)
+  ORDER BY mod_actions.created_at DESC);
 
 
 --
@@ -6739,6 +6748,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220922014326'),
 ('20220923010905'),
 ('20220924092056'),
-('20220925045236');
+('20220925045236'),
+('20220926050108');
 
 
