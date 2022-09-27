@@ -201,7 +201,7 @@ module Searchable
   end
 
   def attribute_matches(value, field, type = :integer)
-    operator, *args = PostQueryBuilder.parse_metatag_value(value, type)
+    operator, *args = RangeParser.parse(value, type)
     relation = where_operator(field, operator, *args)
 
     # XXX Hack to make negating the equality operator work correctly on nullable columns.
@@ -215,7 +215,7 @@ module Searchable
     end
 
     relation
-  rescue PostQueryBuilder::ParseError
+  rescue RangeParser::ParseError
     none
   end
 
@@ -223,15 +223,24 @@ module Searchable
     SearchContext.new(all, params, current_user).search_attributes(attributes)
   end
 
+  # Order according to the list of IDs in the given string.
+  #
+  # Post.order_custom("1,2,3") => [post #1, post #2, post #3]
+  def order_custom(string)
+    operator, ids = RangeParser.parse(string, :integer)
+    return none unless operator == :in
+
+    in_order_of(:id, ids)
+  rescue RangeParser::ParseError
+    none
+  end
+
   def apply_default_order(params)
     if params[:order] == "custom"
-      parse_ids = PostQueryBuilder.parse_range(params[:id], :integer)
-      if parse_ids[0] == :in
-        return in_order_of(:id, parse_ids[1])
-      end
+      order_custom(params[:id])
+    else
+      default_order
     end
-
-    default_order
   end
 
   def default_order

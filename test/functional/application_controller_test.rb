@@ -310,6 +310,30 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_equal(tags.first.id, response.parsed_body.first.fetch("id"))
     end
 
+    should "support ordering by search[order]=custom" do
+      tags = create_list(:tag, 2, post_count: 42)
+      get tags_path, params: { search: { id: "#{tags[0].id},#{tags[1].id}", order: "custom" } }, as: :json
+
+      assert_response :success
+      assert_equal(tags.pluck(:id), response.parsed_body.pluck("id"))
+    end
+
+    should "return nothing if the search[order]=custom param isn't accompanied by search[id]" do
+      tags = create_list(:tag, 2, post_count: 42)
+      get tags_path, params: { search: { order: "custom" } }, as: :json
+
+      assert_response :success
+      assert_equal(0, response.parsed_body.size)
+    end
+
+    should "return nothing if the search[order]=custom param isn't accompanied by a valid search[id]" do
+      tags = create_list(:tag, 2, post_count: 42)
+      get tags_path, params: { search: { id: ">1", order: "custom" } }, as: :json
+
+      assert_response :success
+      assert_equal(0, response.parsed_body.size)
+    end
+
     should "support the expiry parameter" do
       get posts_path, as: :json, params: { expiry: "1" }
 
