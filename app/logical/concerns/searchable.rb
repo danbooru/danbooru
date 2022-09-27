@@ -201,8 +201,16 @@ module Searchable
   end
 
   def attribute_matches(value, field, type = :integer)
-    operator, *args = RangeParser.parse(value, type)
-    relation = where_operator(field, operator, *args)
+    operator, arg = RangeParser.parse(value, type)
+
+    if operator == :union
+      # operator = :union, arg = [[:eq, 5], [:gt, 7], [:lt, 3]]
+      relation = arg.map do |sub_operator, sub_value|
+        where_operator(field, sub_operator, sub_value)
+      end.reduce(:or)
+    else
+      relation = where_operator(field, operator, arg)
+    end
 
     # XXX Hack to make negating the equality operator work correctly on nullable columns.
     #
@@ -210,7 +218,7 @@ module Searchable
     # This way if the relation is negated with `Post.attribute_matches(1, :approver_id).negate_relation`, it will
     # produce `WHERE approver_id != 1 OR approver_id IS NULL`. This is so the search includes NULL values; if it
     # was just `approver_id != 1`, then it would not include when approver_id is NULL.
-    if (operator in :eq | :not_eq) && args[0] != nil && has_attribute?(field) && column_for_attribute(field).null
+    if (operator in :eq | :not_eq) && arg != nil && has_attribute?(field) && column_for_attribute(field).null
       relation = relation.where.not(field => nil)
     end
 

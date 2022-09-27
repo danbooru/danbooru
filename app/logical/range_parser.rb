@@ -15,6 +15,7 @@
 #   RangeParser.parse("5..10")  => [:between, (5..10)]
 #   RangeParser.parse("5...10") => [:between, (5...10)]
 #   RangeParser.parse("5,6,7")  => [:in, [5, 6, 7]]
+#   RangeParser.parse("5,7..9") => [:union, [[:eq, 5], [:between, (7..9)]]]
 #   RangeParser.parse("any")    => [:not_eq, nil]
 #   RangeParser.parse("none")   => [:eq, nil]
 #
@@ -40,6 +41,10 @@ class RangeParser
     range = case string
     in _ if type == :enum
       [:in, string.split(/[, ]+/).map { |x| parse_value(x) }]
+    in /[, ]/ if string.match?(/<|>|\.\./) # >A,<B,C..D
+      [:union, string.split(/[, ]+/).map { |x| RangeParser.parse(x, type) }]
+    in /[, ]/ # A,B,C
+      [:in, string.split(/[, ]+/).map { |x| parse_value(x) }]
     in /\A(.+?)\.\.\.(.+)/ # A...B
       lo, hi = [parse_value($1), parse_value($2)].sort
       [:between, (lo...hi)]
@@ -54,8 +59,6 @@ class RangeParser
       [:gteq, parse_value($1)]
     in /\A>(.+)/ # >A
       [:gt, parse_value($1)]
-    in /[, ]/ # A,B,C
-      [:in, string.split(/[, ]+/).map { |x| parse_value(x) }]
     in "any"
       [:not_eq, nil]
     in "none"

@@ -212,12 +212,38 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[1], posts[0]], "id:#{posts[1].id}..#{posts[0].id}")
       assert_tag_match([posts[1], posts[0]], "id:#{posts[0].id}...#{posts[2].id}")
 
+      assert_tag_match(posts.reverse, "id:#{posts[0].id},#{posts[1].id}..#{posts[2].id}")
+      assert_tag_match(posts.reverse, "id:#{posts[0].id}..#{posts[1].id},#{posts[2].id}")
+      assert_tag_match(posts.reverse, "id:#{posts[0].id},>=#{posts[1].id}")
+      assert_tag_match(posts.reverse, "id:<=#{posts[1].id},#{posts[2].id}")
+
+      assert_tag_match([], "id:<#{posts[0].id},>#{posts[2].id}")
+      assert_tag_match([posts[2], posts[0]], "id:<=#{posts[0].id},>=#{posts[2].id}")
+      assert_tag_match([posts[2], posts[0]], "id:..#{posts[0].id},#{posts[2].id}..")
+
+      assert_tag_match([posts[1]], "id:<#{posts[0].id},#{posts[1].id},>#{posts[2].id}")
+      assert_tag_match([posts[1]], "id:#{posts[1].id},<#{posts[0].id},>#{posts[2].id}")
+      assert_tag_match([posts[1]], "id:<#{posts[0].id},>#{posts[2].id},#{posts[1].id}")
+
       assert_tag_match([posts[1], posts[0]], "-id:>#{posts[1].id}")
       assert_tag_match([posts[2], posts[1]], "-id:<#{posts[1].id}")
       assert_tag_match([posts[0]], "-id:>=#{posts[1].id}")
       assert_tag_match([posts[2]], "-id:<=#{posts[1].id}")
       assert_tag_match([posts[0]], "-id:#{posts[1].id}..#{posts[2].id}")
       assert_tag_match([posts[0]], "-id:#{posts[1].id},#{posts[2].id}")
+
+      assert_tag_match([], "-id:#{posts[0].id},#{posts[1].id}..#{posts[2].id}")
+      assert_tag_match([], "-id:#{posts[0].id}..#{posts[1].id},#{posts[2].id}")
+      assert_tag_match([], "-id:#{posts[0].id},>=#{posts[1].id}")
+      assert_tag_match([], "-id:<=#{posts[1].id},#{posts[2].id}")
+
+      assert_tag_match(posts.reverse, "-id:<#{posts[0].id},>#{posts[2].id}")
+      assert_tag_match([posts[1]], "-id:<=#{posts[0].id},>=#{posts[2].id}")
+      assert_tag_match([posts[1]], "-id:..#{posts[0].id},#{posts[2].id}..")
+
+      assert_tag_match([posts[2], posts[0]], "-id:<#{posts[0].id},#{posts[1].id},>#{posts[2].id}")
+      assert_tag_match([posts[2], posts[0]], "-id:#{posts[1].id},<#{posts[0].id},>#{posts[2].id}")
+      assert_tag_match([posts[2], posts[0]], "-id:<#{posts[0].id},>#{posts[2].id},#{posts[1].id}")
 
       assert_tag_match([], "id:#{posts[0].id} id:#{posts[2].id}")
       assert_tag_match([posts[0]], "-id:#{posts[1].id} -id:#{posts[2].id}")
@@ -1048,6 +1074,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post1], "pixiv:none")
       assert_tag_match([post2], "pixiv:any")
+
+      assert_tag_match([], "-pixiv_id:>40,<50")
+      assert_tag_match([post2], "-pixiv_id:<40,>50")
     end
 
     should "return posts for the search: metatag" do
