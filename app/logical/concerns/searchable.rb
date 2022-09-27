@@ -132,8 +132,7 @@ module Searchable
 
   def where_array_count(attr, value)
     qualified_column = "cardinality(#{qualified_column_for(attr)})"
-    range = PostQueryBuilder.parse_range(value, :integer)
-    where_operator(qualified_column, *range)
+    where_numeric_matches(qualified_column, value)
   end
 
   # @param attr [String] the name of the JSON field
@@ -172,8 +171,7 @@ module Searchable
 
   # value: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
   def where_numeric_matches(attribute, value, type = :integer)
-    range = PostQueryBuilder.parse_range(value, type)
-    where_operator(attribute, *range)
+    attribute_matches(value, attribute, type)
   end
 
   def where_boolean_matches(attribute, value)
@@ -200,6 +198,25 @@ module Searchable
     else
       where_tsvector_matches(columns, query)
     end
+  end
+
+  def attribute_matches(value, field, type = :integer)
+    operator, *args = PostQueryBuilder.parse_metatag_value(value, type)
+    relation = where_operator(field, operator, *args)
+
+    # XXX Hack to make negating the equality operator work correctly on nullable columns.
+    #
+    # This makes `Post.attribute_matches(1, :approver_id)` produce `WHERE approver_id = 1 AND approver_id IS NOT NULL`.
+    # This way if the relation is negated with `Post.attribute_matches(1, :approver_id).negate_relation`, it will
+    # produce `WHERE approver_id != 1 OR approver_id IS NULL`. This is so the search includes NULL values; if it
+    # was just `approver_id != 1`, then it would not include when approver_id is NULL.
+    if (operator in :eq | :not_eq) && args[0] != nil && has_attribute?(field) && column_for_attribute(field).null
+      relation = relation.where.not(field => nil)
+    end
+
+    relation
+  rescue PostQueryBuilder::ParseError
+    none
   end
 
   def search_attributes(params, attributes, current_user:)

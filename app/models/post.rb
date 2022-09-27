@@ -1061,13 +1061,6 @@ class Post < ApplicationRecord
         end
       end
 
-      def attribute_matches(value, field, type = :integer)
-        operator, *args = PostQueryBuilder.parse_metatag_value(value, type)
-        where_operator(field, operator, *args)
-      rescue PostQueryBuilder::ParseError
-        none
-      end
-
       def is_matches(value, current_user = User.anonymous)
         case value.downcase
         when "parent"
@@ -1148,7 +1141,8 @@ class Post < ApplicationRecord
         when "pending", "flagged", "appealed", "modqueue", "deleted", "banned", "active", "unmoderated"
           where.not(parent: nil).where(parent: status_matches(parent))
         when /\A\d+\z/
-          where(id: parent).or(where(parent: parent))
+          # XXX must use `attribute_matches(parent, :parent_id)` instead of `where(parent_id: parent)` so that `-parent:1` works
+          where(id: parent).or(attribute_matches(parent, :parent_id))
         else
           none
         end
@@ -1348,7 +1342,9 @@ class Post < ApplicationRecord
         else
           user = User.find_by_name(username)
           return none if user.nil?
-          where(approver: user)
+
+          # XXX must use `attribute_matches(user.id, :approver_id)` instead of `where(approver: user)` so that `-approver:evazion` works
+          attribute_matches(user.id, :approver_id)
         end
       end
 

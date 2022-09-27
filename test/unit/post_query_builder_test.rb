@@ -331,30 +331,34 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the parent:<N> metatag" do
+      post = create(:post)
       parent = create(:post)
-      child = create(:post, tag_string: "parent:#{parent.id}")
+      child = create(:post, parent: parent)
 
-      assert_tag_match([parent], "parent:none")
+      assert_tag_match([parent, post], "parent:none")
       assert_tag_match([child], "-parent:none")
 
       assert_tag_match([child], "parent:any")
-      assert_tag_match([parent], "-parent:any")
+      assert_tag_match([parent, post], "-parent:any")
 
       assert_tag_match([child, parent], "parent:#{parent.id}")
       assert_tag_match([child], "parent:#{child.id}")
 
-      assert_tag_match([], "-parent:#{parent.id}")
-      assert_tag_match([], "-parent:#{child.id}")
+      assert_tag_match([post], "-parent:#{parent.id}")
+      assert_tag_match([parent, post], "-parent:#{child.id}")
 
       assert_tag_match([child], "parent:#{parent.id} parent:#{child.id}")
 
-      assert_tag_match([child], "child:none")
+      assert_tag_match([], "parent:garbage")
+      assert_tag_match([child, parent, post], "-parent:garbage")
+
+      assert_tag_match([child, post], "child:none")
       assert_tag_match([parent], "child:any")
       assert_tag_match([], "child:garbage")
 
       assert_tag_match([parent], "-child:none")
-      assert_tag_match([child], "-child:any")
-      assert_tag_match([child, parent], "-child:garbage")
+      assert_tag_match([child, post], "-child:any")
+      assert_tag_match([child, parent, post], "-child:garbage")
     end
 
     should "return posts when using the status of the parent/child" do
@@ -442,7 +446,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       posts << create(:post, approver: nil)
 
       assert_tag_match([posts[0]], "approver:#{users[0].name}")
-      assert_tag_match([posts[1]], "-approver:#{users[0].name}")
+      assert_tag_match([posts[2], posts[1]], "-approver:#{users[0].name}")
+      assert_tag_match([posts[2], posts[0]], "-approver:#{users[1].name}")
       assert_tag_match([posts[1], posts[0]], "approver:any")
       assert_tag_match([posts[2]], "approver:none")
       assert_tag_match([posts[2]], "approver:NONE")
@@ -1022,9 +1027,27 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "pixiv_id:any")
     end
 
-    should "return posts for a pixiv_id:none search" do
-      post = create(:post)
-      assert_tag_match([post], "pixiv_id:none")
+    should "return posts for a pixiv_id: search" do
+      post1 = create(:post, pixiv_id: nil)
+      post2 = create(:post, pixiv_id: 42, source: "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/42_p0.png")
+
+      assert_tag_match([post2], "pixiv_id:42")
+      assert_tag_match([post1], "-pixiv_id:42")
+
+      assert_tag_match([post2], "pixiv_id:>=42")
+      assert_tag_match([],      "pixiv_id:<42")
+
+      assert_tag_match([],      "-pixiv_id:>=42")
+      assert_tag_match([post2], "-pixiv_id:<42")
+
+      assert_tag_match([post1], "pixiv_id:none")
+      assert_tag_match([post2], "pixiv_id:any")
+
+      assert_tag_match([post2], "-pixiv_id:none")
+      assert_tag_match([post1], "-pixiv_id:any")
+
+      assert_tag_match([post1], "pixiv:none")
+      assert_tag_match([post2], "pixiv:any")
     end
 
     should "return posts for the search: metatag" do
