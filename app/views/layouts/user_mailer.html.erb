@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: "Tahoma", "Verdana", "Helvetica", sans-serif;
+        font-size: 16px;
+        padding: 0 1em;
+      }
+
+      a {
+        color: #0075f8;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: #8caaff;
+      }
+
+      blockquote {
+        margin-left: 0;
+        padding-left: 0.5em;
+        opacity: 0.75;
+        border-left: 3px solid #d1d1da;
+      }
+
+      .fineprint {
+        color: #9192a7;
+        font-size: 12px;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body style="max-width: 960px; margin: 0 auto;">
+    <h1 style="text-align: center">
+      <%= link_to image_tag(image_url("/images/danbooru-logo-96x96.png", host: root_url), width: 36, height: 36, style: "vertical-align: middle"), root_url %>
+      <%= link_to Danbooru.config.canonical_app_name, root_url %>
+    </h1>
+
+    <%= yield %>
+
+    <div style="text-align: center">
+      <hr>
+      <p style="font-size: 12px">
+        <%= link_to image_tag(image_url("/images/danbooru-logo-96x96.png", host: root_url), width: 16, height: 16, style: "vertical-align: middle"), root_url %>
+        <%= link_to Danbooru.config.canonical_app_name, root_url %> /
+        <%= link_to "Privacy", privacy_policy_url %> /
+        <%= link_to "Contact", contact_url %>
+        <% if content_for(:footer_links).present? %>
+          <%= yield :footer_links %>
+        <% end %>
+      </p>
+    </div>
+  </body>
+</html>

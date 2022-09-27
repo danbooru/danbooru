@@ -4,7 +4,8 @@ class UserMailer < ApplicationMailer
   # The email sent when a user receives a DMail.
   def dmail_notice(dmail)
     @dmail = dmail
-    mail(dmail.to, require_verified_email: true, subject: "#{Danbooru.config.app_name} - Message received from #{dmail.from.name}")
+    @user = dmail.to
+    mail(@user, require_verified_email: true, subject: "#{Danbooru.config.app_name}: #{dmail.from.name} sent you a message")
   end
 
   # The email sent when a user requests a password reset.

@@ -1,12 +1,21 @@
-<!doctype html>
-<html>
-<body>
-<p><%= @dmail.from.name %> said:</p>
+<p>Hi <%= link_to_user @user %>,</p>
 
-<div class="prose">
+<p><%= link_to_user @dmail.from %> sent you a message on <%= link_to Danbooru.config.canonical_app_name, root_url %>:</p>
+
+<div class="prose" style="margin: 0 2em">
+  <b><%= @dmail.title %></b>
+
   <%= format_text(@dmail.body, base_url: root_url) %>
 </div>
 
-<p><%= link_to "View message", dmail_url(@dmail) %> | <%= link_to "Disable notifications", disable_email_notifications_url(@dmail.to) %></p>
-</body>
-</html>
+<%= link_to "Reply", new_dmail_url(respond_to_id: @dmail) %> |
+<%= link_to "View message", dmail_url(@dmail) %>
+
+<p class="fineprint">
+  You received this email because you chose to receive notifications whenever someone sends you a message on <%= Danbooru.config.canonical_app_name %>.
+  <%= link_to "Click here", disable_email_notifications_url(@user) %> to unsubscribe from these emails.
+</p>
+
+<% content_for(:footer_links) do %>
+  / <%= link_to "Unsubscribe", disable_email_notifications_url(@user) %>
+<% end %>
