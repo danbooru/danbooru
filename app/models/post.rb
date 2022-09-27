@@ -80,8 +80,8 @@ class Post < ApplicationRecord
   scope :banned, -> { where(is_banned: true) }
   # XXX conflict with deletable
   scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false).where.not(id: PostAppeal.pending) }
-  scope :appealed, -> { deleted.where(id: PostAppeal.pending.select(:post_id)) }
-  scope :in_modqueue, -> { pending.or(flagged).or(appealed) }
+  scope :appealed, -> { where(id: PostAppeal.pending.select(:post_id)) }
+  scope :in_modqueue, -> { where_union(pending, flagged, appealed) }
   scope :expired, -> { pending.where("posts.created_at < ?", Danbooru.config.moderation_period.ago) }
 
   scope :unflagged, -> { where(is_flagged: false) }
@@ -1049,15 +1049,12 @@ class Post < ApplicationRecord
       end
 
       def available_for_moderation(user, hidden: false)
-        return none if user.is_anonymous?
-
-        approved_posts = user.post_approvals.select(:post_id)
         disapproved_posts = user.post_disapprovals.select(:post_id)
 
         if hidden.present?
-          where("posts.uploader_id = ? OR posts.id IN (#{approved_posts.to_sql}) OR posts.id IN (#{disapproved_posts.to_sql})", user.id)
+          in_modqueue.where(id: disapproved_posts)
         else
-          where.not(uploader: user).where.not(id: approved_posts).where.not(id: disapproved_posts)
+          in_modqueue.where.not(id: disapproved_posts)
         end
       end
 
@@ -1124,7 +1121,7 @@ class Post < ApplicationRecord
         when "active"
           active
         when "unmoderated"
-          in_modqueue.available_for_moderation(current_user, hidden: false)
+          available_for_moderation(current_user, hidden: false)
         when "all", "any"
           where("TRUE")
         else

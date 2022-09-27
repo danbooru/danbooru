@@ -3,7 +3,7 @@ require "test_helper"
 class PostDisapprovalTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
-      @alice = FactoryBot.create(:moderator_user, name: "alice")
+      @alice = FactoryBot.create(:moderator_user)
       CurrentUser.user = @alice
     end
 
@@ -28,25 +28,18 @@ class PostDisapprovalTest < ActiveSupport::TestCase
         end
 
         context "when the current user is alice" do
-          setup do
-            CurrentUser.user = @alice
-          end
-
           should "remove the associated post from alice's moderation queue" do
-            assert_not(Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_1.id))
-            assert(Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_2.id))
+            assert_not(Post.available_for_moderation(@alice, hidden: false).map(&:id).include?(@post_1.id))
+            assert(Post.available_for_moderation(@alice, hidden: false).map(&:id).include?(@post_2.id))
           end
         end
 
-        context "when the current user is brittony" do
-          setup do
-            @brittony = FactoryBot.create(:moderator_user)
-            CurrentUser.user = @brittony
-          end
+        context "when the current user is not the disapprover" do
+          should "not remove the associated post from the disapprover's moderation queue" do
+            @mod = create(:moderator_user)
 
-          should "not remove the associated post from brittony's moderation queue" do
-            assert(Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_1.id))
-            assert(Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_2.id))
+            assert(Post.available_for_moderation(@mod, hidden: false).map(&:id).include?(@post_1.id))
+            assert(Post.available_for_moderation(@mod, hidden: false).map(&:id).include?(@post_2.id))
           end
         end
       end
