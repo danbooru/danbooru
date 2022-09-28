@@ -18,8 +18,7 @@
 # Unhandled URLs
 #
 # * https://lohas.nicoseiga.jp/material/5746c5/4459092
-# * https://dic.nicovideo.jp/oekaki/52833.png
-#
+
 module Source
   class URL::NicoSeiga < Source::URL
     attr_reader :illust_id, :manga_id, :image_id, :oekaki_id, :sm_video_id, :nm_video_id, :user_id, :username, :profile_url
@@ -92,6 +91,10 @@ module Source
       in "dcdn.cdn.nimg.jpg", *, /^\d+$/ => image_id
         @image_id = image_id
 
+      # https://deliver.cdn.nicomanga.jp/thumb/7891081p?1590171867
+      in "deliver.cdn.nicomanga.jp", "thumb", /^(\d+)p$/ => image_id
+        @image_id = $1
+
       # https://deliver.cdn.nicomanga.jp/thumb/aHR0cHM6Ly9kZWxpdmVyLmNkbi5uaWNvbWFuZ2EuanAvdGh1bWIvODEwMDk2OHA_MTU2NTY5OTg4MA.webp (page: https://seiga.nicovideo.jp/watch/mg316708, full image: https://lohas.nicoseiga.jp/priv/1f6d38ef2ba6fc9d9e27823babc4cf721cef16ec/1646906617/8100969)
       in "deliver.cdn.nicomanga.jp", *rest
         # unhandled
@@ -131,7 +134,7 @@ module Source
 
       # https://www.nicovideo.jp/user/4572975
       # https://www.nicovideo.jp/user/20446930/mylist/28674289
-      in ("www.nicovideo.jp"), "user", /^\d+$/ => user_id, *rest
+      in "www.nicovideo.jp", "user", /^\d+$/ => user_id, *rest
         @user_id = user_id
         @profile_url = "https://www.nicovideo.jp/user/#{user_id}"
 
@@ -191,8 +194,8 @@ module Source
         "https://www.nicovideo.jp/watch/sm#{sm_video_id}"
       elsif oekaki_id.present?
         "https://dic.nicovideo.jp/oekaki_id/#{oekaki_id}"
-      #elsif image_id.present?
-      #  "https://seiga.nicovideo.jp/image/source/#{image_id}"
+      # elsif image_id.present?
+      #   "https://seiga.nicovideo.jp/image/source/#{image_id}"
       end
     end
   end

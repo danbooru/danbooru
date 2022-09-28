@@ -40,7 +40,7 @@ module Danbooru
     attr_accessor :max_size, :http
 
     class << self
-      delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :public_only, :download_media, to: :new
+      delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :public_only, :with_legacy_ssl, :download_media, to: :new
     end
 
     def initialize
@@ -132,6 +132,18 @@ module Danbooru
       dup.tap do |o|
         o.http = o.http.dup.tap do |http|
           http.default_options = http.default_options.with_socket_class(ValidatingSocket)
+        end
+      end
+    end
+
+    # allow requests to sites using unsafe legacy renegotiations (such as dic.nicovideo.jp)
+    # see https://github.com/openssl/openssl/commit/72d2670bd21becfa6a64bb03fa55ad82d6d0c0f3
+    def with_legacy_ssl
+      dup.tap do |o|
+        o.http = o.http.dup.tap do |http|
+          ctx = OpenSSL::SSL::SSLContext.new
+          ctx.options |= OpenSSL::SSL::OP_LEGACY_SERVER_CONNECT
+          http.default_options = http.default_options.with_ssl_context(ctx)
         end
       end
     end

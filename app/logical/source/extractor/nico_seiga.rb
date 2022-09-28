@@ -95,6 +95,14 @@ module Source
         parsed_url.manga_id || parsed_referer&.manga_id
       end
 
+      def http
+        if parsed_url.oekaki_id.present?
+          super.with_legacy_ssl
+        else
+          super
+        end
+      end
+
       def api_client
         if illust_id.present?
           NicoSeigaApiClient.new(work_id: illust_id, type: "illust", http: http)

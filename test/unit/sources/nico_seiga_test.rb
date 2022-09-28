@@ -6,157 +6,188 @@ module Sources
       skip "NicoSeiga credentials not configured" unless Source::Extractor::NicoSeiga.enabled?
     end
 
-    context "The source site for nico seiga" do
-      setup do
-        @site_1 = Source::Extractor.find("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
-        @site_2 = Source::Extractor.find("http://seiga.nicovideo.jp/seiga/im4937663")
-        @site_3 = Source::Extractor.find("https://seiga.nicovideo.jp/watch/mg470189?track=ct_episode")
-      end
-
-      should "get the profile" do
-        assert_equal("https://seiga.nicovideo.jp/user/illust/7017777", @site_1.profile_url)
-        assert_equal("https://seiga.nicovideo.jp/user/illust/7017777", @site_2.profile_url)
-        assert_equal("https://seiga.nicovideo.jp/user/illust/20797022", @site_3.profile_url)
-      end
-
-      should "get the artist name" do
-        assert_equal("osamari", @site_1.artist_name)
-        assert_equal("osamari", @site_2.artist_name)
-        assert_equal("風呂", @site_3.artist_name)
-      end
-
-      should "get the artist commentary" do
-        assert_equal("コジコジ", @site_2.artist_commentary_title)
-        assert_equal("コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）", @site_2.artist_commentary_desc)
-
-        assert_equal("ハコ女子 1ハコ目", @site_3.artist_commentary_title)
-        assert_equal("同じクラスの箱田さんはいつもハコを被っている。しかしてその素顔は…？　twitter(@hakojoshi1)にてだいたい毎日更新中。こっちだともうちょっと先まで読めるよ。", @site_3.artist_commentary_desc)
-      end
-
-      should "get the image url(s)" do
-        assert_match(%r{^https?://lohas\.nicoseiga\.jp/priv/}, @site_1.image_urls.sole)
-        assert_match(%r{^https?://lohas\.nicoseiga\.jp/priv/}, @site_2.image_urls.sole)
-
-        expected = [
-          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315315},
-          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315318},
-          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315319},
-          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315320},
-          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315321},
-          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315322},
-          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315323},
-          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315324},
-          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315316},
-        ]
-
-        assert_equal(9, @site_3.image_urls.size)
-        9.times { |n| assert_match(expected[n], @site_3.image_urls[n]) }
-      end
-
-      should "get the page url" do
-        assert_equal("https://seiga.nicovideo.jp/seiga/im4937663", @site_1.page_url)
-        assert_equal("https://seiga.nicovideo.jp/seiga/im4937663", @site_2.page_url)
-        assert_equal("https://seiga.nicovideo.jp/watch/mg470189", @site_3.page_url)
-      end
-
-      should "get the tags" do
-        assert_not(@site_1.tags.empty?)
-        first_tag = @site_1.tags.first
-        assert_equal(["アニメ", "https://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"], first_tag)
-
-        assert_not(@site_2.tags.empty?)
-        first_tag = @site_2.tags.first
-        assert_equal(["アニメ", "https://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"], first_tag)
-
-        assert_not(@site_3.tags.empty?)
-        first_tag = @site_3.tags.first
-        assert_equal(["4コマ漫画", "https://seiga.nicovideo.jp/manga/tag/4%E3%82%B3%E3%83%9E%E6%BC%AB%E7%94%BB"], first_tag)
-      end
-
-      should "convert a page into a json representation" do
-        assert_nothing_raised { @site_1.to_h }
-        assert_nothing_raised { @site_2.to_h }
-        assert_nothing_raised { @site_3.to_h }
-      end
-
-      should "work for a https://lohas.nicoseiga.jp/thumb/${id}i url" do
-        site = Source::Extractor.find("https://lohas.nicoseiga.jp/thumb/6844226i")
-
-        assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/6844226!, site.image_urls.sole)
-        assert_match("https://seiga.nicovideo.jp/seiga/im6844226", site.page_url)
-      end
+    context "A nicoseiga post url" do
+      tags = [
+        ["アニメ", "https://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"],
+        ["コジコジ", "https://seiga.nicovideo.jp/tag/%E3%82%B3%E3%82%B8%E3%82%B3%E3%82%B8"],
+        ["さくらももこ", "https://seiga.nicovideo.jp/tag/%E3%81%95%E3%81%8F%E3%82%89%E3%82%82%E3%82%82%E3%81%93"],
+        ["ドット絵", "https://seiga.nicovideo.jp/tag/%E3%83%89%E3%83%83%E3%83%88%E7%B5%B5"],
+        ["ニコニコ大百科", "https://seiga.nicovideo.jp/tag/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%A4%A7%E7%99%BE%E7%A7%91"],
+        ["お絵カキコ", "https://seiga.nicovideo.jp/tag/%E3%81%8A%E7%B5%B5%E3%82%AB%E3%82%AD%E3%82%B3"],
+      ]
+      strategy_should_work(
+        "http://seiga.nicovideo.jp/seiga/im4937663",
+        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/4937663}],
+        download_size: 2_032,
+        page_url: "https://seiga.nicovideo.jp/seiga/im4937663",
+        tags: tags,
+        artist_name: "osamari",
+        tag_name: "nicoseiga7017777",
+        profile_url: "https://seiga.nicovideo.jp/user/illust/7017777",
+        artist_commentary_title: "コジコジ",
+        artist_commentary_desc: "コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）"
+      )
     end
 
-    context "A manga upload through bookmarklet" do
-      setup do
-        @url = "https://seiga.nicovideo.jp/image/source/9146749"
-        @ref = "https://seiga.nicovideo.jp/watch/mg389884"
-        @site = Source::Extractor.find(@url, @ref)
-      end
-
-      should "get the correct pic" do
-        assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/9146749!, @site.image_urls.sole)
-      end
-
-      should "get the page url" do
-        assert_equal(@ref, @site.page_url)
-      end
+    context "A nicoseiga image url" do
+      tags = [
+        ["アニメ", "https://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"],
+        ["コジコジ", "https://seiga.nicovideo.jp/tag/%E3%82%B3%E3%82%B8%E3%82%B3%E3%82%B8"],
+        ["さくらももこ", "https://seiga.nicovideo.jp/tag/%E3%81%95%E3%81%8F%E3%82%89%E3%82%82%E3%82%82%E3%81%93"],
+        ["ドット絵", "https://seiga.nicovideo.jp/tag/%E3%83%89%E3%83%83%E3%83%88%E7%B5%B5"],
+        ["ニコニコ大百科", "https://seiga.nicovideo.jp/tag/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%A4%A7%E7%99%BE%E7%A7%91"],
+        ["お絵カキコ", "https://seiga.nicovideo.jp/tag/%E3%81%8A%E7%B5%B5%E3%82%AB%E3%82%AD%E3%82%B3"],
+      ]
+      strategy_should_work(
+        "http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663",
+        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/4937663}],
+        download_size: 2_032,
+        page_url: "https://seiga.nicovideo.jp/seiga/im4937663",
+        tags: tags,
+        artist_name: "osamari",
+        tag_name: "nicoseiga7017777",
+        profile_url: "https://seiga.nicovideo.jp/user/illust/7017777",
+        artist_commentary_title: "コジコジ",
+        artist_commentary_desc: "コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）"
+      )
     end
 
-    context "A manga image" do
-      should "work" do
-        @source = Source::Extractor.find("https://drm.cdn.nicomanga.jp/image/d4a2faa68ec34f95497db6601a4323fde2ccd451_9537/8017978p?1570012695")
+    context "A nicoseiga manga url" do
+      image_urls = [
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315315},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315318},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315319},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315320},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315321},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315322},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315323},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315324},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315316},
+      ]
 
-        assert_match(%r{\Ahttps://lohas\.nicoseiga\.jp/priv/\h{40}/\d+/8017978\z}, @source.image_urls.sole)
-      end
+      strategy_should_work(
+        "https://seiga.nicovideo.jp/watch/mg470189?track=ct_episode",
+        image_urls: image_urls,
+        page_url: "https://seiga.nicovideo.jp/watch/mg470189",
+        artist_name: "風呂",
+        profile_url: "https://seiga.nicovideo.jp/user/illust/20797022",
+        artist_commentary_title: "ハコ女子 1ハコ目",
+        artist_commentary_desc: "同じクラスの箱田さんはいつもハコを被っている。しかしてその素顔は…？　twitter(@hakojoshi1)にてだいたい毎日更新中。こっちだともうちょっと先まで読めるよ。"
+      )
     end
 
-    context "A nico.ms illust URL" do
-      should "work" do
-        @source = Source::Extractor.find("https://nico.ms/im10922621")
-
-        assert_match(%r{\Ahttps://lohas\.nicoseiga\.jp/priv/\h{40}/\d+/10922621\z}, @source.image_urls.sole)
-      end
+    context "A https://lohas.nicoseiga.jp/thumb/${id}i url" do
+      strategy_should_work(
+        "https://lohas.nicoseiga.jp/thumb/6844226i",
+        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/6844226}],
+        page_url: "https://seiga.nicovideo.jp/seiga/im6844226"
+      )
     end
 
-    context "A nico.ms manga URL" do
-      should "work" do
-        @source = Source::Extractor.find("https://nico.ms/mg310193")
+    context "An image/source/123 url with referrer" do
+      strategy_should_work(
+        "https://seiga.nicovideo.jp/image/source/9146749",
+        referer: "https://seiga.nicovideo.jp/watch/mg389884",
+        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/9146749}],
+        page_url: "https://seiga.nicovideo.jp/watch/mg389884"
+      )
+    end
 
-        assert_equal(19, @source.image_urls.size)
-        assert_equal("https://seiga.nicovideo.jp/watch/mg310193", @source.page_url)
-      end
+    context "A drm.cdn.nicomanga.jp image url" do
+      strategy_should_work(
+        "https://drm.cdn.nicomanga.jp/image/d4a2faa68ec34f95497db6601a4323fde2ccd451_9537/8017978p?1570012695",
+        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017978}]
+      )
+    end
+
+    context "A nico.ms illust url" do
+      strategy_should_work(
+        "https://nico.ms/im10922621",
+        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10922621}],
+        page_url: "https://seiga.nicovideo.jp/seiga/im10922621",
+        profile_url: "https://seiga.nicovideo.jp/user/illust/2258804"
+      )
+    end
+
+    context "A nico.ms manga url from an anonymous user" do
+      image_urls = [
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017978},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017979},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017980},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017981},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017982},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017983},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017984},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017985},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017986},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017987},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017988},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017989},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017990},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017991},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017992},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017993},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017994},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017995},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017996},
+      ]
+
+      strategy_should_work(
+        "https://nico.ms/mg310193",
+        image_urls: image_urls,
+        artist_name: nil,
+        profile_url: nil,
+        artist_commentary_title: "ライブダンジョン！ 第1話前半"
+      )
+    end
+
+    context "An anonymous illust" do
+      strategy_should_work(
+        "https://seiga.nicovideo.jp/seiga/im520647",
+        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/520647}],
+        artist_name: nil,
+        profile_url: nil
+      )
     end
 
     context "A nicoseiga video" do
-      should "not raise anything" do
-        site = Source::Extractor.find("https://www.nicovideo.jp/watch/sm36465441")
-        assert_nothing_raised { site.to_h }
-      end
-    end
-
-    context "An anonymous picture" do
-      should "still work" do
-        site = Source::Extractor.find("https://seiga.nicovideo.jp/seiga/im520647")
-
-        assert_nothing_raised { site.to_h }
-      end
+      strategy_should_work(
+        "https://www.nicovideo.jp/watch/sm36465441"
+      )
     end
 
     context "An age-restricted picture" do
-      should "still work" do
-        site = Source::Extractor.find("http://seiga.nicovideo.jp/seiga/im9208126")
-
-        assert_match(%r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/9208126!, site.image_urls.sole)
-        assert_nothing_raised { site.to_h }
-      end
+      strategy_should_work(
+        "http://seiga.nicovideo.jp/seiga/im9208126",
+        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/9208126}],
+        artist_name: "ちふり",
+        profile_url: "https://seiga.nicovideo.jp/user/illust/61431040",
+        tags: ["R-15"],
+        artist_commentary_title: "ゾーヤさんといっしょ"
+      )
     end
 
-    context "An oekaki picture" do
-      should "still work" do
-        site = Source::Extractor.find("https://dic.nicovideo.jp/oekaki/52833.png")
-        assert_nothing_raised { site.to_h }
-      end
+    context "An oekaki direct url" do
+      strategy_should_work(
+        "https://dic.nicovideo.jp/oekaki/52833.png",
+        image_urls: ["https://dic.nicovideo.jp/oekaki/52833.png"]
+      )
+    end
+
+    context "A nicoseiga manga page with a single tag (source of XML misparsing)" do
+      image_urls = [
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/7891076},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/7891080},
+        %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/7891081},
+      ]
+      strategy_should_work(
+        "https://seiga.nicovideo.jp/watch/mg302561",
+        image_urls: image_urls,
+        page_url: "https://seiga.nicovideo.jp/watch/mg302561",
+        tags: [["ロリ", "https://seiga.nicovideo.jp/manga/tag/%E3%83%AD%E3%83%AA"]],
+        artist_name: "とろてい",
+        tag_name: "nicoseiga1848060"
+      )
     end
 
     context "A commentary with spoiler" do
@@ -219,34 +250,7 @@ module Sources
       assert(Source::URL.profile_url?("https://3d.nicovideo.jp/u/siobi"))
       assert(Source::URL.profile_url?("http://game.nicovideo.jp/atsumaru/users/7757217"))
 
-      refute(Source::URL.profile_url?("https://seiga.nicovideo.jp"))
-    end
-
-    context "downloading a 'http://seiga.nicovideo.jp/seiga/:id' url" do
-      should "download the original file" do
-        @source = "http://seiga.nicovideo.jp/seiga/im4937663"
-        @rewrite = %r{https://lohas.nicoseiga.jp/priv/\h{40}/\d+/4937663}
-        assert_rewritten(@rewrite, @source)
-        assert_downloaded(2_032, @source)
-      end
-    end
-
-    context "downloading a 'http://lohas.nicoseiga.jp/o/:hash/:id' url" do
-      should "download the original file" do
-        @source = "http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663"
-        @rewrite = %r{https://lohas.nicoseiga.jp/priv/\h{40}/\d+/4937663}
-        assert_rewritten(@rewrite, @source)
-        assert_downloaded(2_032, @source)
-      end
-    end
-
-    context "downloading a 'https://lohas.nicoseiga.jp/thumb/:id' url" do
-      should "download the original file" do
-        @source = "https://lohas.nicoseiga.jp/thumb/4937663i"
-        @rewrite = %r{https://lohas.nicoseiga.jp/priv/\h{40}/\d+/4937663}
-        assert_rewritten(@rewrite, @source)
-        assert_downloaded(2_032, @source)
-      end
+      assert_not(Source::URL.profile_url?("https://seiga.nicovideo.jp"))
     end
   end
 end

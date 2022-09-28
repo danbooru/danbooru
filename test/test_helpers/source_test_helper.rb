@@ -5,7 +5,7 @@ module SourceTestHelper
   # * If deleted is true, it skips the downloading check, but it still tries everything else and makes sure nothing breaks.
   # * Any passed kwargs parameter is tested against the strategy.
 
-  def strategy_should_work(url, arguments)
+  def strategy_should_work(url, arguments = {})
     # XXX: can't use **kwargs because of a bug with shoulda-context
     referer, download_size, deleted = [:referer, :download_size, :deleted].map { |arg| arguments.delete(arg) }
 
@@ -86,15 +86,15 @@ module SourceTestHelper
     # check any method that is passed as kwargs, in order to hardcode as few things as possible
     # XXX can't use **kwargs because of a bug with shoulda-context, so we're using a hash temporarily
     methods_to_test.each do |method_name, expected_value|
-      actual_value = strategy.try(method_name)
+      actual_value = strategy.public_send(method_name)
 
       should "make sure that '#{method_name}' matches" do
         if expected_value.instance_of? Regexp
           assert_match(expected_value, actual_value)
         elsif expected_value.instance_of? Array
           if expected_value.first.instance_of? Regexp
-            actual_values = actual_value.sort
-            expected_value.sort.each_with_index { |each_value, index| assert_match(each_value, actual_values[index]) }
+            # We don't sort actual_value here because sites like nicoseiga have variable values right in the middle of the url, like timestamps
+            expected_value.zip(actual_value).map { |expected_regex, actual_string| assert_match(expected_regex, actual_string) }
           else
             assert_equal(expected_value.sort, actual_value.sort)
           end
