@@ -1995,4 +1995,18 @@ class PostTest < ActiveSupport::TestCase
       assert_equal("https://www.example.com/data/original/77/d8/77d89bda37ea3af09158ed3282f8334f.gif", @post.file_url)
     end
   end
+
+  context "Searching:" do
+    context "the user_tag_match method" do
+      should "should not negate conditions before the search" do
+        @post1 = create(:post, tag_string: "solo", is_pending: true)
+        @post2 = create(:post, tag_string: "touhou", is_deleted: true)
+
+        assert_equal([@post1.id], Post.pending.anon_tag_match("solo").pluck(:id))
+        assert_equal([], Post.pending.anon_tag_match("-solo").pluck(:id))
+        assert_equal([@post2.id], Post.deleted.anon_tag_match("touhou").pluck(:id))
+        assert_equal([], Post.deleted.anon_tag_match("-touhou").pluck(:id))
+      end
+    end
+  end
 end

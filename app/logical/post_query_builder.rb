@@ -255,8 +255,7 @@ class PostQueryBuilder
     end
   end
 
-  def posts(post_query, includes: nil)
-    relation = Post.all
+  def posts(post_query, relation = Post.unscoped, includes: nil)
     relation = add_joins(post_query, relation)
     relation = build_relation(post_query, relation)
 
