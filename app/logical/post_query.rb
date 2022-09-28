@@ -216,19 +216,21 @@ class PostQuery
     # @return [Integer, nil] The number of posts, or nil on timeout.
     def fast_count(timeout: 1_000, estimate_count: true, skip_cache: false)
       count = nil
-      count = estimated_count if estimate_count
+      count = estimated_count(timeout) if estimate_count
       count = cached_count(timeout) if count.nil? && !skip_cache
       count = exact_count(timeout) if count.nil? && skip_cache
       count
     end
 
-    def estimated_count
+    def estimated_count(timeout = 1_000)
       if is_empty_search?
         estimated_row_count
       elsif is_simple_tag?
         tag.try(:post_count)
       elsif is_metatag?(:rating)
         estimated_row_count
+      elsif (is_metatag?(:status) || is_metatag?(:is)) && metatags.sole.value.in?(%w[pending flagged appealed modqueue unmoderated])
+        exact_count(timeout)
       elsif is_metatag?(:pool) || is_metatag?(:ordpool)
         name = find_metatag(:pool, :ordpool)
         Pool.find_by_name(name)&.post_count || 0
