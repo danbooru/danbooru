@@ -176,6 +176,16 @@ module Sources
       )
     end
 
+    context "A tumblr.com/$blog_name/$work_id URL" do
+      strategy_should_work(
+        "https://tumblr.com/munespice/683613396085719040",
+        image_urls: ["https://64.media.tumblr.com/fd6b4692f6e902af861fbc242736ae61/010fd31ffbc70e84-a8/s21000x21000/e0587516e05bae4cec244921f220b45bed08335c.jpg"],
+        artist_name: "munespice",
+        page_url: "https://munespice.tumblr.com/post/683613396085719040",
+        profile_url: "https://munespice.tumblr.com"
+      )
+    end
+
     context "generating page urls" do
       should "work" do
         source1 = "https://octrain1020.tumblr.com/post/190713122589"
