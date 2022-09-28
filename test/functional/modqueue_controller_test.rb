@@ -26,6 +26,17 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
         assert_equal([{ "rating" => @post.rating }], response.parsed_body)
       end
 
+      should "order posts correctly when searching for tags" do
+        post1 = create(:post, tag_string: "touhou", is_pending: true, score: 5)
+        post2 = create(:post, tag_string: "touhou", is_pending: true, score: 10)
+        post3 = create(:post, tag_string: "touhou", is_pending: true, score: 15)
+
+        get_auth modqueue_index_path(search: { tags: "touhou", order: "score_asc" }), @admin, as: :json
+
+        assert_response :success
+        assert_equal([post1.id, post2.id, post3.id], response.parsed_body.pluck("id"))
+      end
+
       should "include appealed posts in the modqueue" do
         @appeal = create(:post_appeal)
         get_auth modqueue_index_path, @admin
