@@ -23,6 +23,6 @@ class ModqueueController < ApplicationController
 
     @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostPreviewComponent::DEFAULT_SIZE
 
-    respond_with(@posts)
+    respond_with(@posts, model: "Post")
   end
 end
