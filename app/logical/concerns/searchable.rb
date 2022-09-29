@@ -496,11 +496,11 @@ module Searchable
       relation = self.relation
 
       if params[name].present?
-        relation = visible(relation, name).where_json_contains(:metadata, params[name])
+        relation = visible(relation, name).where_json_contains(name, params[name])
       end
 
       if params["#{name}_has_key"]
-        relation = visible(relation, name).where_json_has_key(:metadata, params["#{name}_has_key"])
+        relation = visible(relation, name).where_json_has_key(name, params["#{name}_has_key"])
       end
 
       if params["has_#{name}"].to_s.truthy?
