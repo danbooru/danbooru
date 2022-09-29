@@ -19,14 +19,21 @@ module Maintenance
 
         context "#destroy" do
           should "disable email notifications" do
-            delete_auth maintenance_user_email_notification_path(user_id: @user.id, sig: @sig), @user
+            delete maintenance_user_email_notification_path(user_id: @user.id, sig: @sig)
+
+            assert_response :success
+            assert_equal(false, @user.reload.receive_email_notifications)
+          end
+
+          should "disable email notifications from a one-click unsubscribe" do
+            post maintenance_user_email_notification_path(user_id: @user.id, sig: @sig), params: { "List-Unsubscribe": "One-Click" }
 
             assert_response :success
             assert_equal(false, @user.reload.receive_email_notifications)
           end
 
           should "not disable email notifications when given an incorrect signature" do
-            delete_auth maintenance_user_email_notification_path(user_id: @user.id, sig: "foo"), @user
+            delete maintenance_user_email_notification_path(user_id: @user.id, sig: "foo")
 
             assert_response 403
             assert_equal(true, @user.reload.receive_email_notifications)

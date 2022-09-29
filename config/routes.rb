@@ -49,7 +49,7 @@ Rails.application.routes.draw do
   namespace :maintenance do
     namespace :user do
       resource :count_fixes, only: [:new, :create]
-      resource :email_notification, :only => [:show, :destroy]
+      resource :email_notification, only: [:show, :create, :destroy]
       resource :deletion, :only => [:show, :destroy]
     end
   end
