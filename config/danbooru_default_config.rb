@@ -15,7 +15,7 @@
 # and add DANBOORU_ to the front. More examples:
 #
 #     DANBOORU_CANONICAL_URL=https://booru.example.com
-#     DANBOORU_CONTACT_EMAIL=admin@borou.example.com
+#     DANBOORU_CONTACT_EMAIL=admin@booru.example.com
 #     DANBOORU_DISCORD_SERVER_URL=https://discord.gg/yourbooru
 #
 # Settings from environment variables will override those from the config file.
@@ -86,9 +86,24 @@ module Danbooru
       "http://#{Danbooru.config.hostname}"
     end
 
-    # Contact email address of the admin.
+    # The email address of the admin user. This email will be publicly displayed on the contact page.
     def contact_email
       "webmaster@#{Danbooru.config.hostname}"
+    end
+
+    # The email address to use for Dmail notifications.
+    def notification_email
+      "notifications@#{Danbooru.config.hostname}"
+    end
+
+    # The email address to use for password reset and email verification emails.
+    def account_security_email
+      "security@#{Danbooru.config.hostname}"
+    end
+
+    # The email address to use for new user signup emails.
+    def welcome_user_email
+      "welcome@#{Danbooru.config.hostname}"
     end
 
     # System actions, such as sending automated dmails, will be performed with
