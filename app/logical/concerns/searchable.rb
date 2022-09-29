@@ -249,8 +249,9 @@ module Searchable
   # Post.order_custom("1,2,3") => [post #1, post #2, post #3]
   def order_custom(string)
     operator, ids = RangeParser.parse(string, :integer)
-    return none unless operator == :in
+    return none unless operator in :in | :eq
 
+    ids = Array.wrap(ids)
     in_order_of(:id, ids)
   rescue RangeParser::ParseError
     none

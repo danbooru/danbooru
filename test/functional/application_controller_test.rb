@@ -334,6 +334,14 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_equal(0, response.parsed_body.size)
     end
 
+    should "work if the search[order]=custom param is used with a single id" do
+      tags = create_list(:tag, 2, post_count: 42)
+      get tags_path, params: { search: { id: tags[0].id, order: "custom" } }, as: :json
+
+      assert_response :success
+      assert_equal([tags[0].id], response.parsed_body.pluck("id"))
+    end
+
     should "support the expiry parameter" do
       get posts_path, as: :json, params: { expiry: "1" }
 

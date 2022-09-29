@@ -1359,7 +1359,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       as(create(:gold_user)) do
         assert_tag_match([p2, p1, p3], "id:#{p2.id},#{p1.id},#{p3.id} order:custom")
-        assert_tag_match([], "id:#{p1.id} order:custom")
+        assert_tag_match([p1], "id:#{p1.id} order:custom")
         assert_tag_match([], "id:>0 order:custom")
         assert_tag_match([], "id:1,2 id:2,3 order:custom")
         assert_tag_match([], "order:custom")
