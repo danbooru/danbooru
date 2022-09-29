@@ -266,8 +266,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User::Levels::MEMBER, User.last.level)
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_nil(User.last.email_address)
-        assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last], queue: "default"
         assert_equal(true, User.last.user_events.user_creation.exists?)
+
+        perform_enqueued_jobs
+        assert_performed_jobs(1, only: MailDeliveryJob)
+        # assert_enqueued_email_with UserMailer.with_request(request), :welcome_user, args: [User.last], queue: "default"
       end
 
       should "create a user with a valid email" do
@@ -277,8 +280,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("xxx", User.last.name)
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_equal("webmaster@danbooru.donmai.us", User.last.email_address.address)
-        assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last], queue: "default"
         assert_equal(true, User.last.user_events.user_creation.exists?)
+
+        perform_enqueued_jobs
+        assert_performed_jobs(1, only: MailDeliveryJob)
+        # assert_enqueued_email_with UserMailer.with_request(request), :welcome_user, args: [User.last], queue: "default"
       end
 
       should "not create a user with an invalid email" do

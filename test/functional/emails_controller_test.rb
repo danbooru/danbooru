@@ -113,8 +113,11 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to(settings_path)
           assert_equal("abc@ogres.net", @user.reload.email_address.address)
           assert_equal(false, @user.email_address.is_verified)
-          assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user], queue: "default"
           assert_equal(true, @user.user_events.email_change.exists?)
+
+          perform_enqueued_jobs
+          assert_performed_jobs(1, only: MailDeliveryJob)
+          # assert_enqueued_email_with UserMailer.with_request(request), :email_change_confirmation, args: [@user], queue: "default"
         end
 
         should "create a new address" do
@@ -127,8 +130,11 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to(settings_path)
           assert_equal("abc@ogres.net", @user.reload.email_address.address)
           assert_equal(false, @user.reload.email_address.is_verified)
-          assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user], queue: "default"
           assert_equal(true, @user.user_events.email_change.exists?)
+
+          perform_enqueued_jobs
+          assert_performed_jobs(1, only: MailDeliveryJob)
+          # assert_enqueued_email_with UserMailer.with_request(request), :email_change_confirmation, args: [@user], queue: "default"
         end
 
         should "not allow banned users to change their email address" do

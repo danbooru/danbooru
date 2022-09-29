@@ -379,7 +379,7 @@ class User < ApplicationRecord
 
         if errors.none?
           UserEvent.create_from_request!(self, :email_change, request)
-          UserMailer.email_change_confirmation(self).deliver_later
+          UserMailer.with_request(request).email_change_confirmation(self).deliver_later
         end
       end
     end

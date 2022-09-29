@@ -146,7 +146,7 @@ class Dmail < ApplicationRecord
 
   def send_email
     if is_recipient? && !is_deleted? && to.receive_email_notifications?
-      UserMailer.dmail_notice(self).deliver_later
+      UserMailer.with(headers: { "X-Danbooru-Dmail": Routes.dmail_url(self) }).dmail_notice(self).deliver_later
     end
   end
 

@@ -90,7 +90,7 @@ class UsersController < ApplicationController
       flash[:notice] = "Sign up failed: #{@user.errors.full_messages.join("; ")}"
     else
       session[:user_id] = @user.id
-      UserMailer.welcome_user(@user).deliver_later
+      UserMailer.with_request(request).welcome_user(@user).deliver_later
       set_current_user
     end
 

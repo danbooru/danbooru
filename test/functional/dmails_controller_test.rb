@@ -147,6 +147,9 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to Dmail.last
         assert_enqueued_emails 1
+
+        perform_enqueued_jobs
+        assert_performed_jobs(1, only: MailDeliveryJob)
       end
 
       should "not allow banned users to send dmails" do

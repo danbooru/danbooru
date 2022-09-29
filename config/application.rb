@@ -74,6 +74,14 @@ module Danbooru
       config.action_mailer.sendmail_settings = Danbooru.config.mail_settings
     end
 
+    # https://guides.rubyonrails.org/action_mailer_basics.html#intercepting-and-observing-emails
+    # app/logical/email_delivery_logger.rb
+    config.action_mailer.interceptors = ["EmailDeliveryLogger"]
+
+    # https://guides.rubyonrails.org/configuring.html#config-action-mailer-delivery-job
+    # app/jobs/mail_delivery_job.rb
+    config.action_mailer.delivery_job = "MailDeliveryJob"
+
     config.log_tags = [->(req) {"PID:#{Process.pid}"}]
     config.action_controller.action_on_unpermitted_parameters = :raise
 

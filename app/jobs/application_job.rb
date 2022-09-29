@@ -34,7 +34,7 @@ class ApplicationJob < ActiveJob::Base
       PruneRateLimitsJob, ProcessUploadJob, RegeneratePostCountsJob,
       RegeneratePostJob, RetireTagRelationshipsJob, VacuumDatabaseJob,
       DiscordNotificationJob, BigqueryExportJob, ProcessBulkUpdateRequestJob,
-      PruneJobsJob, ActionMailer::MailDeliveryJob
+      PruneJobsJob, MailDeliveryJob
     ]
   end
 end
