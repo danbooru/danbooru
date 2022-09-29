@@ -648,13 +648,8 @@ module Searchable
         relation = visible(relation, attr).where(attr => model.visible(current_user).search(params[model_key], current_user))
       end
 
-      if params["#{attr}_id"].present?
-        relation = search_context(relation).search_attribute("#{attr}_id")
-      end
-
-      if params["#{attr}_type"].present? && !model_specified
-        relation = search_context(relation).search_attribute("#{attr}_type")
-      end
+      relation = search_context(relation).search_attribute("#{attr}_id")
+      relation = search_context(relation).search_attribute("#{attr}_type")
 
       relation
     end

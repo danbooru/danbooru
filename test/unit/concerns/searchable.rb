@@ -229,6 +229,9 @@ class SearchableTest < ActiveSupport::TestCase
           assert_search_equals(@mr2, model_type: "ForumPost", model_id: @mr2.model.id)
           assert_search_equals(@mr3, model_type: "Dmail", model_id: @mr3.model.id)
 
+          assert_search_equals([@mr2, @mr1], model_type_not_eq: "Dmail")
+          assert_search_equals([], model_type: "Dmail", model_id_not_eq: @mr3.model_id)
+
           assert_search_equals(@mr1, Comment: { body: @mr1.model.body })
           assert_search_equals(@mr2, ForumPost: { body: @mr2.model.body })
 

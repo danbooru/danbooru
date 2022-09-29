@@ -65,8 +65,9 @@ class ActiveSupport::TestCase
     CurrentUser.scoped(user, &block)
   end
 
-  def assert_search_equals(expected_results, current_user: CurrentUser.user, **params)
-    results = subject.class.search(params, current_user)
+  def assert_search_equals(expected_results, current_user: User.anonymous, **params)
+    klass = subject.is_a?(ApplicationRecord) ? subject.class : subject
+    results = klass.search(params, current_user)
 
     assert_equal(Array(expected_results).map(&:id), results.ids)
   end
