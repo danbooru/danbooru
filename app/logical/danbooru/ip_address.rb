@@ -9,6 +9,12 @@ module Danbooru
     delegate :ipv4?, :ipv6?, :loopback?, :link_local?, :unique_local?, :private?, :to_string, :network, :prefix, :multicast?, :unspecified?, to: :ip_address
     delegate :ip_info, :is_proxy?, to: :ip_lookup
 
+    def self.parse(string)
+      new(string)
+    rescue
+      nil
+    end
+
     def initialize(string)
       @ip_address = ::IPAddress.parse(string.to_s.strip)
     end

@@ -71,11 +71,13 @@ module Searchable
 
   def where_inet_matches(attr, value)
     if value.match?(/[, ]/)
-      ips = value.split(/[, ]+/).map { |ip| Danbooru::IpAddress.new(ip).to_string }
-      where("#{qualified_column_for(attr)} = ANY(ARRAY[?]::inet[])", ips)
+      ips = value.split(/[, ]+/).map { |ip| Danbooru::IpAddress.parse(ip).to_s }
+      return none if ips.any?(&:blank?)
+      where("#{qualified_column_for(attr)} <<= ANY(ARRAY[?]::inet[])", ips)
     else
-      ip = Danbooru::IpAddress.new(value)
-      where("#{qualified_column_for(attr)} <<= ?", ip.to_string)
+      ip = Danbooru::IpAddress.parse(value)
+      return none if ip.nil?
+      where("#{qualified_column_for(attr)} <<= ?", ip.to_s)
     end
   end
 

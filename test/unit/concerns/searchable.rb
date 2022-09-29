@@ -105,11 +105,19 @@ class SearchableTest < ActiveSupport::TestCase
       subject { UserSession }
 
       should "work" do
-        @us = create(:user_session, ip_addr: "10.0.0.1")
-        assert_search_equals(@us, ip_addr: "10.0.0.1")
-        assert_search_equals(@us, ip_addr: "10.0.0.1/24")
-        assert_search_equals(@us, ip_addr: "10.0.0.1,1.1.1.1")
-        assert_search_equals(@us, ip_addr: "10.0.0.1 1.1.1.1")
+        @us1 = create(:user_session, ip_addr: "10.0.0.1")
+        @us2 = create(:user_session, ip_addr: "11.0.0.1")
+
+        assert_search_equals(@us1, ip_addr: "10.0.0.1")
+        assert_search_equals(@us1, ip_addr: "10.0.0.1/24")
+        assert_search_equals(@us1, ip_addr: "10.0.0.1,1.1.1.1")
+        assert_search_equals(@us1, ip_addr: "10.0.0.1 1.1.1.1")
+
+        assert_search_equals([@us2, @us1], ip_addr: "10.1.0.0/8,11.1.0.0/8")
+        assert_search_equals([@us2, @us1], ip_addr: "10.1.0.0/8 11.1.0.0/8")
+
+        assert_search_equals([], ip_addr: "10.0.0.x")
+        assert_search_equals([], ip_addr: "10.0.0.x 11.0.0.y")
       end
     end
 
