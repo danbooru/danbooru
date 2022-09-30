@@ -44,7 +44,13 @@ module Source
       end
 
       def artist_commentary_desc
-        page&.search(".ct .text, .content .text, .posts .photo .text").to_a.compact.first&.to_html
+        commentary_selectors = [
+          ".ct .text",
+          ".content .text",
+          ".posts .photo .text",
+          "#post .description",
+        ]
+        page&.search(commentary_selectors.join(", ")).to_a.compact.first&.to_html
       end
 
       def illust_id
