@@ -120,11 +120,11 @@ class Source::Extractor
     end
 
     def artist_name
-      parsed_url.blog_name || parsed_referer&.blog_name || post_url_from_image_html&.blog_name
+      parsed_url.blog_name || parsed_referer&.blog_name || post_url_from_image_html&.try(:blog_name)  # Don't crash with custom domains
     end
 
     def work_id
-      parsed_url.work_id || parsed_referer&.work_id || post_url_from_image_html&.work_id
+      parsed_url.work_id || parsed_referer&.work_id || post_url_from_image_html&.try(:work_id)
     end
 
     def api_response
