@@ -1,8 +1,8 @@
 require 'test_helper'
 
 class PostQueryBuilderTest < ActiveSupport::TestCase
-  def assert_tag_match(posts, query, current_user: CurrentUser.user, tag_limit: nil, **options)
-    assert_equal(posts.map(&:id), Post.user_tag_match(query, current_user, tag_limit: tag_limit, **options).pluck("posts.id"))
+  def assert_tag_match(posts, query, relation: Post.all, current_user: CurrentUser.user, tag_limit: nil, **options)
+    assert_equal(posts.map(&:id), relation.user_tag_match(query, current_user, tag_limit: tag_limit, **options).pluck("posts.id"))
   end
 
   def assert_search_error(query, current_user: CurrentUser.user, **options)
@@ -1479,6 +1479,25 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post3, post2, post1], "rating:s or rating:q or rating:e")
 
       assert_tag_match([post2, post1], "id:#{post1.id} or rating:q")
+    end
+
+    should "work on a relation with pre-existing scopes" do
+      post1 = create(:post, rating: "g", is_pending: true, tag_string: ["1girl"])
+      post2 = create(:post, rating: "s", is_flagged: true, tag_string: ["1boy"])
+      create(:post_disapproval, post: post2, reason: "poor_quality")
+
+      assert_tag_match([post1], "1girl", relation: Post.pending)
+      assert_tag_match([post1], "1girl", relation: Post.in_modqueue)
+      assert_tag_match([post1], "1boy", relation: Post.in_modqueue)
+      assert_tag_match([post2, post1], "comments:0", relation: Post.in_modqueue)
+      assert_tag_match([post2, post1], "comments:0 notes:0", relation: Post.in_modqueue)
+
+      assert_tag_match([post2], "-1girl", relation: Post.in_modqueue)
+      assert_tag_match([post2], "disapproved:poor_quality", relation: Post.in_modqueue)
+
+      assert_tag_match([], "rating:g", relation: Post.where(rating: "e"))
+      assert_tag_match([], "id:#{post1.id}", relation: Post.where(id: 0))
+      assert_tag_match([], "order:artcomm", relation: Post.in_modqueue)
     end
 
     should "not allow conflicting order metatags" do

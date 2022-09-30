@@ -1391,7 +1391,7 @@ class Post < ApplicationRecord
         post_query = PostQuery.normalize(query, current_user: user, tag_limit: tag_limit, safe_mode: safe_mode)
         post_query.validate_tag_limit!
         posts = post_query.with_implicit_metatags.posts
-        merge(posts)
+        and_relation(posts)
       end
 
       def search(params, current_user)
@@ -1409,7 +1409,7 @@ class Post < ApplicationRecord
         )
 
         if params[:tags].present?
-          q = q.user_tag_match(params[:tags], current_user)
+          q = q.where(id: user_tag_match(params[:tags], current_user).select(:id))
         end
 
         if params[:order].present?

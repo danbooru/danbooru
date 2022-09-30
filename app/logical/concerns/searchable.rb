@@ -9,6 +9,22 @@ module Searchable
     relation.where(all.where_clause.invert.ast)
   end
 
+  # Combine two relations like `ActiveRecord::Relation#and`, but allow structurally incompatible relations.
+  def and_relation(relation)
+    q = all
+    raise "incompatible FROM clauses: #{q.to_sql}; #{relation.to_sql}" if !q.from_clause.empty? && q.from_clause != relation.from_clause
+    raise "incompatible GROUP BY clauses: #{q.to_sql}; #{relation.to_sql}" if !q.group_values.empty? && q.group_values != relation.group_values
+
+    q = q.select(q.select_values + relation.select_values) if !relation.select_values.empty?
+    q = q.from(relation.from_clause.value) if !relation.from_clause.empty?
+    q = q.joins(relation.joins_values + q.joins_values) if relation.joins_values.present?
+    q = q.where(relation.where_clause.ast) if relation.where_clause.present?
+    q = q.group(relation.group_values) if relation.group_values.present?
+    q = q.order(relation.order_values) if relation.order_values.present? && !relation.reordering_value
+    q = q.reorder(relation.order_values) if relation.order_values.present? && relation.reordering_value
+    q
+  end
+
   # Search a table column by an Arel operator.
   #
   # @see https://github.com/rails/rails/blob/master/activerecord/lib/arel/predications.rb

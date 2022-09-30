@@ -58,6 +58,16 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
         assert_equal([], response.parsed_body.pluck("id"))
       end
 
+      should "filter the disapproved:<reason> metatag correctly" do
+        post1 = create(:post, is_pending: true)
+        post2 = create(:post, is_deleted: true)
+        create(:post_disapproval, post: post2, reason: "poor_quality")
+
+        get_auth modqueue_index_path(search: { tags: "disapproved:poor_quality" }), @admin, as: :json
+        assert_response :success
+        assert_equal([], response.parsed_body.pluck("id"))
+      end
+
       should "include appealed posts in the modqueue" do
         @appeal = create(:post_appeal)
         get_auth modqueue_index_path, @admin
