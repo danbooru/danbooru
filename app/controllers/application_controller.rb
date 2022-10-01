@@ -180,11 +180,13 @@ class ApplicationController < ActionController::Base
 
   def set_current_user
     SessionLoader.new(request).load
+    Sentry.set_user(id: CurrentUser.user.id, username: CurrentUser.user.name, email: CurrentUser.user.email_address&.address, ip_address: request.remote_ip)
   end
 
   def reset_current_user
     CurrentUser.user = nil
     CurrentUser.safe_mode = false
+    Sentry.set_user({})
   end
 
   # Skip setting the session cookie if the response is being publicly cached to

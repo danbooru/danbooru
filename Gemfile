@@ -11,7 +11,6 @@ gem "sanitize"
 gem 'ruby-vips'
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
-gem 'aws-sdk-sqs', '~> 1'
 gem 'responders'
 gem 'dtext_rb', git: "https://github.com/danbooru/dtext_rb.git"
 gem 'memoist'
@@ -53,7 +52,6 @@ gem "rbtrace"
 gem "good_job"
 gem "crass"
 gem "public_suffix"
-gem "elastic-apm"
 gem "debug"
 gem "ffaker"
 gem "composite_primary_keys"
@@ -61,6 +59,8 @@ gem "resolv"
 gem "rover-df"
 gem "ffi-libarchive"
 gem "pry-rails"
+gem "sentry-ruby"
+gem "sentry-rails"
 
 group :development do
   gem 'rubocop', require: false

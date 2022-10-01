@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class EmailAddress < ApplicationRecord
+  BANNED_DOMAIN_REGEX = Regexp.union(Danbooru.config.blacklisted_email_domains).freeze
+
   belongs_to :user, inverse_of: :email_address
 
   attribute :address
@@ -9,6 +11,7 @@ class EmailAddress < ApplicationRecord
   validates :address, presence: true, format: { message: "is invalid", with: Danbooru::EmailAddress::EMAIL_REGEX }
   validates :normalized_address, presence: true, uniqueness: true
   validates :user_id, uniqueness: true
+  validate :validate_domain, on: :create
   validate :validate_deliverable, on: :deliverable
 
   def self.visible(user)
@@ -52,6 +55,10 @@ class EmailAddress < ApplicationRecord
     q = q.restricted(params[:is_restricted])
 
     q.apply_default_order(params)
+  end
+
+  def validate_domain
+    errors.add(:address, "has an invalid domain") if address.match?(BANNED_DOMAIN_REGEX)
   end
 
   def validate_deliverable

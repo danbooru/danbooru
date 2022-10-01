@@ -6,7 +6,7 @@
     <h1>Edit User: <%= @user.name %></h1>
 
     <%= edit_form_for(@user, url: admin_user_path(@user)) do |f| %>
-      <%= f.input :level, collection: User.level_hash.to_a, selected: @user.level %>
+      <%= f.input :level, collection: User.promotable_levels, selected: @user.level %>
       <%= f.submit "Update" %>
     <% end %>
   </div>

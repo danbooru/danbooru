@@ -18,8 +18,6 @@ class UserPromotion
   end
 
   def promote!
-    validate!
-
     user.level = new_level
 
     create_user_feedback
@@ -36,18 +34,6 @@ class UserPromotion
       ModAction.log(%{promoted "#{user.name}":#{Routes.user_path(user)} from #{user.level_string_was} to #{user.level_string}}, :user_level_change, subject: user, user: promoter)
     elsif user.level_changed? && user.level < user.level_was
       ModAction.log(%{demoted "#{user.name}":#{Routes.user_path(user)} from #{user.level_string_was} to #{user.level_string}}, :user_level_change, subject: user, user: promoter)
-    end
-  end
-
-  def validate!
-    if !promoter.is_moderator?
-      raise User::PrivilegeError, "You can't promote or demote other users"
-    elsif promoter == user
-      raise User::PrivilegeError, "You can't promote or demote yourself"
-    elsif new_level >= promoter.level
-      raise User::PrivilegeError, "You can't promote other users to your rank or above"
-    elsif user.level >= promoter.level
-      raise User::PrivilegeError, "You can't promote or demote other users at your rank or above"
     end
   end
 

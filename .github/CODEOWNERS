@@ -4,4 +4,4 @@
 # https://docs.github.com/en/actions/learn-github-actions/security-hardening-for-github-actions#using-codeowners-to-monitor-changes
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
-.github/ @evazion
+.github/ @nottalulah

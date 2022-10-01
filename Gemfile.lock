@@ -90,18 +90,6 @@ GEM
       public_suffix (>= 2.0.2, < 6.0)
     ansi (1.5.0)
     ast (2.4.2)
-    aws-eventstream (1.2.0)
-    aws-partitions (1.709.0)
-    aws-sdk-core (3.170.0)
-      aws-eventstream (~> 1, >= 1.0.2)
-      aws-partitions (~> 1, >= 1.651.0)
-      aws-sigv4 (~> 1.5)
-      jmespath (~> 1, >= 1.6.1)
-    aws-sdk-sqs (1.53.0)
-      aws-sdk-core (~> 3, >= 3.165.0)
-      aws-sigv4 (~> 1.1)
-    aws-sigv4 (1.5.2)
-      aws-eventstream (~> 1, >= 1.0.2)
     backport (1.2.0)
     bcrypt (3.1.18)
     bcrypt_pbkdf (1.1.0)
@@ -166,10 +154,6 @@ GEM
       railties (>= 3.2)
     e2mmap (0.1.0)
     ed25519 (1.3.0)
-    elastic-apm (4.6.0)
-      concurrent-ruby (~> 1.0)
-      http (>= 3.0)
-      ruby2_keywords
     erubi (1.12.0)
     et-orbi (1.2.7)
       tzinfo
@@ -259,7 +243,6 @@ GEM
       concurrent-ruby (~> 1.0)
     ipaddress_2 (0.14.0)
     jaro_winkler (1.5.4)
-    jmespath (1.6.2)
     json (2.6.3)
     jwt (2.7.0)
     kramdown (2.4.0)
@@ -445,6 +428,11 @@ GEM
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
     semantic_range (3.0.0)
+    sentry-rails (5.5.0)
+      railties (>= 5.0)
+      sentry-ruby (~> 5.5.0)
+    sentry-ruby (5.5.0)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
     shakapacker (6.5.5)
       activesupport (>= 5.2)
       rack-proxy (>= 0.6.1)
@@ -522,7 +510,6 @@ DEPENDENCIES
   activemodel-serializers-xml
   activerecord-hierarchical_query
   addressable
-  aws-sdk-sqs (~> 1)
   bcrypt
   bcrypt_pbkdf
   benchmark-ips
@@ -542,7 +529,6 @@ DEPENDENCIES
   dotenv-rails
   dtext_rb!
   ed25519
-  elastic-apm
   factory_bot
   ffaker
   ffi
@@ -589,6 +575,8 @@ DEPENDENCIES
   sanitize
   scenic
   selenium-webdriver
+  sentry-rails
+  sentry-ruby
   shakapacker
   shoulda-context
   shoulda-matchers

@@ -107,7 +107,7 @@ namespace :danbooru do
     # Build a Docker image. Note that uncommited changes won't be included in the image; commit changes to Git first before building the image.
     desc "Build a Docker image"
     task :build do
-      system("git archive HEAD | docker buildx build - --platform linux/amd64 --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --tag danbooru --tag danbooru:x86 --file Dockerfile --load")
+      system("git archive HEAD | docker buildx build - --platform linux/amd64 --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --tag ghcr.io/aibooruorg/aibooru --tag ghcr.io/aibooruorg/aibooru:$(git rev-parse HEAD) --file Dockerfile --load")
     end
 
     # Usage: bin/rails danbooru:docker:build-arm

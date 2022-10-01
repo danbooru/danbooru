@@ -506,6 +506,13 @@ module Danbooru
       "zDMSATq0W3hmA5p3rKTgD"
     end
 
+    def blacklisted_email_domains
+      [
+        /donmai.us$/,
+        /donmai.moe$/,
+      ]
+    end
+
     # The url of the Discord server associated with this site.
     def discord_server_url
       nil
@@ -645,6 +652,9 @@ module Danbooru
     # https://www.elastic.co/observability/application-performance-monitoring
     def elastic_apm_server_url
       # "http://localhost:8200"
+    end
+
+    def sentry_url
     end
 
     # True if the Winter Sale is active.

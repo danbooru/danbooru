@@ -16,7 +16,7 @@
       <%= subnav_link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %>
     <% end %>
 
-    <% if policy(CurrentUser.user).promote? %>
+    <% if policy(@user).promote? %>
       <%= subnav_link_to "Promote", edit_admin_user_path(@user) %>
     <% end %>
 

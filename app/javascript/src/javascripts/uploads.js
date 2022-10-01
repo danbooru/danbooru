@@ -34,7 +34,7 @@ Upload.loadAssets = async function() {
     let ids = $(".upload-media-asset-loading").map((i, el) => $(el).attr("data-id")).toArray().join(",");
     let size = $(".upload-media-asset-gallery").attr("data-size");
     $.get("/upload_media_assets.js", { search: { status: "active failed", id: ids }, size: size });
-    await Utility.delay(250);
+    await Utility.delay(1000);
   }
 }
 

@@ -60,12 +60,6 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       # Generate Docker tags from Git tags.
       # https://github.com/docker/metadata-action
       - name: Generate Docker tags
@@ -73,8 +67,7 @@ jobs:
         id: metadata
         with:
           images: |
-            docker.io/evazion/danbooru
-            ghcr.io/danbooru/danbooru
+            ghcr.io/aibooruorg/aibooru
           tags: |
             type=sha,format=long,prefix=
             type=ref,event=branch

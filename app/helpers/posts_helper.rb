@@ -29,7 +29,7 @@ module PostsHelper
     if source =~ %r{\Ahttps?://}i
       external_link_to(normalized_source, strip: :subdomain) + "&nbsp;".html_safe + link_to("»", source, rel: "external noreferrer nofollow")
     else
-      source
+      tag.span(source, class: "source")
     end
   end
 

@@ -274,7 +274,7 @@
     <% elsif @post.levelblocked? -%>
       <p>This image requires a privileged account to view.</p>
     <% elsif @post.safeblocked? -%>
-      <p>This image is unavailable on <%= Danbooru.config.app_name %>. Go to <%= link_to "Danbooru", "https://danbooru.donmai.us" %> or disable safe mode to view (<%= link_to_wiki "learn more", "help:safe_mode" %>).</p>
+      <p>This image is unavailable on <%= Danbooru.config.app_name %>. Go to <%= link_to Danbooru.config.canonical_app_name, Danbooru.config.canonical_url %> or disable safe mode to view (<%= link_to_wiki "learn more", "help:safe_mode" %>).</p>
     <% elsif @post.is_flash? -%>
       <div class="ruffle-container" data-swf="<%= @post.tagged_file_url %>"></div>
     <% elsif @post.is_video? -%>

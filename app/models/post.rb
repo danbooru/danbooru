@@ -485,7 +485,6 @@ class Post < ApplicationRecord
       tags << "greyscale" if media_asset.is_greyscale?
       tags << "exif_rotation" if media_asset.is_rotated?
       tags << "non-repeating_animation" if media_asset.is_non_repeating_animation?
-      tags << "ai-generated" if media_asset.is_ai_generated?
 
       # Allow Flash files to be manually tagged as `sound`; other files are automatically tagged.
       tags -= ["sound"] unless is_flash?

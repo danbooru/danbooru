@@ -1,4 +1,4 @@
-# Deploy the site to https://betabooru.donmai.us on every push to the `betabooru` branch.
+# Deploy the site to https://beta.aibooru.online on every push to the `betabooru` branch.
 
 name: Deploy Betabooru
 
@@ -22,7 +22,7 @@ jobs:
     # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idenvironment
     environment:
       name: betabooru
-      url: https://betabooru.donmai.us
+      url: https://beta.aibooru.online
 
     steps:
     # https://github.com/marketplace/actions/kubectl-tool-installer

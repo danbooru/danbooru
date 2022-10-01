@@ -61,7 +61,7 @@ class User < ApplicationRecord
   # Personal preferences that are editable by the user, rather than internal flags. These will be cleared when the user deactivates their account.
   USER_PREFERENCE_BOOLEAN_ATTRIBUTES = ACTIVE_BOOLEAN_ATTRIBUTES - %w[is_banned requires_verification is_verified]
 
-  DEFAULT_BLACKLIST = ["guro", "scat", "furry -rating:g"].join("\n")
+  DEFAULT_BLACKLIST = ["guro", "scat"].join("\n")
 
   attribute :id
   attribute :created_at
@@ -84,7 +84,7 @@ class User < ApplicationRecord
   attribute :note_update_count, default: 0
   attribute :unread_dmail_count, default: 0
   attribute :favorite_count, default: 0
-  attribute :per_page, default: 20
+  attribute :per_page, default: Danbooru.config.posts_per_page.to_i
   attribute :theme, default: :auto
   attribute :upload_points, default: Danbooru.config.initial_upload_points.to_i
   attribute :bit_prefs, default: 0
@@ -268,6 +268,14 @@ class User < ApplicationRecord
           "Admin" => Levels::ADMIN,
           "Owner" => Levels::OWNER,
         }
+      end
+
+      def promotable_levels(promoter = CurrentUser.user)
+        if promoter.is_owner?
+          level_hash.to_a
+        else
+          level_hash.filter { |_, v| v < User::Levels::APPROVER }.to_a
+        end
       end
 
       def level_string(value)
