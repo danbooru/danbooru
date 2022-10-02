@@ -131,9 +131,6 @@
         <% else %>
           <li><%= link_to "Profile", profile_path %></li>
           <li><%= link_to "Settings", settings_path %></li>
-          <% if policy(UserNameChangeRequest).create? %>
-            <li><%= link_to "Change name", new_user_name_change_request_path %></li>
-          <% end %>
           <li><%= link_to "Uploads", user_uploads_path(CurrentUser.user) %></li>
           <li><%= link_to "Dmails", dmails_path(search: { folder: "received" }) %></li>
           <li><%= link_to "Favorites", favorites_path %></li>

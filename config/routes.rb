@@ -270,9 +270,8 @@ Rails.application.routes.draw do
     resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
     resources :uploads, only: [:index]
 
-    collection do
-      get :custom_style
-    end
+    get :change_name, on: :member, to: "user_name_change_requests#new"
+    get :custom_style, on: :collection
   end
   get "/upgrade", to: "user_upgrades#new", as: "new_user_upgrade"
   get "/user_upgrades/new", to: redirect("/upgrade")

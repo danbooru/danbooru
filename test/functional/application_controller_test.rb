@@ -95,7 +95,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         @user.update_columns(name: "foo__bar")
 
         get_auth posts_path, @user
-        assert_redirected_to new_user_name_change_request_path
+        assert_redirected_to change_name_user_path(@user)
       end
     end
 

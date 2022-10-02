@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Dmail < ApplicationRecord
-  attr_accessor :creator_ip_addr
+  attr_accessor :creator_ip_addr, :disable_email_notifications
 
   validate :validate_sender_is_not_limited, on: :create
   validates :title, presence: true, length: { maximum: 200 }, if: :title_changed?
@@ -145,7 +145,7 @@ class Dmail < ApplicationRecord
   end
 
   def send_email
-    if is_recipient? && !is_deleted? && to.receive_email_notifications?
+    if is_recipient? && !is_deleted? && to.receive_email_notifications? && !disable_email_notifications
       UserMailer.with(headers: { "X-Danbooru-Dmail": Routes.dmail_url(self) }).dmail_notice(self).deliver_later
     end
   end

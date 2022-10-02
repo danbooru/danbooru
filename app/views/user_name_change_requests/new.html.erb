@@ -1,6 +1,10 @@
 <div id="c-user-name-change-requests">
   <div id="a-new" class="fixed-width-container">
-    <h1>Change Name</h1>
+    <% if CurrentUser.user != @change_request.user %>
+      <h1>Change Name: <%= link_to_user @change_request.user %></h1>
+    <% else %>
+      <h1>Change Name</h1>
+    <% end %>
 
     <% if CurrentUser.user.name_invalid? %>
       <p> Your current username is invalid. You must change your username to continue
@@ -26,6 +30,7 @@
     </div>
 
     <%= edit_form_for(@change_request) do |f| %>
+      <%= f.input :user_id, as: :hidden, input_html: { value: @change_request.user_id } %>
       <%= f.input :desired_name, label: "New name" %>
       <%= f.submit "Submit" %>
     <% end %>

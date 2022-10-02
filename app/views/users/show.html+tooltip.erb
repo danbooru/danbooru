@@ -83,6 +83,14 @@
           <% end %>
         <% end %>
       <% end %>
+
+      <% if policy(UserNameChangeRequest.new(user: @user)).can_rename_user? %>
+        <% menu.item do %>
+          <%= link_to change_name_user_path(@user) do %>
+            <%= feedback_icon %> Rename User
+          <% end %>
+        <% end %>
+      <% end %>
     <% end %>
   </div>
 

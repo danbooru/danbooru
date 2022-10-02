@@ -27,6 +27,10 @@
       <%= subnav_link_to "Promote", edit_admin_user_path(@user) %>
     <% end %>
 
+    <% if policy(UserNameChangeRequest.new(user: @user)).can_rename_user? %>
+      <%= subnav_link_to "Rename", change_name_user_path(@user) %>
+    <% end %>
+
     <% if policy(Ban.new(user: @user)).create? %>
       <% if @user.is_banned? && @user.active_ban.present? %>
         <%= subnav_link_to "Unban", ban_path(@user.active_ban) %>

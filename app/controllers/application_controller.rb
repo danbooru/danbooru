@@ -217,7 +217,7 @@ class ApplicationController < ActionController::Base
   def redirect_if_name_invalid?
     if request.format.html? && !CurrentUser.user.is_anonymous? && CurrentUser.user.name_invalid?
       flash[:notice] = "You must change your username to continue using #{Danbooru.config.app_name}"
-      redirect_to new_user_name_change_request_path
+      redirect_to change_name_user_path(CurrentUser.user)
     end
   end
 
