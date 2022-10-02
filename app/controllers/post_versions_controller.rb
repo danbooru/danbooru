@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class PostVersionsController < ApplicationController
-  before_action :check_availabililty
-  around_action :set_timeout
   respond_to :html, :xml, :json
   respond_to :js, only: [:undo]
 
@@ -27,19 +25,5 @@ class PostVersionsController < ApplicationController
     @post_version.undo!
 
     respond_with(@post_version, location: post_versions_path(search: { post_id: @post_version.post_id }))
-  end
-
-  private
-
-  def set_timeout
-    PostVersion.connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}")
-    yield
-  ensure
-    PostVersion.connection.execute("SET statement_timeout = 0")
-  end
-
-  def check_availabililty
-    return if PostVersion.enabled?
-    raise NotImplementedError, "Archive service is not configured. Post versions are not saved."
   end
 end

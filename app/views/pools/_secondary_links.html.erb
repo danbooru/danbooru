@@ -5,9 +5,7 @@
   <% if policy(Pool).create? %>
     <%= subnav_link_to "New", new_pool_path %>
   <% end %>
-  <% if PoolVersion.enabled? %>
-    <%= subnav_link_to "Changes", pool_versions_path %>
-  <% end %>
+  <%= subnav_link_to "Changes", pool_versions_path %>
   <%= subnav_link_to "Help", wiki_page_path("help:pools") %>
   <% if @pool && !@pool.new_record? %>
     <li>|</li>
@@ -22,9 +20,7 @@
         <%= subnav_link_to "Delete", pool_path(@pool), :method => :delete, :"data-shortcut" => "shift+d", :"data-confirm" => "Are you sure you want to delete this pool?", :remote => true %>
       <% end %>
     <% end %>
-    <% if PoolVersion.enabled? %>
-      <%= subnav_link_to "History", pool_versions_path(:search => {:pool_id => @pool.id}) %>
-    <% end %>
+    <%= subnav_link_to "History", pool_versions_path(:search => {:pool_id => @pool.id}) %>
     <% if policy(@pool).update? %>
       <%= subnav_link_to "Order", edit_pool_order_path(@pool) %>
     <% end %>

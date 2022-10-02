@@ -64,9 +64,7 @@
         <li><h2>Pools</h2></li>
         <li><%= link_to("Pools", pools_path) %></li>
         <li><%= link_to("Gallery", gallery_pools_path) %></li>
-        <% if PoolVersion.enabled? %>
-          <li><%= link_to("History", pool_versions_path) %></li>
-        <% end %>
+        <li><%= link_to("History", pool_versions_path) %></li>
         <li><%= link_to_wiki "Help", "help:pools" %></li>
       </ul>
 

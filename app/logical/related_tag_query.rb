@@ -67,7 +67,7 @@ class RelatedTagQuery
 
   # Returns the top 20 most frequently added tags within the last 20 edits made by the user in the last hour.
   def recent_tags(since: 1.hour.ago, max_edits: 20, max_tags: 20)
-    return [] unless user.present? && PostVersion.enabled?
+    return [] unless user.present?
 
     versions = PostVersion.where(updater_id: user.id).where("updated_at > ?", since).order(id: :desc).limit(max_edits)
     tags = versions.flat_map(&:added_tags)

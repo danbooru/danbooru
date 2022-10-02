@@ -196,12 +196,10 @@
         <td><%= presenter.artist_commentary_version_count(self) %></td>
       </tr>
 
-      <% if PoolVersion.enabled? %>
-        <tr>
-          <th>Pool Changes</th>
-          <td><%= presenter.pool_version_count(self) %></td>
-        </tr>
-      <% end %>
+      <tr>
+        <th>Pool Changes</th>
+        <td><%= presenter.pool_version_count(self) %></td>
+      </tr>
 
       <% if Danbooru.config.forum_enabled?.to_s.truthy? %>
         <tr>

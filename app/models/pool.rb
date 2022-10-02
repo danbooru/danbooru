@@ -17,6 +17,7 @@ class Pool < ApplicationRecord
   after_save :create_version
 
   has_many :mod_actions, as: :subject, dependent: :destroy
+  has_many :versions, class_name: "PoolVersion", dependent: :destroy
 
   deletable
   has_dtext_links :description
@@ -107,7 +108,6 @@ class Pool < ApplicationRecord
   end
 
   def versions
-    raise NotImplementedError, "Archive service not configured" unless PoolVersion.enabled?
     PoolVersion.where(pool_id: id).order("id asc")
   end
 
@@ -223,12 +223,72 @@ class Pool < ApplicationRecord
     post_count > 0 ? Post.find(post_ids.first) : nil
   end
 
-  def create_version(updater: CurrentUser.user)
-    if PoolVersion.enabled?
-      PoolVersion.queue(self, updater)
-    else
-      Rails.logger.warn("Archive service is not configured. Pool versions will not be saved.")
+  def create_version(force = false)
+    if new_record? || saved_change_to_watched_attributes? || force
+      if merge_version?
+        merge_version
+      else
+        create_new_version
+      end
     end
+  end
+
+  def saved_change_to_watched_attributes?
+    saved_change_to_post_ids? || saved_change_to_name? || saved_change_to_description? || saved_change_to_is_deleted? || saved_change_to_category?
+  end
+
+  def merge_version?
+    prev = versions.last
+    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
+  end
+
+
+  def merge_version
+    subject = versions.last
+    prev = subject.previous
+
+    added_post_ids   = post_ids - prev.post_ids
+    removed_post_ids = prev.post_ids - post_ids
+
+    subject.update(
+      post_ids: post_ids,
+      added_post_ids: added_post_ids,
+      removed_post_ids: removed_post_ids,
+      name: name,
+      description: description,
+      is_active: is_active?,
+      is_deleted: is_deleted?,
+      category: category,
+      )
+  end
+
+  def calculate_version
+    1 + versions.maximum(:version).to_i
+  end
+
+  def create_new_version
+    prev = versions.last
+
+    if prev
+      added_post_ids   = post_ids - prev.post_ids
+      removed_post_ids = prev.post_ids - post_ids
+    else
+      added_post_ids   = post_ids
+      removed_post_ids = []
+    end
+
+    versions.create(
+      updater_id: CurrentUser.id,
+      post_ids: post_ids,
+      added_post_ids: added_post_ids,
+      removed_post_ids: removed_post_ids,
+      name: name,
+      description: description,
+      is_active: is_active?,
+      is_deleted: is_deleted?,
+      category: category,
+      version: calculate_version,
+    )
   end
 
   def last_page

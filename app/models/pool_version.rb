@@ -4,23 +4,9 @@ class PoolVersion < ApplicationRecord
   belongs_to :updater, :class_name => "User"
   belongs_to :pool
 
-  def self.enabled?
-    Rails.env.test? || Danbooru.config.aws_sqs_archives_url.present?
-  end
-
-  def self.database_url
-    ENV["ARCHIVE_DATABASE_URL"] || ENV["DATABASE_URL"]
-  end
-
-  establish_connection database_url if enabled?
-
   module SearchMethods
     def default_order
       order(updated_at: :desc)
-    end
-
-    def for_user(user_id)
-      where(updater_id: user_id)
     end
 
     def for_post_id(post_id)
@@ -59,31 +45,6 @@ class PoolVersion < ApplicationRecord
   end
 
   extend SearchMethods
-
-  def self.sqs_service
-    SqsService.new(Danbooru.config.aws_sqs_archives_url)
-  end
-
-  def self.queue(pool, updater)
-    # queue updates to sqs so that if archives goes down for whatever reason it won't
-    # block pool updates
-    raise NotImplementedError, "Archive service is not configured." if !enabled?
-
-    json = {
-      pool_id: pool.id,
-      post_ids: pool.post_ids,
-      updater_id: updater.id,
-      created_at: pool.created_at.try(:iso8601),
-      updated_at: pool.updated_at.try(:iso8601),
-      description: pool.description,
-      name: pool.name,
-      is_active: pool.is_active?,
-      is_deleted: pool.is_deleted?,
-      category: pool.category,
-    }
-    msg = "add pool version\n#{json.to_json}"
-    sqs_service.send_message(msg, message_group_id: "pool:#{pool.id}")
-  end
 
   def self.normalize_name(name)
     name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "")

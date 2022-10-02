@@ -7,16 +7,6 @@ class PostVersion < ApplicationRecord
   belongs_to :post
   belongs_to_updater counter_cache: "post_update_count"
 
-  def self.enabled?
-    Rails.env.test? || Danbooru.config.aws_sqs_archives_url.present?
-  end
-
-  def self.database_url
-    ENV["ARCHIVE_DATABASE_URL"] || ENV["DATABASE_URL"]
-  end
-
-  establish_connection database_url if enabled?
-
   module SearchMethods
     def changed_tags_include(tag)
       where_array_includes_all(:added_tags, [tag]).or(where_array_includes_all(:removed_tags, [tag]))
@@ -72,45 +62,10 @@ class PostVersion < ApplicationRecord
     end
   end
 
-  module ArchiveServiceMethods
-    extend ActiveSupport::Concern
-
-    class_methods do
-      def sqs_service
-        SqsService.new(Danbooru.config.aws_sqs_archives_url)
-      end
-
-      def queue(post)
-        # queue updates to sqs so that if archives goes down for whatever reason it won't
-        # block post updates
-        raise NotImplementedError, "Archive service is not configured" if !enabled?
-
-        json = {
-          "post_id" => post.id,
-          "rating" => post.rating,
-          "parent_id" => post.parent_id,
-          "source" => post.source,
-          "updater_id" => CurrentUser.id,
-          "updated_at" => post.updated_at.try(:iso8601),
-          "created_at" => post.created_at.try(:iso8601),
-          "tags" => post.tag_string,
-        }
-        msg = "add post version\n#{json.to_json}"
-        sqs_service.send_message(msg, message_group_id: "post:#{post.id}")
-      end
-    end
-  end
-
   extend SearchMethods
-  include ArchiveServiceMethods
 
   def tag_array
     tags.split
-  end
-
-  def reload
-    flush_cache
-    super
   end
 
   def previous
