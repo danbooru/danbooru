@@ -6,7 +6,7 @@ class UserNameChangeRequestsController < ApplicationController
   skip_before_action :redirect_if_name_invalid?
 
   def new
-    user = User.find_by_name(params[:id]) || CurrentUser.user
+    user = params[:id].present? ? User.find(params[:id]) : CurrentUser.user
     @change_request = authorize UserNameChangeRequest.new(user: user, **permitted_attributes(UserNameChangeRequest))
     respond_with(@change_request)
   end

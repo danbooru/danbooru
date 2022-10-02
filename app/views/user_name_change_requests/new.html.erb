@@ -6,13 +6,13 @@
       <h1>Change Name</h1>
     <% end %>
 
-    <% if CurrentUser.user.name_invalid? %>
+    <% if @change_request.user.name_invalid? %>
       <p> Your current username is invalid. You must change your username to continue
       using <%= Danbooru.config.canonical_app_name %>.</p>
 
       <p>
-        Current name: <b><%= CurrentUser.user.name %></b>.<br>
-        Error: <%= CurrentUser.user.name_errors.full_messages.join(". ").html_safe %>.
+        Current name: <b><%= @change_request.user.name %></b>.<br>
+        Error: <%= @change_request.user.name_errors.full_messages.join(". ").html_safe %>.
       </p>
     <% end %>
 
