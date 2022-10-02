@@ -14,8 +14,8 @@ def delete(user)
 
     puts "[WARN] id=#{user.id} user='#{user.name}' email='#{user.email_address.address}'"
   elsif ENV.fetch("DELETE", "false").truthy?
-    UserDeletion.new(user: user, deleter: User.owner).delete!
     puts "[DELETE] id=#{user.id} user='#{user.name}'"
+    UserDeletion.new(user: user, deleter: User.owner).delete!
   end
 end
 
@@ -47,7 +47,7 @@ with_confirmation do
     delete(user)
   end
 
-  users.where_regex(:name, "[`~!@#$%^&*()+={}\[\]|\\:;'\"<>,?/]").find_each do |user|
+  users.where_regex(:name, "[][`~!@#$%^&*()+={}|\\:;'\"<>,?/]").find_each do |user|
     delete(user)
   end
 
