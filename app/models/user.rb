@@ -149,6 +149,7 @@ class User < ApplicationRecord
   scope :deleted, -> { where("name ~ 'user_[0-9]+~*'") }
   scope :undeleted, -> { where("name !~ 'user_[0-9]+~*'") }
   scope :admins, -> { where(level: Levels::ADMIN) }
+  scope :banned, -> { bit_prefs_match(:is_banned, true) }
 
   scope :has_blacklisted_tag, ->(name) { where_regex(:blacklisted_tags, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "ni") }
   scope :has_private_favorites, -> { bit_prefs_match(:enable_private_favorites, true) }
