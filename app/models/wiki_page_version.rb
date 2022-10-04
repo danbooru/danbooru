@@ -37,6 +37,8 @@ class WikiPageVersion < ApplicationRecord
       title: "Renamed",
       was_deleted: "Deleted",
       was_undeleted: "Undeleted",
+      was_locked: "Locked",
+      was_unlocked: "Unlocked",
     }
   end
 
@@ -60,6 +62,24 @@ class WikiPageVersion < ApplicationRecord
       !is_deleted && other.is_deleted
     else
       is_deleted && !other.is_deleted
+    end
+  end
+
+  def was_locked(type)
+    other = send(type)
+    if type == "previous"
+      is_locked && !other.is_locked
+    else
+      !is_locked && other.is_locked
+    end
+  end
+
+  def was_unlocked(type)
+    other = send(type)
+    if type == "previous"
+      !is_locked && other.is_locked
+    else
+      is_locked && !other.is_locked
     end
   end
 
