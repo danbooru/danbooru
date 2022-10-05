@@ -43,3 +43,4 @@ exclude_patterns:
   - "tmp/"
   - "**/node_modules/"
   - "**/test/"
+  - "docs/"
