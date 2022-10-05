@@ -36,24 +36,8 @@ Rails. The memory requirement will grow as your database gets bigger.
 In production, Danbooru uses PostgreSQL 10.18, but any release later than this
 should work.
 
-## Troubleshooting
-
-If your setup is not working, here are the steps I usually recommend to people:
-
-1) Test the database. Make sure you can connect to it using `psql`. Make
-sure the tables exist. If this fails, you need to work on correctly
-installing PostgreSQL, importing the initial schema, and running the
-migrations.
-
-2) Test the Rails database connection by using `bin/rails console`. Run
-`Post.count` to make sure Rails can connect to the database. If this
-fails, you need to make sure your Danbooru configuration files are
-correct.
-
-3) Test Nginx to make sure it's working correctly.  You may need to
-debug your Nginx configuration file.
-
-4) Check all log files.
+<br>
+<br>
 
 ## Services
 
@@ -93,3 +77,8 @@ The following features are delegated to the [Reportbooru service](https://github
 ### Recommender Service
 
 Post recommendations require the [Recommender service](https://github.com/danbooru/recommender).
+
+<br>
+
+
+<!----------------------------------------------------------------------------->
