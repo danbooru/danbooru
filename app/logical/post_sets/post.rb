@@ -112,6 +112,7 @@ module PostSets
 
     # @return [Integer, nil] The number of posts returned by the search, or nil if unknown.
     def post_count
+      return 0 if artist.present? && artist.is_banned? && !current_user.is_approver?
       normalized_query.post_count
     end
 
@@ -161,7 +162,9 @@ module PostSets
 
     concerning :TagListMethods do
       def related_tags
-        if normalized_query.wildcards.one? && normalized_query.tags.none?
+        if artist.present? && artist.is_banned? && !current_user.is_approver?
+          []
+        elsif normalized_query.wildcards.one? && normalized_query.tags.none?
           wildcard_tags
         elsif normalized_query.is_metatag?(:search)
           saved_search_tags
