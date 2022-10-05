@@ -39,46 +39,7 @@ should work.
 <br>
 <br>
 
-## Services
 
-Danboou depends on a couple of cloud services and several microservices to
-implement certain features.
-
-### Amazon Web Services
-
-The following features require an Amazon AWS account:
-
-* Pool history
-* Post history
-
-### Google APIs
-
-The following features require a Google Cloud account:
-
-* BigQuery database export
-
-### IQDB Service
-
-IQDB integration is delegated to the [IQDB service](https://github.com/danbooru/iqdb).
-
-### Archive Service
-
-In order to access pool and post histories you will need to install and
-configure the [Archives service](https://github.com/danbooru/archives).
-
-### Reportbooru Service
-
-The following features are delegated to the [Reportbooru service](https://github.com/danbooru/reportbooru):
-
-* Post views
-* Missed searches report
-* Popular searches report
-
-### Recommender Service
-
-Post recommendations require the [Recommender service](https://github.com/danbooru/recommender).
-
-<br>
 
 
 <!----------------------------------------------------------------------------->
