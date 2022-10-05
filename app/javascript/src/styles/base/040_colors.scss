@@ -311,11 +311,13 @@ html, body[data-current-user-theme="light"] {
   --general-tag-hover-color: var(--link-hover-color);
   --meta-tag-color: var(--orange-3);
   --meta-tag-hover-color: var(--orange-2);
+  --model-tag-color: var(--grey-5);
+  --model-tag-hover-color: var(--grey-4);
 
   --user-admin-color: var(--red-5);
   --user-moderator-color: var(--character-tag-color);
   --user-builder-color: var(--copyright-tag-color);
-  --user-platinum-color: var(--grey-5);
+  --user-platinum-color: var(--model-tag-color);
   --user-gold-color: var(--meta-tag-color);
   --user-member-color: var(--general-tag-color);
   --user-restricted-color: var(--general-tag-color);
@@ -532,11 +534,13 @@ html, body[data-current-user-theme="light"] {
   --general-tag-hover-color: var(--azure-3);
   --meta-tag-color: var(--yellow-2);
   --meta-tag-hover-color: var(--yellow-1);
+  --model-tag-color: var(--grey-3);
+  --model-tag-hover-color: var(--grey-2);
 
   --user-admin-color: var(--artist-tag-color);
   --user-moderator-color: var(--character-tag-color);
   --user-builder-color: var(--copyright-tag-color);
-  --user-platinum-color: var(--grey-3);
+  --user-platinum-color: var(--model-tag-color);
   --user-gold-color: var(--meta-tag-color);
   --user-member-color: var(--general-tag-color);
   --user-restricted-color: var(--general-tag-color);

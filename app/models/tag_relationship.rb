@@ -21,7 +21,7 @@ class TagRelationship < ApplicationRecord
 
   # TagAlias.artist, TagAlias.general, TagAlias.character, TagAlias.copyright, TagAlias.meta
   # TagImplication.artist, TagImplication.general, TagImplication.character, TagImplication.copyright, TagImplication.meta
-  TagCategory.categories.each do |category|
+  TagCategory.categories.without("model").each do |category|
     scope category, -> { joins(:consequent_tag).where(consequent_tag: { category: TagCategory.mapping[category] }) }
   end
 

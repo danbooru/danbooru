@@ -62,3 +62,17 @@
     color: var(--meta-tag-hover-color);
   }
 }
+
+.tag-type-6 a, a.tag-type-6 {
+  color: var(--model-tag-color);
+  color: var(--model-tag-hover-color);
+
+  &:link, &:visited {
+    color: var(--model-tag-color);
+  }
+
+  &:hover {
+    color: var(--model-tag-hover-color);
+  }
+}
+
