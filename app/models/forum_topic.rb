@@ -9,6 +9,9 @@ class ForumTopic < ApplicationRecord
 
   MIN_LEVELS = {
     None: 0,
+    Member: User::Levels::MEMBER,
+    Gold: User::Levels::GOLD,
+    Builder: User::Levels::BUILDER,
     Moderator: User::Levels::MODERATOR,
     Admin: User::Levels::ADMIN,
   }
