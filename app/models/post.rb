@@ -1576,7 +1576,7 @@ class Post < ApplicationRecord
 
   def levelblocked?(user = CurrentUser.user)
     #!user.is_gold? && RESTRICTED_TAGS.any? { |tag| has_tag?(tag) }
-    !user.is_approver? && tag_string.match?(RESTRICTED_TAGS_REGEX)
+    !user.is_gold? && tag_string.match?(RESTRICTED_TAGS_REGEX)
   end
 
   def banblocked?(user = CurrentUser.user)
