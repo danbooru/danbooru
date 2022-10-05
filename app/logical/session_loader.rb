@@ -55,7 +55,7 @@ class SessionLoader
 
   # Sets the current user. Runs on each HTTP request. The user is set based on
   # their API key, their session cookie, or the signed user id param (used when
-  # reseting a password from an magic email link)
+  # resetting a password from an magic email link)
   #
   # Also performs post-load actions, including updating the user's last login
   # timestamp, their last used IP, their timezone, their database timeout, their
