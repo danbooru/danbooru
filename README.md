@@ -47,24 +47,6 @@ wget https://raw.githubusercontent.com/danbooru/danbooru/master/docker-compose.y
 docker-compose up
 ```
 
-## Manual Installation
-
-Follow the [INSTALL.debian](INSTALL.debian) script to install Danbooru.
-
-The INSTALL.debian script is written for Debian, but can be adapted for other
-distributions. Danbooru has been successfully installed on Debian, Ubuntu,
-Fedora, Arch, and OS X. It is recommended that you use an Ubuntu-based system
-since Ubuntu is what is used in development and production.
-
-See [here](https://github.com/danbooru/danbooru/wiki/Ubuntu-Installation-Help-Guide)
-for a guide on how set up Danbooru inside a virtual machine.
-
-For best performance, you will need at least 256MB of RAM for PostgreSQL and
-Rails. The memory requirement will grow as your database gets bigger.
-
-In production, Danbooru uses PostgreSQL 10.18, but any release later than this
-should work.
-
 <br>
 
 
