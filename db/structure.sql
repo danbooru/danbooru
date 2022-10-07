@@ -3869,6 +3869,41 @@ CREATE INDEX index_email_addresses_on_address_trgm ON public.email_addresses USI
 
 
 --
+-- Name: index_email_addresses_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_addresses_on_created_at ON public.email_addresses USING btree (created_at);
+
+
+--
+-- Name: index_email_addresses_on_is_deliverable; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_addresses_on_is_deliverable ON public.email_addresses USING btree (is_deliverable) WHERE (is_deliverable = false);
+
+
+--
+-- Name: index_email_addresses_on_is_verified; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_addresses_on_is_verified ON public.email_addresses USING btree (is_verified) WHERE (is_verified = false);
+
+
+--
+-- Name: index_email_addresses_on_lower_address_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_email_addresses_on_lower_address_unique ON public.email_addresses USING btree (lower((address)::text));
+
+
+--
+-- Name: index_email_addresses_on_normalize_address_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_email_addresses_on_normalize_address_unique ON public.email_addresses USING btree (normalized_address);
+
+
+--
 -- Name: index_email_addresses_on_normalized_address; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6749,6 +6784,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220923010905'),
 ('20220924092056'),
 ('20220925045236'),
-('20220926050108');
+('20220926050108'),
+('20221003080342');
 
 
