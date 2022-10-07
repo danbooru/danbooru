@@ -4,9 +4,9 @@
   <% if policy(@favorite_group).can_enable_privacy? %>
     <%= f.input :is_private, label: "Private", as: :boolean, hint: "Don't allow others to view this favgroup." %>
   <% elsif @favorite_group.is_private? %>
-    <%= f.input :is_private, label: "Private", as: :boolean, hint: "Don't allow others to view this favgroup. Warning: if you disable this, you can't re-enable it without ".html_safe + link_to("upgrading to Danbooru Gold", new_user_upgrade_path) + ". (".html_safe + link_to_wiki("learn more", "help:privacy_mode") + ")".html_safe %>
+    <%= f.input :is_private, label: "Private", as: :boolean, hint: "Don't allow others to view this favgroup. Warning: if you disable this, you can't re-enable it without ".html_safe + link_to("upgrading to Gold", new_user_upgrade_path) + ". (".html_safe + link_to_wiki("learn more", "help:privacy_mode") + ")".html_safe %>
   <% else %>
-    <%= f.input :is_private, label: "Private", as: :boolean, hint: link_to("Upgrade to Danbooru Gold to enable private favgroups", new_user_upgrade_path), input_html: { disabled: true } %>
+    <%= f.input :is_private, label: "Private", as: :boolean, hint: link_to("Upgrade to Gold to enable private favgroups", new_user_upgrade_path), input_html: { disabled: true } %>
   <% end %>
   <%= f.submit "Submit" %>
 <% end %>

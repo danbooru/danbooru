@@ -68,7 +68,7 @@
         <% elsif @user.enable_private_favorites? %>
           <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: "Make your favorites and upvotes private. (Warning: if you disable this, you can't re-enable it without ".html_safe + link_to("upgrading to a Gold account", new_user_upgrade_path) + " first. (".html_safe + link_to_wiki("learn more", "help:privacy_mode") + ")".html_safe, collection: { "No" => false, "Yes" => true }, include_blank: false %>
         <% else %>
-          <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: link_to("Upgrade to Danbooru Gold to enable private favorites and upvotes", new_user_upgrade_path), collection: { "No" => false, "Yes" => true }, include_blank: false %>
+          <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: link_to("Upgrade to Gold to enable private favorites and upvotes", new_user_upgrade_path), collection: { "No" => false, "Yes" => true }, include_blank: false %>
         <% end %>
         <%= f.input :disable_tagged_filenames, :as => :select, :hint => "Don't include tags in image filenames", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
         <%= f.input :disable_mobile_gestures, :as => :select, :hint => "Disable swipe left / swipe right gestures on mobile", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
