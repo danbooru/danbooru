@@ -11,8 +11,6 @@
 # * https://video.twimg.com/ext_tw_video/1496554514312269828/pu/vid/480x360/amWjOw0MmLdnPMPB.mp4?tag=12
 #
 # Profile image URLs:
-#
-# * https://pbs.twimg.com/profile_banners/780804311529906176/1475001696
 # * https://pbs.twimg.com/profile_images/1493345400929112064/lF1mY1i2_normal.jpg
 #
 # Shortened URLs:
@@ -71,6 +69,8 @@ class Source::URL::Twitter < Source::URL
     # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg
     in "twimg.com", ("media" | "tweet_video_thumb" | "ext_tw_video_thumb" | "amplify_video_thumb") => media_type, *subdirs, file
       # EBGbJe_U8AA4Ekb.jpg:small
+      @media_type = media_type
+
       @file, @file_size = file.split(":")
       @file, @file_ext = @file.split(".")
 
@@ -80,7 +80,14 @@ class Source::URL::Twitter < Source::URL
 
       # /media/EBGbJe_U8AA4Ekb.jpg
       # /ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
-      @file_path = File.join(media_type, subdirs.join("/"), "#{@file}.#{@file_ext}")
+      @file_path = File.join(@media_type, subdirs.join("/"), "#{@file}.#{@file_ext}")
+
+    # https://pbs.twimg.com/profile_banners/780804311529906176/1475001696
+    # https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/600x200
+    in "twimg.com", "profile_banners" => media_type, /^\d+$/ => user_id, /^\d+$/ => file_id, *dimensions
+      @user_id = user_id
+      @media_type = media_type
+      @file_path = "profile_banners/#{user_id}/#{file_id}/1500x500"
 
     # https://twitter.com/motty08111213
     # https://twitter.com/motty08111213/likes
@@ -102,7 +109,11 @@ class Source::URL::Twitter < Source::URL
   # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:orig
   def full_image_url
     return to_s unless @file_path.present?
-    "#{site}/#{@file_path}:orig"
+    if @media_type == "profile_banners"
+      "#{site}/#{@file_path}"
+    else
+      "#{site}/#{@file_path}:orig"
+    end
   end
 
   def page_url
