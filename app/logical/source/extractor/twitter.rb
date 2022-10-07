@@ -58,13 +58,16 @@ class Source::Extractor
     end
 
     def intent_url
-      user_id = api_response.dig(:user, :id_str)
       return nil if user_id.blank?
       "https://twitter.com/intent/user?user_id=#{user_id}"
     end
 
     def profile_urls
-      [profile_url, intent_url].compact
+      [profile_url, intent_url].compact.uniq
+    end
+
+    def user_id
+      parsed_url.user_id || parsed_referer&.user_id || api_response.dig(:user, :id_str)
     end
 
     def tag_name
@@ -72,8 +75,6 @@ class Source::Extractor
         tag_name_from_url
       elsif api_response.present?
         api_response.dig(:user, :screen_name)
-      else
-        ""
       end
     end
 

@@ -35,7 +35,7 @@ module SourceTestHelper
     should_match_source_data(strategy, arguments)
   end
 
-  def should_download_successfully(strategy, download_size = nil)
+  def should_download_successfully(strategy, download_size = nil) # XXX perhaps refactor into should_upload_successfully in order to streamline the source tests further?
     should "download successfully" do
       file = strategy.download_file!(strategy.image_urls.first)
       if download_size.present?
@@ -56,8 +56,8 @@ module SourceTestHelper
       end
     else
       should "not incorrectly extract a profile url or artist data when there's none to be found" do
-        assert_nil(strategy.profile_url)
-        assert_nil(strategy.artist_name)
+        assert_nil(strategy.profile_url.presence)
+        assert_nil(strategy.artist_name.presence)
         assert_equal([], strategy.other_names)
       end
     end
