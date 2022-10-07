@@ -65,11 +65,17 @@ class PostPreviewComponentTest < ViewComponent::TestCase
         @post = create(:post, is_banned: true)
       end
 
-      should "should be visible to Gold users" do
-        node = render_preview(@post, current_user: create(:gold_user))
+      should "should only be visible to approvers" do
+        node = render_preview(@post, current_user: create(:approver))
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
         assert_equal(@post.media_asset.variant("180x180").file_url, node.css("article img").attr("src").value)
+      end
+
+      should "should be not visible to Gold users" do
+        node = render_preview(@post, current_user: create(:gold_user))
+
+        assert_equal("", node.to_s)
       end
 
       should "not be visible to Members" do
