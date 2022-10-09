@@ -1,91 +1,25 @@
 // Source: https://github.com/pixiv/zip_player
 
-// Required for iOS <6, where Blob URLs are not available. This is slow...
-// Source: https://gist.github.com/jonleighton/958841
-function base64ArrayBuffer(arrayBuffer, off, byteLength) {
-  var base64    = '';
-  var encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-  var bytes         = new Uint8Array(arrayBuffer);
-  var byteRemainder = byteLength % 3;
-  var mainLength    = off + byteLength - byteRemainder;
-  var a, b, c, d;
-  var chunk;
-  // Main loop deals with bytes in chunks of 3
-  for (var i = off; i < mainLength; i = i + 3) {
-    // Combine the three bytes into a single integer
-    chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
-
-    // Use bitmasks to extract 6-bit segments from the triplet
-    a = (chunk & 16515072) >> 18; // 16515072 = (2^6 - 1) << 18
-    b = (chunk & 258048)   >> 12; // 258048   = (2^6 - 1) << 12
-    c = (chunk & 4032)     >>  6; // 4032     = (2^6 - 1) << 6
-    d = chunk & 63;               // 63       = 2^6 - 1
-
-    // Convert the raw binary segments to the appropriate ASCII encoding
-    base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d];
-  }
-
-  // Deal with the remaining bytes and padding
-  if (byteRemainder == 1) {
-    chunk = bytes[mainLength];
-
-    a = (chunk & 252) >> 2; // 252 = (2^6 - 1) << 2
-
-    // Set the 4 least significant bits to zero
-    b = (chunk & 3)   << 4; // 3   = 2^2 - 1
-
-    base64 += encodings[a] + encodings[b] + '==';
-  } else if (byteRemainder == 2) {
-    chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1];
-
-    a = (chunk & 64512) >> 10; // 64512 = (2^6 - 1) << 10
-    b = (chunk & 1008)  >>  4; // 1008  = (2^6 - 1) << 4
-
-    // Set the 2 least significant bits to zero
-    c = (chunk & 15)    <<  2; // 15    = 2^4 - 1
-
-    base64 += encodings[a] + encodings[b] + encodings[c] + '=';
-  }
-
-  return base64;
-}
-
-
 function ZipImagePlayer(options) {
     this.op = options;
-    this._URL = (window.URL || window.webkitURL || window.MozURL
-                 || window.MSURL);
-    this._Blob = (window.Blob || window.WebKitBlob || window.MozBlob
-                  || window.MSBlob);
-    this._BlobBuilder = (window.BlobBuilder || window.WebKitBlobBuilder
-                         || window.MozBlobBuilder || window.MSBlobBuilder);
-    this._Uint8Array = (window.Uint8Array || window.WebKitUint8Array
-                        || window.MozUint8Array || window.MSUint8Array);
-    this._DataView = (window.DataView || window.WebKitDataView
-                      || window.MozDataView || window.MSDataView);
-    this._ArrayBuffer = (window.ArrayBuffer || window.WebKitArrayBuffer
-                         || window.MozArrayBuffer || window.MSArrayBuffer);
-    this._maxLoadAhead = 0;
-    if (!this._URL) {
-        this._debugLog("No URL support! Will use slower data: URLs.");
-        // Throttle loading to avoid making playback stalling completely while
-        // loading images...
-        this._maxLoadAhead = 10;
+    if (!URL) {
+        this._error("No URL support");
     }
-    if (!this._Blob) {
+    if (!Blob) {
         this._error("No Blob support");
     }
-    if (!this._Uint8Array) {
+    if (!Uint8Array) {
         this._error("No Uint8Array support");
     }
-    if (!this._DataView) {
+    if (!DataView) {
         this._error("No DataView support");
     }
-    if (!this._ArrayBuffer) {
+    if (!ArrayBuffer) {
         this._error("No ArrayBuffer support");
     }
-    this._isSafari = Object.prototype.toString.call(
-                         window.HTMLElement).indexOf('Constructor') > 0;
+    if (!this.op.source) {
+        this._error("No source URL provided");
+    }
     this._loadingState = 0;
     this._dead = false;
     this._context = options.canvas.getContext("2d");
@@ -96,7 +30,6 @@ function ZipImagePlayer(options) {
     this._loadFrame = 0;
     this._frameImages = [];
     this._paused = false;
-    this._loadTimer = null;
     this._startLoad();
     if (this.op.autoStart) {
         this.play();
@@ -139,7 +72,7 @@ ZipImagePlayer.prototype = {
                 length = xhr.response.byteLength;
                 _this._len = length;
                 _this._buf = xhr.response;
-                _this._bytes = new _this._Uint8Array(_this._buf);
+                _this._bytes = new Uint8Array(_this._buf);
             } else {
                 if (xhr.status != 206) {
                     _this._error("Unexpected HTTP status " + xhr.status);
@@ -149,7 +82,7 @@ ZipImagePlayer.prototype = {
                                  xhr.response.byteLength +
                                  " (expected " + length + ")");
                 }
-                _this._bytes.set(new _this._Uint8Array(xhr.response), offset);
+                _this._bytes.set(new Uint8Array(xhr.response), offset);
             }
             if (callback) {
                 callback.apply(_this, [offset, length]);
@@ -161,23 +94,12 @@ ZipImagePlayer.prototype = {
         if (offset != null && length != null) {
             var end = offset + length;
             xhr.setRequestHeader("Range", "bytes=" + offset + "-" + (end - 1));
-            if (this._isSafari) {
-                // Range request caching is broken in Safari
-                // https://bugs.webkit.org/show_bug.cgi?id=82672
-                xhr.setRequestHeader("Cache-control", "no-cache");
-                xhr.setRequestHeader("If-None-Match", Math.random().toString());
-            }
         }
         /*this._debugLog("Load: " + offset + " " + length);*/
         xhr.send();
     },
     _startLoad: function() {
         var _this = this;
-        if (!this.op.source) {
-            // Unpacked mode (individiual frame URLs) - just load the frames.
-            this._loadNextFrame();
-            return;
-        }
         $.ajax({
             url: this.op.source,
             type: "HEAD"
@@ -201,8 +123,8 @@ ZipImagePlayer.prototype = {
             }
             _this._debugLog("Len: " + len);
             _this._len = len;
-            _this._buf = new _this._ArrayBuffer(len);
-            _this._bytes = new _this._Uint8Array(_this._buf);
+            _this._buf = new ArrayBuffer(len);
+            _this._bytes = new Uint8Array(_this._buf);
             var off = len - _this._trailerBytes;
             if (off < 0) {
                 off = 0;
@@ -216,7 +138,7 @@ ZipImagePlayer.prototype = {
     },
     _findCentralDirectory: function() {
         // No support for ZIP file comment
-        var dv = new this._DataView(this._buf, this._len - 22, 22);
+        var dv = new DataView(this._buf, this._len - 22, 22);
         if (dv.getUint32(0, true) != 0x06054b50) {
             this._error("End of Central Directory signature not found");
         }
@@ -233,7 +155,7 @@ ZipImagePlayer.prototype = {
         }
     },
     _readCentralDirectory: function(offset, size, count) {
-        var dv = new this._DataView(this._buf, offset, size);
+        var dv = new DataView(this._buf, offset, size);
         var p = 0;
         for (var i = 0; i < count; i++ ) {
             if (dv.getUint32(p, true) != 0x02014b50) {
@@ -248,15 +170,7 @@ ZipImagePlayer.prototype = {
             if (compMethod != 0) {
                 this._error("Unsupported compression method");
             }
-            p += 46;
-            var nameView = new this._Uint8Array(this._buf, offset + p, nameLen);
-            var name = "";
-            for (var j = 0; j < nameLen; j++) {
-                name += String.fromCharCode(nameView[j]);
-            }
-            p += nameLen + extraLen + cmtLen;
-            /*this._debugLog("File: " + name + " (" + uncompSize +
-                           " bytes @ " + off + ")");*/
+            p += 46 + nameLen + extraLen + cmtLen;
             this._files[i] = {off: off, len: uncompSize};
         }
         // Two outstanding fetches at any given time.
@@ -294,9 +208,7 @@ ZipImagePlayer.prototype = {
                 /*this._debugLog("New pHead: " + this._pHead);*/
                 $(this).triggerHandler("loadProgress",
                                        [this._pHead / this._len]);
-                if (!this._loadTimer) {
-                    this._loadNextFrame();
-                }
+                this._loadNextFrame();
             } else {
                 this._pNextHead = off + len;
             }
@@ -327,57 +239,24 @@ ZipImagePlayer.prototype = {
         if (frame >= this._frameCount) {
             return;
         }
-        if (!this.op.source) {
-            // Unpacked mode (individiual frame URLs)
-            this._loadFrame += 1;
-            this._loadImage(frame, frame, false);
-            return;
-        }
         if (!this._isFileAvailable(frame)) {
             return;
         }
         this._loadFrame += 1;
         var off = this._fileDataStart(this._files[frame].off);
         var end = off + this._files[frame].len;
-        var url;
-        var mime_type = this.op.metadata.mime_type || "image/png";
-        if (this._URL) {
-            var slice;
-            if (!this._buf.slice) {
-                slice = new this._ArrayBuffer(this._files[frame].len);
-                var view = new this._Uint8Array(slice);
-                view.set(this._bytes.subarray(off, end));
-            } else {
-                slice = this._buf.slice(off, end);
-            }
-            var blob;
-            try {
-                blob = new this._Blob([slice], {type: mime_type});
-            }
-            catch (err) {
-                this._debugLog("Blob constructor failed. Trying BlobBuilder..."
-                               + " (" + err.message + ")");
-                var bb = new this._BlobBuilder();
-                bb.append(slice);
-                blob = bb.getBlob();
-            }
-            /*_this._debugLog("Loading " + meta.file + " to frame " + frame);*/
-            url = this._URL.createObjectURL(blob);
-            this._loadImage(frame, url, true);
-        } else {
-            url = ("data:" + mime_type + ";base64,"
-                   + base64ArrayBuffer(this._buf, off, end - off));
-            this._loadImage(frame, url, false);
-        }
+        var slice = this._buf.slice(off, end);
+        var blob = new Blob([slice]);
+        /*_this._debugLog("Loading " + meta.file + " to frame " + frame);*/
+        var url = URL.createObjectURL(blob);
+        this._loadImage(frame, url);
     },
-    _loadImage: function(frame, url, isBlob) {
+    _loadImage: function(frame, url) {
         var _this = this;
         var image = new Image();
         image.addEventListener('load', function() {
             _this._debugLog(`Loaded frame ${frame}`);
-            if (isBlob) {
-                _this._URL.revokeObjectURL(url);
-            }
+            URL.revokeObjectURL(url);
             if (_this._dead) {
                 return;
             }
@@ -391,15 +270,7 @@ ZipImagePlayer.prototype = {
                 _this._buf = null;
                 _this._bytes = null;
             } else {
-                if (!_this._maxLoadAhead ||
-                    (frame - _this._frame) < _this._maxLoadAhead) {
-                    _this._loadNextFrame();
-                } else if (!_this._loadTimer) {
-                    _this._loadTimer = setTimeout(function() {
-                        _this._loadTimer = null;
-                        _this._loadNextFrame();
-                    }, 200);
-                }
+                _this._loadNextFrame();
             }
         });
         image.src = url;
@@ -496,28 +367,11 @@ ZipImagePlayer.prototype = {
         if (this._timer) {
             clearTimeout(this._timer);
         }
-        if (this._loadTimer) {
-            clearTimeout(this._loadTimer);
-        }
         this._frameImages = null;
         this._buf = null;
         this._bytes = null;
         $(this).triggerHandler("stop");
     },
-    getCurrentFrame: function() {
-        return this._frame;
-    },
-    getLoadedFrames: function() {
-        return this._frameImages.length;
-    },
-    getFrameCount: function() {
-        return this._frameCount;
-    },
-    hasError: function() {
-        return this._failed;
-    }
 }
-
-// added
 
 export { ZipImagePlayer };
