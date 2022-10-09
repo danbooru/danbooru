@@ -89,7 +89,7 @@ function ZipImagePlayer(options) {
     this._loadingState = 0;
     this._dead = false;
     this._context = options.canvas.getContext("2d");
-    this._files = {};
+    this._files = [];
     this._frameCount = this.op.metadata.frames.length;
     this._debugLog("Frame count: " + this._frameCount);
     this._frame = 0;
@@ -257,7 +257,7 @@ ZipImagePlayer.prototype = {
             p += nameLen + extraLen + cmtLen;
             /*this._debugLog("File: " + name + " (" + uncompSize +
                            " bytes @ " + off + ")");*/
-            this._files[name] = {off: off, len: uncompSize};
+            this._files[i] = {off: off, len: uncompSize};
         }
         // Two outstanding fetches at any given time.
         // Note: the implementation does not support more than two.
@@ -309,10 +309,10 @@ ZipImagePlayer.prototype = {
         var extraLen = dv.getUint16(28, true);
         return offset + 30 + nameLen + extraLen;
     },
-    _isFileAvailable: function(name) {
-        var info = this._files[name];
+    _isFileAvailable: function(index) {
+        var info = this._files[index];
         if (!info) {
-            this._error("File " + name + " not found in ZIP");
+            this._error("File " + index + " not found in ZIP");
         }
         if (this._pHead < (info.off + 30)) {
             return false;
@@ -327,25 +327,24 @@ ZipImagePlayer.prototype = {
         if (frame >= this._frameCount) {
             return;
         }
-        var meta = this.op.metadata.frames[frame];
         if (!this.op.source) {
             // Unpacked mode (individiual frame URLs)
             this._loadFrame += 1;
-            this._loadImage(frame, meta.file, false);
+            this._loadImage(frame, frame, false);
             return;
         }
-        if (!this._isFileAvailable(meta.file)) {
+        if (!this._isFileAvailable(frame)) {
             return;
         }
         this._loadFrame += 1;
-        var off = this._fileDataStart(this._files[meta.file].off);
-        var end = off + this._files[meta.file].len;
+        var off = this._fileDataStart(this._files[frame].off);
+        var end = off + this._files[frame].len;
         var url;
         var mime_type = this.op.metadata.mime_type || "image/png";
         if (this._URL) {
             var slice;
             if (!this._buf.slice) {
-                slice = new this._ArrayBuffer(this._files[meta.file].len);
+                slice = new this._ArrayBuffer(this._files[frame].len);
                 var view = new this._Uint8Array(slice);
                 view.set(this._bytes.subarray(off, end));
             } else {
@@ -374,9 +373,8 @@ ZipImagePlayer.prototype = {
     _loadImage: function(frame, url, isBlob) {
         var _this = this;
         var image = new Image();
-        var meta = this.op.metadata.frames[frame];
         image.addEventListener('load', function() {
-            _this._debugLog("Loaded " + meta.file + " to frame " + frame);
+            _this._debugLog(`Loaded frame ${frame}`);
             if (isBlob) {
                 _this._URL.revokeObjectURL(url);
             }
@@ -417,8 +415,8 @@ ZipImagePlayer.prototype = {
             return;
         }
         var _this = this;
-        var meta = this.op.metadata.frames[this._frame];
-        this._debugLog("Displaying frame: " + this._frame + " " + meta.file);
+        var delay = this.op.metadata.frames[this._frame];
+        this._debugLog("Displaying frame: " + this._frame);
         var image = this._frameImages[this._frame];
         if (!image) {
             this._debugLog("Image not available!");
@@ -444,7 +442,7 @@ ZipImagePlayer.prototype = {
             this._timer = setTimeout(function() {
                 _this._timer = null;
                 _this._nextFrame.apply(_this);
-            }, meta.delay);
+            }, delay);
         }
     },
     _nextFrame: function(frame) {

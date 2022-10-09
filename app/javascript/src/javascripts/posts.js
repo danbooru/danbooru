@@ -391,11 +391,10 @@ Post.initialize_post_sections = function() {
 
 Post.initialize_ugoira_player = function() {
   if ($("#ugoira-controls").length) {
-    let content_type = $("#image").data("ugoira-content-type");
-    let frames = $("#image").data("ugoira-frames");
+    let frame_delays = $("#image").data("ugoira-frame-delays");
     let file_url = $(".image-container").data("file-url");
 
-    Ugoira.create_player(content_type, frames, file_url);
+    Ugoira.create_player(frame_delays, file_url);
     $(window).on("resize.danbooru.ugoira_scale", Post.resize_ugoira_controls);
   }
 };

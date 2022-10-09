@@ -16,6 +16,10 @@ class PixivUgoiraFrameData < ApplicationRecord
     q.apply_default_order(params)
   end
 
+  def frame_delays
+    data.pluck("delay")
+  end
+
   def normalize_data
     return if data.nil?
 
