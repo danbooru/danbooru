@@ -7,7 +7,7 @@
   </div>
 <% end %>
 
-<% if presenter.has_favorites? && policy(user).can_see_favorites? %>
+<% if presenter.has_favorites? %>
   <div class="user-favorites recent-posts">
     <h2 class="recent-posts-header">
       <%= link_to "Favorites", posts_path(tags: "ordfav:#{user.name}") %>

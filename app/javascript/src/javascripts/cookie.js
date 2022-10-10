@@ -45,14 +45,4 @@ Cookie.unescape = function(val) {
   return decodeURIComponent(val.replace(/\+/g, " "));
 }
 
-Cookie.initialize = function() {
-  if (this.get("hide-upgrade-account") !== "1") {
-    $("#upgrade-account").show();
-  }
-}
-
-$(function() {
-  Cookie.initialize();
-});
-
 export default Cookie

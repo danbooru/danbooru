@@ -29,7 +29,7 @@ class User < ApplicationRecord
     _unused_always_resize_images
     _unused_enable_post_navigation
     new_post_navigation_layout
-    enable_private_favorites
+    _unused_enable_private_favorites
     _unused_enable_sequential_post_navigation
     _unused_hide_deleted_posts
     _unused_style_usernames
@@ -102,7 +102,6 @@ class User < ApplicationRecord
   validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE) }
   validates :password, confirmation: true
   validates :comment_threshold, inclusion: { in: (-100..5) }
-  validate  :validate_enable_private_favorites, on: :update
   validate  :validate_custom_css, if: :custom_style_changed?
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_owner_if_first_user
@@ -128,8 +127,6 @@ class User < ApplicationRecord
   has_many :post_votes
   has_many :post_versions, foreign_key: :updater_id
   has_many :bans, -> {order("bans.id desc")}
-  has_many :received_upgrades, class_name: "UserUpgrade", foreign_key: :recipient_id, dependent: :destroy
-  has_many :purchased_upgrades, class_name: "UserUpgrade", foreign_key: :purchaser_id, dependent: :destroy
   has_many :user_events, dependent: :destroy
   has_one :active_ban, -> { active }, class_name: "Ban"
   has_one :email_address, dependent: :destroy
@@ -156,8 +153,6 @@ class User < ApplicationRecord
   scope :banned, -> { bit_prefs_match(:is_banned, true) }
 
   scope :has_blacklisted_tag, ->(name) { where_regex(:blacklisted_tags, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "ni") }
-  scope :has_private_favorites, -> { bit_prefs_match(:enable_private_favorites, true) }
-  scope :has_public_favorites,  -> { bit_prefs_match(:enable_private_favorites, false) }
 
   deletable
 
@@ -199,12 +194,6 @@ class User < ApplicationRecord
   end
 
   concerning :ValidationMethods do
-    def validate_enable_private_favorites
-      if enable_private_favorites_was == false && enable_private_favorites == true && !Pundit.policy!(self, self).can_enable_private_favorites?
-        errors.add(:base, "Can't enable privacy mode without a Gold account")
-      end
-    end
-
     def name_errors
       User.validators_on(:name).each do |validator|
         validator.validate_each(self, :name, name)
@@ -429,7 +418,7 @@ class User < ApplicationRecord
         elsif level == User::Levels::GOLD
           6
         else
-          2
+          4
         end
       end
 

@@ -352,7 +352,7 @@ module Danbooru
       nil
     end
 
-    # Tags that are only visible to Gold+ users.
+    # Tags that are only visible to Approver+ users.
     def restricted_tags
       []
     end
@@ -450,11 +450,6 @@ module Danbooru
       resolution_mismatch source_larger source_smaller ai-generated]
     end
 
-    # Whether the Gold account upgrade page should be enabled.
-    def user_upgrades_enabled?
-      true
-    end
-
     # Whether to enable API rate limits.
     def rate_limits_enabled?
       true
@@ -472,64 +467,6 @@ module Danbooru
 
     # Whether to enable autocomplete.
     def autocomplete_enabled?
-      true
-    end
-
-    # The URL of the Shopify checkout page where account upgrades are sold.
-    def shopify_checkout_url
-    end
-
-    # The secret used to verify webhooks from Shopify. Get it from the https://xxx.myshopify.com/admin/settings/notifications page.
-    def shopify_webhook_secret
-    end
-
-    def stripe_secret_key
-    end
-
-    def stripe_publishable_key
-    end
-
-    def stripe_webhook_secret
-    end
-
-    def stripe_gold_usd_price_id
-    end
-
-    def stripe_platinum_usd_price_id
-    end
-
-    def stripe_gold_to_platinum_usd_price_id
-    end
-
-    def stripe_gold_eur_price_id
-    end
-
-    def stripe_platinum_eur_price_id
-    end
-
-    def stripe_gold_to_platinum_eur_price_id
-    end
-
-    def stripe_promotion_discount_id
-    end
-
-    # The login ID for Authorize.net. Used for accepting payments for user upgrades.
-    # Signup for a test account at https://developer.authorize.net/hello_world/sandbox.html.
-    def authorize_net_login_id
-    end
-
-    # The transaction key for Authorize.net. This is the API secret for API calls.
-    def authorize_net_transaction_key
-    end
-
-    # The signature key for Authorize.net. Used for verifying webhooks sent by Authorize.net.
-    # Generate at Account > Settings > Security Settings > General Security Settings > API Credentials and Keys
-    def authorize_net_signature_key
-    end
-
-    # Whether to use the test environment or the live environment for Authorize.net. The test environment
-    # allows testing payments without using real credit cards.
-    def authorize_net_test_mode
       true
     end
 

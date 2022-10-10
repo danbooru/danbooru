@@ -11,7 +11,6 @@ gem "sanitize"
 gem 'ruby-vips'
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
-gem 'stripe'
 gem 'aws-sdk-sqs', '~> 1'
 gem 'responders'
 gem 'dtext_rb', git: "https://github.com/danbooru/dtext_rb.git"

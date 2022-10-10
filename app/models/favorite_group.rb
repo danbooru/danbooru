@@ -11,12 +11,8 @@ class FavoriteGroup < ApplicationRecord
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
   validate :validate_posts
-  validate :validate_can_enable_privacy
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
-
-  scope :is_public, -> { where(is_public: true) }
-  scope :is_private, -> { where(is_public: false) }
 
   module SearchMethods
     def for_post(post_id)
@@ -29,18 +25,8 @@ class FavoriteGroup < ApplicationRecord
       where_ilike(:name, name)
     end
 
-    def visible(user)
-      if user.is_owner?
-        all
-      elsif user.is_anonymous?
-        is_public
-      else
-        is_public.or(where(creator: user))
-      end
-    end
-
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :name, :is_public, :post_ids, :creator], current_user: current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :name, :post_ids, :creator], current_user: current_user)
 
       if params[:name_contains].present?
         q = q.name_contains(params[:name_contains])
@@ -67,11 +53,7 @@ class FavoriteGroup < ApplicationRecord
 
   def creator_can_create_favorite_groups
     if creator.favorite_groups.count >= creator.favorite_group_limit
-      error = "You can only keep up to #{creator.favorite_group_limit} favorite groups."
-      if !creator.is_gold?
-        error += " Upgrade your account to create more."
-      end
-      errors.add(:base, error)
+      errors.add(:base, "You can only keep up to #{creator.favorite_group_limit} favorite groups.")
     end
   end
 
@@ -93,12 +75,6 @@ class FavoriteGroup < ApplicationRecord
     duplicate_post_ids = post_ids.group_by(&:itself).transform_values(&:size).select { |_id, count| count > 1 }.keys
     if duplicate_post_ids.present?
       errors.add(:base, "Favgroup already contains post #{duplicate_post_ids.to_sentence}")
-    end
-  end
-
-  def validate_can_enable_privacy
-    if is_public_change == [true, false] && !Pundit.policy!(creator, self).can_enable_privacy?
-      errors.add(:base, "Can't enable privacy without a Gold account")
     end
   end
 
@@ -202,18 +178,6 @@ class FavoriteGroup < ApplicationRecord
 
   def contains?(post_id)
     post_ids.include?(post_id)
-  end
-
-  def is_private=(value)
-    self.is_public = !ActiveModel::Type::Boolean.new.cast(value)
-  end
-
-  def is_private
-    !is_public?
-  end
-
-  def is_private?
-    !is_public?
   end
 
   def self.available_includes

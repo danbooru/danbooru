@@ -246,10 +246,8 @@ class PostQuery
 
         if user.nil?
           0
-        elsif Pundit.policy!(current_user, user).can_see_favorites?
-          user.favorite_count
         else
-          nil
+          user.favorite_count
         end
       end
     end

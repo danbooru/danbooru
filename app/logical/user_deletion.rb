@@ -65,17 +65,9 @@ class UserDeletion
     user.api_keys.destroy_all
     user.forum_topic_visits.destroy_all
     user.saved_searches.destroy_all
-    user.favorite_groups.is_private.destroy_all
 
     user.post_votes.active.negative.find_each do |vote|
       vote.soft_delete!(updater: user)
-    end
-
-    if user.enable_private_favorites
-      user.favorites.destroy_all
-      user.post_votes.active.positive.find_each do |vote|
-        vote.soft_delete!(updater: user)
-      end
     end
   end
 

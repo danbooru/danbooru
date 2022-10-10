@@ -486,7 +486,6 @@ GEM
       tilt (~> 2.0)
       yard (~> 0.9, >= 0.9.24)
     stackprof (0.2.23)
-    stripe (8.2.0)
     thor (1.2.1)
     tilt (2.0.11)
     timeout (0.3.1)
@@ -597,7 +596,6 @@ DEPENDENCIES
   simplecov
   solargraph
   stackprof
-  stripe
   tzinfo-data
   view_component
 

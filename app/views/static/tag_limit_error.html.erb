@@ -4,10 +4,6 @@
 
 <p>
   <%= @message %>
-
-  <% unless CurrentUser.is_gold? %>
-    <%= link_to "Upgrade your account", new_user_upgrade_path  %> to search for more tags at once.
-  <% end %>
 </p>
 
 <%= link_to "Go back", :back, rel: "prev" %>

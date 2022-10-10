@@ -51,7 +51,7 @@
           <% when "Dmail" %>
             <%= link_to_user user %> sent a dmail to <%= link_to_user model.to %> (<%= link_to model.title.strip, model %>).
           <% when "FavoriteGroup" %>
-            <%= link_to_user user %> create <%= model.is_public? ? "public" : "private" %> favgroup <%= link_to model.pretty_name, model %>.
+            <%= link_to_user user %> created favgroup <%= link_to model.pretty_name, model %>.
           <% when "ForumPost" %>
             <%= link_to_user user %> <%= link_to "posted", model %> in topic <%= link_to model.topic.title.chomp(".").strip, model.topic %>.
           <% when "ForumTopic" %>
@@ -136,12 +136,6 @@
             <% end %>
           <% when "UserNameChangeRequest" %>
             <%= link_to_user model.user %> <%= link_to "changed their name", model %> from <%= model.original_name %> to <%= model.desired_name %>.
-          <% when "UserUpgrade" %>
-            <% if model.complete? %>
-              <%= link_to_user model.purchaser %> <%= link_to "upgraded", model %> <%= link_to_user model.recipient if model.is_gift? %> to <%= model.level_string %>.
-            <% elsif model.refunded? %>
-              <%= link_to_user model.purchaser %> <%= link_to "upgraded", model %> <%= link_to_user model.recipient if model.is_gift? %> to <%= model.level_string %> (refunded).
-            <% end %>
           <% end %>
         <% end %>
 

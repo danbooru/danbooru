@@ -33,6 +33,8 @@ class PostsController < ApplicationController
     raise PageRemovedError if request.format.html? && @post.banblocked?(CurrentUser.user)
 
     if request.format.html?
+      raise ActiveRecord::RecordNotFound if @post.levelblocked?
+
       include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
       @sibling_posts = @post.parent.present? ? @post.parent.children : Post.none
       @sibling_posts = @sibling_posts.undeleted unless include_deleted

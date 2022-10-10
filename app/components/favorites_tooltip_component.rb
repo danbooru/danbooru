@@ -15,10 +15,6 @@ class FavoritesTooltipComponent < ApplicationComponent
   end
 
   def favoriter_name(favorite)
-    if policy(favorite).can_see_favoriter?
-      link_to_user(favorite.user)
-    else
-      tag.i("hidden")
-    end
+    link_to_user(favorite.user)
   end
 end

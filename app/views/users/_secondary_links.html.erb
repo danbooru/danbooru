@@ -12,15 +12,8 @@
       <%= subnav_link_to "Profile", profile_path %>
       <%= subnav_link_to "Settings", settings_path %>
       <%= subnav_link_to "Messages #{unread_dmail_indicator(CurrentUser.user)}", dmails_path(search: { folder: "received" }) %>
-
-      <% if !@user.is_gold? %>
-        <%= subnav_link_to "Upgrade", new_user_upgrade_path %>
-      <% end %>
     <% else %>
       <%= subnav_link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %>
-      <% if !@user.is_gold? %>
-        <%= subnav_link_to "Gift upgrade", new_user_upgrade_path(:user_id => @user.id) %>
-      <% end %>
     <% end %>
 
     <% if policy(CurrentUser.user).promote? %>

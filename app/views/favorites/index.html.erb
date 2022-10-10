@@ -31,12 +31,8 @@
 
       <% if @user.nil? %>
         <% t.column "Favoriter" do |favorite| %>
-          <% if policy(favorite).can_see_favoriter? %>
-            <%= link_to_user favorite.user %>
-            <%= link_to "»", favorites_path(search: { user_name: favorite.user.name }) %>
-          <% else %>
-            <i>hidden</i>
-          <% end %>
+          <%= link_to_user favorite.user %>
+          <%= link_to "»", favorites_path(search: { user_name: favorite.user.name }) %>
         <% end %>
       <% end %>
     <% end %>

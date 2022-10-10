@@ -44,14 +44,6 @@
         <% end %>
       <% end %>
 
-      <% if !@user.is_gold? %>
-        <% menu.item do %>
-          <%= link_to new_user_upgrade_path(user_id: @user.id) do %>
-            <%= gift_icon %> Gift Upgrade
-          <% end %>
-        <% end %>
-      <% end %>
-
       <% if policy(UserFeedback.new(user: @user)).create? %>
         <% menu.item do %>
           <%= link_to new_user_feedback_path(user_feedback: { user_id: @user.id }) do %>

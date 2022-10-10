@@ -15,7 +15,7 @@ class UserAction < ApplicationRecord
     CommentVote Dmail FavoriteGroup ForumPost ForumPostVote ForumTopic
     ModAction ModerationReport NoteVersion Post PostAppeal PostApproval
     PostDisapproval PostFlag PostReplacement PostVote SavedSearch TagAlias
-    TagImplication TagVersion Upload User UserEvent UserFeedback UserUpgrade
+    TagImplication TagVersion Upload User UserEvent UserFeedback
     UserNameChangeRequest WikiPageVersion AIMetadataVersion]
   end
 
@@ -82,9 +82,7 @@ class UserAction < ApplicationRecord
       (#{UserFeedback.visible(user).select("'UserFeedback', id, creator_id, 'create', created_at").to_sql})
     UNION ALL
       (#{UserFeedback.visible(user).select("'UserFeedback', id, user_id, 'subject', created_at").to_sql})
-    UNION ALL (
-      (#{UserUpgrade.visible(user).select("'UserUpgrade', id, purchaser_id, 'create', created_at").where(status: [:complete, :refunded]).order(created_at: :desc).to_sql})
-    ) UNION ALL
+    UNION ALL
       (#{UserNameChangeRequest.visible(user).select("'UserNameChangeRequest', id, user_id, 'create', created_at").to_sql})
     UNION ALL
       (#{WikiPageVersion.visible(user).select("'WikiPageVersion', id, updater_id, 'create', created_at").to_sql})
