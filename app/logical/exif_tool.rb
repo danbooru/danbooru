@@ -80,6 +80,11 @@ class ExifTool
       loop_count.in?(0..10)
     end
 
+    # https://danbooru.donmai.us/media_assets?search[metadata][PNG:Software]=NovelAI
+    def is_ai_generated?
+      metadata["PNG:Software"] == "NovelAI"
+    end
+
     # @see http://www.vurdalakov.net/misc/gif/netscape-looping-application-extension
     # @see https://wiki.mozilla.org/APNG_Specification#.60acTL.60:_The_Animation_Control_Chunk
     # @see https://danbooru.donmai.us/posts?tags=-exif:GIF:AnimationIterations=Infinite+animated_gif

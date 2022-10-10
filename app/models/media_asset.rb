@@ -24,7 +24,7 @@ class MediaAsset < ApplicationRecord
   has_many :ai_tags
 
   delegate :metadata, to: :media_metadata
-  delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, to: :metadata
+  delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, :is_ai_generated?, to: :metadata
 
   scope :public_only, -> { where(is_public: true) }
   scope :private_only, -> { where(is_public: false) }
