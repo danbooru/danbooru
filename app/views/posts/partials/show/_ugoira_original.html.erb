@@ -5,7 +5,7 @@
   :class => "fit-width",
   :width => post.image_width,
   :height => post.image_height,
-  "data-ugoira-frame-delays" => post.pixiv_ugoira_frame_data.frame_delays.to_json,
+  "data-ugoira-frame-delays" => post.media_metadata.metadata["Ugoira:FrameDelays"].to_json,
 ) %>
 
 <div id="ugoira-controls">
