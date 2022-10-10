@@ -80,9 +80,15 @@ class ExifTool
       loop_count.in?(0..10)
     end
 
-    # https://danbooru.donmai.us/media_assets?search[metadata][PNG:Software]=NovelAI
+    # https://danbooru.donmai.us/posts?tags=exif:PNG:Software=NovelAI
+    # https://danbooru.donmai.us/posts?tags=exif:PNG:Parameters
+    # https://danbooru.donmai.us/posts?tags=exif:PNG:Sd-metadata
+    # https://danbooru.donmai.us/posts?tags=exif:PNG:Dream
     def is_ai_generated?
-      metadata["PNG:Software"] == "NovelAI"
+      metadata["PNG:Software"] == "NovelAI" ||
+        metadata.has_key?("PNG:Parameters") ||
+        metadata.has_key?("PNG:Sd-metadata") ||
+        metadata.has_key?("PNG:Dream")
     end
 
     # @see http://www.vurdalakov.net/misc/gif/netscape-looping-application-extension
