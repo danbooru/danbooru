@@ -191,11 +191,9 @@ module Searchable
   # https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-DOCUMENTS
   # https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
   def where_tsvector_matches(columns, query)
-    tsvectors = Array.wrap(columns).map do |column|
-      to_tsvector("pg_catalog.english", arel_table[column])
-    end.reduce(:concat)
-
-    where("(#{tsvectors.to_sql}) @@ websearch_to_tsquery('pg_catalog.english', :query)", query: query)
+    Array.wrap(columns).map do |column|
+      where("(#{to_tsvector('english', arel_table[column]).to_sql}) @@ websearch_to_tsquery('pg_catalog.english', :query)", query: query)
+    end.reduce(:or)
   end
 
   # value: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
