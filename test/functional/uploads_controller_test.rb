@@ -287,6 +287,14 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "uploading a ugoira" do
+        should "work" do
+          upload = assert_successful_upload("https://www.pixiv.net/en/artworks/45982180", user: @user)
+
+          assert_equal([60] * 70, upload.media_assets.first.metadata["Ugoira:FrameDelays"])
+        end
+      end
+
       context "uploading a file from a source" do
         should_upload_successfully("https://www.artstation.com/artwork/04XA4")
         should_upload_successfully("https://dantewontdie.artstation.com/projects/YZK5q")

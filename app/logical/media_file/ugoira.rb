@@ -22,6 +22,10 @@ class MediaFile::Ugoira < MediaFile
     preview_frame.close
   end
 
+  def metadata
+    super.merge("Ugoira:FrameDelays" => frame_delays)
+  end
+
   def dimensions
     preview_frame.dimensions
   end
