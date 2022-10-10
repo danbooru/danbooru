@@ -17,13 +17,12 @@ class MediaAsset < ApplicationRecord
 
   has_one :post, foreign_key: :md5, primary_key: :md5
   has_one :media_metadata, dependent: :destroy
-  has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
   has_many :upload_media_assets, dependent: :destroy
   has_many :uploads, through: :upload_media_assets
   has_many :uploaders, through: :uploads, class_name: "User", foreign_key: :uploader_id
   has_many :ai_tags
 
-  delegate :metadata, to: :media_metadata
+  delegate :frame_delays, :metadata, to: :media_metadata
   delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, :is_ai_generated?, to: :metadata
 
   scope :public_only, -> { where(is_public: true) }
@@ -81,8 +80,8 @@ class MediaAsset < ApplicationRecord
 
     def open_file
       file = storage_service.open(file_path)
-      frame_data = media_asset.pixiv_ugoira_frame_data&.data if media_asset.is_ugoira?
-      MediaFile.open(file, frame_data: frame_data, strict: false)
+      frame_delays = media_asset.frame_delays if media_asset.is_ugoira?
+      MediaFile.open(file, frame_delays: frame_delays, strict: false)
     end
 
     def convert_file(media_file)
@@ -252,7 +251,6 @@ class MediaAsset < ApplicationRecord
         # XXX should do this in parallel with thumbnail generation.
         # XXX shouldn't generate thumbnail twice (very slow for ugoira)
         media_asset.update!(ai_tags: media_file.preview(360, 360).ai_tags)
-        media_asset.update!(pixiv_ugoira_frame_data: PixivUgoiraFrameData.new(data: media_file.frame_data, content_type: "image/jpeg")) if media_asset.is_ugoira?
         media_asset.update!(media_metadata: MediaMetadata.new(file: media_file))
 
         media_asset.distribute_files!(media_file)
@@ -423,6 +421,6 @@ class MediaAsset < ApplicationRecord
   end
 
   def self.available_includes
-    %i[post media_metadata pixiv_ugoira_frame_data ai_tags]
+    %i[post media_metadata ai_tags]
   end
 end

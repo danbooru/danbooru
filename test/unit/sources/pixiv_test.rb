@@ -46,8 +46,7 @@ module Sources
         should "capture the frame data" do
           media_file = @site.download_file!(@site.image_urls.sole)
 
-          assert_equal(2, media_file.frame_data.size)
-          assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], media_file.frame_data)
+          assert_equal([125, 125], media_file.frame_delays)
         end
       end
 

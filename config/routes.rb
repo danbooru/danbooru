@@ -164,7 +164,6 @@ Rails.application.routes.draw do
   resources :note_versions, :only => [:index, :show]
   resource :note_previews, only: [:create, :show]
   resource :password_reset, only: [:create, :show]
-  resources :pixiv_ugoira_frame_data, only: [:index]
   resources :pools do
     member do
       put :revert

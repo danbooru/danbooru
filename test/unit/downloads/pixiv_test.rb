@@ -122,8 +122,7 @@ module Downloads
         @strategy = Source::Extractor.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
         media_file = @strategy.download_file!(@strategy.image_urls.sole)
 
-        assert_equal(2, media_file.frame_data.size)
-        assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], media_file.frame_data)
+        assert_equal([125, 125], media_file.frame_delays)
       end
     end
   end

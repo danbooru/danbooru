@@ -9,11 +9,11 @@
 # zip file, so it must be passed around separately.
 class MediaFile::Ugoira < MediaFile
   class Error < StandardError; end
-  attr_accessor :frame_data
+  attr_accessor :frame_delays
 
-  def initialize(file, frame_data: {}, **options)
+  def initialize(file, frame_delays: [], **options)
     super(file, **options)
-    @frame_data = frame_data
+    @frame_delays = frame_delays
   end
 
   def close
@@ -39,22 +39,18 @@ class MediaFile::Ugoira < MediaFile
   end
 
   def frame_count
-    frame_data.count
+    frame_delays.count
   end
 
   def frame_rate
     frame_count / duration
   end
 
-  def frame_delays
-    frame_data.map { |frame| frame["delay"] }
-  end
-
   # Convert a ugoira to a webm.
   # XXX should take width and height and resize image
   def convert
     raise NotImplementedError, "can't convert ugoira to webm: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?
-    raise RuntimeError, "can't convert ugoira to webm: no ugoira frame data was provided" unless frame_data.present?
+    raise RuntimeError, "can't convert ugoira to webm: no ugoira frame data was provided" unless frame_delays.present?
 
     Dir.mktmpdir("ugoira-#{md5}") do |tmpdir|
       output_file = Tempfile.new(["ugoira-conversion", ".webm"], binmode: true)
@@ -80,9 +76,9 @@ class MediaFile::Ugoira < MediaFile
       timecodes_path = File.join(tmpdir, "timecodes.tc")
       File.open(timecodes_path, "w+") do |f|
         f.write("# timecode format v2\n")
-        frame_data.each do |img|
+        frame_delays.each do |delay|
           f.write("#{delay_sum}\n")
-          delay_sum += (img["delay"] || img["delay_msec"])
+          delay_sum += delay
         end
         f.write("#{delay_sum}\n")
         f.write("#{delay_sum}\n")

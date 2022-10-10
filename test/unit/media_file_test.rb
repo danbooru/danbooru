@@ -33,8 +33,8 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "determine the correct dimensions for a ugoira file" do
       skip unless MediaFile.videos_enabled?
-      frame_data = JSON.parse(File.read("test/files/ugoira.json"))
-      assert_equal([60, 60], MediaFile.open("test/files/ugoira.zip", frame_data: frame_data).dimensions)
+      frame_delays = JSON.parse(File.read("test/files/ugoira.json")).pluck("delay")
+      assert_equal([60, 60], MediaFile.open("test/files/ugoira.zip", frame_delays: frame_delays).dimensions)
     end
 
     should "determine the correct dimensions for a flash file" do
@@ -58,8 +58,8 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([512, 512], mf.dimensions)
       assert_equal([512, 512], mf.dimensions)
 
-      frame_data = JSON.parse(File.read("test/files/ugoira.json"))
-      mf = MediaFile.open("test/files/ugoira.zip", frame_data: frame_data)
+      frame_delays = JSON.parse(File.read("test/files/ugoira.json")).pluck("delay")
+      mf = MediaFile.open("test/files/ugoira.zip", frame_delays: frame_delays)
       assert_equal([60, 60], mf.dimensions)
       assert_equal([60, 60], mf.dimensions)
     end
@@ -151,8 +151,8 @@ class MediaFileTest < ActiveSupport::TestCase
   context "for a ugoira" do
     setup do
       skip unless MediaFile::Ugoira.videos_enabled?
-      frame_data = JSON.parse(File.read("test/files/ugoira.json"))
-      @ugoira = MediaFile.open("test/files/ugoira.zip", frame_data: frame_data)
+      frame_delays = JSON.parse(File.read("test/files/ugoira.json")).pluck("delay")
+      @ugoira = MediaFile.open("test/files/ugoira.zip", frame_delays: frame_delays)
     end
 
     should "generate a preview" do

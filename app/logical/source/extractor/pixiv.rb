@@ -115,9 +115,9 @@ module Source
       end
 
       def download_file!(url)
-        file = super(url)
-        file.frame_data = ugoira_frame_data if is_ugoira?
-        file
+        media_file = super(url)
+        media_file.frame_delays = ugoira_frame_delays if is_ugoira?
+        media_file
       end
 
       def translate_tag(tag)
@@ -162,8 +162,8 @@ module Source
         parsed_url.username || api_illust[:userAccount]
       end
 
-      def ugoira_frame_data
-        api_ugoira[:frames]
+      def ugoira_frame_delays
+        api_ugoira[:frames].pluck("delay")
       end
 
       memoize :illust_id, :api_client, :api_illust, :api_pages, :api_ugoira

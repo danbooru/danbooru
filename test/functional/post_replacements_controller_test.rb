@@ -128,8 +128,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.media_asset.variant(:original).open_file.md5)
 
           assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
-          assert_equal([{"delay" => 125, "file" => "000000.jpg"}, {"delay" => 125, "file" => "000001.jpg"}], @post.pixiv_ugoira_frame_data.data)
-          assert_equal([125, 125], @post.media_asset.metadata["Ugoira:FrameDelays"])
+          assert_equal([125, 125], @post.media_asset.frame_delays)
         end
       end
 
