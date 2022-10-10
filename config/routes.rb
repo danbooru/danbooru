@@ -195,6 +195,7 @@ Rails.application.routes.draw do
     end
     resource :votes, controller: "post_votes", only: [:create, :destroy], as: "post_votes"
     member do
+      post :view
       put :revert
       put :copy_notes
       get :show_seq

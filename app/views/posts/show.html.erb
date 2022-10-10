@@ -47,6 +47,10 @@
       <li id="post-info-source">Source: <%= post_source_tag(@post.source, @post.normalized_source) %></li>
       <li id="post-info-rating">Rating: <%= @post.pretty_rating %></li>
 
+      <li id="post-info-views">
+        Views: <%= @post.views %>
+      </li>
+
       <li id="post-info-score">
         Score: <%= render_post_votes @post, current_user: CurrentUser.user %>
       </li>
@@ -395,15 +399,11 @@
   </div>
 <% end %>
 
-<% if reportbooru_enabled? %>
-  <script type="text/javascript">
-    $(function() {
-      $.post("<%= Danbooru.config.reportbooru_server %>/post_views", {
-        msg: "<%= generate_reportbooru_signature(params[:id]) %>"
-      });
-    });
-  </script>
-<% end %>
+<script type="text/javascript">
+  $(function() {
+    $.post("<%= view_post_path(@post) %>");
+  });
+</script>
 
 <% content_for(:html_header) do %>
   <meta name="post-id" content="<%= @post.id %>">

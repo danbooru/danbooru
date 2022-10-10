@@ -34,7 +34,7 @@ class PostQueryBuilder
     user approver commenter comm noter noteupdater artcomm commentaryupdater
     flagger appealer upvote downvote fav ordfav favgroup ordfavgroup pool
     ordpool note comment commentary id rating source status filetype
-    disapproved parent child search embedded md5 width height mpixels ratio
+    disapproved parent child search embedded md5 width height mpixels ratio views
     score upvotes downvotes favcount filesize date age order limit tagcount pixiv_id pixiv
     unaliased exif duration random is has ai
   ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
@@ -46,6 +46,7 @@ class PostQueryBuilder
     upvotes upvotes_asc
     downvotes downvotes_asc
     favcount favcount_asc
+    views views_asc
     created_at created_at_asc
     change change_asc
     comment comment_asc

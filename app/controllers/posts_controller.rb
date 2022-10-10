@@ -52,6 +52,10 @@ class PostsController < ApplicationController
     end
   end
 
+  def view
+    Post.track_view!(params[:id], request.remote_ip)
+  end
+
   def show_seq
     authorize Post
     context = PostSearchContext.new(params)

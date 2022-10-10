@@ -1136,6 +1136,8 @@ class Post < ApplicationRecord
           attribute_matches(value, :up_score)
         when "downvotes"
           attribute_matches(value, "ABS(posts.down_score)")
+        when "views"
+          attribute_matches(value, :views)
         when "favcount"
           attribute_matches(value, :fav_count)
         when "filesize"
@@ -1558,6 +1560,12 @@ class Post < ApplicationRecord
         when "downvotes_asc"
           reorder("posts.down_score DESC, posts.id DESC")
 
+        when "views", "views_desc"
+          reorder("posts.views DESC, posts.id DESC")
+
+        when "views_asc"
+          reorder("posts.views ASC, posts.id ASC")
+
         when "favcount"
           reorder("posts.fav_count DESC, posts.id DESC")
 
@@ -1850,6 +1858,12 @@ class Post < ApplicationRecord
       if tags.count(&:general?) < 10
         warnings.add(:base, "Uploads must have at least 10 general tags. Read [[howto:tag]] for guidelines on tagging your uploads")
       end
+    end
+  end
+
+  def self.track_view!(post_id, ip_addr)
+    Cache.get(Cache.hash("#{Danbooru.config.view_counter_salt}-#{ip_addr}-#{post_id}"), 1.week) do
+      Post.increment_counter(:views, post_id)
     end
   end
 

@@ -603,6 +603,10 @@ module Danbooru
     def reportbooru_key
     end
 
+    def view_counter_salt
+      "provence"
+    end
+
     # The URL for the IQDB server (https://github.com/danbooru/iqdb). Optional.
     # Used for dupe detection and reverse image searches. Set this to
     # http://localhost:3000/mock/iqdb to enable a fake iqdb server for
