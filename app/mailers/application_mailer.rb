@@ -12,7 +12,7 @@ class ApplicationMailer < ActionMailer::Base
   default from: "#{Danbooru.config.canonical_app_name} <#{Danbooru.config.contact_email}>", content_type: "text/html"
   default "Message-ID": -> { "<#{SecureRandom.uuid}@#{Danbooru.config.hostname}>" }
 
-  def mail(user, require_verified_email:, **options)
+  def mail_user(user, require_verified_email:, **options)
     # https://www.rfc-editor.org/rfc/rfc8058#section-3.1
     #
     # A mail receiver can do a one-click unsubscription by performing an HTTPS POST to the HTTPS URI in the
@@ -31,19 +31,20 @@ class ApplicationMailer < ActionMailer::Base
 
     headers(params.to_h[:headers].to_h)
 
-    message = super(to: user.email_address&.address, **options)
+    message = mail(to: user.email_address&.address, **options)
     message.perform_deliveries = user.can_receive_email?(require_verified_email: require_verified_email)
     message
   end
 
-  def self.with_request(request)
+  def self.with_request(request, **params)
     with(
       request: {
         url: "#{request.method} #{request.url}",
         remote_ip: request.remote_ip.to_s,
         request_id: request.request_id.to_s,
         session_id: request.session.id.to_s,
-      }
+      },
+      **params
     )
   end
 end

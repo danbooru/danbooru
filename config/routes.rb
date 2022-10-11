@@ -296,6 +296,9 @@ Rails.application.routes.draw do
       get :diff
     end
   end
+  resource :dmca, only: [:create, :show] do
+    get :template
+  end
 
   # Legacy Danbooru 1 API endpoints
   get "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"

@@ -91,6 +91,11 @@ module Danbooru
       "webmaster@#{Danbooru.config.hostname}"
     end
 
+    # The email address where DMCA complaints should be sent.
+    def dmca_email
+      "dmca@#{Danbooru.config.hostname}"
+    end
+
     # The email address to use for Dmail notifications.
     def notification_email
       "notifications@#{Danbooru.config.hostname}"

@@ -1,0 +1,30 @@
+<% page_title "DMCA Notice" %>
+
+<div id="c-static">
+  <div id="a-dmca" class="prose fixed-width-container">
+    <h1>DMCA Notice</h1>
+
+    <p>Your DMCA notice has been submitted. Please allow up to 48 hours for it to be processed. A confirmation email will be sent to <%= @dmca[:email] %>. You may not receive a response unless further information is needed from you. You may contact <%= link_to Danbooru.config.dmca_email, "mailto:#{Danbooru.config.dmca_email}" %> if you have any further questions.</p>
+
+    <p>Your name: <%= @dmca[:name] %></p>
+    <p>Your email: <%= @dmca[:email] %></p>
+    <p>Your address: <%= @dmca[:address] %></p>
+
+    <p>Infringing URLs:</p>
+    <ul>
+      <% @dmca[:infringing_urls].to_s.split.each do |url| %>
+        <li><%= url %></li>
+      <% end %>
+    </ul>
+
+    <p>Original URLs:</p>
+    <ul>
+      <% @dmca[:original_urls].to_s.split.each do |url| %>
+        <li><%= url %></li>
+      <% end %>
+    </ul>
+
+    <p>Proof that you are the artist: <%= @dmca[:proof] %></p>
+    <p>Your signature: <%= @dmca[:signature] %></p>
+  </div>
+</div>

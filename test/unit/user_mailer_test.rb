@@ -68,5 +68,22 @@ class UserMailerTest < ActionMailer::TestCase
         assert_emails(0) { mail.deliver_now }
       end
     end
+
+    context "dmail_complaint method" do
+      should "work" do
+        dmca = {
+          name: "John Doe",
+          email: "test@example.com",
+          address: "123 Fake Street",
+          infringing_urls: "https://example.com/1.html\nhttps://example.com/2.html",
+          original_urls: "https://google.com/1.html\nhttps://google.com/2.html",
+          proof: "source: me",
+          signature: "John Doe",
+        }
+
+        mail = UserMailer.with(dmca: dmca).dmca_complaint(to: dmca[:email])
+        assert_emails(1) { mail.deliver_now }
+      end
+    end
   end
 end
