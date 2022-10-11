@@ -59,7 +59,7 @@ module Source
       end
 
       memoize def post_id_from_md5
-        return nil unless parsed_url.image_url? && parsed_url.page_url.present?
+        return nil unless parsed_url.page_url.present?
 
         response = http.cache(1.minute).head(parsed_url.page_url)
         return nil unless response.status == 200
