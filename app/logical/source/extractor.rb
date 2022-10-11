@@ -39,6 +39,7 @@ module Source
       Source::Extractor::Moebooru,
       Source::Extractor::Nijie,
       Source::Extractor::ArtStation,
+      Source::Extractor::Gelbooru,
       Source::Extractor::HentaiFoundry,
       Source::Extractor::Fanbox,
       Source::Extractor::Mastodon,

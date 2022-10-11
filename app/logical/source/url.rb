@@ -40,6 +40,7 @@ module Source
       Source::URL::Fantia,
       Source::URL::Fc2,
       Source::URL::Foundation,
+      Source::URL::Gelbooru,
       Source::URL::HentaiFoundry,
       Source::URL::Instagram,
       Source::URL::Lofter,

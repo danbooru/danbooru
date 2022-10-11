@@ -313,6 +313,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://konachan.com/post/show/270916")
         should_upload_successfully("https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png")
 
+        should_upload_successfully("https://gelbooru.com/index.php?page=post&s=view&id=7798121")
+
         should_upload_successfully("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
         should_upload_successfully("http://seiga.nicovideo.jp/seiga/im4937663")
         should_upload_successfully("https://seiga.nicovideo.jp/image/source/9146749")
