@@ -2,30 +2,28 @@
 
 <div id="c-static">
   <div id="a-dmca-template" class="prose fixed-width-container">
-    <h1>DMCA Template</h1>
-      <p>Pursuant to 17 USC 512(c)(3)(A), this communication serves as a statement that:</p>
-
+    <h1>Request for Removal of Infringing Material</h1>
       <p>I hereby request that you remove or disable access to the following material as it appears on your service:</p>
 
       <p>
         <ul>
-          <li><b>List of links to the <%= Danbooru.config.canonical_app_name %> posts would you like to have removed.</b></li>
+          <li><b>List of links to each <%= Danbooru.config.canonical_app_name %> post would you like to have removed.</b></li>
         </ul>
       </p>
 
-      <p>I am the exclusive rights holder or the duly authorized representative of the exclusive rights holder for the works listed above. These works infringe upon my original copyrighted works located at:</p>
+      <p>These works infringe upon my original copyrighted works located at:</p>
 
       <p>
         <ul>
-          <li><b>List of links where the above works were originally posted on your social media accounts or personal websites.</b></li>
+          <li><b>List of links where each work above was originally posted by you on your social media accounts or personal websites.</b></li>
         </ul>
       </p>
 
-      <p>I have a good faith belief that the use of this material in such a fashion is not authorized by the copyright holder, the copyright holder's agent, or the law.</p>
+      <p>I am the exclusive rights holder or the duly authorized representative of the exclusive rights holder for the works listed above. I have a good faith belief that the use of this material in such a fashion is not authorized by the copyright holder, the copyright holder's agent, or the law.</p>
 
-      <p>Under penalty of perjury in a United States court of law, I state that the information contained in this notification is accurate, and that I am authorized to act on the behalf of the exclusive rights holder for the material in question.</p>
+      <p>Under penalty of perjury, I attest that the information in this notification is accurate and that I am, or am authorized to act on behalf of, the owner of the rights being infringed by the material listed above.</p>
 
-      <p>I may be contacted by the following methods: <b>[Full name, physical address, phone number, and email address]</b></p>
+      <p>You may contact me at <b>[Your email address]</b>, <b>[Your phone number]</b>, or <b>[Your mailing address]</b>, preferably by <b>[Your preferred contact method]</b>.</p>
 
       <p>Signed,</p>
 
@@ -33,6 +31,6 @@
 
       <hr class="border">
 
-      <p>Send the above notice <%= link_to "here", "mailto:#{Danbooru.config.dmca_email}" %>.</p>
+      <p>You may send the above notice to <%= link_to Danbooru.config.dmca_email, "mailto:#{Danbooru.config.dmca_email}" %>.</p>
   </div>
 </div>
