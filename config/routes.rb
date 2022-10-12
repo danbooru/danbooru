@@ -157,7 +157,11 @@ Rails.application.routes.draw do
   get "/moderator/dashboard" => "moderator_dashboard#show"
   resources :moderation_reports, only: [:new, :create, :index, :show, :update]
   resources :modqueue, only: [:index]
-  resources :news_updates
+  resources :news_updates do
+    member do
+      post :undelete
+    end
+  end
   resources :notes do
     member do
       put :revert

@@ -33,9 +33,17 @@ class NewsUpdatesController < ApplicationController
 
   def destroy
     @news_update = authorize NewsUpdate.find(params[:id])
-    @news_update.destroy
+    @news_update.soft_delete!
     respond_with(@news_update) do |format|
-      format.js
+      format.js { flash[:notice] = "Deleted" }
+    end
+  end
+
+  def undelete
+    @news_update = authorize NewsUpdate.find(params[:id])
+    @news_update.undelete
+    respond_with(@news_update) do |format|
+      format.js { flash[:notice] = "Undeleted" }
     end
   end
 end

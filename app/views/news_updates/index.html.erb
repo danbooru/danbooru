@@ -6,10 +6,22 @@
       <% t.column "Creator" do |news_update| %>
         <%= link_to_user news_update.creator %>
       <% end %>
-      <% t.column :message %>
+      <% t.column :message, td: {class: "col-expand"} %>
+      <% t.column :created do |news_update| %>
+        <%= time_ago_in_words_tagged(news_update.created_at) %>
+      <% end %>
+      <% t.column :updated do |news_update| %>
+        <%= time_ago_in_words_tagged(news_update.updated_at) %>
+      <% end %>
+      <% t.column :status %>
       <% t.column column: "control" do |news_update| %>
         <%= link_to "Edit", edit_news_update_path(news_update) %>
-        | <%= link_to "Delete", news_update_path(news_update), :method => :delete %>
+        |
+        <% if news_update.is_deleted %>
+          <%= link_to "Undelete", undelete_news_update_path(news_update), method: :post, remote: true %>
+        <% else %>
+          <%= link_to "Delete", news_update_path(news_update), method: :delete, remote: true %>
+        <% end %>
       <% end %>
     <% end %>
 
