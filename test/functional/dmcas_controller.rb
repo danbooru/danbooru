@@ -20,9 +20,14 @@ class DmcasControllerTest < ActionDispatch::IntegrationTest
         signature: "John Doe",
       }
 
+      create(:owner_user)
       post dmca_path, params: { dmca: dmca }
+
       assert_response :success
       assert_emails 2
+      assert_equal("DMCA Complaint from John Doe", Dmail.last.title)
+      assert_match(/test@example.com/, Dmail.last.body)
+      assert_match(%r{https://example\.com/1\.html}, Dmail.last.body)
     end
   end
 end
