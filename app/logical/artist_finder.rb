@@ -67,6 +67,7 @@ module ArtistFinder
     /blog-imgs-\d+(?:-origin)?\.fc2\.com/i,
     %r{blog\.fc2\.com(/\w)+/?}i, # http://blog71.fc2.com/a/abk00/file/20080220194219.jpg
     "foundation.app",
+    "foriio.com", # https://www.foriio.com/comori22
     "flickr.com", # https://www.flickr.com/photos/52tracy
     "furaffinity.net",
     "furaffinity.net/user", # http://www.furaffinity.net/user/achthenuts
