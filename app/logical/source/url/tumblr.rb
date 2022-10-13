@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Tumblr < Source::URL
+  RESERVED_NAMES = %w[about app blog dashboard developers explore jobs login logo policy press register security tagged tips]
+
   attr_reader :work_id, :blog_name, :directory, :full_image_url
 
   def self.match?(url)
@@ -73,7 +75,7 @@ class Source::URL::Tumblr < Source::URL
 
     # https://www.tumblr.com/tawni-tailwind
     # https://tumblr.com/tawni-tailwind
-    in ("www.tumblr.com" | "tumblr.com"), blog_name
+    in ("www.tumblr.com" | "tumblr.com"), blog_name unless blog_name.in?(RESERVED_NAMES)
       @blog_name = blog_name
 
     # https://rosarrie.tumblr.com/archive
