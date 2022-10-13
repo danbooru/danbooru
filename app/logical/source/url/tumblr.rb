@@ -71,6 +71,11 @@ class Source::URL::Tumblr < Source::URL
     in ("www.tumblr.com" | "tumblr.com"), "dashboard", "blog", blog_name
       @blog_name = blog_name
 
+    # https://www.tumblr.com/tawni-tailwind
+    # https://tumblr.com/tawni-tailwind
+    in ("www.tumblr.com" | "tumblr.com"), blog_name
+      @blog_name = blog_name
+
     # https://rosarrie.tumblr.com/archive
     # https://solisnotte.tumblr.com/about
     # http://whereisnovember.tumblr.com/tagged/art

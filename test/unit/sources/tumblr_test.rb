@@ -239,6 +239,18 @@ module Sources
       assert(Source::URL.image_url?("https://25.media.tumblr.com/91719d337b218681abc48cdc24e"))
       assert_not(Source::URL.page_url?("https://25.media.tumblr.com/91719d337b218681abc48cdc24e"))
       assert_not(Source::URL.profile_url?("https://25.media.tumblr.com/91719d337b218681abc48cdc24e"))
+
+      assert(Source::URL.profile_url?("https://www.tumblr.com/tawni-tailwind"))
+      assert(Source::URL.profile_url?("https://www.tumblr.com/dashboard/blog/dankwartart"))
+      assert(Source::URL.profile_url?("https://www.tumblr.com/blog/artofelaineho"))
+      assert(Source::URL.profile_url?("https://www.tumblr.com/blog/view/artofelaineho"))
+      assert(Source::URL.profile_url?("https://tumblr.com/tawni-tailwind"))
+      assert(Source::URL.profile_url?("https://tumblr.com/dashboard/blog/dankwartart"))
+      assert(Source::URL.profile_url?("https://tumblr.com/blog/kervalchan"))
+      assert(Source::URL.profile_url?("https://tumblr.com/blog/view/artofelaineho"))
+      assert(Source::URL.profile_url?("https://rosarrie.tumblr.com/archive"))
+      assert(Source::URL.profile_url?("https://solisnotte.tumblr.com/about"))
+      assert(Source::URL.profile_url?("https://whereisnovember.tumblr.com/tagged/art"))
     end
   end
 end
