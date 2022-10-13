@@ -785,6 +785,31 @@ class PostTest < ActiveSupport::TestCase
             assert_equal([@post.id], @pool.post_ids)
             assert_equal("aaa bbb", @post.tag_string)
           end
+
+          should "parse trailing backslash-escaped spaces correctly" do
+            @post.update!(tag_string: " a b c ")
+            assert_equal("a b c", @post.tag_string)
+
+            @post.update!(tag_string: 'newpool:b\  a')
+            assert_equal("a", @post.tag_string)
+            assert_equal("b", Pool.last.name)
+
+            @post.update!(tag_string: 'a newpool:c\ ')
+            assert_equal("a", @post.tag_string)
+            assert_equal("c", Pool.last.name)
+
+            @post.update!(tag_string: 'a newpool:d\  ')
+            assert_equal("a", @post.tag_string)
+            assert_equal("d", Pool.last.name)
+
+            @post.update!(tag_string: 'newpool:e\ a')
+            assert_equal("tagme", @post.tag_string)
+            assert_equal("e_a", Pool.last.name)
+
+            @post.update!(tag_string: 'a newpool:f\\')
+            assert_equal("a", @post.tag_string)
+            assert_equal("f\\", Pool.last.name)
+          end
         end
 
         context "for a rating" do

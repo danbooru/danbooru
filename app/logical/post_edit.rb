@@ -33,7 +33,7 @@ class PostEdit
     @post = post
     @current_tag_names = current_tag_string.to_s.split
     @old_tag_names = old_tag_string.to_s.split
-    @new_tag_string = new_tag_string.to_s.gsub(/[[:space:]]/, " ").strip
+    @new_tag_string = new_tag_string.to_s.gsub(/[[:space:]]/, " ")
     @parser = StringParser.new(@new_tag_string)
   end
 
