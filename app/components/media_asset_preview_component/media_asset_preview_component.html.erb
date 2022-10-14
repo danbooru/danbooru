@@ -26,7 +26,7 @@
             <% end %>
           <% end %>
 
-          <%= tag.img src: variant.file_url, width: variant.width, height: variant.height, class: "media-asset-preview-image w-auto h-auto max-h-#{size}px max-w-full", crossorigin: "anonymous", draggable: "false" -%>
+          <%= tag.img src: variant.file_url, width: variant.width, height: variant.height, class: "media-asset-preview-image w-auto h-auto max-h-#{size}px max-w-full", draggable: "false" -%>
         </picture>
       <% else %>
         <div class="media-asset-placeholder rounded border border-solid flex items-center justify-center w-<%= size %>px h-<%= size %>px">
