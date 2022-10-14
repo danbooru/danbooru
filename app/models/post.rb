@@ -1630,7 +1630,7 @@ class Post < ApplicationRecord
     %i[
       uploader approver flags appeals events parent children notes
       comments approvals disapprovals replacements
-      artist_commentary media_asset ai_tags
+      artist_commentary media_asset media_metadata ai_tags
     ]
   end
 end
