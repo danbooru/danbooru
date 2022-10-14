@@ -96,6 +96,14 @@ module Sources
       )
     end
 
+    context "A video post with a https://va.media.tumblr.com/tumblr_*_720.mp4 URL" do
+      strategy_should_work(
+        "https://cloudstation.tumblr.com/post/697975577362251776/direct-quote-from-kaiba-post-battle-city",
+        image_urls: ["https://va.media.tumblr.com/tumblr_rjoh0hR8Xe1teimlz_720.mp4"],
+        download_size: 1_073_148,
+      )
+    end
+
     context "The source for a 'http://*.tumblr.com/post/*' answer post with inline images" do
       strategy_should_work(
         "https://noizave.tumblr.com/post/171237880542/test-ask",

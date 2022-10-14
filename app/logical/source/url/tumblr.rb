@@ -123,12 +123,19 @@ class Source::URL::Tumblr < Source::URL
     subdomain&.ends_with?(".media") || subdomain&.in?(%w[data media])
   end
 
+  def video_url?
+    # https://va.media.tumblr.com/tumblr_rjoh0hR8Xe1teimlz_720.mp4
+    image_url? && file_ext.in?(%w[mp4 webm])
+  end
+
   def variants
     return [] unless @sample_size.present? && @filename.present?
     directory = "#{@directory}/" if @directory.present?
 
-    sizes = %w[1280 640 540 500h 500 400 250 100]
-    sizes.map { |size| "https://media.tumblr.com/#{directory}#{@filename}_#{size}.#{file_ext}" }
+    media_host = video_url? ? "va.media.tumblr.com" : "media.tumblr.com"
+    sizes = %w[1280 720 640 540 500h 500 400 250 100]
+
+    sizes.map { |size| "https://#{media_host}/#{directory}#{@filename}_#{size}.#{file_ext}" }
   end
 
   def page_url

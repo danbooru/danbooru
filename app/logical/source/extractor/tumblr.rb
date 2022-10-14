@@ -29,7 +29,8 @@ class Source::Extractor
       end
 
       assets += inline_images
-      assets.map { |url| find_largest(url) }
+      assets = assets.map { |url| find_largest(url) }
+      assets.compact
     end
 
     def page_url
@@ -92,9 +93,8 @@ class Source::Extractor
       if parsed_image.full_image_url.present?
         image_url_html(parsed_image.full_image_url)&.at("img[src*='/#{parsed_image.directory}/']")&.[](:src)
       elsif parsed_image.variants.present?
-        # Look for the biggest available version on media.tumblr.com. A bigger
-        # version may or may not exist.
-        parsed_image.variants.find { |variant| http_exists?(variant) }
+        # Look for the biggest available version on media.tumblr.com. A bigger version may or may not exist.
+        parsed_image.variants.find { |variant| http_exists?(variant) } || image_url
       else
         parsed_image.original_url
       end
