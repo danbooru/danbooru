@@ -129,8 +129,7 @@ module PostSets
     end
 
     def best_post
-      # be smarter about this in the future
-      posts.reject(&:is_deleted).select(&:visible?).max_by(&:fav_count)
+      posts.reject(&:is_deleted).select(&:visible?).max_by { |post| [-post.rating_id, post.score] }
     end
 
     def pending_bulk_update_requests

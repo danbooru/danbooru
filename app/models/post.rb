@@ -305,6 +305,11 @@ class Post < ApplicationRecord
       flags.join(" ")
     end
 
+    # g => 0, s => 1, q => 2, e => 3
+    def rating_id
+      RATINGS.keys.index(rating)
+    end
+
     def pretty_rating
       RATINGS.fetch(rating)
     end
