@@ -194,6 +194,16 @@ module Sources
       )
     end
 
+    context "A www.tumblr.com/$blog_name/$work_id/$slug URL" do
+      strategy_should_work(
+        "https://www.tumblr.com/munespice/683613396085719040/saur-family",
+        image_urls: ["https://64.media.tumblr.com/fd6b4692f6e902af861fbc242736ae61/010fd31ffbc70e84-a8/s21000x21000/e0587516e05bae4cec244921f220b45bed08335c.jpg"],
+        artist_name: "munespice",
+        page_url: "https://munespice.tumblr.com/post/683613396085719040",
+        profile_url: "https://munespice.tumblr.com"
+      )
+    end
+
     context "A tumblr image url for which the extractable post url is a custom domain" do
       strategy_should_work(
         "https://64.media.tumblr.com/591b370b9deb7c6ef33d8c18dc2c8db5/tumblr_ph5huubDdz1w0f6yio1_1280.jpg",

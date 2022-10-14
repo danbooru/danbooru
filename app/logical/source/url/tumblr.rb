@@ -48,8 +48,9 @@ class Source::URL::Tumblr < Source::URL
       @blog_name = subdomain unless subdomain == "www"
       @work_id = work_id
 
-    # https://tumblr.com/munespice/683613396085719040, new dashboard links
-    in ("tumblr.com" | "www.tumblr.com"), blog_name, /^\d+$/ => work_id
+    # https://tumblr.com/munespice/683613396085719040 # new dashboard links
+    # https://www.tumblr.com/yamujiburo/682910938493599744/will-tumblr-let-me-keep-this-up
+    in ("tumblr.com" | "www.tumblr.com"), blog_name, /^\d+$/ => work_id, *rest
       @blog_name = blog_name
       @work_id = work_id
 
