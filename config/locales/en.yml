@@ -69,6 +69,7 @@ en:
         uploader: "You"
         uploader_id: "You"
       user/email_address:
+        address: "Email address"
         normalized_address: "Email address"
       user_feedback:
         creator: "You"

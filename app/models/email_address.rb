@@ -3,8 +3,11 @@
 class EmailAddress < ApplicationRecord
   belongs_to :user, inverse_of: :email_address
 
-  validates :address, presence: true, confirmation: true, format: { with: EmailValidator::EMAIL_REGEX }
-  validates :normalized_address, uniqueness: true
+  attribute :address
+  attribute :normalized_address
+
+  validates :address, presence: true, format: { message: "is invalid", with: EmailValidator::EMAIL_REGEX }
+  validates :normalized_address, presence: true, uniqueness: true
   validates :user_id, uniqueness: true
   validate :validate_deliverable, on: :deliverable
 
@@ -17,6 +20,7 @@ class EmailAddress < ApplicationRecord
   end
 
   def address=(value)
+    value = Danbooru::EmailAddress.normalize(value)&.to_s || value
     self.normalized_address = EmailValidator.normalize(value) || address
     super
   end
