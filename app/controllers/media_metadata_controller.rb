@@ -5,6 +5,6 @@ class MediaMetadataController < ApplicationController
 
   def index
     @media_metadata = authorize MediaMetadata.visible(CurrentUser.user).paginated_search(params, count_pages: true)
-    respond_with(@media_metadata)
+    respond_with(@media_metadata, model: "MediaMetadata")
   end
 end

@@ -32,4 +32,8 @@ class MediaMetadata < ApplicationRecord
   def frame_delays
     metadata["Ugoira:FrameDelays"].to_a
   end
+
+  def self.available_includes
+    [:media_asset]
+  end
 end
