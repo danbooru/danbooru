@@ -248,7 +248,7 @@ class ApplicationController < ActionController::Base
   # => /tags?search[name]=touhou
   def normalize_search
     return unless request.get? || request.head?
-    params[:search] ||= ActionController::Parameters.new
+    params[:search] = ActionController::Parameters.new unless params[:search].is_a?(ActionController::Parameters)
 
     deep_reject_blank = lambda do |hash|
       hash.reject { |_k, v| v.blank? || (v.is_a?(Hash) && deep_reject_blank.call(v).blank?) }

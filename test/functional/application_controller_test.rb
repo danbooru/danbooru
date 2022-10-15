@@ -342,6 +342,20 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_equal([tags[0].id], response.parsed_body.pluck("id"))
     end
 
+    should "remove blank `search` params from the URL" do
+      get tags_path(search: { name: "touhou", blah: "" }), as: :json
+
+      assert_redirected_to tags_path(search: { name: "touhou" })
+    end
+
+    should "ignore invalid `search` params" do
+      get tags_path(search: "foo"), as: :json
+      assert_response :success
+
+      get tags_path("search[]": "foo"), as: :json
+      assert_response :success
+    end
+
     should "support the expiry parameter" do
       get posts_path, as: :json, params: { expiry: "1" }
 
