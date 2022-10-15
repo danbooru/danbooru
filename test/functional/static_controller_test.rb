@@ -23,6 +23,12 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
         assert_equal(1, response.parsed_body.css("sitemap loc").size)
       end
     end
+
+    should "work when the sitemap is empty" do
+      get sitemap_path(sitemap: "pools"), as: :xml
+
+      assert_response :success
+    end
   end
 
   context "dtext_help action" do

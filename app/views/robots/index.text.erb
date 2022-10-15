@@ -74,11 +74,32 @@ Allow: /sitemap.xml
 Allow: /favicon.ico
 Allow: /favicon.svg
 
+<% if Artist.undeleted.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "artists") %>
+<% end %>
+
+<% if ForumTopic.undeleted.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "forum_topics") %>
+<% end %>
+
+<% if Pool.undeleted.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "pools") %>
+<% end %>
+
+<% if Post.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "posts") %>
+<% end %>
+
+<% if Tag.nonempty.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "tags") %>
+<% end %>
+
+<% if User.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "users") %>
+<% end %>
+
+<% if WikiPage.undeleted.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "wiki_pages") %>
+<% end %>
+
 <% end %>
