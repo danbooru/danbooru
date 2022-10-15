@@ -165,19 +165,27 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail for api key mismatches" do
-          get profile_path, as: :json, params: { login: @user.name }
+          get profile_path(login: @user.name), as: :json
           assert_response 401
 
-          get profile_path, as: :json, params: { api_key: @api_key.key }
+          get profile_path(api_key: @api_key.key), as: :json
           assert_response 401
 
-          get profile_path, as: :json, params: { login: @user.name, api_key: "bad" }
+          get profile_path(login: @user.name, api_key: "bad"), as: :json
+          assert_response 401
+        end
+
+        should "fail for a blank API key" do
+          get profile_path(login: ""), as: :json
+          assert_response 401
+
+          get profile_path(api_key: ""), as: :json
           assert_response 401
         end
 
         should "succeed for non-GET requests without a CSRF token" do
           assert_changes -> { @user.reload.enable_safe_mode }, from: false, to: true do
-            put user_path(@user), params: { login: @user.name, api_key: @api_key.key, user: { enable_safe_mode: "true" } }, as: :json
+            put user_path(@user, login: @user.name, api_key: @api_key.key), params: { user: { enable_safe_mode: "true" }}, as: :json
             assert_response :success
           end
         end
@@ -220,16 +228,16 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           @post = create(:post)
           @api_key = create(:api_key, permissions: ["posts:index", "posts:show"])
 
-          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          get posts_path(login: @api_key.user.name, api_key: @api_key.key)
           assert_response :success
 
-          get post_path(@post), params: { login: @api_key.user.name, api_key: @api_key.key }
+          get post_path(@post, login: @api_key.user.name, api_key: @api_key.key)
           assert_response :success
 
-          get tags_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          get tags_path(login: @api_key.user.name, api_key: @api_key.key)
           assert_response 403
 
-          put post_path(@post), params: { login: @api_key.user.name, api_key: @api_key.key, post: { rating: "s" }}
+          put post_path(@post, login: @api_key.user.name, api_key: @api_key.key), params: { post: { rating: "s" }}
           assert_response 403
 
           assert_equal(4, @api_key.reload.uses)

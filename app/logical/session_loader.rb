@@ -16,7 +16,7 @@ class SessionLoader
   def initialize(request)
     @request = request
     @session = request.session
-    @params = request.parameters
+    @params = request.query_parameters
   end
 
   # Attempt to log a user in with the given username and password. Records a
@@ -90,7 +90,7 @@ class SessionLoader
 
   # @return [Boolean] true if the current request has an API key
   def has_api_authentication?
-    request.authorization.present? || params[:login].present? || (params[:api_key].present? && params[:api_key].is_a?(String))
+    request.authorization.present? || params.has_key?(:login) || params.has_key?(:api_key)
   end
 
   private
