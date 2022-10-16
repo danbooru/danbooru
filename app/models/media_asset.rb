@@ -58,8 +58,6 @@ class MediaAsset < ApplicationRecord
     def initialize(media_asset, variant)
       @media_asset = media_asset
       @variant = variant.to_sym
-
-      raise ArgumentError, "asset doesn't have #{@variant} variant" unless Variant.exists?(@media_asset, @variant)
     end
 
     def store_file!(original_file)
@@ -108,13 +106,9 @@ class MediaAsset < ApplicationRecord
     end
 
     def file_path(slug = "")
-      if variant.in?(%i[preview 180x180 360x360 720x720]) && media_asset.is_flash?
-        "/images/download-preview.png"
-      else
-        slug = "__#{slug}__" if slug.present?
-        slug = nil if !ENABLE_SEO_POST_URLS
-        "/#{variant}/#{md5[0..1]}/#{md5[2..3]}/#{slug}#{file_name}"
-      end
+      slug = "__#{slug}__" if slug.present?
+      slug = nil if !ENABLE_SEO_POST_URLS
+      "/#{variant}/#{md5[0..1]}/#{md5[2..3]}/#{slug}#{file_name}"
     end
 
     # The file name of this variant.
@@ -168,23 +162,6 @@ class MediaAsset < ApplicationRecord
 
     def height
       dimensions[1]
-    end
-
-    def self.exists?(media_asset, variant)
-      case variant
-      when :preview
-        true
-      when :"180x180"
-        true
-      when :"360x360"
-        true
-      when :"720x720"
-        true
-      when :sample
-        media_asset.is_ugoira? || (media_asset.is_static_image? && media_asset.image_width > LARGE_IMAGE_WIDTH)
-      when :original
-        true
-      end
     end
 
     memoize :file_name, :file_ext, :max_dimensions, :dimensions
@@ -363,15 +340,27 @@ class MediaAsset < ApplicationRecord
 
   concerning :VariantMethods do
     def variant(type)
+      return nil unless has_variant?(type)
       Variant.new(self, type)
     end
 
-    def has_variant?(variant)
-      Variant.exists?(self, variant)
+    def has_variant?(type)
+      variant_types.include?(type.to_sym)
     end
 
     def variants
-      VARIANTS.select { |v| has_variant?(v) }.map { |v| variant(v) }
+      @variants ||= variant_types.map { |type| variant(type) }
+    end
+
+    def variant_types
+      @variant_types ||=
+        if is_flash?
+          [:original]
+        elsif (is_animated? && !is_ugoira?) || (is_static_image? && image_width <= LARGE_IMAGE_WIDTH)
+          VARIANTS - [:sample]
+        else
+          VARIANTS
+        end
     end
   end
 
