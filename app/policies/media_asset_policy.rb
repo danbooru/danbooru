@@ -10,10 +10,8 @@ class MediaAssetPolicy < ApplicationPolicy
   end
 
   def api_attributes
-    if can_see_image?
-      super
-    else
-      super.excluding(:md5, :file_key)
-    end
+    attributes = super + [:variants]
+    attributes -= [:md5, :file_key, :variants] if !can_see_image?
+    attributes
   end
 end

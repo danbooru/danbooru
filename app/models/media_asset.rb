@@ -51,6 +51,8 @@ class MediaAsset < ApplicationRecord
 
   class Variant
     extend Memoist
+    include ActiveModel::Serializers::JSON
+    include ActiveModel::Serializers::Xml
 
     attr_reader :media_asset, :variant
     delegate :md5, :storage_service, :backup_storage_service, to: :media_asset
@@ -162,6 +164,10 @@ class MediaAsset < ApplicationRecord
 
     def height
       dimensions[1]
+    end
+
+    def serializable_hash(*options)
+      { variant: variant, url: file_url, width: width, height: height, file_ext: file_ext }
     end
 
     memoize :file_name, :file_ext, :max_dimensions, :dimensions
