@@ -239,7 +239,59 @@ module Danbooru
       }
     end
 
-    # The method to use for storing image files.
+    # The path to where uploaded files are stored. You can change this to change where files are
+    # stored. By default, files are stored like this:
+    #
+    # * /original/94/43/944364e77f56183e2ebd75de757488e2.jpg
+    # * /sample/94/43/sample-944364e77f56183e2ebd75de757488e2.jpg
+    # * /180x180/94/43/944364e77f56183e2ebd75de757488e2.jpg
+    #
+    # A variant is a thumbnail or other alternate version of an uploaded file; see the Variant class
+    # in app/models/media_asset.rb for details.
+    #
+    # This path is relative to the `base_dir` option in the storage manager (see the `storage_manager` option below).
+    def media_asset_file_path(variant)
+      md5 = variant.md5
+      file_prefix = "sample-" if variant.type == :sample
+      "/#{variant.type}/#{md5[0..1]}/#{md5[2..3]}/#{file_prefix}#{md5}.#{variant.file_ext}"
+
+      # To store files in this format: `/original/944364e77f56183e2ebd75de757488e2.jpg`
+      # "/#{variant.type}/#{variant.md5}.#{variant.file_ext}"
+      #
+      # To store files in this format: `/original/iuQRl7d7n.jpg`
+      # "/#{variant.type}/#{variant.file_key}.#{variant.file_ext}"
+      #
+      # To store files in this format: `/original/12345.jpg`
+      # "/#{variant.type}/#{variant.id}.#{variant.file_ext}"
+    end
+
+    # The URL where uploaded files are served from. You can change this to customize how images are
+    # served. By default, files are served from the same location where they're stored.
+    #
+    # `custom_filename` is an optional tag string that may be included in the URL. It requires Nginx
+    # rewrites to work (see below), so it's ignored by default.
+    #
+    # The URL is relative to the `base_url` option in the storage manager (see the `storage_manager` option below).
+    def media_asset_file_url(variant, custom_filename)
+      media_asset_file_path(variant)
+
+      # To serve files in this format:
+      #
+      #     /original/d3/4e/__kousaka_tamaki_to_heart_2_drawn_by_kyogoku_shin__d34e4cf0a437a5d65f8e82b7bcd02606.jpg.
+      #
+      # Uncomment the code below and add the following to Nginx:
+      #
+      #     # Strip tags from filenames (/original/d3/4e/__kousaka_tamaki_to_heart_2_drawn_by_kyogoku_shin__d34e4cf0a437a5d65f8e82b7bcd02606.jpg => /original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg)
+      #     location ~ (.*)/__.+?__(.+)$ {
+      #       rewrite (.*)/__.+?__(.+)$ $1/$2;
+      #     }
+      #
+      # custom_filename = "__#{custom_filename}__" if custom_filename.present?
+      # file_prefix = "sample-" if variant.type == :sample
+      # "/#{variant.type}/#{variant.md5[0..1]}/#{variant.md5[2..3]}/#{custom_filename}#{file_prefix}#{variant.md5}.#{variant.file_ext}"
+    end
+
+    # The method to use for storing uploaded files. By default, uploads are stored under `public/data`.
     def storage_manager
       # Store files on the local filesystem.
       # base_dir - where to store files (default: under public/data)
@@ -525,11 +577,6 @@ module Danbooru
     def twitter_url
       return nil unless Danbooru.config.twitter_username.present?
       "https://twitter.com/#{Danbooru.config.twitter_username}"
-    end
-
-    # include essential tags in image urls (requires nginx/apache rewrites)
-    def enable_seo_post_urls
-      false
     end
 
     def http_proxy_host

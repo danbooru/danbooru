@@ -11,7 +11,6 @@ class MediaAsset < ApplicationRecord
   MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
   MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
   MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
-  ENABLE_SEO_POST_URLS = Danbooru.config.enable_seo_post_urls
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
   STORAGE_SERVICE = Danbooru.config.storage_manager
 
@@ -54,12 +53,12 @@ class MediaAsset < ApplicationRecord
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
 
-    attr_reader :media_asset, :variant
-    delegate :md5, :storage_service, :backup_storage_service, to: :media_asset
+    attr_reader :media_asset, :type
+    delegate :id, :md5, :file_key, :storage_service, :backup_storage_service, to: :media_asset
 
-    def initialize(media_asset, variant)
+    def initialize(media_asset, type)
       @media_asset = media_asset
-      @variant = variant.to_sym
+      @type = type.to_sym
     end
 
     def store_file!(original_file)
@@ -85,7 +84,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def convert_file(media_file)
-      case variant
+      case type
       in :preview
         media_file.preview(width, height, format: :jpeg, quality: 85)
       in :"180x180"
@@ -103,19 +102,18 @@ class MediaAsset < ApplicationRecord
       end
     end
 
-    def file_url(slug = "")
-      storage_service.file_url(file_path(slug))
+    def file_url(custom_filename = "")
+      url = Danbooru.config.media_asset_file_url(self, custom_filename)
+      storage_service.file_url(url)
     end
 
-    def file_path(slug = "")
-      slug = "__#{slug}__" if slug.present?
-      slug = nil if !ENABLE_SEO_POST_URLS
-      "/#{variant}/#{md5[0..1]}/#{md5[2..3]}/#{slug}#{file_name}"
+    def file_path
+      Danbooru.config.media_asset_file_path(self)
     end
 
     # The file name of this variant.
     def file_name
-      case variant
+      case type
       when :sample
         "sample-#{md5}.#{file_ext}"
       else
@@ -125,7 +123,7 @@ class MediaAsset < ApplicationRecord
 
     # The file extension of this variant.
     def file_ext
-      case variant
+      case type
       when :preview, :"180x180", :"360x360"
         "jpg"
       when :"720x720"
@@ -138,7 +136,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def max_dimensions
-      case variant
+      case type
       when :preview
         [150, 150]
       when :"180x180"
@@ -167,7 +165,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def serializable_hash(*options)
-      { variant: variant, url: file_url, width: width, height: height, file_ext: file_ext }
+      { type: type, url: file_url, width: width, height: height, file_ext: file_ext }
     end
 
     memoize :file_name, :file_ext, :max_dimensions, :dimensions
