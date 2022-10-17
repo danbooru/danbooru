@@ -74,6 +74,9 @@ module Danbooru
 
       address = address.gsub(/@.gmail\.com$/i, "@gmail.com") # @-gmail.com -> @gmail.com
       address = address.gsub(/@g.ail\.com$/i, "@gmail.com") # @g,ail.com -> @gmail.com
+      address = address.gsub(/@gm.il\.com$/i, "@gmail.com") # @gmsil.com -> @gmail.com
+      address = address.gsub(/@gma.l\.com$/i, "@gmail.com") # @gmaul.com -> @gmail.com
+      address = address.gsub(/@gma.il\.com$/i, "@gmail.com") # @gmaail.com -> @gmail.com
       address = address.gsub(/@gmail\.co.$/i, "@gmail.com") # @gmail.co, -> @gmail.com
       address = address.gsub(/@gamil\.com$/i, "@gmail.com") # @gamil.com -> @gmail.com
       address = address.gsub(/@gnail\.com$/i, "@gmail.com") # @gnail.com -> @gmail.com
