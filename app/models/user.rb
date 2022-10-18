@@ -680,6 +680,7 @@ class User < ApplicationRecord
 
   def initialize_attributes
     self.new_post_navigation_layout = true
+    self.style_usernames = true
   end
 
   def presenter
