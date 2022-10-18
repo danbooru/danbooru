@@ -77,7 +77,7 @@ with_confirmation do
     address = address.downcase.gsub(/^(.*)\1$/i, '\1') if address.downcase.match?(/^(.*)\1$/i) # Foo@gmail.comfoo@gmail.com -> foo@gmail.com
     address = address.downcase.gsub(/^(.*)@\1@[a-zA-Z]+\.com$/i, '\1') if address.downcase.match?(/^(.*)@\1@[a-zA-Z]+\.com$/i) # foo@foo@gmail.com -> foo@gmail.com
 
-    normalized_address = EmailValidator.normalize(address)
+    normalized_address = Danbooru::EmailAddress.parse(address)&.canonicalized_address&.to_s
     dupe_emails = EmailAddress.where(normalized_address: normalized_address).excluding(email)
     if dupe_emails.present?
       puts "#{old_address.ljust(40, " ")} DELETE (#{dupe_emails.map { "#{_1.user.name}##{_1.user.id}" }.join(", ")}, #{email.user.name}##{email.user.id})"

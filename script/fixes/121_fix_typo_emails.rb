@@ -5,8 +5,8 @@ require_relative "base"
 with_confirmation do
   EmailAddress.find_each do |email|
     old_address = email.address.to_s
-    fixed_address = Danbooru::EmailAddress.normalize(old_address).to_s
-    normalized_address = EmailValidator.normalize(fixed_address)
+    fixed_address = Danbooru::EmailAddress.correct(old_address).to_s
+    normalized_address = Danbooru::EmailAddress.new(fixed_address).canonicalized_address.to_s
 
     next if old_address == fixed_address
 

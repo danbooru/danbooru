@@ -4,7 +4,7 @@ require_relative "base"
 
 with_confirmation do
   emails = EmailAddress.find_each do |email|
-    normalized_address = EmailValidator.normalize(email.address)
+    normalized_address = Danbooru::EmailAddress.new(email.address).canonicalized_address.to_s
 
     if email.normalized_address != normalized_address
       dupe_emails = EmailAddress.where(normalized_address: normalized_address).joins(:user).to_a

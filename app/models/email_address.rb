@@ -6,7 +6,7 @@ class EmailAddress < ApplicationRecord
   attribute :address
   attribute :normalized_address
 
-  validates :address, presence: true, format: { message: "is invalid", with: EmailValidator::EMAIL_REGEX }
+  validates :address, presence: true, format: { message: "is invalid", with: Danbooru::EmailAddress::EMAIL_REGEX }
   validates :normalized_address, presence: true, uniqueness: true
   validates :user_id, uniqueness: true
   validate :validate_deliverable, on: :deliverable
@@ -20,25 +20,21 @@ class EmailAddress < ApplicationRecord
   end
 
   def address=(value)
-    value = Danbooru::EmailAddress.normalize(value)&.to_s || value
-    self.normalized_address = EmailValidator.normalize(value) || address
+    value = Danbooru::EmailAddress.correct(value)&.to_s || value
+    self.normalized_address = Danbooru::EmailAddress.parse(value)&.canonicalized_address&.to_s || value
     super
   end
 
   def is_restricted?
-    EmailValidator.is_restricted?(normalized_address)
+    !Danbooru::EmailAddress.new(normalized_address).is_nondisposable?
   end
 
   def is_normalized?
     address == normalized_address
   end
 
-  def is_valid?
-    EmailValidator.is_valid?(address)
-  end
-
   def self.restricted(restricted = true)
-    domains = EmailValidator::NONDISPOSABLE_DOMAINS
+    domains = Danbooru::EmailAddress::NONDISPOSABLE_DOMAINS
     domain_regex = domains.map { |domain| Regexp.escape(domain) }.join("|")
 
     if restricted.to_s.truthy?
@@ -59,7 +55,7 @@ class EmailAddress < ApplicationRecord
   end
 
   def validate_deliverable
-    if EmailValidator.undeliverable?(address)
+    if Danbooru::EmailAddress.new(address).undeliverable?(allow_smtp: Rails.env.production?)
       errors.add(:address, "is invalid or does not exist")
     end
   end
