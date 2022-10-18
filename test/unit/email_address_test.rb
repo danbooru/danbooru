@@ -51,6 +51,7 @@ class EmailAddressTest < ActiveSupport::TestCase
       assert_equal("foo@gmail.com", EmailAddress.new(address: "foo@g,ail.com").address.to_s)
       assert_equal("foo@gmail.com", EmailAddress.new(address: "foo@gmai;.com").address.to_s)
       assert_equal("foo@gmail.com", EmailAddress.new(address: "foo@gmail@com").address.to_s)
+      assert_equal("foo@gmail.com", EmailAddress.new(address: "foo.@gmail.com").address.to_s)
     end
   end
 end

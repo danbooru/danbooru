@@ -3,7 +3,7 @@
 require_relative "base"
 
 with_confirmation do
-  emails = EmailAddress.where_not_regex(:address, '^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9][a-zA-Z0-9-]{0,61}\.)+[a-zA-Z]{2,}$') # invalid emails
+  emails = EmailAddress.where_not_regex(:address, '^[a-zA-Z0-9._+-]*[a-zA-Z0-9_+-]@([a-zA-Z0-9][a-zA-Z0-9-]{0,61}\.)+[a-zA-Z]{2,}$') # invalid emails
 
   emails.find_each do |email|
     old_address = email.address
@@ -14,6 +14,9 @@ with_confirmation do
 
     # foo,bar@gmail.com -> foo.bar@gmail.com | @gmail,com -> @gmail.com
     address = address.gsub(/,/, ".")
+
+    address = address.gsub(/\.+@/, "@") # foo.@gmail.com -> foo@gmail.com
+    address = address.gsub(/%/, "") # foo%@gmail.com -> foo@gmail.com
 
     address = address.gsub(/[\\\/]$/, '') # @qq.com\ -> @qq.com, @web.de/ -> @web.de
     address = address.gsub(/^https?:\/\/(www\.)?/i, "") # https://xxx@gmail.com -> xxx@gmail.com
@@ -82,7 +85,7 @@ with_confirmation do
     if dupe_emails.present?
       puts "#{old_address.ljust(40, " ")} DELETE (#{dupe_emails.map { "#{_1.user.name}##{_1.user.id}" }.join(", ")}, #{email.user.name}##{email.user.id})"
       email.destroy if ENV.fetch("FIX", "false").truthy?
-    elsif address.match?(/^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9][a-zA-Z0-9-]{0,61}\.)+[a-zA-Z]{2,}$/)
+    elsif Danbooru::EmailAddress.is_valid?(address)
       puts "#{old_address.ljust(40, " ").gsub(/\r|\n/, "")} #{address}"
       email.user.update!(email_address_attributes: { address: address }) if ENV.fetch("FIX", "false").truthy?
     else
