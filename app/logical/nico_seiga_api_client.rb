@@ -7,7 +7,7 @@ class NicoSeigaApiClient
 
   attr_reader :http, :user_session
 
-  def initialize(work_id:, type:, user_session: Danbooru.config.nico_seiga_user_session, http: Danbooru::Http.new)
+  def initialize(work_id:, type:, user_session: Danbooru.config.nico_seiga_user_session, http:)
     @work_id = work_id
     @work_type = type
     @user_session = user_session

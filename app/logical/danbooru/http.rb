@@ -40,19 +40,31 @@ module Danbooru
     attr_accessor :max_size, :http
 
     class << self
-      delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :public_only, :with_legacy_ssl, :download_media, to: :new
+      delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :proxy, :public_only, :with_legacy_ssl, :download_media, to: :new
     end
 
-    def initialize
-      @http ||=
-        ::Danbooru::Http::ApplicationClient.new
+    # The default HTTP client.
+    def self.default
+      Danbooru::Http::ApplicationClient.new
         .timeout(DEFAULT_TIMEOUT)
-        .headers("Accept-Encoding" => "gzip")
-        .headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
-        #.headers("User-Agent": Danbooru.config.canonical_app_name)
+        .headers("Accept-Encoding": "gzip")
         .use(:auto_inflate)
         .use(redirector: { max_redirects: MAX_REDIRECTS })
         .use(:session)
+    end
+
+    # The default HTTP client for requests to external websites. This includes API calls to external services, fetching source data, and downloading images.
+    def self.external
+      new.proxy.public_only.headers("User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0")
+    end
+
+    # The default HTTP client for API calls to internal services controlled by Danbooru.
+    def self.internal
+      new.headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
+    end
+
+    def initialize
+      @http ||= Danbooru::Http.default
     end
 
     def get(url, **options)

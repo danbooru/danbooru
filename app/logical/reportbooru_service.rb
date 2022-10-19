@@ -7,7 +7,7 @@
 class ReportbooruService
   attr_reader :http, :reportbooru_server
 
-  def initialize(http: Danbooru::Http.new, reportbooru_server: Danbooru.config.reportbooru_server)
+  def initialize(http: Danbooru::Http.internal, reportbooru_server: Danbooru.config.reportbooru_server)
     @reportbooru_server = reportbooru_server
     @http = http.timeout(1)
   end

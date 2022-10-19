@@ -157,7 +157,7 @@ class Source::Extractor
     end
 
     def http
-      Danbooru::Http.new.cookies(_session_id: Danbooru.config.fantia_session_id)
+      super.cookies(_session_id: Danbooru.config.fantia_session_id)
     end
   end
 end

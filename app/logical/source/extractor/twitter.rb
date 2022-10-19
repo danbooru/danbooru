@@ -130,7 +130,7 @@ class Source::Extractor
     end
 
     def api_client
-      TwitterApiClient.new(Danbooru.config.twitter_api_key, Danbooru.config.twitter_api_secret)
+      TwitterApiClient.new(Danbooru.config.twitter_api_key, Danbooru.config.twitter_api_secret, http: http)
     end
 
     def api_response

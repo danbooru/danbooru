@@ -14,7 +14,7 @@ class DiscordApiClient
 
   attr_reader :application_id, :bot_token, :http
 
-  def initialize(application_id: Danbooru.config.discord_application_client_id, bot_token: Danbooru.config.discord_bot_token, http: Danbooru::Http.new)
+  def initialize(application_id: Danbooru.config.discord_application_client_id, bot_token: Danbooru.config.discord_bot_token, http: Danbooru::Http.external)
     @application_id = application_id
     @bot_token = bot_token
     @http = http

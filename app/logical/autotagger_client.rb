@@ -7,7 +7,7 @@
 class AutotaggerClient
   attr_reader :autotagger_url, :http
 
-  def initialize(autotagger_url: Danbooru.config.autotagger_url.to_s, http: Danbooru::Http.new)
+  def initialize(autotagger_url: Danbooru.config.autotagger_url.to_s, http: Danbooru::Http.internal)
     @autotagger_url = autotagger_url.chomp("/")
     @http = http
   end

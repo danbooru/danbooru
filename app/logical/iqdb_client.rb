@@ -11,7 +11,7 @@ class IqdbClient
   # Create a new IQDB API client.
   # @param iqdb_url [String] the base URL of the IQDB server
   # @param http [Danbooru::Http] the HTTP client to use
-  def initialize(iqdb_url: Danbooru.config.iqdb_url.to_s, http: Danbooru::Http.new)
+  def initialize(iqdb_url: Danbooru.config.iqdb_url.to_s, http: Danbooru::Http.internal)
     @iqdb_url = iqdb_url.chomp("/")
     @http = http
   end

@@ -365,7 +365,7 @@ class PixivAjaxClient
 
   # @param phpsessid [String] the Pixiv login cookie
   # @param http [Danbooru::Http] the HTTP client to use for Pixiv
-  def initialize(phpsessid, http: Danbooru::Http.new)
+  def initialize(phpsessid, http:)
     @phpsessid = phpsessid
     @http = http
   end

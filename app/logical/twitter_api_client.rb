@@ -10,7 +10,7 @@ class TwitterApiClient
   # Create a Twitter API client
   # @param api_key [String] the Twitter API key
   # @param api_secret [String] the Twitter API secret
-  def initialize(api_key, api_secret, http: Danbooru::Http.new)
+  def initialize(api_key, api_secret, http:)
     @api_key, @api_secret, @http = api_key, api_secret, http
   end
 

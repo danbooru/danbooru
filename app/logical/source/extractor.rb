@@ -196,7 +196,7 @@ module Source
 
     # A http client for API requests.
     def http
-      Danbooru::Http.new.proxy.public_only
+      Danbooru::Http.external
     end
 
     # A http client for downloading files.

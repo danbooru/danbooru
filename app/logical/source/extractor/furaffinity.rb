@@ -67,7 +67,7 @@ class Source::Extractor
     end
 
     def http
-      Danbooru::Http.new.cookies(a: Danbooru.config.furaffinity_cookie_a, b: Danbooru.config.furaffinity_cookie_b, sfw: 0)
+      super.cookies(a: Danbooru.config.furaffinity_cookie_a, b: Danbooru.config.furaffinity_cookie_b, sfw: 0)
     end
   end
 end

@@ -9,7 +9,7 @@ class AuthorizeNetClient
 
   attr_reader :login_id, :transaction_key, :test_mode, :http
 
-  def initialize(login_id: Danbooru.config.authorize_net_login_id, transaction_key: Danbooru.config.authorize_net_transaction_key, test_mode: Danbooru.config.authorize_net_test_mode, http: Danbooru::Http.new)
+  def initialize(login_id: Danbooru.config.authorize_net_login_id, transaction_key: Danbooru.config.authorize_net_transaction_key, test_mode: Danbooru.config.authorize_net_test_mode, http: Danbooru::Http.external)
     @login_id = login_id
     @transaction_key = transaction_key
     @test_mode = test_mode
