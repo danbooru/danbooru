@@ -30,7 +30,7 @@ class User < ApplicationRecord
     enable_private_favorites
     _unused_enable_sequential_post_navigation
     _unused_hide_deleted_posts
-    style_usernames
+    _unused_style_usernames
     _unused_enable_auto_complete
     show_deleted_children
     _unused_has_saved_searches
