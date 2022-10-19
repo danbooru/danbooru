@@ -7,7 +7,7 @@
   font-display: swap;
   src:
     local("Comic Relief"),
-    url("typopro-web/web/TypoPRO-ComicRelief/TypoPRO-ComicRelief-Regular.woff") format("woff");
+    url("~/public/fonts/ComicRelief-Regular.woff") format("woff");
 }
 
 @font-face {
@@ -16,7 +16,7 @@
   font-display: swap;
   src:
     local("Comic Relief"),
-    url("typopro-web/web/TypoPRO-ComicRelief/TypoPRO-ComicRelief-Bold.woff") format("woff");
+    url("~/public/fonts/ComicRelief-Bold.woff") format("woff");
 }
 
 @font-face {
@@ -25,7 +25,7 @@
   font-display: swap;
   src:
     local("Comic Relief"),
-    url("typopro-web/web/TypoPRO-ComicRelief/TypoPRO-ComicRelief-Regular.woff") format("woff");
+    url("~/public/fonts/ComicRelief-Regular.woff") format("woff");
 }
 
 @font-face {
@@ -34,7 +34,7 @@
   font-display: swap;
   src:
     local("Comic Relief"),
-    url("typopro-web/web/TypoPRO-ComicRelief/TypoPRO-ComicRelief-Bold.woff") format("woff");
+    url("~/public/fonts/ComicRelief-Bold.woff") format("woff");
 }
 
 /* https://fonts.google.com/specimen/IBM+Plex+Mono */
@@ -270,7 +270,7 @@
   font-display: swap;
   src:
     local("Kalam"),
-    url("typopro-web/web/TypoPRO-Kalam/TypoPRO-Kalam-Regular.woff") format("woff");
+    url("~/public/fonts/Kalam-Regular.woff") format("woff");
 }
 
 @font-face {
@@ -279,7 +279,7 @@
   font-display: swap;
   src:
     local("Kalam"),
-    url("typopro-web/web/TypoPRO-Kalam/TypoPRO-Kalam-Bold.woff") format("woff");
+    url("~/public/fonts/Kalam-Bold.woff") format("woff");
 }
 
 /* https://fonts.google.com/specimen/Indie+Flower */
