@@ -1683,12 +1683,12 @@ __metadata:
   linkType: hard
 
 "@jridgewell/trace-mapping@npm:^0.3.14, @jridgewell/trace-mapping@npm:^0.3.8, @jridgewell/trace-mapping@npm:^0.3.9":
-  version: 0.3.16
-  resolution: "@jridgewell/trace-mapping@npm:0.3.16"
+  version: 0.3.17
+  resolution: "@jridgewell/trace-mapping@npm:0.3.17"
   dependencies:
     "@jridgewell/resolve-uri": 3.1.0
     "@jridgewell/sourcemap-codec": 1.4.14
-  checksum: c423eaa18ff9e09a6aedc35924fb8f8f99c4d953316b3bab8de5facc6fc6b6b1923bd2351c4adcc20433214b3a766750144a67b404e766d646f7d80c5b56bc29
+  checksum: 6e0a7c0c3c01087aab753f8ee9fde419dcf5f20f10665726b21a26325b29e76f240683041b240d2f055ada333d82c74a49b4012731ff403ea0a7037c78586474
   languageName: node
   linkType: hard
 
@@ -1999,9 +1999,9 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*":
-  version: 18.8.4
-  resolution: "@types/node@npm:18.8.4"
-  checksum: 492fb33162f957ad715c0dcc02d5915844da3c4959e1509f7d5da27ca58535f220cb5acc407d0e7512bf24fefe335d72c0a7f0757636afd83b01df93f4ea35c2
+  version: 18.11.2
+  resolution: "@types/node@npm:18.11.2"
+  checksum: 1b3b1f880f50e918be2b3bba352ff2612a76994109da23cafcdbf32991243f9381e884592612021cd86d819e37323931a0eb4fb05dc56d4959bfd9ac6a4c82e2
   languageName: node
   linkType: hard
 
@@ -2901,9 +2901,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001400, caniuse-lite@npm:^1.0.30001407":
-  version: 1.0.30001418
-  resolution: "caniuse-lite@npm:1.0.30001418"
-  checksum: c36ad5b1eb77165af9d02944dda582fdc3cdf17541c3b7ade7a45230197e878e8783c313429b56f75cc65b4d315401ae1c698545c5a31acca3b897e096196d09
+  version: 1.0.30001421
+  resolution: "caniuse-lite@npm:1.0.30001421"
+  checksum: 184f673e19792e5103a5160cde1f7e1fb4758b55cf877bbf8618f72e7ea8cade8aa4b6bc46717d3fa6cb95186a6b04e32ad4f0ee586164b1c8aa20e57457b520
   languageName: node
   linkType: hard
 
@@ -3303,9 +3303,9 @@ __metadata:
   linkType: hard
 
 "cssdb@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "cssdb@npm:7.0.1"
-  checksum: 839332421a5840ef96d2ee54311007f92e36787c45de0e63e7fe83d3ed078bdd9b41eeb90bab60a04e2cd5d031f0726c5bdf73014b447cf05f4dd1ea3a4ef42e
+  version: 7.0.2
+  resolution: "cssdb@npm:7.0.2"
+  checksum: 6ecba8ff41abfe64779e4842dc81e5a1aa05f6c8b2f8e507bb654b276b87c9b9aec575f35cc8d366ba60a385c82207d564da55656ed47f3376e7144d910d415c
   languageName: node
   linkType: hard
 
@@ -3569,9 +3569,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.251":
-  version: 1.4.276
-  resolution: "electron-to-chromium@npm:1.4.276"
-  checksum: 1d9ad52d83a78229265a87a5d55d9e662f77a40af340370f51e810cf797b516c77629deb9bac124f24339a0f6777ce54c246a6a2793329a6964c4675cafba5a7
+  version: 1.4.284
+  resolution: "electron-to-chromium@npm:1.4.284"
+  checksum: a23be864e07bfd6757858b05261b567c82341cd9f23b686fc9b9348b44c28252c0daccb2da5584073fa1fcc6ee6f421804168d291136f17aca2bae8d5082bad6
   languageName: node
   linkType: hard
 
@@ -4926,11 +4926,11 @@ fsevents@~2.3.2:
   linkType: hard
 
 "is-core-module@npm:^2.5.0, is-core-module@npm:^2.9.0":
-  version: 2.10.0
-  resolution: "is-core-module@npm:2.10.0"
+  version: 2.11.0
+  resolution: "is-core-module@npm:2.11.0"
   dependencies:
     has: ^1.0.3
-  checksum: 1390a4228c6cceb4ab9bc7cfebd4a6a7e508d982520195ca6b41a019398b0d0aa13977f3e33df8f329e6cacd766f1adb73dc55718342b0ece252cc8aac33029e
+  checksum: a17868d944c75682438e638a6dd79fc1485f9ca34ba63d83c070d46504e079749fed241267952ac69f18097fd50cac5d9406704d4667d94fb9debbff4aa3d263
   languageName: node
   linkType: hard
 
@@ -5803,8 +5803,8 @@ fsevents@~2.3.2:
   linkType: hard
 
 "node-gyp@npm:latest":
-  version: 9.2.0
-  resolution: "node-gyp@npm:9.2.0"
+  version: 9.3.0
+  resolution: "node-gyp@npm:9.3.0"
   dependencies:
     env-paths: ^2.2.0
     glob: ^7.1.4
@@ -5818,7 +5818,7 @@ fsevents@~2.3.2:
     which: ^2.0.2
   bin:
     node-gyp: bin/node-gyp.js
-  checksum: fabaae362cd62e22f4322b4ffe1cda3cb4d80571f801addca1a81a95194c93ae4e115da2faa7cd620c2881c845c51c75cd415bf65bdfa71fdf65cf145e1aeff9
+  checksum: 3686be2431ed5fa9da379189de297714cb900a312d3cd5f501cbd2ca92a0d72273d3f1791ca63b32cc4ac1aae908c55c64c660ee883427ed065ef979cd159847
   languageName: node
   linkType: hard
 
@@ -6762,14 +6762,14 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.16, postcss@npm:^8.4.5, postcss@npm:^8.4.7":
-  version: 8.4.17
-  resolution: "postcss@npm:8.4.17"
+"postcss@npm:^8.4.17, postcss@npm:^8.4.5, postcss@npm:^8.4.7":
+  version: 8.4.18
+  resolution: "postcss@npm:8.4.18"
   dependencies:
     nanoid: ^3.3.4
     picocolors: ^1.0.0
     source-map-js: ^1.0.2
-  checksum: 1b42f98edcf9495cc3e9e4228d79bac089d1a51d98a5a896148e62e0a543b01da0501c16135d03c44959aa09210f6ebbe6536af115ec1655a75d4543a29b9262
+  checksum: 6674ee83d6dd724953d7c0111536e55a71334a51c59cc65e3fbcc4066f49975b0fbda9c63ea4faa86d803804c89249c411a4c9305cfacd9a662b422f50d92be6
   languageName: node
   linkType: hard
 
@@ -7017,9 +7017,9 @@ fsevents@~2.3.2:
   linkType: hard
 
 "regenerator-runtime@npm:^0.13.4":
-  version: 0.13.9
-  resolution: "regenerator-runtime@npm:0.13.9"
-  checksum: 8587f99ed63493b9ce34375f426b8ec61bf380681a374d5f2460c14ae2c289114702bed1f565a2499e809f2ba6d8ecd25a8dfee54bc224171f20a95a249be242
+  version: 0.13.10
+  resolution: "regenerator-runtime@npm:0.13.10"
+  checksum: 86a60d6c9baed5892682d53d066803eefe672e4c7c713e30c7441b86e06610dc8a3325b9d5dd2f18fa43bcae4bccc81681fccd6a5a82f6e9a9b2e4b694bb6229
   languageName: node
   linkType: hard
 
@@ -7912,8 +7912,8 @@ fsevents@~2.3.2:
   linkType: hard
 
 "stylelint@npm:^14.2.0":
-  version: 14.13.0
-  resolution: "stylelint@npm:14.13.0"
+  version: 14.14.0
+  resolution: "stylelint@npm:14.14.0"
   dependencies:
     "@csstools/selector-specificity": ^2.0.2
     balanced-match: ^2.0.0
@@ -7938,7 +7938,7 @@ fsevents@~2.3.2:
     micromatch: ^4.0.5
     normalize-path: ^3.0.0
     picocolors: ^1.0.0
-    postcss: ^8.4.16
+    postcss: ^8.4.17
     postcss-media-query-parser: ^0.2.3
     postcss-resolve-nested-selector: ^0.1.1
     postcss-safe-parser: ^6.0.0
@@ -7955,7 +7955,7 @@ fsevents@~2.3.2:
     write-file-atomic: ^4.0.2
   bin:
     stylelint: bin/stylelint.js
-  checksum: 1db230abb4e5c9633bb10d500563d821cb72e63ee12c8793baf32af623262cefb3041358a3a57fe468888a93aae8f98c04000b200651b86e48617a2b7776f362
+  checksum: a51733227052fcf179855ef8ad7e2aa0daef4b4d95269e8fa839bc2f50e7c79031635303e3283aa830f6a6a8cd42674e7640d44bf10c062402604f94367bdfff
   languageName: node
   linkType: hard
 
