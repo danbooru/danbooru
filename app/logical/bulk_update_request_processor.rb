@@ -217,6 +217,7 @@ class BulkUpdateRequestProcessor
         when :deprecate
           tag = Tag.find_or_create_by_name(args[0])
           tag.update!(is_deprecated: true, updater: User.system)
+          TagAlias.active.where(consequent_name: tag.name).each { |ti| ti.reject!(User.system) }
           TagImplication.active.where(consequent_name: tag.name).each { |ti| ti.reject!(User.system) }
           TagImplication.active.where(antecedent_name: tag.name).each { |ti| ti.reject!(User.system) }
 
