@@ -19,22 +19,34 @@
 # Compose shipped with Ubuntu 18.04 LTS (version 1.17.4).
 version: "3.4"
 
+x-base-template: &base-template
+  user: root
+  image: ghcr.io/danbooru/danbooru:production # you can change this to danbooru:master to get the latest upstream changes
+  environment:
+    RAILS_ENV: production # Set this to development to force danbooru to freshly compile js/css assets (for example if you're doing local development)
+    RAILS_SERVE_STATIC_FILES: true
+    PUMA_WORKERS: 1
+    DATABASE_URL: postgresql://danbooru@postgres/danbooru
+    DANBOORU_REDIS_URL: redis://redis:6379
+    DANBOORU_IQDB_URL: http://iqdb:5588
+    DANBOORU_CANONICAL_URL: http://localhost:3000
+    # # If you want to host danbooru under your own domain you need to replace the above line with the following (replace with your actual domain):
+    # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
+    # DANBOORU_HOSTNAME: danbooru.mydomain.com
+  volumes:
+    - "danbooru-images:/danbooru/public/data"
+    # # If you want to do local development you can uncomment these lines to force the container to use your local changes
+    # # Simply replace $HOME/danbooru to where you cloned the repo
+    # - "$HOME/danbooru/app:/danbooru/app"
+    # - "$HOME/danbooru/config:/danbooru/config"
+    # - "$HOME/danbooru/db:/danbooru/db"
+    # - "$HOME/danbooru/test:/danbooru/test"
+
 services:
   danbooru:
-    user: root
-    image: ghcr.io/danbooru/danbooru:production
+    <<: *base-template
     ports:
       - "3000:3000"
-    environment:
-      - RAILS_ENV=production
-      - RAILS_SERVE_STATIC_FILES=true
-      - PUMA_WORKERS=1
-      - DATABASE_URL=postgresql://danbooru@postgres/danbooru
-      - DANBOORU_REDIS_URL=redis://redis:6379
-      - DANBOORU_IQDB_URL=http://iqdb:5588
-      - DANBOORU_CANONICAL_URL=http://localhost:3000
-    volumes:
-      - "danbooru-images:/danbooru/public/data"
     tmpfs:
       - /tmp
     depends_on:
@@ -42,35 +54,15 @@ services:
     command: ["bash", "-c", "bin/rails db:prepare && bin/rails db:seed && bin/rails server -b 0.0.0.0"]
 
   cron:
-    user: root
-    image: ghcr.io/danbooru/danbooru:production
-    environment:
-      - RAILS_ENV=production
-      - DATABASE_URL=postgresql://danbooru@postgres/danbooru
-      - DANBOORU_REDIS_URL=redis://redis:6379
-      - DANBOORU_IQDB_URL=http://iqdb:5588
-      - DANBOORU_CANONICAL_URL=http://localhost
+    <<: *base-template
     depends_on:
       - danbooru
-    volumes:
-      - "danbooru-images:/danbooru/public/data"
     command: ["bash", "-c", "bin/wait-for-http http://danbooru:3000 5s && bin/rails danbooru:cron"]
 
   jobs:
-    # We need root to write temp upload files in the images directory (/danbooru/public/data)
-    user: root
-    image: ghcr.io/danbooru/danbooru:production
-    environment:
-      - RAILS_ENV=production
-      - DATABASE_URL=postgresql://danbooru@postgres/danbooru
-      - DANBOORU_REDIS_URL=redis://redis:6379
-      - DANBOORU_IQDB_URL=http://iqdb:5588
-      - DANBOORU_CANONICAL_URL=http://localhost
+    <<: *base-template
     depends_on:
       - danbooru
-    volumes:
-      # We need access to images so we can add/remove images to IQDB.
-      - "danbooru-images:/danbooru/public/data"
     command: ["bash", "-c", "bin/wait-for-http http://danbooru:3000 5s && bin/good_job start"]
 
   # https://github.com/danbooru/iqdb
