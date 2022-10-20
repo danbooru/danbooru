@@ -19,6 +19,7 @@
     "core-js": "^3.20.3",
     "css-loader": "^6.5.1",
     "dropzone": "^6.0.0-beta.2",
+    "echarts": "^5.4.0",
     "hammerjs": "^2.0.8",
     "jquery": "^3.6.0",
     "jquery-hotkeys": "^0.2.2",

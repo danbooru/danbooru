@@ -1,0 +1,24 @@
+<% page_title "Reports" %>
+
+<div id="c-reports">
+  <div id="a-index">
+    <h1>Reports</h1>
+
+    <ul class="list-bulleted">
+      <li><%= link_to "Posts", report_path("posts") %></li>
+      <li><%= link_to "Post votes", report_path("post_votes") %></li>
+      <li><%= link_to "Pools", report_path("pools") %></li>
+      <li><%= link_to "Comments", report_path("comments") %></li>
+      <li><%= link_to "Comment votes", report_path("comment_votes") %></li>
+      <li><%= link_to "Forum posts", report_path("forum_posts") %></li>
+      <li><%= link_to "Bulk update requests", report_path("bulk_update_requests") %></li>
+      <li><%= link_to "Tag aliases", report_path("tag_aliases") %></li>
+      <li><%= link_to "Tag implications", report_path("tag_implications") %></li>
+      <li><%= link_to "Artist edits", report_path("artist_versions") %></li>
+      <li><%= link_to "Note edits", report_path("note_versions") %></li>
+      <li><%= link_to "Wiki edits", report_path("wiki_page_versions") %></li>
+      <li><%= link_to "New users", report_path("users") %></li>
+      <li><%= link_to "Bans", report_path("bans") %></li>
+    </ul>
+  </div>
+</div>

@@ -55,6 +55,7 @@ import PreviewSizeMenuComponent from "../src/javascripts/preview_size_menu_compo
 import RelatedTag from "../src/javascripts/related_tag.js";
 import Shortcuts from "../src/javascripts/shortcuts.js";
 import TagCounter from "../src/javascripts/tag_counter.js";
+import TimeSeriesComponent from "../src/javascripts/time_series_component.js";
 import Upload from "../src/javascripts/uploads.js";
 import UserTooltip from "../src/javascripts/user_tooltips.js";
 import Utility from "../src/javascripts/utility.js";
@@ -82,6 +83,7 @@ Danbooru.PreviewSizeMenuComponent = PreviewSizeMenuComponent;
 Danbooru.RelatedTag = RelatedTag;
 Danbooru.Shortcuts = Shortcuts;
 Danbooru.TagCounter = TagCounter;
+Danbooru.TimeSeriesComponent = TimeSeriesComponent;
 Danbooru.Upload = Upload;
 Danbooru.UserTooltip = UserTooltip;
 Danbooru.Utility = Utility;

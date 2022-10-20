@@ -1,0 +1,43 @@
+<div class="flex justify-end text-xs mb-2">
+  <% if mode == :table %>
+    <%= link_to "Chart", current_page_path(search: { **search_params, mode: "chart" }) %>
+  <% else %>
+    <%= link_to "Table", current_page_path(search: { **search_params, mode: "table" }) %>
+  <% end %>
+</div>
+
+<% if mode == :table %>
+  <table class="striped autofit" width="100%">
+    <thead>
+      <th>Date</th>
+
+      <% columns.each do |column| %>
+        <%= tag.th(column.to_s.capitalize, class: ("col-expand" if column == columns.last)) %>
+      <% end %>
+    </thead>
+
+    <tbody>
+      <% results.each do |row| %>
+        <tr>
+          <td><%= row["date"].to_date %></td>
+
+          <% columns.each do |column| %>
+            <td><%= row[column.to_s] %></td>
+          <% end %>
+        <tr>
+      <% end %>
+    </tbody>
+  </table>
+<% elsif mode == :chart %>
+  <div class="line-chart" style="width: 100%; height: 80vh;"></div>
+
+  <script type="text/javascript">
+    var data = <%= raw results.to_a.to_json %>;
+    var columns = <%= raw columns.to_json %>;
+    var chart = new Danbooru.TimeSeriesComponent({
+      container: $(".line-chart").get(0),
+      data: data,
+      columns: columns,
+    });
+  </script>
+<% end %>

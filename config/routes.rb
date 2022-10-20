@@ -230,6 +230,7 @@ Rails.application.routes.draw do
   resources :rate_limits, only: [:index]
   resource :related_tag, :only => [:show, :update]
   resources :recommended_posts, only: [:index]
+  resources :reports, only: [:index, :show]
   resources :robots, only: [:index]
   resources :saved_searches, :except => [:show]
   resource :session, only: [:new, :create, :destroy] do

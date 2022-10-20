@@ -10,6 +10,7 @@ class ApplicationRecord < ActiveRecord::Base
   include HasDtextLinks
   extend HasBitFlags
   extend Searchable
+  extend Aggregatable
 
   concerning :PaginationMethods do
     class_methods do

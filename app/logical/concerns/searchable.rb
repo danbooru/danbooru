@@ -744,16 +744,15 @@ module Searchable
   end
 
   def sql_value(value)
-    if Arel.arel_node?(value)
+    case value
+    in _ if Arel.arel_node?(value)
       value
-    elsif value.is_a?(String)
-      Arel::Nodes.build_quoted(value)
-    elsif value.is_a?(Symbol)
+    in Symbol
       arel_table[value]
-    elsif value.is_a?(Array)
+    in Array
       sql_array(value)
     else
-      raise ArgumentError
+      Arel::Nodes.build_quoted(value)
     end
   end
 

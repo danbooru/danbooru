@@ -1,0 +1,22 @@
+<% page_title @title %>
+
+<div id="c-reports">
+  <div id="a-show">
+    <h1><%= @title %></h1>
+    <%= link_to "« Back", reports_path, class: "text-xs" %>
+
+    <%= search_form_for(current_page_path) do |f| %>
+      <% if @report == "posts" %>
+        <%= f.input :tags, label: "Tags", input_html: { value: params[:search][:tags], data: { autocomplete: "tag-query" } } %>
+      <% end %>
+
+      <%= f.input :from, as: :date, html5: true, input_html: { value: params[:search][:from] || 1.month.ago.to_date } %>
+      <%= f.input :to, as: :date, html5: true, input_html: { value: params[:search][:to] || Time.zone.now.to_date } %>
+      <%= f.input :period, collection: %w[Day Week Month Year], selected: params[:search][:period] %>
+      <%= f.input :mode, as: :hidden, input_html: { value: params[:search][:mode] } %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <%= render TimeSeriesComponent.new(@results, @columns.keys, mode: @mode) %>
+  </div>
+</div>

@@ -2754,9 +2754,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001400, caniuse-lite@npm:^1.0.30001407":
-  version: 1.0.30001421
-  resolution: "caniuse-lite@npm:1.0.30001421"
-  checksum: 184f673e19792e5103a5160cde1f7e1fb4758b55cf877bbf8618f72e7ea8cade8aa4b6bc46717d3fa6cb95186a6b04e32ad4f0ee586164b1c8aa20e57457b520
+  version: 1.0.30001422
+  resolution: "caniuse-lite@npm:1.0.30001422"
+  checksum: 045ad4a3af7629f0c9f5af0823bca5002ca1daa6fd47cca37aa14ae270adf1016b1e7acc6e1b6d72de60aaca004ffd1168628f1d2f6b08283153a8329e054339
   languageName: node
   linkType: hard
 
@@ -3288,6 +3288,16 @@ __metadata:
     "@swc/helpers": ^0.2.13
     just-extend: ^5.0.0
   checksum: c6c7a08a5a09b43a350ce85aacbdccb7c5a3d6af19c0ad956f15fb750701dfd1bbc8eb9b6cef5515a0c2e8dac8a583f316045f955f03cffebe5ec70a427cbd7a
+  languageName: node
+  linkType: hard
+
+"echarts@npm:^5.4.0":
+  version: 5.4.0
+  resolution: "echarts@npm:5.4.0"
+  dependencies:
+    tslib: 2.3.0
+    zrender: 5.4.0
+  checksum: b4336ba9fbc579a9e018770e773a9d9daa7eeae402357fb2def6c7e059734504645bbbcab9bfb87def1e9d78ff370a7b40082cbc2f72050b2966565b2564ca35
   languageName: node
   linkType: hard
 
@@ -6474,6 +6484,7 @@ fsevents@~2.3.2:
     core-js: ^3.20.3
     css-loader: ^6.5.1
     dropzone: ^6.0.0-beta.2
+    echarts: ^5.4.0
     eslint: ^8.7.0
     eslint-plugin-babel: ^5.3.1
     eslint-plugin-ignore-erb: ^0.1.1
@@ -7301,6 +7312,13 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
+"tslib@npm:2.3.0":
+  version: 2.3.0
+  resolution: "tslib@npm:2.3.0"
+  checksum: 7b4fc9feff0f704743c3760f5d8d708f6417fac6458159e63df3a6b1100f0736e3b99edb9fe370f274ad15160a1f49ff05cb49402534c818ff552c48e38c3e6e
+  languageName: node
+  linkType: hard
+
 "type-check@npm:^0.4.0, type-check@npm:~0.4.0":
   version: 0.4.0
   resolution: "type-check@npm:0.4.0"
@@ -7776,5 +7794,14 @@ fsevents@~2.3.2:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: 096c3b40beb2804659539be1605a35c58eb0c85285f94b77b3e924f42ee265c1a40bf9f4153770039517146b469a964d51742395f35ca8135fc9f7e4982b785d
+  languageName: node
+  linkType: hard
+
+"zrender@npm:5.4.0":
+  version: 5.4.0
+  resolution: "zrender@npm:5.4.0"
+  dependencies:
+    tslib: 2.3.0
+  checksum: ddd754f92e132939694ad4abf0914f7811696397370f1dfc684bde45dcaa5a5b0e66e7b60b062a3f3a2dbcd54393ec431cae447a4ea7db9c5307a5f70a0ea5c9
   languageName: node
   linkType: hard
