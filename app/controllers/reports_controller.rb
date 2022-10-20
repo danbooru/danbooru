@@ -3,6 +3,8 @@
 class ReportsController < ApplicationController
   respond_to :html, :json, :xml
 
+  rate_limit :show, rate: 1.0/3.seconds, burst: 15
+
   def index
   end
 
@@ -75,7 +77,16 @@ class ReportsController < ApplicationController
     @from = params.dig(:search, :from) || 1.month.ago
     @to = params.dig(:search, :to) || Time.zone.now
 
-    @results = @model.search(params[:search], CurrentUser.user).timeseries(period: @period, from: @from, to: @to, columns: @columns)
+    if CurrentUser.user.is_member? && CurrentUser.user.statement_timeout < 10_000
+      @statement_timeout = 10_000
+    else
+      @statement_timeout = CurrentUser.user.statement_timeout
+    end
+
+    ApplicationRecord.set_timeout(@statement_timeout) do
+      @results = @model.search(params[:search], CurrentUser.user).timeseries(period: @period, from: @from, to: @to, columns: @columns)
+    end
+
     respond_with(@results)
   end
 end

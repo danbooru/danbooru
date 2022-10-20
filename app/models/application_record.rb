@@ -134,6 +134,13 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :ActiveRecordExtensions do
     class_methods do
+      def set_timeout(n)
+        connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env.test?
+        yield
+      ensure
+        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.statement_timeout}") unless Rails.env.test?
+      end
+
       def without_timeout
         connection.execute("SET STATEMENT_TIMEOUT = 0") unless Rails.env.test?
         yield
