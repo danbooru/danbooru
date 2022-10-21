@@ -19,8 +19,11 @@
 # Compose shipped with Ubuntu 18.04 LTS (version 1.17.4).
 version: "3.4"
 
+name: danbooru
+
 x-base-template: &base-template
   user: root
+  # pull_policy: always # Uncomment this to always pull the latest image when deploying.
   image: ghcr.io/danbooru/danbooru:production # you can change this to danbooru:master to get the latest upstream changes
   environment:
     RAILS_ENV: production # Set this to development to force danbooru to freshly compile js/css assets (for example if you're doing local development)
