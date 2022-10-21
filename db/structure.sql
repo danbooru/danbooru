@@ -146,8 +146,8 @@ ALTER SEQUENCE public.api_keys_id_seq OWNED BY public.api_keys.id;
 CREATE TABLE public.ar_internal_metadata (
     key character varying NOT NULL,
     value character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -268,12 +268,12 @@ CREATE TABLE public.artist_versions (
     name character varying NOT NULL,
     updater_id integer NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
-    other_names text[] DEFAULT '{}'::text[] NOT NULL,
     group_name character varying DEFAULT ''::character varying NOT NULL,
-    urls text[] DEFAULT '{}'::text[] NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    other_names text[] DEFAULT '{}'::text[] NOT NULL,
+    urls text[] DEFAULT '{}'::text[] NOT NULL
 );
 
 
@@ -306,10 +306,10 @@ CREATE TABLE public.artists (
     name character varying NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
-    other_names text[] DEFAULT '{}'::text[] NOT NULL,
     group_name character varying DEFAULT ''::character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    other_names text[] DEFAULT '{}'::text[] NOT NULL
 );
 
 
@@ -801,7 +801,7 @@ ALTER SEQUENCE public.forum_topics_id_seq OWNED BY public.forum_topics.id;
 --
 
 CREATE TABLE public.good_job_processes (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     state jsonb
@@ -813,7 +813,7 @@ CREATE TABLE public.good_job_processes (
 --
 
 CREATE TABLE public.good_jobs (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     queue_name text,
     priority integer,
     serialized_params jsonb,
@@ -836,12 +836,12 @@ CREATE TABLE public.good_jobs (
 --
 
 CREATE TABLE public.ip_bans (
+    id integer NOT NULL,
     creator_id integer NOT NULL,
     ip_addr inet NOT NULL,
     reason text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    id integer NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     category integer DEFAULT 0 NOT NULL,
     hit_count integer DEFAULT 0 NOT NULL,
@@ -1094,17 +1094,17 @@ ALTER SEQUENCE public.news_updates_id_seq OWNED BY public.news_updates.id;
 
 CREATE TABLE public.note_versions (
     id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    note_id integer NOT NULL,
+    post_id integer NOT NULL,
+    updater_id integer NOT NULL,
     x integer NOT NULL,
     y integer NOT NULL,
     width integer NOT NULL,
     height integer NOT NULL,
-    body text NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
-    note_id integer NOT NULL,
-    post_id integer NOT NULL,
-    updater_id integer NOT NULL,
+    body text NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     version integer DEFAULT 0 NOT NULL
 );
 
@@ -1391,8 +1391,8 @@ ALTER SEQUENCE public.post_disapprovals_id_seq OWNED BY public.post_disapprovals
 CREATE TABLE public.post_flags (
     id integer NOT NULL,
     post_id integer NOT NULL,
-    reason text NOT NULL,
     creator_id integer NOT NULL,
+    reason text NOT NULL,
     is_resolved boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -1432,33 +1432,33 @@ CREATE TABLE public.post_replacements (
 CREATE TABLE public.posts (
     id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    uploader_id integer NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    up_score integer DEFAULT 0 NOT NULL,
+    down_score integer DEFAULT 0 NOT NULL,
     score integer DEFAULT 0 NOT NULL,
     source character varying DEFAULT ''::character varying NOT NULL,
     md5 character varying NOT NULL,
-    last_comment_bumped_at timestamp without time zone,
     rating character(1) DEFAULT 'q'::bpchar NOT NULL,
-    image_width integer NOT NULL,
-    image_height integer NOT NULL,
-    tag_string text DEFAULT ''::text NOT NULL,
-    fav_count integer DEFAULT 0 NOT NULL,
-    file_ext character varying NOT NULL,
-    last_noted_at timestamp without time zone,
-    parent_id integer,
-    has_children boolean DEFAULT false NOT NULL,
+    is_pending boolean DEFAULT false NOT NULL,
+    is_flagged boolean DEFAULT false NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
+    uploader_id integer NOT NULL,
     approver_id integer,
+    last_noted_at timestamp without time zone,
+    last_comment_bumped_at timestamp without time zone,
+    fav_count integer DEFAULT 0 NOT NULL,
+    tag_string text DEFAULT ''::text NOT NULL,
+    tag_count integer DEFAULT 0 NOT NULL,
     tag_count_general integer DEFAULT 0 NOT NULL,
     tag_count_artist integer DEFAULT 0 NOT NULL,
     tag_count_character integer DEFAULT 0 NOT NULL,
     tag_count_copyright integer DEFAULT 0 NOT NULL,
+    file_ext character varying NOT NULL,
     file_size integer NOT NULL,
-    up_score integer DEFAULT 0 NOT NULL,
-    down_score integer DEFAULT 0 NOT NULL,
-    is_pending boolean DEFAULT false NOT NULL,
-    is_flagged boolean DEFAULT false NOT NULL,
-    is_deleted boolean DEFAULT false NOT NULL,
-    tag_count integer DEFAULT 0 NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    image_width integer NOT NULL,
+    image_height integer NOT NULL,
+    parent_id integer,
+    has_children boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
     pixiv_id integer,
     last_commented_at timestamp without time zone,
@@ -2018,12 +2018,12 @@ CREATE TABLE public.user_events (
 --
 
 CREATE TABLE public.user_feedback (
+    id integer NOT NULL,
     user_id integer NOT NULL,
     creator_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    body text NOT NULL,
     category character varying NOT NULL,
-    id integer NOT NULL,
+    body text NOT NULL,
+    created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL
 );
@@ -2066,22 +2066,22 @@ CREATE TABLE public.user_upgrades (
 
 CREATE TABLE public.users (
     id integer NOT NULL,
-    name character varying NOT NULL,
-    level integer NOT NULL,
-    inviter_id integer,
     created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone,
+    name character varying NOT NULL,
+    inviter_id integer,
+    level integer NOT NULL,
     last_logged_in_at timestamp without time zone,
     last_forum_read_at timestamp without time zone,
+    post_upload_count integer NOT NULL,
+    post_update_count integer NOT NULL,
+    note_update_count integer NOT NULL,
+    favorite_count integer NOT NULL,
     comment_threshold integer NOT NULL,
-    updated_at timestamp without time zone,
     default_image_size character varying NOT NULL,
     favorite_tags text,
     blacklisted_tags text,
     time_zone character varying NOT NULL,
-    post_update_count integer NOT NULL,
-    note_update_count integer NOT NULL,
-    favorite_count integer NOT NULL,
-    post_upload_count integer NOT NULL,
     bcrypt_password_hash text NOT NULL,
     per_page integer NOT NULL,
     custom_style text,
@@ -2099,13 +2099,13 @@ CREATE TABLE public.users (
 
 CREATE TABLE public.wiki_page_versions (
     id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    wiki_page_id integer NOT NULL,
+    updater_id integer NOT NULL,
     title character varying NOT NULL,
     body text NOT NULL,
-    updater_id integer NOT NULL,
-    wiki_page_id integer NOT NULL,
     is_locked boolean NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     other_names text[] DEFAULT '{}'::text[] NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL
 );
@@ -5673,13 +5673,6 @@ CREATE INDEX index_user_sessions_on_session_id ON public.user_sessions USING btr
 --
 
 CREATE INDEX index_user_sessions_on_updated_at ON public.user_sessions USING btree (updated_at);
-
-
---
--- Name: index_user_upgrades_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_upgrades_on_created_at ON public.user_upgrades USING btree (created_at);
 
 
 --
