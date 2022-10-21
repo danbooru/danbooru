@@ -3,13 +3,13 @@ require 'test_helper'
 class ApproverPrunerTest < ActiveSupport::TestCase
   context "ApproverPruner" do
     setup do
-      @approver = create(:user, can_approve_posts: true)
+      @approver = create(:approver)
     end
 
     should "demote inactive approvers" do
       assert_equal([@approver.id], ApproverPruner.inactive_approvers.map(&:id))
       assert_nothing_raised { ApproverPruner.prune! }
-      assert_equal(false, @approver.reload.can_approve_posts)
+      assert_equal(User::Levels::CONTRIBUTOR, @approver.reload.level)
     end
 
     should "not demote active approvers" do
@@ -22,7 +22,7 @@ class ApproverPrunerTest < ActiveSupport::TestCase
     should "not demote recently promoted approvers" do
       as(create(:admin_user)) do
         @user = create(:user)
-        @user.promote_to!(User::Levels::BUILDER, can_approve_posts: true)
+        @user.promote_to!(User::Levels::APPROVER)
       end
 
       assert_not_includes(ApproverPruner.inactive_approvers.map(&:id), @user.id)

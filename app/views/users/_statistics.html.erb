@@ -94,11 +94,6 @@
         </td>
       </tr>
 
-      <tr>
-        <th>Permissions</th>
-        <td><%= presenter.permissions %></td>
-      </tr>
-
       <% if user.is_banned? && user.active_ban.present? %>
         <tr>
           <th>Ban reason</th>

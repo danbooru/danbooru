@@ -5,7 +5,7 @@ class PostApprovalTest < ActiveSupport::TestCase
     setup do
       @user = create(:user, created_at: 2.weeks.ago)
       @post = create(:post, uploader: @user, is_pending: true)
-      @approver = create(:user, can_approve_posts: true)
+      @approver = create(:approver)
     end
 
     context "a pending post" do

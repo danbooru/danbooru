@@ -7,14 +7,6 @@
 
       <% if @user.is_banned? %>
         <%= link_to "Banned", users_path(search: { is_banned: true }), class: "user-tooltip-badge user-tooltip-badge-banned" %>
-      <% elsif @user.is_admin? %>
-        <%= link_to @user.level_string, users_path(search: { level: @user.level }), class: "user-tooltip-badge user-tooltip-badge-#{@user.level_string.downcase}" %>
-      <% elsif @user.is_moderator? %>
-        <%= link_to @user.level_string, users_path(search: { level: @user.level }), class: "user-tooltip-badge user-tooltip-badge-#{@user.level_string.downcase}" %>
-      <% elsif @user.can_approve_posts? %>
-        <%= link_to "Approver", users_path(search: { can_approve_posts: true }), class: "user-tooltip-badge user-tooltip-badge-approver" %>
-      <% elsif @user.can_upload_free? %>
-        <%= link_to "Contributor", users_path(search: { can_upload_free: true }), class: "user-tooltip-badge user-tooltip-badge-contributor" %>
       <% else %>
         <%= link_to @user.level_string, users_path(search: { level: @user.level }), class: "user-tooltip-badge user-tooltip-badge-#{@user.level_string.downcase}" %>
       <% end %>

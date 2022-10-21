@@ -56,9 +56,8 @@ class UserPolicy < ApplicationPolicy
 
   def api_attributes
     attributes = %i[
-      id created_at name inviter_id level
+      id created_at name inviter_id level level_string
       post_upload_count post_update_count note_update_count is_banned
-      can_approve_posts can_upload_free level_string
     ]
 
     if record.id == user.id

@@ -4,7 +4,7 @@ class PostFlagTest < ActiveSupport::TestCase
   context "PostFlag: " do
     context "an approver" do
       should "be able to flag an unlimited number of posts" do
-        @user = create(:user, can_approve_posts: true)
+        @user = create(:approver)
 
         assert_nothing_raised do
           create_list(:post_flag, 6, creator: @user, status: :pending)

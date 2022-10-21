@@ -9,7 +9,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         @mod_user = create(:moderator_user, name: "yukari")
-        @other_user = create(:builder_user, can_upload_free: true, inviter: @mod_user, created_at: 2.weeks.ago)
+        @other_user = create(:contributor_user, inviter: @mod_user, created_at: 2.weeks.ago)
         @uploader = create(:user, created_at: 2.weeks.ago)
       end
 
@@ -41,7 +41,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should respond_to_search({}).with { [@uploader, @other_user, @mod_user, @user, User.system] }
       should respond_to_search(min_level: User::Levels::BUILDER).with { [@other_user, @mod_user, User.system] }
-      should respond_to_search(can_upload_free: "true").with { @other_user }
       should respond_to_search(name_matches: "yukari").with { @mod_user }
 
       context "using includes" do
@@ -114,7 +113,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     context "show action" do
       setup do
         # flesh out profile to get more test coverage of user presenter.
-        @user = create(:user, can_approve_posts: true, created_at: 2.weeks.ago)
+        @user = create(:approver, created_at: 2.weeks.ago)
         as(@user) do
           create(:saved_search, user: @user)
           create(:post, uploader: @user, tag_string: "fav:#{@user.name}")

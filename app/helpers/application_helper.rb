@@ -218,9 +218,7 @@ module ApplicationHelper
   def link_to_user(user, text = nil, classes: nil, **options)
     return "anonymous" if user.blank?
 
-    user_class = "user user-#{user.level_string.downcase} #{classes}"
-    user_class += " user-post-approver" if user.can_approve_posts?
-    user_class += " user-post-uploader" if user.can_upload_free?
+    user_class = "user user-#{user.level_string.downcase} #{classes}".strip
     user_class += " user-banned" if user.is_banned?
 
     text = user.pretty_name if text.blank?
