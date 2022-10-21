@@ -58,7 +58,6 @@
           </p>
         </div>
 
-        <%= f.input :style_usernames, :as => :select, :label => "Colored usernames", :hint => "Color users according to their user level", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :new_post_navigation_layout, :as => :select, :label => "Navigation bar position", :include_blank => false, :collection => [["Below", "true"], ["Above", "false"]], :hint => "When browsing pools or posts, place navigation links above or below the image" %>
         <%= f.input :show_deleted_posts, as: :select, hint: "Show deleted posts in searches", collection: [["No", "false"], ["Yes", "true"]], include_blank: false %>
         <%= f.input :show_deleted_children, :as => :select, :label => "Show deleted children", :hint => "Show thumbnail borders on parent posts even if the children are deleted", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
