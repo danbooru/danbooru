@@ -24,11 +24,36 @@ class ReportsController < ApplicationController
       @title = "Posts Report"
       @available_columns = { posts: "COUNT(*)", uploaders: "COUNT(distinct uploader_id)" }
       @available_groups = %w[uploader approver rating is_deleted]
+    when "post_approvals"
+      @model = PostApproval
+      @title = "Post Approvals Report"
+      @available_columns = { approvals: "COUNT(*)", approvers: "COUNT(distinct user_id)" }
+      @available_groups = %w[user]
+    when "post_appeals"
+      @model = PostAppeal
+      @title = "Post Appeals Report"
+      @available_columns = { appeals: "COUNT(*)", appealers: "COUNT(distinct creator_id)" }
+      @available_groups = %w[creator status]
+    when "post_flags"
+      @model = PostFlag
+      @title = "Post Flags Report"
+      @available_columns = { flags: "COUNT(*)", flaggers: "COUNT(distinct creator_id)" }
+      @available_groups = %w[status]
+    when "post_replacements"
+      @model = PostReplacement
+      @title = "Post Replacements Report"
+      @available_columns = { replacements: "COUNT(*)", replacers: "COUNT(distinct creator_id)" }
+      @available_groups = %w[creator]
     when "post_votes"
       @model = PostVote
       @title = "Post Votes Report"
       @available_columns = { votes: "COUNT(*)", posts: "COUNT(distinct post_id)", voters: "COUNT(distinct user_id)" }
       @available_groups = %w[]
+    when "media_assets"
+      @model = MediaAsset
+      @title = "Media Assets Report"
+      @available_columns = { assets: "COUNT(*)", size: "SUM(file_size)", duration: "SUM(duration)" }
+      @available_groups = %w[file_ext status]
     when "pools"
       @model = Pool
       @title = "Pools Report"
@@ -69,6 +94,11 @@ class ReportsController < ApplicationController
       @title = "Artist Edits Report"
       @available_columns = { artist_edits: "COUNT(*)", artists: "COUNT(distinct artist_id)", editors: "COUNT(distinct updater_id)" }
       @available_groups = %w[updater]
+    when "artist_commentary_versions"
+      @model = ArtistCommentaryVersion
+      @title = "Artist Commentary Edits Report"
+      @available_columns = { commentary_edits: "COUNT(*)", editors: "COUNT(distinct updater_id)" }
+      @available_groups = %w[updater]
     when "note_versions"
       @model = NoteVersion
       @title = "Note Edits Report"
@@ -79,16 +109,21 @@ class ReportsController < ApplicationController
       @title = "Wiki Edits Report"
       @available_columns = { wiki_edits: "COUNT(*)", editors: "COUNT(distinct updater_id)" }
       @available_groups = %w[updater]
-    when "users"
-      @model = User
-      @title = "New Users Report"
-      @available_columns = { users: "COUNT(*)" }
-      @available_groups = %w[level]
+    when "mod_actions"
+      @model = ModAction
+      @title = "Mod Actions Report"
+      @available_columns = { mod_actions: "COUNT(*)", creators: "COUNT(distinct creator_id)" }
+      @available_groups = %w[creator category subject_type]
     when "bans"
       @model = Ban
       @title = "Bans Report"
       @available_columns = { bans: "COUNT(*)", banners: "COUNT(DISTINCT banner_id)" }
       @available_groups = %w[banner duration]
+    when "users"
+      @model = User
+      @title = "New Users Report"
+      @available_columns = { users: "COUNT(*)" }
+      @available_groups = %w[level]
     else
       raise ActiveRecord::RecordNotFound
     end

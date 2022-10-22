@@ -6,7 +6,12 @@
 
     <ul class="list-bulleted">
       <li><%= link_to "Posts", report_path("posts") %></li>
+      <li><%= link_to "Post approvals", report_path("post_approvals") %></li>
+      <li><%= link_to "Post appeals", report_path("post_appeals") %></li>
+      <li><%= link_to "Post flags", report_path("post_flags") %></li>
+      <li><%= link_to "Post replacements", report_path("post_replacements") %></li>
       <li><%= link_to "Post votes", report_path("post_votes") %></li>
+      <li><%= link_to "Media assets", report_path("media_assets") %></li>
       <li><%= link_to "Pools", report_path("pools") %></li>
       <li><%= link_to "Comments", report_path("comments") %></li>
       <li><%= link_to "Comment votes", report_path("comment_votes") %></li>
@@ -15,10 +20,12 @@
       <li><%= link_to "Tag aliases", report_path("tag_aliases") %></li>
       <li><%= link_to "Tag implications", report_path("tag_implications") %></li>
       <li><%= link_to "Artist edits", report_path("artist_versions") %></li>
+      <li><%= link_to "Artist commentary edits", report_path("artist_commentary_versions") %></li>
       <li><%= link_to "Note edits", report_path("note_versions") %></li>
       <li><%= link_to "Wiki edits", report_path("wiki_page_versions") %></li>
-      <li><%= link_to "New users", report_path("users") %></li>
+      <li><%= link_to "Mod actions", report_path("mod_actions") %></li>
       <li><%= link_to "Bans", report_path("bans") %></li>
+      <li><%= link_to "Users", report_path("users") %></li>
     </ul>
   </div>
 </div>
