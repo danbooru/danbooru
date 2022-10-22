@@ -58,6 +58,7 @@ gem "debug"
 gem "ffaker"
 gem "composite_primary_keys"
 gem "resolv"
+gem "rover-df"
 
 group :development do
   gem 'rubocop', require: false

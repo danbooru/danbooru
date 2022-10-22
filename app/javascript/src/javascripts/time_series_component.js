@@ -11,7 +11,7 @@ export default class TimeSeriesComponent {
 
     this.options = {
       dataset: {
-        dimensions: ["date", ...columns],
+        dimensions: ["date", ...this.columns],
         source: data,
       },
       tooltip: {
@@ -46,14 +46,15 @@ export default class TimeSeriesComponent {
         containLabel: true
       },
       legend: {
-        data: columns.map(startCase),
+        data: this.columns.map(startCase),
       },
       xAxis: { type: "time" },
-      yAxis: columns.map(name => ({ type: "value" })),
-      series: columns.map(name => ({
+      yAxis: this.columns.map(name => ({ type: "value" })),
+      series: this.columns.map(name => ({
         name: startCase(name),
         type: "line",
         areaStyle: {},
+        stack: "all",
         emphasis: {
           focus: "series"
         },

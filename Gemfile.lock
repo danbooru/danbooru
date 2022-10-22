@@ -315,6 +315,7 @@ GEM
     nokogiri (1.13.9)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
+    numo-narray (0.9.2.1)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
       jwt (>= 1.0, < 3.0)
@@ -407,6 +408,8 @@ GEM
     reverse_markdown (2.1.1)
       nokogiri
     rexml (3.2.5)
+    rover-df (0.3.4)
+      numo-narray (>= 0.9.1.9)
     rubocop (1.36.0)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -582,6 +585,7 @@ DEPENDENCIES
   redis
   resolv
   responders
+  rover-df
   rubocop
   rubocop-rails
   ruby-vips

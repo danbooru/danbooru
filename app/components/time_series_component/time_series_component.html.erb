@@ -9,20 +9,18 @@
 <% if mode == :table %>
   <table class="striped autofit" width="100%">
     <thead>
-      <th>Date</th>
-
-      <% columns.each do |column| %>
-        <%= tag.th(column.to_s.capitalize, class: ("col-expand" if column == columns.last)) %>
+      <% dataframe.types.keys.each do |column| %>
+        <%= tag.th(column.to_s.titleize, class: ("col-expand" if column == dataframe.types.keys.last)) %>
       <% end %>
     </thead>
 
     <tbody>
-      <% results.each do |row| %>
+      <% dataframe.each_row do |row| %>
         <tr>
-          <td><%= row["date"].to_date %></td>
-
-          <% columns.each do |column| %>
-            <td><%= row[column.to_s] %></td>
+          <% dataframe.types.keys.each do |column| %>
+            <td>
+              <%= row[column] %>
+            </td>
           <% end %>
         <tr>
       <% end %>
@@ -32,8 +30,8 @@
   <div class="line-chart" style="width: 100%; height: 80vh;"></div>
 
   <script type="text/javascript">
-    var data = <%= raw results.to_a.to_json %>;
-    var columns = <%= raw columns.to_json %>;
+    var data = <%= raw dataframe.each_row.map(&:values).to_json %>;
+    var columns = <%= raw dataframe.types.keys.without("date").to_json %>;
     var chart = new Danbooru.TimeSeriesComponent({
       container: $(".line-chart").get(0),
       data: data,

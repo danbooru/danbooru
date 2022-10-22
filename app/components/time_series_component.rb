@@ -3,11 +3,11 @@
 class TimeSeriesComponent < ApplicationComponent
   delegate :current_page_path, :search_params, to: :helpers
 
-  attr_reader :results, :columns, :mode
+  attr_reader :dataframe, :group, :mode
 
-  def initialize(results, columns, mode: :table)
-    @results = results
-    @columns = columns
+  def initialize(dataframe, group: nil, mode: :table)
+    @dataframe = dataframe
+    @group = group
     @mode = mode.to_sym
   end
 end

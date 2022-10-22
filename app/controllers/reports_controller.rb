@@ -11,71 +11,87 @@ class ReportsController < ApplicationController
   def show
     @report = params[:id]
     @mode = params.dig(:search, :mode) || "chart"
+    @period = params.dig(:search, :period)&.downcase || "day"
+    @from = params.dig(:search, :from) || 1.month.ago
+    @to = params.dig(:search, :to) || Time.zone.now
+    @columns = params.dig(:search, :columns).to_s.split(/[[:space:],]/).map(&:to_sym)
+    @group = params.dig(:search, :group)&.downcase&.tr(" ", "_")
+    @group_limit = params.dig(:search, :group_limit) || 10
 
     case @report
     when "posts"
       @model = Post
       @title = "Posts Report"
-      @columns = { posts: "COUNT(*)", uploaders: "COUNT(distinct uploader_id)" }
+      @available_columns = { posts: "COUNT(*)", uploaders: "COUNT(distinct uploader_id)" }
+      @available_groups = %w[uploader approver rating is_deleted]
     when "post_votes"
       @model = PostVote
       @title = "Post Votes Report"
-      @columns = { votes: "COUNT(*)", posts: "COUNT(distinct post_id)", voters: "COUNT(distinct user_id)" }
+      @available_columns = { votes: "COUNT(*)", posts: "COUNT(distinct post_id)", voters: "COUNT(distinct user_id)" }
+      @available_groups = %w[]
     when "pools"
       @model = Pool
       @title = "Pools Report"
-      @columns = { series_pools: "COUNT(*) FILTER (WHERE category = 'series')", collection_pools: "COUNT(*) FILTER (WHERE category = 'collection')" }
+      @available_columns = { pools: "COUNT(*)" }
+      @available_groups = %w[category is_deleted]
     when "comments"
       @model = Comment
       @title = "Comments Report"
-      @columns = { comments: "COUNT(*)", commenters: "COUNT(distinct creator_id)" }
+      @available_columns = { comments: "COUNT(*)", commenters: "COUNT(distinct creator_id)" }
+      @available_groups = %w[creator do_not_bump_post is_deleted is_sticky]
     when "comment_votes"
       @model = CommentVote
       @title = "Comment Votes Report"
-      @columns = { votes: "COUNT(*)", comments: "COUNT(distinct comment_id)", voters: "COUNT(distinct user_id)" }
+      @available_columns = { votes: "COUNT(*)", comments: "COUNT(distinct comment_id)", voters: "COUNT(distinct user_id)" }
+      @available_groups = %w[]
     when "forum_posts"
       @model = ForumPost
       @title = "Forum Posts Report"
-      @columns = { forum_posts: "COUNT(*)", posters: "COUNT(distinct creator_id)" }
+      @available_columns = { forum_posts: "COUNT(*)", posters: "COUNT(distinct creator_id)" }
+      @available_groups = %w[creator is_deleted]
     when "bulk_update_requests"
       @model = BulkUpdateRequest
       @title = "Bulk Update Requests Report"
-      @columns = { requests: "COUNT(*)", requestors: "COUNT(distinct user_id)" }
+      @available_columns = { requests: "COUNT(*)", requestors: "COUNT(distinct user_id)" }
+      @available_groups = %w[user approver status]
     when "tag_aliases"
       @model = TagAlias
       @title = "Tag Aliases Report"
-      @columns = { aliases: "COUNT(*)" }
+      @available_columns = { aliases: "COUNT(*)" }
+      @available_groups = %w[status approver]
     when "tag_implications"
       @model = TagImplication
       @title = "Tag Implications Report"
-      @columns = { aliases: "COUNT(*)" }
+      @available_columns = { aliases: "COUNT(*)" }
+      @available_groups = %w[status approver]
     when "artist_versions"
       @model = ArtistVersion
       @title = "Artist Edits Report"
-      @columns = { artist_edits: "COUNT(*)", artists: "COUNT(distinct artist_id)", editors: "COUNT(distinct updater_id)" }
+      @available_columns = { artist_edits: "COUNT(*)", artists: "COUNT(distinct artist_id)", editors: "COUNT(distinct updater_id)" }
+      @available_groups = %w[updater]
     when "note_versions"
       @model = NoteVersion
       @title = "Note Edits Report"
-      @columns = { note_edits: "COUNT(*)", posts: "COUNT(distinct post_id)", editors: "COUNT(distinct updater_id)" }
+      @available_columns = { note_edits: "COUNT(*)", posts: "COUNT(distinct post_id)", editors: "COUNT(distinct updater_id)" }
+      @available_groups = %w[updater]
     when "wiki_page_versions"
       @model = WikiPageVersion
       @title = "Wiki Edits Report"
-      @columns = { wiki_edits: "COUNT(*)", editors: "COUNT(distinct updater_id)" }
+      @available_columns = { wiki_edits: "COUNT(*)", editors: "COUNT(distinct updater_id)" }
+      @available_groups = %w[updater]
     when "users"
       @model = User
       @title = "New Users Report"
-      @columns = { users: "COUNT(*)" }
+      @available_columns = { users: "COUNT(*)" }
+      @available_groups = %w[level]
     when "bans"
       @model = Ban
       @title = "Bans Report"
-      @columns = { bans: "COUNT(*)", banners: "COUNT(DISTINCT banner_id)" }
+      @available_columns = { bans: "COUNT(*)", banners: "COUNT(DISTINCT banner_id)" }
+      @available_groups = %w[banner duration]
     else
       raise ActiveRecord::RecordNotFound
     end
-
-    @period = params.dig(:search, :period)&.downcase || "day"
-    @from = params.dig(:search, :from) || 1.month.ago
-    @to = params.dig(:search, :to) || Time.zone.now
 
     if CurrentUser.user.is_member? && CurrentUser.user.statement_timeout < 10_000
       @statement_timeout = 10_000
@@ -84,9 +100,15 @@ class ReportsController < ApplicationController
     end
 
     ApplicationRecord.set_timeout(@statement_timeout) do
-      @results = @model.search(params[:search], CurrentUser.user).timeseries(period: @period, from: @from, to: @to, columns: @columns)
+      @group = nil unless @group&.in?(@available_groups)
+      @columns = @available_columns.slice(*@columns)
+      @columns = [@available_columns.first].to_h if @columns.blank?
+      @dataframe = @model.search(params[:search], CurrentUser.user).timeseries(period: @period, from: @from, to: @to, groups: [@group].compact_blank, group_limit: @group_limit, columns: @columns)
+      @dataframe["date"] = @dataframe["date"].map(&:to_date)
+      @dataframe[@group] = @dataframe[@group].map(&:pretty_name) if @group.in?(%w[creator updater uploader banner approver user])
+      @dataframe = @dataframe.crosstab("date", @group) if @group
     end
 
-    respond_with(@results)
+    respond_with(@dataframe)
   end
 end
