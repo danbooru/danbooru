@@ -10,7 +10,6 @@ module Aggregatable
     from = from.to_date
     to = to.to_date
 
-    group_associations = groups.map { |name| reflections[name.to_s] }.compact_blank
     group_fields = groups.map { |name| reflections[name.to_s]&.foreign_key || name }
 
     # SELECT date_trunc('day', posts.created_at) AS date FROM posts WHERE created_at BETWEEN from AND to GROUP BY date
@@ -75,12 +74,23 @@ module Aggregatable
     #   ) subquery ON subquery.date = dates.date AND subquery.uploader_id = uploader_ids.uploader_id
     #   ORDER BY date DESC
 
-    results = query.select_all
-    types = results.columns.map { |column| [column, :object] }.to_h
+    build_dataframe(query, groups)
+  end
 
-    dataframe = Danbooru::DataFrame.new(results.to_a, types: types)
-    dataframe = dataframe.preload_associations(group_associations)
-    dataframe
+  def aggregate(date_column: :created_at, from: first[date_column], to: Time.now.utc, groups: [], limit: 50, columns: { count: "COUNT(*)" }, order: Arel.sql("#{columns.first.second} DESC"))
+    group_fields = groups.map { |name| reflections[name.to_s]&.foreign_key || name }
+
+    query = where(date_column => (from..to)).reorder(order).limit(limit)
+
+    group_fields.each do |name|
+      query = query.select(name).group(name).where.not(name => nil)
+    end
+
+    columns.each do |name, sql|
+      query = query.select(Arel.sql(sql).as(name.to_s).to_sql)
+    end
+
+    build_dataframe(query, groups)
   end
 
   def group_by_period(period = "day", column = :created_at)
@@ -105,5 +115,17 @@ module Aggregatable
 
   def generate_timeseries(from, to, interval)
     generate_series(from, to, Arel.sql("#{connection.quote("1 #{interval}")}::interval"))
+  end
+
+  private
+
+  def build_dataframe(query, groups)
+    results = query.select_all
+    types = results.columns.map { |column| [column, :object] }.to_h
+    associations = groups.map { |name| reflections[name.to_s] }.compact_blank
+
+    dataframe = Danbooru::DataFrame.new(results.to_a, types: types)
+    dataframe = dataframe.preload_associations(associations)
+    dataframe
   end
 end

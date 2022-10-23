@@ -12,12 +12,13 @@
 
       <%= f.input :from, as: :date, html5: true, input_html: { value: params[:search][:from] || 1.month.ago.to_date } %>
       <%= f.input :to, as: :date, html5: true, input_html: { value: params[:search][:to] || Time.zone.now.to_date } %>
-      <%= f.input :period, collection: %w[Day Week Month Year], selected: params[:search][:period] %>
+      <%= f.input :period, collection: %w[day week month year].map { [_1.capitalize, _1] }, include_blank: true, selected: @period %>
       <%= f.input :group, label: "Group By", collection: @available_groups.map { |group| [group.titleize, group] }, include_blank: true, selected: params[:search][:group] if @available_groups.present? %>
+      <%= f.input :group_limit, label: "Top", collection: [10, 25, 50, 100], selected: @group_limit if @group %>
       <%= f.input :mode, as: :hidden, input_html: { value: params[:search][:mode] } %>
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= render TimeSeriesComponent.new(@dataframe, mode: @mode) %>
+    <%= render TimeSeriesComponent.new(@dataframe, x_axis: @x_axis, mode: @mode) %>
   </div>
 </div>

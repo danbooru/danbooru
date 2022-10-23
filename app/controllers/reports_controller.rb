@@ -11,12 +11,12 @@ class ReportsController < ApplicationController
   def show
     @report = params[:id]
     @mode = params.dig(:search, :mode) || "chart"
-    @period = params.dig(:search, :period)&.downcase || "day"
+    @period = params.dig(:search, :period)&.downcase
     @from = params.dig(:search, :from) || 1.month.ago
     @to = params.dig(:search, :to) || Time.zone.now
     @columns = params.dig(:search, :columns).to_s.split(/[[:space:],]/).map(&:to_sym)
     @group = params.dig(:search, :group)&.downcase&.tr(" ", "_")
-    @group_limit = params.dig(:search, :group_limit) || 10
+    @group_limit = params.dig(:search, :group_limit)&.to_i || 10
 
     case @report
     when "posts"
@@ -138,10 +138,18 @@ class ReportsController < ApplicationController
       @group = nil unless @group&.in?(@available_groups)
       @columns = @available_columns.slice(*@columns)
       @columns = [@available_columns.first].to_h if @columns.blank?
-      @dataframe = @model.search(params[:search], CurrentUser.user).timeseries(period: @period, from: @from, to: @to, groups: [@group].compact_blank, group_limit: @group_limit, columns: @columns)
-      @dataframe["date"] = @dataframe["date"].map(&:to_date)
+
+      if @period.present?
+        @dataframe = @model.search(params[:search], CurrentUser.user).timeseries(period: @period, from: @from, to: @to, groups: [@group].compact_blank, group_limit: @group_limit, columns: @columns)
+        @x_axis = "date"
+      else
+        @dataframe = @model.search(params[:search], CurrentUser.user).aggregate(from: @from, to: @to, groups: [@group].compact_blank, limit: @group_limit, columns: @columns)
+        @x_axis = @group
+      end
+
       @dataframe[@group] = @dataframe[@group].map(&:pretty_name) if @group.in?(%w[creator updater uploader banner approver user])
-      @dataframe = @dataframe.crosstab("date", @group) if @group
+      @dataframe["date"] = @dataframe["date"].map(&:to_date) if @dataframe["date"]
+      @dataframe = @dataframe.crosstab("date", @group) if @group && @period.present?
     end
 
     respond_with(@dataframe)

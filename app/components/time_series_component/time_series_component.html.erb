@@ -6,7 +6,16 @@
   <% end %>
 </div>
 
-<% if mode == :table %>
+<% if mode == :chart && x_axis.present? %>
+  <div class="line-chart" style="width: 100%; height: max(90vh, <%= chart_height.to_i %>px);"></div>
+
+  <script type="text/javascript">
+    var chart = new Danbooru.TimeSeriesComponent({
+      container: $(".line-chart").get(0),
+      options: <%= raw chart_options.to_json %>,
+    });
+  </script>
+<% else %>
   <table class="striped autofit" width="100%">
     <thead>
       <% dataframe.types.keys.each do |column| %>
@@ -26,16 +35,4 @@
       <% end %>
     </tbody>
   </table>
-<% elsif mode == :chart %>
-  <div class="line-chart" style="width: 100%; height: 80vh;"></div>
-
-  <script type="text/javascript">
-    var data = <%= raw dataframe.each_row.map(&:values).to_json %>;
-    var columns = <%= raw dataframe.types.keys.without("date").to_json %>;
-    var chart = new Danbooru.TimeSeriesComponent({
-      container: $(".line-chart").get(0),
-      data: data,
-      columns: columns,
-    });
-  </script>
 <% end %>
