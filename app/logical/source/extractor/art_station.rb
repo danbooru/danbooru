@@ -48,7 +48,7 @@ class Source::Extractor
 
     def tags
       api_response[:tags].to_a.map do |tag|
-        [tag, "https://www.artstation.com/search?q=" + CGI.escape(tag)]
+        [tag, "https://www.artstation.com/search?q=#{CGI.escape(tag)}"]
       end
     end
 
@@ -94,7 +94,7 @@ class Source::Extractor
       image_sizes = %w[original 4k large medium small]
       urls = image_sizes.map { |size| parsed_url.full_image_url(size) }
 
-      chosen_url = urls.find { |url| http_exists?(url) }
+      chosen_url = urls.find { |u| http_exists?(u) }
       chosen_url || url
     end
   end

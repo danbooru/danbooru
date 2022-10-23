@@ -52,7 +52,7 @@ class Source::Extractor
     end
 
     def artist_name
-      api_response.account_name
+      api_response.account_name || artist_name_from_url
     end
 
     def artist_name_from_url
@@ -60,7 +60,7 @@ class Source::Extractor
     end
 
     def other_names
-      [api_response.display_name]
+      [api_response.display_name].compact
     end
 
     def account_id
