@@ -26,6 +26,18 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
+        should "work with the period and group params" do
+          get report_path("posts", search: { period: "month", group: "uploader" })
+
+          assert_response :success
+        end
+
+        should "work with the group param when the dataset is empty" do
+          get report_path("posts", search: { tags: "does_not_exist", group: "uploader" })
+
+          assert_response :success
+        end
+
         should "work when filtering by a nested association" do
           get report_path("posts", search: { uploader: { name: @post.uploader.name }})
 

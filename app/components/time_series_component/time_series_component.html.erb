@@ -6,7 +6,9 @@
   <% end %>
 </div>
 
-<% if mode == :chart && x_axis.present? %>
+<% if dataframe.empty? %>
+  <p>No results found. Try modifying your search or expanding your time range.</p>
+<% elsif mode == :chart && x_axis.present? %>
   <div class="line-chart" style="width: 100%; height: max(90vh, <%= chart_height.to_i %>px);"></div>
 
   <script type="text/javascript">

@@ -4,7 +4,7 @@
 module Danbooru
   class DataFrame
     attr_reader :df
-    delegate :head, :shape, :types, :rename, :each_row, :[], :[]=, to: :df
+    delegate :head, :shape, :names, :types, :rename, :empty?, :each_row, :[], :[]=, to: :df
 
     def initialize(...)
       @df = Rover::DataFrame.new(...)
@@ -17,6 +17,8 @@ module Danbooru
         foreign_key = association.foreign_key
         name = association.name.to_s
 
+        next table if !table.names.include?(foreign_key)
+
         ids = table[foreign_key].to_a.uniq.compact_blank
         records = association.klass.where(primary_key => ids).index_by(&primary_key.to_sym)
 
@@ -27,6 +29,8 @@ module Danbooru
     end
 
     def crosstab(index, pivot)
+      return self if empty?
+
       new_df = DataFrame.new(index => df[index].uniq)
 
       df[pivot].uniq.to_a.each do |value|

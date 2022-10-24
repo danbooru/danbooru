@@ -147,7 +147,7 @@ class ReportsController < ApplicationController
         @x_axis = @group
       end
 
-      @dataframe[@group] = @dataframe[@group].map(&:pretty_name) if @group.in?(%w[creator updater uploader banner approver user])
+      @dataframe[@group] = @dataframe[@group].map(&:pretty_name) if @group.in?(%w[creator updater uploader banner approver user]) && @dataframe.names.include?(@group)
       @dataframe["date"] = @dataframe["date"].map(&:to_date) if @dataframe["date"]
       @dataframe = @dataframe.crosstab("date", @group) if @group && @period.present?
     end

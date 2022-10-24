@@ -18,7 +18,7 @@ class TimeSeriesComponent < ApplicationComponent
 
   def chart_height
     if x_axis != "date"
-      dataframe[x_axis].size * 30
+      dataframe[x_axis]&.size.to_i * 30
     end
   end
 
