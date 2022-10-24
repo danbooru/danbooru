@@ -643,7 +643,15 @@ module Searchable
       end
 
       if parameter_hash?(params[attr])
-        relation = visible(relation, attr).includes(attr).references(attr).where(attr => model.visible(current_user).search(params[attr], current_user).reorder(nil))
+        if association.belongs_to?
+          foreign_key = association.foreign_key
+          primary_key = association.association_primary_key
+        else
+          foreign_key = association.association_primary_key
+          primary_key = association.foreign_key
+        end
+
+        relation = visible(relation, attr).where(foreign_key => model.visible(current_user).search(params[attr], current_user).reorder(nil).select(primary_key))
       end
 
       relation
