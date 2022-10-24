@@ -1,16 +1,18 @@
-<% page_title "DMCA Complaint" %>
+<% page_title "DMCA Notice" %>
 
 <% @danbooru = Danbooru.config.canonical_app_name %>
 
 <div id="c-static">
   <div id="a-dmca" class="prose fixed-width-container mx-auto">
-    <h1>DMCA Complaint</h1>
+    <h1>DMCA Notice</h1>
 
     <p>Fill out the form below to submit a DMCA takedown request.</p>
 
-    <p>Please allow up to 48 hours for your complaint to be processed. You may not receive a response unless further information is needed from you.</p>
+    <p>Please allow up to 48 hours for your request to be processed. You may not receive a response unless further information is needed from you.</p>
 
-    <p>This information is required by the DMCA process. If any required information is falsified or omitted, your notice may be not be processed. Please submit your information in English.</p>
+    <p>This information is required by the DMCA process. If any required information is falsified or omitted, your request may be not be processed. Please submit your information in English.</p>
+
+    <p>Please be aware that information that is not protected by copyright may not be removed from the site. This includes artist tags, artist profiles, wiki pages, links to social media profiles or other websites, links to works on other websites, and other factual information not protected by copyright law.</p>
 
     <hr class="border">
 
@@ -26,12 +28,12 @@
       </p>
 
       <p>
-        <label>Your contact information (mailing address and phone number)</label><br>
+        <label>Your contact information (physical address and phone number)</label><br>
         <textarea name="dmca[address]" class="w-1/2"></textarea>
       </p>
 
       <p>
-        <label>A list of links to each <%= @danbooru %> post you would like to have removed (one per line).</label><br>
+        <label>A list of links to each <%= @danbooru %> post you would like to have removed (one per line). Please list each individual post, not a tag search or profile page.</label><br>
         <textarea name="dmca[infringing_urls]" class="w-full h-150px" required></textarea>
       </p>
 
@@ -60,7 +62,7 @@
       </p>
 
       <p>
-        <label>Your signature (type your full legal name)</label><br>
+        <label>Your signature (Type your full legal name. This must be your legal name, not a pseudonym or artist handle)</label><br>
         <input name="dmca[signature]" class="w-1/2" required></input>
       </p>
 
@@ -74,15 +76,15 @@
     <p>If you'd prefer not to use our automated form, you can <%= link_to "email us here", "mailto:#{Danbooru.config.dmca_email}" %>. Your email must include the following:</p>
 
     <ul>
-      <li>Your contact information, including your name, mailing address, phone number, and email address.</li>
-      <li>Identification of the material you wish to have taken down, along with enough information to locate the material. For example, a list of links to each post on <%= Danbooru.config.canonical_app_name %> you wish to have removed. Screenshots or simply listing your name or social media accounts are not sufficient to locate the works you wish to have removed.</li>
-      <li>Identification of the work you believe is being infringed. For example, for each <%= Danbooru.config.canonical_app_name %> post you claim infringes on your copyright, a link to where the work was originally posted on your Pixiv, Twitter, or other social media accounts or personal websites.</li>
+      <li>Your contact information, including your name, physical address, phone number, and email address.</li>
+      <li>Identification of the material you wish to have removed, with enough information to locate the material. For example, a list of links to each post on <%= Danbooru.config.canonical_app_name %> you wish to have removed. Screenshots or simply listing your artist tag, artist name, or social media accounts are not sufficient to locate the exact material you wish to have removed.</li>
+      <li>Identification of the copyrighted work you claim is being infringed. For example, for each <%= Danbooru.config.canonical_app_name %> post you claim infringes on your copyright, a link to where the original work was posted on your Pixiv, Twitter, or other social media accounts or personal websites.</li>
       <li>A statement that you have a good faith belief that the use of the work you believe is being infringed was not authorized by the copyright owner, an agent of the owner, or the law.</li>
       <li>A statement that everything contained in the takedown notice is accurate and that, under penalty of perjury, you are the copyright owner or have permission to act on the copyright owner’s behalf.</li>
       <li>Your signature. Typing your full name will suffice. This must be your full legal name, not a pseudonym or artist handle.</li>
     </ul>
 
-    <p><%= link_to "Here is a template you can follow", template_dmca_path %>. <%= external_link_to "https://www.copyright.gov/512/sample-notice.pdf", "Here's another template from the US Copyright Office" %>.
-    The above information is legally required by the DMCA process. Your notice may not be processed if any required information is omitted or falsified.</p>
+    <p><%= external_link_to "https://www.copyright.gov/512/sample-notice.pdf", "Here's a template from the US Copyright Office you can follow" %>.
+    All of the above information is legally required by the DMCA process. Your notice may not be processed if any required information is omitted or falsified.</p>
   </div>
 </div>
