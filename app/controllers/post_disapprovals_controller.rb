@@ -18,6 +18,14 @@ class PostDisapprovalsController < ApplicationController
     respond_with(@post_disapprovals)
   end
 
+  def show
+    @post_disapproval = authorize PostDisapproval.find(params[:id])
+
+    respond_with(@post_disapproval) do |format|
+      format.html { redirect_to post_disapprovals_path(search: { id: @post_disapproval.id }) }
+    end
+  end
+
   def edit
     @post_disapproval = authorize PostDisapproval.find(params[:id])
     respond_with(@post_disapproval)

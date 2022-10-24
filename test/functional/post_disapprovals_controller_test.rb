@@ -86,6 +86,24 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action" do
+      setup do
+        @disapproval = create(:post_disapproval)
+      end
+
+      should "render for html" do
+        get post_disapproval_path(@disapproval)
+
+        assert_redirected_to post_disapprovals_path(search: { id: @disapproval.id })
+      end
+
+      should "render for json" do
+        get post_disapproval_path(@disapproval), as: :json
+
+        assert_response :success
+      end
+    end
+
     context "update action" do
       setup do
         @post = create(:post, is_pending: true)
