@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 AS base
+FROM ubuntu:22.10 AS base
 
 WORKDIR /danbooru
 ENV PATH="/root/.asdf/bin:/root/.asdf/shims:$PATH:/usr/lib/postgresql/14/bin"
