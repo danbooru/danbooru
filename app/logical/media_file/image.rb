@@ -11,6 +11,16 @@ class MediaFile::Image < MediaFile
     [0, 0]
   end
 
+  def is_supported?
+    case file_ext
+    when :avif
+      # XXX Mirrored AVIFs should be unsupported too, but we currently can't detect the mirrored flag using exiftool or ffprobe.
+      !metadata.is_rotated? && !metadata.is_cropped? && !metadata.is_grid_image? && !metadata.is_animated_avif?
+    else
+      true
+    end
+  end
+
   def is_corrupt?
     image.stats
     false
@@ -28,6 +38,8 @@ class MediaFile::Image < MediaFile
       image.get("n-pages")
     elsif file_ext == :png
       metadata.fetch("PNG:AnimationFrames", 1)
+    elsif file_ext == :avif
+      video.frame_count
     else
       nil
     end
@@ -110,6 +122,10 @@ class MediaFile::Image < MediaFile
 
   def is_animated_png?
     file_ext == :png && is_animated?
+  end
+
+  def is_animated_avif?
+    file_ext == :avif && is_animated?
   end
 
   # Return true if the image has an embedded ICC color profile.

@@ -26,7 +26,7 @@ class MediaFile
     file = Kernel.open(file, "r", binmode: true) unless file.respond_to?(:read)
 
     case file_ext(file)
-    when :jpg, :gif, :png
+    when :jpg, :gif, :png, :avif
       MediaFile::Image.new(file, **options)
     when :swf
       MediaFile::Flash.new(file, **options)
@@ -66,6 +66,9 @@ class MediaFile
     # M4V (rare) - Apple iTunes Video (https://en.wikipedia.org/wiki/M4V)
     when /\A....ftyp(?:isom|iso5|3gp5|mp42|avc1|M4V)/
       :mp4
+    # https://aomediacodec.github.io/av1-avif/#brands-overview
+    when /\A....ftyp(?:avif|avis)/
+      :avif
     when /\APK\x03\x04/
       :zip
     else
@@ -129,9 +132,14 @@ class MediaFile
     ExifTool.new(file).metadata
   end
 
+  # @return [Boolean] True if the file is supported by Danbooru. Certain files may be unsupported because they use features we don't support.
+  def is_supported?
+    true
+  end
+
   # @return [Boolean] true if the file is an image
   def is_image?
-    file_ext.in?([:jpg, :png, :gif])
+    file_ext.in?([:jpg, :png, :gif, :avif])
   end
 
   # @return [Boolean] true if the file is a video
@@ -189,7 +197,7 @@ class MediaFile
   # @param width [Integer] the max width of the image
   # @param height [Integer] the max height of the image
   # @param options [Hash] extra options when generating the preview
-  # @return [MediaFile] a preview file
+  # @return [MediaFile, nil] a preview file, or nil if we can't generate a preview for this file type (e.g. Flash files)
   def preview(width, height, **options)
     nil
   end
@@ -216,6 +224,7 @@ class MediaFile
       file_size: file_size,
       md5: md5,
       is_corrupt?: is_corrupt?,
+      is_supported?: is_supported?,
       duration: duration,
       frame_count: frame_count,
       frame_rate: frame_rate,

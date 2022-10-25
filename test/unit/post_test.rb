@@ -1217,8 +1217,15 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "a greyscale image missing the greyscale tag" do
-        should "automatically add the greyscale tag" do
+        should "automatically add the greyscale tag for a monochrome JPEG file" do
           @media_asset = MediaAsset.upload!("test/files/test-grey-no-profile.jpg")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("greyscale tagme", @post.tag_string)
+        end
+
+        should "automatically add the greyscale tag for a monochrome AVIF file" do
+          @media_asset = MediaAsset.upload!("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("greyscale tagme", @post.tag_string)

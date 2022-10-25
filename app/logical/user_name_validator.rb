@@ -24,7 +24,7 @@ class UserNameValidator < ActiveModel::EachValidator
       rec.errors.add(attr, "can't start with '#{name.first}'")
     elsif name =~ /[[:punct:]]\z/
       rec.errors.add(attr, "can't end with '#{name.last}'")
-    elsif name =~ /\.(html|json|xml|atom|rss|txt|js|css|csv|png|jpg|jpeg|gif|png|mp4|webm|zip|pdf|exe|sitemap)\z/i
+    elsif name =~ /\.(html|json|xml|atom|rss|txt|js|css|csv|png|jpg|jpeg|gif|png|avif|webp|mp4|webm|zip|pdf|exe|sitemap)\z/i
       rec.errors.add(attr, "can't end with a file extension")
     elsif name =~ /__/
       rec.errors.add(attr, "can't contain multiple underscores in a row")

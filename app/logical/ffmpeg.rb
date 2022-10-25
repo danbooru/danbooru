@@ -32,13 +32,17 @@ class FFmpeg
   end
 
   # Get file metadata using ffprobe.
+  #
   # @see https://ffmpeg.org/ffprobe.html
   # @see https://gist.github.com/nrk/2286511
-  # @return [Hash] a hash of the file's metadata
+  #
+  # @return [Hash] A hash of the file's metadata. Will be empty if reading the file failed for any reason.
   def metadata
     output = shell!("ffprobe -v quiet -print_format json -show_format -show_streams #{file.path.shellescape}")
     json = JSON.parse(output)
     json.with_indifferent_access
+  rescue Error
+    {}
   end
 
   def width
@@ -64,7 +68,7 @@ class FFmpeg
 
   # @return [Integer, nil] The number of frames in the video or animation, or nil if unknown.
   def frame_count
-    if video_streams.first.has_key?(:nb_frames)
+    if video_streams.first&.has_key?(:nb_frames)
       video_streams.first[:nb_frames].to_i
     elsif playback_info.has_key?(:frame)
       playback_info[:frame].to_i
@@ -80,11 +84,11 @@ class FFmpeg
   end
 
   def video_streams
-    metadata[:streams].select { |stream| stream[:codec_type] == "video" }
+    metadata[:streams].to_a.select { |stream| stream[:codec_type] == "video" }
   end
 
   def audio_streams
-    metadata[:streams].select { |stream| stream[:codec_type] == "audio" }
+    metadata[:streams].to_a.select { |stream| stream[:codec_type] == "audio" }
   end
 
   def has_audio?

@@ -48,7 +48,7 @@ class ExifTool
     end
 
     def is_animated?
-      frame_count.to_i > 1
+      frame_count.to_i > 1 || is_animated_avif?
     end
 
     def is_animated_gif?
@@ -59,6 +59,10 @@ class ExifTool
       file_ext == :png && is_animated?
     end
 
+    def is_animated_avif?
+      file_ext == :avif && metadata["QuickTime:CompatibleBrands"].to_a.include?("avis")
+    end
+
     # @see https://exiftool.org/TagNames/JPEG.html
     # @see https://exiftool.org/TagNames/PNG.html
     # @see https://danbooru.donmai.us/posts?tags=exif:File:ColorComponents=1
@@ -66,12 +70,33 @@ class ExifTool
     def is_greyscale?
       metadata["File:ColorComponents"] == 1 ||
         metadata["PNG:ColorType"] == "Grayscale" ||
-        metadata["PNG:ColorType"] == "Grayscale with Alpha"
+        metadata["PNG:ColorType"] == "Grayscale with Alpha" ||
+        metadata["QuickTime:ChromaFormat"].to_s.match?(/Monochrome/) # "Monochrome 4:0:0"
     end
 
     # https://exiftool.org/TagNames/EXIF.html
     def is_rotated?
-      file_ext == :jpg && metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"])
+      case file_ext
+      when :jpg
+        metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"])
+      when :avif
+        metadata["QuickTime:Rotation"].present?
+      else
+        false
+      end
+    end
+
+    # AVIF files can be cropped with the "CleanAperture" (aka "clap") tag.
+    def is_cropped?
+      file_ext == :avif && metadata["QuickTime:CleanAperture"].present?
+    end
+
+    # AVIF files can be a collection of smaller images combined in a grid to
+    # form a larger image. This is done to reduce memory usage during encoding.
+    #
+    # https://0xc0000054.github.io/pdn-avif/using-image-grids.html
+    def is_grid_image?
+      file_ext == :avif && metadata["Meta:MetaImageSize"].present?
     end
 
     # Some animations technically have a finite loop count, but loop for hundreds
@@ -124,6 +149,8 @@ class ExifTool
         :png
       elsif has_key?("GIF:GIFVersion")
         :gif
+      elsif metadata["QuickTime:CompatibleBrands"].to_a.include?("avif") || metadata["QuickTime:CompatibleBrands"].to_a.include?("avis")
+        :avif
       elsif has_key?("QuickTime:MovieHeaderVersion")
         :mp4
       elsif has_key?("Matroska:DocType")

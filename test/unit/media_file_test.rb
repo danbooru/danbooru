@@ -21,6 +21,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([32, 32], MediaFile.open("test/files/test-static-32x32.gif").dimensions)
     end
 
+    should "determine the correct dimensions for an AVIF file" do
+      assert_equal([2048, 858], MediaFile.open("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif").dimensions)
+    end
+
     should "determine the correct dimensions for a webm file" do
       skip unless MediaFile.videos_enabled?
       assert_equal([512, 512], MediaFile.open("test/files/test-512x512.webm").dimensions)
@@ -85,6 +89,12 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(:gif, MediaFile.open("test/files/test-static-32x32.gif").file_ext)
     end
 
+    should "determine the correct extension for an AVIF file" do
+      Dir["test/files/avif/*.avif"].each do |file|
+        assert_equal(:avif, MediaFile.open(file).file_ext)
+      end
+    end
+
     should "determine the correct extension for a webm file" do
       assert_equal(:webm, MediaFile.open("test/files/test-512x512.webm").file_ext)
     end
@@ -127,6 +137,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([150, 101], MediaFile.open("test/files/test.jpg").preview(150, 150).dimensions)
       assert_equal([113, 150], MediaFile.open("test/files/test.png").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test.gif").preview(150, 150).dimensions)
+      assert_equal([150, 63], MediaFile.open("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif").preview(150, 150).dimensions)
     end
 
     should "generate a preview image for an animated image" do
@@ -291,6 +302,72 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal(false, file.is_animated?)
         assert_equal(0, file.frame_count)
       end
+    end
+  end
+
+  context "an AVIF file" do
+    should "be able to read AVIF files" do
+      Dir["test/files/avif/*.avif"].each do |file|
+        assert_nothing_raised { MediaFile.open(file).attributes }
+      end
+    end
+
+    should "detect supported files" do
+      assert_equal(true, MediaFile.open("test/files/avif/paris_icc_exif_xmp.avif").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv444_full_qp40.avif").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/avif/tiger_3layer_1res.avif").is_supported?)
+    end
+
+    should "detect unsupported files" do
+      assert_equal(false, MediaFile.open("test/files/avif/Image grid example.avif").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/avif/kimono.crop.avif").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/avif/kimono.rotate90.avif").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/avif/sequence-with-pitm.avif").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/avif/sequence-without-pitm.avif").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/avif/star-8bpc.avif").is_supported?)
+
+      # XXX These should be unsupported, but aren't.
+      # assert_equal(false, MediaFile.open("test/files/avif/alpha_video.avif").is_supported?)
+      # assert_equal(false, MediaFile.open("test/files/avif/plum-blossom-small-profile0.8bpc.yuv420.alpha-full.avif").is_supported?)
+      # assert_equal(false, MediaFile.open("test/files/avif/kimono.mirror-horizontal.avif").is_supported?)
+    end
+
+    should "detect animated files" do
+      assert_equal(true, MediaFile.open("test/files/avif/sequence-with-pitm.avif").is_animated?)
+      assert_equal(true, MediaFile.open("test/files/avif/sequence-without-pitm.avif").is_animated?)
+      assert_equal(true, MediaFile.open("test/files/avif/alpha_video.avif").is_animated?)
+      assert_equal(true, MediaFile.open("test/files/avif/star-8bpc.avif").is_animated?)
+
+      assert_equal(48, MediaFile.open("test/files/avif/sequence-with-pitm.avif").frame_count)
+      assert_equal(95, MediaFile.open("test/files/avif/sequence-without-pitm.avif").frame_count)
+      assert_equal(48, MediaFile.open("test/files/avif/alpha_video.avif").frame_count)
+      assert_equal(5, MediaFile.open("test/files/avif/star-8bpc.avif").frame_count)
+    end
+
+    should "detect static images with an auxiliary image sequence" do
+      assert_equal(true, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").metadata.is_animated_avif?)
+      assert_equal(false, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").is_animated?)
+      assert_equal(1, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").frame_count)
+    end
+
+    should "detect rotated images" do
+      assert_equal(true, MediaFile.open("test/files/avif/kimono.rotate90.avif").metadata.is_rotated?)
+    end
+
+    should "detect monochrome images" do
+      assert_equal(true, MediaFile.open("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif").metadata.is_greyscale?)
+    end
+
+    should "be able to generate a preview" do
+      assert_equal([180, 75], MediaFile.open("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif").preview(180, 180).dimensions)
+      assert_equal([180, 75], MediaFile.open("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv444_full_qp40.avif").preview(180, 180).dimensions)
+      assert_equal([180, 135], MediaFile.open("test/files/avif/paris_icc_exif_xmp.avif").preview(180, 180).dimensions)
+      assert_equal([180, 180], MediaFile.open("test/files/avif/Image grid example.avif").preview(180, 180).dimensions)
+      assert_equal([180, 120], MediaFile.open("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif").preview(180, 180).dimensions)
+      assert_equal([180, 123], MediaFile.open("test/files/avif/tiger_3layer_1res.avif").preview(180, 180).dimensions)
     end
   end
 
