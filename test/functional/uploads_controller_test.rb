@@ -57,6 +57,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search({}).with { [@upload] }
         should respond_to_search(source: "http://example.com/foobar").with { @upload }
         should respond_to_search(status: "completed").with { @upload }
+        should respond_to_search(media_assets: { file_size: 1_000_000 }).with { @upload }
+        should respond_to_search(media_assets: { md5: "blah" }).with { }
       end
     end
 

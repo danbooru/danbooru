@@ -1412,7 +1412,7 @@ class Post < ApplicationRecord
           :last_comment_bumped_at, :last_commented_at, :last_noted_at,
           :uploader, :approver, :parent,
           :artist_commentary, :flags, :appeals, :notes, :comments, :children,
-          :approvals, :replacements],
+          :approvals, :replacements, :media_metadata],
           current_user: current_user
         )
 

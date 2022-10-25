@@ -261,15 +261,40 @@ class SearchableTest < ActiveSupport::TestCase
       end
     end
 
-    context "for a `has_many through: ...` association" do
+    context "for a `has_many through: has_many` association" do
       subject { Upload }
 
       should "work" do
+        @user = create(:user)
         @media_asset = create(:media_asset)
-        @upload1 = create(:upload, upload_media_assets: [build(:upload_media_asset, media_asset: @media_asset)])
-        @upload2 = create(:upload, upload_media_assets: [build(:upload_media_asset, media_asset: @media_asset)])
+        @upload1 = create(:upload, uploader: @user, upload_media_assets: [build(:upload_media_asset, media_asset: @media_asset)])
+        @upload2 = create(:upload, uploader: @user, upload_media_assets: [build(:upload_media_asset, media_asset: @media_asset)])
+        @upload3 = create(:upload, uploader: @user, upload_media_assets: [build(:upload_media_asset)])
 
-        assert_search_equals([@upload2, @upload1], media_asset: { md5: @media_asset.md5 })
+        assert_search_equals([@upload2, @upload1], media_assets: { md5: @media_asset.md5 }, current_user: @user)
+      end
+    end
+
+    context "for a `has_one through: has_one` association" do
+      subject { Post }
+
+      should "work" do
+        @post1 = create(:post_with_file)
+        @post2 = create(:post)
+
+        assert_search_equals([@post1], media_metadata: { id: @post1.media_metadata.id })
+      end
+    end
+
+    context "for a `has_one through: belongs_to` association" do
+      subject { AITag }
+
+      should "work" do
+        @post = create(:post_with_file)
+        @ai_tag1 = create(:ai_tag, media_asset: @post.media_asset)
+        @ai_tag2 = create(:ai_tag)
+
+        assert_search_equals([@ai_tag1], post: { id: @post.id })
       end
     end
   end
