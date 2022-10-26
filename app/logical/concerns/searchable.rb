@@ -647,39 +647,11 @@ module Searchable
           source_association = association.source_reflection
           through_association = association.through_reflection
 
-          if source_association.macro == :belongs_to
-            source_foreign_key = source_association.foreign_key
-            source_primary_key = source_association.association_primary_key
-          elsif source_association.macro == :has_one
-            source_foreign_key = source_association.join_foreign_key
-            source_primary_key = source_association.join_primary_key
-          else
-            source_foreign_key = source_association.association_primary_key
-            source_primary_key = source_association.foreign_key
-          end
-
-          if through_association.macro == :belongs_to
-            through_foreign_key = through_association.foreign_key
-            through_primary_key = through_association.association_primary_key
-          elsif through_association.macro == :has_one
-            through_foreign_key = through_association.join_foreign_key
-            through_primary_key = through_association.join_primary_key
-          else
-            through_foreign_key = through_association.association_primary_key
-            through_primary_key = through_association.foreign_key
-          end
-
           source_subquery = source_association.klass.visible(current_user).search(params[attr], current_user).reorder(nil)
-          through_subquery = through_association.klass.visible(current_user).where(source_foreign_key => source_subquery.select(source_primary_key))
-          relation = visible(relation, attr).where(through_foreign_key => through_subquery.select(through_primary_key))
-        elsif association.belongs_to?
-          foreign_key = association.foreign_key
-          primary_key = association.association_primary_key
-          relation = visible(relation, attr).where(foreign_key => model.visible(current_user).search(params[attr], current_user).reorder(nil).select(primary_key))
+          through_subquery = through_association.klass.visible(current_user).where(attr => source_subquery)
+          relation = visible(relation, attr).where(through_association.name => through_subquery)
         else
-          foreign_key = association.association_primary_key
-          primary_key = association.foreign_key
-          relation = visible(relation, attr).where(foreign_key => model.visible(current_user).search(params[attr], current_user).reorder(nil).select(primary_key))
+          relation = visible(relation, attr).where(attr => model.visible(current_user).search(params[attr], current_user).reorder(nil))
         end
       end
 
