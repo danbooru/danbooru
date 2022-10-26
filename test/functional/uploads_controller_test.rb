@@ -247,12 +247,9 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      # XXX fixme
       context "for a video longer than the video length limit" do
-        should_eventually "work for an admin" do
-          @source = "https://cdn.donmai.us/original/63/cb/63cb09f2526ef3ac14f11c011516ad9b.webm"
-          post_auth uploads_path(format: :json), create(:admin_user), params: { upload: { source: @source }}
-          perform_enqueued_jobs
+        should "work for an admin" do
+          create_upload!("https://cdn.donmai.us/original/63/cb/63cb09f2526ef3ac14f11c011516ad9b.webm", user: create(:admin_user))
 
           assert_response 201
           assert_equal("completed", Upload.last.status)
@@ -301,6 +298,32 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, upload.media_assets.first.media_metadata.present?)
       end
 
+      context "uploading an AVIF file" do
+        should "generate thumbnails" do
+          upload = assert_successful_upload("test/files/avif/paris_icc_exif_xmp.avif", user: @user)
+          media_asset = upload.media_assets.first
+
+          full_variant = media_asset.variant(:full).open_file
+          assert_equal([403, 302], full_variant.dimensions)
+          assert_equal(:jpg, full_variant.file_ext)
+
+          assert_nil(media_asset.variant(:sample))
+        end
+      end
+
+      context "uploading a WebP file" do
+        should "generate thumbnails" do
+          upload = assert_successful_upload("test/files/webp/fjord.webp", user: @user)
+          media_asset = upload.media_assets.first
+
+          full_variant = media_asset.variant(:full).open_file
+          assert_equal([550, 368], full_variant.dimensions)
+          assert_equal(:jpg, full_variant.file_ext)
+
+          assert_equal(nil, media_asset.variant(:sample))
+        end
+      end
+
       context "uploading a file from your computer" do
         should_upload_successfully("test/files/test.jpg")
         should_upload_successfully("test/files/test.png")
@@ -319,6 +342,11 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("test/files/webp/test.webp")
         should_upload_successfully("test/files/webp/fjord.webp")
+        should_upload_successfully("test/files/webp/2_webp_a.webp")
+        should_upload_successfully("test/files/webp/2_webp_ll.webp")
+        should_upload_successfully("test/files/webp/Exif2.webp")
+        should_upload_successfully("test/files/webp/lossless1.webp")
+        should_upload_successfully("test/files/webp/lossy_alpha1.webp")
       end
 
       context "uploading multiple files from your computer" do
@@ -344,6 +372,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           upload = assert_successful_upload("https://www.pixiv.net/en/artworks/45982180", user: @user)
 
           assert_equal([60] * 70, upload.media_assets.first.metadata["Ugoira:FrameDelays"])
+          assert_equal(:webm, upload.media_assets.first.variant(:sample).open_file.file_ext)
         end
       end
 

@@ -5,7 +5,7 @@ class MediaAsset < ApplicationRecord
 
   FILE_TYPES = %w[jpg png gif webp avif mp4 webm swf zip]
   FILE_KEY_LENGTH = 9
-  VARIANTS = %i[preview 180x180 360x360 720x720 sample original]
+  VARIANTS = %i[preview 180x180 360x360 720x720 sample full original]
   MAX_FILE_SIZE = Danbooru.config.max_file_size.to_i
   MAX_VIDEO_DURATION = Danbooru.config.max_video_duration.to_i
   MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
@@ -95,7 +95,7 @@ class MediaAsset < ApplicationRecord
         media_file.preview(width, height, format: :webp, quality: 75)
       in :sample if media_asset.is_ugoira?
         media_file.convert
-      in :sample if media_asset.is_static_image?
+      in :sample | :full if media_asset.is_static_image?
         media_file.preview(width, height, format: :jpeg, quality: 85)
       in :original
         media_file
@@ -124,13 +124,15 @@ class MediaAsset < ApplicationRecord
     # The file extension of this variant.
     def file_ext
       case type
-      when :preview, :"180x180", :"360x360"
+      in :preview | :"180x180" | :"360x360"
         "jpg"
-      when :"720x720"
+      in :"720x720"
         "webp"
-      when :sample
-        media_asset.is_ugoira? ? "webm" : "jpg"
-      when :original
+      in :sample if media_asset.is_animated?
+        "webm"
+      in :sample | :full if media_asset.is_static_image?
+        "jpg"
+      in :original
         media_asset.file_ext
       end
     end
@@ -147,6 +149,8 @@ class MediaAsset < ApplicationRecord
         [720, 720]
       when :sample
         [850, nil]
+      when :full
+        [nil, nil]
       when :original
         [nil, nil]
       end
@@ -359,14 +363,14 @@ class MediaAsset < ApplicationRecord
     end
 
     def variant_types
-      @variant_types ||=
-        if is_flash?
-          [:original]
-        elsif (is_animated? && !is_ugoira?) || (is_static_image? && image_width <= LARGE_IMAGE_WIDTH)
-          VARIANTS - [:sample]
-        else
-          VARIANTS
-        end
+      @variant_types ||= begin
+        variants = []
+        variants = %i[preview 180x180 360x360 720x720] unless is_flash?
+        variants << :sample if is_ugoira? || (is_static_image? && image_width > LARGE_IMAGE_WIDTH)
+        variants << :full if is_webp? || is_avif?
+        variants << :original
+        variants
+      end
     end
   end
 
@@ -377,6 +381,14 @@ class MediaAsset < ApplicationRecord
 
     def is_static_image?
       is_image? && !is_animated?
+    end
+
+    def is_webp?
+      file_ext == "webp"
+    end
+
+    def is_avif?
+      file_ext == "avif"
     end
 
     def is_video?
