@@ -809,6 +809,19 @@ CREATE TABLE public.good_job_processes (
 
 
 --
+-- Name: good_job_settings; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.good_job_settings (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    key text,
+    value jsonb
+);
+
+
+--
 -- Name: good_jobs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3102,6 +3115,14 @@ ALTER TABLE ONLY public.good_job_processes
 
 
 --
+-- Name: good_job_settings good_job_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.good_job_settings
+    ADD CONSTRAINT good_job_settings_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: good_jobs good_jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4205,10 +4226,24 @@ CREATE INDEX index_forum_topics_on_updated_at ON public.forum_topics USING btree
 
 
 --
+-- Name: index_good_job_settings_on_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_good_job_settings_on_key ON public.good_job_settings USING btree (key);
+
+
+--
 -- Name: index_good_jobs_jobs_on_finished_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_good_jobs_jobs_on_finished_at ON public.good_jobs USING btree (finished_at) WHERE ((retried_good_job_id IS NULL) AND (finished_at IS NOT NULL));
+
+
+--
+-- Name: index_good_jobs_jobs_on_priority_created_at_when_unfinished; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_jobs_on_priority_created_at_when_unfinished ON public.good_jobs USING btree (priority DESC NULLS LAST, created_at) WHERE (finished_at IS NULL);
 
 
 --
@@ -6870,6 +6905,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220925045236'),
 ('20220926050108'),
 ('20221003080342'),
-('20221010035855');
+('20221010035855'),
+('20221026084655'),
+('20221026084656');
 
 
