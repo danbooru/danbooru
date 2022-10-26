@@ -21,6 +21,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([32, 32], MediaFile.open("test/files/test-static-32x32.gif").dimensions)
     end
 
+    should "determine the correct dimensions for a WebP file" do
+      assert_equal([550, 368], MediaFile.open("test/files/webp/fjord.webp").dimensions)
+    end
+
     should "determine the correct dimensions for an AVIF file" do
       assert_equal([2048, 858], MediaFile.open("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif").dimensions)
     end
@@ -89,6 +93,12 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(:gif, MediaFile.open("test/files/test-static-32x32.gif").file_ext)
     end
 
+    should "determine the correct extension for a WebP file" do
+      Dir["test/files/webp/*.webp"].each do |file|
+        assert_equal(:webp, MediaFile.open(file).file_ext)
+      end
+    end
+
     should "determine the correct extension for an AVIF file" do
       Dir["test/files/avif/*.avif"].each do |file|
         assert_equal(:avif, MediaFile.open(file).file_ext)
@@ -137,6 +147,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([150, 101], MediaFile.open("test/files/test.jpg").preview(150, 150).dimensions)
       assert_equal([113, 150], MediaFile.open("test/files/test.png").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test.gif").preview(150, 150).dimensions)
+      assert_equal([150, 100], MediaFile.open("test/files/webp/fjord.webp").preview(150, 150).dimensions)
       assert_equal([150, 63], MediaFile.open("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif").preview(150, 150).dimensions)
     end
 
@@ -308,6 +319,40 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal(false, file.is_animated?)
         assert_equal(0, file.frame_count)
       end
+    end
+  end
+
+  context "a WebP file" do
+    should "be able to read WebP files" do
+      Dir["test/files/webp/*.webp"].each do |file|
+        assert_nothing_raised { MediaFile.open(file).attributes }
+      end
+    end
+
+    should "detect animated files" do
+      assert_equal(true, MediaFile.open("test/files/webp/nyancat.webp").is_animated?)
+      assert_equal(true, MediaFile.open("test/files/webp/nyancat.webp").is_animated_webp?)
+      assert_equal(true, MediaFile.open("test/files/webp/nyancat.webp").metadata.is_animated?)
+      assert_equal(false, MediaFile.open("test/files/webp/nyancat.webp").is_supported?)
+      assert_equal(12, MediaFile.open("test/files/webp/nyancat.webp").frame_count)
+      assert_equal(Float::INFINITY, MediaFile.open("test/files/webp/nyancat.webp").metadata.loop_count)
+
+      # assert_equal(0.84, MediaFile.open("test/files/webp/nyancat.webp").duration)
+    end
+
+    should "be able to generate a preview" do
+      assert_equal([128, 128], MediaFile.open("test/files/webp/test.webp").preview(180, 180).dimensions)
+      assert_equal([176, 180], MediaFile.open("test/files/webp/2_webp_a.webp").preview(180, 180).dimensions)
+      assert_equal([176, 180], MediaFile.open("test/files/webp/2_webp_ll.webp").preview(180, 180).dimensions)
+      assert_equal([180, 120], MediaFile.open("test/files/webp/Exif2.webp").preview(180, 180).dimensions)
+      assert_equal([180, 120], MediaFile.open("test/files/webp/fjord.webp").preview(180, 180).dimensions)
+      assert_equal([180,  55], MediaFile.open("test/files/webp/lossless1.webp").preview(180, 180).dimensions)
+      assert_equal([180,  55], MediaFile.open("test/files/webp/lossy_alpha1.webp").preview(180, 180).dimensions)
+    end
+
+    should "ignore EXIF orientation tags" do
+      # XXX It's possible for .webp files to contain the IFD0:Orientation tag, but browsers currently ignore it, so we do too.
+      assert_equal(false, MediaFile.open("test/files/webp/Exif2.webp").metadata.is_rotated?)
     end
   end
 

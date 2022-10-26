@@ -26,7 +26,7 @@ class MediaFile
     file = Kernel.open(file, "r", binmode: true) unless file.respond_to?(:read)
 
     case file_ext(file)
-    when :jpg, :gif, :png, :avif
+    when :jpg, :gif, :png, :webp, :avif
       MediaFile::Image.new(file, **options)
     when :swf
       MediaFile::Flash.new(file, **options)
@@ -61,6 +61,10 @@ class MediaFile
     # https://www.webmproject.org/docs/container/
     when /\A\x1a\x45\xdf\xa3/n
       :webm
+
+    # https://developers.google.com/speed/webp/docs/riff_container
+    when /\ARIFF....WEBP/
+      :webp
 
     # https://www.ftyps.com
     # isom (common) - MP4 Base Media v1 [IS0 14496-12:2003]
@@ -144,7 +148,7 @@ class MediaFile
 
   # @return [Boolean] true if the file is an image
   def is_image?
-    file_ext.in?([:jpg, :png, :gif, :avif])
+    file_ext.in?(%i[jpg png gif webp avif])
   end
 
   # @return [Boolean] true if the file is a video

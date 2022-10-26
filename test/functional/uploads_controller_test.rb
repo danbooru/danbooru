@@ -197,6 +197,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for an unsupported WebP file" do
+        should "fail for an animated WebP" do
+          create_upload!("test/files/webp/nyancat.webp", user: @user)
+          assert_match("File type is not supported", Upload.last.error)
+        end
+      end
+
       context "for an unsupported AVIF file" do
         should "fail for a grid image" do
           create_upload!("test/files/avif/Image grid example.avif", user: @user)
@@ -309,6 +316,9 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv444_full_qp40.avif")
         should_upload_successfully("test/files/avif/paris_icc_exif_xmp.avif")
         should_upload_successfully("test/files/avif/tiger_3layer_1res.avif")
+
+        should_upload_successfully("test/files/webp/test.webp")
+        should_upload_successfully("test/files/webp/fjord.webp")
       end
 
       context "uploading multiple files from your computer" do

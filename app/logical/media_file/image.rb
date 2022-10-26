@@ -16,6 +16,8 @@ class MediaFile::Image < MediaFile
     when :avif
       # XXX Mirrored AVIFs should be unsupported too, but we currently can't detect the mirrored flag using exiftool or ffprobe.
       !metadata.is_rotated? && !metadata.is_cropped? && !metadata.is_grid_image? && !metadata.is_animated_avif?
+    when :webp
+      !is_animated?
     else
       true
     end
@@ -34,11 +36,12 @@ class MediaFile::Image < MediaFile
   end
 
   def frame_count
-    if file_ext == :gif
-      image.get("n-pages")
-    elsif file_ext == :png
+    case file_ext
+    when :gif, :webp
+      image.get("n-pages") if image.get_fields.include?("n-pages")
+    when :png
       metadata.fetch("PNG:AnimationFrames", 1)
-    elsif file_ext == :avif
+    when :avif
       video.frame_count
     else
       nil
@@ -122,6 +125,10 @@ class MediaFile::Image < MediaFile
 
   def is_animated_png?
     file_ext == :png && is_animated?
+  end
+
+  def is_animated_webp?
+    file_ext == :webp && is_animated?
   end
 
   def is_animated_avif?

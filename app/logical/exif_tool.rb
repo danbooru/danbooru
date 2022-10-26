@@ -48,7 +48,7 @@ class ExifTool
     end
 
     def is_animated?
-      frame_count.to_i > 1 || is_animated_avif?
+      frame_count.to_i > 1 || is_animated_webp? || is_animated_avif?
     end
 
     def is_animated_gif?
@@ -57,6 +57,10 @@ class ExifTool
 
     def is_animated_png?
       file_ext == :png && is_animated?
+    end
+
+    def is_animated_webp?
+      file_ext == :webp && metadata["RIFF:Duration"].present?
     end
 
     def is_animated_avif?
@@ -123,8 +127,10 @@ class ExifTool
     def loop_count
       return Float::INFINITY if metadata["GIF:AnimationIterations"] == "Infinite"
       return Float::INFINITY if metadata["PNG:AnimationPlays"] == "inf"
+      return Float::INFINITY if metadata["RIFF:AnimationLoopCount"] == "inf"
       return metadata["GIF:AnimationIterations"] if has_key?("GIF:AnimationIterations")
       return metadata["PNG:AnimationPlays"] if has_key?("PNG:AnimationPlays")
+      return metadata["RIFF:AnimationLoopCount"] if has_key?("RIFF:AnimationLoopCount")
 
       # If the AnimationIterations tag isn't present, then it's counted as a loop count of 0.
       return 0 if is_animated_gif? && !has_key?("GIF:AnimationIterations")
@@ -153,6 +159,8 @@ class ExifTool
         :avif
       elsif has_key?("QuickTime:MovieHeaderVersion")
         :mp4
+      elsif keys.grep(/\ARIFF:/).any?
+        :webp
       elsif has_key?("Matroska:DocType")
         :webm
       elsif has_key?("Flash:FlashVersion")
