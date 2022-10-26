@@ -20,7 +20,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
 
     context "for a video post" do
       should "render" do
-        @post = create(:post_with_file, filename: "test-512x512.webm").reload
+        @post = create(:post_with_file, filename: "webm/test-512x512.webm").reload
         node = render_preview(@post, current_user: User.anonymous)
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)

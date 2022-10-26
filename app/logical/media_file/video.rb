@@ -15,6 +15,17 @@ class MediaFile::Video < MediaFile
     preview_frame.preview(max_width, max_height, **options)
   end
 
+  def is_supported?
+    case file_ext
+    when :webm
+      metadata["Matroska:DocType"] == "webm"
+    when :mp4
+      true
+    else
+      false
+    end
+  end
+
   private
 
   def video

@@ -775,7 +775,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the duration:<x> metatag" do
-      post = create(:post, media_asset: create(:media_asset, file: "test/files/test-512x512.webm"))
+      post = create(:post, media_asset: create(:media_asset, file: "test/files/webm/test-512x512.webm"))
 
       assert_tag_match([post], "duration:0.48")
       assert_tag_match([post], "duration:>0.4")

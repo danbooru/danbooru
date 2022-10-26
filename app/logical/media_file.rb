@@ -54,7 +54,12 @@ class MediaFile
       :png
     when /\ACWS/, /\AFWS/, /\AZWS/
       :swf
-    when /\x1a\x45\xdf\xa3/n
+
+    # This detects the Matroska (.mkv) header. WebM files have a DocType of "webm", which is checked later in `MediaFile::Video#is_supported?`.
+    #
+    # https://www.rfc-editor.org/rfc/rfc8794.html#section-8.1
+    # https://www.webmproject.org/docs/container/
+    when /\A\x1a\x45\xdf\xa3/n
       :webm
 
     # https://www.ftyps.com

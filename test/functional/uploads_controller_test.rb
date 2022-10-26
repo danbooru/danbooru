@@ -224,6 +224,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for an unsupported video file" do
+        should "fail for a .mkv file" do
+          create_upload!("test/files/webm/test-512x512.mkv", user: @user)
+          assert_match("File type is not supported", Upload.last.error)
+        end
+      end
+
       context "for a video longer than the video length limit" do
         should "fail for a regular user" do
           create_upload!("https://cdn.donmai.us/original/63/cb/63cb09f2526ef3ac14f11c011516ad9b.webm", user: @user)
@@ -293,7 +300,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/test-static-32x32.gif")
         should_upload_successfully("test/files/test-animated-86x52.gif")
         should_upload_successfully("test/files/test-300x300.mp4")
-        should_upload_successfully("test/files/test-512x512.webm")
+        should_upload_successfully("test/files/webm/test-512x512.webm")
         should_upload_successfully("test/files/test-audio.m4v")
         # should_upload_successfully("test/files/compressed.swf")
 

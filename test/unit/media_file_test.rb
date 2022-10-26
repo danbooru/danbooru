@@ -27,7 +27,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "determine the correct dimensions for a webm file" do
       skip unless MediaFile.videos_enabled?
-      assert_equal([512, 512], MediaFile.open("test/files/test-512x512.webm").dimensions)
+      assert_equal([512, 512], MediaFile.open("test/files/webm/test-512x512.webm").dimensions)
     end
 
     should "determine the correct dimensions for a mp4 file" do
@@ -58,7 +58,7 @@ class MediaFileTest < ActiveSupport::TestCase
     should "work for a video if called twice" do
       skip unless MediaFile.videos_enabled?
 
-      mf = MediaFile.open("test/files/test-512x512.webm")
+      mf = MediaFile.open("test/files/webm/test-512x512.webm")
       assert_equal([512, 512], mf.dimensions)
       assert_equal([512, 512], mf.dimensions)
 
@@ -96,7 +96,7 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     should "determine the correct extension for a webm file" do
-      assert_equal(:webm, MediaFile.open("test/files/test-512x512.webm").file_ext)
+      assert_equal(:webm, MediaFile.open("test/files/webm/test-512x512.webm").file_ext)
     end
 
     should "determine the correct extension for a mp4 file" do
@@ -150,7 +150,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "generate a preview image for a video" do
       skip unless MediaFile.videos_enabled?
-      assert_equal([150, 150], MediaFile.open("test/files/test-512x512.webm").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/webm/test-512x512.webm").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test-300x300.mp4").preview(150, 150).dimensions)
     end
 
@@ -204,10 +204,16 @@ class MediaFileTest < ActiveSupport::TestCase
 
   context "for a webm file" do
     should "determine the duration of the video" do
-      file = MediaFile.open("test/files/test-512x512.webm")
+      file = MediaFile.open("test/files/webm/test-512x512.webm")
       assert_equal(0.48, file.duration)
       assert_equal(10/0.48, file.frame_rate)
       assert_equal(10, file.frame_count)
+    end
+
+    should "not detect .mkv files as .webm" do
+      file = MediaFile.open("test/files/webm/test-512x512.mkv")
+
+      assert_equal(false, file.is_supported?)
     end
   end
 
