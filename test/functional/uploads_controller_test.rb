@@ -241,6 +241,16 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           create_upload!("test/files/webm/test-512x512.mkv", user: @user)
           assert_match("File type is not supported", Upload.last.error)
         end
+
+        should "fail for a .mp4 file encoded with h265" do
+          create_upload!("test/files/mp4/test-300x300.h265.mp4", user: @user)
+          assert_match("File type is not supported", Upload.last.error)
+        end
+
+        should "fail for a .mp4 file encoded with av1" do
+          create_upload!("test/files/mp4/test-300x300.av1.mp4", user: @user)
+          assert_match("File type is not supported", Upload.last.error)
+        end
       end
 
       context "for a video longer than the video length limit" do
@@ -334,10 +344,11 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/test.png")
         should_upload_successfully("test/files/test-static-32x32.gif")
         should_upload_successfully("test/files/test-animated-86x52.gif")
-        should_upload_successfully("test/files/test-300x300.mp4")
-        should_upload_successfully("test/files/test-audio.mp4")
+        should_upload_successfully("test/files/mp4/test-300x300.mp4")
+        should_upload_successfully("test/files/mp4/test-300x300.vp9.mp4")
+        should_upload_successfully("test/files/mp4/test-audio.mp4")
+        should_upload_successfully("test/files/mp4/test-audio.m4v")
         should_upload_successfully("test/files/webm/test-512x512.webm")
-        should_upload_successfully("test/files/test-audio.m4v")
         # should_upload_successfully("test/files/compressed.swf")
 
         should_upload_successfully("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif")

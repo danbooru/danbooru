@@ -5,7 +5,7 @@
 #
 # @see https://github.com/streamio/streamio-ffmpeg
 class MediaFile::Video < MediaFile
-  delegate :duration, :frame_count, :frame_rate, :has_audio?, to: :video
+  delegate :duration, :frame_count, :frame_rate, :has_audio?, :video_codec, :video_stream, :video_streams, :audio_streams, to: :video
 
   def dimensions
     [video.width, video.height]
@@ -16,14 +16,12 @@ class MediaFile::Video < MediaFile
   end
 
   def is_supported?
-    case file_ext
-    when :webm
-      metadata["Matroska:DocType"] == "webm"
-    when :mp4
-      true
-    else
-      false
-    end
+    return false if video_streams.size != 1
+    return false if audio_streams.size > 1
+    return false if is_webm? && metadata["Matroska:DocType"] != "webm"
+    return false if is_mp4? && !video_codec.in?(["h264", "vp9"])
+
+    true
   end
 
   # True if decoding the video fails.

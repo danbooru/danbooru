@@ -46,11 +46,11 @@ class FFmpeg
   end
 
   def width
-    video_streams.first[:width]
+    video_stream[:width]
   end
 
   def height
-    video_streams.first[:height]
+    video_stream[:height]
   end
 
   # @see https://trac.ffmpeg.org/wiki/FFprobeTips#Duration
@@ -68,8 +68,8 @@ class FFmpeg
 
   # @return [Integer, nil] The number of frames in the video or animation, or nil if unknown.
   def frame_count
-    if video_streams.first&.has_key?(:nb_frames)
-      video_streams.first[:nb_frames].to_i
+    if video_stream.has_key?(:nb_frames)
+      video_stream[:nb_frames].to_i
     elsif playback_info.has_key?(:frame)
       playback_info[:frame].to_i
     else
@@ -81,6 +81,14 @@ class FFmpeg
   def frame_rate
     return nil if frame_count.nil? || duration.nil? || duration == 0
     frame_count / duration
+  end
+
+  def video_codec
+    video_stream[:codec_name]
+  end
+
+  def video_stream
+    video_streams.first || {}
   end
 
   def video_streams

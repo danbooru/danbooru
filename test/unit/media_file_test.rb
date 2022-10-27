@@ -36,7 +36,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "determine the correct dimensions for a mp4 file" do
       skip unless MediaFile.videos_enabled?
-      assert_equal([300, 300], MediaFile.open("test/files/test-300x300.mp4").dimensions)
+      assert_equal([300, 300], MediaFile.open("test/files/mp4/test-300x300.mp4").dimensions)
     end
 
     should "determine the correct dimensions for a ugoira file" do
@@ -110,15 +110,15 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     should "determine the correct extension for a mp4 file" do
-      assert_equal(:mp4, MediaFile.open("test/files/test-300x300.mp4").file_ext)
+      assert_equal(:mp4, MediaFile.open("test/files/mp4/test-300x300.mp4").file_ext)
     end
 
     should "determine the correct extension for a m4v file" do
-      assert_equal(:mp4, MediaFile.open("test/files/test-audio.m4v").file_ext)
+      assert_equal(:mp4, MediaFile.open("test/files/mp4/test-audio.m4v").file_ext)
     end
 
     should "determine the correct extension for an iso5 mp4 file" do
-      assert_equal(:mp4, MediaFile.open("test/files/test-iso5.mp4").file_ext)
+      assert_equal(:mp4, MediaFile.open("test/files/mp4/test-iso5.mp4").file_ext)
     end
 
     should "determine the correct extension for a ugoira file" do
@@ -162,7 +162,7 @@ class MediaFileTest < ActiveSupport::TestCase
     should "generate a preview image for a video" do
       skip unless MediaFile.videos_enabled?
       assert_equal([150, 150], MediaFile.open("test/files/webm/test-512x512.webm").preview(150, 150).dimensions)
-      assert_equal([150, 150], MediaFile.open("test/files/test-300x300.mp4").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/mp4/test-300x300.mp4").preview(150, 150).dimensions)
     end
 
     should "be able to fit to width only" do
@@ -196,18 +196,18 @@ class MediaFileTest < ActiveSupport::TestCase
 
   context "for an mp4 file " do
     should "detect videos with audio" do
-      assert_equal(true, MediaFile.open("test/files/test-audio.mp4").has_audio?)
-      assert_equal(false, MediaFile.open("test/files/test-300x300.mp4").has_audio?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-audio.mp4").has_audio?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300.mp4").has_audio?)
     end
 
     should "determine the duration of the video" do
-      file = MediaFile.open("test/files/test-audio.mp4")
+      file = MediaFile.open("test/files/mp4/test-audio.mp4")
       assert_equal(false, file.is_corrupt?)
       assert_equal(1.002667, file.duration)
       assert_equal(10/1.002667, file.frame_rate)
       assert_equal(10, file.frame_count)
 
-      file = MediaFile.open("test/files/test-300x300.mp4")
+      file = MediaFile.open("test/files/mp4/test-300x300.mp4")
       assert_equal(false, file.is_corrupt?)
       assert_equal(5.7, file.duration)
       assert_equal(1.75, file.frame_rate.round(2))
@@ -215,9 +215,15 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     should "detect corrupt videos" do
-      file = MediaFile.open("test/files/mp4/test-corrupt.mp4")
+      assert_equal(true, MediaFile.open("test/files/mp4/test-corrupt.mp4").is_corrupt?)
+    end
 
-      assert_equal(true, file.is_corrupt?)
+    should "detect supported files" do
+      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300.vp9.mp4").is_supported?)
+
+      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300.h265.mp4").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300.av1.mp4").is_supported?)
     end
   end
 

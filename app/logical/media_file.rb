@@ -156,6 +156,16 @@ class MediaFile
     file_ext.in?([:webm, :mp4])
   end
 
+  # @return [Boolean] True if the file is a MP4.
+  def is_mp4?
+    file_ext == :mp4
+  end
+
+  # @return [Boolean] True if the file is a WebM.
+  def is_webm?
+    file_ext == :webm
+  end
+
   # @return [Boolean] true if the file is a Pixiv ugoira
   def is_ugoira?
     file_ext == :zip
