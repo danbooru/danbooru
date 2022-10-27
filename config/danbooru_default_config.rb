@@ -175,10 +175,9 @@ module Danbooru
       40
     end
 
-    # Maximum size of an upload. If you change this, you must also change
-    # `client_max_body_size` in your nginx.conf.
+    # Maximum size of an upload. If you change this, you must also change `client_max_body_size` in your nginx.conf.
     def max_file_size
-      50.megabytes
+      100.megabytes
     end
 
     # Maximum resolution (width * height) of an upload. Default: 441 megapixels (21000x21000 pixels).
