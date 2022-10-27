@@ -98,7 +98,7 @@ class IqdbClient
     # @param file [File] the image to search
     def query_file(file, limit: 20)
       media_file = MediaFile.open(file)
-      preview = media_file.preview(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
+      preview = media_file.preview!(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
       file = HTTP::FormData::File.new(preview)
       request(:post, "query", form: { file: file }, params: { limit: limit })
     end

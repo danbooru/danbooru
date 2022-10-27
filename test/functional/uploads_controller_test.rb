@@ -179,7 +179,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "for a corrupted image" do
+      context "for a corrupted file" do
         should "fail for a corrupted jpeg" do
           create_upload!("test/files/test-corrupt.jpg", user: @user)
           assert_match("corrupt", Upload.last.error)
@@ -193,6 +193,11 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         # https://schaik.com/pngsuite/pngsuite_xxx_png.html
         should "fail for a corrupted png" do
           create_upload!("test/files/test-corrupt.png", user: @user)
+          assert_match("corrupt", Upload.last.error)
+        end
+
+        should "fail for a corrupted mp4" do
+          create_upload!("test/files/mp4/test-corrupt.mp4", user: @user)
           assert_match("corrupt", Upload.last.error)
         end
       end
@@ -330,6 +335,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/test-static-32x32.gif")
         should_upload_successfully("test/files/test-animated-86x52.gif")
         should_upload_successfully("test/files/test-300x300.mp4")
+        should_upload_successfully("test/files/test-audio.mp4")
         should_upload_successfully("test/files/webm/test-512x512.webm")
         should_upload_successfully("test/files/test-audio.m4v")
         # should_upload_successfully("test/files/compressed.swf")

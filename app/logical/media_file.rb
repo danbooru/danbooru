@@ -200,15 +200,21 @@ class MediaFile
     false
   end
 
-  # Return a preview of the file, sized to fit within the given width and
-  # height (preserving the aspect ratio).
+  # Return a preview of the file, sized to fit within the given width and height (preserving the aspect ratio).
   #
   # @param width [Integer] the max width of the image
   # @param height [Integer] the max height of the image
   # @param options [Hash] extra options when generating the preview
   # @return [MediaFile, nil] a preview file, or nil if we can't generate a preview for this file type (e.g. Flash files)
   def preview(width, height, **options)
+    preview!(width, height, **options)
+  rescue
     nil
+  end
+
+  # Like `preview`, but raises an exception if generating the preview fails for any reason.
+  def preview!(width, height, **options)
+    raise NotImplementedError
   end
 
   # Return a set of AI-inferred tags for this image. Performs an API call to

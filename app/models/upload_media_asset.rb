@@ -86,9 +86,10 @@ class UploadMediaAsset < ApplicationRecord
     Source::Extractor.find(source_url, page_url)
   end
 
+  # Calls `process_upload!`
   def async_process_upload!
     if file.present?
-      process_upload!
+      ProcessUploadMediaAssetJob.perform_now(self)
     else
       ProcessUploadMediaAssetJob.perform_later(self)
     end

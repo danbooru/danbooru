@@ -86,17 +86,17 @@ class MediaAsset < ApplicationRecord
     def convert_file(media_file)
       case type
       in :preview
-        media_file.preview(width, height, format: :jpeg, quality: 85)
+        media_file.preview!(width, height, format: :jpeg, quality: 85)
       in :"180x180"
-        media_file.preview(width, height, format: :jpeg, quality: 85)
+        media_file.preview!(width, height, format: :jpeg, quality: 85)
       in :"360x360"
-        media_file.preview(width, height, format: :jpeg, quality: 85)
+        media_file.preview!(width, height, format: :jpeg, quality: 85)
       in :"720x720"
-        media_file.preview(width, height, format: :webp, quality: 75)
+        media_file.preview!(width, height, format: :webp, quality: 75)
       in :sample if media_asset.is_ugoira?
         media_file.convert
       in :sample | :full if media_asset.is_static_image?
-        media_file.preview(width, height, format: :jpeg, quality: 85)
+        media_file.preview!(width, height, format: :jpeg, quality: 85)
       in :original
         media_file
       end
@@ -235,7 +235,7 @@ class MediaAsset < ApplicationRecord
 
         # XXX should do this in parallel with thumbnail generation.
         # XXX shouldn't generate thumbnail twice (very slow for ugoira)
-        media_asset.update!(ai_tags: media_file.preview(360, 360).ai_tags)
+        media_asset.update!(ai_tags: media_file.preview!(360, 360).ai_tags)
         media_asset.update!(media_metadata: MediaMetadata.new(file: media_file))
 
         media_asset.distribute_files!(media_file)

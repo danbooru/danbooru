@@ -11,8 +11,8 @@ class MediaFile::Video < MediaFile
     [video.width, video.height]
   end
 
-  def preview(max_width, max_height, **options)
-    preview_frame.preview(max_width, max_height, **options)
+  def preview!(max_width, max_height, **options)
+    preview_frame.preview!(max_width, max_height, **options)
   end
 
   def is_supported?
@@ -24,6 +24,11 @@ class MediaFile::Video < MediaFile
     else
       false
     end
+  end
+
+  # True if decoding the video fails.
+  def is_corrupt?
+    video.playback_info.blank?
   end
 
   private

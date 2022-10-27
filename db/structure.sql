@@ -5501,13 +5501,6 @@ CREATE INDEX index_upgrade_codes_on_user_upgrade_id ON public.upgrade_codes USIN
 
 
 --
--- Name: index_upload_media_assets_on_error; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upload_media_assets_on_error ON public.upload_media_assets USING btree (error) WHERE (error IS NOT NULL);
-
-
---
 -- Name: index_upload_media_assets_on_media_asset_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6907,6 +6900,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221003080342'),
 ('20221010035855'),
 ('20221026084655'),
-('20221026084656');
+('20221026084656'),
+('20221027000931');
 
 

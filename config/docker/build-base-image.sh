@@ -14,7 +14,7 @@ COMMON_BUILD_DEPS="
   curl ca-certificates build-essential pkg-config git
 "
 RUBY_BUILD_DEPS="libssl-dev zlib1g-dev libgmp-dev"
-FFMPEG_BUILD_DEPS="libvpx-dev nasm"
+FFMPEG_BUILD_DEPS="libvpx-dev libdav1d-dev nasm"
 MOZJPEG_BUILD_DEPS="cmake nasm libpng-dev zlib1g-dev"
 VIPS_BUILD_DEPS="
   libfftw3-dev libwebp-dev liborc-dev liblcms2-dev libpng-dev
@@ -24,7 +24,7 @@ EXIFTOOL_RUNTIME_DEPS="perl perl-modules libarchive-zip-perl"
 DANBOORU_RUNTIME_DEPS="
   ca-certificates mkvtoolnix rclone libpq5 openssl libgmpxx4ldbl
   zlib1g libfftw3-3 libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
-  libpng16-16 libexpat1 libglib2.0 libgif7 libexif12 libheif1 libvpx7
+  libpng16-16 libexpat1 libglib2.0 libgif7 libexif12 libheif1 libvpx7 libdav1d6
   libseccomp2 libseccomp-dev libjemalloc2
 "
 COMMON_RUNTIME_DEPS="
@@ -77,7 +77,7 @@ install_ffmpeg() {
   curl -L "$FFMPEG_URL" | tar -C /usr/local/src -xzvf -
   cd /usr/local/src/FFmpeg-n${FFMPEG_VERSION}
 
-  ./configure --disable-ffplay --disable-network --disable-doc --enable-libvpx
+  ./configure --disable-ffplay --disable-network --disable-doc --enable-libvpx --enable-libdav1d
   make -j "$(nproc)"
   cp ffmpeg ffprobe /usr/local/bin
 

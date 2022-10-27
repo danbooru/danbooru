@@ -202,14 +202,22 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "determine the duration of the video" do
       file = MediaFile.open("test/files/test-audio.mp4")
+      assert_equal(false, file.is_corrupt?)
       assert_equal(1.002667, file.duration)
       assert_equal(10/1.002667, file.frame_rate)
       assert_equal(10, file.frame_count)
 
       file = MediaFile.open("test/files/test-300x300.mp4")
+      assert_equal(false, file.is_corrupt?)
       assert_equal(5.7, file.duration)
       assert_equal(1.75, file.frame_rate.round(2))
       assert_equal(10, file.frame_count)
+    end
+
+    should "detect corrupt videos" do
+      file = MediaFile.open("test/files/mp4/test-corrupt.mp4")
+
+      assert_equal(true, file.is_corrupt?)
     end
   end
 
