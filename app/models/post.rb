@@ -188,7 +188,7 @@ class Post < ApplicationRecord
     end
 
     def is_image?
-      file_ext =~ /jpg|gif|png|webp|avif/i
+      file_ext.in?(%w[jpg gif png webp avif])
     end
 
     def is_flash?
