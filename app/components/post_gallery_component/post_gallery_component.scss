@@ -19,7 +19,7 @@
 
   .post-preview-container {
     display: flex;
-    place-items: end;
+    place-items: flex-end;
   }
 
   @media screen and (min-width: 660px) {
