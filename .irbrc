@@ -2,4 +2,4 @@
 #
 # ~/.irbrc will take precedence over this file.
 
-IRB.conf[:USE_AUTOCOMPLETE] = true
+IRB.conf[:USE_AUTOCOMPLETE] = false
