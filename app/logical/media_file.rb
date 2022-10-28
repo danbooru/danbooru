@@ -67,14 +67,20 @@ class MediaFile
       :webp
 
     # https://www.ftyps.com
+    # https://cconcolato.github.io/mp4ra/filetype.html
+    # https://github.com/mozilla/gecko-dev/blob/master/toolkit/components/mediasniffer/nsMediaSniffer.cpp#L78
+    # https://mimesniff.spec.whatwg.org/#signature-for-mp4
+    #
     # isom (common) - MP4 Base Media v1 [IS0 14496-12:2003]
     # mp42 (common) - MP4 v2 [ISO 14496-14]
+    # iso4 (rare) - MP4 Base Media v4
     # iso5 (rare) - MP4 Base Media v5 (used by Twitter)
-    # 3gp5 (rare) - 3GPP Media (.3GP) Release 5
+    # 3gp5 (rare) - 3GPP Media (.3GP) Release 5 (XXX technically this should be .3gp, not .mp4. Supported by Chrome but not Firefox)
     # avc1 (rare) - MP4 Base w/ AVC ext [ISO 14496-12:2005]
     # M4V (rare) - Apple iTunes Video (https://en.wikipedia.org/wiki/M4V)
-    when /\A....ftyp(?:isom|iso5|3gp5|mp42|avc1|M4V)/
+    when /\A....ftyp(?:mp4|avc|iso|3gp5|M4V)/
       :mp4
+
     # https://aomediacodec.github.io/av1-avif/#brands-overview
     when /\A....ftyp(?:avif|avis)/
       :avif
