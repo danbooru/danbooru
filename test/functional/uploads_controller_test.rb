@@ -243,12 +243,37 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail for a .mp4 file encoded with h265" do
-          create_upload!("test/files/mp4/test-300x300.h265.mp4", user: @user)
+          create_upload!("test/files/mp4/test-300x300-h265.mp4", user: @user)
           assert_match("File type is not supported", Upload.last.error)
         end
 
         should "fail for a .mp4 file encoded with av1" do
-          create_upload!("test/files/mp4/test-300x300.av1.mp4", user: @user)
+          create_upload!("test/files/mp4/test-300x300-av1.mp4", user: @user)
+          assert_match("File type is not supported", Upload.last.error)
+        end
+
+        should "fail for a 10-bit color .mp4 file encoded with av1" do
+          create_upload!("test/files/mp4/test-yuv420p10le-av1.mp4", user: @user)
+          assert_match("File type is not supported", Upload.last.error)
+        end
+
+        should "fail for a 10-bit color .mp4 file encoded with h264" do
+          create_upload!("test/files/mp4/test-yuv420p10le-h264.mp4", user: @user)
+          assert_match("File type is not supported", Upload.last.error)
+        end
+
+        should "fail for a 10-bit color .mp4 file encoded with vp9" do
+          create_upload!("test/files/mp4/test-yuv420p10le-vp9.mp4", user: @user)
+          assert_match("File type is not supported", Upload.last.error)
+        end
+
+        should "fail for a 4:4:4 subsampled .mp4 file" do
+          create_upload!("test/files/mp4/test-300x300-yuv444p-h264.mp4", user: @user)
+          assert_match("File type is not supported", Upload.last.error)
+        end
+
+        should "fail for a 10-bit color .webm file encoded with vp9" do
+          create_upload!("test/files/webm/test-yuv420p10le-vp9.webm", user: @user)
           assert_match("File type is not supported", Upload.last.error)
         end
       end
@@ -335,7 +360,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_equal([550, 368], full_variant.dimensions)
           assert_equal(:jpg, full_variant.file_ext)
 
-          assert_equal(nil, media_asset.variant(:sample))
+          assert_nil(media_asset.variant(:sample))
         end
       end
 
@@ -345,10 +370,12 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/test-static-32x32.gif")
         should_upload_successfully("test/files/test-animated-86x52.gif")
         should_upload_successfully("test/files/mp4/test-300x300.mp4")
-        should_upload_successfully("test/files/mp4/test-300x300.vp9.mp4")
+        should_upload_successfully("test/files/mp4/test-300x300-vp9.mp4")
+        should_upload_successfully("test/files/mp4/test-300x300-yuvj420p-h264.mp4")
         should_upload_successfully("test/files/mp4/test-audio.mp4")
         should_upload_successfully("test/files/mp4/test-audio.m4v")
         should_upload_successfully("test/files/webm/test-512x512.webm")
+        should_upload_successfully("test/files/webm/test-gbrp-vp9.webm")
         # should_upload_successfully("test/files/compressed.swf")
 
         should_upload_successfully("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif")

@@ -214,16 +214,36 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(10, file.frame_count)
     end
 
+    should "determine the pixel format of the video" do
+      assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-300x300-av1.mp4").pix_fmt)
+      assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-300x300-h265.mp4").pix_fmt)
+      assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-300x300-vp9.mp4").pix_fmt)
+      assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-300x300.mp4").pix_fmt)
+      assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-audio.m4v").pix_fmt)
+      assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-audio.mp4").pix_fmt)
+      assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-iso5.mp4").pix_fmt)
+      assert_equal("yuv444p", MediaFile.open("test/files/mp4/test-300x300-yuv444p-h264.mp4").pix_fmt)
+      assert_equal("yuvj420p", MediaFile.open("test/files/mp4/test-300x300-yuvj420p-h264.mp4").pix_fmt)
+      assert_equal("yuv420p10le", MediaFile.open("test/files/mp4/test-yuv420p10le-av1.mp4").pix_fmt)
+      assert_equal("yuv420p10le", MediaFile.open("test/files/mp4/test-yuv420p10le-h264.mp4").pix_fmt)
+      assert_equal("yuv420p10le", MediaFile.open("test/files/mp4/test-yuv420p10le-vp9.mp4").pix_fmt)
+    end
+
     should "detect corrupt videos" do
       assert_equal(true, MediaFile.open("test/files/mp4/test-corrupt.mp4").is_corrupt?)
     end
 
     should "detect supported files" do
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300.mp4").is_supported?)
-      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300.vp9.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-vp9.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-yuvj420p-h264.mp4").is_supported?)
 
-      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300.h265.mp4").is_supported?)
-      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300.av1.mp4").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-h265.mp4").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-av1.mp4").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-yuv444p-h264.mp4").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-av1.mp4").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-h264.mp4").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-vp9.mp4").is_supported?)
     end
   end
 
@@ -235,10 +255,12 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(10, file.frame_count)
     end
 
-    should "not detect .mkv files as .webm" do
-      file = MediaFile.open("test/files/webm/test-512x512.mkv")
+    should "detect supported files" do
+      assert_equal(true, MediaFile.open("test/files/webm/test-512x512.webm").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/webm/test-gbrp-vp9.webm").is_supported?)
 
-      assert_equal(false, file.is_supported?)
+      assert_equal(false, MediaFile.open("test/files/webm/test-512x512.mkv").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/webm/test-yuv420p10le-vp9.webm").is_supported?)
     end
   end
 

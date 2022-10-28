@@ -5,7 +5,7 @@
 #
 # @see https://github.com/streamio/streamio-ffmpeg
 class MediaFile::Video < MediaFile
-  delegate :duration, :frame_count, :frame_rate, :has_audio?, :video_codec, :video_stream, :video_streams, :audio_streams, to: :video
+  delegate :duration, :frame_count, :frame_rate, :has_audio?, :pix_fmt, :video_codec, :video_stream, :video_streams, :audio_streams, to: :video
 
   def dimensions
     [video.width, video.height]
@@ -20,6 +20,17 @@ class MediaFile::Video < MediaFile
     return false if audio_streams.size > 1
     return false if is_webm? && metadata["Matroska:DocType"] != "webm"
     return false if is_mp4? && !video_codec.in?(["h264", "vp9"])
+
+    # Only allow pixel formats supported by most browsers. Don't allow 10-bit video or 4:4:4 subsampling (neither are supported by Firefox).
+    #
+    # yuv420p:  8-bit YUV, 4:2:0 subsampling. The vast majority of videos use this format.
+    # yuvj420p: 8-bit YUV, 4:2:0 subsampling, color range restricted to 16-235. Uncommon, but widely supported.
+    # yuv444p:  8-bit YUV, 4:4:4 subsampling (i.e. no subsampling). Uncommon, not supported by Firefox.
+    # yuv420p10le: 10-bit YUV, 4:2:0 subsampling (i.e. 10-bit video). Uncommon, not supported by Firefox.
+    # gbrp: 8-bit RGB (used by VP9). Uncommon, but widely supported.
+    #
+    # https://github.com/FFmpeg/FFmpeg/blob/master/libavutil/pixfmt.h
+    return false if !pix_fmt.in?(%w[yuv420p yuvj420p gbrp])
 
     true
   end

@@ -83,6 +83,10 @@ class FFmpeg
     frame_count / duration
   end
 
+  def pix_fmt
+    video_stream[:pix_fmt]
+  end
+
   def video_codec
     video_stream[:codec_name]
   end
