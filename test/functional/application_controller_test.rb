@@ -18,7 +18,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_equal("Request body not allowed for GET request", response.parsed_body["message"])
     end
 
-    should "return 200 OK for a POST request overriden to be a GET request" do
+    should "return 200 OK for a POST request overridden to be a GET request" do
       post root_path, headers: { "Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json", "X-Http-Method-Override": "GET" }, env: { RAW_POST_DATA: "tags=touhou" }
 
       assert_response 200
