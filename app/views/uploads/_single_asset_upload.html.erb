@@ -31,6 +31,7 @@
         <%= number_to_human_size(media_asset.file_size) %> .<%= media_asset.file_ext %>
       <% end %>
       (<%= media_asset.image_width %>x<%= media_asset.image_height %>)
+      <%= link_to "»", media_asset_path(media_asset) %>
     </p>
   </div>
 
