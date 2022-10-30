@@ -15,7 +15,7 @@ class MastodonApiClient
   def json
     return {} if id.blank? || access_token.blank?
     JSON.parse(access_token.get("/api/v1/statuses/#{id}").body)
-  rescue JSON::ParserError
+  rescue
     {}
   end
 
