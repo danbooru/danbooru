@@ -34,7 +34,7 @@ module Danbooru
     class DownloadError < Error; end
     class FileTooLargeError < Error; end
 
-    DEFAULT_TIMEOUT = 10
+    DEFAULT_TIMEOUT = 20
     MAX_REDIRECTS = 5
 
     attr_accessor :max_size, :http
