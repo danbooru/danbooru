@@ -72,16 +72,6 @@ module Sources
         assert_equal("http://gallery.minitokyo.net/view/199164", Source::URL.page_url(source2))
       end
 
-      should "normalize gelbooru links" do
-        source1 = "https://gelbooru.com//images/ee/5c/ee5c9a69db9602c95debdb9b98fb3e3e.jpeg"
-        source2 = "http://simg.gelbooru.com//images/2003/edd1d2b3881cf70c3acf540780507531.png"
-        source3 = "https://simg3.gelbooru.com//samples/0b/3a/sample_0b3ae5e225072b8e391c827cb470d29c.jpg"
-
-        assert_equal("https://gelbooru.com/index.php?page=post&s=list&tags=md5:ee5c9a69db9602c95debdb9b98fb3e3e", Source::URL.page_url(source1))
-        assert_equal("https://gelbooru.com/index.php?page=post&s=list&tags=md5:edd1d2b3881cf70c3acf540780507531", Source::URL.page_url(source2))
-        assert_equal("https://gelbooru.com/index.php?page=post&s=list&tags=md5:0b3ae5e225072b8e391c827cb470d29c", Source::URL.page_url(source3))
-      end
-
       should "normalize e-shuushuu links" do
         source = "http://e-shuushuu.net/images/2014-07-22-662472.png"
         assert_equal("https://e-shuushuu.net/image/662472", Source::URL.page_url(source))

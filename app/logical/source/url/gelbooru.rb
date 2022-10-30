@@ -24,7 +24,6 @@ class Source::URL::Gelbooru < Source::URL
       @post_id = params[:id].to_i
 
     # https://gelbooru.com//images/ee/5c/ee5c9a69db9602c95debdb9b98fb3e3e.jpeg
-    # http://simg.gelbooru.com//images/2003/edd1d2b3881cf70c3acf540780507531.png
     # https://simg3.gelbooru.com//samples/0b/3a/sample_0b3ae5e225072b8e391c827cb470d29c.jpg
     # https://video-cdn3.gelbooru.com/images/62/95/6295154d082f04009160261b90e7176e.mp4
     # https://img2.gelbooru.com//images/a9/64/a96478bbf9bc3f0584f2b5ddf56025fa.webm
@@ -32,6 +31,12 @@ class Source::URL::Gelbooru < Source::URL
     in "gelbooru.com", ("images" | "samples" | "thumbnails"), h1, h2, /\A(?:\w+_)?(\h{32})\.(jpeg|jpg|png|gif|mp4|webm)\z/i
       @md5 = $1
       @full_image_url = "https://#{host}/images/#{h1}/#{h2}/#{md5}.#{file_ext}"
+
+    # http://simg.gelbooru.com//images/2003/edd1d2b3881cf70c3acf540780507531.png
+    # http://simg2.gelbooru.com//samples/619/sample_fe84fb3f86020e120f4b4712fcbd3abf.jpeg?755046
+    in "gelbooru.com", ("images" | "samples"), /\A\d+\z/ => dir, /\A(?:\w+_)?(\h{32})\.(jpeg|jpg|png|gif|mp4|webm)/i
+      @md5 = $1
+      @full_image_url = url
 
     else
       nil
