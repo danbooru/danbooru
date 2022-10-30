@@ -39,7 +39,7 @@ class UploadLimit
 
   # @return [Boolean] true if the user can't upload because they're out of upload slots.
   def limited?
-    !user.can_upload_free? && used_upload_slots >= upload_slots
+    !user.is_contributor? && used_upload_slots >= upload_slots
   end
 
   # @return [Boolean] true if the user is at max level.
@@ -91,7 +91,7 @@ class UploadLimit
   # @param is_approval [Boolean] true if the post is being approved or
   #   undeleted, false if the post is being deleted.
   def update_limit!(is_pending, is_approval)
-    return if user.can_upload_free?
+    return if user.is_contributor?
 
     user.with_lock do
       # If we're approving or deleting a pending post, we can simply increment

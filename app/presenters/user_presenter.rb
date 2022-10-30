@@ -15,20 +15,6 @@ class UserPresenter
     user.created_at.strftime("%Y-%m-%d")
   end
 
-  def permissions
-    permissions = []
-
-    if user.can_approve_posts?
-      permissions << "approve posts"
-    end
-
-    if user.can_upload_free?
-      permissions << "unrestricted uploads"
-    end
-
-    permissions.join(", ")
-  end
-
   def posts_for_saved_search_category(category)
     Post.user_tag_match("search:#{category}").limit(10)
   end

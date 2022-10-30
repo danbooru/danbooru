@@ -15,12 +15,10 @@ module ApproverPruner
   # Get the list of inactive approvers.
   # @return [Array<User>] the list of inactive approvers
   def inactive_approvers
-    approvers = User.bit_prefs_match(:can_approve_posts, true)
-    approvers = approvers.where("level < ?", User::Levels::MODERATOR)
+    recently_promoted_approvers = UserFeedback.where("created_at >= ?", APPROVAL_PERIOD.ago).where_like(:body, "*You gained the ability to approve posts*").pluck(:user_id) # XXX remove in two months
+    recently_promoted_approvers += UserFeedback.where("created_at >= ?", APPROVAL_PERIOD.ago).where_like(:body, "*You have been promoted to an Approver*").pluck(:user_id)
 
-    recently_promoted_approvers = UserFeedback.where("created_at >= ?", APPROVAL_PERIOD.ago).where_like(:body, "*You gained the ability to approve posts*").select(:user_id)
-    approvers = approvers.where.not(id: recently_promoted_approvers)
-
+    approvers = User.where(level: User::Levels::APPROVER).where.not(id: recently_promoted_approvers)
     approvers.select do |approver|
       approver.post_approvals.where("created_at >= ?", APPROVAL_PERIOD.ago).count < MINIMUM_APPROVALS
     end
@@ -30,7 +28,7 @@ module ApproverPruner
   def prune!
     inactive_approvers.each do |user|
       CurrentUser.scoped(User.system) do
-        user.update!(can_approve_posts: false)
+        user.update!(level: User::Levels::CONTRIBUTOR)
         user.feedback.create(category: "neutral", body: "Lost approval privileges", creator: User.system)
 
         Dmail.create_automated(

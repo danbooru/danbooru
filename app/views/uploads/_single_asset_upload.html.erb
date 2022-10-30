@@ -16,7 +16,7 @@
 
   <%= embed_wiki("help:upload_notice", id: "upload-guide-notice") %>
 
-  <% unless CurrentUser.can_upload_free? %>
+  <% unless CurrentUser.is_contributor? %>
     <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
   <% end %>
 
@@ -89,7 +89,7 @@
 
     <%= f.submit "Post" %>
 
-    <% if CurrentUser.can_upload_free? %>
+    <% if CurrentUser.is_contributor? %>
       <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block" }, input_html: { checked: post.is_pending? } %>
     <% end %>
 

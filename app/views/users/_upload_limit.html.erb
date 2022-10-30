@@ -1,6 +1,6 @@
 <%# user %>
 
-<% if user.can_upload_free? %>
+<% if user.is_contributor? %>
   none
 <% else %>
   <%= link_to user.upload_limit.used_upload_slots, posts_path(tags: "user:#{user.name} status:pending") %> /

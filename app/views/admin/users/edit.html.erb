@@ -7,8 +7,6 @@
 
     <%= edit_form_for(@user, url: admin_user_path(@user)) do |f| %>
       <%= f.input :level, collection: User.level_hash.to_a, selected: @user.level %>
-      <%= f.input :can_upload_free, label: "Unrestricted Uploads", as: :boolean, selected: @user.can_upload_free %>
-      <%= f.input :can_approve_posts, label: "Approve Posts", as: :boolean, selected: @user.can_approve_posts %>
       <%= f.submit "Update" %>
     <% end %>
   </div>

@@ -470,7 +470,7 @@ class PostQueryBuilder
       relation = relation.reorder(Arel.sql("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC"))
 
     when "curated"
-      contributors = User.bit_prefs_match(:can_upload_free, true)
+      contributors = User.where("level >= ?", User::Levels::CONTRIBUTOR)
 
       relation = relation
         .joins(:favorites)

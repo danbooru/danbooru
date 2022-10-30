@@ -43,7 +43,7 @@ class PostAppealTest < ActiveSupport::TestCase
 
         context "for users with unrestricted uploads" do
           should "should not have an appeal limit" do
-            @user = create(:user, can_upload_free: true)
+            @user = create(:contributor)
             create_list(:post_appeal, 10, creator: @user)
 
             assert_equal(15, @user.upload_limit.upload_slots)

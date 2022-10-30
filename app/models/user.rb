@@ -12,13 +12,15 @@ class User < ApplicationRecord
     GOLD = 30
     PLATINUM = 31
     BUILDER = 32
+    CONTRIBUTOR = 35
+    APPROVER = 37
     MODERATOR = 40
     ADMIN = 50
     OWNER = 60
   end
 
   # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
-  Roles = Levels.constants.map(&:downcase) + %i[banned approver]
+  Roles = Levels.constants.map(&:downcase) + %i[banned]
 
   BOOLEAN_ATTRIBUTES = %w[
     is_banned
@@ -34,8 +36,8 @@ class User < ApplicationRecord
     _unused_enable_auto_complete
     show_deleted_children
     _unused_has_saved_searches
-    can_approve_posts
-    can_upload_free
+    _unused_can_approve_posts
+    _unused_can_upload_free
     disable_categorized_saved_searches
     _unused_is_super_voter
     disable_tagged_filenames
@@ -261,6 +263,8 @@ class User < ApplicationRecord
           "Gold" => Levels::GOLD,
           "Platinum" => Levels::PLATINUM,
           "Builder" => Levels::BUILDER,
+          "Contributor" => Levels::CONTRIBUTOR,
+          "Approver" => Levels::APPROVER,
           "Moderator" => Levels::MODERATOR,
           "Admin" => Levels::ADMIN,
           "Owner" => Levels::OWNER,
@@ -268,42 +272,12 @@ class User < ApplicationRecord
       end
 
       def level_string(value)
-        case value
-        when Levels::ANONYMOUS
-          "Anonymous"
-
-        when Levels::RESTRICTED
-          "Restricted"
-
-        when Levels::MEMBER
-          "Member"
-
-        when Levels::BUILDER
-          "Builder"
-
-        when Levels::GOLD
-          "Gold"
-
-        when Levels::PLATINUM
-          "Platinum"
-
-        when Levels::MODERATOR
-          "Moderator"
-
-        when Levels::ADMIN
-          "Admin"
-
-        when Levels::OWNER
-          "Owner"
-
-        else
-          ""
-        end
+        level_hash.key(value)
       end
     end
 
-    def promote_to!(new_level, promoter = CurrentUser.user, **options)
-      UserPromotion.new(self, promoter, new_level, **options).promote!
+    def promote_to!(new_level, promoter = CurrentUser.user)
+      UserPromotion.new(self, promoter, new_level).promote!
     end
 
     def promote_to_owner_if_first_user
@@ -311,8 +285,6 @@ class User < ApplicationRecord
 
       if name != Danbooru.config.system_user && !User.exists?(level: Levels::OWNER)
         self.level = Levels::OWNER
-        self.can_approve_posts = true
-        self.can_upload_free = true
       end
     end
 
@@ -340,16 +312,24 @@ class User < ApplicationRecord
       level >= Levels::MEMBER
     end
 
-    def is_builder?
-      level >= Levels::BUILDER
-    end
-
     def is_gold?
       level >= Levels::GOLD
     end
 
     def is_platinum?
       level >= Levels::PLATINUM
+    end
+
+    def is_builder?
+      level >= Levels::BUILDER
+    end
+
+    def is_contributor?
+      level >= Levels::CONTRIBUTOR
+    end
+
+    def is_approver?
+      level >= Levels::APPROVER
     end
 
     def is_moderator?
@@ -362,10 +342,6 @@ class User < ApplicationRecord
 
     def is_owner?
       level >= Levels::OWNER
-    end
-
-    def is_approver?
-      can_approve_posts?
     end
   end
 
@@ -484,7 +460,7 @@ class User < ApplicationRecord
     end
 
     def is_appeal_limited?
-      return false if can_upload_free?
+      return false if is_contributor?
       upload_limit.free_upload_slots < UploadLimit::APPEAL_COST
     end
 
@@ -496,7 +472,7 @@ class User < ApplicationRecord
     # Flags are unlimited if you're an approver or you have at least 30 flags
     # in the last 3 months and have a 70% flag success rate.
     def has_unlimited_flags?
-      return true if can_approve_posts?
+      return true if is_approver?
 
       recent_flags = post_flags.where("created_at >= ?", 3.months.ago)
       flag_ratio = recent_flags.succeeded.count / recent_flags.count.to_f
@@ -642,11 +618,11 @@ class User < ApplicationRecord
         q = q.where("level <= ?", params[:max_level].to_i)
       end
 
-      %w[can_approve_posts can_upload_free is_banned].each do |flag|
-        if params[flag].to_s.truthy?
-          q = q.bit_prefs_match(flag, true)
-        elsif params[flag].to_s.falsy?
-          q = q.bit_prefs_match(flag, false)
+      if params[:is_banned].present?
+        if params[:is_banned].to_s.truthy?
+          q = q.bit_prefs_match(:is_banned, true)
+        elsif params[:is_banned].to_s.falsy?
+          q = q.bit_prefs_match(:is_banned, false)
         end
       end
 

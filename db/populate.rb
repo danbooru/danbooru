@@ -33,12 +33,6 @@ def populate_users(n, password: DEFAULT_PASSWORD)
     puts "Created user ##{user.id} (#{user.name})"
   end
 
-  user = User.create(name: "contributor", password: password, password_confirmation: password, level: User::Levels::BUILDER, can_upload_free: true)
-  puts "Created user ##{user.id} (#{user.name})"
-
-  user = User.create(name: "approver", password: password, password_confirmation: password, level: User::Levels::BUILDER, can_upload_free: true, can_approve_posts: true)
-  puts "Created user ##{user.id} (#{user.name})"
-
   n.times do |i|
     user = User.create(name: FFaker::Internet.user_name, password: password, password_confirmation: password, level: User::Levels::MEMBER)
     puts "Created user ##{user.id}"

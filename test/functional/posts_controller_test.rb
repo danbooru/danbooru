@@ -522,8 +522,8 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       context "with everything" do
         setup do
-          @admin = create(:admin_user, can_approve_posts: true)
-          @builder = create(:builder_user, can_approve_posts: true)
+          @admin = create(:admin_user)
+          @approver = create(:approver_user)
 
           as(@user) do
             @post.update!(tag_string: "1girl solo highres blah 2001")
@@ -545,7 +545,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
             #create(:post_appeal, post: @post, creator: @user)
             create(:post_vote, post: @post, user: @user)
             create(:favorite, post: @post, user: @user)
-            create(:moderation_report, model: @comment, creator: @builder)
+            create(:moderation_report, model: @comment, creator: @approver)
           end
         end
 
@@ -560,7 +560,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "render for a builder" do
-          get_auth post_path(@post), @builder
+          get_auth post_path(@post), @approver
           assert_response :success
         end
 
@@ -570,7 +570,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "render for a builder with a search query" do
-          get_auth post_path(@post, q: "tagme"), @builder
+          get_auth post_path(@post, q: "tagme"), @approver
           assert_response :success
         end
 
