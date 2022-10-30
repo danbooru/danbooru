@@ -78,6 +78,12 @@ class MediaAsset < ApplicationRecord
     end
 
     def open_file
+      open_file!
+    rescue
+      nil
+    end
+
+    def open_file!
       file = storage_service.open(file_path)
       frame_delays = media_asset.frame_delays if media_asset.is_ugoira?
       MediaFile.open(file, frame_delays: frame_delays, strict: false)
