@@ -131,7 +131,7 @@ class Post < ApplicationRecord
     end
 
     def file(type = :original)
-      media_asset.variant(type).open_file
+      media_asset.variant(type).open_file!
     end
 
     def tagged_file_url(tagged_filenames: !CurrentUser.user.disable_tagged_filenames?)

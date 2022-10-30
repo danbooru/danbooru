@@ -62,13 +62,13 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
       should "allow mods to see disapprover names" do
         get_auth post_disapprovals_path, create(:mod_user)
         assert_response :success
-        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-post-approver", true
+        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-approver", true
       end
 
       should "not allow non-mods to see disapprover names" do
         get post_disapprovals_path
         assert_response :success
-        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-post-approver", false
+        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-approver", false
       end
 
       context "when a non-mod searches by disapprover name" do
