@@ -258,7 +258,7 @@ class AutocompleteService
   def autocomplete_metatag(metatag, value)
     results = case metatag.to_sym
     when :user, :approver, :commenter, :comm, :noter, :noteupdater, :commentaryupdater,
-         :artcomm, :fav, :ordfav, :appealer, :flagger, :upvote, :downvote
+         :artcomm, :fav, :ordfav, :appealer, :flagger, :upvote, :downvote, :updater
       autocomplete_user(value)
     when :pool, :ordpool
       autocomplete_pool(value)

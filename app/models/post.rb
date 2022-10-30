@@ -1241,6 +1241,8 @@ class Post < ApplicationRecord
           user_subquery_matches(Comment.unscoped, value, current_user)
         when "commentaryupdater", "artcomm"
           user_subquery_matches(ArtistCommentaryVersion.unscoped, value, current_user, field: :updater)
+        when "updater"
+          relation.user_subquery_matches(PostVersion.unscoped, value, current_user, field: :updater)
         when "noter"
           user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, current_user, field: :updater)
         when "noteupdater"
