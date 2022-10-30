@@ -334,7 +334,7 @@ module Danbooru
       #   still fail if the mailbox doesn't exist and the server lied to the RCPT TO command.
       def undeliverable?(from_address: Danbooru.config.contact_email, timeout: 3, allow_smtp: false)
         mail_server = mx_domain(timeout: timeout)
-        return true if mail_server.nil?
+        return true if mail_server.blank?
 
         return false if !allow_smtp
         smtp = Net::SMTP.new(mail_server)
@@ -346,7 +346,7 @@ module Danbooru
           conn.mailfrom(from_address)
 
           # Net::SMTPFatalError is raised if RCPT TO returns a 5xx error.
-          response = conn.rcptto(to_address) rescue $!
+          response = conn.rcptto(address) rescue $!
           return response.is_a?(Net::SMTPFatalError)
         end
       rescue
