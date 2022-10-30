@@ -23,6 +23,13 @@ class DmailsController < ApplicationController
     respond_with(@dmails)
   end
 
+  def all
+    @dmails = authorize Dmail.paginated_search(params, count_pages: true)
+    @dmails = @dmails.includes(:owner, :to, :from) if request.format.html?
+
+    respond_with(@dmails)
+  end
+
   def show
     if params[:key].present?
       @dmail = Dmail.find_signed!(params[:key], purpose: "dmail_link")

@@ -104,11 +104,16 @@ class Dmail < ApplicationRecord
       end
     end
 
+    def correspondent_matches(user_id)
+      where(to_id: user_id).or(where(from_id: user_id))
+    end
+
     def search(params, current_user)
       q = search_attributes(params, [:id, :created_at, :updated_at, :is_read, :is_deleted, :title, :body, :to, :from], current_user: current_user)
       q = q.where_text_matches([:title, :body], params[:message_matches])
 
       q = q.folder_matches(params[:folder])
+      q = q.correspondent_matches(params[:correspondent_id]) if params[:correspondent_id].present?
 
       q.apply_default_order(params)
     end

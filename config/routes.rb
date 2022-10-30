@@ -104,6 +104,7 @@ Rails.application.routes.draw do
   end
   resources :dmails, :only => [:new, :create, :update, :index, :show] do
     collection do
+      get :all
       post :mark_all_as_read
     end
   end

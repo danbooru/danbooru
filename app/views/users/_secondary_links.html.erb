@@ -14,6 +14,7 @@
       <%= subnav_link_to "Messages #{unread_dmail_indicator(CurrentUser.user)}", dmails_path(search: { folder: "received" }) %>
     <% else %>
       <%= subnav_link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %>
+      <%= subnav_link_to "Messages", dmails_path(search: { correspondent_id: @user.id }) %>
     <% end %>
 
     <% if policy(@user).promote? %>

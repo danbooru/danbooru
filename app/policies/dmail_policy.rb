@@ -9,6 +9,10 @@ class DmailPolicy < ApplicationPolicy
     !user.is_anonymous?
   end
 
+  def all?
+    user.is_owner?
+  end
+
   def mark_all_as_read?
     !user.is_anonymous?
   end

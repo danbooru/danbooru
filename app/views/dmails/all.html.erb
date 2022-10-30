@@ -1,0 +1,50 @@
+<% page_title "Messages" %>
+<%= render "secondary_links" %>
+
+<div id="c-dmails">
+  <div id="a-index">
+    <% if params[:search][:folder].present? %>
+      <h1><%= params[:search][:folder].titleize %> Messages</h1>
+    <% else %>
+      <h1>Messages</h1>
+    <% end %>
+
+    <%= render "search" %>
+
+    <%= table_for @dmails, class: "striped autofit", width: "100%" do |t| %>
+      <% t.column "Date" do |dmail| %>
+        <%= compact_time(dmail.created_at) %>
+      <% end %>
+      <% t.column "From" do |dmail| %>
+        <%= link_to_user dmail.from %>
+      <% end %>
+      <% t.column "To" do |dmail| %>
+        <%= link_to_user dmail.to %>
+      <% end %>
+      <% t.column "Subject", td: { class: "col-expand" } do |dmail| %>
+        <%= link_to dmail.title, dmail_path(dmail) %>
+      <% end %>
+      <% t.column do |dmail| %>
+        <% if dmail.owner_id == CurrentUser.id %>
+          <% if dmail.is_read? %>
+            <%= link_to "Unread", dmail_path(dmail, format: :js), remote: true, method: :put, "data-params": "dmail[is_read]=false" %>
+          <% else %>
+            <%= link_to "Read", dmail_path(dmail, format: :js), remote: true, method: :put, "data-params": "dmail[is_read]=true" %>
+          <% end %>
+          |
+          <% if dmail.is_deleted? %>
+            <%= link_to "Undelete", dmail_path(dmail, format: :js), remote: true, method: :put, "data-params": "dmail[is_deleted]=false" %>
+          <% else %>
+            <%= link_to "Delete", dmail_path(dmail, format: :js), remote: true, method: :put, "data-params": "dmail[is_deleted]=true", "data-confirm": "Are you sure you want to delete this dmail?" %>
+          <% end %>
+
+          <% if policy(dmail).reportable? %>
+            | <%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Dmail", model_id: dmail.id }), remote: true, title: "Report this dmail to the moderators" %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@dmails) %>
+  </div>
+</div>
