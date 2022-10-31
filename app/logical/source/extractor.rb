@@ -55,6 +55,7 @@ module Source
       Source::Extractor::Booth,
       Source::Extractor::Anifty,
       Source::Extractor::Furaffinity,
+      Source::Extractor::Reddit,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
