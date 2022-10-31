@@ -12,6 +12,6 @@ with_confirmation do
   User.where(level: User::Levels::BUILDER).bit_prefs_match(:_unused_can_approve_posts, true).find_each do |approver|
     approver.level = User::Levels::APPROVER
     approver.save
-    puts "user ##{contributor.id} #{approver.name} updated to approver"
+    puts "user ##{approver.id} #{approver.name} updated to approver"
   end
 end
