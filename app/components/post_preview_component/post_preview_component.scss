@@ -106,7 +106,7 @@ article.post-preview {
 }
 
 /* Flagged posts have red borders for approvers. */
-body[data-current-user-can-approve-posts="true"] .post-preview {
+body[data-current-user-is-approver="true"] .post-preview {
   &.post-status-flagged img {
     border-color: var(--preview-flagged-color);
   }
