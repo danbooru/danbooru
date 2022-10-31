@@ -2,6 +2,7 @@
 
 require_relative "base"
 
+CurrentUser.user = User.system
 condition = ENV.fetch("COND", "TRUE")
 fix = ENV.fetch("FIX", "false").truthy?
 
@@ -17,6 +18,7 @@ MediaAsset.active.where(condition).find_each do |asset|
   # Setting `file` updates the metadata if it's different.
   asset.file = media_file
   asset.media_metadata.file = media_file
+  asset.post.assign_attributes(image_width: asset.image_width, image_height: asset.image_height, file_ext: asset.file_ext, file_size: asset.file_size) if asset.post.present?
 
   old = asset.media_metadata.metadata_was.to_h
   new = asset.media_metadata.metadata.to_h
@@ -24,6 +26,7 @@ MediaAsset.active.where(condition).find_each do |asset|
   puts ({ id: asset.id, **asset.changes, **metadata_changes }).to_json
 
   if fix
+    asset.post.save! if asset.post&.changed?
     asset.save! if asset.changed?
     asset.media_metadata.save! if asset.media_metadata.changed?
   end
