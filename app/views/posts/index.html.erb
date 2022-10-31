@@ -44,7 +44,8 @@
           <li><%= link_to "Viewed", viewed_explore_posts_path %></li>
         <% end %>
 
-        <li><%= link_to "Deleted", posts_path(tags: "#{params[:tags]} status:deleted"), rel: "nofollow" %></li>
+        <li><%= link_to "Deleted", posts_path(tags: "#{params[:tags]} status:deleted"), rel: "nofollow" %>
+          / <%= link_to "All", posts_path(tags: "#{params[:tags]} status:any"), rel: "nofollow" %></li>
         <li><%= link_to "Random", random_posts_path(tags: params[:tags]), id: "random-post", "data-shortcut": "r", rel: "nofollow" %></li>
         <% if @post_set.post_query.has_single_tag? %>
           <li><%= link_to "History", post_versions_path(search: { changed_tags: @post_set.post_query.tag_name }), rel: "nofollow" %></li>
