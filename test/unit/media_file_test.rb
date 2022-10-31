@@ -471,6 +471,18 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal("89a", @metadata["GIF:GIFVersion"])
       assert_equal(6, @metadata.count)
     end
+
+    should "not raise an exception when reading the frame count" do
+      @file = MediaFile.open("test/files/gif/corrupt-static.gif")
+      @metadata = @file.metadata
+
+      assert_equal(true, @file.is_corrupt?)
+      assert_equal(nil, @file.frame_count)
+      assert_equal("File format error", @metadata["ExifTool:Error"])
+      assert_equal("89a", @metadata["GIF:GIFVersion"])
+      assert_equal(6, @metadata.count)
+      assert_nothing_raised { @file.attributes }
+    end
   end
 
   context "a corrupt PNG" do

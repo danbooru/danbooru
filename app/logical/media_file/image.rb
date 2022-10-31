@@ -40,7 +40,7 @@ class MediaFile::Image < MediaFile
   def frame_count
     case file_ext
     when :gif, :webp
-      image.get("n-pages") if image.get_fields.include?("n-pages")
+      n_pages
     when :png
       metadata.fetch("PNG:AnimationFrames", 1)
     when :avif
@@ -48,6 +48,13 @@ class MediaFile::Image < MediaFile
     else
       nil
     end
+  end
+
+  # @return [Integer, nil] The frame count for gif and webp images, or possibly nil if the file doesn't have a frame count or is corrupt.
+  def n_pages
+    image.get("n-pages")
+  rescue Vips::Error
+    nil
   end
 
   def frame_rate
