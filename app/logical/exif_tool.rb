@@ -9,8 +9,8 @@ class ExifTool
   # @see https://exiftool.org/exiftool_pod.html#OPTIONS
   DEFAULT_OPTIONS = %q(
     -G1 -duplicates -unknown -struct --binary
-    -x 'System:*' -x ExifToolVersion -x FileType -x FileTypeExtension
-    -x MIMEType -x ImageWidth -x ImageHeight -x ImageSize -x MegaPixels
+    -x 'System:*' -x ExifToolVersion -x FileTypeExtension
+    -x MIMEType -x ImageSize -x MegaPixels
   ).squish
 
   attr_reader :file

@@ -273,7 +273,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(true, @metadata["Flash:Compressed"])
       assert_not_equal("Install Compress::Zlib to extract compressed information", @metadata["ExifTool:Warning"])
-      assert_equal(6, @metadata.count)
+      assert_equal(9, @metadata.count)
     end
   end
 
@@ -469,7 +469,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(true, @file.is_corrupt?)
       assert_equal("File format error", @metadata["ExifTool:Error"])
       assert_equal("89a", @metadata["GIF:GIFVersion"])
-      assert_equal(6, @metadata.count)
+      assert_equal(9, @metadata.count)
     end
 
     should "not raise an exception when reading the frame count" do
@@ -480,7 +480,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(nil, @file.frame_count)
       assert_equal("File format error", @metadata["ExifTool:Error"])
       assert_equal("89a", @metadata["GIF:GIFVersion"])
-      assert_equal(6, @metadata.count)
+      assert_equal(9, @metadata.count)
       assert_nothing_raised { @file.attributes }
     end
   end
@@ -492,7 +492,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(true, @file.is_corrupt?)
       assert_equal("Grayscale", @metadata["PNG:ColorType"])
-      assert_equal(6, @metadata.count)
+      assert_equal(9, @metadata.count)
     end
   end
 
@@ -503,7 +503,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(true, @file.is_corrupt?)
       assert_equal(1, @metadata["File:ColorComponents"])
-      assert_equal(7, @metadata.count)
+      assert_equal(10, @metadata.count)
     end
   end
 
