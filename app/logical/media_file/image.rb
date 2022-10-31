@@ -10,6 +10,8 @@ class MediaFile::Image < MediaFile
   def dimensions
     image.size
   rescue Vips::Error
+    [metadata.width, metadata.height]
+  rescue
     [0, 0]
   end
 

@@ -45,6 +45,9 @@ class MediaAsset < ApplicationRecord
   validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }, if: :md5_changed?
   validates :file_ext, inclusion: { in: FILE_TYPES, message: "File is not an image or video" }
   validates :file_key, length: { is: FILE_KEY_LENGTH }, uniqueness: true, if: :file_key_changed?
+  validates :file_size, comparison: { greater_than: 0 }, if: :file_size_changed?
+  validates :image_width, comparison: { greater_than: 0 }, if: :image_width_changed?
+  validates :image_height, comparison: { greater_than: 0 }, if: :image_height_changed?
 
   before_create :initialize_file_key
 

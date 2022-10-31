@@ -120,6 +120,14 @@ class ExifTool
         metadata.has_key?("PNG:Dream")
     end
 
+    def width
+      metadata.find { |name, value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageWidth\z/) }&.second
+    end
+
+    def height
+      metadata.find { |name, value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageHeight\z/) }&.second
+    end
+
     # @see http://www.vurdalakov.net/misc/gif/netscape-looping-application-extension
     # @see https://wiki.mozilla.org/APNG_Specification#.60acTL.60:_The_Animation_Control_Chunk
     # @see https://danbooru.donmai.us/posts?tags=-exif:GIF:AnimationIterations=Infinite+animated_gif

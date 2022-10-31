@@ -467,6 +467,7 @@ class MediaFileTest < ActiveSupport::TestCase
       @metadata = @file.metadata
 
       assert_equal(true, @file.is_corrupt?)
+      assert_equal([475, 600], @file.dimensions)
       assert_equal("File format error", @metadata["ExifTool:Error"])
       assert_equal("89a", @metadata["GIF:GIFVersion"])
       assert_equal(9, @metadata.count)
@@ -478,6 +479,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(true, @file.is_corrupt?)
       assert_equal(nil, @file.frame_count)
+      assert_equal([575, 800], @file.dimensions)
       assert_equal("File format error", @metadata["ExifTool:Error"])
       assert_equal("89a", @metadata["GIF:GIFVersion"])
       assert_equal(9, @metadata.count)
