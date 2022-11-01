@@ -80,16 +80,16 @@ class MediaAsset < ApplicationRecord
       backup_storage_service.delete(file_path)
     end
 
-    def open_file
-      open_file!
+    def open_file(&block)
+      open_file!(&block)
     rescue
       nil
     end
 
-    def open_file!
+    def open_file!(&block)
       file = storage_service.open(file_path)
       frame_delays = media_asset.frame_delays if media_asset.is_ugoira?
-      MediaFile.open(file, frame_delays: frame_delays, strict: false)
+      MediaFile.open(file, frame_delays: frame_delays, strict: false, &block)
     end
 
     def convert_file(media_file)
@@ -323,7 +323,15 @@ class MediaAsset < ApplicationRecord
     def regenerate_ai_tags!
       with_lock do
         ai_tags.each(&:destroy!)
-        update!(ai_tags: variant(:"360x360").open_file.ai_tags)
+        update!(ai_tags: generate_ai_tags)
+      end
+    end
+
+    def generate_ai_tags
+      return [] if !has_variant?("360x360")
+
+      variant("360x360").open_file! do |media_file|
+        media_file.ai_tags
       end
     end
 
