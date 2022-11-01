@@ -3,7 +3,7 @@
 set -xeuo pipefail
 
 RUBY_VERSION="${RUBY_VERSION:-3.1.2}"
-VIPS_VERSION="${VIPS_VERSION:-8.13.2}"
+VIPS_VERSION="${VIPS_VERSION:-c76d74be6}"
 FFMPEG_VERSION="${FFMPEG_VERSION:-5.1.2}"
 MOZJPEG_VERSION="${MOZJPEG_VERSION:-4.1.1}"
 EXIFTOOL_VERSION="${EXIFTOOL_VERSION:-12.42}"
@@ -17,6 +17,7 @@ RUBY_BUILD_DEPS="libssl-dev zlib1g-dev libgmp-dev"
 FFMPEG_BUILD_DEPS="libvpx-dev libdav1d-dev nasm"
 MOZJPEG_BUILD_DEPS="cmake nasm libpng-dev zlib1g-dev"
 VIPS_BUILD_DEPS="
+  meson libgirepository1.0-dev
   libfftw3-dev libwebp-dev liborc-dev liblcms2-dev libpng-dev
   libexpat1-dev libglib2.0-dev libgif-dev libexif-dev libheif-dev
 "
@@ -58,13 +59,24 @@ install_mozjpeg() {
 install_vips() {
   apt_install $VIPS_BUILD_DEPS
 
-  VIPS_URL="https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.gz"
-  curl -L "$VIPS_URL" | tar -C /usr/local/src -xzvf -
-  cd /usr/local/src/vips-${VIPS_VERSION}
+  #VIPS_URL="https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.gz"
+  #curl -L "$VIPS_URL" | tar -C /usr/local/src -xzvf -
+  #cd /usr/local/src/vips-${VIPS_VERSION}
 
-  ./configure --disable-static
-  CFLAGS="-O2" make -j "$(nproc)"
-  make install
+  #./configure --disable-static
+  #CFLAGS="-O2" make -j "$(nproc)"
+  #make install
+  #ldconfig
+
+  mkdir /usr/local/src/libvips
+  cd /usr/local/src/libvips
+  git clone https://github.com/libvips/libvips.git .
+  git checkout $VIPS_VERSION
+
+  meson build --prefix /usr/local --buildtype release
+  cd build
+  meson compile
+  meson install
   ldconfig
 
   vips --version
