@@ -15,6 +15,22 @@ class MediaAssetsController < ApplicationController
   def show
     @media_asset = authorize MediaAsset.find(params[:id])
     @post = Post.find_by_md5(@media_asset.md5)
-    respond_with(@media_asset)
+
+    if CurrentUser.is_owner? && request.format.symbol.in?(%i[jpeg webp avif])
+      width = params.fetch(:width, @media_asset.image_width).to_i
+      height = params.fetch(:height, @media_asset.image_height).to_i
+      quality = params.fetch(:quality, 85).to_i
+      original_file = @media_asset.variant(:original).open_file
+
+      if width != @media_asset.image_width || height != @media_asset.image_height || request.format != @media_asset.mime_type
+        media_file = original_file.preview!(width, height, format: request.format.symbol, quality: quality)
+      else
+        media_file = original_file
+      end
+
+      send_file(media_file.path, type: media_file.mime_type, disposition: "inline")
+    else
+      respond_with(@media_asset)
+    end
   end
 end

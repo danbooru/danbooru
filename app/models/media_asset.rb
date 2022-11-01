@@ -304,6 +304,11 @@ class MediaAsset < ApplicationRecord
       end
     end
 
+    # @return [Mime::Type] The file's MIME type.
+    def mime_type
+      Mime::Type.lookup_by_extension(file_ext)
+    end
+
     def file=(file_or_path)
       media_file = file_or_path.is_a?(MediaFile) ? file_or_path : MediaFile.open(file_or_path)
 

@@ -147,6 +147,10 @@ class MediaFile
     ExifTool.new(file).metadata
   end
 
+  def mime_type
+    Mime::Type.lookup_by_extension(file_ext)
+  end
+
   # @return [Boolean] True if the file is supported by Danbooru. Certain files may be unsupported because they use features we don't support.
   def is_supported?
     true
@@ -251,8 +255,9 @@ class MediaFile
       path: path,
       width: width,
       height: height,
-      file_ext: file_ext,
       file_size: file_size,
+      file_ext: file_ext,
+      mime_type: mime_type,
       md5: md5,
       is_corrupt?: is_corrupt?,
       is_supported?: is_supported?,
@@ -276,5 +281,5 @@ class MediaFile
     end
   end
 
-  memoize :file_ext, :file_size, :md5, :metadata
+  memoize :file_ext, :file_size, :md5, :metadata, :mime_type
 end
