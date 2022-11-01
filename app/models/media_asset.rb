@@ -320,11 +320,51 @@ class MediaAsset < ApplicationRecord
       self.duration = media_file.duration
     end
 
-    def regenerate_ai_tags!
+    def regenerate!(metadata: true, files: true, ai_tags: true)
       with_lock do
-        ai_tags.each(&:destroy!)
-        update!(ai_tags: generate_ai_tags)
+        variant("original").open_file! do |original_file|
+          regenerate_metadata!(original_file) if metadata
+          regenerate_files!(original_file) if files
+        end
+
+        regenerate_ai_tags! if ai_tags
       end
+    end
+
+    # Regenerate all metadata for the asset, including the md5, width, height, file size, file ext,
+    # duration, and EXIF metadata, both on the media asset and on the post. This may change the tags
+    # as well if the new metadata causes automatic tags to be recalculated.
+    def regenerate_metadata!(original_file)
+      update!(file: original_file)
+      media_metadata.update!(file: original_file)
+
+      if saved_changes? && post.present?
+        CurrentUser.scoped(User.system) do
+          post.update!(md5: md5, file_ext: file_ext, file_size: file_size, image_width: image_width, image_height: image_height)
+        end
+      end
+    end
+
+    # Regenerate all thumbnail and sample image files for the asset.
+    def regenerate_files!(original_file)
+      distribute_files!(original_file)
+      purge_cached_urls!
+      post.update_iqdb if post.present?
+    end
+
+    # Purge all image URLs from Cloudflare.
+    def purge_cached_urls!
+      urls = variants.map(&:file_url)
+      urls += [post.tagged_file_url(tagged_filenames: true), post.tagged_large_file_url(tagged_filenames: true)] if post.present?
+
+      CloudflareService.new.purge_cache(urls.uniq)
+    end
+
+    # Regenerate the AI tags for the asset. This is based on the 360x360 thumbnail, so the files
+    # should be regenerated first in case the thumbnail changed.
+    def regenerate_ai_tags!
+      ai_tags.each(&:destroy!)
+      update!(ai_tags: generate_ai_tags)
     end
 
     def generate_ai_tags

@@ -1454,37 +1454,10 @@ class Post < ApplicationRecord
 
         ModAction.log("regenerated IQDB for post ##{id}", :post_regenerate_iqdb, subject: self, user: user)
       else
-        media_file = media_asset.variant(:original).open_file
-        media_asset.distribute_files!(media_file)
-
-        update!(
-          image_width: media_file.width,
-          image_height: media_file.height,
-          file_size: media_file.file_size,
-          file_ext: media_file.file_ext
-        )
-
-        media_asset.update!(
-          image_width: media_file.width,
-          image_height: media_file.height,
-          file_size: media_file.file_size,
-          file_ext: media_file.file_ext
-        )
-
-        purge_cached_urls!
-        update_iqdb
+        media_asset.regenerate!
 
         ModAction.log("regenerated image samples for post ##{id}", :post_regenerate, subject: self, user: user)
       end
-    end
-
-    def purge_cached_urls!
-      urls = [
-        preview_file_url, large_file_url, file_url,
-        tagged_file_url(tagged_filenames: true), tagged_large_file_url(tagged_filenames: true),
-      ]
-
-      CloudflareService.new.purge_cache(urls)
     end
   end
 
