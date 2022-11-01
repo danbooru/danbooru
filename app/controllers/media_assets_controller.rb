@@ -41,6 +41,6 @@ class MediaAssetsController < ApplicationController
     variant = media_asset.variant(params[:variant])
     raise ActiveRecord::RecordNotFound if variant.nil?
 
-    redirect_to variant.file_url
+    redirect_to variant.file_url, allow_other_host: true
   end
 end
