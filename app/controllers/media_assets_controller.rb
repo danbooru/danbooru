@@ -3,6 +3,8 @@
 class MediaAssetsController < ApplicationController
   respond_to :html, :json, :xml
 
+  rate_limit :image, rate: 5.0/1.seconds, burst: 50
+
   def index
     @limit = params.fetch(:limit, CurrentUser.user.per_page).to_i.clamp(0, PostSets::Post::MAX_PER_PAGE)
     @preview_size = params[:size].presence || cookies[:post_preview_size].presence || MediaAssetGalleryComponent::DEFAULT_SIZE
@@ -32,5 +34,13 @@ class MediaAssetsController < ApplicationController
     else
       respond_with(@media_asset)
     end
+  end
+
+  def image
+    media_asset = authorize MediaAsset.find(params[:media_asset_id])
+    variant = media_asset.variant(params[:variant])
+    raise ActiveRecord::RecordNotFound if variant.nil?
+
+    redirect_to variant.file_url
   end
 end

@@ -5,6 +5,10 @@ class MediaAssetPolicy < ApplicationPolicy
     true
   end
 
+  def image?
+    can_see_image?
+  end
+
   def can_see_image?
     record.post.blank? || record.post.visible?(user)
   end
