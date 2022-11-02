@@ -6,6 +6,7 @@ module Searchable
   def negate_relation
     relation = unscoped
     relation = relation.from(all.from_clause.value) if all.from_clause.value.present?
+    relation = relation.joins(all.joins_values) if all.joins_values.present?
     relation.where(all.where_clause.invert.ast)
   end
 

@@ -781,6 +781,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "duration:>0.4")
       assert_tag_match([post], "duration:<0.5")
       assert_tag_match([], "duration:>1")
+
+      assert_tag_match([post], "-duration:>0.5")
+      assert_tag_match([post], "-duration:<0.4")
+      assert_tag_match([], "-duration:<0.5")
+      assert_tag_match([], "-duration:>0.4")
     end
 
     should "return posts for the is:<status> metatag" do
@@ -1481,14 +1486,14 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post2, post1], "id:#{post1.id} or rating:q")
     end
 
-    should "work on a relation with pre-existing scopes" do
-      post1 = create(:post, rating: "g", is_pending: true, tag_string: ["1girl"])
-      post2 = create(:post, rating: "s", is_flagged: true, tag_string: ["1boy"])
+    should "work on a relation with pre-existing filters" do
+      post1 = create(:post, rating: "g", is_pending: true, tag_string: "1girl")
+      post2 = create(:post, rating: "s", is_flagged: true, tag_string: "1boy")
       create(:post_disapproval, post: post2, reason: "poor_quality")
 
       assert_tag_match([post1], "1girl", relation: Post.pending)
       assert_tag_match([post1], "1girl", relation: Post.in_modqueue)
-      assert_tag_match([post1], "1boy", relation: Post.in_modqueue)
+      assert_tag_match([post2], "1boy", relation: Post.in_modqueue)
       assert_tag_match([post2, post1], "comments:0", relation: Post.in_modqueue)
       assert_tag_match([post2, post1], "comments:0 notes:0", relation: Post.in_modqueue)
 
