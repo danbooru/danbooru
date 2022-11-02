@@ -73,13 +73,15 @@ class PostPolicy < ApplicationPolicy
   def permitted_attributes_for_create
     %i[upload_id media_asset_id upload_media_asset_id tag_string rating
     parent_id source is_pending artist_commentary_desc artist_commentary_title
-    translated_commentary_desc translated_commentary_title]
+    translated_commentary_desc translated_commentary_title
+    prompt negative_prompt sampler seed steps cfg_scale model_hash]
   end
 
   # XXX For UploadsController#show action
   def permitted_attributes_for_show
     %i[tag_string rating parent_id source is_pending artist_commentary_desc
-    artist_commentary_title translated_commentary_desc translated_commentary_title]
+    artist_commentary_title translated_commentary_desc translated_commentary_title
+    prompt negative_prompt sampler seed steps cfg_scale model_hash]
   end
 
   def permitted_attributes_for_update

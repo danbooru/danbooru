@@ -1,13 +1,17 @@
-<% if @post.valid? %>
-  var $post = $("#post_<%= @post.id %>");
-  var $new_post = $("<%= j post_preview(@post, fit: :compact, show_deleted: true, show_votes: @show_votes, size: @preview_size) %>");
-  Danbooru.Blacklist.apply_post($new_post.get(0));
-  $("#post_<%= @post.id %>").replaceWith($new_post);
-  <% if params[:mode] == "quick-edit" %>
-    Danbooru.PostModeMenu.close_edit_form();
-  <% end %>
+<% if params[:prompt].present? %>
+  window.location.reload();
 <% else %>
-  Danbooru.error(`Post #<%= @post.id %>: <%= j @post.errors.full_messages.join("; ") %>`);
-<% end %>
+  <% if @post.valid? %>
+    var $post = $("#post_<%= @post.id %>");
+    var $new_post = $("<%= j post_preview(@post, fit: :compact, show_deleted: true, show_votes: @show_votes, size: @preview_size) %>");
+    Danbooru.Blacklist.apply_post($new_post.get(0));
+    $("#post_<%= @post.id %>").replaceWith($new_post);
+    <% if params[:mode] == "quick-edit" %>
+      Danbooru.PostModeMenu.close_edit_form();
+    <% end %>
+  <% else %>
+    Danbooru.error(`Post #<%= @post.id %>: <%= j @post.errors.full_messages.join("; ") %>`);
+  <% end %>
 
-$(document).trigger("danbooru:post-preview-updated", <%= raw @post.to_json %>);
+  $(document).trigger("danbooru:post-preview-updated", <%= raw @post.to_json %>);
+<% end %>

@@ -1,0 +1,53 @@
+<div id="c-ai-metadata-versions">
+  <div id="a-index">
+    <h1>AI Metadata History</h1>
+
+    <%= render "posts/partials/common/inline_blacklist" %>
+
+    <div id="p-<%= listing_type(:post_id) %>-listing">
+      <% if listing_type(:post_id) == :revert && @ai_metadata_versions.present? %>
+        <%= post_preview(@ai_metadata_versions.first.post, show_deleted: true) %>
+      <% end %>
+
+      <%= table_for @ai_metadata_versions, class: "striped" do |t| %>
+        <% if listing_type(:post_id) == :standard %>
+          <% t.column "Post", width: "1%" do |metadata_version| %>
+            <%= post_preview(metadata_version.post, show_deleted: true) %>
+          <% end %>
+
+          <% t.column "Version", width: "3%" do |metadata_version| %>
+            <%= link_to "#{metadata_version.post_id}.#{metadata_version.id}&nbsp;»".html_safe, ai_metadata_versions_path(search: { post_id: metadata_version.post_id }, anchor: "ai-metadata-version-#{metadata_version.id}") %>
+          <% end %>
+        <% end %>
+
+        <% t.column "Metadata" do |metadata_version| %>
+          <%= render "ai_metadata/show", ai_metadata: metadata_version %>
+        <% end %>
+
+        <% t.column "Changes", width: "3%" do |metadata_version| %>
+          <%= status_diff_html(metadata_version, "previous") %>
+        <% end %>
+
+        <% t.column "Updated", width: "10%" do |metadata_version| %>
+          <%= link_to_user metadata_version.updater %>
+          <%= link_to "»", ai_metadata_versions_path(search: params[:search].merge({ updater_id: metadata_version.updater_id })) %>
+          <div><%= compact_time metadata_version.updated_at %></div>
+        <% end %>
+
+        <% t.column column: "control", width: "10%" do |metadata_version| %>
+          <% if listing_type(:post_id) == :revert %>
+            <%= link_to "Revert&nbspto".html_safe, revert_post_ai_metadata_path(metadata_version.post_id, version_id: metadata_version.id), remote: true, method: :put, "data-confirm": "Are you sure you want to revert to this version?" %>
+            <% if metadata_version.version > 1 %> | <% end %>
+          <% end %>
+          <% if metadata_version.version > 1 %>
+            <%= link_to "Undo", undo_post_ai_metadata_path(metadata_version.post_id, version_id: metadata_version.id), remote: true, method: :put, "data-confirm": "Are you sure you want to undo these changes?" %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= numbered_paginator(@ai_metadata_versions) %>
+  </div>
+</div>
+
+<%= render "ai_metadata/secondary_links" %>

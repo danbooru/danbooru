@@ -85,6 +85,10 @@ class UserPresenter
     template.link_to(user.artist_commentary_version_count, template.artist_commentary_versions_path(:search => {:updater_id => user.id}))
   end
 
+  def ai_metadata_version_count(template)
+    template.link_to(user.ai_metadata_version_count, template.ai_metadata_versions_path(search: { updater_id: user.id } ))
+  end
+
   def forum_post_count(template)
     template.link_to(user.forum_post_count, template.forum_posts_path(search: { creator_id: user.id }), rel: "nofollow")
   end

@@ -16,11 +16,13 @@ class UserAction < ApplicationRecord
     ModAction ModerationReport NoteVersion Post PostAppeal PostApproval
     PostDisapproval PostFlag PostReplacement PostVote SavedSearch TagAlias
     TagImplication TagVersion Upload User UserEvent UserFeedback UserUpgrade
-    UserNameChangeRequest WikiPageVersion]
+    UserNameChangeRequest WikiPageVersion AIMetadataVersion]
   end
 
   def self.for_user(user)
     sql = <<~SQL.squish
+    (#{AIMetadataVersion.visible(user).select("'AIMetadataVersion'::character varying AS model_type, id AS model_id, updater_id AS user_id, 'create'::character varying AS event_type, created_at AS event_at").to_sql})
+    UNION ALL
       (#{ArtistVersion.visible(user).select("'ArtistVersion'::character varying AS model_type, id AS model_id, updater_id AS user_id, 'create'::character varying AS event_type, created_at AS event_at").to_sql})
     UNION ALL
       (#{ArtistCommentaryVersion.visible(user).select("'ArtistCommentaryVersion', id, updater_id, 'create', created_at").to_sql})

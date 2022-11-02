@@ -136,6 +136,7 @@
         <% end %>
 
         <li id="post-option-add-commentary"><%= link_to "Add commentary", "#", id: "add-commentary" %></li>
+        <li id="post-option-add-ai-metadata"><%= link_to "Add metadata", "#", id: "add-ai-metadata" %></li>
       <% end %>
 
       <% if policy(FavoriteGroup).create? %>
@@ -194,6 +195,7 @@
       <li id="post-history-notes"><%= link_to "Notes", note_versions_path(search: { post_id: @post.id }) %></li>
       <li id="post-history-moderation"><%= link_to "Moderation", post_post_events_path(@post.id) %></li>
       <li id="post-history-commentary"><%= link_to "Commentary", artist_commentary_versions_path(search: { post_id: @post.id }) %></li>
+      <li id="post-history-metadata"><%= link_to "AI Metadata", ai_metadata_versions_path(search: { post_id: @post.id }) %></li>
     </ul>
   </section>
 <% end %>
@@ -330,9 +332,32 @@
     <% end %>
   </section>
 
-  <% if @post.artist_commentary && @post.artist_commentary.any_field_present? %>
+  <% if @post.artist_commentary&.any_field_present? || @post.ai_metadata&.any_field_present? %>
     <div id="artist-commentary">
-      <%= render "artist_commentaries/show", :artist_commentary => @post.artist_commentary %>
+      <menu id="info-section-tabs">
+        <% if @post.artist_commentary&.any_field_present? && @post.ai_metadata&.any_field_present? %>
+          <li class="active"><a href="#commentary">Artist's commentary</a></li> |
+          <li><a href="#ai-metadata">AI Metadata</a></li>
+        <% elsif @post.artist_commentary&.any_field_present? %>
+          <li><b>Artist's commentary</b></li>
+        <% elsif @post.ai_metadata&.any_field_present? %>
+          <li><b>AI Metadata</b></li>
+        <% end %>
+      </menu>
+
+      <% if @post.artist_commentary&.any_field_present? %>
+        <section id="artist-commentary-section">
+          <%= render "artist_commentaries/show", artist_commentary: @post.artist_commentary %>
+        </section>
+      <% end %>
+
+      <% if @post.ai_metadata&.any_field_present? %>
+        <%= tag.section id: "ai-metadata-section", style: ("display:none" if @post.artist_commentary&.any_field_present?) do %>
+          <div id="ai-metadata-table">
+            <%= render "ai_metadata/show", ai_metadata: @post.ai_metadata %>
+          </div>
+        <% end %>
+      <% end %>
     </div>
   <% end %>
 
@@ -390,6 +415,12 @@
 <% if policy(ArtistCommentary).create_or_update? %>
   <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
     <%= render "artist_commentaries/form", post: @post, artist_commentary: @post.artist_commentary || ArtistCommentary.new(post: @post) %>
+  </div>
+<% end %>
+
+<% if policy(AIMetadata).create_or_update? %>
+  <div id="add-ai-metadata-dialog" title="Add metadata" style="display: none;">
+    <%= render "ai_metadata/form", post: @post, ai_metadata: @post.ai_metadata || AIMetadata.new(post: @post) %>
   </div>
 <% end %>
 

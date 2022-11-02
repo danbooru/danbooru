@@ -36,6 +36,8 @@ Post.initialize_all = function() {
     this.initialize_post_image_resize_links();
     this.initialize_recommended();
     this.initialize_ugoira_player();
+    this.initialize_edit_ai_metadata_dialog();
+    this.initialize_info_tabs();
   }
 
   if ($("#c-posts #a-show, #c-uploads #a-show").length) {
@@ -46,6 +48,22 @@ Post.initialize_all = function() {
 
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
+  });
+}
+
+Post.initialize_info_tabs = function() {
+  $("#info-section-tabs li a").on("click.danbooru", function(e) {
+    if (e.target.hash === "#commentary") {
+      $("#artist-commentary-section").show();
+      $("#ai-metadata-section").hide();
+    } else if (e.target.hash === "#ai-metadata") {
+      $("#artist-commentary-section").hide();
+      $("#ai-metadata-section").show();
+    }
+
+    $("#info-section-tabs li").removeClass("active");
+    $(e.target).parent("li").addClass("active");
+    e.preventDefault();
   });
 }
 
@@ -411,6 +429,32 @@ Post.initialize_ruffle_player = function() {
     player.load(src);
   }
 };
+
+Post.initialize_edit_ai_metadata_dialog = function() {
+  $("#add-ai-metadata-dialog").dialog({
+    autoOpen: false,
+    width: 700,
+    buttons: {
+      "Submit": function() {
+        let form = $("#add-ai-metadata-dialog #edit-ai-metadata").get(0);
+        Rails.fire(form, "submit");
+        $(this).dialog("close");
+      },
+      "Cancel": function() {
+        $(this).dialog("close");
+      }
+    }
+  });
+
+  $("#add-ai-metadata-dialog #edit-ai-metadata").submit(() => {
+    $("#add-commentary-dialog").dialog("close");
+  });
+
+  $("#add-ai-metadata").on("click.danbooru", (e) => {
+    e.preventDefault();
+    $("#add-ai-metadata-dialog").dialog("open");
+  });
+}
 
 Post.resize_ugoira_controls = function() {
   var $img = $("#image");

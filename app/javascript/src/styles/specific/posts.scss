@@ -234,3 +234,9 @@ div#c-post-versions, div#c-artist-versions {
     }
   }
 }
+
+#info-section-tabs li a {
+  font-weight: bold;
+  font-size: var(--text-md);
+  color: unset;
+}

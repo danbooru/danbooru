@@ -14,7 +14,7 @@ class AutocompleteService
 
   STATIC_METATAGS = {
     is: %w[parent child sfw nsfw] + POST_STATUSES + MediaAsset::FILE_TYPES + Post::RATINGS.values.map(&:downcase),
-    has: %w[parent children source appeals flags replacements comments commentary notes pools],
+    has: %w[parent children source appeals flags replacements comments commentary notes pools metadata prompt seed],
     status: %w[any] + POST_STATUSES,
     child: %w[any none] + POST_STATUSES,
     parent: %w[any none] + POST_STATUSES,

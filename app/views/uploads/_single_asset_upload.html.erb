@@ -112,6 +112,21 @@
     <%= f.input :rating, label: "Rating (#{link_to_wiki "?", "howto:rate"})".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
     <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
 
+    <div class="input upload_ai_metadata_container">
+      <strong>AI Metadata</strong>
+      <a href="#" id="toggle-ai-metadata">show »</a>
+
+      <div class="ai-metadata" style="display: none;">
+        <%= f.input :prompt, as: :text, input_html: { value: post&.ai_metadata&.prompt } %>
+        <%= f.input :negative_prompt, as: :text, input_html: { value: post&.ai_metadata&.negative_prompt } %>
+        <%= f.input :sampler, as: :string, input_html: { value: post&.ai_metadata&.sampler } %>
+        <%= f.input :seed, as: :integer, input_html: { value: post&.ai_metadata&.seed } %>
+        <%= f.input :steps, as: :integer, input_html: { value: post&.ai_metadata&.steps } %>
+        <%= f.input :cfg_scale, as: :float, input_html: { value: post&.ai_metadata&.cfg_scale } %>
+        <%= f.input :model_hash, as: :string, input_html: { value: post&.ai_metadata&.model_hash } %>
+      </div>
+    </div>
+
     <div class="input upload_artist_commentary_container">
       <strong>Commentary</strong>
       <a href="#" id="toggle-artist-commentary">show »</a>

@@ -22,7 +22,7 @@ class MediaAsset < ApplicationRecord
   has_many :ai_tags
 
   delegate :frame_delays, :metadata, to: :media_metadata, allow_nil: true
-  delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, :is_ai_generated?, :has_sound?, to: :metadata
+  delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, :is_ai_generated?, :has_sound?, :prompt, to: :metadata
 
   scope :public_only, -> { where(is_public: true) }
   scope :private_only, -> { where(is_public: false) }

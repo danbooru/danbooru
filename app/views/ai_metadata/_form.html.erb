@@ -1,0 +1,9 @@
+<%= edit_form_for(ai_metadata, url: create_or_update_post_ai_metadata_path(post_id: post.id, format: :js), remote: true, method: :put, html: { id: "edit-ai-metadata" }) do |f| %>
+  <%= f.input :prompt %>
+  <%= f.input :negative_prompt %>
+  <%= f.input :sampler %>
+  <%= f.input :seed %>
+  <%= f.input :steps %>
+  <%= f.input :cfg_scale %>
+  <%= f.input :model_hash %>
+<% end %>

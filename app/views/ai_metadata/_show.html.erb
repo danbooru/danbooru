@@ -1,0 +1,15 @@
+<table class="striped">
+  <thead>
+    <tr>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% [:prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash].each do |field| %>
+      <tr>
+        <th><%= field.to_s.titleize %></th>
+        <td><%= ai_metadata[field].presence || unknown_field %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

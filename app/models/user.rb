@@ -107,6 +107,7 @@ class User < ApplicationRecord
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_owner_if_first_user
 
+  has_many :ai_metadata_versions, foreign_key: :updater_id
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
   has_many :comments, foreign_key: :creator_id
@@ -533,6 +534,10 @@ class User < ApplicationRecord
 
     def artist_commentary_version_count
       artist_commentary_versions.count
+    end
+
+    def ai_metadata_version_count
+      ai_metadata_versions.count
     end
 
     def pool_version_count

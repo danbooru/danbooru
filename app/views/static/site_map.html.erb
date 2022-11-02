@@ -6,12 +6,21 @@
       <ul>
         <li><h2>Posts</h2></li>
         <li><%= link_to("Posts", posts_path) %></li>
+        <li><%= link_to("AI Metadata", ai_metadata_path) %></li>
         <li><%= link_to("Upload", new_upload_path) %></li>
         <li><%= link_to("Popular", popular_explore_posts_path) %></li>
         <li><%= link_to("Votes", post_votes_path) %></li>
         <li><%= link_to("Most Viewed", viewed_explore_posts_path) %></li>
         <li><%= link_to("Similar Image Search", iqdb_queries_path) %></li>
         <li><%= link_to_wiki "Help", "help:posts" %></li>
+      </ul>
+
+      <ul>
+        <li><h2>AI Metadata</h2></li>
+        <li><%= link_to("AI Metadata", ai_metadata_path) %></li>
+        <li><%= link_to("Search", search_ai_metadata_path) %></li>
+        <li><%= link_to("History", ai_metadata_versions_path) %></li>
+        <li><%= link_to_wiki("Help", "help:ai_metadata") %></li>
       </ul>
 
       <ul>

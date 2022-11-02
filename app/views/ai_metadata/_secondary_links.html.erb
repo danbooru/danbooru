@@ -1,0 +1,7 @@
+<% content_for(:secondary_links) do %>
+  <%= quick_search_form_for(:prompt_matches, ai_metadata_path, "prompts") %>
+  <%= subnav_link_to "Metadata", ai_metadata_path %>
+  <%= subnav_link_to "Changes", ai_metadata_versions_path %>
+  <%= subnav_link_to "Search", search_ai_metadata_path %>
+  <%= subnav_link_to "Help", wiki_page_path("help:ai_metadata") %>
+<% end %>

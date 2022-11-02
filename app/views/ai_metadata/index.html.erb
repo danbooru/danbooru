@@ -1,0 +1,19 @@
+<div id="c-ai-metadata">
+  <div id="a-index">
+    <h1>AI Metadata</h1>
+
+    <%= render "posts/partials/common/inline_blacklist" %>
+
+    <%= table_for @ai_metadata, width: "100%" do |t| %>
+      <% t.column "Post", width: "1%" do |metadata| %>
+        <%= post_preview(metadata.post, show_deleted: true) %>
+      <% end %>
+
+      <% t.column "Metadata" do |metadata| %>
+        <%= render "ai_metadata/show", ai_metadata: metadata %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>

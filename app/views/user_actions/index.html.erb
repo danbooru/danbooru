@@ -22,6 +22,8 @@
           <% event_type = user_action.event_type %>
 
           <% case user_action.model_type %>
+          <% when "AIMetadataVersion" %>
+            <%= link_to_user user %> <%= link_to "updated", model %> AI metadata for <%= link_to model.post.dtext_shortlink, model.post %>.
           <% when "ArtistVersion" %>
             <%= link_to_user user %> <%= link_to "updated", model %> the artist <%= link_to model.artist.pretty_name, model.artist, class: "tag-type-#{Tag.categories.artist}" %>.
           <% when "ArtistCommentaryVersion" %>

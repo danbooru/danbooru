@@ -10,6 +10,11 @@ Upload.initialize_all = function() {
   if ($("#c-uploads #a-show #p-single-asset-upload").length) {
     this.initialize_similar();
 
+    $("#toggle-ai-metadata").on("click.danbooru", function(e) {
+      Upload.toggle_ai_metadata();
+      e.preventDefault();
+    });
+
     $("#toggle-artist-commentary").on("click.danbooru", function(e) {
       Upload.toggle_commentary();
       e.preventDefault();
@@ -44,6 +49,16 @@ Upload.initialize_similar = function() {
       high_similarity: Upload.IQDB_HIGH_SIMILARITY
     }
   });
+}
+
+Upload.toggle_ai_metadata = function() {
+  if ($(".ai-metadata").is(":visible")) {
+    $("#toggle-ai-metadata").text("show »");
+  } else {
+    $("#toggle-ai-metadata").text("« hide");
+  }
+
+  $(".ai-metadata").slideToggle();
 }
 
 Upload.toggle_commentary = function() {

@@ -1,0 +1,5 @@
+<% if @ai_metadata.errors.any? %>
+  Danbooru.error("<%= j @ai_metadata.errors.full_messages.join(',') %>");
+<% else %>
+  location.reload();
+<% end %>
