@@ -41,8 +41,8 @@ class FFmpeg
     output = shell!("ffprobe -v quiet -print_format json -show_format -show_streams #{file.path.shellescape}")
     json = JSON.parse(output)
     json.with_indifferent_access
-  rescue Error
-    {}
+  rescue Error => e
+    { error: e.message.strip }.with_indifferent_access
   end
 
   def width
@@ -107,6 +107,16 @@ class FFmpeg
     audio_streams.present?
   end
 
+  # @return [Boolean] True if the video is unplayable.
+  def is_corrupt?
+    error.present?
+  end
+
+  # @return [String, nil] The error message if the video is unplayable, or nil if no error.
+  def error
+    metadata[:error] || playback_info[:error]
+  end
+
   # Decode the full video and return a hash containing the frame count, fps, and runtime.
   def playback_info
     output = shell!("ffmpeg -i #{file.path.shellescape} -f null /dev/null")
@@ -117,7 +127,7 @@ class FFmpeg
     info = status_line.scan(/\S+=\s*\S+/).map { |pair| pair.split(/=\s*/) }.to_h
     info.with_indifferent_access
   rescue Error => e
-    {}
+    { error: e.message.strip }.with_indifferent_access
   end
 
   def shell!(command)
@@ -127,5 +137,5 @@ class FFmpeg
     output
   end
 
-  memoize :metadata, :playback_info, :frame_count, :duration
+  memoize :metadata, :playback_info, :frame_count, :duration, :error
 end

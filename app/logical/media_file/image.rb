@@ -28,10 +28,22 @@ class MediaFile::Image < MediaFile
   end
 
   def is_corrupt?
+    error.present?
+  end
+
+  def error
+    image = Vips::Image.new_from_file(file.path, fail: true)
     image.stats
-    false
-  rescue Vips::Error
-    true
+    nil
+  rescue Vips::Error => e
+    # XXX Vips has a single global error buffer that is shared between threads and that isn't cleared between operations.
+    # We can't reliably use `e.message` here because it may pick up errors from other threads, or from previous
+    # operations in the same thread.
+    "libvips error"
+  end
+
+  def metadata
+    super.merge({ "Vips:Error" => error }.compact_blank)
   end
 
   def duration
@@ -44,7 +56,7 @@ class MediaFile::Image < MediaFile
     when :gif, :webp
       n_pages
     when :png
-      metadata.fetch("PNG:AnimationFrames", 1)
+      exif_metadata.fetch("PNG:AnimationFrames", 1)
     when :avif
       video.frame_count
     else
@@ -156,12 +168,12 @@ class MediaFile::Image < MediaFile
 
   # @return [Vips::Image] the Vips image object for the file
   def image
-    Vips::Image.new_from_file(file.path, fail: strict).autorot
+    Vips::Image.new_from_file(file.path, fail: false).autorot
   end
 
   def video
     FFmpeg.new(file)
   end
 
-  memoize :image, :video, :dimensions, :is_corrupt?, :is_animated_gif?, :is_animated_png?
+  memoize :image, :video, :preview_frame, :dimensions, :error, :metadata, :is_corrupt?, :is_animated_gif?, :is_animated_png?
 end

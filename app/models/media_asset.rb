@@ -89,7 +89,7 @@ class MediaAsset < ApplicationRecord
     def open_file!(&block)
       file = storage_service.open(file_path)
       frame_delays = media_asset.frame_delays if media_asset.is_ugoira?
-      MediaFile.open(file, frame_delays: frame_delays, strict: false, &block)
+      MediaFile.open(file, frame_delays: frame_delays, &block)
     end
 
     def convert_file(media_file)

@@ -10,7 +10,7 @@ class MediaFile
   extend Memoist
   include ActiveModel::Serializers::JSON
 
-  attr_accessor :file, :strict
+  attr_accessor :file
 
   # delegate all File methods to `file`.
   delegate *(File.instance_methods - MediaFile.instance_methods), to: :file
@@ -122,11 +122,8 @@ class MediaFile
   # Initialize a MediaFile from a regular File.
   #
   # @param file [File] The image file.
-  # @param strict [Boolean] If true, raise errors if the file is corrupt. If false,
-  #   try to process corrupt files without raising any errors.
-  def initialize(file, strict: true, **options)
+  def initialize(file, **options)
     @file = file
-    @strict = strict
   end
 
   # @return [Array<(Integer, Integer)>] the width and height of the file
@@ -164,7 +161,15 @@ class MediaFile
     file.size
   end
 
+  # @return [ExifTool::Metadata] The metadata for the file. Subclasses may override this to add
+  #   extra non-ExifTool metadata, such as error messages, Ugoira frame delays, or ffprobe metadata.
+  #   This metadata may be slower to calculate than the raw `exif_metadata`.
   def metadata
+    exif_metadata
+  end
+
+  # @return [ExifTool::Metadata] The metadata for the file, as returned by ExifTool.
+  def exif_metadata
     ExifTool.new(file).metadata
   end
 
@@ -207,9 +212,14 @@ class MediaFile
     file_ext == :swf
   end
 
-  # @return [Boolean] true if the file is corrupted in some way
+  # @return [Boolean] True if the file is too corrupted to read or generate thumbnails without error.
   def is_corrupt?
-    false
+    error.present?
+  end
+
+  # @return [String, nil] The error message when reading the file, or nil if there are no errors.
+  def error
+    nil
   end
 
   # @return [Boolean] true if the file is animated. Note that GIFs and PNGs may be animated.
@@ -278,7 +288,7 @@ class MediaFile
       height: height,
       file_size: file_size,
       file_ext: file_ext,
-      mime_type: mime_type,
+      mime_type: mime_type.to_s,
       md5: md5,
       is_corrupt?: is_corrupt?,
       is_supported?: is_supported?,
@@ -302,5 +312,5 @@ class MediaFile
     end
   end
 
-  memoize :file_ext, :file_size, :md5, :metadata, :mime_type
+  memoize :file_ext, :file_size, :md5, :mime_type, :exif_metadata
 end

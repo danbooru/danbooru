@@ -108,5 +108,5 @@ class MediaFile::Ugoira < MediaFile
     FFmpeg.new(convert).smart_video_preview
   end
 
-  memoize :zipfile, :preview_frame, :dimensions, :convert
+  memoize :zipfile, :preview_frame, :dimensions, :convert, :metadata
 end

@@ -467,10 +467,11 @@ class MediaFileTest < ActiveSupport::TestCase
       @metadata = @file.metadata
 
       assert_equal(true, @file.is_corrupt?)
+      assert_equal("libvips error", @file.error)
       assert_equal([475, 600], @file.dimensions)
       assert_equal("File format error", @metadata["ExifTool:Error"])
       assert_equal("89a", @metadata["GIF:GIFVersion"])
-      assert_equal(9, @metadata.count)
+      assert_equal(10, @metadata.count)
     end
 
     should "not raise an exception when reading the frame count" do
@@ -478,11 +479,12 @@ class MediaFileTest < ActiveSupport::TestCase
       @metadata = @file.metadata
 
       assert_equal(true, @file.is_corrupt?)
+      assert_equal("libvips error", @file.error)
       assert_equal(nil, @file.frame_count)
       assert_equal([575, 800], @file.dimensions)
       assert_equal("File format error", @metadata["ExifTool:Error"])
       assert_equal("89a", @metadata["GIF:GIFVersion"])
-      assert_equal(9, @metadata.count)
+      assert_equal(10, @metadata.count)
       assert_nothing_raised { @file.attributes }
     end
   end
@@ -493,8 +495,9 @@ class MediaFileTest < ActiveSupport::TestCase
       @metadata = @file.metadata
 
       assert_equal(true, @file.is_corrupt?)
+      assert_equal("libvips error", @file.error)
       assert_equal("Grayscale", @metadata["PNG:ColorType"])
-      assert_equal(9, @metadata.count)
+      assert_equal(10, @metadata.count)
     end
   end
 
@@ -504,8 +507,9 @@ class MediaFileTest < ActiveSupport::TestCase
       @metadata = @file.metadata
 
       assert_equal(true, @file.is_corrupt?)
+      assert_equal("libvips error", @file.error)
       assert_equal(1, @metadata["File:ColorComponents"])
-      assert_equal(10, @metadata.count)
+      assert_equal(11, @metadata.count)
     end
   end
 
