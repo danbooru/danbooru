@@ -90,13 +90,13 @@ class PostQueryBuilder
     when "md5"
       relation.attribute_matches(value, :md5, :md5)
     when "width"
-      relation.attribute_matches(value, :image_width)
+      relation.attribute_matches(value, "media_assets.image_width").joins(:media_asset)
     when "height"
-      relation.attribute_matches(value, :image_height)
+      relation.attribute_matches(value, "media_assets.image_height").joins(:media_asset)
     when "mpixels"
-      relation.attribute_matches(value, "posts.image_width * posts.image_height / 1000000.0", :float)
+      relation.attribute_matches(value, "(media_assets.image_width * media_assets.image_height) / 1000000.0", :float).joins(:media_asset)
     when "ratio"
-      relation.attribute_matches(value, "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", :ratio)
+      relation.attribute_matches(value, "ROUND(media_assets.image_width::numeric / media_assets.image_height::numeric, 2)", :ratio).joins(:media_asset)
     when "score"
       relation.attribute_matches(value, :score)
     when "upvotes"
@@ -106,9 +106,9 @@ class PostQueryBuilder
     when "favcount"
       relation.attribute_matches(value, :fav_count)
     when "filesize"
-      relation.attribute_matches(value, :file_size, :filesize)
+      relation.attribute_matches(value, "media_assets.file_size", :filesize).joins(:media_asset)
     when "filetype"
-      relation.attribute_matches(value, :file_ext, :enum)
+      relation.attribute_matches(value, "media_assets.file_ext", :enum).joins(:media_asset)
     when "date"
       relation.attribute_matches(value, :created_at, :date)
     when "age"
@@ -414,28 +414,23 @@ class PostQueryBuilder
       relation = relation.reorder("artist_commentaries.updated_at ASC")
 
     when "mpixels", "mpixels_desc"
-      relation = relation.where(Arel.sql("posts.image_width is not null and posts.image_height is not null"))
-      # Use "w*h/1000000", even though "w*h" would give the same result, so this can use
-      # the posts_mpixels index.
-      relation = relation.reorder(Arel.sql("posts.image_width * posts.image_height / 1000000.0 DESC"))
+      # Use "w*h/1000000", even though "w*h" would give the same result, so this can use the posts_mpixels index.
+      relation = relation.joins(:media_asset).reorder(Arel.sql("media_assets.image_width * media_assets.image_height / 1000000.0 DESC"))
 
     when "mpixels_asc"
-      relation = relation.where("posts.image_width is not null and posts.image_height is not null")
-      relation = relation.reorder(Arel.sql("posts.image_width * posts.image_height / 1000000.0 ASC"))
+      relation = relation.joins(:media_asset).reorder(Arel.sql("media_assets.image_width * media_assets.image_height / 1000000.0 ASC"))
 
     when "portrait"
-      relation = relation.where("posts.image_width IS NOT NULL and posts.image_height IS NOT NULL")
-      relation = relation.reorder(Arel.sql("1.0 * posts.image_width / GREATEST(1, posts.image_height) ASC"))
+      relation = relation.joins(:media_asset).reorder(Arel.sql("media_assets.image_width::numeric / media_assets.image_height::numeric ASC"))
 
     when "landscape"
-      relation = relation.where("posts.image_width IS NOT NULL and posts.image_height IS NOT NULL")
-      relation = relation.reorder(Arel.sql("1.0 * posts.image_width / GREATEST(1, posts.image_height) DESC"))
+      relation = relation.joins(:media_asset).reorder(Arel.sql("media_assets.image_width::numeric / media_assets.image_height::numeric DESC"))
 
     when "filesize", "filesize_desc"
-      relation = relation.reorder("posts.file_size DESC")
+      relation = relation.joins(:media_asset).reorder("media_assets.file_size DESC")
 
     when "filesize_asc"
-      relation = relation.reorder("posts.file_size ASC")
+      relation = relation.joins(:media_asset).reorder("media_assets.file_size ASC")
 
     when /\A(?<column>#{COUNT_METATAGS.join("|")})(_(?<direction>asc|desc))?\z/i
       column = $~[:column]

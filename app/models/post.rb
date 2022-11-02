@@ -1075,7 +1075,7 @@ class Post < ApplicationRecord
         when *AutocompleteService::POST_STATUSES
           status_matches(value, current_user)
         when *MediaAsset::FILE_TYPES
-          attribute_matches(value, :file_ext, :enum)
+          attribute_matches(value, "media_assets.file_ext", :enum).joins(:media_asset)
         when *Post::RATINGS.values.map(&:downcase)
           rating_matches(value)
         when *Post::RATING_ALIASES.keys

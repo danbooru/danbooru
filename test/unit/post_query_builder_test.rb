@@ -823,13 +823,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the is:<filetype> metatag" do
-      jpg = create(:post, file_ext: "jpg")
-      png = create(:post, file_ext: "png")
-      gif = create(:post, file_ext: "gif")
-      mp4 = create(:post, file_ext: "mp4")
-      webm = create(:post, file_ext: "webm")
-      swf = create(:post, file_ext: "swf")
-      zip = create(:post, file_ext: "zip")
+      jpg = create(:post, file_ext: "jpg", media_asset: build(:media_asset, file_ext: "jpg"))
+      png = create(:post, file_ext: "png", media_asset: build(:media_asset, file_ext: "png"))
+      gif = create(:post, file_ext: "gif", media_asset: build(:media_asset, file_ext: "gif"))
+      mp4 = create(:post, file_ext: "mp4", media_asset: build(:media_asset, file_ext: "mp4"))
+      webm = create(:post, file_ext: "webm", media_asset: build(:media_asset, file_ext: "webm"))
+      swf = create(:post, file_ext: "swf", media_asset: build(:media_asset, file_ext: "swf"))
+      zip = create(:post, file_ext: "zip", media_asset: build(:media_asset, file_ext: "zip"))
 
       assert_tag_match([jpg], "is:jpg")
       assert_tag_match([png], "is:png")
@@ -937,8 +937,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the filetype:<ext> metatag" do
-      png = create(:post, file_ext: "png")
-      jpg = create(:post, file_ext: "jpg")
+      png = create(:post, file_ext: "png", media_asset: build(:media_asset, file_ext: "png"))
+      jpg = create(:post, file_ext: "jpg", media_asset: build(:media_asset, file_ext: "jpg"))
 
       assert_tag_match([png], "filetype:png")
       assert_tag_match([jpg], "-filetype:png")
@@ -1275,7 +1275,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
           # posts[0] is portrait, posts[1] is landscape. posts[1].mpixels > posts[0].mpixels.
           image_height: 100 * n * n,
           image_width: 100 * (3 - n) * n,
-          tag_string: tags[n - 1]
+          tag_string: tags[n - 1],
+          media_asset: build(:media_asset, image_height: 100 * n * n, image_width: 100 * (3 - n) * n, file_size: 1.megabyte * n)
         )
 
         u = create(:user, created_at: 2.weeks.ago)
@@ -1378,7 +1379,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for a filesize search" do
-      post = create(:post, file_size: 1.megabyte)
+      post = create(:post, file_size: 1.megabyte, media_asset: build(:media_asset, file_size: 1.megabyte))
 
       assert_tag_match([post], "filesize:1mb")
       assert_tag_match([post], "filesize:1000kb")
