@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class DmcasController < ApplicationController
+  rate_limit :create, rate: 1.0/15.minutes, burst: 3
+
   def create
     @dmca = params[:dmca].slice(:name, :email, :address, :infringing_urls, :original_urls, :proof, :perjury_agree, :good_faith_agree, :signature)
 
@@ -20,7 +22,7 @@ class DmcasController < ApplicationController
     EOS
 
     UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: Danbooru.config.dmca_email).deliver_now
-    UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: @dmca[:email]).deliver_now
+    UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: @dmca[:email]).deliver_now unless Danbooru::EmailAddress.new(@dmca[:email]).undeliverable?(allow_smtp: Rails.env.production?)
   end
 
   def show
