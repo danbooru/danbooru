@@ -83,6 +83,10 @@ class FFmpeg
     frame_count / duration
   end
 
+  def major_brand
+    metadata.dig(:format, :tags, :major_brand)
+  end
+
   def pix_fmt
     video_stream[:pix_fmt]
   end
@@ -97,6 +101,14 @@ class FFmpeg
 
   def video_streams
     metadata[:streams].to_a.select { |stream| stream[:codec_type] == "video" }
+  end
+
+  def audio_codec
+    audio_stream[:codec_name]
+  end
+
+  def audio_stream
+    audio_streams.first || {}
   end
 
   def audio_streams
