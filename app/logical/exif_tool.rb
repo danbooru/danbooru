@@ -47,6 +47,10 @@ class ExifTool
       @metadata = metadata
     end
 
+    def merge(hash)
+      Metadata.new(metadata.merge(hash))
+    end
+
     def is_animated?
       frame_count.to_i > 1 || is_animated_webp? || is_animated_avif?
     end
