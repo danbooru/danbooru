@@ -5,7 +5,10 @@
 #
 # @see https://github.com/streamio/streamio-ffmpeg
 class MediaFile::Video < MediaFile
-  delegate :duration, :frame_count, :frame_rate, :has_audio?, :is_corrupt?, :major_brand, :pix_fmt, :video_codec, :video_bit_rate, :video_stream, :video_streams, :audio_codec, :audio_bit_rate, :audio_stream, :audio_streams, :error, to: :video
+  delegate :duration, :frame_count, :frame_rate, :has_audio?, :is_corrupt?, :major_brand, :pix_fmt,
+    :video_codec, :video_bit_rate, :video_stream, :video_streams, :audio_codec, :audio_bit_rate,
+    :audio_stream, :audio_streams, :silence_duration, :silence_percentage, :average_loudness,
+    :peak_loudness, :loudness_range, :error, to: :video
 
   def dimensions
     [video.width, video.height]
@@ -28,6 +31,10 @@ class MediaFile::Video < MediaFile
       "FFmpeg:AudioProfile" => audio_stream[:profile],
       "FFmpeg:AudioLayout" => audio_stream[:channel_layout],
       "FFmpeg:AudioBitRate" => audio_bit_rate,
+      "FFmpeg:AudioPeakLoudness" => peak_loudness,
+      "FFmpeg:AudioAverageLoudness" => average_loudness,
+      "FFmpeg:AudioLoudnessRange" => loudness_range,
+      "FFmpeg:AudioSilencePercentage" => silence_percentage,
     }.compact_blank)
   end
 

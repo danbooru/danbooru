@@ -140,8 +140,79 @@ class FFmpeg
     metadata[:streams].to_a.select { |stream| stream[:codec_type] == "audio" }
   end
 
+  # @return [Boolean] True if the file has an audio track. The audio track may be silent.
   def has_audio?
     audio_streams.present?
+  end
+
+  # @return [Float, nil] The total duration in seconds of all silent sections of the audio track.
+  #   Nil if the file doesn't have an audio track.
+  def silence_duration
+    playback_info[:silence].pluck("silence_duration").sum if has_audio?
+  end
+
+  # @return [Float, nil] The percentage of the video that is silent, from 0% to 100%, or nil if the file doesn't
+  #   have an audio track. If the silence percentage is 100%, then the audio track is totally silent.
+  def silence_percentage
+    return nil if !has_audio? || duration.to_f == 0.0
+    (silence_duration.to_f / duration).clamp(0.0, 1.0).round(4)
+  end
+
+  # The average loudness of the audio track, as a percentage of max volume. 0% is silent and 100% is max volume.
+  #
+  # The average loudness value ignores silent or quiet sections of the audio. 7% is the standard
+  # average loudness for TV programs. 15% to 30% is typical for music streaming services.
+  #
+  # @return [Float, nil] The average loudness as a percent, or nil if the file doesn't have an audio track.
+  # @see https://en.wikipedia.org/wiki/EBU_R_128
+  def average_loudness
+    10.pow(average_loudness_lufs / 20.0).round(4) if average_loudness_lufs.present?
+  end
+
+  # The average loudness of the audio track, in LUFS units. -70.0 is silent and 0.0 is max volume.
+  #
+  # The average loudness value ignores silent or quiet sections of the audio. -23.0 LUFS is the
+  # standard average loudness for TV programs. -10.0 to -16.0 is typical for music streaming services.
+  #
+  # @return [Float, nil] The average loudness in LUFS, or nil if the file doesn't have an audio track.
+  # @see https://en.wikipedia.org/wiki/EBU_R_128
+  def average_loudness_lufs
+    playback_info.dig(:ebur128, :I) if has_audio?
+  end
+
+  # The loudness range of the audio track, in LU (loudness units, where 1 LU = 1 dB). The loudness
+  # range is roughly the difference between the quietest sound and the loudest sound (i.e., the
+  # dynamic range). A typical loudness range for music is around 5 to 10 LU.
+  #
+  # This is based on measuring loudness in 3-second intervals, ignoring silence, so it's not very
+  # meaningful for very short videos or videos that are mostly silent.
+  #
+  # @return [Float, nil] The loudness range in LU, or nil if the file doesn't have an audio track.
+  # @see https://en.wikipedia.org/wiki/EBU_R_128
+  # @see https://tech.ebu.ch/docs/tech/tech3342.pdf (EBU Tech 3343 - Loudness Range: A Measure to Supplement EBU R 128 Loudness Normalization)
+  def loudness_range
+    playback_info.dig(:ebur128, :LRA) if has_audio?
+  end
+
+  # The peak loudness of the audio track, as a percentage of max volume. 1.0 is 100% volume, 0.5 is
+  # 50% volume, 0.0 is 0% volume, etc.
+  #
+  # This is the true peak loudness, which means it measures the true loudness even if the audio is clipped.
+  # If the peak loudness if above 1.0, it means the audio is clipped.
+  #
+  # @return [Float, nil] The peak loudness in dBFS, or nil if the file doesn't have an audio track.
+  # @see https://en.wikipedia.org/wiki/EBU_R_128
+  def peak_loudness
+    10.pow(peak_loudness_dbfs / 20.0).round(4) if peak_loudness_dbfs.present?
+  end
+
+  # The peak loudness of the audio track, in dBFS (decibels referenced to full scale). 0.0 is 100%
+  # volume, -6.0 is 50% volume, -20.0 is 10% volume, -40.0 is 1% volume, etc.
+  #
+  # @return [Float, nil] The peak loudness in dBFS, or nil if the file doesn't have an audio track.
+  # @see https://en.wikipedia.org/wiki/DBFS
+  def peak_loudness_dbfs
+    playback_info.dig(:ebur128, :Peak) if has_audio?
   end
 
   def packets
@@ -178,8 +249,10 @@ class FFmpeg
 
   # Decode the full video and return a hash containing the frame count, fps, runtime, and the sizes of the decompressed video and audio streams.
   def playback_info
+    # https://ffmpeg.org/ffmpeg-filters.html#silencedetect
+    # https://ffmpeg.org/ffmpeg-filters.html#ebur128-1
     # XXX `-c copy` is faster, but it doesn't decompress the stream so it can't detect corrupt videos.
-    output = shell!("ffmpeg -hide_banner -i #{file.path.shellescape} -f null /dev/null")
+    output = shell!("ffmpeg -hide_banner -i #{file.path.shellescape} -af silencedetect=noise=0.0001:duration=0.25s,ebur128=metadata=1:dualmono=true:peak=true -f null /dev/null")
     lines = output.split(/\r\n|\r|\n/)
 
     # time_line = "frame=   10 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.48 bitrate=N/A speed= 179x"
@@ -195,7 +268,41 @@ class FFmpeg
       [key.strip, value.to_i * 1000] # [" audio", "16kB"] => ["audio", 16000]
     end.to_h
 
-    { **time_info, **size_info }.with_indifferent_access
+    # [silencedetect @ 0x561855af1040] silence_start: -0.00133333e=N/A speed=  25x
+    # [silencedetect @ 0x561855af1040] silence_end: 12.052 | silence_duration: 12.0533
+    silence_info = lines.grep(/silence_duration/).map do |line|
+      line.scan(/[a-z_]+: *[0-9.]+/i).map do |pair|
+        key, value = pair.split(/: */)
+        [key, value.to_f]
+      end.to_h
+    end
+
+    # [Parsed_ebur128_1 @ 0x5586b53889c0] Summary:
+    #
+    #   Integrated loudness:
+    #     I:         -20.1 LUFS
+    #     Threshold: -30.7 LUFS
+    #
+    #   Loudness range:
+    #     LRA:         5.8 LU
+    #     Threshold: -40.6 LUFS
+    #     LRA low:   -24.0 LUFS
+    #     LRA high:  -18.2 LUFS
+    #
+    #   True peak:
+    #     Peak:       -2.2 dBFS
+    ebur128_index = lines.rindex { |line| /Parsed_ebur128.*Summary:/ === line }
+
+    if ebur128_index
+      ebur128_lines = lines[ebur128_index..ebur128_index + 13].join("\n")
+      ebur128_info = ebur128_lines.scan(/^ *[a-z ]+: *-?(?:inf|[0-9.]+) (?:LUFS|LU|dBFS)$/i).map do |pair|
+        key, value = pair.split(/: */)
+        value = -1000.0 if value == "-inf dBFS" # "Peak: -inf dBFS" for silent audio tracks.
+        [key.strip.tr(" ", "_"), value.to_f] # ["LRA low", "-34.3 LUFS"] => ["lra_low", -34.3]
+      end.to_h
+    end
+
+    { **time_info, **size_info, silence: silence_info, ebur128: ebur128_info.to_h }.with_indifferent_access
   rescue Error => e
     { error: e.message.strip }.with_indifferent_access
   end
