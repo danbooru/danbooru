@@ -3,6 +3,13 @@
 
 <div id="c-counts">
   <div id="a-posts">
+    <h1>Post Counts</h1>
+
+    <%= search_form_for(posts_counts_path) do |f| %>
+      <%= f.input :tags, label: "Tags", input_html: { value: params[:tags], data: { autocomplete: "tag-query" }, name: "tags" } %>
+      <%= f.submit "Search" %>
+    <% end %>
+
     Post count for <%= link_to params[:tags].present? ? params[:tags] : "/posts", posts_path(:tags => params[:tags]) %>:
     <% if @count.nil? %>
       timed out
