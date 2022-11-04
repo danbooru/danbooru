@@ -11,9 +11,10 @@ class FFmpeg
   attr_reader :file
 
   # Operate on a file with FFmpeg.
-  # @param file [File, String] a webm, mp4, gif, or apng file
+  #
+  # @param file [MediaFile, String] A webm, mp4, gif, or apng file.
   def initialize(file)
-    @file = file.is_a?(String) ? File.open(file) : file
+    @file = file.is_a?(String) ? MediaFile.open(file) : file
   end
 
   # Generate a .png preview image for a video or animation. Generates
@@ -38,7 +39,7 @@ class FFmpeg
   #
   # @return [Hash] A hash of the file's metadata. Will be empty if reading the file failed for any reason.
   def metadata
-    output = shell!("ffprobe -v quiet -print_format json -show_format -show_streams #{file.path.shellescape}")
+    output = shell!("ffprobe -v quiet -print_format json -show_format -show_streams -show_packets #{file.path.shellescape}")
     json = JSON.parse(output)
     json.with_indifferent_access
   rescue Error => e
@@ -95,6 +96,18 @@ class FFmpeg
     video_stream[:codec_name]
   end
 
+  # @return [Integer, nil] The bit rate of the video stream, in bits per second, or nil if it can't be calculated.
+  def video_bit_rate
+    if video_stream.has_key?(:bit_rate)
+      video_stream[:bit_rate].to_i
+    # .webm doesn't have the bit rate in the metadata, so we have to calculate it from the video stream size and duration.
+    elsif video_size > 0 && duration > 0
+      ((8.0 * video_size) / duration).to_i
+    else
+      nil
+    end
+  end
+
   def video_stream
     video_streams.first || {}
   end
@@ -105,6 +118,18 @@ class FFmpeg
 
   def audio_codec
     audio_stream[:codec_name]
+  end
+
+  # @return [Integer, nil] The bit rate of the audio stream, in bits per second, or nil if it can't be calculated.
+  def audio_bit_rate
+    if audio_stream.has_key?(:bit_rate)
+      audio_stream[:bit_rate].to_i
+    # .webm doesn't have the bit rate in the metadata, so we have to calculate it from the audio stream size and duration.
+    elsif audio_size > 0 && duration > 0
+      ((8.0 * audio_size) / duration).to_i
+    else
+      nil
+    end
   end
 
   def audio_stream
@@ -119,6 +144,28 @@ class FFmpeg
     audio_streams.present?
   end
 
+  def packets
+    metadata[:packets].to_a
+  end
+
+  def video_packets
+    packets.select { |stream| stream[:codec_type] == "video" }
+  end
+
+  def audio_packets
+    packets.select { |stream| stream[:codec_type] == "audio" }
+  end
+
+  # @return [Integer] The size of the compressed video stream in bytes.
+  def video_size
+    video_packets.pluck("size").map(&:to_i).sum
+  end
+
+  # @return [Integer] The size of the compressed audio stream in bytes.
+  def audio_size
+    audio_packets.pluck("size").map(&:to_i).sum
+  end
+
   # @return [Boolean] True if the video is unplayable.
   def is_corrupt?
     error.present?
@@ -129,15 +176,25 @@ class FFmpeg
     metadata[:error] || playback_info[:error]
   end
 
-  # Decode the full video and return a hash containing the frame count, fps, and runtime.
+  # Decode the full video and return a hash containing the frame count, fps, runtime, and the sizes of the decompressed video and audio streams.
   def playback_info
-    output = shell!("ffmpeg -i #{file.path.shellescape} -f null /dev/null")
-    status_line = output.lines.grep(/\Aframe=/).first.chomp
+    # XXX `-c copy` is faster, but it doesn't decompress the stream so it can't detect corrupt videos.
+    output = shell!("ffmpeg -hide_banner -i #{file.path.shellescape} -f null /dev/null")
 
-    # status_line = "frame=   10 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.48 bitrate=N/A speed= 179x"
-    # info = {"frame"=>"10", "fps"=>"0.0", "q"=>"-0.0", "Lsize"=>"N/A", "time"=>"00:00:00.48", "bitrate"=>"N/A", "speed"=>"188x"}
-    info = status_line.scan(/\S+=\s*\S+/).map { |pair| pair.split(/=\s*/) }.to_h
-    info.with_indifferent_access
+    # time_line = "frame=   10 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.48 bitrate=N/A speed= 179x"
+    # time_info = { "frame"=>"10", "fps"=>"0.0", "q"=>"-0.0", "Lsize"=>"N/A", "time"=>"00:00:00.48", "bitrate"=>"N/A", "speed"=>"188x" }
+    time_line = output.lines.grep(/\Aframe=/).first.chomp
+    time_info = time_line.scan(/\S+=\s*\S+/).map { |pair| pair.split(/=\s*/) }.to_h
+
+    # size_line = "video:36kBkB audio:16kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown"
+    # size_info = { "video" => 36000, "audio" => 16000, "subtitle" => 0, "other streams" => 0, "global headers" => 0, "muxing overhead" => 0 }
+    size_line = output.lines.grep(/\Avideo:/).first.chomp
+    size_info = size_line.scan(/[a-z ]+: *[a-z0-9]+/i).map do |pair|
+      key, value = pair.split(/: */)
+      [key.strip, value.to_i * 1000] # [" audio", "16kB"] => ["audio", 16000]
+    end.to_h
+
+    { **time_info, **size_info }.with_indifferent_access
   rescue Error => e
     { error: e.message.strip }.with_indifferent_access
   end
@@ -149,5 +206,5 @@ class FFmpeg
     output
   end
 
-  memoize :metadata, :playback_info, :frame_count, :duration, :error
+  memoize :metadata, :playback_info, :frame_count, :duration, :error, :video_size, :audio_size
 end

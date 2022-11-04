@@ -132,7 +132,7 @@ class MediaFile::Image < MediaFile
 
   def preview_frame
     if is_animated?
-      FFmpeg.new(file).smart_video_preview
+      FFmpeg.new(self).smart_video_preview
     else
       self
     end
@@ -172,7 +172,7 @@ class MediaFile::Image < MediaFile
   end
 
   def video
-    FFmpeg.new(file)
+    FFmpeg.new(self)
   end
 
   memoize :image, :video, :preview_frame, :dimensions, :error, :metadata, :is_corrupt?, :is_animated_gif?, :is_animated_png?

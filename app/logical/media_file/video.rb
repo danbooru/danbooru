@@ -5,7 +5,7 @@
 #
 # @see https://github.com/streamio/streamio-ffmpeg
 class MediaFile::Video < MediaFile
-  delegate :duration, :frame_count, :frame_rate, :has_audio?, :is_corrupt?, :major_brand, :pix_fmt, :video_codec, :video_stream, :video_streams, :audio_codec, :audio_stream, :audio_streams, :error, to: :video
+  delegate :duration, :frame_count, :frame_rate, :has_audio?, :is_corrupt?, :major_brand, :pix_fmt, :video_codec, :video_bit_rate, :video_stream, :video_streams, :audio_codec, :audio_bit_rate, :audio_stream, :audio_streams, :error, to: :video
 
   def dimensions
     [video.width, video.height]
@@ -23,10 +23,11 @@ class MediaFile::Video < MediaFile
       "FFmpeg:FrameCount" => frame_count,
       "FFmpeg:VideoCodec" => video_codec,
       "FFmpeg:VideoProfile" => video_stream[:profile],
+      "FFmpeg:VideoBitRate" => video_bit_rate,
       "FFmpeg:AudioCodec" => audio_codec,
       "FFmpeg:AudioProfile" => audio_stream[:profile],
       "FFmpeg:AudioLayout" => audio_stream[:channel_layout],
-      "FFmpeg:AudioBitRate" => audio_stream[:bit_rate],
+      "FFmpeg:AudioBitRate" => audio_bit_rate,
     }.compact_blank)
   end
 
@@ -53,7 +54,7 @@ class MediaFile::Video < MediaFile
   private
 
   def video
-    FFmpeg.new(file)
+    FFmpeg.new(self)
   end
 
   def preview_frame
