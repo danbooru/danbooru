@@ -180,15 +180,16 @@ class FFmpeg
   def playback_info
     # XXX `-c copy` is faster, but it doesn't decompress the stream so it can't detect corrupt videos.
     output = shell!("ffmpeg -hide_banner -i #{file.path.shellescape} -f null /dev/null")
+    lines = output.split(/\r\n|\r|\n/)
 
     # time_line = "frame=   10 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.48 bitrate=N/A speed= 179x"
     # time_info = { "frame"=>"10", "fps"=>"0.0", "q"=>"-0.0", "Lsize"=>"N/A", "time"=>"00:00:00.48", "bitrate"=>"N/A", "speed"=>"188x" }
-    time_line = output.lines.grep(/\Aframe=/).first.chomp
+    time_line = lines.grep(/\Aframe=/).last.strip
     time_info = time_line.scan(/\S+=\s*\S+/).map { |pair| pair.split(/=\s*/) }.to_h
 
     # size_line = "video:36kBkB audio:16kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown"
     # size_info = { "video" => 36000, "audio" => 16000, "subtitle" => 0, "other streams" => 0, "global headers" => 0, "muxing overhead" => 0 }
-    size_line = output.lines.grep(/\Avideo:/).first.chomp
+    size_line = lines.grep(/\Avideo:/).last.strip
     size_info = size_line.scan(/[a-z ]+: *[a-z0-9]+/i).map do |pair|
       key, value = pair.split(/: */)
       [key.strip, value.to_i * 1000] # [" audio", "16kB"] => ["audio", 16000]
