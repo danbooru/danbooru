@@ -27,6 +27,10 @@ class Source::URL::Mastodon < Source::URL
     in _, _, /^@/ => username, *rest
       @username = username.delete_prefix("@")
 
+    # https://baraag.net/web/@loodncrood
+    in _, _, "web", /^@/ => username, *rest
+      @username = username.delete_prefix("@")
+
     # https://pawoo.net/users/esoraneko
     # https://pawoo.net/users/khurata/media
     in _, _, "users", username, *rest

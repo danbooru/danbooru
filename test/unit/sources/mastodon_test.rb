@@ -130,6 +130,7 @@ module Sources
       assert(Source::URL.page_url?("https://baraag.net/web/statuses/102270656480174153"))
 
       assert(Source::URL.profile_url?("https://baraag.net/@danbooru"))
+      assert(Source::URL.profile_url?("https://baraag.net/@web/danbooru"))
       assert(Source::URL.profile_url?("https://baraag.net/web/accounts/107862785324786980"))
     end
   end
