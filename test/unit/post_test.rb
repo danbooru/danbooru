@@ -1269,7 +1269,7 @@ class PostTest < ActiveSupport::TestCase
           @media_asset = MediaAsset.upload!("test/files/mp4/test-silent-audio.mp4")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "sound")
-          assert_equal("animated tagme", @post.tag_string)
+          assert_equal("animated", @post.tag_string)
         end
       end
 
@@ -1279,6 +1279,15 @@ class PostTest < ActiveSupport::TestCase
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated sound tagme", @post.tag_string)
+        end
+      end
+
+      context "a Flash file with the sound tag" do
+        should "not automatically remove the sound tag" do
+          @post = create(:post, file_ext: "swf", media_asset: build(:media_asset, file_ext: "swf"))
+          @post.update!(tag_string: "sound")
+
+          assert_equal("flash sound", @post.tag_string)
         end
       end
 
