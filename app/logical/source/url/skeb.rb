@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 class Source::URL::Skeb < Source::URL
+  RESERVED_USERNAMES = %w[works users about terms creator client company]
+
   attr_reader :username, :work_id, :image_id, :image_uuid
 
   def self.match?(url)
-    url.host.in?(%w[skeb.jp skeb.imgix.net skeb-production.s3.ap-northeast-1.amazonaws.com])
+    url.host.in?(%w[www.skeb.jp skeb.jp skeb.imgix.net skeb-production.s3.ap-northeast-1.amazonaws.com])
   end
 
   def parse
@@ -15,14 +17,18 @@ class Source::URL::Skeb < Source::URL
     # https://skeb.jp/@asanagi/works/16 (age-restricted, watermarked)
     # https://skeb.jp/@asanagi/works/6 (private, returns 404)
     # https://skeb.jp/@nasuno42/works/30 (multi-image post)
-    in "skeb.jp", /^@/ => username, "works", work_id
+    in ("www.skeb.jp" | "skeb.jp"), /^@/ => username, "works", work_id
       @username = username.delete_prefix("@")
       @work_id = work_id
 
     # https://skeb.jp/@asanagi
     # https://skeb.jp/@okku_oxn/works
-    in "skeb.jp", /^@/ => username, *rest
+    in ("www.skeb.jp" | "skeb.jp"), /^@/ => username, *rest
       @username = username.delete_prefix("@")
+
+    # https://skeb.jp/OrvMZ
+    in ("www.skeb.jp" | "skeb.jp"), username, *rest unless username.in?(RESERVED_USERNAMES)
+      @username = username
 
     # https://skeb.imgix.net/requests/199886_0?bg=%23fff&auto=format&w=800&s=5a6a908ab964fcdfc4713fad179fe715
     # https://skeb.imgix.net/requests/73290_0?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&w=800&s=4843435cff85d623b1f657209d131526
