@@ -1,0 +1,38 @@
+-- Find artist URLs in the wrong format.
+
+select artist_id, url from artist_urls where url ~ 'artstation.com' and url !~ '^https://www.artstation.com/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'deviantart.com' and url !~ '^https://www.deviantart.com/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'fanbox.cc' and url !~ '^https://[^.]+.fanbox.cc$';
+select artist_id, url from artist_urls where url ~ 'pixiv.net/fanbox' and url !~ '^https://www.pixiv.net/fanbox/creator/[0-9]+$';
+select artist_id, url from artist_urls where url ~ 'fantia.jp' and url !~ '^https://fantia.jp/fanclubs/[0-9]+$' and url !~ '^https://fantia.jp/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'foundation.app' and url !~ '^https://foundation.app/@[a-zA-Z0-9_.-]+$' and url !~ '^https://foundation.app/0x[a-fA-F0-9]{40}$';
+select artist_id, url from artist_urls where url ~ 'hentai-foundry.com' and url !~ '^https://www.hentai-foundry.com/user/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'instagram.com' and url !~ '^https://www.instagram.com/[a-zA-Z0-9_.-]+/$';
+select artist_id, url from artist_urls where url ~ 'lofter.com' and url !~ '^https://[a-zA-Z0-9_.-]+.lofter.com$';
+select artist_id, url from artist_urls where url ~ 'pawoo.net' and url !~ '^https://pawoo.net/@[a-zA-Z0-9_.-]+$' and url !~ '^https://pawoo.net/web/accounts/[0-9]+$';
+select artist_id, url from artist_urls where url ~ 'baraag.net' and url !~ '^https://baraag.net/@[a-zA-Z0-9_.-]+$' and url !~ '^https://baraag.net/web/accounts/[0-9]+$';
+select artist_id, url from artist_urls where url ~ 'newgrounds.com' and url !~ '^https://[a-zA-Z0-9_.-]+.newgrounds.com$';
+select artist_id, url from artist_urls where url ~ 'seiga.nicovideo.jp' and url !~ '^https://seiga.nicovideo.jp/user/illust/[0-9]+$' and url !~ '^https://seiga.nicovideo.jp/manga/list\?user_id=[0-9]+$';
+select artist_id, url from artist_urls where url ~ 'www.nicovideo.jp/user' and url !~ '^https://www.nicovideo.jp/user/[0-9]+$';
+select artist_id, url from artist_urls where url ~ 'nijie.info' and url !~ '^https://nijie.info/members.php\?id=[0-9]+$';
+select artist_id, url from artist_urls where url ~ 'sketch.pixiv.net' and url !~ '^https://sketch.pixiv.net/@[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'plurk.com' and url !~ '^https://www.plurk.com/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'skeb.jp' and url !~ '^https://skeb.jp/@[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'tinami.com' and url !~ '^https://www.tinami.com/creator/profile/[0-9]+$';
+select artist_id, url from artist_urls where url ~ 'twitpic.com' and url !~ '^http://twitpic.com/photos/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'twitter.com' and url !~ '^https://twitter.com/[a-zA-Z0-9_.-]+$' and url !~ '^https://twitter.com/intent/user\?user_id=[0-9]+$';
+select artist_id, url from artist_urls where url ~ 'tumblr.com' and url !~ '^https://[a-zA-Z0-9_.-]+.tumblr.com$';
+select artist_id, url from artist_urls where url ~ 'weibo.com' and url !~ '^https://www.weibo.com/u/[0-9]+$' and url !~ '^https://www.weibo.com/p/[0-9]+$' and url !~ '^https://www.weibo.com/[a-zA-Z0-9]+$';
+select artist_id, url from artist_urls where url ~ 'yfrog.com' and url !~ '^http://yfrog.com/user/[a-zA-Z0-9_.-]+/photos$';
+select artist_id, url from artist_urls where url ~ 'drawr.net' and url !~ '^http://drawr.net/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'theinterviews.jp' and url !~ '^http://theinterviews.jp/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'pixiv.cc' and url !~ '^http://pixiv.cc/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'ameblo' and url !~ '^https://ameblo.jp/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'ask.fm' and url !~ '^https://ask.fm/[a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'booth.pm' and url !~ '^https://[a-zA-Z0-9_.-]+.booth.pm$';
+select artist_id, url from artist_urls where url ~ 'anidb.net' and url !~ '^https://anidb.net/creator/[0-9]+$';
+select artist_id, url from artist_urls where url ~ 'animenewsnetwork' and url !~ '^https://www.animenewsnetwork.com/encyclopedia/people.php\?id=[0-9]+$';
+select artist_id, url from artist_urls where url ~ 'pixiv.net' and url !~ '^https://www.pixiv.net/users/[0-9]+$' and url !~ '^https://www.pixiv.net/stacc/[a-zA-Z0-9._-]+$' and url !~ '^https://www.pixiv.net/fanbox/creator/[0-9]+$' and url !~ '^https://sketch.pixiv.net/@[a-zA-Z0-9_.-]+$' order by artist_id desc;
+select artist_id, url from artist_urls where url ~ 'furaffinity' and url !~ '^https://www.furaffinity.net/user/[~a-zA-Z0-9_.-]+$';
+select artist_id, url from artist_urls where url ~ 'fc2.com' and url !~ '^http://[^.]+.(web|blog|x|h|cart|wiki|bbs|finito|kt).fc2.com$';
+select artist_id, url from artist_urls where url ~ 'reddit' and url !~ '^https://www.reddit.com/user/[a-zA-Z0-9_-]+$';
