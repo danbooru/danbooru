@@ -102,8 +102,11 @@ module Sources
       assert(Source::URL.page_url?("https://omu001.fanbox.cc/posts/39714"))
 
       assert(Source::URL.profile_url?("https://www.pixiv.net/fanbox/creator/1566167"))
+      assert(Source::URL.profile_url?("https://pixiv.net/fanbox/creator/1566167"))
       assert(Source::URL.profile_url?("https://www.pixiv.net/fanbox/member.php?user_id=3410642"))
+      assert(Source::URL.profile_url?("https://pixiv.net/fanbox/member.php?user_id=3410642"))
       assert(Source::URL.profile_url?("https://omu001.fanbox.cc"))
+      assert(Source::URL.profile_url?("https://www.fanbox.cc/@tsukiori"))
       assert_not(Source::URL.profile_url?("https://www.fanbox.cc"))
       assert_not(Source::URL.profile_url?("https://fanbox.cc"))
     end

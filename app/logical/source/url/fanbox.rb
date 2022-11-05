@@ -35,19 +35,26 @@ class Source::URL::Fanbox < Source::URL
       @username = username.delete_prefix("@")
       @work_id = work_id
 
+    # https://www.fanbox.cc/@tsukiori
+    in "www.fanbox.cc", /^@/ => username
+      @username = username.delete_prefix("@")
+
+    # https://pixiv.net/fanbox/creator/1566167/post/39714 (old)
     # https://www.pixiv.net/fanbox/creator/1566167/post/39714 (old)
-    in "www.pixiv.net", "fanbox", "creator", user_id, "post", work_id
+    in ("pixiv.net" | "www.pixiv.net"), "fanbox", "creator", user_id, "post", work_id
       @user_id = user_id
       @work_id = work_id
 
+    # https://pixiv.net/fanbox/creator/1566167
     # https://www.pixiv.net/fanbox/creator/1566167
-    # http://www.pixiv.net/fanbox/user/3410642
+    # https://www.pixiv.net/fanbox/user/3410642
     # https://www.pixiv.net/fanbox/creator/18915237/post
-    in "www.pixiv.net", "fanbox", ("creator" | "user"), user_id, *rest
+    in ("pixiv.net" | "www.pixiv.net"), "fanbox", ("creator" | "user"), user_id, *rest
       @user_id = user_id
 
+    # http://pixiv.net/fanbox/member.php?user_id=3410642
     # http://www.pixiv.net/fanbox/member.php?user_id=3410642
-    in "www.pixiv.net", "fanbox", "member.php" if params[:user_id].present?
+    in ("pixiv.net" | "www.pixiv.net"), "fanbox", "member.php" if params[:user_id].present?
       @user_id = params[:user_id]
 
     # https://omu001.fanbox.cc/posts/39714
