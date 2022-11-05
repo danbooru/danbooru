@@ -402,7 +402,7 @@ class Post < ApplicationRecord
     end
 
     def add_automatic_tags(tags)
-      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation non-web_source wide_image tall_image]
+      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation non-web_source wide_image tall_image sound]
 
       if tags.size >= 30
         tags -= ["tagme"]
@@ -472,6 +472,7 @@ class Post < ApplicationRecord
       tags << "exif_rotation" if media_asset.is_rotated?
       tags << "non-repeating_animation" if media_asset.is_non_repeating_animation?
       tags << "ai-generated" if media_asset.is_ai_generated?
+      tags << "sound" if media_asset.has_sound?
 
       tags
     end

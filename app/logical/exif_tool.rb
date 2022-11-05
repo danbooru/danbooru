@@ -124,6 +124,11 @@ class ExifTool
         metadata.has_key?("PNG:Dream")
     end
 
+    # True if the video has audible sound. False if the video doesn't have an audio track, or the audio track is inaudible.
+    def has_sound?
+      metadata["FFmpeg:AudioPeakLoudness"].to_f >= 0.0003 # -70 dB
+    end
+
     def width
       metadata.find { |name, value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageWidth\z/) }&.second
     end
