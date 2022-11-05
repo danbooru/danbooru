@@ -155,7 +155,7 @@ class FFmpeg
   #   have an audio track. If the silence percentage is 100%, then the audio track is totally silent.
   def silence_percentage
     return nil if !has_audio? || duration.to_f == 0.0
-    (silence_duration.to_f / duration).clamp(0.0, 1.0).round(4)
+    (silence_duration.to_f / duration).clamp(0.0, 1.0)
   end
 
   # The average loudness of the audio track, as a percentage of max volume. 0% is silent and 100% is max volume.
@@ -166,7 +166,7 @@ class FFmpeg
   # @return [Float, nil] The average loudness as a percent, or nil if the file doesn't have an audio track.
   # @see https://en.wikipedia.org/wiki/EBU_R_128
   def average_loudness
-    10.pow(average_loudness_lufs / 20.0).round(4) if average_loudness_lufs.present?
+    10.pow(average_loudness_lufs / 20.0) if average_loudness_lufs.present?
   end
 
   # The average loudness of the audio track, in LUFS units. -70.0 is silent and 0.0 is max volume.
@@ -203,7 +203,7 @@ class FFmpeg
   # @return [Float, nil] The peak loudness in dBFS, or nil if the file doesn't have an audio track.
   # @see https://en.wikipedia.org/wiki/EBU_R_128
   def peak_loudness
-    10.pow(peak_loudness_dbfs / 20.0).round(4) if peak_loudness_dbfs.present?
+    10.pow(peak_loudness_dbfs / 20.0) if peak_loudness_dbfs.present?
   end
 
   # The peak loudness of the audio track, in dBFS (decibels referenced to full scale). 0.0 is 100%

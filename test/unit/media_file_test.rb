@@ -216,10 +216,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal("LC", file.metadata["FFmpeg:AudioProfile"])
       assert_equal("stereo", file.metadata["FFmpeg:AudioLayout"])
       assert_equal(128002, file.metadata["FFmpeg:AudioBitRate"])
-      assert_equal(0.1318, file.metadata["FFmpeg:AudioPeakLoudness"])
-      assert_equal(0.0193, file.metadata["FFmpeg:AudioAverageLoudness"])
+      assert_equal(0.1318, file.metadata["FFmpeg:AudioPeakLoudness"].round(4))
+      assert_equal(0.0193, file.metadata["FFmpeg:AudioAverageLoudness"].round(4))
       assert_equal(0, file.metadata["FFmpeg:AudioLoudnessRange"])
-      assert_equal(0.7562, file.metadata["FFmpeg:AudioSilencePercentage"])
+      assert_equal(0.7562, file.metadata["FFmpeg:AudioSilencePercentage"].round(4))
     end
 
     should "determine the metadata for a video with silent audio" do
@@ -239,10 +239,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal("LC", file.metadata["FFmpeg:AudioProfile"])
       assert_equal("stereo", file.metadata["FFmpeg:AudioLayout"])
       assert_equal(2100, file.metadata["FFmpeg:AudioBitRate"])
-      assert_equal(0, file.metadata["FFmpeg:AudioPeakLoudness"])
-      assert_equal(0.0003, file.metadata["FFmpeg:AudioAverageLoudness"])
+      assert_equal(0, file.metadata["FFmpeg:AudioPeakLoudness"].round(4))
+      assert_equal(0.0003, file.metadata["FFmpeg:AudioAverageLoudness"].round(4))
       assert_equal(0, file.metadata["FFmpeg:AudioLoudnessRange"])
-      assert_equal(0.9999, file.metadata["FFmpeg:AudioSilencePercentage"])
+      assert_equal(0.9999, file.metadata["FFmpeg:AudioSilencePercentage"].round(4))
     end
 
     should "determine the metadata for a video without audio" do
@@ -310,10 +310,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal("opus", file.metadata["FFmpeg:AudioCodec"])
       assert_equal("stereo", file.metadata["FFmpeg:AudioLayout"])
       assert_equal(50661, file.metadata["FFmpeg:AudioBitRate"])
-      assert_equal(0.1274, file.metadata["FFmpeg:AudioPeakLoudness"])
-      assert_equal(0.0186, file.metadata["FFmpeg:AudioAverageLoudness"])
+      assert_equal(0.1274, file.metadata["FFmpeg:AudioPeakLoudness"].round(4))
+      assert_equal(0.0186, file.metadata["FFmpeg:AudioAverageLoudness"].round(4))
       assert_equal(0, file.metadata["FFmpeg:AudioLoudnessRange"])
-      assert_equal(0.7506, file.metadata["FFmpeg:AudioSilencePercentage"])
+      assert_equal(0.7506, file.metadata["FFmpeg:AudioSilencePercentage"].round(4))
     end
 
     should "determine the metadata for a video with silent audio" do
@@ -330,10 +330,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal("opus", file.metadata["FFmpeg:AudioCodec"])
       assert_equal("stereo", file.metadata["FFmpeg:AudioLayout"])
       assert_equal(1197, file.metadata["FFmpeg:AudioBitRate"])
-      assert_equal(0, file.metadata["FFmpeg:AudioPeakLoudness"])
-      assert_equal(0.0003, file.metadata["FFmpeg:AudioAverageLoudness"])
+      assert_equal(0, file.metadata["FFmpeg:AudioPeakLoudness"].round(4))
+      assert_equal(0.0003, file.metadata["FFmpeg:AudioAverageLoudness"].round(4))
       assert_equal(0, file.metadata["FFmpeg:AudioLoudnessRange"])
-      assert_equal(0.985, file.metadata["FFmpeg:AudioSilencePercentage"])
+      assert_equal(0.985, file.metadata["FFmpeg:AudioSilencePercentage"].round(4))
     end
 
     should "determine the metadata for a video without audio" do
