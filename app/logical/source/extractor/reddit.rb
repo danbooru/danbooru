@@ -12,7 +12,7 @@ module Source
         if parsed_url&.full_image_url.present?
           [parsed_url.full_image_url]
         elsif data.present?
-          images = [data.dig("media", "resolutions", 0, "url")].compact
+          images = [data.dig("media", "content")].compact
           images += ordered_gallery_images
           images.compact.uniq.map { |i| Source::URL.parse(i)&.full_image_url }.compact
         else
@@ -30,7 +30,7 @@ module Source
 
       def profile_url
         return nil if artist_name.blank?
-        "https://reddit.com/user/#{artist_name}"
+        "https://www.reddit.com/user/#{artist_name}"
       end
 
       def page_url

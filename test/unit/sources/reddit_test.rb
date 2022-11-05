@@ -12,9 +12,26 @@ module Sources
           "https://i.redd.it/oc5y8k06ryq81.png",
         ],
         artist_name: "Darksin31",
-        profile_url: "https://reddit.com/user/Darksin31",
+        profile_url: "https://www.reddit.com/user/Darksin31",
         page_url: "https://www.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/",
         artist_commentary_title: "Maria Nearl Versus the Left-Armed Knight (@dankestsin)"
+      )
+    end
+
+    context "A reddit post with username instead of subreddit" do
+      strategy_should_work(
+        "https://www.reddit.com/user/blank_page_drawings/comments/nfjz0d/a_sleepy_orc/",
+        image_urls: ["https://i.redd.it/ruh00hxilxz61.png"],
+        page_url: "https://www.reddit.com/user/blank_page_drawings/comments/nfjz0d/a_sleepy_orc/",
+        artist_commentary_title: "A sleepy orc",
+        profile_url: "https://www.reddit.com/user/blank_page_drawings"
+      )
+    end
+
+    context "A reddit post with an external image" do
+      strategy_should_work(
+        "https://www.reddit.com/r/baramanga/comments/n9cgs3/you_can_now_find_me_on_twitter_too_blankpage/",
+        image_urls: ["https://external-preview.redd.it/VlT1G4JoqAmP_7DG5UKRCJP8eTRef7dCrRvu2ABm_Xg.png?auto=webp&s=6510f9f0a69563988aed7af04f750f92fc35f629"]
       )
     end
 
@@ -23,7 +40,7 @@ module Sources
         "https://www.reddit.com/gallery/yc0b8g",
         image_urls: ["https://i.redd.it/eao0je8wzlv91.jpg"],
         page_url: "https://www.reddit.com/r/furrymemes/comments/ybr04z/_/",
-        profile_url: "https://reddit.com/user/lightmare69",
+        profile_url: "https://www.reddit.com/user/lightmare69",
         artist_name: "lightmare69",
         artist_commentary_title: "\u{1FAF5}😐"
       )
@@ -33,7 +50,7 @@ module Sources
       strategy_should_work(
         "https://www.reddit.com/r/Genshin_Impact/comments/u9zilq/cookie_shinobu",
         image_urls: ["https://i.redd.it/bxh5xkp088v81.jpg"],
-        profile_url: "https://reddit.com/user/onethingidkwhy",
+        profile_url: "https://www.reddit.com/user/onethingidkwhy",
         artist_name: "onethingidkwhy",
         artist_commentary_title: "cookie shinobu"
       )
