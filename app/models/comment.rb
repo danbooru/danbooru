@@ -10,6 +10,7 @@ class Comment < ApplicationRecord
   has_many :moderation_reports, as: :model, dependent: :destroy
   has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
   has_many :votes, class_name: "CommentVote", dependent: :destroy
+  has_many :active_votes, -> { active }, class_name: "CommentVote"
   has_many :mod_actions, as: :subject, dependent: :destroy
 
   validates :body, presence: true, length: { maximum: 15_000 }, if: :body_changed?

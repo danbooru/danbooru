@@ -42,7 +42,7 @@ class CommentComponent < ApplicationComponent
   end
 
   def current_vote
-    @current_vote ||= comment.votes.active.find { |v| v.user_id == current_user.id }
+    @current_vote ||= comment.active_votes.find { |v| v.user_id == current_user.id }
   end
 
   def reported?
