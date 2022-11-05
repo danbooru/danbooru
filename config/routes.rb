@@ -50,7 +50,6 @@ Rails.application.routes.draw do
     namespace :user do
       resource :count_fixes, only: [:new, :create]
       resource :email_notification, only: [:show, :create, :destroy]
-      resource :deletion, :only => [:show, :destroy]
     end
   end
 
@@ -274,6 +273,8 @@ Rails.application.routes.draw do
 
     get :change_name, on: :member, to: "user_name_change_requests#new"
     get :custom_style, on: :collection
+    get :deactivate, on: :member     # /users/:id/deactivate
+    get :deactivate, on: :collection # /users/deactivate
   end
   get "/upgrade", to: "user_upgrades#new", as: "new_user_upgrade"
   get "/user_upgrades/new", to: redirect("/upgrade")
@@ -354,6 +355,7 @@ Rails.application.routes.draw do
   get "/static/contact", to: redirect("/contact")
   get "/user_upgrade/new", to: redirect("/upgrade")
   get "/delayed_jobs", to: redirect("/jobs")
+  get "/maintenance/user/deletion", to: redirect("/users/deactivate")
 
   get "/mock/recommender/recommend/:user_id" => "mock_services#recommender_recommend", as: "mock_recommender_recommend"
   get "/mock/recommender/similiar/:post_id" => "mock_services#recommender_similar", as: "mock_recommender_similar"

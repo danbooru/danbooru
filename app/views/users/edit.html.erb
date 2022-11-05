@@ -53,7 +53,7 @@
         <div class="input">
           <label>Account</label>
           <p>
-            <%= link_to "Deactivate account", maintenance_user_deletion_path, id: "delete-account" %>
+            <%= link_to "Deactivate account", deactivate_user_path(@user), id: "delete-account" %>
             (<em>requires confirmation</em>)
           </p>
         </div>

@@ -13,6 +13,14 @@ class UserPolicy < ApplicationPolicy
     record.id == user.id || user.is_admin?
   end
 
+  def deactivate?
+    (record.id == user.id && !user.is_anonymous?) || user.is_owner?
+  end
+
+  def destroy?
+    deactivate?
+  end
+
   def promote?
     user.is_moderator?
   end

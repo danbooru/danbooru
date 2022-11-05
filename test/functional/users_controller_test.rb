@@ -102,6 +102,82 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "#deactivate action" do
+      should "render /users/:id/deactivate for the current user" do
+        get_auth deactivate_user_path(@user), @user
+        assert_response :success
+      end
+
+      should "render /users/:id/deactivate for the Owner user" do
+        get_auth deactivate_user_path(@user), create(:owner)
+        assert_response :success
+      end
+
+      should "not render /users/:id/deactivate for a different user" do
+        get_auth deactivate_user_path(@user), create(:user)
+        assert_response 403
+      end
+
+      should "render /users/deactivate for a logged-in user" do
+        get_auth deactivate_users_path, @user
+        assert_response :success
+      end
+
+      should "not render /users/deactivate for a logged-out user" do
+        get deactivate_users_path
+        assert_response 403
+      end
+
+      should "redirect /maintenance/user/deletion to /users/deactivate" do
+        get "/maintenance/user/deletion"
+        assert_redirected_to deactivate_users_path
+      end
+    end
+
+    context "#destroy action" do
+      should "delete the user when given the correct password" do
+        delete_auth user_path(@user), @user, params: { user: { password: "password" }}
+
+        assert_redirected_to posts_path
+        assert_equal(true, @user.reload.is_deleted?)
+        assert_equal("Your account has been deactivated", flash[:notice])
+        assert_nil(session[:user_id])
+        assert_equal(true, @user.user_events.user_deletion.exists?)
+      end
+
+      should "not delete the user when given an incorrect password" do
+        delete_auth user_path(@user), @user, params: { user: { password: "hunter2" }}
+
+        assert_redirected_to deactivate_user_path(@user)
+        assert_equal(false, @user.reload.is_deleted?)
+        assert_equal("Password is incorrect", flash[:notice])
+        assert_equal(@user.id, session[:user_id])
+        assert_equal(false, @user.user_events.user_deletion.exists?)
+      end
+
+      should "allow the Owner to delete other users" do
+        delete_auth user_path(@user), create(:owner)
+
+        assert_redirected_to posts_path
+        assert_equal(true, @user.reload.is_deleted?)
+        assert_equal("Your account has been deactivated", flash[:notice])
+        assert_nil(session[:user_id])
+        assert_equal(true, @user.user_events.user_deletion.exists?)
+      end
+
+      should "not allow users to delete other users" do
+        delete_auth user_path(@user), create(:user), params: { user: { password: "password" }}
+
+        assert_response 403
+      end
+
+      should "not allow logged-out users to delete other users" do
+        delete user_path(@user), params: { user: { password: "password" }}
+
+        assert_response 403
+      end
+    end
+
     context "custom_style action" do
       should "work" do
         @user.update!(custom_style: "span { color: red; }")

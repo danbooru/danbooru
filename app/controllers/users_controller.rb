@@ -114,6 +114,32 @@ class UsersController < ApplicationController
     end
   end
 
+  def deactivate
+    if params[:id].present?
+      @user = authorize User.find(params[:id])
+    else
+      @user = authorize CurrentUser.user
+    end
+
+    respond_with(@user)
+  end
+
+  def destroy
+    @user = authorize User.find(params[:id])
+
+    user_deletion = UserDeletion.new(user: @user, deleter: CurrentUser.user, password: params.dig(:user, :password), request: request)
+    user_deletion.delete!
+
+    if user_deletion.errors.none?
+      session.delete(:user_id)
+      flash[:notice] = "Your account has been deactivated"
+      respond_with(user_deletion, location: posts_path)
+    else
+      flash[:notice] = user_deletion.errors.full_messages.join("; ")
+      redirect_to deactivate_user_path(@user)
+    end
+  end
+
   def custom_style
     @custom_css = CurrentUser.user.custom_css
     expires_in 10.years
