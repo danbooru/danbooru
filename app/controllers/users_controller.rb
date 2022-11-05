@@ -3,6 +3,8 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
 
+  around_action :set_timeout, only: [:profile, :show]
+
   rate_limit :create, rate: 1.0/5.minutes, burst: 10
 
   def new
@@ -118,6 +120,13 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def set_timeout
+    PostVersion.connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}")
+    yield
+  ensure
+    PostVersion.connection.execute("SET statement_timeout = 0")
+  end
 
   def item_matches_params(user)
     if params[:search][:name_matches]
