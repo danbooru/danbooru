@@ -50,7 +50,7 @@ module Source
       end
 
       def data
-        return nil if work_id.blank?
+        return {} if work_id.blank?
 
         response = http.cache(1.minute).get("https://reddit.com/gallery/#{work_id}")
         return {} if response.status != 200
