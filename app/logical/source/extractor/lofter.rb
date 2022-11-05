@@ -49,6 +49,7 @@ module Source
           ".content .text",
           ".posts .photo .text",
           "#post .description",
+          ".m-post .cont .text",
         ]
         page&.search(commentary_selectors.join(", ")).to_a.compact.first&.to_html
       end

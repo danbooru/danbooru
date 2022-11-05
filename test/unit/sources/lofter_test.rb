@@ -47,6 +47,17 @@ module Sources
       )
     end
 
+    context "A lofter post with commentary under <.m-post .cont .text>" do
+      strategy_should_work(
+        "https://qiuchenghanshuang.lofter.com/post/1f9d6464_2b736607b",
+        image_urls: [
+          "https://imglf4.lf127.net/img/68d1578576f2e8a0/akFYeFo0L0VFMno5d0JuNHlwQ3VMdEFxYysyN1ZseVduNzFkbG9MdUlFVT0.jpg",
+          "https://imglf6.lf127.net/img/9970d5715bd5f72a/akFYeFo0L0VFMno5d0JuNHlwQ3VMZ3QxbkttTHpHZERWZXlVS3FDNmtYcz0.jpg",
+        ],
+        dtext_artist_commentary_desc: /过去与她擦肩而过/
+      )
+    end
+
     context "A dead link" do
       strategy_should_work(
         "https://gxszdddd.lofter.com/post/322595b1_1ca5e6f66",
