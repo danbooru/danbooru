@@ -88,6 +88,7 @@ class User < ApplicationRecord
   attribute :theme, default: :auto
   attribute :upload_points, default: Danbooru.config.initial_upload_points.to_i
   attribute :bit_prefs, default: 0
+  attribute :is_deleted, default: false
 
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
   enum theme: { auto: 0, light: 50, dark: 100 }, _suffix: true

@@ -3,11 +3,11 @@
 class UserNameChangeRequest < ApplicationRecord
   belongs_to :user
 
-  attr_accessor :updater
+  attr_accessor :updater, :is_deletion
 
   validate :not_limited, on: :create
   validates :original_name, presence: true
-  validates :desired_name, user_name: true, presence: true, on: :create
+  validates :desired_name, presence: true, user_name: true, on: :create, unless: :is_deletion
 
   after_create :update_name!
   after_create :create_mod_action
@@ -33,6 +33,7 @@ class UserNameChangeRequest < ApplicationRecord
   end
 
   def not_limited
+    return if is_deletion
     return if user.name_invalid?
     return if updater && updater != user
 

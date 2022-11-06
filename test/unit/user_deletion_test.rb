@@ -18,6 +18,7 @@ class UserDeletionTest < ActiveSupport::TestCase
         @deletion = UserDeletion.new(user: @user, password: "wrongpassword", request: @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "Password is incorrect")
+        assert_equal(false, @user.reload.is_deleted)
       end
     end
 
@@ -27,6 +28,7 @@ class UserDeletionTest < ActiveSupport::TestCase
         @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "Admins cannot delete their account")
+        assert_equal(false, @user.reload.is_deleted)
       end
     end
 
@@ -36,6 +38,7 @@ class UserDeletionTest < ActiveSupport::TestCase
         @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "You cannot delete your account if you are banned")
+        assert_equal(false, @user.reload.is_deleted)
       end
     end
   end
@@ -64,6 +67,11 @@ class UserDeletionTest < ActiveSupport::TestCase
       assert_equal("user_#{@user.id}", @user.reload.name)
     end
 
+    should "mark the user as deleted" do
+      @deletion.delete!
+      assert_equal(true, @user.reload.is_deleted)
+    end
+
     should "generate a user name change request" do
       @deletion.delete!
       assert_equal(1, @user.user_name_change_requests.count)
@@ -78,6 +86,7 @@ class UserDeletionTest < ActiveSupport::TestCase
 
     should "generate a modaction" do
       @deletion.delete!
+
       assert_match(/deleted user ##{@user.id}/, ModAction.last.description)
       assert_equal(@user, ModAction.last.subject)
       assert_equal("user_delete", ModAction.last.category)
@@ -148,9 +157,12 @@ class UserDeletionTest < ActiveSupport::TestCase
 
       @deletion.delete!
       assert_equal("user_#{@user.id}", @user.reload.name)
+      assert_equal(true, @user.is_deleted)
       assert_equal("deleted user ##{@user.id}", ModAction.last.description)
       assert_equal(@deletion.deleter, ModAction.last.creator)
       assert_equal(@user, ModAction.last.subject)
+      assert_equal(false, ModAction.user_name_change.exists?)
+      assert_equal(1, ModAction.count)
     end
 
     should "not work for other users" do
@@ -159,6 +171,7 @@ class UserDeletionTest < ActiveSupport::TestCase
 
       @deletion.delete!
       assert_not_equal("user_#{@user.id}", @user.reload.name)
+      assert_equal(false, @user.is_deleted)
       assert_equal(0, ModAction.count)
     end
   end

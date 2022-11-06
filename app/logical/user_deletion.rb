@@ -87,15 +87,11 @@ class UserDeletion
   end
 
   def reset_password
-    user.update!(password: SecureRandom.hex(16))
+    user.update!(is_deleted: true, password: SecureRandom.hex(16))
   end
 
   def rename
-    name = "user_#{user.id}"
-    name += "~" while User.exists?(name: name)
-
-    request = UserNameChangeRequest.new(user: user, desired_name: name, original_name: user.name)
-    request.save!(validate: false) # XXX don't validate so that the 1 name change per week rule doesn't interfere
+    UserNameChangeRequest.create!(user: user, desired_name: "user_#{user.id}", original_name: user.name, is_deletion: true)
   end
 
   def validate_deletion
