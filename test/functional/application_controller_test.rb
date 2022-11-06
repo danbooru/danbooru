@@ -137,6 +137,14 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           assert_response 401
         end
 
+        should "fail for a deleted user" do
+          @user.update!(is_deleted: true)
+          basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
+          get profile_path, as: :json, headers: { HTTP_AUTHORIZATION: basic_auth_string }
+
+          assert_response 401
+        end
+
         should "succeed for non-GET requests without a CSRF token" do
           assert_changes -> { @user.reload.enable_safe_mode }, from: false, to: true do
             basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
@@ -180,6 +188,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           assert_response 401
 
           get profile_path(api_key: ""), as: :json
+          assert_response 401
+        end
+
+        should "fail for a deleted user" do
+          @user.update!(is_deleted: true)
+          get edit_user_path(@user), params: { login: @user.name, api_key: @api_key.key }
+
           assert_response 401
         end
 
@@ -267,13 +282,25 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "on session cookie authentication" do
-      should "succeed" do
-        user = create(:user, password: "password")
+      setup do
+        @user = create(:user, password: "password")
+        post session_path, params: { name: @user.name, password: "password" }
+      end
 
-        post session_path, params: { name: user.name, password: "password" }
-        get edit_user_path(user)
+      should "succeed" do
+        get profile_path
 
         assert_response :success
+      end
+
+      should "fail for a deleted user" do
+        @user.update!(is_deleted: true)
+
+        get profile_path
+
+        assert_redirected_to login_path(url: "/profile")
+        assert_nil(session[:user_id])
+        assert_equal(true, @user.user_events.exists?(category: :logout))
       end
     end
 

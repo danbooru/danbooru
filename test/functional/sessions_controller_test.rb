@@ -48,6 +48,15 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
       end
 
+      should "not allow deleted users to login" do
+        @user.update!(is_deleted: true)
+        post session_path, params: { name: @user.name, password: "password" }
+
+        assert_response 401
+        assert_nil(nil, session[:user_id])
+        assert_equal(true, @user.user_events.failed_login.exists?)
+      end
+
       should "not allow IP banned users to login" do
         @ip_ban = create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
         post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }

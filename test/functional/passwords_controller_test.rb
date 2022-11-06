@@ -33,6 +33,18 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @user.user_events.password_change.exists?)
       end
 
+      should "not update the password when a deleted user tries to reset their password with a valid login key" do
+        @user.update!(is_deleted: true)
+        old_password = @user.bcrypt_password_hash
+
+        signed_user_id = Danbooru::MessageVerifier.new(:login).generate(@user.id)
+        put_auth user_password_path(@user), @user, params: { user: { password: "abcde", password_confirmation: "abcde", signed_user_id: signed_user_id } }
+
+        assert_response 403
+        assert_equal(old_password, @user.reload.bcrypt_password_hash)
+        assert_equal(false, @user.user_events.password_change.exists?)
+      end
+
       should "allow the site owner to change the password of other users" do
         @owner = create(:owner_user)
         put_auth user_password_path(@user), @owner, params: { user: { password: "abcde", password_confirmation: "abcde" } }

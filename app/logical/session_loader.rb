@@ -143,7 +143,13 @@ class SessionLoader
   # Set the current user based on the `user_id` session cookie.
   def load_session_user
     user = User.find_by_id(session[:user_id])
-    CurrentUser.user = user if user
+    return if user.nil?
+
+    if user.is_deleted?
+      logout(user)
+    else
+      CurrentUser.user = user
+    end
   end
 
   def update_last_logged_in_at
