@@ -67,18 +67,18 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "fail for a moderator trying to change the name of someone above Builder level" do
-        @user = create(:moderator_user, name: "mod")
+        @user = create(:moderator_user, name: "bob")
         post_auth user_name_change_requests_path, create(:moderator_user), params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}
 
         assert_response 403
-        assert_equal("mod", @user.reload.name)
+        assert_equal("bob", @user.reload.name)
       end
     end
 
     context "show action" do
       setup do
         @change_request = as(@user) { create(:user_name_change_request, user_id: @user.id) }
-        @user.update!(name: "user_#{@user.id}")
+        @user.update!(is_deleted: true)
       end
 
       should "render" do

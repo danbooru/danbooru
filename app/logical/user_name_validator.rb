@@ -9,6 +9,13 @@
 class UserNameValidator < ActiveModel::EachValidator
   ALLOWED_PUNCTUATION = "_.-" # All other punctuation characters are forbidden
 
+  RESERVED_NAMES = [
+    "any", "none", # conflicts with `approver:any` search syntax
+    "new", "deactivate", "custom_style", # conflicts with user routes (/users/new, /users/deactivate, /users/custom_style)
+    "mod", "administrator", # mod impersonation
+    *User::Roles.map(&:to_s) # owner, admin, moderator, anonymous, banned, etc
+  ]
+
   def validate_each(rec, attr, name)
     forbidden_characters = name.delete(ALLOWED_PUNCTUATION).chars.grep(/[[:punct:]]/).uniq
 
@@ -34,6 +41,8 @@ class UserNameValidator < ActiveModel::EachValidator
       rec.errors.add(attr, "must contain only basic letters or numbers")
     elsif name =~ /\Auser_\d+\z/i
       rec.errors.add(attr, "can't be the same as a deleted user")
+    elsif name.downcase.in?(RESERVED_NAMES)
+      rec.errors.add(attr, "is a reserved name and can't be used")
     elsif name =~ Regexp.union(Danbooru.config.user_name_blacklist)
       rec.errors.add(attr, "is not allowed")
     end

@@ -205,6 +205,13 @@ class UserTest < ActiveSupport::TestCase
         user.save
         assert_equal(["Name is not allowed"], user.errors.full_messages)
       end
+
+      should_not allow_value("any").for(:name)
+      should_not allow_value("none").for(:name)
+      should_not allow_value("new").for(:name)
+      should_not allow_value("admin").for(:name)
+      should_not allow_value("mod").for(:name)
+      should_not allow_value("moderator").for(:name)
     end
 
     context "searching for users by name" do

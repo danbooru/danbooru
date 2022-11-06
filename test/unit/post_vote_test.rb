@@ -102,7 +102,7 @@ class PostVoteTest < ActiveSupport::TestCase
 
     context "deleting a vote by another user" do
       should "leave a mod action" do
-        admin = create(:admin_user, name: "admin")
+        admin = create(:admin_user)
         vote = create(:post_vote, post: @post, score: 1)
 
         vote.soft_delete!(updater: admin)
@@ -114,7 +114,7 @@ class PostVoteTest < ActiveSupport::TestCase
 
     context "undeleting a vote by another user" do
       setup do
-        @admin = create(:admin_user, name: "admin")
+        @admin = create(:admin_user)
         @vote = create(:post_vote, post: @post, score: 1)
 
         @vote.soft_delete!(updater: @admin)
