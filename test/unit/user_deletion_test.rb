@@ -6,6 +6,9 @@ class UserDeletionTest < ActiveSupport::TestCase
     @request.stubs(:remote_ip).returns("1.1.1.1")
     @request.stubs(:user_agent).returns("Firefox")
     @request.stubs(:session).returns(session_id: "1234")
+    @request.stubs(:query_parameters).returns({})
+    @request.stubs(:delete).with(:user_id).returns(nil)
+    @request.stubs(:delete).with(:last_authenticatd_at).returns(nil)
   end
 
   context "an invalid user deletion" do
@@ -39,12 +42,20 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "a valid user deletion" do
     setup do
-      @user = create(:user, name: "foo", email_address: build(:email_address))
+      @user = create(:gold_user, name: "foo", email_address: build(:email_address))
+      @api_key = create(:api_key, user: @user)
+      @favorite = create(:favorite, user: @user)
+      @forum_topic_visit = as(@user) { create(:forum_topic_visit, user: @user) }
+      @saved_search = create(:saved_search, user: @user)
+      @public_favgroup = create(:favorite_group, creator: @user, is_public: true)
+      @private_favgroup = create(:favorite_group, creator: @user, is_public: false)
+      @post_downvote = create(:post_vote, score: -1)
+      @post_upvote = create(:post_vote, score: 1)
       @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
     end
 
     should "blank out the email" do
-      @deletion.delete!
+      perform_enqueued_jobs { @deletion.delete! }
       assert_nil(@user.reload.email_address)
     end
 
@@ -54,12 +65,10 @@ class UserDeletionTest < ActiveSupport::TestCase
     end
 
     should "generate a user name change request" do
-      assert_difference("UserNameChangeRequest.count") do
-        @deletion.delete!
-      end
-
-      assert_equal("foo", UserNameChangeRequest.last.original_name)
-      assert_equal("user_#{@user.id}", UserNameChangeRequest.last.desired_name)
+      @deletion.delete!
+      assert_equal(1, @user.user_name_change_requests.count)
+      assert_equal("foo", @user.user_name_change_requests.last.original_name)
+      assert_equal("user_#{@user.id}", @user.user_name_change_requests.last.desired_name)
     end
 
     should "reset the password" do
@@ -75,14 +84,60 @@ class UserDeletionTest < ActiveSupport::TestCase
       assert_equal(@deletion.deleter, ModAction.last.creator)
     end
 
-    should "remove any favorites" do
-      @post = create(:post)
-      Favorite.create!(post: @post, user: @user)
-
+    should "remove the user's favorites if they have private favorites" do
+      @user.update!(enable_private_favorites: true)
       perform_enqueued_jobs { @deletion.delete! }
 
-      assert_equal(0, Favorite.count)
-      assert_equal(0, @post.reload.fav_count)
+      assert_equal(0, @user.favorites.count)
+      assert_equal(0, @user.reload.favorite_count)
+    end
+
+    should "not remove the user's favorites if they have public favorites" do
+      perform_enqueued_jobs { @deletion.delete! }
+
+      assert_equal(1, @user.favorites.count)
+      assert_equal(1, @user.favorite_count)
+    end
+
+    should "remove the user's API keys" do
+      perform_enqueued_jobs { @deletion.delete! }
+
+      assert_equal(0, @user.api_keys.count)
+    end
+
+    should "remove the user's forum topic visits" do
+      perform_enqueued_jobs { @deletion.delete! }
+
+      assert_equal(0, @user.forum_topic_visits.count)
+    end
+
+    should "remove the user's saved searches" do
+      perform_enqueued_jobs { @deletion.delete! }
+
+      assert_equal(0, @user.saved_searches.count)
+    end
+
+    should "remove the user's private favgroups but not their public favgroups" do
+      perform_enqueued_jobs { @deletion.delete! }
+
+      assert_equal(0, @user.favorite_groups.is_private.count)
+      assert_equal(1, @user.favorite_groups.is_public.count)
+      assert_not_nil(@public_favgroup.reload)
+    end
+
+    should "only remove the user's downvotes if the don't have private votes enabled" do
+      perform_enqueued_jobs { @deletion.delete! }
+
+      assert_equal(0, @user.post_votes.active.negative.count)
+      assert_equal(1, @user.post_votes.active.positive.count)
+    end
+
+    should "remove both the user's upvotes and downvotes if they have private votes enabled" do
+      @user.update!(enable_private_favorites: true)
+      perform_enqueued_jobs { @deletion.delete! }
+
+      assert_equal(0, @user.post_votes.active.negative.count)
+      assert_equal(0, @user.post_votes.active.positive.count)
     end
   end
 

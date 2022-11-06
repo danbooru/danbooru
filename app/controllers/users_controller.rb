@@ -131,7 +131,6 @@ class UsersController < ApplicationController
     user_deletion.delete!
 
     if user_deletion.errors.none?
-      session.delete(:user_id)
       flash[:notice] = "Your account has been deactivated"
       respond_with(user_deletion, location: posts_path)
     else

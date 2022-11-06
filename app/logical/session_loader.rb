@@ -46,11 +46,11 @@ class SessionLoader
   end
 
   # Logs the current user out. Deletes their session cookie and records a logout event.
-  def logout
+  def logout(user = CurrentUser.user)
     session.delete(:user_id)
     session.delete(:last_authenticated_at)
-    return if CurrentUser.user.is_anonymous?
-    UserEvent.create_from_request!(CurrentUser.user, :logout, request)
+    return if user.is_anonymous?
+    UserEvent.create_from_request!(user, :logout, request)
   end
 
   # Sets the current user. Runs on each HTTP request. The user is set based on
