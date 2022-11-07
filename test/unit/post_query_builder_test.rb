@@ -315,6 +315,23 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post2, post1], "ordfav:#{CurrentUser.user.name} -has:comments")
     end
 
+    should "allow the ordfav:<name> metatag to be combined with other metatags" do
+      post1 = create(:post, tag_string: "fav:#{CurrentUser.user.name}", media_asset: build(:media_asset, image_width: 800, image_height: 600, file_size: 1234, file_ext: "jpg"))
+      post2 = create(:post, tag_string: "fav:#{CurrentUser.user.name}", media_asset: build(:media_asset, image_width: 1920, image_height: 1080, file_size: 4567, file_ext: "png"))
+
+      assert_tag_match([post1], "ordfav:#{CurrentUser.user.name} ratio:4/3")
+      assert_tag_match([post1], "ratio:4/3 ordfav:#{CurrentUser.user.name}")
+
+      assert_tag_match([post2], "ordfav:#{CurrentUser.user.name} ratio:16/9")
+      assert_tag_match([post2], "ratio:16/9 ordfav:#{CurrentUser.user.name}")
+
+      assert_tag_match([post1], "ordfav:#{CurrentUser.user.name} width:800")
+      assert_tag_match([post1], "ordfav:#{CurrentUser.user.name} height:600")
+      assert_tag_match([post1], "ordfav:#{CurrentUser.user.name} mpixels:0.48")
+      assert_tag_match([post1], "ordfav:#{CurrentUser.user.name} filesize:1234")
+      assert_tag_match([post1], "ordfav:#{CurrentUser.user.name} filetype:jpg")
+    end
+
     should "return posts for the pool:<name> metatag" do
       SqsService.any_instance.stubs(:send_message)
 

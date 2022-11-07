@@ -244,12 +244,12 @@ class PostQueryBuilder
       in :and
         joins = children.flat_map(&:joins_values)
         orders = children.flat_map(&:order_values)
-        nodes = children.map { |child| child.joins(joins).order(orders) }
+        nodes = children.map { |child| child.except(:joins).joins(joins).order(orders) }
         nodes.reduce(&:and)
       in :or
         joins = children.flat_map(&:joins_values)
         orders = children.flat_map(&:order_values)
-        nodes = children.map { |child| child.joins(joins).order(orders) }
+        nodes = children.map { |child| child.except(:joins).joins(joins).order(orders) }
         nodes.reduce(&:or)
       end
     end
