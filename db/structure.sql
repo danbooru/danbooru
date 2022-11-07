@@ -2102,7 +2102,8 @@ CREATE TABLE public.users (
     last_ip_addr inet,
     unread_dmail_count integer NOT NULL,
     theme integer NOT NULL,
-    upload_points integer NOT NULL
+    upload_points integer NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -5774,6 +5775,13 @@ CREATE INDEX index_users_on_inviter_id ON public.users USING btree (inviter_id) 
 
 
 --
+-- Name: index_users_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_is_deleted ON public.users USING btree (is_deleted) WHERE (is_deleted = true);
+
+
+--
 -- Name: index_users_on_last_ip_addr; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6901,6 +6909,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221010035855'),
 ('20221026084655'),
 ('20221026084656'),
-('20221027000931');
+('20221027000931'),
+('20221106062419');
 
 
