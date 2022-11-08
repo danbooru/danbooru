@@ -28,7 +28,7 @@ module Source
       end
 
       def gelbooru_tags
-        return [] if api_response.nil?
+        return [] if api_response.blank?
 
         tags = api_response[:tags].split + ["rating:#{api_response[:rating]}"]
         tags.map do |tag|
@@ -38,6 +38,10 @@ module Source
 
       def source_tags
         sub_extractor&.tags.to_a
+      end
+
+      def other_names
+        sub_extractor&.other_names.to_a
       end
 
       def post_id
@@ -50,12 +54,12 @@ module Source
       end
 
       memoize def api_response
-        return nil unless api_url.present?
+        return {} unless api_url.present?
 
         response = http.cache(1.minute).get(api_url)
-        return nil unless response.status == 200
+        return {} unless response.status == 200
 
-        response.parse["post"].first.with_indifferent_access
+        response.parse["post"]&.first.to_h.with_indifferent_access
       end
 
       memoize def post_id_from_md5

@@ -68,6 +68,30 @@ module Sources
       )
     end
 
+    context "A deleted Gelbooru post" do
+      strategy_should_work(
+        "https://gelbooru.com/index.php?page=post&s=list&md5=9d06e876937d46eeda7a5e0ca52f63a8",
+        image_urls: [],
+        artist_name: nil,
+        profile_url: nil,
+        tags: %w[],
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
+      )
+    end
+
+    context "A nonexistent Gelbooru post" do
+      strategy_should_work(
+        "https://gelbooru.com/index.php?page=post&s=list&md5=ffffffffffffffffffffffffffffffff",
+        image_urls: [],
+        artist_name: nil,
+        profile_url: nil,
+        tags: %w[],
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
+      )
+    end
+
     should "normalize gelbooru links" do
       source1 = "https://gelbooru.com//images/ee/5c/ee5c9a69db9602c95debdb9b98fb3e3e.jpeg"
       source2 = "http://simg.gelbooru.com//images/2003/edd1d2b3881cf70c3acf540780507531.png"
