@@ -93,8 +93,8 @@ class ArtistURL < ApplicationRecord
   def priority
     sites = %w[
       Pixiv Twitter
-      Anifty ArtStation Baraag BCY Booth Deviant\ Art Hentai\ Foundry Fantia Furaffinity Foundation Lofter Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Tinami Tumblr Weibo
-      Ask.fm Facebook FC2 Gumroad Instagram Ko-fi Livedoor Mihuashi Mixi.jp Patreon Piapro.jp Picarto Privatter Sakura.ne.jp Stickam Skeb Twitch Youtube
+      Anifty ArtStation Baraag Bilibili BCY Booth Deviant\ Art Fantia Foundation Furaffinity Hentai\ Foundry Lofter Newgrounds Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Reddit Skeb Tinami Tumblr Weibo
+      Ask.fm Facebook FC2 Gumroad Instagram Ko-fi Livedoor Mihuashi Mixi.jp Patreon Piapro.jp Picarto Privatter Sakura.ne.jp Stickam Twitch Youtube
       Amazon Circle.ms DLSite Doujinshi.org Erogamescape Mangaupdates Melonbooks Toranoana Wikipedia
     ]
 

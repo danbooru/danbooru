@@ -27,10 +27,6 @@ module Source
       url.domain.in?(%w[nicovideo.jp nicoseiga.jp nicomanga.jp nimg.jp nico.ms])
     end
 
-    def site_name
-      "Nico Seiga"
-    end
-
     def parse
       case [host, *path_segments]
 
