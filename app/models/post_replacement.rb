@@ -25,7 +25,7 @@ class PostReplacement < ApplicationRecord
   concerning :Search do
     class_methods do
       def search(params, current_user)
-        q = search_attributes(params, [:id, :created_at, :updated_at, :md5, :old_md5, :file_ext, :old_file_ext, :original_url, :replacement_url, :creator, :post], current_user: current_user)
+        q = search_attributes(params, [:id, :created_at, :updated_at, :md5, :old_md5, :file_ext, :old_file_ext, :original_url, :replacement_url, :creator, :post, :media_asset, :old_media_asset], current_user: current_user)
         q.apply_default_order(params)
       end
     end
@@ -47,6 +47,6 @@ class PostReplacement < ApplicationRecord
   end
 
   def self.available_includes
-    [:creator, :post]
+    [:creator, :post, :media_asset, :old_media_asset]
   end
 end
