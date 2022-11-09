@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-# Source extractor for Gelbooru. The commentary and artist information are
-# pulled from the Gelbooru post's source, while the translated tags include
-# both the Gelbooru tags and the source's tags.
+# Source extractor for Gelbooru and Safebooru.org. The commentary and artist information are pulled from the
+# booru post's source, while the translated tags include both the booru tags and the source's tags.
 #
 # @see Source::URL::Gelbooru
 # @see https://gelbooru.com/index.php?page=wiki&s=view&id=18780 (howto:api)
+# @see https://safebooru.org/index.php?page=help&topic=dapi
 module Source
   class Extractor
     class Gelbooru < Source::Extractor
@@ -16,23 +16,27 @@ module Source
       end
 
       def image_urls
-        [api_response[:file_url]].compact
+        if parsed_url.full_image_url.present?
+          [parsed_url.full_image_url]
+        else
+          [api_response[:file_url]].compact
+        end
       end
 
       def page_url
-        "https://gelbooru.com/index.php?page=post&s=view&id=#{post_id}" if post_id.present?
+        "https://#{domain}/index.php?page=post&s=view&id=#{post_id}" if post_id.present?
       end
 
       def tags
-        gelbooru_tags + source_tags
+        site_tags + source_tags
       end
 
-      def gelbooru_tags
+      def site_tags
         return [] if api_response.blank?
 
         tags = api_response[:tags].split + ["rating:#{api_response[:rating]}"]
         tags.map do |tag|
-          [tag, "https://gelbooru.com/index.php?page=post&s=list&tags=#{CGI.escape(tag)}"]
+          [tag, "https://#{domain}/index.php?page=post&s=list&tags=#{CGI.escape(tag)}"]
         end
       end
 
@@ -44,13 +48,18 @@ module Source
         sub_extractor&.other_names.to_a
       end
 
+      def domain
+        parsed_url.domain
+      end
+
       def post_id
-        parsed_url.post_id || parsed_referer&.post_id || post_id_from_md5
+        parsed_url.post_id || parsed_referer&.post_id || api_response[:id]
       end
 
       def api_url
-        # https://gelbooru.com/index.php?page=dapi&s=post&q=index&id=779812&json=1
-        "https://gelbooru.com/index.php?page=dapi&s=post&q=index&id=#{post_id}&json=1" if post_id.present?
+        # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=md5:338078144fe77c9e5f35dbb585e749ec
+        # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=id:7903922
+        parsed_url.api_url || parsed_referer&.api_url
       end
 
       memoize def api_response
@@ -59,20 +68,11 @@ module Source
         response = http.cache(1.minute).get(api_url)
         return {} unless response.status == 200
 
-        response.parse["post"]&.first.to_h.with_indifferent_access
-      end
-
-      memoize def post_id_from_md5
-        return nil unless parsed_url.page_url.present?
-
-        response = http.cache(1.minute).head(parsed_url.page_url)
-        return nil unless response.status == 200
-
-        Source::URL.parse(response.uri).post_id
+        response.parse.dig("posts", "post").to_h.with_indifferent_access
       end
 
       def sub_extractor
-        return nil if api_response[:source].nil?
+        return nil if !api_response[:source].to_s.match?(%r{\Ahttps?://}i)
         @sub_extractor ||= Source::Extractor.find(api_response[:source], default: nil)
       end
     end
