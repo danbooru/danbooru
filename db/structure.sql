@@ -1434,7 +1434,9 @@ CREATE TABLE public.post_replacements (
     file_size integer,
     image_width integer,
     image_height integer,
-    md5 character varying
+    md5 character varying,
+    media_asset_id integer,
+    old_media_asset_id integer
 );
 
 
@@ -4955,6 +4957,34 @@ CREATE INDEX index_post_replacements_on_creator_id_and_created_at ON public.post
 
 
 --
+-- Name: index_post_replacements_on_md5; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_replacements_on_md5 ON public.post_replacements USING btree (md5);
+
+
+--
+-- Name: index_post_replacements_on_media_asset_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_replacements_on_media_asset_id ON public.post_replacements USING btree (media_asset_id);
+
+
+--
+-- Name: index_post_replacements_on_old_md5; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_replacements_on_old_md5 ON public.post_replacements USING btree (old_md5);
+
+
+--
+-- Name: index_post_replacements_on_old_media_asset_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_replacements_on_old_media_asset_id ON public.post_replacements USING btree (old_media_asset_id);
+
+
+--
 -- Name: index_post_replacements_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6046,6 +6076,14 @@ ALTER TABLE ONLY public.comments
 
 
 --
+-- Name: post_replacements fk_rails_317818fc2f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.post_replacements
+    ADD CONSTRAINT fk_rails_317818fc2f FOREIGN KEY (media_asset_id) REFERENCES public.media_assets(id);
+
+
+--
 -- Name: api_keys fk_rails_32c28d0dc2; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6163,6 +6201,14 @@ ALTER TABLE ONLY public.post_approvals
 
 ALTER TABLE ONLY public.news_updates
     ADD CONSTRAINT fk_rails_502e0a41d1 FOREIGN KEY (updater_id) REFERENCES public.users(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: post_replacements fk_rails_5077102432; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.post_replacements
+    ADD CONSTRAINT fk_rails_5077102432 FOREIGN KEY (old_media_asset_id) REFERENCES public.media_assets(id);
 
 
 --
@@ -6910,6 +6956,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221026084655'),
 ('20221026084656'),
 ('20221027000931'),
-('20221106062419');
+('20221106062419'),
+('20221109052923');
 
 
