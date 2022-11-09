@@ -9,12 +9,16 @@ module Source
       end
 
       def image_urls
-        if parsed_url.image_url?
+        if parsed_url.full_image_url.present?
+          [parsed_url.full_image_url]
+        elsif parsed_url.image_url?
           [url]
+        elsif video_data.present?
+          [video_data.dig("sources", "1080p", 0, "src")&.sub(".1080p.", ".")].compact
         else
           urls = []
 
-          urls += page&.css(".image img").to_a.map { |img| img["src"] }
+          urls += page&.css(".image img").to_a.pluck("src")
           urls += page&.css("#author_comments img[data-user-image='1']").to_a.map { |img| img["data-smartload-src"] || img["src"] }
 
           urls.compact
@@ -22,24 +26,12 @@ module Source
       end
 
       def page_url
-        return nil if illust_title.blank? || user_name.blank?
-
-        "https://www.newgrounds.com/art/view/#{user_name}/#{illust_title}"
+        parsed_url.page_url || parsed_referer&.page_url
       end
-
-      def page
-        return nil if page_url.blank?
-
-        response = http.cookies(vmkIdu5l8m: Danbooru.config.newgrounds_session_cookie).cache(1.minute).get(page_url)
-        return nil if response.status == 404
-
-        response.parse
-      end
-      memoize :page
 
       def tags
         page&.css("#sidestats .tags a").to_a.map do |tag|
-          [tag.text, "https://www.newgrounds.com/search/conduct/art?match=tags&tags=" + tag.text]
+          [tag.text, "https://www.newgrounds.com/search/conduct/art?match=tags&tags=#{tag.text}"]
         end
       end
 
@@ -83,6 +75,38 @@ module Source
       def illust_title
         parsed_url.work_title || parsed_referer&.work_title
       end
+
+      def video_id
+        parsed_url.video_id || parsed_referer&.video_id
+      end
+
+      def http
+        super.cookies(vmkIdu5l8m: Danbooru.config.newgrounds_session_cookie)
+      end
+
+      def page
+        return nil if page_url.blank?
+
+        response = http.cache(1.minute).get(page_url)
+        return nil if response.status == 404
+
+        response.parse
+      end
+
+      def video_data
+        # flash files return {"error"=>{"code"=>404, "msg"=>"The submission you are looking for does not have a video."}}
+
+        return {} unless video_id.present?
+
+        response = http.headers("X-Requested-With": "XMLHttpRequest").cache(1.minute).get("https://www.newgrounds.com/portal/video/#{video_id}")
+        return {} unless response.status == 200
+
+        JSON.parse(response).with_indifferent_access
+      rescue JSON::ParserError
+        {}
+      end
+
+      memoize :page, :video_data
     end
   end
 end

@@ -34,6 +34,26 @@ module Sources
       )
     end
 
+    context "A newgrounds video post" do
+      strategy_should_work(
+        "https://www.newgrounds.com/portal/view/536659",
+        image_urls: [%r{https://uploads\.ungrounded\.net/alternate/167000/167280_alternate_602\.mp4}],
+        profile_url: "https://jenjamik.newgrounds.com",
+        artist_name: "jenjamik",
+        page_url: "https://www.newgrounds.com/portal/view/536659",
+        artist_commentary_title: "Link's Barrel Beat",
+        dtext_artist_commentary_desc: /Long time no see!/
+      )
+    end
+
+    context "A newgrounds direct video url" do
+      strategy_should_work(
+        "https://uploads.ungrounded.net/alternate/1801000/1801343_alternate_165104.360p.mp4?1639666238",
+        image_urls: ["https://uploads.ungrounded.net/alternate/1801000/1801343_alternate_165104.mp4"],
+        download_size: 75_605_846
+      )
+    end
+
     context "A multi-image post" do
       strategy_should_work(
         "https://www.newgrounds.com/art/view/natthelich/weaver",
@@ -75,6 +95,7 @@ module Sources
       assert(Source::URL.image_url?("https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg"))
       assert(Source::URL.image_url?("https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg"))
       assert(Source::URL.image_url?("https://art.ngfiles.com/thumbnails/1254000/1254985.png?f1588263349"))
+      assert(Source::URL.image_url?("https://uploads.ungrounded.net/alternate/1801000/1801343_alternate_165104.mp4?1639666238"))
 
       assert(Source::URL.page_url?("https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat"))
       assert(Source::URL.page_url?("https://www.newgrounds.com/portal/view/830293"))
