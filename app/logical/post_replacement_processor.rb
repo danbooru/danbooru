@@ -36,6 +36,7 @@ class PostReplacementProcessor
     replacement.image_height = media_asset.image_height
     replacement.image_width = media_asset.image_width
     replacement.md5 = media_asset.md5
+    replacement.media_asset = media_asset
 
     post.lock!
     post.md5 = media_asset.md5

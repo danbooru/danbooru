@@ -3,6 +3,8 @@
 class PostReplacement < ApplicationRecord
   belongs_to :post
   belongs_to :creator, class_name: "User"
+  belongs_to :media_asset, optional: true
+  belongs_to :old_media_asset, optional: true, class_name: "MediaAsset"
 
   before_validation :initialize_fields, on: :create
   before_create :process!
@@ -17,6 +19,7 @@ class PostReplacement < ApplicationRecord
     self.old_image_width = post.image_width
     self.old_image_height = post.image_height
     self.old_md5 = post.md5
+    self.old_media_asset = post.media_asset
   end
 
   concerning :Search do
