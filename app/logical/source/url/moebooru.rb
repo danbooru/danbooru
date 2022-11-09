@@ -19,6 +19,17 @@ class Source::URL::Moebooru < Source::URL
     # https://konachan.com/data/preview/5d/63/5d633771614e4bf5c17df19a0f0f333f.jpg
     in _, "data", "preview", *subdirs, /^(\h{32})\.jpg$/
       @md5 = $1
+      @image_url = true
+
+    # https://yande.re/post/show?md5=2c95b8975b73744da2bcbed9619c1d59
+    # https://konachan.com/post/show?md5=955aa45f3b452b415509b47dcc9475ac
+    in _, "post", "show" if params[:md5].present?
+      @md5 = params[:md5]
+
+    # https://yande.re/post?tags=md5:2c95b8975b73744da2bcbed9619c1d59
+    # https://konachan.com/post?tags=md5:955aa45f3b452b415509b47dcc9475ac
+    in _, "post" if params[:tags].to_s.match?(/\Amd5:\h{32}\z/i)
+      @md5 = params[:tags][/\Amd5:(\h{32})\z/i, 1]
 
     # https://yande.re/sample/ceb6a12e87945413a95b90fada406f91/.jpg
     # https://files.yande.re/sample/0d79447ce2c89138146f64ba93633568/yande.re%20290757%20sample%20seifuku%20thighhighs%20tsukudani_norio.jpg
@@ -38,6 +49,7 @@ class Source::URL::Moebooru < Source::URL
       @md5 = md5
       @work_id = work_id_from_filename
       @original_file_ext = file_ext_for(sample_type)
+      @image_url = true
 
     # https://yande.re/jpeg/22577d2344fe694cf47f80563031b3cd.jpg
     # https://files.yande.re/image/22577d2344fe694cf47f80563031b3cd.png
@@ -45,6 +57,7 @@ class Source::URL::Moebooru < Source::URL
     in _, ("sample" | "jpeg" | "image") => sample_type, /^(\h{32})\.\w+$/
       @md5 = $1
       @original_file_ext = file_ext_for(sample_type)
+      @image_url = true
 
     else
       nil
@@ -88,7 +101,7 @@ class Source::URL::Moebooru < Source::URL
   end
 
   def image_url?
-    md5.present?
+    @image_url.present?
   end
 
   def page_url
