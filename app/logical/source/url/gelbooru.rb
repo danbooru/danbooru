@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-# This covers both Gelbooru and Safebooru.
+# This covers all Gelbooru-based sites.
 class Source::URL::Gelbooru < Source::URL
   attr_reader :post_id, :md5, :image_type, :full_image_url
 
   def self.match?(url)
-    url.domain.in?(%w[safebooru.org gelbooru.com])
+    url.domain.in?(%w[gelbooru.com safebooru.org tbib.org])
   end
 
   def parse
@@ -14,16 +14,19 @@ class Source::URL::Gelbooru < Source::URL
     # https://gelbooru.com/index.php?page=post&s=view&id=7798045
     # https://www.gelbooru.com/index.php?page=post&s=view&id=7798045
     # https://safebooru.org/index.php?page=post&s=view&id=4196948
+    # https://tbib.org/index.php?page=post&s=view&id=11509934
     in _, "index.php" if params[:page] == "post" && params[:s] == "view" && params[:id].present?
       @post_id = params[:id].to_i
 
     # https://gelbooru.com/index.php?page=post&s=list&md5=99d9977d6c3aa185083a2da22bd8acfb
     # https://safebooru.org/index.php?page=post&s=list&md5=99d9977d6c3aa185083a2da22bd8acfb
+    # https://tbib.org/index.php?page=post&s=list&md5=99d9977d6c3aa185083a2da22bd8acfb
     in _, "index.php" if params[:page] == "post" && params[:s] == "list" && params[:md5].present?
       @md5 = params[:md5]
 
     # https://gelbooru.com/index.php?page=dapi&s=post&q=index&id=7798045&json=1
     # https://safebooru.org/index.php?page=dapi&s=post&q=index&id=4196948&json=1
+    # https://tbib.org/index.php?page=dapi&s=post&q=index&id=11387341&json=1
     in _, "index.php" if params[:page] == "dapi" && params[:q] == "index" && params[:id].present?
       @post_id = params[:id].to_i
 
@@ -48,11 +51,15 @@ class Source::URL::Gelbooru < Source::URL
       @image_type = image_type
       @full_image_url = url.to_s if image_type == "images"
 
-    # Safebooru uses an unknown 40-byte hash for most image URLs.
+    # Safebooru and TBIB use an unknown 40-byte hash for most image URLs.
     # https://safebooru.org//images/4016/d2f50befcdc304cbd9030f2d0832029f5fe8cccc.png
     # https://safebooru.org//samples/4016/sample_ffc6c5705d31422ddbaa7478deb560c985d2ee71.jpg?4196970
     # https://safebooru.org/thumbnails/4016/thumbnail_8d0664867c59acb3103bccd9a9a5562a193eadcd.jpg?4196980
-    in "safebooru.org", ("images" | "samples" | "thumbnails") => image_type, /\A\d+\z/ => directory, /\A(?:sample_|thumbnail_)?(\h{40})\.\w+\z/
+    #
+    # https://tbib.org//images/10754/afadcf830778bd1c9bf94899ace2c889d6bf2903.png
+    # https://tbib.org//samples/10754/sample_afadcf830778bd1c9bf94899ace2c889d6bf2903.jpg?11509246
+    # https://tbib.org/thumbnails/10754/thumbnail_afadcf830778bd1c9bf94899ace2c889d6bf2903.jpg?11509246
+    in ("safebooru.org" | "tbib.org"), ("images" | "samples" | "thumbnails") => image_type, /\A\d+\z/ => directory, /\A(?:sample_|thumbnail_)?(\h{40})\.\w+\z/
       @hash = $1
       @post_id = query if query&.match?(/\A\d+\z/)
       @image_type = image_type
@@ -78,11 +85,13 @@ class Source::URL::Gelbooru < Source::URL
   def api_url
     # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=id:7903922
     # https://safebooru.org/index.php?page=dapi&s=post&q=index&tags=id:4197087
+    # https://tbib.org/index.php?page=dapi&s=post&q=index&tags=id:11509246
     if post_id.present?
       # "https://#{domain}/index.php?page=dapi&s=post&q=index&id=#{post_id}&json=1"
       "https://#{domain}/index.php?page=dapi&s=post&q=index&tags=id:#{post_id}"
     # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=md5:338078144fe77c9e5f35dbb585e749ec
     # https://safebooru.org/index.php?page=dapi&s=post&q=index&tags=md5:8c1fe66ff46d03725caa30135ad70e7e
+    # https://tbib.org/index.php?page=dapi&s=post&q=index&tags=md5:8c1fe66ff46d03725caa30135ad70e7e
     elsif md5.present?
       "https://#{domain}/index.php?page=dapi&s=post&q=index&tags=md5:#{md5}"
     end
