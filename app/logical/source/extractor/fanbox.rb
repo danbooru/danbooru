@@ -12,17 +12,29 @@ module Source
         if parsed_url.image_url?
           [parsed_url.full_image_url]
         elsif api_response.present?
-          # There's two ways pics are returned via api:
-          # Pics in proper array: https://yanmi0308.fanbox.cc/posts/1141325
-          # Embedded pics (imageMap): https://www.fanbox.cc/@tsukiori/posts/1080657
-          images = api_response.dig("body", "images").to_a + api_response.dig("body", "imageMap").to_a.map { |id| id[1] }
-          # The following is needed because imageMap is sorted alphabetically rather than by image order
-          sort_order = api_response.dig("body", "blocks").to_a.map { |b| b["imageId"] if b["type"] == "image" }.compact.uniq
-          images = images.sort_by { |img| sort_order.index(img["id"]) } if sort_order.present?
-          images.pluck("originalUrl")
+          file_list
         else
           []
         end
+      end
+
+      def file_list
+        # There's two ways files or images are returned via api:
+        # https://yanmi0308.fanbox.cc/posts/1141325 (Array) vs https://www.fanbox.cc/@tsukiori/posts/1080657 (embedded)
+        # Same goes for videos and files: https://naochi.fanbox.cc/posts/4657540 (Array) vs https://gomeifuku.fanbox.cc/posts/3975317 (embedded)
+
+        return [] unless api_response.present?
+        files = api_response.dig("body", "files").to_a
+        files += api_response.dig("body", "images").to_a
+
+        sortable_files = api_response.dig("body", "fileMap").to_a.pluck(1)
+        sortable_files += api_response.dig("body", "imageMap").to_a.pluck(1)
+
+        # The following is needed because imageMap/fileMap are sorted alphabetically rather than by image order
+        sort_order = api_response.dig("body", "blocks").to_a.map { |b| b["#{b["type"]}Id"] }.compact.uniq
+        sortable_files = sortable_files.sort_by { |f| sort_order.index(f["id"] || f["imageId"]) } if sort_order.present?
+
+        (files + sortable_files).map { |file| file["originalUrl"] || file["url"] }.reject { |file| File.extname(file) == ".zip" } # XXX remove if we ever add a way to extract zip files from sources
       end
 
       def page_url
