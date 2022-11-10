@@ -34,7 +34,7 @@ class UserDeletion
       rename
       reset_password
       async_delete_user
-      ModAction.log("deleted user ##{user.id}", :user_delete, subject: user, user: deleter)
+      ModAction.log("deleted user ##{user.id}", :user_delete, subject: user, user: deleter) if user != deleter
       UserEvent.create_from_request!(user, :user_deletion, request) if request.present?
       SessionLoader.new(request).logout(user) if user == deleter
     end

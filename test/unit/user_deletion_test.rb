@@ -84,13 +84,10 @@ class UserDeletionTest < ActiveSupport::TestCase
       assert_equal(false, @user.authenticate_password("password"))
     end
 
-    should "generate a modaction" do
+    should "not generate a modaction" do
       @deletion.delete!
 
-      assert_match(/deleted user ##{@user.id}/, ModAction.last.description)
-      assert_equal(@user, ModAction.last.subject)
-      assert_equal("user_delete", ModAction.last.category)
-      assert_equal(@deletion.deleter, ModAction.last.creator)
+      assert_equal(0, ModAction.user_delete.count)
     end
 
     should "remove the user's favorites if they have private favorites" do
