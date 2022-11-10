@@ -60,6 +60,7 @@ module Source
       Source::URL::Anifty,
       Source::URL::Furaffinity,
       Source::URL::Bilibili,
+      Source::URL::Rule34DotUs,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
