@@ -5,7 +5,7 @@ class Source::URL::Gelbooru < Source::URL
   attr_reader :post_id, :md5, :image_type, :full_image_url
 
   def self.match?(url)
-    url.domain.in?(%w[gelbooru.com safebooru.org tbib.org])
+    url.domain.in?(%w[gelbooru.com safebooru.org tbib.org rule34.xxx])
   end
 
   def parse
@@ -15,18 +15,21 @@ class Source::URL::Gelbooru < Source::URL
     # https://www.gelbooru.com/index.php?page=post&s=view&id=7798045
     # https://safebooru.org/index.php?page=post&s=view&id=4196948
     # https://tbib.org/index.php?page=post&s=view&id=11509934
+    # https://rule34.xxx/index.php?page=post&s=view&id=6961597
     in _, "index.php" if params[:page] == "post" && params[:s] == "view" && params[:id].present?
       @post_id = params[:id].to_i
 
     # https://gelbooru.com/index.php?page=post&s=list&md5=99d9977d6c3aa185083a2da22bd8acfb
     # https://safebooru.org/index.php?page=post&s=list&md5=99d9977d6c3aa185083a2da22bd8acfb
     # https://tbib.org/index.php?page=post&s=list&md5=99d9977d6c3aa185083a2da22bd8acfb
+    # https://rule34.xxx/index.php?page=post&s=list&md5=0a8fff70045826d2b39fcde4eed17584
     in _, "index.php" if params[:page] == "post" && params[:s] == "list" && params[:md5].present?
       @md5 = params[:md5]
 
     # https://gelbooru.com/index.php?page=dapi&s=post&q=index&id=7798045&json=1
     # https://safebooru.org/index.php?page=dapi&s=post&q=index&id=4196948&json=1
     # https://tbib.org/index.php?page=dapi&s=post&q=index&id=11387341&json=1
+    # https://rule34.xxx/index.php?page=dapi&s=post&q=index&id=6961597&json=1
     in _, "index.php" if params[:page] == "dapi" && params[:q] == "index" && params[:id].present?
       @post_id = params[:id].to_i
 
@@ -45,6 +48,8 @@ class Source::URL::Gelbooru < Source::URL
     # https://safebooru.org//images/4016/64779fbfc87020ed5fd94854fe973bc0.jpeg
     # https://safebooru.org//samples/4016/sample_64779fbfc87020ed5fd94854fe973bc0.jpg?4196692
     # https://safebooru.org/thumbnails/4016/thumbnail_64779fbfc87020ed5fd94854fe973bc0.jpg?4196692
+    # https://us.rule34.xxx//images/6120/0a8fff70045826d2b39fcde4eed17584.jpeg?6961597
+    # https://us.rule34.xxx/thumbnails/6120/thumbnail_0a8fff70045826d2b39fcde4eed17584.jpg?6961597
     in _, ("images" | "samples" | "thumbnails") => image_type, /\A\d+\z/ => directory, /\A(?:sample_|thumbnail_)?(\h{32})\.\w+\z/
       @md5 = $1
       @post_id = query if query&.match?(/\A\d+\z/)
@@ -86,12 +91,14 @@ class Source::URL::Gelbooru < Source::URL
     # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=id:7903922
     # https://safebooru.org/index.php?page=dapi&s=post&q=index&tags=id:4197087
     # https://tbib.org/index.php?page=dapi&s=post&q=index&tags=id:11509246
+    # https://api.rule34.xxx/index.php?page=post&s=view&id=6961597
     if post_id.present?
       # "https://#{domain}/index.php?page=dapi&s=post&q=index&id=#{post_id}&json=1"
       "https://#{domain}/index.php?page=dapi&s=post&q=index&tags=id:#{post_id}"
     # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=md5:338078144fe77c9e5f35dbb585e749ec
     # https://safebooru.org/index.php?page=dapi&s=post&q=index&tags=md5:8c1fe66ff46d03725caa30135ad70e7e
     # https://tbib.org/index.php?page=dapi&s=post&q=index&tags=md5:8c1fe66ff46d03725caa30135ad70e7e
+    # https://api.rule34.xxx//index.php?page=dapi&s=post&q=index&tags=md5:0a8fff70045826d2b39fcde4eed17584
     elsif md5.present?
       "https://#{domain}/index.php?page=dapi&s=post&q=index&tags=md5:#{md5}"
     end

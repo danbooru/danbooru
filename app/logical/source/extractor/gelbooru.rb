@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
-# Source extractor for Gelbooru and Safebooru.org. The commentary and artist information are pulled from the
-# booru post's source, while the translated tags include both the booru tags and the source's tags.
+# Source extractor for Gelbooru-based sites, including Gelbooru, Safebooru.org, TBIB.org, and Rule34.xxx. The commentary
+# and artist information are pulled from the booru post's source, while the translated tags include both the booru tags
+# and the source's tags.
 #
 # @see Source::URL::Gelbooru
 # @see https://gelbooru.com/index.php?page=wiki&s=view&id=18780 (howto:api)
 # @see https://safebooru.org/index.php?page=help&topic=dapi
+# @see https://tbib.org/
+# @see https://rule34.xxx/index.php?page=help&topic=dapi
 module Source
   class Extractor
     class Gelbooru < Source::Extractor
