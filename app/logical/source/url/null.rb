@@ -15,6 +15,8 @@ class Source::URL::Null < Source::URL
       "Ask.fm"
     in _, ("bcy.net" | "bcyimg.com")
       "BCY"
+    in _, "carrd.co"
+      "Carrd"
     in _, "circle.ms"
       "Circle.ms"
     in _, ("dlsite.com" | "dlsite.net" | "dlsite.jp")
@@ -33,12 +35,14 @@ class Source::URL::Null < Source::URL
       "E-Hentai"
     in _, ("facebook.com" | "fbcdn.net")
       "Facebook"
-    in _, "linktre.ee"
+    in _, "linktr.ee"
       "Linktree"
     in _, "lit.link"
       "Lit.link"
     in _, "kemono.party"
       "Kemono Party"
+    in _, "ko-fi.com"
+      "Ko-fi"
     in _, ("mastodon.cloud" | "mstdn.jp")
       "Mastodon"
     in _, "mixi.jp"
