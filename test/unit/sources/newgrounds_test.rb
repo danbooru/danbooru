@@ -82,8 +82,18 @@ module Sources
       strategy_should_work(
         "https://www.newgrounds.com/art/view/natthelich/nopicture",
         deleted: true,
+        image_urls: [],
         profile_url: "https://natthelich.newgrounds.com",
         artist_name: "natthelich"
+      )
+    end
+
+    context "A deleted or non-existing video" do
+      strategy_should_work(
+        "https://www.newgrounds.com/portal/view/802594",
+        deleted: true,
+        image_urls: [],
+        profile_url: nil
       )
     end
 

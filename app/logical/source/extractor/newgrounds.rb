@@ -15,7 +15,7 @@ module Source
           [url]
         elsif video_data.present?
           sample = video_data&.[]("sources")&.max_by { |k, _v| k.gsub(/p$/, "").to_i }&.dig(1, 0, "src")
-          final = [Source::URL.parse(sample).full_image_url, sample].find { |u| http_exists?(u) }
+          final = [Source::URL.parse(sample)&.full_image_url, sample].compact.find { |u| http_exists?(u) }
           [final].compact
         else
           urls = []
