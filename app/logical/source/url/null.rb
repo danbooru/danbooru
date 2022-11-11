@@ -8,29 +8,69 @@ class Source::URL::Null < Source::URL
   end
 
   def site_name
-    case host
-    when /ask\.fm\z/i
+    case [subdomain, domain]
+    in _, "4cdn.org"
+      "4chan"
+    in _, "ask.fm"
       "Ask.fm"
-    when /bcy\.net\z/i
+    in _, ("bcy.net" | "bcyimg.com")
       "BCY"
-    when /carrd\.co\z/i
-      "Carrd"
-    when /circle\.ms\z/i
+    in _, "circle.ms"
       "Circle.ms"
-    when /dlsite\.(com|net)\z/i
+    in _, ("dlsite.com" | "dlsite.net" | "dlsite.jp")
       "DLSite"
-    when /doujinshi\.org\z/i, /doujinshi\.mugimugi\.org\z/i
+    in _, "donmai.us"
+      "Danbooru" # hey, that's us!
+    in _, ("discordapp.com" | "discordapp.net")
+      "Discord"
+    in _, "doujinshi.org"
       "Doujinshi.org"
-    when /ko-fi\.com\z/i
-      "Ko-fi"
-    when /lit\.link\z/i
+    in "doujinshi", "mugimugi.org"
+      "Doujinshi.org"
+    in _, "cloudfront.net" if host == "dxthpu4318olx.cloudfront.net"
+      "Drawcrowd"
+    in _, ("e-hentai.org" | "exhentai.org" | "hath.network")
+      "E-Hentai"
+    in _, ("facebook.com" | "fbcdn.net")
+      "Facebook"
+    in _, "linktre.ee"
+      "Linktree"
+    in _, "lit.link"
       "Lit.link"
-    when /mixi\.jp\z/i
+    in _, "kemono.party"
+      "Kemono Party"
+    in _, ("mastodon.cloud" | "mstdn.jp")
+      "Mastodon"
+    in _, "mixi.jp"
       "Mixi.jp"
-    when /piapro\.jp\z/i
+    in _, "ocn.ne.jp"
+      "OCN"
+    in _, ("overdoll.com" | "dollycdn.net")
+      "Overdoll"
+    in _, ("patreon.com" | "patreonusercontent.com")
+      "Patreon"
+    in _, "piapro.jp"
       "Piapro.jp"
-    when /sakura\.ne\.jp\z/i
+    in _, ("pinterest.com" | "pinimg.com")
+      "Pinterest"
+    in _, ("joyreactor.cc" | "reactor.cc")
+      "Joyreactor"
+    in _, "rule34.us"
+      "Rule34.us"
+    in _, "sakura.ne.jp"
       "Sakura.ne.jp"
+    in _, "sankakucomplex.com"
+      "Sankaku Complex"
+    in _, "steamstatic.com"
+      "Steam"
+    in _, "the-interviews.jp"
+      "The Interviews"
+    in _, ("weebly.com" | "weeblysite.com")
+      "Weebly"
+    in _, ("wix.com" | "wixsite.com" | "wixstatic.com")
+      "Wix"
+    in _, "youtu.be"
+      "Youtube"
     else
       # "www.melonbooks.co.jp" => "Melonbooks"
       parsed_domain.sld.titleize

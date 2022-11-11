@@ -1,6 +1,21 @@
 # frozen_string_literal: true
 
 module IconHelper
+  # Names of sites we have a icon for. The logo for e.g. Pixiv is at public/images/pixiv-logo.png.
+  #
+  # To add a new site, add the site name here, add the logo in public/images, and update app/logical/source/url/null.rb
+  # if the site name is irregular.
+  SITE_ICON_NAMES = %w[
+    4chan Amazon Ameblo Anifty ArtStation Ask.fm BCY Biglobe Bilibili Booth Carrd Catbox Circle.ms Coconala Danbooru
+    Deviant\ Art Discord DLSite Doujinshi.org Drawcrowd E-Hentai Enty Erogamescape Facebook Fantia FC2 Fiverr Foundation
+    Furaffinity Geocities Gelbooru Google Gumroad Hentai\ Foundry Hitomi Imgur Infoseek Inprnt Instagram Joyreactor
+    Ko-fi Konachan Linktree Lit.link Livedoor Luscious Lofter Kemono\ Party Mangaupdates Marshmallow\ Qa Mastodon Mblg
+    Mega Melonbooks Mihuashi Mihoyo Mixi.jp Monappy Naver Newgrounds Nico\ Seiga Nijie OCN Overdoll Patreon Pawoo Photozou
+    Piapro.jp Picarto Pinterest Pixiv Fanbox Pixiv\ Sketch Plurk Poipiku Privatter Profcard Redbubble Reddit Rule34.us
+    Sakura.ne.jp Sankaku\ Complex Steam Stickam Skeb Skima The\ Interviews Tiktok Tinami Tumblr Twitter Toranoana Twipple
+    Twitch Twitcasting TwitPic Twpf Ustream Vk Webmshare Weebly Weibo Wikipedia Wix Yande.re Yfrog Youtube Wix Zerochan
+  ]
+
   def icon_tag(icon_class, class: nil, **options)
     klass = binding.local_variable_get(:class)
     tag.i(class: "icon #{icon_class} #{klass}", **options)
@@ -211,173 +226,8 @@ module IconHelper
   end
 
   def external_site_icon(site_name, **options)
-    case site_name
-    when "Amazon"
-      image_icon_tag("amazon-logo.png", **options)
-    when "Ameblo"
-      image_icon_tag("ameblo-logo.png", **options)
-    when "Anifty"
-      image_icon_tag("anifty-logo.png", **options)
-    when "ArtStation"
-      image_icon_tag("artstation-logo.png", **options)
-    when "Ask.fm"
-      image_icon_tag("ask-fm-logo.png", **options)
-    when "BCY"
-      image_icon_tag("bcy-logo.png", **options)
-    when "Biglobe"
-      image_icon_tag("biglobe-logo.png", **options)
-    when "Bilibili"
-      image_icon_tag("bilibili-logo.png", **options)
-    when "Booth"
-      image_icon_tag("booth-pm-logo.png", **options)
-    when "Carrd"
-      image_icon_tag("carrd-logo.png", **options)
-    when "Circle.ms"
-      image_icon_tag("circle-ms-logo.png", **options)
-    when "Coconala"
-      image_icon_tag("coconala-logo.png", **options)
-    when "Deviant Art"
-      image_icon_tag("deviantart-logo.png", **options)
-    when "DLSite"
-      image_icon_tag("dlsite-logo.png", **options)
-    when "Doujinshi.org"
-      image_icon_tag("doujinshi-org-logo.png", **options)
-    when "Erogamescape"
-      image_icon_tag("erogamescape-logo.png", **options)
-    when "Facebook"
-      image_icon_tag("facebook-logo.png", **options)
-    when "Fantia"
-      image_icon_tag("fantia-logo.png", **options)
-    when "FC2"
-      image_icon_tag("fc2-logo.png", **options)
-    when "Fiverr"
-      image_icon_tag("fiverr-logo.png", **options)
-    when "Foundation"
-      image_icon_tag("foundation-logo.png", **options)
-    when "Furaffinity"
-      image_icon_tag("furaffinity-logo.png", **options)
-    when "Geocities"
-      image_icon_tag("geocities-logo.png", **options)
-    when "Google"
-      image_icon_tag("google-logo.png", **options)
-    when "Gumroad"
-      image_icon_tag("gumroad-logo.png", **options)
-    when "Hentai Foundry"
-      image_icon_tag("hentai-foundry-logo.png", **options)
-    when "Infoseek"
-      image_icon_tag("infoseek-logo.png", **options)
-    when "Inprnt"
-      image_icon_tag("inprnt-logo.png", **options)
-    when "Instagram"
-      image_icon_tag("instagram-logo.png", **options)
-    when "Ko-fi"
-      image_icon_tag("ko-fi-logo.png", **options)
-    when "Linktr" # https://linktr.ee
-      image_icon_tag("linktree-logo.png", **options)
-    when "Lit.link"
-      image_icon_tag("lit-link-logo.png", **options)
-    when "Livedoor"
-      image_icon_tag("livedoor-logo.png", **options)
-    when "Lofter"
-      image_icon_tag("lofter-logo.png", **options)
-    when "Mangaupdates"
-      image_icon_tag("mangaupdates-logo.png", **options)
-    when "Marshmallow Qa"
-      image_icon_tag("marshmallow-qa-logo.png", **options)
-    when "Mastodon", "Mstdn" # https://mastodon.cloud, https://mstdn.jp
-      image_icon_tag("mastodon-logo.png", **options)
-    when "Mblg"
-      image_icon_tag("mblg-tv-logo.png", **options)
-    when "Melonbooks"
-      image_icon_tag("melonbooks-logo.png", **options)
-    when "Mihuashi"
-      image_icon_tag("mihuashi-logo.png", **options)
-    when "Mixi.jp"
-      image_icon_tag("mixi-jp-logo.png", **options)
-    when "Naver"
-      image_icon_tag("naver-logo.png", **options)
-    when "Newgrounds"
-      image_icon_tag("newgrounds-logo.png", **options)
-    when "Nico Seiga"
-      image_icon_tag("nicoseiga-logo.png", **options)
-    when "Nijie"
-      image_icon_tag("nijie-logo.png", **options)
-    when "Ocn"
-      image_icon_tag("ocn-ne-jp-logo.png", **options)
-    when "Patreon"
-      image_icon_tag("patreon-logo.png", **options)
-    when "Pawoo"
-      image_icon_tag("pawoo-logo.png", **options)
-    when "Photozou"
-      image_icon_tag("photozou-logo.png", **options)
-    when "Piapro.jp"
-      image_icon_tag("piapro-jp-logo.png", **options)
-    when "Picarto"
-      image_icon_tag("picarto-logo.png", **options)
-    when "Pixiv"
-      image_icon_tag("pixiv-logo.png", **options)
-    when "Fanbox"
-      image_icon_tag("pixiv-fanbox-logo.png", **options)
-    when "Pixiv Sketch"
-      image_icon_tag("pixiv-sketch-logo.png", **options)
-    when "Plurk"
-      image_icon_tag("plurk-logo.png", **options)
-    when "Poipiku"
-      image_icon_tag("poipiku-logo.png", **options)
-    when "Privatter"
-      image_icon_tag("privatter-logo.png", **options)
-    when "Profcard"
-      image_icon_tag("profcard-logo.png", **options)
-    when "Redbubble"
-      image_icon_tag("redbubble-logo.png", **options)
-    when "Reddit"
-      image_icon_tag("reddit-logo.png", **options)
-    when "Sakura.ne.jp"
-      image_icon_tag("sakura-ne-jp-logo.png", **options)
-    when "Stickam"
-      image_icon_tag("stickam-logo.png", **options)
-    when "Skeb"
-      image_icon_tag("skeb-logo.png", **options)
-    when "Skima"
-      image_icon_tag("skima-logo.png", **options)
-    when "Theinterviews"
-      image_icon_tag("the-interviews-logo.png", **options)
-    when "Tiktok"
-      image_icon_tag("tiktok-logo.png", **options)
-    when "Tinami"
-      image_icon_tag("tinami-logo.png", **options)
-    when "Tumblr"
-      image_icon_tag("tumblr-logo.png", **options)
-    when "Twitter"
-      image_icon_tag("twitter-logo.png", **options)
-    when "Toranoana"
-      image_icon_tag("toranoana-logo.png", **options)
-    when "Twipple"
-      image_icon_tag("twipple-logo.png", **options)
-    when "Twitch"
-      image_icon_tag("twitch-logo.png", **options)
-    when "Twitcasting"
-      image_icon_tag("twitcasting-logo.png", **options)
-    when "TwitPic"
-      image_icon_tag("twitpic-logo.png", **options)
-    when "Twpf"
-      image_icon_tag("twpf-logo.png", **options)
-    when "Ustream"
-      image_icon_tag("ustream-logo.png", **options)
-    when "Vk"
-      image_icon_tag("vk-logo.png", **options)
-    when "Weebly", "Weeblysite"
-      image_icon_tag("weebly-logo.png", **options)
-    when "Weibo"
-      image_icon_tag("weibo-logo.png", **options)
-    when "Wikipedia"
-      image_icon_tag("wikipedia-logo.png", **options)
-    when "Wixsite"
-      image_icon_tag("wixsite-logo.png", **options)
-    when "Yfrog"
-      image_icon_tag("yfrog-logo.png", **options)
-    when "Youtube"
-      image_icon_tag("youtube-logo.png", **options)
+    if site_name.in?(SITE_ICON_NAMES)
+      image_icon_tag("#{site_name.downcase.tr(" ", "-")}-logo.png", **options)
     else
       globe_icon(**options)
     end
