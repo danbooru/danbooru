@@ -37,12 +37,26 @@ module Sources
     context "A newgrounds video post" do
       strategy_should_work(
         "https://www.newgrounds.com/portal/view/536659",
-        image_urls: [%r{https://uploads\.ungrounded\.net/alternate/167000/167280_alternate_602\.mp4}],
+        image_urls: ["https://uploads.ungrounded.net/alternate/167000/167280_alternate_602.mp4"],
         profile_url: "https://jenjamik.newgrounds.com",
         artist_name: "jenjamik",
         page_url: "https://www.newgrounds.com/portal/view/536659",
         artist_commentary_title: "Link's Barrel Beat",
         dtext_artist_commentary_desc: /Long time no see!/
+      )
+    end
+
+    context "A newgrounds video post with no 1080p version" do
+      strategy_should_work(
+        "https://www.newgrounds.com/portal/view/758590",
+        image_urls: ["https://uploads.ungrounded.net/alternate/1483000/1483159_alternate_102560.mp4"]
+      )
+    end
+
+    context "A newgrounds video post where all images have the resolution in their url" do
+      strategy_should_work(
+        "https://www.newgrounds.com/portal/view/734778",
+        image_urls: ["https://uploads.ungrounded.net/alternate/1352000/1352451_alternate_80350.1080p.mp4?1563167480"]
       )
     end
 
