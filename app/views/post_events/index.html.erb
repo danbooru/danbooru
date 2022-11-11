@@ -49,16 +49,50 @@
             <% end %>
           </div>
         <% when "PostReplacement" %>
-          <% if model.old_file_size && model.old_file_ext && model.old_image_width && model.old_image_height && model.file_size && model.file_ext && model.image_width && model.image_height %>
-            <%= link_to post.dtext_shortlink, post %> was replaced by <%= link_to_user creator %>
-            (<%= external_link_to model.original_url.presence || "none", Source::URL.site_name(model.original_url) || model.original_url %>,
-            <%= model.old_file_size.to_formatted_s(:human_size, precision: 4) %> .<%= model.old_file_ext %>, <%= model.old_image_width %>x<%= model.old_image_height %> ->
-            <%= external_link_to model.replacement_url, Source::URL.site_name(model.replacement_url) || model.replacement_url %>,
-            <%= model.file_size.to_formatted_s(:human_size, precision: 4) %> .<%= model.file_ext %>, <%= model.image_width %>x<%= model.image_height %>).
+          <%= link_to post.dtext_shortlink, post %> was replaced by <%= link_to_user creator %>:
+
+          <% if model.original_url.match?(%r{\Ahttps?://}) %>
+            <%= external_link_to(model.original_url, external_site_icon(Source::URL.site_name(model.original_url), title: model.original_url, class: "h-4")) %>
+          <% elsif model.original_url.present? %>
+            <%= tag.span(model.original_url.truncate(30, omission: "...#{model.original_url.last(15)}"), title: model.original_url) %>,
+          <% end %>
+
+          <% if model.old_media_asset.present? %>
+            <%= link_to model.old_media_asset do %><%#
+            %><%= model.old_media_asset.file_size.to_fs(:human_size, precision: 4) %>
+              .<%= model.old_media_asset.file_ext %>
+              (<%= model.old_media_asset.image_width %>x<%= model.old_media_asset.image_height %><%= ", " + duration_to_hhmmss(model.old_media_asset.duration) if model.old_media_asset.duration.present? %>)
+            <% end %>
+          <% elsif model.old_file_size && model.old_file_ext && model.old_image_width && model.old_image_height %>
+            <%= model.old_file_size.to_fs(:human_size, precision: 4) %>
+            .<%= model.old_file_ext %>
+            (<%= model.old_image_width %>x<%= model.old_image_height %>)
+          <% elsif model.old_md5.present? %>
+            <%= model.old_md5 %>
           <% else %>
-            <%= link_to post.dtext_shortlink, post %> was replaced by <%= link_to_user creator %>
-            (<%= external_link_to model.original_url.presence || "none", Source::URL.site_name(model.original_url) || model.original_url %> ->
-            <%= external_link_to model.replacement_url, Source::URL.site_name(model.replacement_url) || model.replacement_url %>).
+            <i>unknown file</i>
+          <% end %>
+          →
+          <% if model.replacement_url.match?(%r{\Ahttps?://}) %>
+            <%= external_link_to(model.replacement_url, external_site_icon(Source::URL.site_name(model.replacement_url), title: model.replacement_url, class: "h-4")) %>
+          <% elsif model.replacement_url.present? %>
+            <%= tag.span(model.replacement_url.truncate(30, omission: "...#{model.replacement_url.last(15)}"), title: model.replacement_url) %>,
+          <% end %>
+
+          <% if model.media_asset.present? %>
+            <%= link_to model.media_asset do %>
+              <%= model.media_asset.file_size.to_fs(:human_size, precision: 4) %>
+              .<%= model.media_asset.file_ext %>
+              (<%= model.media_asset.image_width %>x<%= model.media_asset.image_height %><%= ", " + duration_to_hhmmss(model.media_asset.duration) if model.media_asset.duration.present? %>)<%#
+          %><% end %>
+          <% elsif model.file_size && model.file_ext && model.image_width && model.image_height %>
+            <%= model.file_size.to_fs(:human_size, precision: 4) %>
+            .<%= model.file_ext %>
+            (<%= model.image_width %>x<%= model.image_height %>)
+          <% elsif model.md5.present? %>
+            <%= model.md5 %>
+          <% else %>
+            <i>unknown file</i>
           <% end %>
         <% when "ModAction" %>
           <% case model.category %>
