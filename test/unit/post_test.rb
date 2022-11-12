@@ -481,6 +481,9 @@ class PostTest < ActiveSupport::TestCase
           assert_invalid_tag("foo\abar")
           assert_invalid_tag("café")
           assert_invalid_tag("東方")
+          assert_invalid_tag("gen:char:foo")
+          assert_invalid_tag("general:newpool:a")
+          assert_invalid_tag("general:rating:g")
         end
 
         context "that already exists" do
@@ -603,6 +606,14 @@ class PostTest < ActiveSupport::TestCase
             assert_match(/Couldn't add tag: 'copy:blah' cannot begin with 'copy:'/, post.warnings[:base].join("\n"))
             assert_equal(["tagme"], post.tag_array)
             assert_equal(false, Tag.exists?(name: "copy:blah"))
+          end
+
+          should "not raise an exception for char:newpool:blah" do
+            post = create(:post, tag_string: "tagme char:newpool:blah")
+
+            assert_match(/Couldn't add tag: 'newpool:blah' cannot begin with 'newpool:'/, post.warnings[:base].join("\n"))
+            assert_equal(["tagme"], post.tag_array)
+            assert_equal(false, Tag.exists?(name: "newpool:blah"))
           end
         end
 

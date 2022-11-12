@@ -41,7 +41,7 @@ class TagNameValidator < ActiveModel::EachValidator
       record.errors.add(attribute, "'#{value}' must consist of only ASCII characters")
     when /\A(#{PostQueryBuilder::METATAGS.join("|")}):(.+)\z/i
       record.errors.add(attribute, "'#{value}' cannot begin with '#{$1}:'")
-    when /\A(#{Tag.categories.regexp}):(.+)\z/i
+    when /\A(#{PostEdit::METATAGS.join("|")}):(.+)\z/i
       record.errors.add(attribute, "'#{value}' cannot begin with '#{$1}:'")
     when "new", "search", "and", "or", "not"
       record.errors.add(attribute, "'#{value}' is a reserved name and cannot be used")
