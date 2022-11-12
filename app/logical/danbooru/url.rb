@@ -34,7 +34,7 @@ module Danbooru
     # @return [Addressable:URI] The parsed and normalized URL.
     attr_reader :url
 
-    delegate :domain, :host, :site, :path, :query, to: :url
+    delegate :domain, :host, :port, :site, :path, :query, :password, to: :url
 
     # Parse a string into a URL, or raise an exception if the string is not a valid HTTP or HTTPS URL.
     #
@@ -109,6 +109,11 @@ module Danbooru
     # @return [String, nil]
     def subdomain
       parsed_domain.trd
+    end
+
+    # @return [String, nil] The username in a `http://username:password@example.com` URL.
+    def http_user
+      url.user
     end
 
     # @return [PublicSuffix::Domain]

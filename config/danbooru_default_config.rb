@@ -578,16 +578,9 @@ module Danbooru
       "https://twitter.com/#{Danbooru.config.twitter_username}"
     end
 
-    def http_proxy_host
-    end
-
-    def http_proxy_port
-    end
-
-    def http_proxy_username
-    end
-
-    def http_proxy_password
+    # The proxy to use for outgoing HTTP requests.
+    def http_proxy
+      # "http://username:password@proxy.example.com:1080"
     end
 
     # The URL for the Reportbooru server (https://github.com/evazion/reportbooru).

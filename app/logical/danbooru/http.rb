@@ -131,11 +131,12 @@ module Danbooru
       use(cache: { expires_in: expires_in })
     end
 
-    def proxy(host: Danbooru.config.http_proxy_host, port: Danbooru.config.http_proxy_port.to_i, username: Danbooru.config.http_proxy_username, password: Danbooru.config.http_proxy_password)
-      return self if host.blank?
+    def proxy(url: Danbooru.config.http_proxy)
+      return self if url.blank?
+      parsed_url = Danbooru::URL.parse!(url)
 
       dup.tap do |o|
-        o.http = o.http.via(host, port, username, password)
+        o.http = o.http.via(parsed_url.host, parsed_url.port, parsed_url.http_user, parsed_url.password)
       end
     end
 
