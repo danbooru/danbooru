@@ -579,6 +579,10 @@ module Danbooru
     end
 
     # The proxy to use for outgoing HTTP requests.
+    #
+    # If you use a proxy and you're running a public-facing site, you should be careful to configure the proxy to block
+    # HTTP requests to the local network. That is, block requests to e.g. 127.0.0.1 and 192.168.0.1/24 so that users
+    # can't upload URLs like `http://192.168.0.1.nip.io/` to trigger HTTP requests to servers inside your local network.
     def http_proxy
       # "http://username:password@proxy.example.com:1080"
     end
