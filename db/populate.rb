@@ -29,7 +29,7 @@ def populate_users(n, password: DEFAULT_PASSWORD)
   puts "*** Creating users ***"
 
   User::Levels.constants.without(:ANONYMOUS).each do |level|
-    user = User.create(name: level.to_s.downcase, password: password, password_confirmation: password, level: User::Levels.const_get(level))
+    user = User.create(name: "#{level.to_s.downcase}_user", password: password, password_confirmation: password, level: User::Levels.const_get(level))
     puts "Created user ##{user.id} (#{user.name})"
   end
 
