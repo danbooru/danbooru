@@ -4,6 +4,7 @@
   <% if policy(WikiPage).new? %>
     <%= subnav_link_to "New", new_wiki_page_path %>
   <% end %>
+  <%= subnav_link_to "Changes", wiki_page_versions_path %>
   <%= subnav_link_to "Help", wiki_page_path("help:wiki") %>
   <% if @wiki_page && @wiki_page.new_record? && @wiki_page.try(:tag).present? %>
     <li>|</li>

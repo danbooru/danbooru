@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <%= quick_search_form_for(:body_matches, comments_path, "comments") %>
-  <%= subnav_link_to "Listing", comments_path(:group_by => "post") %>
+  <%= subnav_link_to "Comments", comments_path %>
   <%= subnav_link_to "Search", comments_path(group_by: "comment") %>
   <% if policy(CommentVote).can_see_votes? %>
     <%= subnav_link_to "Votes", comment_votes_path %>

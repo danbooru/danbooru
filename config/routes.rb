@@ -67,11 +67,7 @@ Rails.application.routes.draw do
     end
   end
   resources :artist_urls, only: [:index]
-  resources :artist_versions, :only => [:index, :show] do
-    collection do
-      get :search
-    end
-  end
+  resources :artist_versions, only: [:index, :show]
   resources :bans
   resources :bulk_update_requests do
     member do
