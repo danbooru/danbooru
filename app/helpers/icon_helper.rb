@@ -6,14 +6,188 @@ module IconHelper
   # To add a new site, add the site name here, add the logo in public/images, and update app/logical/source/url/null.rb
   # if the site name is irregular.
   SITE_ICON_NAMES = %w[
-    4chan Amazon Ameblo Anifty ArtStation Ask.fm BCY Biglobe Bilibili Booth Carrd Catbox Circle.ms Coconala Danbooru
-    Deviant\ Art Discord DLSite Doujinshi.org Drawcrowd E-Hentai Enty Erogamescape Facebook Fantia FC2 Fiverr Foundation
-    Furaffinity Geocities Gelbooru Google Gumroad Hentai\ Foundry Hitomi Imgur Infoseek Inprnt Instagram Joyreactor
-    Ko-fi Konachan Linktree Lit.link Livedoor Luscious Lofter Kemono\ Party Mangaupdates Marshmallow\ Qa Mastodon Mblg
-    Mega Melonbooks Mihuashi Mihoyo Mixi.jp Monappy Naver Newgrounds Nico\ Seiga Nijie OCN Overdoll Patreon Pawoo Photozou
-    Piapro.jp Picarto Pinterest Pixiv Fanbox Pixiv\ Sketch Plurk Poipiku Privatter Profcard Redbubble Reddit Rule34.us
-    Sakura.ne.jp Sankaku\ Complex Steam Stickam Skeb Skima The\ Interviews Tiktok Tinami Tumblr Twitter Toranoana Twipple
-    Twitch Twitcasting TwitPic Twpf Ustream Vk Webmshare Weebly Weibo Wikipedia Wix Yande.re Yfrog Youtube Wix Zerochan
+    4chan
+    Adobe\ Portfolio
+    AllMyLinks
+    Amazon
+    Ameblo
+    Amino
+    Anifty
+    Anime\ News\ Network
+    Animexx
+    Archive\ of\ Our\ Own
+    Art\ Fight
+    Artists&Clients
+    ArtStation
+    Aryion
+    Ask.fm
+    BCY
+    Bandcamp
+    Baraag
+    Beacons
+    Behance
+    Big\ Cartel
+    Biglobe
+    Bilibili
+    Blogger
+    Boosty
+    Booth
+    Buy\ Me\ a\ Coffee
+    Cafe24
+    Carrd
+    Catbox
+    Circle.ms
+    Clip\ Studio
+    Coconala
+    Colors\ Live
+    Commishes
+    Creatorlink
+    Curious\ Cat
+    DLSite
+    Danbooru
+    Deviant\ Art
+    Discord
+    Doujinshi.org
+    Drawcrowd
+    E-Hentai
+    Enty
+    Erogamescape
+    Etsy
+    FC2
+    Facebook
+    Fanbox
+    Fandom
+    Fantia
+    Fiverr
+    Flavors
+    Foundation
+    Furaffinity
+    Fusetter
+    Gelbooru
+    Geocities
+    Giftee
+    GitHub
+    Google
+    Gumroad
+    Hatena\ Blog
+    Hentai\ Foundry
+    Hitomi
+    Imgur
+    Infoseek
+    Inkbunny
+    Inprnt
+    Instagram
+    Jimdo
+    Joyreactor
+    Kakao
+    Kemono\ Party
+    Ko-fi
+    Konachan
+    Last.fm
+    Line
+    LinkedIn
+    Linktree
+    Lit.link
+    Livedoor
+    Lofter
+    Luscious
+    Mangaupdates
+    Marshmallow\ Qa
+    Mastodon
+    Mblg
+    Mega
+    Melonbooks
+    Mihoyo
+    Mihuashi
+    Mixi.jp
+    Monappy
+    Mottohomete
+    MyAnimeList
+    Naver
+    Newgrounds
+    Nico\ Seiga
+    Nijie
+    Note
+    OCN
+    Odaibako
+    Ofuse
+    OnlyFans
+    Overdoll
+    Patreon
+    Pawoo
+    PayPal
+    Peing
+    Photozou
+    Piapro.jp
+    Picarto
+    Picdig
+    Picrew
+    Piczel
+    Pillowfort
+    Pinterest
+    Pixiv
+    Pixiv\ Sketch
+    Plurk
+    Poipiku
+    Pornhub
+    Postype
+    Potofu
+    Privatter
+    Profcard
+    RedGIFs
+    Redbubble
+    Reddit
+    Rule34.us
+    Sakura.ne.jp
+    Sankaku\ Complex
+    Shopee
+    Skeb
+    Sketchmob
+    Sketchfab
+    Skima
+    Society6
+    SoundCloud
+    Spotify
+    Steam
+    Stickam
+    Storenvy
+    SubscribeStar
+    Suzuri
+    Tapas
+    TeePublic
+    Telegram
+    The\ Interviews
+    Tiktok
+    Tinami
+    Tistory
+    Toranoana
+    Toyhouse
+    Trakteer
+    Trello
+    Tumblr
+    Twipple
+    TwitPic
+    Twitcasting
+    Twitch
+    Twitter
+    Twpf
+    Ustream
+    Vimeo
+    Vk
+    Wavebox
+    Weasyl
+    Webmshare
+    Webtoons
+    Weebly
+    Weibo
+    Wikipedia
+    Wix
+    WordPress
+    Yande.re
+    Yfrog
+    Youtube
+    Zerochan
+    html.co.jp
   ]
 
   def icon_tag(icon_class, class: nil, **options)
@@ -227,7 +401,7 @@ module IconHelper
 
   def external_site_icon(site_name, **options)
     if site_name.in?(SITE_ICON_NAMES)
-      image_icon_tag("#{site_name.downcase.tr(" ", "-")}-logo.png", **options)
+      image_icon_tag("#{site_name.downcase.gsub(/[^a-z0-9.]/, "-")}-logo.png", **options)
     else
       globe_icon(**options)
     end
