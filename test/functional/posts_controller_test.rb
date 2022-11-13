@@ -787,7 +787,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "update action" do
-      should "work" do
+      should "redirect to the post on success" do
         put_auth post_path(@post), @user, params: {:post => {:tag_string => "bbb"}}
         assert_redirected_to post_path(@post)
 
@@ -811,6 +811,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         put_auth post_path(@post), create(:restricted_user), params: { post: { tag_string: "blah" }}
         assert_response 403
         assert_not_equal("blah", @post.reload.tag_string)
+      end
+
+      should "not raise an exception on validation error" do
+        put_auth post_path(@post), @user, params: { post: { parent_id: @post.id }}
+        assert_redirected_to post_path(@post)
+
+        assert_nil(@post.parent_id)
       end
     end
 

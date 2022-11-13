@@ -174,13 +174,10 @@ class PostsController < ApplicationController
         end
 
         if post.errors.any?
-          @error_message = post.errors.full_messages.join("; ")
-          render :template => "static/error", :status => 500
-        else
-          response_params = {:q => params[:tags_query], :pool_id => params[:pool_id], :favgroup_id => params[:favgroup_id]}
-          response_params.reject! {|_key, value| value.blank?}
-          redirect_to post_path(post, response_params)
+          flash[:notice] = post.errors.full_messages.join("; ")
         end
+
+        redirect_to post_path(post, { q: params[:q] }.compact_blank)
       end
 
       format.json do
