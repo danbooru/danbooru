@@ -18,9 +18,10 @@ class UserNameValidator < ActiveModel::EachValidator
 
   def validate_each(rec, attr, name)
     forbidden_characters = name.delete(ALLOWED_PUNCTUATION).chars.grep(/[[:punct:]]/).uniq
+    current_user = rec.is_a?(UserNameChangeRequest) ? rec.user : rec
 
-    if rec.new_record? && User.find_by_name(name).present?
-      rec.errors.add(attr, "already exists")
+    if User.without(current_user).find_by_name(name).present?
+      rec.errors.add(attr, "already taken")
     elsif name.length <= 1
       rec.errors.add(attr, "must be more than 1 character long")
     elsif name.length >= 25

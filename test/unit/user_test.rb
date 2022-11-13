@@ -151,6 +151,13 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(["Name can't contain whitespace"], user.errors.full_messages)
       end
 
+      should "not conflict with an existing name" do
+        create(:user, name: "bkub")
+        user = build(:user, name: "BKUB")
+        user.save
+        assert_equal(["Name already taken"], user.errors.full_messages)
+      end
+
       should "be less than 25 characters long" do
         user = build(:user, name: "a"*25)
         user.save
