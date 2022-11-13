@@ -14,7 +14,7 @@
         <% if dtext_link.model_type == "WikiPage" %>
           <span class="<%= tag_class(dtext_link.model.tag) %>">
             <%= link_to(dtext_link.model.title, dtext_link.model) %>
-            <%= link_to("»", dtext_links_path(search: { model_type: "WikiPage", model: { title: dtext_link.model.title }})) %>
+            <%= link_to("»", dtext_links_path(search: { model_type: "WikiPage", WikiPage: { title: dtext_link.model.title }})) %>
           </span>
         <% else %>
           <%= link_to(dtext_link.model.dtext_shortlink, dtext_link.model) %>
