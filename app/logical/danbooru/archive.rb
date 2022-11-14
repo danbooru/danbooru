@@ -155,7 +155,12 @@ module Danbooru
       false
     end
 
-    # @return [String] The archive format ("RAR", "ZIP", etc).
+    # @return [Symbol] The archive format as detected by us (:zip, :rar, :7z, etc).
+    def file_ext
+      @file_ext ||= FileTypeDetector.new(file).file_ext
+    end
+
+    # @return [String] The archive format as returned by libarchive ("RAR", "ZIP", etc).
     def format
       @format ||= entries.lazy.map(&:format).first
     end
