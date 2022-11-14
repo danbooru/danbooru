@@ -75,6 +75,27 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
           filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
         end
       end
+
+      should "work with a .zip file" do
+        Danbooru::Archive.extract!("test/files/archive/ugoira.zip") do |dir, filenames|
+          assert_equal(5, filenames.size)
+          filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+        end
+      end
+
+      should "work with a .rar file" do
+        Danbooru::Archive.extract!("test/files/archive/ugoira.rar") do |dir, filenames|
+          assert_equal(5, filenames.size)
+          filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+        end
+      end
+
+      should "work with a .7z file" do
+        Danbooru::Archive.extract!("test/files/archive/ugoira.7z") do |dir, filenames|
+          assert_equal(5, filenames.size)
+          filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+        end
+      end
     end
 
     context "#uncompressed_size method" do
@@ -92,9 +113,20 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
     end
 
     context "#format method" do
-      should "work" do
-        archive = Danbooru::Archive.open!("test/files/ugoira.zip")
-        assert_equal("ZIP 2.0 (uncompressed)", archive.format)
+      should "detect the file type" do
+        assert_equal("ZIP 2.0 (uncompressed)", Danbooru::Archive.open("test/files/archive/ugoira.zip").format)
+        assert_equal("RAR5", Danbooru::Archive.open("test/files/archive/ugoira.rar").format)
+        assert_equal("7-Zip", Danbooru::Archive.open("test/files/archive/ugoira.7z").format)
+        assert_equal("7-Zip", Danbooru::Archive.open("test/files/archive/ugoira.tar.7z").format)
+      end
+    end
+
+    context "#file_ext method" do
+      should "detect the file extension" do
+        assert_equal(:zip, Danbooru::Archive.open("test/files/archive/ugoira.zip").file_ext)
+        assert_equal(:rar, Danbooru::Archive.open("test/files/archive/ugoira.rar").file_ext)
+        assert_equal(:"7z", Danbooru::Archive.open("test/files/archive/ugoira.7z").file_ext)
+        assert_equal(:"7z", Danbooru::Archive.open("test/files/archive/ugoira.tar.7z").file_ext)
       end
     end
 

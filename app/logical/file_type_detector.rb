@@ -55,8 +55,33 @@ class FileTypeDetector
     # https://aomediacodec.github.io/av1-avif/#brands-overview
     when /\A....ftyp(?:avif|avis)/
       :avif
+
+    # https://www.loc.gov/preservation/digital/formats/fdd/fdd000354.shtml#sign
+    # https://en.wikipedia.org/wiki/ZIP_(file_format)
+    # XXX Does not detect self-extracting archives
     when /\APK\x03\x04/
       :zip
+
+    # https://docs.fileformat.com/compression/7z/#file-signature
+    # https://py7zr.readthedocs.io/en/latest/archive_format.html#signature
+    # https://www.loc.gov/preservation/digital/formats/fdd/fdd000539.shtml#sign
+    # https://en.wikipedia.org/wiki/7z
+    # XXX Does not detect self-extracting archives
+    when /\A7z\xbc\xaf\x27\x1c/n
+      :"7z"
+
+    # Rar 1.5 to 4.0
+    # https://www.rarlab.com/technote.htm#rarsign
+    # https://www.loc.gov/preservation/digital/formats/fdd/fdd000450.shtml#sign
+    # https://en.wikipedia.org/wiki/RAR_(file_format)
+    # XXX Does not detect self-extracting archives
+    when /\ARar!\x1a\x07\x00/n
+      :rar
+
+    # Rar 5.0+
+    when /\ARar!\x1a\x07\x01\x00/n
+      :rar
+
     else
       :bin
     end
