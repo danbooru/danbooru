@@ -9,7 +9,6 @@ gem "sanitize"
 gem 'ruby-vips'
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
-gem 'rubyzip', :require => "zip"
 gem 'stripe'
 gem 'aws-sdk-sqs', '~> 1'
 gem 'responders'
@@ -59,6 +58,7 @@ gem "ffaker"
 gem "composite_primary_keys"
 gem "resolv"
 gem "rover-df"
+gem "ffi-libarchive"
 
 group :development do
   gem 'rubocop', require: false
