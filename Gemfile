@@ -59,6 +59,7 @@ gem "composite_primary_keys"
 gem "resolv"
 gem "rover-df"
 gem "ffi-libarchive"
+gem "pry-rails"
 
 group :development do
   gem 'rubocop', require: false
