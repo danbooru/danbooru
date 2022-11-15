@@ -17,8 +17,9 @@ class MediaFile::Ugoira < MediaFile
   end
 
   def close
-    file.close
-    preview_frame.close
+    super
+    @preview_frame&.close
+    # XXX should clean up `convert` too
   end
 
   def metadata
@@ -52,7 +53,7 @@ class MediaFile::Ugoira < MediaFile
     raise RuntimeError, "can't convert ugoira to webm: no ugoira frame data was provided" unless frame_delays.present?
 
     Danbooru::Archive.extract!(file) do |tmpdir, filenames|
-      output_file = Tempfile.new(["ugoira-conversion", ".webm"], binmode: true)
+      output_file = Danbooru::Tempfile.new(["danbooru-ugoira-conversion-#{md5}-", ".webm"], binmode: true)
 
       # Duplicate last frame to avoid it being displayed only for a very short amount of time.
       last_file_name = File.basename(filenames.last)
@@ -90,8 +91,8 @@ class MediaFile::Ugoira < MediaFile
   private
 
   def preview_frame
-    FFmpeg.new(convert).smart_video_preview
+    @preview_frame ||= FFmpeg.new(convert).smart_video_preview
   end
 
-  memoize :preview_frame, :dimensions, :convert, :metadata
+  memoize :dimensions, :convert, :metadata
 end

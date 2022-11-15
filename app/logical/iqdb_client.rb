@@ -101,6 +101,8 @@ class IqdbClient
       preview = media_file.preview!(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
       file = HTTP::FormData::File.new(preview)
       request(:post, "query", form: { file: file }, params: { limit: limit })
+    ensure
+      preview&.close
     end
 
     # Add a post to IQDB.

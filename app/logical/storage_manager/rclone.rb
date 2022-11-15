@@ -27,7 +27,7 @@ class StorageManager::Rclone < StorageManager
   end
 
   def open(path)
-    file = Tempfile.new(binmode: true)
+    file = Danbooru::Tempfile.new(binmode: true)
     rclone "copyto", key(path), file.path
     file
   end

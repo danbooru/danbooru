@@ -2,7 +2,7 @@ require 'test_helper'
 
 class StorageManagerTest < ActiveSupport::TestCase
   def tempfile(data)
-    file = Tempfile.new
+    file = Danbooru::Tempfile.new
     file.write(data)
     file.flush
     file

@@ -53,6 +53,8 @@ class PostReplacementProcessor
   rescue Exception => exception
     replacement.errors.add(:base, exception.message)
     raise ActiveRecord::Rollback
+  ensure
+    media_file&.close
   end
 
   def rescale_notes(post)

@@ -52,6 +52,8 @@ class DiscordSlashCommand
           },
         }]
       }
+    ensure
+      preview&.close
     end
 
     def get_last_message_with_url(limit: 10)

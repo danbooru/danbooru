@@ -68,6 +68,8 @@ class MediaAsset < ApplicationRecord
       file = convert_file(original_file)
       storage_service.store(file, file_path)
       backup_storage_service.store(file, file_path)
+    ensure
+      file&.close
     end
 
     def trash_file!

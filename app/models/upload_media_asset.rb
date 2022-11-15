@@ -112,6 +112,8 @@ class UploadMediaAsset < ApplicationRecord
     update!(status: :active)
   rescue Exception => e
     update!(status: :failed, error: e.message)
+  ensure
+    media_file&.close
   end
 
   def update_upload_status
