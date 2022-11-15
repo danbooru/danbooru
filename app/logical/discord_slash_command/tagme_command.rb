@@ -31,7 +31,10 @@ class DiscordSlashCommand
     end
 
     def tagme(url, confidence, limit: 50, size: 500)
-      response, file = http.download_media(url)
+      extractor = Source::Extractor.find(url)
+      image_url = extractor.image_urls.first
+      file = extractor.download_file!(image_url)
+
       preview = file.preview(size, size)
       tags = autotagger.evaluate(preview, limit: limit, confidence: confidence).to_a
       tags = tags.sort_by { |tag, confidence| [TagCategory.split_header_list.index(tag.category_name.downcase), -confidence] }.to_h
@@ -45,7 +48,7 @@ class DiscordSlashCommand
             icon_url: "https://danbooru.donmai.us/images/danbooru-logo-96x96.png",
           },
           image: {
-            url: url,
+            url: image_url,
           },
         }]
       }
