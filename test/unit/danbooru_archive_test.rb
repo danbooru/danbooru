@@ -117,7 +117,8 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         assert_equal("ZIP 2.0 (uncompressed)", Danbooru::Archive.open("test/files/archive/ugoira.zip").format)
         assert_equal("RAR5", Danbooru::Archive.open("test/files/archive/ugoira.rar").format)
         assert_equal("7-Zip", Danbooru::Archive.open("test/files/archive/ugoira.7z").format)
-        assert_equal("7-Zip", Danbooru::Archive.open("test/files/archive/ugoira.tar.7z").format)
+        assert_equal("GNU tar format", Danbooru::Archive.open("test/files/archive/ugoira.tar").format)
+        assert_equal("GNU tar format", Danbooru::Archive.open("test/files/archive/ugoira.tar.gz").format)
       end
     end
 
@@ -126,7 +127,8 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         assert_equal(:zip, Danbooru::Archive.open("test/files/archive/ugoira.zip").file_ext)
         assert_equal(:rar, Danbooru::Archive.open("test/files/archive/ugoira.rar").file_ext)
         assert_equal(:"7z", Danbooru::Archive.open("test/files/archive/ugoira.7z").file_ext)
-        assert_equal(:"7z", Danbooru::Archive.open("test/files/archive/ugoira.tar.7z").file_ext)
+        assert_equal(:bin, Danbooru::Archive.open("test/files/archive/ugoira.tar").file_ext)
+        assert_equal(:bin, Danbooru::Archive.open("test/files/archive/ugoira.tar.gz").file_ext)
       end
     end
 
@@ -138,6 +140,41 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         archive.ls(output)
         assert_match(/^-rw-rw-r-- *0 0 *1639 2014-10-05 23:31:06 000000\.jpg$/, output.tap(&:rewind).read)
       end
+    end
+
+    should "detect directory traversal attacks" do
+      archive = Danbooru::Archive.open!("test/files/archive/zip-slip.zip")
+
+      assert_equal(true, archive.entries.any? { |e| e.directory_traversal? })
+      assert_raises(Danbooru::Archive::Error) { archive.extract! }
+    end
+
+    should "detect symlinks" do
+      archive = Danbooru::Archive.open!("test/files/archive/symlink.zip")
+
+      assert_equal(true, archive.entries.any? { |e| !e.file? && !e.directory? })
+      assert_raises(Danbooru::Archive::Error) { archive.extract! }
+    end
+
+    should "detect absolute paths" do
+      archive = Danbooru::Archive.open!("test/files/archive/absolute-path.7z")
+
+      assert_equal(true, archive.entries.any? { |e| e.pathname.starts_with?("/") })
+      assert_raises(Danbooru::Archive::Error) { archive.extract! }
+    end
+
+    should "detect archives with large numbers of files" do
+      archive = Danbooru::Archive.open!("test/files/archive/bomb-10k-files.7z")
+
+      assert_equal(true, archive.exists? { |_, count| count > 100 })
+      assert_equal(10_000, archive.file_count)
+    end
+
+    should "detect decompression bombs" do
+      archive = Danbooru::Archive.open!("test/files/archive/bomb-1-1G.rar")
+
+      assert_equal(1, archive.file_count)
+      assert_equal(1_048_576_000, archive.uncompressed_size)
     end
   end
 end

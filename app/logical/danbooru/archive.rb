@@ -107,10 +107,15 @@ module Danbooru
     ensure
       archive&.close
     end
-    alias_method :entries, :each_entry
 
-    # Extract the files in the archive to a directory. Subdirectories inside the archive are ignored; all files are
-    # extracted to a single top-level directory.
+    # XXX You can't call `extract!` on these entries because libarchive doesn't let you extract an entry after you iterate past it.
+    #
+    # @return [Array<Danbooru::Archive::Entry>] The list of entries in the archive.
+    def entries
+      @entries ||= each_entry.to_a
+    end
+
+    # Extract the files in the archive to a directory.
     #
     # If a block is given, extract the archive to a temp directory and delete the directory after the block finishes.
     # Otherwise, extract to a temp directory and return the directory. The caller should delete the directory afterwards.
@@ -135,13 +140,18 @@ module Danbooru
 
     # Extract the archive to a directory. See `extract!` for details.
     def extract_to!(directory, flags: DEFAULT_FLAGS)
-      entries.map do |entry|
+      each_entry.map do |entry|
         raise Danbooru::Archive::Error, "Can't extract archive containing absolute path (path: '#{entry.pathname_utf8}')" if entry.pathname_utf8.starts_with?("/")
         raise Danbooru::Archive::Error, "'#{entry.pathname_utf8}' is not a regular file" if !entry.file?
 
-        path = "#{directory}/#{entry.pathname_utf8.tr("/", "_")}"
+        path = "#{directory}/#{entry.pathname_utf8}"
         entry.extract!(path, flags: flags)
       end
+    end
+
+    # @return [Integer] The number of files in the archive.
+    def file_count
+      @file_count ||= entries.count
     end
 
     # @return [Integer] The total decompressed size of all files in the archive.
@@ -151,7 +161,7 @@ module Danbooru
 
     # @return [Boolean] True if any entry in the archive satisfies the condition; otherwise false.
     def exists?(&block)
-      entries.with_index { |entry, index| return true if yield entry, index + 1 }
+      each_entry.with_index { |entry, index| return true if yield entry, index + 1 }
       false
     end
 
@@ -162,7 +172,7 @@ module Danbooru
 
     # @return [String] The archive format as returned by libarchive ("RAR", "ZIP", etc).
     def format
-      @format ||= entries.lazy.map(&:format).first
+      @format ||= each_entry.lazy.map(&:format).first
     end
 
     # Print the archive contents in `ls -l` format.
@@ -205,9 +215,15 @@ module Danbooru
       entry.pathname_utf8
     end
 
-    # @return [String] The pathname encoded as UTF-8 instead of ASCII-8BIT. May be wrong if the original pathname wasn't UTF-8.
+    # @see https://security.snyk.io/research/zip-slip-vulnerability
+    # @return [Boolean] True if the pathname contains any ".." components, e.g. "../../../../../etc/passwd"
+    def directory_traversal?
+      entry.pathname.split("/").compact_blank.grep("..").any?
+    end
+
+    # @return [String, nil] The pathname encoded as UTF-8 instead of ASCII-8BIT. May be wrong if the original pathname wasn't UTF-8.
     def pathname_utf8
-      pathname.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
+      pathname&.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
     end
 
     # @return [String] The archive entry format ("RAR", "ZIP", etc).

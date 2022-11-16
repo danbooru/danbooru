@@ -134,7 +134,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail if given both a file and source" do
         assert_no_difference("Upload.count") do
-          file = File.open("test/files/test.jpg")
+          file = Rack::Test::UploadedFile.new("test/files/test.jpg")
           source = "https://files.catbox.moe/om3tcw.webm"
           post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }, source: source }}
         end
@@ -296,6 +296,48 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for an unsupported archive type" do
+        should "fail for a .tar file" do
+          create_upload!("test/files/archive/ugoira.tar", user: @user)
+          assert_match("File is not an image or video", Upload.last.error)
+        end
+
+        should "fail for a .tar.gz file" do
+          create_upload!("test/files/archive/ugoira.tar.gz", user: @user)
+          assert_match("File is not an image or video", Upload.last.error)
+        end
+
+        should "fail for an archive containing more than 100 files" do
+          create_upload!("test/files/archive/bomb-10k-files.7z", user: @user)
+          assert_response 422
+          assert_match("'bomb-10k-files.7z' contains too many files (max 100 files per upload)", response.parsed_body.dig("errors", "base", 0))
+        end
+
+        should "fail for a decompression bomb" do
+          create_upload!("test/files/archive/bomb-1-1G.rar", user: @user)
+          assert_response 422
+          assert_match("'bomb-1-1G.rar' is too large (uncompressed size: 1,000 MB; max size: 100 MB)", response.parsed_body.dig("errors", "base", 0))
+        end
+
+        should "fail for an archive containing absolute paths" do
+          create_upload!("test/files/archive/absolute-path.7z", user: @user)
+          assert_response 422
+          assert_match("'/tmp/foo/foo.txt' in 'absolute-path.7z' can't start with '/'", response.parsed_body.dig("errors", "base", 0))
+        end
+
+        should "fail for an archive containing '..' paths" do
+          create_upload!("test/files/archive/zip-slip.zip", user: @user)
+          assert_response 422
+          assert_match(/'.*' in 'zip-slip\.zip' can't contain '\.\.' components/, response.parsed_body.dig("errors", "base", 0))
+        end
+
+        should "fail for an archive containing symlinks" do
+          create_upload!("test/files/archive/symlink.zip", user: @user)
+          assert_response 422
+          assert_match("'passwd' in 'symlink.zip' isn't a regular file", response.parsed_body.dig("errors", "base", 0))
+        end
+      end
+
       context "when re-uploading a media asset stuck in the 'processing' state" do
         should "mark the asset as failed" do
           asset = create(:media_asset, file: File.open("test/files/test.jpg"), status: "processing")
@@ -393,6 +435,36 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/webp/Exif2.webp")
         should_upload_successfully("test/files/webp/lossless1.webp")
         should_upload_successfully("test/files/webp/lossy_alpha1.webp")
+      end
+
+      context "uploading a .zip file from your computer" do
+        should "work" do
+          upload = assert_successful_upload("test/files/archive/ugoira.zip", user: @user)
+
+          assert_equal(5, upload.media_asset_count)
+          assert_equal(5, upload.upload_media_assets.size)
+          assert_equal("file://ugoira.zip/000000.jpg", upload.upload_media_assets[0].source_url)
+        end
+      end
+
+      context "uploading a .rar file from your computer" do
+        should "work" do
+          upload = assert_successful_upload("test/files/archive/ugoira.rar", user: @user)
+
+          assert_equal(5, upload.media_asset_count)
+          assert_equal(5, upload.upload_media_assets.size)
+          assert_equal("file://ugoira.rar/000000.jpg", upload.upload_media_assets[0].source_url)
+        end
+      end
+
+      context "uploading a .7z file from your computer" do
+        should "work" do
+          upload = assert_successful_upload("test/files/archive/ugoira.7z", user: @user)
+
+          assert_equal(5, upload.media_asset_count)
+          assert_equal(5, upload.upload_media_assets.size)
+          assert_equal("file://ugoira.7z/000000.jpg", upload.upload_media_assets[0].source_url)
+        end
       end
 
       context "uploading multiple files from your computer" do
