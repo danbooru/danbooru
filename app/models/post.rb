@@ -966,11 +966,11 @@ class Post < ApplicationRecord
       end
 
       def random_up(key)
-        where("md5 < ?", key).reorder(md5: :desc).first
+        where("posts.md5 < ?", key).reorder(md5: :desc).first
       end
 
       def random_down(key)
-        where("md5 >= ?", key).reorder(md5: :asc).first
+        where("posts.md5 >= ?", key).reorder(md5: :asc).first
       end
 
       def sample(query, sample_size)

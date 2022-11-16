@@ -1270,11 +1270,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the random:<N> metatag" do
-      post = create(:post)
+      post = create(:post, media_asset: build(:media_asset, file_ext: "png"))
 
       assert_tag_match([], "random:0")
       assert_tag_match([post], "random:1")
       assert_tag_match([post], "random:1000")
+      assert_tag_match([post], "random:1 filetype:png")
     end
 
     should "return posts ordered by a particular attribute" do
