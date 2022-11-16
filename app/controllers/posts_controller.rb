@@ -132,7 +132,7 @@ class PostsController < ApplicationController
     raise ActiveRecord::RecordNotFound if @post.nil?
     authorize @post
     respond_with(@post) do |format|
-      format.html { redirect_to post_path(@post, :tags => params[:tags]) }
+      format.html { redirect_to post_path(@post, q: params[:tags]) }
     end
   end
 

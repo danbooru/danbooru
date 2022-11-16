@@ -498,14 +498,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     context "random action" do
       should "render" do
         get random_posts_path, params: { tags: "aaaa" }
-        assert_redirected_to(post_path(@post, tags: "aaaa"))
+        assert_redirected_to(post_path(@post, q: "aaaa"))
       end
 
       should "render for a ordfav: search" do
         @post = as(@user) { create(:post, tag_string: "fav:me") }
         get random_posts_path, params: { tags: "ordfav:#{@user.name}" }
 
-        assert_redirected_to(post_path(@post, tags: "ordfav:#{@user.name}"))
+        assert_redirected_to(post_path(@post, q: "ordfav:#{@user.name}"))
       end
 
       should "return a 404 when no random posts can be found" do
