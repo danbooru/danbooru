@@ -180,7 +180,13 @@ module Sources
           image_urls: ["https://safebooru.org//images/4016/64779fbfc87020ed5fd94854fe973bc0.jpeg"],
           artist_name: nil,
           profile_url: nil,
-          tags: %w[brown_eyes d4dj dress long_hair pink_hair sword yano_hiiro yorha_no._2_type_b rating:s],
+          tags: %w[
+            black_blindfold black_dress black_footwear black_hairband black_legwear blindfold boots breasts brown_eyes
+            cleavage_cutout d4dj dress gloves hairband high_heel_boots high_heels holding juliet_sleeves leotard
+            long_hair long_sleeves medium_breasts mole mole_under_mouth pink_hair puffy_sleeves rating:s short_hair
+            silver_hair sword tassel thigh_boots thighhighs thighhighs_under_boots vambraces weapon yano_hiiro
+            yorha_no._2_type_b
+          ],
           artist_commentary_title: nil,
           artist_commentary_desc: nil,
         )
@@ -297,6 +303,11 @@ module Sources
           artist_commentary_desc: "いっぱい走ったね… https://t.co/n3ic5BIONP",
           download_size: 201_643,
         )
+      end
+
+      should "normalize rule34.xxx links" do
+        source = "https://us.rule34.xxx//images/1802/0adc8fa0604dc445b4b47e6f4c436a08.jpeg?1949807"
+        assert_equal("https://rule34.xxx/index.php?page=post&s=view&id=1949807", Source::URL.page_url(source))
       end
     end
   end

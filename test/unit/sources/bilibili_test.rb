@@ -22,7 +22,7 @@ module Sources
         profile_url: "https://space.bilibili.com/11742550",
         tags: [],
         artist_commentary_title: nil,
-        dtext_artist_commentary_desc: "\"【崩坏3】少女，泳装，夏日时光！\":[https://www.bilibili.com/video/BV1fB4y1Y7zt]  新视频的图片分享！大家记得来康 http://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png "
+        dtext_artist_commentary_desc: "\"【崩坏3】少女，泳装，夏日时光！\":[https://www.bilibili.com/video/BV1fB4y1Y7zt/]  新视频的图片分享！大家记得来康 http://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png "
       )
     end
 
@@ -113,8 +113,8 @@ module Sources
         "https://i0.hdslb.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png",
         image_urls: ["https://i0.hdslb.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png"],
         profile_url: "",
-        artist_id: "",
-        page_url: ""
+        artist_id: nil,
+        page_url: nil,
       )
     end
 

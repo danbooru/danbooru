@@ -23,7 +23,7 @@ module Sources
       strategy_should_work(
         "https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png",
         image_urls: ["https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png"],
-        download_size: 840_296,
+        download_size: 833_251,
         page_url: "https://www.deviantart.com/nickbeja/art/Mindflayer-Girl01-708675884",
         artist_name: "nickbeja",
         profile_url: "https://www.deviantart.com/nickbeja"

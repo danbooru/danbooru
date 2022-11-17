@@ -165,7 +165,7 @@ module Sources
           artist_name: "影おじ (隠れエリア)",
           profile_url: "https://www.pixiv.net/users/6570768",
           profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
-          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber 両手に茎 乱交],
+          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber10000users入り 両手に茎 乱交],
         )
       end
 
@@ -181,7 +181,7 @@ module Sources
           artist_name: "影おじ (隠れエリア)",
           profile_url: "https://www.pixiv.net/users/6570768",
           profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
-          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber 両手に茎 乱交],
+          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber10000users入り 両手に茎 乱交],
         )
       end
 

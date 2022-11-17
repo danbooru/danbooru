@@ -97,11 +97,6 @@ module Sources
         assert_equal("https://shimmie.katawa-shoujo.com/post/view/2740", Source::URL.page_url(source))
       end
 
-      should "normalize rule34.xxx links" do
-        source = "https://us.rule34.xxx//images/1802/0adc8fa0604dc445b4b47e6f4c436a08.jpeg?1949807"
-        assert_equal("https://rule34.xxx/index.php?page=post&s=list&md5=0adc8fa0604dc445b4b47e6f4c436a08", Source::URL.page_url(source))
-      end
-
       should "normalize diarypro links" do
         source1 = "http://nekomataya.net/diarypro/data/upfile/216-1.jpg"
         source2 = "http://akimbo.sakura.ne.jp/diarypro/diary.cgi?mode=image&upfile=716-3.jpg"
