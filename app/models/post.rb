@@ -490,6 +490,8 @@ class Post < ApplicationRecord
       tags -= ["sound"] unless is_flash?
       tags << "sound" if media_asset.has_sound?
 
+      tags << "novelai" if media_asset.metadata["PNG:Software"] == "NovelAI"
+
       tags
     end
 
