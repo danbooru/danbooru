@@ -518,6 +518,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://rule34.xxx/index.php?page=post&s=view&id=6961597")
         should_upload_successfully("https://rule34.us/index.php?r=posts/view&id=6204967")
 
+        should_upload_successfully("https://boards.4channel.org/vt/thread/1#p1")
+
         should_upload_successfully("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
         should_upload_successfully("http://seiga.nicovideo.jp/seiga/im4937663")
         should_upload_successfully("https://seiga.nicovideo.jp/image/source/9146749")

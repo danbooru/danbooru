@@ -58,6 +58,7 @@ module Source
       Source::Extractor::Reddit,
       Source::Extractor::Bilibili,
       Source::Extractor::Rule34DotUs,
+      Source::Extractor::FourChan,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
@@ -299,7 +300,7 @@ module Source
           :dtext_title => dtext_artist_commentary_title,
           :dtext_description => dtext_artist_commentary_desc
         },
-        :api_response => api_response.to_h
+        :api_response => api_response
       }
     end
 

@@ -34,7 +34,7 @@ module Danbooru
     # @return [Addressable:URI] The parsed and normalized URL.
     attr_reader :url
 
-    delegate :domain, :host, :port, :site, :path, :query, :password, to: :url
+    delegate :domain, :host, :port, :site, :path, :query, :fragment, :password, to: :url
 
     # Parse a string into a URL, or raise an exception if the string is not a valid HTTP or HTTPS URL.
     #
