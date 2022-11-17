@@ -57,8 +57,6 @@ class Source::Extractor
         if asset[:asset_type] == "image"
           asset_url(asset[:image_url])
         elsif asset[:asset_type] == "video_clip"
-          next # XXX Skip for now; actually downloading these videos requires bypassing a Cloudflare captcha.
-
           url = Nokogiri::HTML5.parse(asset[:player_embedded]).at("iframe").attr("src")
           next if url.nil?
 

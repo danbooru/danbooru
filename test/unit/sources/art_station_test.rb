@@ -72,7 +72,7 @@ module Sources
     end
 
     context "An ArtStation post with images and videos" do
-      strategy_should_work( # XXX Broken by Cloudflare captcha
+      strategy_should_work(
         "https://www.artstation.com/artwork/0nP1e8",
         image_urls: %w[
           https://cdn.artstation.com/p/assets/images/images/040/979/418/original/yusuf-umar-workout-10mb.gif?1630425406
@@ -91,7 +91,8 @@ module Sources
     context "An ArtStation video url" do
       strategy_should_work(
         "https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4",
-        image_urls: ["https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4"]
+        image_urls: ["https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4"],
+        download_size: 377_969,
       )
     end
 
