@@ -123,6 +123,10 @@ module Source
         parsed_url.article_id || parsed_referer&.article_id
       end
 
+      def http
+        super.use(:spoof_referrer)
+      end
+
       def page
         return unless page_url.present?
         response = http.cache(1.minute).get(page_url)
