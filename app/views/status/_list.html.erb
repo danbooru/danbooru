@@ -3,7 +3,11 @@
   <% hash.each do |key, value| %>
     <tr>
       <th><%= key.to_s.tr("_", " ").startcase %></th>
-      <td><%= value %></td>
+      <% if value.is_a?(Time) %>
+        <td><%= time_ago_in_words_tagged(value) %></td>
+      <% else %>
+        <td><%= value %>
+      <% end %>
     </tr>
   <% end %>
 </table>

@@ -1,0 +1,30 @@
+#statistics-container {
+  column-count: 3;
+  column-gap: 10px;
+}
+
+.statistics-section {
+  padding: 10px;
+  display: inline-block;
+
+  table {
+    width: 300px;
+
+    th {
+      text-align: left;
+    }
+
+    td {
+      text-align: right;
+    }
+  }
+}
+
+#purge-stats-link {
+  font-size: 0.4em;
+  vertical-align: middle;
+
+  a {
+    color: var(--muted-text-color);
+  }
+}

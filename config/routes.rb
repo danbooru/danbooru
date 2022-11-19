@@ -235,6 +235,11 @@ Rails.application.routes.draw do
   end
   resource :source, :only => [:show]
   resource :status, only: [:show], controller: "status"
+  resource :stats, only: [:show], controller: "statistics" do
+    collection do
+      post :purge_cache
+    end
+  end
   resources :tags
   resources :tag_aliases, only: [:show, :index, :destroy]
   resources :tag_implications, only: [:show, :index, :destroy]

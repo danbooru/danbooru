@@ -1,0 +1,20 @@
+<div id="c-statistics">
+  <div id="a-show" class="fixed-width-container">
+    <h1>Stats
+    <% if StatisticsPolicy.new(CurrentUser, nil).purge_cache? %>
+      <span id="purge-stats-link">
+        (<%= link_to "refresh", purge_cache_stats_path, method: :post, remote: true %>)
+      </span>
+    <% end %>
+    </h1>
+
+    <div id="statistics-container">
+      <% @statistics.each do |section, data| %>
+        <div id="<%= section %>-stats" class="statistics-section">
+          <h2><%= section.to_s.humanize %></h2>
+          <%= render "list", hash: data %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
