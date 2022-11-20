@@ -38,14 +38,20 @@ class BanTest < ActiveSupport::TestCase
     end
 
     should "update the user's feedback" do
-      user = FactoryBot.create(:user)
-      admin = FactoryBot.create(:admin_user)
-      assert(user.feedback.empty?)
-      CurrentUser.scoped(admin) do
-        FactoryBot.create(:ban, :user => user, :banner => admin)
-      end
-      assert(!user.feedback.empty?)
-      assert_equal("negative", user.feedback.last.category)
+      user = create(:user)
+      ban = create(:ban, user: user, duration: 100.years, reason: "lol")
+
+      assert_equal(1, user.feedback.negative.count)
+      assert_equal("Banned forever: lol", user.feedback.last.body)
+    end
+
+    should "send the user a dmail" do
+      user = create(:user)
+      ban = create(:ban, user: user, duration: 100.years, reason: "lol")
+
+      assert_equal(1, user.dmails.count)
+      assert_equal("You have been banned", user.dmails.last.title)
+      assert_equal("You have been banned forever: lol", user.dmails.last.body)
     end
   end
 

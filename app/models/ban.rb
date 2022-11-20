@@ -4,6 +4,7 @@ class Ban < ApplicationRecord
   attribute :duration, :interval
 
   after_create :create_feedback
+  after_create :create_dmail
   after_create :update_user_on_create
   after_create :create_ban_mod_action
   after_destroy :update_user_on_destroy
@@ -77,7 +78,11 @@ class Ban < ApplicationRecord
   end
 
   def create_feedback
-    user.feedback.create!(creator: banner, category: "negative", body: "Banned #{humanized_duration}: #{reason}")
+    user.feedback.create!(creator: banner, category: "negative", body: "Banned #{humanized_duration}: #{reason}", disable_dmail_notification: true)
+  end
+
+  def create_dmail
+    Dmail.create_automated(to: user, title: "You have been banned", body: "You have been banned #{forever? ? "forever" : "for #{humanized_duration}"}: #{reason}")
   end
 
   def create_ban_mod_action

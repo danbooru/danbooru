@@ -10,6 +10,8 @@ class ApproverPrunerTest < ActiveSupport::TestCase
       assert_equal([@approver.id], ApproverPruner.inactive_approvers.map(&:id))
       assert_nothing_raised { ApproverPruner.prune! }
       assert_equal(User::Levels::CONTRIBUTOR, @approver.reload.level)
+      assert_equal(1, @approver.dmails.received.count)
+      assert_equal("Approver inactivity", @approver.dmails.received.last.title)
     end
 
     should "not demote active approvers" do
