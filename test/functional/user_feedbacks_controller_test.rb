@@ -30,7 +30,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "allow moderators to see deleted feedbacks" do
-        as(@user) { @user_feedback.update!(is_deleted: true) }
+        @user_feedback = create(:user_feedback, is_deleted: true)
         get_auth user_feedback_path(@user_feedback), @mod
         assert_response :success
       end
@@ -104,7 +104,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow updating deleted feedbacks" do
-        as(@user) { @user_feedback.update!(is_deleted: true) }
+        @user_feedback = create(:user_feedback, user: @user, creator: @critic, is_deleted: true)
         put_auth user_feedback_path(@user_feedback), @critic, params: { user_feedback: { body: "test" }}
 
         assert_response 403
@@ -125,6 +125,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to @user_feedback
           assert_equal("blah", @user_feedback.reload.body)
           assert_match(/updated user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_equal("user_feedback_update", ModAction.last.category)
           assert_equal(@user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
         end
@@ -134,7 +135,8 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @user_feedback
           assert(@user_feedback.reload.is_deleted?)
-          assert_match(/updated user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_match(/deleted user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_equal("user_feedback_delete", ModAction.last.category)
           assert_equal(@user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
         end

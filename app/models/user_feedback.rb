@@ -3,19 +3,14 @@
 class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
 
-  attr_accessor :disable_dmail_notification
+  attr_accessor :disable_dmail_notification, :updater
 
   belongs_to :user
   belongs_to :creator, class_name: "User"
   validates :body, presence: true
   validates :category, presence: true, inclusion: { in: %w[positive negative neutral] }
   after_create :create_dmail, unless: :disable_dmail_notification
-  after_update(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{updated user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_update, subject: user, user: CurrentUser.user)
-  end
-  after_destroy(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{deleted user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_delete, subject: user, user: CurrentUser.user)
-  end
+  after_update :create_mod_action
 
   deletable
 
@@ -56,6 +51,16 @@ class UserFeedback < ApplicationRecord
   def create_dmail
     body = %{#{disclaimer}@#{creator.name} created a "#{category} record":#{Routes.user_feedbacks_path(search: { user_id: user_id })} for your account:\n\n#{self.body}}
     Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
+  end
+
+  def create_mod_action
+    raise "Updater not set" if updater.nil?
+
+    if saved_change_to_is_deleted == [false, true] && creator != updater
+      ModAction.log(%{deleted user feedback for "#{user.name}":#{Routes.user_path(user)}}, :user_feedback_delete, subject: user, user: updater)
+    elsif creator != updater
+      ModAction.log(%{updated user feedback for "#{user.name}":#{Routes.user_path(user)}}, :user_feedback_update, subject: user, user: updater)
+    end
   end
 
   def self.available_includes
