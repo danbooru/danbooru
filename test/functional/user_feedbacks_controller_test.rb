@@ -79,9 +79,23 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
-      should "allow gold users to create new feedbacks" do
+      should "allow gold users to create positive feedbacks" do
         assert_difference("UserFeedback.count", 1) do
-          post_auth user_feedbacks_path, @critic, params: {:user_feedback => {:category => "positive", :user_name => @user.name, :body => "xxx"}}
+          post_auth user_feedbacks_path, @critic, params: { user_feedback: { category: "positive", user_name: @user.name, body: "xxx" }}
+          assert_response :redirect
+        end
+      end
+
+      should "allow gold users to create neutral feedbacks" do
+        assert_difference("UserFeedback.count", 1) do
+          post_auth user_feedbacks_path, @critic, params: { user_feedback: { category: "positive", user_name: @user.name, body: "xxx" }}
+          assert_response :redirect
+        end
+      end
+
+      should "allow gold users to create negative feedbacks" do
+        assert_difference("UserFeedback.count", 1) do
+          post_auth user_feedbacks_path, @critic, params: { user_feedback: { category: "negative", user_name: @user.name, body: "xxx" }}
           assert_response :redirect
         end
       end
