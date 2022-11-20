@@ -54,7 +54,7 @@ module Source
         commentary = String.new
 
         if post["filename"].present?
-          commentary << "<a href=\"https://i.4cdn.org/#{board}/#{post["tim"]}#{post["ext"]}\">#{post["filename"]}#{post["ext"]}</a> (#{post["fsize"].to_fs(:human_size)}, #{post["w"]}x#{post["h"]})\n"
+          commentary << "<a href=\"https://i.4cdn.org/#{board}/#{post["tim"]}#{post["ext"]}\">#{post["filename"]}#{post["ext"]}</a> (#{post["fsize"].to_fs(:human_size)}, #{post["w"]}x#{post["h"]})<br>"
         end
 
         if post["com"].present?
