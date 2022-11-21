@@ -185,6 +185,15 @@ class MediaAsset < ApplicationRecord
       dimensions[1]
     end
 
+    def ==(other)
+      other.is_a?(Variant) && [media_asset, type] == [other.media_asset, other.type]
+    end
+    alias_method :eql?, :==
+
+    def hash
+      [media_asset, type].hash
+    end
+
     def serializable_hash(*options)
       { type: type, url: file_url, width: width, height: height, file_ext: file_ext }
     end
@@ -330,7 +339,7 @@ class MediaAsset < ApplicationRecord
 
     def regenerate!(metadata: true, files: true, ai_tags: true)
       with_lock do
-        variant("original").open_file! do |original_file|
+        original.open_file! do |original_file|
           regenerate_metadata!(original_file) if metadata
           regenerate_files!(original_file) if files
         end
@@ -355,7 +364,7 @@ class MediaAsset < ApplicationRecord
 
     # Regenerate all thumbnail and sample image files for the asset.
     def regenerate_files!(original_file)
-      distribute_files!(original_file)
+      distribute_files!(original_file, variants: variants.without(original))
       purge_cached_urls!
       post.update_iqdb if post.present?
     end
@@ -403,7 +412,7 @@ class MediaAsset < ApplicationRecord
       variants.each(&:delete_file!)
     end
 
-    def distribute_files!(media_file)
+    def distribute_files!(media_file, variants: self.variants)
       Parallel.each(variants, in_threads: Etc.nprocessors) do |variant|
         variant.store_file!(media_file)
       end
@@ -419,6 +428,10 @@ class MediaAsset < ApplicationRecord
   end
 
   concerning :VariantMethods do
+    def original
+      variant(:original)
+    end
+
     def variant(type)
       return nil unless has_variant?(type)
       Variant.new(self, type)
