@@ -154,19 +154,23 @@ form.one-line-form {
 }
 
 div.ui-dialog {
-  textarea, input[type="text"] {
-    width: 100%;
-    max-width: 100%;
-  }
-
   form.simple_form {
     margin-bottom: 0;
+
+    textarea, input[type="text"] {
+      width: 100%;
+      max-width: 100%;
+    }
 
     div.input {
       margin-bottom: 0.5em;
     }
 
     div.input.hidden {
+      display: none;
+    }
+
+    div.dtext-inline span.dtext-hint {
       display: none;
     }
   }
