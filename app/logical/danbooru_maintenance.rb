@@ -7,6 +7,7 @@ module DanbooruMaintenance
     queue PrunePostsJob
     queue PruneRateLimitsJob
     queue RegeneratePostCountsJob
+    queue PruneUploadsJob
     #queue AmcheckDatabaseJob
   end
 

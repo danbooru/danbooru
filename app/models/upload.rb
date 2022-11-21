@@ -24,6 +24,7 @@ class Upload < ApplicationRecord
 
   validates :source, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { source.present? }
   validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { referer_url.present? }
+  validates :status, inclusion: { in: %w[pending processing completed error] }
   validate :validate_file_and_source, on: :create
   validate :validate_archive_files, on: :create
   validate :validate_uploader_is_not_limited, on: :create
@@ -31,8 +32,10 @@ class Upload < ApplicationRecord
   after_create :async_process_upload!
 
   scope :pending, -> { where(status: "pending") }
+  scope :processing, -> { where(status: "processing") }
   scope :completed, -> { where(status: "completed") }
   scope :failed, -> { where(status: "error") }
+  scope :expired, -> { processing.where(created_at: ..4.hours.ago) }
 
   def self.visible(user)
     if user.is_admin?
@@ -40,6 +43,10 @@ class Upload < ApplicationRecord
     else
       where(uploader: user)
     end
+  end
+
+  def self.prune!
+    expired.update_all(status: "error", error: "Stuck processing for more than 4 hours")
   end
 
   concerning :StatusMethods do

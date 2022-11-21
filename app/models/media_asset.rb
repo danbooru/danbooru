@@ -51,6 +51,12 @@ class MediaAsset < ApplicationRecord
 
   before_create :initialize_file_key
 
+  scope :expired, -> { processing.where(created_at: ..4.hours.ago) }
+
+  def self.prune!
+    expired.update_all(status: :failed)
+  end
+
   class Variant
     extend Memoist
     include ActiveModel::Serializers::JSON

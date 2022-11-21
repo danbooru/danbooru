@@ -25,6 +25,7 @@ class UploadMediaAsset < ApplicationRecord
 
   scope :unfinished, -> { where(status: %w[pending processing]) }
   scope :finished, -> { where(status: %w[active failed]) }
+  scope :expired, -> { unfinished.where(created_at: ..4.hours.ago) }
 
   def self.visible(user)
     if user.is_admin?
@@ -34,6 +35,10 @@ class UploadMediaAsset < ApplicationRecord
     else
       where(upload: user.uploads)
     end
+  end
+
+  def self.prune!
+    expired.update_all(status: :failed, error: "Stuck processing for more than 4 hours")
   end
 
   def self.search(params, current_user)
