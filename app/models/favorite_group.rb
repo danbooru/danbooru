@@ -4,12 +4,10 @@ class FavoriteGroup < ApplicationRecord
   belongs_to :creator, class_name: "User"
 
   before_validation :normalize_name
-  before_validation :strip_name
 
   validates :name, presence: true
   validates :name, uniqueness: { case_sensitive: false, scope: :creator_id }
-  validates :name, format: { without: /,/, message: "cannot have commas" }
-  validates :name, exclusion: { in: %w[any none], message: "can't be '%{value}'" }
+  validate :validate_name, if: :name_changed?
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
   validate :validate_posts
@@ -104,8 +102,31 @@ class FavoriteGroup < ApplicationRecord
     end
   end
 
+  def validate_name
+    case name
+    when /\A(any|none)\z/i
+      errors.add(:name, "cannot be '#{name}'")
+    when /,/
+      errors.add(:name, "cannot contain commas")
+    when /\*/
+      errors.add(:name, "cannot contain asterisks")
+    when /\A_/
+      errors.add(:name, "cannot begin with an underscore")
+    when /_\z/
+      errors.add(:name, "cannot end with an underscore")
+    when /__/
+      errors.add(:name, "cannot contain consecutive underscores")
+    when /[^[:graph:]]/
+      errors.add(:name, "cannot contain non-printable characters")
+    when ""
+      errors.add(:name, "cannot be blank")
+    when /\A[0-9]+\z/
+      errors.add(:name, "cannot contain only digits")
+    end
+  end
+
   def self.normalize_name(name)
-    name.gsub(/[[:space:]]+/, "_")
+    name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "")
   end
 
   def normalize_name
@@ -126,10 +147,6 @@ class FavoriteGroup < ApplicationRecord
 
   def self.find_by_name_or_id!(name, user)
     find_by_name_or_id(name, user) or raise ActiveRecord::RecordNotFound
-  end
-
-  def strip_name
-    self.name = name.to_s.strip
   end
 
   def pretty_name
