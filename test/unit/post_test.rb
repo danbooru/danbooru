@@ -384,11 +384,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "with a banned artist" do
         setup do
-          CurrentUser.scoped(FactoryBot.create(:admin_user)) do
-            @artist = FactoryBot.create(:artist)
-            @artist.ban!
-            perform_enqueued_jobs
-          end
+          @artist = create(:artist, is_banned: true)
           @post = FactoryBot.create(:post, :tag_string => @artist.name)
         end
 

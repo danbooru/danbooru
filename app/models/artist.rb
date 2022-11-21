@@ -193,33 +193,28 @@ class Artist < ApplicationRecord
   end
 
   module BanMethods
-    def unban!(current_user = CurrentUser.user)
-      Post.transaction do
-        ti = TagImplication.find_by(antecedent_name: name, consequent_name: "banned_artist")
-        ti&.destroy
+    def unban!(current_user)
+      with_lock do
+        ti = TagImplication.active.find_by(antecedent_name: name, consequent_name: "banned_artist")
+        ti&.update!(status: "deleted")
 
-        Post.raw_tag_match(name).find_each do |post|
-          post.unban!(current_user)
-          fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
-          post.update(tag_string: fixed_tags) # XXX should use current_user
-        end
+        BulkUpdateRequestProcessor.mass_update(name, "-status:banned -banned_artist", user: current_user)
 
-        update!(is_banned: false) # XXX should use current_user
+        CurrentUser.scoped(current_user) { update!(is_banned: false) }
         ModAction.log("unbanned artist ##{id}", :artist_unban, subject: self, user: current_user)
       end
     end
 
-    def ban!(banner: CurrentUser.user)
-      Post.transaction do
-        Post.raw_tag_match(name).each { |post| post.ban!(banner) }
+    def ban!(banner)
+      with_lock do
+        BulkUpdateRequestProcessor.mass_update(name, "status:banned", user: banner)
 
-        # potential race condition but unlikely
-        unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
+        unless TagImplication.active.exists?(antecedent_name: name, consequent_name: "banned_artist")
           Tag.find_or_create_by_name("banned_artist", category: "artist", current_user: banner)
           TagImplication.approve!(antecedent_name: name, consequent_name: "banned_artist", approver: banner)
         end
 
-        update!(is_banned: true)
+        CurrentUser.scoped(banner) { update!(is_banned: true) }
         ModAction.log("banned artist ##{id}", :artist_ban, subject: self, user: banner)
       end
     end
