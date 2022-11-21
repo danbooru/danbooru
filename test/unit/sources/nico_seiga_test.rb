@@ -22,7 +22,8 @@ module Sources
         page_url: "https://seiga.nicovideo.jp/seiga/im4937663",
         tags: tags,
         artist_name: "osamari",
-        tag_name: "nicoseiga7017777",
+        other_names: ["osamari"],
+        tag_name: "nicoseiga_7017777",
         profile_url: "https://seiga.nicovideo.jp/user/illust/7017777",
         artist_commentary_title: "コジコジ",
         artist_commentary_desc: "コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）"
@@ -45,7 +46,8 @@ module Sources
         page_url: "https://seiga.nicovideo.jp/seiga/im4937663",
         tags: tags,
         artist_name: "osamari",
-        tag_name: "nicoseiga7017777",
+        other_names: ["osamari"],
+        tag_name: "nicoseiga_7017777",
         profile_url: "https://seiga.nicovideo.jp/user/illust/7017777",
         artist_commentary_title: "コジコジ",
         artist_commentary_desc: "コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）"
@@ -186,7 +188,8 @@ module Sources
         page_url: "https://seiga.nicovideo.jp/watch/mg302561",
         tags: [["ロリ", "https://seiga.nicovideo.jp/manga/tag/%E3%83%AD%E3%83%AA"]],
         artist_name: "とろてい",
-        tag_name: "nicoseiga1848060"
+        other_names: ["とろてい"],
+        tag_name: "nicoseiga_1848060"
       )
     end
 

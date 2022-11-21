@@ -56,7 +56,11 @@ module Source
       end
 
       def tag_name
-        nil
+        "tinami_#{user_id}" if user_id.present?
+      end
+
+      def other_names
+        [artist_name].compact
       end
 
       def artist_name

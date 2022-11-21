@@ -44,6 +44,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"],
         download_size: 132_555,
         artist_name: "莚",
+        other_names: ["莚"],
         profile_url: "https://nijie.info/members.php?id=728995",
         artist_commentary_title: "ジャージの下は",
         dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です",
