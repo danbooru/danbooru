@@ -587,13 +587,13 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(Tag.categories.character, tag.last_version.category)
           end
 
-          should "change the category for an aliased tag" do
+          should "not change the category for an aliased tag" do
             create(:tag_alias, antecedent_name: "hoge", consequent_name: "moge")
             post = create(:post, tag_string: "char:hoge")
 
             assert_equal(["moge"], post.tag_array)
             assert_equal(Tag.categories.general, Tag.find_by_name("moge").category)
-            assert_equal(Tag.categories.character, Tag.find_by_name("hoge").category)
+            assert_equal(Tag.categories.general, Tag.find_by_name("hoge").category)
           end
 
           should "not raise an exception for an invalid tag name" do
