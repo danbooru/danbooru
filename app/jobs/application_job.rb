@@ -5,6 +5,9 @@
 # @see https://guides.rubyonrails.org/active_job_basics.html
 # @see https://github.com/bensheldon/good_job
 class ApplicationJob < ActiveJob::Base
+  # Preload subclasses so `job_classes` returns all subclasses in development mode.
+  Dir["#{__dir__}/*.rb"].each { |file| require file }
+
   class JobTimeoutError < StandardError; end
 
   queue_as :default
@@ -26,15 +29,6 @@ class ApplicationJob < ActiveJob::Base
 
   # A list of all available job types. Used by the /jobs search form.
   def self.job_classes
-    [
-      AmcheckDatabaseJob, BigqueryExportAllJob, DeleteFavoritesJob,
-      DmailInactiveApproversJob, IqdbAddPostJob, IqdbRemovePostJob,
-      PopulateSavedSearchJob, PruneApproversJob, PruneBansJob,
-      PruneBulkUpdateRequestsJob, PrunePostDisapprovalsJob, PrunePostsJob,
-      PruneRateLimitsJob, ProcessUploadJob, RegeneratePostCountsJob,
-      RegeneratePostJob, RetireTagRelationshipsJob, VacuumDatabaseJob,
-      DiscordNotificationJob, BigqueryExportJob, ProcessBulkUpdateRequestJob,
-      PruneJobsJob, MailDeliveryJob
-    ]
+    subclasses
   end
 end
