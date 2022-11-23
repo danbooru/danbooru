@@ -383,13 +383,12 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "with a banned artist" do
-        setup do
-          @artist = create(:artist, is_banned: true)
-          @post = FactoryBot.create(:post, :tag_string => @artist.name)
-        end
-
         should "ban the post" do
-          assert_equal(true, @post.is_banned?)
+          artist = create(:artist)
+          implication = create(:tag_implication, antecedent_name: artist.name, consequent_name: "banned_artist")
+          post = create(:post, tag_string: artist.name)
+
+          assert_equal(true, post.is_banned?)
         end
       end
 
