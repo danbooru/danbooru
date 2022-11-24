@@ -28,10 +28,11 @@
             <% if @user.email_address.present? %>
               <%= @user.email_address.address %>
 
-              (<%= link_to "Change email", edit_user_email_path(@user) %>
-              <% if !@user.email_address.is_verified %>
-                | <%= link_to "Verify email", verify_user_email_path(@user) %>
-              <% end %>)
+              <% if @user.email_address.is_verified %>
+                (<%= link_to "Change email", edit_user_email_path(@user) %>)
+              <% else %>
+                (<%= link_to "Change email", edit_user_email_path(@user) %> | <%= link_to "Verify email", verify_user_email_path(@user) %>)
+              <% end %>
             <% else %>
               <%= link_to "Add email", edit_user_email_path(@user) %>
             <% end %>
