@@ -58,7 +58,7 @@ class TimeSeriesComponent < ApplicationComponent
         containLabel: true
       },
       legend: {
-        data: y_axis.map(&:capitalize),
+        data: y_axis,
         type: "scroll",
         left: 0,
         padding: [8, 200, 0, 15],
@@ -87,7 +87,7 @@ class TimeSeriesComponent < ApplicationComponent
       yAxis: [type: "value"] * y_axis.size,
       series: y_axis.map do |name|
         {
-          name: name.capitalize,
+          name: name,
           type: "line",
           areaStyle: {},
           stack: "all",
@@ -109,7 +109,7 @@ class TimeSeriesComponent < ApplicationComponent
       yAxis: [type: "category", inverse: true] * y_axis.size,
       series: y_axis.map do |name|
         {
-          name: name.capitalize,
+          name: name,
           type: "bar",
           emphasis: {
             focus: "series"
