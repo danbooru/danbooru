@@ -75,6 +75,19 @@ class Source::URL::Gelbooru < Source::URL
     end
   end
 
+  def site_name
+    case domain
+    in "rule34.xxx"
+      "Rule34.xxx"
+    in "tbib.org"
+      "TBIB"
+    in "gelbooru.com"
+      "Gelbooru"
+    in "safebooru.org"
+      "Safebooru"
+    end
+  end
+
   def image_url?
     image_type.present?
   end

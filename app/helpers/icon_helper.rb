@@ -138,6 +138,8 @@ module IconHelper
     Redbubble
     Reddit
     Rule34.us
+    Rule34.xxx
+    Safebooru
     Sakura.ne.jp
     Sankaku\ Complex
     Shopee
@@ -154,6 +156,7 @@ module IconHelper
     SubscribeStar
     Suzuri
     Tapas
+    TBIB
     TeePublic
     Telegram
     The\ Interviews
