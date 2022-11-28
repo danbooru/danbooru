@@ -116,6 +116,9 @@ html, body[data-current-user-theme="light"] {
 
   --default-border-color: var(--grey-1);
 
+  --success-color: var(--green-5);
+  --error-color: var(--red-5);
+
   --error-background-color: var(--red-1);
   --success-background-color: var(--green-0);
   --target-background: var(--yellow-0);
@@ -287,6 +290,11 @@ html, body[data-current-user-theme="light"] {
   --paginator-arrow-background-color: var(--inverse-text-color);
   --paginator-arrow-color: var(--link-color);
 
+  --asset-paginator-link-color: var(--link-color);
+  --asset-paginator-link-hover-color: var(--link-color);
+  --asset-paginator-background-color: var(--white);
+  --asset-paginator-background-hover-color: var(--blue-0);
+
   --artist-tag-color: var(--red-6);
   --artist-tag-hover-color: var(--red-5);
   --copyright-tag-color: var(--magenta-6);
@@ -333,6 +341,9 @@ html, body[data-current-user-theme="light"] {
   --header-color: var(--grey-1);
   --link-color: var(--azure-4);
   --link-hover-color: var(--azure-3);
+
+  --success-color: var(--green-3);
+  --error-color: var(--red-3);
 
   --default-border-color: var(--grey-7);
 
@@ -493,6 +504,11 @@ html, body[data-current-user-theme="light"] {
 
   --paginator-arrow-background-color: var(--grey-0);
   --paginator-arrow-color: var(--link-color);
+
+  --asset-paginator-link-color: var(--white);
+  --asset-paginator-link-hover-color: var(--white);
+  --asset-paginator-background-color: var(--grey-9);
+  --asset-paginator-background-hover-color: var(--grey-8);
 
   --artist-tag-color: var(--red-3);
   --artist-tag-hover-color: var(--red-2);

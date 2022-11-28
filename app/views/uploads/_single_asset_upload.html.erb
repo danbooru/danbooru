@@ -23,7 +23,7 @@
   <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
 
   <div id="upload-image">
-    <%= render MediaAssetComponent.new(media_asset: media_asset) %>
+    <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user) %>
 
     <p>
       <strong>Size</strong>
