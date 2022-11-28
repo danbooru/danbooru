@@ -499,6 +499,15 @@ class MediaAsset < ApplicationRecord
     end
   end
 
+  def source_urls
+    urls = upload_media_assets.map { |uma| Source::URL.page_url(uma.source_url) || uma.page_url || uma.source_url }
+    urls += [post.normalized_source] if post&.normalized_source.present?
+
+    urls.compact.select do |url|
+      url.match?(%r{\Ahttps?://}i) && Source::URL.parse(url).recognized?
+    end.uniq
+  end
+
   def self.generate_file_key
     loop do
       key = SecureRandom.send(:choose, [*"0".."9", *"A".."Z", *"a".."z"], FILE_KEY_LENGTH) # base62

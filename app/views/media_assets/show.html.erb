@@ -13,6 +13,12 @@
           <% if policy(@media_asset).can_see_image? %>
             <% component.with_footer do %>
               <div class="flex flex-none h-6 items-center justify-center text-xs">
+                <span class="mr-2">
+                  <% @media_asset.source_urls.take(5).each do |url| %>
+                    <%= external_link_to url, external_site_icon(Source::URL.site_name(url), class: "h-4"), title: url, class: "inline-block align-top" %>
+                  <% end %>
+                </span>
+
                 <%= link_to @media_asset.original.file_url do %>
                   <%= number_to_human_size(@media_asset.file_size) %> .<%= @media_asset.file_ext %>,
                   <%= @media_asset.image_width %>x<%= @media_asset.image_height %>
@@ -50,7 +56,7 @@
         </div>
 
         <div>
-          <table class="striped text-sm w-full">
+          <table class="striped text-xs w-full">
             <tr>
               <th colspan="2" class="text-center">Metadata</th>
             </tr>
@@ -88,6 +94,13 @@
               <tr>
                 <th class="text-left">Duration</th>
                 <td class="break-all"><%= duration_to_hhmmss(@media_asset.duration) %></td>
+              </tr>
+            <% end %>
+
+            <% @media_asset.source_urls.each do |url| %>
+              <tr>
+                <th class="text-left">Source</th>
+                <td class="break-all"><%= external_link_to url %></td>
               </tr>
             <% end %>
 
