@@ -15,7 +15,7 @@
     <% elsif is_ugoira? %>
       <%= tag.video src: variant(:sample).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls", class: "media-asset-image max-h-inherit max-w-full h-full w-auto select-none" %>
     <% elsif is_flash? %>
-      <%= tag.div class: "ruffle-container", "data-swf": variant(:original).file_url %>
+      <%= tag.div "data-swf": variant(:original).file_url, class: "media-asset-image ruffle-container max-h-inherit max-w-full h-full w-auto select-none" %>
     <% end %>
   </div>
 
