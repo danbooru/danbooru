@@ -75,7 +75,11 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_to_show(items)
-    redirect_to send("#{controller_path.singularize}_path", items.first, format: request.format.symbol)
+    if request.format.html?
+      redirect_to send("#{controller_path.singularize}_path", items.first)
+    else
+      redirect_to send("#{controller_path.singularize}_path", items.first, format: request.format.symbol)
+    end
   end
 
   def is_redirect?(items)
