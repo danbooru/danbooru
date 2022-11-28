@@ -11,9 +11,9 @@
     <% elsif is_image? %>
       <%= tag.img src: variant(:original).file_url, width: image_width, height: image_height, draggable: "false", class: "media-asset-image max-h-inherit max-w-full h-full w-auto select-none" -%>
     <% elsif is_video? %>
-      <%= tag.video src: variant(:original).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls" %>
+      <%= tag.video src: variant(:original).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls", class: "media-asset-image max-h-inherit max-w-full h-full w-auto select-none" %>
     <% elsif is_ugoira? %>
-      <%= tag.video src: variant(:sample).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls" %>
+      <%= tag.video src: variant(:sample).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls", class: "media-asset-image max-h-inherit max-w-full h-full w-auto select-none" %>
     <% elsif is_flash? %>
       <%= tag.div class: "ruffle-container", "data-swf": variant(:original).file_url %>
     <% end %>
