@@ -65,6 +65,7 @@ module Source
       Source::Extractor::Imgur,
       Source::Extractor::Zerochan,
       Source::Extractor::Poipiku,
+      Source::Extractor::Pixai,
     ]
 
     # Should return true if the extractor is configured correctly. Return false

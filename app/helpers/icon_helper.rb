@@ -148,6 +148,7 @@ module IconHelper
     Piczel
     Pillowfort
     Pinterest
+    Pixai
     Pixel\ Joint
     Pixiv
     Pixiv\ Sketch

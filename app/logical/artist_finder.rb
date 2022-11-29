@@ -130,6 +130,7 @@ module ArtistFinder
     "pictaram.com", # http://www.pictaram.com/user/5ish/3048385011/1350040096769940245_3048385011
     "pinterest.com", # http://www.pinterest.com/alexandernanitc/
     "pipa.jp", # http://tegaki.pipa.jp/515745
+    "pixai.art", # https://pixai.art/@kit
     "pixiv.cc", # http://pixiv.cc/0123456789/
     "pixiv.me", # https://pixiv.me/gmgm0327
     "pixiv.net", # https://www.pixiv.net/member.php?id=10442390
