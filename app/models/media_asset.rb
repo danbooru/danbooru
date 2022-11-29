@@ -21,7 +21,7 @@ class MediaAsset < ApplicationRecord
   has_many :uploaders, through: :uploads, class_name: "User", foreign_key: :uploader_id
   has_many :ai_tags
 
-  delegate :frame_delays, :metadata, to: :media_metadata
+  delegate :frame_delays, :metadata, to: :media_metadata, allow_nil: true
   delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, :is_ai_generated?, :has_sound?, to: :metadata
 
   scope :public_only, -> { where(is_public: true) }

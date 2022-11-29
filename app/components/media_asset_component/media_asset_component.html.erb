@@ -6,7 +6,13 @@
       100%
     </div>
 
-    <% if !policy(media_asset).can_see_image? %>
+    <% if media_asset.expunged? || media_asset.deleted? %>
+      <p>Image deleted.</p>
+    <% elsif media_asset.processing? %>
+      <p><%= spinner_icon(class: "h-8") %></p>
+    <% elsif media_asset.failed? %>
+      <p>Upload failed.</p>
+    <% elsif !media_asset.active? || !policy(media_asset).can_see_image? %>
       <p>Image unavailable.</p>
     <% elsif is_image? %>
       <%= tag.img src: variant(:original).file_url, width: image_width, height: image_height, draggable: "false", class: "media-asset-image max-h-inherit max-w-full h-full w-auto select-none" -%>

@@ -21,7 +21,9 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
     context "show action" do
       should "render" do
         @media_asset = create(:media_asset)
-        get media_asset_path(@media_asset), as: :json
+        @ai_tags = create_list(:ai_tag, 10, media_asset: @media_asset)
+
+        get media_asset_path(@media_asset)
 
         assert_response :success
       end
@@ -33,6 +35,13 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_nil(response.parsed_body[:md5])
+      end
+
+      should "work for a deleted asset" do
+        @media_asset = create(:media_asset, status: "deleted", media_metadata: nil)
+        get media_asset_path(@media_asset)
+
+        assert_response :success
       end
     end
   end
