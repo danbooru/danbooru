@@ -14,6 +14,10 @@
             <% component.with_footer do %>
               <div class="flex flex-none h-6 items-center justify-center text-xs">
                 <span class="mr-2">
+                  <% if @media_asset.post.present? %>
+                    <%= link_to image_icon_tag("danbooru-logo.png", class: "h-4"), @media_asset.post, class: "inline-block align-top" %>
+                  <% end %>
+
                   <% @media_asset.source_urls.take(5).each do |url| %>
                     <%= external_link_to url, external_site_icon(Source::URL.site_name(url), class: "h-4"), title: url, class: "inline-block align-top" %>
                   <% end %>
