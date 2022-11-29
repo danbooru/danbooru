@@ -26,8 +26,14 @@ class PopupMenuComponent {
 
   // Hides the menu when a menu item is clicked.
   static onMenuItemClicked(event) {
-    let tippy = $(event.target).parents("[data-tippy-root]").get(0)._tippy;
-    tippy.hide();
+    let menuHideOnClick = $(event.target).parents(".popup-menu").data("hide-on-click");
+    let itemHideOnClick = $(event.target).parents("li").data("hide-on-click");
+    let hideOnClick = itemHideOnClick !== undefined ? itemHideOnClick : menuHideOnClick;
+
+    if (hideOnClick) {
+      let tippy = $(event.target).parents("[data-tippy-root]").get(0)._tippy;
+      tippy.hide();
+    }
   }
 }
 

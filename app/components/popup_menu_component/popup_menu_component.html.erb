@@ -1,4 +1,4 @@
-<div class="popup-menu inline-block <%= classes %>">
+<%= tag.div class: "popup-menu inline-block #{classes}".strip, "data-hide-on-click": hide_on_click do %>
   <a class="popup-menu-button inline-block rounded p-1" href="javascript:void(0)">
     <% if button.present? %>
       <%= button %>
@@ -9,7 +9,7 @@
 
   <ul class="popup-menu-content">
     <% items.each do |item| %>
-      <li><%= item %></li>
+      <%= item %>
     <% end %>
   </ul>
-</div>
+<% end %>

@@ -180,7 +180,8 @@ module ApplicationHelper
     time_tag(time.strftime("%Y-%m-%d %H:%M"), time)
   end
 
-  def external_link_to(url, text = url, truncate: nil, strip: false, **link_options)
+  def external_link_to(url, text = url, truncate: nil, strip: false, **link_options, &block)
+    text = capture { yield } if block_given?
     text = text.gsub(%r{\Ahttps?://}i, "") if strip == :scheme
     text = text.gsub(%r{\Ahttps?://(?:www\.)?}i, "") if strip == :subdomain
     text = text.truncate(truncate) if truncate
