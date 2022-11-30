@@ -14,7 +14,7 @@ class MediaAssetPolicy < ApplicationPolicy
   end
 
   def can_see_image?
-    record.post.blank? || record.post.visible?(user)
+    !record.removed? && (record.post.blank? || record.post.visible?(user))
   end
 
   def api_attributes

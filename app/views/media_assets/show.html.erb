@@ -159,11 +159,13 @@
               </tr>
             <% end %>
 
-            <% @media_asset.source_urls.each do |url| %>
-              <tr>
-                <th class="text-left">Source</th>
-                <td class="break-all"><%= external_link_to url %></td>
-              </tr>
+            <% if policy(@media_asset).can_see_image? %>
+              <% @media_asset.source_urls.each do |url| %>
+                <tr>
+                  <th class="text-left">Source</th>
+                  <td class="break-all"><%= external_link_to url %></td>
+                </tr>
+              <% end %>
             <% end %>
 
             <% @media_asset.metadata.to_h.group_by { |key, value| key.split(":").first }.sort.each do |group, pairs| %>

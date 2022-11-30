@@ -27,6 +27,8 @@ class MediaAsset < ApplicationRecord
   scope :public_only, -> { where(is_public: true) }
   scope :private_only, -> { where(is_public: false) }
   scope :without_ai_tags, -> { where.not(AITag.where("ai_tags.media_asset_id = media_assets.id").select(1).arel.exists) }
+  scope :removed, -> { where(status: [:deleted, :expunged]) }
+  scope :expired, -> { processing.where(created_at: ..4.hours.ago) }
 
   # Processing: The asset's files are currently being resized and distributed to the backend servers.
   # Active: The asset has been successfully uploaded and is ready to use.
@@ -50,8 +52,6 @@ class MediaAsset < ApplicationRecord
   validates :image_height, comparison: { greater_than: 0 }, if: :image_height_changed?
 
   before_create :initialize_file_key
-
-  scope :expired, -> { processing.where(created_at: ..4.hours.ago) }
 
   def self.prune!
     expired.update_all(status: :failed)
@@ -319,6 +319,10 @@ class MediaAsset < ApplicationRecord
           raise Error, "Duration must be less than #{MAX_VIDEO_DURATION} seconds"
         end
       end
+    end
+
+    def removed?
+      deleted? || expunged?
     end
 
     # @return [Mime::Type] The file's MIME type.

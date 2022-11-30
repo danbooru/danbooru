@@ -6,7 +6,7 @@
       100%
     </div>
 
-    <% if media_asset.expunged? || media_asset.deleted? %>
+    <% if media_asset.removed? %>
       <p>Image deleted.</p>
     <% elsif media_asset.processing? %>
       <p><%= spinner_icon(class: "h-8") %></p>
