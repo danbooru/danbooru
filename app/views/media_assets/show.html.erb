@@ -51,6 +51,12 @@
                     <% end %>
 
                     <% menu.item do %>
+                      <%= external_link_to "https://ascii2d.net/search/url/#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> Ascii2D
+                      <% end %>
+                    <% end %>
+
+                    <% menu.item do %>
                       <%= external_link_to "https://yandex.com/images/search?rpt=imageview&url=#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
                         <%= search_icon %> Yandex
                       <% end %>
