@@ -208,7 +208,7 @@ class MediaAsset < ApplicationRecord
       end
 
       def search(params, current_user)
-        q = search_attributes(params, [:id, :created_at, :updated_at, :status, :md5, :file_ext, :file_size, :image_width, :image_height, :file_key, :is_public], current_user: current_user)
+        q = search_attributes(params, [:id, :created_at, :updated_at, :status, :md5, :file_ext, :file_size, :image_width, :image_height, :duration, :file_key, :is_public], current_user: current_user)
 
         if params[:metadata].present?
           q = q.joins(:media_metadata).merge(MediaMetadata.search({ metadata: params[:metadata] }, current_user))
