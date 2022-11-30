@@ -7,7 +7,7 @@
 class TagMover
   attr_reader :old_tag, :new_tag, :user
 
-  # Initalize a tag move.
+  # Initialize a tag move.
   # @param old_name [String] the name of the tag to move
   # @param new_name [String] the new tag name
   # @param user [User] the user to credit for all edits in moving the tag
