@@ -395,6 +395,7 @@ class MediaAsset < ApplicationRecord
     def expunge!(current_user, log: true)
       with_lock do
         delete_files!
+        purge_cached_urls!
         update!(status: :expunged)
         ModAction.log("expunged media asset ##{id} (md5=#{md5})", :media_asset_expunge, subject: self, user: current_user) if log
       end
@@ -406,6 +407,7 @@ class MediaAsset < ApplicationRecord
     def trash!(current_user, log: true)
       with_lock do
         variants.each(&:trash_file!)
+        purge_cached_urls!
         update!(status: :deleted)
         ModAction.log("deleted media asset ##{id} (md5=#{md5})", :media_asset_delete, subject: self, user: current_user) if log
       end
