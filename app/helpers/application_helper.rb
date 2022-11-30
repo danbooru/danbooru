@@ -133,6 +133,19 @@ module ApplicationHelper
     end
   end
 
+  def duration_to_hhmmssms(seconds)
+    hh = seconds.div(1.hour).to_s
+    mm = seconds.div(1.minute).to_s
+    ss = "%.2d" % (seconds % 1.minute)
+    ms = ("%.3f" % (seconds % 1.second)).delete_prefix("0.")
+
+    if seconds >= 1.hour
+      "#{hh}:#{mm}:#{ss}.#{ms}"
+    else
+      "#{mm}:#{ss}.#{ms}"
+    end
+  end
+
   def humanized_number(number, million: "M", thousand: "k")
     if number >= 1_000_000
       format("%.1f#{million}", number / 1_000_000.0)
