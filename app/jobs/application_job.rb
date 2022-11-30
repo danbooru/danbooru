@@ -29,6 +29,6 @@ class ApplicationJob < ActiveJob::Base
 
   # A list of all available job types. Used by the /jobs search form.
   def self.job_classes
-    subclasses
+    subclasses.sort_by(&:name)
   end
 end
