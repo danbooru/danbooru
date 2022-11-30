@@ -4,7 +4,7 @@
 # `search:all` or `search:<label>`.
 class PopulateSavedSearchJob < ApplicationJob
   queue_as :default
-  queue_with_priority 20
+  queue_with_priority -1
 
   def perform(query)
     SavedSearch.populate(query)

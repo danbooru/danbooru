@@ -11,6 +11,8 @@ class ApplicationJob < ActiveJob::Base
   class JobTimeoutError < StandardError; end
 
   queue_as :default
+
+  # Jobs with higher priority are processed first. Higher number = higher priority.
   queue_with_priority 0
 
   around_perform do |_job, block|
