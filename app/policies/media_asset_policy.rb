@@ -5,6 +5,10 @@ class MediaAssetPolicy < ApplicationPolicy
     true
   end
 
+  def destroy?
+    user.is_admin?
+  end
+
   def image?
     can_see_image?
   end

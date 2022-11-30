@@ -73,6 +73,18 @@
                         <%= search_icon %> <%= Danbooru.config.app_name %>
                       <% end %>
                     <% end %>
+
+                    <% if policy(@media_asset).destroy? && @media_asset.post.nil? && !@media_asset.deleted? && !@media_asset.expunged? %>
+                      <% menu.item do %>
+                        <hr class="border">
+                      <% end %>
+
+                      <% menu.item do %>
+                        <%= link_to media_asset_path(@media_asset), class: "text-danger", remote: true, xhr: true, method: :delete, "data-confirm": "This will permanently delete this file. Are you sure?" do %>
+                          <%= delete_icon %> Delete file
+                        <% end %>
+                      <% end %>
+                    <% end %>
                   <% end %>
                 </span>
               </div>

@@ -44,5 +44,32 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
     end
+
+    context "destroy action" do
+      should "delete the asset's files" do
+        @admin = create(:admin_user)
+        @media_asset = MediaAsset.upload!("test/files/test.jpg")
+        delete_auth media_asset_path(@media_asset), @admin
+
+        assert_redirected_to @media_asset
+
+        assert_equal("deleted", @media_asset.reload.status)
+        @media_asset.variants.each do |variant|
+          assert_nil(variant.open_file)
+        end
+
+        assert_equal(1, ModAction.count)
+        assert_equal("media_asset_delete", ModAction.last.category)
+        assert_equal(@media_asset, ModAction.last.subject)
+        assert_equal(@admin, ModAction.last.creator)
+      end
+
+      should "fail for non-admins" do
+        @media_asset = create(:media_asset)
+        delete_auth media_asset_path(@media_asset), create(:user)
+
+        assert_response 403
+      end
+    end
   end
 end

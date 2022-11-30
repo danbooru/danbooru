@@ -252,8 +252,13 @@ $spacer: 0.25rem; /* 4px */
 
 .link-color { color: var(--link-color); }
 
-.text-success { color: var(--success-color); }
-.text-error { color: var(--error-color); }
+.text-success { color: var(--success-color) !important; }
+.text-error { color: var(--error-color) !important; }
+.text-danger { color: var(--error-color) !important; }
+
+a.text-success:hover { color: var(--success-hover-color) !important; }
+a.text-error:hover { color: var(--error-hover-color) !important; }
+a.text-danger:hover { color: var(--error-hover-color) !important; }
 
 .transition-opacity {
   transition: opacity 0.15s ease;

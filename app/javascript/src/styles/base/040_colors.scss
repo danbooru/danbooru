@@ -119,6 +119,9 @@ html, body[data-current-user-theme="light"] {
   --success-color: var(--green-5);
   --error-color: var(--red-5);
 
+  --success-hover-color: var(--green-4);
+  --error-hover-color: var(--red-4);
+
   --error-background-color: var(--red-1);
   --success-background-color: var(--green-0);
   --target-background: var(--yellow-0);
@@ -342,8 +345,11 @@ html, body[data-current-user-theme="light"] {
   --link-color: var(--azure-4);
   --link-hover-color: var(--azure-3);
 
-  --success-color: var(--green-3);
-  --error-color: var(--red-3);
+  --success-color: var(--green-4);
+  --error-color: var(--red-4);
+
+  --success-hover-color: var(--green-3);
+  --error-hover-color: var(--red-3);
 
   --default-border-color: var(--grey-7);
 
