@@ -68,6 +68,17 @@ module Danbooru
       nil
     end
 
+    # Escape a string for use in an URL path or query parameter. Like `CGI.escape`, but leaves Unicode characters as Unicode.
+    #
+    # @example
+    #   Danbooru::URL.escape("fate/stay_night") # => "fate%2Fstay_night"
+    #   Danbooru::URL.escape("大丈夫?おっぱい揉む?") # => "大丈夫%3Fおっぱい揉む%3F"
+    #
+    # @return [String] The escaped string
+    def self.escape(string)
+      Addressable::URI.encode_component(string, /[\/?#&+%]/).force_encoding("UTF-8")
+    end
+
     # @return [String] the URL in unnormalized form
     def to_s
       original_url

@@ -77,12 +77,8 @@ module Source
       def tags
         return [] if api_client.blank?
 
-        base_url = "https://seiga.nicovideo.jp/"
-        base_url += "manga/" if manga_id.present?
-        base_url += "tag/"
-
         api_client.tags.map do |name|
-          [name, base_url + CGI.escape(name)]
+          [name, "https://seiga.nicovideo.jp/#{"manga/" if manga_id}tag/#{Danbooru::URL.escape(name)}"]
         end
       end
 

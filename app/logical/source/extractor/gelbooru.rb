@@ -39,7 +39,7 @@ module Source
 
         tags = api_response[:tags].split + ["rating:#{api_response[:rating]}"]
         tags.map do |tag|
-          [tag, "https://#{domain}/index.php?page=post&s=list&tags=#{CGI.escape(tag)}"]
+          [tag, "https://#{domain}/index.php?page=post&s=list&tags=#{Danbooru::URL.escape(tag)}"]
         end
       end
 

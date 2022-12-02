@@ -23,7 +23,7 @@ module Source
 
       def tags
         api_response[:tags].to_s.split.map do |tag|
-          [tag, "https://#{domain}/post?tags=#{CGI.escape(tag)}"]
+          [tag, "https://#{domain}/post?tags=#{Danbooru::URL.escape(tag)}"]
         end
       end
 

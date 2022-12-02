@@ -105,7 +105,7 @@ module Source
 
       def tags
         tags = api_illust.dig(:tags, :tags).to_a.map do |item|
-          [item[:tag], "https://www.pixiv.net/tags/#{CGI.escape(item[:tag])}/artworks"]
+          [item[:tag], "https://www.pixiv.net/tags/#{Danbooru::URL.escape(item[:tag])}/artworks"]
         end
 
         if api_illust["aiType"] == 2

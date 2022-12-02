@@ -47,7 +47,7 @@ module Source
 
       def tags
         page&.css("#view .tag a[href^='/search/list']").to_a.map do |tag|
-          [tag.text, "https://www.tinami.com/search/list?keyword=#{CGI.escape(tag.text)}"]
+          [tag.text, "https://www.tinami.com/search/list?keyword=#{Danbooru::URL.escape(tag.text)}"]
         end
       end
 

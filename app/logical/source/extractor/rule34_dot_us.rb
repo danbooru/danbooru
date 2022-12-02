@@ -28,7 +28,7 @@ module Source
 
       def tags
         page&.css("meta[name='keywords']")&.attr("content")&.value.to_s.split(/, /).compact.map do |tag|
-          [tag.tr(" ", "_"), "https://rule34.us/index.php?r=posts/index&q=#{CGI.escape(tag)}"]
+          [tag.tr(" ", "_"), "https://rule34.us/index.php?r=posts/index&q=#{Danbooru::URL.escape(tag)}"]
         end
       end
 

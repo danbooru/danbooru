@@ -94,10 +94,8 @@ module Sources
 
         should "get the tags" do
           pixiv_tags  = @site.tags.map(&:first)
-          pixiv_links = @site.tags.map(&:last)
 
           assert_equal(%w[漫画 test], pixiv_tags)
-          assert_contains(pixiv_links, /search\.php/)
         end
 
         should "get the artist commentary" do

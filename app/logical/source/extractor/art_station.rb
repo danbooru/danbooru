@@ -48,7 +48,7 @@ class Source::Extractor
 
     def tags
       api_response[:tags].to_a.map do |tag|
-        [tag, "https://www.artstation.com/search?q=#{CGI.escape(tag)}"]
+        [tag, "https://www.artstation.com/search?q=#{Danbooru::URL.escape(tag)}"]
       end
     end
 
