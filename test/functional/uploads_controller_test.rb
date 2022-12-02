@@ -445,6 +445,19 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(5, upload.upload_media_assets.size)
           assert_equal("file://ugoira.zip/000000.jpg", upload.upload_media_assets[0].source_url)
         end
+
+        should "upload the files in filename order" do
+          upload = assert_successful_upload("test/files/archive/out-of-order.zip", user: @user)
+
+          assert_equal(6, upload.media_asset_count)
+          assert_equal(6, upload.upload_media_assets.size)
+          assert_equal("file://out-of-order.zip/9/9.gif", upload.upload_media_assets[0].source_url)
+          assert_equal("file://out-of-order.zip/9/10.gif", upload.upload_media_assets[1].source_url)
+          assert_equal("file://out-of-order.zip/9/11.gif", upload.upload_media_assets[2].source_url)
+          assert_equal("file://out-of-order.zip/10/9.gif", upload.upload_media_assets[3].source_url)
+          assert_equal("file://out-of-order.zip/10/10.gif", upload.upload_media_assets[4].source_url)
+          assert_equal("file://out-of-order.zip/10/11.gif", upload.upload_media_assets[5].source_url)
+        end
       end
 
       context "uploading a .rar file from your computer" do

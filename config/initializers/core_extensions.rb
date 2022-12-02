@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "danbooru"
+
 module Danbooru
   module Extensions
     module String

@@ -206,7 +206,7 @@ class Upload < ApplicationRecord
         tmpdir, filenames = file.extract!
         tmpdirs << tmpdir
 
-        filenames.map do |filename|
+        Danbooru.natural_sort(filenames).map do |filename|
           name = "file://#{original_filename}/#{Pathname.new(filename).relative_path_from(tmpdir)}" # "file://foo.zip/foo/1.jpg"
           UploadMediaAsset.new(upload: self, file: filename, source_url: name)
         end
