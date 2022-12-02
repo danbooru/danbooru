@@ -185,6 +185,17 @@ module Sources
         )
       end
 
+      context "An AI-generated post should get the AI tag" do
+        strategy_should_work(
+          "https://www.pixiv.net/en/artworks/103291492",
+          image_urls: ["https://i.pximg.net/img-original/img/2022/12/03/05/06/51/103291492_p0.png"],
+          artist_commentary_title: "Rem's present",
+          artist_name: "Anzatiridonia",
+          profile_url: "https://www.pixiv.net/users/33589885",
+          tags: %w[AI Re:ゼロから始める異世界生活 レム リゼロ レム(リゼロ) AIイラスト AnythingV3 Present sweater],
+        )
+      end
+
       context "fetching the commentary" do
         should "work when the description is blank" do
           get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981746")
