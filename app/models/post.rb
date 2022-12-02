@@ -167,18 +167,6 @@ class Post < ApplicationRecord
       media_asset.variant(:preview).file_url
     end
 
-    def open_graph_image_url
-      if is_image?
-        if has_large?
-          large_file_url
-        else
-          file_url
-        end
-      else
-        preview_file_url
-      end
-    end
-
     def file_url_for(user)
       if user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
         tagged_large_file_url
@@ -209,10 +197,6 @@ class Post < ApplicationRecord
   end
 
   concerning :ImageMethods do
-    def twitter_card_supported?
-      image_width.to_i >= 280 && image_height.to_i >= 150
-    end
-
     def has_large?
       return false if has_tag?("animated_gif") || has_tag?("animated_png")
       return true if is_ugoira?

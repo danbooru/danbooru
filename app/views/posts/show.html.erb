@@ -393,21 +393,7 @@
   <meta name="post-id" content="<%= @post.id %>">
   <meta name="post-has-embedded-notes" content="<%= @post.has_embedded_notes? %>">
 
-  <% if policy(@post).visible? %>
-    <%= tag.meta property: "og:image", content: @post.open_graph_image_url %>
-
-    <% if @post.is_video? %>
-      <%= json_ld_video_data(@post) %>
-    <% end %>
-  <% end %>
-
-  <% if @post.twitter_card_supported? %>
-    <meta name="twitter:card" content="summary_large_image">
-
-    <% if policy(@post).visible? %>
-      <%= tag.meta name: "twitter:image", content: @post.open_graph_image_url %>
-    <% end %>
-  <% end %>
+  <%= render OpenGraphComponent.new(media_asset: @post.media_asset, current_user: CurrentUser.user) %>
 
   <% if @post.rating == "e" %>
     <meta name="rating" content="adult">

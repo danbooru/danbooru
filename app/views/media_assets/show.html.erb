@@ -193,4 +193,8 @@
   </div>
 </div>
 
+<% content_for(:html_header) do %>
+  <%= render OpenGraphComponent.new(media_asset: @media_asset, current_user: CurrentUser.user) %>
+<% end %>
+
 <%= render "uploads/secondary_links" %>
