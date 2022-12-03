@@ -42,6 +42,15 @@ class UserDeletion
     true
   end
 
+  def undelete!
+    user.with_lock do
+      user.update!(is_deleted: false, password: password)
+      UserNameChangeRequest.create!(user: user, desired_name: user.user_name_change_requests.order(id: :desc).first.original_name, original_name: user.name)
+      ModAction.log("undeleted user ##{user.id}", :user_undelete, subject: user, user: deleter)
+      UserEvent.create_from_request!(user, :user_undeletion, request) if request.present?
+    end
+  end
+
   # Calls `delete_user`.
   def async_delete_user
     DeleteUserJob.perform_later(user)

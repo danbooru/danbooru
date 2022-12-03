@@ -15,6 +15,7 @@ class UserEvent < ApplicationRecord
     logout: 100,
     user_creation: 200,
     user_deletion: 300,
+    user_undeletion: 310,
     password_reset: 400,
     password_change: 500,
     email_change: 600,
