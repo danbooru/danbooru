@@ -603,6 +603,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("http://www.tinami.com/view/1087268")
 
         should_upload_successfully("https://booth.pximg.net/4ee2c0d9-41fa-4a0e-a30f-1bc9e15d4e5b/i/2586180/331b7c5f-7614-4772-aae2-cb979ad44a6b.png")
+
+        should_upload_successfully("https://picdig.net/apricot/projects/9d96c3f2-f92f-4472-856a-93779bb43527")
       end
     end
   end

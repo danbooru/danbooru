@@ -59,6 +59,7 @@ module Source
       Source::Extractor::Bilibili,
       Source::Extractor::Rule34DotUs,
       Source::Extractor::FourChan,
+      Source::Extractor::Picdig,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
