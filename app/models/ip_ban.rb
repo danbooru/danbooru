@@ -7,7 +7,7 @@ class IpBan < ApplicationRecord
   has_many :mod_actions, as: :subject, dependent: :destroy
 
   validate :validate_ip_addr
-  validates :reason, presence: true
+  validates :reason, visible_string: true
 
   after_save :create_mod_action
 

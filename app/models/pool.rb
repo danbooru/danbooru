@@ -6,7 +6,7 @@ class Pool < ApplicationRecord
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
 
-  validates :name, uniqueness: { case_sensitive: false }, if: :name_changed?
+  validates :name, visible_string: true, uniqueness: { case_sensitive: false }, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validates :category, inclusion: { in: %w[series collection] }
   validate :updater_can_edit_deleted

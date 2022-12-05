@@ -7,7 +7,7 @@ class UserFeedback < ApplicationRecord
 
   belongs_to :user
   belongs_to :creator, class_name: "User"
-  validates :body, presence: true
+  validates :body, visible_string: true
   validates :category, presence: true, inclusion: { in: %w[positive negative neutral] }
   after_create :create_dmail, unless: :disable_dmail_notification
   after_update :create_mod_action

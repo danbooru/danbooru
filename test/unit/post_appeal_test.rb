@@ -52,6 +52,15 @@ class PostAppealTest < ActiveSupport::TestCase
           end
         end
       end
+
+      context "validation" do
+        subject { build(:post_appeal) }
+
+        should allow_value("").for(:reason)
+
+        should_not allow_value(" ").for(:reason)
+        should_not allow_value("\u200B").for(:reason)
+      end
     end
   end
 end

@@ -13,7 +13,7 @@ class Comment < ApplicationRecord
   has_many :active_votes, -> { active }, class_name: "CommentVote"
   has_many :mod_actions, as: :subject, dependent: :destroy
 
-  validates :body, presence: true, length: { maximum: 15_000 }, if: :body_changed?
+  validates :body, visible_string: true, length: { maximum: 15_000 }, if: :body_changed?
 
   before_create :autoreport_spam
   before_save :handle_reports_on_deletion

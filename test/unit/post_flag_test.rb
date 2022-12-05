@@ -114,5 +114,13 @@ class PostFlagTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "during validation" do
+      subject { build(:post_flag) }
+
+      should_not allow_value("").for(:reason)
+      should_not allow_value(" ").for(:reason)
+      should_not allow_value("\u200B").for(:reason)
+    end
   end
 end

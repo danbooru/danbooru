@@ -27,7 +27,7 @@ class ForumTopic < ApplicationRecord
   has_many :tag_implications
   has_many :mod_actions, as: :subject, dependent: :destroy
 
-  validates :title, presence: true, length: { maximum: 200 }, if: :title_changed?
+  validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
   validates :category_id, inclusion: { in: CATEGORIES.keys }
   validates :min_level, inclusion: { in: MIN_LEVELS.values }
 

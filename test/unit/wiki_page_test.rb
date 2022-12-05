@@ -114,6 +114,8 @@ class WikiPageTest < ActiveSupport::TestCase
       should normalize_attribute(:title).from(" Foo___   Bar ").to("foo_bar")
 
       should_not allow_value("").for(:title).on(:create)
+      should_not allow_value(" ").for(:title).on(:create)
+      should_not allow_value("\u200B").for(:title).on(:create)
       should_not allow_value("___").for(:title).on(:create)
       should_not allow_value("-foo").for(:title).on(:create)
       should_not allow_value("/foo").for(:title).on(:create)
@@ -124,6 +126,12 @@ class WikiPageTest < ActiveSupport::TestCase
       should_not allow_value("東方").for(:title).on(:create)
       should_not allow_value("FAV:blah").for(:title).on(:create)
       should_not allow_value("X"*171).for(:title).on(:create)
+    end
+
+    context "during body validation" do
+      should_not allow_value("").for(:body)
+      should_not allow_value(" ").for(:body)
+      should_not allow_value("\u200B").for(:body)
     end
 
     context "with other names" do

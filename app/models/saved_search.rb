@@ -11,7 +11,7 @@ class SavedSearch < ApplicationRecord
   normalize :query, :normalize_query
   normalize :labels, :normalize_labels
 
-  validates :query, presence: true
+  validates :query, visible_string: true
   validate :validate_count, on: :create
 
   scope :labeled, ->(label) { where_array_includes_any_lower(:labels, [normalize_label(label)]) }

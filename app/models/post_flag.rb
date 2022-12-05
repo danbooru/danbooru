@@ -10,7 +10,7 @@ class PostFlag < ApplicationRecord
   belongs_to :post
 
   before_validation { post.lock! }
-  validates :reason, presence: true, length: { in: 1..140 }
+  validates :reason, visible_string: true, length: { in: 1..140 }
   validate :validate_creator_is_not_limited, on: :create
   validate :validate_post, on: :create
   validates :creator_id, uniqueness: { scope: :post_id, on: :create, unless: :is_deletion, message: "have already flagged this post" }

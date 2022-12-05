@@ -10,7 +10,7 @@ class ModerationReport < ApplicationRecord
   has_many :mod_actions, as: :subject, dependent: :destroy
 
   before_validation(on: :create) { model.lock! }
-  validates :reason, presence: true
+  validates :reason, visible_string: true
   validates :model_type, inclusion: { in: MODEL_TYPES }
   validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }, on: :create
 

@@ -10,9 +10,9 @@ class BulkUpdateRequest < ApplicationRecord
   belongs_to :forum_post, optional: true
   belongs_to :approver, optional: true, class_name: "User"
 
-  validates :reason, presence: true, on: :create
-  validates :script, presence: true
-  validates :title, presence: true, if: ->(rec) { rec.forum_topic_id.blank? }
+  validates :reason, visible_string: true, on: :create
+  validates :script, visible_string: true
+  validates :title, visible_string: true, if: ->(rec) { rec.forum_topic_id.blank? }
   validates :forum_topic, presence: true, if: ->(rec) { rec.forum_topic_id.present? }
   validates :status, inclusion: { in: STATUSES }
   validate :validate_script, if: :script_changed?

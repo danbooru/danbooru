@@ -4,7 +4,7 @@ class PostAppeal < ApplicationRecord
   belongs_to :creator, :class_name => "User"
   belongs_to :post
 
-  validates :reason, length: { maximum: 140 }
+  validates :reason, visible_string: { allow_empty: true }, length: { maximum: 140 }
   validate :validate_post_is_appealable, on: :create
   validate :validate_creator_is_not_limited, on: :create
   validates :creator, uniqueness: { scope: :post, message: "have already appealed this post" }, on: :create

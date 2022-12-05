@@ -14,7 +14,7 @@ class Ban < ApplicationRecord
 
   validates :duration, presence: true
   validates :duration, inclusion: { in: [1.day, 3.days, 1.week, 1.month, 3.months, 6.months, 1.year, 100.years], message: "%{value} is not a valid ban duration" }, if: :duration_changed?
-  validates :reason, presence: true
+  validates :reason, visible_string: true
   validate :user, :validate_user_is_bannable, on: :create
 
   scope :unexpired, -> { where("bans.created_at + bans.duration > ?", Time.zone.now) }

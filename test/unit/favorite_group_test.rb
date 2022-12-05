@@ -68,5 +68,8 @@ class FavoriteGroupTest < ActiveSupport::TestCase
     should_not allow_value("_").for(:name)
     should_not allow_value("any").for(:name)
     should_not allow_value("none").for(:name)
+    should_not allow_value("").for(:name)
+    should_not allow_value("   ").for(:name)
+    should_not allow_value("\u200B").for(:name)
   end
 end
