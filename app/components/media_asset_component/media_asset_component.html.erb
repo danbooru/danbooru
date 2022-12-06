@@ -1,4 +1,4 @@
-<div class="media-asset-container media-asset-container-fit-height flex flex-col <%= outer_classes %>" data-dynamic-height="<%= dynamic_height %>" style="--header-visible-height: 0px">
+<div class="media-asset-container media-asset-container-fit-height flex flex-col <%= outer_classes %>" data-dynamic-height="<%= dynamic_height %>" style="--header-visible-height: 0px; --media-asset-width: <%= image_width %>; --media-asset-height: <%= image_height %>;">
   <%= header %>
 
   <div class="media-asset-component relative max-h-inherit overflow-hidden <%= inner_classes %>">
@@ -15,13 +15,13 @@
     <% elsif !media_asset.active? || !policy(media_asset).can_see_image? %>
       <p>Image unavailable.</p>
     <% elsif is_image? %>
-      <%= tag.img src: variant(:original).file_url, width: image_width, height: image_height, draggable: "false", class: "media-asset-image max-h-inherit max-w-full h-full w-auto select-none" -%>
+      <%= tag.img src: variant(:original).file_url, width: image_width, height: image_height, draggable: "false", class: "media-asset-image" -%>
     <% elsif is_video? %>
-      <%= tag.video src: variant(:original).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls", class: "media-asset-image max-h-inherit max-w-full h-full w-auto select-none" %>
+      <%= tag.video src: variant(:original).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls", class: "media-asset-image" %>
     <% elsif is_ugoira? %>
-      <%= tag.video src: variant(:sample).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls", class: "media-asset-image max-h-inherit max-w-full h-full w-auto select-none" %>
+      <%= tag.video src: variant(:sample).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls", class: "media-asset-image" %>
     <% elsif is_flash? %>
-      <%= tag.div "data-swf": variant(:original).file_url, class: "media-asset-image ruffle-container max-h-inherit max-w-full h-full w-auto select-none" %>
+      <%= tag.div "data-swf": variant(:original).file_url, class: "media-asset-image ruffle-container" %>
     <% end %>
   </div>
 

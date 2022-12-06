@@ -34,8 +34,22 @@
     }
   }
 
+  .media-asset-image {
+    user-select: none;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: inherit;
+  }
+
   &.media-asset-container-fit-height {
     max-height: calc(100vh - var(--header-visible-height));
     justify-content: center;
+
+    .media-asset-component {
+      aspect-ratio: var(--media-asset-width) / var(--media-asset-height);
+      height: max-content;
+      height: intrinsic; // XXX Safari-only hack to make images correct height on upload page. I have no idea how this works.
+    }
   }
 }
