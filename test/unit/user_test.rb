@@ -219,6 +219,11 @@ class UserTest < ActiveSupport::TestCase
       should_not allow_value("admin").for(:name)
       should_not allow_value("mod").for(:name)
       should_not allow_value("moderator").for(:name)
+
+      should_not allow_value("foo_\u115F").for(:name)
+      should_not allow_value("foo_\u1160").for(:name)
+      should_not allow_value("foo_\u3164").for(:name)
+      should_not allow_value("foo_\uFFA0").for(:name)
     end
 
     context "searching for users by name" do
