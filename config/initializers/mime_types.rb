@@ -9,3 +9,4 @@ Mime::Type.register "image/webp", :webp
 Mime::Type.register "image/avif", :avif
 
 Mime::Type.register "application/x-shockwave-flash", :swf
+Mime::Type.register "application/vnd.microsoft.portable-executable", :exe
