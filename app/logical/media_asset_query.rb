@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-# An AITagQuery is a tag search performed on media assets using AI tags. Only
-# basic tags are allowed, no metatags.
-class AITagQuery
+# A MediaAssetQuery is a tag search performed on media assets (or upload media assets) using AI tags.
+class MediaAssetQuery
   extend Memoist
 
   attr_reader :search_string
@@ -36,7 +35,7 @@ class AITagQuery
         ai_tag = AITag.named(node.name).where(score: score_range)
         relation.where(ai_tag.where(AITag.arel_table[:media_asset_id].eq(relation.arel_table[foreign_key])).arel.exists)
       in :metatag
-        relation.none
+        metatag_matches(node.name, node.value, relation)
       in :wildcard
         relation.none
       in :not
@@ -52,6 +51,39 @@ class AITagQuery
         nodes = children.map { |child| child.joins(joins).order(orders) }
         nodes.reduce(&:or)
       end
+    end
+  end
+
+  def metatag_matches(name, value, relation)
+    case name
+    when "id"
+      relation.attribute_matches(value, :id)
+    when "md5"
+      relation.attribute_matches(value, "media_assets.md5", :md5)
+    when "width"
+      relation.attribute_matches(value, "media_assets.image_width")
+    when "height"
+      relation.attribute_matches(value, "media_assets.image_height")
+    when "duration"
+      relation.attribute_matches(value, "media_assets.duration", :float)
+    when "mpixels"
+      relation.attribute_matches(value, "(media_assets.image_width * media_assets.image_height) / 1000000.0", :float)
+    when "ratio"
+      relation.attribute_matches(value, "ROUND(media_assets.image_width::numeric / media_assets.image_height::numeric, 2)", :ratio)
+    when "filesize"
+      relation.attribute_matches(value, "media_assets.file_size", :filesize)
+    when "filetype"
+      relation.attribute_matches(value, "media_assets.file_ext", :enum)
+    when "date"
+      relation.attribute_matches(value, :created_at, :date)
+    when "age"
+      relation.attribute_matches(value, :created_at, :age)
+    when "status"
+      relation.attribute_matches(value, :status, :enum)
+    when "is"
+      relation.is_matches(value)
+    when "exif"
+      relation.exif_matches(value)
     end
   end
 end

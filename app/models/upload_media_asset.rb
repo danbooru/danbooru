@@ -41,6 +41,21 @@ class UploadMediaAsset < ApplicationRecord
     expired.update_all(status: :failed, error: "Stuck processing for more than 4 hours")
   end
 
+  def self.is_matches(value)
+    case value.downcase
+    when *UploadMediaAsset.statuses.keys
+      where(status: value)
+    when *MediaAsset::FILE_TYPES
+      attribute_matches(value, :file_ext, :enum)
+    else
+      none
+    end
+  end
+
+  def self.exif_matches(string)
+    merge(MediaAsset.exif_matches(string))
+  end
+
   def self.search(params, current_user)
     q = search_attributes(params, [:id, :created_at, :updated_at, :status, :source_url, :page_url, :error, :upload, :media_asset, :post], current_user: current_user)
 

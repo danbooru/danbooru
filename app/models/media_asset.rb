@@ -204,7 +204,30 @@ class MediaAsset < ApplicationRecord
   concerning :SearchMethods do
     class_methods do
       def ai_tags_match(tag_string, score_range: (50..))
-        AITagQuery.search(tag_string, relation: self, score_range: score_range)
+        MediaAssetQuery.search(tag_string, relation: self, score_range: score_range)
+      end
+
+      def is_matches(value)
+        case value.downcase
+        when *MediaAsset.statuses.keys
+          where(status: value)
+        when *FILE_TYPES
+          attribute_matches(value, :file_ext, :enum)
+        else
+          none
+        end
+      end
+
+      def exif_matches(string)
+        # string = File:ColorComponents=3
+        if string.include?("=")
+          key, value = string.split(/=/, 2)
+          hash = { key => value }
+          joins(:media_metadata).where_json_contains("media_metadata.metadata", hash)
+        # string = File:ColorComponents
+        else
+          joins(:media_metadata).where_json_has_key("media_metadata.metadata", string)
+        end
       end
 
       def search(params, current_user)

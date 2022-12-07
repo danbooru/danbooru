@@ -126,7 +126,7 @@ class Upload < ApplicationRecord
   end
 
   def self.ai_tags_match(tag_string, score_range: (50..))
-    upload_media_assets = AITagQuery.search(tag_string, relation: UploadMediaAsset.all, foreign_key: :media_asset_id, score_range: score_range)
+    upload_media_assets = MediaAssetQuery.search(tag_string, relation: UploadMediaAsset.joins(:media_asset), foreign_key: :media_asset_id, score_range: score_range)
     where(upload_media_assets.where("upload_media_assets.upload_id = uploads.id").arel.exists)
   end
 

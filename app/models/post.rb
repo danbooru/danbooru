@@ -1284,17 +1284,7 @@ class Post < ApplicationRecord
       end
 
       def exif_matches(string)
-        # string = exif:File:ColorComponents=3
-        if string.include?("=")
-          key, value = string.split(/=/, 2)
-          hash = { key => value }
-          metadata = MediaMetadata.joins(:media_asset).where_json_contains(:metadata, hash)
-        # string = exif:File:ColorComponents
-        else
-          metadata = MediaMetadata.joins(:media_asset).where_json_has_key(:metadata, string)
-        end
-
-        where(md5: metadata.select(:md5))
+        where(md5: MediaAsset.exif_matches(string).select(:md5))
       end
 
       def ai_tags_include(value, default_confidence: ">=50")
