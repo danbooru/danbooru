@@ -280,11 +280,8 @@ GEM
     loofah (2.19.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
-    mail (2.8.0)
+    mail (2.7.1)
       mini_mime (>= 0.1.1)
-      net-imap
-      net-pop
-      net-smtp
     marcel (1.0.2)
     matrix (0.4.2)
     memoist (0.16.2)
@@ -569,7 +566,7 @@ DEPENDENCIES
   http-cookie!
   ipaddress_2
   listen
-  mail
+  mail (< 2.8)
   memoist
   memory_profiler
   minitest-ci
