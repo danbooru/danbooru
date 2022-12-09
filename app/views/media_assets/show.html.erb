@@ -1,7 +1,7 @@
 <div id="c-media-assets">
   <div id="a-show">
     <div class="md:flex flex-row gap-4">
-      <div class="flex-1 w-full">
+      <div class="flex-1 w-full min-w-0">
         <%= render MediaAssetComponent.new(media_asset: @media_asset, current_user: CurrentUser.user, outer_classes: "sticky h-full relative top-0", inner_classes: "mx-auto", dynamic_height: true) do |component| %>
           <% component.with_header do %>
             <div class="paginator top-0 w-full z-10">

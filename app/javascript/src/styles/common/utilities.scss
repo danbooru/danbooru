@@ -47,6 +47,7 @@ $spacer: 0.25rem; /* 4px */
 
 .overflow-auto { overflow: auto; }
 .overflow-hidden { overflow: hidden; }
+.overflow-x-hidden { overflow-x: hidden; }
 
 .break-all { word-break: break-all; overflow-wrap: anywhere; }
 .break-words { word-break: break-word; overflow-wrap: anywhere; }

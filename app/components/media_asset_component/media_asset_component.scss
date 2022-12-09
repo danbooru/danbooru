@@ -1,4 +1,4 @@
-.media-asset-component:not(:hover) .media-asset-zoom-level {
+.media-asset-container:not(:hover) .media-asset-zoom-level {
   opacity: 0;
 }
 
@@ -7,8 +7,8 @@
   background: var(--preview-icon-background);
 }
 
-.media-asset-container {
-  &:not(.media-asset-container-fit-height) .paginator {
+.media-asset-component {
+  &:not(.media-asset-component-fit-height) .paginator {
     position: sticky;
   }
 
@@ -37,19 +37,24 @@
   .media-asset-image {
     user-select: none;
     width: auto;
-    height: auto;
-    max-width: 100%;
     max-height: inherit;
   }
 
-  &.media-asset-container-fit-height {
+  &.media-asset-component-fit-height {
     max-height: calc(100vh - var(--header-visible-height));
     justify-content: center;
 
-    .media-asset-component {
+    .media-asset-container {
       aspect-ratio: var(--media-asset-width) / var(--media-asset-height);
       height: max-content;
       height: intrinsic; // XXX Safari-only hack to make images correct height on upload page. I have no idea how this works.
+    }
+  }
+
+  &.media-asset-component-fit-width {
+    .media-asset-image {
+      height: auto;
+      max-width: 100%;
     }
   }
 }
