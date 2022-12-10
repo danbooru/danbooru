@@ -83,6 +83,7 @@ module IconHelper
     Hentai\ Foundry
     Hitomi
     HoYoLAB
+    Imagis
     Imgur
     Infoseek
     Inkbunny
@@ -103,6 +104,7 @@ module IconHelper
     Line
     LinkedIn
     Linktree
+    Listography
     Lit.link
     Livedoor
     Lofter
@@ -132,6 +134,7 @@ module IconHelper
     OnlyFans
     OpenSea
     Overdoll
+    Partme
     Patreon
     Pawoo
     PayPal
@@ -150,6 +153,7 @@ module IconHelper
     Plurk
     Poipiku
     Pornhub
+    Portfoliobox
     Postype
     Potofu
     Privatter
@@ -179,13 +183,16 @@ module IconHelper
     SuperRare
     Suzuri
     TBIB
+    Taobao
     Tapas
     TeePublic
     Telegram
     The\ Interviews
+    Tictail
     Tiktok
     Tinami
     Tistory
+    Togetter
     Toranoana
     Toyhouse
     Trakteer
@@ -210,6 +217,7 @@ module IconHelper
     Willow
     Wix
     WordPress
+    Yahoo
     Yande.re
     Yfrog
     Youtube
