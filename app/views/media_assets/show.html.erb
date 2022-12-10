@@ -4,9 +4,9 @@
       <div class="flex-1 w-full min-w-0">
         <%= render MediaAssetComponent.new(media_asset: @media_asset, current_user: CurrentUser.user, outer_classes: "sticky h-full relative top-0", inner_classes: "mx-auto", dynamic_height: true, scroll_on_zoom: true) do |component| %>
           <% component.with_header do %>
-            <div class="paginator top-0 w-full z-10">
-              <%= link_to chevron_left_icon, media_assets_path(search: { id: ">#{@media_asset.id}", order: "id_asc" }, limit: 1, redirect: true), class: "paginator-prev flex items-center justify-center text-xl absolute left-0 z-10", "data-shortcut": "a left" %>
-              <%= link_to chevron_right_icon, media_assets_path(search: { id: "<#{@media_asset.id}", order: "id_desc" }, limit: 1, redirect: true), class: "paginator-next flex items-center justify-center text-xl absolute right-0 z-10", "data-shortcut": "d right" %>
+            <div class="media-asset-paginator absolute flex justify-between top-0 w-full z-10">
+              <%= link_to chevron_left_icon, media_assets_path(search: { id: ">#{@media_asset.id}", order: "id_asc" }, limit: 1, redirect: true), class: "media-asset-paginator-prev flex items-center justify-center z-10 mx-1", "data-shortcut": "a left" %>
+              <%= link_to chevron_right_icon, media_assets_path(search: { id: "<#{@media_asset.id}", order: "id_desc" }, limit: 1, redirect: true), class: "media-asset-paginator-next flex items-center justify-center z-10 mx-1", "data-shortcut": "d right" %>
             </div>
           <% end %>
 
