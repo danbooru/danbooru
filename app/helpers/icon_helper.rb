@@ -12,13 +12,15 @@ module IconHelper
     Amazon
     Ameblo
     Amino
+    AniList
     Anifty
     Anime\ News\ Network
     Animexx
+    Apple\ Music
     Archive\ of\ Our\ Own
+    ArtStation
     Art\ Fight
     Artists&Clients
-    ArtStation
     Aryion
     Ask.fm
     BCY
@@ -37,6 +39,7 @@ module IconHelper
     Carrd
     Catbox
     Circle.ms
+    Class101
     Clip\ Studio
     Coconala
     Colors\ Live
@@ -48,18 +51,23 @@ module IconHelper
     Deviant\ Art
     Discord
     Doujinshi.org
+    Douyin
     Drawcrowd
     E-Hentai
     Enty
     Erogamescape
     Etsy
+    Excite\ Blog
     FC2
     Facebook
+    FanFiction.Net
     Fanbox
     Fandom
     Fantia
     Fiverr
     Flavors
+    Flickr
+    Foriio
     Foundation
     Furaffinity
     Fusetter
@@ -69,21 +77,29 @@ module IconHelper
     GitHub
     Google
     Gumroad
+    Gunsta
+    Hatena
     Hatena\ Blog
     Hentai\ Foundry
     Hitomi
+    HoYoLAB
     Imgur
     Infoseek
     Inkbunny
     Inprnt
     Instagram
+    Itch.io
     Jimdo
     Joyreactor
     Kakao
     Kemono\ Party
+    Kickstarter
+    Kirby's\ Comic\ Art
+    Kiru\ Made
     Ko-fi
     Konachan
     Last.fm
+    Letterboxd
     Line
     LinkedIn
     Linktree
@@ -103,15 +119,18 @@ module IconHelper
     Monappy
     Mottohomete
     MyAnimeList
+    MyFigureCollection
     Naver
     Newgrounds
     Nico\ Seiga
     Nijie
     Note
     OCN
+    Objkt
     Odaibako
     Ofuse
     OnlyFans
+    OpenSea
     Overdoll
     Patreon
     Pawoo
@@ -125,6 +144,7 @@ module IconHelper
     Piczel
     Pillowfort
     Pinterest
+    Pixel\ Joint
     Pixiv
     Pixiv\ Sketch
     Plurk
@@ -134,6 +154,7 @@ module IconHelper
     Potofu
     Privatter
     Profcard
+    Recomet
     RedGIFs
     Redbubble
     Reddit
@@ -144,8 +165,8 @@ module IconHelper
     Sankaku\ Complex
     Shopee
     Skeb
-    Sketchmob
     Sketchfab
+    Sketchmob
     Skima
     Society6
     SoundCloud
@@ -153,10 +174,12 @@ module IconHelper
     Steam
     Stickam
     Storenvy
+    Streamlabs
     SubscribeStar
+    SuperRare
     Suzuri
-    Tapas
     TBIB
+    Tapas
     TeePublic
     Telegram
     The\ Interviews
@@ -184,6 +207,7 @@ module IconHelper
     Weebly
     Weibo
     Wikipedia
+    Willow
     Wix
     WordPress
     Yande.re
@@ -191,6 +215,7 @@ module IconHelper
     Youtube
     Zerochan
     html.co.jp
+    tsunagu.cloud
   ]
 
   def icon_tag(icon_class, class: nil, **options)

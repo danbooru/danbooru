@@ -19,6 +19,10 @@ class Source::URL::Null < Source::URL
       "Anime News Network"
     in _, ("aminoapps.com" | "narvii.com")
       "Amino"
+    in _, "anilist.co"
+      "AniList"
+    in "music", "apple.com"
+      "Apple Music"
     in _, "archiveofourown.org"
       "Archive of Our Own"
     in _, "artfight.net"
@@ -43,6 +47,8 @@ class Source::URL::Null < Source::URL
       "Carrd"
     in _, "circle.ms"
       "Circle.ms"
+    in _, ("class101.co" | "class101.net")
+      "Class101"
     in _, "colorslive.com"
       "Colors Live"
     # XXX curiouscat.qa is possibly a different site
@@ -63,16 +69,30 @@ class Source::URL::Null < Source::URL
       "Drawcrowd"
     in _, ("e-hentai.org" | "exhentai.org" | "hath.network")
       "E-Hentai"
+    in _, "exblog.jp"
+      "Excite Blog"
     in _, ("facebook.com" | "fbcdn.net")
       "Facebook"
     in _, ("fandom.com" | "wikia.com")
       "Fandom"
+    in _, "fanfiction.net"
+      "FanFiction.Net"
+    in _, ("flickr.com" | "staticflickr.com")
+      "Flickr"
     in _, ("github.com" | "githubassets.com")
       "GitHub"
-    in _, "hatenablog.com"
+    in _, "gumpla.jp"
+      "Gunsta"
+    in _, "hatena.ne.jp"
+      "Hatena"
+    in _, ("hatenablog.com" | "hatenablog.jp" | "hateblo.jp" | "st-hatena.com")
       "Hatena Blog"
+    in _, "hoyolab.com"
+      "HoYoLAB"
     in _, "html.co.jp"
       "html.co.jp"
+    in _, "itch.io"
+      "Itch.io"
     in _, ("line.me" | "line-apps.com")
       "Line"
     in _, ("linkedin.com" | "licdn.com")
@@ -83,8 +103,14 @@ class Source::URL::Null < Source::URL
       "Livedoor"
     in "livedoor", "blogimg.jp"
       "Livedoor"
+    in _, ("2chblog.jp" | "blog.jp" | "bloggeek.jp" | "blogism.jp" | "blogo.jp" | "blogstation.jp" | "blogto.jp" | "cafeblog.jp" | "corpblog.jp" | "diary.to" | "doorblog.jp" | "dreamlog.jp" | "gger.jp" | "golog.jp" | "ldblog.jp" | "liblo.jp" | "livedoor.biz" | "myjournal.jp" | "mynikki.jp" | "officeblog.jp" | "officialblog.jp" | "publog.jp" | "storeblog.jp" | "teamblog.jp" | "techblog.jp" | "weblog.to" | "xxxblog.jp" | "youblog.jp")
+      "Livedoor"
     in _, "lit.link"
       "Lit.link"
+    in _, ("kirbyscomicart.com"| "kirbyscomicartshop.com")
+      "Kirby's Comic Art"
+    in _, "kirumade.com"
+      "Kiru Made"
     in _, "kemono.party"
       "Kemono Party"
     in _, "ko-fi.com"
@@ -95,6 +121,8 @@ class Source::URL::Null < Source::URL
       "Mastodon"
     in _, "myanimelist.net"
       "MyAnimeList"
+    in _, "myfigurecollection.net"
+      "MyFigureCollection"
     in _, "mixi.jp"
       "Mixi.jp"
     in _, "note.com"
@@ -105,6 +133,8 @@ class Source::URL::Null < Source::URL
       "OCN"
     in _, "onlyfans.com"
       "OnlyFans"
+    in _, "opensea.io"
+      "OpenSea"
     in _, ("overdoll.com" | "dollycdn.net")
       "Overdoll"
     in _, ("patreon.com" | "patreonusercontent.com")
@@ -115,6 +145,8 @@ class Source::URL::Null < Source::URL
       "PayPal"
     in _, ("pinterest.com" | "pinimg.com")
       "Pinterest"
+    in _, "pixeljoint.com"
+      "Pixel Joint"
     in _, "postype.com"
       "Postype"
     in _, "cloudfront.net" if host == "d33pksfia2a94m.cloudfront.net"
@@ -137,6 +169,8 @@ class Source::URL::Null < Source::URL
       "Steam"
     in _, ("subscribestar.adult" | "subscribestar.com")
       "SubscribeStar"
+    in _, "superrare.com"
+      "SuperRare"
     in _, "suzuri.jp"
       "Suzuri"
     in _, "cloudfront.net" if host == "dijsur42hqnz1.cloudfront.net"
@@ -159,6 +193,8 @@ class Source::URL::Null < Source::URL
       "Toyhouse"
     in "bxp-content-static.prod.public", "atl-paas.net"
       "Trello"
+    in _, "tsunagu.cloud"
+      "tsunagu.cloud"
     in _, ("vimeo.com" | "vimeocdn.com" | "livestream.com")
       "Vimeo"
     in _, "webtoons.com"
@@ -167,6 +203,8 @@ class Source::URL::Null < Source::URL
       "Webtoons"
     in _, ("weebly.com" | "weeblysite.com")
       "Weebly"
+    in _, "wlo.link"
+      "Willow"
     in _, ("wix.com" | "wixsite.com" | "wixstatic.com")
       "Wix"
     in _, "wordpress.com"
