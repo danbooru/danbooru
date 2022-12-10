@@ -1,3 +1,5 @@
+import clamp from "lodash/clamp";
+
 export default class MediaAssetComponent {
   static initialize() {
     $(".media-asset-component").toArray().forEach(element => {
@@ -10,14 +12,16 @@ export default class MediaAssetComponent {
     this.$container = this.$component.find(".media-asset-container");
     this.$image = this.$component.find(".media-asset-image");
     this.$zoomLevel = this.$component.find(".media-asset-zoom-level");
+    this.scrollOnZoom = this.$component.attr("data-scroll-on-zoom") === "true";
+    this.dynamicHeight = this.$component.attr("data-dynamic-height") === "true";
 
-    if (this.$component.attr("data-dynamic-height") === "true") {
+    if (this.dynamicHeight) {
       this.updateHeight();
       $(window).on("scroll.danbooru", e => this.updateHeight());
     }
 
     if (this.$image.length) {
-      this.$image.on("click.danbooru", e => this.toggleFit());
+      this.$image.on("click.danbooru", e => this.toggleFit(e));
       this.$image.on("load.danbooru", e => this.updateZoom());
       this.$image.on("load.danbooru", e => this.updateHeight());
       new ResizeObserver(() => this.updateZoom()).observe(this.$image.get(0));
@@ -25,11 +29,23 @@ export default class MediaAssetComponent {
     }
   }
 
-  toggleFit() {
+  toggleFit(e) {
+    let rect = this.$image.get(0).getBoundingClientRect();
+    let yRatio = (e.clientY - rect.top) / this.$image.height();
+    let gap = this.$component.height() - this.$image.height();
+
     if (this.canZoomOut) {
       this.$component.addClass("media-asset-component-fit-height media-asset-component-fit-width");
     } else if (this.canZoomHeight) {
       this.$component.removeClass("media-asset-component-fit-height");
+    }
+
+    let top = this.$component.offset().top;
+    let height = this.$image.height();
+    let ypos = clamp(top + yRatio * height - (window.innerHeight / 2), Math.min(window.scrollY, top), top + height + gap - window.innerHeight);
+
+    if (this.scrollOnZoom) {
+      window.scrollTo({ top: ypos });
     }
 
     this.updateZoom();
