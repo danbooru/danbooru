@@ -3,7 +3,7 @@
     <%= f.input :user_name, as: :string, input_html: { "data-autocomplete": "user" } %>
   <% end %>
 
-  <%= f.input :duration, collection: [["1 day", 1.day.iso8601], ["3 days", 3.days.iso8601], ["1 week", 1.week.iso8601], ["1 month", 1.month.iso8601], ["3 months", 3.months.iso8601], ["6 months", 6.months.iso8601], ["1 year", 1.year.iso8601], ["forever", 100.years.iso8601]] %>
+  <%= f.input :duration, collection: [["1 day", 1.day.iso8601], ["3 days", 3.days.iso8601], ["1 week", 1.week.iso8601], ["1 month", 1.month.iso8601], ["3 months", 3.months.iso8601], ["6 months", 6.months.iso8601], ["1 year", 1.year.iso8601], ["forever", 100.years.iso8601]], selected: ban.duration&.iso8601 %>
   <%= f.input :reason %>
   <%= f.button :submit %>
 <% end %>
