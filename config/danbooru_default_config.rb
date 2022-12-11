@@ -381,19 +381,11 @@ module Danbooru
     end
 
     # http://tinysubversions.com/notes/mastodon-bot/
-    def pawoo_client_id
+    def pawoo_access_token
       nil
     end
 
-    def pawoo_client_secret
-      nil
-    end
-
-    def baraag_client_id
-      nil
-    end
-
-    def baraag_client_secret
+    def baraag_access_token
       nil
     end
 

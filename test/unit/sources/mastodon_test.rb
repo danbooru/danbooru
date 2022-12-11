@@ -12,7 +12,8 @@ module Sources
           "https://pawoo.net/web/statuses/1202176",
           image_urls: ["https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png"],
           profile_url: "https://pawoo.net/@9ed00e924818",
-          artist_name: "9ed00e924818",
+          tag_name: "9ed00e924818",
+          artist_name: nil,
           dtext_artist_commentary_desc: "a mind forever voyaging through strange seas of thought alone"
         )
       end
@@ -37,7 +38,8 @@ module Sources
             https://img.pawoo.net/media_attachments/files/001/298/084/original/media.mp4
           ],
           profile_urls: %w[https://pawoo.net/@evazion https://pawoo.net/web/accounts/47806],
-          artist_name: "evazion",
+          tag_name: "evazion",
+          artist_name: nil,
           tags: %w[foo bar baz],
           dtext_artist_commentary_desc: desc
         )
@@ -57,7 +59,7 @@ module Sources
         strategy_should_work(
           "https://pawoo.net/@nonamethankswashere/12345678901234567890",
           profile_url: "https://pawoo.net/@nonamethankswashere",
-          artist_name: "nonamethankswashere",
+          tag_name: "nonamethankswashere",
           deleted: true
         )
       end
@@ -74,7 +76,8 @@ module Sources
           image_urls: ["https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"],
           download_size: 573_353,
           profile_url: "https://baraag.net/@bardbot",
-          artist_name: "bardbot",
+          tag_name: "bardbot",
+          artist_name: "SpicyBardo🔞",
           dtext_artist_commentary_desc: "🍌"
         )
       end
@@ -91,7 +94,7 @@ module Sources
         strategy_should_work(
           "https://baraag.net/@nonamethankswashere/12345678901234567890",
           profile_url: "https://baraag.net/@nonamethankswashere",
-          artist_name: "nonamethankswashere",
+          tag_name: "nonamethankswashere",
           deleted: true
         )
       end
