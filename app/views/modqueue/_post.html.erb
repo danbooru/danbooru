@@ -1,4 +1,4 @@
-<%= tag.div id: "post-#{post.id}", **PostPreviewComponent.new(post: post).article_attrs("post mod-queue-preview column-container") do %>
+<%= tag.div id: "post-#{post.id}", **PostPreviewComponent.new(post: post, classes: "post mod-queue-preview column-container").article_attrs do %>
   <aside class="column column-shrink">
     <%= post_preview(post, size: @preview_size, show_size: true, show_deleted: true) %>
   </aside>

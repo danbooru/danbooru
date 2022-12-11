@@ -116,7 +116,7 @@
       <strong>Commentary</strong>
       <a href="#" id="toggle-artist-commentary">show »</a>
 
-      <div class="artist-commentary" style="display: none;">
+      <div class="artist-commentary mt-4" style="display: none;">
         <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: post&.artist_commentary&.original_title } %>
         <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: post&.artist_commentary&.original_description } %>
       </div>
@@ -126,7 +126,7 @@
       <strong>Translation</strong>
       <a href="#" id="toggle-commentary-translation">show »</a>
 
-      <div class="commentary-translation" style="display: none;">
+      <div class="commentary-translation mt-4" style="display: none;">
         <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: post&.artist_commentary&.translated_title } %>
         <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: post&.artist_commentary&.translated_description } %>
       </div>
