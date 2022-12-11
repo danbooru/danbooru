@@ -3,7 +3,7 @@
 
   <% pages.each do |page| %>
     <% if page == "..." %>
-      <%= ellipsis_icon class: "paginator-ellipsis text-muted desktop-only" %>
+      <span class="paginator-ellipsis"><%= ellipsis_icon class: "paginator-ellipsis text-muted desktop-only" %></span>
     <% elsif page == current_page %>
       <%= tag.span page, class: "paginator-current font-bold" %>
     <% else %>
