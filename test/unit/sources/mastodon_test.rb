@@ -4,7 +4,7 @@ module Sources
   class MastodonTest < ActiveSupport::TestCase
     context "For Pawoo," do
       setup do
-        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
+        skip "Pawoo keys not set" unless Danbooru.config.pawoo_access_token
       end
 
       context "a https://pawoo.net/web/status/$id url" do
@@ -14,7 +14,8 @@ module Sources
           profile_url: "https://pawoo.net/@9ed00e924818",
           tag_name: "9ed00e924818",
           artist_name: nil,
-          dtext_artist_commentary_desc: "a mind forever voyaging through strange seas of thought alone"
+          dtext_artist_commentary_desc: "a mind forever voyaging through strange seas of thought alone",
+          download_size: 7_680,
         )
       end
 
@@ -67,7 +68,7 @@ module Sources
 
     context "For Baraag," do
       setup do
-        skip "Baraag keys not set" unless Danbooru.config.baraag_client_id
+        skip "Baraag keys not set" unless Danbooru.config.baraag_access_token
       end
 
       context "a baraag.net/$user/$id url" do
