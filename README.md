@@ -18,7 +18,7 @@ wget https://raw.githubusercontent.com/danbooru/danbooru/master/docker-compose.y
 docker-compose up
 ```
 
-## Manual Installation
+## Manual Server Installation
 
 Follow the [INSTALL.debian](INSTALL.debian) script to install Danbooru.
 
@@ -33,8 +33,67 @@ for a guide on how set up Danbooru inside a virtual machine.
 For best performance, you will need at least 256MB of RAM for PostgreSQL and
 Rails. The memory requirement will grow as your database gets bigger.
 
-In production, Danbooru uses PostgreSQL 10.18, but any release later than this
-should work.
+In production, Danbooru uses PostgreSQL 10.18, but any release later than this should work.
+
+## Running Locally
+
+### Prerequisites
+
+1) Install Ruby (preferably `3.1.0` via a version manager like [rbenv](https://github.com/rbenv/rbenv))
+
+2) Make sure you have PostgreSQL 10.18 or above installed.
+
+3) Install `glib` and `libvips`.
+
+  * In MacOS, you can install these libraries via homebrew `brew install glib vips`
+
+  * For Ubuntu and other Debian based distros, install via apt `sudo apt-get install libglib2.0-dev libvips`
+
+4) Make sure you have [yarn](https://classic.yarnpkg.com/lang/en/docs/install) installed.
+
+### Installation
+
+1) Clone this project and enter its directory.
+
+```shell
+git clone https://github.com/danbooru/danbooru.git
+cd danbooru
+```
+
+2) Set the database username and password in the `.env` file eg:
+
+```
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=
+```
+
+2) Install ruby dependencies
+
+```shell
+bundle install
+```
+
+4) Install node dependencies via yarn
+
+```shell
+yarn install
+```
+
+5) Create the database and migrate
+
+```shell
+rails db:create db:migrate
+```
+
+6) Start the server!
+
+```shell
+rails s
+```
+
+Open [localhost:3000](http://localhost:3000) in your favorite browser.
+
+Trouble with installation? Here's a [video](videolink).
 
 ## Troubleshooting
 
