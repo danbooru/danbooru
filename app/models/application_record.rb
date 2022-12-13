@@ -216,6 +216,51 @@ class ApplicationRecord < ActiveRecord::Base
     end
   end
 
+  concerning :DiscordMethods do
+    def send_embed(channel)
+      channel.send_embed do |embed|
+        embed.author = discord_author
+        embed.title = discord_title
+        embed.url = discord_url
+        embed.image = discord_image(channel)
+        embed.description = discord_body
+        embed.color = discord_color
+        embed.footer = discord_footer
+
+        embed
+      end
+    end
+
+    def discord_author
+      nil
+    end
+
+    def discord_title
+      dtext_shortlink
+    end
+
+    def discord_url
+      Routes.url_for(self)
+    end
+
+    def discord_image(channel)
+      nil
+    end
+
+    def discord_body
+      nil
+    end
+
+    def discord_color
+      nil
+    end
+
+    def discord_footer
+      timestamp = "#{created_at.strftime("%F")} at #{created_at.strftime("%l:%M %p")}"
+      Discordrb::Webhooks::EmbedFooter.new(text: timestamp)
+    end
+  end
+
   concerning :ConcurrencyMethods do
     class_methods do
       def parallel_each(batch_size: 1000, in_processes: 4, in_threads: nil, &block)

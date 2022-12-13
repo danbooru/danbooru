@@ -1898,6 +1898,47 @@ class Post < ApplicationRecord
     end
   end
 
+  concerning :DiscordMethods do
+    def discord_author
+      Discordrb::Webhooks::EmbedAuthor.new(name: "@#{uploader.name}", url: uploader.discord_url)
+    end
+
+    def discord_image(channel)
+      return if rating != 'g' && !channel.nsfw?
+      return if is_banned? || Danbooru.config.discord_censored_tags.any? { |tag| has_tag?(tag) } || !visible?(User.anonymous)
+      url = if large_file_url.start_with?("/") # XXX needed because we use relative URIs for images
+        "#{Danbooru.config.canonical_url}#{large_file_url}"
+      else
+        large_file_url
+      end
+      Discordrb::Webhooks::EmbedImage.new(url: url)
+    end
+
+    def discord_color
+      if is_flagged
+        0xC41C19 # red
+      elsif parent_id
+        0xC0C000 # yellow
+      elsif has_active_children
+        0x00FF00 # green
+      elsif is_pending
+        0x0000FF # blue
+      elsif is_deleted
+        0xFFFFFF # white
+      end
+    end
+
+    def discord_footer
+      post_info = "#{score}⇧ #{fav_count}♥ | Rating: #{rating.upcase}"
+      file_info = "#{image_width}x#{image_height} (#{file_size.to_fs(:human_size, precision: 4)} #{file_ext})"
+      timestamp = "#{created_at.strftime("%F")}"
+
+      Discordrb::Webhooks::EmbedFooter.new(
+        text: "#{post_info} | #{file_info} | #{timestamp}"
+      )
+    end
+  end
+
   def self.track_view!(post_id, ip_addr)
     Cache.get(Cache.hash("#{Danbooru.config.view_counter_salt}-#{ip_addr}-#{post_id}"), 1.week) do
       Post.increment_counter(:views, post_id)

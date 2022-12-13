@@ -152,6 +152,20 @@ class ForumTopic < ApplicationRecord
   include CategoryMethods
   include VisitMethods
 
+  concerning :DiscordMethods do
+    def discord_author
+      Discordrb::Webhooks::EmbedAuthor.new(name: "@#{creator.name}", url: creator.discord_url)
+    end
+
+    def discord_title
+      title
+    end
+
+    def discord_body
+      DText.to_markdown(original_post.body).truncate(2000)
+    end
+  end
+
   # XXX forum_topic_visit_by_current_user is a hack to reduce queries on the forum index.
   def is_read?
     return true if CurrentUser.is_anonymous?

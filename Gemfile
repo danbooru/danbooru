@@ -62,6 +62,11 @@ gem "pry-rails"
 gem "sentry-ruby"
 gem "sentry-rails"
 
+group :discord do
+  gem "discordrb"
+  gem "terminal-table", "~> 3.0"
+end
+
 group :development do
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false

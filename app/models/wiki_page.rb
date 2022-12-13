@@ -215,6 +215,21 @@ class WikiPage < ApplicationRecord
     end
   end
 
+  concerning :DiscordMethods do
+    def discord_title
+      title
+    end
+
+    def discord_body
+      DText.to_markdown(body).truncate(2000)
+    end
+
+    def discord_footer
+      timestamp = "#{updated_at.strftime("%F")} at #{updated_at.strftime("%l:%M %p")}"
+      Discordrb::Webhooks::EmbedFooter.new(text: timestamp)
+    end
+  end
+
   def to_param
     if title =~ /\A\d+\z/
       "~#{title}"

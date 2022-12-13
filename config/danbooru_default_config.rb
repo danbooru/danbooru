@@ -501,6 +501,10 @@ module Danbooru
     def discord_guild_id
     end
 
+    def discord_censored_tags
+      ["loli", "shota", "guro", "bestiality"]
+    end
+
     # you should override this
     def email_key
       "zDMSATq0W3hmA5p3rKTgD"

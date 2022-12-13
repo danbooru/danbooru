@@ -10,6 +10,12 @@ namespace :danbooru do
     Clockwork::run
   end
 
+  desc "Run the Discord bot"
+  task discord: :environment do
+    Bundler.require(:discord)
+    Discord::Bot.new.run
+  end
+
   # Usage: bin/rails danbooru:reindex_iqdb
   #
   # Schedules all posts to be reindexed in IQDB. Requires the jobs

@@ -176,13 +176,27 @@ class ForumPost < ApplicationRecord
     moderation_reports.pending.update!(status: :handled, updater: updater)
   end
 
-  def async_send_discord_notification
-    DiscordNotificationJob.perform_later(forum_post: self)
-  end
+  concerning :DiscordMethods do
+    def async_send_discord_notification
+      DiscordNotificationJob.perform_later(forum_post: self)
+    end
 
-  def send_discord_notification
-    return unless policy(User.anonymous).show?
-    DiscordWebhookService.new.post_message(self)
+    def send_discord_notification
+      return unless policy(User.anonymous).show?
+      DiscordWebhookService.new.post_message(self)
+    end
+
+    def discord_author
+      Discordrb::Webhooks::EmbedAuthor.new(name: "@#{creator.name}", url: creator.discord_url)
+    end
+
+    def discord_title
+      topic.title
+    end
+
+    def discord_body
+      DText.to_markdown(body).truncate(2000)
+    end
   end
 
   def build_response
