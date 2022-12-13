@@ -63,7 +63,7 @@ class ArtistTest < ActiveSupport::TestCase
         @artist = FactoryBot.create(:artist, :name => "aaa")
         @post = FactoryBot.create(:post, :tag_string => "aaa")
         @admin = FactoryBot.create(:admin_user)
-        @artist.ban!(banner: @admin)
+        @artist.ban!(@admin)
         perform_enqueued_jobs
         @post.reload
       end
@@ -72,15 +72,17 @@ class ArtistTest < ActiveSupport::TestCase
         assert_equal(true, @artist.reload.is_banned?)
         assert_equal(true, @post.reload.is_banned?)
         assert_equal(true, @artist.versions.last.is_banned?)
+        assert_equal(true, TagImplication.active.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
 
-        assert_difference("TagImplication.count", -1) do
-          @artist.unban!
-        end
+        @artist.unban!(@admin)
 
         assert_equal(false, @artist.reload.is_banned?)
         assert_equal(false, @post.reload.is_banned?)
         assert_equal(false, @artist.versions.last.is_banned?)
         assert_equal("aaa", @post.tag_string)
+        assert_equal(false, TagImplication.active.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
+        assert_equal(true, TagImplication.deleted.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
+        assert_equal(true, ModAction.artist_unban.exists?(subject: @artist))
       end
 
       should "ban the post" do
@@ -106,7 +108,17 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "update the artist history" do
+        assert_equal(true, @artist.reload.is_banned?)
         assert_equal(true, @artist.versions.last.is_banned?)
+      end
+
+      should "tag the posts" do
+        assert_equal(true, @post.reload.is_banned?)
+        assert_equal(true, @post.has_tag?("banned_artist"))
+      end
+
+      should "create a mod action" do
+        assert_equal(true, ModAction.artist_ban.exists?(subject: @artist))
       end
     end
 
@@ -334,7 +346,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding pawoo artists" do
       setup do
-        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
+        skip "Pawoo keys not set" unless Danbooru.config.pawoo_access_token
         FactoryBot.create(:artist, :name => "evazion", :url_string => "https://pawoo.net/@evazion")
         FactoryBot.create(:artist, :name => "yasumo01", :url_string => "https://pawoo.net/web/accounts/28816")
       end

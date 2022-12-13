@@ -84,13 +84,10 @@ class UserDeletionTest < ActiveSupport::TestCase
       assert_equal(false, @user.authenticate_password("password"))
     end
 
-    should "generate a modaction" do
+    should "not generate a modaction" do
       @deletion.delete!
 
-      assert_match(/deleted user ##{@user.id}/, ModAction.last.description)
-      assert_equal(@user, ModAction.last.subject)
-      assert_equal("user_delete", ModAction.last.category)
-      assert_equal(@deletion.deleter, ModAction.last.creator)
+      assert_equal(0, ModAction.user_delete.count)
     end
 
     should "remove the user's favorites if they have private favorites" do
@@ -173,6 +170,31 @@ class UserDeletionTest < ActiveSupport::TestCase
       assert_not_equal("user_#{@user.id}", @user.reload.name)
       assert_equal(false, @user.is_deleted)
       assert_equal(0, ModAction.count)
+    end
+  end
+
+  context "undeleting a user's account" do
+    should "restore the user's name and reset their password" do
+      @user = create(:user, name: "fumimi", password: "hunter2")
+      @deletion = UserDeletion.new(user: @user, deleter: create(:owner_user), password: "hunter2")
+
+      @deletion.delete!
+      assert_equal("user_#{@user.id}", @user.reload.name)
+      assert_equal(true, @user.is_deleted)
+      assert_equal(false, @user.authenticate_password("hunter2").present?)
+      assert_equal("deleted user ##{@user.id}", ModAction.last.description)
+      assert_equal("user_delete", ModAction.last.category)
+      assert_equal(@deletion.deleter, ModAction.last.creator)
+      assert_equal(@user, ModAction.last.subject)
+
+      @deletion.undelete!
+      assert_equal("fumimi", @user.reload.name)
+      assert_equal(false, @user.is_deleted)
+      assert_equal(true, @user.authenticate_password("hunter2").present?)
+      assert_equal("undeleted user ##{@user.id}", ModAction.last.description)
+      assert_equal("user_undelete", ModAction.last.category)
+      assert_equal(@deletion.deleter, ModAction.last.creator)
+      assert_equal(@user, ModAction.last.subject)
     end
   end
 end

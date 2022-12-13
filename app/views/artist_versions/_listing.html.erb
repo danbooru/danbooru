@@ -1,5 +1,10 @@
-<div id="p-<%= listing_type(:artist_id) %>-listing">
+<%= search_form_for(artist_versions_path) do |f| %>
+  <%= f.input :updater_name, label: "Updater", input_html: { value: params.dig(:search, :updater_name), "data-autocomplete": "user" } %>
+  <%= f.input :name, label: "Artist", input_html: { value: params.dig(:search, :name), "data-autocomplete": "artist" } %>
+  <%= f.submit "Search" %>
+<% end %>
 
+<div id="p-<%= listing_type(:artist_id) %>-listing">
     <%= table_for @artist_versions, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Name", td: {class: "diff-body"} do |artist_version| %>
         <%= link_to artist_version.name, artist_path(artist_version.artist_id) %>

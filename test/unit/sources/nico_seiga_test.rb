@@ -8,12 +8,12 @@ module Sources
 
     context "A nicoseiga post url" do
       tags = [
-        ["アニメ", "https://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"],
-        ["コジコジ", "https://seiga.nicovideo.jp/tag/%E3%82%B3%E3%82%B8%E3%82%B3%E3%82%B8"],
-        ["さくらももこ", "https://seiga.nicovideo.jp/tag/%E3%81%95%E3%81%8F%E3%82%89%E3%82%82%E3%82%82%E3%81%93"],
-        ["ドット絵", "https://seiga.nicovideo.jp/tag/%E3%83%89%E3%83%83%E3%83%88%E7%B5%B5"],
-        ["ニコニコ大百科", "https://seiga.nicovideo.jp/tag/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%A4%A7%E7%99%BE%E7%A7%91"],
-        ["お絵カキコ", "https://seiga.nicovideo.jp/tag/%E3%81%8A%E7%B5%B5%E3%82%AB%E3%82%AD%E3%82%B3"],
+        ["アニメ", "https://seiga.nicovideo.jp/tag/アニメ"],
+        ["コジコジ", "https://seiga.nicovideo.jp/tag/コジコジ"],
+        ["さくらももこ", "https://seiga.nicovideo.jp/tag/さくらももこ"],
+        ["ドット絵", "https://seiga.nicovideo.jp/tag/ドット絵"],
+        ["ニコニコ大百科", "https://seiga.nicovideo.jp/tag/ニコニコ大百科"],
+        ["お絵カキコ", "https://seiga.nicovideo.jp/tag/お絵カキコ"],
       ]
       strategy_should_work(
         "http://seiga.nicovideo.jp/seiga/im4937663",
@@ -22,7 +22,8 @@ module Sources
         page_url: "https://seiga.nicovideo.jp/seiga/im4937663",
         tags: tags,
         artist_name: "osamari",
-        tag_name: "nicoseiga7017777",
+        other_names: ["osamari"],
+        tag_name: "nicoseiga_7017777",
         profile_url: "https://seiga.nicovideo.jp/user/illust/7017777",
         artist_commentary_title: "コジコジ",
         artist_commentary_desc: "コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）"
@@ -31,12 +32,12 @@ module Sources
 
     context "A nicoseiga image url" do
       tags = [
-        ["アニメ", "https://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"],
-        ["コジコジ", "https://seiga.nicovideo.jp/tag/%E3%82%B3%E3%82%B8%E3%82%B3%E3%82%B8"],
-        ["さくらももこ", "https://seiga.nicovideo.jp/tag/%E3%81%95%E3%81%8F%E3%82%89%E3%82%82%E3%82%82%E3%81%93"],
-        ["ドット絵", "https://seiga.nicovideo.jp/tag/%E3%83%89%E3%83%83%E3%83%88%E7%B5%B5"],
-        ["ニコニコ大百科", "https://seiga.nicovideo.jp/tag/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%A4%A7%E7%99%BE%E7%A7%91"],
-        ["お絵カキコ", "https://seiga.nicovideo.jp/tag/%E3%81%8A%E7%B5%B5%E3%82%AB%E3%82%AD%E3%82%B3"],
+        ["アニメ", "https://seiga.nicovideo.jp/tag/アニメ"],
+        ["コジコジ", "https://seiga.nicovideo.jp/tag/コジコジ"],
+        ["さくらももこ", "https://seiga.nicovideo.jp/tag/さくらももこ"],
+        ["ドット絵", "https://seiga.nicovideo.jp/tag/ドット絵"],
+        ["ニコニコ大百科", "https://seiga.nicovideo.jp/tag/ニコニコ大百科"],
+        ["お絵カキコ", "https://seiga.nicovideo.jp/tag/お絵カキコ"],
       ]
       strategy_should_work(
         "http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663",
@@ -45,7 +46,8 @@ module Sources
         page_url: "https://seiga.nicovideo.jp/seiga/im4937663",
         tags: tags,
         artist_name: "osamari",
-        tag_name: "nicoseiga7017777",
+        other_names: ["osamari"],
+        tag_name: "nicoseiga_7017777",
         profile_url: "https://seiga.nicovideo.jp/user/illust/7017777",
         artist_commentary_title: "コジコジ",
         artist_commentary_desc: "コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）"
@@ -184,9 +186,10 @@ module Sources
         "https://seiga.nicovideo.jp/watch/mg302561",
         image_urls: image_urls,
         page_url: "https://seiga.nicovideo.jp/watch/mg302561",
-        tags: [["ロリ", "https://seiga.nicovideo.jp/manga/tag/%E3%83%AD%E3%83%AA"]],
+        tags: [["ロリ", "https://seiga.nicovideo.jp/manga/tag/ロリ"]],
         artist_name: "とろてい",
-        tag_name: "nicoseiga1848060"
+        other_names: ["とろてい"],
+        tag_name: "nicoseiga_1848060"
       )
     end
 

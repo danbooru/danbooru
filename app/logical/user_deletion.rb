@@ -34,12 +34,21 @@ class UserDeletion
       rename
       reset_password
       async_delete_user
-      ModAction.log("deleted user ##{user.id}", :user_delete, subject: user, user: deleter)
+      ModAction.log("deleted user ##{user.id}", :user_delete, subject: user, user: deleter) if user != deleter
       UserEvent.create_from_request!(user, :user_deletion, request) if request.present?
       SessionLoader.new(request).logout(user) if user == deleter
     end
 
     true
+  end
+
+  def undelete!
+    user.with_lock do
+      user.update!(is_deleted: false, password: password)
+      UserNameChangeRequest.create!(user: user, desired_name: user.user_name_change_requests.order(id: :desc).first.original_name, original_name: user.name)
+      ModAction.log("undeleted user ##{user.id}", :user_undelete, subject: user, user: deleter)
+      UserEvent.create_from_request!(user, :user_undeletion, request) if request.present?
+    end
   end
 
   # Calls `delete_user`.

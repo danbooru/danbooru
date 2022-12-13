@@ -78,7 +78,11 @@ module Source
       end
 
       def tag_name
-        "nijie" + artist_id.to_s
+        "nijie_#{artist_id}" if artist_id.present?
+      end
+
+      def other_names
+        [artist_name].compact
       end
 
       def self.to_dtext(text)

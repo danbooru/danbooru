@@ -67,6 +67,25 @@ module Sources
       )
     end
 
+    context "A fanbox post with multiple videos attached as files" do
+      strategy_should_work(
+        "https://gomeifuku.fanbox.cc/posts/3975317",
+        image_urls: [
+          "https://downloads.fanbox.cc/files/post/3975317/eatOUYGtAR2jESVVWkeK57px.mp4",
+          "https://downloads.fanbox.cc/files/post/3975317/hbydNywJEmIlUeL5lTQfQjJi.mp4",
+        ]
+      )
+    end
+
+    context "A fanbox post with a single embedded video" do
+      strategy_should_work(
+        "https://naochi.fanbox.cc/posts/4657540",
+        image_urls: [
+          "https://downloads.fanbox.cc/files/post/4657540/Pos3gwyHP4MKeI5JQS4Cl5sb.mp4",
+        ]
+      )
+    end
+
     context "A cover image" do
       strategy_should_work(
         "https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/QqxYtuWdy4XWQx1ZLIqr4wvA.jpeg",

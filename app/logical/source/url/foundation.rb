@@ -30,6 +30,11 @@ class Source::URL::Foundation < Source::URL
       @user_id = user_id
 
     # https://foundation.app/@mochiiimo/~/97376
+    in "foundation.app", /^@/ => username, "~", /^\d+/ => work_id
+      @username = username.delete_prefix("@")
+      @collection = "foundation"
+      @work_id = work_id
+
     # https://foundation.app/@mochiiimo/foundation/97376
     # https://foundation.app/@KILLERGF/kgfgen/4
     in "foundation.app", /^@/ => username, collection, /^\d+/ => work_id

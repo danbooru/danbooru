@@ -1,17 +1,5 @@
 @import "../../javascript/src/styles/base/000_vars";
 
-.post-votes {
-  // Fix it so that the vote buttons don't move when the score changes width.
-  // XXX duplicated from app/components/comment_component/comment_component.scss
-  .post-score {
-    display: inline-block;
-    text-align: center;
-    min-width: 1.25em;
-    white-space: nowrap;
-    vertical-align: middle;
-  }
-}
-
 article.post-preview {
   .post-score a {
     @include inactive-link;

@@ -58,4 +58,18 @@ class FavoriteGroupTest < ActiveSupport::TestCase
       assert_equal([], @fav_group.reload.post_ids)
     end
   end
+
+  context "when validating names" do
+    subject { build(:favorite_group) }
+
+    should_not allow_value("foo,bar").for(:name)
+    should_not allow_value("foo*bar").for(:name)
+    should_not allow_value("123").for(:name)
+    should_not allow_value("_").for(:name)
+    should_not allow_value("any").for(:name)
+    should_not allow_value("none").for(:name)
+    should_not allow_value("").for(:name)
+    should_not allow_value("   ").for(:name)
+    should_not allow_value("\u200B").for(:name)
+  end
 end

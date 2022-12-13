@@ -167,18 +167,6 @@ class Post < ApplicationRecord
       media_asset.variant(:preview).file_url
     end
 
-    def open_graph_image_url
-      if is_image?
-        if has_large?
-          large_file_url
-        else
-          file_url
-        end
-      else
-        preview_file_url
-      end
-    end
-
     def file_url_for(user)
       if user.default_image_size == "large" && image_width > Danbooru.config.large_image_width
         tagged_large_file_url
@@ -209,10 +197,6 @@ class Post < ApplicationRecord
   end
 
   concerning :ImageMethods do
-    def twitter_card_supported?
-      image_width.to_i >= 280 && image_height.to_i >= 150
-    end
-
     def has_large?
       return false if has_tag?("animated_gif") || has_tag?("animated_png")
       return true if is_ugoira?
@@ -780,7 +764,7 @@ class Post < ApplicationRecord
           decrement_tag_post_counts
           remove_from_all_pools
           remove_from_fav_groups
-          media_asset.trash!
+          media_asset.trash!(current_user, log: false)
           destroy
           update_parent_on_destroy
         end
@@ -966,11 +950,11 @@ class Post < ApplicationRecord
       end
 
       def random_up(key)
-        where("md5 < ?", key).reorder(md5: :desc).first
+        where("posts.md5 < ?", key).reorder(md5: :desc).first
       end
 
       def random_down(key)
-        where("md5 >= ?", key).reorder(md5: :asc).first
+        where("posts.md5 >= ?", key).reorder(md5: :asc).first
       end
 
       def sample(query, sample_size)
@@ -1300,17 +1284,7 @@ class Post < ApplicationRecord
       end
 
       def exif_matches(string)
-        # string = exif:File:ColorComponents=3
-        if string.include?("=")
-          key, value = string.split(/=/, 2)
-          hash = { key => value }
-          metadata = MediaMetadata.joins(:media_asset).where_json_contains(:metadata, hash)
-        # string = exif:File:ColorComponents
-        else
-          metadata = MediaMetadata.joins(:media_asset).where_json_has_key(:metadata, string)
-        end
-
-        where(md5: metadata.select(:md5))
+        where(md5: MediaAsset.exif_matches(string).select(:md5))
       end
 
       def ai_tags_include(value, default_confidence: ">=50")

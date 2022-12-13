@@ -7,9 +7,7 @@
 <%= render_source_data(nil) %>
 
 <%= edit_form_for(post, html: { id: "form" }) do |f| %>
-  <%= f.input :tags_query, as: :hidden, input_html: { id: nil, name: "tags_query", value: params[:q] } %>
-  <%= f.input :pool_id, as: :hidden, input_html: { id: nil, name: "pool_id", value: params[:pool_id] } %>
-  <%= f.input :favgroup_id, as: :hidden, input_html: { id: nil, name: "favgroup_id", value: params[:favgroup_id] } %>
+  <%= f.input :q, as: :hidden, input_html: { id: nil, name: "q", value: params[:q] } %>
   <%= f.input :old_tag_string, as: :hidden, input_html: { value: post.tag_string } %>
   <%= f.input :old_parent_id, as: :hidden, input_html: { value: post.parent_id } %>
   <%= f.input :old_source, as: :hidden, input_html: { value: post.source } %>
@@ -33,9 +31,7 @@
         <span class="tag-count"></span>
         <img>
       </span>
-      <a href="javascript:void(0)">
-        <%= external_link_icon(id: "open-edit-dialog", "data-shortcut": "shift+e") %>
-      </a>
+      <%= link_to external_link_icon(class: "text-xxs"), "javascript:void(0)", id: "open-edit-dialog", "data-shortcut": "shift+e" %>
     </div>
 
     <div>

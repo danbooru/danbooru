@@ -59,6 +59,10 @@ module Source
         api_response&.dig("user", "screen_name")
       end
 
+      def other_names
+        [artist_name].compact
+      end
+
       def artist_id
         parsed_url.artist_short_id || parsed_referer&.artist_short_id || api_response&.dig("user", "id")
       end

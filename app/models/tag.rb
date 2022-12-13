@@ -23,8 +23,10 @@ class Tag < ApplicationRecord
   validates :name, tag_name: true, uniqueness: true, on: :create
   validates :name, tag_name: true, on: :name
   validates :category, inclusion: { in: TagCategory.category_ids }
+  validate :validate_category, if: :category_changed?
 
   before_create :create_character_tag_for_cosplay_tag, if: :is_cosplay_tag?
+  after_save :update_tag_alias_categories, if: :saved_change_to_category?
   after_save :update_category_cache, if: :saved_change_to_category?
   after_save :update_category_post_counts, if: :saved_change_to_category?
 
@@ -172,6 +174,21 @@ class Tag < ApplicationRecord
 
     def update_category_cache
       Cache.put("tc:#{Cache.hash(name)}", category, 3.hours)
+    end
+
+    # When a tag's category is changed, also change the categories of any aliases pointing to it.
+    def update_tag_alias_categories
+      consequent_aliases.each do |tag_alias|
+        if tag_alias.antecedent_tag.category != category
+          tag_alias.antecedent_tag.update!(category: category, updater: updater)
+        end
+      end
+    end
+
+    def validate_category
+      if is_aliased? && category != aliased_tag.category
+        errors.add(:base, "Can't change the category of an aliased tag")
+      end
     end
   end
 

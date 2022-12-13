@@ -82,5 +82,13 @@ class ForumTopicTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "during validation" do
+      subject { build(:forum_topic) }
+
+      should_not allow_value("").for(:title)
+      should_not allow_value(" ").for(:title)
+      should_not allow_value("\u200B").for(:title)
+    end
   end
 end

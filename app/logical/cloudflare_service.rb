@@ -19,7 +19,7 @@ class CloudflareService
   def purge_cache(urls)
     return unless enabled?
 
-    cloudflare = Danbooru::Http.headers(
+    cloudflare = Danbooru::Http.external.headers(
       "Authorization" => "Bearer #{api_token}",
       "Content-Type" => "application/json"
     )

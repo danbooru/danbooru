@@ -48,7 +48,7 @@ class Source::Extractor
 
     def tags
       api_response[:tags].to_a.map do |tag|
-        [tag, "https://www.artstation.com/search?q=#{CGI.escape(tag)}"]
+        [tag, "https://www.artstation.com/search?q=#{Danbooru::URL.escape(tag)}"]
       end
     end
 
@@ -57,8 +57,6 @@ class Source::Extractor
         if asset[:asset_type] == "image"
           asset_url(asset[:image_url])
         elsif asset[:asset_type] == "video_clip"
-          next # XXX Skip for now; actually downloading these videos requires bypassing a Cloudflare captcha.
-
           url = Nokogiri::HTML5.parse(asset[:player_embedded]).at("iframe").attr("src")
           next if url.nil?
 

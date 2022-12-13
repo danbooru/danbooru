@@ -26,15 +26,12 @@ require("jquery-ui/themes/base/button.css");
 require("jquery-ui/themes/base/dialog.css");
 require("jquery-ui/themes/base/theme.css");
 
-require("@fortawesome/fontawesome-free/css/fontawesome.css");
-require("@fortawesome/fontawesome-free/css/solid.css");
-require("@fortawesome/fontawesome-free/css/regular.css");
-
 importAll(require.context('../src/javascripts', true, /\.js(\.erb)?$/));
 importAll(require.context('../src/styles', true, /\.s?css(?:\.erb)?$/));
 importAll(require.context('../../components', true, /\.s?css(?:\.erb)?$/));
 
 import Autocomplete from "../src/javascripts/autocomplete.js";
+import ArtistCommentary from "../src/javascripts/artist_commentaries.js";
 import Blacklist from "../src/javascripts/blacklists.js";
 import CommentComponent from "../src/javascripts/comment_component.js";
 import CommentVotesTooltipComponent from "../src/javascripts/comment_votes_tooltip_component.js";
@@ -63,6 +60,7 @@ import Ugoira from "../src/javascripts/ugoira.js"
 
 let Danbooru = {};
 Danbooru.Autocomplete = Autocomplete;
+Danbooru.ArtistCommentary = ArtistCommentary;
 Danbooru.Blacklist = Blacklist;
 Danbooru.CommentComponent = CommentComponent;
 Danbooru.CommentVotesTooltipComponent = CommentVotesTooltipComponent;

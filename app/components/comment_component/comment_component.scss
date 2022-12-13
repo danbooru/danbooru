@@ -1,6 +1,4 @@
 article.comment {
-  flex: 1;
-
   &[data-is-sticky="true"] {
     background: var(--comment-sticky-background-color);
   }
@@ -25,30 +23,7 @@ article.comment {
     .unhide-comment-link { display: none; }
   }
 
-  .unhide-comment-link {
-    margin-bottom: 0.75rem;
-    display: block;
-  }
-
   .moderation-report-notice {
-    font-weight: bold;
     color: var(--moderation-report-text-color);
-  }
-
-  .comment-votes {
-    color: var(--muted-text-color);
-
-    // Fix it so that the vote buttons don't move when the score changes width.
-    .comment-score {
-      display: inline-block;
-      text-align: center;
-      min-width: 1.25em;
-      white-space: nowrap;
-      vertical-align: middle;
-    }
-
-    .icon {
-      width: 1.25em;
-    }
   }
 }

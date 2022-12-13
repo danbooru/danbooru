@@ -1,13 +1,4 @@
 div#c-forum-topics {
-  td.status-column {
-    white-space: nowrap;
-    text-align: right;
-  }
-
-  td.creator-column, td.updated-by-column {
-    white-space: nowrap;
-  }
-
   a.topic-status {
     margin-right: 0.25em;
 
@@ -52,25 +43,5 @@ div#c-forum-topics {
       border-color: var(--forum-topic-status-rejected-color);
       &:hover { background-color: var(--forum-topic-status-rejected-color); }
     }
-  }
-
-  #a-index {
-    .updated-at-column {
-      white-space: nowrap;
-    }
-
-    .creator-column, .updated-by-column, .updated-at-column {
-      @media screen and (max-width: 660px) {
-        display: none;
-      }
-    }
-  }
-}
-
-#c-forum-posts #a-index {
-  tr[data-topic-is-deleted="true"] .forum-post-topic-title::after,
-  tr[data-is-deleted="true"] .forum-post-excerpt::after {
-    content: " (deleted)";
-    color: var(--muted-text-color);
   }
 }

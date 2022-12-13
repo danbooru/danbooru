@@ -7,6 +7,11 @@
 class MediaFile::Image < MediaFile
   delegate :thumbnail_image, to: :image
 
+  def close
+    super
+    @preview_frame&.close unless @preview_frame == self
+  end
+
   def dimensions
     image.size
   rescue Vips::Error
@@ -107,7 +112,7 @@ class MediaFile::Image < MediaFile
       resized_image = resized_image.flatten(background: 255)
     end
 
-    output_file = Tempfile.new(["image-preview-#{md5}", ".#{format.to_s}"])
+    output_file = Danbooru::Tempfile.new(["danbooru-image-preview-#{md5}-", ".#{format.to_s}"])
     case format.to_sym
     when :jpeg
       # https://www.libvips.org/API/current/VipsForeignSave.html#vips-jpegsave
@@ -128,14 +133,6 @@ class MediaFile::Image < MediaFile
   def preview!(max_width, max_height, **options)
     w, h = MediaFile.scale_dimensions(width, height, max_width, max_height)
     preview_frame.resize!(w, h, size: :force, **options)
-  end
-
-  def preview_frame
-    if is_animated?
-      FFmpeg.new(self).smart_video_preview
-    else
-      self
-    end
   end
 
   def is_animated?
@@ -166,6 +163,8 @@ class MediaFile::Image < MediaFile
     false
   end
 
+  private
+
   # @return [Vips::Image] the Vips image object for the file
   def image
     Vips::Image.new_from_file(file.path, fail: false).autorot
@@ -175,5 +174,15 @@ class MediaFile::Image < MediaFile
     FFmpeg.new(self)
   end
 
-  memoize :image, :video, :preview_frame, :dimensions, :error, :metadata, :is_corrupt?, :is_animated_gif?, :is_animated_png?
+  def preview_frame
+    @preview_frame ||= begin
+      if is_animated?
+        FFmpeg.new(self).smart_video_preview
+      else
+        self
+      end
+    end
+  end
+
+  memoize :image, :video, :dimensions, :error, :metadata, :is_corrupt?, :is_animated_gif?, :is_animated_png?
 end

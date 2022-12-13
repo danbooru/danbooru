@@ -151,6 +151,13 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(["Name can't contain whitespace"], user.errors.full_messages)
       end
 
+      should "not conflict with an existing name" do
+        create(:user, name: "bkub")
+        user = build(:user, name: "BKUB")
+        user.save
+        assert_equal(["Name already taken"], user.errors.full_messages)
+      end
+
       should "be less than 25 characters long" do
         user = build(:user, name: "a"*25)
         user.save
@@ -212,6 +219,11 @@ class UserTest < ActiveSupport::TestCase
       should_not allow_value("admin").for(:name)
       should_not allow_value("mod").for(:name)
       should_not allow_value("moderator").for(:name)
+
+      should_not allow_value("foo_\u115F").for(:name)
+      should_not allow_value("foo_\u1160").for(:name)
+      should_not allow_value("foo_\u3164").for(:name)
+      should_not allow_value("foo_\uFFA0").for(:name)
     end
 
     context "searching for users by name" do

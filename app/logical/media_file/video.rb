@@ -10,6 +10,11 @@ class MediaFile::Video < MediaFile
     :audio_stream, :audio_streams, :silence_duration, :silence_percentage, :average_loudness,
     :peak_loudness, :loudness_range, :error, to: :video
 
+  def close
+    super
+    @preview_frame&.close
+  end
+
   def dimensions
     [video.width, video.height]
   end
@@ -65,8 +70,8 @@ class MediaFile::Video < MediaFile
   end
 
   def preview_frame
-    video.smart_video_preview
+    @preview_frame ||= video.smart_video_preview
   end
 
-  memoize :video, :preview_frame, :dimensions, :metadata, :duration, :has_audio?
+  memoize :video, :dimensions, :metadata, :duration, :has_audio?
 end

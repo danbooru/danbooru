@@ -82,6 +82,8 @@ development:
     pretty: false
     headers:
       'Access-Control-Allow-Origin': '*'
+      'Cache-Control': 'no-store, must-revalidate, private, max-age=0'
+      'Vary': '*'
     watch_options:
       ignored: '**/node_modules/**'
 

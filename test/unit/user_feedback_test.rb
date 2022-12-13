@@ -17,5 +17,11 @@ class UserFeedbackTest < ActiveSupport::TestCase
         assert_equal(dmail, user.dmails.last.body)
       end
     end
+
+    context "on validation" do
+      should_not allow_value("").for(:body)
+      should_not allow_value("   ").for(:body)
+      should_not allow_value("\u200B").for(:body)
+    end
   end
 end

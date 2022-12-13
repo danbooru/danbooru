@@ -57,6 +57,8 @@ class StorageManager
   def copy(src_path, dest_path)
     file = open(src_path)
     store(file, dest_path)
+    file&.close
+    nil
   end
 
   # Move the file from src_path to dest_path.
@@ -66,6 +68,7 @@ class StorageManager
   def move(src_path, dest_path)
     copy(src_path, dest_path)
     delete(src_path)
+    nil
   end
 
   # Return the full URL of the file at the given path, or nil if the file

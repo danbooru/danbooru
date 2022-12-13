@@ -94,10 +94,8 @@ module Sources
 
         should "get the tags" do
           pixiv_tags  = @site.tags.map(&:first)
-          pixiv_links = @site.tags.map(&:last)
 
           assert_equal(%w[漫画 test], pixiv_tags)
-          assert_contains(pixiv_links, /search\.php/)
         end
 
         should "get the artist commentary" do
@@ -165,7 +163,7 @@ module Sources
           artist_name: "影おじ (隠れエリア)",
           profile_url: "https://www.pixiv.net/users/6570768",
           profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
-          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber 両手に茎 乱交],
+          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber10000users入り 両手に茎 乱交],
         )
       end
 
@@ -181,7 +179,18 @@ module Sources
           artist_name: "影おじ (隠れエリア)",
           profile_url: "https://www.pixiv.net/users/6570768",
           profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
-          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber 両手に茎 乱交],
+          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber10000users入り 両手に茎 乱交],
+        )
+      end
+
+      context "An AI-generated post should get the AI tag" do
+        strategy_should_work(
+          "https://www.pixiv.net/en/artworks/103291492",
+          image_urls: ["https://i.pximg.net/img-original/img/2022/12/03/05/06/51/103291492_p0.png"],
+          artist_commentary_title: "Rem's present",
+          artist_name: "Anzatiridonia",
+          profile_url: "https://www.pixiv.net/users/33589885",
+          tags: %w[AI Re:ゼロから始める異世界生活 レム リゼロ レム(リゼロ) AIイラスト AnythingV3 Present sweater],
         )
       end
 

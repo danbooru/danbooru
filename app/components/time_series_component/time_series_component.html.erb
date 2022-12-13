@@ -21,7 +21,7 @@
   <table class="striped autofit" width="100%">
     <thead>
       <% dataframe.types.keys.each do |column| %>
-        <%= tag.th(column.to_s.titleize, class: ("col-expand" if column == dataframe.types.keys.last)) %>
+        <%= tag.th(column == "date" ? "Date" : column.to_s, class: ("col-expand" if column == dataframe.types.keys.last)) %>
       <% end %>
     </thead>
 

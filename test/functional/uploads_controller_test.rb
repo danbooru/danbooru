@@ -134,7 +134,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail if given both a file and source" do
         assert_no_difference("Upload.count") do
-          file = File.open("test/files/test.jpg")
+          file = Rack::Test::UploadedFile.new("test/files/test.jpg")
           source = "https://files.catbox.moe/om3tcw.webm"
           post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }, source: source }}
         end
@@ -296,6 +296,48 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for an unsupported archive type" do
+        should "fail for a .tar file" do
+          create_upload!("test/files/archive/ugoira.tar", user: @user)
+          assert_match("File is not an image or video", Upload.last.error)
+        end
+
+        should "fail for a .tar.gz file" do
+          create_upload!("test/files/archive/ugoira.tar.gz", user: @user)
+          assert_match("File is not an image or video", Upload.last.error)
+        end
+
+        should "fail for an archive containing more than 100 files" do
+          create_upload!("test/files/archive/bomb-10k-files.7z", user: @user)
+          assert_response 422
+          assert_match("'bomb-10k-files.7z' contains too many files (max 100 files per upload)", response.parsed_body.dig("errors", "base", 0))
+        end
+
+        should "fail for a decompression bomb" do
+          create_upload!("test/files/archive/bomb-1-1G.rar", user: @user)
+          assert_response 422
+          assert_match("'bomb-1-1G.rar' is too large (uncompressed size: 1,000 MB; max size: 100 MB)", response.parsed_body.dig("errors", "base", 0))
+        end
+
+        should "fail for an archive containing absolute paths" do
+          create_upload!("test/files/archive/absolute-path.7z", user: @user)
+          assert_response 422
+          assert_match("'/tmp/foo/foo.txt' in 'absolute-path.7z' can't start with '/'", response.parsed_body.dig("errors", "base", 0))
+        end
+
+        should "fail for an archive containing '..' paths" do
+          create_upload!("test/files/archive/zip-slip.zip", user: @user)
+          assert_response 422
+          assert_match(/'.*' in 'zip-slip\.zip' can't contain '\.\.' components/, response.parsed_body.dig("errors", "base", 0))
+        end
+
+        should "fail for an archive containing symlinks" do
+          create_upload!("test/files/archive/symlink.zip", user: @user)
+          assert_response 422
+          assert_match("'passwd' in 'symlink.zip' isn't a regular file", response.parsed_body.dig("errors", "base", 0))
+        end
+      end
+
       context "when re-uploading a media asset stuck in the 'processing' state" do
         should "mark the asset as failed" do
           asset = create(:media_asset, file: File.open("test/files/test.jpg"), status: "processing")
@@ -395,6 +437,49 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/webp/lossy_alpha1.webp")
       end
 
+      context "uploading a .zip file from your computer" do
+        should "work" do
+          upload = assert_successful_upload("test/files/archive/ugoira.zip", user: @user)
+
+          assert_equal(5, upload.media_asset_count)
+          assert_equal(5, upload.upload_media_assets.size)
+          assert_equal("file://ugoira.zip/000000.jpg", upload.upload_media_assets[0].source_url)
+        end
+
+        should "upload the files in filename order" do
+          upload = assert_successful_upload("test/files/archive/out-of-order.zip", user: @user)
+
+          assert_equal(6, upload.media_asset_count)
+          assert_equal(6, upload.upload_media_assets.size)
+          assert_equal("file://out-of-order.zip/9/9.gif", upload.upload_media_assets[0].source_url)
+          assert_equal("file://out-of-order.zip/9/10.gif", upload.upload_media_assets[1].source_url)
+          assert_equal("file://out-of-order.zip/9/11.gif", upload.upload_media_assets[2].source_url)
+          assert_equal("file://out-of-order.zip/10/9.gif", upload.upload_media_assets[3].source_url)
+          assert_equal("file://out-of-order.zip/10/10.gif", upload.upload_media_assets[4].source_url)
+          assert_equal("file://out-of-order.zip/10/11.gif", upload.upload_media_assets[5].source_url)
+        end
+      end
+
+      context "uploading a .rar file from your computer" do
+        should "work" do
+          upload = assert_successful_upload("test/files/archive/ugoira.rar", user: @user)
+
+          assert_equal(5, upload.media_asset_count)
+          assert_equal(5, upload.upload_media_assets.size)
+          assert_equal("file://ugoira.rar/000000.jpg", upload.upload_media_assets[0].source_url)
+        end
+      end
+
+      context "uploading a .7z file from your computer" do
+        should "work" do
+          upload = assert_successful_upload("test/files/archive/ugoira.7z", user: @user)
+
+          assert_equal(5, upload.media_asset_count)
+          assert_equal(5, upload.upload_media_assets.size)
+          assert_equal("file://ugoira.7z/000000.jpg", upload.upload_media_assets[0].source_url)
+        end
+      end
+
       context "uploading multiple files from your computer" do
         should "work" do
           files = {
@@ -441,6 +526,12 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png")
 
         should_upload_successfully("https://gelbooru.com/index.php?page=post&s=view&id=7798121")
+        should_upload_successfully("https://safebooru.org/index.php?page=post&s=view&id=4189916")
+        should_upload_successfully("https://tbib.org/index.php?page=post&s=view&id=11480218")
+        should_upload_successfully("https://rule34.xxx/index.php?page=post&s=view&id=6961597")
+        should_upload_successfully("https://rule34.us/index.php?r=posts/view&id=6204967")
+
+        should_upload_successfully("https://boards.4channel.org/vt/thread/1#p1")
 
         should_upload_successfully("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
         should_upload_successfully("http://seiga.nicovideo.jp/seiga/im4937663")
@@ -458,8 +549,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://nijie.info/view_popup.php?id=213043")
         should_upload_successfully("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg")
 
-        should_upload_successfully("https://pawoo.net/web/statuses/1202176") if Danbooru.config.pawoo_client_id.present? # XXX
-        should_upload_successfully("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png") if Danbooru.config.pawoo_client_id.present? # XXX
+        should_upload_successfully("https://pawoo.net/web/statuses/1202176") if Danbooru.config.pawoo_access_token.present? # XXX
+        should_upload_successfully("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png") if Danbooru.config.pawoo_access_token.present? # XXX
 
         should_upload_successfully("https://baraag.net/@danbooru/107866090743238456")
         should_upload_successfully("https://baraag.net/system/media_attachments/files/107/866/084/749/942/932/original/a9e0f553e332f303.mp4")
@@ -512,6 +603,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("http://www.tinami.com/view/1087268")
 
         should_upload_successfully("https://booth.pximg.net/4ee2c0d9-41fa-4a0e-a30f-1bc9e15d4e5b/i/2586180/331b7c5f-7614-4772-aae2-cb979ad44a6b.png")
+
+        should_upload_successfully("https://picdig.net/apricot/projects/9d96c3f2-f92f-4472-856a-93779bb43527")
       end
     end
   end

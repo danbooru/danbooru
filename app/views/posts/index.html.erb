@@ -237,6 +237,10 @@
     <% page_title(@post_set.page_title) %>
     <% meta_description @post_set.meta_description %>
     <% atom_feed_tag "Posts: #{@post_set.page_title}", posts_url(tags: @post_set.tag_string, format: :atom) %>
+
+    <% if @post_set.best_post.present? %>
+      <%= render OpenGraphComponent.new(media_asset: @post_set.best_post.media_asset, current_user: CurrentUser.user) %>
+    <% end %>
   <% end %>
 
   <% if params[:tags].blank? && @post_set.current_page == 1 %>
@@ -249,11 +253,5 @@
 
   <% if @post_set.has_explicit? %>
     <meta name="rating" content="adult">
-  <% end %>
-
-  <% if @post_set.best_post.present? %>
-    <%= tag.meta property: "og:image", content: @post_set.best_post.open_graph_image_url %>
-    <%= tag.meta name: "twitter:image", content: @post_set.best_post.open_graph_image_url %>
-    <%= tag.meta name: "twitter:card", content: "summary_large_image" %>
   <% end %>
 <% end %>

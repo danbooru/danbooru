@@ -11,7 +11,7 @@ class Note < ApplicationRecord
   validates :y, presence: true
   validates :width, presence: true
   validates :height, presence: true
-  validates :body, presence: true
+  validates :body, visible_string: true
   validate :note_within_image
   after_save :update_post
   after_save :create_version

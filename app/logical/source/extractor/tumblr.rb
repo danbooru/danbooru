@@ -75,7 +75,7 @@ class Source::Extractor
 
     def tags
       post[:tags].to_a.map do |tag|
-        [tag, "https://tumblr.com/tagged/#{CGI.escape(tag)}"]
+        [tag, "https://tumblr.com/tagged/#{Danbooru::URL.escape(tag)}"]
       end.uniq
     end
 

@@ -349,6 +349,9 @@ module Danbooru
           response = conn.rcptto(address) rescue $!
           return response.is_a?(Net::SMTPFatalError)
         end
+      rescue Errno::ECONNREFUSED
+        # nobody@yeah.com (MX: 0.0.0.0)
+        true
       rescue
         false
       end

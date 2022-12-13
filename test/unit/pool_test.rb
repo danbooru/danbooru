@@ -244,9 +244,17 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     context "when validating names" do
-      ["foo,bar", "foo*bar", "123", "___", "   ", "any", "none", "series", "collection"].each do |bad_name|
-        should_not allow_value(bad_name).for(:name)
-      end
+      should_not allow_value("foo,bar").for(:name)
+      should_not allow_value("foo*bar").for(:name)
+      should_not allow_value("123").for(:name)
+      should_not allow_value("any").for(:name)
+      should_not allow_value("none").for(:name)
+      should_not allow_value("series").for(:name)
+      should_not allow_value("collection").for(:name)
+      should_not allow_value("___").for(:name)
+      should_not allow_value("   ").for(:name)
+      should_not allow_value("\u200B").for(:name)
+      should_not allow_value("").for(:name)
     end
   end
 

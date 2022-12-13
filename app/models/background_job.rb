@@ -62,5 +62,13 @@ class BackgroundJob < GoodJob::Job
     def pretty_name
       job_class.titleize.delete_suffix(" Job")
     end
+
+    def job_duration
+      finished_at - performed_at if finished_at
+    end
+
+    def queue_delay
+      performed_at - created_at if performed_at
+    end
   end
 end

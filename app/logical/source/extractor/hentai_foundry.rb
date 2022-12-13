@@ -39,7 +39,7 @@ module Source
         tags = page&.search(".boxbody [rel='tag']").to_a.map(&:text)
 
         tags.map do |tag|
-          [tag, "https://www.hentai-foundry.com/pictures/tagged/#{CGI.escape(tag)}"]
+          [tag, "https://www.hentai-foundry.com/pictures/tagged/#{Danbooru::URL.escape(tag)}"]
         end
       end
 

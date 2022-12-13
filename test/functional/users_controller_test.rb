@@ -161,7 +161,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to posts_path
         assert_equal(true, @user.reload.is_deleted?)
         assert_equal("Your account has been deactivated", flash[:notice])
-        assert_nil(session[:user_id])
         assert_equal(true, @user.user_events.user_deletion.exists?)
       end
 

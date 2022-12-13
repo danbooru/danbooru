@@ -40,7 +40,7 @@ module Source
       end
 
       def profile_url
-        "https://seiga.nicovideo.jp/user/illust/#{api_client.user_id}" if api_client&.user_id.present?
+        "https://seiga.nicovideo.jp/user/illust/#{artist_id}" if artist_id.present?
       end
 
       def artist_name
@@ -67,19 +67,18 @@ module Source
       end
 
       def tag_name
-        return if api_client&.user_id.blank?
-        "nicoseiga#{api_client.user_id}"
+        "nicoseiga_#{artist_id}" if artist_id.present?
+      end
+
+      def other_names
+        [artist_name].compact
       end
 
       def tags
         return [] if api_client.blank?
 
-        base_url = "https://seiga.nicovideo.jp/"
-        base_url += "manga/" if manga_id.present?
-        base_url += "tag/"
-
         api_client.tags.map do |name|
-          [name, base_url + CGI.escape(name)]
+          [name, "https://seiga.nicovideo.jp/#{"manga/" if manga_id}tag/#{Danbooru::URL.escape(name)}"]
         end
       end
 
@@ -93,6 +92,10 @@ module Source
 
       def manga_id
         parsed_url.manga_id || parsed_referer&.manga_id
+      end
+
+      def artist_id
+        api_client&.user_id
       end
 
       def http

@@ -1,19 +1,19 @@
-<div class="header">
-  <div class="row">
-    <span class="info">
+<div class="mb-4">
+  <div class="space-x-4">
+    <span class="info space-x-1">
       <strong>Date</strong>
       <%= compact_time(post.created_at) %>
     </span>
-    <span class="info">
+    <span class="info space-x-1">
       <strong>Uploader</strong>
       <%= link_to_user(post.uploader) %>
     </span>
-    <span class="info">
+    <span class="info space-x-1">
       <strong>Rating</strong>
-      <%= post.pretty_rating %>
+      <span><%= post.pretty_rating %></span>
     </span>
   </div>
-  <div class="row list-of-tags">
+  <div class="space-x-1">
     <strong>Tags</strong>
     <%= render_inline_tag_list(post) %>
   </div>

@@ -56,7 +56,7 @@ div#c-posts {
     }
   }
 
-  form#remove-fav-button button:not([disabled]) i.icon {
+  form#remove-fav-button button:not([disabled]) .icon {
     color: var(--remove-favorite-button);
   }
 
@@ -219,10 +219,6 @@ div#c-post-versions, div#c-artist-versions {
 
     label {
       display: inline-block;
-    }
-
-    i#open-edit-dialog {
-      font-size: var(--text-xxs);
     }
 
     span[data-tag-counter] {

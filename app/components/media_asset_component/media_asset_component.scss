@@ -1,11 +1,79 @@
-.media-asset-component.fit-screen img, .media-asset-component.fit-screen video {
-  max-width: 100%;
-  max-height: 90vh;
-  width: auto;
-  height: auto;
+.media-asset-container:not(:hover) .media-asset-zoom-level {
+  opacity: 0;
 }
 
 .media-asset-zoom-level {
   color: var(--preview-icon-color);
   background: var(--preview-icon-background);
+}
+
+.media-asset-component {
+  &:not(.media-asset-component-fit-height) .media-asset-paginator {
+    position: sticky;
+    top: calc((100vh + var(--header-visible-height) - var(--paginator-size)) / 2);
+  }
+
+  &:hover {
+    .media-asset-paginator-prev, .media-asset-paginator-next {
+      opacity: 0.4;
+    }
+  }
+
+  .media-asset-paginator {
+    top: calc((100% - var(--paginator-size)) / 2);
+    height: 0;
+
+    --paginator-size: 32px;
+    font-size: var(--text-lg);
+
+    @media screen and (min-width: 660px) {
+      --paginator-size: 48px;
+      font-size: var(--text-xl);
+    }
+  }
+
+  .media-asset-paginator-prev, .media-asset-paginator-next {
+    opacity: 0;
+    width: var(--paginator-size);
+    height: var(--paginator-size);
+    border-radius: var(--paginator-size);
+    transition: opacity 0.125s, background-color 0.125s;
+
+    color: var(--asset-paginator-link-color);
+    background-color: var(--asset-paginator-background-color);
+
+    &:hover {
+      opacity: 1;
+      color: var(--asset-paginator-link-hover-color);
+      background-color: var(--asset-paginator-background-hover-color);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .media-asset-image {
+    user-select: none;
+    width: auto;
+    max-height: inherit;
+  }
+
+  &.media-asset-component-fit-height {
+    max-height: calc(100vh - var(--header-visible-height));
+    justify-content: center;
+
+    .media-asset-container {
+      aspect-ratio: var(--media-asset-width) / var(--media-asset-height);
+      height: max-content;
+      height: intrinsic; // XXX Safari-only hack to make images correct height on upload page. I have no idea how this works.
+    }
+  }
+
+  &.media-asset-component-fit-width {
+    .media-asset-image {
+      height: auto;
+      max-width: 100%;
+    }
+  }
 }

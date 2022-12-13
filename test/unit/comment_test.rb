@@ -202,8 +202,11 @@ class CommentTest < ActiveSupport::TestCase
     end
 
     context "during validation" do
-      subject { FactoryBot.build(:comment) }
+      subject { build(:comment) }
+
+      should_not allow_value("").for(:body)
       should_not allow_value(" ").for(:body)
+      should_not allow_value("\u200B").for(:body)
     end
   end
 end

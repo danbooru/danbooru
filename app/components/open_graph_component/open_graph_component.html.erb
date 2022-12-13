@@ -1,0 +1,23 @@
+<% if policy(media_asset).can_see_image? %>
+  <% if is_image? %>
+    <%= tag.meta property: "og:image", content: image_url %>
+    <%= tag.meta property: "og:image:secure_url", content: image_url %>
+    <%= tag.meta property: "og:image:width", content: image_width %>
+    <%= tag.meta property: "og:image:height", content: image_height %>
+    <%= tag.meta property: "og:image:type", content: mime_type %>
+  <% elsif is_video? || is_ugoira? %>
+    <%= tag.meta property: "og:image", content: image_url %>
+    <%= tag.meta property: "og:video", content: video_url %>
+    <%= tag.meta property: "og:video:secure_url", content: video_url %>
+    <%= tag.meta property: "og:video:width", content: image_width %>
+    <%= tag.meta property: "og:video:height", content: image_height %>
+    <%= tag.meta property: "og:video:type", content: mime_type %>
+
+    <%= json_ld_video_data %>
+  <% end %>
+
+  <% if twitter_image_url.present? %>
+    <%= tag.meta name: "twitter:card", content: "summary_large_image" %>
+    <%= tag.meta name: "twitter:image", content: twitter_image_url %>
+  <% end %>
+<% end %>

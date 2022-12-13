@@ -9,7 +9,6 @@ gem "sanitize"
 gem 'ruby-vips'
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
-gem 'rubyzip', :require => "zip"
 gem 'stripe'
 gem 'aws-sdk-sqs', '~> 1'
 gem 'responders'
@@ -34,7 +33,7 @@ gem 'http'
 gem 'activerecord-hierarchical_query'
 gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
-gem 'mail'
+gem 'mail', '< 2.8'
 gem 'nokogiri'
 gem 'view_component'
 gem 'tzinfo-data'
@@ -59,6 +58,8 @@ gem "ffaker"
 gem "composite_primary_keys"
 gem "resolv"
 gem "rover-df"
+gem "ffi-libarchive"
+gem "pry-rails"
 
 group :development do
   gem 'rubocop', require: false

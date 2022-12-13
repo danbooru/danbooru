@@ -132,12 +132,12 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
     context "unban action" do
       should "unban an artist" do
-        as(@admin) { @artist.ban!(banner: @admin) }
+        @artist.ban!(@admin)
         put_auth unban_artist_path(@artist.id), @admin
 
         assert_redirected_to(@artist)
         assert_equal(false, @artist.reload.is_banned?)
-        assert_equal(false, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
+        assert_equal(true, TagImplication.deleted.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
       end
     end
 

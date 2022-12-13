@@ -60,6 +60,17 @@ module Sources
           tags: %w[anchovy bandages darjeeling girls_und_panzer katyusha kay_(girls_und_panzer) mika_(girls_und_panzer) nishi_kinuyo nishizumi_maho nishizumi_miho shimada_arisu uniform]
         )
       end
+
+      context "a https://yande.re/post/show?md5=<md5> URL" do
+        strategy_should_work(
+          "https://yande.re/post/show?md5=7ecfdead705d7b956b26b1d37b98d089",
+          image_urls: ["https://files.yande.re/image/7ecfdead705d7b956b26b1d37b98d089/yande.re%20482880.jpg"],
+          download_size: 362_554,
+          tags: ["bayashiko", "journey_to_the_west", "sun_wukong"],
+          page_url: "https://yande.re/post/show/482880",
+          profile_url: "https://twitter.com/apononori"
+        )
+      end
     end
 
     context "For konachan.com," do
@@ -102,6 +113,16 @@ module Sources
           profile_url: "https://www.pixiv.net/users/22528152"
         )
       end
+
+      context "a https://konachan.com/post/show?md5=<md5>" do
+        strategy_should_work(
+          "https://konachan.com/post/show?md5=ca12cdb79a66d242e95a6f958341bf05",
+          image_urls: ["https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png"],
+          download_size: 8_167_593,
+          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hoodie long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
+          profile_url: "https://www.pixiv.net/users/22528152"
+        )
+      end
     end
 
     should "Parse yande.re URLs correctly" do
@@ -117,6 +138,8 @@ module Sources
       assert(Source::URL.image_url?("https://ayase.yande.re/image/2d0d229fd8465a325ee7686fcc7f75d2/yande.re%20192481%20animal_ears%20bunny_ears%20garter_belt%20headphones%20mitha%20stockings%20thighhighs.jpg"))
       assert(Source::URL.image_url?("https://yuno.yande.re/image/1764b95ae99e1562854791c232e3444b/yande.re%20281544%20cameltoe%20erect_nipples%20fundoshi%20horns%20loli%20miyama-zero%20sarashi%20sling_bikini%20swimsuits.jpg"))
 
+      assert(Source::URL.page_url?("https://yande.re/post/show?md5=2c95b8975b73744da2bcbed9619c1d59"))
+      assert(Source::URL.page_url?("https://yande.re/post?tags=md5:2c95b8975b73744da2bcbed9619c1d59"))
       assert(Source::URL.page_url?("https://yande.re/post/show/3"))
     end
 
@@ -129,6 +152,8 @@ module Sources
       assert(Source::URL.image_url?("https://konachan.com/sample/e2e2994bae738ff52fff7f4f50b069d5/Konachan.com%20-%20270803%20sample.jpg"))
       assert(Source::URL.image_url?("https://konachan.com/jpeg/e2e2994bae738ff52fff7f4f50b069d5/Konachan.com%20-%20270803%20banishment%20bicycle%20grass%20group%20male%20night%20original%20rooftop%20scenic%20signed%20stars%20tree.jpg"))
 
+      assert(Source::URL.page_url?("https://konachan.com/post/show?md5=955aa45f3b452b415509b47dcc9475ac"))
+      assert(Source::URL.page_url?("https://konachan.com/post?tags=md5:955aa45f3b452b415509b47dcc9475ac"))
       assert(Source::URL.page_url?("https://konachan.com/post/show/270803/banishment-bicycle-grass-group-male-night-original"))
     end
   end

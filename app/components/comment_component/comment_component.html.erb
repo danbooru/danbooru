@@ -1,4 +1,4 @@
-<article id="comment_<%= comment.id %>" class="comment message"
+<article id="comment_<%= comment.id %>" class="comment message <%= classes %>"
           x-data="{ showThresholded: false }"
           x-bind:data-show-thresholded="String(showThresholded)"
           data-id="<%= comment.id %>"
@@ -31,7 +31,7 @@
   </div>
 
   <div class="content">
-    <%= link_to "[hidden]", "javascript:void(0)", class: "unhide-comment-link", "x-on:click": "showThresholded = true" %>
+    <%= link_to "[hidden]", "javascript:void(0)", class: "unhide-comment-link block mb-3", "x-on:click": "showThresholded = true" %>
 
     <%= tag.div class: "body prose" do %>
       <% if redact_deleted? %>
@@ -54,7 +54,7 @@
             <%= link_to upvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "1"), class: "comment-upvote-link inactive-link", method: :post, remote: true %>
           <% end %>
 
-          <span class="comment-score">
+          <span class="comment-score inline-block text-center whitespace-nowrap align-middle min-w-4">
             <% if policy(CommentVote).can_see_votes? %>
               <%= link_to comment.score, comment_votes_path(search: { comment_id: comment.id }, variant: "compact"), class: "inactive-link" %>
             <% else %>
@@ -85,7 +85,7 @@
       <% end %>
 
       <% if reported? %>
-        <li class="moderation-report-notice">
+        <li class="moderation-report-notice font-bold">
           Reported (<%= link_to pluralize(comment.pending_moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "Comment", model_id: comment.id, status: "pending" }) %>)
         </li>
       <% end %>

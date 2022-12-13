@@ -67,11 +67,7 @@ Rails.application.routes.draw do
     end
   end
   resources :artist_urls, only: [:index]
-  resources :artist_versions, :only => [:index, :show] do
-    collection do
-      get :search
-    end
-  end
+  resources :artist_versions, only: [:index, :show]
   resources :bans
   resources :bulk_update_requests do
     member do
@@ -145,7 +141,7 @@ Rails.application.routes.draw do
       get :check, to: redirect {|path_params, req| "/iqdb_queries?#{req.query_string}"}
     end
   end
-  resources :media_assets, only: [:index, :show] do
+  resources :media_assets, only: [:index, :show, :destroy] do
     get "/:variant", to: "media_assets#image", as: :image
   end
   resources :media_metadata, only: [:index]

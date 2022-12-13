@@ -165,5 +165,13 @@ class ForumPostTest < ActiveSupport::TestCase
         assert_equal(@second_user.id, @post.updater_id)
       end
     end
+
+    context "during validation" do
+      subject { build(:forum_post) }
+
+      should_not allow_value("").for(:body)
+      should_not allow_value(" ").for(:body)
+      should_not allow_value("\u200B").for(:body)
+    end
   end
 end

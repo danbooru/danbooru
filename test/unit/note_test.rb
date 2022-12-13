@@ -145,5 +145,11 @@ class NoteTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "when validating notes" do
+      should_not allow_value("").for(:body)
+      should_not allow_value("   ").for(:body)
+      should_not allow_value("\u200B").for(:body)
+    end
   end
 end

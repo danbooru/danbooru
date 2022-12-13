@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MediaAssetsController < ApplicationController
-  respond_to :html, :json, :xml
+  respond_to :html, :json, :xml, :js
 
   rate_limit :image, rate: 5.0/1.seconds, burst: 50
 
@@ -34,6 +34,13 @@ class MediaAssetsController < ApplicationController
     else
       respond_with(@media_asset)
     end
+  end
+
+  def destroy
+    @media_asset = authorize MediaAsset.find(params[:id])
+    @media_asset.trash!(CurrentUser.user)
+    flash[:notice] = "File deleted"
+    respond_with(@media_asset)
   end
 
   def image

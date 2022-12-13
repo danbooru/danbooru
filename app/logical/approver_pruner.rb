@@ -29,7 +29,7 @@ module ApproverPruner
     inactive_approvers.each do |user|
       CurrentUser.scoped(User.system) do
         user.update!(level: User::Levels::CONTRIBUTOR)
-        user.feedback.create(category: "neutral", body: "Lost approval privileges", creator: User.system)
+        user.feedback.create!(category: "neutral", body: "Lost approval privileges", creator: User.system, disable_dmail_notification: true)
 
         Dmail.create_automated(
           to_id: user.id,

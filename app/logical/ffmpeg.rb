@@ -22,7 +22,7 @@ class FFmpeg
   #
   # @return [MediaFile] the preview image
   def smart_video_preview
-    vp = Tempfile.new(["video-preview", ".png"], binmode: true)
+    vp = Danbooru::Tempfile.new(["danbooru-video-preview-#{file.md5}-", ".png"], binmode: true)
 
     # https://ffmpeg.org/ffmpeg.html#Main-options
     # https://ffmpeg.org/ffmpeg-filters.html#thumbnail

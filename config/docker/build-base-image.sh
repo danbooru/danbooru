@@ -6,8 +6,8 @@ RUBY_VERSION="${RUBY_VERSION:-3.1.2}"
 VIPS_VERSION="${VIPS_VERSION:-8.13.3}"
 FFMPEG_VERSION="${FFMPEG_VERSION:-5.1.2}"
 MOZJPEG_VERSION="${MOZJPEG_VERSION:-4.1.1}"
-EXIFTOOL_VERSION="${EXIFTOOL_VERSION:-12.42}"
-OPENRESTY_VERSION="${OPENRESTY_VERSION:-1.19.9.1}"
+EXIFTOOL_VERSION="${EXIFTOOL_VERSION:-12.50}"
+OPENRESTY_VERSION="${OPENRESTY_VERSION:-1.21.4.1}"
 POSTGRESQL_CLIENT_VERSION="${POSTGRESQL_CLIENT_VERSION:-14}"
 
 COMMON_BUILD_DEPS="
@@ -26,7 +26,7 @@ DANBOORU_RUNTIME_DEPS="
   ca-certificates mkvtoolnix rclone libpq5 openssl libgmpxx4ldbl
   zlib1g libfftw3-3 libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
   libpng16-16 libexpat1 libglib2.0 libgif7 libexif12 libheif1 libvpx7 libdav1d6
-  libseccomp2 libseccomp-dev libjemalloc2
+  libseccomp2 libseccomp-dev libjemalloc2 libarchive13
 "
 COMMON_RUNTIME_DEPS="
   $DANBOORU_RUNTIME_DEPS $EXIFTOOL_RUNTIME_DEPS tini busybox less ncdu

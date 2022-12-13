@@ -1,7 +1,7 @@
 <% content_for(:secondary_links) do %>
   <%= quick_search_form_for(:name_matches, tags_path, "tags", autocomplete: "tag") %>
   <%= subnav_link_to "Tags", tags_path %>
-  <%= subnav_link_to "History", tag_versions_path %>
+  <%= subnav_link_to "Changes", tag_versions_path %>
   <%= subnav_link_to("Aliases", tag_aliases_path) %>
   <%= subnav_link_to("Implications", tag_implications_path) %>
   <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path %>
@@ -13,5 +13,6 @@
     <li>|</li>
     <%= subnav_link_to "Posts (#{@tag.post_count})", posts_path(:tags => @tag.name) %>
     <%= subnav_link_to "Edit", edit_tag_path(@tag) %>
+    <%= subnav_link_to "History", tag_versions_path(search: { tag_id: @tag.id }) %>
   <% end %>
 <% end %>

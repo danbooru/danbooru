@@ -133,6 +133,19 @@ module ApplicationHelper
     end
   end
 
+  def duration_to_hhmmssms(seconds)
+    hh = seconds.div(1.hour).to_s
+    mm = seconds.div(1.minute).to_s
+    ss = "%.2d" % (seconds % 1.minute)
+    ms = ("%.3f" % (seconds % 1.second)).delete_prefix("0.")
+
+    if seconds >= 1.hour
+      "#{hh}:#{mm}:#{ss}.#{ms}"
+    else
+      "#{mm}:#{ss}.#{ms}"
+    end
+  end
+
   def humanized_number(number, million: "M", thousand: "k")
     if number >= 1_000_000
       format("%.1f#{million}", number / 1_000_000.0)
@@ -180,7 +193,8 @@ module ApplicationHelper
     time_tag(time.strftime("%Y-%m-%d %H:%M"), time)
   end
 
-  def external_link_to(url, text = url, truncate: nil, strip: false, **link_options)
+  def external_link_to(url, text = url, truncate: nil, strip: false, **link_options, &block)
+    text = capture { yield } if block_given?
     text = text.gsub(%r{\Ahttps?://}i, "") if strip == :scheme
     text = text.gsub(%r{\Ahttps?://(?:www\.)?}i, "") if strip == :subdomain
     text = text.truncate(truncate) if truncate

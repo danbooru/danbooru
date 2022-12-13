@@ -381,19 +381,11 @@ module Danbooru
     end
 
     # http://tinysubversions.com/notes/mastodon-bot/
-    def pawoo_client_id
+    def pawoo_access_token
       nil
     end
 
-    def pawoo_client_secret
-      nil
-    end
-
-    def baraag_client_id
-      nil
-    end
-
-    def baraag_client_secret
+    def baraag_access_token
       nil
     end
 
@@ -578,16 +570,13 @@ module Danbooru
       "https://twitter.com/#{Danbooru.config.twitter_username}"
     end
 
-    def http_proxy_host
-    end
-
-    def http_proxy_port
-    end
-
-    def http_proxy_username
-    end
-
-    def http_proxy_password
+    # The proxy to use for outgoing HTTP requests.
+    #
+    # If you use a proxy and you're running a public-facing site, you should be careful to configure the proxy to block
+    # HTTP requests to the local network. That is, block requests to e.g. 127.0.0.1 and 192.168.0.1/24 so that users
+    # can't upload URLs like `http://192.168.0.1.nip.io/` to trigger HTTP requests to servers inside your local network.
+    def http_proxy
+      # "http://username:password@proxy.example.com:1080"
     end
 
     # The URL for the Reportbooru server (https://github.com/evazion/reportbooru).

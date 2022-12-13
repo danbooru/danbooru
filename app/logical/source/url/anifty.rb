@@ -7,10 +7,6 @@ class Source::URL::Anifty < Source::URL
     url.domain == "anifty.jp" || url.host == "anifty.imgix.net" || (url.host == "storage.googleapis.com" && url.path.include?("/anifty-media/"))
   end
 
-  def site_name
-    "Anifty"
-  end
-
   def parse
     case [host, *path_segments]
 

@@ -141,6 +141,7 @@ module ArtistFinder
     "poipiku.com", # https://poipiku.com/1776623/
     "pomf.tv", # https://pomf.tv/oozutsucannon
     "pomf.tv/stream", # https://pomf.tv/stream/Kukseleg
+    "picdig.net", # https://picdig.net/kenny8686/portfolio
     "plala.or.jp", # http://www7.plala.or.jp/reirei
     "plurk.com", # http://www.plurk.com/a1amorea1a1
     "pornhub.com", # https://www.pornhub.com/model/mizzpeachy

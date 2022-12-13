@@ -383,17 +383,12 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "with a banned artist" do
-        setup do
-          CurrentUser.scoped(FactoryBot.create(:admin_user)) do
-            @artist = FactoryBot.create(:artist)
-            @artist.ban!
-            perform_enqueued_jobs
-          end
-          @post = FactoryBot.create(:post, :tag_string => @artist.name)
-        end
-
         should "ban the post" do
-          assert_equal(true, @post.is_banned?)
+          artist = create(:artist)
+          implication = create(:tag_implication, antecedent_name: artist.name, consequent_name: "banned_artist")
+          post = create(:post, tag_string: artist.name)
+
+          assert_equal(true, post.is_banned?)
         end
       end
 
@@ -481,6 +476,9 @@ class PostTest < ActiveSupport::TestCase
           assert_invalid_tag("foo\abar")
           assert_invalid_tag("café")
           assert_invalid_tag("東方")
+          assert_invalid_tag("gen:char:foo")
+          assert_invalid_tag("general:newpool:a")
+          assert_invalid_tag("general:rating:g")
         end
 
         context "that already exists" do
@@ -588,13 +586,13 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(Tag.categories.character, tag.last_version.category)
           end
 
-          should "change the category for an aliased tag" do
+          should "not change the category for an aliased tag" do
             create(:tag_alias, antecedent_name: "hoge", consequent_name: "moge")
             post = create(:post, tag_string: "char:hoge")
 
             assert_equal(["moge"], post.tag_array)
             assert_equal(Tag.categories.general, Tag.find_by_name("moge").category)
-            assert_equal(Tag.categories.character, Tag.find_by_name("hoge").category)
+            assert_equal(Tag.categories.general, Tag.find_by_name("hoge").category)
           end
 
           should "not raise an exception for an invalid tag name" do
@@ -603,6 +601,14 @@ class PostTest < ActiveSupport::TestCase
             assert_match(/Couldn't add tag: 'copy:blah' cannot begin with 'copy:'/, post.warnings[:base].join("\n"))
             assert_equal(["tagme"], post.tag_array)
             assert_equal(false, Tag.exists?(name: "copy:blah"))
+          end
+
+          should "not raise an exception for char:newpool:blah" do
+            post = create(:post, tag_string: "tagme char:newpool:blah")
+
+            assert_match(/Couldn't add tag: 'newpool:blah' cannot begin with 'newpool:'/, post.warnings[:base].join("\n"))
+            assert_equal(["tagme"], post.tag_array)
+            assert_equal(false, Tag.exists?(name: "newpool:blah"))
           end
         end
 

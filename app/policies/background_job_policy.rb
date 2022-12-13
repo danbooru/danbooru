@@ -21,6 +21,6 @@ class BackgroundJobPolicy < ApplicationPolicy
   def api_attributes
     attributes = super
     attributes -= [:serialized_params] unless can_see_params?
-    attributes
+    attributes + [:job_duration, :queue_delay]
   end
 end

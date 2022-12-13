@@ -46,7 +46,7 @@ export default class FileUploadComponent {
       timeout: 0,
       uploadMultiple: true,
       createImageThumbnails: false,
-      acceptedFiles: "image/jpeg,image/png,image/gif,image/webp,image/avif,video/mp4,video/webm",
+      acceptedFiles: ".jpg,.jpeg,.png,.gif,.webp,.avif,.mp4,.webm,.zip,.rar,.7z",
       previewTemplate: this.$component.find(".dropzone-preview-template").html(),
     });
 

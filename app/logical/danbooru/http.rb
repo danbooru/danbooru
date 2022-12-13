@@ -55,7 +55,13 @@ module Danbooru
 
     # The default HTTP client for requests to external websites. This includes API calls to external services, fetching source data, and downloading images.
     def self.external
-      new.proxy.public_only.headers("User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0")
+      if Danbooru.config.http_proxy.present?
+        # XXX The `proxy` option is incompatible with the `public_only` option. When using a proxy, the proxy itself
+        # should be configured to block HTTP requests to IPs on the local network.
+        new.proxy.headers("User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0")
+      else
+        new.public_only.headers("User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0")
+      end
     end
 
     # The default HTTP client for API calls to internal services controlled by Danbooru.
@@ -131,11 +137,12 @@ module Danbooru
       use(cache: { expires_in: expires_in })
     end
 
-    def proxy(host: Danbooru.config.http_proxy_host, port: Danbooru.config.http_proxy_port.to_i, username: Danbooru.config.http_proxy_username, password: Danbooru.config.http_proxy_password)
-      return self if host.blank?
+    def proxy(url: Danbooru.config.http_proxy)
+      return self if url.blank?
+      parsed_url = Danbooru::URL.parse!(url)
 
       dup.tap do |o|
-        o.http = o.http.via(host, port, username, password)
+        o.http = o.http.via(parsed_url.host, parsed_url.port, parsed_url.http_user, parsed_url.password)
       end
     end
 
@@ -164,11 +171,11 @@ module Danbooru
       # Download a file from `url` and return a {MediaFile}.
       #
       # @param url [String] the URL to download
-      # @param file [Tempfile] the file to download the URL to
+      # @param file [Danbooru::Tempfile] the file to download the URL to
       # @raise [DownloadError] if the server returns a non-200 OK response
       # @raise [FileTooLargeError] if the file exceeds Danbooru's maximum download size.
       # @return [Array<(HTTP::Response, MediaFile)>] the HTTP response and the downloaded file
-      def download_media(url, file: Tempfile.new("danbooru-download-", binmode: true))
+      def download_media(url, file: Danbooru::Tempfile.new("danbooru-download-#{url.parameterize.truncate(96)}-", binmode: true))
         response = get(url)
 
         raise DownloadError, "#{url} failed with code #{response.status}" if response.status != 200

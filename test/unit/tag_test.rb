@@ -175,6 +175,17 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(0, tag.reload.category)
     end
 
+    should "not change category if the tag is aliased" do
+      t1 = create(:tag, name: "ff7", category: Tag.categories.copyright)
+      t2 = create(:tag, name: "final_fantasy_vii", category: Tag.categories.copyright)
+      ta = create(:tag_alias, antecedent_name: "ff7", consequent_name: "final_fantasy_vii")
+
+      t1.reload.category = Tag.categories.character
+
+      assert_equal(false, t1.valid?)
+      assert_equal(["Can't change the category of an aliased tag"], t1.errors[:base])
+    end
+
     should "update post tag counts when the category is changed" do
       post = FactoryBot.create(:post, tag_string: "test")
       assert_equal(1, post.tag_count_general)
@@ -184,6 +195,15 @@ class TagTest < ActiveSupport::TestCase
       post.reload
       assert_equal(0, post.tag_count_general)
       assert_equal(1, post.tag_count_character)
+    end
+
+    should "update aliased tags when the tag's category is changed" do
+      t1 = create(:tag, name: "ff7", category: Tag.categories.general)
+      t2 = create(:tag, name: "final_fantasy_vii", category: Tag.categories.general)
+      ta = create(:tag_alias, antecedent_name: "ff7", consequent_name: "final_fantasy_vii")
+      t2.update!(category: Tag.categories.copyright, updater: User.system)
+
+      assert_equal("Copyright", t1.reload.category_name)
     end
 
     should "be created when one doesn't exist" do

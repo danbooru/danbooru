@@ -114,11 +114,14 @@ class ExifTool
     end
 
     # https://danbooru.donmai.us/posts?tags=exif:PNG:Software=NovelAI
+    # https://danbooru.donmai.us/posts?tags=exif:"PNG:Title=AI generated image"
     # https://danbooru.donmai.us/posts?tags=exif:PNG:Parameters
     # https://danbooru.donmai.us/posts?tags=exif:PNG:Sd-metadata
     # https://danbooru.donmai.us/posts?tags=exif:PNG:Dream
     def is_ai_generated?
       metadata["PNG:Software"] == "NovelAI" ||
+        metadata["PNG:Title"] == "AI generated image" ||
+        metadata["PNG:Description"]&.match?(/masterpiece|best quality/) ||
         metadata.has_key?("PNG:Parameters") ||
         metadata.has_key?("PNG:Sd-metadata") ||
         metadata.has_key?("PNG:Dream")

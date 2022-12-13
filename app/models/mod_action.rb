@@ -17,6 +17,7 @@ class ModAction < ApplicationRecord
   # Misc:     6-19
   enum category: {
     user_delete: 2,
+    user_undelete: 3,
     user_ban: 4,
     user_unban: 5,
     user_name_change: 6,
@@ -42,6 +43,8 @@ class ModAction < ApplicationRecord
     post_vote_undelete: 233,
     pool_delete: 62,
     pool_undelete: 63,
+    media_asset_delete: 72,
+    media_asset_expunge: 76,
     artist_ban: 184,
     artist_unban: 185,
     comment_update: 81,

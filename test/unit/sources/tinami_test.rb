@@ -8,6 +8,7 @@ module Sources
           source = Source::Extractor.find("http://www.tinami.com/view/1087268")
 
           assert_equal("みぐめ", source.artist_name)
+          assert_equal(["みぐめ"], source.other_names)
           assert_equal("https://www.tinami.com/view/1087268", source.page_url)
           assert_equal(["https://img.tinami.com/illust2/img/49/6234fe552348b.jpg"], source.image_urls)
           assert_equal("https://www.tinami.com/creator/profile/66493", source.profile_url)
@@ -22,6 +23,7 @@ module Sources
           source = Source::Extractor.find("http://www.tinami.com/view/1087271")
 
           assert_equal("Shimaken", source.artist_name)
+          assert_equal(["Shimaken"], source.other_names)
           assert_equal("https://www.tinami.com/view/1087271", source.page_url)
           assert_equal(%w[
             https://img.tinami.com/illust2/img/458/62351d05dc2d1.jpg
@@ -40,6 +42,7 @@ module Sources
           source = Source::Extractor.find("http://www.tinami.com/view/1087270")
 
           assert_equal("セラ箱", source.artist_name)
+          assert_equal(["セラ箱"], source.other_names)
           assert_equal("https://www.tinami.com/view/1087270", source.page_url)
           assert_equal(%w[
             https://img.tinami.com/illust2/img/399/623503bb2c686.jpg
@@ -84,6 +87,7 @@ module Sources
           source = Source::Extractor.find("https://img.tinami.com/illust2/img/647/6234fe5588e97.jpg", "http://www.tinami.com/view/1087268")
 
           assert_equal("みぐめ", source.artist_name)
+          assert_equal(["みぐめ"], source.other_names)
           assert_equal("https://www.tinami.com/view/1087268", source.page_url)
           assert_equal(["https://img.tinami.com/illust2/img/647/6234fe5588e97.jpg"], source.image_urls)
           assert_equal("https://www.tinami.com/creator/profile/66493", source.profile_url)

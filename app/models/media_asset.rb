@@ -21,12 +21,14 @@ class MediaAsset < ApplicationRecord
   has_many :uploaders, through: :uploads, class_name: "User", foreign_key: :uploader_id
   has_many :ai_tags
 
-  delegate :frame_delays, :metadata, to: :media_metadata
+  delegate :frame_delays, :metadata, to: :media_metadata, allow_nil: true
   delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, :is_ai_generated?, :has_sound?, to: :metadata
 
   scope :public_only, -> { where(is_public: true) }
   scope :private_only, -> { where(is_public: false) }
   scope :without_ai_tags, -> { where.not(AITag.where("ai_tags.media_asset_id = media_assets.id").select(1).arel.exists) }
+  scope :removed, -> { where(status: [:deleted, :expunged]) }
+  scope :expired, -> { processing.where(created_at: ..4.hours.ago) }
 
   # Processing: The asset's files are currently being resized and distributed to the backend servers.
   # Active: The asset has been successfully uploaded and is ready to use.
@@ -51,6 +53,10 @@ class MediaAsset < ApplicationRecord
 
   before_create :initialize_file_key
 
+  def self.prune!
+    expired.update_all(status: :failed)
+  end
+
   class Variant
     extend Memoist
     include ActiveModel::Serializers::JSON
@@ -68,6 +74,8 @@ class MediaAsset < ApplicationRecord
       file = convert_file(original_file)
       storage_service.store(file, file_path)
       backup_storage_service.store(file, file_path)
+    ensure
+      file&.close
     end
 
     def trash_file!
@@ -177,6 +185,15 @@ class MediaAsset < ApplicationRecord
       dimensions[1]
     end
 
+    def ==(other)
+      other.is_a?(Variant) && [media_asset, type] == [other.media_asset, other.type]
+    end
+    alias_method :eql?, :==
+
+    def hash
+      [media_asset, type].hash
+    end
+
     def serializable_hash(*options)
       { type: type, url: file_url, width: width, height: height, file_ext: file_ext }
     end
@@ -187,11 +204,34 @@ class MediaAsset < ApplicationRecord
   concerning :SearchMethods do
     class_methods do
       def ai_tags_match(tag_string, score_range: (50..))
-        AITagQuery.search(tag_string, relation: self, score_range: score_range)
+        MediaAssetQuery.search(tag_string, relation: self, score_range: score_range)
+      end
+
+      def is_matches(value)
+        case value.downcase
+        when *MediaAsset.statuses.keys
+          where(status: value)
+        when *FILE_TYPES
+          attribute_matches(value, :file_ext, :enum)
+        else
+          none
+        end
+      end
+
+      def exif_matches(string)
+        # string = File:ColorComponents=3
+        if string.include?("=")
+          key, value = string.split(/=/, 2)
+          hash = { key => value }
+          joins(:media_metadata).where_json_contains("media_metadata.metadata", hash)
+        # string = File:ColorComponents
+        else
+          joins(:media_metadata).where_json_has_key("media_metadata.metadata", string)
+        end
       end
 
       def search(params, current_user)
-        q = search_attributes(params, [:id, :created_at, :updated_at, :status, :md5, :file_ext, :file_size, :image_width, :image_height, :file_key, :is_public], current_user: current_user)
+        q = search_attributes(params, [:id, :created_at, :updated_at, :status, :md5, :file_ext, :file_size, :image_width, :image_height, :duration, :file_key, :is_public], current_user: current_user)
 
         if params[:metadata].present?
           q = q.joins(:media_metadata).merge(MediaMetadata.search({ metadata: params[:metadata] }, current_user))
@@ -304,6 +344,10 @@ class MediaAsset < ApplicationRecord
       end
     end
 
+    def removed?
+      deleted? || expunged?
+    end
+
     # @return [Mime::Type] The file's MIME type.
     def mime_type
       Mime::Type.lookup_by_extension(file_ext)
@@ -322,7 +366,7 @@ class MediaAsset < ApplicationRecord
 
     def regenerate!(metadata: true, files: true, ai_tags: true)
       with_lock do
-        variant("original").open_file! do |original_file|
+        original.open_file! do |original_file|
           regenerate_metadata!(original_file) if metadata
           regenerate_files!(original_file) if files
         end
@@ -347,7 +391,7 @@ class MediaAsset < ApplicationRecord
 
     # Regenerate all thumbnail and sample image files for the asset.
     def regenerate_files!(original_file)
-      distribute_files!(original_file)
+      distribute_files!(original_file, variants: variants.without(original))
       purge_cached_urls!
       post.update_iqdb if post.present?
     end
@@ -375,17 +419,25 @@ class MediaAsset < ApplicationRecord
       end
     end
 
-    def expunge!
-      delete_files!
-      update!(status: :expunged)
+    def expunge!(current_user, log: true)
+      with_lock do
+        delete_files!
+        purge_cached_urls!
+        update!(status: :expunged)
+        ModAction.log("expunged media asset ##{id} (md5=#{md5})", :media_asset_expunge, subject: self, user: current_user) if log
+      end
     rescue
       update!(status: :failed)
       raise
     end
 
-    def trash!
-      variants.each(&:trash_file!)
-      update!(status: :deleted)
+    def trash!(current_user, log: true)
+      with_lock do
+        variants.each(&:trash_file!)
+        purge_cached_urls!
+        update!(status: :deleted)
+        ModAction.log("deleted media asset ##{id} (md5=#{md5})", :media_asset_delete, subject: self, user: current_user) if log
+      end
     rescue
       update!(status: :failed)
       raise
@@ -395,7 +447,7 @@ class MediaAsset < ApplicationRecord
       variants.each(&:delete_file!)
     end
 
-    def distribute_files!(media_file)
+    def distribute_files!(media_file, variants: self.variants)
       Parallel.each(variants, in_threads: Etc.nprocessors) do |variant|
         variant.store_file!(media_file)
       end
@@ -411,6 +463,10 @@ class MediaAsset < ApplicationRecord
   end
 
   concerning :VariantMethods do
+    def original
+      variant(:original)
+    end
+
     def variant(type)
       return nil unless has_variant?(type)
       Variant.new(self, type)
@@ -476,6 +532,15 @@ class MediaAsset < ApplicationRecord
     def is_animated_png?
       is_animated? && file_ext == "png"
     end
+  end
+
+  def source_urls
+    urls = upload_media_assets.map { |uma| Source::URL.page_url(uma.source_url) || uma.page_url || uma.source_url }
+    urls += [post.normalized_source] if post&.normalized_source.present?
+
+    urls.compact.select do |url|
+      url.match?(%r{\Ahttps?://}i) && Source::URL.parse(url).recognized?
+    end.uniq
   end
 
   def self.generate_file_key

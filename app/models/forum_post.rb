@@ -16,7 +16,7 @@ class ForumPost < ApplicationRecord
   has_one :tag_implication
   has_one :bulk_update_request
 
-  validates :body, presence: true, length: { maximum: 200_000 }, if: :body_changed?
+  validates :body, visible_string: true, length: { maximum: 200_000 }, if: :body_changed?
   validate :validate_deletion_of_original_post
   validate :validate_undeletion_of_post
 
@@ -25,12 +25,7 @@ class ForumPost < ApplicationRecord
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
-  after_update(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |forum_post|
-    ModAction.log("updated #{forum_post.dtext_shortlink}", :forum_post_update, subject: self, user: forum_post.updater)
-  end
-  after_destroy(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |forum_post|
-    ModAction.log("deleted #{forum_post.dtext_shortlink}", :forum_post_delete, subject: self, user: forum_post.updater)
-  end
+  after_update :create_mod_action
   after_create_commit :async_send_discord_notification
 
   deletable
@@ -149,6 +144,14 @@ class ForumPost < ApplicationRecord
     end
 
     topic.response_count -= 1
+  end
+
+  def create_mod_action
+    if saved_change_to_is_deleted == [false, true] && creator != updater
+      ModAction.log("deleted #{dtext_shortlink}", :forum_post_delete, subject: self, user: updater)
+    elsif creator != updater
+      ModAction.log("updated #{dtext_shortlink}", :forum_post_update, subject: self, user: updater)
+    end
   end
 
   def quoted_response
