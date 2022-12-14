@@ -60,7 +60,7 @@ git clone https://github.com/danbooru/danbooru.git
 cd danbooru
 ```
 
-2) Set the database username and password in the `.env` file eg:
+2) Set the database username and password in the `.env` file EG:
 
 ```
 DATABASE_USERNAME=postgres
@@ -116,7 +116,7 @@ debug your Nginx configuration file.
 
 ## Services
 
-Danboou depends on a couple of cloud services and several microservices to
+Danbooru depends on a couple of cloud services and several microservices to
 implement certain features.
 
 ### Amazon Web Services
