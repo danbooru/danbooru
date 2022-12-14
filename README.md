@@ -93,7 +93,7 @@ rails s
 
 Open [localhost:3000](http://localhost:3000) in your favorite browser.
 
-Trouble with installation? Here's a [video](videolink).
+Trouble with installation? Here's a [video walkthrough](https://replayable.io/replay/6399b61d300ffb0063c3b95c/?share=LYxvXUDxJaUcL4DTCkwdg).
 
 ## Troubleshooting
 
