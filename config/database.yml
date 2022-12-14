@@ -42,6 +42,8 @@ development:
 
 test:
   <<: *default
+  username: <%= ENV["DATABASE_USERNAME"] || 'danbooru' %>
+  password: <%= ENV["DATABASE_PASSWORD"] %>
   database: danbooru2_test
 
 archive_production:
