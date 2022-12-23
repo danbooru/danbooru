@@ -1,4 +1,4 @@
-# some of these settings are overriden in also test/.rubocop.yml
+# some of these settings are overridden in also test/.rubocop.yml
 
 require:
   - rubocop-rails
