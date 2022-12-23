@@ -15,7 +15,16 @@
 name: Docker Build
 
 # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
-on: [push, create, workflow_dispatch]
+on:
+  push:
+  create:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: "Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)"
+        required: false
+        default: false
 
 # https://docs.github.com/en/actions/reference/authentication-in-a-workflow#permissions-for-the-github_token
 # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idpermissions
@@ -89,3 +98,10 @@ jobs:
 
           build-args: |
             SOURCE_COMMIT=${{ github.sha }}
+
+      # https://github.com/marketplace/actions/debugging-with-ssh
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ always() && (github.event_name == 'workflow_dispatch' && inputs.debug_enabled) }}
+        with:
+          limit-access-to-actor: true
