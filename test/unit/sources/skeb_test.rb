@@ -88,7 +88,7 @@ module Sources
     context "A post with a video" do
       should "get it correctly" do
         site = Source::Extractor.find("https://skeb.jp/@kaisouafuro/works/112")
-        assert_match(%r{\Ahttps://skeb-production.s3.ap-northeast-1.amazonaws.com/uploads/outputs/20f9d68f-50ec-44ae-8630-173fc38a2d6a\?response-content-disposition=attachment%3B%20filename%3D%22458093-1.output.mp4%22%3B%20filename%2A%3DUTF-8%27%27458093-1.output.mp4&response-content-type=video%2Fmp4&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=.*&X-Amz-Date=.*&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=.*}, site.image_urls.sole)
+        assert_match(%r{\Ahttps://cdn\.skeb\.jp/uploads/outputs/20f9d68f-50ec-44ae-8630-173fc38a2d6a\?response-content-disposition=inline&Expires=\d+&Signature=.*&Key-Pair-Id=.*}, site.image_urls.sole)
       end
     end
 

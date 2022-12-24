@@ -33,7 +33,7 @@ module Sources
       strategy_should_work(
         "https://www.artstation.com/artwork/cody-from-sf",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/000/144/922/4k/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"],
-        tags: ["Street Fighter", "Cody", "SF"]
+        tags: ["Street Fighter", "Cody", "SF", "NoAI"]
       )
     end
 

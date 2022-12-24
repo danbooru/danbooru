@@ -166,15 +166,6 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      context "with the banned_artist tag" do
-        should "also ban the post" do
-          post = FactoryBot.create(:post, :tag_string => "banned_artist")
-          post.delete!("test")
-          post.reload
-          assert(post.is_banned?)
-        end
-      end
-
       context "that is still in cooldown after being flagged" do
         should "succeed" do
           flag = create(:post_flag)
