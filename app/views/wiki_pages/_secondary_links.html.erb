@@ -13,7 +13,7 @@
     <li>|</li>
     <%= subnav_link_to "Posts (#{@wiki_page.tag.try(:post_count) || 0})", posts_path(:tags => @wiki_page.title) %>
     <%= subnav_link_to "History", wiki_page_versions_path(:search => {:wiki_page_id => @wiki_page.id}) %>
-    <% if policy(@wiki_page).edit? and %>
+    <% if policy(@wiki_page).edit? %>
       <% if current_page?(action: :edit) %>
         <% if @wiki_page.is_deleted? %>
           <%= subnav_link_to "Undelete", wiki_page_path(@wiki_page.id), remote: true, method: :put, "data-params": "wiki_page[is_deleted]=false", "data-shortcut": "shift+d", "data-confirm": "Are you sure you want to undelete this wiki?" %>
