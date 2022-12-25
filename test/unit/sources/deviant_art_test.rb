@@ -255,12 +255,17 @@ module Sources
       assert_equal("https://www.deviantart.com/deviation/599977532", Source::URL.page_url(source5))
       assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source6))
 
+      assert_equal("https://www.deviantart.com/noizave", Source::URL.profile_url("https://noizave.daportfolio.com"))
+      assert_equal("https://www.deviantart.com/noizave", Source::URL.profile_url("https://noizave.artworkfolio.com"))
+
       assert(Source::URL.image_url?("http://www.deviantart.com/download/135944599/Touhou___Suwako_Moriya_Colored_by_Turtle_Chibi.png"))
       assert(Source::URL.image_url?("http://fc08.deviantart.net/images3/i/2004/088/8/f/Blackrose_for_MuzicFreq.jpg"))
       assert(Source::URL.image_url?("http://prnt00.deviantart.net/9b74/b/2016/101/4/468a9d89f52a835d4f6f1c8caca0dfb2-pnjfbh.jpg"))
       assert(Source::URL.page_url?("https://sta.sh/0wxs31o7nn2"))
       assert(Source::URL.profile_url?("https://www.deviantart.com/noizave"))
       assert(Source::URL.profile_url?("https://noizave.deviantart.com"))
+      assert(Source::URL.profile_url?("https://noizave.daportfolio.com"))
+      assert(Source::URL.profile_url?("https://noizave.artworkfolio.com"))
       assert_not(Source::URL.profile_url?("https://deviantart.net"))
     end
   end

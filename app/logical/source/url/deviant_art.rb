@@ -21,7 +21,7 @@ module Source
     attr_reader :username, :work_id, :stash_id, :title, :file
 
     def self.match?(url)
-      url.domain.in?(%w[deviantart.net deviantart.com fav.me sta.sh]) || url.host.in?(%w[images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com wixmp-ed30a86b8c4ca887773594c2.wixmp.com api-da.wixmp.com])
+      url.domain.in?(%w[artworkfolio.com daportfolio.com deviantart.net deviantart.com fav.me sta.sh]) || url.host.in?(%w[images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com wixmp-ed30a86b8c4ca887773594c2.wixmp.com api-da.wixmp.com])
     end
 
     def parse
@@ -71,7 +71,9 @@ module Source
         @username = username
 
       # https://noizave.deviantart.com
-      in ["deviantart.com"] unless subdomain.in?(RESERVED_SUBDOMAINS)
+      # http://nemupanart.daportfolio.com
+      # http://regi-chan.artworkfolio.com
+      in ("deviantart.com" | "daportfolio.com" | "artworkfolio.com"), *rest unless subdomain.in?(RESERVED_SUBDOMAINS)
         @username = subdomain
 
       # https://fav.me/dbc3a48
