@@ -56,6 +56,11 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("https://arca.live/u/@윾파", url.url)
     end
 
+    should "not apply NFKC normalization to URLs" do
+      url = create(:artist_url, url: "https://arca.live/u/@ㅇㅇ/43979125")
+      assert_equal("https://arca.live/u/@ㅇㅇ/43979125", url.url)
+    end
+
     should "normalize ArtStation urls" do
       url = create(:artist_url, url: "https://artstation.com/koyorin")
       assert_equal("https://www.artstation.com/koyorin", url.url)

@@ -360,11 +360,10 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "work for a source URL containing unicode characters" do
-        source1 = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=東方&two=a%20b"
-        source2 = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=%E6%9D%B1%E6%96%B9&two=a%20b"
+        source = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=東方&two=a%20b"
 
-        upload = assert_successful_upload(source1, user: @user)
-        assert_equal(source2, upload.source)
+        upload = assert_successful_upload(source, user: @user)
+        assert_equal(source, upload.source)
       end
 
       should "save the AI tags" do

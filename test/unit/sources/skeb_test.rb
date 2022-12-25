@@ -99,6 +99,15 @@ module Sources
       end
     end
 
+    context "A watermarked sample URL" do
+      # Test that we don't alter the percent encoding of the URL, otherwise the signature will be wrong
+      # page: https://skeb.jp/@LambOic029/works/146
+      strategy_should_work(
+        "https://skeb.imgix.net/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=7dbecbeb7b05394537b60c881a081776",
+        download_size: 126_690,
+      )
+    end
+
     should "Parse Skeb URLs correctly" do
       assert(Source::URL.image_url?("https://skeb.imgix.net/requests/229088_2?bg=%23fff&auto=format&w=800&s=9cac8b76c0838f2df4f19ebc41c1ae0a"))
       assert(Source::URL.image_url?("https://skeb.imgix.net/uploads/origins/04d62c2f-e396-46f9-903a-3ca8bd69fc7c?bg=%23fff&auto=format&w=800&s=966c5d0389c3b94dc36ac970f812bef4"))

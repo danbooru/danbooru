@@ -41,7 +41,8 @@ module Danbooru
     # @param url [String, Danbooru::URL]
     def initialize(url)
       @original_url = url.to_s
-      @url = Addressable::URI.heuristic_parse(original_url).display_uri
+      @url = Addressable::URI.heuristic_parse(original_url)
+      @url.authority = @url.normalized_authority
       @url.path = Addressable::URI.unencode_component(@url.path, String, "/%")
       @url.path = nil if @url.path == "/"
 
