@@ -60,6 +60,7 @@ module Source
       Source::Extractor::Rule34DotUs,
       Source::Extractor::FourChan,
       Source::Extractor::Picdig,
+      Source::Extractor::Enty,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
@@ -319,7 +320,7 @@ module Source
       text = text.to_s
       text = Rails::Html::FullSanitizer.new.sanitize(text, encode_special_chars: false)
       text = CGI.unescapeHTML(text)
-      text
+      text.strip
     end
 
     memoize :http, :http_downloader, :related_posts

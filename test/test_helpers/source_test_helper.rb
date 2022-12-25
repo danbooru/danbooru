@@ -100,13 +100,12 @@ module SourceTestHelper
 
         if expected_value.instance_of? Regexp
           assert_match(expected_value, actual_value)
-        elsif expected_value.instance_of? Array
-          if expected_value.first.instance_of? Regexp
-            # We don't sort actual_value here because sites like nicoseiga have variable values right in the middle of the url, like timestamps
-            expected_value.zip(actual_value).map { |expected_regex, actual_string| assert_match(expected_regex, actual_string) }
-          else
-            assert_equal(expected_value.sort, actual_value.sort)
+        elsif expected_value.is_a?(Array) && expected_value.grep(Regexp).any?
+          expected_value.zip(actual_value).each do |expected, actual|
+            assert_match(expected, actual)
           end
+        elsif expected_value.is_a?(Array)
+          assert_equal(expected_value.sort, actual_value.sort)
         elsif expected_value.nil?
           assert_nil(actual_value)
         else
