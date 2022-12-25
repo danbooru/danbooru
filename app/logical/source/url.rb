@@ -64,6 +64,7 @@ module Source
       Source::URL::FourChan,
       Source::URL::Picdig,
       Source::URL::Enty,
+      Source::URL::ArcaLive,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.

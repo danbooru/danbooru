@@ -607,6 +607,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://picdig.net/apricot/projects/9d96c3f2-f92f-4472-856a-93779bb43527")
 
         should_upload_successfully("https://enty.jp/posts/141598")
+
+        should_upload_successfully("https://arca.live/b/arknights/66031722")
       end
     end
   end

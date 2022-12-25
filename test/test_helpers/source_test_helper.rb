@@ -53,7 +53,7 @@ module SourceTestHelper
 
         assert_not_nil(Danbooru::URL.parse(strategy.profile_url))
         assert_equal(profile_url, strategy.profile_url)
-        artist = FactoryBot.create(:artist, name: strategy.tag_name, url_string: profile_url)
+        artist = create(:artist, name: strategy.tag_name || SecureRandom.uuid, url_string: profile_url)
         assert_equal([artist], strategy.artists)
       end
     else

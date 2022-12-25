@@ -17,6 +17,7 @@ module IconHelper
     Anime\ News\ Network
     Animexx
     Apple\ Music
+    Arca.live
     Archive\ of\ Our\ Own
     ArtStation
     Art\ Fight

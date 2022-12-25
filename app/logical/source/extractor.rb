@@ -61,6 +61,7 @@ module Source
       Source::Extractor::FourChan,
       Source::Extractor::Picdig,
       Source::Extractor::Enty,
+      Source::Extractor::ArcaLive,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
@@ -141,7 +142,7 @@ module Source
     #
     # @return [String, nil]
     def tag_name
-      artist_name
+      Tag.normalize_name(artist_name) if artist_name.present? && artist_name.match?(/\A[a-zA-Z0-9._-]+\z/)
     end
 
     # The artists's primary name. If an artist has both a display name and a
