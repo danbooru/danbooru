@@ -18,27 +18,24 @@ wget https://raw.githubusercontent.com/danbooru/danbooru/master/docker-compose.y
 docker-compose up
 ```
 
+If you get an error such as `'name' does not match any of the regexes: '^x-'` make sure 
+that you're running an updated version of Docker Compose.
+
 ## Manual Installation
 
-Follow the [INSTALL.debian](INSTALL.debian) script to install Danbooru.
-
-The INSTALL.debian script is written for Debian, but can be adapted for other
-distributions. Danbooru has been successfully installed on Debian, Ubuntu,
-Fedora, Arch, and OS X. It is recommended that you use an Ubuntu-based system
-since Ubuntu is what is used in development and production.
-
 See [here](https://github.com/danbooru/danbooru/wiki/Ubuntu-Installation-Help-Guide)
-for a guide on how set up Danbooru inside a virtual machine.
+for a guide on how set up Danbooru inside a virtual machine. Note that this
+is a deprecated method, and that Docker is the only supported way to run this software.
 
-For best performance, you will need at least 256MB of RAM for PostgreSQL and
-Rails. The memory requirement will grow as your database gets bigger.
+You can also follow the [INSTALL.debian](INSTALL.debian) script to install Danbooru.
+This script is written for Debian, but can be adapted for other
+distributions. Danbooru has been successfully installed on Debian, Ubuntu,
+Fedora, Arch, and OS X.
 
-In production, Danbooru uses PostgreSQL 10.18, but any release later than this
+In production, Danbooru uses PostgreSQL 14.1, but any release later than this
 should work.
 
-## Troubleshooting
-
-If your setup is not working, here are the steps I usually recommend to people:
+If your manual installation is not working, here are the steps we usually recommend:
 
 1) Test the database. Make sure you can connect to it using `psql`. Make
 sure the tables exist. If this fails, you need to work on correctly
