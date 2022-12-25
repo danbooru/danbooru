@@ -108,6 +108,8 @@ module Sources
         assert(Source::URL.page_url?("https://arca.live/b/arknights/66031722?p=1"))
         assert(Source::URL.profile_url?("https://arca.live/u/@Si리링"))
         assert(Source::URL.profile_url?("https://arca.live/u/@Nauju/45320365"))
+
+        assert_equal("윾파", Source::URL.parse("https://arca.live/u/@%EC%9C%BE%ED%8C%8C").username)
       end
     end
   end

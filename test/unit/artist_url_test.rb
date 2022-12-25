@@ -51,6 +51,11 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("https://artistname.example.com", url.url)
     end
 
+    should "decode encoded URLs" do
+      url = create(:artist_url, url: "https://arca.live/u/@%EC%9C%BE%ED%8C%8C")
+      assert_equal("https://arca.live/u/@윾파", url.url)
+    end
+
     should "normalize ArtStation urls" do
       url = create(:artist_url, url: "https://artstation.com/koyorin")
       assert_equal("https://www.artstation.com/koyorin", url.url)

@@ -42,6 +42,7 @@ module Danbooru
     def initialize(url)
       @original_url = url.to_s
       @url = Addressable::URI.heuristic_parse(original_url).display_uri
+      @url.path = Addressable::URI.unencode_component(@url.path, String, "/%")
       @url.path = nil if @url.path == "/"
 
       raise Error, "#{original_url} is not an http:// URL" if !@url.normalized_scheme.in?(["http", "https"])
