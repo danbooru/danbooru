@@ -277,29 +277,22 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "return posts for the fav:<name> metatag" do
       user1 = create(:user)
       user2 = create(:user)
-      user3 = create(:user, enable_private_favorites: true)
+
       post1 = as(user1) { create(:post, tag_string: "fav:true") }
       post2 = as(user2) { create(:post, tag_string: "fav:true") }
-      post3 = as(user3) { create(:post, tag_string: "fav:true") }
 
       assert_tag_match([post1], "fav:#{user1.name}")
       assert_tag_match([post2], "fav:#{user2.name}")
-      assert_tag_match([], "fav:#{user3.name}")
 
       assert_tag_match([], "fav:#{user1.name} fav:#{user2.name}")
       assert_tag_match([post1], "fav:#{user1.name} -fav:#{user2.name}")
-      assert_tag_match([post3], "-fav:#{user1.name} -fav:#{user2.name}")
+      assert_tag_match([], "-fav:#{user1.name} -fav:#{user2.name}")
 
       assert_tag_match([], "fav:dne")
 
-      assert_tag_match([post3, post2], "-fav:#{user1.name}")
-      assert_tag_match([post3], "-fav:#{user1.name} -fav:#{user2.name}")
-      assert_tag_match([post3, post2, post1], "-fav:dne")
-
-      as(user3) do
-        assert_tag_match([post3], "fav:#{user3.name}")
-        assert_tag_match([post2, post1], "-fav:#{user3.name}")
-      end
+      assert_tag_match([post2], "-fav:#{user1.name}")
+      assert_tag_match([], "-fav:#{user1.name} -fav:#{user2.name}")
+      assert_tag_match([post2, post1], "-fav:dne")
     end
 
     should "return posts for the ordfav:<name> metatag" do
@@ -333,8 +326,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the pool:<name> metatag" do
-      SqsService.any_instance.stubs(:send_message)
-
       pool1 = create(:pool, name: "test_a", category: "series")
       pool2 = create(:pool, name: "test_b", category: "collection")
       post1 = create(:post, tag_string: "pool:test_a")
@@ -424,7 +415,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       favgroup1 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post1.id])
       favgroup2 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post2.id])
-      favgroup3 = create(:private_favorite_group, post_ids: [post3.id])
+      favgroup3 = create(:favorite_group, post_ids: [post3.id])
 
       assert_tag_match([post1], "favgroup:#{favgroup1.id}")
       assert_tag_match([post2], "favgroup:#{favgroup2.name}")
@@ -459,11 +450,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post3 = create(:post)
 
       favgroup1 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post1.id, post2.id])
-      favgroup2 = create(:private_favorite_group, post_ids: [post2.id, post3.id])
+      favgroup2 = create(:favorite_group, post_ids: [post2.id, post3.id])
 
       assert_tag_match([post1, post2], "ordfavgroup:#{favgroup1.id}")
       assert_tag_match([post1, post2], "ordfavgroup:#{favgroup1.name}")
-      assert_tag_match([], "ordfavgroup:#{favgroup2.id}")
+      assert_tag_match([post2, post3], "ordfavgroup:#{favgroup2.id}")
       assert_tag_match([], "ordfavgroup:#{favgroup2.name}")
 
       as(favgroup2.creator) do
@@ -1150,33 +1141,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         @downvote = create(:post_vote, user: @user, score: -1)
       end
 
-      should "show public upvotes to all users" do
+      should "show upvotes to all users" do
         as(User.anonymous) do
-          assert_tag_match([@upvote.post], "upvote:#{@user.name}")
-          assert_tag_match([@downvote.post], "-upvote:#{@user.name}")
-        end
-      end
-
-      should "not show private upvotes to other users" do
-        @user.update!(enable_private_favorites: true)
-
-        as(User.anonymous) do
-          assert_tag_match([], "upvote:#{@user.name}")
-          assert_tag_match([@downvote.post, @upvote.post], "-upvote:#{@user.name}")
-        end
-      end
-
-      should "show private upvotes to admins" do
-        @user.update!(enable_private_favorites: true)
-
-        as(create(:admin_user)) do
-          assert_tag_match([@upvote.post], "upvote:#{@user.name}")
-          assert_tag_match([@downvote.post], "-upvote:#{@user.name}")
-        end
-      end
-
-      should "show private upvotes to the voter themselves" do
-        as(@user) do
           assert_tag_match([@upvote.post], "upvote:#{@user.name}")
           assert_tag_match([@downvote.post], "-upvote:#{@user.name}")
         end
@@ -1185,7 +1151,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for the downvote:<user> metatag" do
       setup do
-        @user = create(:user, enable_private_favorites: true)
+        @user = create(:user)
         @upvote = create(:post_vote, user: @user, score: 1)
         @downvote = create(:post_vote, user: @user, score: -1)
       end
@@ -1617,13 +1583,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         assert_fast_count(1, "-fav:#{fav.user.name}")
       end
 
-      should "return the correct favorite count for a fav:<name> search for a user with private favorites" do
-        fav = create(:private_favorite)
-
-        assert_fast_count(0, "fav:#{fav.user.name}")
-        assert_fast_count(0, "ordfav:#{fav.user.name}")
-      end
-
       should "return the correct favorite count for a fav:<name> search for a nonexistent user" do
         assert_fast_count(0, "fav:doesnotexist")
         assert_fast_count(0, "ordfav:doesnotexist")
@@ -1673,12 +1632,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for a user-dependent metatag" do
       should "cache the count separately for different users" do
-        @user = create(:user, enable_private_favorites: true)
+        @user = create(:user)
         @post = as(@user) { create(:post, tag_string: "fav:#{@user.name}") }
         @comment = create(:comment, post: @post, creator: @user, is_deleted: true)
-
-        assert_equal(1, PostQuery.new("fav:#{@user.name}", current_user: @user).fast_count)
-        assert_equal(0, PostQuery.new("fav:#{@user.name}").fast_count)
 
         assert_equal(1, PostQuery.new("commenter:#{@user.name}", current_user: @user).fast_count)
         assert_equal(0, PostQuery.new("commenter:#{@user.name}").fast_count)

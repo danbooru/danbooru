@@ -919,8 +919,8 @@ class Post < ApplicationRecord
         parent_changed: saved_change_to_parent_id?,
         source: source,
         source_changed: saved_change_to_source?,
-        version: calculate_version
-      ) && User.where(id: CurrentUser.id).update_all("post_update_count = post_update_count + 1")
+        version: calculate_version,
+      )
     end
 
     def revert_to(target)

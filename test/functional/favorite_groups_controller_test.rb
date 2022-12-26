@@ -10,7 +10,6 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         @mod_favgroup = create(:favorite_group, name: "Beautiful Smile", creator: build(:moderator_user, name: "fumimi"))
-        @private_favgroup = create(:private_favorite_group)
       end
 
       should "render" do
@@ -30,32 +29,12 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(creator_name: "fumimi").with { @mod_favgroup }
         should respond_to_search(creator: {level: User::Levels::MEMBER}).with { @favgroup }
       end
-
-      context "for private favorite groups as the creator" do
-        setup do
-          CurrentUser.user = @private_favgroup.creator
-        end
-
-        should respond_to_search(is_public: "false").with { @private_favgroup }
-      end
     end
 
     context "show action" do
-      should "show public favgroups to anonymous users" do
+      should "show favgroups to anonymous users" do
         get favorite_group_path(@favgroup)
         assert_response :success
-      end
-
-      should "show private favgroups to the creator" do
-        @favgroup.update_columns(is_public: false)
-        get_auth favorite_group_path(@favgroup), @user
-        assert_response :success
-      end
-
-      should "not show private favgroups to other users" do
-        @favgroup = create(:private_favorite_group)
-        get_auth favorite_group_path(@favgroup), create(:user)
-        assert_response 403
       end
     end
 
@@ -95,13 +74,6 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 403
         assert_not_equal("foo", @favgroup.reload.name)
-      end
-
-      should "not allow non-Gold users to enable private favgroups" do
-        put_auth favorite_group_path(@favgroup), @user, params: { favorite_group: { is_private: true } }
-
-        assert_response :success
-        assert_equal(false, @favgroup.is_private?)
       end
     end
 

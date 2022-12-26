@@ -247,8 +247,13 @@ class Pool < ApplicationRecord
     subject = versions.last
     prev = subject.previous
 
-    added_post_ids   = post_ids - prev.post_ids
-    removed_post_ids = prev.post_ids - post_ids
+    if prev
+      added_post_ids   = post_ids - prev.post_ids
+      removed_post_ids = prev.post_ids - post_ids
+    else
+      added_post_ids   = post_ids
+      removed_post_ids = []
+    end
 
     subject.update(
       post_ids: post_ids,

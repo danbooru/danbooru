@@ -15,9 +15,10 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that has multiple versions: " do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryBot.create(:post, :tag_string => "1")
+        travel(2.hours)
         @post.update(tag_string: "1 2")
+        travel(2.hours)
         @post.update(tag_string: "2 3")
       end
 
@@ -36,7 +37,7 @@ class PostVersionTest < ActiveSupport::TestCase
     context "that has been created" do
       setup do
         @parent = FactoryBot.create(:post)
-        @post = create(:post, tag_string: "aaa bbb ccc", rating: "e", parent: @parent, source: "http://xyz.com")
+        @post = create(:post, tag_string: "aaa bbb ccc", rating: "e", parent: @parent, source: "http://xyz.com", created_at: 2.hours.ago)
       end
 
       should "also create a version" do
@@ -80,9 +81,8 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that has been updated" do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
-        @post = create(:post, created_at: 1.minute.ago, tag_string: "aaa bbb ccc", rating: "q", source: "http://xyz.com")
-        @post.update(tag_string: "bbb ccc xxx", source: "")
+        @post = create(:post, tag_string: "aaa bbb ccc", rating: "q", source: "http://xyz.com")
+        as(create(:user)) { @post.update(tag_string: "bbb ccc xxx", source: "") }
       end
 
       should "also create a version" do
@@ -104,14 +104,14 @@ class PostVersionTest < ActiveSupport::TestCase
 
       should "should create a version if the rating changes" do
         assert_difference("@post.versions.size", 1) do
-          @post.update(rating: "s")
+          travel(2.hours) { @post.update(rating: "s") }
           assert_equal("s", @post.versions.max_by(&:id).rating)
         end
       end
 
       should "should create a version if the source changes" do
         assert_difference("@post.versions.size", 1) do
-          @post.update(source: "blah")
+          travel(2.hours) { @post.update(source: "blah") }
           assert_equal("blah", @post.versions.max_by(&:id).source)
         end
       end
@@ -119,14 +119,14 @@ class PostVersionTest < ActiveSupport::TestCase
       should "should create a version if the parent changes" do
         assert_difference("@post.versions.size", 1) do
           @parent = create(:post)
-          @post.update(parent_id: @parent.id)
+          travel(2.hours) { @post.update(parent_id: @parent.id) }
           assert_equal(@parent.id, @post.versions.max_by(&:id).parent_id)
         end
       end
 
       should "should create a version if the tags change" do
         assert_difference("@post.versions.size", 1) do
-          @post.update(tag_string: "blah")
+          travel(2.hours) { @post.update(tag_string: "blah") }
           assert_equal("blah", @post.versions.max_by(&:id).tags)
         end
       end
@@ -134,9 +134,10 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "#undo" do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = create(:post, tag_string: "1")
+        travel(2.hours)
         @post.update(tag_string: "1 2")
+        travel(2.hours)
         @post.update(tag_string: "2 3")
       end
 

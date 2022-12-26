@@ -37,7 +37,6 @@ class UserActionsControllerTest < ActionDispatch::IntegrationTest
           create(:user_event)
           create(:user_feedback)
           create(:user_name_change_request)
-          create(:user_upgrade)
           create(:wiki_page)
         end
       end
@@ -69,4 +68,3 @@ class UserActionsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 end
-

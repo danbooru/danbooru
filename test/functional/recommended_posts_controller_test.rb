@@ -32,12 +32,6 @@ class RecommendedPostsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select ".post-gallery #post_#{@post.id}"
       end
-
-      should "not show recommendations for users with private favorites to other users" do
-        @other_user = create(:user, enable_private_favorites: true)
-        get_auth recommended_posts_path(search: { user_id: @other_user.id }), @user
-        assert_response 403
-      end
     end
   end
 end

@@ -22,7 +22,7 @@ class ApproverPrunerTest < ActiveSupport::TestCase
     end
 
     should "not demote recently promoted approvers" do
-      as(create(:admin_user)) do
+      as(create(:owner_user)) do
         @user = create(:user)
         @user.promote_to!(User::Levels::APPROVER)
       end

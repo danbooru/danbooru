@@ -32,22 +32,26 @@ class UserTest < ActiveSupport::TestCase
         @owner = create(:owner_user)
       end
 
-      should "allow moderators to promote users up to builder level" do
+      should "allow moderators to promote users up to contributor level" do
         assert_promoted_to(User::Levels::GOLD, @user, @mod)
         assert_promoted_to(User::Levels::PLATINUM, @user, @mod)
         assert_promoted_to(User::Levels::BUILDER, @user, @mod)
+        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @mod)
 
+        assert_not_promoted_to(User::Levels::APPROVER, @user, @mod)
         assert_not_promoted_to(User::Levels::MODERATOR, @user, @mod)
         assert_not_promoted_to(User::Levels::ADMIN, @user, @mod)
         assert_not_promoted_to(User::Levels::OWNER, @user, @mod)
       end
 
-      should "allow admins to promote users up to moderator level" do
+      should "allow admins to promote users up to contributor level" do
         assert_promoted_to(User::Levels::GOLD, @user, @admin)
         assert_promoted_to(User::Levels::PLATINUM, @user, @admin)
         assert_promoted_to(User::Levels::BUILDER, @user, @admin)
-        assert_promoted_to(User::Levels::MODERATOR, @user, @admin)
+        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @admin)
 
+        assert_not_promoted_to(User::Levels::APPROVER, @user, @admin)
+        assert_not_promoted_to(User::Levels::MODERATOR, @user, @admin)
         assert_not_promoted_to(User::Levels::ADMIN, @user, @admin)
         assert_not_promoted_to(User::Levels::OWNER, @user, @admin)
       end
@@ -56,6 +60,8 @@ class UserTest < ActiveSupport::TestCase
         assert_promoted_to(User::Levels::GOLD, @user, @owner)
         assert_promoted_to(User::Levels::PLATINUM, @user, @owner)
         assert_promoted_to(User::Levels::BUILDER, @user, @owner)
+        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @owner)
+        assert_promoted_to(User::Levels::APPROVER, @user, @owner)
         assert_promoted_to(User::Levels::MODERATOR, @user, @owner)
         assert_promoted_to(User::Levels::ADMIN, @user, @owner)
 
@@ -79,6 +85,11 @@ class UserTest < ActiveSupport::TestCase
         assert_not_promoted_to(User::Levels::MODERATOR, create(:admin_user), @admin)
 
         assert_not_promoted_to(User::Levels::ADMIN, create(:owner_user), @owner)
+      end
+
+      should "not allow moderators to demote promote or demote approver or above" do
+        assert_not_promoted_to(User::Levels::BUILDER, create(:approver_user), @mod)
+        assert_not_promoted_to(User::Levels::APPROVER, create(:contributor_user), @mod)
       end
 
       should "not allow users to promote themselves" do
@@ -116,23 +127,23 @@ class UserTest < ActiveSupport::TestCase
     end
 
     should "normalize its level" do
-      user = FactoryBot.create(:user, :level => User::Levels::OWNER)
+      user = FactoryBot.create(:user, level: User::Levels::OWNER)
       assert(user.is_owner?)
       assert(user.is_admin?)
       assert(user.is_moderator?)
       assert(user.is_gold?)
 
-      user = FactoryBot.create(:user, :level => User::Levels::ADMIN)
+      user = FactoryBot.create(:user, level: User::Levels::ADMIN)
       assert(!user.is_owner?)
       assert(user.is_moderator?)
       assert(user.is_gold?)
 
-      user = FactoryBot.create(:user, :level => User::Levels::MODERATOR)
+      user = FactoryBot.create(:user, level: User::Levels::MODERATOR)
       assert(!user.is_admin?)
       assert(user.is_moderator?)
       assert(user.is_gold?)
 
-      user = FactoryBot.create(:user, :level => User::Levels::GOLD)
+      user = FactoryBot.create(:user, level: User::Levels::GOLD)
       assert(!user.is_admin?)
       assert(!user.is_moderator?)
       assert(user.is_gold?)

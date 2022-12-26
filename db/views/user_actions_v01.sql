@@ -92,12 +92,7 @@ UNION ALL
 UNION ALL
   SELECT 'UserFeedback', id, user_id, 'subject', created_at
   FROM user_feedback
-UNION ALL (
-  SELECT 'UserUpgrade', id, purchaser_id, 'create', created_at
-  FROM user_upgrades
-  WHERE status IN (20, 30)
-  ORDER BY created_at DESC
-) UNION ALL
+UNION ALL
   SELECT 'UserNameChangeRequest', id, user_id, 'create', created_at
   FROM user_name_change_requests
 UNION ALL

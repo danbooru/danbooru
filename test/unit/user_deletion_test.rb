@@ -50,8 +50,7 @@ class UserDeletionTest < ActiveSupport::TestCase
       @favorite = create(:favorite, user: @user)
       @forum_topic_visit = as(@user) { create(:forum_topic_visit, user: @user) }
       @saved_search = create(:saved_search, user: @user)
-      @public_favgroup = create(:favorite_group, creator: @user, is_public: true)
-      @private_favgroup = create(:favorite_group, creator: @user, is_public: false)
+      @favgroup = create(:favorite_group, creator: @user)
       @post_downvote = create(:post_vote, score: -1)
       @post_upvote = create(:post_vote, score: 1)
       @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
@@ -90,15 +89,7 @@ class UserDeletionTest < ActiveSupport::TestCase
       assert_equal(0, ModAction.user_delete.count)
     end
 
-    should "remove the user's favorites if they have private favorites" do
-      @user.update!(enable_private_favorites: true)
-      perform_enqueued_jobs { @deletion.delete! }
-
-      assert_equal(0, @user.favorites.count)
-      assert_equal(0, @user.reload.favorite_count)
-    end
-
-    should "not remove the user's favorites if they have public favorites" do
+    should "not remove the user's favorites" do
       perform_enqueued_jobs { @deletion.delete! }
 
       assert_equal(1, @user.favorites.count)
@@ -123,27 +114,18 @@ class UserDeletionTest < ActiveSupport::TestCase
       assert_equal(0, @user.saved_searches.count)
     end
 
-    should "remove the user's private favgroups but not their public favgroups" do
+    should "not remove the user's favgroups" do
       perform_enqueued_jobs { @deletion.delete! }
 
-      assert_equal(0, @user.favorite_groups.is_private.count)
-      assert_equal(1, @user.favorite_groups.is_public.count)
-      assert_not_nil(@public_favgroup.reload)
+      assert_equal(1, @user.favorite_groups.count)
+      assert_not_nil(@favgroup.reload)
     end
 
-    should "only remove the user's downvotes if the don't have private votes enabled" do
+    should "only remove the user's downvotes" do
       perform_enqueued_jobs { @deletion.delete! }
 
       assert_equal(0, @user.post_votes.active.negative.count)
       assert_equal(1, @user.post_votes.active.positive.count)
-    end
-
-    should "remove both the user's upvotes and downvotes if they have private votes enabled" do
-      @user.update!(enable_private_favorites: true)
-      perform_enqueued_jobs { @deletion.delete! }
-
-      assert_equal(0, @user.post_votes.active.negative.count)
-      assert_equal(0, @user.post_votes.active.positive.count)
     end
   end
 

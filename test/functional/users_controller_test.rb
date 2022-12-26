@@ -417,7 +417,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "mark users signing up from proxies as restricted" do
-          skip unless IpLookup.enabled?
+          skip "IP Registry credentials not configured" unless IpLookup.enabled?
           self.remote_addr = @proxy_ip
 
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
@@ -445,7 +445,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not mark users signing up from non-proxies as restricted" do
-          skip unless IpLookup.enabled?
+          skip "IP Registry credentials not configured" unless IpLookup.enabled?
           self.remote_addr = @valid_ip
 
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
@@ -510,34 +510,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         put_auth user_path(@user), @user, params: {:user => {:favorite_tags => "xyz"}}
         @user.reload
         assert_equal("xyz", @user.favorite_tags)
-      end
-
-      context "for a Member-level user" do
-        should "allow disabling the private favorites option" do
-          @user = create(:user, enable_private_favorites: true)
-          put_auth user_path(@user), @user, params: { user: { enable_private_favorites: false }}
-
-          assert_redirected_to edit_user_path(@user)
-          assert_equal(false, @user.reload.enable_private_favorites)
-        end
-
-        should "not allow enabling the private favorites option" do
-          @user = create(:user, enable_private_favorites: false)
-          put_auth user_path(@user), @user, params: { user: { enable_private_favorites: true }}
-
-          assert_redirected_to edit_user_path(@user)
-          assert_equal(false, @user.reload.enable_private_favorites)
-        end
-      end
-
-      context "for a Gold-level user" do
-        should "allow enabling the private favorites option" do
-          @user = create(:gold_user, enable_private_favorites: false)
-          put_auth user_path(@user), @user, params: { user: { enable_private_favorites: true }}
-
-          assert_redirected_to edit_user_path(@user)
-          assert_equal(true, @user.reload.enable_private_favorites)
-        end
       end
 
       context "changing the level" do

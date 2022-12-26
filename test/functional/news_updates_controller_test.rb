@@ -48,9 +48,22 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
 
     context "destroy action" do
       should "work" do
-        assert_difference("NewsUpdate.count", -1) do
+        assert_difference("NewsUpdate.active.count", -1) do
           delete_auth news_update_path(@news_update), @admin
         end
+        assert(@news_update.reload.is_deleted)
+        assert_redirected_to(news_updates_path)
+      end
+    end
+
+    context "undelete action" do
+      should "work" do
+        @news_update.update_column(:is_deleted, true)
+
+        assert_difference("NewsUpdate.active.count", 1) do
+          post_auth undelete_news_update_path(@news_update), @admin
+        end
+        refute(@news_update.reload.is_deleted)
         assert_redirected_to(news_updates_path)
       end
     end

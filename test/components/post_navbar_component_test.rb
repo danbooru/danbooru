@@ -62,7 +62,7 @@ class PostNavbarComponentTest < ViewComponent::TestCase
       setup do
         as(@user) do
           @favgroup1 = create(:favorite_group, creator: @user, post_ids: [@post.id])
-          @favgroup2 = create(:private_favorite_group, creator: @user, post_ids: [@post.id])
+          @favgroup2 = create(:favorite_group, creator: @user, post_ids: [@post.id])
         end
       end
 
@@ -87,16 +87,10 @@ class PostNavbarComponentTest < ViewComponent::TestCase
         assert_css(".favgroup-navbar[data-selected=false] .favgroup-name", text: "Favgroup: #{@favgroup2.pretty_name}")
       end
 
-      should "show public favgroups that belong to another user when doing a favgroup:<id> search" do
+      should "show favgroups that belong to another user when doing a favgroup:<id> search" do
         render_post_navbar(@post, current_user: create(:user), search: "favgroup:#{@favgroup1.id}")
 
         assert_css(".favgroup-navbar[data-selected=true] .favgroup-name", text: "Favgroup: #{@favgroup1.pretty_name}")
-      end
-
-      should "not show private favgroups that belong to another user when doing a favgroup:<id> search" do
-        render_post_navbar(@post, current_user: create(:user), search: "favgroup:#{@favgroup2.id}")
-
-        assert_css(".favgroup-navbar .favgroup-name", count: 0)
       end
 
       should "show the search navbar when doing a 'favgroup:<id> + tag' search" do

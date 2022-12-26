@@ -31,7 +31,6 @@ class ActiveSupport::TestCase
   include IqdbTestHelper
   include UploadTestHelper
   extend SourceTestHelper
-  extend StripeTestHelper
   extend NormalizeAttributeHelper
 
   unless Danbooru.config.debug_mode

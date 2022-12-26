@@ -228,7 +228,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "render an error when searching for too many tags" do
-          get posts_path, params: { tags: "1 2 3" }
+          get posts_path, params: { tags: "1 2 3 4 5" }
 
           assert_response 422
           assert_select "h1", "Search Error"
@@ -644,7 +644,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       context "with a non-web source" do
         should "render" do
-          @post.update!(source: "Blog.")
+          as(@user) { @post.update!(source: "Blog.") }
           get post_path(@post)
 
           assert_response :success
@@ -924,8 +924,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "revert action" do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
-        as(@user) { @post.update(tag_string: "zzz") }
+        as(create(:user)) { @post.update(tag_string: "zzz") }
       end
 
       should "work" do

@@ -123,7 +123,6 @@ class PostTest < ActiveSupport::TestCase
           # must be a builder to update deleted pools. must be >1 week old to remove posts from pools.
           CurrentUser.user = FactoryBot.create(:builder_user, created_at: 1.month.ago)
 
-          SqsService.any_instance.stubs(:send_message)
           @pool = FactoryBot.create(:pool)
           @pool.add!(@post)
 
@@ -1538,15 +1537,10 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "increment the updater's post_update_count" do
-          PostVersion.sqs_service.stubs(:merge?).returns(false)
           post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
 
-          # XXX in the test environment the update count gets bumped twice: and
-          # once by Post#post_update_count, and once by the counter cache. in
-          # production the counter cache doesn't bump the count, because
-          # versions are created on a separate server.
-          assert_difference("CurrentUser.user.reload.post_update_count", 2) do
-            post.update(tag_string: "zzz")
+          assert_difference("CurrentUser.user.reload.post_update_count", 1) do
+            travel(2.hours) { post.update(tag_string: "zzz") }
           end
         end
 
@@ -1868,7 +1862,7 @@ class PostTest < ActiveSupport::TestCase
         @parent = FactoryBot.create(:post)
         @child = FactoryBot.create(:post, parent: @parent)
 
-        @user1 = FactoryBot.create(:user, enable_private_favorites: true)
+        @user1 = FactoryBot.create(:user)
         @gold1 = FactoryBot.create(:gold_user)
 
         create(:favorite, post: @child, user: @user1)
@@ -1894,12 +1888,6 @@ class PostTest < ActiveSupport::TestCase
         assert(@parent.votes.where(user: @user1).exists?)
         assert_equal(2, @parent.score)
       end
-    end
-  end
-
-  context "Pools:" do
-    setup do
-      SqsService.any_instance.stubs(:send_message)
     end
   end
 
@@ -2005,15 +1993,18 @@ class PostTest < ActiveSupport::TestCase
   context "Reverting: " do
     context "a post that has been updated" do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = create(:post, rating: "q", tag_string: "aaa", source: "")
         @post.reload
+        travel(2.hours)
         @post.update(tag_string: "aaa bbb ccc ddd")
         @post.reload
+        travel(2.hours)
         @post.update(tag_string: "bbb xxx yyy", source: "http://xyz.com")
         @post.reload
+        travel(2.hours)
         @post.update(tag_string: "bbb mmm yyy", source: "http://abc.com")
         @post.reload
+        travel(2.hours)
       end
 
       context "and then reverted to an early version" do

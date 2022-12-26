@@ -36,6 +36,10 @@ class NewsUpdatesController < ApplicationController
     @news_update.soft_delete!
     respond_with(@news_update) do |format|
       format.js { flash[:notice] = "Deleted" }
+      format.html do
+        flash[:notice] = "Deleted"
+        redirect_to news_updates_path
+      end
     end
   end
 
@@ -44,6 +48,10 @@ class NewsUpdatesController < ApplicationController
     @news_update.undelete
     respond_with(@news_update) do |format|
       format.js { flash[:notice] = "Undeleted" }
+      format.html do
+        flash[:notice] = "Undeleted"
+        redirect_to news_updates_path
+      end
     end
   end
 end
