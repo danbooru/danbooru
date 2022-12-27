@@ -18,39 +18,16 @@ wget https://raw.githubusercontent.com/danbooru/danbooru/master/docker-compose.y
 docker-compose up
 ```
 
-If you get an error such as `'name' does not match any of the regexes: '^x-'` make sure 
+If you get an error such as `'name' does not match any of the regexes: '^x-'` make sure
 that you're running an updated version of Docker Compose.
 
-## Manual Installation
+## Installation
 
-See [here](https://github.com/danbooru/danbooru/wiki/Ubuntu-Installation-Help-Guide)
-for a guide on how set up Danbooru inside a virtual machine. Note that this
-is a deprecated method, and that Docker is the only supported way to run this software.
+See the [Docker Guide](https://github.com/danbooru/danbooru/wiki/Docker-Guide) for more information on running Danbooru using Docker. This is the recommended way to run Danbooru.
 
-You can also follow the [INSTALL.debian](INSTALL.debian) script to install Danbooru.
-This script is written for Debian, but can be adapted for other
-distributions. Danbooru has been successfully installed on Debian, Ubuntu,
-Fedora, Arch, and OS X.
+Alternatively, you may use the [Manual Installation Guide](https://github.com/danbooru/danbooru/wiki/Manual-Installation-Guide) to install Danbooru without Docker. Manual installation is much more difficult than using Docker, and therefore is not recommended or officially supported.
 
-In production, Danbooru uses PostgreSQL 14.1, but any release later than this
-should work.
-
-If your manual installation is not working, here are the steps we usually recommend:
-
-1) Test the database. Make sure you can connect to it using `psql`. Make
-sure the tables exist. If this fails, you need to work on correctly
-installing PostgreSQL, importing the initial schema, and running the
-migrations.
-
-2) Test the Rails database connection by using `bin/rails console`. Run
-`Post.count` to make sure Rails can connect to the database. If this
-fails, you need to make sure your Danbooru configuration files are
-correct.
-
-3) Test Nginx to make sure it's working correctly.  You may need to
-debug your Nginx configuration file.
-
-4) Check all log files.
+For help, ask in the [#technical](https://discord.com/channels/310432830138089472/310846683376517121) channel on the [Danbooru Discord](https://discord.gg/danbooru), or in the [discussions area](https://github.com/danbooru/danbooru/discussions) on Github.
 
 ## Services
 
