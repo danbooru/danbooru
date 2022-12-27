@@ -608,6 +608,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://enty.jp/posts/141598")
 
         should_upload_successfully("https://arca.live/b/arknights/66031722")
+
+        should_upload_successfully("https://imgur.com/AOeREEF")
       end
     end
   end

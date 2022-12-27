@@ -62,6 +62,7 @@ module Source
       Source::Extractor::Picdig,
       Source::Extractor::Enty,
       Source::Extractor::ArcaLive,
+      Source::Extractor::Imgur,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
