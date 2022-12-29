@@ -115,7 +115,7 @@
                     <%= link_to "?", wiki_page_path(ai_tag.name) %>
                   <% end %>
 
-                  <%= link_to ai_tag.pretty_name, media_assets_path(search: { ai_tags_match: ai_tag.name }), class: "break-word" %>
+                  <%= link_to ai_tag.pretty_name, media_assets_path(search: { ai_tags_match: ai_tag.name }), class: "break-word", rel: "nofollow" %>
                   <%= tag.span "#{ai_tag.score}%", class: ["text-muted text-xs"] %>
                 <% end %>
               <% end %>
@@ -182,7 +182,7 @@
               <% pairs.sort.each do |key, value| %>
                 <tr>
                   <th class="text-left w-1/4"><%= key.split(":").second.scan(/(?:[A-Z][a-z]+|[A-Z]+(?![a-z]))/).join(" ") %></th>
-                  <td class="break-words"><%= link_to value, media_assets_path(search: { metadata: { key => value }}) %></td>
+                  <td class="break-words"><%= link_to value, media_assets_path(search: { metadata: { key => value }}), rel: "nofollow" %></td>
                 </tr>
               <% end %>
             <% end %>

@@ -22,7 +22,7 @@
   <% if artist.other_names.present? %>
     <div>
       <% artist.other_names.map do |other_name| %>
-        <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name" %>
+        <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name", rel: "nofollow"%>
       <% end %>
     </div>
   <% end %>
