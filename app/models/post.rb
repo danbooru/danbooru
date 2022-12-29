@@ -1284,7 +1284,7 @@ class Post < ApplicationRecord
       end
 
       def exif_matches(string)
-        where(md5: MediaAsset.exif_matches(string).select(:md5))
+        joins(:media_asset).merge(MediaAsset.exif_matches(string))
       end
 
       def ai_tags_include(value, default_confidence: ">=50")
