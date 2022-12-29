@@ -230,16 +230,18 @@ class Artist < ApplicationRecord
     end
 
     def any_other_name_like(name)
-      where(id: Artist.from("unnest(other_names) AS other_name").where_like("other_name", name))
+      where(id: Artist.from("unnest(other_names) AS other_name").where_ilike("other_name", name))
     end
 
     def any_name_matches(query)
       if query =~ %r{\A/(.*)/\z}
         where_regex(:name, $1).or(any_other_name_matches($1)).or(where_regex(:group_name, $1))
+      elsif query.include?("*")
+        normalized_name = normalize_name(query)
+        where_ilike(:name, normalized_name).or(any_other_name_like(normalized_name)).or(where_ilike(:group_name, normalized_name))
       else
         normalized_name = normalize_name(query)
-        normalized_name = "*#{normalized_name}*" unless normalized_name.include?("*")
-        where_like(:name, normalized_name).or(any_other_name_like(normalized_name)).or(where_like(:group_name, normalized_name))
+        where_array_includes_any("lower(ARRAY[name, group_name]::text[] || other_names)", [normalized_name])
       end
     end
 

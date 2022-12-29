@@ -496,6 +496,13 @@ class ArtistTest < ActiveSupport::TestCase
       assert_search_equals([yuu, cat_or_fish], any_name_matches: "/cat/")
     end
 
+    should "search case-insensitively on any_name_matches" do
+      artist = create(:artist, name: "foo", other_names: ["BAR"])
+
+      assert_search_equals(artist, any_name_matches: "FOO")
+      assert_search_equals(artist, any_name_matches: "bar")
+    end
+
     should "search on url and return matches" do
       bkub = create(:artist, name: "bkub", url_string: "http://bkub.com")
 
