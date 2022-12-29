@@ -66,6 +66,17 @@ COMMENT ON EXTENSION pgstattuple IS 'show tuple-level statistics';
 
 
 --
+-- Name: lower(text[]); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.lower(text[]) RETURNS text[]
+    LANGUAGE sql IMMUTABLE PARALLEL SAFE
+    AS $_$
+  SELECT array_agg(lower(value)) FROM unnest($1) value;
+$_$;
+
+
+--
 -- Name: reverse_textregexeq(text, text); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -801,7 +812,7 @@ ALTER SEQUENCE public.forum_topics_id_seq OWNED BY public.forum_topics.id;
 --
 
 CREATE TABLE public.good_job_processes (
-    id uuid DEFAULT public.gen_random_uuid() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     state jsonb
@@ -826,7 +837,7 @@ CREATE TABLE public.good_job_settings (
 --
 
 CREATE TABLE public.good_jobs (
-    id uuid DEFAULT public.gen_random_uuid() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     queue_name text,
     priority integer,
     serialized_params jsonb,
@@ -3666,6 +3677,13 @@ CREATE INDEX index_artists_on_is_banned ON public.artists USING btree (is_banned
 --
 
 CREATE INDEX index_artists_on_is_deleted ON public.artists USING btree (is_deleted);
+
+
+--
+-- Name: index_artists_on_lower_names; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artists_on_lower_names ON public.artists USING gin (public.lower((ARRAY[(name)::text, (group_name)::text] || other_names)));
 
 
 --
@@ -6957,6 +6975,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221026084656'),
 ('20221027000931'),
 ('20221106062419'),
-('20221109052923');
+('20221109052923'),
+('20221228232240');
 
 
