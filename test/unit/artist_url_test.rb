@@ -56,6 +56,11 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("https://arca.live/u/@윾파", url.url)
     end
 
+    should "not fail when decoding percent-encoded Shift JIS URLs" do
+      url = create(:artist_url, url: "https://www.digiket.com/abooks/result/_data/staff=%8F%BC%94C%92m%8A%EE")
+      assert_equal("https://www.digiket.com/abooks/result/_data/staff=%8F%BC%94C%92m%8A%EE", url.url)
+    end
+
     should "not apply NFKC normalization to URLs" do
       url = create(:artist_url, url: "https://arca.live/u/@ㅇㅇ/43979125")
       assert_equal("https://arca.live/u/@ㅇㅇ/43979125", url.url)

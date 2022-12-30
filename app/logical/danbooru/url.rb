@@ -46,6 +46,7 @@ module Danbooru
       @url.path = Addressable::URI.unencode_component(@url.path, String, "/%")
       @url.path = nil if @url.path == "/"
 
+      raise Error, "invalid byte sequence in UTF-8" if !@url.path.valid_encoding?
       raise Error, "#{original_url} is not an http:// URL" if !@url.normalized_scheme.in?(["http", "https"])
       raise Error, "#{original_url} is not a valid hostname" if parsed_domain.nil?
     rescue Addressable::URI::InvalidURIError => e
