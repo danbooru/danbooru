@@ -194,6 +194,13 @@ module Sources
         )
       end
 
+      context "A work requested via Pixiv Requests" do
+        strategy_should_work(
+          "https://www.pixiv.net/en/artworks/91322075",
+          tags: %w[アイドルマスターシンデレラガールズ 大槻唯 濡れ透け パンツ 透けブラ 裾結び プール掃除 おへそ びしょ濡れ ぱんつ pixiv_commission]
+        )
+      end
+
       context "fetching the commentary" do
         should "work when the description is blank" do
           get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981746")

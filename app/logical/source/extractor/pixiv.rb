@@ -113,6 +113,11 @@ module Source
           tags += [["AI", "https://www.pixiv.net/tags/AI/artworks"]]
         end
 
+        if api_illust["request"].present?
+          # XXX There's no way to search for posts commissioned via Pixiv Requests on Pixiv. The "依頼絵" ("commission") tag is the closest equivalent.
+          tags += [["pixiv_commission", "https://www.pixiv.net/tags/依頼絵/artworks"]]
+        end
+
         tags
       end
 
