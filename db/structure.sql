@@ -72,7 +72,7 @@ COMMENT ON EXTENSION pgstattuple IS 'show tuple-level statistics';
 CREATE FUNCTION public.array_initials(text[]) RETURNS text
     LANGUAGE sql IMMUTABLE PARALLEL SAFE
     AS $_$
-  SELECT string_agg(left(string, 1), '') FROM unnest($1) string;
+  SELECT string_agg(left(string, 1), '' ORDER BY ordinality) FROM unnest($1) WITH ORDINALITY AS string;
 $_$;
 
 

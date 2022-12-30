@@ -4,7 +4,7 @@ class AddWordInitialsIndexOnTags < ActiveRecord::Migration[7.0]
   def up
     execute <<~EOS
       CREATE OR REPLACE FUNCTION array_initials(text[]) RETURNS text LANGUAGE SQL IMMUTABLE PARALLEL SAFE AS $$
-        SELECT string_agg(left(string, 1), '') FROM unnest($1) string;
+        SELECT string_agg(left(string, 1), '' ORDER BY ordinality) FROM unnest($1) WITH ORDINALITY AS string;
       $$;
     EOS
 
