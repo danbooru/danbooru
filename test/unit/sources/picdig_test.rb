@@ -13,6 +13,7 @@ module Sources
           ],
           profile_url: "https://picdig.net/ema/portfolio",
           profile_urls: %w[
+            https://picdig.net/ema/portfolio
             https://twitter.com/Ema_azure
             https://www.pixiv.net/users/41875383
           ],
@@ -42,6 +43,7 @@ module Sources
           ],
           profile_url: "https://picdig.net/ema/portfolio",
           profile_urls: %w[
+            https://picdig.net/ema/portfolio
             https://twitter.com/Ema_azure
             https://www.pixiv.net/users/41875383
           ],

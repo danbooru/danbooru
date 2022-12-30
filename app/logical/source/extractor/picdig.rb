@@ -32,6 +32,7 @@ module Source
 
       def profile_urls
         [
+          profile_url,
           api_response.dig(:user, :homepage_url),
           api_response.dig(:user, :twitter_url),
           api_response.dig(:user, :instagram_url),
