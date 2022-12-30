@@ -50,9 +50,14 @@ class Source::URL::Tumblr < Source::URL
 
     # https://tumblr.com/munespice/683613396085719040 # new dashboard links
     # https://www.tumblr.com/yamujiburo/682910938493599744/will-tumblr-let-me-keep-this-up
-    in ("tumblr.com" | "www.tumblr.com"), blog_name, /^\d+$/ => work_id, *rest
+    # https://at.tumblr.com/pizza-and-ramen/118684413624/uqndb20nkyob
+    in ("tumblr.com" | "www.tumblr.com" | "at.tumblr.com"), blog_name, /^\d+$/ => work_id, *rest
       @blog_name = blog_name
       @work_id = work_id
+
+    # https://at.tumblr.com/everythingfox/everythingfox-so-sleepy/d842mqsx8lwd
+    in "at.tumblr.com", blog_name, title, _
+      @blog_name = blog_name
 
     # https://www.tumblr.com/blog/view/artofelaineho/187614935612  # old dashboard links
     in ("www.tumblr.com" | "tumblr.com"), "blog", "view", blog_name, /^\d+$/ => work_id
@@ -77,6 +82,10 @@ class Source::URL::Tumblr < Source::URL
     # https://www.tumblr.com/tawni-tailwind
     # https://tumblr.com/tawni-tailwind
     in ("www.tumblr.com" | "tumblr.com"), blog_name unless blog_name.in?(RESERVED_NAMES)
+      @blog_name = blog_name
+
+    # https://at.tumblr.com/cyanideqpoison/u2czj612ttzq
+    in "at.tumblr.com", blog_name, _
       @blog_name = blog_name
 
     # https://rosarrie.tumblr.com/archive

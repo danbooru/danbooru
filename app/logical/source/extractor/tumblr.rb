@@ -100,13 +100,19 @@ class Source::Extractor
       end
     end
 
-    def post_url_from_image_html
-      return nil unless parsed_url.image_url? && parsed_url.file_ext&.in?(%w[jpg png pnj gif])
+    memoize def post_url_from_image_html
+      # https://at.tumblr.com/everythingfox/everythingfox-so-sleepy/d842mqsx8lwd
+      if parsed_url.subdomain == "at"
+        response = http.get(parsed_url)
+        return nil if response.status != 200
 
-      extracted = image_url_html(parsed_url)&.at("[href*='/post/']")&.[](:href)
-      Source::URL.parse(extracted)
+        url = Source::URL.parse(response.request.uri)
+        url if url.page_url?
+      elsif parsed_url.image_url? && parsed_url.file_ext&.in?(%w[jpg png pnj gif])
+        extracted = image_url_html(parsed_url)&.at("[href*='/post/']")&.[](:href)
+        Source::URL.parse(extracted)
+      end
     end
-    memoize :post_url_from_image_html
 
     def image_url_html(image_url)
       resp = http.cache(1.minute).headers(accept: "text/html").get(image_url)

@@ -204,6 +204,25 @@ module Sources
       )
     end
 
+    context "A at.tumblr.com/$blog_name/$work_id/$tracker_id URL" do
+      strategy_should_work(
+        "https://at.tumblr.com/munespice/683613396085719040/vzs8ma5elvnc",
+        image_urls: ["https://64.media.tumblr.com/fd6b4692f6e902af861fbc242736ae61/010fd31ffbc70e84-a8/s21000x21000/e0587516e05bae4cec244921f220b45bed08335c.jpg"],
+        artist_name: "munespice",
+        page_url: "https://munespice.tumblr.com/post/683613396085719040",
+        profile_url: "https://munespice.tumblr.com"
+      )
+    end
+    context "A at.tumblr.com/$blog_name/$slug/$tracker_id URL" do
+      strategy_should_work(
+        "https://at.tumblr.com/everythingfox/everythingfox-so-sleepy/d842mqsx8lwd",
+        image_urls: ["https://va.media.tumblr.com/tumblr_q1a6suYYEX1vmobp0.mp4"],
+        artist_name: "everythingfox",
+        page_url: "https://everythingfox.tumblr.com/post/701872943963226112",
+        profile_url: "https://everythingfox.tumblr.com"
+      )
+    end
+
     context "A tumblr image url for which the extractable post url is a custom domain" do
       strategy_should_work(
         "https://64.media.tumblr.com/591b370b9deb7c6ef33d8c18dc2c8db5/tumblr_ph5huubDdz1w0f6yio1_1280.jpg",
@@ -269,6 +288,9 @@ module Sources
       assert(Source::URL.profile_url?("https://rosarrie.tumblr.com/archive"))
       assert(Source::URL.profile_url?("https://solisnotte.tumblr.com/about"))
       assert(Source::URL.profile_url?("https://whereisnovember.tumblr.com/tagged/art"))
+
+      assert_equal("https://pizza-and-ramen.tumblr.com/post/118684413624", Source::URL.page_url("https://at.tumblr.com/pizza-and-ramen/118684413624/uqndb20nkyob"))
+      assert_equal("https://cyanideqpoison.tumblr.com", Source::URL.profile_url("https://at.tumblr.com/cyanideqpoison/u2czj612ttzq"))
     end
   end
 end
