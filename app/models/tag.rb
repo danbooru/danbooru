@@ -3,8 +3,6 @@
 class Tag < ApplicationRecord
   include Versionable
 
-  ABBREVIATION_REGEXP = /([a-z0-9])[a-z0-9']*($|[^a-z0-9']+)/
-
   # Tags that are permitted to have unbalanced parentheses, as a special exception to the normal rule that parentheses in tags must balanced.
   PERMITTED_UNBALANCED_TAGS = %w[:) :( ;) ;( >:) >:(]
 
@@ -325,7 +323,7 @@ class Tag < ApplicationRecord
       abbrev = abbrev.downcase.delete_prefix("/")
       return none if abbrev !~ /\A[a-z0-9*]*\z/
 
-      where("regexp_replace(tags.name, ?, '\\1', 'g') LIKE ?", ABBREVIATION_REGEXP.source, abbrev.to_escaped_for_sql_like)
+      where_like("array_initials(words)", abbrev)
     end
 
     def find_by_name_or_alias(name)
@@ -415,7 +413,7 @@ class Tag < ApplicationRecord
   end
 
   def abbreviation
-    name.gsub(ABBREVIATION_REGEXP, "\\1")
+    words.map(&:first).join
   end
 
   def tag_alias_for_pattern(pattern)

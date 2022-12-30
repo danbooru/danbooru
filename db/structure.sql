@@ -66,6 +66,17 @@ COMMENT ON EXTENSION pgstattuple IS 'show tuple-level statistics';
 
 
 --
+-- Name: array_initials(text[]); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.array_initials(text[]) RETURNS text
+    LANGUAGE sql IMMUTABLE PARALLEL SAFE
+    AS $_$
+  SELECT string_agg(left(string, 1), '') FROM unnest($1) string;
+$_$;
+
+
+--
 -- Name: lower(text[]); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -4317,6 +4328,13 @@ CREATE INDEX index_good_jobs_on_scheduled_at ON public.good_jobs USING btree (sc
 
 
 --
+-- Name: index_good_jobs_on_scheduled_at_priority_created_at_when_unfini; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_scheduled_at_priority_created_at_when_unfini ON public.good_jobs USING btree (scheduled_at DESC NULLS LAST, priority DESC NULLS LAST, created_at) WHERE (finished_at IS NULL);
+
+
+--
 -- Name: index_ip_bans_on_category; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5512,6 +5530,13 @@ CREATE INDEX index_tags_on_name_trgm ON public.tags USING gin (name public.gin_t
 --
 
 CREATE INDEX index_tags_on_post_count ON public.tags USING btree (post_count);
+
+
+--
+-- Name: index_tags_on_word_initials; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tags_on_word_initials ON public.tags USING gin (public.array_initials((words)::text[]) public.gin_trgm_ops);
 
 
 --
@@ -6976,6 +7001,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221027000931'),
 ('20221106062419'),
 ('20221109052923'),
-('20221228232240');
+('20221228232240'),
+('20221230011825');
 
 
