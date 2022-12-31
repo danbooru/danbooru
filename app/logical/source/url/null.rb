@@ -410,18 +410,6 @@ class Source::URL::Null < Source::URL
       @work_id = work_id
       @page_url = "http://p.twipple.jp/#{work_id}"
 
-    # https://static.zerochan.net/Fullmetal.Alchemist.full.2831797.png
-    # https://s1.zerochan.net/Cocoa.Cookie.600.2957938.jpg
-    # http://static.zerochan.net/full/24/13/90674.jpg
-    in _, "zerochan.net", *subdirs, /(\d+)\.(jpg|png|gif)$/
-      @work_id = $1
-      @page_url = "https://www.zerochan.net/#{@work_id}#full"
-
-    # http://www.zerochan.net/full/1567893
-    in _, "zerochan.net", "full", /^\d+$/ => work_id
-      @work_id = work_id
-      @page_url = "https://www.zerochan.net/#{@work_id}#full"
-
     else
       @recognized = false
 

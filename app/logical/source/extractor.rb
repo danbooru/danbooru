@@ -63,6 +63,7 @@ module Source
       Source::Extractor::Enty,
       Source::Extractor::ArcaLive,
       Source::Extractor::Imgur,
+      Source::Extractor::Zerochan,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
