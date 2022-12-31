@@ -381,11 +381,11 @@ module IconHelper
   end
 
   def caret_down_icon(**options)
-    svg_icon_tag("caret-down", viewBox: "0 0 448 512", **options)
+    svg_icon_tag("caret-down", viewBox: "0 0 320 512", **options)
   end
 
   def sound_icon(**options)
-    svg_icon_tag("sound", "volume-high", viewBox: "0 0 320 512", **options)
+    svg_icon_tag("sound", "volume-high", viewBox: "0 0 640 512", **options)
   end
 
   def hashtag_icon(**options)
