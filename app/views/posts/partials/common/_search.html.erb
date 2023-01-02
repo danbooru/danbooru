@@ -12,7 +12,7 @@
     <% if params[:size] %>
       <%= hidden_field_tag :size, params[:size] %>
     <% end %>
-    <%= text_field_tag("tags", tags, :id => tags_dom_id, :class => "flex-auto", :"data-shortcut" => "q", :"data-autocomplete" => "tag-query") %>
+    <%= text_field_tag("tags", tags, id: tags_dom_id, class: "flex-auto", "data-shortcut": "q", "data-autocomplete": "tag-query", "autocapitalize": "none") %>
     <%= hidden_field_tag :z, 5 %>
     <button id="search-box-submit" type="submit"><%= search_icon %></button>
   <% end %>
