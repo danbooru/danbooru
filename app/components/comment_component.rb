@@ -49,4 +49,8 @@ class CommentComponent < ApplicationComponent
   def reported?
     policy(ModerationReport).can_see_moderation_reports? && comment.pending_moderation_reports.present?
   end
+
+  def component_state
+    { component: { classes: classes, context: context }}
+  end
 end
