@@ -62,12 +62,7 @@
     "eslint-all": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts",
     "stylelint-all": "yarn run stylelint 'app/**/*.scss'"
   },
-  "babel": {
-    "presets": [
-      "./node_modules/shakapacker/package/babel/preset.js"
-    ]
-  },
   "browserslist": [
-    "last 5 years"
+    "since 2018"
   ]
 }

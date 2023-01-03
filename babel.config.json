@@ -1,0 +1,16 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env", {
+        "useBuiltIns": "entry",
+        "corejs": "3.8",
+        "modules": "auto",
+        "bugfixes": true,
+        "exclude": ["transform-typeof-symbol"]
+      }
+    ]
+  ],
+  "plugins": [
+    ["@babel/plugin-transform-runtime", { "helpers": false }]
+  ]
+}
