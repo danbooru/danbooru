@@ -19,7 +19,7 @@ clock: bin/rails danbooru:cron
 
 # The Javascript bundler. Rebuilds Javascript/CSS files when they change. See
 # config/webpacker.yml and https://webpack.js.org/configuration/dev-server.
-webpack-dev-server: bin/webpack-dev-server
+webpacker-dev-server: bin/webpacker-dev-server
 
 # The postgres database. It can be run in the Procfile, but it's better to run it manually.
 # db: docker run --rm -it --name danbooru-postgres --shm-size=8g -p 5432:5432 -e POSTGRES_USER=danbooru - e POSTRES_HOST_AUTH_METHOD=trust -v danbooru-postgres:/var/lib/postgresql/data ghcr.io/danbooru/postgres:14.1

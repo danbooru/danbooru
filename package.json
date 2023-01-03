@@ -2,7 +2,11 @@
   "license": "MIT",
   "dependencies": {
     "@alpinejs/morph": "^3.9.0",
+    "@babel/core": "7",
     "@babel/plugin-proposal-decorators": "^7.16.7",
+    "@babel/plugin-transform-runtime": "7",
+    "@babel/preset-env": "7",
+    "@babel/runtime": "7",
     "@fontsource/anton": "^4.0.0",
     "@fontsource/archivo-narrow": "^4.0.0",
     "@fontsource/ibm-plex-mono": "^4.0.0",
@@ -12,9 +16,10 @@
     "@fontsource/rokkitt": "^4.0.0",
     "@fontsource/unifrakturmaguntia": "^4.0.0",
     "@rails/ujs": "^7.0.1",
-    "@rails/webpacker": "=6.0.0-rc.6",
     "@ruffle-rs/ruffle": "0.1.0-nightly.2022.1.31",
     "alpinejs": "^3.9.0",
+    "babel-loader": "8",
+    "compression-webpack-plugin": "9",
     "core-js": "^3.20.3",
     "css-loader": "^6.5.1",
     "dropzone": "^6.0.0-beta.2",
@@ -32,9 +37,13 @@
     "postcss-preset-env": "^7.2.3",
     "sass": "^1.48.0",
     "sass-loader": "^12.4.0",
+    "shakapacker": "6.5.5",
+    "terser-webpack-plugin": "5",
     "tippy.js": "^6.3.7",
-    "webpack": "^5.66.0",
-    "webpack-cli": "^4.9.1"
+    "webpack": "5",
+    "webpack-assets-manifest": "5",
+    "webpack-cli": "4",
+    "webpack-merge": "5"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.8",
@@ -47,10 +56,7 @@
     "stylelint": "^14.2.0",
     "stylelint-config-standard": "^24.0.0",
     "stylelint-config-standard-scss": "^3.0.0",
-    "webpack-dev-server": "^4.7.3"
-  },
-  "resolutions": {
-    "webpack": "5.66.0"
+    "webpack-dev-server": "^4.11.1"
   },
   "scripts": {
     "eslint-all": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts",
@@ -58,7 +64,7 @@
   },
   "babel": {
     "presets": [
-      "./node_modules/@rails/webpacker/package/babel/preset.js"
+      "./node_modules/shakapacker/package/babel/preset.js"
     ]
   },
   "browserslist": [

@@ -65,7 +65,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:7.20.7, @babel/core@npm:^7.15.5":
+"@babel/core@npm:7, @babel/core@npm:7.20.7":
   version: 7.20.7
   resolution: "@babel/core@npm:7.20.7"
   dependencies:
@@ -434,7 +434,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-class-properties@npm:^7.14.5, @babel/plugin-proposal-class-properties@npm:^7.18.6":
+"@babel/plugin-proposal-class-properties@npm:^7.18.6":
   version: 7.18.6
   resolution: "@babel/plugin-proposal-class-properties@npm:7.18.6"
   dependencies:
@@ -1100,7 +1100,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-transform-runtime@npm:^7.15.0":
+"@babel/plugin-transform-runtime@npm:7":
   version: 7.19.6
   resolution: "@babel/plugin-transform-runtime@npm:7.19.6"
   dependencies:
@@ -1195,7 +1195,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/preset-env@npm:^7.15.6":
+"@babel/preset-env@npm:7":
   version: 7.20.2
   resolution: "@babel/preset-env@npm:7.20.2"
   dependencies:
@@ -1295,7 +1295,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.8.4":
+"@babel/runtime@npm:7, @babel/runtime@npm:^7.8.4":
   version: 7.20.7
   resolution: "@babel/runtime@npm:7.20.7"
   dependencies:
@@ -1769,31 +1769,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rails/webpacker@npm:=6.0.0-rc.6":
-  version: 6.0.0-rc.6
-  resolution: "@rails/webpacker@npm:6.0.0-rc.6"
-  dependencies:
-    "@babel/core": ^7.15.5
-    "@babel/plugin-proposal-class-properties": ^7.14.5
-    "@babel/plugin-transform-runtime": ^7.15.0
-    "@babel/preset-env": ^7.15.6
-    "@babel/runtime": ^7.15.4
-    babel-loader: ^8.2.2
-    compression-webpack-plugin: ^9.0.0
-    glob: ^7.2.0
-    js-yaml: ^4.1.0
-    path-complete-extname: ^1.0.0
-    pnp-webpack-plugin: ^1.7.0
-    terser-webpack-plugin: ^5.2.4
-    webpack: ^5.53.0
-    webpack-assets-manifest: ^5.0.6
-    webpack-cli: ^4.8.0
-    webpack-merge: ^5.8.0
-    webpack-sources: ^3.2.1
-  checksum: 16db66b597cb1c5201fe9fb366d204ccc22298ad2efc5f80afa981fcc197d972238e5737be8e0a8032d66643b13b4ee71a368d705dcd82f745e9b8ae57825554
-  languageName: node
-  linkType: hard
-
 "@ruffle-rs/ruffle@npm:0.1.0-nightly.2022.1.31":
   version: 0.1.0-nightly.2022.1.31
   resolution: "@ruffle-rs/ruffle@npm:0.1.0-nightly.2022.1.31"
@@ -1853,7 +1828,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/eslint-scope@npm:^3.7.0":
+"@types/eslint-scope@npm:^3.7.3":
   version: 3.7.4
   resolution: "@types/eslint-scope@npm:3.7.4"
   dependencies:
@@ -1880,10 +1855,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/estree@npm:^0.0.50":
-  version: 0.0.50
-  resolution: "@types/estree@npm:0.0.50"
-  checksum: dd52d035077d4ea92ff7a1191b1b02ccd0dba76ad51d1d95e4cd81dd3cc234042b859ae9160c3059dcc5c384cd895cd860d4f18913f1033736f867543f5d4743
+"@types/estree@npm:^0.0.51":
+  version: 0.0.51
+  resolution: "@types/estree@npm:0.0.51"
+  checksum: b67a490e5b0b5e7f532912eb4ba3231df6c3eb73b71d8fea2d445f71da6058c204bf0c4ba05c1d7877e4c77428f929bc51cf683ae19eeaf33dc12b79168208ab
   languageName: node
   linkType: hard
 
@@ -2268,7 +2243,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn@npm:^8.4.1, acorn@npm:^8.5.0, acorn@npm:^8.8.0":
+"acorn@npm:^8.5.0, acorn@npm:^8.7.1, acorn@npm:^8.8.0":
   version: 8.8.1
   resolution: "acorn@npm:8.8.1"
   bin:
@@ -2495,7 +2470,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-loader@npm:^8.2.2":
+"babel-loader@npm:8":
   version: 8.3.0
   resolution: "babel-loader@npm:8.3.0"
   dependencies:
@@ -2908,7 +2883,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"compression-webpack-plugin@npm:^9.0.0":
+"compression-webpack-plugin@npm:9":
   version: 9.2.0
   resolution: "compression-webpack-plugin@npm:9.2.0"
   dependencies:
@@ -2994,11 +2969,11 @@ __metadata:
   linkType: hard
 
 "core-js-compat@npm:^3.25.1":
-  version: 3.26.1
-  resolution: "core-js-compat@npm:3.26.1"
+  version: 3.27.1
+  resolution: "core-js-compat@npm:3.27.1"
   dependencies:
     browserslist: ^4.21.4
-  checksum: 65b39835e0a7b6f70d8833120e1480d4dc70d8ab0830c80ef09ddc4f33c87ec820671d2985d7e78c5ece5154e11be7e5ec589fa33c9a9548a1f3b656cd9fa38f
+  checksum: 3535570dad0ea1a0a419f3da632f3207112cda3d64470f1116ede09fc14bf244cf1463d75647bc4f14a2faa46954c12f42725b2806491efd530feb4725db46ba
   languageName: node
   linkType: hard
 
@@ -3319,7 +3294,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enhanced-resolve@npm:^5.8.3":
+"enhanced-resolve@npm:^5.10.0":
   version: 5.12.0
   resolution: "enhanced-resolve@npm:5.12.0"
   dependencies:
@@ -4645,14 +4620,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"json-parse-better-errors@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "json-parse-better-errors@npm:1.0.2"
-  checksum: b4c4f0e43b43892af887db742b26f9aa6302b09cd5f6e655ead49fca9f47f3cdd300dcf98cf5218778262be51d7b29859221206fc98b87a1a61c5af7618dae89
-  languageName: node
-  linkType: hard
-
-"json-parse-even-better-errors@npm:^2.3.0":
+"json-parse-even-better-errors@npm:^2.3.0, json-parse-even-better-errors@npm:^2.3.1":
   version: 2.3.1
   resolution: "json-parse-even-better-errors@npm:2.3.1"
   checksum: d89fa7fe57957f3004cf0e786465a64183c0de861f6fda800d352956397c01b22f9feb141d0dce5b23f5dbe0aae74dd5b45fc0c3c1679b0942688efa5544e726
@@ -4681,11 +4649,11 @@ fsevents@~2.3.2:
   linkType: hard
 
 "json5@npm:^2.1.2, json5@npm:^2.2.1":
-  version: 2.2.2
-  resolution: "json5@npm:2.2.2"
+  version: 2.2.3
+  resolution: "json5@npm:2.2.3"
   bin:
     json5: lib/cli.js
-  checksum: 70582bc91b42319608fa9d6dd53791078cec9021a5ba3a9b025878cd69e18e0978a09c7f04e106b5470cb2af295b75c91c38e0bcd05ceb452e4d57c6a884d9a7
+  checksum: c6ab786b232e576477f63d9b672ee4b546a181ac732e8cba0603e3e7352ac1fe9287344af1132c76c71613b5f69ce4f9b92ec41a10f51030ab764e015087932a
   languageName: node
   linkType: hard
 
@@ -5581,15 +5549,6 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"pnp-webpack-plugin@npm:^1.7.0":
-  version: 1.7.0
-  resolution: "pnp-webpack-plugin@npm:1.7.0"
-  dependencies:
-    ts-pnp: ^1.1.6
-  checksum: 756163c5d0460a22353606dc44c2041fbb15e235cc9aac063755c885b090fc68c7c4d9dac68bdd3970716bd98bf2fae521a62ba97146f489cd5d8c08d84fa2f3
-  languageName: node
-  linkType: hard
-
 "postcss-attribute-case-insensitive@npm:^5.0.2":
   version: 5.0.2
   resolution: "postcss-attribute-case-insensitive@npm:5.0.2"
@@ -6439,8 +6398,12 @@ fsevents@~2.3.2:
   dependencies:
     "@alpinejs/morph": ^3.9.0
     "@babel/cli": ^7.16.8
+    "@babel/core": 7
     "@babel/eslint-parser": ^7.16.5
     "@babel/plugin-proposal-decorators": ^7.16.7
+    "@babel/plugin-transform-runtime": 7
+    "@babel/preset-env": 7
+    "@babel/runtime": 7
     "@fontsource/anton": ^4.0.0
     "@fontsource/archivo-narrow": ^4.0.0
     "@fontsource/ibm-plex-mono": ^4.0.0
@@ -6450,10 +6413,11 @@ fsevents@~2.3.2:
     "@fontsource/rokkitt": ^4.0.0
     "@fontsource/unifrakturmaguntia": ^4.0.0
     "@rails/ujs": ^7.0.1
-    "@rails/webpacker": =6.0.0-rc.6
     "@ruffle-rs/ruffle": 0.1.0-nightly.2022.1.31
     "@webpack-cli/serve": ^1.6.0
     alpinejs: ^3.9.0
+    babel-loader: 8
+    compression-webpack-plugin: 9
     core-js: ^3.20.3
     css-loader: ^6.5.1
     dropzone: ^6.0.0-beta.2
@@ -6475,13 +6439,17 @@ fsevents@~2.3.2:
     postcss-preset-env: ^7.2.3
     sass: ^1.48.0
     sass-loader: ^12.4.0
+    shakapacker: 6.5.5
     stylelint: ^14.2.0
     stylelint-config-standard: ^24.0.0
     stylelint-config-standard-scss: ^3.0.0
+    terser-webpack-plugin: 5
     tippy.js: ^6.3.7
-    webpack: ^5.66.0
-    webpack-cli: ^4.9.1
-    webpack-dev-server: ^4.7.3
+    webpack: 5
+    webpack-assets-manifest: 5
+    webpack-cli: 4
+    webpack-dev-server: ^4.11.1
+    webpack-merge: 5
   languageName: unknown
   linkType: soft
 
@@ -6707,6 +6675,30 @@ fsevents@~2.3.2:
   version: 1.2.0
   resolution: "setprototypeof@npm:1.2.0"
   checksum: 72691439857719aa33ec11ebc97960347f0f96e75c2fe65d0f2ca5c9c44fb1aa026e2ae528959624ed3ae3820fe06bfb1aded306402c5c941afd3dfdf47f79d0
+  languageName: node
+  linkType: hard
+
+"shakapacker@npm:6.5.5":
+  version: 6.5.5
+  resolution: "shakapacker@npm:6.5.5"
+  dependencies:
+    glob: ^7.2.0
+    js-yaml: ^4.1.0
+    path-complete-extname: ^1.0.0
+  peerDependencies:
+    "@babel/core": ^7.17.9
+    "@babel/plugin-transform-runtime": ^7.17.0
+    "@babel/preset-env": ^7.16.11
+    "@babel/runtime": ^7.17.9
+    babel-loader: ^8.2.4 || ^9.0.0
+    compression-webpack-plugin: ^9.0.0 || ^10.0.0
+    terser-webpack-plugin: ^5.3.1
+    webpack: ^5.72.0
+    webpack-assets-manifest: ^5.0.6
+    webpack-cli: ^4.9.2 || ^5.0.0
+    webpack-dev-server: ^4.9.0
+    webpack-merge: ^5.8.0
+  checksum: 164c98e05882162a22180273514075f9e8d22e4847f9754de52264e2ab191c5aa31f83b7ee026b8d612c58ba68c48f150ceb688ec113a20e4d6180c94cb2fe1c
   languageName: node
   linkType: hard
 
@@ -7186,7 +7178,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"terser-webpack-plugin@npm:^5.1.3, terser-webpack-plugin@npm:^5.2.4":
+"terser-webpack-plugin@npm:5, terser-webpack-plugin@npm:^5.1.3":
   version: 5.3.6
   resolution: "terser-webpack-plugin@npm:5.3.6"
   dependencies:
@@ -7272,16 +7264,6 @@ fsevents@~2.3.2:
   version: 3.0.1
   resolution: "trim-newlines@npm:3.0.1"
   checksum: a1cc3d5992d47349fa0b48206038e524f42d0ade81913cc72322e4f5a99c5e936eb730af762c9f5bafa3c19ab1e9eaf14bdff487cbe3f2c5d525dd03f3f89fb0
-  languageName: node
-  linkType: hard
-
-"ts-pnp@npm:^1.1.6":
-  version: 1.2.0
-  resolution: "ts-pnp@npm:1.2.0"
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 78341a27939de565e2754ff65ebb689743c16e3295528089d143c08d91842cf9029c3d6b3c95a9a20854a114a7904329d02c710d63f7ce4dbf671b8a3e560ac1
   languageName: node
   linkType: hard
 
@@ -7465,7 +7447,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"watchpack@npm:^2.3.1":
+"watchpack@npm:^2.4.0":
   version: 2.4.0
   resolution: "watchpack@npm:2.4.0"
   dependencies:
@@ -7484,7 +7466,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"webpack-assets-manifest@npm:^5.0.6":
+"webpack-assets-manifest@npm:5":
   version: 5.1.0
   resolution: "webpack-assets-manifest@npm:5.1.0"
   dependencies:
@@ -7501,7 +7483,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"webpack-cli@npm:^4.8.0, webpack-cli@npm:^4.9.1":
+"webpack-cli@npm:4":
   version: 4.10.0
   resolution: "webpack-cli@npm:4.10.0"
   dependencies:
@@ -7549,7 +7531,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"webpack-dev-server@npm:^4.7.3":
+"webpack-dev-server@npm:^4.11.1":
   version: 4.11.1
   resolution: "webpack-dev-server@npm:4.11.1"
   dependencies:
@@ -7593,7 +7575,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"webpack-merge@npm:^5.7.3, webpack-merge@npm:^5.8.0":
+"webpack-merge@npm:5, webpack-merge@npm:^5.7.3":
   version: 5.8.0
   resolution: "webpack-merge@npm:5.8.0"
   dependencies:
@@ -7603,47 +7585,47 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"webpack-sources@npm:^3.2.1, webpack-sources@npm:^3.2.2":
+"webpack-sources@npm:^3.2.3":
   version: 3.2.3
   resolution: "webpack-sources@npm:3.2.3"
   checksum: aac02eb6759647fe681f47cf81056e03cde27440da5c3cef6d67e76eed29c372a02831af6333e9f3ca2fd08914f6e1c123dc2154063f2ac08ee89021ff503f05
   languageName: node
   linkType: hard
 
-"webpack@npm:5.66.0":
-  version: 5.66.0
-  resolution: "webpack@npm:5.66.0"
+"webpack@npm:5":
+  version: 5.75.0
+  resolution: "webpack@npm:5.75.0"
   dependencies:
-    "@types/eslint-scope": ^3.7.0
-    "@types/estree": ^0.0.50
+    "@types/eslint-scope": ^3.7.3
+    "@types/estree": ^0.0.51
     "@webassemblyjs/ast": 1.11.1
     "@webassemblyjs/wasm-edit": 1.11.1
     "@webassemblyjs/wasm-parser": 1.11.1
-    acorn: ^8.4.1
+    acorn: ^8.7.1
     acorn-import-assertions: ^1.7.6
     browserslist: ^4.14.5
     chrome-trace-event: ^1.0.2
-    enhanced-resolve: ^5.8.3
+    enhanced-resolve: ^5.10.0
     es-module-lexer: ^0.9.0
     eslint-scope: 5.1.1
     events: ^3.2.0
     glob-to-regexp: ^0.4.1
     graceful-fs: ^4.2.9
-    json-parse-better-errors: ^1.0.2
+    json-parse-even-better-errors: ^2.3.1
     loader-runner: ^4.2.0
     mime-types: ^2.1.27
     neo-async: ^2.6.2
     schema-utils: ^3.1.0
     tapable: ^2.1.1
     terser-webpack-plugin: ^5.1.3
-    watchpack: ^2.3.1
-    webpack-sources: ^3.2.2
+    watchpack: ^2.4.0
+    webpack-sources: ^3.2.3
   peerDependenciesMeta:
     webpack-cli:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: c3aa9aef470b258f8eacb6b20f1e4f3ddb7d2fe9c0bd0c95504baabad5b637f4ce1d5cb7dbcc8d4ae246b8582062001954dcd6a53c401100b39a8e0677665a89
+  checksum: 15f4767d54f270ab4e03b116bf9eff18db8a04d8bfdf8913a7f0df35361312b5e631f2b228012acba4a20200b27775818bc3f667cb70acb6ba43dcb050588770
   languageName: node
   linkType: hard
 

@@ -41,7 +41,7 @@ COPY .yarn/ ./.yarn/
 RUN yarn install
 
 COPY postcss.config.js Rakefile ./
-COPY bin/rails bin/webpack ./bin/
+COPY bin/rails bin/webpacker ./bin/
 COPY config/application.rb config/boot.rb config/danbooru_default_config.rb config/webpacker.yml ./config/
 COPY config/webpack/ ./config/webpack/
 COPY public/images ./public/images

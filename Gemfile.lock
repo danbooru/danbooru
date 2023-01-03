@@ -452,6 +452,11 @@ GEM
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
     semantic_range (3.0.0)
+    shakapacker (6.5.5)
+      activesupport (>= 5.2)
+      rack-proxy (>= 0.6.1)
+      railties (>= 5.2)
+      semantic_range (>= 2.3.0)
     shoulda-context (2.0.0)
     shoulda-matchers (5.3.0)
       activesupport (>= 5.2.0)
@@ -511,11 +516,6 @@ GEM
       activesupport (>= 5.2.0, < 8.0)
       concurrent-ruby (~> 1.0)
       method_source (~> 1.0)
-    webpacker (6.0.0.rc.6)
-      activesupport (>= 5.2)
-      rack-proxy (>= 0.6.1)
-      railties (>= 5.2)
-      semantic_range (>= 2.3.0)
     webrick (1.7.0)
     websocket (1.2.9)
     websocket-driver (0.7.5)
@@ -602,6 +602,7 @@ DEPENDENCIES
   sanitize
   scenic
   selenium-webdriver
+  shakapacker
   shoulda-context
   shoulda-matchers
   simple_form
@@ -612,7 +613,6 @@ DEPENDENCIES
   stripe-ruby-mock
   tzinfo-data
   view_component
-  webpacker (= 6.0.0.rc.6)
 
 BUNDLED WITH
    2.3.12

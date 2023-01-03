@@ -230,13 +230,13 @@ module IconHelper
   def svg_icon_tag(name, id = name, class: nil, **options)
     klass = binding.local_variable_get(:class)
     tag.svg(class: "icon svg-icon #{name}-icon #{klass}".strip, **options) do
-      tag.use(fill: "currentColor", href: asset_pack_path("static/icons.svg") + "##{id}")
+      tag.use(fill: "currentColor", href: asset_pack_path("static/images/icons.svg") + "##{id}")
     end
   end
 
   def image_icon_tag(filename, class: nil, **options)
     klass = binding.local_variable_get(:class)
-    image_pack_tag("static/#{filename}", class: "icon #{klass}", **options)
+    image_pack_tag("static/images/#{filename}", class: "icon #{klass}", **options)
   end
 
   def upvote_icon(**options)

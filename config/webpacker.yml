@@ -1,91 +1,98 @@
-# This file configures Webpacker, the Rails wrapper around Webpack. Webpack is
-# used to bundle Javascript and CSS assets.
+# This file configures Shakapacker, the Rails wrapper around Webpack. Webpack is used to bundle Javascript and CSS assets.
 #
-# Note: You must restart bin/webpack-dev-server for changes to take effect
+# Note: You must restart bin/webpacker-dev-server for changes to take effect
 #
-# @see https://github.com/rails/webpacker
-# @see https://edgeguides.rubyonrails.org/webpacker.html
+# @see https://github.com/shakacode/shakapacker
+# @see config/webpack/webpack.config.js
 
 default: &default
   source_path: app/javascript
+
+  # You can have a subdirectory of the source_path, like 'packs' (recommended).
+  # Alternatively, you can use '/' to use the whole source_path directory.
   source_entry_path: packs
+
+  # If nested_entries is true, then we'll pick up subdirectories within the source_entry_path.
+  # You cannot set this option to true if you set source_entry_path to '/'
+  nested_entries: false
+
+  #  While using a File-System-based automated bundle generation feature, miscellaneous warnings suggesting css order
+  #  conflicts may arise due to the mini-css-extract-plugin. For projects where css ordering has been mitigated through
+  #  consistent use of scoping or naming conventions, the css order warnings can be disabled by setting
+  #  css_extract_ignore_order_warnings to true
+  css_extract_ignore_order_warnings: false
+
   public_root_path: public
   public_output_path: packs
-  cache_path: tmp/cache/webpacker
+  cache_path: tmp/webpacker
   webpack_compile_output: true
+  # See https://github.com/shakacode/shakapacker#deployment
+  webpacker_precompile: true
 
-  # Additional paths webpack should lookup modules
+  # Location for manifest.json, defaults to {public_output_path}/manifest.json if unset
+  # manifest_path: public/packs/manifest.json
+
+  # Additional paths webpack should look up modules
   # ['app/assets', 'engine/foo/app/assets']
   additional_paths: ["app/components", "public/images"]
 
   # Reload manifest.json on all requests so we reload latest compiled packs
   cache_manifest: false
 
-  # Extract and emit a css file
-  extract_css: true
+  # Select loader to use, available options are 'babel' (default), 'swc' or 'esbuild'
+  webpack_loader: 'babel'
 
-  static_assets_extensions:
-    - .jpg
-    - .jpeg
-    - .png
-    - .gif
-    - .tiff
-    - .ico
-    - .svg
-    - .eot
-    - .otf
-    - .ttf
-    - .woff
-    - .woff2
+  # Set to true to enable check for matching versions of shakapacker gem and NPM package - will raise an error if there is a mismatch or wildcard versioning is used
+  ensure_consistent_versioning: false
 
-  extensions:
-    - .erb
-    - .mjs
-    - .js
-    - .sass
-    - .scss
-    - .css
-    - .module.sass
-    - .module.scss
-    - .module.css
-    - .png
-    - .svg
-    - .gif
-    - .jpeg
-    - .jpg
+  # Select whether the compiler will use SHA digest ('digest' option) or most most recent modified timestamp ('mtime') to determine freshness
+  compiler_strategy: digest
 
 development:
   <<: *default
   compile: true
+  compiler_strategy: mtime
 
   # Reference: https://webpack.js.org/configuration/dev-server/
+  # Keys not described there are documented inline and in https://github.com/shakacode/shakapacker/
   dev_server:
     https: false
     host: localhost
     port: 3035
-    public: localhost:3035
     # Hot Module Replacement updates modules while the application is running without a full reload
+    # Used instead of the `hot` key in https://webpack.js.org/configuration/dev-server/#devserverhot
     hmr: false
-    # Inline should be set to true if using HMR; it inserts a script to take care of live reloading
-    inline: true
-    # Should we show a full-screen overlay in the browser when there are compiler errors or warnings?
-    overlay: true
+    # If HMR is on, CSS will by inlined by delivering it as part of the script payload via style-loader. Be sure
+    # that you add style-loader to your project dependencies.
+    #
+    # If you want to instead deliver CSS via <link> with the mini-css-extract-plugin, set inline_css to false.
+    # In that case, style-loader is not needed as a dependency.
+    #
+    # mini-css-extract-plugin is a required dependency in both cases.
+    inline_css: true
+    # Defaults to the inverse of hmr. Uncomment to manually set this.
+    # live_reload: true
+    client:
+      # Should we show a full-screen overlay in the browser when there are compiler errors or warnings?
+      overlay: true
+      # May also be a string
+      # webSocketURL:
+      #  hostname: '0.0.0.0'
+      #  pathname: '/ws'
+      #  port: 8080
     # Should we use gzip compression?
     compress: true
     # Note that apps that do not check the host are vulnerable to DNS rebinding attacks
-    disable_host_check: true
-    # This option lets the browser open with your local IP
-    use_local_ip: false
-    # When enabled, nothing except the initial startup information will be written to the console.
-    # This also means that errors or warnings from webpack are not visible.
-    quiet: false
-    pretty: false
+    allowed_hosts: 'all'
+    # Shows progress and colorizes output of bin/webpacker[-dev-server]
+    pretty: true
     headers:
       'Access-Control-Allow-Origin': '*'
       'Cache-Control': 'no-store, must-revalidate, private, max-age=0'
       'Vary': '*'
-    watch_options:
-      ignored: '**/node_modules/**'
+    static:
+      watch:
+        ignored: '**/node_modules/**'
 
 test:
   <<: *default
