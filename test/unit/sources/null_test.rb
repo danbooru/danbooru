@@ -54,16 +54,6 @@ module Sources
         assert_equal("https://chan.sankakucomplex.com/post/show?md5=c2d7270b84ac81326384d4eadd4d4746", Source::URL.page_url(source))
       end
 
-      should "normalize zerochan links" do
-        source1 = "http://static.zerochan.net/full/23/15/183273.jpg"
-        source2 = "https://s4.zerochan.net/Victorique.de.Blois.full.411536.jpg"
-        source3 = "http://www.zerochan.net/full/1567893"
-
-        assert_equal("https://www.zerochan.net/183273#full", Source::URL.page_url(source1))
-        assert_equal("https://www.zerochan.net/411536#full", Source::URL.page_url(source2))
-        assert_equal("https://www.zerochan.net/1567893#full", Source::URL.page_url(source3))
-      end
-
       should "normalize minitokyo links" do
         source1 = "http://static.minitokyo.net/downloads/27/13/365677.jpg?433592448,Minitokyo.Eien.no.Aselia.Scans_365677.jpg"
         source2 = "http://static.minitokyo.net/downloads/14/33/199164.jpg?928244019"

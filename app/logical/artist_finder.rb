@@ -205,7 +205,8 @@ module ArtistFinder
     "youtube.com/c", # https://www.youtube.com/c/serafleurArt
     "youtube.com/channel", # https://www.youtube.com/channel/UCfrCa2Y6VulwHD3eNd3HBRA
     "youtube.com/user", # https://www.youtube.com/user/148nasuka
-    "youtu.be" # http://youtu.be/gibeLKKRT-0
+    "youtu.be", # http://youtu.be/gibeLKKRT-0
+    "zerochan.net",
   ]
 
   SITE_BLACKLIST_REGEXP = Regexp.union(SITE_BLACKLIST.map do |domain|
