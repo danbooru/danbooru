@@ -10,6 +10,8 @@ require('@rails/ujs').start();
 require('hammerjs');
 require('jquery-hotkeys');
 import morphdom from 'morphdom';
+import Alpine from 'alpinejs';
+import morph from '@alpinejs/morph';
 
 // should start looking for nodejs replacements
 importAll(require.context('../vendor', true, /\.js$/));
@@ -93,4 +95,8 @@ Danbooru.error = Utility.error;
 window.$ = jQuery;
 window.jQuery = jQuery;
 window.morphdom = morphdom;
+window.Alpine = Alpine;
 window.Danbooru = Danbooru;
+
+Alpine.plugin(morph);
+$(() => Alpine.start());
