@@ -1204,39 +1204,6 @@ ALTER SEQUENCE public.notes_id_seq OWNED BY public.notes.id;
 
 
 --
--- Name: pixiv_ugoira_frame_data; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.pixiv_ugoira_frame_data (
-    id integer NOT NULL,
-    post_id integer,
-    data text NOT NULL,
-    content_type character varying NOT NULL,
-    md5 character varying
-);
-
-
---
--- Name: pixiv_ugoira_frame_data_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.pixiv_ugoira_frame_data_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: pixiv_ugoira_frame_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.pixiv_ugoira_frame_data_id_seq OWNED BY public.pixiv_ugoira_frame_data.id;
-
-
---
 -- Name: pool_versions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2776,13 +2743,6 @@ ALTER TABLE ONLY public.notes ALTER COLUMN id SET DEFAULT nextval('public.notes_
 
 
 --
--- Name: pixiv_ugoira_frame_data id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.pixiv_ugoira_frame_data ALTER COLUMN id SET DEFAULT nextval('public.pixiv_ugoira_frame_data_id_seq'::regclass);
-
-
---
 -- Name: pool_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3225,14 +3185,6 @@ ALTER TABLE ONLY public.note_versions
 
 ALTER TABLE ONLY public.notes
     ADD CONSTRAINT notes_pkey PRIMARY KEY (id);
-
-
---
--- Name: pixiv_ugoira_frame_data pixiv_ugoira_frame_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.pixiv_ugoira_frame_data
-    ADD CONSTRAINT pixiv_ugoira_frame_data_pkey PRIMARY KEY (id);
 
 
 --
@@ -4703,20 +4655,6 @@ CREATE INDEX index_notes_on_body_tsvector ON public.notes USING gin (to_tsvector
 --
 
 CREATE INDEX index_notes_on_post_id ON public.notes USING btree (post_id);
-
-
---
--- Name: index_pixiv_ugoira_frame_data_on_md5; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_pixiv_ugoira_frame_data_on_md5 ON public.pixiv_ugoira_frame_data USING btree (md5);
-
-
---
--- Name: index_pixiv_ugoira_frame_data_on_post_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_pixiv_ugoira_frame_data_on_post_id ON public.pixiv_ugoira_frame_data USING btree (post_id);
 
 
 --
@@ -6647,14 +6585,6 @@ ALTER TABLE ONLY public.posts
 
 
 --
--- Name: pixiv_ugoira_frame_data fk_rails_f249d093cc; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.pixiv_ugoira_frame_data
-    ADD CONSTRAINT fk_rails_f249d093cc FOREIGN KEY (post_id) REFERENCES public.posts(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: artist_versions fk_rails_f37d58ea23; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -7002,6 +6932,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221106062419'),
 ('20221109052923'),
 ('20221228232240'),
-('20221230011825');
+('20221230011825'),
+('20230104064916');
 
 
