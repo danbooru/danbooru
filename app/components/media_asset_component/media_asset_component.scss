@@ -19,6 +19,10 @@
     }
   }
 
+  &[data-dynamic-height="true"]:not([data-dynamic-height-initialized="true"]) {
+    visibility: hidden;
+  }
+
   .media-asset-paginator {
     top: calc((100% - var(--paginator-size)) / 2);
     height: 0;

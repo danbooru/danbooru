@@ -17,6 +17,7 @@ export default class MediaAssetComponent {
 
     if (this.dynamicHeight) {
       this.updateHeight();
+      $(window).on("load.danbooru", e => this.updateHeight());
       $(window).on("scroll.danbooru", e => this.updateHeight());
     }
 
@@ -62,8 +63,8 @@ export default class MediaAssetComponent {
   }
 
   updateHeight() {
-    // XXX 115 = header height (hardcoded to prevent height glitches as page loads)
-    this.$component.css("--header-visible-height", Math.min(115, Math.max(0, this.$component.offset().top - $(window).scrollTop())) + "px");
+    this.$component.css("--header-visible-height", Math.max(0, this.$component.offset().top - $(window).scrollTop()) + "px");
+    this.$component.attr("data-dynamic-height-initialized", "true");
   }
 
   get zoomLevel() {
