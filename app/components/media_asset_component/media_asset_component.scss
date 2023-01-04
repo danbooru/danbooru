@@ -65,11 +65,16 @@
 
     .media-asset-container {
       aspect-ratio: var(--media-asset-width) / var(--media-asset-height);
-      height: max-content;
+      height: fit-content;
     }
   }
 
   &.media-asset-component-fit-width {
+    .media-asset-container {
+      width: fit-content;
+      width: intrinsic; // XXX Safari hack, testcase: https://danbooru.donmai.us/media_assets/4784100
+    }
+
     .media-asset-image {
       height: auto;
       max-width: 100%;
