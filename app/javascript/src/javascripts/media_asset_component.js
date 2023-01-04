@@ -23,7 +23,6 @@ export default class MediaAssetComponent {
     if (this.$image.length) {
       this.$image.on("click.danbooru", e => this.toggleFit(e));
       this.$image.on("load.danbooru", e => this.updateZoom());
-      this.$image.on("load.danbooru", e => this.updateHeight());
       new ResizeObserver(() => this.updateZoom()).observe(this.$image.get(0));
       this.updateZoom();
     }
