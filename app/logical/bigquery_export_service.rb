@@ -70,6 +70,7 @@ class BigqueryExportService
     end
 
     gzip.finish
+    file.fsync
     file
   end
 
