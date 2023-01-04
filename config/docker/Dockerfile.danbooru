@@ -40,7 +40,7 @@ COPY .yarnrc.yml package.json yarn.lock ./
 COPY .yarn/ ./.yarn/
 RUN yarn install
 
-COPY postcss.config.js Rakefile ./
+COPY postcss.config.js babel.config.json Rakefile ./
 COPY bin/rails bin/webpacker ./bin/
 COPY config/application.rb config/boot.rb config/danbooru_default_config.rb config/webpacker.yml ./config/
 COPY config/webpack/ ./config/webpack/
