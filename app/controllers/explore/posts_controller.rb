@@ -15,15 +15,6 @@ module Explore
       respond_with(@posts)
     end
 
-    def curated
-      @date, @scale, @min_date, @max_date = parse_date(params)
-
-      limit = params.fetch(:limit, CurrentUser.user.per_page)
-      @posts = curated_posts(@min_date, @max_date).paginate(params[:page], limit: limit, search_count: false)
-
-      respond_with(@posts)
-    end
-
     def viewed
       @date, @scale, @min_date, @max_date = parse_date(params)
       @posts = ReportbooruService.new.popular_posts(@date)
@@ -54,10 +45,6 @@ module Explore
 
     def popular_posts(min_date, max_date)
       Post.where(created_at: min_date..max_date).includes(:media_asset).user_tag_match("order:score")
-    end
-
-    def curated_posts(min_date, max_date)
-      Post.where(created_at: min_date..max_date).includes(:media_asset).user_tag_match("order:curated")
     end
   end
 end

@@ -58,7 +58,6 @@ class PostQueryBuilder
     tagcount tagcount_asc
     duration duration_asc
     rank
-    curated
     modqueue
     random
     custom
@@ -463,16 +462,6 @@ class PostQueryBuilder
     when "rank"
       relation = relation.where("posts.score > 0 and posts.created_at >= ?", 2.days.ago)
       relation = relation.reorder(Arel.sql("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC"))
-
-    when "curated"
-      contributors = User.where("level >= ?", User::Levels::CONTRIBUTOR)
-
-      relation = relation
-        .joins(:favorites)
-        .where(favorites: { user: contributors })
-        .group("posts.id")
-        .select("posts.*, COUNT(*) AS contributor_fav_count")
-        .reorder("contributor_fav_count DESC, posts.fav_count DESC, posts.id DESC")
 
     when "modqueue", "modqueue_desc"
       relation = relation.with_queued_at.reorder("queued_at DESC, posts.id DESC")

@@ -19,15 +19,6 @@ module Explore
          end
       end
 
-      context "#curated" do
-        should "render" do
-          @builder = create(:builder_user)
-          Favorite.create!(post: @post, user: @builder)
-          get curated_explore_posts_path
-          assert_response :success
-        end
-      end
-
       context "#viewed" do
         should "render" do
           mock_post_view_rankings(Date.today, [[@post.id, 100]])
