@@ -111,22 +111,44 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      return "" if artist_commentary_desc.blank?
+      return nil if artist_commentary_desc.blank?
 
-      url_replacements = api_response.dig(:entities, :urls).to_a.map do |obj|
-        [obj[:url], obj[:expanded_url]]
-      end
-      url_replacements += api_response.dig(:extended_entities, :media).to_a.map do |obj|
-        [obj[:url], ""]
-      end
-      url_replacements = url_replacements.to_h
+      dtext = "".dup
+      desc = artist_commentary_desc
+      entities = []
 
-      desc = artist_commentary_desc.unicode_normalize(:nfkc)
-      desc = CGI.unescapeHTML(desc)
-      desc = desc.gsub(%r{https?://t\.co/[a-zA-Z0-9]+}i, url_replacements)
-      desc = desc.gsub(/#([^[:space:]]+)/, '"#\\1":[https://twitter.com/hashtag/\\1]')
-      desc = desc.gsub(/@([a-zA-Z0-9_]+)/, '"@\\1":[https://twitter.com/\\1]')
-      desc.strip
+      entities += api_response.dig(:entities, :hashtags).to_a.pluck(:indices, :text).map do |e|
+        { first: e[0][0], last: e[0][1], text: e[1], dtext: %Q("##{e[1]}":[https://twitter.com/hashtag/#{Danbooru::URL.escape(e[1])}]) }
+      end
+
+      entities += api_response.dig(:entities, :urls).to_a.pluck(:indices, :expanded_url).map do |e|
+        { first: e[0][0], last: e[0][1], text: e[1], dtext: "<#{e[1]}>" }
+      end
+
+      entities += api_response.dig(:entities, :user_mentions).to_a.pluck(:indices, :screen_name).map do |e|
+        { first: e[0][0], last: e[0][1], text: e[1], dtext: %Q("@#{e[1]}":[https://twitter.com/#{CGI.escape(e[1])}]) }
+      end
+
+      entities += api_response.dig(:entities, :symbols).to_a.pluck(:indices, :text).map do |e|
+        { first: e[0][0], last: e[0][1], text: e[1], dtext: %Q("$#{e[1]}":[https://twitter.com/search?q=$#{CGI.escape(e[1])}]) }
+      end
+
+      entities += api_response.dig(:extended_entities, :media).to_a.pluck(:indices, :expanded_url).map do |e|
+        { first: e[0][0], last: e[0][1], text: e[1], dtext: "" }
+      end
+
+      entities.sort_by! { _1[:first] }
+
+      i = 0
+      entities.each do |entity|
+        dtext << desc[i..entity[:first]-1] if i < entity[:first]
+        dtext << entity[:dtext]
+        i = entity[:last]
+      end
+
+      dtext << desc[i..desc.size]
+      dtext = CGI.unescapeHTML(dtext).strip
+      dtext
     end
 
     def api_client

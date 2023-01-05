@@ -17,9 +17,17 @@ module Sources
         ],
         download_size: 275_713,
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "えのぐマネージャー 丸茂",
+        artist_name: "丸茂_えのぐマネージャー",
         tag_name: "motty08111213",
-        tags: ["岩本町芸能社", "女優部"]
+        tags: ["岩本町芸能社", "女優部"],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          岩本町芸能社女優部のタレント3名がHPに公開されました。
+          部署が違うので私の担当ではありませんが、みんなとても良い子たちです。
+          あんずと環 同様、応援していただけると嬉しいです…！
+          詳細はこちらから↓
+          <http://rbc-geino.com/profile_2/>
+          "#岩本町芸能社":[https://twitter.com/hashtag/岩本町芸能社] "#女優部":[https://twitter.com/hashtag/女優部]
+        EOS
       )
     end
 
@@ -34,7 +42,7 @@ module Sources
         ],
         download_size: 275_713,
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "えのぐマネージャー 丸茂",
+        artist_name: "丸茂_えのぐマネージャー",
         tag_name: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
@@ -51,7 +59,7 @@ module Sources
         ],
         download_size: 275_713,
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "えのぐマネージャー 丸茂",
+        artist_name: "丸茂_えのぐマネージャー",
         tag_name: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
@@ -62,7 +70,10 @@ module Sources
         "https://twitter.com/CincinnatiZoo/status/859073537713328129",
         image_urls: ["https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4"],
         page_url: "https://twitter.com/CincinnatiZoo/status/859073537713328129",
-        download_size: 8_602_983
+        download_size: 8_602_983,
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Fiona loves playing in the hose water just like her parents! 💦 "#TeamFiona":[https://twitter.com/hashtag/TeamFiona] "#fionafix":[https://twitter.com/hashtag/fionafix]
+        EOS
       )
     end
 
@@ -96,7 +107,9 @@ module Sources
       strategy_should_work(
         "https://twitter.com/i/web/status/1252517866059907073",
         image_urls: ["https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4"],
-        download_size: 542_833
+        download_size: 542_833,
+        artist_commentary_desc: "https://t.co/gyTKOSBOQ7",
+        dtext_artist_commentary_desc: ""
       )
     end
 
@@ -117,7 +130,8 @@ module Sources
       strategy_should_work(
         "https://twitter.com/teruyo/status/1058452066060853248",
         profile_url: "https://twitter.com/teruyo",
-        image_urls: []
+        image_urls: [],
+        dtext_artist_commentary_desc: "all the women washizutan2 draws look like roast chicken",
       )
     end
 
@@ -144,7 +158,8 @@ module Sources
         "https://twitter.com/masayasuf/status/870734961778630656",
         deleted: true,
         tag_name: "masayasuf",
-        profile_url: "https://twitter.com/masayasuf"
+        profile_url: "https://twitter.com/masayasuf",
+        dtext_artist_commentary_desc: nil,
       )
     end
 
@@ -153,7 +168,8 @@ module Sources
         "https://twitter.com/tanso_panz/status/1192429800717029377",
         tag_name: "tanso_panz",
         profile_url: "https://twitter.com/tanso_panz",
-        image_urls: []
+        image_urls: [],
+        dtext_artist_commentary_desc: nil,
       )
     end
 
@@ -181,22 +197,27 @@ module Sources
       strategy_should_work(
         "https://twitter.com/kasaishin100/status/1186658635226607616",
         tags: ["西住みほ生誕祭2019"],
-        normalized_tags: ["西住みほ"]
+        normalized_tags: ["西住みほ"],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          みぽりん誕生日おめでとうございます！！🎂
+          ボコボコ探検隊🙌✨
+          "#西住みほ生誕祭2019":[https://twitter.com/hashtag/西住みほ生誕祭2019]
+        EOS
       )
     end
 
     context "A tweet with mentions that can be converted to dtext" do
       strategy_should_work(
         "https://twitter.com/noizave/status/875768175136317440",
-        dtext_artist_commentary_desc: 'test "#foo":[https://twitter.com/hashtag/foo] "#ホワイトデー":[https://twitter.com/hashtag/ホワイトデー] "@noizave":[https://twitter.com/noizave]\'s blah http://www.example.com <>& 😀'
+        dtext_artist_commentary_desc: 'test "#foo":[https://twitter.com/hashtag/foo] "#ホワイトデー":[https://twitter.com/hashtag/ホワイトデー] "@noizave":[https://twitter.com/noizave]\'s blah <http://www.example.com> <>& 😀'
       )
     end
 
-    context "A tweet with normalizable unicode text" do
+    context "A tweet with unicode text" do
       strategy_should_work(
         "https://twitter.com/aprilarcus/status/367557195186970624",
         artist_commentary_desc: "𝖸𝗈 𝐔𝐧𝐢𝐜𝐨𝐝𝐞 𝗅 𝗁𝖾𝗋𝖽 𝕌 𝗅𝗂𝗄𝖾 𝑡𝑦𝑝𝑒𝑓𝑎𝑐𝑒𝑠 𝗌𝗈 𝗐𝖾 𝗉𝗎𝗍 𝗌𝗈𝗆𝖾 𝚌𝚘𝚍𝚎𝚙𝚘𝚒𝚗𝚝𝚜 𝗂𝗇 𝗒𝗈𝗎𝗋 𝔖𝔲𝔭𝔭𝔩𝔢𝔪𝔢𝔫𝔱𝔞𝔯𝔶 𝔚𝔲𝔩𝔱𝔦𝔩𝔦𝔫𝔤𝔳𝔞𝔩 𝔓𝔩𝔞𝔫𝔢 𝗌𝗈 𝗒𝗈𝗎 𝖼𝖺𝗇 𝓮𝓷𝓬𝓸𝓭𝓮 𝕗𝕠𝕟𝕥𝕤 𝗂𝗇 𝗒𝗈𝗎𝗋 𝒇𝒐𝒏𝒕𝒔.",
-        dtext_artist_commentary_desc: "Yo Unicode l herd U like typefaces so we put some codepoints in your Supplementary Wultilingval Plane so you can encode fonts in your fonts."
+        dtext_artist_commentary_desc: "𝖸𝗈 𝐔𝐧𝐢𝐜𝐨𝐝𝐞 𝗅 𝗁𝖾𝗋𝖽 𝕌 𝗅𝗂𝗄𝖾 𝑡𝑦𝑝𝑒𝑓𝑎𝑐𝑒𝑠 𝗌𝗈 𝗐𝖾 𝗉𝗎𝗍 𝗌𝗈𝗆𝖾 𝚌𝚘𝚍𝚎𝚙𝚘𝚒𝚗𝚝𝚜 𝗂𝗇 𝗒𝗈𝗎𝗋 𝔖𝔲𝔭𝔭𝔩𝔢𝔪𝔢𝔫𝔱𝔞𝔯𝔶 𝔚𝔲𝔩𝔱𝔦𝔩𝔦𝔫𝔤𝔳𝔞𝔩 𝔓𝔩𝔞𝔫𝔢 𝗌𝗈 𝗒𝗈𝗎 𝖼𝖺𝗇 𝓮𝓷𝓬𝓸𝓭𝓮 𝕗𝕠𝕟𝕥𝕤 𝗂𝗇 𝗒𝗈𝗎𝗋 𝒇𝒐𝒏𝒕𝒔.",
       )
     end
 
@@ -205,6 +226,38 @@ module Sources
         "https://twitter.com/corpsmanWelt/status/1037724260075069441",
         artist_commentary_desc: %{新しいおともだち\n＃けものフレンズ https://t.co/sEAuu16yAQ},
         dtext_artist_commentary_desc: %{新しいおともだち\n"#けものフレンズ":[https://twitter.com/hashtag/けものフレンズ]}
+      )
+    end
+
+    context "A tweet with mega.nz links" do
+      strategy_should_work(
+        "https://twitter.com/VG_Worklog/status/1587457941418160128",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Sound by: "@RealAudiodude":[https://twitter.com/RealAudiodude] 
+          Download: <https://mega.nz/folder/i80gVL7L#111g2XX7bIJ-2KnAHxMt0w>
+          Support: <https://www.patreon.com/vgerotica>
+        EOS
+      )
+    end
+
+    context "A tweet with fullwidth parentheses" do
+      strategy_should_work(
+        "https://twitter.com/Chanta_in_inari/status/1031042032934871041",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          政長さん（<https://twitter.com/naga_masanaga>）の藍様線画を塗ってましたあ。
+          うーん、かわいい。
+        EOS
+      )
+    end
+
+    context "A tweet with cashtags" do
+      strategy_should_work(
+        "https://twitter.com/CFRJacobsson/status/1608788299665276931",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          "$GOOG":[https://twitter.com/search?q=$GOOG] is the next "$IBM":[https://twitter.com/search?q=$IBM] 🧵
+
+          1/7
+        EOS
       )
     end
 
