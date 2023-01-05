@@ -73,7 +73,7 @@ class PostQuery
   end
 
   def ast
-    @ast ||= Parser.parse(search)
+    @ast ||= Parser.parse(search, metatags: PostQueryBuilder::METATAGS)
   end
 
   def posts

@@ -10,6 +10,9 @@ class MediaAssetTest < ActiveSupport::TestCase
       setup do
         @asset1 = create(:media_asset, image_width: 720, image_height: 1280, file_size: 1.megabyte, file_ext: "jpg", created_at: Time.zone.now, media_metadata: build(:media_metadata, metadata: { "File:FileType" => "JPEG" }))
         @asset2 = create(:media_asset, image_width: 1920, image_height: 1080, file_size: 2.megabytes, file_ext: "png", duration: 3.0, created_at: Time.parse("2022-01-01"), media_metadata: build(:media_metadata, metadata: { "File:FileType" => "PNG" }))
+        @tag = build(:tag, name: "rating:g")
+        @tag.save(validate: false)
+        @ai_tag = create(:ai_tag, media_asset: @asset1, tag: @tag, score: 100)
       end
 
       should "return assets for the id: metatag" do
@@ -68,6 +71,14 @@ class MediaAssetTest < ActiveSupport::TestCase
       should "return assets for the exif: tag" do
         assert_tag_match([@asset2, @asset1], "exif:File:FileType")
         assert_tag_match([@asset1], "exif:File:FileType=JPEG")
+      end
+
+      should "treat unsupported metatags as regular tags" do
+        assert_tag_match([@asset1], "rating:g")
+        assert_tag_match([], "pool:none")
+        assert_tag_match([], "parent:none")
+        assert_tag_match([], "user:bkub")
+        assert_tag_match([], "fav:bkub")
       end
     end
   end

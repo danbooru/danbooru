@@ -4,6 +4,8 @@
 class MediaAssetQuery
   extend Memoist
 
+  METATAGS = %w[id md5 width height duration mpixels ratio filesize filetype date age status is exif]
+
   attr_reader :search_string
   delegate :to_infix, :to_pretty_string, to: :ast
   alias_method :to_s, :to_infix
@@ -17,7 +19,7 @@ class MediaAssetQuery
   end
 
   def ast
-    @ast ||= PostQuery::Parser.parse(search_string)
+    @ast ||= PostQuery::Parser.parse(search_string, metatags: METATAGS)
   end
 
   def normalized_ast
