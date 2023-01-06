@@ -1,6 +1,0 @@
-<% if policy(post).visible? %>
-  <%= content_tag(:picture) do -%>
-    <%= tag.source media: "(max-width: 660px)", srcset: post.tagged_large_file_url -%>
-    <%= tag.img width: post.image_width_for(CurrentUser.user), height: post.image_height_for(CurrentUser.user), id: "image", class: "fit-width", alt: post.presenter.humanized_essential_tag_string, src: post.file_url_for(CurrentUser.user) %>
-  <% end -%>
-<% end %>

@@ -268,13 +268,27 @@
     <% elsif @post.safeblocked? -%>
       <p>This image is unavailable on <%= Danbooru.config.app_name %>. Go to <%= link_to "Danbooru", "https://danbooru.donmai.us" %> or disable safe mode to view (<%= link_to_wiki "learn more", "help:safe_mode" %>).</p>
     <% elsif @post.is_flash? -%>
-      <%= render("posts/partials/show/flash", post: @post) -%>
+      <div class="ruffle-container" data-swf="<%= @post.tagged_file_url %>"></div>
     <% elsif @post.is_video? -%>
-      <%= render("posts/partials/show/video", post: @post) -%>
+      <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_file_url) %>
     <% elsif @post.is_ugoira? -%>
-      <%= render("posts/partials/show/ugoira", post: @post) -%>
-    <% elsif !@post.is_image? -%>
-      <%= render("posts/partials/show/download", post: @post) -%>
+      <% if CurrentUser.user.default_image_size == "large" && params[:original].blank? %>
+        <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_large_file_url) %>
+
+        <p><%= link_to "View original", current_page_path(original: 1) %></p>
+      <% else %>
+        <%= tag.canvas(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, "data-ugoira-frame-delays": @post.media_metadata.metadata["Ugoira:FrameDelays"].to_json) %>
+
+        <div id="ugoira-controls">
+          <div id="ugoira-control-panel" class="mb-2 flex items-center" style="width: <%= [@post.image_width, 350].max %>px;">
+            <button id="ugoira-play" style="display: none;">Play</button>
+            <button id="ugoira-pause">Pause</button>
+            <div id="seek-slider" class="ml-4" style="width: <%= [@post.image_width, 350].max - 81 %>px;"></div>
+          </div>
+
+          <p><%= link_to "View WebM", current_page_path(original: nil) %></p>
+        </div>
+      <% end %>
     <% elsif @post.is_image? -%>
       <picture>
         <%= tag.source media: "(max-width: 660px)", srcset: @post.tagged_large_file_url %>
