@@ -2,10 +2,6 @@ require 'test_helper'
 
 module Sources
   class TwitterTest < ActiveSupport::TestCase
-    setup do
-      skip "Twitter credentials are not configured" if !Source::Extractor::Twitter.enabled?
-    end
-
     context "A https://twitter.com/:username/status/:id url" do
       strategy_should_work(
         "https://twitter.com/motty08111213/status/943446161586733056",
@@ -110,6 +106,22 @@ module Sources
         download_size: 542_833,
         artist_commentary_desc: "https://t.co/gyTKOSBOQ7",
         dtext_artist_commentary_desc: ""
+      )
+    end
+
+    context "A mixed-media tweet" do
+      strategy_should_work(
+        "https://twitter.com/twotenky/status/1577831592227000320",
+        image_urls: %w[
+          https://pbs.twimg.com/media/FeWVcf2VUAATTey.jpg:orig
+          https://video.twimg.com/tweet_video/FeWVcf4VQAAIPTe.mp4
+        ],
+        page_url: "https://twitter.com/twotenky/status/1577831592227000320",
+        tag_name: "twotenky",
+        artist_name: "通天機",
+        profile_url: "https://twitter.com/twotenky",
+        artist_commentary_desc: "動画と静止画がセットでお得と聞いて https://t.co/hWvKoHLN7y",
+        dtext_artist_commentary_desc: "動画と静止画がセットでお得と聞いて",
       )
     end
 

@@ -513,12 +513,6 @@ module Danbooru
       true
     end
 
-    def twitter_api_key
-    end
-
-    def twitter_api_secret
-    end
-
     # If defined, Danbooru will automatically post new forum posts to the
     # Discord channel belonging to this webhook.
     def discord_webhook_id

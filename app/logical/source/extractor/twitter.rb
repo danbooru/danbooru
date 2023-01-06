@@ -19,10 +19,6 @@ class Source::Extractor
       /(?<!\A)版お絵描き60分一本勝負(?:_\d+)?\z/
     ]
 
-    def self.enabled?
-      Danbooru.config.twitter_api_key.present? && Danbooru.config.twitter_api_secret.present?
-    end
-
     def match?
       Source::URL::Twitter === parsed_url
     end
@@ -31,8 +27,8 @@ class Source::Extractor
       # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
       if parsed_url.image_url?
         [parsed_url.full_image_url]
-      elsif api_response.present?
-        api_response.dig(:extended_entities, :media).to_a.map do |media|
+      else
+        api_response[:mediaDetails].to_a.map do |media|
           if media[:type] == "photo"
             media[:media_url_https] + ":orig"
           elsif media[:type].in?(["video", "animated_gif"])
@@ -42,8 +38,6 @@ class Source::Extractor
             video[:url]
           end
         end
-      else
-        []
       end
     end
 
@@ -86,12 +80,8 @@ class Source::Extractor
       end
     end
 
-    def artist_commentary_title
-      ""
-    end
-
     def artist_commentary_desc
-      api_response[:full_text].to_s
+      api_response[:text].to_s
     end
 
     def tags
@@ -133,7 +123,7 @@ class Source::Extractor
         { first: e[0][0], last: e[0][1], text: e[1], dtext: %Q("$#{e[1]}":[https://twitter.com/search?q=$#{CGI.escape(e[1])}]) }
       end
 
-      entities += api_response.dig(:extended_entities, :media).to_a.pluck(:indices, :expanded_url).map do |e|
+      entities += api_response.dig(:entities, :media).to_a.pluck(:indices, :expanded_url).map do |e|
         { first: e[0][0], last: e[0][1], text: e[1], dtext: "" }
       end
 
@@ -151,13 +141,15 @@ class Source::Extractor
       dtext
     end
 
-    def api_client
-      TwitterApiClient.new(Danbooru.config.twitter_api_key, Danbooru.config.twitter_api_secret, http: http)
-    end
+    memoize def api_response
+      return {} if status_id.blank?
 
-    def api_response
-      return {} unless self.class.enabled? && status_id.present?
-      api_client.status(status_id)
+      # https://publish.twitter.com/?query=https%3A%2F%2Ftwitter.com%2Ftwotenky%2Fstatus%2F1577831592227000320
+      # https://cdn.syndication.twimg.com/tweet-result?id=1577831592227000320
+      response = http.get("https://cdn.syndication.twimg.com/tweet-result?id=#{status_id}")
+      return {} if response.code != 200
+
+      response.parse.with_indifferent_access
     end
 
     def status_id
@@ -167,7 +159,5 @@ class Source::Extractor
     def tag_name_from_url
       parsed_url.username || parsed_referer&.username
     end
-
-    memoize :api_response
   end
 end
