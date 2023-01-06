@@ -88,8 +88,8 @@ module Sources
 
     context "A cover image" do
       strategy_should_work(
-        "https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/QqxYtuWdy4XWQx1ZLIqr4wvA.jpeg",
-        download_size: 750_484,
+        "https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/pYOm2wWFyzffzZaty7fbHiJ1.jpeg",
+        download_size: 562_582,
         profile_url: "https://omu001.fanbox.cc"
       )
     end

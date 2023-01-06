@@ -1,6 +1,6 @@
 $(function() {
   let $comment = $("#comment_<%= @comment.id %>");
-  let html = "<%= j render_comment(@comment, current_user: CurrentUser.user, **params.require(:component).permit(:classes, :context).to_h.symbolize_keys) %>";
+  let html = "<%= j render_comment(@comment, current_user: CurrentUser.user, **params[:component]&.permit(:classes, :context).to_h.symbolize_keys) %>";
   $comment.replaceWith(html);
   // Alpine.moprh(comment, html); // XXX breaks state of the popup menu
 });

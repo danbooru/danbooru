@@ -3,35 +3,58 @@ require "test_helper"
 module Sources
   class BoothTest < ActiveSupport::TestCase
     context "A booth post" do
-      images = %w[
-        https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/ae0fdbcf-e4c5-4840-8d5c-43e18bddc93e.jpg
-        https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/d12bce50-a0c7-43f8-a4fb-5ee0ea6855a3.jpg
-        https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/f5332da3-4097-4d33-bbf6-a9b64c7671b3.jpg
-      ]
       strategy_should_work(
-        "https://booth.pm/en/items/3713604",
-        image_urls: images,
-        profile_url: "https://amedamacon.booth.pm",
-        page_url: "https://booth.pm/en/items/3713604",
-        artist_name: "amedamacon",
-        other_names: ["あめうさぎBOOTH"],
-        tags: [["抱き枕カバー", "https://booth.pm/en/browse/Pillow%20Cover?tags%5B%5D=%E6%8A%B1%E3%81%8D%E6%9E%95%E3%82%AB%E3%83%90%E3%83%BC"]],
-        artist_commentary_title: "フユちゃん抱き枕カバー",
-        dtext_artist_commentary_desc: /発送：6月上旬頃（BOOTH倉庫より発送）/
+        "https://booth.pm/en/items/3240411",
+        image_urls: %w[
+          https://booth.pximg.net/767c867a-c6c7-426b-80b6-894d92993db3/i/3240411/150d3a16-7339-4484-b95f-63638c0b75d2.png
+          https://booth.pximg.net/767c867a-c6c7-426b-80b6-894d92993db3/i/3240411/1207a003-baf5-49b5-8010-e986dd00e63a.jpg
+          https://booth.pximg.net/767c867a-c6c7-426b-80b6-894d92993db3/i/3240411/ce9b3c6c-5f00-47b0-9bd1-fb9619a36531.jpg
+        ],
+        profile_url: "https://cullmee.booth.pm",
+        page_url: "https://booth.pm/en/items/3240411",
+        artist_name: "cullmee",
+        other_names: ["くるみ"],
+        tags: [["アイドルマスターシャイニーカラーズ", "https://booth.pm/en/browse/Acrylic%20Figure?tags%5B%5D=%E3%82%A2%E3%82%A4%E3%83%89%E3%83%AB%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%82%B7%E3%83%A3%E3%82%A4%E3%83%8B%E3%83%BC%E3%82%AB%E3%83%A9%E3%83%BC%E3%82%BA"]],
+        artist_commentary_title: "月岡恋鐘 日本横断フェア アクリルスタンド",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          歌姫庭園28にて頒布した月岡恋鐘(日本横断フェア衣装)のアクリルスタンド
+          高さ140mm×幅8mm(約)
+          厚さ3mm
+        EOS
       )
     end
 
-    context "A booth image" do
+    context "An active booth image" do
+      strategy_should_work(
+        "https://booth.pximg.net/767c867a-c6c7-426b-80b6-894d92993db3/i/3240411/150d3a16-7339-4484-b95f-63638c0b75d2.png",
+        image_urls: %w[
+          https://booth.pximg.net/767c867a-c6c7-426b-80b6-894d92993db3/i/3240411/150d3a16-7339-4484-b95f-63638c0b75d2.png
+        ],
+        profile_url: "https://cullmee.booth.pm",
+        page_url: "https://booth.pm/en/items/3240411",
+        artist_name: "cullmee",
+        other_names: ["くるみ"],
+        tags: [["アイドルマスターシャイニーカラーズ", "https://booth.pm/en/browse/Acrylic%20Figure?tags%5B%5D=%E3%82%A2%E3%82%A4%E3%83%89%E3%83%AB%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%82%B7%E3%83%A3%E3%82%A4%E3%83%8B%E3%83%BC%E3%82%AB%E3%83%A9%E3%83%BC%E3%82%BA"]],
+        artist_commentary_title: "月岡恋鐘 日本横断フェア アクリルスタンド",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          歌姫庭園28にて頒布した月岡恋鐘(日本横断フェア衣装)のアクリルスタンド
+          高さ140mm×幅8mm(約)
+          厚さ3mm
+        EOS
+      )
+    end
+
+    context "A deleted booth image" do
       strategy_should_work(
         "https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/d12bce50-a0c7-43f8-a4fb-5ee0ea6855a3_base_resized.jpg",
         image_urls: ["https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/d12bce50-a0c7-43f8-a4fb-5ee0ea6855a3.jpg"],
-        profile_url: "https://amedamacon.booth.pm",
         page_url: "https://booth.pm/en/items/3713604",
-        artist_name: "amedamacon",
-        other_names: ["あめうさぎBOOTH"],
-        tags: [["抱き枕カバー", "https://booth.pm/en/browse/Pillow%20Cover?tags%5B%5D=%E6%8A%B1%E3%81%8D%E6%9E%95%E3%82%AB%E3%83%90%E3%83%BC"]],
-        artist_commentary_title: "フユちゃん抱き枕カバー",
-        dtext_artist_commentary_desc: /発送：6月上旬頃（BOOTH倉庫より発送）/
+        profile_url: nil,
+        artist_name: nil,
+        other_names: [],
+        tags: [],
+        artist_commentary_title: nil,
+        dtext_artist_commentary_desc: "",
       )
     end
 
