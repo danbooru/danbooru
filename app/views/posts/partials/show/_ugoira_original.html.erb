@@ -15,5 +15,5 @@
     <div id="seek-slider" class="ml-4" style="width: <%= [@post.image_width, 350].max - 81 %>px;"></div>
   </div>
 
-  <%= link_to "Save as video (right click and save)", post.tagged_large_file_url %>
+  <p><%= link_to "View WebM", current_page_path(original: nil) %></p>
 </div>
