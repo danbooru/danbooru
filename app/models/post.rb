@@ -1054,6 +1054,123 @@ class Post < ApplicationRecord
         end
       end
 
+      def metatag_matches(name, value, current_user = User.anonymous, quoted: false)
+        case name
+        when "id"
+          attribute_matches(value, :id)
+        when "md5"
+          attribute_matches(value, :md5, :md5)
+        when "width"
+          attribute_matches(value, "media_assets.image_width").joins(:media_asset)
+        when "height"
+          attribute_matches(value, "media_assets.image_height").joins(:media_asset)
+        when "mpixels"
+          attribute_matches(value, "(media_assets.image_width * media_assets.image_height) / 1000000.0", :float).joins(:media_asset)
+        when "ratio"
+          attribute_matches(value, "ROUND(media_assets.image_width::numeric / media_assets.image_height::numeric, 2)", :ratio).joins(:media_asset)
+        when "score"
+          attribute_matches(value, :score)
+        when "upvotes"
+          attribute_matches(value, :up_score)
+        when "downvotes"
+          attribute_matches(value, "ABS(posts.down_score)")
+        when "favcount"
+          attribute_matches(value, :fav_count)
+        when "filesize"
+          attribute_matches(value, "media_assets.file_size", :filesize).joins(:media_asset)
+        when "filetype"
+          attribute_matches(value, "media_assets.file_ext", :enum).joins(:media_asset)
+        when "date"
+          attribute_matches(value, :created_at, :date)
+        when "age"
+          attribute_matches(value, :created_at, :age)
+        when "pixiv", "pixiv_id"
+          attribute_matches(value, :pixiv_id)
+        when "tagcount"
+          attribute_matches(value, :tag_count)
+        when "duration"
+          attribute_matches(value, "media_assets.duration", :float).joins(:media_asset)
+        when "is"
+          is_matches(value, current_user)
+        when "has"
+          has_matches(value)
+        when "status"
+          status_matches(value, current_user)
+        when "parent"
+          parent_matches(value)
+        when "child"
+          child_matches(value)
+        when "rating"
+          rating_matches(value)
+        when "embedded"
+          embedded_matches(value)
+        when "source"
+          source_matches(value, quoted)
+        when "disapproved"
+          disapproved_matches(value, current_user)
+        when "commentary"
+          commentary_matches(value, quoted)
+        when "note"
+          note_matches(value)
+        when "comment"
+          comment_matches(value)
+        when "search"
+          saved_search_matches(value, current_user)
+        when "pool"
+          pool_matches(value)
+        when "ordpool"
+          ordpool_matches(value)
+        when "favgroup"
+          favgroup_matches(value, current_user)
+        when "ordfavgroup"
+          ordfavgroup_matches(value, current_user)
+        when "fav"
+          favorites_include(value, current_user)
+        when "ordfav"
+          ordfav_matches(value, current_user)
+        when "unaliased"
+          tags_include(value)
+        when "exif"
+          exif_matches(value)
+        when "ai"
+          ai_tags_include(value)
+        when "user"
+          uploader_matches(value)
+        when "approver"
+          approver_matches(value)
+        when "flagger"
+          user_subquery_matches(PostFlag.unscoped.category_matches("normal"), value, current_user)
+        when "appealer"
+          user_subquery_matches(PostAppeal.unscoped, value, current_user)
+        when "commenter", "comm"
+          user_subquery_matches(Comment.unscoped, value, current_user)
+        when "commentaryupdater", "artcomm"
+          user_subquery_matches(ArtistCommentaryVersion.unscoped, value, current_user, field: :updater)
+        when "noter"
+          user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, current_user, field: :updater)
+        when "noteupdater"
+          user_subquery_matches(NoteVersion.unscoped, value, current_user, field: :updater)
+        when "upvoter", "upvote"
+          user_subquery_matches(PostVote.active.positive.visible(current_user), value, current_user, field: :user)
+        when "downvoter", "downvote"
+          user_subquery_matches(PostVote.active.negative.visible(current_user), value, current_user, field: :user)
+        when *PostQueryBuilder::CATEGORY_COUNT_METATAGS
+          short_category = name.delete_suffix("tags")
+          category = TagCategory.short_name_mapping[short_category]
+          attribute_matches(value, :"tag_count_#{category}")
+        when *PostQueryBuilder::COUNT_METATAGS
+          attribute_matches(value, name.to_sym)
+        when "random"
+          all # handled elsewhere
+        when "limit"
+          all
+        when "order"
+          all
+        else
+          raise NotImplementedError, "metatag not implemented"
+        end
+      end
+
       def is_matches(value, current_user = User.anonymous)
         case value.downcase
         when "parent"
@@ -1346,6 +1463,145 @@ class Post < ApplicationRecord
         end
       end
 
+      def order_matches(order)
+        case order.to_s.downcase
+        when "id", "id_asc"
+          reorder("posts.id ASC")
+
+        when "id_desc"
+          reorder("posts.id DESC")
+
+        when "md5", "md5_desc"
+          reorder("posts.md5 DESC")
+
+        when "md5_asc"
+          reorder("posts.md5 ASC")
+
+        when "score", "score_desc"
+          reorder("posts.score DESC, posts.id DESC")
+
+        when "score_asc"
+          reorder("posts.score ASC, posts.id ASC")
+
+        when "upvotes", "upvotes_desc"
+          reorder("posts.up_score DESC, posts.id DESC")
+
+        when "upvotes_asc"
+          reorder("posts.up_score ASC, posts.id ASC")
+
+        # XXX down_score is negative so order:downvotes sorts lowest-to-highest so that most downvoted is first.
+        when "downvotes", "downvotes_desc"
+          reorder("posts.down_score ASC, posts.id ASC")
+
+        when "downvotes_asc"
+          reorder("posts.down_score DESC, posts.id DESC")
+
+        when "favcount"
+          reorder("posts.fav_count DESC, posts.id DESC")
+
+        when "favcount_asc"
+          reorder("posts.fav_count ASC, posts.id ASC")
+
+        when "created_at", "created_at_desc"
+          reorder("posts.created_at DESC")
+
+        when "created_at_asc"
+          reorder("posts.created_at ASC")
+
+        when "change", "change_desc"
+          reorder("posts.updated_at DESC, posts.id DESC")
+
+        when "change_asc"
+          reorder("posts.updated_at ASC, posts.id ASC")
+
+        when "comment", "comm"
+          reorder("posts.last_commented_at DESC NULLS LAST, posts.id DESC")
+
+        when "comment_asc", "comm_asc"
+          reorder("posts.last_commented_at ASC NULLS LAST, posts.id ASC")
+
+        when "comment_bumped"
+          reorder("posts.last_comment_bumped_at DESC NULLS LAST")
+
+        when "comment_bumped_asc"
+          reorder("posts.last_comment_bumped_at ASC NULLS FIRST")
+
+        when "note"
+          reorder("posts.last_noted_at DESC NULLS LAST")
+
+        when "note_asc"
+          reorder("posts.last_noted_at ASC NULLS FIRST")
+
+        when "artcomm"
+          joins(:artist_commentary).reorder("artist_commentaries.updated_at DESC")
+
+        when "artcomm_asc"
+          joins(:artist_commentary).reorder("artist_commentaries.updated_at ASC")
+
+        when "mpixels", "mpixels_desc"
+          # Use "w*h/1000000", even though "w*h" would give the same result, so this can use the posts_mpixels index.
+          joins(:media_asset).reorder(Arel.sql("media_assets.image_width * media_assets.image_height / 1000000.0 DESC"))
+
+        when "mpixels_asc"
+          joins(:media_asset).reorder(Arel.sql("media_assets.image_width * media_assets.image_height / 1000000.0 ASC"))
+
+        when "portrait"
+          joins(:media_asset).reorder(Arel.sql("media_assets.image_width::numeric / media_assets.image_height::numeric ASC"))
+
+        when "landscape"
+          joins(:media_asset).reorder(Arel.sql("media_assets.image_width::numeric / media_assets.image_height::numeric DESC"))
+
+        when "filesize", "filesize_desc"
+          joins(:media_asset).reorder("media_assets.file_size DESC")
+
+        when "filesize_asc"
+          joins(:media_asset).reorder("media_assets.file_size ASC")
+
+        when /\A(?<column>#{PostQueryBuilder::COUNT_METATAGS.join("|")})(_(?<direction>asc|desc))?\z/i
+          column = $~[:column]
+          direction = $~[:direction] || "desc"
+          reorder(column => direction, :id => direction)
+
+        when "tagcount", "tagcount_desc"
+          reorder("posts.tag_count DESC")
+
+        when "tagcount_asc"
+          reorder("posts.tag_count ASC")
+
+        when "duration", "duration_desc"
+          joins(:media_asset).reorder("media_assets.duration DESC NULLS LAST, posts.id DESC")
+
+        when "duration_asc"
+          joins(:media_asset).reorder("media_assets.duration ASC NULLS LAST, posts.id ASC")
+
+        # artags_desc, copytags_desc, chartags_desc, gentags_desc, metatags_desc
+        when /(#{TagCategory.short_name_list.join("|")})tags(?:\Z|_desc)/
+          reorder("posts.tag_count_#{TagCategory.short_name_mapping[$1]} DESC")
+
+        # artags_asc, copytags_asc, chartags_asc, gentags_asc, metatags_asc
+        when /(#{TagCategory.short_name_list.join("|")})tags_asc/
+          reorder("posts.tag_count_#{TagCategory.short_name_mapping[$1]} ASC")
+
+        when "random"
+          reorder("random()")
+
+        when "rank"
+          where("posts.score > 0 and posts.created_at >= ?", 2.days.ago).reorder(Arel.sql("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC"))
+
+        when "modqueue", "modqueue_desc"
+          with_queued_at.reorder("queued_at DESC, posts.id DESC")
+
+        when "modqueue_asc"
+          with_queued_at.reorder("queued_at ASC, posts.id ASC")
+
+        when "none"
+          reorder(nil)
+
+        else
+          reorder("posts.id DESC")
+        end
+      end
+
       def tags_include(*tags)
         where_array_includes_all("string_to_array(posts.tag_string, ' ')", tags)
       end
@@ -1399,7 +1655,7 @@ class Post < ApplicationRecord
         end
 
         if params[:order].present?
-          q = PostQueryBuilder.new(nil).search_order(q, params[:order])
+          q = q.order_matches(params[:order])
         else
           q = q.apply_default_order(params)
         end
