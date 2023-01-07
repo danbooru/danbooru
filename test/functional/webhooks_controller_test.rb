@@ -1,13 +1,7 @@
 require 'test_helper'
 
 class WebhooksControllerTest < ActionDispatch::IntegrationTest
-  setup do
-    StripeMock.start
-  end
-
-  teardown do
-    StripeMock.stop
-  end
+  mock_stripe!
 
   def post_stripe_webhook(*args, metadata: {}, payment_status: "paid")
     skip unless PaymentTransaction::Stripe.enabled?
