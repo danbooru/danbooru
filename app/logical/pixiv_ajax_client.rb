@@ -359,8 +359,6 @@
 # }
 
 class PixivAjaxClient
-  USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36"
-
   attr_reader :phpsessid, :http
 
   # @param phpsessid [String] the Pixiv login cookie
@@ -410,6 +408,6 @@ class PixivAjaxClient
 
   # @return [Danbooru::Http] the HTTP client used for Pixiv
   def client
-    @client ||= http.headers("User-Agent": USER_AGENT).cookies(PHPSESSID: phpsessid)
+    @client ||= http.cookies(PHPSESSID: phpsessid)
   end
 end

@@ -34,6 +34,8 @@ module Danbooru
     class DownloadError < Error; end
     class FileTooLargeError < Error; end
 
+    DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0"
+
     DEFAULT_TIMEOUT = 20
     MAX_REDIRECTS = 5
 
@@ -59,9 +61,9 @@ module Danbooru
       if Danbooru.config.http_proxy.present?
         # XXX The `proxy` option is incompatible with the `public_only` option. When using a proxy, the proxy itself
         # should be configured to block HTTP requests to IPs on the local network.
-        new.proxy.headers("User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0")
+        new.proxy.headers("User-Agent": DEFAULT_USER_AGENT)
       else
-        new.public_only.headers("User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0")
+        new.public_only.headers("User-Agent": DEFAULT_USER_AGENT)
       end
     end
 
