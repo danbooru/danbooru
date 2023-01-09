@@ -570,7 +570,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(true, @file.is_corrupt?)
       assert_equal("libvips error", @file.error)
-      assert_nil(@file.frame_count)
+      assert_equal(1, @file.frame_count)
       assert_equal([575, 800], @file.dimensions)
       assert_equal("File format error", @metadata["ExifTool:Error"])
       assert_equal("89a", @metadata["GIF:GIFVersion"])
