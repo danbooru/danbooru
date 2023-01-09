@@ -1,0 +1,15 @@
+<%= tag.div class: ["tab-panel-component", *Array.wrap(classes)], "x-data": "{ active: 0 }" do %>
+  <div class="tab-list">
+    <% tabs.each_with_index do |tab, i| %>
+      <%= link_to tab.name, tab.url, class: ["tab", ("active-tab" if i == 0)], "x-on:click.prevent": "active = #{i}", "x-bind:class": "{ 'active-tab': active === #{i} }" %>
+    <% end %>
+  </div>
+
+  <div class="tab-panels">
+    <% panels.each_with_index do |panel, i| %>
+      <%= tag.div class: "tab-panel", style: ("display: none;" if i != 0), "x-show": "active === #{i}" do %>
+        <%= panel %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

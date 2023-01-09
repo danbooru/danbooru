@@ -1,0 +1,29 @@
+@import "../../javascript/src/styles/base/000_vars";
+
+.tab-panel-component {
+  &.horizontal-tab-panel {
+    .tab-list {
+      display: flex;
+      flex-wrap: wrap;
+      border-bottom-width: 1px;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      .tab {
+        display: inline-block;
+        padding: 0.25rem;
+        padding-bottom: 0.5rem;
+      }
+
+      .active-tab {
+        border-color: currentColor;
+        border-bottom-width: 0.125rem;
+        margin-bottom: -1px;
+      }
+
+      :not(.active-tab) {
+        @include inactive-link;
+      }
+    }
+  }
+}
