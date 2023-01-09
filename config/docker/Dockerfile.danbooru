@@ -64,6 +64,9 @@ FROM base as production
 ENV LD_PRELOAD=libjemalloc.so.2
 ENV MALLOC_CONF=background_thread:true,narenas:2,dirty_decay_ms:1000,muzzy_decay_ms:0,tcache:false
 
+# Disable libvips warning messages
+ENV VIPS_WARNING=0
+
 COPY --from=development /root /root
 COPY --from=development /danbooru /danbooru
 

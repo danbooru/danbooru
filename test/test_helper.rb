@@ -8,6 +8,7 @@ Dir["#{Rails.root}/test/factories/*.rb"].sort.each { |file| require file }
 Dir["#{Rails.root}/test/test_helpers/*.rb"].sort.each { |file| require file }
 
 Minitest::Reporters.use!(Minitest::Reporters::ProgressReporter.new)
+Minitest::Ci.report_dir = "tmp/reports"
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :minitest

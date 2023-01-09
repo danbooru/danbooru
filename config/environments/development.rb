@@ -71,6 +71,7 @@ Rails.application.configure do
   logger           = ActiveSupport::Logger.new(STDERR)
   logger.formatter = config.log_formatter
   config.logger    = ActiveSupport::TaggedLogging.new(logger)
+  config.log_level = :debug
 
   BetterErrors::Middleware.allow_ip!(IPAddr.new("0.0.0.0/0"))
   BetterErrors::Middleware.allow_ip!(IPAddr.new("::/0"))

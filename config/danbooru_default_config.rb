@@ -125,11 +125,11 @@ module Danbooru
       "_danbooru2_session"
     end
 
-    # Debug mode does some things to make testing easier. It disables parallel
-    # testing and it replaces Danbooru's custom exception page with the default
-    # Rails exception page. This is only useful during development and testing.
+    # Debug mode does some things to make testing easier. It outputs more verbose logs, it disables parallel testing,
+    # and it replaces Danbooru's custom exception page with the default Rails exception page. This is only useful during
+    # development and testing.
     #
-    # Usage: `DANBOORU_DEBUG_MODE=true bin/rails test
+    # Usage: DANBOORU_DEBUG_MODE=true bin/rails test
     def debug_mode
       false
     end
