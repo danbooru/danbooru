@@ -34,7 +34,7 @@ class FileTypeDetector
       :webm
 
     # https://developers.google.com/speed/webp/docs/riff_container
-    when /\ARIFF....WEBP/
+    when /\ARIFF....WEBP/nm
       :webp
 
     # https://www.ftyps.com
@@ -49,11 +49,11 @@ class FileTypeDetector
     # 3gp5 (rare) - 3GPP Media (.3GP) Release 5 (XXX technically this should be .3gp, not .mp4. Supported by Chrome but not Firefox)
     # avc1 (rare) - MP4 Base w/ AVC ext [ISO 14496-12:2005]
     # M4V (rare) - Apple iTunes Video (https://en.wikipedia.org/wiki/M4V)
-    when /\A....ftyp(?:mp4|avc|iso|3gp5|M4V)/
+    when /\A....ftyp(?:mp4|avc|iso|3gp5|M4V)/nm
       :mp4
 
     # https://aomediacodec.github.io/av1-avif/#brands-overview
-    when /\A....ftyp(?:avif|avis)/
+    when /\A....ftyp(?:avif|avis)/nm
       :avif
 
     # https://www.loc.gov/preservation/digital/formats/fdd/fdd000354.shtml#sign

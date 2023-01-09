@@ -603,6 +603,19 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
+  context "a corrupt WEBP" do
+    should "still read the metadata" do
+      @file = MediaFile.open("test/files/webp/truncated.webp")
+      @metadata = @file.metadata
+
+      assert_equal(true, @file.is_corrupt?)
+      assert_equal(:webp, @file.file_ext)
+      assert_equal("libvips error", @file.error)
+      assert_equal([800, 1067], @file.dimensions)
+      assert_equal(28, @metadata.count)
+    end
+  end
+
   context "a greyscale image without an embedded color profile" do
     should "successfully generate a thumbnail" do
       @image = MediaFile.open("test/files/test-grey-no-profile.jpg")
