@@ -9,7 +9,7 @@ class MediaAssetTest < ActiveSupport::TestCase
     context "searching" do
       setup do
         @asset1 = create(:media_asset, image_width: 720, image_height: 1280, file_size: 1.megabyte, file_ext: "jpg", created_at: Time.zone.now, media_metadata: build(:media_metadata, metadata: { "File:FileType" => "JPEG" }))
-        @asset2 = create(:media_asset, image_width: 1920, image_height: 1080, file_size: 2.megabytes, file_ext: "png", duration: 3.0, created_at: Time.parse("2022-01-01"), media_metadata: build(:media_metadata, metadata: { "File:FileType" => "PNG" }))
+        @asset2 = create(:media_asset, image_width: 1920, image_height: 1080, file_size: 2.megabytes, file_ext: "png", duration: 3.0, created_at: Time.zone.parse("2022-01-01"), media_metadata: build(:media_metadata, metadata: { "File:FileType" => "PNG" }))
         @tag = build(:tag, name: "rating:g")
         @tag.save(validate: false)
         @ai_tag = create(:ai_tag, media_asset: @asset1, tag: @tag, score: 100)

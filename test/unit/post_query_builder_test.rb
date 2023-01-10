@@ -156,7 +156,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for an invalid metatag value" do
       should "return nothing" do
-        post = create(:post_with_file, created_at: Time.parse("2021-06-15 12:00:00"), score: 42, filename: "test.jpg")
+        post = create(:post_with_file, created_at: Time.zone.parse("2021-06-15 12:00:00"), score: 42, filename: "test.jpg")
 
         assert_tag_match([], "score:foo")
         assert_tag_match([], "score:42x")

@@ -19,7 +19,7 @@ module Sources
         assert_equal([], source.tags)
         assert_equal("大きく育った心春ちゃん1", source.artist_commentary_title)
         assert_equal("色々やります", source.artist_commentary_desc)
-        assert_downloaded(3_692_131, url)
+        assert_downloaded(3_694_895, url)
         assert_nothing_raised { source.to_h }
       end
     end
@@ -53,7 +53,7 @@ module Sources
         assert_equal(tags, source.tags.map(&:first))
         assert_equal("2021年9月更新分[PNG] - September 2021", source.artist_commentary_title)
         assert_match(/This is the same as the image data updated in September 2021/, source.artist_commentary_desc)
-        assert_downloaded(288_801, url)
+        assert_downloaded(289_848, url)
         assert_nothing_raised { source.to_h }
       end
     end
@@ -125,7 +125,7 @@ module Sources
         assert_equal("https://fantia.jp/fanclubs/7", source.profile_url)
         assert_equal("https://fantia.jp/products/249638", source.page_url)
 
-        assert_downloaded(288_801, source.image_urls[0])
+        assert_downloaded(289_848, source.image_urls[0])
         assert_downloaded(515_598, source.image_urls[1])
         assert_downloaded(613_103, source.image_urls[2])
         assert_downloaded(146_837, source.image_urls[3])

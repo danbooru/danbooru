@@ -12,10 +12,10 @@ class UploadTest < ActiveSupport::TestCase
         @asset2 = create(:media_asset, image_width: 1920, image_height: 1080, file_size: 2.megabytes, file_ext: "png", duration: 3.0, media_metadata: build(:media_metadata, metadata: { "File:FileType" => "PNG" }))
 
         @uma1 = build(:upload_media_asset, media_asset: @asset1, status: "active", created_at: Time.zone.now)
-        @uma2 = build(:upload_media_asset, media_asset: @asset2, status: "active", created_at: Time.parse("2022-01-01"))
+        @uma2 = build(:upload_media_asset, media_asset: @asset2, status: "active", created_at: Time.zone.parse("2022-01-01"))
 
         @upload1 = create(:upload, created_at: Time.zone.now, upload_media_assets: [@uma1])
-        @upload2 = create(:upload, created_at: Time.parse("2022-01-01"), upload_media_assets: [@uma2])
+        @upload2 = create(:upload, created_at: Time.zone.parse("2022-01-01"), upload_media_assets: [@uma2])
       end
 
       should "return assets for the id: metatag" do
