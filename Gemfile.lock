@@ -291,8 +291,6 @@ GEM
     mini_mime (1.1.2)
     mini_portile2 (2.8.1)
     minitest (5.17.0)
-    minitest-ci (3.4.0)
-      minitest (>= 5.0.6)
     minitest-reporters (1.5.0)
       ansi
       builder
@@ -566,7 +564,6 @@ DEPENDENCIES
   mail (< 2.8)
   memoist
   memory_profiler
-  minitest-ci
   minitest-reporters
   mocha
   mock_redis

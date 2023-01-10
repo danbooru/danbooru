@@ -83,7 +83,6 @@ group :test do
   gem "factory_bot"
   gem "mocha", require: "mocha/minitest"
   gem "simplecov", require: false
-  gem "minitest-ci"
   gem "minitest-reporters", require: "minitest/reporters"
   gem "mock_redis"
   gem "capybara"
