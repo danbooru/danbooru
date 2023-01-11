@@ -9,7 +9,8 @@ Dir["#{Rails.root}/test/test_helpers/*.rb"].sort.each { |file| require file }
 
 Minitest::Reporters.use!([
   Minitest::Reporters::ProgressReporter.new,
-  Minitest::Reporters::JUnitReporter.new("tmp/reports")
+  Minitest::Reporters::HtmlReporter.new(reports_dir: "tmp/html-test-results"),
+  Minitest::Reporters::JUnitReporter.new("tmp/junit-test-results")
 ])
 
 Shoulda::Matchers.configure do |config|

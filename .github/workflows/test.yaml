@@ -1,4 +1,12 @@
 # Run the test suite after the Docker image is successfully built.
+#
+# Test locally:
+#
+#     # https://github.com/settings/tokens
+#     # https://github.com/nektos/act
+#     GITHUB_TOKEN="..."
+#     echo $GITHUB_TOKEN | docker login ghcr.io -u evazion --password-stdin
+#    ./act -s GITHUB_TOKEN=$GITHUB_TOKEN -j test -v --artifact-server-path tmp/artifacts
 
 name: Test
 
@@ -107,27 +115,11 @@ jobs:
       if: always()
       with:
         name: test-results
-        # path: "**/TEST-*.xml" # XXX this doesn't work because the action has a bug with following symlinks
-        path: "/tmp/reports/TEST-*.xml"
-
-
-  publish-test-results:
-    name: Publish test results
-    needs: test
-    runs-on: ubuntu-latest
-    if: always()
-    permissions:
-      checks: write
-
-    steps:
-    - name: Download results
-      uses: actions/download-artifact@v3
-      with:
-        name: test-results
-        path: test-results
+        path: |
+          /tmp/html-test-results/index.html
+          /tmp/junit-test-results/TEST-*.xml
 
     - name: Publish test results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      with:
-        junit_files: "test-results/**/*.xml"
-        comment_mode: off
+      if: always()
+      run: |
+        bin/github-print-test-results /tmp/junit-test-results/TEST-*.xml
