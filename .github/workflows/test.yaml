@@ -18,6 +18,10 @@ on:
         required: false
         default: false
 
+defaults:
+ run:
+   working-directory: /danbooru
+
 jobs:
   test:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -32,6 +36,7 @@ jobs:
       options: --user root
 
     env:
+      HOME: /root
       RAILS_ENV: test
       PARALLEL_WORKERS: 8 # number of parallel tests to run
       RUBYOPT: -W0 # silence ruby warnings
@@ -91,13 +96,38 @@ jobs:
 
     - name: Prepare database
       run: |
-        export HOME=/root
-        cd /danbooru
         bin/rails db:test:prepare
 
     - name: Run tests
       run: |
-        export HOME=/root
-        cd /danbooru
-        ln -s packs public/packs-test
         bin/rails test
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        # path: "**/TEST-*.xml" # XXX this doesn't work because the action has a bug with following symlinks
+        path: "/tmp/reports/TEST-*.xml"
+
+
+  publish-test-results:
+    name: Publish test results
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    permissions:
+      checks: write
+
+    steps:
+    - name: Download results
+      uses: actions/download-artifact@v3
+      with:
+        name: test-results
+        path: test-results
+
+    - name: Publish test results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        junit_files: "test-results/**/*.xml"
+        comment_mode: off
