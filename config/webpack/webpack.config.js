@@ -1,5 +1,6 @@
 const { webpackConfig: baseWebpackConfig, merge } = require("shakapacker");
 const ESLintPlugin = require("eslint-webpack-plugin");
+const StylelintPlugin = require("stylelint-webpack-plugin");
 const path = require("path");
 
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -18,6 +19,10 @@ module.exports = merge({}, baseWebpackConfig, {
       cache: true,
       threads: true,
       emitWarning: true
+    }),
+    isDevelopment && new StylelintPlugin({
+      context: "app/javascript/src/styles",
+      threads: true,
     }),
   ].filter(Boolean),
   module: {

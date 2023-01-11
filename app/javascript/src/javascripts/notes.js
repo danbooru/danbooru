@@ -388,7 +388,7 @@ class Note {
       if (this.note.embed && this.note.has_rotation) {
         const box_data = this.note.box.get_bounding_box();
         // Select the lowest box corner to the farthest left
-        let selected_corner = box_data.norm_coord.reduce(function (selected, coord) {return (selected[1] > coord[1]) || (selected[1] === coord[1] && selected[0] < coord[0]) ? selected : coord;});
+        let selected_corner = box_data.norm_coord.reduce(function (selected, coord) { return (selected[1] > coord[1]) || (selected[1] === coord[1] && selected[0] < coord[0]) ? selected : coord; });
         let normalized_degrees = box_data.degrees % 90.0;
         // Align to the left or right body corner depending upon the box angle
         let body_corner = $note_box.position().left - (normalized_degrees > 0.0 && normalized_degrees <= 45.0 ? $note_body.width() : 0);

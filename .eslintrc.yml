@@ -50,6 +50,7 @@ rules:
 
   # formatting issues
   array-bracket-spacing: warn
+  block-spacing: warn
   brace-style: [warn, 1tbs, allowSingleLine: true]
   comma-spacing: warn
   curly: warn
@@ -60,6 +61,7 @@ rules:
   linebreak-style: [warn, unix]
   key-spacing: warn
   keyword-spacing: warn
+  no-multi-spaces: warn
   no-multiple-empty-lines: warn
   no-tabs: warn
   no-trailing-spaces: warn
@@ -72,7 +74,6 @@ rules:
 
 # These rules are potentially useful, but are currently too noisy to enable.
 
-#  block-spacing: warn
 #  no-alert: warn
 #  no-extra-parens: warn
 #  no-magic-numbers:
@@ -80,7 +81,6 @@ rules:
 #    - ignore: [-1, 0, 1]
 #      ignoreArrayIndexes: true
 #      enforceConst: true
-#  no-multi-spaces: warn
 #  no-negated-condition: warn
 #  no-param-reassign: warn
 #  no-var: warn

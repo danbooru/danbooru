@@ -125,7 +125,7 @@ RelatedTag.toggle_tag = function(e) {
   RelatedTag.update_selected();
 
   // The timeout is needed on Chrome since it will clobber the field attribute otherwise
-  setTimeout(function () { $field.prop('selectionStart', $field.val().length);}, 100);
+  setTimeout(function () { $field.prop('selectionStart', $field.val().length); }, 100);
   e.preventDefault();
 
   // Artificially trigger input event so the tag counter updates.

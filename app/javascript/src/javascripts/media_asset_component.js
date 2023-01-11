@@ -42,7 +42,7 @@ export default class MediaAssetComponent {
 
     let top = this.$component.offset().top;
     let height = this.$image.height();
-    let ypos = clamp(top + yRatio * height - (window.innerHeight / 2), Math.min(window.scrollY, top), top + height + gap - window.innerHeight);
+    let ypos = clamp(top + (yRatio * height) - (window.innerHeight / 2), Math.min(window.scrollY, top), top + height + gap - window.innerHeight);
 
     if (this.scrollOnZoom) {
       window.scrollTo({ top: ypos });

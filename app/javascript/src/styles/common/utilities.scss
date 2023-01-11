@@ -80,14 +80,14 @@ $spacer: 0.25rem; /* 4px */
 .left-4   { left:   4 * $spacer; }
 .right-4  { right:  4 * $spacer; }
 
-.inset-0 { top: 0; right: 0; bottom: 0; left: 0 }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
 
 .border, %border { border-width: 1px; }
 
 .border-b   { border-bottom-width: 1px; }
 .border-b-2 { border-bottom-width: 0.5 * $spacer; }
 
-.border-current { border-color: currentColor; }
+.border-current { border-color: currentcolor; }
 
 .rounded-sm, %rounded-sm { border-radius: 0.5 * $spacer; }
 .rounded,    %rounded    { border-radius: 1   * $spacer; }
@@ -97,8 +97,8 @@ $spacer: 0.25rem; /* 4px */
 .rounded-t,    %rounded-t    { border-top-left-radius: 1   * $spacer; border-top-right-radius: 1   * $spacer; }
 .rounded-t-lg, %rounded-t-lg { border-top-left-radius: 2   * $spacer; border-top-right-radius: 2   * $spacer; }
 
-.shadow-md, %shadow-md { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
-.shadow-lg, %shadow-lg { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+.shadow-md, %shadow-md { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%); }
+.shadow-lg, %shadow-lg { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%); }
 
 .object-contain { object-fit: contain; }
 

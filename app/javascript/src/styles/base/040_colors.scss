@@ -98,10 +98,10 @@ html {
   --magenta-8: #4f1450; /* hsluv(307, 80, 19.0) */
   --magenta-9: #380c39; /* hsluv(307, 80, 12.0) */
 
-  --white: #FFFFFF;
+  --white: #ffffff;
   --black: #000000;
 
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0 0 0 / 10%), 0 4px 6px -2px rgba(0 0 0 / 5%);
 }
 
 html, body[data-current-user-theme="light"] {
@@ -168,10 +168,10 @@ html, body[data-current-user-theme="light"] {
   --preview-deleted-color: var(--grey-9);
   --preview-has-children-color: var(--green-3);
   --preview-has-parent-color: var(--yellow-3);
-  --preview-selected-color: rgba(0, 0, 0, 0.15);
+  --preview-selected-color: rgba(0 0 0 / 15%);
 
   --preview-icon-color: var(--inverse-text-color);
-  --preview-icon-background: rgba(0, 0, 0, 0.7);
+  --preview-icon-background: rgba(0 0 0 / 70%);
 
   --media-asset-placeholder-background-color: var(--grey-1);
 
@@ -210,7 +210,7 @@ html, body[data-current-user-theme="light"] {
 
   --autocomplete-selected-background-color: var(--blue-1);
   --autocomplete-border-color: var(--grey-2);
-  --autocomplete-tag-autocorrect-underline: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAHElEQVQYV2NkQAL/GRj+M4IJBgY4zQhSABMEsQHMOAgCT5YN9gAAAABJRU5ErkJggg==);
+  --autocomplete-tag-autocorrect-underline: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAHElEQVQYV2NkQAL/GRj+M4IJBgY4zQhSABMEsQHMOAgCT5YN9gAAAABJRU5ErkJggg==");
 
   --diff-list-added-color: var(--green-5);
   --diff-list-removed-color: var(--red-5);
@@ -235,7 +235,7 @@ html, body[data-current-user-theme="light"] {
   --post-upvote-color: var(--link-color);
   --post-downvote-color: var(--red-5);
 
-  --note-body-background: #FFE;
+  --note-body-background: #ffffee;
   --note-body-text-color: var(--black);
   --note-body-border-color: var(--black);
   --note-box-border-color: var(--black);
@@ -399,7 +399,7 @@ html, body[data-current-user-theme="light"] {
   --preview-deleted-color: var(--grey-3);
   --preview-has-children-color: var(--green-3);
   --preview-has-parent-color: var(--orange-3);
-  --preview-selected-color: rgba(255, 255, 255, 0.25);
+  --preview-selected-color: rgba(255 255 255 / 25%);
 
   --media-asset-placeholder-background-color: var(--grey-8);
 
@@ -561,4 +561,3 @@ body[data-current-user-theme="dark"] {
     @include dark-theme;
   }
 }
-
