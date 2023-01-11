@@ -17,7 +17,10 @@ div.prose {
 
   h1, h2, h3, h4 {
     font-size: var(--text-xl);
-    margin-top: 1.75rem;
+
+    &:not(:first-child) {
+      margin-top: 1.75rem;
+    }
   }
 
   h5 {
