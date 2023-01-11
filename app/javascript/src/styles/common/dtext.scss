@@ -2,6 +2,10 @@ div.prose {
   line-height: 1.4em;
   word-break: break-word;
 
+  > *:last-child {
+    margin-bottom: 0;
+  }
+
   p {
     margin-bottom: 0.75rem;
   }
@@ -139,11 +143,6 @@ div.prose {
       margin-bottom: 1em;
     }
   }
-}
-
-// avoid empty gaps beneath dtext blocks in table rows.
-table td div.prose > *:last-child {
-  margin-bottom: 0;
 }
 
 div.dtext-preview {

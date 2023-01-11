@@ -1,5 +1,5 @@
 <% if wiki_page.tag.present? && !wiki_page.tag.empty? %>
-  <div class="recent-posts">
+  <div class="recent-posts mt-4">
     <h2 class="recent-posts-header">
       <%= link_to "Posts", posts_path(tags: wiki_page.title) %>
     </h2>

@@ -39,9 +39,9 @@
       <% else %>
         <%= format_text(comment.body, data: dtext_data) %>
       <% end %>
-
-      <%= render "application/update_notice", record: comment %>
     <% end %>
+
+    <%= render "application/update_notice", record: comment %>
 
     <menu class="mt-2">
       <% if votable? %>
