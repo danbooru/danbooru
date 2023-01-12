@@ -19,6 +19,8 @@ def parse_files(filenames)
   end
 end
 
+# XXX Currently Github only supports 10 error annotations and 10 warning annotations per workflow step. If there are
+# more test failures than this, they will be ignored.
 def print_annotations(testcases)
   testcases.each do |tc|
     if tc.at_css("failure, error, skipped").present?
@@ -36,6 +38,60 @@ def print_annotations(testcases)
   end
 end
 
+def print_table(testcases, output = StringIO.new)
+  output.puts "### Failed"
+  output.puts
+  output.puts "<table>"
+
+  testcases.each do |tc|
+    if tc.at_css("failure, error").present?
+      title = ":anger: #{tc[:classname]}: #{tc[:name].delete_prefix("test_:").strip.delete_suffix(".").upcase_first} (#{tc[:time].to_f.round(2)}s)"
+      message = tc.text.to_s.strip.remove(/^Failure:|^test_: |\(Minitest::Result\) \[.*\]:/)
+
+      output.puts <<~EOS
+        <tr>
+          <td>
+            <details>
+              <summary>#{ERB::Util.h(title)}</summary>
+              <pre>#{ERB::Util.h(message)}</pre>
+            </details>
+          </td>
+          <td>
+
+          [#{ERB::Util.h(File.basename(tc[:file]))}:#{tc[:lineno]}](#{ERB::Util.h(tc[:file])}#L#{tc[:lineno]})
+
+          </td>
+        </tr>
+      EOS
+    end
+  end
+
+  output.puts "</table>"
+  output.puts
+  output.puts "### Skipped"
+  output.puts
+  output.puts "<table>"
+
+  testcases.each do |tc|
+    if tc.at_css("skipped").present?
+      title = "#{tc[:classname]}: #{tc[:name].delete_prefix("test_:").strip.delete_suffix(".").upcase_first}"
+
+      output.puts <<~EOS
+        <tr>
+          <td>#{ERB::Util.h(title)}</td>
+          <td>
+
+          [#{ERB::Util.h(File.basename(tc[:file]))}:#{tc[:lineno]}](#{ERB::Util.h(tc[:file])}#L#{tc[:lineno]})
+
+          </td>
+        </tr>
+      EOS
+    end
+  end
+
+  output.puts "</table>"
+end
+
 def print_summary(testcases, output)
   tests = testcases.count
   assertions = testcases.sum { _1[:assertions].to_i }
@@ -47,13 +103,19 @@ def print_summary(testcases, output)
 
   # https://github.com/test-summary/action
   output.puts "![](https://svg.test-summary.com/dashboard.svg?p=#{passes}&f=#{failures + errors}&s=#{skips})"
-  output.puts ""
-  output.puts "#{tests.pluralize("test")}, #{assertions.pluralize("assertion")}, #{failures.pluralize("failure")}, #{errors.pluralize("error")}, #{skips.pluralize("skip")}"
-  output.puts "Finished in #{ApplicationController.helpers.duration_to_hhmmss(seconds)} (#{(seconds / tests).round(2)}s / test, #{(seconds / assertions).round(2)}s / assertion)" if tests.nonzero? && assertions.nonzero?
+  output.puts
+  output.print "#{pluralize(tests, "test")}, #{pluralize(assertions, "assertion")}, #{pluralize(failures, "failure")}, #{pluralize(errors, "error")}, #{pluralize(skips, "skip")}"
+  output.puts ", finished in #{ApplicationController.helpers.duration_to_hhmmss(seconds)} (#{(seconds / tests).round(2)}s/test, #{(seconds / assertions).round(2)}s/assertion)" if tests.nonzero? && assertions.nonzero?
+  output.puts
+  print_table(testcases, output)
 end
 
 def github_escape(str)
   str.gsub(/[%\n\r]/, { "%" => "%25", "\n" => "%0A", "\r" => "%0D" })
+end
+
+def pluralize(count, string)
+  "#{count} #{string.pluralize(count)}"
 end
 
 def main(filenames)
