@@ -120,8 +120,8 @@ module ApplicationHelper
 
   def duration_to_hhmmss(seconds)
     seconds = seconds.round
-    hh = seconds.div(1.hour).to_s
-    mm = seconds.div(1.minute).to_s
+    hh = seconds.div(1.hour)
+    mm = (seconds.seconds - hh.hours.seconds).div(1.minute)
     ss = "%.2d" % (seconds % 1.minute)
 
     if seconds >= 1.hour
