@@ -2,7 +2,7 @@
 
 set -xeuo pipefail
 
-RUBY_VERSION="${RUBY_VERSION:-3.1.2}"
+RUBY_VERSION="${RUBY_VERSION:-3.2.0}"
 VIPS_VERSION="${VIPS_VERSION:-8.14.1}"
 FFMPEG_VERSION="${FFMPEG_VERSION:-5.1.2}"
 MOZJPEG_VERSION="${MOZJPEG_VERSION:-4.1.1}"
@@ -13,7 +13,7 @@ POSTGRESQL_CLIENT_VERSION="${POSTGRESQL_CLIENT_VERSION:-14}"
 COMMON_BUILD_DEPS="
   curl ca-certificates build-essential pkg-config git
 "
-RUBY_BUILD_DEPS="libssl-dev zlib1g-dev libgmp-dev"
+RUBY_BUILD_DEPS="rustc libssl-dev zlib1g-dev libgmp-dev libyaml-dev libffi-dev libreadline-dev"
 FFMPEG_BUILD_DEPS="libvpx-dev libdav1d-dev nasm"
 MOZJPEG_BUILD_DEPS="cmake nasm libpng-dev zlib1g-dev"
 VIPS_BUILD_DEPS="
@@ -26,7 +26,7 @@ DANBOORU_RUNTIME_DEPS="
   ca-certificates mkvtoolnix rclone libpq5 openssl libgmpxx4ldbl
   zlib1g libfftw3-3 libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
   libpng16-16 libexpat1 libglib2.0 libgif7 libexif12 libheif1 libvpx7 libdav1d6
-  libseccomp2 libseccomp-dev libjemalloc2 libarchive13
+  libseccomp2 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 libreadline8
 "
 COMMON_RUNTIME_DEPS="
   $DANBOORU_RUNTIME_DEPS $EXIFTOOL_RUNTIME_DEPS tini busybox less ncdu
@@ -108,7 +108,7 @@ install_ruby() {
   apt_install $RUBY_BUILD_DEPS
 
   asdf plugin add ruby
-  RUBY_BUILD_OPTS="--verbose" RUBY_CONFIGURE_OPTS="--disable-install-doc" asdf install ruby "$RUBY_VERSION"
+  RUBY_BUILD_OPTS="--verbose" RUBY_CONFIGURE_OPTS="--disable-install-doc --enable-yjit" asdf install ruby "$RUBY_VERSION"
   asdf global ruby "$RUBY_VERSION"
 
   ruby --version
