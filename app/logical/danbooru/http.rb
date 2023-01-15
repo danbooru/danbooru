@@ -50,7 +50,7 @@ module Danbooru
       Danbooru::Http::ApplicationClient.new
         .timeout(DEFAULT_TIMEOUT)
         .headers("Accept-Encoding": "gzip")
-        .use(normalize_uri: { normalizer: ->(uri) { HTTP::URI.parse(Addressable::URI.encode_component(uri, "[[:ascii:]]")) } }) # XXX Percent-encode Unicode characters to avoid "URI::InvalidURIError: URI must be ascii only" error
+        .use(normalize_uri: { normalizer: ->(uri) { HTTP::URI.parse(Addressable::URI.encode_component(uri, "[[:ascii:]&&[^ ]]")) } }) # XXX Percent-encode Unicode and space characters to avoid "URI::InvalidURIError: URI must be ascii only" error
         .use(:auto_inflate)
         .use(redirector: { max_redirects: MAX_REDIRECTS })
         .use(:session)

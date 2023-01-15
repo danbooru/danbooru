@@ -80,6 +80,18 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         resp4 = http.cookies(def: 3, ghi: 4).get(httpbin_url("cookies"))
         assert_equal({ abc: "1", def: "3", ghi: "4" }, resp4.parse["cookies"].symbolize_keys)
       end
+
+      should "work for a URL containing spaces" do
+        resp = Danbooru::Http.get(httpbin_url("anything/foo bar"))
+        assert_equal(200, resp.status)
+        assert_equal(httpbin_url("anything/foo%20bar"), resp.parse["url"])
+      end
+
+      should "work for a URL containing Unicode characters" do
+        resp = Danbooru::Http.get(httpbin_url("anything/東方"))
+        assert_equal(200, resp.status)
+        assert_equal(httpbin_url("anything/東方"), resp.parse["url"])
+      end
     end
 
     context "#post method" do
