@@ -272,11 +272,7 @@
     <% elsif @post.is_video? -%>
       <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_file_url) %>
     <% elsif @post.is_ugoira? -%>
-      <% if CurrentUser.user.default_image_size == "large" && params[:original].blank? %>
-        <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_large_file_url) %>
-
-        <p><%= link_to "View original", current_page_path(original: 1) %></p>
-      <% else %>
+      <% if params[:size] == "original" || (CurrentUser.user.default_image_size == "original" && params[:size].blank?) %>
         <%= tag.canvas(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, "data-ugoira-frame-delays": @post.media_metadata.metadata["Ugoira:FrameDelays"].to_json) %>
 
         <div id="ugoira-controls">
@@ -286,8 +282,12 @@
             <div id="seek-slider" class="ml-4" style="width: <%= [@post.image_width, 350].max - 81 %>px;"></div>
           </div>
 
-          <p><%= link_to "View WebM", current_page_path(original: nil) %></p>
+          <p><%= link_to "View WebM", current_page_path(size: "webm") %></p>
         </div>
+      <% else %>
+        <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_large_file_url) %>
+
+        <p><%= link_to "View original", current_page_path(size: "original") %></p>
       <% end %>
     <% elsif @post.is_image? -%>
       <picture>
