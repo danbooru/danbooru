@@ -20,6 +20,10 @@
     <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
   <% end %>
 
+  <% if CurrentUser.user.id != upload.uploader_id %>
+    <p>Uploaded by <%= link_to_user upload.uploader %>.</p>
+  <% end %>
+
   <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
 
   <div id="upload-image">

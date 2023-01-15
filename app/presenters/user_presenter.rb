@@ -39,6 +39,10 @@ class UserPresenter
     template.link_to(user.post_upload_count, template.posts_path(tags: "user:#{user.name}"), rel: "nofollow")
   end
 
+  def unposted_upload_count(template)
+    template.link_to(user.unposted_upload_count, template.user_uploads_path(user, search: { is_posted: false }))
+  end
+
   def deleted_upload_count(template)
     template.link_to(user.posts.deleted.count, template.posts_path(tags: "status:deleted user:#{user.name}"), rel: "nofollow")
   end

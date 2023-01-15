@@ -521,6 +521,10 @@ class User < ApplicationRecord
   end
 
   concerning :CountMethods do
+    def unposted_upload_count
+      uploads.completed.where.missing(:posts).count
+    end
+
     def wiki_page_version_count
       wiki_page_versions.count
     end

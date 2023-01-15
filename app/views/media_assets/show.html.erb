@@ -80,6 +80,18 @@
                       <% end %>
                     <% end %>
 
+                    <% if policy(Upload.new).show? %>
+                      <% menu.item do %>
+                        <hr class="border">
+                      <% end %>
+
+                      <% menu.item do %>
+                        <%= link_to upload_media_assets_path(search: { media_asset_id: @media_asset.id }) do %>
+                          <%= search_icon %> Find Uploads
+                        <% end %>
+                      <% end %>
+                    <% end %>
+
                     <% if policy(@media_asset).destroy? && @media_asset.post.nil? && !@media_asset.deleted? && !@media_asset.expunged? %>
                       <% menu.item do %>
                         <hr class="border">
