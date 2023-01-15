@@ -157,12 +157,19 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([150, 105], MediaFile.open("test/files/test-animated-400x281.gif").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test-animated-256x256.png").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/apng/normal_apng.png").preview(150, 150).dimensions)
+      # assert_equal([150, 150], MediaFile.open("test/files/webp/nyancat.webp").preview(150, 150).dimensions) # XXX not supported by FFmpeg (https://trac.ffmpeg.org/ticket/4907)
+      assert_equal([150, 113], MediaFile.open("test/files/avif/sequence-with-pitm.avif").preview(150, 150).dimensions)
+      assert_equal([150, 84], MediaFile.open("test/files/avif/sequence-without-pitm.avif").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/avif/star-8bpc.avif").preview(150, 150).dimensions)
+      assert_equal([150, 113], MediaFile.open("test/files/avif/alpha_video.avif").preview(150, 150).dimensions)
     end
 
     should "generate a preview image for a video" do
       skip unless MediaFile.videos_enabled?
-      assert_equal([150, 150], MediaFile.open("test/files/webm/test-512x512.webm").preview(150, 150).dimensions)
-      assert_equal([150, 150], MediaFile.open("test/files/mp4/test-300x300.mp4").preview(150, 150).dimensions)
+
+      Dir.glob("test/files/**/*.{webm,mp4}").grep_v(/corrupt/).each do |file|
+        assert_equal(:jpg, MediaFile.open(file).preview(150, 150).file_ext)
+      end
     end
 
     should "be able to fit to width only" do
@@ -279,6 +286,12 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(true, MediaFile.open("test/files/mp4/test-corrupt.mp4").is_corrupt?)
     end
 
+    should "handle all supported video types" do
+      Dir.glob("test/files/mp4/*.{mp4,m4v}").grep_v(/corrupt/).each do |file|
+        assert_equal(false, MediaFile.open(file).is_corrupt?)
+      end
+    end
+
     should "detect supported files" do
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-vp9.mp4").is_supported?)
@@ -354,6 +367,12 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(false, MediaFile.open("test/files/webm/test-512x512.mkv").is_supported?)
       assert_equal(false, MediaFile.open("test/files/webm/test-yuv420p10le-vp9.webm").is_supported?)
+    end
+
+    should "handle all supported video types" do
+      Dir.glob("test/files/webm/*.{webm,mkv}").each do |file|
+        assert_equal(false, MediaFile.open(file).is_corrupt?)
+      end
     end
   end
 
@@ -612,7 +631,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(:webp, @file.file_ext)
       assert_equal("libvips error", @file.error)
       assert_equal([800, 1067], @file.dimensions)
-      assert_equal(28, @metadata.count)
+      assert_equal(29, @metadata.count)
     end
   end
 

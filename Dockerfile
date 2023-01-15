@@ -30,9 +30,8 @@ ARG RUBY_URL
 RUN \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $RUBY_BUILD_DEPS && \
   curl -L $RUBY_URL | tar --strip-components=1 -xzvf - && \
-  ./configure --prefix=/usr/local --enable-yjit --disable-install-doc && \
-  make -j && \
-  make install && \
+  ./configure --prefix=/usr/local --enable-yjit --enable-shared --disable-install-doc && \
+  make -j install && \
   rm -rf /build/* && \
   ruby --version
 
@@ -47,10 +46,9 @@ RUN \
   curl -L $MOZJPEG_URL | tar --strip-components=1 -xzvf - && \
   mkdir build && \
   cd build && \
-  cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-  make -j && \
-  make install && \
-  rm -rf /build/* && \
+  cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_STATIC=0 -DWITH_ARITH_ENC=1 -DWITH_ARITH_DEC=1 .. && \
+  make -j install && \
+  rm -rf /build/* /usr/local/share /usr/local/man && \
   cjpeg -version
 
 
@@ -62,11 +60,11 @@ ARG VIPS_URL
 RUN \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $VIPS_BUILD_DEPS && \
   curl -L $VIPS_URL | tar --strip-components=1 -xJvf - && \
-  meson build --prefix /usr/local --buildtype release && \
+  meson build --prefix /usr/local -Dcplusplus=false --buildtype release && \
   cd build && \
   meson compile && \
   meson install && \
-  rm -rf /build/* && \
+  rm -rf /build/* /usr/local/share /usr/local/man && \
   ldconfig && \
   vips --version
 
@@ -74,15 +72,40 @@ RUN \
 
 # Build FFmpeg. Output is in /usr/local.
 FROM build-base AS build-ffmpeg
-ARG FFMPEG_BUILD_DEPS="nasm libvpx-dev libdav1d-dev zlib1g-dev"
 ARG FFMPEG_URL
+ARG FFMPEG_BUILD_DEPS="nasm libvpx-dev libdav1d-dev zlib1g-dev"
+ARG FFMPEG_BUILD_OPTIONS="--disable-ffplay --disable-network --disable-doc --disable-static --enable-shared \
+                         --enable-libvpx --enable-libdav1d --enable-zlib \
+                         --disable-muxers \
+                           --enable-muxer=mp4 --enable-muxer=webm --enable-muxer=image2 --enable-muxer=null \
+                         --disable-demuxers \
+                           --enable-demuxer=mov,mp4,m4a,3gp,3g2,mj2 --enable-demuxer=matroska,webm \
+                           --enable-demuxer=image2 --enable-demuxer=apng --enable-demuxer=gif \
+                         --disable-filters \
+                           --enable-filter=scale --enable-filter=thumbnail --enable-filter=silencedetect \
+                           --enable-filter=ebur128 --enable-filter=aresample --enable-filter=anull \
+                           --enable-filter=null --enable-filter=copy \
+                         --disable-encoders \
+                           --enable-encoder=libvpx_vp8 --enable-encoder=libvpx_vp9 --enable-encoder=png \
+                           --enable-encoder=null --enable-encoder=wrapped_avframe --enable-encoder=pcm_s16le \
+                         --disable-decoders \
+                           --enable-decoder=vp8 --enable-decoder=vp9 --enable-decoder=h264 --enable-decoder=hevc \
+                           --enable-decoder=libdav1d --enable-decoder=mpeg4 --enable-decoder=mjpeg --enable-decoder=png \
+                           --enable-decoder=apng --enable-decoder=gif --enable-decoder=webp --enable-decoder=aac \
+                           --enable-decoder=mp3 --enable-decoder=mp2 --enable-decoder=opus --enable-decoder=vorbis \
+                           --enable-decoder=ac3 \
+                         --disable-protocols \
+                           --enable-protocol=file \
+                         --disable-bsfs"
+
 RUN \
+  echo $FFMPEG_BUILD_OPTIONS && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $FFMPEG_BUILD_DEPS && \
   curl -L $FFMPEG_URL | tar --strip-components=1 -xzvf - && \
-  ./configure --disable-ffplay --disable-network --disable-doc --enable-libvpx --enable-libdav1d --enable-zlib && \
-  make -j && \
-  cp ffmpeg ffprobe /usr/local/bin && \
-  rm -rf /build/* && \
+  ./configure $FFMPEG_BUILD_OPTIONS && \
+  make -j install && \
+  rm -rf /build/* /usr/local/include /usr/local/share && \
+  ldconfig && \
   ffmpeg -version && \
   ffprobe -version
 
@@ -117,8 +140,7 @@ RUN \
     --with-http_gunzip_module --with-http_gzip_static_module \
     --with-http_realip_module --with-http_ssl_module \
     --with-http_stub_status_module --with-http_v2_module && \
-  make -j && \
-  make install && \
+  make -j install && \
   rm -rf /build/* && \
   openresty -version
 
@@ -141,18 +163,20 @@ RUN \
 
 
 
-# Build Ruby gems. Output is in /build/vendor.
+# Build Ruby gems. Output is in /usr/local.
 FROM build-ruby AS build-gems
-ENV BUNDLE_DEPLOYMENT=1
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libpq-dev libglib2.0-dev
 COPY --link Gemfile Gemfile.lock ./
 RUN \
-  bundle install --jobs $(nproc) && \
-  rm -rf vendor/cache vendor/bundle/ruby/*/cache && \
-  find vendor -regextype egrep -regex '.*\.(o|c|h|md|log|out)$' -delete && \
-  find vendor -regextype egrep -regex 'CHANGE|LICENSE|README' -delete
-
+  BUNDLE_DEPLOYMENT=1 bundle install --no-cache --jobs $(nproc) && \
+  rm -rf vendor/bundle/ruby/*/cache && \
+  find vendor -regextype egrep -regex '.*\.(o|a|c|h|hh|hpp|exe|java|md|po|log|out)$' -delete && \
+  find vendor -regextype egrep -regex '^.*/(Change|CHANGE|NEWS|LICENSE|COPYING|LEGAL|AUTHORS|CONTRIBUTORS|THANK|README|INSTALL|NOTICE|TODO).*$' -delete && \
+  rm -rf /usr/local/* && \
+  mkdir -p /usr/local/lib/ruby/gems && \
+  mv -i vendor/bundle/ruby/* /usr/local/lib/ruby/gems/ && \
+  rm -rf /build/*
 
 
 # Build the base Danbooru image. Pull in dependencies from previous layers and install runtime dependencies from apt-get.
@@ -161,13 +185,8 @@ WORKDIR /danbooru
 ARG POSTGRESQL_CLIENT_VERSION
 ARG NODE_VERSION
 
-ENV BUNDLE_DEPLOYMENT=1
-
 COPY --link --from=build-mozjpeg /usr/local /usr/local
 COPY --link --from=build-vips /usr/local /usr/local
-COPY --link --from=build-ffmpeg /usr/local /usr/local
-COPY --link --from=build-exiftool /usr/local /usr/local
-COPY --link --from=build-openresty /usr/local /usr/local
 COPY --link --from=build-ruby /usr/local /usr/local
 COPY --link --from=build-node /usr/local /usr/local
 
@@ -178,7 +197,7 @@ RUN \
     libglib2.0 libgif7 libexif12 libheif1 libvpx7 libdav1d6 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
     libreadline8 libarchive-zip-perl tini busybox less ncdu curl && \
   npm install -g yarn && \
-  gem install foreman && \
+  gem install --no-document foreman && \
   busybox --install -s && \
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs libglib2.0-bin libglib2.0-doc mount procps python3 tzdata && \
   apt-get autoremove -y && \
@@ -203,7 +222,7 @@ COPY --link app/components/ ./app/components/
 COPY --link app/javascript/ ./app/javascript/
 
 COPY --link Gemfile Gemfile.lock ./
-COPY --link --from=build-gems /build/vendor /danbooru/vendor
+COPY --link --from=build-gems /usr/local /usr/local
 RUN bin/rails assets:precompile
 
 
@@ -211,8 +230,12 @@ RUN bin/rails assets:precompile
 # Build the final layer. Pull in the compiled assets and gems on top of the base Danbooru layer.
 FROM danbooru-base AS production
 
+COPY --link --from=build-ffmpeg /usr/local /usr/local
+COPY --link --from=build-exiftool /usr/local /usr/local
+COPY --link --from=build-openresty /usr/local /usr/local
+
 COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
-COPY --link --from=build-gems /build/vendor /danbooru/vendor
+COPY --link --from=build-gems /usr/local /usr/local
 COPY --link . /danbooru
 
 # http://jemalloc.net/jemalloc.3.html#tuning
@@ -230,7 +253,8 @@ RUN \
   echo "$SOURCE_COMMIT" > REVISION && \
   ln -s /tmp tmp && \
   ln -s packs public/packs-test && \
-  useradd --create-home --user-group danbooru
+  useradd --create-home --user-group danbooru && \
+  ldconfig
 
 USER danbooru
 ENTRYPOINT ["tini", "--"]
