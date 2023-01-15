@@ -24,16 +24,18 @@ class PostApproval < ApplicationRecord
   end
 
   def approve_post
-    is_pending = post.is_pending
-    is_undeletion = post.is_deleted
+    transaction do
+      is_pending = post.is_pending
+      is_undeletion = post.is_deleted
 
-    post.flags.pending.update!(status: :rejected)
-    post.appeals.pending.update!(status: :succeeded)
+      post.flags.pending.update!(status: :rejected)
+      post.appeals.pending.update!(status: :succeeded)
 
-    post.update(approver: user, is_flagged: false, is_pending: false, is_deleted: false)
-    ModAction.log("undeleted post ##{post_id}", :post_undelete, subject: post, user: user) if is_undeletion
+      post.update!(approver: user, is_flagged: false, is_pending: false, is_deleted: false)
+      ModAction.log("undeleted post ##{post_id}", :post_undelete, subject: post, user: user) if is_undeletion
 
-    post.uploader.upload_limit.update_limit!(is_pending, true)
+      post.uploader.upload_limit.update_limit!(is_pending, true)
+    end
   end
 
   def self.search(params, current_user)
