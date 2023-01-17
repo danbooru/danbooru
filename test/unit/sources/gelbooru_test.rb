@@ -92,6 +92,20 @@ module Sources
       )
     end
 
+    context "A sourceless Gelbooru post" do
+      strategy_should_work(
+        "https://gelbooru.com/index.php?page=post&s=view&id=706722",
+        image_urls: ["https://img3.gelbooru.com/images/c3/a8/c3a86e901159d971448044b16ac72c4c.jpg"],
+        artist_name: nil,
+        profile_url: nil,
+        profile_urls: [],
+        other_names: [],
+        tags: [],
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
+      )
+    end
+
     should "normalize gelbooru links" do
       source1 = "https://gelbooru.com//images/ee/5c/ee5c9a69db9602c95debdb9b98fb3e3e.jpeg"
       source2 = "http://simg.gelbooru.com//images/2003/edd1d2b3881cf70c3acf540780507531.png"

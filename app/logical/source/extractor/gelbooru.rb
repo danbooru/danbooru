@@ -12,7 +12,7 @@
 module Source
   class Extractor
     class Gelbooru < Source::Extractor
-      delegate :artist_name, :profile_url, :profile_urls, :other_names, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
+      delegate :artist_name, :profile_url, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
 
       def match?
         Source::URL::Gelbooru === parsed_url
@@ -49,6 +49,10 @@ module Source
 
       def other_names
         sub_extractor&.other_names.to_a
+      end
+
+      def profile_urls
+        sub_extractor&.profile_urls.to_a
       end
 
       def domain
