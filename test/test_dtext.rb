@@ -1,5 +1,8 @@
-require 'minitest/autorun'
-require 'dtext/dtext'
+# frozen_string_literal: true
+
+require "dtext"
+require "cgi"
+require "minitest/autorun"
 
 class DTextTest < Minitest::Test
   def assert_parse_id_link(class_name, url, input)

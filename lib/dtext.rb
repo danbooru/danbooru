@@ -1,4 +1,6 @@
 require "dtext/dtext"
+require "dtext/version"
+require "dtext_ruby"
 require "nokogiri"
 
 module DTextRagel
