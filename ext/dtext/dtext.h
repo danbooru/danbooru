@@ -18,6 +18,7 @@ typedef struct StateMachine {
   bool f_inline;
   bool f_mentions;
   const char * base_url;
+  const char * domain;
 
   size_t top;
   int cs;

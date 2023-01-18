@@ -853,6 +853,19 @@ static inline bool dstack_check2(const StateMachine * sm, element_t expected_ele
   return top2 == expected_element;
 }
 
+static inline bool is_internal_url(StateMachine * sm, GUri* url) {
+  if (sm->domain == NULL || url == NULL) {
+    return false;
+  }
+
+  const char* host = g_uri_get_host(url);
+  if (host == NULL) {
+    return false;
+  }
+
+  return strcmp(sm->domain, host) == 0;
+}
+
 static inline void append(StateMachine * sm, const char * s) {
   sm->output = g_string_append(sm->output, s);
 }
@@ -931,7 +944,15 @@ static inline void append_id_link(StateMachine * sm, const char * title, const c
 }
 
 static inline void append_unnamed_url(StateMachine * sm, const char * url_start, const char * url_end) {
-  append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
+  g_autoptr(GString) url = g_string_new_len(url_start, url_end - url_start);
+  g_autoptr(GUri) parsed_url = g_uri_parse(url->str, G_URI_FLAGS_NONE, NULL);
+
+  if (is_internal_url(sm, parsed_url)) {
+    append(sm, "<a class=\"dtext-link\" href=\"");
+  } else {
+    append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
+  }
+
   append_segment_html_escaped(sm, url_start, url_end);
   append(sm, "\">");
   append_segment_html_escaped(sm, url_start, url_end);
@@ -952,7 +973,14 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
       append(sm, sm->base_url);
     }
   } else {
-    append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"");
+    g_autoptr(GString) url = g_string_new_len(url_start, url_end - url_start);
+    g_autoptr(GUri) parsed_url = g_uri_parse(url->str, G_URI_FLAGS_NONE, NULL);
+
+    if (is_internal_url(sm, parsed_url)) {
+      append(sm, "<a class=\"dtext-link\" href=\"");
+    } else {
+      append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"");
+    }
   }
 
   append_segment_html_escaped(sm, url_start, url_end);
@@ -1223,6 +1251,7 @@ StateMachine* init_machine(const char* src, size_t len) {
   sm->f_inline = FALSE;
   sm->f_mentions = TRUE;
   sm->base_url = NULL;
+  sm->domain = NULL;
   sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
   sm->dstack = g_queue_new();
   sm->error = NULL;

@@ -7,7 +7,7 @@
 static VALUE cDText = Qnil;
 static VALUE cDTextError = Qnil;
 
-static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE f_inline, VALUE f_disable_mentions) {
+static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALUE f_inline, VALUE f_disable_mentions) {
   if (NIL_P(input)) {
     return Qnil;
   }
@@ -20,6 +20,10 @@ static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE f_inline, VA
 
   if (!NIL_P(base_url)) {
     sm->base_url = StringValueCStr(base_url); // base_url.to_str # raises ArgumentError if base_url contains null bytes.
+  }
+
+  if (!NIL_P(domain)) {
+    sm->domain = StringValueCStr(domain); // domain.to_str # raises ArgumentError if domain contains null bytes.
   }
 
   if (!parse_helper(sm)) {
@@ -38,5 +42,5 @@ static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE f_inline, VA
 void Init_dtext() {
   cDText = rb_define_class("DText", rb_cObject);
   cDTextError = rb_define_class_under(cDText, "Error", rb_eStandardError);
-  rb_define_singleton_method(cDText, "c_parse", c_parse, 4);
+  rb_define_singleton_method(cDText, "c_parse", c_parse, 5);
 }
