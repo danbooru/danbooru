@@ -274,19 +274,24 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us">https://danbooru.donmai.us</a></p>', 'https://danbooru.donmai.us', domain: "danbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us">https://danbooru.donmai.us</a></p>', 'https://danbooru.donmai.us', domain: "testbooru.donmai.us")
 
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us">https://danbooru.donmai.us</a></p>', 'https://danbooru.donmai.us', domain: "danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/login">https://danbooru.donmai.us/login</a></p>', 'https://danbooru.donmai.us/login', domain: "danbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us/login">https://danbooru.donmai.us/login</a></p>', 'https://danbooru.donmai.us/login', domain: "testbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us/login">https://danbooru.donmai.us/login</a></p>', 'https://danbooru.donmai.us/login', domain: "")
 
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us">https://danbooru.donmai.us</a></p>', '<https://danbooru.donmai.us>', domain: "danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/login">https://danbooru.donmai.us/login</a></p>', '<https://danbooru.donmai.us/login>', domain: "danbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us/login">https://danbooru.donmai.us/login</a></p>', '<https://danbooru.donmai.us/login>', domain: "testbooru.donmai.us")
 
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us">home</a></p>', '"home":https://danbooru.donmai.us', domain: "danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/login">login</a></p>', '"login":https://danbooru.donmai.us/login', domain: "danbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://danbooru.donmai.us/login">login</a></p>', '"login":https://danbooru.donmai.us/login', domain: "testbooru.donmai.us")
 
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us">home</a></p>', '"home":[https://danbooru.donmai.us]', domain: "danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/login">login</a></p>', '"login":[https://danbooru.donmai.us/login]', domain: "danbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://danbooru.donmai.us/login">login</a></p>', '"login":[https://danbooru.donmai.us/login]', domain: "testbooru.donmai.us")
 
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us">home</a></p>', '[https://danbooru.donmai.us](home)', domain: "danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/login">login</a></p>', '[https://danbooru.donmai.us/login](login)', domain: "danbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://danbooru.donmai.us/login">login</a></p>', '[https://danbooru.donmai.us/login](login)', domain: "testbooru.donmai.us")
 

@@ -418,7 +418,7 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
       append(sm, sm->base_url);
     }
   } else {
-    g_autoptr(GString) url = g_string_new_len(url_start, url_end - url_start);
+    g_autoptr(GString) url = g_string_new_len(url_start, url_end - url_start + 1);
     g_autoptr(GUri) parsed_url = g_uri_parse(url->str, G_URI_FLAGS_NONE, NULL);
 
     if (is_internal_url(sm, parsed_url)) {
