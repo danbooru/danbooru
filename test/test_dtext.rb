@@ -271,6 +271,9 @@ class DTextTest < Minitest::Test
   end
 
   def test_internal_links
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us">https://danbooru.donmai.us</a></p>', 'https://danbooru.donmai.us', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us">https://danbooru.donmai.us</a></p>', 'https://danbooru.donmai.us', domain: "testbooru.donmai.us")
+
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/login">https://danbooru.donmai.us/login</a></p>', 'https://danbooru.donmai.us/login', domain: "danbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us/login">https://danbooru.donmai.us/login</a></p>', 'https://danbooru.donmai.us/login', domain: "testbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us/login">https://danbooru.donmai.us/login</a></p>', 'https://danbooru.donmai.us/login', domain: "")
@@ -286,6 +289,8 @@ class DTextTest < Minitest::Test
 
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/login">login</a></p>', '[https://danbooru.donmai.us/login](login)', domain: "danbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://danbooru.donmai.us/login">login</a></p>', '[https://danbooru.donmai.us/login](login)', domain: "testbooru.donmai.us")
+
+    assert_parse('<p><a class="dtext-link" href="https://user:pass@danbooru.donmai.us:80">https://user:pass@danbooru.donmai.us:80</a></p>', 'https://user:pass@danbooru.donmai.us:80', domain: "danbooru.donmai.us")
   end
 
   def test_old_style_links
