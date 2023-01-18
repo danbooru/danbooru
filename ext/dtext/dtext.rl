@@ -233,11 +233,12 @@ inline := |*
 
   'dmail #'i id '/' dmail_key => { append_dmail_key_link(sm); };
 
-  'topic #'i id '/p'i page => { append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/", "?page="); };
-  'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"https://www.pixiv.net/artworks/", "#"); };
+  'topic #'i id '/p'i page => { append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"", "/forum_topics/", "?page="); };
+  'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"", "https://www.pixiv.net/artworks/", "#"); };
 
   post_link => {
-    append(sm, "<a class=\"dtext-link dtext-post-search-link\" href=\"/posts?tags=");
+    append(sm, "<a class=\"dtext-link dtext-post-search-link\" href=\"");
+    append_url(sm, "/posts?tags=");
     append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -283,7 +284,7 @@ inline := |*
     const char* url_start = sm->ts;
     const char* url_end = find_boundary_c(match_end);
 
-    append_url(sm, url_start, url_end, url_start, url_end);
+    append_unnamed_url(sm, url_start, url_end);
 
     if (url_end < match_end) {
       append_segment_html_escaped(sm, url_end + 1, match_end);
@@ -291,7 +292,7 @@ inline := |*
   };
 
   delimited_url => {
-    append_url(sm, sm->ts + 1, sm->te - 2, sm->ts + 1, sm->te - 2);
+    append_unnamed_url(sm, sm->ts + 1, sm->te - 2);
   };
 
   # probably a tag. examples include @.@ and @_@
@@ -311,7 +312,8 @@ inline := |*
 
       append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
       append_segment_html_escaped(sm, name_start, name_end);
-      append(sm, "\" href=\"/users?name=");
+      append(sm, "\" href=\"");
+      append_url(sm, "/users?name=");
       append_segment_uri_escaped(sm, name_start, name_end);
       append(sm, "\">");
       append_c(sm, '@');
@@ -328,7 +330,8 @@ inline := |*
     if (sm->f_mentions) {
       append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
       append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-      append(sm, "\" href=\"/users?name=");
+      append(sm, "\" href=\"");
+      append_url(sm, "/users?name=");
       append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
       append(sm, "\">");
       append_c(sm, '@');
@@ -901,6 +904,14 @@ static inline void append_segment_html_escaped(StateMachine * sm, const char * a
   sm->output = g_string_append(sm->output, segment);
 }
 
+static inline void append_url(StateMachine * sm, const char* url) {
+  if ((url[0] == '/' || url[0] == '#') && sm->base_url) {
+    append(sm, sm->base_url);
+  }
+
+  append(sm, url);
+}
+
 static inline void append_id_link(StateMachine * sm, const char * title, const char * id_name, const char * url) {
   if (url[0] == '/') {
     append(sm, "<a class=\"dtext-link dtext-id-link dtext-");
@@ -910,7 +921,7 @@ static inline void append_id_link(StateMachine * sm, const char * title, const c
 
   append(sm, id_name);
   append(sm, "-id-link\" href=\"");
-  append(sm, url);
+  append_url(sm, url);
   append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
   append(sm, "\">");
   append(sm, title);
@@ -919,11 +930,11 @@ static inline void append_id_link(StateMachine * sm, const char * title, const c
   append(sm, "</a>");
 }
 
-static inline void append_url(StateMachine * sm, const char * url_start, const char * url_end, const char * title_start, const char * title_end) {
+static inline void append_unnamed_url(StateMachine * sm, const char * url_start, const char * url_end) {
   append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
   append_segment_html_escaped(sm, url_start, url_end);
   append(sm, "\">");
-  append_segment_html_escaped(sm, title_start, title_end);
+  append_segment_html_escaped(sm, url_start, url_end);
   append(sm, "</a>");
 }
 
@@ -936,6 +947,10 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
 
   if (url_start[0] == '/' || url_start[0] == '#') {
     append(sm, "<a class=\"dtext-link\" href=\"");
+
+    if (sm->base_url) {
+      append(sm, sm->base_url);
+    }
   } else {
     append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"");
   }
@@ -971,15 +986,17 @@ static inline void append_wiki_link(StateMachine * sm, const char * tag_segment,
   g_string_prepend_len(title_string, prefix_segment, prefix_len);
   g_string_append_len(title_string, suffix_segment, suffix_len);
 
-  append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/");
+  append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"");
+  append_url(sm, "/wiki_pages/");
   append_segment_uri_escaped(sm, normalized_tag->str, normalized_tag->str + normalized_tag->len - 1);
   append(sm, "\">");
   append_segment_html_escaped(sm, title_string->str, title_string->str + title_string->len - 1);
   append(sm, "</a>");
 }
 
-static inline void append_paged_link(StateMachine * sm, const char * title, const char * ahref, const char * param) {
-  append(sm, ahref);
+static inline void append_paged_link(StateMachine * sm, const char * title, const char * tag, const char * href, const char * param) {
+  append(sm, tag);
+  append_url(sm, href);
   append_segment(sm, sm->a1, sm->a2 - 1);
   append(sm, param);
   append_segment(sm, sm->b1, sm->b2 - 1);
@@ -992,7 +1009,8 @@ static inline void append_paged_link(StateMachine * sm, const char * title, cons
 }
 
 static inline void append_dmail_key_link(StateMachine * sm) {
-  append(sm, "<a class=\"dtext-link dtext-id-link dtext-dmail-id-link\" href=\"/dmails/");
+  append(sm, "<a class=\"dtext-link dtext-id-link dtext-dmail-id-link\" href=\"");
+  append_url(sm, "/dmails/");
   append_segment(sm, sm->a1, sm->a2 - 1);
   append(sm, "?key=");
   append_segment_uri_escaped(sm, sm->b1, sm->b2 - 1);
@@ -1176,7 +1194,7 @@ static inline const char* find_boundary_c(const char* c) {
   return c - offset;
 }
 
-StateMachine* init_machine(const char * src, size_t len, bool f_inline, bool f_mentions) {
+StateMachine* init_machine(const char* src, size_t len) {
   size_t output_length = 0;
   StateMachine* sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
 
@@ -1202,8 +1220,9 @@ StateMachine* init_machine(const char * src, size_t len, bool f_inline, bool f_m
   sm->c2 = NULL;
   sm->d1 = NULL;
   sm->d2 = NULL;
-  sm->f_inline = f_inline;
-  sm->f_mentions = f_mentions;
+  sm->f_inline = FALSE;
+  sm->f_mentions = TRUE;
+  sm->base_url = NULL;
   sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
   sm->dstack = g_queue_new();
   sm->error = NULL;
@@ -1228,7 +1247,9 @@ GQuark dtext_parse_error_quark() {
 
 GString* parse_basic_inline(const char* dtext, const ssize_t length) {
     GString* output = NULL;
-    StateMachine* sm = init_machine(dtext, length, true, false);
+    StateMachine* sm = init_machine(dtext, length);
+    sm->f_inline = true;
+    sm->f_mentions = false;
     sm->cs = dtext_en_basic_inline;
 
     if (parse_helper(sm)) {
@@ -1277,7 +1298,10 @@ static void parse_file(FILE* input, FILE* output, gboolean opt_inline, gboolean 
     }
   }
 
-  StateMachine* sm = init_machine(dtext, length, opt_inline, opt_mentions);
+  StateMachine* sm = init_machine(dtext, length);
+  sm->f_inline = opt_inline;
+  sm->f_mentions = opt_mentions;
+
   if (!parse_helper(sm)) {
     fprintf(stderr, "dtext parse error: %s\n", sm->error->message);
     exit(1);

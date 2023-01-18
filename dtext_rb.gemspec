@@ -24,7 +24,6 @@ Gem::Specification.new do |spec|
     lib/dtext/version.rb
   ]
 
-  spec.add_runtime_dependency("nokogiri", ["~> 1.10"])
   spec.add_development_dependency("minitest", ["~> 5.15"])
   spec.add_development_dependency("rake", ["~> 13"])
   spec.add_development_dependency("rake-compiler", ["~> 1.1"])
