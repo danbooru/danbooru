@@ -5,6 +5,14 @@ require "cgi"
 require "minitest/autorun"
 
 class DTextTest < Minitest::Test
+  def parse(*args, **options)
+    DText.parse(*args, **options)
+  end
+
+  def parse_inline(dtext)
+    parse(dtext, inline: true)
+  end
+
   def assert_parse_id_link(class_name, url, input)
     if url[0] == "/"
       assert_parse(%{<p><a class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input)
@@ -15,9 +23,9 @@ class DTextTest < Minitest::Test
 
   def assert_parse(expected, input, **options)
     if expected.nil?
-      assert_nil(DTextRagel.parse(input, **options))
+      assert_nil(parse(input, **options))
     else
-      assert_equal(expected, DTextRagel.parse(input, **options))
+      assert_equal(expected, parse(input, **options))
     end
   end
 
@@ -34,7 +42,7 @@ class DTextTest < Minitest::Test
   def test_args
     assert_parse(nil, nil)
     assert_parse("", "")
-    assert_raises(TypeError) { DTextRagel.parse(42) }
+    assert_raises(TypeError) { parse(42) }
   end
 
   def test_mentions
@@ -43,7 +51,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>this is not @.@ @_@ <a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a></p>', "this is not @.@ @_@ @bob")
     assert_parse('<p>this is an email@address.com and should not trigger</p>', "this is an email@address.com and should not trigger")
     assert_parse('<p>multiple <a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a> <a class="dtext-link dtext-user-mention-link" data-user-name="anna" href="/users?name=anna">@anna</a></p>', "multiple @bob @anna")
-    assert_equal('<p>hi @bob</p>', DTextRagel.parse("hi @bob", :disable_mentions => true))
+    assert_equal('<p>hi @bob</p>', parse("hi @bob", :disable_mentions => true))
   end
 
   def test_nested_nonmention
@@ -454,7 +462,7 @@ class DTextTest < Minitest::Test
   end
 
   def test_inline_mode
-    assert_equal("hello", DTextRagel.parse_inline("hello").strip)
+    assert_equal("hello", parse_inline("hello").strip)
   end
 
   def test_old_asterisks
@@ -496,28 +504,28 @@ class DTextTest < Minitest::Test
   end
 
   def test_stack_depth_limit
-    assert_raises(DTextRagel::Error) { DTextRagel.parse("* foo\n" * 513) }
+    assert_raises(DText::Error) { parse("* foo\n" * 513) }
   end
 
   def test_null_bytes
-    assert_raises(DTextRagel::Error) { DTextRagel.parse("foo\0bar") }
+    assert_raises(DText::Error) { parse("foo\0bar") }
   end
 
   def test_wiki_link_xss
-    assert_raises(DTextRagel::Error) do
-      DTextRagel.parse("[[\xFA<script \xFA>alert(42); //\xFA</script \xFA>]]")
+    assert_raises(DText::Error) do
+      parse("[[\xFA<script \xFA>alert(42); //\xFA</script \xFA>]]")
     end
   end
 
   def test_mention_xss
-    assert_raises(DTextRagel::Error) do
-      DTextRagel.parse("@user\xF4<b>xss\xFA</b>")
+    assert_raises(DText::Error) do
+      parse("@user\xF4<b>xss\xFA</b>")
     end
   end
 
   def test_url_xss
-    assert_raises(DTextRagel::Error) do
-      DTextRagel.parse(%("url":/page\xF4">x\xFA<b>xss\xFA</b>))
+    assert_raises(DText::Error) do
+      parse(%("url":/page\xF4">x\xFA<b>xss\xFA</b>))
     end
   end
 end

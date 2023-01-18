@@ -13,7 +13,7 @@ bin/rake install
 # Usage
 
 ```bash
-ruby -rdtext -e 'puts DTextRagel.parse("hello world")'
+ruby -rdtext -e 'puts DText.parse("hello world")'
 # => <p>hello world</p>
 ```
 

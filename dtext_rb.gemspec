@@ -20,7 +20,8 @@ Gem::Specification.new do |spec|
   spec.files = %w[
     lib/dtext.rb
     lib/dtext/dtext.so
-    lib/dtext_ruby.rb
+    lib/dtext/ruby.rb
+    lib/dtext/version.rb
   ]
 
   spec.add_runtime_dependency("nokogiri", ["~> 1.10"])

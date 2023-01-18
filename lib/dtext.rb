@@ -1,14 +1,10 @@
 require "dtext/dtext"
 require "dtext/version"
-require "dtext_ruby"
+require "dtext/ruby"
 require "nokogiri"
 
-module DTextRagel
+class DText
   class Error < StandardError; end
-
-  def self.parse_inline(str)
-    parse(str, :inline => true)
-  end
 
   def self.parse(str, inline: false, disable_mentions: false, base_url: nil)
     html = c_parse(str, inline, disable_mentions)
