@@ -1,9 +1,8 @@
 GIT
   remote: https://github.com/danbooru/dtext_rb.git
-  revision: 954cd9aa52401108beed122fe93203b0beb8682a
+  revision: cdd81a048f0ea5afb5b28c223065cbb3e1453679
   specs:
-    dtext_rb (1.10.7)
-      nokogiri (~> 1.8)
+    dtext_rb (1.11.1)
 
 GIT
   remote: https://github.com/danbooru/http-cookie
