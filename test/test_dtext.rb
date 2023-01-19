@@ -491,6 +491,10 @@ class DTextTest < Minitest::Test
 
   def test_aliased_expand
     assert_parse("<details><summary>hello</summary><div><p>blah blah</p></div></details>", "[expand=hello]blah blah[/expand]")
+    assert_parse("<details><summary>hello</summary><div><p>blah blah</p></div></details>", "[expand hello]blah blah[/expand]")
+    assert_parse("<details><summary>hello</summary><div><p>blah blah</p></div></details>", "[expand = hello]blah blah[/expand]")
+    assert_parse("<details><summary>hello</summary><div><p>blah blah</p></div></details>", "[expand= hello]blah blah[/expand]")
+    assert_parse("<details><summary>hello</summary><div><p>blah blah</p></div></details>", "[expand =hello]blah blah[/expand]")
   end
 
   def test_expand_with_nested_code
