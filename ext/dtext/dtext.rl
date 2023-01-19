@@ -102,6 +102,7 @@ action mark_d2 {
 }
 
 newline = '\r\n' | '\n';
+ws = ' ' | '\t';
 
 nonnewline = any - (newline | '\r');
 nonquote = ^'"';
@@ -128,7 +129,7 @@ bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | relativ
 
 # XXX: internal markdown links aren't allowed to avoid parsing closing tags as links: `[b]foo[/b](bar)`.
 markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonrparen+ >mark_b1 %mark_b2 ')';
-html_link = '<a'i space+ 'href="'i (url | relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
+html_link = '<a'i ws+ 'href="'i (url | relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
 basic_wiki_link = alnum* >mark_a1 %mark_a2 '[[' (nonbracket nonpipebracket*) >mark_b1 %mark_b2 ']]' alnum* >mark_c1 %mark_c2;
 aliased_wiki_link = alnum* >mark_a1 %mark_a2 '[[' nonpipebracket+ >mark_b1 %mark_b2 '|' nonpipebracket* >mark_c1 %mark_c2 ']]' alnum* >mark_d1 %mark_d2;
@@ -140,11 +141,11 @@ alnum_id = alnum+ >mark_a1 %mark_a2;
 page = digit+ >mark_b1 %mark_b2;
 dmail_key = (alnum | '=' | '-')+ >mark_b1 %mark_b2;
 
-ws = ' ' | '\t';
 nonperiod = graph - ('.' | '"');
 header = 'h'i [123456] >mark_a1 %mark_a2 '.' ws*;
 header_with_id = 'h'i [123456] >mark_a1 %mark_a2 '#' nonperiod+ >mark_b1 %mark_b2 '.' ws*;
-aliased_expand = '[expand'i space* '='? space* (nonbracket+ >mark_a1 %mark_a2) ']';
+aliased_expand = ('[expand'i ws* '='? ws* (nonbracket+ >mark_a1 %mark_a2) ']')
+               | ('<expand'i ws* '='? ws* ((^'>')+ >mark_a1 %mark_a2) '>');
 
 list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
