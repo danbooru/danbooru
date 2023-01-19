@@ -180,6 +180,10 @@ div.prose {
         background-color: var(--dtext-details-summary-hover-background-color);
         cursor: pointer;
       }
+
+      &::-webkit-details-marker {
+        display: none;
+      }
     }
 
     > div {
