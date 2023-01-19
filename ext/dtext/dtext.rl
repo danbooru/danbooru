@@ -443,7 +443,7 @@ inline := |*
   close_expand => {
     dstack_close_before_block(sm);
 
-    if (dstack_close_block(sm, BLOCK_EXPAND, "</div></div>")) {
+    if (dstack_close_block(sm, BLOCK_EXPAND, "</div></details>")) {
       fret;
     }
   };
@@ -749,22 +749,17 @@ main := |*
 
   open_expand space* => {
     dstack_close_before_block(sm);
-    const char* html = "<div class=\"expandable\"><div class=\"expandable-header\">"
-                       "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>"
-                       "<div class=\"expandable-content\">";
-    dstack_open_block(sm, BLOCK_EXPAND, html);
+    dstack_open_block(sm, BLOCK_EXPAND, "<details>");
+    append(sm, "<summary>Show</summary><div>");
   };
 
   aliased_expand space* => {
     g_debug("block [expand=]");
     dstack_close_before_block(sm);
-    dstack_push(sm, BLOCK_EXPAND);
-    append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
-    append(sm, "<span>");
+    dstack_open_block(sm, BLOCK_EXPAND, "<details>");
+    append(sm, "<summary>");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</span>");
-    append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
-    append_block(sm, "<div class=\"expandable-content\">");
+    append(sm, "</summary><div>");
   };
 
   open_nodtext space* => {
@@ -1132,7 +1127,7 @@ static void dstack_rewind(StateMachine * sm) {
     case INLINE_SPOILER: append(sm, "</span>"); break;
     case BLOCK_SPOILER: append_block(sm, "</div>"); break;
     case BLOCK_QUOTE: append_block(sm, "</blockquote>"); break;
-    case BLOCK_EXPAND: append_block(sm, "</div></div>"); break;
+    case BLOCK_EXPAND: append_block(sm, "</div></details>"); break;
     case BLOCK_NODTEXT: append_closing_p(sm); break;
     case BLOCK_CODE: append_block(sm, "</pre>"); break;
     case BLOCK_TD: append_block(sm, "</td>"); break;

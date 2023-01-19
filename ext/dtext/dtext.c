@@ -45,7 +45,7 @@ typedef enum element_t {
 } element_t;
 
 
-#line 827 "ext/dtext/dtext.rl"
+#line 822 "ext/dtext/dtext.rl"
 
 
 
@@ -271,7 +271,7 @@ static const int dtext_en_list = 798;
 static const int dtext_en_main = 696;
 
 
-#line 830 "ext/dtext/dtext.rl"
+#line 825 "ext/dtext/dtext.rl"
 
 static inline void dstack_push(StateMachine * sm, element_t element) {
   g_queue_push_tail(sm->dstack, GINT_TO_POINTER(element));
@@ -577,7 +577,7 @@ static void dstack_rewind(StateMachine * sm) {
     case INLINE_SPOILER: append(sm, "</span>"); break;
     case BLOCK_SPOILER: append_block(sm, "</div>"); break;
     case BLOCK_QUOTE: append_block(sm, "</blockquote>"); break;
-    case BLOCK_EXPAND: append_block(sm, "</div></div>"); break;
+    case BLOCK_EXPAND: append_block(sm, "</div></details>"); break;
     case BLOCK_NODTEXT: append_closing_p(sm); break;
     case BLOCK_CODE: append_block(sm, "</pre>"); break;
     case BLOCK_TD: append_block(sm, "</td>"); break;
@@ -755,7 +755,7 @@ gboolean parse_helper(StateMachine* sm) {
 	( sm->act) = 0;
 	}
 
-#line 1305 "ext/dtext/dtext.rl"
+#line 1300 "ext/dtext/dtext.rl"
   
 #line 761 "ext/dtext/dtext.c"
 	{
@@ -8329,7 +8329,7 @@ f30:
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_before_block(sm);
 
-    if (dstack_close_block(sm, BLOCK_EXPAND, "</div></div>")) {
+    if (dstack_close_block(sm, BLOCK_EXPAND, "</div></details>")) {
       { sm->cs = ( ((int *)sm->stack->data))[--( sm->top)];goto _again;}
     }
   }}
@@ -8785,7 +8785,7 @@ f5:
   }}
 	goto _again;
 f6:
-#line 777 "ext/dtext/dtext.rl"
+#line 772 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_close_before_block(sm);
     dstack_open_block(sm, BLOCK_TABLE, "<table class=\"striped\">");
@@ -8805,7 +8805,7 @@ f6:
   }}
 	goto _again;
 f7:
-#line 783 "ext/dtext/dtext.rl"
+#line 778 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     dstack_open_block(sm, BLOCK_TN, "<p class=\"tn\">");
     {
@@ -8824,7 +8824,7 @@ f7:
   }}
 	goto _again;
 f77:
-#line 815 "ext/dtext/dtext.rl"
+#line 810 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p)+1;{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -9014,28 +9014,23 @@ f84:
 #line 750 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     dstack_close_before_block(sm);
-    const char* html = "<div class=\"expandable\"><div class=\"expandable-header\">"
-                       "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>"
-                       "<div class=\"expandable-content\">";
-    dstack_open_block(sm, BLOCK_EXPAND, html);
+    dstack_open_block(sm, BLOCK_EXPAND, "<details>");
+    append(sm, "<summary>Show</summary><div>");
   }}
 	goto _again;
 f89:
-#line 758 "ext/dtext/dtext.rl"
+#line 756 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block [expand=]");
     dstack_close_before_block(sm);
-    dstack_push(sm, BLOCK_EXPAND);
-    append_block(sm, "<div class=\"expandable\"><div class=\"expandable-header\">");
-    append(sm, "<span>");
+    dstack_open_block(sm, BLOCK_EXPAND, "<details>");
+    append(sm, "<summary>");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
-    append(sm, "</span>");
-    append_block(sm, "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>");
-    append_block(sm, "<div class=\"expandable-content\">");
+    append(sm, "</summary><div>");
   }}
 	goto _again;
 f85:
-#line 770 "ext/dtext/dtext.rl"
+#line 765 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     dstack_close_before_block(sm);
     dstack_open_block(sm, BLOCK_NODTEXT, "");
@@ -9056,7 +9051,7 @@ f85:
   }}
 	goto _again;
 f80:
-#line 815 "ext/dtext/dtext.rl"
+#line 810 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -9081,7 +9076,7 @@ f80:
   }}
 	goto _again;
 f2:
-#line 815 "ext/dtext/dtext.rl"
+#line 810 "ext/dtext/dtext.rl"
 	{{( sm->p) = ((( sm->te)))-1;}{
     g_debug("block char: %c", (*( sm->p)));
     ( sm->p)--;
@@ -9664,7 +9659,7 @@ f81:
 	{
   sm->b2 = sm->p;
 }
-#line 788 "ext/dtext/dtext.rl"
+#line 783 "ext/dtext/dtext.rl"
 	{( sm->te) = ( sm->p);( sm->p)--;{
     g_debug("block list");
     g_debug("  call list");
@@ -9776,13 +9771,13 @@ f157:
 f1:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 798 "ext/dtext/dtext.rl"
+#line 793 "ext/dtext/dtext.rl"
 	{( sm->act) = 112;}
 	goto _again;
 f78:
 #line 1 "NONE"
 	{( sm->te) = ( sm->p)+1;}
-#line 811 "ext/dtext/dtext.rl"
+#line 806 "ext/dtext/dtext.rl"
 	{( sm->act) = 113;}
 	goto _again;
 f103:
@@ -9862,7 +9857,7 @@ _again:
 #line 1 "NONE"
 	{( sm->ts) = 0;}
 	break;
-#line 9866 "ext/dtext/dtext.c"
+#line 9861 "ext/dtext/dtext.c"
 	}
 
 	if ( ++( sm->p) != ( sm->pe) )
@@ -10674,7 +10669,7 @@ _again:
 	_out: {}
 	}
 
-#line 1306 "ext/dtext/dtext.rl"
+#line 1301 "ext/dtext/dtext.rl"
 
   dstack_close(sm);
 

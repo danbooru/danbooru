@@ -228,7 +228,7 @@ class DTextTest < Minitest::Test
   end
 
   def test_quote_blocks_nested_expand
-    assert_parse("<blockquote><p>a</p><div class=\"expandable\"><div class=\"expandable-header\"><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><p>b</p></div></div><p>c</p></blockquote>", "[quote]\na\n[expand]\nb\n[/expand]\nc\n[/quote]")
+    assert_parse("<blockquote><p>a</p><details><summary>Show</summary><div><p>b</p></div></details><p>c</p></blockquote>", "[quote]\na\n[expand]\nb\n[/expand]\nc\n[/quote]")
   end
 
   def test_block_code
@@ -486,19 +486,19 @@ class DTextTest < Minitest::Test
   end
 
   def test_expand
-    assert_parse("<div class=\"expandable\"><div class=\"expandable-header\"><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><p>hello world</p></div></div>", "[expand]hello world[/expand]")
+    assert_parse("<details><summary>Show</summary><div><p>hello world</p></div></details>", "[expand]hello world[/expand]")
   end
 
   def test_aliased_expand
-    assert_parse("<div class=\"expandable\"><div class=\"expandable-header\"><span>hello</span><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><p>blah blah</p></div></div>", "[expand=hello]blah blah[/expand]")
+    assert_parse("<details><summary>hello</summary><div><p>blah blah</p></div></details>", "[expand=hello]blah blah[/expand]")
   end
 
   def test_expand_with_nested_code
-    assert_parse("<div class=\"expandable\"><div class=\"expandable-header\"><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><pre>hello\n</pre></div></div>", "[expand]\n[code]\nhello\n[/code]\n[/expand]")
+    assert_parse("<details><summary>Show</summary><div><pre>hello\n</pre></div></details>", "[expand]\n[code]\nhello\n[/code]\n[/expand]")
   end
 
   def test_expand_with_nested_list
-    assert_parse("<div class=\"expandable\"><div class=\"expandable-header\"><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><ul><li>a</li><li>b<br></li></ul></div></div><p>c</p>", "[expand]\n* a\n* b\n[/expand]\nc")
+    assert_parse("<details><summary>Show</summary><div><ul><li>a</li><li>b<br></li></ul></div></details><p>c</p>", "[expand]\n* a\n* b\n[/expand]\nc")
   end
 
   def test_inline_mode
