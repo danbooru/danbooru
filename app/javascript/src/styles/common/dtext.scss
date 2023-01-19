@@ -140,10 +140,54 @@ div.prose {
   }
 
   details {
-    margin-bottom: 1em;
+    margin-bottom: 0.75rem;
+    border-radius: 0.25rem;
+    background-color: var(--dtext-details-background-color);
+
+    &[open] summary {
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+
+      &::before {
+        rotate: 180deg;
+      }
+    }
 
     summary {
-      margin-bottom: 1em;
+      display: flex;
+      align-items: center;
+      list-style: none;
+      user-select: none;
+      font-weight: bold;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+
+      color: var(--dtext-details-summary-text-color);
+      background-color: var(--dtext-details-summary-background-color);
+
+      &::before {
+        content: "";
+        display: inline-block;
+        flex: none;
+        width: 24px;
+        height: 24px;
+        background-color: var(--dtext-details-summary-text-color);
+        mask-image: url('data:image/svg+xml,\00003csvg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\00003cpath fill="currentcolor" d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z">\00003c/path>\00003c/svg>');
+        mask-repeat: no-repeat;
+      }
+
+      &:hover {
+        background-color: var(--dtext-details-summary-hover-background-color);
+        cursor: pointer;
+      }
+    }
+
+    > div {
+      padding: 1rem;
+
+      > *:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 }
