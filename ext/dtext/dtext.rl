@@ -426,8 +426,8 @@ inline := |*
       dstack_close_list(sm);
     }
 
-    if (dstack_check(sm, BLOCK_QUOTE)) {
-      dstack_rewind(sm);
+    if (dstack_is_open(sm, BLOCK_QUOTE)) {
+      dstack_close_until(sm, BLOCK_QUOTE);
       fret;
     } else {
       append_block(sm, "[/quote]");
@@ -849,6 +849,11 @@ static inline bool dstack_check2(const StateMachine * sm, element_t expected_ele
   return top2 == expected_element;
 }
 
+// Return true if the given tag is currently open.
+static inline bool dstack_is_open(const StateMachine * sm, element_t element) {
+  return g_queue_index(sm->dstack, GINT_TO_POINTER(element)) != -1;
+}
+
 static inline bool is_internal_url(StateMachine * sm, GUri* url) {
   if (sm->domain == NULL || url == NULL) {
     return false;
@@ -1183,6 +1188,15 @@ static void dstack_close_before_block(StateMachine * sm) {
       return;
     }
   }
+}
+
+// Close all open tags up to and including the given tag.
+static void dstack_close_until(StateMachine * sm, element_t element) {
+  while (!g_queue_is_empty(sm->dstack) && !dstack_check(sm, element)) {
+    dstack_rewind(sm);
+  }
+
+  dstack_rewind(sm);
 }
 
 static void dstack_close(StateMachine * sm) {

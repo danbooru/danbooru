@@ -298,6 +298,11 @@ static inline bool dstack_check2(const StateMachine * sm, element_t expected_ele
   return top2 == expected_element;
 }
 
+// Return true if the given tag is currently open.
+static inline bool dstack_is_open(const StateMachine * sm, element_t element) {
+  return g_queue_index(sm->dstack, GINT_TO_POINTER(element)) != -1;
+}
+
 static inline bool is_internal_url(StateMachine * sm, GUri* url) {
   if (sm->domain == NULL || url == NULL) {
     return false;
@@ -634,6 +639,15 @@ static void dstack_close_before_block(StateMachine * sm) {
   }
 }
 
+// Close all open tags up to and including the given tag.
+static void dstack_close_until(StateMachine * sm, element_t element) {
+  while (!g_queue_is_empty(sm->dstack) && !dstack_check(sm, element)) {
+    dstack_rewind(sm);
+  }
+
+  dstack_rewind(sm);
+}
+
 static void dstack_close(StateMachine * sm) {
   while (!g_queue_is_empty(sm->dstack)) {
     dstack_rewind(sm);
@@ -759,7 +773,7 @@ gboolean parse_helper(StateMachine* sm) {
   }
 
   
-#line 763 "ext/dtext/dtext.c"
+#line 777 "ext/dtext/dtext.c"
 	{
 	( sm->top) = 0;
 	( sm->ts) = 0;
@@ -767,9 +781,9 @@ gboolean parse_helper(StateMachine* sm) {
 	( sm->act) = 0;
 	}
 
-#line 1313 "ext/dtext/dtext.rl"
+#line 1327 "ext/dtext/dtext.rl"
   
-#line 773 "ext/dtext/dtext.c"
+#line 787 "ext/dtext/dtext.c"
 	{
 	if ( ( sm->p) == ( sm->pe) )
 		goto _test_eof;
@@ -779,7 +793,7 @@ _resume:
 #line 1 "NONE"
 	{( sm->ts) = ( sm->p);}
 	break;
-#line 783 "ext/dtext/dtext.c"
+#line 797 "ext/dtext/dtext.c"
 	}
 
 	switch (  sm->cs ) {
@@ -8494,8 +8508,8 @@ f110:
       dstack_close_list(sm);
     }
 
-    if (dstack_check(sm, BLOCK_QUOTE)) {
-      dstack_rewind(sm);
+    if (dstack_is_open(sm, BLOCK_QUOTE)) {
+      dstack_close_until(sm, BLOCK_QUOTE);
       { sm->cs = ( ((int *)sm->stack->data))[--( sm->top)];goto _again;}
     } else {
       append_block(sm, "[/quote]");
@@ -9978,7 +9992,7 @@ _again:
 #line 1 "NONE"
 	{( sm->ts) = 0;}
 	break;
-#line 9982 "ext/dtext/dtext.c"
+#line 9996 "ext/dtext/dtext.c"
 	}
 
 	if ( ++( sm->p) != ( sm->pe) )
@@ -10794,7 +10808,7 @@ _again:
 	_out: {}
 	}
 
-#line 1314 "ext/dtext/dtext.rl"
+#line 1328 "ext/dtext/dtext.rl"
 
   dstack_close(sm);
 
