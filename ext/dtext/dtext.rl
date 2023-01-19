@@ -122,13 +122,13 @@ delimited_mention = '<' mention :>> '>';
 
 url = 'http'i 's'i? '://' utf8graph+;
 delimited_url = '<' url :>> '>';
-internal_url = [/#] utf8graph+;
-basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | internal_url) >mark_b1 @mark_b2;
-bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | internal_url) >mark_b1 @mark_b2 :>> ']';
+relative_url = [/#] utf8graph*;
+basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | relative_url) >mark_b1 @mark_b2;
+bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | relative_url) >mark_b1 @mark_b2 :>> ']';
 
 # XXX: internal markdown links aren't allowed to avoid parsing closing tags as links: `[b]foo[/b](bar)`.
 markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonrparen+ >mark_b1 %mark_b2 ')';
-html_link = '<a'i space+ 'href="'i (url | internal_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
+html_link = '<a'i space+ 'href="'i (url | relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
 basic_wiki_link = alnum* >mark_a1 %mark_a2 '[[' (nonbracket nonpipebracket*) >mark_b1 %mark_b2 ']]' alnum* >mark_c1 %mark_c2;
 aliased_wiki_link = alnum* >mark_a1 %mark_a2 '[[' nonpipebracket+ >mark_b1 %mark_b2 '|' nonpipebracket* >mark_c1 %mark_c2 ']]' alnum* >mark_d1 %mark_d2;
@@ -955,20 +955,32 @@ static inline void append_unnamed_url(StateMachine * sm, const char * url_start,
 }
 
 static inline bool append_named_url(StateMachine * sm, const char * url_start, const char * url_end, const char * title_start, const char * title_end) {
+  int url_len = url_end - url_start + 1;
   g_autoptr(GString) parsed_title = parse_basic_inline(title_start, title_end - title_start);
 
   if (!parsed_title) {
     return false;
   }
 
-  if (url_start[0] == '/' || url_start[0] == '#') {
+  // protocol-relative url; treat `//example.com` like `http://example.com`
+  if (url_len > 2 && url_start[0] == '/' && url_start[1] == '/') {
+    g_autoptr(GString) url = g_string_new_len(url_start, url_len);
+    g_string_prepend(url, "http:");
+    g_autoptr(GUri) parsed_url = g_uri_parse(url->str, G_URI_FLAGS_NONE, NULL);
+
+    if (is_internal_url(sm, parsed_url)) {
+      append(sm, "<a class=\"dtext-link\" href=\"http:");
+    } else {
+      append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"http:");
+    }
+  } else if (url_start[0] == '/' || url_start[0] == '#') {
     append(sm, "<a class=\"dtext-link\" href=\"");
 
     if (sm->base_url) {
       append(sm, sm->base_url);
     }
   } else {
-    g_autoptr(GString) url = g_string_new_len(url_start, url_end - url_start + 1);
+    g_autoptr(GString) url = g_string_new_len(url_start, url_len);
     g_autoptr(GUri) parsed_url = g_uri_parse(url->str, G_URI_FLAGS_NONE, NULL);
 
     if (is_internal_url(sm, parsed_url)) {

@@ -302,6 +302,13 @@ class DTextTest < Minitest::Test
   def test_old_style_links
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">test</a></p>', '"test":http://test.com')
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://test.com">test</a></p>', '"test":Http://test.com')
+
+    assert_parse('<p><a class="dtext-link" href="#">test</a></p>', '"test":#')
+    assert_parse('<p><a class="dtext-link" href="/">test</a></p>', '"test":/')
+    assert_parse('<p><a class="dtext-link" href="/x">test</a></p>', '"test":/x')
+    assert_parse('<p><a class="dtext-link" href="//">test</a></p>', '"test"://')
+
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a></p>', '"test"://example.com')
   end
 
   def test_old_style_links_with_inline_tags
@@ -319,6 +326,13 @@ class DTextTest < Minitest::Test
   def test_new_style_links
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">test</a></p>', '"test":[http://test.com]')
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://test.com">test</a></p>', '"test":[Http://test.com]')
+
+    assert_parse('<p><a class="dtext-link" href="#">test</a></p>', '"test":[#]')
+    assert_parse('<p><a class="dtext-link" href="/">test</a></p>', '"test":[/]')
+    assert_parse('<p><a class="dtext-link" href="/x">test</a></p>', '"test":[/x]')
+    assert_parse('<p><a class="dtext-link" href="//">test</a></p>', '"test":[//]')
+
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a></p>', '"test":[//example.com]')
   end
 
   def test_new_style_links_with_inline_tags
@@ -348,6 +362,13 @@ class DTextTest < Minitest::Test
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a>', '<a href="http://example.com">test</a>')
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://example.com">test</a>', '<a href="Http://example.com">test</a>')
     assert_inline_parse('<a class="dtext-link" href="/x">a <em>b</em> c</a>', '<a href="/x">a [i]b[/i] c</a>')
+
+    assert_parse('<p><a class="dtext-link" href="#">test</a></p>', '<a href="#">test</a>')
+    assert_parse('<p><a class="dtext-link" href="/">test</a></p>', '<a href="/">test</a>')
+    assert_parse('<p><a class="dtext-link" href="/x">test</a></p>', '<a href="/x">test</a>')
+    assert_parse('<p><a class="dtext-link" href="//">test</a></p>', '<a href="//">test</a>')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://x">test</a></p>', '<a href="//x">test</a>')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://evil.com">test</a></p>', '<a href="//evil.com">test</a>')
 
     assert_inline_parse(CGI.escapeHTML('<a href="">test</a>'), '<a href="">test</a>')
     assert_inline_parse(CGI.escapeHTML('<a id="foo" href="">test</a>'), '<a id="foo" href="">test</a>')
