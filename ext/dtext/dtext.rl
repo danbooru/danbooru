@@ -120,7 +120,7 @@ utf8graph = (0x00..0x7F) & graph
 mention = '@' utf8graph+ >mark_a1 %mark_a2;
 delimited_mention = '<' mention :>> '>';
 
-url = 'http' 's'? '://' utf8graph+;
+url = 'http'i 's'i? '://' utf8graph+;
 delimited_url = '<' url :>> '>';
 internal_url = [/#] utf8graph+;
 basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | internal_url) >mark_b1 @mark_b2;
