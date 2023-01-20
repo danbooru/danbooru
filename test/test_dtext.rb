@@ -27,7 +27,7 @@ class DTextTest < Minitest::Test
     if expected.nil?
       assert_nil(parse(input, **options))
     else
-      assert_equal(expected, parse(input, **options))
+      assert_equal(expected, parse(input, **options), "DText: #{input}")
     end
   end
 
@@ -225,7 +225,7 @@ class DTextTest < Minitest::Test
     assert_parse('<blockquote><div class="spoiler"><p>foo</p></div></blockquote>', "[quote][spoiler]foo[/quote]")
     assert_parse('<blockquote><pre>foo[/quote]</pre></blockquote>', "[quote][code]foo[/quote]")
     assert_parse('<blockquote><details><summary>Show</summary><div><p>foo</p></div></details></blockquote>', "[quote][expand]foo[/quote]")
-    assert_parse('<blockquote><p>foo[/quote]</p></p></blockquote>', "[quote][nodtext]foo[/quote]") # XXX wrong closing </p>
+    assert_parse('<blockquote><p>foo[/quote]</p></blockquote>', "[quote][nodtext]foo[/quote]")
     assert_parse('<blockquote><table class="striped"><td>foo</td></table></blockquote>', "[quote][table][td]foo[/quote]")
     assert_parse('<blockquote><ul><li>foo</li></ul></blockquote>', "[quote]* foo[/quote]")
     assert_parse('<blockquote><h1>foo</h1></blockquote>', "[quote]h1. foo[/quote]")
@@ -592,6 +592,12 @@ class DTextTest < Minitest::Test
     assert_parse('<p>[b]not bold[/b]</p><p> <strong>bold</strong></p>', "[nodtext][b]not bold[/b][/nodtext] [b]bold[/b]")
     assert_parse('<p>[b]not bold[/b]</p><p><strong>hello</strong></p>', "[nodtext][b]not bold[/b][/nodtext]\n\n[b]hello[/b]")
     assert_parse('<p> [b]not bold[/b]</p>', " [nodtext][b]not bold[/b][/nodtext]")
+    assert_parse('<p>[b]not bold</p>', "[nodtext][b]not bold")
+    assert_parse('<h1>[b]not bold</h1>', "h1. [nodtext][b]not bold")
+    assert_parse('<ul><li>[b]not bold</li></ul>', "* [nodtext][b]not bold")
+    assert_parse('<div class="spoiler"><p>[b]not bold</p></div>', "[spoiler][nodtext][b]not bold")
+    assert_parse('<p class="tn">[b]not bold</p>', "[tn][nodtext][b]not bold")
+    assert_parse('<blockquote><p>[b]not bold</p></blockquote>', "[quote][nodtext][b]not bold")
   end
 
   def test_stack_depth_limit

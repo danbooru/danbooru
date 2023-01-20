@@ -524,15 +524,14 @@ code := |*
 
 nodtext := |*
   close_nodtext => {
-    if (dstack_check2(sm, BLOCK_NODTEXT)) {
+    if (dstack_check(sm, BLOCK_NODTEXT)) {
       g_debug("block dstack check");
-      dstack_pop(sm);
       dstack_pop(sm);
       append_block(sm, "</p>");
       fret;
     } else if (dstack_check(sm, INLINE_NODTEXT)) {
       g_debug("inline dstack check");
-      dstack_pop(sm);
+      dstack_rewind(sm);
       fret;
     } else {
       g_debug("else dstack check");
@@ -775,8 +774,7 @@ main := |*
 
   open_nodtext space* => {
     dstack_close_before_block(sm);
-    dstack_open_block(sm, BLOCK_NODTEXT, "");
-    dstack_open_block(sm, BLOCK_P, "<p>");
+    dstack_open_block(sm, BLOCK_NODTEXT, "<p>");
     fcall nodtext;
   };
 
