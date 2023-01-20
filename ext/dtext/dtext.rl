@@ -11,36 +11,69 @@ static const size_t MAX_STACK_DEPTH = 512;
 
 typedef enum element_t {
   QUEUE_EMPTY = 0,
-  BLOCK_P = 1,
-  INLINE_SPOILER = 2,
-  BLOCK_SPOILER = 3,
-  BLOCK_QUOTE = 4,
-  BLOCK_EXPAND = 5,
-  BLOCK_NODTEXT = 6,
-  BLOCK_CODE = 7,
-  BLOCK_TD = 8,
-  INLINE_NODTEXT = 9,
-  INLINE_B = 10,
-  INLINE_I = 11,
-  INLINE_U = 12,
-  INLINE_S = 13,
-  INLINE_TN = 14,
-  BLOCK_TN = 15,
-  BLOCK_TABLE = 16,
-  BLOCK_THEAD = 17,
-  BLOCK_TBODY = 18,
-  BLOCK_TR = 19,
-  BLOCK_UL = 20,
-  BLOCK_LI = 21,
-  BLOCK_TH = 22,
-  BLOCK_H1 = 23,
-  BLOCK_H2 = 24,
-  BLOCK_H3 = 25,
-  BLOCK_H4 = 26,
-  BLOCK_H5 = 27,
-  BLOCK_H6 = 28,
-  INLINE_CODE = 29,
+  BLOCK_P,
+  BLOCK_TN,
+  BLOCK_QUOTE,
+  BLOCK_EXPAND,
+  BLOCK_SPOILER,
+  BLOCK_NODTEXT,
+  BLOCK_CODE,
+  BLOCK_TABLE,
+  BLOCK_THEAD,
+  BLOCK_TBODY,
+  BLOCK_TR,
+  BLOCK_TH,
+  BLOCK_TD,
+  BLOCK_UL,
+  BLOCK_LI,
+  BLOCK_H1,
+  BLOCK_H2,
+  BLOCK_H3,
+  BLOCK_H4,
+  BLOCK_H5,
+  BLOCK_H6,
+  INLINE_B,
+  INLINE_I,
+  INLINE_U,
+  INLINE_S,
+  INLINE_TN,
+  INLINE_CODE,
+  INLINE_SPOILER,
+  INLINE_NODTEXT,
 } element_t;
+
+const char* element_names[] = {
+  "QUEUE_EMPTY",
+  "BLOCK_P",
+  "BLOCK_TN",
+  "BLOCK_QUOTE",
+  "BLOCK_EXPAND",
+  "BLOCK_SPOILER",
+  "BLOCK_NODTEXT",
+  "BLOCK_CODE",
+  "BLOCK_TABLE",
+  "BLOCK_THEAD",
+  "BLOCK_TBODY",
+  "BLOCK_TR",
+  "BLOCK_TH",
+  "BLOCK_TD",
+  "BLOCK_UL",
+  "BLOCK_LI",
+  "BLOCK_H1",
+  "BLOCK_H2",
+  "BLOCK_H3",
+  "BLOCK_H4",
+  "BLOCK_H5",
+  "BLOCK_H6",
+  "INLINE_B",
+  "INLINE_I",
+  "INLINE_U",
+  "INLINE_S",
+  "INLINE_TN",
+  "INLINE_CODE",
+  "INLINE_SPOILER",
+  "INLINE_NODTEXT",
+};
 
 %%{
 machine dtext;
@@ -64,7 +97,7 @@ prepush {
   }
 
   if (sm->top >= len) {
-    g_debug("growing sm->stack %zi\n", len + 16);
+    g_debug("growing sm->stack %zi", len + 16);
     sm->stack = g_array_set_size(sm->stack, len + 16);
   }
 }
@@ -304,6 +337,7 @@ inline := |*
   mention => {
     if (!sm->f_mentions || (sm->a1 > sm->pb && sm->a1 - 1 > sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
       // handle emails
+      g_debug("write '@' (ignored mention)");
       append_c(sm, '@');
       fexec sm->a1;
     } else {
@@ -311,6 +345,7 @@ inline := |*
       const char* name_start = sm->a1;
       const char* name_end = find_boundary_c(match_end);
 
+      g_debug("mention: '@%.*s'", (int)(name_end - name_start + 1), sm->a1);
       append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
       append_segment_html_escaped(sm, name_start, name_end);
       append(sm, "\" href=\"");
@@ -329,6 +364,7 @@ inline := |*
 
   delimited_mention => {
     if (sm->f_mentions) {
+      g_debug("delimited mention: <@%.*s>", (int)(sm->a2 - sm->a1), sm->a1);
       append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
       append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
       append(sm, "\" href=\"");
@@ -374,6 +410,7 @@ inline := |*
   };
 
   close_tn => {
+    g_debug("inline [/tn]");
     dstack_close_before_block(sm);
 
     if (dstack_check(sm, INLINE_TN)) {
@@ -490,7 +527,6 @@ inline := |*
   };
 
   any => {
-    g_debug("inline char: %c", fc);
     append_c_html_escaped(sm, fc);
   };
 *|;
@@ -809,7 +845,7 @@ main := |*
   };
 
   any => {
-    g_debug("block char: %c", fc);
+    g_debug("block char");
     fhold;
 
     if (g_queue_is_empty(sm->dstack) || dstack_check(sm, BLOCK_QUOTE) || dstack_check(sm, BLOCK_SPOILER) || dstack_check(sm, BLOCK_EXPAND)) {
@@ -876,6 +912,8 @@ static inline void append_c(StateMachine * sm, char s) {
 }
 
 static inline void append_c_html_escaped(StateMachine * sm, char s) {
+  g_debug("write '%c'", s);
+
   switch (s) {
     case '<':
       sm->output = g_string_append(sm->output, "&lt;");
@@ -1063,6 +1101,7 @@ static inline void append_dmail_key_link(StateMachine * sm) {
 
 static inline void append_block_segment(StateMachine * sm, const char * a, const char * b) {
   if (!sm->f_inline) {
+    g_debug("write '%.*s'", (int)(b - a + 1), a);
     sm->output = g_string_append_len(sm->output, a, b - a + 1);
   }
 }
@@ -1074,11 +1113,15 @@ static inline void append_block(StateMachine * sm, const char * s) {
 static void append_closing_p(StateMachine * sm) {
   size_t i = sm->output->len;
 
+  g_debug("append closing p");
+
   if (i > 4 && !strncmp(sm->output->str + i - 4, "<br>", 4)) {
+    g_debug("trim last <br>");
     sm->output = g_string_truncate(sm->output, sm->output->len - 4);
   }
 
   if (i > 3 && !strncmp(sm->output->str + i - 3, "<p>", 3)) {
+    g_debug("trim last <p>");
     sm->output = g_string_truncate(sm->output, sm->output->len - 3);
     return;
   }
@@ -1096,14 +1139,14 @@ static void append_closing_p_if(StateMachine * sm) {
 }
 
 static void dstack_open_inline(StateMachine * sm, element_t type, const char * html) {
-  g_debug("push inline element [%d]: %s", type, html);
+  g_debug("opening inline %s", html);
 
   dstack_push(sm, type);
   append(sm, html);
 }
 
 static void dstack_open_block(StateMachine * sm, element_t type, const char * html) {
-  g_debug("push block element [%d]: %s", type, html);
+  g_debug("opening block %s", html);
 
   dstack_push(sm, type);
   append_block(sm, html);
@@ -1111,12 +1154,12 @@ static void dstack_open_block(StateMachine * sm, element_t type, const char * ht
 
 static void dstack_close_inline(StateMachine * sm, element_t type, const char * close_html) {
   if (dstack_check(sm, type)) {
-    g_debug("pop inline element [%d]: %s", type, close_html);
+    g_debug("closing inline %s", close_html);
 
     dstack_pop(sm);
     append(sm, close_html);
   } else {
-    g_debug("ignored out-of-order closing inline tag [%d]", type);
+    g_debug("out-of-order closing %s", element_names[type]);
 
     append_segment(sm, sm->ts, sm->te - 1);
   }
@@ -1124,13 +1167,13 @@ static void dstack_close_inline(StateMachine * sm, element_t type, const char * 
 
 static bool dstack_close_block(StateMachine * sm, element_t type, const char * close_html) {
   if (dstack_check(sm, type)) {
-    g_debug("pop block element [%d]: %s", type, close_html);
+    g_debug("closing block %s", close_html);
 
     dstack_pop(sm);
     append_block(sm, close_html);
     return true;
   } else {
-    g_debug("ignored out-of-order closing block tag [%d]", type);
+    g_debug("out-of-order closing %s", element_names[type]);
 
     append_block_segment(sm, sm->ts, sm->te - 1);
     return false;
@@ -1139,6 +1182,7 @@ static bool dstack_close_block(StateMachine * sm, element_t type, const char * c
 
 static void dstack_rewind(StateMachine * sm) {
   element_t element = dstack_pop(sm);
+  g_debug("dstack rewind %s", element_names[element]);
 
   switch(element) {
     case BLOCK_P: append_closing_p(sm); break;
@@ -1178,6 +1222,8 @@ static void dstack_rewind(StateMachine * sm) {
 }
 
 static void dstack_close_before_block(StateMachine * sm) {
+  g_debug("dstack close before block");
+
   while (1) {
     if (dstack_check(sm, BLOCK_P)) {
       dstack_pop(sm);
@@ -1316,7 +1362,7 @@ GString* parse_basic_inline(const char* dtext, const ssize_t length) {
 gboolean parse_helper(StateMachine* sm) {
   const gchar* end = NULL;
 
-  g_debug("start\n");
+  g_debug("parse '%s'", sm->p);
 
   if (!g_utf8_validate(sm->pb, sm->pe - sm->pb, &end)) {
     g_set_error(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_INVALID_UTF8, "invalid utf8 starting at byte %td", end - sm->pb + 1);
@@ -1326,7 +1372,9 @@ gboolean parse_helper(StateMachine* sm) {
   %% write init nocs;
   %% write exec;
 
+  g_debug("EOF; closing stray blocks");
   dstack_close(sm);
+  g_debug("done");
 
   return sm->error == NULL;
 }
