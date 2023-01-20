@@ -86,6 +86,7 @@ class DTextTest < Minitest::Test
 
   def test_wiki_links
     assert_parse("<p>a <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/b\">b</a> c</p>", "a [[b]] c")
+    assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/%E6%9D%B1%E6%96%B9\">東方</a></p>", "[[東方]]")
   end
 
   def test_wiki_links_spoiler
@@ -442,6 +443,8 @@ class DTextTest < Minitest::Test
 
   def test_inline_tags_special_entities
     assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%3C3">&lt;3</a></p>', "{{<3}}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%20%22%23%26%2B%3C%3E%3F"> &quot;#&amp;+&lt;&gt;?</a></p>', '{{ "#&+<>?}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%E6%9D%B1%E6%96%B9">東方</a></p>', "{{東方}}")
   end
 
   def test_extra_newlines
@@ -558,13 +561,13 @@ class DTextTest < Minitest::Test
   end
 
   def test_utf8_mentions
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="葉月" href="/users?name=葉月">@葉月</a></p>', "@葉月")
-    assert_parse('<p>Hello <a class="dtext-link dtext-user-mention-link" data-user-name="葉月" href="/users?name=葉月">@葉月</a> and <a class="dtext-link dtext-user-mention-link" data-user-name="Alice" href="/users?name=Alice">@Alice</a></p>', "Hello @葉月 and @Alice")
+    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="葉月" href="/users?name=%E8%91%89%E6%9C%88">@葉月</a></p>', "@葉月")
+    assert_parse('<p>Hello <a class="dtext-link dtext-user-mention-link" data-user-name="葉月" href="/users?name=%E8%91%89%E6%9C%88">@葉月</a> and <a class="dtext-link dtext-user-mention-link" data-user-name="Alice" href="/users?name=Alice">@Alice</a></p>', "Hello @葉月 and @Alice")
     assert_parse('<p>Should not parse 葉月@葉月</p>', "Should not parse 葉月@葉月")
   end
 
   def test_mention_boundaries
-    assert_parse('<p>「hi <a class="dtext-link dtext-user-mention-link" data-user-name="葉月" href="/users?name=葉月">@葉月</a>」</p>', "「hi @葉月」")
+    assert_parse('<p>「hi <a class="dtext-link dtext-user-mention-link" data-user-name="葉月" href="/users?name=%E8%91%89%E6%9C%88">@葉月</a>」</p>', "「hi @葉月」")
   end
 
   def test_delimited_mentions

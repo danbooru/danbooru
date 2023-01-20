@@ -911,18 +911,13 @@ static inline void append_segment(StateMachine * sm, const char * a, const char 
 }
 
 static inline void append_segment_uri_escaped(StateMachine * sm, const char * a, const char * b) {
-  g_autofree char * segment1 = NULL;
-  g_autofree char * segment2 = NULL;
-  g_autoptr(GString) segment_string = g_string_new_len(a, b - a + 1);
-
-  segment1 = g_uri_escape_string(segment_string->str, NULL, TRUE);
-  segment2 = g_markup_escape_text(segment1, -1);
-  sm->output = g_string_append(sm->output, segment2);
+  g_autofree char* escaped = g_uri_escape_bytes((const guint8 *)a, b - a + 1, NULL);
+  g_string_append(sm->output, escaped);
 }
 
 static inline void append_segment_html_escaped(StateMachine * sm, const char * a, const char * b) {
   g_autofree gchar * segment = g_markup_escape_text(a, b - a + 1);
-  sm->output = g_string_append(sm->output, segment);
+  g_string_append(sm->output, segment);
 }
 
 static inline void append_url(StateMachine * sm, const char* url) {
