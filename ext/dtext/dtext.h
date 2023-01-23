@@ -39,6 +39,7 @@ typedef struct StateMachine {
   const char * d1;
   const char * d2;
   bool header_mode;
+  GString * input;
   GString * output;
   GArray * stack;
   GQueue * dstack;

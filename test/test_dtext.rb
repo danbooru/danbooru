@@ -552,6 +552,51 @@ class DTextTest < Minitest::Test
     assert_parse("<details><summary>Show</summary><div><ul><li>a</li><li>b<br></li></ul></div></details><p>c</p>", "[expand]\n* a\n* b\n[/expand]\nc")
   end
 
+  def test_hr
+    assert_parse("<hr>", "[hr]")
+    assert_parse("<hr>", "[HR]")
+    assert_parse("<hr>", "<hr>")
+
+    assert_parse("<hr>", " [hr]")
+    assert_parse("<hr>", "[hr] ")
+    assert_parse("<hr>", " [hr] ")
+    assert_parse("<hr>", "\n\n [hr] \n\n")
+
+    assert_parse("<hr><hr><hr>", "[hr]\n\n[hr]\n\n[hr]")
+    assert_parse("<hr><hr><hr>", "[hr]\n[hr]\n[hr]")
+
+    assert_parse("<p>foo</p><hr>", "foo\n\n[hr]")
+    assert_parse("<hr><p>foo</p>", "[hr]\n\nfoo")
+
+    assert_parse("<p>foo</p><hr>", "foo\n[hr]")
+    assert_parse("<hr><p>foo</p>", "[hr]\nfoo")
+
+    assert_parse("<p>x[hr]</p>", "x[hr]")
+    assert_parse("<p>[hr]x</p>", "[hr]x")
+    assert_parse("<p>foo [hr] bar</p>", "foo [hr] bar")
+    assert_parse("<p>[hr][hr]</p>", "[hr][hr]")
+
+    assert_parse("<h1>[hr]</h1>", "h1. [hr]")
+    assert_parse("<ul><li>[hr]</li></ul>", "* [hr]")
+
+    assert_parse("<blockquote><hr></blockquote>", "[quote]\n[hr]\n[/quote]")
+    assert_parse('<div class="spoiler"><hr></div>', "[spoiler]\n[hr]\n[/spoiler]")
+    assert_parse('<p class="tn"><hr></p>', "[tn]\n[hr]\n[/tn]")
+    assert_parse("<details><summary>Show</summary><div><hr></div></details>", "[expand]\n[hr]\n[/expand]")
+    assert_parse("<pre>[hr]\n</pre>", "[code]\n[hr]\n[/code]") # XXX [code] shouldn't swallow spaces
+    assert_parse("<p>[hr]\n</p>", "[nodtext]\n[hr]\n[/nodtext]") # XXX [nodtext] shouldn't swallow spaces
+    assert_parse('<table class="striped"></table>', "[table]\n[hr]\n[/table]")
+
+    assert_parse("<h1>foo</h1><hr>", "h1. foo\n[hr]")
+    assert_parse("<ul><li>foo</li></ul><hr>", "* foo\n[hr]")
+
+    # XXX these shouldn't work
+    #assert_parse("<blockquote><hr></blockquote>", "[quote][hr][/quote]")
+    #assert_parse('<div class="spoiler"><hr></div>', "[spoiler][hr][/spoiler]")
+    #assert_parse('<p class="tn"><hr></p>', "[tn][hr][/tn]")
+    #assert_parse("<details><summary>Show</summary><hr></details>", "[expand][hr][/expand]")
+  end
+
   def test_inline_mode
     assert_equal("hello", parse_inline("hello").strip)
   end

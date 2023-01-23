@@ -10,7 +10,7 @@
 static const size_t MAX_STACK_DEPTH = 512;
 
 typedef enum element_t {
-  QUEUE_EMPTY = 0,
+  INVALID = 0,
   BLOCK_P,
   BLOCK_TN,
   BLOCK_QUOTE,
@@ -32,6 +32,7 @@ typedef enum element_t {
   BLOCK_H4,
   BLOCK_H5,
   BLOCK_H6,
+  INLINE,
   INLINE_B,
   INLINE_I,
   INLINE_U,
@@ -43,7 +44,7 @@ typedef enum element_t {
 } element_t;
 
 const char* element_names[] = {
-  "QUEUE_EMPTY",
+  "INVALID",
   "BLOCK_P",
   "BLOCK_TN",
   "BLOCK_QUOTE",
@@ -65,6 +66,7 @@ const char* element_names[] = {
   "BLOCK_H4",
   "BLOCK_H5",
   "BLOCK_H6",
+  "INLINE",
   "INLINE_B",
   "INLINE_I",
   "INLINE_U",
@@ -134,9 +136,14 @@ action mark_d2 {
   sm->d2 = sm->p;
 }
 
+# Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
+eos = '\0';
+
 newline = '\r\n' | '\n';
 ws = ' ' | '\t';
+eol = newline | eos;
 
+nonspace = ^space - eos;
 nonnewline = any - (newline | '\r');
 nonquote = ^'"';
 nonbracket = ^']';
@@ -145,12 +152,12 @@ nonpipe = ^'|';
 nonpipebracket = nonpipe & nonbracket;
 noncurly = ^'}';
 
-mention = '@' ^space+ >mark_a1 %mark_a2;
+mention = '@' nonspace+ >mark_a1 %mark_a2;
 delimited_mention = '<' mention :>> '>';
 
-url = 'http'i 's'i? '://' ^space+;
+url = 'http'i 's'i? '://' nonspace+;
 delimited_url = '<' url :>> '>';
-relative_url = [/#] ^space*;
+relative_url = [/#] nonspace*;
 basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | relative_url) >mark_b1 @mark_b2;
 bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | relative_url) >mark_b1 @mark_b2 :>> ']';
 
@@ -175,6 +182,8 @@ aliased_expand = ('[expand'i ws* '='? ws* (nonbracket+ >mark_a1 %mark_a2) ']')
                | ('<expand'i ws* '='? ws* ((^'>')+ >mark_a1 %mark_a2) '>');
 
 list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
+
+hr = ws* ('[hr]'i | '<hr>'i) ws* eol+;
 
 open_spoilers = ('[spoiler'i 's'i? ']') | ('<spoiler'i 's'i? '>');
 open_nodtext = '[nodtext]'i | '<nodtext>'i;
@@ -219,6 +228,7 @@ basic_inline := |*
   close_s => { dstack_close_inline(sm, INLINE_S, "</s>"); };
   open_u  => { dstack_open_inline(sm,  INLINE_U, "<u>"); };
   close_u => { dstack_close_inline(sm, INLINE_U, "</u>"); };
+  eos;
   any => { append_c_html_escaped(sm, fc); };
 *|;
 
@@ -329,7 +339,7 @@ inline := |*
   };
 
   mention => {
-    if (!sm->f_mentions || (sm->a1 - 2 >= sm->pb && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
+    if (!sm->f_mentions || (sm->a1[-2] != '\0' && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
       g_debug("write '@' (ignored mention)");
       append_c_html_escaped(sm, '@');
       fexec sm->a1;
@@ -475,6 +485,19 @@ inline := |*
     }
   };
 
+  eol+ hr => {
+    g_debug("inline [hr] (pos: %ld)", sm->ts - sm->pb);
+
+    if (sm->header_mode) {
+      sm->header_mode = false;
+      dstack_rewind(sm);
+    }
+
+    dstack_close_before_block(sm);
+    fexec sm->ts;
+    fret;
+  };
+
   newline{2,} => {
     g_debug("inline newline2");
     g_debug("  return");
@@ -500,6 +523,8 @@ inline := |*
     append_c_html_escaped(sm, ' ');
   };
 
+  eos;
+
   any => {
     append_c_html_escaped(sm, fc);
   };
@@ -510,6 +535,8 @@ code := |*
     dstack_rewind(sm);
     fret;
   };
+
+  eos;
 
   any => {
     append_c_html_escaped(sm, fc);
@@ -532,6 +559,8 @@ nodtext := |*
       append(sm, "[/nodtext]");
     }
   };
+
+  eos;
 
   any => {
     append_c_html_escaped(sm, fc);
@@ -783,6 +812,11 @@ main := |*
     fcall inline;
   };
 
+  hr => {
+    g_debug("write '<hr>' (pos: %ld)", sm->ts - sm->pb);
+    append(sm, "<hr>");
+  };
+
   list_item => {
     g_debug("block list");
     g_debug("  call list");
@@ -808,6 +842,8 @@ main := |*
   newline => {
     g_debug("block newline");
   };
+
+  eos;
 
   any => {
     g_debug("block char");
@@ -1185,7 +1221,9 @@ static void dstack_rewind(StateMachine * sm) {
     case BLOCK_H2: append_block(sm, "</h2>"); break;
     case BLOCK_H1: append_block(sm, "</h1>"); break;
 
-    case QUEUE_EMPTY: break;
+    // Should never happen.
+    case INLINE: break;
+    case INVALID: break;
   } 
 }
 
@@ -1260,9 +1298,15 @@ StateMachine* init_machine(const char* src, size_t len) {
     output_length *= 2;
   }
 
-  sm->p = src;
-  sm->pb = sm->p;
-  sm->pe = sm->p + len;
+  // Add null bytes to the beginning and end of the string as start and end of string markers.
+  sm->input = g_string_sized_new(len + 2);
+  g_string_append_c(sm->input, '\0');
+  g_string_append_len(sm->input, src, len);
+  g_string_append_c(sm->input, '\0');
+
+  sm->p = sm->input->str;
+  sm->pb = sm->input->str;
+  sm->pe = sm->input->str + sm->input->len;
   sm->eof = sm->pe;
   sm->ts = NULL;
   sm->te = NULL;
@@ -1292,6 +1336,7 @@ StateMachine* init_machine(const char* src, size_t len) {
 }
 
 void free_machine(StateMachine * sm) {
+  g_string_free(sm->input, TRUE);
   g_string_free(sm->output, TRUE);
   g_array_unref(sm->stack);
   g_queue_free(sm->dstack);
@@ -1323,10 +1368,10 @@ GString* parse_basic_inline(const char* dtext, const ssize_t length) {
 gboolean parse_helper(StateMachine* sm) {
   const gchar* end = NULL;
 
-  g_debug("parse '%s'", sm->p);
+  g_debug("parse '%.*s'", (int)sm->input->len, sm->input->str + 1);
 
-  if (!g_utf8_validate(sm->pb, sm->pe - sm->pb, &end)) {
-    g_set_error(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_INVALID_UTF8, "invalid utf8 starting at byte %td", end - sm->pb + 1);
+  if (!g_utf8_validate_len(sm->input->str + 1, sm->input->len - 2, &end)) {
+    g_set_error(&sm->error, DTEXT_PARSE_ERROR, DTEXT_PARSE_ERROR_INVALID_UTF8, "invalid utf8 starting at byte %td", end - sm->input->str + 1);
     return FALSE;
   }
 
