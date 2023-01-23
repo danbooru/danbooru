@@ -866,24 +866,15 @@ static inline void dstack_push(StateMachine * sm, element_t element) {
 }
 
 static inline element_t dstack_pop(StateMachine * sm) {
-  return GPOINTER_TO_INT(g_queue_pop_tail(sm->dstack));
+  return (element_t)GPOINTER_TO_INT(g_queue_pop_tail(sm->dstack));
 }
 
 static inline element_t dstack_peek(const StateMachine * sm) {
-  return GPOINTER_TO_INT(g_queue_peek_tail(sm->dstack));
+  return (element_t)GPOINTER_TO_INT(g_queue_peek_tail(sm->dstack));
 }
 
 static inline bool dstack_check(const StateMachine * sm, element_t expected_element) {
   return dstack_peek(sm) == expected_element;
-}
-
-static inline bool dstack_check2(const StateMachine * sm, element_t expected_element) {
-  if (sm->dstack->length < 2) {
-    return false;
-  }
-
-  element_t top2 = GPOINTER_TO_INT(g_queue_peek_nth(sm->dstack, sm->dstack->length - 2));
-  return top2 == expected_element;
 }
 
 // Return true if the given tag is currently open.
@@ -1050,7 +1041,7 @@ static inline void append_wiki_link(StateMachine * sm, const char * tag_segment,
   g_autoptr(GString) normalized_tag = g_string_new(g_strdelimit(lowercased_tag, " ", '_'));
   g_autoptr(GString) title_string = g_string_new_len(title_segment, title_len);
 
-  if (g_regex_match_simple("^[0-9]+$", normalized_tag->str, 0, 0)) {
+  if (g_regex_match_simple("^[0-9]+$", normalized_tag->str, (GRegexCompileFlags)0, (GRegexMatchFlags)0)) {
     g_string_prepend(normalized_tag, "~");
   }
   
@@ -1059,8 +1050,8 @@ static inline void append_wiki_link(StateMachine * sm, const char * tag_segment,
     g_string_append_len(title_string, tag_segment, tag_len);
 
     /* strip qualifier from tag: "kaga (kantai collection)" -> "kaga" */
-    g_autoptr(GRegex) qualifier_regex = g_regex_new("[ _]\\([^)]+?\\)$", 0, 0, NULL);
-    g_autofree gchar* stripped_string = g_regex_replace_literal(qualifier_regex, title_string->str, title_string->len, 0, "", 0, NULL);
+    g_autoptr(GRegex) qualifier_regex = g_regex_new("[ _]\\([^)]+?\\)$", (GRegexCompileFlags)0, (GRegexMatchFlags)0, NULL);
+    g_autofree gchar* stripped_string = g_regex_replace_literal(qualifier_regex, title_string->str, title_string->len, 0, "", (GRegexMatchFlags)0, NULL);
 
     g_string_assign(title_string, stripped_string);
   }

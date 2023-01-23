@@ -39,7 +39,7 @@ static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALU
   return ret;
 }
 
-void Init_dtext() {
+extern "C" void Init_dtext() {
   cDText = rb_define_class("DText", rb_cObject);
   cDTextError = rb_define_class_under(cDText, "Error", rb_eStandardError);
   rb_define_singleton_method(cDText, "c_parse", c_parse, 5);
