@@ -6,6 +6,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    benchmark-ips (2.10.0)
     cgi (0.3.6)
     minitest (5.17.0)
     rake (13.0.6)
@@ -16,6 +17,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  benchmark-ips (~> 2.10)
   cgi (~> 0.3)
   dtext_rb!
   minitest (~> 5.15)
