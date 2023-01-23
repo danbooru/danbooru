@@ -23,7 +23,7 @@ file "bin/cdtext.exe" => "ext/dtext/dtext.cpp" do
 end
 
 file "ext/dtext/dtext.cpp" => Dir["ext/dtext/dtext.{cpp.rl,h}", "Rakefile"] do
-  sh "ragel -G1 ext/dtext/dtext.cpp.rl -o ext/dtext/dtext.cpp"
+  sh "ragel -G2 ext/dtext/dtext.cpp.rl -o ext/dtext/dtext.cpp"
 end
 
 task test: :compile
