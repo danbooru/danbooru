@@ -984,12 +984,13 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
 }
 
 static inline void append_wiki_link(StateMachine * sm, const char * tag_segment, const size_t tag_len, const char * title_segment, const size_t title_len, const char * prefix_segment, const size_t prefix_len, const char * suffix_segment, const size_t suffix_len) {
-  g_autofree gchar* lowercased_tag = g_utf8_strdown(tag_segment, tag_len);
-  g_autoptr(GString) normalized_tag = g_string_new(g_strdelimit(lowercased_tag, " ", '_'));
+  std::string normalized_tag = std::string(tag_segment, tag_len);
+  std::transform(normalized_tag.begin(), normalized_tag.end(), normalized_tag.begin(), [](unsigned char c) { return c == ' ' ? '_' : std::tolower(c); });
+
   g_autoptr(GString) title_string = g_string_new_len(title_segment, title_len);
 
-  if (std::all_of(normalized_tag->str, normalized_tag->str + normalized_tag->len, ::isdigit)) {
-    g_string_prepend(normalized_tag, "~");
+  if (std::all_of(normalized_tag.begin(), normalized_tag.end(), ::isdigit)) {
+    normalized_tag.insert(0, "~");
   }
   
   /* handle pipe trick: [[Kaga (Kantai Collection)|]] -> [[kaga_(kantai_collection)|Kaga]] */
@@ -1008,7 +1009,7 @@ static inline void append_wiki_link(StateMachine * sm, const char * tag_segment,
 
   append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"");
   append_url(sm, "/wiki_pages/");
-  append_segment_uri_escaped(sm, normalized_tag->str, normalized_tag->str + normalized_tag->len - 1);
+  append_segment_uri_escaped(sm, normalized_tag.c_str(), normalized_tag.c_str() + normalized_tag.size() - 1);
   append(sm, "\">");
   append_segment_html_escaped(sm, title_string->str, title_string->str + title_string->len - 1);
   append(sm, "</a>");
