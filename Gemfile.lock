@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dtext_rb (1.11.4)
+    dtext_rb (1.11.5)
 
 GEM
   remote: https://rubygems.org/
