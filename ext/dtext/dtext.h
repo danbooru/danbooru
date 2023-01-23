@@ -1,24 +1,82 @@
 #ifndef DTEXT_H
 #define DTEXT_H
 
-#include <glib.h>
-#include <stdbool.h>
+#include <string>
+#include <vector>
 
-#ifndef DEBUG
-#undef g_debug
-#define g_debug(...)
-#endif
+typedef enum element_t {
+  DSTACK_EMPTY = 0,
+  BLOCK_P,
+  BLOCK_TN,
+  BLOCK_QUOTE,
+  BLOCK_EXPAND,
+  BLOCK_SPOILER,
+  BLOCK_NODTEXT,
+  BLOCK_CODE,
+  BLOCK_TABLE,
+  BLOCK_THEAD,
+  BLOCK_TBODY,
+  BLOCK_TR,
+  BLOCK_TH,
+  BLOCK_TD,
+  BLOCK_UL,
+  BLOCK_LI,
+  BLOCK_H1,
+  BLOCK_H2,
+  BLOCK_H3,
+  BLOCK_H4,
+  BLOCK_H5,
+  BLOCK_H6,
+  INLINE,
+  INLINE_B,
+  INLINE_I,
+  INLINE_U,
+  INLINE_S,
+  INLINE_TN,
+  INLINE_CODE,
+  INLINE_SPOILER,
+  INLINE_NODTEXT,
+} element_t;
 
-#define DTEXT_PARSE_ERROR dtext_parse_error_quark()
-#define DTEXT_PARSE_ERROR_FAILED 0
-#define DTEXT_PARSE_ERROR_DEPTH_EXCEEDED 1
-#define DTEXT_PARSE_ERROR_INVALID_UTF8 2
+static const char* element_names[] = {
+  "DSTACK_EMPTY",
+  "BLOCK_P",
+  "BLOCK_TN",
+  "BLOCK_QUOTE",
+  "BLOCK_EXPAND",
+  "BLOCK_SPOILER",
+  "BLOCK_NODTEXT",
+  "BLOCK_CODE",
+  "BLOCK_TABLE",
+  "BLOCK_THEAD",
+  "BLOCK_TBODY",
+  "BLOCK_TR",
+  "BLOCK_TH",
+  "BLOCK_TD",
+  "BLOCK_UL",
+  "BLOCK_LI",
+  "BLOCK_H1",
+  "BLOCK_H2",
+  "BLOCK_H3",
+  "BLOCK_H4",
+  "BLOCK_H5",
+  "BLOCK_H6",
+  "INLINE",
+  "INLINE_B",
+  "INLINE_I",
+  "INLINE_U",
+  "INLINE_S",
+  "INLINE_TN",
+  "INLINE_CODE",
+  "INLINE_SPOILER",
+  "INLINE_NODTEXT",
+};
 
 typedef struct StateMachine {
   bool f_inline;
   bool f_mentions;
-  const char * base_url;
-  const char * domain;
+  std::string base_url;
+  std::string domain;
 
   size_t top;
   int cs;
@@ -29,7 +87,6 @@ typedef struct StateMachine {
   const char * eof;
   const char * ts;
   const char * te;
-
   const char * a1;
   const char * a2;
   const char * b1;
@@ -39,20 +96,18 @@ typedef struct StateMachine {
   const char * d1;
   const char * d2;
   bool header_mode;
-  GString * input;
-  GString * output;
-  GArray * stack;
-  GQueue * dstack;
-  GError * error;
   int list_nest;
+
+  std::string input;
+  std::string output;
+  std::vector<int> stack;
+  std::vector<element_t> dstack;
+  std::string error;
 } StateMachine;
 
-StateMachine* init_machine(const char * src, size_t len);
-void free_machine(StateMachine * sm);
+StateMachine init_machine(const char * src, size_t len);
 
-gboolean parse_helper(StateMachine* sm);
-GString* parse_basic_inline(const char* dtext, const ssize_t length);
-
-GQuark dtext_parse_error_quark();
+bool parse_helper(StateMachine* sm);
+std::string parse_basic_inline(const char* dtext, const ssize_t length);
 
 #endif
