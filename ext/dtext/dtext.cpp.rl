@@ -882,8 +882,18 @@ static inline void append_segment(StateMachine * sm, const char * a, const char 
 }
 
 static inline void append_segment_uri_escaped(StateMachine * sm, const char * a, const char * b) {
-  g_autofree char* escaped = g_uri_escape_bytes((const guint8 *)a, b - a + 1, NULL);
-  sm->output += escaped;
+  static const char hex[] = "0123456789ABCDEF";
+  const std::string_view input(a, b - a + 1);
+
+  for (const unsigned char c : input) {
+    if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '-' || c == '_' || c == '.' || c == '~') {
+      sm->output += c;
+    } else {
+      sm->output += '%';
+      sm->output += hex[c >> 4];
+      sm->output += hex[c & 0x0F];
+    }
+  }
 }
 
 static inline void append_segment_html_escaped(StateMachine * sm, const char * a, const char * b) {
