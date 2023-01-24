@@ -830,17 +830,20 @@ static inline bool dstack_is_open(const StateMachine * sm, element_t element) {
   return std::find(sm->dstack.begin(), sm->dstack.end(), element) != sm->dstack.end();
 }
 
-static inline bool is_internal_url(StateMachine * sm, GUri* url) {
-  if (sm->domain.empty() || url == NULL) {
+template <typename string_type>
+static inline bool is_internal_url(StateMachine * sm, const string_type url) {
+  if (url.starts_with("/")) {
+    return true;
+  } else if (sm->domain.empty() || url.empty()) {
     return false;
-  }
+  } else {
+    // Matches the domain name part of a URL.
+    static const std::regex url_regex("^https?://(?:[^/?#]*@)?([^/?#:]+)", std::regex_constants::icase);
 
-  const char* host = g_uri_get_host(url);
-  if (host == NULL) {
-    return false;
+    std::match_results<typename string_type::const_iterator> matches;
+    std::regex_search(url.begin(), url.end(), matches, url_regex);
+    return matches[1] == sm->domain;
   }
-
-  return !sm->domain.compare(host);
 }
 
 template <typename string_type>
@@ -923,10 +926,9 @@ static inline void append_id_link(StateMachine * sm, const char * title, const c
 }
 
 static inline void append_unnamed_url(StateMachine * sm, const char * url_start, const char * url_end) {
-  std::string url = std::string(url_start, url_end - url_start + 1);
-  g_autoptr(GUri) parsed_url = g_uri_parse(url.c_str(), G_URI_FLAGS_NONE, NULL);
+  std::string_view url(url_start, url_end - url_start + 1);
 
-  if (is_internal_url(sm, parsed_url)) {
+  if (is_internal_url(sm, url)) {
     append(sm, "<a class=\"dtext-link\" href=\"");
   } else {
     append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
@@ -939,7 +941,7 @@ static inline void append_unnamed_url(StateMachine * sm, const char * url_start,
 }
 
 static inline bool append_named_url(StateMachine * sm, const char * url_start, const char * url_end, const char * title_start, const char * title_end) {
-  int url_len = url_end - url_start + 1;
+  std::string_view url(url_start, url_end - url_start + 1);
   auto parsed_title = parse_basic_inline(title_start, title_end - title_start);
 
   if (parsed_title.empty()) {
@@ -947,26 +949,20 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
   }
 
   // protocol-relative url; treat `//example.com` like `http://example.com`
-  if (url_len > 2 && url_start[0] == '/' && url_start[1] == '/') {
-    std::string url = "http:" + std::string(url_start, url_len);
-    g_autoptr(GUri) parsed_url = g_uri_parse(url.c_str(), G_URI_FLAGS_NONE, NULL);
-
-    if (is_internal_url(sm, parsed_url)) {
+  if (url.size() > 2 && url.starts_with("//")) {
+    if (is_internal_url(sm, "http:" + std::string(url))) {
       append(sm, "<a class=\"dtext-link\" href=\"http:");
     } else {
       append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"http:");
     }
-  } else if (url_start[0] == '/' || url_start[0] == '#') {
+  } else if (url[0] == '/' || url[0] == '#') {
     append(sm, "<a class=\"dtext-link\" href=\"");
 
     if (!sm->base_url.empty()) {
       append(sm, sm->base_url);
     }
   } else {
-    std::string url = std::string(url_start, url_len);
-    g_autoptr(GUri) parsed_url = g_uri_parse(url.c_str(), G_URI_FLAGS_NONE, NULL);
-
-    if (is_internal_url(sm, parsed_url)) {
+    if (is_internal_url(sm, url)) {
       append(sm, "<a class=\"dtext-link\" href=\"");
     } else {
       append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"");

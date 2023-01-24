@@ -310,6 +310,14 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://danbooru.donmai.us/login">login</a></p>', '[https://danbooru.donmai.us/login](login)', domain: "testbooru.donmai.us")
 
     assert_parse('<p><a class="dtext-link" href="https://user:pass@danbooru.donmai.us:80">https://user:pass@danbooru.donmai.us:80</a></p>', 'https://user:pass@danbooru.donmai.us:80', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/posts?tags=simple@house">https://danbooru.donmai.us/posts?tags=simple@house</a></p>', 'https://danbooru.donmai.us/posts?tags=simple@house', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/posts?tags=%s">https://danbooru.donmai.us/posts?tags=%s</a></p>', 'https://danbooru.donmai.us/posts?tags=%s', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/posts?tags=pok%E9mon">https://danbooru.donmai.us/posts?tags=pok%E9mon</a></p>', 'https://danbooru.donmai.us/posts?tags=pok%E9mon', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/posts?tags=foo%00bar">https://danbooru.donmai.us/posts?tags=foo%00bar</a></p>', 'https://danbooru.donmai.us/posts?tags=foo%00bar', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https:///">https:///</a></p>', 'https:///', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://#">https://#</a></p>', 'https://#', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://?">https://?</a></p>', '<https://?>', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://:">https://:</a></p>', '<https://:>', domain: "danbooru.donmai.us")
   end
 
   def test_old_style_links

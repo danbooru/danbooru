@@ -17,7 +17,7 @@ CLEAN.include %w[lib/dtext/dtext.so bin/cdtext.exe]
 
 task compile: "bin/cdtext.exe"
 file "bin/cdtext.exe" => "ext/dtext/dtext.cpp" do
-  flags = "#{ENV["CFLAGS"] || "-ggdb3 -pg -Wall -Wno-unused-const-variable"}"
+  flags = "#{ENV["CFLAGS"] || "-std=c++20 -ggdb3 -pg -Wall -Wno-unused-const-variable"}"
   libs = "$(pkg-config --cflags --libs glib-2.0)"
   sh "g++ -DCDTEXT -o bin/cdtext.exe ext/dtext/dtext.cpp #{flags} #{libs}"
 end
