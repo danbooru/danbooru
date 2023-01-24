@@ -171,7 +171,7 @@ basic_inline := |*
   open_u  => { dstack_open_inline(sm,  INLINE_U, "<u>"); };
   close_u => { dstack_close_inline(sm, INLINE_U, "</u>"); };
   eos;
-  any => { append_c_html_escaped(sm, fc); };
+  any => { append_html_escaped(sm, fc); };
 *|;
 
 inline := |*
@@ -221,7 +221,7 @@ inline := |*
     append_url(sm, "/posts?tags=");
     append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "\">");
-    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+    append_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "</a>");
   };
 
@@ -243,7 +243,7 @@ inline := |*
     }
 
     if (url_end < match_end) {
-      append_segment_html_escaped(sm, url_end + 1, match_end);
+      append_html_escaped(sm, url_end + 1, match_end);
     }
   };
 
@@ -267,7 +267,7 @@ inline := |*
     append_unnamed_url(sm, url_start, url_end);
 
     if (url_end < match_end) {
-      append_segment_html_escaped(sm, url_end + 1, match_end);
+      append_html_escaped(sm, url_end + 1, match_end);
     }
   };
 
@@ -277,13 +277,13 @@ inline := |*
 
   # probably a tag. examples include @.@ and @_@
   '@' graph '@' => {
-    append_segment_html_escaped(sm, sm->ts, sm->te - 1);
+    append_html_escaped(sm, sm->ts, sm->te - 1);
   };
 
   mention => {
     if (!sm->f_mentions || (sm->a1[-2] != '\0' && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
       g_debug("write '@' (ignored mention)");
-      append_c_html_escaped(sm, '@');
+      append(sm, '@');
       fexec sm->a1;
     } else {
       const char* match_end = sm->a2 - 1;
@@ -294,7 +294,7 @@ inline := |*
       append_mention(sm, name_start, name_end);
 
       if (name_end < match_end) {
-        append_segment_html_escaped(sm, name_end + 1, match_end);
+        append_html_escaped(sm, name_end + 1, match_end);
       }
     }
   };
@@ -462,13 +462,13 @@ inline := |*
   };
 
   '\r' => {
-    append_c_html_escaped(sm, ' ');
+    append(sm, ' ');
   };
 
   eos;
 
   any => {
-    append_c_html_escaped(sm, fc);
+    append_html_escaped(sm, fc);
   };
 *|;
 
@@ -481,7 +481,7 @@ code := |*
   eos;
 
   any => {
-    append_c_html_escaped(sm, fc);
+    append_html_escaped(sm, fc);
   };
 *|;
 
@@ -505,7 +505,7 @@ nodtext := |*
   eos;
 
   any => {
-    append_c_html_escaped(sm, fc);
+    append_html_escaped(sm, fc);
   };
 *|;
 
@@ -732,7 +732,7 @@ main := |*
     dstack_close_before_block(sm);
     dstack_open_block(sm, BLOCK_EXPAND, "<details>");
     append(sm, "<summary>");
-    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+    append_html_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, "</summary><div>");
   };
 
@@ -843,37 +843,26 @@ static inline bool is_internal_url(StateMachine * sm, GUri* url) {
   return !sm->domain.compare(host);
 }
 
-static inline void append(StateMachine * sm, const char * s) {
-  sm->output += s;
+template <typename string_type>
+static inline void append(StateMachine * sm, const string_type c) {
+  sm->output += c;
 }
 
-static inline void append(StateMachine * sm, const std::string string) {
-  sm->output += string;
-}
-
-static inline void append_c_html_escaped(StateMachine * sm, char s) {
-  g_debug("write '%c'", s);
-
+static inline void append_html_escaped(StateMachine * sm, char s) {
   switch (s) {
-    case '<':
-      sm->output += "&lt;";
-      break;
+    case '<': append(sm, "&lt;"); break;
+    case '>': append(sm, "&gt;"); break;
+    case '&': append(sm, "&amp;"); break;
+    case '"': append(sm, "&quot;"); break;
+    default:  append(sm, s);
+  }
+}
 
-    case '>':
-      sm->output += "&gt;";
-      break;
+static inline void append_html_escaped(StateMachine * sm, const char * a, const char * b) {
+  const std::string_view input(a, b - a + 1);
 
-    case '&':
-      sm->output += "&amp;";
-      break;
-
-    case '"':
-      sm->output += "&quot;";
-      break;
-
-    default:
-      sm->output += s;
-      break;
+  for (const unsigned char c : input) {
+    append_html_escaped(sm, c);
   }
 }
 
@@ -896,11 +885,6 @@ static inline void append_segment_uri_escaped(StateMachine * sm, const char * a,
   }
 }
 
-static inline void append_segment_html_escaped(StateMachine * sm, const char * a, const char * b) {
-  g_autofree gchar * segment = g_markup_escape_text(a, b - a + 1);
-  sm->output += segment;
-}
-
 static inline void append_url(StateMachine * sm, const char* url) {
   if ((url[0] == '/' || url[0] == '#') && !sm->base_url.empty()) {
     append(sm, sm->base_url);
@@ -911,12 +895,12 @@ static inline void append_url(StateMachine * sm, const char* url) {
 
 static inline void append_mention(StateMachine * sm, const char* name_start, const char* name_end) {
   append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
-  append_segment_html_escaped(sm, name_start, name_end);
+  append_html_escaped(sm, name_start, name_end);
   append(sm, "\" href=\"");
   append_url(sm, "/users?name=");
   append_segment_uri_escaped(sm, name_start, name_end);
   append(sm, "\">@");
-  append_segment_html_escaped(sm, name_start, name_end);
+  append_html_escaped(sm, name_start, name_end);
   append(sm, "</a>");
 }
 
@@ -934,7 +918,7 @@ static inline void append_id_link(StateMachine * sm, const char * title, const c
   append(sm, "\">");
   append(sm, title);
   append(sm, " #");
-  append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+  append_html_escaped(sm, sm->a1, sm->a2 - 1);
   append(sm, "</a>");
 }
 
@@ -948,9 +932,9 @@ static inline void append_unnamed_url(StateMachine * sm, const char * url_start,
     append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
   }
 
-  append_segment_html_escaped(sm, url_start, url_end);
+  append_html_escaped(sm, url_start, url_end);
   append(sm, "\">");
-  append_segment_html_escaped(sm, url_start, url_end);
+  append_html_escaped(sm, url_start, url_end);
   append(sm, "</a>");
 }
 
@@ -989,7 +973,7 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
     }
   }
 
-  append_segment_html_escaped(sm, url_start, url_end);
+  append_html_escaped(sm, url_start, url_end);
   append(sm, "\">");
   append(sm, parsed_title);
   append(sm, "</a>");
@@ -1033,7 +1017,7 @@ static inline void append_wiki_link(StateMachine * sm, const char * tag_segment,
   append_url(sm, "/wiki_pages/");
   append_segment_uri_escaped(sm, normalized_tag.c_str(), normalized_tag.c_str() + normalized_tag.size() - 1);
   append(sm, "\">");
-  append_segment_html_escaped(sm, title.c_str(), title.c_str() + title.size() - 1);
+  append_html_escaped(sm, title.c_str(), title.c_str() + title.size() - 1);
   append(sm, "</a>");
 }
 
