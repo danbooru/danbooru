@@ -487,19 +487,8 @@ code := |*
 
 nodtext := |*
   close_nodtext => {
-    if (dstack_check(sm, BLOCK_NODTEXT)) {
-      g_debug("block dstack check");
-      dstack_pop(sm);
-      append_block(sm, "</p>");
-      fret;
-    } else if (dstack_check(sm, INLINE_NODTEXT)) {
-      g_debug("inline dstack check");
-      dstack_rewind(sm);
-      fret;
-    } else {
-      g_debug("else dstack check");
-      append(sm, "[/nodtext]");
-    }
+    dstack_rewind(sm);
+    fret;
   };
 
   eos;
@@ -1133,7 +1122,7 @@ static void dstack_rewind(StateMachine * sm) {
     case BLOCK_SPOILER: append_block(sm, "</div>"); break;
     case BLOCK_QUOTE: append_block(sm, "</blockquote>"); break;
     case BLOCK_EXPAND: append_block(sm, "</div></details>"); break;
-    case BLOCK_NODTEXT: append_closing_p(sm); break;
+    case BLOCK_NODTEXT: append_block(sm, "</p>"); break;
     case BLOCK_CODE: append_block(sm, "</pre>"); break;
     case BLOCK_TD: append_block(sm, "</td>"); break;
     case BLOCK_TH: append_block(sm, "</th>"); break;

@@ -654,6 +654,14 @@ class DTextTest < Minitest::Test
     assert_parse('<div class="spoiler"><p>[b]not bold</p></div>', "[spoiler][nodtext][b]not bold")
     assert_parse('<p class="tn">[b]not bold</p>', "[tn][nodtext][b]not bold")
     assert_parse('<blockquote><p>[b]not bold</p></blockquote>', "[quote][nodtext][b]not bold")
+    assert_parse('<p>foo  bar</p>', "foo [nodtext] bar")
+    assert_parse('<p>foo bar</p>', "foo [nodtext]bar[/nodtext]")
+    assert_parse('<p></p>', "[nodtext]")
+    assert_parse('<p></p>', "[nodtext][/nodtext]")
+    assert_parse('<p>[/nodtext]</p>', "[/nodtext]")
+
+    assert_parse('', "[nodtext]", inline: true)
+    assert_parse('', "[nodtext][/nodtext]", inline: true)
   end
 
   def test_stack_depth_limit
