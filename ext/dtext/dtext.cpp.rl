@@ -7,6 +7,7 @@
 #include <string.h>
 #include <glib.h>
 #include <algorithm>
+#include <regex>
 
 #ifndef DEBUG
 #undef g_debug
@@ -14,6 +15,9 @@
 #endif
 
 static const size_t MAX_STACK_DEPTH = 512;
+
+// Matches `_(fate) in `artoria_pendragon_(lancer)_(fate)`.
+static std::regex tag_qualifier_regex("[ _]\\([^)]+?\\)$");
 
 %%{
 machine dtext;
@@ -984,34 +988,42 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
 }
 
 static inline void append_wiki_link(StateMachine * sm, const char * tag_segment, const size_t tag_len, const char * title_segment, const size_t title_len, const char * prefix_segment, const size_t prefix_len, const char * suffix_segment, const size_t suffix_len) {
-  std::string normalized_tag = std::string(tag_segment, tag_len);
-  std::transform(normalized_tag.begin(), normalized_tag.end(), normalized_tag.begin(), [](unsigned char c) { return c == ' ' ? '_' : std::tolower(c); });
+  std::string_view tag(tag_segment, tag_len);
+  std::string_view prefix(prefix_segment, prefix_len);
+  std::string_view suffix(suffix_segment, suffix_len);
 
-  g_autoptr(GString) title_string = g_string_new_len(title_segment, title_len);
+  std::string normalized_tag(tag);
+  std::string title(title_segment, title_len);
 
-  if (std::all_of(normalized_tag.begin(), normalized_tag.end(), ::isdigit)) {
+  // "Kantai Collection" -> "kantai_collection"
+  std::transform(normalized_tag.cbegin(), normalized_tag.cend(), normalized_tag.begin(), [](unsigned char c) { return c == ' ' ? '_' : std::tolower(c); });
+
+  // [[2019]] -> [[~2019]]
+  if (std::all_of(normalized_tag.cbegin(), normalized_tag.cend(), ::isdigit)) {
     normalized_tag.insert(0, "~");
   }
-  
-  /* handle pipe trick: [[Kaga (Kantai Collection)|]] -> [[kaga_(kantai_collection)|Kaga]] */
-  if (title_string->len == 0) {
-    g_string_append_len(title_string, tag_segment, tag_len);
 
-    /* strip qualifier from tag: "kaga (kantai collection)" -> "kaga" */
-    g_autoptr(GRegex) qualifier_regex = g_regex_new("[ _]\\([^)]+?\\)$", (GRegexCompileFlags)0, (GRegexMatchFlags)0, NULL);
-    g_autofree gchar* stripped_string = g_regex_replace_literal(qualifier_regex, title_string->str, title_string->len, 0, "", (GRegexMatchFlags)0, NULL);
-
-    g_string_assign(title_string, stripped_string);
+  // Pipe trick: [[Kaga (Kantai Collection)|]] -> [[kaga_(kantai_collection)|Kaga]]
+  if (title.empty()) {
+    // Strip qualifier from tag: "Artoria Pendragon (Lancer) (Fate)" -> "Artoria Pendragon (Lancer)"
+    std::regex_replace(std::back_inserter(title), tag.cbegin(), tag.cend(), tag_qualifier_regex, "");
   }
 
-  g_string_prepend_len(title_string, prefix_segment, prefix_len);
-  g_string_append_len(title_string, suffix_segment, suffix_len);
+  // 19[[60s]] -> [[60s|1960s]]
+  if (!prefix.empty()) {
+    title.insert(0, prefix);
+  }
+
+  // [[cat]]s -> [[cat|cats]]
+  if (!suffix.empty()) {
+    title.append(suffix);
+  }
 
   append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"");
   append_url(sm, "/wiki_pages/");
   append_segment_uri_escaped(sm, normalized_tag.c_str(), normalized_tag.c_str() + normalized_tag.size() - 1);
   append(sm, "\">");
-  append_segment_html_escaped(sm, title_string->str, title_string->str + title_string->len - 1);
+  append_segment_html_escaped(sm, title.c_str(), title.c_str() + title.size() - 1);
   append(sm, "</a>");
 }
 
