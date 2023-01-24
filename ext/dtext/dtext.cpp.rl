@@ -609,42 +609,42 @@ main := |*
       case '1':
         dstack_push(sm, BLOCK_H1);
         append_block(sm, "<h1 id=\"");
-        append_block(sm, id_name.c_str());
+        append_block(sm, id_name);
         append_block(sm, "\">");
         break;
 
       case '2':
         dstack_push(sm, BLOCK_H2);
         append_block(sm, "<h2 id=\"");
-        append_block(sm, id_name.c_str());
+        append_block(sm, id_name);
         append_block(sm, "\">");
         break;
 
       case '3':
         dstack_push(sm, BLOCK_H3);
         append_block(sm, "<h3 id=\"");
-        append_block(sm, id_name.c_str());
+        append_block(sm, id_name);
         append_block(sm, "\">");
         break;
 
       case '4':
         dstack_push(sm, BLOCK_H4);
         append_block(sm, "<h4 id=\"");
-        append_block(sm, id_name.c_str());
+        append_block(sm, id_name);
         append_block(sm, "\">");
         break;
 
       case '5':
         dstack_push(sm, BLOCK_H5);
         append_block(sm, "<h5 id=\"");
-        append_block(sm, id_name.c_str());
+        append_block(sm, id_name);
         append_block(sm, "\">");
         break;
 
       case '6':
         dstack_push(sm, BLOCK_H6);
         append_block(sm, "<h6 id=\"");
-        append_block(sm, id_name.c_str());
+        append_block(sm, id_name);
         append_block(sm, "\">");
         break;
     }
@@ -846,9 +846,12 @@ static inline bool is_internal_url(StateMachine * sm, const string_type url) {
   }
 }
 
-template <typename string_type>
-static inline void append(StateMachine * sm, const string_type c) {
+static inline void append(StateMachine * sm, const auto c) {
   sm->output += c;
+}
+
+static inline void append(StateMachine * sm, const char * a, const char * b) {
+  append(sm, std::string_view(a, b - a));
 }
 
 static inline void append_html_escaped(StateMachine * sm, char s) {
@@ -869,21 +872,17 @@ static inline void append_html_escaped(StateMachine * sm, const char * a, const 
   }
 }
 
-static inline void append_segment(StateMachine * sm, const char * a, const char * b) {
-  sm->output.append(a, b - a + 1);
-}
-
 static inline void append_segment_uri_escaped(StateMachine * sm, const char * a, const char * b) {
   static const char hex[] = "0123456789ABCDEF";
   const std::string_view input(a, b - a + 1);
 
   for (const unsigned char c : input) {
     if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '-' || c == '_' || c == '.' || c == '~') {
-      sm->output += c;
+      append(sm, c);
     } else {
-      sm->output += '%';
-      sm->output += hex[c >> 4];
-      sm->output += hex[c & 0x0F];
+      append(sm, '%');
+      append(sm, hex[c >> 4]);
+      append(sm, hex[c & 0x0F]);
     }
   }
 }
@@ -1020,51 +1019,50 @@ static inline void append_wiki_link(StateMachine * sm, const char * tag_segment,
 static inline void append_paged_link(StateMachine * sm, const char * title, const char * tag, const char * href, const char * param) {
   append(sm, tag);
   append_url(sm, href);
-  append_segment(sm, sm->a1, sm->a2 - 1);
+  append(sm, sm->a1, sm->a2);
   append(sm, param);
-  append_segment(sm, sm->b1, sm->b2 - 1);
+  append(sm, sm->b1, sm->b2);
   append(sm, "\">");
   append(sm, title);
-  append_segment(sm, sm->a1, sm->a2 - 1);
+  append(sm, sm->a1, sm->a2);
   append(sm, "/p");
-  append_segment(sm, sm->b1, sm->b2 - 1);
+  append(sm, sm->b1, sm->b2);
   append(sm, "</a>");
 }
 
 static inline void append_dmail_key_link(StateMachine * sm) {
   append(sm, "<a class=\"dtext-link dtext-id-link dtext-dmail-id-link\" href=\"");
   append_url(sm, "/dmails/");
-  append_segment(sm, sm->a1, sm->a2 - 1);
+  append(sm, sm->a1, sm->a2);
   append(sm, "?key=");
   append_segment_uri_escaped(sm, sm->b1, sm->b2 - 1);
   append(sm, "\">");
   append(sm, "dmail #");
-  append_segment(sm, sm->a1, sm->a2 - 1);
+  append(sm, sm->a1, sm->a2);
   append(sm, "</a>");
 }
 
-static inline void append_block_segment(StateMachine * sm, const char * a, const char * b) {
+static inline void append_block(StateMachine * sm, const char * a, const char * b) {
   if (!sm->f_inline) {
-    g_debug("write '%.*s'", (int)(b - a + 1), a);
-    sm->output.append(a, b - a + 1);
+    append(sm, a, b);
   }
 }
 
-static inline void append_block(StateMachine * sm, const char * s) {
-  append_block_segment(sm, s, s + strlen(s) - 1);
+static inline void append_block(StateMachine * sm, const auto s) {
+  if (!sm->f_inline) {
+    append(sm, s);
+  }
 }
 
 static void append_closing_p(StateMachine * sm) {
-  size_t i = sm->output.size();
-
   g_debug("append closing p");
 
-  if (i > 4 && !strncmp(sm->output.c_str() + i - 4, "<br>", 4)) {
+  if (sm->output.size() > 4 && sm->output.ends_with("<br>")) {
     g_debug("trim last <br>");
     sm->output.resize(sm->output.size() - 4);
   }
 
-  if (i > 3 && !strncmp(sm->output.c_str() + i - 3, "<p>", 3)) {
+  if (sm->output.size() > 3 && sm->output.ends_with("<p>")) {
     g_debug("trim last <p>");
     sm->output.resize(sm->output.size() - 3);
     return;
@@ -1105,7 +1103,7 @@ static void dstack_close_inline(StateMachine * sm, element_t type, const char * 
   } else {
     g_debug("out-of-order closing %s", element_names[type]);
 
-    append_segment(sm, sm->ts, sm->te - 1);
+    append(sm, sm->ts, sm->te);
   }
 }
 
@@ -1119,7 +1117,7 @@ static bool dstack_close_block(StateMachine * sm, element_t type, const char * c
   } else {
     g_debug("out-of-order closing %s", element_names[type]);
 
-    append_block_segment(sm, sm->ts, sm->te - 1);
+    append_block(sm, sm->ts, sm->te);
     return false;
   }
 }
