@@ -1,15 +1,15 @@
 #include "dtext.h"
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
 #include <glib.h>
 #include <algorithm>
 #include <regex>
 
-#ifndef DEBUG
+#ifdef DEBUG
+#undef g_debug
+#define STRINGIFY(x) XSTRINGIFY(x)
+#define XSTRINGIFY(x) #x
+#define g_debug(fmt, ...) fprintf(stderr, "\x1B[1;32mDEBUG\x1B[0m %-28.28s %-24.24s " fmt "\n", __FILE__ ":" STRINGIFY(__LINE__), __func__, ##__VA_ARGS__)
+#else
 #undef g_debug
 #define g_debug(...)
 #endif
@@ -1264,8 +1264,8 @@ StateMachine init_machine(const char* src, size_t len) {
   sm.c2 = NULL;
   sm.d1 = NULL;
   sm.d2 = NULL;
-  sm.f_inline = FALSE;
-  sm.f_mentions = TRUE;
+  sm.f_inline = false;
+  sm.f_mentions = true;
   sm.list_nest = 0;
   sm.header_mode = false;
 
@@ -1286,7 +1286,7 @@ std::string parse_basic_inline(const char* dtext, const ssize_t length) {
 }
 
 bool parse_helper(StateMachine* sm) {
-  const gchar* end = NULL;
+  const char* end = NULL;
 
   g_debug("parse '%.*s'", (int)(sm->input.size() - 2), sm->input.c_str() + 1);
 
@@ -1308,22 +1308,15 @@ bool parse_helper(StateMachine* sm) {
 /* Everything below is optional, it's only needed to build bin/cdtext.exe. */
 #ifdef CDTEXT
 
+#include <glib.h>
+#include <iostream>
+
 static void parse_file(FILE* input, FILE* output, bool opt_inline, bool opt_mentions) {
-  g_autofree char* dtext = NULL;
-  size_t n = 0;
+  std::stringstream ss;
+  ss << std::cin.rdbuf();
+  std::string dtext = ss.str();
 
-  ssize_t length = getdelim(&dtext, &n, '\0', input);
-  if (length == -1) {
-    if (ferror(input)) {
-      perror("getdelim failed");
-      exit(1);
-    } else /* EOF (file was empty, continue with the empty string) */ {
-      dtext = NULL;
-      length = 0;
-    }
-  }
-
-  StateMachine sm = init_machine(dtext, length);
+  StateMachine sm = init_machine(dtext.c_str(), dtext.size());
   sm.f_inline = opt_inline;
   sm.f_mentions = opt_mentions;
 
