@@ -1043,6 +1043,12 @@ static inline void append_block(StateMachine * sm, const auto s) {
   }
 }
 
+static inline void append_block_html_escaped(StateMachine * sm, const char * a, const char * b) {
+  if (!sm->f_inline) {
+    append_html_escaped(sm, a, b);
+  }
+}
+
 static void append_closing_p(StateMachine * sm) {
   g_debug("append closing p");
 
@@ -1092,7 +1098,7 @@ static void dstack_close_inline(StateMachine * sm, element_t type, const char * 
   } else {
     g_debug("out-of-order closing %s", element_names[type]);
 
-    append(sm, sm->ts, sm->te);
+    append_html_escaped(sm, sm->ts, sm->te - 1);
   }
 }
 
@@ -1106,7 +1112,7 @@ static bool dstack_close_block(StateMachine * sm, element_t type, const char * c
   } else {
     g_debug("out-of-order closing %s", element_names[type]);
 
-    append_block(sm, sm->ts, sm->te);
+    append_block_html_escaped(sm, sm->ts, sm->te - 1);
     return false;
   }
 }

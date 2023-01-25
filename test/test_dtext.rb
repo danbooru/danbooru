@@ -664,6 +664,59 @@ class DTextTest < Minitest::Test
     assert_parse('', "[nodtext][/nodtext]", inline: true)
   end
 
+  def test_stray_closing_tags
+    assert_parse('<p>inline &lt;/b&gt;</p>', 'inline </b>')
+    assert_parse('<p>inline &lt;/i&gt;</p>', 'inline </i>')
+    assert_parse('<p>inline &lt;/u&gt;</p>', 'inline </u>')
+    assert_parse('<p>inline &lt;/s&gt;</p>', 'inline </s>')
+    assert_parse('<p>inline &lt;/code&gt;</p>', 'inline </code>')
+    assert_parse('<p>inline &lt;/nodtext&gt;</p>', 'inline </nodtext>')
+    assert_parse('<p>inline &lt;/table&gt;</p>', 'inline </table>')
+    assert_parse('<p>inline &lt;/thead&gt;</p>', 'inline </thead>')
+    assert_parse('<p>inline &lt;/tbody&gt;</p>', 'inline </tbody>')
+    assert_parse('<p>inline &lt;/tr&gt;</p>', 'inline </tr>')
+    assert_parse('<p>inline &lt;/th&gt;</p>', 'inline </th>')
+    assert_parse('<p>inline &lt;/td&gt;</p>', 'inline </td>')
+
+    # assert_parse('<p>inline &lt;/spoiler&gt;</p>', 'inline </spoiler>')
+    # assert_parse('<p>inline &lt;/expand&gt;</p>', 'inline </expand>')
+    # assert_parse('<p>inline &lt;/quote&gt;</p>', 'inline </quote>')
+    # assert_parse('<p>inline &lt;/tn&gt;</p>', 'inline </tn>')
+    assert_parse('<p>inline </p>&lt;/spoiler&gt;', 'inline </spoiler>') # XXX wrong
+    assert_parse('<p>inline </p>&lt;/expand&gt;', 'inline </expand>') # XXX wrong
+    assert_parse('<p>inline </p>[/quote]', 'inline </quote>') # XXX wrong
+    assert_parse('<p>inline </p>&lt;/tn&gt;', 'inline </tn>') # XXX wrong
+
+    # assert_parse('<p>&lt;/spoiler&gt;</p>', '</spoiler>')
+    # assert_parse('<p>&lt;/expand&gt;</p>', '</expand>')
+    # assert_parse('<p>&lt;/quote&gt;</p>', '</quote>')
+    # assert_parse('<p>&lt;/tn&gt;</p>', '</tn>')
+    assert_parse('', '</spoiler>') # XXX wrong
+    assert_parse('<p></p>&lt;/expand&gt;', '</expand>') # XXX wrong
+    assert_parse('<p></p>[/quote]', '</quote>') # XXX wrong
+    assert_parse('<p></p>&lt;/tn&gt;', '</tn>') # XXX wrong
+
+    assert_parse('<p>&lt;/b&gt;</p>', '</b>')
+    assert_parse('<p>&lt;/i&gt;</p>', '</i>')
+    assert_parse('<p>&lt;/u&gt;</p>', '</u>')
+    assert_parse('<p>&lt;/s&gt;</p>', '</s>')
+    assert_parse('<p>&lt;/code&gt;</p>', '</code>')
+    assert_parse('<p>&lt;/nodtext&gt;</p>', '</nodtext>')
+    assert_parse('<p>&lt;/table&gt;</p>', '</table>')
+    assert_parse('<p>&lt;/thead&gt;</p>', '</thead>')
+    assert_parse('<p>&lt;/tbody&gt;</p>', '</tbody>')
+    assert_parse('<p>&lt;/tr&gt;</p>', '</tr>')
+    assert_parse('<p>&lt;/th&gt;</p>', '</th>')
+    assert_parse('<p>&lt;/td&gt;</p>', '</td>')
+  end
+
+  def test_mismatched_tags
+    assert_parse('<p>inline <strong>foo[/i]</strong></p>', 'inline [b]foo[/i]')
+    assert_parse('<p>inline <strong><em>foo[/b]</em></strong></p>', 'inline [b][i]foo[/b][/i]')
+
+    # assert_parse('<div class="spoiler"><blockquote><p>foo</p></blockquote></div>', '[spoiler]\n[quote]\nfoo\n[/spoiler][/quote]')
+  end
+
   def test_stack_depth_limit
     assert_raises(DText::Error) { parse("* foo\n" * 513) }
   end
