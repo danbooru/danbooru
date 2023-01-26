@@ -6,7 +6,7 @@ A Ruby library for parsing [DText](https://danbooru.donmai.us/wiki_pages/help:dt
 # Installation
 
 ```bash
-sudo apt-get install build-essential ragel libglib2.0-dev
+sudo apt-get install build-essential ragel
 bin/rake install
 ```
 

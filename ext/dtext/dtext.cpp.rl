@@ -1,6 +1,5 @@
 #include "dtext.h"
 
-#include <glib.h>
 #include <algorithm>
 #include <regex>
 
@@ -18,6 +17,52 @@ static const size_t MAX_STACK_DEPTH = 512;
 
 // Matches `_(fate) in `artoria_pendragon_(lancer)_(fate)`.
 static std::regex tag_qualifier_regex("[ _]\\([^)]+?\\)$");
+
+// Characters that mark the end of a link.
+//
+// http://www.fileformat.info/info/unicode/category/Pe/list.htm
+// http://www.fileformat.info/info/unicode/block/cjk_symbols_and_punctuation/list.htm
+static char32_t boundary_characters[] = {
+  0x0021, // '!' U+0021 EXCLAMATION MARK
+  0x0029, // ')' U+0029 RIGHT PARENTHESIS
+  0x002C, // ',' U+002C COMMA
+  0x002E, // '.' U+002E FULL STOP
+  0x003A, // ':' U+003A COLON
+  0x003B, // ';' U+003B SEMICOLON
+  0x003C, // '<' U+003C LESS-THAN SIGN
+  0x003E, // '>' U+003E GREATER-THAN SIGN
+  0x003F, // '?' U+003F QUESTION MARK
+  0x005D, // ']' U+005D RIGHT SQUARE BRACKET
+  0x007D, // '}' U+007D RIGHT CURLY BRACKET
+  0x276D, // '❭' U+276D MEDIUM RIGHT-POINTING ANGLE BRACKET ORNAMENT
+  0x3000, // '　' U+3000 IDEOGRAPHIC SPACE (U+3000)
+  0x3001, // '、' U+3001 IDEOGRAPHIC COMMA (U+3001)
+  0x3002, // '。' U+3002 IDEOGRAPHIC FULL STOP (U+3002)
+  0x3008, // '〈' U+3008 LEFT ANGLE BRACKET (U+3008)
+  0x3009, // '〉' U+3009 RIGHT ANGLE BRACKET (U+3009)
+  0x300A, // '《' U+300A LEFT DOUBLE ANGLE BRACKET (U+300A)
+  0x300B, // '》' U+300B RIGHT DOUBLE ANGLE BRACKET (U+300B)
+  0x300C, // '「' U+300C LEFT CORNER BRACKET (U+300C)
+  0x300D, // '」' U+300D RIGHT CORNER BRACKET (U+300D)
+  0x300E, // '『' U+300E LEFT WHITE CORNER BRACKET (U+300E)
+  0x300F, // '』' U+300F RIGHT WHITE CORNER BRACKET (U+300F)
+  0x3010, // '【' U+3010 LEFT BLACK LENTICULAR BRACKET (U+3010)
+  0x3011, // '】' U+3011 RIGHT BLACK LENTICULAR BRACKET (U+3011)
+  0x3014, // '〔' U+3014 LEFT TORTOISE SHELL BRACKET (U+3014)
+  0x3015, // '〕' U+3015 RIGHT TORTOISE SHELL BRACKET (U+3015)
+  0x3016, // '〖' U+3016 LEFT WHITE LENTICULAR BRACKET (U+3016)
+  0x3017, // '〗' U+3017 RIGHT WHITE LENTICULAR BRACKET (U+3017)
+  0x3018, // '〘' U+3018 LEFT WHITE TORTOISE SHELL BRACKET (U+3018)
+  0x3019, // '〙' U+3019 RIGHT WHITE TORTOISE SHELL BRACKET (U+3019)
+  0x301A, // '〚' U+301A LEFT WHITE SQUARE BRACKET (U+301A)
+  0x301B, // '〛' U+301B RIGHT WHITE SQUARE BRACKET (U+301B)
+  0x301C, // '〜' U+301C WAVE DASH (U+301C)
+  0xFF09, // '）' U+FF09 FULLWIDTH RIGHT PARENTHESIS
+  0xFF3D, // '］' U+FF3D FULLWIDTH RIGHT SQUARE BRACKET
+  0xFF5D, // '｝' U+FF5D FULLWIDTH RIGHT CURLY BRACKET
+  0xFF60, // '｠' U+FF60 FULLWIDTH RIGHT WHITE PARENTHESIS
+  0xFF63, // '｣' U+FF63 HALFWIDTH RIGHT CORNER BRACKET
+};
 
 %%{
 machine dtext;
@@ -1200,34 +1245,42 @@ static void dstack_close_list(StateMachine * sm) {
   sm->list_nest = 0;
 }
 
+static inline std::tuple<char32_t, int> get_utf8_char(const char* c) {
+  const unsigned char* p = reinterpret_cast<const unsigned char*>(c);
+
+  // 0x10xxxxxx is a continuation byte; back up to the leading byte.
+  while ((p[0] >> 6) == 0b10) {
+    p--;
+  }
+
+  if (p[0] >> 7 == 0) {
+    // 0x0xxxxxxx
+    return { p[0], 1 };
+  } else if ((p[0] >> 5) == 0b110) {
+    // 0x110xxxxx, 0x10xxxxxx
+    return { ((p[0] & 0b00011111) << 6) | (p[1] & 0b00111111), 2 };
+  } else if ((p[0] >> 4) == 0b1110) {
+    // 0x1110xxxx, 0x10xxxxxx, 0x10xxxxxx
+    return { ((p[0] & 0b00001111) << 12) | (p[1] & 0b00111111) << 6 | (p[2] & 0b00111111), 3 };
+  } else if ((p[0] >> 3) == 0b11110) {
+    // 0x11110xxx, 0x10xxxxxx, 0x10xxxxxx, 0x10xxxxxx
+    return { ((p[0] & 0b00000111) << 18) | (p[1] & 0b00111111) << 12 | (p[2] & 0b00111111) << 6 | (p[3] & 0b00111111), 4 };
+  } else {
+    return { 0, 0 };
+  }
+}
+
 // Returns the preceding non-boundary character if `c` is a boundary character.
 // Otherwise, returns `c` if `c` is not a boundary character. Boundary characters
 // are trailing punctuation characters that should not be part of the matched text.
 static inline const char* find_boundary_c(const char* c) {
-  gunichar ch = g_utf8_get_char(g_utf8_prev_char(c + 1));
-  int offset = 0;
+  auto [ch, len] = get_utf8_char(c);
 
-  // Close punctuation: http://www.fileformat.info/info/unicode/category/Pe/list.htm
-  // U+3000 - U+303F: http://www.fileformat.info/info/unicode/block/cjk_symbols_and_punctuation/list.htm
-  if (g_unichar_type(ch) == G_UNICODE_CLOSE_PUNCTUATION || (ch >= 0x3000 && ch <= 0x303F)) {
-    offset = g_unichar_to_utf8(ch, NULL);
+  if (std::binary_search(std::begin(boundary_characters), std::end(boundary_characters), ch)) {
+    return c - len;
+  } else {
+    return c;
   }
-
-  switch (*c) {
-    case ':':
-    case ';':
-    case '.':
-    case ',':
-    case '!':
-    case '?':
-    case ')':
-    case ']':
-    case '<':
-    case '>':
-      offset = 1;
-  }
-
-  return c - offset;
 }
 
 StateMachine init_machine(const char* src, size_t len) {
@@ -1285,14 +1338,7 @@ std::string parse_basic_inline(const char* dtext, const ssize_t length) {
 }
 
 bool parse_helper(StateMachine* sm) {
-  const char* end = NULL;
-
   g_debug("parse '%.*s'", (int)(sm->input.size() - 2), sm->input.c_str() + 1);
-
-  if (!g_utf8_validate_len(sm->input.c_str() + 1, sm->input.size() - 2, &end)) {
-    sm->error = "invalid utf8 starting at byte " + std::to_string(end - sm->input.c_str() + 1);
-    return false;
-  }
 
   %% write init nocs;
   %% write exec;
