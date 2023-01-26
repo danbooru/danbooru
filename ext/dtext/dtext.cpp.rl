@@ -854,9 +854,15 @@ static inline void append_html_escaped(StateMachine * sm, char s) {
 }
 
 static inline void append_html_escaped(StateMachine * sm, const char * a, const char * b) {
-  const std::string_view input(a, b - a + 1);
+  const std::string_view string(a, b - a + 1);
 
-  for (const unsigned char c : input) {
+  for (const unsigned char c : string) {
+    append_html_escaped(sm, c);
+  }
+}
+
+static inline void append_html_escaped(StateMachine * sm, const std::string_view string) {
+  for (const unsigned char c : string) {
     append_html_escaped(sm, c);
   }
 }
@@ -876,12 +882,12 @@ static inline void append_segment_uri_escaped(StateMachine * sm, const char * a,
   }
 }
 
-static inline void append_url(StateMachine * sm, const char* url) {
+static inline void append_url(StateMachine * sm, const auto url) {
   if ((url[0] == '/' || url[0] == '#') && !sm->base_url.empty()) {
-    append(sm, sm->base_url);
+    append_html_escaped(sm, sm->base_url);
   }
 
-  append(sm, url);
+  append_html_escaped(sm, url);
 }
 
 static inline void append_mention(StateMachine * sm, const char* name_start, const char* name_end) {
@@ -1001,7 +1007,7 @@ static inline void append_wiki_link(StateMachine * sm, const char * tag_segment,
   append_url(sm, "/wiki_pages/");
   append_segment_uri_escaped(sm, normalized_tag.c_str(), normalized_tag.c_str() + normalized_tag.size() - 1);
   append(sm, "\">");
-  append_html_escaped(sm, title.c_str(), title.c_str() + title.size() - 1);
+  append_html_escaped(sm, title);
   append(sm, "</a>");
 }
 

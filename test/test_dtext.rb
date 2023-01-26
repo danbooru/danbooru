@@ -522,7 +522,7 @@ class DTextTest < Minitest::Test
 
     assert_parse_id_link("dtext-yandere-id-link", "https://yande.re/post/show/1234", "yandere #1234")
     assert_parse_id_link("dtext-sankaku-id-link", "https://chan.sankakucomplex.com/post/show/1234", "sankaku #1234")
-    assert_parse_id_link("dtext-gelbooru-id-link", "https://gelbooru.com/index.php?page=post&s=view&id=1234", "gelbooru #1234")
+    assert_parse_id_link("dtext-gelbooru-id-link", "https://gelbooru.com/index.php?page=post&amp;s=view&amp;id=1234", "gelbooru #1234")
   end
 
   def test_dmail_key_id_link
