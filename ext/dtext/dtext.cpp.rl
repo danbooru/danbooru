@@ -478,7 +478,7 @@ inline := |*
     fret;
   };
 
-  newline{2,} => {
+  eol{2,} => {
     g_debug("inline newline2");
     g_debug("  return");
 

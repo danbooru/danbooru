@@ -282,6 +282,7 @@ class DTextTest < Minitest::Test
 
   def test_auto_urls_in_parentheses
     assert_parse('<p>a (<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>) b</p>', 'a (http://test.com) b')
+    assert_parse('<p>(at <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/1234?page=42)">http://test.com/1234?page=42)</a>. blah</p>', '(at http://test.com/1234?page=42). blah')
   end
 
   def test_internal_links
@@ -404,6 +405,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>a （<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>） b</p>', 'a （http://test.com） b')
     assert_parse('<p>a 〜<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>〜 b</p>', 'a 〜http://test.com〜 b')
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>　 b</p>', 'a http://test.com　 b')
+    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://dic.pixiv.net/a/姉ヶ崎寧々">http://dic.pixiv.net/a/姉ヶ崎寧々</a> b</p>', 'a http://dic.pixiv.net/a/姉ヶ崎寧々 b')
   end
 
   def test_old_style_link_boundaries
@@ -457,6 +459,34 @@ class DTextTest < Minitest::Test
 
   def test_extra_newlines
     assert_parse('<p>a</p><p>b</p>', "a\n\n\n\n\n\n\nb\n\n\n\n")
+
+    assert_parse('<p>foo</p>', "foo\n")
+    assert_parse('<ul><li>See also</li></ul>', "* See also\n")
+    assert_parse('<ul><li>See also</li></ul>', "\n* See also\n")
+    assert_parse('<h1>foo</h1>', "h1. foo\n")
+
+    assert_parse('<p>inline <em>foo</em></p>', "inline [i]foo\n")
+    assert_parse('<p>inline <span class="spoiler">blah</span></p>', "inline [spoiler]blah\n")
+    assert_parse('<p>inline <span class="tn">blah</span></p>', "inline [tn]blah\n")
+    assert_parse("<p>inline <code>blah\n</code></p>", "inline [code]blah\n")
+    assert_parse("<p>inline blah\n</p>", "inline [nodtext]blah\n")
+
+    assert_parse('<p class="tn">foo</p>', "[tn]foo\n")
+    assert_parse("<pre>foo\n</pre>", "[code]foo\n")
+    assert_parse("<blockquote><p>foo</p></blockquote>", "[quote]foo\n")
+    assert_parse("<details><summary>Show</summary><div><p>foo</p></div></details>", "[expand]foo\n")
+    assert_parse("<p>foo\n</p>", "[nodtext]foo\n") # XXX should replace newlines
+
+    assert_parse('<p>[/i]<br>blah</p>', "[/i]\nblah\n")
+    assert_parse('<p>[/code]<br>blah</p>', "[/code]\nblah\n")
+    assert_parse('<p>[/nodtext]<br>blah</p>', "[/nodtext]\nblah\n")
+    assert_parse('<p>[/th]<br>blah</p>', "[/th]\nblah\n")
+    assert_parse('<p>[/td]<br>blah</p>', "[/td]\nblah\n")
+
+    assert_parse('<p></p>[/tn]<br>blah', "[/tn]\nblah\n") # XXX wrong
+    assert_parse('<p>blah</p>', "[/spoiler]\nblah\n") # XXX wrong
+    assert_parse('<p></p>[/expand]<br>blah', "[/expand]\nblah\n") # XXX wrong
+    assert_parse('<p></p>[/quote]blah', "[/quote]\nblah\n") # XXX wrong
   end
 
   def test_complex_links_1
