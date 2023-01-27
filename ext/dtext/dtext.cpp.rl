@@ -81,8 +81,7 @@ prepush {
   size_t len = sm->stack.size();
 
   if (len > MAX_STACK_DEPTH) {
-    sm->error = "too many nested elements";
-    fbreak;
+    throw DTextError("too many nested elements");
   }
 
   if (sm->top >= len) {
@@ -283,9 +282,7 @@ inline := |*
     const char* url_start = sm->b1;
     const char* url_end = find_boundary_c(match_end);
 
-    if (!append_named_url(sm, url_start, url_end, sm->a1, sm->a2)) {
-      fbreak;
-    }
+    append_named_url(sm, url_start, url_end, sm->a1, sm->a2);
 
     if (url_end < match_end) {
       append_html_escaped(sm, url_end + 1, match_end);
@@ -293,15 +290,11 @@ inline := |*
   };
 
   bracketed_textile_link => {
-    if (!append_named_url(sm, sm->b1, sm->b2, sm->a1, sm->a2)) {
-      fbreak;
-    }
+    append_named_url(sm, sm->b1, sm->b2, sm->a1, sm->a2);
   };
 
   markdown_link | html_link => {
-    if (!append_named_url(sm, sm->a1, sm->a2 - 1, sm->b1, sm->b2)) {
-      fbreak;
-    }
+    append_named_url(sm, sm->a1, sm->a2 - 1, sm->b1, sm->b2);
   };
 
   url => {
@@ -326,7 +319,7 @@ inline := |*
   };
 
   mention => {
-    if (!sm->f_mentions || (sm->a1[-2] != '\0' && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
+    if (!sm->options.f_mentions || (sm->a1[-2] != '\0' && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
       g_debug("write '@' (ignored mention)");
       append(sm, '@');
       fexec sm->a1;
@@ -345,7 +338,7 @@ inline := |*
   };
 
   delimited_mention => {
-    if (sm->f_mentions) {
+    if (sm->options.f_mentions) {
       g_debug("delimited mention: <@%.*s>", (int)(sm->a2 - sm->a1), sm->a1);
       append_mention(sm, sm->a1, sm->a2 - 1);
     }
@@ -635,7 +628,7 @@ main := |*
     char header = *sm->a1;
     std::string id_name = "dtext-" + std::string(sm->b1, sm->b2 - sm->b1);
 
-    if (sm->f_inline) {
+    if (sm->options.f_inline) {
       header = '6';
     }
 
@@ -690,7 +683,7 @@ main := |*
   header => {
     char header = *sm->a1;
 
-    if (sm->f_inline) {
+    if (sm->options.f_inline) {
       header = '6';
     }
 
@@ -868,7 +861,7 @@ template <typename string_type>
 static inline bool is_internal_url(StateMachine * sm, const string_type url) {
   if (url.starts_with("/")) {
     return true;
-  } else if (sm->domain.empty() || url.empty()) {
+  } else if (sm->options.domain.empty() || url.empty()) {
     return false;
   } else {
     // Matches the domain name part of a URL.
@@ -876,7 +869,7 @@ static inline bool is_internal_url(StateMachine * sm, const string_type url) {
 
     std::match_results<typename string_type::const_iterator> matches;
     std::regex_search(url.begin(), url.end(), matches, url_regex);
-    return matches[1] == sm->domain;
+    return matches[1] == sm->options.domain;
   }
 }
 
@@ -928,8 +921,8 @@ static inline void append_segment_uri_escaped(StateMachine * sm, const char * a,
 }
 
 static inline void append_url(StateMachine * sm, const auto url) {
-  if ((url[0] == '/' || url[0] == '#') && !sm->base_url.empty()) {
-    append_html_escaped(sm, sm->base_url);
+  if ((url[0] == '/' || url[0] == '#') && !sm->options.base_url.empty()) {
+    append_html_escaped(sm, sm->options.base_url);
   }
 
   append_html_escaped(sm, url);
@@ -979,13 +972,10 @@ static inline void append_unnamed_url(StateMachine * sm, const char * url_start,
   append(sm, "</a>");
 }
 
-static inline bool append_named_url(StateMachine * sm, const char * url_start, const char * url_end, const char * title_start, const char * title_end) {
+static inline void append_named_url(StateMachine * sm, const char * url_start, const char * url_end, const char * title_start, const char * title_end) {
   std::string_view url(url_start, url_end - url_start + 1);
-  auto parsed_title = parse_basic_inline(title_start, title_end - title_start);
-
-  if (parsed_title.empty()) {
-    return false;
-  }
+  std::string_view title(title_start, title_end - title_start);
+  auto parsed_title = sm->parse_basic_inline(title);
 
   // protocol-relative url; treat `//example.com` like `http://example.com`
   if (url.size() > 2 && url.starts_with("//")) {
@@ -997,8 +987,8 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
   } else if (url[0] == '/' || url[0] == '#') {
     append(sm, "<a class=\"dtext-link\" href=\"");
 
-    if (!sm->base_url.empty()) {
-      append(sm, sm->base_url);
+    if (!sm->options.base_url.empty()) {
+      append(sm, sm->options.base_url);
     }
   } else {
     if (is_internal_url(sm, url)) {
@@ -1012,8 +1002,6 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
   append(sm, "\">");
   append(sm, parsed_title);
   append(sm, "</a>");
-
-  return true;
 }
 
 static inline void append_wiki_link(StateMachine * sm, const char * tag_segment, const size_t tag_len, const char * title_segment, const size_t title_len, const char * prefix_segment, const size_t prefix_len, const char * suffix_segment, const size_t suffix_len) {
@@ -1083,19 +1071,19 @@ static inline void append_dmail_key_link(StateMachine * sm) {
 }
 
 static inline void append_block(StateMachine * sm, const char * a, const char * b) {
-  if (!sm->f_inline) {
+  if (!sm->options.f_inline) {
     append(sm, a, b);
   }
 }
 
 static inline void append_block(StateMachine * sm, const auto s) {
-  if (!sm->f_inline) {
+  if (!sm->options.f_inline) {
     append(sm, s);
   }
 }
 
 static inline void append_block_html_escaped(StateMachine * sm, const char * a, const char * b) {
-  if (!sm->f_inline) {
+  if (!sm->options.f_inline) {
     append_html_escaped(sm, a, b);
   }
 }
@@ -1283,61 +1271,39 @@ static inline const char* find_boundary_c(const char* c) {
   }
 }
 
-StateMachine init_machine(const char* src, size_t len) {
-  StateMachine sm;
-
-  size_t output_length = len;
-  if (output_length < (INT16_MAX / 2)) {
-    output_length *= 2;
-  }
-
+StateMachine::StateMachine(const auto string, int initial_state, const DTextOptions options) : options(options) {
   // Add null bytes to the beginning and end of the string as start and end of string markers.
-  sm.input.resize(len + 2, '\0');
-  sm.input.replace(1, len, src, len);
+  input.resize(string.size() + 2, '\0');
+  input.replace(1, string.size(), string.data(), string.size());
 
-  sm.output.reserve(output_length);
-  sm.stack.reserve(16);
-  sm.dstack.reserve(16);
+  output.reserve(string.size() * 1.5);
+  stack.reserve(16);
+  dstack.reserve(16);
 
-  sm.p = sm.input.c_str();
-  sm.pb = sm.input.c_str();
-  sm.pe = sm.input.c_str() + sm.input.size();
-  sm.eof = sm.pe;
-  sm.ts = NULL;
-  sm.te = NULL;
-  sm.cs = dtext_start;
-  sm.act = 0;
-  sm.top = 0;
-  sm.a1 = NULL;
-  sm.a2 = NULL;
-  sm.b1 = NULL;
-  sm.b2 = NULL;
-  sm.c1 = NULL;
-  sm.c2 = NULL;
-  sm.d1 = NULL;
-  sm.d2 = NULL;
-  sm.f_inline = false;
-  sm.f_mentions = true;
-  sm.list_nest = 0;
-  sm.header_mode = false;
-
-  return sm;
+  p = input.c_str();
+  pb = input.c_str();
+  pe = input.c_str() + input.size();
+  eof = pe;
+  cs = initial_state;
 }
 
-std::string parse_basic_inline(const char* dtext, const ssize_t length) {
-    StateMachine sm = init_machine(dtext, length);
-    sm.f_inline = true;
-    sm.f_mentions = false;
-    sm.cs = dtext_en_basic_inline;
-
-    if (!parse_helper(&sm)) {
-      g_debug("parse_basic_inline failed");
-    }
-
-    return sm.output;
+std::string StateMachine::parse_inline(const std::string_view dtext) {
+  StateMachine sm(dtext, dtext_en_inline, options);
+  return sm.parse();
 }
 
-bool parse_helper(StateMachine* sm) {
+std::string StateMachine::parse_basic_inline(const std::string_view dtext) {
+  StateMachine sm(dtext, dtext_en_basic_inline, options);
+  return sm.parse();
+}
+
+std::string StateMachine::parse_dtext(const std::string_view dtext, DTextOptions options) {
+  StateMachine sm(dtext, dtext_en_main, options);
+  return sm.parse();
+}
+
+std::string StateMachine::parse() {
+  StateMachine* sm = this;
   g_debug("parse '%.*s'", (int)(sm->input.size() - 2), sm->input.c_str() + 1);
 
   %% write init nocs;
@@ -1347,7 +1313,7 @@ bool parse_helper(StateMachine* sm) {
   dstack_close_all(sm);
   g_debug("done");
 
-  return sm->error.empty();
+  return sm->output;
 }
 
 /* Everything below is optional, it's only needed to build bin/cdtext.exe. */
@@ -1356,22 +1322,20 @@ bool parse_helper(StateMachine* sm) {
 #include <glib.h>
 #include <iostream>
 
-static void parse_file(FILE* input, FILE* output, bool opt_inline, bool opt_mentions) {
+static void parse_file(FILE* input, FILE* output) {
   std::stringstream ss;
   ss << std::cin.rdbuf();
   std::string dtext = ss.str();
 
-  StateMachine sm = init_machine(dtext.c_str(), dtext.size());
-  sm.f_inline = opt_inline;
-  sm.f_mentions = opt_mentions;
+  try {
+    auto result = StateMachine::parse_dtext(dtext, options);
 
-  if (!parse_helper(&sm)) {
-    fprintf(stderr, "dtext parse error: %s\n", sm.error.c_str());
-    exit(1);
-  }
-
-  if (fwrite(sm.output.c_str(), 1, sm.output.size(), output) != sm.output.size()) {
-    perror("fwrite failed");
+    if (fwrite(result.c_str(), 1, result.size(), output) != result.size()) {
+      perror("fwrite failed");
+      exit(1);
+    }
+  } catch (std::exception& e) {
+    fprintf(stderr, "dtext parse error: %s\n", e.what());
     exit(1);
   }
 }
@@ -1406,7 +1370,7 @@ int main(int argc, char* argv[]) {
   argc--, argv++;
 
   if (argc == 0) {
-    parse_file(stdin, stdout, opt_inline, !opt_no_mentions);
+    parse_file(stdin, stdout, { .f_inline = opt_inline, .f_mentions = !opt_no_mentions });
     return 0;
   }
 

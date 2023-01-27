@@ -13,16 +13,16 @@ static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALU
 
   StringValue(input);
 
-  StateMachine sm = init_machine(RSTRING_PTR(input), RSTRING_LEN(input));
-  sm.f_inline = RTEST(f_inline);
-  sm.f_mentions = !RTEST(f_disable_mentions);
+  DTextOptions options;
+  options.f_inline = RTEST(f_inline);
+  options.f_mentions = !RTEST(f_disable_mentions);
 
   if (!NIL_P(base_url)) {
-    sm.base_url = StringValueCStr(base_url); // base_url.to_str # raises ArgumentError if base_url contains null bytes.
+    options.base_url = StringValueCStr(base_url); // base_url.to_str # raises ArgumentError if base_url contains null bytes.
   }
 
   if (!NIL_P(domain)) {
-    sm.domain = StringValueCStr(domain); // domain.to_str # raises ArgumentError if domain contains null bytes.
+    options.domain = StringValueCStr(domain); // domain.to_str # raises ArgumentError if domain contains null bytes.
   }
 
   // if input.encoding != Encoding::UTF_8
@@ -40,12 +40,14 @@ static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALU
     rb_raise(cDTextError, "input contains null byte");
   }
 
-  if (!parse_helper(&sm)) {
-    rb_raise(cDTextError, "%s", sm.error.c_str());
-  }
+  try  {
+    auto dtext = std::string_view(RSTRING_PTR(input), RSTRING_LEN(input));
+    auto result = StateMachine::parse_dtext(dtext, options);
 
-  VALUE ret = rb_utf8_str_new(sm.output.c_str(), sm.output.size());
-  return ret;
+    return rb_utf8_str_new(result.c_str(), result.size());
+  } catch (std::exception& e) {
+    rb_raise(cDTextError, "%s", e.what());
+  }
 }
 
 extern "C" void Init_dtext() {

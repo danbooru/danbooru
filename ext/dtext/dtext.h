@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 typedef enum element_t {
   DSTACK_EMPTY = 0,
@@ -72,42 +73,54 @@ static const char* element_names[] = {
   "INLINE_NODTEXT",
 };
 
-typedef struct StateMachine {
-  bool f_inline;
-  bool f_mentions;
+class DTextError : public std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
+
+struct DTextOptions {
+  bool f_inline = false;
+  bool f_mentions = true;
   std::string base_url;
   std::string domain;
+};
 
-  size_t top;
+class StateMachine {
+public:
+  const DTextOptions options;
+
+  size_t top = 0;
   int cs;
-  int act;
-  const char * p;
-  const char * pb;
-  const char * pe;
-  const char * eof;
-  const char * ts;
-  const char * te;
-  const char * a1;
-  const char * a2;
-  const char * b1;
-  const char * b2;
-  const char * c1;
-  const char * c2;
-  const char * d1;
-  const char * d2;
-  bool header_mode;
-  int list_nest;
+  int act = 0;
+  const char * p = NULL;
+  const char * pb = NULL;
+  const char * pe = NULL;
+  const char * eof = NULL;
+  const char * ts = NULL;
+  const char * te = NULL;
+  const char * a1 = NULL;
+  const char * a2 = NULL;
+  const char * b1 = NULL;
+  const char * b2 = NULL;
+  const char * c1 = NULL;
+  const char * c2 = NULL;
+  const char * d1 = NULL;
+  const char * d2 = NULL;
+  bool header_mode = false;
+  int list_nest = 0;
 
   std::string input;
   std::string output;
   std::vector<int> stack;
   std::vector<element_t> dstack;
-  std::string error;
-} StateMachine;
 
-StateMachine init_machine(const char * src, size_t len);
+  static std::string parse_dtext(const std::string_view dtext, const DTextOptions options);
 
-bool parse_helper(StateMachine* sm);
-std::string parse_basic_inline(const char* dtext, const ssize_t length);
+  std::string parse_inline(const std::string_view dtext);
+  std::string parse_basic_inline(const std::string_view dtext);
+
+private:
+  StateMachine(const auto string, int initial_state, const DTextOptions = {});
+  std::string parse();
+};
 
 #endif
