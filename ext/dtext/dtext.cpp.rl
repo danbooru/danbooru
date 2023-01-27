@@ -142,10 +142,10 @@ mention = '@' nonspace+ >mark_a1 %mark_a2;
 delimited_mention = '<' mention :>> '>';
 
 url = 'http'i 's'i? '://' nonspace+;
-delimited_url = '<' url :>> '>';
+delimited_url = '<' url >mark_a1 %mark_a2 :>> '>';
 relative_url = [/#] nonspace*;
-basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | relative_url) >mark_b1 @mark_b2;
-bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | relative_url) >mark_b1 @mark_b2 :>> ']';
+basic_textile_link = '"' nonquote+ >mark_a1 %mark_a2 '"' ':' (url | relative_url) >mark_b1 %mark_b2;
+bracketed_textile_link = '"' nonquote+ >mark_a1 %mark_a2 '"' ':[' (url | relative_url) >mark_b1 %mark_b2 :>> ']';
 
 # XXX: internal markdown links aren't allowed to avoid parsing closing tags as links: `[b]foo[/b](bar)`.
 markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonrparen+ >mark_b1 %mark_b2 ')';
@@ -263,59 +263,59 @@ inline := |*
   post_link => {
     append(sm, "<a class=\"dtext-link dtext-post-search-link\" href=\"");
     append_url(sm, "/posts?tags=");
-    append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
+    append_uri_escaped(sm, { sm->a1, sm->a2 });
     append(sm, "\">");
-    append_html_escaped(sm, sm->a1, sm->a2 - 1);
+    append_html_escaped(sm, { sm->a1, sm->a2 });
     append(sm, "</a>");
   };
 
   basic_wiki_link => {
-    append_wiki_link(sm, sm->b1, sm->b2 - sm->b1, sm->b1, sm->b2 - sm->b1, sm->a1, sm->a2 - sm->a1, sm->c1, sm->c2 - sm->c1);
+    append_wiki_link(sm, { sm->b1, sm->b2 }, { sm->b1, sm->b2 }, { sm->a1, sm->a2 }, { sm->c1, sm->c2 });
   };
 
   aliased_wiki_link => {
-    append_wiki_link(sm, sm->b1, sm->b2 - sm->b1, sm->c1, sm->c2 - sm->c1, sm->a1, sm->a2 - sm->a1, sm->d1, sm->d2 - sm->d1);
+    append_wiki_link(sm, { sm->b1, sm->b2 }, { sm->c1, sm->c2 }, { sm->a1, sm->a2 }, { sm->d1, sm->d2 });
   };
 
   basic_textile_link => {
     const char* match_end = sm->b2;
     const char* url_start = sm->b1;
-    const char* url_end = find_boundary_c(match_end);
+    const char* url_end = find_boundary_c(match_end - 1) + 1;
 
-    append_named_url(sm, url_start, url_end, sm->a1, sm->a2);
+    append_named_url(sm, { url_start, url_end }, { sm->a1, sm->a2 });
 
     if (url_end < match_end) {
-      append_html_escaped(sm, url_end + 1, match_end);
+      append_html_escaped(sm, { url_end, match_end });
     }
   };
 
   bracketed_textile_link => {
-    append_named_url(sm, sm->b1, sm->b2, sm->a1, sm->a2);
+    append_named_url(sm, { sm->b1, sm->b2 }, { sm->a1, sm->a2 });
   };
 
   markdown_link | html_link => {
-    append_named_url(sm, sm->a1, sm->a2 - 1, sm->b1, sm->b2);
+    append_named_url(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 });
   };
 
   url => {
-    const char* match_end = sm->te - 1;
+    const char* match_end = sm->te;
     const char* url_start = sm->ts;
-    const char* url_end = find_boundary_c(match_end);
+    const char* url_end = find_boundary_c(match_end - 1) + 1;
 
-    append_unnamed_url(sm, url_start, url_end);
+    append_unnamed_url(sm, { url_start, url_end });
 
     if (url_end < match_end) {
-      append_html_escaped(sm, url_end + 1, match_end);
+      append_html_escaped(sm, { url_end, match_end });
     }
   };
 
   delimited_url => {
-    append_unnamed_url(sm, sm->ts + 1, sm->te - 2);
+    append_unnamed_url(sm, { sm->a1, sm->a2 });
   };
 
   # probably a tag. examples include @.@ and @_@
   '@' graph '@' => {
-    append_html_escaped(sm, sm->ts, sm->te - 1);
+    append_html_escaped(sm, { sm->ts, sm->te });
   };
 
   mention => {
@@ -324,15 +324,15 @@ inline := |*
       append(sm, '@');
       fexec sm->a1;
     } else {
-      const char* match_end = sm->a2 - 1;
+      const char* match_end = sm->a2;
       const char* name_start = sm->a1;
-      const char* name_end = find_boundary_c(match_end);
+      const char* name_end = find_boundary_c(match_end - 1) + 1;
 
-      g_debug("mention: '@%.*s'", (int)(name_end - name_start + 1), sm->a1);
-      append_mention(sm, name_start, name_end);
+      g_debug("mention: '@%.*s'", (int)(name_end - name_start), sm->a1);
+      append_mention(sm, { name_start, name_end });
 
       if (name_end < match_end) {
-        append_html_escaped(sm, name_end + 1, match_end);
+        append_html_escaped(sm, { name_end, match_end });
       }
     }
   };
@@ -340,7 +340,7 @@ inline := |*
   delimited_mention => {
     if (sm->options.f_mentions) {
       g_debug("delimited mention: <@%.*s>", (int)(sm->a2 - sm->a1), sm->a1);
-      append_mention(sm, sm->a1, sm->a2 - 1);
+      append_mention(sm, { sm->a1, sm->a2 });
     }
   };
 
@@ -626,7 +626,7 @@ list := |*
 main := |*
   header_with_id => {
     char header = *sm->a1;
-    std::string id_name = "dtext-" + std::string(sm->b1, sm->b2 - sm->b1);
+    std::string id_name = "dtext-" + std::string(sm->b1, sm->b2);
 
     if (sm->options.f_inline) {
       header = '6';
@@ -759,7 +759,7 @@ main := |*
     dstack_close_before_block(sm);
     dstack_open_block(sm, BLOCK_EXPAND, "<details>");
     append(sm, "<summary>");
-    append_html_escaped(sm, sm->a1, sm->a2 - 1);
+    append_html_escaped(sm, { sm->a1, sm->a2 });
     append(sm, "</summary><div>");
   };
 
@@ -878,7 +878,7 @@ static inline void append(StateMachine * sm, const auto c) {
 }
 
 static inline void append(StateMachine * sm, const char * a, const char * b) {
-  append(sm, std::string_view(a, b - a));
+  append(sm, std::string_view(a, b));
 }
 
 static inline void append_html_escaped(StateMachine * sm, char s) {
@@ -891,25 +891,16 @@ static inline void append_html_escaped(StateMachine * sm, char s) {
   }
 }
 
-static inline void append_html_escaped(StateMachine * sm, const char * a, const char * b) {
-  const std::string_view string(a, b - a + 1);
-
-  for (const unsigned char c : string) {
-    append_html_escaped(sm, c);
-  }
-}
-
 static inline void append_html_escaped(StateMachine * sm, const std::string_view string) {
   for (const unsigned char c : string) {
     append_html_escaped(sm, c);
   }
 }
 
-static inline void append_segment_uri_escaped(StateMachine * sm, const char * a, const char * b) {
+static inline void append_uri_escaped(StateMachine * sm, const std::string_view string) {
   static const char hex[] = "0123456789ABCDEF";
-  const std::string_view input(a, b - a + 1);
 
-  for (const unsigned char c : input) {
+  for (const unsigned char c : string) {
     if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '-' || c == '_' || c == '.' || c == '~') {
       append(sm, c);
     } else {
@@ -928,14 +919,14 @@ static inline void append_url(StateMachine * sm, const auto url) {
   append_html_escaped(sm, url);
 }
 
-static inline void append_mention(StateMachine * sm, const char* name_start, const char* name_end) {
+static inline void append_mention(StateMachine * sm, const std::string_view name) {
   append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
-  append_html_escaped(sm, name_start, name_end);
+  append_html_escaped(sm, name);
   append(sm, "\" href=\"");
   append_url(sm, "/users?name=");
-  append_segment_uri_escaped(sm, name_start, name_end);
+  append_uri_escaped(sm, name);
   append(sm, "\">@");
-  append_html_escaped(sm, name_start, name_end);
+  append_html_escaped(sm, name);
   append(sm, "</a>");
 }
 
@@ -949,32 +940,28 @@ static inline void append_id_link(StateMachine * sm, const char * title, const c
   append(sm, id_name);
   append(sm, "-id-link\" href=\"");
   append_url(sm, url);
-  append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
+  append_uri_escaped(sm, { sm->a1, sm->a2 });
   append(sm, "\">");
   append(sm, title);
   append(sm, " #");
-  append_html_escaped(sm, sm->a1, sm->a2 - 1);
+  append_html_escaped(sm, { sm->a1, sm->a2 });
   append(sm, "</a>");
 }
 
-static inline void append_unnamed_url(StateMachine * sm, const char * url_start, const char * url_end) {
-  std::string_view url(url_start, url_end - url_start + 1);
-
+static inline void append_unnamed_url(StateMachine * sm, const std::string_view url) {
   if (is_internal_url(sm, url)) {
     append(sm, "<a class=\"dtext-link\" href=\"");
   } else {
     append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
   }
 
-  append_html_escaped(sm, url_start, url_end);
+  append_html_escaped(sm, url);
   append(sm, "\">");
-  append_html_escaped(sm, url_start, url_end);
+  append_html_escaped(sm, url);
   append(sm, "</a>");
 }
 
-static inline void append_named_url(StateMachine * sm, const char * url_start, const char * url_end, const char * title_start, const char * title_end) {
-  std::string_view url(url_start, url_end - url_start + 1);
-  std::string_view title(title_start, title_end - title_start);
+static inline void append_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
   auto parsed_title = sm->parse_basic_inline(title);
 
   // protocol-relative url; treat `//example.com` like `http://example.com`
@@ -998,19 +985,15 @@ static inline void append_named_url(StateMachine * sm, const char * url_start, c
     }
   }
 
-  append_html_escaped(sm, url_start, url_end);
+  append_html_escaped(sm, url);
   append(sm, "\">");
   append(sm, parsed_title);
   append(sm, "</a>");
 }
 
-static inline void append_wiki_link(StateMachine * sm, const char * tag_segment, const size_t tag_len, const char * title_segment, const size_t title_len, const char * prefix_segment, const size_t prefix_len, const char * suffix_segment, const size_t suffix_len) {
-  std::string_view tag(tag_segment, tag_len);
-  std::string_view prefix(prefix_segment, prefix_len);
-  std::string_view suffix(suffix_segment, suffix_len);
-
-  std::string normalized_tag(tag);
-  std::string title(title_segment, title_len);
+static inline void append_wiki_link(StateMachine * sm, const std::string_view tag, const std::string_view title, const std::string_view prefix, const std::string_view suffix) {
+  auto normalized_tag = std::string(tag);
+  auto title_string = std::string(title);
 
   // "Kantai Collection" -> "kantai_collection"
   std::transform(normalized_tag.cbegin(), normalized_tag.cend(), normalized_tag.begin(), [](unsigned char c) { return c == ' ' ? '_' : std::tolower(c); });
@@ -1021,26 +1004,26 @@ static inline void append_wiki_link(StateMachine * sm, const char * tag_segment,
   }
 
   // Pipe trick: [[Kaga (Kantai Collection)|]] -> [[kaga_(kantai_collection)|Kaga]]
-  if (title.empty()) {
+  if (title_string.empty()) {
     // Strip qualifier from tag: "Artoria Pendragon (Lancer) (Fate)" -> "Artoria Pendragon (Lancer)"
-    std::regex_replace(std::back_inserter(title), tag.cbegin(), tag.cend(), tag_qualifier_regex, "");
+    std::regex_replace(std::back_inserter(title_string), tag.cbegin(), tag.cend(), tag_qualifier_regex, "");
   }
 
   // 19[[60s]] -> [[60s|1960s]]
   if (!prefix.empty()) {
-    title.insert(0, prefix);
+    title_string.insert(0, prefix);
   }
 
   // [[cat]]s -> [[cat|cats]]
   if (!suffix.empty()) {
-    title.append(suffix);
+    title_string.append(suffix);
   }
 
   append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"");
   append_url(sm, "/wiki_pages/");
-  append_segment_uri_escaped(sm, normalized_tag.c_str(), normalized_tag.c_str() + normalized_tag.size() - 1);
+  append_uri_escaped(sm, normalized_tag);
   append(sm, "\">");
-  append_html_escaped(sm, title);
+  append_html_escaped(sm, title_string);
   append(sm, "</a>");
 }
 
@@ -1063,7 +1046,7 @@ static inline void append_dmail_key_link(StateMachine * sm) {
   append_url(sm, "/dmails/");
   append(sm, sm->a1, sm->a2);
   append(sm, "?key=");
-  append_segment_uri_escaped(sm, sm->b1, sm->b2 - 1);
+  append_uri_escaped(sm, { sm->b1, sm->b2 });
   append(sm, "\">");
   append(sm, "dmail #");
   append(sm, sm->a1, sm->a2);
@@ -1082,9 +1065,9 @@ static inline void append_block(StateMachine * sm, const auto s) {
   }
 }
 
-static inline void append_block_html_escaped(StateMachine * sm, const char * a, const char * b) {
+static inline void append_block_html_escaped(StateMachine * sm, const std::string_view string) {
   if (!sm->options.f_inline) {
-    append_html_escaped(sm, a, b);
+    append_html_escaped(sm, string);
   }
 }
 
@@ -1137,7 +1120,7 @@ static void dstack_close_inline(StateMachine * sm, element_t type, const char * 
   } else {
     g_debug("out-of-order closing %s", element_names[type]);
 
-    append_html_escaped(sm, sm->ts, sm->te - 1);
+    append_html_escaped(sm, { sm->ts, sm->te });
   }
 }
 
@@ -1151,7 +1134,7 @@ static bool dstack_close_block(StateMachine * sm, element_t type, const char * c
   } else {
     g_debug("out-of-order closing %s", element_names[type]);
 
-    append_block_html_escaped(sm, sm->ts, sm->te - 1);
+    append_block_html_escaped(sm, { sm->ts, sm->te });
     return false;
   }
 }
