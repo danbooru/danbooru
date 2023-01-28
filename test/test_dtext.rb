@@ -654,6 +654,18 @@ class DTextTest < Minitest::Test
 
     assert_parse("<details><summary>hello</summary><div><p>blah blah</p></div></details>", "<expand=hello>blah blah</expand>")
     assert_parse("<details><summary>ab]cd</summary><div><p>blah blah</p></div></details>", "<expand=ab]cd>blah blah</expand>")
+    assert_parse("<details><summary>ab</summary><div><p>cd&gt;blah blah</p></div></details>", "<expand=ab>cd>blah blah</expand>")
+
+    assert_parse("<details><summary></summary><div><p>blah blah</p></div></details>", "[expand=]blah blah[/expand]")
+    assert_parse("<details><summary></summary><div><p>blah blah</p></div></details>", "<expand=>blah blah</expand>")
+    assert_parse("<details><summary></summary><div><p>blah blah</p></div></details>", "[expand ]blah blah[/expand]")
+    assert_parse("<details><summary></summary><div><p>blah blah</p></div></details>", "[expand= ]blah blah[/expand]")
+
+    # assert_parse("<p>[expandhello]blah blah[/expand]</p>", "[expandhello]blah blah[/expand]")
+    assert_parse("<p>[expandhello]blah blah</p>[/expand]", "[expandhello]blah blah[/expand]") # XXX wrong
+
+    # assert_parse("<p>[expand <br>title]blah blah[/expand]</p>", "[expand \ntitle]blah blah[/expand]")
+    assert_parse("<p>[expand <br>title]blah blah</p>[/expand]", "[expand \ntitle]blah blah[/expand]") # XXX wrong
 
     assert_parse("<p>inline </p><details><summary>hello</summary><div><p>blah</p></div></details>", "inline [expand=hello]blah[/expand]") # XXX trim space after inline
 

@@ -164,8 +164,8 @@ dmail_key = (alnum | '=' | '-')+ >mark_b1 %mark_b2;
 nonperiod = graph - ('.' | '"');
 header = 'h'i [123456] >mark_a1 %mark_a2 '.' ws*;
 header_with_id = 'h'i [123456] >mark_a1 %mark_a2 '#' nonperiod+ >mark_b1 %mark_b2 '.' ws*;
-aliased_expand = ('[expand'i ws* '='? ws* (nonbracket+ >mark_a1 %mark_a2) ']')
-               | ('<expand'i ws* '='? ws* ((^'>')+ >mark_a1 %mark_a2) '>');
+aliased_expand = ('[expand'i (ws* '=' ws* | ws+) ((nonnewline - ']')* >mark_a1 %mark_a2) ']')
+               | ('<expand'i (ws* '=' ws* | ws+) ((nonnewline - '>')* >mark_a1 %mark_a2) '>');
 
 list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
