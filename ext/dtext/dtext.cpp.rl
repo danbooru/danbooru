@@ -438,10 +438,10 @@ inline := |*
     }
   };
 
-  open_expand => {
+  (open_expand | aliased_expand) => {
     g_debug("inline [expand]");
     dstack_rewind(sm);
-    fexec(sm->p - 7);
+    fexec sm->ts;
     fret;
   };
 

@@ -585,8 +585,17 @@ class DTextTest < Minitest::Test
     assert_parse("<details><summary>hello</summary><div><p>blah blah</p></div></details>", "<expand=hello>blah blah</expand>")
     assert_parse("<details><summary>ab]cd</summary><div><p>blah blah</p></div></details>", "<expand=ab]cd>blah blah</expand>")
 
-    # <p>inline [expand=hello]blah blah</p>[/expand]
-    # assert_parse("<p>inline <details><summary>hello</summary><div><p>blah blah</p></div></details>", "inline [expand=hello]blah blah[/expand]") # XXX broken
+    assert_parse("<p>inline </p><details><summary>hello</summary><div><p>blah</p></div></details>", "inline [expand=hello]blah[/expand]") # XXX trim space after inline
+
+    assert_parse("<p>inline</p><details><summary>hello</summary><div><p>blah</p></div></details><p>blah</p>", "inline\n[expand=hello]blah[/expand]\nblah")
+
+    # assert_parse("<ul><li>list</li></ul><details><summary>hello</summary><div><p>blah</p></div></details>", "* list\n[expand=hello]blah[/expand]")
+    assert_parse("<ul><li>list<br></li></ul><details><summary>hello</summary><div><p>blah</p></div></details>", "* list\n[expand=hello]blah[/expand]") # XXX wrong, trim <br>
+
+    assert_parse("<ul><li>list </li></ul><details><summary>hello</summary><div><p>blah</p></div></details>", "* list [expand=hello]blah[/expand]") # XXX wrong, should ignore in lists
+
+    assert_parse("<h1>foo </h1><details><summary>hello</summary><div><p>blah</p></div></details>", "h1. foo [expand=hello]blah[/expand]") # XXX wrong, should ignore in headers
+    assert_parse("<h1>foo</h1><details><summary>hello</summary><div><p>blah</p></div></details>", "h1. foo\n[expand=hello]blah[/expand]")
   end
 
   def test_expand_with_nested_code
