@@ -247,6 +247,76 @@ class DTextTest < Minitest::Test
     assert_parse("<p>foo <code>x</code></p>", "foo [code]x")
   end
 
+  def test_code_fence
+    assert_parse('<pre>code</pre>', "```\ncode\n```")
+    assert_parse('<pre>code</pre>', "``` \ncode\n``` ")
+    assert_parse("<pre>\ncode\n</pre>", "```\n\ncode\n\n```")
+    assert_parse("<pre>\n\ncode\n\n</pre>", "```\n\n\ncode\n\n\n```")
+    assert_parse("<pre>one\ntwo\nthree</pre>", "```\none\ntwo\nthree\n```")
+
+    assert_parse('<p>````<br>code<br>```</p>', "````\ncode\n```")
+    assert_parse('<p>```<br>code<br>````</p>', "```\ncode\n````")
+
+    assert_parse('<p>```<br>```</p>', "```\n```") # XXX wrong? should allow empty code blocks
+    assert_parse('<pre></pre>', "```\n\n```")
+
+    assert_parse('<pre>&lt;b&gt;</pre>', "```\n<b>\n```")
+
+    assert_parse('<p>text</p><pre>code</pre>', "text\n\n```\ncode\n```")
+    assert_parse('<p>text</p><pre>code</pre>', "text\n```\ncode\n```")
+    assert_parse('<pre>code</pre><p>text</p>', "```\ncode\n```\n\ntext")
+    assert_parse('<pre>code</pre><p>text</p>', "```\ncode\n```\ntext")
+    assert_parse('<p>text</p><pre>code</pre><p>text</p>', "text\n```\ncode\n```\ntext")
+    assert_parse('<p>text</p><pre>code</pre><p>text</p>', "text\n\n\n\n```\ncode\n```\n\n\n\ntext")
+
+    assert_parse('<pre>one</pre><p>two<br>```</p>', "```\none\n```\ntwo\n```")
+    assert_parse('<pre>one</pre><p>two</p><p>```</p>', "```\none\n```\ntwo\n\n```")
+    assert_parse('<pre>one</pre><p>two</p><pre>three</pre>', "```\none\n```\ntwo\n```\nthree\n```")
+    assert_parse('<pre>one</pre><p>two</p><pre>three</pre>', "```\none\n```\ntwo\n\n```\nthree\n```")
+
+    assert_parse('<p>text</p><p>x```<br>code<br>```</p>', "text\n\nx```\ncode\n```")
+    assert_parse('<p>text</p><p> ```<br>code<br>```</p>', "text\n\n ```\ncode\n```")
+
+    assert_parse('<p>x ```<br>code<br>```</p>', "x ```\ncode\n```")
+    assert_parse('<p> ```<br>code<br>```</p>', " ```\ncode\n```")
+    assert_parse('<p>```code```</p>', "```code```")
+    assert_parse('<p>```<br>code```</p>', "```\ncode```")
+    assert_parse('<p>```code<br>```</p>', "```code\n```")
+    assert_parse('<p>```code</p>', "```code")
+    assert_parse('<p>```<br>code</p>', "```\ncode")
+    assert_parse('<p>```</p>', "```")
+
+    assert_parse('<h4>Code</h4><pre>code</pre>', "h4. Code\n```\ncode\n```")
+    assert_parse('<ul><li>list</li></ul><pre>code</pre>', "* list\n```\ncode\n```")
+    assert_parse('<hr><pre>code</pre>', "[hr]\n```\ncode\n```")
+
+    assert_parse('<p><strong>text</strong></p><pre>code</pre>', "[b]text\n```\ncode\n```")
+    assert_parse('<p><em>text</em></p><pre>code</pre>', "[i]text\n```\ncode\n```")
+    assert_parse('<p><u>text</u></p><pre>code</pre>', "[u]text\n```\ncode\n```")
+    assert_parse('<p><s>text</s></p><pre>code</pre>', "[s]text\n```\ncode\n```")
+
+    assert_parse('<p>inline <span class="tn">text</span></p><pre>code</pre>', "inline [tn]text\n```\ncode\n```")
+    assert_parse('<p>inline <span class="spoiler">text</span></p><pre>code</pre>', "inline [spoiler]text\n```\ncode\n```")
+
+    # assert_parse('<p>inline text</p><pre>code</pre>', "inline [nodtext]text\n```\ncode\n```")
+    assert_parse("<p>inline text\n```\ncode\n```</p>", "inline [nodtext]text\n```\ncode\n```") # XXX wrong, inline [nodtext] should end at end of line
+
+    # assert_parse('<p>inline <code>text</code></p><pre>code</pre>', "inline [code]text\n```\ncode\n```")
+    assert_parse("<p>inline <code>text\n```\ncode\n```</code></p>", "inline [code]text\n```\ncode\n```") # XXX wrong, inline [code] should end at end of line
+
+    assert_parse('<blockquote><pre>code</pre></blockquote>', "[quote]\n```\ncode\n```\n[/quote]")
+    assert_parse('<blockquote><pre>code</pre></blockquote>', "[quote]\n```\ncode\n```")
+    assert_parse('<blockquote><pre>[/quote]</pre></blockquote>', "[quote]\n```\n[/quote]\n```")
+    assert_parse('<div class="spoiler"><pre>code</pre></div>', "[spoiler]\n```\ncode\n```\n[/spoiler]")
+    assert_parse('<div class="spoiler"><pre>code</pre></div>', "[spoiler]\n```\ncode\n```")
+    assert_parse('<details><summary>Show</summary><div><pre>code</pre></div></details>', "[expand]\n```\ncode\n```\n[/expand]")
+    assert_parse('<details><summary>Show</summary><div><pre>code</pre></div></details>', "[expand]\n```\ncode\n```")
+    assert_parse("<pre>```\ncode\n```\n</pre>", "[code]\n```\ncode\n```\n[/code]")
+    assert_parse("<p>```\ncode\n```\n</p>", "[nodtext]\n```\ncode\n```\n[/nodtext]")
+    assert_parse('<p class="tn"><pre>code</pre></p>', "[tn]\n```\ncode\n```\n[/tn]") # XXX invalid html
+    assert_parse('<p class="tn"><pre>code</pre></p>', "[tn]\n```\ncode\n```") # XXX invalid html
+  end
+
   def test_urls
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a> b</p>', 'a http://test.com b')
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="Http://test.com">Http://test.com</a> b</p>', 'a Http://test.com b')

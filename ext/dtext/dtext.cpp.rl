@@ -171,6 +171,8 @@ list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
 hr = ws* ('[hr]'i | '<hr>'i) ws* eol+;
 
+code_fence = ('```' ws* eol) (any* >mark_a1 %mark_a2) :>> (eol '```' ws* eol);
+
 open_spoilers = ('[spoiler'i 's'i? ']') | ('<spoiler'i 's'i? '>');
 open_nodtext = '[nodtext]'i | '<nodtext>'i;
 open_quote = '[quote]'i | '<quote>'i | '<blockquote>'i;
@@ -390,6 +392,12 @@ inline := |*
   open_code => {
     dstack_open_inline(sm, INLINE_CODE, "<code>");
     fcall code;
+  };
+
+  newline code_fence => {
+    dstack_close_leaf_blocks(sm);
+    fexec sm->ts;
+    fret;
   };
 
   open_spoilers => {
@@ -746,6 +754,12 @@ main := |*
     dstack_close_before_block(sm);
     dstack_open_block(sm, BLOCK_CODE, "<pre>");
     fcall code;
+  };
+
+  code_fence => {
+    append_block(sm, "<pre>");
+    append_html_escaped(sm, { sm->a1, sm->a2 });
+    append_block(sm, "</pre>");
   };
 
   open_expand space* => {
@@ -1190,6 +1204,19 @@ static void dstack_close_before_block(StateMachine * sm) {
   while (dstack_check(sm, BLOCK_P) || dstack_check(sm, BLOCK_LI) || dstack_check(sm, BLOCK_UL)) {
     dstack_rewind(sm);
   }
+}
+
+// container blocks: [spoiler], [quote], [expand], [tn]
+// leaf blocks: [nodtext], [code], [table], [td]?, [th]?, <h1>, <p>, <li>, <ul>
+static void dstack_close_leaf_blocks(StateMachine * sm) {
+  g_debug("dstack close leaf blocks");
+
+  while (!sm->dstack.empty() && !dstack_check(sm, BLOCK_QUOTE) && !dstack_check(sm, BLOCK_SPOILER) && !dstack_check(sm, BLOCK_EXPAND) && !dstack_check(sm, BLOCK_TN)) {
+    dstack_rewind(sm);
+  }
+
+  sm->header_mode = false;
+  sm->list_nest = 0;
 }
 
 // Close all open tags up to and including the given tag.
