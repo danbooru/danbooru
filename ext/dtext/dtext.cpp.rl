@@ -384,7 +384,6 @@ inline := |*
 
   newline* close_tn => {
     g_debug("inline [/tn]");
-    dstack_close_before_block(sm);
 
     if (dstack_check(sm, INLINE_TN)) {
       dstack_close_inline(sm, INLINE_TN, "</span>");

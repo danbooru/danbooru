@@ -268,6 +268,12 @@ class DTextTest < Minitest::Test
   def test_inline_tn
     assert_parse('<p>foo <span class="tn">bar</span> baz</p>', "foo [tn]bar[/tn] baz")
     assert_parse('<p>foo <span class="tn">bar</span> baz</p>', "foo <tn>bar</tn> baz")
+
+    assert_parse('<p>foo bar[/tn] baz</p>', "foo bar[/tn] baz")
+    assert_parse('<p>foo bar&lt;/tn&gt; baz</p>', "foo bar</tn> baz")
+    assert_parse('<ul><li>foo [/tn] bar</li></ul>', "* foo [/tn] bar")
+    assert_parse('<h4>foo [/tn] bar</h4>', "h4. foo [/tn] bar")
+    assert_parse('<blockquote><p>foo [/tn] bar</p></blockquote>', "[quote]\nfoo [/tn] bar\n[/quote]")
   end
 
   def test_block_tn
@@ -622,7 +628,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>[/th]<br>blah</p>', "[/th]\nblah\n")
     assert_parse('<p>[/td]<br>blah</p>', "[/td]\nblah\n")
 
-    assert_parse('<p></p>[/tn]<br>blah', "[/tn]\nblah\n") # XXX wrong
+    assert_parse('<p>[/tn]<br>blah</p>', "[/tn]\nblah\n")
     assert_parse('<p>blah</p>', "[/spoiler]\nblah\n") # XXX wrong
     assert_parse('<p></p>[/expand]<br>blah', "[/expand]\nblah\n") # XXX wrong
     assert_parse('<p></p>[/quote]blah', "[/quote]\nblah\n") # XXX wrong
@@ -900,20 +906,18 @@ class DTextTest < Minitest::Test
     # assert_parse('<p>inline &lt;/spoiler&gt;</p>', 'inline </spoiler>')
     # assert_parse('<p>inline &lt;/expand&gt;</p>', 'inline </expand>')
     # assert_parse('<p>inline &lt;/quote&gt;</p>', 'inline </quote>')
-    # assert_parse('<p>inline &lt;/tn&gt;</p>', 'inline </tn>')
+    assert_parse('<p>inline &lt;/tn&gt;</p>', 'inline </tn>')
     assert_parse('<p>inline </p>&lt;/spoiler&gt;', 'inline </spoiler>') # XXX wrong
     assert_parse('<p>inline </p>&lt;/expand&gt;', 'inline </expand>') # XXX wrong
     assert_parse('<p>inline </p>[/quote]', 'inline </quote>') # XXX wrong
-    assert_parse('<p>inline </p>&lt;/tn&gt;', 'inline </tn>') # XXX wrong
 
     # assert_parse('<p>&lt;/spoiler&gt;</p>', '</spoiler>')
     # assert_parse('<p>&lt;/expand&gt;</p>', '</expand>')
     # assert_parse('<p>&lt;/quote&gt;</p>', '</quote>')
-    # assert_parse('<p>&lt;/tn&gt;</p>', '</tn>')
+    assert_parse('<p>&lt;/tn&gt;</p>', '</tn>')
     assert_parse('', '</spoiler>') # XXX wrong
     assert_parse('<p></p>&lt;/expand&gt;', '</expand>') # XXX wrong
     assert_parse('<p></p>[/quote]', '</quote>') # XXX wrong
-    assert_parse('<p></p>&lt;/tn&gt;', '</tn>') # XXX wrong
 
     assert_parse('<p>&lt;/b&gt;</p>', '</b>')
     assert_parse('<p>&lt;/i&gt;</p>', '</i>')
