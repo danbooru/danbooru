@@ -813,11 +813,21 @@ class DTextTest < Minitest::Test
     assert_parse("<h1>foo</h1><hr>", "h1. foo\n[hr]")
     assert_parse("<ul><li>foo</li></ul><hr>", "* foo\n[hr]")
 
-    # XXX these shouldn't work
-    #assert_parse("<blockquote><hr></blockquote>", "[quote][hr][/quote]")
-    #assert_parse('<div class="spoiler"><hr></div>', "[spoiler][hr][/spoiler]")
-    #assert_parse('<p class="tn"><hr></p>', "[tn][hr][/tn]")
-    #assert_parse("<details><summary>Show</summary><hr></details>", "[expand][hr][/expand]")
+    #assert_parse("<blockquote><hr></blockquote>", "[quote][hr][/quote]") # XXX should this work?
+    #assert_parse('<div class="spoiler"><hr></div>', "[spoiler][hr][/spoiler]") # XXX should this work?
+    #assert_parse("<details><summary>Show</summary><hr></details>", "[expand][hr][/expand]") # XXX should this work?
+
+    assert_parse("<blockquote><hr></blockquote>", "[quote]\n[hr]\n[/quote]")
+    assert_parse('<div class="spoiler"><hr></div>', "[spoiler]\n[hr]\n[/spoiler]")
+    assert_parse("<details><summary>Show</summary><div><hr></div></details>", "[expand]\n[hr]\n[/expand]")
+
+    assert_parse('<p>inline <strong></strong></p><hr><p>[/b]</p>', "inline [b]\n[hr]\n[/b]")
+    assert_parse('<p>inline <span class="tn"></span></p><hr><p>[/tn]</p>', "inline [tn]\n[hr]\n[/tn]")
+
+    # assert_parse('<p>inline <span class="spoiler"></span></p><hr><p>[/spoiler]</p>', "inline [spoiler]\n[hr]\n[/spoiler]")
+    assert_parse('<p>inline <span class="spoiler"></span></p><hr>', "inline [spoiler]\n[hr]\n[/spoiler]") # XXX wrong
+
+    #assert_parse('<p class="tn"><hr></p>', "[tn][hr][/tn]") # XXX shouldn't work
   end
 
   def test_inline_mode

@@ -476,15 +476,9 @@ inline := |*
     }
   };
 
-  eol+ hr => {
+  newline hr => {
     g_debug("inline [hr] (pos: %ld)", sm->ts - sm->pb);
-
-    if (sm->header_mode) {
-      sm->header_mode = false;
-      dstack_rewind(sm);
-    }
-
-    dstack_close_before_block(sm);
+    dstack_close_leaf_blocks(sm);
     fexec sm->ts;
     fret;
   };
