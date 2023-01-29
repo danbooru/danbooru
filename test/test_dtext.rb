@@ -142,10 +142,10 @@ class DTextTest < Minitest::Test
 
   def test_disabled_mentions
     assert_parse('<p>@bob</p>', "@bob", disable_mentions: true)
-    # assert_parse('<p>&lt;@bob&gt;</p>', "<@bob>", disable_mentions: true) # XXX stripped from output
+    assert_parse('<p>&lt;@bob&gt;</p>', "<@bob>", disable_mentions: true)
 
     assert_parse('<p>@bob<em>blah</em></p>', "@bob[i]blah[/i]", disable_mentions: true)
-    # assert_parse('<p>&lt;@bob<em>blah</em>&gt;</p>', "<@bob[i]blah[/i]>", disable_mentions: true) # XXX stripped from output
+    assert_parse('<p>&lt;@bob<em>blah</em>&gt;</p>', "<@bob[i]blah[/i]>", disable_mentions: true)
     assert_parse('<p>@<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://twitter.com/eshaolang">@eshaolang</a></p>', '@"@eshaolang":[https://twitter.com/eshaolang]', disable_mentions: true)
   end
 

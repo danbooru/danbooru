@@ -122,6 +122,8 @@ action mark_d2 {
   sm->d2 = sm->p;
 }
 
+action mentions_enabled { sm->options.f_mentions }
+
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
 eos = '\0';
 
@@ -324,8 +326,8 @@ inline := |*
     append_unnamed_url(sm, { sm->a1, sm->a2 });
   };
 
-  mention => {
-    if (!sm->options.f_mentions || (sm->a1[-2] != '\0' && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n')) {
+  mention when mentions_enabled => {
+    if (sm->a1[-2] != '\0' && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n') {
       g_debug("write '@' (ignored mention)");
       append(sm, '@');
       fexec sm->a1;
@@ -343,11 +345,9 @@ inline := |*
     }
   };
 
-  delimited_mention => {
-    if (sm->options.f_mentions) {
-      g_debug("delimited mention: <@%.*s>", (int)(sm->a2 - sm->a1), sm->a1);
-      append_mention(sm, { sm->a1, sm->a2 });
-    }
+  delimited_mention when mentions_enabled => {
+    g_debug("delimited mention: <@%.*s>", (int)(sm->a2 - sm->a1), sm->a1);
+    append_mention(sm, { sm->a1, sm->a2 });
   };
 
   newline list_item => {
