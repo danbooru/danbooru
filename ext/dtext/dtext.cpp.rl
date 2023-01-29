@@ -129,6 +129,12 @@ newline = '\r\n' | '\n';
 ws = ' ' | '\t';
 eol = newline | eos;
 
+asciichar = 0x00..0x7F;
+utf8char  = 0xC2..0xDF 0x80..0xBF
+          | 0xE0..0xEF 0x80..0xBF 0x80..0xBF
+          | 0xF0..0xF4 0x80..0xBF 0x80..0xBF 0x80..0xBF;
+char = asciichar | utf8char;
+
 nonspace = ^space - eos;
 nonnewline = any - (newline | '\r');
 nonquote = ^'"';
@@ -138,8 +144,11 @@ nonpipe = ^'|';
 nonpipebracket = nonpipe & nonbracket;
 noncurly = ^'}';
 
-mention = '@' nonspace+ >mark_a1 %mark_a2;
-delimited_mention = '<' mention :>> '>';
+# A username must start with a nonpunctuation character, or start with a '_' or '.' followed by a nonpunctuation character. The second character can't be a '@'.
+nonpunct = (char - punct - space - eos);
+username = ([_.]? nonpunct nonspace+) - (char '@');
+mention = '@' username >mark_a1 %mark_a2;
+delimited_mention = '<@' (nonspace nonnewline*) >mark_a1 %mark_a2 :>> '>';
 
 url = 'http'i 's'i? '://' nonspace+;
 delimited_url = '<' url >mark_a1 %mark_a2 :>> '>';
@@ -313,11 +322,6 @@ inline := |*
 
   delimited_url => {
     append_unnamed_url(sm, { sm->a1, sm->a2 });
-  };
-
-  # probably a tag. examples include @.@ and @_@
-  '@' graph '@' => {
-    append_html_escaped(sm, { sm->ts, sm->te });
   };
 
   mention => {
