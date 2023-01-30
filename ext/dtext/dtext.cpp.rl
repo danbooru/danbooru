@@ -124,6 +124,7 @@ action mark_d2 {
 
 action mentions_enabled { sm->options.f_mentions }
 action in_quote { dstack_is_open(sm, BLOCK_QUOTE) }
+action in_expand { dstack_is_open(sm, BLOCK_EXPAND) }
 
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
 eos = '\0';
@@ -205,7 +206,7 @@ open_u = '[u]'i | '<u>'i;
 close_spoilers = ('[/spoiler'i 's'i? ']') | ('</spoiler'i 's'i? '>');
 close_nodtext = '[/nodtext]'i | '</nodtext>'i;
 close_quote = '[/quote'i (']' when in_quote) | '</quote'i ('>' when in_quote) | '</blockquote'i (']' when in_quote);
-close_expand = '[/expand]'i | '</expand>'i;
+close_expand = '[/expand'i (']' when in_expand) | '</expand'i ('>' when in_expand);
 close_code = '[/code]'i | '</code>'i;
 close_table = '[/table]'i | '</table>'i;
 close_thead = '[/thead]'i | '</thead>'i;
@@ -447,12 +448,10 @@ inline := |*
     fret;
   };
 
-  newline* close_expand => {
-    dstack_close_before_block(sm);
-
-    if (dstack_close_block(sm, BLOCK_EXPAND, "</div></details>")) {
-      fret;
-    }
+  newline? close_expand ws* => {
+    g_debug("inline [/expand]");
+    dstack_close_until(sm, BLOCK_EXPAND);
+    fret;
   };
 
   newline* close_th => {

@@ -678,12 +678,12 @@ class DTextTest < Minitest::Test
 
     assert_parse('<p>[/tn]<br>blah</p>', "[/tn]\nblah\n")
     assert_parse('<p>blah</p>', "[/spoiler]\nblah\n") # XXX wrong
-    assert_parse('<p></p>[/expand]<br>blah', "[/expand]\nblah\n") # XXX wrong
+    assert_parse('<p>[/expand]<br>blah</p>', "[/expand]\nblah\n")
 
     assert_parse("<p>[/quote]<br>blah</p>", "[/quote]\nblah\n")
 
     assert_parse('<blockquote><ul><li>foo</li><li>bar</li></ul></blockquote>', "[quote]\n* foo\n* bar\n[/quote]")
-    assert_parse('<blockquote>[/expand]<br>blah</blockquote>', "[quote][/expand]\nblah\n")
+    assert_parse('<blockquote><p>[/expand]<br>blah</p></blockquote>', "[quote][/expand]\nblah\n")
 
     assert_parse('<table class="striped"><tr><td><br>foo</td></tr></table>', "\n[table]\n[tr]\n[td]\nfoo\n[/td]\n[/tr]\n[/table]\n") # XXX wrong
 
@@ -781,6 +781,20 @@ class DTextTest < Minitest::Test
     assert_parse("<p>inline </p><details><summary>Show</summary><div><p>blah blah</p></div></details>", "inline [expand]blah blah[/expand]")
     assert_parse("<p>inline <em>foo </em></p><details><summary>Show</summary><div><p>blah blah</p></div></details>", "inline [i]foo [expand]blah blah[/expand]")
     assert_parse('<p>inline <span class="spoiler">foo </span></p><details><summary>Show</summary><div><p>blah blah</p></div></details>', "inline [spoiler]foo [expand]blah blah[/expand]")
+
+    assert_parse('<details><summary>Show</summary><div><p>test</p></div></details>', "[expand]\ntest\n[/expand] ")
+    assert_parse('<details><summary>Show</summary><div><p>test</p></div></details><p>blah</p>', "[expand]\ntest\n[/expand] blah")
+    assert_parse('<details><summary>Show</summary><div><p>test</p></div></details><p>blah</p>', "[expand]\ntest\n[/expand] \nblah")
+    assert_parse('<details><summary>Show</summary><div><p>test</p></div></details><p>blah</p>', "[expand]\ntest\n[/expand]\nblah")
+    assert_parse('<details><summary>Show</summary><div><p>test</p></div></details><p> blah</p>', "[expand]\ntest\n[/expand]\n blah") # XXX should ignore space
+
+    assert_parse("<p>[/expand]</p>", "[/expand]")
+    assert_parse("<p>foo [/expand] bar</p>", "foo [/expand] bar")
+    assert_parse('<p>test<br>[/expand] blah</p>', "test\n[/expand] blah")
+    assert_parse('<p>test<br>[/expand]</p><ul><li>blah</li></ul>', "test\n[/expand]\n* blah")
+
+    assert_parse('<details><summary>Show</summary><div><p>test</p></div></details><h4>See also</h4>', "[expand]\ntest\n[/expand]\nh4. See also")
+    assert_parse('<details><summary>Show</summary><div><p>test</p></div></details><div class="spoiler"><p>blah</p></div>', "[expand]\ntest\n[/expand]\n[spoiler]blah[/spoiler]")
   end
 
   def test_aliased_expand
@@ -799,11 +813,8 @@ class DTextTest < Minitest::Test
     assert_parse("<details><summary></summary><div><p>blah blah</p></div></details>", "[expand ]blah blah[/expand]")
     assert_parse("<details><summary></summary><div><p>blah blah</p></div></details>", "[expand= ]blah blah[/expand]")
 
-    # assert_parse("<p>[expandhello]blah blah[/expand]</p>", "[expandhello]blah blah[/expand]")
-    assert_parse("<p>[expandhello]blah blah</p>[/expand]", "[expandhello]blah blah[/expand]") # XXX wrong
-
-    # assert_parse("<p>[expand <br>title]blah blah[/expand]</p>", "[expand \ntitle]blah blah[/expand]")
-    assert_parse("<p>[expand <br>title]blah blah</p>[/expand]", "[expand \ntitle]blah blah[/expand]") # XXX wrong
+    assert_parse("<p>[expandhello]blah blah[/expand]</p>", "[expandhello]blah blah[/expand]")
+    assert_parse("<p>[expand <br>title]blah blah[/expand]</p>", "[expand \ntitle]blah blah[/expand]")
 
     assert_parse("<p>inline </p><details><summary>hello</summary><div><p>blah</p></div></details>", "inline [expand=hello]blah[/expand]") # XXX trim space after inline
 
@@ -972,7 +983,7 @@ class DTextTest < Minitest::Test
     # assert_parse('<p>inline &lt;/quote&gt;</p>', 'inline </quote>')
     assert_parse('<p>inline &lt;/tn&gt;</p>', 'inline </tn>')
     assert_parse('<p>inline </p>&lt;/spoiler&gt;', 'inline </spoiler>') # XXX wrong
-    assert_parse('<p>inline </p>&lt;/expand&gt;', 'inline </expand>') # XXX wrong
+    assert_parse('<p>inline &lt;/expand&gt;</p>', 'inline </expand>')
     assert_parse('<p>inline &lt;/quote&gt;</p>', 'inline </quote>')
 
     # assert_parse('<p>&lt;/spoiler&gt;</p>', '</spoiler>')
@@ -980,7 +991,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>&lt;/quote&gt;</p>', '</quote>')
     assert_parse('<p>&lt;/tn&gt;</p>', '</tn>')
     assert_parse('', '</spoiler>') # XXX wrong
-    assert_parse('<p></p>&lt;/expand&gt;', '</expand>') # XXX wrong
+    assert_parse('<p>&lt;/expand&gt;</p>', '</expand>')
     assert_parse('<p>&lt;/quote&gt;</p>', '</quote>')
 
     assert_parse('<p>&lt;/b&gt;</p>', '</b>')
