@@ -451,7 +451,7 @@ inline := |*
 
   (open_expand | aliased_expand) => {
     g_debug("inline [expand]");
-    dstack_rewind(sm);
+    dstack_close_leaf_blocks(sm);
     fexec sm->ts;
     fret;
   };
@@ -760,14 +760,14 @@ main := |*
   };
 
   open_expand space* => {
-    dstack_close_before_block(sm);
+    dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_EXPAND, "<details>");
     append(sm, "<summary>Show</summary><div>");
   };
 
   aliased_expand space* => {
     g_debug("block [expand=]");
-    dstack_close_before_block(sm);
+    dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_EXPAND, "<details>");
     append(sm, "<summary>");
     append_html_escaped(sm, { sm->a1, sm->a2 });

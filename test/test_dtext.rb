@@ -767,6 +767,8 @@ class DTextTest < Minitest::Test
     assert_parse("<details><summary>Show</summary><div><p>hello world</p></div></details>", "[expand]hello world</expand>")
 
     assert_parse("<p>inline </p><details><summary>Show</summary><div><p>blah blah</p></div></details>", "inline [expand]blah blah[/expand]")
+    assert_parse("<p>inline <em>foo </em></p><details><summary>Show</summary><div><p>blah blah</p></div></details>", "inline [i]foo [expand]blah blah[/expand]")
+    assert_parse('<p>inline <span class="spoiler">foo </span></p><details><summary>Show</summary><div><p>blah blah</p></div></details>', "inline [spoiler]foo [expand]blah blah[/expand]")
   end
 
   def test_aliased_expand
@@ -802,6 +804,9 @@ class DTextTest < Minitest::Test
 
     assert_parse("<h1>foo </h1><details><summary>hello</summary><div><p>blah</p></div></details>", "h1. foo [expand=hello]blah[/expand]") # XXX wrong, should ignore in headers
     assert_parse("<h1>foo</h1><details><summary>hello</summary><div><p>blah</p></div></details>", "h1. foo\n[expand=hello]blah[/expand]")
+
+    assert_parse("<p>inline <em>foo </em></p><details><summary>title</summary><div><p>blah blah</p></div></details>", "inline [i]foo [expand=title]blah blah[/expand]")
+    assert_parse('<p>inline <span class="spoiler">foo </span></p><details><summary>title</summary><div><p>blah blah</p></div></details>', "inline [spoiler]foo [expand=title]blah blah[/expand]")
   end
 
   def test_expand_with_nested_code
