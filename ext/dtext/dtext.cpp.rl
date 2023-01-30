@@ -622,7 +622,7 @@ list := |*
   newline;
 
   any => {
-    dstack_rewind(sm);
+    dstack_close_leaf_blocks(sm);
     fhold;
     fret;
   };

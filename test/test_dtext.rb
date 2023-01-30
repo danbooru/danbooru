@@ -311,8 +311,7 @@ class DTextTest < Minitest::Test
     assert_parse("<blockquote><p>a<br><span class=\"spoiler\">blah</span><br>c</p></blockquote>", "[quote]\na\n[spoiler]blah[/spoiler]\nc[/quote]")
     assert_parse("<blockquote><p>a</p><div class=\"spoiler\"><p>blah</p></div><p>c</p></blockquote>", "[quote]\na\n\n[spoiler]blah[/spoiler]\n\nc[/quote]")
 
-    # assert_parse('<details><summary>Show</summary><div><div class="spoiler"><ul><li>blah</li></ul></div></div></details>', "[expand]\n[spoiler]\n* blah\n[/spoiler]\n[/expand]")
-    assert_parse('<details><summary>Show</summary><div><div class="spoiler"><ul><li>blah</li></ul></div></div></details>[/expand]', "[expand]\n[spoiler]\n* blah\n[/spoiler]\n[/expand]") # XXX wrong
+    assert_parse('<details><summary>Show</summary><div><div class="spoiler"><ul><li>blah</li></ul></div></div></details>', "[expand]\n[spoiler]\n* blah\n[/spoiler]\n[/expand]")
   end
 
   def test_quote_blocks_nested_expand
@@ -563,27 +562,65 @@ class DTextTest < Minitest::Test
 
   def test_lists_1
     assert_parse('<ul><li>a</li></ul>', '* a')
-  end
-
-  def test_lists_2
     assert_parse('<ul><li>a</li><li>b</li></ul>', "* a\n* b")
-  end
+    assert_parse('<ul><li>a</li><li>b</li><li>c</li></ul>', "* a\n* b\n* c")
 
-  def test_lists_nested
+    assert_parse('<ul><li>a</li><li>b</li></ul>', "* a\r\n* b")
+    assert_parse('<ul><li>a</li></ul><ul><li>b</li></ul>', "* a\n\n* b")
+    assert_parse('<ul><li>a</li><li>b</li><li>c</li></ul>', "* a\r\n* b\r\n* c")
+
     assert_parse('<ul><li>a</li><ul><li>b</li></ul></ul>', "* a\n** b")
-  end
+    assert_parse('<ul><li>a</li><ul><li>b</li><ul><li>c</li></ul></ul></ul>', "* a\n** b\n*** c")
+    #assert_parse('<ul><ul><ul><li>a</li></ul><li>b</li></ul><li>c</li></ul>', "*** a\n**\n b\n* c")
+    assert_parse('<ul><ul><ul><li>a</li></ul></ul><li>b</li></ul>', "*** a\n* b")
+    assert_parse('<ul><ul><ul><li>a</li></ul></ul></ul>', "*** a")
 
-  def test_lists_inline
-    assert_parse('<ul><li><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1">post #1</a></li></ul>', "* post #1")
-  end
+    # assert_parse('<ul><li>a</li></ul><p>b</p><ul><li>c</li></ul>', "* a\nb\n* c")
+    assert_parse('<ul><li>a<br>b</li><li>c</li></ul>', "* a\nb\n* c") # XXX wrong?
 
-  def test_lists_not_preceded_by_newline
     assert_parse('<p>a<br>b</p><ul><li>c</li><li>d</li></ul>', "a\nb\n* c\n* d")
-  end
-
-  def test_lists_with_multiline_items
     assert_parse('<p>a</p><ul><li>b<br>c</li><li>d<br>e</li></ul><p>another one</p>', "a\n* b\nc\n* d\ne\n\nanother one")
     assert_parse('<p>a</p><ul><li>b<br>c</li><ul><li>d<br>e</li></ul></ul><p>another one</p>', "a\n* b\nc\n** d\ne\n\nanother one")
+
+    assert_parse('<ul><li><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1">post #1</a></li></ul>', "* post #1")
+
+    assert_parse('<ul><li><em>a</em></li><li>b</li></ul>', "* [i]a[/i]\n* b")
+
+    # assert_parse('<ul><li><em>a</em></li><li>b</li></ul>', "* [i]a\n* b")
+    assert_parse('<ul><li><em>a<li>b</li></em></li></ul>', "* [i]a\n* b") # XXX wrong
+
+    # assert_parse('<p><em>a</em><ul><li>a<li>b</li></li></ul>', "[i]a\n* b\n* c")
+    assert_parse('<p><em>a<ul><li>b</li><li>c</li></ul></em></p>', "[i]a\n* b\n* c") # XXX wrong
+
+    # assert_parse('<ul><li></li></ul><h4>See also</h4><ul><li>a</li></ul>', "* h4. See also\n* a")
+    assert_parse('<ul><li>h4. See also</li><li>a</li></ul>', "* h4. See also\n* a") # XXX wrong?
+
+    # assert_parse('<ul><li>a</li></ul><h4>See also</h4>', "* a\nh4. See also")
+    assert_parse('<ul><li>a<br>h4. See also</li></ul>', "* a\nh4. See also") # XXX wrong
+
+    # assert_parse('<h4><em>See also</em></h4><ul><li>a</li></ul>', "h4. [i]See also\n* a")
+    assert_parse('<h4><em>See also</em><ul><li>a</li></ul></h4>', "h4. [i]See also\n* a") # XXX wrong
+
+    # assert_parse('<ul><li><em>a</em></li></ul><h4>See also</h4>', "* [i]a\nh4. See also")
+    assert_parse('<ul><li><em>a<br>h4. See also</em></li></ul>', "* [i]a\nh4. See also") # XXX wrong
+
+    assert_parse('<h4>See also</h4><ul><li>a</li></ul>', "h4. See also\n* a")
+    assert_parse('<h4>See also</h4><ul><li>a</li><li>h4. External links</li></ul>', "h4. See also\n* a\n* h4. External links")
+
+    # assert_parse('<p>a</p><div class="spoiler"><ul><li>b</li><li>c</li></ul></div><p>d</p>', "a\n[spoilers]\n* b\n* c\n[/spoilers]\nd")
+    assert_parse('<p>a<br><span class="spoiler"><ul><li>b</li><li>c</li></ul></span><br>d</p>', "a\n[spoilers]\n* b\n* c\n[/spoilers]\nd") # XXX wrong
+
+    assert_parse('<p>a</p><blockquote><ul><li>b</li><li>c</li></ul></blockquote><p>d</p>', "a\n[quote]\n* b\n* c\n[/quote]\nd")
+    assert_parse('<p>a</p><details><summary>Show</summary><div><ul><li>b</li><li>c</li></ul></div></details><p>d</p>', "a\n[expand]\n* b\n* c\n[/expand]\nd")
+
+    assert_parse('<p>a</p><blockquote><ul><li>b</li><li>c</li></ul><p>d</p></blockquote>', "a\n[quote]\n* b\n* c\n\nd")
+    assert_parse('<p>a</p><details><summary>Show</summary><div><ul><li>b</li><li>c</li></ul><p>d</p></div></details>', "a\n[expand]\n* b\n* c\n\nd")
+
+    assert_parse('<p>*</p>', "*")
+    assert_parse('<p>*a</p>', "*a")
+    assert_parse('<p>***</p>', "***")
+    assert_parse('<p>*<br>*<br>*</p>', "*\n*\n*")
+    assert_parse('<p>* <br>blah</p>', "* \r\nblah")
   end
 
   def test_inline_tags
