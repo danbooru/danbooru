@@ -299,6 +299,9 @@ class DTextTest < Minitest::Test
     assert_parse("<p>inline </p><blockquote><p>blah blah</p></blockquote>", "inline [quote]blah blah[/quote]")
     assert_parse("<p>inline <em>foo </em></p><blockquote><p>blah blah</p></blockquote>", "inline [i]foo [quote]blah blah[/quote]")
     assert_parse('<p>inline <span class="spoiler">foo </span></p><blockquote><p>blah blah</p></blockquote>', "inline [spoiler]foo [quote]blah blah[/quote]")
+
+    assert_parse("<p>inline <em>foo</em></p><blockquote><p>blah blah</p></blockquote>", "inline [i]foo\n\n[quote]blah blah[/quote]")
+    assert_parse('<p>inline <span class="spoiler">foo </span></p><blockquote><p>blah blah</p></blockquote>', "inline [spoiler]\n\nfoo [quote]blah blah[/quote]")
   end
 
   def test_quote_blocks_with_list
@@ -785,6 +788,9 @@ class DTextTest < Minitest::Test
     assert_parse("<p>inline </p><details><summary>Show</summary><div><p>blah blah</p></div></details>", "inline [expand]blah blah[/expand]")
     assert_parse("<p>inline <em>foo </em></p><details><summary>Show</summary><div><p>blah blah</p></div></details>", "inline [i]foo [expand]blah blah[/expand]")
     assert_parse('<p>inline <span class="spoiler">foo </span></p><details><summary>Show</summary><div><p>blah blah</p></div></details>', "inline [spoiler]foo [expand]blah blah[/expand]")
+
+    assert_parse("<p>inline <em>foo</em></p><details><summary>Show</summary><div><p>blah blah</p></div></details>", "inline [i]foo\n\n[expand]blah blah[/expand]")
+    assert_parse('<p>inline <span class="spoiler">foo</span></p><details><summary>Show</summary><div><p>blah blah</p></div></details>', "inline [spoiler]foo\n\n[expand]blah blah[/expand]")
 
     assert_parse('<details><summary>Show</summary><div><p>test</p></div></details>', "[expand]\ntest\n[/expand] ")
     assert_parse('<details><summary>Show</summary><div><p>test</p></div></details><p>blah</p>', "[expand]\ntest\n[/expand] blah")
