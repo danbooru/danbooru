@@ -724,7 +724,7 @@ main := |*
   };
 
   open_spoilers space* => {
-    dstack_close_before_block(sm);
+    dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_SPOILER, "<div class=\"spoiler\">");
   };
 
