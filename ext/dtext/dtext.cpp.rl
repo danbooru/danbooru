@@ -123,6 +123,7 @@ action mark_d2 {
 }
 
 action mentions_enabled { sm->options.f_mentions }
+action in_quote { dstack_is_open(sm, BLOCK_QUOTE) }
 
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
 eos = '\0';
@@ -203,7 +204,7 @@ open_u = '[u]'i | '<u>'i;
 
 close_spoilers = ('[/spoiler'i 's'i? ']') | ('</spoiler'i 's'i? '>');
 close_nodtext = '[/nodtext]'i | '</nodtext>'i;
-close_quote = '[/quote]'i | '</quote>'i | '</blockquote>'i;
+close_quote = '[/quote'i (']' when in_quote) | '</quote'i ('>' when in_quote) | '</blockquote'i (']' when in_quote);
 close_expand = '[/expand]'i | '</expand>'i;
 close_code = '[/code]'i | '</code>'i;
 close_table = '[/table]'i | '</table>'i;
@@ -433,20 +434,10 @@ inline := |*
     fret;
   };
 
-  newline* close_quote space* => {
+  newline? close_quote ws* => {
     g_debug("inline [/quote]");
-    dstack_close_before_block(sm);
-
-    if (dstack_check(sm, BLOCK_LI)) {
-      dstack_close_list(sm);
-    }
-
-    if (dstack_is_open(sm, BLOCK_QUOTE)) {
-      dstack_close_until(sm, BLOCK_QUOTE);
-      fret;
-    } else {
-      append_block(sm, "[/quote]");
-    }
+    dstack_close_until(sm, BLOCK_QUOTE);
+    fret;
   };
 
   (open_expand | aliased_expand) => {
@@ -1062,12 +1053,6 @@ static inline void append_dmail_key_link(StateMachine * sm) {
   append(sm, "dmail #");
   append(sm, sm->a1, sm->a2);
   append(sm, "</a>");
-}
-
-static inline void append_block(StateMachine * sm, const char * a, const char * b) {
-  if (!sm->options.f_inline) {
-    append(sm, a, b);
-  }
 }
 
 static inline void append_block(StateMachine * sm, const auto s) {
