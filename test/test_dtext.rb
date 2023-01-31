@@ -219,8 +219,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>inline <em>foo</em></p><div class="spoiler"><p>blah blah</p></div>', "inline [i]foo\n\n[spoiler]blah blah[/spoiler]")
     assert_parse('<p>inline <span class="spoiler"> foo</span></p><div class="spoiler"><p>blah blah</p></div>', "inline [spoiler] foo\n\n[spoiler]blah blah[/spoiler]")
 
-    # assert_parse('<ul><li>one</li></ul><div class="spoiler"><ul><li>two</li></ul></div><ul><li>three</li></ul>', "* one\n[spoiler]\n* two\n[/spoiler]\n* three")
-    assert_parse('<ul><li>one</li></ul><div class="spoiler"><ul><li>two</li></ul></div><li>three</li>', "* one\n[spoiler]\n* two\n[/spoiler]\n* three") # XXX wrong
+    assert_parse('<ul><li>one</li></ul><div class="spoiler"><ul><li>two</li></ul></div><ul><li>three</li></ul>', "* one\n[spoiler]\n* two\n[/spoiler]\n* three")
 
     assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><p>three</p>', "one\n[spoiler]\ntwo\n[/spoiler]\nthree")
     assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><p>three</p>', "one\n[spoiler]\ntwo\n[/spoiler]three")
@@ -594,49 +593,45 @@ class DTextTest < Minitest::Test
     assert_parse('<p>a 「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">title</a>」 b</p>', 'a 「"title":[http://test.com]」 b')
   end
 
-  def test_lists_1
+  def test_lists
     assert_parse('<ul><li>a</li></ul>', '* a')
     assert_parse('<ul><li>a</li><li>b</li></ul>', "* a\n* b")
     assert_parse('<ul><li>a</li><li>b</li><li>c</li></ul>', "* a\n* b\n* c")
+    assert_parse('<ul><li>a</li></ul><p> </p>', "* a\n ") # XXX should strip space
 
     assert_parse('<ul><li>a</li><li>b</li></ul>', "* a\r\n* b")
     assert_parse('<ul><li>a</li></ul><ul><li>b</li></ul>', "* a\n\n* b")
     assert_parse('<ul><li>a</li><li>b</li><li>c</li></ul>', "* a\r\n* b\r\n* c")
 
     assert_parse('<ul><li>a</li><ul><li>b</li></ul></ul>', "* a\n** b")
+    assert_parse('<ul><li>a</li><ul><ul><li>b</li></ul></ul></ul>', "* a\n*** b")
     assert_parse('<ul><li>a</li><ul><li>b</li><ul><li>c</li></ul></ul></ul>', "* a\n** b\n*** c")
-    #assert_parse('<ul><ul><ul><li>a</li></ul><li>b</li></ul><li>c</li></ul>', "*** a\n**\n b\n* c")
+    assert_parse('<ul><ul><ul><li>a</li></ul><li>b</li></ul><li>c</li></ul>', "*** a\n** b\n* c")
     assert_parse('<ul><ul><ul><li>a</li></ul></ul><li>b</li></ul>', "*** a\n* b")
     assert_parse('<ul><ul><ul><li>a</li></ul></ul></ul>', "*** a")
 
-    # assert_parse('<ul><li>a</li></ul><p>b</p><ul><li>c</li></ul>', "* a\nb\n* c")
-    assert_parse('<ul><li>a<br>b</li><li>c</li></ul>', "* a\nb\n* c") # XXX wrong?
+    assert_parse('<ul><li>a</li></ul><p>b</p><ul><li>c</li></ul>', "* a\nb\n* c")
 
     assert_parse('<p>a<br>b</p><ul><li>c</li><li>d</li></ul>', "a\nb\n* c\n* d")
-    assert_parse('<p>a</p><ul><li>b<br>c</li><li>d<br>e</li></ul><p>another one</p>', "a\n* b\nc\n* d\ne\n\nanother one")
-    assert_parse('<p>a</p><ul><li>b<br>c</li><ul><li>d<br>e</li></ul></ul><p>another one</p>', "a\n* b\nc\n** d\ne\n\nanother one")
+    assert_parse('<p>a</p><ul><li>b</li></ul><p>c</p><ul><li>d</li></ul><p>e</p><p>another one</p>', "a\n* b\nc\n* d\ne\n\nanother one")
+    assert_parse('<p>a</p><ul><li>b</li></ul><p>c</p><ul><ul><li>d</li></ul></ul><p>e</p><p>another one</p>', "a\n* b\nc\n** d\ne\n\nanother one")
+    assert_parse('<p>a</p><ul><li>b</li></ul><p>c</p><ul><ul><li>d</li></ul></ul><p>e</p><p>another one</p>', "a\n* b\nc\n** d\ne\n\nanother one")
 
     assert_parse('<ul><li><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1">post #1</a></li></ul>', "* post #1")
 
     assert_parse('<ul><li><em>a</em></li><li>b</li></ul>', "* [i]a[/i]\n* b")
+    assert_parse('<ul><li><em>a</em></li><li>b</li></ul>', "* [i]a\n* b")
 
-    # assert_parse('<ul><li><em>a</em></li><li>b</li></ul>', "* [i]a\n* b")
-    assert_parse('<ul><li><em>a<li>b</li></em></li></ul>', "* [i]a\n* b") # XXX wrong
-
-    # assert_parse('<p><em>a</em><ul><li>a<li>b</li></li></ul>', "[i]a\n* b\n* c")
-    assert_parse('<p><em>a<ul><li>b</li><li>c</li></ul></em></p>', "[i]a\n* b\n* c") # XXX wrong
+    assert_parse('<ul><ul><li><em>a</em></li></ul><li>b</li></ul>', "** [i]a\n* b")
+    assert_parse('<ul><li><em>a</em></li></ul><ul><li>b</li></ul>', "* [i]a\n\n* b")
+    assert_parse('<p><em>a</em></p><ul><li>b</li><li>c</li></ul>', "[i]a\n* b\n* c")
 
     # assert_parse('<ul><li></li></ul><h4>See also</h4><ul><li>a</li></ul>', "* h4. See also\n* a")
     assert_parse('<ul><li>h4. See also</li><li>a</li></ul>', "* h4. See also\n* a") # XXX wrong?
 
-    # assert_parse('<ul><li>a</li></ul><h4>See also</h4>', "* a\nh4. See also")
-    assert_parse('<ul><li>a<br>h4. See also</li></ul>', "* a\nh4. See also") # XXX wrong
-
-    # assert_parse('<h4><em>See also</em></h4><ul><li>a</li></ul>', "h4. [i]See also\n* a")
-    assert_parse('<h4><em>See also</em><ul><li>a</li></ul></h4>', "h4. [i]See also\n* a") # XXX wrong
-
-    # assert_parse('<ul><li><em>a</em></li></ul><h4>See also</h4>', "* [i]a\nh4. See also")
-    assert_parse('<ul><li><em>a<br>h4. See also</em></li></ul>', "* [i]a\nh4. See also") # XXX wrong
+    assert_parse('<ul><li>a</li></ul><h4>See also</h4>', "* a\nh4. See also")
+    assert_parse('<h4><em>See also</em></h4><ul><li>a</li></ul>', "h4. [i]See also\n* a")
+    assert_parse('<ul><li><em>a</em></li></ul><h4>See also</h4>', "* [i]a\nh4. See also")
 
     assert_parse('<h4>See also</h4><ul><li>a</li></ul>', "h4. See also\n* a")
     assert_parse('<h4>See also</h4><ul><li>a</li><li>h4. External links</li></ul>', "h4. See also\n* a\n* h4. External links")
@@ -648,6 +643,11 @@ class DTextTest < Minitest::Test
 
     assert_parse('<p>a</p><blockquote><ul><li>b</li><li>c</li></ul><p>d</p></blockquote>', "a\n[quote]\n* b\n* c\n\nd")
     assert_parse('<p>a</p><details><summary>Show</summary><div><ul><li>b</li><li>c</li></ul><p>d</p></div></details>', "a\n[expand]\n* b\n* c\n\nd")
+
+    assert_parse('<ul><li>* * * *</li></ul>', "* * * * *") # XXX wrong
+    assert_parse('<ul><li>Nosebleed *</li></ul>', "* Nosebleed *") # XXX wrong
+    assert_parse('<blockquote><ul><ul><ul><li>said:</li></ul></ul></ul></blockquote>', "[quote] *** said:") # XXX wrong
+    assert_parse('<div class="spoiler"><ul><li>It could also mean</li></ul></div>', "[spoiler] * It could also mean") # XXX wrong
 
     assert_parse('<p>*</p>', "*")
     assert_parse('<p>*a</p>', "*a")
@@ -844,12 +844,9 @@ class DTextTest < Minitest::Test
     assert_parse("<p>inline </p><details><summary>hello</summary><div><p>blah</p></div></details>", "inline [expand=hello]blah[/expand]") # XXX trim space after inline
 
     assert_parse("<p>inline</p><details><summary>hello</summary><div><p>blah</p></div></details><p>blah</p>", "inline\n[expand=hello]blah[/expand]\nblah")
-
-    # assert_parse("<ul><li>list</li></ul><details><summary>hello</summary><div><p>blah</p></div></details>", "* list\n[expand=hello]blah[/expand]")
-    assert_parse("<ul><li>list<br></li></ul><details><summary>hello</summary><div><p>blah</p></div></details>", "* list\n[expand=hello]blah[/expand]") # XXX wrong, trim <br>
+    assert_parse("<ul><li>list</li></ul><details><summary>hello</summary><div><p>blah</p></div></details>", "* list\n[expand=hello]blah[/expand]")
 
     assert_parse("<ul><li>list </li></ul><details><summary>hello</summary><div><p>blah</p></div></details>", "* list [expand=hello]blah[/expand]") # XXX wrong, should ignore in lists
-
     assert_parse("<h1>foo </h1><details><summary>hello</summary><div><p>blah</p></div></details>", "h1. foo [expand=hello]blah[/expand]") # XXX wrong, should ignore in headers
     assert_parse("<h1>foo</h1><details><summary>hello</summary><div><p>blah</p></div></details>", "h1. foo\n[expand=hello]blah[/expand]")
 
@@ -1034,10 +1031,6 @@ class DTextTest < Minitest::Test
     assert_parse('<p>inline <strong><em>foo[/b]</em></strong></p>', 'inline [b][i]foo[/b][/i]')
 
     # assert_parse('<div class="spoiler"><blockquote><p>foo</p></blockquote></div>', '[spoiler]\n[quote]\nfoo\n[/spoiler][/quote]')
-  end
-
-  def test_stack_depth_limit
-    assert_raises(DText::Error) { parse("* foo\n" * 513) }
   end
 
   def test_null_bytes

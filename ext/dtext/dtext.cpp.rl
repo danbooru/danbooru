@@ -81,6 +81,7 @@ prepush {
   size_t len = sm->stack.size();
 
   if (len > MAX_STACK_DEPTH) {
+    // Should never happen.
     throw DTextError("too many nested elements");
   }
 
@@ -354,21 +355,8 @@ inline := |*
 
   newline list_item => {
     g_debug("inline list");
-
-    if (dstack_check(sm, BLOCK_LI)) {
-      g_debug("  rewind li");
-      dstack_rewind(sm);
-    } else if (dstack_check(sm, BLOCK_P)) {
-      g_debug("  rewind p");
-      dstack_rewind(sm);
-    } else if (sm->header_mode) {
-      g_debug("  rewind header");
-      dstack_rewind(sm);
-    }
-
-    g_debug("  next list");
     fexec sm->ts + 1;
-    fnext list;
+    fret;
   };
 
   open_b  => { dstack_open_inline(sm,  INLINE_B, "<strong>"); };
@@ -495,6 +483,9 @@ inline := |*
       sm->header_mode = false;
       dstack_rewind(sm);
       fret;
+    } else if (dstack_is_open(sm, BLOCK_UL)) {
+      dstack_close_list(sm);
+      fret;
     } else {
       append(sm, "<br>");
     }
@@ -579,49 +570,6 @@ table := |*
   };
 
   any;
-*|;
-
-list := |*
-  list_item => {
-    int prev_nest = sm->list_nest;
-    append_closing_p_if(sm);
-    g_debug("list start");
-    sm->list_nest = sm->a2 - sm->a1;
-    fexec sm->b1;
-
-    if (sm->list_nest > prev_nest) {
-      for (int i = prev_nest; i < sm->list_nest; ++i) {
-        dstack_open_block(sm, BLOCK_UL, "<ul>");
-      }
-    } else if (sm->list_nest < prev_nest) {
-      for (int i = sm->list_nest; i < prev_nest; ++i) {
-        if (dstack_check(sm, BLOCK_UL)) {
-          dstack_rewind(sm);
-        }
-      }
-    }
-
-    dstack_open_block(sm, BLOCK_LI, "<li>");
-
-    g_debug("  call inline");
-
-    fcall inline;
-  };
-
-  # exit list
-  newline{2,} => {
-    dstack_close_list(sm);
-    fexec sm->ts;
-    fret;
-  };
-
-  newline;
-
-  any => {
-    dstack_close_leaf_blocks(sm);
-    fhold;
-    fret;
-  };
 *|;
 
 main := |*
@@ -785,11 +733,9 @@ main := |*
 
   list_item => {
     g_debug("block list");
-    g_debug("  call list");
-    sm->list_nest = 0;
-    append_closing_p_if(sm);
-    fexec sm->ts;
-    fcall list;
+    dstack_open_list(sm, sm->a2 - sm->a1);
+    fexec sm->b1;
+    fcall inline;
   };
 
   newline{2,} => {
@@ -798,8 +744,8 @@ main := |*
     if (sm->header_mode) {
       sm->header_mode = false;
       dstack_rewind(sm);
-    } else if (sm->list_nest) {
-      dstack_close_list(sm);
+    } else if (dstack_is_open(sm, BLOCK_UL)) {
+      dstack_close_until(sm, BLOCK_UL);
     } else {
       dstack_close_before_block(sm);
     }
@@ -853,6 +799,10 @@ static inline bool dstack_check(const StateMachine * sm, element_t expected_elem
 // Return true if the given tag is currently open.
 static inline bool dstack_is_open(const StateMachine * sm, element_t element) {
   return std::find(sm->dstack.begin(), sm->dstack.end(), element) != sm->dstack.end();
+}
+
+static inline int dstack_count(const StateMachine * sm, element_t element) {
+  return std::count(sm->dstack.begin(), sm->dstack.end(), element);
 }
 
 template <typename string_type>
@@ -1080,15 +1030,6 @@ static void append_closing_p(StateMachine * sm) {
   append_block(sm, "</p>");
 }
 
-static void append_closing_p_if(StateMachine * sm) {
-  if (!dstack_check(sm, BLOCK_P)) {
-    return;
-  }
-
-  dstack_pop(sm);
-  append_closing_p(sm);
-}
-
 static void dstack_open_inline(StateMachine * sm, element_t type, const char * html) {
   g_debug("opening inline %s", html);
 
@@ -1194,7 +1135,6 @@ static void dstack_close_leaf_blocks(StateMachine * sm) {
   }
 
   sm->header_mode = false;
-  sm->list_nest = 0;
 }
 
 // Close all open tags up to and including the given tag.
@@ -1213,12 +1153,30 @@ static void dstack_close_all(StateMachine * sm) {
   }
 }
 
-static void dstack_close_list(StateMachine * sm) {
-  while (dstack_check(sm, BLOCK_LI) || dstack_check(sm, BLOCK_UL)) {
-    dstack_rewind(sm);
+static void dstack_open_list(StateMachine * sm, int depth) {
+  g_debug("open list");
+
+  if (dstack_is_open(sm, BLOCK_LI)) {
+    dstack_close_until(sm, BLOCK_LI);
+  } else {
+    dstack_close_leaf_blocks(sm);
   }
 
-  sm->list_nest = 0;
+  while (dstack_count(sm, BLOCK_UL) < depth) {
+    dstack_open_block(sm, BLOCK_UL, "<ul>");
+  }
+
+  while (dstack_count(sm, BLOCK_UL) > depth) {
+    dstack_close_until(sm, BLOCK_UL);
+  }
+
+  dstack_open_block(sm, BLOCK_LI, "<li>");
+}
+
+static void dstack_close_list(StateMachine * sm) {
+  while (dstack_is_open(sm, BLOCK_UL)) {
+    dstack_close_until(sm, BLOCK_UL);
+  }
 }
 
 static inline std::tuple<char32_t, int> get_utf8_char(const char* c) {

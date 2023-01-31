@@ -106,7 +106,6 @@ public:
   const char * d1 = NULL;
   const char * d2 = NULL;
   bool header_mode = false;
-  int list_nest = 0;
 
   std::string input;
   std::string output;
