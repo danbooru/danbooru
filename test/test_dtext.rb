@@ -212,11 +212,9 @@ class DTextTest < Minitest::Test
     assert_parse("<div class=\"spoiler\"><p>this is a block spoiler with no closing tag</p></div>", "[spoiler]\nthis is a block spoiler with no closing tag")
     assert_parse("<div class=\"spoiler\"><p>this is <span class=\"spoiler\">a nested</span> spoiler</p></div>", "[spoiler]this is [spoiler]a nested[/spoiler] spoiler[/spoiler]")
 
-    # assert_parse('<div class="spoiler"><h4>Blah</h4></div>', "[spoiler]\nh4. Blah\n[/spoiler]")
-    assert_parse(%{<div class="spoiler"><h4>Blah\n[/spoiler]</h4></div>}, "[spoiler]\nh4. Blah\n[/spoiler]") # XXX wrong
-
-    # assert_parse('<p>First sentence</p><p>[/spoiler] Second sentence.</p>', "First sentence\n\n[/spoiler] Second sentence.")
-    assert_parse("<p>First sentence</p>\n\n[/spoiler] Second sentence.", "First sentence\n\n[/spoiler] Second sentence.") # XXX wrong
+    assert_parse('<div class="spoiler"><h4>Blah</h4></div>', "[spoiler]\nh4. Blah\n[/spoiler]")
+    assert_parse('<div class="spoiler"><h4>Blah</h4></div>', "[spoiler]\n\nh4. Blah\n[/spoiler]")
+    assert_parse('<p>First sentence</p><p>[/spoiler] Second sentence.</p>', "First sentence\n\n[/spoiler] Second sentence.")
 
     assert_parse('<p>inline <em>foo</em></p><div class="spoiler"><p>blah blah</p></div>', "inline [i]foo\n\n[spoiler]blah blah[/spoiler]")
     assert_parse('<p>inline <span class="spoiler"> foo</span></p><div class="spoiler"><p>blah blah</p></div>', "inline [spoiler] foo\n\n[spoiler]blah blah[/spoiler]")
@@ -230,6 +228,11 @@ class DTextTest < Minitest::Test
     assert_parse('<p>one<br><span class="spoiler">two</span></p>', "one\n[spoiler]two")
     assert_parse('<p>one</p><div class="spoiler"></div>', "one\n[spoiler]")
     assert_parse('<blockquote><p>user said:</p><div class="spoiler"><p>aeris dies</p></div></blockquote>', "[quote]user said:\n[spoiler]\naeris dies[/spoiler]\n[/quote]")
+
+    assert_parse('<div class="spoiler"><p>foo</p></div>', "[spoiler]\n\nfoo\n\n[/spoiler]")
+
+    # assert_parse('<p>inline <span class="spoiler">foo</span></p><p>[/spoiler]</p>', "inline [spoiler]foo\n\n[/spoiler]")
+    assert_parse('<p>inline <span class="spoiler">foo</span></p>', "inline [spoiler]foo\n\n[/spoiler]") # XXX wrong
   end
 
   def test_paragraphs
@@ -696,7 +699,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>[/td]<br>blah</p>', "[/td]\nblah\n")
 
     assert_parse('<p>[/tn]<br>blah</p>', "[/tn]\nblah\n")
-    assert_parse('<p>blah</p>', "[/spoiler]\nblah\n") # XXX wrong
+    assert_parse('<p>[/spoiler]<br>blah</p>', "[/spoiler]\nblah\n")
     assert_parse('<p>[/expand]<br>blah</p>', "[/expand]\nblah\n")
 
     assert_parse("<p>[/quote]<br>blah</p>", "[/quote]\nblah\n")
@@ -911,8 +914,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>inline <strong></strong></p><hr><p>[/b]</p>', "inline [b]\n[hr]\n[/b]")
     assert_parse('<p>inline <span class="tn"></span></p><hr><p>[/tn]</p>', "inline [tn]\n[hr]\n[/tn]")
 
-    # assert_parse('<p>inline <span class="spoiler"></span></p><hr><p>[/spoiler]</p>', "inline [spoiler]\n[hr]\n[/spoiler]")
-    assert_parse('<p>inline <span class="spoiler"></span></p><hr>', "inline [spoiler]\n[hr]\n[/spoiler]") # XXX wrong
+    assert_parse('<p>inline <span class="spoiler"></span></p><hr><p>[/spoiler]</p>', "inline [spoiler]\n[hr]\n[/spoiler]")
 
     #assert_parse('<p class="tn"><hr></p>', "[tn][hr][/tn]") # XXX shouldn't work
   end
@@ -1000,19 +1002,16 @@ class DTextTest < Minitest::Test
     assert_parse('<p>inline &lt;/th&gt;</p>', 'inline </th>')
     assert_parse('<p>inline &lt;/td&gt;</p>', 'inline </td>')
 
-    # assert_parse('<p>inline &lt;/spoiler&gt;</p>', 'inline </spoiler>')
-    # assert_parse('<p>inline &lt;/expand&gt;</p>', 'inline </expand>')
-    # assert_parse('<p>inline &lt;/quote&gt;</p>', 'inline </quote>')
     assert_parse('<p>inline &lt;/tn&gt;</p>', 'inline </tn>')
-    assert_parse('<p>inline </p>&lt;/spoiler&gt;', 'inline </spoiler>') # XXX wrong
+    assert_parse('<p>inline &lt;/spoiler&gt;</p>', 'inline </spoiler>')
     assert_parse('<p>inline &lt;/expand&gt;</p>', 'inline </expand>')
     assert_parse('<p>inline &lt;/quote&gt;</p>', 'inline </quote>')
 
-    # assert_parse('<p>&lt;/spoiler&gt;</p>', '</spoiler>')
-    # assert_parse('<p>&lt;/expand&gt;</p>', '</expand>')
+    assert_parse('<p>&lt;/spoiler&gt;</p>', '</spoiler>')
+    assert_parse('<p>&lt;/expand&gt;</p>', '</expand>')
     assert_parse('<p>&lt;/quote&gt;</p>', '</quote>')
     assert_parse('<p>&lt;/tn&gt;</p>', '</tn>')
-    assert_parse('', '</spoiler>') # XXX wrong
+    assert_parse('<p>&lt;/spoiler&gt;</p>', '</spoiler>')
     assert_parse('<p>&lt;/expand&gt;</p>', '</expand>')
     assert_parse('<p>&lt;/quote&gt;</p>', '</quote>')
 

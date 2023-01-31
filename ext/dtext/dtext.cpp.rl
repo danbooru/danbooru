@@ -415,14 +415,14 @@ inline := |*
     dstack_open_inline(sm, INLINE_SPOILER, "<span class=\"spoiler\">");
   };
 
-  newline* close_spoilers => {
-    g_debug("inline [/spoiler]");
-    dstack_close_before_block(sm);
-
+  newline? close_spoilers => {
     if (dstack_check(sm, INLINE_SPOILER)) {
       dstack_close_inline(sm, INLINE_SPOILER, "</span>");
-    } else if (dstack_close_block(sm, BLOCK_SPOILER, "</div>")) {
+    } else if (dstack_is_open(sm, BLOCK_SPOILER)) {
+      dstack_close_until(sm, BLOCK_SPOILER);
       fret;
+    } else {
+      append_html_escaped(sm, { sm->ts, sm->te });
     }
   };
 
@@ -732,15 +732,6 @@ main := |*
   open_spoilers space* => {
     dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_SPOILER, "<div class=\"spoiler\">");
-  };
-
-  close_spoilers => {
-    g_debug("block [/spoiler]");
-    dstack_close_before_block(sm);
-    if (dstack_check(sm, BLOCK_SPOILER)) {
-      g_debug("  rewind");
-      dstack_rewind(sm);
-    }
   };
 
   open_code space* => {
