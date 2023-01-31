@@ -252,6 +252,16 @@ class DTextTest < Minitest::Test
     assert_parse("<p>a</p>", "a\n \n")
     assert_parse("<p>a</p>", "a \n\n")
     assert_parse("<p>a</p>", "a \n \n ")
+
+    assert_parse("a<br>b<br>c", "a\nb\nc", inline: true)
+    assert_parse(" a", "\n\na", inline: true)
+    assert_parse("a ", "a\n\n", inline: true)
+    assert_parse("a b", "a\n\nb", inline: true)
+    assert_parse("a b", "a\r\n\r\nb", inline: true)
+    assert_parse("a b", "a \n\nb", inline: true)
+    assert_parse("a b", "a\n \nb", inline: true)
+    assert_parse("a b", "a \n \nb", inline: true)
+    assert_parse("a  b", "a\n\n b", inline: true) # XXX strip space?
   end
 
   def test_headers

@@ -750,6 +750,10 @@ main := |*
     } else {
       dstack_close_before_block(sm);
     }
+
+    if (sm->options.f_inline) {
+      append(sm, " ");
+    }
   };
 
   newline => {
