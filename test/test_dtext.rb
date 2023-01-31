@@ -236,14 +236,22 @@ class DTextTest < Minitest::Test
 
   def test_paragraphs
     assert_parse("<p>abc</p>", "abc")
-  end
-
-  def test_paragraphs_with_newlines_1
     assert_parse("<p>a<br>b<br>c</p>", "a\nb\nc")
-  end
-
-  def test_paragraphs_with_newlines_2
     assert_parse("<p>a</p><p>b</p>", "a\n\nb")
+    assert_parse("<p>a</p><p>b</p>", "a\r\n\r\nb")
+    assert_parse("<p>a</p><p>b</p>", "a \n\nb")
+    assert_parse("<p>a</p><p>b</p>", "a\n \nb")
+    assert_parse("<p>a</p><p>b</p>", "a \n \nb")
+    assert_parse("<p>a</p><p> b</p>", "a\n\n b") # XXX strip space?
+
+    assert_parse("<p>a</p>", "a\n ")
+    assert_parse("<p>a</p>", "a \n")
+    assert_parse("<p>a</p>", "a \n ")
+
+    assert_parse("<p>a</p>", "a\n\n ")
+    assert_parse("<p>a</p>", "a\n \n")
+    assert_parse("<p>a</p>", "a \n\n")
+    assert_parse("<p>a</p>", "a \n \n ")
   end
 
   def test_headers
@@ -597,7 +605,7 @@ class DTextTest < Minitest::Test
     assert_parse('<ul><li>a</li></ul>', '* a')
     assert_parse('<ul><li>a</li><li>b</li></ul>', "* a\n* b")
     assert_parse('<ul><li>a</li><li>b</li><li>c</li></ul>', "* a\n* b\n* c")
-    assert_parse('<ul><li>a</li></ul><p> </p>', "* a\n ") # XXX should strip space
+    assert_parse('<ul><li>a</li></ul>', "* a\n ")
 
     assert_parse('<ul><li>a</li><li>b</li></ul>', "* a\r\n* b")
     assert_parse('<ul><li>a</li></ul><ul><li>b</li></ul>', "* a\n\n* b")
@@ -675,10 +683,30 @@ class DTextTest < Minitest::Test
   def test_extra_newlines
     assert_parse('<p>a</p><p>b</p>', "a\n\n\n\n\n\n\nb\n\n\n\n")
 
+    assert_parse('', "\n")
+    assert_parse('', " \n")
+    assert_parse('', "\n ")
+    assert_parse('', " \n ")
+    assert_parse('', "\n\n")
+    assert_parse('', " \n\n")
+    assert_parse('', "\n \n")
+    assert_parse('', " \n \n ")
+
     assert_parse('<p>foo</p>', "foo\n")
     assert_parse('<ul><li>See also</li></ul>', "* See also\n")
     assert_parse('<ul><li>See also</li></ul>', "\n* See also\n")
+
     assert_parse('<h1>foo</h1>', "h1. foo\n")
+    assert_parse('<h1>foo</h1>', "h1. foo\n\n")
+    assert_parse('<h1>foo</h1>', "h1. foo\n   \n")
+    assert_parse('<h1>foo</h1>', "h1. foo\n\n   ")
+
+    assert_parse('<h1>foo</h1>', "\nh1. foo")
+    assert_parse('<h1>foo</h1>', " \nh1. foo")
+    assert_parse('<h1>foo</h1>', "\n\nh1. foo")
+    assert_parse('<h1>foo</h1>', "   \n\nh1. foo")
+    assert_parse('<h1>foo</h1>', "\n   \nh1. foo")
+    assert_parse('<h1>foo</h1>', "   \n   \nh1. foo")
 
     assert_parse('<p>inline <em>foo</em></p>', "inline [i]foo\n")
     assert_parse('<p>inline <span class="spoiler">blah</span></p>', "inline [spoiler]blah\n")

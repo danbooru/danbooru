@@ -133,6 +133,7 @@ eos = '\0';
 newline = '\r\n' | '\n';
 ws = ' ' | '\t';
 eol = newline | eos;
+blank_lines = (ws* eol){2,};
 
 asciichar = 0x00..0x7F;
 utf8char  = 0xC2..0xDF 0x80..0xBF
@@ -467,7 +468,7 @@ inline := |*
     fret;
   };
 
-  eol{2,} => {
+  blank_lines => {
     g_debug("inline newline2");
     g_debug("  return");
 
@@ -738,7 +739,7 @@ main := |*
     fcall inline;
   };
 
-  newline{2,} => {
+  blank_lines => {
     g_debug("block newline2");
 
     if (sm->header_mode) {
