@@ -220,6 +220,16 @@ class DTextTest < Minitest::Test
 
     assert_parse('<p>inline <em>foo</em></p><div class="spoiler"><p>blah blah</p></div>', "inline [i]foo\n\n[spoiler]blah blah[/spoiler]")
     assert_parse('<p>inline <span class="spoiler"> foo</span></p><div class="spoiler"><p>blah blah</p></div>', "inline [spoiler] foo\n\n[spoiler]blah blah[/spoiler]")
+
+    # assert_parse('<ul><li>one</li></ul><div class="spoiler"><ul><li>two</li></ul></div><ul><li>three</li></ul>', "* one\n[spoiler]\n* two\n[/spoiler]\n* three")
+    assert_parse('<ul><li>one</li></ul><div class="spoiler"><ul><li>two</li></ul></div><li>three</li>', "* one\n[spoiler]\n* two\n[/spoiler]\n* three") # XXX wrong
+
+    assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><p>three</p>', "one\n[spoiler]\ntwo\n[/spoiler]\nthree")
+    assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><p>three</p>', "one\n[spoiler]\ntwo\n[/spoiler]three")
+    assert_parse('<p>one<br><span class="spoiler">two</span><br>three</p>', "one\n[spoiler]two[/spoiler]\nthree")
+    assert_parse('<p>one<br><span class="spoiler">two</span></p>', "one\n[spoiler]two")
+    assert_parse('<p>one</p><div class="spoiler"></div>', "one\n[spoiler]")
+    assert_parse('<blockquote><p>user said:</p><div class="spoiler"><p>aeris dies</p></div></blockquote>', "[quote]user said:\n[spoiler]\naeris dies[/spoiler]\n[/quote]")
   end
 
   def test_paragraphs
@@ -628,8 +638,7 @@ class DTextTest < Minitest::Test
     assert_parse('<h4>See also</h4><ul><li>a</li></ul>', "h4. See also\n* a")
     assert_parse('<h4>See also</h4><ul><li>a</li><li>h4. External links</li></ul>', "h4. See also\n* a\n* h4. External links")
 
-    # assert_parse('<p>a</p><div class="spoiler"><ul><li>b</li><li>c</li></ul></div><p>d</p>', "a\n[spoilers]\n* b\n* c\n[/spoilers]\nd")
-    assert_parse('<p>a<br><span class="spoiler"><ul><li>b</li><li>c</li></ul></span><br>d</p>', "a\n[spoilers]\n* b\n* c\n[/spoilers]\nd") # XXX wrong
+    assert_parse('<p>a</p><div class="spoiler"><ul><li>b</li><li>c</li></ul></div><p>d</p>', "a\n[spoilers]\n* b\n* c\n[/spoilers]\nd")
 
     assert_parse('<p>a</p><blockquote><ul><li>b</li><li>c</li></ul></blockquote><p>d</p>', "a\n[quote]\n* b\n* c\n[/quote]\nd")
     assert_parse('<p>a</p><details><summary>Show</summary><div><ul><li>b</li><li>c</li></ul></div></details><p>d</p>', "a\n[expand]\n* b\n* c\n[/expand]\nd")

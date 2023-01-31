@@ -405,6 +405,12 @@ inline := |*
     fret;
   };
 
+  newline ws* open_spoilers ws* eol => {
+    dstack_close_leaf_blocks(sm);
+    fexec sm->ts;
+    fret;
+  };
+
   open_spoilers => {
     dstack_open_inline(sm, INLINE_SPOILER, "<span class=\"spoiler\">");
   };
