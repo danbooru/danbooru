@@ -175,12 +175,9 @@ utf8_boundary_char =
 
 nonspace = ^space - eos;
 nonnewline = any - (newline | '\r');
-nonquote = ^'"';
 nonbracket = ^']';
-nonrparen = ^')';
 nonpipe = ^'|';
 nonpipebracket = nonpipe & nonbracket;
-noncurly = ^'}';
 
 # A bare @-mention (e.g. `@username`):
 #
@@ -202,17 +199,17 @@ delimited_mention = '<@' (nonspace nonnewline*) >mark_a1 %mark_a2 :>> '>';
 url = 'http'i 's'i? '://' nonspace+;
 delimited_url = '<' url >mark_a1 %mark_a2 :>> '>';
 relative_url = [/#] nonspace*;
-basic_textile_link = '"' nonquote+ >mark_a1 %mark_a2 '"' ':' (url | relative_url) >mark_b1 %mark_b2;
-bracketed_textile_link = '"' nonquote+ >mark_a1 %mark_a2 '"' ':[' (url | relative_url) >mark_b1 %mark_b2 :>> ']';
+basic_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':' (url | relative_url) >mark_b1 %mark_b2;
+bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (url | relative_url) >mark_b1 %mark_b2 :>> ']';
 
 # XXX: internal markdown links aren't allowed to avoid parsing closing tags as links: `[b]foo[/b](bar)`.
-markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonrparen+ >mark_b1 %mark_b2 ')';
+markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonnewline+ >mark_b1 %mark_b2 :>> ')';
 html_link = '<a'i ws+ 'href="'i (url | relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
 basic_wiki_link = alnum* >mark_a1 %mark_a2 '[[' (nonbracket nonpipebracket*) >mark_b1 %mark_b2 ']]' alnum* >mark_c1 %mark_c2;
 aliased_wiki_link = alnum* >mark_a1 %mark_a2 '[[' nonpipebracket+ >mark_b1 %mark_b2 '|' nonpipebracket* >mark_c1 %mark_c2 ']]' alnum* >mark_d1 %mark_d2;
 
-post_link = '{{' noncurly+ >mark_a1 %mark_a2 '}}';
+post_link = '{{' (nonnewline - '}')+ >mark_a1 %mark_a2 :>> '}}';
 
 id = digit+ >mark_a1 %mark_a2;
 alnum_id = alnum+ >mark_a1 %mark_a2;
