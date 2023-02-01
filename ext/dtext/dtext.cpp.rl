@@ -123,6 +123,7 @@ action mark_d2 {
   sm->d2 = sm->p;
 }
 
+action after_mention_boundary { is_mention_boundary(p[-1]) }
 action mentions_enabled { sm->options.f_mentions }
 action in_quote { dstack_is_open(sm, BLOCK_QUOTE) }
 action in_expand { dstack_is_open(sm, BLOCK_EXPAND) }
@@ -141,6 +142,37 @@ utf8char  = 0xC2..0xDF 0x80..0xBF
           | 0xF0..0xF4 0x80..0xBF 0x80..0xBF 0x80..0xBF;
 char = asciichar | utf8char;
 
+# Characters that can't be the first or last character in a @-mention.
+utf8_boundary_char =
+  0xE2 0x9D 0xAD | # '❭' U+276D MEDIUM RIGHT-POINTING ANGLE BRACKET ORNAMENT
+  0xE3 0x80 0x80 | # '　' U+3000 IDEOGRAPHIC SPACE (U+3000)
+  0xE3 0x80 0x81 | # '、' U+3001 IDEOGRAPHIC COMMA (U+3001)
+  0xE3 0x80 0x82 | # '。' U+3002 IDEOGRAPHIC FULL STOP (U+3002)
+  0xE3 0x80 0x88 | # '〈' U+3008 LEFT ANGLE BRACKET (U+3008)
+  0xE3 0x80 0x89 | # '〉' U+3009 RIGHT ANGLE BRACKET (U+3009)
+  0xE3 0x80 0x8A | # '《' U+300A LEFT DOUBLE ANGLE BRACKET (U+300A)
+  0xE3 0x80 0x8B | # '》' U+300B RIGHT DOUBLE ANGLE BRACKET (U+300B)
+  0xE3 0x80 0x8C | # '「' U+300C LEFT CORNER BRACKET (U+300C)
+  0xE3 0x80 0x8D | # '」' U+300D RIGHT CORNER BRACKET (U+300D)
+  0xE3 0x80 0x8E | # '『' U+300E LEFT WHITE CORNER BRACKET (U+300E)
+  0xE3 0x80 0x8F | # '』' U+300F RIGHT WHITE CORNER BRACKET (U+300F)
+  0xE3 0x80 0x90 | # '【' U+3010 LEFT BLACK LENTICULAR BRACKET (U+3010)
+  0xE3 0x80 0x91 | # '】' U+3011 RIGHT BLACK LENTICULAR BRACKET (U+3011)
+  0xE3 0x80 0x94 | # '〔' U+3014 LEFT TORTOISE SHELL BRACKET (U+3014)
+  0xE3 0x80 0x95 | # '〕' U+3015 RIGHT TORTOISE SHELL BRACKET (U+3015)
+  0xE3 0x80 0x96 | # '〖' U+3016 LEFT WHITE LENTICULAR BRACKET (U+3016)
+  0xE3 0x80 0x97 | # '〗' U+3017 RIGHT WHITE LENTICULAR BRACKET (U+3017)
+  0xE3 0x80 0x98 | # '〘' U+3018 LEFT WHITE TORTOISE SHELL BRACKET (U+3018)
+  0xE3 0x80 0x99 | # '〙' U+3019 RIGHT WHITE TORTOISE SHELL BRACKET (U+3019)
+  0xE3 0x80 0x9A | # '〚' U+301A LEFT WHITE SQUARE BRACKET (U+301A)
+  0xE3 0x80 0x9B | # '〛' U+301B RIGHT WHITE SQUARE BRACKET (U+301B)
+  0xE3 0x80 0x9C | # '〜' U+301C WAVE DASH (U+301C)
+  0xEF 0xBC 0x89 | # '）' U+FF09 FULLWIDTH RIGHT PARENTHESIS
+  0xEF 0xBC 0xBD | # '］' U+FF3D FULLWIDTH RIGHT SQUARE BRACKET
+  0xEF 0xBD 0x9D | # '｝' U+FF5D FULLWIDTH RIGHT CURLY BRACKET
+  0xEF 0xBD 0xA0 | # '｠' U+FF60 FULLWIDTH RIGHT WHITE PARENTHESIS
+  0xEF 0xBD 0xA3 ; # '｣' U+FF63 HALFWIDTH RIGHT CORNER BRACKET
+
 nonspace = ^space - eos;
 nonnewline = any - (newline | '\r');
 nonquote = ^'"';
@@ -150,10 +182,21 @@ nonpipe = ^'|';
 nonpipebracket = nonpipe & nonbracket;
 noncurly = ^'}';
 
-# A username must start with a nonpunctuation character, or start with a '_' or '.' followed by a nonpunctuation character. The second character can't be a '@'.
-nonpunct = (char - punct - space - eos);
-username = ([_.]? nonpunct nonspace+) - (char '@');
-mention = '@' username >mark_a1 %mark_a2;
+# A bare @-mention (e.g. `@username`):
+#
+# * Can only appear after a space or one of the following characters: / " \ ( ) [ ] { }
+# * Can't start or end with a punctuation character (either ASCII or Unicode).
+# ** Exception: it can start with `_` or `.`, as long the next character is a non-punctuation character (this is to grandfather in names like @.Dank or @_cf).
+# * Can't contain punctuation characters, except for . _ / ' - + !
+# * Can't end in "'s" or "'d" (to allow `@kia'ra`, but not `@user's`).
+# * The second character can't be '@' (to avoid emoticons like '@_@').
+# * Must be at least two characters long.
+
+mention_nonboundary_char = char - punct - space - eos - utf8_boundary_char;
+mention_char = nonspace - (punct - [._/'\-+!]);
+bare_username = ([_.]? mention_nonboundary_char mention_char* mention_nonboundary_char) - (char '@') - (char* '\'' [sd]);
+
+bare_mention = ('@' when after_mention_boundary) (bare_username >mark_a1 @mark_a2);
 delimited_mention = '<@' (nonspace nonnewline*) >mark_a1 %mark_a2 :>> '>';
 
 url = 'http'i 's'i? '://' nonspace+;
@@ -330,23 +373,8 @@ inline := |*
     append_unnamed_url(sm, { sm->a1, sm->a2 });
   };
 
-  mention when mentions_enabled => {
-    if (sm->a1[-2] != '\0' && sm->a1[-2] != ' ' && sm->a1[-2] != '\r' && sm->a1[-2] != '\n') {
-      g_debug("write '@' (ignored mention)");
-      append(sm, '@');
-      fexec sm->a1;
-    } else {
-      const char* match_end = sm->a2;
-      const char* name_start = sm->a1;
-      const char* name_end = find_boundary_c(match_end - 1) + 1;
-
-      g_debug("mention: '@%.*s'", (int)(name_end - name_start), sm->a1);
-      append_mention(sm, { name_start, name_end });
-
-      if (name_end < match_end) {
-        append_html_escaped(sm, { name_end, match_end });
-      }
-    }
+  bare_mention when mentions_enabled => {
+    append_mention(sm, { sm->a1, sm->a2 + 1 });
   };
 
   delimited_mention when mentions_enabled => {
@@ -1185,6 +1213,26 @@ static void dstack_open_list(StateMachine * sm, int depth) {
 static void dstack_close_list(StateMachine * sm) {
   while (dstack_is_open(sm, BLOCK_UL)) {
     dstack_close_until(sm, BLOCK_UL);
+  }
+}
+
+// True if a mention is allowed to start after this character.
+static inline bool is_mention_boundary(unsigned char c) {
+  switch (c) {
+    case '\0': return true;
+    case '\r': return true;
+    case '\n': return true;
+    case ' ':  return true;
+    case '/':  return true;
+    case '"':  return true;
+    case '\'': return true;
+    case '(':  return true;
+    case ')':  return true;
+    case '[':  return true;
+    case ']':  return true;
+    case '{':  return true;
+    case '}':  return true;
+    default:   return false;
   }
 }
 

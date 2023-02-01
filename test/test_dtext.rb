@@ -3,6 +3,7 @@
 require "dtext"
 require "cgi"
 require "minitest/autorun"
+require "nokogiri"
 
 class DTextTest < Minitest::Test
   def parse(*args, **options)
@@ -35,6 +36,13 @@ class DTextTest < Minitest::Test
     assert_parse(expected, input, inline: true)
   end
 
+  def assert_mention(expected_username, input, **options)
+    html = parse(input)
+    actual_username = Nokogiri::HTML5.fragment(html).css("a.dtext-user-mention-link").text
+
+    assert_equal("@" + expected_username, actual_username)
+  end
+
   def test_relative_urls
     assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="http://danbooru.donmai.us/posts/1234">post #1234</a></p>', "post #1234", base_url: "http://danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="http://danbooru.donmai.us/wiki_pages/touhou">touhou</a></p>', "[[touhou]]", base_url: "http://danbooru.donmai.us")
@@ -56,32 +64,72 @@ class DTextTest < Minitest::Test
   end
 
   def test_mentions
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a></p>', "@bob")
-    assert_parse('<p>hi <a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a></p>', "hi @bob")
+    assert_mention("user", "@user")
+    assert_mention("user", "hi @user")
+    assert_mention("user", "@user:")
+    assert_mention("user", "@user?")
+    assert_mention("user", "/@user")
+    assert_mention("user", "(@user)")
+    assert_mention("user", '(@user: blah')
+    assert_mention("user", '[i]@user [/i]')
+    assert_mention("user", '[quote]@user:')
+    assert_mention("user", 'Twitter/@user')
+    assert_mention("factory", '[b][@factory (Asakura Kotomi)] KotoKoi (Nisekoi)[/b]')
+
+    assert_mention("user", "@user's")
+    assert_mention('user', '@user...')
+    assert_mention('user', '"@user"')
+    assert_mention('user', '"@user":')
+    assert_mention('user', '(and "@user");')
+    assert_mention("user", "(@user?)")
+    assert_mention("user", "(@user!)")
+    assert_mention("user", "(@user).")
+    assert_mention("user", "(@user),")
+    assert_mention("user", "@user- hi")
+    assert_mention("user", '[i]@user:[/i]')
+    assert_mention("user", '[i]@user[/i]')
+    assert_mention("Bunch", '[i]Comic @Bunch[/i]')
+    assert_mention("TunaMayo", '@TunaMayo,　乙でした～.')
+
+    assert_mention("21", 'https://www.youtube.com/watch?v=gUxxclCqD8g (@21:50)') # XXX wrong
+    assert_mention('1027x768', '12"@1027x768') # XXX wrong
+    assert_mention("和茶_Official", "[喜欢]@和茶_Official") # XXX wrong
+    assert_mention("amazonses.com", "(from <[redacted]@amazonses.com>)") # XXX wrong
+    assert_mention("waniguchi", "(Twitter ID: @waniguchi_)") # XXX wrong
+    assert_mention("rifu", "@rifu_ from twitter") # XXX wrong
+
     assert_parse('<p>this is not @.@ @_@ <a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a></p>', "this is not @.@ @_@ @bob")
     assert_parse('<p>multiple <a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a> <a class="dtext-link dtext-user-mention-link" data-user-name="anna" href="/users?name=anna">@anna</a></p>', "multiple @bob @anna")
 
-    # assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a>\'s</p>', "@bob's")
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="bob\'s" href="/users?name=bob%27s">@bob\'s</a></p>', "@bob's") # XXX shouldn't include apostrophe
+    assert_mention("_cf", "@_cf")
+    assert_mention(".musouka", "@.musouka")
+    assert_mention(".dank", "@.dank")
+    assert_mention("kia'ra", "@kia'ra")
+    assert_mention("T34/38", "@T34/38")
+    assert_mention("F/A-18F", "@F/A-18F")
+    assert_mention("79248cm/s", "@79248cm/s:")
+    assert_mention("games.2019", "@games.2019")
+    assert_mention(".k1.38+23", "@.k1.38+23")
+    assert_mention('T!ramisu', '@T!ramisu')
+    assert_mention("PostIt-Notes", "@PostIt-Notes")
+    assert_mention("Fox/Tamamo™", "@Fox/Tamamo™")
+    assert_mention("Équi_libriste", "@Équi_libriste")
+    assert_mention("111K女", "@111K女")
+    assert_mention("🌟💖🌈RainbowStarblast🌈💖🌟", "@🌟💖🌈RainbowStarblast🌈💖🌟")
 
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="_cf" href="/users?name=_cf">@_cf</a></p>', "@_cf")
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="_dk" href="/users?name=_dk">@_dk</a></p>', "@_dk")
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name=".musouka" href="/users?name=.musouka">@.musouka</a></p>', "@.musouka")
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name=".dank" href="/users?name=.dank">@.dank</a></p>', "@.dank")
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="games.2019" href="/users?name=games.2019">@games.2019</a></p>', "@games.2019")
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name=".k1.38+23" href="/users?name=.k1.38%2B23">@.k1.38+23</a></p>', "@.k1.38+23")
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="PostIt-Notes" href="/users?name=PostIt-Notes">@PostIt-Notes</a></p>', "@PostIt-Notes")
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="Équi_libriste" href="/users?name=%C3%89qui_libriste">@Équi_libriste</a></p>', "@Équi_libriste")
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="111K女" href="/users?name=111K%E5%A5%B3">@111K女</a></p>', "@111K女")
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="🌟💖🌈RainbowStarblast🌈💖🌟" href="/users?name=%F0%9F%8C%9F%F0%9F%92%96%F0%9F%8C%88RainbowStarblast%F0%9F%8C%88%F0%9F%92%96%F0%9F%8C%9F">@🌟💖🌈RainbowStarblast🌈💖🌟</a></p>', "@🌟💖🌈RainbowStarblast🌈💖🌟")
+    assert_mention("初　音　ミ　ク", "@初　音　ミ　ク") # XXX shouldn't work
+    assert_mention("http", "@http://example.com") # XXX shouldn't work
 
-    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="　初　音　ミ　ク" href="/users?name=%E3%80%80%E5%88%9D%E3%80%80%E9%9F%B3%E3%80%80%E3%83%9F%E3%80%80%E3%82%AF">@　初　音　ミ　ク</a></p>', "@　初　音　ミ　ク") # XXX shouldn't work
+    assert_parse('<p>@e?</p>', '@e?') # XXX should work
+    assert_parse("<p>@[KN]</p>", "@[KN]") # XXX should work
+    assert_parse("<p>@|Leo|</p>", "@|Leo|") # XXX should work
+    assert_parse("<p>@-abraxas-</p>", "@-abraxas-") # XXX should work
+    assert_parse("<p>@-Yangbojian</p>", "@-Yangbojian") # XXX should work
 
-    # assert_parse('<p>@http://en.or.tp/~suzuran/</p>', "@http://en.or.tp/~suzuran/") # XXX shouldn't work
-    # assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="[KN]" href="/users?name=[KN]">@[KN]</a></p>', "@[KN]") # XXX should work
-    # assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="|Leo|" href="/users?name=|Leo|">@|Leo|</a></p>', "@|Leo|") # XXX should work
-    # assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="-abraxas-" href="/users?name=-abraxas-">@-abraxas-</a></p>', "@-abraxas-") # should work
-    # assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="-Yangbojian" href="/users?name=-Yanbojian">@-Yangbojian</a></p>', "@-Yangbojian") # should work
+    assert_mention("deadW", "@deadW@nderer") # XXX wrong
+    assert_mention("sweetpe", "@sweetpe@") # XXX wrong
+    assert_mention("Nito", "@Nito(ri^n)") # XXX wrong
+    assert_mention("Lucas", "@Lucas#Vidal:") # XXX wrong
   end
 
   def test_nonmentions
@@ -91,6 +139,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>@?</p>', "@?")
     assert_parse('<p>@N</p>', "@N")
     assert_parse('<p>@$$</p>', "@$$")
+    assert_parse('<p>@s*</p>', "@s*")
     assert_parse('<p>@%%</p>', "@%%")
     assert_parse('<p>@.@</p>', "@.@")
     assert_parse('<p>@.o</p>', "@.o")
@@ -99,8 +148,10 @@ class DTextTest < Minitest::Test
     assert_parse('<p>@_@</p>', "@_@")
     assert_parse('<p>@¬@</p>', "@¬@")
     assert_parse('<p>@w@</p>', "@w@")
+    assert_parse('<p>@m@;</p>', "@m@;")
     assert_parse('<p>@n@</p>', "@n@")
     assert_parse('<p>@A@</p>', "@A@")
+    assert_parse('<p>@A@?</p>', "@A@?")
     assert_parse('<p>@3@</p>', "@3@")
     assert_parse('<p>@__X</p>', "@__X")
     assert_parse('<p>@__@</p>', "@__@")
@@ -131,6 +182,20 @@ class DTextTest < Minitest::Test
     assert_parse('<p>@&quot;I love ProgRock&quot;</p>', '@"I love ProgRock"')
     assert_parse('<p>@@text</p>', "@@text")
     assert_parse('<p>@o@</p>', "@o@")
+    assert_parse('<p>@.o&quot;</p>', '@.o"')
+    assert_parse("<p>@.o''</p>", "@.o''")
+    assert_parse('<p>things(@_0;...</p>', 'things(@_0;...')
+    assert_parse('<p>(@﹏@) . . .</p>', '(@﹏@) . . .')
+
+    assert_parse('<p>Q^$@T5#</p>', "Q^$@T5#")
+    assert_parse('<p>f#*@ing</p>', "f#*@ing")
+    assert_parse('<p>sick f$#@s!</p>', 'sick f$#@s!')
+    assert_parse('<p>motherf&amp;#@er!</p>', 'motherf&#@er!')
+    assert_parse('<p>mutha&amp;#*@ing</p>', "mutha&#*@ing")
+    assert_parse('<p>...@you guys.</p>', "...@you guys.")
+    assert_parse('<p>*chuckle*@the cocks tag</p>', "*chuckle*@the cocks tag")
+    assert_parse('<p>Poi!@poi?</p>', 'Poi!@poi?')
+    assert_parse('<p> @0:43?</p>', ' @0:43?')
 
     assert_parse('<p>email@address.com</p>', "email@address.com")
     assert_parse('<p>idolm@ster</p>', 'idolm@ster')
