@@ -498,6 +498,10 @@ inline := |*
 
   eos;
 
+  alnum+ | utf8char+ => {
+    append(sm, std::string_view { sm->ts, sm->te });
+  };
+
   any => {
     append_html_escaped(sm, fc);
   };
