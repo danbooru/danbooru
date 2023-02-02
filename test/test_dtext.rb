@@ -441,6 +441,11 @@ class DTextTest < Minitest::Test
     assert_parse("<pre>[code]</pre>", "[code][code][/code]")
     assert_parse("<pre>post #123</pre>", "[code]post #123[/code]")
     assert_parse("<pre>x</pre>", "[code]x")
+
+    assert_parse("<p>inline</p><pre>[/i]\n</pre>", "inline\n\n[code]\n[/i]\n[/code]")
+    assert_parse('<p>inline</p><pre>[/i]</pre>', "inline\n\n[code][/i][/code]")
+    assert_parse("<p><em>inline</em></p><pre>[/i]\n</pre>", "[i]inline\n\n[code]\n[/i]\n[/code]")
+    assert_parse('<p><em>inline</em></p><pre>[/i]</pre>', "[i]inline\n\n[code][/i][/code]")
   end
 
   def test_inline_code
@@ -848,11 +853,13 @@ class DTextTest < Minitest::Test
   end
 
   def test_table
-    assert_parse("<table class=\"striped\"><thead><tr><th>header</th></tr></thead><tbody><tr><td><a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/100\">post #100</a></td></tr></tbody></table>", "[table][thead][tr][th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]")
-  end
+    assert_parse("<table class=\"striped\"><tr><td>text</td></tr></table>", "[table][tr][td]text[/td][/tr][/table]")
 
-  def test_table_with_newlines
+    assert_parse("<table class=\"striped\"><thead><tr><th>header</th></tr></thead><tbody><tr><td><a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/100\">post #100</a></td></tr></tbody></table>", "[table][thead][tr][th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]")
     assert_parse("<table class=\"striped\"><thead><tr><th>header</th></tr></thead><tbody><tr><td><a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/100\">post #100</a></td></tr></tbody></table>", "[table]\n[thead]\n[tr]\n[th]header[/th][/tr][/thead][tbody][tr][td]post #100[/td][/tr][/tbody][/table]")
+
+    assert_parse('<p>inline</p><table class="striped"><tr><td>text</td></tr></table>', "inline\n\n[table][tr][td]text[/td][/tr][/table]")
+    assert_parse("<p><em>inline</em></p><table class=\"striped\"><tr><td>text</td></tr></table>", "[i]inline\n\n[table][tr][td]text[/td][/tr][/table]")
   end
 
   def test_unclosed_th
@@ -1102,6 +1109,11 @@ class DTextTest < Minitest::Test
     assert_parse('<p></p>', "[nodtext]")
     assert_parse('<p></p>', "[nodtext][/nodtext]")
     assert_parse('<p>[/nodtext]</p>', "[/nodtext]")
+
+    assert_parse("<p>inline</p><p>[/i]\n</p>", "inline\n\n[nodtext]\n[/i]\n[/nodtext]") # XXX trim newlines
+    assert_parse('<p>inline</p><p>[/i]</p>', "inline\n\n[nodtext][/i][/nodtext]")
+    assert_parse("<p><em>inline</em></p><p>[/i]\n</p>", "[i]inline\n\n[nodtext]\n[/i]\n[/nodtext]") # XXX trim newlines
+    assert_parse('<p><em>inline</em></p><p>[/i]</p>', "[i]inline\n\n[nodtext][/i][/nodtext]")
 
     assert_parse('', "[nodtext]", inline: true)
     assert_parse('', "[nodtext][/nodtext]", inline: true)

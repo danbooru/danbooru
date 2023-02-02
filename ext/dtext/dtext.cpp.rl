@@ -719,7 +719,7 @@ main := |*
   };
 
   open_code space* => {
-    dstack_close_before_block(sm);
+    dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_CODE, "<pre>");
     fcall code;
   };
@@ -746,13 +746,13 @@ main := |*
   };
 
   open_nodtext space* => {
-    dstack_close_before_block(sm);
+    dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_NODTEXT, "<p>");
     fcall nodtext;
   };
 
   open_table => {
-    dstack_close_before_block(sm);
+    dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_TABLE, "<table class=\"striped\">");
     fcall table;
   };
