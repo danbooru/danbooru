@@ -1025,6 +1025,8 @@ static inline void append_wiki_link(StateMachine * sm, const std::string_view ta
   append(sm, "\">");
   append_html_escaped(sm, title_string);
   append(sm, "</a>");
+
+  sm->wiki_pages.insert(std::string(tag));
 }
 
 static inline void append_paged_link(StateMachine * sm, const char * title, const char * tag, const char * href, const char * param) {
@@ -1315,9 +1317,9 @@ std::string StateMachine::parse_basic_inline(const std::string_view dtext) {
   return sm.parse();
 }
 
-std::string StateMachine::parse_dtext(const std::string_view dtext, DTextOptions options) {
+StateMachine::ParseResult StateMachine::parse_dtext(const std::string_view dtext, DTextOptions options) {
   StateMachine sm(dtext, dtext_en_main, options);
-  return sm.parse();
+  return { sm.parse(), sm.wiki_pages };
 }
 
 std::string StateMachine::parse() {

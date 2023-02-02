@@ -1167,6 +1167,38 @@ class DTextTest < Minitest::Test
     # assert_parse('<div class="spoiler"><blockquote><p>foo</p></blockquote></div>', '[spoiler]\n[quote]\nfoo\n[/spoiler][/quote]')
   end
 
+  def test_parse_wiki_pages
+    assert_wiki_pages(%w[], "")
+    assert_wiki_pages(%w[kantai_collection], "[[kantai_collection]]")
+    assert_wiki_pages(%w[Kantai\ Collection], "[[Kantai Collection]]")
+    assert_wiki_pages(%w[Kantai\ Collection], "[[Kantai Collection|Kancolle]]")
+    assert_wiki_pages(%w[cat], "[[cat]]s")
+    assert_wiki_pages(%w[60s], "19[[60s]]")
+    assert_wiki_pages(%w[cat], "[[cat]] [[cat]]")
+    assert_wiki_pages(%w[cat dog], "[[cat]] [[dog]]")
+    assert_wiki_pages(%w[], "[nodtext][[cat]][/nodtext]")
+
+    touhou_tags = [
+      "100th Black Market", "Alternative Facts in Eastern Utopia", "Antinomy of Common Flowers", "Bohemian Archive in Japanese Red",
+      "Cage in Lunatic Runagate", "Changeability of Strange Dream", "Curiosities of Lotus Asia", "Dateless Bar \"Old Adam\"",
+      "Dolls in Pseudo Paradise", "Double Dealing Character", "Double Spoiler", "Dr.Latency's Freak Report",
+      "Eastern and Little Nature Deity", "Embodiment of Scarlet Devil", "Forbidden Scrollery", "Foul Detective Satori",
+      "Ghostly Field Club", "Hidden Star in Four Seasons", "Highly Responsive to Prayers", "Hopeless Masquerade",
+      "Immaterial and Missing Power", "Imperishable Night", "Impossible Spell Card", "Inaba of the Moon and Inaba of the Earth",
+      "Legacy of Lunatic Kingdom", "List of Touhou Characters", "List of Touhou Fanwork Tags", "Lotus Land Story", "Magical Astronomy",
+      "Michi no Hana Michi no Tabi", "Mountain of Faith", "Mystic Square", "Neo-traditionalism of Japan", "Perfect Cherry Blossom",
+      "Perfect Memento in Strict Sense", "Phantasmagoria of Dim.Dream", "Phantasmagoria of Flower View", "Portrait of Exotic Girls",
+      "Rainbow-Colored Septentrion", "Retrospective 53 minutes", "Scarlet Weather Rhapsody", "Shoot the Bullet", "Silent Sinner in Blue",
+      "Story of Eastern Wonderland", "Strange Creators of Outer World", "Subterranean Animism", "Symposium of Post-mysticism",
+      "Ten Desires", "Touhou (PC-98)", "Touhou Bougetsushou", "Touhou Gouyoku Ibun", "Touhou Hisoutensoku", "Touhou Sangetsusei",
+      "Trojan Green Asteroid", "Turbo Byakuren", "Unconnected Marketeers", "Undefined Fantastic Object", "Urban Legend in Limbo",
+      "Violet Detector", "Wild and Horned Hermit", "Wily Beast and Weakest Creature", "Yousei Daisensou", "ZUN (artist)", "danmaku",
+      "gameplay mechanics", "grimoire_of_marisa", "grimoire_of_usami", "lotus eaters", "parody"
+    ]
+
+    assert_wiki_pages(touhou_tags, File.read("test/files/touhou-wiki.txt"))
+  end
+
   def test_null_bytes
     assert_raises(DText::Error) { parse("foo\0bar") }
   end

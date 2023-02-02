@@ -1,6 +1,7 @@
 #ifndef DTEXT_H
 #define DTEXT_H
 
+#include <unordered_set>
 #include <string>
 #include <vector>
 #include <stdexcept>
@@ -111,8 +112,10 @@ public:
   std::string output;
   std::vector<int> stack;
   std::vector<element_t> dstack;
+  std::unordered_set<std::string> wiki_pages;
 
-  static std::string parse_dtext(const std::string_view dtext, const DTextOptions options);
+  using ParseResult = std::tuple<std::string, decltype(wiki_pages)>;
+  static ParseResult parse_dtext(const std::string_view dtext, const DTextOptions options);
 
   std::string parse_inline(const std::string_view dtext);
   std::string parse_basic_inline(const std::string_view dtext);

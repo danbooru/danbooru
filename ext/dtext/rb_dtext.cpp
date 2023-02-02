@@ -6,12 +6,39 @@
 static VALUE cDText = Qnil;
 static VALUE cDTextError = Qnil;
 
-static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALUE f_inline, VALUE f_disable_mentions, VALUE validate) {
+static void validate_dtext(VALUE string) {
+  // if input.encoding != Encoding::UTF_8
+  if (rb_enc_get_index(string) != rb_utf8_encindex()) {
+    rb_raise(cDTextError, "input must be UTF-8");
+  }
+
+  // if !input.valid_encoding?
+  // https://github.com/ruby/ruby/blob/2d9812713171097eb4a3f38e49d9be39d90da2f6/string.c#L10847
+  if (rb_enc_str_coderange(string) == ENC_CODERANGE_BROKEN) {
+    rb_raise(cDTextError, "input contains invalid UTF-8");
+  }
+
+  if (memchr(RSTRING_PTR(string), 0, RSTRING_LEN(string))) {
+    rb_raise(cDTextError, "input contains null byte");
+  }
+}
+
+static auto parse_dtext(VALUE input, DTextOptions options = {}) {
+  try  {
+    StringValue(input);
+    validate_dtext(input);
+
+    std::string_view dtext(RSTRING_PTR(input), RSTRING_LEN(input));
+    return StateMachine::parse_dtext(dtext, options);
+  } catch (std::exception& e) {
+    rb_raise(cDTextError, "%s", e.what());
+  }
+}
+
+static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALUE f_inline, VALUE f_disable_mentions) {
   if (NIL_P(input)) {
     return Qnil;
   }
-
-  StringValue(input);
 
   DTextOptions options;
   options.f_inline = RTEST(f_inline);
@@ -25,33 +52,25 @@ static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALU
     options.domain = StringValueCStr(domain); // domain.to_str # raises ArgumentError if domain contains null bytes.
   }
 
-  // if input.encoding != Encoding::UTF_8
-  if (RTEST(validate) && rb_enc_get_index(input) != rb_utf8_encindex()) {
-    rb_raise(cDTextError, "input must be UTF-8");
+  auto [html, _wiki_pages] = parse_dtext(input, options);
+  return rb_utf8_str_new(html.c_str(), html.size());
+}
+
+static VALUE c_parse_wiki_pages(VALUE self, VALUE input) {
+  auto [_html, wiki_pages] = parse_dtext(input);
+
+  VALUE rb_wiki_pages = rb_ary_new_capa(wiki_pages.size());
+  for (auto wiki_page : wiki_pages) {
+    VALUE rb_wiki_page = rb_str_new(wiki_page.data(), wiki_page.size());
+    rb_ary_push(rb_wiki_pages, rb_wiki_page);
   }
 
-  // if !input.valid_encoding?
-  // https://github.com/ruby/ruby/blob/2d9812713171097eb4a3f38e49d9be39d90da2f6/string.c#L10847
-  if (RTEST(validate) && rb_enc_str_coderange(input) == ENC_CODERANGE_BROKEN) {
-    rb_raise(cDTextError, "input contains invalid UTF-8");
-  }
-
-  if (memchr(RSTRING_PTR(input), 0, RSTRING_LEN(input))) {
-    rb_raise(cDTextError, "input contains null byte");
-  }
-
-  try  {
-    auto dtext = std::string_view(RSTRING_PTR(input), RSTRING_LEN(input));
-    auto result = StateMachine::parse_dtext(dtext, options);
-
-    return rb_utf8_str_new(result.c_str(), result.size());
-  } catch (std::exception& e) {
-    rb_raise(cDTextError, "%s", e.what());
-  }
+  return rb_wiki_pages;
 }
 
 extern "C" void Init_dtext() {
   cDText = rb_define_class("DText", rb_cObject);
   cDTextError = rb_define_class_under(cDText, "Error", rb_eStandardError);
-  rb_define_singleton_method(cDText, "c_parse", c_parse, 6);
+  rb_define_singleton_method(cDText, "c_parse", c_parse, 5);
+  rb_define_singleton_method(cDText, "c_parse_wiki_pages", c_parse_wiki_pages, 1);
 }
