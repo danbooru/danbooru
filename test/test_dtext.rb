@@ -332,18 +332,19 @@ class DTextTest < Minitest::Test
   def test_headers
     assert_parse("<h1>header</h1>", "h1. header")
     assert_parse("<ul><li>a</li></ul><h1>header</h1><ul><li>list</li></ul>", "* a\n\nh1. header\n* list")
-  end
-
-  def test_inline_headers
     assert_parse("<p>blah h1. blah</p>", "blah h1. blah")
-  end
 
-  def test_headers_with_ids
     assert_parse("<h1 id=\"dtext-blah-blah\">header</h1>", "h1#blah-blah. header")
-  end
-
-  def test_headers_with_ids_with_quote
     assert_parse("<p>h1#blah-&quot;blah. header</p>", "h1#blah-\"blah. header")
+
+    assert_parse('<p>text</p><h1>header</h1>', "text\nh1. header")
+    assert_parse('<p>text</p><h1 id="dtext-blah">header</h1>', "text\nh1#blah. header")
+    assert_parse('<p><em>text</em></p><h1>header</h1>', "[i]text\nh1. header")
+    assert_parse('<div class="spoiler"><p>text</p><h1>header</h1></div>', "[spoiler]text\nh1. header")
+    assert_parse('<h1>header</h1><p>text</p>', "h1. header\ntext")
+    assert_parse('<ul><li>one</li></ul><h1>header</h1>', "* one\nh1. header")
+    assert_parse('<ul><li>one</li></ul><h1>header</h1><ul><li>two</li></ul>', "* one\nh1. header\n* two")
+    assert_parse('<h1>header</h1><h2>header</h2>', "h1. header\nh2. header")
   end
 
   def test_inline_elements
