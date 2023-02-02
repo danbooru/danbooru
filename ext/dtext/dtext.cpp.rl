@@ -15,8 +15,7 @@
 
 static const size_t MAX_STACK_DEPTH = 512;
 
-// Matches `_(fate) in `artoria_pendragon_(lancer)_(fate)`.
-static std::regex tag_qualifier_regex("[ _]\\([^)]+?\\)$");
+static inline const char* find_boundary_c(const char* c);
 
 // Characters that mark the end of a link.
 //
@@ -318,12 +317,7 @@ inline := |*
   'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"", "https://www.pixiv.net/artworks/", "#"); };
 
   post_link => {
-    append(sm, "<a class=\"dtext-link dtext-post-search-link\" href=\"");
-    append_url(sm, "/posts?tags=");
-    append_uri_escaped(sm, { sm->a1, sm->a2 });
-    append(sm, "\">");
-    append_html_escaped(sm, { sm->a1, sm->a2 });
-    append(sm, "</a>");
+    append_post_search_link(sm, { sm->a1, sm->a2 });
   };
 
   basic_wiki_link => {
@@ -335,15 +329,7 @@ inline := |*
   };
 
   basic_textile_link => {
-    const char* match_end = sm->b2;
-    const char* url_start = sm->b1;
-    const char* url_end = find_boundary_c(match_end - 1) + 1;
-
-    append_named_url(sm, { url_start, url_end }, { sm->a1, sm->a2 });
-
-    if (url_end < match_end) {
-      append_html_escaped(sm, { url_end, match_end });
-    }
+    append_bare_named_url(sm, { sm->b1, sm->b2 }, { sm->a1, sm->a2 });
   };
 
   bracketed_textile_link => {
@@ -355,15 +341,7 @@ inline := |*
   };
 
   url => {
-    const char* match_end = sm->te;
-    const char* url_start = sm->ts;
-    const char* url_end = find_boundary_c(match_end - 1) + 1;
-
-    append_unnamed_url(sm, { url_start, url_end });
-
-    if (url_end < match_end) {
-      append_html_escaped(sm, { url_end, match_end });
-    }
+    append_bare_unnamed_url(sm, { sm->ts, sm->te });
   };
 
   delimited_url => {
@@ -949,6 +927,18 @@ static inline void append_unnamed_url(StateMachine * sm, const std::string_view 
   append(sm, "</a>");
 }
 
+static inline void append_bare_unnamed_url(StateMachine * sm, const std::string_view url) {
+  const char* match_end = end(url);
+  const char* url_start = begin(url);
+  const char* url_end = find_boundary_c(match_end - 1) + 1;
+
+  append_unnamed_url(sm, { url_start, url_end });
+
+  if (url_end < match_end) {
+    append_html_escaped(sm, { url_end, match_end });
+  }
+}
+
 static inline void append_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
   auto parsed_title = sm->parse_basic_inline(title);
 
@@ -979,6 +969,27 @@ static inline void append_named_url(StateMachine * sm, const std::string_view ur
   append(sm, "</a>");
 }
 
+static inline void append_bare_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
+  const char* match_end = end(url);
+  const char* url_start = begin(url);
+  const char* url_end = find_boundary_c(match_end - 1) + 1;
+
+  append_named_url(sm, { url_start, url_end }, title);
+
+  if (url_end < match_end) {
+    append_html_escaped(sm, { url_end, match_end });
+  }
+}
+
+static inline void append_post_search_link(StateMachine * sm, const std::string_view search) {
+  append(sm, "<a class=\"dtext-link dtext-post-search-link\" href=\"");
+  append_url(sm, "/posts?tags=");
+  append_uri_escaped(sm, search);
+  append(sm, "\">");
+  append_html_escaped(sm, search);
+  append(sm, "</a>");
+}
+
 static inline void append_wiki_link(StateMachine * sm, const std::string_view tag, const std::string_view title, const std::string_view prefix, const std::string_view suffix) {
   auto normalized_tag = std::string(tag);
   auto title_string = std::string(title);
@@ -994,6 +1005,7 @@ static inline void append_wiki_link(StateMachine * sm, const std::string_view ta
   // Pipe trick: [[Kaga (Kantai Collection)|]] -> [[kaga_(kantai_collection)|Kaga]]
   if (title_string.empty()) {
     // Strip qualifier from tag: "Artoria Pendragon (Lancer) (Fate)" -> "Artoria Pendragon (Lancer)"
+    static const std::regex tag_qualifier_regex("[ _]\\([^)]+?\\)$");
     std::regex_replace(std::back_inserter(title_string), tag.cbegin(), tag.cend(), tag_qualifier_regex, "");
   }
 
