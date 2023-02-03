@@ -417,6 +417,12 @@ inline := |*
   # these are block level elements that should kick us out of the inline
   # scanner
 
+  newline (open_code | open_code_lang | open_nodtext) => {
+    dstack_close_leaf_blocks(sm);
+    fexec sm->ts;
+    fret;
+  };
+
   newline (header | header_with_id) => {
     dstack_close_leaf_blocks(sm);
     fexec sm->ts;

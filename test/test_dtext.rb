@@ -513,6 +513,11 @@ class DTextTest < Minitest::Test
     assert_parse('<p>inline</p><pre>[/i]</pre>', "inline\n\n[code][/i][/code]")
     assert_parse("<p><em>inline</em></p><pre>[/i]</pre>", "[i]inline\n\n[code]\n[/i]\n[/code]")
     assert_parse('<p><em>inline</em></p><pre>[/i]</pre>', "[i]inline\n\n[code][/i][/code]")
+
+    assert_parse('<p>inline</p><pre>[/i]</pre>', "inline\n[code]\n[/i]\n[/code]")
+    assert_parse('<p>inline</p><pre>[/i]</pre>', "inline\n[code][/i][/code]")
+    assert_parse('<p><em>inline</em></p><pre>[/i]</pre>', "[i]inline\n[code]\n[/i]\n[/code]")
+    assert_parse('<p><em>inline</em></p><pre>[/i]</pre>', "[i]inline\n[code][/i][/code]")
   end
 
   def test_inline_code
@@ -524,7 +529,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>inline <code data-language="ruby">x</code></p>', "inline [code=ruby]x[/code]")
     assert_parse('<p>inline <code data-language="ruby">x</code></p>', "inline [code = ruby]x[/code]")
     assert_parse("<p>inline [code=ruby'&gt;]x[/code]</p>", "inline [code=ruby'>]x[/code]")
-    assert_parse('<p>inline <code data-language="ruby">code</code><br><code>code</code></p>', "inline [code=ruby]code[/code]\n[code]code[/code]")
+    assert_parse('<p>inline <code data-language="ruby">code</code></p><pre>code</pre>', "inline [code=ruby]code[/code]\n[code]code[/code]")
 
     assert_parse("<p>foo <code> bar </code></p>", "foo [code] bar [/code]")
     assert_parse("<p>foo <code>bar</code></p>", "foo [code]\nbar\n[/code]")
@@ -1211,6 +1216,11 @@ class DTextTest < Minitest::Test
     assert_parse("<p> bar </p>", "[nodtext] bar [/nodtext]")
     assert_parse("<p>bar</p>", "[nodtext]\nbar\n[/nodtext]")
     assert_parse("<p>bar </p>", "[nodtext] \nbar \n[/nodtext]")
+
+    assert_parse('<p>inline</p><p>[/i]</p>', "inline\n[nodtext]\n[/i]\n[/nodtext]")
+    assert_parse('<p>inline</p><p>[/i]</p>', "inline\n[nodtext][/i][/nodtext]")
+    assert_parse("<p><em>inline</em></p><p>[/i]</p>", "[i]inline\n[nodtext]\n[/i]\n[/nodtext]")
+    assert_parse('<p><em>inline</em></p><p>[/i]</p>', "[i]inline\n[nodtext][/i][/nodtext]")
 
     assert_parse("<p>inline</p><p>[/i]</p>", "inline\n\n[nodtext]\n[/i]\n[/nodtext]")
     assert_parse('<p>inline</p><p>[/i]</p>', "inline\n\n[nodtext][/i][/nodtext]")
