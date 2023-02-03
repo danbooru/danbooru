@@ -449,6 +449,12 @@ inline := |*
     fret;
   };
 
+  newline ws* open_table => {
+    dstack_close_leaf_blocks(sm);
+    fexec sm->ts;
+    fret;
+  };
+
   newline* close_th => {
     if (dstack_close_block(sm, BLOCK_TH, "</th>")) {
       fret;
@@ -628,7 +634,7 @@ main := |*
     fcall nodtext;
   };
 
-  open_table => {
+  ws* open_table => {
     dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_TABLE, "<table class=\"striped\">");
     fcall table;

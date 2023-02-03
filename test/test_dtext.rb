@@ -943,6 +943,18 @@ class DTextTest < Minitest::Test
 
     assert_parse('<p>inline</p><table class="striped"><tr><td>text</td></tr></table>', "inline\n\n[table][tr][td]text[/td][/tr][/table]")
     assert_parse("<p><em>inline</em></p><table class=\"striped\"><tr><td>text</td></tr></table>", "[i]inline\n\n[table][tr][td]text[/td][/tr][/table]")
+
+    assert_parse('<p>inline</p><table class="striped"><tr><td>text</td></tr></table>', "inline\n[table][tr][td]text[/td][/tr][/table]")
+    assert_parse("<p><em>inline</em></p><table class=\"striped\"><tr><td>text</td></tr></table>", "[i]inline\n[table][tr][td]text[/td][/tr][/table]")
+
+    assert_parse('<p>inline[table][tr][td]text[/td][/tr][/table]</p>', "inline[table][tr][td]text[/td][/tr][/table]")
+    assert_parse('<p><em>inline[table][tr][td]text[/td][/tr][/table]</em></p>', "[i]inline[table][tr][td]text[/td][/tr][/table]")
+
+    assert_parse('<h4>See also</h4><table class="striped"><tr><td>text</td></tr></table>', "h4. See also\n[table][tr][td]text[/td][/tr][/table]")
+    assert_parse('<ul><li>list</li></ul><table class="striped"><tr><td>text</td></tr></table>', "* list\n[table][tr][td]text[/td][/tr][/table]")
+    assert_parse('<div class="spoiler"><table class="striped"><tr><td>text</td></tr></table></div>', "[spoiler][table][tr][td]text[/td][/tr][/table][/spoiler]")
+    assert_parse('<blockquote><table class="striped"><tr><td>text</td></tr></table></blockquote>', "[quote][table][tr][td]text[/td][/tr][/table][/quote]")
+    assert_parse('<details><summary>Show</summary><div><table class="striped"><tr><td>text</td></tr></table></div></details>', "[expand][table][tr][td]text[/td][/tr][/table][/expand]")
   end
 
   def test_unclosed_th
