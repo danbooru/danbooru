@@ -386,8 +386,13 @@ class DTextTest < Minitest::Test
     assert_parse("<ul><li>a</li></ul><h1>header</h1><ul><li>list</li></ul>", "* a\n\nh1. header\n* list")
     assert_parse("<p>blah h1. blah</p>", "blah h1. blah")
 
-    assert_parse("<h1 id=\"dtext-blah-blah\">header</h1>", "h1#blah-blah. header")
-    assert_parse("<p>h1#blah-&quot;blah. header</p>", "h1#blah-\"blah. header")
+    assert_parse('<h1 id="dtext-blah">header</h1>', "h1#blah. header")
+    assert_parse('<h1 id="dtext-see-also">header</h1>', "h1#See_Also. header")
+    assert_parse('<h1 id="dtext-see-also-42">header</h1>', "h1#See_Also&42. header")
+    assert_parse('<h1 id="dtext--see-also-42-">header</h1>', "h1#-See_Also&42-. header")
+    assert_parse('<h1 id="dtext-see-also">header</h1>', "h1#see-also. header")
+    assert_parse('<p>h1#See Also. header</p>', "h1#See Also. header")
+    assert_parse('<p>h1#see-&quot;also. header</p>', 'h1#see-"also. header')
 
     assert_parse('<p>text</p><h1>header</h1>', "text\nh1. header")
     assert_parse('<p>text</p><h1 id="dtext-blah">header</h1>', "text\nh1#blah. header")
