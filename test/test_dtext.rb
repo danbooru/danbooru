@@ -269,6 +269,40 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/kaga_%28kantai_collection%29">kaga</a></p>', "[[kaga_(kantai_collection)|]]")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/kaga_%28kantai_collection%29">Kaga</a></p>', "[[Kaga (Kantai Collection)|]]")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/kaga_%28kantai_collection%29_%28cosplay%29">kaga (kantai collection)</a></p>', "[[kaga (kantai collection) (cosplay)|]]")
+
+    assert_parse('<p>[[|long hair]]</p>', "[[|long hair]]")
+  end
+
+  def test_wiki_links_anchor
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/touhou#dtext-see-also">touhou</a></p>', '[[touhou#See also]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/touhou#dtext-see-also">touhou</a></p>', '[[touhou#See-Also]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/touhou#dtext-see-also">touhou</a></p>', '[[touhou#See_Also]]')
+
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/cd#dtext-ef">abghij</a></p>', 'ab[[cd#Ef|gh]]ij')
+
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%23compass">#compass</a></p>', '[[#compass]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%23compass">#Compass</a></p>', '[[#Compass]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%23compass">Compass</a></p>', '[[#compass|Compass]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%23compass">Compass</a></p>', '[[#Compass|Compass]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%23compass#dtext-see-also">#compass</a></p>', '[[#compass#See also]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%23compass#dtext-see-also">#Compass</a></p>', '[[#Compass#See also]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%23compass#dtext-see-also">Compass</a></p>', '[[#compass#See also|Compass]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%23compass#dtext-see-also">Compass</a></p>', '[[#Compass#See also|Compass]]')
+
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/evo_moment_%2337">evo_moment_#37</a></p>', '[[evo_moment_#37]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/evo_moment_%2337">Evo Moment #37</a></p>', '[[Evo Moment #37]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/evo_moment_%2337#dtext-see-also">Evo Moment #37</a></p>', '[[Evo Moment #37#See also]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/evo_moment_%2337#dtext-see-also">Evo</a></p>', '[[Evo Moment #37#See also|Evo]]')
+
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/htol%23niq%3A_hotaru_no_nikki">htol#niq:_hotaru_no_nikki</a></p>', '[[htol#niq:_hotaru_no_nikki]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/htol%23niq%3A_hotaru_no_nikki">Htol#niq: Hotaru no Nikki</a></p>', '[[Htol#niq: Hotaru no Nikki]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/htol%23niq%3A_hotaru_no_nikki#dtext-see-also">Htol#niq: Hotaru no Nikki</a></p>', '[[Htol#niq: Hotaru no Nikki#See also]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/htol%23niq%3A_hotaru_no_nikki#dtext-see-also">Hotaru no Nikki</a></p>', '[[Htol#niq: Hotaru no Nikki#See also|Hotaru no Nikki]]')
+
+    assert_parse('<p>[[touhou#See Also:]]</p>', '[[touhou#See Also:]]')
+    assert_parse('<p>[[Htol#Niq: Hotaru no Nikki#See also]]</p>', '[[Htol#Niq: Hotaru no Nikki#See also]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/tokyo_mirage_sessions_#dtext-fe">Tokyo Mirage Sessions </a></p>', '[[Tokyo Mirage Sessions #FE]]') # XXX wrong
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/http%3A%2F%2Fen.wikipedia.org%2Fwiki%2Fgolden_age_of_detective_fiction#dtext-description-of-the-genre"> Knox Decalogue</a></p>', '[[http://en.wikipedia.org/wiki/Golden_Age_of_Detective_Fiction#Description_of_the_genre| Knox Decalogue]]') # XXX wrong
   end
 
   def test_spoilers

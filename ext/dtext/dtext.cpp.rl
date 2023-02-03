@@ -88,37 +88,16 @@ prepush {
   }
 }
 
-action mark_a1 {
-  sm->a1 = sm->p;
-}
-
-action mark_a2 {
-  sm->a2 = sm->p;
-}
-
-action mark_b1 {
-  sm->b1 = sm->p;
-}
-
-action mark_b2 {
-  sm->b2 = sm->p;
-}
-
-action mark_c1 {
-  sm->c1 = sm->p;
-}
-
-action mark_c2 {
-  sm->c2 = sm->p;
-}
-
-action mark_d1 {
-  sm->d1 = sm->p;
-}
-
-action mark_d2 {
-  sm->d2 = sm->p;
-}
+action mark_a1 { sm->a1 = sm->p; }
+action mark_a2 { sm->a2 = sm->p; }
+action mark_b1 { sm->b1 = sm->p; }
+action mark_b2 { sm->b2 = sm->p; }
+action mark_c1 { sm->c1 = sm->p; }
+action mark_c2 { sm->c2 = sm->p; }
+action mark_d1 { sm->d1 = sm->p; }
+action mark_d2 { sm->d2 = sm->p; }
+action mark_e1 { sm->e1 = sm->p; }
+action mark_e2 { sm->e2 = sm->p; }
 
 action after_mention_boundary { is_mention_boundary(p[-1]) }
 action mentions_enabled { sm->options.f_mentions }
@@ -204,8 +183,14 @@ bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (url | relative_ur
 markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonnewline+ >mark_b1 %mark_b2 :>> ')';
 html_link = '<a'i ws+ 'href="'i (url | relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
-basic_wiki_link = alnum* >mark_a1 %mark_a2 '[[' (nonbracket nonpipebracket*) >mark_b1 %mark_b2 ']]' alnum* >mark_c1 %mark_c2;
-aliased_wiki_link = alnum* >mark_a1 %mark_a2 '[[' nonpipebracket+ >mark_b1 %mark_b2 '|' nonpipebracket* >mark_c1 %mark_c2 ']]' alnum* >mark_d1 %mark_d2;
+wiki_prefix = alnum* >mark_a1 %mark_a2;
+wiki_suffix = alnum* >mark_e1 %mark_e2;
+wiki_target = nonpipebracket+ >mark_b1 %mark_b2;
+wiki_anchor_id = ([A-Z] (alnum | [ _\-])*) >mark_c1 %mark_c2;
+wiki_title  = nonpipebracket* >mark_d1 %mark_d2;
+
+basic_wiki_link = wiki_prefix '[[' wiki_target :>> ('#' wiki_anchor_id)? ']]' wiki_suffix;
+aliased_wiki_link = wiki_prefix '[[' wiki_target :>> ('#' wiki_anchor_id)? :>> ('|' wiki_title) ']]' wiki_suffix;
 
 post_link = '{{' (nonnewline - '}')+ >mark_a1 %mark_a2 :>> '}}';
 
@@ -321,11 +306,11 @@ inline := |*
   };
 
   basic_wiki_link => {
-    append_wiki_link(sm, { sm->b1, sm->b2 }, { sm->b1, sm->b2 }, { sm->a1, sm->a2 }, { sm->c1, sm->c2 });
+    append_wiki_link(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 }, { sm->c1, sm->c2 }, { sm->b1, sm->b2 }, { sm->e1, sm->e2 });
   };
 
   aliased_wiki_link => {
-    append_wiki_link(sm, { sm->b1, sm->b2 }, { sm->c1, sm->c2 }, { sm->a1, sm->a2 }, { sm->d1, sm->d2 });
+    append_wiki_link(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 }, { sm->c1, sm->c2 }, { sm->d1, sm->d2 }, { sm->e1, sm->e2 });
   };
 
   basic_textile_link => {
@@ -997,7 +982,7 @@ static inline void append_post_search_link(StateMachine * sm, const std::string_
   append(sm, "</a>");
 }
 
-static inline void append_wiki_link(StateMachine * sm, const std::string_view tag, const std::string_view title, const std::string_view prefix, const std::string_view suffix) {
+static inline void append_wiki_link(StateMachine * sm, const std::string_view prefix, const std::string_view tag, const std::string_view anchor, const std::string_view title, const std::string_view suffix) {
   auto normalized_tag = std::string(tag);
   auto title_string = std::string(title);
 
@@ -1029,6 +1014,14 @@ static inline void append_wiki_link(StateMachine * sm, const std::string_view ta
   append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"");
   append_url(sm, "/wiki_pages/");
   append_uri_escaped(sm, normalized_tag);
+
+  if (!anchor.empty()) {
+    std::string normalized_anchor(anchor);
+    std::transform(normalized_anchor.begin(), normalized_anchor.end(), normalized_anchor.begin(), [](char c) { return isalpha(c) ? tolower(c) : '-'; });
+    append_html_escaped(sm, "#dtext-");
+    append_html_escaped(sm, normalized_anchor);
+  }
+
   append(sm, "\">");
   append_html_escaped(sm, title_string);
   append(sm, "</a>");

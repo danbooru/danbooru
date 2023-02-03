@@ -106,6 +106,8 @@ public:
   const char * c2 = NULL;
   const char * d1 = NULL;
   const char * d2 = NULL;
+  const char * e1 = NULL;
+  const char * e2 = NULL;
   bool header_mode = false;
 
   std::string input;
