@@ -243,8 +243,22 @@ class DTextTest < Minitest::Test
   end
 
   def test_wiki_links_edge
-    assert_parse("<p>[[|_|]]</p>", "[[|_|]]")
-    assert_parse("<p>[[||_||]]</p>", "[[||_||]]")
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7C3">|3</a></p>', '[[|3]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7Cd">|D</a></p>', '[[|D]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%3A%7C">:|</a></p>', '[[:|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7C_%7C">|_|</a></p>', '[[|_|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7C%7C_%7C%7C">||_||</a></p>', '[[||_||]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%5C%7C%7C%2F">\||/</a></p>', '[[\||/]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%3C%7C%3E_%3C%7C%3E">&lt;|&gt;_&lt;|&gt;</a></p>', '[[<|>_<|>]]')
+
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7C3">blah</a></p>', '[[|3|blah]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7Cd">blah</a></p>', '[[|D|blah]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7C_%7C">blah</a></p>', '[[|_||blah]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7C%7C_%7C%7C">blah</a></p>', '[[||_|||blah]]')
+
+    #assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%3A%7C">blah</a></p>', '[[:||blah]]') # XXX should work
+    #assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%5C%7C%7C%2F">blah</a></p>', '[[\||/|blah]]') # XXX should work
+    #assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%3C%7C%3E_%3C%7C%3E">blah</a></p>', '[[<|>_<|>|blah]]') # XXX should work
   end
 
   def test_wiki_links_nested_b

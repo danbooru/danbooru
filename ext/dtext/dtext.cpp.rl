@@ -183,9 +183,10 @@ bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (url | relative_ur
 markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonnewline+ >mark_b1 %mark_b2 :>> ')';
 html_link = '<a'i ws+ 'href="'i (url | relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
+emoticon_tags = '|' alnum | ':|' | '|_|' | '||_||' | '\\||/' | '<|>_<|>';
 wiki_prefix = alnum* >mark_a1 %mark_a2;
 wiki_suffix = alnum* >mark_e1 %mark_e2;
-wiki_target = nonpipebracket+ >mark_b1 %mark_b2;
+wiki_target = (nonpipebracket+ | emoticon_tags) >mark_b1 %mark_b2;
 wiki_anchor_id = ([A-Z] (alnum | [ _\-])*) >mark_c1 %mark_c2;
 wiki_title  = nonpipebracket* >mark_d1 %mark_d2;
 
