@@ -15,8 +15,6 @@
 
 static const size_t MAX_STACK_DEPTH = 512;
 
-static inline const char* find_boundary_c(const char* c);
-
 // Characters that mark the end of a link.
 //
 // http://www.fileformat.info/info/unicode/category/Pe/list.htm
@@ -225,13 +223,14 @@ list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
 hr = ws* ('[hr]'i | '<hr>'i) ws* eol+;
 
-code_fence = ('```' ws* eol) (any* >mark_a1 %mark_a2) :>> (eol '```' ws* eol);
+code_fence = ('```' ws* (alnum* >mark_a1 %mark_a2) ws* eol) (any* >mark_b1 %mark_b2) :>> (eol '```' ws* eol);
 
 open_spoilers = ('[spoiler'i 's'i? ']') | ('<spoiler'i 's'i? '>');
 open_nodtext = '[nodtext]'i | '<nodtext>'i;
 open_quote = '[quote]'i | '<quote>'i | '<blockquote>'i;
 open_expand = '[expand]'i | '<expand>'i;
 open_code = '[code]'i | '<code>'i;
+open_code_lang = '[code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) ']' | '<code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) '>';
 open_table = '[table]'i | '<table>'i;
 open_thead = '[thead]'i | '<thead>'i;
 open_tbody = '[tbody]'i | '<tbody>'i;
@@ -387,7 +386,12 @@ inline := |*
   };
 
   open_code => {
-    dstack_open_inline(sm, INLINE_CODE, "<code>");
+    append_inline_code(sm);
+    fcall code;
+  };
+
+  open_code_lang => {
+    append_inline_code(sm, { sm->a1, sm->a2 });
     fcall code;
   };
 
@@ -697,15 +701,17 @@ main := |*
   };
 
   open_code space* => {
-    dstack_close_leaf_blocks(sm);
-    dstack_open_block(sm, BLOCK_CODE, "<pre>");
+    append_block_code(sm);
+    fcall code;
+  };
+
+  open_code_lang space* => {
+    append_block_code(sm, { sm->a1, sm->a2 });
     fcall code;
   };
 
   code_fence => {
-    append_block(sm, "<pre>");
-    append_html_escaped(sm, { sm->a1, sm->a2 });
-    append_block(sm, "</pre>");
+    append_code_fence(sm, { sm->b1, sm->b2 }, { sm->a1, sm->a2 });
   };
 
   open_expand space* => {
@@ -1053,6 +1059,42 @@ static inline void append_dmail_key_link(StateMachine * sm) {
   append(sm, "dmail #");
   append(sm, sm->a1, sm->a2);
   append(sm, "</a>");
+}
+
+static inline void append_code_fence(StateMachine * sm, const std::string_view code, const std::string_view language) {
+  if (language.empty()) {
+    append_block(sm, "<pre>");
+    append_html_escaped(sm, code);
+    append_block(sm, "</pre>");
+  } else {
+    append_block(sm, "<pre data-language=\"");
+    append_html_escaped(sm, language);
+    append_block(sm, "\">");
+    append_html_escaped(sm, code);
+    append_block(sm, "</pre>");
+  }
+}
+
+static inline void append_inline_code(StateMachine * sm, const std::string_view language = {}) {
+  if (language.empty()) {
+    dstack_open_inline(sm, INLINE_CODE, "<code>");
+  } else {
+    dstack_open_inline(sm, INLINE_CODE, "<code data-language=\"");
+    append_html_escaped(sm, language);
+    append(sm, "\">");
+  }
+}
+
+static inline void append_block_code(StateMachine * sm, const std::string_view language = {}) {
+  dstack_close_leaf_blocks(sm);
+
+  if (language.empty()) {
+    dstack_open_block(sm, BLOCK_CODE, "<pre>");
+  } else {
+    dstack_open_block(sm, BLOCK_CODE, "<pre data-language=\"");
+    append_html_escaped(sm, language);
+    append(sm, "\">");
+  }
 }
 
 static inline void append_block(StateMachine * sm, const auto s) {

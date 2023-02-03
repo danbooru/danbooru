@@ -125,4 +125,10 @@ private:
   std::string parse();
 };
 
+static inline const char* find_boundary_c(const char* c);
+static void dstack_open_inline(StateMachine * sm, element_t type, const char * html);
+static void dstack_open_block(StateMachine * sm, element_t type, const char * html);
+static void dstack_close_leaf_blocks(StateMachine * sm);
+static inline void append_block(StateMachine * sm, const auto s);
+
 #endif

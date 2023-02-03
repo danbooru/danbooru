@@ -43,6 +43,10 @@ class DTextTest < Minitest::Test
     assert_equal("@" + expected_username, actual_username)
   end
 
+  def assert_wiki_pages(expected, dtext)
+    assert_equal(expected.sort, DText.c_parse_wiki_pages(dtext).sort)
+  end
+
   def test_relative_urls
     assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="http://danbooru.donmai.us/posts/1234">post #1234</a></p>', "post #1234", base_url: "http://danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="http://danbooru.donmai.us/wiki_pages/touhou">touhou</a></p>', "[[touhou]]", base_url: "http://danbooru.donmai.us")
@@ -442,6 +446,11 @@ class DTextTest < Minitest::Test
     assert_parse("<pre>post #123</pre>", "[code]post #123[/code]")
     assert_parse("<pre>x</pre>", "[code]x")
 
+    assert_parse(%{<pre data-language="ruby">x\n</pre>}, "[code=ruby]\nx\n[/code]")
+    assert_parse(%{<pre data-language="ruby">x\n</pre>}, "[code = ruby]\nx\n[/code]")
+    assert_parse("<p>[code=ruby'&gt;]<br>x<br>[/code]</p>", "[code=ruby'>]\nx\n[/code]")
+    assert_parse(%{<pre data-language="ruby">code\n</pre><pre>code\n</pre>}, "[code=ruby]\ncode\n[/code]\n\n[code]\ncode\n[/code]")
+
     assert_parse("<p>inline</p><pre>[/i]\n</pre>", "inline\n\n[code]\n[/i]\n[/code]")
     assert_parse('<p>inline</p><pre>[/i]</pre>', "inline\n\n[code][/i][/code]")
     assert_parse("<p><em>inline</em></p><pre>[/i]\n</pre>", "[i]inline\n\n[code]\n[/i]\n[/code]")
@@ -453,6 +462,11 @@ class DTextTest < Minitest::Test
     assert_parse("<p>foo <code>[code]</code>.</p>", "foo [code][code][/code].")
     assert_parse("<p>foo <em><code>post #123</code></em>.</p>", "foo [i][code]post #123[/code][/i].")
     assert_parse("<p>foo <code>x</code></p>", "foo [code]x")
+
+    assert_parse('<p>inline <code data-language="ruby">x</code></p>', "inline [code=ruby]x[/code]")
+    assert_parse('<p>inline <code data-language="ruby">x</code></p>', "inline [code = ruby]x[/code]")
+    assert_parse("<p>inline [code=ruby'&gt;]x[/code]</p>", "inline [code=ruby'>]x[/code]")
+    assert_parse('<p>inline <code data-language="ruby">code</code><br><code>code</code></p>', "inline [code=ruby]code[/code]\n[code]code[/code]")
   end
 
   def test_code_fence
@@ -461,6 +475,11 @@ class DTextTest < Minitest::Test
     assert_parse("<pre>\ncode\n</pre>", "```\n\ncode\n\n```")
     assert_parse("<pre>\n\ncode\n\n</pre>", "```\n\n\ncode\n\n\n```")
     assert_parse("<pre>one\ntwo\nthree</pre>", "```\none\ntwo\nthree\n```")
+
+    assert_parse('<pre data-language="ruby">code</pre>', "```ruby\ncode\n```")
+    assert_parse('<pre data-language="ruby">code</pre>', "``` ruby \ncode\n```")
+    assert_parse("<p>```ruby'&gt;<br>code<br>```</p>", "```ruby'>\ncode\n```")
+    assert_parse('<pre data-language="ruby">code</pre><pre>code</pre>', "```ruby\ncode\n```\n\n```\ncode\n```")
 
     assert_parse('<p>````<br>code<br>```</p>', "````\ncode\n```")
     assert_parse('<p>```<br>code<br>````</p>', "```\ncode\n````")
