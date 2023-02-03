@@ -131,7 +131,8 @@ eos = '\0';
 newline = '\r\n' | '\n';
 ws = ' ' | '\t';
 eol = newline | eos;
-blank_lines = (ws* eol){2,};
+blank_line = ws* eol;
+blank_lines = blank_line{2,};
 
 asciichar = 0x00..0x7F;
 utf8char  = 0xC2..0xDF 0x80..0xBF
@@ -385,12 +386,12 @@ inline := |*
     }
   };
 
-  open_code => {
+  open_code blank_line? => {
     append_inline_code(sm);
     fcall code;
   };
 
-  open_code_lang => {
+  open_code_lang blank_line? => {
     append_inline_code(sm, { sm->a1, sm->a2 });
     fcall code;
   };
@@ -422,7 +423,7 @@ inline := |*
     }
   };
 
-  open_nodtext => {
+  open_nodtext blank_line? => {
     dstack_open_inline(sm, INLINE_NODTEXT, "");
     fcall nodtext;
   };
@@ -521,7 +522,7 @@ inline := |*
 *|;
 
 code := |*
-  close_code => {
+  newline? close_code => {
     dstack_rewind(sm);
     fret;
   };
@@ -534,7 +535,7 @@ code := |*
 *|;
 
 nodtext := |*
-  close_nodtext => {
+  newline? close_nodtext => {
     dstack_rewind(sm);
     fret;
   };
@@ -700,12 +701,12 @@ main := |*
     dstack_open_block(sm, BLOCK_SPOILER, "<div class=\"spoiler\">");
   };
 
-  open_code space* => {
+  open_code blank_line? => {
     append_block_code(sm);
     fcall code;
   };
 
-  open_code_lang space* => {
+  open_code_lang blank_line? => {
     append_block_code(sm, { sm->a1, sm->a2 });
     fcall code;
   };
@@ -729,7 +730,7 @@ main := |*
     append(sm, "</summary><div>");
   };
 
-  open_nodtext space* => {
+  open_nodtext blank_line? => {
     dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_NODTEXT, "<p>");
     fcall nodtext;

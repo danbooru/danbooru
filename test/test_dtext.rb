@@ -446,14 +446,19 @@ class DTextTest < Minitest::Test
     assert_parse("<pre>post #123</pre>", "[code]post #123[/code]")
     assert_parse("<pre>x</pre>", "[code]x")
 
-    assert_parse(%{<pre data-language="ruby">x\n</pre>}, "[code=ruby]\nx\n[/code]")
-    assert_parse(%{<pre data-language="ruby">x\n</pre>}, "[code = ruby]\nx\n[/code]")
+    assert_parse(%{<pre data-language="ruby">x</pre>}, "[code=ruby]\nx\n[/code]")
+    assert_parse(%{<pre data-language="ruby">x</pre>}, "[code = ruby]\nx\n[/code]")
     assert_parse("<p>[code=ruby'&gt;]<br>x<br>[/code]</p>", "[code=ruby'>]\nx\n[/code]")
-    assert_parse(%{<pre data-language="ruby">code\n</pre><pre>code\n</pre>}, "[code=ruby]\ncode\n[/code]\n\n[code]\ncode\n[/code]")
+    assert_parse(%{<pre data-language="ruby">code</pre><pre>code</pre>}, "[code=ruby]\ncode\n[/code]\n\n[code]\ncode\n[/code]")
 
-    assert_parse("<p>inline</p><pre>[/i]\n</pre>", "inline\n\n[code]\n[/i]\n[/code]")
+    assert_parse("<pre> bar </pre>", "[code] bar [/code]")
+    assert_parse("<pre>bar</pre>", "[code]\nbar\n[/code]")
+    assert_parse("<pre>bar </pre>", "[code] \nbar \n[/code]")
+    assert_parse("<pre> ▲\n▲ ▲</pre>", "[code]\n ▲\n▲ ▲\n[/code]")
+
+    assert_parse("<p>inline</p><pre>[/i]</pre>", "inline\n\n[code]\n[/i]\n[/code]")
     assert_parse('<p>inline</p><pre>[/i]</pre>', "inline\n\n[code][/i][/code]")
-    assert_parse("<p><em>inline</em></p><pre>[/i]\n</pre>", "[i]inline\n\n[code]\n[/i]\n[/code]")
+    assert_parse("<p><em>inline</em></p><pre>[/i]</pre>", "[i]inline\n\n[code]\n[/i]\n[/code]")
     assert_parse('<p><em>inline</em></p><pre>[/i]</pre>', "[i]inline\n\n[code][/i][/code]")
   end
 
@@ -467,6 +472,10 @@ class DTextTest < Minitest::Test
     assert_parse('<p>inline <code data-language="ruby">x</code></p>', "inline [code = ruby]x[/code]")
     assert_parse("<p>inline [code=ruby'&gt;]x[/code]</p>", "inline [code=ruby'>]x[/code]")
     assert_parse('<p>inline <code data-language="ruby">code</code><br><code>code</code></p>', "inline [code=ruby]code[/code]\n[code]code[/code]")
+
+    assert_parse("<p>foo <code> bar </code></p>", "foo [code] bar [/code]")
+    assert_parse("<p>foo <code>bar</code></p>", "foo [code]\nbar\n[/code]")
+    assert_parse("<p>foo <code>bar </code></p>", "foo [code] \nbar \n[/code]")
   end
 
   def test_code_fence
@@ -538,10 +547,12 @@ class DTextTest < Minitest::Test
     assert_parse('<div class="spoiler"><pre>code</pre></div>', "[spoiler]\n```\ncode\n```")
     assert_parse('<details><summary>Show</summary><div><pre>code</pre></div></details>', "[expand]\n```\ncode\n```\n[/expand]")
     assert_parse('<details><summary>Show</summary><div><pre>code</pre></div></details>', "[expand]\n```\ncode\n```")
-    assert_parse("<pre>```\ncode\n```\n</pre>", "[code]\n```\ncode\n```\n[/code]")
-    assert_parse("<p>```\ncode\n```\n</p>", "[nodtext]\n```\ncode\n```\n[/nodtext]")
+    assert_parse("<pre>```\ncode\n```</pre>", "[code]\n```\ncode\n```\n[/code]")
+    assert_parse("<p>```\ncode\n```</p>", "[nodtext]\n```\ncode\n```\n[/nodtext]")
     assert_parse('<p class="tn"><pre>code</pre></p>', "[tn]\n```\ncode\n```\n[/tn]") # XXX invalid html
     assert_parse('<p class="tn"><pre>code</pre></p>', "[tn]\n```\ncode\n```") # XXX invalid html
+
+    assert_parse("<pre> ▲\n▲ ▲</pre>", "```\n ▲\n▲ ▲\n```")
   end
 
   def test_urls
@@ -1003,7 +1014,7 @@ class DTextTest < Minitest::Test
   end
 
   def test_expand_with_nested_code
-    assert_parse("<details><summary>Show</summary><div><pre>hello\n</pre></div></details>", "[expand]\n[code]\nhello\n[/code]\n[/expand]")
+    assert_parse("<details><summary>Show</summary><div><pre>hello</pre></div></details>", "[expand]\n[code]\nhello\n[/code]\n[/expand]")
   end
 
   def test_expand_with_nested_list
@@ -1041,8 +1052,8 @@ class DTextTest < Minitest::Test
     assert_parse('<div class="spoiler"><hr></div>', "[spoiler]\n[hr]\n[/spoiler]")
     assert_parse('<p class="tn"><hr></p>', "[tn]\n[hr]\n[/tn]")
     assert_parse("<details><summary>Show</summary><div><hr></div></details>", "[expand]\n[hr]\n[/expand]")
-    assert_parse("<pre>[hr]\n</pre>", "[code]\n[hr]\n[/code]") # XXX [code] shouldn't swallow spaces
-    assert_parse("<p>[hr]\n</p>", "[nodtext]\n[hr]\n[/nodtext]") # XXX [nodtext] shouldn't swallow spaces
+    assert_parse("<pre>[hr]</pre>", "[code]\n[hr]\n[/code]")
+    assert_parse("<p>[hr]</p>", "[nodtext]\n[hr]\n[/nodtext]")
     assert_parse('<table class="striped"></table>', "[table]\n[hr]\n[/table]")
 
     assert_parse("<h1>foo</h1><hr>", "h1. foo\n[hr]")
@@ -1129,9 +1140,16 @@ class DTextTest < Minitest::Test
     assert_parse('<p></p>', "[nodtext][/nodtext]")
     assert_parse('<p>[/nodtext]</p>', "[/nodtext]")
 
-    assert_parse("<p>inline</p><p>[/i]\n</p>", "inline\n\n[nodtext]\n[/i]\n[/nodtext]") # XXX trim newlines
+    assert_parse("<p>foo  bar </p>", "foo [nodtext] bar [/nodtext]")
+    assert_parse("<p>foo bar</p>", "foo [nodtext]\nbar\n[/nodtext]")
+    assert_parse("<p>foo bar </p>", "foo [nodtext] \nbar \n[/nodtext]")
+    assert_parse("<p> bar </p>", "[nodtext] bar [/nodtext]")
+    assert_parse("<p>bar</p>", "[nodtext]\nbar\n[/nodtext]")
+    assert_parse("<p>bar </p>", "[nodtext] \nbar \n[/nodtext]")
+
+    assert_parse("<p>inline</p><p>[/i]</p>", "inline\n\n[nodtext]\n[/i]\n[/nodtext]")
     assert_parse('<p>inline</p><p>[/i]</p>', "inline\n\n[nodtext][/i][/nodtext]")
-    assert_parse("<p><em>inline</em></p><p>[/i]\n</p>", "[i]inline\n\n[nodtext]\n[/i]\n[/nodtext]") # XXX trim newlines
+    assert_parse("<p><em>inline</em></p><p>[/i]</p>", "[i]inline\n\n[nodtext]\n[/i]\n[/nodtext]")
     assert_parse('<p><em>inline</em></p><p>[/i]</p>', "[i]inline\n\n[nodtext][/i][/nodtext]")
 
     assert_parse('', "[nodtext]", inline: true)
