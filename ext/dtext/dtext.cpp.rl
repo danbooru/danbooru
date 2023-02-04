@@ -215,7 +215,9 @@ wiki_title  = nonpipebracket* >mark_d1 %mark_d2;
 basic_wiki_link = wiki_prefix '[[' wiki_target :>> ('#' wiki_anchor_id)? ']]' wiki_suffix;
 aliased_wiki_link = wiki_prefix '[[' wiki_target :>> ('#' wiki_anchor_id)? :>> ('|' wiki_title) ']]' wiki_suffix;
 
-post_link = '{{' (nonnewline - '}')+ >mark_a1 %mark_a2 :>> '}}';
+tag = (nonspace - [}])+;
+tags = tag (ws+ tag)*;
+post_search_link = '{{' ws* (tags >mark_a1 %mark_a2) ws* :>> '}}';
 
 id = digit+ >mark_a1 %mark_a2;
 alnum_id = alnum+ >mark_a1 %mark_a2;
@@ -335,7 +337,7 @@ inline := |*
   'topic #'i id '/p'i page => { append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"", "/forum_topics/", "?page="); };
   'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"", "https://www.pixiv.net/artworks/", "#"); };
 
-  post_link => {
+  post_search_link => {
     append_post_search_link(sm, { sm->a1, sm->a2 });
   };
 

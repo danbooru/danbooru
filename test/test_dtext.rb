@@ -851,13 +851,19 @@ class DTextTest < Minitest::Test
 
   def test_post_search_links
     assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "{{tag}}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "{{ tag}}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "{{tag }}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "{{ tag }}")
     assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag1%20tag2">tag1 tag2</a></p>', "{{tag1 tag2}}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag1%20tag2">tag1 tag2</a></p>', "{{ tag1 tag2 }}")
     assert_parse('<p><a class="dtext-link dtext-post-search-link" href="https://danbooru.donmai.us/posts?tags=tag1%20tag2">tag1 tag2</a></p>', "{{tag1 tag2}}", base_url: "https://danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%3C3">&lt;3</a></p>', "{{<3}}")
-    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%20%22%23%26%2B%3C%3E%3F"> &quot;#&amp;+&lt;&gt;?</a></p>', '{{ "#&+<>?}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%22%23%26%2B%3C%3E%3F">&quot;#&amp;+&lt;&gt;?</a></p>', '{{ "#&+<>?}}')
     assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%E6%9D%B1%E6%96%B9">東方</a></p>', "{{東方}}")
     assert_parse('<p>use {{}}, like so: <a class="dtext-link dtext-post-search-link" href="/posts?tags=touhou">touhou</a></p>', "use {{}}, like so: {{touhou}}")
 
+    assert_parse('<p>{{}}</p>', "{{}}")
+    assert_parse('<p>{{ }}</p>', "{{ }}")
     assert_parse('<p>{{1girl<br>solo}}</p>', "{{1girl\nsolo}}")
   end
 
