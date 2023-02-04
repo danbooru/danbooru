@@ -18,17 +18,20 @@ static const size_t MAX_STACK_DEPTH = 512;
 
 // Permitted HTML attribute names.
 static const std::unordered_map<std::string_view, const std::unordered_set<std::string_view>> permitted_attribute_names = {
-  { "thead", { "align" } },
-  { "tbody", { "align" } },
-  { "tr",    { "align" } },
-  { "td",    { "align", "colspan", "rowspan" } },
-  { "th",    { "align", "colspan", "rowspan" } },
+  { "thead",    { "align" } },
+  { "tbody",    { "align" } },
+  { "tr",       { "align" } },
+  { "td",       { "align", "colspan", "rowspan" } },
+  { "th",       { "align", "colspan", "rowspan" } },
+  { "col",      { "align", "span" } },
+  { "colgroup", {} },
 };
 
 // Permitted HTML attribute values.
 static const std::unordered_set<std::string_view> align_values = { "left", "center", "right", "justify" };
 static const std::unordered_map<std::string_view, std::function<bool(std::string_view)>> permitted_attribute_values = {
   { "align",   [](auto value) { return align_values.find(value) != align_values.end(); } },
+  { "span",    [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
   { "colspan", [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
   { "rowspan", [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
 };
@@ -245,6 +248,8 @@ open_expand = '[expand]'i | '<expand>'i;
 open_code = '[code]'i | '<code>'i;
 open_code_lang = '[code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) ']' | '<code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) '>';
 open_table = '[table]'i | '<table>'i;
+open_colgroup = '[colgroup'i tag_attributes :>> ']' | '<colgroup'i tag_attributes :>> '>';
+open_col = '[col'i tag_attributes :>> ']' | '<col'i tag_attributes :>> '>';
 open_thead = '[thead'i tag_attributes :>> ']' | '<thead'i tag_attributes :>> '>';
 open_tbody = '[tbody'i tag_attributes :>> ']' | '<tbody'i tag_attributes :>> '>';
 open_tr = '[tr'i tag_attributes :>> ']' | '<tr'i tag_attributes :>> '>';
@@ -263,6 +268,7 @@ close_quote = '[/quote'i (']' when in_quote) | '</quote'i ('>' when in_quote) | 
 close_expand = '[/expand'i (']' when in_expand) | '</expand'i ('>' when in_expand);
 close_code = '[/code]'i | '</code>'i;
 close_table = '[/table]'i | '</table>'i;
+close_colgroup = '[/colgroup]'i | '</colgroup>'i;
 close_thead = '[/thead]'i | '</thead>'i;
 close_tbody = '[/tbody]'i | '</tbody>'i;
 close_tr = '[/tr]'i | '</tr>'i;
@@ -573,6 +579,19 @@ nodtext := |*
 *|;
 
 table := |*
+  open_colgroup => {
+    dstack_open_block(sm, BLOCK_COLGROUP, "colgroup", sm->tag_attributes);
+  };
+
+  close_colgroup => {
+    dstack_close_block(sm, BLOCK_COLGROUP, "</colgroup>");
+  };
+
+  open_col => {
+    dstack_open_block(sm, BLOCK_COL, "col", sm->tag_attributes);
+    dstack_pop(sm); // XXX [col] has no end tag
+  };
+
   open_thead => {
     dstack_open_block(sm, BLOCK_THEAD, "thead", sm->tag_attributes);
   };
@@ -1180,6 +1199,7 @@ static void dstack_rewind(StateMachine * sm) {
 
     case BLOCK_TN: append_closing_p(sm); break;
     case BLOCK_TABLE: append_block(sm, "</table>"); break;
+    case BLOCK_COLGROUP: append_block(sm, "</colgroup>"); break;
     case BLOCK_THEAD: append_block(sm, "</thead>"); break;
     case BLOCK_TBODY: append_block(sm, "</tbody>"); break;
     case BLOCK_TR: append_block(sm, "</tr>"); break;

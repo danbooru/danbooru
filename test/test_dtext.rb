@@ -1002,10 +1002,21 @@ class DTextTest < Minitest::Test
     assert_parse('<table class="striped"><tr align="left"><td>foo</td></tr></table>', '[table][tr align="left"][td]foo[/td][/tr][/table]')
     assert_parse('<table class="striped"><tbody align="left"><td>foo</td></tbody></table>', '[table][tbody align="left"][td]foo[/td][/tbody][/table]')
     assert_parse('<table class="striped"><thead align="left"><td>foo</td></thead></table>', '[table][thead align="left"][td]foo[/td][/thead][/table]')
+
+    assert_parse('<table class="striped"><colgroup></colgroup><td>foo</td></table>', '[table][colgroup align="left"][/colgroup][td]foo[/td][/table]')
+    assert_parse('<table class="striped"><colgroup></colgroup><td>foo</td></table>', '[table][colgroup span="1"][/colgroup][td]foo[/td][/table]')
+
+    assert_parse('<table class="striped"><colgroup><col align="left"><col align="right" span="2"></colgroup><td>one</td><td>two</td><td>three</td></table>', '[table][colgroup][col align="left"][col align="right" span="2"][/colgroup][td]one[/td][td]two[/td][td]three[/td][/table]')
   end
 
-  def test_unclosed_th
+  def test_unclosed_tables
     assert_parse('<table class="striped"><th>foo</th></table>', "[table][th]foo")
+    assert_parse('<table class="striped"><td>foo</td></table>', "[table][td]foo")
+    assert_parse('<table class="striped"><tr><td>foo</td></tr></table>', "[table][tr][td]foo")
+    assert_parse('<table class="striped"><thead><td>foo</td></thead></table>', "[table][thead][td]foo") # XXX wrong
+    assert_parse('<table class="striped"><tbody><td>foo</td></tbody></table>', "[table][tbody][td]foo") # XXX wrong
+    assert_parse('<table class="striped"><colgroup><td>foo</td></colgroup></table>', "[table][colgroup][td]foo") # XXX wrong
+    assert_parse('<table class="striped"><colgroup><col><td>foo</td></colgroup></table>', "[table][colgroup][col][td]foo") # XXX wrong
   end
 
   def test_forum_links
