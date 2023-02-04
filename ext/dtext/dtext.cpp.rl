@@ -748,11 +748,11 @@ main := |*
 
 %% write data;
 
-static inline void dstack_push(StateMachine * sm, element_t element) {
+static void dstack_push(StateMachine * sm, element_t element) {
   sm->dstack.push_back(element);
 }
 
-static inline element_t dstack_pop(StateMachine * sm) {
+static element_t dstack_pop(StateMachine * sm) {
   if (sm->dstack.empty()) {
     g_debug("dstack pop empty stack");
     return DSTACK_EMPTY;
@@ -763,25 +763,25 @@ static inline element_t dstack_pop(StateMachine * sm) {
   }
 }
 
-static inline element_t dstack_peek(const StateMachine * sm) {
+static element_t dstack_peek(const StateMachine * sm) {
   return sm->dstack.empty() ? DSTACK_EMPTY : sm->dstack.back();
 }
 
-static inline bool dstack_check(const StateMachine * sm, element_t expected_element) {
+static bool dstack_check(const StateMachine * sm, element_t expected_element) {
   return dstack_peek(sm) == expected_element;
 }
 
 // Return true if the given tag is currently open.
-static inline bool dstack_is_open(const StateMachine * sm, element_t element) {
+static bool dstack_is_open(const StateMachine * sm, element_t element) {
   return std::find(sm->dstack.begin(), sm->dstack.end(), element) != sm->dstack.end();
 }
 
-static inline int dstack_count(const StateMachine * sm, element_t element) {
+static int dstack_count(const StateMachine * sm, element_t element) {
   return std::count(sm->dstack.begin(), sm->dstack.end(), element);
 }
 
 template <typename string_type>
-static inline bool is_internal_url(StateMachine * sm, const string_type url) {
+static bool is_internal_url(StateMachine * sm, const string_type url) {
   if (url.starts_with("/")) {
     return true;
   } else if (sm->options.domain.empty() || url.empty()) {
@@ -796,15 +796,15 @@ static inline bool is_internal_url(StateMachine * sm, const string_type url) {
   }
 }
 
-static inline void append(StateMachine * sm, const auto c) {
+static void append(StateMachine * sm, const auto c) {
   sm->output += c;
 }
 
-static inline void append(StateMachine * sm, const char * a, const char * b) {
+static void append(StateMachine * sm, const char * a, const char * b) {
   append(sm, std::string_view(a, b));
 }
 
-static inline void append_html_escaped(StateMachine * sm, char s) {
+static void append_html_escaped(StateMachine * sm, char s) {
   switch (s) {
     case '<': append(sm, "&lt;"); break;
     case '>': append(sm, "&gt;"); break;
@@ -814,13 +814,13 @@ static inline void append_html_escaped(StateMachine * sm, char s) {
   }
 }
 
-static inline void append_html_escaped(StateMachine * sm, const std::string_view string) {
+static void append_html_escaped(StateMachine * sm, const std::string_view string) {
   for (const unsigned char c : string) {
     append_html_escaped(sm, c);
   }
 }
 
-static inline void append_uri_escaped(StateMachine * sm, const std::string_view string) {
+static void append_uri_escaped(StateMachine * sm, const std::string_view string) {
   static const char hex[] = "0123456789ABCDEF";
 
   for (const unsigned char c : string) {
@@ -834,7 +834,7 @@ static inline void append_uri_escaped(StateMachine * sm, const std::string_view 
   }
 }
 
-static inline void append_url(StateMachine * sm, const auto url) {
+static void append_url(StateMachine * sm, const auto url) {
   if ((url[0] == '/' || url[0] == '#') && !sm->options.base_url.empty()) {
     append_html_escaped(sm, sm->options.base_url);
   }
@@ -842,7 +842,7 @@ static inline void append_url(StateMachine * sm, const auto url) {
   append_html_escaped(sm, url);
 }
 
-static inline void append_mention(StateMachine * sm, const std::string_view name) {
+static void append_mention(StateMachine * sm, const std::string_view name) {
   append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
   append_html_escaped(sm, name);
   append(sm, "\" href=\"");
@@ -853,7 +853,7 @@ static inline void append_mention(StateMachine * sm, const std::string_view name
   append(sm, "</a>");
 }
 
-static inline void append_id_link(StateMachine * sm, const char * title, const char * id_name, const char * url) {
+static void append_id_link(StateMachine * sm, const char * title, const char * id_name, const char * url) {
   if (url[0] == '/') {
     append(sm, "<a class=\"dtext-link dtext-id-link dtext-");
   } else {
@@ -871,7 +871,7 @@ static inline void append_id_link(StateMachine * sm, const char * title, const c
   append(sm, "</a>");
 }
 
-static inline void append_unnamed_url(StateMachine * sm, const std::string_view url) {
+static void append_unnamed_url(StateMachine * sm, const std::string_view url) {
   if (is_internal_url(sm, url)) {
     append(sm, "<a class=\"dtext-link\" href=\"");
   } else {
@@ -884,7 +884,7 @@ static inline void append_unnamed_url(StateMachine * sm, const std::string_view 
   append(sm, "</a>");
 }
 
-static inline void append_bare_unnamed_url(StateMachine * sm, const std::string_view url) {
+static void append_bare_unnamed_url(StateMachine * sm, const std::string_view url) {
   const char* match_end = end(url);
   const char* url_start = begin(url);
   const char* url_end = find_boundary_c(match_end - 1) + 1;
@@ -896,7 +896,7 @@ static inline void append_bare_unnamed_url(StateMachine * sm, const std::string_
   }
 }
 
-static inline void append_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
+static void append_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
   auto parsed_title = sm->parse_basic_inline(title);
 
   // protocol-relative url; treat `//example.com` like `http://example.com`
@@ -926,7 +926,7 @@ static inline void append_named_url(StateMachine * sm, const std::string_view ur
   append(sm, "</a>");
 }
 
-static inline void append_bare_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
+static void append_bare_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
   const char* match_end = end(url);
   const char* url_start = begin(url);
   const char* url_end = find_boundary_c(match_end - 1) + 1;
@@ -938,7 +938,7 @@ static inline void append_bare_named_url(StateMachine * sm, const std::string_vi
   }
 }
 
-static inline void append_post_search_link(StateMachine * sm, const std::string_view search) {
+static void append_post_search_link(StateMachine * sm, const std::string_view search) {
   append(sm, "<a class=\"dtext-link dtext-post-search-link\" href=\"");
   append_url(sm, "/posts?tags=");
   append_uri_escaped(sm, search);
@@ -947,7 +947,7 @@ static inline void append_post_search_link(StateMachine * sm, const std::string_
   append(sm, "</a>");
 }
 
-static inline void append_wiki_link(StateMachine * sm, const std::string_view prefix, const std::string_view tag, const std::string_view anchor, const std::string_view title, const std::string_view suffix) {
+static void append_wiki_link(StateMachine * sm, const std::string_view prefix, const std::string_view tag, const std::string_view anchor, const std::string_view title, const std::string_view suffix) {
   auto normalized_tag = std::string(tag);
   auto title_string = std::string(title);
 
@@ -994,7 +994,7 @@ static inline void append_wiki_link(StateMachine * sm, const std::string_view pr
   sm->wiki_pages.insert(std::string(tag));
 }
 
-static inline void append_paged_link(StateMachine * sm, const char * title, const char * tag, const char * href, const char * param) {
+static void append_paged_link(StateMachine * sm, const char * title, const char * tag, const char * href, const char * param) {
   append(sm, tag);
   append_url(sm, href);
   append(sm, sm->a1, sm->a2);
@@ -1008,7 +1008,7 @@ static inline void append_paged_link(StateMachine * sm, const char * title, cons
   append(sm, "</a>");
 }
 
-static inline void append_dmail_key_link(StateMachine * sm) {
+static void append_dmail_key_link(StateMachine * sm) {
   append(sm, "<a class=\"dtext-link dtext-id-link dtext-dmail-id-link\" href=\"");
   append_url(sm, "/dmails/");
   append(sm, sm->a1, sm->a2);
@@ -1020,7 +1020,7 @@ static inline void append_dmail_key_link(StateMachine * sm) {
   append(sm, "</a>");
 }
 
-static inline void append_code_fence(StateMachine * sm, const std::string_view code, const std::string_view language) {
+static void append_code_fence(StateMachine * sm, const std::string_view code, const std::string_view language) {
   if (language.empty()) {
     append_block(sm, "<pre>");
     append_html_escaped(sm, code);
@@ -1034,7 +1034,7 @@ static inline void append_code_fence(StateMachine * sm, const std::string_view c
   }
 }
 
-static inline void append_inline_code(StateMachine * sm, const std::string_view language = {}) {
+static void append_inline_code(StateMachine * sm, const std::string_view language = {}) {
   if (language.empty()) {
     dstack_open_inline(sm, INLINE_CODE, "<code>");
   } else {
@@ -1044,7 +1044,7 @@ static inline void append_inline_code(StateMachine * sm, const std::string_view 
   }
 }
 
-static inline void append_block_code(StateMachine * sm, const std::string_view language = {}) {
+static void append_block_code(StateMachine * sm, const std::string_view language = {}) {
   dstack_close_leaf_blocks(sm);
 
   if (language.empty()) {
@@ -1056,7 +1056,7 @@ static inline void append_block_code(StateMachine * sm, const std::string_view l
   }
 }
 
-static inline void append_header(StateMachine * sm, char header, const std::string_view id) {
+static void append_header(StateMachine * sm, char header, const std::string_view id) {
   static element_t blocks[] = { BLOCK_H1, BLOCK_H2, BLOCK_H3, BLOCK_H4, BLOCK_H5, BLOCK_H6 };
   element_t block = blocks[header - '1'];
 
@@ -1078,13 +1078,13 @@ static inline void append_header(StateMachine * sm, char header, const std::stri
   sm->header_mode = true;
 }
 
-static inline void append_block(StateMachine * sm, const auto s) {
+static void append_block(StateMachine * sm, const auto s) {
   if (!sm->options.f_inline) {
     append(sm, s);
   }
 }
 
-static inline void append_block_html_escaped(StateMachine * sm, const std::string_view string) {
+static void append_block_html_escaped(StateMachine * sm, const std::string_view string) {
   if (!sm->options.f_inline) {
     append_html_escaped(sm, string);
   }
@@ -1290,7 +1290,7 @@ static void clear_tag_attributes(StateMachine * sm) {
 }
 
 // True if a mention is allowed to start after this character.
-static inline bool is_mention_boundary(unsigned char c) {
+static bool is_mention_boundary(unsigned char c) {
   switch (c) {
     case '\0': return true;
     case '\r': return true;
@@ -1309,7 +1309,7 @@ static inline bool is_mention_boundary(unsigned char c) {
   }
 }
 
-static inline std::tuple<char32_t, int> get_utf8_char(const char* c) {
+static std::tuple<char32_t, int> get_utf8_char(const char* c) {
   const unsigned char* p = reinterpret_cast<const unsigned char*>(c);
 
   // 0x10xxxxxx is a continuation byte; back up to the leading byte.
@@ -1337,7 +1337,7 @@ static inline std::tuple<char32_t, int> get_utf8_char(const char* c) {
 // Returns the preceding non-boundary character if `c` is a boundary character.
 // Otherwise, returns `c` if `c` is not a boundary character. Boundary characters
 // are trailing punctuation characters that should not be part of the matched text.
-static inline const char* find_boundary_c(const char* c) {
+static const char* find_boundary_c(const char* c) {
   auto [ch, len] = get_utf8_char(c);
 
   if (std::binary_search(std::begin(boundary_characters), std::end(boundary_characters), ch)) {

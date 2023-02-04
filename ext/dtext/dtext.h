@@ -135,12 +135,12 @@ private:
   std::string parse();
 };
 
-static inline const char* find_boundary_c(const char* c);
+static const char* find_boundary_c(const char* c);
 static void dstack_open_inline(StateMachine * sm, element_t type, const char * html);
 static void dstack_open_block(StateMachine * sm, element_t type, const char * html);
 static void dstack_close_leaf_blocks(StateMachine * sm);
-static inline void append_block(StateMachine * sm, const auto s);
-static inline void append_block_html_escaped(StateMachine * sm, const std::string_view string);
+static void append_block(StateMachine * sm, const auto s);
+static void append_block_html_escaped(StateMachine * sm, const std::string_view string);
 static void save_tag_attribute(StateMachine * sm, const std::string_view name, const std::string_view value);
 static void clear_tag_attributes(StateMachine * sm);
 
