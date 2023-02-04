@@ -1,6 +1,7 @@
 #include "dtext.h"
 
 #include <algorithm>
+#include <unordered_set>
 #include <regex>
 
 #ifdef DEBUG
@@ -14,6 +15,12 @@
 #endif
 
 static const size_t MAX_STACK_DEPTH = 512;
+
+// Permitted HTML attributes for the [td] and [th] tags.
+static const std::unordered_map<std::string_view, const std::unordered_set<std::string_view>> permitted_tag_attributes = {
+  { "td", { "colspan", "rowspan" } },
+  { "th", { "colspan", "rowspan" } }
+};
 
 // Characters that mark the end of a link.
 //
@@ -103,6 +110,7 @@ action after_mention_boundary { is_mention_boundary(p[-1]) }
 action mentions_enabled { sm->options.f_mentions }
 action in_quote { dstack_is_open(sm, BLOCK_QUOTE) }
 action in_expand { dstack_is_open(sm, BLOCK_EXPAND) }
+action save_tag_attribute { save_tag_attribute(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 }); }
 
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
 eos = '\0';
@@ -212,6 +220,13 @@ hr = ws* ('[hr]'i | '<hr>'i) ws* eol+;
 
 code_fence = ('```' ws* (alnum* >mark_a1 %mark_a2) ws* eol) (any* >mark_b1 %mark_b2) :>> (eol '```' ws* eol);
 
+double_quoted_value = '"' (nonnewline+ >mark_b1 %mark_b2) :>> '"';
+single_quoted_value = "'" (nonnewline+ >mark_b1 %mark_b2) :>> "'";
+unquoted_value = alnum+ >mark_b1 %mark_b2;
+tag_attribute_value = double_quoted_value | single_quoted_value | unquoted_value;
+tag_attribute = ws+ (alnum+ >mark_a1 %mark_a2) ws* '=' ws* tag_attribute_value %save_tag_attribute;
+tag_attributes = tag_attribute*;
+
 open_spoilers = ('[spoiler'i 's'i? ']') | ('<spoiler'i 's'i? '>');
 open_nodtext = '[nodtext]'i | '<nodtext>'i;
 open_quote = '[quote]'i | '<quote>'i | '<blockquote>'i;
@@ -221,9 +236,10 @@ open_code_lang = '[code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) ']' | '<code'i 
 open_table = '[table]'i | '<table>'i;
 open_thead = '[thead]'i | '<thead>'i;
 open_tbody = '[tbody]'i | '<tbody>'i;
-open_th = '[th]'i | '<th>'i;
 open_tr = '[tr]'i | '<tr>'i;
-open_td = '[td]'i | '<td>'i;
+open_th = '[th'i tag_attributes :>> ']' | '<th'i tag_attributes :>> '>';
+open_td = '[td'i tag_attributes :>> ']' | '<td'i tag_attributes :>> '>';
+
 open_tn = '[tn]'i | '<tn>'i;
 open_b = '[b]'i | '<b>'i | '<strong>'i;
 open_i = '[i]'i | '<i>'i | '<em>'i;
@@ -563,7 +579,7 @@ table := |*
   };
 
   open_th => {
-    dstack_open_block(sm, BLOCK_TH, "<th>");
+    dstack_open_block(sm, BLOCK_TH, "th", sm->tag_attributes);
     fcall inline;
   };
 
@@ -576,7 +592,7 @@ table := |*
   };
 
   open_td => {
-    dstack_open_block(sm, BLOCK_TD, "<td>");
+    dstack_open_block(sm, BLOCK_TD, "td", sm->tag_attributes);
     fcall inline;
   };
 
@@ -1075,6 +1091,26 @@ static void dstack_open_block(StateMachine * sm, element_t type, const char * ht
   append_block(sm, html);
 }
 
+static void dstack_open_block(StateMachine * sm, element_t type, const std::string_view& tag_name, const StateMachine::TagAttributes& tag_attributes) {
+  dstack_push(sm, type);
+  append_block(sm, "<");
+  append_block(sm, tag_name);
+
+  auto& permitted = permitted_tag_attributes.at(tag_name);
+  for (auto& [name, value] : tag_attributes) {
+    if (permitted.find(name) != permitted.end()) {
+      append_block(sm, " ");
+      append_block_html_escaped(sm, name);
+      append_block(sm, "=\"");
+      append_block_html_escaped(sm, value);
+      append_block(sm, "\"");
+    }
+  }
+
+  append_block(sm, ">");
+  clear_tag_attributes(sm);
+}
+
 static void dstack_close_inline(StateMachine * sm, element_t type, const char * close_html) {
   if (dstack_check(sm, type)) {
     g_debug("closing inline %s", close_html);
@@ -1208,6 +1244,14 @@ static void dstack_close_list(StateMachine * sm) {
   while (dstack_is_open(sm, BLOCK_UL)) {
     dstack_close_until(sm, BLOCK_UL);
   }
+}
+
+static void save_tag_attribute(StateMachine * sm, const std::string_view name, const std::string_view value) {
+  sm->tag_attributes[name] = value;
+}
+
+static void clear_tag_attributes(StateMachine * sm) {
+  sm->tag_attributes.clear();
 }
 
 // True if a mention is allowed to start after this character.

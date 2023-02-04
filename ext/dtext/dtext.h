@@ -1,10 +1,11 @@
 #ifndef DTEXT_H
 #define DTEXT_H
 
-#include <unordered_set>
-#include <string>
-#include <vector>
+#include <map>
 #include <stdexcept>
+#include <string>
+#include <unordered_set>
+#include <vector>
 
 typedef enum element_t {
   DSTACK_EMPTY = 0,
@@ -87,6 +88,8 @@ struct DTextOptions {
 
 class StateMachine {
 public:
+  using TagAttributes = std::map<std::string_view, std::string_view>;
+
   const DTextOptions options;
 
   size_t top = 0;
@@ -109,6 +112,7 @@ public:
   const char * e1 = NULL;
   const char * e2 = NULL;
   bool header_mode = false;
+  TagAttributes tag_attributes;
 
   std::string input;
   std::string output;
@@ -133,5 +137,7 @@ static void dstack_open_block(StateMachine * sm, element_t type, const char * ht
 static void dstack_close_leaf_blocks(StateMachine * sm);
 static inline void append_block(StateMachine * sm, const auto s);
 static inline void append_block_html_escaped(StateMachine * sm, const std::string_view string);
+static void save_tag_attribute(StateMachine * sm, const std::string_view name, const std::string_view value);
+static void clear_tag_attributes(StateMachine * sm);
 
 #endif
