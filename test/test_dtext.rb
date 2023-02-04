@@ -972,9 +972,6 @@ class DTextTest < Minitest::Test
     assert_parse('<table class="striped"><td colspan="2" rowspan="3">foo</td></table>', '[table][td colspan=2 rowspan=3]foo[/td][/table]')
     assert_parse('<table class="striped"><td colspan="2" rowspan="3">foo</td></table>', '[table][td rowspan=3 colspan=2]foo[/td][/table]')
 
-    assert_parse('<table class="striped"><td colspan="blah">foo</td></table>', '[table][td colspan="blah"]foo[/td][/table]')
-    assert_parse('<table class="striped"><td colspan="blah">foo</td></table>', '[table][td colspan=blah]foo[/td][/table]')
-
     assert_parse('<table class="striped"></table>', '[table][td colspan=2rowspan=3]foo[/td][/table]')
     assert_parse('<table class="striped"></table>', '[table][td colspan="2"rowspan="3"]foo[/td][/table]')
     assert_parse('<table class="striped"></table>', '[table][tdcolspan]foo[/td][/table]')
@@ -988,10 +985,23 @@ class DTextTest < Minitest::Test
     assert_parse('<table class="striped"></table>', '[table][td colspan=2 ]foo[/td][/table]')
     assert_parse('<table class="striped"></table>', '[table][td ]foo[/td][/table]')
 
+    assert_parse('<table class="striped"><td>foo</td></table>', '[table][td colspan="blah"]foo[/td][/table]')
+    assert_parse('<table class="striped"><td>foo</td></table>', '[table][td colspan=blah]foo[/td][/table]')
     assert_parse('<table class="striped"><td>foo</td></table>', '[table][td id="blah"]foo[/td][/table]')
     assert_parse('<table class="striped"><td>foo</td></table>', '[table][td class="blah"]foo[/td][/table]')
     assert_parse('<table class="striped"><td>foo</td></table>', '[table][td style="blah"]foo[/td][/table]')
     assert_parse('<table class="striped"><td>foo</td></table>', '[table][td onclick="blah"]foo[/td][/table]')
+
+    assert_parse('<table class="striped"><td align="left">foo</td></table>',    '[table][td align="left"]foo[/td][/table]')
+    assert_parse('<table class="striped"><td align="center">foo</td></table>',  '[table][td align="center"]foo[/td][/table]')
+    assert_parse('<table class="striped"><td align="right">foo</td></table>',   '[table][td align="right"]foo[/td][/table]')
+    assert_parse('<table class="striped"><td align="justify">foo</td></table>', '[table][td align="justify"]foo[/td][/table]')
+    assert_parse('<table class="striped"><td>foo</td></table>',                 '[table][td align="blah"]foo[/td][/table]')
+
+    assert_parse('<table class="striped"><th align="left">foo</th></table>', '[table][th align="left"]foo[/th][/table]')
+    assert_parse('<table class="striped"><tr align="left"><td>foo</td></tr></table>', '[table][tr align="left"][td]foo[/td][/tr][/table]')
+    assert_parse('<table class="striped"><tbody align="left"><td>foo</td></tbody></table>', '[table][tbody align="left"][td]foo[/td][/tbody][/table]')
+    assert_parse('<table class="striped"><thead align="left"><td>foo</td></thead></table>', '[table][thead align="left"][td]foo[/td][/thead][/table]')
   end
 
   def test_unclosed_th

@@ -16,10 +16,21 @@
 
 static const size_t MAX_STACK_DEPTH = 512;
 
-// Permitted HTML attributes for the [td] and [th] tags.
-static const std::unordered_map<std::string_view, const std::unordered_set<std::string_view>> permitted_tag_attributes = {
-  { "td", { "colspan", "rowspan" } },
-  { "th", { "colspan", "rowspan" } }
+// Permitted HTML attribute names.
+static const std::unordered_map<std::string_view, const std::unordered_set<std::string_view>> permitted_attribute_names = {
+  { "thead", { "align" } },
+  { "tbody", { "align" } },
+  { "tr",    { "align" } },
+  { "td",    { "align", "colspan", "rowspan" } },
+  { "th",    { "align", "colspan", "rowspan" } },
+};
+
+// Permitted HTML attribute values.
+static const std::unordered_set<std::string_view> align_values = { "left", "center", "right", "justify" };
+static const std::unordered_map<std::string_view, std::function<bool(std::string_view)>> permitted_attribute_values = {
+  { "align",   [](auto value) { return align_values.find(value) != align_values.end(); } },
+  { "colspan", [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
+  { "rowspan", [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
 };
 
 // Characters that mark the end of a link.
@@ -234,9 +245,9 @@ open_expand = '[expand]'i | '<expand>'i;
 open_code = '[code]'i | '<code>'i;
 open_code_lang = '[code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) ']' | '<code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) '>';
 open_table = '[table]'i | '<table>'i;
-open_thead = '[thead]'i | '<thead>'i;
-open_tbody = '[tbody]'i | '<tbody>'i;
-open_tr = '[tr]'i | '<tr>'i;
+open_thead = '[thead'i tag_attributes :>> ']' | '<thead'i tag_attributes :>> '>';
+open_tbody = '[tbody'i tag_attributes :>> ']' | '<tbody'i tag_attributes :>> '>';
+open_tr = '[tr'i tag_attributes :>> ']' | '<tr'i tag_attributes :>> '>';
 open_th = '[th'i tag_attributes :>> ']' | '<th'i tag_attributes :>> '>';
 open_td = '[td'i tag_attributes :>> ']' | '<td'i tag_attributes :>> '>';
 
@@ -563,7 +574,7 @@ nodtext := |*
 
 table := |*
   open_thead => {
-    dstack_open_block(sm, BLOCK_THEAD, "<thead>");
+    dstack_open_block(sm, BLOCK_THEAD, "thead", sm->tag_attributes);
   };
 
   close_thead => {
@@ -571,7 +582,7 @@ table := |*
   };
 
   open_tbody => {
-    dstack_open_block(sm, BLOCK_TBODY, "<tbody>");
+    dstack_open_block(sm, BLOCK_TBODY, "tbody", sm->tag_attributes);
   };
 
   close_tbody => {
@@ -584,7 +595,7 @@ table := |*
   };
 
   open_tr => {
-    dstack_open_block(sm, BLOCK_TR, "<tr>");
+    dstack_open_block(sm, BLOCK_TR, "tr", sm->tag_attributes);
   };
 
   close_tr => {
@@ -1096,14 +1107,18 @@ static void dstack_open_block(StateMachine * sm, element_t type, const std::stri
   append_block(sm, "<");
   append_block(sm, tag_name);
 
-  auto& permitted = permitted_tag_attributes.at(tag_name);
+  auto& permitted_names = permitted_attribute_names.at(tag_name);
   for (auto& [name, value] : tag_attributes) {
-    if (permitted.find(name) != permitted.end()) {
-      append_block(sm, " ");
-      append_block_html_escaped(sm, name);
-      append_block(sm, "=\"");
-      append_block_html_escaped(sm, value);
-      append_block(sm, "\"");
+    if (permitted_names.find(name) != permitted_names.end()) {
+      auto validate_value = permitted_attribute_values.at(name);
+
+      if (validate_value(value)) {
+        append_block(sm, " ");
+        append_block_html_escaped(sm, name);
+        append_block(sm, "=\"");
+        append_block_html_escaped(sm, value);
+        append_block(sm, "\"");
+      }
     }
   }
 
