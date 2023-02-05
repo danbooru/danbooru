@@ -211,12 +211,12 @@ html_link = '<a'i ws+ 'href="'i (url | relative_url) >mark_a1 %mark_a2 :>> '">' 
 emoticon_tags = '|' alnum | ':|' | '|_|' | '||_||' | '\\||/' | '<|>_<|>' | '>:|' | '>|3' | '|w|' | ':{' | ':}';
 wiki_prefix = alnum* >mark_a1 %mark_a2;
 wiki_suffix = alnum* >mark_e1 %mark_e2;
-wiki_target = (nonpipebracket+ | emoticon_tags) >mark_b1 %mark_b2;
-wiki_anchor_id = ([A-Z] (alnum | [ _\-])*) >mark_c1 %mark_c2;
-wiki_title  = nonpipebracket* >mark_d1 %mark_d2;
+wiki_target = (nonpipebracket* (nonpipebracket - space) | emoticon_tags) >mark_b1 %mark_b2;
+wiki_anchor_id = ([A-Z] ([ _\-]* alnum+)*) >mark_c1 %mark_c2;
+wiki_title = (ws* (nonpipebracket - space)+)* >mark_d1 %mark_d2;
 
-basic_wiki_link = wiki_prefix '[[' wiki_target :>> ('#' wiki_anchor_id)? ']]' wiki_suffix;
-aliased_wiki_link = wiki_prefix '[[' wiki_target :>> ('#' wiki_anchor_id)? :>> ('|' wiki_title) ']]' wiki_suffix;
+basic_wiki_link = wiki_prefix '[[' ws* wiki_target ws* :>> ('#' wiki_anchor_id ws*)? ']]' wiki_suffix;
+aliased_wiki_link = wiki_prefix '[[' ws* wiki_target ws* :>> ('#' wiki_anchor_id ws*)? '|' ws* wiki_title ws* ']]' wiki_suffix;
 
 tag = (nonspace - [|{}])+ | ([~\-]? emoticon_tags);
 tags = (tag (ws+ tag)*) >mark_b1 %mark_b2;

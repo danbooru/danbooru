@@ -238,6 +238,15 @@ class DTextTest < Minitest::Test
     assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/%E6%9D%B1%E6%96%B9\">東方</a></p>", "[[東方]]")
   end
 
+  def test_wiki_link_spacing
+    assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/tag\">tag</a></p>", "[[ tag ]]")
+    assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/tag\">thetagger</a></p>", "the[[ tag ]]ger")
+    assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/tag\">theTagger</a></p>", "the[[ tag|Tag ]]ger")
+    assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/tag\">theTagger</a></p>", "the[[ tag | Tag ]]ger")
+    assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/tag#dtext-see-also\">thetagger</a></p>", "the[[ tag #See Also ]]ger")
+    assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/tag#dtext-see-also\">theTagger</a></p>", "the[[ tag #See Also | Tag ]]ger")
+  end
+
   def test_wiki_links_spoiler
     assert_parse("<p>a <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/spoiler\">spoiler</a> c</p>", "a [[spoiler]] c")
   end
@@ -277,13 +286,19 @@ class DTextTest < Minitest::Test
   def test_wiki_links_pipe_trick
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/tagme">tagme</a></p>', "[[tagme|]]")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/tagme">TAGME</a></p>', "[[TAGME|]]")
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/tagme">tagme</a></p>', "[[tagme| ]]")
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/tagme">tagme</a></p>', "[[tagme |]]")
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/tagme">tagme</a></p>', "[[tagme | ]]")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo_%28bar%29">foo</a></p>', "[[foo (bar)|]]")
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo_%28bar%29">foo</a></p>', "[[foo (bar) | ]]")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo_%28bar%29">abcfoo123</a></p>', "abc[[foo (bar)|]]123")
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo_%28bar%29">abcfoo123</a></p>', "abc[[foo (bar) | ]]123")
 
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/kaga_%28kantai_collection%29">kaga</a></p>', "[[kaga_(kantai_collection)|]]")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/kaga_%28kantai_collection%29">Kaga</a></p>', "[[Kaga (Kantai Collection)|]]")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/kaga_%28kantai_collection%29_%28cosplay%29">kaga (kantai collection)</a></p>', "[[kaga (kantai collection) (cosplay)|]]")
 
+    assert_parse('<p>[[long hair|<br>long]]</p>', "[[long hair|\nlong]]")
     assert_parse('<p>[[|long hair]]</p>', "[[|long hair]]")
   end
 
@@ -315,8 +330,8 @@ class DTextTest < Minitest::Test
 
     assert_parse('<p>[[touhou#See Also:]]</p>', '[[touhou#See Also:]]')
     assert_parse('<p>[[Htol#Niq: Hotaru no Nikki#See also]]</p>', '[[Htol#Niq: Hotaru no Nikki#See also]]')
-    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/tokyo_mirage_sessions_#dtext-fe">Tokyo Mirage Sessions </a></p>', '[[Tokyo Mirage Sessions #FE]]') # XXX wrong
-    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/http%3A%2F%2Fen.wikipedia.org%2Fwiki%2Fgolden_age_of_detective_fiction#dtext-description-of-the-genre"> Knox Decalogue</a></p>', '[[http://en.wikipedia.org/wiki/Golden_Age_of_Detective_Fiction#Description_of_the_genre| Knox Decalogue]]') # XXX wrong
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/tokyo_mirage_sessions#dtext-fe">Tokyo Mirage Sessions</a></p>', '[[Tokyo Mirage Sessions #FE]]') # XXX wrong
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/http%3A%2F%2Fen.wikipedia.org%2Fwiki%2Fgolden_age_of_detective_fiction#dtext-description-of-the-genre">Knox Decalogue</a></p>', '[[http://en.wikipedia.org/wiki/Golden_Age_of_Detective_Fiction#Description_of_the_genre| Knox Decalogue]]') # XXX wrong
   end
 
   def test_spoilers
