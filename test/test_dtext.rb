@@ -862,9 +862,72 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%E6%9D%B1%E6%96%B9">東方</a></p>', "{{東方}}")
     assert_parse('<p>use {{}}, like so: <a class="dtext-link dtext-post-search-link" href="/posts?tags=touhou">touhou</a></p>', "use {{}}, like so: {{touhou}}")
 
+    assert_parse('<p>{<a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "{{{tag}}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a>}</p>', "{{tag}}}")
+    assert_parse('<p>{{<a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a>}}</p>', "{{{{tag}}}}")
+    assert_parse('<p>{{tag1,<a class="dtext-link dtext-post-search-link" href="/posts?tags=tag2">tag2</a></p>', "{{tag1,{{tag2}}")
+
+    assert_parse('<p>I like <a class="dtext-link dtext-post-search-link" href="/posts?tags=cat">cats</a>.</p>', "I like {{cat}}s.")
+    assert_parse('<p>a <a class="dtext-link dtext-post-search-link" href="/posts?tags=cat">cat</a>\'s paw</p>', "a {{cat}}'s paw")
+    assert_parse('<p>the <a class="dtext-link dtext-post-search-link" href="/posts?tags=60s">1960s</a>.</p>', "the 19{{60s}}.")
+    assert_parse('<p>a <a class="dtext-link dtext-post-search-link" href="/posts?tags=c">bcd</a> e</p>', "a b{{c}}d e")
+    assert_parse('<p>a <a class="dtext-link dtext-post-search-link" href="/posts?tags=c">bde</a> f</p>', "a b{{c|d}}e f")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=cd">abcdef</a><a class="dtext-link dtext-post-search-link" href="/posts?tags=gh">ghij</a></p>', "ab{{cd}}ef{{gh}}ij")
+
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=long_hair">Long Hair</a></p>', "{{long_hair|Long Hair}}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=long_hair">Long Hair</a></p>', "{{ long_hair | Long Hair }}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%7C_%7C">foo|bar</a></p>', "{{ |_| | foo|bar }}")
+
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tagme">tagme</a></p>', "{{tagme|}}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=bb_%28fate%29">bb</a></p>', "{{bb_(fate)|}}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=bb_%28fate%29">bb</a></p>', "{{bb_(fate)| }}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=bb_%28fate%29">bb</a></p>', "{{bb_(fate) |}}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=bb_%28fate%29">bb</a></p>', "{{bb_(fate) | }}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=bb_%28swimsuit_mooncancer%29_%28fate%29">bb_(swimsuit_mooncancer)</a></p>', "{{bb_(swimsuit_mooncancer)_(fate)|}}")
+
+    assert_parse('<p>{{smile | :} }}</p>', "{{smile | :} }}") # XXX should work
+    #assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=smile">:}</a></p>', "{{ smile | :} }}")
+    #assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=smile">:}</a></p>', "{{ smile |:} }}")
+    #assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=smile">:</a>}</p>', "{{ smile | :}}}")
+    #assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=smile">:</a>}</p>', "{{ smile |:}}}")
+
+    #assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=smile">}}</a></p>', "{{ smile |}} }}")
+    #assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=smile">}}</a></p>', "{{ smile | }} }}")
+    #assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=smile">}</a>}</p>', "{{ smile |}}}}")
+    #assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=smile">}</a>}</p>', "{{ smile | }}}}")
+
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%7C3">|3</a></p>', '{{|3}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%7CD">|D</a></p>', '{{|D}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%3A%7C">:|</a></p>', '{{:|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%7C_%7C">|_|</a></p>', '{{|_|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%7C%7C_%7C%7C">||_||</a></p>', '{{||_||}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%5C%7C%7C%2F">\||/</a></p>', '{{\||/}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%3C%7C%3E_%3C%7C%3E">&lt;|&gt;_&lt;|&gt;</a></p>', '{{<|>_<|>}}')
+
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%7C3">blah</a></p>', '{{|3|blah}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%7CD">blah</a></p>', '{{|D|blah}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%3A%7C">blah</a></p>', '{{:||blah}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%7C_%7C">blah</a></p>', '{{|_||blah}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%7C%7C_%7C%7C">blah</a></p>', '{{||_|||blah}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%5C%7C%7C%2F">blah</a></p>', '{{\||/|blah}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%3C%7C%3E_%3C%7C%3E">blah</a></p>', '{{<|>_<|>|blah}}')
+
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=-%7CD">-|D</a></p>', '{{-|D}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=~%7CD">~|D</a></p>', '{{~|D}}')
+
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/tag#dtext-see-also">tag</a> <a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "[[tag#See also]] {{tag}}")
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/tag#dtext-see-also">Tag</a> <a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "[[tag#See also|Tag]] {{tag}}")
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">Tag</a> <a class="dtext-link dtext-wiki-link" href="/wiki_pages/tag">tag</a></p>', "{{tag|Tag}} [[tag]]")
+
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=%3A%7C">:|</a> foo <a class="dtext-link dtext-post-search-link" href="/posts?tags=bar">bar</a></p>', '{{:|}} foo {{bar}}')
+
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=pool%3A%22Granblue%20Fantasy%20Unexpected%20Confession">Vane x Gran&quot;</a></p>', '{{pool:"Granblue Fantasy Unexpected Confession | Vane x Gran"}}') # XXX wrong
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=http%3A%2F%2Ftvtropes.org%2Fpmwiki%2Fpmwiki.php%2FMain%2FExactlyWhatItSaysOnTheTin">Exactly what it says on the tin</a></p>', "{{http://tvtropes.org/pmwiki/pmwiki.php/Main/ExactlyWhatItSaysOnTheTin|Exactly what it says on the tin}}") # XXX incorrect usage
+
     assert_parse('<p>{{}}</p>', "{{}}")
     assert_parse('<p>{{ }}</p>', "{{ }}")
     assert_parse('<p>{{1girl<br>solo}}</p>', "{{1girl\nsolo}}")
+    assert_parse('<p>{{|bb_(fate)}}</p>', "{{|bb_(fate)}}")
   end
 
   def test_extra_newlines

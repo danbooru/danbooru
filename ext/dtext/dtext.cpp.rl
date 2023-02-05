@@ -16,6 +16,9 @@
 
 static const size_t MAX_STACK_DEPTH = 512;
 
+// Strip qualifier from tag: "Artoria Pendragon (Lancer) (Fate)" -> "Artoria Pendragon (Lancer)"
+static const std::regex tag_qualifier_regex("[ _]\\([^)]+?\\)$");
+
 // Permitted HTML attribute names.
 static const std::unordered_map<std::string_view, const std::unordered_set<std::string_view>> permitted_attribute_names = {
   { "thead",    { "align" } },
@@ -205,7 +208,7 @@ bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (url | relative_ur
 markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonnewline+ >mark_b1 %mark_b2 :>> ')';
 html_link = '<a'i ws+ 'href="'i (url | relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
-emoticon_tags = '|' alnum | ':|' | '|_|' | '||_||' | '\\||/' | '<|>_<|>';
+emoticon_tags = '|' alnum | ':|' | '|_|' | '||_||' | '\\||/' | '<|>_<|>' | '>:|' | '>|3' | '|w|' | ':{' | ':}';
 wiki_prefix = alnum* >mark_a1 %mark_a2;
 wiki_suffix = alnum* >mark_e1 %mark_e2;
 wiki_target = (nonpipebracket+ | emoticon_tags) >mark_b1 %mark_b2;
@@ -215,9 +218,14 @@ wiki_title  = nonpipebracket* >mark_d1 %mark_d2;
 basic_wiki_link = wiki_prefix '[[' wiki_target :>> ('#' wiki_anchor_id)? ']]' wiki_suffix;
 aliased_wiki_link = wiki_prefix '[[' wiki_target :>> ('#' wiki_anchor_id)? :>> ('|' wiki_title) ']]' wiki_suffix;
 
-tag = (nonspace - [}])+;
-tags = tag (ws+ tag)*;
-post_search_link = '{{' ws* (tags >mark_a1 %mark_a2) ws* :>> '}}';
+tag = (nonspace - [|{}])+ | ([~\-]? emoticon_tags);
+tags = (tag (ws+ tag)*) >mark_b1 %mark_b2;
+search_title = ((nonnewline* nonspace) -- '}')? >mark_c1 %mark_c2;
+search_prefix = alnum* >mark_a1 %mark_a2;
+search_suffix = alnum* >mark_d1 %mark_d2;
+
+basic_post_search_link = search_prefix '{{' ws* tags ws* '}}' search_suffix;
+aliased_post_search_link = search_prefix '{{' ws* tags ws* '|' ws* search_title ws* '}}' search_suffix;
 
 id = digit+ >mark_a1 %mark_a2;
 alnum_id = alnum+ >mark_a1 %mark_a2;
@@ -337,8 +345,12 @@ inline := |*
   'topic #'i id '/p'i page => { append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"", "/forum_topics/", "?page="); };
   'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"", "https://www.pixiv.net/artworks/", "#"); };
 
-  post_search_link => {
-    append_post_search_link(sm, { sm->a1, sm->a2 });
+  basic_post_search_link => {
+    append_post_search_link(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 }, { sm->b1, sm->b2 }, { sm->d1, sm->d2 });
+  };
+
+  aliased_post_search_link => {
+    append_post_search_link(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 }, { sm->c1, sm->c2 }, { sm->d1, sm->d2 });
   };
 
   basic_wiki_link => {
@@ -940,13 +952,33 @@ static void append_bare_named_url(StateMachine * sm, const std::string_view url,
   }
 }
 
-static void append_post_search_link(StateMachine * sm, const std::string_view search) {
+static void append_post_search_link(StateMachine * sm, const std::string_view prefix, const std::string_view search, const std::string_view title, const std::string_view suffix) {
+  auto normalized_title = std::string(title);
+
   append(sm, "<a class=\"dtext-link dtext-post-search-link\" href=\"");
   append_url(sm, "/posts?tags=");
   append_uri_escaped(sm, search);
   append(sm, "\">");
-  append_html_escaped(sm, search);
+
+  // 19{{60s}} -> {{60s|1960s}}
+  if (!prefix.empty()) {
+    normalized_title.insert(0, prefix);
+  }
+
+  // {{pokemon_(creature)|}} -> {{pokemon_(creature)|pokemon}}
+  if (title.empty()) {
+    std::regex_replace(std::back_inserter(normalized_title), search.begin(), search.end(), tag_qualifier_regex, "");
+  }
+
+  // {{cat}}s -> {{cat|cats}}
+  if (!suffix.empty()) {
+    normalized_title.append(suffix);
+  }
+
+  append_html_escaped(sm, normalized_title);
   append(sm, "</a>");
+
+  clear_matches(sm);
 }
 
 static void append_wiki_link(StateMachine * sm, const std::string_view prefix, const std::string_view tag, const std::string_view anchor, const std::string_view title, const std::string_view suffix) {
@@ -963,8 +995,6 @@ static void append_wiki_link(StateMachine * sm, const std::string_view prefix, c
 
   // Pipe trick: [[Kaga (Kantai Collection)|]] -> [[kaga_(kantai_collection)|Kaga]]
   if (title_string.empty()) {
-    // Strip qualifier from tag: "Artoria Pendragon (Lancer) (Fate)" -> "Artoria Pendragon (Lancer)"
-    static const std::regex tag_qualifier_regex("[ _]\\([^)]+?\\)$");
     std::regex_replace(std::back_inserter(title_string), tag.cbegin(), tag.cend(), tag_qualifier_regex, "");
   }
 
@@ -994,6 +1024,8 @@ static void append_wiki_link(StateMachine * sm, const std::string_view prefix, c
   append(sm, "</a>");
 
   sm->wiki_pages.insert(std::string(tag));
+
+  clear_matches(sm);
 }
 
 static void append_paged_link(StateMachine * sm, const char * title, const char * tag, const char * href, const char * param) {
@@ -1289,6 +1321,19 @@ static void save_tag_attribute(StateMachine * sm, const std::string_view name, c
 
 static void clear_tag_attributes(StateMachine * sm) {
   sm->tag_attributes.clear();
+}
+
+static void clear_matches(StateMachine * sm) {
+  sm->a1 = NULL;
+  sm->a2 = NULL;
+  sm->b1 = NULL;
+  sm->b2 = NULL;
+  sm->c1 = NULL;
+  sm->c2 = NULL;
+  sm->d1 = NULL;
+  sm->d2 = NULL;
+  sm->e1 = NULL;
+  sm->e2 = NULL;
 }
 
 // True if a mention is allowed to start after this character.

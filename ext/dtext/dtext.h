@@ -143,5 +143,6 @@ static void append_block(StateMachine * sm, const auto s);
 static void append_block_html_escaped(StateMachine * sm, const std::string_view string);
 static void save_tag_attribute(StateMachine * sm, const std::string_view name, const std::string_view value);
 static void clear_tag_attributes(StateMachine * sm);
+static void clear_matches(StateMachine * sm);
 
 #endif
