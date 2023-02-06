@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/danbooru/dtext_rb.git
-  revision: bcc0b6bbcc7130eb4b567fa847ae1d6ab68b7da2
+  revision: 3b08e7fd4942813f82098860bef892d7a5eb7511
   specs:
-    dtext_rb (1.11.2)
+    dtext_rb (1.12.0)
 
 GIT
   remote: https://github.com/danbooru/http-cookie
