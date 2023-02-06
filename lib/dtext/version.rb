@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 class DText
-  VERSION = "1.11.5"
+  VERSION = "1.12.0"
 end
