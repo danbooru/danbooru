@@ -14,13 +14,13 @@ class DTextTest < Minitest::Test
     parse(dtext, inline: true)
   end
 
-  def assert_parse_id_link(class_name, url, input)
+  def assert_parse_id_link(class_name, url, input, **options)
     if url[0] == "/"
-      assert_parse(%{<p><a class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input)
-      assert_parse(%{<p><a class="dtext-link dtext-id-link #{class_name}" href="http://danbooru.donmai.us#{url}">#{input}</a></p>}, input, base_url: "http://danbooru.donmai.us")
+      assert_parse(%{<p><a class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input, **options)
+      assert_parse(%{<p><a class="dtext-link dtext-id-link #{class_name}" href="http://danbooru.donmai.us#{url}">#{input}</a></p>}, input, base_url: "http://danbooru.donmai.us", **options)
     else
-      assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input)
-      assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input, base_url: "http://danbooru.donmai.us")
+      assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input, **options)
+      assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input, base_url: "http://danbooru.donmai.us", **options)
     end
   end
 
@@ -668,6 +668,15 @@ class DTextTest < Minitest::Test
 
   def test_internal_links
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us">https://danbooru.donmai.us</a></p>', 'https://danbooru.donmai.us', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us">https://danbooru.donmai.us</a></p>', '"https://danbooru.donmai.us":https://danbooru.donmai.us', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/login">https://danbooru.donmai.us</a></p>', '"https://danbooru.donmai.us":https://danbooru.donmai.us/login', domain: "danbooru.donmai.us")
+
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/">https://danbooru.donmai.us/</a></p>', 'https://danbooru.donmai.us/', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/?blah">https://danbooru.donmai.us/?blah</a></p>', 'https://danbooru.donmai.us/?blah', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/#foo">https://danbooru.donmai.us/#foo</a></p>', 'https://danbooru.donmai.us/#foo', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us?">https://danbooru.donmai.us?</a></p>', '<https://danbooru.donmai.us?>', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us#">https://danbooru.donmai.us#</a></p>', '<https://danbooru.donmai.us#>', domain: "danbooru.donmai.us")
+
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us">https://danbooru.donmai.us</a></p>', 'https://danbooru.donmai.us', domain: "testbooru.donmai.us")
 
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us">https://danbooru.donmai.us</a></p>', 'https://danbooru.donmai.us', domain: "danbooru.donmai.us")
@@ -700,11 +709,59 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://#">https://#</a></p>', 'https://#', domain: "danbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://?">https://?</a></p>', '<https://?>', domain: "danbooru.donmai.us")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://:">https://:</a></p>', '<https://:>', domain: "danbooru.donmai.us")
+
+    assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/post/show/810829/arms_behind_back-ayanami_rei">http://danbooru.donmai.us/post/show/810829/arms_behind_back-ayanami_rei</a></p>', 'http://danbooru.donmai.us/post/show/810829/arms_behind_back-ayanami_rei', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/post/show/####">http://danbooru.donmai.us/post/show/####</a></p>', 'http://danbooru.donmai.us/post/show/####', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/posts/####">http://danbooru.donmai.us/posts/####</a></p>', 'http://danbooru.donmai.us/posts/####', domain: "danbooru.donmai.us")
+  end
+
+  def test_internal_link_to_shortlink_conversion
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://testbooru.donmai.us/posts/1234">https://testbooru.donmai.us/posts/1234</a></p>', "https://testbooru.donmai.us/posts/1234", domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', 'https://danbooru.donmai.us/posts/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', '<https://danbooru.donmai.us/posts/1234>', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', '"https://danbooru.donmai.us/posts/1234":https://danbooru.donmai.us/posts/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', '"https://danbooru.donmai.us/posts/1234":[https://danbooru.donmai.us/posts/1234]', internal_domains: %w[danbooru.donmai.us])
+
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', 'https://danbooru.donmai.us/posts/1234', internal_domains: %w[danbooru.donmai.us betabooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', 'https://betabooru.donmai.us/posts/1234', internal_domains: %w[danbooru.donmai.us betabooru.donmai.us])
+
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', 'https://danbooru.donmai.us/posts/1234?q=touhou', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', 'https://danbooru.donmai.us:443/posts/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', 'https://user:pass@danbooru.donmai.us/posts/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', 'https://user:pass@danbooru.donmai.us:443/posts/1234?q=touhou', internal_domains: %w[danbooru.donmai.us])
+
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/posts/1234#comment-5678">https://danbooru.donmai.us/posts/1234#comment-5678</a></p>', 'https://danbooru.donmai.us/posts/1234#comment-5678', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link" href="https://user:pass@danbooru.donmai.us:443/posts/1234?q=touhou#comment-5678">https://user:pass@danbooru.donmai.us:443/posts/1234?q=touhou#comment-5678</a></p>', 'https://user:pass@danbooru.donmai.us:443/posts/1234?q=touhou#comment-5678', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', 'https://danbooru.donmai.us/posts/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-pool-id-link" href="/pools/1234">pool #1234</a></p>', 'https://danbooru.donmai.us/pools/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-comment-id-link" href="/comments/1234">comment #1234</a></p>', 'https://danbooru.donmai.us/comments/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-forum-post-id-link" href="/forum_posts/1234">forum #1234</a></p>', 'https://danbooru.donmai.us/forum_posts/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-forum-topic-id-link" href="/forum_topics/1234">topic #1234</a></p>', 'https://danbooru.donmai.us/forum_topics/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-user-id-link" href="/users/1234">user #1234</a></p>', 'https://danbooru.donmai.us/users/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-artist-id-link" href="/artists/1234">artist #1234</a></p>', 'https://danbooru.donmai.us/artists/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-note-id-link" href="/notes/1234">note #1234</a></p>', 'https://danbooru.donmai.us/notes/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-favorite-group-id-link" href="/favorite_groups/1234">favgroup #1234</a></p>', 'https://danbooru.donmai.us/favorite_groups/1234', internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link dtext-id-link dtext-wiki-page-id-link" href="/wiki_pages/1234">wiki #1234</a></p>', 'https://danbooru.donmai.us/wiki_pages/1234', internal_domains: %w[danbooru.donmai.us])
+
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/posts/1234#comment_5678">https://danbooru.donmai.us/posts/1234#comment_5678</a></p>', 'https://danbooru.donmai.us/posts/1234#comment_5678', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/pools/1234?page=2">https://danbooru.donmai.us/pools/1234?page=2</a></p>', 'https://danbooru.donmai.us/pools/1234?page=2', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/favorite_groups/1234?page=2">https://danbooru.donmai.us/favorite_groups/1234?page=2</a></p>', 'https://danbooru.donmai.us/favorite_groups/1234?page=2', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/forum_topics/1234?page=2">https://danbooru.donmai.us/forum_topics/1234?page=2</a></p>', 'https://danbooru.donmai.us/forum_topics/1234?page=2', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/forum_topics/1234#forum_post_5678">https://danbooru.donmai.us/forum_topics/1234#forum_post_5678</a></p>', 'https://danbooru.donmai.us/forum_topics/1234#forum_post_5678', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/wiki_pages/1234#dtext-see-also">https://danbooru.donmai.us/wiki_pages/1234#dtext-see-also</a></p>', 'https://danbooru.donmai.us/wiki_pages/1234#dtext-see-also', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/wiki_pages/touhou#dtext-see-also">https://danbooru.donmai.us/wiki_pages/touhou#dtext-see-also</a></p>', 'https://danbooru.donmai.us/wiki_pages/touhou#dtext-see-also', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/touhou">touhou</a></p>', 'https://danbooru.donmai.us/wiki_pages/touhou', internal_domains: %w[danbooru.donmai.us])
   end
 
   def test_old_style_links
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">test</a></p>', '"test":http://test.com')
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://test.com">test</a></p>', '"test":Http://test.com')
+
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a></p>', '"http://test.com":http://test.com')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a></p>', '"http://test.com":[http://test.com]')
 
     assert_parse('<p><a class="dtext-link" href="#">test</a></p>', '"test":#')
     assert_parse('<p><a class="dtext-link" href="/">test</a></p>', '"test":/')

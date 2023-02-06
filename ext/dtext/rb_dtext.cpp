@@ -35,7 +35,7 @@ static auto parse_dtext(VALUE input, DTextOptions options = {}) {
   }
 }
 
-static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALUE f_inline, VALUE f_disable_mentions) {
+static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALUE internal_domains, VALUE f_inline, VALUE f_disable_mentions) {
   if (NIL_P(input)) {
     return Qnil;
   }
@@ -50,6 +50,13 @@ static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALU
 
   if (!NIL_P(domain)) {
     options.domain = StringValueCStr(domain); // domain.to_str # raises ArgumentError if domain contains null bytes.
+  }
+
+  internal_domains = rb_check_array_type(internal_domains); // raises TypeError if the argument isn't an array.
+  for (int i = 0; i < RARRAY_LEN(internal_domains); i++) {
+    VALUE rb_domain = rb_ary_entry(internal_domains, i);
+    std::string domain = StringValueCStr(rb_domain); // raise ArgumentError if the domain contains null bytes.
+    options.internal_domains.insert(domain);
   }
 
   auto [html, _wiki_pages] = parse_dtext(input, options);
@@ -71,6 +78,6 @@ static VALUE c_parse_wiki_pages(VALUE self, VALUE input) {
 extern "C" void Init_dtext() {
   cDText = rb_define_class("DText", rb_cObject);
   cDTextError = rb_define_class_under(cDText, "Error", rb_eStandardError);
-  rb_define_singleton_method(cDText, "c_parse", c_parse, 5);
+  rb_define_singleton_method(cDText, "c_parse", c_parse, 6);
   rb_define_singleton_method(cDText, "c_parse_wiki_pages", c_parse_wiki_pages, 1);
 }

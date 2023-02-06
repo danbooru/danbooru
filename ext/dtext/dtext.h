@@ -1,6 +1,8 @@
 #ifndef DTEXT_H
 #define DTEXT_H
 
+#include "url.h"
+
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -84,10 +86,20 @@ class DTextError : public std::runtime_error {
 };
 
 struct DTextOptions {
+  // If false, strip block-level elements (used for displaying DText in small spaces).
   bool f_inline = false;
+
+  // If false, ignore @-mentions (used for artist commentaries).
   bool f_mentions = true;
+
+  // If set, convert relative URLs to absolute URLs (used for sending dmails).
   std::string base_url;
+
+  // Links to this domain are considered internal URLs, rather than external URLs (used so links to https://danbooru.donmai.us don't get marked as external).
   std::string domain;
+
+  // Links to these domains are converted to shortlinks (used so links to https://danbooru.donmai.us/posts/1234 are converted to post #1234).
+  std::unordered_set<std::string> internal_domains;
 };
 
 class StateMachine {
@@ -136,11 +148,18 @@ private:
 };
 
 static const char* find_boundary_c(const char* c);
+static std::tuple<std::string_view, std::string_view, std::string_view, std::string_view> parse_url(const std::string_view url);
+static std::vector<std::string_view> split_string(const std::string_view input, char delim = '/');
 static void dstack_open_inline(StateMachine * sm, element_t type, const char * html);
 static void dstack_open_block(StateMachine * sm, element_t type, const char * html);
 static void dstack_close_leaf_blocks(StateMachine * sm);
 static void append_block(StateMachine * sm, const auto s);
 static void append_block_html_escaped(StateMachine * sm, const std::string_view string);
+static void append_relative_url(StateMachine * sm, const auto url);
+static void append_absolute_link(StateMachine * sm, const std::string_view url, const std::string_view title, bool internal_url = false, bool escape_title = true);
+static void append_internal_url(StateMachine * sm, const DText::URL& url);
+static void append_unnamed_url(StateMachine * sm, const std::string_view url);
+static void append_wiki_link(StateMachine * sm, const std::string_view prefix, const std::string_view tag, const std::string_view anchor, const std::string_view title, const std::string_view suffix);
 static void save_tag_attribute(StateMachine * sm, const std::string_view name, const std::string_view value);
 static void clear_tag_attributes(StateMachine * sm);
 static void clear_matches(StateMachine * sm);

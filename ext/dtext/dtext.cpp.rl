@@ -1,4 +1,5 @@
 #include "dtext.h"
+#include "url.h"
 
 #include <algorithm>
 #include <unordered_set>
@@ -304,41 +305,41 @@ basic_inline := |*
 *|;
 
 inline := |*
-  'post #'i id        => { append_id_link(sm, "post", "post", "/posts/"); };
-  'appeal #'i id      => { append_id_link(sm, "appeal", "post-appeal", "/post_appeals/"); };
-  'flag #'i id        => { append_id_link(sm, "flag", "post-flag", "/post_flags/"); };
-  'note #'i id        => { append_id_link(sm, "note", "note", "/notes/"); };
-  'forum #'i id       => { append_id_link(sm, "forum", "forum-post", "/forum_posts/"); };
-  'topic #'i id       => { append_id_link(sm, "topic", "forum-topic", "/forum_topics/"); };
-  'comment #'i id     => { append_id_link(sm, "comment", "comment", "/comments/"); };
-  'dmail #'i id       => { append_id_link(sm, "dmail", "dmail", "/dmails/"); };
-  'pool #'i id        => { append_id_link(sm, "pool", "pool", "/pools/"); };
-  'user #'i id        => { append_id_link(sm, "user", "user", "/users/"); };
-  'artist #'i id      => { append_id_link(sm, "artist", "artist", "/artists/"); };
-  'ban #'i id         => { append_id_link(sm, "ban", "ban", "/bans/"); };
-  'bur #'i id         => { append_id_link(sm, "BUR", "bulk-update-request", "/bulk_update_requests/"); };
-  'alias #'i id       => { append_id_link(sm, "alias", "tag-alias", "/tag_aliases/"); };
-  'implication #'i id => { append_id_link(sm, "implication", "tag-implication", "/tag_implications/"); };
-  'favgroup #'i id    => { append_id_link(sm, "favgroup", "favorite-group", "/favorite_groups/"); };
-  'mod action #'i id  => { append_id_link(sm, "mod action", "mod-action", "/mod_actions/"); };
-  'modreport #'i id   => { append_id_link(sm, "modreport", "moderation-report", "/moderation_reports/"); };
-  'feedback #'i id    => { append_id_link(sm, "feedback", "user-feedback", "/user_feedbacks/"); };
-  'wiki #'i id        => { append_id_link(sm, "wiki", "wiki-page", "/wiki_pages/"); };
+  'post #'i id             => { append_id_link(sm, "post", "post", "/posts/", { sm->a1, sm->a2 }); };
+  'appeal #'i id           => { append_id_link(sm, "appeal", "post-appeal", "/post_appeals/", { sm->a1, sm->a2 }); };
+  'flag #'i id             => { append_id_link(sm, "flag", "post-flag", "/post_flags/", { sm->a1, sm->a2 }); };
+  'note #'i id             => { append_id_link(sm, "note", "note", "/notes/", { sm->a1, sm->a2 }); };
+  'forum #'i id            => { append_id_link(sm, "forum", "forum-post", "/forum_posts/", { sm->a1, sm->a2 }); };
+  'topic #'i id            => { append_id_link(sm, "topic", "forum-topic", "/forum_topics/", { sm->a1, sm->a2 }); };
+  'comment #'i id          => { append_id_link(sm, "comment", "comment", "/comments/", { sm->a1, sm->a2 }); };
+  'dmail #'i id            => { append_id_link(sm, "dmail", "dmail", "/dmails/", { sm->a1, sm->a2 }); };
+  'pool #'i id             => { append_id_link(sm, "pool", "pool", "/pools/", { sm->a1, sm->a2 }); };
+  'user #'i id             => { append_id_link(sm, "user", "user", "/users/", { sm->a1, sm->a2 }); };
+  'artist #'i id           => { append_id_link(sm, "artist", "artist", "/artists/", { sm->a1, sm->a2 }); };
+  'ban #'i id              => { append_id_link(sm, "ban", "ban", "/bans/", { sm->a1, sm->a2 }); };
+  'bur #'i id              => { append_id_link(sm, "BUR", "bulk-update-request", "/bulk_update_requests/", { sm->a1, sm->a2 }); };
+  'alias #'i id            => { append_id_link(sm, "alias", "tag-alias", "/tag_aliases/", { sm->a1, sm->a2 }); };
+  'implication #'i id      => { append_id_link(sm, "implication", "tag-implication", "/tag_implications/", { sm->a1, sm->a2 }); };
+  'favgroup #'i id         => { append_id_link(sm, "favgroup", "favorite-group", "/favorite_groups/", { sm->a1, sm->a2 }); };
+  'mod action #'i id       => { append_id_link(sm, "mod action", "mod-action", "/mod_actions/", { sm->a1, sm->a2 }); };
+  'modreport #'i id        => { append_id_link(sm, "modreport", "moderation-report", "/moderation_reports/", { sm->a1, sm->a2 }); };
+  'feedback #'i id         => { append_id_link(sm, "feedback", "user-feedback", "/user_feedbacks/", { sm->a1, sm->a2 }); };
+  'wiki #'i id             => { append_id_link(sm, "wiki", "wiki-page", "/wiki_pages/", { sm->a1, sm->a2 }); };
 
-  'issue #'i id            => { append_id_link(sm, "issue", "github", "https://github.com/danbooru/danbooru/issues/"); };
-  'pull #'i id             => { append_id_link(sm, "pull", "github-pull", "https://github.com/danbooru/danbooru/pull/"); };
-  'commit #'i id           => { append_id_link(sm, "commit", "github-commit", "https://github.com/danbooru/danbooru/commit/"); };
-  'artstation #'i alnum_id => { append_id_link(sm, "artstation", "artstation", "https://www.artstation.com/artwork/"); };
-  'deviantart #'i id       => { append_id_link(sm, "deviantart", "deviantart", "https://www.deviantart.com/deviation/"); };
-  'nijie #'i id            => { append_id_link(sm, "nijie", "nijie", "https://nijie.info/view.php?id="); };
-  'pawoo #'i id            => { append_id_link(sm, "pawoo", "pawoo", "https://pawoo.net/web/statuses/"); };
-  'pixiv #'i id            => { append_id_link(sm, "pixiv", "pixiv", "https://www.pixiv.net/artworks/"); };
-  'seiga #'i id            => { append_id_link(sm, "seiga", "seiga", "https://seiga.nicovideo.jp/seiga/im"); };
-  'twitter #'i id          => { append_id_link(sm, "twitter", "twitter", "https://twitter.com/i/web/status/"); };
+  'issue #'i id            => { append_id_link(sm, "issue", "github", "https://github.com/danbooru/danbooru/issues/", { sm->a1, sm->a2 }); };
+  'pull #'i id             => { append_id_link(sm, "pull", "github-pull", "https://github.com/danbooru/danbooru/pull/", { sm->a1, sm->a2 }); };
+  'commit #'i id           => { append_id_link(sm, "commit", "github-commit", "https://github.com/danbooru/danbooru/commit/", { sm->a1, sm->a2 }); };
+  'artstation #'i alnum_id => { append_id_link(sm, "artstation", "artstation", "https://www.artstation.com/artwork/", { sm->a1, sm->a2 }); };
+  'deviantart #'i id       => { append_id_link(sm, "deviantart", "deviantart", "https://www.deviantart.com/deviation/", { sm->a1, sm->a2 }); };
+  'nijie #'i id            => { append_id_link(sm, "nijie", "nijie", "https://nijie.info/view.php?id=", { sm->a1, sm->a2 }); };
+  'pawoo #'i id            => { append_id_link(sm, "pawoo", "pawoo", "https://pawoo.net/web/statuses/", { sm->a1, sm->a2 }); };
+  'pixiv #'i id            => { append_id_link(sm, "pixiv", "pixiv", "https://www.pixiv.net/artworks/", { sm->a1, sm->a2 }); };
+  'seiga #'i id            => { append_id_link(sm, "seiga", "seiga", "https://seiga.nicovideo.jp/seiga/im", { sm->a1, sm->a2 }); };
+  'twitter #'i id          => { append_id_link(sm, "twitter", "twitter", "https://twitter.com/i/web/status/", { sm->a1, sm->a2 }); };
 
-  'yandere #'i id => { append_id_link(sm, "yandere", "yandere", "https://yande.re/post/show/"); };
-  'sankaku #'i id => { append_id_link(sm, "sankaku", "sankaku", "https://chan.sankakucomplex.com/post/show/"); };
-  'gelbooru #'i id => { append_id_link(sm, "gelbooru", "gelbooru", "https://gelbooru.com/index.php?page=post&s=view&id="); };
+  'yandere #'i id => { append_id_link(sm, "yandere", "yandere", "https://yande.re/post/show/", { sm->a1, sm->a2 }); };
+  'sankaku #'i id => { append_id_link(sm, "sankaku", "sankaku", "https://chan.sankakucomplex.com/post/show/", { sm->a1, sm->a2 }); };
+  'gelbooru #'i id => { append_id_link(sm, "gelbooru", "gelbooru", "https://gelbooru.com/index.php?page=post&s=view&id=", { sm->a1, sm->a2 }); };
 
   'dmail #'i id '/' dmail_key => { append_dmail_key_link(sm); };
 
@@ -794,8 +795,7 @@ static int dstack_count(const StateMachine * sm, element_t element) {
   return std::count(sm->dstack.begin(), sm->dstack.end(), element);
 }
 
-template <typename string_type>
-static bool is_internal_url(StateMachine * sm, const string_type url) {
+static bool is_internal_url(StateMachine * sm, const std::string_view url) {
   if (url.starts_with("/")) {
     return true;
   } else if (sm->options.domain.empty() || url.empty()) {
@@ -804,7 +804,7 @@ static bool is_internal_url(StateMachine * sm, const string_type url) {
     // Matches the domain name part of a URL.
     static const std::regex url_regex("^https?://(?:[^/?#]*@)?([^/?#:]+)", std::regex_constants::icase);
 
-    std::match_results<typename string_type::const_iterator> matches;
+    std::match_results<std::string_view::const_iterator> matches;
     std::regex_search(url.begin(), url.end(), matches, url_regex);
     return matches[1] == sm->options.domain;
   }
@@ -848,7 +848,7 @@ static void append_uri_escaped(StateMachine * sm, const std::string_view string)
   }
 }
 
-static void append_url(StateMachine * sm, const auto url) {
+static void append_relative_url(StateMachine * sm, const auto url) {
   if ((url[0] == '/' || url[0] == '#') && !sm->options.base_url.empty()) {
     append_html_escaped(sm, sm->options.base_url);
   }
@@ -856,45 +856,56 @@ static void append_url(StateMachine * sm, const auto url) {
   append_html_escaped(sm, url);
 }
 
+static void append_absolute_link(StateMachine * sm, const std::string_view url, const std::string_view title, bool internal_url, bool escape_title) {
+  if (internal_url) {
+    append(sm, "<a class=\"dtext-link\" href=\"");
+  } else if (url == title) {
+    append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
+  } else {
+    append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"");
+  }
+
+  append_html_escaped(sm, url);
+  append(sm, "\">");
+
+  if (escape_title) {
+    append_html_escaped(sm, title);
+  } else {
+    append(sm, title);
+  }
+
+  append(sm, "</a>");
+}
+
 static void append_mention(StateMachine * sm, const std::string_view name) {
   append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
   append_html_escaped(sm, name);
   append(sm, "\" href=\"");
-  append_url(sm, "/users?name=");
+  append_relative_url(sm, "/users?name=");
   append_uri_escaped(sm, name);
   append(sm, "\">@");
   append_html_escaped(sm, name);
   append(sm, "</a>");
 }
 
-static void append_id_link(StateMachine * sm, const char * title, const char * id_name, const char * url) {
+static void append_id_link(StateMachine * sm, const char * title, const char * id_name, const char * url, const std::string_view id) {
   if (url[0] == '/') {
     append(sm, "<a class=\"dtext-link dtext-id-link dtext-");
+    append(sm, id_name);
+    append(sm, "-id-link\" href=\"");
+    append_relative_url(sm, url);
   } else {
     append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-");
+    append(sm, id_name);
+    append(sm, "-id-link\" href=\"");
+    append_html_escaped(sm, url);
   }
 
-  append(sm, id_name);
-  append(sm, "-id-link\" href=\"");
-  append_url(sm, url);
-  append_uri_escaped(sm, { sm->a1, sm->a2 });
+  append_uri_escaped(sm, id);
   append(sm, "\">");
   append(sm, title);
   append(sm, " #");
-  append_html_escaped(sm, { sm->a1, sm->a2 });
-  append(sm, "</a>");
-}
-
-static void append_unnamed_url(StateMachine * sm, const std::string_view url) {
-  if (is_internal_url(sm, url)) {
-    append(sm, "<a class=\"dtext-link\" href=\"");
-  } else {
-    append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
-  }
-
-  append_html_escaped(sm, url);
-  append(sm, "\">");
-  append_html_escaped(sm, url);
+  append_html_escaped(sm, id);
   append(sm, "</a>");
 }
 
@@ -910,34 +921,90 @@ static void append_bare_unnamed_url(StateMachine * sm, const std::string_view ur
   }
 }
 
+static void append_unnamed_url(StateMachine * sm, const std::string_view url) {
+  DText::URL parsed_url(url);
+
+  if (sm->options.internal_domains.find(std::string(parsed_url.domain)) != sm->options.internal_domains.end()) {
+    append_internal_url(sm, parsed_url);
+  } else {
+    append_absolute_link(sm, url, url, parsed_url.domain == sm->options.domain);
+  }
+}
+
+static void append_internal_url(StateMachine * sm, const DText::URL& url) {
+  auto path_components = url.path_components();
+  auto query = url.query;
+  auto fragment = url.fragment;
+
+  if (path_components.size() == 2) {
+    auto controller = path_components.at(0);
+    auto id = path_components.at(1);
+
+    if (!id.empty() && std::all_of(id.begin(), id.end(), ::isdigit)) {
+      if (controller == "posts" && fragment.empty()) {
+        // https://danbooru.donmai.us/posts/6000000#comment_2288996
+        return append_id_link(sm, "post", "post", "/posts/", id);
+      } else if (controller == "pools" && query.empty()) {
+        // https://danbooru.donmai.us/pools/903?page=2
+        return append_id_link(sm, "pool", "pool", "/pools/", id);
+      } else if (controller == "comments") {
+        return append_id_link(sm, "comment", "comment", "/comments/", id);
+      } else if (controller == "forum_posts") {
+        return append_id_link(sm, "forum", "forum-post", "/forum_posts/", id);
+      } else if (controller == "forum_topics" && query.empty() && fragment.empty()) {
+        // https://danbooru.donmai.us/forum_topics/1234?page=2
+        // https://danbooru.donmai.us/forum_topics/1234#forum_post_5678
+        return append_id_link(sm, "topic", "forum-topic", "/forum_topics/", id);
+      } else if (controller == "users") {
+        return append_id_link(sm, "user", "user", "/users/", id);
+      } else if (controller == "artists") {
+        return append_id_link(sm, "artist", "artist", "/artists/", id);
+      } else if (controller == "notes") {
+        return append_id_link(sm, "note", "note", "/notes/", id);
+      } else if (controller == "favorite_groups" && query.empty()) {
+        // https://danbooru.donmai.us/favorite_groups/1234?page=2
+        return append_id_link(sm, "favgroup", "favorite-group", "/favorite_groups/", id);
+      } else if (controller == "wiki_pages" && fragment.empty()) {
+        // http://danbooru.donmai.us/wiki_pages/10933#dtext-self-upload
+        return append_id_link(sm, "wiki", "wiki-page", "/wiki_pages/", id);
+      }
+    } else if (controller == "wiki_pages" && fragment.empty()) {
+      return append_wiki_link(sm, {}, id, {}, id, {});
+    }
+  } else if (path_components.size() >= 3) {
+    // http://danbooru.donmai.us/post/show/1234/touhou
+    auto controller = path_components.at(0);
+    auto action = path_components.at(1);
+    auto id = path_components.at(2);
+
+    if (!id.empty() && std::all_of(id.begin(), id.end(), ::isdigit)) {
+      if (controller == "post" && action == "show") {
+        return append_id_link(sm, "post", "post", "/posts/", id);
+      }
+    }
+  }
+
+  append_absolute_link(sm, url.url, url.url, url.domain == sm->options.domain);
+}
+
 static void append_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
   auto parsed_title = sm->parse_basic_inline(title);
 
   // protocol-relative url; treat `//example.com` like `http://example.com`
   if (url.size() > 2 && url.starts_with("//")) {
-    if (is_internal_url(sm, "http:" + std::string(url))) {
-      append(sm, "<a class=\"dtext-link\" href=\"http:");
-    } else {
-      append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"http:");
-    }
+    auto full_url = "http:" + std::string(url);
+    append_absolute_link(sm, full_url, parsed_title, is_internal_url(sm, full_url), false);
   } else if (url[0] == '/' || url[0] == '#') {
     append(sm, "<a class=\"dtext-link\" href=\"");
-
-    if (!sm->options.base_url.empty()) {
-      append(sm, sm->options.base_url);
-    }
+    append_relative_url(sm, url);
+    append(sm, "\">");
+    append(sm, parsed_title);
+    append(sm, "</a>");
+  } else if (url == title) {
+    append_unnamed_url(sm, url);
   } else {
-    if (is_internal_url(sm, url)) {
-      append(sm, "<a class=\"dtext-link\" href=\"");
-    } else {
-      append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"");
-    }
+    append_absolute_link(sm, url, parsed_title, is_internal_url(sm, url), false);
   }
-
-  append_html_escaped(sm, url);
-  append(sm, "\">");
-  append(sm, parsed_title);
-  append(sm, "</a>");
 }
 
 static void append_bare_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
@@ -956,7 +1023,7 @@ static void append_post_search_link(StateMachine * sm, const std::string_view pr
   auto normalized_title = std::string(title);
 
   append(sm, "<a class=\"dtext-link dtext-post-search-link\" href=\"");
-  append_url(sm, "/posts?tags=");
+  append_relative_url(sm, "/posts?tags=");
   append_uri_escaped(sm, search);
   append(sm, "\">");
 
@@ -1009,7 +1076,7 @@ static void append_wiki_link(StateMachine * sm, const std::string_view prefix, c
   }
 
   append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"");
-  append_url(sm, "/wiki_pages/");
+  append_relative_url(sm, "/wiki_pages/");
   append_uri_escaped(sm, normalized_tag);
 
   if (!anchor.empty()) {
@@ -1030,7 +1097,7 @@ static void append_wiki_link(StateMachine * sm, const std::string_view prefix, c
 
 static void append_paged_link(StateMachine * sm, const char * title, const char * tag, const char * href, const char * param) {
   append(sm, tag);
-  append_url(sm, href);
+  append_relative_url(sm, href);
   append(sm, sm->a1, sm->a2);
   append(sm, param);
   append(sm, sm->b1, sm->b2);
@@ -1044,7 +1111,7 @@ static void append_paged_link(StateMachine * sm, const char * title, const char 
 
 static void append_dmail_key_link(StateMachine * sm) {
   append(sm, "<a class=\"dtext-link dtext-id-link dtext-dmail-id-link\" href=\"");
-  append_url(sm, "/dmails/");
+  append_relative_url(sm, "/dmails/");
   append(sm, sm->a1, sm->a2);
   append(sm, "?key=");
   append_uri_escaped(sm, { sm->b1, sm->b2 });
