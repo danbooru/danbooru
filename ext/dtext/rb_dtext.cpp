@@ -7,9 +7,10 @@ static VALUE cDText = Qnil;
 static VALUE cDTextError = Qnil;
 
 static void validate_dtext(VALUE string) {
-  // if input.encoding != Encoding::UTF_8
-  if (rb_enc_get_index(string) != rb_utf8_encindex()) {
-    rb_raise(cDTextError, "input must be UTF-8");
+  // if input.encoding != Encoding::UTF_8 || input.encoding != Encoding::USASCII
+  int encoding = rb_enc_get_index(string);
+  if (encoding != rb_usascii_encindex() && encoding != rb_utf8_encindex()) {
+    rb_raise(cDTextError, "input must be US-ASCII or UTF-8");
   }
 
   // if !input.valid_encoding?

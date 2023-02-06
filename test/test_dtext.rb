@@ -1509,6 +1509,14 @@ class DTextTest < Minitest::Test
     assert_raises(DText::Error) { parse("foo\0bar") }
   end
 
+  def test_encodings
+    assert_parse("<p>foo</p>", "foo".dup.force_encoding("US-ASCII"))
+    assert_parse("<p>foo</p>", "foo".dup.force_encoding("UTF-8"))
+    assert_raises(DText::Error) { parse("foo".dup.force_encoding("ASCII-8BIT")) }
+    assert_raises(DText::Error) { parse("\xFF".dup.force_encoding("US-ASCII")) }
+    assert_raises(DText::Error) { parse("\xFF".dup.force_encoding("UTF-8")) }
+  end
+
   def test_wiki_link_xss
     assert_raises(DText::Error) do
       parse("[[\xFA<script \xFA>alert(42); //\xFA</script \xFA>]]")
