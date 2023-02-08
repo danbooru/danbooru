@@ -1064,6 +1064,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>***</p>', "***")
     assert_parse('<p>*<br>*<br>*</p>', "*\n*\n*")
     assert_parse('<p>* <br>blah</p>', "* \r\nblah")
+    assert_parse('<p>* </p>', '* ')
   end
 
   def test_post_search_links

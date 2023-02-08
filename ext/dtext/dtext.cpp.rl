@@ -134,7 +134,7 @@ utf8_boundary_char =
   0xEF 0xBD 0xA3 ; # '｣' U+FF63 HALFWIDTH RIGHT CORNER BRACKET
 
 nonspace = ^space - eos;
-nonnewline = any - (newline | '\r');
+nonnewline = any - newline - eos - '\r';
 nonbracket = ^']';
 nonpipe = ^'|';
 nonpipebracket = nonpipe & nonbracket;
