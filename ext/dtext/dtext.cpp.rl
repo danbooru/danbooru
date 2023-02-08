@@ -200,15 +200,28 @@ bare_username = ([_.]? mention_nonboundary_char mention_char* mention_nonboundar
 bare_mention = ('@' when after_mention_boundary) (bare_username >mark_a1 @mark_a2);
 delimited_mention = '<@' (nonspace nonnewline*) >mark_a1 %mark_a2 :>> '>';
 
-url = 'http'i 's'i? '://' nonspace+;
-delimited_url = '<' url >mark_a1 %mark_a2 :>> '>';
+http = 'http'i 's'i? '://';
+subdomain = (utf8char | alnum | [_\-])+;
+domain = subdomain ('.' subdomain)+;
+port = ':' [0-9]+;
+
+url_char = char - space - eos;
+path = '/' (url_char - [?#])*;
+query = '?' (url_char - [#])*;
+fragment = '#' url_char*;
+
+bare_absolute_url = http domain port? path? query? fragment?;
+
+delimited_absolute_url = http nonspace+;
 relative_url = [/#] nonspace*;
-basic_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':' (url | relative_url) >mark_b1 %mark_b2;
-bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (url | relative_url) >mark_b1 %mark_b2 :>> ']';
+
+delimited_url = '<' delimited_absolute_url >mark_a1 %mark_a2 :>> '>';
+basic_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':' (bare_absolute_url | relative_url) >mark_b1 @mark_b2;
+bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (delimited_absolute_url | relative_url) >mark_b1 %mark_b2 :>> ']';
 
 # XXX: internal markdown links aren't allowed to avoid parsing closing tags as links: `[b]foo[/b](bar)`.
-markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonnewline+ >mark_b1 %mark_b2 :>> ')';
-html_link = '<a'i ws+ 'href="'i (url | relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
+markdown_link = '[' delimited_absolute_url >mark_a1 %mark_a2 :>> '](' nonnewline+ >mark_b1 %mark_b2 :>> ')';
+html_link = '<a'i ws+ 'href="'i (delimited_absolute_url | relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
 emoticon_tags = '|' alnum | ':|' | '|_|' | '||_||' | '\\||/' | '<|>_<|>' | '>:|' | '>|3' | '|w|' | ':{' | ':}';
 wiki_prefix = alnum* >mark_a1 %mark_a2;
@@ -364,7 +377,7 @@ inline := |*
   };
 
   basic_textile_link => {
-    append_bare_named_url(sm, { sm->b1, sm->b2 }, { sm->a1, sm->a2 });
+    append_bare_named_url(sm, { sm->b1, sm->b2 + 1 }, { sm->a1, sm->a2 });
   };
 
   bracketed_textile_link => {
@@ -375,7 +388,7 @@ inline := |*
     append_named_url(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 });
   };
 
-  url => {
+  bare_absolute_url => {
     append_bare_unnamed_url(sm, { sm->ts, sm->te });
   };
 

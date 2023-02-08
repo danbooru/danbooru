@@ -36,15 +36,15 @@ class URL {
  private:
 
   void parse() {
-    // https://user:pass@danbooru.donmai.us:443/posts/1234?q=touhou#comment-1234
-    static const std::regex url_regex("^https?://([^/]+@)?([a-zA-Z0-9.-]+)(:[0-9]+)?(?:/([^?#]*))?(?:\\?([^#]*))?(?:#(.*))?$", std::regex_constants::icase | std::regex_constants::optimize);
+    // https://danbooru.donmai.us:443/posts/1234?q=touhou#comment-1234
+    static const std::regex url_regex("^https?://([^/?#:]+)(:[0-9]+)?(?:/([^?#]*))?(?:\\?([^#]*))?(?:#(.*))?$", std::regex_constants::icase | std::regex_constants::optimize);
     std::match_results<std::string_view::const_iterator> matches;
 
     if (std::regex_search(url.begin(), url.end(), matches, url_regex)) {
-      domain = { matches[2].first, matches[2].second };
-      path = { matches[4].first, matches[4].second };
-      query = { matches[5].first, matches[5].second };
-      fragment = { matches[6].first, matches[6].second };
+      domain = { matches[1].first, matches[1].second };
+      path = { matches[3].first, matches[3].second };
+      query = { matches[4].first, matches[4].second };
+      fragment = { matches[5].first, matches[5].second };
     };
   }
 };
