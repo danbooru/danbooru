@@ -181,6 +181,13 @@ bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (delimited_absolut
 markdown_link = '[' delimited_absolute_url >mark_a1 %mark_a2 :>> '](' nonnewline+ >mark_b1 %mark_b2 :>> ')';
 html_link = '<a'i ws+ 'href="'i (delimited_absolute_url | delimited_relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
+unquoted_bbcode_url = delimited_absolute_url | delimited_relative_url;
+double_quoted_bbcode_url = '"' unquoted_bbcode_url >mark_b1 %mark_b2 :>> '"';
+single_quoted_bbcode_url = "'" unquoted_bbcode_url >mark_b1 %mark_b2 :>> "'";
+bbcode_url = double_quoted_bbcode_url | single_quoted_bbcode_url | unquoted_bbcode_url >mark_b1 %mark_b2;
+named_bbcode_link   = '[url'i ws* '=' ws* (bbcode_url :>> ws* ']') ws* (nonnewline+ >mark_a1 %mark_a2 :>> ws* '[/url]'i);
+unnamed_bbcode_link = '[url]'i ws* unquoted_bbcode_url >mark_a1 %mark_a2 ws* :>> '[/url]'i;
+
 emoticon_tags = '|' alnum | ':|' | '|_|' | '||_||' | '\\||/' | '<|>_<|>' | '>:|' | '>|3' | '|w|' | ':{' | ':}';
 wiki_prefix = alnum* >mark_a1 %mark_a2;
 wiki_suffix = alnum* >mark_e1 %mark_e2;
@@ -338,7 +345,7 @@ inline := |*
     append_bare_named_url(sm, { sm->b1, sm->b2 + 1 }, { sm->a1, sm->a2 });
   };
 
-  bracketed_textile_link => {
+  bracketed_textile_link | named_bbcode_link => {
     append_named_url(sm, { sm->b1, sm->b2 }, { sm->a1, sm->a2 });
   };
 
@@ -350,7 +357,7 @@ inline := |*
     append_bare_unnamed_url(sm, { sm->ts, sm->te });
   };
 
-  delimited_url => {
+  delimited_url | unnamed_bbcode_link => {
     append_unnamed_url(sm, { sm->a1, sm->a2 });
   };
 
