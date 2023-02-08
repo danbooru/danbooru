@@ -433,6 +433,11 @@ class DTextTest < Minitest::Test
 
     assert_inline_parse("<u>foo</u>", "[u]foo[/u]")
     assert_inline_parse("<u>foo</u>", "<u>foo</u>")
+
+    assert_inline_parse("blah", "[expand]blah[/expand]")
+    assert_inline_parse("blah", "[expand=title]blah[/expand]")
+
+    assert_inline_parse("", "[hr]")
   end
 
   def test_inline_tn

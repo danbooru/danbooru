@@ -662,16 +662,16 @@ main := |*
   open_expand space* => {
     dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_EXPAND, "<details>");
-    append(sm, "<summary>Show</summary><div>");
+    append_block(sm, "<summary>Show</summary><div>");
   };
 
   aliased_expand space* => {
     g_debug("block [expand=]");
     dstack_close_leaf_blocks(sm);
     dstack_open_block(sm, BLOCK_EXPAND, "<details>");
-    append(sm, "<summary>");
-    append_html_escaped(sm, { sm->a1, sm->a2 });
-    append(sm, "</summary><div>");
+    append_block(sm, "<summary>");
+    append_block_html_escaped(sm, { sm->a1, sm->a2 });
+    append_block(sm, "</summary><div>");
   };
 
   open_nodtext blank_line? => {
@@ -693,7 +693,7 @@ main := |*
 
   hr => {
     g_debug("write '<hr>' (pos: %ld)", sm->ts - sm->pb);
-    append(sm, "<hr>");
+    append_block(sm, "<hr>");
   };
 
   list_item => {
