@@ -147,7 +147,7 @@ private:
   std::string parse();
 };
 
-static const char* find_boundary_c(const char* c);
+static std::tuple<std::string_view, std::string_view> trim_url(const std::string_view url);
 static std::tuple<std::string_view, std::string_view, std::string_view, std::string_view> parse_url(const std::string_view url);
 static std::vector<std::string_view> split_string(const std::string_view input, char delim = '/');
 static void dstack_open_inline(StateMachine * sm, element_t type, const char * html);

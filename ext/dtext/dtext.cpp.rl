@@ -41,52 +41,6 @@ static const std::unordered_map<std::string_view, std::function<bool(std::string
   { "rowspan", [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
 };
 
-// Characters that mark the end of a link.
-//
-// http://www.fileformat.info/info/unicode/category/Pe/list.htm
-// http://www.fileformat.info/info/unicode/block/cjk_symbols_and_punctuation/list.htm
-static char32_t boundary_characters[] = {
-  0x0021, // '!' U+0021 EXCLAMATION MARK
-  0x0029, // ')' U+0029 RIGHT PARENTHESIS
-  0x002C, // ',' U+002C COMMA
-  0x002E, // '.' U+002E FULL STOP
-  0x003A, // ':' U+003A COLON
-  0x003B, // ';' U+003B SEMICOLON
-  0x003C, // '<' U+003C LESS-THAN SIGN
-  0x003E, // '>' U+003E GREATER-THAN SIGN
-  0x003F, // '?' U+003F QUESTION MARK
-  0x005D, // ']' U+005D RIGHT SQUARE BRACKET
-  0x007D, // '}' U+007D RIGHT CURLY BRACKET
-  0x276D, // '❭' U+276D MEDIUM RIGHT-POINTING ANGLE BRACKET ORNAMENT
-  0x3000, // '　' U+3000 IDEOGRAPHIC SPACE (U+3000)
-  0x3001, // '、' U+3001 IDEOGRAPHIC COMMA (U+3001)
-  0x3002, // '。' U+3002 IDEOGRAPHIC FULL STOP (U+3002)
-  0x3008, // '〈' U+3008 LEFT ANGLE BRACKET (U+3008)
-  0x3009, // '〉' U+3009 RIGHT ANGLE BRACKET (U+3009)
-  0x300A, // '《' U+300A LEFT DOUBLE ANGLE BRACKET (U+300A)
-  0x300B, // '》' U+300B RIGHT DOUBLE ANGLE BRACKET (U+300B)
-  0x300C, // '「' U+300C LEFT CORNER BRACKET (U+300C)
-  0x300D, // '」' U+300D RIGHT CORNER BRACKET (U+300D)
-  0x300E, // '『' U+300E LEFT WHITE CORNER BRACKET (U+300E)
-  0x300F, // '』' U+300F RIGHT WHITE CORNER BRACKET (U+300F)
-  0x3010, // '【' U+3010 LEFT BLACK LENTICULAR BRACKET (U+3010)
-  0x3011, // '】' U+3011 RIGHT BLACK LENTICULAR BRACKET (U+3011)
-  0x3014, // '〔' U+3014 LEFT TORTOISE SHELL BRACKET (U+3014)
-  0x3015, // '〕' U+3015 RIGHT TORTOISE SHELL BRACKET (U+3015)
-  0x3016, // '〖' U+3016 LEFT WHITE LENTICULAR BRACKET (U+3016)
-  0x3017, // '〗' U+3017 RIGHT WHITE LENTICULAR BRACKET (U+3017)
-  0x3018, // '〘' U+3018 LEFT WHITE TORTOISE SHELL BRACKET (U+3018)
-  0x3019, // '〙' U+3019 RIGHT WHITE TORTOISE SHELL BRACKET (U+3019)
-  0x301A, // '〚' U+301A LEFT WHITE SQUARE BRACKET (U+301A)
-  0x301B, // '〛' U+301B RIGHT WHITE SQUARE BRACKET (U+301B)
-  0x301C, // '〜' U+301C WAVE DASH (U+301C)
-  0xFF09, // '）' U+FF09 FULLWIDTH RIGHT PARENTHESIS
-  0xFF3D, // '］' U+FF3D FULLWIDTH RIGHT SQUARE BRACKET
-  0xFF5D, // '｝' U+FF5D FULLWIDTH RIGHT CURLY BRACKET
-  0xFF60, // '｠' U+FF60 FULLWIDTH RIGHT WHITE PARENTHESIS
-  0xFF63, // '｣' U+FF63 HALFWIDTH RIGHT CORNER BRACKET
-};
-
 %%{
 machine dtext;
 
@@ -146,7 +100,9 @@ utf8char  = 0xC2..0xDF 0x80..0xBF
           | 0xF0..0xF4 0x80..0xBF 0x80..0xBF 0x80..0xBF;
 char = asciichar | utf8char;
 
-# Characters that can't be the first or last character in a @-mention.
+# Characters that can't be the first or last character in a @-mention, or be contained in a URL.
+# http://www.fileformat.info/info/unicode/category/Pe/list.htm
+# http://www.fileformat.info/info/unicode/block/cjk_symbols_and_punctuation/list.htm
 utf8_boundary_char =
   0xE2 0x9D 0xAD | # '❭' U+276D MEDIUM RIGHT-POINTING ANGLE BRACKET ORNAMENT
   0xE3 0x80 0x80 | # '　' U+3000 IDEOGRAPHIC SPACE (U+3000)
@@ -205,23 +161,25 @@ subdomain = (utf8char | alnum | [_\-])+;
 domain = subdomain ('.' subdomain)+;
 port = ':' [0-9]+;
 
-url_char = char - space - eos;
-path = '/' (url_char - [?#])*;
+url_boundary_char = ["':;,.?] | utf8_boundary_char;
+url_char = char - space - eos - utf8_boundary_char;
+path = '/' (url_char - [?#<>[\]])*;
 query = '?' (url_char - [#])*;
-fragment = '#' url_char*;
+fragment = '#' (url_char - [#<>[\]])*;
 
-bare_absolute_url = http domain port? path? query? fragment?;
+bare_absolute_url = (http domain port? path? query? fragment?) - (char* url_boundary_char);
+bare_relative_url = (path query? fragment? | fragment) - (char* url_boundary_char);
 
 delimited_absolute_url = http nonspace+;
-relative_url = [/#] nonspace*;
+delimited_relative_url = [/#] nonspace*;
 
 delimited_url = '<' delimited_absolute_url >mark_a1 %mark_a2 :>> '>';
-basic_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':' (bare_absolute_url | relative_url) >mark_b1 @mark_b2;
-bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (delimited_absolute_url | relative_url) >mark_b1 %mark_b2 :>> ']';
+basic_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':' (bare_absolute_url | bare_relative_url) >mark_b1 @mark_b2;
+bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (delimited_absolute_url | delimited_relative_url) >mark_b1 %mark_b2 :>> ']';
 
 # XXX: internal markdown links aren't allowed to avoid parsing closing tags as links: `[b]foo[/b](bar)`.
 markdown_link = '[' delimited_absolute_url >mark_a1 %mark_a2 :>> '](' nonnewline+ >mark_b1 %mark_b2 :>> ')';
-html_link = '<a'i ws+ 'href="'i (delimited_absolute_url | relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
+html_link = '<a'i ws+ 'href="'i (delimited_absolute_url | delimited_relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
 emoticon_tags = '|' alnum | ':|' | '|_|' | '||_||' | '\\||/' | '<|>_<|>' | '>:|' | '>|3' | '|w|' | ':{' | ':}';
 wiki_prefix = alnum* >mark_a1 %mark_a2;
@@ -924,15 +882,9 @@ static void append_id_link(StateMachine * sm, const char * title, const char * i
 }
 
 static void append_bare_unnamed_url(StateMachine * sm, const std::string_view url) {
-  const char* match_end = end(url);
-  const char* url_start = begin(url);
-  const char* url_end = find_boundary_c(match_end - 1) + 1;
-
-  append_unnamed_url(sm, { url_start, url_end });
-
-  if (url_end < match_end) {
-    append_html_escaped(sm, { url_end, match_end });
-  }
+  auto [trimmed_url, leftovers] = trim_url(url);
+  append_unnamed_url(sm, trimmed_url);
+  append_html_escaped(sm, leftovers);
 }
 
 static void append_unnamed_url(StateMachine * sm, const std::string_view url) {
@@ -1021,16 +973,10 @@ static void append_named_url(StateMachine * sm, const std::string_view url, cons
   }
 }
 
-static void append_bare_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
-  const char* match_end = end(url);
-  const char* url_start = begin(url);
-  const char* url_end = find_boundary_c(match_end - 1) + 1;
-
-  append_named_url(sm, { url_start, url_end }, title);
-
-  if (url_end < match_end) {
-    append_html_escaped(sm, { url_end, match_end });
-  }
+static void append_bare_named_url(StateMachine * sm, const std::string_view url, std::string_view title) {
+  auto [trimmed_url, leftovers] = trim_url(url);
+  append_named_url(sm, trimmed_url, title);
+  append_html_escaped(sm, leftovers);
 }
 
 static void append_post_search_link(StateMachine * sm, const std::string_view prefix, const std::string_view search, const std::string_view title, const std::string_view suffix) {
@@ -1437,42 +1383,15 @@ static bool is_mention_boundary(unsigned char c) {
   }
 }
 
-static std::tuple<char32_t, int> get_utf8_char(const char* c) {
-  const unsigned char* p = reinterpret_cast<const unsigned char*>(c);
+// Trim trailing unbalanced ')' characters from the URL.
+static std::tuple<std::string_view, std::string_view> trim_url(const std::string_view url) {
+  std::string_view trimmed = url;
 
-  // 0x10xxxxxx is a continuation byte; back up to the leading byte.
-  while ((p[0] >> 6) == 0b10) {
-    p--;
+  while (!trimmed.empty() && trimmed.back() == ')' && std::count(trimmed.begin(), trimmed.end(), ')') > std::count(trimmed.begin(), trimmed.end(), '(')) {
+    trimmed.remove_suffix(1);
   }
 
-  if (p[0] >> 7 == 0) {
-    // 0x0xxxxxxx
-    return { p[0], 1 };
-  } else if ((p[0] >> 5) == 0b110) {
-    // 0x110xxxxx, 0x10xxxxxx
-    return { ((p[0] & 0b00011111) << 6) | (p[1] & 0b00111111), 2 };
-  } else if ((p[0] >> 4) == 0b1110) {
-    // 0x1110xxxx, 0x10xxxxxx, 0x10xxxxxx
-    return { ((p[0] & 0b00001111) << 12) | (p[1] & 0b00111111) << 6 | (p[2] & 0b00111111), 3 };
-  } else if ((p[0] >> 3) == 0b11110) {
-    // 0x11110xxx, 0x10xxxxxx, 0x10xxxxxx, 0x10xxxxxx
-    return { ((p[0] & 0b00000111) << 18) | (p[1] & 0b00111111) << 12 | (p[2] & 0b00111111) << 6 | (p[3] & 0b00111111), 4 };
-  } else {
-    return { 0, 0 };
-  }
-}
-
-// Returns the preceding non-boundary character if `c` is a boundary character.
-// Otherwise, returns `c` if `c` is not a boundary character. Boundary characters
-// are trailing punctuation characters that should not be part of the matched text.
-static const char* find_boundary_c(const char* c) {
-  auto [ch, len] = get_utf8_char(c);
-
-  if (std::binary_search(std::begin(boundary_characters), std::end(boundary_characters), ch)) {
-    return c - len;
-  } else {
-    return c;
-  }
+  return { trimmed, { trimmed.end(), url.end() } };
 }
 
 StateMachine::StateMachine(const auto string, int initial_state, const DTextOptions options) : options(options) {

@@ -637,7 +637,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p>a [<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>] b</p>', 'a [http://test.com] b')
     assert_parse('<p>a {<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>} b</p>', 'a {http://test.com} b')
     assert_parse('<p>a(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>) b</p>', 'a(http://test.com) b')
-    assert_parse('<p>(at <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/1234?page=42)">http://test.com/1234?page=42)</a>. blah</p>', '(at http://test.com/1234?page=42). blah')
+    assert_parse('<p>(at <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/1234?page=42">http://test.com/1234?page=42</a>). blah</p>', '(at http://test.com/1234?page=42). blah')
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/~bob/image.jpg">http://test.com/~bob/image.jpg</a> b</p>', 'a http://test.com/~bob/image.jpg b')
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/home.html#toc">http://test.com/home.html#toc</a> b</p>', 'a http://test.com/home.html#toc b')
 
@@ -706,8 +706,8 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/posts?tags=foo%00bar">https://danbooru.donmai.us/posts?tags=foo%00bar</a></p>', 'https://danbooru.donmai.us/posts?tags=foo%00bar', domain: "danbooru.donmai.us")
 
     assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/post/show/810829/arms_behind_back-ayanami_rei">http://danbooru.donmai.us/post/show/810829/arms_behind_back-ayanami_rei</a></p>', 'http://danbooru.donmai.us/post/show/810829/arms_behind_back-ayanami_rei', domain: "danbooru.donmai.us")
-    assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/post/show/####">http://danbooru.donmai.us/post/show/####</a></p>', 'http://danbooru.donmai.us/post/show/####', domain: "danbooru.donmai.us")
-    assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/posts/####">http://danbooru.donmai.us/posts/####</a></p>', 'http://danbooru.donmai.us/posts/####', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/post/show/#">http://danbooru.donmai.us/post/show/#</a>###</p>', 'http://danbooru.donmai.us/post/show/####', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/posts/#">http://danbooru.donmai.us/posts/#</a>###</p>', 'http://danbooru.donmai.us/posts/####', domain: "danbooru.donmai.us")
   end
 
   def test_internal_link_to_shortlink_conversion
@@ -847,16 +847,57 @@ class DTextTest < Minitest::Test
     #assert_parse('<p>&lt;https://?&gt;</p>', '<https://?>')
     #assert_parse('<p>&lt;https://:&gt;</p>', '<https://:>')
 
+    # boundary chars
     assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com:80">http://example.com:80</a></p>}, %{http://example.com:80})
     assert_parse(%{<p>'<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>'</p>}, %{'http://example.com'})
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>!</p>}, %{http://example.com!})
     assert_parse(%{<p>&quot;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>&quot;</p>}, %{"http://example.com"})
+    assert_parse(%{<p>&quot;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>&quot;:</p>}, %{"http://example.com":})
+    assert_parse(%{<p>&quot;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>&quot;&gt;</p>}, %{"http://example.com">})
     assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>)</p>}, %{(http://example.com)})
     assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>).</p>}, %{(http://example.com).})
     assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>),</p>}, %{(http://example.com),})
+    assert_parse(%{<p>「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>」</p>}, %{「http://example.com」})
+    assert_parse(%{<p>（<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>）</p>}, %{（http://example.com）})
     assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>[/quote]</p>}, %{http://example.com[/quote]})
-    assert_parse('<p>「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>」</p>', '「http://example.com」')
-    assert_parse('<p>（<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>）</p>', '（http://example.com）')
 
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com:80/path">http://example.com:80/path</a></p>}, %{http://example.com:80/path})
+    assert_parse(%{<p>'<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path">http://example.com/path</a>'</p>}, %{'http://example.com/path'})
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path!">http://example.com/path!</a></p>}, %{http://example.com/path!})
+    assert_parse(%{<p>&quot;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path">http://example.com/path</a>&quot;</p>}, %{"http://example.com/path"})
+    assert_parse(%{<p>&quot;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path">http://example.com/path</a>&quot;:</p>}, %{"http://example.com/path":})
+    assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path">http://example.com/path</a>)</p>}, %{(http://example.com/path)})
+    assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path">http://example.com/path</a>).</p>}, %{(http://example.com/path).})
+    assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path">http://example.com/path</a>),</p>}, %{(http://example.com/path),})
+    assert_parse(%{<p>「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path">http://example.com/path</a>」</p>}, %{「http://example.com/path」})
+    assert_parse(%{<p>（<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path">http://example.com/path</a>）</p>}, %{（http://example.com/path）})
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path">http://example.com/path</a>[/quote]</p>}, %{http://example.com/path[/quote]})
+
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com:80/path?query">http://example.com:80/path?query</a></p>}, %{http://example.com:80/path?query})
+    assert_parse(%{<p>'<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query">http://example.com/path?query</a>'</p>}, %{'http://example.com/path?query'})
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query!">http://example.com/path?query!</a></p>}, %{http://example.com/path?query!})
+    assert_parse(%{<p>&quot;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query">http://example.com/path?query</a>&quot;</p>}, %{"http://example.com/path?query"})
+    assert_parse(%{<p>&quot;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query">http://example.com/path?query</a>&quot;:</p>}, %{"http://example.com/path?query":})
+    assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query">http://example.com/path?query</a>)</p>}, %{(http://example.com/path?query)})
+    assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query">http://example.com/path?query</a>).</p>}, %{(http://example.com/path?query).})
+    assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query">http://example.com/path?query</a>),</p>}, %{(http://example.com/path?query),})
+    assert_parse(%{<p>「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query">http://example.com/path?query</a>」</p>}, %{「http://example.com/path?query」})
+    assert_parse(%{<p>（<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query">http://example.com/path?query</a>）</p>}, %{（http://example.com/path?query）})
+    #assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query">http://example.com/path?query</a>[/quote]</p>}, %{http://example.com/path?query[/quote]})
+
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com:80/path?query#fragment">http://example.com:80/path?query#fragment</a></p>}, %{http://example.com:80/path?query#fragment})
+    assert_parse(%{<p>'<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query#fragment">http://example.com/path?query#fragment</a>'</p>}, %{'http://example.com/path?query#fragment'})
+    assert_parse(%{<p>'<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query#fragment!">http://example.com/path?query#fragment!</a></p>}, %{'http://example.com/path?query#fragment!})
+    assert_parse(%{<p>&quot;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query#fragment">http://example.com/path?query#fragment</a>&quot;</p>}, %{"http://example.com/path?query#fragment"})
+    assert_parse(%{<p>&quot;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query#fragment">http://example.com/path?query#fragment</a>&quot;:</p>}, %{"http://example.com/path?query#fragment":})
+    assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query#fragment">http://example.com/path?query#fragment</a>)</p>}, %{(http://example.com/path?query#fragment)})
+    assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query#fragment">http://example.com/path?query#fragment</a>).</p>}, %{(http://example.com/path?query#fragment).})
+    assert_parse(%{<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query#fragment">http://example.com/path?query#fragment</a>),</p>}, %{(http://example.com/path?query#fragment),})
+    assert_parse(%{<p>「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query#fragment">http://example.com/path?query#fragment</a>」</p>}, %{「http://example.com/path?query#fragment」})
+    assert_parse(%{<p>（<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query#fragment">http://example.com/path?query#fragment</a>）</p>}, %{（http://example.com/path?query#fragment）})
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/path?query#fragment">http://example.com/path?query#fragment</a>[/quote]</p>}, %{http://example.com/path?query#fragment[/quote]})
+
+    # misc
     assert_parse('<p>http://<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://cramnuts.web.fc2.com/index.html">http://cramnuts.web.fc2.com/index.html</a></p>', 'http://http://cramnuts.web.fc2.com/index.html')
     assert_parse('<p>（アートスペースエーワン)<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://www.artspace-a1.com">http://www.artspace-a1.com</a>)にてこちらの原画他、</p>', '（アートスペースエーワン)http://www.artspace-a1.com)にてこちらの原画他、')
     assert_parse('<p>&quot;Referer: <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://www.pixiv.net">http://www.pixiv.net</a>&quot;.</p>', '"Referer: http://www.pixiv.net".')
@@ -864,13 +905,15 @@ class DTextTest < Minitest::Test
     assert_parse('<p>[url=&quot;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://customseekdeal.com">http://customseekdeal.com</a>&quot;]custom</p>', '[url="http://customseekdeal.com"]custom')
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://en.wikipedia.org/wiki/Natsume_Sōseki">http://en.wikipedia.org/wiki/Natsume_Sōseki</a></p>', 'http://en.wikipedia.org/wiki/Natsume_Sōseki')
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://example.com">https://example.com</a>@gmail.com</p>', 'https://example.com@gmail.com')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://transformers.wikia.com/wiki/Starscream_(Movie)">http://transformers.wikia.com/wiki/Starscream_(Movie)</a>,</p>', 'http://transformers.wikia.com/wiki/Starscream_(Movie),')
 
     # trailing tags
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://www.pixiv.net">Pixiv</a>.[/quote]</p>', '"Pixiv":http://www.pixiv.net.[/quote]')
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://edwinhuang.tumblr.com">http://edwinhuang.tumblr.com</a>[/quote]</p>', 'http://edwinhuang.tumblr.com[/quote]')
-    #assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://edwinhuang.tumblr.com/">http://edwinhuang.tumblr.com/</a>[/quote]</p>', 'http://edwinhuang.tumblr.com/[/quote]')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://edwinhuang.tumblr.com/">http://edwinhuang.tumblr.com/</a>[/quote]</p>', 'http://edwinhuang.tumblr.com/[/quote]')
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://edwinhuang.tumblr.com">http://edwinhuang.tumblr.com</a>&lt;/quote&gt;</p>', 'http://edwinhuang.tumblr.com</quote>')
-    #assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://edwinhuang.tumblr.com/">http://edwinhuang.tumblr.com/</a>&lt;/quote&gt;</p>', 'http://edwinhuang.tumblr.com/</quote>')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://edwinhuang.tumblr.com/">http://edwinhuang.tumblr.com/</a>&lt;/quote&gt;</p>', 'http://edwinhuang.tumblr.com/</quote>')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://www.youtube.com/watch#!v=qvRqnd4ymus">http://www.youtube.com/watch#!v=qvRqnd4ymus</a><strong>&amp;feature=related</strong></p>', 'http://www.youtube.com/watch#!v=qvRqnd4ymus[b]&feature=related[/b]')
 
     # domains
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://www15.oekakibbs.com">http://www15.oekakibbs.com</a>./bbs/sousyou7676/oekakibbs.cgi</p>', 'http://www15.oekakibbs.com./bbs/sousyou7676/oekakibbs.cgi') # XXX technically legal, but usually a typo
@@ -906,6 +949,11 @@ class DTextTest < Minitest::Test
     assert_parse('<p>https://username@gmail.com</p>', 'https://username@gmail.com')
     assert_parse('<p>http://myhost:3000/post/create.xml?tags=blah&amp;source=http://someurl</p>', 'http://myhost:3000/post/create.xml?tags=blah&source=http://someurl') # XXX should work
     assert_parse('<p>https://user:pass@example.com</p>', 'https://user:pass@example.com') # XXX should work
+
+    # trailing CJK
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://www.toranoana.jp/mailorder/article/04/0030/25/75/040030257564.html">http://www.toranoana.jp/mailorder/article/04/0030/25/75/040030257564.html</a>」<span class="tn">Author</span></p>', 'http://www.toranoana.jp/mailorder/article/04/0030/25/75/040030257564.html」[tn]Author')
+    assert_parse('<p>の「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://color-t.net/">http://color-t.net/</a>」か</p>', 'の「http://color-t.net/」か')
+    assert_parse('<p>続・小鳥さんのGM奮闘記（<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://www.nicovideo.jp/watch/sm9767866">http://www.nicovideo.jp/watch/sm9767866</a>）の舞さんを描かせてもらいました。</p>', '続・小鳥さんのGM奮闘記（http://www.nicovideo.jp/watch/sm9767866）の舞さんを描かせてもらいました。')
   end
 
   def test_old_style_link_boundaries
