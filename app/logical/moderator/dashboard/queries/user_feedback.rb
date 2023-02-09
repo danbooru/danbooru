@@ -5,7 +5,7 @@ module Moderator
     module Queries
       class UserFeedback
         def self.all
-          ::UserFeedback.includes(:user).order("id desc").limit(10)
+          ::UserFeedback.visible(CurrentUser.user).includes(:user).order("id desc").limit(10)
         end
       end
     end
