@@ -10,7 +10,7 @@ class UserNameChangeRequestPolicy < ApplicationPolicy
   end
 
   def create?
-    !user.is_anonymous? && (name_change.user == user || can_rename_user?)
+    unbanned? && (name_change.user == user || can_rename_user?)
   end
 
   def can_rename_user?

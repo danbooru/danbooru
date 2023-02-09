@@ -73,6 +73,14 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
         assert_equal("bob", @user.reload.name)
       end
+
+      should "fail for a banned user trying to change their own name" do
+        @banned = create(:banned_user, name: "sockpuppet")
+        post_auth user_name_change_requests_path, @banned, params: { user_name_change_request: { user_id: @banned.id, desired_name: "zun" }}
+
+        assert_response 403
+        assert_equal("sockpuppet", @banned.reload.name)
+      end
     end
 
     context "show action" do
