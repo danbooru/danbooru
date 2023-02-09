@@ -6,13 +6,12 @@ div.prose {
     margin-bottom: 0;
   }
 
-  p {
+  p, ul, pre, blockquote, details, div.spoiler, table, h1, h2, h3, h4, h5, h6 {
     margin-bottom: 0.75rem;
   }
 
   h1, h2, h3, h4, h5, h6 {
     line-height: 1;
-    margin-bottom: 0.75rem;
   }
 
   h1, h2, h3, h4 {
@@ -39,7 +38,6 @@ div.prose {
 
   ul {
     margin-left: 1em;
-    margin-bottom: 0.75rem;
 
     ul {
       margin-bottom: 0;
@@ -56,13 +54,11 @@ div.prose {
   }
 
   pre {
-    margin: 0.5em 0;
     padding: 0.5em 1em;
     white-space: pre-wrap;
   }
 
   blockquote {
-    margin-bottom: 1em;
     padding-left: 0.5em;
     opacity: 0.75;
     border-left: 3px solid var(--dtext-blockquote-border-color);
@@ -117,7 +113,6 @@ div.prose {
   }
 
   details {
-    margin-bottom: 0.75rem;
     border-radius: 0.25rem;
     background-color: var(--dtext-details-background-color);
 
