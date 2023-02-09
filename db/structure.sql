@@ -819,6 +819,27 @@ ALTER SEQUENCE public.forum_topics_id_seq OWNED BY public.forum_topics.id;
 
 
 --
+-- Name: good_job_batches; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.good_job_batches (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    description text,
+    serialized_properties jsonb,
+    on_finish text,
+    on_success text,
+    on_discard text,
+    callback_queue_name text,
+    callback_priority integer,
+    enqueued_at timestamp(6) without time zone,
+    discarded_at timestamp(6) without time zone,
+    finished_at timestamp(6) without time zone
+);
+
+
+--
 -- Name: good_job_processes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -862,7 +883,9 @@ CREATE TABLE public.good_jobs (
     concurrency_key text,
     cron_key text,
     retried_good_job_id uuid,
-    cron_at timestamp without time zone
+    cron_at timestamp without time zone,
+    batch_id uuid,
+    batch_callback_id uuid
 );
 
 
@@ -3092,6 +3115,14 @@ ALTER TABLE ONLY public.forum_topics
 
 
 --
+-- Name: good_job_batches good_job_batches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.good_job_batches
+    ADD CONSTRAINT good_job_batches_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: good_job_processes good_job_processes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4242,6 +4273,20 @@ CREATE INDEX index_good_jobs_on_active_job_id ON public.good_jobs USING btree (a
 --
 
 CREATE INDEX index_good_jobs_on_active_job_id_and_created_at ON public.good_jobs USING btree (active_job_id, created_at);
+
+
+--
+-- Name: index_good_jobs_on_batch_callback_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_batch_callback_id ON public.good_jobs USING btree (batch_callback_id) WHERE (batch_callback_id IS NOT NULL);
+
+
+--
+-- Name: index_good_jobs_on_batch_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_batch_id ON public.good_jobs USING btree (batch_id) WHERE (batch_id IS NOT NULL);
 
 
 --
@@ -6933,6 +6978,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221109052923'),
 ('20221228232240'),
 ('20221230011825'),
-('20230104064916');
+('20230104064916'),
+('20230209060757');
 
 

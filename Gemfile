@@ -35,7 +35,7 @@ gem 'http'
 gem 'activerecord-hierarchical_query'
 gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
-gem 'mail', '< 2.8'
+gem 'mail'
 gem 'nokogiri'
 gem 'view_component'
 gem 'tzinfo-data'
