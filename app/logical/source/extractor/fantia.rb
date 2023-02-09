@@ -2,6 +2,8 @@
 
 class Source::Extractor
   class Fantia < Source::Extractor
+    extend Memoist
+
     def self.enabled?
       Danbooru.config.fantia_session_id.present?
     end
@@ -136,19 +138,29 @@ class Source::Extractor
       parsed_url.work_id || parsed_referer&.work_id
     end
 
-    def api_response
-      return {} unless work_type == "post"
-      api_url = "https://fantia.jp/api/v1/posts/#{work_id}"
+    memoize def post_page
+      return nil unless work_type == "post"
+      response = http.cache(1.minute).get("https://fantia.jp/posts/#{work_id}")
 
-      response = http.cache(1.minute).get(api_url)
-      return {} unless response.status == 200
-
-      JSON.parse(response)
-    rescue JSON::ParserError
-      {}
+      return nil unless response.status == 200
+      response.parse
     end
 
-    def html_response
+    memoize def csrf_token
+      post_page&.css('meta[name="csrf-token"]')&.attr("content")&.value
+    end
+
+    memoize def api_response
+      return {} unless work_type == "post" && csrf_token.present?
+      api_url = "https://fantia.jp/api/v1/posts/#{work_id}"
+
+      response = http.cache(1.minute).headers("X-CSRF-Token": csrf_token).get(api_url)
+      return {} unless response.status == 200
+
+      response.parse
+    end
+
+    memoize def html_response
       return nil unless work_type == "product"
       response = http.cache(1.minute).get("https://fantia.jp/products/#{work_id}")
 
