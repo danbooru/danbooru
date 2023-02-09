@@ -77,29 +77,6 @@ div.prose {
     color: var(--muted-text-color);
   }
 
-  div.expandable {
-    margin-bottom: 1em;
-    border: var(--dtext-expand-border);
-  }
-
-  div.expandable-header {
-    padding: 0.4em;
-
-    span {
-      margin-right: 0.5em;
-      font-weight: bold;
-    }
-  }
-
-  div.expandable-content {
-    display: none;
-    padding: 0.4em;
-
-    > :last-child {
-      margin-bottom: 0;
-    }
-  }
-
   a.dtext-named-external-link::after {
     // https://stackoverflow.com/a/66093928
     content: "";
@@ -149,7 +126,7 @@ div.prose {
       border-bottom-left-radius: 0;
 
       &::before {
-        rotate: 180deg;
+        rotate: 0deg;
       }
     }
 
@@ -169,11 +146,13 @@ div.prose {
         content: "";
         display: inline-block;
         flex: none;
-        width: 24px;
-        height: 24px;
+        width: 12px;
+        height: 12px;
+        margin-right: 0.25rem;
         background-color: var(--dtext-details-summary-text-color);
-        mask-image: url('data:image/svg+xml,\00003csvg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">\00003cpath fill="currentcolor" d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z">\00003c/path>\00003c/svg>');
+        mask-image: url('data:image/svg+xml,\00003csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">\00003cpath fill="currentcolor" d="m17.5 4.75-7.5 7.5-7.5-7.5L1 6.25l9 9 9-9z"/>\00003c/svg>');
         mask-repeat: no-repeat;
+        rotate: -90deg;
       }
 
       &:hover {
