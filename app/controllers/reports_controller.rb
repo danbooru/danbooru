@@ -87,7 +87,7 @@ class ReportsController < ApplicationController
     when "tag_implications"
       @model = TagImplication
       @title = "Tag Implications Report"
-      @available_columns = { aliases: "COUNT(*)" }
+      @available_columns = { implications: "COUNT(*)" }
       @available_groups = %w[status approver]
     when "artist_versions"
       @model = ArtistVersion
