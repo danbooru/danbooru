@@ -241,7 +241,7 @@ class Artist < ApplicationRecord
         where_ilike(:name, normalized_name).or(any_other_name_like(normalized_name)).or(where_ilike(:group_name, normalized_name))
       else
         normalized_name = normalize_name(query)
-        where_array_includes_any("lower(ARRAY[name, group_name]::text[] || other_names)", [normalized_name])
+        where_array_includes_any("lower(ARRAY[artists.name, artists.group_name]::text[] || artists.other_names)", [normalized_name])
       end
     end
 

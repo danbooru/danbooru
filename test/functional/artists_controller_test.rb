@@ -168,6 +168,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(name: "masao").with { @masao }
         should respond_to_search(is_banned: "true").with { @banned }
         should respond_to_search(is_deleted: "true").with { @deleted }
+        should respond_to_search(any_name_matches: "masao", order: "post_count").with { @masao }
         should respond_to_search(url_matches: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg").with { @masao }
         should respond_to_search(url_matches: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939").with { @masao }
 
