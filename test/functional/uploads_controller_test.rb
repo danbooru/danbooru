@@ -603,7 +603,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://booth.pximg.net/4ee2c0d9-41fa-4a0e-a30f-1bc9e15d4e5b/i/2586180/331b7c5f-7614-4772-aae2-cb979ad44a6b.png")
 
-        should_upload_successfully("https://picdig.net/apricot/projects/9d96c3f2-f92f-4472-856a-93779bb43527")
+        should_upload_successfully("https://picdig.net/ema/projects/9d99151f-6d3e-4084-9cc0-082d386122ca")
 
         should_upload_successfully("https://enty.jp/posts/141598")
 
