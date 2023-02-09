@@ -74,7 +74,7 @@ module Sources
       context "a baraag.net/$user/$id url" do
         strategy_should_work(
           "https://baraag.net/@bardbot/105732813175612920",
-          image_urls: ["https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"],
+          image_urls: ["https://media.baraag.net/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"],
           download_size: 573_353,
           profile_url: "https://baraag.net/@bardbot",
           tag_name: "bardbot",
@@ -83,10 +83,18 @@ module Sources
         )
       end
 
-      context "a baraag image url" do
+      context "an old baraag image url" do
         strategy_should_work(
           "https://baraag.net/system/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png",
-          image_urls: ["https://baraag.net/system/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
+          image_urls: ["https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
+          download_size: 363_261
+        )
+      end
+
+      context "a new baraag image url" do
+        strategy_should_work(
+          "https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png",
+          image_urls: ["https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
           download_size: 363_261
         )
       end
@@ -111,7 +119,7 @@ module Sources
       should "handle inconvertible urls" do
         assert_nil(Source::URL.page_url("https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png"))
         assert_nil(Source::URL.page_url("https://pawoo.net/@evazion/media"))
-        assert_nil(Source::URL.page_url("https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"))
+        assert_nil(Source::URL.page_url("https://media.baraag.net/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"))
       end
     end
 
@@ -129,6 +137,7 @@ module Sources
 
     should "Parse Baraag URLs correctly" do
       assert(Source::URL.image_url?("https://baraag.net/system/media_attachments/files/107/866/084/749/942/932/original/a9e0f553e332f303.mp4"))
+      assert(Source::URL.image_url?("https://media.baraag.net/media_attachments/files/107/866/084/749/942/932/original/a9e0f553e332f303.mp4"))
 
       assert(Source::URL.page_url?("https://baraag.net/@curator/102270656480174153"))
       assert(Source::URL.page_url?("https://baraag.net/web/statuses/102270656480174153"))
