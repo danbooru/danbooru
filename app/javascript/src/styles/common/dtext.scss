@@ -30,6 +30,13 @@ div.prose {
     font-size: var(--text-md);
   }
 
+  hr {
+    // Same total height as <p> element: 0.75rem = <p> bottom margin, 1.25em = <p> line-height.
+    height: 2px;
+    margin: calc((0.75rem + 1.25em - 2px) / 2) auto;
+    background-color: var(--dtext-blockquote-border-color);
+  }
+
   table {
     th {
       white-space: nowrap;
