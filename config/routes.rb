@@ -22,7 +22,6 @@ Rails.application.routes.draw do
     resources :users, :only => [:edit, :update]
   end
   namespace :moderator do
-    resource :dashboard, :only => [:show]
     namespace :post do
       resources :posts, :only => [:delete, :expunge, :confirm_delete] do
         member do
@@ -149,6 +148,7 @@ Rails.application.routes.draw do
   put "/ai_tags/:media_asset_id/:tag_id/tag", to: "ai_tags#tag", as: "tag_ai_tag"
 
   resources :mod_actions
+  get "/moderator/dashboard" => "moderator_dashboard#show"
   resources :moderation_reports, only: [:new, :create, :index, :show, :update]
   resources :modqueue, only: [:index]
   resources :news_updates

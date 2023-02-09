@@ -1,0 +1,32 @@
+<% page_title "Mod Dashboard" %>
+
+<div id="c-moderator-dashboard">
+  <div id="a-show">
+    <h1>Moderator Dashboard</h1>
+
+    <div id="activity-search">
+      <%= search_form_for(moderator_dashboard_path) do |f| %>
+        <%= f.input :min_date, as: :date, html5: true, input_html: { value: @dashboard.min_date } %>
+        <%= f.input :max_level, collection: User.level_hash.to_a, include_blank: true, selected: @dashboard.max_level %>
+        <%= f.submit "Search" %>
+      <% end %>
+    </div>
+
+    <%= render "posts/partials/common/inline_blacklist" %>
+
+    <section class="md:grid grid-cols-2 gap-4">
+      <div class="space-y-4">
+        <div><%= render "activity_upload" %></div>
+        <div><%= render "activity_note" %></div>
+        <div><%= render "activity_wiki_page" %></div>
+        <div><%= render "activity_artist" %></div>
+      </div>
+
+      <div class="space-y-4">
+        <div><%= render "activity_comment" %></div>
+        <div><%= render "activity_user_feedback" %></div>
+        <div><%= render "activity_mod_action" %></div>
+      </div>
+    </section>
+  </div>
+</div>
