@@ -2,7 +2,7 @@ div.prose {
   line-height: 1.4em;
   word-break: break-word;
 
-  > *:last-child {
+  *:last-child {
     margin-bottom: 0;
   }
 
@@ -167,10 +167,6 @@ div.prose {
 
     > div {
       padding: 1rem;
-
-      > *:last-child {
-        margin-bottom: 0;
-      }
     }
   }
 }
