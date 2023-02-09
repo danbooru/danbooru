@@ -42,6 +42,22 @@ div.prose {
     }
   }
 
+  // Make [tr align="..."] override [tbody align="..."]
+  thead, tbody, thead tr, tbody tr, tr {
+    &[align="left"]    { th, td { text-align: left; } }
+    &[align="right"]   { th, td { text-align: right; } }
+    &[align="center"]  { th, td { text-align: center; } }
+    &[align="justify"] { th, td { text-align: justify; } }
+  }
+
+  // Make [td align="..."] override [tr align="..."] and [tbody align="..."]
+  td, th {
+    &[align="left"]    { text-align: left !important; }
+    &[align="right"]   { text-align: right !important; }
+    &[align="center"]  { text-align: center !important; }
+    &[align="justify"] { text-align: justify !important; }
+  }
+
   ul {
     margin-left: 1em;
 
