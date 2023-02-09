@@ -2,6 +2,8 @@
 
 class Pool < ApplicationRecord
   class RevertError < StandardError; end
+
+  RESERVED_NAMES = %w[none any series collection]
   POOL_ORDER_LIMIT = 1000
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
@@ -234,9 +236,9 @@ class Pool < ApplicationRecord
   end
 
   def validate_name
-    case name
-    when /\A(any|none|series|collection)\z/i
-      errors.add(:name, "cannot be any of the following names: any, none, series, collection")
+    case name.downcase
+    when *RESERVED_NAMES
+      errors.add(:name, "cannot be any of the following names: #{RESERVED_NAMES.to_sentence(last_word_connector: ", or ")}")
     when /,/
       errors.add(:name, "cannot contain commas")
     when /\*/

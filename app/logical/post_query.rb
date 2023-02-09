@@ -234,7 +234,12 @@ class PostQuery
         exact_count(timeout)
       elsif is_metatag?(:pool) || is_metatag?(:ordpool)
         name = find_metatag(:pool, :ordpool)
-        Pool.find_by_name(name)&.post_count || 0
+
+        if name.downcase.in?(Pool::RESERVED_NAMES)
+          nil
+        else
+          Pool.find_by_name(name)&.post_count || 0
+        end
       elsif is_metatag?(:fav) || is_metatag?(:ordfav)
         name = find_metatag(:fav, :ordfav)
         user = User.find_by_name(name)

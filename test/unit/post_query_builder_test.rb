@@ -1596,6 +1596,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         assert_fast_count(3, "ordpool:#{pool.id}")
         assert_fast_count(3, "ordpool:#{pool.name}")
 
+        assert_fast_count(1, "pool:none")
+        assert_fast_count(1, "pool:any")
+        assert_fast_count(1, "pool:series")
+        assert_fast_count(1, "pool:collection")
+        assert_fast_count(1, "pool:COLLECTION")
+
         assert_fast_count(Post.count, "-pool:#{pool.id}")
         assert_fast_count(Post.count, "-pool:#{pool.name}")
       end
