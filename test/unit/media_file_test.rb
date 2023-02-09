@@ -298,6 +298,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-yuvj420p-h264.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-iso4.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-3gp5.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-audio.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-audio-mp3.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-audio-opus.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-audio-vorbis.mp4").is_supported?)
 
       assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-h265.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-av1.mp4").is_supported?)
@@ -305,6 +309,9 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-av1.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-h264.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-vp9.mp4").is_supported?)
+
+      assert_equal(false, MediaFile.open("test/files/mp4/test-audio-ac3.mp4").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-audio-mp2.mp4").is_supported?)
     end
   end
 
