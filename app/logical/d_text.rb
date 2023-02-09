@@ -319,6 +319,9 @@ class DText
       when "blockquote"
         node.name = "span"
         node.content = to_plaintext(node.inner_html).gsub(/^/, "> ")
+      when "details"
+        node.name = "span"
+        node.content = to_plaintext(node.css("div").inner_html)
       end
     end
 
