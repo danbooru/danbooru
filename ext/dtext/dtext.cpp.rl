@@ -426,7 +426,7 @@ inline := |*
   };
 
   newline? close_spoilers => {
-    if (dstack_check(sm, INLINE_SPOILER)) {
+    if (dstack_is_open(sm, INLINE_SPOILER)) {
       dstack_close_element(sm, INLINE_SPOILER);
     } else if (dstack_is_open(sm, BLOCK_SPOILER)) {
       dstack_close_until(sm, BLOCK_SPOILER);
@@ -1211,6 +1211,10 @@ static void dstack_open_element(StateMachine * sm, element_t type, std::string_v
 
 static bool dstack_close_element(StateMachine * sm, element_t type) {
   if (dstack_check(sm, type)) {
+    dstack_rewind(sm);
+    return true;
+  } else if (type >= INLINE && dstack_peek(sm) >= INLINE) {
+    g_debug("out-of-order close %s; closing %s instead", element_names[type], element_names[dstack_peek(sm)]);
     dstack_rewind(sm);
     return true;
   } else if (type >= INLINE) {

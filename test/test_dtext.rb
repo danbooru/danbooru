@@ -1621,8 +1621,9 @@ class DTextTest < Minitest::Test
   end
 
   def test_mismatched_tags
-    assert_parse('<p>inline <strong>foo[/i]</strong></p>', 'inline [b]foo[/i]')
-    assert_parse('<p>inline <strong><em>foo[/b]</em></strong></p>', 'inline [b][i]foo[/b][/i]')
+    assert_parse('<p>inline <strong>foo</strong></p>', 'inline [b]foo[/i]')
+    assert_parse('<p>inline <strong><em>foo</em></strong></p>', 'inline [b][i]foo[/b][/i]')
+    assert_parse('<p>inline <span class="spoiler"><em>foo</em></span></p>', 'inline [spoiler][i]foo[/spoiler][/i]')
 
     # assert_parse('<div class="spoiler"><blockquote><p>foo</p></blockquote></div>', '[spoiler]\n[quote]\nfoo\n[/spoiler][/quote]')
   end
