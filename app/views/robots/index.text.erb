@@ -5,9 +5,9 @@ Allow: /$
 <% if !Rails.env.production? || Danbooru.config.hostname == request.host %>
 Disallow: /*.atom
 Disallow: /*.json
-Disallow: /posts?tags=source:*
-Disallow: /posts?tags=ordfav:*
-Disallow: /posts?tags=approver:*
+Disallow: /posts?*tags=source:*
+Disallow: /posts?*tags=ordfav:*
+Disallow: /posts?*tags=approver:*
 Disallow: /posts/*/favorites
 Disallow: /posts/*/show_seq*
 Disallow: /artists?search*
