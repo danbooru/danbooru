@@ -386,8 +386,9 @@ class DTextTest < Minitest::Test
     assert_parse("<p>a</p>", "a \n \n ")
 
     assert_parse("a<br>b<br>c", "a\nb\nc", inline: true)
-    assert_parse(" a", "\n\na", inline: true)
-    assert_parse("a ", "a\n\n", inline: true)
+    assert_parse("", "", inline: true)
+    assert_parse("a", "\n\na", inline: true)
+    assert_parse("a ", "a\n\n", inline: true) # XXX should strip space
     assert_parse("a b", "a\n\nb", inline: true)
     assert_parse("a b", "a\r\n\r\nb", inline: true)
     assert_parse("a b", "a \n\nb", inline: true)
@@ -425,6 +426,8 @@ class DTextTest < Minitest::Test
     assert_parse('<h1><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">example</a></h1><p>blah</p>', %{h1. "example":http://example.com\nblah})
 
     assert_parse('<blockquote><blockquote><h1>header</h1></blockquote></blockquote>', %{[quote]\n\n[quote]\n\nh1. header\n[/quote]\n\n[/quote]})
+
+    assert_parse('<blockquote><h1>header</h1></blockquote><p>one<br>two</p>', %{[quote]\nh1. header\n[/quote]\none\ntwo})
   end
 
   def test_inline_elements
@@ -1221,6 +1224,20 @@ class DTextTest < Minitest::Test
     assert_parse('<p>inline <span class="tn">foo</span> bar</p>', "inline [tn]foo\n[/tn] bar") # XXX wrong?
     assert_parse('<p>inline <span class="tn"><br>foo</span> bar</p>', "inline [tn]\nfoo[/tn] bar") # XXX wrong?
     assert_parse('<p>inline <span class="tn"><br>foo</span> bar</p>', "inline [tn]\nfoo\n[/tn] bar") # XXX wrong?
+
+    assert_parse('<pre>blah</pre><p>blah</p>', "[code]blah[/code] \nblah")
+
+    assert_parse('<div class="spoiler"><p>blah</p></div>', "[spoiler]blah[/spoiler]")
+    assert_parse('<div class="spoiler"><p>blah</p></div>', "[spoiler]blah[/spoiler] ")
+    assert_parse('<div class="spoiler"><p>blah</p></div>', "[spoiler]\nblah\n[/spoiler]")
+    assert_parse('<div class="spoiler"><p>blah</p></div>', "[spoiler]\nblah\n[/spoiler] ")
+
+    assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><div class="spoiler"><p>three</p></div>', "one\n\n[spoiler]two[/spoiler]\n[spoiler]three[/spoiler]")
+    assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><div class="spoiler"><p>three</p></div>', "one\n\n[spoiler]two[/spoiler]\n\n[spoiler]three[/spoiler]")
+    assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><div class="spoiler"><p>three</p></div>', "one\n \n[spoiler]two[/spoiler]\n \n[spoiler]three[/spoiler]")
+    assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><div class="spoiler"><p>three</p></div>', "one\n \n[spoiler]two[/spoiler]\n[spoiler]three[/spoiler]")
+    assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><div class="spoiler"><p>three</p></div>', "one\n \n[spoiler]two[/spoiler]\n\n[spoiler]three[/spoiler]")
+    assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><div class="spoiler"><p>three</p></div>', "one\n \n[spoiler]two[/spoiler]\n \n[spoiler]three[/spoiler]")
   end
 
   def test_complex_links_1

@@ -509,10 +509,19 @@ inline := |*
 
   blank_lines => {
     g_debug("inline newline2");
-    g_debug("  return");
 
-    dstack_close_list(sm);
-    fexec sm->ts;
+    if (dstack_check(sm, BLOCK_P)) {
+      dstack_rewind(sm);
+    } else if (sm->header_mode) {
+      dstack_close_leaf_blocks(sm);
+    } else {
+      dstack_close_list(sm);
+    }
+
+    if (sm->options.f_inline) {
+      append(sm, " ");
+    }
+
     fret;
   };
 
@@ -702,27 +711,9 @@ main := |*
     fcall inline;
   };
 
-  blank_lines => {
-    g_debug("block newline2");
-
-    if (sm->header_mode) {
-      dstack_close_leaf_blocks(sm);
-    } else if (dstack_is_open(sm, BLOCK_UL)) {
-      dstack_close_until(sm, BLOCK_UL);
-    } else {
-      dstack_close_before_block(sm);
-    }
-
-    if (sm->options.f_inline) {
-      append(sm, " ");
-    }
+  blank_line+ => {
+    g_debug("block blank line(s)");
   };
-
-  newline => {
-    g_debug("block newline");
-  };
-
-  eos;
 
   any => {
     g_debug("block char");
@@ -1260,26 +1251,17 @@ static void dstack_rewind(StateMachine * sm) {
     case BLOCK_TR: append_block(sm, "</tr>"); break;
     case BLOCK_UL: append_block(sm, "</ul>"); break;
     case BLOCK_LI: append_block(sm, "</li>"); break;
-    case BLOCK_H6: append_block(sm, "</h6>"); break;
-    case BLOCK_H5: append_block(sm, "</h5>"); break;
-    case BLOCK_H4: append_block(sm, "</h4>"); break;
-    case BLOCK_H3: append_block(sm, "</h3>"); break;
-    case BLOCK_H2: append_block(sm, "</h2>"); break;
-    case BLOCK_H1: append_block(sm, "</h1>"); break;
+    case BLOCK_H6: append_block(sm, "</h6>"); sm->header_mode = false; break;
+    case BLOCK_H5: append_block(sm, "</h5>"); sm->header_mode = false; break;
+    case BLOCK_H4: append_block(sm, "</h4>"); sm->header_mode = false; break;
+    case BLOCK_H3: append_block(sm, "</h3>"); sm->header_mode = false; break;
+    case BLOCK_H2: append_block(sm, "</h2>"); sm->header_mode = false; break;
+    case BLOCK_H1: append_block(sm, "</h1>"); sm->header_mode = false; break;
 
     // Should never happen.
     case INLINE: break;
     case DSTACK_EMPTY: break;
   } 
-}
-
-// Close the last open paragraph or list, if there is one.
-static void dstack_close_before_block(StateMachine * sm) {
-  g_debug("dstack close before block");
-
-  while (dstack_check(sm, BLOCK_P) || dstack_check(sm, BLOCK_LI) || dstack_check(sm, BLOCK_UL)) {
-    dstack_rewind(sm);
-  }
 }
 
 // container blocks: [spoiler], [quote], [expand], [tn]
@@ -1290,8 +1272,6 @@ static void dstack_close_leaf_blocks(StateMachine * sm) {
   while (!sm->dstack.empty() && !dstack_check(sm, BLOCK_QUOTE) && !dstack_check(sm, BLOCK_SPOILER) && !dstack_check(sm, BLOCK_EXPAND) && !dstack_check(sm, BLOCK_TN)) {
     dstack_rewind(sm);
   }
-
-  sm->header_mode = false;
 }
 
 // Close all open tags up to and including the given tag.
