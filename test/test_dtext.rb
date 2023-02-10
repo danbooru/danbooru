@@ -417,6 +417,14 @@ class DTextTest < Minitest::Test
     assert_parse('<ul><li>one</li></ul><h1>header</h1>', "* one\nh1. header")
     assert_parse('<ul><li>one</li></ul><h1>header</h1><ul><li>two</li></ul>', "* one\nh1. header\n* two")
     assert_parse('<h1>header</h1><h2>header</h2>', "h1. header\nh2. header")
+
+    assert_parse('<h1><em>header</em></h1><p>blah</p>', "h1. [i]header\nblah")
+    assert_parse('<h1><span class="spoiler">header</span></h1><p>blah</p>', "h1. [spoiler]header\nblah")
+    assert_parse('<h1><span class="tn">header</span></h1><p>blah</p>', "h1. [tn]header\nblah")
+    assert_parse('<h1><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a></h1><p>blah</p>', %{h1. http://example.com\nblah})
+    assert_parse('<h1><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">example</a></h1><p>blah</p>', %{h1. "example":http://example.com\nblah})
+
+    assert_parse('<blockquote><blockquote><h1>header</h1></blockquote></blockquote>', %{[quote]\n\n[quote]\n\nh1. header\n[/quote]\n\n[/quote]})
   end
 
   def test_inline_elements

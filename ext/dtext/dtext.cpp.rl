@@ -520,8 +520,7 @@ inline := |*
     g_debug("inline newline");
 
     if (sm->header_mode) {
-      sm->header_mode = false;
-      dstack_rewind(sm);
+      dstack_close_leaf_blocks(sm);
       fret;
     } else if (dstack_is_open(sm, BLOCK_UL)) {
       dstack_close_list(sm);
@@ -707,8 +706,7 @@ main := |*
     g_debug("block newline2");
 
     if (sm->header_mode) {
-      sm->header_mode = false;
-      dstack_rewind(sm);
+      dstack_close_leaf_blocks(sm);
     } else if (dstack_is_open(sm, BLOCK_UL)) {
       dstack_close_until(sm, BLOCK_UL);
     } else {
