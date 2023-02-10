@@ -91,7 +91,7 @@ GEM
     ansi (1.5.0)
     ast (2.4.2)
     aws-eventstream (1.2.0)
-    aws-partitions (1.708.0)
+    aws-partitions (1.709.0)
     aws-sdk-core (3.170.0)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.651.0)
@@ -140,8 +140,6 @@ GEM
     date (3.3.3)
     dead_end (4.0.0)
     debug (1.7.1)
-      irb (>= 1.5.0)
-      reline (>= 0.3.1)
     debug_inspector (1.1.0)
     declarative (0.0.20)
     derailed_benchmarks (2.1.2)
@@ -259,10 +257,7 @@ GEM
     httpclient (2.8.3)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
-    io-console (0.6.0)
     ipaddress_2 (0.14.0)
-    irb (1.6.2)
-      reline (>= 0.3.0)
     jaro_winkler (1.5.4)
     jmespath (1.6.2)
     json (2.6.3)
@@ -330,7 +325,7 @@ GEM
     optimist (3.0.1)
     os (1.1.4)
     parallel (1.22.1)
-    parser (3.2.0.0)
+    parser (3.2.1.0)
       ast (~> 2.4.1)
     pg (1.4.5)
     prometheus-client (4.0.0)
@@ -403,8 +398,6 @@ GEM
     redis-client (0.12.1)
       connection_pool
     regexp_parser (2.7.0)
-    reline (0.3.2)
-      io-console (~> 0.5)
     representable (3.2.0)
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
@@ -609,7 +602,7 @@ DEPENDENCIES
   view_component
 
 RUBY VERSION
-   ruby 3.2.0p0
+   ruby 3.2.1p31
 
 BUNDLED WITH
-   2.4.3
+   2.4.6
