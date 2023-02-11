@@ -1,8 +1,9 @@
 User-agent: *
 Disallow: /
+
+<% if Danbooru.config.allow_web_crawlers?.to_s.truthy? %>
 Allow: /$
 
-<% if !Rails.env.production? || Danbooru.config.hostname == request.host %>
 Disallow: /*.atom
 Disallow: /*.json
 Disallow: /posts?*tags=source:*

@@ -152,6 +152,16 @@ module Danbooru
       "#{source_code_url}/issues"
     end
 
+    # If true, allow web crawlers such as Google to crawl your site.
+    #
+    # If false, don't allow crawlers to crawl your site. This means your site won't be indexed by search engines.
+    #
+    # Setting this to false disallows crawlers in /robots.txt. This will only block crawlers that actually respect
+    # robots.txt, mainly search engines, not other bots.
+    def allow_web_crawlers?
+      true
+    end
+
     # If true, new accounts will require email verification if they seem
     # suspicious (they were created using a proxy, multiple accounts were
     # created by the same IP, etc).
