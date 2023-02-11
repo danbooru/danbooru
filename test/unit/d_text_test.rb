@@ -62,6 +62,14 @@ class DTextTest < ActiveSupport::TestCase
         assert_match(/tag-type-#{Tag.categories.artist}/, DText.format_text("[[bkub]]", base_url: "http://www.example.com"))
       end
 
+      should "convert direct links to short links" do
+        assert_equal('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', DText.format_text("https://danbooru.donmai.us/posts/1234", domain: "danbooru.donmai.us"))
+        assert_equal('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', DText.format_text("https://danbooru.donmai.us/posts/1234", domain: "danbooru.donmai.us", alternate_domains: ["betabooru.donmai.us"]))
+        assert_equal('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', DText.format_text("https://danbooru.donmai.us/posts/1234", domain: "betabooru.donmai.us", alternate_domains: ["danbooru.donmai.us"]))
+
+        assert_equal('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us/posts/1234">https://danbooru.donmai.us/posts/1234</a></p>', DText.format_text("https://danbooru.donmai.us/posts/1234", domain: "betabooru.donmai.us"))
+      end
+
       should "mark links to nonexistent tags or wikis" do
         create(:tag, name: "no_wiki", post_count: 42)
         create(:tag, name: "empty_tag", post_count: 0)

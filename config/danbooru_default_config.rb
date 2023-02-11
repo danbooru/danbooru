@@ -66,6 +66,16 @@ module Danbooru
       Socket.gethostname
     end
 
+    # A list of alternate domains for your site, if your site is accessible under multiple domains. For example,
+    # Danbooru is accessible under danbooru.donmai.us, betabooru.donmai.us, safebooru.donmai.us, etc.
+    #
+    # Used for converting direct links to these domains to shortlinks, e.g. `https://danbooru.donmai.us/posts/1234` to `post #1234`.
+    #
+    # Most people should leave this empty.
+    def alternate_domains
+      []
+    end
+
     # A list of alternate hostnames where safe mode will automatically be enabled.
     def safe_mode_hostnames
       ["safebooru.donmai.us"]
