@@ -244,8 +244,10 @@
 
   <% if params[:tags].blank? && @post_set.current_page == 1 %>
     <% canonical_url root_url(host: Danbooru.config.hostname) %>
+  <% elsif @post_set.current_page == 1 %>
+    <% canonical_url posts_url(host: Danbooru.config.hostname, tags: @post_set.post_query.search, limit: params[:limit]) %>
   <% else %>
-    <% canonical_url posts_url(host: Danbooru.config.hostname, tags: params[:tags], page: params[:page], limit: params[:limit]) %>
+    <% canonical_url posts_url(host: Danbooru.config.hostname, tags: @post_set.post_query.search, page: params[:page], limit: params[:limit]) %>
   <% end %>
 
   <% noindex if @post_set.hide_from_crawler? %>
