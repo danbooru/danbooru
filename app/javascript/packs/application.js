@@ -3,8 +3,9 @@ function importAll(r) {
   r.keys().forEach(r);
 }
 
-// XXX for dropzone.
-import "core-js/web/dom-collections";
+// This will only import the necessary polyfills needed by the current browserslist setting in package.json, not
+// everything. See @babel/preset-env.
+import "core-js";
 
 require('@rails/ujs').start();
 require('hammerjs');
