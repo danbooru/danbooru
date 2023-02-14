@@ -44,14 +44,6 @@ class DTextTest < ActiveSupport::TestCase
     end
 
     context "#format_text" do
-      setup do
-        CurrentUser.user = create(:user)
-      end
-
-      teardown do
-        CurrentUser.user = nil
-      end
-
       should "add tag types to wiki links" do
         create(:tag, name: "bkub", category: Tag.categories.artist, post_count: 42)
         assert_match(/tag-type-#{Tag.categories.artist}/, DText.format_text("[[bkub]]"))

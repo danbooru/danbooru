@@ -1586,24 +1586,25 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
 
       should "return the correct cached count for a pool:<id> search" do
-        pool = create(:pool, post_ids: [1, 2, 3])
+        posts1 = create_list(:post, 3)
+        posts2 = create_list(:post, 2)
+        pool1 = create(:pool, post_ids: posts1.pluck(:id), category: "series")
+        pool2 = create(:pool, post_ids: posts2.pluck(:id), category: "collection")
+        build(:tag, name: "pool:#{pool1.id}", post_count: -100).save(validate: false)
 
-        build(:tag, name: "pool:#{pool.id}", post_count: -100).save(validate: false)
-        Cache.put("pfc:pool:1234", 100)
-
-        assert_fast_count(3, "pool:#{pool.id}")
-        assert_fast_count(3, "pool:#{pool.name}")
-        assert_fast_count(3, "ordpool:#{pool.id}")
-        assert_fast_count(3, "ordpool:#{pool.name}")
+        assert_fast_count(3, "pool:#{pool1.id}")
+        assert_fast_count(3, "pool:#{pool1.name}")
+        assert_fast_count(3, "ordpool:#{pool1.id}")
+        assert_fast_count(3, "ordpool:#{pool1.name}")
 
         assert_fast_count(1, "pool:none")
-        assert_fast_count(1, "pool:any")
-        assert_fast_count(1, "pool:series")
-        assert_fast_count(1, "pool:collection")
-        assert_fast_count(1, "pool:COLLECTION")
+        assert_fast_count(5, "pool:any")
+        assert_fast_count(3, "pool:series")
+        assert_fast_count(2, "pool:collection")
+        assert_fast_count(2, "pool:COLLECTION")
 
-        assert_fast_count(Post.count, "-pool:#{pool.id}")
-        assert_fast_count(Post.count, "-pool:#{pool.name}")
+        assert_fast_count(3, "-pool:#{pool1.id}")
+        assert_fast_count(3, "-pool:#{pool1.name}")
       end
 
       should "return the correct favorite count for a fav:<name> search" do
