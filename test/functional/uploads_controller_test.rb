@@ -610,6 +610,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://arca.live/b/arknights/66031722")
 
         should_upload_successfully("https://imgur.com/AOeREEF")
+
+        should_upload_successfully("https://poipiku.com/583/2867587.html")
       end
     end
   end

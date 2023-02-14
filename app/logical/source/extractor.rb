@@ -64,6 +64,7 @@ module Source
       Source::Extractor::ArcaLive,
       Source::Extractor::Imgur,
       Source::Extractor::Zerochan,
+      Source::Extractor::Poipiku,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
