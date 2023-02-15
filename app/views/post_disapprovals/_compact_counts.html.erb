@@ -10,8 +10,4 @@
   <% if disapprovals.map(&:reason).grep(/disinterest|legacy/).count > 0 %>
     (no interest: <%= disapprovals.map(&:reason).grep(/disinterest|legacy/).count %>)
   <% end %>
-
-  <% if disapprovals.map(&:message).any?(&:present?) %>
-    (messages: <%= disapprovals.map(&:message).select(&:present?).map { |msg| format_text(msg, inline: true) }.to_sentence.html_safe %>)
-  <% end %>
 <% end %>

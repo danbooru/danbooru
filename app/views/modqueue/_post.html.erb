@@ -1,3 +1,5 @@
+<% disapprovals = post.disapprovals.order(id: :asc) %>
+
 <%= tag.div id: "post-#{post.id}", **PostPreviewComponent.new(post: post, classes: "post mod-queue-preview column-container").article_attrs do %>
   <aside class="column column-shrink">
     <%= post_preview(post, size: @preview_size, show_size: true, show_deleted: true) %>
@@ -6,7 +8,7 @@
   <section class="column column-expand">
     <div class="row quick-mod-row">
       <%= render "modqueue/quick_mod", post: post %>
-      <%= render "post_disapprovals/compact_counts", disapprovals: post.disapprovals.order(id: :asc), post: post %>
+      <%= render "post_disapprovals/compact_counts", disapprovals: disapprovals, post: post %>
     </div>
 
     <div class="row">
@@ -56,18 +58,38 @@
     </div>
 
     <div class="row post-flags-row">
+      <% if disapprovals.map(&:message).any?(&:present?) %>
+        <div class="info">
+          <strong>Disapprovals</strong>
+
+          <% disapprovals.select { |disapproval| disapproval.message.present? }.each do |disapproval| %>
+            <ul class="post-disapproval-reason list-bulleted">
+              <li>
+                <span class="prose"><%= format_text(disapproval.message, inline: true) %></span>
+
+                <% if policy(disapproval).can_view_creator? %>
+                  (<%= link_to_user(disapproval.user) %>, <%= time_ago_in_words_tagged(disapproval.created_at) %>)
+                <% else %>
+                  (<%= time_ago_in_words_tagged(disapproval.created_at) %>)
+                <% end %>
+              </li>
+            </ul>
+          <% end %>
+        </div>
+      <% end %>
+
       <% if post.is_flagged? %>
-        <span class="info">
-          <strong>Flagged</strong>
+        <div class="info">
+          <strong>Flag</strong>
           <%= render "post_flags/reasons", flag: post.flags.select(&:pending?).last %>
-        </span>
+        </div>
       <% end %>
 
       <% if post.is_appealed? %>
-        <span class="info">
-          <strong>Appeals</strong>
+        <div class="info">
+          <strong>Appeal</strong>
           <%= render "post_appeals/reasons", appeal: post.appeals.select(&:pending?).last %>
-        </span>
+        </div>
       <% end %>
     </div>
   </section>
