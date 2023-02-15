@@ -309,6 +309,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to login_path(url: "/profile")
       end
 
+      should "redirect `Accept: */*` requests to the sign in page" do
+        get profile_path, headers: { Accept: "*/*" }
+        assert_redirected_to login_path(url: "/profile")
+      end
+
       should "return success for anonymous api calls" do
         get profile_path(format: :json)
         assert_response :success

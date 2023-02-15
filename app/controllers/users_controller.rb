@@ -53,13 +53,11 @@ class UsersController < ApplicationController
   def profile
     @user = authorize CurrentUser.user
 
-    if !@user.is_anonymous?
+    if !@user.is_anonymous? || request.format.json? || request.format.xml?
       params[:action] = "show"
       respond_with(@user, methods: @user.full_attributes, template: "users/show")
-    elsif request.format.html?
-      redirect_to login_path(url: profile_path)
     else
-      respond_with(@user, methods: @user.full_attributes, template: "users/show")
+      redirect_to login_path(url: profile_path)
     end
   end
 
