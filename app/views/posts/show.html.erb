@@ -220,8 +220,10 @@
       <%= render "post_disapprovals/counts", disapprovals: @post.disapprovals.order(id: :asc), post: @post %>
 
       <% if CurrentUser.user.is_approver? %>
-        <%= render "modqueue/quick_mod", post: @post %>
-        <%= render "post_disapprovals/detailed_rejection_dialog" %>
+        <div>
+          <%= render "modqueue/quick_mod", post: @post %>
+          <%= render "post_disapprovals/detailed_rejection_dialog" %>
+        </div>
       <% end %>
     </div>
   <% elsif @post.is_deleted? %>

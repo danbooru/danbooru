@@ -1,4 +1,4 @@
-<div class="quick-mod">
+<span class="quick-mod">
   <%= link_to_if post.is_approvable?, "Approve", post_approvals_path(post_id: post.id), method: :post, remote: true, class: "approve-link btn" %> |
   <% PostDisapproval::REASONS.each do |reason| %>
     <% if @previous_disapproval&.reason == reason %>
@@ -10,4 +10,4 @@
     <% end %>
   <% end %>
   <%= link_to "Detailed Rejection", "#", "data-post-id" => post.id, class: "detailed-rejection-link btn" %>
-</div>
+</span>

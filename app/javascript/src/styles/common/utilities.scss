@@ -137,6 +137,7 @@ $spacer: 0.25rem; /* 4px */
 .p-px   { padding: 1px; }
 .p-0\.5 { padding: 0.5 * $spacer; }
 .p-1  { padding: 1 * $spacer; }
+.p-2  { padding: 2 * $spacer; }
 .p-4  { padding: 4 * $spacer; }
 
 .px-1 { padding-left: 1 * $spacer; padding-right: 1 * $spacer; }
@@ -268,10 +269,13 @@ $spacer: 0.25rem; /* 4px */
 .text-success { color: var(--success-color) !important; }
 .text-error { color: var(--error-color) !important; }
 .text-danger { color: var(--error-color) !important; }
+.text-inverse { color: var(--inverse-text-color); }
 
 a.text-success:hover { color: var(--success-hover-color) !important; }
 a.text-error:hover { color: var(--error-hover-color) !important; }
 a.text-danger:hover { color: var(--error-hover-color) !important; }
+
+.bg\:error-color { background-color: var(--error-color); }
 
 .transition-opacity {
   transition: opacity 0.15s ease;
@@ -362,4 +366,8 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   .md\:space-y-0 > * + * { margin-top: 0; }
 
   .md\:w-360px { width: 360px; }
+}
+
+@media screen and (max-width: 660px) {
+  .sm\:text-center { text-align: center; }
 }

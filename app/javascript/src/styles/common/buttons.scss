@@ -6,6 +6,7 @@
 
   &[disabled] {
     cursor: default;
+    pointer-events: none;
   }
 }
 
@@ -103,6 +104,12 @@ a, button, input[type="submit"] {
       color: var(--button-primary-disabled-color);
       border: 1px solid var(--button-primary-disabled-color);
     }
+  }
+
+  /* An extra small button. */
+  &.button-xs {
+    padding: 0.125rem 0.5rem;
+    font-size: var(--text-xs);
   }
 
   /* A small button. */

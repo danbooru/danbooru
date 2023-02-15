@@ -1,6 +1,8 @@
 <%= render PopupMenuComponent.new(classes: "preview-size-menu") do |menu| %>
   <% menu.button do %>
-    <%= image_icon %> <span class="text-sm">Size</span> <%= caret_down_icon(class: "text-xs") %>
+    <span class="rounded p-1">
+      <%= image_icon %> <span class="text-sm">Size</span> <%= caret_down_icon(class: "text-xs") %>
+    </span>
   <% end %>
 
   <% menu.item do %>

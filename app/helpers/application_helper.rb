@@ -229,7 +229,7 @@ module ApplicationHelper
     to_sentence(links, **options)
   end
 
-  def link_to_user(user, text = nil, classes: nil, **options)
+  def link_to_user(user, text = nil, url: user, classes: nil, **options)
     return "anonymous" if user.blank?
 
     user_class = "user user-#{user.level_string.downcase} #{classes}".strip
@@ -237,7 +237,7 @@ module ApplicationHelper
 
     text = user.pretty_name if text.blank?
     data = { "user-id": user.id, "user-name": user.name, "user-level": user.level }
-    link_to(text, user, class: user_class, data: data)
+    link_to(text, url, class: user_class, data: data)
   end
 
   def embed_wiki(title, **options)

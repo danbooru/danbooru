@@ -29,8 +29,8 @@ class PostDisapprovalTest < ActiveSupport::TestCase
 
         context "when the current user is alice" do
           should "remove the associated post from alice's moderation queue" do
-            assert_not(Post.available_for_moderation(@alice, hidden: false).map(&:id).include?(@post_1.id))
-            assert(Post.available_for_moderation(@alice, hidden: false).map(&:id).include?(@post_2.id))
+            assert_not(Post.available_for_moderation(@alice, :unseen).map(&:id).include?(@post_1.id))
+            assert(Post.available_for_moderation(@alice, :unseen).map(&:id).include?(@post_2.id))
           end
         end
 
@@ -38,8 +38,8 @@ class PostDisapprovalTest < ActiveSupport::TestCase
           should "not remove the associated post from the disapprover's moderation queue" do
             @mod = create(:moderator_user)
 
-            assert(Post.available_for_moderation(@mod, hidden: false).map(&:id).include?(@post_1.id))
-            assert(Post.available_for_moderation(@mod, hidden: false).map(&:id).include?(@post_2.id))
+            assert(Post.available_for_moderation(@mod, :unseen).map(&:id).include?(@post_1.id))
+            assert(Post.available_for_moderation(@mod, :unseen).map(&:id).include?(@post_2.id))
           end
         end
       end

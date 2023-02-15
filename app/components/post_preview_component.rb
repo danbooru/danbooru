@@ -8,6 +8,7 @@ class PostPreviewComponent < ApplicationComponent
   SIZES = %w[150 180 225 225w 270 270w 360 540 720]
 
   with_collection_parameter :post
+  renders_one :footer
 
   attr_reader :post, :tags, :size, :classes, :show_deleted, :link_target, :pool, :similarity, :recommended, :show_votes, :fit, :show_size, :save_data, :current_user, :options
 

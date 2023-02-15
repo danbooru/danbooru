@@ -1,68 +1,48 @@
-<% disapprovals = post.disapprovals.order(id: :asc) %>
+<%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post, classes: "post card mod-queue-preview md:flex gap-4 p-4").article_attrs do %>
+  <div class="sm:text-center">
+    <%= render(PostPreviewComponent.new(post: post, classes: "mod-queue-preview", size: @preview_size, fit: :fixed, show_deleted: true)) do |component| %>
+      <% component.footer do %>
+        <%= render "modqueue/post_preview_footer", post: post %>
+      <% end %>
+    <% end %>
+  </div>
 
-<%= tag.div id: "post-#{post.id}", **PostPreviewComponent.new(post: post, classes: "post mod-queue-preview column-container").article_attrs do %>
-  <aside class="column column-shrink">
-    <%= post_preview(post, size: @preview_size, show_size: true, show_deleted: true) %>
-  </aside>
-
-  <section class="column column-expand">
-    <div class="row quick-mod-row">
-      <%= render "modqueue/quick_mod", post: post %>
-      <%= render "post_disapprovals/compact_counts", disapprovals: disapprovals, post: post %>
-    </div>
-
-    <div class="row">
-      <span class="info">
+  <div>
+    <div class="space-x-4">
+      <span>
         <strong>Date</strong>
-        <%= compact_time(post.created_at) %>
+        <%= time_ago_in_words_tagged(post.created_at) %>
       </span>
 
-      <span class="info">
-        <strong>User</strong>
-        <%= link_to_user(post.uploader) %>
-        <%= link_to "»", modqueue_index_path(search: { tags: "user:#{post.uploader.name}" }) %>
+      <span>
+        <strong>Uploader</strong>
+        <%= link_to_user(post.uploader) %>&nbsp;<%= link_to "»", modqueue_index_path(search: { tags: "user:#{post.uploader.name}" }) %>
       </span>
 
-      <span class="info">
+      <span>
         <strong>Rating</strong>
         <%= post.pretty_rating %>
-      </span>
-
-      <span class="info">
-        <strong>Score</strong>
-        <%= render_post_votes post, current_user: CurrentUser.user %>
-      </span>
-    </div>
-
-    <div class="row">
-      <span class="info">
-        <strong>Source</strong>
-        <%= post_source_tag(post.source, post.normalized_source) %>
       </span>
     </div>
 
     <% if post.has_active_pools? %>
-      <div class="row">
-        <span class="info">
-          <strong>Pools</strong>
-          <%= render "pools/inline_list", pools: post.pools.undeleted %>
-        </span>
+      <div>
+        <strong>Pools</strong>
+        <%= render "pools/inline_list", pools: post.pools.undeleted %>
       </div>
     <% end %>
 
-    <div class="row list-of-tags">
-      <span class="info">
-        <strong>Tags</strong>
-        <%= render_inline_tag_list(post) %>
-      </span>
+    <div>
+      <strong>Tags</strong>
+      <%= render_inline_tag_list(post) %>
     </div>
 
-    <div class="row post-flags-row">
-      <% if disapprovals.map(&:message).any?(&:present?) %>
-        <div class="info">
+    <div class="mt-4">
+      <% if post.disapprovals.map(&:message).any?(&:present?) %>
+        <div>
           <strong>Disapprovals</strong>
 
-          <% disapprovals.select { |disapproval| disapproval.message.present? }.each do |disapproval| %>
+          <% post.disapprovals.sort_by(&:id).select { |disapproval| disapproval.message.present? }.each do |disapproval| %>
             <ul class="post-disapproval-reason list-bulleted">
               <li>
                 <span class="prose"><%= format_text(disapproval.message, inline: true) %></span>
@@ -79,18 +59,18 @@
       <% end %>
 
       <% if post.is_flagged? %>
-        <div class="info">
+        <div>
           <strong>Flag</strong>
           <%= render "post_flags/reasons", flag: post.flags.select(&:pending?).last %>
         </div>
       <% end %>
 
       <% if post.is_appealed? %>
-        <div class="info">
+        <div>
           <strong>Appeal</strong>
           <%= render "post_appeals/reasons", appeal: post.appeals.select(&:pending?).last %>
         </div>
       <% end %>
     </div>
-  </section>
+  </div>
 <% end %>

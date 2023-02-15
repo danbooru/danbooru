@@ -57,6 +57,7 @@ class PostQueryBuilder
     filesize filesize_asc
     tagcount tagcount_asc
     duration duration_asc
+    disapproved disapproved_asc
     rank
     modqueue
     random

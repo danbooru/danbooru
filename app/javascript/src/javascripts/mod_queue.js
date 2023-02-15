@@ -11,7 +11,7 @@ ModQueue.detailed_rejection_dialog = function() {
 }
 
 $(function() {
-  $(document).on("click.danbooru", ".quick-mod .detailed-rejection-link", ModQueue.detailed_rejection_dialog);
+  $(document).on("click.danbooru", ".detailed-rejection-link", ModQueue.detailed_rejection_dialog);
 });
 
 export default ModQueue

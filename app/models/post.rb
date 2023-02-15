@@ -1044,13 +1044,16 @@ class Post < ApplicationRecord
         from(relation.arel.as("posts"))
       end
 
-      def available_for_moderation(user, hidden: false)
+      def available_for_moderation(user, type)
         disapproved_posts = user.post_disapprovals.select(:post_id)
 
-        if hidden.present?
+        case type.to_s
+        when "seen"
           in_modqueue.where(id: disapproved_posts)
-        else
+        when "unseen"
           in_modqueue.where.not(id: disapproved_posts)
+        else
+          in_modqueue
         end
       end
 
@@ -1234,7 +1237,7 @@ class Post < ApplicationRecord
         when "active"
           active
         when "unmoderated"
-          available_for_moderation(current_user, hidden: false)
+          available_for_moderation(current_user, :unseen)
         when "all", "any"
           where("TRUE")
         else
@@ -1593,6 +1596,12 @@ class Post < ApplicationRecord
 
         when "modqueue_asc"
           with_queued_at.reorder("queued_at ASC, posts.id ASC")
+
+        when "disapproved", "disapproved_desc"
+          group(:id).left_outer_joins(:disapprovals).select("posts.*").select("MAX(post_disapprovals.created_at) AS disapproved_at").reorder("disapproved_at DESC, posts.id DESC")
+
+        when "disapproved_asc"
+          group(:id).left_outer_joins(:disapprovals).select("posts.*").select("MAX(post_disapprovals.created_at) AS disapproved_at").reorder("disapproved_at ASC, posts.id ASC")
 
         when "none"
           reorder(nil)

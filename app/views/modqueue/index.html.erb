@@ -11,31 +11,56 @@
 <% end %>
 
 <% content_for(:top_content) do %>
-  <div class="flex mb-4">
-    <h1 class="flex-grow-1">Moderation Queue</h1>
-    <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
-  </div>
+  <h1 class="mb-4">Moderation Queue</h1>
 
-  <div id="moderation-guideline" class="fixed-width-container">
-    <h2>Deletion Guidelines</h2>
+  <div class="prose mb-4">
+    <details>
+      <summary>Guidelines</summary>
 
-    <%= render "desc" %>
-
-    <p>
-      <% if params.dig(:search, :hidden) %>
-        <%= link_to "View pending posts", modqueue_index_path(search: { tags: params.dig(:search, :tags), hidden: nil }) %>.
-      <% else %>
-        <%= link_to "View hidden posts", modqueue_index_path(search: { tags: params.dig(:search, :tags), hidden: true, }) %>.
-      <% end %>
-    </p>
+      <div>
+        <ul>
+          <li>You should approve anything you think is good quality. A good rule of thumb is to approve things you would upload yourself.</li>
+          <li>If you're unsure whether something should be approved, you can skip it and let other approvers take a look.</li>
+          <li>You can reject a post as "Poor quality" or "Breaks rules" to tell other approvers that you think the post shouldn't be approved.</li>
+          <li>You can give a "Detailed rejection" to explain why you think a post shouldn't be approved. This message is seen by the uploader, so don't be rude.</li>
+          <li>Posts should only be manually deleted if they clearly break the <%= link_to_wiki "help:upload rules" %> or are extremely bad (so bad they shouldn't stay up the full 3 days).</li>
+          <li>If you haven't approved at least 30 posts in the last 45 days, you will lose approver privileges for inactivity.</li>
+        <ul>
+      </div>
+    </details>
   </div>
 <% end %>
 
 <% content_for(:content) do %>
-  <h2>Posts</h2>
+  <div class="flex flex-wrap gap-4 mb-4 border-b">
+    <%= link_to "New", current_page_path(search: search_params.except(:modqueue, :order)), class: ["inline-block p-1 pb-2", (search_params[:modqueue].nil? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+    <%= link_to "Seen", current_page_path(search: search_params.merge(modqueue: :seen, order: "disapproved")), class: ["inline-block p-1 pb-2", (search_params[:modqueue] == "seen" ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
 
-  <% @posts.each do |post| %>
-    <%= render "post", post: post %>
+    <span class="flex-grow-1"></span>
+    <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+    <% if @mode == "gallery" %>
+      <%= link_to list_icon, current_page_path(mode: "list"), title: "List", class: "inline-block p-1 pb-2 rounded inactive-link" %>
+    <% else %>
+      <%= link_to grid_icon, current_page_path(mode: nil), title: "Gallery", class: "inline-block p-1 pb-2 rounded inactive-link" %>
+    <% end %>
+  </div>
+
+  <% if @mode == "gallery" %>
+    <%= render(PostGalleryComponent.new(size: @preview_size)) do |gallery| %>
+      <% @posts.each do |post| %>
+        <% gallery.post(post: post, size: @preview_size, classes: "card mod-queue-preview p-2", show_deleted: true) do |preview| %>
+          <% preview.footer do %>
+            <%= render "modqueue/post_preview_footer", post: post %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <div class="flex flex-col gap-4">
+      <% @posts.each do |post| %>
+        <%= render "modqueue/post", post: post %>
+      <% end %>
+    </div>
   <% end %>
 
   <%= numbered_paginator(@posts) %>

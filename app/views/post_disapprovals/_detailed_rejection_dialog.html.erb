@@ -9,7 +9,7 @@
   <% else %>
     <%= edit_form_for(PostDisapproval.new, remote: true, html: { id: "detailed-rejection-form" }) do |f| %>
       <%= f.hidden_field :post_id, value: "x" %>
-      <%= f.input :reason, collection: PostDisapproval::REASONS.map { |x| [x.humanize, x] } %>
+      <%= f.input :reason, collection: PostDisapproval::REASONS.map { |x| [x.humanize, x] }, include_blank: false %>
       <%= f.input :message, as: :string %>
     <% end %>
   <% end %>
