@@ -12,9 +12,10 @@ module Sources
         ],
         profile_url: "https://cullmee.booth.pm",
         page_url: "https://booth.pm/en/items/3240411",
-        artist_name: "cullmee",
-        other_names: ["くるみ"],
-        tags: [["アイドルマスターシャイニーカラーズ", "https://booth.pm/en/browse/Acrylic%20Figure?tags%5B%5D=%E3%82%A2%E3%82%A4%E3%83%89%E3%83%AB%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%82%B7%E3%83%A3%E3%82%A4%E3%83%8B%E3%83%BC%E3%82%AB%E3%83%A9%E3%83%BC%E3%82%BA"]],
+        artist_name: "くるみ",
+        tag_name: "cullmee",
+        other_names: %w[cullmee くるみ],
+        tags: %w[アイドルマスターシャイニーカラーズ アクリルスタンド二次創作 シャニマス 月岡恋鐘],
         artist_commentary_title: "月岡恋鐘 日本横断フェア アクリルスタンド",
         dtext_artist_commentary_desc: <<~EOS.chomp
           歌姫庭園28にて頒布した月岡恋鐘(日本横断フェア衣装)のアクリルスタンド
@@ -32,9 +33,10 @@ module Sources
         ],
         profile_url: "https://cullmee.booth.pm",
         page_url: "https://booth.pm/en/items/3240411",
-        artist_name: "cullmee",
-        other_names: ["くるみ"],
-        tags: [["アイドルマスターシャイニーカラーズ", "https://booth.pm/en/browse/Acrylic%20Figure?tags%5B%5D=%E3%82%A2%E3%82%A4%E3%83%89%E3%83%AB%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%82%B7%E3%83%A3%E3%82%A4%E3%83%8B%E3%83%BC%E3%82%AB%E3%83%A9%E3%83%BC%E3%82%BA"]],
+        artist_name: "くるみ",
+        tag_name: "cullmee",
+        other_names: %w[cullmee くるみ],
+        tags: %w[アイドルマスターシャイニーカラーズ アクリルスタンド二次創作 シャニマス 月岡恋鐘],
         artist_commentary_title: "月岡恋鐘 日本横断フェア アクリルスタンド",
         dtext_artist_commentary_desc: <<~EOS.chomp
           歌姫庭園28にて頒布した月岡恋鐘(日本横断フェア衣装)のアクリルスタンド
@@ -51,6 +53,7 @@ module Sources
         page_url: "https://booth.pm/en/items/3713604",
         profile_url: nil,
         artist_name: nil,
+        tag_name: nil,
         other_names: [],
         tags: [],
         artist_commentary_title: nil,
@@ -64,9 +67,10 @@ module Sources
         image_urls: ["https://booth.pximg.net/8bb9e4e3-d171-4027-88df-84480480f79d/i/2423989/a692d4f3-4371-4a86-a337-83fee82d46a4.png"],
         profile_url: "https://re-face.booth.pm",
         page_url: "https://booth.pm/en/items/2423989",
-        artist_name: "re-face",
-        other_names: ["Re:fAce/りふぇいす。"],
-        tags: ["original"],
+        artist_name: "Re:fAce/りふぇいす。",
+        tag_name: "re-face",
+        other_names: %w[Re:fAce/りふぇいす。 re-face],
+        tags: %w[music original re:face ricchan\ * virtual\ youtuber くるみ だてんちゆあ ひなの羽衣 りふぇいす。 アイドル 千草はな 白乃クロミ 白咲べる 赤坂まさか 音楽],
         artist_commentary_title: "RwithV vol.1 -アイドルはじめます！-",
         dtext_artist_commentary_desc: /注文が殺到した際は、発送が遅れてしまう場合もございますので予めご了承ください。/
       )
@@ -76,7 +80,14 @@ module Sources
       strategy_should_work(
         "https://s2.booth.pm/8bb9e4e3-d171-4027-88df-84480480f79d/3d70de06-8e7c-444e-b8eb-a8a95bf20638_base_resized.jpg",
         image_urls: ["https://s2.booth.pm/8bb9e4e3-d171-4027-88df-84480480f79d/3d70de06-8e7c-444e-b8eb-a8a95bf20638.png"],
-        profile_url: nil
+        page_url: nil,
+        profile_url: nil,
+        artist_name: nil,
+        tag_name: nil,
+        other_names: [],
+        tags: [],
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
       )
     end
 
@@ -84,12 +95,30 @@ module Sources
       strategy_should_work(
         "https://booth.pximg.net/c/128x128/users/3193929/icon_image/5be9eff4-1d9e-4a79-b097-33c1cd4ad314_base_resized.jpg",
         image_urls: ["https://booth.pximg.net/users/3193929/icon_image/5be9eff4-1d9e-4a79-b097-33c1cd4ad314.png"],
-        profile_url: nil
+        page_url: nil,
+        profile_url: nil,
+        artist_name: nil,
+        tag_name: nil,
+        other_names: [],
+        tags: [],
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
       )
     end
 
     context "A non-existing or deleted post" do
-      strategy_should_work("https://booth.pm/en/items/2003079", deleted: true)
+      strategy_should_work(
+        "https://booth.pm/en/items/2003079",
+        deleted: true,
+        page_url: "https://booth.pm/en/items/2003079",
+        profile_url: nil,
+        artist_name: nil,
+        tag_name: nil,
+        other_names: [],
+        tags: [],
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
+      )
     end
 
     should "Parse Booth URLs correctly" do

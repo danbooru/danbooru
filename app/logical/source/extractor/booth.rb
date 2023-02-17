@@ -8,44 +8,33 @@ class Source::Extractor
     end
 
     def image_urls
-      if parsed_url.image_url?
-        if parsed_url.full_image_url?
-          [parsed_url.to_s]
-        else
-          [find_right_extension(parsed_url)]
-        end
+      if parsed_url.full_image_url?
+        [parsed_url.to_s]
+      elsif parsed_url.image_url?
+        [find_right_extension(parsed_url)]
       else
-        page&.css(".market-item-detail-item-image")&.pluck("data-origin").to_a.compact
+        api_response["images"].to_a.pluck("original").map { |url| find_right_extension(Source::URL.parse(url)) }
       end
     end
 
     def profile_url
-      if page.present?
-        page.at(".summary [data-product-list*='shop_index']")&.[]("href")&.chomp("/")
-      else
-        parsed_url.profile_url || parsed_referer&.profile_url
-      end
+      parsed_url.profile_url || parsed_referer&.profile_url || Source::URL.profile_url(api_response.dig("shop", "url"))
+    end
+
+    def tag_name
+      api_response.dig("shop", "subdomain")
     end
 
     def artist_name
-      return nil unless profile_url.present?
-      Source::URL.parse(profile_url)&.username
-    end
-
-    def display_name
-      page&.at(".summary .user-avatar")&.[]("alt")
-    end
-
-    def other_names
-      [display_name].compact
+      api_response.dig("shop", "name")
     end
 
     def artist_commentary_title
-      page&.at(".summary .u-tpg-title1")&.text
+      api_response["name"]
     end
 
     def artist_commentary_desc
-      page&.at(".autolink")&.to_html
+      api_response["description"]
     end
 
     def dtext_artist_commentary_desc
@@ -53,8 +42,8 @@ class Source::Extractor
     end
 
     def tags
-      page&.css(".item-info-detail [data-product-list*='tag_category_search']").to_a.map do |element|
-        [element.text.gsub(/ x .*/, ""), element["href"]]
+      api_response["tags"].to_a.map do |tag|
+        [tag["name"], tag["url"]]
       end
     end
 
@@ -62,15 +51,14 @@ class Source::Extractor
       parsed_url.page_url || parsed_referer&.page_url
     end
 
-    def page
-      return nil if parsed_url.page_url.blank?
+    memoize def api_response
+      return {} if parsed_url.api_url.blank?
 
-      resp = http.cache(1.minute).cookies(adult: "t").get(page_url)
-      return nil if resp.code != 200
+      resp = http.cache(1.minute).cookies(adult: "t").get(parsed_url.api_url)
+      return {} if resp.code != 200
 
       resp.parse
     end
-    memoize :page
 
     def find_right_extension(parsed_url)
       extensions = %w[png jpg jpeg]

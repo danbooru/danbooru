@@ -92,6 +92,10 @@ module Source
       "https://booth.pm/en/items/#{work_id}" if work_id.present?
     end
 
+    def api_url
+      "https://booth.pm/en/items/#{work_id}.json" if work_id.present?
+    end
+
     def profile_url
       "https://#{username}.booth.pm" if username.present?
     end
