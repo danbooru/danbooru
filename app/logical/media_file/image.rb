@@ -10,6 +10,8 @@ class MediaFile::Image < MediaFile
   def close
     super
     @preview_frame&.close unless @preview_frame == self
+    Vips.vips_image_invalidate_all(@image) if @image
+    @image = nil
   end
 
   def dimensions
@@ -167,7 +169,7 @@ class MediaFile::Image < MediaFile
 
   # @return [Vips::Image] the Vips image object for the file
   def image
-    Vips::Image.new_from_file(file.path, fail: false).autorot
+    @image ||= Vips::Image.new_from_file(file.path, fail: false).autorot
   end
 
   def video

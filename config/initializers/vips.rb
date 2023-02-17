@@ -4,3 +4,5 @@
 # be hidden even if the log level is set to `error` or above. You have to set the VIPS_WARNING environment variable
 # before the program starts to hide these warnings.
 GLib.logger = Rails.logger
+
+Vips.attach_function :vips_image_invalidate_all, [:pointer], :void
