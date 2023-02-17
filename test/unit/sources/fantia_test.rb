@@ -109,6 +109,36 @@ module Sources
       end
     end
 
+    context "A fantia.jp/posts/$id blog type url" do
+      strategy_should_work(
+        "https://fantia.jp/posts/1734300",
+        page_url: "https://fantia.jp/posts/1734300",
+        image_urls: %w[
+          https://c.fantia.jp/uploads/post/file/1734300/ed85ffde-0e85-47f5-ac37-864984550216.gif
+          https://c.fantia.jp/uploads/post/file/1649664/83e30463-3ed7-48e9-af21-d9a022bb1e95.png
+          https://c.fantia.jp/uploads/post/file/1679805/dc4ad3d8-e0ce-4388-aafc-64046e285de9.png
+          https://c.fantia.jp/uploads/post/file/1679848/f5ee8427-eea6-4a51-8eba-5a89fdf2ee48.png
+        ],
+        profile_url: "https://fantia.jp/fanclubs/7",
+        profile_urls: %w[https://fantia.jp/fanclubs/7],
+        artist_name: nil,
+        tag_name: nil,
+        tags: [],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          つば広お帽子すきです。
+          ⭐️お気に入りボタンを押していただけると次の投稿の励みになります。いつも応援ありがとうございます！
+          うんうん差分作りました。うんうんの民の救済になれば……。
+          zipファイル内にフォルダを分けて入れてあります！
+          ▼前回のオリジナルシリーズ：モーターショーのえっちなお姉さん
+          ▼過去のオリジナルイラスト一覧
+          ▼Fantia5年間の総集編まとめ本委託中です：🐯とらのあな / 🍈メロンブックス
+          I like wide-brimmed hats. This time I made a scatology diff, which is in a separate folder in the zip file.
+          Please press the ⭐️star (favorite) button to cheer me on! Thank you for your support!
+          ⇩🔞下スクロールでエロ差分🔞⇩
+        EOS
+      )
+    end
+
     context "A fantia.jp/products/$id url" do
       should "work" do
         url = "https://fantia.jp/products/249638"

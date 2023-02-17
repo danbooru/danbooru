@@ -39,25 +39,23 @@ class Source::Extractor
 
     def images_for_post
       return [] unless api_response.present?
-      images = [api_response.dig("post", "thumb_micro")]
-      api_response.dig("post", "post_contents").to_a.map do |content|
+
+      images = api_response.dig("post", "post_contents").to_a.map do |content|
         next if content["visible_status"] != "visible"
 
         case content["category"]
         when "photo_gallery"
-          content["post_content_photos"].to_a.map { |i| images << i.dig("url", "original") }
+          content["post_content_photos"].to_a.map { |i| i.dig("url", "original") }
         when "file"
-          images << image_from_downloadable("https://www.fantia.jp/#{content["download_uri"]}")
+          image_from_downloadable("https://www.fantia.jp/#{content["download_uri"]}")
         when "blog"
-          begin
-            sub_json = JSON.parse(content["comment"])
-          rescue Json::ParserError
-            sub_json = {}
-          end
-          sub_json["ops"].to_a.map { |js| images << js.dig("insert", "fantiaImage", "url") }
+          comment = JSON.parse(content["comment"]) rescue {}
+          comment["ops"].to_a.pluck("insert").pluck("image").compact
         end
-      end
-      images
+      end.flatten.compact
+
+      thumb_micro = api_response.dig("post", "thumb_micro")
+      [thumb_micro, *images].compact
     end
 
     def images_for_product
