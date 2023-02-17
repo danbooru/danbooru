@@ -73,7 +73,7 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
         get_auth modqueue_index_path, @admin
 
         assert_response :success
-        assert_select "#post-#{@appeal.post_id}"
+        assert_select "#post_#{@appeal.post_id}"
       end
     end
   end

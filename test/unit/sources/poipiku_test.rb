@@ -97,15 +97,20 @@ module Sources
       # Ignores the warning image
       context "A page url with a warning image" do
         strategy_should_work(
-          "https://poipiku.com/6849873/8237184.html",
-          page_url: "https://poipiku.com/6849873/8237184.html",
-          image_urls: %w[https://img-org.poipiku.com/user_img03/006849873/008237184_016726466_RCZvKk0L0.jpeg],
+          "https://poipiku.com/6849873/8143439.html",
+          page_url: "https://poipiku.com/6849873/8143439.html",
+          image_urls: %w[
+            https://img-org.poipiku.com/user_img03/006849873/008143439_016477493_W51KQXsLM.jpeg
+          ],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
           artist_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
-          dtext_artist_commentary_desc: "らくがき"
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            オモチリ体型こうだったらいいな絵
+            ⚠︎全裸
+          EOS
         )
       end
 
