@@ -43,6 +43,10 @@ module Source
         in "m", "bilibili.com", "dynamic", /^\d+$/ => t_work_id
           @t_work_id = t_work_id
 
+        # https://www.bilibili.com/opus/684571925561737250
+        in _, "bilibili.com", "opus", /^\d+$/ => t_work_id
+          @t_work_id = t_work_id
+
         # https://h.bilibili.com/83341894
         in "h", "bilibili.com", /^\d+$/ => h_work_id
           @h_work_id = h_work_id

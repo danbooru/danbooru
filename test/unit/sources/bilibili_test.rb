@@ -27,6 +27,31 @@ module Sources
       )
     end
 
+    context "A www.bilibili.com/opus/:id post" do
+      strategy_should_work(
+        "https://www.bilibili.com/opus/686082748803186697",
+        image_urls: [
+          "https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg",
+          "https://i0.hdslb.com/bfs/new_dyn/4c6b93d5e85b8ed5b84c3f04909f195711742550.jpg",
+          "https://i0.hdslb.com/bfs/new_dyn/e1a1e6be01b6c68f6610cdf1d127f38311742550.jpg",
+          "https://i0.hdslb.com/bfs/new_dyn/9ff31bbe8005aa1b9c438e1b2e6ce81111742550.jpg",
+          "https://i0.hdslb.com/bfs/new_dyn/716a9733fc804d11d823cfacb7a3c78b11742550.jpg",
+          "https://i0.hdslb.com/bfs/new_dyn/fa42eaa6ee9cd2a896cadc41e16ab62b11742550.jpg",
+          "https://i0.hdslb.com/bfs/new_dyn/fc9553ff7e4ad1185e0379b3ccf7e2d911742550.jpg",
+          "https://i0.hdslb.com/bfs/new_dyn/da95475b858be577fc8c79bd22b7519e11742550.jpg",
+          "https://i0.hdslb.com/bfs/new_dyn/60a3c652b362c54bc61ea3365258d1d111742550.jpg",
+        ],
+        page_url: "https://t.bilibili.com/686082748803186697",
+        artist_name: "哈米伦的弄笛者",
+        other_names: ["哈米伦的弄笛者"],
+        tag_name: "bilibili_11742550",
+        profile_url: "https://space.bilibili.com/11742550",
+        tags: [],
+        artist_commentary_title: nil,
+        dtext_artist_commentary_desc: "\"【崩坏3】少女，泳装，夏日时光！\":[https://www.bilibili.com/video/BV1fB4y1Y7zt/]  新视频的图片分享！大家记得来康 https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png "
+      )
+    end
+
     context "A t.bilibili.com:id repost" do
       strategy_should_work(
         "https://t.bilibili.com/723052706467414039?spm_id_from=333.999.0.0",
@@ -134,8 +159,10 @@ module Sources
     should "Parse Bilibili URLs correctly" do
       assert_equal("https://h.bilibili.com/8773541", Source::URL.page_url("https://www.bilibili.com/p/h5/8773541"))
       assert_equal("https://t.bilibili.com/612214375070704555", Source::URL.page_url("https://m.bilibili.com/dynamic/612214375070704555"))
+      assert_equal("https://t.bilibili.com/612214375070704555", Source::URL.page_url("https://www.bilibili.com/opus/612214375070704555"))
 
       assert(Source::URL.page_url?("https://t.bilibili.com/612214375070704555"))
+      assert(Source::URL.page_url?("https://www.bilibili.com/opus/612214375070704555"))
       assert(Source::URL.page_url?("https://h.bilibili.com/8773541"))
       assert(Source::URL.page_url?("https://www.bilibili.com/read/cv7360489"))
       assert(Source::URL.page_url?("https://www.bilibili.com/video/BV1dY4y1u7Vi"))
