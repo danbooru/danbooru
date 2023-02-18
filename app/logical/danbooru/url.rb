@@ -122,7 +122,7 @@ module Danbooru
     #
     # @return [String, nil]
     def subdomain
-      parsed_domain.trd
+      parsed_domain&.trd
     end
 
     # @return [String, nil] The username in a `http://username:password@example.com` URL.
@@ -130,10 +130,10 @@ module Danbooru
       url.user
     end
 
-    # @return [PublicSuffix::Domain]
+    # @return [PublicSuffix::Domain, nil]
     def parsed_domain
       @parsed_domain ||= PublicSuffix.parse(host)
-    rescue PublicSuffix::DomainNotAllowed
+    rescue # PublicSuffix::DomainInvalid, PublicSuffix::DomainNotAllowed
       nil
     end
   end

@@ -72,6 +72,13 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 451
       end
+
+      should "render for an invalid url" do
+        artist = create(:artist, url_string: "https://.auone-net.jp/~hakueki/")
+        get artist_path(artist.id)
+
+        assert_response :success
+      end
     end
 
     context "new action" do
@@ -101,6 +108,13 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     context "edit action" do
       should "render" do
         get_auth edit_artist_path(@artist.id), @user
+        assert_response :success
+      end
+
+      should "render for an invalid url" do
+        artist = create(:artist, url_string: "https://.auone-net.jp/~hakueki/")
+        get_auth edit_artist_path(artist.id), @user
+
         assert_response :success
       end
     end
