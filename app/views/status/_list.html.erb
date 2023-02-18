@@ -2,7 +2,7 @@
 <table class="striped aligned-vertical">
   <% hash.each do |key, value| %>
     <tr>
-      <th><%= key.to_s.humanize %></th>
+      <th><%= key.to_s.tr("_", " ").startcase %></th>
       <td><%= value %></td>
     </tr>
   <% end %>

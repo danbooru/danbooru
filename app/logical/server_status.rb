@@ -56,7 +56,7 @@ class ServerStatus
   concerning :InfoMethods do
     def http_headers
       headers = request.headers.env.select { |key| key.starts_with?("HTTP_") }
-      headers = headers.transform_keys { |key| key.delete_prefix("HTTP_").titleize.tr(" ", "-") }
+      headers = headers.transform_keys { |key| key.delete_prefix("HTTP_").tr("_", "-").startcase }
       headers = headers.except("Cookie")
       headers = headers.transform_values { |v| v.encode("UTF-8", invalid: :replace, undef: :replace) }
       headers = headers.reject { |k, v| v.blank? }

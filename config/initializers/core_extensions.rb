@@ -76,6 +76,13 @@ module Danbooru
         text
       end
 
+      # Capitalize every word in the string. Like `titleize`, but doesn't remove underscores, apply inflection rules, or strip the `_id` suffix.
+      #
+      # @return [String] The string with every word capitalized.
+      def startcase
+        self.gsub(/(?<![a-z'])([a-z]+)/i, &:capitalize)
+      end
+
       # @return [Boolean] True if the string contains only balanced parentheses; false if the string contains unbalanced parentheses.
       def has_balanced_parens?(open = "(", close = ")")
         parens = 0

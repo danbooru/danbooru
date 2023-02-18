@@ -63,4 +63,35 @@ class StringTest < ActiveSupport::TestCase
       assert_equal(false, "\u{1D455}".invisible?) # https://codepoints.net/U+1D455 (<reserved>)
     end
   end
+
+  context "String#startcase" do
+    should "work" do
+      assert_equal("2Girls", "2girls".startcase)
+      assert_equal("Bad Pixiv Id", "bad pixiv id".startcase) # XXX wrong, should be "Bad Pixiv ID"
+      assert_equal("K-On!", "k-on!".startcase)
+      assert_equal(".Hack//", ".hack//".startcase)
+      assert_equal("Re:Zero", "re:zero".startcase)
+      assert_equal("#Compass", "#compass".startcase)
+      assert_equal(".Hack//G.U.", ".hack//g.u.".startcase)
+      assert_equal("Me!Me!Me!", "me!me!me!".startcase)
+      assert_equal("D.Gray-Man", "d.gray-man".startcase)
+      assert_equal("Steins;Gate", "steins;gate".startcase)
+      assert_equal("Tiger & Bunny", "tiger & bunny".startcase)
+      assert_equal("Ssss.Gridman", "ssss.gridman".startcase) # XXX wrong, should be "SSSS.Gridman"
+      assert_equal("Yu-Gi-Oh! 5D's", "yu-gi-oh! 5d's".startcase)
+      assert_equal(%{Don't Say "Lazy"}, %q{don't say "lazy"}.startcase)
+      assert_equal("Jack-O'-Lantern", "jack-o'-lantern".startcase)
+      assert_equal("Miqo'te", "miqo'te".startcase)
+      assert_equal("Ninomae Ina'nis", "ninomae ina'nis".startcase)
+      assert_equal("D.Va (Overwatch)", "d.va (overwatch)".startcase)
+      assert_equal("Rosario+Vampire", "rosario+vampire".startcase)
+      assert_equal("Yorha No. 2 Type B", "yorha no. 2 type b".startcase)
+      assert_equal("Jeanne D'arc Alter (Ver. Shinjuku 1999) (Fate)", "jeanne d'arc alter (ver. shinjuku 1999) (fate)".startcase) # XXX wrong, should be "d'Arc"
+      assert_equal("Kaguya-Sama Wa Kokurasetai ~Tensai-Tachi No Renai Zunousen~", "kaguya-sama wa kokurasetai ~tensai-tachi no renai zunousen~".startcase) # XXX wrong
+      assert_equal("Nyoro~N", "nyoro~n".startcase) # XXX wrong, should be "Nyoro~n"
+      assert_equal(":O", ":o".startcase)
+      assert_equal("O_O", "o_o".startcase)
+      assert_equal("Http_User_Agent", "HTTP_USER_AGENT".startcase)
+    end
+  end
 end

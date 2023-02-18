@@ -296,7 +296,7 @@ class PostQuery
         in [:wildcard, name]
           name
         in [:tag, name]
-          name.tr("_", " ").gsub(/\b([a-z])/, &:capitalize)
+          name.tr("_", " ").startcase
         in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
         in :not, child

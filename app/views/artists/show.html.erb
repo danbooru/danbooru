@@ -1,4 +1,4 @@
-<% page_title "#{@artist.pretty_name.titleize} | Artist Profile" %>
+<% page_title "#{@artist.pretty_name.startcase} | Artist Profile" %>
 <% noindex if @artist.is_banned? %>
 <%= render "secondary_links" %>
 
