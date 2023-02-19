@@ -15,7 +15,9 @@
   <%= f.input :original_description, input_html: { value: artist_commentary.try(:original_description) } %>
 
   <%= f.input :translated_title, as: :string, input_html: { value: artist_commentary.try(:translated_title) } %>
-  <%= f.input :translated_description, input_html: { value: artist_commentary.try(:translated_description) } %>
+  <%= f.input :translated_description, as: :dtext, input_html: { value: artist_commentary.try(:translated_description) } %>
+  <%# TODO: Unuglify this button. %>
+  <%= dtext_preview_button "artist_commentary_translated_description" %>
 
   <% if post.has_tag?("commentary") %>
     <%= f.input :remove_commentary_tag, as: :boolean %>
