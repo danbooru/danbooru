@@ -147,6 +147,7 @@ Rails.application.routes.draw do
     end
   end
   resources :media_assets, only: [:index, :show, :destroy] do
+    get :metadata
     get "/:variant", to: "media_assets#image", as: :image
   end
   resources :media_metadata, only: [:index]

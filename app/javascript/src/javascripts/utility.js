@@ -140,4 +140,19 @@ $.fn.selectEnd = function() {
   })
 }
 
+// Update a field if it's blank, signal an error if there's a conflict.
+Utility.update_field = function($field, value) {
+  $field.closest(".input").removeClass("field_with_errors");
+
+  if ($field.val().trim() === "") {
+    $field.val(value);
+    return true;
+  } else if ($field.val().trim() !== value) {
+    $field.closest(".input").addClass("field_with_errors");
+    return false;
+  } else {
+    return true;
+  }
+};
+
 export default Utility

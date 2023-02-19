@@ -107,9 +107,9 @@ ArtistCommentary.fill_commentary = function(commentary) {
 
   // Update the other fields if they're blank. Return success if none conflict.
   return [
-    ArtistCommentary.update_field($("#artist_commentary_original_title"), commentary.original_title),
-    ArtistCommentary.update_field($("#artist_commentary_translated_title"), commentary.translated_title),
-    ArtistCommentary.update_field($("#artist_commentary_translated_description"), commentary.translated_description),
+    Utility.update_field($("#artist_commentary_original_title"), commentary.original_title),
+    Utility.update_field($("#artist_commentary_translated_title"), commentary.translated_title),
+    Utility.update_field($("#artist_commentary_translated_description"), commentary.translated_description),
   ].every(function (i) { return i; });
 };
 
@@ -132,21 +132,6 @@ ArtistCommentary.merge_commentaries = function(description, commentary) {
     return commentary.original_description || description;
   }
 };
-
-// Update commentary field if it's blank, signal an error if there's a conflict.
-ArtistCommentary.update_field = function($field, value) {
-  $field.closest(".input").removeClass("field_with_errors");
-
-  if ($field.val().trim() === "") {
-    $field.val(value);
-    return true;
-  } else if ($field.val().trim() !== value) {
-    $field.closest(".input").addClass("field_with_errors");
-    return false;
-  } else {
-    return true;
-  }
-}
 
 $(function() {
   ArtistCommentary.initialize_all();

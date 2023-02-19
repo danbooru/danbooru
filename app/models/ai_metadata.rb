@@ -7,6 +7,7 @@ class AIMetadata < ApplicationRecord
   attr_accessor :updater
 
   before_save :normalize_prompts
+  before_validation :normalize_model_hash
   validate :validate_model_hash, if: :model_hash_changed?
 
   belongs_to :post
@@ -38,8 +39,8 @@ class AIMetadata < ApplicationRecord
         subject.model_hash = metadata["PNG:Source"]&.scan(/\b[A-Fa-f0-9]+$/)&.first&.downcase
       rescue JSON::ParserError
       end
-    elsif metadata.has_key?("PNG:Parameters")
-      prompt, negative_prompt, params = parse_parameters(metadata["PNG:Parameters"])
+    elsif metadata.has_key?("PNG:Parameters") || metadata.has_key?("ExifIFD:UserComment")
+      prompt, negative_prompt, params = parse_parameters(metadata["PNG:Parameters"] || metadata["ExifIFD:UserComment"])
       subject.prompt = prompt
       subject.negative_prompt = negative_prompt&.delete_prefix("Negative prompt: ")
       if params.present?
@@ -77,6 +78,10 @@ class AIMetadata < ApplicationRecord
   def normalize_prompts
     self.prompt = prompt&.split(/\s*,\s*/)&.join(", ")
     self.negative_prompt = negative_prompt&.split(/\s*,\s*/)&.join(", ")
+  end
+
+  def normalize_model_hash
+    self.model_hash = self.model_hash.downcase
   end
 
   def validate_model_hash

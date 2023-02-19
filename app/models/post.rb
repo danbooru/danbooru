@@ -55,7 +55,7 @@ class Post < ApplicationRecord
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
   belongs_to :parent, class_name: "Post", optional: true
-  has_one :ai_metadata
+  has_one :ai_metadata, dependent: :destroy
   has_one :media_asset, -> { active }, foreign_key: :md5, primary_key: :md5
   has_one :media_metadata, through: :media_asset
   has_one :artist_commentary, :dependent => :destroy
@@ -131,7 +131,7 @@ class Post < ApplicationRecord
       steps: steps,
       cfg_scale: cfg_scale,
       model_hash: model_hash,
-    }.compact)
+    }.compact_blank)
 
     if add_artist_tag
       tag_string = "#{tag_string} #{upload_media_asset.source_extractor&.artists.to_a.map(&:tag).map(&:name).join(" ")}".strip

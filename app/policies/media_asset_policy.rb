@@ -13,6 +13,10 @@ class MediaAssetPolicy < ApplicationPolicy
     can_see_image?
   end
 
+  def metadata?
+    show?
+  end
+
   def can_see_image?
     !record.removed? && (record.post.blank? || record.post.visible?(user))
   end

@@ -4,6 +4,7 @@ class MediaAssetsController < ApplicationController
   respond_to :html, :json, :xml, :js
 
   rate_limit :image, rate: 5.0/1.seconds, burst: 50
+  rate_limit :metadata, rate: 1.0/1.seconds, burst: 3
 
   def index
     @limit = params.fetch(:limit, CurrentUser.user.per_page).to_i.clamp(0, PostSets::Post::MAX_PER_PAGE)
@@ -49,5 +50,12 @@ class MediaAssetsController < ApplicationController
     raise ActiveRecord::RecordNotFound if variant.nil?
 
     redirect_to variant.file_url, allow_other_host: true
+  end
+
+  def metadata
+    media_asset = authorize MediaAsset.find(params[:media_asset_id])
+    @ai_metadata = AIMetadata.new_from_metadata(media_asset.metadata)
+
+    respond_with(@ai_metadata)
   end
 end

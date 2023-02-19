@@ -36,7 +36,6 @@ Post.initialize_all = function() {
     this.initialize_post_image_resize_links();
     this.initialize_recommended();
     this.initialize_ugoira_player();
-    this.initialize_edit_ai_metadata_dialog();
     this.initialize_info_tabs();
   }
 
@@ -429,32 +428,6 @@ Post.initialize_ruffle_player = function() {
     player.load(src);
   }
 };
-
-Post.initialize_edit_ai_metadata_dialog = function() {
-  $("#add-ai-metadata-dialog").dialog({
-    autoOpen: false,
-    width: 700,
-    buttons: {
-      "Submit": function() {
-        let form = $("#add-ai-metadata-dialog #edit-ai-metadata").get(0);
-        Rails.fire(form, "submit");
-        $(this).dialog("close");
-      },
-      "Cancel": function() {
-        $(this).dialog("close");
-      }
-    }
-  });
-
-  $("#add-ai-metadata-dialog #edit-ai-metadata").submit(() => {
-    $("#add-commentary-dialog").dialog("close");
-  });
-
-  $("#add-ai-metadata").on("click.danbooru", (e) => {
-    e.preventDefault();
-    $("#add-ai-metadata-dialog").dialog("open");
-  });
-}
 
 Post.resize_ugoira_controls = function() {
   var $img = $("#image");
