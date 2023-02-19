@@ -7,7 +7,11 @@ AIMetadata.initialize_all = function() {
   if ($("#c-posts").length && $("#a-show").length) {
     this.initialize_edit_ai_metadata_dialog();
   }
-}
+
+  if ($("#copy-as-webui").length) {
+    this.initialize_copy_button();
+  }
+};
 
 AIMetadata.initialize_edit_ai_metadata_dialog = function() {
   $("#add-ai-metadata-dialog").dialog({
@@ -36,13 +40,23 @@ AIMetadata.initialize_edit_ai_metadata_dialog = function() {
     e.preventDefault();
     $("#add-ai-metadata-dialog").dialog("open");
   });
-}
+};
+
+AIMetadata.initialize_copy_button = function() {
+  $("#copy-as-webui").on("click.danbooru.ai-metadata", (e) => {
+    e.preventDefault();
+    let content = $("#webui-parameters").text();
+    navigator.clipboard.writeText(content)
+      .then(() => Utility.notice("Copied to clipboard."))
+      .catch(() => Utility.error("Error copying text to clipboard."));
+  });
+};
 
 AIMetadata.fetch_file_metadata = function() {
   // XXX this is ugly
   let media_asset_id = parseInt($("#post-info-size > a:nth-child(2)").attr("href").match(/\/media_assets\/(\d+)$/)[1]);
   return $.get(`/media_assets/${media_asset_id}/metadata.json`);
-}
+};
 
 AIMetadata.load_from_file = function() {
   Utility.notice("Loading metadata...");

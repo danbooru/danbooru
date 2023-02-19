@@ -75,6 +75,14 @@ class AIMetadata < ApplicationRecord
     end
   end
 
+  def to_webui_parameters
+    uc = "Negative prompt: #{negative_prompt}"
+    parameters = ["Steps", "Sampler", "CFG scale", "Seed"].map { |param| "#{param}: #{self.send(param.downcase.gsub(' ', '_').to_sym)}" }
+    parameters.push("Size: #{post.image_width}x#{post.image_height}")
+
+    [prompt, uc, parameters.join(", ")].join("\n")
+  end
+
   def normalize_prompts
     self.prompt = prompt&.split(/\s*,\s*/)&.join(", ")
     self.negative_prompt = negative_prompt&.split(/\s*,\s*/)&.join(", ")

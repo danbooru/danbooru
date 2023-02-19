@@ -27,6 +27,14 @@ class AIMetadataVersion < ApplicationRecord
     }
   end
 
+  def to_webui_parameters
+    uc = "Negative prompt: #{negative_prompt}"
+    parameters = ["Steps", "Sampler", "CFG scale", "Seed"].map { |param| "#{param}: #{self.send(param.downcase.gsub(' ', '_').to_sym)}" }
+    parameters.push("Size: #{post.image_width}x#{post.image_height}")
+
+    [prompt, uc, parameters.join(", ")].join("\n")
+  end
+
   def self.available_includes
     [:post, :updater, :ai_metadata]
   end
