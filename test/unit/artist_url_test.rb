@@ -196,6 +196,9 @@ class ArtistURLTest < ActiveSupport::TestCase
         assert_search_equals([@bkub_url], url_matches: "*bkub*")
         assert_search_equals([@bkub_url], url_matches: "/^https?://bkub\.com$/")
         assert_search_equals([@bkub_url], url_matches: "https://bkub.com")
+        assert_search_equals([@bkub_url], url_matches: "http://bkub.com")
+        assert_search_equals([@bkub_url], url_matches: "http://bkub.com/")
+        assert_search_equals([@bkub_url], url_matches: "http://BKUB.com/")
         assert_search_equals([@masao_url, @bkub_url], url_matches: "https://bkub.com https://masao.com")
         assert_search_equals([@masao_url, @bkub_url], url_matches: ["https://bkub.com", "https://masao.com"])
 

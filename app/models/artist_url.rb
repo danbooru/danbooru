@@ -50,10 +50,16 @@ class ArtistURL < ApplicationRecord
       where_ilike(:url, url)
     elsif url =~ %r{\Ahttps?://}i
       profile_url = Source::URL.profile_url(url) || Source::Extractor.find(url).profile_url || normalize_url(url)
-      where(url: profile_url)
+      normalized_url_like(profile_url)
     else
       where_ilike(:url, "*#{url}*")
     end
+  end
+
+  def self.normalized_url_like(url)
+    url = url.downcase.gsub(%r{\Ahttps?://|/\z}i, "") # "https://example.com/A/B/C/" => "example.com/a/b/c"
+    url = url + "/" unless url.include?("*")
+    where_like("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'", url) # this is indexed
   end
 
   def domain
