@@ -68,6 +68,7 @@ module Source
       Source::URL::Imgur,
       Source::URL::Zerochan,
       Source::URL::Poipiku,
+      Source::URL::AboutMe,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
