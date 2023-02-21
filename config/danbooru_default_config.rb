@@ -152,6 +152,16 @@ module Danbooru
       "#{source_code_url}/issues"
     end
 
+    # The maximum number of threads to use for certain operations, such as generating thumbnails or processing bulk
+    # update requests.
+    #
+    # The default is to use 1 thread per CPU core.
+    #
+    # Set this to 0 to disable multithreading. This may save memory at the cost of reduced performance.
+    def max_concurrency
+      Etc.nprocessors
+    end
+
     # If true, allow web crawlers such as Google to crawl your site.
     #
     # If false, don't allow crawlers to crawl your site. This means your site won't be indexed by search engines.

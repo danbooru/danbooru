@@ -263,7 +263,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :ConcurrencyMethods do
     class_methods do
-      def parallel_each(batch_size: 1000, in_processes: 4, in_threads: nil, &block)
+      def parallel_each(batch_size: 1000, in_processes: Danbooru.config.max_concurrency.to_i, in_threads: nil, &block)
         # XXX We may deadlock if a transaction is open; do a non-parallel each.
         return find_each(&block) if connection.transaction_open?
 

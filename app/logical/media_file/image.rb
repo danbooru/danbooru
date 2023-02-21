@@ -10,7 +10,8 @@ class MediaFile::Image < MediaFile
   def close
     super
     @preview_frame&.close unless @preview_frame == self
-    Vips.vips_image_invalidate_all(@image) if @image
+    @preview_frame = nil
+    @image&.release
     @image = nil
   end
 
@@ -39,8 +40,10 @@ class MediaFile::Image < MediaFile
   end
 
   def error
-    image = Vips::Image.new_from_file(file.path, fail: true)
-    image.stats
+    image = Vips::Image.new_from_file(file.path, fail: true, access: :sequential)
+    stats = image.stats
+    stats.release
+    image.release
     nil
   rescue Vips::Error => e
     # XXX Vips has a single global error buffer that is shared between threads and that isn't cleared between operations.
@@ -111,7 +114,9 @@ class MediaFile::Image < MediaFile
     end
 
     if resized_image.has_alpha?
-      resized_image = resized_image.flatten(background: 255)
+      flattened_image = resized_image.flatten(background: 255)
+      resized_image.release
+      resized_image = flattened_image
     end
 
     output_file = Danbooru::Tempfile.new(["danbooru-image-preview-#{md5}-", ".#{format.to_s}"])
@@ -129,12 +134,13 @@ class MediaFile::Image < MediaFile
       raise NotImplementedError
     end
 
+    resized_image.release
     MediaFile::Image.new(output_file)
   end
 
   def preview!(max_width, max_height, **options)
     w, h = MediaFile.scale_dimensions(width, height, max_width, max_height)
-    preview_frame.resize!(w, h, size: :force, **options)
+    MediaFile::Image.new(preview_frame.file).resize!(w, h, size: :force, **options)
   end
 
   def is_animated?
@@ -159,7 +165,8 @@ class MediaFile::Image < MediaFile
 
   # Return true if the image has an embedded ICC color profile.
   def has_embedded_profile?
-    image.icc_import(embedded: true)
+    out = image.icc_import(embedded: true)
+    out.release
     true
   rescue Vips::Error
     false
@@ -169,7 +176,7 @@ class MediaFile::Image < MediaFile
 
   # @return [Vips::Image] the Vips image object for the file
   def image
-    @image ||= Vips::Image.new_from_file(file.path, fail: false).autorot
+    @image ||= Vips::Image.new_from_file(file.path, fail: false, access: :sequential).autorot
   end
 
   def video
@@ -186,5 +193,5 @@ class MediaFile::Image < MediaFile
     end
   end
 
-  memoize :image, :video, :dimensions, :error, :metadata, :is_corrupt?, :is_animated_gif?, :is_animated_png?
+  memoize :video, :dimensions, :error, :metadata, :is_corrupt?, :is_animated_gif?, :is_animated_png?
 end
