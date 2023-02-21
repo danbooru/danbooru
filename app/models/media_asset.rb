@@ -75,7 +75,7 @@ class MediaAsset < ApplicationRecord
       storage_service.store(file, file_path)
       backup_storage_service.store(file, file_path)
     ensure
-      file&.close
+      file&.close unless file == original_file
     end
 
     def trash_file!
@@ -448,7 +448,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def distribute_files!(media_file, variants: self.variants)
-      Parallel.each(variants, in_threads: Etc.nprocessors) do |variant|
+      Parallel.each(variants, in_threads: Danbooru.config.max_concurrency.to_i) do |variant|
         variant.store_file!(media_file)
       end
     end
