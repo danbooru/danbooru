@@ -99,9 +99,24 @@ class MediaFile
     width * height
   end
 
+  # @return [String] The MD5 hash of the file, as a hex string.
+  def self.md5(filename, **options)
+    MediaFile.open(filename, **options, &:md5)
+  end
+
   # @return [String] the MD5 hash of the file, as a hex string.
   def md5
     Digest::MD5.file(file.path).hexdigest
+  end
+
+  # @return [String] The MD5 hash of the image's pixel data, or just the file's MD5 if we can't compute a hash of the image data.
+  def self.pixel_hash(filename, **options)
+    MediaFile.open(filename, **options, &:pixel_hash)
+  end
+
+  # @return [String] The MD5 hash of the image's pixel data, or just the file's MD5 if we can't compute a hash of the image data.
+  def pixel_hash
+    md5
   end
 
   # @return [Symbol] the detected file extension
@@ -243,6 +258,7 @@ class MediaFile
       file_ext: file_ext,
       mime_type: mime_type.to_s,
       md5: md5,
+      pixel_hash: pixel_hash,
       is_corrupt?: is_corrupt?,
       is_supported?: is_supported?,
       duration: duration,
