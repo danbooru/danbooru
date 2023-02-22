@@ -177,6 +177,121 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
+  context "#pixel_hash" do
+    should "return the file's md5 for corrupted files" do
+      assert_equal(MediaFile.md5("test/files/test-blank.jpg"), MediaFile.pixel_hash("test/files/test-blank.jpg"))
+      assert_equal(MediaFile.md5("test/files/test-corrupt.jpg"), MediaFile.pixel_hash("test/files/test-corrupt.jpg"))
+      assert_equal(MediaFile.md5("test/files/test-exif-small.jpg"), MediaFile.pixel_hash("test/files/test-exif-small.jpg"))
+      assert_equal(MediaFile.md5("test/files/test-large.jpg"), MediaFile.pixel_hash("test/files/test-large.jpg"))
+      assert_equal(MediaFile.md5("test/files/test-corrupt.png"), MediaFile.pixel_hash("test/files/test-corrupt.png"))
+      assert_equal(MediaFile.md5("test/files/test-corrupt.gif"), MediaFile.pixel_hash("test/files/test-corrupt.gif"))
+      assert_equal(MediaFile.md5("test/files/webp/truncated.webp"), MediaFile.pixel_hash("test/files/webp/truncated.webp"))
+    end
+
+    should "return the file's md5 for animated files" do
+      assert_equal("64872dbdc62b6b02e6fc5f468838f674", MediaFile.pixel_hash("test/files/test-animated-256x256.png"))
+      assert_equal("8b18b12d212e08d1773f6fd329b63b15", MediaFile.pixel_hash("test/files/test-animated-inf-fps.png"))
+      assert_equal("77d89bda37ea3af09158ed3282f8334f", MediaFile.pixel_hash("test/files/test-animated-86x52.gif"))
+      assert_equal("f9961d54b2290c36ad3e54995d9d2dcf", MediaFile.pixel_hash("test/files/webp/nyancat.webp"))
+      assert_equal("5ad19202d4cd9b0e90587f56ff648c28", MediaFile.pixel_hash("test/files/avif/alpha_video.avif"))
+    end
+
+    should "return the file's md5 for Flash files" do
+      assert_equal("1f9a43dbebb2195a8f7d9e0eede51e4b", MediaFile.pixel_hash("test/files/compressed.swf"))
+    end
+
+    should "return the file's md5 for Ugoira files" do
+      frame_delays = JSON.parse(File.read("test/files/ugoira.json")).pluck("delay")
+      ugoira = MediaFile.open("test/files/ugoira.zip", frame_delays: frame_delays)
+      assert_equal("0d94800c4b520bf3d8adda08f95d31e2", ugoira.pixel_hash)
+    end
+
+    should "return the file's md5 for video files" do
+      assert_equal("34dd2489f7aaa9e57eda1b996ff26ff7", MediaFile.pixel_hash("test/files/webm/test-512x512.webm"))
+      assert_equal("865c93102cad3e8a893d6aac6b51b0d2", MediaFile.pixel_hash("test/files/mp4/test-300x300.mp4"))
+    end
+
+    should "work for normal images" do
+      assert_equal("01cb481ec7730b7cfced57ffa5abd196", MediaFile.pixel_hash("test/files/test.jpg"))
+      assert_equal("07daec7b3ee9438734107c36263707b2", MediaFile.pixel_hash("test/files/test-cmyk-no-profile.jpg"))
+      assert_equal("85e9fde0ba6cc7d4fedf24c71bb6277b", MediaFile.pixel_hash("test/files/test-grey-no-profile.jpg"))
+      assert_equal("7bc62a583c0eb07de4fb7fa0dc9e0851", MediaFile.pixel_hash("test/files/test-rotation-90cw.jpg"))
+      assert_equal("510aa465afbba3d7d818038b7aa7bb6f", MediaFile.pixel_hash("test/files/test-rotation-180.jpg"))
+      assert_equal("ac0220aea5683e3c4ffcb2c7b34078e8", MediaFile.pixel_hash("test/files/test-rotation-270cw.jpg"))
+      assert_equal("0365fdfe0e905167c14c67e2bbdf8110", MediaFile.pixel_hash("test/files/test-weird-profile.jpg"))
+
+      assert_equal("5daef1f4d42b97cc5cda14f93867b085", MediaFile.pixel_hash("test/files/alpha.png"))
+      assert_equal("d351db38efb2697d355cf89853099539", MediaFile.pixel_hash("test/files/test.png"))
+      assert_equal("723bce01fcc6b8444ae362467e8628af", MediaFile.pixel_hash("test/files/test-rotation-90cw.png"))
+
+      assert_equal("446ddbb45f40265e565efbc8229d5eea", MediaFile.pixel_hash("test/files/test.gif"))
+      assert_equal("d42cd8553aa008b4ef9bc253ff4f1239", MediaFile.pixel_hash("test/files/test-static-32x32.gif"))
+
+      assert_equal("21e8133c81d6e30cec95127973a1793a", MediaFile.pixel_hash("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif"))
+
+      assert_equal("3d9213ea387706db93f0b39247d77573", MediaFile.pixel_hash("test/files/webp/test.webp"))
+      assert_equal("fd52591b61fc34192d7c337fa024bf12", MediaFile.pixel_hash("test/files/webp/lossless1.webp"))
+      assert_equal("c5c77aff5b4015d3416817d12c2c2377", MediaFile.pixel_hash("test/files/webp/lossy_alpha1.webp"))
+      assert_equal("509da3d93ff4def075b98bbff08010ba", MediaFile.pixel_hash("test/files/webp/Exif2.webp"))
+    end
+
+    should "compute the same pixel hash for images with different EXIF metadata" do
+      assert_equal("1839af48fab8688cf72653d6ac4b52ab", MediaFile.md5("test/files/dupes/countergirl-baseline.jpg"))
+      assert_equal("fa00b3cc4152933bf98692045fc59a6f", MediaFile.md5("test/files/dupes/countergirl-no-exif.jpg"))
+
+      assert_equal("c135caa2229b6d43d06179503f70ed74", MediaFile.pixel_hash("test/files/dupes/countergirl-baseline.jpg"))
+      assert_equal("c135caa2229b6d43d06179503f70ed74", MediaFile.pixel_hash("test/files/dupes/countergirl-no-exif.jpg"))
+    end
+
+    should "compute the same pixel hash for progressive and baseline encoded JPEGs" do
+      assert_equal("1839af48fab8688cf72653d6ac4b52ab", MediaFile.md5("test/files/dupes/countergirl-baseline.jpg"))
+      assert_equal("264cb22336ceaddf8bf2b1ba6d472bb0", MediaFile.md5("test/files/dupes/countergirl-progressive.jpg"))
+
+      assert_equal("c135caa2229b6d43d06179503f70ed74", MediaFile.pixel_hash("test/files/dupes/countergirl-baseline.jpg"))
+      assert_equal("c135caa2229b6d43d06179503f70ed74", MediaFile.pixel_hash("test/files/dupes/countergirl-progressive.jpg"))
+    end
+
+    should "compute the same pixel hash for greyscale and sRGB images" do
+      assert_equal("1073acb0a8a59139a687360bf9031c7f", MediaFile.md5("test/files/dupes/countergirl-grey.png"))
+      assert_equal("632766b7230cc2844cf36fa14d2bf765", MediaFile.md5("test/files/dupes/countergirl-grey-srgb.png"))
+
+      assert_equal("d007f30f42cb7c5835fb3d0d9c24587e", MediaFile.pixel_hash("test/files/dupes/countergirl-grey.png"))
+      assert_equal("d007f30f42cb7c5835fb3d0d9c24587e", MediaFile.pixel_hash("test/files/dupes/countergirl-grey-srgb.png"))
+    end
+
+    should "compute the same pixel hash for images with a transparent alpha channel" do
+      assert_equal("cc2e12de5c11afad72540c230e9dea37", MediaFile.md5("test/files/dupes/countergirl.gif"))
+      assert_equal("af529aa2250b21fcb37b781a246937e5", MediaFile.md5("test/files/dupes/countergirl.png"))
+      assert_equal("830eeb693d0f575ac76c92ed223dc3d8", MediaFile.md5("test/files/dupes/countergirl-no-exif.png"))
+
+      assert_equal("2981edc81606af5552b9cd2db0a60a2c", MediaFile.pixel_hash("test/files/dupes/countergirl.gif"))
+      assert_equal("2981edc81606af5552b9cd2db0a60a2c", MediaFile.pixel_hash("test/files/dupes/countergirl.png"))
+      assert_equal("2981edc81606af5552b9cd2db0a60a2c", MediaFile.pixel_hash("test/files/dupes/countergirl-no-exif.png"))
+    end
+
+    should "compute the same pixel hash for images with an opaque alpha channel" do
+      assert_equal("a353ab010901216b56a2be2d90fc8bfc", MediaFile.md5("test/files/dupes/countergirl-whitebg-alpha.png"))
+      assert_equal("a4b5924967ace4045546def1609e9abc", MediaFile.md5("test/files/dupes/countergirl-whitebg-noalpha.gif"))
+      assert_equal("058a5b03b4b22befe3813f4bc901fe1e", MediaFile.md5("test/files/dupes/countergirl-whitebg-noalpha.png"))
+
+      assert_equal("5199b09cccde8a33c3d204413f5450d9", MediaFile.pixel_hash("test/files/dupes/countergirl-whitebg-alpha.png"))
+      assert_equal("5199b09cccde8a33c3d204413f5450d9", MediaFile.pixel_hash("test/files/dupes/countergirl-whitebg-noalpha.gif"))
+      assert_equal("5199b09cccde8a33c3d204413f5450d9", MediaFile.pixel_hash("test/files/dupes/countergirl-whitebg-noalpha.png"))
+    end
+
+    should "compute different pixel hashes for images with the same pixels but with different dimensions" do
+      assert_equal("d7fccdb09eb17ed57ee2aaeff165e415", MediaFile.pixel_hash("test/files/dupes/black-100x200.png"))
+      assert_equal("c1d32710ce71b7c02a9d943e1113b31f", MediaFile.pixel_hash("test/files/dupes/black-200x100.png"))
+    end
+
+    should "compute different pixel hashes for images with the same pixel values but with different embedded color profiles" do
+      assert_equal("51b5c7fe125eca4048cd963617df5668", MediaFile.pixel_hash("test/files/dupes/countergirl-srgb.jpg"))
+      assert_equal("56092d3fb1e5b803b4f89c039c4e46b4", MediaFile.pixel_hash("test/files/dupes/countergirl-p3.jpg"))
+      assert_equal("ddd8706eb76f051d57bdbab45d7347d5", MediaFile.pixel_hash("test/files/dupes/countergirl-prophoto.jpg"))
+      assert_equal("92df52d799527a96819e8aa52c16967f", MediaFile.pixel_hash("test/files/dupes/countergirl-adobergb.jpg"))
+    end
+  end
+
   context "for a ugoira" do
     setup do
       skip unless MediaFile::Ugoira.videos_enabled?
