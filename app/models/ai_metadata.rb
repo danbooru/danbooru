@@ -89,7 +89,7 @@ class AIMetadata < ApplicationRecord
   end
 
   def normalize_model_hash
-    self.model_hash = self.model_hash.downcase
+    self.model_hash = self.model_hash&.downcase
   end
 
   def validate_model_hash
