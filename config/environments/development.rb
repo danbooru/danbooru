@@ -68,13 +68,14 @@ Rails.application.configure do
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
 
-  logger           = ActiveSupport::Logger.new(STDERR)
-  logger.formatter = config.log_formatter
-  config.logger    = ActiveSupport::TaggedLogging.new(logger)
-  config.log_level = :debug
-
   BetterErrors::Middleware.allow_ip!(IPAddr.new("0.0.0.0/0"))
   BetterErrors::Middleware.allow_ip!(IPAddr.new("::/0"))
+
+  # Log SQL queries at INFO level instead of DEBUG level.
+  config.active_record.logger = Logger.new(STDERR)
+  def (config.active_record.logger).add(level, message = nil, prog = nil)
+    Rails.logger.add(Logger::Severity::INFO, message, prog)
+  end
 
   # https://bigbinary.com/blog/rails-6-adds-guard-against-dns-rebinding-attacks
   # hxxps://github.com/rails/rails/pull/33145

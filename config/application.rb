@@ -82,7 +82,11 @@ module Danbooru
     # app/jobs/mail_delivery_job.rb
     config.action_mailer.delivery_job = "MailDeliveryJob"
 
-    config.log_tags = [->(req) {"PID:#{Process.pid}"}]
+    logger           = ActiveSupport::Logger.new(STDERR)
+    config.logger    = ActiveSupport::TaggedLogging.new(logger)
+    config.log_tags  = [->(req) {"PID:#{Process.pid}"}]
+    config.log_level = Danbooru.config.log_level
+
     config.action_controller.action_on_unpermitted_parameters = :raise
 
     if File.exist?("#{config.root}/REVISION")

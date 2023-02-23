@@ -144,6 +144,25 @@ module Danbooru
       false
     end
 
+    # The log level for the application. Valid values are "debug", "info", "warn", "error", or "fatal". "debug" is the
+    # most verbose and "fatal" is the least verbose.
+    #
+    # The default log level is taken from the RAILS_LOG_LEVEL environment variable, otherwise it's "debug" if debug mode
+    # is enabled, otherwise it's "error" in production, "info" in development, or "fatal" in testing.
+    def log_level
+      if ENV["RAILS_LOG_LEVEL"].present?
+        ENV["RAILS_LOG_LEVEL"]
+      elsif debug_mode
+        :debug
+      elsif Rails.env.production?
+        :error
+      elsif Rails.env.development?
+        :info
+      else
+        :fatal
+      end
+    end
+
     def source_code_url
       "https://github.com/danbooru/danbooru"
     end
