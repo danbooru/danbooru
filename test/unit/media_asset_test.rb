@@ -23,6 +23,10 @@ class MediaAssetTest < ActiveSupport::TestCase
         assert_tag_match([@asset1], "md5:#{@asset1.md5}")
       end
 
+      should "return assets for the pixelhash: metatag" do
+        assert_tag_match([@asset1], "pixelhash:#{@asset1.pixel_hash}")
+      end
+
       should "return assets for the width: metatag" do
         assert_tag_match([@asset1], "width:#{@asset1.image_width}")
       end
