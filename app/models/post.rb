@@ -1063,6 +1063,8 @@ class Post < ApplicationRecord
           attribute_matches(value, :id)
         when "md5"
           attribute_matches(value, :md5, :md5)
+        when "pixelhash"
+          attribute_matches(value, "media_assets.pixel_hash", :md5).joins(:media_asset)
         when "width"
           attribute_matches(value, "media_assets.image_width").joins(:media_asset)
         when "height"

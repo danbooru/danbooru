@@ -4,7 +4,7 @@
 class MediaAssetQuery
   extend Memoist
 
-  METATAGS = %w[id md5 width height duration mpixels ratio filesize filetype date age status is exif]
+  METATAGS = %w[id md5 pixelhash width height duration mpixels ratio filesize filetype date age status is exif]
 
   attr_reader :search_string
   delegate :to_infix, :to_pretty_string, to: :ast
@@ -62,6 +62,8 @@ class MediaAssetQuery
       relation.attribute_matches(value, :id)
     when "md5"
       relation.attribute_matches(value, "media_assets.md5", :md5)
+    when "pixelhash"
+      relation.attribute_matches(value, "media_assets.pixel_hash", :md5)
     when "width"
       relation.attribute_matches(value, "media_assets.image_width")
     when "height"

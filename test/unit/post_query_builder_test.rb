@@ -192,6 +192,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         assert_tag_match([], "age:30")
 
         assert_tag_match([], "md5:foo")
+
+        assert_tag_match([], "pixelhash:foo")
       end
     end
 
@@ -1008,6 +1010,23 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "md5:ecef68c44edb8a0d6a3070b5f8e8ee76 md5:xyz")
 
       assert_tag_match([post2, post1], "-md5:xyz")
+    end
+
+    should "return posts for the pixelhash:<md5> metatag" do
+      post1 = create(:post_with_file, filename: "test.jpg")
+      post2 = create(:post_with_file, filename: "test.png")
+
+      assert_tag_match([post1], "pixelhash:01cb481ec7730b7cfced57ffa5abd196")
+      assert_tag_match([post1], "pixelhash:01CB481EC7730B7CFCED57FFA5ABD196")
+      assert_tag_match([post1], "pixelhash:01cb481ec7730b7cfced57ffa5abd196,ecef68c44edb8a0d6a3070b5f8e8ee76")
+
+      assert_tag_match([post2], "-pixelhash:01cb481ec7730b7cfced57ffa5abd196")
+      assert_tag_match([post2], "-pixelhash:01CB481EC7730B7CFCED57FFA5ABD196")
+
+      assert_tag_match([], "pixelhash:xyz")
+      assert_tag_match([], "pixelhash:01cb481ec7730b7cfced57ffa5abd196 pixelhash:xyz")
+
+      assert_tag_match([post2, post1], "-pixelhash:xyz")
     end
 
     should "return posts for a source:<text> search" do
