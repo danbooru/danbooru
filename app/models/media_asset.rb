@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MediaAsset < ApplicationRecord
+  self.ignored_columns = [:pixel_hash]
+
   class Error < StandardError; end
 
   FILE_TYPES = %w[jpg png gif webp avif mp4 webm swf zip]
@@ -13,6 +15,19 @@ class MediaAsset < ApplicationRecord
   MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
   STORAGE_SERVICE = Danbooru.config.storage_manager
+
+  attribute :id
+  attribute :created_at
+  attribute :updated_at
+  attribute :md5
+  attribute :file_ext
+  attribute :file_size
+  attribute :image_width
+  attribute :image_height
+  attribute :duration
+  attribute :status
+  attribute :is_public
+  #attribute :pixel_hash, :md5
 
   has_one :post, foreign_key: :md5, primary_key: :md5
   has_one :media_metadata, dependent: :destroy
