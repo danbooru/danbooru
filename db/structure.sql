@@ -986,7 +986,8 @@ CREATE TABLE public.media_assets (
     duration double precision,
     status integer DEFAULT 200 NOT NULL,
     file_key character varying,
-    is_public boolean DEFAULT true NOT NULL
+    is_public boolean DEFAULT true NOT NULL,
+    pixel_hash uuid
 );
 
 
@@ -6979,6 +6980,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221228232240'),
 ('20221230011825'),
 ('20230104064916'),
-('20230209060757');
+('20230209060757'),
+('20230222230650');
 
 
