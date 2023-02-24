@@ -1,6 +1,6 @@
 @import "../../javascript/src/styles/base/000_vars";
 
-article.post-preview {
+article.post-preview, .post-tooltip-header {
   .post-score a {
     @include inactive-link;
   }

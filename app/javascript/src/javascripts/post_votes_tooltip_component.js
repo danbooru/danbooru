@@ -5,16 +5,12 @@ import 'tippy.js/dist/tippy.css';
 class PostVotesTooltipComponent {
   // Trigger on the post score link; see PostVotesComponent.
   static TARGET_SELECTOR = "span.post-votes span.post-score a";
-  static SHOW_DELAY = 125;
+  static SHOW_DELAY = 375;
   static HIDE_DELAY = 125;
   static DURATION = 250;
   static instance = null;
 
   static initialize() {
-    if ($(PostVotesTooltipComponent.TARGET_SELECTOR).length === 0) {
-      return;
-    }
-
     PostVotesTooltipComponent.instance = delegate("body", {
       allowHTML: true,
       appendTo: document.querySelector("#post-votes-tooltips"),
@@ -35,8 +31,6 @@ class PostVotesTooltipComponent {
     let $target = $(instance.reference);
     let $tooltip = $(instance.popper);
     let postId = $target.parents("[data-id]").data("id");
-
-    hideAll({ exclude: instance });
 
     try {
       $tooltip.addClass("tooltip-loading");
