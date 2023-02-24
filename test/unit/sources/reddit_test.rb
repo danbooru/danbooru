@@ -2,7 +2,7 @@ require 'test_helper'
 
 module Sources
   class RedditTest < ActiveSupport::TestCase
-    context "A reddit post" do
+    context "A reddit gallery post" do
       strategy_should_work(
         "https://www.reddit.com/gallery/ttyccp",
         image_urls: [
@@ -15,6 +15,22 @@ module Sources
         profile_url: "https://www.reddit.com/user/Darksin31",
         page_url: "https://www.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/",
         artist_commentary_title: "Maria Nearl Versus the Left-Armed Knight (@dankestsin)"
+      )
+    end
+
+    context "A reddit multi-image post" do
+      strategy_should_work(
+        "https://www.reddit.com/r/leagueoflegends/comments/e7yzhe/pulling_ahris_cheeks/",
+        image_urls: %w[
+          https://i.redd.it/hpe45fcwzg341.jpg
+          https://i.redd.it/3edn5rjvzg341.png
+          https://i.redd.it/7yydis0zxg341.png
+        ],
+        tag_name: "melancholicmelanie",
+        artist_name: "MelancholicMelanie",
+        profile_url: "https://www.reddit.com/user/MelancholicMelanie",
+        page_url: "https://www.reddit.com/r/leagueoflegends/comments/e7yzhe/pulling_ahris_cheeks/",
+        artist_commentary_title: "Pulling Ahri's Cheeks",
       )
     end
 

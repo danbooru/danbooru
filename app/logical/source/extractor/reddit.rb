@@ -22,10 +22,11 @@ module Source
 
       def ordered_gallery_images
         gallery_images = data.dig("media", "mediaMetadata")
-        return [] unless gallery_images.present?
-        gallery_order = data.dig("media", "gallery", "items").pluck("mediaId")
 
-        gallery_order.map { |id| gallery_images[id].dig("s", "u") }
+        gallery_order = data.dig("media", "gallery", "items").to_a.pluck("mediaId")
+        gallery_order = data.dig("media", "richtextContent", "document").to_a.pluck("id").compact if gallery_order.blank?
+
+        gallery_images.to_h.values_at(*gallery_order).compact.pluck("s").pluck("u")
       end
 
       def profile_url
