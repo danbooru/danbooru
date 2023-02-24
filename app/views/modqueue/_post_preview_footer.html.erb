@@ -41,15 +41,19 @@
     <% end %>
   </div>
 
-  <% if (CurrentUser.is_approver? || post.created_at < Danbooru.config.moderation_period.ago) && post.disapprovals.map(&:reason).without("disinterest").present? %>
-    <div class="text-center text-xs">
-      <% %w[poor_quality breaks_rules].each do |reason| %>
-        <% if post.disapprovals.map(&:reason).grep(reason).count > 0 %>
-          <span class="inline-block rounded px-2 text-inverse bg:error-color">
-            <%= reason.titleize %>: <%= post.disapprovals.map(&:reason).grep(reason).count %>
-          </span>
-        <% end %>
+  <div class="text-center text-xs">
+    <% %w[poor_quality breaks_rules].each do |reason| %>
+      <% if post.disapprovals.map(&:reason).grep(reason).count > 0 %>
+        <span class="inline-block rounded px-2 mb-1 text-inverse bg:error-color">
+          <%= reason.titleize %>: <%= post.disapprovals.map(&:reason).grep(reason).count %>
+        </span>
       <% end %>
-    </div>
-  <% end %>
+    <% end %>
+
+    <% (post.tag_array & Danbooru.config.modqueue_warning_tags).each do |tag| %>
+      <span class="inline-block rounded px-2 mb-1 text-inverse bg:error-color">
+        <%= tag.tr("_", " ").startcase %>
+      </span>
+    <% end %>
+  </div>
 </div>
