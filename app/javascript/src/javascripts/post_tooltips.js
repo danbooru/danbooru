@@ -36,12 +36,22 @@ PostTooltip.initialize = function () {
 };
 
 PostTooltip.on_create = function (instance) {
+  if (instance.reference === document.body) {
+    return;
+  }
+
   let title = instance.reference.getAttribute("title");
 
   if (title) {
     instance.reference.setAttribute("data-title", title);
     instance.reference.setAttribute("title", "");
   }
+
+  // Only show the tooltip after the mouse has stopped moving inside the thumbnail.
+  $(instance.reference).on("mousemove.danbooru", e => {
+    instance.clearDelayTimeouts();
+    instance.reference.dispatchEvent(new Event('mouseenter'));
+  });
 };
 
 PostTooltip.on_show = async function (instance) {
