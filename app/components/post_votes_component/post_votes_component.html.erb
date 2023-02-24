@@ -1,4 +1,4 @@
-<span class="post-votes" data-id="<%= post.id %>">
+<span class="post-votes inline-flex gap-1" data-id="<%= post.id %>">
   <% if current_user.is_anonymous? %>
     <%= link_to upvote_icon, login_path(url: request.fullpath), class: "post-upvote-link inactive-link" %>
   <% elsif upvoted? %>

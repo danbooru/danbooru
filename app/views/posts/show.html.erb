@@ -217,10 +217,14 @@
         This post is pending approval. (<%= link_to_wiki "learn more", "about:mod_queue" %>)
       <% elsif @post.is_flagged? %>
         This post was flagged and is pending approval (<%= link_to_wiki "learn more", "howto:flag" %>)
-        <%= render "post_flags/reasons", flag: @post.flags.select(&:pending?).last %>
+        <ul class="list-bulleted">
+          <li><%= render "post_flags/reasons", flag: @post.flags.select(&:pending?).last %></li>
+        </ul>
       <% elsif @post.is_appealed? %>
         This post was appealed and is pending approval (<%= link_to_wiki "learn more", "about:mod_queue" %>)
-        <%= render "post_appeals/reasons", appeal: @post.appeals.select(&:pending?).last %>
+        <ul class="list-bulleted">
+          <li><%= render "post_appeals/reasons", appeal: @post.appeals.select(&:pending?).last %></li>
+        </ul>
       <% end %>
 
       <%= render "post_disapprovals/counts", disapprovals: @post.disapprovals.order(id: :asc), post: @post %>

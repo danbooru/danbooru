@@ -1,37 +1,29 @@
-<div class="post-tooltip-header">
-  <%= link_to_user @post.uploader %>
+<div class="post-tooltip-header flex gap-2 items-center whitespace-nowrap h-6">
+  <%= link_to_user @post.uploader, classes: "truncate" %>
 
-  <span class="post-tooltip-favorites post-tooltip-info">
-    <span><%= @post.fav_count %></span>
-    <%= empty_heart_icon(class: "fa-xs") %>
+  <%= link_to posts_path(tags: "date:#{@post.created_at.strftime("%Y-%m-%d")}"), class: "post-tooltip-date inactive-link" do %>
+    <%= time_ago_in_words_tagged(@post.created_at, compact: true) %>
+  <% end %>
+
+  <span class="post-tooltip-score">
+    <%= render_post_votes @post, current_user: CurrentUser.user %>
   </span>
 
-  <span class="post-tooltip-score post-tooltip-info">
-    <span><%= @post.score %></span>
-    <%= upvote_icon %>
-  </span>
+  <span class="flex-grow-1"></span>
 
   <% if Danbooru.config.comments_enabled?.to_s.truthy? && @post.last_commented_at.present? %>
-    <span class="post-tooltip-comments post-tooltip-info">
+    <span class="post-tooltip-comments text-muted">
       <span><%= @post.comments.count %></span>
-      <%= comments_icon(class: "fa-xs") %>
+      <%= comments_icon(class: "text-xxs") %>
     </span>
   <% end %>
 
-  <%= link_to posts_path(tags: "date:#{@post.created_at.strftime("%Y-%m-%d")}"), class: "post-tooltip-date post-tooltip-info" do %>
-    <%= time_ago_in_words_tagged(@post.created_at, compact: true) %> ago
-  <% end %>
+  <%= link_to "#{@post.rating.upcase}", posts_path(tags: "rating:#{@post.pretty_rating}"), class: "post-tooltip-rating inactive-link" %>
+  <%= link_to "#{@post.media_asset.image_width}x#{@post.media_asset.image_height}", @post.media_asset, class: "post-tooltip-dimensions inactive-link" %>
 
-  <% if @post.source_domain.present? %>
-    <%= link_to @post.source_domain, @post.normalized_source, class: "post-tooltip-source post-tooltip-info" %>
-  <% elsif @post.source.present? %>
-    <%= link_to "non-web source", posts_path(tags: "non-web_source"), title: @post.source, class: "post-tooltip-source post-tooltip-info" %>
-  <% else %>
-    <%= link_to "no source", posts_path(tags: "source:none"), class: "post-tooltip-source post-tooltip-info" %>
+  <% if @post.parsed_source.present? %>
+    <%= external_link_to @post.normalized_source, external_site_icon(@post.parsed_source.site_name, class: "h-3"), title: @post.normalized_source, class: "post-tooltip-source" %>
   <% end %>
-
-  <%= link_to "#{@post.rating.upcase}", posts_path(tags: "rating:#{@post.pretty_rating}"), class: "post-tooltip-rating post-tooltip-info" %>
-  <%= link_to "#{@post.image_width}x#{@post.image_height}", @post.file_url, class: "post-tooltip-dimensions post-tooltip-info" %>
 
   <%= render PopupMenuComponent.new do |menu| %>
     <% menu.item do %>
@@ -42,17 +34,50 @@
   <% end %>
 </div>
 
-<div class="post-tooltip-body thin-scrollbar <%= "has-preview" if params[:preview].truthy? %>">
-  <div class="post-tooltip-body-left">
+<div class="post-tooltip-body thin-scrollbar text-xs flex <%= "has-preview gap-1" if params[:preview].truthy? %>">
+  <div class="flex-none">
     <% if params[:preview].truthy? %>
       <%= post_preview(@post, show_deleted: true, compact: true) %>
     <% end %>
   </div>
 
-  <div class="post-tooltip-body-right">
+  <div class="flex-1 min-w-0 space-y-1">
+    <% if CurrentUser.is_approver? %>
+      <% if @post.is_flagged? %>
+        <div class="post-tooltip-flag">
+          <strong>Flag</strong>
+          <%= render "post_flags/reasons", flag: @post.flags.select(&:pending?).last %>
+        </div>
+      <% elsif @post.is_appealed? %>
+        <div class="post-tooltip-appeal">
+          <strong>Appeal</strong>
+          <%= render "post_appeals/reasons", appeal: @post.appeals.select(&:pending?).last %>
+        </div>
+      <% end %>
+
+      <% if @post.disapprovals.map(&:message).any?(&:present?) %>
+        <div class="post-tooltip-disapprovals">
+          <% @post.disapprovals.sort_by(&:id).select { |disapproval| disapproval.message.present? }.each do |disapproval| %>
+            <ul class="post-disapproval-reason">
+              <li>
+                <strong>Disapproval</strong>
+                <span class="prose"><%= format_text(disapproval.message.strip.chomp("."), inline: true) %></span>
+
+                <% if policy(disapproval).can_view_creator? %>
+                  (<%= link_to_user(disapproval.user) %>, <%= time_ago_in_words_tagged(disapproval.created_at) %>)
+                <% else %>
+                  (<%= time_ago_in_words_tagged(disapproval.created_at) %>)
+                <% end %>
+              </li>
+            </ul>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+
     <div class="post-tooltip-pools">
       <% @post.pools.series.undeleted.each do |pool| %>
-        <%= link_to pool, class: "pool-category-#{pool.category}" do %>
+        <%= link_to pool, class: "pool-category-#{pool.category} break-all" do %>
           <%= "pool:#{pool.name} [#{pool.page_number(@post.id)}/#{pool.post_count}]" %>
         <% end %>
       <% end %>
