@@ -421,6 +421,18 @@ module IconHelper
     svg_icon_tag("globe", viewBox: "0 0 512 512", **options)
   end
 
+  def file_lines_icon(**options)
+    svg_icon_tag("file-lines", viewBox: "0 0 384 512", **options)
+  end
+
+  def file_pen_icon(**options)
+    svg_icon_tag("file-pen", viewBox: "0 0 576 512", **options)
+  end
+
+  def link_slash_icon(**options)
+    svg_icon_tag("link-slash", viewBox: "0 0 640 512", **options)
+  end
+
   def discord_icon(**options)
     image_icon_tag("discord-logo.png", **options)
   end

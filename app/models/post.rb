@@ -633,6 +633,14 @@ class Post < ApplicationRecord
       source.match?(%r{\Ahttps?://}i)
     end
 
+    def file_source?
+      source.starts_with?("file://")
+    end
+
+    def text_source?
+      source.present? && !web_source? && !file_source?
+    end
+
     def has_tag?(tag)
       tag_array.include?(tag)
     end

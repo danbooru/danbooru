@@ -23,6 +23,12 @@
 
   <% if @post.parsed_source.present? %>
     <%= external_link_to @post.normalized_source, external_site_icon(@post.parsed_source.site_name, class: "h-3"), title: @post.normalized_source, class: "post-tooltip-source" %>
+  <% elsif @post.file_source? %>
+    <%= link_to file_lines_icon(class: "h-3"), posts_path(tags: %{source:"#{@post.source.gsub(/"/, '\\"')}"}), title: @post.source, class: "post-tooltip-source inactive-link" %>
+  <% elsif @post.text_source? %>
+    <%= link_to file_pen_icon(class: "h-3"), posts_path(tags: %{source:"#{@post.source.gsub(/"/, '\\"')}"}), title: @post.source, class: "post-tooltip-source inactive-link" %>
+  <% else %>
+    <%= link_to link_slash_icon(class: "h-2"), posts_path(tags: "source:none"), title: "no source", class: "post-tooltip-source inactive-link" %>
   <% end %>
 
   <%= render PopupMenuComponent.new do |menu| %>

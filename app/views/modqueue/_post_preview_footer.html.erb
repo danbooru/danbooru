@@ -2,9 +2,15 @@
 
 <div class="flex flex-col mt-2 gap-2">
   <div class="flex flex-wrap gap-2 items-center justify-center w-full text-xs">
-    <div class="">
+    <div>
       <% if post.parsed_source.present? %>
         <%= external_link_to post.normalized_source, external_site_icon(post.parsed_source.site_name, class: "h-4"), title: post.normalized_source, class: "inline-block align-top" %>
+      <% elsif post.file_source? %>
+        <%= link_to file_lines_icon(class: "h-3"), posts_path(tags: %{source:"#{post.source.gsub(/"/, '\\"')}"}), title: post.source, class: "align-top" %>
+      <% elsif post.text_source? %>
+        <%= link_to file_pen_icon(class: "h-3"), posts_path(tags: %{source:"#{post.source.gsub(/"/, '\\"')}"}), title: post.source, class: "align-top" %>
+      <% else %>
+        <%= link_to link_slash_icon(class: "h-2"), posts_path(tags: "source:none"), title: "no source", class: "align-top" %>
       <% end %>
 
       <%= link_to post.media_asset do %>
@@ -54,6 +60,10 @@
       <span class="inline-block rounded px-2 mb-1 text-inverse bg:error-color">
         <%= tag.tr("_", " ").startcase %>
       </span>
+    <% end %>
+
+    <% if post.source.blank? %>
+      <span class="inline-block rounded px-2 mb-1 text-inverse bg:error-color">No Source</span>
     <% end %>
   </div>
 </div>
