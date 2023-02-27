@@ -88,7 +88,7 @@ action save_tag_attribute { save_tag_attribute(sm, { sm->a1, sm->a2 }, { sm->b1,
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
 eos = '\0';
 
-newline = '\r\n' | '\n';
+newline = '\n';
 ws = ' ' | '\t';
 eol = newline | eos;
 blank_line = ws* eol;
@@ -1368,10 +1368,25 @@ static std::tuple<std::string_view, std::string_view> trim_url(const std::string
   return { trimmed, { trimmed.end(), url.end() } };
 }
 
+// Replace CRLF sequences with LF.
+static void replace_newlines(const std::string_view input, std::string& output) {
+  size_t pos, last = 0;
+
+  while (std::string::npos != (pos = input.find("\r\n", last))) {
+    output.append(input, last, pos - last);
+    output.append("\n");
+    last = pos + 2;
+  }
+
+  output.append(input, last, pos - last);
+}
+
 StateMachine::StateMachine(const auto string, int initial_state, const DTextOptions options) : options(options) {
   // Add null bytes to the beginning and end of the string as start and end of string markers.
-  input.resize(string.size() + 2, '\0');
-  input.replace(1, string.size(), string.data(), string.size());
+  input.reserve(string.size());
+  input.append(1, '\0');
+  replace_newlines(string, input);
+  input.append(1, '\0');
 
   output.reserve(string.size() * 1.5);
   stack.reserve(16);

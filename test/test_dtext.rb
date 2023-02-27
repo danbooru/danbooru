@@ -574,6 +574,12 @@ class DTextTest < Minitest::Test
     assert_parse("<pre>\n\ncode\n\n</pre>", "```\n\n\ncode\n\n\n```")
     assert_parse("<pre>one\ntwo\nthree</pre>", "```\none\ntwo\nthree\n```")
 
+    assert_parse('<pre>code</pre>', "```\r\ncode\r\n```")
+    assert_parse('<pre>code</pre>', "``` \r\ncode\r\n``` ")
+    assert_parse("<pre>\ncode\n</pre>", "```\r\n\r\ncode\r\n\r\n```")
+    assert_parse("<pre>\n\ncode\n\n</pre>", "```\r\n\r\n\r\ncode\r\n\r\n\r\n```")
+    assert_parse("<pre>one\ntwo\nthree</pre>", "```\r\none\r\ntwo\r\nthree\r\n```")
+
     assert_parse('<pre class="language-ruby">code</pre>', "```ruby\ncode\n```")
     assert_parse('<pre class="language-ruby">code</pre>', "``` ruby \ncode\n```")
     assert_parse("<p>```ruby'&gt;<br>code<br>```</p>", "```ruby'>\ncode\n```")
@@ -581,6 +587,8 @@ class DTextTest < Minitest::Test
 
     assert_parse('<p>````<br>code<br>```</p>', "````\ncode\n```")
     assert_parse('<p>```<br>code<br>````</p>', "```\ncode\n````")
+    assert_parse('<p>````<br>code<br>```</p>', "````\r\ncode\r\n```")
+    assert_parse('<p>```<br>code<br>````</p>', "```\r\ncode\r\n````")
 
     assert_parse('<p>```<br>```</p>', "```\n```") # XXX wrong? should allow empty code blocks
     assert_parse('<pre></pre>', "```\n\n```")
@@ -642,6 +650,8 @@ class DTextTest < Minitest::Test
     assert_parse('<p class="tn"><pre>code</pre></p>', "[tn]\n```\ncode\n```") # XXX invalid html
 
     assert_parse("<pre> ▲\n▲ ▲</pre>", "```\n ▲\n▲ ▲\n```")
+
+    assert_parse('<blockquote><pre>code</pre></blockquote>', "[quote]\r\n```\r\ncode\r\n```\r\n[/quote]")
   end
 
   def test_urls
