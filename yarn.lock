@@ -6447,7 +6447,7 @@ fsevents@~2.3.2:
     postcss-preset-env: ^7.2.3
     sass: ^1.48.0
     sass-loader: ^12.4.0
-    shakapacker: 6.5.6
+    shakapacker: 6.5.5
     stylelint: ^14.2.0
     stylelint-config-standard: ^24.0.0
     stylelint-config-standard-scss: ^3.0.0
@@ -6687,9 +6687,9 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"shakapacker@npm:6.5.6":
-  version: 6.5.6
-  resolution: "shakapacker@npm:6.5.6"
+"shakapacker@npm:6.5.5":
+  version: 6.5.5
+  resolution: "shakapacker@npm:6.5.5"
   dependencies:
     glob: ^7.2.0
     js-yaml: ^4.1.0
@@ -6707,7 +6707,7 @@ fsevents@~2.3.2:
     webpack-cli: ^4.9.2 || ^5.0.0
     webpack-dev-server: ^4.9.0
     webpack-merge: ^5.8.0
-  checksum: adf40443db2826727ec12c5d1c9f3e8c2ee6c01393df01b0c6052bdfeba3553dded90e039be13758ef9a9b8df83b8f7268a6db46b194cbe810b43a28012a1f5f
+  checksum: 164c98e05882162a22180273514075f9e8d22e4847f9754de52264e2ab191c5aa31f83b7ee026b8d612c58ba68c48f150ceb688ec113a20e4d6180c94cb2fe1c
   languageName: node
   linkType: hard
 

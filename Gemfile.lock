@@ -445,7 +445,7 @@ GEM
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
     semantic_range (3.0.0)
-    shakapacker (6.5.6)
+    shakapacker (6.5.5)
       activesupport (>= 5.2)
       rack-proxy (>= 0.6.1)
       railties (>= 5.2)
@@ -590,7 +590,7 @@ DEPENDENCIES
   sanitize
   scenic
   selenium-webdriver
-  shakapacker
+  shakapacker (< 6.5.6)
   shoulda-context
   shoulda-matchers
   simple_form

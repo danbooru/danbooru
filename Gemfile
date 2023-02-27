@@ -23,7 +23,7 @@ gem 'addressable'
 gem 'rakismet'
 gem 'recaptcha', require: "recaptcha/rails"
 gem 'activemodel-serializers-xml'
-gem 'shakapacker'
+gem 'shakapacker', "< 6.5.6"
 gem 'rake'
 gem 'redis'
 gem 'builder'
