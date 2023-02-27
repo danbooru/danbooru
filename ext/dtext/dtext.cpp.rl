@@ -245,6 +245,7 @@ open_tbody = '[tbody'i tag_attributes :>> ']' | '<tbody'i tag_attributes :>> '>'
 open_tr = '[tr'i tag_attributes :>> ']' | '<tr'i tag_attributes :>> '>';
 open_th = '[th'i tag_attributes :>> ']' | '<th'i tag_attributes :>> '>';
 open_td = '[td'i tag_attributes :>> ']' | '<td'i tag_attributes :>> '>';
+open_br = '[br]'i | '<br>'i;
 
 open_tn = '[tn]'i | '<tn>'i;
 open_b = '[b]'i | '<b>'i | '<strong>'i;
@@ -397,6 +398,14 @@ inline := |*
     } else if (dstack_close_element(sm, BLOCK_TN)) {
       fret;
     }
+  };
+
+  open_br => {
+    if (sm->header_mode) {
+      append_html_escaped(sm, "<br>");
+    } else {
+      append(sm, "<br>");
+    };
   };
 
   open_code blank_line? => {

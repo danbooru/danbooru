@@ -1520,6 +1520,20 @@ class DTextTest < Minitest::Test
     #assert_parse('<p class="tn"><hr></p>', "[tn][hr][/tn]") # XXX shouldn't work
   end
 
+  def test_br
+    assert_parse("<p>foo<br>bar</p>", "foo[br]bar")
+    assert_parse("<p>foo<br>bar</p>", "foo[BR]bar")
+    assert_parse("<p>foo<br>bar</p>", "foo<br>bar")
+    assert_parse("<p>foo<br>bar</p>", "foo<BR>bar")
+
+    assert_parse("<ul><li>foo<br>bar</li></ul>", "* foo<br>bar")
+    assert_parse('<table class="striped"><tr><td>foo<br>bar</td></tr></table>', "[table][tr][td]foo[br]bar[/td][/tr][/table]")
+
+    assert_parse("<h4>foo&lt;br&gt;bar</h4>", "h4. foo<br>bar")
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">bar&lt;br&gt;baz</a></p>', "[[foo|bar<br>baz]]")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">foo&lt;br&gt;bar</a></p>', '"foo<br>bar":http://example.com')
+  end
+
   def test_inline_mode
     assert_equal("hello", parse_inline("hello").strip)
   end
