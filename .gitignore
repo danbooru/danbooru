@@ -1,6 +1,7 @@
 gmon.out
 tmp/
 pkg/
+test/files/*.json.gz
 *.bundle
 *.o
 *.so
