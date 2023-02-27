@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/danbooru/dtext_rb.git
-  revision: 43503ac6677016c901f07140a6b195cec367f28e
+  revision: 572a6e00ecd5d135d536e6448bb34cd14a407df6
   specs:
     dtext_rb (1.12.2)
 
