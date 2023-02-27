@@ -1083,7 +1083,7 @@ static void append_code_fence(StateMachine * sm, const std::string_view code, co
     append_html_escaped(sm, code);
     append_block(sm, "</pre>");
   } else {
-    append_block(sm, "<pre data-language=\"");
+    append_block(sm, "<pre class=\"language-");
     append_html_escaped(sm, language);
     append_block(sm, "\">");
     append_html_escaped(sm, code);
@@ -1095,7 +1095,7 @@ static void append_inline_code(StateMachine * sm, const std::string_view languag
   if (language.empty()) {
     dstack_open_element(sm, INLINE_CODE, "<code>");
   } else {
-    dstack_open_element(sm, INLINE_CODE, "<code data-language=\"");
+    dstack_open_element(sm, INLINE_CODE, "<code class=\"language-");
     append_html_escaped(sm, language);
     append(sm, "\">");
   }
@@ -1107,7 +1107,7 @@ static void append_block_code(StateMachine * sm, const std::string_view language
   if (language.empty()) {
     dstack_open_element(sm, BLOCK_CODE, "<pre>");
   } else {
-    dstack_open_element(sm, BLOCK_CODE, "<pre data-language=\"");
+    dstack_open_element(sm, BLOCK_CODE, "<pre class=\"language-");
     append_html_escaped(sm, language);
     append(sm, "\">");
   }

@@ -530,10 +530,10 @@ class DTextTest < Minitest::Test
     assert_parse("<pre>post #123</pre>", "[code]post #123[/code]")
     assert_parse("<pre>x</pre>", "[code]x")
 
-    assert_parse(%{<pre data-language="ruby">x</pre>}, "[code=ruby]\nx\n[/code]")
-    assert_parse(%{<pre data-language="ruby">x</pre>}, "[code = ruby]\nx\n[/code]")
+    assert_parse(%{<pre class="language-ruby">x</pre>}, "[code=ruby]\nx\n[/code]")
+    assert_parse(%{<pre class="language-ruby">x</pre>}, "[code = ruby]\nx\n[/code]")
     assert_parse("<p>[code=ruby'&gt;]<br>x<br>[/code]</p>", "[code=ruby'>]\nx\n[/code]")
-    assert_parse(%{<pre data-language="ruby">code</pre><pre>code</pre>}, "[code=ruby]\ncode\n[/code]\n\n[code]\ncode\n[/code]")
+    assert_parse(%{<pre class="language-ruby">code</pre><pre>code</pre>}, "[code=ruby]\ncode\n[/code]\n\n[code]\ncode\n[/code]")
 
     assert_parse("<pre> bar </pre>", "[code] bar [/code]")
     assert_parse("<pre>bar</pre>", "[code]\nbar\n[/code]")
@@ -557,10 +557,10 @@ class DTextTest < Minitest::Test
     assert_parse("<p>foo <em><code>post #123</code></em>.</p>", "foo [i][code]post #123[/code][/i].")
     assert_parse("<p>foo <code>x</code></p>", "foo [code]x")
 
-    assert_parse('<p>inline <code data-language="ruby">x</code></p>', "inline [code=ruby]x[/code]")
-    assert_parse('<p>inline <code data-language="ruby">x</code></p>', "inline [code = ruby]x[/code]")
+    assert_parse('<p>inline <code class="language-ruby">x</code></p>', "inline [code=ruby]x[/code]")
+    assert_parse('<p>inline <code class="language-ruby">x</code></p>', "inline [code = ruby]x[/code]")
     assert_parse("<p>inline [code=ruby'&gt;]x[/code]</p>", "inline [code=ruby'>]x[/code]")
-    assert_parse('<p>inline <code data-language="ruby">code</code></p><pre>code</pre>', "inline [code=ruby]code[/code]\n[code]code[/code]")
+    assert_parse('<p>inline <code class="language-ruby">code</code></p><pre>code</pre>', "inline [code=ruby]code[/code]\n[code]code[/code]")
 
     assert_parse("<p>foo <code> bar </code></p>", "foo [code] bar [/code]")
     assert_parse("<p>foo <code>bar</code></p>", "foo [code]\nbar\n[/code]")
@@ -574,10 +574,10 @@ class DTextTest < Minitest::Test
     assert_parse("<pre>\n\ncode\n\n</pre>", "```\n\n\ncode\n\n\n```")
     assert_parse("<pre>one\ntwo\nthree</pre>", "```\none\ntwo\nthree\n```")
 
-    assert_parse('<pre data-language="ruby">code</pre>', "```ruby\ncode\n```")
-    assert_parse('<pre data-language="ruby">code</pre>', "``` ruby \ncode\n```")
+    assert_parse('<pre class="language-ruby">code</pre>', "```ruby\ncode\n```")
+    assert_parse('<pre class="language-ruby">code</pre>', "``` ruby \ncode\n```")
     assert_parse("<p>```ruby'&gt;<br>code<br>```</p>", "```ruby'>\ncode\n```")
-    assert_parse('<pre data-language="ruby">code</pre><pre>code</pre>', "```ruby\ncode\n```\n\n```\ncode\n```")
+    assert_parse('<pre class="language-ruby">code</pre><pre>code</pre>', "```ruby\ncode\n```\n\n```\ncode\n```")
 
     assert_parse('<p>````<br>code<br>```</p>', "````\ncode\n```")
     assert_parse('<p>```<br>code<br>````</p>', "```\ncode\n````")
