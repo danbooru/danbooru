@@ -154,6 +154,7 @@ static void dstack_rewind(StateMachine * sm);
 static void dstack_open_inline(StateMachine * sm, element_t type, const char * html);
 static void dstack_open_element(StateMachine * sm, element_t type, const char * html);
 static void dstack_open_element(StateMachine * sm, element_t type, std::string_view tag_name, const StateMachine::TagAttributes& tag_attributes);
+static bool dstack_close_element(StateMachine * sm, element_t type);
 static void dstack_close_leaf_blocks(StateMachine * sm);
 static void append_block(StateMachine * sm, const auto s);
 static void append_block_html_escaped(StateMachine * sm, const std::string_view string);
