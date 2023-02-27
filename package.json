@@ -37,7 +37,7 @@
     "postcss-preset-env": "^7.2.3",
     "sass": "^1.48.0",
     "sass-loader": "^12.4.0",
-    "shakapacker": "6.5.6",
+    "shakapacker": "6.5.5",
     "terser-webpack-plugin": "5",
     "tippy.js": "^6.3.7",
     "webpack": "5",

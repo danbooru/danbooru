@@ -454,7 +454,7 @@ GEM
       sentry-ruby (~> 5.5.0)
     sentry-ruby (5.5.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-    shakapacker (6.5.6)
+    shakapacker (6.5.5)
       activesupport (>= 5.2)
       rack-proxy (>= 0.6.1)
       railties (>= 5.2)
@@ -604,7 +604,7 @@ DEPENDENCIES
   selenium-webdriver
   sentry-rails
   sentry-ruby
-  shakapacker
+  shakapacker (< 6.5.6)
   shoulda-context
   shoulda-matchers
   simple_form
