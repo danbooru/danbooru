@@ -42,11 +42,13 @@ module Danbooru
     def initialize(url)
       @original_url = url.to_s
       @url = Addressable::URI.heuristic_parse(original_url)
+
       @url.authority = @url.normalized_authority
       @url.path = Addressable::URI.unencode_component(@url.path, String, "/%")
+      raise Error, "invalid byte sequence in UTF-8" if !@url.path.valid_encoding?
+      @url.path = @url.path.gsub(/[^[:graph:]]/) { |c| "%%%02X" % c.ord }
       @url.path = nil if @url.path == "/"
 
-      raise Error, "invalid byte sequence in UTF-8" if !@url.path.valid_encoding?
       raise Error, "#{original_url} is not an http:// URL" if !@url.normalized_scheme.in?(["http", "https"])
       raise Error, "#{original_url} is not a valid hostname" if parsed_domain.nil?
     rescue Addressable::URI::InvalidURIError => e

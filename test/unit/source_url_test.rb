@@ -15,6 +15,10 @@ class SourceURLTest < ActiveSupport::TestCase
 
         assert_not_nil(Source::URL.parse("https://!!!.com")) # XXX invalid
       end
+
+      should "normalize URLs" do
+        assert_equal("https://example.com/foo%20%09%0B%0C%0D%0Abar", Source::URL.parse("https://example.com/foo \t\v\f\r\nbar").to_normalized_s)
+      end
     end
   end
 end

@@ -56,6 +56,11 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("https://arca.live/u/@윾파", url.url)
     end
 
+    should "percent-encode spaces" do
+      url = create(:artist_url, url: "http://dic.nicovideo.jp/a/tetla pot")
+      assert_equal("http://dic.nicovideo.jp/a/tetla%20pot", url.url)
+    end
+
     should "not fail when decoding percent-encoded Shift JIS URLs" do
       url = create(:artist_url, url: "https://www.digiket.com/abooks/result/_data/staff=%8F%BC%94C%92m%8A%EE")
       assert_equal("https://www.digiket.com/abooks/result/_data/staff=%8F%BC%94C%92m%8A%EE", url.url)
