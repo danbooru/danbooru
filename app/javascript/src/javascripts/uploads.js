@@ -9,16 +9,6 @@ Upload.IQDB_HIGH_SIMILARITY = 70;
 Upload.initialize_all = function() {
   if ($("#c-uploads #a-show #p-single-asset-upload").length) {
     this.initialize_similar();
-
-    $("#toggle-artist-commentary").on("click.danbooru", function(e) {
-      Upload.toggle_commentary();
-      e.preventDefault();
-    });
-
-    $("#toggle-commentary-translation").on("click.danbooru", function(e) {
-      Upload.toggle_translation();
-      e.preventDefault();
-    });
   }
 
   Upload.loadAssets();
@@ -45,27 +35,6 @@ Upload.initialize_similar = function() {
     }
   });
 }
-
-Upload.toggle_commentary = function() {
-  if ($(".artist-commentary").is(":visible")) {
-    $("#toggle-artist-commentary").text("show »");
-  } else {
-    $("#toggle-artist-commentary").text("« hide");
-  }
-
-  $(".artist-commentary").slideToggle();
-  $(".upload_commentary_translation_container").slideToggle();
-};
-
-Upload.toggle_translation = function() {
-  if ($(".commentary-translation").is(":visible")) {
-    $("#toggle-commentary-translation").text("show »");
-  } else {
-    $("#toggle-commentary-translation").text("« hide");
-  }
-
-  $(".commentary-translation").slideToggle();
-};
 
 $(function() {
   Upload.initialize_all();

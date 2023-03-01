@@ -102,6 +102,7 @@ Post.open_edit_dialog = function() {
   $("#comments").hide();
   $("#post-sections li").removeClass("active");
   $("#post-edit-link").parent("li").addClass("active");
+  $(".upload-container").css("display", "block");
 
   var $tag_string = $("#post_tag_string");
   $("#open-edit-dialog").hide();
@@ -158,7 +159,8 @@ Post.open_edit_dialog = function() {
 }
 
 Post.close_edit_dialog = function(e, ui) {
-  $("#form").appendTo($("#c-posts #edit,#c-uploads #a-show"));
+  $("#form").appendTo($("#c-posts #edit, .upload-edit-container"));
+  $(".upload-container").css("display", "");
   $("#edit-dialog").remove();
   var $tag_string = $("#post_tag_string");
   $("div.input").has($tag_string).prevAll().show();

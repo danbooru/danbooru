@@ -3,6 +3,16 @@
     <% tabs.each_with_index do |tab, i| %>
       <%= link_to tab.name, tab.url, class: ["tab", ("active-tab" if i == 0)], "x-on:click.prevent": "active = #{i}", "x-bind:class": "{ 'active-tab': active === #{i} }" %>
     <% end %>
+
+    <% if menu_items.present? %>
+      <span class="flex-grow-1"></span>
+
+      <% menu_items.each do |menu_item| %>
+        <span class="tab-menu-item">
+          <%= menu_item %>
+        </span>
+      <% end %>
+    <% end %>
   </div>
 
   <div class="tab-panels">

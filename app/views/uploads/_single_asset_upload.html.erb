@@ -14,145 +14,146 @@
   <% upload = upload_media_asset.upload %>
   <% media_asset = upload_media_asset.media_asset %>
 
-  <%= embed_wiki("help:upload_notice", id: "upload-guide-notice") %>
+  <div class="upload-container md:grid gap-4">
+    <div class="upload-image-container">
+      <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user, inner_classes: "mx-auto", dynamic_height: true, scroll_on_zoom: true) do |component| %>
+        <% component.with_footer do %>
+          <div class="flex flex-none gap-2 h-6 items-center justify-center text-xs">
+            <% if policy(media_asset).can_see_image? %>
+              <div class="flex flex-none gap-2 h-6 items-center text-xs">
+                <% if media_asset.source_urls.present? %>
+                  <span>
+                    <% media_asset.source_urls.take(5).each do |url| %>
+                      <%= external_link_to url, external_site_icon(Source::URL.site_name(url), class: "h-4"), title: url, class: "inline-block align-top" %>
+                    <% end %>
+                  </span>
+                <% end %>
 
-  <% unless CurrentUser.is_contributor? %>
-    <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
-  <% end %>
+                <%= link_to media_asset do %>
+                  <%= number_to_human_size(media_asset.file_size) %> .<%= media_asset.file_ext %>,
+                  <%= media_asset.image_width %>x<%= media_asset.image_height %>
 
-  <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
+                  <% if media_asset.duration.present? %>
+                    (<%= duration_to_hhmmss(media_asset.duration) %>)
+                  <% end %>
+                <% end %>
 
-  <div id="upload-image">
-    <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user) %>
+                <span>
+                  <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
+                    <% menu.item(hide_on_click: true) do %>
+                      <%= link_to "#{media_asset.original.file_url}?download=1", download: media_asset.original.file_name do %>
+                        <%= download_icon %> Download
+                      <% end %>
+                    <% end %>
 
-    <% if policy(media_asset).can_see_image? %>
-      <div class="flex flex-none gap-2 h-6 items-center text-xs">
-        <% if media_asset.source_urls.present? %>
-          <span>
-            <% media_asset.source_urls.take(5).each do |url| %>
-              <%= external_link_to url, external_site_icon(Source::URL.site_name(url), class: "h-4"), title: url, class: "inline-block align-top" %>
+                    <% menu.item do %>
+                      <hr class="border">
+                    <% end %>
+
+                    <% menu.item do %>
+                      <%= external_link_to "https://saucenao.com/search.php?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> SauceNAO
+                      <% end %>
+                    <% end %>
+
+                    <% menu.item do %>
+                      <%= external_link_to "https://ascii2d.net/search/url/#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> Ascii2D
+                      <% end %>
+                    <% end %>
+
+                    <% menu.item do %>
+                      <%= external_link_to "https://yandex.com/images/search?rpt=imageview&url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> Yandex
+                      <% end %>
+                    <% end %>
+
+                    <% menu.item do %>
+                      <%= external_link_to "https://lens.google.com/uploadbyurl?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> Google
+                      <% end %>
+                    <% end %>
+
+                    <% menu.item do %>
+                      <%= external_link_to "https://www.bing.com/images/searchbyimage?cbir=sbi&imgurl=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> Bing
+                      <% end %>
+                    <% end %>
+
+                    <% menu.item do %>
+                      <%= link_to iqdb_queries_path(search: { media_asset_id: media_asset.id }), target: "_blank" do %>
+                        <%= search_icon %> <%= Danbooru.config.app_name %>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                </span>
+              </div>
             <% end %>
-          </span>
+          </div>
         <% end %>
+      <% end %>
 
-        <%= link_to media_asset do %>
-          <%= number_to_human_size(media_asset.file_size) %> .<%= media_asset.file_ext %>,
-          <%= media_asset.image_width %>x<%= media_asset.image_height %>
+      <%= render "uploads/related_posts", source: upload_media_asset.source_extractor %>
+    </div>
 
-          <% if media_asset.duration.present? %>
-            (<%= duration_to_hhmmss(media_asset.duration) %>)
+    <div class="upload-edit-container">
+      <% post = Post.new_from_upload(upload_media_asset, add_artist_tag: true, source: upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys) %>
+      <%= edit_form_for(post, html: { id: "form", class: "upload-form md:sticky top-4" }) do |f| %>
+        <%= hidden_field_tag :media_asset_id, media_asset.id %> <%# used by iqdb javascript %>
+        <%= hidden_field_tag :upload_media_asset_id, upload_media_asset.id %>
+
+        <%= render(TabPanelComponent.new do |t| %>
+          <% t.menu_item do %>
+            <%= link_to external_link_icon(class: "text-sm align-bottom"), "javascript:void(0)", id: "open-edit-dialog", class: "desktop-only", "data-shortcut": "shift+e" %>
           <% end %>
-        <% end %>
 
-        <span>
-          <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
-            <% menu.item(hide_on_click: true) do %>
-              <%= link_to "#{media_asset.original.file_url}?download=1", download: media_asset.original.file_name do %>
-                <%= download_icon %> Download
-              <% end %>
-            <% end %>
+          <% t.panel(name: "Tags", active: true) do %>
+            <%= embed_wiki("help:upload_notice", id: "upload-guide-notice", classes: "mb-4") %>
 
-            <% menu.item do %>
-              <hr class="border">
-            <% end %>
+            <%= f.input :rating, label: "Rating (#{link_to_wiki "?", "howto:rate"})".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
+            <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
 
-            <% menu.item do %>
-              <%= external_link_to "https://saucenao.com/search.php?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
-                <%= search_icon %> SauceNAO
-              <% end %>
-            <% end %>
+            <div class="input fixed-width-container" id="tags-container">
+              <div class="header">
+                <%= f.label :tag_string, "Tags" %>
 
-            <% menu.item do %>
-              <%= external_link_to "https://ascii2d.net/search/url/#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
-                <%= search_icon %> Ascii2D
-              <% end %>
-            <% end %>
+                <span data-tag-counter data-for="#post_tag_string">
+                  <span class="tag-count"></span>
+                  <img>
+                </span>
+              </div>
 
-            <% menu.item do %>
-              <%= external_link_to "https://yandex.com/images/search?rpt=imageview&url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
-                <%= search_icon %> Yandex
-              <% end %>
-            <% end %>
+              <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
+              <%= render "related_tags/buttons" %>
 
-            <% menu.item do %>
-              <%= external_link_to "https://lens.google.com/uploadbyurl?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
-                <%= search_icon %> Google
-              <% end %>
-            <% end %>
+              <div class="mt-2">
+                <%= f.submit "Post", class: "button-primary button-sm" %>
 
-            <% menu.item do %>
-              <%= external_link_to "https://www.bing.com/images/searchbyimage?cbir=sbi&imgurl=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
-                <%= search_icon %> Bing
-              <% end %>
-            <% end %>
+                <% if CurrentUser.is_contributor? %>
+                  <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block" }, input_html: { checked: post.is_pending? } %>
+                <% else %>
+                  <span id="upload-limit" class="fineprint">Upload limit: <%= render "users/upload_limit", user: CurrentUser.user %></span>
+                <% end %>
+              </div>
 
-            <% menu.item do %>
-              <%= link_to iqdb_queries_path(search: { media_asset_id: media_asset.id }), target: "_blank" do %>
-                <%= search_icon %> <%= Danbooru.config.app_name %>
-              <% end %>
-            <% end %>
+              <%= render "related_tags/container", media_asset: media_asset %>
+            </div>
           <% end %>
-        </span>
-      </div>
-    <% end %>
+
+          <% t.panel(name: "Source") do %>
+            <% if upload_media_asset.source_extractor.present? %>
+              <%= render_source_data(upload_media_asset.source_extractor) %>
+            <% end %>
+
+            <%= f.input :source, as: :string, input_html: { value: post.source } %>
+
+            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: post&.artist_commentary&.original_title } %>
+            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: post&.artist_commentary&.original_description } %>
+            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: post&.artist_commentary&.translated_title } %>
+            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: post&.artist_commentary&.translated_description } %>
+          <% end %>
+        <% end) %>
+      <% end %>
+    </div>
   </div>
-
-  <%= render "uploads/related_posts", source: upload_media_asset.source_extractor %>
-
-  <% if upload_media_asset.source_extractor.present? %>
-    <%= render_source_data(upload_media_asset.source_extractor) %>
-  <% end %>
-
-  <% post = Post.new_from_upload(upload_media_asset, add_artist_tag: true, source: upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys) %>
-  <%= edit_form_for(post, html: { id: "form" }) do |f| %>
-    <%= hidden_field_tag :media_asset_id, media_asset.id %> <%# used by iqdb javascript %>
-    <%= hidden_field_tag :upload_media_asset_id, upload_media_asset.id %>
-
-    <%= f.input :source, as: :string, input_html: { value: post.source } %>
-    <%= f.input :rating, label: "Rating (#{link_to_wiki "?", "howto:rate"})".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
-    <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
-
-    <div class="input upload_artist_commentary_container">
-      <strong>Commentary</strong>
-      <a href="#" id="toggle-artist-commentary">show »</a>
-
-      <div class="artist-commentary mt-4" style="display: none;">
-        <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: post&.artist_commentary&.original_title } %>
-        <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: post&.artist_commentary&.original_description } %>
-      </div>
-    </div>
-
-    <div class="input upload_commentary_translation_container" style="display: none;">
-      <strong>Translation</strong>
-      <a href="#" id="toggle-commentary-translation">show »</a>
-
-      <div class="commentary-translation mt-4" style="display: none;">
-        <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: post&.artist_commentary&.translated_title } %>
-        <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: post&.artist_commentary&.translated_description } %>
-      </div>
-    </div>
-
-    <div class="input fixed-width-container" id="tags-container">
-      <div class="header">
-        <%= f.label :tag_string, "Tags" %>
-
-        <span data-tag-counter data-for="#post_tag_string">
-          <span class="tag-count"></span>
-          <img>
-        </span>
-        <%= link_to external_link_icon(class: "text-xxs"), "javascript:void(0)", id: "open-edit-dialog", "data-shortcut": "shift+e" %>
-      </div>
-
-      <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
-      <%= render "related_tags/buttons" %>
-    </div>
-
-    <%= f.submit "Post" %>
-
-    <% if CurrentUser.is_contributor? %>
-      <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block" }, input_html: { checked: post.is_pending? } %>
-    <% end %>
-
-    <%= render "related_tags/container", media_asset: media_asset %>
-  <% end %>
 <% end %>
