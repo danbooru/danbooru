@@ -5,14 +5,24 @@ div#c-uploads {
     }
 
     .upload-container {
-      --max-edit-column-width: 480px;
-      grid-template-columns: 1fr min(50%, var(--max-edit-column-width));
+      --min-edit-container-width: 240;
+      --edit-container-width: 480;
+      grid-template-columns: 1fr max-content calc(var(--edit-container-width) * 1px);
     }
 
     @media (max-width: 660px) {
       div.post_rating .radio label {
         margin-right: 0.5rem;
         font-size: var(--text-sm);
+      }
+    }
+
+    .upload-divider {
+      background: linear-gradient(currentcolor, currentcolor) no-repeat center/1px 100%;
+      color: var(--divider-border-color);
+
+      &:hover {
+        color: var(--divider-border-hover-color);
       }
     }
   }

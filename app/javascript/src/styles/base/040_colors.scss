@@ -272,7 +272,8 @@ html, body[data-current-user-theme="light"] {
 
   --login-link-color: var(--red-5);
   --footer-border-color: var(--grey-1);
-  --divider-border-color: var(--grey-2);
+  --divider-border-color: var(--grey-1);
+  --divider-border-hover-color: var(--grey-3);
 
   --jquery-ui-widget-content-background: var(--body-background-color);
   --jquery-ui-widget-content-text-color: var(--text-color);
@@ -494,6 +495,7 @@ html, body[data-current-user-theme="light"] {
   --login-link-color: var(--red-4);
   --footer-border-color: var(--grey-7);
   --divider-border-color: var(--grey-7);
+  --divider-border-hover-color: var(--grey-6);
 
   --jquery-ui-widget-content-text-color: var(--text-color);
   --jquery-ui-widget-content-background: var(--grey-8);
