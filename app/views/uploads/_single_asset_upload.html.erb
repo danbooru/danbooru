@@ -14,7 +14,7 @@
   <% upload = upload_media_asset.upload %>
   <% media_asset = upload_media_asset.media_asset %>
 
-  <div class="upload-container md:grid gap-4">
+  <%= tag.div class: "upload-container md:grid gap-4", style: ("--edit-container-width: #{cookies[:upload_edit_container_width]};" if cookies[:upload_edit_container_width].present?) do %>
     <div class="upload-image-container">
       <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user, inner_classes: "mx-auto", dynamic_height: true, scroll_on_zoom: true) do |component| %>
         <% component.with_footer do %>
@@ -96,6 +96,8 @@
       <%= render "uploads/related_posts", source: upload_media_asset.source_extractor %>
     </div>
 
+    <div class="upload-divider px-2 cursor-col-resize"></div>
+
     <div class="upload-edit-container">
       <% post = Post.new_from_upload(upload_media_asset, add_artist_tag: true, source: upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys) %>
       <%= edit_form_for(post, html: { id: "form", class: "upload-form md:sticky top-4" }) do |f| %>
@@ -165,5 +167,5 @@
         <% end) %>
       <% end %>
     </div>
-  </div>
+  <% end %>
 <% end %>
