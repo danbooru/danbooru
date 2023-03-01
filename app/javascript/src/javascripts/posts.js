@@ -155,7 +155,7 @@ Post.open_edit_dialog = function() {
   });
 
   $tag_string.css({"resize": "none", "width": "100%"});
-  $tag_string.focus().selectEnd().height($tag_string[0].scrollHeight);
+  $tag_string.focus().selectEnd();
 }
 
 Post.close_edit_dialog = function(e, ui) {
@@ -372,7 +372,7 @@ Post.initialize_post_sections = function() {
     } else if (e.target.hash === "#edit") {
       $("#edit").show();
       $("#comments").hide();
-      $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
+      $("#post_tag_string").focus().selectEnd();
       $("#recommended").hide();
       $(document).trigger("danbooru:open-post-edit-tab");
     } else if (e.target.hash === "#recommended") {
