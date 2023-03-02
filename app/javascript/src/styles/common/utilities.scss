@@ -99,6 +99,8 @@ $spacer: 0.25rem; /* 4px */
 .rounded-t,    %rounded-t    { border-top-left-radius: 1   * $spacer; border-top-right-radius: 1   * $spacer; }
 .rounded-t-lg, %rounded-t-lg { border-top-left-radius: 2   * $spacer; border-top-right-radius: 2   * $spacer; }
 
+.rounded-full { border-radius: 9999px; }
+
 .shadow-md, %shadow-md { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%); }
 .shadow-lg, %shadow-lg { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%); }
 
@@ -289,6 +291,7 @@ a.text-success:hover { color: var(--success-hover-color) !important; }
 a.text-error:hover { color: var(--error-hover-color) !important; }
 a.text-danger:hover { color: var(--error-hover-color) !important; }
 
+.bg\:primary-color { background-color: var(--link-color); }
 .bg\:error-color { background-color: var(--error-color); }
 
 .transition-opacity {

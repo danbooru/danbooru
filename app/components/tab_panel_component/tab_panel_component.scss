@@ -15,7 +15,7 @@
         padding-bottom: 0.5rem;
       }
 
-      .active-tab {
+      .tab.active-tab {
         border-color: currentcolor;
         border-bottom-width: 0.125rem;
         margin-bottom: -1px;
@@ -24,6 +24,10 @@
       .tab:not(.active-tab) {
         @include inactive-link;
       }
+    }
+
+    .tab-panel:not(.active-tab) {
+      display: none;
     }
   }
 }

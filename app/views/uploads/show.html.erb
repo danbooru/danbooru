@@ -1,5 +1,5 @@
-<div id="c-uploads">
-  <div id="a-show">
+<div id="c-uploads" class="h-full">
+  <div id="a-show" class="h-full">
     <% if @upload.is_errored? %>
       <p>Error: <%= @upload.error %>.</p>
     <% elsif @upload.media_asset_count == 0 %>
@@ -9,7 +9,7 @@
         <meta http-equiv="refresh" content="1">
       <% end %>
     <% elsif @upload.media_asset_count == 1 %>
-      <div id="p-single-asset-upload">
+      <div id="p-single-asset-upload" class="h-full">
         <%= render "uploads/single_asset_upload", upload_media_asset: @upload.upload_media_assets.first %>
       </div>
     <% end %>
