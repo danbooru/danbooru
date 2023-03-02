@@ -6,6 +6,10 @@
   display: none !important;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   color: var(--text-color);
   background-color: var(--body-background-color);
