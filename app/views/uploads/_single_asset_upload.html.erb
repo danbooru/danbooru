@@ -13,8 +13,9 @@
 <% else %>
   <% upload = upload_media_asset.upload %>
   <% media_asset = upload_media_asset.media_asset %>
+  <% source = upload_media_asset.source_extractor %>
 
-  <%= tag.div class: "upload-container md:grid gap-4", style: ("--edit-container-width: #{cookies[:upload_edit_container_width]};" if cookies[:upload_edit_container_width].present?) do %>
+  <%= tag.div class: "upload-container grid gap-4 h-full", style: ("--edit-container-width: #{cookies[:upload_edit_container_width]};" if cookies[:upload_edit_container_width].present?) do %>
     <div class="upload-image-container">
       <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user, inner_classes: "mx-auto", dynamic_height: true, scroll_on_zoom: true) do |component| %>
         <% component.with_footer do %>
@@ -92,8 +93,6 @@
           </div>
         <% end %>
       <% end %>
-
-      <%= render "uploads/related_posts", source: upload_media_asset.source_extractor %>
     </div>
 
     <div class="upload-divider px-2 cursor-col-resize"></div>
@@ -113,7 +112,6 @@
             <%= embed_wiki("help:upload_notice", id: "upload-guide-notice", classes: "mb-4") %>
 
             <%= f.input :rating, label: "Rating (#{link_to_wiki "?", "howto:rate"})".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
-            <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
 
             <div class="input fixed-width-container" id="tags-container">
               <div class="header">
@@ -153,6 +151,36 @@
             <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: post&.artist_commentary&.original_description } %>
             <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: post&.artist_commentary&.translated_title } %>
             <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: post&.artist_commentary&.translated_description } %>
+          <% end %>
+
+          <% t.panel(name: "Similar") do %>
+            <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
+
+            <div class="space-y-4">
+              <% if source.present? && source.related_posts.present? %>
+                <div id="related-posts-by-source">
+                  <h2>Related Posts</h2>
+
+                  <p class="fineprint">
+                    Found <%= link_to pluralize(source.related_posts.total_count, "other post"), posts_path(tags: source.related_posts_search_query) %> from the same source.
+                  </p>
+
+                  <%= render(PostGalleryComponent.new(size: "180")) do |gallery| %>
+                    <% source.related_posts.each do |post| %>
+                      <%= gallery.post(post: post, size: gallery.size, show_deleted: true) do |preview| %>
+                        <% preview.footer do %>
+                          <div class="text-xs text-center mt-1">
+                            <%= render "posts/partials/show/preview_source_footer", post: post %>
+                          </div>
+                        <% end %>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <div id="iqdb-similar" style="display: none;"></div>
+            </div>
           <% end %>
         <% end) %>
       <% end %>

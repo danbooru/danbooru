@@ -1,3 +1,5 @@
+<%# high_similarity_matches, low_similarity_matches, matches %>
+
 <div class="iqdb-posts">
   <h2>Similar Posts</h2>
 
@@ -12,20 +14,21 @@
     <% end %>
   </p>
 
-  <%= render(PostGalleryComponent.new) do |gallery| %>
+  <%= render(PostGalleryComponent.new(size: "180")) do |gallery| %>
     <% @matches.each do |match| %>
       <% post = match["post"] %>
-      <% high_similarity = match["score"] >= IqdbClient::HIGH_SIMILARITY_THRESHOLD %>
-      <% preview_class = high_similarity ? "iqdb-high-similarity" : "iqdb-low-similarity hidden" %>
+      <% preview_class = match.in?(@high_similarity_matches) ? "iqdb-high-similarity" : "iqdb-low-similarity hidden" %>
 
       <%= gallery.post(post: post, size: gallery.size, show_deleted: true, classes: preview_class) do |preview| %>
         <% preview.footer do %>
-          <div class="text-xs text-center">
-            <%= render "posts/partials/show/preview_source_footer", post: post %>
-          </div>
+          <div class="text-xs text-center mt-1">
+            <div>
+              <%= render "posts/partials/show/preview_source_footer", post: post %>
+            </div>
 
-          <div class="text-xs text-center">
-            <%= link_to "#{match["score"].round}% similar", iqdb_queries_path(post_id: post.id), class: "inactive-link iqdb-similarity-score" %>
+            <div>
+              <%= link_to "#{match["score"].round}% similar", iqdb_queries_path(post_id: post.id), class: "inactive-link iqdb-similarity-score" %>
+            </div>
           </div>
         <% end %>
       <% end %>
