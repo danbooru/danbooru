@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module ComponentsHelper
-  def post_preview(post, fit: :fixed, **options)
-    render PostPreviewComponent.new(post: post, fit: fit, **options)
+  def post_preview(post, fit: :fixed, **options, &block)
+    render PostPreviewComponent.new(post: post, fit: fit, **options), &block
   end
 
   # Render a set of posts as thumbnail gallery.
