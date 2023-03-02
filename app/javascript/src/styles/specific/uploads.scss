@@ -10,6 +10,10 @@ div#c-uploads {
       grid-template-columns: 1fr max-content calc(var(--edit-container-width) * 1px);
     }
 
+    .media-asset-component-fit-height {
+      position: sticky;
+    }
+
     @media (max-width: 660px) {
       .upload-container {
         grid-template-columns: 1fr;

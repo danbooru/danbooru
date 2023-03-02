@@ -17,7 +17,7 @@
 
   <%= tag.div class: "upload-container grid gap-4 h-full", style: ("--edit-container-width: #{cookies[:upload_edit_container_width]};" if cookies[:upload_edit_container_width].present?) do %>
     <div class="upload-image-container">
-      <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user, inner_classes: "mx-auto", dynamic_height: true, scroll_on_zoom: true) do |component| %>
+      <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user, outer_classes: "h-full top-0", inner_classes: "mx-auto", dynamic_height: true, scroll_on_zoom: true) do |component| %>
         <% component.with_footer do %>
           <div class="flex flex-none gap-2 h-6 items-center justify-center text-xs">
             <% if policy(media_asset).can_see_image? %>
