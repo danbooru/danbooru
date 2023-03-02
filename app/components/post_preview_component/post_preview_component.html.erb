@@ -36,27 +36,6 @@
     <p class="desc">
       <%= link_to pool.pretty_name.truncate(80), pool %>
     </p>
-  <% elsif similarity -%>
-    <p class="desc">
-      <% if post.source =~ %r!\Ahttps?://!i %>
-        <%= external_link_to post.normalized_source, post.source_domain %>
-        (<%= time_ago_in_words_tagged(post.created_at, compact: true) %>)
-      <% else %>
-        <%= time_ago_in_words_tagged(post.created_at, compact: true) %>
-      <% end %>
-    </p>
-    <p class="desc">
-      <%= link_to "#{number_to_human_size(file_size)} .#{file_ext}", post.file_url %>
-      (<%= post.image_width %>x<%= post.image_height %>)
-    </p>
-    <p class="desc">
-      <%= link_to "#{similarity}%", iqdb_queries_path(post_id: post.id) %> similarity
-    </p>
-  <% elsif show_size -%>
-    <p class="desc">
-      <%= link_to "#{number_to_human_size(file_size)} .#{file_ext}", post.file_url %>
-      (<%= post.image_width %>x<%= post.image_height %>)
-    </p>
   <% elsif recommended -%>
     <p class="desc recommended">
       <%= link_to recommended_posts_path(search: { post_id: post.id }), class: "more-recommended-posts", "data-post-id": post.id do %>

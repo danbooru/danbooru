@@ -5,6 +5,9 @@
 #
 # @see https://github.com/danbooru/iqdb
 class IqdbClient
+  LOW_SIMILARITY_THRESHOLD = 0.0
+  HIGH_SIMILARITY_THRESHOLD = 65.0
+
   class Error < StandardError; end
   attr_reader :iqdb_url, :http
 
@@ -22,7 +25,7 @@ class IqdbClient
 
   concerning :QueryMethods do
     # Search for an image by file, URL, hash, or post ID.
-    def search(post_id: nil, media_asset_id: nil, file: nil, hash: nil, url: nil, image_url: nil, file_url: nil, similarity: 0.0, high_similarity: 65.0, limit: 20)
+    def search(post_id: nil, media_asset_id: nil, file: nil, hash: nil, url: nil, image_url: nil, file_url: nil, similarity: LOW_SIMILARITY_THRESHOLD, high_similarity: HIGH_SIMILARITY_THRESHOLD, limit: 20)
       limit = limit.to_i.clamp(1, 1000)
       similarity = similarity.to_f.clamp(0.0, 100.0)
       high_similarity = high_similarity.to_f.clamp(0.0, 100.0)
@@ -58,16 +61,15 @@ class IqdbClient
       file.try(:close)
     end
 
-    # Transform the JSON returned by IQDB to add the full post data for each
-    # match.
+    # Transform the JSON returned by IQDB to add the full post data for each match.
+    #
     # @param matches [Array<Hash>] the array of IQDB matches
     # @param low_similarity [Float] the threshold for a result to be considered low similarity
     # @param high_similarity [Float] the threshold for a result to be considered high similarity
     # @return [(Array, Array, Array)] the set of high similarity, low similarity, and all matches
     def process_results(matches, low_similarity, high_similarity)
-      matches = matches.select { |result| result["score"] >= low_similarity }
-      post_ids = matches.map { |match| match["post_id"] }
-      posts = Post.includes(:media_asset).where(id: post_ids).group_by(&:id).transform_values(&:first)
+      matches = matches.select { |match| match["score"] >= low_similarity }.sort_by { |match| -match["score"] }
+      posts = Post.includes(:media_asset).where(id: matches.pluck("post_id")).group_by(&:id).transform_values(&:first)
 
       matches = matches.map do |match|
         post = posts.fetch(match["post_id"], nil)

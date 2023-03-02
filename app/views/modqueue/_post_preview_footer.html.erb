@@ -3,20 +3,7 @@
 <div class="flex flex-col mt-2 gap-2">
   <div class="flex flex-wrap gap-2 items-center justify-center w-full text-xs">
     <div>
-      <% if post.parsed_source.present? %>
-        <%= external_link_to post.normalized_source, external_site_icon(post.parsed_source.site_name, class: "h-4"), title: post.normalized_source, class: "inline-block align-top" %>
-      <% elsif post.file_source? %>
-        <%= link_to file_lines_icon(class: "h-3"), posts_path(tags: %{source:"#{post.source.gsub(/"/, '\\"')}"}), title: post.source, class: "align-top" %>
-      <% elsif post.text_source? %>
-        <%= link_to file_pen_icon(class: "h-3"), posts_path(tags: %{source:"#{post.source.gsub(/"/, '\\"')}"}), title: post.source, class: "align-top" %>
-      <% else %>
-        <%= link_to link_slash_icon(class: "h-2"), posts_path(tags: "source:none"), title: "no source", class: "align-top" %>
-      <% end %>
-
-      <%= link_to post.media_asset do %>
-        <%= number_to_human_size(post.media_asset.file_size) %> .<%= post.media_asset.file_ext %>,
-        <%= post.media_asset.image_width %>x<%= post.media_asset.image_height %>
-      <% end %>
+      <%= render "posts/partials/show/preview_source_footer", post: post %>
     </div>
 
     <% if @preview_size.to_i > 180 %>
