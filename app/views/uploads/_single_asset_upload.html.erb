@@ -19,83 +19,95 @@
     <div class="upload-image-container">
       <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user, outer_classes: "h-full top-0", inner_classes: "mx-auto", dynamic_height: true, scroll_on_zoom: true) do |component| %>
         <% component.with_footer do %>
-          <div class="flex flex-none gap-2 h-6 items-center justify-center text-xs">
-            <% if policy(media_asset).can_see_image? %>
-              <div class="flex flex-none gap-2 h-6 items-center text-xs">
-                <% if media_asset.source_urls.present? %>
-                  <span>
-                    <% media_asset.source_urls.take(5).each do |url| %>
-                      <%= external_link_to url, external_site_icon(Source::URL.site_name(url), class: "h-4"), title: url, class: "inline-block align-top" %>
-                    <% end %>
-                  </span>
-                <% end %>
-
-                <%= link_to media_asset do %>
-                  <%= number_to_human_size(media_asset.file_size) %> .<%= media_asset.file_ext %>,
-                  <%= media_asset.image_width %>x<%= media_asset.image_height %>
-
-                  <% if media_asset.duration.present? %>
-                    (<%= duration_to_hhmmss(media_asset.duration) %>)
-                  <% end %>
-                <% end %>
-
+          <% if policy(media_asset).can_see_image? %>
+            <div class="flex flex-wrap flex-none gap-2 items-center justify-center text-xs my-1">
+              <% if media_asset.source_urls.present? %>
                 <span>
-                  <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
-                    <% menu.item(hide_on_click: true) do %>
-                      <%= link_to "#{media_asset.original.file_url}?download=1", download: media_asset.original.file_name do %>
-                        <%= download_icon %> Download
-                      <% end %>
-                    <% end %>
-
-                    <% menu.item do %>
-                      <hr class="border">
-                    <% end %>
-
-                    <% menu.item do %>
-                      <%= external_link_to "https://saucenao.com/search.php?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
-                        <%= search_icon %> SauceNAO
-                      <% end %>
-                    <% end %>
-
-                    <% menu.item do %>
-                      <%= external_link_to "https://ascii2d.net/search/url/#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
-                        <%= search_icon %> Ascii2D
-                      <% end %>
-                    <% end %>
-
-                    <% menu.item do %>
-                      <%= external_link_to "https://yandex.com/images/search?rpt=imageview&url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
-                        <%= search_icon %> Yandex
-                      <% end %>
-                    <% end %>
-
-                    <% menu.item do %>
-                      <%= external_link_to "https://lens.google.com/uploadbyurl?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
-                        <%= search_icon %> Google
-                      <% end %>
-                    <% end %>
-
-                    <% menu.item do %>
-                      <%= external_link_to "https://www.bing.com/images/searchbyimage?cbir=sbi&imgurl=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
-                        <%= search_icon %> Bing
-                      <% end %>
-                    <% end %>
-
-                    <% menu.item do %>
-                      <%= link_to iqdb_queries_path(search: { media_asset_id: media_asset.id }), target: "_blank" do %>
-                        <%= search_icon %> <%= Danbooru.config.app_name %>
-                      <% end %>
-                    <% end %>
+                  <% media_asset.source_urls.take(5).each do |url| %>
+                    <%= external_link_to url, external_site_icon(Source::URL.site_name(url), class: "h-4"), title: url, class: "inline-block align-top" %>
                   <% end %>
                 </span>
+              <% end %>
+
+              <%= link_to media_asset do %>
+                <%= number_to_human_size(media_asset.file_size) %> .<%= media_asset.file_ext %>,
+                <%= media_asset.image_width %>x<%= media_asset.image_height %>
+
+                <% if media_asset.duration.present? %>
+                  (<%= duration_to_hhmmss(media_asset.duration) %>)
+                <% end %>
+              <% end %>
+
+              <span>
+                <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
+                  <% menu.item(hide_on_click: true) do %>
+                    <%= link_to "#{media_asset.original.file_url}?download=1", download: media_asset.original.file_name do %>
+                      <%= download_icon %> Download
+                    <% end %>
+                  <% end %>
+
+                  <% menu.item do %>
+                    <hr class="border">
+                  <% end %>
+
+                  <% menu.item do %>
+                    <%= external_link_to "https://saucenao.com/search.php?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                      <%= search_icon %> SauceNAO
+                    <% end %>
+                  <% end %>
+
+                  <% menu.item do %>
+                    <%= external_link_to "https://ascii2d.net/search/url/#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                      <%= search_icon %> Ascii2D
+                    <% end %>
+                  <% end %>
+
+                  <% menu.item do %>
+                    <%= external_link_to "https://yandex.com/images/search?rpt=imageview&url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                      <%= search_icon %> Yandex
+                    <% end %>
+                  <% end %>
+
+                  <% menu.item do %>
+                    <%= external_link_to "https://lens.google.com/uploadbyurl?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                      <%= search_icon %> Google
+                    <% end %>
+                  <% end %>
+
+                  <% menu.item do %>
+                    <%= external_link_to "https://www.bing.com/images/searchbyimage?cbir=sbi&imgurl=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                      <%= search_icon %> Bing
+                    <% end %>
+                  <% end %>
+
+                  <% menu.item do %>
+                    <%= link_to iqdb_queries_path(search: { media_asset_id: media_asset.id }), target: "_blank" do %>
+                      <%= search_icon %> <%= Danbooru.config.app_name %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              </span>
+
+              <div class="inline-block">
+                <% if upload_media_asset.file_upload? %>
+                  <%= external_link_to "https://saucenao.com/search.php?url=#{Danbooru::URL.escape(media_asset.original.file_url)}", "No Source", target: "_blank", class: "upload-no-source-warning button-danger button-xs" %>
+                <% elsif upload_media_asset.parsed_canonical_url&.image_url? && upload_media_asset.parsed_canonical_url&.page_url.nil? %>
+                  <%= link_to "Bad Source", wiki_page_path("bad_link"), class: "upload-source-warning button-danger button-xs" %>
+                <% end %>
+
+                <% if media_asset.is_ai_generated? %>
+                  <%= link_to "AI-Generated", wiki_page_path("ai-generated"), class: "upload-ai-warning button-danger button-xs" %>
+                <% end %>
+
+                <a class="upload-duplicate-warning button-danger button-xs hidden" href="javascript:$('a.tab.similar-tab').get(0).click()">Duplicate</a>
               </div>
-            <% end %>
-          </div>
+            </div>
+          <% end %>
         <% end %>
       <% end %>
     </div>
 
-    <div class="upload-divider px-2 cursor-col-resize"></div>
+    <div class="upload-divider px-2 cursor-col-resize desktop-only"></div>
 
     <div class="upload-edit-container">
       <% post = Post.new_from_upload(upload_media_asset, add_artist_tag: true, source: upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys) %>
@@ -113,7 +125,7 @@
 
             <%= f.input :rating, label: "Rating (#{link_to_wiki "?", "howto:rate"})".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
 
-            <div class="input fixed-width-container" id="tags-container">
+            <div class="input" id="tags-container">
               <div class="header">
                 <%= f.label :tag_string, "Tags" %>
 
