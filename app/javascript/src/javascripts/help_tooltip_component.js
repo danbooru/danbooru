@@ -1,19 +1,12 @@
-import { delegate } from 'tippy.js';
-import 'tippy.js/dist/tippy.css';
+import { createTooltip } from './utility';
 
 class HelpTooltipComponent {
   static initialize() {
-    delegate("body", {
-      allowHTML: true,
-      interactive: true,
-      theme: "common-tooltip help-tooltip",
+    createTooltip("help-tooltip", {
       target: "a.help-tooltip-link",
-      placement: "top",
       trigger: "click",
-      maxWidth: "none",
-      duration: 50,
       touch: "hold",
-      appendTo: document.querySelector("#tooltips"),
+      duration: 50,
       content(element) {
         let $content = $(element).next(".help-tooltip-content");
         $content.show();

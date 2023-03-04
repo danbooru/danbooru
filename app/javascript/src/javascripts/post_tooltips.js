@@ -1,6 +1,7 @@
 import CurrentUser from './current_user';
 import Utility from './utility';
-import { delegate, hideAll } from 'tippy.js';
+import { createTooltip } from './utility';
+import { hideAll } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 
 let PostTooltip = {};
@@ -16,15 +17,10 @@ PostTooltip.initialize = function () {
     return;
   }
 
-  PostTooltip.instance = delegate("body", {
-    allowHTML: true,
-    appendTo: document.querySelector("#post-tooltips"),
+  PostTooltip.instance = createTooltip("post-tooltip", {
     delay: [PostTooltip.SHOW_DELAY, PostTooltip.HIDE_DELAY],
     duration: PostTooltip.DURATION,
-    interactive: true,
-    maxWidth: "none",
     target: PostTooltip.POST_SELECTOR,
-    theme: "common-tooltip post-tooltip",
     touch: false,
 
     onCreate: PostTooltip.on_create,

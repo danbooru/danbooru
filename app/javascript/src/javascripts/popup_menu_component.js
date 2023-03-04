@@ -1,16 +1,13 @@
-import { delegate } from 'tippy.js';
-import 'tippy.js/dist/tippy.css';
+import { createTooltip } from './utility';
 
 class PopupMenuComponent {
   static initialize() {
-    delegate("body", {
-      allowHTML: true,
-      interactive: true,
-      theme: "common-tooltip",
+    createTooltip("popup-menu-tooltip", {
       target: "a.popup-menu-button",
       placement: "bottom-start",
       trigger: "click",
       touch: "hold",
+      appendTo: "parent",
       animation: null,
       content: PopupMenuComponent.content,
     });

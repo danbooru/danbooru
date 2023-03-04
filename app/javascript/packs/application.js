@@ -29,6 +29,8 @@ require("jquery-ui/themes/base/button.css");
 require("jquery-ui/themes/base/dialog.css");
 require("jquery-ui/themes/base/theme.css");
 
+import 'tippy.js/dist/tippy.css';
+
 importAll(require.context('../src/javascripts', true, /\.js(\.erb)?$/));
 importAll(require.context('../src/styles', true, /\.s?css(?:\.erb)?$/));
 importAll(require.context('../../components', true, /\.s?css(?:\.erb)?$/));
