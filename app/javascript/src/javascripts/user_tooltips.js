@@ -1,6 +1,5 @@
 import Utility from './utility';
-import { delegate } from 'tippy.js';
-import 'tippy.js/dist/tippy.css';
+import { createTooltip } from './utility';
 
 let UserTooltip = {};
 
@@ -11,15 +10,12 @@ UserTooltip.DURATION = 250;
 UserTooltip.MAX_WIDTH = 600;
 
 UserTooltip.initialize = function () {
-  delegate("body", {
-    allowHTML: true,
-    appendTo: document.querySelector("#user-tooltips"),
+  createTooltip("user-tooltip", {
     delay: [UserTooltip.SHOW_DELAY, UserTooltip.HIDE_DELAY],
     duration: UserTooltip.DURATION,
-    interactive: true,
     maxWidth: UserTooltip.MAX_WIDTH,
     target: UserTooltip.SELECTOR,
-    theme: "common-tooltip user-tooltip",
+    appendTo: "parent",
     touch: false,
 
     onShow: UserTooltip.on_show,

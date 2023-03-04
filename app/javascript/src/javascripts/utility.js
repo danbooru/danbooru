@@ -1,5 +1,5 @@
 import Rails from '@rails/ujs';
-import { hideAll } from 'tippy.js';
+import { delegate, hideAll } from 'tippy.js';
 import words from "lodash/words";
 
 let Utility = {};
@@ -131,6 +131,25 @@ Utility.copyToClipboard = async function(text, message = "Copied!") {
   } catch (error) {
     Utility.error("Couldn't copy to clipboard");
   }
+}
+
+export function createTooltip(name, options = {}) {
+  return delegate("body", {
+    allowHTML: true,
+    interactive: true,
+    maxWidth: "none",
+    theme: `common-tooltip ${name}`,
+    appendTo: document.querySelector("#tooltips"),
+    popperOptions: {
+      modifiers: [
+        {
+          name: "eventListeners",
+          enabled: false,
+        },
+      ],
+    },
+    ...options
+  });
 }
 
 $.fn.selectEnd = function() {

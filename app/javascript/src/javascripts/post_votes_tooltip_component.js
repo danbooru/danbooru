@@ -1,26 +1,19 @@
 import Utility from "./utility";
-import { delegate } from 'tippy.js';
-import 'tippy.js/dist/tippy.css';
+import { createTooltip } from "./utility";
 
 class PostVotesTooltipComponent {
   // Trigger on the post score link; see PostVotesComponent.
-  static TARGET_SELECTOR = "span.post-votes span.post-score a";
+  static TARGET_SELECTOR = "span.post-votes span.post-score > a";
   static SHOW_DELAY = 375;
   static HIDE_DELAY = 125;
   static DURATION = 250;
   static instance = null;
 
   static initialize() {
-    PostVotesTooltipComponent.instance = delegate("body", {
-      allowHTML: true,
-      appendTo: document.querySelector("#post-votes-tooltips"),
+    PostVotesTooltipComponent.instance = createTooltip("post-votes-tooltip", {
       delay: [PostVotesTooltipComponent.SHOW_DELAY, PostVotesTooltipComponent.HIDE_DELAY],
       duration: PostVotesTooltipComponent.DURATION,
-      interactive: true,
-      maxWidth: "none",
       target: PostVotesTooltipComponent.TARGET_SELECTOR,
-      theme: "common-tooltip",
-      touch: false,
 
       onShow: PostVotesTooltipComponent.onShow,
       onHide: PostVotesTooltipComponent.onHide,
