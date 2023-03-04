@@ -13,7 +13,7 @@
   <%= f.input :old_source, as: :hidden, input_html: { value: post.source } %>
   <%= f.input :old_rating, as: :hidden, input_html: { value: post.rating } %>
 
-  <%= f.input :rating, label: "Rating (#{link_to_wiki "?", "howto:rate"})".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, boolean_style: :inline %>
+  <%= f.input :rating, label: "Rating #{help_tooltip(embed_wiki("help:rating_notice", classes: "text-xs"))}".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, boolean_style: :inline %>
 
   <fieldset class="inline-fieldset post_has_embedded_notes_fieldset">
     <label>Notes</label>

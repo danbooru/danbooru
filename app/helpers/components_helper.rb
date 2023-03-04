@@ -97,4 +97,9 @@ module ComponentsHelper
       render SequentialPaginatorComponent.new(records: records, params: params)
     end
   end
+
+  def help_tooltip(content = nil, icon: help_icon, &block)
+    content = yield if block_given?
+    render HelpTooltipComponent.new(icon, content)
+  end
 end
