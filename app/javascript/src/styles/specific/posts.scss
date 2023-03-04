@@ -54,6 +54,14 @@
   color: var(--low-post-count-color);
 }
 
+// Put the Rating label on the same line as the radio buttons.
+div.post_rating > label {
+  display: inline-block !important;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  font-size: var(--text-md);
+}
+
 div#c-posts {
   .fav-buttons {
     font-size: var(--text-lg);
