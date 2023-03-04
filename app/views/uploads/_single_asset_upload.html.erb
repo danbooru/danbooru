@@ -123,7 +123,7 @@
           <% t.panel(name: "Tags", active: true) do %>
             <%= embed_wiki("help:upload_notice", id: "upload-guide-notice", classes: "mb-4") %>
 
-            <%= f.input :rating, label: "Rating (#{link_to_wiki "?", "howto:rate"})".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
+            <%= f.input :rating, label: "Rating #{help_tooltip(embed_wiki("help:rating_notice", classes: "text-xs"))}".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
 
             <div class="input" id="tags-container">
               <div class="header">

@@ -432,6 +432,14 @@ module IconHelper
     svg_icon_tag("link-slash", viewBox: "0 0 640 512", **options)
   end
 
+  def help_icon(**options)
+    svg_icon_tag("circle-question", viewBox: "0 0 512 512", **options)
+  end
+
+  def info_icon(**options)
+    svg_icon_tag("circle-info", viewBox: "0 0 512 512", **options)
+  end
+
   def discord_icon(**options)
     image_icon_tag("discord-logo.png", **options)
   end
