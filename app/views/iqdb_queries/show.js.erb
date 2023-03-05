@@ -1,7 +1,7 @@
 $("#iqdb-similar").html("<%= j render "iqdb_queries/matches" %>").show();
 
 <% if @high_similarity_matches.size > 0 %>
-  $(".upload-container .tab.similar-tab").html("Similar <%= j tag.span(@high_similarity_matches.size, class: "inline-block rounded-full mx-1 px-1 text-inverse bg:primary-color") %>")
+  $(".upload-container .tab.similar-tab").html("Similar <%= j tag.span(@high_similarity_matches.size, class: "rounded-full mx-1 px-2 text-sm text-center text-inverse bg:primary-color") %>")
 <% end %>
 
 <% if @matches.any? { |match| match["score"] >= IqdbClient::DUPLICATE_THRESHOLD } %>

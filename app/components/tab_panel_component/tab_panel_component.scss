@@ -20,8 +20,16 @@
         margin-bottom: -1px;
       }
 
+      .tab:focus {
+        outline: none; // XXX remove default `a { outline: thin dotted }`
+      }
+
       .tab:not(.active-tab) {
-        @include inactive-link;
+        color: var(--muted-text-color);
+
+        &:hover {
+          color: var(--link-hover-color);
+        }
       }
     }
 
