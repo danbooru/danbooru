@@ -1,19 +1,36 @@
 # frozen_string_literal: true
 
 class TabPanelComponent < ApplicationComponent
-  attr_reader :tabs, :classes
+  Panel = Data.define(:name, :id, :index, :url, :active, :classes)
+  MenuItem = Data.define(:id, :classes, :content)
+  Spacer = Data.define
+
+  attr_reader :tabs, :classes, :index
 
   renders_many :panels
-  renders_many :menu_items
 
   def initialize(classes: "horizontal-tab-panel")
     @tabs = []
     @classes = classes
+    @index = 0
     yield self
   end
 
-  def panel(name:, url: "#", active: false, &block)
-    tabs << OpenStruct.new(name:, url:, active:)
+  def panel(name, id: "#{name.parameterize}-tab", index: @index, url: "#", active: false, classes: nil, &block)
+    tabs << Panel.new(name:, id:, index:, url:, active:, classes:)
     with_panel(&block)
+    @index += 1
+  end
+
+  def menu_item(id: nil, classes: nil, &block)
+    tabs << MenuItem.new(id:, classes:, content: block)
+  end
+
+  def spacer
+    tabs << Spacer.new
+  end
+
+  def default_tab
+    @default_tab ||= tabs.find(&:active)
   end
 end

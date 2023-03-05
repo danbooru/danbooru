@@ -112,14 +112,8 @@
         <%= hidden_field_tag :upload_media_asset_id, upload_media_asset.id %>
 
         <%= render(TabPanelComponent.new do |t| %>
-          <% t.menu_item do %>
-            <%= link_to external_link_icon(class: "text-sm align-bottom"), "javascript:void(0)", id: "open-edit-dialog", class: "desktop-only", "data-shortcut": "shift+e" %>
-          <% end %>
-
-          <% t.panel(name: "Tags", active: true) do %>
-            <%= embed_wiki("help:upload_notice", id: "upload-guide-notice", classes: "mb-4") %>
-
-            <%= f.input :rating, label: "Rating #{help_tooltip(embed_wiki("help:rating_notice", classes: "text-xs"))}".html_safe, wrapper_html: { class: "radio-button-group text-xs" }, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
+          <% t.panel("Tags", active: true) do %>
+            <%= f.input :rating, label: "Rating #{help_tooltip embed_wiki("help:rating_notice", classes: "text-xs"), link_class: "inactive-link" }".html_safe, wrapper_html: { class: "radio-button-group text-xs" }, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
 
             <div class="input" id="tags-container">
               <div class="header">
@@ -144,11 +138,15 @@
                 <% end %>
               </div>
 
+              <% if CurrentUser.post_upload_count < 10 %>
+                <p class="fineprint">Read the <%= link_to_wiki "upload rules", "help:upload_rules" %> before uploading.</p>
+              <% end %>
+
               <%= render "related_tags/container", media_asset: media_asset %>
             </div>
           <% end %>
 
-          <% t.panel(name: "Source") do %>
+          <% t.panel("Source") do %>
             <% if upload_media_asset.source_extractor.present? %>
               <%= render_source_data(upload_media_asset.source_extractor) %>
             <% end %>
@@ -161,7 +159,7 @@
             <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: post&.artist_commentary&.translated_description } %>
           <% end %>
 
-          <% t.panel(name: "Similar") do %>
+          <% t.panel("Similar") do %>
             <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
 
             <div class="space-y-4">
@@ -191,7 +189,7 @@
             </div>
           <% end %>
 
-          <% t.panel(name: "AI Metadata") do %>
+          <% t.panel("AI Metadata") do %>
             <%= f.input :prompt, as: :text, input_html: { value: post&.ai_metadata&.prompt } %>
             <%= f.input :negative_prompt, as: :text, input_html: { value: post&.ai_metadata&.negative_prompt } %>
             <%= f.input :sampler, as: :string, input_html: { value: post&.ai_metadata&.sampler } %>
@@ -199,6 +197,19 @@
             <%= f.input :steps, as: :integer, input_html: { value: post&.ai_metadata&.steps } %>
             <%= f.input :cfg_scale, as: :float, input_html: { value: post&.ai_metadata&.cfg_scale } %>
             <%= f.input :model_hash, as: :string, input_html: { value: post&.ai_metadata&.model_hash } %>
+          <% end %>
+
+          <% t.spacer %>
+
+          <% help_updated = WikiPage.find_by_title("help:upload_notice")&.updated_at.to_i > CurrentUser.user.posts.maximum(:created_at).to_i %>
+          <% help_icon = exclamation_icon(class: "text-warning") if help_updated %>
+          <% t.panel("#{help_icon} Help".strip.html_safe, id: "help-tab") do %>
+            <%= embed_wiki("help:upload_notice") %>
+            <%= render "application/update_notice", record: WikiPage.find_by_title("help:upload_notice") %>
+          <% end %>
+
+          <% t.menu_item(id: "open-edit-dialog-tab", classes: "desktop-only") do %>
+            <% link_to external_link_icon(class: "text-sm align-bottom"), "javascript:void(0)", id: "open-edit-dialog", "data-shortcut": "shift+e" %>
           <% end %>
         <% end) %>
       <% end %>
