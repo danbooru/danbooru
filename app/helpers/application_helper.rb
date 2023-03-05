@@ -216,9 +216,9 @@ module ApplicationHelper
     link_to tag.pretty_name, posts_path(tags: tag.name), class: tag_class(tag), **options
   end
 
-  def link_to_wiki(text, title = text, **options)
+  def link_to_wiki(text, title = text, classes: nil, **options)
     title = "~#{title}" if title =~ /\A\d+\z/
-    link_to text, wiki_page_path(title), class: "wiki-link", **options
+    link_to text, wiki_page_path(title), class: "wiki-link #{classes}", **options
   end
 
   def link_to_wikis(*wiki_titles, **options)
