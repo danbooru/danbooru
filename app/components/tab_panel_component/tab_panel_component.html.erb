@@ -1,23 +1,22 @@
-<%= tag.div class: ["tab-panel-component", *Array.wrap(classes)], "x-data": "{ active: 0 }" do %>
+<%= tag.div class: ["tab-panel-component", *Array.wrap(classes)], "x-data": "{ active: #{default_tab.index} }" do %>
   <div class="tab-list">
-    <% tabs.each_with_index do |tab, i| %>
-      <%= link_to tab.name, tab.url, class: ["tab", "#{tab.name.parameterize}-tab", ("active-tab" if i == 0)], "x-on:click.prevent": "active = #{i}", "x-bind:class": "{ 'active-tab': active === #{i} }" %>
-    <% end %>
-
-    <% if menu_items.present? %>
-      <span class="flex-grow-1"></span>
-
-      <% menu_items.each do |menu_item| %>
-        <span class="tab-menu-item">
-          <%= menu_item %>
+    <% tabs.each do |tab| %>
+      <% case tab %>
+      <% when Panel %>
+        <%= link_to tab.name, tab.url, class: ["tab", tab.id, tab.classes, ("active-tab" if tab.index == default_tab.index)], "x-on:click.prevent": "active = #{tab.index}", "x-bind:class": "{ 'active-tab': active === #{tab.index} }" %>
+      <% when Spacer %>
+        <span class="tab-spacer flex-grow-1"></span>
+      <% when MenuItem %>
+        <span class="tab-menu-item <%= tab.id %> <%= tab.classes %>">
+          <%= tab.content.call %>
         </span>
       <% end %>
     <% end %>
   </div>
 
   <div class="tab-panels">
-    <% tabs.zip(panels).each_with_index do |(tab, panel), i| %>
-      <%= tag.div class: ["tab-panel", "#{tab.name.parameterize}-tab", ("active-tab" if i == 0)], "x-bind:class": "{ 'active-tab': active === #{i} }" do %>
+    <% panels.zip(tabs.grep(Panel)).each do |(panel, tab)| %>
+      <%= tag.div class: ["tab-panel", tab.id, ("active-tab" if tab.index == default_tab.index)], "x-bind:class": "{ 'active-tab': active === #{tab.index} }" do %>
         <%= panel %>
       <% end %>
     <% end %>

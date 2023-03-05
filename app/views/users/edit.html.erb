@@ -7,7 +7,7 @@
 
     <%= edit_form_for @user do |f| %>
       <%= render(TabPanelComponent.new do |t| %>
-        <% t.panel(name: "Basic", active: true) do %>
+        <% t.panel("Basic", active: true) do %>
           <fieldset id="basic-settings-section">
             <div class="input">
               <label>Name</label>
@@ -47,7 +47,7 @@
           </fieldset>
         <% end %>
 
-        <% t.panel(name: "Advanced") do %>
+        <% t.panel("Advanced") do %>
           <fieldset id="advanced-settings-section">
             <div class="input">
               <label>Account</label>

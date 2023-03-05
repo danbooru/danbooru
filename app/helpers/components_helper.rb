@@ -98,8 +98,8 @@ module ComponentsHelper
     end
   end
 
-  def help_tooltip(content = nil, icon: help_icon, &block)
+  def help_tooltip(content = nil, icon: help_icon, **options, &block)
     content = yield if block_given?
-    render HelpTooltipComponent.new(icon, content)
+    render HelpTooltipComponent.new(icon, content, **options)
   end
 end

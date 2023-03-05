@@ -285,11 +285,13 @@ $spacer: 0.25rem; /* 4px */
 
 .text-success { color: var(--success-color) !important; }
 .text-error { color: var(--error-color) !important; }
+.text-warning { color: var(--warning-color) !important; }
 .text-danger { color: var(--error-color) !important; }
 .text-inverse { color: var(--inverse-text-color); }
 
 a.text-success:hover { color: var(--success-hover-color) !important; }
 a.text-error:hover { color: var(--error-hover-color) !important; }
+a.text-warning:hover { color: var(--warning-hover-color) !important; }
 a.text-danger:hover { color: var(--error-hover-color) !important; }
 
 .bg\:primary-color { background-color: var(--link-color); }

@@ -106,6 +106,7 @@ Post.open_edit_dialog = function() {
 
   var $tag_string = $("#post_tag_string");
   $("#open-edit-dialog").hide();
+  $(".open-edit-dialog-tab").hide();
 
   var dialog = $("<div/>").attr("id", "edit-dialog");
   $("#form").appendTo(dialog);
@@ -165,6 +166,7 @@ Post.close_edit_dialog = function(e, ui) {
   var $tag_string = $("#post_tag_string");
   $("div.input").has($tag_string).prevAll().show();
   $("#open-edit-dialog").show();
+  $(".open-edit-dialog-tab").show();
   $tag_string.css({"resize": "", "width": ""});
   $(document).trigger("danbooru:close-post-edit-dialog");
 }
