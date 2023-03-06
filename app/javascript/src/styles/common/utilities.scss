@@ -360,6 +360,62 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   }
 }
 
+// Show a thin horizontal scrollbar on hover if content is overflowing.
+.thin-x-scrollbar, %thin-x-scrollbar {
+  overflow-x: auto;
+
+  @media (hover: hover) {
+    overflow-x: hidden;
+
+    &:hover {
+      overflow-x: auto;
+      scrollbar-width: thin; // Firefox only
+
+      &::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+
+      &::-webkit-scrollbar-button {
+        width: 0;
+        height: 0;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--post-tooltip-scrollbar-background);
+        border: none;
+        border-radius: 0;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: var(--post-tooltip-scrollbar-thumb-color);
+      }
+
+      &::-webkit-scrollbar-thumb:active {
+        background: var(--post-tooltip-scrollbar-thumb-color);
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--post-tooltip-scrollbar-track-background);
+        border: none;
+        border-radius: 0;
+      }
+
+      &::-webkit-scrollbar-track:hover {
+        background: var(--post-tooltip-scrollbar-track-background);
+      }
+
+      &::-webkit-scrollbar-track:active {
+        background: var(--post-tooltip-scrollbar-track-background);
+      }
+
+      &::-webkit-scrollbar-corner {
+        background: transparent;
+      }
+    }
+  }
+}
+
 .animate-spin {
   animation: animate-spin 1s linear infinite;
 }

@@ -1,5 +1,5 @@
 <%= tag.div class: ["tab-panel-component", *Array.wrap(classes)], "x-data": "{ active: #{default_tab.index} }" do %>
-  <div class="tab-list">
+  <div class="tab-list thin-x-scrollbar">
     <% tabs.each do |tab| %>
       <% case tab %>
       <% when Panel %>

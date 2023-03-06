@@ -1,4 +1,5 @@
 @import "../base/020_base";
+@import "../common/utilities";
 
 form.simple_form {
   margin: 0 0 1em 0;
@@ -104,11 +105,16 @@ form.simple_form {
 
       // Show radio buttons as a rounded button group.
       &.radio-button-group {
+        @extend %thin-x-scrollbar;
+
+        white-space: nowrap;
+
         input {
           display: none;
         }
 
         .radio label {
+          display: inline-block;
           margin: 0;
           margin-right: 0;
           padding: 0.25rem 0.33rem;
