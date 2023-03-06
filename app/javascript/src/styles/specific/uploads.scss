@@ -5,7 +5,7 @@ div#c-uploads {
     }
 
     .upload-container {
-      --min-edit-container-width: 240;
+      --min-edit-container-width: 180;
       --edit-container-width: 480;
       grid-template-columns: 1fr max-content calc(var(--edit-container-width) * 1px);
     }

@@ -4,24 +4,26 @@
   &.horizontal-tab-panel {
     .tab-list {
       display: flex;
-      flex-wrap: wrap;
+      white-space: nowrap;
       border-bottom-width: 1px;
+      padding-bottom: 1px;
       gap: 1rem;
       margin-bottom: 1rem;
 
       .tab, .tab-menu-item {
         padding: 0.25rem;
         padding-bottom: 0.5rem;
+        line-height: 1;
+
+        &:focus {
+          outline: none; // XXX remove default `a { outline: thin dotted }`
+        }
       }
 
       .tab.active-tab {
         border-color: currentcolor;
-        border-bottom-width: 0.125rem;
+        border-bottom-width: 2px;
         margin-bottom: -1px;
-      }
-
-      .tab:focus {
-        outline: none; // XXX remove default `a { outline: thin dotted }`
       }
 
       .tab:not(.active-tab) {
