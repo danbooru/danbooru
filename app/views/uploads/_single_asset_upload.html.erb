@@ -15,7 +15,7 @@
   <% media_asset = upload_media_asset.media_asset %>
   <% source = upload_media_asset.source_extractor %>
 
-  <%= tag.div class: "upload-container grid gap-4 h-full", style: ("--edit-container-width: #{cookies[:upload_edit_container_width]};" if cookies[:upload_edit_container_width].present?) do %>
+  <%= tag.div class: "upload-container grid gap-2 h-full", style: ("--edit-container-width: #{cookies[:upload_edit_container_width]};" if cookies[:upload_edit_container_width].present?) do %>
     <div class="upload-image-container">
       <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user, outer_classes: "h-full top-0", inner_classes: "mx-auto", dynamic_height: true, scroll_on_zoom: true) do |component| %>
         <% component.with_footer do %>
@@ -107,7 +107,7 @@
       <% end %>
     </div>
 
-    <div class="upload-divider px-2 cursor-col-resize desktop-only"></div>
+    <div class="upload-divider px-4 cursor-col-resize desktop-only"></div>
 
     <div class="upload-edit-container">
       <% post = Post.new_from_upload(upload_media_asset, add_artist_tag: true, source: upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys) %>

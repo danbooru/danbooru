@@ -23,11 +23,18 @@ div#c-uploads {
     }
 
     .upload-divider {
+      touch-action: none;
       background: linear-gradient(currentcolor, currentcolor) no-repeat center/1px 100%;
       color: var(--divider-border-color);
 
-      &:hover {
-        color: var(--divider-border-hover-color);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--divider-border-hover-color);
+        }
+      }
+
+      &.dragging {
+        color: var(--link-color);
       }
     }
   }
