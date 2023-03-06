@@ -27,22 +27,48 @@ Upload.loadAssets = async function() {
 }
 
 Upload.initialize_draggable_divider = function() {
-  Upload.dragStartWidth = 0;
+  $(".upload-divider").on("pointerdown", (startEvent) => {
+    if (startEvent.button !== 0 || !startEvent.originalEvent.isPrimary) {
+      return; // Ignore right-clicks and multi-touch gestures.
+    }
 
-  $(".upload-divider").draggable({ axis: "x" });
+    let active = true;
+    let dragStartWidth = $(".upload-edit-container").width();
+    let panelWidth = dragStartWidth;
+    let pointerId = startEvent.pointerId;
+    startEvent.preventDefault();
 
-  $(".upload-divider").on("dragstart", (event, ui) => {
-    Upload.dragStartWidth = parseInt($(".upload-container").css("--edit-container-width"));
-  });
+    $(".upload-divider").get(0).setPointerCapture(pointerId);
+    $(".upload-divider").addClass("dragging");
 
-  $(".upload-divider").on("drag", (event, ui) => {
-    let minWidth = parseInt($(".upload-container").css("--min-edit-container-width"));
-    let maxWidth = $(".upload-container").width() - minWidth;
-    let width = clamp(Upload.dragStartWidth - ui.position.left, minWidth, maxWidth);
+    $(document.body).on("pointermove", (moveEvent) => {
+      requestAnimationFrame(() => {
+        if (moveEvent.pointerId !== pointerId || !active) {
+          return; // Ignore multi-touch gestures and pointermove events after pointerup has already been fired.
+        }
 
-    $(".upload-container").css("--edit-container-width", width);
-    Cookie.put("upload_edit_container_width", width);
-    ui.position.left = 0;
+        let dragOffsetX = moveEvent.clientX - startEvent.clientX;
+        let minWidth = parseInt($(".upload-container").css("--min-edit-container-width"));
+        let maxWidth = $(".upload-container").width() - minWidth;
+        panelWidth = clamp(dragStartWidth - dragOffsetX, minWidth, maxWidth);
+        $(".upload-container").css("--edit-container-width", panelWidth);
+
+        moveEvent.preventDefault();
+      });
+    });
+
+    $(document.body).on("pointerup pointercancel", (endEvent) => {
+      if (endEvent.pointerId !== pointerId) {
+        return; // Ignore multi-touch gestures.
+      }
+
+      active = false;
+      $(document.body).off("pointerup pointercancel pointermove");
+      $(".upload-divider").removeClass("dragging");
+      Cookie.put("upload_edit_container_width", panelWidth);
+
+      endEvent.preventDefault();
+    });
   });
 };
 
