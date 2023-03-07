@@ -81,6 +81,10 @@ module PostSets
       posts.any? {|x| x.rating == "e"}
     end
 
+    def niche_posts
+      posts.select(&:nicheblocked?)
+    end
+
     def hidden_posts
       posts.reject(&:visible?)
     end

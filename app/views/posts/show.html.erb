@@ -273,6 +273,8 @@
       <p>The artist requested removal of this image.</p>
     <% elsif @post.levelblocked? -%>
       <p>This image requires a privileged account to view.</p>
+    <% elsif @post.nicheblocked? -%>
+      <p>This image is hidden by your settings.</p>
     <% elsif @post.safeblocked? -%>
       <p>This image is unavailable on <%= Danbooru.config.app_name %>. Go to <%= link_to Danbooru.config.canonical_app_name, Danbooru.config.canonical_url %> or disable safe mode to view (<%= link_to_wiki "learn more", "help:safe_mode" %>).</p>
     <% elsif @post.is_flash? -%>

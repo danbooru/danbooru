@@ -9,6 +9,7 @@ class Post < ApplicationRecord
                       annotated partially_annotated check_annotation annotation_request]
 
   RESTRICTED_TAGS_REGEX = /(?:^| )(?:#{Danbooru.config.restricted_tags.join("|")})(?:$| )/o
+  NICHE_TAGS_REGEX = /(?:^| )(?:#{Danbooru.config.niche_tags.join("|")})(?:$| )/o
 
   RATINGS = {
     g: "General",
@@ -1965,8 +1966,12 @@ class Post < ApplicationRecord
     false
   end
 
+  def nicheblocked?(user = CurrentUser.user)
+    !user.show_niche_posts && tag_string.match?(NICHE_TAGS_REGEX)
+  end
+
   def visible?(user = CurrentUser.user)
-    !safeblocked? && !levelblocked?(user) && !banblocked?(user)
+    !safeblocked? && !levelblocked?(user) && !banblocked?(user) && !nicheblocked?(user)
   end
 
   def reload(options = nil)

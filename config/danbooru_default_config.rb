@@ -376,6 +376,10 @@ module Danbooru
       []
     end
 
+    def niche_tags
+      []
+    end
+
     # If present, the 404 page will show a random post from this pool.
     def page_not_found_pool_id
       nil

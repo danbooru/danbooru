@@ -50,7 +50,7 @@ class User < ApplicationRecord
     _unused_enable_recommended_posts
     _unused_opt_out_tracking
     _unused_no_flagging
-    _unused_no_feedback
+    show_niche_posts
     requires_verification
     is_verified
     show_deleted_posts
