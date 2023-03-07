@@ -14,11 +14,18 @@ div#c-uploads {
       position: sticky;
     }
 
-    @media (max-width: 660px) {
+    // XXX Use the vertical layout on tall-ish screens. We use aspect ratio <4:3 instead of <1:1 to avoid the layout
+    // switching when the on-screen keyboard is opened in Firefox on Android. We write it this way because we want
+    // <1.3333, not <=1.3333.
+    @media (max-aspect-ratio: 10000/7501) {
       .upload-container {
         grid-template-columns: 1fr;
         grid-template-rows: min-content;
         gap: 0.25rem;
+      }
+
+      .upload-divider {
+        display: none;
       }
     }
 

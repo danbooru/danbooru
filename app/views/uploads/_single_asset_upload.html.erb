@@ -107,7 +107,7 @@
       <% end %>
     </div>
 
-    <div class="upload-divider px-4 cursor-col-resize desktop-only"></div>
+    <div class="upload-divider px-4 cursor-col-resize"></div>
 
     <div class="upload-edit-container">
       <% post = Post.new_from_upload(upload_media_asset, add_artist_tag: true, source: upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys) %>
