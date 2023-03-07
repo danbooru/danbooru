@@ -12,8 +12,11 @@
 
   &:not(.media-asset-component-fit-height) .media-asset-paginator {
     position: sticky;
+
     top: calc((max(var(--min-asset-height), 100vh)  + var(--header-visible-height) - var(--paginator-size)) / 2);
-    top: calc((max(var(--min-asset-height), 100dvh) + var(--header-visible-height) - var(--paginator-size)) / 2);
+    @supports (top: 100dvh) {
+      top: calc((max(var(--min-asset-height), 100dvh) + var(--header-visible-height) - var(--paginator-size)) / 2);
+    }
   }
 
   &:hover {
@@ -68,7 +71,10 @@
 
   &.media-asset-component-fit-height {
     max-height: calc(max(var(--min-asset-height), 100vh)  - var(--header-visible-height));
-    max-height: calc(max(var(--min-asset-height), 100dvh) - var(--header-visible-height));
+    @supports (max-height: 100dvh) {
+      max-height: calc(max(var(--min-asset-height), 100dvh) - var(--header-visible-height));
+    }
+
     justify-content: center;
 
     .media-asset-container {
