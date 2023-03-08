@@ -13,6 +13,7 @@ require('jquery-hotkeys');
 import morphdom from 'morphdom';
 import Alpine from 'alpinejs';
 import morph from '@alpinejs/morph';
+import persist from '@alpinejs/persist'
 
 // should start looking for nodejs replacements
 importAll(require.context('../vendor', true, /\.js$/));
@@ -40,6 +41,7 @@ import ArtistCommentary from "../src/javascripts/artist_commentaries.js";
 import Blacklist from "../src/javascripts/blacklists.js";
 import CommentComponent from "../src/javascripts/comment_component.js";
 import CommentVotesTooltipComponent from "../src/javascripts/comment_votes_tooltip_component.js";
+import Cookie from "../src/javascripts/cookie.js";
 import CurrentUser from "../src/javascripts/current_user.js";
 import Dtext from "../src/javascripts/dtext.js";
 import FavoritesTooltipComponent from "../src/javascripts/favorites_tooltip_component.js";
@@ -70,6 +72,7 @@ Danbooru.ArtistCommentary = ArtistCommentary;
 Danbooru.Blacklist = Blacklist;
 Danbooru.CommentComponent = CommentComponent;
 Danbooru.CommentVotesTooltipComponent = CommentVotesTooltipComponent;
+Danbooru.Cookie = Cookie;
 Danbooru.CurrentUser = CurrentUser;
 Danbooru.Dtext = Dtext;
 Danbooru.FavoritesTooltipComponent = FavoritesTooltipComponent;
@@ -104,4 +107,5 @@ window.Alpine = Alpine;
 window.Danbooru = Danbooru;
 
 Alpine.plugin(morph);
+Alpine.plugin(persist)
 $(() => Alpine.start());

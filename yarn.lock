@@ -12,6 +12,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@alpinejs/persist@npm:^3.12.0":
+  version: 3.12.0
+  resolution: "@alpinejs/persist@npm:3.12.0"
+  checksum: 0623557e6f42252cc30a061c4c757465e05809b2c3c7946a6a63b52acdcbb5b9ee51e183882fcad92add990e18134b211d0839d438f5abb540e148e03ebff4ba
+  languageName: node
+  linkType: hard
+
 "@ampproject/remapping@npm:^2.2.0":
   version: 2.2.0
   resolution: "@ampproject/remapping@npm:2.2.0"
@@ -6405,6 +6412,7 @@ fsevents@~2.3.2:
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
     "@alpinejs/morph": ^3.9.0
+    "@alpinejs/persist": ^3.12.0
     "@babel/cli": ^7.16.8
     "@babel/core": 7
     "@babel/eslint-parser": ^7.16.5

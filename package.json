@@ -2,6 +2,7 @@
   "license": "MIT",
   "dependencies": {
     "@alpinejs/morph": "^3.9.0",
+    "@alpinejs/persist": "^3.12.0",
     "@babel/core": "7",
     "@babel/plugin-proposal-decorators": "^7.16.7",
     "@babel/plugin-transform-runtime": "7",
