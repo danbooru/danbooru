@@ -69,9 +69,17 @@
     max-height: inherit;
   }
 
+  &.media-asset-component-fit-height {
+    justify-content: center;
+
+    .media-asset-container {
+      aspect-ratio: var(--media-asset-width) / var(--media-asset-height);
+      height: fit-content;
+    }
+  }
+
   &.media-asset-component-fit-height[data-dynamic-height="false"] {
     top: calc(var(--header-initial-height) / 2);
-    justify-content: center;
 
     max-height: calc(max(var(--min-asset-height), 100vh)  - var(--header-initial-height));
     @supports (max-height: 100dvh) {
@@ -83,13 +91,6 @@
     max-height: calc(max(var(--min-asset-height), 100vh)  - var(--header-visible-height));
     @supports (max-height: 100dvh) {
       max-height: calc(max(var(--min-asset-height), 100dvh) - var(--header-visible-height));
-    }
-
-    justify-content: center;
-
-    .media-asset-container {
-      aspect-ratio: var(--media-asset-width) / var(--media-asset-height);
-      height: fit-content;
     }
   }
 
