@@ -15,11 +15,9 @@ export default class MediaAssetComponent {
     this.scrollOnZoom = this.$component.attr("data-scroll-on-zoom") === "true";
     this.dynamicHeight = this.$component.attr("data-dynamic-height") === "true";
 
-    if (this.dynamicHeight) {
-      this.updateHeight();
-      $(window).on("load.danbooru", e => this.updateHeight());
-      $(window).on("scroll.danbooru", e => this.updateHeight());
-    }
+    this.updateHeight();
+    $(window).on("load.danbooru", e => this.updateHeight());
+    $(window).on("scroll.danbooru", e => this.updateHeight());
 
     if (this.$image.length) {
       this.$image.on("click.danbooru", e => this.toggleFit(e));
@@ -63,7 +61,8 @@ export default class MediaAssetComponent {
   }
 
   updateHeight() {
-    this.$component.css("--header-visible-height", Math.max(0, this.$component.offset().top - $(window).scrollTop()) + "px");
+    this.$component.css("--header-initial-height", Math.max(0, this.$component.parent().offset().top) + "px");
+    this.$component.css("--header-visible-height", Math.max(0, this.$component.parent().offset().top - $(window).scrollTop()) + "px");
     this.$component.attr("data-dynamic-height-initialized", "true");
   }
 
