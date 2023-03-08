@@ -28,8 +28,8 @@ class PopupMenuComponent {
     let hideOnClick = itemHideOnClick !== undefined ? itemHideOnClick : menuHideOnClick;
 
     if (hideOnClick) {
-      let tippy = $(event.target).parents("[data-tippy-root]").get(0)._tippy;
-      tippy.hide();
+      let tippy = $(event.target).parents("[data-tippy-root]").get(0)?._tippy;
+      tippy?.hide();
     }
   }
 }
