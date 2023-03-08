@@ -69,7 +69,17 @@
     max-height: inherit;
   }
 
-  &.media-asset-component-fit-height {
+  &.media-asset-component-fit-height[data-dynamic-height="false"] {
+    top: calc(var(--header-initial-height) / 2);
+    justify-content: center;
+
+    max-height: calc(max(var(--min-asset-height), 100vh)  - var(--header-initial-height));
+    @supports (max-height: 100dvh) {
+      max-height: calc(max(var(--min-asset-height), 100dvh) - var(--header-initial-height));
+    }
+  }
+
+  &.media-asset-component-fit-height[data-dynamic-height="true"] {
     max-height: calc(max(var(--min-asset-height), 100vh)  - var(--header-visible-height));
     @supports (max-height: 100dvh) {
       max-height: calc(max(var(--min-asset-height), 100dvh) - var(--header-visible-height));
