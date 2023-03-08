@@ -14,7 +14,7 @@ Cookie.put = function(name, value, max_age_in_seconds = 60 * 60 * 24 * 365 * 20)
   document.cookie = cookie;
 }
 
-Cookie.raw_get = function(name) {
+Cookie.get = function(name) {
   var nameEq = name + "=";
   var ca = document.cookie.split(";");
 
@@ -26,15 +26,11 @@ Cookie.raw_get = function(name) {
     }
 
     if (c.indexOf(nameEq) === 0) {
-      return c.substring(nameEq.length, c.length);
+      return this.unescape(c.substring(nameEq.length, c.length));
     }
   }
 
-  return "";
-}
-
-Cookie.get = function(name) {
-  return this.unescape(this.raw_get(name));
+  return null;
 }
 
 Cookie.remove = function(name) {
@@ -44,6 +40,9 @@ Cookie.remove = function(name) {
 Cookie.unescape = function(val) {
   return decodeURIComponent(val.replace(/\+/g, " "));
 }
+
+Cookie.getItem = Cookie.get;
+Cookie.setItem = Cookie.put;
 
 Cookie.initialize = function() {
   if (this.get("hide-upgrade-account") !== "1") {

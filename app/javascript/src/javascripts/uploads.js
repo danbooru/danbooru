@@ -47,7 +47,8 @@ Upload.initialize_draggable_divider = function() {
           return; // Ignore multi-touch gestures and pointermove events after pointerup has already been fired.
         }
 
-        let dragOffsetX = moveEvent.clientX - startEvent.clientX;
+        let reverseDrag = $(".upload-container[data-dock='left']").length === 1;
+        let dragOffsetX = (moveEvent.clientX - startEvent.clientX) * (reverseDrag ? -1 : 1);
         let minWidth = parseInt($(".upload-container").css("--min-edit-container-width"));
         let maxWidth = $(".upload-container").width() - minWidth;
         panelWidth = clamp(dragStartWidth - dragOffsetX, minWidth, maxWidth);

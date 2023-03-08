@@ -440,6 +440,26 @@ module IconHelper
     svg_icon_tag("circle-info", viewBox: "0 0 512 512", **options)
   end
 
+  def dock_top_icon(**options)
+    svg_icon_tag("dock-top", viewBox: "0 0 1024 1024", **options)
+  end
+
+  def dock_right_icon(**options)
+    svg_icon_tag("dock-right", viewBox: "0 0 1024 1024", **options)
+  end
+
+  def dock_bottom_icon(**options)
+    svg_icon_tag("dock-bottom", viewBox: "0 0 1024 1024", **options)
+  end
+
+  def dock_left_icon(**options)
+    svg_icon_tag("dock-left", viewBox: "0 0 1024 1024", **options)
+  end
+
+  def rotate_icon(**options)
+    svg_icon_tag("rotate", viewBox: "0 0 512 512", **options)
+  end
+
   def discord_icon(**options)
     image_icon_tag("discord-logo.png", **options)
   end
