@@ -23,20 +23,19 @@
   <%= f.input :parent_id, label: "Parent", as: :string %>
   <%= f.input :source %>
 
-  <div class="input fixed-width-container" id="tags-container">
-    <div class="header">
-      <%= f.label :tag_string, "Tags" %>
+  <div class="input fixed-width-container">
+    <div class="flex justify-between">
+      <span class="inline-flex gap-1 items-center">
+        <%= f.label :tag_string, "Tags" %>
+        <%= link_to external_link_icon(class: "text-xxs"), "javascript:void(0)", id: "open-edit-dialog", "data-shortcut": "shift+e" %>
+      </span>
 
-      <span data-tag-counter data-for="#post_tag_string">
+      <span data-tag-counter data-for="#post_tag_string" class="text-muted text-sm">
         <span class="tag-count"></span>
       </span>
-      <%= link_to external_link_icon(class: "text-xxs"), "javascript:void(0)", id: "open-edit-dialog", "data-shortcut": "shift+e" %>
     </div>
 
-    <div>
-      <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
-    </div>
-
+    <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
     <%= render "related_tags/buttons" %>
   </div>
 

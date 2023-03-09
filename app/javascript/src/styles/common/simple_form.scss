@@ -4,10 +4,13 @@
 form.simple_form {
   margin: 0 0 1em 0;
 
+  label {
+    font-weight: bold;
+  }
+
   fieldset.inline-fieldset {
     > label {
       display: block;
-      font-weight: bold;
     }
 
     div.input {
@@ -81,7 +84,6 @@ form.simple_form {
 
     label {
       display: block;
-      font-weight: bold;
       line-height: 1.5em;
     }
 
