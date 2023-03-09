@@ -43,9 +43,7 @@ class WikiPage < ApplicationRecord
     end
 
     def other_names_include(name)
-      name = normalize_other_name(name)
-      subquery = WikiPage.from("unnest(other_names) AS other_name").where_iequals("other_name", name)
-      where(id: subquery)
+      where_any_in_array_iequals("other_names", normalize_other_name(name))
     end
 
     def other_names_match(name)

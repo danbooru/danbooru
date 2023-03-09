@@ -145,6 +145,10 @@ module Searchable
     where_array_to_tsvector_matches(attr, escape_patterns_for_tsquery(patterns).join(" | "))
   end
 
+  def where_any_in_array_iequals(attr, value)
+    where_array_to_tsvector_matches("lower(#{qualified_column_for(attr)})", value.downcase.to_escaped_for_tsquery)
+  end
+
   def where_text_includes_lower(attr, values)
     where("lower(#{qualified_column_for(attr)}) IN (?)", values.map(&:downcase))
   end

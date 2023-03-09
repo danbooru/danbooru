@@ -5888,6 +5888,13 @@ CREATE INDEX index_wiki_page_versions_on_wiki_page_id ON public.wiki_page_versio
 
 
 --
+-- Name: index_wiki_pages_on_array_to_tsvector_lower_other_names; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_wiki_pages_on_array_to_tsvector_lower_other_names ON public.wiki_pages USING gin (array_to_tsvector(public.lower(other_names)));
+
+
+--
 -- Name: index_wiki_pages_on_array_to_tsvector_other_names; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6981,6 +6988,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221230011825'),
 ('20230104064916'),
 ('20230209060757'),
-('20230222230650');
+('20230222230650'),
+('20230309014439');
 
 
