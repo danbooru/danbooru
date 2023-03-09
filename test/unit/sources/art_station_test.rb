@@ -82,8 +82,8 @@ module Sources
           https://cdn.artstation.com/p/assets/images/images/040/979/503/4k/yusuf-umar-4.jpg?1630425547
           https://cdn.artstation.com/p/assets/images/images/040/979/659/4k/yusuf-umar-5.jpg?1630425795
           https://cdn.artstation.com/p/assets/images/images/040/980/932/4k/yusuf-umar-tpose.jpg?1630427748
-          https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4
-          https://cdn-animation.artstation.com/p/video_sources/000/466/623/workout-clay.mp4
+          https://cdn.artstation.com/p/video_sources/000/466/622/workout.mp4
+          https://cdn.artstation.com/p/video_sources/000/466/623/workout-clay.mp4
         ]
       )
     end

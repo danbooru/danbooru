@@ -81,6 +81,8 @@ class Source::Extractor
       json = JSON.parse(response.to_s)
       html = Nokogiri::HTML5.fragment(json["html"])
       html
+    rescue JSON::ParserError
+      nil
     end
   end
 end

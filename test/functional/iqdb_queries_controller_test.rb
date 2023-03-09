@@ -10,7 +10,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
     context "show action" do
       context "with a url parameter" do
         should "render a response" do
-          @url = "https://danbooru.donmai.us/images/flash-preview.png"
+          @url = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
           @matches = [{ post_id: @post.id, score: 95.0 }]
           mock_iqdb_matches(@matches)
 

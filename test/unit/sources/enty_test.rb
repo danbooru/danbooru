@@ -9,7 +9,7 @@ module Sources
           image_urls: [
             "https://img01.enty.jp/uploads/post/thumbnail/141598/post_show_b6c7d85c-b63c-4950-9152-e4bf30678022.png",
             "https://img01.enty.jp/uploads/ckeditor/pictures/194353/content_20211227_130_030_100.png",
-            %r{https://entyjp\.s3-ap-northeast-1\.amazonaws\.com/uploads/post/attachment/141598/20211227_130_030_100\.png\?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIMO6YQGDXLXXJKQA%2F20230214%2Fap-northeast-1%2Fs3%2Faws4_request&X-Amz-Date=.+&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=\h+},
+            %r{https://entyjp\.s3-ap-northeast-1\.amazonaws\.com/uploads/post/attachment/141598/20211227_130_030_100\.png\?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=.+&X-Amz-Date=.+&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=\h+},
           ],
           profile_url: "https://enty.jp/kouyoumatsunaga",
           profile_urls: %w[
