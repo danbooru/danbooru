@@ -119,11 +119,11 @@
           <% t.panel("Tags", active: true) do %>
             <%= f.input :rating, label: "Rating #{help_tooltip embed_wiki("help:rating_notice", classes: "text-xs"), link_class: "inactive-link" }".html_safe, wrapper_html: { class: "radio-button-group text-xs" }, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
 
-            <div class="input" id="tags-container">
-              <div class="header">
+            <div>
+              <div class="flex justify-between">
                 <%= f.label :tag_string, "Tags" %>
 
-                <span data-tag-counter data-for="#post_tag_string">
+                <span data-tag-counter data-for="#post_tag_string" class="text-muted text-sm">
                   <span class="tag-count"></span>
                 </span>
               </div>
