@@ -6,7 +6,7 @@ class Source::URL::Skeb < Source::URL
   attr_reader :username, :work_id, :image_id, :image_uuid
 
   def self.match?(url)
-    url.host.in?(%w[www.skeb.jp fcdn.skeb.jp cdn.skeb.jp skeb.jp skeb.imgix.net skeb-production.s3.ap-northeast-1.amazonaws.com])
+    url.host.in?(%w[www.skeb.jp fcdn.skeb.jp cdn.skeb.jp skeb.jp skeb.imgix.net si.imgix.net skeb-production.s3.ap-northeast-1.amazonaws.com])
   end
 
   def parse
@@ -38,6 +38,10 @@ class Source::URL::Skeb < Source::URL
 
     # https://skeb.imgix.net/uploads/origins/04d62c2f-e396-46f9-903a-3ca8bd69fc7c?bg=%23fff&auto=format&w=800&s=966c5d0389c3b94dc36ac970f812bef4
     in "skeb", "imgix.net", "uploads", "origins", /^\h{8}-\h{4}-\h{4}-\h{4}-\h{12}$/ => image_uuid
+      @image_uuid = image_uuid
+
+    # https://si.imgix.net/17e73ecf/uploads/origins/5097b1e1-18ce-418e-82f0-e7e2cdab1cea?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=701f0e4a2c63865fe7e295b6c66b543b
+    in "si", "imgix.net", /^\h{8}$/, "uploads", "origins", /^\h{8}-\h{4}-\h{4}-\h{4}-\h{12}$/ => image_uuid
       @image_uuid = image_uuid
 
     # Page: https://skeb.jp/@kaisouafuro/works/112
