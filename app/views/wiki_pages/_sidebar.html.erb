@@ -25,10 +25,11 @@
       <li><%= link_to "What Links Here", wiki_pages_path(search: { linked_to: @wiki_page.title }) %></li>
       <% end %>
 
-      <li><%= link_to "Mistagged posts", posts_path(tags: "#{tag.name} ai:#{tag.name},0%") %></li>
+      <% if @wiki_page.id.present? %>
+       <li><%= link_to "Mistagged posts", posts_path(tags: "#{tag.name} ai:#{tag.name},0%") %></li>
       
       <li><%= link_to "Untagged posts", ai_tags_path(search: { tag_name: tag.name, post_tags_match: "-#{tag.name}", is_posted: true, order: "score_desc" }) %></li>
-      <li><% end %></li>
+      <% end %>
     </ul>
   <% end %>
 <% end %>
