@@ -316,7 +316,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should "fail for a decompression bomb" do
           create_upload!("test/files/archive/bomb-1-1G.rar", user: @user)
           assert_response 422
-          assert_match("'bomb-1-1G.rar' is too large (uncompressed size: 1,000 MB; max size: 100 MB)", response.parsed_body.dig("errors", "base", 0))
+          assert_match("'bomb-1-1G.rar' is too large (uncompressed size: 1000 MB; max size: 100 MB)", response.parsed_body.dig("errors", "base", 0))
         end
 
         should "fail for an archive containing absolute paths" do
