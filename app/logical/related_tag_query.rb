@@ -3,6 +3,7 @@
 # Handle finding related tags by the {RelatedTagsController}. Used for finding
 # related tags when tagging a post.
 class RelatedTagQuery
+  extend Memoist
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml
 
@@ -48,12 +49,27 @@ class RelatedTagQuery
     end
   end
 
-  def frequent_tags
-    @frequent_tags ||= RelatedTagCalculator.frequent_tags_for_search(post_query, category: category_of).take(limit)
+  memoize def frequent_tags(category = nil)
+    tags = RelatedTagCalculator.frequent_tags_for_search(post_query, category: category).take(limit)
+    tags = tags.select { |t| t.category.in?(TagCategory.related_tag_categories[tag.category]) } if category.nil?
+    sort_by_category(tags, category)
   end
 
-  def similar_tags
-    @similar_tags ||= RelatedTagCalculator.similar_tags_for_search(post_query, category: category_of).take(limit)
+  memoize def similar_tags(category = nil, category_top_n: 4)
+    tags = RelatedTagCalculator.similar_tags_for_search(post_query, category: category)
+    tags = tags.select { |t| t.category.in?(TagCategory.related_tag_categories[tag.category]) } if category.nil?
+    tags = sort_by_category(tags, category)
+
+    if category.nil?
+      category_counts = Hash.new { 0 }
+
+      tags = tags.select do |t|
+        category_counts[t.category] += 1
+        t.general? || category_counts[t.category] <= category_top_n
+      end
+    end
+
+    tags.take(limit)
   end
 
   def ai_tags
@@ -73,7 +89,8 @@ class RelatedTagQuery
     tags = versions.flat_map(&:added_tags)
     tags = tags.reject { |tag| tag.match?(/\A(source:|parent:|rating:)/) }
     tags = tags.group_by(&:itself).transform_values(&:size).sort_by { |tag, count| [-count, tag] }.map(&:first)
-    tags.take(max_tags)
+    tags = tags.take(max_tags)
+    tags
   end
 
   def favorite_tags
@@ -126,7 +143,19 @@ class RelatedTagQuery
     }
   end
 
+  memoize def tag
+    post_query.tag
+  end
+
+  def related_categories
+    TagCategory.related_tag_categories[tag.category]
+  end
+
   protected
+
+  def sort_by_category(tags, category)
+    tags.sort_by.with_index { |tag, i| [related_categories.index(tag.category), i] }
+  end
 
   def tags_with_categories(list_of_tag_names)
     Tag.categories_for(list_of_tag_names).to_a

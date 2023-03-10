@@ -10,6 +10,8 @@ RelatedTag.initialize_all = function() {
   $(document).on("click.danbooru", "#show-related-tags-link", RelatedTag.show);
   $(document).on("click.danbooru", "#hide-related-tags-link", RelatedTag.hide);
   $(document).on("keyup.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_selected);
+  $(document).on("click.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_current_tag);
+  $(document).on("change.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_current_tag);
 
   $(document).on("danbooru:open-post-edit-dialog", RelatedTag.hide);
   $(document).on("danbooru:close-post-edit-dialog", RelatedTag.show);
@@ -83,6 +85,14 @@ RelatedTag.current_tag = function() {
   return string.slice(a, b);
 }
 
+RelatedTag.update_current_tag = function() {
+  let current_tag = RelatedTag.current_tag().trim().replace(/_/g, " ");
+
+  if (current_tag) {
+    $(".related-tags-current-tag").show().text(current_tag);
+  }
+}
+
 RelatedTag.update_selected = function(e) {
   var current_tags = RelatedTag.current_tags();
 
@@ -97,6 +107,8 @@ RelatedTag.update_selected = function(e) {
       $(li).find("input").prop("checked", false);
     }
   });
+
+  RelatedTag.update_current_tag();
 }
 
 RelatedTag.current_tags = function() {

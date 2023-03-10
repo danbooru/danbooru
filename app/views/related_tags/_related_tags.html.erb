@@ -1,1 +1,19 @@
-<%= render "related_tags/tag_column", tags: related_tags&.tags.to_a.map(&:name), class: "general-related-tags-column", title: related_tags&.pretty_name %>
+<div class="general-related-tags-column">
+  <% if related_tags.present? && related_tags.tag.present? %>
+    <%= render(TabPanelComponent.new(classes: nil) do |t| %>
+      <% t.menu_item do %>
+        <% tag.h3(related_tags.pretty_name, class: "ml-4") %>
+      <% end %>
+
+      <% t.panel("All", active: true, classes: "ml-4 button-outline-primary button-xs") do %>
+        <%= render "related_tags/tag_column", tags: related_tags.similar_tags.map(&:name), class: "all-related-tags-column", title: nil %>
+      <% end %>
+
+      <% related_tags.related_categories.reverse.each do |category| %>
+        <% t.panel(TagCategory.reverse_mapping[category].upcase_first.pluralize, classes: "button-outline-primary button-xs") do %>
+          <%= render "related_tags/tag_column", tags: related_tags.frequent_tags(category).map(&:name), title: nil %>
+        <% end %>
+      <% end %>
+    <% end) %>
+  <% end %>
+</div>

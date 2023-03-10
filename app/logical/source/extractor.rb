@@ -241,8 +241,12 @@ module Source
     end
 
     def translated_tags
-      translated_tags = normalized_tags.flat_map(&method(:translate_tag)).uniq.sort
-      translated_tags.reject(&:artist?).reject(&:is_deprecated?)
+      translated_tags = normalized_tags.flat_map(&method(:translate_tag)).uniq
+      translated_tags = translated_tags.reject(&:artist?).reject(&:is_deprecated?)
+
+      translated_tags.sort_by do |tag|
+        [TagCategory.categorized_list.index(tag.category_name.downcase), tag.name]
+      end
     end
 
     # Given a tag from the source site, should return an array of corresponding Danbooru tags.

@@ -6,6 +6,12 @@
 module TagCategory
   module_function
 
+  GENERAL = 0
+  ARTIST = 1
+  COPYRIGHT = 3
+  CHARACTER = 4
+  META = 5
+
   # Returns a hash mapping various tag categories to a numerical value.
   def mapping
     {
@@ -55,17 +61,6 @@ module TagCategory
     }
   end
 
-  # Returns a hash mapping for related tag buttons (javascripts/related_tag.js.erb)
-  def related_button_mapping
-    {
-      "general" => "General",
-      "character" => "Characters",
-      "copyright" => "Copyrights",
-      "artist" => "Artists",
-      "meta" => nil,
-    }
-  end
-
   def categories
     %w[general character copyright artist meta]
   end
@@ -88,9 +83,15 @@ module TagCategory
     %w[artist copyright character meta general]
   end
 
-  # The order of tags in the related tag buttons.
-  def related_button_list
-    %w[general artist character copyright]
+  # Which tag categories to show in the related tags box for a tag of the given type.
+  def related_tag_categories
+    @related_tag_categories ||= {
+      GENERAL   => [GENERAL],
+      ARTIST    => [COPYRIGHT, CHARACTER, GENERAL],
+      CHARACTER => [COPYRIGHT, CHARACTER, GENERAL],
+      COPYRIGHT => [COPYRIGHT, CHARACTER, GENERAL],
+      META      => [META, GENERAL]
+    }
   end
 
   def category_ids_regex

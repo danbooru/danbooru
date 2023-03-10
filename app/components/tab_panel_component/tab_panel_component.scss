@@ -2,7 +2,7 @@
 
 .tab-panel-component {
   &.horizontal-tab-panel {
-    .tab-list {
+    > .tab-list {
       display: flex;
       white-space: nowrap;
       border-bottom-width: 1px;
@@ -34,9 +34,9 @@
         }
       }
     }
+  }
 
-    .tab-panel:not(.active-tab) {
-      display: none;
-    }
+  > .tab-panels > .tab-panel:not(.active-tab) {
+    display: none;
   }
 }
