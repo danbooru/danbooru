@@ -11,7 +11,6 @@ RelatedTag.initialize_all = function() {
   $(document).on("click.danbooru", "#hide-related-tags-link", RelatedTag.hide);
   $(document).on("keyup.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_selected);
 
-  $(document).on("danbooru:update-source-data", RelatedTag.on_update_source_data);
   $(document).on("danbooru:open-post-edit-dialog", RelatedTag.hide);
   $(document).on("danbooru:close-post-edit-dialog", RelatedTag.show);
 
@@ -34,11 +33,6 @@ RelatedTag.initialize_recent_and_favorite_tags = function(event) {
 RelatedTag.on_click_related_tags_button = function (event) {
   $.get("/related_tag.js", { query: RelatedTag.current_tag(), category: $(event.target).data("category") });
   RelatedTag.show();
-}
-
-RelatedTag.on_update_source_data = function (event, { related_tags_html }) {
-  $(".source-related-tags-columns").replaceWith(related_tags_html);
-  RelatedTag.update_selected();
 }
 
 RelatedTag.current_tag = function() {

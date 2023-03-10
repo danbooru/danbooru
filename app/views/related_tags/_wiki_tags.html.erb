@@ -1,0 +1,5 @@
+<% if related_tags.present? %>
+  <%= render "related_tags/tag_column", tags: related_tags.wiki_page_tags, class: "wiki-related-tags-column", title: link_to_wiki("wiki:#{related_tags.pretty_name}", related_tags.query, target: "_blank") %>
+<% else %>
+  <%= render "related_tags/tag_column", tags: [], class: "wiki-related-tags-column" %>
+<% end %>
