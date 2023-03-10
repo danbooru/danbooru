@@ -1,4 +1,5 @@
 import Cookie from "./cookie";
+import Draggable from "./draggable";
 import Utility from "./utility";
 import clamp from "lodash/clamp";
 
@@ -27,49 +28,27 @@ Upload.loadAssets = async function() {
 }
 
 Upload.initialize_draggable_divider = function() {
-  $(".upload-divider").on("pointerdown", (startEvent) => {
-    if (startEvent.button !== 0 || !startEvent.originalEvent.isPrimary) {
-      return; // Ignore right-clicks and multi-touch gestures.
-    }
+  Upload.draggable = new Draggable(".upload-divider");
+  let currentPanelWidth = 0;
+  let initialPanelWidth = 0;
 
-    let active = true;
-    let dragStartWidth = $(".upload-edit-container").width();
-    let panelWidth = dragStartWidth;
-    let pointerId = startEvent.pointerId;
-    startEvent.preventDefault();
+  $(".upload-divider").on("drag:start", event => {
+    initialPanelWidth = $(".upload-edit-container").width();
+    currentPanelWidth = initialPanelWidth;
+  });
 
-    $(".upload-divider").get(0).setPointerCapture(pointerId);
-    $(".upload-divider").addClass("dragging");
+  $(".upload-divider").on("drag:move", (event, moveEvent, drag) => {
+    let reverseDrag = $(".upload-container").data("dock") === "left";
+    let dragOffset = drag.x * (reverseDrag ? -1 : 1);
+    let minWidth = parseInt($(".upload-container").css("--min-edit-container-width"));
+    let maxWidth = $(".upload-container").width() - minWidth;
 
-    $(document.body).on("pointermove", (moveEvent) => {
-      requestAnimationFrame(() => {
-        if (moveEvent.pointerId !== pointerId || !active) {
-          return; // Ignore multi-touch gestures and pointermove events after pointerup has already been fired.
-        }
+    currentPanelWidth = clamp(initialPanelWidth - dragOffset, minWidth, maxWidth);
+    $(".upload-container").css("--edit-container-width", currentPanelWidth);
+  });
 
-        let reverseDrag = $(".upload-container[data-dock='left']").length === 1;
-        let dragOffsetX = (moveEvent.clientX - startEvent.clientX) * (reverseDrag ? -1 : 1);
-        let minWidth = parseInt($(".upload-container").css("--min-edit-container-width"));
-        let maxWidth = $(".upload-container").width() - minWidth;
-        panelWidth = clamp(dragStartWidth - dragOffsetX, minWidth, maxWidth);
-        $(".upload-container").css("--edit-container-width", panelWidth);
-
-        moveEvent.preventDefault();
-      });
-    });
-
-    $(document.body).on("pointerup pointercancel", (endEvent) => {
-      if (endEvent.pointerId !== pointerId) {
-        return; // Ignore multi-touch gestures.
-      }
-
-      active = false;
-      $(document.body).off("pointerup pointercancel pointermove");
-      $(".upload-divider").removeClass("dragging");
-      Cookie.put("upload_edit_container_width", panelWidth);
-
-      endEvent.preventDefault();
-    });
+  $(".upload-divider").on("drag:stop", event => {
+    Cookie.put("upload_edit_container_width", currentPanelWidth);
   });
 };
 
