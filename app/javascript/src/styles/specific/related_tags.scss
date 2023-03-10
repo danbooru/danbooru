@@ -8,11 +8,9 @@ div#related-tags-container {
 
 div.related-tags {
   background: var(--related-tags-container-background);
-  overflow: auto;
-  flex-wrap: wrap;
 
-  div.tag-column {
-    width: 15em;
+  .tag-column {
+    max-width: 14rem;
   }
 
   li.selected a {
