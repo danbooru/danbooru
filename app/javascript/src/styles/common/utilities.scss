@@ -168,6 +168,10 @@ $spacer: 0.25rem; /* 4px */
 .w-min  { width: min-content; }
 .w-max  { width: max-content; }
 .w-fit  { width: fit-content; }
+.w-1    { width: 1 * $spacer; }
+.w-2    { width: 3 * $spacer; }
+.w-3    { width: 3 * $spacer; }
+.w-4    { width: 4 * $spacer; }
 .w-sm   { width: 24rem; }
 .w-md   { width: 28rem; }
 .w-1\/4 { width: 25%; }
@@ -258,6 +262,10 @@ $spacer: 0.25rem; /* 4px */
 .self-end { align-self: flex-end; }
 
 .float-right { float: right; }
+
+.-rotate-90 { transform: rotate(-90deg); }
+.rotate-90 { transform: rotate(90deg); }
+.rotate-180 { transform: rotate(180deg); }
 
 .grid-cols-1  { grid-template-columns: repeat(1, minmax(0, 1fr)); }
 .grid-cols-2  { grid-template-columns: repeat(2, minmax(0, 1fr)); }

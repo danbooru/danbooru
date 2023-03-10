@@ -361,6 +361,10 @@ module IconHelper
     svg_icon_tag("chevron-right", viewBox: "0 0 384 512", **options)
   end
 
+  def chevron_down_icon(**options)
+    svg_icon_tag("chevron-down", viewBox: "0 0 448 512", **options)
+  end
+
   def ellipsis_icon(**options)
     svg_icon_tag("ellipsis", viewBox: "0 0 448 512", **options)
   end

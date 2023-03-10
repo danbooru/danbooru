@@ -2,8 +2,8 @@
 
 class TabPanelComponent < ApplicationComponent
   Panel = Data.define(:name, :id, :index, :url, :active, :classes)
-  MenuItem = Data.define(:id, :classes, :content)
-  Spacer = Data.define
+  MenuItem = Data.define(:id, :classes, :content, :active)
+  Spacer = Data.define(:active)
 
   attr_reader :tabs, :classes, :index
 
@@ -23,11 +23,11 @@ class TabPanelComponent < ApplicationComponent
   end
 
   def menu_item(id: nil, classes: nil, &block)
-    tabs << MenuItem.new(id:, classes:, content: block)
+    tabs << MenuItem.new(id:, classes:, active: false, content: block)
   end
 
   def spacer
-    tabs << Spacer.new
+    tabs << Spacer.new(active: false)
   end
 
   def default_tab

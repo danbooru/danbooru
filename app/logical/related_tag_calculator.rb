@@ -60,7 +60,7 @@ module RelatedTagCalculator
     tags = Tag.from(tag_counts).joins("JOIN tags ON tags.name = tag")
     tags = tags.select("tags.*, overlap_count")
     tags = tags.nonempty.undeprecated
-    tags = tags.where(category: category) if category.present?
+    tags = tags.where(category: Tag.categories.value_for(category)) if category.present?
     tags = tags.order("overlap_count DESC, tags.post_count DESC, tags.name")
     tags
   end
