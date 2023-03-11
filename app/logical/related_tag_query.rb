@@ -99,8 +99,8 @@ class RelatedTagQuery
     user&.favorite_tags.to_s.split
   end
 
-  def wiki_page_tags
-    wiki_page.try(:tags) || []
+  memoize def wiki_page_tags
+    wiki_page&.tags.to_a
   end
 
   def serializable_hash(options = {})
@@ -142,7 +142,7 @@ class RelatedTagQuery
     tags
   end
 
-  def wiki_page
-    WikiPage.titled(query).first
+  memoize def wiki_page
+    WikiPage.active.titled(query).first
   end
 end
