@@ -17,21 +17,32 @@
 # related tags feature when tagging a post.
 #
 # @see https://en.wikipedia.org/wiki/Cosine_similarity
-module RelatedTagCalculator
+class RelatedTagCalculator
+  extend Memoist
+
+  attr_reader :post_query, :search_sample_size, :tag_sample_size, :category
+
+  # @param search_sample_size [Integer] The number of posts to sample from the search.
+  # @param tag_sample_size [Integer] The number of tags to calculate similarity for.
+  # @param category [Integer] An optional tag category, to restrict the tags to a given category.
+  def initialize(post_query = nil, search_sample_size: 5000, tag_sample_size: 500, category: nil)
+    @post_query = post_query
+    @search_sample_size = search_sample_size
+    @tag_sample_size = tag_sample_size
+    @category = category
+  end
+
   # Return the set of tags similar to the given search.
-  # @param post_query [PostQuery] the search to find similar tags for.
-  # @param search_sample_size [Integer] the number of posts to sample from the search
-  # @param tag_sample_size [Integer] the number of tags to calculate similarity for
-  # @param category [Integer] an optional tag category, to restrict the tags to a given category.
+  #
   # @return [Array<Tag>] the set of similar tags, ordered by most similar
-  def self.similar_tags_for_search(post_query, search_sample_size: 1000, tag_sample_size: 250, category: nil)
+  memoize def similar_tags_for_search
     search_count = post_query.post_count
     return [] if search_count.nil?
 
-    search_sample_size = [search_count, search_sample_size].min
+    search_sample_size = [search_count, @search_sample_size].min
     return [] if search_sample_size <= 0
 
-    tags = frequent_tags_for_search(post_query, search_sample_size: search_sample_size, category: category).limit(tag_sample_size)
+    tags = frequent_tags_for_search(search_sample_size: search_sample_size, category: category)
     tags = tags.sort_by do |tag|
       # cosine distance(tag1, tag2) = 1 - {{tag1 tag2}} / sqrt({{tag1}} * {{tag2}})
       1 - tag.overlap_count / Math.sqrt(tag.post_count * search_count.to_f)
@@ -41,16 +52,15 @@ module RelatedTagCalculator
   end
 
   # Return the set of tags most frequently appearing in the given search.
-  # @param post_query [PostQuery] the search to find frequent tags for.
-  # @param search_sample_size [Integer] the number of posts to sample from the search
-  # @param category [Integer] an optional tag category, to restrict the tags to a given category.
+  #
   # @return [Array<Tag>] the set of frequent tags, ordered by most frequent
-  def self.frequent_tags_for_search(post_query, search_sample_size: 1000, category: nil)
+  memoize def frequent_tags_for_search
     sample_posts = post_query.posts.reorder(:md5).limit(search_sample_size)
-    frequent_tags_for_post_relation(sample_posts, category: category)
+    RelatedTagCalculator.frequent_tags_for_post_relation(sample_posts, category: category).limit(tag_sample_size)
   end
 
   # Return the set of tags most frequently appearing in the given set of posts.
+  #
   # @param posts [ActiveRecord::Relation<Post>] the set of posts
   # @param category [Integer] an optional tag category, to restrict the tags to a given category.
   # @return [Array<Tag>] the set of frequent tags, ordered by most frequent
@@ -66,6 +76,7 @@ module RelatedTagCalculator
   end
 
   # Return the set of tags most frequently appearing in the given array of posts.
+  #
   # @param posts [Array<Post>] the array of posts
   # @return [Array<Tag>] the set of frequent tags, ordered by most frequent
   def self.frequent_tags_for_post_array(posts)
@@ -74,25 +85,24 @@ module RelatedTagCalculator
   end
 
   # Return a cached set of tags similar to the given search.
-  # @param post_query [PostQuery] the search to find similar tags for.
+  #
   # @param max_tags [Integer] the maximum number of tags to return
   # @param search_timeout [Integer] the database timeout for the search
   # @param cache_timeout [Integer] the length of time to cache the results
   # @return [Array<String>] the set of similar tag names, ordered by most similar
-  def self.cached_similar_tags_for_search(post_query, max_tags, search_timeout: 2000, cache_timeout: 8.hours)
-    Cache.get(cache_key(post_query), cache_timeout, race_condition_ttl: 60.seconds) do
+  def cached_similar_tags_for_search(max_tags, search_timeout: 2000, cache_timeout: 8.hours)
+    Cache.get(cache_key, cache_timeout, race_condition_ttl: 60.seconds) do
       ApplicationRecord.with_timeout(search_timeout, []) do
-        similar_tags_for_search(post_query).take(max_tags).pluck(:name)
+        similar_tags_for_search.take(max_tags).pluck(:name)
       end
     end
   end
 
-  # Return a cache key for the given search. Some searches are cached on a
-  # per-user basis because they depend on the current user (for example,
-  # searches for private favorites, favgroups, or saved searches).
-  # @param post_query [PostQuery] the post search
+  # Return a cache key for the given search. Some searches are cached on a per-user basis because they depend on the
+  # current user (for example, searches for private favorites, favgroups, or saved searches).
+  #
   # @return [String] the cache key
-  def self.cache_key(post_query)
+  def cache_key
     if post_query.is_user_dependent_search?
       "similar_tags[#{post_query.current_user.id}]:#{post_query.to_s}"
     else

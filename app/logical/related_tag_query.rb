@@ -49,24 +49,26 @@ class RelatedTagQuery
     end
   end
 
-  memoize def frequent_tags(category = nil)
-    tags = RelatedTagCalculator.frequent_tags_for_search(post_query, category: category).take(limit)
-    tags = tags.select { |t| t.category.in?(TagCategory.related_tag_categories[tag.category]) } if category.nil?
-    sort_by_category(tags, category)
+  memoize def related_tag_calculator
+    RelatedTagCalculator.new(post_query)
   end
 
-  memoize def similar_tags(category = nil, category_top_n: 4)
-    tags = RelatedTagCalculator.similar_tags_for_search(post_query, category: category)
-    tags = tags.select { |t| t.category.in?(TagCategory.related_tag_categories[tag.category]) } if category.nil?
-    tags = sort_by_category(tags, category)
+  def frequent_tags(categories: related_categories)
+    tags = related_tag_calculator.frequent_tags_for_search
+    tags = tags.select { |t| t.category.in?(categories) }
+    tags = sort_by_category(tags)
+    tags.take(limit)
+  end
 
-    if category.nil?
-      category_counts = Hash.new { 0 }
+  def similar_tags(categories: related_categories, category_top_n: 4)
+    tags = related_tag_calculator.similar_tags_for_search
+    tags = tags.select { |t| t.category.in?(categories) }
+    tags = sort_by_category(tags)
 
-      tags = tags.select do |t|
-        category_counts[t.category] += 1
-        t.general? || category_counts[t.category] <= category_top_n
-      end
+    category_counts = Hash.new { 0 }
+    tags = tags.select do |t|
+      category_counts[t.category] += 1
+      t.general? || category_counts[t.category] <= category_top_n
     end
 
     tags.take(limit)
@@ -121,7 +123,7 @@ class RelatedTagQuery
 
   protected
 
-  def sort_by_category(tags, category)
+  def sort_by_category(tags)
     tags.sort_by.with_index { |tag, i| [related_categories.index(tag.category), i] }
   end
 
