@@ -14,7 +14,8 @@ Post.SWIPE_VELOCITY = 0.6;
 Post.MAX_RECOMMENDATIONS = 45; // 3 rows of 9 posts at 1920x1080.
 Post.LOW_TAG_COUNT = 10;
 Post.HIGH_TAG_COUNT = 20;
-Post.EDIT_DIALOG_WIDTH = 720;
+Post.EDIT_DIALOG_WIDTH = 640;
+Post.EDIT_DIALOG_MIN_HEIGHT = 320;
 
 Post.initialize_all = function() {
 
@@ -129,9 +130,10 @@ Post.open_edit_dialog = function() {
   dialog.dialog({
     title: "Edit tags",
     width: Post.EDIT_DIALOG_WIDTH,
+    height: Math.max($(window).height() * 0.50, Post.EDIT_DIALOG_MIN_HEIGHT),
     position: {
-      my: "right",
-      at: "right-20",
+      my: "right top",
+      at: "right-20 top+20",
       of: window
     },
     drag: function(e, ui) {

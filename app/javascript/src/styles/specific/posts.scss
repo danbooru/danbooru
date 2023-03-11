@@ -38,6 +38,10 @@
   }
 }
 
+#post_tag_string {
+  max-height: 10rem;
+}
+
 #has-parent-relationship-preview, #has-children-relationship-preview {
   article.post-preview.current-post {
     border-radius: 0.25rem;

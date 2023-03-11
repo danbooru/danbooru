@@ -1,3 +1,5 @@
+@import "./utilities";
+
 .ui-widget {
   font-family: var(--body-font);
 
@@ -30,6 +32,10 @@ div.ui-dialog {
   .ui-dialog-titlebar {
     border-radius: 0;
     border: none;
+  }
+
+  .ui-dialog-content {
+    @extend %thin-scrollbar;
   }
 }
 
