@@ -101,37 +101,6 @@ class RelatedTagQuery
     wiki_page.try(:tags) || []
   end
 
-  def other_wiki_pages
-    tag = post_query.tag
-    return [] if tag.nil?
-
-    if tag.copyright?
-      copyright_other_wiki_pages
-    elsif tag.general?
-      general_other_wiki_pages
-    else
-      []
-    end
-  end
-
-  def copyright_other_wiki_pages
-    list_of_wikis = DText.parse_wiki_titles(wiki_page&.body&.to_s).grep(/\Alist_of_/i)
-    map_tags_to_wikis(list_of_wikis)
-  end
-
-  def general_other_wiki_pages
-    match = query.match(/(.+?)_\(cosplay\)/)
-    return [] unless match
-    map_tags_to_wikis([match[1]])
-  end
-
-  def map_tags_to_wikis(other_tags)
-    other_wikis = other_tags.map { |name| WikiPage.titled(name).first }
-    other_wikis = other_wikis.reject { |wiki| wiki.nil? }
-    other_wikis = other_wikis.select { |wiki| wiki.tags.present? }
-    other_wikis
-  end
-
   def serializable_hash(options = {})
     {
       query: query,
@@ -139,7 +108,6 @@ class RelatedTagQuery
       tags: tags_with_categories(tags.map(&:name)),
       tags_overlap: tags_overlap,
       wiki_page_tags: tags_with_categories(wiki_page_tags),
-      other_wikis: other_wiki_pages.map { |wiki| [wiki.title, tags_with_categories(wiki.tags)] }.to_h
     }
   end
 
