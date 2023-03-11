@@ -11,7 +11,7 @@
 
       <% related_tags.related_categories.reverse.each do |category| %>
         <% t.panel(TagCategory.reverse_mapping[category].upcase_first.pluralize, classes: "button-outline-primary button-xs") do %>
-          <%= render "related_tags/tag_column", tags: related_tags.frequent_tags(category).map(&:name), title: nil %>
+          <%= render "related_tags/tag_column", tags: related_tags.frequent_tags(categories: [category]).map(&:name), title: nil %>
         <% end %>
       <% end %>
     <% end) %>
