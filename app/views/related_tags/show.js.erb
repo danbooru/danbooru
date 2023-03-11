@@ -4,7 +4,6 @@
   $(".frequent-related-tags-column").replaceWith("<%= j render "related_tags/frequent_tags", related_tags: @query %>");
 <% else %>
   $(".general-related-tags-column").replaceWith("<%= j render "related_tags/related_tags", related_tags: @query %>");
-  $(".wiki-related-tags-column").replaceWith("<%= j render "related_tags/wiki_tags", related_tags: @query %>");
 <% end %>
 
 Danbooru.RelatedTag.update_selected();
