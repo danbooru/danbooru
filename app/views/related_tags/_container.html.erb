@@ -1,17 +1,9 @@
-<div id="related-tags-container" class="visible" data-media-asset-id="<%= media_asset.id %>">
-  <div class="whitespace-nowrap overflow-auto thin-x-scrollbar mb-1">
-    <a href="#" id="show-related-tags-link" class="inline-block align-top w-4"><%= chevron_right_icon %></a>
-    <a href="#" id="hide-related-tags-link" class="inline-block align-top w-4"><%= chevron_down_icon %></a>
-
-    <h6 class="inline-block">Related Tags</h6>
-    <%= link_to "", "javascript:void(0)", class: "related-tags-current-tag related-tags-button button-outline-primary button-xs", style: "display: none;" %>
-  </div>
-
-  <div class="related-tags overflow-auto w-full p-4 flex flex-wrap gap-4 thin-scrollbar">
+<div id="related-tags-container" data-media-asset-id="<%= media_asset.id %>">
+  <div class="related-tags fixed-width-container flex flex-col gap-2">
+    <%= render "related_tags/related_tags", related_tags: nil, collapsed: true %>
     <%= render "related_tags/translated_tags", source: nil %>
     <%= render "related_tags/ai_tags", related_tags: nil %>
-    <%= render "related_tags/recent_tags", related_tags: nil %>
     <%= render "related_tags/frequent_tags", related_tags: nil %>
-    <%= render "related_tags/related_tags", related_tags: nil %>
+    <%= render "related_tags/recent_tags", related_tags: nil %>
   </div>
 </div>

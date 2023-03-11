@@ -1,5 +1,10 @@
 import SourceDataComponent from "./source_data_component.js";
 import Utility from './utility';
+import Alpine from 'alpinejs';
+
+Alpine.store("relatedTags", {
+  loading: false,
+});
 
 let RelatedTag = {};
 
@@ -7,14 +12,10 @@ RelatedTag.initialize_all = function() {
   $(document).on("click.danbooru", ".related-tags-button", RelatedTag.on_click_related_tags_button);
   $(document).on("change.danbooru", ".related-tags input", RelatedTag.toggle_tag);
   $(document).on("click.danbooru", ".related-tags a.search-tag", RelatedTag.toggle_tag);
-  $(document).on("click.danbooru", "#show-related-tags-link", RelatedTag.show);
-  $(document).on("click.danbooru", "#hide-related-tags-link", RelatedTag.hide);
-  $(document).on("keyup.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_selected);
+  $(document).on("input.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_selected);
   $(document).on("click.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_current_tag);
-  $(document).on("change.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_current_tag);
 
-  $(document).on("danbooru:open-post-edit-dialog", RelatedTag.hide);
-  $(document).on("danbooru:close-post-edit-dialog", RelatedTag.show);
+  $(document).on("danbooru:open-post-edit-dialog", RelatedTag.show);
 
   // Initialize the recent/favorite/translated/artist tag columns once, the first time the related tags are shown.
   $(document).one("danbooru:show-related-tags", RelatedTag.initialize_recent_and_favorite_tags);
@@ -32,9 +33,11 @@ RelatedTag.initialize_recent_and_favorite_tags = function(event) {
   $.get("/related_tag.js", { user_tags: true, media_asset_id: media_asset_id });
 }
 
-RelatedTag.on_click_related_tags_button = function (event) {
-  $.get("/related_tag.js", { query: RelatedTag.current_tag(), category: $(event.target).data("category") });
+RelatedTag.on_click_related_tags_button = async function (event) {
+  Alpine.store("relatedTags").loading = true;
+  await $.get("/related_tag.js", { query: RelatedTag.current_tag() });
   RelatedTag.show();
+  Alpine.store("relatedTags").loading = false;
 }
 
 RelatedTag.current_tag = function() {
@@ -89,6 +92,7 @@ RelatedTag.update_current_tag = function() {
   let current_tag = RelatedTag.current_tag().trim().replace(/_/g, " ");
 
   if (current_tag) {
+    $(".general-related-tags-column").removeClass("hidden");
     $(".related-tags-current-tag").show().text(current_tag);
   }
 }
@@ -140,19 +144,7 @@ RelatedTag.toggle_tag = function(e) {
 
 RelatedTag.show = function(e) {
   $(document).trigger("danbooru:show-related-tags");
-  $("#related-tags-container").removeClass("collapsed").addClass("visible");
-
-  if (e) {
-    e.preventDefault();
-  }
-}
-
-RelatedTag.hide = function(e) {
-  $("#related-tags-container").removeClass("visible").addClass("collapsed");
-
-  if (e) {
-    e.preventDefault();
-  }
+  e?.preventDefault();
 }
 
 $(function() {
