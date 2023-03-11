@@ -1,3 +1,0 @@
-<% related_tags&.other_wiki_pages.to_a.each do |wiki| %>
-  <%= render "related_tags/tag_column", tags: wiki.tags, class: "other-wiki-related-tags-column", title: link_to_wiki("wiki:#{wiki.pretty_title}", wiki.title, target: "_blank") %>
-<% end %>
