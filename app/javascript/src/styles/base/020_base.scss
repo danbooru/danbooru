@@ -2,7 +2,7 @@
  * Make sure elements with the HTML5 [hidden] attribute (e.g. <span hidden>blah</span>)
  * really are hidden. Otherwise the `display` property can override the [hidden] attribute.
  */
-[hidden] {
+[hidden], [x-cloak] {
   display: none !important;
 }
 

@@ -1,18 +1,4 @@
-div#related-tags-container {
-  &.visible a#show-related-tags-link,
-  &.collapsed a#hide-related-tags-link,
-  &.collapsed div.related-tags {
-    display: none;
-  }
-}
-
 div.related-tags {
-  background: var(--related-tags-container-background);
-
-  .tag-column {
-    max-width: 14rem;
-  }
-
   li.selected a {
     // https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke
     // https://caniuse.com/text-stroke

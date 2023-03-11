@@ -465,6 +465,10 @@ module IconHelper
     svg_icon_tag("rotate", viewBox: "0 0 512 512", **options)
   end
 
+  def rotate_right_icon(**options)
+    svg_icon_tag("rotate-right", viewBox: "0 0 512 512", **options)
+  end
+
   def discord_icon(**options)
     image_icon_tag("discord-logo.png", **options)
   end

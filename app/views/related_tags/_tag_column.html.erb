@@ -1,11 +1,18 @@
 <%# tags, title, class %>
 
-<%= tag.div class: ["tag-column", local_assigns[:class], ("hidden" if tags.blank?)] do %>
+<%= tag.div "x-data": { collapsed: false }.to_json, class: ["tag-column", local_assigns[:class], ("hidden" if tags.blank?)] do %>
   <% if tags.present? %>
     <% if title.present? %>
-      <h3 class="ml-4"><%= title %></h3>
+      <div class="flex justify-between ml-4">
+        <h6><%= title %></h6>
+
+        <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-on:click="collapsed = false" x-show="collapsed"><%= chevron_down_icon(class: "rotate-180") %></a>
+        <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-on:click="collapsed = true" x-show="!collapsed"><%= chevron_down_icon %></a>
+      </div>
     <% end %>
 
-    <%= render_related_tag_list(tags) %>
+    <div class="mt-1" x-cloak x-show="!collapsed">
+      <%= render_related_tag_list(tags) %>
+    </div>
   <% end %>
 <% end %>
