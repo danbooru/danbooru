@@ -315,7 +315,7 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   @extend %shadow-md;
 }
 
-.thin-scrollbar {
+.thin-scrollbar, %thin-scrollbar {
   overflow: auto;
   padding-right: 2 * $spacer;
   overscroll-behavior-x: contain; // https://caniuse.com/css-overscroll-behavior
