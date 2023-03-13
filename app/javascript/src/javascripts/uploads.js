@@ -38,7 +38,7 @@ Upload.initialize_draggable_divider = function() {
   });
 
   $(".upload-divider").on("drag:move", (event, moveEvent, drag) => {
-    let reverseDrag = $(".upload-container").data("dock") === "left";
+    let reverseDrag = $(".upload-container").attr("data-dock") === "left";
     let dragOffset = drag.x * (reverseDrag ? -1 : 1);
     let minWidth = parseInt($(".upload-container").css("--min-edit-container-width"));
     let maxWidth = $(".upload-container").width() - minWidth;
