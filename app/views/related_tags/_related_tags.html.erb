@@ -1,15 +1,15 @@
 <%= tag.div class: "card p-2 general-related-tags-column hidden", "x-data": { collapsed: collapsed }.to_json do %>
-  <div class="flex justify-between">
-    <h6 class="inline-flex gap-1 items-center">
+  <div class="related-tags-header flex justify-between cursor-pointer select-none" x-on:click="collapsed = !collapsed; !collapsed && Danbooru.RelatedTag.update_related_tags($event)">
+    <h6 class="inline-flex gap-1 items-center ">
       <%= spinner_icon(class: "text-muted align-middle invisible", "x-cloak": true, "x-bind:class": '{ invisible: !$store.relatedTags.loading }') %>
 
       Related:
-      <%= link_to "", "javascript:void(0)", class: "related-tags-button related-tags-current-tag" %>
+      <%= link_to "", "javascript:void(0)", class: "related-tags-current-tag", "x-on:click.stop": "Danbooru.RelatedTag.update_related_tags($event)" %>
     </h6>
 
     <span>
-      <a href="javascript:void(0)" class="related-tags-button inline-block align-top w-4" x-cloak x-on:click="collapsed = false" x-show="collapsed"><%= chevron_down_icon(class: "rotate-180") %></a>
-      <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-on:click="collapsed = true" x-show="!collapsed"><%= chevron_down_icon %></a>
+      <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-show="collapsed"><%= chevron_down_icon(class: "rotate-180") %></a>
+      <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-show="!collapsed"><%= chevron_down_icon %></a>
     </span>
   </div>
 
