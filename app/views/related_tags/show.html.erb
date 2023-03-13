@@ -12,7 +12,7 @@
     <% end %>
 
     <% if params.dig(:search, :query).present? %>
-      <%= table_for @query.tags do |t| %>
+      <%= table_for @query.related_tags(categories: @query.categories) do |t| %>
         <% t.column "Name" do |tag| %>
           <%= link_to_wiki "?", tag.name, class: tag_class(tag) %>
           <%= link_to tag.name, posts_path(tags: tag.name), class: tag_class(tag) %>

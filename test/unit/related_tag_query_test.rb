@@ -6,24 +6,6 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     CurrentUser.user = user
   end
 
-  context "#other_wiki_pages" do
-    subject { RelatedTagQuery.new(query: "copyright") }
-
-    setup do
-      create(:tag, name: "alpha", post_count: 1)
-      create(:tag, name: "beta", post_count: 1)
-      @copyright = FactoryBot.create(:copyright_tag, name: "copyright")
-      @wiki = FactoryBot.create(:wiki_page, title: "copyright", body: "[[list_of_hoges]]")
-      @list_of_hoges = FactoryBot.create(:wiki_page, title: "list_of_hoges", body: "[[alpha]] and [[beta]]")
-    end
-
-    should "return tags from the associated list wiki" do
-      result = subject.other_wiki_pages
-      assert_not_nil(result[0])
-      assert_equal(%w(alpha beta), result[0].tags)
-    end
-  end
-
   context "a related tag query without a category constraint" do
     setup do
       @post_1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
@@ -36,7 +18,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "work" do
-        assert_equal(["aaa", "bbb", "ccc"], @query.tags.map(&:name))
+        assert_equal(["aaa", "bbb", "ccc"], @query.related_tags.map(&:name))
       end
     end
 
@@ -46,7 +28,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "work" do
-        assert_equal(true, @query.tags.empty?)
+        assert_equal(true, @query.related_tags(categories: @query.categories).empty?)
       end
     end
 
@@ -63,7 +45,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "take related tags from the consequent tag" do
-        assert_equal(%w[aaa bbb ccc], @query.tags.map(&:name))
+        assert_equal(%w[aaa bbb ccc], @query.related_tags.map(&:name))
       end
     end
 
@@ -73,7 +55,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "work" do
-        assert_equal(["aaa"], @query.tags.map(&:name))
+        assert_equal(["aaa"], @query.related_tags.map(&:name))
       end
     end
 
@@ -109,11 +91,11 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       @post_1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
       @post_2 = FactoryBot.create(:post, :tag_string => "aaa art:ccc")
       @post_3 = FactoryBot.create(:post, :tag_string => "aaa copy:ddd")
-      @query = RelatedTagQuery.new(query: "aaa", category: "artist")
+      @query = RelatedTagQuery.new(query: "aaa", categories: ["artist"])
     end
 
     should "find the related tags" do
-      assert_equal(["ccc"], @query.tags.map(&:name))
+      assert_equal(["ccc"], @query.related_tags(categories: @query.categories).map(&:name))
     end
   end
 end
