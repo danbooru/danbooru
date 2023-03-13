@@ -131,6 +131,8 @@ html, body[data-current-user-theme="light"] {
   --subnav-menu-background-color: var(--blue-0);
   --responsive-menu-background-color: var(--blue-1);
 
+  --card-background-color: var(--body-background-color);
+
   --form-input-text-color: var(--text-color);
   --form-input-background: var(--body-background-color);
   --form-input-border-color: var(--grey-2);
@@ -183,7 +185,6 @@ html, body[data-current-user-theme="light"] {
 
   --modqueue-tag-warning-color: var(--red-1);
 
-  --file-upload-component-background-color: var(--body-background-color);
   --uploads-dropzone-background: var(--grey-1);
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
   --uploads-dropzone-progress-bar-background-color: var(--link-hover-color);
@@ -369,6 +370,8 @@ html, body[data-current-user-theme="light"] {
   --subnav-menu-background-color: var(--grey-8);
   --responsive-menu-background-color: var(--grey-8);
 
+  --card-background-color: var(--grey-8);
+
   --form-input-text-color: var(--grey-2);
   --form-input-background: var(--grey-7);
   --form-input-border-color: var(--grey-5);
@@ -418,7 +421,6 @@ html, body[data-current-user-theme="light"] {
 
   --modqueue-tag-warning-color: var(--red-7);
 
-  --file-upload-component-background-color: var(--grey-8);
   --uploads-dropzone-background: var(--grey-7);
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
   --uploads-dropzone-progress-bar-background-color: var(--link-hover-color);
