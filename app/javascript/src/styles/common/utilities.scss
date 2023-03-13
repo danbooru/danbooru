@@ -316,6 +316,8 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   @extend %border;
   @extend %rounded-lg;
   @extend %shadow-md;
+
+  background-color: var(--card-background-color);
 }
 
 .thin-scrollbar, %thin-scrollbar {
