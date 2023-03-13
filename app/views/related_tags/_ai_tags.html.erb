@@ -1,11 +1,11 @@
 <% ai_tags = related_tags&.ai_tags.to_a %>
 
 <div class="card p-2 tag-column ai-tags-related-tags-column" x-data="{ collapsed: false }">
-  <div class="flex justify-between ml-4">
+  <div class="flex justify-between pl-4 cursor-pointer select-none" x-on:click.prevent="collapsed = !collapsed">
     <h6>Suggested</h6>
 
-    <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-on:click="collapsed = false" x-show="collapsed"><%= chevron_down_icon(class: "rotate-180") %></a>
-    <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-on:click="collapsed = true" x-show="!collapsed"><%= chevron_down_icon %></a>
+    <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-show="collapsed"><%= chevron_down_icon(class: "rotate-180") %></a>
+    <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-show="!collapsed"><%= chevron_down_icon %></a>
   </div>
 
   <ul class="tag-list simple-tag-list" x-cloak x-show="!collapsed">
