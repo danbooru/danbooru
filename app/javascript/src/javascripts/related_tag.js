@@ -34,10 +34,13 @@ RelatedTag.initialize_recent_and_favorite_tags = function(event) {
 }
 
 RelatedTag.on_click_related_tags_button = async function (event) {
-  Alpine.store("relatedTags").loading = true;
-  await $.get("/related_tag.js", { query: RelatedTag.current_tag() });
-  RelatedTag.show();
-  Alpine.store("relatedTags").loading = false;
+  if (event.button === 0 && !event.ctrlKey && !event.shiftKey && !event.metaKey && !event.altKey) {
+    event.preventDefault();
+    Alpine.store("relatedTags").loading = true;
+    await $.get("/related_tag.js", { query: RelatedTag.current_tag() });
+    RelatedTag.show();
+    Alpine.store("relatedTags").loading = false;
+  }
 }
 
 RelatedTag.current_tag = function() {
@@ -89,11 +92,12 @@ RelatedTag.current_tag = function() {
 }
 
 RelatedTag.update_current_tag = function() {
-  let current_tag = RelatedTag.current_tag().trim().replace(/_/g, " ");
+  let current_tag = RelatedTag.current_tag().trim();
 
   if (current_tag) {
     $(".general-related-tags-column").removeClass("hidden");
-    $(".related-tags-current-tag").show().text(current_tag);
+    $(".related-tags-current-tag").show().text(current_tag.replace(/_/g, " "));
+    $(".related-tags-current-tag").attr("href", `/posts?tags=${encodeURIComponent(current_tag)}`);
   }
 }
 
