@@ -1,4 +1,8 @@
 #related-tags-container {
+  .related-tags-body {
+    height: 30rem;
+  }
+
   li.selected a {
     // https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke
     // https://caniuse.com/text-stroke
