@@ -1,14 +1,14 @@
 require 'test_helper'
 
 class RelatedTagCalculatorTest < ActiveSupport::TestCase
-  def frequent_tags_for_search(tag_search, user = CurrentUser.user, **options)
+  def frequent_tags_for_search(tag_search, user = CurrentUser.user, category: nil)
     post_query = PostQuery.normalize(tag_search, current_user: user)
-    RelatedTagCalculator.new(post_query).frequent_tags_for_search(**options).pluck(:name)
+    RelatedTagCalculator.new(post_query, category: category).frequent_tags_for_search.pluck(:name)
   end
 
-  def similar_tags_for_search(tag_search, user = CurrentUser.user, **options)
+  def similar_tags_for_search(tag_search, user = CurrentUser.user, category: nil)
     post_query = PostQuery.normalize(tag_search, current_user: user)
-    RelatedTagCalculator.new(post_query).similar_tags_for_search(**options).pluck(:name)
+    RelatedTagCalculator.new(post_query, category: category).similar_tags_for_search.pluck(:name)
   end
 
   setup do
