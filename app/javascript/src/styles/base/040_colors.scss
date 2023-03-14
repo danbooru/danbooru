@@ -144,10 +144,14 @@ html, body[data-current-user-theme="light"] {
   --form-button-hover-box-shadow-color: var(--grey-5);
   --form-button-active-background: var(--grey-2);
 
-  --button-primary-text-color: var(--white);
+  --button-text-color: var(--white);
+  --button-disabled-color: var(--grey-5);
+
   --button-primary-background-color: var(--link-color);
   --button-primary-hover-background-color: var(--link-hover-color);
-  --button-primary-disabled-color: var(--grey-5);
+
+  --button-danger-background-color: var(--red-5);
+  --button-danger-hover-background-color: var(--red-4);
 
   --button-outline-primary-color: var(--link-color);
   --button-outline-danger-color: var(--red-5);
@@ -377,10 +381,14 @@ html, body[data-current-user-theme="light"] {
   --form-button-hover-box-shadow-color: var(--grey-5);
   --form-button-active-background: var(--grey-3);
 
-  --button-primary-text-color: var(--white);
+  --button-text-color: var(--white);
+  --button-disabled-color: var(--grey-4);
+
   --button-primary-background-color: var(--link-color);
   --button-primary-hover-background-color: var(--link-hover-color);
-  --button-primary-disabled-color: var(--grey-4);
+
+  --button-danger-background-color: var(--red-4);
+  --button-danger-hover-background-color: var(--red-3);
 
   --button-outline-primary-color: var(--azure-4);
   --button-outline-danger-color: var(--red-4);

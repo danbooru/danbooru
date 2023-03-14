@@ -1,6 +1,6 @@
 div#c-uploads {
   div#a-show {
-    input {
+    input, textarea {
       max-width: 100%;
     }
 
@@ -17,6 +17,7 @@ div#c-uploads {
     @media (max-width: 660px) {
       .upload-container {
         grid-template-columns: 1fr;
+        grid-template-rows: min-content;
         gap: 0.25rem;
       }
 

@@ -7,6 +7,7 @@
 class IqdbClient
   LOW_SIMILARITY_THRESHOLD = 0.0
   HIGH_SIMILARITY_THRESHOLD = 65.0
+  DUPLICATE_THRESHOLD = 92.0
 
   class Error < StandardError; end
   attr_reader :iqdb_url, :http

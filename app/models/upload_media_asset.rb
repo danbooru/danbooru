@@ -89,7 +89,7 @@ class UploadMediaAsset < ApplicationRecord
 
   # The source of the post after upload. This is either the image URL, if the image URL is convertible to a page URL
   # (e.g. Pixiv), or the page URL if it's not (e.g. Twitter).
-  def canonical_url
+  memoize def canonical_url
     if file_upload?
       source_url
 
@@ -109,6 +109,10 @@ class UploadMediaAsset < ApplicationRecord
     else
       source_url
     end
+  end
+
+  memoize def parsed_canonical_url
+    Source::URL.parse(canonical_url) unless file_upload?
   end
 
   def source_extractor
