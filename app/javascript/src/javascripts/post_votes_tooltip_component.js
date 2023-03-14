@@ -1,5 +1,5 @@
 import Utility from "./utility";
-import { delegate, hideAll } from 'tippy.js';
+import { delegate } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 
 class PostVotesTooltipComponent {

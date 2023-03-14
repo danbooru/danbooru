@@ -1,29 +1,19 @@
 div#c-uploads {
   div#a-show {
-    div#upload-guide-notice {
-      margin-bottom: 2em;
+    input {
+      max-width: 100%;
     }
 
-    div#related-posts-by-source, div#iqdb-similar {
-      display: inline-block;
+    .upload-container {
+      --max-edit-column-width: 480px;
+      grid-template-columns: 1fr min(50%, var(--max-edit-column-width));
     }
 
-    div.upload_rating .radio label {
-      font-weight: normal;
-      display: inline;
-      margin-right: 2em;
-
-      input {
-        margin-right: 0.5em;
+    @media (max-width: 660px) {
+      div.post_rating .radio label {
+        margin-right: 0.5rem;
+        font-size: var(--text-sm);
       }
-    }
-
-    div.field_with_errors {
-      display: inline;
-    }
-
-    #related-tags-container {
-      margin-top: 1em;
     }
   }
 }

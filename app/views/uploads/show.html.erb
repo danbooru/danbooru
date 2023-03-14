@@ -1,7 +1,5 @@
 <div id="c-uploads">
   <div id="a-show">
-    <h1 class="mb-4">Upload</h1>
-
     <% if @upload.is_errored? %>
       <p>Error: <%= @upload.error %>.</p>
     <% elsif @upload.media_asset_count == 0 %>

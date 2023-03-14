@@ -4,6 +4,7 @@ class TabPanelComponent < ApplicationComponent
   attr_reader :tabs, :classes
 
   renders_many :panels
+  renders_many :menu_items
 
   def initialize(classes: "horizontal-tab-panel")
     @tabs = []

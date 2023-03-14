@@ -9,21 +9,6 @@ Upload.IQDB_HIGH_SIMILARITY = 70;
 Upload.initialize_all = function() {
   if ($("#c-uploads #a-show #p-single-asset-upload").length) {
     this.initialize_similar();
-
-    $("#toggle-ai-metadata").on("click.danbooru", function(e) {
-      Upload.toggle_ai_metadata();
-      e.preventDefault();
-    });
-
-    $("#toggle-artist-commentary").on("click.danbooru", function(e) {
-      Upload.toggle_commentary();
-      e.preventDefault();
-    });
-
-    $("#toggle-commentary-translation").on("click.danbooru", function(e) {
-      Upload.toggle_translation();
-      e.preventDefault();
-    });
   }
 
   Upload.loadAssets();
@@ -50,37 +35,6 @@ Upload.initialize_similar = function() {
     }
   });
 }
-
-Upload.toggle_ai_metadata = function() {
-  if ($(".ai-metadata").is(":visible")) {
-    $("#toggle-ai-metadata").text("show »");
-  } else {
-    $("#toggle-ai-metadata").text("« hide");
-  }
-
-  $(".ai-metadata").slideToggle();
-}
-
-Upload.toggle_commentary = function() {
-  if ($(".artist-commentary").is(":visible")) {
-    $("#toggle-artist-commentary").text("show »");
-  } else {
-    $("#toggle-artist-commentary").text("« hide");
-  }
-
-  $(".artist-commentary").slideToggle();
-  $(".upload_commentary_translation_container").slideToggle();
-};
-
-Upload.toggle_translation = function() {
-  if ($(".commentary-translation").is(":visible")) {
-    $("#toggle-commentary-translation").text("show »");
-  } else {
-    $("#toggle-commentary-translation").text("« hide");
-  }
-
-  $(".commentary-translation").slideToggle();
-};
 
 $(function() {
   Upload.initialize_all();

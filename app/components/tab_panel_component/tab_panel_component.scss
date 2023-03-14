@@ -9,7 +9,7 @@
       gap: 1rem;
       margin-bottom: 1rem;
 
-      .tab {
+      .tab, .tab-menu-item {
         display: inline-block;
         padding: 0.25rem;
         padding-bottom: 0.5rem;
@@ -21,7 +21,7 @@
         margin-bottom: -1px;
       }
 
-      :not(.active-tab) {
+      .tab:not(.active-tab) {
         @include inactive-link;
       }
     }

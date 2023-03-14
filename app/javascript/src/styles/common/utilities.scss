@@ -263,6 +263,16 @@ $spacer: 0.25rem; /* 4px */
 .grid-cols-8  { grid-template-columns: repeat(8, minmax(0, 1fr)); }
 .grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
 
+.col-span-1	 { grid-column: span 1 / span 1; }
+.col-span-2	 { grid-column: span 2 / span 2; }
+.col-span-3	 { grid-column: span 3 / span 3; }
+.col-span-4	 { grid-column: span 4 / span 4; }
+.col-span-6	 { grid-column: span 6 / span 6; }
+.col-span-8	 { grid-column: span 8 / span 8; }
+.col-span-9	 { grid-column: span 9 / span 9; }
+.col-span-10 { grid-column: span 10 / span 10; }
+.col-span-12 { grid-column: span 12 / span 12; }
+
 .z-0 { z-index: 0; }
 .z-10 { z-index: 10; }
 .z-20 { z-index: 20; }

@@ -8,5 +8,4 @@ $(document).trigger("danbooru:update-source-data", {
 if ($("#c-uploads #a-show").length) {
   $("#post_artist_commentary_title").val(<%= raw @source.dtext_artist_commentary_title.to_json %>);
   $("#post_artist_commentary_desc").val(<%= raw @source.dtext_artist_commentary_desc.to_json %>);
-  Danbooru.Upload.toggle_commentary();
 }

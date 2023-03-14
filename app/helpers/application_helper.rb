@@ -240,10 +240,10 @@ module ApplicationHelper
     link_to(text, url, class: user_class, data: data)
   end
 
-  def embed_wiki(title, **options)
+  def embed_wiki(title, classes: nil, **options)
     wiki = WikiPage.find_by(title: title)
     text = format_text(wiki&.body)
-    tag.div(text, class: "prose", **options)
+    tag.div(text, class: "prose #{classes}".strip, **options)
   end
 
   def dtext_preview_button(preview_field)
