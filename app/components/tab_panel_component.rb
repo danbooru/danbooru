@@ -5,13 +5,14 @@ class TabPanelComponent < ApplicationComponent
   MenuItem = Data.define(:id, :classes, :content, :active)
   Spacer = Data.define(:active)
 
-  attr_reader :tabs, :classes, :tab_list_classes, :index, :html
+  attr_reader :tabs, :classes, :id, :tab_list_classes, :index, :html
 
   renders_many :panels
 
-  def initialize(classes: "horizontal-tab-panel", tab_list_classes: nil, html: {})
+  def initialize(classes: "horizontal-tab-panel", id: nil, tab_list_classes: nil, html: {})
     @tabs = []
     @classes = classes
+    @id = id
     @tab_list_classes = tab_list_classes
     @index = 0
     @html = html

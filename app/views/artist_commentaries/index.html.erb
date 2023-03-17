@@ -19,8 +19,8 @@
         <%= post_preview(commentary.post, show_deleted: true) %>
       <% end %>
       <% t.column "Original" do |commentary| %>
-          <%= format_commentary_title(commentary.original_title) %>
-          <%= format_commentary_description(commentary.original_description) %>
+        <%= format_commentary_title(commentary.original_title) %>
+        <%= format_commentary_description(commentary.original_description) %>
       <% end %>
       <% t.column "Translated" do |commentary| %>
         <%= format_commentary_title(commentary.translated_title) %>

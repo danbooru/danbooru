@@ -5,28 +5,8 @@ let ArtistCommentary = {};
 
 ArtistCommentary.initialize_all = function() {
   if ($("#c-posts").length && $("#a-show").length) {
-    if ($("#original-artist-commentary").length && $("#translated-artist-commentary").length) {
-      this.initialize_commentary_display_tabs();
-    }
-
     this.initialize_edit_commentary_dialog();
   }
-}
-
-ArtistCommentary.initialize_commentary_display_tabs = function() {
-  $("#commentary-sections li a").on("click.danbooru", function(e) {
-    if (e.target.hash === "#original") {
-      $("#original-artist-commentary").show();
-      $("#translated-artist-commentary").hide();
-    } else if (e.target.hash === "#translated") {
-      $("#original-artist-commentary").hide();
-      $("#translated-artist-commentary").show();
-    }
-
-    $("#commentary-sections li").removeClass("active");
-    $(e.target).parent("li").addClass("active");
-    e.preventDefault();
-  });
 }
 
 ArtistCommentary.initialize_edit_commentary_dialog = function() {

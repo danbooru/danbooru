@@ -339,32 +339,40 @@
   </section>
 
   <% if @post.artist_commentary&.any_field_present? || @post.ai_metadata&.any_field_present? %>
-    <div id="artist-commentary">
-      <menu id="info-section-tabs">
-        <% if @post.artist_commentary&.any_field_present? && @post.ai_metadata&.any_field_present? %>
-          <li class="active"><a href="#commentary">Artist's commentary</a></li> |
-          <li><a href="#ai-metadata">AI Metadata</a></li>
-        <% elsif @post.artist_commentary&.any_field_present? %>
-          <li><b>Artist's commentary</b></li>
-        <% elsif @post.ai_metadata&.any_field_present? %>
-          <li><b>AI Metadata</b></li>
+    <%= render(TabPanelComponent.new(id: "artist-commentary") do |t| %>
+      <% if @post.artist_commentary&.original_present? %>
+        <% t.panel("Original Commentary", active: true) do %>
+          <section id="original-artist-commentary">
+            <%= format_commentary_title(@post.artist_commentary.original_title) %>
+            <%= format_commentary_description(@post.artist_commentary.original_description) %>
+          </section>
         <% end %>
-      </menu>
+      <% end %>
 
-      <% if @post.artist_commentary&.any_field_present? %>
-        <section id="artist-commentary-section">
-          <%= render "artist_commentaries/show", artist_commentary: @post.artist_commentary %>
-        </section>
+      <% if @post.artist_commentary&.translated_present? %>
+        <% t.panel("Translated Commentary", active: !@post.artist_commentary&.original_present?) do %>
+          <section id="translated-artist-commentary">
+            <% if @post.artist_commentary.translated_title.present? %>
+              <%= format_commentary_title(@post.artist_commentary.translated_title) %>
+            <% else %>
+              <%= format_commentary_title(@post.artist_commentary.original_title, classes: "inactive") %>
+            <% end %>
+
+            <% if @post.artist_commentary.translated_description.present? %>
+              <%= format_commentary_description(@post.artist_commentary.translated_description) %>
+            <% else %>
+              <%= format_commentary_description(@post.artist_commentary.original_description, classes: "inactive") %>
+            <% end %>
+          </section>
+        <% end %>
       <% end %>
 
       <% if @post.ai_metadata&.any_field_present? %>
-        <%= tag.section id: "ai-metadata-section", style: ("display:none" if @post.artist_commentary&.any_field_present?) do %>
-          <div id="ai-metadata-table">
-            <%= render "ai_metadata/show", ai_metadata: @post.ai_metadata %>
-          </div>
+        <% t.panel("AI Metadata", active: !@post.artist_commentary&.any_field_present?) do %>
+          <%= render "ai_metadata/show", ai_metadata: @post.ai_metadata %>
         <% end %>
       <% end %>
-    </div>
+    <% end) %>
   <% end %>
 
   <% if CurrentUser.user.new_post_navigation_layout %>
