@@ -26,6 +26,12 @@ $spacer: 0.25rem; /* 4px */
 .flex { display: flex; }
 .grid { display: grid; }
 
+.sr-only, %sr-only {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+
 .text-left   { text-align: left; }
 .text-center { text-align: center; }
 .text-right  { text-align: right; }
