@@ -112,7 +112,7 @@ form.simple_form {
         white-space: nowrap;
 
         input {
-          display: none;
+          @extend %sr-only; // Visually hide <input> without using `display: none`, since that would prevent focusing it.
         }
 
         .radio label {
@@ -130,6 +130,10 @@ form.simple_form {
             background-color: var(--link-hover-color);
             border-color: var(--link-hover-color);
           }
+        }
+
+        input:focus ~ label {
+          box-shadow: inset 0 0 0 2px var(--link-color);
         }
 
         input:checked ~ label {
