@@ -55,12 +55,6 @@ module ComponentsHelper
     render SourceDataComponent.new(source: source, **options)
   end
 
-  # A simple vertical tag list with no post counts. Used in related tags.
-  def render_related_tag_list(tag_names, **options)
-    tags = RelatedTagListComponent.tags_from_names(tag_names)
-    render RelatedTagListComponent.new(tags: tags, **options)
-  end
-
   # A horizontal tag list, with tags grouped by category. Used in post
   # tooltips, on the comments index, and in the modqueue.
   def render_inline_tag_list(post, **options)

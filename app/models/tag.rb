@@ -326,6 +326,18 @@ class Tag < ApplicationRecord
       where_like("array_initials(words)", abbrev)
     end
 
+    def named_or_aliased(names)
+      names = names.map { |name| Tag.normalize_name(name) }
+      names = TagAlias.to_aliased(names)
+      where(name: names)
+    end
+
+    def named_or_aliased_in_order(names)
+      names = names.map { |name| Tag.normalize_name(name) }
+      names = TagAlias.to_aliased(names)
+      where(name: names).to_a.in_order_of(:name, names)
+    end
+
     def find_by_name_or_alias(name)
       find_by_name(TagAlias.to_aliased(normalize_name(name)))
     end
@@ -435,6 +447,10 @@ class Tag < ApplicationRecord
 
       antecedent_matches && !name_matches
     end
+  end
+
+  def to_aliased_tag
+    is_aliased? ? aliased_tag : self
   end
 
   def is_aliased?
