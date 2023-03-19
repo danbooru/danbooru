@@ -1,18 +1,33 @@
 <%# tags, title, class %>
 
-<%= tag.div "x-data": { collapsed: false }.to_json, class: ["tag-column", local_assigns[:class], ("hidden" if tags.blank?)] do %>
+<%= tag.div "x-data": { collapsed: false }.to_json, class: ["tag-column", ("card p-2 h-fit space-y-1" if title.present?), local_assigns[:class], ("hidden" if tags.blank?)] do %>
   <% if tags.present? %>
     <% if title.present? %>
-      <div class="flex justify-between pl-4 cursor-pointer select-none" x-on:click.prevent="collapsed = !collapsed">
+      <div class="flex items-center justify-between gap-2 pl-4 pr-2 cursor-pointer select-none" x-on:click.prevent="collapsed = !collapsed">
         <h6><%= title %></h6>
 
-        <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-show="collapsed"><%= chevron_down_icon(class: "rotate-180") %></a>
-        <a href="javascript:void(0)" class="inline-block align-top w-4" x-cloak x-show="!collapsed"><%= chevron_down_icon %></a>
+        <%= chevron_down_icon(class: "link-color rotate-180", "x-cloak": true, "x-show": "collapsed") %>
+        <%= chevron_down_icon(class: "link-color", "x-cloak": true, "x-show": "!collapsed") %>
       </div>
     <% end %>
 
-    <div class="mt-1" x-cloak x-show="!collapsed">
-      <%= render_related_tag_list(tags) %>
-    </div>
+    <ul class="tag-list" x-cloak x-show="!collapsed">
+      <% tags.each do |t| %>
+        <li class="flex items-center gap-1 w-fit">
+          <input type="checkbox" tabindex="-1">
+
+          <% if t.is_a?(AITag) %>
+            <span>
+              <% ai_tag = t %>
+              <% t = t.to_aliased_tag %>
+              <%= link_to t.pretty_name, posts_path(tags: t.name), class: "break-words #{tag_class(t)}", "data-tag-name": t.name %>
+              <%= tag.span "#{ai_tag.score}%", class: "text-muted text-xs" %>
+            </span>
+          <% else %>
+            <%= link_to t.pretty_name, posts_path(tags: t.name), class: "break-words #{tag_class(t)}", "data-tag-name": t.name %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
   <% end %>
 <% end %>

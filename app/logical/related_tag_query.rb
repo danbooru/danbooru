@@ -94,15 +94,17 @@ class RelatedTagQuery
     tags = tags.reject { |tag| tag.match?(/\A(source:|parent:|rating:)/) }
     tags = tags.group_by(&:itself).transform_values(&:size).sort_by { |tag, count| [-count, tag] }.map(&:first)
     tags = tags.take(max_tags)
+    tags = Tag.nonempty.undeprecated.named_or_aliased_in_order(tags)
     tags
   end
 
   def favorite_tags
-    user&.favorite_tags.to_s.split
+    tag_names = user&.favorite_tags.to_s.split
+    Tag.nonempty.undeprecated.named_or_aliased_in_order(tag_names)
   end
 
   memoize def wiki_page_tags
-    wiki_page&.tags.to_a
+    wiki_page&.tags
   end
 
   def serializable_hash(options = {})

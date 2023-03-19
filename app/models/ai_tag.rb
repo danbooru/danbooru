@@ -15,7 +15,7 @@ class AITag < ApplicationRecord
   scope :empty, -> { where(tag: Tag.empty) }
   scope :nonempty, -> { where(tag: Tag.nonempty) }
 
-  delegate :name, :pretty_name, :post_count, :category, :category_name, :is_deprecated?, :empty?, :is_aliased?, :metatag?, to: :tag
+  delegate :name, :pretty_name, :post_count, :category, :category_name, :to_aliased_tag, :is_deprecated?, :empty?, :is_aliased?, :metatag?, to: :tag
 
   def self.named(name)
     name = $1.downcase if name =~ /\A(rating:.)/i

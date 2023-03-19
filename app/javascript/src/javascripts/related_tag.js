@@ -10,7 +10,7 @@ let RelatedTag = {};
 
 RelatedTag.initialize_all = function() {
   $(document).on("change.danbooru", ".related-tags input", RelatedTag.toggle_tag);
-  $(document).on("click.danbooru", ".related-tags a.search-tag", RelatedTag.toggle_tag);
+  $(document).on("click.danbooru", ".related-tags .tag-list a", RelatedTag.toggle_tag);
   $(document).on("input.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_selected);
   $(document).on("click.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_current_tag);
 

@@ -41,7 +41,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "take wiki tags from the consequent's wiki" do
-        assert_equal(%w[foo], @query.wiki_page_tags)
+        assert_equal(%w[foo], @query.wiki_page_tags.pluck(:name))
       end
 
       should "take related tags from the consequent tag" do
@@ -66,22 +66,23 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "find any tags embedded in the wiki page" do
-        assert_equal(["bbb", "ccc"], @query.wiki_page_tags)
+        assert_equal(["bbb", "ccc"], @query.wiki_page_tags.pluck(:name))
       end
 
       should "return the tags in the same order as given by the wiki" do
         create(:wiki_page, title: "wiki", body: "[[ccc]] [[bbb]] [[ccc]] [[bbb]] [[aaa]]")
 
         query = RelatedTagQuery.new(query: "wiki")
-        assert_equal(%w[ccc bbb aaa], query.wiki_page_tags)
+        assert_equal(%w[ccc bbb aaa], query.wiki_page_tags.pluck(:name))
       end
 
       should "return aliased tags" do
+        create(:tag, name: "cat", post_count: 42)
         create(:tag_alias, antecedent_name: "kitten", consequent_name: "cat", status: "active")
         create(:wiki_page, title: "wiki", body: "[[kitten]]")
 
         query = RelatedTagQuery.new(query: "wiki")
-        assert_equal(%w[cat], query.wiki_page_tags)
+        assert_equal(%w[cat], query.wiki_page_tags.pluck(:name))
       end
     end
   end

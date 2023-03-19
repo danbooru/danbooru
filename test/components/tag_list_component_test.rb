@@ -11,14 +11,6 @@ class TagListComponentTest < ViewComponent::TestCase
       @tags = Tag.all
     end
 
-    context "for a related tag list" do
-      should "render" do
-        render_inline(RelatedTagListComponent.new(tags: @tags))
-
-        assert_css(".simple-tag-list a.search-tag", count: 5)
-      end
-    end
-
     context "for an inline tag list" do
       should "render" do
         render_inline(InlineTagListComponent.new(tags: @tags))

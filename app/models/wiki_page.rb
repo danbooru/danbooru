@@ -202,9 +202,7 @@ class WikiPage < ApplicationRecord
 
   def tags
     titles = DText.parse_wiki_titles(body).uniq
-    tags = Tag.nonempty.undeprecated.where(name: titles).pluck(:name)
-    tags += TagAlias.active.where(antecedent_name: titles).pluck(:antecedent_name)
-    TagAlias.to_aliased(titles & tags)
+    Tag.nonempty.undeprecated.named_or_aliased_in_order(titles)
   end
 
   def self.rewrite_wiki_links!(old_name, new_name)
