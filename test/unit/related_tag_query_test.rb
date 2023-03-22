@@ -28,7 +28,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "work" do
-        assert_equal(true, @query.related_tags(categories: @query.categories).empty?)
+        assert_equal(true, @query.related_tags.empty?)
       end
     end
 
@@ -55,7 +55,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "work" do
-        assert_equal(["aaa"], @query.related_tags.map(&:name))
+        assert_equal(%w[aaa bbb ccc], @query.related_tags.map(&:name))
       end
     end
 
@@ -96,7 +96,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     end
 
     should "find the related tags" do
-      assert_equal(["ccc"], @query.related_tags(categories: @query.categories).map(&:name))
+      assert_equal(["ccc"], @query.related_tags.map(&:name))
     end
   end
 end

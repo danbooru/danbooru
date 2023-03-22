@@ -20,59 +20,89 @@
 class RelatedTagCalculator
   extend Memoist
 
-  attr_reader :post_query, :search_sample_size, :tag_sample_size, :category
+  attr_reader :post_query, :search_sample_size, :tag_sample_size, :categories
 
+  RelatedTag = Data.define(:tag, :overlap_count, :search_count, :sample_count) do
+    include ActiveModel::Serializers::JSON
+    include ActiveModel::Serializers::Xml
+
+    delegate :name, :pretty_name, :category, :post_count, :general?, to: :tag
+
+    # https://en.wikipedia.org/wiki/Cosine_similarity#Otsuka%E2%80%93Ochiai_coefficient
+    def cosine_similarity
+      overlap / Math.sqrt(tag.post_count * search_count.to_f)
+    end
+
+    # https://en.wikipedia.org/wiki/Jaccard_index
+    def jaccard_similarity
+      overlap / (tag.post_count + search_count - overlap)
+    end
+
+    # https://en.wikipedia.org/wiki/Overlap_coefficient
+    def overlap_coefficient
+      overlap / [tag.post_count, search_count].min
+    end
+
+    # The estimated number of posts in common between tag A and tag B; that is, the intersection between A and B.
+    def overlap
+      [frequency * search_count, tag.post_count].min
+    end
+
+    # The estimated percentage of posts in common between tag A and tag B; that is, how frequently tag A appears together with tag B.
+    def frequency
+      overlap_count.to_f / sample_count.to_f
+    end
+
+    def attributes
+      %i[tag cosine_similarity jaccard_similarity overlap_coefficient frequency].map { |name| [name, send(name)] }.to_h
+    end
+  end
+
+  # @param post_query [PostQuery] The search to calculate related tags for. Usually a single tag, but may be an arbitrary search.
   # @param search_sample_size [Integer] The number of posts to sample from the search.
-  # @param tag_sample_size [Integer] The number of tags to calculate similarity for.
-  # @param category [Integer] An optional tag category, to restrict the tags to a given category.
-  def initialize(post_query = nil, search_sample_size: 5000, tag_sample_size: 500, category: nil)
+  # @param tag_sample_size [Integer] The maximum number of tags to return.
+  # @param categories [Array<Integer>] An optional list of tag categories, to restrict the tags to a given category.
+  def initialize(post_query = nil, search_sample_size: 5000, tag_sample_size: 500, categories: nil)
     @post_query = post_query
     @search_sample_size = search_sample_size
     @tag_sample_size = tag_sample_size
-    @category = category
+    @categories = categories
   end
 
   # Return the set of tags similar to the given search.
   #
-  # @return [Array<Tag>] the set of similar tags, ordered by most similar
+  # @return [Array<RelatedTag>] The set of similar tags, ordered by highest cosine similarity first.
   memoize def similar_tags_for_search
-    search_count = post_query.post_count
-    return [] if search_count.nil?
-
-    search_sample_size = [search_count, @search_sample_size].min
-    return [] if search_sample_size <= 0
-
-    tags = frequent_tags_for_search(search_sample_size: search_sample_size, category: category)
-    tags = tags.sort_by do |tag|
-      # cosine distance(tag1, tag2) = 1 - {{tag1 tag2}} / sqrt({{tag1}} * {{tag2}})
-      1 - tag.overlap_count / Math.sqrt(tag.post_count * search_count.to_f)
-    end
-
-    tags
+    frequent_tags_for_search.sort_by(&:cosine_similarity).reverse
   end
 
   # Return the set of tags most frequently appearing in the given search.
   #
-  # @return [Array<Tag>] the set of frequent tags, ordered by most frequent
+  # @return [Array<RelatedTag>] The set of frequent tags, ordered by most frequent first.
   memoize def frequent_tags_for_search
     sample_posts = post_query.posts.reorder(:md5).limit(search_sample_size)
-    RelatedTagCalculator.frequent_tags_for_post_relation(sample_posts, category: category).limit(tag_sample_size)
+    frequent_tags_for_post_relation(sample_posts, post_query.post_count)
   end
 
   # Return the set of tags most frequently appearing in the given set of posts.
   #
   # @param posts [ActiveRecord::Relation<Post>] the set of posts
-  # @param category [Integer] an optional tag category, to restrict the tags to a given category.
-  # @return [Array<Tag>] the set of frequent tags, ordered by most frequent
-  def self.frequent_tags_for_post_relation(posts, category: nil)
+  # @param search_count [Integer] The total number of posts in the search
+  # @return [Array<RelatedTag>] The set of related tags, ordered by most frequent first.
+  def frequent_tags_for_post_relation(posts, search_count = post_query.post_count)
+    return [] if search_count.nil?
+
     tag_counts = Post.from(posts).with_unflattened_tags.group("tag").select("tag, COUNT(*) AS overlap_count")
 
     tags = Tag.from(tag_counts).joins("JOIN tags ON tags.name = tag")
     tags = tags.select("tags.*, overlap_count")
     tags = tags.nonempty.undeprecated
-    tags = tags.where(category: Tag.categories.value_for(category)) if category.present?
+    tags = tags.where(category: categories) if categories.present?
     tags = tags.order("overlap_count DESC, tags.post_count DESC, tags.name")
-    tags
+    tags = tags.limit(tag_sample_size)
+    tags.map do |tag|
+      RelatedTag.new(tag: tag, overlap_count: tag.overlap_count, search_count: search_count, sample_count: [search_count, search_sample_size].min)
+    end
   end
 
   # Return the set of tags most frequently appearing in the given array of posts.
@@ -93,7 +123,7 @@ class RelatedTagCalculator
   def cached_similar_tags_for_search(max_tags, search_timeout: 2000, cache_timeout: 8.hours)
     Cache.get(cache_key, cache_timeout, race_condition_ttl: 60.seconds) do
       ApplicationRecord.with_timeout(search_timeout, []) do
-        similar_tags_for_search.take(max_tags).pluck(:name)
+        similar_tags_for_search.take(max_tags).map(&:name)
       end
     end
   end

@@ -7,9 +7,9 @@ class RelatedTagQuery
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml
 
-  attr_reader :query, :post_query, :media_asset, :categories, :type, :user, :limit
+  attr_reader :query, :post_query, :media_asset, :categories, :search_sample_size, :tag_sample_size, :user, :order, :limit
 
-  def initialize(query:, media_asset: nil, user: User.anonymous, categories: TagCategory.category_ids, type: nil, limit: nil)
+  def initialize(query:, media_asset: nil, user: User.anonymous, categories: nil, search_sample_size: nil, tag_sample_size: nil, order: nil, limit: nil)
     @user = user
     @post_query = PostQuery.normalize(query, current_user: user) # XXX This query does not include implicit metatags (rating:s, -status:deleted)
     @query = @post_query.to_s
@@ -17,45 +17,37 @@ class RelatedTagQuery
     @categories = categories
     @categories = @categories.to_s.split(/[[:space:],]/) unless categories.is_a?(Array)
     @categories = @categories.map { |c| Tag.categories.value_for(c) }
-    @type = type
-    @limit = (limit =~ /^\d+/ ? limit.to_i : 25)
+    @order = order
+    @search_sample_size = search_sample_size.to_i.clamp(0, 100_000)
+    @search_sample_size = 5000 if @search_sample_size == 0
+    @tag_sample_size = tag_sample_size.to_i.clamp(0, 1000)
+    @tag_sample_size = 500 if @tag_sample_size == 0
+    @limit = limit.to_i.clamp(0, 1000)
+    @limit = 100 if @limit == 0
   end
 
-  def pretty_name
-    query.tr("_", " ")
-  end
+  def related_tags
+    tags = related_tag_calculator.frequent_tags_for_search
 
-  def related_tags(**options)
-    if type == "frequent"
-      frequent_tags(**options)
-    elsif type == "similar"
-      similar_tags(**options)
-    elsif type == "like"
-      pattern_matching_tags("*#{query}*")
-    elsif query =~ /\*/
-      pattern_matching_tags(query)
-    elsif categories.present?
-      frequent_tags(**options)
-    elsif query.present?
-      similar_tags(**options)
+    case order.to_s.downcase
+    when "cosine"
+      tags = tags.sort_by { |t| [-t.cosine_similarity, t.category, -t.post_count, t.name] }
+    when "jaccard"
+      tags = tags.sort_by { |t| [-t.jaccard_similarity, t.category, -t.post_count, t.name] }
+    when "overlap"
+      tags = tags.sort_by { |t| [-t.overlap_coefficient, t.category, -t.post_count, t.name] }
     else
-      Tag.none
+      tags = tags.sort_by { |t| [-t.frequency, t.category, -t.post_count, t.name] }
     end
-  end
 
-  def tags_overlap
-    if type == "like" || query =~ /\*/
-      {}
-    else
-      related_tags.map { |v| [v.name, v.overlap_count] }.to_h
-    end
+    tags.take(limit)
   end
 
   memoize def related_tag_calculator
-    RelatedTagCalculator.new(post_query)
+    RelatedTagCalculator.new(post_query, categories: categories, search_sample_size: search_sample_size, tag_sample_size: tag_sample_size)
   end
 
-  def frequent_tags(categories: related_categories)
+  def frequent_tags(categories: [])
     tags = related_tag_calculator.frequent_tags_for_search
     tags = tags.select { |t| t.category.in?(categories) } if categories.present?
     tags = sort_by_category(tags) if categories.present?
@@ -110,10 +102,10 @@ class RelatedTagQuery
   def serializable_hash(options = {})
     {
       query: query,
-      categories: categories,
-      tags: tags_with_categories(related_tags.map(&:name)),
-      tags_overlap: tags_overlap,
-      wiki_page_tags: tags_with_categories(wiki_page_tags),
+      post_count: post_query.post_count,
+      tag: tag,
+      related_tags: related_tags,
+      wiki_page_tags: wiki_page_tags,
     }
   end
 
@@ -130,17 +122,6 @@ class RelatedTagQuery
 
   def sort_by_category(tags)
     tags.sort_by.with_index { |tag, i| [related_categories.index(tag.category), i] }
-  end
-
-  def tags_with_categories(list_of_tag_names)
-    Tag.categories_for(list_of_tag_names).to_a
-  end
-
-  def pattern_matching_tags(tag_query)
-    tags = Tag.nonempty.name_matches(tag_query)
-    tags = tags.where(category: categories) if categories.present?
-    tags = tags.order("post_count desc, name asc").limit(limit)
-    tags
   end
 
   memoize def wiki_page

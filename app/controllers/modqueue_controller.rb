@@ -23,7 +23,7 @@ class ModqueueController < ApplicationController
     #@new_count = @modqueue_posts.available_for_moderation(CurrentUser.user, search_params.fetch(:modqueue, :unseen)).count
     #@seen_count = @modqueue_posts.available_for_moderation(CurrentUser.user, search_params.fetch(:modqueue, :seen)).where(id: CurrentUser.user.post_disapprovals.select(:post_id)).count
 
-    @tags = RelatedTagCalculator.frequent_tags_for_post_relation(@modqueue_posts)
+    @tags = RelatedTagCalculator.new.frequent_tags_for_post_relation(@modqueue_posts, @modqueue_posts.size).map(&:tag)
     @artist_tags = @tags.select(&:artist?).sort_by(&:overlap_count).reverse.take(10)
     @copyright_tags = @tags.select(&:copyright?).sort_by(&:overlap_count).reverse.take(10)
     @character_tags = @tags.select(&:character?).sort_by(&:overlap_count).reverse.take(10)
