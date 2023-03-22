@@ -13,19 +13,19 @@
 
     <ul class="tag-list" x-cloak x-show="!collapsed">
       <% tags.each do |t| %>
-        <li class="flex items-center gap-1 w-fit">
+        <li class="flex items-center gap-1 w-fit leading-none">
           <input type="checkbox" tabindex="-1">
 
-          <% if t.is_a?(AITag) %>
-            <span>
-              <% ai_tag = t %>
-              <% t = t.to_aliased_tag %>
+          <span>
+            <% if t.is_a?(AITag) %>
+              <% at = t.to_aliased_tag %>
+              <%= link_to at.pretty_name, posts_path(tags: at.name), class: "break-words #{tag_class(at)}", "data-tag-name": at.name %>
+              <%= tag.span "#{t.score}%", class: "text-muted text-xs" %>
+            <% else %>
               <%= link_to t.pretty_name, posts_path(tags: t.name), class: "break-words #{tag_class(t)}", "data-tag-name": t.name %>
-              <%= tag.span "#{ai_tag.score}%", class: "text-muted text-xs" %>
-            </span>
-          <% else %>
-            <%= link_to t.pretty_name, posts_path(tags: t.name), class: "break-words #{tag_class(t)}", "data-tag-name": t.name %>
-          <% end %>
+              <%= tag.span humanized_number(t.post_count), class: "post-count text-xs", title: t.post_count %>
+            <% end %>
+          </span>
         </li>
       <% end %>
     </ul>
