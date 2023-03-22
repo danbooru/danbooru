@@ -8,14 +8,34 @@
     <%= search_form_for(related_tag_path) do |f| %>
       <%= f.input :query, label: "Tag", input_html: { value: params[:search][:query], "data-autocomplete": "tag" } %>
       <%= f.input :category, collection: TagCategory.categories.map(&:capitalize), include_blank: true, selected: params[:search][:category] %>
-      <%= f.submit "Show" %>
+      <%= f.input :order, collection: %w[Cosine Jaccard Overlap Frequency], include_blank: true, selected: params[:search][:order] %>
+      <%= f.input :search_sample_size, label: "Search Sample Size", as: :hidden, input_html: { value: params[:search][:search_sample_size] } %>
+      <%= f.input :tag_sample_size, label: "Tag Sample Size", as: :hidden, input_html: { value: params[:search][:tag_sample_size] } %>
+      <%= f.submit "Search" %>
     <% end %>
 
     <% if params.dig(:search, :query).present? %>
-      <%= table_for @query.related_tags(categories: @query.categories) do |t| %>
-        <% t.column "Name" do |tag| %>
-          <%= link_to_wiki "?", tag.name, class: tag_class(tag) %>
-          <%= link_to tag.name, posts_path(tags: tag.name), class: tag_class(tag) %>
+      <%= table_for @query.related_tags, class: "striped w-full fixed-width-container" do |table| %>
+        <% table.column "Name" do |t| %>
+          <%= link_to_wiki "?", tag.name, class: tag_class(t) %>
+          <%= link_to t.name, posts_path(tags: t.name), class: tag_class(t) %>
+          <%= tag.span humanized_number(t.post_count), class: "post-count", title: t.post_count %>
+        <% end %>
+
+        <% table.column "Cosine" do |t| %>
+          <%= tag.span "%.2f%%" % (t.cosine_similarity * 100) %>
+        <% end %>
+
+        <% table.column "Jaccard" do |t| %>
+          <%= tag.span "%.2f%%" % (t.jaccard_similarity * 100) %>
+        <% end %>
+
+        <% table.column "Overlap" do |t| %>
+          <%= tag.span "%.2f%%" % (t.overlap_coefficient * 100) %>
+        <% end %>
+
+        <% table.column "Frequency" do |t| %>
+          <%= tag.span "%.2f%%" % (t.frequency * 100) %>
         <% end %>
       <% end %>
     <% end %>

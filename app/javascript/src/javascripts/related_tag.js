@@ -8,6 +8,8 @@ Alpine.store("relatedTags", {
 
 let RelatedTag = {};
 
+RelatedTag.MAX_RELATED_TAGS = 25;
+
 RelatedTag.initialize_all = function() {
   $(document).on("change.danbooru", ".related-tags input", RelatedTag.toggle_tag);
   $(document).on("click.danbooru", ".related-tags .tag-list a", RelatedTag.toggle_tag);
@@ -36,7 +38,7 @@ RelatedTag.update_related_tags = async function(event) {
   if (event.button === 0 && !event.ctrlKey && !event.shiftKey && !event.metaKey && !event.altKey) {
     event.preventDefault();
     Alpine.store("relatedTags").loading = true;
-    await $.get("/related_tag.js", { query: RelatedTag.current_tag() });
+    await $.get("/related_tag.js", { query: RelatedTag.current_tag(), limit: RelatedTag.MAX_RELATED_TAGS });
     RelatedTag.show();
     Alpine.store("relatedTags").loading = false;
   }
