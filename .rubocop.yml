@@ -47,7 +47,7 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Max: 50
-  IgnoredMethods:
+  AllowedMethods:
     - concerning
     - context
     - should
@@ -182,7 +182,7 @@ Style/SymbolArray:
   MinSize: 10
 
 Style/SymbolProc:
-  IgnoredMethods:
+  AllowedMethods:
     - respond_with
 
 Style/TernaryParentheses:
