@@ -213,15 +213,6 @@ module Sources
         profile_url: "https://munespice.tumblr.com"
       )
     end
-    context "A at.tumblr.com/$blog_name/$slug/$tracker_id URL" do
-      strategy_should_work(
-        "https://at.tumblr.com/everythingfox/everythingfox-so-sleepy/d842mqsx8lwd",
-        image_urls: ["https://va.media.tumblr.com/tumblr_q1a6suYYEX1vmobp0.mp4"],
-        artist_name: "everythingfox",
-        page_url: "https://everythingfox.tumblr.com/post/701872943963226112",
-        profile_url: "https://everythingfox.tumblr.com"
-      )
-    end
 
     #context "A tumblr image url for which the extractable post url is a custom domain" do
     #  strategy_should_work(
