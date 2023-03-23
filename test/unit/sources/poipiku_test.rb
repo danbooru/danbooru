@@ -171,7 +171,7 @@ module Sources
           #  https://wavebox.me/wave/7rjgokpzrv4326x8/
           #  https://odaibako.net/u/kmbkshbnlss
           #],
-          artist_name: "緊縛師ボンレス",
+          artist_name: "緊縛師ボンレス（ル×ガの民）",
           tag_name: "poipiku_16109",
           tags: [
             ["腐向け", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=腐向け"],
