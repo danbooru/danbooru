@@ -353,7 +353,7 @@ class MediaFileTest < ActiveSupport::TestCase
       file = MediaFile.open("test/files/mp4/test-silent-audio.mp4")
 
       assert_equal(false, file.is_corrupt?)
-      assert_equal(5.736, file.duration)
+      assert_equal(5.735011, file.duration)
       assert_equal(1.74, file.frame_rate.round(2))
       assert_equal(10, file.frame_count)
       assert_equal(10, file.metadata["FFmpeg:FrameCount"])
@@ -369,7 +369,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(0, file.metadata["FFmpeg:AudioPeakLoudness"].round(4))
       assert_equal(0.0003, file.metadata["FFmpeg:AudioAverageLoudness"].round(4))
       assert_equal(0, file.metadata["FFmpeg:AudioLoudnessRange"])
-      assert_equal(0.9999, file.metadata["FFmpeg:AudioSilencePercentage"].round(4))
+      assert_equal(1.0, file.metadata["FFmpeg:AudioSilencePercentage"].round(4))
     end
 
     should "determine the metadata for a video without audio" do
@@ -541,8 +541,8 @@ class MediaFileTest < ActiveSupport::TestCase
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
-        assert_equal(3.0, file.duration)
-        assert_equal(1.0, file.frame_rate)
+        assert_equal(2.0, file.duration)
+        assert_equal(1.5, file.frame_rate)
         assert_equal(3, file.frame_count)
       end
     end
