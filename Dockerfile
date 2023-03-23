@@ -18,7 +18,7 @@
 
 ARG MOZJPEG_URL="https://github.com/mozilla/mozjpeg/archive/refs/tags/v4.1.1.tar.gz"
 ARG VIPS_URL="https://github.com/libvips/libvips/releases/download/v8.14.2/vips-8.14.2.tar.xz"
-ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n5.1.2.tar.gz"
+ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.0.tar.gz"
 ARG EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/12.56.tar.gz"
 ARG OPENRESTY_URL="https://openresty.org/download/openresty-1.21.4.1.tar.gz"
 ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.1.tar.gz"
