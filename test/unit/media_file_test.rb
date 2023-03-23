@@ -213,7 +213,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "work for normal images" do
       assert_equal("01cb481ec7730b7cfced57ffa5abd196", MediaFile.pixel_hash("test/files/test.jpg"))
-      assert_equal("07daec7b3ee9438734107c36263707b2", MediaFile.pixel_hash("test/files/test-cmyk-no-profile.jpg"))
+      assert_equal("dfcdf4d8e525ffd7057f103384126cf0", MediaFile.pixel_hash("test/files/test-cmyk-no-profile.jpg"))
       assert_equal("85e9fde0ba6cc7d4fedf24c71bb6277b", MediaFile.pixel_hash("test/files/test-grey-no-profile.jpg"))
       assert_equal("7bc62a583c0eb07de4fb7fa0dc9e0851", MediaFile.pixel_hash("test/files/test-rotation-90cw.jpg"))
       assert_equal("510aa465afbba3d7d818038b7aa7bb6f", MediaFile.pixel_hash("test/files/test-rotation-180.jpg"))
@@ -257,6 +257,11 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal("d007f30f42cb7c5835fb3d0d9c24587e", MediaFile.pixel_hash("test/files/dupes/countergirl-grey.png"))
       assert_equal("d007f30f42cb7c5835fb3d0d9c24587e", MediaFile.pixel_hash("test/files/dupes/countergirl-grey-srgb.png"))
+    end
+
+    should "compute the same pixel hash for a color image with an incompatible greyscale color profile" do
+      assert_equal("c135caa2229b6d43d06179503f70ed74", MediaFile.pixel_hash("test/files/dupes/countergirl-no-exif.jpg"))
+      assert_equal("c135caa2229b6d43d06179503f70ed74", MediaFile.pixel_hash("test/files/dupes/countergirl-rgb-gray.jpg"))
     end
 
     should "compute the same pixel hash for images with a transparent alpha channel" do
