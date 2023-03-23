@@ -175,6 +175,10 @@ class MediaFileTest < ActiveSupport::TestCase
     should "be able to fit to width only" do
       assert_equal([400, 268], MediaFile.open("test/files/test.jpg").preview(400, nil).dimensions)
     end
+
+    should "generate a thumbnail with the correct colors for a CMYK image with no color profile" do
+      assert_equal("4c9515d85842a291f6512c93458dd7b8", MediaFile.open("test/files/test-cmyk-no-profile.jpg").preview(180, 180).pixel_hash)
+    end
   end
 
   context "#pixel_hash" do
