@@ -80,6 +80,8 @@ module Sources
       assert(Source::URL.image_url?("http://zip.4chan.org/a/src/1201922408724.jpg"))
       assert(Source::URL.image_url?("http://cgi.4chan.org/r/src/1210870653551.jpg"))
       assert(Source::URL.image_url?("http://img.4chan.org/b/src/1226194386317.jpg"))
+      assert(Source::URL.image_url?("http://cgi.4chan.org/f/src/Zone_Peach.swf"))
+      assert(Source::URL.image_url?("https://s.4cdn.org/image/contests/4chan_vtuber_winner_2018.jpg"))
 
       assert(Source::URL.page_url?("https://boards.4channel.org/vt/thread/37293562#p37294005"))
       assert(Source::URL.page_url?("http://boards.4chan.org/a/res/41938201"))

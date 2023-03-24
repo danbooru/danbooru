@@ -52,7 +52,7 @@ class Source::URL::FourChan < Source::URL
   end
 
   def image_url?
-    image_id.present?
+    file_ext.in?(%w[jpg png gif webm swf])
   end
 
   def page_url
