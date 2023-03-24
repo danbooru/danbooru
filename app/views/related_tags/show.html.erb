@@ -6,7 +6,7 @@
     <h1>Related tags</h1>
 
     <%= search_form_for(related_tag_path) do |f| %>
-      <%= f.input :query, label: "Tag", input_html: { value: params[:search][:query], "data-autocomplete": "tag" } %>
+      <%= f.input :query, label: "Tag", input_html: { value: params[:search][:query], "data-autocomplete": "tag-query" } %>
       <%= f.input :category, collection: TagCategory.categories.map(&:capitalize), include_blank: true, selected: params[:search][:category] %>
       <%= f.input :order, collection: %w[Cosine Jaccard Overlap Frequency], include_blank: true, selected: params[:search][:order] %>
       <%= f.input :search_sample_size, label: "Search Sample Size", as: :hidden, input_html: { value: params[:search][:search_sample_size] } %>
