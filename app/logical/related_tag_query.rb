@@ -47,6 +47,10 @@ class RelatedTagQuery
     RelatedTagCalculator.new(post_query, categories: categories, search_sample_size: search_sample_size, tag_sample_size: tag_sample_size)
   end
 
+  def results_present?
+    related_tag_calculator.frequent_tags_for_search.present? || wiki_page_tags.present?
+  end
+
   def frequent_tags(categories: [])
     tags = related_tag_calculator.frequent_tags_for_search
     tags = tags.select { |t| t.category.in?(categories) } if categories.present?
@@ -120,8 +124,8 @@ class RelatedTagQuery
   end
 
   def related_categories
-    return categories if tag.nil?
-    TagCategory.related_tag_categories[tag.category]
+    category = tag&.category || TagCategory::CHARACTER
+    TagCategory.related_tag_categories[category]
   end
 
   protected
