@@ -128,6 +128,14 @@ class RelatedTagQuery
     TagCategory.related_tag_categories[category]
   end
 
+  def cache_duration
+    4.hours
+  end
+
+  def cache_publicly?
+    !post_query.is_user_dependent_search?
+  end
+
   protected
 
   def sort_by_category(tags)
