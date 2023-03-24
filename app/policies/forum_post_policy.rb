@@ -30,7 +30,7 @@ class ForumPostPolicy < ApplicationPolicy
   end
 
   def votable?
-    unbanned? && show? && record.bulk_update_request.present? && record.bulk_update_request.is_pending? && record.bulk_update_request.user_id != user.id
+    unbanned? && show? && record.bulk_update_request.present? && record.bulk_update_request.is_pending?
   end
 
   def reportable?

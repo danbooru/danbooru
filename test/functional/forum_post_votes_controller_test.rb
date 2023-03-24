@@ -65,10 +65,10 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "not allow creators to vote on their own BURs" do
-        assert_difference("ForumPostVote.count", 0) do
+      should "allow creators to vote on their own BURs" do
+        assert_difference("ForumPostVote.count", 1) do
           post_auth forum_post_votes_path(format: :js), @bulk_update_request.user, params: { forum_post_id: @forum_post.id, forum_post_vote: { score: 1 }}
-          assert_response 403
+          assert_response :success
         end
       end
     end
