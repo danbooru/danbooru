@@ -17,7 +17,13 @@ module Sources
         image_urls: image_urls,
         artist_name: "gengar563",
         profile_url: "https://gengar563.lofter.com",
-        dtext_artist_commentary_desc: /发了三次发不出有毒…… \n.*\n失去耐心.jpg/
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          发了三次发不出有毒……
+
+          二部运动au  性转ac注意
+
+          失去耐心.jpg
+        EOS
       )
     end
 
@@ -43,7 +49,11 @@ module Sources
       strategy_should_work(
         "https://chengyeliuli.lofter.com/post/1d127639_2b6e850c8",
         image_urls: ["https://imglf3.lf127.net/img/d28aeb098a69b1d2/ZmltbmVjOU9BRzFHVTVnTkNmc0V0NDlSRnNrdENIWWwyZkFreTJJd0duRT0.jpg"],
-        dtext_artist_commentary_desc: /練習\s+画画卡姐～/
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          練習
+
+          画画卡姐～
+        EOS
       )
     end
 
@@ -54,7 +64,44 @@ module Sources
           "https://imglf4.lf127.net/img/68d1578576f2e8a0/akFYeFo0L0VFMno5d0JuNHlwQ3VMdEFxYysyN1ZseVduNzFkbG9MdUlFVT0.jpg",
           "https://imglf6.lf127.net/img/9970d5715bd5f72a/akFYeFo0L0VFMno5d0JuNHlwQ3VMZ3QxbkttTHpHZERWZXlVS3FDNmtYcz0.jpg",
         ],
-        dtext_artist_commentary_desc: /过去与她擦肩而过/
+        dtext_artist_commentary_desc: "过去与她擦肩而过"
+      )
+    end
+
+    context "A lofter post with commentary under <.ct .txtcont>" do
+      strategy_should_work(
+        "https://okitagumi.lofter.com/post/1e69aeeb_fbb63ca",
+        image_urls: [
+          "https://imglf4.lf127.net/img/d2ZIUXlGd2FraFNMMC9KUTNGdTFjVkZydjlsNUxhVyt2MHpUanhaeld5Vy8zZEQzUE5XMXhBPT0.jpg",
+        ],
+        tag_name: "okitagumi",
+        artist_name: "okitagumi",
+        page_url: "https://okitagumi.lofter.com/post/1e69aeeb_fbb63ca",
+        profile_url: "https://okitagumi.lofter.com",
+        download_size: 154_620,
+        tags: [],
+        dtext_artist_commentary_title: "冲田组原主与刀温馨向合志《金平糖》补货及预售通贩告知",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          非常感谢各位一直以来的支持和厚爱，冲田组原主与刀温馨向合志[b]《金平糖》二刷[/b]的通贩现货目前已经完售
+
+          但由于淘宝上存在数家对《金平糖》进行盗印的不法商家，并且已经有数位受骗上当、购买了盗印的同好，为了不让这些无耻的盗印商得逞，我们决定继续对本子加印补货
+
+          [b]淘宝通贩→[/b]"[b]※※※※[/b]":[https://item.taobao.com/item.htm?id=542050423915&qq-pf-to=pcqq.c2c]
+
+          [b]本宣地址→[/b]"[b]※※※※[/b]":[https://okitagumi.lofter.com/post/1e69aeeb_e30959e]
+
+          《金平糖》的通贩代理只有[b]@JACKPOT_印刷寄售社团[/b] 一家 ，除此之外全部都是盗印店，还请大家帮忙奔走相告( ´•̥×•̥` )
+
+          补货预售期间，购买本子均会送两张特典小卡片。
+
+          由于本次三刷补货并没有增加特典，内容也和之前完全一样，所以不再进行额外宣传。
+
+          大家这份热忱令我们十分惊异，同时也深深感受到各位对冲田组的喜爱，谢谢每一位支持过《金平糖》的同好。
+
+          今后也请多多指教【鞠躬
+
+          占tag非常抱歉。
+        EOS
       )
     end
 
