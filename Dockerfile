@@ -251,11 +251,12 @@ RUN <<EOS
 
   npm install -g yarn
   gem install --no-document foreman
-  busybox --install -s
 
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs libglib2.0-bin libglib2.0-doc mount procps python3 tzdata
   apt-get autoremove -y
   rm -rf /var/{lib,cache,log} /usr/share/{doc,info}/* /build
+
+  busybox --install -s
 EOS
 
 
