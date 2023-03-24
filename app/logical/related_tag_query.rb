@@ -92,7 +92,13 @@ class RelatedTagQuery
 
   def favorite_tags
     tag_names = user&.favorite_tags.to_s.split
-    Tag.nonempty.undeprecated.named_or_aliased_in_order(tag_names)
+
+    tag_names = TagAlias.to_aliased(tag_names)
+    names_to_tags = Tag.where(name: tag_names).index_by(&:name)
+    tags = tag_names.map { |name| names_to_tags[name] || Tag.new(name: name).freeze }
+    tags = tags.reject(&:is_deprecated?).reject { |tag| tag.empty? && !tag.metatag? }
+
+    tags
   end
 
   memoize def wiki_page_tags
