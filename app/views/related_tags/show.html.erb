@@ -17,7 +17,7 @@
     <% if params.dig(:search, :query).present? %>
       <%= table_for @query.related_tags, class: "striped w-full fixed-width-container" do |table| %>
         <% table.column "Name" do |t| %>
-          <%= link_to_wiki "?", tag.name, class: tag_class(t) %>
+          <%= link_to_wiki "?", t.name, class: tag_class(t) %>
           <%= link_to t.name, posts_path(tags: t.name), class: tag_class(t) %>
           <%= tag.span humanized_number(t.post_count), class: "post-count", title: t.post_count %>
         <% end %>
