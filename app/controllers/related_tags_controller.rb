@@ -16,6 +16,8 @@ class RelatedTagsController < ApplicationController
     media_asset = MediaAsset.find(params[:media_asset_id]) if params[:media_asset_id].present?
 
     @query = RelatedTagQuery.new(query:, media_asset:, categories:, search_sample_size:, tag_sample_size:, order:, limit:, user: CurrentUser.user)
+
+    expires_in @query.cache_duration, public: @query.cache_publicly? if request.format.js? && response.cache_control.blank? && params[:user_tags].blank?
     respond_with(@query)
   end
 end

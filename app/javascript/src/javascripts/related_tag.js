@@ -38,7 +38,7 @@ RelatedTag.update_related_tags = async function(event) {
   if (event.button === 0 && !event.ctrlKey && !event.shiftKey && !event.metaKey && !event.altKey) {
     event.preventDefault();
     Alpine.store("relatedTags").loading = true;
-    await $.get("/related_tag.js", { query: RelatedTag.current_tag(), limit: RelatedTag.MAX_RELATED_TAGS });
+    await $.get("/related_tag.js", { query: RelatedTag.current_tag().trim(), limit: RelatedTag.MAX_RELATED_TAGS });
     RelatedTag.show();
     Alpine.store("relatedTags").loading = false;
   }
