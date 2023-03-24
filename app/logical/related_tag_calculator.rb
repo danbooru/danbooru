@@ -81,7 +81,8 @@ class RelatedTagCalculator
   # @return [Array<RelatedTag>] The set of frequent tags, ordered by most frequent first.
   memoize def frequent_tags_for_search
     sample_posts = post_query.posts.reorder(:md5).limit(search_sample_size)
-    frequent_tags_for_post_relation(sample_posts, post_query.post_count)
+    search_count = post_query.fast_count(timeout: post_query.current_user.statement_timeout)
+    frequent_tags_for_post_relation(sample_posts, search_count)
   end
 
   # Return the set of tags most frequently appearing in the given set of posts.
@@ -89,7 +90,7 @@ class RelatedTagCalculator
   # @param posts [ActiveRecord::Relation<Post>] the set of posts
   # @param search_count [Integer] The total number of posts in the search
   # @return [Array<RelatedTag>] The set of related tags, ordered by most frequent first.
-  def frequent_tags_for_post_relation(posts, search_count = post_query.post_count)
+  def frequent_tags_for_post_relation(posts, search_count)
     return [] if search_count.nil?
 
     tag_counts = Post.from(posts).with_unflattened_tags.group("tag").select("tag, COUNT(*) AS overlap_count")
