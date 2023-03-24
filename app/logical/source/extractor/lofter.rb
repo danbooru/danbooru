@@ -12,7 +12,7 @@ module Source
         if parsed_url.image_url?
           [parsed_url.full_image_url]
         else
-          images = page&.search(".imgclasstag img")
+          images = page&.search(".imgclasstag img, .ct .txtcont img")
           images.to_a.pluck("src").map { |url| Source::URL.parse(url).full_image_url }
         end
       end
@@ -43,15 +43,26 @@ module Source
         end
       end
 
+      def artist_commentary_title
+        title_selectors = ".ct .ttl"
+        page&.search(title_selectors).to_a.compact.first&.to_html
+      end
+
       def artist_commentary_desc
         commentary_selectors = [
           ".ct .text",
+          ".ct .txtcont",
           ".content .text",
           ".posts .photo .text",
           "#post .description",
           ".m-post .cont .text",
-        ]
-        page&.search(commentary_selectors.join(", ")).to_a.compact.first&.to_html
+        ].join(", ")
+
+        page&.search(commentary_selectors).to_a.compact.first&.to_html
+      end
+
+      def dtext_artist_commentary_desc
+        DText.from_html(artist_commentary_desc)&.normalize_whitespace&.gsub(/\r\n/, "\n").gsub(/ *\n */, "\n")&.strip
       end
 
       def illust_id
