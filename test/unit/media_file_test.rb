@@ -236,7 +236,8 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal("3d9213ea387706db93f0b39247d77573", MediaFile.pixel_hash("test/files/webp/test.webp"))
       assert_equal("fd52591b61fc34192d7c337fa024bf12", MediaFile.pixel_hash("test/files/webp/lossless1.webp"))
       assert_equal("c5c77aff5b4015d3416817d12c2c2377", MediaFile.pixel_hash("test/files/webp/lossy_alpha1.webp"))
-      assert_equal("509da3d93ff4def075b98bbff08010ba", MediaFile.pixel_hash("test/files/webp/Exif2.webp"))
+      assert_equal("96d0f06ba512efea2de7bda8b5775106", MediaFile.pixel_hash("test/files/webp/Exif2.webp"))
+      assert_equal("4811ad7d928dbf069ef991bb3051d7f6", MediaFile.pixel_hash("test/files/webp/Exif6.webp"))
     end
 
     should "compute the same pixel hash for images with different EXIF metadata" do
@@ -813,51 +814,75 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
-  context "an image that is rotated 90 degrees clockwise" do
-    should "have the correct dimensions" do
+  context "a large JPEG with an orientation flag" do
+    should "read the whole image without `out of order read` errors" do
+      @file = MediaFile.open("test/files/test-rotation-270cw-large.jpg")
+
+      assert_equal([1104, 736], @file.dimensions)
+      assert_equal([180, 120], @file.preview(180, 180).dimensions)
+      assert_nil(@file.error)
+      assert_equal("b9f80b26f56c1877b8a7f12b42e76909", @file.md5)
+      assert_equal("f4602dd62706f8607b86cec90b51d498", @file.pixel_hash)
+    end
+  end
+
+  context "a JPEG that is rotated 90 degrees clockwise" do
+    should "rotate the image correctly" do
       @file = MediaFile.open("test/files/test-rotation-90cw.jpg")
+
       assert_equal([96, 128], @file.dimensions)
-    end
-
-    should "generate a rotated thumbnail" do
-      @file = MediaFile.open("test/files/test-rotation-90cw.jpg")
       assert_equal([48, 64], @file.preview(64, 64).dimensions)
+      assert_equal("7bc62a583c0eb07de4fb7fa0dc9e0851", @file.pixel_hash)
     end
   end
 
-  context "an image that is rotated 270 degrees clockwise" do
-    should "have the correct dimensions" do
+  context "a JPEG that is rotated 270 degrees clockwise" do
+    should "rotate the image correctly" do
       @file = MediaFile.open("test/files/test-rotation-270cw.jpg")
+
       assert_equal([100, 66], @file.dimensions)
-    end
-
-    should "generate a rotated thumbnail" do
-      @file = MediaFile.open("test/files/test-rotation-270cw.jpg")
       assert_equal([50, 33], @file.preview(50, 50).dimensions)
+      assert_equal("ac0220aea5683e3c4ffcb2c7b34078e8", @file.pixel_hash)
     end
   end
 
-  context "an image that is rotated 180 degrees" do
-    should "have the correct dimensions" do
+  context "a JPEG that is rotated 180 degrees" do
+    should "rotate the image correctly" do
       @file = MediaFile.open("test/files/test-rotation-180.jpg")
-      assert_equal([66, 100], @file.dimensions)
-    end
 
-    should "generate a rotated thumbnail" do
-      @file = MediaFile.open("test/files/test-rotation-180.jpg")
+      assert_equal([66, 100], @file.dimensions)
       assert_equal([33, 50], @file.preview(50, 50).dimensions)
+      assert_equal("510aa465afbba3d7d818038b7aa7bb6f", @file.pixel_hash)
     end
   end
 
   context "a PNG with an exif orientation flag" do
-    should "not generate rotated dimensions" do
+    should "not rotate the image" do
       @file = MediaFile.open("test/files/test-rotation-90cw.png")
-      assert_equal([128, 96], @file.dimensions)
-    end
 
-    should "not generate a rotated thumbnail" do
-      @file = MediaFile.open("test/files/test-rotation-90cw.png")
+      assert_equal([128, 96], @file.dimensions)
       assert_equal([64, 48], @file.preview(64, 64).dimensions)
+      assert_equal("723bce01fcc6b8444ae362467e8628af", @file.pixel_hash)
+    end
+  end
+
+  context "a WebP with an exif orientation flag" do
+    should "not rotate the image" do
+      @file = MediaFile.open("test/files/webp/Exif6.webp")
+
+      assert_equal([427, 640], @file.dimensions)
+      assert_equal([43, 64], @file.preview(64, 64).dimensions)
+      assert_equal("4811ad7d928dbf069ef991bb3051d7f6", @file.pixel_hash)
+    end
+  end
+
+  context "a AVIF with an exif orientation flag" do
+    should "not rotate the image" do
+      @file = MediaFile.open("test/files/avif/Exif6.avif")
+
+      assert_equal([427, 640], @file.dimensions)
+      assert_equal([43, 64], @file.preview(64, 64).dimensions)
+      assert_equal("2cd7cd5f7f67a786c1b14d60ed7b6c25", @file.pixel_hash)
     end
   end
 end

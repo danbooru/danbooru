@@ -40,7 +40,7 @@ class MediaFile::Image < MediaFile
   end
 
   def error
-    image = Vips::Image.new_from_file(file.path, fail: true, access: :sequential)
+    image = open_image(fail: true)
     stats = image.stats
     stats.release
     image.release
@@ -185,7 +185,7 @@ class MediaFile::Image < MediaFile
 
   # @return [MediaFile::Image] The raw image used for computing the pixel hash.
   def pixel_hash_file
-    image = Vips::Image.new_from_file(file.path, fail: true, access: :sequential).autorot
+    image = open_image(fail: true)
     image = image.icc_transform("srgb") if image.get_typeof("icc-profile-data") != 0
     image = image.colourspace("srgb") if image.interpretation != :srgb
     image = image.add_alpha unless image.has_alpha?
@@ -211,7 +211,19 @@ class MediaFile::Image < MediaFile
 
   # @return [Vips::Image] the Vips image object for the file
   def image
-    @image ||= Vips::Image.new_from_file(file.path, fail: false, access: :sequential).autorot
+    @image ||= open_image(fail: false)
+  end
+
+  def open_image(**options)
+    case file_ext
+    when :jpg
+      # Only JPEG supports the EXIF orientation flag. It may technically be present in other formats, but web browsers
+      # ignore it, so we do too. XXX AVIF also has `irot` and `imir` flags, which browsers support, but libvips doesn't.
+      # https://zpl.fi/exif-orientation-in-different-formats/
+      Vips::Image.new_from_file(file.path, access: :sequential, autorotate: true, **options)
+    else
+      Vips::Image.new_from_file(file.path, access: :sequential, **options)
+    end
   end
 
   def video
