@@ -985,9 +985,9 @@ CREATE TABLE public.media_assets (
     image_height integer NOT NULL,
     duration double precision,
     status integer DEFAULT 200 NOT NULL,
-    file_key character varying,
+    file_key character varying NOT NULL,
     is_public boolean DEFAULT true NOT NULL,
-    pixel_hash uuid
+    pixel_hash uuid NOT NULL
 );
 
 
@@ -4529,6 +4529,13 @@ CREATE UNIQUE INDEX index_media_assets_on_md5_and_status ON public.media_assets 
 
 
 --
+-- Name: index_media_assets_on_pixel_hash; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_assets_on_pixel_hash ON public.media_assets USING btree (pixel_hash);
+
+
+--
 -- Name: index_media_assets_on_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6989,6 +6996,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230104064916'),
 ('20230209060757'),
 ('20230222230650'),
-('20230309014439');
+('20230309014439'),
+('20230325143851');
 
 
