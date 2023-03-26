@@ -7,7 +7,7 @@
       display: flex;
       white-space: nowrap;
       border-bottom-width: 1px;
-      padding-bottom: 1px;
+      padding-bottom: 2px;
       gap: 1rem;
       margin-bottom: 1rem;
 
@@ -24,7 +24,7 @@
       .tab.active-tab {
         border-color: currentcolor;
         border-bottom-width: 2px;
-        margin-bottom: -1px;
+        margin-bottom: -2px;
       }
 
       .tab:not(.active-tab) {

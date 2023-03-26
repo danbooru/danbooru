@@ -22,17 +22,21 @@
 <% end %>
 
 <% content_for(:content) do %>
-  <div class="flex flex-wrap gap-4 mb-4 border-b">
-    <%= link_to "New", current_page_path(search: search_params.except(:modqueue, :order)), class: ["inline-block p-1 pb-2", (search_params[:modqueue].nil? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
-    <%= link_to "Seen", current_page_path(search: search_params.merge(modqueue: :seen, order: "disapproved")), class: ["inline-block p-1 pb-2", (search_params[:modqueue] == "seen" ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+  <div class="tab-panel-component horizontal-tab-panel">
+    <div class="tab-list">
+      <%= link_to "New", current_page_path(search: search_params.except(:modqueue, :order)), class: [(search_params[:modqueue].nil? ? "tab active-tab" : "tab")] %>
+      <%= link_to "Seen", current_page_path(search: search_params.merge(modqueue: :seen, order: "disapproved")), class: [(search_params[:modqueue] == "seen" ? "tab active-tab" : "tab")] %>
 
-    <span class="flex-grow-1"></span>
-    <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
-    <% if @mode == "gallery" %>
-      <%= link_to list_icon, current_page_path(mode: "list"), title: "List", class: "inline-block p-1 pb-2 rounded inactive-link" %>
-    <% else %>
-      <%= link_to grid_icon, current_page_path(mode: nil), title: "Gallery", class: "inline-block p-1 pb-2 rounded inactive-link" %>
-    <% end %>
+      <span class="flex-grow-1"></span>
+
+      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+
+      <% if @mode == "gallery" %>
+        <%= link_to list_icon, current_page_path(mode: "list"), title: "List", class: "tab" %>
+      <% else %>
+        <%= link_to grid_icon, current_page_path(mode: nil), title: "Gallery", class: "tab" %>
+      <% end %>
+    </div>
   </div>
 
   <% if @mode == "gallery" %>
