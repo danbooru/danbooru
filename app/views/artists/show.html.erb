@@ -17,7 +17,7 @@
 
           <%= render "posts/partials/common/inline_blacklist" %>
 
-          <%= render_post_gallery(@artist.tag.posts.limit(8), tags: @artist.name) %>
+          <%= render_post_gallery(PostQuery.new(@artist.tag.name).paginated_posts(1, count: @artist.tag.post_count, limit: 8), tags: @artist.name) %>
         </div>
       <% end %>
     <% end%>

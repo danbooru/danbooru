@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
-require "strscan"
-
 # A PostQueryBuilder represents a post search. It contains all logic for parsing
 # and executing searches.
 #
 # @example
-#   PostQueryBuilder.new("touhou rating:s").build
+#   PostQueryBuilder.new(PostQuery.new("touhou rating:s")).build
 #   #=> <set of posts>
 #
 class PostQueryBuilder
@@ -69,16 +67,15 @@ class PostQueryBuilder
     COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
     CATEGORY_COUNT_METATAGS.flat_map { |str| [str, "#{str}_asc"] }
 
-  attr_reader :query_string, :current_user, :tag_limit, :safe_mode
+  attr_reader :post_query, :current_user, :tag_limit, :safe_mode
   alias_method :safe_mode?, :safe_mode
 
-  # Initialize a post query.
-  # @param query_string [String] the tag search
+  # @param post_query [PostQuery] the tag search
   # @param current_user [User] the user performing the search
   # @param tag_limit [Integer] the user's tag limit
-  # @param safe_mode [Boolean] whether safe mode is enabled. if true, return only rating:s posts.
-  def initialize(query_string, current_user = User.anonymous, tag_limit: nil, safe_mode: false)
-    @query_string = query_string
+  # @param safe_mode [Boolean] whether safe mode is enabled. if true, return only rating:g posts.
+  def initialize(post_query, current_user = User.anonymous, tag_limit: nil, safe_mode: false)
+    @post_query = post_query
     @current_user = current_user
     @tag_limit = tag_limit
     @safe_mode = safe_mode
@@ -167,7 +164,7 @@ class PostQueryBuilder
       relation = relation.random(count)
     end
 
-    relation = relation.includes(includes)
+    relation = relation.includes(includes) if includes.present?
     relation
   end
 
@@ -200,6 +197,10 @@ class PostQueryBuilder
       posts = small_search(relation) if posts.nil?
     elsif post_count <= small_search_threshold
       # Otherwise if we know the search is small, then treat it as a small search.
+      posts = small_search(relation)
+    elsif post_query.tags.any?(&:is_deprecated?)
+      # If the search contains a deprecated tag, then assume the tag is small, even if it's over the threshold. Most
+      # deprecated tags are small enough that a bitmap scan is faster than a sequential scan.
       posts = small_search(relation)
     else
       # Otherwise if we know it's large, treat it normally

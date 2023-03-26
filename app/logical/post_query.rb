@@ -65,7 +65,7 @@ class PostQuery
   end
 
   def builder
-    @builder ||= PostQueryBuilder.new(search, current_user, tag_limit: tag_limit, safe_mode: safe_mode)
+    @builder ||= PostQueryBuilder.new(self, current_user, tag_limit: tag_limit, safe_mode: safe_mode)
   end
 
   def search
