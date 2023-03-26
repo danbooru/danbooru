@@ -20,9 +20,9 @@
   <p>This artist entry does not exist. <%= link_to "Create new artist entry", new_artist_path(artist: { name: artist.name }), rel: "nofollow" %>.</p>
 <% else %>
   <% if artist.other_names.present? %>
-    <div>
+    <div class="flex flex-wrap gap-1">
       <% artist.other_names.map do |other_name| %>
-        <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name", rel: "nofollow"%>
+        <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name chip-primary text-sm truncate", rel: "nofollow"%>
       <% end %>
     </div>
   <% end %>
@@ -30,7 +30,7 @@
   <% if artist.group_name.present? %>
     <div>
       <strong>Group</strong>
-      <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }), class: "artist-other-name" %>
+      <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }), class: "artist-other-name chip-primary text-sm truncate" %>
     </div>
   <% end %>
 

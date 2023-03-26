@@ -248,6 +248,7 @@ $spacer: 0.25rem; /* 4px */
 
 .align-top { vertical-align: top; }
 .align-middle { vertical-align: middle; }
+.align-bottom { vertical-align: bottom; }
 
 .flex-1 { flex: 1 1 0%; }
 .flex-auto { flex: 1 1 auto; }
@@ -320,12 +321,24 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   transition: opacity 0.15s ease;
 }
 
-.card {
+.card, .card-elevated {
   @extend %border;
   @extend %rounded-lg;
   @extend %shadow-md;
 
   background-color: var(--card-background-color);
+}
+
+.card-outlined {
+  @extend %border;
+  @extend %rounded-lg;
+}
+
+.chip-primary, .chip-blue {
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  border-width: 1px;
+  background-color: var(--chip-background-color);
 }
 
 .thin-scrollbar, %thin-scrollbar {

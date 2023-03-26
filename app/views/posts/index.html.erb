@@ -121,7 +121,7 @@
       <% @post_set.wiki_page.tap do |wiki_page| %>
         <div class="prose">
           <% if wiki_page.other_names.present? %>
-            <p><%= wiki_page_other_names_list(wiki_page) %></p>
+            <%= wiki_page_other_names_list(wiki_page) %>
           <% end %>
 
           <%= format_text(wiki_page.body) %>

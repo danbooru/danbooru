@@ -130,8 +130,8 @@ html, body[data-current-user-theme="light"] {
 
   --subnav-menu-background-color: var(--blue-0);
   --responsive-menu-background-color: var(--blue-1);
-
   --card-background-color: var(--body-background-color);
+  --chip-background-color: var(--blue-0);
 
   --form-input-text-color: var(--text-color);
   --form-input-background: var(--body-background-color);
@@ -257,8 +257,6 @@ html, body[data-current-user-theme="light"] {
   --collection-pool-color: var(--general-tag-color);
   --collection-pool-hover-color: var(--general-tag-hover-color);
 
-  --fetch-source-data-border-color: var(--grey-2);
-
   --post-mode-menu-active-post-outline-color: var(--blue-2);
   --post-mode-menu-translation-background: var(--blue-2);
 
@@ -295,8 +293,6 @@ html, body[data-current-user-theme="light"] {
   --dtext-details-summary-text-color: var(--header-color);
   --dtext-spoiler-background-color: var(--text-color);
   --dtext-spoiler-hover-color: var(--inverse-text-color);
-
-  --wiki-page-other-name-background-color: var(--grey-1);
 
   --paginator-arrow-background-color: var(--inverse-text-color);
   --paginator-arrow-color: var(--link-color);
@@ -367,8 +363,8 @@ html, body[data-current-user-theme="light"] {
 
   --subnav-menu-background-color: var(--grey-8);
   --responsive-menu-background-color: var(--grey-8);
-
   --card-background-color: var(--grey-8);
+  --chip-background-color: var(--grey-8);
 
   --form-input-text-color: var(--grey-2);
   --form-input-background: var(--grey-7);
@@ -482,8 +478,6 @@ html, body[data-current-user-theme="light"] {
   --collection-pool-color: var(--general-tag-color);
   --collection-pool-hover-color: var(--general-tag-hover-color);
 
-  --fetch-source-data-border-color: var(--grey-4);
-
   --post-mode-menu-active-post-outline-color: var(--azure-4);
   --post-mode-menu-translation-background: var(--blue-8);
 
@@ -519,8 +513,6 @@ html, body[data-current-user-theme="light"] {
   --dtext-details-summary-text-color: var(--text-color);
   --dtext-spoiler-background-color: black;
   --dtext-spoiler-hover-color: var(--grey-0);
-
-  --wiki-page-other-name-background-color: var(--grey-8);
 
   --paginator-arrow-background-color: var(--grey-0);
   --paginator-arrow-color: var(--link-color);

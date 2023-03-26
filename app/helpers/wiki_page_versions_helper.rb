@@ -14,7 +14,7 @@ module WikiPageVersionsHelper
     this_names = this_version.other_names
     other_names = other_version.other_names
 
-    diff_list_html(this_names, other_names, ul_class: ["wiki-other-names-diff-list list-inline"], li_class: ["wiki-other-name"])
+    diff_list_html(this_names, other_names, ul_class: ["wiki-other-names-diff-list flex flex-wrap gap-1"], li_class: ["wiki-other-name chip-primary text-sm truncate"])
   end
 
   def wiki_version_title_diff(wiki_page_version, type)
