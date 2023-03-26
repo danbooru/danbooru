@@ -6,7 +6,7 @@
 
   <div id="wiki-page-body" class="dtext prose">
     <% if @wiki_page_version.other_names.present? %>
-      <p><%= wiki_page_other_names_list(@wiki_page_version) %></p>
+      <%= wiki_page_other_names_list(@wiki_page_version) %>
     <% end %>
 
     <%= format_text(@wiki_page_version.body) %>
