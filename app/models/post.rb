@@ -57,7 +57,7 @@ class Post < ApplicationRecord
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
   belongs_to :parent, class_name: "Post", optional: true
   has_one :ai_metadata, dependent: :destroy
-  has_one :media_asset, -> { active }, foreign_key: :md5, primary_key: :md5
+  has_one :media_asset, -> { active }, foreign_key: :md5, primary_key: :md5, inverse_of: :post
   has_one :media_metadata, through: :media_asset
   has_one :artist_commentary, :dependent => :destroy
   has_one :vote_by_current_user, -> { active.where(user_id: CurrentUser.id) }, class_name: "PostVote" # XXX using current user here is wrong

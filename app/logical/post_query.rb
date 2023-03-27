@@ -105,7 +105,7 @@ class PostQuery
 
   # The only tag in the query, if the query contains a single tag. The query may contain other metatags or wildcards, and the tag may be negated.
   def tag
-    tags.first if has_single_tag?
+    tags.to_a.first if has_single_tag?
   end
 
   # The list of all tags contained in the query.
