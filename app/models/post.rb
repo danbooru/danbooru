@@ -1734,7 +1734,7 @@ class Post < ApplicationRecord
     end
 
     def uploader_is_not_limited
-      errors.add(:uploader, "have reached your upload limit") if uploader.upload_limit.limited?
+      errors.add(:uploader, "have reached your upload limit. Please wait for your pending uploads to be approved before uploading more") if uploader.upload_limit.limited?
     end
 
     def added_tags_are_valid

@@ -1,8 +1,4 @@
-<% if CurrentUser.user.upload_limit.limited? %>
-  <p>You have reached your upload limit. Please wait for your pending uploads to be approved before uploading more.</p>
-
-  <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
-<% elsif upload_media_asset.loading? %>
+<% if upload_media_asset.loading? %>
   <p>Processing <%= external_link_to upload_media_asset.source_url %>...</p>
 
   <% content_for(:html_header) do %>
