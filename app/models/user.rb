@@ -204,10 +204,7 @@ class User < ApplicationRecord
     end
 
     def name_errors
-      User.validators_on(:name).each do |validator|
-        validator.validate_each(self, :name, name)
-      end
-
+      UserNameValidator.new(attributes: [:name], skip_uniqueness: true).validate(self)
       errors
     end
 
