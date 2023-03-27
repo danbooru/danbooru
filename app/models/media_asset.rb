@@ -27,7 +27,7 @@ class MediaAsset < ApplicationRecord
   attribute :is_public
   attribute :pixel_hash, :md5
 
-  has_one :post, foreign_key: :md5, primary_key: :md5
+  has_one :post, foreign_key: :md5, primary_key: :md5, inverse_of: :media_asset
   has_one :media_metadata, dependent: :destroy
   has_many :upload_media_assets, dependent: :destroy
   has_many :uploads, through: :upload_media_assets

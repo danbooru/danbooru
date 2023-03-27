@@ -157,8 +157,8 @@ class PostsController < ApplicationController
       query: post_set.normalized_query.to_s,
       page: post_set.current_page,
       limit: post_set.per_page,
-      tag_count: post_set.post_query.tags.count,
-      metatag_count: post_set.post_query.metatags.count,
+      tag_count: post_set.post_query.tag_names.length,
+      metatag_count: post_set.post_query.metatags.length,
     })
   end
 
