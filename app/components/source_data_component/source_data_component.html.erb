@@ -43,13 +43,11 @@
             <% if @source.tags.empty? %>
               <em>None</em>
             <% else %>
-              <ul class="list-inline">
+              <div class="flex flex-wrap gap-1">
                 <% @source.tags.each do |tag, href| %>
-                  <li>
-                    <%= external_link_to href, tag, class: "source-data-tag chip-primary text-sm truncate" %>
-                  </li>
+                  <%= external_link_to href, tag, class: "source-data-tag chip-primary text-sm truncate" %>
                 <% end %>
-              </ul>
+              </div>
             <% end %>
           </td>
         </tr>
