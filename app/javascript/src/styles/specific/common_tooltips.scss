@@ -1,3 +1,7 @@
+div[data-tippy-root] {
+  display: inline-block;
+}
+
 div[data-tippy-root].tooltip-loading {
   visibility: hidden !important;
 }
