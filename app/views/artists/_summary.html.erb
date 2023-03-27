@@ -28,7 +28,7 @@
   <% end %>
 
   <% if artist.group_name.present? %>
-    <div>
+    <div class="mt-2">
       <strong>Group</strong>
       <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }), class: "artist-other-name chip-primary text-sm truncate" %>
     </div>
