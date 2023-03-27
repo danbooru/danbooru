@@ -15,25 +15,21 @@ article.forum-post {
     font-weight: bold;
   }
 
-  .vote-score-up {
+  .vote-score-up .upvote-icon {
     color: var(--forum-vote-up-color);
   }
 
-  .vote-score-meh {
+  .vote-score-meh .meh-icon {
     color: var(--forum-vote-meh-color);
   }
 
-  .vote-score-down {
+  .vote-score-down .downvote-icon {
     color: var(--forum-vote-down-color);
   }
 
   div.content {
     .edit_forum_post, .edit_forum_topic {
       display: none;
-    }
-
-    menu.votes {
-      margin: 0.5em 0;
     }
   }
 

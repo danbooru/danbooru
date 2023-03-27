@@ -83,9 +83,7 @@
       <% end %>
 
       <% if forum_post.bulk_update_request.present? %>
-        <menu class="votes" id="forum-post-votes-for-<%= forum_post.id %>">
-          <%= render "forum_post_votes/list", votes: forum_post.votes, forum_post: forum_post %>
-        </menu>
+        <%= render "forum_post_votes/list", votes: forum_post.votes, forum_post: forum_post %>
       <% end %>
     </menu>
 

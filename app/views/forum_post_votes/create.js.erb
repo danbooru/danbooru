@@ -3,5 +3,5 @@
 <% else %>
   Danbooru.notice("Voted");
   var code = <%= raw render(partial: "forum_post_votes/list", locals: {forum_post: @forum_post_vote.forum_post, votes: @forum_post_vote.forum_post.votes }).to_json %>;
-  $("#forum-post-votes-for-<%= @forum_post_vote.forum_post.id %>").html(code);
+  $("#forum-post-votes-for-<%= @forum_post_vote.forum_post.id %>").replaceWith(code);
 <% end %>

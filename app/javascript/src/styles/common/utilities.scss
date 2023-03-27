@@ -334,11 +334,39 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   @extend %rounded-lg;
 }
 
-.chip-primary, .chip-blue {
-  padding: 0.25rem;
+%chip {
+  padding: 0.125rem 0.25rem;
   border-radius: 0.25rem;
   border-width: 1px;
-  background-color: var(--chip-background-color);
+}
+
+.chip-primary {
+  @extend %chip;
+  background-color: var(--chip-primary-background-color);
+}
+
+.chip-red {
+  @extend %chip;
+  background-color: var(--chip-red-background-color);
+  border-color: var(--chip-red-border-color);
+}
+
+.chip-green {
+  @extend %chip;
+  background-color: var(--chip-green-background-color);
+  border-color: var(--chip-green-border-color);
+}
+
+.chip-blue {
+  @extend %chip;
+  background-color: var(--chip-blue-background-color);
+  border-color: var(--chip-blue-border-color);
+}
+
+.chip-yellow {
+  @extend %chip;
+  background-color: var(--chip-yellow-background-color);
+  border-color: var(--chip-yellow-border-color);
 }
 
 .thin-scrollbar, %thin-scrollbar {

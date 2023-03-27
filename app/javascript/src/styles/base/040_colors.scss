@@ -131,7 +131,16 @@ html, body[data-current-user-theme="light"] {
   --subnav-menu-background-color: var(--blue-0);
   --responsive-menu-background-color: var(--blue-1);
   --card-background-color: var(--body-background-color);
-  --chip-background-color: var(--blue-0);
+
+  --chip-primary-background-color: var(--blue-0);
+  --chip-red-background-color: var(--red-0);
+  --chip-green-background-color: var(--green-0);
+  --chip-blue-background-color: var(--blue-0);
+  --chip-yellow-background-color: var(--yellow-0);
+  --chip-red-border-color: var(--red-2);
+  --chip-green-border-color: var(--green-2);
+  --chip-blue-border-color: var(--blue-2);
+  --chip-yellow-border-color: var(--yellow-2);
 
   --form-input-text-color: var(--text-color);
   --form-input-background: var(--body-background-color);
@@ -366,7 +375,16 @@ html, body[data-current-user-theme="light"] {
   --subnav-menu-background-color: var(--grey-8);
   --responsive-menu-background-color: var(--grey-8);
   --card-background-color: var(--grey-8);
-  --chip-background-color: var(--grey-8);
+
+  --chip-primary-background-color: var(--grey-8);
+  --chip-red-background-color: var(--red-8);
+  --chip-green-background-color: var(--green-8);
+  --chip-blue-background-color: var(--blue-8);
+  --chip-yellow-background-color: var(--yellow-8);
+  --chip-red-border-color: var(--red-6);
+  --chip-green-border-color: var(--green-6);
+  --chip-blue-border-color: var(--blue-6);
+  --chip-yellow-border-color: var(--yellow-6);
 
   --form-input-text-color: var(--grey-2);
   --form-input-background: var(--grey-7);
