@@ -943,26 +943,32 @@ class Post < ApplicationRecord
 
   concerning :SearchMethods do
     class_methods do
-      # Return a set of up to N random posts. May return less if there aren't
-      # enough posts.
+      # Return a set of up to N random posts. May return less if it can't find enough posts.
       #
-      # @param n [Integer] The maximum number of posts to return
-      # @return [ActiveRecord::Relation<Post>]
-      def random(n = 1)
-        posts = n.times.map do
-          key = SecureRandom.hex(16)
-          random_up(key) || random_down(key)
-        end.compact.uniq
+      # Works by generating N random MD5s and picking the closest post below each MD5 (or above it if there aren't any
+      # posts below it). For small searches, this procedure is noticeably biased. It may return less than N posts and
+      # some posts may be more likely to be returned than others. This is because MD5s aren't evenly distributed for
+      # small searches.
+      #
+      # @param limit [Integer] The maximum number of posts to return.
+      # @return [ActiveRecord::Relation<Post>] The set of random posts.
+      def random(limit = 1)
+        random_md5s = <<~SQL
+          WITH RECURSIVE random_md5s (n, r, md5) AS (
+              SELECT 0, random(), NULL::text
+            UNION ALL
+              SELECT
+                n+1,
+                r+1,
+                (((#{reselect(:md5).where("posts.md5 < md5((n + r)::text)").reorder(md5: :desc).limit(1).to_sql}) UNION ALL
+                  (#{reselect(:md5).where("posts.md5 >= md5((n + r)::text)").reorder(md5: :asc).limit(1).to_sql})) LIMIT 1)
+              FROM random_md5s
+              WHERE n+1 < #{limit + 1}
+          )
+          SELECT DISTINCT md5 FROM random_md5s
+        SQL
 
-        reorder(nil).in_order_of(:id, posts.map(&:id))
-      end
-
-      def random_up(key)
-        where("posts.md5 < ?", key).reorder(md5: :desc).first
-      end
-
-      def random_down(key)
-        where("posts.md5 >= ?", key).reorder(md5: :asc).first
+        where("posts.md5 IN (#{random_md5s})").reorder("random()")
       end
 
       def sample(query, sample_size)
