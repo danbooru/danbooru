@@ -28,7 +28,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       should "render existing votes" do
         get_auth forum_topic_path(@forum_topic), @mod
         assert_response :success
-        assert_select "li.vote-score-up"
+        assert_select ".vote-score-up"
       end
 
       context "after the BUR is rejected" do
@@ -45,7 +45,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "still render existing votes" do
-          assert_select "li.vote-score-up"
+          assert_select ".vote-score-up"
           assert_response :success
         end
       end
