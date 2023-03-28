@@ -19,6 +19,22 @@ module Sources
         )
       end
 
+      context "A `imgur.com/$file.$ext` URL" do
+        strategy_should_work(
+          "https://imgur.com/AOeREEF.png",
+          image_urls: %w[
+            https://i.imgur.com/AOeREEF.png
+          ],
+          page_url: "https://imgur.com/AOeREEF",
+          profile_url: nil,
+          artist_name: nil,
+          artist_commentary_title: "",
+          dtext_artist_commentary_desc: "Karl franz.",
+          tags: [],
+          download_size: 1_360_409,
+        )
+      end
+
       context "A 7-character sample image URL" do
         strategy_should_work(
           "https://i.imgur.com/AOeREEFl.png",
@@ -148,6 +164,7 @@ module Sources
       should "Parse Imgur URLs correctly" do
         assert(Source::URL.image_url?("https://i.imgur.com/c7EXjJu.jpeg"))
         assert(Source::URL.image_url?("https://i.imgur.io/c7EXjJu.jpeg"))
+        assert(Source::URL.image_url?("https://imgur.com/c7EXjJu.jpeg"))
         assert(Source::URL.image_url?("https://imgur.com/download/c7EXjJu/"))
 
         assert(Source::URL.page_url?("https://imgur.com/c7EXjJu"))
@@ -161,6 +178,7 @@ module Sources
         assert_equal("c7EXjJu", Source::URL.parse("https://i.imgur.com/c7EXjJu.jpeg").image_id)
         assert_equal("c7EXjJu", Source::URL.parse("https://i.imgur.com/c7EXjJum.jpeg").image_id)
         assert_equal("c7EXjJu", Source::URL.parse("https://i.imgur.com/c7EXjJu_d.jpeg").image_id)
+        assert_equal("c7EXjJu", Source::URL.parse("https://imgur.com/c7EXjJu.jpeg").image_id)
 
         assert_equal("kJ2FL", Source::URL.parse("https://i.imgur.com/kJ2FL.jpeg").image_id)
         assert_equal("kJ2FL", Source::URL.parse("https://i.imgur.com/kJ2FLm.jpeg").image_id)
