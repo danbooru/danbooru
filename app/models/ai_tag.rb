@@ -60,7 +60,7 @@ class AITag < ApplicationRecord
     if media_asset.post.nil?
       false
     elsif tag.name =~ /\Arating:(.)\z/
-      media_asset.post.rating == $1
+      media_asset.post.rating == $1.first
     else
       media_asset.post.has_tag?(tag.name)
     end
