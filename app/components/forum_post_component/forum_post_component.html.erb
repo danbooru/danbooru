@@ -15,19 +15,19 @@
     </div>
     <%= render "application/update_notice", record: forum_post %>
 
-    <menu class="mt-2">
+    <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
       <% if policy(forum_post).reply? %>
         <% if current_user.is_anonymous? %>
-          <li><%= link_to "Reply", login_path(url: request.fullpath) %></li>
+          <%= link_to "Reply", login_path(url: request.fullpath) %>
         <% else %>
-          <li><%= link_to "Reply", new_forum_post_path(post_id: forum_post.id), method: :get, remote: true %></li>
+          <%= link_to "Reply", new_forum_post_path(post_id: forum_post.id), method: :get, remote: true %>
         <% end %>
       <% end %>
 
       <% if reported? %>
-        <li class="moderation-report-notice">
+        <span class="moderation-report-notice">
           Reported (<%= link_to pluralize(forum_post.pending_moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "ForumPost", model_id: forum_post.id, status: "pending" }) %>)
-        </li>
+        </span>
       <% end %>
 
       <%= render PopupMenuComponent.new do |menu| %>

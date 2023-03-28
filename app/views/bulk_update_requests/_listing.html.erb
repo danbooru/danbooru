@@ -32,8 +32,7 @@
     <div><%= time_ago_in_words_tagged(request.created_at) %></div>
   <% end %>
   <% t.column column: "control" do |request| %>
-    <%= link_to "Show", bulk_update_request_path(request) %> |
-    <%= render "bulk_update_requests/bur_edit_links", bur: request %>
+    <%= link_to "View", request, class: "button-primary button-sm" %>
   <% end %>
 <% end %>
 

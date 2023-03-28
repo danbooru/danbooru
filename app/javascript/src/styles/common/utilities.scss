@@ -244,6 +244,16 @@ $spacer: 0.25rem; /* 4px */
 .gap-3 { gap: 3 * $spacer; }
 .gap-4 { gap: 4 * $spacer; }
 
+.gap-x-1 { column-gap: 1 * $spacer; }
+.gap-x-2 { column-gap: 2 * $spacer; }
+.gap-x-3 { column-gap: 3 * $spacer; }
+.gap-x-4 { column-gap: 4 * $spacer; }
+
+.gap-y-1 { row-gap: 1 * $spacer; }
+.gap-y-2 { row-gap: 2 * $spacer; }
+.gap-y-3 { row-gap: 3 * $spacer; }
+.gap-y-4 { row-gap: 4 * $spacer; }
+
 .divide-y-1 > * + * { border-top: 1px solid var(--divider-border-color); }
 
 .align-top { vertical-align: top; }
@@ -508,4 +518,5 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
 
 @media screen and (max-width: 660px) {
   .sm\:text-center { text-align: center; }
+  .sm\:items-center { align-items: center; }
 }
