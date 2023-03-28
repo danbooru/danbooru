@@ -3,26 +3,28 @@
 # forum_post
 %>
 
-<div class="forum-post-votes mt-2 flex flex-wrap gap-2" id="forum-post-votes-for-<%= forum_post.id %>">
-  <% vote_by_current_user = votes.find { |vote| vote.creator == CurrentUser.user } %>
+<% if policy(forum_post).votable? || forum_post.votes.present? %>
+  <span class="forum-post-votes inline-flex flex-wrap gap-2" id="forum-post-votes-for-<%= forum_post.id %>">
+    <% vote_by_current_user = votes.find { |vote| vote.creator == CurrentUser.user } %>
 
-  <% if policy(forum_post).votable? && !vote_by_current_user.present? %>
-    <span class="vote-buttons chip-primary flex items-center gap-1">
-      <%= link_to upvote_icon, forum_post_votes_path(forum_post_id: forum_post.id, format: "js"), remote: true, method: :post, data: { params: "forum_post_vote[score]=1" }, title: "Vote up" %>
-      <%= link_to meh_icon, forum_post_votes_path(forum_post_id: forum_post.id, format: "js"), remote: true, method: :post, data: { params: "forum_post_vote[score]=0" }, title: "Vote meh" %>
-      <%= link_to downvote_icon, forum_post_votes_path(forum_post_id: forum_post.id, format: "js"), remote: true, method: :post, data: { params: "forum_post_vote[score]=-1" }, title: "Vote down" %>
-    </span>
-  <% end %>
+    <% if policy(forum_post).votable? && !vote_by_current_user.present? %>
+      <span class="vote-buttons chip-primary flex items-center gap-1">
+        <%= link_to upvote_icon, forum_post_votes_path(forum_post_id: forum_post.id, format: "js"), remote: true, method: :post, data: { params: "forum_post_vote[score]=1" }, title: "Vote up" %>
+        <%= link_to meh_icon, forum_post_votes_path(forum_post_id: forum_post.id, format: "js"), remote: true, method: :post, data: { params: "forum_post_vote[score]=0" }, title: "Vote meh" %>
+        <%= link_to downvote_icon, forum_post_votes_path(forum_post_id: forum_post.id, format: "js"), remote: true, method: :post, data: { params: "forum_post_vote[score]=-1" }, title: "Vote down" %>
+      </span>
+    <% end %>
 
-  <% votes.sort_by { |fpv| [fpv.creator == CurrentUser.user ? 0 : 1, -fpv.score, fpv.id] }.each do |vote| %>
-    <span class="vote-score-<%= vote.vote_type %> truncate flex items-center gap-1 chip-<%= vote.score == 1 ? "green" : vote.score == 0 ? "yellow" : "red" %>">
-      <% if policy(forum_post).votable? && vote.creator_id == CurrentUser.id %>
-        <%= link_to forum_post_vote_icon(vote), forum_post_vote_path(vote, format: "js"), remote: true, method: :delete %>
-        <%= link_to_user vote.creator %>
-      <% else %>
-        <%= forum_post_vote_icon(vote) %>
-        <%= link_to_user vote.creator %>
-      <% end %>
-    </span>
-  <% end %>
-</div>
+    <% votes.sort_by { |fpv| [fpv.creator == CurrentUser.user ? 0 : 1, -fpv.score, fpv.id] }.each do |vote| %>
+      <span class="vote-score-<%= vote.vote_type %> truncate flex items-center gap-1 chip-<%= vote.score == 1 ? "green" : vote.score == 0 ? "yellow" : "red" %>">
+        <% if policy(forum_post).votable? && vote.creator_id == CurrentUser.id %>
+          <%= link_to forum_post_vote_icon(vote), forum_post_vote_path(vote, format: "js"), remote: true, method: :delete %>
+          <%= link_to_user vote.creator %>
+        <% else %>
+          <%= forum_post_vote_icon(vote) %>
+          <%= link_to_user vote.creator %>
+        <% end %>
+      </span>
+    <% end %>
+  </span>
+<% end %>

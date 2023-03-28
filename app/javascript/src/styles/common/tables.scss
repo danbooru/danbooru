@@ -49,10 +49,6 @@ table.autofit {
 }
 
 table.search, table.aligned-vertical {
-  tr {
-    height: 2em;
-  }
-
   th {
     text-align: right;
     padding-right: 1em;
@@ -67,6 +63,10 @@ table.search, table.aligned-vertical {
 
 table.aligned-vertical {
   height: 1.75em;
+}
+
+table.table-xs {
+  th, td { padding: 0.125rem 0.25rem; }
 }
 
 table.table-sm {
