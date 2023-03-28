@@ -23,9 +23,10 @@ class Source::URL::Imgur < Source::URL
     # https://i.imgur.com/c7EXjJut.jpeg (sample)
     # https://i.imgur.com/Kp9TdlX.gifv (.mp4 embedded in html page)
     # https://i.imgur.com/Kp9TdlX.mp4 (sample; original image is .gif)
-    in "i", _, _
+    # https://imgur.com/TWGnhx6.png
+    in _, _, /^[a-zA-Z0-9_]+\.(jpeg|jpg|png|gif|gifv|webp|avif|webm|mp4)$/i => file
       # Imgur IDs are 5 characters or 7 characters; if it has 6 or 8, then the last character indicates the sample image type.
-      @image_id = filename[/([[:alnum:]]{7}|[[:alnum:]]{5})/, 1]
+      @image_id = filename[/^([[:alnum:]]{7}|[[:alnum:]]{5})/, 1]
       @image = true
 
     # https://imgur.com/download/c7EXjJu/
@@ -37,7 +38,7 @@ class Source::URL::Imgur < Source::URL
     # https://imgur.com/c7EXjJu
     # https://imgur.io/c7EXjJu
     # https://m.imgur.com/c7EXjJu
-    in _, _, image_id
+    in _, _, /^[a-zA-Z0-9]+$/ => image_id
       @image_id = image_id
 
     # https://imgur.com/gallery/0BDNq
