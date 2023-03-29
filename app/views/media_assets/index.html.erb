@@ -18,7 +18,7 @@
         <% end %>
       <% end %>
 
-      <%= f.input :order, collection: [%w[Newest id], %w[Oldest id_asc]], include_blank: true, selected: params[:search][:order] %>
+      <%= f.input :order, collection: [%w[Newest id], %w[Oldest id_asc], %w[Random random]], include_blank: true, selected: params[:search][:order] %>
       <%= f.submit "Search" %>
     <% end %>
 
