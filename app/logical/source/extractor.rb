@@ -66,6 +66,7 @@ module Source
       Source::Extractor::Zerochan,
       Source::Extractor::Poipiku,
       Source::Extractor::Pixai,
+      Source::Extractor::ArtStreet,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
