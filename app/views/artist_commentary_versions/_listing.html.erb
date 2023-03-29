@@ -15,7 +15,7 @@
         <%= link_to "#{commentary_version.post_id}.#{commentary_version.id}&nbsp;»".html_safe, artist_commentary_versions_path(search: {post_id: commentary_version.post_id}, anchor: "artist-commentary-version-#{commentary_version.id}") %>
       <% end %>
     <% end %>
-    <% t.column "Original", width: "40%", td: { class: "diff-body align-top mt-2" } do |commentary_version| %>
+    <% t.column "Original", width: "40%", td: { class: "diff-body break-words" } do |commentary_version| %>
       <% if !commentary_version.unchanged_empty?(:original_title) %>
         <p class="commentary-body-section font-bold">
           <%= commentary_version_field_diff(commentary_version, params[:type], :original_title) %>
@@ -27,7 +27,7 @@
         </p>
       <% end %>
     <% end %>
-    <% t.column "Translated", width: "40%", td: { class: "diff-body align-top mt-4" } do |commentary_version| %>
+    <% t.column "Translated", width: "40%", td: { class: "diff-body break-words" } do |commentary_version| %>
       <% if !commentary_version.unchanged_empty?(:translated_title) %>
         <p class="commentary-body-section font-bold">
           <%= commentary_version_field_diff(commentary_version, params[:type], :translated_title) %>
