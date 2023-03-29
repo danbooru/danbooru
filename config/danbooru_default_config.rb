@@ -465,6 +465,13 @@ module Danbooru
     def furaffinity_cookie_b
     end
 
+    # Your ArtStreet (medibang.com) "MSID" cookie. Needed to view R-18 works.
+    #
+    # After you create an account, go to https://medibang.com/myProfile/myProfileModifyForm/ to set your age to 18+,
+    # then enable mature content. After you login, use the devtools to find the "MSID" cookie.
+    def art_street_session_cookie
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch

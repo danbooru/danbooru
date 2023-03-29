@@ -44,6 +44,7 @@ class Source::URL::ArtStreet < Source::URL
       @author_id = author_id.to_i
 
     # https://medibang.com/author/8769655/ (redirects to https://medibang.com/u/16672238/)
+    # https://medibang.com/author/272687/activities/?type=2
     in _, "medibang.com", "author", author_id, *rest
       @author_id = author_id
 

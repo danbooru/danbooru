@@ -27,16 +27,17 @@ class Source::Extractor
     end
 
     def profile_url
-      user_url
+      author_url
     end
 
     def profile_urls
-      [author_url, user_url]
+      [author_url, user_url].compact_blank.uniq
     end
 
     def user_url
-      # https://medibang.com/u/16672238/
-      author_page&.at("a.contentsTab[data-tgt=0]")&.attr("href")
+      # https://medibang.com/u/16672238/ or https://medibang.com/author/749476/
+      url = author_page&.at("a.contentsTab[data-tgt=0]")&.attr("href")
+      return url if Source::URL.parse(url)&.user_id.present?
     end
 
     def author_url
@@ -49,11 +50,11 @@ class Source::Extractor
     end
 
     def other_names
-      [artist_name]
+      [artist_name].compact_blank
     end
 
     def tags
-      page&.css(".cmn-tag .tag, #js-tag-view-area .keyword a").to_a.map do |tag|
+      page&.css(".cmn-tag a.tag[href^='https://'], #js-tag-view-area .keyword a").to_a.map do |tag|
         [tag.text.strip, tag.attr("href")]
       end
     end
@@ -63,7 +64,7 @@ class Source::Extractor
     end
 
     def artist_commentary_desc
-      page&.at(".pictureDetails__summaryOriginal, #originInfo, .summary-txt:not(#truncInfo)").inner_html.strip
+      page&.at(".pictureDetails__summaryOriginal, #originInfo, .summary-txt:not(#truncInfo)")&.inner_html&.strip
     end
 
     def dtext_artist_commentary_desc
@@ -81,7 +82,7 @@ class Source::Extractor
     memoize def book_api_response
       return {} if book_api_url.blank?
 
-      response = http.get(book_api_url)
+      response = http.cache(1.minute).get(book_api_url)
       return {} if response.code != 200
 
       response.parse
@@ -90,7 +91,7 @@ class Source::Extractor
     memoize def page
       return nil if page_url.blank?
 
-      response = http.get(page_url)
+      response = http.cache(1.minute).get(page_url)
       return nil if response.code != 200
 
       response.parse
@@ -99,10 +100,14 @@ class Source::Extractor
     memoize def author_page
       return nil if author_url.blank?
 
-      response = http.get(author_url)
+      response = http.cache(1.minute).get(author_url)
       return nil if response.code != 200
 
       response.parse
+    end
+
+    def http
+      super.cookies(MSID: Danbooru.config.art_street_session_cookie)
     end
   end
 end

@@ -11,7 +11,7 @@ module Sources
             https://dthezntil550i.cloudfront.net/4b/latest/4b2112261505098280008769655/d5b22a94-4864-45d5-96e7-cbca9e0043f4.png
             https://dthezntil550i.cloudfront.net/4b/latest/4b2112261505098280008769655/9a500170-4995-446e-8c9d-eb69fa325485.png
           ],
-          profile_url: "https://medibang.com/u/16672238/",
+          profile_url: "https://medibang.com/author/8769655/",
           profile_urls: %w[
             https://medibang.com/u/16672238/
             https://medibang.com/author/8769655/
@@ -33,7 +33,7 @@ module Sources
             https://dthezntil550i.cloudfront.net/4b/latest/4b2112261505098280008769655/d5b22a94-4864-45d5-96e7-cbca9e0043f4.png
           ],
           download_size: 6_650_948,
-          profile_url: "https://medibang.com/u/16672238/",
+          profile_url: "https://medibang.com/author/8769655/",
           profile_urls: %w[
             https://medibang.com/u/16672238/
             https://medibang.com/author/8769655/
@@ -54,7 +54,7 @@ module Sources
           image_urls: %w[
             https://dqmk835cy5zzx.cloudfront.net/f7/current/f72107281839259430002176282/798080e1-1361-49c0-84aa-06518bdf1a22.jpg?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9kcW1rODM1Y3k1enp4LmNsb3VkZnJvbnQubmV0L2Y3L2N1cnJlbnQvZjcyMTA3MjgxODM5MjU5NDMwMDAyMTc2MjgyLyoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE2ODAxMTU0NTR9fX1dfQ__&Signature=cmqcwnTqKcMtc1-8kRVGsGiDQzQPjeNuEvzhHjiUt7WLJ8DKzUAHvQQwMjh4hBdFFUk19oTM3zGV0qfOffnqRP9EMhXjMxxHG1IngryfdnPfbyHyEIRg~lpW3LNjv-ZKBx8EYDIO1P-1XT2Xi6YZwphv7SIZrhmSyT2TOfXiayJhqWeIBs6MF2UMuDwn2KxRroRNsf09v3jtKQdx1YQzNzIhQWDmInxF7ml2HyxDOCNxKHJkCpzI7H2x7M-s-AZDoj-~x7LfJDpNwOK~TdGrmjBz8BCNgU3q9vrj-iOos4PwnY8awimIVDaXuf~UaHAyWueP2IgB6z4QrQDQ8m1dBw__&Key-Pair-Id=APKAI322DZTKDWD5CY2Q
           ],
-          profile_url: "https://medibang.com/u/littlegfu3/",
+          profile_url: "https://medibang.com/author/2176282/",
           profile_urls: %w[
             https://medibang.com/u/littlegfu3/
             https://medibang.com/author/2176282/
@@ -106,7 +106,7 @@ module Sources
             %r{https://dqmk835cy5zzx\.cloudfront\.net/f7/current/f72107281839259430002176282/ea4d5a66-d1fd-4b88-9886-aee202e825a4\.jpg},
             %r{https://dqmk835cy5zzx\.cloudfront\.net/f7/current/f72107281839259430002176282/5fbdec9e-5b17-469d-9c37-6f39e19524c1\.jpg},
           ],
-          profile_url: "https://medibang.com/u/littlegfu3/",
+          profile_url: "https://medibang.com/author/2176282/",
           profile_urls: %w[
             https://medibang.com/u/littlegfu3/
             https://medibang.com/author/2176282/
@@ -134,6 +134,64 @@ module Sources
         )
       end
 
+      context "A picture page url for an artist without a /u/:id profile" do
+        strategy_should_work(
+          "https://medibang.com/picture/0h1701050329209270000749476",
+          page_url: "https://medibang.com/picture/0h1701050329209270000749476/",
+          image_urls: %w[
+            https://dthezntil550i.cloudfront.net/0h/latest/0h1701050329209270000749476/a688c4d7-c448-4867-9c31-10c59c5a4007.jpg
+          ],
+          profile_url: "https://medibang.com/author/749476/",
+          profile_urls: %w[
+            https://medibang.com/author/749476/
+          ],
+          artist_name: "チッタ",
+          other_names: ["チッタ"],
+          tags: [],
+          artist_commentary_title: "空想に浸る",
+          dtext_artist_commentary_desc: "",
+        )
+      end
+
+      context "A R-18 page url" do
+        strategy_should_work(
+          "https://medibang.com/picture/ln1908221547595430010136798/",
+          page_url: "https://medibang.com/picture/ln1908221547595430010136798/",
+          image_urls: ["https://dthezntil550i.cloudfront.net/ln/latest/ln1908221547595430010136798/922ad884-b010-498c-a979-50e9a464fee3.png"],
+          download_size: 827_822,
+          profile_url: "https://medibang.com/author/10136798/",
+          profile_urls: %w[
+            https://medibang.com/author/10136798/
+            https://medibang.com/u/Sweetie/
+          ],
+          artist_name: "아시아꿈",
+          other_names: ["아시아꿈"],
+          tags: %w[R-18 furry hatsunemiku Ecchi anthro medibangpaint Butt Lewd],
+          artist_commentary_title: "하츠네 미쿠 (R-18)",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            Do not reprint to other website
+            다른 웹 사이트로 무단 전재 금지
+          EOS
+        )
+      end
+
+      context "A deleted page url" do
+        strategy_should_work(
+          "https://medibang.com/picture/i51604010226402270000329446/",
+          page_url: "https://medibang.com/picture/i51604010226402270000329446/",
+          image_urls: [],
+          profile_url: "https://medibang.com/author/329446/",
+          profile_urls: %w[
+            https://medibang.com/author/329446/
+          ],
+          artist_name: nil,
+          other_names: [],
+          tags: [],
+          artist_commentary_title: "",
+          dtext_artist_commentary_desc: "",
+        )
+      end
+
       should "Parse ArtStreet URLs correctly" do
         assert(Source::URL.image_url?("https://dthezntil550i.cloudfront.net/4b/latest/4b2112261505098280008769655/1280_960/d5b22a94-4864-45d5-96e7-cbca9e0043f4.png"))
         assert(Source::URL.image_url?("https://dthezntil550i.cloudfront.net/4b/latest/4b2112261505098280008769655/d5b22a94-4864-45d5-96e7-cbca9e0043f4.png"))
@@ -144,6 +202,7 @@ module Sources
         assert(Source::URL.page_url?("https://medibang.com/viewer/f72107281839259430002176282/"))
 
         assert(Source::URL.profile_url?("https://medibang.com/author/8769655"))
+        assert(Source::URL.profile_url?("https://medibang.com/author/749476/gallery/?cat=illust"))
         assert(Source::URL.profile_url?("https://medibang.com/u/16672238/"))
         assert(Source::URL.profile_url?("https://medibang.com/u/16672238/gallery/?cat=comic"))
         assert(Source::URL.profile_url?("https://medibang.com/u/littlegfu3/"))
