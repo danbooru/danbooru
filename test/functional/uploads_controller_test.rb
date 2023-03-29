@@ -612,6 +612,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://imgur.com/AOeREEF")
 
         should_upload_successfully("https://poipiku.com/583/2867587.html")
+
+        should_upload_successfully("https://medibang.com/picture/4b2112261505098280008769655/")
       end
     end
   end
