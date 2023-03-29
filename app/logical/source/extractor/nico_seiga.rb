@@ -14,24 +14,27 @@ module Source
 
       def image_urls
         if image_id.present?
-          [image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}")]
+          [image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}") || url]
         elsif illust_id.present?
-          [image_url_for("https://seiga.nicovideo.jp/image/source/#{illust_id}")]
-        elsif manga_id.present? && api_client.image_ids.present?
-          api_client.image_ids.map { |id| image_url_for("https://seiga.nicovideo.jp/image/source/#{id}") }
+          [image_url_for("https://seiga.nicovideo.jp/image/source/#{illust_id}") || url]
+        elsif manga_id.present?
+          api_client.manga_api_response.pluck("meta").pluck("source_url").map do |url|
+            image_id = Source::URL.parse(url).image_id
+            image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}") || url
+          end
         else
-          [image_url_for(url)]
+          [image_url_for(url) || url]
         end
       end
 
       def image_url_for(url)
-        return url if api_client.blank?
+        return nil if api_client.blank?
 
         resp = api_client.head(url)
         if resp.uri.to_s =~ %r{https?://.+/(\w+/\d+/\d+)\z}i
           "https://lohas.nicoseiga.jp/priv/#{$1}"
         else
-          url
+          nil
         end
       end
 

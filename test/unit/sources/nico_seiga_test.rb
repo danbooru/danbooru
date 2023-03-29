@@ -78,6 +78,27 @@ module Sources
       )
     end
 
+    context "A nicoseiga manga url with deliver.cdn.nicomanga.jp images" do
+      strategy_should_work(
+        "https://seiga.nicovideo.jp/watch/mg658198",
+        image_urls: %w[
+          https://deliver.cdn.nicomanga.jp/thumb/12773050p?1655391688
+          https://deliver.cdn.nicomanga.jp/thumb/12773051p?1655391688
+          https://deliver.cdn.nicomanga.jp/thumb/12773052p?1655391688
+          https://deliver.cdn.nicomanga.jp/thumb/12773053p?1655391688
+          https://deliver.cdn.nicomanga.jp/thumb/12773054p?1655391688
+          https://deliver.cdn.nicomanga.jp/thumb/12773055p?1655391688
+          https://deliver.cdn.nicomanga.jp/thumb/12773056p?1655391688
+        ],
+        page_url: "https://seiga.nicovideo.jp/watch/mg658198",
+        artist_name: "あろめみ",
+        profile_url: "https://seiga.nicovideo.jp/user/illust/123720050",
+        tags: %w[DIY 日常],
+        artist_commentary_title: "工作少女 Do It Yourself !!",
+        artist_commentary_desc: "作業中のひとにいきなり話しかけるのはやめましょう"
+      )
+    end
+
     context "A https://lohas.nicoseiga.jp/thumb/${id}i url" do
       strategy_should_work(
         "https://lohas.nicoseiga.jp/thumb/6844226i",
