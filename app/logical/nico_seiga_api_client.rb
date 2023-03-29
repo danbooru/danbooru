@@ -14,15 +14,6 @@ class NicoSeigaApiClient
     @http = http
   end
 
-  def image_ids
-    case @work_type
-    when "illust"
-      [api_response["id"]]
-    when "manga"
-      manga_api_response.map { |x| Source::URL.parse(x.dig("meta", "source_url"))&.image_id }.compact
-    end
-  end
-
   def title
     api_response["title"]
   end
