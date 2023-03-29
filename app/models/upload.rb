@@ -149,6 +149,8 @@ class Upload < ApplicationRecord
       q = q.order(id: :desc)
     when "id_asc"
       q = q.order(id: :asc)
+    when "random"
+      q = q.order("random()")
     else
       q = q.apply_default_order(params)
     end
