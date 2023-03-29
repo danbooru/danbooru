@@ -116,6 +116,7 @@ $spacer: 0.25rem; /* 4px */
 
 .m-auto { margin: auto; }
 .m-0    { margin: 0; }
+.\!m-0  { margin: 0 !important; }
 .m-px   { margin: 1px; }
 .m-0\.5 { margin: 0.5 * $spacer; }
 

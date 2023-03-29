@@ -126,19 +126,19 @@
 
               <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
 
-              <div class="mt-2">
+              <div class="mb-4">
                 <%= f.submit "Post", class: "button-primary button-sm" %>
 
                 <% if CurrentUser.is_contributor? %>
-                  <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block" }, input_html: { checked: post.is_pending? } %>
+                  <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block !m-0" }, input_html: { checked: post.is_pending? } %>
                 <% else %>
                   <span id="upload-limit" class="fineprint">Upload limit: <%= render "users/upload_limit", user: CurrentUser.user %></span>
                 <% end %>
-              </div>
 
-              <% if CurrentUser.post_upload_count < 10 %>
-                <p class="fineprint">Read the <%= link_to_wiki "upload rules", "help:upload_rules" %> before uploading.</p>
-              <% end %>
+                <% if CurrentUser.post_upload_count < 10 %>
+                  <p class="fineprint my-4">Read the <%= link_to_wiki "upload rules", "help:upload_rules" %> before uploading.</p>
+                <% end %>
+              </div>
 
               <%= render "related_tags/container", media_asset: media_asset %>
             </div>
