@@ -9,6 +9,8 @@
       <% unless @wiki_page.is_meta_wiki? %>
         <% if @wiki_page.tag.present? %>
           <li><%= link_to "Tag History", tag_versions_path(search: { tag_id: @wiki_page.tag&.id }) %></li>
+          <li><%= link_to "Mistagged posts", posts_path(tags: "#{tag.name} ai:#{tag.name},0%") %></li>
+          <li><%= link_to "Untagged posts", ai_tags_path(search: { tag_name: tag.name, post_tags_match: "-#{tag.name}", is_posted: true, order: "score_desc" }) %></li>
         <% end %>
 
         <li><%= link_to "Post History", post_versions_path(search: { changed_tags: @wiki_page.title }) %></li>
