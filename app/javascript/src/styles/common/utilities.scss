@@ -96,6 +96,7 @@ $spacer: 0.25rem; /* 4px */
 
 .border-b   { border-bottom-width: 1px; }
 .border-b-2 { border-bottom-width: 0.5 * $spacer; }
+.border-t   { border-top-width: 1px; }
 
 .border-current { border-color: currentcolor; }
 
@@ -162,6 +163,7 @@ $spacer: 0.25rem; /* 4px */
 
 .py-1 { padding-top: 1 * $spacer; padding-bottom: 1 * $spacer; }
 .py-2 { padding-top: 2 * $spacer; padding-bottom: 2 * $spacer; }
+.py-3 { padding-top: 3 * $spacer; padding-bottom: 3 * $spacer; }
 .py-4 { padding-top: 4 * $spacer; padding-bottom: 4 * $spacer; }
 .py-8 { padding-top: 8 * $spacer; padding-bottom: 8 * $spacer; }
 
@@ -261,6 +263,7 @@ $spacer: 0.25rem; /* 4px */
 .align-middle { vertical-align: middle; }
 .align-bottom { vertical-align: bottom; }
 
+.flex-0 { flex: 0 1 0%; }
 .flex-1 { flex: 1 1 0%; }
 .flex-auto { flex: 1 1 auto; }
 .flex-initial { flex: 0 1 auto; }
@@ -520,4 +523,9 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
 @media screen and (max-width: 660px) {
   .sm\:text-center { text-align: center; }
   .sm\:items-center { align-items: center; }
+
+  .sm\:flex-col { flex-direction: column; }
+
+  .sm\:order-1 { order: 1; }
+  .sm\:order-2 { order: 2; }
 }

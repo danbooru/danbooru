@@ -176,29 +176,27 @@
 
   <div id="tooltips"></div>
 
-  <footer id="page-footer" class="text-sm flex-initial mt-4">
+  <footer id="page-footer" class="text-sm text-center flex-initial mt-4 py-3 w-full border-t flex flex-wrap items-center justify-center gap-1">
     <%= link_to "Terms", terms_of_service_path %>
     / <%= link_to "Privacy", privacy_policy_path %>
     / <%= link_to "Upgrade", new_user_upgrade_path %>
     / <%= link_to "Contact", contact_path %>
     /
-    <span class="social-icons">
-      <% if Danbooru.config.source_code_url.present? %>
-        <%= link_to Danbooru.config.source_code_url, title: "Running commit: #{Rails.application.config.x.git_hash&.first(9)}", class: "social-icon" do %>
-          <%= github_icon %>
-        <% end %>
+    <% if Danbooru.config.source_code_url.present? %>
+      <%= link_to Danbooru.config.source_code_url, title: "Running commit: #{Rails.application.config.x.git_hash&.first(9)}", class: "social-icon" do %>
+        <%= github_icon(class: "h-4") %>
       <% end %>
-      <% if Danbooru.config.twitter_username.present? %>
-        <%= link_to "https://twitter.com/#{Danbooru.config.twitter_username}", class: "social-icon" do %>
-          <%= twitter_icon %>
-        <% end %>
+    <% end %>
+    <% if Danbooru.config.twitter_username.present? %>
+      <%= link_to "https://twitter.com/#{Danbooru.config.twitter_username}", class: "social-icon" do %>
+        <%= twitter_icon(class: "h-4") %>
       <% end %>
-      <% if Danbooru.config.discord_server_url.present? %>
-        <%= link_to Danbooru.config.discord_server_url, class: "social-icon" do %>
-          <%= discord_icon %>
-        <% end %>
+    <% end %>
+    <% if Danbooru.config.discord_server_url.present? %>
+      <%= link_to Danbooru.config.discord_server_url, class: "social-icon" do %>
+        <%= discord_icon(class: "h-4") %>
       <% end %>
-    </span>
+    <% end %>
   </footer>
 <% end %>
 </html>

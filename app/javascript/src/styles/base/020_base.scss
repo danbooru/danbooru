@@ -97,10 +97,6 @@ p {
   margin-bottom: 1em;
 }
 
-table tfoot {
-  margin-top: 2em;
-}
-
 details {
   summary {
     cursor: pointer;
@@ -125,15 +121,6 @@ a.link-plain {
 
 .fixed-width-container {
   max-width: 60rem;
-}
-
-.column-container {
-  display: flex;
-
-  .column-expand { flex: 1; }
-  .column-shrink { flex: 0; }
-
-  @media (max-width: 660px) { display: block; }
 }
 
 ul.list-bulleted {

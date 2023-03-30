@@ -12,25 +12,8 @@ div#page {
   }
 }
 
-footer#page-footer {
-  width: 100%;
-  text-align: center;
-  padding: 1em 0 1em;
-  border-top: 1px solid var(--footer-border-color);
-
-  .social-icon img {
-    vertical-align: bottom;
-    margin: 0 0.1em;
-    height: 16px;
-  }
-}
-
 .sidebar-container {
-  display: flex;
-
   #sidebar {
-    flex: 0;
-
     min-width: 230px;
 
     @media (min-width: 1080px) {
@@ -39,27 +22,6 @@ footer#page-footer {
 
     @media (min-width: 1920px) {
       min-width: 280px;
-    }
-
-    overflow-wrap: break-word;
-  }
-
-  #content {
-    flex: 1;
-    padding-left: 1em;
-    min-width: 0;
-  }
-
-  @media (max-width: 660px) {
-    flex-direction: column;
-
-    #content {
-      order: 1;
-      padding: 0;
-    }
-
-    #sidebar {
-      order: 2;
     }
   }
 }
