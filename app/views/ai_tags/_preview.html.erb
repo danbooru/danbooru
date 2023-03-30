@@ -2,6 +2,7 @@
   <% preview.footer do %>
     <div class="text-center text-xs leading-none px-2 w-full mt-2">
       <div class="truncate mb-2">
+        <%= link_to_wiki "?", t.name, class: tag_class(t) %>
         <%= link_to "#{ai_tag.tag.pretty_name}", ai_tags_path(search: search_params.merge(tag_name: ai_tag.tag.name)), class: "tag-type-#{ai_tag.tag.category}", "data-tag-name": ai_tag.tag.name, title: ai_tag.tag.pretty_name %>
         <br>
         <%= link_to "#{ai_tag.score}%", ai_tags_path(search: search_params.merge(tag_name: ai_tag.tag.name, score: ">=#{ai_tag.score}")), class: "tag-type-#{ai_tag.tag.category}", "data-tag-name": ai_tag.tag.name %>
