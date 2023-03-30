@@ -99,7 +99,14 @@
                   <%= link_to "AI-Generated", wiki_page_path("ai-generated"), class: "upload-ai-warning button-danger button-xs" %>
                 <% end %>
 
-                <a class="upload-duplicate-warning button-danger button-xs hidden" href="javascript:$('a.tab.similar-tab').get(0).click()">Duplicate</a>
+                <% duplicates = Post.joins(:media_asset).where("media_assets.pixel_hash": media_asset.pixel_hash).load %>
+                <% if duplicates.size == 1 %>
+                  <%= link_to "Pixel-Perfect Duplicate", duplicates.first, class: "upload-pixel-perfect-duplicate-warning button-danger button-xs" %>
+                <% elsif duplicates.size > 1 %>
+                  <a class="upload-duplicate-warning button-danger button-xs" href="javascript:$('a.tab.similar-tab').get(0).click()">Pixel-Perfect Duplicate</a>
+                <% else %>
+                  <a class="upload-duplicate-warning button-danger button-xs hidden" href="javascript:$('a.tab.similar-tab').get(0).click()">Duplicate</a>
+                <% end %>
               </div>
             </div>
           <% end %>
