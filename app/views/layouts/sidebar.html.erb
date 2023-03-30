@@ -7,12 +7,12 @@
         </section>
       <% end %>
 
-      <div class="sidebar-container">
-        <aside id="sidebar">
+      <div class="sidebar-container flex sm:flex-col gap-3">
+        <aside id="sidebar" class="flex-0 break-words sm:order-2">
           <%= yield :sidebar %>
         </aside>
 
-        <section id="content">
+        <section id="content" class="flex-1 min-w-0 sm:order-1">
           <%= yield :content %>
         </section>
       </div>
