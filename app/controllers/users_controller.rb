@@ -75,18 +75,15 @@ class UsersController < ApplicationController
     user_verifier.log! if user_verifier.requires_verification?
     UserEvent.build_from_request(@user, :user_creation, request)
 
-    if params[:user][:email].present?
-      @user.email_address = EmailAddress.new(address: params[:user][:email])
+    if params[:user][:email_address].present?
+      @user.email_address = EmailAddress.new(address: params[:user][:email_address])
     end
 
     if Danbooru.config.enable_recaptcha? && !verify_recaptcha(model: @user)
-      flash[:notice] = "Sign up failed"
-    elsif @user.email_address&.invalid?(:deliverable)
-      flash[:notice] = "Sign up failed: email address is invalid or doesn't exist"
-      @user.errors.add(:base, @user.email_address.errors.full_messages.join("; "))
-    elsif !@user.save
-      flash[:notice] = "Sign up failed: #{@user.errors.full_messages.join("; ")}"
-    else
+      @user.errors.add(:base, "Sign up failed")
+    elsif @user.email_address&.valid? && @user.email_address&.invalid?(:deliverable)
+      @user.errors.add(:email_address, "is invalid or can't receive mail")
+    elsif @user.save
       session[:user_id] = @user.id
       UserMailer.with_request(request).welcome_user(@user).deliver_later
       set_current_user

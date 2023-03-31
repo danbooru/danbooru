@@ -353,7 +353,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "create a user with a valid email" do
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "webmaster@danbooru.donmai.us" }}
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: "webmaster@danbooru.donmai.us" }}
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
@@ -368,7 +368,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not create a user with an invalid email" do
         assert_no_difference(["User.count", "EmailAddress.count"]) do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "test" }}
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: "test" }}
 
           assert_response :success
           assert_no_enqueued_emails
@@ -377,7 +377,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not create a user with an undeliverable email address" do
         assert_no_difference(["User.count", "EmailAddress.count"]) do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "nobody@nothing.donmai.us" } }
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: "nobody@nothing.donmai.us" } }
 
           assert_response :success
           assert_no_enqueued_emails

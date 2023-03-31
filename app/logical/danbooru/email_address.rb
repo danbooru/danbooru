@@ -12,7 +12,7 @@ module Danbooru
     class Error < StandardError; end
 
     # https://www.regular-expressions.info/email.html
-    EMAIL_REGEX = /\A[a-z0-9._+-]*[a-z0-9_+-]@(?:[a-z0-9][a-z0-9-]{0,61}\.)+[a-z]{2,}\z/i
+    EMAIL_REGEX = /^[a-zA-Z0-9._+-]*[a-zA-Z0-9_+-]@([a-zA-Z0-9][a-zA-Z0-9-]{0,61}\.)+[a-zA-Z]{2,}$/
 
     # Sites that ignore dots in email addresses, e.g. where `foo.bar@gmail.com` is the same as `foobar@gmail.com`.
     IGNORE_DOTS = %w[gmail.com]
