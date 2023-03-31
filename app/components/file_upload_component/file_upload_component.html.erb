@@ -1,8 +1,8 @@
 <div class="file-upload-component relative card w-md max-w-full" data-drop-target="<%= j drop_target %>" data-max-file-size="<%= j max_file_size %>" data-max-files-per-upload="<%= j max_files_per_upload %>">
-  <%= simple_form_for(Upload.new, url: uploads_path(format: :json), html: { class: "flex flex-col", autocomplete: "off" }, remote: true) do |f| %>
+  <%= simple_form_for(Upload.new, url: uploads_path(format: :json), html: { class: "flex flex-col !m-0", autocomplete: "off" }, remote: true) do |f| %>
     <%= f.input :files, as: :file, wrapper_html: { class: "hidden" }, input_html: { "multiple": max_files_per_upload > 1 }  %>
 
-    <div class="dropzone-container input text-center rounded-t-lg cursor-pointer p-4 max-h-360px thin-scrollbar">
+    <div class="dropzone-container relative input text-center rounded-t-lg cursor-pointer p-4 max-h-360px thin-scrollbar">
       <div class="dropzone-hint py-4">
         <div>Choose file or drag image here</div>
         <div class="hint">Max size: <%= number_to_human_size(Danbooru.config.max_file_size) %>.</div>
@@ -25,11 +25,11 @@
         <span class="dz-size" data-dz-size></span>
       </div>
 
-      <div class="dz-progress absolute w-full h-1">
+      <div class="dz-progress absolute bottom-0 left-0 w-full h-1">
         <div class="dz-upload h-1" data-dz-uploadprogress></div>
       </div>
 
-      <div class="hidden dz-error-message" data-dz-errormessage></div>
+      <div class="hidden dz-error-message block" data-dz-errormessage></div>
     </div>
   </template>
 </div>
