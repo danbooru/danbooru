@@ -6,7 +6,7 @@ class EmailAddress < ApplicationRecord
   attribute :address
   attribute :normalized_address
 
-  validates :address, presence: true, format: { message: "is invalid", with: Danbooru::EmailAddress::EMAIL_REGEX }
+  validates :address, presence: true, format: { message: "is invalid", with: Danbooru::EmailAddress::EMAIL_REGEX, multiline: true }
   validates :normalized_address, presence: true, uniqueness: true
   validates :user_id, uniqueness: true
   validate :validate_deliverable, on: :deliverable
@@ -55,7 +55,7 @@ class EmailAddress < ApplicationRecord
   end
 
   def validate_deliverable
-    if Danbooru::EmailAddress.new(address).undeliverable?(allow_smtp: Rails.env.production?)
+    if Danbooru::EmailAddress.parse(address)&.undeliverable?(allow_smtp: Rails.env.production?)
       errors.add(:address, "is invalid or does not exist")
     end
   end

@@ -7,6 +7,8 @@
 #
 # @see https://guides.rubyonrails.org/active_record_validations.html#custom-validators
 class UserNameValidator < ActiveModel::EachValidator
+  MIN_LENGTH = 1
+  MAX_LENGTH = 24
   ALLOWED_PUNCTUATION = "_.-" # All other punctuation characters are forbidden
 
   RESERVED_NAMES = [
@@ -22,10 +24,10 @@ class UserNameValidator < ActiveModel::EachValidator
 
     if !options[:skip_uniqueness] && User.without(current_user).find_by_name(name).present?
       rec.errors.add(attr, "already taken")
-    elsif name.length <= 1
-      rec.errors.add(attr, "must be more than 1 character long")
-    elsif name.length >= 25
-      rec.errors.add(attr, "must be less than 25 characters long")
+    elsif name.length <= MIN_LENGTH
+      rec.errors.add(attr, "must be more than #{MIN_LENGTH} character long")
+    elsif name.length > MAX_LENGTH
+      rec.errors.add(attr, "must be less than #{MAX_LENGTH + 1} characters long")
     # \p{di} = default ignorable codepoints. Filters out Hangul filler characters (U+115F, U+1160, U+3164, U+FFA0)
     elsif name =~ /[[:space:]\p{di}]/
       rec.errors.add(attr, "can't contain whitespace")
