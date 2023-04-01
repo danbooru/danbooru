@@ -47,8 +47,12 @@
       <% end %>
     </p>
   <% elsif show_votes -%>
-    <div class="post-preview-score text-sm text-center mt-1">
+    <div class="post-preview-score text-sm text-center mt-1 hidden">
       <%= render_post_votes post, current_user: current_user %>
+    </div>
+
+    <div class="post-reactions flex flex-wrap justify-center my-2">
+      <%= render ReactionComponent.new(model: post, current_user: current_user) %>
     </div>
   <% end -%>
 

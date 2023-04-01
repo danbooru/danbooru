@@ -37,6 +37,10 @@ class ForumPostPolicy < ApplicationPolicy
     unbanned? && show? && record.creator_id != user.id && !record.creator.is_moderator? && record.created_at.after?(1.year.ago)
   end
 
+  def reactable?
+    unbanned?
+  end
+
   def show_deleted?
     !record.is_deleted? || user.is_moderator?
   end

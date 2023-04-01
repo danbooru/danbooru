@@ -6,8 +6,8 @@
   <% end %>
 
   <% @posts.includes(:media_asset, :uploader, :vote_by_current_user, comments: [:creator, :votes]).select(&:visible?).each do |post| %>
-    <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post, classes: "post md:flex gap-4").article_attrs do %>
-      <%= post_preview(post, show_deleted: true, show_votes: true, classes: "flex mx-auto") %>
+    <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post, classes: "post flex sm:flex-col gap-4").article_attrs do %>
+      <%= post_preview(post, show_deleted: true, show_votes: true, classes: "flex md:mx-auto !sm:w-full") %>
 
       <div class="flex-1">
         <%= render "comments/partials/index/header", post: post %>

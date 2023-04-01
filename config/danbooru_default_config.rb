@@ -753,6 +753,10 @@ module Danbooru
     # The forum topic linked to in the Winter Sale notice.
     def winter_sale_forum_topic_id
     end
+
+    def reactions
+      {}
+    end
   end
 
   EnvironmentConfiguration = Struct.new(:config) do

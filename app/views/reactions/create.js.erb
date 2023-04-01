@@ -1,0 +1,2 @@
+var html = "<%= j render(ReactionComponent.new(model: @reaction.model, current_user: CurrentUser.user)) %>";
+$("#reactions-for-<%= @reaction.model_type.parameterize %>-<%= @reaction.model_id %>").replaceWith(html);

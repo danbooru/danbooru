@@ -1726,6 +1726,41 @@ ALTER SEQUENCE public.rate_limits_id_seq OWNED BY public.rate_limits.id;
 
 
 --
+-- Name: reactions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.reactions (
+    id integer NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    creator_id integer NOT NULL,
+    reaction_id integer NOT NULL,
+    model_type character varying NOT NULL,
+    model_id integer NOT NULL
+);
+
+
+--
+-- Name: reactions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.reactions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: reactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.reactions_id_seq OWNED BY public.reactions.id;
+
+
+--
 -- Name: saved_searches; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2844,6 +2879,13 @@ ALTER TABLE ONLY public.rate_limits ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: reactions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.reactions ALTER COLUMN id SET DEFAULT nextval('public.reactions_id_seq'::regclass);
+
+
+--
 -- Name: saved_searches id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3305,6 +3347,14 @@ ALTER TABLE ONLY public.posts
 
 ALTER TABLE ONLY public.rate_limits
     ADD CONSTRAINT rate_limits_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reactions reactions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.reactions
+    ADD CONSTRAINT reactions_pkey PRIMARY KEY (id);
 
 
 --
@@ -5272,6 +5322,27 @@ CREATE UNIQUE INDEX index_rate_limits_on_key_and_action ON public.rate_limits US
 
 
 --
+-- Name: index_reactions_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_reactions_on_creator_id ON public.reactions USING btree (creator_id);
+
+
+--
+-- Name: index_reactions_on_model; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_reactions_on_model ON public.reactions USING btree (model_type, model_id);
+
+
+--
+-- Name: index_reactions_on_model_creator_reaction; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_reactions_on_model_creator_reaction ON public.reactions USING btree (model_type, model_id, creator_id, reaction_id);
+
+
+--
 -- Name: index_saved_searches_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6997,6 +7068,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230209060757'),
 ('20230222230650'),
 ('20230309014439'),
-('20230325143851');
+('20230325143851'),
+('20230401013159');
 
 

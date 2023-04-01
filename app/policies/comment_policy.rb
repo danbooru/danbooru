@@ -13,6 +13,10 @@ class CommentPolicy < ApplicationPolicy
     unbanned? && record.creator_id != user.id && !record.creator.is_moderator? && !record.is_deleted? && record.created_at.after?(1.year.ago)
   end
 
+  def reactable?
+    unbanned?
+  end
+
   def can_sticky_comment?
     user.is_moderator?
   end

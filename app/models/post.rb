@@ -72,6 +72,7 @@ class Post < ApplicationRecord
   has_many :ai_tags, through: :media_asset
   has_many :events, class_name: "PostEvent"
   has_many :mod_actions, as: :subject, dependent: :destroy
+  has_many :reactions, as: :model, dependent: :destroy, class_name: "Reaction"
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :post_edit
 

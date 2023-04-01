@@ -47,11 +47,11 @@
       <li id="post-info-source">Source: <%= post_source_tag(@post.source, @post.normalized_source) %></li>
       <li id="post-info-rating">Rating: <%= @post.pretty_rating %></li>
 
-      <li id="post-info-score">
+      <li id="post-info-score" class="hidden">
         Score: <%= render_post_votes @post, current_user: CurrentUser.user %>
       </li>
 
-      <li id="post-info-favorites">
+      <li id="post-info-favorites" class="hidden">
         Favorites:
         <%= tag.span class: "post-favcount", "data-id": @post.id do %>
           <%= link_to @post.fav_count, post_favorites_path(@post), rel: "nofollow" %>
@@ -306,16 +306,22 @@
   <% end -%>
 
   <% if policy(Favorite).create? %>
-    <%= content_tag(:div, class: "mb-2 fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
-      <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
-        <%= button_tag empty_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
-      <% end %>
+    <div class="fav-buttons-container hidden">
+      <%= content_tag(:div, class: "mb-2 fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
+        <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
+          <%= button_tag empty_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
+        <% end %>
 
-      <%= form_tag(favorite_path(@post.id), method: "delete", id: "remove-fav-button", "data-remote": true) do %>
-        <%= button_tag solid_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
+        <%= form_tag(favorite_path(@post.id), method: "delete", id: "remove-fav-button", "data-remote": true) do %>
+          <%= button_tag solid_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
+        <% end %>
       <% end %>
-    <% end %>
+    </div>
   <% end %>
+
+  <div class="post-reactions mb-2">
+    <%= render ReactionComponent.new(model: @post, current_user: CurrentUser.user) %>
+  </div>
 
   <section id="mark-as-translated-section">
     <%= edit_form_for(@post, url: mark_as_translated_post_path(@post), method: :put) do |f| %>
