@@ -13,10 +13,18 @@
         </div>
       <% end %>
     <% end %>
+  <% elsif current_user.is_anonymous? %>
+    <%= link_to add_reaction_icon(class: "h-4"), login_path(url: url_for(model)) %>
   <% end %>
 
   <% distinct_reactions.each do |(reaction_id, reactions)| %>
-    <% if !policy(model).reactable? %>
+    <% if current_user.is_anonymous? %>
+      <%= link_to login_path(url: url_for(model)) do %>
+        <span class="reaction-icon flex items-center gap-1 chip-primary border-current text-muted text-sm">
+          <%= reaction_icon(reaction_id) %> <%= tag.span reactions.size %>
+        </span>
+      <% end %>
+    <% elsif !policy(model).reactable? %>
       <span class="reaction-icon flex items-center gap-1 chip-primary border-current text-muted text-sm">
         <%= reaction_icon(reaction_id) %> <%= tag.span reactions.size %>
       </span>
