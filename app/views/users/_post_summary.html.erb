@@ -3,7 +3,7 @@
     <h2 class="recent-posts-header">
       <%= link_to "Uploads", posts_path(tags: "user:#{user.name}") %>
     </h2>
-    <%= render_post_gallery(presenter.uploads, tags: "user:#{user.name}", show_deleted: true) %>
+    <%= render_post_gallery(presenter.uploads, tags: "user:#{user.name}", show_deleted: true, show_votes: true) %>
   </div>
 <% end %>
 
@@ -12,6 +12,16 @@
     <h2 class="recent-posts-header">
       <%= link_to "Favorites", posts_path(tags: "ordfav:#{user.name}") %>
     </h2>
-    <%= render_post_gallery(presenter.favorites, tags: "ordfav:#{user.name}", show_deleted: true) %>
+    <%= render_post_gallery(presenter.favorites, tags: "ordfav:#{user.name}", show_deleted: true, show_votes: true) %>
+  </div>
+<% end %>
+
+<% if user.post_reactions.count > 0 %>
+  <div class="user-reactions recent-posts">
+    <h2 class="recent-posts-header">
+      <%= link_to "Reactions", posts_path(tags: "reacted:#{user.name}") %>
+    </h2>
+
+    <%= render_post_gallery(presenter.reactions, tags: "reacted:#{user.name}", show_deleted: true, show_votes: true) %>
   </div>
 <% end %>

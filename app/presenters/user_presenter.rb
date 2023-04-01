@@ -20,7 +20,11 @@ class UserPresenter
   end
 
   def uploads
-    PostQuery.new("user:#{user.name}", current_user: CurrentUser.user).posts_with_timeout(6, count: user.post_upload_count)
+    PostQuery.new("user:#{user.name}", current_user: CurrentUser.user).posts_with_timeout(6, count: user.post_upload_count, includes: [:reactions, :vote_by_current_user])
+  end
+
+  def reactions
+    PostQuery.new("reacted:#{user.name}", current_user: CurrentUser.user).posts_with_timeout(6, count: user.post_reactions.count, includes: [:reactions, :vote_by_current_user])
   end
 
   def has_uploads?
@@ -28,7 +32,7 @@ class UserPresenter
   end
 
   def favorites
-    PostQuery.new("ordfav:#{user.name}", current_user: CurrentUser.user).posts_with_timeout(6, count: user.favorite_count)
+    PostQuery.new("ordfav:#{user.name}", current_user: CurrentUser.user).posts_with_timeout(6, count: user.favorite_count, includes: [:reactions, :vote_by_current_user])
   end
 
   def has_favorites?
