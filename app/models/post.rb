@@ -1148,6 +1148,8 @@ class Post < ApplicationRecord
           favorites_include(value, current_user)
         when "ordfav"
           ordfav_matches(value, current_user)
+        when "reacted"
+          reacted_by(value)
         when "unaliased"
           tags_include(value)
         when "exif"
@@ -1415,6 +1417,16 @@ class Post < ApplicationRecord
 
         if user.present? && Pundit.policy!(current_user, user).can_see_favorites?
           joins(:favorites).merge(Favorite.where(user: user)).order("favorites.id DESC")
+        else
+          none
+        end
+      end
+
+      def reacted_by(username)
+        reactor = User.find_by_name(username)
+
+        if reactor.present?
+          where(id: reactor.post_reactions.select(:model_id))
         else
           none
         end

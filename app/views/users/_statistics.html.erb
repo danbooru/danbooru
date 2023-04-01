@@ -147,6 +147,13 @@
         </td>
       </tr>
 
+      <tr>
+        <th>Reactions</th>
+        <td>
+          <%= link_to user.post_reactions.count, posts_path(tags: "reacted:#{user.name}") %>
+        </td>
+      </tr>
+
       <% if CurrentUser.user == user || CurrentUser.user.is_admin? %>
         <tr>
           <th>Votes</th>

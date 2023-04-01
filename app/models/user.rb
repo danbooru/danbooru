@@ -125,6 +125,7 @@ class User < ApplicationRecord
   has_many :post_flags, foreign_key: :creator_id
   has_many :post_votes
   has_many :post_versions, foreign_key: :updater_id
+  has_many :post_reactions, -> { post }, class_name: "Reaction", foreign_key: :creator_id
   has_many :bans, -> {order("bans.id desc")}
   has_many :received_upgrades, class_name: "UserUpgrade", foreign_key: :recipient_id, dependent: :destroy
   has_many :purchased_upgrades, class_name: "UserUpgrade", foreign_key: :purchaser_id, dependent: :destroy
