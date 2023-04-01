@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Reaction < ApplicationRecord
-  MODEL_TYPES = %w[Post Comment ForumPost]
+  MODEL_TYPES = %w[Post Comment ForumPost User Tag Pool]
 
   REACTIONS = Danbooru.config.reactions
   REACTION_IDS = REACTIONS.keys

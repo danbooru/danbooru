@@ -17,6 +17,7 @@ class Pool < ApplicationRecord
   after_save :create_version
 
   has_many :mod_actions, as: :subject, dependent: :destroy
+  has_many :reactions, as: :model, dependent: :destroy
 
   deletable
   has_dtext_links :description

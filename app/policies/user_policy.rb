@@ -33,6 +33,10 @@ class UserPolicy < ApplicationPolicy
     !user.is_anonymous?
   end
 
+  def reactable?
+    unbanned?
+  end
+
   def can_see_last_logged_in_at?
     user.is_moderator?
   end

@@ -1,5 +1,5 @@
 <span class="inline-flex flex-wrap gap-1 justify-center items-center min-h-8" id="reactions-for-<%= model.class.name.parameterize %>-<%= model.id %>">
-  <% if policy(model).reactable? && distinct_reactions.size <= ReactionComponent::MAX_REACTIONS %>
+  <% if policy(model).try(:reactable?) && distinct_reactions.size <= ReactionComponent::MAX_REACTIONS %>
     <%= render PopupMenuComponent.new do |menu| %>
       <% menu.button do %>
         <%= add_reaction_icon(class: "h-4") %>

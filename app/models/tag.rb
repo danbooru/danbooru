@@ -16,6 +16,7 @@ class Tag < ApplicationRecord
   has_many :antecedent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "antecedent_name", :primary_key => "name"
   has_many :consequent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "consequent_name", :primary_key => "name"
   has_many :dtext_links, foreign_key: :link_target, primary_key: :name
+  has_many :reactions, as: :model, dependent: :destroy
   has_many :ai_tags
 
   validates :name, tag_name: true, uniqueness: true, on: :create
