@@ -152,7 +152,7 @@ module PostSets
 
     def includes
       if show_votes?
-        [:media_asset, :vote_by_current_user]
+        [:media_asset, :reactions, :vote_by_current_user]
       else
         [:media_asset]
       end

@@ -9,6 +9,7 @@ class ForumPost < ApplicationRecord
   belongs_to :topic, class_name: "ForumTopic", inverse_of: :forum_posts
 
   has_many :moderation_reports, as: :model
+  has_many :reactions, as: :model, dependent: :destroy, class_name: "Reaction"
   has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
   has_many :votes, class_name: "ForumPostVote"
   has_many :mod_actions, as: :subject, dependent: :destroy
