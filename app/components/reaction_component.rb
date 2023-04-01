@@ -14,7 +14,7 @@ class ReactionComponent < ApplicationComponent
   end
 
   memoize def distinct_reactions
-    model.reactions.group_by(&:reaction_id)
+    model.reactions.select { |reaction| reaction.reaction_id.in?(Reaction::REACTION_IDS) }.group_by(&:reaction_id)
   end
 
   def reaction_by_current_user(reaction_id)

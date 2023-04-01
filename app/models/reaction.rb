@@ -4,12 +4,14 @@ class Reaction < ApplicationRecord
   MODEL_TYPES = %w[Post Comment ForumPost]
 
   REACTIONS = Danbooru.config.reactions
+  REACTION_IDS = REACTIONS.keys
 
   belongs_to :model, polymorphic: true
   belongs_to :creator, class_name: "User"
 
   validates :creator, uniqueness: { scope: [:model_type, :model_id, :creator_id, :reaction_id], message: ->(reaction, data) { "already used this reaction." } }, on: :create
   validates :model_type, inclusion: { in: MODEL_TYPES }
+  validates :reaction_id, inclusion: { in: REACTION_IDS }
 
   scope :post, -> { where(model_type: "Post") }
   scope :comment, -> { where(model_type: "Comment") }
