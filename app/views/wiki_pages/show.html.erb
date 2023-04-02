@@ -10,23 +10,17 @@
 <%= render "sidebar" %>
 
 <% content_for(:content) do %>
-  <div class="flex flex-wrap items-center gap-x-2 mb-2">
-    <h1 id="wiki-page-title">
-      <%= link_to @wiki_page.pretty_title, posts_path(tags: @wiki_page.title), class: tag_class(@wiki_page.tag) %>
+  <h1 id="wiki-page-title">
+    <%= link_to @wiki_page.pretty_title, posts_path(tags: @wiki_page.title), class: tag_class(@wiki_page.tag) %>
 
-      <% if @wiki_page.is_locked? %>
-        (locked)
-      <% end %>
-
-      <% if @wiki_page.is_deleted? %>
-        (deleted)
-      <% end %>
-    </h1>
-
-    <% if @wiki_page.tag.present? %>
-      <%= render ReactionComponent.new(model: @wiki_page.tag, current_user: CurrentUser.user) %>
+    <% if @wiki_page.is_locked? %>
+      (locked)
     <% end %>
-  </div>
+
+    <% if @wiki_page.is_deleted? %>
+      (deleted)
+    <% end %>
+  </h1>
 
   <% if @wiki_page.other_names.present? %>
     <%= wiki_page_other_names_list(@wiki_page) %>

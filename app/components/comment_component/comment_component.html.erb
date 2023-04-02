@@ -43,9 +43,37 @@
 
     <%= render "application/update_notice", record: comment %>
 
-    <menu class="mt-2 flex flex-wrap items-center min-h-8 gap-4">
+    <menu class="mt-2">
+      <% if votable? %>
+        <li class="comment-votes">
+          <% if current_user.is_anonymous? %>
+            <%= link_to upvote_icon, login_path(url: request.fullpath), class: "comment-upvote-link inactive-link" %>
+          <% elsif upvoted? %>
+            <%= link_to upvote_icon, comment_vote_path(current_vote), class: "comment-upvote-link comment-unvote-link active-link", method: :delete, remote: true, "data-params": component_state.to_param %>
+          <% else %>
+            <%= link_to upvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "1"), class: "comment-upvote-link inactive-link", method: :post, remote: true, "data-params": component_state.to_param %>
+          <% end %>
+
+          <span class="comment-score inline-block text-center whitespace-nowrap align-middle min-w-4">
+            <% if policy(CommentVote).can_see_votes? %>
+              <%= link_to comment.score, comment_votes_path(search: { comment_id: comment.id }, variant: "compact"), class: "inactive-link" %>
+            <% else %>
+              <%= comment.score %>
+            <% end %>
+          </span>
+
+          <% if current_user.is_anonymous? %>
+            <%= link_to downvote_icon, login_path(url: request.fullpath), class: "comment-downvote-link inactive-link" %>
+          <% elsif downvoted? %>
+            <%= link_to downvote_icon, comment_vote_path(current_vote), class: "comment-downvote-link comment-unvote-link active-link", method: :delete, remote: true, "data-params": component_state.to_param %>
+          <% else %>
+            <%= link_to downvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "-1"), class: "comment-downvote-link inactive-link", method: :post, remote: true, "data-params": component_state.to_param %>
+          <% end %>
+        </li>
+      <% end %>
+
       <% if policy(comment).reply? %>
-        <li class="comment-reply !m-0">
+        <li class="comment-reply">
           <% if current_user.is_anonymous? %>
             <%= link_to "Reply", login_path(url: request.fullpath) %>
           <% elsif context == :index_by_comment %>
@@ -118,8 +146,6 @@
             <% end %>
           <% end %>
         <% end %>
-
-        <%= render ReactionComponent.new(model: comment, current_user: CurrentUser.user) %>
       <% end %>
     </menu>
 

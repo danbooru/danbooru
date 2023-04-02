@@ -57,10 +57,6 @@ class PostPolicy < ApplicationPolicy
     user.is_admin?
   end
 
-  def reactable?
-    unbanned?
-  end
-
   def visible?
     record.visible?(user)
   end

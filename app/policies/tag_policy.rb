@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class TagPolicy < ApplicationPolicy
-  def reactable?
-    unbanned?
-  end
-
   def can_change_category?
     user.is_admin? ||
       (user.is_builder? && record.post_count < 1_000) ||

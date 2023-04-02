@@ -6,16 +6,13 @@
 
 <div id="c-pools">
   <div id="a-show">
-    <div class="flex flex-wrap items-center gap-x-2 mb-2">
-      <h1>
-        <%= link_to @pool.pretty_name, posts_path(:tags => "pool:#{@pool.id}"), :class => "pool-category-#{@pool.category}" %>
-        <% if @pool.is_deleted? %>
-          <span class="inactive">(deleted)</span>
-        <% end %>
-      </h1>
-
-      <%= render ReactionComponent.new(model: @pool, current_user: CurrentUser.user) %>
-    </div>
+    <h1>
+      <%= @pool.pretty_category %>:
+      <%= link_to @pool.pretty_name, posts_path(:tags => "pool:#{@pool.id}"), :class => "pool-category-#{@pool.category}" %>
+      <% if @pool.is_deleted? %>
+        <span class="inactive">(deleted)</span>
+      <% end %>
+    </h1>
 
     <div id="description" class="prose mb-4">
       <%= format_text(@pool.description) %>

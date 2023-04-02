@@ -2,11 +2,11 @@
 
 class ReactionPolicy < ApplicationPolicy
   def create?
-    unbanned? && policy(record.model).try(:reactable?)
+    false
   end
 
   def destroy?
-    unbanned? && record.creator_id == user.id
+    false
   end
 
   def permitted_attributes

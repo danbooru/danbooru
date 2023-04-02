@@ -28,7 +28,7 @@
     <% end %>
 
     <div class="list-of-forum-posts list-of-messages">
-      <%= render ForumPostComponent.with_collection(@forum_posts.includes(:reactions), forum_topic: @forum_topic, current_user: CurrentUser.user) %>
+      <%= render ForumPostComponent.with_collection(@forum_posts, forum_topic: @forum_topic, current_user: CurrentUser.user) %>
     </div>
 
     <% if policy(ForumPost.new(topic: @forum_topic)).create? %>

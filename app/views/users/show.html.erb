@@ -3,10 +3,7 @@
 
 <div id="c-users">
   <div id="a-show">
-    <div class="flex flex-wrap items-center gap-x-2">
-      <h1><%= link_to_user @user %></h1>
-      <%= render ReactionComponent.new(model: @user, current_user: CurrentUser.user) %>
-    </div>
+    <h1><%= link_to_user @user %></h1>
 
     <%= render "statistics", presenter: @user.presenter, user: @user %>
 

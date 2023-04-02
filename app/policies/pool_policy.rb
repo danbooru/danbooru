@@ -21,10 +21,6 @@ class PoolPolicy < ApplicationPolicy
     update?
   end
 
-  def reactable?
-    unbanned?
-  end
-
   def permitted_attributes
     [:name, :description, :category, :post_ids, :post_ids_string, { post_ids: [] }]
   end

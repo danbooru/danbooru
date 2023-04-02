@@ -85,8 +85,6 @@
       <% if forum_post.bulk_update_request.present? %>
         <%= render "forum_post_votes/list", votes: forum_post.votes, forum_post: forum_post %>
       <% end %>
-
-      <%= render ReactionComponent.new(model: forum_post, current_user: current_user) %>
     </div>
 
     <% if policy(forum_post).update? %>
