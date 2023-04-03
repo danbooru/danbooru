@@ -74,6 +74,7 @@ $spacer: 0.25rem; /* 4px */
 .absolute { position: absolute; }
 .relative { position: relative; }
 .sticky { position: sticky; }
+.fixed { position: fixed; }
 
 .top-0    { top:    0; }
 .bottom-0 { bottom: 0; }
@@ -84,6 +85,11 @@ $spacer: 0.25rem; /* 4px */
 .bottom-0\.5 { bottom: 0.5 * $spacer; }
 .left-0\.5   { left: 0.5 * $spacer; }
 .right-0\.5  { right: 0.5 * $spacer; }
+
+.top-2    { top:    2 * $spacer; }
+.bottom-2 { bottom: 2 * $spacer; }
+.left-2   { left:   2 * $spacer; }
+.right-2  { right:  2 * $spacer; }
 
 .top-4    { top:    4 * $spacer; }
 .bottom-4 { bottom: 4 * $spacer; }
@@ -202,6 +208,8 @@ $spacer: 0.25rem; /* 4px */
 .min-w-0 { min-width: 0; }
 .min-w-4 { min-width: 4 * $spacer; }
 
+.max-w-720px { max-width: 720px; }
+
 .max-w-full { max-width: 100%; }
 .max-h-full { max-height: 100%; }
 
@@ -318,6 +326,7 @@ $spacer: 0.25rem; /* 4px */
 .z-0 { z-index: 0; }
 .z-10 { z-index: 10; }
 .z-20 { z-index: 20; }
+.z-9999 { z-index: 9999; }
 
 .link-color { color: var(--link-color); }
 
@@ -527,6 +536,8 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
 }
 
 @media screen and (max-width: 660px) {
+  .sm\:text-sm { font-size: var(--text-sm); }
+
   .sm\:text-center { text-align: center; }
   .sm\:items-center { align-items: center; }
 

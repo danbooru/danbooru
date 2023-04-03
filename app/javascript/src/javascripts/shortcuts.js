@@ -60,7 +60,6 @@ Shortcuts.nav_scroll_up = function() {
 }
 
 Shortcuts.hide_tooltips = function() {
-  console.log("hide tooltips");
   hideAll({ duration: 0 });
 }
 
