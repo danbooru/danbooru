@@ -149,9 +149,9 @@
       </div>
     <% end %>
 
-    <div class="notice notice-info" id="notice" style="<%= "display: none;" unless flash[:notice] %>">
-      <span class="prose"><%= format_text(flash[:notice], inline: true) %>.</span>
-      <a href="#" id="close-notice-link">close</a>
+    <div id="notice" class="notice notice-info flex items-center fixed top-2 left-2 right-2 p-2 mx-auto max-w-720px z-9999 sm:text-sm" style="<%= "display: none;" unless flash[:notice] %>">
+      <span class="prose flex-1"><%= format_text(flash[:notice], inline: true) %>.</span>
+      <a href="#" id="close-notice-link" class="flex text-lg" data-shortcut="esc"><%= close_icon %></a>
     </div>
 
     <%= yield :layout %>
