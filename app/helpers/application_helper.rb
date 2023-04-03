@@ -263,7 +263,7 @@ module ApplicationHelper
 
   def search_form_for(url, classes: "inline-form", method: :get, &block)
     defaults = { required: false }
-    html_options = { autocomplete: "off", class: "search-form #{classes}" }
+    html_options = { autocomplete: "off", novalidate: true, class: "search-form #{classes}" }
 
     simple_form_for(:search, method: method, url: url, defaults: defaults, html: html_options) do |f|
       out = "".html_safe
