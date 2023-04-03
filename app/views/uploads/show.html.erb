@@ -10,7 +10,7 @@
       <% end %>
     <% elsif @upload.media_asset_count == 1 %>
       <div id="p-single-asset-upload" class="h-full">
-        <%= render "uploads/single_asset_upload", upload_media_asset: @upload.upload_media_assets.first %>
+        <%= render "uploads/single_asset_upload", upload_media_asset: @upload.upload_media_assets.first, post: @post %>
       </div>
     <% end %>
   </div>

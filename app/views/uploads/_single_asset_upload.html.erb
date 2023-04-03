@@ -113,14 +113,19 @@
     <div class="upload-divider px-4 cursor-col-resize"></div>
 
     <div class="upload-edit-container">
-      <% post = Post.new_from_upload(upload_media_asset, add_artist_tag: true, source: upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys) %>
-      <%= edit_form_for(post, html: { id: "form", class: "upload-form md:sticky top-4" }) do |f| %>
+      <%= edit_form_for(post, error_notice: false, html: { id: "form", class: "upload-form md:sticky top-4" }) do |f| %>
         <%= hidden_field_tag :media_asset_id, media_asset.id %> <%# used by iqdb javascript %>
         <%= hidden_field_tag :upload_media_asset_id, upload_media_asset.id %>
 
         <%= render(TabPanelComponent.new do |t| %>
           <% t.panel("Tags", active: true) do %>
-            <%= f.input :rating, label: "Rating #{help_tooltip embed_wiki("help:rating_notice", classes: "text-xs"), link_class: "inactive-link" }".html_safe, wrapper_html: { class: "radio-button-group text-xs" }, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
+            <%= f.input :rating,
+                        label: "Rating #{help_tooltip embed_wiki("help:rating_notice", classes: "text-xs"), link_class: "inactive-link" }".html_safe,
+                        wrapper_html: { class: "radio-button-group text-xs", "x-on:input": "$el.classList.remove('field_with_errors')" },
+                        collection: Post::RATINGS.invert.reverse_each.to_h,
+                        as: :radio_buttons,
+                        selected: post.rating,
+                        error: false %>
 
             <div>
               <div class="flex justify-between">
