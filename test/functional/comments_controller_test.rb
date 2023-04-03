@@ -268,6 +268,12 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         get_auth new_comment_path(id: @comment.id), @user, as: :javascript
         assert_response :success
       end
+
+      should "not allow quoting a deleted comment" do
+        @comment = create(:comment, is_deleted: true)
+        get_auth new_comment_path(id: @comment.id), @user
+        assert_response 403
+      end
     end
 
     context "create action" do
