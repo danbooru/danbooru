@@ -28,7 +28,7 @@ class PostTest < ActiveSupport::TestCase
   context "Deletion:" do
     context "Expunging a post" do
       setup do
-        @post = create(:post_with_file, uploader: @user, filename: "test.jpg")
+        @post = create(:post_with_file, tag_string: "1girl solo", uploader: @user, filename: "test.jpg")
         Favorite.create!(post: @post, user: @user)
         create(:favorite_group, post_ids: [@post.id])
         perform_enqueued_jobs # perform IqdbAddPostJob
@@ -85,6 +85,16 @@ class PostTest < ActiveSupport::TestCase
         assert_equal("post_permanent_delete", ModAction.last.category)
         assert_equal(@user, ModAction.last.creator)
         assert_nil(ModAction.last.subject)
+      end
+
+      should "decrement the tag post counts" do
+        assert_equal(1, Tag.find_by_name("1girl").post_count)
+        assert_equal(1, Tag.find_by_name("solo").post_count)
+
+        @post.expunge!
+
+        assert_equal(0, Tag.find_by_name("1girl").post_count)
+        assert_equal(0, Tag.find_by_name("solo").post_count)
       end
 
       should "decrement the uploader's upload count" do

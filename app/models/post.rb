@@ -365,10 +365,6 @@ class Post < ApplicationRecord
       tags - tags_was
     end
 
-    def decrement_tag_post_counts
-      Tag.where(:name => tag_array).update_all("post_count = post_count - 1") if tag_array.any?
-    end
-
     def update_tag_post_counts
       decrement_tags = tag_array_was - tag_array
 
@@ -801,7 +797,7 @@ class Post < ApplicationRecord
           ModAction.log("permanently deleted post ##{id} (md5=#{md5})", :post_permanent_delete, subject: nil, user: current_user)
 
           update_children_on_destroy
-          decrement_tag_post_counts
+          Tag.decrement_post_counts(tag_array)
           remove_from_all_pools
           remove_from_fav_groups
           media_asset.trash!(current_user, log: false)
