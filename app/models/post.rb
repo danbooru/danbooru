@@ -1736,12 +1736,12 @@ class Post < ApplicationRecord
   concerning :IqdbMethods do
     def update_iqdb
       # performs IqdbClient.new.add_post(post)
-      IqdbAddPostJob.perform_later(self)
+      IqdbAddPostJob.perform_later(self) if IqdbClient.new.enabled?
     end
 
     def remove_iqdb
       # performs IqdbClient.new.remove(id)
-      IqdbRemovePostJob.perform_later(id)
+      IqdbRemovePostJob.perform_later(id) if IqdbClient.new.enabled?
     end
   end
 

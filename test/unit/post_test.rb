@@ -113,6 +113,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "remove the post from iqdb" do
+        mock_iqdb_remove_post!(@post)
         @post.expunge!
         perform_enqueued_jobs
         assert_performed_jobs(1, only: IqdbRemovePostJob)
