@@ -24,7 +24,7 @@ class CommentsController < ApplicationController
 
   def new
     if params[:id]
-      quoted_comment = Comment.find(params[:id])
+      quoted_comment = authorize Comment.find(params[:id]), :reply?
       @comment = authorize Comment.new(post_id: quoted_comment.post_id, body: quoted_comment.quoted_response)
     else
       @comment = authorize Comment.new(permitted_attributes(Comment))
