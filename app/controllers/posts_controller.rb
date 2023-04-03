@@ -93,7 +93,7 @@ class PostsController < ApplicationController
       flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
       redirect_to @original_post
     else
-      flash[:notice] = @post.errors.full_messages.join("; ")
+      flash.now[:notice] = @post.errors.full_messages.join("; ")
       @post.tag_string = params.dig(:post, :tag_string) # Preserve original tag string on validation error
       respond_with(@post, render: { template: "upload_media_assets/show" })
     end
