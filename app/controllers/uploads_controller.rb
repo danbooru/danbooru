@@ -40,6 +40,8 @@ class UploadsController < ApplicationController
     elsif request.format.html? && @upload.media_asset_count > 1
       redirect_to [@upload, UploadMediaAsset]
     else
+      @upload_media_asset = @upload.upload_media_assets.first
+      @post = Post.new_from_upload(@upload_media_asset, add_artist_tag: true, source: @upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys)
       respond_with(@upload, include: { upload_media_assets: { include: :media_asset }})
     end
   end

@@ -154,6 +154,11 @@ form.simple_form {
           border-top-left-radius: 0;
           border-bottom-left-radius: 0;
         }
+
+        &.field_with_errors .radio label {
+          border-color: var(--chip-red-border-color);
+          background-color: var(--chip-red-background-color);
+        }
       }
     }
   }

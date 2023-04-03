@@ -32,12 +32,12 @@ class Post < ApplicationRecord
   before_validation :normalize_tags
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
+  validate :uploader_is_not_limited, on: :create
+  validate :post_is_not_its_own_parent
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
   validates :rating, presence: { message: "not selected" }
   validates :rating, inclusion: { in: RATINGS.keys, message: "must be #{RATINGS.keys.map(&:upcase).to_sentence(last_word_connector: ", or ")}" }, if: -> { rating.present? }
   validates :source, length: { maximum: 1200 }
-  validate :post_is_not_its_own_parent
-  validate :uploader_is_not_limited, on: :create
   before_save :parse_pixiv_id
   before_save :added_tags_are_valid
   before_save :removed_tags_are_valid
@@ -1753,7 +1753,10 @@ class Post < ApplicationRecord
     end
 
     def uploader_is_not_limited
-      errors.add(:uploader, "have reached your upload limit. Please wait for your pending uploads to be approved before uploading more") if uploader.upload_limit.limited?
+      if uploader.upload_limit.limited?
+        errors.add(:uploader, "have reached your upload limit. Please wait for your pending uploads to be approved before uploading more")
+        throw :abort # Don't bother returning other validation errors if we're upload-limited.
+      end
     end
 
     def added_tags_are_valid
