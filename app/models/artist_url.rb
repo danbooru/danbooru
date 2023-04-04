@@ -80,15 +80,9 @@ class ArtistURL < ApplicationRecord
       true
     when %r{twitter\.com/intent}i
       true
-    when %r{lohas\.nicoseiga\.jp}i
-      true
     when %r{(?:www|com|dic)\.nicovideo\.jp}i
       true
     when %r{pawoo\.net/web/accounts}i
-      true
-    when %r{www\.artstation\.com}i
-      true
-    when %r{blogimg\.jp}i, %r{image\.blog\.livedoor\.jp}i
       true
     else
       false
