@@ -15,8 +15,10 @@ Alternatively, if you already have Docker Compose installed, you can just do:
 
 ```sh
 wget https://raw.githubusercontent.com/danbooru/danbooru/master/docker-compose.yaml
-docker-compose up
+docker compose up
 ```
+
+You will likely need to run docker with elevated permissions.
 
 If you get an error such as `'name' does not match any of the regexes: '^x-'` make sure
 that you're running an updated version of Docker Compose.
