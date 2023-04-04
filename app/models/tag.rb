@@ -461,6 +461,10 @@ class Tag < ApplicationRecord
     name.match?(/\A#{PostQueryBuilder::METATAGS.join("|")}:/i)
   end
 
+  def rating?
+    name.match?(/\Arating:[#{Post::RATINGS.keys.join}]\z/o)
+  end
+
   def self.model_restriction(table)
     super.where(table[:post_count].gt(0))
   end
