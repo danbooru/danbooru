@@ -40,10 +40,12 @@ class Source::URL::Twitter < Source::URL
 
     # https://twitter.com/i/status/943446161586733056
     # https://twitter.com/motty08111213/status/943446161586733056
+    # https://twitter.com/@motty08111213/status/943446161586733056
     # https://twitter.com/motty08111213/status/943446161586733056?s=19
     # https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
     # https://twitter.com/sato_1_11/status/1496489742791475201/photo/2
     in "twitter.com", username, "status", status_id, *rest
+      username = username.delete_prefix("@")
       @username = username unless username.in?(RESERVED_USERNAMES)
       @status_id = status_id
 
@@ -91,8 +93,9 @@ class Source::URL::Twitter < Source::URL
 
     # https://twitter.com/motty08111213
     # https://twitter.com/motty08111213/likes
+    # https://twitter.com/@eemapso
     in "twitter.com", username, *rest unless username.in?(RESERVED_USERNAMES)
-      @username = username
+      @username = username.delete_prefix("@")
 
     else
       nil
