@@ -23,10 +23,6 @@ class UserPresenter
     PostQuery.new("user:#{user.name}", current_user: CurrentUser.user).posts_with_timeout(6, count: user.post_upload_count, includes: [:vote_by_current_user])
   end
 
-  def reactions
-    PostQuery.new("reacted:#{user.name}", current_user: CurrentUser.user).posts_with_timeout(6, count: user.post_reactions.count, includes: [:vote_by_current_user])
-  end
-
   def has_uploads?
     user.post_upload_count > 0
   end
