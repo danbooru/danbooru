@@ -286,8 +286,10 @@ module Sources
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194/photo/1"))
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194?s=19"))
+      assert(Source::URL.page_url?("https://twitter.com/@BOW999/status/1261877313349640194"))
 
       assert(Source::URL.profile_url?("https://www.twitter.com/irt_5433"))
+      assert(Source::URL.profile_url?("https://www.twitter.com/@irt_5433"))
       assert(Source::URL.profile_url?("https://www.twitter.com/irt_5433/likes"))
       assert(Source::URL.profile_url?("https://twitter.com/intent/user?user_id=1485229827984531457"))
       assert(Source::URL.profile_url?("https://twitter.com/intent/user?screen_name=ryuudog_NFT"))
@@ -298,6 +300,8 @@ module Sources
       assert_nil(Source::URL.parse("https://twitter.com/i/status/1261877313349640194").username)
       assert_nil(Source::URL.parse("https://twitter.com/i/web/status/1261877313349640194").username)
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/BOW999/status/1261877313349640194").username)
+      assert_equal("BOW999", Source::URL.parse("https://twitter.com/@BOW999/status/1261877313349640194").username)
+      assert_equal("BOW999", Source::URL.parse("https://twitter.com/@BOW999").username)
     end
   end
 end
