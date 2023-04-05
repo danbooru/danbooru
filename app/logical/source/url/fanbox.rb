@@ -10,13 +10,13 @@ class Source::URL::Fanbox < Source::URL
   end
 
   def parse
-    case [host, *path_segments]
+    case [subdomain, domain, *path_segments]
 
     # https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png (full res)
     # https://downloads.fanbox.cc/images/post/39714/c/1200x630/JvjJal8v1yLgc5DPyEI05YpT.jpeg (sample)
     # https://downloads.fanbox.cc/images/post/39714/w/1200/JvjJal8v1yLgc5DPyEI05YpT.jpeg (sample)
     # https://fanbox.pixiv.net/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png (old)
-    in ("downloads.fanbox.cc" | "fanbox.pixiv.net"), "images", "post", work_id, *rest
+    in ("downloads" | "fanbox"), ("fanbox.cc" | "pixiv.net"), "images", "post", work_id, *rest
       @work_id = work_id
 
     # https://pixiv.pximg.net/c/1200x630_90_a2_g5/fanbox/public/images/post/186919/cover/VCI1Mcs2rbmWPg0mmiTisovn.jpeg
@@ -31,17 +31,19 @@ class Source::URL::Fanbox < Source::URL
       @user_id = user_id
 
     # https://www.fanbox.cc/@tsukiori/posts/1080657
-    in "www.fanbox.cc", /^@/ => username, "posts", work_id
+    # https://fanbox.cc/@tsukiori/posts/1080657
+    in _, "fanbox.cc", /^@/ => username, "posts", work_id
       @username = username.delete_prefix("@")
       @work_id = work_id
 
     # https://www.fanbox.cc/@tsukiori
-    in "www.fanbox.cc", /^@/ => username
+    # https://fanbox.cc/@shaggysusu/
+    in _, "fanbox.cc", /^@/ => username
       @username = username.delete_prefix("@")
 
     # https://pixiv.net/fanbox/creator/1566167/post/39714 (old)
     # https://www.pixiv.net/fanbox/creator/1566167/post/39714 (old)
-    in ("pixiv.net" | "www.pixiv.net"), "fanbox", "creator", user_id, "post", work_id
+    in _, "pixiv.net", "fanbox", "creator", user_id, "post", work_id
       @user_id = user_id
       @work_id = work_id
 
@@ -49,25 +51,25 @@ class Source::URL::Fanbox < Source::URL
     # https://www.pixiv.net/fanbox/creator/1566167
     # https://www.pixiv.net/fanbox/user/3410642
     # https://www.pixiv.net/fanbox/creator/18915237/post
-    in ("pixiv.net" | "www.pixiv.net"), "fanbox", ("creator" | "user"), user_id, *rest
+    in _, "pixiv.net", "fanbox", ("creator" | "user"), user_id, *rest
       @user_id = user_id
 
     # http://pixiv.net/fanbox/member.php?user_id=3410642
     # http://www.pixiv.net/fanbox/member.php?user_id=3410642
-    in ("pixiv.net" | "www.pixiv.net"), "fanbox", "member.php" if params[:user_id].present?
+    in _, "pixiv.net", "fanbox", "member.php" if params[:user_id].present?
       @user_id = params[:user_id]
 
     # https://omu001.fanbox.cc/posts/39714
     # https://brllbrll.fanbox.cc/posts/626093 (R-18)
-    in /fanbox\.cc/, "posts", work_id unless subdomain.in?(RESERVED_SUBDOMAINS)
-      @username = subdomain
+    in username, "fanbox.cc", "posts", work_id unless username.in?(RESERVED_SUBDOMAINS)
+      @username = username
       @work_id = work_id
 
     # https://omu001.fanbox.cc
     # https://omu001.fanbox.cc/posts
     # https://omu001.fanbox.cc/plans
-    in /fanbox\.cc/, *rest unless subdomain.in?(RESERVED_SUBDOMAINS)
-      @username = subdomain
+    in username, "fanbox.cc", *rest unless username.in?(RESERVED_SUBDOMAINS)
+      @username = username
 
     else
       nil
