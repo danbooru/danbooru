@@ -614,6 +614,9 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://poipiku.com/583/2867587.html")
 
         should_upload_successfully("https://medibang.com/picture/4b2112261505098280008769655/")
+
+        should_upload_successfully("https://movw2000.gumroad.com/l/zbslv")
+        should_upload_successfully("https://movw2000.gumroad.com/p/new-product-b072093e-e628-4a92-9740-e9b4564d9901")
       end
     end
   end
