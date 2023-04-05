@@ -70,6 +70,7 @@ module Source
       Source::URL::Poipiku,
       Source::URL::AboutMe,
       Source::URL::ArtStreet,
+      Source::URL::Gumroad,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.

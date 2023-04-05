@@ -36,3 +36,6 @@ select artist_id, url from artist_urls where url ~ 'pixiv.net' and url !~ '^http
 select artist_id, url from artist_urls where url ~ 'furaffinity' and url !~ '^https://www.furaffinity.net/user/[~a-zA-Z0-9_.-]+$';
 select artist_id, url from artist_urls where url ~ 'fc2.com' and url !~ '^http://[^.]+.(web|blog|x|h|cart|wiki|bbs|finito|kt).fc2.com$';
 select artist_id, url from artist_urls where url ~ 'reddit' and url !~ '^https://www.reddit.com/user/[a-zA-Z0-9_-]+$';
+select artist_id, url from artist_urls where url ~ 'poipiku' and url !~ '^https://poipiku.com/[0-9]+/$';
+select artist_id, url from artist_urls where url ~ 'about.me' and url !~ '^https://about.me/[a-zA-Z0-9_.]+/$';
+select artist_id, url from artist_urls where url ~ 'gumroad.com' and url !~ '^https://[a-zA-Z0-9_.-]+.gumroad.com$';
