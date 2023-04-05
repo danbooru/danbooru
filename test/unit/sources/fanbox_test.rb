@@ -128,6 +128,12 @@ module Sources
       assert(Source::URL.profile_url?("https://www.fanbox.cc/@tsukiori"))
       assert_not(Source::URL.profile_url?("https://www.fanbox.cc"))
       assert_not(Source::URL.profile_url?("https://fanbox.cc"))
+
+      assert_equal("omu001", Source::URL.parse("https://fanbox.cc/@omu001").username)
+      assert_equal("omu001", Source::URL.parse("https://www.fanbox.cc/@omu001").username)
+      assert_equal("omu001", Source::URL.parse("https://www.fanbox.cc/@omu001/posts/39714").username)
+      assert_equal("omu001", Source::URL.parse("https://fanbox.cc/@omu001/posts/39714").username)
+      assert_equal("omu001", Source::URL.parse("https://omu001.fanbox.cc/posts/39714").username)
     end
   end
 end
