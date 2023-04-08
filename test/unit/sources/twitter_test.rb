@@ -138,6 +138,62 @@ module Sources
       )
     end
 
+    context "A NSFW tweet" do
+      strategy_should_work(
+        "https://twitter.com/shoka_bg/status/1644344692107268097",
+        image_urls: ["https://pbs.twimg.com/media/FtHbwvuaQAAxQ8v.jpg:orig"],
+        page_url: "https://twitter.com/shoka_bg/status/1644344692107268097",
+        profile_url: "https://twitter.com/shoka_bg",
+        profile_urls: ["https://twitter.com/shoka_bg", "https://twitter.com/intent/user?user_id=1109709388049051649"],
+        tag_name: "shoka_bg",
+        tags: %w[ブルアカ],
+        artist_name: "shooka",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          風紀委員の実態
+          "#ブルアカ":[https://twitter.com/hashtag/ブルアカ]
+        EOS
+      )
+    end
+
+    context "A long tweet with >280 characters" do
+      strategy_should_work(
+        "https://twitter.com/loveremi_razoku/status/1637647185969041408",
+        image_urls: ["https://pbs.twimg.com/media/FroXbmIaIAEuC1B.jpg:orig"],
+        page_url: "https://twitter.com/loveremi_razoku/status/1637647185969041408",
+        profile_url: "https://twitter.com/loveremi_razoku",
+        profile_urls: ["https://twitter.com/loveremi_razoku", "https://twitter.com/intent/user?user_id=293443351"],
+        tag_name: "loveremi_razoku",
+        artist_name: "ラブレミ@うぉるやふぁんくらぶ",
+        tags: [],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          「ラリアッ党の野望チョコ」
+          commission ラリアット さん"@rariatoo":[https://twitter.com/rariatoo]
+
+          シゲ「カッパ、お前何やった?」
+
+          カッパ「オイラ、ルディちゃんでヤンス!エロいでヤンス!」
+
+          シゲ「コイツ、ほんまエロガッパやな…ワイはノス＆ザクロや!これでコンプやで!」
+
+          シゲ「ミツ、お前は?」
+
+          ミツはうつむいて何も言わない
+          シゲはミツのシールを覗き込んだ
+
+          シゲ「【ウチはムーンライト!姐さん方にたてつくヤツはいてこましたるでェ!】か…今月の一般公募枠やん!粋なファンサやな…」
+
+          カッパ「ゲヘヘ!この子もエロいでヤンス〜!」
+
+          シゲ「そういやお前もハガキ、書いてたよな…ん?泣いとるんか?ラムネ飲みすぎて腹でも壊したか?」
+
+          カッパはシゲの肩に手を置き、いつになくきれいな目で首を横に振っていた
+          その瞬間、シゲもすべてを察した
+
+          シゲ「ミツ…ラムネおごったるさかい、今日はこの子の事存分に語り合おうや…」
+        EOS
+      )
+    end
+
     context "A tweet without any images" do
       strategy_should_work(
         "https://twitter.com/teruyo/status/1058452066060853248",

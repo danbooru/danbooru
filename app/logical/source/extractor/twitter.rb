@@ -28,7 +28,7 @@ class Source::Extractor
       if parsed_url.image_url?
         [parsed_url.full_image_url]
       else
-        api_response[:mediaDetails].to_a.map do |media|
+        graphql_tweet.dig(:legacy, :extended_entities, :media).to_a.map do |media|
           if media[:type] == "photo"
             media[:media_url_https] + ":orig"
           elsif media[:type].in?(["video", "animated_gif"])
@@ -61,31 +61,23 @@ class Source::Extractor
     end
 
     def user_id
-      parsed_url.user_id || parsed_referer&.user_id || api_response.dig(:user, :id_str)
+      parsed_url.user_id || parsed_referer&.user_id || graphql_tweet.dig(:legacy, :user_id_str)
     end
 
     def tag_name
-      if tag_name_from_url.present?
-        tag_name_from_url
-      elsif api_response.present?
-        api_response.dig(:user, :screen_name)
-      end
+      tag_name_from_url || graphql_tweet.dig(:core, :user_results, :result, :legacy, :screen_name)
     end
 
     def artist_name
-      if api_response.present?
-        api_response.dig(:user, :name)
-      else
-        tag_name
-      end
+      graphql_tweet.dig(:core, :user_results, :result, :legacy, :name) || tag_name
     end
 
     def artist_commentary_desc
-      api_response[:text].to_s
+      graphql_tweet.dig(:note_tweet, :note_tweet_results, :result, :text) || graphql_tweet.dig(:legacy, :full_text)
     end
 
     def tags
-      api_response.dig(:entities, :hashtags).to_a.map do |hashtag|
+      graphql_tweet.dig(:legacy, :entities, :hashtags).to_a.map do |hashtag|
         [hashtag[:text], "https://twitter.com/hashtag/#{hashtag[:text]}"]
       end
     end
@@ -106,24 +98,25 @@ class Source::Extractor
       dtext = "".dup
       desc = artist_commentary_desc
       entities = []
+      api_entities = graphql_tweet.dig(:note_tweet, :note_tweet_results, :result, :entity_set) || graphql_tweet.dig(:legacy, :entities)
 
-      entities += api_response.dig(:entities, :hashtags).to_a.pluck(:indices, :text).map do |e|
+      entities += api_entities[:hashtags].to_a.pluck(:indices, :text).map do |e|
         { first: e[0][0], last: e[0][1], text: e[1], dtext: %Q("##{e[1]}":[https://twitter.com/hashtag/#{Danbooru::URL.escape(e[1])}]) }
       end
 
-      entities += api_response.dig(:entities, :urls).to_a.pluck(:indices, :expanded_url).map do |e|
+      entities += api_entities[:urls].to_a.pluck(:indices, :expanded_url).map do |e|
         { first: e[0][0], last: e[0][1], text: e[1], dtext: "<#{e[1]}>" }
       end
 
-      entities += api_response.dig(:entities, :user_mentions).to_a.pluck(:indices, :screen_name).map do |e|
+      entities += api_entities[:user_mentions].to_a.pluck(:indices, :screen_name).map do |e|
         { first: e[0][0], last: e[0][1], text: e[1], dtext: %Q("@#{e[1]}":[https://twitter.com/#{CGI.escape(e[1])}]) }
       end
 
-      entities += api_response.dig(:entities, :symbols).to_a.pluck(:indices, :text).map do |e|
+      entities += api_entities[:symbols].to_a.pluck(:indices, :text).map do |e|
         { first: e[0][0], last: e[0][1], text: e[1], dtext: %Q("$#{e[1]}":[https://twitter.com/search?q=$#{CGI.escape(e[1])}]) }
       end
 
-      entities += api_response.dig(:entities, :media).to_a.pluck(:indices, :expanded_url).map do |e|
+      entities += api_entities[:media].to_a.pluck(:indices, :expanded_url).map do |e|
         { first: e[0][0], last: e[0][1], text: e[1], dtext: "" }
       end
 
@@ -141,7 +134,7 @@ class Source::Extractor
       dtext
     end
 
-    memoize def api_response
+    memoize def syndication_api_response
       return {} if status_id.blank?
 
       # https://publish.twitter.com/?query=https%3A%2F%2Ftwitter.com%2Ftwotenky%2Fstatus%2F1577831592227000320
@@ -150,6 +143,65 @@ class Source::Extractor
       return {} if response.code != 200
 
       response.parse.with_indifferent_access
+    end
+
+    memoize def graphql_api_response
+      return {} if status_id.blank?
+
+      # These params are necessary for the GraphQL API. It will return an error if they're not all present.
+      variables = {
+        focalTweetId: status_id,
+        includePromotedContent: false,
+        withCommunity: true,
+        withQuickPromoteEligibilityTweetFields: true,
+        withBirdwatchNotes: true,
+        withDownvotePerspective: false,
+        withReactionsMetadata: false,
+        withReactionsPerspective: false,
+        withVoice: true,
+        withV2Timeline: true,
+      }
+
+      features = {
+        blue_business_profile_image_shape_enabled: false,
+        responsive_web_graphql_exclude_directive_enabled: true,
+        verified_phone_label_enabled: false,
+        responsive_web_graphql_timeline_navigation_enabled: true,
+        responsive_web_graphql_skip_user_profile_image_extensions_enabled: false,
+        tweetypie_unmention_optimization_enabled: true,
+        vibe_api_enabled: true,
+        responsive_web_edit_tweet_api_enabled: true,
+        graphql_is_translatable_rweb_tweet_is_translatable_enabled: true,
+        view_counts_everywhere_api_enabled: true,
+        longform_notetweets_consumption_enabled: true,
+        tweet_awards_web_tipping_enabled: false,
+        freedom_of_speech_not_reach_fetch_enabled: false,
+        standardized_nudges_misinfo: true,
+        tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled: false,
+        interactive_text_enabled: true,
+        responsive_web_text_conversations_enabled: false,
+        longform_notetweets_richtext_consumption_enabled: false,
+        responsive_web_enhance_cards_enabled: false,
+      }
+
+      response = http.get("https://twitter.com/i/api/graphql/1oIoGPTOJN2mSjbbXlQifA/TweetDetail", params: { variables: variables.to_json, features: features.to_json })
+      return {} if response.code != 200
+
+      response.parse.with_indifferent_access
+    end
+
+    memoize def graphql_tweet
+      graphql_api_response.dig("data", "threaded_conversation_with_injections_v2", "instructions", 0, "entries", 0, "content", "itemContent", "tweet_results", "result") || {}
+    end
+
+    def http
+      super.headers(
+        "authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA", # non-secret; used by the official client
+        "x-csrf-token": Danbooru.config.twitter_csrf_token,
+      ).cookies(
+        "auth_token": Danbooru.config.twitter_auth_token,
+        "ct0": Danbooru.config.twitter_csrf_token,
+      )
     end
 
     def status_id
