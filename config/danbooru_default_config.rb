@@ -472,6 +472,18 @@ module Danbooru
     def art_street_session_cookie
     end
 
+    # Your Twitter "auth_token" cookie. A 40-character hex string.
+    #
+    # Login to Twitter, open the devtools, open a tweet, then use the devtools to find the /TweetDetail request and look for the auth_token cookie.
+    def twitter_auth_token
+    end
+
+    # Your Twitter "ct0" cookie. Also available in the X-CSRF-Token HTTP Header. A 160-character hex string.
+    #
+    # Login to Twitter, open the devtools, open a tweet, then use the devtools to find the /TweetDetail request and look for the ct0 cookie or the x-csrf-request header.
+    def twitter_csrf_token
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
