@@ -1,4 +1,5 @@
 import Utility from './utility'
+import { hideAll } from 'tippy.js';
 
 let Shortcuts = {};
 
@@ -6,6 +7,7 @@ Shortcuts.initialize = function() {
   Utility.keydown("s", "scroll_down", Shortcuts.nav_scroll_down);
   Utility.keydown("w", "scroll_up", Shortcuts.nav_scroll_up);
   Utility.keydown("ctrl+return", "submit_form", Shortcuts.submit_form, 'input[type="text"], textarea');
+  Utility.keydown("esc", "hide_tooltips", Shortcuts.hide_tooltips);
 
   Shortcuts.initialize_data_shortcuts();
 }
@@ -55,6 +57,11 @@ Shortcuts.nav_scroll_down = function() {
 
 Shortcuts.nav_scroll_up = function() {
   window.scrollBy(0, $(window).height() * -0.15);
+}
+
+Shortcuts.hide_tooltips = function() {
+  console.log("hide tooltips");
+  hideAll({ duration: 0 });
 }
 
 $(document).ready(function() {

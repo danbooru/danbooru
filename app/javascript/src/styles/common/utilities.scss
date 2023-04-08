@@ -212,6 +212,7 @@ $spacer: 0.25rem; /* 4px */
 .h-3    { height: 3  * $spacer; }
 .h-4    { height: 4  * $spacer; }
 .h-6    { height: 6  * $spacer; }
+.h-7    { height: 7  * $spacer; }
 .h-8    { height: 8  * $spacer; }
 .h-10   { height: 10 * $spacer; }
 .h-12   { height: 12 * $spacer; }
@@ -222,6 +223,8 @@ $spacer: 0.25rem; /* 4px */
 .h-225px { height: 225px; }
 .h-270px { height: 270px; }
 .h-360px { height: 360px; }
+
+.min-h-8 { min-height: 8  * $spacer; }
 
 .max-h-150px { max-height: 150px; }
 .max-h-180px { max-height: 180px; }
@@ -299,6 +302,7 @@ $spacer: 0.25rem; /* 4px */
 .grid-cols-4  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .grid-cols-6  { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 .grid-cols-8  { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+.grid-cols-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
 .grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
 
 .col-span-1	 { grid-column: span 1 / span 1; }
@@ -518,6 +522,8 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   .md\:space-y-0 > * + * { margin-top: 0; }
 
   .md\:w-360px { width: 360px; }
+
+  .md\:mx-auto { margin-left: auto; margin-right: auto; }
 }
 
 @media screen and (max-width: 660px) {
@@ -528,4 +534,6 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
 
   .sm\:order-1 { order: 1; }
   .sm\:order-2 { order: 2; }
+
+  .\!sm\:w-full { width: 100% !important; }
 }
