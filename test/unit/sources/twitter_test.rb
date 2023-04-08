@@ -194,6 +194,24 @@ module Sources
       )
     end
 
+    context "A tweet that is in reply to another tweet" do
+      strategy_should_work(
+        "https://twitter.com/emurin/status/912861472916508672",
+        image_urls: ["https://pbs.twimg.com/media/DKsikYaU8AEEMKU.jpg:orig"],
+        page_url: "https://twitter.com/emurin/status/912861472916508672",
+        profile_url: "https://twitter.com/emurin",
+        profile_urls: ["https://twitter.com/emurin", "https://twitter.com/intent/user?user_id=30642502"],
+        tag_name: "emurin",
+        tags: %w[odaibako],
+        artist_name: "えむりん",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          > ほわほわ系クーデレギロチンおねがいします <https://odaibako.net/detail/request/277bac5ea1b34b1abc7ac21dd1031690> "#odaibako":[https://twitter.com/hashtag/odaibako]
+
+          セカコスにしたらギロクロ感がなくなった…
+        EOS
+      )
+    end
+
     context "A tweet without any images" do
       strategy_should_work(
         "https://twitter.com/teruyo/status/1058452066060853248",
