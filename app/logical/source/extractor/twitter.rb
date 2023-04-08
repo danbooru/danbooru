@@ -191,7 +191,11 @@ class Source::Extractor
     end
 
     memoize def graphql_tweet
-      graphql_api_response.dig("data", "threaded_conversation_with_injections_v2", "instructions", 0, "entries", 0, "content", "itemContent", "tweet_results", "result") || {}
+      return {} if status_id.blank?
+
+      entries = graphql_api_response.dig("data", "threaded_conversation_with_injections_v2", "instructions", 0, "entries")
+      entry = entries&.find { |entry| entry["entryId"] == "tweet-#{status_id}" }
+      entry&.dig("content", "itemContent", "tweet_results", "result") || {}
     end
 
     def http
