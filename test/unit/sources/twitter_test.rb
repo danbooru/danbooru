@@ -129,6 +129,7 @@ module Sources
       strategy_should_work(
         "https://mobile.twitter.com/Strangestone/status/556440271961858051",
         image_urls: ["https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:orig"],
+        download_size: 280_150,
         page_url: "https://twitter.com/Strangestone/status/556440271961858051",
         profile_url: "https://twitter.com/Strangestone",
         profile_urls: ["https://twitter.com/Strangestone", "https://twitter.com/intent/user?user_id=93332575"],
@@ -224,6 +225,24 @@ module Sources
         artist_name: "えない🚀",
         dtext_artist_commentary_desc: <<~EOS.chomp
           すろぉもぉしょん💊
+        EOS
+      )
+    end
+
+    context "A 'https://pbs.twimg.com/media/*:large' url" do
+      strategy_should_work(
+        "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large",
+        referer: "https://twitter.com/nounproject/status/540944400767922176",
+        image_urls: ["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"],
+        download_size: 9800,
+        page_url: "https://twitter.com/nounproject/status/540944400767922176",
+        profile_url: "https://twitter.com/nounproject/status/540944400767922176",
+        profile_urls: ["https://twitter.com/nounproject", "https://twitter.com/intent/user?user_id=88996186"],
+        tag_name: "nounproject",
+        tags: [],
+        artist_name: "Noun Project",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          More is better. Unlimited is best. NounPro Members now get unlimited icon downloads <http://bit.ly/1yn2KWn>
         EOS
       )
     end

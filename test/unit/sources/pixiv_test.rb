@@ -34,28 +34,38 @@ module Sources
         end
       end
 
-      context "An ugoira source site for pixiv" do
-        setup do
-          @site = Source::Extractor.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-        end
-
-        should "get the file url" do
-          assert_equal(["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"], @site.image_urls)
-        end
-
-        should "capture the frame data" do
-          media_file = @site.download_file!(@site.image_urls.sole)
-
-          assert_equal([125, 125], media_file.frame_delays)
-        end
+      context "A ugoira page URL" do
+        strategy_should_work(
+          "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364",
+          image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"],
+          media_files: [
+            { file_size: 2804, frame_delays: [125, 125] },
+          ],
+          page_url: "https://www.pixiv.net/artworks/62247364",
+          profile_url: "https://www.pixiv.net/users/22252953",
+          artist_name: "uroobnad2",
+          tag_name: "user_myeg3558",
+          tags: %w[Ugoira png blue],
+          artist_commentary_title: "ugoira",
+          dtext_artist_commentary_desc: "",
+        )
       end
 
-      context "A https://i.pximg.net/img-zip/ugoira/* source" do
-        should "get the metadata" do
-          @site = Source::Extractor.find("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip")
-
-          assert_equal("uroobnad2", @site.artist_name)
-        end
+      context "A https://i.pximg.net/img-zip/ugoira/* image URL" do
+        strategy_should_work(
+          "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip",
+          image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"],
+          media_files: [
+            { file_size: 2804, frame_delays: [125, 125] },
+          ],
+          page_url: "https://www.pixiv.net/artworks/62247364",
+          profile_url: "https://www.pixiv.net/users/22252953",
+          artist_name: "uroobnad2",
+          tag_name: "user_myeg3558",
+          tags: %w[Ugoira png blue],
+          artist_commentary_title: "ugoira",
+          dtext_artist_commentary_desc: "",
+        )
       end
 
       context "A https://www.pixiv.net/*/artworks/* source" do
@@ -333,6 +343,96 @@ module Sources
           source = get_source("https://www.pixiv.net/en/artworks/88487025")
           assert_equal(["éé"], source.other_names)
         end
+      end
+
+      context "A http://www.pixiv.net/member_illust.php?mode=medium&illust_id=$id URL" do
+        strategy_should_work(
+          "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350",
+          image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png"],
+          media_files: [{ file_size: 16_275 }],
+          page_url: "https://www.pixiv.net/artworks/62247350",
+          profile_url: "https://www.pixiv.net/users/22252953",
+          artist_name: "uroobnad2",
+          tag_name: "user_myeg3558",
+          tags: %w[blue png],
+          artist_commentary_title: "single image",
+          dtext_artist_commentary_desc: "description here",
+        )
+      end
+
+      context "An /img-master/ image URL" do
+        strategy_should_work(
+          "https://i.pximg.net/c/600x600/img-master/img/2017/04/04/08/54/15/62247350_p0_master1200.jpg",
+          image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png"],
+          media_files: [{ file_size: 16_275 }],
+          page_url: "https://www.pixiv.net/artworks/62247350",
+          profile_url: "https://www.pixiv.net/users/22252953",
+          artist_name: "uroobnad2",
+          tag_name: "user_myeg3558",
+          tags: %w[blue png],
+          artist_commentary_title: "single image",
+          dtext_artist_commentary_desc: "description here",
+        )
+      end
+
+      context "An /img-original/ image URL" do
+        strategy_should_work(
+          "https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png",
+          image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png"],
+          media_files: [{ file_size: 16_275 }],
+          page_url: "https://www.pixiv.net/artworks/62247350",
+          profile_url: "https://www.pixiv.net/users/22252953",
+          artist_name: "uroobnad2",
+          tag_name: "user_myeg3558",
+          tags: %w[blue png],
+          artist_commentary_title: "single image",
+          dtext_artist_commentary_desc: "description here",
+        )
+      end
+
+      context "A profile image URL" do
+        strategy_should_work(
+          "https://i.pximg.net/user-profile/img/2014/12/18/10/31/23/8733472_7dc7310db6cc37163af145d04499e411_170.jpg",
+          image_urls: ["https://i.pximg.net/user-profile/img/2014/12/18/10/31/23/8733472_7dc7310db6cc37163af145d04499e411_170.jpg"],
+          media_files: [{ file_size: 26_040 }],
+          page_url: nil,
+          profile_url: nil,
+          artist_name: nil,
+          tag_name: nil,
+          tags: [],
+          artist_commentary_title: nil,
+          dtext_artist_commentary_desc: nil,
+        )
+      end
+
+      context "A background image URL" do
+        strategy_should_work(
+          "https://i.pximg.net/background/img/2015/10/25/08/45/27/198128_77ddf78cdb162e3d1c0d5134af185813.jpg",
+          image_urls: ["https://i.pximg.net/background/img/2015/10/25/08/45/27/198128_77ddf78cdb162e3d1c0d5134af185813.jpg"],
+          media_files: [{ file_size: 266_948 }],
+          page_url: nil,
+          profile_url: nil,
+          artist_name: nil,
+          tag_name: nil,
+          tags: [],
+          artist_commentary_title: nil,
+          dtext_artist_commentary_desc: nil,
+        )
+      end
+
+      context "A novel image URL" do
+        strategy_should_work(
+          "https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg",
+          image_urls: ["https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg"],
+          media_files: [{ file_size: 532_037 }],
+          page_url: nil,
+          profile_url: nil,
+          artist_name: nil,
+          tag_name: nil,
+          tags: [],
+          artist_commentary_title: nil,
+          dtext_artist_commentary_desc: nil,
+        )
       end
 
       context "parsing illust ids" do

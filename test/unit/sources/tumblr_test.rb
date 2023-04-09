@@ -42,6 +42,7 @@ module Sources
       strategy_should_work(
         "https://noizave.tumblr.com/post/162206271767",
         image_urls: ["https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png"],
+        download_size: 3655,
         page_url: "https://noizave.tumblr.com/post/162206271767",
         artist_name: "noizave",
         profile_url: "https://noizave.tumblr.com",
@@ -225,6 +226,76 @@ module Sources
     #    # A possible solution could be doing a head request for unknown domains in Source::Extractor::Null to check if they're custom tumblr domains
     #  )
     #end
+
+    context "A *.media.tumblr.com/*/*_500.jpg sample image URL" do
+      strategy_should_work(
+        "https://24.media.tumblr.com/fc328250915434e66e8e6a92773f79d0/tumblr_mf4nshfibc1s0oswoo1_500.jpg",
+        image_urls: ["https://media.tumblr.com/fc328250915434e66e8e6a92773f79d0/tumblr_mf4nshfibc1s0oswoo1_1280.jpg"],
+        download_size: 118_315,
+        page_url: "https://nagian.tumblr.com/post/38061868112",
+        profile_url: "https://nagian.tumblr.com",
+        artist_name: "nagian",
+        tag_name: "nagian",
+        tags: [],
+        dtext_artist_commentary_desc: "ゆいあず",
+      )
+    end
+
+    context "A *.media.tumblr.com/tumblr_$id_$size image URL without a larger size" do
+      strategy_should_work(
+        "https://25.media.tumblr.com/tumblr_lxbzel2H5y1r9yjhso1_500.jpg",
+        image_urls: ["https://media.tumblr.com/tumblr_lxbzel2H5y1r9yjhso1_1280.jpg"],
+        download_size: 42_997,
+        page_url: nil,
+        profile_url: nil,
+        artist_name: nil,
+        tag_name: nil,
+        tags: [],
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
+    context "A *.media.tumblr.com/tumblr_$id_$size image URL with a larger size" do
+      strategy_should_work(
+        "https://25.media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png",
+        image_urls: ["https://media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_1280.png"],
+        download_size: 62_658,
+        page_url: nil,
+        profile_url: nil,
+        artist_name: nil,
+        tag_name: nil,
+        tags: [],
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
+    context "A *.media.tumblr.com/$hash/tumblr_$id_rN_$size image URL" do
+      strategy_should_work(
+        "https://33.media.tumblr.com/4b7fecf9a5a8284fbaefb051a2369b55/tumblr_npozqfwc9h1rt6u7do1_r1_500.gif",
+        image_urls: ["https://media.tumblr.com/4b7fecf9a5a8284fbaefb051a2369b55/tumblr_npozqfwc9h1rt6u7do1_r1_1280.gif"],
+        download_size: 1_234_017,
+        page_url: "https://jonroru.tumblr.com/post/121126557895",
+        profile_url: "https://jonroru.tumblr.com",
+        artist_name: "jonroru",
+        tag_name: "jonroru",
+        tags: ["splatoon", "pixel art", "inkling", "super nes", "animation", "nintendo", "wiiu", "gaming", "gif", "animated gif", "saltspray rig", "ink", "i'm a kid now", "i'm a squid now", "squid"],
+        dtext_artist_commentary_desc: "[b]“SPLATOON SUPER NES VERSION (or more like GBA according to some XD)”[/b]",
+      )
+    end
+
+    context "A *.media.tumblr.com/$hash/tumblr_inline_$id_$size image URL" do
+      strategy_should_work(
+        "https://68.media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_250.gif",
+        image_urls: ["https://media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_1280.gif"],
+        download_size: 110_348,
+        page_url: nil,
+        profile_url: nil,
+        artist_name: nil,
+        tag_name: nil,
+        tags: [],
+        dtext_artist_commentary_desc: "",
+      )
+    end
 
     context "generating page urls" do
       should "work" do

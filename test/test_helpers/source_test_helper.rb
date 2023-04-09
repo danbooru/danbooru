@@ -3,14 +3,15 @@ module SourceTestHelper
 
   # A helper method to automate all the checks needed to make sure that a strategy does not break.
   #
-  # * If download_size is nil, it tests that the file is downloaded correctly, otherwise it also checks the filesize.
+  # * If media_files is present, then it tests that the downloaded files have the given attributes.
+  # * If download_size is present, it tests that the file is downloaded correctly and has the correct filesize.
   # * If deleted is true, it skips the downloading check, but it still tries everything else and makes sure nothing breaks.
   # * Any passed kwargs parameter is tested against the strategy.
 
   class_methods do
     def strategy_should_work(url, arguments = {})
       # XXX: can't use **kwargs because of a bug with shoulda-context
-      referer, download_size, deleted = [:referer, :download_size, :deleted].map { |arg| arguments.delete(arg) }
+      referer, download_size, deleted, media_files = [:referer, :download_size, :deleted, :media_files].map { |arg| arguments.delete(arg) }
 
       should "work" do
         strategy = Source::Extractor.find(url, referer)
@@ -21,7 +22,18 @@ module SourceTestHelper
         assert_not(strategy.image_urls.include?(nil), "image_urls should not contain nil")
         assert(strategy.image_urls.all?(String), "image_urls should contain only strings")
 
-        if download_size.present? && strategy.image_urls.present?
+        if media_files.present?
+          files = strategy.image_urls.map { |image_url| strategy.download_file!(image_url) }
+
+          assert_equal(media_files.size, files.size, "expected #{media_files.size} images; got #{files.size}")
+
+          media_files.zip(files).each do |expected_file_attributes, actual_file|
+            expected_file_attributes.each do |attribute, expected_value|
+              actual_value = actual_file.send(attribute)
+              assert_equal(expected_value, actual_value, "expected #{attribute} to be #{expected_value}; got #{actual_value}")
+            end
+          end
+        elsif download_size.present? && strategy.image_urls.present?
           file = strategy.download_file!(strategy.image_urls.first)
           assert_equal(download_size, file.size)
         end
