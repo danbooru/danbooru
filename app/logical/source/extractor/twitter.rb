@@ -195,7 +195,9 @@ class Source::Extractor
 
       entries = graphql_api_response.dig("data", "threaded_conversation_with_injections_v2", "instructions", 0, "entries")
       entry = entries&.find { |entry| entry["entryId"] == "tweet-#{status_id}" }
-      entry&.dig("content", "itemContent", "tweet_results", "result") || {}
+      result = entry&.dig("content", "itemContent", "tweet_results", "result") || {}
+      tweet = result["tweet"] || result
+      tweet
     end
 
     def http
