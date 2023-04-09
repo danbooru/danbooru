@@ -139,7 +139,7 @@ class Source::Extractor
 
       # https://publish.twitter.com/?query=https%3A%2F%2Ftwitter.com%2Ftwotenky%2Fstatus%2F1577831592227000320
       # https://cdn.syndication.twimg.com/tweet-result?id=1577831592227000320
-      response = http.get("https://cdn.syndication.twimg.com/tweet-result?id=#{status_id}")
+      response = http.cache(1.minute).get("https://cdn.syndication.twimg.com/tweet-result?id=#{status_id}")
       return {} if response.code != 200
 
       response.parse.with_indifferent_access
@@ -184,7 +184,7 @@ class Source::Extractor
         responsive_web_enhance_cards_enabled: false,
       }
 
-      response = http.get("https://twitter.com/i/api/graphql/1oIoGPTOJN2mSjbbXlQifA/TweetDetail", params: { variables: variables.to_json, features: features.to_json })
+      response = http.cache(1.minute).get("https://twitter.com/i/api/graphql/1oIoGPTOJN2mSjbbXlQifA/TweetDetail", params: { variables: variables.to_json, features: features.to_json })
       return {} if response.code != 200
 
       response.parse.with_indifferent_access
