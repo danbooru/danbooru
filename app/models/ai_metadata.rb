@@ -77,7 +77,10 @@ class AIMetadata < ApplicationRecord
 
   def to_webui_parameters
     uc = "Negative prompt: #{negative_prompt}"
-    parameters = ["Steps", "Sampler", "CFG scale", "Seed"].map { |param| "#{param}: #{self.send(param.downcase.gsub(' ', '_').to_sym)}" }
+    parameters = ["Steps", "Sampler", "CFG scale", "Seed", "Model hash"].filter_map do |param|
+      value = self.send(param.downcase.gsub(" ", "_").to_sym)
+      "#{param}: #{value}" if value.present?
+    end
     parameters.push("Size: #{post.image_width}x#{post.image_height}")
 
     [prompt, uc, parameters.join(", ")].join("\n")
