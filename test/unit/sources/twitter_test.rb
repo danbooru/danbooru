@@ -212,6 +212,22 @@ module Sources
       )
     end
 
+    context "A tweet that from an account that is set to followers-only" do
+      strategy_should_work(
+        "https://twitter.com/enaiC31/status/1644997451626221568",
+        image_urls: ["https://pbs.twimg.com/media/FtQ0ddcaAAAkSvS.jpg:orig"],
+        page_url: "https://twitter.com/enaiC31/status/1644997451626221568",
+        profile_url: "https://twitter.com/enaiC31",
+        profile_urls: ["https://twitter.com/enaiC31", "https://twitter.com/intent/user?user_id=1444938344891240452"],
+        tag_name: "enaiC31",
+        tags: [],
+        artist_name: "えない🚀",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          すろぉもぉしょん💊
+        EOS
+      )
+    end
+
     context "A tweet without any images" do
       strategy_should_work(
         "https://twitter.com/teruyo/status/1058452066060853248",
