@@ -156,6 +156,8 @@ class ApplicationController < ActionController::Base
       render_error_page(503, exception, message: "The database is unavailable. Try again later.")
     else
       raise exception if Rails.env.development? || Danbooru.config.debug_mode
+
+      Sentry.capture_exception(exception)
       render_error_page(500, exception)
     end
   end
