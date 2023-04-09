@@ -5195,27 +5195,6 @@ CREATE INDEX index_posts_on_created_at ON public.posts USING btree (created_at);
 
 
 --
--- Name: index_posts_on_file_size; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_file_size ON public.posts USING btree (file_size);
-
-
---
--- Name: index_posts_on_image_height; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_image_height ON public.posts USING btree (image_height);
-
-
---
--- Name: index_posts_on_image_width; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_image_width ON public.posts USING btree (image_width);
-
-
---
 -- Name: index_posts_on_is_deleted; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5255,13 +5234,6 @@ CREATE INDEX index_posts_on_last_noted_at ON public.posts USING btree (last_note
 --
 
 CREATE UNIQUE INDEX index_posts_on_md5 ON public.posts USING btree (md5);
-
-
---
--- Name: index_posts_on_mpixels; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_mpixels ON public.posts USING btree (((((image_width * image_height))::numeric / 1000000.0)));
 
 
 --
@@ -7069,6 +7041,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230222230650'),
 ('20230309014439'),
 ('20230325143851'),
-('20230401013159');
+('20230401013159'),
+('20230409141638');
 
 
