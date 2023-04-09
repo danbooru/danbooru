@@ -18,7 +18,7 @@ module Sources
       strategy_should_work(
         "http://seiga.nicovideo.jp/seiga/im4937663",
         image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/4937663}],
-        download_size: 2_032,
+        media_files: [{ file_size: 2_032 }],
         page_url: "https://seiga.nicovideo.jp/seiga/im4937663",
         tags: tags,
         artist_name: "osamari",
@@ -42,7 +42,7 @@ module Sources
       strategy_should_work(
         "http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663",
         image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/4937663}],
-        download_size: 2_032,
+        media_files: [{ file_size: 2_032 }],
         page_url: "https://seiga.nicovideo.jp/seiga/im4937663",
         tags: tags,
         artist_name: "osamari",

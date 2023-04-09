@@ -4,14 +4,13 @@ module SourceTestHelper
   # A helper method to automate all the checks needed to make sure that a strategy does not break.
   #
   # * If media_files is present, then it tests that the downloaded files have the given attributes.
-  # * If download_size is present, it tests that the file is downloaded correctly and has the correct filesize.
   # * If deleted is true, it skips the downloading check, but it still tries everything else and makes sure nothing breaks.
   # * Any passed kwargs parameter is tested against the strategy.
 
   class_methods do
     def strategy_should_work(url, arguments = {})
       # XXX: can't use **kwargs because of a bug with shoulda-context
-      referer, download_size, deleted, media_files = [:referer, :download_size, :deleted, :media_files].map { |arg| arguments.delete(arg) }
+      referer, deleted, media_files = [:referer, :deleted, :media_files].map { |arg| arguments.delete(arg) }
 
       should "work" do
         strategy = Source::Extractor.find(url, referer)
@@ -33,9 +32,6 @@ module SourceTestHelper
               assert_equal(expected_value, actual_value, "expected #{attribute} to be #{expected_value}; got #{actual_value}")
             end
           end
-        elsif download_size.present? && strategy.image_urls.present?
-          file = strategy.download_file!(strategy.image_urls.first)
-          assert_equal(download_size, file.size)
         end
 
         if arguments.include?(:profile_url)

@@ -32,7 +32,7 @@ module Sources
         "https://imglf4.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJUFczb2RKSVlpMHJkNy9kc3BSQVQvQm5DNzB4eVhxay9nPT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0",
         image_urls: ["https://imglf4.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJUFczb2RKSVlpMHJkNy9kc3BSQVQvQm5DNzB4eVhxay9nPT0.png"],
         profile_url: nil,
-        download_size: 2_739_443
+        media_files: [{ file_size: 2_739_443 }]
       )
     end
 
@@ -78,7 +78,7 @@ module Sources
         artist_name: "okitagumi",
         page_url: "https://okitagumi.lofter.com/post/1e69aeeb_fbb63ca",
         profile_url: "https://okitagumi.lofter.com",
-        download_size: 154_620,
+        media_files: [{ file_size: 154_620 }],
         tags: [],
         dtext_artist_commentary_title: "冲田组原主与刀温馨向合志《金平糖》补货及预售通贩告知",
         dtext_artist_commentary_desc: <<~EOS.chomp

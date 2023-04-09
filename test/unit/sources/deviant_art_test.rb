@@ -11,7 +11,7 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484",
         image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/11a24395-0f24-446d-ae73-a9f812e79e55/d70rm0s-e5b6b5e6-5795-44bb-a0ba-27b5c2349be7\.jpg}],
-        download_size: 877_987,
+        media_files: [{ file_size: 877_987 }],
         page_url: "https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484",
         artist_name: "aeror404",
         profile_url: "https://www.deviantart.com/aeror404",
@@ -23,7 +23,7 @@ module Sources
       strategy_should_work(
         "https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png",
         image_urls: ["https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png"],
-        download_size: 833_251,
+        media_files: [{ file_size: 833_251 }],
         page_url: "https://www.deviantart.com/nickbeja/art/Mindflayer-Girl01-708675884",
         artist_name: "nickbeja",
         profile_url: "https://www.deviantart.com/nickbeja"
@@ -34,7 +34,7 @@ module Sources
       strategy_should_work(
         "https://pre00.deviantart.net/b5e6/th/pre/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg",
         image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/b1f96af6-56a3-47a8-b7f4-406f243af3a3/daihpha-9f1fcd2e-7557-4db5-951b-9aedca9a3ae7\.jpg}],
-        download_size: 906_621,
+        media_files: [{ file_size: 906_621 }],
         page_url: "https://www.deviantart.com/hideyoshi/art/Legend-of-Galactic-Heroes-635721022",
         artist_name: "hideyoshi",
         profile_url: "https://www.deviantart.com/hideyoshi",
@@ -77,7 +77,7 @@ module Sources
       strategy_should_work(
         "http://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png",
         image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png}],
-        download_size: 3_619,
+        media_files: [{ file_size: 3_619 }],
         page_url: "https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408",
         artist_name: "noizave",
         profile_url: "https://www.deviantart.com/noizave",
@@ -91,7 +91,7 @@ module Sources
       strategy_should_work(
         "https://img00.deviantart.net/a233/i/2017/160/5/1/test_post_please_ignore_by_noizave-dbc3a48.png",
         image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png}],
-        download_size: 3_619,
+        media_files: [{ file_size: 3_619 }],
         page_url: "https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408"
       )
     end
@@ -100,7 +100,7 @@ module Sources
       strategy_should_work(
         "http://th00.deviantart.net/fs71/PRE/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png",
         image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/d8995973-0b32-4a7d-8cd8-d847d083689a/d797tit-1eac22e0-38b6-4eae-adcb-1b72843fd62a\.png}],
-        download_size: 3_391_584,
+        media_files: [{ file_size: 3_391_584 }],
         page_url: "https://www.deviantart.com/xyelkiltrox/art/Goruto-438744629"
       )
     end
@@ -109,7 +109,7 @@ module Sources
       strategy_should_work(
         "https://noizave.deviantart.com/art/test-no-download-697415967",
         image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbj81lr-3306feb1-87dc-4d25-9a4c-da8d2973a8b7\.jpg\?token=}],
-        download_size: 59_401,
+        media_files: [{ file_size: 59_401 }],
         page_url: "https://www.deviantart.com/noizave/art/test-no-download-697415967",
         artist_name: "noizave",
         profile_url: "https://www.deviantart.com/noizave",
@@ -120,7 +120,7 @@ module Sources
     context "A deviantart page with download disabled for a huge file" do
       strategy_should_work(
         "https://www.deviantart.com/anatofinnstark/art/The-Blade-of-Miquella-914166242",
-        download_size: 26_037_561
+        media_files: [{ file_size: 26_037_561 }]
       )
     end
 
@@ -128,7 +128,7 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781",
         image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/a6289ca5-2205-4118-af55-c6934fba0930/dct67m5-51e8db38-9167-4f5c-931d-561ea4d3810d\.jpg}],
-        download_size: 1_402_017,
+        media_files: [{ file_size: 1_402_017 }],
         page_url: "https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781",
         artist_name: "len1",
         profile_url: "https://www.deviantart.com/len1",
@@ -189,7 +189,7 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/heartgear/art/Silent-Night-579982816",
         image_urls: [%r{\Ahttps://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/ea95be00-c5aa-4063-bd55-f5a9183912f7/d9lb1ls-7d625444-0003-4123-bf00-274737ca7fdd.gif\?token=}],
-        download_size: 350_156
+        media_files: [{ file_size: 350_156 }]
       )
     end
 
@@ -197,7 +197,7 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/gs-mantis/art/Chen-Goes-Fishing-505847233",
         image_urls: ["https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4"],
-        download_size: 9_739_947
+        media_files: [{ file_size: 9_739_947 }]
       )
     end
 
@@ -205,7 +205,7 @@ module Sources
       strategy_should_work(
         "http://noizave.deviantart.com/art/hidden-work-685458369",
         image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3r29-10c99118-5cfe-4402-ad55-7b57e7c0ca43\.png}],
-        download_size: 3_619
+        media_files: [{ file_size: 3_619 }]
       )
     end
 

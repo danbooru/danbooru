@@ -15,7 +15,7 @@ module Sources
           artist_commentary_title: "",
           dtext_artist_commentary_desc: "Karl franz.",
           tags: [],
-          download_size: 1_360_409,
+          media_files: [{ file_size: 1_360_409 }],
         )
       end
 
@@ -31,7 +31,7 @@ module Sources
           artist_commentary_title: "",
           dtext_artist_commentary_desc: "Karl franz.",
           tags: [],
-          download_size: 1_360_409,
+          media_files: [{ file_size: 1_360_409 }],
         )
       end
 
@@ -47,7 +47,7 @@ module Sources
           artist_commentary_title: "",
           dtext_artist_commentary_desc: "Karl franz.",
           tags: [],
-          download_size: 1_360_409,
+          media_files: [{ file_size: 1_360_409 }],
         )
       end
 
@@ -63,7 +63,7 @@ module Sources
           artist_commentary_title: "Bow Dash",
           dtext_artist_commentary_desc: "",
           tags: [],
-          download_size: 106_895,
+          media_files: [{ file_size: 106_895 }],
         )
       end
 
@@ -128,7 +128,7 @@ module Sources
           artist_commentary_title: "",
           dtext_artist_commentary_desc: "",
           tags: [],
-          download_size: 3_818_049,
+          media_files: [{ file_size: 3_818_049 }],
         )
       end
 
@@ -144,7 +144,7 @@ module Sources
           artist_commentary_title: "",
           dtext_artist_commentary_desc: "",
           tags: [],
-          download_size: 3_818_049,
+          media_files: [{ file_size: 3_818_049 }],
         )
       end
 

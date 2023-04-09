@@ -25,7 +25,7 @@ module Sources
         tags: %w[gantz Reika],
         artist_commentary_title: "Reika ",
         dtext_artist_commentary_desc: "From Gantz.",
-        download_size: 210_899
+        media_files: [{ file_size: 210_899 }]
       )
     end
 
@@ -92,7 +92,7 @@ module Sources
       strategy_should_work(
         "https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4",
         image_urls: ["https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4"],
-        download_size: 377_969,
+        media_files: [{ file_size: 377_969 }],
       )
     end
 
@@ -111,7 +111,7 @@ module Sources
       strategy_should_work(
         "https://cdnb3.artstation.com/p/assets/images/images/003/716/071/small/aoi-ogata-hate-city.jpg?1476754974",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/003/716/071/4k/aoi-ogata-hate-city.jpg?1476754974"],
-        download_size: 1_816_628
+        media_files: [{ file_size: 1_816_628 }]
       )
     end
 
@@ -119,7 +119,7 @@ module Sources
       strategy_should_work(
         "https://cdnb.artstation.com/p/assets/images/images/003/716/071/large/aoi-ogata-hate-city.jpg?1476754974",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/003/716/071/4k/aoi-ogata-hate-city.jpg?1476754974"],
-        download_size: 1_816_628
+        media_files: [{ file_size: 1_816_628 }]
       )
     end
 
@@ -127,7 +127,7 @@ module Sources
       strategy_should_work(
         "https://cdna.artstation.com/p/assets/images/images/004/730/278/large/mendel-oh-dragonll.jpg",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/004/730/278/4k/mendel-oh-dragonll.jpg"],
-        download_size: 452_985
+        media_files: [{ file_size: 452_985 }]
       )
     end
 

@@ -6,7 +6,7 @@ module Sources
       strategy_should_work(
         "https://www.plurk.com/p/om6zv4",
         image_urls: ["https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg"],
-        download_size: 627_697,
+        media_files: [{ file_size: 627_697 }],
         artist_name: "紅眼兔@姑且是個畫圖的",
         tag_name: "redeyehare",
         profile_url: "https://www.plurk.com/redeyehare",
