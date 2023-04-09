@@ -123,7 +123,7 @@ class Post < ApplicationRecord
       translated_description: translated_commentary_desc,
     )
 
-    ai_metadata = AIMetadata.new_from_metadata(media_asset.metadata)
+    ai_metadata = AIMetadata.new_from_metadata(media_asset&.metadata.to_h)
     ai_metadata.assign_attributes({
       prompt: prompt,
       negative_prompt: negative_prompt,
