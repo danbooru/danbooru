@@ -43,18 +43,15 @@ module Source
       end
 
       def artist_name
-        name = page&.css(".item-user .item-details h4 a")&.text&.strip || user_name
-        name&.downcase
+        page&.at(".item-user .item-details h4 a")&.text&.strip || user_name
       end
 
       def other_names
-        [artist_name, user_name].compact.uniq
+        [artist_name, (user_name if user_name != artist_name&.downcase)].compact.uniq
       end
 
       def profile_url
-        # user names are not mutable, artist names are.
-        # However we need the latest name for normalization
-        "https://#{artist_name}.newgrounds.com" if artist_name.present?
+        page&.at(".item-user .item-details h4 a")&.attr("href") || parsed_url.profile_url || parsed_referer&.profile_url
       end
 
       def artist_commentary_title
