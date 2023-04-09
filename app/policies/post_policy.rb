@@ -90,7 +90,7 @@ class PostPolicy < ApplicationPolicy
 
   def api_attributes
     attributes = super
-    attributes += [:has_large, :has_visible_children]
+    attributes += [:has_large, :has_visible_children, :media_asset]
     attributes += TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
     attributes += [:file_url, :large_file_url, :preview_file_url] if visible?
     attributes -= [:md5] if !visible?
