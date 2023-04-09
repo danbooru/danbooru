@@ -11,7 +11,7 @@ module Sources
           artist_commentary_title: nil,
           artist_commentary_desc: nil,
           dtext_artist_commentary_desc: "",
-          download_size: 145_602,
+          media_files: [{ file_size: 145_602 }],
         )
       end
 
@@ -28,7 +28,7 @@ module Sources
 
             Please note that discussion should pertain to a VTuber's streams and content, and should not pertain to their real lives, relationships, or appearances ("IRL").
           EOS
-          download_size: 145_602,
+          media_files: [{ file_size: 145_602 }],
         )
       end
 
@@ -40,7 +40,7 @@ module Sources
           artist_commentary_title: nil,
           artist_commentary_desc: nil,
           dtext_artist_commentary_desc: "",
-          download_size: 7430,
+          media_files: [{ file_size: 7430 }],
         )
       end
 
@@ -56,7 +56,7 @@ module Sources
 
             Please note that discussion should pertain to a VTuber's streams and content, and should not pertain to their real lives, relationships, or appearances ("IRL").
           EOS
-          download_size: 145_602,
+          media_files: [{ file_size: 145_602 }],
         )
       end
 
@@ -65,7 +65,7 @@ module Sources
           "https://boards.4channel.org/vt/thread/1",
           image_urls: ["https://i.4cdn.org/vt/1611919211191.jpg"],
           page_url: "https://boards.4channel.org/vt/thread/1",
-          download_size: 145_602,
+          media_files: [{ file_size: 145_602 }],
         )
       end
     end

@@ -37,7 +37,7 @@ module Sources
         strategy_should_work(
           "https://public-files.gumroad.com/variants/6hbo93vnwie3ff26u5f4t6bnksm4/baaca0eb0e33dc4f9d45910b8c86623f0144cea0fe0c2093c546d17d535752eb",
           image_urls: ["https://public-files.gumroad.com/6hbo93vnwie3ff26u5f4t6bnksm4"],
-          download_size: 859_625,
+          media_files: [{ file_size: 859_625 }],
           page_url: nil,
           profile_url: nil,
           artist_name: nil,

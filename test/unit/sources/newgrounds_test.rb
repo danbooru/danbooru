@@ -7,7 +7,7 @@ module Sources
         "https://www.newgrounds.com/art/view/hcnone/sephiroth",
         image_urls: ["https://art.ngfiles.com/images/1539000/1539538_hcnone_sephiroth.png?f1607668234"],
         page_url: "https://www.newgrounds.com/art/view/hcnone/sephiroth",
-        download_size: 4_224,
+        media_files: [{ file_size: 4_224 }],
         artist_name: "hcnone",
         profile_url: "https://hcnone.newgrounds.com",
         artist_commentary_title: "Sephiroth",
@@ -23,7 +23,7 @@ module Sources
         "https://art.ngfiles.com/images/1539000/1539538_hcnone_sephiroth.png?f1607668234",
         image_urls: ["https://art.ngfiles.com/images/1539000/1539538_hcnone_sephiroth.png?f1607668234"],
         page_url: "https://www.newgrounds.com/art/view/hcnone/sephiroth",
-        download_size: 4_224,
+        media_files: [{ file_size: 4_224 }],
         artist_name: "hcnone",
         profile_url: "https://hcnone.newgrounds.com",
         artist_commentary_title: "Sephiroth",
@@ -64,7 +64,7 @@ module Sources
       strategy_should_work(
         "https://uploads.ungrounded.net/alternate/1801000/1801343_alternate_165104.360p.mp4?1639666238",
         image_urls: ["https://uploads.ungrounded.net/alternate/1801000/1801343_alternate_165104.mp4"],
-        download_size: 75_605_846
+        media_files: [{ file_size: 75_605_846 }]
       )
     end
 

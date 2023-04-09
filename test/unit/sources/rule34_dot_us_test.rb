@@ -9,7 +9,7 @@ module Sources
           page_url: "https://rule34.us/index.php?r=posts/view&id=6204967",
           image_urls: ["https://img2.rule34.us/images/23/66/236690fd962fa394edf9894450261dac.png"],
           tags: %w[sora kingdom_hearts rule_63 ai_generated brown_hair female genderswap_(mtf) nai_diffusion stable_diffusion],
-          download_size: 503_358,
+          media_files: [{ file_size: 503_358 }],
         )
       end
 
@@ -19,7 +19,7 @@ module Sources
           page_url: "https://rule34.us/index.php?r=posts/view&id=6204967",
           image_urls: ["https://img2.rule34.us/images/23/66/236690fd962fa394edf9894450261dac.png"],
           tags: %w[sora kingdom_hearts rule_63 ai_generated brown_hair female genderswap_(mtf) nai_diffusion stable_diffusion],
-          download_size: 503_358,
+          media_files: [{ file_size: 503_358 }],
         )
       end
 
@@ -29,7 +29,7 @@ module Sources
           page_url: "https://rule34.us/index.php?r=posts/view&id=6204967",
           image_urls: ["https://img2.rule34.us/images/23/66/236690fd962fa394edf9894450261dac.png"],
           tags: %w[sora kingdom_hearts rule_63 ai_generated brown_hair female genderswap_(mtf) nai_diffusion stable_diffusion],
-          download_size: 503_358,
+          media_files: [{ file_size: 503_358 }],
         )
       end
     end

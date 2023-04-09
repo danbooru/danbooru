@@ -11,7 +11,11 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        download_size: 275_713,
+        media_files: [
+          { file_size: 275_713 },
+          { file_size: 207_248 },
+          { file_size: 188_553 },
+        ],
         profile_url: "https://twitter.com/motty08111213",
         artist_name: "丸茂_えのぐマネージャー",
         tag_name: "motty08111213",
@@ -36,7 +40,6 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        download_size: 275_713,
         profile_url: "https://twitter.com/motty08111213",
         artist_name: "丸茂_えのぐマネージャー",
         tag_name: "motty08111213",
@@ -53,7 +56,6 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        download_size: 275_713,
         profile_url: "https://twitter.com/motty08111213",
         artist_name: "丸茂_えのぐマネージャー",
         tag_name: "motty08111213",
@@ -66,7 +68,7 @@ module Sources
         "https://twitter.com/CincinnatiZoo/status/859073537713328129",
         image_urls: ["https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4"],
         page_url: "https://twitter.com/CincinnatiZoo/status/859073537713328129",
-        download_size: 8_602_983,
+        media_files: [{ file_size: 8_602_983 }],
         dtext_artist_commentary_desc: <<~EOS.chomp
           Fiona loves playing in the hose water just like her parents! 💦 "#TeamFiona":[https://twitter.com/hashtag/TeamFiona] "#fionafix":[https://twitter.com/hashtag/fionafix]
         EOS
@@ -78,7 +80,7 @@ module Sources
       strategy_should_work(
         "https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:small",
         image_urls: ["https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig"],
-        download_size: 18_058
+        media_files: [{ file_size: 18_058 }]
       )
     end
 
@@ -86,7 +88,7 @@ module Sources
       strategy_should_work(
         "https://pbs.twimg.com/ext_tw_video_thumb/1578376127801761793/pu/img/oGcUqPnwRYYhk-gi.jpg:small",
         image_urls: ["https://pbs.twimg.com/ext_tw_video_thumb/1578376127801761793/pu/img/oGcUqPnwRYYhk-gi.jpg:orig"],
-        download_size: 243_227
+        media_files: [{ file_size: 243_227 }]
       )
     end
 
@@ -95,7 +97,7 @@ module Sources
       strategy_should_work(
         "https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:small",
         image_urls: ["https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:orig"],
-        download_size: 106_942
+        media_files: [{ file_size: 106_942 }]
       )
     end
 
@@ -103,7 +105,7 @@ module Sources
       strategy_should_work(
         "https://twitter.com/i/web/status/1252517866059907073",
         image_urls: ["https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4"],
-        download_size: 542_833,
+        media_files: [{ file_size: 542_833 }],
         artist_commentary_desc: "https://t.co/gyTKOSBOQ7",
         dtext_artist_commentary_desc: ""
       )
@@ -129,7 +131,7 @@ module Sources
       strategy_should_work(
         "https://mobile.twitter.com/Strangestone/status/556440271961858051",
         image_urls: ["https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:orig"],
-        download_size: 280_150,
+        media_files: [{ file_size: 280_150 }],
         page_url: "https://twitter.com/Strangestone/status/556440271961858051",
         profile_url: "https://twitter.com/Strangestone",
         profile_urls: ["https://twitter.com/Strangestone", "https://twitter.com/intent/user?user_id=93332575"],
@@ -234,7 +236,7 @@ module Sources
         "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large",
         referer: "https://twitter.com/nounproject/status/540944400767922176",
         image_urls: ["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"],
-        download_size: 9800,
+        media_files: [{ file_size: 9800 }],
         page_url: "https://twitter.com/nounproject/status/540944400767922176",
         profile_url: "https://twitter.com/nounproject/status/540944400767922176",
         profile_urls: ["https://twitter.com/nounproject", "https://twitter.com/intent/user?user_id=88996186"],
@@ -260,7 +262,7 @@ module Sources
       strategy_should_work(
         "https://pbs.twimg.com/media/EBGp2YdUYAA19Uj?format=jpg&name=small",
         image_urls: ["https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig"],
-        download_size: 229_661,
+        media_files: [{ file_size: 229_661 }],
         profile_url: nil
       )
     end
@@ -269,7 +271,7 @@ module Sources
       strategy_should_work(
         "https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg",
         image_urls: ["https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg:orig"],
-        download_size: 842_373,
+        media_files: [{ file_size: 842_373 }],
         profile_url: nil
       )
     end
@@ -298,7 +300,7 @@ module Sources
       strategy_should_work(
         "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696",
         image_urls: ["https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/1500x500"],
-        download_size: 128_141,
+        media_files: [{ file_size: 128_141 }],
         profile_url: nil
         # profile_url: "https://twitter.com/intent/user?user_id=780804311529906176"
         # XXX we COULD fully support these by setting the page_url to https://twitter.com/Kekeflipnote/header_photo, but it's a lot of work for a niche case
@@ -309,7 +311,7 @@ module Sources
       strategy_should_work(
         "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/600x200",
         image_urls: ["https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/1500x500"],
-        download_size: 128_141,
+        media_files: [{ file_size: 128_141 }],
         profile_url: nil
       )
     end

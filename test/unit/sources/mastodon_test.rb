@@ -15,7 +15,7 @@ module Sources
           tag_name: "9ed00e924818",
           artist_name: nil,
           dtext_artist_commentary_desc: "a mind forever voyaging through strange seas of thought alone",
-          download_size: 7_680,
+          media_files: [{ file_size: 7_680 }],
         )
       end
 
@@ -50,7 +50,7 @@ module Sources
         strategy_should_work(
           "https://img.pawoo.net/media_attachments/files/001/298/028/original/55a6fd252778454b.mp4",
           image_urls: ["https://img.pawoo.net/media_attachments/files/001/298/028/original/55a6fd252778454b.mp4"],
-          download_size: 59_950,
+          media_files: [{ file_size: 59_950 }],
           referer: "https://pawoo.net/@evazion/19451018",
           page_url: "https://pawoo.net/@evazion/19451018"
         )
@@ -75,7 +75,7 @@ module Sources
         strategy_should_work(
           "https://baraag.net/@bardbot/105732813175612920",
           image_urls: ["https://media.baraag.net/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"],
-          download_size: 573_353,
+          media_files: [{ file_size: 573_353 }],
           profile_url: "https://baraag.net/@bardbot",
           tag_name: "bardbot",
           artist_name: "SpicyBardo🔞",
@@ -87,7 +87,7 @@ module Sources
         strategy_should_work(
           "https://baraag.net/system/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png",
           image_urls: ["https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
-          download_size: 363_261
+          media_files: [{ file_size: 363_261 }]
         )
       end
 
@@ -95,7 +95,7 @@ module Sources
         strategy_should_work(
           "https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png",
           image_urls: ["https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
-          download_size: 363_261
+          media_files: [{ file_size: 363_261 }]
         )
       end
 

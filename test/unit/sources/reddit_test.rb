@@ -76,7 +76,7 @@ module Sources
       strategy_should_work(
         "https://i.redd.it/oc5y8k06ryq81.png",
         image_urls: ["https://i.redd.it/oc5y8k06ryq81.png"],
-        download_size: 940_616,
+        media_files: [{ file_size: 940_616 }],
         page_url: nil
       )
     end
@@ -85,7 +85,7 @@ module Sources
       strategy_should_work(
         "https://preview.redd.it/qtdv0k06ryq81.png?width=960&crop=smart&auto=webp&s=3b1505f76f3c8b7ce47da5ab2dd17c511d3c2a44",
         image_urls: ["https://i.redd.it/qtdv0k06ryq81.png"],
-        download_size: 699_898,
+        media_files: [{ file_size: 699_898 }],
         page_url: nil
       )
     end

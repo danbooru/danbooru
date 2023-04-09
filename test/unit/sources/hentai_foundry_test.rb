@@ -9,7 +9,7 @@ module Sources
         artist_name: "Afrobull",
         artist_commentary_title: "kuroeda",
         profile_url: "https://www.hentai-foundry.com/user/Afrobull",
-        download_size: 1_349_887,
+        media_files: [{ file_size: 1_349_887 }],
         tags: [["elf", "https://www.hentai-foundry.com/pictures/tagged/elf"]]
       )
     end
@@ -21,7 +21,7 @@ module Sources
         artist_name: "Afrobull",
         artist_commentary_title: "kuroeda",
         profile_url: "https://www.hentai-foundry.com/user/Afrobull",
-        download_size: 1_349_887,
+        media_files: [{ file_size: 1_349_887 }],
         tags: [["elf", "https://www.hentai-foundry.com/pictures/tagged/elf"]]
       )
     end

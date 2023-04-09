@@ -32,7 +32,7 @@ module Sources
           image_urls: %w[
             https://dthezntil550i.cloudfront.net/4b/latest/4b2112261505098280008769655/d5b22a94-4864-45d5-96e7-cbca9e0043f4.png
           ],
-          download_size: 6_650_948,
+          media_files: [{ file_size: 6_650_948 }],
           profile_url: "https://medibang.com/author/8769655/",
           profile_urls: %w[
             https://medibang.com/u/16672238/
@@ -158,7 +158,7 @@ module Sources
           "https://medibang.com/picture/ln1908221547595430010136798/",
           page_url: "https://medibang.com/picture/ln1908221547595430010136798/",
           image_urls: ["https://dthezntil550i.cloudfront.net/ln/latest/ln1908221547595430010136798/922ad884-b010-498c-a979-50e9a464fee3.png"],
-          download_size: 827_822,
+          media_files: [{ file_size: 827_822 }],
           profile_url: "https://medibang.com/author/10136798/",
           profile_urls: %w[
             https://medibang.com/author/10136798/

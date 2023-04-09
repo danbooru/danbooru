@@ -10,7 +10,7 @@ module Sources
           image_urls: %w[
             https://img-org.poipiku.com/user_img03/000000583/002867587_M1EY9rofF.jpeg
           ],
-          download_size: 209_902,
+          media_files: [{ file_size: 209_902 }],
           profile_url: "https://poipiku.com/583/",
           profile_urls: %w[https://poipiku.com/583/ https://twitter.com/avocado_0w0],
           artist_name: "リアクションありがとう～～",
@@ -54,7 +54,7 @@ module Sources
           image_urls: %w[
             https://img-org.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg
           ],
-          download_size: 343_562,
+          media_files: [{ file_size: 343_562 }],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
           artist_name: "omo_chi2",
@@ -78,7 +78,7 @@ module Sources
           image_urls: %w[
             https://img-org.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg
           ],
-          download_size: 343_562,
+          media_files: [{ file_size: 343_562 }],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
           artist_name: "omo_chi2",

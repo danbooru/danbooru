@@ -42,7 +42,7 @@ module Sources
       strategy_should_work(
         "https://nijie.info/view.php?id=213043",
         image_urls: ["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"],
-        download_size: 132_555,
+        media_files: [{ file_size: 132_555 }],
         artist_name: "莚",
         other_names: ["莚"],
         profile_url: "https://nijie.info/members.php?id=728995",
