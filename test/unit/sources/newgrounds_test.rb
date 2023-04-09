@@ -39,7 +39,9 @@ module Sources
         "https://www.newgrounds.com/portal/view/536659",
         image_urls: ["https://uploads.ungrounded.net/alternate/167000/167280_alternate_602.mp4"],
         profile_url: "https://jenjamik.newgrounds.com",
-        artist_name: "jenjamik",
+        artist_name: "Jenjamik",
+        other_names: ["Jenjamik"],
+        tag_name: "jenjamik",
         page_url: "https://www.newgrounds.com/portal/view/536659",
         artist_commentary_title: "Link's Barrel Beat",
         dtext_artist_commentary_desc: /Long time no see!/
@@ -71,10 +73,14 @@ module Sources
     context "A multi-image post" do
       strategy_should_work(
         "https://www.newgrounds.com/art/view/natthelich/weaver",
-        image_urls: [
-          "https://art.ngfiles.com/images/1520000/1520217_natthelich_weaver.jpg?f1606365031",
-          "https://art.ngfiles.com/comments/199000/iu_199826_7115981.jpg",
-        ]
+        image_urls: %w[
+          https://art.ngfiles.com/images/1520000/1520217_natthelich_weaver.jpg?f1606365031
+          https://art.ngfiles.com/comments/199000/iu_199826_7115981.jpg
+        ],
+        profile_url: "https://natthelich.newgrounds.com",
+        artist_name: "NatTheLich",
+        other_names: ["NatTheLich"],
+        tag_name: "natthelich",
       )
     end
 
@@ -84,7 +90,9 @@ module Sources
         deleted: true,
         image_urls: [],
         profile_url: "https://natthelich.newgrounds.com",
-        artist_name: "natthelich"
+        artist_name: "natthelich",
+        other_names: ["natthelich"],
+        tag_name: "natthelich",
       )
     end
 
@@ -109,7 +117,30 @@ module Sources
     context "A post with links to other illustrations not belonging to the commentary" do
       strategy_should_work(
         "https://www.newgrounds.com/art/view/boxofwant/annie-hughes-1",
+        profile_url: "https://boxofwant.newgrounds.com",
+        artist_name: "BoxOfWant",
+        other_names: ["BoxOfWant"],
+        tag_name: "boxofwant",
         dtext_artist_commentary_desc: 'Commission of Annie Hughes, the mom from The Iron Giant, for "@ManStawberry":[https://twitter.com/ManStawberry].'
+      )
+    end
+
+    context "A video credited to multiple users" do
+      strategy_should_work(
+        "https://www.newgrounds.com/portal/view/874316",
+        image_urls: ["https://uploads.ungrounded.net/alternate/4520000/4520879_alternate_210456.mp4"],
+        profile_url: "https://jakada.newgrounds.com",
+        artist_name: "Jakada",
+        other_names: ["Jakada"],
+        tag_name: "jakada",
+        artist_commentary_title: "Selen Tatsuki",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          VA&SFX courtesy of BrittanyBabbles
+
+          --------------------------------------------------------------
+
+          Follow me on twitter if you liked! Im posting a lot of wips for my upcoming nsfw animation project there <https://twitter.com/jakada_ani>
+        EOS
       )
     end
 
