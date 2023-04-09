@@ -44,6 +44,11 @@ module SourceTestHelper
           should_validate_tags(strategy, tags)
         end
 
+        if arguments.include?(:translated_tags)
+          translated_tags = arguments.delete(:translated_tags)
+          assert_equal(translated_tags.sort, strategy.translated_tags.map(&:name).sort)
+        end
+
         should_match_source_data(strategy, arguments)
       end
     end
