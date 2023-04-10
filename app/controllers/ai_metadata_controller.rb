@@ -10,12 +10,11 @@ class AIMetadataController < ApplicationController
     respond_with(@ai_metadata, model: "AIMetadata")
   end
 
-  def search
-  end
-
   def show
     @ai_metadata = authorize AIMetadata.find(params[:id])
-    respond_with(@ai_metadata)
+    respond_with(@ai_metadata) do |fmt|
+      fmt.html { redirect_to ai_metadata_path(search: { id: @ai_metadata.id }) }
+    end
   end
 
   def create_or_update

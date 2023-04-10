@@ -4,6 +4,17 @@
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
+    <%= search_form_for(ai_metadata_path) do |f| %>
+      <%= f.input :prompt_matches, label: "Prompt" %>
+      <%= f.input :negative_prompt_matches, label: "Negative prompt" %>
+      <%= f.input :sampler %>
+      <%= f.input :seed %>
+      <%= f.input :steps %>
+      <%= f.input :cfg_scale %>
+      <%= f.input :model_hash %>
+      <%= f.submit "Search" %>
+    <% end %>
+
     <%= table_for @ai_metadata, width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |metadata| %>
         <%= post_preview(metadata.post, show_deleted: true) %>

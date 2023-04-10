@@ -51,11 +51,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :ai_metadata, only: [:index, :show] do
-    collection do
-      get :search
-    end
-  end
+  resources :ai_metadata, only: [:index, :show]
   resources :ai_metadata_versions, only: [:index, :show]
   resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
 
