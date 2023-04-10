@@ -13,6 +13,8 @@
         <%= render "ai_metadata/show", ai_metadata: metadata %>
       <% end %>
     <% end %>
+
+    <%= numbered_paginator(@ai_metadata) %>
   </div>
 </div>
 
