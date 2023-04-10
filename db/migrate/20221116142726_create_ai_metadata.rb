@@ -1,7 +1,7 @@
 class CreateAIMetadata < ActiveRecord::Migration[7.0]
   def change
     create_table :ai_metadata do |t|
-      t.references :post, index: { unique: true }
+      t.references :post, null: false, index: { unique: true }
       t.text :prompt
       t.text :negative_prompt
       t.string :sampler

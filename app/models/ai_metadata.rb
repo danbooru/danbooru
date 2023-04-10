@@ -11,7 +11,7 @@ class AIMetadata < ApplicationRecord
   before_save :normalize_prompts
   before_validation :normalize_model_hash
   validate :validate_model_hash, if: :model_hash_changed?
-
+  validates :post_id, uniqueness: true
   belongs_to :post
 
   versionable :prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash, :post_id
