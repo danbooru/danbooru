@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AIMetadata < ApplicationRecord
+  self.table_name = "ai_metadata"
+
   PARAMETER_REGEX = /\s*([\w ]+):\s*("(?:\\|\"|[^\"])+"|[^,]*)(?:,|$)/
 
   include Versionable
@@ -15,7 +17,7 @@ class AIMetadata < ApplicationRecord
   versionable :prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash, :post_id
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :post_id, :prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash, :created_at, :updated_at], current_user: current_user)
+    q = search_attributes(params, [:id, :post, :prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash, :created_at, :updated_at], current_user: current_user)
 
     q.apply_default_order(params)
   end
@@ -120,5 +122,9 @@ class AIMetadata < ApplicationRecord
   def revert_to!(version)
     revert_to(version)
     save!
+  end
+
+  def self.available_includes
+    %i[post]
   end
 end

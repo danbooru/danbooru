@@ -7,7 +7,7 @@ class AIMetadataController < ApplicationController
     @ai_metadata = authorize AIMetadata.paginated_search(params)
     @ai_metadata.includes(post: [:uploader, :media_asset]) if request.format.html?
 
-    respond_with(@ai_metadata)
+    respond_with(@ai_metadata, model: "AIMetadata")
   end
 
   def search
