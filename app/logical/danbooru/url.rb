@@ -44,8 +44,10 @@ module Danbooru
       @url = Addressable::URI.heuristic_parse(original_url)
 
       @url.authority = @url.normalized_authority
+
+      # Decode percent-encoded paths. Leave percent-encoded if characters are invalid UTF-8 or nonprintable (spaces, control characters).
       @url.path = Addressable::URI.unencode_component(@url.path, String, "/%")
-      raise Error, "invalid byte sequence in UTF-8" if !@url.path.valid_encoding?
+      @url.path.force_encoding("ASCII-8BIT").gsub(/[^[:ascii:]]/) { |c| "%%%02X" % c.ord }.force_encoding("UTF-8") if !@url.path.valid_encoding?
       @url.path = @url.path.gsub(/[^[:graph:]]/) { |c| "%%%02X" % c.ord }
       @url.path = nil if @url.path == "/"
 
