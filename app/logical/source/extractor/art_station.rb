@@ -43,7 +43,7 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      ActionView::Base.full_sanitizer.sanitize(artist_commentary_desc)
+      DText.from_html(artist_commentary_desc)&.strip
     end
 
     def tags
