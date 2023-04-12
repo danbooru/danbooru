@@ -33,7 +33,9 @@ module Sources
       strategy_should_work(
         "https://www.artstation.com/artwork/cody-from-sf",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/000/144/922/4k/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"],
-        tags: ["Street Fighter", "Cody", "SF", "NoAI"]
+        tags: ["Street Fighter", "Cody", "SF", "NoAI"],
+        artist_commentary_title: "Cody from SF",
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -67,7 +69,9 @@ module Sources
     context "An ArtStation post with images and youtube links" do
       strategy_should_work(
         "https://www.artstation.com/artwork/BDxrA",
-        image_urls: ["https://cdn.artstation.com/p/assets/images/images/006/037/253/4k/astri-lohne-sjursen-eva.jpg?1495573664"]
+        image_urls: ["https://cdn.artstation.com/p/assets/images/images/006/037/253/4k/astri-lohne-sjursen-eva.jpg?1495573664"],
+        artist_commentary_title: "Akealor",
+        dtext_artist_commentary_desc: "Demon hunter commissionnnn",
       )
     end
 
@@ -84,7 +88,15 @@ module Sources
           https://cdn.artstation.com/p/assets/images/images/040/980/932/4k/yusuf-umar-tpose.jpg?1630427748
           https://cdn.artstation.com/p/video_sources/000/466/622/workout.mp4
           https://cdn.artstation.com/p/video_sources/000/466/623/workout-clay.mp4
-        ]
+        ],
+        artist_commentary_title: "Workout",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Workout. Created using Blender 2.93 and rendered using Eevee.
+          Blend file is available on:
+          <https://gum.co/oVXqU>
+          <https://www.artstation.com/marketplace/p/v9YrA>
+          If you like my artwork, consider supporting me on Patreon: <https://www.patreon.com/ucupumar>
+        EOS
       )
     end
 
@@ -134,14 +146,54 @@ module Sources
     context "An ArtStation url with underscores in the artist name" do
       strategy_should_work(
         "https://hosi_na.artstation.com/projects/3oEk3B",
-        artist_name: "hosi_na"
+        artist_name: "hosi_na",
+        artist_commentary_title: "The Queen 여왕",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          The keywords of this concept are absolute Power, The Queen, and a cool-headed person. 
+          컨셉 키워드는 '힘,여왕,냉정함'
+        EOS
       )
     end
 
     context "An ArtStation url with dashes in the artist name" do
       strategy_should_work(
         "https://sa-dui.artstation.com/projects/DVERn",
-        artist_name: "sa-dui"
+        artist_name: "sa-dui",
+        artist_commentary_title: "Commission : Srevere",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Commission for Srevere.
+          Cover image for her Pokemon-based fandom series.
+        EOS
+      )
+    end
+
+    context "An ArtStation post with HTML entities in the commentary" do
+      strategy_should_work(
+        "https://www.artstation.com/artwork/nq8go",
+        page_url: "https://idrawbagman.artstation.com/projects/nq8go",
+        image_urls: %w[
+          https://cdn.artstation.com/p/assets/images/images/006/809/536/4k/kent-davis-stillben-02.jpg?1501433242
+          https://cdn.artstation.com/p/assets/images/images/006/809/540/4k/kent-davis-theemeraldcitadelofsyngorn-03.jpg?1501433246
+          https://cdn.artstation.com/p/assets/images/images/006/809/543/4k/kent-davis-theinsatiablesanctuary-02.jpg?1501433252
+          https://cdn.artstation.com/p/assets/images/images/006/809/614/4k/kent-davis-wildemountcastle-02.jpg?1501433798
+        ],
+        artist_name: "idrawbagman",
+        tag_name: "idrawbagman",
+        other_names: ["idrawbagman"],
+        profile_url: "https://www.artstation.com/idrawbagman",
+        tags: [],
+        artist_commentary_title: "Landscapes of Tal'dorei Part 1",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          "Wildemount Castle"
+          "The Insatiable Sanctuary"
+          "Stilben"
+          "The Emerald Citadel of Syngorn"
+
+          These were featured as part of the art for the "Tal'dorei Campaign Setting" book by Matt Mercer and James Haeck. Based on locations on the continent of Tal'dorei from the D&D web series "Critical Role" by Geek & Sundry.
+
+          Copyright 2017 
+          Green Ronin Publishing, LLC
+        EOS
       )
     end
 
