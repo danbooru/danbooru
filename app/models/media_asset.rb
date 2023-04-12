@@ -555,7 +555,7 @@ class MediaAsset < ApplicationRecord
     urls += [post.normalized_source] if post&.normalized_source.present?
 
     urls.compact.select do |url|
-      url.match?(%r{\Ahttps?://}i) && Source::URL.parse(url).recognized?
+      url.match?(%r{\Ahttps?://}i) && Source::URL.parse(url)&.recognized?
     end.uniq
   end
 

@@ -88,7 +88,7 @@ class UploadMediaAsset < ApplicationRecord
   end
 
   def bad_source?
-    parsed_canonical_url.recognized? && parsed_canonical_url&.image_url? && parsed_canonical_url&.page_url.nil?
+    parsed_canonical_url&.recognized? && parsed_canonical_url&.image_url? && parsed_canonical_url&.page_url.nil?
   end
 
   # The source of the post after upload. This is either the image URL, if the image URL is convertible to a page URL

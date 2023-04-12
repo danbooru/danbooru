@@ -19,6 +19,10 @@ class SourceURLTest < ActiveSupport::TestCase
       should "normalize URLs" do
         assert_equal("https://example.com/foo%20%09%0B%0C%0D%0Abar", Source::URL.parse("https://example.com/foo \t\v\f\r\nbar").to_normalized_s)
       end
+
+      should "parse URLs containing invalid UTF-8" do
+        assert_equal("/20140924_45/dnflgmldus_1411489948549jC2ma_PNG/%BD%C3%C1%EE%C7%C3%B7%B9%BE%EE.png", Source::URL.parse("https://https://cafeptthumb-phinf.pstatic.net/20140924_45/dnflgmldus_1411489948549jC2ma_PNG/%BD%C3%C1%EE%C7%C3%B7%B9%BE%EE.png?type=w1600")&.path)
+      end
     end
   end
 end
