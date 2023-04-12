@@ -16,22 +16,23 @@ class Source::Extractor
     end
 
     def page_url
-      return nil if project_id.blank?
-
-      if artist_name.present?
-        "https://#{artist_name}.artstation.com/projects/#{project_id}"
-      else
+      if tag_name.present? && project_id.present?
+        "https://#{tag_name}.artstation.com/projects/#{project_id}"
+      elsif project_id.present?
         "https://www.artstation.com/artwork/#{project_id}"
       end
     end
 
     def profile_url
-      return nil if artist_name.blank?
-      "https://www.artstation.com/#{artist_name}"
+      "https://www.artstation.com/#{tag_name}" if tag_name.present?
     end
 
     def artist_name
-      artist_name_from_url || api_response.dig(:user, :username)
+      api_response.dig(:user, :full_name)
+    end
+
+    def tag_name
+      api_response.dig(:user, :username) || parsed_url.username || parsed_referer&.username
     end
 
     def artist_commentary_title
@@ -68,15 +69,11 @@ class Source::Extractor
       end.compact
     end
 
-    def artist_name_from_url
-      parsed_url.username || parsed_referer&.username
-    end
-
     def project_id
       parsed_url.work_id || parsed_referer&.work_id
     end
 
-    def api_response
+    memoize def api_response
       return {} if project_id.blank?
 
       resp = http.cache(1.minute).get("https://www.artstation.com/projects/#{project_id}.json")
@@ -84,7 +81,6 @@ class Source::Extractor
 
       resp.parse.with_indifferent_access
     end
-    memoize :api_response
 
     def asset_url(url)
       parsed_url = Source::URL.parse(url)

@@ -8,7 +8,8 @@ module Sources
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/000/705/368/4k/jey-rain-one1.jpg?1443931773"],
         page_url: "https://jeyrain.artstation.com/projects/04XA4",
         profile_url: "https://www.artstation.com/jeyrain",
-        artist_name: "jeyrain",
+        artist_name: "Jey Rain",
+        tag_name: "jeyrain",
         tags: [],
         artist_commentary_title: "pink",
         dtext_artist_commentary_desc: ""
@@ -21,7 +22,8 @@ module Sources
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/006/066/534/4k/yinan-cui-reika.jpg?1495781565"],
         page_url: "https://dantewontdie.artstation.com/projects/YZK5q",
         profile_url: "https://www.artstation.com/dantewontdie",
-        artist_name: "dantewontdie",
+        artist_name: "Yinan Cui",
+        tag_name: "dantewontdie",
         tags: %w[gantz Reika],
         artist_commentary_title: "Reika ",
         dtext_artist_commentary_desc: "From Gantz.",
@@ -33,6 +35,8 @@ module Sources
       strategy_should_work(
         "https://www.artstation.com/artwork/cody-from-sf",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/000/144/922/4k/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"],
+        artist_name: "Cassio Yoshiyaki",
+        tag_name: "yoshiyaki",
         tags: ["Street Fighter", "Cody", "SF", "NoAI"],
         artist_commentary_title: "Cody from SF",
         dtext_artist_commentary_desc: "",
@@ -55,7 +59,8 @@ module Sources
         referer: "https://www.artstation.com/artwork/4BWW2",
         page_url: "https://amama.artstation.com/projects/4BWW2",
         profile_url: "https://www.artstation.com/amama",
-        artist_name: "amama"
+        artist_name: "Amama L",
+        tag_name: "amama",
       )
     end
 
@@ -70,6 +75,8 @@ module Sources
       strategy_should_work(
         "https://www.artstation.com/artwork/BDxrA",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/006/037/253/4k/astri-lohne-sjursen-eva.jpg?1495573664"],
+        artist_name: "Astri Lohne",
+        tag_name: "sjursen",
         artist_commentary_title: "Akealor",
         dtext_artist_commentary_desc: "Demon hunter commissionnnn",
       )
@@ -89,6 +96,8 @@ module Sources
           https://cdn.artstation.com/p/video_sources/000/466/622/workout.mp4
           https://cdn.artstation.com/p/video_sources/000/466/623/workout-clay.mp4
         ],
+        artist_name: "ucupumar",
+        tag_name: "ucupumar",
         artist_commentary_title: "Workout",
         dtext_artist_commentary_desc: <<~EOS.chomp
           Workout. Created using Blender 2.93 and rendered using Eevee.
@@ -113,7 +122,8 @@ module Sources
         "https://fiship.artstation.com/projects/x8n8XT",
         deleted: true,
         image_urls: [],
-        artist_name: "fiship",
+        artist_name: nil,
+        tag_name: "fiship",
         profile_url: "https://www.artstation.com/fiship",
         page_url: "https://fiship.artstation.com/projects/x8n8XT"
       )
@@ -146,7 +156,8 @@ module Sources
     context "An ArtStation url with underscores in the artist name" do
       strategy_should_work(
         "https://hosi_na.artstation.com/projects/3oEk3B",
-        artist_name: "hosi_na",
+        artist_name: "somi kim",
+        tag_name: "hosi_na",
         artist_commentary_title: "The Queen 여왕",
         dtext_artist_commentary_desc: <<~EOS.chomp
           The keywords of this concept are absolute Power, The Queen, and a cool-headed person. 
@@ -158,7 +169,8 @@ module Sources
     context "An ArtStation url with dashes in the artist name" do
       strategy_should_work(
         "https://sa-dui.artstation.com/projects/DVERn",
-        artist_name: "sa-dui",
+        artist_name: "Titapa Khemakavat (Sa-Dui)",
+        tag_name: "sa-dui",
         artist_commentary_title: "Commission : Srevere",
         dtext_artist_commentary_desc: <<~EOS.chomp
           Commission for Srevere.
@@ -177,9 +189,9 @@ module Sources
           https://cdn.artstation.com/p/assets/images/images/006/809/543/4k/kent-davis-theinsatiablesanctuary-02.jpg?1501433252
           https://cdn.artstation.com/p/assets/images/images/006/809/614/4k/kent-davis-wildemountcastle-02.jpg?1501433798
         ],
-        artist_name: "idrawbagman",
+        artist_name: "Kent Davis",
         tag_name: "idrawbagman",
-        other_names: ["idrawbagman"],
+        other_names: ["Kent Davis", "idrawbagman"],
         profile_url: "https://www.artstation.com/idrawbagman",
         tags: [],
         artist_commentary_title: "Landscapes of Tal'dorei Part 1",
