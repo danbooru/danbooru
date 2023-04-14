@@ -343,7 +343,7 @@
   <% if @post.artist_commentary&.any_field_present? || @post.ai_metadata&.any_field_present? %>
     <%= render(TabPanelComponent.new(id: "artist-commentary") do |t| %>
       <% if @post.artist_commentary&.original_present? %>
-        <% t.panel("Original Commentary", active: true) do %>
+        <% t.panel("Original Commentary", active: !@post.artist_commentary&.translated_present?) do %>
           <section id="original-artist-commentary">
             <%= format_commentary_title(@post.artist_commentary.original_title) %>
             <%= format_commentary_description(@post.artist_commentary.original_description) %>
@@ -352,7 +352,7 @@
       <% end %>
 
       <% if @post.artist_commentary&.translated_present? %>
-        <% t.panel("Translated Commentary", active: !@post.artist_commentary&.original_present?) do %>
+        <% t.panel("Translated Commentary", active: true) do %>
           <section id="translated-artist-commentary">
             <% if @post.artist_commentary.translated_title.present? %>
               <%= format_commentary_title(@post.artist_commentary.translated_title) %>
