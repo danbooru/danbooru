@@ -71,7 +71,7 @@ class MediaFile::Video < MediaFile
   end
 
   def preview_frame
-    @preview_frame ||= video.smart_video_preview
+    @preview_frame ||= video.smart_video_preview!
   end
 
   memoize :video, :dimensions, :metadata, :duration, :has_audio?

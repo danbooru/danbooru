@@ -44,6 +44,11 @@ class MediaFile::Image < MediaFile
     stats = image.stats
     stats.release
     image.release
+
+    # XXX we should check if animated gifs can be successfully decoded, but ffmpeg sometimes returns errors for
+    # seemingly good gifs, and no errors for known corrupted gifs.
+    # return video.error if is_animated? && video.error.present?
+
     nil
   rescue Vips::Error => e
     # XXX Vips has a single global error buffer that is shared between threads and that isn't cleared between operations.
@@ -233,7 +238,7 @@ class MediaFile::Image < MediaFile
   def preview_frame
     @preview_frame ||= begin
       if is_animated?
-        FFmpeg.new(self).smart_video_preview
+        video.smart_video_preview || self
       else
         self
       end
