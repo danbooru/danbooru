@@ -7,6 +7,11 @@ class NotePreviewsControllerTest < ActionDispatch::IntegrationTest
         get note_previews_path, params: { body: "<b>test</b>", format: "json" }
         assert_response :success
       end
+
+      should "work for a missing body argument" do
+        get note_previews_path, params: { format: "json" }
+        assert_response :success
+      end
     end
   end
 end

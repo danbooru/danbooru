@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class NoteSanitizerTest < ActiveSupport::TestCase
@@ -32,6 +34,28 @@ class NoteSanitizerTest < ActiveSupport::TestCase
     should "not fail when rewriting bad links" do
       body = %{<a href ="\nhttp!://www.google.com:12x3">google</a>}
       assert_equal(%{<a rel="external noreferrer nofollow">google</a>}, NoteSanitizer.sanitize(body))
+    end
+
+    should "escape '<' characters properly" do
+      assert_equal("foo &lt; bar", NoteSanitizer.sanitize("foo < bar"))
+      assert_equal("foo &lt;- bar", NoteSanitizer.sanitize("foo <- bar"))
+      assert_equal("foo &lt;3 bar", NoteSanitizer.sanitize("foo <3 bar"))
+      assert_equal("foo &lt;: bar", NoteSanitizer.sanitize("foo <: bar"))
+      assert_equal("foo &lt;&gt; bar", NoteSanitizer.sanitize("foo <> bar"))
+      assert_equal("foo &lt;", NoteSanitizer.sanitize("foo <"))
+
+      assert_equal("foo ", NoteSanitizer.sanitize("foo <x bar"))
+      assert_equal("foo ", NoteSanitizer.sanitize("foo <? bar"))
+      assert_equal("foo ", NoteSanitizer.sanitize("foo <! bar"))
+      assert_equal("foo ", NoteSanitizer.sanitize("foo </ bar"))
+    end
+
+    should "not fail on a frozen string" do
+      assert_equal("", NoteSanitizer.sanitize("".freeze))
+    end
+
+    should "not fail on nil" do
+      assert_equal("", NoteSanitizer.sanitize(nil))
     end
   end
 end

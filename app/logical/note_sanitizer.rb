@@ -61,8 +61,6 @@ module NoteSanitizer
   # @param text [String] the HTML to sanitize
   # @return [String] the sanitized HTML
   def self.sanitize(text)
-    text.gsub!(/<( |-|3|:|>|\Z)/, "&lt;\\1")
-
     Sanitize.clean(
       text,
       :elements => ALLOWED_ELEMENTS,
