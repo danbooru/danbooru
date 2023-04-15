@@ -396,6 +396,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-300x300-h265.mp4").pix_fmt)
       assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-300x300-vp9.mp4").pix_fmt)
       assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-300x300.mp4").pix_fmt)
+      assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-300x300-invalid-utf8-metadata.mp4").pix_fmt)
       assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-audio.m4v").pix_fmt)
       assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-audio.mp4").pix_fmt)
       assert_equal("yuv420p", MediaFile.open("test/files/mp4/test-300x300-iso4.mp4").pix_fmt)
@@ -427,6 +428,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(true, MediaFile.open("test/files/mp4/test-audio-mp3.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-audio-opus.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-audio-vorbis.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-invalid-utf8-metadata.mp4").is_supported?)
 
       assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-h265.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-av1.mp4").is_supported?)
@@ -437,6 +439,10 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(false, MediaFile.open("test/files/mp4/test-audio-ac3.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-audio-mp2.mp4").is_supported?)
+    end
+
+    should "not fail during decoding if the video contains invalid UTF-8 characters in the file metadata" do
+      assert_not_nil(MediaFile.open("test/files/mp4/test-300x300-invalid-utf8-metadata.mp4").attributes)
     end
   end
 

@@ -311,7 +311,7 @@ class FFmpeg
     program = command.shellsplit.first
     output, status = Open3.capture2e(command)
     raise Error, "#{program} failed: #{output}" if !status.success?
-    output
+    output.force_encoding("ASCII-8BIT")
   end
 
   memoize :metadata, :playback_info, :frame_count, :duration, :error, :video_size, :audio_size
