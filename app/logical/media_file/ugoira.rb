@@ -91,7 +91,7 @@ class MediaFile::Ugoira < MediaFile
   private
 
   def preview_frame
-    @preview_frame ||= FFmpeg.new(convert).smart_video_preview
+    @preview_frame ||= FFmpeg.new(convert).smart_video_preview!
   end
 
   memoize :dimensions, :convert, :metadata

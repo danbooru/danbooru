@@ -21,15 +21,22 @@ class FFmpeg
   # thumbnails intelligently by avoiding blank frames.
   #
   # @return [MediaFile] the preview image
-  def smart_video_preview
+  # @raise [Error] The error if generating the preview image fails (probably because FFmpeg couldn't decode the GIF or video)
+  def smart_video_preview!
     vp = Danbooru::Tempfile.new(["danbooru-video-preview-#{file.md5}-", ".png"], binmode: true)
 
     # https://ffmpeg.org/ffmpeg.html#Main-options
     # https://ffmpeg.org/ffmpeg-filters.html#thumbnail
     output = shell!("ffmpeg -i #{file.path.shellescape} -vf thumbnail=300 -frames:v 1 -y #{vp.path.shellescape}")
-    Rails.logger.debug(output)
 
     MediaFile.open(vp)
+  end
+
+  # @return [MediaFile, nil] The preview image, or nil on error.
+  def smart_video_preview
+    smart_video_preview!
+  rescue Error
+    nil
   end
 
   # Get file metadata using ffprobe.
@@ -310,8 +317,12 @@ class FFmpeg
   def shell!(command)
     program = command.shellsplit.first
     output, status = Open3.capture2e(command)
-    raise Error, "#{program} failed: #{output}" if !status.success?
+    raise Error, "#{program} failed: #{parse_errors(output)}" if !status.success?
     output.force_encoding("ASCII-8BIT")
+  end
+
+  def parse_errors(output)
+    output.split(/\r?\n/).grep(/^(Error|\[\w+ @ 0x\h+\])/).uniq.join("\n")
   end
 
   memoize :metadata, :playback_info, :frame_count, :duration, :error, :video_size, :audio_size
