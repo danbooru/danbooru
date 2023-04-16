@@ -30,14 +30,14 @@ module Discord
     respond_to_id ForumPost, "forum"
 
     respond(:wiki_link, /\[\[ [^\]]+ \]\]/x) do |event, text|
-      title = text[/[^\[\]]+/]
+      title = text[/[^\[\]]+/].gsub(/\s/, "_")
 
       event.channel.start_typing
 
-      tag = Tag.where(name: title).joins(:wiki_page).first
+      wiki_page = WikiPage.find_by(title:)
 
-      if tag&.wiki_page.present?
-        tag.wiki_page.send_embed(event.channel)
+      if wiki_page.present?
+        wiki_page.send_embed(event.channel)
       end
     end
 
