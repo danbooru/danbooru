@@ -11,6 +11,7 @@ module MigrationHelpers
 
     reversible do |dir|
       dir.up do
+        execute("ALTER TABLE #{table} DROP CONSTRAINT IF EXISTS #{constraint_name};")
         add_check_constraint(table, "#{column} IS NOT NULL", name: constraint_name, validate: false)
         execute("ALTER TABLE #{table} VALIDATE CONSTRAINT #{constraint_name};")
         change_column_null(table, column, false)
@@ -18,6 +19,7 @@ module MigrationHelpers
       end
 
       dir.down do
+        execute("ALTER TABLE #{table} DROP CONSTRAINT IF EXISTS #{constraint_name};")
         change_column_null(table, column, true)
       end
     end
