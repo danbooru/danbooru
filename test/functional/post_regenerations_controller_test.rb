@@ -41,14 +41,14 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
 
       context "for an image sample regeneration" do
         should "regenerate missing thumbnails" do
-          @preview_file_size = @post.media_asset.variant(:preview).open_file.size
-          @post.media_asset.variant(:preview).delete_file!
-          assert_raise(Errno::ENOENT) { @post.file(:preview) }
+          @preview_file_size = @post.media_asset.variant(:"180x180").open_file.size
+          @post.media_asset.variant(:"180x180").delete_file!
+          assert_raise(Errno::ENOENT) { @post.file(:"180x180") }
 
           post_auth post_regenerations_path, @mod, params: { post_id: @post.id }
           perform_enqueued_jobs
 
-          assert_equal(@preview_file_size, @post.file(:preview).size)
+          assert_equal(@preview_file_size, @post.file(:"180x180").size)
         end
 
         should "log a mod action" do
