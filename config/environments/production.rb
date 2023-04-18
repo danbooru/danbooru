@@ -36,6 +36,10 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for Apache
   # config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for NGINX
 
+  if Danbooru.config.trusted_proxies.present?
+    config.action_dispatch.trusted_proxies = Danbooru.config.trusted_proxies.map { |ip| IPAddr.new(ip) }
+  end
+
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
 

@@ -713,12 +713,17 @@ module Danbooru
       false
     end
 
-    # The end date of the Winter Sale.
-    def winter_sale_end_date
-    end
-
-    # The forum topic linked to in the Winter Sale notice.
-    def winter_sale_forum_topic_id
+    # Proxies to exclude from Rails' RemoteIp method.
+    # @see https://github.com/rails/rails/blob/8f60051e14198f09277f391ee0ca614dc6af2cd5/actionpack/lib/action_dispatch/middleware/remote_ip.rb
+    def trusted_proxies
+      [
+        "127.0.0.0/8",    # localhost IPv4 range, per RFC-3330
+        "::1",            # localhost IPv6
+        "fc00::/7",       # private IPv6 range fc00::/7
+        "10.0.0.0/8",     # private IPv4 range 10.x.x.x
+        "172.16.0.0/12",  # private IPv4 range 172.16.0.0 .. 172.31.255.255
+        "192.168.0.0/16", # private IPv4 range 192.168.x.x
+      ]
     end
   end
 
