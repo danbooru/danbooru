@@ -211,6 +211,7 @@ class TagTest < ActiveSupport::TestCase
         tag = Tag.find_or_create_by_name("hoge")
         assert_equal("hoge", tag.name)
         assert_equal(Tag.categories.general, tag.category)
+        assert_equal(0, tag.versions.count)
       end
     end
 
@@ -219,7 +220,15 @@ class TagTest < ActiveSupport::TestCase
         tag = Tag.find_or_create_by_name("hoge", category: "artist", current_user: @builder)
         assert_equal("hoge", tag.name)
         assert_equal(Tag.categories.artist, tag.category)
+        assert_equal(0, tag.versions.count)
       end
+    end
+
+    should "not raise an exception if the tag name is invalid" do
+      tag = Tag.find_or_create_by_name("foo__bar")
+
+      assert_equal(false, tag.valid?)
+      assert_equal(["'foo__bar' cannot contain consecutive underscores"], tag.errors[:name])
     end
 
     should "parse tag names into words" do

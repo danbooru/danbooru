@@ -216,7 +216,13 @@ class Tag < ApplicationRecord
 
       def find_or_create_by_name(name, category: nil, current_user: nil)
         cat_id = categories.value_for(category)
-        tag = create_with(category: cat_id).find_or_create_by(name: normalize_name(name))
+        tag = Tag.find_by(name: normalize_name(name))
+
+        if tag.nil?
+          tag = Tag.new(name: normalize_name(name), category: cat_id)
+          saved = tag.save_if_unique(:name)
+          tag = Tag.find_by!(name: normalize_name(name)) if !saved && tag.errors.of_kind?(:name, :taken)
+        end
 
         if category.present? && current_user.present? && cat_id != tag.category && Pundit.policy!(current_user, tag).can_change_category?
           tag.update(category: cat_id, updater: current_user)
