@@ -213,7 +213,7 @@ class WikiPage < ApplicationRecord
 
   concerning :DiscordMethods do
     def discord_title
-      title
+      pretty_title
     end
 
     def discord_body
