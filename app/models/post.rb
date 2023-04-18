@@ -82,7 +82,7 @@ class Post < ApplicationRecord
   scope :flagged, -> { where(is_flagged: true) }
   scope :banned, -> { where(is_banned: true) }
   # XXX conflict with deletable
-  scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false).where.not(id: PostAppeal.pending) }
+  scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false) }
   scope :appealed, -> { where(id: PostAppeal.pending.select(:post_id)) }
   scope :in_modqueue, -> { where_union(pending, flagged, appealed) }
   scope :expired, -> { pending.where("posts.created_at < ?", Danbooru.config.moderation_period.ago) }
