@@ -1,3 +1,10 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.0
+-- Dumped by pg_dump version 15.2
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -110,6 +117,86 @@ CREATE OPERATOR public.~<< (
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: ai_metadata; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ai_metadata (
+    id bigint NOT NULL,
+    post_id bigint,
+    prompt text,
+    negative_prompt text,
+    sampler character varying,
+    seed bigint,
+    steps integer,
+    cfg_scale double precision,
+    model_hash character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: ai_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.ai_metadata_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: ai_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.ai_metadata_id_seq OWNED BY public.ai_metadata.id;
+
+
+--
+-- Name: ai_metadata_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ai_metadata_versions (
+    id bigint NOT NULL,
+    ai_metadata_id bigint NOT NULL,
+    post_id bigint NOT NULL,
+    updater_id bigint NOT NULL,
+    previous_version_id bigint,
+    version integer NOT NULL,
+    prompt text,
+    negative_prompt text,
+    sampler character varying,
+    seed bigint,
+    steps integer,
+    cfg_scale double precision,
+    model_hash character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: ai_metadata_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.ai_metadata_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: ai_metadata_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.ai_metadata_versions_id_seq OWNED BY public.ai_metadata_versions.id;
+
 
 --
 -- Name: ai_tags; Type: TABLE; Schema: public; Owner: -
@@ -620,8 +707,7 @@ CREATE TABLE public.favorite_groups (
     creator_id integer NOT NULL,
     post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    is_public boolean DEFAULT true NOT NULL
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -844,7 +930,7 @@ CREATE TABLE public.good_job_batches (
 --
 
 CREATE TABLE public.good_job_processes (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     state jsonb
@@ -869,7 +955,7 @@ CREATE TABLE public.good_job_settings (
 --
 
 CREATE TABLE public.good_jobs (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    id uuid DEFAULT public.gen_random_uuid() NOT NULL,
     queue_name text,
     priority integer,
     serialized_params jsonb,
@@ -1123,7 +1209,8 @@ CREATE TABLE public.news_updates (
     creator_id integer NOT NULL,
     updater_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -1492,7 +1579,9 @@ CREATE TABLE public.posts (
     last_commented_at timestamp without time zone,
     has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL
+    tag_count_meta integer DEFAULT 0 NOT NULL,
+    tag_count_model integer DEFAULT 0 NOT NULL,
+    views integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1920,41 +2009,6 @@ ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
--- Name: upgrade_codes; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.upgrade_codes (
-    id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    code character varying NOT NULL,
-    status integer NOT NULL,
-    creator_id integer NOT NULL,
-    redeemer_id integer,
-    user_upgrade_id integer
-);
-
-
---
--- Name: upgrade_codes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.upgrade_codes_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: upgrade_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.upgrade_codes_id_seq OWNED BY public.upgrade_codes.id;
-
-
---
 -- Name: upload_media_assets; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2068,23 +2122,6 @@ CREATE TABLE public.user_name_change_requests (
     desired_name character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: user_upgrades; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.user_upgrades (
-    id integer NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    recipient_id integer NOT NULL,
-    purchaser_id integer NOT NULL,
-    upgrade_type integer NOT NULL,
-    status integer NOT NULL,
-    transaction_id character varying,
-    payment_processor integer DEFAULT 0 NOT NULL
 );
 
 
@@ -2359,15 +2396,6 @@ UNION ALL
     user_feedback.created_at AS event_at
    FROM public.user_feedback
 UNION ALL
-( SELECT 'UserUpgrade'::character varying AS model_type,
-    user_upgrades.id AS model_id,
-    user_upgrades.purchaser_id AS user_id,
-    'create'::character varying AS event_type,
-    user_upgrades.created_at AS event_at
-   FROM public.user_upgrades
-  WHERE (user_upgrades.status = ANY (ARRAY[20, 30]))
-  ORDER BY user_upgrades.created_at DESC)
-UNION ALL
  SELECT 'UserNameChangeRequest'::character varying AS model_type,
     user_name_change_requests.id AS model_id,
     user_name_change_requests.user_id,
@@ -2476,25 +2504,6 @@ ALTER SEQUENCE public.user_sessions_id_seq OWNED BY public.user_sessions.id;
 
 
 --
--- Name: user_upgrades_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.user_upgrades_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: user_upgrades_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.user_upgrades_id_seq OWNED BY public.user_upgrades.id;
-
-
---
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -2568,6 +2577,20 @@ CREATE SEQUENCE public.wiki_pages_id_seq
 --
 
 ALTER SEQUENCE public.wiki_pages_id_seq OWNED BY public.wiki_pages.id;
+
+
+--
+-- Name: ai_metadata id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ai_metadata ALTER COLUMN id SET DEFAULT nextval('public.ai_metadata_id_seq'::regclass);
+
+
+--
+-- Name: ai_metadata_versions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ai_metadata_versions ALTER COLUMN id SET DEFAULT nextval('public.ai_metadata_versions_id_seq'::regclass);
 
 
 --
@@ -2879,13 +2902,6 @@ ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id
 
 
 --
--- Name: upgrade_codes id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.upgrade_codes ALTER COLUMN id SET DEFAULT nextval('public.upgrade_codes_id_seq'::regclass);
-
-
---
 -- Name: upload_media_assets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2928,13 +2944,6 @@ ALTER TABLE ONLY public.user_sessions ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- Name: user_upgrades id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_upgrades ALTER COLUMN id SET DEFAULT nextval('public.user_upgrades_id_seq'::regclass);
-
-
---
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2953,6 +2962,22 @@ ALTER TABLE ONLY public.wiki_page_versions ALTER COLUMN id SET DEFAULT nextval('
 --
 
 ALTER TABLE ONLY public.wiki_pages ALTER COLUMN id SET DEFAULT nextval('public.wiki_pages_id_seq'::regclass);
+
+
+--
+-- Name: ai_metadata ai_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ai_metadata
+    ADD CONSTRAINT ai_metadata_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ai_metadata_versions ai_metadata_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ai_metadata_versions
+    ADD CONSTRAINT ai_metadata_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -3356,14 +3381,6 @@ ALTER TABLE ONLY public.tags
 
 
 --
--- Name: upgrade_codes upgrade_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.upgrade_codes
-    ADD CONSTRAINT upgrade_codes_pkey PRIMARY KEY (id);
-
-
---
 -- Name: upload_media_assets upload_media_assets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3412,14 +3429,6 @@ ALTER TABLE ONLY public.user_sessions
 
 
 --
--- Name: user_upgrades user_upgrades_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_upgrades
-    ADD CONSTRAINT user_upgrades_pkey PRIMARY KEY (id);
-
-
---
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3441,6 +3450,55 @@ ALTER TABLE ONLY public.wiki_page_versions
 
 ALTER TABLE ONLY public.wiki_pages
     ADD CONSTRAINT wiki_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_ai_metadata_versions_on_metadata_id_and_prev_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_ai_metadata_versions_on_metadata_id_and_prev_id ON public.ai_metadata_versions USING btree (ai_metadata_id, previous_version_id);
+
+
+--
+-- Name: idx_users_on_level; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_users_on_level ON public.users USING btree (level) WHERE (level = 60);
+
+
+--
+-- Name: index_ai_metadata_on_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_ai_metadata_on_post_id ON public.ai_metadata USING btree (post_id);
+
+
+--
+-- Name: index_ai_metadata_versions_on_ai_metadata_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ai_metadata_versions_on_ai_metadata_id ON public.ai_metadata_versions USING btree (ai_metadata_id);
+
+
+--
+-- Name: index_ai_metadata_versions_on_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ai_metadata_versions_on_post_id ON public.ai_metadata_versions USING btree (post_id);
+
+
+--
+-- Name: index_ai_metadata_versions_on_previous_version_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ai_metadata_versions_on_previous_version_id ON public.ai_metadata_versions USING btree (previous_version_id);
+
+
+--
+-- Name: index_ai_metadata_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ai_metadata_versions_on_updater_id ON public.ai_metadata_versions USING btree (updater_id);
 
 
 --
@@ -3878,20 +3936,6 @@ CREATE INDEX index_comments_on_updater_id ON public.comments USING btree (update
 
 
 --
--- Name: index_completed_user_upgrades_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_completed_user_upgrades_on_created_at ON public.user_upgrades USING btree (created_at) WHERE (status = ANY (ARRAY[20, 30]));
-
-
---
--- Name: index_completed_user_upgrades_on_updater_id_and_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_completed_user_upgrades_on_updater_id_and_created_at ON public.user_upgrades USING btree (purchaser_id, created_at) WHERE (status = ANY (ARRAY[20, 30]));
-
-
---
 -- Name: index_dmails_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4046,24 +4090,10 @@ CREATE INDEX index_favorite_groups_on_created_at ON public.favorite_groups USING
 
 
 --
--- Name: index_favorite_groups_on_created_at_id_is_public_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_favorite_groups_on_created_at_id_is_public_creator_id ON public.favorite_groups USING btree (created_at, id, is_public, creator_id);
-
-
---
 -- Name: index_favorite_groups_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_favorite_groups_on_creator_id ON public.favorite_groups USING btree (creator_id);
-
-
---
--- Name: index_favorite_groups_on_is_public; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_favorite_groups_on_is_public ON public.favorite_groups USING btree (is_public);
 
 
 --
@@ -4323,13 +4353,6 @@ CREATE INDEX index_good_jobs_on_queue_name_and_scheduled_at ON public.good_jobs 
 --
 
 CREATE INDEX index_good_jobs_on_scheduled_at ON public.good_jobs USING btree (scheduled_at) WHERE (finished_at IS NULL);
-
-
---
--- Name: index_good_jobs_on_scheduled_at_priority_created_at_when_unfini; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_good_jobs_on_scheduled_at_priority_created_at_when_unfini ON public.good_jobs USING btree (scheduled_at DESC NULLS LAST, priority DESC NULLS LAST, created_at) WHERE (finished_at IS NULL);
 
 
 --
@@ -5524,41 +5547,6 @@ CREATE INDEX index_tags_on_word_initials ON public.tags USING gin (public.array_
 
 
 --
--- Name: index_upgrade_codes_on_code; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_upgrade_codes_on_code ON public.upgrade_codes USING btree (code);
-
-
---
--- Name: index_upgrade_codes_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upgrade_codes_on_creator_id ON public.upgrade_codes USING btree (creator_id);
-
-
---
--- Name: index_upgrade_codes_on_redeemer_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upgrade_codes_on_redeemer_id ON public.upgrade_codes USING btree (redeemer_id) WHERE (redeemer_id IS NOT NULL);
-
-
---
--- Name: index_upgrade_codes_on_status; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upgrade_codes_on_status ON public.upgrade_codes USING btree (status);
-
-
---
--- Name: index_upgrade_codes_on_user_upgrade_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upgrade_codes_on_user_upgrade_id ON public.upgrade_codes USING btree (user_upgrade_id) WHERE (user_upgrade_id IS NOT NULL);
-
-
---
 -- Name: index_upload_media_assets_on_media_asset_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5759,48 +5747,6 @@ CREATE INDEX index_user_sessions_on_session_id ON public.user_sessions USING btr
 --
 
 CREATE INDEX index_user_sessions_on_updated_at ON public.user_sessions USING btree (updated_at);
-
-
---
--- Name: index_user_upgrades_on_payment_processor; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_upgrades_on_payment_processor ON public.user_upgrades USING btree (payment_processor);
-
-
---
--- Name: index_user_upgrades_on_purchaser_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_upgrades_on_purchaser_id ON public.user_upgrades USING btree (purchaser_id);
-
-
---
--- Name: index_user_upgrades_on_recipient_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_upgrades_on_recipient_id ON public.user_upgrades USING btree (recipient_id);
-
-
---
--- Name: index_user_upgrades_on_status; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_upgrades_on_status ON public.user_upgrades USING btree (status);
-
-
---
--- Name: index_user_upgrades_on_transaction_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_upgrades_on_transaction_id ON public.user_upgrades USING btree (transaction_id);
-
-
---
--- Name: index_user_upgrades_on_upgrade_type; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_upgrades_on_upgrade_type ON public.user_upgrades USING btree (upgrade_type);
 
 
 --
@@ -6174,6 +6120,14 @@ ALTER TABLE ONLY public.post_disapprovals
 
 
 --
+-- Name: ai_metadata_versions fk_rails_4124aea0ca; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ai_metadata_versions
+    ADD CONSTRAINT fk_rails_4124aea0ca FOREIGN KEY (updater_id) REFERENCES public.users(id);
+
+
+--
 -- Name: post_appeals fk_rails_4153b9e5a4; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6254,14 +6208,6 @@ ALTER TABLE ONLY public.forum_topics
 
 
 --
--- Name: user_upgrades fk_rails_55b7770fa9; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_upgrades
-    ADD CONSTRAINT fk_rails_55b7770fa9 FOREIGN KEY (recipient_id) REFERENCES public.users(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: tag_implications fk_rails_567423c3a3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6318,6 +6264,14 @@ ALTER TABLE ONLY public.saved_searches
 
 
 --
+-- Name: ai_metadata_versions fk_rails_65090d8b2a; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ai_metadata_versions
+    ADD CONSTRAINT fk_rails_65090d8b2a FOREIGN KEY (previous_version_id) REFERENCES public.ai_metadata_versions(id);
+
+
+--
 -- Name: post_flags fk_rails_68fe8072b5; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6366,27 +6320,11 @@ ALTER TABLE ONLY public.post_approvals
 
 
 --
--- Name: upgrade_codes fk_rails_778e1e40b5; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.upgrade_codes
-    ADD CONSTRAINT fk_rails_778e1e40b5 FOREIGN KEY (redeemer_id) REFERENCES public.users(id);
-
-
---
 -- Name: favorite_groups fk_rails_796204a5e3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.favorite_groups
     ADD CONSTRAINT fk_rails_796204a5e3 FOREIGN KEY (creator_id) REFERENCES public.users(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: upgrade_codes fk_rails_80bbec9661; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.upgrade_codes
-    ADD CONSTRAINT fk_rails_80bbec9661 FOREIGN KEY (user_upgrade_id) REFERENCES public.user_upgrades(id);
 
 
 --
@@ -6558,11 +6496,11 @@ ALTER TABLE ONLY public.uploads
 
 
 --
--- Name: upgrade_codes fk_rails_d5a4e5e1a6; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: ai_metadata fk_rails_d81005f88c; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.upgrade_codes
-    ADD CONSTRAINT fk_rails_d5a4e5e1a6 FOREIGN KEY (creator_id) REFERENCES public.users(id);
+ALTER TABLE ONLY public.ai_metadata
+    ADD CONSTRAINT fk_rails_d81005f88c FOREIGN KEY (post_id) REFERENCES public.posts(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -6662,333 +6600,5 @@ ALTER TABLE ONLY public.upload_media_assets
 
 
 --
--- Name: user_upgrades fk_rails_f9349ed07b; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_upgrades
-    ADD CONSTRAINT fk_rails_f9349ed07b FOREIGN KEY (purchaser_id) REFERENCES public.users(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- PostgreSQL database dump complete
 --
-
-SET search_path TO "$user", public;
-
-INSERT INTO "schema_migrations" (version) VALUES
-('20100204211522'),
-('20100204214746'),
-('20100205162521'),
-('20100205163027'),
-('20100205224030'),
-('20100211025616'),
-('20100211181944'),
-('20100211191709'),
-('20100211191716'),
-('20100213181847'),
-('20100213183712'),
-('20100214080549'),
-('20100214080557'),
-('20100214080605'),
-('20100215182234'),
-('20100215213756'),
-('20100215223541'),
-('20100215224629'),
-('20100215224635'),
-('20100215225710'),
-('20100215230642'),
-('20100219230537'),
-('20100221003655'),
-('20100221005812'),
-('20100223001012'),
-('20100224171915'),
-('20100224172146'),
-('20100307073438'),
-('20100309211553'),
-('20100318213503'),
-('20100826232512'),
-('20110328215652'),
-('20110328215701'),
-('20110607194023'),
-('20110717010705'),
-('20110722211855'),
-('20110815233456'),
-('20111101212358'),
-('20130106210658'),
-('20130114154400'),
-('20130219171111'),
-('20130219184743'),
-('20130221032344'),
-('20130221035518'),
-('20130221214811'),
-('20130302214500'),
-('20130305005138'),
-('20130307225324'),
-('20130308204213'),
-('20130318002652'),
-('20130318012517'),
-('20130318030619'),
-('20130318231740'),
-('20130320070700'),
-('20130322162059'),
-('20130322173202'),
-('20130322173859'),
-('20130323160259'),
-('20130326035904'),
-('20130328092739'),
-('20130331180246'),
-('20130331182719'),
-('20130401013601'),
-('20130409191950'),
-('20130417221643'),
-('20130424121410'),
-('20130506154136'),
-('20130606224559'),
-('20130618230158'),
-('20130620215658'),
-('20130712162600'),
-('20130914175431'),
-('20131006193238'),
-('20131117150705'),
-('20131118153503'),
-('20131130190411'),
-('20131209181023'),
-('20131217025233'),
-('20131225002748'),
-('20140111191413'),
-('20140204233337'),
-('20140221213349'),
-('20140428015134'),
-('20140505000956'),
-('20140603225334'),
-('20140604002414'),
-('20140613004559'),
-('20140701224800'),
-('20140722225753'),
-('20140725003232'),
-('20141009231234'),
-('20141017231608'),
-('20141120045943'),
-('20150119191042'),
-('20150120005624'),
-('20150128005954'),
-('20150403224949'),
-('20150613010904'),
-('20150623191904'),
-('20150629235905'),
-('20150705014135'),
-('20150721214646'),
-('20150728170433'),
-('20150805010245'),
-('20151217213321'),
-('20160219004022'),
-('20160219010854'),
-('20160219172840'),
-('20160222211328'),
-('20160526174848'),
-('20160820003534'),
-('20160822230752'),
-('20160919234407'),
-('20161018221128'),
-('20161024220345'),
-('20161101003139'),
-('20161221225849'),
-('20161227003428'),
-('20161229001201'),
-('20170106012138'),
-('20170112021922'),
-('20170112060921'),
-('20170117233040'),
-('20170218104710'),
-('20170302014435'),
-('20170314235626'),
-('20170316224630'),
-('20170319000519'),
-('20170329185605'),
-('20170330230231'),
-('20170413000209'),
-('20170414005856'),
-('20170414233426'),
-('20170414233617'),
-('20170416224142'),
-('20170428220448'),
-('20170512221200'),
-('20170515235205'),
-('20170519204506'),
-('20170526183928'),
-('20170608043651'),
-('20170613200356'),
-('20170709190409'),
-('20170914200122'),
-('20171106075030'),
-('20171127195124'),
-('20171218213037'),
-('20171219001521'),
-('20171230220225'),
-('20180113211343'),
-('20180116001101'),
-('20180403231351'),
-('20180413224239'),
-('20180425194016'),
-('20180516222413'),
-('20180517190048'),
-('20180518175154'),
-('20180804203201'),
-('20180816230604'),
-('20180912185624'),
-('20180913184128'),
-('20180916002448'),
-('20181108162204'),
-('20181108205842'),
-('20181113174914'),
-('20181114180205'),
-('20181114185032'),
-('20181114202744'),
-('20181130004740'),
-('20181202172145'),
-('20190109210822'),
-('20190129012253'),
-('20190712174818'),
-('20190827013252'),
-('20190827014726'),
-('20190827233235'),
-('20190827234625'),
-('20190828005453'),
-('20190829052629'),
-('20190829055758'),
-('20190902224045'),
-('20190908031103'),
-('20190908035317'),
-('20190919175836'),
-('20190923071044'),
-('20190926000912'),
-('20191023191749'),
-('20191024194544'),
-('20191111004329'),
-('20191111024520'),
-('20191116001441'),
-('20191116021759'),
-('20191116224228'),
-('20191117074642'),
-('20191117080647'),
-('20191117081229'),
-('20191117200404'),
-('20191119061018'),
-('20191223032633'),
-('20200114204550'),
-('20200115010442'),
-('20200117220602'),
-('20200118015014'),
-('20200119184442'),
-('20200119193110'),
-('20200123184743'),
-('20200217044719'),
-('20200223042415'),
-('20200223234015'),
-('20200306202253'),
-('20200307021204'),
-('20200309035334'),
-('20200309043653'),
-('20200318224633'),
-('20200325073456'),
-('20200325074859'),
-('20200403210353'),
-('20200406054838'),
-('20200427190519'),
-('20200803022359'),
-('20200816175151'),
-('20201201211748'),
-('20201213052805'),
-('20201219201007'),
-('20201224101208'),
-('20210106212805'),
-('20210108030722'),
-('20210108030723'),
-('20210108030724'),
-('20210110015410'),
-('20210110090656'),
-('20210115015308'),
-('20210123112752'),
-('20210127000201'),
-('20210127012303'),
-('20210214095121'),
-('20210214101614'),
-('20210303195217'),
-('20210310221248'),
-('20210330003356'),
-('20210330093133'),
-('20210901230931'),
-('20210908015203'),
-('20210921164936'),
-('20210921170444'),
-('20210926123414'),
-('20210926125826'),
-('20211008091234'),
-('20211010181657'),
-('20211011044400'),
-('20211013011619'),
-('20211014063943'),
-('20211015223510'),
-('20211018045429'),
-('20211018062916'),
-('20211023225730'),
-('20211121080239'),
-('20220101224048'),
-('20220104214319'),
-('20220106171727'),
-('20220106172910'),
-('20220107014433'),
-('20220109032042'),
-('20220109163815'),
-('20220110171021'),
-('20220110171022'),
-('20220110171023'),
-('20220110171024'),
-('20220120233850'),
-('20220124195900'),
-('20220203040648'),
-('20220204075610'),
-('20220207195123'),
-('20220210171310'),
-('20220210200157'),
-('20220211075129'),
-('20220318082614'),
-('20220403042706'),
-('20220403220558'),
-('20220407203236'),
-('20220410050628'),
-('20220504235329'),
-('20220514175125'),
-('20220525214746'),
-('20220623052547'),
-('20220627211714'),
-('20220829184824'),
-('20220909205433'),
-('20220909211649'),
-('20220913191300'),
-('20220913191309'),
-('20220917204044'),
-('20220918031429'),
-('20220919041622'),
-('20220920224005'),
-('20220921022408'),
-('20220922014326'),
-('20220923010905'),
-('20220924092056'),
-('20220925045236'),
-('20220926050108'),
-('20221003080342'),
-('20221010035855'),
-('20221026084655'),
-('20221026084656'),
-('20221027000931'),
-('20221106062419'),
-('20221109052923'),
-('20221228232240'),
-('20221230011825'),
-('20230104064916'),
-('20230209060757'),
-('20230222230650'),
-('20230309014439');
-
-
