@@ -476,14 +476,9 @@ class User < ApplicationRecord
       post_flags.active.count >= 5
     end
 
-    # Flags are unlimited if you're an approver or you have at least 30 flags
-    # in the last 3 months and have a 70% flag success rate.
+    # Flags are unlimited if you're an approver.
     def has_unlimited_flags?
       return true if is_approver?
-
-      recent_flags = post_flags.where("created_at >= ?", 3.months.ago)
-      flag_ratio = recent_flags.succeeded.count / recent_flags.count.to_f
-      recent_flags.count >= 30 && flag_ratio >= 0.70
     end
 
     def upload_limit
