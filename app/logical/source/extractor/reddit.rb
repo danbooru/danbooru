@@ -16,7 +16,7 @@ module Source
           images += ordered_gallery_images
           images.compact.uniq.map { |i| Source::URL.parse(i)&.full_image_url }.compact
         else
-          [parsed_url.original_url]
+          []
         end
       end
 
@@ -58,7 +58,7 @@ module Source
 
         json_string = response.parse&.at("script#data").to_s[/\s({.*})/, 1]
         data = JSON.parse(json_string).with_indifferent_access
-        data.dig("posts", "models").values.min_by { |p| p["created"].to_i } # to avoid reposts
+        data.dig("posts", "models").values.min_by { |p| p["created"].to_i } || {} # to avoid reposts
       rescue JSON::ParserError
         {}
       end

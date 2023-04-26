@@ -72,6 +72,18 @@ module Sources
       )
     end
 
+    context "A post from a banned subreddit" do
+      strategy_should_work(
+        "https://www.reddit.com/r/ArknightsHQ/comments/qoy11i/utages_beauty/",
+        page_url: "https://www.reddit.com/r/ArknightsHQ/comments/qoy11i/utages_beauty",
+        image_urls: [],
+        profile_url: nil,
+        artist_name: nil,
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
+      )
+    end
+
     context "A reddit image" do
       strategy_should_work(
         "https://i.redd.it/oc5y8k06ryq81.png",
