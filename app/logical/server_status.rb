@@ -12,7 +12,7 @@ class ServerStatus
 
   attr_reader :request
 
-  def initialize(request)
+  def initialize(request = nil)
     @request = request
   end
 
@@ -29,7 +29,7 @@ class ServerStatus
         worker_uptime: worker_uptime,
         requests_processed: requests_processed,
         danbooru_version: danbooru_version,
-        ruby_version: RUBY_VERSION,
+        ruby_version: ruby_version,
         distro_version: distro_version,
         libvips_version: libvips_version,
         ffmpeg_version: ffmpeg_version,
@@ -126,6 +126,10 @@ class ServerStatus
 
     def kernel_version
       File.read("/proc/version").chomp
+    end
+
+    def ruby_version
+      RUBY_VERSION
     end
 
     def distro_version
