@@ -109,16 +109,11 @@ module Source
 
       def api_response
         return {} if illust_id.blank?
+
         resp = client.get("https://api.fanbox.cc/post.info?postId=#{illust_id}")
-        json_response = JSON.parse(resp)["body"]
+        return {} if resp.code != 200
 
-        # At some point in 2020 fanbox stopped hiding R18 posts from the api
-        # This check exists in case they ever start blocking them again
-        return {} if json_response["restrictedFor"] == 2 && json_response["body"].blank?
-
-        json_response
-      rescue JSON::ParserError
-        {}
+        resp.parse["body"] || {}
       end
 
       def artist_api_response

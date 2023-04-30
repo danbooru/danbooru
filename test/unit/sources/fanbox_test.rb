@@ -118,6 +118,43 @@ module Sources
       )
     end
 
+    # These posts are still accessible in the API even though the HTML returns an error.
+    context "An 'access is restricted for this user' Fanbox post" do
+      strategy_should_work(
+        "https://eclipsehake.fanbox.cc/posts/4246830",
+        page_url: "https://eclipsehake.fanbox.cc/posts/4246830",
+        profile_url: "https://eclipsehake.fanbox.cc",
+        image_urls: ["https://downloads.fanbox.cc/images/post/4246830/XUW76l3mT1yxkjbMTVeMow4w.jpeg"],
+        artist_name: "eclipsehake",
+        tag_name: "eclipsehake",
+        artist_commentary_title: "シアリュ―",
+        artist_commentary_desc: <<~EOS.chomp,
+          🐉👻♂
+
+          臆病な性格 / 物音に敏感
+
+          175cm　享年20歳
+
+          旅パ会社の期待の新人。享年20歳(推定)のアンデッド。生前の記憶が殆ど無く彷徨っていた所をスカウトされ就職。霊符で式神的なモノを呼び出して戦う。お人好しで頼まれ事は断れないタイプ。
+        EOS
+        tags: [],
+      )
+    end
+
+    context "A deleted Fanbox post" do
+      strategy_should_work(
+        "https://wakura081.fanbox.cc/posts/4923490",
+        page_url: "https://wakura081.fanbox.cc/posts/4923490",
+        profile_url: "https://wakura081.fanbox.cc",
+        image_urls: [],
+        artist_name: "wakura081",
+        tag_name: "wakura081",
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
+        tags: [],
+      )
+    end
+
     should "Parse Fanbox URLs correctly" do
       assert_equal("https://www.pixiv.net/fanbox/creator/1566167", Source::URL.page_url("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg"))
 
