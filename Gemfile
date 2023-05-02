@@ -66,6 +66,7 @@ group :discord do
   gem "discordrb"
   gem "terminal-table", "~> 3.0"
 end
+gem "drb"
 
 group :development do
   gem 'rubocop', require: false

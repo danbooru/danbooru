@@ -30,6 +30,8 @@ class ServerStatus
         requests_processed: requests_processed,
         danbooru_version: danbooru_version,
         ruby_version: ruby_version,
+        rails_version: rails_version,
+        puma_version: puma_version,
         distro_version: distro_version,
         libvips_version: libvips_version,
         ffmpeg_version: ffmpeg_version,
@@ -132,6 +134,14 @@ class ServerStatus
       RUBY_VERSION
     end
 
+    def rails_version
+      Rails.version
+    end
+
+    def puma_version
+      Puma::Const::PUMA_VERSION
+    end
+
     def distro_version
       `. /etc/os-release; echo "$NAME $VERSION"`.chomp
     end
@@ -198,5 +208,5 @@ class ServerStatus
     end
   end
 
-  memoize :redis_info
+  memoize :redis_info, :kernel_version, :distro_version, :ffmpeg_version
 end
