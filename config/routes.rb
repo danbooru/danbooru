@@ -143,7 +143,10 @@ Rails.application.routes.draw do
     get "/:variant", to: "media_assets#image", as: :image
   end
   resources :media_metadata, only: [:index]
-  resources :metrics, only: [:index], defaults: { format: :text }
+
+  resources :metrics, only: [:index], defaults: { format: :text } do
+    get "/instance", on: :collection, to: "metrics#instance", as: :instance
+  end
 
   resources :ai_tags, only: [:index]
   put "/ai_tags/:media_asset_id/:tag_id/tag", to: "ai_tags#tag", as: "tag_ai_tag"

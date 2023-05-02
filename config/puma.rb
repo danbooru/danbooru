@@ -62,6 +62,10 @@ threads min_threads_count, max_threads_count
 # Setting this value will not protect against slow requests.
 worker_timeout ENV.fetch("PUMA_WORKER_TIMEOUT", 60)
 
+# How often worker processes check in with the master process. This also controls how often worker metrics are updated in the master process.
+# Default: once per second.
+worker_check_interval ENV.fetch("PUMA_CHECK_INTERVAL", 1).to_i
+
 # The number of seconds to wait for another request within a persistent (keep
 # alive) session.
 persistent_timeout 20
@@ -114,4 +118,12 @@ before_fork do
 
   PumaWorkerKiller.rolling_restart_splay_seconds = 0.0..180.0 # 0 to 3 minutes in seconds
   PumaWorkerKiller.enable_rolling_restart ENV.fetch("PUMA_RESTART_INTERVAL", 2 * 60 * 60).to_i # every 2 hours by default
+end
+
+on_worker_boot do |worker_id|
+  # The Puma worker ID identifies the current Puma process. Each worker gets an ID from 0 to num_workers-1. Every time a
+  # worker is killed, a new worker is started with a new PID but the same worker ID.
+  #
+  # This is used by the /metrics/instance endpoint to assign a stable identifier to each worker process for metric reporting purposes.
+  ENV["PUMA_WORKER_ID"] = worker_id.to_s
 end

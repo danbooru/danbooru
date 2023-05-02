@@ -21,5 +21,13 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
     end
+
+    context "#instance action" do
+      should "work for text format" do
+        get instance_metrics_path
+
+        assert_response :success
+      end
+    end
   end
 end
