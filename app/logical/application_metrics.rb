@@ -402,7 +402,9 @@ class ApplicationMetrics
     rescue IOError, DRb::DRbConnError
       # XXX Ignore any errors we may receive when fetching metrics from a remote process that has shut down (usually by the Puma worker killer)
       nil
-    end.reduce(&:merge)
+    end
+
+    metrics.reduce(&:merge)
   end
 
   # Makes metrics for the current process available to other processes. Starts a background thread serving process
