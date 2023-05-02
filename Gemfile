@@ -45,7 +45,6 @@ gem 'google-cloud-storage', require: "google/cloud/storage"
 gem 'ed25519'
 gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
 gem 'clockwork'
-gem 'puma-metrics'
 gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
 gem "parallel"

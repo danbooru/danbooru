@@ -12,7 +12,6 @@
 # * PUMA_WORKER_TIMEOUT
 # * PUMA_PIDFILE
 # * PUMA_CONTROL_URL
-# * PUMA_METRICS_URL
 # * PUMA_RESTART_INTERVAL
 #
 # Use `bin/pumactl` to control a running Puma instance.
@@ -89,13 +88,6 @@ end
 
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
-
-# Enable Prometheus metrics.
-# https://github.com/harmjanblok/puma-metrics
-plugin :metrics
-
-# Export Prometheus metrics by default on http://localhost:9393
-metrics_url ENV.fetch("PUMA_METRICS_URL", "tcp://localhost:9393")
 
 # Start the Puma control rack application on +url+. This application can
 # be communicated with to control the main server. Additionally, you can
