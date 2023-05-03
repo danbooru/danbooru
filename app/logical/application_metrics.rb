@@ -5,12 +5,27 @@
 # @see app/logical/danbooru/metric.rb
 # @see app/controllers/metrics_controller.rb
 class ApplicationMetrics
+  extend Memoist
+
+  delegate :[], to: :process_metrics
+
+  # The Puma worker ID identifies the current Puma process. Each worker gets an ID from 0 to num_workers-1. Every time a
+  # worker is killed, a new worker is started with a new PID but the same worker ID.
+  #
+  # Set in config/puma.rb.
+  attr_accessor :puma_worker_id
+
+  # @param [ApplicationMetrics] The singleton instance. Class methods are delegated to this.
+  def self.instance
+    @instance ||= new
+  end
+
   # Returns metrics related to the site as a whole. This mostly consists of the sizes of various database tables.
   #
   # @return [Danbooru::Metric::Set] The set of application metrics.
-  def self.application_metrics
+  def application_metrics
     metrics = Danbooru::Metric::Set.new({
-      danbooru_info:                                [:counter, "Information about the present application build."],
+      danbooru_info:                                [:counter, "Information about the current application build."],
       danbooru_artists_total:                       [:gauge,   "The total number of artists."],
       danbooru_artist_urls_total:                   [:gauge,   "The total number of artist URLs."],
       danbooru_artist_versions_total:               [:counter, "The total number of artist versions."],
@@ -170,39 +185,51 @@ class ApplicationMetrics
     metrics
   end
 
-  # Returns metrics related to the current running Ruby process. Metrics from multiple processes are combined together
-  # below in `ApplicationMetrics.instance_metrics`.
+  # Returns metrics related to the current Ruby process. A Danbooru instance normally consists of a Puma server running
+  # several worker processes. Metrics from each process are combined together below in `#instance_metrics`.
   #
   # @return [Danbooru::Metric::Set] The set of metrics for this process.
-  def process_metrics
-    metrics = Danbooru::Metric::Set.new
-
-    metrics.register({
-      target_info:     [:gauge, "Information about the present application instance."],
-
-      # Global Puma metrics (not tied to the current process)
-      puma_started_at: [:counter, "When the master process started."],
-      puma_workers:    [:gauge,   "Number of configured worker processes."],
-
-      # Worker-specific Puma metrics (tied to a single Puma worker process)
-      puma_worker_started_at:     [:counter, "When the worker last restarted. Workers are periodically restarted to prevent memory bloat."],
-      puma_worker_last_checkin:   [:counter, "When the worker last checked in with the master process."],
-      puma_worker_max_threads:    [:gauge,   "Number of configured worker threads."],
-      puma_worker_running:        [:gauge,   "Current number of worker threads."],
-      puma_worker_pool_capacity:  [:gauge,   "Current number of idle worker threads."],
-      puma_worker_backlog:        [:gauge,   "Current number of accepted connections waiting for an idle worker thread."],
-      puma_worker_socket_backlog: [:gauge,   "Current number of unaccepted connections."],
-      puma_worker_requests_count: [:counter, "Total number of requests served since the worker started."],
+  memoize def process_metrics
+    metrics = Danbooru::Metric::Set.new({
+      target_info:     [:gauge, "Information about the current application instance."],
     })
 
-    # Process-specific metrics (tied to a single Puma worker process)
-    puma_worker_id = ENV["PUMA_WORKER_ID"]
+    status = ServerStatus.new
+    metrics[:target_info][{
+      pod_name:         status.container_name,
+      node_name:        status.node_name,
+      ruby_version:     status.ruby_version,
+      rails_version:    status.rails_version,
+      puma_version:     status.puma_version,
+      danbooru_version: status.danbooru_version,
+    }].set(1)
+
+    if puma_running?
+      metrics.register({
+        # Global Puma metrics (not tied to the current process)
+        puma_started_at: [:counter, "When the master process started."],
+        puma_workers:    [:gauge,   "Number of configured worker processes."],
+
+        # Worker-specific Puma metrics (tied to a single Puma worker process)
+        puma_worker_started_at:     [:counter, "When the worker last restarted. Workers are periodically restarted to prevent memory bloat."],
+        puma_worker_last_checkin:   [:counter, "When the worker last checked in with the master process."],
+        puma_worker_restart_count:  [:counter, "Total number of times this worker has restarted (including initial start)."],
+        puma_worker_max_threads:    [:gauge,   "Number of configured worker threads."],
+        puma_worker_running:        [:gauge,   "Current number of worker threads."],
+        puma_worker_pool_capacity:  [:gauge,   "Current number of idle worker threads."],
+        puma_worker_backlog:        [:gauge,   "Current number of accepted connections waiting for an idle worker thread."],
+        puma_worker_socket_backlog: [:gauge,   "Current number of unaccepted connections."],
+        puma_worker_requests_count: [:counter, "Total number of requests served since the worker started."],
+      })
+    end
+
     metrics.register({
       rails_connection_pool_size:                      [:gauge, "Maximum number of database connections in the pool."],
       rails_connection_pool_connections:               [:gauge, "Current number of database connections by state."],
       rails_connection_pool_waiting:                   [:gauge, "Current number of threads blocked waiting to checkout a database connection."],
       rails_connection_pool_checkout_timeout:          [:gauge, "Maxmimum amount of time to wait on checking out a database connection."],
 
+      ruby_pid:                                        [:gauge,   "Current process ID."],
       ruby_thread_count:                               [:gauge,   "Current number of threads."],
       ruby_vm_constant_cache_invalidations:            [:counter, "Total number of constant cache invalidations."],
       ruby_vm_constant_cache_misses:                   [:counter, "Total number of constant cache misses."],
@@ -258,15 +285,14 @@ class ApplicationMetrics
       ruby_yjit_object_shape_count:                    [:gauge,   "Current number of object shapes."],
     }, { worker: puma_worker_id })
 
-    status = ServerStatus.new
-    metrics[:target_info][{
-      pod_name:         status.container_name,
-      node_name:        status.node_name,
-      ruby_version:     status.ruby_version,
-      rails_version:    status.rails_version,
-      puma_version:     status.puma_version,
-      danbooru_version: status.danbooru_version,
-    }].set(1)
+    metrics
+  end
+
+  # Updates metrics related to the current running Ruby process.
+  #
+  # @return [Danbooru::Metric::Set] The set of metrics for this process.
+  def update_process_metrics
+    metrics = process_metrics
 
     conn_pool_stats = ApplicationRecord.connection_pool.stat
     metrics[:rails_connection_pool_size][{}].set(conn_pool_stats[:size])
@@ -276,36 +302,39 @@ class ApplicationMetrics
     metrics[:rails_connection_pool_waiting][{}].set(conn_pool_stats[:waiting])
     metrics[:rails_connection_pool_checkout_timeout][{}].set(conn_pool_stats[:checkout_timeout])
 
-    resp = Danbooru::Http.get("http://localhost:9293/stats")
-    puma_stats = resp.code == 200 ? resp.parse.with_indifferent_access : {}
+    if puma_running?
+      resp = Danbooru::Http.internal.timeout(1).get("http://localhost:9293/stats")
+      puma_stats = resp.code == 200 ? resp.parse.with_indifferent_access : {}
 
-    metrics.set({
-      puma_started_at: puma_stats[:started_at].to_s.to_time.to_i,
-      puma_workers:    puma_stats[:workers],
-    })
-
-    puma_stats[:worker_status].to_a.each do |worker|
       metrics.set({
-        puma_worker_started_at:     Time.parse(worker[:started_at]).to_i,
-        puma_worker_last_checkin:   Time.parse(worker[:last_checkin]).to_i,
-        puma_worker_running:        worker.dig(:last_status, :running),
-        puma_worker_backlog:        worker.dig(:last_status, :backlog),
-        puma_worker_pool_capacity:  worker.dig(:last_status, :pool_capacity),
-        puma_worker_max_threads:    worker.dig(:last_status, :max_threads),
-        puma_worker_requests_count: worker.dig(:last_status, :requests_count),
-      }, { worker: worker[:index] })
-    end
+        puma_started_at: puma_stats[:started_at].to_s.to_time.to_i,
+        puma_workers:    puma_stats[:workers],
+      })
 
-    # XXX The Puma server object is in a thread local variable, which may be in another thread, so we have to search for it.
-    puma_socket = Thread.list.filter_map { |thread| thread[:puma_server] }.first&.binder&.ios&.first
-    puma_socket_backlog = puma_socket&.getsockopt(Socket::SOL_TCP, Socket::TCP_INFO)&.inspect.to_s[/unacked=(\d+)/, 1].to_i
-    metrics[:puma_worker_socket_backlog][worker: puma_worker_id].set(puma_socket_backlog)
+      puma_stats[:worker_status].to_a.each do |worker|
+        metrics.set({
+          puma_worker_started_at:     Time.parse(worker[:started_at]).to_i,
+          puma_worker_last_checkin:   Time.parse(worker[:last_checkin]).to_i,
+          puma_worker_running:        worker.dig(:last_status, :running),
+          puma_worker_backlog:        worker.dig(:last_status, :backlog),
+          puma_worker_pool_capacity:  worker.dig(:last_status, :pool_capacity),
+          puma_worker_max_threads:    worker.dig(:last_status, :max_threads),
+          puma_worker_requests_count: worker.dig(:last_status, :requests_count),
+        }, { worker: worker[:index] })
+      end
+
+      # XXX The Puma server object is in a thread local variable, which may be in another thread, so we have to search for it.
+      puma_socket = Thread.list.filter_map { |thread| thread[:puma_server] }.first&.binder&.ios&.first
+      puma_socket_backlog = puma_socket&.getsockopt(Socket::SOL_TCP, Socket::TCP_INFO)&.inspect.to_s[/unacked=(\d+)/, 1].to_i
+      metrics[:puma_worker_socket_backlog][worker: puma_worker_id].set(puma_socket_backlog)
+    end
 
     ruby_stats = RubyVM.stat
     metrics.set({
       ruby_vm_constant_cache_invalidations: ruby_stats[:constant_cache_invalidations],
       ruby_vm_constant_cache_misses:        ruby_stats[:constant_cache_misses],
       ruby_thread_count:                    Thread.list.count,
+      ruby_pid:                             Process.pid,
     })
 
     object_stats = ObjectSpace.count_objects
@@ -392,26 +421,41 @@ class ApplicationMetrics
     metrics
   end
 
+  def puma_running?
+    puma_worker_id.present?
+  end
+
+  # Resets the process metrics (by flushing the memoize cache).
+  def reset_metrics
+    flush_cache
+    self
+  end
+
   # Collects metrics from each Puma worker process and combines them into a single set of metrics for /metrics/instance.
   #
   # @return [Danbooru::Metric::Set] The combined set of metrics from each Puma worker process.
-  def self.instance_metrics
-    metrics = Dir.glob("tmp/drb-process-metrics-*.sock").filter_map do |filename|
+  def instance_metrics
+    metrics = Dir.glob("tmp/drb-process-metrics-*.sock").map do |filename|
       application_metrics = DRbObject.new_with_uri("drbunix:#{filename}")
-      application_metrics.process_metrics
+      application_metrics.update_process_metrics
     rescue IOError, DRb::DRbConnError
       # XXX Ignore any errors we may receive when fetching metrics from a remote process that has shut down (usually by the Puma worker killer)
-      nil
+      Danbooru::Metric::Set.new
     end
 
     metrics.reduce(&:merge)
   end
 
-  # Makes metrics for the current process available to other processes. Starts a background thread serving process
-  # metrics on a Unix domain socket under tmp/. Called by each process on startup in config/initializers/metrics.rb.
-  def self.serve_process_metrics
-    filename = "tmp/drb-process-metrics-#{ENV["PUMA_WORKER_ID"] || 0}.sock"
+  # Makes metrics for the current process available to other Puma worker processes. Starts a background thread serving process
+  # metrics on a Unix domain socket under tmp/. Called by each process on startup in config/puma.rb.
+  def serve_process_metrics
+    filename = "tmp/drb-process-metrics-#{puma_worker_id}.sock"
     FileUtils.rm_f(filename)
-    DRb.start_service("drbunix:#{filename}", ApplicationMetrics.new)
+    DRb.start_service("drbunix:#{filename}", ApplicationMetrics.instance)
+  end
+
+  class << self
+    # For each instance method, define a class method that delegates to the singleton instance.
+    delegate *ApplicationMetrics.instance_methods(false), to: :instance
   end
 end

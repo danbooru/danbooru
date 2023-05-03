@@ -112,22 +112,23 @@ before_fork do
   PumaWorkerKiller.enable_rolling_restart ENV.fetch("PUMA_RESTART_INTERVAL", 2 * 60 * 60).to_i # every 2 hours by default
 end
 
-# This is called in cluster mode (when $PUMA_WORKERS > 0) every time a worker process starts or restarts. It's not
-# called in single mode (when $PUMA_WORKERS == 0).
-on_worker_boot do |worker_id|
-  # The Puma worker ID identifies the current Puma process. Each worker gets an ID from 0 to num_workers-1. Every time a
-  # worker is killed, a new worker is started with a new PID but the same worker ID.
-  #
-  # This is used by the /metrics/instance endpoint to assign a stable identifier to each worker process for metric reporting purposes.
-  ENV["PUMA_WORKER_ID"] = worker_id.to_s
+# This is called in the master process right before a worker is started.
+on_worker_fork do |worker_id|
+  ApplicationMetrics[:puma_worker_restart_count][worker: worker_id].increment
+end
 
+# This is called every time a worker process starts or restarts. It's not called in single mode (when workers == 0)
+# when there are no child worker processes.
+on_worker_boot do |worker_id|
   # Starts a background thread that serves process metrics on a Unix domain socket under tmp/.
   require_relative "../app/logical/application_metrics"
+  ApplicationMetrics.puma_worker_id = worker_id.to_s
+  ApplicationMetrics.reset_metrics # Don't inherit metrics from the master process
   ApplicationMetrics.serve_process_metrics
 end
 
-# This is only called in single mode (when $PUMA_WORKERS == 0), not in clustered mode (when $PUMA_WORKERS > 0).
-if @options[:workers] == 0
-  require_relative "../app/logical/application_metrics"
-  ApplicationMetrics.serve_process_metrics
-end
+# Initialize metrics in the master process when running in cluster mode (when workers > 0), or in the main process when
+# running in single mode (when workers == 0)
+require_relative "../app/logical/application_metrics"
+ApplicationMetrics.puma_worker_id = "master" if @options[:workers] > 0
+ApplicationMetrics.serve_process_metrics
