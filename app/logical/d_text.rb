@@ -58,7 +58,7 @@ class DText
 
     fragment.css("a.dtext-wiki-link").each do |node|
       path = Addressable::URI.parse(node["href"]).path
-      name = path[%r!\A/wiki_pages/(.*)\z!i, 1]
+      name = path.split("/").last
       name = CGI.unescape(name)
       name = WikiPage.normalize_title(name)
       wiki = wiki_pages.find { |wiki| wiki.title == name }
@@ -189,7 +189,7 @@ class DText
     fragment = parse_html(html)
 
     titles = fragment.css("a.dtext-wiki-link").map do |node|
-      title = node["href"][%r{\A/wiki_pages/(.*)\z}i, 1]
+      title = node["href"].split("/").last
       title = CGI.unescape(title)
       title = WikiPage.normalize_title(title)
       title
