@@ -103,6 +103,38 @@ plugin :tmp_restart
 # https://github.com/puma/puma#controlstatus-server
 activate_control_app ENV.fetch("PUMA_CONTROL_URL", "tcp://localhost:9293"), no_token: true
 
+# The last resort error handler for exceptions unhandled by the app. This only handles errors not handled by the
+# `rescue_exception` handler in ApplicationController. This normally only happens if `rescue_exception` itself raises an
+# error, or if a middleware raises an error before or after the request is handled by the app.
+#
+# When RAILS_ENV is development, errors will be swallowed by the BetterErrors gem before they get to this point.
+lowlevel_error_handler do |exception, env|
+  ApplicationMetrics[:rack_exceptions_total][exception: exception.class.name].increment
+
+  backtrace = Rails.backtrace_cleaner.clean(exception.backtrace).join("\n")
+  message = <<~EOS
+    An unexpected error has occurred.
+
+    Details: #{exception.class.to_s} exception raised.
+
+    #{backtrace}
+  EOS
+
+  [500, {}, [message]]
+rescue Exception => second_exception # This should never happen
+  message = <<~EOS
+    An unexpected error has occurred on the error page. Oh baby, a triple fault!
+
+    Details: #{exception.class.to_s} exception raised.
+    #{exception.backtrace.join("\n")}
+
+    #{second_exception.class.to_s} exception raised.
+    #{second_exception.backtrace.join("\n")}
+  EOS
+
+  [500, {}, [message]]
+end
+
 # https://github.com/schneems/puma_worker_killer
 # https://docs.gitlab.com/ee/administration/operations/puma.html#puma-worker-killer
 before_fork do

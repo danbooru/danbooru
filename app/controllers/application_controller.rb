@@ -174,7 +174,17 @@ class ApplicationController < ActionController::Base
     # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
     layout = CurrentUser.user.present? ? "default" : "blank"
 
-    DanbooruLogger.log(@exception, expected: @expected) if @exception
+    if @exception
+      DanbooruLogger.log(@exception, expected: @expected)
+
+      ApplicationMetrics[:rails_exceptions_total][
+        exception: @exception.class.name,
+        controller: controller_name,
+        action: action_name,
+        expected: @expected.to_s,
+      ].increment
+    end
+
     render template, layout: layout, status: status, formats: format
   rescue ActionView::MissingTemplate
     render "static/error", layout: layout, status: status, formats: format

@@ -224,6 +224,9 @@ class ApplicationMetrics
     end
 
     metrics.register({
+      rack_exceptions_total:                           [:counter, "Total number of exceptions not caught by Rails."],
+      rails_exceptions_total:                          [:counter, "Total number of exceptions caught by Rails."],
+
       rails_connection_pool_size:                      [:gauge, "Maximum number of database connections in the pool."],
       rails_connection_pool_connections:               [:gauge, "Current number of database connections by state."],
       rails_connection_pool_waiting:                   [:gauge, "Current number of threads blocked waiting to checkout a database connection."],
