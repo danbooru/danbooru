@@ -47,7 +47,7 @@ module Danbooru
       @name = name.to_sym
       @type = type
       @help = help
-      @labels = labels.reject { |key, value| value.blank? }
+      @labels = labels.transform_values(&:to_s).reject { |key, value| value.blank? }
       @value_hash = {}
     end
 
@@ -183,7 +183,7 @@ module Danbooru
       def initialize(metric, value = 0, labels: {})
         @name = metric.name
         @value = value
-        @labels = labels.reject { |key, value| value.blank? }
+        @labels = labels.transform_values(&:to_s).reject { |key, value| value.blank? }
       end
 
       # @param val [Integer, Float, Boolean, nil] The new value of the metric.
