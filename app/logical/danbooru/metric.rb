@@ -210,6 +210,15 @@ module Danbooru
         self
       end
 
+      # Record time spent executing the given block.
+      def increment_duration(&block)
+        start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        yield
+      ensure
+        finish = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        increment(finish - start)
+      end
+
       # @return [String] The metric labels, in `{name="value"}` format. Quotes, newlines, and backslashes are backslash-escaped.
       def label_string
         @label_string ||=

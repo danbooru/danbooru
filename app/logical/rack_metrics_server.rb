@@ -1,0 +1,39 @@
+# frozen_string_literal: true
+
+# This starts a background thread that serves process metrics at http://0.0.0.0:9090/metrics. It's used by GoodJob
+# workers (`bin/good_job start`) and by the cron process (`bin/rails danbooru:cron`) to expose internal metrics.
+#
+# @see config/initializers/good_job.rb
+# @see lib/tasks/danbooru.rake
+class RackMetricsServer
+  attr_reader :host, :port, :options, :server, :thread
+
+  def initialize(host: ENV.fetch("DANBOORU_METRICS_HOST", "0.0.0.0"), port: ENV.fetch("DANBOORU_METRICS_PORT", 9090), **options)
+    @host = host
+    @port = port
+    @options = options
+  end
+
+  def start
+    @server = Rack::Handler.get("webrick")
+    @thread = Thread.new do
+      @server.run(self, Host: host, Port: port, **options)
+    end
+
+    self
+  end
+
+  def call(env)
+    request = Rack::Request.new(env)
+
+    case request.path_info
+    when "/health"
+      [200, {}, []]
+    when "/metrics"
+      metrics = ApplicationMetrics.update_process_metrics.to_prom
+      [200, {"Content-Type" => "text/plain"}, [metrics]]
+    else
+      [404, {}, []]
+    end
+  end
+end

@@ -227,6 +227,15 @@ class ApplicationMetrics
       rack_exceptions_total:                           [:counter, "Total number of exceptions not caught by Rails."],
       rails_exceptions_total:                          [:counter, "Total number of exceptions caught by Rails."],
 
+      rails_jobs_enqueued_total:                       [:counter, "Total number of background jobs successfully enqueued. Does not include foreground jobs."],
+      rails_jobs_attempts_total:                       [:counter, "Total number of jobs attempted to be worked. Includes successful jobs, failed jobs, and retried jobs."],
+      rails_jobs_worked_total:                         [:counter, "Total number of jobs successfully worked."],
+      rails_jobs_retries_total:                        [:counter, "Total number of jobs retried after a failure."],
+      rails_jobs_exceptions_total:                     [:counter, "Total number of jobs failed due to an exception."],
+      rails_jobs_duration_seconds:                     [:counter, "Time spent working jobs. Does not include time spent enqueuing jobs, or waiting for queued jobs to be worked."],
+      rails_jobs_queue_duration_seconds:               [:counter, "Time spent waiting on jobs to be worked. Does not include time spent enqueuing jobs."],
+      rails_jobs_enqueue_duration_seconds:             [:counter, "Time spent adding jobs to the queue."],
+
       rails_connection_pool_size:                      [:gauge, "Maximum number of database connections in the pool."],
       rails_connection_pool_connections:               [:gauge, "Current number of database connections by state."],
       rails_connection_pool_waiting:                   [:gauge, "Current number of threads blocked waiting to checkout a database connection."],
@@ -446,7 +455,7 @@ class ApplicationMetrics
       Danbooru::Metric::Set.new
     end
 
-    metrics.reduce(&:merge)
+    metrics.reduce(&:merge) || Danbooru::Metric::Set.new
   end
 
   # Makes metrics for the current process available to other Puma worker processes. Starts a background thread serving process
