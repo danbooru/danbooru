@@ -46,12 +46,7 @@ module Source
       end
 
       memoize def page
-        return nil if api_url.blank?
-
-        response = http.cache(1.minute).get(api_url)
-        return nil unless response.status == 200
-
-        response.parse
+        http.cache(1.minute).parsed_get(api_url)
       end
     end
   end

@@ -90,17 +90,15 @@ module Source
         end
       end
 
-      def api_response
-        return {} if (mobile_url = parsed_url.mobile_url || parsed_referer&.mobile_url).blank?
-
-        resp = http.cache(1.minute).get(mobile_url)
-        json_string = resp.to_s[/var \$render_data = \[(.*)\]\[0\]/m, 1]
-
-        return {} if json_string.blank?
-
-        JSON.parse(json_string)["status"]
+      def mobile_page_url
+        parsed_url.mobile_url || parsed_referer&.mobile_url
       end
-      memoize :api_response
+
+      memoize def api_response
+        html = http.cache(1.minute).parsed_get(mobile_page_url)
+        json_string = html.to_s[/var \$render_data = \[(.*)\]\[0\]/m, 1] || "{}"
+        JSON.parse(json_string)["status"] || {}
+      end
     end
   end
 end

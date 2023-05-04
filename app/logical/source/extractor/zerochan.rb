@@ -30,13 +30,12 @@ module Source
         parsed_url.work_id || parsed_referer&.work_id
       end
 
+      def api_url
+        "https://www.zerochan.net/#{work_id}?json" if work_id.present?
+      end
+
       memoize def api_response
-        return {} if work_id.blank?
-
-        response = http.cache(1.minute).get("https://www.zerochan.net/#{work_id}?json")
-        return {} unless response.status == 200
-
-        JSON.parse(response.to_s).with_indifferent_access
+        http.cache(1.minute).parsed_get(api_url) || {}
       end
     end
   end

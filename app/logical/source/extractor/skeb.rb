@@ -53,19 +53,8 @@ module Source
         "https://skeb.jp/api/users/#{artist_name}/works/#{illust_id}"
       end
 
-      def api_response
-        return {} unless api_url.present?
-
-        headers = {
-          Referer: profile_url,
-          Authorization: "Bearer null",
-        }
-
-        response = http.cache(1.minute).headers(headers).get(api_url)
-        return {} unless response.status == 200
-        # The status check is required for private commissions, which return 404
-
-        response.parse
+      memoize def api_response
+        http.cache(1.minute).headers(Referer: profile_url, Authorization: "Bearer null").parsed_get(api_url) || {}
       end
 
       def profile_url
@@ -105,8 +94,6 @@ module Source
           artist_commentary_desc
         end
       end
-
-      memoize :api_response
     end
   end
 end

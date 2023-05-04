@@ -38,13 +38,8 @@ module Source
         parsed_url.work_id || parsed_referer&.work_id
       end
 
-      def page
-        return nil if page_url.blank?
-
-        response = http.cache(1.minute).get(page_url)
-        return nil unless response.status == 200
-
-        response.parse
+      memoize def page
+        http.cache(1.minute).parsed_get(page_url)
       end
 
       # For non-adult works, returns both the main images and the images posted by the artist in the replies.
@@ -65,20 +60,17 @@ module Source
         urls.select { Source::URL.parse(_1)&.image_url? }.uniq
       end
 
-      def page_json
+      memoize def page_json
         script_text = page&.search("body script").to_a.map(&:text).grep(/plurk =/).first.to_s
         json = script_text.strip.delete_prefix("plurk = ").delete_suffix(";").gsub(/new Date\((.*?)\)/) { $1 }
         return {} if json.blank?
         JSON.parse(json)
       end
 
-      def api_replies
+      memoize def api_replies
         return {} if illust_id.blank?
 
-        response = http.cache(1.minute).post("https://www.plurk.com/Responses/get", form: { plurk_id: illust_id.to_i(36), from_response_id: 0 })
-        return {} unless response.status == 200
-
-        response.parse
+        http.cache(1.minute).parsed_post("https://www.plurk.com/Responses/get", form: { plurk_id: illust_id.to_i(36), from_response_id: 0 }) || {}
       end
 
       def tag_name
@@ -109,8 +101,6 @@ module Source
           end
         end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
       end
-
-      memoize :page, :page_json, :api_replies
     end
   end
 end

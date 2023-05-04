@@ -133,19 +133,13 @@ class Source::Extractor
       parsed_url.work_id || parsed_referer&.work_id || post_url_from_image_html&.try(:work_id)
     end
 
-    def api_response
+    memoize def api_response
       return {} unless self.class.enabled?
       return {} unless artist_name.present? && work_id.present?
 
-      response = http.cache(1.minute).get(
-        "https://api.tumblr.com/v2/blog/#{artist_name}/posts",
-        params: { id: work_id, api_key: Danbooru.config.tumblr_consumer_key }
-      )
-
-      return {} if response.code != 200
-      response.parse.with_indifferent_access
+      params = { id: work_id, api_key: Danbooru.config.tumblr_consumer_key }
+      http.cache(1.minute).parsed_get("https://api.tumblr.com/v2/blog/#{artist_name}/posts", params: params) || {}
     end
-    memoize :api_response
 
     def post
       api_response.dig(:response, :posts)&.first || {}

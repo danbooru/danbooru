@@ -52,12 +52,7 @@ class Source::Extractor
     end
 
     memoize def api_response
-      return {} if parsed_url.api_url.blank?
-
-      resp = http.cache(1.minute).cookies(adult: "t").get(parsed_url.api_url)
-      return {} if resp.code != 200
-
-      resp.parse
+      http.cache(1.minute).cookies(adult: "t").parsed_get(parsed_url.api_url) || {}
     end
 
     def find_right_extension(parsed_url)

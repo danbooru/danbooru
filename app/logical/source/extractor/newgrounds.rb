@@ -83,29 +83,18 @@ module Source
         super.cookies(vmkIdu5l8m: Danbooru.config.newgrounds_session_cookie)
       end
 
-      def page
-        return nil if page_url.blank?
-
-        response = http.cache(1.minute).get(page_url)
-        return nil if response.status == 404
-
-        response.parse
+      def video_page_url
+        "https://www.newgrounds.com/portal/video/#{video_id}" if video_id.present?
       end
 
-      def video_data
+      memoize def page
+        http.cache(1.minute).parsed_get(page_url)
+      end
+
+      memoize def video_data
         # flash files return {"error"=>{"code"=>404, "msg"=>"The submission you are looking for does not have a video."}}
-
-        return {} unless video_id.present?
-
-        response = http.headers("X-Requested-With": "XMLHttpRequest").cache(1.minute).get("https://www.newgrounds.com/portal/video/#{video_id}")
-        return {} unless response.status == 200
-
-        JSON.parse(response).with_indifferent_access
-      rescue JSON::ParserError
-        {}
+        response = http.headers("X-Requested-With": "XMLHttpRequest").cache(1.minute).parsed_get(video_page_url, format: :json)
       end
-
-      memoize :page, :video_data
     end
   end
 end

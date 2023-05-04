@@ -94,11 +94,12 @@ class Source::Extractor
       end.strip
     end
 
-    def api_response
-      return {} if status_id.blank?
-      resp = http.get("https://#{domain}/api/v1/statuses/#{status_id}")
-      return {} if resp.status != 200
-      resp.parse
+    def status_api_url
+      "https://#{domain}/api/v1/statuses/#{status_id}" if status_id.present?
+    end
+
+    memoize def api_response
+      http.cache(1.minute).parsed_get(status_api_url) || {}
     end
 
     def http
@@ -111,7 +112,5 @@ class Source::Extractor
       when "Baraag" then Danbooru.config.baraag_access_token
       end
     end
-
-    memoize :api_response
   end
 end

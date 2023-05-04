@@ -59,13 +59,8 @@ module Source
       end
 
       # curl https://sketch.pixiv.net/api/items/5835314698645024323.json | jq
-      def api_response
-        return {} if api_url.blank?
-
-        response = http.cache(1.minute).get(api_url)
-        return {} if response.status == 404
-
-        response.parse
+      memoize def api_response
+        http.cache(1.minute).parsed_get(api_url) || {}
       end
 
       def page_url
@@ -75,8 +70,6 @@ module Source
       def api_url
         parsed_url.api_url || parsed_referer&.api_url
       end
-
-      memoize :api_response
     end
   end
 end

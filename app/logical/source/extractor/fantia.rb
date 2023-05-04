@@ -138,10 +138,7 @@ class Source::Extractor
 
     memoize def post_page
       return nil unless work_type == "post"
-      response = http.cache(1.minute).get("https://fantia.jp/posts/#{work_id}")
-
-      return nil unless response.status == 200
-      response.parse
+      http.cache(1.minute).parsed_get("https://fantia.jp/posts/#{work_id}")
     end
 
     memoize def csrf_token
@@ -152,18 +149,12 @@ class Source::Extractor
       return {} unless work_type == "post" && csrf_token.present?
       api_url = "https://fantia.jp/api/v1/posts/#{work_id}"
 
-      response = http.cache(1.minute).headers("X-CSRF-Token": csrf_token).get(api_url)
-      return {} unless response.status == 200
-
-      response.parse
+      http.cache(1.minute).headers("X-CSRF-Token": csrf_token).parsed_get(api_url) || {}
     end
 
     memoize def html_response
       return nil unless work_type == "product"
-      response = http.cache(1.minute).get("https://fantia.jp/products/#{work_id}")
-
-      return nil unless response.status == 200
-      response.parse
+      http.cache(1.minute).parsed_get("https://fantia.jp/products/#{work_id}")
     end
 
     def http

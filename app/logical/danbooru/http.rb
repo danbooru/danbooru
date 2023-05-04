@@ -2,6 +2,7 @@
 
 require "danbooru/http/application_client"
 require "danbooru/http/html_adapter"
+require "danbooru/http/json_adapter"
 require "danbooru/http/xml_adapter"
 require "danbooru/http/cache"
 require "danbooru/http/logger"
@@ -42,7 +43,7 @@ module Danbooru
     attr_accessor :max_size, :http
 
     class << self
-      delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :proxy, :public_only, :with_legacy_ssl, :download_media, to: :new
+      delegate :get, :head, :put, :post, :delete, :parsed_get, :parsed_post, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :proxy, :public_only, :with_legacy_ssl, :download_media, to: :new
     end
 
     # The default HTTP client.
@@ -102,6 +103,14 @@ module Danbooru
 
     def post!(url, **options)
       request!(:post, url, **options)
+    end
+
+    def parsed_get(url, **options)
+      parsed_request(:get, url, **options)
+    end
+
+    def parsed_post(url, **options)
+      parsed_request(:post, url, **options)
     end
 
     def follow(*args)
@@ -203,10 +212,19 @@ module Danbooru
     #
     # @param method [String] the HTTP method
     # @param url [String] the URL to request
+    # @param format [Symbol] if present, override the response's content type to be this format (:json, :html, or :xml).
     # @param options [Hash] the URL parameters
     # @return [HTTP::Response] the HTTP response
-    def request(method, url, **options)
-      http.send(method, url, **options)
+    def request(method, url, format: nil, **options)
+      response = http.send(method, url, **options)
+
+      if format
+        mime_type = Mime::Type.lookup_by_extension(format).to_s
+        content_type = HTTP::ContentType.parse(mime_type)
+        response.instance_eval { @content_type = content_type }
+      end
+
+      response
     rescue OpenSSL::SSL::SSLError
       fake_response(590)
     rescue ValidatingSocket::ProhibitedIpError
@@ -237,6 +255,20 @@ module Danbooru
       else
         raise Error, "#{method.upcase} #{url} failed (HTTP #{response.status})"
       end
+    end
+
+    # Perform a HTTP request for the given URL and return the parsed JSON, XML, or HTML response.
+    # Return nil on error, or if the URL was blank.
+    #
+    # @param method [String] The HTTP method.
+    # @param url [String] The URL to request.
+    # @param options [Hash] The URL parameters.
+    # @return [Hash, Array, Nokogiri::HTML::Document, nil] The parsed HTTP response body, or nil on error.
+    def parsed_request(method, url, **options)
+      return nil if url.blank?
+      response = request(method, url, **options)
+      return nil if response.code != 200
+      response.parse
     end
 
     def fake_response(status)

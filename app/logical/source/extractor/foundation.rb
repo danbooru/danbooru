@@ -38,13 +38,8 @@ module Source
         parsed_url.page_url || parsed_referer&.page_url
       end
 
-      def page
-        return nil if page_url.blank?
-
-        response = http.cache(1.minute).get(page_url)
-        return nil unless response.status == 200
-
-        response.parse
+      memoize def page
+        http.cache(1.minute).parsed_get(page_url)
       end
 
       def tags
@@ -92,7 +87,7 @@ module Source
         DText.from_html(artist_commentary_desc)
       end
 
-      def api_response
+      memoize def api_response
         return {} if page.nil?
 
         data = page.at("#__NEXT_DATA__")&.text
@@ -100,8 +95,6 @@ module Source
 
         JSON.parse(data).with_indifferent_access
       end
-
-      memoize :api_response
     end
   end
 end

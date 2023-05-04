@@ -131,21 +131,15 @@ module Source
         super.use(:spoof_referrer)
       end
 
-      def page
-        return unless page_url.present?
-        response = http.cache(1.minute).get(page_url)
-        return response.parse unless response.status != 200
+      memoize def page
+        http.cache(1.minute).parsed_get(page_url)
       end
 
       def get_json(url)
-        response = http.cache(1.minute).get(url)
-        return {} unless response.status == 200
-        JSON.parse(response).with_indifferent_access
-      rescue JSON::ParserError
-        {}
+        http.cache(1.minute).parsed_get(url) || {}
       end
 
-      def data
+      memoize def data
         if t_work_id.present?
           data = get_json("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?timezone_offset=-60&id=#{t_work_id}")
           if data.dig("data", "item", "orig", "id_str").present? # it means it's a repost
@@ -160,8 +154,6 @@ module Source
           {}
         end
       end
-
-      memoize :data, :page
     end
   end
 end

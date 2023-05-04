@@ -80,30 +80,15 @@ class Source::Extractor
     end
 
     memoize def book_api_response
-      return {} if book_api_url.blank?
-
-      response = http.cache(1.minute).get(book_api_url)
-      return {} if response.code != 200
-
-      response.parse
+      http.cache(1.minute).parsed_get(book_api_url) || {}
     end
 
     memoize def page
-      return nil if page_url.blank?
-
-      response = http.cache(1.minute).get(page_url)
-      return nil if response.code != 200
-
-      response.parse
+      http.cache(1.minute).parsed_get(page_url)
     end
 
     memoize def author_page
-      return nil if author_url.blank?
-
-      response = http.cache(1.minute).get(author_url)
-      return nil if response.code != 200
-
-      response.parse
+      http.cache(1.minute).parsed_get(author_url)
     end
 
     def http
