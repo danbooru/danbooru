@@ -7,6 +7,7 @@ namespace :danbooru do
   # Usage: bin/rails danbooru:cron
   desc "Run the cronjob scheduler"
   task cron: :environment do
+    RackMetricsServer.new.start
     Clockwork::run
   end
 
