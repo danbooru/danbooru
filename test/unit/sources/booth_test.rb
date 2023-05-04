@@ -48,9 +48,9 @@ module Sources
 
     context "A deleted booth image" do
       strategy_should_work(
-        "https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/d12bce50-a0c7-43f8-a4fb-5ee0ea6855a3_base_resized.jpg",
-        image_urls: ["https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/d12bce50-a0c7-43f8-a4fb-5ee0ea6855a3.jpg"],
-        page_url: "https://booth.pm/en/items/3713604",
+        "https://booth.pximg.net/67e59677-bc7e-4249-918f-8c406b204df6/i/4266304/71f7517c-ed21-4a51-9e62-030787c44c0c.jpeg",
+        image_urls: ["https://booth.pximg.net/67e59677-bc7e-4249-918f-8c406b204df6/i/4266304/71f7517c-ed21-4a51-9e62-030787c44c0c.jpeg"],
+        page_url: "https://booth.pm/en/items/4266304",
         profile_url: nil,
         artist_name: nil,
         tag_name: nil,
@@ -67,9 +67,9 @@ module Sources
         image_urls: ["https://booth.pximg.net/8bb9e4e3-d171-4027-88df-84480480f79d/i/2423989/a692d4f3-4371-4a86-a337-83fee82d46a4.png"],
         profile_url: "https://re-face.booth.pm",
         page_url: "https://booth.pm/en/items/2423989",
-        artist_name: "Re:fAce/りふぇいす。",
+        artist_name: "Re:fAce Music Production SHOP",
         tag_name: "re-face",
-        other_names: %w[Re:fAce/りふぇいす。 re-face],
+        other_names: ["Re:fAce Music Production SHOP", "re-face"],
         tags: %w[music original re:face ricchan\ * virtual\ youtuber くるみ だてんちゆあ ひなの羽衣 りふぇいす。 アイドル 千草はな 白乃クロミ 白咲べる 赤坂まさか 音楽],
         artist_commentary_title: "RwithV vol.1 -アイドルはじめます！-",
         dtext_artist_commentary_desc: /注文が殺到した際は、発送が遅れてしまう場合もございますので予めご了承ください。/

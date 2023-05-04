@@ -28,11 +28,8 @@ module Source
         "#{profile_url}/post/#{illust_id}"
       end
 
-      def page
-        return nil if page_url.blank?
-
-        response = http.cache(1.minute).get(page_url)
-        response.parse if response.status == 200
+      memoize def page
+        http.cache(1.minute).parsed_get(page_url)
       end
 
       def tags
@@ -72,8 +69,6 @@ module Source
       def artist_name
         parsed_url.username || parsed_referer&.username
       end
-
-      memoize :page
     end
   end
 end

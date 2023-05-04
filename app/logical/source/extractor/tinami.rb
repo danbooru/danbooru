@@ -4,7 +4,6 @@
 module Source
   class Extractor
     class Tinami < Source::Extractor
-
       def match?
         Source::URL::Tinami === parsed_url
       end
@@ -98,20 +97,15 @@ module Source
         response.parse.at("body > div > a > img[src^='//img.tinami.com']")&.attr("src")&.prepend("https:")
       end
 
-      def page
-        return nil if page_url.blank?
-
-        response = http.cache(1.minute).get(page_url)
-        return nil unless response.status == 200
-
-        response.parse
+      memoize def page
+        http.cache(1.minute).parsed_get(page_url)
       end
 
       def http
         super.cookies(Tinami2SESSID: Danbooru.config.tinami_session_id).use(:spoof_referrer)
       end
 
-      memoize :page, :user_id, :work_id, :ethna_csrf, :image_urls, :image_sub_ids, :nv_body_image_urls
+      memoize :user_id, :work_id, :ethna_csrf, :image_urls, :image_sub_ids, :nv_body_image_urls
     end
   end
 end

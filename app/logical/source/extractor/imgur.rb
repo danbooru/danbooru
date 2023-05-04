@@ -77,13 +77,8 @@ module Source
       end
 
       memoize def api_response
-        return {} if api_url.blank?
-
-        response = http.cache(1.minute).get(api_url)
-        return {} unless response.status == 200
-
-        # Imgur uses a custom 'application/vnd.imgur.v1+json' response type that isn't recognized by `response.parse`
-        JSON.parse(response.to_s).with_indifferent_access
+        # Imgur uses a custom 'application/vnd.imgur.v1+json' content type that isn't recognized by `response.parse`
+        http.cache(1.minute).parsed_get(api_url, format: :json) || {}
       end
     end
   end

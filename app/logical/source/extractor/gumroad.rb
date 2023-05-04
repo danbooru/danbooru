@@ -51,12 +51,7 @@ class Source::Extractor
     end
 
     memoize def page
-      return nil if page_url.blank?
-
-      response = http.cache(1.minute).get(page_url)
-      return nil if response.code != 200
-
-      response.parse
+      http.cache(1.minute).parsed_get(page_url)
     end
 
     memoize def api_response

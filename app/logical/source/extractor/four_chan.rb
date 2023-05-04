@@ -117,12 +117,7 @@ module Source
       end
 
       memoize def api_response
-        return [] unless api_url.present?
-
-        response = http.cache(1.minute).get(api_url)
-        return [] unless response.status == 200
-
-        response.parse["posts"]
+        http.cache(1.minute).parsed_get(api_url)&.dig(:posts) || []
       end
 
       def api_url

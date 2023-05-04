@@ -72,12 +72,7 @@ module Source
       end
 
       memoize def api_response
-        return {} if api_url.blank?
-
-        response = http.cache(1.minute).get(api_url)
-        return {} unless response.status == 200
-
-        response.parse.with_indifferent_access.dig(:data, :project)
+        http.cache(1.minute).parsed_get(api_url)&.dig(:data, :project) || {}
       end
     end
   end

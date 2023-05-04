@@ -87,24 +87,16 @@ class Source::Extractor
       parsed_url.artist_hash || parsed_referer&.artist_hash
     end
 
-    def api_response
+    memoize def api_response
       return {} if work_id.blank?
 
-      resp = http.cache(1.minute).get("https://asia-northeast1-anifty-59655.cloudfunctions.net/api/v2/creations/#{work_id}")
-      return {} if resp.code != 200
-
-      resp.parse.with_indifferent_access
+      http.cache(1.minute).parsed_get("https://asia-northeast1-anifty-59655.cloudfunctions.net/api/v2/creations/#{work_id}") || {}
     end
-    memoize :api_response
 
-    def artist_api_response
+    memoize def artist_api_response
       return {} if artist_hash.blank?
 
-      resp = http.cache(1.minute).get("https://asia-northeast1-anifty-59655.cloudfunctions.net/api/users/#{artist_hash}")
-      return {} if resp.code != 200
-
-      resp.parse.with_indifferent_access
+      http.cache(1.minute).parsed_get("https://asia-northeast1-anifty-59655.cloudfunctions.net/api/users/#{artist_hash}") || {}
     end
-    memoize :artist_api_response
   end
 end

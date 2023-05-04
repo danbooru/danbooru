@@ -50,20 +50,19 @@ module Source
         data["author"] || parsed_url.username || parsed_referer&.username
       end
 
-      def data
-        return {} if work_id.blank?
+      def api_url
+        "https://reddit.com/gallery/#{work_id}" if work_id.present?
+      end
 
-        response = http.cache(1.minute).get("https://reddit.com/gallery/#{work_id}")
-        return {} if response.status != 200
+      memoize def data
+        html = http.cache(1.minute).parsed_get(api_url)
 
-        json_string = response.parse&.at("script#data").to_s[/\s({.*})/, 1]
+        json_string = html&.at("script#data").to_s[/\s({.*})/, 1].to_s
         data = JSON.parse(json_string).with_indifferent_access
         data.dig("posts", "models").values.min_by { |p| p["created"].to_i } || {} # to avoid reposts
       rescue JSON::ParserError
         {}
       end
-
-      memoize :data
     end
   end
 end

@@ -70,12 +70,7 @@ module Source
       end
 
       memoize def api_response
-        return {} unless api_url.present?
-
-        response = http.cache(1.minute).get(api_url)
-        return {} unless response.status == 200
-
-        response.parse.dig("posts", "post").to_h.with_indifferent_access
+        http.cache(1.minute).parsed_get(api_url)&.dig("posts", "post") || {}
       end
 
       def sub_extractor

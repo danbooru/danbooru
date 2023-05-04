@@ -396,14 +396,7 @@ class PixivAjaxClient
   # @param url [String] the Pixiv URL
   # @return [Hash] the parsed response, or blank on error
   def get(url)
-    response = client.cache(1.minute).get(url)
-
-    if response.code == 200
-      response.parse["body"]
-    else
-      DanbooruLogger.info("Pixiv API call failed (url=#{url} status=#{response.code} body=#{response.body})")
-      {}
-    end
+    client.cache(1.minute).parsed_get(url)&.dig("body") || {}
   end
 
   # @return [Danbooru::Http] the HTTP client used for Pixiv
