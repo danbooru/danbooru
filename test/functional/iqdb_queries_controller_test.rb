@@ -19,6 +19,15 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select("#post_#{@post.id}")
         end
+
+        should "return an error if the url doesn't have any images" do
+          mock_iqdb_matches([])
+          get_auth iqdb_queries_path, @user, params: { url: "https://twitter.com/dril/status/384408932061417472" }
+
+          assert_response :success
+          assert_select ".post-gallery", /No posts found/
+          assert_select "#notice", /Search failed: .* has no images/
+        end
       end
 
       context "with a post_id parameter" do
