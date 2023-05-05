@@ -24,6 +24,20 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 200
     end
 
+    should "return 404 Not Found for an unsupported method on the root path" do
+      post root_path
+      assert_response 404
+
+      put root_path
+      assert_response 404
+
+      patch root_path
+      assert_response 404
+
+      delete root_path
+      assert_response 404
+    end
+
     context "on a RecordNotFound error" do
       should "return 404 Not Found even with a bad file extension" do
         get post_path("bad.json")
