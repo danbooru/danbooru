@@ -35,7 +35,8 @@ class IqdbClient
         file = file.tempfile
       elsif url.present?
         extractor = Source::Extractor.find(url)
-        raise Error, "Can't do reverse image search: #{url} has multiple images. Enter the URL of a single image." if extractor.image_urls.size > 1
+        raise Error, "Search failed: #{url} has multiple images. Enter the URL of a single image" if extractor.image_urls.size > 1
+        raise Error, "Search failed: #{url} has no images" if extractor.image_urls.size == 0
 
         download_url = extractor.image_urls.first
         file = Source::Extractor.find(download_url).download_file!(download_url)
