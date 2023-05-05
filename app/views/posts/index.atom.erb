@@ -14,7 +14,7 @@
     <entry>
       <title><%= post.presenter.humanized_essential_tag_string %></title>
       <link href="<%= post_url(post) %>" rel="alternate"/>
-      <% if post.source =~ %r{\Ahttps?://} %>
+      <% if post.web_source? %>
         <link href="<%= post.source %>" rel="related"/>
       <% end %>
       <id><%= post_url(post) %></id>
@@ -23,7 +23,11 @@
       <content type="xhtml">
         <div xmlns="http://www.w3.org/1999/xhtml">
           <%= link_to post_url(post) do %>
-            <%= image_tag post.media_asset.variant("360x360").file_url %>
+            <% if post.has_preview? %>
+              <%= image_tag post.media_asset.variant("360x360").file_url %>
+            <% else %>
+              <%= post.media_asset.original.file_url %>
+            <% end %>
           <% end %>
           <p><%= post.tag_string %></p>
         </div>
