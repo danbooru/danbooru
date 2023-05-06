@@ -224,6 +224,19 @@ class ApplicationMetrics
     end
 
     metrics.register({
+      rails_requests_total:                            [:counter, "Total number of HTTP requests processed by Rails."],
+      rails_request_duration_seconds:                  [:counter, "Time spent processing HTTP requests. Total time is CPU time plus idle time. View time is a subset of CPU time. DB time is a subset of idle time."],
+      rails_view_renders_total:                        [:counter, "Total number of view templates rendered."],
+      rails_view_render_duration_seconds:              [:counter, "Time spent rendering view templates."],
+      rails_cache_operations_total:                    [:counter, "Total number of Redis cache operations."],
+      rails_cache_operation_duration_seconds:          [:counter, "Time spent performing Redis cache operations."],
+      rails_cache_reads_total:                         [:counter, "Total number of hits and misses in single-key read operations."],
+      rails_cache_read_multi_keys_total:               [:counter, "Total number of hits and misses in multi-key read operations."],
+      rails_cache_write_multi_keys_total:              [:counter, "Total number of keys written in multi-key write operations."],
+      rails_sql_queries_total:                         [:counter, "Total number of SQL queries executed."],
+      rails_sql_query_duration_seconds:                [:counter, "Time spent processing SQL queries."],
+      rails_active_record_instantiations_total:        [:counter, "Total number of Active Record objects instantiated."],
+
       rack_exceptions_total:                           [:counter, "Total number of exceptions not caught by Rails."],
       rails_exceptions_total:                          [:counter, "Total number of exceptions caught by Rails."],
 
@@ -441,6 +454,101 @@ class ApplicationMetrics
   def reset_metrics
     flush_cache
     self
+  end
+
+  def capture_rails_metrics!
+    @subscribers ||= []
+
+    @subscribers << ActiveSupport::Notifications.monotonic_subscribe("process_action.action_controller") do |event|
+      labels = {
+        method:     event.payload[:method],
+        controller: event.payload.dig(:params, :controller),
+        action:     event.payload[:action],
+        format:     event.payload[:response]&.media_type,
+        status:     event.payload[:status],
+      }
+
+      ApplicationMetrics[:rails_requests_total][labels].increment
+      ApplicationMetrics[:rails_request_duration_seconds][**labels, duration: :cpu].increment(event.cpu_time / 1000.0)
+      ApplicationMetrics[:rails_request_duration_seconds][**labels, duration: :idle].increment(event.idle_time / 1000.0)
+      ApplicationMetrics[:rails_request_duration_seconds][**labels, duration: :view].increment(event.payload[:view_runtime].to_f / 1000.0)
+      ApplicationMetrics[:rails_request_duration_seconds][**labels, duration: :db].increment(event.payload[:db_runtime].to_f / 1000.0)
+    end
+
+    @subscribers << ActiveSupport::Notifications.monotonic_subscribe("sql.active_record") do |event|
+      next if event.payload[:cached]
+
+      sql = event.payload[:sql]
+      statement_type = sql[0..sql.index(" ")&.pred] # extract first word up to the first space, e.g. "SELECT ..." -> "SELECT"
+      labels = {
+        statement: statement_type || "UNKNOWN",
+        type: event.payload[:name] || "RAW",
+      }
+
+      ApplicationMetrics[:rails_sql_queries_total][labels].increment
+      ApplicationMetrics[:rails_sql_query_duration_seconds][**labels, duration: :cpu].increment(event.cpu_time / 1000.0)
+      ApplicationMetrics[:rails_sql_query_duration_seconds][**labels, duration: :db].increment(event.idle_time / 1000.0)
+    end
+
+    @subscribers << ActiveSupport::Notifications.monotonic_subscribe(/render_(template|layout|partial|collection)\.action_view/) do |event|
+      labels = { template: event.payload[:identifier] }
+
+      ApplicationMetrics[:rails_view_renders_total][labels].increment
+      ApplicationMetrics[:rails_view_render_duration_seconds][**labels, duration: :cpu].increment(event.cpu_time / 1000.0)
+      ApplicationMetrics[:rails_view_render_duration_seconds][**labels, duration: :idle].increment(event.idle_time / 1000.0)
+    end
+
+    @subscribers << ActiveSupport::Notifications.monotonic_subscribe("instantiation.active_record") do |event|
+      labels = { class: event.payload[:class_name] }
+
+      ApplicationMetrics[:rails_active_record_instantiations_total][labels].increment(event.payload[:record_count])
+    end
+
+    @subscribers << ActiveSupport::Notifications.monotonic_subscribe(/cache_(read|write)\.active_support/) do |event|
+      key = event.payload[:key]
+      category = key[0..key.index(":")&.pred] # extract first word up to the first ":", e.g. "pfc:1girl solo" -> "pfc"
+
+      case event.name
+      when "cache_read.active_support"
+        labels = { category: category, operation: "read" }
+
+        ApplicationMetrics[:rails_cache_reads_total][**labels, hit: "true"].increment if event.payload[:hit]
+        ApplicationMetrics[:rails_cache_reads_total][**labels, hit: "false"].increment if !event.payload[:hit]
+      when "cache_write.active_support"
+        labels = { category: category, operation: "write" }
+      end
+
+      ApplicationMetrics[:rails_cache_operations_total][labels].increment
+      ApplicationMetrics[:rails_cache_operation_duration_seconds][**labels, duration: :cpu].increment(event.cpu_time / 1000.0)
+      ApplicationMetrics[:rails_cache_operation_duration_seconds][**labels, duration: :idle].increment(event.idle_time / 1000.0)
+    end
+
+    @subscribers << ActiveSupport::Notifications.monotonic_subscribe(/cache_(read_multi|write_multi)\.active_support/) do |event|
+      next if event.payload[:key].empty?
+
+      case event.name
+      when "cache_read_multi.active_support"
+        key = event.payload[:key].first
+        hits = event.payload[:hits].size
+        misses = event.payload[:key].size - hits
+        category = key[0..key.index(":")&.pred]
+        labels = { category: category, operation: "read_multi" }
+
+        ApplicationMetrics[:rails_cache_read_multi_keys_total][**labels, hit: "true"].increment(hits)
+        ApplicationMetrics[:rails_cache_read_multi_keys_total][**labels, hit: "false"].increment(misses)
+      when "cache_write_multi.active_support"
+        key = event.payload[:key].first[0]
+        keys = event.payload[:key].size
+        category = key[0..key.index(":")&.pred]
+        labels = { category: category, operation: "write_multi" }
+
+        ApplicationMetrics[:rails_cache_write_multi_keys_total][labels].increment(keys)
+      end
+
+      ApplicationMetrics[:rails_cache_operations_total][labels].increment
+      ApplicationMetrics[:rails_cache_operation_duration_seconds][**labels, duration: :cpu].increment(event.cpu_time / 1000.0)
+      ApplicationMetrics[:rails_cache_operation_duration_seconds][**labels, duration: :idle].increment(event.idle_time / 1000.0)
+    end
   end
 
   # Collects metrics from each Puma worker process and combines them into a single set of metrics for /metrics/instance.
