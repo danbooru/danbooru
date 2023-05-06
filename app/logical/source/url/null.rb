@@ -123,6 +123,8 @@ class Source::URL::Null < Source::URL
       "MyAnimeList"
     in _, "myfigurecollection.net"
       "MyFigureCollection"
+    in _, "misskey.io"
+      "Misskey"
     in _, "mixi.jp"
       "Mixi.jp"
     in _, "note.com"
