@@ -27,6 +27,7 @@ class ActiveSupport::TestCase
   include FactoryBot::Syntax::Methods
   include ReportbooruHelper
   include AutotaggerHelper
+  include DatabaseTestHelper
   include DownloadTestHelper
   include IqdbTestHelper
   include UploadTestHelper

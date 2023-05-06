@@ -179,15 +179,27 @@ class ServerStatus
     def redis_version
       redis_info["redis_version"]
     end
+
+    def redis_up?
+      redis_version.present?
+    end
   end
 
   concerning :PostgresMethods do
+    def postgres_up?
+      postgres_version.present?
+    end
+
     def postgres_version
       ApplicationRecord.connection.select_value("SELECT version()")
+    rescue ActiveRecord::ActiveRecordError
+      nil
     end
 
     def postgres_active_connections
       ApplicationRecord.connection.select_value("SELECT COUNT(*) FROM pg_stat_activity WHERE state = 'active'")
+    rescue ActiveRecord::ActiveRecordError
+      nil
     end
 
     def postgres_connection_stats
@@ -197,6 +209,8 @@ class ServerStatus
     def run_query(query)
       result = ApplicationRecord.connection.select_all(query)
       serialize_result(result)
+    rescue ActiveRecord::ActiveRecordError
+      nil
     end
 
     def serialize_result(result)

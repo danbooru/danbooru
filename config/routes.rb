@@ -348,6 +348,10 @@ Rails.application.routes.draw do
   get "/profile", to: "users#profile", as: :profile
   get "/settings", to: "users#settings", as: :settings
 
+  #get "/up", to: proc { [204, {}, []] }
+  get "/up" => "health#show", as: :rails_health_check
+  get "/up/postgres" => "health#postgres"
+  get "/up/redis" => "health#redis"
   get "/sitemap" => "static#sitemap_index"
   get "/opensearch" => "static#opensearch", :as => "opensearch"
   get "/privacy" => "static#privacy_policy", :as => "privacy_policy"
