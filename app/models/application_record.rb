@@ -135,27 +135,27 @@ class ApplicationRecord < ActiveRecord::Base
   concerning :ActiveRecordExtensions do
     class_methods do
       def set_timeout(n)
-        connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env.test?
+        connection.execute("SET statement_timeout = #{n}") unless Rails.env.test?
         yield
       ensure
-        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.statement_timeout}") unless Rails.env.test?
+        connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}") unless Rails.env.test?
       end
 
       def without_timeout
-        connection.execute("SET STATEMENT_TIMEOUT = 0") unless Rails.env.test?
+        connection.execute("SET statement_timeout = 0") unless Rails.env.test?
         yield
       ensure
-        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env.test?
+        connection.execute("SET statement_timeout = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env.test?
       end
 
       def with_timeout(n, default_value = nil, new_relic_params = {})
-        connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env.test?
+        connection.execute("SET statement_timeout = #{n}") unless Rails.env.test?
         yield
       rescue ::ActiveRecord::StatementInvalid => e
         DanbooruLogger.log(e, expected: true, **new_relic_params)
         default_value
       ensure
-        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env.test?
+        connection.execute("SET statement_timeout = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env.test?
       end
 
       def update!(*args)
