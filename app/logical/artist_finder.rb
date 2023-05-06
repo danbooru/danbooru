@@ -101,6 +101,9 @@ module ArtistFinder
     "mega.nz/file", # https://mega.nz/file/9zxwxCDD#TJn7S7sPag30wDVD-kaVhFkeROzz-fE7_ZOb3gIZPTA
     "mega.nz/folder", # https://mega.nz/folder/8d4E0LxK#yzYqKHoGFu92RzMNWnoZEw/file/tUgAQZJA
     "mihuashi.com", # https://www.mihuashi.com/profiles/75614
+    "misskey.io",
+    "misskey.art",
+    "misskey.design",
     "mixi.jp", #http://mixi.jp/show_friend.pl?id=310102
     "mlbg.tv", # http://mblg.tv/ikusanin01/
     "monappy.jp",

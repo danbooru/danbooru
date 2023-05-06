@@ -69,6 +69,7 @@ module Source
       Source::Extractor::ArtStreet,
       Source::Extractor::Gumroad,
       Source::Extractor::Civitai,
+      Source::Extractor::Misskey,
     ]
 
     # Should return true if the extractor is configured correctly. Return false

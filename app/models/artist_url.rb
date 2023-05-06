@@ -84,6 +84,8 @@ class ArtistURL < ApplicationRecord
       true
     when %r{pawoo\.net/web/accounts}i
       true
+    when %r{misskey\.(?:io|art|design)/users}i
+      true
     else
       false
     end
@@ -93,7 +95,7 @@ class ArtistURL < ApplicationRecord
   def priority
     sites = %w[
       Pixiv Twitter
-      Anifty ArtStation Baraag Bilibili BCY Booth Civitai Deviant\ Art Fantia Foundation Furaffinity Hentai\ Foundry Lofter Newgrounds Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Reddit Skeb Tinami Tumblr Weibo
+      Anifty ArtStation Baraag Bilibili BCY Booth Civitai Deviant\ Art Fantia Foundation Furaffinity Hentai\ Foundry Lofter Newgrounds Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Reddit Skeb Tinami Tumblr Weibo Misskey.io Misskey.art Misskey.design
       Ask.fm Facebook FC2 Gumroad Instagram Ko-fi Livedoor Mihuashi Mixi.jp Patreon Piapro.jp Picarto Privatter Sakura.ne.jp Stickam Twitch Youtube
       Amazon Circle.ms DLSite Doujinshi.org Erogamescape Mangaupdates Melonbooks Toranoana Wikipedia
     ]
