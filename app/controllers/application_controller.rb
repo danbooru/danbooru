@@ -49,6 +49,13 @@ class ApplicationController < ActionController::Base
     skip_before_action :check_default_rate_limit, only: action, if: if_proc
   end
 
+  # Mark an action as for anonymous users only. The current user won't be loaded, instead the user will be set to the anonymous user.
+  def self.anonymous_only(*actions, **options)
+    skip_before_action :set_current_user, **options
+    skip_before_action :redirect_if_name_invalid?, **options
+    before_action -> { CurrentUser.user = User.anonymous }, **options
+  end
+
   private
 
   def respond_with(subject, *args, model: model_name, **options, &block)
