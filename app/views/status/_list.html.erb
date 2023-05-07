@@ -6,7 +6,7 @@
       <% if value.is_a?(Time) %>
         <td><%= time_ago_in_words_tagged(value) %></td>
       <% else %>
-        <td><%= value %>
+        <td><%= value || tag.i("unavailable") %>
       <% end %>
     </tr>
   <% end %>
