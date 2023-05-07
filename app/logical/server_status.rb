@@ -47,9 +47,12 @@ class ServerStatus
         kernel_version: kernel_version,
       },
       postgres: {
+        up: postgres_up?,
+        error: postgres_error,
         connection_stats: postgres_connection_stats,
       },
       redis: {
+        up: redis_up?,
         info: redis_info,
       }
     }
@@ -153,14 +156,44 @@ class ServerStatus
     def ffmpeg_version
       version = `ffmpeg -version`
       version[/ffmpeg version ([0-9.]+)/, 1]
+    rescue
+      nil
+    end
+
+    def ffmpeg_installed?
+      ffmpeg_version.present?
     end
 
     def mkvmerge_version
       `mkvmerge --version`.chomp
+    rescue
+      nil
+    end
+
+    def mkvmerge_installed?
+      mkvmerge_version.present?
     end
 
     def exiftool_version
       `exiftool -ver`.chomp
+    rescue
+      nil
+    end
+
+    def exiftool_installed?
+      exiftool_version.present?
+    end
+
+    def instance_error
+      if !exiftool_installed?
+        "ExifTool not installed"
+      elsif !ffmpeg_installed?
+        "FFmpeg not installed"
+      elsif !mkvmerge_installed?
+        "Mkvmerge not installed"
+      else
+        nil
+      end
     end
   end
 
@@ -185,7 +218,14 @@ class ServerStatus
 
   concerning :PostgresMethods do
     def postgres_up?
-      postgres_version.present?
+      postgres_error.nil?
+    end
+
+    def postgres_error
+      ApplicationRecord.connection.select_value("SELECT version()")
+      nil
+    rescue ActiveRecord::ActiveRecordError => error
+      error.message
     end
 
     def postgres_version
@@ -201,11 +241,7 @@ class ServerStatus
     end
 
     def postgres_connection_stats
-      run_query("SELECT pid, state, query_start, state_change, xact_start, backend_start, backend_type FROM pg_stat_activity ORDER BY state, query_start DESC, backend_type")
-    end
-
-    def run_query(query)
-      result = ApplicationRecord.connection.select_all(query)
+      result = ApplicationRecord.connection.select_all("SELECT now() - xact_start AS transaction_duration, now() - query_start AS query_duration, application_name AS source, wait_event FROM pg_stat_activity WHERE state = 'active' ORDER BY 2 DESC, pid")
       serialize_result(result)
     rescue ActiveRecord::ActiveRecordError
       nil
@@ -213,8 +249,14 @@ class ServerStatus
 
     def serialize_result(result)
       result.rows.map do |row|
-        row.each_with_index.map do |col, i|
-          [result.columns[i], col]
+        row.each_with_index.map do |column_value, i|
+          column_name = result.columns[i]
+
+          if result.column_types[column_name]&.type == :interval
+            column_value = Danbooru::Helpers.duration_to_hhmmssms(ActiveSupport::Duration.parse(column_value).to_f.clamp(0.0..))
+          end
+
+          [column_name, column_value]
         end.to_h
       end
     end

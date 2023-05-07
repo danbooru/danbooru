@@ -3,7 +3,7 @@
   <% hash.each do |key, value| %>
     <tr>
       <th><%= key.to_s.tr("_", " ").startcase %></th>
-      <td><%= value %></td>
+      <td><%= value || tag.i("unavailable") %></td>
     </tr>
   <% end %>
 </table>
