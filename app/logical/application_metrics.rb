@@ -506,6 +506,7 @@ class ApplicationMetrics
 
     @subscribers << ActiveSupport::Notifications.monotonic_subscribe(/cache_(read|write)\.active_support/) do |event|
       key = event.payload[:key]
+      key = key.last if key.is_a?(Array)
       category = key[0..key.index(":")&.pred] # extract first word up to the first ":", e.g. "pfc:1girl solo" -> "pfc"
 
       case event.name
