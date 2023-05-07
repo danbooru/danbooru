@@ -157,6 +157,40 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "a replacement URL that contains multiple images" do
+        should "return an error" do
+          @post = create(:post)
+
+          post_auth post_replacements_path, create(:moderator_user), params: {
+            format: :json,
+            post_id: @post.id,
+            post_replacement: {
+              replacement_url: "https://twitter.com/catwheezie/status/1604604864809799680",
+            }
+          }
+
+          assert_response 422
+          assert_match(/has multiple images/, response.parsed_body.dig("errors", "base", 0))
+        end
+      end
+
+      context "a replacement URL that doesn't contain any images" do
+        should "return an error" do
+          @post = create(:post)
+
+          post_auth post_replacements_path, create(:moderator_user), params: {
+            format: :json,
+            post_id: @post.id,
+            post_replacement: {
+              replacement_url: "https://twitter.com/dril/status/384408932061417472",
+            }
+          }
+
+          assert_response 422
+          assert_match(/has no images/, response.parsed_body.dig("errors", "base", 0))
+        end
+      end
+
       context "a replacement that fails" do
         should "not create a post replacement record" do
           @post = create(:post)
