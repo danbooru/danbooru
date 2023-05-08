@@ -296,6 +296,10 @@ class ApplicationMetrics
       ruby_yjit_code_gc_count:                         [:counter, "Total number of code garbage collections."],
       ruby_yjit_code_region_size:                      [:gauge,   "Size in bytes of memory region allocated for JIT code."],
       ruby_yjit_object_shape_count:                    [:gauge,   "Current number of object shapes."],
+
+      vips_memory_bytes:                               [:gauge,   "Current amount of memory allocated by libvips."],
+      vips_allocations:                                [:gauge,   "Current number of active memory allocations by libvips."],
+      vips_files:                                      [:gauge,   "Current number of files opened by libvips."],
     }, { worker: puma_worker_id })
 
     metrics
@@ -436,6 +440,12 @@ class ApplicationMetrics
       metrics[:ruby_gc_pool_heap_slots][slot_size: pool_stats[:slot_size], type: :eden].set(pool_stats[:heap_eden_slots])
       metrics[:ruby_gc_pool_heap_slots][slot_size: pool_stats[:slot_size], type: :tomb].set(pool_stats[:heap_tomb_slots])
     end
+
+    metrics.set({
+      vips_memory_bytes: Vips.vips_tracked_get_mem,
+      vips_allocations:  Vips.vips_tracked_get_allocs,
+      vips_files:        Vips.vips_tracked_get_files,
+    })
 
     metrics
   end
