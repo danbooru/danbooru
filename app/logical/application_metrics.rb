@@ -207,25 +207,23 @@ class ApplicationMetrics
     if puma_running?
       metrics.register({
         # Global Puma metrics (not tied to the current process)
-        puma_started_at: [:counter, "When the master process started."],
         puma_workers:    [:gauge,   "Number of configured worker processes."],
 
         # Worker-specific Puma metrics (tied to a single Puma worker process)
-        puma_worker_started_at:     [:counter, "When the worker last restarted. Workers are periodically restarted to prevent memory bloat."],
-        puma_worker_last_checkin:   [:counter, "When the worker last checked in with the master process."],
-        puma_worker_restart_count:  [:counter, "Total number of times this worker has restarted (including initial start)."],
-        puma_worker_max_threads:    [:gauge,   "Number of configured worker threads."],
-        puma_worker_running:        [:gauge,   "Current number of worker threads."],
-        puma_worker_pool_capacity:  [:gauge,   "Current number of idle worker threads."],
-        puma_worker_backlog:        [:gauge,   "Current number of accepted connections waiting for an idle worker thread."],
-        puma_worker_socket_backlog: [:gauge,   "Current number of unaccepted connections."],
-        puma_worker_requests_count: [:counter, "Total number of requests served since the worker started."],
+        puma_started_at:          [:gauge,   "When the process started. Worker processes are periodically restarted to prevent memory bloat."],
+        puma_last_checkin:        [:gauge,   "When the worker last checked in with the master process."],
+        puma_restarts_total:      [:counter, "Total number of times this worker has restarted (including initial start)."],
+        puma_max_threads:         [:gauge,   "Maximum number of worker threads."],
+        puma_threads:             [:gauge,   "Current number of worker threads. May be less than max threads because idle threads are periodically reaped."],
+        puma_thread_backlog:      [:gauge,   "Current number of accepted connections waiting for an idle worker thread (thread pool queue length)."],
+        puma_socket_backlog:      [:gauge,   "Current number of unaccepted connections (socket queue length)."],
+        puma_http_requests_total: [:counter, "Total number of HTTP requests processed by Puma since the worker started."],
       })
     end
 
     metrics.register({
-      rails_requests_total:                            [:counter, "Total number of HTTP requests processed by Rails."],
-      rails_request_duration_seconds:                  [:counter, "Time spent processing HTTP requests. Total time is CPU time plus idle time. View time is a subset of CPU time. DB time is a subset of idle time."],
+      rails_http_requests_total:                       [:counter, "Total number of HTTP requests processed by Rails. Does not include requests processed by Rack middleware or by the Rails router before they got to Rails, such as redirects."],
+      rails_http_request_duration_seconds:             [:counter, "Time spent processing HTTP requests. Total time is CPU time plus idle time. View time is a subset of CPU time. DB time is a subset of idle time."],
       rails_view_renders_total:                        [:counter, "Total number of view templates rendered."],
       rails_view_render_duration_seconds:              [:counter, "Time spent rendering view templates."],
       rails_cache_operations_total:                    [:counter, "Total number of Redis cache operations."],
@@ -237,8 +235,8 @@ class ApplicationMetrics
       rails_sql_query_duration_seconds:                [:counter, "Time spent processing SQL queries."],
       rails_active_record_instantiations_total:        [:counter, "Total number of Active Record objects instantiated."],
 
-      rack_exceptions_total:                           [:counter, "Total number of exceptions not caught by Rails."],
-      rails_exceptions_total:                          [:counter, "Total number of exceptions caught by Rails."],
+      puma_exceptions_total:                           [:counter, "Total number of exceptions caught by Puma. These are errors not caught by the normal Rails error handler, usually errors in middleware or in the error handler itself."],
+      rails_exceptions_total:                          [:counter, "Total number of exceptions caught by Rails. These are errors caught by the error handler in ApplicationController."],
 
       rails_jobs_enqueued_total:                       [:counter, "Total number of background jobs successfully enqueued. Does not include foreground jobs."],
       rails_jobs_attempts_total:                       [:counter, "Total number of jobs attempted to be worked. Includes successful jobs, failed jobs, and retried jobs."],
@@ -260,44 +258,34 @@ class ApplicationMetrics
       ruby_vm_constant_cache_misses:                   [:counter, "Total number of constant cache misses."],
       ruby_objects_count:                              [:gauge,   "Current number of Ruby objects by type."],
 
-      ruby_gc_count:                                   [:counter, "Total number of garbage collections since process start (includes both major and minor collections)."],
-      ruby_gc_major_gc_count:                          [:counter, "Total number of major garbage collections."],
-      ruby_gc_minor_gc_count:                          [:counter, "Total number of minor garbage collections."],
+      ruby_gc_total:                                   [:counter, "Total number of garbage collections since process start."],
       ruby_gc_duration_seconds:                        [:counter, "Time spent in garbage collection since process start."],
-      ruby_gc_heap_allocated_pages:                    [:gauge,   "Current number of allocated heap pages (eden pages + tomb pages)."],
-      ruby_gc_heap_eden_pages:                         [:gauge,   "Current number of unfreeable heap pages (pages that contain at least one live object)."],
-      ruby_gc_heap_tomb_pages:                         [:gauge,   "Current number of freeable heap pages (pages that don't contain any live objects)."],
-      ruby_gc_heap_sorted_length:                      [:gauge,   "Current number of pages that can fit into the buffer that holds references to all pages."],
-      ruby_gc_heap_allocatable_pages:                  [:gauge,   "Current number of pages the application could allocate without additional GC."],
-      ruby_gc_heap_available_slots:                    [:gauge,   "Current number of object slots in all heap_allocated_pages."],
-      ruby_gc_heap_live_slots:                         [:gauge,   "Current number of object slots which contain live objects."],
-      ruby_gc_heap_free_slots:                         [:gauge,   "Current number of object slots which do not contain live objects."],
-      ruby_gc_heap_final_slots:                        [:gauge,   "Current number of object slots with finalizers attached to them."],
+      ruby_gc_heap_pages_allocated_total:              [:counter, "Total number of heap pages allocated from the OS since process start."],
+      ruby_gc_heap_pages_freed_total:                  [:counter, "Total number of heap pages freed back to the OS since process start."],
+      ruby_gc_objects_allocated_total:                 [:counter, "Total number of objects allocated since process start."],
+      ruby_gc_objects_freed_total:                     [:counter, "Total number of objects freed since process start."],
+      ruby_gc_heap_pages:                              [:gauge,   "Current number of heap pages. Each page is #{GC::INTERNAL_CONSTANTS[:HEAP_PAGE_SIZE] / 1024}kb. Pages are divided into live or free object slots. Eden pages contain at least one live object. Tomb and allocatable pages are empty."],
+      ruby_gc_heap_live_slots:                         [:gauge,   "Current number of heap page slots containing live objects."],
+      ruby_gc_heap_free_slots:                         [:gauge,   "Current number of heap page slots not containing live objects."],
+      ruby_gc_heap_final_slots:                        [:gauge,   "Current number of objects with finalizers attached to them."],
       ruby_gc_heap_marked_slots:                       [:gauge,   "Number of objects marked in the last GC."],
-      ruby_gc_total_allocated_pages:                   [:counter, "Total number of pages allocated since process start."],
-      ruby_gc_total_freed_pages:                       [:counter, "Total number of pages freed since process start."],
-      ruby_gc_total_allocated_objects:                 [:counter, "Total number of objects allocated since process start."],
-      ruby_gc_total_freed_objects:                     [:counter, "Total number of objects freed since process start."],
-      ruby_gc_malloc_increase_bytes:                   [:gauge,   "Current amount of memory allocated on the heap for objects. Decreased by major or minor GC."],
-      ruby_gc_malloc_increase_bytes_limit:             [:gauge,   "When malloc_increase_bytes crosses this limit, GC is triggered."],
-      ruby_gc_compact_count:                           [:counter, "Total number of heap compactions."],
+      ruby_gc_malloc_increase_bytes:                   [:gauge,   "Current amount of off-heap memory allocated for objects by malloc. Decreased by major or minor GC."],
+      ruby_gc_malloc_increase_bytes_limit:             [:gauge,   "When malloc_increase_bytes crosses this limit, a major GC is triggered."],
+      ruby_gc_compact_total:                           [:counter, "Total number of heap compactions."],
       ruby_gc_read_barrier_faults:                     [:counter, "Total number of times the read barrier was triggered during compaction."],
-      ruby_gc_total_moved_objects:                     [:counter, "Total number of objects heap compaction has moved."],
+      ruby_gc_moved_objects_total:                     [:counter, "Total number of objects moved by heap compaction."],
       ruby_gc_remembered_wb_unprotected_objects:       [:gauge,   "Current number of objects without write barriers in the remembered set."],
       ruby_gc_remembered_wb_unprotected_objects_limit: [:gauge,   "When remembered_wb_unprotected_objects crosses this limit, major GC is triggered."],
-      ruby_gc_old_objects:                             [:gauge,   "Number of live, old objects which survived at least 3 garbage collections."],
-      ruby_gc_old_objects_limit:                       [:gauge,   "When old_objects crosses this limit, major GC is triggered."],
-      ruby_gc_oldmalloc_increase_bytes:                [:gauge,   "Current amount of memory allocated on the heap for old objects. Decreased by major GC."],
+      ruby_gc_old_objects:                             [:gauge,   "Current number of live objects that have survived at least 3 garbage collections. Decreased by major GC."],
+      ruby_gc_old_objects_limit:                       [:gauge,   "When old_objects crosses this limit, a major GC is triggered."],
+      ruby_gc_oldmalloc_increase_bytes:                [:gauge,   "Current amount of off-heap memory allocated for old objects by malloc. Decreased by major GC."],
       ruby_gc_oldmalloc_increase_bytes_limit:          [:gauge,   "When old_malloc_increase_bytes crosses this limit, major GC is triggered."],
 
-      ruby_gc_pool_heap_allocatable_pages:             [:gauge,   "Current number of pages the application could allocate without additional GC."],
-      ruby_gc_pool_heap_eden_pages:                    [:gauge,   "Current number of unfreeable heap pages (pages that contain at least one live object)."],
-      ruby_gc_pool_heap_eden_slots:                    [:gauge,   "Current number of object slots in eden pages."],
-      ruby_gc_pool_heap_tomb_pages:                    [:gauge,   "Current number of freeable heap pages (pages that don't contain any live objects)."],
-      ruby_gc_pool_heap_tomb_slots:                    [:gauge,   "Current number of object slots in tomb pages."],
-      ruby_gc_pool_total_allocated_pages:              [:counter, "Total number of pages allocated since process start."],
-      ruby_gc_pool_total_freed_pages:                  [:counter, "Total number of pages freed since process start."],
-      ruby_gc_pool_force_major_gc_count:               [:counter, "Total number of times a major GC was caused by running out of free slots."],
+      ruby_gc_pool_heap_pages:                         [:gauge,   "Current number of heap pages. Eden pages contain at least one object. Tomb and allocatable pages are empty."],
+      ruby_gc_pool_heap_slots:                         [:gauge,   "Current number of object slots in eden or tomb pages."],
+      ruby_gc_pool_heap_pages_allocated_total:         [:counter, "Total number of pages allocated per pool since process start."],
+      ruby_gc_pool_heap_pages_freed_total:             [:counter, "Total number of pages freed per pool since process start."],
+      ruby_gc_pool_force_major_gc_count:               [:counter, "Total number of times a major GC was caused by running out of free object slots."],
 
       ruby_yjit_enabled:                               [:gauge,   "Whether YJIT is enabled."],
       ruby_yjit_inline_code_size:                      [:gauge,   "Inlined code size."],
@@ -334,24 +322,30 @@ class ApplicationMetrics
       metrics.set({
         puma_started_at: puma_stats[:started_at].to_s.to_time.to_i,
         puma_workers:    puma_stats[:workers],
-      })
+      }, { worker: "master" })
 
       puma_stats[:worker_status].to_a.each do |worker|
+        max_threads = worker.dig(:last_status, :max_threads)
+        cur_threads = worker.dig(:last_status, :running)
+        idle_threads = worker.dig(:last_status, :pool_capacity) - (max_threads - cur_threads)
+        busy_threads = cur_threads - idle_threads
+
         metrics.set({
-          puma_worker_started_at:     Time.parse(worker[:started_at]).to_i,
-          puma_worker_last_checkin:   Time.parse(worker[:last_checkin]).to_i,
-          puma_worker_running:        worker.dig(:last_status, :running),
-          puma_worker_backlog:        worker.dig(:last_status, :backlog),
-          puma_worker_pool_capacity:  worker.dig(:last_status, :pool_capacity),
-          puma_worker_max_threads:    worker.dig(:last_status, :max_threads),
-          puma_worker_requests_count: worker.dig(:last_status, :requests_count),
+          puma_started_at:          Time.parse(worker[:started_at]).to_i,
+          puma_last_checkin:        Time.parse(worker[:last_checkin]).to_i,
+          puma_max_threads:         max_threads,
+          puma_thread_backlog:      worker.dig(:last_status, :backlog),
+          puma_http_requests_total: worker.dig(:last_status, :requests_count),
         }, { worker: worker[:index] })
+
+        metrics[:puma_threads][worker: worker[:index], state: "idle"].set(idle_threads)
+        metrics[:puma_threads][worker: worker[:index], state: "busy"].set(busy_threads)
       end
 
       # XXX The Puma server object is in a thread local variable, which may be in another thread, so we have to search for it.
       puma_socket = Thread.list.filter_map { |thread| thread[:puma_server] }.first&.binder&.ios&.first
       puma_socket_backlog = puma_socket&.getsockopt(Socket::SOL_TCP, Socket::TCP_INFO)&.inspect.to_s[/unacked=(\d+)/, 1].to_i
-      metrics[:puma_worker_socket_backlog][worker: puma_worker_id].set(puma_socket_backlog)
+      metrics[:puma_socket_backlog][worker: puma_worker_id].set(puma_socket_backlog)
     end
 
     ruby_stats = RubyVM.stat
@@ -398,29 +392,20 @@ class ApplicationMetrics
 
     gc_stats = GC.stat
     metrics.set({
-      ruby_gc_count:                                   gc_stats[:count],
       ruby_gc_duration_seconds:                        gc_stats[:time] / 1000.0,
-      ruby_gc_heap_allocated_pages:                    gc_stats[:heap_allocated_pages],
-      ruby_gc_heap_sorted_length:                      gc_stats[:heap_sorted_length],
-      ruby_gc_heap_allocatable_pages:                  gc_stats[:heap_allocatable_pages],
-      ruby_gc_heap_available_slots:                    gc_stats[:heap_available_slots],
       ruby_gc_heap_live_slots:                         gc_stats[:heap_live_slots],
       ruby_gc_heap_free_slots:                         gc_stats[:heap_free_slots],
       ruby_gc_heap_final_slots:                        gc_stats[:heap_final_slots],
       ruby_gc_heap_marked_slots:                       gc_stats[:heap_marked_slots],
-      ruby_gc_heap_eden_pages:                         gc_stats[:heap_eden_pages],
-      ruby_gc_heap_tomb_pages:                         gc_stats[:heap_tomb_pages],
-      ruby_gc_total_allocated_pages:                   gc_stats[:total_allocated_pages],
-      ruby_gc_total_freed_pages:                       gc_stats[:total_freed_pages],
-      ruby_gc_total_allocated_objects:                 gc_stats[:total_allocated_objects],
-      ruby_gc_total_freed_objects:                     gc_stats[:total_freed_objects],
+      ruby_gc_heap_pages_allocated_total:              gc_stats[:total_allocated_pages],
+      ruby_gc_heap_pages_freed_total:                  gc_stats[:total_freed_pages],
+      ruby_gc_objects_allocated_total:                 gc_stats[:total_allocated_objects],
+      ruby_gc_objects_freed_total:                     gc_stats[:total_freed_objects],
       ruby_gc_malloc_increase_bytes:                   gc_stats[:malloc_increase_bytes],
       ruby_gc_malloc_increase_bytes_limit:             gc_stats[:malloc_increase_bytes_limit],
-      ruby_gc_minor_gc_count:                          gc_stats[:minor_gc_count],
-      ruby_gc_major_gc_count:                          gc_stats[:major_gc_count],
-      ruby_gc_compact_count:                           gc_stats[:compact_count],
+      ruby_gc_compact_total:                           gc_stats[:compact_count],
       ruby_gc_read_barrier_faults:                     gc_stats[:read_barrier_faults],
-      ruby_gc_total_moved_objects:                     gc_stats[:total_moved_objects],
+      ruby_gc_moved_objects_total:                     gc_stats[:total_moved_objects],
       ruby_gc_remembered_wb_unprotected_objects:       gc_stats[:remembered_wb_unprotected_objects],
       ruby_gc_remembered_wb_unprotected_objects_limit: gc_stats[:remembered_wb_unprotected_objects_limit],
       ruby_gc_old_objects:                             gc_stats[:old_objects],
@@ -429,18 +414,27 @@ class ApplicationMetrics
       ruby_gc_oldmalloc_increase_bytes_limit:          gc_stats[:oldmalloc_increase_bytes_limit],
     })
 
+    metrics[:ruby_gc_total][type: :major].set(gc_stats[:major_gc_count])
+    metrics[:ruby_gc_total][type: :minor].set(gc_stats[:minor_gc_count])
+
+    metrics[:ruby_gc_heap_pages][type: :eden].set(gc_stats[:heap_eden_pages])
+    metrics[:ruby_gc_heap_pages][type: :tomb].set(gc_stats[:heap_tomb_pages])
+    metrics[:ruby_gc_heap_pages][type: :allocatable].set(gc_stats[:heap_allocatable_pages])
+
     gc_object_pool_stats = GC.stat_heap
     gc_object_pool_stats.each do |pool_id, pool_stats|
       metrics.set({
-        ruby_gc_pool_heap_allocatable_pages: pool_stats[:heap_allocatable_pages],
-        ruby_gc_pool_heap_eden_pages:        pool_stats[:heap_eden_pages],
-        ruby_gc_pool_heap_eden_slots:        pool_stats[:heap_eden_slots],
-        ruby_gc_pool_heap_tomb_pages:        pool_stats[:heap_tomb_pages],
-        ruby_gc_pool_heap_tomb_slots:        pool_stats[:heap_tomb_slots],
-        ruby_gc_pool_total_allocated_pages:  pool_stats[:heap_total_allocated_pages],
-        ruby_gc_pool_total_freed_pages:      pool_stats[:heap_total_freed_pages],
-        ruby_gc_pool_force_major_gc_count:   pool_stats[:heap_force_major_gc_count],
+        ruby_gc_pool_heap_pages_allocated_total: pool_stats[:heap_total_allocated_pages],
+        ruby_gc_pool_heap_pages_freed_total:     pool_stats[:heap_total_freed_pages],
+        ruby_gc_pool_force_major_gc_count:       pool_stats[:heap_force_major_gc_count],
       }, { slot_size: pool_stats[:slot_size] })
+
+      metrics[:ruby_gc_pool_heap_pages][slot_size: pool_stats[:slot_size], type: :eden].set(pool_stats[:heap_eden_pages])
+      metrics[:ruby_gc_pool_heap_pages][slot_size: pool_stats[:slot_size], type: :tomb].set(pool_stats[:heap_tomb_pages])
+      metrics[:ruby_gc_pool_heap_pages][slot_size: pool_stats[:slot_size], type: :allocatable].set(pool_stats[:heap_allocatable_pages])
+
+      metrics[:ruby_gc_pool_heap_slots][slot_size: pool_stats[:slot_size], type: :eden].set(pool_stats[:heap_eden_slots])
+      metrics[:ruby_gc_pool_heap_slots][slot_size: pool_stats[:slot_size], type: :tomb].set(pool_stats[:heap_tomb_slots])
     end
 
     metrics
@@ -468,11 +462,11 @@ class ApplicationMetrics
         status:     event.payload[:status],
       }
 
-      ApplicationMetrics[:rails_requests_total][labels].increment
-      ApplicationMetrics[:rails_request_duration_seconds][**labels, duration: :cpu].increment(event.cpu_time / 1000.0)
-      ApplicationMetrics[:rails_request_duration_seconds][**labels, duration: :idle].increment(event.idle_time / 1000.0)
-      ApplicationMetrics[:rails_request_duration_seconds][**labels, duration: :view].increment(event.payload[:view_runtime].to_f / 1000.0)
-      ApplicationMetrics[:rails_request_duration_seconds][**labels, duration: :db].increment(event.payload[:db_runtime].to_f / 1000.0)
+      ApplicationMetrics[:rails_http_requests_total][labels].increment
+      ApplicationMetrics[:rails_http_request_duration_seconds][**labels, duration: :cpu].increment(event.cpu_time / 1000.0)
+      ApplicationMetrics[:rails_http_request_duration_seconds][**labels, duration: :idle].increment(event.idle_time / 1000.0)
+      ApplicationMetrics[:rails_http_request_duration_seconds][**labels, duration: :view].increment(event.payload[:view_runtime].to_f / 1000.0)
+      ApplicationMetrics[:rails_http_request_duration_seconds][**labels, duration: :db].increment(event.payload[:db_runtime].to_f / 1000.0)
     end
 
     @subscribers << ActiveSupport::Notifications.monotonic_subscribe("sql.active_record") do |event|
