@@ -99,6 +99,11 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         response = Danbooru::Http.get(httpbin_url("redirect-to?url=#{httpbin_url("get")}"))
         assert_equal(200, response.status)
       end
+
+      should "work for POST requests with JSON encoded bodies" do
+        response = Danbooru::Http.post(httpbin_url("/post"), json: { foo: "bar" })
+        assert_equal(200, response.status)
+      end
     end
 
     context "cache feature" do
