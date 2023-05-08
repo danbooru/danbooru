@@ -67,6 +67,7 @@ module Source
       Source::Extractor::Poipiku,
       Source::Extractor::ArtStreet,
       Source::Extractor::Gumroad,
+      Source::Extractor::Misskey,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
