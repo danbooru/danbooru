@@ -109,7 +109,7 @@ activate_control_app ENV.fetch("PUMA_CONTROL_URL", "tcp://localhost:9293"), no_t
 #
 # When RAILS_ENV is development, errors will be swallowed by the BetterErrors gem before they get to this point.
 lowlevel_error_handler do |exception, env|
-  ApplicationMetrics[:rack_exceptions_total][exception: exception.class.name].increment
+  ApplicationMetrics[:puma_exceptions_total][exception: exception.class.name].increment
 
   backtrace = Rails.backtrace_cleaner.clean(exception.backtrace).join("\n")
   message = <<~EOS
@@ -146,7 +146,7 @@ end
 
 # This is called in the master process right before a worker is started.
 on_worker_fork do |worker_id|
-  ApplicationMetrics[:puma_worker_restart_count][worker: worker_id].increment
+  ApplicationMetrics[:puma_restarts_total][worker: worker_id].increment
 end
 
 # This is called every time a worker process starts or restarts. It's not called in single mode (when workers == 0)
