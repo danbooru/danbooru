@@ -1566,7 +1566,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     context "for a single metatag" do
       should "return the correct cached count" do
         build(:tag, name: "score:42", post_count: -100).save(validate: false)
-        Cache.put("pfc:score:42", 100)
+        Cache.put("post-count:score:42", 100)
         assert_fast_count(100, "score:42")
       end
 
@@ -1610,7 +1610,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for a multi-tag search" do
       should "return the cached count, if it exists" do
-        Cache.put("pfc:aaa score:42", 100)
+        Cache.put("post-count:aaa score:42", 100)
         assert_fast_count(100, "aaa score:42")
       end
 
