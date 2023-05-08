@@ -135,9 +135,9 @@ class RelatedTagCalculator
   # @return [String] the cache key
   def cache_key
     if post_query.is_user_dependent_search?
-      "similar_tags[#{post_query.current_user.id}]:#{post_query.to_s}"
+      "similar-tags-for-user:#{post_query.current_user.id}:#{post_query.to_s}"
     else
-      "similar_tags:#{post_query.to_s}"
+      "similar-tags:#{post_query.to_s}"
     end
   end
 end

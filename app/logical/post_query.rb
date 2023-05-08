@@ -285,9 +285,9 @@ class PostQuery
 
     def count_cache_key
       if is_user_dependent_search?
-        "pfc[#{current_user.id.to_i}]:#{to_s}"
+        "post-count-for-user:#{current_user.id.to_i}:#{to_s}"
       else
-        "pfc:#{to_s}"
+        "post-count:#{to_s}"
       end
     end
   end

@@ -68,10 +68,10 @@ class TagTest < ActiveSupport::TestCase
 
     should "reset its category after updating" do
       tag = FactoryBot.create(:artist_tag)
-      assert_equal(Tag.categories.artist, Cache.get("tc:#{Cache.hash(tag.name)}"))
+      assert_equal(Tag.categories.artist, Cache.get("tag-category:#{Cache.hash(tag.name)}"))
 
       tag.update!(category: Tag.categories.copyright, updater: create(:user))
-      assert_equal(Tag.categories.copyright, Cache.get("tc:#{Cache.hash(tag.name)}"))
+      assert_equal(Tag.categories.copyright, Cache.get("tag-category:#{Cache.hash(tag.name)}"))
     end
 
     context "not be settable to an invalid category" do

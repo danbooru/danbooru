@@ -172,7 +172,7 @@ class Tag < ApplicationRecord
     end
 
     def update_category_cache
-      Cache.put("tc:#{Cache.hash(name)}", category, 3.hours)
+      Cache.put("tag-category:#{Cache.hash(name)}", category, 3.hours)
     end
 
     # When a tag's category is changed, also change the categories of any aliases pointing to it.
