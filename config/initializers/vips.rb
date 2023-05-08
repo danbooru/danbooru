@@ -5,6 +5,10 @@
 # before the program starts to hide these warnings.
 GLib.logger = Rails.logger
 
+Vips.attach_function :vips_tracked_get_mem, [], :int
+Vips.attach_function :vips_tracked_get_allocs, [], :int
+Vips.attach_function :vips_tracked_get_files, [], :int
+
 # Disable the vips operation cache unless the VIPS_MAX_CACHE environment variable is set.
 #
 # Normally Vips caches the last 100 operations so that, for example, if the same image is thumbnailed twice in a row,
