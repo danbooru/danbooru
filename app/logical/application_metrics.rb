@@ -257,6 +257,10 @@ class ApplicationMetrics
       ruby_vm_constant_cache_invalidations:            [:counter, "Total number of constant cache invalidations."],
       ruby_vm_constant_cache_misses:                   [:counter, "Total number of constant cache misses."],
       ruby_objects_count:                              [:gauge,   "Current number of Ruby objects by type."],
+      ruby_objects_size_bytes:                         [:gauge,   "Current approximate size of all Ruby objects."],
+      ruby_objects_symbols_count:                      [:gauge,   "Current number of symbol objects. Immortal symbols aren't garbage collected."],
+      ruby_objects_tdata_count:                        [:gauge,   "Current number of T_DATA objects. TypedData objects are Ruby wrappers around C structs."],
+      ruby_objects_imemo_count:                        [:gauge,   "Current number of T_IMEMO objects."],
 
       ruby_gc_total:                                   [:counter, "Total number of garbage collections since process start."],
       ruby_gc_duration_seconds:                        [:counter, "Time spent in garbage collection since process start."],
@@ -371,26 +375,27 @@ class ApplicationMetrics
       ruby_pid:                             Process.pid,
     })
 
-    object_stats = ObjectSpace.count_objects
-    metrics[:ruby_objects_count][type: "free"    ].set(object_stats[:FREE])
-    metrics[:ruby_objects_count][type: "object"  ].set(object_stats[:T_OBJECT])
-    metrics[:ruby_objects_count][type: "class"   ].set(object_stats[:T_CLASS])
-    metrics[:ruby_objects_count][type: "module"  ].set(object_stats[:T_MODULE])
-    metrics[:ruby_objects_count][type: "float"   ].set(object_stats[:T_FLOAT])
-    metrics[:ruby_objects_count][type: "string"  ].set(object_stats[:T_STRING])
-    metrics[:ruby_objects_count][type: "regexp"  ].set(object_stats[:T_REGEXP])
-    metrics[:ruby_objects_count][type: "array"   ].set(object_stats[:T_ARRAY])
-    metrics[:ruby_objects_count][type: "hash"    ].set(object_stats[:T_HASH])
-    metrics[:ruby_objects_count][type: "struct"  ].set(object_stats[:T_STRUCT])
-    metrics[:ruby_objects_count][type: "bignum"  ].set(object_stats[:T_BIGNUM])
-    metrics[:ruby_objects_count][type: "file"    ].set(object_stats[:T_FILE])
-    metrics[:ruby_objects_count][type: "data"    ].set(object_stats[:T_DATA])
-    metrics[:ruby_objects_count][type: "match"   ].set(object_stats[:T_MATCH])
-    metrics[:ruby_objects_count][type: "complex" ].set(object_stats[:T_COMPLEX])
-    metrics[:ruby_objects_count][type: "rational"].set(object_stats[:T_RATIONAL])
-    metrics[:ruby_objects_count][type: "symbol"  ].set(object_stats[:T_SYMBOL])
-    metrics[:ruby_objects_count][type: "imemo"   ].set(object_stats[:T_IMEMO])
-    metrics[:ruby_objects_count][type: "iclass"  ].set(object_stats[:T_ICLASS])
+    ObjectSpace.count_objects.each do |type, count|
+      next if type == :TOTAL
+      metrics[:ruby_objects_count][type: type.to_s.delete_prefix("T_").downcase].set(count)
+    end
+
+    ObjectSpace.count_objects_size.each do |type, size|
+      next if type == :TOTAL
+      metrics[:ruby_objects_size_bytes][type: type.to_s.delete_prefix("T_").downcase].set(size)
+    end
+
+    ObjectSpace.count_tdata_objects.each do |type, count|
+      metrics[:ruby_objects_tdata_count][type: type.to_s].set(count)
+    end
+
+    ObjectSpace.count_symbols.each do |type, count|
+      metrics[:ruby_objects_symbols_count][type: type].set(count)
+    end
+
+    ObjectSpace.count_imemo_objects.each do |type, count|
+      metrics[:ruby_objects_imemo_count][type: type].set(count)
+    end
 
     ruby_yjit_stats = defined?(RubyVM::YJIT) ? RubyVM::YJIT.runtime_stats : Hash.new { 0 }
     metrics.set({
@@ -439,9 +444,9 @@ class ApplicationMetrics
     gc_object_pool_stats = GC.stat_heap
     gc_object_pool_stats.each do |pool_id, pool_stats|
       metrics.set({
-        ruby_gc_pool_heap_pages_allocated_total: pool_stats[:heap_total_allocated_pages],
-        ruby_gc_pool_heap_pages_freed_total:     pool_stats[:heap_total_freed_pages],
-        ruby_gc_pool_force_major_gc_count:       pool_stats[:heap_force_major_gc_count],
+        ruby_gc_pool_heap_pages_allocated_total: pool_stats[:total_allocated_pages],
+        ruby_gc_pool_heap_pages_freed_total:     pool_stats[:total_freed_pages],
+        ruby_gc_pool_force_major_gc_count:       pool_stats[:force_major_gc_count],
       }, { slot_size: pool_stats[:slot_size] })
 
       metrics[:ruby_gc_pool_heap_pages][slot_size: pool_stats[:slot_size], type: :eden].set(pool_stats[:heap_eden_pages])
