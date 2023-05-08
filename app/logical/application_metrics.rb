@@ -302,6 +302,17 @@ class ApplicationMetrics
       vips_files:                                      [:gauge,   "Current number of files opened by libvips."],
     }, { worker: puma_worker_id })
 
+    if Jemalloc.enabled?
+      metrics.register({
+        jemalloc_thread_count:                           [:gauge,   "Current number of background threads used by jemalloc."],
+        jemalloc_allocated_bytes:                        [:gauge,   "Current number of bytes requested by the application itself."],
+        jemalloc_mapped_bytes:                           [:gauge,   "Current number of bytes in active extents mapped by the allocator."],
+        jemalloc_resident_bytes:                         [:gauge,   "Current number of bytes in physically resident data pages mapped by the allocator."],
+        jemalloc_active_bytes:                           [:gauge,   "Current number of bytes in active pages allocated by the application."],
+        jemalloc_metadata_bytes:                         [:gauge,   "Current number of bytes dedicated to metadata by the allocator."],
+      }, { worker: puma_worker_id })
+    end
+
     metrics
   end
 
@@ -446,6 +457,18 @@ class ApplicationMetrics
       vips_allocations:  Vips.vips_tracked_get_allocs,
       vips_files:        Vips.vips_tracked_get_files,
     })
+
+    if Jemalloc.enabled?
+      Jemalloc.update_stats!
+      metrics.set({
+        jemalloc_thread_count:    Jemalloc.thread_count,
+        jemalloc_allocated_bytes: Jemalloc.allocated,
+        jemalloc_active_bytes:    Jemalloc.active,
+        jemalloc_metadata_bytes:  Jemalloc.metadata,
+        jemalloc_resident_bytes:  Jemalloc.resident,
+        jemalloc_mapped_bytes:    Jemalloc.mapped,
+      })
+    end
 
     metrics
   end
