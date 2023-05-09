@@ -8,7 +8,7 @@
 class RackMetricsServer
   attr_reader :host, :port, :options, :server, :thread
 
-  def initialize(host: ENV.fetch("DANBOORU_METRICS_HOST", "0.0.0.0"), port: ENV.fetch("DANBOORU_METRICS_PORT", 9090), **options)
+  def initialize(host: ENV.fetch("DANBOORU_METRICS_HOST", "0.0.0.0"), port: ENV.fetch("DANBOORU_METRICS_PORT", 3000), **options)
     @host = host
     @port = port
     @options = options
@@ -29,7 +29,7 @@ class RackMetricsServer
     case request.path_info
     when "/health"
       [200, {}, []]
-    when "/metrics"
+    when "/metrics", "/metrics/instance"
       metrics = ApplicationMetrics.update_process_metrics.to_prom
       [200, {"Content-Type" => "text/plain"}, [metrics]]
     else
