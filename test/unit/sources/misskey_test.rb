@@ -21,7 +21,7 @@ module Sources
         tag_name: "ixy194",
         tags: ["村上さん"],
         dtext_artist_commentary_desc: <<~EOS.chomp
-          村上さん #村上さん　村上アート
+          村上さん "#村上さん":[https://misskey.io/tags/村上さん]　村上アート
         EOS
       )
     end
@@ -44,6 +44,16 @@ module Sources
       strategy_should_work(
         "https://misskey.io/notes/9ef8xtot2m",
         image_urls: [],
+      )
+    end
+
+    context "A note with content warning" do
+      strategy_should_work(
+        "https://misskey.io/notes/9eh2m7ir57",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          RNしてくれたフォロワーさんの第一印象を答えます！
+          (知らねぇやつばっかだからプロフィールとアイコンと直近のノートを参照しよう…。)
+        EOS
       )
     end
 

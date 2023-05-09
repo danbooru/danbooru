@@ -62,7 +62,13 @@ class Source::Extractor::Misskey < Source::Extractor
   end
 
   def artist_commentary_desc
-    [api_response["cw"], api_response["text"]].compact.join("\n")
+    if ap_api_response.present?
+      [ap_api_response["summary"], ap_api_response["content"]]
+    elsif api_response.present?
+      [api_response["cw"], api_response["text"]]
+    else
+      []
+    end.compact.join("<br>")
   end
 
   def tags
@@ -72,14 +78,19 @@ class Source::Extractor::Misskey < Source::Extractor
   end
 
   def dtext_artist_commentary_desc
-    # TODO
-    super
+    DText.from_html(artist_commentary_desc)&.strip
   end
 
   memoize def api_response
     return {} unless note_id.present?
 
-    http.parsed_post("https://#{domain}/api/notes/show", json: { noteId: note_id }) || {}
+    http.cache(1.minute).parsed_post("https://#{domain}/api/notes/show##{note_id}", json: { noteId: note_id }) || {}
+  end
+
+  memoize def ap_api_response
+    return {} unless note_id.present?
+
+    http.cache(1.minute).headers(accept: "application/ld+json").parsed_get("https://#{domain}/notes/#{note_id}") || {}
   end
 
 end
