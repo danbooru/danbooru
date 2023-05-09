@@ -144,7 +144,7 @@ class Tag < ApplicationRecord
       end
 
       def categories_for(tag_names)
-        Cache.get_multi(Array(tag_names), "tc") do |tag|
+        Cache.get_multi(Array(tag_names), "tag-category") do |tag|
           Tag.select_category_for(tag)
         end
       end
