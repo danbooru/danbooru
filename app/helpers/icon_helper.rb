@@ -119,6 +119,9 @@ module IconHelper
     Melonbooks
     Mihoyo
     Mihuashi
+    Misskey.art
+    Misskey.design
+    Misskey.io
     Mixi.jp
     Monappy
     Mottohomete
