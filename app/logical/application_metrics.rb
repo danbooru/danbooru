@@ -496,7 +496,7 @@ class ApplicationMetrics
         method:     event.payload[:method],
         controller: event.payload.dig(:params, :controller),
         action:     event.payload[:action],
-        format:     event.payload[:response]&.media_type,
+        format:     event.payload[:response]&.media_type || "none",
         status:     event.payload[:status],
       }
 
@@ -522,7 +522,7 @@ class ApplicationMetrics
       ApplicationMetrics[:rails_sql_query_duration_seconds][**labels, duration: :db].increment(event.idle_time / 1000.0)
     end
 
-    @subscribers << ActiveSupport::Notifications.monotonic_subscribe(/render_(template|layout|partial|collection)\.action_view/) do |event|
+    @subscribers << ActiveSupport::Notifications.monotonic_subscribe(/\Arender_(template|layout|partial|collection)\.action_view/) do |event|
       labels = { template: event.payload[:identifier] }
 
       ApplicationMetrics[:rails_view_renders_total][labels].increment
@@ -536,7 +536,7 @@ class ApplicationMetrics
       ApplicationMetrics[:rails_active_record_instantiations_total][labels].increment(event.payload[:record_count])
     end
 
-    @subscribers << ActiveSupport::Notifications.monotonic_subscribe(/cache_(read|write)\.active_support/) do |event|
+    @subscribers << ActiveSupport::Notifications.monotonic_subscribe(/\Acache_(read|write)\.active_support/) do |event|
       key = event.payload[:key]
       key = key.last if key.is_a?(Array)
       category = key[0..key.index(":")&.pred] # extract first word up to the first ":", e.g. "pfc:1girl solo" -> "pfc"
@@ -556,7 +556,7 @@ class ApplicationMetrics
       ApplicationMetrics[:rails_cache_operation_duration_seconds][**labels, duration: :idle].increment(event.idle_time / 1000.0)
     end
 
-    @subscribers << ActiveSupport::Notifications.monotonic_subscribe(/cache_(read_multi|write_multi)\.active_support/) do |event|
+    @subscribers << ActiveSupport::Notifications.monotonic_subscribe(/\Acache_(read_multi|write_multi)\.active_support/) do |event|
       next if event.payload[:key].empty?
 
       case event.name
