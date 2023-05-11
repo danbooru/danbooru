@@ -16,11 +16,6 @@ Rails.application.configure do
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
 
-  # Enable server timing
-  # XXX Re-enable after the fix for rails 44167 is released
-  #config.server_timing = true
-  config.server_timing = false
-
   # Ensures that a master key has been made available in either ENV["RAILS_MASTER_KEY"]
   # or in config/master.key. This key is used to decrypt credentials (and other encrypted files).
   # config.require_master_key = true
