@@ -1,0 +1,9 @@
+// Make current page indicator gave feedback when touch. 
+// Only on mobile.
+
+@media screen and (max-width: 660px) {   
+    .paginator-current:active {
+        background: var(--paginator-arrow-color);
+        color: var(--paginator-arrow-background-color);
+    }
+}

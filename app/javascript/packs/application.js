@@ -52,6 +52,7 @@ import HelpTooltipComponent from "../src/javascripts/help_tooltip_component.js";
 import IqdbQuery from "../src/javascripts/iqdb_queries.js";
 import Note from "../src/javascripts/notes.js";
 import MediaAssetComponent from "../src/javascripts/media_asset_component.js";
+import PaginatorJumpComponent from "../src/javascripts/paginator_jump_component.js";
 import PopupMenuComponent from "../src/javascripts/popup_menu_component.js";
 import Post from "../src/javascripts/posts.js";
 import PostModeMenu from "../src/javascripts/post_mode_menu.js";
@@ -84,6 +85,7 @@ Danbooru.HelpTooltipComponent = HelpTooltipComponent;
 Danbooru.IqdbQuery = IqdbQuery;
 Danbooru.MediaAssetComponent = MediaAssetComponent;
 Danbooru.Note = Note;
+Danbooru.PaginatorJumpComponent = PaginatorJumpComponent
 Danbooru.PopupMenuComponent = PopupMenuComponent;
 Danbooru.Post = Post;
 Danbooru.PostModeMenu = PostModeMenu;

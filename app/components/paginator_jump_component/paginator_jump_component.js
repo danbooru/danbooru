@@ -1,0 +1,1 @@
+../../javascript/src/javascripts/paginator_jump_component.js
