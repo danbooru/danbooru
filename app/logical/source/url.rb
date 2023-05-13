@@ -288,12 +288,27 @@ module Source
       recognized? && image_url? && page_url.nil?
     end
 
+    # Determine if the URL is considered an "image sample".
+    #
+    # Posts will be tagged "image_sample" if this returns true for the post's source URL. If this returns false, then the
+    # image_sample tag will be removed. If this returns nil, then the image_sample tag will not be added or removed.
+    #
+    # @return [Boolean, nil] True if the URL is an image sample, false if it's not an image sample, or nil if we don't know
+    #   whether it's an image sample or not.
+    def image_sample?
+      nil
+    end
+
     def self.site_name(url)
       Source::URL.parse(url)&.site_name
     end
 
     def self.image_url?(url)
       Source::URL.parse(url)&.image_url?
+    end
+
+    def self.image_sample?(url)
+      Source::URL.parse(url)&.image_sample?
     end
 
     def self.page_url?(url)

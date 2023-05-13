@@ -7,10 +7,30 @@ module Source::Tests::URL
         image_urls: [
           "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg",
           "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:small",
+          "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig",
+          "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg",
+          "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=900x900",
+          "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=orig",
+          "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696",
+          "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/600x200",
+          "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/1500x500",
+          "https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg",
+          "https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg",
+          "https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg",
+        ],
+        image_samples: [
+          "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg",
+          "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:small",
+          "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg",
           "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=900x900",
           "https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg",
           "https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg",
           "https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg",
+          "https://pbs.twimg.com/profile_images/1425792004877733891/UM8s9d2x_400x400.png",
+          "https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs_normal.jpeg",
+          "https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs_400x400.jpeg",
+          "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696",
+          "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/600x200",
         ],
         page_urls: [
           "https://twitter.com/i/status/1261877313349640194",
@@ -54,6 +74,16 @@ module Source::Tests::URL
       )
 
       should_not_find_false_positives(
+        image_samples: [
+          "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig",
+          "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=orig",
+          "https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig",
+          "https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:orig",
+          "https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:orig",
+          "https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs.jpeg",
+          "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/1500x500",
+          "https://twitter.com/i/status/1261877313349640194",
+        ],
         profile_urls: [
           "https://twitter.com/home",
           "https://t.co/Dxn7CuVErW",
