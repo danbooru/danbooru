@@ -135,7 +135,7 @@ Utility.copyToClipboard = async function(text, message = "Copied!") {
 
 Utility.isMobile = function () {
   // Detection is based on css .mobile-only which check if screen width is less than 660px
-  return window.innerWidth <= 660;
+  return window.screen.width <= 660;
 }
 
 export function createTooltip(name, options = {}) {
