@@ -41,6 +41,7 @@ module IconHelper
     Carrd
     Catbox
     Circle.ms
+    Civitai
     Class101
     Clip\ Studio
     Coconala

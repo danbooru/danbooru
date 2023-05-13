@@ -68,6 +68,7 @@ module Source
       Source::Extractor::Pixai,
       Source::Extractor::ArtStreet,
       Source::Extractor::Gumroad,
+      Source::Extractor::Civitai,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
@@ -232,7 +233,7 @@ module Source
     end
 
     def tags
-      (@tags || []).uniq
+      []
     end
 
     def normalized_tags
