@@ -41,26 +41,35 @@ class Source::URL::Twitter < Source::URL
       # /media/EBGbJe_U8AA4Ekb.jpg
       # /ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
       @full_image_url = File.join(site, media_type, *subdirs, "#{@file}.#{@file_ext}:orig")
+      @image_sample = @file_size != "orig"
 
     # https://pbs.twimg.com/profile_banners/780804311529906176/1475001696
     # https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/600x200
     in "pbs", "twimg.com", "profile_banners" => media_type, /^\d+$/ => user_id, /^\d+$/ => file_id, *dimensions
       @user_id = user_id
       @profile_banner = true
+      @file_size, = dimensions
       @full_image_url = "#{site}/#{media_type}/#{user_id}/#{file_id}/1500x500"
+      @image_sample = @file_size != "1500x500"
 
     # https://pbs.twimg.com/profile_images/1425792004877733891/UM8s9d2x_400x400.png (sample)
     # https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs_normal.jpeg (sample)
     # https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs_400x400.jpeg (sample)
     # https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs.jpeg (full; 1252x1252)
     # https://pbs.twimg.com/profile_images/378800000094437961/99ac06f2873f8597fa5961a404769066.gif (obsolete)
-    in "pbs", "twimg.com", "profile_images", /^\d+$/ => user_id, /^(\w{8})(_\w+)?\.\w+$/
+    in "pbs", "twimg.com", "profile_images", /^\d+$/ => user_id, /^(\w{8})(_\w+)?\.(\w+)$/
       @user_id = user_id
+      @file = $1
+      @file_size = $2
+      @file_ext = $3
       @full_image_url = "https://pbs.twimg.com/profile_images/#{user_id}/#{$1}.#{file_ext}"
+      @image_sample = @file_size.present?
 
     # https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=small
     in "pbs", "twimg.com", "ad_img" => media_type, media_id, file if params[:format].present?
+      @file_size = params[:name] if params[:name].present?
       @full_image_url = "#{site}/#{media_type}/#{media_id}/#{file}?format=#{params[:format]}&name=orig"
+      @image_sample = @file_size != "orig"
 
     # https://video.twimg.com/tweet_video/E_8lAMJUYAIyenr.mp4
     # https://video.twimg.com/ext_tw_video/1496554514312269828/pu/pl/Srzcr2EsBK5Mwlvf.m3u8?tag=12&container=fmp4
@@ -129,6 +138,10 @@ class Source::URL::Twitter < Source::URL
 
   def bad_link?
     image_url? && !profile_banner?
+  end
+
+  def image_sample?
+    @image_sample
   end
 
   def page_url
