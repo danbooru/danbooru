@@ -460,7 +460,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def distribute_files!(media_file, variants: self.variants)
-      Parallel.each(variants, in_threads: Danbooru.config.max_concurrency.to_i) do |variant|
+      variants.parallel_each do |variant|
         variant.store_file!(media_file)
       end
     end

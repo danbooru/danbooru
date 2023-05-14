@@ -7,7 +7,7 @@ condition = ENV.fetch("COND", "TRUE")
 fix = ENV.fetch("FIX", "false").truthy?
 workers = ENV.fetch("WORKERS", 4).to_i
 
-MediaAsset.active.where(condition).parallel_each(in_processes: workers) do |asset|
+MediaAsset.active.where(condition).parallel_find_each(in_processes: workers) do |asset|
   variant = asset.variant(:original)
   media_file = variant.open_file
 

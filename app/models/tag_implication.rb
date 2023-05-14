@@ -150,7 +150,7 @@ class TagImplication < TagRelationship
 
     def update_posts!
       CurrentUser.scoped(User.system) do
-        Post.system_tag_match("#{antecedent_name} -#{consequent_name}").reorder(nil).parallel_each do |post|
+        Post.system_tag_match("#{antecedent_name} -#{consequent_name}").reorder(nil).parallel_find_each do |post|
           post.lock!
           post.save!
         end
