@@ -345,8 +345,22 @@ class DText
 
     html.children.map do |node|
       case node.name
-      when "div", "blockquote", "table"
-        "" # strip [expand], [quote], and [table] tags
+      when "a"
+        if node.attributes["href"].present?
+          href = node.attributes["href"].value
+          if href.starts_with?("/")
+            href = "#{Danbooru.config.canonical_url}#{href}"
+          end
+          %Q<[#{node.text}](#{href})>
+        else
+          node.text
+        end
+      when "blockquote"
+        node.children.map do |child|
+          "> " + html_to_markdown(child)
+        end.join.strip.gsub("\n\n", "\n> \n") + "\n\n"
+      when "div", "table"
+        "" # strip [expand] and [table] tags
       when "br"
         "\n"
       when "text"
