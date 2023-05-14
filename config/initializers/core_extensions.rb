@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "danbooru"
+require_relative "../../app/logical/danbooru/enumerable"
 
 module Danbooru
   module Extensions
@@ -104,6 +105,10 @@ end
 
 class String
   include Danbooru::Extensions::String
+end
+
+module Enumerable
+  include Danbooru::Enumerable
 end
 
 module MimeNegotationExtension

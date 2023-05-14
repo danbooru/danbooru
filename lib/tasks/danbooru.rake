@@ -37,7 +37,7 @@ namespace :danbooru do
     task validate: :environment do
       processes = ENV.fetch("PROCESSES", Etc.nprocessors).to_i
 
-      MediaAsset.active.parallel_each(in_processes: processes) do |asset|
+      MediaAsset.active.parallel_find_each(in_processes: processes) do |asset|
         media_file = asset.variant(:original).open_file
 
         raise if asset.md5 != media_file.md5
@@ -100,7 +100,7 @@ namespace :danbooru do
       tags = ENV["TAGS"]
       posts = Post.system_tag_match(tags)
 
-      posts.parallel_each do |post|
+      posts.parallel_find_each do |post|
         sm.store_file(post.file(:preview), post, :preview) if post.has_preview?
         sm.store_file(post.file(:sample), post, :sample) if post.has_large?
         sm.store_file(post.file(:original), post, :original)

@@ -5,14 +5,14 @@ class ApplicationRecordTest < ActiveSupport::TestCase
     @tags = FactoryBot.create_list(:tag, 3, post_count: 1)
   end
 
-  context "ApplicationRecord#parallel_each" do
+  context "ApplicationRecord#parallel_find_each" do
     context "in threaded mode" do
       should "set CurrentUser correctly" do
         @user1 = create(:user)
         @user2 = create(:user)
 
         CurrentUser.scoped(@user1) do
-          Tag.parallel_each do |tag|
+          Tag.parallel_find_each do |tag|
             assert_equal(@user1, CurrentUser.user)
 
             CurrentUser.scoped(@user2) do

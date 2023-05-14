@@ -21,7 +21,7 @@ rescue Timeout::Error
   puts ({ error: "upload timed out", replacement: replacement.id, upload: upload&.id, image_url:, }).to_json
 end
 
-PostReplacement.where(COND).parallel_each(in_processes: WORKERS) do |replacement|
+PostReplacement.where(COND).parallel_find_each(in_processes: WORKERS) do |replacement|
   old_media_asset = MediaAsset.active.find_by(md5: replacement.old_md5)
   new_media_asset = MediaAsset.active.find_by(md5: replacement.md5)
 
