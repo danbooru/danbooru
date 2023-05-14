@@ -1925,7 +1925,8 @@ class Post < ApplicationRecord
 
     def discord_image(channel)
       return if (rating != 'g' && !channel.nsfw?) || !visible?(User.anonymous)
-      Discordrb::Webhooks::EmbedImage.new(url: file_url)
+      url = file_size > 8.megabytes ? media_asset.variant(:sample).file_url : file_url
+      Discordrb::Webhooks::EmbedImage.new(url: url)
     end
 
     def discord_color
@@ -1964,7 +1965,6 @@ class Post < ApplicationRecord
   end
 
   def levelblocked?(user = CurrentUser.user)
-    #!user.is_gold? && RESTRICTED_TAGS.any? { |tag| has_tag?(tag) }
     user.id != uploader_id && !user.is_approver? && tag_string.match?(RESTRICTED_TAGS_REGEX)
   end
 

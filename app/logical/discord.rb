@@ -28,6 +28,8 @@ module Discord
     respond_to_id Post
     respond_to_id ForumTopic, "topic"
     respond_to_id ForumPost, "forum"
+    respond_to_id Comment
+    respond_to_id User
 
     respond(:wiki_link, /\[\[ [^\]]+ \]\]/x) do |event, text|
       title = text[/[^\[\]]+/].gsub(/\s/, "_")

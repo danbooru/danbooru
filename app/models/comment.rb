@@ -110,6 +110,29 @@ class Comment < ApplicationRecord
     DText.quote(body, creator.name)
   end
 
+  concerning :DiscordMethods do
+    def discord_author
+      Discordrb::Webhooks::EmbedAuthor.new(name: "@#{creator.name}", url: creator.discord_url)
+    end
+
+    def discord_thumbnail(channel)
+      return if (post.rating != 'g' && !channel.nsfw?) || !post.visible?(User.anonymous)
+      Discordrb::Webhooks::EmbedThumbnail.new(url: post.media_asset.variant(:"360x360").file_url)
+    end
+
+    def discord_body
+      DText.to_markdown(body).truncate(2000)
+    end
+
+    def discord_footer
+      timestamp = "#{created_at.strftime("%F")}"
+
+      Discordrb::Webhooks::EmbedFooter.new(
+        text: "#{score}⇧ | #{timestamp}"
+      )
+    end
+  end
+
   def self.available_includes
     [:post, :creator, :updater]
   end

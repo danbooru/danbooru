@@ -223,7 +223,9 @@ class ApplicationRecord < ActiveRecord::Base
         embed.title = discord_title
         embed.url = discord_url
         embed.image = discord_image(channel)
+        embed.thumbnail = discord_thumbnail(channel)
         embed.description = discord_body
+        embed.fields = discord_fields
         embed.color = discord_color
         embed.footer = discord_footer
 
@@ -247,8 +249,16 @@ class ApplicationRecord < ActiveRecord::Base
       nil
     end
 
+    def discord_thumbnail(channel)
+      nil
+    end
+
     def discord_body
       nil
+    end
+
+    def discord_fields
+      []
     end
 
     def discord_color

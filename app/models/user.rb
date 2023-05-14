@@ -652,6 +652,53 @@ class User < ApplicationRecord
     end
   end
 
+  concerning :DiscordMethods do
+    def discord_author
+      Discordrb::Webhooks::EmbedAuthor.new(name:, url: discord_url)
+    end
+
+    def discord_title
+      is_banned? ? "~~#{name}~~" : name
+    end
+
+    def discord_color
+      return 0xED2426 if is_banned?
+      case level
+      in Levels::GOLD
+        0xEAD084
+      in Levels::PLATINUM
+        0xABABBC
+      in Levels::BUILDER | Levels::CONTRIBUTOR | Levels::APPROVER
+        0xC979FF
+      in Levels::MODERATOR
+        0x35C64A
+      in Levels::ADMIN | Levels::OWNER
+        0xFF8A8B
+      else
+        nil
+      end
+    end
+
+    def discord_fields
+      [
+        Discordrb::Webhooks::EmbedField.new(inline: true, name: "Level", value: is_banned? ? "Banned" : level_string),
+        Discordrb::Webhooks::EmbedField.new(inline: true, name: "Uploads", value: "#{post_upload_count} (#{posts.deleted.count} deleted)"),
+        Discordrb::Webhooks::EmbedField.new(inline: true, name: "Comments", value: comments.visible(User.anonymous).count),
+        Discordrb::Webhooks::EmbedField.new(inline: true, name: "Forum posts", value: forum_posts.visible(User.anonymous).count),
+        Discordrb::Webhooks::EmbedField.new(inline: true, name: "Post edits", value: post_update_count),
+        Discordrb::Webhooks::EmbedField.new(inline: true, name: "Artist edits", value: artist_version_count),
+      ]
+    end
+
+    def discord_footer
+      timestamp = "#{created_at.strftime("%F")}"
+
+      Discordrb::Webhooks::EmbedFooter.new(
+        text: "#{positive_feedback_count}⇧ #{neutral_feedback_count}😐 #{negative_feedback_count}⇩ | Joined #{timestamp}"
+      )
+    end
+  end
+
   include BanMethods
   include LevelMethods
   include EmailMethods
