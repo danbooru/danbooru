@@ -70,7 +70,7 @@ class PostPreviewComponent < ApplicationComponent
     when "540", "720"
       media_asset.variant("720x720")
     else
-      raise NotImplementedError
+      media_asset.variant("180x180")
     end
   end
 
