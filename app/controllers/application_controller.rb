@@ -161,15 +161,15 @@ class ApplicationController < ActionController::Base
       render_error_page(500, exception, message: "Your request took too long to complete and was canceled.")
     when NotImplementedError
       render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
-    when PG::ConnectionBad
-      render_error_page(503, exception, message: "The database is unavailable. Try again later.")
+    when ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad
+      render_error_page(503, exception, message: "The database is unavailable. Try again later.", layout: "blank")
     else
       raise exception if Rails.env.development? || Danbooru.config.debug_mode
       render_error_page(500, exception)
     end
   end
 
-  def render_error_page(status, exception = nil, message: "", template: "static/error", format: request.format.symbol)
+  def render_error_page(status, exception = nil, message: "", template: "static/error", format: request.format.symbol, layout: "default")
     @exception = exception
     @expected = status < 500
     @message = message.to_s.encode("utf-8", invalid: :replace, undef: :replace)
@@ -179,7 +179,7 @@ class ApplicationController < ActionController::Base
     @api_response = { success: false, error: @exception.class.to_s, message: @message, backtrace: @backtrace }
 
     # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
-    layout = CurrentUser.user.present? ? "default" : "blank"
+    layout = "blank" if CurrentUser.user.nil?
 
     if @exception
       DanbooruLogger.log(@exception, expected: @expected)
