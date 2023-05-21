@@ -42,7 +42,7 @@ module Source
 
       def artist_commentary_desc
         if t_work_id.present?
-          data.dig("modules", "module_dynamic", "desc", "rich_text_nodes").map do |text_node|
+          data.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.map do |text_node|
             case text_node["type"]
             when "RICH_TEXT_NODE_TYPE_BV"
               "<a href='#{URI.join("https://", text_node["jump_url"])}'>#{text_node["text"]}</a>"
@@ -128,7 +128,7 @@ module Source
       end
 
       def http
-        super.use(:spoof_referrer)
+        super.headers(Referer: "https://www.bilibili.com")
       end
 
       memoize def page
