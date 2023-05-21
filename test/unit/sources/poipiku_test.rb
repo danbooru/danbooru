@@ -37,10 +37,10 @@ module Sources
           tag_name: "omo_chi2",
           tags: [],
           artist_commentary_desc: <<~EOS.chomp,
-            オモチリ。トップの邪魔するcrちゃん<br>キスしてるだけ
+            オモチ。トップの邪魔するcrちゃん<br>キスしてるだけ
           EOS
           dtext_artist_commentary_desc: <<~EOS.chomp
-            オモチリ。トップの邪魔するcrちゃん
+            オモチ。トップの邪魔するcrちゃん
             キスしてるだけ
           EOS
         )
@@ -61,10 +61,10 @@ module Sources
           tag_name: "omo_chi2",
           tags: [],
           artist_commentary_desc: <<~EOS.chomp,
-            オモチリ。トップの邪魔するcrちゃん<br>キスしてるだけ
+            オモチ。トップの邪魔するcrちゃん<br>キスしてるだけ
           EOS
           dtext_artist_commentary_desc: <<~EOS.chomp
-            オモチリ。トップの邪魔するcrちゃん
+            オモチ。トップの邪魔するcrちゃん
             キスしてるだけ
           EOS
         )
@@ -85,10 +85,10 @@ module Sources
           tag_name: "omo_chi2",
           tags: [],
           artist_commentary_desc: <<~EOS.chomp,
-            オモチリ。トップの邪魔するcrちゃん<br>キスしてるだけ
+            オモチ。トップの邪魔するcrちゃん<br>キスしてるだけ
           EOS
           dtext_artist_commentary_desc: <<~EOS.chomp
-            オモチリ。トップの邪魔するcrちゃん
+            オモチ。トップの邪魔するcrちゃん
             キスしてるだけ
           EOS
         )
@@ -108,7 +108,7 @@ module Sources
           tag_name: "omo_chi2",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
-            オモチリ体型こうだったらいいな絵
+            オモチの体型こうだったらいいな絵
             ⚠︎全裸
           EOS
         )
@@ -143,7 +143,7 @@ module Sources
           tag_name: "omo_chi2",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
-            モブチリ(モブ女、モブ男×cr)
+            モブチ(モブ女、モブ男×cr)
             ⚠︎モブ姦、無理矢理
 
             ファンのモブ女にクスリ盛られてモブ男と性行為させられるcrちゃんです

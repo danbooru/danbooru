@@ -112,17 +112,18 @@ module Sources
       end
     end
 
-    context "A share.api.weibo.cn/share/:id URL that is deleted" do
+    context "A share.api.weibo.cn/share/:id URL" do
       strategy_should_work(
         "https://share.api.weibo.cn/share/304950356,4767694689143828.html",
-        image_urls: [],
-        page_url: nil,
-        artist_name: nil,
-        other_names: [],
-        artist_commentary_desc: nil,
-        profile_url: nil,
-        profile_urls: [],
-        tags: []
+        image_urls: ["https://wx3.sinaimg.cn/large/007bspzxly1h23na4y0hhj32982pinpd.jpg"],
+        page_url: "https://www.weibo.com/6582241007/Lsp2YCmJ6",
+        artist_name: "号布谷鸟",
+        other_names: ["号布谷鸟"],
+        profile_url: "https://www.weibo.com/u/6582241007",
+        profile_urls: ["https://www.weibo.com/u/6582241007"],
+        tags: ["快递组"],
+        artist_commentary_desc: "<a  href=\"https://m.weibo.cn/search?containerid=231522type%3D1%26t%3D10%26q%3D%23%E5%BF%AB%E9%80%92%E7%BB%84%23&extparam=%23%E5%BF%AB%E9%80%92%E7%BB%84%23&luicode=20000061&lfid=4767694689143828\" data-hide=\"\"><span class=\"surl-text\">#快递组#</span></a> 摸了 ",
+        media_files: [{ file_size: 1_781_330 }],
       )
     end
 
