@@ -50,6 +50,10 @@ class ApplicationJob < ActiveJob::Base
     raise
   end
 
+  discard_on ActiveJob::DeserializationError do |_job, error|
+    DanbooruLogger.log(error)
+  end
+
   # @return [Duration] The amount of time to let a job run before it is canceled. May be overriden by subclasses.
   def job_timeout
     24.hours

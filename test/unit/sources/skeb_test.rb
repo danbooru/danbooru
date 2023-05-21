@@ -69,7 +69,7 @@ module Sources
     context "A post with both the small and large version clean" do
       should "just get the bigger image" do
         site = Source::Extractor.find("https://skeb.jp/@goma_feet/works/1")
-        assert_equal(["https://skeb.imgix.net/uploads/origins/78ca23dc-a053-4ebe-894f-d5a06e228af8?bg=%23fff&auto=format&fm=webp&w=800&s=3a458a1e443dee3d73d45e88f0794f85"], site.image_urls)
+        assert_equal(["https://si.imgix.net/74d299ef/uploads/origins/78ca23dc-a053-4ebe-894f-d5a06e228af8?bg=%23fff&auto=format&fm=webp&w=800&s=0f091c291e3eeaa8ffe4e35a314b153e"], site.image_urls)
       end
     end
 
