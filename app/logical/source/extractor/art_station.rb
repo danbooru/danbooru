@@ -73,6 +73,10 @@ class Source::Extractor
       "https://www.artstation.com/projects/#{project_id}.json" if project_id.present?
     end
 
+    def http
+      super.headers("User-Agent": "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)")
+    end
+
     memoize def api_response
       http.cache(1.minute).parsed_get(api_url) || {}
     end
