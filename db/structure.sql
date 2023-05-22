@@ -926,6 +926,24 @@ CREATE TABLE public.good_job_batches (
 
 
 --
+-- Name: good_job_executions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.good_job_executions (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    active_job_id uuid NOT NULL,
+    job_class text,
+    queue_name text,
+    serialized_params jsonb,
+    scheduled_at timestamp(6) without time zone,
+    finished_at timestamp(6) without time zone,
+    error text
+);
+
+
+--
 -- Name: good_job_processes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -971,8 +989,12 @@ CREATE TABLE public.good_jobs (
     retried_good_job_id uuid,
     cron_at timestamp without time zone,
     batch_id uuid,
-    batch_callback_id uuid
+    batch_callback_id uuid,
+    is_discrete boolean,
+    executions_count integer,
+    job_class text
 );
+ALTER TABLE ONLY public.good_jobs ALTER COLUMN finished_at SET STATISTICS 1000;
 
 
 --
@@ -3149,6 +3171,14 @@ ALTER TABLE ONLY public.good_job_batches
 
 
 --
+-- Name: good_job_executions good_job_executions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.good_job_executions
+    ADD CONSTRAINT good_job_executions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: good_job_processes good_job_processes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4269,6 +4299,13 @@ CREATE INDEX index_forum_topics_on_title_tsvector ON public.forum_topics USING g
 --
 
 CREATE INDEX index_forum_topics_on_updated_at ON public.forum_topics USING btree (updated_at);
+
+
+--
+-- Name: index_good_job_executions_on_active_job_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_job_executions_on_active_job_id_and_created_at ON public.good_job_executions USING btree (active_job_id, created_at);
 
 
 --
