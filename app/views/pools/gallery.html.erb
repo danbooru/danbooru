@@ -11,7 +11,7 @@
 
     <%= render(PostGalleryComponent.new) do |gallery| %>
       <% @pools.each do |pool| %>
-        <% gallery.post(post: pool.cover_post, link_target: pool, pool: pool, show_deleted: true) %>
+        <% gallery.with_post(post: pool.cover_post, link_target: pool, pool: pool, show_deleted: true) %>
       <% end %>
     <% end %>
 

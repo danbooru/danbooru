@@ -1,39 +1,39 @@
 <%= render PopupMenuComponent.new(classes: "preview-size-menu") do |menu| %>
-  <% menu.button do %>
+  <% menu.with_button do %>
     <span class="rounded flex gap-1 items-center">
       <%= image_icon %> <span class="text-sm">Size</span> <%= caret_down_icon(class: "text-xs self-center") %>
     </span>
   <% end %>
 
-  <% menu.item do %>
+  <% menu.with_item do %>
     <%= link_to "Small", current_page_path(size: 150), class: ("font-bold" if current_size == 150), rel: "nofollow" %>
   <% end %>
 
-  <% menu.item do %>
+  <% menu.with_item do %>
     <%= link_to "Medium", current_page_path(size: 180), class: ("font-bold" if current_size == 180), rel: "nofollow" %>
   <% end %>
 
-  <% menu.item do %>
+  <% menu.with_item do %>
     <%= link_to "Large", current_page_path(size: 225), class: ("font-bold" if current_size == 225), rel: "nofollow" %>
   <% end %>
 
   <%# Mobile only %>
-  <% menu.item do %>
+  <% menu.with_item do %>
     <%= link_to "Huge", current_page_path(size: 360), class: ["mobile-only", ("font-bold" if current_size == 360)], rel: "nofollow" %>
   <% end %>
 
   <%# Desktop only %>
-  <% menu.item do %>
+  <% menu.with_item do %>
     <%= link_to "Huge", current_page_path(size: 270), class: ["desktop-only", ("font-bold" if current_size == 270)], rel: "nofollow" %>
   <% end %>
 
   <%# Desktop only %>
-  <% menu.item do %>
+  <% menu.with_item do %>
     <%= link_to "Gigantic", current_page_path(size: 360), class: ["desktop-only", ("font-bold" if current_size == 360)], rel: "nofollow" %>
   <% end %>
 
   <%# Desktop only %>
-  <% menu.item do %>
+  <% menu.with_item do %>
     <%= link_to "Absurd", current_page_path(size: 720), class: ["desktop-only", ("font-bold" if current_size == 720)], rel: "nofollow" %>
   <% end %>
 <% end %>

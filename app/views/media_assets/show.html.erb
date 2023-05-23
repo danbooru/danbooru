@@ -34,47 +34,47 @@
 
                 <span>
                   <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
-                    <% menu.item(hide_on_click: true) do %>
+                    <% menu.with_item(hide_on_click: true) do %>
                       <%= link_to "#{@media_asset.original.file_url}?download=1", download: @media_asset.original.file_name do %>
                         <%= download_icon %> Download
                       <% end %>
                     <% end %>
 
-                    <% menu.item do %>
+                    <% menu.with_item do %>
                       <hr class="border">
                     <% end %>
 
-                    <% menu.item do %>
+                    <% menu.with_item do %>
                       <%= external_link_to "https://saucenao.com/search.php?url=#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
                         <%= search_icon %> SauceNAO
                       <% end %>
                     <% end %>
 
-                    <% menu.item do %>
+                    <% menu.with_item do %>
                       <%= external_link_to "https://ascii2d.net/search/url/#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
                         <%= search_icon %> Ascii2D
                       <% end %>
                     <% end %>
 
-                    <% menu.item do %>
+                    <% menu.with_item do %>
                       <%= external_link_to "https://yandex.com/images/search?rpt=imageview&url=#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
                         <%= search_icon %> Yandex
                       <% end %>
                     <% end %>
 
-                    <% menu.item do %>
+                    <% menu.with_item do %>
                       <%= external_link_to "https://lens.google.com/uploadbyurl?url=#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
                         <%= search_icon %> Google
                       <% end %>
                     <% end %>
 
-                    <% menu.item do %>
+                    <% menu.with_item do %>
                       <%= external_link_to "https://www.bing.com/images/searchbyimage?cbir=sbi&imgurl=#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
                         <%= search_icon %> Bing
                       <% end %>
                     <% end %>
 
-                    <% menu.item do %>
+                    <% menu.with_item do %>
                       <%= link_to iqdb_queries_path(search: { media_asset_id: @media_asset.id }), target: "_blank" do %>
                         <%= search_icon %> <%= Danbooru.config.app_name %>
                       <% end %>
@@ -93,11 +93,11 @@
                     <% end %>
 
                     <% if policy(@media_asset).destroy? && @media_asset.post.nil? && !@media_asset.deleted? && !@media_asset.expunged? %>
-                      <% menu.item do %>
+                      <% menu.with_item do %>
                         <hr class="border">
                       <% end %>
 
-                      <% menu.item do %>
+                      <% menu.with_item do %>
                         <%= link_to media_asset_path(@media_asset), class: "text-danger", remote: true, xhr: true, method: :delete, "data-confirm": "This will permanently delete this file. Are you sure?" do %>
                           <%= delete_icon %> Delete file
                         <% end %>

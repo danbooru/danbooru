@@ -1,7 +1,7 @@
 <%= render(MediaAssetGalleryComponent.new(size: size)) do |gallery| %>
   <% ai_tags.each do |ai_tag| %>
     <% if policy(ai_tag.media_asset).can_see_image? %>
-      <% gallery.media_asset do %>
+      <% gallery.with_media_asset do %>
         <%= render "ai_tags/preview", ai_tag: ai_tag, media_asset: ai_tag.media_asset, post: ai_tag.media_asset.post, size: gallery.size %>
       <% end %>
     <% end %>

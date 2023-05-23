@@ -19,8 +19,8 @@
       <% post = match["post"] %>
       <% preview_class = match.in?(@high_similarity_matches) ? "iqdb-high-similarity" : "iqdb-low-similarity hidden" %>
 
-      <%= gallery.post(post: post, size: gallery.size, show_deleted: true, classes: preview_class) do |preview| %>
-        <% preview.footer do %>
+      <%= gallery.with_post(post: post, size: gallery.size, show_deleted: true, classes: preview_class) do |preview| %>
+        <% preview.with_footer do %>
           <div class="text-xs text-center mt-1">
             <div>
               <%= render "posts/partials/show/preview_source_footer", post: post %>

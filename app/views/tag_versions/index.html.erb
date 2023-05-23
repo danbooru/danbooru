@@ -57,13 +57,13 @@
         <% t.column column: "control" do |tag_version| %>
           <%= render PopupMenuComponent.new do |menu| %>
             <% if policy(tag_version.tag).update? %>
-              <% menu.item do %>
+              <% menu.with_item do %>
                 <%= link_to "Edit tag", edit_tag_path(tag_version.tag) %>
               <% end %>
             <% end %>
 
             <% unless @tag %>
-              <% menu.item do %>
+              <% menu.with_item do %>
                 <%= link_to "Tag history", tag_versions_path(search: { tag_id: tag_version.tag_id }) %>
               <% end %>
             <% end %>

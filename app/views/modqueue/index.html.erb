@@ -42,8 +42,8 @@
   <% if @mode == "gallery" %>
     <%= render(PostGalleryComponent.new(size: @preview_size)) do |gallery| %>
       <% @posts.each do |post| %>
-        <% gallery.post(post: post, size: @preview_size, classes: "card mod-queue-preview p-2", show_deleted: true) do |preview| %>
-          <% preview.footer do %>
+        <% gallery.with_post(post: post, size: @preview_size, classes: "card mod-queue-preview p-2", show_deleted: true) do |preview| %>
+          <% preview.with_footer do %>
             <%= render "modqueue/post_preview_footer", post: post %>
           <% end %>
         <% end %>

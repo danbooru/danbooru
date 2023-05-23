@@ -32,7 +32,7 @@
 
       <%= render PopupMenuComponent.new do |menu| %>
         <% if policy(forum_post).update? %>
-          <% menu.item do %>
+          <% menu.with_item do %>
             <% if forum_post.is_original_post?(original_forum_post_id) %>
               <%= link_to edit_forum_topic_path(forum_post.topic), id: "edit_forum_topic_link_#{forum_post.topic_id}", class: "edit_forum_topic_link" do %>
                 <%= edit_icon %> Edit
@@ -46,7 +46,7 @@
         <% end %>
 
         <% if forum_post.is_deleted? && policy(forum_post).undelete? && !forum_post.is_original_post?(original_forum_post_id) %>
-          <% menu.item do %>
+          <% menu.with_item do %>
             <%= link_to undelete_forum_post_path(forum_post.id), method: :post, remote: true do %>
               <%= undelete_icon %> Undelete
             <% end %>
@@ -54,7 +54,7 @@
         <% end %>
 
         <% if !forum_post.is_deleted? && policy(forum_post).destroy? && !forum_post.is_original_post?(original_forum_post_id) %>
-          <% menu.item do %>
+          <% menu.with_item do %>
             <%= link_to forum_post_path(forum_post.id), "data-confirm": "Are you sure you want to delete this forum post?", method: :delete, remote: true do %>
               <%= delete_icon %> Delete
             <% end %>
@@ -62,20 +62,20 @@
         <% end %>
 
         <% if policy(forum_post).reportable? %>
-          <% menu.item do %>
+          <% menu.with_item do %>
             <%= link_to new_moderation_report_path(moderation_report: { model_type: "ForumPost", model_id: forum_post.id }), remote: true do %>
               <%= flag_icon %> Report
             <% end %>
           <% end %>
         <% end %>
 
-        <% menu.item do %>
+        <% menu.with_item do %>
           <%= link_to forum_post_path(forum_post.id), class: "forum-post-copy-id" do %>
             <%= hashtag_icon %> Copy ID
           <% end %>
         <% end %>
 
-        <% menu.item do %>
+        <% menu.with_item do %>
           <%= link_to forum_post_path(forum_post.id), class: "forum-post-copy-link" do %>
             <%= link_icon %> Copy Link
           <% end %>

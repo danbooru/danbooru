@@ -16,7 +16,7 @@
     <%= render "posts/partials/common/inline_blacklist" %>
 
     <%= render_post_gallery(@posts, tags: "favgroup:#{@favorite_group.id}", show_deleted: true) do |gallery| %>
-      <% gallery.footer do %>
+      <% gallery.with_footer do %>
         <%= numbered_paginator(@posts) %>
       <% end %>
     <% end %>

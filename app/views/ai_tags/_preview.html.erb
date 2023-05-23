@@ -1,7 +1,7 @@
 <%# ai_tag, media_asset, post, size %>
 
 <%= render(MediaAssetPreviewComponent.new(media_asset: media_asset, size: size, link_target: post || media_asset, classes: "card-outlined overflow-hidden flex flex-col items-center w-full h-full pb-2", inner_classes: "flex-auto flex items-center", html: { "data-tag-id": ai_tag.tag_id, **data_attributes_for(media_asset) })) do |preview| %>
-  <% preview.footer do %>
+  <% preview.with_footer do %>
     <div class="text-center text-xs leading-none px-2 w-full mt-2">
       <div class="truncate mb-2">
         <% if ai_tag.tag.rating? %>
