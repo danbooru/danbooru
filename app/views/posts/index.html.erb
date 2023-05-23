@@ -109,7 +109,7 @@
 
   <div id="excerpt" style="display: none;">
     <% if @post_set.artist.present? && @post_set.artist.is_banned? && !CurrentUser.user.is_approver? %>
-      <p>The artist requested removal of this page.</p>
+      <p>This page has been removed because of a takedown request.</p>
     <% elsif @post_set.artist.present? %>
       <%= render "artists/summary", artist: @post_set.artist %>
     <% elsif @post_set.tag&.artist? %>
@@ -176,7 +176,7 @@
         <% if @post_set.hidden_posts.present? %>
           <div class="fineprint hidden-posts-notice">
             <% if @post_set.banned_posts.size == @post_set.posts.size %>
-              This page was removed at the artist's request (<%= link_to_wiki "learn more", "banned_artist" %>).<br>
+              This page has been removed because of a takedown request.<br>
             <% end %>
 
             <% if @post_set.censored_posts.present? %>
