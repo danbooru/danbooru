@@ -207,7 +207,7 @@
 
   <% if @post.is_banned? %>
     <div class="notice notice-small post-notice post-notice-banned">
-      The artist requested removal of this page
+      This page has been removed because of a takedown request or rule violation.
     </div>
   <% end %>
 
@@ -274,7 +274,7 @@
 
   <%= tag.section class: ["image-container", "note-container", ("danbirthday" if is_danbirthday?(@post))], **image_container_data_attributes(@post, CurrentUser.user) do -%>
     <% if @post.banblocked? -%>
-      <p>The artist requested removal of this image.</p>
+      <p>This page has been removed because of a takedown request or rule violation.</p>
     <% elsif @post.levelblocked? -%>
       <p>This image requires a privileged account to view.</p>
     <% elsif @post.nicheblocked? -%>

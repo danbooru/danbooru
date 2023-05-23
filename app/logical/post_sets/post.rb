@@ -149,7 +149,7 @@ module PostSets
     end
 
     def banned_artist?
-      artist.present? && artist.is_banned? && !artist.policy(current_user).can_view_banned?
+      artist.present? && artist.is_banned? && !current_user.is_approver?
     end
 
     def includes

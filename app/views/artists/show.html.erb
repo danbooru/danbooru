@@ -5,7 +5,7 @@
 <div id="c-artists">
   <div id="a-show">
     <% if @artist.is_banned? && !policy(@artist).can_view_banned? %>
-      <p>The artist requested removal of this page.</p>
+      <p>This page has been removed because of a takedown request.</p>
     <% else %>
       <%= render "artists/summary", artist: @artist %>
 
