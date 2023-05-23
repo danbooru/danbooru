@@ -14,7 +14,7 @@ module ComponentsHelper
 
     render(PostGalleryComponent.new(**options)) do |gallery|
       posts.each do |post|
-        gallery.post(post: post, size: gallery.size, **options)
+        gallery.with_post(post: post, size: gallery.size, **options)
       end
 
       if block_given?

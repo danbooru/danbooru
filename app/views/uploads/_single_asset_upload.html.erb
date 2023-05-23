@@ -40,47 +40,47 @@
 
               <span>
                 <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
-                  <% menu.item(hide_on_click: true) do %>
+                  <% menu.with_item(hide_on_click: true) do %>
                     <%= link_to "#{media_asset.original.file_url}?download=1", download: media_asset.original.file_name do %>
                       <%= download_icon %> Download
                     <% end %>
                   <% end %>
 
-                  <% menu.item do %>
+                  <% menu.with_item do %>
                     <hr class="border">
                   <% end %>
 
-                  <% menu.item do %>
+                  <% menu.with_item do %>
                     <%= external_link_to "https://saucenao.com/search.php?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
                       <%= search_icon %> SauceNAO
                     <% end %>
                   <% end %>
 
-                  <% menu.item do %>
+                  <% menu.with_item do %>
                     <%= external_link_to "https://ascii2d.net/search/url/#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
                       <%= search_icon %> Ascii2D
                     <% end %>
                   <% end %>
 
-                  <% menu.item do %>
+                  <% menu.with_item do %>
                     <%= external_link_to "https://yandex.com/images/search?rpt=imageview&url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
                       <%= search_icon %> Yandex
                     <% end %>
                   <% end %>
 
-                  <% menu.item do %>
+                  <% menu.with_item do %>
                     <%= external_link_to "https://lens.google.com/uploadbyurl?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
                       <%= search_icon %> Google
                     <% end %>
                   <% end %>
 
-                  <% menu.item do %>
+                  <% menu.with_item do %>
                     <%= external_link_to "https://www.bing.com/images/searchbyimage?cbir=sbi&imgurl=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
                       <%= search_icon %> Bing
                     <% end %>
                   <% end %>
 
-                  <% menu.item do %>
+                  <% menu.with_item do %>
                     <%= link_to iqdb_queries_path(search: { media_asset_id: media_asset.id }), target: "_blank" do %>
                       <%= search_icon %> <%= Danbooru.config.app_name %>
                     <% end %>
@@ -187,8 +187,8 @@
 
                   <%= render(PostGalleryComponent.new(size: "180")) do |gallery| %>
                     <% source.related_posts.each do |post| %>
-                      <%= gallery.post(post: post, size: gallery.size, show_deleted: true) do |preview| %>
-                        <% preview.footer do %>
+                      <%= gallery.with_post(post: post, size: gallery.size, show_deleted: true) do |preview| %>
+                        <% preview.with_footer do %>
                           <div class="text-xs text-center mt-1">
                             <%= render "posts/partials/show/preview_source_footer", post: post %>
                           </div>
@@ -214,31 +214,31 @@
 
           <% t.menu_item(id: "docking-menu-tab") do %>
             <% render PopupMenuComponent.new(button_classes: "inactive-link") do |menu| %>
-              <% menu.item do %>
+              <% menu.with_item do %>
                 <%= link_to "javascript:void(0)", "x-on:click": "dock = 'auto'", id: "dock-auto-link", title: "Rotate your screen to change layout" do %>
                   <%= rotate_icon %> Automatic
                 <% end %>
               <% end %>
 
-              <% menu.item do %>
+              <% menu.with_item do %>
                 <%= link_to "javascript:void(0)", "x-on:click": "dock = 'right'", id: "dock-right-link", "data-shortcut": "shift+r" do %>
                   <%= dock_right_icon %> Dock to Right
                 <% end %>
               <% end %>
 
-              <% menu.item do %>
+              <% menu.with_item do %>
                 <%= link_to "javascript:void(0)", "x-on:click": "dock = 'bottom'", id: "dock-bottom-link", "data-shortcut": "shift+b" do %>
                   <%= dock_bottom_icon %> Dock to Bottom
                 <% end %>
               <% end %>
 
-              <% menu.item do %>
+              <% menu.with_item do %>
                 <%= link_to "javascript:void(0)", "x-on:click": "dock = 'left'", id: "dock-left-link", "data-shortcut": "shift+l" do %>
                   <%= dock_left_icon %> Dock to Left
                 <% end %>
               <% end %>
 
-              <% menu.item do %>
+              <% menu.with_item do %>
                 <%= link_to "javascript:void(0)", id: "open-edit-dialog", "data-shortcut": "shift+e" do %>
                   <%= external_link_icon(class: "text-xs") %> Open window
                 <% end %>

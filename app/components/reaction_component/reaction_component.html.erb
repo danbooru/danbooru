@@ -1,11 +1,11 @@
 <span class="inline-flex flex-wrap gap-1 justify-center items-center min-h-8" id="reactions-for-<%= model.class.name.parameterize %>-<%= model.id %>" x-data="{ search: '' }">
   <% if policy(model).try(:reactable?) && distinct_reactions.size <= ReactionComponent::MAX_REACTIONS %>
     <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
-      <% menu.button do %>
+      <% menu.with_button do %>
         <%= add_reaction_icon(class: "h-4", "x-on:click": "$nextTick(() => $refs.search.focus())") %>
       <% end %>
 
-      <% menu.item do %>
+      <% menu.with_item do %>
         <div>
           <input type="text" placeholder="Search emoji..." class="reaction-search w-full mb-2" x-ref="search" x-model="search" x-on:keyup.escape="Danbooru.Shortcuts.hide_tooltips()">
 

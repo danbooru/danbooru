@@ -43,7 +43,7 @@
       <% t.column column: "control" do |vote| %>
         <% if !vote.is_deleted? && policy(vote).destroy? %>
           <%= render PopupMenuComponent.new do |menu| %>
-            <% menu.item do %>
+            <% menu.with_item do %>
               <%= link_to "Remove", post_vote_path(vote.id, variant: "listing"), method: :delete, remote: true %>
             <% end %>
           <% end %>

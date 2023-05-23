@@ -2,8 +2,6 @@
 
 # A component that shows a "..." button that when clicked displays a popup menu.
 class PopupMenuComponent < ApplicationComponent
-  include ViewComponent::SlotableV2
-
   attr_reader :hide_on_click, :classes, :button_classes
 
   renders_one :button

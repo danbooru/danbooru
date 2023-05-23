@@ -32,7 +32,7 @@
   <% end %>
 
   <%= render PopupMenuComponent.new do |menu| %>
-    <% menu.item do %>
+    <% menu.with_item do %>
       <%= link_to "javascript:void(0)", class: "post-tooltip-disable"  do %>
         <%= close_icon %> Disable tooltips
       <% end %>

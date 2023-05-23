@@ -1,5 +1,5 @@
 <%= render(MediaAssetPreviewComponent.new(media_asset: media_asset, size: size, link_target: media_asset, html: { **data_attributes_for(media_asset), "data-is-posted": media_asset.post.present? })) do |preview| %>
-  <% preview.footer do %>
+  <% preview.with_footer do %>
     <div class="text-center text-xs h-8">
       <% if media_asset.post.present? %>
         <%= link_to "post ##{media_asset.post.id}", media_asset.post %>

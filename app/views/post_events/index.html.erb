@@ -140,18 +140,18 @@
       <% t.column column: "control" do |event| %>
         <%= render PopupMenuComponent.new do |menu| %>
           <% unless @post %>
-            <% menu.item do %>
+            <% menu.with_item do %>
               <%= link_to "Post history", post_post_events_path(event.post) %>
             <% end %>
           <% end %>
 
           <% if policy(event).can_see_creator? %>
-            <% menu.item do %>
+            <% menu.with_item do %>
               <%= link_to "User history", post_events_path(search: { creator_name: event.creator.name }) %>
             <% end %>
           <% end %>
 
-          <% menu.item do %>
+          <% menu.with_item do %>
             <%= link_to "Details", event.model %>
           <% end %>
         <% end %>

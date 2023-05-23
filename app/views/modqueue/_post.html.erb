@@ -1,7 +1,7 @@
 <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post, classes: "post card mod-queue-preview md:flex gap-4 p-4").article_attrs do %>
   <div class="sm:text-center">
     <%= render(PostPreviewComponent.new(post: post, classes: "mod-queue-preview", size: @preview_size, fit: :fixed, show_deleted: true)) do |component| %>
-      <% component.footer do %>
+      <% component.with_footer do %>
         <%= render "modqueue/post_preview_footer", post: post %>
       <% end %>
     <% end %>

@@ -93,13 +93,13 @@
       <% unless redact_deleted? %>
         <%= render PopupMenuComponent.new do |menu| %>
           <% if policy(comment).update? %>
-            <% menu.item do %>
+            <% menu.with_item do %>
               <%= link_to edit_comment_path(comment.id), id: "edit_comment_link_#{comment.id}", class: "edit_comment_link" do %>
                 <%= edit_icon %> Edit
               <% end %>
             <% end %>
 
-            <% menu.item do %>
+            <% menu.with_item do %>
               <% if comment.is_deleted? %>
                 <%= link_to comment_path(comment.id), "data-params": { comment: { is_deleted: false }, **component_state }.to_param, method: :put, remote: true do %>
                   <%= undelete_icon %> Undelete
@@ -113,7 +113,7 @@
           <% end %>
 
           <% if policy(comment).can_sticky_comment? %>
-            <% menu.item do %>
+            <% menu.with_item do %>
               <% if comment.is_sticky? %>
                 <%= link_to comment_path(comment.id), "data-params": { comment: { is_sticky: false }, **component_state }.to_param, method: :put, remote: true do %>
                   <%= unsticky_icon %> Unsticky
@@ -127,20 +127,20 @@
           <% end %>
 
           <% if policy(comment).reportable? %>
-            <% menu.item do %>
+            <% menu.with_item do %>
               <%= link_to new_moderation_report_path(moderation_report: { model_type: "Comment", model_id: comment.id }), remote: true do %>
                 <%= flag_icon %> Report
               <% end %>
             <% end %>
           <% end %>
 
-          <% menu.item do %>
+          <% menu.with_item do %>
             <%= link_to comment_path(comment.id), class: "comment-copy-id" do %>
               <%= hashtag_icon %> Copy ID
             <% end %>
           <% end %>
 
-          <% menu.item do %>
+          <% menu.with_item do %>
             <%= link_to comment_path(comment.id), class: "comment-copy-link" do %>
               <%= link_icon %> Copy Link
             <% end %>

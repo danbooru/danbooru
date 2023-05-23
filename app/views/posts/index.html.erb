@@ -86,7 +86,7 @@
       <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
 
       <%= render PopupMenuComponent.new(classes: "post-preview-options-menu") do |menu| %>
-        <% menu.item do %>
+        <% menu.with_item do %>
           <% if @post_set.show_votes %>
             <%= link_to "Hide scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: nil, size: params[:size]), class: "post-preview-hide-votes", rel: "nofollow" %>
           <% else %>
@@ -172,7 +172,7 @@
 
   <div id="posts">
     <%= render_post_gallery(@post_set.posts, show_deleted: @post_set.show_deleted?, tags: @post_set.tag_string, show_votes: @post_set.show_votes?, size: @preview_size) do |gallery, posts| %>
-      <% gallery.footer do %>
+      <% gallery.with_footer do %>
         <% if @post_set.hidden_posts.present? %>
           <div class="fineprint hidden-posts-notice">
             <% if @post_set.banned_posts.size == @post_set.posts.size %>

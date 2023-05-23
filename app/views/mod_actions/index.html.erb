@@ -24,11 +24,11 @@
       <% t.column column: :control do |mod_action| %>
         <% if mod_action.subject_id.present? %>
           <%= render PopupMenuComponent.new do |menu| %>
-            <% menu.item do %>
+            <% menu.with_item do %>
               <%= link_to "Details", mod_action.subject %>
             <% end %>
 
-            <% menu.item do %>
+            <% menu.with_item do %>
               <%= link_to "#{mod_action.subject_type.titleize.humanize} history", mod_actions_path(search: { subject_type: mod_action.subject_type, subject_id: mod_action.subject_id }) %>
             <% end %>
           <% end %>
