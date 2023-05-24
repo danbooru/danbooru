@@ -6,6 +6,8 @@
 # with the event.
 
 class UserEvent < ApplicationRecord
+  self.ignored_columns = [:ip_addr, :session_id, :user_agent, :metadata]
+
   belongs_to :user
   belongs_to :user_session
 
