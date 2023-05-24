@@ -2094,7 +2094,11 @@ CREATE TABLE public.user_events (
     updated_at timestamp(6) without time zone NOT NULL,
     user_id integer NOT NULL,
     user_session_id integer NOT NULL,
-    category integer NOT NULL
+    category integer NOT NULL,
+    ip_addr inet,
+    session_id uuid,
+    user_agent character varying,
+    metadata jsonb
 );
 
 
@@ -5723,10 +5727,38 @@ CREATE INDEX index_user_events_on_created_at ON public.user_events USING btree (
 
 
 --
+-- Name: index_user_events_on_ip_addr; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_ip_addr ON public.user_events USING btree (ip_addr);
+
+
+--
+-- Name: index_user_events_on_metadata; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_metadata ON public.user_events USING gin (metadata);
+
+
+--
+-- Name: index_user_events_on_session_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_session_id ON public.user_events USING btree (session_id);
+
+
+--
 -- Name: index_user_events_on_updated_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_events_on_updated_at ON public.user_events USING btree (updated_at);
+
+
+--
+-- Name: index_user_events_on_user_agent; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_user_agent ON public.user_events USING gin (user_agent public.gin_trgm_ops);
 
 
 --
@@ -7073,6 +7105,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230325143851'),
 ('20230401013159'),
 ('20230409141638'),
-('20230522005908');
+('20230522005908'),
+('20230524201206');
 
 
