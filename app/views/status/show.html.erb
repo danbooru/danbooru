@@ -93,5 +93,22 @@
       </summary>
       <%= render "list", hash: @status.serializable_hash[:headers] %>
     </details>
+
+    <h2 class="flex gap-2 items-center">
+      Browser <span><span class="chip-green text-success text-sm">Ok</span></span>
+    </h2>
+
+    <details x-data="{ metadata: {} }" x-init="metadata = await Danbooru.Device.flatMetadata()">
+      <summary x-text="metadata['browser.userAgent']"></summary>
+
+      <table class="striped aligned-vertical table-sm">
+        <template x-for="[key, value] in Object.entries(metadata)">
+          <tr>
+            <th x-text="key"></th>
+            <td x-text="value ?? 'undefined'"></td>
+          </tr>
+        </template>
+      </table>
+    </details>
   </div>
 </div>
