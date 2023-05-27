@@ -69,6 +69,10 @@ class ApplicationRecord < ActiveRecord::Base
         reflections.select { |_, v| v.macro == :has_many }.keys.map(&:to_sym)
       end
 
+      def associated_relations(name)
+        [name]
+      end
+
       def associated_models(name)
         if reflections[name].options[:polymorphic]
           reflections[name].active_record.try(:model_types) || []

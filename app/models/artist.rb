@@ -327,6 +327,15 @@ class Artist < ApplicationRecord
   end
 
   def self.available_includes
-    [:members, :urls, :wiki_page, :tag_alias, :tag]
+    [:members, :urls, :sorted_urls, :wiki_page, :tag_alias, :tag]
+  end
+
+  def self.associated_relations(name)
+    case name
+    when :sorted_urls
+      [:urls]
+    else
+      super
+    end
   end
 end
