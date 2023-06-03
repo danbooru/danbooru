@@ -12,9 +12,21 @@
           <%= yield :sidebar %>
         </aside>
 
-        <section id="content" class="flex-1 min-w-0 sm:order-1">
-          <%= yield :content %>
-        </section>
+        <div id="content-container">
+          <section id="content" class="flex-1 min-w-0 sm:order-1">
+            <%= yield :content %>
+          </section>
+
+          <section id="exoclick">
+            <% if CurrentUser.user.show_ads? && controller_name == "posts" %>
+              <% if cookies[:post_preview_size].to_i >= 360 %>
+                <iframe src="//a.realsrv.com/iframe.php?idzone=4966200&size=900x250" width="900" height="250" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>
+              <% else %>
+                <iframe src="//a.realsrv.com/iframe.php?idzone=4998976&size=728x90" width="728" height="90" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>
+              <% end %>
+            <% end %>
+          </section>
+        </div>
       </div>
     </div>
   </div>

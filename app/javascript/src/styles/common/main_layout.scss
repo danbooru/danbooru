@@ -40,3 +40,14 @@ div.page-heading {
     align-self: center;
   }
 }
+
+#content-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#exoclick {
+  margin-left: auto;
+  margin-right: auto;
+}
