@@ -3,5 +3,12 @@
   <%= subnav_link_to "My Uploads", user_uploads_path(CurrentUser.user.id.to_i) %>
   <%= subnav_link_to "All Uploads", media_assets_path %>
   <%= subnav_link_to "Reverse Image Search", iqdb_queries_path %> |
+  <% if @upload&.id.present? %>
+    <% if policy(@upload).undelete? %>
+      <%= subnav_link_to "Undelete", undelete_upload_path(@upload), remote: true, method: :post, data: { shortcut: "shift-d", confirm: "Are you sure you want to undelete this upload?" } %>
+    <% elsif policy(@upload).destroy? %>
+      <%= subnav_link_to "Delete", upload_path(@upload), remote: true, method: :delete, data: { shortcut: "shift-d", confirm: "Are you sure you want to delete this upload?" } %>
+    <% end %>
+  <% end %>
   <%= subnav_link_to "Help", wiki_page_path("help:upload") %>
 <% end %>

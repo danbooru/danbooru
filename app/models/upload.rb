@@ -36,6 +36,7 @@ class Upload < ApplicationRecord
   scope :completed, -> { where(status: "completed") }
   scope :failed, -> { where(status: "error") }
   scope :expired, -> { processing.where(created_at: ..4.hours.ago) }
+  scope :undeleted, -> { where(is_deleted: false) }
 
   def self.visible(user)
     if user.is_admin?
@@ -142,6 +143,10 @@ class Upload < ApplicationRecord
       q = q.where.not(id: Upload.where.missing(:posts))
     elsif params[:is_posted].to_s.falsy?
       q = q.where(id: Upload.where.missing(:posts))
+    end
+
+    if !params[:show_deleted].to_s.truthy?
+      q = q.undeleted
     end
 
     case params[:order]

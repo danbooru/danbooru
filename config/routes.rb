@@ -265,6 +265,9 @@ Rails.application.routes.draw do
     collection do
       get :batch, to: redirect(path: "/uploads/new")
     end
+    member do
+      post :undelete
+    end
     resources :upload_media_assets, only: [:show, :index], path: "assets"
   end
   resources :upload_media_assets, only: [:show, :index]

@@ -9,6 +9,7 @@
       <%= f.input :min_score, as: :hidden, input_html: { value: params.dig(:search, :min_score) } %>
 
       <%= f.input :order, collection: [%w[Newest id], %w[Oldest id_asc], %w[Random random]], include_blank: true, selected: params[:search][:order] %>
+      <%= f.input :show_deleted, collection: ["No", "Yes"], selected: params[:search][:show_deleted] %>
       <%= f.submit "Search" %>
     <% end %>
 
