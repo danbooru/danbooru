@@ -128,7 +128,10 @@ module Source
       end
 
       def http
-        super.headers(Referer: "https://www.bilibili.com")
+        super.headers(
+          Referer: parsed_url.page_url || parsed_referer&.page_url,
+          "User-Agent": "",
+        )
       end
 
       memoize def page
