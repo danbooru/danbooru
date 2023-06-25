@@ -747,6 +747,22 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @post.is_pending?)
       end
 
+      should "approve the original post when a duplicate upload is made by approver" do
+        media_asset = create(:media_asset)
+        post = create_post!(user: create(:user), media_asset: media_asset)
+        assert_equal(true, post.is_pending?)
+        create_post!(user: create(:approver_user), media_asset: media_asset)
+        assert_equal(false, post.reload.is_pending?)
+      end
+
+      should "not approve the original post when a duplicate upload for approval is made by approver" do
+        media_asset = create(:media_asset)
+        post = create_post!(user: create(:user), media_asset: media_asset)
+        assert_equal(true, post.is_pending?)
+        create_post!(user: create(:approver_user), media_asset: media_asset, is_pending: true)
+        assert_equal(true, post.reload.is_pending?)
+      end
+
       should "create a commentary record if the commentary is present" do
         assert_difference("ArtistCommentary.count", 1) do
           @post = create_post!(

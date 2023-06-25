@@ -84,6 +84,12 @@ class PostsController < ApplicationController
     elsif @post.errors.of_kind?(:md5, :taken)
       @original_post = Post.find_by!(md5: @post.md5)
       @original_post.update(rating: @post.rating, parent_id: @post.parent_id, tag_string: "#{@original_post.tag_string} #{@post.tag_string}")
+      
+      if CurrentUser.user.is_approver? && !@original_post.is_active? && @post.is_active?
+        @approval = authorize @original_post.approvals.new(user: CurrentUser.user)
+        @approval.save
+      end
+      
       flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
       redirect_to @original_post
     else
