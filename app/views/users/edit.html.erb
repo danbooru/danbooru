@@ -44,7 +44,7 @@
             <%= f.input :time_zone, include_blank: false, hint: "The timezone to use for timestamps." %>
             <%= f.input :comment_threshold, hint: "Comments at or below this score will be hidden by default.", input_html: { min: -100, max: 5 } %>
             <%= f.input :show_niche_posts, include_blank: false, collection: [["Yes", "true"], ["No", "false"]], hint: "Display posts containing contentious content." %>
-            <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => { :data => {:autocomplete => "tag-query"}} %>
+            <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, input_html: { data: {autocomplete: "tag-query"}} %>
           </fieldset>
         <% end %>
 
@@ -58,17 +58,21 @@
               </p>
             </div>
 
-            <%= f.input :new_post_navigation_layout, :as => :select, :label => "Navigation bar position", :include_blank => false, :collection => [["Below", "true"], ["Above", "false"]], :hint => "When browsing pools or posts, place navigation links above or below the image" %>
+            <%= f.input :new_post_navigation_layout, as: :select, label: "Navigation bar position", include_blank: false, collection: [["Below", "true"], ["Above", "false"]], hint: "When browsing pools or posts, place navigation links above or below the image" %>
             <%= f.input :show_deleted_posts, as: :select, hint: "Show deleted posts in searches", collection: [["No", "false"], ["Yes", "true"]], include_blank: false %>
-            <%= f.input :show_deleted_children, :as => :select, :label => "Show deleted children", :hint => "Show thumbnail borders on parent posts even if the children are deleted", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
-            <%= f.input :disable_categorized_saved_searches, :hint => "Don't show dialog box when creating a new saved search", :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-            <%= f.input :disable_tagged_filenames, :as => :select, :hint => "Don't include tags in image filenames", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-            <%= f.input :disable_mobile_gestures, :as => :select, :hint => "Disable swipe left / swipe right gestures on mobile", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-            <%= f.input :disable_post_tooltips, :as => :select, :hint => "Disable advanced tooltips when hovering over thumbnails", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-            <%= f.input :enable_desktop_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Use the desktop layout on mobile" %>
+            <%= f.input :show_deleted_children, as: :select, label: "Show deleted children", hint: "Show thumbnail borders on parent posts even if the children are deleted", include_blank: false, collection: [["Yes", "true"], ["No", "false"]] %>
+            <%= f.input :disable_categorized_saved_searches, hint: "Don't show dialog box when creating a new saved search", as: :select, collection: [["No", "false"], ["Yes", "true"]], include_blank: false %>
+            <%= f.input :disable_tagged_filenames, as: :select, hint: "Don't include tags in image filenames", collection: [["No", "false"], ["Yes", "true"]], include_blank: false %>
+            <%= f.input :disable_mobile_gestures, as: :select, hint: "Disable swipe left / swipe right gestures on mobile", collection: [["No", "false"], ["Yes", "true"]], include_blank: false %>
+            <%= f.input :disable_post_tooltips, as: :select, hint: "Disable advanced tooltips when hovering over thumbnails", collection: [["No", "false"], ["Yes", "true"]], include_blank: false %>
+            <%= f.input :enable_desktop_mode, as: :select, collection: [["No", "false"], ["Yes", "true"]], include_blank: false, hint: "Use the desktop layout on mobile" %>
 
-            <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :data => { :autocomplete => "tag-query" } } %>
-            <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site." %>
+            <% if CurrentUser.is_gold? %>
+              <%= f.input :add_extra_data_attributes, as: :select, collection: [["No", "false"], ["Yes", "true"]], include_blank: false, hint: "Include extra data attributess in post previews. May cause slower loading time" %>
+            <% end %>
+
+            <%= f.input :favorite_tags, label: "Frequent tags", hint: "A list of tags that you use often. They will appear when using the list of Related Tags.", input_html: { data: { autocomplete: "tag-query" } } %>
+            <%= f.input :custom_style, label: "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, hint: "CSS rules to apply to the whole site." %>
           </fieldset>
         <% end %>
       <% end) %>

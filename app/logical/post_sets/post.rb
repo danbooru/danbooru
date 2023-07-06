@@ -12,11 +12,12 @@ module PostSets
     MAX_SIDEBAR_TAGS = 25
     MAX_WILDCARD_TAGS = PostQueryBuilder::MAX_WILDCARD_TAGS
 
-    attr_reader :current_user, :page, :format, :tag_string, :post_query, :normalized_query, :show_votes
+    attr_reader :current_user, :page, :format, :tag_string, :post_query, :normalized_query, :show_votes, :add_extra_data_attributes
     delegate :tag, to: :post_query
     alias_method :show_votes?, :show_votes
+    alias_method :add_extra_data_attributes?, :add_extra_data_attributes
 
-    def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, format: "html", show_votes: false)
+    def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, format: "html", show_votes: false, add_extra_data_attributes: false)
       @current_user = user
       @post_query = PostQuery.normalize(tags, current_user: user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?)
       @normalized_query = post_query.with_implicit_metatags
@@ -25,6 +26,7 @@ module PostSets
       @per_page = per_page
       @format = format.to_s
       @show_votes = show_votes
+      @add_extra_data_attributes = add_extra_data_attributes
     end
 
     # The title of the page for the <title> tag.
@@ -120,11 +122,7 @@ module PostSets
     end
 
     def hide_from_crawler?
-      return true if current_page > 50
-      return true if show_votes?
-      return true if artist.present? && artist.is_banned?
-      return false if post_query.is_empty_search? || post_query.is_simple_tag? || post_query.is_metatag?(:order, :rank)
-      true
+      !(post_query.is_empty_search? || post_query.is_simple_tag? || post_query.is_metatag?(:order, :rank))
     end
 
     def current_page
@@ -155,11 +153,11 @@ module PostSets
     end
 
     def includes
-      if show_votes?
-        [:media_asset, :vote_by_current_user]
-      else
-        [:media_asset]
-      end
+      arr = [:media_asset]
+      arr << :vote_by_current_user if show_votes?
+      arr << :favorite_by_current_user if add_extra_data_attributes?
+
+      arr
     end
 
     concerning :TagListMethods do

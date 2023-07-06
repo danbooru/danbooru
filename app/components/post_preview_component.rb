@@ -10,7 +10,7 @@ class PostPreviewComponent < ApplicationComponent
   with_collection_parameter :post
   renders_one :footer
 
-  attr_reader :post, :tags, :size, :classes, :show_deleted, :link_target, :pool, :recommended, :show_votes, :fit, :save_data, :current_user, :options
+  attr_reader :post, :tags, :size, :classes, :show_deleted, :link_target, :pool, :recommended, :show_votes, :add_extra_data_attributes, :fit, :save_data, :current_user, :options
 
   delegate :external_link_to, :time_ago_in_words_tagged, :duration_to_hhmmss, :render_post_votes, :empty_heart_icon, :sound_icon, to: :helpers
   delegate :image_width, :image_height, :file_ext, :file_size, :duration, :is_animated?, to: :media_asset
@@ -45,6 +45,7 @@ class PostPreviewComponent < ApplicationComponent
     @fit = fit
     @save_data = save_data
     @current_user = current_user
+    @add_extra_data_attributes = current_user.add_extra_data_attributes
     @options = options
   end
 
@@ -99,6 +100,7 @@ class PostPreviewComponent < ApplicationComponent
       "data-flags" => post.status_flags,
       "data-score" => post.score,
       "data-uploader-id" => post.uploader_id,
+      "data-is-favorited" => (post.favorited_by_current_user? if add_extra_data_attributes)
     }
   end
 

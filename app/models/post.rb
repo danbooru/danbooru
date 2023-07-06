@@ -61,6 +61,7 @@ class Post < ApplicationRecord
   has_one :media_metadata, through: :media_asset
   has_one :artist_commentary, :dependent => :destroy
   has_one :vote_by_current_user, -> { active.where(user_id: CurrentUser.id) }, class_name: "PostVote" # XXX using current user here is wrong
+  has_one :favorite_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "Favorite"
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
@@ -673,6 +674,11 @@ class Post < ApplicationRecord
     def favorited_by?(user)
       return false if user.is_anonymous?
       Favorite.exists?(post: self, user: user)
+    end
+
+    def favorited_by_current_user?
+      return false if CurrentUser.is_anonymous?
+      favorite_by_current_user.present?
     end
 
     def favorite_groups

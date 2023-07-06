@@ -155,7 +155,8 @@ class PostsController < ApplicationController
     @post_set ||= begin
       tag_query = params[:tags] || params.dig(:post, :tags)
       show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
-      PostSets::Post.new(tag_query, params[:page], params[:limit], format: request.format.symbol, show_votes: show_votes)
+      add_extra_data_attributes = CurrentUser.add_extra_data_attributes
+      PostSets::Post.new(tag_query, params[:page], params[:limit], format: request.format.symbol, show_votes: show_votes, add_extra_data_attributes: add_extra_data_attributes)
     end
   end
 

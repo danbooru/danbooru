@@ -49,7 +49,7 @@ class User < ApplicationRecord
     disable_post_tooltips
     _unused_enable_recommended_posts
     _unused_opt_out_tracking
-    _unused_no_flagging
+    add_extra_data_attributes
     show_niche_posts
     requires_verification
     is_verified
@@ -102,7 +102,8 @@ class User < ApplicationRecord
   validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE) }
   validates :password, confirmation: true
   validates :comment_threshold, inclusion: { in: (-100..5) }
-  validate  :validate_custom_css, if: :custom_style_changed?
+  validate :validate_custom_css, if: :custom_style_changed?
+  validate :validate_add_extra_data_attributes, unless: :new_record?
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_owner_if_first_user
 
@@ -194,6 +195,12 @@ class User < ApplicationRecord
   end
 
   concerning :ValidationMethods do
+    def validate_add_extra_data_attributes
+      if !add_extra_data_attributes_was && add_extra_data_attributes_was && !Pundit.policy!(self, self).add_extra_data_attributes?
+        errors.add(:base, "Can't enable extra data attributes without a Gold account")
+      end
+    end
+
     def name_errors
       UserNameValidator.new(attributes: [:name], skip_uniqueness: true).validate(self)
       errors
@@ -501,6 +508,10 @@ class User < ApplicationRecord
 
     def statement_timeout
       User.statement_timeout(level)
+    end
+
+    def show_ads?
+      !CurrentUser.safe_mode? && !is_gold?
     end
   end
 

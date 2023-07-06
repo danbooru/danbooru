@@ -33,6 +33,10 @@ class UserPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def add_extra_data_attributes?
+    user.is_gold?
+  end
+
   def permitted_attributes_for_create
     [:name, :password, :password_confirmation, { email_address_attributes: [:address] }]
   end
@@ -46,7 +50,7 @@ class UserPolicy < ApplicationPolicy
       disable_categorized_saved_searches disable_tagged_filenames
       disable_mobile_gestures enable_safe_mode
       enable_desktop_mode disable_post_tooltips
-      show_niche_posts
+      show_niche_posts add_extra_data_attributes
     ].compact
   end
 
