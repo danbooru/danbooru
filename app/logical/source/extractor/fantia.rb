@@ -149,7 +149,10 @@ class Source::Extractor
       return {} unless work_type == "post" && csrf_token.present?
       api_url = "https://fantia.jp/api/v1/posts/#{work_id}"
 
-      http.cache(1.minute).headers("X-CSRF-Token": csrf_token).parsed_get(api_url) || {}
+      http.cache(1.minute).headers(
+        "X-CSRF-Token": csrf_token,
+        "X-Requested-With": "XMLHttpRequest",
+      ).parsed_get(api_url) || {}
     end
 
     memoize def html_response
