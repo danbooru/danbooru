@@ -53,6 +53,7 @@ module Source
           ".posts .photo .text",
           "#post .description",
           ".m-post .cont .text",
+          ".cnwrapper > p:nth-child(2)",
         ].join(", ")
 
         page&.search(commentary_selectors).to_a.compact.first&.to_html
