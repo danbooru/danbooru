@@ -68,6 +68,19 @@ module Sources
       )
     end
 
+    context "A lofter post with commentary under <.cnwrapper p:nth-child(2)>" do
+      strategy_should_work(
+        "https://sdz013.lofter.com/post/1ec04eca_1ccabb5df",
+        image_urls: [
+          "https://imglf5.lf127.net/img/b57d91d0e107e2e6/Sytua1gwSUwyV1k3SXZxY3FiVGJvVW82Ny90bVVOeElEUmZ3bXFrbGlnST0.png",
+          "https://imglf4.lf127.net/img/067bd19dd731b52f/Sytua1gwSUwyV1k3SXZxY3FiVGJvZWVFS25EUWVGR1FseCtkTHBFS2xzaz0.png",
+          "https://imglf4.lf127.net/img/323e0e53fec354b8/Sytua1gwSUwyV1k3SXZxY3FiVGJvWWh2MjZSUHdvM3JNWndUS0pSSS9Gdz0.png",
+          "https://imglf3.lf127.net/img/304d83b42234fa53/Sytua1gwSUwyV1k3SXZxY3FiVGJvY2xNK3FDQ2lTaDBOdU1lenhtNDJLaz0.png",
+        ],
+        dtext_artist_commentary_desc: "本来是给外国朋友但是我销号了所以存下()",
+      )
+    end
+
     context "A lofter post with commentary under <.ct .txtcont>" do
       strategy_should_work(
         "https://okitagumi.lofter.com/post/1e69aeeb_fbb63ca",
