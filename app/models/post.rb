@@ -1331,7 +1331,7 @@ class Post < ApplicationRecord
         when "pools"
           where(id: Pool.undeleted.select("unnest(post_ids)"))
         when "metadata"
-          where(AIMetadata.where("ai_metadata.post_id = posts.id").arel.exists)
+          where(AIMetadata.nonblank.where("ai_metadata.post_id = posts.id").arel.exists)
         when "prompt"
           where(AIMetadata.where("ai_metadata.post_id = posts.id and prompt != ''").arel.exists)
         when "seed"

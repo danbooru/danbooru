@@ -16,6 +16,10 @@ class AIMetadata < ApplicationRecord
 
   versionable :prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash, :post_id
 
+  scope :nonblank, -> {
+    where("prompt != '' or negative_prompt != '' or sampler != '' or seed is not null or steps is not null or cfg_scale is not null or model_hash != ''")
+  }
+
   def self.search(params, current_user)
     q = search_attributes(params, [:id, :post, :prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash, :created_at, :updated_at], current_user: current_user)
 
