@@ -5,8 +5,12 @@ class AIMetadataPolicy < ApplicationPolicy
     unbanned?
   end
 
+  def undo?
+    create_or_update?
+  end
+
   def revert?
-    unbanned?
+    create_or_update?
   end
 
   def permitted_attributes

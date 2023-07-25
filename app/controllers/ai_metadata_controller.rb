@@ -25,10 +25,17 @@ class AIMetadataController < ApplicationController
     respond_with(@ai_metadata)
   end
 
-  def revert
-    @ai_metadata = authorize AIMetadata.find_by_post_id!(params[:id])
+  def undo
+    @ai_metadata = authorize AIMetadata.find_by_post_id!(params[:post_id])
     @version = @ai_metadata.versions.find(params[:version_id])
-    @ai_metadata.revert_to!(@version)
+    @version.undo!(CurrentUser.user)
+    respond_with(@ai_metadata)
+  end
+
+  def revert
+    @ai_metadata = authorize AIMetadata.find_by_post_id!(params[:post_id])
+    @version = @ai_metadata.versions.find(params[:version_id])
+    @version.revert_to!(CurrentUser.user)
     respond_with(@ai_metadata)
   end
 end

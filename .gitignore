@@ -21,3 +21,7 @@ public/packs/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+apply
+*.patch
+.irb_history

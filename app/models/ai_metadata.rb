@@ -14,6 +14,7 @@ class AIMetadata < ApplicationRecord
   validates :post_id, uniqueness: true
   belongs_to :post
 
+  # XXX post_id shouldn't be versionable but it needs to be set in new versions due to foreign key.
   versionable :prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash, :post_id
 
   scope :nonblank, -> {

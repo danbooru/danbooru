@@ -83,11 +83,11 @@ module VersionFor
     updated_at > created_at
   end
 
-  # Return a hash of changes made by this edit (compared to the previous version, or to another version).
+  # Return an array of changes made by this edit (compared to the previous version, or to another version).
   #
-  # The hash looks like `{ attr => [old_value, new_value] }`.
+  # The array looks like `[attr, old_value, new_value]`.
   def diff(version = previous_version)
-    versioned_columns.map { |attr| [attr, [version&.send(attr), send(attr)]] }.to_h
+    versioned_columns.map { |attr| [attr, version&.send(attr), send(attr)] }
   end
 
   # Revert the model back to this version.
