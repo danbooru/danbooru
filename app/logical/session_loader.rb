@@ -9,13 +9,14 @@
 class SessionLoader
   class AuthenticationFailure < StandardError; end
 
-  attr_reader :session, :request, :params
+  attr_reader :session, :request, :ip_address, :params
 
   # Initialize the session loader.
   # @param request the HTTP request
   def initialize(request)
     @request = request
     @session = request.session
+    @ip_address = Danbooru::IpAddress.new(request.remote_ip)
     @params = request.query_parameters
   end
 
@@ -28,6 +29,12 @@ class SessionLoader
     user = User.find_by_name(name)
 
     if user.present? && user.authenticate_password(password)
+      # Don't allow logins to privileged accounts from proxies, even if the password is correct
+      if user.is_approver? && ip_address.is_proxy?
+        UserEvent.create_from_request!(user, :failed_login, request)
+        return nil
+      end
+
       session[:user_id] = user.id
       session[:last_authenticated_at] = Time.now.utc.to_s
 
