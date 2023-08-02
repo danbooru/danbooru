@@ -50,7 +50,7 @@
 
         <% t.panel("Advanced") do %>
           <fieldset id="advanced-settings-section">
-            <div class="input">
+            <div class="input" hidden>
               <label>Account</label>
               <p>
                 <%= link_to "Deactivate account", deactivate_user_path(@user), id: "delete-account" %>
