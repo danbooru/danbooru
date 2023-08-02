@@ -2,7 +2,7 @@
 
 class PostDisapprovalPolicy < ApplicationPolicy
   def create?
-    user.is_approver?
+    user.is_approver? && unbanned?
   end
 
   def can_view_creator?
