@@ -29,8 +29,8 @@ class SessionLoader
     user = User.find_by_name(name)
 
     if user.present? && user.authenticate_password(password)
-      # Don't allow logins to privileged accounts from proxies, even if the password is correct
-      if user.is_approver? && ip_address.is_proxy?
+      # Don't allow logins to privileged or inactive accounts from proxies, even if the password is correct
+      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy?
         UserEvent.create_from_request!(user, :failed_login, request)
         return nil
       end
