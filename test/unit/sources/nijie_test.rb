@@ -147,7 +147,7 @@ module Sources
         desc = <<-EOS.strip_heredoc.chomp
           foo [b]bold[/b] [i]italics[/i] [s]strike[/s] red
 
-          <http://nijie.info/view.php?id=218944>
+          "http://nijie.info/view.php?id=218944":[https://nijie.info/view.php?id=218944]
         EOS
 
         assert_equal(desc, @site.dtext_artist_commentary_desc)
