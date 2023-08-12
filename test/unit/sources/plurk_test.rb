@@ -7,7 +7,7 @@ module Sources
         "https://www.plurk.com/p/om6zv4",
         image_urls: ["https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg"],
         media_files: [{ file_size: 627_697 }],
-        artist_name: "紅眼兔@姑且是個畫圖的",
+        artist_name: "紅眼兔@不務正業",
         tag_name: "redeyehare",
         profile_url: "https://www.plurk.com/redeyehare",
         dtext_artist_commentary_desc: "Trick or Treat!\n很久沒畫萬聖賀圖了，畫一波大的  感覺持續復健中"

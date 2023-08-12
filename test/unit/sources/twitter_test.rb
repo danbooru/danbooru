@@ -166,7 +166,7 @@ module Sources
         profile_urls: ["https://twitter.com/shoka_bg", "https://twitter.com/intent/user?user_id=1109709388049051649"],
         tag_name: "shoka_bg",
         tags: %w[ブルアカ],
-        artist_name: "shooka",
+        artist_name: "shooka@土曜日 西 “む” 34a",
         dtext_artist_commentary_desc: <<~EOS.chomp
           風紀委員の実態
           "#ブルアカ":[https://twitter.com/hashtag/ブルアカ]
@@ -314,9 +314,9 @@ module Sources
 
     context "A profile banner image" do
       strategy_should_work(
-        "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696",
-        image_urls: ["https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/1500x500"],
-        media_files: [{ file_size: 128_141 }],
+        "https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500",
+        image_urls: ["https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500"],
+        media_files: [{ file_size: 108_605 }],
         profile_url: nil
         # profile_url: "https://twitter.com/intent/user?user_id=780804311529906176"
         # XXX we COULD fully support these by setting the page_url to https://twitter.com/Kekeflipnote/header_photo, but it's a lot of work for a niche case
@@ -325,9 +325,9 @@ module Sources
 
     context "A profile banner image sample" do
       strategy_should_work(
-        "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/600x200",
-        image_urls: ["https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/1500x500"],
-        media_files: [{ file_size: 128_141 }],
+        "https://pbs.twimg.com/profile_banners/16298441/1394248006/600x200",
+        image_urls: ["https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500"],
+        media_files: [{ file_size: 108_605 }],
         profile_url: nil
       )
     end
