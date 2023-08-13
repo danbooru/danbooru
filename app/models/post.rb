@@ -1705,8 +1705,10 @@ class Post < ApplicationRecord
       return unless web_source?
 
       site = Source::Extractor::Pixiv.new(source)
-      if site.match?
+      if site.match? && site.illust_id.present?
         self.pixiv_id = site.illust_id
+        # XXX does not extract illust id from unlisted posts, because that requires an api call
+        # e.g.: https://www.pixiv.net/en/artworks/unlisted/ntQchboUi1CsqMhDpo5j => https://www.pixiv.net/artworks/90237981
       end
     end
   end

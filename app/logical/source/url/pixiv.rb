@@ -2,7 +2,7 @@
 
 module Source
   class URL::Pixiv < Source::URL
-    attr_reader :work_id, :image_type, :page, :username, :user_id
+    attr_reader :work_id, :unlisted_work_id, :unlisted_base62_id, :unlisted_hex_id, :image_type, :page, :username, :user_id
 
     def self.match?(url)
       return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url) || Source::URL::Booth.match?(url)
@@ -22,6 +22,8 @@ module Source
       # https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png
       # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg
       # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_s.png
+      # https://i.pximg.net/img-original/img/2022/06/13/23/41/56/99036538-4d41e66dfe45fbcf66366490bf8ace02_p0.jpg (unlisted, https://www.pixiv.net/en/artworks/unlisted/od9Zu9IgJMjTxLp1bLbo)
+      # https://i.pximg.net/img-master/img/2022/06/13/23/41/56/99036538-4d41e66dfe45fbcf66366490bf8ace02_p0_master1200.jpg (unlisted, same as above)
       #
       # but not:
       #
@@ -45,6 +47,11 @@ module Source
       # http://www.pixiv.net/i/18557054
       in _, "pixiv.net", "i", work_id
         @work_id = work_id
+
+      # https://www.pixiv.net/en/artworks/unlisted/od9Zu9IgJMjTxLp1bLbo (https://www.pixiv.net/en/artworks/99036538)
+      # https://www.pixiv.net/artworks/unlisted/ntQchboUi1CsqMhDpo5j
+      in _, "pixiv.net", *, "artworks", "unlisted", unlisted_base62_id
+        @unlisted_base62_id = unlisted_base62_id
 
       # http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
@@ -114,6 +121,12 @@ module Source
       in /^\d+$/ => work_id, *rest
         @work_id = work_id
 
+      # https://i.pximg.net/img-original/img/2022/06/13/23/41/56/99036538-4d41e66dfe45fbcf66366490bf8ace02_p0.jpg (unlisted)
+      in /^(\d+)-(\w+)$/, /^p\d+$/ => page, *rest
+        @unlisted_work_id = $1 # mostly useless to us, api and html for this ID return 404
+        @unlisted_hex_id = $2
+        @page = page.delete_prefix("p").to_i
+
       else
         nil
       end
@@ -136,7 +149,11 @@ module Source
     end
 
     def page_url
-      "https://www.pixiv.net/artworks/#{work_id}" if work_id.present?
+      if work_id.present?
+        "https://www.pixiv.net/artworks/#{work_id}"
+      elsif unlisted_base62_id.present?
+        "https://www.pixiv.net/artworks/unlisted/#{unlisted_base62_id}"
+      end
     end
 
     def profile_url

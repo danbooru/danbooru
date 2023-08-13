@@ -370,7 +370,8 @@ class PixivAjaxClient
 
   # Return the illust data for a Pixiv illustration.
   # @see https://www.pixiv.net/ajax/illust/87598468
-  # @param illust_id [Integer] the Pixiv illustration id
+  # @see https://www.pixiv.net/ajax/illust/unlisted/ntQchboUi1CsqMhDpo5j
+  # @param illust_id [Integer, String] the Pixiv illustration id or "unlisted/`<unlisted base62 id>`"
   # @return [Hash] the illustration data
   def illust(illust_id)
     get("https://www.pixiv.net/ajax/illust/#{illust_id}").with_indifferent_access
@@ -378,7 +379,8 @@ class PixivAjaxClient
 
   # Return the data for a Pixiv manga illust with multiple pages.
   # @see https://www.pixiv.net/ajax/illust/87598468/pages
-  # @param illust_id [Integer] the Pixiv illustration id
+  # @see https://www.pixiv.net/ajax/illust/unlisted/ntQchboUi1CsqMhDpo5j/pages
+  # @param illust_id [Integer, String] the Pixiv illustration id or "unlisted/`<unlisted base62 id>`"
   # @return [Hash] the illustration data
   def pages(illust_id)
     get("https://www.pixiv.net/ajax/illust/#{illust_id}/pages")
@@ -386,7 +388,8 @@ class PixivAjaxClient
 
   # Return the data for a Pixiv ugoira.
   # @see https://www.pixiv.net/ajax/illust/74932152/ugoira_meta
-  # @param illust_id [Integer] the Pixiv illustration id
+  # @see https://www.pixiv.net/ajax/illust/unlisted/ntQchboUi1CsqMhDpo5j/ugoira_meta
+  # @param illust_id [Integer, String] the Pixiv illustration id or "unlisted/`<unlisted base62 id>`"
   # @return [Hash] the ugoira data
   def ugoira_meta(illust_id)
     get("https://www.pixiv.net/ajax/illust/#{illust_id}/ugoira_meta").with_indifferent_access
