@@ -177,7 +177,7 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     should "generate a thumbnail with the correct colors for a CMYK image with no color profile" do
-      assert_equal("4c9515d85842a291f6512c93458dd7b8", MediaFile.open("test/files/test-cmyk-no-profile.jpg").preview(180, 180).pixel_hash)
+      assert_equal("7577481a2a688e6e5e9ec901addcf0e3", MediaFile.open("test/files/test-cmyk-no-profile.jpg").preview(180, 180).pixel_hash)
     end
   end
 
@@ -217,8 +217,9 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "work for normal images" do
       assert_equal("01cb481ec7730b7cfced57ffa5abd196", MediaFile.pixel_hash("test/files/test.jpg"))
-      assert_equal("dfcdf4d8e525ffd7057f103384126cf0", MediaFile.pixel_hash("test/files/test-cmyk-no-profile.jpg"))
+      assert_equal("69e64bd6e054757ac6ec67d1da3ad4fc", MediaFile.pixel_hash("test/files/test-cmyk-no-profile.jpg"))
       assert_equal("85e9fde0ba6cc7d4fedf24c71bb6277b", MediaFile.pixel_hash("test/files/test-grey-no-profile.jpg"))
+      assert_equal("4d13f4b20edc9b238f760970105c6ce6", MediaFile.pixel_hash("test/files/test-grey-bad-profile.jpg"))
       assert_equal("7bc62a583c0eb07de4fb7fa0dc9e0851", MediaFile.pixel_hash("test/files/test-rotation-90cw.jpg"))
       assert_equal("510aa465afbba3d7d818038b7aa7bb6f", MediaFile.pixel_hash("test/files/test-rotation-180.jpg"))
       assert_equal("ac0220aea5683e3c4ffcb2c7b34078e8", MediaFile.pixel_hash("test/files/test-rotation-270cw.jpg"))
