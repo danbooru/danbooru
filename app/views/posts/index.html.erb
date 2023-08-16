@@ -130,6 +130,8 @@
             <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</p>
           <% end %>
 
+          <%= render_tag_change_notice(tag: wiki_page.tag, current_user: CurrentUser.user) %>
+
           <p class="mt-4">
             <%= link_to_wiki "View wiki", wiki_page.title, id: "view-wiki-link" %>
           </p>
@@ -167,6 +169,8 @@
       <% if @post_set.tag&.is_deprecated? %>
         <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</p>
       <% end %>
+
+      <%= render_tag_change_notice(tag: @post_set.tag, current_user: CurrentUser.user) %>
     <% end %>
   </div>
 
