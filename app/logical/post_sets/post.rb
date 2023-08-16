@@ -133,11 +133,6 @@ module PostSets
       posts.reject(&:is_deleted).select(&:visible?).max_by { |post| [-post.rating_id, post.score] }
     end
 
-    def pending_bulk_update_requests
-      return BulkUpdateRequest.none unless tag.present?
-      @pending_bulk_update_requests ||= BulkUpdateRequest.pending.where_array_includes_any(:tags, tag.name)
-    end
-
     def show_deleted?
       current_user.show_deleted_posts? || has_status_metatag?
     end
