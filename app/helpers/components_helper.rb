@@ -84,6 +84,10 @@ module ComponentsHelper
     # Swallow any exceptions when loading records so that the page load doesn't fail.
   end
 
+  def render_tag_change_notice(tag:, current_user:)
+    render TagChangeNoticeComponent.new(tag: tag, current_user: current_user)
+  end
+
   def numbered_paginator(records)
     if records.paginator_mode == :numbered
       render NumberedPaginatorComponent.new(records: records, params: params)
