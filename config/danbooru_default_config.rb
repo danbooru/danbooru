@@ -45,14 +45,14 @@ module Danbooru
     # The name of this Danbooru.
     def app_name
       if CurrentUser.safe_mode?
-        "Safebooru"
+        "Solidbooru"
       else
-        "Danbooru"
+        "Solidbooru"
       end
     end
 
     def canonical_app_name
-      "Danbooru"
+      "Solidbooru"
     end
 
     # The public domain name of your site, e.g. "danbooru.donmai.us". If your
@@ -78,7 +78,7 @@ module Danbooru
 
     # A list of alternate hostnames where safe mode will automatically be enabled.
     def safe_mode_hostnames
-      ["safebooru.donmai.us"]
+      ["solidbooru.online"]
     end
 
     # The URL of your site, e.g. https://danbooru.donmai.us.
@@ -201,7 +201,7 @@ module Danbooru
     # Disable this if you're running a public booru and you don't want email
     # verification for new accounts.
     def new_user_verification?
-      true
+      false
     end
 
     # An array of regexes containing disallowed usernames.
@@ -368,7 +368,7 @@ module Danbooru
 
     # Tags that are not visible in safe mode.
     def safe_mode_restricted_tags
-      []
+      ["breasts", "huge_breasts", "large_breasts", "ass", "cleavage", "underwear"]
     end
 
     # If present, the 404 page will show a random post from this pool.
@@ -499,7 +499,7 @@ module Danbooru
 
     # Whether to enable API rate limits.
     def rate_limits_enabled?
-      true
+      false
     end
 
     # Whether to enable comments.
@@ -659,8 +659,8 @@ module Danbooru
     # to enable a fake server for development purposes, or do
     # `docker run --rm -p 5000:5000 ghcr.io/danbooru/autotagger` to run a real server.
     def autotagger_url
-      # "http://localhost:3000/mock/autotagger"
-      # "http://localhost:5000"
+      "https://autotagger.donmai.us"
+      # "http://116.203.249.43:5000"
     end
 
     def aws_credentials
