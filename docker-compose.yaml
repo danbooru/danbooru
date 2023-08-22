@@ -24,7 +24,7 @@ name: solidbooru
 x-base-template: &base-template
   user: root
   # pull_policy: always # Uncomment this to always pull the latest image when deploying.
-  image: ghcr.io/danbooru/danbooru:master # you can change this to danbooru:master to get the latest upstream changes
+  image: ghcr.io/kille250/danbooru:production # you can change this to danbooru:master to get the latest upstream changes
   environment:
     RAILS_ENV: production # Set this to development to force danbooru to freshly compile js/css assets (for example if you're doing local development)
     RAILS_SERVE_STATIC_FILES: true
@@ -37,11 +37,12 @@ x-base-template: &base-template
     # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
     # DANBOORU_HOSTNAME: danbooru.mydomain.com
   volumes:
-    - "/root/danbooru/aws:/danbooru/public/data"
+    - "danbooru-images:/danbooru/public/data"
+    # - "$HOME/danbooru/aws:/danbooru/public/data"
     # # If you want to do local development you can uncomment these lines to force the container to use your local changes
     # # Simply replace $HOME/danbooru to where you cloned the repo
     # - "$HOME/danbooru/app:/danbooru/app"
-    - "$HOME/danbooru/config:/danbooru/config"
+    # - "$HOME/danbooru/config:/danbooru/config"
     # - "$HOME/danbooru/db:/danbooru/db"
     # - "$HOME/danbooru/test:/danbooru/test"
 
