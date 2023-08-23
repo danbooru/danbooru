@@ -69,7 +69,7 @@ Post.initialize_all = function() {
 Post.initialize_endlessscroll = function() {
   {
     //Stop if inside an iframe
-    if( window != window.top || scrollBuffer == 0 )
+    if( window != window.top || Post.scrollBuffer == 0 )
       return;
     
     //Stop if no "table"
