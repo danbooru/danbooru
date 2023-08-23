@@ -530,50 +530,8 @@ Post.initialize_recommended = function() {
   });
 };
 
-// Infinite Scrolling
-let page = 1;
-const observer = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-        page++;
-        loadMorePosts(page);
-    }
-}, {
-    threshold: 1.0
-});
-
-function loadMorePosts(page) {
-  return fetch(`/posts?page=${page}`)
-      .then(response => response.text())
-      .then(data => {
-          const postsContainer = document.querySelector('.posts-grid');
-          
-          // Überprüfen Sie, ob die Daten leer sind oder einen speziellen Marker für "keine weiteren Daten" enthalten
-          if (!data.trim() || data.includes('No posts found.')) {
-              observer.disconnect();  // Beenden Sie das Beobachten des Triggers, wenn es keine weiteren Posts gibt
-              return;
-          }
-          
-          postsContainer.innerHTML += data;
-          ensurePageIsFilled();  // Stellen Sie sicher, dass die Seite gefüllt ist
-      });
-}
-
-function ensurePageIsFilled() {
-  const postsContainer = document.querySelector('.posts-grid');
-  
-  // Überprüfen Sie, ob der untere Rand des postsContainer den unteren Rand des Fensters erreicht hat
-  if (postsContainer.getBoundingClientRect().bottom <= window.innerHeight) {
-      page++;
-      loadMorePosts(page);
-  }
-}
-
 $(document).ready(function() {
   Post.initialize_all();
-  ensurePageIsFilled();
-  if (document.querySelector('.load-more-trigger')) {
-    observer.observe(document.querySelector('.load-more-trigger'));
-  }
 });
 
 export default Post
