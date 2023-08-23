@@ -548,12 +548,28 @@ const observer = new IntersectionObserver((entries) => {
 });
 
 function loadMorePosts(page) {
-    fetch(`/posts?page=${page}`)
-        .then(response => response.text())
-        .then(data => {
-            const postsContainer = document.querySelector('.posts-grid');
-            postsContainer.innerHTML += data;
-        });
+  return fetch(`/posts?page=${page}`)
+      .then(response => response.text())
+      .then(data => {
+          const postsContainer = document.querySelector('.posts-grid');
+          postsContainer.innerHTML += data;
+          ensurePageIsFilled();  // Stellen Sie sicher, dass die Seite gefüllt ist
+      });
 }
+
+function ensurePageIsFilled() {
+  const postsContainer = document.querySelector('.posts-grid');
+  
+  // Überprüfen Sie, ob der untere Rand des postsContainer den unteren Rand des Fensters erreicht hat
+  if (postsContainer.getBoundingClientRect().bottom <= window.innerHeight) {
+      page++;
+      loadMorePosts(page);
+  }
+}
+
+// Dies aufrufen, sobald das Dokument geladen ist, um sicherzustellen, dass die Seite gefüllt ist
+$(document).ready(function() {
+  ensurePageIsFilled();
+});
 
 observer.observe(document.querySelector('.load-more-trigger'));
