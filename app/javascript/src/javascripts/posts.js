@@ -112,7 +112,7 @@ Post.initialize_endlessscroll = function() {
     Post.iframe.addEventListener("load", function(e){ setTimeout( Post.appendNewContent, 100 ); }, false);
       
     //Stop if empty page
-    if( /<p>(Nothing to display.|Nobody here but us chickens!)<.p>/.test(Post.mainTable.innerHTML) )
+    if( /<p>(Nothing to display.|No posts found.)<.p>/.test(Post.mainTable.innerHTML) )
       return;
 
     //Add copy of paginator to the top
