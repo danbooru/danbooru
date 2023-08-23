@@ -177,7 +177,7 @@ Post.getPaginator = function(source) {
 };
 
 Post.getNextPage = function(source) {
-	let page = Page.getPaginator(source);
+	let page = Post.getPaginator(source);
 	if( page )
 		page = new XPathEvaluator().evaluate(".//a[@alt='next' or @rel='next' or contains(text(),'>') or contains(text(),'Next')]", page, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     
