@@ -17,6 +17,17 @@ Post.HIGH_TAG_COUNT = 20;
 Post.EDIT_DIALOG_WIDTH = 640;
 Post.EDIT_DIALOG_MIN_HEIGHT = 320;
 
+// Variablen für das Endlos-Scrolling
+Post.pageBreak = false;
+Post.scrollBuffer = 600;
+Post.timeToFailure = 15000;
+Post.nextPage = null;
+Post.mainTable = null;
+Post.mainParent = null;
+Post.pending = false;
+Post.timeout = null;
+Post.iframe = null;
+
 Post.initialize_all = function() {
 
   if ($("#c-posts").length) {
@@ -28,6 +39,7 @@ Post.initialize_all = function() {
 
   // Bedingung ändern, um Gesten auf der Hauptseite und der Post-Seite zu initialisieren.
   if ($("#c-posts").length && (isMainPage || $("#a-show").length)) {
+    this.initialize_endlessscroll();
     this.initialize_excerpt();
     this.initialize_gestures();
     this.initialize_post_preview_size_menu();
@@ -53,6 +65,184 @@ Post.initialize_all = function() {
     Post.initialize_saved_searches();
   });
 }
+
+Post.initialize_endlessscroll = function() {
+  {
+    //Stop if inside an iframe
+    if( window != window.top || scrollBuffer == 0 )
+      return;
+    
+    //Stop if no "table"
+    Post.mainTable = this.getMainTable(document);
+    if( !Post.mainTable )
+      {
+          //console.log("UPW: No main table");
+      return;
+      }
+      
+    //Stop if no paginator
+    var paginator = this.getPaginator(document);
+    if( !paginator )
+      {
+          //console.log("UPW: No paginator found");
+      return;
+      }
+      
+    //Stop if no more pages
+    Post.nextPage = this.getNextPage(paginator);
+    if( !Post.nextPage )
+      return;
+    
+    //Hide the blacklist sidebar, since this script breaks the tag totals and post unhiding.
+    var sidebar = document.getElementById("blacklisted-sidebar");
+    if( sidebar )
+      sidebar.style.display = "none";
+
+    //Other important variables:
+    Post.scrollBuffer += window.innerHeight;
+    Post.mainParent = Post.mainTable.parentNode;
+    Post.pending = false;
+    
+    Post.iframe = document.createElement("iframe");
+    Post.iframe.width = iframe.height = 0;
+    Post.iframe.style.visibility = "hidden";
+    document.body.appendChild(Post.iframe);
+
+    //Slight delay so that Danbooru's initialize_edit_links() has time to hide all the edit boxes on the Comment index
+    Post.iframe.addEventListener("load", function(e){ setTimeout( Post.appendNewContent, 100 ); }, false);
+      
+    //Stop if empty page
+    if( /<p>(Nothing to display.|Nobody here but us chickens!)<.p>/.test(Post.mainTable.innerHTML) )
+      return;
+
+    //Add copy of paginator to the top
+    Post.mainParent.insertBefore( paginator.cloneNode(true), Post.mainParent.firstChild );
+
+    if( !Post.pageBreak )
+      paginator.style.display = "none";//Hide bottom paginator
+    else
+    {
+      //Reposition bottom paginator and add horizontal break
+      Post.mainTable.parentNode.insertBefore( document.createElement("hr"), Post.mainTable.nextSibling );
+      Post.mainTable.parentNode.insertBefore( paginator, Post.mainTable.nextSibling );
+    }
+    
+    //Listen for scroll events
+    window.addEventListener("scroll", Post.testScrollPosition, false);
+    this.testScrollPosition();
+  }
+}
+
+Post.getMainTable = function(source) {
+	var xpath =
+	[
+		 ".//div[contains(@class,'posts-container') or contains(@class,'media-assets-container')]"   // Danbooru (posts, ai_tags, uploads)
+		,".//div[@id='a-index']/table[not(contains(@class,'search'))]"	// Danbooru (/forum_topics, ...), take care that this doesn't catch comments containing tables
+		,".//div[@id='a-index']"						// Danbooru (/comments, ...)
+		
+		,".//table[contains(@class,'highlight')]"		// large number of pages
+		,".//div[contains(@id,'comment-list')]/div/.."	// comment index
+		,".//*[not(contains(@id,'popular'))]/span[contains(@class,'thumb')]/a/../.."	// post/index, pool/show, note/index
+		,".//li/div/a[contains(@class,'thumb')]/../../.."	// post/index, note/index
+		,".//div[@id='content']//table/tbody/tr[contains(@class,'even')]/../.."	// user/index, wiki/history
+		,".//div[@id='content']/div/table"				// 3dbooru user records
+		,".//div[@id='forum']"							// forum/show
+	];
+
+  for (var i = 0; i < xpath.length; i++) {
+      let evaluatorFunction = (function(query) {
+          return function(src) {
+              return new XPathEvaluator().evaluate(query, src, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+          };
+      })(xpath[i]);
+
+      var result = evaluatorFunction(source);
+      if (result) {
+          return result;
+      }
+  }
+
+  return null;
+};
+
+Post.getPaginator = function(source) {
+	var pager = new XPathEvaluator().evaluate("descendant-or-self::div[@id='paginator' or contains(@class,'paginator') or @id='paginater']", source, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+	
+	// Need clear:none to prevent the 2nd page from being pushed to below the sidebar on the Post index... but we don't want this when viewing a specific pool,
+	// because then the paginator is shoved to the right of the last images on a page.  Other sites have issues with clear:none as well, like //yande.re/post.
+	if( pager && location.host.indexOf("donmai.") >= 0 && document.getElementById("sidebar") )
+		pager.style.clear = "none";
+	
+	return pager;
+};
+
+Post.getNextPage = function(source) {
+	let page = Page.getPaginator(source);
+	if( page )
+		page = new XPathEvaluator().evaluate(".//a[@alt='next' or @rel='next' or contains(text(),'>') or contains(text(),'Next')]", page, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    
+	return( page && page.href );
+};
+
+Post.testScrollPosition = function() {
+	if( !nextPage )
+		this.testScrollPosition = function(){};
+	
+	//Take the max of the two heights for browser compatibility
+	else if( !Post.pending && window.pageYOffset + Post.scrollBuffer > Math.max( document.documentElement.scrollHeight, document.documentElement.offsetHeight ) )
+	{
+		Post.pending = true;
+		Post.timeout = setTimeout( function(){Post.pending=false;Post.testScrollPosition();}, Post.timeToFailure );
+		iframe.contentDocument.location.replace(Post.nextPage);
+	}
+};
+
+Post.appendNewContent = function() {
+	//Make sure page is correct.  Using 'indexOf' instead of '!=' because links like "https://danbooru.donmai.us/pools?page=2&search%5Border%5D=" become "https://danbooru.donmai.us/pools?page=2" in the iframe href.
+	clearTimeout(Post.timeout);
+	if( Post.nextPage.indexOf(iframe.contentDocument.location.href) < 0 )
+	{
+		setTimeout( function(){ Post.pending = false; }, 1000 );
+		return;
+	}
+    
+	//Copy content from retrived page to current page, but leave off certain headers, labels, etc...
+  var sourcePaginator = document.adoptNode( Post.getPaginator(iframe.contentDocument) );
+	var nextElem, deleteMe, source = document.adoptNode( Post.getMainTable(iframe.contentDocument) );
+	
+	if( /<p>(Nothing to display.|Nobody here but us chickens!)<.p>/.test(source.innerHTML) )
+		Post.nextPage = null;
+	else
+	{
+		Post.nextPage = Post.getNextPage(sourcePaginator);
+
+		if( Post.pageBreak )
+			Post.mainParent.appendChild(source);
+		else
+		{
+			//Hide elements separating one table from the next (h1 is used for user names on comment index)
+			var rems = source.querySelectorAll("h2, h3, h4, thead, tfood");
+			for( var i = 0; i < rems.length; i++ )
+				rems[i].style.display = "none";
+			
+			//Move contents of next table into current one
+			var fragment = document.createDocumentFragment();
+			while( (nextElem = source.firstChild) )
+				fragment.appendChild(nextElem);
+			Post.mainTable.appendChild(fragment);
+		}
+	}
+
+	//Add the paginator at the bottom if needed.
+	if( !Post.nextPage || Post.pageBreak )
+		Post.mainParent.appendChild( sourcePaginator );
+	if( Post.pageBreak && Post.nextPage )
+		Post.mainParent.appendChild( document.createElement("hr") );
+	
+	//Clear the pending request marker and check position again
+	Post.pending = false;
+	this.testScrollPosition();
+};
 
 Post.initialize_gestures = function() {
   console.log("initialize_gestures called");
