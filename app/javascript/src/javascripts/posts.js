@@ -185,7 +185,7 @@ Post.getNextPage = function(source) {
 };
 
 Post.testScrollPosition = function() {
-	if( !nextPage )
+	if( !Post.nextPage )
 		this.testScrollPosition = function(){};
 	
 	//Take the max of the two heights for browser compatibility
