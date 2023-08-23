@@ -104,7 +104,7 @@ Post.initialize_endlessscroll = function() {
     Post.pending = false;
     
     Post.iframe = document.createElement("iframe");
-    Post.iframe.width = iframe.height = 0;
+    Post.iframe.width = Post.iframe.height = 0;
     Post.iframe.style.visibility = "hidden";
     document.body.appendChild(Post.iframe);
 
@@ -193,22 +193,22 @@ Post.testScrollPosition = function() {
 	{
 		Post.pending = true;
 		Post.timeout = setTimeout( function(){Post.pending=false;Post.testScrollPosition();}, Post.timeToFailure );
-		iframe.contentDocument.location.replace(Post.nextPage);
+		Post.iframe.contentDocument.location.replace(Post.nextPage);
 	}
 };
 
 Post.appendNewContent = function() {
 	//Make sure page is correct.  Using 'indexOf' instead of '!=' because links like "https://danbooru.donmai.us/pools?page=2&search%5Border%5D=" become "https://danbooru.donmai.us/pools?page=2" in the iframe href.
 	clearTimeout(Post.timeout);
-	if( Post.nextPage.indexOf(iframe.contentDocument.location.href) < 0 )
+	if( Post.nextPage.indexOf(Post.iframe.contentDocument.location.href) < 0 )
 	{
 		setTimeout( function(){ Post.pending = false; }, 1000 );
 		return;
 	}
     
 	//Copy content from retrived page to current page, but leave off certain headers, labels, etc...
-  var sourcePaginator = document.adoptNode( Post.getPaginator(iframe.contentDocument) );
-	var nextElem, deleteMe, source = document.adoptNode( Post.getMainTable(iframe.contentDocument) );
+  var sourcePaginator = document.adoptNode( Post.getPaginator(Post.iframe.contentDocument) );
+	var nextElem, deleteMe, source = document.adoptNode( Post.getMainTable(Post.iframe.contentDocument) );
 	
 	if( /<p>(Nothing to display.|Nobody here but us chickens!)<.p>/.test(source.innerHTML) )
 		Post.nextPage = null;
