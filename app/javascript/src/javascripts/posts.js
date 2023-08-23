@@ -112,11 +112,9 @@ Post.initialize_endlessscroll = function() {
     Post.iframe.addEventListener("load", function(e){ setTimeout( Post.appendNewContent, 100 ); }, false);
     
     var content = Post.mainTable.innerHTML;
-    console.log(Post.mainTable.innerHTML);
-    var regex = /<div id="posts">[\s\S]*?<p>\s*No posts found\.\s*<\/p>[\s\S]*?<\/div>/;
     
     //Stop if empty page
-    if (regex.test(content)) {
+    if (!content) {
       return;
     }
 
