@@ -24,7 +24,7 @@ name: solidbooru
 x-base-template: &base-template
   user: root
   # pull_policy: always # Uncomment this to always pull the latest image when deploying.
-  image: ghcr.io/kille250/danbooru:production # you can change this to danbooru:master to get the latest upstream changes
+  image: ghcr.io/kille250/danbooru:master # you can change this to danbooru:master to get the latest upstream changes
   environment:
     RAILS_ENV: production # Set this to development to force danbooru to freshly compile js/css assets (for example if you're doing local development)
     RAILS_SERVE_STATIC_FILES: true
