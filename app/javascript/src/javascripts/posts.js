@@ -112,9 +112,10 @@ Post.initialize_endlessscroll = function() {
     Post.iframe.addEventListener("load", function(e){ setTimeout( Post.appendNewContent, 100 ); }, false);
     
     var content = Post.mainTable.innerHTML;
+    var regex = /<div id="posts">[\s\S]*?<p>\s*No posts found\.\s*<\/p>[\s\S]*?<\/div>/;
     
     //Stop if empty page
-    if (!content) {
+    if (regex.test(content)) {
       return;
     }
 
@@ -212,8 +213,11 @@ Post.appendNewContent = function() {
 	//Copy content from retrived page to current page, but leave off certain headers, labels, etc...
   var sourcePaginator = document.adoptNode( Post.getPaginator(Post.iframe.contentDocument) );
 	var nextElem, deleteMe, source = document.adoptNode( Post.getMainTable(Post.iframe.contentDocument) );
+
+  var content = source.innerHTML;
+  var regex = /<div id="posts">[\s\S]*?<p>\s*No posts found\.\s*<\/p>[\s\S]*?<\/div>/;
 	
-	if( /<p>(Nothing to display.|Nobody here but us chickens!)<.p>/.test(source.innerHTML) )
+	if( regex.test(content) )
 		Post.nextPage = null;
 	else
 	{
