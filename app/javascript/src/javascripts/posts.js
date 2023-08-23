@@ -241,7 +241,7 @@ Post.appendNewContent = function() {
 	
 	//Clear the pending request marker and check position again
 	Post.pending = false;
-	this.testScrollPosition();
+	Post.testScrollPosition();
 };
 
 Post.initialize_gestures = function() {
