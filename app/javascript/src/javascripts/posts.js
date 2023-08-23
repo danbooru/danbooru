@@ -535,3 +535,25 @@ $(document).ready(function() {
 });
 
 export default Post
+
+// Infinite Scrolling
+let page = 1;
+const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+        page++;
+        loadMorePosts(page);
+    }
+}, {
+    threshold: 1.0
+});
+
+function loadMorePosts(page) {
+    fetch(`/posts?page=${page}`)
+        .then(response => response.text())
+        .then(data => {
+            const postsContainer = document.querySelector('.posts-grid');
+            postsContainer.innerHTML += data;
+        });
+}
+
+observer.observe(document.querySelector('.load-more-trigger'));
