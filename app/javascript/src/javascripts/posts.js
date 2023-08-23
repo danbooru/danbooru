@@ -571,8 +571,9 @@ function ensurePageIsFilled() {
 $(document).ready(function() {
   Post.initialize_all();
   ensurePageIsFilled();
+  if (document.querySelector('.load-more-trigger')) {
+    observer.observe(document.querySelector('.load-more-trigger'));
+  }
 });
-
-observer.observe(document.querySelector('.load-more-trigger'));
 
 export default Post
