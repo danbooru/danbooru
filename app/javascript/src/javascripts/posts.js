@@ -23,7 +23,11 @@ Post.initialize_all = function() {
     this.initialize_saved_searches();
   }
 
-  if ($("#c-posts").length && $("#a-index").length) {
+  // Überprüfen, ob wir uns auf der Hauptseite oder auf der Post-Seite befinden.
+  let isMainPage = $("#a-index").length > 0;
+
+  // Bedingung ändern, um Gesten auf der Hauptseite und der Post-Seite zu initialisieren.
+  if ($("#c-posts").length && (isMainPage || $("#a-show").length)) {
     this.initialize_excerpt();
     this.initialize_gestures();
     this.initialize_post_preview_size_menu();
@@ -65,8 +69,12 @@ Post.initialize_gestures = function() {
     return;
   }
   $(".image-container").css({overflow: "visible"});
-  var hasPrev = $(".paginator a[rel~=prev]").length;
-  var hasNext = $(".paginator a[rel~=next]").length;
+
+  // Erkennen, ob wir uns auf der Hauptseite oder auf der Post-Seite befinden.
+  let isMainPage = $("#a-index").length;
+  
+  var hasPrev = isMainPage ? $(".paginator a[rel~=prev]").length : $("a[rel='nofollow prev']").length;
+  var hasNext = isMainPage ? $(".paginator a[rel~=next]").length : $("a[rel='nofollow next']").length;
 
   var hammer = new Hammer($body[0], {touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: Post.SWIPE_THRESHOLD, velocity: Post.SWIPE_VELOCITY, direction: Hammer.DIRECTION_HORIZONTAL }]], inputClass: Hammer.TouchInput});
   $body.data("hammer", hammer);
@@ -76,7 +84,7 @@ Post.initialize_gestures = function() {
       console.log("swiperight detected");
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(150%)"});
       await Utility.delay(200);
-      Post.swipe_prev(e);
+      Post.swipe_prev(e, isMainPage);
     });
   }
 
@@ -85,9 +93,27 @@ Post.initialize_gestures = function() {
       console.log("swipeleft detected");
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(-150%)"});
       await Utility.delay(200);
-      Post.swipe_next(e);
+      Post.swipe_next(e, isMainPage);
     });
   }
+}
+
+Post.swipe_prev = function(e, isMainPage) {
+  var linkSelector = isMainPage ? ".paginator a[rel~=prev]" : "a[rel='nofollow prev']";
+  if ($(linkSelector).length) {
+    location.href = $(linkSelector).attr("href");
+  }
+
+  e.preventDefault();
+}
+
+Post.swipe_next = function(e, isMainPage) {
+  var linkSelector = isMainPage ? ".paginator a[rel~=next]" : "a[rel='nofollow next']";
+  if ($(linkSelector).length) {
+    location.href = $(linkSelector).attr("href");
+  }
+
+  e.preventDefault();
 }
 
 Post.initialize_edit_dialog = function() {
