@@ -186,7 +186,7 @@ Post.getNextPage = function(source) {
 
 Post.testScrollPosition = function() {
 	if( !Post.nextPage )
-		this.testScrollPosition = function(){};
+		Post.testScrollPosition = function(){};
 	
 	//Take the max of the two heights for browser compatibility
 	else if( !Post.pending && window.pageYOffset + Post.scrollBuffer > Math.max( document.documentElement.scrollHeight, document.documentElement.offsetHeight ) )
