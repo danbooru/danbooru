@@ -659,7 +659,7 @@ module Danbooru
     # to enable a fake server for development purposes, or do
     # `docker run --rm -p 5000:5000 ghcr.io/danbooru/autotagger` to run a real server.
     def autotagger_url
-      "https://autotagger.donmai.us"
+      # "https://autotagger.donmai.us"
       # "http://116.203.249.43:5000"
     end
 
