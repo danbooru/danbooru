@@ -214,22 +214,6 @@ Post.close_edit_dialog = function(e, ui) {
   $(document).trigger("danbooru:close-post-edit-dialog");
 }
 
-Post.swipe_prev = function(e) {
-  if ($(".paginator a[rel~=prev]").length) {
-    location.href = $("a[rel~=prev]").attr("href");
-  }
-
-  e.preventDefault();
-}
-
-Post.swipe_next = function(e) {
-  if ($(".paginator a[rel~=next ]").length) {
-    location.href = $(".paginator a[rel~=next]").attr("href");
-  }
-
-  e.preventDefault();
-}
-
 Post.initialize_links = function() {
   $("#copy-notes").on("click.danbooru", function(e) {
     var current_post_id = $("meta[name=post-id]").attr("content");
