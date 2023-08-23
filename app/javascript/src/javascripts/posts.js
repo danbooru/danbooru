@@ -110,8 +110,15 @@ Post.initialize_endlessscroll = function() {
 
     //Slight delay so that Danbooru's initialize_edit_links() has time to hide all the edit boxes on the Comment index
     Post.iframe.addEventListener("load", function(e){ setTimeout( Post.appendNewContent, 100 ); }, false);
-      
+    
+    var content = Post.mainTable.innerHTML;
+    var regex = /<p>\s*No posts found\.\s*<\/p>/;
+    
     //Stop if empty page
+    if (regex.test(content)) {
+      return;
+    }
+
     if( /<p>(Nothing to display.|No posts found.)<.p>/.test(Post.mainTable.innerHTML) )
       return;
 
