@@ -44,12 +44,6 @@
   }
 }
 
-.posts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-}
-
 .post-count {
   color: var(--tag-count-color);
   margin-left: 0.2em;
