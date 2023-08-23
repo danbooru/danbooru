@@ -99,7 +99,13 @@ Post.initialize_gestures = function() {
 }
 
 Post.swipe_prev = function(e, isMainPage) {
-  var linkSelector = isMainPage ? ".paginator a[rel~=prev]" : "a[rel='nofollow prev']";
+  var linkSelector;
+  if (isMainPage) {
+    linkSelector = $(".paginator a[rel~=prev]").length ? ".paginator a[rel~=prev]" : "a[rel='prev']";
+  } else {
+    linkSelector = "a[rel='nofollow prev']";
+  }
+  
   if ($(linkSelector).length) {
     location.href = $(linkSelector).attr("href");
   }
@@ -108,7 +114,13 @@ Post.swipe_prev = function(e, isMainPage) {
 }
 
 Post.swipe_next = function(e, isMainPage) {
-  var linkSelector = isMainPage ? ".paginator a[rel~=next]" : "a[rel='nofollow next']";
+  var linkSelector;
+  if (isMainPage) {
+    linkSelector = $(".paginator a[rel~=next]").length ? ".paginator a[rel~=next]" : "a[rel='next']";
+  } else {
+    linkSelector = "a[rel='nofollow next']";
+  }
+
   if ($(linkSelector).length) {
     location.href = $(linkSelector).attr("href");
   }
