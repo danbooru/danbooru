@@ -32,7 +32,7 @@ x-base-template: &base-template
     DATABASE_URL: postgresql://danbooru@postgres/danbooru
     DANBOORU_REDIS_URL: redis://redis:6379
     DANBOORU_IQDB_URL: http://iqdb:5588
-    DANBOORU_CANONICAL_URL: https://solidbooru.online
+    DANBOORU_CANONICAL_URL: http://127.0.0.1:3000
     # # If you want to host danbooru under your own domain you need to replace the above line with the following (replace with your actual domain):
     # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
     # DANBOORU_HOSTNAME: danbooru.mydomain.com
