@@ -530,12 +530,6 @@ Post.initialize_recommended = function() {
   });
 };
 
-$(document).ready(function() {
-  Post.initialize_all();
-});
-
-export default Post
-
 // Infinite Scrolling
 let page = 1;
 const observer = new IntersectionObserver((entries) => {
@@ -552,6 +546,13 @@ function loadMorePosts(page) {
       .then(response => response.text())
       .then(data => {
           const postsContainer = document.querySelector('.posts-grid');
+          
+          // Überprüfen Sie, ob die Daten leer sind oder einen speziellen Marker für "keine weiteren Daten" enthalten
+          if (!data.trim() || data.includes('No posts found.')) {
+              observer.disconnect();  // Beenden Sie das Beobachten des Triggers, wenn es keine weiteren Posts gibt
+              return;
+          }
+          
           postsContainer.innerHTML += data;
           ensurePageIsFilled();  // Stellen Sie sicher, dass die Seite gefüllt ist
       });
@@ -567,9 +568,11 @@ function ensurePageIsFilled() {
   }
 }
 
-// Dies aufrufen, sobald das Dokument geladen ist, um sicherzustellen, dass die Seite gefüllt ist
 $(document).ready(function() {
+  Post.initialize_all();
   ensurePageIsFilled();
 });
 
 observer.observe(document.querySelector('.load-more-trigger'));
+
+export default Post
