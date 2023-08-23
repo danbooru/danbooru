@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/danbooru/danbooru:${{ github.sha }}
+      image: ghcr.io/kille250/danbooru:${{ github.sha }}
       options: --user root
 
     env:
