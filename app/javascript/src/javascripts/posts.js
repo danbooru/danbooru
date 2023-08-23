@@ -119,9 +119,6 @@ Post.initialize_endlessscroll = function() {
       return;
     }
 
-    if( /<p>(Nothing to display.|No posts found.)<.p>/.test(Post.mainTable.innerHTML) )
-      return;
-
     //Add copy of paginator to the top
     Post.mainParent.insertBefore( paginator.cloneNode(true), Post.mainParent.firstChild );
 
