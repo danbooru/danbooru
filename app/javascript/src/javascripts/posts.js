@@ -128,15 +128,6 @@ Post.initialize_endlessscroll = function() {
 
     //Add copy of paginator to the top
     Post.mainParent.insertBefore( paginator.cloneNode(true), Post.mainParent.firstChild );
-
-    if( !Post.pageBreak )
-      paginator.style.display = "none";//Hide bottom paginator
-    else
-    {
-      //Reposition bottom paginator and add horizontal break
-      Post.mainTable.parentNode.insertBefore( document.createElement("hr"), Post.mainTable.nextSibling );
-      Post.mainTable.parentNode.insertBefore( paginator, Post.mainTable.nextSibling );
-    }
     
     //Listen for scroll events
     let postsContainer = document.querySelector(".posts-container");
