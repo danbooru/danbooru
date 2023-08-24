@@ -144,6 +144,7 @@ Post.initialize_endlessscroll = function() {
         }, false);
     }
   }
+  Post.loadUntilFull();
 }
 
 Post.getMainTable = function(source) {
@@ -199,7 +200,7 @@ Post.getNextPage = function(source) {
 
 Post.testScrollPosition = function() {
   let postsContainer = document.querySelector(".posts-container");
-    
+  
   if (!postsContainer || !Post.nextPage) {
       return;
   }
@@ -209,6 +210,13 @@ Post.testScrollPosition = function() {
   let scrollTop = postsContainer.scrollTop;
 
   if (!Post.pending && (scrollTop + containerHeight + Post.scrollBuffer > scrollHeight)) {
+      Post.pending = true;
+      Post.timeout = setTimeout(function(){
+          Post.pending = false;
+          Post.testScrollPosition();
+      }, Post.timeToFailure);
+      Post.iframe.contentDocument.location.replace(Post.nextPage);
+  } else if (!Post.isContainerFull()) {
       Post.pending = true;
       Post.timeout = setTimeout(function(){
           Post.pending = false;
@@ -226,6 +234,25 @@ Post.setPaginator = function(paginator) {
       console.log("Paginator replaced.");
   } else {
       console.log("Failed to replace paginator. Current:", currentPaginator, "New:", paginator);
+  }
+};
+
+Post.isContainerFull = function() {
+  let postsContainer = document.querySelector(".posts-container");
+  return postsContainer.clientHeight >= window.innerHeight;
+}
+
+Post.loadUntilFull = async function() {
+  let postsContainer = document.querySelector(".posts-container");
+  
+  // Lade so lange Posts, bis der Container voll ist oder keine weiteren Posts mehr vorhanden sind
+  while (postsContainer.clientHeight < window.innerHeight && Post.nextPage) {
+      // Simuliere das Laden der Posts
+      await new Promise(resolve => {
+          // Hier wird die URL des nächsten Beitrags geladen
+          Post.iframe.onload = resolve;
+          Post.iframe.contentDocument.location.replace(Post.nextPage);
+      });
   }
 };
 
@@ -279,7 +306,7 @@ Post.updatePaginatorBasedOnScroll = function() {
 Post.appendNewContent = function() {
 	//Make sure page is correct.  Using 'indexOf' instead of '!=' because links like "https://danbooru.donmai.us/pools?page=2&search%5Border%5D=" become "https://danbooru.donmai.us/pools?page=2" in the iframe href.
 	clearTimeout(Post.timeout);
-	if( Post.nextPage.indexOf(Post.iframe.contentDocument.location.href) < 0 )
+	if( Post.nextPage && Post.nextPage.indexOf(Post.iframe.contentDocument.location.href) < 0 )
 	{
 		setTimeout( function(){ Post.pending = false; }, 1000 );
 		return;
