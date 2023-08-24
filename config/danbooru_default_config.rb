@@ -164,7 +164,7 @@ module Danbooru
     end
 
     def source_code_url
-      "https://github.com/danbooru/danbooru"
+      "https://github.com/kille250/danbooru"
     end
 
     def issues_url
@@ -499,7 +499,7 @@ module Danbooru
 
     # Whether to enable API rate limits.
     def rate_limits_enabled?
-      false
+      true
     end
 
     # Whether to enable comments.
