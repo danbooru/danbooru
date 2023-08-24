@@ -74,27 +74,31 @@ Post.initialize_endlessscroll = function() {
     //Stop if inside an iframe
     if( window != window.top || Post.scrollBuffer == 0 )
       return;
-    
+
     //Stop if no "table"
     Post.mainTable = this.getMainTable(document);
     if( !Post.mainTable )
-      {
-          //console.log("UPW: No main table");
       return;
-      }
-      
+
     //Stop if no paginator
     var paginator = this.getPaginator(document);
     if( !paginator )
-      {
-          //console.log("UPW: No paginator found");
       return;
-      }
-      
+
     //Stop if no more pages
     Post.nextPage = this.getNextPage(paginator);
     if( !Post.nextPage )
       return;
+
+    // Initialisieren Sie die pageHistory für die aktuelle Seite
+    let currentPosts = Post.mainTable.querySelectorAll("article");
+    let currentPostIds = Array.from(currentPosts).map(post => post.getAttribute("data-id"));
+
+    Post.pageHistory.push({
+        url: Post.originalPage,
+        paginator: Post.getPaginator(document),
+        posts: currentPostIds
+    });
     
     //Hide the blacklist sidebar, since this script breaks the tag totals and post unhiding.
     var sidebar = document.getElementById("blacklisted-sidebar");
@@ -278,47 +282,39 @@ Post.updatePaginatorBasedOnScroll = function() {
 };
 
 Post.appendNewContent = function() {
-	//Make sure page is correct.  Using 'indexOf' instead of '!=' because links like "https://danbooru.donmai.us/pools?page=2&search%5Border%5D=" become "https://danbooru.donmai.us/pools?page=2" in the iframe href.
-	clearTimeout(Post.timeout);
-	if( Post.nextPage.indexOf(Post.iframe.contentDocument.location.href) < 0 )
-	{
-		setTimeout( function(){ Post.pending = false; }, 1000 );
-		return;
-	}
-    
-	//Copy content from retrived page to current page, but leave off certain headers, labels, etc...
-  var sourcePaginator = document.adoptNode( Post.getPaginator(Post.iframe.contentDocument) );
-  console.log(sourcePaginator )
-	var nextElem, deleteMe, source = document.adoptNode( Post.getMainTable(Post.iframe.contentDocument) );
+    clearTimeout(Post.timeout);
+    if( Post.nextPage.indexOf(Post.iframe.contentDocument.location.href) < 0 ) {
+        setTimeout( function(){ Post.pending = false; }, 1000 );
+        return;
+    }
 
-  var content = source.innerHTML;
-  var regex = /<div id="posts">[\s\S]*?<p>\s*No posts found\.\s*<\/p>[\s\S]*?<\/div>/;
-	
-	if( regex.test(content) )
-		Post.nextPage = null;
-	else
-	{
-		Post.nextPage = Post.getNextPage(sourcePaginator);
+    var sourcePaginator = document.adoptNode( Post.getPaginator(Post.iframe.contentDocument) );
+    var nextElem, deleteMe, source = document.adoptNode( Post.getMainTable(Post.iframe.contentDocument) );
 
-    let existingPosts = Post.mainTable.querySelectorAll("article");
-    existingPosts.forEach(post => post.setAttribute('data-existing', 'true'));
+    var content = source.innerHTML;
+    var regex = /<div id="posts">[\s\S]*?<p>\s*No posts found\.\s*<\/p>[\s\S]*?<\/div>/;
 
-		if( Post.pageBreak )
-			Post.mainParent.appendChild(source);
-		else
-		{
-			//Hide elements separating one table from the next (h1 is used for user names on comment index)
-			var rems = source.querySelectorAll("h2, h3, h4, thead, tfood");
-			for( var i = 0; i < rems.length; i++ )
-				rems[i].style.display = "none";
-			
-			//Move contents of next table into current one
-			var fragment = document.createDocumentFragment();
-			while( (nextElem = source.firstChild) )
-				fragment.appendChild(nextElem);
-			Post.mainTable.appendChild(fragment);
-		}
-	}
+    if( regex.test(content) )
+        Post.nextPage = null;
+    else {
+        Post.nextPage = Post.getNextPage(sourcePaginator);
+
+        let existingPosts = Post.mainTable.querySelectorAll("article");
+        existingPosts.forEach(post => post.setAttribute('data-existing', 'true'));
+
+        if( Post.pageBreak )
+            Post.mainParent.appendChild(source);
+        else {
+            var rems = source.querySelectorAll("h2, h3, h4, thead, tfood");
+            for( var i = 0; i < rems.length; i++ )
+                rems[i].style.display = "none";
+            
+            var fragment = document.createDocumentFragment();
+            while( (nextElem = source.firstChild) )
+                fragment.appendChild(nextElem);
+            Post.mainTable.appendChild(fragment);
+        }
+    }
 
 	if( Post.pageBreak && Post.nextPage )
 		Post.mainParent.appendChild( document.createElement("hr") );
@@ -329,13 +325,17 @@ Post.appendNewContent = function() {
 
   let posts = Post.mainTable.querySelectorAll("article:not([data-existing='true'])");
   let postIds = Array.from(posts).map(post => post.getAttribute("data-id"));
-  
-  Post.pageHistory.push({
-      url: Post.originalPage,
-      paginator: sourcePaginator,
-      posts: postIds
-  });
-  console.log("Page History updated:", Post.pageHistory);
+
+  // Überprüfen Sie, ob diese Beiträge bereits in der Historie sind
+  let existingPage = Post.pageHistory.find(page => page.posts.some(id => postIds.includes(id)));
+
+  if (!existingPage) {
+      Post.pageHistory.push({
+          url: Post.originalPage,
+          paginator: sourcePaginator,
+          posts: postIds
+      });
+  }
 };
 
 Post.initialize_gestures = function() {
