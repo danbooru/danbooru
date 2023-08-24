@@ -128,6 +128,7 @@ Post.initialize_endlessscroll = function() {
 
     //Add copy of paginator to the top
     Post.mainParent.insertBefore( paginator.cloneNode(true), Post.mainParent.firstChild );
+    paginator.style.display = "none";
 
     // Ensure the top paginator is always visible
     let topPaginator = document.querySelector("#paginator:first-child");
