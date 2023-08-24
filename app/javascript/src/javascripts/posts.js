@@ -90,8 +90,6 @@ Post.initialize_endlessscroll = function() {
     if( !Post.nextPage )
       return;
 
-    paginator.style.display = "block";
-
     // Initialisieren Sie die pageHistory für die aktuelle Seite
     let currentPosts = Post.mainTable.querySelectorAll("article");
     let currentPostIds = Array.from(currentPosts).map(post => post.getAttribute("data-id"));
@@ -130,13 +128,11 @@ Post.initialize_endlessscroll = function() {
 
     //Add copy of paginator to the top
     Post.mainParent.insertBefore( paginator.cloneNode(true), Post.mainParent.firstChild );
-    if (!Post.pageBreak) {
-      paginator.style.display = "none";
-    }
+    paginator.style.display = "none";
 
     // Ensure the top paginator is always visible
-    let topPaginator = document.querySelector("#paginator");
-    if (topPaginator && topPaginator.previousElementSibling !== paginator) {
+    let topPaginator = document.querySelector("#paginator:first-child");
+    if (topPaginator) {
         topPaginator.style.display = "block";
     }
 
@@ -234,6 +230,7 @@ Post.setPaginator = function(paginator) {
   let currentPaginator = Post.getPaginator(document);
   if (currentPaginator && paginator) {
       currentPaginator.parentNode.replaceChild(paginator, currentPaginator);
+      paginator.style.display = "";  // Entfernen Sie den 'display' Stilwert
   }
 };
 
