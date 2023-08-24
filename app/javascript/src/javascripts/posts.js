@@ -6,41 +6,36 @@ import Note from './notes'
 import Ugoira from './ugoira'
 import Rails from '@rails/ujs'
 
-let Post = {};
-
-Post.pending_update_count = 0;
-Post.SWIPE_THRESHOLD = 60;
-Post.SWIPE_VELOCITY = 0.6;
-Post.MAX_RECOMMENDATIONS = 45; // 3 rows of 9 posts at 1920x1080.
-Post.LOW_TAG_COUNT = 10;
-Post.HIGH_TAG_COUNT = 20;
-Post.EDIT_DIALOG_WIDTH = 640;
-Post.EDIT_DIALOG_MIN_HEIGHT = 320;
-
-// Variablen für das Endlos-Scrolling
-Post.pageBreak = false;
-Post.scrollBuffer = 600;
-Post.timeToFailure = 15000;
-Post.nextPage = null;
-Post.mainTable = null;
-Post.mainParent = null;
-Post.pending = false;
-Post.timeout = null;
-Post.iframe = null;
-Post.originalPage = window.location.href;
-Post.lastScrollPosition = 0;
-Post.pageHistory = [];
+let Post = {
+  pending_update_count: 0,
+  SWIPE_THRESHOLD: 60,
+  SWIPE_VELOCITY: 0.6,
+  MAX_RECOMMENDATIONS: 45,
+  LOW_TAG_COUNT: 10,
+  HIGH_TAG_COUNT: 20,
+  EDIT_DIALOG_WIDTH: 640,
+  EDIT_DIALOG_MIN_HEIGHT: 320,
+  pageBreak: false,
+  scrollBuffer: 600,
+  timeToFailure: 15000,
+  nextPage: null,
+  mainTable: null,
+  mainParent: null,
+  pending: false,
+  timeout: null,
+  iframe: null,
+  originalPage: window.location.href,
+  lastScrollPosition: 0,
+  pageHistory: []
+};
 
 Post.initialize_all = function() {
-
   if ($("#c-posts").length) {
     this.initialize_saved_searches();
   }
 
-  // Überprüfen, ob wir uns auf der Hauptseite oder auf der Post-Seite befinden.
   let isMainPage = $("#a-index").length > 0;
 
-  // Bedingung ändern, um Gesten auf der Hauptseite und der Post-Seite zu initialisieren.
   if ($("#c-posts").length && (isMainPage || $("#a-show").length)) {
     this.initialize_endlessscroll();
     this.initialize_excerpt();
@@ -67,92 +62,71 @@ Post.initialize_all = function() {
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
   });
-}
+};
 
 Post.initialize_endlessscroll = function() {
-  {
-    //Stop if inside an iframe
-    if( window != window.top || Post.scrollBuffer == 0 )
-      return;
+  if (window != window.top || Post.scrollBuffer == 0) return;
 
-    //Stop if no "table"
-    Post.mainTable = this.getMainTable(document);
-    if( !Post.mainTable )
-      return;
+  Post.mainTable = this.getMainTable(document);
+  if (!Post.mainTable) return;
 
-    //Stop if no paginator
-    var paginator = this.getPaginator(document);
-    if( !paginator )
-      return;
+  let paginator = this.getPaginator(document);
+  if (!paginator) return;
 
-    //Stop if no more pages
-    Post.nextPage = this.getNextPage(paginator);
-    if( !Post.nextPage )
-      return;
+  Post.nextPage = this.getNextPage(paginator);
+  if (!Post.nextPage) return;
 
-    // Initialisieren Sie die pageHistory für die aktuelle Seite
-    let currentPosts = Post.mainTable.querySelectorAll("article");
-    let currentPostIds = Array.from(currentPosts).map(post => post.getAttribute("data-id"));
+  let currentPosts = Post.mainTable.querySelectorAll("article");
+  let currentPostIds = Array.from(currentPosts).map(post => post.getAttribute("data-id"));
 
-    Post.pageHistory.push({
-        url: Post.originalPage,
-        paginator: Post.getPaginator(document),
-        posts: currentPostIds
-    });
-    
-    //Hide the blacklist sidebar, since this script breaks the tag totals and post unhiding.
-    var sidebar = document.getElementById("blacklisted-sidebar");
-    if( sidebar )
-      sidebar.style.display = "none";
+  Post.pageHistory.push({
+    url: Post.originalPage,
+    paginator: Post.getPaginator(document),
+    posts: currentPostIds
+  });
 
-    //Other important variables:
-    Post.scrollBuffer += window.innerHeight;
-    Post.mainParent = Post.mainTable.parentNode;
-    Post.pending = false;
-    
-    Post.iframe = document.createElement("iframe");
-    Post.iframe.width = Post.iframe.height = 0;
-    Post.iframe.style.visibility = "hidden";
-    document.body.appendChild(Post.iframe);
+  let sidebar = document.getElementById("blacklisted-sidebar");
+  if (sidebar) sidebar.style.display = "none";
 
-    //Slight delay so that Danbooru's initialize_edit_links() has time to hide all the edit boxes on the Comment index
-    Post.iframe.addEventListener("load", function(e){ setTimeout( Post.appendNewContent, 100 ); }, false);
-    
-    var content = Post.mainTable.innerHTML;
-    var regex = /<div id="posts">[\s\S]*?<p>\s*No posts found\.\s*<\/p>[\s\S]*?<\/div>/;
-    
-    //Stop if empty page
-    if (regex.test(content)) {
-      return;
-    }
+  Post.scrollBuffer += window.innerHeight;
+  Post.mainParent = Post.mainTable.parentNode;
+  Post.pending = false;
 
-    //Add copy of paginator to the top
-    Post.mainParent.insertBefore( paginator.cloneNode(true), Post.mainParent.firstChild );
-    paginator.style.display = "none";
+  Post.iframe = document.createElement("iframe");
+  Post.iframe.width = Post.iframe.height = 0;
+  Post.iframe.style.visibility = "hidden";
+  document.body.appendChild(Post.iframe);
 
-    // Ensure the top paginator is always visible
-    let topPaginator = document.querySelector("#paginator:first-child");
-    if (topPaginator) {
-        topPaginator.style.display = "block";
-    }
+  Post.iframe.addEventListener("load", function(e) {
+    setTimeout(Post.appendNewContent, 100);
+  }, false);
 
-    if(Post.pageBreak) {
-      //Reposition bottom paginator and add horizontal break
-      Post.mainTable.parentNode.insertBefore( document.createElement("hr"), Post.mainTable.nextSibling );
-      Post.mainTable.parentNode.insertBefore( paginator, Post.mainTable.nextSibling );
-    }
-    
-    //Listen for scroll events
-    let postsContainer = document.querySelector(".posts-container");
-    if (postsContainer) {
-        postsContainer.addEventListener("scroll", function() {
-            Post.testScrollPosition();
-            Post.updatePaginatorBasedOnScroll(); // Hinzugefügt
-        }, false);
-    }
-    Post.testScrollPosition();
+  let content = Post.mainTable.innerHTML;
+  let regex = /<div id="posts">[\s\S]*?<p>\s*No posts found\.\s*<\/p>[\s\S]*?<\/div>/;
+
+  if (regex.test(content)) {
+    return;
   }
-}
+
+  let topPaginator = document.querySelector("#paginator:first-child");
+  if (topPaginator) {
+    topPaginator.style.display = "block";
+  }
+
+  if (Post.pageBreak) {
+    Post.mainTable.parentNode.insertBefore(document.createElement("hr"), Post.mainTable.nextSibling);
+    Post.mainTable.parentNode.insertBefore(paginator, Post.mainTable.nextSibling);
+  }
+
+  let postsContainer = document.querySelector(".posts-container");
+  if (postsContainer) {
+    postsContainer.addEventListener("scroll", function() {
+      Post.testScrollPosition();
+      Post.updatePaginatorBasedOnScroll();
+    }, false);
+  }
+  Post.testScrollPosition();
+};
 
 Post.getMainTable = function(source) {
 	var xpath =
