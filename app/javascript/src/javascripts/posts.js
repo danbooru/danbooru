@@ -90,6 +90,8 @@ Post.initialize_endlessscroll = function() {
     if( !Post.nextPage )
       return;
 
+    paginator.style.display = "block";
+
     // Initialisieren Sie die pageHistory für die aktuelle Seite
     let currentPosts = Post.mainTable.querySelectorAll("article");
     let currentPostIds = Array.from(currentPosts).map(post => post.getAttribute("data-id"));
@@ -128,7 +130,9 @@ Post.initialize_endlessscroll = function() {
 
     //Add copy of paginator to the top
     Post.mainParent.insertBefore( paginator.cloneNode(true), Post.mainParent.firstChild );
-    paginator.style.display = "none";
+    if (!Post.pageBreak) {
+      paginator.style.display = "none";
+    }
 
     // Ensure the top paginator is always visible
     let topPaginator = document.querySelector("#paginator");
@@ -229,7 +233,6 @@ Post.testScrollPosition = function() {
 Post.setPaginator = function(paginator) {
   let currentPaginator = Post.getPaginator(document);
   if (currentPaginator && paginator) {
-      paginator.style.display = "block";
       currentPaginator.parentNode.replaceChild(paginator, currentPaginator);
   }
 };
