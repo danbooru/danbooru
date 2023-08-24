@@ -216,7 +216,7 @@ Post.testScrollPosition = function() {
           Post.testScrollPosition();
       }, Post.timeToFailure);
       Post.iframe.contentDocument.location.replace(Post.nextPage);
-  } else if (!Post.isContainerFull()) {
+  } else if (scrollTop + containerHeight > scrollHeight - Post.scrollBuffer) {
       Post.pending = true;
       Post.timeout = setTimeout(function(){
           Post.pending = false;
