@@ -131,8 +131,8 @@ Post.initialize_endlessscroll = function() {
     paginator.style.display = "none";
 
     // Ensure the top paginator is always visible
-    let topPaginator = document.querySelector("#paginator:first-child");
-    if (topPaginator) {
+    let topPaginator = document.querySelector("#paginator");
+    if (topPaginator && topPaginator.previousElementSibling !== paginator) {
         topPaginator.style.display = "block";
     }
 
