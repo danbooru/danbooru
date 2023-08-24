@@ -128,7 +128,18 @@ Post.initialize_endlessscroll = function() {
 
     //Add copy of paginator to the top
     Post.mainParent.insertBefore( paginator.cloneNode(true), Post.mainParent.firstChild );
-    paginator.style.display = "none";
+
+    // Ensure the top paginator is always visible
+    let topPaginator = document.querySelector("#paginator:first-child");
+    if (topPaginator) {
+        topPaginator.style.display = "block";
+    }
+
+    if(Post.pageBreak) {
+      //Reposition bottom paginator and add horizontal break
+      Post.mainTable.parentNode.insertBefore( document.createElement("hr"), Post.mainTable.nextSibling );
+      Post.mainTable.parentNode.insertBefore( paginator, Post.mainTable.nextSibling );
+    }
     
     //Listen for scroll events
     let postsContainer = document.querySelector(".posts-container");
