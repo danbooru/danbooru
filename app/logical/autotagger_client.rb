@@ -20,6 +20,23 @@ class AutotaggerClient
 
     tag_names_with_scores = response.parse.first["tags"]
     tags = Tag.where(name: tag_names_with_scores.keys).index_by(&:name)
-    tag_names_with_scores.transform_keys(&tags)
+    bad_tags = []
+
+    if tags.size < tag_names_with_scores.size
+      # The autotagger gave us tags we aren't aware of
+      missing_tags = tag_names_with_scores.keys - tags.keys
+      missing_tags.each do |tag_name|
+        new_tag = Tag.create(name: tag_name)
+        if new_tag.errors.any? then
+          # If we fail to create a tag for any reason (such as an invalid tag name), we silently drop it
+          bad_tags << tag_name
+        end
+      end
+      Tag.uncached do
+        tags = Tag.where(name: tag_names_with_scores.keys).index_by(&:name)
+      end
+    end
+
+    tag_names_with_scores.reject { |tag, score| bad_tags.include?(tag) }.transform_keys(&tags)
   end
 end
