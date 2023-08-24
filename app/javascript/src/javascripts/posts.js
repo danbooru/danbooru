@@ -252,6 +252,7 @@ Post.updatePaginatorBasedOnScroll = function() {
             Post.setPaginator(page.paginator);
             break;
         }
+      }
     }
 
   // Speichern Sie die aktuelle Scroll-Position für das nächste Mal.
@@ -341,6 +342,7 @@ Post.initialize_gestures = function() {
 
   if (hasPrev) {
     hammer.on("swiperight", async function(e) {
+      console.log("swiperight detected");
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(150%)"});
       await Utility.delay(200);
       Post.swipe_prev(e, isMainPage);
@@ -349,6 +351,7 @@ Post.initialize_gestures = function() {
 
   if (hasNext) {
     hammer.on("swipeleft", async function(e) {
+      console.log("swipeleft detected");
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(-150%)"});
       await Utility.delay(200);
       Post.swipe_next(e, isMainPage);
