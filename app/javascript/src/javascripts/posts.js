@@ -229,6 +229,7 @@ Post.testScrollPosition = function() {
 Post.setPaginator = function(paginator) {
   let currentPaginator = Post.getPaginator(document);
   if (currentPaginator && paginator) {
+      paginator.style.display = "block";
       currentPaginator.parentNode.replaceChild(paginator, currentPaginator);
   }
 };
