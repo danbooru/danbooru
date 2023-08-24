@@ -18,7 +18,11 @@
     gap: 10px; 
     max-height: calc(70vh - 10px); /* 100% - 20% - 10% = 70% (abzüglich des Abstands zwischen den Grid-Elementen) */
     overflow-y: auto;
-}
+  }
+  
+  .posts-container::-webkit-scrollbar {
+    display: none;  /* Für Chrome, Safari und Edge */
+  }
 
   .post-preview-container {
     display: flex;
