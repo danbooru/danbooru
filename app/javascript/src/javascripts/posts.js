@@ -209,7 +209,7 @@ Post.testScrollPosition = function() {
   let scrollHeight = postsContainer.scrollHeight;
   let scrollTop = postsContainer.scrollTop;
 
-  if (!Post.pending && (scrollTop + containerHeight + Post.scrollBuffer > scrollHeight)) {
+  if (!Post.pending && (scrollTop + containerHeight >= scrollHeight - Post.scrollBuffer)) {
       Post.pending = true;
       Post.timeout = setTimeout(function(){
           Post.pending = false;
