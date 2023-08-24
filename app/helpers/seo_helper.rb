@@ -11,7 +11,7 @@
 
 module SeoHelper
   def site_description
-    "#{Danbooru.config.canonical_app_name} is the original anime image booru. Search millions of anime pictures categorized by thousands of tags."
+    "#{Danbooru.config.canonical_app_name} is the original Imageboard for everything. Search millions of pictures or videos categorized by thousands of tags."
   end
 
   def json_ld_website_data
@@ -19,7 +19,7 @@ module SeoHelper
       Danbooru.config.twitter_url,
       Danbooru.config.discord_server_url,
       Danbooru.config.source_code_url,
-      "https://en.wikipedia.org/wiki/Danbooru",
+      "https://en.wikipedia.org/wiki/Solidbooru",
     ].compact
 
     json_ld_tag({
