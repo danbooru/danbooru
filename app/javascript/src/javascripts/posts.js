@@ -139,12 +139,10 @@ Post.initialize_endlessscroll = function() {
     if (postsContainer) {
         postsContainer.addEventListener("scroll", function() {
             console.log("Scrolling inside postsContainer!");
+            Post.testScrollPosition();
             Post.updatePaginatorBasedOnScroll(); // Hinzugefügt
         }, false);
     }
-
-
-    this.testScrollPosition();
   }
 }
 
