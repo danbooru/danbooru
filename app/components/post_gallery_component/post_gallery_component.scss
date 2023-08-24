@@ -14,7 +14,12 @@
 .post-gallery-grid {
   .posts-container {
     display: grid;
-  }
+    grid-template-columns: repeat(3, 1fr);  /* Drei gleich große Spalten */
+    gap: 10px;  /* Abstand zwischen den Grid-Elementen */
+    max-height: 400px;
+    overflow-y: auto;
+}
+
 
   .post-preview-container {
     display: flex;

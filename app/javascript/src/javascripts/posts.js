@@ -27,6 +27,9 @@ Post.mainParent = null;
 Post.pending = false;
 Post.timeout = null;
 Post.iframe = null;
+Post.originalPage = window.location.href;
+Post.lastScrollPosition = 0;
+Post.pageHistory = [];
 
 Post.initialize_all = function() {
 
@@ -132,7 +135,15 @@ Post.initialize_endlessscroll = function() {
     }
     
     //Listen for scroll events
-    window.addEventListener("scroll", Post.testScrollPosition, false);
+    let postsContainer = document.querySelector(".posts-container");
+    if (postsContainer) {
+        postsContainer.addEventListener("scroll", function() {
+            console.log("Scrolling inside postsContainer!");
+            Post.updatePaginatorBasedOnScroll(); // Hinzugefügt
+        }, false);
+    }
+
+
     this.testScrollPosition();
   }
 }
@@ -201,6 +212,64 @@ Post.testScrollPosition = function() {
 	}
 };
 
+Post.setPaginator = function(paginator) {
+  let currentPaginator = Post.getPaginator(document);
+  if (currentPaginator && paginator) {
+      console.log("Replacing paginator with:", paginator);
+      currentPaginator.parentNode.replaceChild(paginator, currentPaginator);
+      console.log("Paginator replaced.");
+  } else {
+      console.log("Failed to replace paginator. Current:", currentPaginator, "New:", paginator);
+  }
+};
+
+Post.updatePaginatorBasedOnScroll = function() {
+  let postsContainer = document.querySelector(".posts-container");
+  
+  if (!postsContainer) return;
+  
+  let currentScrollPosition = postsContainer.scrollTop;
+  let containerHeight = postsContainer.clientHeight;
+
+  console.log("Current Scroll Position:", currentScrollPosition);
+
+  // Bestimmen Sie den aktuellen sichtbaren Post
+  let posts = postsContainer.querySelectorAll("article");
+  let currentPost = null;
+
+  for (let post of posts) {
+    let postPosition = post.offsetTop;
+    if (postPosition >= currentScrollPosition && postPosition < currentScrollPosition + containerHeight) {
+      currentPost = post;
+      break;
+    }
+  }
+
+  // Bestimmen Sie die Seite des aktuellen sichtbaren Posts
+  if (currentPost) {
+    let postId = currentPost.getAttribute("data-id");
+    console.log("Found post with ID:", postId);
+
+    let foundPage = false;
+    for (let page of Post.pageHistory) {
+        if (page.posts.includes(postId)) {
+            foundPage = true;
+            Post.setPaginator(page.paginator);
+            break;
+        }
+    }
+
+    if (!foundPage) {
+        console.log("Post ID not found in page history.");
+    }
+  } else {
+    console.log("No current post found in view.");
+  }
+
+  // Speichern Sie die aktuelle Scroll-Position für das nächste Mal.
+  Post.lastScrollPosition = currentScrollPosition;
+};
+
 Post.appendNewContent = function() {
 	//Make sure page is correct.  Using 'indexOf' instead of '!=' because links like "https://danbooru.donmai.us/pools?page=2&search%5Border%5D=" become "https://danbooru.donmai.us/pools?page=2" in the iframe href.
 	clearTimeout(Post.timeout);
@@ -212,6 +281,7 @@ Post.appendNewContent = function() {
     
 	//Copy content from retrived page to current page, but leave off certain headers, labels, etc...
   var sourcePaginator = document.adoptNode( Post.getPaginator(Post.iframe.contentDocument) );
+  console.log(sourcePaginator )
 	var nextElem, deleteMe, source = document.adoptNode( Post.getMainTable(Post.iframe.contentDocument) );
 
   var content = source.innerHTML;
@@ -222,6 +292,9 @@ Post.appendNewContent = function() {
 	else
 	{
 		Post.nextPage = Post.getNextPage(sourcePaginator);
+
+    let existingPosts = Post.mainTable.querySelectorAll("article");
+    existingPosts.forEach(post => post.setAttribute('data-existing', 'true'));
 
 		if( Post.pageBreak )
 			Post.mainParent.appendChild(source);
@@ -240,15 +313,22 @@ Post.appendNewContent = function() {
 		}
 	}
 
-	//Add the paginator at the bottom if needed.
-	if( !Post.nextPage || Post.pageBreak )
-		Post.mainParent.appendChild( sourcePaginator );
 	if( Post.pageBreak && Post.nextPage )
 		Post.mainParent.appendChild( document.createElement("hr") );
 	
 	//Clear the pending request marker and check position again
 	Post.pending = false;
 	Post.testScrollPosition();
+
+  let posts = Post.mainTable.querySelectorAll("article:not([data-existing='true'])");
+  let postIds = Array.from(posts).map(post => post.getAttribute("data-id"));
+  
+  Post.pageHistory.push({
+      url: Post.originalPage,
+      paginator: sourcePaginator,
+      posts: postIds
+  });
+  console.log("Page History updated:", Post.pageHistory);
 };
 
 Post.initialize_gestures = function() {
