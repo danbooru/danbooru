@@ -200,16 +200,24 @@ Post.getNextPage = function(source) {
 };
 
 Post.testScrollPosition = function() {
-	if( !Post.nextPage )
-		Post.testScrollPosition = function(){};
-	
-	//Take the max of the two heights for browser compatibility
-	else if( !Post.pending && window.pageYOffset + Post.scrollBuffer > Math.max( document.documentElement.scrollHeight, document.documentElement.offsetHeight ) )
-	{
-		Post.pending = true;
-		Post.timeout = setTimeout( function(){Post.pending=false;Post.testScrollPosition();}, Post.timeToFailure );
-		Post.iframe.contentDocument.location.replace(Post.nextPage);
-	}
+  let postsContainer = document.querySelector(".posts-container");
+    
+  if (!postsContainer || !Post.nextPage) {
+      return;
+  }
+
+  let containerHeight = postsContainer.clientHeight;
+  let scrollHeight = postsContainer.scrollHeight;
+  let scrollTop = postsContainer.scrollTop;
+
+  if (!Post.pending && (scrollTop + containerHeight + Post.scrollBuffer > scrollHeight)) {
+      Post.pending = true;
+      Post.timeout = setTimeout(function(){
+          Post.pending = false;
+          Post.testScrollPosition();
+      }, Post.timeToFailure);
+      Post.iframe.contentDocument.location.replace(Post.nextPage);
+  }
 };
 
 Post.setPaginator = function(paginator) {
