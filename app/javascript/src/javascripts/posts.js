@@ -128,12 +128,12 @@ Post.initialize_endlessscroll = function() {
 
     //Add copy of paginator to the top
     Post.mainParent.insertBefore( paginator.cloneNode(true), Post.mainParent.firstChild );
+    paginator.style.display = "none";
     
     //Listen for scroll events
     let postsContainer = document.querySelector(".posts-container");
     if (postsContainer) {
         postsContainer.addEventListener("scroll", function() {
-            console.log("Scrolling inside postsContainer!");
             Post.testScrollPosition();
             Post.updatePaginatorBasedOnScroll(); // Hinzugefügt
         }, false);
@@ -217,11 +217,7 @@ Post.testScrollPosition = function() {
 Post.setPaginator = function(paginator) {
   let currentPaginator = Post.getPaginator(document);
   if (currentPaginator && paginator) {
-      console.log("Replacing paginator with:", paginator);
       currentPaginator.parentNode.replaceChild(paginator, currentPaginator);
-      console.log("Paginator replaced.");
-  } else {
-      console.log("Failed to replace paginator. Current:", currentPaginator, "New:", paginator);
   }
 };
 
@@ -232,8 +228,6 @@ Post.updatePaginatorBasedOnScroll = function() {
   
   let currentScrollPosition = postsContainer.scrollTop;
   let containerHeight = postsContainer.clientHeight;
-
-  console.log("Current Scroll Position:", currentScrollPosition);
 
   // Bestimmen Sie den aktuellen sichtbaren Post
   let posts = postsContainer.querySelectorAll("article");
@@ -250,7 +244,6 @@ Post.updatePaginatorBasedOnScroll = function() {
   // Bestimmen Sie die Seite des aktuellen sichtbaren Posts
   if (currentPost) {
     let postId = currentPost.getAttribute("data-id");
-    console.log("Found post with ID:", postId);
 
     let foundPage = false;
     for (let page of Post.pageHistory) {
@@ -260,13 +253,6 @@ Post.updatePaginatorBasedOnScroll = function() {
             break;
         }
     }
-
-    if (!foundPage) {
-        console.log("Post ID not found in page history.");
-    }
-  } else {
-    console.log("No current post found in view.");
-  }
 
   // Speichern Sie die aktuelle Scroll-Position für das nächste Mal.
   Post.lastScrollPosition = currentScrollPosition;
@@ -333,7 +319,6 @@ Post.initialize_gestures = function() {
   console.log("initialize_gestures called");
 
   if (CurrentUser.data("disable-mobile-gestures")) {
-    console.log("Mobile gestures disabled");
     return;
   }
   var $body = $("body");
@@ -356,7 +341,6 @@ Post.initialize_gestures = function() {
 
   if (hasPrev) {
     hammer.on("swiperight", async function(e) {
-      console.log("swiperight detected");
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(150%)"});
       await Utility.delay(200);
       Post.swipe_prev(e, isMainPage);
@@ -365,7 +349,6 @@ Post.initialize_gestures = function() {
 
   if (hasNext) {
     hammer.on("swipeleft", async function(e) {
-      console.log("swipeleft detected");
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(-150%)"});
       await Utility.delay(200);
       Post.swipe_next(e, isMainPage);
