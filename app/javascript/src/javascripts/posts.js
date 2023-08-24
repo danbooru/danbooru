@@ -143,6 +143,7 @@ Post.initialize_endlessscroll = function() {
             Post.updatePaginatorBasedOnScroll(); // Hinzugefügt
         }, false);
     }
+    Post.testScrollPosition();
   }
 }
 
