@@ -6,38 +6,28 @@ import Note from './notes'
 import Ugoira from './ugoira'
 import Rails from '@rails/ujs'
 
-let Post = {
-  pending_update_count: 0,
-  SWIPE_THRESHOLD: 60,
-  SWIPE_VELOCITY: 0.6,
-  MAX_RECOMMENDATIONS: 45,
-  LOW_TAG_COUNT: 10,
-  HIGH_TAG_COUNT: 20,
-  EDIT_DIALOG_WIDTH: 640,
-  EDIT_DIALOG_MIN_HEIGHT: 320,
-  pageBreak: false,
-  scrollBuffer: 600,
-  timeToFailure: 15000,
-  nextPage: null,
-  mainTable: null,
-  mainParent: null,
-  pending: false,
-  timeout: null,
-  iframe: null,
-  originalPage: window.location.href,
-  lastScrollPosition: 0,
-  pageHistory: []
-};
+let Post = {};
+
+Post.pending_update_count = 0;
+Post.SWIPE_THRESHOLD = 60;
+Post.SWIPE_VELOCITY = 0.6;
+Post.MAX_RECOMMENDATIONS = 45; // 3 rows of 9 posts at 1920x1080.
+Post.LOW_TAG_COUNT = 10;
+Post.HIGH_TAG_COUNT = 20;
+Post.EDIT_DIALOG_WIDTH = 640;
+Post.EDIT_DIALOG_MIN_HEIGHT = 320;
 
 Post.initialize_all = function() {
+
   if ($("#c-posts").length) {
     this.initialize_saved_searches();
   }
 
+  // Überprüfen, ob wir uns auf der Hauptseite oder auf der Post-Seite befinden.
   let isMainPage = $("#a-index").length > 0;
 
+  // Bedingung ändern, um Gesten auf der Hauptseite und der Post-Seite zu initialisieren.
   if ($("#c-posts").length && (isMainPage || $("#a-show").length)) {
-    this.initialize_endlessscroll();
     this.initialize_excerpt();
     this.initialize_gestures();
     this.initialize_post_preview_size_menu();
@@ -62,251 +52,13 @@ Post.initialize_all = function() {
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
   });
-};
-
-Post.initialize_endlessscroll = function() {
-  if (window != window.top || Post.scrollBuffer == 0) return;
-
-  Post.mainTable = this.getMainTable(document);
-  if (!Post.mainTable) return;
-
-  let paginator = this.getPaginator(document);
-  if (!paginator) return;
-
-  Post.nextPage = this.getNextPage(paginator);
-  if (!Post.nextPage) return;
-
-  let currentPosts = Post.mainTable.querySelectorAll("article");
-  let currentPostIds = Array.from(currentPosts).map(post => post.getAttribute("data-id"));
-
-  Post.pageHistory.push({
-    url: Post.originalPage,
-    paginator: Post.getPaginator(document),
-    posts: currentPostIds
-  });
-
-  let sidebar = document.getElementById("blacklisted-sidebar");
-  if (sidebar) sidebar.style.display = "none";
-
-  Post.scrollBuffer += window.innerHeight;
-  Post.mainParent = Post.mainTable.parentNode;
-  Post.pending = false;
-
-  Post.iframe = document.createElement("iframe");
-  Post.iframe.width = Post.iframe.height = 0;
-  Post.iframe.style.visibility = "hidden";
-  document.body.appendChild(Post.iframe);
-
-  Post.iframe.addEventListener("load", function(e) {
-    setTimeout(Post.appendNewContent, 100);
-  }, false);
-
-  let content = Post.mainTable.innerHTML;
-  let regex = /<div id="posts">[\s\S]*?<p>\s*No posts found\.\s*<\/p>[\s\S]*?<\/div>/;
-
-  if (regex.test(content)) {
-    return;
-  }
-
-  let topPaginator = document.querySelector("#paginator:first-child");
-  if (topPaginator) {
-    topPaginator.style.display = "block";
-  }
-
-  if (Post.pageBreak) {
-    Post.mainTable.parentNode.insertBefore(document.createElement("hr"), Post.mainTable.nextSibling);
-    Post.mainTable.parentNode.insertBefore(paginator, Post.mainTable.nextSibling);
-  }
-
-  let postsContainer = document.querySelector(".posts-container");
-  if (postsContainer) {
-    postsContainer.addEventListener("scroll", function() {
-      Post.testScrollPosition();
-      Post.updatePaginatorBasedOnScroll();
-    }, false);
-  }
-  Post.testScrollPosition();
-};
-
-Post.getMainTable = function(source) {
-	var xpath =
-	[
-		 ".//div[contains(@class,'posts-container') or contains(@class,'media-assets-container')]"   // Danbooru (posts, ai_tags, uploads)
-		,".//div[@id='a-index']/table[not(contains(@class,'search'))]"	// Danbooru (/forum_topics, ...), take care that this doesn't catch comments containing tables
-		,".//div[@id='a-index']"						// Danbooru (/comments, ...)
-		
-		,".//table[contains(@class,'highlight')]"		// large number of pages
-		,".//div[contains(@id,'comment-list')]/div/.."	// comment index
-		,".//*[not(contains(@id,'popular'))]/span[contains(@class,'thumb')]/a/../.."	// post/index, pool/show, note/index
-		,".//li/div/a[contains(@class,'thumb')]/../../.."	// post/index, note/index
-		,".//div[@id='content']//table/tbody/tr[contains(@class,'even')]/../.."	// user/index, wiki/history
-		,".//div[@id='content']/div/table"				// 3dbooru user records
-		,".//div[@id='forum']"							// forum/show
-	];
-
-  for (var i = 0; i < xpath.length; i++) {
-      let evaluatorFunction = (function(query) {
-          return function(src) {
-              return new XPathEvaluator().evaluate(query, src, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-          };
-      })(xpath[i]);
-
-      var result = evaluatorFunction(source);
-      if (result) {
-          return result;
-      }
-  }
-
-  return null;
-};
-
-Post.getPaginator = function(source) {
-	var pager = new XPathEvaluator().evaluate("descendant-or-self::div[@id='paginator' or contains(@class,'paginator') or @id='paginater']", source, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-	
-	// Need clear:none to prevent the 2nd page from being pushed to below the sidebar on the Post index... but we don't want this when viewing a specific pool,
-	// because then the paginator is shoved to the right of the last images on a page.  Other sites have issues with clear:none as well, like //yande.re/post.
-	if( pager && location.host.indexOf("donmai.") >= 0 && document.getElementById("sidebar") )
-		pager.style.clear = "none";
-	
-	return pager;
-};
-
-Post.getNextPage = function(source) {
-	let page = Post.getPaginator(source);
-	if( page )
-		page = new XPathEvaluator().evaluate(".//a[@alt='next' or @rel='next' or contains(text(),'>') or contains(text(),'Next')]", page, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    
-	return( page && page.href );
-};
-
-Post.testScrollPosition = function() {
-  let postsContainer = document.querySelector(".posts-container");
-    
-  if (!postsContainer || !Post.nextPage) {
-      return;
-  }
-
-  let containerHeight = postsContainer.clientHeight;
-  let scrollHeight = postsContainer.scrollHeight;
-  let scrollTop = postsContainer.scrollTop;
-
-  if (!Post.pending && (scrollTop + containerHeight + Post.scrollBuffer > scrollHeight)) {
-      Post.pending = true;
-      Post.timeout = setTimeout(function(){
-          Post.pending = false;
-          Post.testScrollPosition();
-      }, Post.timeToFailure);
-      Post.iframe.contentDocument.location.replace(Post.nextPage);
-  }
-};
-
-Post.setPaginator = function(paginator) {
-  let currentPaginator = Post.getPaginator(document);
-  if (currentPaginator && paginator) {
-      currentPaginator.parentNode.replaceChild(paginator, currentPaginator);
-      paginator.style.display = "";  // Entfernen Sie den 'display' Stilwert
-  }
-};
-
-Post.updatePaginatorBasedOnScroll = function() {
-  let postsContainer = document.querySelector(".posts-container");
-  
-  if (!postsContainer) return;
-  
-  let currentScrollPosition = postsContainer.scrollTop;
-  let containerHeight = postsContainer.clientHeight;
-
-  // Bestimmen Sie den aktuellen sichtbaren Post
-  let posts = postsContainer.querySelectorAll("article");
-  let currentPost = null;
-
-  for (let post of posts) {
-    let postPosition = post.offsetTop;
-    if (postPosition >= currentScrollPosition && postPosition < currentScrollPosition + containerHeight) {
-      currentPost = post;
-      break;
-    }
-  }
-
-  // Bestimmen Sie die Seite des aktuellen sichtbaren Posts
-  if (currentPost) {
-    let postId = currentPost.getAttribute("data-id");
-
-    let foundPage = false;
-    for (let page of Post.pageHistory) {
-        if (page.posts.includes(postId)) {
-            foundPage = true;
-            Post.setPaginator(page.paginator);
-            break;
-        }
-      }
-    }
-
-  // Speichern Sie die aktuelle Scroll-Position für das nächste Mal.
-  Post.lastScrollPosition = currentScrollPosition;
-};
-
-Post.appendNewContent = function() {
-    clearTimeout(Post.timeout);
-    if( Post.nextPage.indexOf(Post.iframe.contentDocument.location.href) < 0 ) {
-        setTimeout( function(){ Post.pending = false; }, 1000 );
-        return;
-    }
-
-    var sourcePaginator = document.adoptNode( Post.getPaginator(Post.iframe.contentDocument) );
-    var nextElem, deleteMe, source = document.adoptNode( Post.getMainTable(Post.iframe.contentDocument) );
-
-    var content = source.innerHTML;
-    var regex = /<div id="posts">[\s\S]*?<p>\s*No posts found\.\s*<\/p>[\s\S]*?<\/div>/;
-
-    if( regex.test(content) )
-        Post.nextPage = null;
-    else {
-        Post.nextPage = Post.getNextPage(sourcePaginator);
-
-        let existingPosts = Post.mainTable.querySelectorAll("article");
-        existingPosts.forEach(post => post.setAttribute('data-existing', 'true'));
-
-        if( Post.pageBreak )
-            Post.mainParent.appendChild(source);
-        else {
-            var rems = source.querySelectorAll("h2, h3, h4, thead, tfood");
-            for( var i = 0; i < rems.length; i++ )
-                rems[i].style.display = "none";
-            
-            var fragment = document.createDocumentFragment();
-            while( (nextElem = source.firstChild) )
-                fragment.appendChild(nextElem);
-            Post.mainTable.appendChild(fragment);
-        }
-    }
-
-	if( Post.pageBreak && Post.nextPage )
-		Post.mainParent.appendChild( document.createElement("hr") );
-	
-	//Clear the pending request marker and check position again
-	Post.pending = false;
-	Post.testScrollPosition();
-
-  let posts = Post.mainTable.querySelectorAll("article:not([data-existing='true'])");
-  let postIds = Array.from(posts).map(post => post.getAttribute("data-id"));
-
-  // Überprüfen Sie, ob diese Beiträge bereits in der Historie sind
-  let existingPage = Post.pageHistory.find(page => page.posts.some(id => postIds.includes(id)));
-
-  if (!existingPage) {
-      Post.pageHistory.push({
-          url: Post.originalPage,
-          paginator: sourcePaginator,
-          posts: postIds
-      });
-  }
-};
+}
 
 Post.initialize_gestures = function() {
   console.log("initialize_gestures called");
 
   if (CurrentUser.data("disable-mobile-gestures")) {
+    console.log("Mobile gestures disabled");
     return;
   }
   var $body = $("body");
