@@ -181,7 +181,7 @@ class SessionLoader
   end
 
   def set_safe_mode
-    CurrentUser.safe_mode = CurrentUser.user.is_anonymous?
+    CurrentUser.safe_mode = !CurrentUser.user.is_gold?
 
     ### No need for special domains, block via role check.
     # safe_mode = request.host.in?(Danbooru.config.safe_mode_hostnames) || params[:safe_mode].to_s.truthy? || CurrentUser.user.enable_safe_mode?
