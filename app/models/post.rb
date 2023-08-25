@@ -1823,12 +1823,12 @@ class Post < ApplicationRecord
   end
 
   def safeblocked?
-    CurrentUser.safe_mode? && (rating != "g" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
+    CurrentUser.user.is_anonymous? || CurrentUser.safe_mode? && (rating != "g" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
   end
 
   def levelblocked?(user = CurrentUser.user)
     #!user.is_gold? && RESTRICTED_TAGS.any? { |tag| has_tag?(tag) }
-    rating != "g" || user.id != uploader_id && !user.is_gold? && tag_string.match?(RESTRICTED_TAGS_REGEX)
+    user.id != uploader_id && !user.is_gold? && tag_string.match?(RESTRICTED_TAGS_REGEX)
   end
 
   def banblocked?(user = CurrentUser.user)
