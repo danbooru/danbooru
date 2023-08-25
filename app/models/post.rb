@@ -1823,7 +1823,7 @@ class Post < ApplicationRecord
   end
 
   def safeblocked?
-    CurrentUser.user.is_anonymous? || CurrentUser.safe_mode? && (rating != "g" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
+    CurrentUser.safe_mode? && (rating != "g" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
   end
 
   def levelblocked?(user = CurrentUser.user)
