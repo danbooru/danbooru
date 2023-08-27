@@ -132,7 +132,7 @@ module Danbooru
     # The name of the cookie that stores the current user's login session.
     # Changing this will force all users to login again.
     def session_cookie_name
-      "_danbooru2_session"
+      "_solidbooru_session"
     end
 
     # Debug mode does some things to make testing easier. It outputs more verbose logs, it disables parallel testing,
