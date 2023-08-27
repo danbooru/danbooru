@@ -106,12 +106,12 @@
           </td>
           <td>
             <% if !UserUpgrade.enabled? %>
-              <%= button_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo]), class: "button-primary", disabled: true %>
+              <%= button_to "Upgrade to Gold", nil, class: "button-primary", disabled: true %>
             <% elsif @user_upgrade.purchaser.is_anonymous? %>
               <%= link_to "Upgrade to Gold", new_user_path(url: new_user_upgrade_path), class: "button-primary block mb-2" %>
               <%= link_to "Redeem upgrade code", redeem_upgrade_codes_path, class: "text-sm block" %>
             <% elsif @user_upgrade.recipient.level <= User::Levels::MEMBER %>
-              <%= button_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo], payment_processor: "shopify"), class: "button-primary mb-2", remote: true, disable_with: "Redirecting..." %>
+              <%= button_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo], payment_processor: "stripe"), class: "button-primary mb-2", remote: true, disable_with: "Redirecting..." %>
               <%= link_to "Redeem upgrade code", redeem_upgrade_codes_path, class: "text-sm" %>
             <% else %>
               <%= link_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id), class: "button-primary", disabled: true %>
