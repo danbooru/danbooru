@@ -2,6 +2,10 @@
 <% meta_description "Upgrade to a Gold account." %>
 <script src="https://js.stripe.com/v3/"></script>
 
+<% content_for :html_header do %>
+  <meta name="referrer" content="no-referrer">
+<% end %>
+
 <%= render "users/secondary_links" %>
 
 <div id="c-user-upgrades">
@@ -24,8 +28,12 @@
       <%= Danbooru.config.canonical_app_name %>. Your support helps keep the
       site ad-free for everyone!</p>
 
-      <p>You can also gift an account upgrade to someone else. Just go to
-      their profile page and look for a "Gift Upgrade" link.</p>
+      <p><%= Danbooru.config.canonical_app_name %> Gold is a lifetime upgrade,
+      not a subscription. You pay only once and keep the upgrade forever!</p>
+
+      <% if !UserUpgrade.enabled? %>
+        <p><b>Notice: Gold upgrades are temporarily disabled.</b></p>
+      <% end %>
     <% end %>
 
     <% if Danbooru.config.is_promotion? %>
@@ -55,7 +63,7 @@
             <% if Danbooru.config.is_promotion? %>
               <s>$20</s>
             <% end %>
-            <%= cents_to_usd(UserUpgrade.gold_price) %>
+            <b><%= number_to_currency(UserUpgrade.gold_price, precision: 0) %></b>
             <div class="fineprint">One time fee</div>
           </td>
         </tr>
@@ -68,11 +76,6 @@
           <td>Page Limit</td>
           <td><%= User.page_limit(User::Levels::MEMBER) %></td>
           <td><%= User.page_limit(User::Levels::GOLD) %></td>
-        </tr>
-        <tr>
-          <td>See Hidden Tags</td>
-          <td>No</td>
-          <td>Yes</td>
         </tr>
         <tr>
           <td>Private Favorites</td>
@@ -96,62 +99,87 @@
         </tr>
         <tr>
           <td></td>
-          <% if @user_upgrade.purchaser.is_anonymous? %>
-            <td><%= link_to "Login", login_path(url: new_user_upgrade_path), class: "login-button button-primary" %></td>
-            <td><%= link_to "Get #{Danbooru.config.canonical_app_name} Gold", login_path(url: new_user_upgrade_path), class: "login-button button-primary" %></td>
-          <% elsif @recipient.level == User::Levels::MEMBER %>
-            <td></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo]), class: "button-primary", remote: true, disable_with: "Redirecting..." %></td>
-          <% else %>
-            <td></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %></td>
-          <% end %>
+          <td>
+            <% if @user_upgrade.purchaser.is_anonymous? %>
+              <%= link_to "Create free account", new_user_path(url: new_user_upgrade_path), class: "button-outline-primary" %>
+            <% end %>
+          </td>
+          <td>
+            <% if !UserUpgrade.enabled? %>
+              <%= button_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo]), class: "button-primary", disabled: true %>
+            <% elsif @user_upgrade.purchaser.is_anonymous? %>
+              <%= link_to "Upgrade to Gold", new_user_path(url: new_user_upgrade_path), class: "button-primary block mb-2" %>
+              <%= link_to "Redeem upgrade code", redeem_upgrade_codes_path, class: "text-sm block" %>
+            <% elsif @user_upgrade.recipient.level <= User::Levels::MEMBER %>
+              <%= button_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo], payment_processor: "shopify"), class: "button-primary mb-2", remote: true, disable_with: "Redirecting..." %>
+              <%= link_to "Redeem upgrade code", redeem_upgrade_codes_path, class: "text-sm" %>
+            <% else %>
+              <%= link_to "Upgrade to Gold", user_upgrades_path(user_id: @recipient.id), class: "button-primary", disabled: true %>
+            <% end %>
+          </td>
         </tr>
       </tbody>
     </table>
+
+    <% if @user_upgrade.purchaser.is_anonymous? %>
+      <p class="text-center">
+        Already have an account? <%= link_to "Log in", login_path(url: new_user_upgrade_path) %>.
+      </p>
+    <% end %>
 
     <h2 class="mb-4">Frequently Asked Questions</h2>
 
     <div id="frequently-asked-questions" class="divide-y-1">
       <details>
+        <summary>How do I upgrade my account?</summary>
+
+        <p>Click the "Upgrade to Gold" button on this page. After you purchase an upgrade, you will receive a code you can
+        <%= link_to "redeem here", redeem_upgrade_codes_path %> to upgrade your account to Gold. Look for the upgrade code
+        in your email or on the order confirmation page. <%= link_to "Contact us", contact_path %> if you have any questions.</p>
+      </details>
+
+      <details>
         <summary>What are the benefits of <%= Danbooru.config.canonical_app_name %> Gold?</summary>
 
         <p><%= Danbooru.config.canonical_app_name %> Gold lets you search for more tags at once, browse
-        deeper in search results, see tags non-Gold users can't see, keep your favorites private,
-        and keep more favorite groups and saved searches.</p>
+        deeper in search results, keep your favorites private, and keep more favorite groups and saved searches.</p>
       </details>
 
       <details>
         <summary>What is the tag limit?</summary>
 
-        <p>Normal users can only search for <%= User.tag_query_limit(User::Levels::MEMBER) %> tags at
-        once. Gold users can search for up to <%= User.tag_query_limit(User::Levels::GOLD) %> tags at once.</p>
+        <p>The tag limit is how many tags you can search for at once. Normal users can only search for
+        <%= User.tag_query_limit(User::Levels::MEMBER) %> tags at once. Gold users can search for up
+        to <%= User.tag_query_limit(User::Levels::GOLD) %> tags at once.</p>
+
+        <p>See <%= link_to_wiki "help:cheatsheet" %> for more information on searches.</p>
       </details>
 
       <details>
         <summary>What is the page limit?</summary>
 
-        <p>Normal users can only browse tags up to page 1000. Gold users can browse tags up to page 5000.</p>
+        <p>Normal users can only browse posts up to page 1000. Gold users can browse posts up to page 5000.</p>
       </details>
 
       <details>
         <summary>What are private favorites?</summary>
 
-        <p>Normally your favorites are public to everyone. Gold users can make their favorites
+        <p>Normally your favorites are visible to everyone. Gold users can make their favorites
         private in their <%= link_to "account settings", settings_path %>.</p>
       </details>
 
       <details>
         <summary>What are favorite groups?</summary>
 
-        <p>Favorite groups are like personal tags or pools. They let your organize your favorites
-        in groups however you wish. See <%= link_to_wiki "help:favorite groups" %> for more details.</p>
+        <p>Favorite groups are like personal tags or pools. They let you organize your favorites
+        in groups however you wish. Gold users can have an unlimited number of favorite groups. See
+        <%= link_to_wiki "help:favorite groups" %> for more details.</p>
       </details>
 
       <details>
         <summary>What are saved searches?</summary>
 
-        <p>Saved searches let you save your favorite tags and searches. They let easily check for
+        <p>Saved searches let you save your favorite tags and searches. They let you easily check for
         new posts under your favorite tags. Gold users can keep up to 1000 saved searches. See
         <%= link_to_wiki "help:saved searches" %> for more details.</p>
       </details>
@@ -165,23 +193,32 @@
       </details>
 
       <details>
+        <summary>Can I gift an upgrade to someone else?</summary>
+
+        <p>Sure. You can buy an upgrade code and give it to someone else.</p>
+      </details>
+
+      <details>
         <summary>What payment methods do you support?</summary>
 
-        <p>We support all major credit and debit cards. We don't support PayPal or Bitcoin at this time.</p>
+        <p>We support all major credit and debit cards. We don't support Bitcoin at this time.</p>
       </details>
 
       <details>
         <summary>Is this a subscription?</summary>
 
-        <p>No, this is not a subscription. This is a one-time payment. You pay
-        only once and keep the upgrade forever.</p>
+        <p>No, this is not a subscription. This is a one-time payment only. You pay only once and keep the upgrade forever.</p>
       </details>
 
       <details>
         <summary>What is your refund policy?</summary>
 
-        <p>You can <%= link_to "contact us", contact_path %> to request a refund
-        for any reason within 48 hours of your purchase.</p>
+        <p>You can request a refund for any reason within 48 hours of your purchase. To request a refund,
+        <%= link_to "contact us", contact_path %> or send an email to <%= mail_to Danbooru.config.contact_email %>.
+        Please include your username in your request.</p>
+
+        <p>Refund requests will be responded to within 1 business day. Please note that it may take up to 10 business days for refunds
+        to be processed by your bank or credit card company.</p>
       </details>
     </div>
   </div>
