@@ -269,10 +269,10 @@
   <%= tag.section class: ["image-container", "note-container", ("danbirthday" if is_danbirthday?(@post))], **image_container_data_attributes(@post, CurrentUser.user) do -%>
     <% if @post.banblocked? -%>
       <p>This page has been removed because of a takedown request or rule violation.</p>
-    <% elsif @post.levelblocked? -%>
+    <% elsif @post.levelblocked? || (@post.safeblocked? && !CurrentUser.user.is_gold?) -%>
       <p><%= link_to "You need a gold account to see this image", new_user_upgrade_path %>.</p>
-    <% elsif @post.safeblocked? -%>
-      <p>This image is unavailable on <%= Danbooru.config.app_name %>. Go to <%= link_to "Danbooru", "https://danbooru.donmai.us" %> or disable safe mode to view (<%= link_to_wiki "learn more", "help:safe_mode" %>).</p>
+    <% elsif @post.safeblocked? && CurrentUser.user.is_gold? -%>
+      <p>This image is unavailable on <%= Danbooru.config.app_name %>. Go to <%= link_to "SolidBooru", "https://solidbooru.online" %> or disable safe mode to view (<%= link_to_wiki "learn more", "help:safe_mode" %>).</p>
     <% elsif @post.is_flash? -%>
       <div class="ruffle-container" data-swf="<%= @post.tagged_file_url %>"></div>
     <% elsif @post.is_video? -%>
