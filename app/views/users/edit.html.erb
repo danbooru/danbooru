@@ -38,7 +38,7 @@
 
             <%= f.input :theme, collection: User.themes.keys, include_blank: false, hint: "The site's colorscheme (light mode or dark mode)." %>
             <%= f.input :enable_safe_mode, label: "Safe mode", hint: "Show only safe images. Hide sensitive, questionable and explicit images.", as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]] %>
-            <%= f.input :per_page, label: "Posts per page", as: :select, hint: "Number of thumbnails per page", collection: (1..PostSets::Post::MAX_PER_PAGE), include_blank: false %>
+            <%= f.input :per_page, label: "Posts per page", hint: "Number of thumbnails per page (max: #{PostSets::Post::MAX_PER_PAGE})", input_html: { min: 1, max: PostSets::Post::MAX_PER_PAGE } %>
             <%= f.input :default_image_size, hint: "Show full original images or resized #{Danbooru.config.large_image_width}px width samples.", label: "Default image width", collection: [["850px", "large"], ["original", "original"]], include_blank: false %>
             <%= f.input :receive_email_notifications, as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]], hint: "Receive an email when you receive a new dmail." %>
             <%= f.input :time_zone, include_blank: false, hint: "The timezone to use for timestamps." %>
