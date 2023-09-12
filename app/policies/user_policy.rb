@@ -22,7 +22,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def promote?
-    (user.is_owner? || (user.is_moderator? && record.level < User::Levels::APPROVER)) && user != record
+    user.is_moderator?
   end
 
   def fix_counts?

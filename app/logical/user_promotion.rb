@@ -40,6 +40,8 @@ class UserPromotion
   end
 
   def validate!
+    return if promoter.is_owner?
+
     if !promoter.is_moderator?
       raise User::PrivilegeError, "You can't promote or demote other users"
     elsif promoter == user
@@ -48,8 +50,6 @@ class UserPromotion
       raise User::PrivilegeError, "You can't promote other users to your rank or above"
     elsif user.level >= promoter.level
       raise User::PrivilegeError, "You can't promote or demote other users at your rank or above"
-    elsif !(promoter.is_owner? || promoter == User.system) && (new_level > User::Levels::CONTRIBUTOR || user.level > User::Levels::CONTRIBUTOR)
-      raise User::PrivilegeError, "You can't promote or demote users to that level"
     end
   end
 
