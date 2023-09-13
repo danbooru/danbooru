@@ -14,8 +14,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def deactivate?
-    false
-    # (record.id == user.id && !user.is_anonymous?) || user.is_owner?
+    (record.id == user.id && !user.is_anonymous?) || user.is_owner?
   end
 
   def destroy?
