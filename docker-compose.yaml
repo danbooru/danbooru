@@ -22,7 +22,10 @@ version: "3.4"
 services:
   danbooru:
     user: root
-    image: ghcr.io/danbooru/danbooru:production
+    # image: ghcr.io/danbooru/danbooru:production
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -32,7 +35,8 @@ services:
       - DATABASE_URL=postgresql://danbooru@postgres/danbooru
       - DANBOORU_REDIS_URL=redis://redis:6379
       - DANBOORU_IQDB_URL=http://iqdb:5588
-      - DANBOORU_CANONICAL_URL=http://localhost:3000
+      - DANBOORU_AUTOTAGGER_URl=http://autotagger:5000
+      - DANBOORU_CANONICAL_URL=https://gallery.ostan-collections.net
     volumes:
       - "danbooru-images:/danbooru/public/data"
     tmpfs:
@@ -43,12 +47,16 @@ services:
 
   cron:
     user: root
-    image: ghcr.io/danbooru/danbooru:production
+    #image: ghcr.io/danbooru/danbooru:production
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     environment:
       - RAILS_ENV=production
       - DATABASE_URL=postgresql://danbooru@postgres/danbooru
       - DANBOORU_REDIS_URL=redis://redis:6379
       - DANBOORU_IQDB_URL=http://iqdb:5588
+      - DANBOORU_AUTOTAGGER_URl=http://autotagger:5000
       - DANBOORU_CANONICAL_URL=http://localhost
     depends_on:
       - danbooru
@@ -59,12 +67,16 @@ services:
   jobs:
     # We need root to write temp upload files in the images directory (/danbooru/public/data)
     user: root
-    image: ghcr.io/danbooru/danbooru:production
+    #image: ghcr.io/danbooru/danbooru:production
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     environment:
       - RAILS_ENV=production
       - DATABASE_URL=postgresql://danbooru@postgres/danbooru
       - DANBOORU_REDIS_URL=redis://redis:6379
       - DANBOORU_IQDB_URL=http://iqdb:5588
+      - DANBOORU_AUTOTAGGER_URl=http://autotagger:5000
       - DANBOORU_CANONICAL_URL=http://localhost
     depends_on:
       - danbooru
@@ -77,9 +89,17 @@ services:
   # https://hub.docker.com/repository/docker/evazion/iqdb
   iqdb:
     image: evazion/iqdb
+    ports:
+      - "5588:5588"
     volumes:
       - "iqdb-data:/iqdb/data"
     command: ["http", "0.0.0.0", "5588", "/iqdb/data/iqdb.sqlite"]
+
+  #docker run --rm -p 5000:5000
+  autotagger:
+    image: ghcr.io/danbooru/autotagger
+    ports:
+      - "5000:5000"
 
   redis:
     image: redis

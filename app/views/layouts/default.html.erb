@@ -5,7 +5,6 @@
   <title><%= page_title %></title>
 
   <link rel="icon" href="/favicon.ico" sizes="16x16" type="image/x-icon">
-  <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml">
   <%= render_meta_links @current_item if @current_item.respond_to?(:paginate) %>
   <%= tag.link rel: "canonical", href: canonical_url %>
   <%= tag.link rel: "search", type: "application/opensearchdescription+xml", href: opensearch_url(format: :xml, version: 2), title: "Search posts" %>
@@ -72,7 +71,7 @@
 
   <header id="top">
     <div id="app-name-header" class="font-bold font-header leading-normal inline-flex items-center gap-1">
-      <%= link_to image_pack_tag("static/danbooru-logo-128x128.png"), root_path, id: "app-logo" %>
+      <%= link_to image_pack_tag("static/logo.png"), root_path, id: "app-logo" %>
       <%= link_to Danbooru.config.app_name, root_path, id: "app-name" %>
     </div>
 
@@ -83,6 +82,7 @@
 
     <nav id="nav">
       <menu id="main-menu" class="main">
+        <%= nav_link_to("Forum", "https://ostan-collections.net/") %>
         <% if CurrentUser.is_anonymous? %>
           <%= nav_link_to("Login", login_path(url: request.fullpath), rel: "nofollow") %>
         <% else %>
