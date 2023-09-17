@@ -225,6 +225,7 @@ module IconHelper
     Willow
     Wix
     WordPress
+    Xfolio
     Yahoo
     Yande.re
     Yfrog

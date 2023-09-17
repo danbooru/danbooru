@@ -76,6 +76,7 @@ module Source
       Source::URL::Civitai,
       Source::URL::Misskey,
       Source::URL::CiEn,
+      Source::URL::Xfolio,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
