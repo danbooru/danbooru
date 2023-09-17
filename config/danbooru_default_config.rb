@@ -479,6 +479,11 @@ module Danbooru
     def twitter_csrf_token
     end
 
+    # Your Xfolio "xfolio_session" cookie. Login to Xfolio then use the
+    # devtools to find the "xfolio_session" cookie.
+    def xfolio_session
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
