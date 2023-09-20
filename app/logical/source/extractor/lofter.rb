@@ -36,7 +36,9 @@ module Source
         return [] if artist_name.blank?
         page&.search("[href*='#{artist_name}.lofter.com/tag/']").to_a.map do |tag|
           href = tag.attr("href")
-          [Source::URL.parse(href).unescaped_tag, href]
+          [Source::URL.parse(href).unescaped_tag.encode!("UTF-8", :invalid => :replace, :replace => ""), href]
+          # nasty surprise from some posts like https://xingfulun16203.lofter.com/post/77a68dc4_2b9f0f00c
+          # if 0xA0 is present in a tag, it seems the tag search will crash, so not even lofter can handle these properly
         end
       end
 
@@ -60,7 +62,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc)&.normalize_whitespace&.gsub(/\r\n/, "\n").gsub(/ *\n */, "\n")&.strip
+        DText.from_html(artist_commentary_desc)&.normalize_whitespace&.gsub(/\r\n/, "\n")&.gsub(/ *\n */, "\n")&.strip
       end
 
       def illust_id
