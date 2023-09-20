@@ -77,7 +77,7 @@ module Sources
           "https://imglf4.lf127.net/img/323e0e53fec354b8/Sytua1gwSUwyV1k3SXZxY3FiVGJvWWh2MjZSUHdvM3JNWndUS0pSSS9Gdz0.png",
           "https://imglf3.lf127.net/img/304d83b42234fa53/Sytua1gwSUwyV1k3SXZxY3FiVGJvY2xNK3FDQ2lTaDBOdU1lenhtNDJLaz0.png",
         ],
-        dtext_artist_commentary_desc: "本来是给外国朋友但是我销号了所以存下()",
+        dtext_artist_commentary_desc: "本来是给外国朋友但是我销号了所以存下()"
       )
     end
 
@@ -115,6 +115,14 @@ module Sources
 
           占tag非常抱歉。
         EOS
+      )
+    end
+
+    context "A lofter post with the character 0xA0 in a tag" do
+      strategy_should_work(
+        "https://xingfulun16203.lofter.com/post/77a68dc4_2b9f0f00c",
+        image_urls: ["https://imglf4.lf127.net/img/b7c3e00acd19f7c0/azVib0c4ZHd2WVd6UEhkWG93c1QxRXM3V3VVM2pab0pqaXB3UFV4WG1tVT0.png"],
+        tags: %w[夸奈 我推的孩子 夸奈24h:海蓝苏打七夕特供]
       )
     end
 
