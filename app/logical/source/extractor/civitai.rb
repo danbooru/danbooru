@@ -60,12 +60,7 @@ class Source::Extractor
     end
 
     def width
-      case image_metadata["Size"].to_s.scan(/(\d+)x(\d+)/)
-      in [[width, height]]
-        width
-      else
-        next_data.dig("queries", 0, "state", "data", "width")
-      end
+      next_data.dig("queries", 0, "state", "data", "width")
     end
   end
 end
