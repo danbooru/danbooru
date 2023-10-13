@@ -48,6 +48,15 @@ module Sources
       )
     end
 
+    context "A work without full image available" do
+      strategy_should_work(
+        "https://xfolio.jp/portfolio/riku_mochiduki/works/329367",
+        media_files: [
+          { file_size: 79_118 },
+        ],
+      )
+    end
+
     should "Parse Xfolio URLs correctly" do
       assert(Source::URL.image_url?("https://xfolio.jp/user_asset.php?id=1128032&work_id=237599&work_image_id=1128032&type=work_image"))
 

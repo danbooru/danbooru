@@ -14,11 +14,15 @@ class Source::Extractor::Xfolio < Source::Extractor
     if work_id.present? && image_id.present?
       ["https://xfolio.jp/user_asset.php?id=#{image_id}&work_id=#{work_id}&work_image_id=#{image_id}&type=work_image"]
     elsif page.present?
-      page&.search("a").to_a.pluck("href").map do |url|
-        match = url.to_s.match(%r{\Ahttps://xfolio.jp/fullscale_image\?image_id=(\d+)&work_id=(\d+)\z})
-        if match
+      page&.search(".article__wrap_img").map do |wrap_img|
+        a = wrap_img.search("a").first
+        img = wrap_img.search("img").first
+        if a
+          match = a.attr("href").match(%r{\Ahttps://xfolio.jp/fullscale_image\?image_id=(\d+)&work_id=(\d+)\z})
           image_id, work_id = match[1..]
           "https://xfolio.jp/user_asset.php?id=#{image_id}&work_id=#{work_id}&work_image_id=#{image_id}&type=work_image"
+        elsif img
+          img.attr("src")
         end
       end.compact
     else
