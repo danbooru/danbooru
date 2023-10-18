@@ -63,6 +63,22 @@ module Sources
       )
     end
 
+    context "A https://x.com/i/status/:id url" do
+      strategy_should_work(
+        "https://x.com/i/status/943446161586733056",
+        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        image_urls: [
+          "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
+        ],
+        profile_url: "https://twitter.com/motty08111213",
+        artist_name: "丸茂_えのぐマネージャー",
+        tag_name: "motty08111213",
+        tags: ["岩本町芸能社", "女優部"]
+      )
+    end
+
     context "A video tweet" do
       strategy_should_work(
         "https://twitter.com/CincinnatiZoo/status/859073537713328129",
@@ -150,7 +166,7 @@ module Sources
         profile_urls: ["https://twitter.com/shoka_bg", "https://twitter.com/intent/user?user_id=1109709388049051649"],
         tag_name: "shoka_bg",
         tags: %w[ブルアカ],
-        artist_name: "shooka",
+        artist_name: "shooka@土曜日 西 “む” 34a",
         dtext_artist_commentary_desc: <<~EOS.chomp
           風紀委員の実態
           "#ブルアカ":[https://twitter.com/hashtag/ブルアカ]
@@ -298,9 +314,9 @@ module Sources
 
     context "A profile banner image" do
       strategy_should_work(
-        "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696",
-        image_urls: ["https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/1500x500"],
-        media_files: [{ file_size: 128_141 }],
+        "https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500",
+        image_urls: ["https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500"],
+        media_files: [{ file_size: 108_605 }],
         profile_url: nil
         # profile_url: "https://twitter.com/intent/user?user_id=780804311529906176"
         # XXX we COULD fully support these by setting the page_url to https://twitter.com/Kekeflipnote/header_photo, but it's a lot of work for a niche case
@@ -309,9 +325,9 @@ module Sources
 
     context "A profile banner image sample" do
       strategy_should_work(
-        "https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/600x200",
-        image_urls: ["https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/1500x500"],
-        media_files: [{ file_size: 128_141 }],
+        "https://pbs.twimg.com/profile_banners/16298441/1394248006/600x200",
+        image_urls: ["https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500"],
+        media_files: [{ file_size: 108_605 }],
         profile_url: nil
       )
     end
@@ -399,12 +415,21 @@ module Sources
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194?s=19"))
       assert(Source::URL.page_url?("https://twitter.com/@BOW999/status/1261877313349640194"))
 
+      assert(Source::URL.page_url?("https://x.com/i/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://x.com/i/web/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://x.com/BOW999/status/1261877313349640194"))
+
       assert(Source::URL.profile_url?("https://www.twitter.com/irt_5433"))
       assert(Source::URL.profile_url?("https://www.twitter.com/@irt_5433"))
       assert(Source::URL.profile_url?("https://www.twitter.com/irt_5433/likes"))
       assert(Source::URL.profile_url?("https://twitter.com/intent/user?user_id=1485229827984531457"))
       assert(Source::URL.profile_url?("https://twitter.com/intent/user?screen_name=ryuudog_NFT"))
       assert(Source::URL.profile_url?("https://twitter.com/i/user/889592953"))
+
+      assert(Source::URL.profile_url?("https://x.com/irt_5433"))
+      assert(Source::URL.profile_url?("https://x.com/intent/user?user_id=1485229827984531457"))
+      assert(Source::URL.profile_url?("https://x.com/intent/user?screen_name=ryuudog_NFT"))
+      assert(Source::URL.profile_url?("https://x.com/i/user/889592953"))
 
       assert_not(Source::URL.profile_url?("https://twitter.com/home"))
 
