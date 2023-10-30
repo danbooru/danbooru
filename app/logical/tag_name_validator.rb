@@ -37,8 +37,10 @@ class TagNameValidator < ActiveModel::EachValidator
       record.errors.add(attribute, "'#{value}' cannot contain consecutive underscores")
     when /[^[:graph:]]/
       record.errors.add(attribute, "'#{value}' cannot contain non-printable characters")
-    when /[^[:ascii:]]/
-      record.errors.add(attribute, "'#{value}' must consist of only ASCII characters")
+    when /[^ -~]/
+      record.errors.add(attribute, "'#{value}' cannot contain non-standard ASCII characters")
+    #when /[^[:ascii:]]/
+      #record.errors.add(attribute, "'#{value}' must consist of only ASCII characters")
     when /\A(#{PostQueryBuilder::METATAGS.join("|")}):(.+)\z/i
       record.errors.add(attribute, "'#{value}' cannot begin with '#{$1}:'")
     when /\A(#{PostEdit::METATAGS.join("|")}):(.+)\z/i
