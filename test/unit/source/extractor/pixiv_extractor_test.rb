@@ -279,7 +279,52 @@ module Source::Tests::Extractor
     context "A work requested via Pixiv Requests" do
       strategy_should_work(
         "https://www.pixiv.net/en/artworks/91322075",
-        tags: %w[アイドルマスターシンデレラガールズ 大槻唯 濡れ透け パンツ 透けブラ 裾結び プール掃除 おへそ ぱんつ パンモロにも定評のあるゆいれそ pixiv_commission],
+        image_urls: %w[
+          https://i.pximg.net/img-original/img/2021/07/18/10/57/28/91322075_p0.jpg
+          https://i.pximg.net/img-original/img/2021/07/18/10/57/28/91322075_p1.jpg
+        ],
+        media_files: [
+          { file_size: 376_917 },
+          { file_size: 369_540 },
+        ],
+        page_url: "https://www.pixiv.net/artworks/91322075",
+        profile_url: "https://www.pixiv.net/users/13540",
+        profile_urls: %w[https://www.pixiv.net/users/13540 https://www.pixiv.net/stacc/lielos],
+        display_name: "ゆいれそ",
+        username: "lielos",
+        published_at: Time.parse("2021-07-18T01:57:00.000000Z"),
+        updated_at: Time.parse("2021-07-18T01:57:00.000000Z"),
+        tags: [
+          ["アイドルマスターシンデレラガールズ", "https://www.pixiv.net/tags/アイドルマスターシンデレラガールズ/artworks"],
+          ["大槻唯", "https://www.pixiv.net/tags/大槻唯/artworks"],
+          ["濡れ透け", "https://www.pixiv.net/tags/濡れ透け/artworks"],
+          ["パンツ", "https://www.pixiv.net/tags/パンツ/artworks"],
+          ["透けブラ", "https://www.pixiv.net/tags/透けブラ/artworks"],
+          ["裾結び", "https://www.pixiv.net/tags/裾結び/artworks"],
+          ["プール掃除", "https://www.pixiv.net/tags/プール掃除/artworks"],
+          ["おへそ", "https://www.pixiv.net/tags/おへそ/artworks"],
+          ["ぱんつ", "https://www.pixiv.net/tags/ぱんつ/artworks"],
+          ["パンモロにも定評のあるゆいれそ", "https://www.pixiv.net/tags/パンモロにも定評のあるゆいれそ/artworks"],
+          ["pixiv_commission", "https://www.pixiv.net/tags/依頼絵/artworks"],
+        ],
+        dtext_artist_commentary_title: "唯ちゃん",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          pixivリクエストから大槻唯ちゃん。
+          リクエストでは下はパンツだったのですが、オマケの差分でハーフパンツありも付けました。
+
+          [tn]Source: https://www.pixiv.net/artworks/91322075[/tn]
+
+          キャラはデレマスの大槻唯
+          上半身は体操服のシャツを着ていて下半身は下着だけ（[はじけてON AIR!]特訓前の服装からズボンを脱いで腰にジャージを巻いてない感じ）
+          シャツの裾を結んでへそ出し
+          ホースを持って水かけしている
+          びしょ濡れ状態でシャツの下にブラを付けている
+          下着の色は淡いピンク、パンツのフロント部分にリボンが付いてる
+          ポーズは立ちポーズで（細かいのはおまかせ）
+          よろしくご検討ください！
+
+          [tn]Source: https://www.pixiv.net/requests/31661[/tn]
+        EOS
       )
     end
 

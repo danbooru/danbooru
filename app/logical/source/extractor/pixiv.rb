@@ -120,7 +120,13 @@ module Source
         if api_novel_series.present?
           DText.from_plaintext(artist_commentary_desc)
         else
-          text = artist_commentary_desc.to_s
+          text = artist_commentary_desc.to_s.dup
+
+          if html_commission_desc.present?
+            text << "<br><br><small>Source: #{page_url}</small><br><br>"
+            text << html_commission_desc
+            text << "<br><br><small>Source: #{commission_url}</small>"
+          end
 
           text = text.gsub(%r{<a href="https?://www\.pixiv\.net/(?:[a-z]+/)?artworks/([0-9]+)">illust/[0-9]+</a>}i) do |_match|
             pixiv_id = $1
@@ -144,6 +150,38 @@ module Source
             end
           end
         end
+      end
+
+      def commission_id
+        api_illust.dig("request", "request", "requestId")
+      end
+
+      def commission_url
+        "https://www.pixiv.net/requests/#{commission_id}" if commission_id.present?
+      end
+
+      def commission_desc
+        api_illust.dig("request", "request", "requestProposal", "requestOriginalProposal")
+      end
+
+      def html_commission_desc
+        text = commission_desc
+        return nil if text.nil?
+
+        text = CGI.escapeHTML(text)
+        text.gsub!("\n", "<br>")
+
+        text.gsub!(%r{(?<=<br>|\s|\A)https?://www\.pixiv\.net/(?:[a-z]+/)?artworks/([0-9]+)(?=<br>|\s|\z)}i) do |_match|
+          pixiv_id = $1
+          %(<a href="https://www.pixiv.net/artworks/#{pixiv_id}">illust/#{pixiv_id}</a>)
+        end
+
+        text.gsub!(%r{(?<=<br>|\s|\A)https?://www\.pixiv\.net/(?:[a-z]+/)?users/([0-9]+)(?=<br>|\s|\z)}i) do |_match|
+          member_id = $1
+          %(<a href="https://www.pixiv.net/users/#{member_id}">user/#{member_id}</a>)
+        end
+
+        text
       end
 
       def tags
