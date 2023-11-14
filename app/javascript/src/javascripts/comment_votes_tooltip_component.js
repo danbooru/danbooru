@@ -1,6 +1,6 @@
 import Utility from "./utility";
-import { delegate, hideAll } from 'tippy.js';
-import 'tippy.js/dist/tippy.css';
+import { createTooltip } from "./utility";
+import { hideAll } from 'tippy.js';
 
 class CommentVotesTooltipComponent {
   // Trigger on the comment score link; see CommentComponent.
@@ -15,16 +15,10 @@ class CommentVotesTooltipComponent {
       return;
     }
 
-    CommentVotesTooltipComponent.instance = delegate("body", {
-      allowHTML: true,
-      appendTo: document.querySelector("#comment-votes-tooltips"),
+    CommentVotesTooltipComponent.instance = createTooltip("comment-tooltip", {
       delay: [CommentVotesTooltipComponent.SHOW_DELAY, CommentVotesTooltipComponent.HIDE_DELAY],
       duration: CommentVotesTooltipComponent.DURATION,
-      interactive: true,
-      maxWidth: "none",
       target: CommentVotesTooltipComponent.TARGET_SELECTOR,
-      theme: "common-tooltip",
-      touch: false,
 
       onShow: CommentVotesTooltipComponent.onShow,
       onHide: CommentVotesTooltipComponent.onHide,

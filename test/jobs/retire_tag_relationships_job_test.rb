@@ -51,7 +51,7 @@ class RetireTagRelationshipsJobTest < ActiveJob::TestCase
 
       RetireTagRelationshipsJob.perform_now
 
-      assert_equal(false, ta0.reload.is_retired?)
+      assert_equal(true, ta0.reload.is_retired?)
       assert_equal(false, ta1.reload.is_retired?)
       assert_equal(false, ta2.reload.is_retired?)
       assert_equal(false, ta3.reload.is_retired?)

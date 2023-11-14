@@ -19,7 +19,7 @@ class UserVerifier
   # IPs are unrestricted so that verification isn't required for development,
   # testing, or personal boorus.
   def requires_verification?
-    return false if !Danbooru.config.new_user_verification?
+    return false if !Danbooru.config.new_user_verification?.to_s.truthy?
     return false if ip_address.is_local?
 
     # we check for IP bans first to make sure we bump the IP ban hit count

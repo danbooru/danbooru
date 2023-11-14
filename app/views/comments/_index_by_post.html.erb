@@ -1,11 +1,13 @@
-<div id="p-index-by-post">
+<%= render "posts/partials/common/inline_blacklist" %>
+
+<div id="p-index-by-post" class="space-y-12">
   <% if @posts.blank? %>
     <%= render "post_sets/blank" %>
   <% end %>
 
   <% @posts.includes(:media_asset, :uploader, :vote_by_current_user, comments: [:creator, :votes]).select(&:visible?).each do |post| %>
-    <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post).article_attrs("post space-x-4") do %>
-      <%= post_preview(post, show_deleted: true, show_votes: true) %>
+    <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post, classes: "post flex sm:flex-col gap-4").article_attrs do %>
+      <%= post_preview(post, show_deleted: true, show_votes: true, classes: "flex md:mx-auto !sm:w-full") %>
 
       <div class="flex-1">
         <%= render "comments/partials/index/header", post: post %>

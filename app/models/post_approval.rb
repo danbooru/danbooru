@@ -31,13 +31,13 @@ class PostApproval < ApplicationRecord
     post.appeals.pending.update!(status: :succeeded)
 
     post.update(approver: user, is_flagged: false, is_pending: false, is_deleted: false)
-    ModAction.log("undeleted post ##{post_id}", :post_undelete, user) if is_undeletion
+    ModAction.log("undeleted post ##{post_id}", :post_undelete, subject: post, user: user) if is_undeletion
 
     post.uploader.upload_limit.update_limit!(is_pending, true)
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :user, :post)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :user, :post], current_user: current_user)
     q.apply_default_order(params)
   end
 

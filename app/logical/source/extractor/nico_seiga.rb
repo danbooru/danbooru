@@ -14,24 +14,27 @@ module Source
 
       def image_urls
         if image_id.present?
-          [image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}")]
+          [image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}") || url]
         elsif illust_id.present?
-          [image_url_for("https://seiga.nicovideo.jp/image/source/#{illust_id}")]
-        elsif manga_id.present? && api_client.image_ids.present?
-          api_client.image_ids.map { |id| image_url_for("https://seiga.nicovideo.jp/image/source/#{id}") }
+          [image_url_for("https://seiga.nicovideo.jp/image/source/#{illust_id}") || url]
+        elsif manga_id.present?
+          api_client.manga_api_response.pluck("meta").pluck("source_url").map do |url|
+            image_id = Source::URL.parse(url).image_id
+            image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}") || url
+          end
         else
-          [image_url_for(url)]
+          [image_url_for(url) || url]
         end
       end
 
       def image_url_for(url)
-        return url if api_client.blank?
+        return nil if api_client.blank?
 
         resp = api_client.head(url)
         if resp.uri.to_s =~ %r{https?://.+/(\w+/\d+/\d+)\z}i
           "https://lohas.nicoseiga.jp/priv/#{$1}"
         else
-          url
+          nil
         end
       end
 
@@ -40,7 +43,7 @@ module Source
       end
 
       def profile_url
-        "https://seiga.nicovideo.jp/user/illust/#{api_client.user_id}" if api_client&.user_id.present?
+        "https://seiga.nicovideo.jp/user/illust/#{artist_id}" if artist_id.present?
       end
 
       def artist_name
@@ -67,19 +70,18 @@ module Source
       end
 
       def tag_name
-        return if api_client&.user_id.blank?
-        "nicoseiga#{api_client.user_id}"
+        "nicoseiga_#{artist_id}" if artist_id.present?
+      end
+
+      def other_names
+        [artist_name].compact
       end
 
       def tags
         return [] if api_client.blank?
 
-        base_url = "https://seiga.nicovideo.jp/"
-        base_url += "manga/" if manga_id.present?
-        base_url += "tag/"
-
         api_client.tags.map do |name|
-          [name, base_url + CGI.escape(name)]
+          [name, "https://seiga.nicovideo.jp/#{"manga/" if manga_id}tag/#{Danbooru::URL.escape(name)}"]
         end
       end
 
@@ -93,6 +95,18 @@ module Source
 
       def manga_id
         parsed_url.manga_id || parsed_referer&.manga_id
+      end
+
+      def artist_id
+        api_client&.user_id
+      end
+
+      def http
+        if parsed_url.oekaki_id.present?
+          super.with_legacy_ssl
+        else
+          super
+        end
       end
 
       def api_client

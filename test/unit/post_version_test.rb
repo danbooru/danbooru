@@ -7,12 +7,10 @@ class PostVersionTest < ActiveSupport::TestCase
         @user = FactoryBot.create(:user)
       end
       CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "that has multiple versions: " do

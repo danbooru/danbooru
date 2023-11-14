@@ -1,19 +1,22 @@
 import SourceDataComponent from "./source_data_component.js";
 import Utility from './utility';
+import Alpine from 'alpinejs';
+
+Alpine.store("relatedTags", {
+  loading: false,
+});
 
 let RelatedTag = {};
 
-RelatedTag.initialize_all = function() {
-  $(document).on("click.danbooru", ".related-tags-button", RelatedTag.on_click_related_tags_button);
-  $(document).on("change.danbooru", ".related-tags input", RelatedTag.toggle_tag);
-  $(document).on("click.danbooru", ".related-tags a.search-tag", RelatedTag.toggle_tag);
-  $(document).on("click.danbooru", "#show-related-tags-link", RelatedTag.show);
-  $(document).on("click.danbooru", "#hide-related-tags-link", RelatedTag.hide);
-  $(document).on("keyup.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_selected);
+RelatedTag.MAX_RELATED_TAGS = 25;
 
-  $(document).on("danbooru:update-source-data", RelatedTag.on_update_source_data);
-  $(document).on("danbooru:open-post-edit-dialog", RelatedTag.hide);
-  $(document).on("danbooru:close-post-edit-dialog", RelatedTag.show);
+RelatedTag.initialize_all = function() {
+  $(document).on("change.danbooru", ".related-tags input", RelatedTag.toggle_tag);
+  $(document).on("click.danbooru", ".related-tags .tag-list a", RelatedTag.toggle_tag);
+  $(document).on("input.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_selected);
+  $(document).on("click.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_current_tag);
+
+  $(document).on("danbooru:open-post-edit-dialog", RelatedTag.show);
 
   // Initialize the recent/favorite/translated/artist tag columns once, the first time the related tags are shown.
   $(document).one("danbooru:show-related-tags", RelatedTag.initialize_recent_and_favorite_tags);
@@ -31,14 +34,14 @@ RelatedTag.initialize_recent_and_favorite_tags = function(event) {
   $.get("/related_tag.js", { user_tags: true, media_asset_id: media_asset_id });
 }
 
-RelatedTag.on_click_related_tags_button = function (event) {
-  $.get("/related_tag.js", { query: RelatedTag.current_tag(), category: $(event.target).data("category") });
-  RelatedTag.show();
-}
-
-RelatedTag.on_update_source_data = function (event, { related_tags_html }) {
-  $(".source-related-tags-columns").replaceWith(related_tags_html);
-  RelatedTag.update_selected();
+RelatedTag.update_related_tags = async function(event) {
+  if (event.button === 0 && !event.ctrlKey && !event.shiftKey && !event.metaKey && !event.altKey) {
+    event.preventDefault();
+    Alpine.store("relatedTags").loading = true;
+    await $.get("/related_tag.js", { query: RelatedTag.current_tag().trim(), limit: RelatedTag.MAX_RELATED_TAGS });
+    RelatedTag.show();
+    Alpine.store("relatedTags").loading = false;
+  }
 }
 
 RelatedTag.current_tag = function() {
@@ -89,6 +92,16 @@ RelatedTag.current_tag = function() {
   return string.slice(a, b);
 }
 
+RelatedTag.update_current_tag = function() {
+  let current_tag = RelatedTag.current_tag().trim();
+
+  if (current_tag) {
+    $(".general-related-tags-column").removeClass("hidden");
+    $(".related-tags-current-tag").show().text(current_tag.replace(/_/g, " "));
+    $(".related-tags-current-tag").attr("href", `/posts?tags=${encodeURIComponent(current_tag)}`);
+  }
+}
+
 RelatedTag.update_selected = function(e) {
   var current_tags = RelatedTag.current_tags();
 
@@ -103,6 +116,8 @@ RelatedTag.update_selected = function(e) {
       $(li).find("input").prop("checked", false);
     }
   });
+
+  RelatedTag.update_current_tag();
 }
 
 RelatedTag.current_tags = function() {
@@ -125,7 +140,7 @@ RelatedTag.toggle_tag = function(e) {
   RelatedTag.update_selected();
 
   // The timeout is needed on Chrome since it will clobber the field attribute otherwise
-  setTimeout(function () { $field.prop('selectionStart', $field.val().length);}, 100);
+  setTimeout(function () { $field.prop('selectionStart', $field.val().length); }, 100);
   e.preventDefault();
 
   // Artificially trigger input event so the tag counter updates.
@@ -134,19 +149,7 @@ RelatedTag.toggle_tag = function(e) {
 
 RelatedTag.show = function(e) {
   $(document).trigger("danbooru:show-related-tags");
-  $("#related-tags-container").removeClass("collapsed").addClass("visible");
-
-  if (e) {
-    e.preventDefault();
-  }
-}
-
-RelatedTag.hide = function(e) {
-  $("#related-tags-container").removeClass("visible").addClass("collapsed");
-
-  if (e) {
-    e.preventDefault();
-  }
+  e?.preventDefault();
 }
 
 $(function() {

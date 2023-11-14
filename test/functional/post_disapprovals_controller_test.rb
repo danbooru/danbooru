@@ -62,13 +62,13 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
       should "allow mods to see disapprover names" do
         get_auth post_disapprovals_path, create(:mod_user)
         assert_response :success
-        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-post-approver", true
+        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-approver", true
       end
 
       should "not allow non-mods to see disapprover names" do
         get post_disapprovals_path
         assert_response :success
-        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-post-approver", false
+        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-approver", false
       end
 
       context "when a non-mod searches by disapprover name" do
@@ -83,6 +83,24 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
       context "when a disapprover searches by their own name" do
         setup { CurrentUser.user = @approver }
         should respond_to_search(user_name: "eiki").with { @user_disapproval }
+      end
+    end
+
+    context "show action" do
+      setup do
+        @disapproval = create(:post_disapproval)
+      end
+
+      should "render for html" do
+        get post_disapproval_path(@disapproval)
+
+        assert_redirected_to post_disapprovals_path(search: { id: @disapproval.id })
+      end
+
+      should "render for json" do
+        get post_disapproval_path(@disapproval), as: :json
+
+        assert_response :success
       end
     end
 

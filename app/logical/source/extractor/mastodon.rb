@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Mastodon
+# @see https://docs.joinmastodon.org/api
 class Source::Extractor
   class Mastodon < Source::Extractor
     def match?
@@ -18,80 +19,98 @@ class Source::Extractor
       if parsed_url.image_url?
         [parsed_url.full_image_url]
       else
-        api_response.image_urls
+        api_response.dig("media_attachments").to_a.pluck("url")
       end
     end
 
     def page_url
-      artist_name = artist_name_from_url
-      status_id = status_id_from_url
-      return if status_id.blank?
-
-      if artist_name.present?
-        "https://#{domain}/@#{artist_name}/#{status_id}"
-      else
+      if username.present? && status_id.present?
+        "https://#{domain}/@#{username}/#{status_id}"
+      elsif status_id.present?
         "https://#{domain}/web/statuses/#{status_id}"
       end
     end
 
     def profile_url
-      if artist_name_from_url.present?
-        "https://#{domain}/@#{artist_name_from_url}"
-      elsif api_response.present? && api_response.profile_url.present?
-        api_response.profile_url
+      if username.present?
+        "https://#{domain}/@#{username}"
+      else
+        api_response.dig("account", "url")
       end
     end
 
     def account_url
-      return if account_id.blank?
-      "https://#{domain}/web/accounts/#{account_id}"
+      "https://#{domain}/web/accounts/#{account_id}" if account_id.present?
     end
 
     def profile_urls
       [profile_url, account_url].compact
     end
 
-    def artist_name
-      api_response.account_name
+    def username
+      api_response.dig("account", "username") || artist_name_from_url
+    end
+
+    def tag_name
+      username
     end
 
     def artist_name_from_url
       parsed_url.username || parsed_referer&.username
     end
 
-    def other_names
-      [api_response.display_name]
+    def artist_name
+      api_response.dig("account", "display_name").presence
     end
 
     def account_id
-      parsed_url.user_id || parsed_referer&.user_id || api_response.account_id
+      parsed_url.user_id || parsed_referer&.user_id || api_response.dig("account", "id")
     end
 
-    def status_id_from_url
+    def status_id
       parsed_url.work_id || parsed_referer&.work_id
     end
 
     def artist_commentary_desc
-      api_response.commentary
+      commentary = "".dup
+      commentary << "<p>#{api_response["spoiler_text"]}</p>" if api_response["spoiler_text"].present?
+      commentary << api_response["content"] if api_response["content"].present?
+      commentary
     end
 
     def tags
-      api_response.tags
+      api_response.dig("tags").to_a.map do |tag|
+        [tag["name"], tag["url"]]
+      end
     end
 
     def dtext_artist_commentary_desc
       DText.from_html(artist_commentary_desc) do |element|
         if element.name == "a"
           # don't include links to the toot itself.
-          media_urls = api_response.json["media_attachments"].map { |attr| attr["text_url"] }
+          media_urls = api_response.dig("media_attachments").pluck("text_url")
           element["href"] = nil if element["href"].in?(media_urls)
         end
       end.strip
     end
 
-    def api_response
-      MastodonApiClient.new(domain, status_id_from_url)
+    def status_api_url
+      "https://#{domain}/api/v1/statuses/#{status_id}" if status_id.present?
     end
-    memoize :api_response
+
+    memoize def api_response
+      http.cache(1.minute).parsed_get(status_api_url) || {}
+    end
+
+    def http
+      super.headers(Authorization: "Bearer #{access_token}")
+    end
+
+    def access_token
+      case site_name
+      when "Pawoo" then Danbooru.config.pawoo_access_token
+      when "Baraag" then Danbooru.config.baraag_access_token
+      end
+    end
   end
 end

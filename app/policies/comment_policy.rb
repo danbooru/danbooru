@@ -21,6 +21,10 @@ class CommentPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def can_see_creator?
+    !record.is_deleted? || can_see_deleted? || record.creator_id == user.id
+  end
+
   def reply?
     !record.is_deleted?
   end
@@ -35,8 +39,20 @@ class CommentPolicy < ApplicationPolicy
 
   def api_attributes
     attributes = super
-    attributes -= [:creator_id, :updater_id, :body] if record.is_deleted? && !can_see_deleted?
+    attributes -= [:creator_id] unless can_see_creator?
+    attributes -= [:updater_id, :body, :score, :do_not_bump_post, :is_sticky] if record.is_deleted? && !can_see_deleted?
     attributes
+  end
+
+  def visible_for_search(comments, attribute)
+    case attribute
+    in :creator | :creator_id if !can_see_deleted?
+      comments.where(creator: user, is_deleted: true).or(comments.undeleted)
+    in :updater | :updater_id | :body | :score | :do_not_bump_post | :is_sticky if !can_see_deleted?
+      comments.undeleted
+    else
+      comments
+    end
   end
 
   alias_method :undelete?, :update?

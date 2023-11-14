@@ -1,13 +1,8 @@
 require 'test_helper'
 
 class WikiPageTest < ActiveSupport::TestCase
-  setup do
-    CurrentUser.ip_addr = "127.0.0.1"
-  end
-
   teardown do
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   context "A wiki page" do
@@ -25,8 +20,7 @@ class WikiPageTest < ActiveSupport::TestCase
       end
 
       should "search other names with wildcards" do
-        matches = WikiPage.search(other_names_match: "fo*")
-        assert_equal([@wiki_page.id], matches.map(&:id))
+        assert_search_equals(@wiki_page, other_names_match: "fo*")
       end
 
       should "create versions" do
@@ -120,6 +114,8 @@ class WikiPageTest < ActiveSupport::TestCase
       should normalize_attribute(:title).from(" Foo___   Bar ").to("foo_bar")
 
       should_not allow_value("").for(:title).on(:create)
+      should_not allow_value(" ").for(:title).on(:create)
+      should_not allow_value("\u200B").for(:title).on(:create)
       should_not allow_value("___").for(:title).on(:create)
       should_not allow_value("-foo").for(:title).on(:create)
       should_not allow_value("/foo").for(:title).on(:create)
@@ -130,6 +126,12 @@ class WikiPageTest < ActiveSupport::TestCase
       should_not allow_value("東方").for(:title).on(:create)
       should_not allow_value("FAV:blah").for(:title).on(:create)
       should_not allow_value("X"*171).for(:title).on(:create)
+    end
+
+    context "during body validation" do
+      should_not allow_value("").for(:body)
+      should_not allow_value(" ").for(:body)
+      should_not allow_value("\u200B").for(:body)
     end
 
     context "with other names" do

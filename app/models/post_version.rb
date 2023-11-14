@@ -39,8 +39,8 @@ class PostVersion < ApplicationRecord
       where_ilike(:tags, tag)
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :updated_at, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :updated_at, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version], current_user: current_user)
 
       if params[:changed_tags]
         q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
@@ -91,7 +91,6 @@ class PostVersion < ApplicationRecord
           "parent_id" => post.parent_id,
           "source" => post.source,
           "updater_id" => CurrentUser.id,
-          "updater_ip_addr" => CurrentUser.ip_addr.to_s,
           "updated_at" => post.updated_at.try(:iso8601),
           "created_at" => post.created_at.try(:iso8601),
           "tags" => post.tag_string,
@@ -125,11 +124,6 @@ class PostVersion < ApplicationRecord
       end
     end
     @previous.first
-  end
-
-  def subsequent
-    @subsequent ||= PostVersion.where("post_id = ? and version > ?", post_id, version).order("version asc").limit(1).to_a
-    @subsequent.first
   end
 
   def current

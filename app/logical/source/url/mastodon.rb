@@ -27,6 +27,10 @@ class Source::URL::Mastodon < Source::URL
     in _, _, /^@/ => username, *rest
       @username = username.delete_prefix("@")
 
+    # https://baraag.net/web/@loodncrood
+    in _, _, "web", /^@/ => username, *rest
+      @username = username.delete_prefix("@")
+
     # https://pawoo.net/users/esoraneko
     # https://pawoo.net/users/khurata/media
     in _, _, "users", username, *rest
@@ -56,7 +60,15 @@ class Source::URL::Mastodon < Source::URL
     # https://baraag.net/system/media_attachments/files/107/866/084/754/651/925/original/8f3df857681a1639.png
     in _, "baraag.net", "system", "media_attachments", "files", *subdirs, file_size, file
       @file_size = file_size
-      @full_image_url = "#{site}/system/media_attachments/files/#{subdirs.join("/")}/original/#{file}"
+      @full_image_url = "https://media.baraag.net/media_attachments/files/#{subdirs.join("/")}/original/#{file}"
+
+    # Page: https://baraag.net/@danbooru/107866090743238456
+    # https://media.baraag.net/media_attachments/files/107/866/084/749/942/932/original/a9e0f553e332f303.mp4
+    # https://media.baraag.net/media_attachments/files/107/866/084/754/127/256/original/3895a14ce3736f13.mp4
+    # https://media.baraag.net/media_attachments/files/107/866/084/754/651/925/original/8f3df857681a1639.png
+    in "media", "baraag.net", "media_attachments", "files", *subdirs, file_size, file
+      @file_size = file_size
+      @full_image_url = "https://media.baraag.net/media_attachments/files/#{subdirs.join("/")}/original/#{file}"
 
     # https://pawoo.net/media/lU2uV7C1MMQSb1czwvg
     in _, "pawoo.net", "media", media_hash

@@ -1,9 +1,7 @@
-<div id="c-uploads">
-  <div id="a-show">
-    <h1 class="mb-4">Upload</h1>
-
-    <div id="p-single-asset-upload">
-      <%= render "uploads/single_asset_upload", upload_media_asset: @upload_media_asset %>
+<div id="c-uploads" class="h-full">
+  <div id="a-show" class="h-full">
+    <div id="p-single-asset-upload" class="h-full">
+      <%= render "uploads/single_asset_upload", upload_media_asset: @upload_media_asset, post: @post %>
     </div>
   </div>
 </div>

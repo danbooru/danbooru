@@ -3,9 +3,11 @@
 
     <%= table_for @forum_posts, width: "100%" do |t| %>
       <% t.column "Topic", td: {class: "forum-post-topic-title"} do |forum_post| %>
+        <%= delete_icon(class: "text-muted") if forum_post.topic.is_deleted? %>
         <%= link_to forum_post.topic.title, forum_topic_path(forum_post.topic) %>
       <% end %>
       <% t.column "Excerpt", td: {class: "forum-post-excerpt"} do |forum_post| %>
+        <%= delete_icon(class: "text-muted") if forum_post.is_deleted? %>
         <%= link_to truncate(forum_post.body, :length => 50), forum_post_path(forum_post) %>
       <% end %>
       <% t.column "Creator" do |forum_post| %>

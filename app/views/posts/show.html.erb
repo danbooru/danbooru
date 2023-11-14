@@ -188,9 +188,8 @@
       <li id="post-history-tags"><%= link_to "Tags", post_versions_path(search: { post_id: @post.id }) %></li>
       <li id="post-history-pools"><%= link_to "Pools", pool_versions_path(search: { post_id: @post.id }) %></li>
       <li id="post-history-notes"><%= link_to "Notes", note_versions_path(search: { post_id: @post.id }) %></li>
-      <li id="post-history-moderation"><%= link_to "Moderation", post_events_path(@post.id) %></li>
+      <li id="post-history-moderation"><%= link_to "Moderation", post_post_events_path(@post.id) %></li>
       <li id="post-history-commentary"><%= link_to "Commentary", artist_commentary_versions_path(search: { post_id: @post.id }) %></li>
-      <li id="post-history-replacements"><%= link_to "Replacements", post_replacements_path(search: {post_id: @post.id }) %></li>
     </ul>
   </section>
 <% end %>
@@ -202,7 +201,7 @@
 
   <% if @post.is_banned? %>
     <div class="notice notice-small post-notice post-notice-banned">
-      The artist requested removal of this page
+      This page has been removed because of a takedown request or rule violation.
     </div>
   <% end %>
 
@@ -212,17 +211,23 @@
         This post is pending approval. (<%= link_to_wiki "learn more", "about:mod_queue" %>)
       <% elsif @post.is_flagged? %>
         This post was flagged and is pending approval (<%= link_to_wiki "learn more", "howto:flag" %>)
-        <%= render "post_flags/reasons", flag: @post.flags.select(&:pending?).last %>
+        <ul class="list-bulleted">
+          <li><%= render "post_flags/reasons", flag: @post.flags.select(&:pending?).last %></li>
+        </ul>
       <% elsif @post.is_appealed? %>
         This post was appealed and is pending approval (<%= link_to_wiki "learn more", "about:mod_queue" %>)
-        <%= render "post_appeals/reasons", appeal: @post.appeals.select(&:pending?).last %>
+        <ul class="list-bulleted">
+          <li><%= render "post_appeals/reasons", appeal: @post.appeals.select(&:pending?).last %></li>
+        </ul>
       <% end %>
 
       <%= render "post_disapprovals/counts", disapprovals: @post.disapprovals.order(id: :asc), post: @post %>
 
       <% if CurrentUser.user.is_approver? %>
-        <%= render "modqueue/quick_mod", post: @post %>
-        <%= render "post_disapprovals/detailed_rejection_dialog" %>
+        <div>
+          <%= render "modqueue/quick_mod", post: @post %>
+          <%= render "post_disapprovals/detailed_rejection_dialog" %>
+        </div>
       <% end %>
     </div>
   <% elsif @post.is_deleted? %>
@@ -263,19 +268,33 @@
 
   <%= tag.section class: ["image-container", "note-container", ("danbirthday" if is_danbirthday?(@post))], **image_container_data_attributes(@post, CurrentUser.user) do -%>
     <% if @post.banblocked? -%>
-      <p>The artist requested removal of this image.</p>
+      <p>This page has been removed because of a takedown request or rule violation.</p>
     <% elsif @post.levelblocked? -%>
       <p><%= link_to "You need a gold account to see this image", new_user_upgrade_path %>.</p>
     <% elsif @post.safeblocked? -%>
       <p>This image is unavailable on <%= Danbooru.config.app_name %>. Go to <%= link_to "Danbooru", "https://danbooru.donmai.us" %> or disable safe mode to view (<%= link_to_wiki "learn more", "help:safe_mode" %>).</p>
     <% elsif @post.is_flash? -%>
-      <%= render("posts/partials/show/flash", post: @post) -%>
+      <div class="ruffle-container" data-swf="<%= @post.tagged_file_url %>"></div>
     <% elsif @post.is_video? -%>
-      <%= render("posts/partials/show/video", post: @post) -%>
+      <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_file_url) %>
     <% elsif @post.is_ugoira? -%>
-      <%= render("posts/partials/show/ugoira", post: @post) -%>
-    <% elsif !@post.is_image? -%>
-      <%= render("posts/partials/show/download", post: @post) -%>
+      <% if params[:size] == "original" || (CurrentUser.user.default_image_size == "original" && params[:size].blank?) %>
+        <%= tag.canvas(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, "data-ugoira-frame-delays": @post.media_metadata.metadata["Ugoira:FrameDelays"].to_json) %>
+
+        <div id="ugoira-controls">
+          <div id="ugoira-control-panel" class="mb-2 flex items-center" style="width: <%= [@post.image_width, 350].max %>px;">
+            <button id="ugoira-play" style="display: none;">Play</button>
+            <button id="ugoira-pause">Pause</button>
+            <div id="seek-slider" class="ml-4" style="width: <%= [@post.image_width, 350].max - 81 %>px;"></div>
+          </div>
+
+          <p><%= link_to "View WebM", current_page_path(size: "webm") %></p>
+        </div>
+      <% else %>
+        <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_large_file_url) %>
+
+        <p><%= link_to "View original", current_page_path(size: "original") %></p>
+      <% end %>
     <% elsif @post.is_image? -%>
       <picture>
         <%= tag.source media: "(max-width: 660px)", srcset: @post.tagged_large_file_url %>
@@ -287,22 +306,22 @@
   <% end -%>
 
   <% if policy(Favorite).create? %>
-    <%= content_tag(:div, class: "mb-2 fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
-      <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
-        <%= button_tag empty_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
-      <% end %>
+    <div class="fav-buttons-container">
+      <%= content_tag(:div, class: "mb-2 fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
+        <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
+          <%= button_tag empty_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
+        <% end %>
 
-      <%= form_tag(favorite_path(@post.id), method: "delete", id: "remove-fav-button", "data-remote": true) do %>
-        <%= button_tag solid_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
+        <%= form_tag(favorite_path(@post.id), method: "delete", id: "remove-fav-button", "data-remote": true) do %>
+          <%= button_tag solid_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
+        <% end %>
       <% end %>
-    <% end %>
+    </div>
   <% end %>
 
   <section id="mark-as-translated-section">
     <%= edit_form_for(@post, url: mark_as_translated_post_path(@post), method: :put) do |f| %>
-      <%= f.input :tags_query, as: :hidden, input_html: { id: nil, name: "tags_query", value: params[:q] } %>
-      <%= f.input :pool_id, as: :hidden, input_html: { id: nil, name: "pool_id", value: params[:pool_id] } %>
-      <%= f.input :favgroup_id, as: :hidden, input_html: { id: nil, name: "favgroup_id", value: params[:favgroup_id] } %>
+      <%= f.input :q, as: :hidden, input_html: { id: nil, name: "q", value: params[:q] } %>
 
       <fieldset class="inline-fieldset">
         <%= f.input :check_translation, as: :boolean, input_html: { checked: @post.has_tag?("check_translation") } %>
@@ -396,21 +415,7 @@
   <meta name="post-id" content="<%= @post.id %>">
   <meta name="post-has-embedded-notes" content="<%= @post.has_embedded_notes? %>">
 
-  <% if policy(@post).visible? %>
-    <%= tag.meta property: "og:image", content: @post.open_graph_image_url %>
-
-    <% if @post.is_video? %>
-      <%= json_ld_video_data(@post) %>
-    <% end %>
-  <% end %>
-
-  <% if @post.twitter_card_supported? %>
-    <meta name="twitter:card" content="summary_large_image">
-
-    <% if policy(@post).visible? %>
-      <%= tag.meta name: "twitter:image", content: @post.open_graph_image_url %>
-    <% end %>
-  <% end %>
+  <%= render OpenGraphComponent.new(media_asset: @post.media_asset, current_user: CurrentUser.user) %>
 
   <% if @post.rating == "e" %>
     <meta name="rating" content="adult">

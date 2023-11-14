@@ -51,7 +51,7 @@ module PaginationExtension
       @paginator_mode = :sequential_after
       paginate_sequential_after($1, records_per_page)
     elsif page.to_i > page_limit
-      raise PaginationError
+      raise PaginationError, "You cannot go beyond page #{page_limit}."
     elsif page.to_i == page_limit
       @paginator_mode = :sequential_after
       paginate_numbered(page.to_i, records_per_page)

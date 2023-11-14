@@ -3,14 +3,12 @@ require "test_helper"
 class PostDisapprovalTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
-      @alice = FactoryBot.create(:moderator_user, name: "alice")
+      @alice = FactoryBot.create(:moderator_user)
       CurrentUser.user = @alice
-      CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "a post disapproval" do
@@ -30,25 +28,18 @@ class PostDisapprovalTest < ActiveSupport::TestCase
         end
 
         context "when the current user is alice" do
-          setup do
-            CurrentUser.user = @alice
-          end
-
           should "remove the associated post from alice's moderation queue" do
-            assert_not(Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_1.id))
-            assert(Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_2.id))
+            assert_not(Post.available_for_moderation(@alice, :unseen).map(&:id).include?(@post_1.id))
+            assert(Post.available_for_moderation(@alice, :unseen).map(&:id).include?(@post_2.id))
           end
         end
 
-        context "when the current user is brittony" do
-          setup do
-            @brittony = FactoryBot.create(:moderator_user)
-            CurrentUser.user = @brittony
-          end
+        context "when the current user is not the disapprover" do
+          should "not remove the associated post from the disapprover's moderation queue" do
+            @mod = create(:moderator_user)
 
-          should "not remove the associated post from brittony's moderation queue" do
-            assert(Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_1.id))
-            assert(Post.available_for_moderation(CurrentUser.user, hidden: false).map(&:id).include?(@post_2.id))
+            assert(Post.available_for_moderation(@mod, :unseen).map(&:id).include?(@post_1.id))
+            assert(Post.available_for_moderation(@mod, :unseen).map(&:id).include?(@post_2.id))
           end
         end
       end
@@ -81,9 +72,8 @@ class PostDisapprovalTest < ActiveSupport::TestCase
           disapproval1 = FactoryBot.create(:post_disapproval, user: @approver, post: @post1, reason: "breaks_rules")
           disapproval2 = FactoryBot.create(:post_disapproval, user: @approver, post: @post2, reason: "poor_quality", message: "bad anatomy")
 
-          assert_equal([disapproval1.id], PostDisapproval.search(reason: "breaks_rules").pluck(:id))
-          assert_equal([disapproval2.id], PostDisapproval.search(message: "bad anatomy").pluck(:id))
-          assert_equal([disapproval1.id, disapproval2.id], PostDisapproval.where(user: @approver).pluck(:id))
+          assert_search_equals([disapproval1], reason: "breaks_rules")
+          assert_search_equals([disapproval2], message: "bad anatomy")
         end
       end
     end

@@ -1,10 +1,12 @@
 root = true
 
 [**.{js,rb,css,scss,erb,md,json,yml}]
+charset = utf-8
 indent_style = space
 indent_size = 2
 end_of_line = lf
 insert_final_newline = true
+max_line_length = 120
 trim_trailing_whitespace = true
 
 [**.html.erb]

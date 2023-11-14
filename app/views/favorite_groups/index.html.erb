@@ -1,7 +1,7 @@
 <div id="c-favorite-groups">
   <div id="a-index">
     <%= search_form_for(favorite_groups_path) do |f| %>
-      <%= f.input :name_matches, label: "Name", input_html: { value: params.dig(:search, :name_matches), "data-autocomplete": "favorite-group" } %>
+      <%= f.input :name_contains, label: "Name", input_html: { value: params.dig(:search, :name_contains), "data-autocomplete": "favorite-group" } %>
       <%= f.input :creator_name, label: "Creator", input_html: { value: params.dig(:search, :creator_name), "data-autocomplete": "user" } %>
       <%= f.input :order, collection: [%w[Created created_at], %w[Updated updated_at], %w[Name name], %w[Post\ count post_count]], include_blank: true, selected: params.dig(:search, :order) %>
       <%= f.submit "Search" %>

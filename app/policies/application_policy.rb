@@ -68,10 +68,24 @@ class ApplicationPolicy
     permitted_attributes_for_update
   end
 
+  # When a user performs a search, this method is used to filter out results
+  # that are hidden from the user based on what they're searching for. For
+  # example, if a user searches for post flags by flagger name, they can see
+  # their own flags, and if they're a moderator they can see flags on other
+  # users' uploads, but they can't see flags on their own uploads.
+  #
+  # @param relation [ActiveRecord::Relation] The current search.
+  # @param attribute [Symbol] The name of the attribute being searched by the user.
+  #
+  # @see ApplicationRecord#search
+  # @see app/logical/concerns/searchable.rb
+  def visible_for_search(relation, attribute = nil)
+    relation
+  end
+
   # The list of attributes that are permitted to be returned by the API.
   def api_attributes
-    # XXX allow inet
-    record.class.attribute_types.reject { |_name, attr| attr.type.in?([:inet, :tsvector]) }.keys.map(&:to_sym)
+    record.class.column_names.map(&:to_sym)
   end
 
   # The list of attributes that are permitted to be used as data-* attributes

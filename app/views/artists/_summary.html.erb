@@ -15,33 +15,35 @@
 </div>
 
 <% if artist.is_banned? && !policy(artist).can_view_banned? %>
-  <p>The artist requested removal of this page.</p>
+  <p>This page has been removed because of a takedown request.</p>
 <% elsif artist.new_record? %>
   <p>This artist entry does not exist. <%= link_to "Create new artist entry", new_artist_path(artist: { name: artist.name }), rel: "nofollow" %>.</p>
 <% else %>
-  <% if artist.other_names.present? %>
-    <div>
-      <% artist.other_names.map do |other_name| %>
-        <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name" %>
-      <% end %>
-    </div>
-  <% end %>
+  <div class="flex flex-col gap-2">
+    <% if artist.other_names.present? %>
+      <div class="flex flex-wrap gap-1">
+        <% artist.other_names.map do |other_name| %>
+          <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name chip-primary text-sm truncate", rel: "nofollow"%>
+        <% end %>
+      </div>
+    <% end %>
 
-  <% if artist.group_name.present? %>
-    <div>
-      <strong>Group</strong>
-      <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }), class: "artist-other-name" %>
-    </div>
-  <% end %>
+    <% if artist.group_name.present? %>
+      <div>
+        <strong>Group</strong>
+        <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }), class: "artist-other-name chip-primary text-sm truncate" %>
+      </div>
+    <% end %>
 
-  <% if artist.members.present? %>
-    <div>
-      <strong>Members</strong>
-      <% artist.members.each do |member| %>
-        <%= link_to member.name, artists_path(search: { name: member.name }), class: "artist-other-name" %>
-      <% end %>
-    </div>
-  <% end %>
+    <% if artist.members.present? %>
+      <div>
+        <strong>Members</strong>
+        <% artist.members.each do |member| %>
+          <%= link_to member.name, artists_path(search: { name: member.name }), class: "artist-other-name chip-primary text-sm truncate" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
 
   <% if artist.wiki_page.present? && !artist.wiki_page.is_deleted? %>
     <div class="artist-wiki prose mt-4">
@@ -50,7 +52,7 @@
   <% end %>
 
   <% if artist.urls.present? %>
-    <p>
+    <div class="my-4">
       <h6>URLs</h6>
 
       <ul>
@@ -65,7 +67,7 @@
           </li>
         <% end %>
       </ul>
-    </p>
+    </div>
   <% end %>
 
   <p>

@@ -14,7 +14,8 @@ Post.SWIPE_VELOCITY = 0.6;
 Post.MAX_RECOMMENDATIONS = 45; // 3 rows of 9 posts at 1920x1080.
 Post.LOW_TAG_COUNT = 10;
 Post.HIGH_TAG_COUNT = 20;
-Post.EDIT_DIALOG_WIDTH = 720;
+Post.EDIT_DIALOG_WIDTH = 640;
+Post.EDIT_DIALOG_MIN_HEIGHT = 320;
 
 Post.initialize_all = function() {
 
@@ -36,12 +37,13 @@ Post.initialize_all = function() {
     this.initialize_post_image_resize_links();
     this.initialize_recommended();
     this.initialize_ugoira_player();
-    this.initialize_ruffle_player();
   }
 
   if ($("#c-posts #a-show, #c-uploads #a-show").length) {
     this.initialize_edit_dialog();
   }
+
+  this.initialize_ruffle_player();
 
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
@@ -101,18 +103,20 @@ Post.open_edit_dialog = function() {
   $("#comments").hide();
   $("#post-sections li").removeClass("active");
   $("#post-edit-link").parent("li").addClass("active");
+  $(".upload-container").css("display", "block");
 
   var $tag_string = $("#post_tag_string");
-  $("#open-edit-dialog").hide();
+  $("body.c-uploads .docking-menu-tab").hide();
 
   var dialog = $("<div/>").attr("id", "edit-dialog");
   $("#form").appendTo(dialog);
   dialog.dialog({
     title: "Edit tags",
     width: Post.EDIT_DIALOG_WIDTH,
+    height: Math.max($(window).height() * 0.50, Post.EDIT_DIALOG_MIN_HEIGHT),
     position: {
-      my: "right",
-      at: "right-20",
+      my: "right top",
+      at: "right-20 top+20",
       of: window
     },
     drag: function(e, ui) {
@@ -153,15 +157,16 @@ Post.open_edit_dialog = function() {
   });
 
   $tag_string.css({"resize": "none", "width": "100%"});
-  $tag_string.focus().selectEnd().height($tag_string[0].scrollHeight);
+  $tag_string.focus().selectEnd();
 }
 
 Post.close_edit_dialog = function(e, ui) {
-  $("#form").appendTo($("#c-posts #edit,#c-uploads #a-show"));
+  $("#form").appendTo($("#c-posts #edit, .upload-edit-container"));
+  $(".upload-container").css("display", "");
   $("#edit-dialog").remove();
   var $tag_string = $("#post_tag_string");
   $("div.input").has($tag_string).prevAll().show();
-  $("#open-edit-dialog").show();
+  $("body.c-uploads .docking-menu-tab").show();
   $tag_string.css({"resize": "", "width": ""});
   $(document).trigger("danbooru:close-post-edit-dialog");
 }
@@ -369,7 +374,7 @@ Post.initialize_post_sections = function() {
     } else if (e.target.hash === "#edit") {
       $("#edit").show();
       $("#comments").hide();
-      $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
+      $("#post_tag_string").focus().selectEnd();
       $("#recommended").hide();
       $(document).trigger("danbooru:open-post-edit-tab");
     } else if (e.target.hash === "#recommended") {
@@ -391,11 +396,10 @@ Post.initialize_post_sections = function() {
 
 Post.initialize_ugoira_player = function() {
   if ($("#ugoira-controls").length) {
-    let content_type = $("#image").data("ugoira-content-type");
-    let frames = $("#image").data("ugoira-frames");
+    let frame_delays = $("#image").data("ugoira-frame-delays");
     let file_url = $(".image-container").data("file-url");
 
-    Ugoira.create_player(content_type, frames, file_url);
+    Ugoira.create_player(frame_delays, file_url);
     $(window).on("resize.danbooru.ugoira_scale", Post.resize_ugoira_controls);
   }
 };

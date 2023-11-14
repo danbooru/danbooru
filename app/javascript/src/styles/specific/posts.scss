@@ -24,11 +24,17 @@
 
 #edit-dialog {
   /* Hide everything but the rating and tags fields. */
-  .post_has_embedded_notes_fieldset, .post_lock_fieldset, .post_parent_id,
-  .post_source, .dropzone-container, .upload_as_pending, .upload_source_container,
-  .upload_parent_id, .upload_artist_commentary_container, .upload_commentary_translation_container {
+  .post_has_embedded_notes_fieldset, .post_lock_fieldset, .post_parent_id, .post_source, .dropzone-container, #upload-guide-notice {
     display: none;
   }
+
+  .upload-form {
+    position: static;
+  }
+}
+
+#post_tag_string {
+  max-height: 10rem;
 }
 
 #has-parent-relationship-preview, #has-children-relationship-preview {
@@ -47,6 +53,14 @@
   color: var(--low-post-count-color);
 }
 
+// Put the Rating label on the same line as the radio buttons.
+div.post_rating > label {
+  display: inline-block !important;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  font-size: var(--text-md);
+}
+
 div#c-posts {
   .fav-buttons {
     font-size: var(--text-lg);
@@ -56,7 +70,7 @@ div#c-posts {
     }
   }
 
-  form#remove-fav-button button:not([disabled]) i.icon {
+  form#remove-fav-button button:not([disabled]) .icon {
     color: var(--remove-favorite-button);
   }
 
@@ -206,35 +220,6 @@ div#c-post-versions, div#c-artist-versions {
   div#a-index {
     a {
       word-wrap: break-word;
-    }
-  }
-}
-
-/* Container for the tag edit <textarea>, header, and related tags buttons. */
-#tags-container {
-  max-width: 60rem;
-
-  div.header {
-    line-height: 1.5em;
-
-    label {
-      display: inline-block;
-    }
-
-    i#open-edit-dialog {
-      font-size: var(--text-xxs);
-    }
-
-    span[data-tag-counter] {
-      float: right;
-      color: var(--muted-text-color);
-      font-size: var(--text-sm);
-
-      img {
-        margin-left: 0.5em;
-        width: 20px;
-        height: 20px;
-      }
     }
   }
 }

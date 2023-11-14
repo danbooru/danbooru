@@ -1,11 +1,11 @@
-<% page_title "#{@artist.pretty_name.titleize} | Artist Profile" %>
+<% page_title "#{@artist.pretty_name.startcase} | Artist Profile" %>
 <% noindex if @artist.is_banned? %>
 <%= render "secondary_links" %>
 
 <div id="c-artists">
   <div id="a-show">
     <% if @artist.is_banned? && !policy(@artist).can_view_banned? %>
-      <p>The artist requested removal of this page.</p>
+      <p>This page has been removed because of a takedown request.</p>
     <% else %>
       <%= render "artists/summary", artist: @artist %>
 
@@ -17,7 +17,7 @@
 
           <%= render "posts/partials/common/inline_blacklist" %>
 
-          <%= render_post_gallery(@artist.tag.posts.limit(8), tags: @artist.name) %>
+          <%= render_post_gallery(PostQuery.new(@artist.name, current_user: CurrentUser.user).posts_with_timeout(8), tags: @artist.name) %>
         </div>
       <% end %>
     <% end%>

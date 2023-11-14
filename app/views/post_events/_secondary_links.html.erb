@@ -1,0 +1,18 @@
+<% content_for(:secondary_links) do %>
+  <% case controller_name %>
+  <% when "post_approvals" %>
+    <%= quick_search_form_for(:user_name, post_approvals_path, "user", autocomplete: "user") %>
+  <% when "post_disapprovals" %>
+    <%= quick_search_form_for(:user_name, post_disapprovals_path, "user", autocomplete: "user") %>
+  <% else %>
+    <%= quick_search_form_for(:creator_name, url_for, "user", autocomplete: "user") %>
+  <% end %>
+
+  <%= subnav_link_to "Events", post_events_path %>
+  <%= subnav_link_to "Appeals", post_appeals_path %>
+  <%= subnav_link_to "Approvals", post_approvals_path %>
+  <%= subnav_link_to "Disapprovals", post_disapprovals_path %>
+  <%= subnav_link_to "Flags", post_flags_path %>
+  <%= subnav_link_to "Replacements", post_replacements_path %>
+  <%= subnav_link_to "Mod Actions", mod_actions_path(search: { subject_type: "Post" }) %>
+<% end %>

@@ -102,17 +102,19 @@ class PostVoteTest < ActiveSupport::TestCase
 
     context "deleting a vote by another user" do
       should "leave a mod action" do
-        admin = create(:admin_user, name: "admin")
+        admin = create(:admin_user)
         vote = create(:post_vote, post: @post, score: 1)
 
         vote.soft_delete!(updater: admin)
-        assert_match(/admin deleted post vote #\d+ on post #\d+/, ModAction.post_vote_delete.last.description)
+        assert_match(/deleted post vote #\d+ on post #\d+/, ModAction.post_vote_delete.last.description)
+        assert_equal(vote, ModAction.post_vote_delete.last.subject)
+        assert_equal(admin, ModAction.post_vote_delete.last.creator)
       end
     end
 
     context "undeleting a vote by another user" do
       setup do
-        @admin = create(:admin_user, name: "admin")
+        @admin = create(:admin_user)
         @vote = create(:post_vote, post: @post, score: 1)
 
         @vote.soft_delete!(updater: @admin)
@@ -128,7 +130,9 @@ class PostVoteTest < ActiveSupport::TestCase
       end
 
       should "leave a mod action" do
-        assert_match(/admin undeleted post vote #\d+ on post #\d+/, ModAction.post_vote_undelete.last.description)
+        assert_match(/undeleted post vote #\d+ on post #\d+/, ModAction.post_vote_undelete.last.description)
+        assert_equal(@vote, ModAction.post_vote_undelete.last.subject)
+        assert_equal(@admin, ModAction.post_vote_undelete.last.creator)
       end
     end
   end

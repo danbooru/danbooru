@@ -4,7 +4,7 @@ class PostFlagTest < ActiveSupport::TestCase
   context "PostFlag: " do
     context "an approver" do
       should "be able to flag an unlimited number of posts" do
-        @user = create(:user, can_approve_posts: true)
+        @user = create(:approver)
 
         assert_nothing_raised do
           create_list(:post_flag, 6, creator: @user, status: :pending)
@@ -14,8 +14,7 @@ class PostFlagTest < ActiveSupport::TestCase
 
     context "a user with unlimited flags" do
       should "be able to flag an unlimited number of posts" do
-        @user = create(:user)
-        create_list(:post_flag, 30, status: :succeeded, creator: @user)
+        @user = create(:approver)
 
         assert_equal(true, @user.has_unlimited_flags?)
         assert_equal(false, @user.is_flag_limited?)
@@ -98,6 +97,29 @@ class PostFlagTest < ActiveSupport::TestCase
           assert(@flag3.errors.empty?)
         end
       end
+
+      should "be able to flag a post in the cooldown period if they're a mod" do
+        @post = create(:post)
+        @flag1 = create(:post_flag, post: @post)
+
+        create(:post_approval, post: @post)
+        assert_equal(false, @post.reload.is_pending?)
+
+        travel_to(Danbooru.config.moderation_period.from_now - 1.minute) do
+          @flag2 = create(:post_flag, post: @post, reason: "something", creator: create(:approver))
+
+          assert_equal(true, @flag2.valid?)
+          assert_equal(true, @post.reload.is_flagged?)
+        end
+      end
+    end
+
+    context "during validation" do
+      subject { build(:post_flag) }
+
+      should_not allow_value("").for(:reason)
+      should_not allow_value(" ").for(:reason)
+      should_not allow_value("\u200B").for(:reason)
     end
   end
 end

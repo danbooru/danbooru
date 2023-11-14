@@ -13,6 +13,14 @@ class UserPolicy < ApplicationPolicy
     record.id == user.id || user.is_admin?
   end
 
+  def deactivate?
+    (record.id == user.id && !user.is_anonymous?) || user.is_owner?
+  end
+
+  def destroy?
+    deactivate?
+  end
+
   def promote?
     user.is_moderator?
   end
@@ -47,7 +55,7 @@ class UserPolicy < ApplicationPolicy
       blacklisted_tags time_zone per_page custom_style theme
       receive_email_notifications
       new_post_navigation_layout enable_private_favorites
-      style_usernames show_deleted_posts show_deleted_children
+      show_deleted_posts show_deleted_children
       disable_categorized_saved_searches disable_tagged_filenames
       disable_mobile_gestures enable_safe_mode
       enable_desktop_mode disable_post_tooltips
@@ -56,9 +64,8 @@ class UserPolicy < ApplicationPolicy
 
   def api_attributes
     attributes = %i[
-      id created_at name inviter_id level
-      post_upload_count post_update_count note_update_count is_banned
-      can_approve_posts can_upload_free level_string
+      id created_at name inviter_id level level_string
+      post_upload_count post_update_count note_update_count is_banned is_deleted
     ]
 
     if record.id == user.id
@@ -71,6 +78,8 @@ class UserPolicy < ApplicationPolicy
         tag_query_limit max_saved_searches theme
       ]
     end
+
+    attributes += [:last_ip_addr] if policy(:ip_address).show?
 
     attributes
   end

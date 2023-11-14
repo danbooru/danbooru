@@ -1,9 +1,0 @@
-<div class="source-related-tags-columns">
-  <% if source.present? %>
-    <%# XXX %>
-    <% tags = source.artists.map(&:name) %>
-    <% tags += ["banned_artist"] if source.artists.any?(&:is_banned?) %>
-    <% tags += source.translated_tags.map(&:name) %>
-    <%= render "related_tags/tag_column", tags: tags, class: "translated-tags-related-tags-column", title: "Translated Tags" %>
-  <% end %>
-</div>

@@ -1,0 +1,36 @@
+<% page_title "DMCA Template" %>
+
+<div id="c-static">
+  <div id="a-dmca-template" class="prose fixed-width-container">
+    <h1>Request for Removal of Infringing Material</h1>
+      <p>I hereby request that you remove or disable access to the following material as it appears on your service:</p>
+
+      <p>
+        <ul>
+          <li><b>List of links to each <%= Danbooru.config.canonical_app_name %> post would you like to have removed.</b></li>
+        </ul>
+      </p>
+
+      <p>These works infringe upon my original copyrighted works located at:</p>
+
+      <p>
+        <ul>
+          <li><b>List of links where each work above was originally posted by you on your social media accounts or personal websites.</b></li>
+        </ul>
+      </p>
+
+      <p>I am the exclusive rights holder or the duly authorized representative of the exclusive rights holder for the works listed above. I have a good faith belief that the use of this material in such a fashion is not authorized by the copyright holder, the copyright holder's agent, or the law.</p>
+
+      <p>Under penalty of perjury, I attest that the information in this notification is accurate and that I am, or am authorized to act on behalf of, the owner of the rights being infringed by the material listed above.</p>
+
+      <p>You may contact me at <b>[Your email address]</b>, <b>[Your phone number]</b>, or <b>[Your mailing address]</b>, preferably by <b>[Your preferred contact method]</b>.</p>
+
+      <p>Signed,</p>
+
+      <p><b>[Your full legal name]</b></p>
+
+      <hr class="border">
+
+      <p>You may send the above notice to <%= link_to Danbooru.config.dmca_email, "mailto:#{Danbooru.config.dmca_email}" %>.</p>
+  </div>
+</div>

@@ -17,6 +17,8 @@ class Source::URL::Furaffinity < Source::URL
       @work_id = work_id
 
     # https://d.furaffinity.net/art/iwbitu/1650222955/1650222955.iwbitu_yubi.jpg
+    # https://t.furaffinity.net/46821705@800-1650222955.jpg
+    # https://a.furaffinity.net/1550854991/iwbitu.gif
     in _, "art", username, subdir, filename
       @username = username
       @filename = filename
@@ -24,7 +26,9 @@ class Source::URL::Furaffinity < Source::URL
     # https://www.furaffinity.net/gallery/iwbitu
     # https://www.furaffinity.net/scraps/iwbitu/2/?
     # https://www.furaffinity.net/gallery/iwbitu/folder/133763/Regular-commissions
-    in _, ("gallery" | "user" | "favorites" | "scraps" | "journals"), username, *pages
+    # https://www.furaffinity.net/user/lottieloveart/user?user_id=1021820442510802945
+    # https://www.furaffinity.net/stats/duskmoor/submissions/
+    in _, ("gallery" | "user" | "favorites" | "scraps" | "journals" | "stats"), username, *pages
       @username = username
 
     else

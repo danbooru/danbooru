@@ -6,13 +6,11 @@ class ForumTopicTest < ActiveSupport::TestCase
       travel_to Time.now
       @user = FactoryBot.create(:user)
       CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
       @topic = create(:forum_topic, title: "xxx", creator: @user)
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "#mark_as_read!" do
@@ -46,13 +44,13 @@ class ForumTopicTest < ActiveSupport::TestCase
     end
 
     should "be searchable by title" do
-      assert_equal(1, ForumTopic.search(title: "xxx").count)
-      assert_equal(0, ForumTopic.search(title: "aaa").count)
+      assert_search_equals(@topic, title: "xxx")
+      assert_search_equals([], title: "aaa")
     end
 
     should "be searchable by category id" do
-      assert_equal(1, ForumTopic.search(:category_id => 0).count)
-      assert_equal(0, ForumTopic.search(:category_id => 1).count)
+      assert_search_equals(@topic, category_id: 0)
+      assert_search_equals([], category_id: 1)
     end
 
     should "initialize its creator" do
@@ -83,6 +81,14 @@ class ForumTopicTest < ActiveSupport::TestCase
           @topic.destroy
         end
       end
+    end
+
+    context "during validation" do
+      subject { build(:forum_topic) }
+
+      should_not allow_value("").for(:title)
+      should_not allow_value(" ").for(:title)
+      should_not allow_value("\u200B").for(:title)
     end
   end
 end

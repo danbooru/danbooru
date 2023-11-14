@@ -1,34 +1,205 @@
 <div id="c-media-assets">
-  <div id="a-show" class="fixed-width-container">
-    <h1 class="mb-4">Media Asset</h1>
+  <div id="a-show">
+    <div class="md:flex flex-row gap-4">
+      <div class="flex-1 w-full min-w-0">
+        <%= render MediaAssetComponent.new(media_asset: @media_asset, current_user: CurrentUser.user, outer_classes: "sticky h-full relative top-0", inner_classes: "mx-auto", dynamic_height: false, scroll_on_zoom: true) do |component| %>
+          <% component.with_header do %>
+            <div class="media-asset-paginator absolute flex justify-between top-0 w-full z-10">
+              <%= link_to chevron_left_icon, media_assets_path(search: { id: ">#{@media_asset.id}", order: "id_asc" }, limit: 1, redirect: true), class: "media-asset-paginator-prev flex items-center justify-center z-10 mx-1", "data-shortcut": "a left" %>
+              <%= link_to chevron_right_icon, media_assets_path(search: { id: "<#{@media_asset.id}", order: "id_desc" }, limit: 1, redirect: true), class: "media-asset-paginator-next flex items-center justify-center z-10 mx-1", "data-shortcut": "d right" %>
+            </div>
+          <% end %>
 
-    <% if policy(@media_asset).can_see_image? %>
-      <%= render MediaAssetComponent.new(media_asset: @media_asset) %>
-    <% end %>
+          <% if policy(@media_asset).can_see_image? %>
+            <% component.with_footer do %>
+              <div class="flex flex-none gap-2 h-6 items-center justify-center text-xs">
+                <span>
+                  <% if @media_asset.post.present? %>
+                    <%= link_to image_icon_tag("danbooru-logo.png", class: "h-4"), @media_asset.post, class: "inline-block align-top" %>
+                  <% end %>
 
-    <table class="striped aligned-vertical">
-      <% if @post.present? %>
-        <tr>
-          <th>Post</th>
-          <td><%= link_to "##{@post.id}", @post %></td>
-        </tr>
-      <% end %>
+                  <% @media_asset.source_urls.take(5).each do |url| %>
+                    <%= external_link_to url, external_site_icon(Source::URL.site_name(url), class: "h-4"), title: url, class: "inline-block align-top" %>
+                  <% end %>
+                </span>
 
-      <% if policy(@media_asset).can_see_image? %>
-        <tr>
-          <th>MD5</th>
-          <td><%= @media_asset.md5 %></td>
-        </tr>
-      <% end %>
+                <%= link_to @media_asset.original.file_url do %>
+                  <%= number_to_human_size(@media_asset.file_size) %> .<%= @media_asset.file_ext %>,
+                  <%= @media_asset.image_width %>x<%= @media_asset.image_height %>
 
-      <% @media_asset.metadata.sort.each do |key, value| %>
-        <tr>
-          <th><%= key %></th>
-          <td><%= link_to value, media_assets_path(search: { metadata: { key => value }}) %></td>
-        </tr>
-      <% end %>
-    </table>
+                  <% if @media_asset.duration.present? %>
+                    (<%= duration_to_hhmmss(@media_asset.duration) %>)
+                  <% end %>
+                <% end %>
+
+                <span>
+                  <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
+                    <% menu.with_item(hide_on_click: true) do %>
+                      <%= link_to "#{@media_asset.original.file_url}?download=1", download: @media_asset.original.file_name do %>
+                        <%= download_icon %> Download
+                      <% end %>
+                    <% end %>
+
+                    <% menu.with_item do %>
+                      <hr class="border">
+                    <% end %>
+
+                    <% menu.with_item do %>
+                      <%= external_link_to "https://saucenao.com/search.php?url=#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> SauceNAO
+                      <% end %>
+                    <% end %>
+
+                    <% menu.with_item do %>
+                      <%= external_link_to "https://ascii2d.net/search/url/#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> Ascii2D
+                      <% end %>
+                    <% end %>
+
+                    <% menu.with_item do %>
+                      <%= external_link_to "https://yandex.com/images/search?rpt=imageview&url=#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> Yandex
+                      <% end %>
+                    <% end %>
+
+                    <% menu.with_item do %>
+                      <%= external_link_to "https://lens.google.com/uploadbyurl?url=#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> Google
+                      <% end %>
+                    <% end %>
+
+                    <% menu.with_item do %>
+                      <%= external_link_to "https://www.bing.com/images/searchbyimage?cbir=sbi&imgurl=#{CGI.escape(@media_asset.original.file_url)}", target: "_blank" do %>
+                        <%= search_icon %> Bing
+                      <% end %>
+                    <% end %>
+
+                    <% menu.with_item do %>
+                      <%= link_to iqdb_queries_path(search: { media_asset_id: @media_asset.id }), target: "_blank" do %>
+                        <%= search_icon %> <%= Danbooru.config.app_name %>
+                      <% end %>
+                    <% end %>
+
+                    <% if policy(@media_asset).destroy? && @media_asset.post.nil? && !@media_asset.deleted? && !@media_asset.expunged? %>
+                      <% menu.with_item do %>
+                        <hr class="border">
+                      <% end %>
+
+                      <% menu.with_item do %>
+                        <%= link_to media_asset_path(@media_asset), class: "text-danger", remote: true, xhr: true, method: :delete, "data-confirm": "This will permanently delete this file. Are you sure?" do %>
+                          <%= delete_icon %> Delete file
+                        <% end %>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                </span>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="media-asset-sidebar flex-none md:w-360px">
+        <% if @media_asset.ai_tags.present? %>
+          <div>
+            <h3>Tags</h3>
+
+            <ul class="tag-list categorized-tag-list">
+              <% @media_asset.ai_tags.undeprecated.sort_by { |tag| [TagCategory.split_header_list.index(tag.category_name.downcase), tag.name.starts_with?("rating:") ? 0 : 1, tag.name] }.each do |ai_tag| %>
+                <%= tag.li class: "tag-type-#{ai_tag.category} space-x-1 text-sm", "data-tag-name": ai_tag.name do %>
+                  <% if ai_tag.tag.artist? %>
+                    <%= link_to "?", show_or_new_artists_path(name: ai_tag.name) %>
+                  <% elsif ai_tag.name =~ /\A\d+\z/ %>
+                    <%= link_to "?", wiki_page_path("~#{ai_tag.name}") %>
+                  <% else %>
+                    <%= link_to "?", wiki_page_path(ai_tag.name) %>
+                  <% end %>
+
+                  <%= link_to ai_tag.pretty_name, media_assets_path(search: { ai_tags_match: ai_tag.name }), class: "break-word", rel: "nofollow" %>
+                  <%= tag.span "#{ai_tag.score}%", class: ["text-muted text-xs"] %>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div>
+          <table class="striped text-xs w-full">
+            <tr>
+              <th colspan="2" class="text-center">Metadata</th>
+            </tr>
+
+            <% if @post.present? %>
+              <tr>
+                <th class="text-left">Post</th>
+                <td class="break-all"><%= link_to "##{@post.id}", @post %></td>
+              </tr>
+            <% end %>
+
+            <% if policy(@media_asset).can_see_image? %>
+              <tr>
+                <th class="text-left">MD5</th>
+                <td class="break-all"><%= @media_asset.md5 %></td>
+              </tr>
+            <% end %>
+
+            <tr>
+              <th class="text-left">Pixel Hash</th>
+              <td class="break-all"><%= link_to @media_asset.pixel_hash, media_assets_path(search: { pixel_hash: @media_asset.pixel_hash }) %></td>
+            </tr>
+
+            <tr>
+              <th class="text-left">File Type</th>
+              <td class="break-all"><%= @media_asset.mime_type %></td>
+            </tr>
+
+            <tr>
+              <th class="text-left">File Size</th>
+              <td class="break-all"><%= number_to_human_size(@media_asset.file_size) %></td>
+            </tr>
+
+            <tr>
+              <th class="text-left">Resolution</th>
+              <td class="break-all"><%= @media_asset.image_width %>x<%= @media_asset.image_height %></td>
+            </tr>
+
+            <% if @media_asset.duration.present? %>
+              <tr>
+                <th class="text-left">Duration</th>
+                <td class="break-all"><%= duration_to_hhmmss(@media_asset.duration) %></td>
+              </tr>
+            <% end %>
+
+            <% if policy(@media_asset).can_see_image? %>
+              <% @media_asset.source_urls.each do |url| %>
+                <tr>
+                  <th class="text-left">Source</th>
+                  <td class="break-all"><%= external_link_to url %></td>
+                </tr>
+              <% end %>
+            <% end %>
+
+            <% @media_asset.metadata.to_h.group_by { |key, value| key.split(":").first }.sort.each do |group, pairs| %>
+              <tr>
+                <th colspan="2" class="text-center"><%= group.split(/[ _-]/).map(&:upcase_first).join(" ") %></th>
+              </tr>
+
+              <% pairs.sort.each do |key, value| %>
+                <tr>
+                  <th class="text-left w-1/4"><%= key.split(":").second.scan(/(?:[A-Z][a-z]+|[A-Z]+(?![a-z]))/).join(" ") %></th>
+                  <td class="break-words"><%= link_to value, media_assets_path(search: { metadata: { key => value }}), rel: "nofollow" %></td>
+                </tr>
+              <% end %>
+            <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<% content_for(:html_header) do %>
+  <%= render OpenGraphComponent.new(media_asset: @media_asset, current_user: CurrentUser.user) %>
+<% end %>
 
 <%= render "uploads/secondary_links" %>

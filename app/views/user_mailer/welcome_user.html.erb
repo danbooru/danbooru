@@ -1,19 +1,18 @@
-<!doctype html>
-<html>
-  <body>
-    <h2>Hi <%= @user.name %>,</h2>
+<h2>Hi <%= link_to_user @user %>,</h2>
 
-    <p>
-      Welcome to <%= Danbooru.config.app_name %>! Click the link below to verify your email address.
-    </p>
+<p>
+  Welcome to <%= link_to Danbooru.config.canonical_app_name, root_url %>! Click the link below to verify your email address:
+</p>
 
-    <p>
-      <%= link_to "Verify email address", email_verification_url(@user) %>
-    </p>
+<p style="margin-left: 2em">
+  <%= link_to "Verify email address", email_verification_url(@user) %>
+</p>
 
-    <p>
-      By verifying your email address, you can receive site notifications and you can
-      recover your account if you ever forget your password.
-    </p>
-  </body>
-</html>
+<p class="fineprint">
+  You received this email because someone signed up for <%= link_to Danbooru.config.canonical_app_name, root_url %> with your address.
+  <%= link_to "Click here", disable_email_notifications_url(@user) %> to disable email notifications.
+</p>
+
+<% content_for(:footer_links) do %>
+  / <%= link_to "Unsubscribe", disable_email_notifications_url(@user) %>
+<% end %>

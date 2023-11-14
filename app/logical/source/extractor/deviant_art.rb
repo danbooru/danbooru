@@ -159,25 +159,13 @@ module Source
         parsed_url.username || parsed_referer&.username
       end
 
-      def page
-        return nil if page_url_from_image_url.blank?
-
-        resp = http.cache(1.minute).get(page_url_from_image_url, follow: {max_hops: 1})
-
-        if resp.status.success?
-          resp.parse
-        # the work was deleted
-        elsif resp.code == 404
-          nil
-        else
-          raise "failed to fetch page (got code #{resp.code})"
-        end
+      memoize def page
+        http.cache(1.minute).parsed_get(page_url_from_image_url, follow: { max_hops: 1 })
       end
-      memoize :page
 
       # Scrape UUID from <meta property="da:appurl" content="DeviantArt://deviation/12F08C5D-A3A4-338C-2F1A-7E4E268C0E8B">
       # For hidden or deleted works the UUID will be nil.
-      def uuid
+      memoize def uuid
         return nil if page.nil?
         meta = page.at_css('meta[property="da:appurl"]')
         return nil if meta.nil?
@@ -186,37 +174,29 @@ module Source
         uuid = appurl[%r{\ADeviantArt://deviation/(.*)\z}, 1]
         uuid
       end
-      memoize :uuid
 
-      def api_client
-        api_client = DeviantArtApiClient.new(
-          Danbooru.config.deviantart_client_id,
-          Danbooru.config.deviantart_client_secret
-        )
+      memoize def api_client
+        api_client = DeviantArtApiClient.new(Danbooru.config.deviantart_client_id, Danbooru.config.deviantart_client_secret, http)
         api_client.access_token = Cache.get("da-access-token", 11.weeks) do
           api_client.access_token.to_hash
         end
         api_client
       end
-      memoize :api_client
 
-      def api_deviation
+      memoize def api_deviation
         return {} if uuid.nil?
         api_client.deviation(uuid)
       end
-      memoize :api_deviation
 
-      def api_metadata
+      memoize def api_metadata
         return {} if uuid.nil?
         api_client.metadata(uuid)[:metadata].first
       end
-      memoize :api_metadata
 
-      def api_download
+      memoize def api_download
         return {} unless uuid.present? && api_deviation[:is_downloadable]
         api_client.download(uuid)
       end
-      memoize :api_download
 
       def api_response
         {

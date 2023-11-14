@@ -2,6 +2,7 @@
 
 require "danbooru/http/application_client"
 require "danbooru/http/html_adapter"
+require "danbooru/http/json_adapter"
 require "danbooru/http/xml_adapter"
 require "danbooru/http/cache"
 require "danbooru/http/logger"
@@ -34,25 +35,46 @@ module Danbooru
     class DownloadError < Error; end
     class FileTooLargeError < Error; end
 
-    DEFAULT_TIMEOUT = 10
+    DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0"
+
+    DEFAULT_TIMEOUT = 20
     MAX_REDIRECTS = 5
 
     attr_accessor :max_size, :http
 
     class << self
-      delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :public_only, :download_media, to: :new
+      delegate :get, :head, :put, :post, :delete, :parsed_get, :parsed_post, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :proxy, :public_only, :with_legacy_ssl, :download_media, to: :new
     end
 
-    def initialize
-      @http ||=
-        ::Danbooru::Http::ApplicationClient.new
+    # The default HTTP client.
+    def self.default
+      Danbooru::Http::ApplicationClient.new
         .timeout(DEFAULT_TIMEOUT)
-        .headers("Accept-Encoding" => "gzip")
-        .headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
-        #.headers("User-Agent": Danbooru.config.canonical_app_name)
+        .headers("Accept-Encoding": "gzip")
+        .use(normalize_uri: { normalizer: ->(uri) { HTTP::URI.parse(Addressable::URI.encode_component(uri, "[[:ascii:]&&[^ ]]")) } }) # XXX Percent-encode Unicode and space characters to avoid "URI::InvalidURIError: URI must be ascii only" error
         .use(:auto_inflate)
         .use(redirector: { max_redirects: MAX_REDIRECTS })
         .use(:session)
+    end
+
+    # The default HTTP client for requests to external websites. This includes API calls to external services, fetching source data, and downloading images.
+    def self.external
+      if Danbooru.config.http_proxy.present?
+        # XXX The `proxy` option is incompatible with the `public_only` option. When using a proxy, the proxy itself
+        # should be configured to block HTTP requests to IPs on the local network.
+        new.proxy.headers("User-Agent": DEFAULT_USER_AGENT)
+      else
+        new.public_only.headers("User-Agent": DEFAULT_USER_AGENT)
+      end
+    end
+
+    # The default HTTP client for API calls to internal services controlled by Danbooru.
+    def self.internal
+      new.headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
+    end
+
+    def initialize
+      @http ||= Danbooru::Http.default
     end
 
     def get(url, **options)
@@ -81,6 +103,14 @@ module Danbooru
 
     def post!(url, **options)
       request!(:post, url, **options)
+    end
+
+    def parsed_get(url, **options)
+      parsed_request(:get, url, **options)
+    end
+
+    def parsed_post(url, **options)
+      parsed_request(:post, url, **options)
     end
 
     def follow(*args)
@@ -119,11 +149,12 @@ module Danbooru
       use(cache: { expires_in: expires_in })
     end
 
-    def proxy(host: Danbooru.config.http_proxy_host, port: Danbooru.config.http_proxy_port.to_i, username: Danbooru.config.http_proxy_username, password: Danbooru.config.http_proxy_password)
-      return self if host.blank?
+    def proxy(url: Danbooru.config.http_proxy)
+      return self if url.blank?
+      parsed_url = Danbooru::URL.parse!(url)
 
       dup.tap do |o|
-        o.http = o.http.via(host, port, username, password)
+        o.http = o.http.via(parsed_url.host, parsed_url.port, parsed_url.http_user, parsed_url.password)
       end
     end
 
@@ -136,15 +167,27 @@ module Danbooru
       end
     end
 
+    # allow requests to sites using unsafe legacy renegotiations (such as dic.nicovideo.jp)
+    # see https://github.com/openssl/openssl/commit/72d2670bd21becfa6a64bb03fa55ad82d6d0c0f3
+    def with_legacy_ssl
+      dup.tap do |o|
+        o.http = o.http.dup.tap do |http|
+          ctx = OpenSSL::SSL::SSLContext.new
+          ctx.options |= OpenSSL::SSL::OP_LEGACY_SERVER_CONNECT
+          http.default_options = http.default_options.with_ssl_context(ctx)
+        end
+      end
+    end
+
     concerning :DownloadMethods do
       # Download a file from `url` and return a {MediaFile}.
       #
       # @param url [String] the URL to download
-      # @param file [Tempfile] the file to download the URL to
+      # @param file [Danbooru::Tempfile] the file to download the URL to
       # @raise [DownloadError] if the server returns a non-200 OK response
       # @raise [FileTooLargeError] if the file exceeds Danbooru's maximum download size.
       # @return [Array<(HTTP::Response, MediaFile)>] the HTTP response and the downloaded file
-      def download_media(url, file: Tempfile.new("danbooru-download-", binmode: true))
+      def download_media(url, file: Danbooru::Tempfile.new("danbooru-download-#{url.parameterize.truncate(96)}-", binmode: true))
         response = get(url)
 
         raise DownloadError, "#{url} failed with code #{response.status}" if response.status != 200
@@ -169,10 +212,19 @@ module Danbooru
     #
     # @param method [String] the HTTP method
     # @param url [String] the URL to request
+    # @param format [Symbol] if present, override the response's content type to be this format (:json, :html, or :xml).
     # @param options [Hash] the URL parameters
     # @return [HTTP::Response] the HTTP response
-    def request(method, url, **options)
-      http.send(method, url, **options)
+    def request(method, url, format: nil, **options)
+      response = http.send(method, url, **options)
+
+      if format
+        mime_type = Mime::Type.lookup_by_extension(format).to_s
+        content_type = HTTP::ContentType.parse(mime_type)
+        response.instance_eval { @content_type = content_type }
+      end
+
+      response
     rescue OpenSSL::SSL::SSLError
       fake_response(590)
     rescue ValidatingSocket::ProhibitedIpError
@@ -203,6 +255,20 @@ module Danbooru
       else
         raise Error, "#{method.upcase} #{url} failed (HTTP #{response.status})"
       end
+    end
+
+    # Perform a HTTP request for the given URL and return the parsed JSON, XML, or HTML response.
+    # Return nil on error, or if the URL was blank.
+    #
+    # @param method [String] The HTTP method.
+    # @param url [String] The URL to request.
+    # @param options [Hash] The URL parameters.
+    # @return [Hash, Array, Nokogiri::HTML::Document, nil] The parsed HTTP response body, or nil on error.
+    def parsed_request(method, url, **options)
+      return nil if url.blank?
+      response = request(method, url, **options)
+      return nil if response.code != 200
+      response.parse
     end
 
     def fake_response(status)

@@ -65,10 +65,13 @@ en:
         user_id: "You"
       comment_vote:
         user_id: "You"
+      reaction:
+        creator: "You"
       upload:
         uploader: "You"
         uploader_id: "You"
       user/email_address:
+        address: "Email address"
         normalized_address: "Email address"
       user_feedback:
         creator: "You"

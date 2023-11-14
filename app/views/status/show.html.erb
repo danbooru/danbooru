@@ -1,8 +1,18 @@
 <div id="c-status">
-  <div id="a-show" class="fixed-width-container">
+  <div id="a-show" class="fixed-width-container flex flex-col gap-2">
     <h1>Status</h1>
 
-    <h2>Instance</h1>
+    <h2 class="flex gap-2 items-center">
+      Instance
+
+      <span>
+        <% if @status.instance_error.present? %>
+          <span class="chip-red text-error text-sm"><%= @status.instance_error %></span>
+        <% else %>
+          <span class="chip-green text-success text-sm">Ok</span>
+        <% end %>
+      </span>
+    </h2>
 
     <details>
       <summary>
@@ -13,45 +23,92 @@
         on <%= @status.instance_name %>
         for <%= @status.instance_uptime %>
       </summary>
+
       <%= render "list", hash: @status.serializable_hash[:instance] %>
     </details>
 
-    <h2>Server</h1>
+    <h2 class="flex gap-2 items-center">
+      Server <span><span class="chip-green text-success text-sm">Ok</span></span>
+    </h2>
 
     <details>
       <summary>
         Server: <%= @status.node_name %>
       </summary>
+
       <%= render "list", hash: @status.serializable_hash[:server] %>
     </details>
 
-    <h2>Postgres</h2>
+    <h2 class="flex gap-2 items-center">
+      Postgres
+      <span>
+        <% if @status.postgres_up? %>
+          <span class="chip-green text-success text-sm">Ok</span>
+        <% else %>
+          <span class="chip-red text-error text-sm">Down</span>
+        <% end %>
+      </span>
+    </h2>
 
-    <details>
-      <summary>
-        <%= pluralize @status.postgres_active_connections, "active connection" %>.
-      </summary>
+    <% if @status.postgres_up? %>
+      <details>
+        <summary>
+          <%= pluralize @status.postgres_active_connections, "active connection" %>.
+        </summary>
 
-      <%= render "table", rows: @status.serializable_hash[:postgres][:connection_stats] %>
-    </details>
+        <%= render "table", rows: @status.serializable_hash[:postgres][:connection_stats] || [] %>
+      </details>
+    <% else %>
+      Error: <%= @status.postgres_error %>
+    <% end %>
 
-    <h2>Redis</h2>
+    <h2 class="flex gap-2 items-center">
+      Redis
+      <span>
+        <% if @status.redis_up? %>
+          <span class="chip-green text-success text-sm">Ok</span>
+        <% else %>
+          <span class="chip-red text-error text-sm">Down</span>
+        <% end %>
+      </span>
+    </h2>
 
-    <details>
-      <summary>
-        <%= @status.redis_used_memory %> memory used.
-      </summary>
+    <% if @status.redis_up? %>
+      <details>
+        <summary>
+          <%= @status.redis_used_memory %> memory used.
+        </summary>
 
-      <%= render "list", hash: @status.serializable_hash[:redis][:info] %>
-    </details>
+        <%= render "list", hash: @status.serializable_hash[:redis][:info] %>
+      </details>
+    <% end %>
 
-    <h2>Request</h2>
+    <h2 class="flex gap-2 items-center">
+      Request <span><span class="chip-green text-success text-sm">Ok</span></span>
+    </h2>
 
     <details>
       <summary>
         IP: <%= @status.request.remote_ip %>
       </summary>
       <%= render "list", hash: @status.serializable_hash[:headers] %>
+    </details>
+
+    <h2 class="flex gap-2 items-center">
+      Browser <span><span class="chip-green text-success text-sm">Ok</span></span>
+    </h2>
+
+    <details x-data="{ metadata: {} }" x-init="metadata = await Danbooru.Device.flatMetadata()">
+      <summary x-text="metadata['browser.userAgent']"></summary>
+
+      <table class="striped aligned-vertical table-sm">
+        <template x-for="[key, value] in Object.entries(metadata)">
+          <tr>
+            <th x-text="key"></th>
+            <td x-text="value ?? 'undefined'"></td>
+          </tr>
+        </template>
+      </table>
     </details>
   </div>
 </div>

@@ -72,6 +72,13 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 451
       end
+
+      should "render for an invalid url" do
+        artist = create(:artist, url_string: "https://.auone-net.jp/~hakueki/")
+        get artist_path(artist.id)
+
+        assert_response :success
+      end
     end
 
     context "new action" do
@@ -103,6 +110,13 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         get_auth edit_artist_path(@artist.id), @user
         assert_response :success
       end
+
+      should "render for an invalid url" do
+        artist = create(:artist, url_string: "https://.auone-net.jp/~hakueki/")
+        get_auth edit_artist_path(artist.id), @user
+
+        assert_response :success
+      end
     end
 
     context "banned action" do
@@ -132,12 +146,12 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
     context "unban action" do
       should "unban an artist" do
-        as(@admin) { @artist.ban!(banner: @admin) }
+        @artist.ban!(@admin)
         put_auth unban_artist_path(@artist.id), @admin
 
         assert_redirected_to(@artist)
         assert_equal(false, @artist.reload.is_banned?)
-        assert_equal(false, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
+        assert_equal(true, TagImplication.deleted.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
       end
     end
 
@@ -168,6 +182,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(name: "masao").with { @masao }
         should respond_to_search(is_banned: "true").with { @banned }
         should respond_to_search(is_deleted: "true").with { @deleted }
+        should respond_to_search(any_name_matches: "masao", order: "post_count").with { @masao }
         should respond_to_search(url_matches: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg").with { @masao }
         should respond_to_search(url_matches: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939").with { @masao }
 

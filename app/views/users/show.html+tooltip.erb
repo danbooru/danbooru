@@ -7,14 +7,6 @@
 
       <% if @user.is_banned? %>
         <%= link_to "Banned", users_path(search: { is_banned: true }), class: "user-tooltip-badge user-tooltip-badge-banned" %>
-      <% elsif @user.is_admin? %>
-        <%= link_to @user.level_string, users_path(search: { level: @user.level }), class: "user-tooltip-badge user-tooltip-badge-#{@user.level_string.downcase}" %>
-      <% elsif @user.is_moderator? %>
-        <%= link_to @user.level_string, users_path(search: { level: @user.level }), class: "user-tooltip-badge user-tooltip-badge-#{@user.level_string.downcase}" %>
-      <% elsif @user.can_approve_posts? %>
-        <%= link_to "Approver", users_path(search: { can_approve_posts: true }), class: "user-tooltip-badge user-tooltip-badge-approver" %>
-      <% elsif @user.can_upload_free? %>
-        <%= link_to "Contributor", users_path(search: { can_upload_free: true }), class: "user-tooltip-badge user-tooltip-badge-contributor" %>
       <% else %>
         <%= link_to @user.level_string, users_path(search: { level: @user.level }), class: "user-tooltip-badge user-tooltip-badge-#{@user.level_string.downcase}" %>
       <% end %>
@@ -34,7 +26,7 @@
 
     <div class="user-tooltip-header-bottom">
       <%= time_tag @user.created_at.to_date.iso8601, @user.created_at, class: "user-tooltip-created-at" %>
-      <% if @user.last_ip_addr.present? && policy(IpAddress).show? %>
+      <% if @user.last_ip_addr.present? && policy(:ip_address).show? %>
         · <%= link_to_ip @user.last_ip_addr, shorten: true, class: "link-plain" %>
       <% end %>
 
@@ -46,14 +38,14 @@
     </div>
 
     <%= render PopupMenuComponent.new do |menu| %>
-      <% menu.item do %>
+      <% menu.with_item do %>
         <%= link_to new_dmail_path(dmail: { to_id: @user.id }) do %>
           <%= message_icon %> Send Message
         <% end %>
       <% end %>
 
       <% if !@user.is_gold? %>
-        <% menu.item do %>
+        <% menu.with_item do %>
           <%= link_to new_user_upgrade_path(user_id: @user.id) do %>
             <%= gift_icon %> Gift Upgrade
           <% end %>
@@ -61,7 +53,7 @@
       <% end %>
 
       <% if policy(UserFeedback.new(user: @user)).create? %>
-        <% menu.item do %>
+        <% menu.with_item do %>
           <%= link_to new_user_feedback_path(user_feedback: { user_id: @user.id }) do %>
             <%= feedback_icon %> Give Feedback
           <% end %>
@@ -69,7 +61,7 @@
       <% end %>
 
       <% if policy(CurrentUser.user).promote? %>
-        <% menu.item do %>
+        <% menu.with_item do %>
           <%= link_to edit_admin_user_path(@user.id) do %>
             <%= promotion_icon %> Promote User
           <% end %>
@@ -77,9 +69,17 @@
       <% end %>
 
       <% if policy(Ban.new(user: @user)).create? %>
-        <% menu.item do %>
+        <% menu.with_item do %>
           <%= link_to new_ban_path(ban: { user_id: @user.id }) do %>
             <%= ban_icon %> Ban User
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% if policy(UserNameChangeRequest.new(user: @user)).can_rename_user? %>
+        <% menu.with_item do %>
+          <%= link_to change_name_user_path(@user) do %>
+            <%= feedback_icon %> Rename User
           <% end %>
         <% end %>
       <% end %>

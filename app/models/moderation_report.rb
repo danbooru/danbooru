@@ -7,9 +7,10 @@ class ModerationReport < ApplicationRecord
 
   belongs_to :model, polymorphic: true
   belongs_to :creator, class_name: "User"
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   before_validation(on: :create) { model.lock! }
-  validates :reason, presence: true
+  validates :reason, visible_string: true
   validates :model_type, inclusion: { in: MODEL_TYPES }
   validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }, on: :create
 
@@ -35,8 +36,10 @@ class ModerationReport < ApplicationRecord
   def self.visible(user)
     if user.is_moderator?
       all
-    else
+    elsif !user.is_anonymous?
       where(creator: user)
+    else
+      none
     end
   end
 
@@ -59,9 +62,9 @@ class ModerationReport < ApplicationRecord
     return unless saved_change_to_status? && status != :pending
 
     if handled?
-      ModAction.log("handled modreport ##{id}", :moderation_report_handled, updater)
+      ModAction.log("handled modreport ##{id}", :moderation_report_handled, subject: self, user: updater)
     elsif rejected?
-      ModAction.log("rejected modreport ##{id}", :moderation_report_rejected, updater)
+      ModAction.log("rejected modreport ##{id}", :moderation_report_rejected, subject: self, user: updater)
     end
   end
 
@@ -80,14 +83,13 @@ class ModerationReport < ApplicationRecord
     where(model: Comment.where(creator: user)).or(where(model: ForumPost.where(creator: user))).or(where(model: Dmail.received.where(from: user)))
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :reason, :creator, :model, :status)
-    q = q.text_attribute_matches(:reason, params[:reason_matches])
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :reason, :creator, :model, :status], current_user: current_user)
 
     if params[:recipient_id].present?
-      q = q.received_by(User.search(id: params[:recipient_id]))
+      q = q.received_by(User.search({ id: params[:recipient_id] }, current_user))
     elsif params[:recipient_name].present?
-      q = q.received_by(User.search(name_matches: params[:recipient_name]))
+      q = q.received_by(User.search({ name_matches: params[:recipient_name] }, current_user))
     end
 
     q.apply_default_order(params)

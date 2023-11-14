@@ -3,7 +3,7 @@
 module Source
   class URL
     class Reddit < Source::URL
-      attr_reader :subreddit, :work_id, :title, :username
+      attr_reader :subreddit, :work_id, :title, :username, :file
 
       def self.match?(url)
         url.domain.in?(["reddit.com", "redd.it"])
@@ -14,11 +14,21 @@ module Source
 
         # https://i.redd.it/p5utgk06ryq81.png
         # https://preview.redd.it/qoyhz3o8yde71.jpg?width=1440&format=pjpg&auto=webp&s=5cbe3b0b097d6e7263761c461dae19a43038db22
+        in ("i" | "preview"), "redd.it", file
+          @file = file
+
         # https://external-preview.redd.it/92G2gkb545UNlA-PywJqM_F-4TT0xngvmf_gb9sFDqk.jpg?auto=webp&s=0f1e3d0603dbaabe1ead7352202d0de1653d76f6
+        # https://external-preview.redd.it/VlT1G4JoqAmP_7DG5UKRCJP8eTRef7dCrRvu2ABm_Xg.png?width=1080&crop=smart&auto=webp&s=d074e9cbfcb2780e6ec0d948daff3cadc91c2a50
         # https://g.redditmedia.com/f-OWw5C5aVumPS4HXVFhTspgzgQB4S77mO-6ad0rzpg.gif?fm=mp4&mp4-fragmented=false&s=ed3d767bf3b0360a50ddd7f503d46225
         # https://i.redditmedia.com/9cYFBDQ3QsqWnF9v7EhW5uOcQNHz1Ak9_E1zVNeSLek.png?s=6fee1bb56e7d926847dc3ece01a1ffd4
         in *rest if image_url?
-          # pass
+        # pass
+
+        # https://www.reddit.com/user/blank_page_drawings/comments/nfjz0d/a_sleepy_orc/
+        in _, "reddit.com", ("user" | "u"), username, "comments", work_id, title
+          @username = username
+          @work_id = work_id
+          @title = title
 
         # https://www.reddit.com/user/xSlimes
         # https://www.reddit.com/u/Valshier
@@ -63,6 +73,8 @@ module Source
       def page_url
         if subreddit.present? && work_id.present? && title.present?
           "https://www.reddit.com/r/#{subreddit}/comments/#{work_id}/#{title}"
+        elsif username.present? && work_id.present? && title.present?
+          "https://www.reddit.com/user/#{username}/comments/#{work_id}/#{title}"
         elsif subreddit.present? && work_id.present?
           "https://www.reddit.com/r/#{subreddit}/comments/#{work_id}"
         elsif work_id.present?
@@ -72,6 +84,12 @@ module Source
 
       def profile_url
         "https://www.reddit.com/user/#{username}" if username.present?
+      end
+
+      def full_image_url
+        return unless image_url?
+        return "https://i.redd.it/#{file}" if file.present?
+        original_url
       end
     end
   end

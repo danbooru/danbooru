@@ -2,18 +2,25 @@
 
 <section id="search-box">
   <h2>Search</h2>
+
   <%= form_tag(path, method: "get", id: "search-box-form", class: "flex") do %>
-    <% if params[:random] %>
-      <%= hidden_field_tag :random, params[:random] %>
+    <% if current_page?(action: "index") %>
+      <% if params[:random] %>
+        <%= hidden_field_tag :random, params[:random] %>
+      <% end %>
+
+      <% if params[:show_votes] %>
+        <%= hidden_field_tag :show_votes, params[:show_votes] %>
+      <% end %>
+
+      <% if params[:size] %>
+        <%= hidden_field_tag :size, params[:size] %>
+      <% end %>
     <% end %>
-    <% if params[:show_votes] %>
-      <%= hidden_field_tag :show_votes, params[:show_votes] %>
-    <% end %>
-    <% if params[:size] %>
-      <%= hidden_field_tag :size, params[:size] %>
-    <% end %>
-    <%= text_field_tag("tags", tags, :id => tags_dom_id, :class => "flex-auto", :"data-shortcut" => "q", :"data-autocomplete" => "tag-query") %>
+
+    <%= text_field_tag("tags", tags, id: tags_dom_id, class: "flex-auto", "data-shortcut": "q", "data-autocomplete": "tag-query", "autocapitalize": "none") %>
     <%= hidden_field_tag :z, 5 %>
+
     <button id="search-box-submit" type="submit"><%= search_icon %></button>
   <% end %>
 </section>

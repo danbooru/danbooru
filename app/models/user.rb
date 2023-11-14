@@ -12,13 +12,15 @@ class User < ApplicationRecord
     GOLD = 30
     PLATINUM = 31
     BUILDER = 32
+    CONTRIBUTOR = 35
+    APPROVER = 37
     MODERATOR = 40
     ADMIN = 50
     OWNER = 60
   end
 
   # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
-  Roles = Levels.constants.map(&:downcase) + %i[banned approver]
+  Roles = Levels.constants.map(&:downcase) + %i[banned]
 
   BOOLEAN_ATTRIBUTES = %w[
     is_banned
@@ -30,12 +32,12 @@ class User < ApplicationRecord
     enable_private_favorites
     _unused_enable_sequential_post_navigation
     _unused_hide_deleted_posts
-    style_usernames
+    _unused_style_usernames
     _unused_enable_auto_complete
     show_deleted_children
     _unused_has_saved_searches
-    can_approve_posts
-    can_upload_free
+    _unused_can_approve_posts
+    _unused_can_upload_free
     disable_categorized_saved_searches
     _unused_is_super_voter
     disable_tagged_filenames
@@ -56,6 +58,9 @@ class User < ApplicationRecord
 
   ACTIVE_BOOLEAN_ATTRIBUTES = BOOLEAN_ATTRIBUTES.grep_v(/unused/)
 
+  # Personal preferences that are editable by the user, rather than internal flags. These will be cleared when the user deactivates their account.
+  USER_PREFERENCE_BOOLEAN_ATTRIBUTES = ACTIVE_BOOLEAN_ATTRIBUTES - %w[is_banned requires_verification is_verified]
+
   DEFAULT_BLACKLIST = ["gore", "guro", "scat", "rating:e"].join("\n")
 
   attribute :id
@@ -67,7 +72,7 @@ class User < ApplicationRecord
   attribute :inviter_id
   attribute :last_logged_in_at, default: -> { Time.zone.now }
   attribute :last_forum_read_at, default: "1960-01-01 00:00:00"
-  attribute :last_ip_addr
+  attribute :last_ip_addr, :ip_address
   attribute :comment_threshold, default: -8
   attribute :default_image_size, default: "large"
   attribute :favorite_tags
@@ -83,6 +88,7 @@ class User < ApplicationRecord
   attribute :theme, default: :auto
   attribute :upload_points, default: Danbooru.config.initial_upload_points.to_i
   attribute :bit_prefs, default: 0
+  attribute :is_deleted, default: false
 
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
   enum theme: { auto: 0, light: 50, dark: 100 }, _suffix: true
@@ -115,9 +121,11 @@ class User < ApplicationRecord
   has_many :post_appeals, foreign_key: :creator_id
   has_many :post_approvals, :dependent => :destroy
   has_many :post_disapprovals, :dependent => :destroy
+  has_many :post_events, class_name: "PostEvent", foreign_key: :creator_id
   has_many :post_flags, foreign_key: :creator_id
   has_many :post_votes
   has_many :post_versions, foreign_key: :updater_id
+  has_many :post_reactions, -> { post }, class_name: "Reaction", foreign_key: :creator_id
   has_many :bans, -> {order("bans.id desc")}
   has_many :received_upgrades, class_name: "UserUpgrade", foreign_key: :recipient_id, dependent: :destroy
   has_many :purchased_upgrades, class_name: "UserUpgrade", foreign_key: :purchaser_id, dependent: :destroy
@@ -138,19 +146,20 @@ class User < ApplicationRecord
   has_many :tag_implications, foreign_key: :creator_id
   has_many :uploads, foreign_key: :uploader_id, dependent: :destroy
   has_many :upload_media_assets, through: :uploads, dependent: :destroy
+  has_many :mod_actions, as: :subject, dependent: :destroy
+  has_many :reactions, as: :model, dependent: :destroy
   belongs_to :inviter, class_name: "User", optional: true
 
   accepts_nested_attributes_for :email_address, reject_if: :all_blank, allow_destroy: true
 
-  # UserDeletion#rename renames deleted users to `user_<1234>~`. Tildes
-  # are appended if the username is taken.
-  scope :deleted, -> { where("name ~ 'user_[0-9]+~*'") }
-  scope :undeleted, -> { where("name !~ 'user_[0-9]+~*'") }
   scope :admins, -> { where(level: Levels::ADMIN) }
+  scope :banned, -> { bit_prefs_match(:is_banned, true) }
 
   scope :has_blacklisted_tag, ->(name) { where_regex(:blacklisted_tags, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "ni") }
   scope :has_private_favorites, -> { bit_prefs_match(:enable_private_favorites, true) }
   scope :has_public_favorites,  -> { bit_prefs_match(:enable_private_favorites, false) }
+
+  deletable
 
   module BanMethods
     def unban!
@@ -197,10 +206,7 @@ class User < ApplicationRecord
     end
 
     def name_errors
-      User.validators_on(:name).each do |validator|
-        validator.validate_each(self, :name, name)
-      end
-
+      UserNameValidator.new(attributes: [:name], skip_uniqueness: true).validate(self)
       errors
     end
 
@@ -215,16 +221,22 @@ class User < ApplicationRecord
       self.bcrypt_password_hash = BCrypt::Password.create(hash_password(new_password))
     end
 
+    # @return [User, Boolean] Return the user if the signed user ID is correct, or false if it isn't.
     def authenticate_login_key(signed_user_id)
+      return false if is_deleted?
       signed_user_id.present? && id == Danbooru::MessageVerifier.new(:login).verify(signed_user_id) && self
     end
 
+    # @return [Array<(User, ApiKey)>, Boolean] Return a (User, ApiKey) pair if the API key is correct, or false if it isn't.
     def authenticate_api_key(key)
+      return false if is_deleted?
       api_key = api_keys.find_by(key: key)
       api_key.present? && ActiveSupport::SecurityUtils.secure_compare(api_key.key, key) && [self, api_key]
     end
 
+    # @return [User, Boolean] Return the user if the password is correct, or false if it isn't.
     def authenticate_password(password)
+      return false if is_deleted?
       BCrypt::Password.new(bcrypt_password_hash) == hash_password(password) && self
     end
 
@@ -258,6 +270,8 @@ class User < ApplicationRecord
           "Gold" => Levels::GOLD,
           "Platinum" => Levels::PLATINUM,
           "Builder" => Levels::BUILDER,
+          "Contributor" => Levels::CONTRIBUTOR,
+          "Approver" => Levels::APPROVER,
           "Moderator" => Levels::MODERATOR,
           "Admin" => Levels::ADMIN,
           "Owner" => Levels::OWNER,
@@ -265,42 +279,12 @@ class User < ApplicationRecord
       end
 
       def level_string(value)
-        case value
-        when Levels::ANONYMOUS
-          "Anonymous"
-
-        when Levels::RESTRICTED
-          "Restricted"
-
-        when Levels::MEMBER
-          "Member"
-
-        when Levels::BUILDER
-          "Builder"
-
-        when Levels::GOLD
-          "Gold"
-
-        when Levels::PLATINUM
-          "Platinum"
-
-        when Levels::MODERATOR
-          "Moderator"
-
-        when Levels::ADMIN
-          "Admin"
-
-        when Levels::OWNER
-          "Owner"
-
-        else
-          ""
-        end
+        level_hash.key(value)
       end
     end
 
-    def promote_to!(new_level, promoter = CurrentUser.user, **options)
-      UserPromotion.new(self, promoter, new_level, **options).promote!
+    def promote_to!(new_level, promoter = CurrentUser.user)
+      UserPromotion.new(self, promoter, new_level).promote!
     end
 
     def promote_to_owner_if_first_user
@@ -308,8 +292,6 @@ class User < ApplicationRecord
 
       if name != Danbooru.config.system_user && !User.exists?(level: Levels::OWNER)
         self.level = Levels::OWNER
-        self.can_approve_posts = true
-        self.can_upload_free = true
       end
     end
 
@@ -319,10 +301,6 @@ class User < ApplicationRecord
 
     def level_string(value = nil)
       User.level_string(value || level)
-    end
-
-    def is_deleted?
-      name.match?(/\Auser_[0-9]+~*\z/)
     end
 
     def is_anonymous?
@@ -337,16 +315,24 @@ class User < ApplicationRecord
       level >= Levels::MEMBER
     end
 
-    def is_builder?
-      level >= Levels::BUILDER
-    end
-
     def is_gold?
       level >= Levels::GOLD
     end
 
     def is_platinum?
       level >= Levels::PLATINUM
+    end
+
+    def is_builder?
+      level >= Levels::BUILDER
+    end
+
+    def is_contributor?
+      level >= Levels::CONTRIBUTOR
+    end
+
+    def is_approver?
+      level >= Levels::APPROVER
     end
 
     def is_moderator?
@@ -359,10 +345,6 @@ class User < ApplicationRecord
 
     def is_owner?
       level >= Levels::OWNER
-    end
-
-    def is_approver?
-      can_approve_posts?
     end
   end
 
@@ -377,7 +359,7 @@ class User < ApplicationRecord
 
         if errors.none?
           UserEvent.create_from_request!(self, :email_change, request)
-          UserMailer.email_change_confirmation(self).deliver_later
+          UserMailer.with_request(request).email_change_confirmation(self).deliver_later
         end
       end
     end
@@ -459,7 +441,7 @@ class User < ApplicationRecord
     end
 
     def is_appeal_limited?
-      return false if can_upload_free?
+      return false if is_contributor?
       upload_limit.free_upload_slots < UploadLimit::APPEAL_COST
     end
 
@@ -468,14 +450,9 @@ class User < ApplicationRecord
       post_flags.active.count >= 5
     end
 
-    # Flags are unlimited if you're an approver or you have at least 30 flags
-    # in the last 3 months and have a 70% flag success rate.
+    # Flags are unlimited if you're an approver.
     def has_unlimited_flags?
-      return true if can_approve_posts?
-
-      recent_flags = post_flags.where("created_at >= ?", 3.months.ago)
-      flag_ratio = recent_flags.succeeded.count / recent_flags.count.to_f
-      recent_flags.count >= 30 && flag_ratio >= 0.70
+      return true if is_approver?
     end
 
     def upload_limit
@@ -539,7 +516,7 @@ class User < ApplicationRecord
     end
 
     def comment_count
-      comments.count
+      comments.visible_for_search(:creator, CurrentUser.user).count
     end
 
     def favorite_group_count
@@ -590,18 +567,17 @@ class User < ApplicationRecord
   end
 
   module SearchMethods
-    def search(params)
+    def search(params, current_user)
       params = params.dup
       params[:name_matches] = params.delete(:name) if params[:name].present?
 
       q = search_attributes(
         params,
-        :id, :created_at, :updated_at, :name, :level, :post_upload_count,
-        :post_update_count, :note_update_count, :favorite_count, :posts,
-        :note_versions, :artist_commentary_versions, :post_appeals,
-        :post_approvals, :artist_versions, :comments, :wiki_page_versions,
-        :feedback, :forum_topics, :forum_posts, :forum_post_votes,
-        :tag_aliases, :tag_implications, :bans, :inviter
+        [:id, :created_at, :updated_at, :name, :level, :is_deleted, :post_upload_count, :post_update_count,
+         :note_update_count, :favorite_count, :posts, :note_versions, :artist_commentary_versions, :post_appeals,
+         :post_approvals, :artist_versions, :comments, :wiki_page_versions, :feedback, :forum_topics, :forum_posts,
+         :forum_post_votes, :tag_aliases, :tag_implications, :bans, :inviter],
+        current_user: current_user
       )
 
       if params[:name_matches].present?
@@ -616,11 +592,11 @@ class User < ApplicationRecord
         q = q.where("level <= ?", params[:max_level].to_i)
       end
 
-      %w[can_approve_posts can_upload_free is_banned].each do |flag|
-        if params[flag].to_s.truthy?
-          q = q.bit_prefs_match(flag, true)
-        elsif params[flag].to_s.falsy?
-          q = q.bit_prefs_match(flag, false)
+      if params[:is_banned].present?
+        if params[:is_banned].to_s.truthy?
+          q = q.bit_prefs_match(:is_banned, true)
+        elsif params[:is_banned].to_s.falsy?
+          q = q.bit_prefs_match(:is_banned, false)
         end
       end
 

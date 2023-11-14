@@ -22,12 +22,9 @@ class CommentsController < ApplicationController
     end
   end
 
-  def search
-  end
-
   def new
     if params[:id]
-      quoted_comment = Comment.find(params[:id])
+      quoted_comment = authorize Comment.find(params[:id]), :reply?
       @comment = authorize Comment.new(post_id: quoted_comment.post_id, body: quoted_comment.quoted_response)
     else
       @comment = authorize Comment.new(permitted_attributes(Comment))
@@ -43,7 +40,7 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @comment = authorize Comment.new(creator: CurrentUser.user, creator_ip_addr: CurrentUser.ip_addr)
+    @comment = authorize Comment.new(creator: CurrentUser.user, creator_ip_addr: request.remote_ip)
     @comment.update(permitted_attributes(@comment))
     flash[:notice] = @comment.valid? ? "Comment posted" : @comment.errors.full_messages.join("; ")
     respond_with(@comment) do |format|

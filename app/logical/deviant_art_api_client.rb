@@ -21,10 +21,10 @@ class DeviantArtApiClient
   class Error < StandardError; end
   BASE_URL = "https://www.deviantart.com/api/v1/oauth2/"
 
-  attr_reader :client_id, :client_secret
+  attr_reader :client_id, :client_secret, :http
 
-  def initialize(client_id, client_secret)
-    @client_id, @client_secret = client_id, client_secret
+  def initialize(client_id, client_secret, http)
+    @client_id, @client_secret, @http = client_id, client_secret, http
   end
 
   # https://www.deviantart.com/developers/http/v1/20160316/deviation_single/bcc296bdf3b5e40636825a942a514816
@@ -54,7 +54,7 @@ class DeviantArtApiClient
     params = { access_token: access_token.token, **params }
 
     url = URI.join(BASE_URL, url).to_s
-    response = Danbooru::Http.cache(1.minute).get(url, params: params)
+    response = http.cache(1.minute).get(url, params: params)
     response.parse.with_indifferent_access
   end
 

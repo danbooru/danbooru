@@ -3,145 +3,156 @@ require 'test_helper'
 module Sources
   class FanboxTest < ActiveSupport::TestCase
     context "A free Pixiv Fanbox post" do
-      setup do
-        @post1 = Source::Extractor.find("https://yanmi0308.fanbox.cc/posts/1141325")
-        @post2 = Source::Extractor.find("https://chanxco.fanbox.cc/posts/209386")
-        @post3 = Source::Extractor.find("https://downloads.fanbox.cc/images/post/209386/w/1200/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg")
-
-        assert_nothing_raised { @post1.to_h }
-        assert_nothing_raised { @post2.to_h }
-        assert_nothing_raised { @post3.to_h }
-      end
-
-      should "get the image urls" do
-        # "images" in api response
-        images1 = %w[
+      strategy_should_work(
+        "https://yanmi0308.fanbox.cc/posts/1141325",
+        image_urls: %w[
           https://downloads.fanbox.cc/images/post/1141325/q7GaJ0A9J5Uz8kvEAUizHJoN.png
           https://downloads.fanbox.cc/images/post/1141325/LMJz0sAig5h9D3rPZGCEGniZ.png
           https://downloads.fanbox.cc/images/post/1141325/dRSz380Uf3N8s4pT2ADEXBco.png
           https://downloads.fanbox.cc/images/post/1141325/h48L2mbm39qqNUB1abLAvzvg.png
-        ]
-        assert_equal(images1, @post1.image_urls)
+        ],
+        artist_commentary_title: "栗山やんみ（デザイン）",
+        artist_commentary_desc: "˗ˋˏ Special Thanks ˎˊ˗   (敬称略)\n\n🎨キャラクターデザイン\n特急みかん  https://twitter.com/tokkyuumikan\n\n🤖3Dモデリング\n（仮）  https://twitter.com/Admiral_TMP\n\n⚙プログラミング\n神無月ユズカ  https://twitter.com/Kannaduki_Yzk\n\n🎧OP・EDミュージック\n卓球少年  https://twitter.com/takkyuu_s\n\n📻BGM\nC  https://twitter.com/nica2c\n\n🖌ロゴデザイン\nてづかもり  https://twitter.com/tezkamori\n\n🎨SDキャラクター\nAZU。  https://twitter.com/tokitou_aaa",
+        page_url: "https://yanmi0308.fanbox.cc/posts/1141325",
+        profile_url: "https://yanmi0308.fanbox.cc",
+        media_files: [
+          { file_size: 431_225 },
+          { file_size: 753_048 },
+          { file_size: 589_327 },
+          { file_size: 178_739 },
+        ],
+        tags: [
+          ["栗山やんみ", "https://fanbox.cc/tags/栗山やんみ"], ["VTuber", "https://fanbox.cc/tags/VTuber"], ["三面図", "https://fanbox.cc/tags/三面図"],
+          ["イラスト", "https://fanbox.cc/tags/イラスト"], ["ロゴデザイン", "https://fanbox.cc/tags/ロゴデザイン"], ["モデリング", "https://fanbox.cc/tags/モデリング"],
+        ],
+        artist_name: "yanmi0308",
+        display_name: "栗山やんみ"
+      )
+    end
 
-        # "imageMapi" in api response (embedded pics)
-        images2 = %w[
+    context "A free Pixiv Fanbox post with embedded pics" do
+      strategy_should_work(
+        "https://chanxco.fanbox.cc/posts/209386",
+        image_urls: %w[
           https://downloads.fanbox.cc/images/post/209386/Q8rZ0iMHpcmJDACEzNGjTj9E.jpeg
           https://downloads.fanbox.cc/images/post/209386/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg
           https://downloads.fanbox.cc/images/post/209386/AGGWF0JxytFcNL2ybPKBaqp7.jpeg
-        ]
-        assert_equal(images2, @post2.image_urls)
-      end
-
-      should "get the commentary" do
-        # Normal commentary
-        assert_equal("栗山やんみ（デザイン）", @post1.artist_commentary_title)
-
-        body1 = "˗ˋˏ Special Thanks ˎˊ˗   (敬称略)\n\n🎨キャラクターデザイン\n特急みかん  https://twitter.com/tokkyuumikan\n\n🤖3Dモデリング\n（仮）  https://twitter.com/Admiral_TMP\n\n⚙プログラミング\n神無月ユズカ  https://twitter.com/Kannaduki_Yzk\n\n🎧OP・EDミュージック\n卓球少年  https://twitter.com/takkyuu_s\n\n📻BGM\nC  https://twitter.com/nica2c\n\n🖌ロゴデザイン\nてづかもり  https://twitter.com/tezkamori\n\n🎨SDキャラクター\nAZU。  https://twitter.com/tokitou_aaa"
-        assert_equal(body1, @post1.artist_commentary_desc)
-
-        # With embedded pics
-        assert_equal("水着BBちゃん＋アラフィフ＋ライダーさん", @post2.artist_commentary_title)
-        assert_equal("水着BBちゃん＋アラフィフ＋ライダーさん", @post3.artist_commentary_title)
-
-        body2 = "今週のらくがきまとめ\n\nhttps://downloads.fanbox.cc/images/post/209386/Q8rZ0iMHpcmJDACEzNGjTj9E.jpeg\n水着BBちゃん\n第一再臨もなかなかセクシー\nhttps://downloads.fanbox.cc/images/post/209386/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg\nアラフィフ\n男キャラも描いていこうと練習中\n新宿での軽いキャラも好き\nhttps://downloads.fanbox.cc/images/post/209386/AGGWF0JxytFcNL2ybPKBaqp7.jpeg\nライダーさん\nつい眼鏡も描いてしまう\n\n＃FGO\n"
-        assert_equal(body2, @post2.artist_commentary_desc)
-        assert_equal(body2, @post3.artist_commentary_desc)
-      end
-
-      should "get the right page url" do
-        assert_equal("https://yanmi0308.fanbox.cc/posts/1141325", @post1.page_url)
-        assert_equal("https://chanxco.fanbox.cc/posts/209386", @post2.page_url)
-        assert_equal("https://chanxco.fanbox.cc/posts/209386", @post3.page_url)
-      end
-
-      should "correctly download the right image" do
-        assert_downloaded(431_225, @post1.image_urls[0])
-        assert_downloaded(753_048, @post1.image_urls[1])
-        assert_downloaded(589_327, @post1.image_urls[2])
-        assert_downloaded(178_739, @post1.image_urls[3])
-
-        assert_downloaded(245_678, @post2.image_urls[0])
-        assert_downloaded(320_056, @post2.image_urls[1])
-        assert_downloaded(666_681, @post2.image_urls[2])
-
-        assert_downloaded(320_056, @post3.image_urls.sole)
-      end
-
-      should "get the tags" do
-        tags = [
-          ["栗山やんみ", "https://fanbox.cc/tags/栗山やんみ"], ["VTuber", "https://fanbox.cc/tags/VTuber"], ["三面図", "https://fanbox.cc/tags/三面図"],
-          ["イラスト", "https://fanbox.cc/tags/イラスト"], ["ロゴデザイン", "https://fanbox.cc/tags/ロゴデザイン"], ["モデリング", "https://fanbox.cc/tags/モデリング"]
-        ]
-        assert_equal(tags, @post1.tags)
-      end
-
-      should "find the correct artist" do
-        @artist1 = FactoryBot.create(:artist, name: "yanmi", url_string: @post1.url)
-        @artist2 = FactoryBot.create(:artist, name: "chanxco", url_string: @post2.url)
-        assert_equal([@artist1], @post1.artists)
-        assert_equal([@artist2], @post2.artists)
-        assert_equal([@artist2], @post3.artists)
-      end
-
-      should "find the right artist names" do
-        assert_equal("yanmi0308", @post1.artist_name)
-        assert_equal("栗山やんみ", @post1.display_name)
-        assert_equal("chanxco", @post2.artist_name)
-        assert_equal("CHANxCO", @post2.display_name)
-        assert_equal(@post2.artist_name, @post3.artist_name)
-        assert_equal(@post2.display_name, @post3.display_name)
-      end
+        ],
+        artist_commentary_title: "水着BBちゃん＋アラフィフ＋ライダーさん",
+        artist_commentary_desc: "今週のらくがきまとめ\n\nhttps://downloads.fanbox.cc/images/post/209386/Q8rZ0iMHpcmJDACEzNGjTj9E.jpeg\n水着BBちゃん\n第一再臨もなかなかセクシー\nhttps://downloads.fanbox.cc/images/post/209386/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg\nアラフィフ\n男キャラも描いていこうと練習中\n新宿での軽いキャラも好き\nhttps://downloads.fanbox.cc/images/post/209386/AGGWF0JxytFcNL2ybPKBaqp7.jpeg\nライダーさん\nつい眼鏡も描いてしまう\n\n＃FGO\n",
+        page_url: "https://chanxco.fanbox.cc/posts/209386",
+        profile_url: "https://chanxco.fanbox.cc",
+        media_files: [
+          { file_size: 245_678 },
+          { file_size: 320_056 },
+          { file_size: 666_681 },
+        ],
+        artist_name: "chanxco",
+        display_name: "CHANxCO"
+      )
     end
 
-    context "an age-restricted fanbox post" do
-      should "work" do
-        @source = Source::Extractor.find("https://mfr.fanbox.cc/posts/1306390")
-
-        assert_nothing_raised { @source.to_h }
-        assert_equal("mfr", @source.artist_name)
-        assert_equal(["https://downloads.fanbox.cc/images/post/1306390/VOXblkyvltL5fRhMoR7RdSkk.png"], @source.image_urls)
-      end
+    context "A Pixiv Fanbox sample" do
+      strategy_should_work(
+        "https://downloads.fanbox.cc/images/post/209386/w/1200/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg",
+        image_urls: ["https://downloads.fanbox.cc/images/post/209386/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg"],
+        artist_commentary_title: "水着BBちゃん＋アラフィフ＋ライダーさん",
+        artist_commentary_desc: "今週のらくがきまとめ\n\nhttps://downloads.fanbox.cc/images/post/209386/Q8rZ0iMHpcmJDACEzNGjTj9E.jpeg\n水着BBちゃん\n第一再臨もなかなかセクシー\nhttps://downloads.fanbox.cc/images/post/209386/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg\nアラフィフ\n男キャラも描いていこうと練習中\n新宿での軽いキャラも好き\nhttps://downloads.fanbox.cc/images/post/209386/AGGWF0JxytFcNL2ybPKBaqp7.jpeg\nライダーさん\nつい眼鏡も描いてしまう\n\n＃FGO\n",
+        page_url: "https://chanxco.fanbox.cc/posts/209386",
+        profile_url: "https://chanxco.fanbox.cc",
+        media_files: [{ file_size: 320_056 }],
+        artist_name: "chanxco",
+        display_name: "CHANxCO"
+      )
     end
 
-    context "A link in the old format" do
-      should "still work" do
-        post = Source::Extractor.find("https://www.pixiv.net/fanbox/creator/1566167/post/39714")
-        assert_nothing_raised { post.to_h }
-        assert_equal("https://omu001.fanbox.cc", post.profile_url)
-        assert_equal("https://omu001.fanbox.cc/posts/39714", post.page_url)
-        artist = FactoryBot.create(:artist, name: "omu", url_string: "https://omu001.fanbox.cc")
-        assert_equal([artist], post.artists)
-      end
+    context "An age-restricted Fanbox post" do
+      strategy_should_work(
+        "https://mfr.fanbox.cc/posts/1306390",
+        image_urls: ["https://downloads.fanbox.cc/images/post/1306390/VOXblkyvltL5fRhMoR7RdSkk.png"],
+        artist_name: "mfr",
+        artist_commentary_desc: "これからセックスしまーす♪と言ってるシーン(･ω･｀)\nhttps://downloads.fanbox.cc/images/post/1306390/VOXblkyvltL5fRhMoR7RdSkk.png\n※海苔強化して再アップしました( 'A`;)\n",
+        profile_url: "https://mfr.fanbox.cc"
+      )
+    end
+
+    context "A fanbox post with multiple videos attached as files" do
+      strategy_should_work(
+        "https://gomeifuku.fanbox.cc/posts/3975317",
+        image_urls: [
+          "https://downloads.fanbox.cc/files/post/3975317/eatOUYGtAR2jESVVWkeK57px.mp4",
+          "https://downloads.fanbox.cc/files/post/3975317/hbydNywJEmIlUeL5lTQfQjJi.mp4",
+        ]
+      )
+    end
+
+    context "A fanbox post with a single embedded video" do
+      strategy_should_work(
+        "https://naochi.fanbox.cc/posts/4657540",
+        image_urls: [
+          "https://downloads.fanbox.cc/files/post/4657540/Pos3gwyHP4MKeI5JQS4Cl5sb.mp4",
+        ]
+      )
     end
 
     context "A cover image" do
-      should "still work" do
-        post = Source::Extractor.find("https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/QqxYtuWdy4XWQx1ZLIqr4wvA.jpeg")
-        assert_nothing_raised { post.to_h }
-        assert_downloaded(750_484, post.image_urls.sole)
-        assert_equal("https://omu001.fanbox.cc", post.profile_url)
-        assert_equal(post.profile_url, post.page_url)
-        artist = FactoryBot.create(:artist, name: "omu", url_string: "https://omu001.fanbox.cc")
-        assert_equal([artist], post.artists)
-      end
+      strategy_should_work(
+        "https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/pYOm2wWFyzffzZaty7fbHiJ1.jpeg",
+        media_files: [{ file_size: 562_582 }],
+        profile_url: "https://omu001.fanbox.cc"
+      )
     end
 
-    context "A dead profile picture from the old domain" do
-      should "still find the artist" do
-        post = Source::Extractor.find("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg")
-        assert_equal("https://omu001.fanbox.cc", post.profile_url)
-        artist = FactoryBot.create(:artist, name: "omu", url_string: "https://omu001.fanbox.cc")
-        assert_equal([artist], post.artists)
-      end
+    context "A post in the old pixiv format" do
+      strategy_should_work(
+        "https://www.pixiv.net/fanbox/creator/1566167/post/39714",
+        page_url: "https://omu001.fanbox.cc/posts/39714",
+        profile_url: "https://omu001.fanbox.cc"
+      )
     end
 
-    context "A deleted /fanbox/creator/:id profile url" do
-      should "not raise an exception" do
-        source = Source::Extractor.find("https://www.pixiv.net/fanbox/creator/40684196")
+    context "A dead profile picture in the old pixiv format" do
+      strategy_should_work(
+        "https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/29999491/profile/Ew6fOhLGPvmUcwU6FyH8JAMX.jpeg",
+        profile_url: "https://deaver0211.fanbox.cc"
+      )
+    end
 
-        assert_equal("https://www.pixiv.net/fanbox/creator/40684196", source.profile_url)
-        assert_nothing_raised { source.to_h }
-      end
+    # These posts are still accessible in the API even though the HTML returns an error.
+    context "An 'access is restricted for this user' Fanbox post" do
+      strategy_should_work(
+        "https://eclipsehake.fanbox.cc/posts/4246830",
+        page_url: "https://eclipsehake.fanbox.cc/posts/4246830",
+        profile_url: "https://eclipsehake.fanbox.cc",
+        image_urls: ["https://downloads.fanbox.cc/images/post/4246830/XUW76l3mT1yxkjbMTVeMow4w.jpeg"],
+        artist_name: "eclipsehake",
+        tag_name: "eclipsehake",
+        artist_commentary_title: "シアリュ―",
+        artist_commentary_desc: <<~EOS.chomp,
+          🐉👻♂
+
+          臆病な性格 / 物音に敏感
+
+          175cm　享年20歳
+
+          旅パ会社の期待の新人。享年20歳(推定)のアンデッド。生前の記憶が殆ど無く彷徨っていた所をスカウトされ就職。霊符で式神的なモノを呼び出して戦う。お人好しで頼まれ事は断れないタイプ。
+        EOS
+        tags: [],
+      )
+    end
+
+    context "A deleted Fanbox post" do
+      strategy_should_work(
+        "https://wakura081.fanbox.cc/posts/4923490",
+        page_url: "https://wakura081.fanbox.cc/posts/4923490",
+        profile_url: "https://wakura081.fanbox.cc",
+        image_urls: [],
+        artist_name: "wakura081",
+        tag_name: "wakura081",
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
+        tags: [],
+      )
     end
 
     should "Parse Fanbox URLs correctly" do
@@ -156,10 +167,19 @@ module Sources
       assert(Source::URL.page_url?("https://omu001.fanbox.cc/posts/39714"))
 
       assert(Source::URL.profile_url?("https://www.pixiv.net/fanbox/creator/1566167"))
+      assert(Source::URL.profile_url?("https://pixiv.net/fanbox/creator/1566167"))
       assert(Source::URL.profile_url?("https://www.pixiv.net/fanbox/member.php?user_id=3410642"))
+      assert(Source::URL.profile_url?("https://pixiv.net/fanbox/member.php?user_id=3410642"))
       assert(Source::URL.profile_url?("https://omu001.fanbox.cc"))
-      refute(Source::URL.profile_url?("https://www.fanbox.cc"))
-      refute(Source::URL.profile_url?("https://fanbox.cc"))
+      assert(Source::URL.profile_url?("https://www.fanbox.cc/@tsukiori"))
+      assert_not(Source::URL.profile_url?("https://www.fanbox.cc"))
+      assert_not(Source::URL.profile_url?("https://fanbox.cc"))
+
+      assert_equal("omu001", Source::URL.parse("https://fanbox.cc/@omu001").username)
+      assert_equal("omu001", Source::URL.parse("https://www.fanbox.cc/@omu001").username)
+      assert_equal("omu001", Source::URL.parse("https://www.fanbox.cc/@omu001/posts/39714").username)
+      assert_equal("omu001", Source::URL.parse("https://fanbox.cc/@omu001/posts/39714").username)
+      assert_equal("omu001", Source::URL.parse("https://omu001.fanbox.cc/posts/39714").username)
     end
   end
 end

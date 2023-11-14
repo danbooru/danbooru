@@ -6,13 +6,10 @@ class PoolTest < ActiveSupport::TestCase
       @user = FactoryBot.create(:user)
       CurrentUser.user = @user
     end
-
-    CurrentUser.ip_addr = "127.0.0.1"
   end
 
   teardown do
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   context "Searching pools" do
@@ -20,7 +17,12 @@ class PoolTest < ActiveSupport::TestCase
       @pool = FactoryBot.create(:pool, name: "Test Pool")
 
       assert_equal(@pool.id, Pool.find_by_name("test pool").id)
-      assert_equal(@pool.id, Pool.search(name_matches: "test pool").first.id)
+
+      assert_search_equals(@pool, name_contains: "test pool")
+      assert_search_equals(@pool, name_contains: "tes")
+      assert_search_equals(@pool, name_matches: "test pool")
+      assert_search_equals(@pool, name_matches: "testing pool")
+      assert_search_equals([], name_matches: "tes")
     end
 
     should "find pools by post id" do
@@ -29,8 +31,8 @@ class PoolTest < ActiveSupport::TestCase
       @post1 = create(:post, tag_string: "pool:pool1")
       @post2 = create(:post, tag_string: "pool:pool2")
 
-      assert_equal([@pool1.id], Pool.search(post_ids_include_any: @post1.id).pluck(:id))
-      assert_equal([@pool2.id, @pool1.id], Pool.search(post_ids_include_any: "#{@post1.id} #{@post2.id}").pluck(:id))
+      assert_search_equals(@pool1, post_ids_include_any: @post1.id)
+      assert_search_equals([@pool2, @pool1], post_ids_include_any: "#{@post1.id} #{@post2.id}")
     end
 
     should "find pools by post id count" do
@@ -39,7 +41,7 @@ class PoolTest < ActiveSupport::TestCase
       @post1 = create(:post, tag_string: "pool:pool1")
       @post2 = create(:post, tag_string: "pool:pool1")
 
-      assert_equal([@pool1.id], Pool.search(post_id_count: 2).pluck(:id))
+      assert_search_equals(@pool1, post_id_count: 2)
     end
 
     should "find pools by post tags" do
@@ -49,13 +51,13 @@ class PoolTest < ActiveSupport::TestCase
       @post2 = create(:post, tag_string: "pool:pool1 fumimi")
       @post3 = create(:post, tag_string: "pool:pool2 bkub fumimi")
 
-      assert_equal([@pool2.id, @pool1.id], Pool.search(post_tags_match: "bkub").pluck(:id))
-      assert_equal([@pool2.id, @pool1.id], Pool.search(post_tags_match: "fumimi").pluck(:id))
-      assert_equal([@pool2.id], Pool.search(post_tags_match: "bkub fumimi").pluck(:id))
+      assert_search_equals([@pool2, @pool1], post_tags_match: "bkub")
+      assert_search_equals([@pool2, @pool1], post_tags_match: "fumimi")
+      assert_search_equals(@pool2, post_tags_match: "bkub fumimi")
 
-      assert_equal(2, Pool.search(post_tags_match: "bkub").count)
-      assert_equal(2, Pool.search(post_tags_match: "fumimi").count)
-      assert_equal(1, Pool.search(post_tags_match: "bkub fumimi").count)
+      assert_equal(2, Pool.search({ post_tags_match: "bkub" }, current_user: User.anonymous).count)
+      assert_equal(2, Pool.search({ post_tags_match: "fumimi" }, current_user: User.anonymous).count)
+      assert_equal(1, Pool.search({ post_tags_match: "bkub fumimi" }, current_user: User.anonymous).count)
     end
   end
 
@@ -242,9 +244,17 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     context "when validating names" do
-      ["foo,bar", "foo*bar", "123", "___", "   ", "any", "none", "series", "collection"].each do |bad_name|
-        should_not allow_value(bad_name).for(:name)
-      end
+      should_not allow_value("foo,bar").for(:name)
+      should_not allow_value("foo*bar").for(:name)
+      should_not allow_value("123").for(:name)
+      should_not allow_value("any").for(:name)
+      should_not allow_value("none").for(:name)
+      should_not allow_value("series").for(:name)
+      should_not allow_value("collection").for(:name)
+      should_not allow_value("___").for(:name)
+      should_not allow_value("   ").for(:name)
+      should_not allow_value("\u200B").for(:name)
+      should_not allow_value("").for(:name)
     end
   end
 

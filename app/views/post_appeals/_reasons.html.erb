@@ -1,15 +1,13 @@
-<ul class="post-appeal-reason list-bulleted">
-  <li>
-    <% if appeal.reason.present? %>
-      <span class="prose"><%= format_text(appeal.reason, inline: true) %></span>
-    <% else %>
-      <span class="prose"><em>no reason</em></span>
-    <% end %>
+<span class="post-appeal-reason prose">
+  <% if appeal.reason.present? %>
+    <span class="prose"><%= format_text(appeal.reason.strip.chomp("."), inline: true) %></span>
+  <% else %>
+    <span class="prose"><em>no reason</em></span>
+  <% end %>
 
-    <% if policy(appeal).edit? %>
-      (<%= link_to "edit", edit_post_appeal_url(appeal) %>)
-    <% end %>
-    
-    (<%= link_to_user(appeal.creator) %>, <%= time_ago_in_words_tagged(appeal.created_at) %>)
-  </li>
-</ul>
+  <% if policy(appeal).edit? %>
+    (<%= link_to "edit", edit_post_appeal_url(appeal) %>)
+  <% end %>
+
+  (<%= link_to_user(appeal.creator) %>, <%= time_ago_in_words_tagged(appeal.created_at) %>)
+</span>

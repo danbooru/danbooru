@@ -10,6 +10,34 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 406
     end
 
+    should "return 400 Bad Request for a GET request with a body" do
+      get root_path, headers: { "Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json" }, env: { RAW_POST_DATA: "tags=touhou" }
+
+      assert_response 400
+      assert_equal("ApplicationController::RequestBodyNotAllowedError", response.parsed_body["error"])
+      assert_equal("Request body not allowed for GET request", response.parsed_body["message"])
+    end
+
+    should "return 200 OK for a POST request overridden to be a GET request" do
+      post root_path, headers: { "Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json", "X-Http-Method-Override": "GET" }, env: { RAW_POST_DATA: "tags=touhou" }
+
+      assert_response 200
+    end
+
+    should "return 404 Not Found for an unsupported method on the root path" do
+      post root_path
+      assert_response 404
+
+      put root_path
+      assert_response 404
+
+      patch root_path
+      assert_response 404
+
+      delete root_path
+      assert_response 404
+    end
+
     context "on a RecordNotFound error" do
       should "return 404 Not Found even with a bad file extension" do
         get post_path("bad.json")
@@ -81,7 +109,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         @user.update_columns(name: "foo__bar")
 
         get_auth posts_path, @user
-        assert_redirected_to new_user_name_change_request_path
+        assert_redirected_to change_name_user_path(@user)
       end
     end
 
@@ -123,6 +151,14 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           assert_response 401
         end
 
+        should "fail for a deleted user" do
+          @user.update!(is_deleted: true)
+          basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
+          get profile_path, as: :json, headers: { HTTP_AUTHORIZATION: basic_auth_string }
+
+          assert_response 401
+        end
+
         should "succeed for non-GET requests without a CSRF token" do
           assert_changes -> { @user.reload.enable_safe_mode }, from: false, to: true do
             basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
@@ -151,19 +187,34 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail for api key mismatches" do
-          get profile_path, as: :json, params: { login: @user.name }
+          get profile_path(login: @user.name), as: :json
           assert_response 401
 
-          get profile_path, as: :json, params: { api_key: @api_key.key }
+          get profile_path(api_key: @api_key.key), as: :json
           assert_response 401
 
-          get profile_path, as: :json, params: { login: @user.name, api_key: "bad" }
+          get profile_path(login: @user.name, api_key: "bad"), as: :json
+          assert_response 401
+        end
+
+        should "fail for a blank API key" do
+          get profile_path(login: ""), as: :json
+          assert_response 401
+
+          get profile_path(api_key: ""), as: :json
+          assert_response 401
+        end
+
+        should "fail for a deleted user" do
+          @user.update!(is_deleted: true)
+          get edit_user_path(@user), params: { login: @user.name, api_key: @api_key.key }
+
           assert_response 401
         end
 
         should "succeed for non-GET requests without a CSRF token" do
           assert_changes -> { @user.reload.enable_safe_mode }, from: false, to: true do
-            put user_path(@user), params: { login: @user.name, api_key: @api_key.key, user: { enable_safe_mode: "true" } }, as: :json
+            put user_path(@user, login: @user.name, api_key: @api_key.key), params: { user: { enable_safe_mode: "true" }}, as: :json
             assert_response :success
           end
         end
@@ -206,16 +257,16 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           @post = create(:post)
           @api_key = create(:api_key, permissions: ["posts:index", "posts:show"])
 
-          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          get posts_path(login: @api_key.user.name, api_key: @api_key.key)
           assert_response :success
 
-          get post_path(@post), params: { login: @api_key.user.name, api_key: @api_key.key }
+          get post_path(@post, login: @api_key.user.name, api_key: @api_key.key)
           assert_response :success
 
-          get tags_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          get tags_path(login: @api_key.user.name, api_key: @api_key.key)
           assert_response 403
 
-          put post_path(@post), params: { login: @api_key.user.name, api_key: @api_key.key, post: { rating: "s" }}
+          put post_path(@post, login: @api_key.user.name, api_key: @api_key.key), params: { post: { rating: "s" }}
           assert_response 403
 
           assert_equal(4, @api_key.reload.uses)
@@ -245,13 +296,25 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "on session cookie authentication" do
-      should "succeed" do
-        user = create(:user, password: "password")
+      setup do
+        @user = create(:user, password: "password")
+        post session_path, params: { name: @user.name, password: "password" }
+      end
 
-        post session_path, params: { name: user.name, password: "password" }
-        get edit_user_path(user)
+      should "succeed" do
+        get profile_path
 
         assert_response :success
+      end
+
+      should "fail for a deleted user" do
+        @user.update!(is_deleted: true)
+
+        get profile_path
+
+        assert_redirected_to login_path(url: "/profile")
+        assert_nil(session[:user_id])
+        assert_equal(true, @user.user_events.exists?(category: :logout))
       end
     end
 
@@ -294,6 +357,52 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_equal(1, response.parsed_body.size)
       assert_equal(tags.first.id, response.parsed_body.first.fetch("id"))
+    end
+
+    should "support ordering by search[order]=custom" do
+      tags = create_list(:tag, 2, post_count: 42)
+      get tags_path, params: { search: { id: "#{tags[0].id},#{tags[1].id}", order: "custom" } }, as: :json
+
+      assert_response :success
+      assert_equal(tags.pluck(:id), response.parsed_body.pluck("id"))
+    end
+
+    should "return nothing if the search[order]=custom param isn't accompanied by search[id]" do
+      tags = create_list(:tag, 2, post_count: 42)
+      get tags_path, params: { search: { order: "custom" } }, as: :json
+
+      assert_response :success
+      assert_equal(0, response.parsed_body.size)
+    end
+
+    should "return nothing if the search[order]=custom param isn't accompanied by a valid search[id]" do
+      tags = create_list(:tag, 2, post_count: 42)
+      get tags_path, params: { search: { id: ">1", order: "custom" } }, as: :json
+
+      assert_response :success
+      assert_equal(0, response.parsed_body.size)
+    end
+
+    should "work if the search[order]=custom param is used with a single id" do
+      tags = create_list(:tag, 2, post_count: 42)
+      get tags_path, params: { search: { id: tags[0].id, order: "custom" } }, as: :json
+
+      assert_response :success
+      assert_equal([tags[0].id], response.parsed_body.pluck("id"))
+    end
+
+    should "remove blank `search` params from the URL" do
+      get tags_path(search: { name: "touhou", blah: "" }), as: :json
+
+      assert_redirected_to tags_path(search: { name: "touhou" })
+    end
+
+    should "ignore invalid `search` params" do
+      get tags_path(search: "foo"), as: :json
+      assert_response :success
+
+      get tags_path("search[]": "foo"), as: :json
+      assert_response :success
     end
 
     should "support the expiry parameter" do

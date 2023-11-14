@@ -39,6 +39,7 @@ module Source
       Source::Extractor::Moebooru,
       Source::Extractor::Nijie,
       Source::Extractor::ArtStation,
+      Source::Extractor::Gelbooru,
       Source::Extractor::HentaiFoundry,
       Source::Extractor::Fanbox,
       Source::Extractor::Mastodon,
@@ -54,6 +55,19 @@ module Source
       Source::Extractor::Booth,
       Source::Extractor::Anifty,
       Source::Extractor::Furaffinity,
+      Source::Extractor::Reddit,
+      Source::Extractor::Bilibili,
+      Source::Extractor::Rule34DotUs,
+      Source::Extractor::FourChan,
+      Source::Extractor::Picdig,
+      Source::Extractor::Enty,
+      Source::Extractor::ArcaLive,
+      Source::Extractor::Imgur,
+      Source::Extractor::Zerochan,
+      Source::Extractor::Poipiku,
+      Source::Extractor::ArtStreet,
+      Source::Extractor::Gumroad,
+      Source::Extractor::Misskey,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
@@ -134,7 +148,7 @@ module Source
     #
     # @return [String, nil]
     def tag_name
-      artist_name
+      Tag.normalize_name(artist_name) if artist_name.present? && artist_name.match?(/\A[a-zA-Z0-9._-]+\z/)
     end
 
     # The artists's primary name. If an artist has both a display name and a
@@ -195,7 +209,7 @@ module Source
 
     # A http client for API requests.
     def http
-      Danbooru::Http.new.proxy.public_only
+      Danbooru::Http.external
     end
 
     # A http client for downloading files.
@@ -230,8 +244,12 @@ module Source
     end
 
     def translated_tags
-      translated_tags = normalized_tags.flat_map(&method(:translate_tag)).uniq.sort
-      translated_tags.reject(&:artist?).reject(&:is_deprecated?)
+      translated_tags = normalized_tags.flat_map(&method(:translate_tag)).uniq
+      translated_tags = translated_tags.reject(&:artist?).reject(&:is_deprecated?)
+
+      translated_tags.sort_by do |tag|
+        [TagCategory.categorized_list.index(tag.category_name.downcase), tag.name]
+      end
     end
 
     # Given a tag from the source site, should return an array of corresponding Danbooru tags.
@@ -295,7 +313,7 @@ module Source
           :dtext_title => dtext_artist_commentary_title,
           :dtext_description => dtext_artist_commentary_desc
         },
-        :api_response => api_response.to_h
+        :api_response => api_response
       }
     end
 
@@ -313,7 +331,7 @@ module Source
       text = text.to_s
       text = Rails::Html::FullSanitizer.new.sanitize(text, encode_special_chars: false)
       text = CGI.unescapeHTML(text)
-      text
+      text.strip
     end
 
     memoize :http, :http_downloader, :related_posts

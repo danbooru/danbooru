@@ -1,0 +1,49 @@
+<span class="inline-flex flex-wrap gap-1 justify-center items-center min-h-8" id="reactions-for-<%= model.class.name.parameterize %>-<%= model.id %>" x-data="{ search: '' }">
+  <% if policy(model).try(:reactable?) && distinct_reactions.size <= ReactionComponent::MAX_REACTIONS %>
+    <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
+      <% menu.with_button do %>
+        <%= add_reaction_icon(class: "h-4", "x-on:click": "$nextTick(() => $refs.search.focus())") %>
+      <% end %>
+
+      <% menu.with_item do %>
+        <div>
+          <input type="text" placeholder="Search emoji..." class="reaction-search w-full mb-2" x-ref="search" x-model="search" x-on:keyup.escape="Danbooru.Shortcuts.hide_tooltips()">
+
+          <div class="max-w-full grid grid-cols-10 gap-1">
+            <% Reaction::REACTIONS.each do |id, (name, url)| %>
+              <%= link_to reaction_icon(id), reactions_path(reaction: { model_type: model.class.name, model_id: model.id, reaction_id: id }, format: "js"), remote: true, method: :post, "x-show": "'#{j name}'.toLowerCase().includes(search.toLowerCase().replace(/[^a-zA-Z0-9]/g, ''))", title: ":#{name}:" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  <% elsif current_user.is_anonymous? %>
+    <%= link_to add_reaction_icon(class: "h-4"), login_path(url: url_for(model)) %>
+  <% end %>
+
+  <% distinct_reactions.each do |(reaction_id, reactions)| %>
+    <% if current_user.is_anonymous? %>
+      <%= link_to login_path(url: url_for(model)) do %>
+        <span class="reaction-icon flex items-center gap-1 chip-primary border-current text-muted text-sm">
+          <%= reaction_icon(reaction_id) %> <%= tag.span reactions.size %>
+        </span>
+      <% end %>
+    <% elsif !policy(model).reactable? %>
+      <span class="reaction-icon flex items-center gap-1 chip-primary border-current text-muted text-sm">
+        <%= reaction_icon(reaction_id) %> <%= tag.span reactions.size %>
+      </span>
+    <% elsif reaction = reaction_by_current_user(reaction_id) %>
+      <%= link_to reaction_path(reaction.id, format: "js"), remote: true, method: :delete do %>
+        <span class="reaction-icon flex items-center gap-1 chip-primary border-current text-muted text-sm link-color">
+          <%= reaction_icon(reaction_id) %> <%= tag.span reactions.size %>
+        </span>
+      <% end %>
+    <% else %>
+      <%= link_to reactions_path(reaction: { model_type: model.class.name, model_id: model.id, reaction_id: reaction_id }, format: "js"), remote: true, method: :post do %>
+        <span class="reaction-icon flex items-center gap-1 chip-primary border-current text-muted text-sm">
+          <%= reaction_icon(reaction_id) %> <%= tag.span reactions.size %>
+        </span>
+      <% end %>
+    <% end %>
+  <% end %>
+</span>

@@ -2,75 +2,25 @@ require 'test_helper'
 
 module Sources
   class MastodonTest < ActiveSupport::TestCase
-    context "The source site for a https://pawoo.net/web/status/$id url" do
+    context "For Pawoo," do
       setup do
-        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
-        @site = Source::Extractor.find("https://pawoo.net/web/statuses/1202176")
+        skip "Pawoo keys not set" unless Danbooru.config.pawoo_access_token
       end
 
-      should "get the profile" do
-        assert_equal("https://pawoo.net/@9ed00e924818", @site.profile_url)
+      context "a https://pawoo.net/web/status/$id url" do
+        strategy_should_work(
+          "https://pawoo.net/web/statuses/1202176",
+          image_urls: ["https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png"],
+          profile_url: "https://pawoo.net/@9ed00e924818",
+          tag_name: "9ed00e924818",
+          artist_name: nil,
+          dtext_artist_commentary_desc: "a mind forever voyaging through strange seas of thought alone",
+          media_files: [{ file_size: 7_680 }],
+        )
       end
 
-      should "get the artist name" do
-        assert_equal("9ed00e924818", @site.artist_name)
-      end
-
-      should "get the image url" do
-        assert_equal(["https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png"], @site.image_urls)
-      end
-
-      should "get the commentary" do
-        desc = '<p>a mind forever voyaging through strange seas of thought alone <a href="https://pawoo.net/media/9hJzXvwxVl1CezW0ecM" rel="nofollow noopener noreferrer" target="_blank"><span class="invisible">https://</span><span class="ellipsis">pawoo.net/media/9hJzXvwxVl1Cez</span><span class="invisible">W0ecM</span></a></p>'
-        assert_equal(desc, @site.artist_commentary_desc)
-      end
-
-      should "get the dtext-ified commentary" do
-        desc = 'a mind forever voyaging through strange seas of thought alone'
-        assert_equal(desc, @site.dtext_artist_commentary_desc)
-      end
-    end
-
-    context "The source site for a https://pawoo.net/$user/$id url" do
-      setup do
-        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
-        @site = Source::Extractor.find("https://pawoo.net/@evazion/19451018")
-      end
-
-      should "get the profile" do
-        profiles = %w[https://pawoo.net/@evazion https://pawoo.net/web/accounts/47806]
-        assert_equal(profiles.first, @site.profile_url)
-        assert_equal(profiles, @site.profile_urls)
-      end
-
-      should "get the artist name" do
-        assert_equal("evazion", @site.artist_name)
-      end
-
-      should "get the image urls" do
-        urls = %w[
-          https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png
-          https://img.pawoo.net/media_attachments/files/001/298/028/original/55a6fd252778454b.mp4
-          https://img.pawoo.net/media_attachments/files/001/298/081/original/2588ee9ba808f38f.webm
-          https://img.pawoo.net/media_attachments/files/001/298/084/original/media.mp4
-        ]
-
-        assert_equal(urls, @site.image_urls)
-      end
-
-      should "get the tags" do
-        assert_equal(%w[foo bar baz], @site.tags.map(&:first))
-      end
-
-      should "get the commentary" do
-        desc = "<p>test post please ignore</p><p>blah blah blah</p><p>this is a test 🍕</p><p><a href=\"https://pawoo.net/tags/foo\" class=\"mention hashtag\" rel=\"tag\">#<span>foo</span></a> <a href=\"https://pawoo.net/tags/bar\" class=\"mention hashtag\" rel=\"tag\">#<span>bar</span></a> <a href=\"https://pawoo.net/tags/baz\" class=\"mention hashtag\" rel=\"tag\">#<span>baz</span></a></p>"
-
-        assert_nil(@site.artist_commentary_title)
-        assert_equal(desc, @site.artist_commentary_desc)
-      end
-
-      should "get the dtext-ified commentary" do
-        desc = <<-DESC.strip_heredoc.chomp
+      context "a https://pawoo.net/$user/$id url" do
+        desc = <<~DESC.chomp
           test post please ignore
 
           blah blah blah
@@ -80,45 +30,82 @@ module Sources
           "#foo":[https://pawoo.net/tags/foo] "#bar":[https://pawoo.net/tags/bar] "#baz":[https://pawoo.net/tags/baz]
         DESC
 
-        assert_equal(desc, @site.dtext_artist_commentary_desc)
+        strategy_should_work(
+          "https://pawoo.net/@evazion/19451018",
+          image_urls: %w[
+            https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png
+            https://img.pawoo.net/media_attachments/files/001/298/028/original/55a6fd252778454b.mp4
+            https://img.pawoo.net/media_attachments/files/001/298/081/original/2588ee9ba808f38f.webm
+            https://img.pawoo.net/media_attachments/files/001/298/084/original/media.mp4
+          ],
+          profile_urls: %w[https://pawoo.net/@evazion https://pawoo.net/web/accounts/47806],
+          tag_name: "evazion",
+          artist_name: nil,
+          tags: %w[foo bar baz],
+          dtext_artist_commentary_desc: desc
+        )
+      end
+
+      context "a https://img.pawoo.net/ url" do
+        strategy_should_work(
+          "https://img.pawoo.net/media_attachments/files/001/298/028/original/55a6fd252778454b.mp4",
+          image_urls: ["https://img.pawoo.net/media_attachments/files/001/298/028/original/55a6fd252778454b.mp4"],
+          media_files: [{ file_size: 59_950 }],
+          referer: "https://pawoo.net/@evazion/19451018",
+          page_url: "https://pawoo.net/@evazion/19451018"
+        )
+      end
+
+      context "a deleted or invalid source" do
+        strategy_should_work(
+          "https://pawoo.net/@nonamethankswashere/12345678901234567890",
+          profile_url: "https://pawoo.net/@nonamethankswashere",
+          tag_name: "nonamethankswashere",
+          deleted: true
+        )
       end
     end
 
-    context "The source site for a https://img.pawoo.net/ url" do
+    context "For Baraag," do
       setup do
-        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
-        @url = "https://img.pawoo.net/media_attachments/files/001/298/028/original/55a6fd252778454b.mp4"
-        @ref = "https://pawoo.net/@evazion/19451018"
-        @site = Source::Extractor.find(@url, @ref)
+        skip "Baraag keys not set" unless Danbooru.config.baraag_access_token
       end
 
-      should "fetch the source data" do
-        assert_equal("evazion", @site.artist_name)
+      context "a baraag.net/$user/$id url" do
+        strategy_should_work(
+          "https://baraag.net/@bardbot/105732813175612920",
+          image_urls: ["https://media.baraag.net/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"],
+          media_files: [{ file_size: 573_353 }],
+          profile_url: "https://baraag.net/@bardbot",
+          tag_name: "bardbot",
+          artist_name: "SpicyBardo🔞",
+          dtext_artist_commentary_desc: "🍌"
+        )
       end
 
-      should "correctly get the page url" do
-        assert_equal(@ref, @site.page_url)
-      end
-    end
-
-    context "A baraag url" do
-      setup do
-        skip "Baraag keys not set" unless Danbooru.config.baraag_client_id
-        @url = "https://baraag.net/@bardbot/105732813175612920"
-        @site1 = Source::Extractor.find(@url)
-
-        @img = "https://baraag.net/system/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"
-        @ref = "https://baraag.net/@Nakamura/105803949565505009"
-        @site2 = Source::Extractor.find(@img, @ref)
+      context "an old baraag image url" do
+        strategy_should_work(
+          "https://baraag.net/system/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png",
+          image_urls: ["https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
+          media_files: [{ file_size: 363_261 }]
+        )
       end
 
-      should "work" do
-        assert_equal("https://baraag.net/@bardbot", @site1.profile_url)
-        assert_equal(["https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"], @site1.image_urls)
-        assert_equal("bardbot", @site1.artist_name)
-        assert_equal("🍌", @site1.dtext_artist_commentary_desc)
+      context "a new baraag image url" do
+        strategy_should_work(
+          "https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png",
+          image_urls: ["https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
+          media_files: [{ file_size: 363_261 }]
+        )
+      end
 
-        assert_equal([@img], @site2.image_urls)
+      context "a deleted or invalid source" do
+        strategy_should_work(
+          "https://baraag.net/@nonamethankswashere/12345678901234567890",
+          profile_url: "https://baraag.net/@nonamethankswashere",
+          tag_name: "nonamethankswashere",
+          deleted: true
+        )
       end
     end
 
@@ -132,24 +119,7 @@ module Sources
       should "handle inconvertible urls" do
         assert_nil(Source::URL.page_url("https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png"))
         assert_nil(Source::URL.page_url("https://pawoo.net/@evazion/media"))
-        assert_nil(Source::URL.page_url("https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"))
-      end
-    end
-
-    context "A deleted or invalid source" do
-      setup do
-        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
-
-        @site1 = Source::Extractor.find("https://pawoo.net/@nantokakun/105643037682139899") # 404
-        @site2 = Source::Extractor.find("https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png")
-
-        assert_nothing_raised { @site1.to_h }
-        assert_nothing_raised { @site2.to_h }
-      end
-
-      should "still find the artist" do
-        @artist = FactoryBot.create(:artist, name: "nantokakun", url_string: "https://pawoo.net/@nantokakun")
-        assert_equal([@artist], @site1.artists)
+        assert_nil(Source::URL.page_url("https://media.baraag.net/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"))
       end
     end
 
@@ -167,11 +137,13 @@ module Sources
 
     should "Parse Baraag URLs correctly" do
       assert(Source::URL.image_url?("https://baraag.net/system/media_attachments/files/107/866/084/749/942/932/original/a9e0f553e332f303.mp4"))
+      assert(Source::URL.image_url?("https://media.baraag.net/media_attachments/files/107/866/084/749/942/932/original/a9e0f553e332f303.mp4"))
 
       assert(Source::URL.page_url?("https://baraag.net/@curator/102270656480174153"))
       assert(Source::URL.page_url?("https://baraag.net/web/statuses/102270656480174153"))
 
       assert(Source::URL.profile_url?("https://baraag.net/@danbooru"))
+      assert(Source::URL.profile_url?("https://baraag.net/@web/danbooru"))
       assert(Source::URL.profile_url?("https://baraag.net/web/accounts/107862785324786980"))
     end
   end

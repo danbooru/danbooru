@@ -1,0 +1,17 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env", {
+        "useBuiltIns": "entry",
+        "corejs": "3.27",
+        "debug": true,
+        "modules": "auto",
+        "bugfixes": true,
+        "exclude": ["transform-typeof-symbol"]
+      }
+    ]
+  ],
+  "plugins": [
+    ["@babel/plugin-transform-runtime", { "helpers": false }]
+  ]
+}

@@ -1,8 +1,4 @@
-<% if CurrentUser.user.upload_limit.limited? %>
-  <p>You have reached your upload limit. Please wait for your pending uploads to be approved before uploading more.</p>
-
-  <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
-<% elsif upload_media_asset.loading? %>
+<% if upload_media_asset.loading? %>
   <p>Processing <%= external_link_to upload_media_asset.source_url %>...</p>
 
   <% content_for(:html_header) do %>
@@ -13,85 +9,244 @@
 <% else %>
   <% upload = upload_media_asset.upload %>
   <% media_asset = upload_media_asset.media_asset %>
+  <% source = upload_media_asset.source_extractor %>
 
-  <%= embed_wiki("help:upload_notice", id: "upload-guide-notice") %>
+  <%= tag.div class: "upload-container h-full",
+              "x-data": "{ dock: $persist('#{j JSON.parse(cookies.fetch(:upload_edit_panel_dock, "auto".to_json))}').as('upload_edit_panel_dock').using(Danbooru.Cookie) }",
+              "x-bind:data-dock": "dock",
+              "data-dock": JSON.parse(cookies.fetch(:upload_edit_panel_dock, "auto".to_json)),
+              style: ("--edit-container-width: #{cookies[:upload_edit_container_width]};" if cookies[:upload_edit_container_width].present?) do %>
+    <div class="upload-image-container">
+      <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user, outer_classes: "h-full top-0", inner_classes: "mx-auto", dynamic_height: false, scroll_on_zoom: true) do |component| %>
+        <% component.with_footer do %>
+          <% if policy(media_asset).can_see_image? %>
+            <div class="flex flex-wrap flex-none gap-2 items-center justify-center text-xs my-1">
+              <% if media_asset.source_urls.present? %>
+                <span>
+                  <% media_asset.source_urls.take(5).each do |url| %>
+                    <%= external_link_to url, external_site_icon(Source::URL.site_name(url), class: "h-4"), title: url, class: "inline-block align-top" %>
+                  <% end %>
+                </span>
+              <% end %>
 
-  <% unless CurrentUser.can_upload_free? %>
-    <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
-  <% end %>
+              <%= link_to media_asset do %>
+                <%= number_to_human_size(media_asset.file_size) %> .<%= media_asset.file_ext %>,
+                <%= media_asset.image_width %>x<%= media_asset.image_height %>
 
-  <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
+                <% if media_asset.duration.present? %>
+                  (<%= duration_to_hhmmss(media_asset.duration) %>)
+                <% end %>
+              <% end %>
 
-  <div id="upload-image">
-    <%= render MediaAssetComponent.new(media_asset: media_asset) %>
+              <span>
+                <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
+                  <% menu.with_item(hide_on_click: true) do %>
+                    <%= link_to "#{media_asset.original.file_url}?download=1", download: media_asset.original.file_name do %>
+                      <%= download_icon %> Download
+                    <% end %>
+                  <% end %>
 
-    <p>
-      <strong>Size</strong>
-      <%= link_to media_asset.variant(:original).file_url do %>
-        <%= number_to_human_size(media_asset.file_size) %> .<%= media_asset.file_ext %>
+                  <% menu.with_item do %>
+                    <hr class="border">
+                  <% end %>
+
+                  <% menu.with_item do %>
+                    <%= external_link_to "https://saucenao.com/search.php?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                      <%= search_icon %> SauceNAO
+                    <% end %>
+                  <% end %>
+
+                  <% menu.with_item do %>
+                    <%= external_link_to "https://ascii2d.net/search/url/#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                      <%= search_icon %> Ascii2D
+                    <% end %>
+                  <% end %>
+
+                  <% menu.with_item do %>
+                    <%= external_link_to "https://yandex.com/images/search?rpt=imageview&url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                      <%= search_icon %> Yandex
+                    <% end %>
+                  <% end %>
+
+                  <% menu.with_item do %>
+                    <%= external_link_to "https://lens.google.com/uploadbyurl?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                      <%= search_icon %> Google
+                    <% end %>
+                  <% end %>
+
+                  <% menu.with_item do %>
+                    <%= external_link_to "https://www.bing.com/images/searchbyimage?cbir=sbi&imgurl=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                      <%= search_icon %> Bing
+                    <% end %>
+                  <% end %>
+
+                  <% menu.with_item do %>
+                    <%= link_to iqdb_queries_path(search: { media_asset_id: media_asset.id }), target: "_blank" do %>
+                      <%= search_icon %> <%= Danbooru.config.app_name %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              </span>
+
+              <div class="inline-block">
+                <% if upload_media_asset.file_upload? %>
+                  <%= external_link_to "https://saucenao.com/search.php?url=#{Danbooru::URL.escape(media_asset.original.file_url)}", "No Source", target: "_blank", class: "upload-no-source-warning button-danger button-xs" %>
+                <% elsif upload_media_asset.bad_source? %>
+                  <%= link_to "Bad Source", wiki_page_path("bad_link"), class: "upload-source-warning button-danger button-xs" %>
+                <% end %>
+
+                <% if media_asset.is_ai_generated? %>
+                  <%= link_to "AI-Generated", wiki_page_path("ai-generated"), class: "upload-ai-warning button-danger button-xs" %>
+                <% end %>
+
+                <% duplicates = Post.joins(:media_asset).where("media_assets.pixel_hash": media_asset.pixel_hash).load %>
+                <% if duplicates.size == 1 %>
+                  <%= link_to "Pixel-Perfect Duplicate", duplicates.first, class: "upload-pixel-perfect-duplicate-warning button-danger button-xs" %>
+                <% elsif duplicates.size > 1 %>
+                  <a class="upload-duplicate-warning button-danger button-xs" href="javascript:$('a.tab.similar-tab').get(0).click()">Pixel-Perfect Duplicate</a>
+                <% else %>
+                  <a class="upload-duplicate-warning button-danger button-xs hidden" href="javascript:$('a.tab.similar-tab').get(0).click()">Duplicate</a>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
       <% end %>
-      (<%= media_asset.image_width %>x<%= media_asset.image_height %>)
-    </p>
-  </div>
-
-  <%= render "uploads/related_posts", source: upload_media_asset.source_extractor %>
-
-  <% if upload_media_asset.source_extractor.present? %>
-    <%= render_source_data(upload_media_asset.source_extractor) %>
-  <% end %>
-
-  <% post = Post.new_from_upload(upload_media_asset, add_artist_tag: true, source: upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys) %>
-  <%= edit_form_for(post, html: { id: "form" }) do |f| %>
-    <%= hidden_field_tag :media_asset_id, media_asset.id %> <%# used by iqdb javascript %>
-    <%= hidden_field_tag :upload_media_asset_id, upload_media_asset.id %>
-
-    <%= f.input :source, as: :string, input_html: { value: post.source } %>
-    <%= f.input :rating, label: "Rating (#{link_to_wiki "?", "howto:rate"})".html_safe, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, selected: post.rating %>
-    <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
-
-    <div class="input upload_artist_commentary_container">
-      <strong>Commentary</strong>
-      <a href="#" id="toggle-artist-commentary">show »</a>
-
-      <div class="artist-commentary" style="display: none;">
-        <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: post&.artist_commentary&.original_title } %>
-        <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: post&.artist_commentary&.original_description } %>
-      </div>
     </div>
 
-    <div class="input upload_commentary_translation_container" style="display: none;">
-      <strong>Translation</strong>
-      <a href="#" id="toggle-commentary-translation">show »</a>
+    <div class="upload-divider px-4 cursor-col-resize"></div>
 
-      <div class="commentary-translation" style="display: none;">
-        <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: post&.artist_commentary&.translated_title } %>
-        <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: post&.artist_commentary&.translated_description } %>
-      </div>
+    <div class="upload-edit-container">
+      <%= edit_form_for(post, error_notice: false, html: { id: "form", class: "upload-form md:sticky top-4" }) do |f| %>
+        <%= hidden_field_tag :media_asset_id, media_asset.id %> <%# used by iqdb javascript %>
+        <%= hidden_field_tag :upload_media_asset_id, upload_media_asset.id %>
+
+        <%= render(TabPanelComponent.new do |t| %>
+          <% t.panel("Tags", active: true) do %>
+            <%= f.input :rating,
+                        label: "Rating #{help_tooltip embed_wiki("help:rating_notice", classes: "text-xs"), link_class: "inactive-link" }".html_safe,
+                        wrapper_html: { class: "radio-button-group text-xs", "x-on:input": "$el.classList.remove('field_with_errors')" },
+                        collection: Post::RATINGS.invert.reverse_each.to_h,
+                        as: :radio_buttons,
+                        selected: post.rating,
+                        error: false %>
+
+            <div>
+              <div class="flex justify-between">
+                <%= f.label :tag_string, "Tags" %>
+
+                <span data-tag-counter data-for="#post_tag_string" class="text-muted text-sm">
+                  <span class="tag-count"></span>
+                </span>
+              </div>
+
+              <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
+
+              <div class="mb-4">
+                <%= f.submit "Post", class: "button-primary button-sm" %>
+
+                <% if CurrentUser.is_contributor? %>
+                  <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block !m-0" }, input_html: { checked: post.is_pending? } %>
+                <% else %>
+                  <span id="upload-limit" class="fineprint">Upload limit: <%= render "users/upload_limit", user: CurrentUser.user %></span>
+                <% end %>
+
+                <% if CurrentUser.post_upload_count < 10 %>
+                  <p class="fineprint my-4">Read the <%= link_to_wiki "upload rules", "help:upload_rules" %> before uploading.</p>
+                <% end %>
+              </div>
+
+              <%= render "related_tags/container", media_asset: media_asset %>
+            </div>
+          <% end %>
+
+          <% t.panel("Source") do %>
+            <% if upload_media_asset.source_extractor.present? %>
+              <%= render_source_data(upload_media_asset.source_extractor) %>
+            <% end %>
+
+            <%= f.input :source, as: :string, input_html: { value: post.source } %>
+
+            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: post&.artist_commentary&.original_title } %>
+            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: post&.artist_commentary&.original_description } %>
+            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: post&.artist_commentary&.translated_title } %>
+            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: post&.artist_commentary&.translated_description } %>
+          <% end %>
+
+          <% t.panel("Similar") do %>
+            <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
+
+            <div class="space-y-4">
+              <% if source.present? && source.related_posts.present? %>
+                <div id="related-posts-by-source">
+                  <h2>Related Posts</h2>
+
+                  <p class="fineprint">
+                    Found <%= link_to pluralize(source.related_posts.total_count, "other post"), posts_path(tags: source.related_posts_search_query) %> from the same source.
+                  </p>
+
+                  <%= render(PostGalleryComponent.new(size: "180")) do |gallery| %>
+                    <% source.related_posts.each do |post| %>
+                      <%= gallery.with_post(post: post, size: gallery.size, show_deleted: true) do |preview| %>
+                        <% preview.with_footer do %>
+                          <div class="text-xs text-center mt-1">
+                            <%= render "posts/partials/show/preview_source_footer", post: post %>
+                          </div>
+                        <% end %>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <div id="iqdb-similar" style="display: none;"></div>
+            </div>
+          <% end %>
+
+          <% t.spacer %>
+
+          <% help_updated = WikiPage.find_by_title("help:upload_notice")&.updated_at.to_i > CurrentUser.user.posts.maximum(:created_at).to_i %>
+          <% help_icon = exclamation_icon(class: "text-warning") if help_updated %>
+          <% t.panel("#{help_icon} Help".strip.html_safe, id: "help-tab") do %>
+            <%= embed_wiki("help:upload_notice") %>
+            <%= render "application/update_notice", record: WikiPage.find_by_title("help:upload_notice") %>
+          <% end %>
+
+          <% t.menu_item(id: "docking-menu-tab") do %>
+            <% render PopupMenuComponent.new(button_classes: "inactive-link") do |menu| %>
+              <% menu.with_item do %>
+                <%= link_to "javascript:void(0)", "x-on:click": "dock = 'auto'", id: "dock-auto-link", title: "Rotate your screen to change layout" do %>
+                  <%= rotate_icon %> Automatic
+                <% end %>
+              <% end %>
+
+              <% menu.with_item do %>
+                <%= link_to "javascript:void(0)", "x-on:click": "dock = 'right'", id: "dock-right-link", "data-shortcut": "shift+r" do %>
+                  <%= dock_right_icon %> Dock to Right
+                <% end %>
+              <% end %>
+
+              <% menu.with_item do %>
+                <%= link_to "javascript:void(0)", "x-on:click": "dock = 'bottom'", id: "dock-bottom-link", "data-shortcut": "shift+b" do %>
+                  <%= dock_bottom_icon %> Dock to Bottom
+                <% end %>
+              <% end %>
+
+              <% menu.with_item do %>
+                <%= link_to "javascript:void(0)", "x-on:click": "dock = 'left'", id: "dock-left-link", "data-shortcut": "shift+l" do %>
+                  <%= dock_left_icon %> Dock to Left
+                <% end %>
+              <% end %>
+
+              <% menu.with_item do %>
+                <%= link_to "javascript:void(0)", id: "open-edit-dialog", "data-shortcut": "shift+e" do %>
+                  <%= external_link_icon(class: "text-xs") %> Open window
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end) %>
+      <% end %>
     </div>
-
-    <div class="input fixed-width-container" id="tags-container">
-      <div class="header">
-        <%= f.label :tag_string, "Tags" %>
-
-        <span data-tag-counter data-for="#post_tag_string">
-          <span class="tag-count"></span>
-          <img>
-        </span>
-        <a href="javascript:void(0)">
-          <%= external_link_icon(id: "open-edit-dialog", "data-shortcut": "shift+e") %>
-        </a>
-      </div>
-
-      <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
-      <%= render "related_tags/buttons" %>
-    </div>
-
-    <%= f.submit "Post" %>
-
-    <% if CurrentUser.can_upload_free? %>
-      <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block" }, input_html: { checked: post.is_pending? } %>
-    <% end %>
-
-    <%= render "related_tags/container", media_asset: media_asset %>
   <% end %>
 <% end %>

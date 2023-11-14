@@ -6,14 +6,12 @@
 config/danbooru_local_config.rb
 config/deploy/*.rb
 config/newrelic.yml
-coverage/
 node_modules/
 log/
 tmp/
 public/data/
 public/packs-test/
 public/packs/
-test/reports/
 /vendor/
 
 # https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored

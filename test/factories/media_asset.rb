@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory(:media_asset) do
-    md5 { SecureRandom.hex(32) }
+    md5 { SecureRandom.hex(16) }
+    pixel_hash { SecureRandom.hex(16) }
     file_ext { "jpg" }
     file_size { 1_000_000 }
     image_width { 1000 }

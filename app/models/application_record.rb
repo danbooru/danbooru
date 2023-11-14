@@ -10,6 +10,7 @@ class ApplicationRecord < ActiveRecord::Base
   include HasDtextLinks
   extend HasBitFlags
   extend Searchable
+  extend Aggregatable
 
   concerning :PaginationMethods do
     class_methods do
@@ -27,12 +28,13 @@ class ApplicationRecord < ActiveRecord::Base
       #   of results; assume there are too many pages to count.
       # @param count [Integer] the precalculated number of search results, or nil to calculate it
       # @param defaults [Hash] The default params for the search
-      def paginated_search(params, page: params[:page], limit: params[:limit], count_pages: params[:search].present?, count: nil, defaults: {})
+      # @param current_user [User] The user performing the search
+      def paginated_search(params, page: params[:page], limit: params[:limit], count_pages: params[:search].present?, count: nil, defaults: {}, current_user: CurrentUser.user)
         search_params = params.fetch(:search, {}).permit!
         search_params = defaults.merge(search_params).with_indifferent_access
 
         max_limit = (params[:format] == "sitemap") ? 10_000 : 1_000
-        search(search_params).paginate(page, limit: limit, max_limit: max_limit, count: count, search_count: count_pages)
+        search(search_params, current_user).paginate(page, limit: limit, max_limit: max_limit, count: count, search_count: count_pages)
       end
     end
   end
@@ -41,6 +43,10 @@ class ApplicationRecord < ActiveRecord::Base
     class_methods do
       def visible(_user)
         all
+      end
+
+      def visible_for_search(attribute, current_user)
+        policy(current_user).visible_for_search(all, attribute)
       end
 
       def policy(current_user)
@@ -128,21 +134,28 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :ActiveRecordExtensions do
     class_methods do
-      def without_timeout
-        connection.execute("SET STATEMENT_TIMEOUT = 0") unless Rails.env.test?
+      def set_timeout(n)
+        connection.execute("SET statement_timeout = #{n}") unless Rails.env.test?
         yield
       ensure
-        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env.test?
+        connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}") unless Rails.env.test?
+      end
+
+      def without_timeout
+        connection.execute("SET statement_timeout = 0") unless Rails.env.test?
+        yield
+      ensure
+        connection.execute("SET statement_timeout = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env.test?
       end
 
       def with_timeout(n, default_value = nil, new_relic_params = {})
-        connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env.test?
+        connection.execute("SET statement_timeout = #{n}") unless Rails.env.test?
         yield
       rescue ::ActiveRecord::StatementInvalid => e
         DanbooruLogger.log(e, expected: true, **new_relic_params)
         default_value
       ensure
-        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env.test?
+        connection.execute("SET statement_timeout = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env.test?
       end
 
       def update!(*args)
@@ -191,7 +204,6 @@ class ApplicationRecord < ActiveRecord::Base
           belongs_to :updater, class_name: "User", **options
           before_validation do |rec|
             rec.updater_id = CurrentUser.id
-            rec.updater_ip_addr = CurrentUser.ip_addr if rec.respond_to?(:updater_ip_addr=)
           end
         end
       end
@@ -206,7 +218,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :ConcurrencyMethods do
     class_methods do
-      def parallel_each(batch_size: 1000, in_processes: 4, in_threads: nil, &block)
+      def parallel_find_each(batch_size: 1000, in_processes: Danbooru.config.max_concurrency.to_i, in_threads: nil, &block)
         # XXX We may deadlock if a transaction is open; do a non-parallel each.
         return find_each(&block) if connection.transaction_open?
 
@@ -218,20 +230,23 @@ class ApplicationRecord < ActiveRecord::Base
         end
 
         current_user = CurrentUser.user
-        current_ip = CurrentUser.ip_addr
 
         find_in_batches(batch_size: batch_size, error_on_ignore: true) do |batch|
           Parallel.each(batch, in_processes: in_processes, in_threads: in_threads) do |record|
             # XXX In threaded mode, the current user isn't inherited from the
             # parent thread because the current user is a thread-local
             # variable. Hence, we have to set it explicitly in the child thread.
-            CurrentUser.scoped(current_user, current_ip) do
+            CurrentUser.scoped(current_user) do
               yield record
             end
           end
         end
       end
     end
+  end
+
+  def revised?
+    updated_at > created_at
   end
 
   def warnings

@@ -67,6 +67,7 @@ module ArtistFinder
     /blog-imgs-\d+(?:-origin)?\.fc2\.com/i,
     %r{blog\.fc2\.com(/\w)+/?}i, # http://blog71.fc2.com/a/abk00/file/20080220194219.jpg
     "foundation.app",
+    "foriio.com", # https://www.foriio.com/comori22
     "flickr.com", # https://www.flickr.com/photos/52tracy
     "furaffinity.net",
     "furaffinity.net/user", # http://www.furaffinity.net/user/achthenuts
@@ -99,6 +100,9 @@ module ArtistFinder
     "mega.nz/file", # https://mega.nz/file/9zxwxCDD#TJn7S7sPag30wDVD-kaVhFkeROzz-fE7_ZOb3gIZPTA
     "mega.nz/folder", # https://mega.nz/folder/8d4E0LxK#yzYqKHoGFu92RzMNWnoZEw/file/tUgAQZJA
     "mihuashi.com", # https://www.mihuashi.com/profiles/75614
+    "misskey.io",
+    "misskey.art",
+    "misskey.design",
     "mixi.jp", #http://mixi.jp/show_friend.pl?id=310102
     "mlbg.tv", # http://mblg.tv/ikusanin01/
     "monappy.jp",
@@ -138,6 +142,9 @@ module ArtistFinder
     %r{pixiv.net/(?:en/)?artworks}i, # https://www.pixiv.net/en/artworks/85241178
     "i.pximg.net",
     "poipiku.com", # https://poipiku.com/1776623/
+    "pomf.tv", # https://pomf.tv/oozutsucannon
+    "pomf.tv/stream", # https://pomf.tv/stream/Kukseleg
+    "picdig.net", # https://picdig.net/kenny8686/portfolio
     "plala.or.jp", # http://www7.plala.or.jp/reirei
     "plurk.com", # http://www.plurk.com/a1amorea1a1
     "pornhub.com", # https://www.pornhub.com/model/mizzpeachy
@@ -201,7 +208,8 @@ module ArtistFinder
     "youtube.com/c", # https://www.youtube.com/c/serafleurArt
     "youtube.com/channel", # https://www.youtube.com/channel/UCfrCa2Y6VulwHD3eNd3HBRA
     "youtube.com/user", # https://www.youtube.com/user/148nasuka
-    "youtu.be" # http://youtu.be/gibeLKKRT-0
+    "youtu.be", # http://youtu.be/gibeLKKRT-0
+    "zerochan.net",
   ]
 
   SITE_BLACKLIST_REGEXP = Regexp.union(SITE_BLACKLIST.map do |domain|
@@ -223,13 +231,13 @@ module ArtistFinder
     url = ArtistURL.normalize_url(url)
 
     # First try an exact match
-    artists = Artist.active.joins(:urls).where(urls: { url: url })
+    artists = Artist.active.joins(:urls).where(urls: { url: url }).load
 
     # If that fails, try removing the rightmost path component until we find an artist URL that matches the current URL.
     url = url.downcase.gsub(%r{\Ahttps?://|/\z}, "") # "https://example.com/A/B/C/" => "example.com/a/b/c"
     while artists.empty? && url != "."
       u = url.gsub("*", '\*') + "/*"
-      artists += Artist.active.joins(:urls).where_like("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'", u).limit(10)
+      artists += Artist.active.where(id: ArtistURL.normalized_url_like(u).select(:artist_id)).limit(10)
 
       # File.dirname("example.com/a/b/c") => "example.com/a/b"; File.dirname("example.com") => "."
       url = File.dirname(url)

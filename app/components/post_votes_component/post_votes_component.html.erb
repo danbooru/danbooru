@@ -1,4 +1,4 @@
-<span class="post-votes" data-id="<%= post.id %>">
+<span class="post-votes inline-flex gap-1" data-id="<%= post.id %>">
   <% if current_user.is_anonymous? %>
     <%= link_to upvote_icon, login_path(url: request.fullpath), class: "post-upvote-link inactive-link" %>
   <% elsif upvoted? %>
@@ -7,7 +7,7 @@
     <%= link_to upvote_icon, post_post_votes_path(post_id: post.id, score: 1), class: "post-upvote-link inactive-link", method: :post, remote: true %>
   <% end %>
 
-  <span class="post-score">
+  <span class="post-score inline-block text-center whitespace-nowrap align-middle min-w-4">
     <%= link_to post.score, post_votes_path(search: { post_id: post.id }, variant: :compact), rel: "nofollow" %>
   </span>
 

@@ -15,45 +15,21 @@ Alternatively, if you already have Docker Compose installed, you can just do:
 
 ```sh
 wget https://raw.githubusercontent.com/danbooru/danbooru/master/docker-compose.yaml
-docker-compose up
+docker compose up
 ```
 
-## Manual Installation
+You will likely need to run docker with elevated permissions.
 
-Follow the [INSTALL.debian](INSTALL.debian) script to install Danbooru.
+If you get an error such as `'name' does not match any of the regexes: '^x-'` make sure
+that you're running an updated version of Docker Compose.
 
-The INSTALL.debian script is written for Debian, but can be adapted for other
-distributions. Danbooru has been successfully installed on Debian, Ubuntu,
-Fedora, Arch, and OS X. It is recommended that you use an Ubuntu-based system
-since Ubuntu is what is used in development and production.
+## Installation
 
-See [here](https://github.com/danbooru/danbooru/wiki/Ubuntu-Installation-Help-Guide)
-for a guide on how set up Danbooru inside a virtual machine.
+See the [Docker Guide](https://github.com/danbooru/danbooru/wiki/Docker-Guide) for more information on running Danbooru using Docker. This is the recommended way to run Danbooru.
 
-For best performance, you will need at least 256MB of RAM for PostgreSQL and
-Rails. The memory requirement will grow as your database gets bigger.
+Alternatively, you may use the [Manual Installation Guide](https://github.com/danbooru/danbooru/wiki/Manual-Installation-Guide) to install Danbooru without Docker. Manual installation is much more difficult than using Docker, and therefore is not recommended or officially supported.
 
-In production, Danbooru uses PostgreSQL 10.18, but any release later than this
-should work.
-
-## Troubleshooting
-
-If your setup is not working, here are the steps I usually recommend to people:
-
-1) Test the database. Make sure you can connect to it using `psql`. Make
-sure the tables exist. If this fails, you need to work on correctly
-installing PostgreSQL, importing the initial schema, and running the
-migrations.
-
-2) Test the Rails database connection by using `bin/rails console`. Run
-`Post.count` to make sure Rails can connect to the database. If this
-fails, you need to make sure your Danbooru configuration files are
-correct.
-
-3) Test Nginx to make sure it's working correctly.  You may need to
-debug your Nginx configuration file.
-
-4) Check all log files.
+For help, ask in the [#technical](https://discord.com/channels/310432830138089472/310846683376517121) channel on the [Danbooru Discord](https://discord.gg/danbooru), or in the [discussions area](https://github.com/danbooru/danbooru/discussions) on Github.
 
 ## Services
 

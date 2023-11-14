@@ -1,19 +1,13 @@
 require 'test_helper'
 
 class ArtistURLTest < ActiveSupport::TestCase
-  def assert_search_equals(results, conditions)
-    assert_equal(results.map(&:id), subject.search(conditions).map(&:id))
-  end
-
   context "An artist url" do
     setup do
       CurrentUser.user = FactoryBot.create(:user)
-      CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     should "allow urls to be marked as inactive" do
@@ -55,6 +49,26 @@ class ArtistURLTest < ActiveSupport::TestCase
     should "normalise domains to lowercase" do
       url = create(:artist_url, url: "https://ArtistName.example.com")
       assert_equal("https://artistname.example.com", url.url)
+    end
+
+    should "decode encoded URLs" do
+      url = create(:artist_url, url: "https://arca.live/u/@%EC%9C%BE%ED%8C%8C")
+      assert_equal("https://arca.live/u/@윾파", url.url)
+    end
+
+    should "percent-encode spaces" do
+      url = create(:artist_url, url: "http://dic.nicovideo.jp/a/tetla pot")
+      assert_equal("http://dic.nicovideo.jp/a/tetla%20pot", url.url)
+    end
+
+    should "not fail when decoding percent-encoded Shift JIS URLs" do
+      url = create(:artist_url, url: "https://www.digiket.com/abooks/result/_data/staff=%8F%BC%94C%92m%8A%EE")
+      assert_equal("https://www.digiket.com/abooks/result/_data/staff=%8F%BC%94C%92m%8A%EE", url.url)
+    end
+
+    should "not apply NFKC normalization to URLs" do
+      url = create(:artist_url, url: "https://arca.live/u/@ㅇㅇ/43979125")
+      assert_equal("https://arca.live/u/@ㅇㅇ/43979125", url.url)
     end
 
     should "normalize ArtStation urls" do
@@ -175,8 +189,6 @@ class ArtistURLTest < ActiveSupport::TestCase
     end
 
     context "#search method" do
-      subject { ArtistURL }
-
       should "work" do
         @bkub = create(:artist, name: "bkub", is_deleted: false, url_string: "https://bkub.com")
         @masao = create(:artist, name: "masao", is_deleted: true, url_string: "-https://masao.com")
@@ -189,6 +201,9 @@ class ArtistURLTest < ActiveSupport::TestCase
         assert_search_equals([@bkub_url], url_matches: "*bkub*")
         assert_search_equals([@bkub_url], url_matches: "/^https?://bkub\.com$/")
         assert_search_equals([@bkub_url], url_matches: "https://bkub.com")
+        assert_search_equals([@bkub_url], url_matches: "http://bkub.com")
+        assert_search_equals([@bkub_url], url_matches: "http://bkub.com/")
+        assert_search_equals([@bkub_url], url_matches: "http://BKUB.com/")
         assert_search_equals([@masao_url, @bkub_url], url_matches: "https://bkub.com https://masao.com")
         assert_search_equals([@masao_url, @bkub_url], url_matches: ["https://bkub.com", "https://masao.com"])
 

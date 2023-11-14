@@ -3,19 +3,14 @@
 class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
 
-  attr_accessor :disable_dmail_notification
+  attr_accessor :disable_dmail_notification, :updater
 
   belongs_to :user
   belongs_to :creator, class_name: "User"
-  validates :body, presence: true
+  validates :body, visible_string: true
   validates :category, presence: true, inclusion: { in: %w[positive negative neutral] }
   after_create :create_dmail, unless: :disable_dmail_notification
-  after_update(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.user.name} updated user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_update)
-  end
-  after_destroy(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.user.name} deleted user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_delete)
-  end
+  after_update :create_mod_action
 
   deletable
 
@@ -32,9 +27,8 @@ class UserFeedback < ApplicationRecord
       order(created_at: :desc)
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :category, :body, :is_deleted, :creator, :user)
-      q = q.text_attribute_matches(:body, params[:body_matches])
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :category, :body, :is_deleted, :creator, :user], current_user: current_user)
 
       q.apply_default_order(params)
     end
@@ -46,17 +40,24 @@ class UserFeedback < ApplicationRecord
     self.user = User.find_by_name(name)
   end
 
-  def disclaimer
-    if category != "negative"
-      return nil
+  def create_dmail
+    body = %{@#{creator.name} created a "#{category} record":#{Routes.user_feedbacks_path(search: { user_id: user_id })} for your account:\n\n#{self.body}}
+
+    if category == "negative"
+      body += "\n\n---\n\nA negative feedback is a record on your account that you've engaged in negative or rule-breaking behavior. You can appeal this feedback if you think it's unfair by petitioning the mods and admins in the forum. Negative feedback generally doesn't affect your usability of the site, but serious or repeated infractions may lead to a ban."
     end
 
-    "The purpose of feedback is to help you become a valuable member of the site by highlighting adverse behaviors. The author, #{creator.name}, should have sent you a message in the recent past as a warning. The fact that you're receiving this feedback now implies you've ignored their advice.\n\nYou can protest this feedback by petitioning the mods and admins in the forum. If #{creator.name} fails to provide sufficient evidence, you can have the feedback removed. However, if you fail to defend yourself against the accusations, you will likely earn yourself another negative feedback.\n\nNegative feedback generally doesn't affect your usability of the site. But it does mean other users may trust you less and give you less benefit of the doubt.\n\n"
+    Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
   end
 
-  def create_dmail
-    body = %{#{disclaimer}@#{creator.name} created a "#{category} record":#{Routes.user_feedbacks_path(search: { user_id: user_id })} for your account:\n\n#{self.body}}
-    Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
+  def create_mod_action
+    raise "Updater not set" if updater.nil?
+
+    if saved_change_to_is_deleted == [false, true] && creator != updater
+      ModAction.log(%{deleted user feedback for "#{user.name}":#{Routes.user_path(user)}}, :user_feedback_delete, subject: user, user: updater)
+    elsif creator != updater
+      ModAction.log(%{updated user feedback for "#{user.name}":#{Routes.user_path(user)}}, :user_feedback_update, subject: user, user: updater)
+    end
   end
 
   def self.available_includes

@@ -28,16 +28,16 @@ class Post < ApplicationRecord
 
   normalize :source, :normalize_source
   before_validation :merge_old_changes
-  before_validation :normalize_tags
   before_validation :apply_pre_metatags
+  before_validation :normalize_tags
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
+  validate :uploader_is_not_limited, on: :create
+  validate :post_is_not_its_own_parent
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
   validates :rating, presence: { message: "not selected" }
   validates :rating, inclusion: { in: RATINGS.keys, message: "must be #{RATINGS.keys.map(&:upcase).to_sentence(last_word_connector: ", or ")}" }, if: -> { rating.present? }
   validates :source, length: { maximum: 1200 }
-  validate :post_is_not_its_own_parent
-  validate :uploader_is_not_limited, on: :create
   before_save :parse_pixiv_id
   before_save :added_tags_are_valid
   before_save :removed_tags_are_valid
@@ -55,9 +55,9 @@ class Post < ApplicationRecord
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
   belongs_to :parent, class_name: "Post", optional: true
-  has_one :media_asset, -> { active }, foreign_key: :md5, primary_key: :md5
+  has_one :media_asset, -> { active }, foreign_key: :md5, primary_key: :md5, inverse_of: :post
+  has_one :media_metadata, through: :media_asset
   has_one :artist_commentary, :dependent => :destroy
-  has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
   has_one :vote_by_current_user, -> { active.where(user_id: CurrentUser.id) }, class_name: "PostVote" # XXX using current user here is wrong
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
@@ -70,6 +70,9 @@ class Post < ApplicationRecord
   has_many :favorites, dependent: :destroy
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
   has_many :ai_tags, through: :media_asset
+  has_many :events, class_name: "PostEvent"
+  has_many :mod_actions, as: :subject, dependent: :destroy
+  has_many :reactions, as: :model, dependent: :destroy, class_name: "Reaction"
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :post_edit
 
@@ -77,9 +80,9 @@ class Post < ApplicationRecord
   scope :flagged, -> { where(is_flagged: true) }
   scope :banned, -> { where(is_banned: true) }
   # XXX conflict with deletable
-  scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false).where.not(id: PostAppeal.pending) }
-  scope :appealed, -> { deleted.where(id: PostAppeal.pending.select(:post_id)) }
-  scope :in_modqueue, -> { pending.or(flagged).or(appealed) }
+  scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false) }
+  scope :appealed, -> { where(id: PostAppeal.pending.select(:post_id)) }
+  scope :in_modqueue, -> { where_union(pending, flagged, appealed) }
   scope :expired, -> { pending.where("posts.created_at < ?", Danbooru.config.moderation_period.ago) }
 
   scope :unflagged, -> { where(is_flagged: false) }
@@ -109,7 +112,6 @@ class Post < ApplicationRecord
 
     post = Post.new(
       uploader: upload.uploader,
-      uploader_ip_addr: upload.uploader_ip_addr,
       md5: media_asset&.md5,
       file_ext: media_asset&.file_ext,
       file_size: media_asset&.file_size,
@@ -119,7 +121,7 @@ class Post < ApplicationRecord
       tag_string: tag_string,
       rating: rating,
       parent_id: parent_id,
-      is_pending: !upload.uploader.can_upload_free? || is_pending.to_s.truthy?,
+      is_pending: !upload.uploader.is_contributor? || is_pending.to_s.truthy?,
       artist_commentary: (commentary if commentary.any_field_present?),
     )
   end
@@ -130,7 +132,7 @@ class Post < ApplicationRecord
     end
 
     def file(type = :original)
-      media_asset.variant(type).open_file
+      media_asset.variant(type).open_file!
     end
 
     def tagged_file_url(tagged_filenames: !CurrentUser.user.disable_tagged_filenames?)
@@ -161,19 +163,9 @@ class Post < ApplicationRecord
     end
 
     def preview_file_url
-      media_asset.variant(:preview).file_url
-    end
-
-    def open_graph_image_url
-      if is_image?
-        if has_large?
-          large_file_url
-        else
-          file_url
-        end
-      else
-        preview_file_url
-      end
+      # XXX hack to return placeholder thumbnail for Flash files the /posts.json API.
+      return Danbooru.config.storage_manager.file_url("/images/flash-preview.png") if media_asset.is_flash?
+      media_asset.variant(:"180x180").file_url
     end
 
     def file_url_for(user)
@@ -185,7 +177,7 @@ class Post < ApplicationRecord
     end
 
     def is_image?
-      file_ext =~ /jpg|gif|png/i
+      file_ext.in?(%w[jpg gif png webp avif])
     end
 
     def is_flash?
@@ -206,10 +198,6 @@ class Post < ApplicationRecord
   end
 
   concerning :ImageMethods do
-    def twitter_card_supported?
-      image_width.to_i >= 280 && image_height.to_i >= 150
-    end
-
     def has_large?
       return false if has_tag?("animated_gif") || has_tag?("animated_png")
       return true if is_ugoira?
@@ -304,6 +292,11 @@ class Post < ApplicationRecord
       flags.join(" ")
     end
 
+    # g => 0, s => 1, q => 2, e => 3
+    def rating_id
+      RATINGS.keys.index(rating)
+    end
+
     def pretty_rating
       RATINGS.fetch(rating)
     end
@@ -340,10 +333,6 @@ class Post < ApplicationRecord
 
     def added_tags
       tags - tags_was
-    end
-
-    def decrement_tag_post_counts
-      Tag.where(:name => tag_array).update_all("post_count = post_count - 1") if tag_array.any?
     end
 
     def update_tag_post_counts
@@ -385,10 +374,11 @@ class Post < ApplicationRecord
       if old_rating == rating
         self.rating = rating_before_last_save || rating_was
       end
+
+      @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
     end
 
     def normalize_tags
-      @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
       self.tag_string = Tag.create_for_list(post_edit.tag_names).uniq.sort.join(" ")
     end
 
@@ -462,6 +452,11 @@ class Post < ApplicationRecord
       tags << "greyscale" if media_asset.is_greyscale?
       tags << "exif_rotation" if media_asset.is_rotated?
       tags << "non-repeating_animation" if media_asset.is_non_repeating_animation?
+      tags << "ai-generated" if media_asset.is_ai_generated?
+
+      # Allow Flash files to be manually tagged as `sound`; other files are automatically tagged.
+      tags -= ["sound"] unless is_flash?
+      tags << "sound" if media_asset.has_sound?
 
       tags
     end
@@ -515,11 +510,11 @@ class Post < ApplicationRecord
 
         in "status", "banned"
           raise User::PrivilegeError unless CurrentUser.is_approver?
-          ban!
+          ban!(CurrentUser.user)
 
         in "-status", "banned"
           raise User::PrivilegeError unless CurrentUser.is_approver?
-          unban!
+          unban!(CurrentUser.user)
 
         in "disapproved", reason
           raise User::PrivilegeError unless CurrentUser.is_approver?
@@ -533,14 +528,14 @@ class Post < ApplicationRecord
         in "-child", ids
           next if ids.blank?
 
-          children.search(id: ids).each do |post|
+          children.where_numeric_matches(:id, ids).each do |post|
             post.update!(parent_id: nil)
           end
 
         in "child", ids
           next if ids.blank?
 
-          Post.search(id: ids).where.not(id: id).limit(10).each do |post|
+          Post.where_numeric_matches(:id, ids).where.not(id: id).limit(10).each do |post|
             post.update!(parent_id: id)
           end
 
@@ -590,7 +585,7 @@ class Post < ApplicationRecord
           self.source = value
 
         in category, name if category.in?(PostEdit::CATEGORIZATION_METATAGS)
-          Tag.find_or_create_by_name("#{category}:#{name}", creator: CurrentUser.user)
+          Tag.find_or_create_by_name(name, category: category, current_user: CurrentUser.user)
 
         else
           nil
@@ -601,6 +596,14 @@ class Post < ApplicationRecord
 
     def web_source?
       source.match?(%r{\Ahttps?://}i)
+    end
+
+    def file_source?
+      source.starts_with?("file://")
+    end
+
+    def text_source?
+      source.present? && !web_source? && !file_source?
     end
 
     def has_tag?(tag)
@@ -731,7 +734,7 @@ class Post < ApplicationRecord
       nil
     end
 
-    def give_favorites_to_parent
+    def give_favorites_to_parent(current_user = CurrentUser.user)
       return if parent.nil?
 
       transaction do
@@ -741,7 +744,7 @@ class Post < ApplicationRecord
         end
       end
 
-      ModAction.log("moved favorites from post ##{id} to post ##{parent.id}", :post_move_favorites)
+      ModAction.log("moved favorites from post ##{id} to post ##{parent.id}", :post_move_favorites, subject: self, user: current_user)
     end
 
     def has_visible_children?
@@ -757,16 +760,16 @@ class Post < ApplicationRecord
   end
 
   concerning :DeletionMethods do
-    def expunge!
+    def expunge!(current_user = CurrentUser.user)
       transaction do
         Post.without_timeout do
-          ModAction.log("permanently deleted post ##{id} (md5=#{md5})", :post_permanent_delete)
+          ModAction.log("permanently deleted post ##{id} (md5=#{md5})", :post_permanent_delete, subject: nil, user: current_user)
 
           update_children_on_destroy
-          decrement_tag_post_counts
+          Tag.decrement_post_counts(tag_array)
           remove_from_all_pools
           remove_from_fav_groups
-          media_asset.trash!
+          media_asset.trash!(current_user, log: false)
           destroy
           update_parent_on_destroy
         end
@@ -775,20 +778,20 @@ class Post < ApplicationRecord
       remove_iqdb # this is non-transactional
     end
 
-    def ban!
+    def ban!(current_user)
       return if is_banned?
       update_column(:is_banned, true)
-      ModAction.log("banned post ##{id}", :post_ban)
+      ModAction.log("banned post ##{id}", :post_ban, subject: self, user: current_user)
     end
 
-    def unban!
+    def unban!(current_user)
       return unless is_banned?
       update_column(:is_banned, false)
-      ModAction.log("unbanned post ##{id}", :post_unban)
+      ModAction.log("unbanned post ##{id}", :post_unban, subject: self, user: current_user)
     end
 
     def delete!(reason, move_favorites: false, user: CurrentUser.user)
-      transaction do
+      with_lock do
         automated = (user == User.system)
 
         flags.pending.update!(status: :succeeded)
@@ -803,7 +806,7 @@ class Post < ApplicationRecord
         uploader.upload_limit.update_limit!(is_pending?, false)
 
         unless automated
-          ModAction.log("deleted post ##{id}, reason: #{reason}", :post_delete)
+          ModAction.log("deleted post ##{id}, reason: #{reason}", :post_delete, subject: self, user: user)
         end
       end
     end
@@ -937,26 +940,32 @@ class Post < ApplicationRecord
 
   concerning :SearchMethods do
     class_methods do
-      # Return a set of up to N random posts. May return less if there aren't
-      # enough posts.
+      # Return a set of up to N random posts. May return less if it can't find enough posts.
       #
-      # @param n [Integer] The maximum number of posts to return
-      # @return [ActiveRecord::Relation<Post>]
-      def random(n = 1)
-        posts = n.times.map do
-          key = SecureRandom.hex(16)
-          random_up(key) || random_down(key)
-        end.compact.uniq
+      # Works by generating N random MD5s and picking the closest post below each MD5 (or above it if there aren't any
+      # posts below it). For small searches, this procedure is noticeably biased. It may return less than N posts and
+      # some posts may be more likely to be returned than others. This is because MD5s aren't evenly distributed for
+      # small searches.
+      #
+      # @param limit [Integer] The maximum number of posts to return.
+      # @return [ActiveRecord::Relation<Post>] The set of random posts.
+      def random(limit = 1)
+        random_md5s = <<~SQL
+          WITH RECURSIVE random_md5s (n, r, md5) AS (
+              SELECT 0, random(), NULL::text
+            UNION ALL
+              SELECT
+                n+1,
+                r+1,
+                (((#{reselect(:md5).where("posts.md5 < md5((n + r)::text)").reorder(md5: :desc).limit(1).to_sql}) UNION ALL
+                  (#{reselect(:md5).where("posts.md5 >= md5((n + r)::text)").reorder(md5: :asc).limit(1).to_sql})) LIMIT 1)
+              FROM random_md5s
+              WHERE n+1 < #{limit + 1}
+          )
+          SELECT DISTINCT md5 FROM random_md5s
+        SQL
 
-        reorder(nil).in_order_of(:id, posts.map(&:id))
-      end
-
-      def random_up(key)
-        where("md5 < ?", key).reorder(md5: :desc).first
-      end
-
-      def random_down(key)
-        where("md5 >= ?", key).reorder(md5: :asc).first
+        where("posts.md5 IN (#{random_md5s})").reorder("random()")
       end
 
       def sample(query, sample_size)
@@ -1046,24 +1055,138 @@ class Post < ApplicationRecord
         from(relation.arel.as("posts"))
       end
 
-      def available_for_moderation(user, hidden: false)
-        return none if user.is_anonymous?
-
-        approved_posts = user.post_approvals.select(:post_id)
+      def available_for_moderation(user, type)
         disapproved_posts = user.post_disapprovals.select(:post_id)
 
-        if hidden.present?
-          where("posts.uploader_id = ? OR posts.id IN (#{approved_posts.to_sql}) OR posts.id IN (#{disapproved_posts.to_sql})", user.id)
+        case type.to_s
+        when "seen"
+          in_modqueue.where(id: disapproved_posts)
+        when "unseen"
+          in_modqueue.where.not(id: disapproved_posts)
         else
-          where.not(uploader: user).where.not(id: approved_posts).where.not(id: disapproved_posts)
+          in_modqueue
         end
       end
 
-      def attribute_matches(value, field, type = :integer)
-        operator, *args = PostQueryBuilder.parse_metatag_value(value, type)
-        where_operator(field, operator, *args)
-      rescue PostQueryBuilder::ParseError
-        none
+      def metatag_matches(name, value, current_user = User.anonymous, quoted: false)
+        case name
+        when "id"
+          attribute_matches(value, :id)
+        when "md5"
+          attribute_matches(value, :md5, :md5)
+        when "pixelhash"
+          attribute_matches(value, "media_assets.pixel_hash", :md5).joins(:media_asset)
+        when "width"
+          attribute_matches(value, "media_assets.image_width").joins(:media_asset)
+        when "height"
+          attribute_matches(value, "media_assets.image_height").joins(:media_asset)
+        when "mpixels"
+          attribute_matches(value, "(media_assets.image_width * media_assets.image_height) / 1000000.0", :float).joins(:media_asset)
+        when "ratio"
+          attribute_matches(value, "ROUND(media_assets.image_width::numeric / media_assets.image_height::numeric, 2)", :ratio).joins(:media_asset)
+        when "score"
+          attribute_matches(value, :score)
+        when "upvotes"
+          attribute_matches(value, :up_score)
+        when "downvotes"
+          attribute_matches(value, "ABS(posts.down_score)")
+        when "favcount"
+          attribute_matches(value, :fav_count)
+        when "filesize"
+          attribute_matches(value, "media_assets.file_size", :filesize).joins(:media_asset)
+        when "filetype"
+          attribute_matches(value, "media_assets.file_ext", :enum).joins(:media_asset)
+        when "date"
+          attribute_matches(value, :created_at, :date)
+        when "age"
+          attribute_matches(value, :created_at, :age)
+        when "pixiv", "pixiv_id"
+          attribute_matches(value, :pixiv_id)
+        when "tagcount"
+          attribute_matches(value, :tag_count)
+        when "duration"
+          attribute_matches(value, "media_assets.duration", :float).joins(:media_asset)
+        when "is"
+          is_matches(value, current_user)
+        when "has"
+          has_matches(value)
+        when "status"
+          status_matches(value, current_user)
+        when "parent"
+          parent_matches(value)
+        when "child"
+          child_matches(value)
+        when "rating"
+          rating_matches(value)
+        when "embedded"
+          embedded_matches(value)
+        when "source"
+          source_matches(value, quoted)
+        when "disapproved"
+          disapproved_matches(value, current_user)
+        when "commentary"
+          commentary_matches(value, quoted)
+        when "note"
+          note_matches(value)
+        when "comment"
+          comment_matches(value)
+        when "search"
+          saved_search_matches(value, current_user)
+        when "pool"
+          pool_matches(value)
+        when "ordpool"
+          ordpool_matches(value)
+        when "favgroup"
+          favgroup_matches(value, current_user)
+        when "ordfavgroup"
+          ordfavgroup_matches(value, current_user)
+        when "fav"
+          favorites_include(value, current_user)
+        when "ordfav"
+          ordfav_matches(value, current_user)
+        when "reacted"
+          reacted_by(value)
+        when "unaliased"
+          tags_include(value)
+        when "exif"
+          exif_matches(value)
+        when "ai"
+          ai_tags_include(value)
+        when "user"
+          uploader_matches(value)
+        when "approver"
+          approver_matches(value)
+        when "flagger"
+          user_subquery_matches(PostFlag.unscoped.category_matches("normal"), value, current_user)
+        when "appealer"
+          user_subquery_matches(PostAppeal.unscoped, value, current_user)
+        when "commenter", "comm"
+          user_subquery_matches(Comment.unscoped, value, current_user)
+        when "commentaryupdater", "artcomm"
+          user_subquery_matches(ArtistCommentaryVersion.unscoped, value, current_user, field: :updater)
+        when "noter"
+          user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, current_user, field: :updater)
+        when "noteupdater"
+          user_subquery_matches(NoteVersion.unscoped, value, current_user, field: :updater)
+        when "upvoter", "upvote"
+          user_subquery_matches(PostVote.active.positive.visible(current_user), value, current_user, field: :user)
+        when "downvoter", "downvote"
+          user_subquery_matches(PostVote.active.negative.visible(current_user), value, current_user, field: :user)
+        when *PostQueryBuilder::CATEGORY_COUNT_METATAGS
+          short_category = name.delete_suffix("tags")
+          category = TagCategory.short_name_mapping[short_category]
+          attribute_matches(value, :"tag_count_#{category}")
+        when *PostQueryBuilder::COUNT_METATAGS
+          attribute_matches(value, name.to_sym)
+        when "random"
+          all # handled elsewhere
+        when "limit"
+          all
+        when "order"
+          all
+        else
+          raise NotImplementedError, "metatag not implemented"
+        end
       end
 
       def is_matches(value, current_user = User.anonymous)
@@ -1075,7 +1198,7 @@ class Post < ApplicationRecord
         when *AutocompleteService::POST_STATUSES
           status_matches(value, current_user)
         when *MediaAsset::FILE_TYPES
-          attribute_matches(value, :file_ext, :enum)
+          attribute_matches(value, "media_assets.file_ext", :enum).joins(:media_asset)
         when *Post::RATINGS.values.map(&:downcase)
           rating_matches(value)
         when *Post::RATING_ALIASES.keys
@@ -1129,7 +1252,7 @@ class Post < ApplicationRecord
         when "active"
           active
         when "unmoderated"
-          in_modqueue.available_for_moderation(current_user, hidden: false)
+          available_for_moderation(current_user, :unseen)
         when "all", "any"
           where("TRUE")
         else
@@ -1146,7 +1269,8 @@ class Post < ApplicationRecord
         when "pending", "flagged", "appealed", "modqueue", "deleted", "banned", "active", "unmoderated"
           where.not(parent: nil).where(parent: status_matches(parent))
         when /\A\d+\z/
-          where(id: parent).or(where(parent: parent))
+          # XXX must use `attribute_matches(parent, :parent_id)` instead of `where(parent_id: parent)` so that `-parent:1` works
+          where(id: parent).or(attribute_matches(parent, :parent_id))
         else
           none
         end
@@ -1209,16 +1333,16 @@ class Post < ApplicationRecord
           where(disapprovals: PostDisapproval.where(reason: query.downcase))
         else
           user = User.find_by_name(query)
-          where(disapprovals: PostDisapproval.creator_matches(user, current_user))
+          where(disapprovals: PostDisapproval.visible_for_search(:user, current_user).where(user: user))
         end
       end
 
       def note_matches(query)
-        where(notes: Note.search(body_matches: query).reorder(nil))
+        where(notes: Note.where_text_matches(:body, query))
       end
 
       def comment_matches(query)
-        where(comments: Comment.search(body_matches: query).reorder(nil))
+        where(comments: Comment.where_text_matches(:body, query))
       end
 
       def saved_search_matches(label, current_user = User.anonymous)
@@ -1241,7 +1365,7 @@ class Post < ApplicationRecord
         when "collection"
           where(id: Pool.collection.select("unnest(post_ids)"))
         when /\*/
-          where(id: Pool.name_matches(pool_name).select("unnest(post_ids)"))
+          where(id: Pool.name_contains(pool_name).select("unnest(post_ids)"))
         else
           where(id: Pool.named(pool_name).select("unnest(post_ids)"))
         end
@@ -1294,18 +1418,18 @@ class Post < ApplicationRecord
         end
       end
 
-      def exif_matches(string)
-        # string = exif:File:ColorComponents=3
-        if string.include?("=")
-          key, value = string.split(/=/, 2)
-          hash = { key => value }
-          metadata = MediaMetadata.joins(:media_asset).where_json_contains(:metadata, hash)
-        # string = exif:File:ColorComponents
-        else
-          metadata = MediaMetadata.joins(:media_asset).where_json_has_key(:metadata, string)
-        end
+      def reacted_by(username)
+        reactor = User.find_by_name(username)
 
-        where(md5: metadata.select(:md5))
+        if reactor.present?
+          where(id: reactor.post_reactions.select(:model_id))
+        else
+          none
+        end
+      end
+
+      def exif_matches(string)
+        joins(:media_asset).merge(MediaAsset.exif_matches(string))
       end
 
       def ai_tags_include(value, default_confidence: ">=50")
@@ -1346,35 +1470,169 @@ class Post < ApplicationRecord
         else
           user = User.find_by_name(username)
           return none if user.nil?
-          where(approver: user)
+
+          # XXX must use `attribute_matches(user.id, :approver_id)` instead of `where(approver: user)` so that `-approver:evazion` works
+          attribute_matches(user.id, :approver_id)
         end
       end
 
-      def flagger_matches(username, current_user)
-        flags = PostFlag.unscoped.category_matches("normal")
-
-        user_subquery_matches(flags, username) do |username|
-          flagger = User.find_by_name(username)
-          PostFlag.unscoped.creator_matches(flagger, current_user)
-        end
-      end
-
-      def user_subquery_matches(subquery, username, field: :creator, &block)
+      def user_subquery_matches(subquery, username, current_user, field: :creator)
         subquery = subquery.where("post_id = posts.id").select(1)
 
         if username.downcase == "any"
           where("EXISTS (#{subquery.to_sql})")
         elsif username.downcase == "none"
           where("NOT EXISTS (#{subquery.to_sql})")
-        elsif block.nil?
+        else
           user = User.find_by_name(username)
           return none if user.nil?
-          subquery = subquery.where(field => user)
+          subquery = subquery.visible_for_search(field, current_user).where(field => user)
           where("EXISTS (#{subquery.to_sql})")
+        end
+      end
+
+      def order_matches(order)
+        case order.to_s.downcase
+        when "id", "id_asc"
+          reorder("posts.id ASC")
+
+        when "id_desc"
+          reorder("posts.id DESC")
+
+        when "md5", "md5_desc"
+          reorder("posts.md5 DESC")
+
+        when "md5_asc"
+          reorder("posts.md5 ASC")
+
+        when "score", "score_desc"
+          reorder("posts.score DESC, posts.id DESC")
+
+        when "score_asc"
+          reorder("posts.score ASC, posts.id ASC")
+
+        when "upvotes", "upvotes_desc"
+          reorder("posts.up_score DESC, posts.id DESC")
+
+        when "upvotes_asc"
+          reorder("posts.up_score ASC, posts.id ASC")
+
+        # XXX down_score is negative so order:downvotes sorts lowest-to-highest so that most downvoted is first.
+        when "downvotes", "downvotes_desc"
+          reorder("posts.down_score ASC, posts.id ASC")
+
+        when "downvotes_asc"
+          reorder("posts.down_score DESC, posts.id DESC")
+
+        when "favcount"
+          reorder("posts.fav_count DESC, posts.id DESC")
+
+        when "favcount_asc"
+          reorder("posts.fav_count ASC, posts.id ASC")
+
+        when "created_at", "created_at_desc"
+          reorder("posts.created_at DESC")
+
+        when "created_at_asc"
+          reorder("posts.created_at ASC")
+
+        when "change", "change_desc"
+          reorder("posts.updated_at DESC, posts.id DESC")
+
+        when "change_asc"
+          reorder("posts.updated_at ASC, posts.id ASC")
+
+        when "comment", "comm"
+          reorder("posts.last_commented_at DESC NULLS LAST, posts.id DESC")
+
+        when "comment_asc", "comm_asc"
+          reorder("posts.last_commented_at ASC NULLS LAST, posts.id ASC")
+
+        when "comment_bumped"
+          reorder("posts.last_comment_bumped_at DESC NULLS LAST")
+
+        when "comment_bumped_asc"
+          reorder("posts.last_comment_bumped_at ASC NULLS FIRST")
+
+        when "note"
+          reorder("posts.last_noted_at DESC NULLS LAST")
+
+        when "note_asc"
+          reorder("posts.last_noted_at ASC NULLS FIRST")
+
+        when "artcomm"
+          joins(:artist_commentary).reorder("artist_commentaries.updated_at DESC")
+
+        when "artcomm_asc"
+          joins(:artist_commentary).reorder("artist_commentaries.updated_at ASC")
+
+        when "mpixels", "mpixels_desc"
+          # Use "w*h/1000000", even though "w*h" would give the same result, so this can use the posts_mpixels index.
+          joins(:media_asset).reorder(Arel.sql("media_assets.image_width * media_assets.image_height / 1000000.0 DESC"))
+
+        when "mpixels_asc"
+          joins(:media_asset).reorder(Arel.sql("media_assets.image_width * media_assets.image_height / 1000000.0 ASC"))
+
+        when "portrait"
+          joins(:media_asset).reorder(Arel.sql("media_assets.image_width::numeric / media_assets.image_height::numeric ASC"))
+
+        when "landscape"
+          joins(:media_asset).reorder(Arel.sql("media_assets.image_width::numeric / media_assets.image_height::numeric DESC"))
+
+        when "filesize", "filesize_desc"
+          joins(:media_asset).reorder("media_assets.file_size DESC")
+
+        when "filesize_asc"
+          joins(:media_asset).reorder("media_assets.file_size ASC")
+
+        when /\A(?<column>#{PostQueryBuilder::COUNT_METATAGS.join("|")})(_(?<direction>asc|desc))?\z/i
+          column = $~[:column]
+          direction = $~[:direction] || "desc"
+          reorder(column => direction, :id => direction)
+
+        when "tagcount", "tagcount_desc"
+          reorder("posts.tag_count DESC")
+
+        when "tagcount_asc"
+          reorder("posts.tag_count ASC")
+
+        when "duration", "duration_desc"
+          joins(:media_asset).reorder("media_assets.duration DESC NULLS LAST, posts.id DESC")
+
+        when "duration_asc"
+          joins(:media_asset).reorder("media_assets.duration ASC NULLS LAST, posts.id ASC")
+
+        # artags_desc, copytags_desc, chartags_desc, gentags_desc, metatags_desc
+        when /(#{TagCategory.short_name_list.join("|")})tags(?:\Z|_desc)/
+          reorder("posts.tag_count_#{TagCategory.short_name_mapping[$1]} DESC")
+
+        # artags_asc, copytags_asc, chartags_asc, gentags_asc, metatags_asc
+        when /(#{TagCategory.short_name_list.join("|")})tags_asc/
+          reorder("posts.tag_count_#{TagCategory.short_name_mapping[$1]} ASC")
+
+        when "random"
+          reorder("random()")
+
+        when "rank"
+          where("posts.score > 0 and posts.created_at >= ?", 2.days.ago).reorder(Arel.sql("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC"))
+
+        when "modqueue", "modqueue_desc"
+          with_queued_at.reorder("queued_at DESC, posts.id DESC")
+
+        when "modqueue_asc"
+          with_queued_at.reorder("queued_at ASC, posts.id ASC")
+
+        when "disapproved", "disapproved_desc"
+          group(:id).left_outer_joins(:disapprovals).select("posts.*").select("MAX(post_disapprovals.created_at) AS disapproved_at").reorder("disapproved_at DESC, posts.id DESC")
+
+        when "disapproved_asc"
+          group(:id).left_outer_joins(:disapprovals).select("posts.*").select("MAX(post_disapprovals.created_at) AS disapproved_at").reorder("disapproved_at ASC, posts.id ASC")
+
+        when "none"
+          reorder(nil)
+
         else
-          subquery = subquery.merge(block.call(username))
-          return none if subquery.to_sql.blank?
-          where("EXISTS (#{subquery.to_sql})")
+          reorder("posts.id DESC")
         end
       end
 
@@ -1408,28 +1666,30 @@ class Post < ApplicationRecord
       def user_tag_match(query, user = CurrentUser.user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?)
         post_query = PostQuery.normalize(query, current_user: user, tag_limit: tag_limit, safe_mode: safe_mode)
         post_query.validate_tag_limit!
-        post_query.with_implicit_metatags.posts
+        posts = post_query.with_implicit_metatags.posts
+        and_relation(posts)
       end
 
-      def search(params)
+      def search(params, current_user)
         q = search_attributes(
           params,
-          :id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
+          [:id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
           :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
           :image_height, :tag_count, :has_children, :has_active_children,
           :is_pending, :is_flagged, :is_deleted, :is_banned,
           :last_comment_bumped_at, :last_commented_at, :last_noted_at,
-          :uploader_ip_addr, :uploader, :approver, :parent,
+          :uploader, :approver, :parent,
           :artist_commentary, :flags, :appeals, :notes, :comments, :children,
-          :approvals, :replacements, :pixiv_ugoira_frame_data
+          :approvals, :replacements, :media_metadata],
+          current_user: current_user
         )
 
         if params[:tags].present?
-          q = q.user_tag_match(params[:tags])
+          q = q.where(id: user_tag_match(params[:tags], current_user).select(:id))
         end
 
         if params[:order].present?
-          q = PostQueryBuilder.new(nil).search_order(q, params[:order])
+          q = q.order_matches(params[:order])
         else
           q = q.apply_default_order(params)
         end
@@ -1460,51 +1720,24 @@ class Post < ApplicationRecord
       if category == "iqdb"
         update_iqdb
 
-        ModAction.log("<@#{user.name}> regenerated IQDB for post ##{id}", :post_regenerate_iqdb, user)
+        ModAction.log("regenerated IQDB for post ##{id}", :post_regenerate_iqdb, subject: self, user: user)
       else
-        media_file = media_asset.variant(:original).open_file
-        media_asset.distribute_files!(media_file)
+        media_asset.regenerate!
 
-        update!(
-          image_width: media_file.width,
-          image_height: media_file.height,
-          file_size: media_file.file_size,
-          file_ext: media_file.file_ext
-        )
-
-        media_asset.update!(
-          image_width: media_file.width,
-          image_height: media_file.height,
-          file_size: media_file.file_size,
-          file_ext: media_file.file_ext
-        )
-
-        purge_cached_urls!
-        update_iqdb
-
-        ModAction.log("<@#{user.name}> regenerated image samples for post ##{id}", :post_regenerate, user)
+        ModAction.log("regenerated image samples for post ##{id}", :post_regenerate, subject: self, user: user)
       end
-    end
-
-    def purge_cached_urls!
-      urls = [
-        preview_file_url, large_file_url, file_url,
-        tagged_file_url(tagged_filenames: true), tagged_large_file_url(tagged_filenames: true),
-      ]
-
-      CloudflareService.new.purge_cache(urls)
     end
   end
 
   concerning :IqdbMethods do
     def update_iqdb
       # performs IqdbClient.new.add_post(post)
-      IqdbAddPostJob.perform_later(self)
+      IqdbAddPostJob.perform_later(self) if IqdbClient.new.enabled?
     end
 
     def remove_iqdb
       # performs IqdbClient.new.remove(id)
-      IqdbRemovePostJob.perform_later(id)
+      IqdbRemovePostJob.perform_later(id) if IqdbClient.new.enabled?
     end
   end
 
@@ -1516,7 +1749,10 @@ class Post < ApplicationRecord
     end
 
     def uploader_is_not_limited
-      errors.add(:uploader, "have reached your upload limit") if uploader.upload_limit.limited?
+      if uploader.upload_limit.limited?
+        errors.add(:uploader, "have reached your upload limit. Please wait for your pending uploads to be approved before uploading more")
+        throw :abort # Don't bother returning other validation errors if we're upload-limited.
+      end
     end
 
     def added_tags_are_valid
@@ -1592,13 +1828,13 @@ class Post < ApplicationRecord
 
   def levelblocked?(user = CurrentUser.user)
     #!user.is_gold? && RESTRICTED_TAGS.any? { |tag| has_tag?(tag) }
-    !user.is_gold? && tag_string.match?(RESTRICTED_TAGS_REGEX)
+    user.id != uploader_id && !user.is_gold? && tag_string.match?(RESTRICTED_TAGS_REGEX)
   end
 
   def banblocked?(user = CurrentUser.user)
     return true if is_taken_down? && !user.is_moderator?
     return true if is_banned? && has_tag?("paid_reward") && !user.is_approver?
-    return true if is_banned? && !user.is_gold?
+    return true if is_banned? && !user.is_approver?
     false
   end
 
@@ -1643,9 +1879,9 @@ class Post < ApplicationRecord
   def self.available_includes
     # attributes accessible through the ?only= parameter
     %i[
-      uploader approver flags appeals parent children notes
-      comments approvals disapprovals replacements pixiv_ugoira_frame_data
-      artist_commentary media_asset ai_tags
+      uploader approver flags appeals events parent children notes
+      comments approvals disapprovals replacements
+      artist_commentary media_asset media_metadata ai_tags
     ]
   end
 end

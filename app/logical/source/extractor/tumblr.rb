@@ -29,7 +29,8 @@ class Source::Extractor
       end
 
       assets += inline_images
-      assets.map { |url| find_largest(url) }
+      assets = assets.map { |url| find_largest(url) }
+      assets.compact
     end
 
     def page_url
@@ -74,7 +75,7 @@ class Source::Extractor
 
     def tags
       post[:tags].to_a.map do |tag|
-        [tag, "https://tumblr.com/tagged/#{CGI.escape(tag)}"]
+        [tag, "https://tumblr.com/tagged/#{Danbooru::URL.escape(tag)}"]
       end.uniq
     end
 
@@ -92,21 +93,26 @@ class Source::Extractor
       if parsed_image.full_image_url.present?
         image_url_html(parsed_image.full_image_url)&.at("img[src*='/#{parsed_image.directory}/']")&.[](:src)
       elsif parsed_image.variants.present?
-        # Look for the biggest available version on media.tumblr.com. A bigger
-        # version may or may not exist.
-        parsed_image.variants.find { |variant| http_exists?(variant) }
+        # Look for the biggest available version on media.tumblr.com. A bigger version may or may not exist.
+        parsed_image.variants.find { |variant| http_exists?(variant) } || image_url
       else
         parsed_image.original_url
       end
     end
 
-    def post_url_from_image_html
-      return nil unless parsed_url.image_url? && parsed_url.file_ext&.in?(%w[jpg png pnj gif])
+    memoize def post_url_from_image_html
+      # https://at.tumblr.com/everythingfox/everythingfox-so-sleepy/d842mqsx8lwd
+      if parsed_url.subdomain == "at"
+        response = http.get(parsed_url)
+        return nil if response.status != 200
 
-      extracted = image_url_html(parsed_url)&.at("[href*='/post/']")&.[](:href)
-      Source::URL.parse(extracted)
+        url = Source::URL.parse(response.request.uri)
+        url if url.page_url?
+      elsif parsed_url.image_url? && parsed_url.file_ext&.in?(%w[jpg png pnj gif])
+        extracted = image_url_html(parsed_url)&.at("[href*='/post/']")&.[](:href)
+        Source::URL.parse(extracted)
+      end
     end
-    memoize :post_url_from_image_html
 
     def image_url_html(image_url)
       resp = http.cache(1.minute).headers(accept: "text/html").get(image_url)
@@ -120,26 +126,20 @@ class Source::Extractor
     end
 
     def artist_name
-      parsed_url.blog_name || parsed_referer&.blog_name || post_url_from_image_html&.blog_name
+      parsed_url.blog_name || parsed_referer&.blog_name || post_url_from_image_html&.try(:blog_name)  # Don't crash with custom domains
     end
 
     def work_id
-      parsed_url.work_id || parsed_referer&.work_id || post_url_from_image_html&.work_id
+      parsed_url.work_id || parsed_referer&.work_id || post_url_from_image_html&.try(:work_id)
     end
 
-    def api_response
+    memoize def api_response
       return {} unless self.class.enabled?
       return {} unless artist_name.present? && work_id.present?
 
-      response = http.cache(1.minute).get(
-        "https://api.tumblr.com/v2/blog/#{artist_name}/posts",
-        params: { id: work_id, api_key: Danbooru.config.tumblr_consumer_key }
-      )
-
-      return {} if response.code != 200
-      response.parse.with_indifferent_access
+      params = { id: work_id, api_key: Danbooru.config.tumblr_consumer_key }
+      http.cache(1.minute).parsed_get("https://api.tumblr.com/v2/blog/#{artist_name}/posts", params: params) || {}
     end
-    memoize :api_response
 
     def post
       api_response.dig(:response, :posts)&.first || {}

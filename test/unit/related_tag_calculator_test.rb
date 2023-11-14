@@ -3,12 +3,12 @@ require 'test_helper'
 class RelatedTagCalculatorTest < ActiveSupport::TestCase
   def frequent_tags_for_search(tag_search, user = CurrentUser.user, **options)
     post_query = PostQuery.normalize(tag_search, current_user: user)
-    RelatedTagCalculator.frequent_tags_for_search(post_query, **options).pluck(:name)
+    RelatedTagCalculator.new(post_query, **options).frequent_tags_for_search.map(&:name)
   end
 
   def similar_tags_for_search(tag_search, user = CurrentUser.user, **options)
     post_query = PostQuery.normalize(tag_search, current_user: user)
-    RelatedTagCalculator.similar_tags_for_search(post_query, **options).pluck(:name)
+    RelatedTagCalculator.new(post_query, **options).similar_tags_for_search.map(&:name)
   end
 
   setup do
@@ -49,8 +49,8 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "aaa bbb ccc")
         create(:post, tag_string: "aaa bbb")
 
-        assert_equal(%w[aaa bbb], frequent_tags_for_search("aaa", @user, category: Tag.categories.general))
-        assert_equal(%w[ccc], frequent_tags_for_search("aaa", @user, category: Tag.categories.artist))
+        assert_equal(%w[aaa bbb], frequent_tags_for_search("aaa", @user, categories: [Tag.categories.general]))
+        assert_equal(%w[ccc], frequent_tags_for_search("aaa", @user, categories: [Tag.categories.artist]))
       end
     end
 
@@ -70,7 +70,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "bunny dog")
         create(:post, tag_string: "bunny cat")
 
-        assert_equal(%w[bunny cat dog], similar_tags_for_search("rabbit", @user))
+        assert_equal(%w[bunny dog cat], similar_tags_for_search("rabbit", @user))
       end
     end
   end

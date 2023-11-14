@@ -1,7 +1,10 @@
 @import "../../javascript/src/styles/base/000_vars";
 
 div.popup-menu {
-  a.popup-menu-button {
+  a.default-popup-menu-button {
+    display: inline-block;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
     color: var(--muted-text-color);
 
     // the popup menu is open

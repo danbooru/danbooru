@@ -11,4 +11,10 @@ CurrentUser.update = function(settings) {
   });
 };
 
+CurrentUser.darkMode = function() {
+  let theme = CurrentUser.data("theme");
+
+  return theme === "dark" || (theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+};
+
 export default CurrentUser;

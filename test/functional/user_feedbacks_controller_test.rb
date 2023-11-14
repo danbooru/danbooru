@@ -30,7 +30,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "allow moderators to see deleted feedbacks" do
-        as(@user) { @user_feedback.update!(is_deleted: true) }
+        @user_feedback = create(:user_feedback, is_deleted: true)
         get_auth user_feedback_path(@user_feedback), @mod
         assert_response :success
       end
@@ -79,9 +79,23 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
-      should "allow gold users to create new feedbacks" do
+      should "allow gold users to create positive feedbacks" do
         assert_difference("UserFeedback.count", 1) do
-          post_auth user_feedbacks_path, @critic, params: {:user_feedback => {:category => "positive", :user_name => @user.name, :body => "xxx"}}
+          post_auth user_feedbacks_path, @critic, params: { user_feedback: { category: "positive", user_name: @user.name, body: "xxx" }}
+          assert_response :redirect
+        end
+      end
+
+      should "allow gold users to create neutral feedbacks" do
+        assert_difference("UserFeedback.count", 1) do
+          post_auth user_feedbacks_path, @critic, params: { user_feedback: { category: "positive", user_name: @user.name, body: "xxx" }}
+          assert_response :redirect
+        end
+      end
+
+      should "allow gold users to create negative feedbacks" do
+        assert_difference("UserFeedback.count", 1) do
+          post_auth user_feedbacks_path, @critic, params: { user_feedback: { category: "negative", user_name: @user.name, body: "xxx" }}
           assert_response :redirect
         end
       end
@@ -100,10 +114,11 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to(@user_feedback)
         assert_equal("positive", @user_feedback.reload.category)
+        assert_equal(0, ModAction.count)
       end
 
       should "not allow updating deleted feedbacks" do
-        as(@user) { @user_feedback.update!(is_deleted: true) }
+        @user_feedback = create(:user_feedback, user: @user, creator: @critic, is_deleted: true)
         put_auth user_feedback_path(@user_feedback), @critic, params: { user_feedback: { body: "test" }}
 
         assert_response 403
@@ -114,14 +129,30 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :redirect
         assert_equal(true, @user_feedback.reload.is_deleted)
+        assert_equal(0, ModAction.count)
       end
 
       context "by a moderator" do
         should "allow updating feedbacks given to other users" do
+          put_auth user_feedback_path(@user_feedback), @mod, params: { user_feedback: { body: "blah" }}
+
+          assert_redirected_to @user_feedback
+          assert_equal("blah", @user_feedback.reload.body)
+          assert_match(/updated user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_equal("user_feedback_update", ModAction.last.category)
+          assert_equal(@user, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
+        end
+
+        should "allow deleting feedbacks given to other users" do
           put_auth user_feedback_path(@user_feedback), @mod, params: { user_feedback: { is_deleted: "true" }}
 
           assert_redirected_to @user_feedback
           assert(@user_feedback.reload.is_deleted?)
+          assert_match(/deleted user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_equal("user_feedback_delete", ModAction.last.category)
+          assert_equal(@user, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
         end
 
         should "not allow updating feedbacks given to themselves" do

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Comment < ApplicationRecord
+  attr_accessor :creator_ip_addr
+
   belongs_to :post
   belongs_to :creator, class_name: "User"
   belongs_to_updater
@@ -8,18 +10,21 @@ class Comment < ApplicationRecord
   has_many :moderation_reports, as: :model, dependent: :destroy
   has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
   has_many :votes, class_name: "CommentVote", dependent: :destroy
+  has_many :reactions, as: :model, dependent: :destroy, class_name: "Reaction"
+  has_many :active_votes, -> { active }, class_name: "CommentVote"
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
-  validates :body, presence: true, length: { maximum: 15_000 }, if: :body_changed?
+  validates :body, visible_string: true, length: { maximum: 15_000 }, if: :body_changed?
 
   before_create :autoreport_spam
   before_save :handle_reports_on_deletion
   after_create :update_last_commented_at_on_create
-  after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log("comment ##{rec.id} updated by #{CurrentUser.user.name}", :comment_update)
+  after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |comment|
+    ModAction.log("updated #{comment.dtext_shortlink}", :comment_update, subject: self, user: comment.updater)
   end
   after_save :update_last_commented_at_on_destroy, :if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted?}
-  after_save(:if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log("comment ##{rec.id} deleted by #{CurrentUser.user.name}", :comment_delete)
+  after_save(:if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |comment|
+    ModAction.log("deleted #{comment.dtext_shortlink}", :comment_delete, subject: self, user: comment.updater)
   end
 
   deletable
@@ -30,17 +35,32 @@ class Comment < ApplicationRecord
   )
 
   module SearchMethods
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score, :post, :creator, :updater)
-      q = q.text_attribute_matches(:body, params[:body_matches])
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score, :post, :creator, :updater], current_user: current_user)
+
+      if params[:is_edited].to_s.truthy?
+        q = q.where("comments.updated_at - comments.created_at > ?", 5.minutes.iso8601)
+      elsif params[:is_edited].to_s.falsy?
+        q = q.where("comments.updated_at - comments.created_at <= ?", 5.minutes.iso8601)
+      end
 
       case params[:order]
+      when "id_asc"
+        q = q.order("comments.id ASC")
+      when "created_at", "created_at_desc"
+        q = q.order("comments.created_at DESC, comments.id DESC")
+      when "created_at_asc"
+        q = q.order("comments.created_at ASC, comments.id ASC")
       when "post_id", "post_id_desc"
         q = q.order("comments.post_id DESC, comments.id DESC")
       when "score", "score_desc"
         q = q.order("comments.score DESC, comments.id DESC")
+      when "score_asc"
+        q = q.order("comments.score ASC, comments.id ASC")
       when "updated_at", "updated_at_desc"
-        q = q.order("comments.updated_at DESC")
+        q = q.order("comments.updated_at DESC, comments.id DESC")
+      when "updated_at_asc"
+        q = q.order("comments.updated_at ASC, comments.id ASC")
       else
         q = q.apply_default_order(params)
       end
@@ -52,7 +72,7 @@ class Comment < ApplicationRecord
   extend SearchMethods
 
   def autoreport_spam
-    if SpamDetector.new(self).spam?
+    if SpamDetector.new(self, user_ip: creator_ip_addr).spam?
       moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end
   end

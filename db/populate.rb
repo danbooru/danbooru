@@ -24,21 +24,14 @@ FAVORITES    = ENV.fetch("FAVORITES",    POSTS * 5.0).to_i
 DEFAULT_PASSWORD = ENV.fetch("DEFAULT_PASSWORD", "password")
 
 CurrentUser.user = User.system
-CurrentUser.ip_addr = "127.0.0.1"
 
 def populate_users(n, password: DEFAULT_PASSWORD)
   puts "*** Creating users ***"
 
   User::Levels.constants.without(:ANONYMOUS).each do |level|
-    user = User.create(name: level.to_s.downcase, password: password, password_confirmation: password, level: User::Levels.const_get(level))
+    user = User.create(name: "#{level.to_s.downcase}_user", password: password, password_confirmation: password, level: User::Levels.const_get(level))
     puts "Created user ##{user.id} (#{user.name})"
   end
-
-  user = User.create(name: "contributor", password: password, password_confirmation: password, level: User::Levels::BUILDER, can_upload_free: true)
-  puts "Created user ##{user.id} (#{user.name})"
-
-  user = User.create(name: "approver", password: password, password_confirmation: password, level: User::Levels::BUILDER, can_upload_free: true, can_approve_posts: true)
-  puts "Created user ##{user.id} (#{user.name})"
 
   n.times do |i|
     user = User.create(name: FFaker::Internet.user_name, password: password, password_confirmation: password, level: User::Levels::MEMBER)
@@ -56,8 +49,7 @@ def populate_posts(n, search: "rating:s", batch_size: 200, timeout: 30.seconds)
     posts.each do |danbooru_post|
       Timeout.timeout(timeout) do
         user = User.order("random()").first
-        ip_addr = FFaker::Internet.ip_v4_address
-        upload = Upload.create(uploader: user, uploader_ip_addr: ip_addr, source: danbooru_post["file_url"])
+        upload = Upload.create(uploader: user, source: danbooru_post["file_url"])
         sleep 1 until upload.reload.is_finished? # wait for the job worker to process the upload in the background
 
         post = Post.new_from_upload(upload.upload_media_assets.first, tag_string: danbooru_post["tag_string"], source: danbooru_post["source"], rating: danbooru_post["rating"])
@@ -77,8 +69,7 @@ def populate_comments(n)
   n.times do |i|
     user = User.order("random()").first
     post = Post.order("random()").first
-    ip_addr = FFaker::Internet.ip_v4_address
-    comment = CurrentUser.scoped(user) { Comment.create(creator: user, creator_ip_addr: ip_addr, post: post, body: FFaker::Lorem.paragraph) }
+    comment = CurrentUser.scoped(user) { Comment.create(creator: user, post: post, body: FFaker::Lorem.paragraph) }
 
     puts "Created comment ##{comment.id}"
   end

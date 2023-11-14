@@ -21,7 +21,7 @@
     <%= render "posts/partials/common/inline_blacklist" %>
 
     <%= render_post_gallery(@posts, tags: "pool:#{@pool.id}", show_deleted: @pool.is_series?) do |gallery| %>
-      <% gallery.footer do %>
+      <% gallery.with_footer do %>
         <%= numbered_paginator(@posts) %>
       <% end %>
     <% end %>

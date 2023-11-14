@@ -12,64 +12,30 @@ FactoryBot.define do
     end
 
     factory(:restricted_user) do
-      level {10}
+      level {User::Levels::RESTRICTED}
       requires_verification { true }
       is_verified { false }
     end
 
-    factory(:member_user) do
-      level {20}
-    end
+    User.level_hash.each do |level_name, level_value|
+      # allows create(:moderator_user), create(:approver) etc
+      next if level_name == "Restricted"  # already defined above
 
-    factory(:gold_user) do
-      level {30}
-    end
+      factory(level_name.downcase) do
+        level {level_value}
+      end
 
-    factory(:platinum_user) do
-      level {31}
-    end
-
-    factory(:builder_user) do
-      level {32}
-    end
-
-    factory(:contributor_user) do
-      level {32}
-      can_upload_free {true}
-    end
-
-    factory(:contrib_user) do
-      level {32}
-      can_upload_free {true}
-    end
-
-    factory(:moderator_user) do
-      level {40}
-      can_approve_posts {true}
+      factory("#{level_name.downcase}_user") do
+        level {level_value}
+      end
     end
 
     factory(:mod_user) do
-      level {40}
-      can_approve_posts {true}
-    end
-
-    factory(:admin_user) do
-      level {50}
-      can_approve_posts {true}
-    end
-
-    factory(:owner_user) do
-      level { User::Levels::OWNER }
-      can_approve_posts {true}
+      level {User::Levels::MODERATOR}
     end
 
     factory(:uploader) do
       created_at { 2.weeks.ago }
-    end
-
-    factory(:approver) do
-      level {32}
-      can_approve_posts {true}
     end
   end
 end

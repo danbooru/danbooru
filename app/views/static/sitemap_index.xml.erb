@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <% 0.upto(@relation.maximum(:id) / @limit) do |page| %>
+  <% 0.upto(@relation.maximum(:id).to_i / @limit) do |page| %>
     <% lo = page * @limit %>
     <% hi = (page + 1) * @limit %>
     <% lastmod = @relation.where(id: lo..hi).maximum(:updated_at)&.iso8601 %>

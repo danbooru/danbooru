@@ -1,82 +1,78 @@
 # frozen_string_literal: true
 
-class PostEvent
-  include ActiveModel::Model
-  include ActiveModel::Serializers::JSON
-  include ActiveModel::Serializers::Xml
+class PostEvent < ApplicationRecord
+  belongs_to :model, polymorphic: true
+  belongs_to :creator, class_name: "User"
+  belongs_to :post
 
-  attr_accessor :event
-
-  delegate :created_at, to: :event
-
-  def self.find_for_post(post_id)
-    post = Post.find(post_id)
-    (post.appeals + post.flags + post.approvals).sort_by(&:created_at).reverse.map { |e| new(event: e) }
+  def self.model_types
+    %w[Post PostAppeal PostApproval PostDisapproval PostFlag PostReplacement ModAction]
   end
 
-  def type_name
-    case event
-    when PostFlag
-      "flag"
-    when PostAppeal
-      "appeal"
-    when PostApproval
-      "approval"
-    end
+  def self.categories
+    # model_types.excluding("ModAction") + ModAction.categories.keys.grep(/\Apost_(?!permanent_delete|vote)/).map(&:camelize)
+    %w[Upload Flag Appeal Approval Disapproval Delete Undelete Ban Unban Replacement Regenerate RegenerateIqdb MoveFavorites NoteLockCreate NoteLockDelete RatingLockCreate RatingLockDelete]
   end
 
-  def type
-    type_name.first
+  def self.visible(user)
+    all
   end
 
-  def reason
-    event.try(:reason) || ""
-  end
+  def self.category_matches(category)
+    category = category.squish.titleize.delete(" ")
 
-  def creator_id
-    event.try(:creator_id) || event.try(:user_id)
-  end
-
-  def creator
-    event.try(:creator) || event.try(:user)
-  end
-
-  def status
-    if event.is_a?(PostApproval)
-      "approved"
-    elsif (event.is_a?(PostAppeal) && event.succeeded?) || (event.is_a?(PostFlag) && event.rejected?)
-      "approved"
-    elsif (event.is_a?(PostAppeal) && event.rejected?) || (event.is_a?(PostFlag) && event.succeeded?)
-      "deleted"
+    case category
+    when "Upload"
+      where(model_type: "Post")
+    when "Flag", "Appeal", "Approval", "Disapproval", "Replacement"
+      where(model_type: "Post" + category)
+    when *categories
+      where(model: ModAction.where(category: "post_" + category.underscore))
     else
-      "pending"
+      none
     end
   end
 
-  def is_creator_visible?(user = CurrentUser.user)
-    case event
-    when PostAppeal, PostApproval
-      true
-    when PostFlag
-      flag = event
-      Pundit.policy!(user, flag).can_view_flagger?
+  def self.search(params, current_user)
+    q = search_attributes(params, [:model, :post, :creator, :event_at], current_user: current_user)
+
+    if params[:category]
+      q = q.category_matches(params[:category])
+    end
+
+    case params[:order]
+    when "event_at_asc"
+      q = q.order(event_at: :asc, model_id: :asc)
+    else
+      q = q.apply_default_order(params)
+    end
+
+    q
+  end
+
+  def self.default_order
+    order(event_at: :desc, model_id: :desc)
+  end
+
+  def self.available_includes
+    [:post, :model] # XXX creator isn't included because it leaks flagger/disapprover names
+  end
+
+  def category
+    if model_type == "Post"
+      "Upload"
+    elsif model_type == "ModAction"
+      model.category.camelize.delete_prefix("Post")
+    else
+      model_type.delete_prefix("Post")
     end
   end
 
-  def attributes
-    {
-      creator_id: nil,
-      created_at: nil,
-      reason: nil,
-      status: nil,
-      type: nil,
-    }
+  def pretty_category
+    category.titleize.delete_prefix("Post ")
   end
 
-  # XXX can't use hidden_attributes because we don't inherit from ApplicationRecord.
-  def serializable_hash(options = {})
-    hash = super
-    hash = hash.except(:creator_id) unless is_creator_visible?
-    hash
+  def readonly?
+    true
   end
 end

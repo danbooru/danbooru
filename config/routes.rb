@@ -22,12 +22,6 @@ Rails.application.routes.draw do
     resources :users, :only => [:edit, :update]
   end
   namespace :moderator do
-    resource :dashboard, :only => [:show]
-    resources :ip_addrs, :only => [:index] do
-      collection do
-        get :search
-      end
-    end
     namespace :post do
       resources :posts, :only => [:delete, :expunge, :confirm_delete] do
         member do
@@ -39,17 +33,11 @@ Rails.application.routes.draw do
         end
       end
     end
-    resources :ip_addrs, :only => [:index, :search] do
-      collection do
-        get :search
-      end
-    end
   end
   namespace :explore do
     resources :posts, :only => [] do
       collection do
         get :popular
-        get :curated
         get :viewed
         get :searches
         get :missed_searches
@@ -59,8 +47,7 @@ Rails.application.routes.draw do
   namespace :maintenance do
     namespace :user do
       resource :count_fixes, only: [:new, :create]
-      resource :email_notification, :only => [:show, :destroy]
-      resource :deletion, :only => [:show, :destroy]
+      resource :email_notification, only: [:show, :create, :destroy]
     end
   end
 
@@ -78,11 +65,7 @@ Rails.application.routes.draw do
     end
   end
   resources :artist_urls, only: [:index]
-  resources :artist_versions, :only => [:index, :show] do
-    collection do
-      get :search
-    end
-  end
+  resources :artist_versions, only: [:index, :show]
   resources :bans
   resources :bulk_update_requests do
     member do
@@ -95,7 +78,7 @@ Rails.application.routes.draw do
       get "/", action: :index
     end
     collection do
-      get :search
+      get :search, to: redirect("/comments?group_by=comment")
     end
     member do
       post :undelete
@@ -147,8 +130,8 @@ Rails.application.routes.draw do
     end
   end
   resources :forum_topic_visits, only: [:index]
-  resources :ip_bans, only: [:index, :new, :create, :update]
-  resources :ip_addresses, only: [:show, :index], id: /.+?(?=\.json|\.xml|\.html)|.+/
+  resources :ip_bans, only: [:index, :show, :new, :create, :update]
+  resources :ip_addresses, only: [:show], id: /.+?(?=\.json|\.xml|\.html)|.+/
   resources :ip_geolocations, only: [:index]
   resource :iqdb_queries, :only => [:show, :create] do
     collection do
@@ -156,13 +139,20 @@ Rails.application.routes.draw do
       get :check, to: redirect {|path_params, req| "/iqdb_queries?#{req.query_string}"}
     end
   end
-  resources :media_assets, only: [:index, :show]
+  resources :media_assets, only: [:index, :show, :destroy] do
+    get "/:variant", to: "media_assets#image", as: :image
+  end
   resources :media_metadata, only: [:index]
+
+  resources :metrics, only: [:index], defaults: { format: :text } do
+    get "/instance", on: :collection, to: "metrics#instance", as: :instance
+  end
 
   resources :ai_tags, only: [:index]
   put "/ai_tags/:media_asset_id/:tag_id/tag", to: "ai_tags#tag", as: "tag_ai_tag"
 
   resources :mod_actions
+  get "/moderator/dashboard" => "moderator_dashboard#show"
   resources :moderation_reports, only: [:new, :create, :index, :show, :update]
   resources :modqueue, only: [:index]
   resources :news_updates
@@ -174,7 +164,6 @@ Rails.application.routes.draw do
   resources :note_versions, :only => [:index, :show]
   resource :note_previews, only: [:create, :show]
   resource :password_reset, only: [:create, :show]
-  resources :pixiv_ugoira_frame_data, only: [:index]
   resources :pools do
     member do
       put :revert
@@ -194,13 +183,14 @@ Rails.application.routes.draw do
       get :search
     end
   end
+  resources :post_events, only: [:index]
   resources :post_regenerations, :only => [:create]
-  resources :post_replacements, :only => [:index, :new, :create, :update]
+  resources :post_replacements, only: [:index, :show, :new, :create, :update]
   resources :post_votes, only: [:index, :show, :create, :destroy]
 
   # XXX Use `only: []` to avoid redefining post routes defined at top of file.
   resources :posts, only: [] do
-    resources :events, :only => [:index], :controller => "post_events"
+    resources :events, only: [:index], controller: "post_events", as: "post_events"
     resources :favorites, only: [:index, :create, :destroy]
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
     resource :artist_commentary, only: [:show] do
@@ -218,7 +208,7 @@ Rails.application.routes.draw do
   end
   resources :post_appeals
   resources :post_flags
-  resources :post_approvals, only: [:create, :index]
+  resources :post_approvals, only: [:create, :index, :show]
   resources :post_disapprovals
   resources :post_versions, :only => [:index, :search] do
     member do
@@ -238,8 +228,10 @@ Rails.application.routes.draw do
   end
   resources :artist_commentary_versions, :only => [:index, :show]
   resources :rate_limits, only: [:index]
+  resources :reactions, only: [:index, :show, :create, :destroy]
   resource :related_tag, :only => [:show, :update]
   resources :recommended_posts, only: [:index]
+  resources :reports, only: [:index, :show]
   resources :robots, only: [:index]
   resources :saved_searches, :except => [:show]
   resource :session, only: [:new, :create, :destroy] do
@@ -251,6 +243,7 @@ Rails.application.routes.draw do
   resources :tags
   resources :tag_aliases, only: [:show, :index, :destroy]
   resources :tag_implications, only: [:show, :index, :destroy]
+  resources :tag_versions, only: [:index, :show]
 
   get "/redeem", to: "upgrade_codes#redeem", as: "redeem_upgrade_codes"
   resources :upgrade_codes, only: [:create, :index] do
@@ -265,7 +258,9 @@ Rails.application.routes.draw do
     resources :upload_media_assets, only: [:show, :index], path: "assets"
   end
   resources :upload_media_assets, only: [:show, :index]
+  resources :user_actions, only: [:index, :show]
   resources :users do
+    resources :actions, only: [:index]
     resources :favorites, only: [:index, :create, :destroy]
     resources :favorite_groups, controller: "favorite_groups", only: [:index], as: "favorite_groups"
     resource :email, only: [:show, :edit, :update] do
@@ -276,9 +271,10 @@ Rails.application.routes.draw do
     resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
     resources :uploads, only: [:index]
 
-    collection do
-      get :custom_style
-    end
+    get :change_name, on: :member, to: "user_name_change_requests#new"
+    get :custom_style, on: :collection
+    get :deactivate, on: :member     # /users/:id/deactivate
+    get :deactivate, on: :collection # /users/deactivate
   end
   get "/upgrade", to: "user_upgrades#new", as: "new_user_upgrade"
   get "/user_upgrades/new", to: redirect("/upgrade")
@@ -303,6 +299,9 @@ Rails.application.routes.draw do
     collection do
       get :diff
     end
+  end
+  resource :dmca, only: [:create, :show] do
+    get :template
   end
 
   # Legacy Danbooru 1 API endpoints
@@ -339,6 +338,10 @@ Rails.application.routes.draw do
   get "/profile", to: "users#profile", as: :profile
   get "/settings", to: "users#settings", as: :settings
 
+  #get "/up", to: proc { [204, {}, []] }
+  get "/up" => "health#show", as: :rails_health_check
+  get "/up/postgres" => "health#postgres"
+  get "/up/redis" => "health#redis"
   get "/sitemap" => "static#sitemap_index"
   get "/opensearch" => "static#opensearch", :as => "opensearch"
   get "/privacy" => "static#privacy_policy", :as => "privacy_policy"
@@ -356,6 +359,7 @@ Rails.application.routes.draw do
   get "/static/contact", to: redirect("/contact")
   get "/user_upgrade/new", to: redirect("/upgrade")
   get "/delayed_jobs", to: redirect("/jobs")
+  get "/maintenance/user/deletion", to: redirect("/users/deactivate")
 
   get "/mock/recommender/recommend/:user_id" => "mock_services#recommender_recommend", as: "mock_recommender_recommend"
   get "/mock/recommender/similiar/:post_id" => "mock_services#recommender_similar", as: "mock_recommender_similar"
@@ -366,5 +370,6 @@ Rails.application.routes.draw do
   post "/mock/iqdb/query" => "mock_services#iqdb_query"
   get "/mock/autotagger/evaluate" => "mock_services#autotagger_evaluate", as: "mock_autotagger_evaluate"
 
+  match "/", to: "static#not_found", via: %i[post put patch delete trace]
   match "*other", to: "static#not_found", via: :all
 end

@@ -1,20 +1,15 @@
-<!doctype html>
-<html>
-  <body>
-    <h2>Hi <%= @user.name %>,</h2>
+<h2>Hi <%= link_to_user @user %>,</h2>
 
-    <p>
-      You recently changed your email address on <%= Danbooru.config.app_name %>.
-      Click the link below to verify your new email address.
-    </p>
+<p>
+  You changed your email address on <%= link_to Danbooru.config.canonical_app_name, root_url %>.
+  Click the link below to verify your new email address:
+</p>
 
-    <p>
-      <%= link_to "Verify email address", email_verification_url(@user) %>
-    </p>
+<p style="margin-left: 2em">
+  <%= link_to "Verify email address", email_verification_url(@user) %>
+</p>
 
-    <p>
-      If you did not recently change your email address on <%= Danbooru.config.app_name %>,
-      you may delete and ignore this email.
-    </p>
-  </body>
-</html>
+<p class="fineprint">
+  You received this email because someone changed their email to this address on <%= link_to Danbooru.config.canonical_app_name, root_url %>. If this
+  wasn't you, you may ignore this email.
+</p>

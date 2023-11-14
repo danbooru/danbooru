@@ -23,7 +23,7 @@ module Sources
         profile_url: "https://anifty.jp/@unagi189",
         page_url: "https://anifty.jp/creations/1585",
         artist_name: "yunagi",
-        other_names: ["unagi189", "夕凪"],
+        other_names: ["unagi189"],
         tags: ["background", "girl", "uniform"],
         artist_commentary_title: "Sound!",
         artist_commentary_desc: "This work was created in 2017 and partially modified for exhibition.I created this work with the image of after-school for the girls in the brass band."
@@ -37,7 +37,7 @@ module Sources
         profile_url: "https://anifty.jp/@hightree",
         page_url: nil,
         artist_name: "Knoy Konome",
-        other_names: ["hightree", "木芽のい"],
+        other_names: ["hightree"],
         tags: [],
         artist_commentary_title: nil,
         artist_commentary_desc: nil

@@ -1,3 +1,5 @@
+<%# high_similarity_matches, low_similarity_matches, matches %>
+
 <div class="iqdb-posts">
   <h2>Similar Posts</h2>
 
@@ -7,20 +9,29 @@
     <% end %>
 
     <% if @low_similarity_matches.present? %>
-      Found <%= pluralize(@low_similarity_matches.length, "low similarity match") %>
-      (<%= link_to "show", "#", class: "toggle-iqdb-posts-low-similarity" %><%= link_to "hide", "#", class: "toggle-iqdb-posts-low-similarity", style: "display: none" %>)
+      <%= link_to "Show #{pluralize(@low_similarity_matches.length, "low similarity match")}", "#", class: "toggle-iqdb-posts-low-similarity" %>
+      <%= link_to "Hide #{pluralize(@low_similarity_matches.length, "low similarity match")}", "#", class: "toggle-iqdb-posts-low-similarity", style: "display: none" %>
     <% end %>
   </p>
 
-  <span class="iqdb-posts-high-similarity">
-    <% @high_similarity_matches.each do |match| %>
-      <%= post_preview(match["post"], show_deleted: true, similarity: match["score"], show_size: true) %>
-    <% end %>
-  </span>
+  <%= render(PostGalleryComponent.new(size: "180")) do |gallery| %>
+    <% @matches.each do |match| %>
+      <% post = match["post"] %>
+      <% preview_class = match.in?(@high_similarity_matches) ? "iqdb-high-similarity" : "iqdb-low-similarity hidden" %>
 
-  <span class="iqdb-posts-low-similarity" style="display: none">
-    <% @low_similarity_matches.each do |match| %>
-      <%= post_preview(match["post"], show_deleted: true, similarity: match["score"], show_size: true) %>
+      <%= gallery.with_post(post: post, size: gallery.size, show_deleted: true, classes: preview_class) do |preview| %>
+        <% preview.with_footer do %>
+          <div class="text-xs text-center mt-1">
+            <div>
+              <%= render "posts/partials/show/preview_source_footer", post: post %>
+            </div>
+
+            <div>
+              <%= link_to "#{match["score"].round}% similar", iqdb_queries_path(post_id: post.id), class: "inactive-link iqdb-similarity-score" %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
     <% end %>
-  </span>
+  <% end %>
 </div>

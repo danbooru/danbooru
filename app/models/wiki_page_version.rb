@@ -7,10 +7,8 @@ class WikiPageVersion < ApplicationRecord
   belongs_to :tag, primary_key: :name, foreign_key: :title, optional: true
 
   module SearchMethods
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :title, :body, :other_names, :is_locked, :is_deleted, :updater, :wiki_page, :tag)
-      q = q.text_attribute_matches(:title, params[:title_matches])
-      q = q.text_attribute_matches(:body, params[:body_matches])
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :title, :body, :other_names, :is_locked, :is_deleted, :updater, :wiki_page, :tag], current_user: current_user)
 
       q.apply_default_order(params)
     end
@@ -27,11 +25,6 @@ class WikiPageVersion < ApplicationRecord
     @previous.first
   end
 
-  def subsequent
-    @subsequent ||= WikiPageVersion.where("wiki_page_id = ? and id > ?", wiki_page_id, id).order("id asc").limit(1).to_a
-    @subsequent.first
-  end
-
   def current
     @current ||= WikiPageVersion.where(wiki_page_id: wiki_page_id).order("id desc").limit(1).to_a
     @current.first
@@ -44,6 +37,8 @@ class WikiPageVersion < ApplicationRecord
       title: "Renamed",
       was_deleted: "Deleted",
       was_undeleted: "Undeleted",
+      was_locked: "Locked",
+      was_unlocked: "Unlocked",
     }
   end
 
@@ -67,6 +62,24 @@ class WikiPageVersion < ApplicationRecord
       !is_deleted && other.is_deleted
     else
       is_deleted && !other.is_deleted
+    end
+  end
+
+  def was_locked(type)
+    other = send(type)
+    if type == "previous"
+      is_locked && !other.is_locked
+    else
+      !is_locked && other.is_locked
+    end
+  end
+
+  def was_unlocked(type)
+    other = send(type)
+    if type == "previous"
+      !is_locked && other.is_locked
+    else
+      is_locked && !other.is_locked
     end
   end
 

@@ -3,6 +3,7 @@
 module Danbooru
   class Http
     class XmlAdapter < HTTP::MimeType::Adapter
+      HTTP::MimeType.register_adapter "text/xml", self
       HTTP::MimeType.register_adapter "application/xml", self
       HTTP::MimeType.register_alias "application/xml", :xml
 

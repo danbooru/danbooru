@@ -6,13 +6,11 @@ class BanTest < ActiveSupport::TestCase
       setup do
         @banner = FactoryBot.create(:admin_user)
         CurrentUser.user = @banner
-        CurrentUser.ip_addr = "127.0.0.1"
       end
 
       teardown do
         @banner = nil
         CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
       end
 
       should "set the is_banned flag on the user" do
@@ -40,49 +38,39 @@ class BanTest < ActiveSupport::TestCase
     end
 
     should "update the user's feedback" do
-      user = FactoryBot.create(:user)
-      admin = FactoryBot.create(:admin_user)
-      assert(user.feedback.empty?)
-      CurrentUser.scoped(admin) do
-        FactoryBot.create(:ban, :user => user, :banner => admin)
-      end
-      assert(!user.feedback.empty?)
-      assert_equal("negative", user.feedback.last.category)
+      user = create(:user)
+      ban = create(:ban, user: user, duration: 100.years, reason: "lol")
+
+      assert_equal(1, user.feedback.negative.count)
+      assert_equal("Banned forever: lol", user.feedback.last.body)
+    end
+
+    should "send the user a dmail" do
+      user = create(:user)
+      ban = create(:ban, user: user, duration: 100.years, reason: "lol")
+
+      assert_equal(1, user.dmails.count)
+      assert_equal("You have been banned", user.dmails.last.title)
+      assert_equal("You have been banned forever: lol", user.dmails.last.body)
     end
   end
 
   context "Searching for a ban" do
     should "find a given ban" do
-      CurrentUser.user = FactoryBot.create(:admin_user)
-      CurrentUser.ip_addr = "127.0.0.1"
+      ban = create(:ban)
 
-      user = FactoryBot.create(:user)
-      ban = FactoryBot.create(:ban, user: user)
-      params = {
-        user_name: user.name,
-        banner_name: ban.banner.name,
-        reason: ban.reason,
-        expired: false,
-        order: :id_desc
-      }
-
-      bans = Ban.search(params)
-
-      assert_equal(1, bans.length)
-      assert_equal(ban.id, bans.first.id)
+      assert_search_equals(ban, user_name: ban.user.name, banner_name: ban.banner.name, reason: ban.reason, expired: false, order: :id_desc)
     end
 
     context "by user id" do
       setup do
         @admin = FactoryBot.create(:admin_user)
         CurrentUser.user = @admin
-        CurrentUser.ip_addr = "127.0.0.1"
         @user = FactoryBot.create(:user)
       end
 
       teardown do
         CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
       end
     end
   end

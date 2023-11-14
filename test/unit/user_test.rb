@@ -18,12 +18,10 @@ class UserTest < ActiveSupport::TestCase
     setup do
       @user = FactoryBot.create(:user)
       CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "promoting a user" do
@@ -153,6 +151,13 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(["Name can't contain whitespace"], user.errors.full_messages)
       end
 
+      should "not conflict with an existing name" do
+        create(:user, name: "bkub")
+        user = build(:user, name: "BKUB")
+        user.save
+        assert_equal(["Name already taken"], user.errors.full_messages)
+      end
+
       should "be less than 25 characters long" do
         user = build(:user, name: "a"*25)
         user.save
@@ -207,6 +212,18 @@ class UserTest < ActiveSupport::TestCase
         user.save
         assert_equal(["Name is not allowed"], user.errors.full_messages)
       end
+
+      should_not allow_value("any").for(:name)
+      should_not allow_value("none").for(:name)
+      should_not allow_value("new").for(:name)
+      should_not allow_value("admin").for(:name)
+      should_not allow_value("mod").for(:name)
+      should_not allow_value("moderator").for(:name)
+
+      should_not allow_value("foo_\u115F").for(:name)
+      should_not allow_value("foo_\u1160").for(:name)
+      should_not allow_value("foo_\u3164").for(:name)
+      should_not allow_value("foo_\uFFA0").for(:name)
     end
 
     context "searching for users by name" do
@@ -296,9 +313,9 @@ class UserTest < ActiveSupport::TestCase
         user2.save(validate: false)
         user3.save(validate: false)
 
-        assert_equal([user2.id, user1.id], User.search(name: "foo*").map(&:id))
-        assert_equal([user2.id], User.search(name: "foo\*bar").map(&:id))
-        assert_equal([user3.id], User.search(name: "bar\\\*baz").map(&:id))
+        assert_search_equals([user2, user1], name: "foo*")
+        assert_search_equals(user2, name: "foo\*bar")
+        assert_search_equals(user3, name: "bar\\\*baz")
       end
     end
 

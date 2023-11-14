@@ -1,14 +1,14 @@
-<article id="comment_<%= comment.id %>" class="comment message"
+<article id="comment_<%= comment.id %>" class="comment message <%= classes %>"
           x-data="{ showThresholded: false }"
           x-bind:data-show-thresholded="String(showThresholded)"
           data-id="<%= comment.id %>"
           data-post-id="<%= comment.post_id %>"
-          data-creator-id="<%= comment.creator_id unless redact_deleted? %>"
+          data-creator-id="<%= comment.creator_id if can_see_creator? %>"
           data-updater-id="<%= comment.updater_id unless redact_deleted? %>"
-          data-score="<%= comment.score %>"
-          data-do-not-bump-post="<%= comment.do_not_bump_post? %>"
+          data-score="<%= comment.score unless redact_deleted? %>"
+          data-do-not-bump-post="<%= comment.do_not_bump_post? unless redact_deleted? %>"
           data-is-deleted="<%= comment.is_deleted? %>"
-          data-is-sticky="<%= comment.is_sticky? %>"
+          data-is-sticky="<%= comment.is_sticky? unless redact_deleted? %>"
           data-is-dimmed="<%= dimmed? %>"
           data-is-thresholded="<%= thresholded? %>"
           data-is-reported="<%= reported? %>"
@@ -18,12 +18,12 @@
 
   <div class="author">
     <div class="author-name">
-      <% if redact_deleted? %>
+      <% if redact_deleted? && !can_see_creator? %>
         [deleted]
       <% else %>
         <%= link_to_user comment.creator %>
         <% if comment.is_deleted? %>
-          (deleted)
+          [deleted]
         <% end %>
       <% end %>
     </div>
@@ -31,7 +31,7 @@
   </div>
 
   <div class="content">
-    <%= link_to "[hidden]", "javascript:void(0)", class: "unhide-comment-link", "x-on:click": "showThresholded = true" %>
+    <%= link_to "[hidden]", "javascript:void(0)", class: "unhide-comment-link block mb-3", "x-on:click": "showThresholded = true" %>
 
     <%= tag.div class: "body prose" do %>
       <% if redact_deleted? %>
@@ -39,9 +39,9 @@
       <% else %>
         <%= format_text(comment.body, data: dtext_data) %>
       <% end %>
-
-      <%= render "application/update_notice", record: comment %>
     <% end %>
+
+    <%= render "application/update_notice", record: comment %>
 
     <menu class="mt-2">
       <% if votable? %>
@@ -49,12 +49,12 @@
           <% if current_user.is_anonymous? %>
             <%= link_to upvote_icon, login_path(url: request.fullpath), class: "comment-upvote-link inactive-link" %>
           <% elsif upvoted? %>
-            <%= link_to upvote_icon, comment_vote_path(current_vote), class: "comment-upvote-link comment-unvote-link active-link", method: :delete, remote: true %>
+            <%= link_to upvote_icon, comment_vote_path(current_vote), class: "comment-upvote-link comment-unvote-link active-link", method: :delete, remote: true, "data-params": component_state.to_param %>
           <% else %>
-            <%= link_to upvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "1"), class: "comment-upvote-link inactive-link", method: :post, remote: true %>
+            <%= link_to upvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "1"), class: "comment-upvote-link inactive-link", method: :post, remote: true, "data-params": component_state.to_param %>
           <% end %>
 
-          <span class="comment-score">
+          <span class="comment-score inline-block text-center whitespace-nowrap align-middle min-w-4">
             <% if policy(CommentVote).can_see_votes? %>
               <%= link_to comment.score, comment_votes_path(search: { comment_id: comment.id }, variant: "compact"), class: "inactive-link" %>
             <% else %>
@@ -65,9 +65,9 @@
           <% if current_user.is_anonymous? %>
             <%= link_to downvote_icon, login_path(url: request.fullpath), class: "comment-downvote-link inactive-link" %>
           <% elsif downvoted? %>
-            <%= link_to downvote_icon, comment_vote_path(current_vote), class: "comment-downvote-link comment-unvote-link active-link", method: :delete, remote: true %>
+            <%= link_to downvote_icon, comment_vote_path(current_vote), class: "comment-downvote-link comment-unvote-link active-link", method: :delete, remote: true, "data-params": component_state.to_param %>
           <% else %>
-            <%= link_to downvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "-1"), class: "comment-downvote-link inactive-link", method: :post, remote: true %>
+            <%= link_to downvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "-1"), class: "comment-downvote-link inactive-link", method: :post, remote: true, "data-params": component_state.to_param %>
           <% end %>
         </li>
       <% end %>
@@ -85,70 +85,71 @@
       <% end %>
 
       <% if reported? %>
-        <li class="moderation-report-notice">
+        <li class="moderation-report-notice font-bold">
           Reported (<%= link_to pluralize(comment.pending_moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "Comment", model_id: comment.id, status: "pending" }) %>)
         </li>
       <% end %>
 
-      <%= render PopupMenuComponent.new do |menu| %>
-        <% if policy(comment).update? %>
-          <% menu.item do %>
-            <%= link_to edit_comment_path(comment.id), id: "edit_comment_link_#{comment.id}", class: "edit_comment_link" do %>
-              <%= edit_icon %> Edit
-            <% end %>
-          <% end %>
-
-          <% menu.item do %>
-            <% if comment.is_deleted? %>
-              <%= link_to comment_path(comment.id), "data-params": "comment[is_deleted]=false", method: :put, remote: true do %>
-                <%= undelete_icon %> Undelete
-              <% end %>
-            <% else %>
-              <%= link_to comment_path(comment.id), "data-params": "comment[is_deleted]=true", "data-confirm": "Are you sure you want to delete this comment?", method: :put, remote: true do %>
-                <%= delete_icon %> Delete
+      <% unless redact_deleted? %>
+        <%= render PopupMenuComponent.new do |menu| %>
+          <% if policy(comment).update? %>
+            <% menu.with_item do %>
+              <%= link_to edit_comment_path(comment.id), id: "edit_comment_link_#{comment.id}", class: "edit_comment_link" do %>
+                <%= edit_icon %> Edit
               <% end %>
             <% end %>
-          <% end %>
-        <% end %>
 
-        <% if policy(comment).can_sticky_comment? %>
-          <% menu.item do %>
-            <% if comment.is_sticky? %>
-              <%= link_to comment_path(comment.id), "data-params": "comment[is_sticky]=false", method: :put, remote: true do %>
-                <%= unsticky_icon %> Unsticky
-              <% end %>
-            <% else %>
-              <%= link_to comment_path(comment.id), "data-params": "comment[is_sticky]=true", method: :put, remote: true do %>
-                <%= sticky_icon %> Sticky
+            <% menu.with_item do %>
+              <% if comment.is_deleted? %>
+                <%= link_to comment_path(comment.id), "data-params": { comment: { is_deleted: false }, **component_state }.to_param, method: :put, remote: true do %>
+                  <%= undelete_icon %> Undelete
+                <% end %>
+              <% else %>
+                <%= link_to comment_path(comment.id), "data-params": { comment: { is_deleted: true }, **component_state }.to_param, "data-confirm": "Are you sure you want to delete this comment?", method: :put, remote: true do %>
+                  <%= delete_icon %> Delete
+                <% end %>
               <% end %>
             <% end %>
           <% end %>
-        <% end %>
 
-        <% if policy(comment).reportable? %>
-          <% menu.item do %>
-            <%= link_to new_moderation_report_path(moderation_report: { model_type: "Comment", model_id: comment.id }), remote: true do %>
-              <%= flag_icon %> Report
+          <% if policy(comment).can_sticky_comment? %>
+            <% menu.with_item do %>
+              <% if comment.is_sticky? %>
+                <%= link_to comment_path(comment.id), "data-params": { comment: { is_sticky: false }, **component_state }.to_param, method: :put, remote: true do %>
+                  <%= unsticky_icon %> Unsticky
+                <% end %>
+              <% else %>
+                <%= link_to comment_path(comment.id), "data-params": { comment: { is_sticky: true }, **component_state }.to_param, method: :put, remote: true do %>
+                  <%= sticky_icon %> Sticky
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <% if policy(comment).reportable? %>
+            <% menu.with_item do %>
+              <%= link_to new_moderation_report_path(moderation_report: { model_type: "Comment", model_id: comment.id }), remote: true do %>
+                <%= flag_icon %> Report
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <% menu.with_item do %>
+            <%= link_to comment_path(comment.id), class: "comment-copy-id" do %>
+              <%= hashtag_icon %> Copy ID
+            <% end %>
+          <% end %>
+
+          <% menu.with_item do %>
+            <%= link_to comment_path(comment.id), class: "comment-copy-link" do %>
+              <%= link_icon %> Copy Link
             <% end %>
           <% end %>
         <% end %>
-
-        <% menu.item do %>
-          <%= link_to comment_path(comment.id), class: "comment-copy-id" do %>
-            <%= hashtag_icon %> Copy ID
-          <% end %>
-        <% end %>
-
-        <% menu.item do %>
-          <%= link_to comment_path(comment.id), class: "comment-copy-link" do %>
-            <%= link_icon %> Copy Link
-          <% end %>
-        <% end %>
-
       <% end %>
     </menu>
 
-    <% if policy(comment).update? %>
+    <% if policy(comment).update? && !redact_deleted? %>
       <%= render "comments/form", comment: comment, hidden: true %>
     <% end %>
   </div>

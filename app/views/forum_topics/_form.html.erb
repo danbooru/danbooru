@@ -1,6 +1,6 @@
 <div id="form-content">
   <%= edit_form_for(forum_topic) do |f| %>
-    <%= f.input :title %>
+    <%= f.input :title, as: :string %>
 
     <div class="input">
       <label for="forum_topic_category_id">Category</label>

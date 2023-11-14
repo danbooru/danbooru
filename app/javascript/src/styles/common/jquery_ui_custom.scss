@@ -1,3 +1,5 @@
+@import "./utilities";
+
 .ui-widget {
   font-family: var(--body-font);
 
@@ -32,9 +34,8 @@ div.ui-dialog {
     border: none;
   }
 
-  ul {
-    margin-left: 1em;
-    margin-bottom: 1em;
+  .ui-dialog-content {
+    @extend %thin-scrollbar;
   }
 }
 

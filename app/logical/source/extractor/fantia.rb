@@ -2,6 +2,8 @@
 
 class Source::Extractor
   class Fantia < Source::Extractor
+    extend Memoist
+
     def self.enabled?
       Danbooru.config.fantia_session_id.present?
     end
@@ -37,25 +39,23 @@ class Source::Extractor
 
     def images_for_post
       return [] unless api_response.present?
-      images = [api_response.dig("post", "thumb_micro")]
-      api_response.dig("post", "post_contents").to_a.map do |content|
+
+      images = api_response.dig("post", "post_contents").to_a.map do |content|
         next if content["visible_status"] != "visible"
 
         case content["category"]
         when "photo_gallery"
-          content["post_content_photos"].to_a.map { |i| images << i.dig("url", "original") }
+          content["post_content_photos"].to_a.map { |i| i.dig("url", "original") }
         when "file"
-          images << image_from_downloadable("https://www.fantia.jp/#{content["download_uri"]}")
+          image_from_downloadable("https://www.fantia.jp/#{content["download_uri"]}")
         when "blog"
-          begin
-            sub_json = JSON.parse(content["comment"])
-          rescue Json::ParserError
-            sub_json = {}
-          end
-          sub_json["ops"].to_a.map { |js| images << js.dig("insert", "fantiaImage", "url") }
+          comment = JSON.parse(content["comment"]) rescue {}
+          comment["ops"].to_a.pluck("insert").pluck("image").compact
         end
-      end
-      images
+      end.flatten.compact
+
+      thumb_micro = api_response.dig("post", "thumb_micro")
+      [thumb_micro, *images].compact
     end
 
     def images_for_product
@@ -136,28 +136,32 @@ class Source::Extractor
       parsed_url.work_id || parsed_referer&.work_id
     end
 
-    def api_response
-      return {} unless work_type == "post"
-      api_url = "https://fantia.jp/api/v1/posts/#{work_id}"
-
-      response = http.cache(1.minute).get(api_url)
-      return {} unless response.status == 200
-
-      JSON.parse(response)
-    rescue JSON::ParserError
-      {}
+    memoize def post_page
+      return nil unless work_type == "post"
+      http.cache(1.minute).parsed_get("https://fantia.jp/posts/#{work_id}")
     end
 
-    def html_response
-      return nil unless work_type == "product"
-      response = http.cache(1.minute).get("https://fantia.jp/products/#{work_id}")
+    memoize def csrf_token
+      post_page&.css('meta[name="csrf-token"]')&.attr("content")&.value
+    end
 
-      return nil unless response.status == 200
-      response.parse
+    memoize def api_response
+      return {} unless work_type == "post" && csrf_token.present?
+      api_url = "https://fantia.jp/api/v1/posts/#{work_id}"
+
+      http.cache(1.minute).headers(
+        "X-CSRF-Token": csrf_token,
+        "X-Requested-With": "XMLHttpRequest",
+      ).parsed_get(api_url) || {}
+    end
+
+    memoize def html_response
+      return nil unless work_type == "product"
+      http.cache(1.minute).parsed_get("https://fantia.jp/products/#{work_id}")
     end
 
     def http
-      Danbooru::Http.new.cookies(_session_id: Danbooru.config.fantia_session_id)
+      super.cookies(_session_id: Danbooru.config.fantia_session_id)
     end
   end
 end

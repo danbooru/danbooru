@@ -2,6 +2,7 @@
 
 class ApplicationController < ActionController::Base
   class PageRemovedError < StandardError; end
+  class RequestBodyNotAllowedError < StandardError; end
 
   include Pundit::Authorization
   helper_method :search_params, :permitted_attributes
@@ -9,6 +10,7 @@ class ApplicationController < ActionController::Base
   self.responder = ApplicationResponder
 
   skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
+  before_action :check_get_body
   before_action :reset_current_user
   before_action :set_current_user
   before_action :normalize_search
@@ -39,12 +41,19 @@ class ApplicationController < ActionController::Base
 
     before_action(only: action, if: if_proc) do
       key = "#{controller_name}:#{action}"
-      rate_limiter = RateLimiter.build(action: key, rate: rate, burst: burst, user: CurrentUser.user, ip_addr: CurrentUser.ip_addr)
+      rate_limiter = RateLimiter.build(action: key, rate: rate, burst: burst, user: CurrentUser.user, ip_addr: request.remote_ip)
       headers["X-Rate-Limit"] = rate_limiter.to_json
       rate_limiter.limit!
     end
 
     skip_before_action :check_default_rate_limit, only: action, if: if_proc
+  end
+
+  # Mark an action as for anonymous users only. The current user won't be loaded, instead the user will be set to the anonymous user.
+  def self.anonymous_only(*actions, **options)
+    skip_before_action :set_current_user, **options
+    skip_before_action :redirect_if_name_invalid?, **options
+    before_action -> { CurrentUser.user = User.anonymous }, **options
   end
 
   private
@@ -65,7 +74,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_version_comparison(default_type = "previous")
-    params[:type] = %w[previous subsequent current].include?(params[:type]) ? params[:type] : default_type
+    params[:type] = %w[previous current].include?(params[:type]) ? params[:type] : default_type
   end
 
   def model_name
@@ -73,7 +82,11 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_to_show(items)
-    redirect_to send("#{controller_path.singularize}_path", items.first, format: request.format.symbol)
+    if request.format.html?
+      redirect_to send("#{controller_path.singularize}_path", items.first)
+    else
+      redirect_to send("#{controller_path.singularize}_path", items.first, format: request.format.symbol)
+    end
   end
 
   def is_redirect?(items)
@@ -101,7 +114,7 @@ class ApplicationController < ActionController::Base
       rate: CurrentUser.user.api_regen_multiplier,
       burst: 200,
       user: CurrentUser.user,
-      ip_addr: CurrentUser.ip_addr,
+      ip_addr: request.remote_ip,
     )
 
     headers["X-Rate-Limit"] = rate_limiter.to_json
@@ -116,6 +129,8 @@ class ApplicationController < ActionController::Base
       render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
     when ActionController::BadRequest
       render_error_page(400, exception, message: exception.message)
+    when RequestBodyNotAllowedError
+      render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")
     when SessionLoader::AuthenticationFailure
       render_error_page(401, exception, message: exception.message, template: "sessions/new")
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest, ActionController::Redirecting::UnsafeRedirectError
@@ -131,7 +146,7 @@ class ApplicationController < ActionController::Base
     when ActionController::UnknownFormat, ActionView::MissingTemplate
       render_error_page(406, exception, message: "#{request.format} is not a supported format for this page")
     when PaginationExtension::PaginationError
-      render_error_page(410, exception, template: "static/pagination_error", message: "You cannot go beyond page #{CurrentUser.user.page_limit}.")
+      render_error_page(410, exception, template: "static/pagination_error", message: exception.message)
     when PostQuery::TagLimitError
       render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
     when PostQuery::Error
@@ -146,15 +161,15 @@ class ApplicationController < ActionController::Base
       render_error_page(500, exception, message: "Your request took too long to complete and was canceled.")
     when NotImplementedError
       render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
-    when PG::ConnectionBad
-      render_error_page(503, exception, message: "The database is unavailable. Try again later.")
+    when ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad
+      render_error_page(503, exception, message: "The database is unavailable. Try again later.", layout: "blank")
     else
       raise exception if Rails.env.development? || Danbooru.config.debug_mode
       render_error_page(500, exception)
     end
   end
 
-  def render_error_page(status, exception = nil, message: "", template: "static/error", format: request.format.symbol)
+  def render_error_page(status, exception = nil, message: "", template: "static/error", format: request.format.symbol, layout: "default")
     @exception = exception
     @expected = status < 500
     @message = message.to_s.encode("utf-8", invalid: :replace, undef: :replace)
@@ -164,9 +179,19 @@ class ApplicationController < ActionController::Base
     @api_response = { success: false, error: @exception.class.to_s, message: @message, backtrace: @backtrace }
 
     # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
-    layout = CurrentUser.user.present? ? "default" : "blank"
+    layout = "blank" if CurrentUser.user.nil?
 
-    DanbooruLogger.log(@exception, expected: @expected) if @exception
+    if @exception
+      DanbooruLogger.log(@exception, expected: @expected)
+
+      ApplicationMetrics[:rails_exceptions_total][
+        exception: @exception.class.name,
+        controller: controller_name,
+        action: action_name,
+        expected: @expected.to_s,
+      ].increment
+    end
+
     render template, layout: layout, status: status, formats: format
   rescue ActionView::MissingTemplate
     render "static/error", layout: layout, status: status, formats: format
@@ -178,7 +203,6 @@ class ApplicationController < ActionController::Base
 
   def reset_current_user
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
     CurrentUser.safe_mode = false
   end
 
@@ -192,6 +216,10 @@ class ApplicationController < ActionController::Base
 
   def set_variant
     request.variant = params[:variant].try(:to_sym)
+  end
+
+  def check_get_body
+    raise RequestBodyNotAllowedError if request.method.in?(%w[GET HEAD OPTIONS]) && request.body.size > 0
   end
 
   # allow api clients to force errors for testing purposes.
@@ -210,12 +238,12 @@ class ApplicationController < ActionController::Base
   def redirect_if_name_invalid?
     if request.format.html? && !CurrentUser.user.is_anonymous? && CurrentUser.user.name_invalid?
       flash[:notice] = "You must change your username to continue using #{Danbooru.config.app_name}"
-      redirect_to new_user_name_change_request_path
+      redirect_to change_name_user_path(CurrentUser.user)
     end
   end
 
   def ip_ban_check
-    raise User::PrivilegeError if !request.get? && IpBan.hit!(:full, CurrentUser.ip_addr)
+    raise User::PrivilegeError if !request.get? && IpBan.hit!(:full, request.remote_ip)
   end
 
   def pundit_user
@@ -241,7 +269,7 @@ class ApplicationController < ActionController::Base
   # => /tags?search[name]=touhou
   def normalize_search
     return unless request.get? || request.head?
-    params[:search] ||= ActionController::Parameters.new
+    params[:search] = ActionController::Parameters.new unless params[:search].is_a?(ActionController::Parameters)
 
     deep_reject_blank = lambda do |hash|
       hash.reject { |_k, v| v.blank? || (v.is_a?(Hash) && deep_reject_blank.call(v).blank?) }

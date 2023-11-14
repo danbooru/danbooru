@@ -56,6 +56,7 @@ module Sources
       assert(Source::URL.profile_url?("https://www.furaffinity.net/user/iwbitu"))
       assert(Source::URL.profile_url?("https://www.furaffinity.net/gallery/iwbitu"))
       assert(Source::URL.profile_url?("https://www.furaffinity.net/gallery/iwbitu/folder/133763/Regular-commissions"))
+      assert(Source::URL.profile_url?("https://www.furaffinity.net/stats/duskmoor/submissions/"))
     end
   end
 end

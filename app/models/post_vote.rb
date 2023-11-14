@@ -5,6 +5,7 @@ class PostVote < ApplicationRecord
 
   belongs_to :post
   belongs_to :user
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   validates :score, inclusion: { in: [1, -1], message: "must be 1 or -1" }
 
@@ -17,7 +18,7 @@ class PostVote < ApplicationRecord
 
   scope :positive, -> { where("post_votes.score > 0") }
   scope :negative, -> { where("post_votes.score < 0") }
-  scope :public_votes, -> { active.positive.where(user: User.has_public_favorites) }
+  scope :public_votes, -> { active.positive.where.not(user: User.has_private_favorites) }
 
   deletable
 
@@ -31,8 +32,8 @@ class PostVote < ApplicationRecord
     end
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :score, :is_deleted, :user, :post)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :score, :is_deleted, :user, :post], current_user: current_user)
 
     q.apply_default_order(params)
   end
@@ -81,9 +82,9 @@ class PostVote < ApplicationRecord
     return if new_record? || updater.nil? || updater == user
 
     if is_deleted_changed?(from: false, to: true)
-      ModAction.log("#{updater.name} deleted post vote ##{id} on post ##{post_id}", :post_vote_delete, updater)
+      ModAction.log("deleted post vote ##{id} on post ##{post_id}", :post_vote_delete, subject: self, user: updater)
     elsif is_deleted_changed?(from: true, to: false)
-      ModAction.log("#{updater.name} undeleted post vote ##{id} on post ##{post_id}", :post_vote_undelete, updater)
+      ModAction.log("undeleted post vote ##{id} on post ##{post_id}", :post_vote_undelete, subject: self, user: updater)
     end
   end
 

@@ -170,7 +170,7 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_equals(["filetype:gif"], "filetype:g", :tag_query)
         assert_autocomplete_equals(["filetype:swf"], "filetype:s", :tag_query)
         assert_autocomplete_equals(["filetype:zip"], "filetype:z", :tag_query)
-        assert_autocomplete_equals(["filetype:webm"], "filetype:w", :tag_query)
+        assert_autocomplete_equals(["filetype:webm", "filetype:webp"], "filetype:w", :tag_query)
         assert_autocomplete_equals(["filetype:mp4"], "filetype:m", :tag_query)
 
         assert_autocomplete_equals(["commentary:true"], "commentary:tru", :tag_query)

@@ -1,11 +1,33 @@
 <%# tags, title, class %>
 
-<% if tags.present? %>
-  <%= tag.div class: ["tag-column", local_assigns[:class]] do %>
-    <h3 class="flex items-center space-x-1">
-      <input type="checkbox" class="invisible">
-      <span><%= title %></span>
-    </h3>
-    <%= render_related_tag_list(tags) %>
+<%= tag.div "x-data": { collapsed: false }.to_json, class: ["tag-column", ("card p-2 h-fit space-y-1" if title.present?), local_assigns[:class], ("hidden" if tags.blank?)] do %>
+  <% if tags.present? %>
+    <% if title.present? %>
+      <div class="flex items-center justify-between gap-2 pl-4 pr-2 cursor-pointer select-none" x-on:click.prevent="collapsed = !collapsed">
+        <h6><%= title %></h6>
+
+        <%= chevron_down_icon(class: "link-color rotate-180", "x-cloak": true, "x-show": "collapsed") %>
+        <%= chevron_down_icon(class: "link-color", "x-cloak": true, "x-show": "!collapsed") %>
+      </div>
+    <% end %>
+
+    <ul class="tag-list" x-cloak x-show="!collapsed">
+      <% tags.each do |t| %>
+        <li class="flex items-center gap-1 w-fit leading-none">
+          <input type="checkbox" tabindex="-1">
+
+          <span>
+            <% if t.is_a?(AITag) %>
+              <% at = t.to_aliased_tag %>
+              <%= link_to at.pretty_name, posts_path(tags: at.name), class: "break-words #{tag_class(at)}", "data-tag-name": at.name %>
+              <%= tag.span "#{t.score}%", class: "text-muted text-xs" %>
+            <% else %>
+              <%= link_to t.pretty_name, posts_path(tags: t.name), class: "break-words #{tag_class(t)}", "data-tag-name": t.name %>
+              <%= tag.span humanized_number(t.post_count), class: "post-count text-xs", title: t.post_count %>
+            <% end %>
+          </span>
+        </li>
+      <% end %>
+    </ul>
   <% end %>
 <% end %>

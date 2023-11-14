@@ -184,7 +184,7 @@ class BulkUpdateRequestProcessor
 
   # Process the bulk update request immediately.
   def process!
-    CurrentUser.scoped(User.system, "127.0.0.1") do
+    CurrentUser.scoped(User.system) do
       commands.map do |command, *args|
         case command
         when :create_alias
@@ -212,17 +212,18 @@ class BulkUpdateRequestProcessor
 
         when :change_category
           tag = Tag.find_or_create_by_name(args[0])
-          tag.update!(category: Tag.categories.value_for(args[1]))
+          tag.update!(category: Tag.categories.value_for(args[1]), updater: User.system)
 
         when :deprecate
           tag = Tag.find_or_create_by_name(args[0])
-          tag.update!(is_deprecated: true)
+          tag.update!(is_deprecated: true, updater: User.system)
+          TagAlias.active.where(consequent_name: tag.name).each { |ti| ti.reject!(User.system) }
           TagImplication.active.where(consequent_name: tag.name).each { |ti| ti.reject!(User.system) }
           TagImplication.active.where(antecedent_name: tag.name).each { |ti| ti.reject!(User.system) }
 
         when :undeprecate
           tag = Tag.find_or_create_by_name(args[0])
-          tag.update!(is_deprecated: false)
+          tag.update!(is_deprecated: false, updater: User.system)
 
         else
           # should never happen
@@ -306,7 +307,7 @@ class BulkUpdateRequestProcessor
 
   def self.mass_update(antecedent, consequent, user: User.system)
     CurrentUser.scoped(user) do
-      Post.anon_tag_match(antecedent).reorder(nil).parallel_each do |post|
+      Post.anon_tag_match(antecedent).reorder(nil).parallel_find_each do |post|
         post.with_lock do
           post.tag_string += " " + consequent
           post.save

@@ -8,29 +8,209 @@ class Source::URL::Null < Source::URL
   end
 
   def site_name
-    case host
-    when /ask\.fm\z/i
+    case [subdomain, domain]
+    in _, "myportfolio.com"
+      "Adobe Portfolio"
+    in _, "adobe.com" if host == "portfolio.adobe.com"
+      "Adobe Portfolio"
+    in _, "allmylinks.com"
+      "AllMyLinks"
+    in _, "animenewsnetwork.com"
+      "Anime News Network"
+    in _, ("aminoapps.com" | "narvii.com")
+      "Amino"
+    in _, "anilist.co"
+      "AniList"
+    in "music", "apple.com"
+      "Apple Music"
+    in _, "archiveofourown.org"
+      "Archive of Our Own"
+    in _, "artfight.net"
+      "Art Fight"
+    in _, "artistsnclients.com"
+      "Artists&Clients"
+    in _, "ask.fm"
       "Ask.fm"
-    when /bcy\.net\z/i
+    in _, ("bandcamp.com" | "bcbits.com")
+      "Bandcamp"
+    in _, ("bcy.net" | "bcyimg.com")
       "BCY"
-    when /carrd\.co\z/i
+    in _, "bigcartel.com"
+      "Big Cartel"
+    in _, ("blogger.com" | /blogspot\.(com|ca|de|jp|kr|tw)\z/i)
+      "Blogger"
+    in "blogger", "googleusercontent.com"
+      "Blogger"
+    in _, "buymeacoffee.com"
+      "Buy Me a Coffee"
+    in _, "carrd.co"
       "Carrd"
-    when /circle\.ms\z/i
+    in _, "circle.ms"
       "Circle.ms"
-    when /dlsite\.(com|net)\z/i
+    in _, ("class101.co" | "class101.net")
+      "Class101"
+    in _, "colorslive.com"
+      "Colors Live"
+    # XXX curiouscat.qa is possibly a different site
+    # https://www.bleepingcomputer.com/news/security/popular-qanda-app-curious-cat-loses-domain-posts-bizarre-tweets/
+    in _, ("curiouscat.live" | "curiouscat.me" | "curiouscat.qa")
+      "Curious Cat"
+    in _, ("dlsite.com" | "dlsite.net" | "dlsite.jp")
       "DLSite"
-    when /doujinshi\.org\z/i, /doujinshi\.mugimugi\.org\z/i
+    in _, "donmai.us"
+      "Danbooru" # hey, that's us!
+    in _, ("discordapp.com" | "discordapp.net")
+      "Discord"
+    in _, "doujinshi.org"
       "Doujinshi.org"
-    when /ko-fi\.com\z/i
-      "Ko-fi"
-    when /lit\.link\z/i
+    in "doujinshi", "mugimugi.org"
+      "Doujinshi.org"
+    in _, "cloudfront.net" if host == "dxthpu4318olx.cloudfront.net"
+      "Drawcrowd"
+    in _, ("e-hentai.org" | "exhentai.org" | "hath.network")
+      "E-Hentai"
+    in _, "exblog.jp"
+      "Excite Blog"
+    in _, ("facebook.com" | "fbcdn.net")
+      "Facebook"
+    in _, ("fandom.com" | "wikia.com")
+      "Fandom"
+    in _, "fanfiction.net"
+      "FanFiction.Net"
+    in _, ("flickr.com" | "staticflickr.com")
+      "Flickr"
+    in _, ("github.com" | "githubassets.com")
+      "GitHub"
+    in _, "gumpla.jp"
+      "Gunsta"
+    in _, "hatena.ne.jp"
+      "Hatena"
+    in _, ("hatenablog.com" | "hatenablog.jp" | "hateblo.jp" | "st-hatena.com")
+      "Hatena Blog"
+    in _, "hoyolab.com"
+      "HoYoLAB"
+    in _, "html.co.jp"
+      "html.co.jp"
+    in _, "itch.io"
+      "Itch.io"
+    in _, ("line.me" | "line-apps.com")
+      "Line"
+    in _, ("linkedin.com" | "licdn.com")
+      "LinkedIn"
+    in _, "linktr.ee"
+      "Linktree"
+    in _, "livedoor.jp"
+      "Livedoor"
+    in "livedoor", "blogimg.jp"
+      "Livedoor"
+    in _, ("2chblog.jp" | "blog.jp" | "bloggeek.jp" | "blogism.jp" | "blogo.jp" | "blogstation.jp" | "blogto.jp" | "cafeblog.jp" | "corpblog.jp" | "diary.to" | "doorblog.jp" | "dreamlog.jp" | "gger.jp" | "golog.jp" | "ldblog.jp" | "liblo.jp" | "livedoor.biz" | "myjournal.jp" | "mynikki.jp" | "officeblog.jp" | "officialblog.jp" | "publog.jp" | "storeblog.jp" | "teamblog.jp" | "techblog.jp" | "weblog.to" | "xxxblog.jp" | "youblog.jp")
+      "Livedoor"
+    in _, "lit.link"
       "Lit.link"
-    when /mixi\.jp\z/i
+    in _, ("kirbyscomicart.com"| "kirbyscomicartshop.com")
+      "Kirby's Comic Art"
+    in _, "kirumade.com"
+      "Kiru Made"
+    in _, "kemono.party"
+      "Kemono Party"
+    in _, "ko-fi.com"
+      "Ko-fi"
+    in _, "last.fm"
+      "Last.fm"
+    in _, ("mastodon.cloud" | "mstdn.jp")
+      "Mastodon"
+    in _, "myanimelist.net"
+      "MyAnimeList"
+    in _, "myfigurecollection.net"
+      "MyFigureCollection"
+    in _, "mixi.jp"
       "Mixi.jp"
-    when /piapro\.jp\z/i
+    in _, "note.com"
+      "Note"
+    in _, "cloudfront.net" if host == "d291vdycu0ht11.cloudfront.net"
+      "Note"
+    in _, "ocn.ne.jp"
+      "OCN"
+    in _, "onlyfans.com"
+      "OnlyFans"
+    in _, "opensea.io"
+      "OpenSea"
+    in _, ("overdoll.com" | "dollycdn.net")
+      "Overdoll"
+    in _, ("patreon.com" | "patreonusercontent.com")
+      "Patreon"
+    in _, "piapro.jp"
       "Piapro.jp"
-    when /sakura\.ne\.jp\z/i
+    in _, ("paypal.com" | "paypal.me" | "paypalobjects.com")
+      "PayPal"
+    in _, ("pinterest.com" | "pinimg.com")
+      "Pinterest"
+    in _, "pixeljoint.com"
+      "Pixel Joint"
+    in _, "postype.com"
+      "Postype"
+    in _, "cloudfront.net" if host == "d33pksfia2a94m.cloudfront.net"
+      "Postype"
+    in _, ("joyreactor.cc" | "reactor.cc")
+      "Joyreactor"
+    in _, "redgifs.com"
+      "RedGIFs"
+    in _, "rule34.us"
+      "Rule34.us"
+    in _, "sakura.ne.jp"
       "Sakura.ne.jp"
+    in _, "sankakucomplex.com"
+      "Sankaku Complex"
+    in _, ("spotify.com" | "spotifycdn.com")
+      "Spotify"
+    in _, ("soundcloud.com" | "sndcdn.com")
+      "SoundCloud"
+    in _, ("steamstatic.com" | "steamcommunity.com")
+      "Steam"
+    in _, ("subscribestar.adult" | "subscribestar.com")
+      "SubscribeStar"
+    in _, "superrare.com"
+      "SuperRare"
+    in _, "suzuri.jp"
+      "Suzuri"
+    in _, "cloudfront.net" if host == "dijsur42hqnz1.cloudfront.net"
+      "Suzuri"
+    in _, "theinterviews.jp"
+      "The Interviews"
+    in _, "tapas.io"
+      "Tapas"
+    in _, "cloudfront.net" if host == "d30womf5coomej.cloudfront.net"
+      "Tapas"
+    in _, "teepublic.com"
+      "TeePublic"
+    in _, ("telegram.org" | "t.me")
+      "Telegram"
+    in _, "tistory.com"
+      "Tistory"
+    in "t1", "daumcdn.net"
+      "Tistory"
+    in _, "toyhou.se"
+      "Toyhouse"
+    in "bxp-content-static.prod.public", "atl-paas.net"
+      "Trello"
+    in _, "tsunagu.cloud"
+      "tsunagu.cloud"
+    in _, ("vimeo.com" | "vimeocdn.com" | "livestream.com")
+      "Vimeo"
+    in _, "webtoons.com"
+      "Webtoons"
+    in "webtoons-static", "pstatic.net"
+      "Webtoons"
+    in _, ("weebly.com" | "weeblysite.com")
+      "Weebly"
+    in _, "wlo.link"
+      "Willow"
+    in _, ("wix.com" | "wixsite.com" | "wixstatic.com")
+      "Wix"
+    in _, "wordpress.com"
+      "WordPress"
+    in _, "youtu.be"
+      "Youtube"
     else
       # "www.melonbooks.co.jp" => "Melonbooks"
       parsed_domain.sld.titleize
@@ -131,14 +311,15 @@ class Source::URL::Null < Source::URL
       @work_id = $1
       @page_url = "https://www.facebook.com/photo.php?fbid=#{work_id}"
 
-    # https://gelbooru.com//images/ee/5c/ee5c9a69db9602c95debdb9b98fb3e3e.jpeg
-    # http://simg.gelbooru.com//images/2003/edd1d2b3881cf70c3acf540780507531.png
-    # https://simg3.gelbooru.com//samples/0b/3a/sample_0b3ae5e225072b8e391c827cb470d29c.jpg
-    # https://video-cdn3.gelbooru.com/images/62/95/6295154d082f04009160261b90e7176e.mp4
-    # https://img2.gelbooru.com//images/a9/64/a96478bbf9bc3f0584f2b5ddf56025fa.webm
-    in _, "gelbooru.com", ("images" | "samples"), *subdirs, /^(?:sample_)?(\h{32})\.(jpeg|jpg|png|gif|mp4|webm)$/
-      @md5 = $1
-      @page_url = "https://gelbooru.com/index.php?page=post&s=list&tags=md5:#{@md5}"
+    # https://fori.io/comori22
+    in _, "fori.io", username
+      @username = username
+      @profile_url = "https://www.foriio.com/#{username}"
+
+    # https://www.foriio.com/comori22
+    in _, "foriio.com", username
+      @username = username
+      @profile_url = "https://www.foriio.com/#{username}"
 
     # https://a.hitomi.la/galleries/907838/1.png
     # https://0a.hitomi.la/galleries/1169701/23.png
@@ -228,18 +409,6 @@ class Source::URL::Null < Source::URL
     in _, ("twpl.jp" | "twipple.jp"), "show", ("large" | "orig"), work_id
       @work_id = work_id
       @page_url = "http://p.twipple.jp/#{work_id}"
-
-    # https://static.zerochan.net/Fullmetal.Alchemist.full.2831797.png
-    # https://s1.zerochan.net/Cocoa.Cookie.600.2957938.jpg
-    # http://static.zerochan.net/full/24/13/90674.jpg
-    in _, "zerochan.net", *subdirs, /(\d+)\.(jpg|png|gif)$/
-      @work_id = $1
-      @page_url = "https://www.zerochan.net/#{@work_id}#full"
-
-    # http://www.zerochan.net/full/1567893
-    in _, "zerochan.net", "full", /^\d+$/ => work_id
-      @work_id = work_id
-      @page_url = "https://www.zerochan.net/#{@work_id}#full"
 
     else
       @recognized = false

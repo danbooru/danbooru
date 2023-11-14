@@ -54,32 +54,12 @@ module Sources
         assert_equal("https://chan.sankakucomplex.com/post/show?md5=c2d7270b84ac81326384d4eadd4d4746", Source::URL.page_url(source))
       end
 
-      should "normalize zerochan links" do
-        source1 = "http://static.zerochan.net/full/23/15/183273.jpg"
-        source2 = "https://s4.zerochan.net/Victorique.de.Blois.full.411536.jpg"
-        source3 = "http://www.zerochan.net/full/1567893"
-
-        assert_equal("https://www.zerochan.net/183273#full", Source::URL.page_url(source1))
-        assert_equal("https://www.zerochan.net/411536#full", Source::URL.page_url(source2))
-        assert_equal("https://www.zerochan.net/1567893#full", Source::URL.page_url(source3))
-      end
-
       should "normalize minitokyo links" do
         source1 = "http://static.minitokyo.net/downloads/27/13/365677.jpg?433592448,Minitokyo.Eien.no.Aselia.Scans_365677.jpg"
         source2 = "http://static.minitokyo.net/downloads/14/33/199164.jpg?928244019"
 
         assert_equal("http://gallery.minitokyo.net/view/365677", Source::URL.page_url(source1))
         assert_equal("http://gallery.minitokyo.net/view/199164", Source::URL.page_url(source2))
-      end
-
-      should "normalize gelbooru links" do
-        source1 = "https://gelbooru.com//images/ee/5c/ee5c9a69db9602c95debdb9b98fb3e3e.jpeg"
-        source2 = "http://simg.gelbooru.com//images/2003/edd1d2b3881cf70c3acf540780507531.png"
-        source3 = "https://simg3.gelbooru.com//samples/0b/3a/sample_0b3ae5e225072b8e391c827cb470d29c.jpg"
-
-        assert_equal("https://gelbooru.com/index.php?page=post&s=list&tags=md5:ee5c9a69db9602c95debdb9b98fb3e3e", Source::URL.page_url(source1))
-        assert_equal("https://gelbooru.com/index.php?page=post&s=list&tags=md5:edd1d2b3881cf70c3acf540780507531", Source::URL.page_url(source2))
-        assert_equal("https://gelbooru.com/index.php?page=post&s=list&tags=md5:0b3ae5e225072b8e391c827cb470d29c", Source::URL.page_url(source3))
       end
 
       should "normalize e-shuushuu links" do
@@ -105,11 +85,6 @@ module Sources
       should "normalize shimmie.katawa-shoujo.com links" do
         source = "http://shimmie.katawa-shoujo.com/image/2740.png"
         assert_equal("https://shimmie.katawa-shoujo.com/post/view/2740", Source::URL.page_url(source))
-      end
-
-      should "normalize rule34.xxx links" do
-        source = "https://us.rule34.xxx//images/1802/0adc8fa0604dc445b4b47e6f4c436a08.jpeg?1949807"
-        assert_equal("https://rule34.xxx/index.php?page=post&s=list&md5=0adc8fa0604dc445b4b47e6f4c436a08", Source::URL.page_url(source))
       end
 
       should "normalize diarypro links" do

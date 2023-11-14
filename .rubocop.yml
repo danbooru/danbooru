@@ -1,4 +1,4 @@
-# some of these settings are overriden in also test/.rubocop.yml
+# some of these settings are overridden in also test/.rubocop.yml
 
 require:
   - rubocop-rails
@@ -47,7 +47,7 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Max: 50
-  IgnoredMethods:
+  AllowedMethods:
     - concerning
     - context
     - should
@@ -182,7 +182,7 @@ Style/SymbolArray:
   MinSize: 10
 
 Style/SymbolProc:
-  IgnoredMethods:
+  AllowedMethods:
     - respond_with
 
 Style/TernaryParentheses:

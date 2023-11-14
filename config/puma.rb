@@ -12,7 +12,6 @@
 # * PUMA_WORKER_TIMEOUT
 # * PUMA_PIDFILE
 # * PUMA_CONTROL_URL
-# * PUMA_METRICS_URL
 # * PUMA_RESTART_INTERVAL
 #
 # Use `bin/pumactl` to control a running Puma instance.
@@ -62,6 +61,10 @@ threads min_threads_count, max_threads_count
 # Setting this value will not protect against slow requests.
 worker_timeout ENV.fetch("PUMA_WORKER_TIMEOUT", 60)
 
+# How often worker processes check in with the master process. This also controls how often worker metrics are updated in the master process.
+# Default: once per second.
+worker_check_interval ENV.fetch("PUMA_CHECK_INTERVAL", 1).to_i
+
 # The number of seconds to wait for another request within a persistent (keep
 # alive) session.
 persistent_timeout 20
@@ -86,13 +89,6 @@ end
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
 
-# Enable Prometheus metrics.
-# https://github.com/harmjanblok/puma-metrics
-plugin :metrics
-
-# Export Prometheus metrics by default on http://localhost:9393
-metrics_url ENV.fetch("PUMA_METRICS_URL", "tcp://localhost:9393")
-
 # Start the Puma control rack application on +url+. This application can
 # be communicated with to control the main server. Additionally, you can
 # provide an authentication token, so all requests to the control server
@@ -107,6 +103,38 @@ metrics_url ENV.fetch("PUMA_METRICS_URL", "tcp://localhost:9393")
 # https://github.com/puma/puma#controlstatus-server
 activate_control_app ENV.fetch("PUMA_CONTROL_URL", "tcp://localhost:9293"), no_token: true
 
+# The last resort error handler for exceptions unhandled by the app. This only handles errors not handled by the
+# `rescue_exception` handler in ApplicationController. This normally only happens if `rescue_exception` itself raises an
+# error, or if a middleware raises an error before or after the request is handled by the app.
+#
+# When RAILS_ENV is development, errors will be swallowed by the BetterErrors gem before they get to this point.
+lowlevel_error_handler do |exception, env|
+  ApplicationMetrics[:puma_exceptions_total][exception: exception.class.name].increment
+
+  backtrace = Rails.backtrace_cleaner.clean(exception.backtrace).join("\n")
+  message = <<~EOS
+    An unexpected error has occurred.
+
+    Details: #{exception.class.to_s} exception raised.
+
+    #{backtrace}
+  EOS
+
+  [500, {}, [message]]
+rescue Exception => second_exception # This should never happen
+  message = <<~EOS
+    An unexpected error has occurred on the error page. Oh baby, a triple fault!
+
+    Details: #{exception.class.to_s} exception raised.
+    #{exception.backtrace.join("\n")}
+
+    #{second_exception.class.to_s} exception raised.
+    #{second_exception.backtrace.join("\n")}
+  EOS
+
+  [500, {}, [message]]
+end
+
 # https://github.com/schneems/puma_worker_killer
 # https://docs.gitlab.com/ee/administration/operations/puma.html#puma-worker-killer
 before_fork do
@@ -115,3 +143,24 @@ before_fork do
   PumaWorkerKiller.rolling_restart_splay_seconds = 0.0..180.0 # 0 to 3 minutes in seconds
   PumaWorkerKiller.enable_rolling_restart ENV.fetch("PUMA_RESTART_INTERVAL", 2 * 60 * 60).to_i # every 2 hours by default
 end
+
+# This is called in the master process right before a worker is started.
+on_worker_fork do |worker_id|
+  ApplicationMetrics[:puma_restarts_total][worker: worker_id].increment
+end
+
+# This is called every time a worker process starts or restarts. It's not called in single mode (when workers == 0)
+# when there are no child worker processes.
+on_worker_boot do |worker_id|
+  # Starts a background thread that serves process metrics on a Unix domain socket under tmp/.
+  require_relative "../app/logical/application_metrics"
+  ApplicationMetrics.puma_worker_id = worker_id.to_s
+  ApplicationMetrics.reset_metrics # Don't inherit metrics from the master process
+  ApplicationMetrics.serve_process_metrics
+end
+
+# Initialize metrics in the master process when running in cluster mode (when workers > 0), or in the main process when
+# running in single mode (when workers == 0)
+require_relative "../app/logical/application_metrics"
+ApplicationMetrics.puma_worker_id = "master" if @options[:workers] > 0
+ApplicationMetrics.serve_process_metrics

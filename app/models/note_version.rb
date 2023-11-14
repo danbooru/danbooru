@@ -5,9 +5,8 @@ class NoteVersion < ApplicationRecord
   belongs_to :note
   belongs_to_updater :counter_cache => "note_update_count"
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :is_active, :x, :y, :width, :height, :body, :version, :updater, :note, :post)
-    q = q.text_attribute_matches(:body, params[:body_matches])
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :is_active, :x, :y, :width, :height, :body, :version, :updater, :note, :post], current_user: current_user)
 
     q.apply_default_order(params)
   end
@@ -15,11 +14,6 @@ class NoteVersion < ApplicationRecord
   def previous
     @previous ||= NoteVersion.where("note_id = ? and version < ?", note_id, version).order("updated_at desc").limit(1).to_a
     @previous.first
-  end
-
-  def subsequent
-    @subsequent ||= NoteVersion.where("note_id = ? and version > ?", note_id, version).order("updated_at asc").limit(1).to_a
-    @subsequent.first
   end
 
   def current

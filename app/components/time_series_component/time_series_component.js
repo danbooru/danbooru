@@ -1,0 +1,1 @@
+../../javascript/src/javascripts/time_series_component.js

@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 class Tag < ApplicationRecord
-  ABBREVIATION_REGEXP = /([a-z0-9])[a-z0-9']*($|[^a-z0-9']+)/
+  include Versionable
 
   # Tags that are permitted to have unbalanced parentheses, as a special exception to the normal rule that parentheses in tags must balanced.
   PERMITTED_UNBALANCED_TAGS = %w[:) :( ;) ;( >:) >:(]
+
+  attr_accessor :updater
 
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
@@ -14,16 +16,20 @@ class Tag < ApplicationRecord
   has_many :antecedent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "antecedent_name", :primary_key => "name"
   has_many :consequent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "consequent_name", :primary_key => "name"
   has_many :dtext_links, foreign_key: :link_target, primary_key: :name
+  has_many :reactions, as: :model, dependent: :destroy
   has_many :ai_tags
 
   validates :name, tag_name: true, uniqueness: true, on: :create
   validates :name, tag_name: true, on: :name
   validates :category, inclusion: { in: TagCategory.category_ids }
+  validate :validate_category, if: :category_changed?
 
   before_create :create_character_tag_for_cosplay_tag, if: :is_cosplay_tag?
-  before_save :create_mod_action
+  after_save :update_tag_alias_categories, if: :saved_change_to_category?
   after_save :update_category_cache, if: :saved_change_to_category?
   after_save :update_category_post_counts, if: :saved_change_to_category?
+
+  versionable :name, :category, :is_deprecated, merge_window: nil, delay_first_version: true
 
   scope :empty, -> { where("tags.post_count <= 0") }
   scope :nonempty, -> { where("tags.post_count > 0") }
@@ -139,7 +145,7 @@ class Tag < ApplicationRecord
       end
 
       def categories_for(tag_names)
-        Cache.get_multi(Array(tag_names), "tc") do |tag|
+        Cache.get_multi(Array(tag_names), "tag-category") do |tag|
           Tag.select_category_for(tag)
         end
       end
@@ -166,7 +172,22 @@ class Tag < ApplicationRecord
     end
 
     def update_category_cache
-      Cache.put("tc:#{Cache.hash(name)}", category, 3.hours)
+      Cache.put("tag-category:#{Cache.hash(name)}", category, 3.hours)
+    end
+
+    # When a tag's category is changed, also change the categories of any aliases pointing to it.
+    def update_tag_alias_categories
+      consequent_aliases.each do |tag_alias|
+        if tag_alias.antecedent_tag.category != category
+          tag_alias.antecedent_tag.update!(category: category, updater: updater)
+        end
+      end
+    end
+
+    def validate_category
+      if is_aliased? && category != aliased_tag.category
+        errors.add(:base, "Can't change the category of an aliased tag")
+      end
     end
   end
 
@@ -193,50 +214,21 @@ class Tag < ApplicationRecord
         names.map {|x| find_or_create_by_name(x).name}
       end
 
-      def find_or_create_by_name(name, creator: CurrentUser.user)
-        name = normalize_name(name)
-        category = nil
+      def find_or_create_by_name(name, category: nil, current_user: nil)
+        cat_id = categories.value_for(category)
+        tag = Tag.find_by(name: normalize_name(name))
 
-        if name =~ /\A(#{categories.regexp}):(.+)\Z/
-          category = $1
-          name = $2
+        if tag.nil?
+          tag = Tag.new(name: normalize_name(name), category: cat_id)
+          saved = tag.save_if_unique(:name)
+          tag = Tag.find_by!(name: normalize_name(name)) if !saved && tag.errors.of_kind?(:name, :taken)
         end
 
-        tag = find_by_name(name)
-
-        if tag
-          if category
-            category_id = categories.value_for(category)
-
-            # in case a category change hasn't propagated to this server yet,
-            # force an update the local cache. This may get overwritten in the
-            # next few lines if the category is changed.
-            tag.update_category_cache
-
-            if Pundit.policy!(creator, tag).can_change_category?
-              tag.update(category: category_id)
-            end
-          end
-
-          tag
-        else
-          Tag.new.tap do |t|
-            t.name = name
-            t.category = categories.value_for(category)
-            t.save
-          end
+        if category.present? && current_user.present? && cat_id != tag.category && Pundit.policy!(current_user, tag).can_change_category?
+          tag.update(category: cat_id, updater: current_user)
         end
-      end
-    end
-  end
 
-  concerning :DeprecationMethods do
-    def create_mod_action
-      return if CurrentUser.user == User.system
-      if is_deprecated_was == true and is_deprecated == false
-        ModAction.log("marked the tag [[#{name}]] as not deprecated", :tag_undeprecate)
-      elsif is_deprecated_was == false and is_deprecated == true
-        ModAction.log("marked the tag [[#{name}]] as deprecated", :tag_deprecate)
+        tag
       end
     end
   end
@@ -338,7 +330,19 @@ class Tag < ApplicationRecord
       abbrev = abbrev.downcase.delete_prefix("/")
       return none if abbrev !~ /\A[a-z0-9*]*\z/
 
-      where("regexp_replace(tags.name, ?, '\\1', 'g') LIKE ?", ABBREVIATION_REGEXP.source, abbrev.to_escaped_for_sql_like)
+      where_like("array_initials(words)", abbrev)
+    end
+
+    def named_or_aliased(names)
+      names = names.map { |name| Tag.normalize_name(name) }
+      names = TagAlias.to_aliased(names)
+      where(name: names)
+    end
+
+    def named_or_aliased_in_order(names)
+      names = names.map { |name| Tag.normalize_name(name) }
+      names = TagAlias.to_aliased(names)
+      where(name: names).to_a.in_order_of(:name, names)
     end
 
     def find_by_name_or_alias(name)
@@ -349,8 +353,8 @@ class Tag < ApplicationRecord
       abbreviation_matches(abbrev.escape_wildcards).order(post_count: :desc).first
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deprecated, :category, :post_count, :name, :wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deprecated, :category, :post_count, :name, :wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links], current_user: current_user)
 
       if params[:fuzzy_name_matches].present?
         q = q.fuzzy_name_matches(params[:fuzzy_name_matches])
@@ -393,39 +397,6 @@ class Tag < ApplicationRecord
 
       q
     end
-
-    def names_matches_with_aliases(name, limit)
-      name = normalize_name(name)
-      wildcard_name = "#{name}*"
-
-      query1 =
-        Tag
-        .nonempty
-        .select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
-        .name_matches(wildcard_name)
-        .order(post_count: :desc)
-        .limit(limit)
-
-      query2 =
-        TagAlias
-        .select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
-        .joins("INNER JOIN tags ON tags.name = tag_aliases.consequent_name")
-        .where_like(:antecedent_name, wildcard_name)
-        .active
-        .where_not_like("tags.name", wildcard_name)
-        .where("tags.post_count > 0")
-        .order("tags.post_count desc")
-        .limit(limit * 2) # Get extra records in case some duplicates get filtered out.
-
-      sql_query = "((#{query1.to_sql}) UNION ALL (#{query2.to_sql})) AS unioned_query"
-      tags = Tag.select("DISTINCT ON (name, post_count) *").from(sql_query).order("post_count desc").limit(limit)
-
-      if tags.empty?
-        tags = Tag.select("tags.name, tags.post_count, tags.category, null AS antecedent_name").fuzzy_name_matches(name).order_similarity(name).nonempty.limit(limit)
-      end
-
-      tags
-    end
   end
 
   def self.automatic_tags_for(names)
@@ -440,7 +411,7 @@ class Tag < ApplicationRecord
   concerning :CosplayTagMethods do
     def create_character_tag_for_cosplay_tag
       character_name = name.delete_suffix("_(cosplay)")
-      Tag.find_or_create_by_name("char:#{character_name}")
+      Tag.find_or_create_by_name(character_name, category: "character", current_user: CurrentUser.user)
     end
 
     def is_cosplay_tag?
@@ -461,7 +432,7 @@ class Tag < ApplicationRecord
   end
 
   def abbreviation
-    name.gsub(ABBREVIATION_REGEXP, "\\1")
+    words.map(&:first).join
   end
 
   def tag_alias_for_pattern(pattern)
@@ -485,12 +456,20 @@ class Tag < ApplicationRecord
     end
   end
 
+  def to_aliased_tag
+    is_aliased? ? aliased_tag : self
+  end
+
   def is_aliased?
     aliased_tag.present?
   end
 
   def metatag?
     name.match?(/\A#{PostQueryBuilder::METATAGS.join("|")}:/i)
+  end
+
+  def rating?
+    name.match?(/\Arating:[#{Post::RATINGS.keys.join}]\z/o)
   end
 
   def self.model_restriction(table)

@@ -5,7 +5,7 @@ module Sources
     context "A foundation post" do
       strategy_should_work(
         "https://foundation.app/@dadachyo/~/103724",
-        download_size: 13_908_349,
+        media_files: [{ file_size: 13_908_349 }],
         image_urls: ["https://f8n-ipfs-production.imgix.net/QmPhpz6E9TFRpvdVTviM8Hy9o9rxrnPW5Ywj471NnSNkpi/nft.jpg"],
         artist_commentary_title: "Rose tea",
         artist_name: "dadachyo",
@@ -19,7 +19,7 @@ module Sources
       strategy_should_work(
         "https://f8n-ipfs-production.imgix.net/QmPhpz6E9TFRpvdVTviM8Hy9o9rxrnPW5Ywj471NnSNkpi/nft.jpg",
         image_urls: ["https://f8n-ipfs-production.imgix.net/QmPhpz6E9TFRpvdVTviM8Hy9o9rxrnPW5Ywj471NnSNkpi/nft.jpg"],
-        download_size: 13_908_349
+        media_files: [{ file_size: 13_908_349 }]
       )
     end
 
@@ -29,7 +29,7 @@ module Sources
         artist_name: "patch_oxxo",
         profile_url: "https://foundation.app/@patch_oxxo",
         image_urls: ["https://f8n-ipfs-production.imgix.net/QmWQpt9opcue5F7Q2vTT5P5jPYo1xHhEs7RDxgXzWFHcfK/nft.gif"],
-        download_size: 52_352_138,
+        media_files: [{ file_size: 52_352_138 }],
         tags: %w[2d animation],
       )
     end
@@ -60,7 +60,7 @@ module Sources
       strategy_should_work(
         "https://foundation.app/@huwari/~/88982",
         image_urls: ["https://f8n-ipfs-production.imgix.net/QmU8bbsjaVQpEKMDWbSZdDD6GsPmRYBhQtYRn8bEGv7igs/nft.mp4"],
-        download_size: 13_391_766,
+        media_files: [{ file_size: 13_391_766 }],
         artist_name: "huwari",
         profile_url: "https://foundation.app/@huwari",
         profile_urls: ["https://foundation.app/@huwari", "https://foundation.app/0xaa2f2eDE4D502F59b3706d2E2dA873C8A00A3d4d"],

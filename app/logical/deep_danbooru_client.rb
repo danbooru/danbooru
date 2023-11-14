@@ -3,7 +3,7 @@
 class DeepDanbooruClient
   attr_reader :http
 
-  def initialize(http: Danbooru::Http.new)
+  def initialize(http: Danbooru::Http.internal)
     @http = http
   end
 

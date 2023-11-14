@@ -1,4 +1,4 @@
-body[data-current-user-style-usernames="true"] {
+body {
   a.user-owner {
     color: var(--user-admin-color);
   }
@@ -9,6 +9,14 @@ body[data-current-user-style-usernames="true"] {
 
   a.user-moderator {
     color: var(--user-moderator-color);
+  }
+
+  a.user-approver {
+    color: var(--user-builder-color);
+  }
+
+  a.user-contributor {
+    color: var(--user-builder-color);
   }
 
   a.user-builder {

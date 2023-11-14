@@ -33,7 +33,7 @@ class UserFeedbacksController < ApplicationController
 
   def update
     @user_feedback = authorize UserFeedback.find(params[:id])
-    @user_feedback.update(permitted_attributes(@user_feedback))
+    @user_feedback.update(updater: CurrentUser.user, **permitted_attributes(@user_feedback))
     respond_with(@user_feedback)
   end
 end

@@ -18,11 +18,11 @@
       <% t.column "Post", width: "1%" do |commentary| %>
         <%= post_preview(commentary.post, show_deleted: true) %>
       <% end %>
-      <% t.column "Original" do |commentary| %>
+      <% t.column "Original", td: { class: "break-words" }, width: "50%" do |commentary| %>
           <%= format_commentary_title(commentary.original_title) %>
           <%= format_commentary_description(commentary.original_description) %>
       <% end %>
-      <% t.column "Translated" do |commentary| %>
+      <% t.column "Translated", td: { class: "break-words" }, width: "50%" do |commentary| %>
         <%= format_commentary_title(commentary.translated_title) %>
         <%= format_commentary_description(commentary.translated_description) %>
       <% end %>

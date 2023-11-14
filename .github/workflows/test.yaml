@@ -1,4 +1,12 @@
 # Run the test suite after the Docker image is successfully built.
+#
+# Test locally:
+#
+#     # https://github.com/settings/tokens
+#     # https://github.com/nektos/act
+#     GITHUB_TOKEN="..."
+#     echo $GITHUB_TOKEN | docker login ghcr.io -u evazion --password-stdin
+#    ./act -s GITHUB_TOKEN=$GITHUB_TOKEN -j test -v --artifact-server-path tmp/artifacts
 
 name: Test
 
@@ -18,6 +26,10 @@ on:
         required: false
         default: false
 
+defaults:
+ run:
+   working-directory: /danbooru
+
 jobs:
   test:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -32,6 +44,7 @@ jobs:
       options: --user root
 
     env:
+      HOME: /root
       RAILS_ENV: test
       PARALLEL_WORKERS: 8 # number of parallel tests to run
       RUBYOPT: -W0 # silence ruby warnings
@@ -42,8 +55,6 @@ jobs:
       DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
       DANBOORU_SECRET_KEY_BASE: 1234
       DANBOORU_AWS_SQS_ENABLED: false
-      DANBOORU_TWITTER_API_KEY: ${{ secrets.DANBOORU_TWITTER_API_KEY }}
-      DANBOORU_TWITTER_API_SECRET: ${{ secrets.DANBOORU_TWITTER_API_SECRET }}
       DANBOORU_PIXIV_PHPSESSID: ${{ secrets.DANBOORU_PIXIV_PHPSESSID }}
       DANBOORU_NIJIE_LOGIN: ${{ secrets.DANBOORU_NIJIE_LOGIN }}
       DANBOORU_NIJIE_PASSWORD: ${{ secrets.DANBOORU_NIJIE_PASSWORD }}
@@ -51,10 +62,8 @@ jobs:
       DANBOORU_TUMBLR_CONSUMER_KEY: ${{ secrets.DANBOORU_TUMBLR_CONSUMER_KEY }}
       DANBOORU_DEVIANTART_CLIENT_ID: ${{ secrets.DANBOORU_DEVIANTART_CLIENT_ID }}
       DANBOORU_DEVIANTART_CLIENT_SECRET: ${{ secrets.DANBOORU_DEVIANTART_CLIENT_SECRET }}
-      DANBOORU_PAWOO_CLIENT_ID: ${{ secrets.DANBOORU_PAWOO_CLIENT_ID }}
-      DANBOORU_PAWOO_CLIENT_SECRET: ${{ secrets.DANBOORU_PAWOO_CLIENT_SECRET }}
-      DANBOORU_BARAAG_CLIENT_ID: ${{ secrets.DANBOORU_BARAAG_CLIENT_ID }}
-      DANBOORU_BARAAG_CLIENT_SECRET: ${{ secrets.DANBOORU_BARAAG_CLIENT_SECRET }}
+      DANBOORU_PAWOO_ACCESS_TOKEN: ${{ secrets.DANBOORU_PAWOO_ACCESS_TOKEN }}
+      DANBOORU_BARAAG_ACCESS_TOKEN: ${{ secrets.DANBOORU_BARAAG_ACCESS_TOKEN }}
       DANBOORU_FANTIA_SESSION_ID: ${{ secrets.DANBOORU_FANTIA_SESSION_ID }}
       DANBOORU_FURAFFINITY_COOKIE_A: ${{ secrets.DANBOORU_FURAFFINITY_COOKIE_A }}
       DANBOORU_FURAFFINITY_COOKIE_B: ${{ secrets.DANBOORU_FURAFFINITY_COOKIE_B }}
@@ -95,13 +104,22 @@ jobs:
 
     - name: Prepare database
       run: |
-        export HOME=/root
-        cd /danbooru
         bin/rails db:test:prepare
 
     - name: Run tests
       run: |
-        export HOME=/root
-        cd /danbooru
-        ln -s packs public/packs-test
         bin/rails test
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: |
+          /tmp/html-test-results/index.html
+          /tmp/junit-test-results/TEST-*.xml
+
+    - name: Publish test results
+      if: always()
+      run: |
+        bin/github-print-test-results /tmp/junit-test-results/TEST-*.xml

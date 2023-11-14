@@ -1,13 +1,7 @@
-<div id="related-tags-container" class="visible" data-media-asset-id="<%= media_asset.id %>">
-  <h3>
-    Related Tags
-    <a href="#" id="show-related-tags-link">»</a>
-    <a href="#" id="hide-related-tags-link">«</a>
-  </h3>
-
-  <div class="related-tags w-full mb-4 p-4 space-y-4 md:space-y-0 md:flex md:space-x-4">
-    <%= render "related_tags/user_tags", related_tags: nil %>
-    <%= render "related_tags/current_tags", related_tags: nil %>
-    <%= render "related_tags/source_tags", source: nil %>
-  </div>
+<div id="related-tags-container" class="related-tags fixed-width-container flex flex-col gap-2" data-media-asset-id="<%= media_asset.id %>">
+  <%= render "related_tags/related_tags", related_tags: nil, collapsed: true %>
+  <%= render "related_tags/translated_tags", source: nil %>
+  <%= render "related_tags/ai_tags", related_tags: nil %>
+  <%= render "related_tags/frequent_tags", related_tags: nil %>
+  <%= render "related_tags/recent_tags", related_tags: nil %>
 </div>

@@ -5,12 +5,12 @@ class UploadsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:create], if: -> { request.xhr? }
 
   def new
-    @upload = authorize Upload.new(uploader: CurrentUser.user, uploader_ip_addr: CurrentUser.ip_addr, source: params[:url], referer_url: params[:ref], **permitted_attributes(Upload))
+    @upload = authorize Upload.new(uploader: CurrentUser.user, source: params[:url], referer_url: params[:ref], **permitted_attributes(Upload))
     respond_with(@upload)
   end
 
   def create
-    @upload = authorize Upload.new(uploader: CurrentUser.user, uploader_ip_addr: CurrentUser.ip_addr, **permitted_attributes(Upload))
+    @upload = authorize Upload.new(uploader: CurrentUser.user, **permitted_attributes(Upload))
     @upload.save
     respond_with(@upload)
   end
@@ -39,6 +39,10 @@ class UploadsController < ApplicationController
       redirect_to @upload.media_assets.first.post
     elsif request.format.html? && @upload.media_asset_count > 1
       redirect_to [@upload, UploadMediaAsset]
+    elsif @upload.media_asset_count == 1
+      @upload_media_asset = @upload.upload_media_assets.first
+      @post = Post.new_from_upload(@upload_media_asset, add_artist_tag: true, source: @upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys)
+      respond_with(@upload, include: { upload_media_assets: { include: :media_asset }})
     else
       respond_with(@upload, include: { upload_media_assets: { include: :media_asset }})
     end

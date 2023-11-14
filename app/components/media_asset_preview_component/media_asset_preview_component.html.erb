@@ -17,16 +17,20 @@
         <% end %>
 
         <picture>
-          <% unless save_data %>
-            <% case size %>
-            <% when 150, 180 %>
-              <%= tag.source type: "image/jpeg", srcset: "#{media_asset.variant("180x180").file_url} 1x, #{media_asset.variant("360x360").file_url} 2x" %>
-            <% when 225, 270, 360 %>
-              <%= tag.source type: "image/webp", srcset: "#{media_asset.variant("360x360").file_url} 1x, #{media_asset.variant("720x720").file_url} 2x" %>
+          <% if media_asset.is_flash? %>
+            <%= tag.img src: "images/flash-preview.png", class: "media-asset-preview-image w-auto h-auto max-h-#{size}px max-w-full", draggable: "false" -%>
+          <% else %>
+            <% unless save_data %>
+              <% case size %>
+              <% when 150, 180 %>
+                <%= tag.source type: "image/jpeg", srcset: "#{media_asset.variant("180x180").file_url} 1x, #{media_asset.variant("360x360").file_url} 2x" %>
+              <% when 225, 270, 360 %>
+                <%= tag.source type: "image/webp", srcset: "#{media_asset.variant("360x360").file_url} 1x, #{media_asset.variant("720x720").file_url} 2x" %>
+              <% end %>
             <% end %>
-          <% end %>
 
-          <%= tag.img src: variant.file_url, width: variant.width, height: variant.height, class: "media-asset-preview-image w-auto h-auto max-h-#{size}px max-w-full", crossorigin: "anonymous", draggable: "false" -%>
+            <%= tag.img src: variant.file_url, width: variant.width, height: variant.height, class: "media-asset-preview-image w-auto h-auto max-h-#{size}px max-w-full", draggable: "false" -%>
+          <% end %>
         </picture>
       <% else %>
         <div class="media-asset-placeholder rounded border border-solid flex items-center justify-center w-<%= size %>px h-<%= size %>px">

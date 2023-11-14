@@ -9,25 +9,29 @@
 # zip file, so it must be passed around separately.
 class MediaFile::Ugoira < MediaFile
   class Error < StandardError; end
-  attr_accessor :frame_data
+  attr_accessor :frame_delays
 
-  def initialize(file, frame_data: {}, **options)
+  def initialize(file, frame_delays: [], **options)
     super(file, **options)
-    @frame_data = frame_data
+    @frame_delays = frame_delays
   end
 
   def close
-    file.close
-    zipfile.close
-    preview_frame.close
+    super
+    @preview_frame&.close
+    # XXX should clean up `convert` too
+  end
+
+  def metadata
+    super.merge("Ugoira:FrameDelays" => frame_delays)
   end
 
   def dimensions
     preview_frame.dimensions
   end
 
-  def preview(width, height, **options)
-    preview_frame.preview(width, height, **options)
+  def preview!(width, height, **options)
+    preview_frame.preview!(width, height, **options)
   end
 
   def duration
@@ -35,60 +39,46 @@ class MediaFile::Ugoira < MediaFile
   end
 
   def frame_count
-    frame_data.count
+    frame_delays.count
   end
 
   def frame_rate
     frame_count / duration
   end
 
-  def frame_delays
-    frame_data.map { |frame| frame["delay"] }
-  end
-
   # Convert a ugoira to a webm.
   # XXX should take width and height and resize image
   def convert
     raise NotImplementedError, "can't convert ugoira to webm: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?
-    raise RuntimeError, "can't convert ugoira to webm: no ugoira frame data was provided" unless frame_data.present?
+    raise RuntimeError, "can't convert ugoira to webm: no ugoira frame data was provided" unless frame_delays.present?
 
-    Dir.mktmpdir("ugoira-#{md5}") do |tmpdir|
-      output_file = Tempfile.new(["ugoira-conversion", ".webm"], binmode: true)
-
-      FileUtils.mkdir_p("#{tmpdir}/images")
-
-      zipfile.each do |entry|
-        path = File.join(tmpdir, "images", entry.name)
-        entry.extract(path)
-      end
+    Danbooru::Archive.extract!(file) do |tmpdir, filenames|
+      output_file = Danbooru::Tempfile.new(["danbooru-ugoira-conversion-#{md5}-", ".webm"], binmode: true)
 
       # Duplicate last frame to avoid it being displayed only for a very short amount of time.
-      last_file_name = zipfile.entries.last.name
-      last_file_name =~ /\A(\d{6})(\.\w{,4})\Z/
-      new_last_index = $1.to_i + 1
-      file_ext = $2
-      new_last_filename = ("%06d" % new_last_index) + file_ext
-      path_from = File.join(tmpdir, "images", last_file_name)
-      path_to = File.join(tmpdir, "images", new_last_filename)
+      last_file_name = File.basename(filenames.last)
+      last_index, file_ext = last_file_name.split(".")
+      new_last_filename = "#{"%06d" % (last_index.to_i + 1)}.#{file_ext}"
+      path_from = File.join(tmpdir, last_file_name)
+      path_to = File.join(tmpdir, new_last_filename)
       FileUtils.cp(path_from, path_to)
 
       delay_sum = 0
       timecodes_path = File.join(tmpdir, "timecodes.tc")
       File.open(timecodes_path, "w+") do |f|
         f.write("# timecode format v2\n")
-        frame_data.each do |img|
+        frame_delays.each do |delay|
           f.write("#{delay_sum}\n")
-          delay_sum += (img["delay"] || img["delay_msec"])
+          delay_sum += delay
         end
         f.write("#{delay_sum}\n")
         f.write("#{delay_sum}\n")
       end
 
-      ext = zipfile.first.name.match(/\.(\w{,4})$/)[1]
-      ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir}/images/%06d.#{ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 1 -passlogfile #{tmpdir}/ffmpeg2pass -f null /dev/null")
+      ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir}/%06d.#{file_ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 1 -passlogfile #{tmpdir}/ffmpeg2pass -f null /dev/null")
       raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
-      ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir}/images/%06d.#{ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 2 -passlogfile #{tmpdir}/ffmpeg2pass #{tmpdir}/tmp.webm")
+      ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir}/%06d.#{file_ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 2 -passlogfile #{tmpdir}/ffmpeg2pass #{tmpdir}/tmp.webm")
       raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
       mkvmerge_out, status = Open3.capture2e("mkvmerge -o #{output_file.path} --webm --timecodes 0:#{tmpdir}/timecodes.tc #{tmpdir}/tmp.webm")
@@ -100,13 +90,9 @@ class MediaFile::Ugoira < MediaFile
 
   private
 
-  def zipfile
-    Zip::File.new(file.path)
-  end
-
   def preview_frame
-    FFmpeg.new(convert).smart_video_preview
+    @preview_frame ||= FFmpeg.new(convert).smart_video_preview!
   end
 
-  memoize :zipfile, :preview_frame, :dimensions, :convert
+  memoize :dimensions, :convert, :metadata
 end

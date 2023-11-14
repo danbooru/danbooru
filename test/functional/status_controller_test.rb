@@ -16,5 +16,22 @@ class StatusControllerTest < ActionDispatch::IntegrationTest
       get status_path(format: :json)
       assert_response :success
     end
+
+    should "work for a header containing UTF-8 characters" do
+      get status_path, headers: { "User-Agent": "Portimão".force_encoding("ASCII-8BIT") }
+      assert_response :success
+    end
+
+    should "work for a header containing invalid UTF-8 characters" do
+      get status_path, headers: { "User-Agent": "Portim\xE3o".force_encoding("ASCII-8BIT") }
+      assert_response :success
+    end
+
+    should "work when the database is down" do
+      without_database do
+        get status_path
+        assert_response :success
+      end
+    end
   end
 end

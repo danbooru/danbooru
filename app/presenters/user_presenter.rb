@@ -15,26 +15,12 @@ class UserPresenter
     user.created_at.strftime("%Y-%m-%d")
   end
 
-  def permissions
-    permissions = []
-
-    if user.can_approve_posts?
-      permissions << "approve posts"
-    end
-
-    if user.can_upload_free?
-      permissions << "unrestricted uploads"
-    end
-
-    permissions.join(", ")
-  end
-
   def posts_for_saved_search_category(category)
-    Post.user_tag_match("search:#{category}").limit(10)
+    PostQuery.new("search:#{category}", current_user: CurrentUser.user).posts_with_timeout(10)
   end
 
   def uploads
-    Post.user_tag_match("user:#{user.name}").limit(6)
+    PostQuery.new("user:#{user.name}", current_user: CurrentUser.user).posts_with_timeout(6, count: user.post_upload_count, includes: [:vote_by_current_user])
   end
 
   def has_uploads?
@@ -42,7 +28,7 @@ class UserPresenter
   end
 
   def favorites
-    Post.user_tag_match("ordfav:#{user.name}").limit(6)
+    PostQuery.new("ordfav:#{user.name}", current_user: CurrentUser.user).posts_with_timeout(6, count: user.favorite_count, includes: [:vote_by_current_user])
   end
 
   def has_favorites?

@@ -8,7 +8,7 @@ class Favorite < ApplicationRecord
   after_create :upvote_post_on_create
   after_destroy :unvote_post_on_destroy
 
-  scope :public_favorites, -> { where(user: User.has_public_favorites) }
+  scope :public_favorites, -> { where.not(user: User.has_private_favorites) }
 
   def self.visible(user)
     if user.is_admin?
@@ -20,8 +20,8 @@ class Favorite < ApplicationRecord
     end
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :post, :user)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :post, :user], current_user: current_user)
     q.apply_default_order(params)
   end
 

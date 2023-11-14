@@ -1,60 +1,61 @@
 <% content_for(:sidebar) do %>
   <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags], :tags_dom_id => "tags" %>
 
-  <% if policy(Post).can_use_mode_menu? %>
-    <section id="mode-box">
-      <h2>Mode</h2>
-      <form action="/">
-        <select name="mode">
-          <option value="view">View</option>
-          <option value="edit">Edit</option>
-          <option value="tag-script">Tag script</option>
-          <option value="add-fav">Favorite</option>
-          <option value="remove-fav">Unfavorite</option>
-        </select>
-      </form>
-      <input id="tag-script-field" data-autocomplete="tag-edit" placeholder="Enter tag script" style="display: none; margin-top: 0.5em; width: 100%;">
+  <% unless @post_set.artist.present? && @post_set.artist.is_banned? && !CurrentUser.user.is_approver? %>
+    <% if policy(Post).can_use_mode_menu? %>
+      <section id="mode-box">
+        <h2>Mode</h2>
+        <form action="/">
+          <select name="mode">
+            <option value="view">View</option>
+            <option value="edit">Edit</option>
+            <option value="tag-script">Tag script</option>
+            <option value="add-fav">Favorite</option>
+            <option value="remove-fav">Unfavorite</option>
+          </select>
+        </form>
+        <input id="tag-script-field" data-autocomplete="tag-edit" placeholder="Enter tag script" style="display: none; margin-top: 0.5em; width: 100%;">
+      </section>
+    <% end %>
+
+    <%= render "posts/partials/index/blacklist" %>
+
+    <section id="tag-box">
+      <h2>Tags</h2>
+      <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?, search_params: { show_votes: params[:show_votes], size: params[:size] }) %>
+    </section>
+
+    <section id="options-box">
+      <h2>Options</h2>
+      <ul>
+        <% if policy(SavedSearch).create? %>
+          <li><%= button_tag(bookmark_icon + " Save search", id: "save-search", class: "ui-button ui-widget ui-corner-all sub") %></li>
+        <% end %>
+      </ul>
+    </section>
+
+    <section id="related-box">
+      <h2>Related</h2>
+      <ul id="related-list">
+        <% if discover_mode? %>
+          <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
+          <li id="secondary-links-posts-popular"><%= link_to "Popular", popular_explore_posts_path %></li>
+          <li><%= link_to "Searches", searches_explore_posts_path %></li>
+          <li><%= link_to "Viewed", viewed_explore_posts_path %></li>
+        <% end %>
+
+        <li><%= link_to "Deleted", posts_path(tags: "#{params[:tags]} status:deleted"), rel: "nofollow" %></li>
+        <li><%= link_to "Random", random_posts_path(tags: params[:tags]), id: "random-post", "data-shortcut": "r", rel: "nofollow" %></li>
+        <% if @post_set.post_query.has_single_tag? %>
+          <li><%= link_to "History", post_versions_path(search: { changed_tags: @post_set.post_query.tag_name }), rel: "nofollow" %></li>
+          <% if Danbooru.config.forum_enabled?.to_s.truthy? %>
+            <li><%= link_to "Discussions", forum_posts_path(search: { linked_to: @post_set.post_query.tag_name }), rel: "nofollow" %></li>
+          <% end %>
+        <% end %>
+        <li><%= link_to "Count", posts_counts_path(tags: params[:tags]), rel: "nofollow" %></li>
+      </ul>
     </section>
   <% end %>
-
-  <%= render "posts/partials/index/blacklist" %>
-
-  <section id="tag-box">
-    <h2>Tags</h2>
-    <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?, search_params: { show_votes: params[:show_votes], size: params[:size] }) %>
-  </section>
-
-  <section id="options-box">
-    <h2>Options</h2>
-    <ul>
-      <% if policy(SavedSearch).create? %>
-        <li><%= button_tag(bookmark_icon + " Save search", id: "save-search", class: "ui-button ui-widget ui-corner-all sub") %></li>
-      <% end %>
-    </ul>
-  </section>
-
-  <section id="related-box">
-    <h2>Related</h2>
-    <ul id="related-list">
-      <% if discover_mode? %>
-        <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
-        <li id="secondary-links-posts-popular"><%= link_to "Popular", popular_explore_posts_path %></li>
-        <li id="secondary-links-posts-curated"><%= link_to "Curated", curated_explore_posts_path %></li>
-        <li><%= link_to "Searches", searches_explore_posts_path %></li>
-        <li><%= link_to "Viewed", viewed_explore_posts_path %></li>
-      <% end %>
-
-      <li><%= link_to "Deleted", posts_path(tags: "#{params[:tags]} status:deleted"), rel: "nofollow" %></li>
-      <li><%= link_to "Random", random_posts_path(tags: params[:tags]), id: "random-post", "data-shortcut": "r", rel: "nofollow" %></li>
-      <% if @post_set.post_query.has_single_tag? %>
-        <li><%= link_to "History", post_versions_path(search: { changed_tags: @post_set.post_query.tag_name }), rel: "nofollow" %></li>
-        <% if Danbooru.config.forum_enabled?.to_s.truthy? %>
-          <li><%= link_to "Discussions", forum_posts_path(search: { linked_to: @post_set.post_query.tag_name }), rel: "nofollow" %></li>
-        <% end %>
-      <% end %>
-      <li><%= link_to "Count", posts_counts_path(tags: params[:tags]), rel: "nofollow" %></li>
-    </ul>
-  </section>
 <% end %>
 
 <% content_for(:content) do %>
@@ -62,7 +63,9 @@
     <li class="flex-grow-1 space-x-2">
       <a href="#" id="show-posts-link" class="active">Posts</a>
 
-      <% if @post_set.artist.present? %>
+      <% if @post_set.artist.present? && @post_set.artist.is_banned? && !CurrentUser.user.is_approver? %>
+        <%# no-op %>
+      <% elsif @post_set.artist.present? %>
         <%= link_to "Artist", artist_path(@post_set.artist), id: "show-excerpt-link", class: "artist-excerpt-link" %>
       <% elsif @post_set.tag&.artist? %>
         <%= link_to "Artist", new_artist_path(artist: { name: @post_set.tag.name }), id: "show-excerpt-link", class: "artist-excerpt-link", rel: "nofollow" %>
@@ -83,7 +86,7 @@
       <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
 
       <%= render PopupMenuComponent.new(classes: "post-preview-options-menu") do |menu| %>
-        <% menu.item do %>
+        <% menu.with_item do %>
           <% if @post_set.show_votes %>
             <%= link_to "Hide scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: nil, size: params[:size]), class: "post-preview-hide-votes", rel: "nofollow" %>
           <% else %>
@@ -105,8 +108,8 @@
   </div>
 
   <div id="excerpt" style="display: none;">
-    <% if @post_set.artist.present? && @post_set.artist.is_banned? && !policy(@post_set.artist).can_view_banned? %>
-      <p>The artist requested removal of this page.</p>
+    <% if @post_set.artist.present? && @post_set.artist.is_banned? && !CurrentUser.user.is_approver? %>
+      <p>This page has been removed because of a takedown request.</p>
     <% elsif @post_set.artist.present? %>
       <%= render "artists/summary", artist: @post_set.artist %>
     <% elsif @post_set.tag&.artist? %>
@@ -117,7 +120,7 @@
       <% @post_set.wiki_page.tap do |wiki_page| %>
         <div class="prose">
           <% if wiki_page.other_names.present? %>
-            <p><%= wiki_page_other_names_list(wiki_page) %></p>
+            <%= wiki_page_other_names_list(wiki_page) %>
           <% end %>
 
           <%= format_text(wiki_page.body) %>
@@ -169,11 +172,11 @@
 
   <div id="posts">
     <%= render_post_gallery(@post_set.posts, show_deleted: @post_set.show_deleted?, tags: @post_set.tag_string, show_votes: @post_set.show_votes?, size: @preview_size) do |gallery, posts| %>
-      <% gallery.footer do %>
+      <% gallery.with_footer do %>
         <% if @post_set.hidden_posts.present? %>
           <div class="fineprint hidden-posts-notice">
-            <% if @post_set.banned_posts.present? %>
-              <%= @post_set.banned_posts.size %> post(s) were removed from this page at the artist's request (<%= link_to_wiki "learn more", "banned_artist" %>).<br>
+            <% if @post_set.banned_posts.size == @post_set.posts.size %>
+              This page has been removed because of a takedown request.<br>
             <% end %>
 
             <% if @post_set.censored_posts.present? %>
@@ -181,7 +184,7 @@
             <% end %>
 
             <% if @post_set.safe_posts.present? %>
-              <%= @post_set.safe_posts.size %> post(s) on this page were hidden by safe mode. Go to <%= link_to "Danbooru", "https://danbooru.donmai.us" %> or disable safe mode to view them (<%= link_to_wiki "learn more", "help:user_settings" %>).<br>
+              <%= @post_set.safe_posts.size %> post(s) on this page were hidden by safe mode. Disable safe mode to view them (<%= link_to_wiki "learn more", "help:user_settings" %>).<br>
             <% end %>
           </div>
         <% end %>
@@ -233,23 +236,23 @@
     <% page_title(@post_set.page_title) %>
     <% meta_description @post_set.meta_description %>
     <% atom_feed_tag "Posts: #{@post_set.page_title}", posts_url(tags: @post_set.tag_string, format: :atom) %>
+
+    <% if @post_set.best_post.present? %>
+      <%= render OpenGraphComponent.new(media_asset: @post_set.best_post.media_asset, current_user: CurrentUser.user) %>
+    <% end %>
   <% end %>
 
   <% if params[:tags].blank? && @post_set.current_page == 1 %>
     <% canonical_url root_url(host: Danbooru.config.hostname) %>
+  <% elsif @post_set.current_page == 1 %>
+    <% canonical_url posts_url(host: Danbooru.config.hostname, tags: @post_set.post_query.search, limit: params[:limit]) %>
   <% else %>
-    <% canonical_url posts_url(host: Danbooru.config.hostname, tags: params[:tags], page: params[:page], limit: params[:limit]) %>
+    <% canonical_url posts_url(host: Danbooru.config.hostname, tags: @post_set.post_query.search.presence, page: params[:page], limit: params[:limit]) %>
   <% end %>
 
   <% noindex if @post_set.hide_from_crawler? %>
 
   <% if @post_set.has_explicit? %>
     <meta name="rating" content="adult">
-  <% end %>
-
-  <% if @post_set.best_post.present? %>
-    <%= tag.meta property: "og:image", content: @post_set.best_post.open_graph_image_url %>
-    <%= tag.meta name: "twitter:image", content: @post_set.best_post.open_graph_image_url %>
-    <%= tag.meta name: "twitter:card", content: "summary_large_image" %>
   <% end %>
 <% end %>

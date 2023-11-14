@@ -17,7 +17,7 @@ class PostPrunerTest < ActiveSupport::TestCase
 
     context "for a flagged post" do
       should "prune expired flags" do
-        @post = create(:post, created_at: 4.weeks.ago, is_flagged: true)
+        @post = create(:post, created_at: 4.weeks.ago)
         @flag = create(:post_flag, post: @post, created_at: 5.days.ago)
         PostPruner.prune!
 
@@ -31,7 +31,7 @@ class PostPrunerTest < ActiveSupport::TestCase
       end
 
       should "not prune unexpired flags" do
-        @post = create(:post, created_at: 4.weeks.ago, is_flagged: true)
+        @post = create(:post, created_at: 4.weeks.ago)
         @flag = create(:post_flag, post: @post, created_at: 1.day.ago)
         PostPruner.prune!
 
@@ -44,10 +44,12 @@ class PostPrunerTest < ActiveSupport::TestCase
       end
 
       should "leave the status of old flags unchanged" do
-        @post = create(:post, created_at: 4.weeks.ago, is_flagged: true)
+        @post = create(:post, created_at: 4.weeks.ago)
         @flag1 = create(:post_flag, post: @post, created_at: 3.weeks.ago, status: :succeeded)
         @flag2 = create(:post_flag, post: @post, created_at: 2.weeks.ago, status: :rejected)
         @flag3 = create(:post_flag, post: @post, created_at: 1.weeks.ago, status: :pending)
+
+        assert_equal(true, @post.is_flagged?)
         PostPruner.prune!
 
         assert_equal(true, @post.reload.is_deleted?)

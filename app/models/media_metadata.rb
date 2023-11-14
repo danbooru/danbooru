@@ -16,8 +16,8 @@ class MediaMetadata < ApplicationRecord
   attribute :metadata
   belongs_to :media_asset
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :media_asset, :metadata)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :media_asset, :metadata], current_user: current_user)
     q.apply_default_order(params)
   end
 
@@ -27,5 +27,13 @@ class MediaMetadata < ApplicationRecord
 
   def metadata
     ExifTool::Metadata.new(self[:metadata])
+  end
+
+  def frame_delays
+    metadata["Ugoira:FrameDelays"].to_a
+  end
+
+  def self.available_includes
+    [:media_asset]
   end
 end

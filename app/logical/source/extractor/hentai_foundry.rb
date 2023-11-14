@@ -26,20 +26,17 @@ module Source
         end
       end
 
-      def page
+      memoize def page
         return nil if page_url.blank?
 
-        response = http.cache(1.minute).get("#{page_url}?enterAgree=1")
-        return nil unless response.status == 200
-
-        response.parse
+        http.cache(1.minute).parsed_get("#{page_url}?enterAgree=1")
       end
 
       def tags
         tags = page&.search(".boxbody [rel='tag']").to_a.map(&:text)
 
         tags.map do |tag|
-          [tag, "https://www.hentai-foundry.com/pictures/tagged/#{CGI.escape(tag)}"]
+          [tag, "https://www.hentai-foundry.com/pictures/tagged/#{Danbooru::URL.escape(tag)}"]
         end
       end
 
@@ -67,8 +64,6 @@ module Source
       def illust_id
         parsed_url.work_id || parsed_referer&.work_id
       end
-
-      memoize :page
     end
   end
 end

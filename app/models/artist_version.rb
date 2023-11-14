@@ -16,10 +16,8 @@ class ArtistVersion < ApplicationRecord
   end
 
   module SearchMethods
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :urls, :other_names, :updater, :artist)
-      q = q.text_attribute_matches(:name, params[:name_matches])
-      q = q.text_attribute_matches(:group_name, params[:group_name_matches])
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :urls, :other_names, :updater, :artist], current_user: current_user)
 
       if params[:order] == "name"
         q = q.order("artist_versions.name").default_order
@@ -36,11 +34,6 @@ class ArtistVersion < ApplicationRecord
   def previous
     @previous ||= ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").limit(1).to_a
     @previous.first
-  end
-
-  def subsequent
-    @subsequent ||= ArtistVersion.where("artist_id = ? and created_at > ?", artist_id, created_at).order("created_at asc").limit(1).to_a
-    @subsequent.first
   end
 
   def current

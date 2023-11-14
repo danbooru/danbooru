@@ -9,7 +9,7 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
       end
       as(@user) do
         @post = create(:post)
-        @pool = create(:pool, name: "pool", description: "[[touhou]]")
+        @pool = create(:pool, name: "Beautiful Smile", description: "[[touhou]]")
       end
     end
 
@@ -25,7 +25,12 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(Pool.count, response.parsed_body.css("urlset url loc").size)
       end
 
-      should respond_to_search(name_matches: "pool").with { @pool }
+      should respond_to_search(name_contains: "eautiful").with { @pool }
+      should respond_to_search(name_contains: "beautiful smile").with { @pool }
+      should respond_to_search(name_contains: "smiling beauty").with { [] }
+      should respond_to_search(name_matches: "eautiful").with { [] }
+      should respond_to_search(name_matches: "beautiful smile").with { @pool }
+      should respond_to_search(name_matches: "smiling beauty").with { @pool }
       should respond_to_search(linked_to: "touhou").with { @pool }
       should respond_to_search(not_linked_to: "touhou").with { [] }
     end

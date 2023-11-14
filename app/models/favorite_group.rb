@@ -4,12 +4,10 @@ class FavoriteGroup < ApplicationRecord
   belongs_to :creator, class_name: "User"
 
   before_validation :normalize_name
-  before_validation :strip_name
 
-  validates :name, presence: true
+  validates :name, visible_string: true
   validates :name, uniqueness: { case_sensitive: false, scope: :creator_id }
-  validates :name, format: { without: /,/, message: "cannot have commas" }
-  validates :name, exclusion: { in: %w[any none], message: "can't be '%{value}'" }
+  validate :validate_name, if: :name_changed?
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
   validate :validate_posts
@@ -17,26 +15,35 @@ class FavoriteGroup < ApplicationRecord
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
 
+  scope :is_public, -> { where(is_public: true) }
+  scope :is_private, -> { where(is_public: false) }
+
   module SearchMethods
     def for_post(post_id)
       where_array_includes_any(:post_ids, [post_id])
     end
 
-    def name_matches(name)
+    def name_contains(name)
       name = normalize_name(name)
       name = "*#{name}*" unless name =~ /\*/
       where_ilike(:name, name)
     end
 
     def visible(user)
-      where(is_public: true).or(where(creator_id: user.id))
+      if user.is_owner?
+        all
+      elsif user.is_anonymous?
+        is_public
+      else
+        is_public.or(where(creator: user))
+      end
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :name, :is_public, :post_ids, :creator)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :name, :is_public, :post_ids, :creator], current_user: current_user)
 
-      if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches])
+      if params[:name_contains].present?
+        q = q.name_contains(params[:name_contains])
       end
 
       case params[:order]
@@ -95,8 +102,31 @@ class FavoriteGroup < ApplicationRecord
     end
   end
 
+  def validate_name
+    case name
+    when /\A(any|none)\z/i
+      errors.add(:name, "cannot be '#{name}'")
+    when /,/
+      errors.add(:name, "cannot contain commas")
+    when /\*/
+      errors.add(:name, "cannot contain asterisks")
+    when /\A_/
+      errors.add(:name, "cannot begin with an underscore")
+    when /_\z/
+      errors.add(:name, "cannot end with an underscore")
+    when /__/
+      errors.add(:name, "cannot contain consecutive underscores")
+    when /[^[:graph:]]/
+      errors.add(:name, "cannot contain non-printable characters")
+    when ""
+      errors.add(:name, "cannot be blank")
+    when /\A[0-9]+\z/
+      errors.add(:name, "cannot contain only digits")
+    end
+  end
+
   def self.normalize_name(name)
-    name.gsub(/[[:space:]]+/, "_")
+    name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "")
   end
 
   def normalize_name
@@ -117,10 +147,6 @@ class FavoriteGroup < ApplicationRecord
 
   def self.find_by_name_or_id!(name, user)
     find_by_name_or_id(name, user) or raise ActiveRecord::RecordNotFound
-  end
-
-  def strip_name
-    self.name = name.to_s.strip
   end
 
   def pretty_name

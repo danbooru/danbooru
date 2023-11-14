@@ -5,7 +5,7 @@ class PostApprovalTest < ActiveSupport::TestCase
     setup do
       @user = create(:user, created_at: 2.weeks.ago)
       @post = create(:post, uploader: @user, is_pending: true)
-      @approver = create(:user, can_approve_posts: true)
+      @approver = create(:approver)
     end
 
     context "a pending post" do
@@ -68,6 +68,8 @@ class PostApprovalTest < ActiveSupport::TestCase
           assert_equal(true, @post.reload.is_active?)
           assert_equal("post_undelete", ModAction.last.category)
           assert_equal("undeleted post ##{@post.id}", ModAction.last.description)
+          assert_equal(@post, ModAction.last.subject)
+          assert_equal(@new_approver, ModAction.last.creator)
         end
       end
 
@@ -95,9 +97,8 @@ class PostApprovalTest < ActiveSupport::TestCase
         CurrentUser.scoped(@approver) do
           @post.update!(tag_string: "touhou")
           @approval = create(:post_approval, post: @post, user: @approver)
-          @approvals = PostApproval.search(user_name: @approver.name, post_tags_match: "touhou", post_id: @post.id)
 
-          assert_equal([@approval.id], @approvals.map(&:id))
+          assert_search_equals(@approval, user_name: @approver.name, post_tags_match: "touhou", post_id: @post.id)
         end
       end
     end

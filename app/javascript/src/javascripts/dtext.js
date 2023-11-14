@@ -2,23 +2,10 @@ let Dtext = {};
 
 Dtext.initialize_all = function() {
   Dtext.initialize_links();
-  Dtext.initialize_expandables();
 }
 
 Dtext.initialize_links = function() {
   $(document).on("click.danbooru", ".dtext-preview-button", Dtext.click_button);
-}
-
-Dtext.initialize_expandables = function() {
-  $(document).on("click.danbooru", ".expandable-button", function(e) {
-    var button = $(this);
-    button.parent().next().fadeToggle("fast");
-    if (button.val() === "Show") {
-      button.val("Hide");
-    } else {
-      button.val("Show");
-    }
-  });
 }
 
 Dtext.call_preview = async function(e, $button, $input, $preview) {

@@ -1,17 +1,16 @@
 <% content_for(:secondary_links) do %>
-  <%= quick_search_form_for(:name_matches, pools_path, "pools", autocomplete: "pool", redirect: true) %>
+  <%= quick_search_form_for(:name_contains, pools_path, "pools", autocomplete: "pool", redirect: true) %>
   <%= subnav_link_to "Gallery", gallery_pools_path %>
   <%= subnav_link_to "Listing", pools_path %>
   <% if policy(Pool).create? %>
     <%= subnav_link_to "New", new_pool_path %>
   <% end %>
   <% if PoolVersion.enabled? %>
-    <%= subnav_link_to "Recent changes", pool_versions_path %>
+    <%= subnav_link_to "Changes", pool_versions_path %>
   <% end %>
   <%= subnav_link_to "Help", wiki_page_path("help:pools") %>
   <% if @pool && !@pool.new_record? %>
     <li>|</li>
-    <%= subnav_link_to "Show", pool_path(@pool) %>
     <%= subnav_link_to "Posts", posts_path(:tags => "pool:#{@pool.id}") %>
     <% if policy(@pool).update? %>
       <%= subnav_link_to "Edit", edit_pool_path(@pool), "data-shortcut": "e" %>

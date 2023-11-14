@@ -1,30 +1,19 @@
 import Utility from "./utility";
-import { delegate, hideAll } from 'tippy.js';
-import 'tippy.js/dist/tippy.css';
+import { createTooltip } from "./utility";
 
 class PostVotesTooltipComponent {
   // Trigger on the post score link; see PostVotesComponent.
-  static TARGET_SELECTOR = "span.post-votes span.post-score a";
-  static SHOW_DELAY = 125;
+  static TARGET_SELECTOR = "span.post-votes span.post-score > a";
+  static SHOW_DELAY = 375;
   static HIDE_DELAY = 125;
   static DURATION = 250;
   static instance = null;
 
   static initialize() {
-    if ($(PostVotesTooltipComponent.TARGET_SELECTOR).length === 0) {
-      return;
-    }
-
-    PostVotesTooltipComponent.instance = delegate("body", {
-      allowHTML: true,
-      appendTo: document.querySelector("#post-votes-tooltips"),
+    PostVotesTooltipComponent.instance = createTooltip("post-votes-tooltip", {
       delay: [PostVotesTooltipComponent.SHOW_DELAY, PostVotesTooltipComponent.HIDE_DELAY],
       duration: PostVotesTooltipComponent.DURATION,
-      interactive: true,
-      maxWidth: "none",
       target: PostVotesTooltipComponent.TARGET_SELECTOR,
-      theme: "common-tooltip",
-      touch: false,
 
       onShow: PostVotesTooltipComponent.onShow,
       onHide: PostVotesTooltipComponent.onHide,
@@ -35,8 +24,6 @@ class PostVotesTooltipComponent {
     let $target = $(instance.reference);
     let $tooltip = $(instance.popper);
     let postId = $target.parents("[data-id]").data("id");
-
-    hideAll({ exclude: instance });
 
     try {
       $tooltip.addClass("tooltip-loading");

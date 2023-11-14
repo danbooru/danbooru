@@ -4,12 +4,10 @@ class TagTest < ActiveSupport::TestCase
   setup do
     @builder = FactoryBot.create(:builder_user)
     CurrentUser.user = @builder
-    CurrentUser.ip_addr = "127.0.0.1"
   end
 
   teardown do
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   context "A tag category fetcher" do
@@ -70,14 +68,78 @@ class TagTest < ActiveSupport::TestCase
 
     should "reset its category after updating" do
       tag = FactoryBot.create(:artist_tag)
-      assert_equal(Tag.categories.artist, Cache.get("tc:#{Cache.hash(tag.name)}"))
+      assert_equal(Tag.categories.artist, Cache.get("tag-category:#{Cache.hash(tag.name)}"))
 
-      tag.update_attribute(:category, Tag.categories.copyright)
-      assert_equal(Tag.categories.copyright, Cache.get("tc:#{Cache.hash(tag.name)}"))
+      tag.update!(category: Tag.categories.copyright, updater: create(:user))
+      assert_equal(Tag.categories.copyright, Cache.get("tag-category:#{Cache.hash(tag.name)}"))
     end
 
     context "not be settable to an invalid category" do
       should validate_inclusion_of(:category).in_array(TagCategory.category_ids)
+    end
+  end
+
+  context "When a tag is created" do
+    should "not create a new version" do
+      tag = create(:tag, category: Tag.categories.character)
+
+      assert_equal(0, tag.versions.count)
+    end
+  end
+
+  context "When a tag is updated" do
+    should "create the initial version before the new version" do
+      user = create(:user)
+      tag = create(:tag, created_at: 1.year.ago, updated_at: 6.months.ago)
+      tag.update!(updater: user, category: Tag.categories.character, is_deprecated: true)
+
+      assert_equal(2, tag.versions.count)
+
+      assert_equal(1, tag.first_version.version)
+      assert_equal(tag.updated_at_before_last_save.round(4), tag.first_version.created_at.round(4))
+      assert_equal(tag.updated_at_before_last_save.round(4), tag.first_version.updated_at.round(4))
+      assert_nil(tag.first_version.updater)
+      assert_nil(tag.first_version.previous_version)
+      assert_equal(Tag.categories.general, tag.first_version.category)
+      assert_equal(false, tag.first_version.is_deprecated)
+
+      assert_equal(2, tag.last_version.version)
+      assert_equal(user, tag.last_version.updater)
+      assert_equal(tag.first_version, tag.last_version.previous_version)
+      assert_equal(Tag.categories.character, tag.last_version.category)
+      assert_equal(true, tag.last_version.is_deprecated)
+    end
+  end
+
+  context "When a tag is updated twice by the same user" do
+    should "not merge the edits" do
+      updated_at = 6.months.ago
+      user = create(:user)
+      tag = create(:tag, created_at: 1.year.ago, updated_at: updated_at)
+      travel_to(1.minute.ago) { tag.update!(updater: user, category: Tag.categories.character, is_deprecated: true) }
+      tag.update!(updater: user, category: Tag.categories.copyright)
+
+      assert_equal(3, tag.versions.count)
+
+      assert_equal(1, tag.versions[0].version)
+      assert_equal(updated_at.round(4), tag.versions[0].created_at.round(4))
+      assert_equal(updated_at.round(4), tag.versions[0].updated_at.round(4))
+      assert_nil(tag.versions[0].updater)
+      assert_nil(tag.versions[0].previous_version)
+      assert_equal(Tag.categories.general, tag.versions[0].category)
+      assert_equal(false, tag.versions[0].is_deprecated)
+
+      assert_equal(2, tag.versions[1].version)
+      assert_equal(user, tag.versions[1].updater)
+      assert_equal(tag.versions[0], tag.versions[1].previous_version)
+      assert_equal(Tag.categories.character, tag.versions[1].category)
+      assert_equal(true, tag.versions[1].is_deprecated)
+
+      assert_equal(3, tag.versions[2].version)
+      assert_equal(user, tag.versions[2].updater)
+      assert_equal(tag.versions[1], tag.versions[2].previous_version)
+      assert_equal(Tag.categories.copyright, tag.versions[2].category)
+      assert_equal(true, tag.versions[2].is_deprecated)
     end
   end
 
@@ -93,7 +155,7 @@ class TagTest < ActiveSupport::TestCase
       tag = FactoryBot.create(:tag)
       assert_difference("Tag.count", 0) do
         assert_equal(Tag.categories.general, tag.category)
-        Tag.find_or_create_by_name("artist:#{tag.name}")
+        Tag.find_or_create_by_name(tag.name, category: "artist", current_user: @builder)
         tag.reload
         assert_equal(Tag.categories.artist, tag.category)
       end
@@ -101,16 +163,27 @@ class TagTest < ActiveSupport::TestCase
 
     should "not change category when the tag is too large to be changed by a builder" do
       tag = FactoryBot.create(:tag, post_count: 1001)
-      Tag.find_or_create_by_name("artist:#{tag.name}", creator: @builder)
+      Tag.find_or_create_by_name(tag.name, category: "artist", current_user: @builder)
 
       assert_equal(0, tag.reload.category)
     end
 
     should "not change category when the tag is too large to be changed by a member" do
       tag = FactoryBot.create(:tag, post_count: 51)
-      Tag.find_or_create_by_name("artist:#{tag.name}", creator: FactoryBot.create(:member_user))
+      Tag.find_or_create_by_name(tag.name, category: "artist", current_user: create(:member_user))
 
       assert_equal(0, tag.reload.category)
+    end
+
+    should "not change category if the tag is aliased" do
+      t1 = create(:tag, name: "ff7", category: Tag.categories.copyright)
+      t2 = create(:tag, name: "final_fantasy_vii", category: Tag.categories.copyright)
+      ta = create(:tag_alias, antecedent_name: "ff7", consequent_name: "final_fantasy_vii")
+
+      t1.reload.category = Tag.categories.character
+
+      assert_equal(false, t1.valid?)
+      assert_equal(["Can't change the category of an aliased tag"], t1.errors[:base])
     end
 
     should "update post tag counts when the category is changed" do
@@ -118,10 +191,19 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(1, post.tag_count_general)
       assert_equal(0, post.tag_count_character)
 
-      tag = Tag.find_or_create_by_name("char:test")
+      tag = Tag.find_or_create_by_name("test", category: "char", current_user: @builder)
       post.reload
       assert_equal(0, post.tag_count_general)
       assert_equal(1, post.tag_count_character)
+    end
+
+    should "update aliased tags when the tag's category is changed" do
+      t1 = create(:tag, name: "ff7", category: Tag.categories.general)
+      t2 = create(:tag, name: "final_fantasy_vii", category: Tag.categories.general)
+      ta = create(:tag_alias, antecedent_name: "ff7", consequent_name: "final_fantasy_vii")
+      t2.update!(category: Tag.categories.copyright, updater: User.system)
+
+      assert_equal("Copyright", t1.reload.category_name)
     end
 
     should "be created when one doesn't exist" do
@@ -129,15 +211,24 @@ class TagTest < ActiveSupport::TestCase
         tag = Tag.find_or_create_by_name("hoge")
         assert_equal("hoge", tag.name)
         assert_equal(Tag.categories.general, tag.category)
+        assert_equal(0, tag.versions.count)
       end
     end
 
     should "be created with the type when one doesn't exist" do
       assert_difference("Tag.count", 1) do
-        tag = Tag.find_or_create_by_name("artist:hoge")
+        tag = Tag.find_or_create_by_name("hoge", category: "artist", current_user: @builder)
         assert_equal("hoge", tag.name)
         assert_equal(Tag.categories.artist, tag.category)
+        assert_equal(0, tag.versions.count)
       end
+    end
+
+    should "not raise an exception if the tag name is invalid" do
+      tag = Tag.find_or_create_by_name("foo__bar")
+
+      assert_equal(false, tag.valid?)
+      assert_equal(["'foo__bar' cannot contain consecutive underscores"], tag.errors[:name])
     end
 
     should "parse tag names into words" do

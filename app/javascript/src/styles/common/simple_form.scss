@@ -1,12 +1,16 @@
 @import "../base/020_base";
+@import "../common/utilities";
 
 form.simple_form {
   margin: 0 0 1em 0;
 
+  label {
+    font-weight: bold;
+  }
+
   fieldset.inline-fieldset {
     > label {
       display: block;
-      font-weight: bold;
     }
 
     div.input {
@@ -80,7 +84,6 @@ form.simple_form {
 
     label {
       display: block;
-      font-weight: bold;
       line-height: 1.5em;
     }
 
@@ -90,11 +93,72 @@ form.simple_form {
     }
 
     &.radio_buttons {
+      span.radio {
+        display: inline-block;
+        white-space: nowrap;
+      }
+
       span.radio label {
         font-weight: normal;
         display: inline;
-        margin: 0 2em 0 0.25em;
+        margin: 0 1rem 0 0.25rem;
         vertical-align: middle;
+      }
+
+      // Show radio buttons as a rounded button group.
+      &.radio-button-group {
+        @extend %thin-x-scrollbar;
+
+        white-space: nowrap;
+
+        input {
+          @extend %sr-only; // Visually hide <input> without using `display: none`, since that would prevent focusing it.
+        }
+
+        .radio label {
+          display: inline-block;
+          margin: 0;
+          margin-right: 0;
+          padding: 0.25rem 0.33rem;
+          border-width: 1px;
+          border-radius: 0.25rem;
+          user-select: none;
+          cursor: pointer;
+
+          &:hover {
+            color: var(--inverse-text-color);
+            background-color: var(--link-hover-color);
+            border-color: var(--link-hover-color);
+          }
+        }
+
+        input:focus ~ label {
+          box-shadow: inset 0 0 0 2px var(--link-color);
+        }
+
+        input:checked ~ label {
+          &, &:hover {
+            color: var(--inverse-text-color);
+            background-color: var(--link-color);
+            border-color: var(--link-color);
+          }
+        }
+
+        .radio:not(:last-of-type) label {
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+
+        .radio:not(:first-of-type) label {
+          margin-left: -1px;
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
+
+        &.field_with_errors .radio label {
+          border-color: var(--chip-red-border-color);
+          background-color: var(--chip-red-background-color);
+        }
       }
     }
   }
@@ -162,11 +226,20 @@ div.ui-dialog {
   form.simple_form {
     margin-bottom: 0;
 
+    textarea, input[type="text"] {
+      width: 100%;
+      max-width: 100%;
+    }
+
     div.input {
       margin-bottom: 0.5em;
     }
 
     div.input.hidden {
+      display: none;
+    }
+
+    div.dtext-inline span.dtext-hint {
       display: none;
     }
   }

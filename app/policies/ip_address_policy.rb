@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class IpAddressPolicy < ApplicationPolicy
-  def index?
+  def show?
     user.is_moderator?
   end
 

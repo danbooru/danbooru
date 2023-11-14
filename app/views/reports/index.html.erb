@@ -1,0 +1,31 @@
+<% page_title "Reports" %>
+
+<div id="c-reports">
+  <div id="a-index">
+    <h1>Reports</h1>
+
+    <ul class="list-bulleted">
+      <li><%= link_to "Posts", report_path("posts", search: { period: "day" }) %></li>
+      <li><%= link_to "Post approvals", report_path("post_approvals", search: { period: "day" }) %></li>
+      <li><%= link_to "Post appeals", report_path("post_appeals", search: { period: "day" }) %></li>
+      <li><%= link_to "Post flags", report_path("post_flags", search: { period: "day" }) %></li>
+      <li><%= link_to "Post replacements", report_path("post_replacements", search: { period: "day" }) %></li>
+      <li><%= link_to "Post votes", report_path("post_votes", search: { period: "day" }) %></li>
+      <li><%= link_to "Media assets", report_path("media_assets", search: { period: "day" }) %></li>
+      <li><%= link_to "Pools", report_path("pools", search: { period: "day" }) %></li>
+      <li><%= link_to "Comments", report_path("comments", search: { period: "day" }) %></li>
+      <li><%= link_to "Comment votes", report_path("comment_votes", search: { period: "day" }) %></li>
+      <li><%= link_to "Forum posts", report_path("forum_posts", search: { period: "day" }) %></li>
+      <li><%= link_to "Bulk update requests", report_path("bulk_update_requests", search: { period: "day" }) %></li>
+      <li><%= link_to "Tag aliases", report_path("tag_aliases", search: { period: "day" }) %></li>
+      <li><%= link_to "Tag implications", report_path("tag_implications", search: { period: "day" }) %></li>
+      <li><%= link_to "Artist edits", report_path("artist_versions", search: { period: "day" }) %></li>
+      <li><%= link_to "Artist commentary edits", report_path("artist_commentary_versions", search: { period: "day" }) %></li>
+      <li><%= link_to "Note edits", report_path("note_versions", search: { period: "day" }) %></li>
+      <li><%= link_to "Wiki edits", report_path("wiki_page_versions", search: { period: "day" }) %></li>
+      <li><%= link_to "Mod actions", report_path("mod_actions", search: { period: "day" }) %></li>
+      <li><%= link_to "Bans", report_path("bans", search: { period: "day" }) %></li>
+      <li><%= link_to "Users", report_path("users", search: { period: "day" }) %></li>
+    </ul>
+  </div>
+</div>

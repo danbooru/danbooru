@@ -9,6 +9,9 @@ class ForumTopic < ApplicationRecord
 
   MIN_LEVELS = {
     None: 0,
+    Member: User::Levels::MEMBER,
+    Gold: User::Levels::GOLD,
+    Builder: User::Levels::BUILDER,
     Moderator: User::Levels::MODERATOR,
     Admin: User::Levels::ADMIN,
   }
@@ -22,8 +25,9 @@ class ForumTopic < ApplicationRecord
   has_many :bulk_update_requests
   has_many :tag_aliases
   has_many :tag_implications
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
-  validates :title, presence: true, length: { maximum: 200 }, if: :title_changed?
+  validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
   validates :category_id, inclusion: { in: CATEGORIES.keys }
   validates :min_level, inclusion: { in: MIN_LEVELS.values }
 
@@ -32,7 +36,7 @@ class ForumTopic < ApplicationRecord
   after_update :update_posts_on_deletion_or_undeletion
   after_update :update_original_post
   after_save(:if => ->(rec) {rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
-    ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock)
+    ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock, subject: self, user: CurrentUser.user)
   end
 
   deletable
@@ -87,9 +91,8 @@ class ForumTopic < ApplicationRecord
       order(updated_at: :desc)
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_sticky, :is_locked, :is_deleted, :category_id, :title, :response_count, :creator, :updater, :forum_posts, :bulk_update_requests, :tag_aliases, :tag_implications)
-      q = q.text_attribute_matches(:title, params[:title_matches])
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_sticky, :is_locked, :is_deleted, :category_id, :title, :response_count, :creator, :updater, :forum_posts, :bulk_update_requests, :tag_aliases, :tag_implications], current_user: current_user)
 
       if params[:is_private].to_s.truthy?
         q = q.private_only
@@ -165,11 +168,11 @@ class ForumTopic < ApplicationRecord
   end
 
   def create_mod_action_for_delete
-    ModAction.log("deleted forum topic ##{id} (title: #{title})", :forum_topic_delete)
+    ModAction.log("deleted forum topic ##{id} (title: #{title})", :forum_topic_delete, subject: self, user: CurrentUser.user)
   end
 
   def create_mod_action_for_undelete
-    ModAction.log("undeleted forum topic ##{id} (title: #{title})", :forum_topic_undelete)
+    ModAction.log("undeleted forum topic ##{id} (title: #{title})", :forum_topic_undelete, subject: self, user: CurrentUser.user)
   end
 
   def page_for(post_id)

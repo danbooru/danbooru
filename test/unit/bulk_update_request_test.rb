@@ -12,12 +12,10 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     setup do
       @admin = FactoryBot.create(:admin_user)
       CurrentUser.user = @admin
-      CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     should_eventually "parse tags with tag type prefixes inside the script" do
@@ -163,6 +161,13 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't create alias tag -> tag_ ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+        end
+
+        should "fail if the consequent name contains a tag type prefix" do
+          @bur = build(:bulk_update_request, script: "alias blah -> char:bar")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create alias blah -> char:bar ('char:bar' cannot begin with 'char:')"], @bur.errors.full_messages)
         end
 
         should "be case-insensitive" do
@@ -606,14 +611,16 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_equal(true, @tag.reload.is_deprecated?)
       end
 
-      should "remove implications" do
+      should "remove implications and aliases" do
         @ti1 = create(:tag_implication, antecedent_name: "grey_hair", consequent_name: "old_woman")
         @ti2 = create(:tag_implication, antecedent_name: "my_literal_dog", consequent_name: "grey_hair")
+        @ta = create(:tag_alias, antecedent_name: "silver_hair", consequent_name: "grey_hair")
         @wiki = create(:wiki_page, title: "grey_hair")
         @bur = create_bur!("deprecate grey_hair", @admin)
 
         assert_equal("deleted", @ti1.reload.status)
         assert_equal("deleted", @ti2.reload.status)
+        assert_equal("deleted", @ta.reload.status)
         assert_equal("approved", @bur.reload.status)
       end
 
@@ -775,8 +782,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
 
       should "work" do
-        assert_equal([@bur2.id, @bur1.id], BulkUpdateRequest.search.map(&:id))
-        assert_equal([@bur1.id], BulkUpdateRequest.search(user_name: @admin.name, approver_name: @admin.name, status: "approved").map(&:id))
+        assert_search_equals(@bur1, user_name: @admin.name, approver_name: @admin.name, status: "approved")
       end
     end
   end

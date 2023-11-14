@@ -1,0 +1,56 @@
+<% disapproval = post.disapprovals.find { |disapproval| disapproval.user == CurrentUser.user } %>
+
+<div class="flex flex-col mt-2 gap-2">
+  <div class="flex flex-wrap gap-2 items-center justify-center w-full text-xs">
+    <div>
+      <%= render "posts/partials/show/preview_source_footer", post: post %>
+    </div>
+
+    <% if @preview_size.to_i > 180 %>
+      <%= render_post_votes post, current_user: CurrentUser.user %>
+    <% end %>
+  </div>
+
+  <div class="flex flex-wrap justify-center gap-2">
+    <%= link_to "Approve", post_approvals_path(post_id: post.id), method: :post, remote: true, class: "button-primary button-xs", disabled: !post.is_approvable? %>
+    <%= link_to "Skip", post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), method: :post, remote: true, class: "button-primary button-xs", disabled: disapproval.present? %>
+
+    <%= render PopupMenuComponent.new(button_classes: "button-outline-danger button-xs align-top") do |menu| %>
+      <% menu.with_button do %>
+        Reject
+      <% end %>
+
+      <% menu.with_item do %>
+        <%= link_to "Poor quality", post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "poor_quality" }), method: :post, remote: true %>
+      <% end %>
+
+      <% menu.with_item do %>
+        <%= link_to "Breaks rules", post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "breaks_rules" }), method: :post, remote: true %>
+      <% end %>
+
+      <% menu.with_item do %>
+        <%= link_to "Detailed Rejection", "#", "data-post-id": post.id, class: "detailed-rejection-link" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="text-center text-xs">
+    <% %w[poor_quality breaks_rules].each do |reason| %>
+      <% if post.disapprovals.map(&:reason).grep(reason).count > 0 %>
+        <span class="inline-block rounded px-2 mb-1 text-inverse bg:error-color">
+          <%= reason.titleize %>: <%= post.disapprovals.map(&:reason).grep(reason).count %>
+        </span>
+      <% end %>
+    <% end %>
+
+    <% (post.tag_array & Danbooru.config.modqueue_warning_tags).each do |tag| %>
+      <span class="inline-block rounded px-2 mb-1 text-inverse bg:error-color">
+        <%= tag.tr("_", " ").startcase %>
+      </span>
+    <% end %>
+
+    <% if post.source.blank? %>
+      <span class="inline-block rounded px-2 mb-1 text-inverse bg:error-color">No Source</span>
+    <% end %>
+  </div>
+</div>

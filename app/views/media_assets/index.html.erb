@@ -1,3 +1,5 @@
+<% noindex if params[:search].present? %>
+
 <div id="c-media-assets">
   <div id="a-index">
     <h1 class="mb-2">All Uploads</h1>
@@ -16,16 +18,20 @@
         <% end %>
       <% end %>
 
-      <%= f.input :order, collection: [%w[Newest id], %w[Oldest id_asc]], include_blank: true, selected: params[:search][:order] %>
+      <%= f.input :order, collection: [%w[Newest id], %w[Oldest id_asc], %w[Random random]], include_blank: true, selected: params[:search][:order] %>
       <%= f.submit "Search" %>
     <% end %>
 
-    <div class="border-b mb-4 flex flex-wrap gap-4">
-      <%= link_to "All", current_page_path(search: search_params.merge(is_posted: nil)), class: ["inline-block p-1 pb-2", (search_params[:is_posted].nil? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
-      <%= link_to "Posted", current_page_path(search: search_params.merge(is_posted: true)), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.truthy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
-      <%= link_to "Unposted", current_page_path(search: search_params.merge(is_posted: false)), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.falsy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
-      <span class="flex-grow-1"></span>
-      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+    <div class="tab-panel-component horizontal-tab-panel">
+      <div class="tab-list">
+        <%= link_to "All", current_page_path(search: search_params.merge(is_posted: nil)), class: [(search_params[:is_posted].nil? ? "tab active-tab" : "tab")] %>
+        <%= link_to "Posted", current_page_path(search: search_params.merge(is_posted: true)), class: [(search_params[:is_posted].to_s.truthy? ? "tab active-tab" : "tab")] %>
+        <%= link_to "Unposted", current_page_path(search: search_params.merge(is_posted: false)), class: [(search_params[:is_posted].to_s.falsy? ? "tab active-tab" : "tab")] %>
+
+        <span class="flex-grow-1"></span>
+
+        <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+      </div>
     </div>
 
     <% if params[:mode] == "table" %>

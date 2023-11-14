@@ -15,15 +15,15 @@ class AITag < ApplicationRecord
   scope :empty, -> { where(tag: Tag.empty) }
   scope :nonempty, -> { where(tag: Tag.nonempty) }
 
-  delegate :name, :pretty_name, :post_count, :category, :category_name, :is_deprecated?, :empty?, :is_aliased?, :metatag?, to: :tag
+  delegate :name, :pretty_name, :post_count, :category, :category_name, :to_aliased_tag, :is_deprecated?, :empty?, :is_aliased?, :metatag?, to: :tag
 
   def self.named(name)
     name = $1.downcase if name =~ /\A(rating:.)/i
     where(tag: Tag.find_by_name_or_alias(name))
   end
 
-  def self.search(params)
-    q = search_attributes(params, :media_asset, :tag, :post, :score)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:media_asset, :tag, :post, :score], current_user: current_user)
 
     if params[:tag_name].present?
       q = q.named(params[:tag_name])

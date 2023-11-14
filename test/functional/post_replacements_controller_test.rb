@@ -128,7 +128,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.media_asset.variant(:original).open_file.md5)
 
           assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
-          assert_equal([{"delay" => 125, "file" => "000000.jpg"}, {"delay" => 125, "file" => "000001.jpg"}], @post.pixiv_ugoira_frame_data.data)
+          assert_equal([125, 125], @post.media_asset.frame_delays)
         end
       end
 
@@ -154,6 +154,40 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
           # replacement image is 80x82, so we're downscaling by 50% (160x164 -> 80x82).
           assert_equal([40, 41, 40, 41], [@note.x, @note.y, @note.width, @note.height])
+        end
+      end
+
+      context "a replacement URL that contains multiple images" do
+        should "return an error" do
+          @post = create(:post)
+
+          post_auth post_replacements_path, create(:moderator_user), params: {
+            format: :json,
+            post_id: @post.id,
+            post_replacement: {
+              replacement_url: "https://twitter.com/catwheezie/status/1604604864809799680",
+            }
+          }
+
+          assert_response 422
+          assert_match(/has multiple images/, response.parsed_body.dig("errors", "base", 0))
+        end
+      end
+
+      context "a replacement URL that doesn't contain any images" do
+        should "return an error" do
+          @post = create(:post)
+
+          post_auth post_replacements_path, create(:moderator_user), params: {
+            format: :json,
+            post_id: @post.id,
+            post_replacement: {
+              replacement_url: "https://twitter.com/dril/status/384408932061417472",
+            }
+          }
+
+          assert_response 422
+          assert_match(/has no images/, response.parsed_body.dig("errors", "base", 0))
         end
       end
 
@@ -222,6 +256,24 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(post_tags_match: "touhou").with { @post_replacement }
         should respond_to_search(creator: {level: User::Levels::ADMIN}).with { @admin_replacement }
         should respond_to_search(creator_name: "yukari").with { @post_replacement }
+      end
+    end
+
+    context "show action" do
+      setup do
+        @replacement = create(:post_replacement)
+      end
+
+      should "render for html" do
+        get post_replacement_path(@replacement)
+
+        assert_redirected_to post_replacements_path(search: { id: @replacement.id })
+      end
+
+      should "render for json" do
+        get post_replacement_path(@replacement), as: :json
+
+        assert_response :success
       end
     end
   end

@@ -1,8 +1,27 @@
 # frozen_string_literal: true
 
+require "danbooru"
+require_relative "../../app/logical/danbooru/enumerable"
+
 module Danbooru
   module Extensions
     module String
+      # https://invisible-characters.com
+      # https://character.construction/blanks
+      # https://www.unicode.org/review/pr-5.html (5.22 Default Ignorable Code Points)
+      # https://en.wikipedia.org/wiki/Whitespace_character
+      #
+      # [[:space:]] = https://codepoints.net/search?gc[]=Z (Space_Separator | Line_Separator | Paragraph_Separator | U+0009 | U+000A | U+000B | U+000C | U+000D | U+0085)
+      # \p{di} = https://codepoints.net/search?DI=1 (Default_Ignorable_Code_Point)
+      # \u2800 = https://codepoints.net/U+2800 (BRAILLE PATTERN BLANK)
+      INVISIBLE_REGEX = /\A[[:space:]\p{di}\u2800]*\z/
+
+      # Returns true if the string consists entirely of invisible characters. Like `#blank?`, but includes control
+      # characters and certain other invisible Unicode characters that aren't classified as spaces.
+      def invisible?
+        match?(INVISIBLE_REGEX)
+      end
+
       def to_escaped_for_sql_like
         string = self.gsub(/%|_|\*|\\\*|\\\\|\\/) do |str|
           case str
@@ -58,6 +77,13 @@ module Danbooru
         text
       end
 
+      # Capitalize every word in the string. Like `titleize`, but doesn't remove underscores, apply inflection rules, or strip the `_id` suffix.
+      #
+      # @return [String] The string with every word capitalized.
+      def startcase
+        self.gsub(/(?<![a-z'])([a-z]+)/i, &:capitalize)
+      end
+
       # @return [Boolean] True if the string contains only balanced parentheses; false if the string contains unbalanced parentheses.
       def has_balanced_parens?(open = "(", close = ")")
         parens = 0
@@ -79,6 +105,10 @@ end
 
 class String
   include Danbooru::Extensions::String
+end
+
+module Enumerable
+  include Danbooru::Enumerable
 end
 
 module MimeNegotationExtension

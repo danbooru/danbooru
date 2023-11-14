@@ -4,6 +4,6 @@
 
 $(function() {
   let $comment = $("article#comment_<%= @comment_vote.comment_id %>").get(0);
-  let html = "<%= j render_comment(@comment_vote.comment, current_user: CurrentUser.user) %>";
+  let html = "<%= j render_comment(@comment_vote.comment, current_user: CurrentUser.user, **params[:component]&.permit(:classes, :context).to_h.symbolize_keys) %>";
   Alpine.morph($comment, html);
 });

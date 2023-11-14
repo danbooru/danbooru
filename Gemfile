@@ -1,5 +1,7 @@
 source 'https://rubygems.org/'
 
+ruby "~> 3.2.1"
+
 gem 'dotenv-rails', :require => "dotenv/rails-now"
 
 gem "rails", "~> 7.0"
@@ -9,7 +11,6 @@ gem "sanitize"
 gem 'ruby-vips'
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
-gem 'rubyzip', :require => "zip"
 gem 'stripe'
 gem 'aws-sdk-sqs', '~> 1'
 gem 'responders'
@@ -22,7 +23,7 @@ gem 'addressable'
 gem 'rakismet'
 gem 'recaptcha', require: "recaptcha/rails"
 gem 'activemodel-serializers-xml'
-gem 'webpacker', '= 6.0.0.rc.6'
+gem 'shakapacker', "< 6.5.6"
 gem 'rake'
 gem 'redis'
 gem 'builder'
@@ -44,7 +45,6 @@ gem 'google-cloud-storage', require: "google/cloud/storage"
 gem 'ed25519'
 gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
 gem 'clockwork'
-gem 'puma-metrics'
 gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
 gem "parallel"
@@ -57,11 +57,16 @@ gem "elastic-apm"
 gem "debug"
 gem "ffaker"
 gem "composite_primary_keys"
+gem "resolv"
+gem "rover-df"
+gem "ffi-libarchive"
+gem "pry-rails"
+gem "drb"
 
 group :development do
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
-  #gem 'meta_request'
+  gem 'meta_request'
   gem 'rack-mini-profiler'
   gem 'stackprof'
   gem 'flamegraph'
@@ -80,11 +85,9 @@ group :test do
   gem "factory_bot"
   gem "mocha", require: "mocha/minitest"
   gem "simplecov", require: false
-  gem "minitest-ci"
   gem "minitest-reporters", require: "minitest/reporters"
   gem "mock_redis"
   gem "capybara"
   gem "selenium-webdriver"
   gem "codecov", require: false
-  gem 'stripe-ruby-mock', require: "stripe_mock"
 end

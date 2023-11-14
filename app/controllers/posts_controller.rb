@@ -87,7 +87,8 @@ class PostsController < ApplicationController
       flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
       redirect_to @original_post
     else
-      flash[:notice] = @post.errors.full_messages.join("; ")
+      flash.now[:notice] = @post.errors.full_messages.join("; ")
+      @post.tag_string = params.dig(:post, :tag_string) # Preserve original tag string on validation error
       respond_with(@post, render: { template: "upload_media_assets/show" })
     end
   end
@@ -132,7 +133,7 @@ class PostsController < ApplicationController
     raise ActiveRecord::RecordNotFound if @post.nil?
     authorize @post
     respond_with(@post) do |format|
-      format.html { redirect_to post_path(@post, :tags => params[:tags]) }
+      format.html { redirect_to post_path(@post, q: params[:tags]) }
     end
   end
 
@@ -157,8 +158,8 @@ class PostsController < ApplicationController
       query: post_set.normalized_query.to_s,
       page: post_set.current_page,
       limit: post_set.per_page,
-      tag_count: post_set.post_query.tags.count,
-      metatag_count: post_set.post_query.metatags.count,
+      tag_count: post_set.post_query.tag_names.length,
+      metatag_count: post_set.post_query.metatags.length,
     })
   end
 
@@ -174,13 +175,10 @@ class PostsController < ApplicationController
         end
 
         if post.errors.any?
-          @error_message = post.errors.full_messages.join("; ")
-          render :template => "static/error", :status => 500
-        else
-          response_params = {:q => params[:tags_query], :pool_id => params[:pool_id], :favgroup_id => params[:favgroup_id]}
-          response_params.reject! {|_key, value| value.blank?}
-          redirect_to post_path(post, response_params)
+          flash[:notice] = post.errors.full_messages.join("; ")
         end
+
+        redirect_to post_path(post, { q: params[:q] }.compact_blank)
       end
 
       format.json do

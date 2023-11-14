@@ -12,13 +12,12 @@ module PostSets
     MAX_SIDEBAR_TAGS = 25
     MAX_WILDCARD_TAGS = PostQueryBuilder::MAX_WILDCARD_TAGS
 
-    attr_reader :current_user, :page, :format, :tag_string, :query, :post_query, :normalized_query, :show_votes
+    attr_reader :current_user, :page, :format, :tag_string, :post_query, :normalized_query, :show_votes
     delegate :tag, to: :post_query
     alias_method :show_votes?, :show_votes
 
     def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, format: "html", show_votes: false)
       @current_user = user
-      @query = PostQueryBuilder.new(tags, user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?)
       @post_query = PostQuery.normalize(tags, current_user: user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?)
       @normalized_query = post_query.with_implicit_metatags
       @tag_string = tags
@@ -112,6 +111,7 @@ module PostSets
 
     # @return [Integer, nil] The number of posts returned by the search, or nil if unknown.
     def post_count
+      return 0 if artist.present? && artist.is_banned? && !current_user.is_approver?
       normalized_query.post_count
     end
 
@@ -128,8 +128,7 @@ module PostSets
     end
 
     def best_post
-      # be smarter about this in the future
-      posts.reject(&:is_deleted).select(&:visible?).max_by(&:fav_count)
+      posts.reject(&:is_deleted).select(&:visible?).max_by { |post| [-post.rating_id, post.score] }
     end
 
     def pending_bulk_update_requests
@@ -148,7 +147,7 @@ module PostSets
     end
 
     def banned_artist?
-      artist.present? && artist.is_banned? && !artist.policy(current_user).can_view_banned?
+      artist.present? && artist.is_banned? && !current_user.is_approver?
     end
 
     def includes
@@ -161,7 +160,9 @@ module PostSets
 
     concerning :TagListMethods do
       def related_tags
-        if normalized_query.wildcards.one? && normalized_query.tags.none?
+        if artist.present? && artist.is_banned? && !current_user.is_approver?
+          []
+        elsif normalized_query.wildcards.one? && normalized_query.tags.none?
           wildcard_tags
         elsif normalized_query.is_metatag?(:search)
           saved_search_tags
@@ -179,7 +180,7 @@ module PostSets
       end
 
       def similar_tags
-        RelatedTagCalculator.cached_similar_tags_for_search(post_query, MAX_SIDEBAR_TAGS)
+        RelatedTagCalculator.new(post_query).cached_similar_tags_for_search(MAX_SIDEBAR_TAGS)
       end
 
       def frequent_tags

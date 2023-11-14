@@ -15,7 +15,7 @@
 # and add DANBOORU_ to the front. More examples:
 #
 #     DANBOORU_CANONICAL_URL=https://booru.example.com
-#     DANBOORU_CONTACT_EMAIL=admin@borou.example.com
+#     DANBOORU_CONTACT_EMAIL=admin@booru.example.com
 #     DANBOORU_DISCORD_SERVER_URL=https://discord.gg/yourbooru
 #
 # Settings from environment variables will override those from the config file.
@@ -66,6 +66,16 @@ module Danbooru
       Socket.gethostname
     end
 
+    # A list of alternate domains for your site, if your site is accessible under multiple domains. For example,
+    # Danbooru is accessible under danbooru.donmai.us, betabooru.donmai.us, safebooru.donmai.us, etc.
+    #
+    # Used for converting direct links to these domains to shortlinks, e.g. `https://danbooru.donmai.us/posts/1234` to `post #1234`.
+    #
+    # Most people should leave this empty.
+    def alternate_domains
+      []
+    end
+
     # A list of alternate hostnames where safe mode will automatically be enabled.
     def safe_mode_hostnames
       ["safebooru.donmai.us"]
@@ -86,9 +96,29 @@ module Danbooru
       "http://#{Danbooru.config.hostname}"
     end
 
-    # Contact email address of the admin.
+    # The email address of the admin user. This email will be publicly displayed on the contact page.
     def contact_email
       "webmaster@#{Danbooru.config.hostname}"
+    end
+
+    # The email address where DMCA complaints should be sent.
+    def dmca_email
+      "dmca@#{Danbooru.config.hostname}"
+    end
+
+    # The email address to use for Dmail notifications.
+    def notification_email
+      "notifications@#{Danbooru.config.hostname}"
+    end
+
+    # The email address to use for password reset and email verification emails.
+    def account_security_email
+      "security@#{Danbooru.config.hostname}"
+    end
+
+    # The email address to use for new user signup emails.
+    def welcome_user_email
+      "welcome@#{Danbooru.config.hostname}"
     end
 
     # System actions, such as sending automated dmails, will be performed with
@@ -105,13 +135,32 @@ module Danbooru
       "_danbooru2_session"
     end
 
-    # Debug mode does some things to make testing easier. It disables parallel
-    # testing and it replaces Danbooru's custom exception page with the default
-    # Rails exception page. This is only useful during development and testing.
+    # Debug mode does some things to make testing easier. It outputs more verbose logs, it disables parallel testing,
+    # and it replaces Danbooru's custom exception page with the default Rails exception page. This is only useful during
+    # development and testing.
     #
-    # Usage: `DANBOORU_DEBUG_MODE=true bin/rails test
+    # Usage: DANBOORU_DEBUG_MODE=true bin/rails test
     def debug_mode
       false
+    end
+
+    # The log level for the application. Valid values are "debug", "info", "warn", "error", or "fatal". "debug" is the
+    # most verbose and "fatal" is the least verbose.
+    #
+    # The default log level is taken from the RAILS_LOG_LEVEL environment variable, otherwise it's "debug" if debug mode
+    # is enabled, otherwise it's "error" in production, "info" in development, or "fatal" in testing.
+    def log_level
+      if ENV["RAILS_LOG_LEVEL"].present?
+        ENV["RAILS_LOG_LEVEL"]
+      elsif debug_mode
+        :debug
+      elsif Rails.env.production?
+        :error
+      elsif Rails.env.development?
+        :info
+      else
+        :fatal
+      end
     end
 
     def source_code_url
@@ -120,6 +169,26 @@ module Danbooru
 
     def issues_url
       "#{source_code_url}/issues"
+    end
+
+    # The maximum number of threads to use for certain operations, such as generating thumbnails or processing bulk
+    # update requests.
+    #
+    # The default is to use 1 thread per CPU core.
+    #
+    # Set this to 0 to disable multithreading. This may save memory at the cost of reduced performance.
+    def max_concurrency
+      Etc.nprocessors
+    end
+
+    # If true, allow web crawlers such as Google to crawl your site.
+    #
+    # If false, don't allow crawlers to crawl your site. This means your site won't be indexed by search engines.
+    #
+    # Setting this to false disallows crawlers in /robots.txt. This will only block crawlers that actually respect
+    # robots.txt, mainly search engines, not other bots.
+    def allow_web_crawlers?
+      true
     end
 
     # If true, new accounts will require email verification if they seem
@@ -140,11 +209,6 @@ module Danbooru
       []
     end
 
-    # Thumbnail size
-    def small_image_width
-      150
-    end
-
     # Large resize image width. Set to nil to disable.
     def large_image_width
       850
@@ -155,10 +219,9 @@ module Danbooru
       40
     end
 
-    # Maximum size of an upload. If you change this, you must also change
-    # `client_max_body_size` in your nginx.conf.
+    # Maximum size of an upload. If you change this, you must also change `client_max_body_size` in your nginx.conf.
     def max_file_size
-      50.megabytes
+      100.megabytes
     end
 
     # Maximum resolution (width * height) of an upload. Default: 441 megapixels (21000x21000 pixels).
@@ -219,7 +282,59 @@ module Danbooru
       }
     end
 
-    # The method to use for storing image files.
+    # The path to where uploaded files are stored. You can change this to change where files are
+    # stored. By default, files are stored like this:
+    #
+    # * /original/94/43/944364e77f56183e2ebd75de757488e2.jpg
+    # * /sample/94/43/sample-944364e77f56183e2ebd75de757488e2.jpg
+    # * /180x180/94/43/944364e77f56183e2ebd75de757488e2.jpg
+    #
+    # A variant is a thumbnail or other alternate version of an uploaded file; see the Variant class
+    # in app/models/media_asset.rb for details.
+    #
+    # This path is relative to the `base_dir` option in the storage manager (see the `storage_manager` option below).
+    def media_asset_file_path(variant)
+      md5 = variant.md5
+      file_prefix = "sample-" if variant.type == :sample
+      "/#{variant.type}/#{md5[0..1]}/#{md5[2..3]}/#{file_prefix}#{md5}.#{variant.file_ext}"
+
+      # To store files in this format: `/original/944364e77f56183e2ebd75de757488e2.jpg`
+      # "/#{variant.type}/#{variant.md5}.#{variant.file_ext}"
+      #
+      # To store files in this format: `/original/iuQRl7d7n.jpg`
+      # "/#{variant.type}/#{variant.file_key}.#{variant.file_ext}"
+      #
+      # To store files in this format: `/original/12345.jpg`
+      # "/#{variant.type}/#{variant.id}.#{variant.file_ext}"
+    end
+
+    # The URL where uploaded files are served from. You can change this to customize how images are
+    # served. By default, files are served from the same location where they're stored.
+    #
+    # `custom_filename` is an optional tag string that may be included in the URL. It requires Nginx
+    # rewrites to work (see below), so it's ignored by default.
+    #
+    # The URL is relative to the `base_url` option in the storage manager (see the `storage_manager` option below).
+    def media_asset_file_url(variant, custom_filename)
+      media_asset_file_path(variant)
+
+      # To serve files in this format:
+      #
+      #     /original/d3/4e/__kousaka_tamaki_to_heart_2_drawn_by_kyogoku_shin__d34e4cf0a437a5d65f8e82b7bcd02606.jpg.
+      #
+      # Uncomment the code below and add the following to Nginx:
+      #
+      #     # Strip tags from filenames (/original/d3/4e/__kousaka_tamaki_to_heart_2_drawn_by_kyogoku_shin__d34e4cf0a437a5d65f8e82b7bcd02606.jpg => /original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg)
+      #     location ~ (.*)/__.+?__(.+)$ {
+      #       rewrite (.*)/__.+?__(.+)$ $1/$2;
+      #     }
+      #
+      # custom_filename = "__#{custom_filename}__" if custom_filename.present?
+      # file_prefix = "sample-" if variant.type == :sample
+      # "/#{variant.type}/#{variant.md5[0..1]}/#{variant.md5[2..3]}/#{custom_filename}#{file_prefix}#{variant.md5}.#{variant.file_ext}"
+    end
+
+    # The method to use for storing uploaded files. By default, uploads are stored under `public/data`.
     def storage_manager
       # Store files on the local filesystem.
       # base_dir - where to store files (default: under public/data)
@@ -310,19 +425,11 @@ module Danbooru
     end
 
     # http://tinysubversions.com/notes/mastodon-bot/
-    def pawoo_client_id
+    def pawoo_access_token
       nil
     end
 
-    def pawoo_client_secret
-      nil
-    end
-
-    def baraag_client_id
-      nil
-    end
-
-    def baraag_client_secret
+    def baraag_access_token
       nil
     end
 
@@ -353,6 +460,25 @@ module Danbooru
     def furaffinity_cookie_b
     end
 
+    # Your ArtStreet (medibang.com) "MSID" cookie. Needed to view R-18 works.
+    #
+    # After you create an account, go to https://medibang.com/myProfile/myProfileModifyForm/ to set your age to 18+,
+    # then enable mature content. After you login, use the devtools to find the "MSID" cookie.
+    def art_street_session_cookie
+    end
+
+    # Your Twitter "auth_token" cookie. A 40-character hex string.
+    #
+    # Login to Twitter, open the devtools, open a tweet, then use the devtools to find the /TweetDetail request and look for the auth_token cookie.
+    def twitter_auth_token
+    end
+
+    # Your Twitter "ct0" cookie. Also available in the X-CSRF-Token HTTP Header. A 160-character hex string.
+    #
+    # Login to Twitter, open the devtools, open a tweet, then use the devtools to find the /TweetDetail request and look for the ct0 cookie or the x-csrf-request header.
+    def twitter_csrf_token
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
@@ -362,9 +488,8 @@ module Danbooru
 
     # Posts with these tags will be highlighted in the modqueue.
     def modqueue_warning_tags
-      %w[hard_translated self_upload nude_filter third-party_edit screenshot
-      anime_screencap duplicate image_sample md5_mismatch resized upscaled downscaled
-      resolution_mismatch source_larger source_smaller]
+      %w[ai-generated ai-assisted anime_screencap bad_source duplicate hard_translated image_sample md5_mismatch
+      nude_filter off-topic paid_reward resized third-party_edit]
     end
 
     # Whether the Gold account upgrade page should be enabled.
@@ -450,12 +575,6 @@ module Danbooru
       true
     end
 
-    def twitter_api_key
-    end
-
-    def twitter_api_secret
-    end
-
     # If defined, Danbooru will automatically post new forum posts to the
     # Discord channel belonging to this webhook.
     def discord_webhook_id
@@ -507,21 +626,13 @@ module Danbooru
       "https://twitter.com/#{Danbooru.config.twitter_username}"
     end
 
-    # include essential tags in image urls (requires nginx/apache rewrites)
-    def enable_seo_post_urls
-      false
-    end
-
-    def http_proxy_host
-    end
-
-    def http_proxy_port
-    end
-
-    def http_proxy_username
-    end
-
-    def http_proxy_password
+    # The proxy to use for outgoing HTTP requests.
+    #
+    # If you use a proxy and you're running a public-facing site, you should be careful to configure the proxy to block
+    # HTTP requests to the local network. That is, block requests to e.g. 127.0.0.1 and 192.168.0.1/24 so that users
+    # can't upload URLs like `http://192.168.0.1.nip.io/` to trigger HTTP requests to servers inside your local network.
+    def http_proxy
+      # "http://username:password@proxy.example.com:1080"
     end
 
     # The URL for the Reportbooru server (https://github.com/evazion/reportbooru).
@@ -648,6 +759,10 @@ module Danbooru
 
     # The forum topic linked to in the Winter Sale notice.
     def winter_sale_forum_topic_id
+    end
+
+    def reactions
+      {}
     end
   end
 

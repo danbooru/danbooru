@@ -27,21 +27,21 @@ class PoolVersion < ApplicationRecord
       where_array_includes_any(:added_post_ids, [post_id]).or(where_array_includes_any(:removed_post_ids, [post_id]))
     end
 
-    def name_matches(name)
+    def name_contains(name)
       name = normalize_name_for_search(name)
       name = "*#{name}*" unless name =~ /\*/
       where_ilike(:name, name)
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :pool_id, :post_ids, :added_post_ids, :removed_post_ids, :updater_id, :description, :description_changed, :name, :name_changed, :version, :is_active, :is_deleted, :category)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :pool_id, :post_ids, :added_post_ids, :removed_post_ids, :updater_id, :description, :description_changed, :name, :name_changed, :version, :is_active, :is_deleted, :category], current_user: current_user)
 
       if params[:post_id]
         q = q.for_post_id(params[:post_id].to_i)
       end
 
-      if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches])
+      if params[:name_contains].present?
+        q = q.name_contains(params[:name_contains])
       end
 
       if params[:updater_name].present?
@@ -64,7 +64,7 @@ class PoolVersion < ApplicationRecord
     SqsService.new(Danbooru.config.aws_sqs_archives_url)
   end
 
-  def self.queue(pool, updater, updater_ip_addr)
+  def self.queue(pool, updater)
     # queue updates to sqs so that if archives goes down for whatever reason it won't
     # block pool updates
     raise NotImplementedError, "Archive service is not configured." if !enabled?
@@ -73,7 +73,6 @@ class PoolVersion < ApplicationRecord
       pool_id: pool.id,
       post_ids: pool.post_ids,
       updater_id: updater.id,
-      updater_ip_addr: updater_ip_addr.to_s,
       created_at: pool.created_at.try(:iso8601),
       updated_at: pool.updated_at.try(:iso8601),
       description: pool.description,
@@ -97,11 +96,6 @@ class PoolVersion < ApplicationRecord
   def previous
     @previous ||= PoolVersion.where("pool_id = ? and version < ?", pool_id, version).order("version desc").limit(1).to_a
     @previous.first
-  end
-
-  def subsequent
-    @subsequent ||= PoolVersion.where("pool_id = ? and version > ?", pool_id, version).order("version asc").limit(1).to_a
-    @subsequent.first
   end
 
   def current

@@ -1,2 +1,0 @@
-local    all         postgres,danbooru                              trust
-host     all         postgres,danbooru          127.0.0.1/32        trust

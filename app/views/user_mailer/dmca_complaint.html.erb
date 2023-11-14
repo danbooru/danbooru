@@ -1,0 +1,22 @@
+<p>Your DMCA notice has been submitted. Please allow up to 48 hours for it to be processed. You may not receive a response unless further information is needed from you. You may contact <%= Danbooru.config.dmca_email %> if you have any further questions.</p>
+
+<p>Name: <%= @dmca[:name] %></p>
+<p>Email: <%= @dmca[:email] %></p>
+<p>Address: <%= @dmca[:address] %></p>
+
+<p>Infringing URLs:</p>
+<ul>
+  <% @dmca[:infringing_urls].to_s.split.each do |url| %>
+    <li><%= url %></li>
+  <% end %>
+</ul>
+
+<p>Original URLs:</p>
+<ul>
+  <% @dmca[:original_urls].to_s.split.each do |url| %>
+    <li><%= url %></li>
+  <% end %>
+</ul>
+
+<p>Proof that you are the artist: <%= @dmca[:proof] %></p>
+<p>Signature: <%= @dmca[:signature] %></p>

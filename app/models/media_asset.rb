@@ -3,31 +3,45 @@
 class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
-  FILE_TYPES = %w[jpg png gif mp4 webm swf zip]
+  FILE_TYPES = %w[jpg png gif webp avif mp4 webm swf zip]
   FILE_KEY_LENGTH = 9
-  VARIANTS = %i[preview 180x180 360x360 720x720 sample original]
+  VARIANTS = %i[180x180 360x360 720x720 sample full original]
+  MAX_FILE_SIZE = Danbooru.config.max_file_size.to_i
   MAX_VIDEO_DURATION = Danbooru.config.max_video_duration.to_i
   MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
   MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
   MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
-  ENABLE_SEO_POST_URLS = Danbooru.config.enable_seo_post_urls
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
   STORAGE_SERVICE = Danbooru.config.storage_manager
 
-  has_one :post, foreign_key: :md5, primary_key: :md5
+  attribute :id
+  attribute :created_at
+  attribute :updated_at
+  attribute :md5
+  attribute :file_ext
+  attribute :file_size
+  attribute :image_width
+  attribute :image_height
+  attribute :duration
+  attribute :status
+  attribute :is_public
+  attribute :pixel_hash, :md5
+
+  has_one :post, foreign_key: :md5, primary_key: :md5, inverse_of: :media_asset
   has_one :media_metadata, dependent: :destroy
-  has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
   has_many :upload_media_assets, dependent: :destroy
   has_many :uploads, through: :upload_media_assets
   has_many :uploaders, through: :uploads, class_name: "User", foreign_key: :uploader_id
   has_many :ai_tags
 
-  delegate :metadata, to: :media_metadata
-  delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, to: :metadata
+  delegate :frame_delays, :metadata, to: :media_metadata, allow_nil: true
+  delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, :is_ai_generated?, :has_sound?, to: :metadata
 
   scope :public_only, -> { where(is_public: true) }
   scope :private_only, -> { where(is_public: false) }
   scope :without_ai_tags, -> { where.not(AITag.where("ai_tags.media_asset_id = media_assets.id").select(1).arel.exists) }
+  scope :removed, -> { where(status: [:deleted, :expunged]) }
+  scope :expired, -> { processing.where(created_at: ..4.hours.ago) }
 
   # Processing: The asset's files are currently being resized and distributed to the backend servers.
   # Active: The asset has been successfully uploaded and is ready to use.
@@ -45,30 +59,36 @@ class MediaAsset < ApplicationRecord
 
   validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }, if: :md5_changed?
   validates :file_ext, inclusion: { in: FILE_TYPES, message: "File is not an image or video" }
-  validates :file_size, numericality: { less_than_or_equal_to: Danbooru.config.max_file_size, message: ->(asset, _) { "too large (size: #{asset.file_size.to_formatted_s(:human_size)}; max size: #{Danbooru.config.max_file_size.to_formatted_s(:human_size)})" } }
   validates :file_key, length: { is: FILE_KEY_LENGTH }, uniqueness: true, if: :file_key_changed?
-  validates :duration, numericality: { less_than_or_equal_to: MAX_VIDEO_DURATION, message: "must be less than #{MAX_VIDEO_DURATION} seconds", allow_nil: true }, on: :create # XXX should allow admins to bypass
-  validate :validate_resolution, on: :create
+  validates :file_size, comparison: { greater_than: 0 }, if: :file_size_changed?
+  validates :image_width, comparison: { greater_than: 0 }, if: :image_width_changed?
+  validates :image_height, comparison: { greater_than: 0 }, if: :image_height_changed?
 
   before_create :initialize_file_key
 
+  def self.prune!
+    expired.update_all(status: :failed)
+  end
+
   class Variant
     extend Memoist
+    include ActiveModel::Serializers::JSON
+    include ActiveModel::Serializers::Xml
 
-    attr_reader :media_asset, :variant
-    delegate :md5, :storage_service, :backup_storage_service, to: :media_asset
+    attr_reader :media_asset, :type
+    delegate :id, :md5, :file_key, :storage_service, :backup_storage_service, to: :media_asset
 
-    def initialize(media_asset, variant)
+    def initialize(media_asset, type)
       @media_asset = media_asset
-      @variant = variant.to_sym
-
-      raise ArgumentError, "asset doesn't have #{@variant} variant" unless Variant.exists?(@media_asset, @variant)
+      @type = type.to_sym
     end
 
     def store_file!(original_file)
       file = convert_file(original_file)
       storage_service.store(file, file_path)
       backup_storage_service.store(file, file_path)
+    ensure
+      file&.close unless file == original_file
     end
 
     def trash_file!
@@ -81,48 +101,47 @@ class MediaAsset < ApplicationRecord
       backup_storage_service.delete(file_path)
     end
 
-    def open_file
+    def open_file(&block)
+      open_file!(&block)
+    rescue
+      nil
+    end
+
+    def open_file!(&block)
       file = storage_service.open(file_path)
-      frame_data = media_asset.pixiv_ugoira_frame_data&.data if media_asset.is_ugoira?
-      MediaFile.open(file, frame_data: frame_data, strict: false)
+      frame_delays = media_asset.frame_delays if media_asset.is_ugoira?
+      MediaFile.open(file, frame_delays: frame_delays, &block)
     end
 
     def convert_file(media_file)
-      case variant
-      in :preview
-        media_file.preview(width, height, format: :jpeg, quality: 85)
+      case type
       in :"180x180"
-        media_file.preview(width, height, format: :jpeg, quality: 85)
+        media_file.preview!(width, height, format: :jpeg, quality: 85)
       in :"360x360"
-        media_file.preview(width, height, format: :jpeg, quality: 85)
+        media_file.preview!(width, height, format: :jpeg, quality: 85)
       in :"720x720"
-        media_file.preview(width, height, format: :webp, quality: 75)
+        media_file.preview!(width, height, format: :webp, quality: 75)
       in :sample if media_asset.is_ugoira?
         media_file.convert
-      in :sample if media_asset.is_static_image?
-        media_file.preview(width, height, format: :jpeg, quality: 85)
+      in :sample | :full if media_asset.is_static_image?
+        media_file.preview!(width, height, format: :jpeg, quality: 85)
       in :original
         media_file
       end
     end
 
-    def file_url(slug = "")
-      storage_service.file_url(file_path(slug))
+    def file_url(custom_filename = "")
+      url = Danbooru.config.media_asset_file_url(self, custom_filename)
+      storage_service.file_url(url)
     end
 
-    def file_path(slug = "")
-      if variant.in?(%i[preview 180x180 360x360 720x720]) && media_asset.is_flash?
-        "/images/download-preview.png"
-      else
-        slug = "__#{slug}__" if slug.present?
-        slug = nil if !ENABLE_SEO_POST_URLS
-        "/#{variant}/#{md5[0..1]}/#{md5[2..3]}/#{slug}#{file_name}"
-      end
+    def file_path
+      Danbooru.config.media_asset_file_path(self)
     end
 
     # The file name of this variant.
     def file_name
-      case variant
+      case type
       when :sample
         "sample-#{md5}.#{file_ext}"
       else
@@ -132,22 +151,22 @@ class MediaAsset < ApplicationRecord
 
     # The file extension of this variant.
     def file_ext
-      case variant
-      when :preview, :"180x180", :"360x360"
+      case type
+      in :"180x180" | :"360x360"
         "jpg"
-      when :"720x720"
+      in :"720x720"
         "webp"
-      when :sample
-        media_asset.is_ugoira? ? "webm" : "jpg"
-      when :original
+      in :sample if media_asset.is_animated?
+        "webm"
+      in :sample | :full if media_asset.is_static_image?
+        "jpg"
+      in :original
         media_asset.file_ext
       end
     end
 
     def max_dimensions
-      case variant
-      when :preview
-        [150, 150]
+      case type
       when :"180x180"
         [180, 180]
       when :"360x360"
@@ -156,6 +175,8 @@ class MediaAsset < ApplicationRecord
         [720, 720]
       when :sample
         [850, nil]
+      when :full
+        [nil, nil]
       when :original
         [nil, nil]
       end
@@ -173,21 +194,17 @@ class MediaAsset < ApplicationRecord
       dimensions[1]
     end
 
-    def self.exists?(media_asset, variant)
-      case variant
-      when :preview
-        true
-      when :"180x180"
-        true
-      when :"360x360"
-        true
-      when :"720x720"
-        true
-      when :sample
-        media_asset.is_ugoira? || (media_asset.is_static_image? && media_asset.image_width > LARGE_IMAGE_WIDTH)
-      when :original
-        true
-      end
+    def ==(other)
+      other.is_a?(Variant) && [media_asset, type] == [other.media_asset, other.type]
+    end
+    alias_method :eql?, :==
+
+    def hash
+      [media_asset, type].hash
+    end
+
+    def serializable_hash(*options)
+      { type: type, url: file_url, width: width, height: height, file_ext: file_ext }
     end
 
     memoize :file_name, :file_ext, :max_dimensions, :dimensions
@@ -196,14 +213,37 @@ class MediaAsset < ApplicationRecord
   concerning :SearchMethods do
     class_methods do
       def ai_tags_match(tag_string, score_range: (50..))
-        AITagQuery.search(tag_string, relation: self, score_range: score_range)
+        MediaAssetQuery.search(tag_string, relation: self, score_range: score_range)
       end
 
-      def search(params)
-        q = search_attributes(params, :id, :created_at, :updated_at, :status, :md5, :file_ext, :file_size, :image_width, :image_height, :file_key, :is_public)
+      def is_matches(value)
+        case value.downcase
+        when *MediaAsset.statuses.keys
+          where(status: value)
+        when *FILE_TYPES
+          attribute_matches(value, :file_ext, :enum)
+        else
+          none
+        end
+      end
+
+      def exif_matches(string)
+        # string = File:ColorComponents=3
+        if string.include?("=")
+          key, value = string.split(/=/, 2)
+          hash = { key => value }
+          joins(:media_metadata).where_json_contains("media_metadata.metadata", hash)
+        # string = File:ColorComponents
+        else
+          joins(:media_metadata).where_json_has_key("media_metadata.metadata", string)
+        end
+      end
+
+      def search(params, current_user)
+        q = search_attributes(params, [:id, :created_at, :updated_at, :status, :md5, :pixel_hash, :file_ext, :file_size, :image_width, :image_height, :duration, :file_key, :is_public], current_user: current_user)
 
         if params[:metadata].present?
-          q = q.joins(:media_metadata).merge(MediaMetadata.search(metadata: params[:metadata]))
+          q = q.joins(:media_metadata).merge(MediaMetadata.search({ metadata: params[:metadata] }, current_user))
         end
 
         if params[:ai_tags_match].present?
@@ -224,6 +264,8 @@ class MediaAsset < ApplicationRecord
           q = q.order(id: :desc)
         when "id_asc"
           q = q.order(id: :asc)
+        when "random"
+          q = q.order("random()")
         else
           q = q.apply_default_order(params)
         end
@@ -248,15 +290,12 @@ class MediaAsset < ApplicationRecord
       def upload!(media_file, &block)
         media_file = MediaFile.open(media_file) unless media_file.is_a?(MediaFile)
 
-        raise Error, "File is corrupt" if media_file.is_corrupt?
-
         media_asset = create!(file: media_file, status: :processing)
         yield media_asset if block_given?
 
         # XXX should do this in parallel with thumbnail generation.
         # XXX shouldn't generate thumbnail twice (very slow for ugoira)
-        media_asset.update!(ai_tags: media_file.preview(360, 360).ai_tags)
-        media_asset.update!(pixiv_ugoira_frame_data: PixivUgoiraFrameData.new(data: media_file.frame_data, content_type: "image/jpeg")) if media_asset.is_ugoira?
+        media_asset.update!(ai_tags: media_file.preview!(360, 360).ai_tags)
         media_asset.update!(media_metadata: MediaMetadata.new(file: media_file))
 
         media_asset.distribute_files!(media_file)
@@ -294,12 +333,42 @@ class MediaAsset < ApplicationRecord
         media_asset&.update!(status: :failed)
         raise
       end
+
+      def validate_media_file!(media_file, uploader)
+        if !media_file.file_ext.to_s.in?(FILE_TYPES)
+          raise Error, "File is not an image or video"
+        elsif !media_file.is_supported?
+          raise Error, "File type is not supported"
+        elsif media_file.is_corrupt?
+          raise Error, "File is corrupt"
+        elsif media_file.file_size > MAX_FILE_SIZE
+          raise Error, "File size too large (size: #{media_file.file_size.to_formatted_s(:human_size)}; max size: #{MAX_FILE_SIZE.to_formatted_s(:human_size)})"
+        elsif media_file.resolution > MAX_IMAGE_RESOLUTION
+          raise Error, "Image resolution is too large (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)"
+        elsif media_file.width > MAX_IMAGE_WIDTH
+          raise Error, "Image width is too large (width: #{media_file.width}; max width: #{MAX_IMAGE_WIDTH})"
+        elsif media_file.height > MAX_IMAGE_HEIGHT
+          raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
+        elsif media_file.duration.to_i > MAX_VIDEO_DURATION && !uploader.is_admin?
+          raise Error, "Duration must be less than #{MAX_VIDEO_DURATION} seconds"
+        end
+      end
+    end
+
+    def removed?
+      deleted? || expunged?
+    end
+
+    # @return [Mime::Type] The file's MIME type.
+    def mime_type
+      Mime::Type.lookup_by_extension(file_ext)
     end
 
     def file=(file_or_path)
       media_file = file_or_path.is_a?(MediaFile) ? file_or_path : MediaFile.open(file_or_path)
 
       self.md5 = media_file.md5
+      self.pixel_hash = media_file.pixel_hash
       self.file_ext = media_file.file_ext
       self.file_size = media_file.file_size
       self.image_width = media_file.width
@@ -307,24 +376,80 @@ class MediaAsset < ApplicationRecord
       self.duration = media_file.duration
     end
 
-    def regenerate_ai_tags!
+    def regenerate!(metadata: true, files: true, ai_tags: true)
       with_lock do
-        ai_tags.each(&:destroy!)
-        update!(ai_tags: variant(:"360x360").open_file.ai_tags)
+        original.open_file! do |original_file|
+          regenerate_metadata!(original_file) if metadata
+          regenerate_files!(original_file) if files
+        end
+
+        regenerate_ai_tags! if ai_tags
       end
     end
 
-    def expunge!
-      delete_files!
-      update!(status: :expunged)
+    # Regenerate all metadata for the asset, including the md5, width, height, file size, file ext,
+    # duration, and EXIF metadata, both on the media asset and on the post. This may change the tags
+    # as well if the new metadata causes automatic tags to be recalculated.
+    def regenerate_metadata!(original_file)
+      update!(file: original_file)
+      media_metadata.update!(file: original_file)
+
+      if saved_changes? && post.present?
+        CurrentUser.scoped(User.system) do
+          post.update!(md5: md5, file_ext: file_ext, file_size: file_size, image_width: image_width, image_height: image_height)
+        end
+      end
+    end
+
+    # Regenerate all thumbnail and sample image files for the asset.
+    def regenerate_files!(original_file)
+      distribute_files!(original_file, variants: variants.without(original))
+      purge_cached_urls!
+      post.update_iqdb if post.present?
+    end
+
+    # Purge all image URLs from Cloudflare.
+    def purge_cached_urls!
+      urls = variants.map(&:file_url)
+      urls += [post.tagged_file_url(tagged_filenames: true), post.tagged_large_file_url(tagged_filenames: true)] if post.present?
+
+      CloudflareService.new.purge_cache(urls.uniq)
+    end
+
+    # Regenerate the AI tags for the asset. This is based on the 360x360 thumbnail, so the files
+    # should be regenerated first in case the thumbnail changed.
+    def regenerate_ai_tags!
+      ai_tags.each(&:destroy!)
+      update!(ai_tags: generate_ai_tags)
+    end
+
+    def generate_ai_tags
+      return [] if !has_variant?("360x360")
+
+      variant("360x360").open_file! do |media_file|
+        media_file.ai_tags
+      end
+    end
+
+    def expunge!(current_user, log: true)
+      with_lock do
+        delete_files!
+        purge_cached_urls!
+        update!(status: :expunged)
+        ModAction.log("expunged media asset ##{id} (md5=#{md5})", :media_asset_expunge, subject: self, user: current_user) if log
+      end
     rescue
       update!(status: :failed)
       raise
     end
 
-    def trash!
-      variants.each(&:trash_file!)
-      update!(status: :deleted)
+    def trash!(current_user, log: true)
+      with_lock do
+        variants.each(&:trash_file!)
+        purge_cached_urls!
+        update!(status: :deleted)
+        ModAction.log("deleted media asset ##{id} (md5=#{md5})", :media_asset_delete, subject: self, user: current_user) if log
+      end
     rescue
       update!(status: :failed)
       raise
@@ -334,8 +459,8 @@ class MediaAsset < ApplicationRecord
       variants.each(&:delete_file!)
     end
 
-    def distribute_files!(media_file)
-      Parallel.each(variants, in_threads: Etc.nprocessors) do |variant|
+    def distribute_files!(media_file, variants: self.variants)
+      variants.parallel_each do |variant|
         variant.store_file!(media_file)
       end
     end
@@ -350,26 +475,50 @@ class MediaAsset < ApplicationRecord
   end
 
   concerning :VariantMethods do
+    def original
+      variant(:original)
+    end
+
     def variant(type)
+      return nil unless has_variant?(type)
       Variant.new(self, type)
     end
 
-    def has_variant?(variant)
-      Variant.exists?(self, variant)
+    def has_variant?(type)
+      variant_types.include?(type.to_sym)
     end
 
     def variants
-      VARIANTS.select { |v| has_variant?(v) }.map { |v| variant(v) }
+      @variants ||= variant_types.map { |type| variant(type) }
+    end
+
+    def variant_types
+      @variant_types ||= begin
+        variants = []
+        variants = %i[180x180 360x360 720x720] unless is_flash?
+        variants << :sample if is_ugoira? || (is_static_image? && image_width > LARGE_IMAGE_WIDTH)
+        variants << :full if is_webp? || is_avif?
+        variants << :original
+        variants
+      end
     end
   end
 
   concerning :FileTypeMethods do
     def is_image?
-      file_ext.in?(%w[jpg png gif])
+      file_ext.in?(%w[jpg png gif webp avif])
     end
 
     def is_static_image?
       is_image? && !is_animated?
+    end
+
+    def is_webp?
+      file_ext == "webp"
+    end
+
+    def is_avif?
+      file_ext == "avif"
     end
 
     def is_video?
@@ -397,18 +546,13 @@ class MediaAsset < ApplicationRecord
     end
   end
 
-  concerning :ValidationMethods do
-    def validate_resolution
-      resolution = image_width * image_height
+  def source_urls
+    urls = upload_media_assets.map { |uma| Source::URL.page_url(uma.source_url) || uma.page_url || uma.source_url }
+    urls += [post.normalized_source] if post&.normalized_source.present?
 
-      if resolution > MAX_IMAGE_RESOLUTION
-        errors.add(:base, "Image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{image_width}x#{image_height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)")
-      elsif image_width > MAX_IMAGE_WIDTH
-        errors.add(:image_width, "is too large (width: #{image_width}; max width: #{MAX_IMAGE_WIDTH})")
-      elsif image_height > MAX_IMAGE_HEIGHT
-        errors.add(:image_height, "is too large (height: #{image_height}; max height: #{MAX_IMAGE_HEIGHT})")
-      end
-    end
+    urls.compact.select do |url|
+      url.match?(%r{\Ahttps?://}i) && Source::URL.parse(url)&.recognized?
+    end.uniq
   end
 
   def self.generate_file_key
@@ -423,6 +567,6 @@ class MediaAsset < ApplicationRecord
   end
 
   def self.available_includes
-    %i[post media_metadata pixiv_ugoira_frame_data ai_tags]
+    %i[post media_metadata ai_tags]
   end
 end

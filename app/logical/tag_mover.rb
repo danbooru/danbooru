@@ -7,7 +7,7 @@
 class TagMover
   attr_reader :old_tag, :new_tag, :user
 
-  # Initalize a tag move.
+  # Initialize a tag move.
   # @param old_name [String] the name of the tag to move
   # @param new_name [String] the new tag name
   # @param user [User] the user to credit for all edits in moving the tag
@@ -37,9 +37,9 @@ class TagMover
   # Sync the category of both tags, if one is a general tag and the other is non-general.
   def move_tag_category!
     if old_tag.general? && !new_tag.general?
-      old_tag.update!(category: new_tag.category)
+      old_tag.update!(category: new_tag.category, updater: user)
     elsif new_tag.general? && !old_tag.general?
-      new_tag.update!(category: old_tag.category)
+      new_tag.update!(category: old_tag.category, updater: user)
     end
   end
 
@@ -71,7 +71,7 @@ class TagMover
 
   # Retag the posts from the old tag to the new tag.
   def move_posts!
-    Post.raw_tag_match(old_tag.name).reorder(nil).parallel_each do |post|
+    Post.raw_tag_match(old_tag.name).reorder(nil).parallel_find_each do |post|
       post.lock!
       post.remove_tag(old_tag.name)
       post.add_tag(new_tag.name)

@@ -1,5 +1,0 @@
-<% if CurrentUser.user.default_image_size == "large" && params[:original].blank? %>
-  <%= render "posts/partials/show/ugoira_webm", :post => post %>
-<% else %>
-  <%= render "posts/partials/show/ugoira_original", :post => post %>
-<% end %>

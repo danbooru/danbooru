@@ -30,30 +30,31 @@ class PostQuery
   class Parser
     extend Memoist
 
-    METATAG_NAME_REGEX = /(#{PostQueryBuilder::METATAGS.join("|")}):/i
-
-    attr_reader :parser
+    attr_reader :parser, :metatags, :metatag_regex
     delegate :error, :rest, :eos?, :accept, :expect, :rewind, :zero_or_more, :one_or_more, :one_of, to: :parser
 
     # @param input [String] The search string to parse.
-    def initialize(input)
+    # @param metatags [Array<String>] The list of metatags supported by the query.
+    def initialize(input, metatags: [])
       @parser = StringParser.new(input, state: 0) # 0 is the initial number of unclosed parens.
+      @metatags = metatags
+      @metatag_regex = /(#{metatags.join("|")}):/i
     end
 
     # Parse a search and return the AST.
     #
     # @param string [String] The search string to parse.
     # @returns [PostQuery::AST] The AST of the parsed search.
-    def self.parse(string)
-      new(string).parse
+    def self.parse(string, **options)
+      new(string, **options).parse
     end
 
     concerning :ParserMethods do
       # Parse the search and return the AST, or return a search that matches nothing if the parse failed.
       #
       # @return [PostQuery::AST] The AST of the parsed search.
-      def parse
-        parse!
+      def parse(**options)
+        parse!(**options)
       rescue StringParser::Error
         AST.none
       end
@@ -156,7 +157,7 @@ class PostQuery
       # metatag = metatag_name ":" quoted_string
       # metatag_name = "user" | "fav" | "pool" | "order" | ...
       def metatag
-        name = expect(METATAG_NAME_REGEX).delete_suffix(":")
+        name = expect(metatag_regex).delete_suffix(":")
         quoted, value = quoted_string
 
         AST.metatag(name, value, quoted)
@@ -179,7 +180,7 @@ class PostQuery
       # A wildcard is a string that contains a '*' character and that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
       def wildcard
         t = string(/(?=[^ ]*\*)[^ \)~-][^ ]*/, skip_balanced_parens: true)
-        error("Invalid tag name: #{t}") if t.match?(/\A#{METATAG_NAME_REGEX}/)
+        error("Invalid tag name: #{t}") if t.match?(/\A#{metatag_regex}/)
         space
         AST.wildcard(t)
       end
@@ -187,7 +188,7 @@ class PostQuery
       # A tag is a string that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
       def tag
         t = string(/[^ \)~-][^ ]*/, skip_balanced_parens: true)
-        error("Invalid tag name: #{t}") if t.downcase.in?(%w[and or]) || t.include?("*") || t.match?(/\A#{METATAG_NAME_REGEX}/)
+        error("Invalid tag name: #{t}") if t.downcase.in?(%w[and or]) || t.include?("*") || t.match?(/\A#{metatag_regex}/)
         space
         AST.tag(t)
       end

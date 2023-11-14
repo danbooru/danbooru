@@ -3,81 +3,81 @@
 
 <div id="c-users">
   <div id="a-edit">
-    <h1>Settings</h1>
+    <h1 class="mb-4">Settings</h1>
 
     <%= edit_form_for @user do |f| %>
-      <h2 id="edit-options">
-        <%= link_to "Basic", "#basic-settings", :class => "active" %>
-        | <%= link_to "Advanced", "#advanced-settings" %>
-      </h2>
+      <%= render(TabPanelComponent.new do |t| %>
+        <% t.panel("Basic", active: true) do %>
+          <fieldset id="basic-settings-section">
+            <div class="input">
+              <label>Name</label>
+              <p><%= link_to "Change your name", change_name_user_path(@user) %></p>
+            </div>
 
-      <fieldset id="basic-settings-section">
-        <div class="input">
-          <label>Name</label>
-          <p><%= link_to "Change your name", new_user_name_change_request_path %></p>
-        </div>
+            <div class="input">
+              <label>Password</label>
+              <p><%= link_to "Change password", edit_user_password_path(user_id: @user.id) %></p>
+            </div>
 
-        <div class="input">
-          <label>Password</label>
-          <p><%= link_to "Change password", edit_user_password_path(user_id: @user.id) %></p>
-        </div>
+            <div class="input">
+              <label>Email</label>
+              <p>
+                <% if @user.email_address.present? %>
+                  <%= @user.email_address.address %>
 
-        <div class="input">
-          <label>Email</label>
-          <p>
-            <% if @user.email_address.present? %>
-              <%= @user.email_address.address %>
+                  <% if @user.email_address.is_verified %>
+                    (<%= link_to "Change email", edit_user_email_path(@user) %>)
+                  <% else %>
+                    (<%= link_to "Change email", edit_user_email_path(@user) %> | <%= link_to "Verify email", verify_user_email_path(@user) %>)
+                  <% end %>
+                <% else %>
+                  <%= link_to "Add email", edit_user_email_path(@user) %>
+                <% end %>
+              </p>
+            </div>
 
-              (<%= link_to "Change email", edit_user_email_path(@user) %>
-              <% if !@user.email_address.is_verified %>
-                | <%= link_to "Verify email", verify_user_email_path(@user) %>
-              <% end %>)
-            <% else %>
-              <%= link_to "Add email", edit_user_email_path(@user) %>
-            <% end %>
-          </p>
-        </div>
-
-        <%= f.input :theme, collection: User.themes.keys, include_blank: false, hint: "The site's colorscheme (light mode or dark mode)." %>
-        <%= f.input :enable_safe_mode, label: "Safe mode", hint: "Show only safe images. Hide questionable and explicit images.", as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]] %>
-
-        <%= f.input :per_page, label: "Posts per page", as: :select, hint: "Number of thumbnails per page", collection: (1..PostSets::Post::MAX_PER_PAGE), include_blank: false %>
-        <%= f.input :default_image_size, hint: "Show full original images or resized #{Danbooru.config.large_image_width}px width samples.", label: "Default image width", collection: [["850px", "large"], ["original", "original"]], include_blank: false %>
-        <%= f.input :receive_email_notifications, as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]], hint: "Receive an email when you receive a new dmail." %>
-        <%= f.input :time_zone, include_blank: false, hint: "The timezone to use for timestamps." %>
-        <%= f.input :comment_threshold, hint: "Comments at or below this score will be hidden by default.", input_html: { min: -100, max: 5 } %>
-        <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => { :data => {:autocomplete => "tag-query"}} %>
-      </fieldset>
-
-      <fieldset id="advanced-settings-section">
-        <div class="input">
-          <label>Account</label>
-          <p>
-            <%= link_to "Deactivate account", maintenance_user_deletion_path, id: "delete-account" %>
-            (<em>requires confirmation</em>)
-          </p>
-        </div>
-
-        <%= f.input :style_usernames, :as => :select, :label => "Colored usernames", :hint => "Color users according to their user level", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
-        <%= f.input :new_post_navigation_layout, :as => :select, :label => "Navigation bar position", :include_blank => false, :collection => [["Below", "true"], ["Above", "false"]], :hint => "When browsing pools or posts, place navigation links above or below the image" %>
-        <%= f.input :show_deleted_posts, as: :select, hint: "Show deleted posts in searches", collection: [["No", "false"], ["Yes", "true"]], include_blank: false %>
-        <%= f.input :show_deleted_children, :as => :select, :label => "Show deleted children", :hint => "Show thumbnail borders on parent posts even if the children are deleted", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
-        <%= f.input :disable_categorized_saved_searches, :hint => "Don't show dialog box when creating a new saved search", :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-        <% if policy(@user).can_enable_private_favorites? %>
-          <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: "Make your favorites and upvotes private", collection: { "No" => false, "Yes" => true }, include_blank: false %>
-        <% elsif @user.enable_private_favorites? %>
-          <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: "Make your favorites and upvotes private. (Warning: if you disable this, you can't re-enable it without ".html_safe + link_to("upgrading to a Gold account", new_user_upgrade_path) + " first. (".html_safe + link_to_wiki("learn more", "help:privacy_mode") + ")".html_safe, collection: { "No" => false, "Yes" => true }, include_blank: false %>
-        <% else %>
-          <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: link_to("Upgrade to Danbooru Gold to enable private favorites and upvotes", new_user_upgrade_path), collection: { "No" => false, "Yes" => true }, include_blank: false %>
+            <%= f.input :theme, collection: User.themes.keys, include_blank: false, hint: "The site's colorscheme (light mode or dark mode)." %>
+            <%= f.input :enable_safe_mode, label: "Safe mode", hint: "Show only safe images. Hide sensitive, questionable and explicit images.", as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]] %>
+            <%= f.input :per_page, label: "Posts per page", as: :select, hint: "Number of thumbnails per page", collection: (1..PostSets::Post::MAX_PER_PAGE), include_blank: false %>
+            <%= f.input :default_image_size, hint: "Show full original images or resized #{Danbooru.config.large_image_width}px width samples.", label: "Default image width", collection: [["850px", "large"], ["original", "original"]], include_blank: false %>
+            <%= f.input :receive_email_notifications, as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]], hint: "Receive an email when you receive a new dmail." %>
+            <%= f.input :time_zone, include_blank: false, hint: "The timezone to use for timestamps." %>
+            <%= f.input :comment_threshold, hint: "Comments at or below this score will be hidden by default.", input_html: { min: -100, max: 5 } %>
+            <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => { :data => {:autocomplete => "tag-query"}} %>
+          </fieldset>
         <% end %>
-        <%= f.input :disable_tagged_filenames, :as => :select, :hint => "Don't include tags in image filenames", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-        <%= f.input :disable_mobile_gestures, :as => :select, :hint => "Disable swipe left / swipe right gestures on mobile", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-        <%= f.input :disable_post_tooltips, :as => :select, :hint => "Disable advanced tooltips when hovering over thumbnails", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-        <%= f.input :enable_desktop_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Use the desktop layout on mobile" %>
 
-        <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :data => { :autocomplete => "tag-query" } } %>
-        <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site." %>
-      </fieldset>
+        <% t.panel("Advanced") do %>
+          <fieldset id="advanced-settings-section">
+            <div class="input">
+              <label>Account</label>
+              <p>
+                <%= link_to "Deactivate account", deactivate_user_path(@user), id: "delete-account" %>
+                (<em>requires confirmation</em>)
+              </p>
+            </div>
+
+            <%= f.input :new_post_navigation_layout, :as => :select, :label => "Navigation bar position", :include_blank => false, :collection => [["Below", "true"], ["Above", "false"]], :hint => "When browsing pools or posts, place navigation links above or below the image" %>
+            <%= f.input :show_deleted_posts, as: :select, hint: "Show deleted posts in searches", collection: [["No", "false"], ["Yes", "true"]], include_blank: false %>
+            <%= f.input :show_deleted_children, :as => :select, :label => "Show deleted children", :hint => "Show thumbnail borders on parent posts even if the children are deleted", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
+            <%= f.input :disable_categorized_saved_searches, :hint => "Don't show dialog box when creating a new saved search", :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
+            <% if policy(@user).can_enable_private_favorites? %>
+              <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: "Make your favorites and upvotes private", collection: { "No" => false, "Yes" => true }, include_blank: false %>
+            <% elsif @user.enable_private_favorites? %>
+              <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: "Make your favorites and upvotes private. (Warning: if you disable this, you can't re-enable it without ".html_safe + link_to("upgrading to a Gold account", new_user_upgrade_path) + " first. (".html_safe + link_to_wiki("learn more", "help:privacy_mode") + ")".html_safe, collection: { "No" => false, "Yes" => true }, include_blank: false %>
+            <% else %>
+              <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: link_to("Upgrade to Gold to enable private favorites and upvotes", new_user_upgrade_path), collection: { "No" => false, "Yes" => true }, include_blank: false %>
+            <% end %>
+            <%= f.input :disable_tagged_filenames, :as => :select, :hint => "Don't include tags in image filenames", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
+            <%= f.input :disable_mobile_gestures, :as => :select, :hint => "Disable swipe left / swipe right gestures on mobile", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
+            <%= f.input :disable_post_tooltips, :as => :select, :hint => "Disable advanced tooltips when hovering over thumbnails", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
+            <%= f.input :enable_desktop_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Use the desktop layout on mobile" %>
+
+            <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :data => { :autocomplete => "tag-query" } } %>
+            <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site." %>
+          </fieldset>
+        <% end %>
+      <% end) %>
 
       <%= f.button :submit, "Submit" %>
     <% end %>

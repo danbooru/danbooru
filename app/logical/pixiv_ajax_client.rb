@@ -359,13 +359,11 @@
 # }
 
 class PixivAjaxClient
-  USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36"
-
   attr_reader :phpsessid, :http
 
   # @param phpsessid [String] the Pixiv login cookie
   # @param http [Danbooru::Http] the HTTP client to use for Pixiv
-  def initialize(phpsessid, http: Danbooru::Http.new)
+  def initialize(phpsessid, http:)
     @phpsessid = phpsessid
     @http = http
   end
@@ -398,18 +396,11 @@ class PixivAjaxClient
   # @param url [String] the Pixiv URL
   # @return [Hash] the parsed response, or blank on error
   def get(url)
-    response = client.cache(1.minute).get(url)
-
-    if response.code == 200
-      response.parse["body"]
-    else
-      DanbooruLogger.info("Pixiv API call failed (url=#{url} status=#{response.code} body=#{response.body})")
-      {}
-    end
+    client.cache(1.minute).parsed_get(url)&.dig("body") || {}
   end
 
   # @return [Danbooru::Http] the HTTP client used for Pixiv
   def client
-    @client ||= http.headers("User-Agent": USER_AGENT).cookies(PHPSESSID: phpsessid)
+    @client ||= http.cookies(PHPSESSID: phpsessid)
   end
 end

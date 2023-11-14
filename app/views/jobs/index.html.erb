@@ -32,6 +32,14 @@
 
       <% t.column :status %>
 
+      <% t.column "Duration" do |job| %>
+        <%= duration_to_hhmmssms(job.job_duration) if job.job_duration %>
+      <% end %>
+
+      <% t.column "Queue Delay" do |job| %>
+        <%= duration_to_hhmmssms(job.queue_delay) if job.queue_delay %>
+      <% end %>
+
       <% t.column "Created" do |job| %>
         <%= time_ago_in_words_tagged(job.created_at) %>
       <% end %>

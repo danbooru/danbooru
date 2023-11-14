@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 class IpBan < ApplicationRecord
+  attribute :ip_addr, :ip_address
+
   belongs_to :creator, class_name: "User"
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   validate :validate_ip_addr
-  validates :reason, presence: true
+  validates :reason, visible_string: true
 
-  before_save :create_mod_action
+  after_save :create_mod_action
 
   deletable
   enum category: {
@@ -23,7 +26,7 @@ class IpBan < ApplicationRecord
   end
 
   def self.ip_matches(ip_addr)
-    where("ip_addr >>= ?", ip_addr)
+    where("ip_addr >>= ?", ip_addr.to_s)
   end
 
   def self.hit!(category, ip_addr)
@@ -34,9 +37,8 @@ class IpBan < ApplicationRecord
     true
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :ip_addr, :reason, :is_deleted, :category, :hit_count, :last_hit_at, :creator)
-    q = q.text_attribute_matches(:reason, params[:reason_matches])
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :ip_addr, :reason, :is_deleted, :category, :hit_count, :last_hit_at, :creator], current_user: current_user)
 
     case params[:order]
     when /\A(created_at|updated_at|last_hit_at)(?:_(asc|desc))?\z/i
@@ -51,19 +53,19 @@ class IpBan < ApplicationRecord
   end
 
   def create_mod_action
-    if new_record?
-      ModAction.log("#{creator.name} created ip ban for #{ip_addr}", :ip_ban_create)
-    elsif is_deleted? == true && is_deleted_was == false
-      ModAction.log("#{CurrentUser.user.name} deleted ip ban for #{ip_addr}", :ip_ban_delete)
-    elsif is_deleted? == false && is_deleted_was == true
-      ModAction.log("#{CurrentUser.user.name} undeleted ip ban for #{ip_addr}", :ip_ban_undelete)
+    if previously_new_record?
+      ModAction.log("created ip ban for #{ip_addr}", :ip_ban_create, subject: self, user: creator)
+    elsif is_deleted? == true && is_deleted_before_last_save == false
+      ModAction.log("deleted ip ban for #{ip_addr}", :ip_ban_delete, subject: self, user: CurrentUser.user)
+    elsif is_deleted? == false && is_deleted_before_last_save == true
+      ModAction.log("undeleted ip ban for #{ip_addr}", :ip_ban_undelete, subject: self, user: CurrentUser.user)
     end
   end
 
   def validate_ip_addr
     if ip_addr.blank?
       errors.add(:ip_addr, "is invalid")
-    elsif ip_addr.private? || ip_addr.loopback? || ip_addr.link_local?
+    elsif ip_addr.is_local?
       errors.add(:ip_addr, "must be a public address")
     elsif full_ban? && ip_addr.ipv4? && ip_addr.prefix < 24
       errors.add(:ip_addr, "may not have a subnet bigger than /24")
@@ -73,23 +75,9 @@ class IpBan < ApplicationRecord
       errors.add(:ip_addr, "may not have a subnet bigger than /48")
     elsif partial_ban? && ip_addr.ipv6? && ip_addr.prefix < 20
       errors.add(:ip_addr, "may not have a subnet bigger than /20")
-    elsif new_record? && IpBan.active.where(category: category).ip_matches(subnetted_ip).exists?
+    elsif new_record? && IpBan.active.where(category: category).ip_matches(ip_addr).exists?
       errors.add(:ip_addr, "is already banned")
     end
-  end
-
-  def has_subnet?
-    (ip_addr.ipv4? && ip_addr.prefix < 32) || (ip_addr.ipv6? && ip_addr.prefix < 128)
-  end
-
-  def subnetted_ip
-    str = ip_addr.to_s
-    str += "/" + ip_addr.prefix.to_s if has_subnet?
-    str
-  end
-
-  def ip_addr=(ip_addr)
-    super(ip_addr.strip)
   end
 
   def self.available_includes

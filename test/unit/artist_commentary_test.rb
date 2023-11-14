@@ -4,12 +4,10 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
   setup do
     user = FactoryBot.create(:user)
     CurrentUser.user = user
-    CurrentUser.ip_addr = "127.0.0.1"
   end
 
   teardown do
     CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   should "A post should not have more than one commentary" do
@@ -31,16 +29,16 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
       end
 
       should "find the correct match" do
-        assert_equal([@artcomm1.id], ArtistCommentary.search(post_id: @post1.id.to_s).map(&:id))
-        assert_equal([@artcomm1.id], ArtistCommentary.search(text_matches: "foo").map(&:id))
-        assert_equal([@artcomm1.id], ArtistCommentary.search(text_matches: "f*").map(&:id))
-        assert_equal([@artcomm1.id], ArtistCommentary.search(post_tags_match: "artcomm1").map(&:id))
+        assert_search_equals(@artcomm1, post_id: @post1.id.to_s)
+        assert_search_equals(@artcomm1, text_matches: "foo")
+        assert_search_equals(@artcomm1, text_matches: "f*")
+        assert_search_equals(@artcomm1, post_tags_match: "artcomm1")
 
-        assert_equal([@artcomm1.id], ArtistCommentary.search(original_present: "yes").map(&:id))
-        assert_equal([@artcomm2.id], ArtistCommentary.search(original_present: "no").map(&:id))
+        assert_search_equals(@artcomm1, original_present: "yes")
+        assert_search_equals(@artcomm2, original_present: "no")
 
-        assert_equal([@artcomm1.id], ArtistCommentary.search(translated_present: "yes").map(&:id))
-        assert_equal([@artcomm2.id], ArtistCommentary.search(translated_present: "no").map(&:id))
+        assert_search_equals(@artcomm1, translated_present: "yes")
+        assert_search_equals(@artcomm2, translated_present: "no")
       end
     end
 

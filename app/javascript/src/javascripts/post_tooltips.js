@@ -1,11 +1,12 @@
 import CurrentUser from './current_user';
 import Utility from './utility';
-import { delegate, hideAll } from 'tippy.js';
+import { createTooltip } from './utility';
+import { hideAll } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 
 let PostTooltip = {};
 
-PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img, .dtext-post-id-link";
+PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview .post-preview-image, .dtext-post-id-link";
 PostTooltip.SHOW_DELAY = 500;
 PostTooltip.HIDE_DELAY = 125;
 PostTooltip.DURATION = 250;
@@ -16,15 +17,10 @@ PostTooltip.initialize = function () {
     return;
   }
 
-  PostTooltip.instance = delegate("body", {
-    allowHTML: true,
-    appendTo: document.querySelector("#post-tooltips"),
+  PostTooltip.instance = createTooltip("post-tooltip", {
     delay: [PostTooltip.SHOW_DELAY, PostTooltip.HIDE_DELAY],
     duration: PostTooltip.DURATION,
-    interactive: true,
-    maxWidth: "none",
     target: PostTooltip.POST_SELECTOR,
-    theme: "common-tooltip post-tooltip",
     touch: false,
 
     onCreate: PostTooltip.on_create,
@@ -36,12 +32,22 @@ PostTooltip.initialize = function () {
 };
 
 PostTooltip.on_create = function (instance) {
+  if (instance.reference === document.body) {
+    return;
+  }
+
   let title = instance.reference.getAttribute("title");
 
   if (title) {
     instance.reference.setAttribute("data-title", title);
     instance.reference.setAttribute("title", "");
   }
+
+  // Only show the tooltip after the mouse has stopped moving inside the thumbnail.
+  $(instance.reference).on("mousemove.danbooru", e => {
+    instance.clearDelayTimeouts();
+    instance.reference.dispatchEvent(new Event('mouseenter'));
+  });
 };
 
 PostTooltip.on_show = async function (instance) {

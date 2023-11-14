@@ -15,21 +15,21 @@
     <h2>Status</h2>
     <ul>
       <li>
-        <%= link_to "status:pending", modqueue_index_path(search: { tags: "status:pending" }) %>
+        <%= link_to "status:pending", current_page_path(search: search_params.merge(tags: "status:pending")) %>
         <span class="post-count"><%= @pending_post_count %></span>
       </li>
       <li>
-        <%= link_to "status:flagged", modqueue_index_path(search: { tags: "status:flagged" }) %>
+        <%= link_to "status:flagged", current_page_path(search: search_params.merge(tags: "status:flagged")) %>
         <span class="post-count"><%= @flagged_post_count %></span>
       </li>
       <li>
-        <%= link_to "status:appealed", modqueue_index_path(search: { tags: "status:appealed" }) %>
+        <%= link_to "status:appealed", current_page_path(search: search_params.merge(tags: "status:appealed")) %>
         <span class="post-count"><%= @appealed_post_count %></span>
       </li>
 
       <% @disapproval_reasons.each do |reason, count| %>
         <li>
-          <%= link_to "disapproved:#{reason}", modqueue_index_path(search: { tags: "disapproved:#{reason}" }) %>
+          <%= link_to "disapproved:#{reason}", current_page_path(search: search_params.merge(tags: "disapproved:#{reason}")) %>
           <span class="post-count"><%= count %></span>
         </li>
       <% end %>
@@ -41,8 +41,7 @@
     <ul>
       <% @uploaders.each do |uploader, count| %>
         <li>
-          <%= link_to_user uploader %>
-          <%= link_to "»", modqueue_index_path(search: { tags: "user:#{uploader.name}" }) %>
+          <%= link_to_user uploader, url: current_page_path(search: search_params.merge(tags: "user:#{uploader.name}")) %>
           <span class="post-count"><%= count %></span>
         </li>
       <% end %>

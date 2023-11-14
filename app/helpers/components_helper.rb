@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module ComponentsHelper
-  def post_preview(post, fit: :fixed, **options)
-    render PostPreviewComponent.new(post: post, fit: fit, **options)
+  def post_preview(post, fit: :fixed, **options, &block)
+    render PostPreviewComponent.new(post: post, fit: fit, **options), &block
   end
 
   # Render a set of posts as thumbnail gallery.
@@ -14,7 +14,7 @@ module ComponentsHelper
 
     render(PostGalleryComponent.new(**options)) do |gallery|
       posts.each do |post|
-        gallery.post(post: post, size: gallery.size, **options)
+        gallery.with_post(post: post, size: gallery.size, **options)
       end
 
       if block_given?
@@ -55,12 +55,6 @@ module ComponentsHelper
     render SourceDataComponent.new(source: source, **options)
   end
 
-  # A simple vertical tag list with no post counts. Used in related tags.
-  def render_related_tag_list(tag_names, **options)
-    tags = RelatedTagListComponent.tags_from_names(tag_names)
-    render RelatedTagListComponent.new(tags: tags, **options)
-  end
-
   # A horizontal tag list, with tags grouped by category. Used in post
   # tooltips, on the comments index, and in the modqueue.
   def render_inline_tag_list(post, **options)
@@ -96,5 +90,10 @@ module ComponentsHelper
     else
       render SequentialPaginatorComponent.new(records: records, params: params)
     end
+  end
+
+  def help_tooltip(content = nil, icon: help_icon, **options, &block)
+    content = yield if block_given?
+    render HelpTooltipComponent.new(icon, content, **options)
   end
 end

@@ -6,9 +6,8 @@ require("jquery-ui/themes/base/slider.css");
 
 let Ugoira = {};
 
-Ugoira.create_player = (mime_type, frames, file_url) => {
+Ugoira.create_player = (frames, file_url) => {
   var meta_data = {
-    mime_type: mime_type,
     frames: frames
   };
   var options = {

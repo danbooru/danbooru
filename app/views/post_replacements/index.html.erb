@@ -32,10 +32,10 @@
         <% if post_replacement.old_md5.present? && post_replacement.md5.present? %>
           <dl>
             <dt>Original MD5</dt>
-            <dd><%= post_replacement.old_md5 %></dd>
+            <dd><%= link_to_if post_replacement.old_media_asset.present?, post_replacement.old_md5, post_replacement.old_media_asset %></dd>
 
             <dt>Replacement MD5</dt>
-            <dd><%= post_replacement.md5 %></dd>
+            <dd><%= link_to_if post_replacement.media_asset.present?, post_replacement.md5, post_replacement.media_asset %></dd>
           </dl>
         <% end %>
       <% end %>
@@ -44,14 +44,12 @@
           <dl>
             <dt>Original Size</dt>
             <dd>
-              <%= post_replacement.old_image_width %>x<%= post_replacement.old_image_height %>
-              (<%= post_replacement.old_file_size.to_formatted_s(:human_size, precision: 4) %>, <%= post_replacement.old_file_ext %>)
+              <%= link_to_if post_replacement.old_media_asset.present?, "#{post_replacement.old_image_width}x#{post_replacement.old_image_height} (#{post_replacement.old_file_size.to_fs(:human_size, precision: 4)}, #{post_replacement.old_file_ext})", post_replacement.old_media_asset %>
             </dd>
 
             <dt>Replacement Size</dt>
             <dd>
-              <%= post_replacement.image_width %>x<%= post_replacement.image_height %>
-              (<%= post_replacement.file_size.to_formatted_s(:human_size, precision: 4) %>, <%= post_replacement.file_ext %>)
+              <%= link_to_if post_replacement.media_asset.present?, "#{post_replacement.image_width}x#{post_replacement.image_height} (#{post_replacement.file_size.to_fs(:human_size, precision: 4)}, #{post_replacement.file_ext})", post_replacement.media_asset %>
             </dd>
           </dl>
         <% end %>
@@ -66,3 +64,5 @@
     <%= numbered_paginator(@post_replacements) %>
   </div>
 </div>
+
+<%= render "post_events/secondary_links" %>

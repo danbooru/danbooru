@@ -19,13 +19,13 @@ class ArtistsController < ApplicationController
 
   def ban
     @artist = authorize Artist.find(params[:id])
-    @artist.ban!(banner: CurrentUser.user)
+    @artist.ban!(CurrentUser.user)
     redirect_to(artist_path(@artist), :notice => "Artist was banned")
   end
 
   def unban
     @artist = authorize Artist.find(params[:id])
-    @artist.unban!
+    @artist.unban!(CurrentUser.user)
     redirect_to(artist_path(@artist), :notice => "Artist was unbanned")
   end
 

@@ -4,25 +4,6 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
   setup do
     user = FactoryBot.create(:user)
     CurrentUser.user = user
-    CurrentUser.ip_addr = "127.0.0.1"
-  end
-
-  context "#other_wiki_pages" do
-    subject { RelatedTagQuery.new(query: "copyright") }
-
-    setup do
-      create(:tag, name: "alpha", post_count: 1)
-      create(:tag, name: "beta", post_count: 1)
-      @copyright = FactoryBot.create(:copyright_tag, name: "copyright")
-      @wiki = FactoryBot.create(:wiki_page, title: "copyright", body: "[[list_of_hoges]]")
-      @list_of_hoges = FactoryBot.create(:wiki_page, title: "list_of_hoges", body: "[[alpha]] and [[beta]]")
-    end
-
-    should "return tags from the associated list wiki" do
-      result = subject.other_wiki_pages
-      assert_not_nil(result[0])
-      assert_equal(%w(alpha beta), result[0].tags)
-    end
   end
 
   context "a related tag query without a category constraint" do
@@ -37,7 +18,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "work" do
-        assert_equal(["aaa", "bbb", "ccc"], @query.tags.map(&:name))
+        assert_equal(["aaa", "bbb", "ccc"], @query.related_tags.map(&:name))
       end
     end
 
@@ -47,7 +28,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "work" do
-        assert_equal(true, @query.tags.empty?)
+        assert_equal(true, @query.related_tags.empty?)
       end
     end
 
@@ -60,11 +41,11 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "take wiki tags from the consequent's wiki" do
-        assert_equal(%w[foo], @query.wiki_page_tags)
+        assert_equal(%w[foo], @query.wiki_page_tags.pluck(:name))
       end
 
       should "take related tags from the consequent tag" do
-        assert_equal(%w[aaa bbb ccc], @query.tags.map(&:name))
+        assert_equal(%w[aaa bbb ccc], @query.related_tags.map(&:name))
       end
     end
 
@@ -74,7 +55,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "work" do
-        assert_equal(["aaa"], @query.tags.map(&:name))
+        assert_equal(%w[aaa bbb ccc], @query.related_tags.map(&:name))
       end
     end
 
@@ -85,22 +66,23 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "find any tags embedded in the wiki page" do
-        assert_equal(["bbb", "ccc"], @query.wiki_page_tags)
+        assert_equal(["bbb", "ccc"], @query.wiki_page_tags.pluck(:name))
       end
 
       should "return the tags in the same order as given by the wiki" do
         create(:wiki_page, title: "wiki", body: "[[ccc]] [[bbb]] [[ccc]] [[bbb]] [[aaa]]")
 
         query = RelatedTagQuery.new(query: "wiki")
-        assert_equal(%w[ccc bbb aaa], query.wiki_page_tags)
+        assert_equal(%w[ccc bbb aaa], query.wiki_page_tags.pluck(:name))
       end
 
       should "return aliased tags" do
+        create(:tag, name: "cat", post_count: 42)
         create(:tag_alias, antecedent_name: "kitten", consequent_name: "cat", status: "active")
         create(:wiki_page, title: "wiki", body: "[[kitten]]")
 
         query = RelatedTagQuery.new(query: "wiki")
-        assert_equal(%w[cat], query.wiki_page_tags)
+        assert_equal(%w[cat], query.wiki_page_tags.pluck(:name))
       end
     end
   end
@@ -110,11 +92,11 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       @post_1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
       @post_2 = FactoryBot.create(:post, :tag_string => "aaa art:ccc")
       @post_3 = FactoryBot.create(:post, :tag_string => "aaa copy:ddd")
-      @query = RelatedTagQuery.new(query: "aaa", category: "artist")
+      @query = RelatedTagQuery.new(query: "aaa", categories: ["artist"])
     end
 
     should "find the related tags" do
-      assert_equal(["ccc"], @query.tags.map(&:name))
+      assert_equal(["ccc"], @query.related_tags.map(&:name))
     end
   end
 end

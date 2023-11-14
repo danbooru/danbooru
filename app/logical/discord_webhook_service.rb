@@ -6,7 +6,7 @@
 class DiscordWebhookService
   attr_reader :webhook_id, :webhook_secret, :http
 
-  def initialize(webhook_id: Danbooru.config.discord_webhook_id, webhook_secret: Danbooru.config.discord_webhook_secret, http: Danbooru::Http.new)
+  def initialize(webhook_id: Danbooru.config.discord_webhook_id, webhook_secret: Danbooru.config.discord_webhook_secret, http: Danbooru::Http.external)
     @webhook_id = webhook_id
     @webhook_secret = webhook_secret
     @http = http

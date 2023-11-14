@@ -4,13 +4,11 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
   context "A comment votes controller" do
     setup do
       CurrentUser.user = @user = create(:user, name: "cirno")
-      CurrentUser.ip_addr = "127.0.0.1"
       @comment = create(:comment, creator: @user)
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     context "index action" do
@@ -216,7 +214,8 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(1, @vote.comment.score)
 
         assert_difference("CommentVote.count", 0) do
-          delete_auth comment_vote_path(@vote), create(:admin_user), xhr: true, params: { variant: "listing" }
+          admin = create(:admin_user)
+          delete_auth comment_vote_path(@vote), admin, xhr: true, params: { variant: "listing" }
 
           assert_response :success
           assert_equal(true, @vote.reload.is_deleted?)
@@ -224,6 +223,8 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal("comment_vote_delete", ModAction.last.category)
           assert_match(/deleted comment vote/, ModAction.last.description)
+          assert_equal(@vote, ModAction.last.subject)
+          assert_equal(admin, ModAction.last.creator)
         end
       end
 

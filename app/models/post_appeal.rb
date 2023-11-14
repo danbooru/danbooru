@@ -4,7 +4,7 @@ class PostAppeal < ApplicationRecord
   belongs_to :creator, :class_name => "User"
   belongs_to :post
 
-  validates :reason, length: { maximum: 140 }
+  validates :reason, visible_string: { allow_empty: true }, length: { maximum: 140 }
   validate :validate_post_is_appealable, on: :create
   validate :validate_creator_is_not_limited, on: :create
   validates :creator, uniqueness: { scope: :post, message: "have already appealed this post" }, on: :create
@@ -23,9 +23,8 @@ class PostAppeal < ApplicationRecord
   end
 
   module SearchMethods
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :reason, :status, :creator, :post)
-      q = q.text_attribute_matches(:reason, params[:reason_matches])
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :reason, :status, :creator, :post], current_user: current_user)
 
       q.apply_default_order(params)
     end

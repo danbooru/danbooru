@@ -4,7 +4,7 @@ class PrunePostsJobTest < ActiveJob::TestCase
   context "PrunePostsJob" do
     should "prune expired posts" do
       @pending = create(:post, is_pending: true, created_at: 5.days.ago)
-      @flagged = create(:post, is_flagged: true, created_at: 5.days.ago)
+      @flagged = create(:post, created_at: 5.days.ago)
       @appealed = create(:post, is_deleted: true, created_at: 5.days.ago)
 
       @flag = create(:post_flag, post: @flagged, created_at: 4.days.ago)

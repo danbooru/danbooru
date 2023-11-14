@@ -15,4 +15,12 @@ class PostApprovalsController < ApplicationController
 
     respond_with(@post_approvals)
   end
+
+  def show
+    @approval = authorize PostApproval.find(params[:id])
+
+    respond_with(@approval) do |format|
+      format.html { redirect_to post_approvals_path(search: { id: @approval.id }) }
+    end
+  end
 end

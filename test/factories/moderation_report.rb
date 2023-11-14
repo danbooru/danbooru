@@ -3,5 +3,6 @@ FactoryBot.define do
     creator
     reason {"xxx"}
     status { :pending }
+    model { build(:comment) }
   end
 end

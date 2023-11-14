@@ -23,7 +23,7 @@ module Source
 
       def tags
         api_response[:tags].to_s.split.map do |tag|
-          [tag, "https://#{domain}/post?tags=#{CGI.escape(tag)}"]
+          [tag, "https://#{domain}/post?tags=#{Danbooru::URL.escape(tag)}"]
         end
       end
 
@@ -34,7 +34,7 @@ module Source
 
       # Moebooru returns an empty array when doing an md5:<hash> search for a
       # deleted post. Because of this, api_response may be empty in some cases.
-      def api_response
+      memoize def api_response
         if post_id_from_url.present?
           params = { tags: "id:#{post_id_from_url}" }
         elsif post_md5_from_url.present?
@@ -43,11 +43,8 @@ module Source
           return {}
         end
 
-        response = http.cache(1.minute).get("https://#{domain}/post.json", params: params)
-        post = response.parse.first&.with_indifferent_access
-        post || {}
+        http.cache(1.minute).parsed_get("https://#{domain}/post.json", params: params)&.first&.with_indifferent_access || {}
       end
-      memoize :api_response
 
       concerning :HelperMethods do
         def sub_extractor

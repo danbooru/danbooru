@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 class CommentComponent < ApplicationComponent
-  attr_reader :comment, :context, :dtext_data, :current_user
+  attr_reader :comment, :context, :classes, :dtext_data, :current_user
 
-  def initialize(comment:, current_user:, context: nil, dtext_data: nil)
+  def initialize(comment:, current_user:, context: nil, classes: nil, dtext_data: nil)
     super
     @comment = comment
     @context = context
+    @classes = classes
     @dtext_data = dtext_data
     @current_user = current_user
   end
@@ -17,6 +18,10 @@ class CommentComponent < ApplicationComponent
 
   def thresholded?
     !comment.is_deleted? && !comment.is_sticky? && comment.score <= current_user.comment_threshold
+  end
+
+  def can_see_creator?
+    policy(comment).can_see_creator?
   end
 
   def redact_deleted?
@@ -38,10 +43,14 @@ class CommentComponent < ApplicationComponent
   end
 
   def current_vote
-    @current_vote ||= comment.votes.active.find { |v| v.user_id == current_user.id }
+    @current_vote ||= comment.active_votes.find { |v| v.user_id == current_user.id }
   end
 
   def reported?
     policy(ModerationReport).can_see_moderation_reports? && comment.pending_moderation_reports.present?
+  end
+
+  def component_state
+    { component: { classes: classes, context: context }}
   end
 end

@@ -40,20 +40,24 @@ module TagRelationshipRetirementService
   end
 
   def inactive_relationships
-    (inactive_aliases + inactive_implications).uniq
+    (inactive_gentag_aliases + inactive_artist_aliases + inactive_implications).uniq
   end
 
   def inactive_implications
     TagImplication.active.empty.where.not(consequent_name: "banned_artist")
   end
 
-  def inactive_aliases
-    aliases = TagAlias.general.or(TagAlias.artist).active.where("tag_aliases.created_at < ?", THRESHOLD.ago)
+  def inactive_gentag_aliases
+    aliases = TagAlias.general.active.where("tag_aliases.created_at < ?", THRESHOLD.ago)
     aliases = aliases.select do |tag_alias|
       !tag_alias.consequent_tag.posts.exists?(["created_at > ?", THRESHOLD.ago])
     end
 
     aliases += TagAlias.active.empty
     aliases
+  end
+
+  def inactive_artist_aliases
+    TagAlias.active.artist.where("tag_aliases.created_at < ?", THRESHOLD.ago)
   end
 end

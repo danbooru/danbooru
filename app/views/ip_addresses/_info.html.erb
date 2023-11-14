@@ -1,6 +1,6 @@
 <div class="space-x-4">
   <div class="inline-block">
-    <table class="aligned-vertical">
+    <table class="aligned-vertical table-sm">
       <% if ip_info[:country].present? %>
         <tr>
           <th>Location</th>
@@ -20,7 +20,7 @@
         <tr>
           <th>Network</th>
           <td>
-            <%= link_to ip_info[:network], ip_addresses_path(search: { ip_addr: ip_info[:network] }) %>
+            <%= link_to ip_info[:network], user_events_path(search: { user_session: { ip_addr: ip_info[:network] }}) %>
             (<%= link_to "info", "https://ipinfo.io/AS#{ip_info[:asn]}/#{ip_info[:network]}"  %>)
           </td>
         </tr>
@@ -28,10 +28,10 @@
 
       <tr>
         <th>Proxy?</th>
-        <td><%= ip_address.ip_addr.is_proxy? ? "Yes" : "No" %></td>
+        <td><%= ip_address.is_proxy? ? "Yes" : "No" %></td>
       </tr>
 
-      <% if ip_address.ip_addr.is_tor? %>
+      <% if ip_address.is_tor? %>
         <tr>
           <th>Tor?</th>
           <td>Yes</td>
@@ -41,8 +41,8 @@
       <tr>
         <th>IP Banned?</th>
         <td>
-          <% if IpBan.ip_matches(ip_address.ip_addr.to_s).exists? %>
-            Yes (<%= link_to "info", ip_bans_path(search: { ip_addr: ip_address.ip_addr.to_s }) %>)
+          <% if IpBan.ip_matches(ip_address.to_s).exists? %>
+            Yes (<%= link_to "info", ip_bans_path(search: { ip_addr: ip_address.to_s }) %>)
           <% else %>
             No
           <% end %>
@@ -78,7 +78,7 @@
         <th>Details</th>
         <td>
           <details>
-            <pre><%= JSON.pretty_generate(ip_address.lookup.response) %></pre>
+            <pre><%= JSON.pretty_generate(ip_address.ip_lookup.response) %></pre>
           </details>
         </td>
       </tr>

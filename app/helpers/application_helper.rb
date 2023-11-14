@@ -62,7 +62,7 @@ module ApplicationHelper
 
   def version_type_links(params)
     html = []
-    %w[previous subsequent current].each do |type|
+    %w[previous current].each do |type|
       if type == params[:type]
         html << %{<span>#{type}</span>}
       else
@@ -120,8 +120,8 @@ module ApplicationHelper
 
   def duration_to_hhmmss(seconds)
     seconds = seconds.round
-    hh = seconds.div(1.hour).to_s
-    mm = seconds.div(1.minute).to_s
+    hh = seconds.div(1.hour)
+    mm = (seconds.seconds - hh.hours.seconds).div(1.minute)
     ss = "%.2d" % (seconds % 1.minute)
 
     if seconds >= 1.hour
@@ -130,6 +130,19 @@ module ApplicationHelper
       "#{mm}:#{ss}"
     else
       "0:01"
+    end
+  end
+
+  def duration_to_hhmmssms(seconds)
+    hh = seconds.div(1.hour).to_s
+    mm = seconds.div(1.minute).to_s
+    ss = "%.2d" % (seconds % 1.minute)
+    ms = ("%.3f" % (seconds % 1.second)).delete_prefix("0.")
+
+    if seconds >= 1.hour
+      "#{hh}:#{mm}:#{ss}.#{ms}"
+    else
+      "#{mm}:#{ss}.#{ms}"
     end
   end
 
@@ -180,7 +193,8 @@ module ApplicationHelper
     time_tag(time.strftime("%Y-%m-%d %H:%M"), time)
   end
 
-  def external_link_to(url, text = url, truncate: nil, strip: false, **link_options)
+  def external_link_to(url, text = url, truncate: nil, strip: false, **link_options, &block)
+    text = capture { yield } if block_given?
     text = text.gsub(%r{\Ahttps?://}i, "") if strip == :scheme
     text = text.gsub(%r{\Ahttps?://(?:www\.)?}i, "") if strip == :subdomain
     text = text.truncate(truncate) if truncate
@@ -195,16 +209,16 @@ module ApplicationHelper
   def link_to_ip(ip, shorten: false, **options)
     ip_addr = IPAddr.new(ip.to_s)
     ip_addr.prefix = 64 if ip_addr.ipv6? && shorten
-    link_to ip_addr.to_s, ip_addresses_path(search: { ip_addr: ip, group_by: "user" }), **options
+    link_to ip_addr.to_s, user_events_path(search: { user_session: { ip_addr: ip }}), **options
   end
 
-  def link_to_search(search)
-    link_to search, posts_path(tags: search)
+  def link_to_search(tag, **options)
+    link_to tag.pretty_name, posts_path(tags: tag.name), class: tag_class(tag), **options
   end
 
-  def link_to_wiki(text, title = text, **options)
+  def link_to_wiki(text, title = text, classes: nil, **options)
     title = "~#{title}" if title =~ /\A\d+\z/
-    link_to text, wiki_page_path(title), class: "wiki-link", **options
+    link_to text, wiki_page_path(title), class: "wiki-link #{classes}", **options
   end
 
   def link_to_wikis(*wiki_titles, **options)
@@ -215,23 +229,21 @@ module ApplicationHelper
     to_sentence(links, **options)
   end
 
-  def link_to_user(user, text = nil, classes: nil, **options)
+  def link_to_user(user, text = nil, url: user, classes: nil, **options)
     return "anonymous" if user.blank?
 
-    user_class = "user user-#{user.level_string.downcase} #{classes}"
-    user_class += " user-post-approver" if user.can_approve_posts?
-    user_class += " user-post-uploader" if user.can_upload_free?
+    user_class = "user user-#{user.level_string.downcase} #{classes}".strip
     user_class += " user-banned" if user.is_banned?
 
     text = user.pretty_name if text.blank?
     data = { "user-id": user.id, "user-name": user.name, "user-level": user.level }
-    link_to(text, user, class: user_class, data: data)
+    link_to(text, url, class: user_class, data: data)
   end
 
-  def embed_wiki(title, **options)
+  def embed_wiki(title, classes: nil, **options)
     wiki = WikiPage.find_by(title: title)
     text = format_text(wiki&.body)
-    tag.div(text, class: "prose", **options)
+    tag.div(text, class: "prose #{classes}".strip, **options)
   end
 
   def dtext_preview_button(preview_field)
@@ -251,21 +263,26 @@ module ApplicationHelper
 
   def search_form_for(url, classes: "inline-form", method: :get, &block)
     defaults = { required: false }
-    html_options = { autocomplete: "off", class: "search-form #{classes}" }
+    html_options = { autocomplete: "off", novalidate: true, class: "search-form #{classes}" }
 
-    simple_form_for(:search, method: method, url: url, defaults: defaults, html: html_options, &block)
+    simple_form_for(:search, method: method, url: url, defaults: defaults, html: html_options) do |f|
+      out = "".html_safe
+      out += tag.input(type: :hidden, name: :limit, value: params[:limit]) if params[:limit].present?
+      out += capture { yield f } if block_given?
+      out
+    end
   end
 
-  def edit_form_for(model, **options, &block)
-    options[:html] = { autocomplete: "off", **options[:html].to_h }
+  def edit_form_for(model, validate: false, error_notice: true, warning_notice: true, **options, &block)
+    options[:html] = { autocomplete: "off", novalidate: !validate, **options[:html].to_h }
     options[:authenticity_token] = true if options[:remote] == true
 
     simple_form_for(model, **options) do |form|
-      if model.try(:errors).try(:any?)
+      if error_notice && model.try(:errors).try(:any?)
         concat tag.div(format_text(model.errors.full_messages.join("; ")), class: "notice notice-error notice-small prose")
       end
 
-      if model.try(:warnings).try(:any?)
+      if warning_notice && model.try(:warnings).try(:any?)
         concat tag.div(format_text(model.warnings.full_messages.join("; ")), class: "notice notice-info notice-small prose")
       end
 

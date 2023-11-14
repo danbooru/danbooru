@@ -1,8 +1,0 @@
-<ul class="tag-list simple-tag-list">
-  <% tags.each do |t| %>
-    <li class="flex items-center space-x-1">
-      <input type="checkbox" tabindex="-1">
-      <%= link_to t.pretty_name, posts_path(tags: t.name), class: "search-tag tag-type-#{t.category}", "data-tag-name": t.name %>
-    </li>
-  <% end %>
-</ul>

@@ -1,11 +1,8 @@
-$tooltip-line-height: 16px;
-$tooltip-body-height: $tooltip-line-height * 6; // 4 lines high.
-
 .tippy-box[data-theme~="post-tooltip"] {
-  min-width: 20em;
-  max-width: 35em !important;
-  font-size: 11px;
-  line-height: $tooltip-line-height;
+  --tooltip-body-height: 96px;
+
+  min-width: 180px;
+  max-width: 400px !important;
 
   .tippy-content {
     padding: 0;
@@ -15,52 +12,24 @@ $tooltip-body-height: $tooltip-line-height * 6; // 4 lines high.
     }
 
     .post-tooltip-body {
-      max-height: $tooltip-body-height;
-      overflow-y: auto;
-      display: flex;
+      max-height: var(--tooltip-body-height);
 
       &.has-preview {
-        max-height: 154px;
-        padding: 8px;
-
-        article.post-preview {
-          margin: 0 8px 0 0;
-        }
+        max-height: calc(2 * var(--tooltip-body-height));
       }
-
-      li {
-        margin-right: 0;
-      }
-
-      .post-tooltip-body-left { flex: 0; }
-      .post-tooltip-body-right { flex: 1; }
     }
 
     div.post-tooltip-header {
       background-color: var(--post-tooltip-header-background-color);
-      display: flex;
-      white-space: nowrap;
-      align-items: center;
+      font-size: 10px;
 
-      .post-tooltip-info {
-        margin-right: 0.5em;
-        color: var(--post-tooltip-info-color);
-        font-size: 10px;
-        flex: 0;
+      .post-tooltip-score .post-votes {
+        gap: 2px;
       }
 
       a.user {
-        margin-right: 0.5em;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
         min-width: 0;
         max-width: 11em;
-      }
-
-      .post-tooltip-source {
-        flex: 1;
-        text-align: right;
       }
     }
   }

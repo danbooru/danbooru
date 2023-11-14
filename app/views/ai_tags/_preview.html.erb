@@ -1,16 +1,29 @@
-<%= render(MediaAssetPreviewComponent.new(media_asset: media_asset, size: size, link_target: media_asset.post || media_asset, classes: "flex flex-col items-center w-full h-full border rounded pb-2", inner_classes: "flex-auto flex items-center", html: { "data-tag-id": ai_tag.tag_id, **data_attributes_for(media_asset) })) do |preview| %>
-  <% preview.footer do %>
+<%# ai_tag, media_asset, post, size %>
+
+<%= render(MediaAssetPreviewComponent.new(media_asset: media_asset, size: size, link_target: post || media_asset, classes: "card-outlined overflow-hidden flex flex-col items-center w-full h-full pb-2", inner_classes: "flex-auto flex items-center", html: { "data-tag-id": ai_tag.tag_id, **data_attributes_for(media_asset) })) do |preview| %>
+  <% preview.with_footer do %>
     <div class="text-center text-xs leading-none px-2 w-full mt-2">
       <div class="truncate mb-2">
+        <% if ai_tag.tag.rating? %>
+          <%= link_to_wiki "?", "howto:rate", class: tag_class(ai_tag.tag)  %>
+        <% else %>
+          <%= link_to_wiki "?", ai_tag.tag.name, class: tag_class(ai_tag.tag)  %>
+        <% end %>
+
         <%= link_to "#{ai_tag.tag.pretty_name}", ai_tags_path(search: search_params.merge(tag_name: ai_tag.tag.name)), class: "tag-type-#{ai_tag.tag.category}", "data-tag-name": ai_tag.tag.name, title: ai_tag.tag.pretty_name %>
         <br>
         <%= link_to "#{ai_tag.score}%", ai_tags_path(search: search_params.merge(tag_name: ai_tag.tag.name, score: ">=#{ai_tag.score}")), class: "tag-type-#{ai_tag.tag.category}", "data-tag-name": ai_tag.tag.name %>
       </div>
 
-      <% if media_asset.post.nil? %>
+      <% if post.nil? %>
         <% # no button %>
       <% elsif !policy(ai_tag).update? %>
         <%= button_to "Add", nil, class: "button-primary button-sm", disabled: true %>
+      <% elsif post.saved_change_to_rating? && "rating:#{post.rating_before_last_save}" != ai_tag.tag.name %>
+        <% previous_rating = "rating:#{post.rating_before_last_save}" %>
+        <%= button_to "Remove", tag_ai_tag_path(media_asset_id: ai_tag.media_asset, tag_id: ai_tag.tag), remote: true, method: :put, params: { tag: previous_rating }, class: "button-outline-danger button-sm", title: "Revert to #{previous_rating}" %>
+      <% elsif ai_tag.post_tagged? && ai_tag.tag.rating? %>
+        <%= button_to "Remove", nil, class: "button-primary button-sm", disabled: true %>
       <% elsif ai_tag.post_tagged? %>
         <%= button_to "Remove", tag_ai_tag_path(media_asset_id: ai_tag.media_asset, tag_id: ai_tag.tag), remote: true, method: :put, params: { mode: "remove" }, class: "button-outline-danger button-sm", title: "Remove the tag from the post" %>
       <% else %>

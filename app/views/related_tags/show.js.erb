@@ -1,7 +1,9 @@
 <% if params[:user_tags] %>
-  $(".user-related-tags-columns").replaceWith("<%= j render "user_tags", related_tags: @query %>");
+  $(".ai-tags-related-tags-column").replaceWith("<%= j render "related_tags/ai_tags", related_tags: @query %>");
+  $(".recent-related-tags-column").replaceWith("<%= j render "related_tags/recent_tags", related_tags: @query %>");
+  $(".frequent-related-tags-column").replaceWith("<%= j render "related_tags/frequent_tags", related_tags: @query %>");
 <% else %>
-  $(".current-related-tags-columns").replaceWith("<%= j render "current_tags", related_tags: @query %>");
+  $(".general-related-tags-column").replaceWith("<%= j render "related_tags/related_tags", related_tags: @query, collapsed: false %>");
 <% end %>
 
 Danbooru.RelatedTag.update_selected();

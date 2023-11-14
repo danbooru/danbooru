@@ -1,29 +1,61 @@
 User-agent: *
 Disallow: /
+
+<% if Danbooru.config.allow_web_crawlers?.to_s.truthy? %>
 Allow: /$
 
-<% if !Rails.env.production? || Danbooru.config.hostname == request.host %>
 Disallow: /*.atom
 Disallow: /*.json
-Disallow: /posts?tags=source:*
-Disallow: /posts?tags=ordfav:*
-Disallow: /posts?tags=approver:*
+Disallow: /posts?*tags=source:*
+Disallow: /posts?*tags=ordfav:*
+Disallow: /posts?*tags=approver:*
+Disallow: /posts?*show_votes=*
+Disallow: /posts?*size=*
+Disallow: /posts/*/events
 Disallow: /posts/*/favorites
 Disallow: /posts/*/show_seq*
+Disallow: /posts/random
+Disallow: /artists?*search*
+Disallow: /artists/*/edit
+Disallow: /comments?*search*
+Disallow: /forum_posts?*search*
+Disallow: /media_assets?*search*
+Disallow: /pools?*search*
+Disallow: /tags/*/edit
+Disallow: /users?*search*
+Disallow: /wiki_pages?*search*
+Disallow: /wiki_pages/*/edit
 
 Disallow: <%= artist_urls_path %>
 Disallow: <%= artist_versions_path %>
+Disallow: <%= artist_commentaries_path %>
 Disallow: <%= artist_commentary_versions_path %>
+Disallow: <%= comments_path(format: :atom) %>
+Disallow: <%= comment_votes_path %>
+Disallow: <%= forum_post_votes_path %>
+Disallow: <%= forum_topics_path(format: :atom) %>
 Disallow: <%= note_versions_path %>
+Disallow: <%= post_appeals_path %>
+Disallow: <%= post_flags_path %>
+Disallow: <%= post_approvals_path %>
+Disallow: <%= post_disapprovals_path %>
+Disallow: <%= post_replacements_path %>
+Disallow: <%= post_events_path %>
 Disallow: <%= post_versions_path %>
 Disallow: <%= pool_versions_path %>
+Disallow: <%= tag_aliases_path %>
+Disallow: <%= tag_implications_path %>
+Disallow: <%= tag_versions_path %>
+Disallow: <%= user_actions_path %>
+Disallow: <%= user_events_path %>
+Disallow: <%= user_feedbacks_path %>
+Disallow: <%= user_name_change_requests_path %>
+Disallow: <%= new_wiki_page_path %>
 Disallow: <%= wiki_page_versions_path %>
 
 Allow: <%= artists_path %>
-Allow: <%= artist_commentaries_path %>
 Allow: <%= comments_path %>
 Allow: <%= popular_explore_posts_path %>
-Allow: <%= curated_explore_posts_path %>
 Allow: <%= viewed_explore_posts_path %>
 Allow: <%= searches_explore_posts_path %>
 Allow: <%= missed_searches_explore_posts_path %>
@@ -73,11 +105,35 @@ Allow: <%= not_found_path %>
 Allow: /sitemap.xml
 Allow: /favicon.svg
 
+<% if Artist.undeleted.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "artists") %>
+<% end %>
+
+<% if ForumTopic.undeleted.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "forum_topics") %>
+<% end %>
+
+<% if Pool.undeleted.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "pools") %>
+<% end %>
+
+<% if Post.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "posts") %>
+<% end %>
+
+<% if Tag.nonempty.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "tags") %>
+<% end %>
+
+<% if User.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "users") %>
+<% end %>
+
+<% if WikiPage.undeleted.exists? %>
 Sitemap: <%= sitemap_url(format: :xml, sitemap: "wiki_pages") %>
 <% end %>
+
+<% end %>
+
+# Honeypot for bots that intentionally ignore robots.txt. Only dumb bots follow this link.
+Disallow: <%= post_path(2884633, i_am_dumb: "true") %>

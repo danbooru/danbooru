@@ -7,25 +7,11 @@ class NicoSeigaApiClient
 
   attr_reader :http, :user_session
 
-  def initialize(work_id:, type:, user_session: Danbooru.config.nico_seiga_user_session, http: Danbooru::Http.new)
+  def initialize(work_id:, type:, user_session: Danbooru.config.nico_seiga_user_session, http:)
     @work_id = work_id
     @work_type = type
     @user_session = user_session
     @http = http
-  end
-
-  def image_ids
-    case @work_type
-    when "illust"
-      [api_response["id"]]
-    when "manga"
-      manga_api_response.map do |x|
-        case x["meta"]["source_url"]
-        when %r{/thumb/(\d+)\w}i then Regexp.last_match(1)
-        when %r{nicoseiga\.cdn\.nimg\.jp/drm/image/\w+/(\d+)\w}i then Regexp.last_match(1)
-        end
-      end
-    end
   end
 
   def title
@@ -37,11 +23,21 @@ class NicoSeigaApiClient
   end
 
   def tags
-    api_response.dig("tag_list", "tag").to_a.map { |t| t["name"] }.compact
+    tags = api_response.dig("tag_list", "tag")
+    if tags.instance_of? Hash
+      # When a manga post has a single tag, the XML parser thinks it's a hash instead of an array of hashes,
+      # so we need to manually turn it into the latter. Example: https://seiga.nicovideo.jp/watch/mg302561
+      tags = [tags]
+    end
+    tags.to_a.map { |t| t["name"] }.compact
   end
 
   def user_id
-    api_response["user_id"]
+    if api_response["user_id"].to_i == 0  # anonymous: https://nico.ms/mg310193
+      nil
+    else
+      api_response["user_id"]
+    end
   end
 
   def user_name
@@ -80,6 +76,7 @@ class NicoSeigaApiClient
   end
 
   def user_api_response(user_id)
+    return {} unless user_id.present?
     resp = get("#{XML_API}/user/info?id=#{user_id}")
     return {} if resp.blank? || resp.code.to_i == 404
     Hash.from_xml(resp.to_s)["response"]["user"]

@@ -9,7 +9,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         @mod_user = create(:moderator_user, name: "yukari")
-        @other_user = create(:builder_user, can_upload_free: true, inviter: @mod_user, created_at: 2.weeks.ago)
+        @other_user = create(:contributor_user, inviter: @mod_user, created_at: 2.weeks.ago)
         @uploader = create(:user, created_at: 2.weeks.ago)
       end
 
@@ -41,7 +41,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should respond_to_search({}).with { [@uploader, @other_user, @mod_user, @user, User.system] }
       should respond_to_search(min_level: User::Levels::BUILDER).with { [@other_user, @mod_user, User.system] }
-      should respond_to_search(can_upload_free: "true").with { @other_user }
       should respond_to_search(name_matches: "yukari").with { @mod_user }
 
       context "using includes" do
@@ -103,6 +102,81 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "#deactivate action" do
+      should "render /users/:id/deactivate for the current user" do
+        get_auth deactivate_user_path(@user), @user
+        assert_response :success
+      end
+
+      should "render /users/:id/deactivate for the Owner user" do
+        get_auth deactivate_user_path(@user), create(:owner)
+        assert_response :success
+      end
+
+      should "not render /users/:id/deactivate for a different user" do
+        get_auth deactivate_user_path(@user), create(:user)
+        assert_response 403
+      end
+
+      should "render /users/deactivate for a logged-in user" do
+        get_auth deactivate_users_path, @user
+        assert_response :success
+      end
+
+      should "not render /users/deactivate for a logged-out user" do
+        get deactivate_users_path
+        assert_response 403
+      end
+
+      should "redirect /maintenance/user/deletion to /users/deactivate" do
+        get "/maintenance/user/deletion"
+        assert_redirected_to deactivate_users_path
+      end
+    end
+
+    context "#destroy action" do
+      should "delete the user when given the correct password" do
+        delete_auth user_path(@user), @user, params: { user: { password: "password" }}
+
+        assert_redirected_to posts_path
+        assert_equal(true, @user.reload.is_deleted?)
+        assert_equal("Your account has been deactivated", flash[:notice])
+        assert_nil(session[:user_id])
+        assert_equal(true, @user.user_events.user_deletion.exists?)
+      end
+
+      should "not delete the user when given an incorrect password" do
+        delete_auth user_path(@user), @user, params: { user: { password: "hunter2" }}
+
+        assert_redirected_to deactivate_user_path(@user)
+        assert_equal(false, @user.reload.is_deleted?)
+        assert_equal("Password is incorrect", flash[:notice])
+        assert_equal(@user.id, session[:user_id])
+        assert_equal(false, @user.user_events.user_deletion.exists?)
+      end
+
+      should "allow the Owner to delete other users" do
+        delete_auth user_path(@user), create(:owner)
+
+        assert_redirected_to posts_path
+        assert_equal(true, @user.reload.is_deleted?)
+        assert_equal("Your account has been deactivated", flash[:notice])
+        assert_equal(true, @user.user_events.user_deletion.exists?)
+      end
+
+      should "not allow users to delete other users" do
+        delete_auth user_path(@user), create(:user), params: { user: { password: "password" }}
+
+        assert_response 403
+      end
+
+      should "not allow logged-out users to delete other users" do
+        delete user_path(@user), params: { user: { password: "password" }}
+
+        assert_response 403
+      end
+    end
+
     context "custom_style action" do
       should "work" do
         @user.update!(custom_style: "span { color: red; }")
@@ -114,7 +188,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     context "show action" do
       setup do
         # flesh out profile to get more test coverage of user presenter.
-        @user = create(:user, can_approve_posts: true, created_at: 2.weeks.ago)
+        @user = create(:approver, created_at: 2.weeks.ago)
         as(@user) do
           create(:saved_search, user: @user)
           create(:post, uploader: @user, tag_string: "fav:#{@user.name}")
@@ -127,21 +201,28 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "show hidden attributes to the owner" do
-        get_auth user_path(@user), @user, params: {format: :json}
-        json = JSON.parse(response.body)
+        get_auth user_path(@user), @user, as: :json
 
         assert_response :success
-        assert_not_nil(json["last_logged_in_at"])
+        assert_not_nil(response.parsed_body["last_logged_in_at"])
+      end
+
+      should "show the last_ip_addr to mods" do
+        user = create(:user, last_ip_addr: "1.2.3.4")
+        get_auth user_path(user), create(:mod_user), as: :json
+
+        assert_response :success
+        assert_equal("1.2.3.4", response.parsed_body["last_ip_addr"])
       end
 
       should "not show hidden attributes to others" do
         @another = create(:user)
 
-        get_auth user_path(@another), @user, params: {format: :json}
-        json = JSON.parse(response.body)
+        get_auth user_path(@another), @user, as: :json
 
         assert_response :success
-        assert_nil(json["last_logged_in_at"])
+        assert_nil(response.parsed_body["last_logged_in_at"])
+        assert_nil(response.parsed_body["last_ip_addr"])
       end
 
       should "strip '?' from attributes" do
@@ -220,11 +301,16 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth profile_path, @user, as: :json
         assert_response :success
 
-        assert_equal(@user.comment_count, response.parsed_body["comment_count"])
+        assert_equal(@user.comments.count, response.parsed_body["comment_count"])
       end
 
       should "redirect anonymous users to the sign in page" do
         get profile_path
+        assert_redirected_to login_path(url: "/profile")
+      end
+
+      should "redirect `Accept: */*` requests to the sign in page" do
+        get profile_path, headers: { Accept: "*/*" }
         assert_redirected_to login_path(url: "/profile")
       end
 
@@ -259,24 +345,30 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User::Levels::MEMBER, User.last.level)
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_nil(User.last.email_address)
-        assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last], queue: "default"
         assert_equal(true, User.last.user_events.user_creation.exists?)
+
+        perform_enqueued_jobs
+        assert_performed_jobs(1, only: MailDeliveryJob)
+        # assert_enqueued_email_with UserMailer.with_request(request), :welcome_user, args: [User.last], queue: "default"
       end
 
       should "create a user with a valid email" do
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "webmaster@danbooru.donmai.us" }}
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: "webmaster@danbooru.donmai.us" }}
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_equal("webmaster@danbooru.donmai.us", User.last.email_address.address)
-        assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last], queue: "default"
         assert_equal(true, User.last.user_events.user_creation.exists?)
+
+        perform_enqueued_jobs
+        assert_performed_jobs(1, only: MailDeliveryJob)
+        # assert_enqueued_email_with UserMailer.with_request(request), :welcome_user, args: [User.last], queue: "default"
       end
 
       should "not create a user with an invalid email" do
         assert_no_difference(["User.count", "EmailAddress.count"]) do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "test" }}
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: "test" }}
 
           assert_response :success
           assert_no_enqueued_emails
@@ -285,7 +377,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not create a user with an undeliverable email address" do
         assert_no_difference(["User.count", "EmailAddress.count"]) do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "nobody@nothing.donmai.us" } }
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: "nobody@nothing.donmai.us" } }
 
           assert_response :success
           assert_no_enqueued_emails

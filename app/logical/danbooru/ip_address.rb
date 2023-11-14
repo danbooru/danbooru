@@ -6,11 +6,17 @@
 module Danbooru
   class IpAddress
     attr_reader :ip_address
-    delegate :ipv4?, :ipv6?, :loopback?, :link_local?, :unique_local?, :private?, :to_string, :prefix, :multicast?, :unspecified?, to: :ip_address
+    delegate :ipv4?, :ipv6?, :loopback?, :link_local?, :unique_local?, :private?, :to_string, :network, :prefix, :multicast?, :unspecified?, to: :ip_address
     delegate :ip_info, :is_proxy?, to: :ip_lookup
 
+    def self.parse(string)
+      new(string)
+    rescue
+      nil
+    end
+
     def initialize(string)
-      @ip_address = ::IPAddress.parse(string.to_s)
+      @ip_address = ::IPAddress.parse(string.to_s.strip)
     end
 
     def ip_lookup
@@ -39,9 +45,13 @@ module Danbooru
       ip_address.include?(other.ip_address)
     end
 
+    def as_json
+      to_s
+    end
+
     # "1.2.3.4/24" if the address is a subnet, "1.2.3.4" otherwise.
     def to_s
-      ip_address.size > 1 ? ip_address.to_string : ip_address.to_s
+      ip_address.size > 1 ? "#{network}/#{prefix}" : ip_address.to_s
     end
 
     def inspect

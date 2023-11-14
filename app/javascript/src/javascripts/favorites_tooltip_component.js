@@ -1,6 +1,6 @@
 import Utility from "./utility";
-import { delegate, hideAll } from 'tippy.js';
-import 'tippy.js/dist/tippy.css';
+import { createTooltip } from "./utility";
+import { hideAll } from 'tippy.js';
 
 class FavoritesTooltipComponent {
   // Trigger on the post favcount link.
@@ -15,16 +15,10 @@ class FavoritesTooltipComponent {
       return;
     }
 
-    FavoritesTooltipComponent.instance = delegate("body", {
-      allowHTML: true,
-      appendTo: document.querySelector("#post-favorites-tooltips"),
+    FavoritesTooltipComponent.instance = createTooltip("favorites-tooltip", {
       delay: [FavoritesTooltipComponent.SHOW_DELAY, FavoritesTooltipComponent.HIDE_DELAY],
       duration: FavoritesTooltipComponent.DURATION,
-      interactive: true,
-      maxWidth: "none",
       target: FavoritesTooltipComponent.TARGET_SELECTOR,
-      theme: "common-tooltip",
-      touch: false,
 
       onShow: FavoritesTooltipComponent.onShow,
       onHide: FavoritesTooltipComponent.onHide,

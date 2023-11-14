@@ -7,7 +7,12 @@ require 'rails/test_help'
 Dir["#{Rails.root}/test/factories/*.rb"].sort.each { |file| require file }
 Dir["#{Rails.root}/test/test_helpers/*.rb"].sort.each { |file| require file }
 
-Minitest::Reporters.use!(Minitest::Reporters::ProgressReporter.new)
+Minitest::Reporters.use!([
+  Minitest::Reporters::ProgressReporter.new,
+  Minitest::Reporters::HtmlReporter.new(reports_dir: "tmp/html-test-results"),
+  Minitest::Reporters::JUnitReporter.new("tmp/junit-test-results")
+])
+
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :minitest
@@ -24,10 +29,11 @@ class ActiveSupport::TestCase
   extend PoolArchiveTestHelper
   include ReportbooruHelper
   include AutotaggerHelper
+  include DatabaseTestHelper
   include DownloadTestHelper
   include IqdbTestHelper
   include UploadTestHelper
-  extend SourceTestHelper
+  include SourceTestHelper
   extend StripeTestHelper
   extend NormalizeAttributeHelper
 
@@ -50,10 +56,12 @@ class ActiveSupport::TestCase
   setup do
     Socket.stubs(:gethostname).returns("www.example.com")
 
-    @temp_dir = Dir.mktmpdir("danbooru-temp-")
+    @temp_dir = Dir.mktmpdir("danbooru-uploads-")
     storage_manager = StorageManager::Local.new(base_url: "https://www.example.com/data", base_dir: @temp_dir)
     Danbooru.config.stubs(:storage_manager).returns(storage_manager)
     Danbooru.config.stubs(:backup_storage_manager).returns(StorageManager::Null.new)
+
+    at_exit { FileUtils.rm_rf(@temp_dir) }
   end
 
   teardown do
@@ -63,6 +71,13 @@ class ActiveSupport::TestCase
 
   def as(user, &block)
     CurrentUser.scoped(user, &block)
+  end
+
+  def assert_search_equals(expected_results, current_user: User.anonymous, **params)
+    klass = subject.is_a?(ApplicationRecord) ? subject.class : subject
+    results = klass.search(params, current_user)
+
+    assert_equal(Array(expected_results).map(&:id), results.ids)
   end
 end
 

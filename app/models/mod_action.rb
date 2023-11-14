@@ -2,6 +2,7 @@
 
 class ModAction < ApplicationRecord
   belongs_to :creator, :class_name => "User"
+  belongs_to :subject, polymorphic: true, optional: true
 
   # ####DIVISIONS#####
   # Groups:     0-999
@@ -16,6 +17,7 @@ class ModAction < ApplicationRecord
   # Misc:     6-19
   enum category: {
     user_delete: 2,
+    user_undelete: 3,
     user_ban: 4,
     user_unban: 5,
     user_name_change: 6,
@@ -41,6 +43,8 @@ class ModAction < ApplicationRecord
     post_vote_undelete: 233,
     pool_delete: 62,
     pool_undelete: 63,
+    media_asset_delete: 72,
+    media_asset_expunge: 76,
     artist_ban: 184,
     artist_unban: 185,
     comment_update: 81,
@@ -66,31 +70,39 @@ class ModAction < ApplicationRecord
     ip_ban_delete: 162,
     ip_ban_undelete: 163,
     mass_update: 1000, # XXX unused
-    bulk_revert: 1001, # XXX unused
-    other: 2000,
   }
+
+  def self.model_types
+    %w[Artist Comment CommentVote ForumPost ForumTopic IpBan ModerationReport Pool Post PostVote Tag TagAlias TagImplication User]
+  end
 
   def self.visible(user)
     if user.is_moderator?
       all
     else
-      where.not(category: [:ip_ban_create, :ip_ban_delete])
+      where.not(category: [:ip_ban_create, :ip_ban_delete, :ip_ban_undelete, :moderation_report_handled, :moderation_report_rejected])
     end
   end
 
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :category, :description, :creator)
-    q = q.text_attribute_matches(:description, params[:description_matches])
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :category, :description, :creator, :subject], current_user: current_user)
 
-    q.apply_default_order(params)
+    case params[:order]
+    when "created_at_asc"
+      q = q.order(created_at: :asc, id: :asc)
+    else
+      q = q.apply_default_order(params)
+    end
+
+    q
   end
 
   def category_id
     self.class.categories[category]
   end
 
-  def self.log(desc, cat = :other, user = CurrentUser.user)
-    create(creator: user, description: desc, category: categories[cat])
+  def self.log(description, category, subject:, user:)
+    create!(description: description, category: category, subject: subject, creator: user)
   end
 
   def self.available_includes

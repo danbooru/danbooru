@@ -21,9 +21,11 @@
 
   <%# XXX hack to only load Ruffle on Flash posts %>
   <% if controller_name == "posts" && action_name == "show" && @post&.is_flash? %>
-    <%= javascript_pack_tag "application", "alpine", "flash", defer: false %>
+    <%= javascript_pack_tag "application", "flash", defer: false %>
+  <% elsif controller_name == "media_assets" && action_name == "show" && @media_asset&.is_flash? %>
+    <%= javascript_pack_tag "application", "flash", defer: false %>
   <% else %>
-    <%= javascript_pack_tag "application", "alpine", defer: false %>
+    <%= javascript_pack_tag "application", defer: false %>
   <% end %>
 
   <%= stylesheet_pack_tag "application" %>
@@ -70,9 +72,9 @@
   <% end %>
 
   <header id="top">
-    <div id="app-name-header" class="font-bold font-header leading-normal inline-flex items-center gap-1">
-      <%= link_to image_pack_tag("static/logo.png"), root_path, id: "app-logo" %>
-      <%= link_to Danbooru.config.app_name, root_path, id: "app-name" %>
+    <div id="app-name-header" class="font-bold font-header leading-normal inline-flex items-end gap-2">
+      <%= link_to image_pack_tag("static/images/logo.png"), root_path, id: "app-logo" %>
+      <%= link_to Danbooru.config.app_name, root_path, id: "app-name", class: "m-auto" %>
     </div>
 
     <div id="maintoggle" class="mobile-only">
@@ -139,7 +141,7 @@
 
         <span>(<%= link_to "hide", "#", id: "hide-promotion-notice" %>)</span>
       </div>
-    <% elsif !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && !CurrentUser.user.is_banned? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
+    <% elsif UserUpgrade.enabled? && !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && !CurrentUser.user.is_banned? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
       <%= render "users/upgrade_notice" %>
     <% end %>
 
@@ -160,50 +162,40 @@
     <% if !CurrentUser.user.is_anonymous? && CurrentUser.user.name_invalid? %>
       <div class="notice notice-error notice-large" id="invalid-name-notice">
         <h2>Action required </h2>
-        <div>You must <%= link_to "change your username", new_user_name_change_request_path %> to continue using <%= Danbooru.config.canonical_app_name %>.</div>
+        <div>You must <%= link_to "change your username", change_name_user_path(CurrentUser.user) %> to continue using <%= Danbooru.config.canonical_app_name %>.</div>
       </div>
     <% end %>
 
-    <div class="notice notice-info" id="notice" style="<%= "display: none;" unless flash[:notice] %>">
-      <span class="prose"><%= format_text(flash[:notice], inline: true) %>.</span>
-      <a href="#" id="close-notice-link">close</a>
+    <div id="notice" class="notice notice-info flex fixed top-2 left-2 right-2 p-2 mx-auto max-w-720px max-h-150px thin-scrollbar z-9999 sm:text-sm" style="<%= "display: none;" unless flash[:notice] %>">
+      <span class="prose flex-1"><%= format_text(flash[:notice], inline: true) %>.</span>
+      <a href="#" id="close-notice-link" class="flex self-center text-lg" data-shortcut="esc"><%= close_icon %></a>
     </div>
 
     <%= yield :layout %>
   </div>
 
-  <div id="tooltips">
-    <%# Order matters here; items at the bottom of the list appear on top of earlier items %>
-    <div id="post-tooltips"></div>
-    <div id="comment-votes-tooltips"></div>
-    <div id="post-votes-tooltips"></div>
-    <div id="post-favorites-tooltips"></div>
-    <div id="user-tooltips"></div>
-    <div id="popup-menus"></div>
-  </div>
+  <div id="tooltips"></div>
 
-  <footer id="page-footer" class="text-sm flex-initial">
+  <footer id="page-footer" class="text-sm text-center flex-initial mt-4 py-3 w-full border-t flex flex-wrap items-center justify-center gap-1">
     <%= link_to "Terms", terms_of_service_path %>
     / <%= link_to "Privacy", privacy_policy_path %>
     / <%= link_to "Contact", contact_path %>
     /
-    <span class="social-icons">
-      <% if Danbooru.config.source_code_url.present? %>
-        <%= link_to Danbooru.config.source_code_url, title: "Running commit: #{Rails.application.config.x.git_hash&.first(9)}", class: "social-icon" do %>
-          <%= github_icon %>
-        <% end %>
+    <% if Danbooru.config.source_code_url.present? %>
+      <%= link_to Danbooru.config.source_code_url, title: "Running commit: #{Rails.application.config.x.git_hash&.first(9)}", class: "social-icon" do %>
+        <%= github_icon(class: "h-4") %>
       <% end %>
-      <% if Danbooru.config.twitter_username.present? %>
-        <%= link_to "https://twitter.com/#{Danbooru.config.twitter_username}", class: "social-icon" do %>
-          <%= twitter_icon %>
-        <% end %>
+    <% end %>
+    <% if Danbooru.config.twitter_username.present? %>
+      <%= link_to "https://twitter.com/#{Danbooru.config.twitter_username}", class: "social-icon" do %>
+        <%= twitter_icon(class: "h-4") %>
       <% end %>
-      <% if Danbooru.config.discord_server_url.present? %>
-        <%= link_to Danbooru.config.discord_server_url, class: "social-icon" do %>
-          <%= discord_icon %>
-        <% end %>
+    <% end %>
+    <% if Danbooru.config.discord_server_url.present? %>
+      <%= link_to Danbooru.config.discord_server_url, class: "social-icon" do %>
+        <%= discord_icon(class: "h-4") %>
       <% end %>
-    </span>
+    <% end %>
   </footer>
 <% end %>
 </html>

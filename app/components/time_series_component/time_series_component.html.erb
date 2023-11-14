@@ -1,0 +1,40 @@
+<div class="flex justify-end text-xs mb-2">
+  <% if mode == :table %>
+    <%= link_to "Chart", current_page_path(search: { **search_params, mode: "chart" }) %>
+  <% else %>
+    <%= link_to "Table", current_page_path(search: { **search_params, mode: "table" }) %>
+  <% end %>
+</div>
+
+<% if dataframe.empty? %>
+  <p>No results found. Try modifying your search or expanding your time range.</p>
+<% elsif mode == :chart && x_axis.present? %>
+  <div class="line-chart" style="width: 100%; height: max(90vh, <%= chart_height.to_i %>px);"></div>
+
+  <script type="text/javascript">
+    var chart = new Danbooru.TimeSeriesComponent({
+      container: $(".line-chart").get(0),
+      options: <%= raw chart_options.to_json %>,
+    });
+  </script>
+<% else %>
+  <table class="striped autofit" width="100%">
+    <thead>
+      <% dataframe.types.keys.each do |column| %>
+        <%= tag.th(column == "date" ? "Date" : column.to_s, class: ("col-expand" if column == dataframe.types.keys.last)) %>
+      <% end %>
+    </thead>
+
+    <tbody>
+      <% dataframe.each_row do |row| %>
+        <tr>
+          <% dataframe.types.keys.each do |column| %>
+            <td>
+              <%= row[column] %>
+            </td>
+          <% end %>
+        <tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

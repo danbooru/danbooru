@@ -3,7 +3,7 @@
 class WikiPage < ApplicationRecord
   class RevertError < StandardError; end
 
-  META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:"]
+  META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:","api:"]
 
   after_save :create_version
 
@@ -14,7 +14,7 @@ class WikiPage < ApplicationRecord
   array_attribute :other_names # XXX must come after `normalize :other_names`
 
   validates :title, tag_name: true, presence: true, uniqueness: true, if: :title_changed?
-  validates :body, presence: true, unless: -> { is_deleted? || other_names.present? }
+  validates :body, visible_string: true, unless: -> { is_deleted? || other_names.present? }
   validate :validate_rename
   validate :validate_other_names
 
@@ -43,9 +43,7 @@ class WikiPage < ApplicationRecord
     end
 
     def other_names_include(name)
-      name = normalize_other_name(name)
-      subquery = WikiPage.from("unnest(other_names) AS other_name").where_iequals("other_name", name)
-      where(id: subquery)
+      where_any_in_array_iequals("other_names", normalize_other_name(name))
     end
 
     def other_names_match(name)
@@ -61,10 +59,9 @@ class WikiPage < ApplicationRecord
       order(updated_at: :desc)
     end
 
-    def search(params = {})
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_locked, :is_deleted, :body, :title, :other_names, :tag, :artist, :dtext_links)
-      q = q.text_attribute_matches(:body, params[:body_matches])
-      q = q.text_attribute_matches([:title, :body], params[:title_or_body_matches])
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_locked, :is_deleted, :body, :title, :other_names, :tag, :artist, :dtext_links], current_user: current_user)
+      q = q.where_text_matches([:title, :body], params[:title_or_body_matches])
 
       if params[:title_normalize].present?
         q = q.where_like(:title, normalize_title(params[:title_normalize]))
@@ -185,7 +182,6 @@ class WikiPage < ApplicationRecord
   def create_new_version
     versions.create(
       :updater_id => CurrentUser.id,
-      :updater_ip_addr => CurrentUser.ip_addr,
       :title => title,
       :body => body,
       :is_locked => is_locked,
@@ -206,9 +202,7 @@ class WikiPage < ApplicationRecord
 
   def tags
     titles = DText.parse_wiki_titles(body).uniq
-    tags = Tag.nonempty.undeprecated.where(name: titles).pluck(:name)
-    tags += TagAlias.active.where(antecedent_name: titles).pluck(:antecedent_name)
-    TagAlias.to_aliased(titles & tags)
+    Tag.nonempty.undeprecated.named_or_aliased_in_order(titles)
   end
 
   def self.rewrite_wiki_links!(old_name, new_name)

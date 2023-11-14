@@ -3,35 +3,61 @@ require "test_helper"
 module Sources
   class BoothTest < ActiveSupport::TestCase
     context "A booth post" do
-      images = %w[
-        https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/ae0fdbcf-e4c5-4840-8d5c-43e18bddc93e.jpg
-        https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/d12bce50-a0c7-43f8-a4fb-5ee0ea6855a3.jpg
-        https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/f5332da3-4097-4d33-bbf6-a9b64c7671b3.jpg
-      ]
       strategy_should_work(
-        "https://booth.pm/en/items/3713604",
-        image_urls: images,
-        profile_url: "https://amedamacon.booth.pm",
-        page_url: "https://booth.pm/en/items/3713604",
-        artist_name: "amedamacon",
-        other_names: ["あめうさぎBOOTH"],
-        tags: [["抱き枕カバー", "https://booth.pm/en/browse/Pillow%20Cover?tags%5B%5D=%E6%8A%B1%E3%81%8D%E6%9E%95%E3%82%AB%E3%83%90%E3%83%BC"]],
-        artist_commentary_title: "フユちゃん抱き枕カバー",
-        dtext_artist_commentary_desc: /発送：6月上旬頃（BOOTH倉庫より発送）/
+        "https://booth.pm/en/items/3240411",
+        image_urls: %w[
+          https://booth.pximg.net/767c867a-c6c7-426b-80b6-894d92993db3/i/3240411/150d3a16-7339-4484-b95f-63638c0b75d2.png
+          https://booth.pximg.net/767c867a-c6c7-426b-80b6-894d92993db3/i/3240411/1207a003-baf5-49b5-8010-e986dd00e63a.jpg
+          https://booth.pximg.net/767c867a-c6c7-426b-80b6-894d92993db3/i/3240411/ce9b3c6c-5f00-47b0-9bd1-fb9619a36531.jpg
+        ],
+        profile_url: "https://cullmee.booth.pm",
+        page_url: "https://booth.pm/en/items/3240411",
+        artist_name: "くるみ",
+        tag_name: "cullmee",
+        other_names: %w[cullmee くるみ],
+        tags: %w[アイドルマスターシャイニーカラーズ アクリルスタンド二次創作 シャニマス 月岡恋鐘],
+        artist_commentary_title: "月岡恋鐘 日本横断フェア アクリルスタンド",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          歌姫庭園28にて頒布した月岡恋鐘(日本横断フェア衣装)のアクリルスタンド
+          高さ140mm×幅8mm(約)
+          厚さ3mm
+        EOS
       )
     end
 
-    context "A booth image" do
+    context "An active booth image" do
       strategy_should_work(
-        "https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/d12bce50-a0c7-43f8-a4fb-5ee0ea6855a3_base_resized.jpg",
-        image_urls: ["https://booth.pximg.net/a212cd73-75ab-482d-8fce-1ce2965e4d4f/i/3713604/d12bce50-a0c7-43f8-a4fb-5ee0ea6855a3.jpg"],
-        profile_url: "https://amedamacon.booth.pm",
-        page_url: "https://booth.pm/en/items/3713604",
-        artist_name: "amedamacon",
-        other_names: ["あめうさぎBOOTH"],
-        tags: [["抱き枕カバー", "https://booth.pm/en/browse/Pillow%20Cover?tags%5B%5D=%E6%8A%B1%E3%81%8D%E6%9E%95%E3%82%AB%E3%83%90%E3%83%BC"]],
-        artist_commentary_title: "フユちゃん抱き枕カバー",
-        dtext_artist_commentary_desc: /発送：6月上旬頃（BOOTH倉庫より発送）/
+        "https://booth.pximg.net/767c867a-c6c7-426b-80b6-894d92993db3/i/3240411/150d3a16-7339-4484-b95f-63638c0b75d2.png",
+        image_urls: %w[
+          https://booth.pximg.net/767c867a-c6c7-426b-80b6-894d92993db3/i/3240411/150d3a16-7339-4484-b95f-63638c0b75d2.png
+        ],
+        profile_url: "https://cullmee.booth.pm",
+        page_url: "https://booth.pm/en/items/3240411",
+        artist_name: "くるみ",
+        tag_name: "cullmee",
+        other_names: %w[cullmee くるみ],
+        tags: %w[アイドルマスターシャイニーカラーズ アクリルスタンド二次創作 シャニマス 月岡恋鐘],
+        artist_commentary_title: "月岡恋鐘 日本横断フェア アクリルスタンド",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          歌姫庭園28にて頒布した月岡恋鐘(日本横断フェア衣装)のアクリルスタンド
+          高さ140mm×幅8mm(約)
+          厚さ3mm
+        EOS
+      )
+    end
+
+    context "A deleted booth image" do
+      strategy_should_work(
+        "https://booth.pximg.net/67e59677-bc7e-4249-918f-8c406b204df6/i/4266304/71f7517c-ed21-4a51-9e62-030787c44c0c.jpeg",
+        image_urls: ["https://booth.pximg.net/67e59677-bc7e-4249-918f-8c406b204df6/i/4266304/71f7517c-ed21-4a51-9e62-030787c44c0c.jpeg"],
+        page_url: "https://booth.pm/en/items/4266304",
+        profile_url: nil,
+        artist_name: nil,
+        tag_name: nil,
+        other_names: [],
+        tags: [],
+        artist_commentary_title: nil,
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -41,9 +67,10 @@ module Sources
         image_urls: ["https://booth.pximg.net/8bb9e4e3-d171-4027-88df-84480480f79d/i/2423989/a692d4f3-4371-4a86-a337-83fee82d46a4.png"],
         profile_url: "https://re-face.booth.pm",
         page_url: "https://booth.pm/en/items/2423989",
-        artist_name: "re-face",
-        other_names: ["Re:fAce/りふぇいす。"],
-        tags: ["original"],
+        artist_name: "Re:fAce Music Production SHOP",
+        tag_name: "re-face",
+        other_names: ["Re:fAce Music Production SHOP", "re-face"],
+        tags: %w[music original re:face ricchan\ * virtual\ youtuber くるみ だてんちゆあ ひなの羽衣 りふぇいす。 アイドル 千草はな 白乃クロミ 白咲べる 赤坂まさか 音楽],
         artist_commentary_title: "RwithV vol.1 -アイドルはじめます！-",
         dtext_artist_commentary_desc: /注文が殺到した際は、発送が遅れてしまう場合もございますので予めご了承ください。/
       )
@@ -53,7 +80,14 @@ module Sources
       strategy_should_work(
         "https://s2.booth.pm/8bb9e4e3-d171-4027-88df-84480480f79d/3d70de06-8e7c-444e-b8eb-a8a95bf20638_base_resized.jpg",
         image_urls: ["https://s2.booth.pm/8bb9e4e3-d171-4027-88df-84480480f79d/3d70de06-8e7c-444e-b8eb-a8a95bf20638.png"],
-        profile_url: nil
+        page_url: nil,
+        profile_url: nil,
+        artist_name: nil,
+        tag_name: nil,
+        other_names: [],
+        tags: [],
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
       )
     end
 
@@ -61,12 +95,30 @@ module Sources
       strategy_should_work(
         "https://booth.pximg.net/c/128x128/users/3193929/icon_image/5be9eff4-1d9e-4a79-b097-33c1cd4ad314_base_resized.jpg",
         image_urls: ["https://booth.pximg.net/users/3193929/icon_image/5be9eff4-1d9e-4a79-b097-33c1cd4ad314.png"],
-        profile_url: nil
+        page_url: nil,
+        profile_url: nil,
+        artist_name: nil,
+        tag_name: nil,
+        other_names: [],
+        tags: [],
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
       )
     end
 
     context "A non-existing or deleted post" do
-      strategy_should_work("https://booth.pm/en/items/2003079", deleted: true)
+      strategy_should_work(
+        "https://booth.pm/en/items/2003079",
+        deleted: true,
+        page_url: "https://booth.pm/en/items/2003079",
+        profile_url: nil,
+        artist_name: nil,
+        tag_name: nil,
+        other_names: [],
+        tags: [],
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil,
+      )
     end
 
     should "Parse Booth URLs correctly" do

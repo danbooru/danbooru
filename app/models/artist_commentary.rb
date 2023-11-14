@@ -29,16 +29,11 @@ class ArtistCommentary < ApplicationRecord
 
   module SearchMethods
     def text_matches(query)
-      query = "*#{query}*" unless query =~ /\*/
-
-      where_ilike(:original_title, query)
-        .or(where_ilike(:original_description, query))
-        .or(where_ilike(:translated_title, query))
-        .or(where_ilike(:translated_description, query))
+      where_text_matches(%i[original_title original_description translated_title translated_description], query)
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :original_title, :original_description, :translated_title, :translated_description, :post)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :original_title, :original_description, :translated_title, :translated_description, :post], current_user: current_user)
 
       if params[:text_matches].present?
         q = q.text_matches(params[:text_matches])

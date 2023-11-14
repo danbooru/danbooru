@@ -1,9 +1,9 @@
 <% if wiki_page.tag.present? && !wiki_page.tag.empty? %>
-  <div class="recent-posts">
+  <div class="recent-posts mt-4">
     <h2 class="recent-posts-header">
       <%= link_to "Posts", posts_path(tags: wiki_page.title) %>
     </h2>
 
-    <%= render_post_gallery(wiki_page.tag.posts.limit(8), tags: wiki_page.title) %>
+    <%= render_post_gallery(PostQuery.new(wiki_page.tag.name, current_user: CurrentUser.user).posts_with_timeout(8), tags: wiki_page.title) %>
   </div>
 <% end %>

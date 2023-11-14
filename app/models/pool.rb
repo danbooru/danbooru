@@ -2,17 +2,22 @@
 
 class Pool < ApplicationRecord
   class RevertError < StandardError; end
+
+  RESERVED_NAMES = %w[none any series collection]
   POOL_ORDER_LIMIT = 1000
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
 
-  validates :name, uniqueness: { case_sensitive: false }, if: :name_changed?
+  validates :name, visible_string: true, uniqueness: { case_sensitive: false }, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validates :category, inclusion: { in: %w[series collection] }
   validate :updater_can_edit_deleted
   before_validation :normalize_post_ids
   before_validation :normalize_name
   after_save :create_version
+
+  has_many :mod_actions, as: :subject, dependent: :destroy
+  has_many :reactions, as: :model, dependent: :destroy
 
   deletable
   has_dtext_links :description
@@ -21,7 +26,7 @@ class Pool < ApplicationRecord
   scope :collection, -> { where(category: "collection") }
 
   module SearchMethods
-    def name_matches(name)
+    def name_contains(name)
       name = normalize_name_for_search(name)
       name = "*#{name}*" unless name =~ /\*/
       where_ilike(:name, name)
@@ -37,16 +42,15 @@ class Pool < ApplicationRecord
       order(updated_at: :desc)
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :name, :description, :post_ids, :dtext_links)
-      q = q.text_attribute_matches(:description, params[:description_matches])
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :name, :description, :post_ids, :dtext_links], current_user: current_user)
 
       if params[:post_tags_match]
         q = q.post_tags_match(params[:post_tags_match])
       end
 
-      if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches])
+      if params[:name_contains].present?
+        q = q.name_contains(params[:name_contains])
       end
 
       if params[:linked_to].present?
@@ -158,11 +162,11 @@ class Pool < ApplicationRecord
   end
 
   def create_mod_action_for_delete
-    ModAction.log("deleted pool ##{id} (name: #{name})", :pool_delete)
+    ModAction.log("deleted pool ##{id} (name: #{name})", :pool_delete, subject: self, user: CurrentUser.user)
   end
 
   def create_mod_action_for_undelete
-    ModAction.log("undeleted pool ##{id} (name: #{name})", :pool_undelete)
+    ModAction.log("undeleted pool ##{id} (name: #{name})", :pool_undelete, subject: self, user: CurrentUser.user)
   end
 
   def add!(post)
@@ -220,9 +224,9 @@ class Pool < ApplicationRecord
     post_count > 0 ? Post.find(post_ids.first) : nil
   end
 
-  def create_version(updater: CurrentUser.user, updater_ip_addr: CurrentUser.ip_addr)
+  def create_version(updater: CurrentUser.user)
     if PoolVersion.enabled?
-      PoolVersion.queue(self, updater, updater_ip_addr)
+      PoolVersion.queue(self, updater)
     else
       Rails.logger.warn("Archive service is not configured. Pool versions will not be saved.")
     end
@@ -233,9 +237,9 @@ class Pool < ApplicationRecord
   end
 
   def validate_name
-    case name
-    when /\A(any|none|series|collection)\z/i
-      errors.add(:name, "cannot be any of the following names: any, none, series, collection")
+    case name.downcase
+    when *RESERVED_NAMES
+      errors.add(:name, "cannot be any of the following names: #{RESERVED_NAMES.to_sentence(last_word_connector: ", or ")}")
     when /,/
       errors.add(:name, "cannot contain commas")
     when /\*/

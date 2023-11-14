@@ -6,7 +6,6 @@ module PostSets
       setup do
         @user = FactoryBot.create(:user)
         CurrentUser.user = @user
-        CurrentUser.ip_addr = "127.0.0.1"
 
         @post_1 = FactoryBot.create(:post, :tag_string => "a")
         @post_2 = FactoryBot.create(:post, :tag_string => "b")
@@ -15,7 +14,6 @@ module PostSets
 
       teardown do
         CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
       end
 
       context "a set for page 2" do
@@ -128,14 +126,12 @@ module PostSets
         end
 
         context "that has a matching artist" do
-          setup do
-            Tag.find_by(name: "a").update!(category: Tag.categories.artist)
-            @artist = FactoryBot.create(:artist, :name => "a")
-          end
-
           should "find the artist" do
-            assert_not_nil(@set.artist)
-            assert_equal(@artist.id, @set.artist.id)
+            set = PostSets::Post.new("bkub")
+            artist = create(:artist, name: "bkub")
+
+            assert_not_nil(set.artist)
+            assert_equal(artist, set.artist)
           end
         end
       end

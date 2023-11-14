@@ -1,19 +1,24 @@
 div.prose {
-  line-height: 1.4em;
   word-break: break-word;
 
-  p {
+  *:last-child {
+    margin-bottom: 0;
+  }
+
+  p, ul, pre, blockquote, details, div.spoiler, table, h1, h2, h3, h4, h5, h6 {
     margin-bottom: 0.75rem;
   }
 
   h1, h2, h3, h4, h5, h6 {
     line-height: 1;
-    margin-bottom: 0.75rem;
   }
 
   h1, h2, h3, h4 {
     font-size: var(--text-xl);
-    margin-top: 1.75rem;
+
+    &:not(:first-child) {
+      margin-top: 1.75rem;
+    }
   }
 
   h5 {
@@ -24,15 +29,37 @@ div.prose {
     font-size: var(--text-md);
   }
 
+  hr {
+    // Same total height as <p> element: 0.75rem = <p> bottom margin, 1.25em = <p> line-height.
+    height: 1px;
+    margin: calc((0.75rem + 1.25em - 1px) / 2) auto;
+    background-color: var(--dtext-hr-color);
+  }
+
   table {
     th {
       white-space: nowrap;
     }
   }
 
+  // Make [tr align="..."] override [tbody align="..."]
+  thead, tbody, thead tr, tbody tr, tr {
+    &[align="left"]    { th, td { text-align: left; } }
+    &[align="right"]   { th, td { text-align: right; } }
+    &[align="center"]  { th, td { text-align: center; } }
+    &[align="justify"] { th, td { text-align: justify; } }
+  }
+
+  // Make [td align="..."] override [tr align="..."] and [tbody align="..."]
+  td, th {
+    &[align="left"]    { text-align: left !important; }
+    &[align="right"]   { text-align: right !important; }
+    &[align="center"]  { text-align: center !important; }
+    &[align="justify"] { text-align: justify !important; }
+  }
+
   ul {
     margin-left: 1em;
-    margin-bottom: 0.75rem;
 
     ul {
       margin-bottom: 0;
@@ -49,13 +76,11 @@ div.prose {
   }
 
   pre {
-    margin: 0.5em 0;
     padding: 0.5em 1em;
     white-space: pre-wrap;
   }
 
   blockquote {
-    margin-bottom: 1em;
     padding-left: 0.5em;
     opacity: 0.75;
     border-left: 3px solid var(--dtext-blockquote-border-color);
@@ -70,45 +95,16 @@ div.prose {
     color: var(--muted-text-color);
   }
 
-  div.expandable {
-    margin-bottom: 1em;
-    border: var(--dtext-expand-border);
-  }
-
-  div.expandable-header {
-    padding: 0.4em;
-
-    span {
-      margin-right: 0.5em;
-      font-weight: bold;
-    }
-  }
-
-  div.expandable-content {
-    display: none;
-    padding: 0.4em;
-
-    > :last-child {
-      margin-bottom: 0;
-    }
-  }
-
   a.dtext-named-external-link::after {
-    // https://fontawesome.com/icons/external-link-alt?style=solid
-    // https://fontawesome.com/how-to-use/on-the-web/advanced/css-pseudo-elements
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    content: "\f35d";
-
-    font-size: 0.6em;
-    padding: 0 0.2em 0 0.3em;
-    vertical-align: 1px;
+    // https://stackoverflow.com/a/66093928
+    content: "";
+    padding: 0 0.275em;
+    margin: 0 0.25rem;
+    vertical-align: -0.125em;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M352 0c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9L370.7 96 201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L416 141.3l41.4 41.4c9.2 9.2 22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6V32c0-17.7-14.3-32-32-32H352zM80 32C35.8 32 0 67.8 0 112V432c0 44.2 35.8 80 80 80H400c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32V432c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16H192c17.7 0 32-14.3 32-32s-14.3-32-32-32H80z'%3E%3C/path%3E%3C/svg%3E");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    background-color: currentcolor;
   }
 
   a.dtext-wiki-does-not-exist, a.dtext-tag-does-not-exist, a.dtext-artist-does-not-exist {
@@ -139,17 +135,57 @@ div.prose {
   }
 
   details {
-    margin-bottom: 1em;
+    border-radius: 0.25rem;
+    background-color: var(--dtext-details-background-color);
+
+    &[open] summary {
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+
+      &::before {
+        rotate: 0deg;
+      }
+    }
 
     summary {
-      margin-bottom: 1em;
+      display: flex;
+      align-items: center;
+      list-style: none;
+      user-select: none;
+      font-weight: bold;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+
+      color: var(--dtext-details-summary-text-color);
+      background-color: var(--dtext-details-summary-background-color);
+
+      &::before {
+        content: "";
+        display: inline-block;
+        flex: none;
+        width: 12px;
+        height: 12px;
+        margin-right: 0.25rem;
+        background-color: var(--dtext-details-summary-text-color);
+        mask-image: url('data:image/svg+xml,\00003csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">\00003cpath fill="currentcolor" d="m17.5 4.75-7.5 7.5-7.5-7.5L1 6.25l9 9 9-9z"/>\00003c/svg>');
+        mask-repeat: no-repeat;
+        rotate: -90deg;
+      }
+
+      &:hover {
+        background-color: var(--dtext-details-summary-hover-background-color);
+        cursor: pointer;
+      }
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+
+    > div {
+      padding: 1rem;
     }
   }
-}
-
-// avoid empty gaps beneath dtext blocks in table rows.
-table td div.prose > *:last-child {
-  margin-bottom: 0;
 }
 
 div.dtext-preview {

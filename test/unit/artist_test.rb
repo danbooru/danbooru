@@ -2,14 +2,14 @@ require 'test_helper'
 
 class ArtistTest < ActiveSupport::TestCase
   def assert_artist_found(expected_name, source_url)
-    artists = Artist.search(url_matches: source_url).to_a
+    artists = Artist.search({ url_matches: source_url }, current_user: User.anonymous).to_a
 
     assert_equal(1, artists.size)
     assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
   end
 
   def assert_artist_not_found(source_url)
-    artists = Artist.search(url_matches: source_url).to_a
+    artists = Artist.search({ url_matches: source_url }, current_user: User.anonymous).to_a
     assert_equal(0, artists.size, "Testing URL: #{source_url}")
   end
 
@@ -17,12 +17,10 @@ class ArtistTest < ActiveSupport::TestCase
     setup do
       user = travel_to(1.month.ago) {FactoryBot.create(:user)}
       CurrentUser.user = user
-      CurrentUser.ip_addr = "127.0.0.1"
     end
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
     end
 
     should "parse inactive urls" do
@@ -65,7 +63,7 @@ class ArtistTest < ActiveSupport::TestCase
         @artist = FactoryBot.create(:artist, :name => "aaa")
         @post = FactoryBot.create(:post, :tag_string => "aaa")
         @admin = FactoryBot.create(:admin_user)
-        @artist.ban!(banner: @admin)
+        @artist.ban!(@admin)
         perform_enqueued_jobs
         @post.reload
       end
@@ -74,15 +72,17 @@ class ArtistTest < ActiveSupport::TestCase
         assert_equal(true, @artist.reload.is_banned?)
         assert_equal(true, @post.reload.is_banned?)
         assert_equal(true, @artist.versions.last.is_banned?)
+        assert_equal(true, TagImplication.active.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
 
-        assert_difference("TagImplication.count", -1) do
-          @artist.unban!
-        end
+        @artist.unban!(@admin)
 
         assert_equal(false, @artist.reload.is_banned?)
         assert_equal(false, @post.reload.is_banned?)
         assert_equal(false, @artist.versions.last.is_banned?)
         assert_equal("aaa", @post.tag_string)
+        assert_equal(false, TagImplication.active.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
+        assert_equal(true, TagImplication.deleted.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
+        assert_equal(true, ModAction.artist_unban.exists?(subject: @artist))
       end
 
       should "ban the post" do
@@ -98,13 +98,27 @@ class ArtistTest < ActiveSupport::TestCase
         assert_equal("aaa banned_artist", @post.reload.tag_string)
       end
 
+      should "create the banned_artist tag if it doesn't already exist" do
+        assert_equal(true, Tag.exists?(name: "banned_artist", category: Tag.categories.artist))
+      end
+
       should "set the approver of the banned_artist implication" do
         ta = TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").first
         assert_equal(@admin.id, ta.approver.id)
       end
 
       should "update the artist history" do
+        assert_equal(true, @artist.reload.is_banned?)
         assert_equal(true, @artist.versions.last.is_banned?)
+      end
+
+      should "tag the posts" do
+        assert_equal(true, @post.reload.is_banned?)
+        assert_equal(true, @post.has_tag?("banned_artist"))
+      end
+
+      should "create a mod action" do
+        assert_equal(true, ModAction.artist_ban.exists?(subject: @artist))
       end
     end
 
@@ -298,7 +312,6 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding twitter artists" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         FactoryBot.create(:artist, :name => "hammer_(sunset_beach)", :url_string => "http://twitter.com/hamaororon")
         FactoryBot.create(:artist, :name => "haruyama_kazunori", :url_string => "https://twitter.com/kazuharoom")
       end
@@ -332,7 +345,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding pawoo artists" do
       setup do
-        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
+        skip "Pawoo keys not set" unless Danbooru.config.pawoo_access_token
         FactoryBot.create(:artist, :name => "evazion", :url_string => "https://pawoo.net/@evazion")
         FactoryBot.create(:artist, :name => "yasumo01", :url_string => "https://pawoo.net/web/accounts/28816")
       end
@@ -453,50 +466,58 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "search on its name should return results" do
-      artist = FactoryBot.create(:artist, :name => "artist")
+      artist1 = create(:artist, name: "artist")
+      artist2 = create(:artist, name: "bkub")
 
-      assert_not_nil(Artist.search(:name => "artist").first)
-      assert_not_nil(Artist.search(:name_like => "artist").first)
-      assert_not_nil(Artist.search(:any_name_matches => "artist").first)
-      assert_not_nil(Artist.search(:any_name_matches => "/art/").first)
+      assert_search_equals(artist1, name: "artist")
+      assert_search_equals(artist1, name_like: "artist")
+      assert_search_equals(artist1, any_name_matches: "artist")
+      assert_search_equals(artist1, any_name_matches: "/art/")
     end
 
     should "search on other names should return matches" do
-      artist = FactoryBot.create(:artist, :name => "artist", :other_names_string => "aaa ccc_ddd")
+      artist = create(:artist, name: "artist", other_names_string: "aaa ccc_ddd")
 
-      assert_nil(Artist.search(any_other_name_like: "*artist*").first)
-      assert_not_nil(Artist.search(any_other_name_like: "*aaa*").first)
-      assert_not_nil(Artist.search(any_other_name_like: "*ccc_ddd*").first)
-      assert_not_nil(Artist.search(name: "artist").first)
-      assert_not_nil(Artist.search(:any_name_matches => "aaa").first)
-      assert_not_nil(Artist.search(:any_name_matches => "/a/").first)
+      assert_search_equals([], any_other_name_like: "*artist*")
+      assert_search_equals(artist, any_other_name_like: "*aaa*")
+      assert_search_equals(artist, any_other_name_like: "*ccc_ddd*")
+      assert_search_equals(artist, name: "artist")
+      assert_search_equals(artist, any_name_matches: "aaa")
+      assert_search_equals(artist, any_name_matches: "/a/")
     end
 
     should "search on group name and return matches" do
-      cat_or_fish = FactoryBot.create(:artist, :name => "cat_or_fish")
-      yuu = FactoryBot.create(:artist, :name => "yuu", :group_name => "cat_or_fish")
+      cat_or_fish = create(:artist, name: "cat_or_fish")
+      yuu = create(:artist, name: "yuu", group_name: "cat_or_fish")
 
-      assert_not_nil(Artist.search(:group_name => "cat_or_fish").first)
-      assert_not_nil(Artist.search(:any_name_matches => "cat_or_fish").first)
-      assert_not_nil(Artist.search(:any_name_matches => "/cat/").first)
+      assert_search_equals(yuu, group_name: "cat_or_fish")
+      assert_search_equals([yuu, cat_or_fish], any_name_matches: "cat_or_fish")
+      assert_search_equals([yuu, cat_or_fish], any_name_matches: "/cat/")
+    end
+
+    should "search case-insensitively on any_name_matches" do
+      artist = create(:artist, name: "foo", other_names: ["BAR"])
+
+      assert_search_equals(artist, any_name_matches: "FOO")
+      assert_search_equals(artist, any_name_matches: "bar")
     end
 
     should "search on url and return matches" do
-      bkub = FactoryBot.create(:artist, name: "bkub", url_string: "http://bkub.com")
+      bkub = create(:artist, name: "bkub", url_string: "http://bkub.com")
 
-      assert_equal([bkub.id], Artist.search(url_matches: "bkub").map(&:id))
-      assert_equal([bkub.id], Artist.search(url_matches: "*bkub*").map(&:id))
-      assert_equal([bkub.id], Artist.search(url_matches: "/rifyu|bkub/").map(&:id))
-      assert_equal([bkub.id], Artist.search(url_matches: "http://bkub.com/test.jpg").map(&:id))
+      assert_search_equals(bkub, url_matches: "bkub")
+      assert_search_equals(bkub, url_matches: "*bkub*")
+      assert_search_equals(bkub, url_matches: "/rifyu|bkub/")
+      assert_search_equals(bkub, url_matches: "http://bkub.com/test.jpg")
     end
 
     should "search on has_tag and return matches" do
-      bkub = FactoryBot.create(:artist, name: "bkub")
-      none = FactoryBot.create(:artist, name: "none")
-      post = FactoryBot.create(:post, tag_string: "bkub")
+      bkub = create(:artist, name: "bkub")
+      none = create(:artist, name: "none")
+      post = create(:post, tag_string: "bkub")
 
-      assert_equal(bkub.id, Artist.search(has_tag: "true").first.id)
-      assert_equal(none.id, Artist.search(has_tag: "false").first.id)
+      assert_search_equals(bkub, has_tag: "true")
+      assert_search_equals(none, has_tag: "false")
     end
 
     should "revert to prior versions" do

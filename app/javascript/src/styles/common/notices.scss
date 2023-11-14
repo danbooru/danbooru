@@ -1,16 +1,5 @@
 div#notice {
-  padding: 0.5em;
-  position: fixed;
-  top: 1em;
-  left: 25%;
-  width: 50%;
-  z-index: 9999;
   box-shadow: var(--shadow-lg);
-
-  a#close-notice-link {
-    position: absolute;
-    right: 1em;
-  }
 }
 
 .notice {

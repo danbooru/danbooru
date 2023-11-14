@@ -1,5 +1,0 @@
-<%= button_tag "Related tags", type: :button, class: "related-tags-button ui-button ui-widget ui-corner-all sub" %>
-
-<% TagCategory.related_button_list.each do |category| %>
-  <%= button_tag TagCategory.related_button_mapping[category], type: :button, "data-category": category, class: "related-tags-button ui-button ui-widget ui-corner-all sub" %>
-<% end %>

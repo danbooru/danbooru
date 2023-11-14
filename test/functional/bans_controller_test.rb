@@ -32,7 +32,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @mod = create(:mod_user, name: "mod")
+        @mod = create(:mod_user, name: "mod123")
         @ban1 = create(:ban, created_at: 1.week.ago, duration: 1.day)
         @ban2 = create(:ban, user: build(:builder_user), reason: "blah", banner: @mod, duration: 100.years)
       end
@@ -47,7 +47,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(expired: "false").with { @ban2 }
       should respond_to_search(duration: "<1w").with { @ban1 }
 
-      should respond_to_search(banner_name: "mod").with { @ban2 }
+      should respond_to_search(banner_name: "mod123").with { @ban2 }
       should respond_to_search(banner: { level: User::Levels::MODERATOR }).with { @ban2 }
     end
 
@@ -60,6 +60,9 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to bans_path
           assert_equal(true, @user.reload.is_banned?)
+          assert_match(/banned <@#{@user.name}> 1 day: xxx/, ModAction.last.description)
+          assert_equal(@user, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
         end
       end
 
@@ -131,7 +134,11 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
         assert_difference("Ban.count", -1) do
           delete_auth ban_path(@ban.id), @mod
+
           assert_redirected_to bans_path
+          assert_match(/unbanned <@#{@ban.user.name}>/, ModAction.last.description)
+          assert_equal(@ban.user, ModAction.last.subject)
+          assert_equal(@mod, ModAction.last.creator)
         end
       end
     end

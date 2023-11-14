@@ -82,7 +82,6 @@ class DanbooruLogger
       name: user&.name,
       level: user&.level_string,
       #ip: request.remote_ip,
-      #country: CurrentUser.country,
       #safe_mode: CurrentUser.safe_mode?,
       #bot: UserAgent.new(request.headers["HTTP_USER_AGENT"]).is_bot?,
     }

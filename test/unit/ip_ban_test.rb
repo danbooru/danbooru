@@ -4,14 +4,14 @@ class IpBanTest < ActiveSupport::TestCase
   should "be able to ban a user" do
     ip_ban = create(:ip_ban, ip_addr: "1.2.3.4")
 
-    assert_equal("1.2.3.4", ip_ban.subnetted_ip)
+    assert_equal("1.2.3.4", ip_ban.ip_addr.to_s)
     assert(IpBan.ip_matches("1.2.3.4").exists?)
   end
 
   should "be able to ban a subnet" do
     ip_ban = create(:ip_ban, ip_addr: "1.2.3.4/24")
 
-    assert_equal("1.2.3.0/24", ip_ban.subnetted_ip)
+    assert_equal("1.2.3.0/24", ip_ban.ip_addr.to_s)
     assert(IpBan.ip_matches("1.2.3.0").exists?)
     assert(IpBan.ip_matches("1.2.3.255").exists?)
   end

@@ -11,7 +11,7 @@ class Note < ApplicationRecord
   validates :y, presence: true
   validates :width, presence: true
   validates :height, presence: true
-  validates :body, presence: true
+  validates :body, visible_string: true
   validate :note_within_image
   after_save :update_post
   after_save :create_version
@@ -19,9 +19,8 @@ class Note < ApplicationRecord
   scope :active, -> { where(is_active: true) }
 
   module SearchMethods
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_active, :x, :y, :width, :height, :body, :version, :post)
-      q = q.text_attribute_matches(:body, params[:body_matches])
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_active, :x, :y, :width, :height, :body, :version, :post], current_user: current_user)
 
       q.apply_default_order(params)
     end
@@ -54,7 +53,7 @@ class Note < ApplicationRecord
     end
   end
 
-  def create_version(updater: CurrentUser.user, updater_ip_addr: CurrentUser.ip_addr)
+  def create_version(updater: CurrentUser.user)
     return unless saved_change_to_versioned_attributes?
 
     if merge_version?(updater.id)
@@ -62,7 +61,7 @@ class Note < ApplicationRecord
     else
       Note.where(:id => id).update_all("version = coalesce(version, 0) + 1")
       reload
-      create_new_version(updater.id, updater_ip_addr)
+      create_new_version(updater.id)
     end
   end
 
@@ -70,10 +69,9 @@ class Note < ApplicationRecord
     new_record? || saved_change_to_x? || saved_change_to_y? || saved_change_to_width? || saved_change_to_height? || saved_change_to_is_active? || saved_change_to_body?
   end
 
-  def create_new_version(updater_id, updater_ip_addr)
+  def create_new_version(updater_id)
     versions.create(
       :updater_id => updater_id,
-      :updater_ip_addr => updater_ip_addr,
       :post_id => post_id,
       :x => x,
       :y => y,
@@ -92,7 +90,7 @@ class Note < ApplicationRecord
 
   def merge_version?(updater_id)
     prev = versions.last
-    prev && prev.updater_id == updater_id && prev.updated_at > 1.hour.ago && !saved_change_to_is_active?
+    prev && prev.updater_id == updater_id && prev.updated_at > 1.hour.ago
   end
 
   def revert_to(version)

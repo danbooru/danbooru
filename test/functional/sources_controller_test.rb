@@ -9,7 +9,6 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "work for a direct twitter URL with referer" do
-        skip "Twitter keys are not set" if !Danbooru.config.twitter_api_key
         get source_path, params: {
           url: "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large",
           ref: "https://twitter.com/nounproject/status/540944400767922176",

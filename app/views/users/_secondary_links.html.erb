@@ -12,6 +12,7 @@
       <%= subnav_link_to "Profile", profile_path %>
       <%= subnav_link_to "Settings", settings_path %>
       <%= subnav_link_to "Messages #{unread_dmail_indicator(CurrentUser.user)}", dmails_path(search: { folder: "received" }) %>
+      <%= subnav_link_to "My Uploads", user_uploads_path(CurrentUser.user.id.to_i) %>
 
       <% if !@user.is_gold? %>
         <%= subnav_link_to "Upgrade", new_user_upgrade_path %>
@@ -25,6 +26,10 @@
 
     <% if policy(CurrentUser.user).promote? %>
       <%= subnav_link_to "Promote", edit_admin_user_path(@user) %>
+    <% end %>
+
+    <% if policy(UserNameChangeRequest.new(user: @user)).can_rename_user? %>
+      <%= subnav_link_to "Rename", change_name_user_path(@user) %>
     <% end %>
 
     <% if policy(Ban.new(user: @user)).create? %>

@@ -1,18 +1,6 @@
-div#related-tags-container {
-  &.visible a#show-related-tags-link,
-  &.collapsed a#hide-related-tags-link,
-  &.collapsed div.related-tags {
-    display: none;
-  }
-}
-
-div.related-tags {
-  background: var(--related-tags-container-background);
-  overflow: auto;
-  flex-wrap: wrap;
-
-  div.tag-column {
-    width: 15em;
+#related-tags-container {
+  .related-tags-body {
+    height: 30rem;
   }
 
   li.selected a {

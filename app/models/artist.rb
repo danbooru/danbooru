@@ -24,6 +24,7 @@ class Artist < ApplicationRecord
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
   has_many :urls, dependent: :destroy, class_name: "ArtistURL", autosave: true
   has_many :versions, -> {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
+  has_many :mod_actions, as: :subject, dependent: :destroy
   has_one :wiki_page, -> { active }, foreign_key: "title", primary_key: "name"
   has_one :tag_alias, -> { active }, foreign_key: "antecedent_name", primary_key: "name"
   belongs_to :tag, foreign_key: "name", primary_key: "name", default: -> { Tag.new(name: name, category: Tag.categories.artist) }
@@ -111,7 +112,6 @@ class Artist < ApplicationRecord
         :artist_id => id,
         :name => name,
         :updater_id => CurrentUser.id,
-        :updater_ip_addr => CurrentUser.ip_addr,
         :urls => url_array,
         :is_deleted => is_deleted,
         :is_banned => is_banned,
@@ -187,40 +187,35 @@ class Artist < ApplicationRecord
       return unless !is_deleted? && name_changed? && tag.present?
 
       if tag.category_name != "Artist" && tag.empty?
-        tag.update!(category: Tag.categories.artist)
+        tag.update!(category: Tag.categories.artist, updater: CurrentUser.user)
       end
     end
   end
 
   module BanMethods
-    def unban!
-      Post.transaction do
-        ti = TagImplication.find_by(antecedent_name: name, consequent_name: "banned_artist")
-        ti&.destroy
+    def unban!(current_user)
+      with_lock do
+        ti = TagImplication.active.find_by(antecedent_name: name, consequent_name: "banned_artist")
+        ti&.update!(status: "deleted")
 
-        Post.raw_tag_match(name).find_each do |post|
-          post.unban!
-          fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
-          post.update(tag_string: fixed_tags)
-        end
+        BulkUpdateRequestProcessor.mass_update(name, "-status:banned -banned_artist", user: current_user)
 
-        update!(is_banned: false)
-        ModAction.log("unbanned artist ##{id}", :artist_unban)
+        CurrentUser.scoped(current_user) { update!(is_banned: false) }
+        ModAction.log("unbanned artist ##{id}", :artist_unban, subject: self, user: current_user)
       end
     end
 
-    def ban!(banner: CurrentUser.user)
-      Post.transaction do
-        Post.raw_tag_match(name).each(&:ban!)
+    def ban!(banner)
+      with_lock do
+        BulkUpdateRequestProcessor.mass_update(name, "status:banned", user: banner)
 
-        # potential race condition but unlikely
-        unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
-          Tag.find_or_create_by_name("artist:banned_artist") # ensure the banned_artist exists and is an artist tag.
+        unless TagImplication.active.exists?(antecedent_name: name, consequent_name: "banned_artist")
+          Tag.find_or_create_by_name("banned_artist", category: "artist", current_user: banner)
           TagImplication.approve!(antecedent_name: name, consequent_name: "banned_artist", approver: banner)
         end
 
-        update!(is_banned: true)
-        ModAction.log("banned artist ##{id}", :artist_ban)
+        CurrentUser.scoped(banner) { update!(is_banned: true) }
+        ModAction.log("banned artist ##{id}", :artist_ban, subject: self, user: banner)
       end
     end
   end
@@ -235,16 +230,18 @@ class Artist < ApplicationRecord
     end
 
     def any_other_name_like(name)
-      where(id: Artist.from("unnest(other_names) AS other_name").where_like("other_name", name))
+      where(id: Artist.from("unnest(other_names) AS other_name").where_ilike("other_name", name))
     end
 
     def any_name_matches(query)
       if query =~ %r{\A/(.*)/\z}
         where_regex(:name, $1).or(any_other_name_matches($1)).or(where_regex(:group_name, $1))
+      elsif query.include?("*")
+        normalized_name = normalize_name(query)
+        where_ilike(:name, normalized_name).or(any_other_name_like(normalized_name)).or(where_ilike(:group_name, normalized_name))
       else
         normalized_name = normalize_name(query)
-        normalized_name = "*#{normalized_name}*" unless normalized_name.include?("*")
-        where_like(:name, normalized_name).or(any_other_name_like(normalized_name)).or(where_like(:group_name, normalized_name))
+        where_array_includes_any("lower(ARRAY[artists.name, artists.group_name]::text[] || artists.other_names)", [normalized_name])
       end
     end
 
@@ -278,8 +275,8 @@ class Artist < ApplicationRecord
       end
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :other_names, :urls, :wiki_page, :tag_alias, :tag)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :other_names, :urls, :wiki_page, :tag_alias, :tag], current_user: current_user)
 
       if params[:any_other_name_like]
         q = q.any_other_name_like(params[:any_other_name_like])

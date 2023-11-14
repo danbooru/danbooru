@@ -1,4 +1,7 @@
+import Cookie from "./cookie";
+import Draggable from "./draggable";
 import Utility from "./utility";
+import clamp from "lodash/clamp";
 
 let Upload = {};
 
@@ -9,16 +12,7 @@ Upload.IQDB_HIGH_SIMILARITY = 70;
 Upload.initialize_all = function() {
   if ($("#c-uploads #a-show #p-single-asset-upload").length) {
     this.initialize_similar();
-
-    $("#toggle-artist-commentary").on("click.danbooru", function(e) {
-      Upload.toggle_commentary();
-      e.preventDefault();
-    });
-
-    $("#toggle-commentary-translation").on("click.danbooru", function(e) {
-      Upload.toggle_translation();
-      e.preventDefault();
-    });
+    this.initialize_draggable_divider();
   }
 
   Upload.loadAssets();
@@ -33,6 +27,31 @@ Upload.loadAssets = async function() {
   }
 }
 
+Upload.initialize_draggable_divider = function() {
+  Upload.draggable = new Draggable(".upload-divider");
+  let currentPanelWidth = 0;
+  let initialPanelWidth = 0;
+
+  $(".upload-divider").on("drag:start", event => {
+    initialPanelWidth = $(".upload-edit-container").width();
+    currentPanelWidth = initialPanelWidth;
+  });
+
+  $(".upload-divider").on("drag:move", (event, moveEvent, drag) => {
+    let reverseDrag = $(".upload-container").attr("data-dock") === "left";
+    let dragOffset = drag.x * (reverseDrag ? -1 : 1);
+    let minWidth = parseInt($(".upload-container").css("--min-edit-container-width"));
+    let maxWidth = $(".upload-container").width() - minWidth;
+
+    currentPanelWidth = clamp(initialPanelWidth - dragOffset, minWidth, maxWidth);
+    $(".upload-container").css("--edit-container-width", currentPanelWidth);
+  });
+
+  $(".upload-divider").on("drag:stop", event => {
+    Cookie.put("upload_edit_container_width", currentPanelWidth);
+  });
+};
+
 Upload.initialize_similar = function() {
   let media_asset_id = $("input[name='media_asset_id']").val();
 
@@ -45,27 +64,6 @@ Upload.initialize_similar = function() {
     }
   });
 }
-
-Upload.toggle_commentary = function() {
-  if ($(".artist-commentary").is(":visible")) {
-    $("#toggle-artist-commentary").text("show »");
-  } else {
-    $("#toggle-artist-commentary").text("« hide");
-  }
-
-  $(".artist-commentary").slideToggle();
-  $(".upload_commentary_translation_container").slideToggle();
-};
-
-Upload.toggle_translation = function() {
-  if ($(".commentary-translation").is(":visible")) {
-    $("#toggle-commentary-translation").text("show »");
-  } else {
-    $("#toggle-commentary-translation").text("« hide");
-  }
-
-  $(".commentary-translation").slideToggle();
-};
 
 $(function() {
   Upload.initialize_all();

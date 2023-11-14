@@ -9,14 +9,15 @@
 class SessionLoader
   class AuthenticationFailure < StandardError; end
 
-  attr_reader :session, :request, :params
+  attr_reader :session, :request, :ip_address, :params
 
   # Initialize the session loader.
   # @param request the HTTP request
   def initialize(request)
     @request = request
     @session = request.session
-    @params = request.parameters
+    @ip_address = Danbooru::IpAddress.new(request.remote_ip)
+    @params = request.query_parameters
   end
 
   # Attempt to log a user in with the given username and password. Records a
@@ -28,6 +29,12 @@ class SessionLoader
     user = User.find_by_name(name)
 
     if user.present? && user.authenticate_password(password)
+      # Don't allow logins to privileged or inactive accounts from proxies, even if the password is correct
+      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy?
+        UserEvent.create_from_request!(user, :failed_login, request)
+        return nil
+      end
+
       session[:user_id] = user.id
       session[:last_authenticated_at] = Time.now.utc.to_s
 
@@ -46,27 +53,26 @@ class SessionLoader
   end
 
   # Logs the current user out. Deletes their session cookie and records a logout event.
-  def logout
+  def logout(user = CurrentUser.user)
     session.delete(:user_id)
     session.delete(:last_authenticated_at)
-    return if CurrentUser.user.is_anonymous?
-    UserEvent.create_from_request!(CurrentUser.user, :logout, request)
+    return if user.is_anonymous?
+    UserEvent.create_from_request!(user, :logout, request)
   end
 
   # Sets the current user. Runs on each HTTP request. The user is set based on
   # their API key, their session cookie, or the signed user id param (used when
-  # reseting a password from an magic email link)
+  # resetting a password from an magic email link)
   #
   # Also performs post-load actions, including updating the user's last login
-  # timestamp, their last used IP, their timezone, their database timeout, their
-  # country, whether safe mode is enabled, their session cookie, and unbanning
-  # banned users if their ban is expired.
+  # timestamp, their last used IP, their timezone, their database timeout,
+  # whether safe mode is enabled, their session cookie, and unbanning banned
+  # users if their ban is expired.
   #
   # @see ApplicationController#set_current_user
   # @see CurrentUser
   def load
     CurrentUser.user = User.anonymous
-    CurrentUser.ip_addr = request.remote_ip
 
     if has_api_authentication?
       load_session_for_api
@@ -80,7 +86,6 @@ class SessionLoader
     update_last_logged_in_at
     update_last_ip_addr
     set_time_zone
-    set_country
     set_safe_mode
     set_save_data_mode
     initialize_session_cookies
@@ -91,14 +96,14 @@ class SessionLoader
 
   # @return [Boolean] true if the current request has an API key
   def has_api_authentication?
-    request.authorization.present? || params[:login].present? || (params[:api_key].present? && params[:api_key].is_a?(String))
+    request.authorization.present? || params.has_key?(:login) || params.has_key?(:api_key)
   end
 
   private
 
   def set_statement_timeout
     timeout = CurrentUser.user.statement_timeout
-    ActiveRecord::Base.connection.execute("set statement_timeout = #{timeout}")
+    ActiveRecord::Base.connection.execute("SET statement_timeout = #{timeout}")
   end
 
   # Sets the current API user based on either the `login` + `api_key` URL params,
@@ -145,7 +150,13 @@ class SessionLoader
   # Set the current user based on the `user_id` session cookie.
   def load_session_user
     user = User.find_by_id(session[:user_id])
-    CurrentUser.user = user if user
+    return if user.nil?
+
+    if user.is_deleted?
+      logout(user)
+    else
+      CurrentUser.user = user
+    end
   end
 
   def update_last_logged_in_at
@@ -167,12 +178,6 @@ class SessionLoader
 
   def set_time_zone
     Time.zone = CurrentUser.user.time_zone
-  end
-
-  # Depends on Cloudflare
-  # https://support.cloudflare.com/hc/en-us/articles/200168236-Configuring-Cloudflare-IP-Geolocation
-  def set_country
-    CurrentUser.country = request.headers["CF-IPCountry"]
   end
 
   def set_safe_mode

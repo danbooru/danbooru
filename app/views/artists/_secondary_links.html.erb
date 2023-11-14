@@ -1,16 +1,15 @@
 <% content_for(:secondary_links) do %>
   <%= quick_search_form_for(:any_name_or_url_matches, artists_path, "artists", autocomplete: "artist", redirect: true) %>
-  <%= subnav_link_to "Listing", artists_path %>
-  <%= subnav_link_to "Banned", artists_path(search: { is_banned: "true", order: "updated_at" }) %>
+  <%= subnav_link_to "Artists", artists_path %>
   <% if policy(Artist).create? %>
     <%= subnav_link_to "New", new_artist_path %>
   <% end %>
-  <%= subnav_link_to "Recent changes", artist_versions_path %>
+  <%= subnav_link_to "Banned", artists_path(search: { is_banned: "true", order: "updated_at" }) %>
+  <%= subnav_link_to "Changes", artist_versions_path %>
   <%= subnav_link_to "URLs", artist_urls_path %>
   <% if @artist && !@artist.new_record? && (!@artist.is_banned? || policy(@artist).can_view_banned?) %>
     <li>|</li>
     <%= subnav_link_to "Posts (#{@artist.tag.try(:post_count).to_i})", posts_path(:tags => @artist.name) %>
-    <%= subnav_link_to "Show", artist_path(@artist) %>
     <% if policy(@artist).update? %>
       <%= subnav_link_to "Edit", edit_artist_path(@artist), :"data-shortcut" => "e" %>
     <% end %>

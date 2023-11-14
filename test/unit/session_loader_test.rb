@@ -11,6 +11,7 @@ class SessionLoaderTest < ActiveSupport::TestCase
       @request.stubs(:cookie_jar).returns({})
       @request.stubs(:cookies).returns({})
       @request.stubs(:parameters).returns({})
+      @request.stubs(:query_parameters).returns({})
       @request.stubs(:session).returns({})
       @request.stubs(:headers).returns({})
       SessionLoader.any_instance.stubs(:initialize_session_cookies)
@@ -18,7 +19,6 @@ class SessionLoaderTest < ActiveSupport::TestCase
 
     teardown do
       CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
       CurrentUser.safe_mode = nil
     end
 

@@ -41,7 +41,32 @@ class BigqueryExportService
     Rails.application.eager_load!
 
     models = ApplicationRecord.descendants.sort_by(&:name)
-    models -= [GoodJob::BaseRecord, GoodJob::Process, GoodJob::Execution, GoodJob::ActiveJobJob, GoodJob::Job, GoodJob::Setting, IpAddress, TagRelationship, ArtistVersion, ArtistCommentaryVersion, NoteVersion, PoolVersion, PostVersion, WikiPageVersion, Post, PostVote, MediaAsset, Favorite, AITag]
+
+    models -= [
+      GoodJob::BaseRecord,
+      GoodJob::Process,
+      GoodJob::Execution,
+      GoodJob::BaseExecution,
+      GoodJob::DiscreteExecution,
+      GoodJob::BatchRecord,
+      GoodJob::Job,
+      GoodJob::Setting,
+      TagRelationship,
+      ArtistVersion,
+      ArtistCommentaryVersion,
+      NoteVersion,
+      PoolVersion,
+      PostVersion,
+      WikiPageVersion,
+      Post,
+      PostEvent,
+      PostVote,
+      MediaAsset,
+      Favorite,
+      AITag,
+      UserAction
+    ]
+
     models
   end
 
@@ -55,20 +80,22 @@ class BigqueryExportService
 
     file = dump_records!
     upload_to_bigquery!(file)
+  ensure
+    file&.close
   end
 
   # Dump the table's records to a gzipped, newline-delimited JSON tempfile.
-  def dump_records!
-    file = Tempfile.new("danbooru-export-dump-", binmode: true)
-    file = Zlib::GzipWriter.new(file)
+  def dump_records!(file = Danbooru::Tempfile.new("danbooru-export-dump-#{model.name}-", binmode: true))
+    gzip = Zlib::GzipWriter.new(file)
 
     CurrentUser.scoped(User.anonymous) do
       records.find_each(batch_size: 5_000) do |record|
-        file.puts(record.to_json)
+        gzip.puts(record.to_json)
       end
     end
 
-    file.close # flush zlib footer
+    gzip.finish
+    file.fsync
     file
   end
 

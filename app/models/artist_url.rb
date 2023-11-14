@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ArtistURL < ApplicationRecord
-  self.ignored_columns = [:normalized_url]
-
   normalize :url, :normalize_url
 
   validates :url, presence: true, uniqueness: { scope: :artist_id }
@@ -19,8 +17,8 @@ class ArtistURL < ApplicationRecord
     [is_active, url]
   end
 
-  def self.search(params = {})
-    q = search_attributes(params, :id, :created_at, :updated_at, :url, :is_active, :artist)
+  def self.search(params, current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :url, :is_active, :artist], current_user: current_user)
     q = q.urls_match(params[:url_matches])
 
     case params[:order]
@@ -52,10 +50,16 @@ class ArtistURL < ApplicationRecord
       where_ilike(:url, url)
     elsif url =~ %r{\Ahttps?://}i
       profile_url = Source::URL.profile_url(url) || Source::Extractor.find(url).profile_url || normalize_url(url)
-      where(url: profile_url)
+      normalized_url_like(profile_url)
     else
       where_ilike(:url, "*#{url}*")
     end
+  end
+
+  def self.normalized_url_like(url)
+    url = url.downcase.gsub(%r{\Ahttps?://|/\z}i, "") # "https://example.com/A/B/C/" => "example.com/a/b/c"
+    url = url + "/" unless url.include?("*")
+    where_like("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'", url) # this is indexed
   end
 
   def domain
@@ -76,15 +80,11 @@ class ArtistURL < ApplicationRecord
       true
     when %r{twitter\.com/intent}i
       true
-    when %r{lohas\.nicoseiga\.jp}i
-      true
     when %r{(?:www|com|dic)\.nicovideo\.jp}i
       true
     when %r{pawoo\.net/web/accounts}i
       true
-    when %r{www\.artstation\.com}i
-      true
-    when %r{blogimg\.jp}i, %r{image\.blog\.livedoor\.jp}i
+    when %r{misskey\.(?:io|art|design)/users}i
       true
     else
       false
@@ -95,8 +95,8 @@ class ArtistURL < ApplicationRecord
   def priority
     sites = %w[
       Pixiv Twitter
-      Anifty ArtStation Baraag BCY Booth Deviant\ Art Hentai\ Foundry Fantia Furaffinity Foundation Lofter Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Tinami Tumblr Weibo
-      Ask.fm Facebook FC2 Gumroad Instagram Ko-fi Livedoor Mihuashi Mixi.jp Patreon Piapro.jp Picarto Privatter Sakura.ne.jp Stickam Skeb Twitch Youtube
+      Anifty ArtStation Baraag Bilibili BCY Booth Deviant\ Art Fantia Foundation Furaffinity Hentai\ Foundry Lofter Newgrounds Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Reddit Skeb Tinami Tumblr Weibo Misskey.io Misskey.art Misskey.design
+      Ask.fm Facebook FC2 Gumroad Instagram Ko-fi Livedoor Mihuashi Mixi.jp Patreon Piapro.jp Picarto Privatter Sakura.ne.jp Stickam Twitch Youtube
       Amazon Circle.ms DLSite Doujinshi.org Erogamescape Mangaupdates Melonbooks Toranoana Wikipedia
     ]
 

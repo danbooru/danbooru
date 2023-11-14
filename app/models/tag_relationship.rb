@@ -13,6 +13,7 @@ class TagRelationship < ApplicationRecord
   belongs_to :consequent_tag, class_name: "Tag", foreign_key: "consequent_name", primary_key: "name", default: -> { Tag.find_or_create_by_name(consequent_name) }
   belongs_to :antecedent_wiki, class_name: "WikiPage", foreign_key: "antecedent_name", primary_key: "title", optional: true
   belongs_to :consequent_wiki, class_name: "WikiPage", foreign_key: "consequent_name", primary_key: "title", optional: true
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   scope :active, -> {where(status: "active")}
   scope :deleted, -> {where(status: "deleted")}
@@ -61,7 +62,7 @@ class TagRelationship < ApplicationRecord
 
     if rejector != User.system
       category = relationship == "tag alias" ? :tag_alias_delete : :tag_implication_delete
-      ModAction.log("deleted #{relationship} #{antecedent_name} -> #{consequent_name}", category, rejector)
+      ModAction.log("deleted #{relationship} #{antecedent_name} -> #{consequent_name}", category, subject: self, user: rejector)
     end
   end
 
@@ -82,8 +83,8 @@ class TagRelationship < ApplicationRecord
       where(status: status.downcase)
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :antecedent_name, :consequent_name, :reason, :creator, :approver, :forum_post, :forum_topic, :antecedent_tag, :consequent_tag, :antecedent_wiki, :consequent_wiki)
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :antecedent_name, :consequent_name, :reason, :creator, :approver, :forum_post, :forum_topic, :antecedent_tag, :consequent_tag, :antecedent_wiki, :consequent_wiki], current_user: current_user)
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])

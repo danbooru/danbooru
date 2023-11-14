@@ -31,8 +31,16 @@ class PostReplacementsController < ApplicationController
   def index
     params[:search][:post_id] = params.delete(:post_id) if params.key?(:post_id)
     @post_replacements = authorize PostReplacement.paginated_search(params)
-    @post_replacements = @post_replacements.includes(:creator, post: [:uploader, :media_asset]) if request.format.html?
+    @post_replacements = @post_replacements.includes(:creator, :old_media_asset, :media_asset, post: [:uploader, :media_asset]) if request.format.html?
 
     respond_with(@post_replacements)
+  end
+
+  def show
+    @post_replacement = authorize PostReplacement.find(params[:id])
+
+    respond_with(@post_replacement) do |format|
+      format.html { redirect_to post_replacements_path(search: { id: @post_replacement.id }) }
+    end
   end
 end

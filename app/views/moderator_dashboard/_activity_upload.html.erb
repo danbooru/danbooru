@@ -1,0 +1,18 @@
+<h2>Uploads</h2>
+
+<table class="striped w-full">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @dashboard.posts.each do |activity| %>
+      <tr>
+        <td><%= link_to_user(activity.user) %></td>
+        <td><%= link_to activity.count, posts_path(:tags => "user:#{activity.user.name}") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

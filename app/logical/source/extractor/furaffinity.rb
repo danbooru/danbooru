@@ -58,16 +58,12 @@ class Source::Extractor
       DText.from_html(artist_commentary_desc)&.strip
     end
 
-    def html_response
-      return nil unless page_url.present?
-      response = http.cache(1.minute).get(page_url)
-
-      return nil unless response.status == 200
-      response.parse
+    memoize def html_response
+      http.cache(1.minute).parsed_get(page_url)
     end
 
     def http
-      Danbooru::Http.new.cookies(a: Danbooru.config.furaffinity_cookie_a, b: Danbooru.config.furaffinity_cookie_b, sfw: 0)
+      super.cookies(a: Danbooru.config.furaffinity_cookie_a, b: Danbooru.config.furaffinity_cookie_b, sfw: 0)
     end
   end
 end

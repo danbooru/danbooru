@@ -10,6 +10,14 @@ class MediaMetadataControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "work with the only=media_asset param" do
+        metadata = create(:media_metadata)
+        get media_metadata_path(only: "media_asset"), as: :json
+
+        assert_response :success
+        assert_equal(metadata.media_asset.id, response.parsed_body.sole.dig("media_asset", "id"))
+      end
+
       context "searching" do
         setup do
           @jpg = create(:media_metadata, file: "test/files/test.jpg")

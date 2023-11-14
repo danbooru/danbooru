@@ -21,7 +21,7 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should respond_to_search({}).with { @versions.reverse }
-      should respond_to_search(title_matches: "supreme").with { [@versions[2], @versions[1]] }
+      should respond_to_search(title_like: "supreme").with { [@versions[2], @versions[1]] }
       should respond_to_search(body_matches: "blah").with { [@versions[2], @versions[1]] }
       should respond_to_search(other_names_include_any: "not_this").with { [@versions[2], @versions[1]] }
 

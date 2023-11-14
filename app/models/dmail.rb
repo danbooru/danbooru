@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class Dmail < ApplicationRecord
+  attr_accessor :creator_ip_addr, :disable_email_notifications
+
   validate :validate_sender_is_not_limited, on: :create
-  validates :title, presence: true, length: { maximum: 200 }, if: :title_changed?
-  validates :body, presence: true, length: { maximum: 50_000 }, if: :body_changed?
+  validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
+  validates :body, visible_string: true, length: { maximum: 50_000 }, if: :body_changed?
 
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
@@ -52,7 +54,7 @@ class Dmail < ApplicationRecord
       end
 
       def create_automated(params)
-        dmail = Dmail.new(from: User.system, creator_ip_addr: "127.0.0.1", **params)
+        dmail = Dmail.new(from: User.system, **params)
         dmail.owner = dmail.to
         dmail.save
         dmail
@@ -76,7 +78,11 @@ class Dmail < ApplicationRecord
 
   module SearchMethods
     def visible(user)
-      where(owner: user)
+      if user.is_anonymous?
+        none
+      else
+        where(owner: user)
+      end
     end
 
     def sent_by(user)
@@ -98,11 +104,9 @@ class Dmail < ApplicationRecord
       end
     end
 
-    def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_read, :is_deleted, :title, :body, :to, :from)
-      q = q.text_attribute_matches(:title, params[:title_matches])
-      q = q.text_attribute_matches(:body, params[:body_matches])
-      q = q.text_attribute_matches([:title, :body], params[:message_matches])
+    def search(params, current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_read, :is_deleted, :title, :body, :to, :from], current_user: current_user)
+      q = q.where_text_matches([:title, :body], params[:message_matches])
 
       q = q.folder_matches(params[:folder])
 
@@ -141,8 +145,8 @@ class Dmail < ApplicationRecord
   end
 
   def send_email
-    if is_recipient? && !is_deleted? && to.receive_email_notifications?
-      UserMailer.dmail_notice(self).deliver_later
+    if is_recipient? && !is_deleted? && to.receive_email_notifications? && !disable_email_notifications
+      UserMailer.with(headers: { "X-Danbooru-Dmail": Routes.dmail_url(self) }).dmail_notice(self).deliver_later
     end
   end
 
@@ -167,7 +171,7 @@ class Dmail < ApplicationRecord
   end
 
   def autoreport_spam
-    if is_recipient? && !is_sender? && SpamDetector.new(self).spam?
+    if is_recipient? && !is_sender? && SpamDetector.new(self, user_ip: creator_ip_addr).spam?
       self.is_deleted = true
       moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end

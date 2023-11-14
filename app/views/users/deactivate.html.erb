@@ -1,0 +1,51 @@
+<% page_title "Deactivate Account" %>
+<%= render "secondary_links" %>
+
+<div id="c-users">
+  <div id="a-deactivate">
+    <% if @user == CurrentUser.user %>
+      <h1>Deactivate Account</h1>
+    <% else %>
+      <h1>Deactivate Account: <%= link_to_user @user %></h1>
+    <% end %>
+
+    <div class="prose mb-4 fixed-width-container">
+      <p>
+        You can deactivate your account by entering your password below. Deactivating your account will delete your
+        private account information, but it will not delete your contributions to the site.
+
+      </p>Deactivating your account will do the following things: </p>
+
+      <ul>
+        <li>Change your username to a generic username (<i>user_<%= @user.id %></i>).</li>
+        <li>Delete your password, email address, <%= link_to_wiki "API keys", "help:api" %>, and account settings.</li>
+        <li>Delete your <%= link_to_wiki "saved searches", "help:saved_searches" %>.</li>
+        <li>Delete your <%= link_to_wiki "private favorite groups", "help:favorite_groups" %>.</li>
+        <li>Delete your private favorites and upvotes (only if <%= link_to_wiki "privacy mode", "help:privacy_mode" %> is enabled).</li>
+      </ul>
+
+      <p>
+        The following things will <strong>not</strong> be deleted:
+      </p>
+
+      <ul>
+        <li>Posts you've uploaded.</li>
+        <li>Your comments, forum posts, and private messages.</li>
+        <li>Your tag edits, wiki edits, translation notes, and any other contributions you've made to the site.</li>
+        <li>Your login history, including your IP address and geographic location. This is kept for moderation purposes.</li>
+      </ul>
+
+      <p>If you just want to change your username, you can <%= link_to "change your name here", change_name_user_path(@user) %>.</p>
+
+      <p>
+        Enter your password below to deactivate your account. This cannot be
+        undone. Your account cannot be recovered after it is deactivated.
+      </p>
+    </div>
+
+    <%= edit_form_for(:user, url: user_path(@user), method: :delete) do |f| %>
+      <%= f.input :password %>
+      <%= f.submit "Deactivate account", "data-confirm": "Are you sure you want to deactivate your account? This cannot be undone" %>
+    <% end %>
+  </div>
+</div>

@@ -1,7 +1,0 @@
-<div class="user-related-tags-columns space-y-4 md:space-y-0 md:flex md:space-x-4">
-  <% if related_tags.present? %>
-    <%= render "related_tags/tag_column", tags: related_tags.recent_tags, class: "recent-related-tags-column", title: "Recent" %>
-    <%= render "related_tags/tag_column", tags: related_tags.favorite_tags, class: "frequent-related-tags-column", title: "Frequent" %>
-    <%= render "related_tags/ai_tags_column", ai_tags: related_tags.ai_tags %>
-  <% end %>
-</div>

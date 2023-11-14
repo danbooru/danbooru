@@ -2,8 +2,12 @@
  * Make sure elements with the HTML5 [hidden] attribute (e.g. <span hidden>blah</span>)
  * really are hidden. Otherwise the `display` property can override the [hidden] attribute.
  */
-[hidden] {
+[hidden], [x-cloak] {
   display: none !important;
+}
+
+html {
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -93,10 +97,6 @@ p {
   margin-bottom: 1em;
 }
 
-table tfoot {
-  margin-top: 2em;
-}
-
 details {
   summary {
     cursor: pointer;
@@ -120,16 +120,7 @@ a.link-plain {
 }
 
 .fixed-width-container {
-  max-width: 70em;
-}
-
-.column-container {
-  display: flex;
-
-  .column-expand { flex: 1; }
-  .column-shrink { flex: 0; }
-
-  @media (max-width: 660px) { display: block; }
+  max-width: 60rem;
 }
 
 ul.list-bulleted {

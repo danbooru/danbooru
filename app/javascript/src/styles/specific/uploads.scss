@@ -1,47 +1,88 @@
 div#c-uploads {
   div#a-show {
-    .artist-commentary {
-      margin-top: 1em;
+    input, textarea {
+      max-width: 100%;
     }
 
-    .commentary-translation {
-      margin-top: 1em;
-    }
+    .upload-container {
+      --min-edit-container-width: 180;
+      --edit-container-width: 480;
 
-    div#upload-guide-notice {
-      margin-bottom: 2em;
-    }
+      display: grid;
+      gap: 0.5rem;
 
-    ul#links {
-      margin-bottom: 1em;
-    }
+      // "Auto" docks to the bottom on tall-ish screens and to the right on wide screens. XXX We use aspect ratio >=4:3
+      // instead of >=1:1 to avoid the layout switching when the on-screen keyboard is opened in Firefox on Android.
+      &[data-dock="auto"] {
+        .upload-container {
+          grid-template-columns: 1fr;
+          grid-template-rows: min-content;
+          gap: 0.25rem;
+        }
 
-    div#related-posts-by-source, div#iqdb-similar {
-      display: inline-block;
-    }
+        .upload-divider {
+          display: none;
+        }
 
-    div.upload_rating .radio label {
-      font-weight: normal;
-      display: inline;
-      margin-right: 2em;
+        #dock-auto-link { font-weight: bold; }
 
-      input {
-        margin-right: 0.5em;
+        @media (min-aspect-ratio: 4/3) {
+          grid-template-columns: 1fr max-content calc(var(--edit-container-width) * 1px);
+
+          .upload-divider {
+            display: block;
+          }
+        }
+      }
+
+      &[data-dock="bottom"] {
+        grid-template-columns: 1fr;
+        grid-template-rows: min-content;
+        gap: 0.25rem;
+
+        .upload-divider {
+          display: none;
+        }
+
+        #dock-bottom-link { font-weight: bold; }
+      }
+
+      &[data-dock="right"] {
+        grid-template-columns: 1fr max-content calc(var(--edit-container-width) * 1px);
+
+        #dock-right-link { font-weight: bold; }
+      }
+
+      &[data-dock="left"] {
+        grid-template-columns: calc(var(--edit-container-width) * 1px) max-content 1fr;
+
+        // XXX The z-index is a hack to make the docking popup menu show up above the image container in Firefox.
+        .upload-edit-container  { order: 1; z-index: 1; }
+        .upload-divider         { order: 2; }
+        .upload-image-container { order: 3; }
+
+        #dock-left-link { font-weight: bold; }
       }
     }
 
-    div.field_with_errors {
-      display: inline;
+    .media-asset-component-fit-height {
+      position: sticky;
     }
 
-    #related-tags-container {
-      margin-top: 1em;
-    }
-  }
+    .upload-divider {
+      touch-action: none;
+      background: linear-gradient(currentcolor, currentcolor) no-repeat center/1px 100%;
+      color: var(--divider-border-color);
 
-  div#a-index {
-    .info {
-      margin-right: 1.5em;
+      @media (hover: hover) {
+        &:hover {
+          color: var(--divider-border-hover-color);
+        }
+      }
+
+      &.dragging {
+        color: var(--link-color);
+      }
     }
   }
 }

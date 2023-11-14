@@ -38,6 +38,26 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(nil, session[:user_id])
       end
 
+      should "not log the user in when attempting to login to a privileged account from a proxy" do
+        user = create(:approver_user, password: "password")
+        ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.1.1.1")
+
+        post session_path, params: { name: user.name, password: "password" }
+
+        assert_response 401
+        assert_nil(nil, session[:user_id])
+      end
+
+      should "not log the user in when attempting to login to a inactive account from a proxy" do
+        user = create(:user, password: "password", last_logged_in_at: 1.year.ago)
+        ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.1.1.1")
+
+        post session_path, params: { name: user.name, password: "password" }
+
+        assert_response 401
+        assert_nil(nil, session[:user_id])
+      end
+
       should "redirect the user when given an url param" do
         post session_path, params: { name: @user.name, password: "password", url: tags_path }
         assert_redirected_to tags_path
@@ -46,6 +66,15 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       should "not allow redirects to protocol-relative URLs" do
         post session_path, params: { name: @user.name, password: "password", url: "//example.com" }
         assert_response 403
+      end
+
+      should "not allow deleted users to login" do
+        @user.update!(is_deleted: true)
+        post session_path, params: { name: @user.name, password: "password" }
+
+        assert_response 401
+        assert_nil(nil, session[:user_id])
+        assert_equal(true, @user.user_events.failed_login.exists?)
       end
 
       should "not allow IP banned users to login" do

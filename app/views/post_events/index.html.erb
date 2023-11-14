@@ -1,25 +1,165 @@
 <div id="c-post-events">
   <div id="a-index">
-    <h1>Post Events</h1>
+    <% if @post %>
+      <h1>Events: <%= link_to @post.dtext_shortlink, @post %></h1>
+      <%= link_to "« Back", post_events_path, class: "text-xs" %>
+    <% else %>
+      <h1>Events</h1>
+    <% end %>
 
-    <%= table_for @events, class: "striped autofit", width: "100%" do |t| %>
-      <% t.column :type_name, name: "Type" %>
-      <% t.column "Description", td: { class: "col-expand" } do |event| %>
-        <div class="prose">
-          <%= format_text event.reason %>
-        </div>
+    <% unless @post %>
+      <%= search_form_for(post_events_path) do |f| %>
+        <%= f.input :creator_name, label: "User", input_html: { value: params[:search][:creator_name], "data-autocomplete": "user" } %>
+        <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], "data-autocomplete": "tag-query" } %>
+        <%= f.input :category, label: "Category", collection: PostEvent.categories.map { |category| [category.titleize, category] }, include_blank: true, selected: params[:search][:category] %>
+        <%= f.input :order, collection: [%w[Newest event_at], %w[Oldest event_at_asc]], include_blank: true, selected: params[:search][:order] %>
+        <%= f.submit "Search" %>
       <% end %>
-      <% t.column "Status" do |event| %>
-        <%= event.status %>
+    <% end %>
+
+    <%= table_for @post_events, class: "striped autofit mt-4", width: "100%" do |t| %>
+      <% t.column "Event", td: { class: "col-expand" } do |event| %>
+        <% post = event.post %>
+        <% model = event.model %>
+        <% creator = event.creator %>
+
+        <% case event.model_type %>
+        <% when "Post" %>
+          <%= link_to post.dtext_shortlink, post %> was uploaded by <%= link_to_user creator %>.
+        <% when "PostAppeal" %>
+          <div class="prose">
+            <%= link_to post.dtext_shortlink, post %> was appealed by <%= link_to_user creator %><%= " (#{format_text(model.reason.strip.chomp("."), inline: true)})".html_safe if model.reason.present? %>.
+          </div>
+        <% when "PostApproval" %>
+          <%= link_to post.dtext_shortlink, post %> was approved by <%= link_to_user creator %>.
+        <% when "PostDisapproval" %>
+          <div class="prose">
+            <% if policy(model).can_view_creator? %>
+              <%= link_to post.dtext_shortlink, post %> was disapproved by <%= link_to_user creator %> (<%= model.reason.titleize.downcase %><%= ": ".html_safe + format_text(model.message.strip.chomp("."), inline: true) if model.message.present? %>).
+            <% else %>
+              <%= link_to post.dtext_shortlink, post %> was disapproved (<%= model.reason.titleize.downcase %><%= ": ".html_safe + format_text(model.message.strip.chomp("."), inline: true) if model.message.present? %>).
+            <% end %>
+          </div>
+        <% when "PostFlag" %>
+          <div class="prose">
+            <% if policy(model).can_view_flagger? %>
+              <%= link_to post.dtext_shortlink, post %> was flagged by <%= link_to_user creator %> (<%= format_text(model.reason.strip.chomp("."), inline: true) %>).
+            <% else %>
+              <%= link_to post.dtext_shortlink, post %> was flagged (<%= format_text(model.reason.strip.chomp("."), inline: true) %>).
+            <% end %>
+          </div>
+        <% when "PostReplacement" %>
+          <%= link_to post.dtext_shortlink, post %> was replaced by <%= link_to_user creator %>:
+
+          <% if model.original_url.match?(%r{\Ahttps?://}) %>
+            <%= external_link_to(model.original_url, external_site_icon(Source::URL.site_name(model.original_url), title: model.original_url, class: "h-4")) %>
+          <% elsif model.original_url.present? %>
+            <%= tag.span(model.original_url.truncate(30, omission: "...#{model.original_url.last(15)}"), title: model.original_url) %>,
+          <% end %>
+
+          <% if model.old_media_asset.present? %>
+            <%= link_to model.old_media_asset do %><%#
+            %><%= model.old_media_asset.file_size.to_fs(:human_size, precision: 4) %>
+              .<%= model.old_media_asset.file_ext %>
+              (<%= model.old_media_asset.image_width %>x<%= model.old_media_asset.image_height %><%= ", " + duration_to_hhmmss(model.old_media_asset.duration) if model.old_media_asset.duration.present? %>)
+            <% end %>
+          <% elsif model.old_file_size && model.old_file_ext && model.old_image_width && model.old_image_height %>
+            <%= model.old_file_size.to_fs(:human_size, precision: 4) %>
+            .<%= model.old_file_ext %>
+            (<%= model.old_image_width %>x<%= model.old_image_height %>)
+          <% elsif model.old_md5.present? %>
+            <%= model.old_md5 %>
+          <% else %>
+            <i>unknown file</i>
+          <% end %>
+          →
+          <% if model.replacement_url.match?(%r{\Ahttps?://}) %>
+            <%= external_link_to(model.replacement_url, external_site_icon(Source::URL.site_name(model.replacement_url), title: model.replacement_url, class: "h-4")) %>
+          <% elsif model.replacement_url.present? %>
+            <%= tag.span(model.replacement_url.truncate(30, omission: "...#{model.replacement_url.last(15)}"), title: model.replacement_url) %>,
+          <% end %>
+
+          <% if model.media_asset.present? %>
+            <%= link_to model.media_asset do %>
+              <%= model.media_asset.file_size.to_fs(:human_size, precision: 4) %>
+              .<%= model.media_asset.file_ext %>
+              (<%= model.media_asset.image_width %>x<%= model.media_asset.image_height %><%= ", " + duration_to_hhmmss(model.media_asset.duration) if model.media_asset.duration.present? %>)<%#
+          %><% end %>
+          <% elsif model.file_size && model.file_ext && model.image_width && model.image_height %>
+            <%= model.file_size.to_fs(:human_size, precision: 4) %>
+            .<%= model.file_ext %>
+            (<%= model.image_width %>x<%= model.image_height %>)
+          <% elsif model.md5.present? %>
+            <%= model.md5 %>
+          <% else %>
+            <i>unknown file</i>
+          <% end %>
+        <% when "ModAction" %>
+          <% case model.category %>
+          <% when "post_ban" %>
+            <%= link_to post.dtext_shortlink, post %> was banned by <%= link_to_user creator %>.
+          <% when "post_unban" %>
+            <%= link_to post.dtext_shortlink, post %> was unbanned by <%= link_to_user creator %>.
+          <% when "post_delete" %>
+            <%= link_to post.dtext_shortlink, post %> was deleted by <%= link_to_user creator %>.
+          <% when "post_undelete" %>
+            <%= link_to post.dtext_shortlink, post %> was undeleted by <%= link_to_user creator %>.
+          <% when "post_regenerate" %>
+            <%= link_to post.dtext_shortlink, post %> had its thumbnails regenerated by <%= link_to_user creator %>.
+          <% when "post_regenerate_iqdb" %>
+            <%= link_to post.dtext_shortlink, post %> was reindexed in IQDB by <%= link_to_user creator %>.
+          <% when "post_rating_lock_create" %>
+            <%= link_to post.dtext_shortlink, post %> was rating locked by <%= link_to_user creator %>.
+          <% when "post_rating_lock_delete" %>
+            <%= link_to post.dtext_shortlink, post %> was rating unlocked by <%= link_to_user creator %>.
+          <% when "post_note_lock_create" %>
+            <%= link_to post.dtext_shortlink, post %> was note locked by <%= link_to_user creator %>.
+          <% when "post_note_lock_delete" %>
+            <%= link_to post.dtext_shortlink, post %> was note unlocked by <%= link_to_user creator %>.
+          <% else %>
+            <div class="prose">
+              <%= link_to_user creator %> <%= format_text(model.description.chomp(".").strip, inline: true) %>.
+            </div>
+          <% end %>
+        <% end %>
       <% end %>
+
+      <% t.column "Category" do |event| %>
+        <%= link_to event.pretty_category, post_events_path(search: { category: event.category, **search_params }) %>
+      <% end %>
+
       <% t.column "User" do |event| %>
-        <% if event.is_creator_visible? %>
-          <%= link_to_user event.creator %>
+        <% if policy(event).can_see_creator? %>
+          <%= link_to_user event.creator %> <%= link_to "»", post_events_path(search: { **search_params, creator_name: event.creator.name }) %>
         <% else %>
           <i>hidden</i>
         <% end %>
-        <br><%= time_ago_in_words_tagged event.created_at %>
+        <div><%= time_ago_in_words_tagged(event.event_at) %></div>
+      <% end %>
+
+      <% t.column column: "control" do |event| %>
+        <%= render PopupMenuComponent.new do |menu| %>
+          <% unless @post %>
+            <% menu.with_item do %>
+              <%= link_to "Post history", post_post_events_path(event.post) %>
+            <% end %>
+          <% end %>
+
+          <% if policy(event).can_see_creator? %>
+            <% menu.with_item do %>
+              <%= link_to "User history", post_events_path(search: { creator_name: event.creator.name }) %>
+            <% end %>
+          <% end %>
+
+          <% menu.with_item do %>
+            <%= link_to "Details", event.model %>
+          <% end %>
+        <% end %>
       <% end %>
     <% end %>
+
+    <%= numbered_paginator(@post_events) %>
   </div>
 </div>
+
+<%= render "secondary_links" %>

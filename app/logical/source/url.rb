@@ -40,6 +40,7 @@ module Source
       Source::URL::Fantia,
       Source::URL::Fc2,
       Source::URL::Foundation,
+      Source::URL::Gelbooru,
       Source::URL::HentaiFoundry,
       Source::URL::Instagram,
       Source::URL::Lofter,
@@ -58,6 +59,19 @@ module Source
       Source::URL::Weibo,
       Source::URL::Anifty,
       Source::URL::Furaffinity,
+      Source::URL::Bilibili,
+      Source::URL::Rule34DotUs,
+      Source::URL::FourChan,
+      Source::URL::Picdig,
+      Source::URL::Enty,
+      Source::URL::ArcaLive,
+      Source::URL::Imgur,
+      Source::URL::Zerochan,
+      Source::URL::Poipiku,
+      Source::URL::AboutMe,
+      Source::URL::ArtStreet,
+      Source::URL::Gumroad,
+      Source::URL::Misskey,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
@@ -183,6 +197,10 @@ module Source
     # @return [String, nil]
     def profile_url
       nil
+    end
+
+    def self.site_name(url)
+      Source::URL.parse(url)&.site_name
     end
 
     def self.image_url?(url)

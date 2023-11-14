@@ -58,7 +58,7 @@ class EmailsController < ApplicationController
 
   def send_confirmation
     @user = authorize User.find(params[:user_id]), policy_class: EmailAddressPolicy
-    UserMailer.welcome_user(@user).deliver_later
+    UserMailer.with_request(request).welcome_user(@user).deliver_later
 
     flash[:notice] = "Confirmation email sent to #{@user.email_address.address}. Check your email to confirm your address"
     redirect_to @user
