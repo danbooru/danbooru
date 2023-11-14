@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title><%= page_title %></title>
 
-  <link rel="icon" href="/favicon.ico" sizes="16x16" type="image/x-icon">
+  <link rel="icon" href="/favicon.svg" sizes="16x16" type="image/x-icon">
   <%= render_meta_links @current_item if @current_item.respond_to?(:paginate) %>
   <%= tag.link rel: "canonical", href: canonical_url %>
   <%= tag.link rel: "search", type: "application/opensearchdescription+xml", href: opensearch_url(format: :xml, version: 2), title: "Search posts" %>
@@ -185,7 +185,6 @@
   <footer id="page-footer" class="text-sm flex-initial">
     <%= link_to "Terms", terms_of_service_path %>
     / <%= link_to "Privacy", privacy_policy_path %>
-    / <%= link_to "Upgrade", new_user_upgrade_path %>
     / <%= link_to "Contact", contact_path %>
     /
     <span class="social-icons">

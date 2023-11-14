@@ -37,16 +37,6 @@
       </p>
     <% end %>
 
-    <% if !CurrentUser.is_gold? %>
-      <h3>Search limits</h3>
-
-      <p>
-        Members are limited to searches that take up to 3 seconds long. You can
-        <%= link_to "upgrade to Gold", new_user_upgrade_path %> to increase
-        your search limit to 6 seconds long.
-      </p>
-    <% end %>
-
     <%= link_to "Go back", :back, rel: "prev" %>
   </div>
 </div>
