@@ -270,7 +270,7 @@
     <% if @post.banblocked? -%>
       <p>This page has been removed because of a takedown request or rule violation.</p>
     <% elsif @post.levelblocked? -%>
-      <p><%= link_to "You need a gold account to see this image", new_user_upgrade_path %>.</p>
+      <p><%= link_to_wiki "You need a higher access account to see this image", "help:users" %>.</p>
     <% elsif @post.safeblocked? -%>
       <p>This image is unavailable on <%= Danbooru.config.app_name %>. Go to <%= link_to "Danbooru", "https://danbooru.donmai.us" %> or disable safe mode to view (<%= link_to_wiki "learn more", "help:safe_mode" %>).</p>
     <% elsif @post.is_flash? -%>

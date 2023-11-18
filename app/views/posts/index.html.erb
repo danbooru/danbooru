@@ -180,7 +180,7 @@
             <% end %>
 
             <% if @post_set.censored_posts.present? %>
-              <%= @post_set.censored_posts.size %> post(s) on this page require a <%= link_to "Gold account", new_user_upgrade_path %> to view (<%= link_to_wiki "learn more", "help:censored_tags" %>).<br>
+              <%= @post_set.censored_posts.size %> post(s) on this page require a <%= link_to_wiki "higher access", "help:users" %> account to view (<%= link_to_wiki "learn more", "help:censored_tags" %>).<br>
             <% end %>
 
             <% if @post_set.safe_posts.present? %>
