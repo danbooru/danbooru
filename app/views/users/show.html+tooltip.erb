@@ -44,7 +44,7 @@
         <% end %>
       <% end %>
 
-      <% if !@user.is_gold? %>
+      <% if (!@user.is_gold?)&&(!UserUpgrade.enabled) %>
         <% menu.with_item do %>
           <%= link_to new_user_upgrade_path(user_id: @user.id) do %>
             <%= gift_icon %> Gift Upgrade

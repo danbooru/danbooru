@@ -201,7 +201,7 @@ class User < ApplicationRecord
   concerning :ValidationMethods do
     def validate_enable_private_favorites
       if enable_private_favorites_was == false && enable_private_favorites == true && !Pundit.policy!(self, self).can_enable_private_favorites?
-        errors.add(:base, "Can't enable privacy mode without a Gold account")
+        errors.add(:base, "Can't enable privacy mode without a gold account or higher")
       end
     end
 

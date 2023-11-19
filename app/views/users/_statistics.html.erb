@@ -84,7 +84,7 @@
         <td>
           <%= user.level_string %>
 
-          <% if !user.is_gold? %>
+          <% if (!user.is_gold?)&&(!UserUpgrade.enabled) %>
             <% if CurrentUser.user == user %>
               (<%= link_to "Upgrade account", new_user_upgrade_path %>)
             <% else %>
