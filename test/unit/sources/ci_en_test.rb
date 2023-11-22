@@ -34,31 +34,42 @@ module Sources
 
     context "An R18 article url" do
       strategy_should_work(
-        "https://ci-en.dlsite.com/creator/4565/article/1004364",
-        page_url: "https://ci-en.net/creator/4565/article/1004364",
+        "https://ci-en.dlsite.com/creator/12924/article/733140",
+        page_url: "https://ci-en.net/creator/12924/article/733140",
         media_files: [
-          { file_size: 908_311 },
+          { file_size: 85_171 },
+          { file_size: 4_015_039 },
         ],
         profile_urls: [
-          "https://ci-en.net/creator/4565",
+          "https://ci-en.net/creator/12924",
         ],
-        artist_name: "おおいぬのふぐり",
-        tag_name: "cien_4565",
-        tags: ["skeb", "いぬのふぐり", "イラスト", "オリジナル", "制服", "学校"],
-        dtext_artist_commentary_title: "[R-15絵] 廊下でぶつかってパンモロ",
+        artist_name: "あまちゃ/おぽぽわーるど",
+        tag_name: "cien_12924",
+        tags: ["動画", "アニメ", "ゲーム", "R-18"],
+        dtext_artist_commentary_title: "ショートストーリー付きR-18動画ゲーム制作のお知らせ",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          [u]"Skeb":[https://skeb.jp/@inu_no_huguri][/u]でリクエストをいただきました！
-          お題は [b]ぶつかってパンツが丸見えになっちゃった女の子[/b] です。ラッキースケベ。
-          パンツの描き込みをいつもより力入れました！
-          たまたま"[u]前記事[/u]":[https://ci-en.dlsite.com/creator/4565/article/999219]とパンツネタが被りました。
+          h1. R-18動画制作のお知らせ
+          初めまして、あまちゃと申します。
+          この度、新しくLIVE2Dを使った動画やゲームの制作を始めることとなりまして、活動報告の場としてCi-enを始めました。
+          現在、イラストレーターのJIMA先生と共同でR-18動画の制作を開始しておりまして、そちらの進捗を紹介します。
+          h2. 内容について
           
-          h6. おおいぬのふぐりプランで高解像度のパンツ差分など
-          高解像度版のサイズは 1500×2000 pixel です。
-          パンツ差分もあります。
-          ※裸差分なし
-          * 水色の水玉パンツ（上記と同じ）
-          * 無地の白パンツ
-          * ピンクの縞パンツ
+          
+          ・JIMA先生が描かれるキャラクター、「あくまっこちゃん」をテーマにしたR-18動画の制作
+          ・アプリ形式で動画を切り替えるシステム
+          ・アドベンチャー形式のショートストーリー主にこちらを制作しております！
+          JIMA先生の美麗で煽情的なイラストをLIVE2DでよりHに皆様にお届けできればと思いますのでご期待ください！
+          また、ショートストーリーについてもJIMA先生監修のもと、制作しております。
+          ここでしか見られない「あくまっこちゃん」のキャラクターを是非お楽しみに！
+          
+          完成後はDLsite等で販売の予定となります。（2023年今冬のリリースを目標）
+          ※ゲーム形式の制作をするのは初めてなこともあり作業が遅延しがちになっています。気長に完成をお待ちください。
+          h2. 制作中動画を少しだけ特別公開！
+          こんな感じの動画を色々なシチュエーションで制作中となります。
+          動画化するイラストについては下記のファンサイトで先行公開中です！
+          じま (JIMA)
+          【FANBOX】<https://b0o367po.fanbox.cc/posts>
+          【fantia】<https://fantia.jp/fanclubs/84283>
         EOS
       )
     end

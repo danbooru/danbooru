@@ -14,7 +14,14 @@ class Source::Extractor::CiEn < Source::Extractor
     if parsed_url.image_url?
       [parsed_url.to_s]
     else
-      page&.css(".l-creatorPage-main article [data-raw]").to_a.pluck("data-raw")
+      [
+        *page&.css(".l-creatorPage-main article vue-l-image").to_a.pluck("data-raw"),
+        *page&.css(".l-creatorPage-main article vue-file-player").to_a.map do |video|
+          Addressable::URI.heuristic_parse(video["base-path"]).join("video-web.mp4").tap do |uri|
+            uri.query = video["auth-key"]
+          end.to_s
+        end,
+      ].compact.uniq
     end
   end
 
@@ -46,11 +53,9 @@ class Source::Extractor::CiEn < Source::Extractor
     page&.dup&.css(".l-creatorPage-main article")&.tap do |article|
       article.css(".article-title").remove
       article.css(".articleContents").remove
+      article.css("vue-file-player").remove
       article.css(".file-player-image-wrapper").remove
       article.css(".c-rewardBox").remove
-      article.css("h1").each do |node|
-        node.name = "h6"
-      end
     end&.to_html
   end
 
