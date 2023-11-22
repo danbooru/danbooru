@@ -4,6 +4,9 @@ class Post < ApplicationRecord
   class RevertError < StandardError; end
   class DeletionError < StandardError; end
 
+  # The maximum number of tags a post can have.
+  MAX_TAG_COUNT = 1250
+
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
                       annotated partially_annotated check_annotation annotation_request]
@@ -34,6 +37,7 @@ class Post < ApplicationRecord
   before_validation :remove_parent_loops
   validate :uploader_is_not_limited, on: :create
   validate :post_is_not_its_own_parent
+  validate :validate_tag_count
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
   validates :rating, presence: { message: "not selected" }
   validates :rating, inclusion: { in: RATINGS.keys, message: "must be #{RATINGS.keys.map(&:upcase).to_sentence(last_word_connector: ", or ")}" }, if: -> { rating.present? }
@@ -1752,6 +1756,12 @@ class Post < ApplicationRecord
       if uploader.upload_limit.limited?
         errors.add(:uploader, "have reached your upload limit. Please wait for your pending uploads to be approved before uploading more")
         throw :abort # Don't bother returning other validation errors if we're upload-limited.
+      end
+    end
+
+    def validate_tag_count
+      if tag_array.size > MAX_TAG_COUNT
+        errors.add(:base, "Post cannot have more than #{MAX_TAG_COUNT} tags")
       end
     end
 
