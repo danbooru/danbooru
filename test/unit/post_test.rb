@@ -1110,6 +1110,13 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(false, @post.valid?)
             assert_equal(["is too long (maximum is 1200 characters)"], @post.errors[:source])
           end
+
+          should "validate the maximum number of tags" do
+            @post.update(tag_string: (1..Post::MAX_TAG_COUNT + 1).to_a.join(" "))
+
+            assert_equal(false, @post.valid?)
+            assert_equal(["Post cannot have more than #{Post::MAX_TAG_COUNT} tags"], @post.errors[:base])
+          end
         end
 
         context "of" do
