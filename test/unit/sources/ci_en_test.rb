@@ -12,6 +12,7 @@ module Sources
         "https://ci-en.net/creator/492/article/1004190",
         page_url: "https://ci-en.net/creator/492/article/1004190",
         media_files: [
+          { file_size: 76_796 },
           { file_size: 463_147 },
         ],
         profile_urls: [
@@ -37,6 +38,7 @@ module Sources
         "https://ci-en.dlsite.com/creator/12924/article/733140",
         page_url: "https://ci-en.net/creator/12924/article/733140",
         media_files: [
+          { file_size: 126_100 },
           { file_size: 85_171 },
           { file_size: 4_015_039 },
         ],

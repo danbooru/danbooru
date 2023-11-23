@@ -15,6 +15,7 @@ class Source::Extractor::CiEn < Source::Extractor
       [parsed_url.to_s]
     else
       [
+        page&.css("meta[property='og:image']")&.attr("content").to_s,
         *page&.css(".l-creatorPage-main article vue-l-image").to_a.pluck("data-raw"),
         *page&.css(".l-creatorPage-main article vue-file-player").to_a.map do |video|
           Addressable::URI.heuristic_parse(video["base-path"]).join("video-web.mp4").tap do |uri|
