@@ -76,19 +76,46 @@ module Sources
       )
     end
 
+    context "A self-introduction article" do
+      strategy_should_work(
+        "https://ci-en.dlsite.com/creator/15496",
+        page_url: "https://ci-en.net/creator/15496",
+        media_files: [
+          { file_size: 40_080 },
+          { file_size: 8_432_538 },
+          { file_size: 1_056_744 },
+          { file_size: 906_897 },
+          { file_size: 650_843 },
+        ],
+        profile_urls: [
+          "https://ci-en.net/creator/15496",
+        ],
+        artist_name: "るりり",
+        tag_name: "cien_15496",
+        tags: [],
+      )
+    end
+
     should "Parse Ci-En URLs correctly" do
       assert(Source::URL.image_url?("https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-800.jpg?px-time=1700517240&px-hash=eb626eafb7e5733c96fb0891188848dac10cb84c"))
       assert(Source::URL.image_url?("https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/upload/%E3%81%B0%E3%81%AB%E3%81%A3%E3%81%A1A.jpg?px-time=1700517240&px-hash=eb626eafb7e5733c96fb0891188848dac10cb84c"))
 
       assert(Source::URL.page_url?("https://ci-en.net/creator/11019/article/921762"))
       assert(Source::URL.page_url?("https://ci-en.dlsite.com/creator/5290/article/998146"))
+      assert_not(Source::URL.profile_url?("https://ci-en.net/creator/11019/article/921762"))
+      assert_not(Source::URL.profile_url?("https://ci-en.dlsite.com/creator/5290/article/998146"))
       assert_equal("https://ci-en.net/creator/5290/article/998146", Source::URL.page_url("https://ci-en.dlsite.com/creator/5290/article/998146"))
 
+      assert(Source::URL.page_url?("https://ci-en.net/creator/11019"))
+      assert(Source::URL.page_url?("https://ci-en.dlsite.com/creator/5290"))
       assert(Source::URL.profile_url?("https://ci-en.net/creator/11019"))
       assert(Source::URL.profile_url?("https://ci-en.dlsite.com/creator/5290"))
+      assert_equal("https://ci-en.net/creator/5290", Source::URL.page_url("https://ci-en.dlsite.com/creator/5290"))
       assert_equal("https://ci-en.net/creator/5290", Source::URL.profile_url("https://ci-en.dlsite.com/creator/5290"))
 
-      assert_not(Source::URL.page_url?("https://ci-en.net/creator/11019/article/"))
+      assert(Source::URL.page_url?("https://ci-en.net/creator/11019/article/"))
+      assert(Source::URL.profile_url?("https://ci-en.net/creator/11019/article/"))
+      
       assert_not(Source::URL.profile_url?("https://ci-en.net/creator"))
 
       assert_equal("11019", Source::URL.parse("https://ci-en.net/creator/11019/article/921762").creator_id)

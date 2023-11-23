@@ -8,17 +8,17 @@ class Source::URL::CiEn < Source::URL
   end
 
   def parse
-    case [subdomain, domain, *path_segments]
+    case [host, *path_segments]
 
     # https://ci-en.net/creator/11019/article/921762
     # https://ci-en.dlsite.com/creator/5290/article/998146
-    in _, _, "creator", creator_id, "article", article_id, *rest
+    in ("ci-en.net" | "ci-en.dlsite.com"), "creator", creator_id, "article", article_id, *rest
       @creator_id = creator_id
       @article_id = article_id
 
     # https://ci-en.net/creator/11019
     # https://ci-en.dlsite.com/creator/5290
-    in _, _, "creator", creator_id, *rest
+    in ("ci-en.net" | "ci-en.dlsite.com"), "creator", creator_id, *rest
       @creator_id = creator_id
 
     else
@@ -34,16 +34,23 @@ class Source::URL::CiEn < Source::URL
     host == "media.ci-en.jp"
   end
 
-  # All-ages and R18 pages urls are interchangeable and will redirect to the correct site
   def page_url
-    if creator_id.present? && article_id.present?
-      "https://ci-en.net/creator/#{creator_id}/article/#{article_id}"
+    if article_id.present?
+      "#{profile_url}/article/#{article_id}"
+    else
+      profile_url
     end
   end
 
+  # All-ages and R18 pages urls are interchangeable and will redirect to the correct site
   def profile_url
     if creator_id.present?
       "https://ci-en.net/creator/#{creator_id}"
     end
+  end
+
+  # Public profiles require a self-introduction article, so every profile url is also a page url
+  def profile_url?
+    profile_url.present? && page_url == profile_url && !image_url?
   end
 end

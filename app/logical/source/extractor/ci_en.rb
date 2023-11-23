@@ -39,7 +39,7 @@ class Source::Extractor::CiEn < Source::Extractor
   end
 
   def artist_name
-    page&.css(".l-creatorPage-main .e-userName")&.text
+    page&.css(".c-accountInfo .e-userName")&.text&.strip
   end
 
   def profile_url
@@ -76,6 +76,9 @@ class Source::Extractor::CiEn < Source::Extractor
 
   def http
     # Same cookie works for both all-ages and R18 sites
-    super.cookies(ci_en_session: Danbooru.config.ci_en_session_cookie)
+    super.cookies(
+      ci_en_session: Danbooru.config.ci_en_session_cookie,
+      accepted_rating: "r18g",
+    )
   end
 end
