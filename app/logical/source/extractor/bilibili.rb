@@ -128,9 +128,12 @@ module Source
       end
 
       def http
+        browser_ver = 109 + (Date.today - Date.new(2023, 1, 18)).days.in_weeks.to_i / 4
+        browser_ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:#{browser_ver}.0) Gecko/20100101 Firefox/#{browser_ver}.0"
+
         super.headers(
-          Referer: parsed_url.page_url || parsed_referer&.page_url,
-          "User-Agent": "",
+          Referer: parsed_url.page_url || parsed_referer&.page_url || "https://www.bilibili.com",
+          "User-Agent": browser_ua,
         )
       end
 
