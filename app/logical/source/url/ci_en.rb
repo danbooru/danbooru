@@ -4,22 +4,29 @@ class Source::URL::CiEn < Source::URL
   attr_reader :creator_id, :article_id
 
   def self.match?(url)
-    url.host.in?(%w[ci-en.net ci-en.dlsite.com media.ci-en.jp])
+    url.host.in?(%w[ci-en.jp ci-en.net ci-en.dlsite.com media.ci-en.jp])
   end
 
   def parse
-    case [host, *path_segments]
+    case host
 
-    # https://ci-en.net/creator/11019/article/921762
-    # https://ci-en.dlsite.com/creator/5290/article/998146
-    in ("ci-en.net" | "ci-en.dlsite.com"), "creator", creator_id, "article", article_id, *rest
-      @creator_id = creator_id
-      @article_id = article_id
+    in ("ci-en.jp" | "ci-en.net" | "ci-en.dlsite.com")
+      case [*path_segments]
 
-    # https://ci-en.net/creator/11019
-    # https://ci-en.dlsite.com/creator/5290
-    in ("ci-en.net" | "ci-en.dlsite.com"), "creator", creator_id, *rest
-      @creator_id = creator_id
+      # https://ci-en.net/creator/11019/article/921762
+      # https://ci-en.dlsite.com/creator/5290/article/998146
+      in "creator", creator_id, "article", article_id, *rest
+        @creator_id = creator_id
+        @article_id = article_id
+
+      # https://ci-en.net/creator/11019
+      # https://ci-en.dlsite.com/creator/5290
+      in "creator", creator_id, *rest
+        @creator_id = creator_id
+
+      else
+        nil
+      end
 
     else
       nil
