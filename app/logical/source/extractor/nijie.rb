@@ -16,19 +16,14 @@ module Source
         if parsed_url.image_url?
           [parsed_url.full_image_url]
         else
-          image_urls_from_page
+          image_urls_from_popup
         end
       end
 
-      def image_urls_from_page
-        if doujin?
-          images = page&.search("#dojin_left .left img").to_a.pluck("src")
-          images += page&.search("#dojin_diff img.mozamoza").to_a.pluck("data-original")
-        else
-          images = page&.search("div#gallery a > .mozamoza").to_a.pluck("src")
+      def image_urls_from_popup
+        popup&.search("#img_window .box-shadow999").to_a.pluck("src").map do |img|
+          Source::URL.parse("https:#{img}").full_image_url
         end
-
-        images.map { |img| Source::URL.parse("https:#{img}").full_image_url }
       end
 
       def page_url
@@ -41,12 +36,21 @@ module Source
         "https://nijie.info/members.php?id=#{artist_id}"
       end
 
-      def artist_name
+      def popup_url
+        return nil if illust_id.blank?
+        "https://nijie.info/view_popup.php?id=#{illust_id}"
+      end
+
+      def artist_anchor
         if doujin?
-          page&.at("#dojin_left .right a[href*='members.php?id=']")&.text
+          page&.at("#dojin_left .right a[href*='members.php?id=']")
         else
-          page&.at("a.name")&.text
+          page&.at("a.name")
         end
+      end
+
+      def artist_name
+        artist_anchor&.text
       end
 
       def artist_commentary_title
@@ -106,7 +110,7 @@ module Source
       end
 
       def artist_id_from_page
-        page&.search("a.name")&.first&.attr("href")&.match(/members\.php\?id=(\d+)/) { $1.to_i }
+        artist_anchor&.attr("href")&.match(/members\.php\?id=(\d+)/) { $1.to_i }
       end
 
       def artist_id
@@ -117,18 +121,25 @@ module Source
         page&.at("#dojin_left").present?
       end
 
-      def page
-        return nil if page_url.blank? || client.blank?
+      memoize def page
+        request page_url
+      end
 
-        response = client.cache(1.minute).get(page_url)
+      memoize def popup
+        request popup_url
+      end
 
-        if response.status != 200 || response.parse.search("#login_illust").present?
+      def request(url)
+        return nil if url.blank? || client.blank?
+
+        response = client.cache(1.minute).get(url)
+
+        if response.status != 200 || response.parse.search("#login_illust").present? || response.uri.path == "/login.php"
           clear_cached_session_cookie!
         else
           response.parse
         end
       end
-      memoize :page
 
       def client
         return nil if cached_session_cookie.nil?
