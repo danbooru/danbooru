@@ -147,7 +147,7 @@ module Sources
         desc = <<-EOS.strip_heredoc.chomp
           foo [b]bold[/b] [i]italics[/i] [s]strike[/s] red
 
-          "http://nijie.info/view.php?id=218944":[https://nijie.info/view.php?id=218944]
+          <http://nijie.info/view.php?id=218944>
         EOS
 
         assert_equal(desc, @site.dtext_artist_commentary_desc)
@@ -281,6 +281,7 @@ module Sources
         assert_equal("<p>ある日目がさめると女の子になっていたいつき<br>\nそこへ幼馴染の小梅が現れて…<br>\n2010年コミックマーケット78で販売したコピー本のDL版で<br>\n本編18Pの短編マンガです <br>\n</p>", site.artist_commentary_desc)
         assert_equal(tags, site.tags)
         assert_equal("リック・ロガニー", site.artist_name)
+        assert_equal("https://nijie.info/members.php?id=334", site.profile_url)
       end
     end
 
