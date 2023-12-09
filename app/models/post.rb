@@ -462,6 +462,12 @@ class Post < ApplicationRecord
       tags -= ["sound"] unless is_flash?
       tags << "sound" if media_asset.has_sound?
 
+      min_score = 40
+      AITag.where(media_asset_id: media_asset_id)
+        .where("score > ?", min_score)
+        .map(&:name)
+        .each { |tag_name| tags << tag_name }
+
       tags
     end
 
