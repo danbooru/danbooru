@@ -463,7 +463,7 @@ class Post < ApplicationRecord
       tags << "sound" if media_asset.has_sound?
 
       min_score = 40
-      ai_post_tags = AITag.joins(:media_asset).where_numeric_matches(:score, min_score).where("media_assets.md5 = posts.md5") 
+      ai_post_tags = AITag.joins(:media_asset).where(media_asset: media_asset).where_numeric_matches(:score, min_score)
       
       ai_post_tags.each do |ai_tag|
         tags << ai_tag.tag.name
