@@ -467,6 +467,7 @@ class Post < ApplicationRecord
 
       ai_post_tags.each do |ai_tag|
         tags << ai_tag.tag.name
+      end
 
       tags
     end
