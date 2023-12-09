@@ -465,10 +465,8 @@ class Post < ApplicationRecord
       min_score = 40
       ai_post_tags = AITag.joins(:media_asset).where_numeric_matches(:score, min_score).where("media_assets.md5 = posts.md5") 
       
-      if ai_post_tags.exists?
-        ai_post_tags.each do |ai_tag|
-          tags << ai_tag.tag.name
-        end
+      ai_post_tags.each do |ai_tag|
+        tags << ai_tag.tag.name
       end
 
       tags
