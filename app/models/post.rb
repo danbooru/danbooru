@@ -463,10 +463,10 @@ class Post < ApplicationRecord
       tags << "sound" if media_asset.has_sound?
 
       min_score = 40
-      AITag.where(media_asset_id: media_asset_id)
-        .where("score > ?", min_score)
-        .map(&:name)
-        .each { |tag_name| tags << tag_name }
+      ai_post_tags =  AITag.joins(:media_asset).where_numeric_matches(:score, confidence)
+
+      ai_post_tags.each do |ai_tag|
+        tags << ai_tag.tag.name
 
       tags
     end
