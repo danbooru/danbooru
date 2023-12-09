@@ -462,8 +462,8 @@ class Post < ApplicationRecord
       tags -= ["sound"] unless is_flash?
       tags << "sound" if media_asset.has_sound?
 
-      confidence = 40
-      ai_post_tags = media_asset.ai_tags.where_numeric_matches(:score, confidence)
+      confidence = 40..
+      ai_post_tags = media_asset.ai_tags.where(score: confidence)
       
       ai_post_tags.each do |ai_tag|
         next if ai_tag.tag.name.match?(/\Arating:.+/)
