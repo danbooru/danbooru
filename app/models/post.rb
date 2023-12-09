@@ -389,6 +389,14 @@ class Post < ApplicationRecord
     def add_automatic_tags(tags)
       tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation non-web_source wide_image tall_image]
 
+      confidence = (40..)
+      ai_post_tags = media_asset.ai_tags.where(score: confidence)
+      
+      ai_post_tags.each do |ai_tag|
+        next if ai_tag.tag.name.match?(/\Arating:.+/)
+        tags << ai_tag.tag.name
+      end
+      
       if tags.size >= 30
         tags -= ["tagme"]
       elsif tags.empty?
@@ -461,14 +469,6 @@ class Post < ApplicationRecord
       # Allow Flash files to be manually tagged as `sound`; other files are automatically tagged.
       tags -= ["sound"] unless is_flash?
       tags << "sound" if media_asset.has_sound?
-
-      confidence = (40..)
-      ai_post_tags = media_asset.ai_tags.where(score: confidence)
-      
-      ai_post_tags.each do |ai_tag|
-        next if ai_tag.tag.name.match?(/\Arating:.+/)
-        tags << ai_tag.tag.name
-      end
 
       tags
     end
