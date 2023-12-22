@@ -105,8 +105,15 @@ class RelatedTagQuery
     tags
   end
 
+  # The list of tags mentioned in the wiki page of the queried tag. General tags aren't included when looking up characters.
   memoize def wiki_page_tags
-    wiki_page&.tags
+    tags = wiki_page&.tags
+
+    if tag&.category == TagCategory::CHARACTER
+      tags.reject { |t| t.category == TagCategory::GENERAL }
+    else
+      tags
+    end
   end
 
   def serializable_hash(options = {})
