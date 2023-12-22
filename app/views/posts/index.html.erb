@@ -22,7 +22,7 @@
 
     <section id="tag-box">
       <h2>Tags</h2>
-      <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?, search_params: { show_votes: params[:show_votes], size: params[:size] }) %>
+      <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], search_params: { show_votes: params[:show_votes], size: params[:size] }) %>
     </section>
 
     <section id="options-box">

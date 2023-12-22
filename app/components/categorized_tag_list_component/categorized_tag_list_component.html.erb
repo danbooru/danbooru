@@ -15,11 +15,6 @@
             <%= link_to "?", wiki_page_path(t.name, z: 1), class: "wiki-link" %>
           <% end %>
 
-          <% if show_extra_links && current_query.present? %>
-            <%= link_to "+", posts_path(tags: "#{current_query} #{t.name}", z: 3), class: "search-inc-tag" %>
-            <%= link_to "-", posts_path(tags: "#{current_query} -#{t.name}", z: 3), class: "search-exl-tag" %>
-          <% end %>
-
           <%= link_to t.pretty_name, posts_path(tags: t.name, z: 1), class: "search-tag" %>
 
           <%= tag.span humanized_number(t.post_count), class: ["post-count", ("low-post-count" if is_underused_tag?(t))], title: t.post_count %>

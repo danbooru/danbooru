@@ -13,7 +13,7 @@
   <%= render "posts/partials/index/blacklist" %>
 
   <section id="tag-list">
-    <%= render_categorized_tag_list(@post, current_query: params[:q], show_extra_links: policy(@post).show_extra_links?) %>
+    <%= render_categorized_tag_list(@post, current_query: params[:q]) %>
   </section>
 
   <section id="post-information">
