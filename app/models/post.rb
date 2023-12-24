@@ -10,6 +10,9 @@ class Post < ApplicationRecord
   # The maximum number of new tags that can be created in a single tag edit.
   MAX_NEW_TAGS = 10
 
+  # The maximum number of tags that can be added or removed by a single tag edit. The uploader isn't subject to this restriction.
+  MAX_CHANGED_TAGS = 100
+
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
                       annotated partially_annotated check_annotation annotation_request]
@@ -41,6 +44,7 @@ class Post < ApplicationRecord
   before_validation :remove_parent_loops
   validate :uploader_is_not_limited, on: :create
   validate :post_is_not_its_own_parent
+  validate :validate_changed_tags
   validate :validate_tag_count
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
   validates :rating, presence: { message: "not selected" }
@@ -341,6 +345,10 @@ class Post < ApplicationRecord
 
     def added_tags
       tags - tags_was
+    end
+
+    def removed_tags
+      tags_was - tags
     end
 
     def update_tag_post_counts
@@ -1770,6 +1778,17 @@ class Post < ApplicationRecord
       if uploader.upload_limit.limited?
         errors.add(:uploader, "have reached your upload limit. Please wait for your pending uploads to be approved before uploading more")
         throw :abort # Don't bother returning other validation errors if we're upload-limited.
+      end
+    end
+
+    def validate_changed_tags
+      return if uploader == CurrentUser.user
+
+      changed_tags = added_tags + removed_tags
+
+      if changed_tags.size > MAX_CHANGED_TAGS
+        errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS} tags at once")
+        throw :abort
       end
     end
 
