@@ -11,8 +11,10 @@ class Post < ApplicationRecord
   MAX_NEW_TAGS = 20
   MAX_NEW_TAGS_INTERVAL = 1.minute
 
-  # The maximum number of tags that can be added or removed by a single tag edit. The uploader isn't subject to this restriction.
+  # The maximum number of tags that can be added or removed by a user per minute. Default is 100 tags per minute.
+  # Builders and the uploader aren't subject to this restriction.
   MAX_CHANGED_TAGS = 100
+  MAX_CHANGED_TAGS_INTERVAL = 1.minute
 
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
@@ -1887,12 +1889,12 @@ class Post < ApplicationRecord
     end
 
     def validate_changed_tags
-      return if uploader == CurrentUser.user
+      return if uploader == CurrentUser.user || CurrentUser.user.is_builder?
 
       changed_tags = added_tags + removed_tags
 
-      if changed_tags.size > MAX_CHANGED_TAGS
-        errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS} tags at once")
+      if RateLimiter.limited?(action: "post:validate_changed_tags", user: CurrentUser.user, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f/MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
+        errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS.to_i} tags per #{MAX_CHANGED_TAGS_INTERVAL.inspect}. Wait a while and try again")
         throw :abort
       end
     end
