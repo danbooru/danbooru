@@ -7,6 +7,9 @@ class Post < ApplicationRecord
   # The maximum number of tags a post can have.
   MAX_TAG_COUNT = 1250
 
+  # The maximum number of new tags that can be created in a single tag edit.
+  MAX_NEW_TAGS = 10
+
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
                       annotated partially_annotated check_annotation annotation_request]
@@ -33,6 +36,7 @@ class Post < ApplicationRecord
   normalize :source, :normalize_source
   before_validation :merge_old_changes
   before_validation :apply_pre_metatags
+  before_validation :validate_new_tags
   before_validation :normalize_tags
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
@@ -411,6 +415,16 @@ class Post < ApplicationRecord
       end
 
       @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
+    end
+
+    # XXX should be a `validate` hook instead of `before_validation` hook
+    def validate_new_tags
+      new_tags = post_edit.effective_added_tag_names.select { |name| !Tag.exists?(name: name) }
+
+      if new_tags.size > MAX_NEW_TAGS
+        errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags at once")
+        throw :abort
+      end
     end
 
     def normalize_tags
