@@ -7,8 +7,9 @@ class Post < ApplicationRecord
   # The maximum number of tags a post can have.
   MAX_TAG_COUNT = 1250
 
-  # The maximum number of new tags that can be created in a single tag edit.
-  MAX_NEW_TAGS = 10
+  # The maximum number of new tags that can be created by a single user. Default is 20 tags per minute.
+  MAX_NEW_TAGS = 20
+  MAX_NEW_TAGS_INTERVAL = 1.minute
 
   # The maximum number of tags that can be added or removed by a single tag edit. The uploader isn't subject to this restriction.
   MAX_CHANGED_TAGS = 100
@@ -427,11 +428,13 @@ class Post < ApplicationRecord
 
     # XXX should be a `validate` hook instead of `before_validation` hook
     def validate_new_tags
+      return if CurrentUser.user.is_builder?
+
       new_tags = post_edit.effective_added_tag_names.select { |name| !Tag.exists?(name: name) }
 
-      if new_tags.size > MAX_NEW_TAGS
-        errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags at once")
-        throw :abort
+      if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f/MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
+        errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
+        throw :abort # XXX This causes a transaction rollback which means the rate limit doesn't get properly updated.
       end
     end
 
