@@ -32,7 +32,7 @@ class RateLimit < ApplicationRecord
     key_params = keys.map.with_index { |key, i| [:"key#{i}", key] }.to_h
 
     # (created_at, updated_at, action, keyN, points)
-    values = keys.map.with_index { |_key, i| "(:now, :now, :action, :key#{i}, :points)" }
+    values = keys.map.with_index { |_key, i| "(:now, :now, :action, :key#{i}, :limited, :points)" }
 
     # Do an upsert, creating a new rate limit object for each key that doesn't
     # already exist, and updating the limit for each limit that already exists.
@@ -45,11 +45,11 @@ class RateLimit < ApplicationRecord
     #
     # https://www.postgresql.org/docs/current/sql-insert.html#SQL-ON-CONFLICT
     sql = <<~SQL.squish
-      INSERT INTO rate_limits (created_at, updated_at, action, key, points)
+      INSERT INTO rate_limits (created_at, updated_at, action, key, limited, points)
       VALUES #{values.join(", ")}
       ON CONFLICT (action, key) DO UPDATE SET
         updated_at = :now,
-        limited = rate_limits.points + :rate * EXTRACT(epoch FROM (:now - rate_limits.updated_at)) < 0,
+        limited = LEAST(:burst, rate_limits.points + :rate * EXTRACT(epoch FROM (:now - rate_limits.updated_at))) - :cost < 0,
         points =
           CASE
           WHEN rate_limits.points + :rate * EXTRACT(epoch FROM (:now - rate_limits.updated_at)) < 0 THEN
@@ -60,14 +60,17 @@ class RateLimit < ApplicationRecord
       RETURNING *
     SQL
 
+    points = [burst - cost, minimum_points].max
+
     sql_params = {
       now: Time.zone.now,
       action: action,
       rate: rate,
       burst: burst,
       cost: cost,
-      points: burst - cost,
+      points: points,
       minimum_points: minimum_points,
+      limited: points < 0,
       **key_params,
     }
 
