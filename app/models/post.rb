@@ -47,7 +47,7 @@ class Post < ApplicationRecord
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
   validate :uploader_is_not_limited, on: :create
-  validate :post_is_not_its_own_parent
+  validate :validate_no_parent_cycles
   validate :validate_changed_tags
   validate :validate_tag_count
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
@@ -752,18 +752,18 @@ class Post < ApplicationRecord
   end
 
   concerning :ParentMethods do
-    # A parent has many children. A child belongs to a parent.
-    # A parent cannot have a parent.
-    #
-    # After expunging a child:
-    # - Move favorites to parent.
-    # - Does the parent have any children?
-    #   - Yes: Done.
-    #   - No: Update parent's has_children flag to false.
-    #
-    # After expunging a parent:
-    # - Move favorites to the first child.
-    # - Reparent all children to the first child.
+    # @return [Array<Post>] The list of this post's ancestors (its parent, grandparent, great-grandparent, etc).
+    def ancestors
+      ancestors = []
+      parent = self.parent
+
+      while parent.present? && !self.in?(ancestors)
+        ancestors << parent
+        parent = parent.parent
+      end
+
+      ancestors
+    end
 
     def update_has_children_flag
       update(has_children: children.exists?, has_active_children: children.undeleted.exists?)
@@ -1875,8 +1875,10 @@ class Post < ApplicationRecord
   end
 
   concerning :ValidationMethods do
-    def post_is_not_its_own_parent
-      if !new_record? && id == parent_id
+    def validate_no_parent_cycles
+      return unless parent_id_changed?
+
+      if self.in?(ancestors)
         errors.add(:base, "Post cannot have itself as a parent")
       end
     end

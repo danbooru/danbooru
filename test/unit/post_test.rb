@@ -197,6 +197,25 @@ class PostTest < ActiveSupport::TestCase
 
   context "Parenting:" do
     context "Assigning a parent to a post" do
+      should "not allow a post to be its own parent" do
+        post = create(:post)
+        post.update(parent_id: post.id)
+
+        assert_equal(["Post cannot have itself as a parent"], post.errors[:base])
+      end
+
+      should "not allow a post to be its own great-grandparent" do
+        p1 = create(:post)
+        p2 = create(:post)
+        p3 = create(:post)
+
+        p1.update(parent: p2)
+        p2.update(parent: p3)
+        p3.update(parent: p1)
+
+        assert_equal(["Post cannot have itself as a parent"], p3.errors[:base])
+      end
+
       should "update the has_children flag on the parent" do
         p1 = FactoryBot.create(:post)
         assert(!p1.has_children?, "Parent should not have any children")
