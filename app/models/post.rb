@@ -20,6 +20,9 @@ class Post < ApplicationRecord
   # levels deep. That is, a post can have children, grandchildren, and great-grandchildren, but no great-great-grandchildren.
   MAX_PARENT_DEPTH = 4
 
+  # The maximum number of child posts that a parent post may have.
+  MAX_CHILD_POSTS = 30
+
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
                       annotated partially_annotated check_annotation annotation_request]
@@ -52,6 +55,7 @@ class Post < ApplicationRecord
   validate :uploader_is_not_limited, on: :create
   validate :validate_no_parent_cycles
   validate :validate_parent_depth
+  validate :validate_child_count
   validate :validate_changed_tags
   validate :validate_tag_count
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
@@ -1809,6 +1813,14 @@ class Post < ApplicationRecord
 
       if parent_hierarchy_depth > MAX_PARENT_DEPTH
         errors.add(:base, "Post cannot have a parent-child chain more than #{MAX_PARENT_DEPTH} levels deep")
+      end
+    end
+
+    def validate_child_count
+      return unless parent_id_changed? && parent.present?
+
+      if parent.children.count >= MAX_CHILD_POSTS
+        errors.add(:base, "post ##{parent_id} cannot have more than #{MAX_CHILD_POSTS} child posts")
       end
     end
 
