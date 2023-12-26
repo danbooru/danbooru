@@ -228,6 +228,16 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(["Post cannot have a parent-child chain more than 4 levels deep"], p3.errors[:base])
       end
 
+      should "not allow a post to have too many children" do
+        p1 = create(:post)
+        p2 = create(:post)
+        create_list(:post, Post::MAX_CHILD_POSTS, parent: p1)
+
+        p2.update(parent: p1)
+
+        assert_equal(["post ##{p1.id} cannot have more than 30 child posts"], p2.errors[:base])
+      end
+
       should "update the has_children flag on the parent" do
         p1 = FactoryBot.create(:post)
         assert(!p1.has_children?, "Parent should not have any children")
