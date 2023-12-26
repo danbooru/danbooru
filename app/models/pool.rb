@@ -10,6 +10,7 @@ class Pool < ApplicationRecord
 
   validates :name, visible_string: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 170 }, if: :name_changed?
   validate :validate_name, if: :name_changed?
+  validates :description, length: { maximum: 20_000 }, if: :description_changed?
   validates :category, inclusion: { in: %w[series collection] }
   validate :updater_can_edit_deleted
   before_validation :normalize_post_ids
