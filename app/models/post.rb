@@ -16,6 +16,10 @@ class Post < ApplicationRecord
   MAX_CHANGED_TAGS = 100
   MAX_CHANGED_TAGS_INTERVAL = 1.minute
 
+  # The maximum number of levels in a parent-child hierarchy. By default, a parent-child hierarchy can be no more than 4
+  # levels deep. That is, a post can have children, grandchildren, and great-grandchildren, but no great-great-grandchildren.
+  MAX_PARENT_DEPTH = 4
+
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
                       annotated partially_annotated check_annotation annotation_request]
@@ -47,6 +51,7 @@ class Post < ApplicationRecord
   before_validation :remove_parent_loops
   validate :uploader_is_not_limited, on: :create
   validate :validate_no_parent_cycles
+  validate :validate_parent_depth
   validate :validate_changed_tags
   validate :validate_tag_count
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
@@ -726,6 +731,23 @@ class Post < ApplicationRecord
       end
 
       ancestors
+    end
+
+    # @return [Integer] The total number of levels in the entire parent-child tree. A post with no parent or
+    # children has depth 1; a post with a parent but no children has depth 2; a post with a parent and one level of
+    # children has depth 3; etc.
+    def parent_hierarchy_depth
+      ancestors.size + child_height + 1
+    end
+
+    # @return [Integer] The number of levels of child posts this post has. A post with no children has height 0; a post
+    # with children but no grandchildren has height 1; a post with grandchildren but no great-grandchildren has height 2; etc.
+    def child_height
+      if children.present?
+        children.map(&:child_height).max + 1
+      else
+        0
+      end
     end
 
     def update_has_children_flag
@@ -1778,6 +1800,15 @@ class Post < ApplicationRecord
 
       if self.in?(ancestors)
         errors.add(:base, "Post cannot have itself as a parent")
+        throw :abort # Abort to avoid additional error about parent-child chain being more than 4 levels deep
+      end
+    end
+
+    def validate_parent_depth
+      return unless parent_id_changed?
+
+      if parent_hierarchy_depth > MAX_PARENT_DEPTH
+        errors.add(:base, "Post cannot have a parent-child chain more than #{MAX_PARENT_DEPTH} levels deep")
       end
     end
 
