@@ -11,7 +11,13 @@
 
     <%= render(PostGalleryComponent.new) do |gallery| %>
       <% @pools.each do |pool| %>
-        <% gallery.with_post(post: pool.cover_post, link_target: pool, pool: pool, show_deleted: true) %>
+        <% gallery.with_post(post: pool.cover_post, link_target: pool, show_deleted: true) do |preview| %>
+          <% preview.with_footer do %>
+            <div class="text-center">
+              <%= link_to pool.pretty_name, pool, class: "text-sm pool-category-#{pool.category}" %>
+            </div>
+          <% end %>
+        <% end %>
       <% end %>
     <% end %>
 
