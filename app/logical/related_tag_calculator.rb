@@ -109,35 +109,38 @@ class RelatedTagCalculator
   # Return the set of tags most frequently appearing in the given array of posts.
   #
   # @param posts [Array<Post>] the array of posts
+  # @param categories [Array<Integer>] the list of tag categories to include
+  # @param max_tags [Integer} the maxmimum number of tags to return
   # @return [Array<Tag>] the set of frequent tags, ordered by most frequent
-  def self.frequent_tags_for_post_array(posts)
+  def self.frequent_tags_for_post_array(posts, categories: TagCategory.category_ids, max_tags: 10)
     tags_with_counts = posts.flat_map(&:tag_array).group_by(&:itself).transform_values(&:size)
-    tags_with_counts.sort_by { |tag_name, count| [-count, tag_name] }.map(&:first)
+    tag_names = tags_with_counts.sort_by { |tag_name, count| [-count, tag_name] }.map(&:first).take(max_tags * 2)
+    Tag.where(name: tag_names, category: categories).to_a.in_order_of(:name, tag_names).take(max_tags)
   end
 
   # Return a cached set of tags similar to the given search.
   #
   # @param max_tags [Integer] the maximum number of tags to return
+  # @param categories [Array<Integer>] the list of tag categories to include
   # @param search_timeout [Integer] the database timeout for the search
   # @param cache_timeout [Integer] the length of time to cache the results
-  # @return [Array<String>] the set of similar tag names, ordered by most similar
-  def cached_similar_tags_for_search(max_tags, search_timeout: 2000, cache_timeout: 8.hours)
-    Cache.get(cache_key, cache_timeout, race_condition_ttl: 60.seconds) do
+  # @return [Array<Tag>] the set of similar tags, ordered by most similar
+  def cached_similar_tags_for_search(max_tags, categories: TagCategory.category_ids, search_timeout: 2000, cache_timeout: 8.hours)
+    # Some searches are cached on a per-user basis because they depend on the current user (for example, searches for
+    # private favorites, favgroups, or saved searches).
+    if post_query.is_user_dependent_search?
+      cache_key = "similar-tags-for-user:#{post_query.current_user.id}:#{max_tags}:#{categories}:#{post_query.to_s}"
+    else
+      cache_key = "similar-tags:#{max_tags}:#{categories}:#{post_query.to_s}"
+    end
+
+    tag_names = Cache.get(cache_key, cache_timeout, race_condition_ttl: 60.seconds) do
       ApplicationRecord.with_timeout(search_timeout, []) do
-        similar_tags_for_search.take(max_tags).map(&:name)
+        tags = similar_tags_for_search.select { |related_tag| related_tag.tag.category.in?(categories) }
+        tags.map(&:name).take(max_tags)
       end
     end
-  end
 
-  # Return a cache key for the given search. Some searches are cached on a per-user basis because they depend on the
-  # current user (for example, searches for private favorites, favgroups, or saved searches).
-  #
-  # @return [String] the cache key
-  def cache_key
-    if post_query.is_user_dependent_search?
-      "similar-tags-for-user:#{post_query.current_user.id}:#{post_query.to_s}"
-    else
-      "similar-tags:#{post_query.to_s}"
-    end
+    Tag.where(name: tag_names).to_a.in_order_of(:name, tag_names)
   end
 end
