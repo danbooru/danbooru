@@ -39,10 +39,12 @@ module Sources
         "https://ci-en.dlsite.com/creator/12924/article/733140",
         page_url: "https://ci-en.net/creator/12924/article/733140",
         image_urls: [
+          %r!https://media\.ci-en\.jp/public/article_cover/creator/00012924/e3325a27a31c22516c8b717e729fcc09a89c3d8485af6f1af3013917d3181290/image-1280-c\.jpg!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/89d0417b09c3aafda23e7a02931d60fb179ee0f1a0f77d245797accd2979371d/upload/main_378b7bcd-3a89-4f98-b51e-4188ad802509\.jpg!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/b06a35213c77ef64d72a19fbf0981097d1151393e855bd271688ffe1af1df2ed/video-web\.mp4!,
         ],
         media_files: [
+          { file_size: 126_100 },
           { file_size: 85_171 },
           { file_size: 4_015_039 },
         ],
@@ -85,6 +87,7 @@ module Sources
         "https://ci-en.dlsite.com/creator/12924/article/1031385",
         page_url: "https://ci-en.net/creator/12924/article/1031385",
         image_urls: [
+          %r!https://media\.ci-en\.jp/public/article_cover/creator/00012924/3ed655ddd544fd230e1c0444078f7a5c5953ef45a68db108295b607f9f4e4196/image-1280-c\.jpg!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/6e26c981273ebe6c7c7cb4ee00f4fd9b795d044876839f26a9892db3970a617a/upload/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202023-11-11%20144943\.png!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/0ce345937988e41e0027c6376db82584d48fd8050c3262e125505e665399ecef/upload/%E3%82%AD%E3%83%A3%E3%83%A9%E7%B4%B9%E4%BB%8B%E7%94%A8%E3%82%B7%E3%82%A8%E3%83%B3\.png!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/46dfe232c372cdf3665726657a7842011960156b2654d521d13d05a43a2ddd07/upload/%E6%AD%A9%E3%81%8D%E3%83%89%E3%83%83%E3%83%882\.png!,
@@ -120,12 +123,14 @@ module Sources
         "https://ci-en.dlsite.com/creator/15496",
         page_url: "https://ci-en.net/creator/15496",
         image_urls: [
+          %r!https://media\.ci-en\.jp/public/cover/creator/00015496/d9abf3b919895d05a86253172e675dd5307ae7c6667313c20ddc39ab79bdd09f/image-990-c\.jpg!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/763e7e9d7b6180b3b5a96cec735ecfabe993b7b4b4202bd411a471d3b7452a56/upload/1\.png!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/101ddf6e8874c70b7075b2449cdc106fe66a9a797890f32350bd75d4a6954e5e/upload/05\.jpg!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/181d03ba9346bedde4e541204fd628464931837f47dbea269ba3fed02e3fc21b/upload/%EF%BC%90%EF%BC%91\.jpg!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/775b1249e43702ef746bba5bd2404352844e16d3a45b2de96fb86e8931d1f493/upload/%EF%BC%90%EF%BC%92\.jpg!,
         ],
         media_files: [
+          { file_size: 40_080 },
           { file_size: 8_432_538 },
           { file_size: 1_056_744 },
           { file_size: 906_897 },
