@@ -3,7 +3,6 @@ require 'test_helper'
 module Sources
   class CiEnTest < ActiveSupport::TestCase
     def setup
-      super
       skip "ci_en_session cookie not set" unless Danbooru.config.ci_en_session_cookie.present?
     end
 
@@ -11,8 +10,10 @@ module Sources
       strategy_should_work(
         "https://ci-en.net/creator/492/article/1004190",
         page_url: "https://ci-en.net/creator/492/article/1004190",
+        image_urls: [
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00000492/fb4e76d52cebb915acf048ad2eb1a0a58cea4269a4e79194fde6624726e1f771/upload/83_pixiv_s\.jpg!,
+        ],
         media_files: [
-          { file_size: 76_796 },
           { file_size: 463_147 },
         ],
         profile_urls: [
@@ -37,8 +38,11 @@ module Sources
       strategy_should_work(
         "https://ci-en.dlsite.com/creator/12924/article/733140",
         page_url: "https://ci-en.net/creator/12924/article/733140",
+        image_urls: [
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/89d0417b09c3aafda23e7a02931d60fb179ee0f1a0f77d245797accd2979371d/upload/main_378b7bcd-3a89-4f98-b51e-4188ad802509\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/b06a35213c77ef64d72a19fbf0981097d1151393e855bd271688ffe1af1df2ed/video-web\.mp4!,
+        ],
         media_files: [
-          { file_size: 126_100 },
           { file_size: 85_171 },
           { file_size: 4_015_039 },
         ],
@@ -80,8 +84,13 @@ module Sources
       strategy_should_work(
         "https://ci-en.dlsite.com/creator/15496",
         page_url: "https://ci-en.net/creator/15496",
+        image_urls: [
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/763e7e9d7b6180b3b5a96cec735ecfabe993b7b4b4202bd411a471d3b7452a56/upload/1\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/101ddf6e8874c70b7075b2449cdc106fe66a9a797890f32350bd75d4a6954e5e/upload/05\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/181d03ba9346bedde4e541204fd628464931837f47dbea269ba3fed02e3fc21b/upload/%EF%BC%90%EF%BC%91\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/775b1249e43702ef746bba5bd2404352844e16d3a45b2de96fb86e8931d1f493/upload/%EF%BC%90%EF%BC%92\.jpg!,
+        ],
         media_files: [
-          { file_size: 40_080 },
           { file_size: 8_432_538 },
           { file_size: 1_056_744 },
           { file_size: 906_897 },
@@ -122,7 +131,7 @@ module Sources
 
       assert(Source::URL.page_url?("https://ci-en.net/creator/11019/article/"))
       assert(Source::URL.profile_url?("https://ci-en.net/creator/11019/article/"))
-      
+
       assert_not(Source::URL.profile_url?("https://ci-en.net/creator"))
 
       assert_equal("11019", Source::URL.parse("https://ci-en.net/creator/11019/article/921762").creator_id)
