@@ -80,6 +80,41 @@ module Sources
       )
     end
 
+    context "An article with images and videos" do
+      strategy_should_work(
+        "https://ci-en.dlsite.com/creator/12924/article/1031385",
+        page_url: "https://ci-en.net/creator/12924/article/1031385",
+        image_urls: [
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/6e26c981273ebe6c7c7cb4ee00f4fd9b795d044876839f26a9892db3970a617a/upload/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202023-11-11%20144943\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/0ce345937988e41e0027c6376db82584d48fd8050c3262e125505e665399ecef/upload/%E3%82%AD%E3%83%A3%E3%83%A9%E7%B4%B9%E4%BB%8B%E7%94%A8%E3%82%B7%E3%82%A8%E3%83%B3\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/46dfe232c372cdf3665726657a7842011960156b2654d521d13d05a43a2ddd07/upload/%E6%AD%A9%E3%81%8D%E3%83%89%E3%83%83%E3%83%882\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/c0e7cee13990f34c993ac81a0d404e18ae3f956223e23ff8464e946b090deac2/upload/%E7%9D%80%E6%9B%BF%E3%81%881\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/84ed22e5b9fdcebcdd4277e38eb3e1846c386009e137f8940dafb589fe2178b4/upload/%E3%82%AD%E3%83%A3%E3%83%A9%E7%B4%B9%E4%BB%8B%E7%94%A8%E3%82%A2%E3%83%AA%E3%82%B9%E7%84%A1%E4%BF%AE%E6%AD%A3\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/d4b6c0fce1c229d9d2d236577817273595d8214d5dea99fba1319e02d971e067/upload/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202023-12-17%20170228\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/e0b3f618e3302434cd873140ed6afdcfa72f22907da994938d91cdbe2d7bba72/upload/%E3%82%A8%E3%83%AD%E3%83%89%E3%83%83%E3%83%88\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/19f0db879cebbd78ddd8a4292088d0b0bd6bfe1af900081e89ae29c144f9e8a5/video-web\.mp4!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/b19e10a566e91bcf1e57ffbc02146e532f18fb1e76f6db0f34635513ce4260c0/upload/%E3%82%AD%E3%83%A3%E3%83%A9%E7%B4%B9%E4%BB%8B%E7%94%A8%E3%82%B7%E3%83%A3%E3%83%AB%E3%83%AD%E3%83%83%E3%83%88_%E7%84%A1%E4%BF%AE%E6%AD%A3\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/a0cf83f3ccab6b340be9b4b3b0f951a1c0aa29f924e4159a2c88fe9d9d9ed3b2/upload/bandicam%202023-12-24%2021-31-01-029\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/caaace96f152728a39341e4edf6af299ce2582bdd8eac280f0994095d86b0507/upload/bandicam%202023-12-24%2021-31-42-255\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/8c5a1242338c79bf2412b9d6442ed1f2ff9a1b20332a45d3681b29c5a2e499c0/upload/bandicam%202023-12-24%2021-31-55-221\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/81c4b559021dca6835e6e54029e9bf0f5262aa6e58210dbdeb493f1c3928ec8f/upload/bandicam%202023-12-24%2021-32-06-796\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/4731c3978225ddd2da5b347a1e8d05b127dcd8c05d3397abb4e1f6516e80dd07/upload/bandicam%202023-12-24%2021-35-54-698\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/58ac85fa305191ee8cc3361ff4fcb79e391bdad2333cae16684d15355d5e875d/upload/bandicam%202023-12-24%2021-36-06-038\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/0432ce59d558108f64cb2b3c873e307d0ceb522d336cf26d61a2092d938a2df4/upload/bandicam%202023-12-24%2021-36-16-202\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/79d1408d98d4660e49ba8735a222bfe796f91f6d820623c8f32cf5f15d7c36a7/upload/bandicam%202023-12-24%2021-36-22-697\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/3264f4ef1ca1a81f8c9b7b6478b04544981d1fbd379f240392c22ba5fd6f5261/upload/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202023-12-25%20000405\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/239d41991099961ba18f737dbfbc0858fd226c78b76d89fb4ccb60cc0619633f/upload/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202023-12-25%20000524\.png!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/eeaf3644cf557bdd2a847599dbc26b9264292ffba8b8b0077bd95947a086b62c/upload/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202023-12-24%20230929\.png!,
+        ],
+        profile_urls: [
+          "https://ci-en.net/creator/12924",
+        ],
+        artist_name: "あまちゃ/おぽぽわーるど",
+        tag_name: "cien_12924",
+        tags: %w[ゲーム ロリ R-18],
+      )
+    end
+
     context "A self-introduction article" do
       strategy_should_work(
         "https://ci-en.dlsite.com/creator/15496",
