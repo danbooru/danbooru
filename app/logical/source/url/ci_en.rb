@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::CiEn < Source::URL
-  attr_reader :creator_id, :article_id
+  attr_reader :creator_id, :article_id, :image_type
 
   def self.match?(url)
     url.host.in?(%w[ci-en.jp ci-en.net ci-en.dlsite.com media.ci-en.jp])
@@ -34,8 +34,10 @@ class Source::URL::CiEn < Source::URL
 
       # https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-800.jpg?px-time=1700517240&px-hash=eb626eafb7e5733c96fb0891188848dac10cb84c
       # https://media.ci-en.jp/public/article_cover/creator/00020980/a65e3c05e2082018f4f28e99e7bc69b67ae96bb6f40b4a4b580ca939f435430d/image-1280-c.jpg
-      in _, _, "creator", creator_id, *rest
+      # https://media.ci-en.jp/public/cover/creator/00013341/cc4ec0e58b9ad36c8f36aca9faee334239761b4b2969d379d6629a5e07a52a6c/image-990-c.jpg
+      in _, image_type, "creator", creator_id, *rest
         @creator_id = creator_id.to_i.to_s
+        @image_type = image_type
 
       end
 

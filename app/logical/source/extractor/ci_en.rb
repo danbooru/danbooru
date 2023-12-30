@@ -14,7 +14,14 @@ class Source::Extractor::CiEn < Source::Extractor
     if parsed_url.image_url?
       [parsed_url.to_s]
     else
-      page&.css(".l-creatorPage-main article vue-l-image, .l-creatorPage-main article vue-file-player").map do |node|
+      urls = []
+
+      og_url = Source::URL.parse(page&.css("meta[property='og:image']")&.attr("content").to_s)
+      if og_url.image_type != "attachment"
+        urls << og_url.to_s
+      end
+
+      urls += page&.css(".l-creatorPage-main article vue-l-image, .l-creatorPage-main article vue-file-player").map do |node|
         case node.name
         when "vue-l-image"
           node["data-raw"]
@@ -24,6 +31,8 @@ class Source::Extractor::CiEn < Source::Extractor
           end.to_s
         end
       end.compact.uniq
+
+      urls
     end
   end
 
