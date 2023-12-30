@@ -174,6 +174,12 @@ module Sources
 
       assert_equal("11019", Source::URL.parse("https://ci-en.net/creator/11019").creator_id)
       assert_nil(Source::URL.parse("https://ci-en.net/creator/11019").article_id)
+
+      assert_equal("11019", Source::URL.parse("https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-web.jpg?px-time=1703968668&px-hash=9497dce5fa56c5081413ad1126e06d6f44f0ab3e").creator_id)
+      assert_equal("11019", Source::URL.parse("https://media.ci-en.jp/public/cover/creator/00011019/ae96c79d7626c8127bfe9823111601d3b566977d19c3aa0409de4ef838f8dc12/image-990-c.jpg").creator_id)
+
+      assert_not(Source::URL.page_url?("https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-web.jpg?px-time=1703968668&px-hash=9497dce5fa56c5081413ad1126e06d6f44f0ab3e"))
+      assert_not(Source::URL.page_url?("https://media.ci-en.jp/public/cover/creator/00011019/ae96c79d7626c8127bfe9823111601d3b566977d19c3aa0409de4ef838f8dc12/image-990-c.jpg"))
     end
   end
 end
