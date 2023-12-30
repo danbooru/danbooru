@@ -14,14 +14,16 @@ class Source::Extractor::CiEn < Source::Extractor
     if parsed_url.image_url?
       [parsed_url.to_s]
     else
-      [
-        *page&.css(".l-creatorPage-main article vue-l-image").to_a.pluck("data-raw"),
-        *page&.css(".l-creatorPage-main article vue-file-player").to_a.map do |video|
-          Addressable::URI.heuristic_parse(video["base-path"]).join("video-web.mp4").tap do |uri|
-            uri.query = video["auth-key"]
+      page&.css(".l-creatorPage-main article vue-l-image, .l-creatorPage-main article vue-file-player").map do |node|
+        case node.name
+        when "vue-l-image"
+          node["data-raw"]
+        when "vue-file-player"
+          Addressable::URI.heuristic_parse(node["base-path"]).join("video-web.mp4").tap do |uri|
+            uri.query = node["auth-key"]
           end.to_s
-        end,
-      ].compact.uniq
+        end
+      end.compact.uniq
     end
   end
 
