@@ -11,6 +11,9 @@ module Source
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]
+        elsif parsed_url.candidate_full_image_urls.present?
+          full_image_url = parsed_url.candidate_full_image_urls.find { |url| http_exists?(url) }
+          [full_image_url.presence || url]
         elsif parsed_url.image_url?
           [url]
         elsif video_data.present?
@@ -20,11 +23,25 @@ module Source
         else
           urls = []
 
-          urls += page&.css(".image img").to_a.pluck("src")
+          if page&.css(".art-view-gallery").present?
+            urls += image_urls_from_gallery
+          elsif page&.css(".art-images").present?
+            urls += page&.css(".image a[data-action]").to_a.pluck("href")
+          else
+            urls += page&.css(".image img").to_a.pluck("src")
+          end
+
           urls += page&.css("#author_comments img[data-user-image='1']").to_a.map { |img| img["data-smartload-src"] || img["src"] }
 
           urls.compact
         end
+      end
+
+      def image_urls_from_gallery
+        script = page&.css("script")&.find { |node| node.text.match?(/let imageData =/) }
+        json = script&.text.to_s[/let imageData =(.*?);/m, 1]
+        images = JSON.parse(json) rescue []
+        images.pluck("image")
       end
 
       def page_url
