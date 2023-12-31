@@ -84,6 +84,62 @@ module Sources
       )
     end
 
+    context "A new image page" do
+      strategy_should_work(
+        "https://www.newgrounds.com/art/view/sphenodaile/princess-of-the-thorns-pages-7-8",
+        image_urls: %w[
+          https://art.ngfiles.com/images/5235000/5235203_233092_sphenodaile_untitled-5235203.19acabafc67df2351f7125dad47c12cd.jpg?f1700955250
+          https://art.ngfiles.com/images/5235000/5235203_233093_sphenodaile_untitled-5235203.19acabafc67df2351f7125dad47c12cd.jpg?f1700955250
+        ],
+      )
+    end
+
+    context "A new multi-image gallery" do
+      strategy_should_work(
+        "https://www.newgrounds.com/art/view/sphenodaile/princess-of-the-thorns-pages-11-12-afterwords",
+        image_urls: %w[
+          https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.jpg?f1702161372
+          https://art.ngfiles.com/images/5267000/5267492_276883_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.81ca470f3d2830104e142d2e2b610e4c.jpg?f1702161410
+          https://art.ngfiles.com/images/5267000/5267492_276881_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.9ece029ebd69b6e55dbaf777a30b0e79.jpg?f1702161407
+          https://art.ngfiles.com/images/5267000/5267492_276882_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.462b90641c2487627650683f5002c0be.jpg?f1702161408
+        ],
+      )
+    end
+
+    context "A new sample image" do
+      strategy_should_work(
+        "https://art.ngfiles.com/medium_views/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.webp?f1702161430",
+        image_urls: [
+          %r!https://art\.ngfiles\.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords\.1403130356bd217fb99f7ae3f9ce6029\.jpg!
+        ],
+        media_files: [
+          { file_size: 2_107_866 },
+        ],
+        page_url: nil,
+        profile_url: "https://sphenodaile.newgrounds.com",
+        artist_name: "sphenodaile",
+        other_names: ["sphenodaile"],
+        tag_name: "sphenodaile",
+      )
+    end
+
+    context "A new full size image" do
+      strategy_should_work(
+        "https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.jpg?f1702161430",
+        image_urls: [
+          %r!https://art\.ngfiles\.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords\.1403130356bd217fb99f7ae3f9ce6029\.jpg!
+        ],
+        media_files: [
+          { file_size: 2_107_866 },
+        ],
+        page_url: nil,
+        profile_url: "https://sphenodaile.newgrounds.com",
+        artist_name: "sphenodaile",
+        other_names: ["sphenodaile"],
+        tag_name: "sphenodaile",
+      )
+    end
+
     context "A deleted or non-existing post" do
       strategy_should_work(
         "https://www.newgrounds.com/art/view/natthelich/nopicture",
@@ -150,6 +206,8 @@ module Sources
       assert(Source::URL.image_url?("https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg"))
       assert(Source::URL.image_url?("https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg"))
       assert(Source::URL.image_url?("https://art.ngfiles.com/thumbnails/1254000/1254985.png?f1588263349"))
+      assert(Source::URL.image_url?("https://art.ngfiles.com/medium_views/5225000/5225108_220662_nanobutts_untitled-5225108.4a602f9525d0d55d8add3dcfb1485507.webp?f1700595860"))
+      assert(Source::URL.image_url?("https://art.ngfiles.com/images/5225000/5225108_220662_nanobutts_untitled-5225108.4a602f9525d0d55d8add3dcfb1485507.webp?f1700595860"))
       assert(Source::URL.image_url?("https://uploads.ungrounded.net/alternate/1801000/1801343_alternate_165104.mp4?1639666238"))
 
       assert(Source::URL.page_url?("https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat"))
@@ -158,6 +216,10 @@ module Sources
       assert(Source::URL.profile_url?("https://natthelich.newgrounds.com"))
       assert_not(Source::URL.profile_url?("https://www.newgrounds.com"))
       assert_not(Source::URL.profile_url?("https://newgrounds.com"))
+
+      assert_nil(Source::URL.page_url("https://art.ngfiles.com/medium_views/5225000/5225108_220662_nanobutts_untitled-5225108.4a602f9525d0d55d8add3dcfb1485507.webp?f1700595860"))
+      assert_equal("https://www.newgrounds.com/art/view/natthelich/pandora", Source::URL.page_url("https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg")) # XXX dead page
+      assert_equal("https://www.newgrounds.com/art/view/natthelich/pandora-2", Source::URL.page_url("https://art.ngfiles.com/images/1543000/1543982_natthelich_pandora-2.jpg?f1607971817"))
     end
   end
 end
