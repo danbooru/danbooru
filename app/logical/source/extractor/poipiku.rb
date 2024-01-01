@@ -75,7 +75,7 @@ class Source::Extractor
     memoize def additional_images_html
       return nil if user_id.blank? || post_id.blank?
 
-      response = http.use(:spoof_referrer).cache(1.minute).post("https://poipiku.com/f/ShowAppendFileF.jsp", form: { UID: user_id, IID: post_id })
+      response = http.cookies(POIPIKU_LK: Danbooru.config.poipiku_session_cookie).use(:spoof_referrer).cache(1.minute).post("https://poipiku.com/f/ShowAppendFileF.jsp", form: { UID: user_id, IID: post_id })
       return nil unless response.status == 200
 
       json = JSON.parse(response.to_s)
