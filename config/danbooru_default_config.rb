@@ -488,6 +488,11 @@ module Danbooru
     def ci_en_session_cookie
     end
 
+    # Your Poipiku "POIPIKU_LK" cookie. Login to Poipiku then use the
+    # devtools to find the "POIPIKU_LK" cookie.
+    def poipiku_session_cookie
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
