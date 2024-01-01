@@ -168,7 +168,8 @@ module PostSets
         elsif normalized_query.is_metatag?(:search)
           saved_search_tags
         elsif normalized_query.is_empty_search? || normalized_query.is_metatag?(:order, :rank)
-          sort_sidebar_tags(popular_tags.presence || frequent_tags)
+          tags = popular_tags.presence || frequent_tags
+          tags.sort_by.with_index { |tag, i| [TagCategory.category_ids.index(tag.category), i] }
         elsif normalized_query.is_simple_tag? && tag.present?
           categories = TagCategory.search_sidebar_tag_categories[tag.category]
           tags = similar_tags(categories).presence || frequent_tags(categories)
