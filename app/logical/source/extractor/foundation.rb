@@ -42,14 +42,6 @@ module Source
         http.cache(1.minute).parsed_get(page_url)
       end
 
-      def tags
-        tags = api_response.dig("props", "pageProps", "artwork", "tags").to_a
-
-        tags.map do |tag|
-          [tag, "https://foundation.app/tags/#{tag}"]
-        end
-      end
-
       def artist_name
         parsed_url.username || parsed_referer&.username || api_response.dig("props", "pageProps", "artwork", "creator", "username")
       end

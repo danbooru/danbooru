@@ -5,13 +5,13 @@ module Sources
     context "A foundation post" do
       strategy_should_work(
         "https://foundation.app/@dadachyo/~/103724",
+        page_url: "https://foundation.app/@dadachyo/foundation/103724",
         media_files: [{ file_size: 13_908_349 }],
         image_urls: ["https://f8n-ipfs-production.imgix.net/QmPhpz6E9TFRpvdVTviM8Hy9o9rxrnPW5Ywj471NnSNkpi/nft.jpg"],
         artist_commentary_title: "Rose tea",
         artist_name: "dadachyo",
         profile_url: "https://foundation.app/@dadachyo",
         profile_urls: ["https://foundation.app/0xb4D9073800c7935351ACDC1e46F0CF670853eA99", "https://foundation.app/@dadachyo"],
-        tags: %w[dadachyo rose 2018 matcrewnft]
       )
     end
 
@@ -30,35 +30,35 @@ module Sources
         profile_url: "https://foundation.app/@patch_oxxo",
         image_urls: ["https://f8n-ipfs-production.imgix.net/QmWQpt9opcue5F7Q2vTT5P5jPYo1xHhEs7RDxgXzWFHcfK/nft.gif"],
         media_files: [{ file_size: 52_352_138 }],
-        tags: %w[2d animation],
       )
     end
 
     context "A foundation.app/@username/foo-bar-1234 URL" do
       strategy_should_work(
         "https://foundation.app/@asuka111art/dinner-with-cats-82426",
+        page_url: "https://foundation.app/@asuka111art/foundation/82426",
         image_urls: ["https://f8n-ipfs-production.imgix.net/Qma7Lz2LfFb4swoqzr1V43oRGh9xikgigM11g3EukdU61R/nft.png"],
         artist_name: "asuka111art",
         profile_url: "https://foundation.app/@asuka111art",
         profile_urls: ["https://foundation.app/@asuka111art", "https://foundation.app/0x9A94f94626352566e0A9105F1e3DA0439E3e3783"],
-        tags: %w[2d anime illustration digital fantasy]
       )
     end
 
     context "A f8n-production-collection-assets.imgix.net URL" do
       strategy_should_work(
         "https://f8n-production-collection-assets.imgix.net/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/128711/QmcBfbeCMSxqYB3L1owPAxFencFx3jLzCPFx6xUBxgSCkH/nft.png?q=80&auto=format%2Ccompress&cs=srgb&h=640",
+        page_url: "https://foundation.app/@foundation/foundation/128711",
         image_urls: ["https://f8n-ipfs-production.imgix.net/QmcBfbeCMSxqYB3L1owPAxFencFx3jLzCPFx6xUBxgSCkH/nft.png"],
         artist_name: "mochiiimo",
         profile_url: "https://foundation.app/@mochiiimo",
         profile_urls: ["https://foundation.app/0x7E2ef75C0C09b2fc6BCd1C68B6D409720CcD58d2", "https://foundation.app/@mochiiimo"],
-        tags: %w[anime landscape girl cat 2d illustration matcrewnft]
       )
     end
 
     context "A foundation post with a video hosted on imgix" do
       strategy_should_work(
         "https://foundation.app/@huwari/~/88982",
+        page_url: "https://foundation.app/@huwari/foundation/88982",
         image_urls: ["https://f8n-ipfs-production.imgix.net/QmU8bbsjaVQpEKMDWbSZdDD6GsPmRYBhQtYRn8bEGv7igs/nft.mp4"],
         media_files: [{ file_size: 13_391_766 }],
         artist_name: "huwari",
