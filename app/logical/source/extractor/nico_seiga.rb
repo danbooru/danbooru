@@ -19,8 +19,7 @@ module Source
           [image_url_for("https://seiga.nicovideo.jp/image/source/#{illust_id}") || url]
         elsif manga_id.present?
           api_client.manga_api_response.pluck("meta").pluck("source_url").map do |url|
-            image_id = Source::URL.parse(url).image_id
-            image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}") || url
+            manga_image_url_for(url)
           end
         else
           [image_url_for(url) || url]
@@ -35,6 +34,34 @@ module Source
           "https://lohas.nicoseiga.jp/priv/#{$1}"
         else
           nil
+        end
+      end
+
+      # Try to convert a https://deliver.cdn.nicomanga.jp/thumb/:id URL to the full size image. Not always possible.
+      #
+      # Doesn't work (redirects to a totally different image):
+      #
+      #   https://deliver.cdn.nicomanga.jp/thumb/10543313p?1592370039
+      #   => https://seiga.nicovideo.jp/image/source/10543313
+      #   => https://lohas.nicoseiga.jp/o/a6aaf607d27e9377a62a4353f73671c2138a6190/1704167420/10543313
+      #   => https://lohas.nicoseiga.jp/priv/a6aaf607d27e9377a62a4353f73671c2138a6190/1704167420/10543313
+      #
+      # Works (redirects to the right image):
+      #
+      #   https://deliver.cdn.nicomanga.jp/thumb/10315315p?1586768900
+      #   => https://seiga.nicovideo.jp/image/source/10315315
+      #   => https://lohas.nicoseiga.jp/priv/a9969a0177a30d21aa57720b9afa6b3f0a59dd7e/1704167121/10315315
+      def manga_image_url_for(manga_sample_url)
+        image_id = Source::URL.parse(manga_sample_url).image_id
+        return manga_sample_url if image_id.nil?
+
+        candidate_url = "https://seiga.nicovideo.jp/image/source/#{image_id}"
+        redirected_url = Source::URL.parse(api_client&.head(candidate_url)&.uri.to_s)
+
+        if redirected_url.to_s.match?("/priv/")
+          redirected_url.to_s
+        else
+          manga_sample_url
         end
       end
 
