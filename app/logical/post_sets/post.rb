@@ -196,7 +196,7 @@ module PostSets
       # @return [Array<Tag>] the list of most frequently searched tags for the day.
       def popular_tags
         tag_names = ReportbooruService.new.popular_searches(Date.today, limit: MAX_SIDEBAR_TAGS)
-        Tag.where(name: tag_names)
+        Tag.where(name: tag_names).to_a.in_order_of(:name, tag_names)
       end
 
       # @return [Array<Tag>] the list of tags most related to the current search.
