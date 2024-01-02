@@ -14,11 +14,19 @@ module Sources
 
         <!-- more -->
 
-        <ol><li>one</li>
+        <ol>
+        <li>one</li>
         <li>two</li>
-        </ol><ul><li>one</li>
-        <ul><li>two</li>
-        </ul></ul><blockquote><p>quote</p></blockquote>
+        </ol>
+
+        <ul>
+        <li>one</li>
+        <ul>
+        <li>two</li>
+        </ul>
+        </ul>
+
+        <blockquote><p>quote</p></blockquote>
 
         <p><a href=\"http://www.google.com\">link</a></p>
       EOS
