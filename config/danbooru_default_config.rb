@@ -489,6 +489,14 @@ module Danbooru
     def poipiku_session_cookie
     end
 
+    # Your Zerochan user ID. Login to Zerochan then use the devtools to find the "z_id" cookie.
+    def zerochan_user_id
+    end
+
+    # Your Zerochan "z_hash" cookie. Login to Zerochan then use the devtools to find the "z_hash" cookie.
+    def zerochan_session_cookie
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch

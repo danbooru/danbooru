@@ -3,22 +3,16 @@ require "test_helper"
 module Sources
   class ZerochanTest < ActiveSupport::TestCase
     context "Zerochan:" do
-      context "A post url" do
+      context "A SFW post url" do
         strategy_should_work(
-          "https://www.zerochan.net/90674",
-          image_urls: ["https://static.zerochan.net/Full.Moon.wo.Sagashite.full.90674.jpg"],
-          page_url: "https://www.zerochan.net/90674#full",
-          tags: [
-            "Female", "Ecchi", "Fanart", "Twin Tails", "Wings", "Brown Hair",
-            "Red Eyes", "Strawberry", "Gloves", "Pink Hair", "Hat",
-            "Full Moon wo Sagashite", "Meroko Yui", "Usagimimi", "Bows (Fashion)",
-            "Two Girls", "Black Eyes", "Kemonomimi", "Duo", "Text", "Red Gloves",
-            "Japanese Text", "Hat Bow", "Kouyama Mitsuki", "Red Handwear",
-          ]
+          "https://www.zerochan.net/4090352",
+          image_urls: ["https://static.zerochan.net/Kira.Yamato.full.4090352.jpg"],
+          page_url: "https://www.zerochan.net/4090352#full",
+          tags: ["Male", "Fanart", "Brown Hair", "Purple Eyes", "Short Hair", "Kira Yamato", "Mobile Suit Gundam SEED Destiny", "Mobile Suit Gundam SEED", "Pixiv", "Solo", "Fanart from Pixiv", "ususio 11"]
         )
       end
 
-      context "An old post url" do
+      context "A NSFW post url" do
         strategy_should_work(
           "http://www.zerochan.net/full/90674",
           image_urls: ["https://static.zerochan.net/Full.Moon.wo.Sagashite.full.90674.jpg"],
