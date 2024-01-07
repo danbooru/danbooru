@@ -52,6 +52,7 @@ module IconHelper
     Curious\ Cat
     DLSite
     Danbooru
+    DC\ Inside
     Deviant\ Art
     Discord
     Doujinshi.org
