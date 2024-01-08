@@ -479,6 +479,11 @@ module Danbooru
     def twitter_csrf_token
     end
 
+    # Your Xfolio "xfolio_session" cookie. Login to Xfolio then use the
+    # devtools to find the "xfolio_session" cookie.
+    def xfolio_session
+    end
+
     # Your Ci-En "ci_en_session" cookie. Login to Ci-En then use the
     # devtools to find the "ci_en_session" cookie.
     def ci_en_session_cookie

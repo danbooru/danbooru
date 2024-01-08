@@ -202,6 +202,7 @@ module ArtistFinder
     "weibo.cn/p", # https://m.weibo.cn/p/1005055921792975
     "wikipedia.org", # https://en.wikipedia.org/wiki/Hidetaka_Tenjin
     "wp.com",
+    "xfolio.jp",
     "yande.re",
     "yaplog.jp", # http://yaplog.jp/niyang53
     "yfrog.com", # http://yfrog.com/user/0128sinonome/photos

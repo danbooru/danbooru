@@ -72,6 +72,7 @@ module Source
       Source::URL::ArtStreet,
       Source::URL::Gumroad,
       Source::URL::Misskey,
+      Source::URL::Xfolio,
       Source::URL::CiEn,
     ]
 
