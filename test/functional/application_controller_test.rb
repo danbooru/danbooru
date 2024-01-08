@@ -339,6 +339,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       should "fail with a 429 error" do
         user = create(:user)
         post = create(:post, rating: "s")
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
         RateLimit.any_instance.stubs(:limited?).returns(true)
 
         put_auth post_path(post), user, params: { post: { rating: "e" } }

@@ -159,7 +159,8 @@ module PostSets
     end
 
     concerning :TagListMethods do
-      def related_tags
+      # @return [Array<Tag>] The list of tags for the sidebar on the post index page.
+      def sidebar_tags
         if artist.present? && artist.is_banned? && !current_user.is_approver?
           []
         elsif normalized_query.wildcards.one? && normalized_query.tags.none?
@@ -167,35 +168,58 @@ module PostSets
         elsif normalized_query.is_metatag?(:search)
           saved_search_tags
         elsif normalized_query.is_empty_search? || normalized_query.is_metatag?(:order, :rank)
-          popular_tags.presence || frequent_tags
+          tags = popular_tags.presence || frequent_tags
+          tags.sort_by.with_index { |tag, i| [TagCategory.category_ids.index(tag.category), i] }
+        elsif normalized_query.is_simple_tag? && tag.present?
+          categories = TagCategory.search_sidebar_tag_categories[tag.category]
+          tags = similar_tags(categories).presence || frequent_tags(categories)
+          tags = [tag] + tags if !tag.in?(tags)
+          sort_sidebar_tags(tags, categories)
         elsif normalized_query.is_single_term?
-          similar_tags.presence || frequent_tags
+          sort_sidebar_tags(similar_tags.presence || frequent_tags)
         else
-          frequent_tags
+          sort_sidebar_tags(frequent_tags)
         end
       end
 
+      # Sort the list of tags by category. For artist, character, and copyright tags, subsort them by post count. For
+      # general and meta tags, leave them in the same order they were given in (similarity or frequency order).
+      #
+      # @param tags [Array<Tag>] the list of tags to sort
+      # @param categories [Array<Integer>] the category order in which tags should be sorted by
+      def sort_sidebar_tags(tags, categories = TagCategory.category_ids)
+        tags.sort_by.with_index do |tag, i|
+          [categories.index(tag.category) || -1, (tag.category == TagCategory::GENERAL || tag.category == TagCategory::META ? i : -tag.post_count)]
+        end
+      end
+
+      # @return [Array<Tag>] the list of most frequently searched tags for the day.
       def popular_tags
-        ReportbooruService.new.popular_searches(Date.today, limit: MAX_SIDEBAR_TAGS)
+        tag_names = ReportbooruService.new.popular_searches(Date.today, limit: MAX_SIDEBAR_TAGS)
+        Tag.where(name: tag_names).to_a.in_order_of(:name, tag_names)
       end
 
-      def similar_tags
-        RelatedTagCalculator.new(post_query).cached_similar_tags_for_search(MAX_SIDEBAR_TAGS)
+      # @return [Array<Tag>] the list of tags most related to the current search.
+      def similar_tags(categories = TagCategory.category_ids)
+        RelatedTagCalculator.new(post_query).cached_similar_tags_for_search(MAX_SIDEBAR_TAGS, categories: categories)
       end
 
-      def frequent_tags
-        RelatedTagCalculator.frequent_tags_for_post_array(posts).take(MAX_SIDEBAR_TAGS)
+      # @return [Array<Tag>] the list of tags most frequently appearing in the current page of search results.
+      def frequent_tags(categories = TagCategory.category_ids)
+        RelatedTagCalculator.frequent_tags_for_post_array(posts, categories: categories, max_tags: MAX_SIDEBAR_TAGS)
       end
 
       # Wildcard searches can show up to 100 tags in the sidebar, not 25,
       # because that's how many tags the search itself will use.
       def wildcard_tags
-        Tag.wildcard_matches(post_query.wildcards.first).limit(MAX_WILDCARD_TAGS).pluck(:name)
+        Tag.wildcard_matches(post_query.wildcards.first).limit(MAX_WILDCARD_TAGS).to_a
       end
 
       def saved_search_tags
         searches = ["search:all"] + SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
-        searches.take(MAX_SIDEBAR_TAGS)
+        searches.take(MAX_SIDEBAR_TAGS).map do |search|
+          Tag.new(name: search).freeze
+        end
       end
     end
 

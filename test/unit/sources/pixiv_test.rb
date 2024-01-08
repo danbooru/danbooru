@@ -140,7 +140,7 @@ module Sources
       context "A work requested via Pixiv Requests" do
         strategy_should_work(
           "https://www.pixiv.net/en/artworks/91322075",
-          tags: %w[アイドルマスターシンデレラガールズ 大槻唯 濡れ透け パンツ 透けブラ 裾結び プール掃除 おへそ びしょ濡れ ぱんつ pixiv_commission]
+          tags: %w[アイドルマスターシンデレラガールズ 大槻唯 濡れ透け パンツ 透けブラ 裾結び プール掃除 おへそ ぱんつ パンモロにも定評のあるゆいれそ pixiv_commission]
         )
       end
 

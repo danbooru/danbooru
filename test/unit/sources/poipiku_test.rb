@@ -94,6 +94,34 @@ module Sources
         )
       end
 
+      context "A page that requires a login" do
+        strategy_should_work(
+          "https://poipiku.com/8566613/9625938.html",
+          page_url: "https://poipiku.com/8566613/9625938.html",
+          image_urls: %w[
+            https://img-org.poipiku.com/user_img03/008566613/009625669_020612310_toCYdeSNu.jpeg
+            https://img-org.poipiku.com/user_img02/008566613/009625669_020612311_woW7C76Mm.jpeg
+            https://img-org.poipiku.com/user_img02/008566613/009625669_020612314_f7gKnobZf.jpeg
+            https://img-org.poipiku.com/user_img03/008566613/009625669_020612315_PruYge0kI.jpeg
+            https://img-org.poipiku.com/user_img03/008566613/009625669_020612316_BzYCPGlTs.jpeg
+            https://img-org.poipiku.com/user_img02/008566613/009625669_020612317_MLJKcyPlU.jpeg
+            https://img-org.poipiku.com/user_img03/008566613/009625938_020619084_HBrdSJ8V3.jpeg
+          ],
+          profile_url: "https://poipiku.com/8566613/",
+          profile_urls: %w[https://poipiku.com/8566613/],
+          artist_name: "kino",
+          tag_name: "kino",
+          tags: [],
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            丹穹　R-18 (※攻めローションガーゼ)
+            普段水を操っている丹が自分から出る水分を制御できないのえっちだよね！のらくがきです
+
+            ⚠︎なんでも大丈夫な方向け
+            少しでも不安を覚えた方はブラウザバック推奨です
+          EOS
+        )
+      end
+
       # Ignores the warning image
       context "A page url with a warning image" do
         strategy_should_work(

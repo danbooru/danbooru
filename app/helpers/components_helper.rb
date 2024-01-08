@@ -71,12 +71,6 @@ module ComponentsHelper
     render CategorizedTagListComponent.new(tags: post.tags, **options)
   end
 
-  # A vertical tag list, used in the post index sidebar.
-  def render_search_tag_list(tag_names, **options)
-    tags = SearchTagListComponent.tags_from_names(tag_names)
-    render SearchTagListComponent.new(tags: tags, **options)
-  end
-
   # The <link rel="next"> / <link rel="prev"> links in the <meta> element of the <head>.
   def render_meta_links(records)
     render MetaLinksComponent.new(records: records, params: params)

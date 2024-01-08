@@ -46,7 +46,8 @@ class Source::URL::Fantia < Source::URL
       @download_id = image_id
 
     # https://fantia.jp/posts/1148334
-    in _, "posts", /\d+/ => post_id
+    # https://fantia.jp/posts/2245222/post_content_photo/14978435
+    in _, "posts", /\d+/ => post_id, *rest
       @post_id = post_id
 
     # https://fantia.jp/products/249638

@@ -40,6 +40,7 @@ module IconHelper
     Cafe24
     Carrd
     Catbox
+    Ci-En
     Circle.ms
     Class101
     Clip\ Studio

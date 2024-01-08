@@ -40,6 +40,17 @@ module Sources
       end
     end
 
+    context "A c.fantia.jp/uploads/post_content_photo/ url with full size page referer" do
+      url = "https://cc.fantia.jp/uploads/post_content_photo/file/14978435/86ec43ba-8121-43ac-9d3c-aec86f5238a2.jpg?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9wb3N0X2NvbnRlbnRfcGhvdG8vZmlsZS8xNDk3ODQzNS84NmVjNDNiYS04MTIxLTQzYWMtOWQzYy1hZWM4NmY1MjM4YTIuanBnIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNjk1MTM4MDI1fX19XX0_&Signature=ypwGfl0VivNcjmsfC5Cu6qNXhnXpuKTHnukMwBEgdWlENuAbVBi0napKC~39NN0e~FBNpgoOW2OqY0BX5zgeMdbz2RAGI1eFsfYpRRNfHDpEvh6dOVgBrHopZvXZzMf1G12yiBnKmXAvNyzwD1cDhnCW0mvcy9RbCJro1ELQ4qWt4BuBUzOtYX5h6OV-WvGnOdys25p~t4n8h15MhaWyIVx32W0wIsbs~cHnaScwgOIJAinBkgp4Mp1AwqYtvmgw28PjJrzohhFDrLGZeM6yjlvLQKnYqjQn5D8CR9l0TLADtMYc65hL92ywG0BXf1zGnGJ86gmqSiZjZ077rl9FVw__"
+
+      strategy_should_work(
+        url,
+        referer: "https://fantia.jp/posts/2245222/post_content_photo/14978435",
+        image_urls: [url],
+        page_url: "https://fantia.jp/posts/2245222",
+      )
+    end
+
     context "A c.fantia.jp/uploads/product/image/ url" do
       should "work" do
         url = "https://c.fantia.jp/uploads/product/image/249638/fd5aef8f-c217-49d0-83e8-289efb33dfc4.jpg"

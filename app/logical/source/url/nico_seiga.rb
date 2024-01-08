@@ -88,6 +88,8 @@ module Source
         @image_id = image_id
 
       # https://deliver.cdn.nicomanga.jp/thumb/7891081p?1590171867
+      # https://deliver.cdn.nicomanga.jp/thumb/10543313p?1592370039 (webp: https://deliver.cdn.nicomanga.jp/thumb/aHR0cHM6Ly9zYXBpLm5pY29tYW5nYS5qcC9leHRlcm5hbC90aHVtYj9pZD0xMDU0MzMxMyZyZWY9Z2V0X2V4dGVybmFsX3RodW1iX3VybCZtb2RlPXJlZGlyZWN0JmU9MTcwODMwMzMxMyZoPTU0MGZhNmViZTQ2ZGE3YjUyYjViYmE3M2JiZDcxZTQzODI0NzcxNzI.webp, manga: https://seiga.nicovideo.jp/watch/mg485611)
+      # (note: the id isn't always an image_id. https://seiga.nicovideo.jp/image/source/10543313 redirects to a different image)
       in "deliver.cdn.nicomanga.jp", "thumb", /^(\d+)p$/ => image_id
         @image_id = $1
 

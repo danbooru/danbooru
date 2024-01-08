@@ -68,7 +68,7 @@ class NicoSeigaApiClient
   end
 
   def manga_api_response
-    resp = get("https://ssl.seiga.nicovideo.jp/api/v1/app/manga/episodes/#{@work_id}/frames")
+    resp = get("https://api.nicomanga.jp/api/v1/app/manga/episodes/#{@work_id}/frames?enable_webp=false")
     return {} if resp.blank? || resp.code.to_i == 404
     JSON.parse(resp)["data"]["result"]
   rescue JSON::ParserError

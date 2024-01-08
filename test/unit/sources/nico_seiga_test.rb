@@ -99,6 +99,36 @@ module Sources
       )
     end
 
+    context "A nicoseiga manga url (2)" do
+      strategy_should_work(
+        "https://seiga.nicovideo.jp/watch/mg485611",
+        image_urls: %w[
+          https://deliver.cdn.nicomanga.jp/thumb/10543313p?1592370039
+          https://deliver.cdn.nicomanga.jp/thumb/10543311p?1592262182
+          https://deliver.cdn.nicomanga.jp/thumb/10543312p?1592262182
+          https://deliver.cdn.nicomanga.jp/thumb/10543314p?1610453519
+        ],
+        page_url: "https://seiga.nicovideo.jp/watch/mg485611",
+        artist_name: "まいまい",
+        profile_url: "https://seiga.nicovideo.jp/user/illust/1116797",
+        tags: %w[ドラゴンクエスト 4コマ ムーンブルクの王女 着替え中 マジックミラー],
+        artist_commentary_title: "勇者さまが死んだので帰ります！ No.291 カミカゼアタック",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          アソビ大全を買おうかどうしようか悩み中
+
+
+          ※ファンティアにはイラストをアップしてるのでフォローよろしくどうぞ
+
+          https://fantia.jp/fanclubs/3263
+
+
+          ※公開中100話以外の回はCG集(描き下ろし多数)に収録、よろしくどうぞ
+
+          https://www.dlsite.com/home/circle/profile/=/maker_id/RG44783.html
+        EOS
+      )
+    end
+
     context "A https://lohas.nicoseiga.jp/thumb/${id}i url" do
       strategy_should_work(
         "https://lohas.nicoseiga.jp/thumb/6844226i",
