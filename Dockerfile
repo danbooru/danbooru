@@ -18,16 +18,16 @@
 
 ARG MOZJPEG_URL="https://github.com/mozilla/mozjpeg/archive/refs/tags/v4.1.1.tar.gz"
 ARG VIPS_URL="https://github.com/libvips/libvips/releases/download/v8.14.2/vips-8.14.2.tar.xz"
-ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.0.tar.gz"
+ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.0.1.tar.gz"
 ARG EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/12.56.tar.gz"
 ARG OPENRESTY_URL="https://openresty.org/download/openresty-1.21.4.1.tar.gz"
 ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.1.tar.gz"
-ARG POSTGRESQL_CLIENT_VERSION="14"
 ARG NODE_VERSION="18.x"
+ARG UBUNTU_VERSION="24.04"
 
 
 # The base layer for everything.
-FROM ubuntu:22.10 AS base
+FROM ubuntu:$UBUNTU_VERSION AS base
 SHELL ["/bin/bash", "-xeuo", "pipefail", "-O", "globstar", "-O", "dotglob", "-c"]
 ENV DEBIAN_FRONTEND="noninteractive"
 RUN <<EOS
@@ -170,7 +170,7 @@ EOS
 # Build OpenResty. Output is in /usr/local.
 FROM build-base AS build-openresty
 ARG OPENRESTY_URL
-ARG OPENRESTY_BUILD_DEPS="libssl-dev libpcre++-dev zlib1g-dev"
+ARG OPENRESTY_BUILD_DEPS="libssl-dev libpcre3-dev zlib1g-dev"
 ARG OPENRESTY_BUILD_OPTIONS="\
  --with-threads --with-compat --with-pcre-jit --with-file-aio \
  --with-http_gunzip_module --with-http_gzip_static_module \
@@ -199,9 +199,8 @@ ARG NODE_VERSION
 RUN <<EOS
   apt-get install -y --no-install-recommends gnupg
 
-  . /etc/lsb-release
-  curl https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor > /usr/share/keyrings/nodesource.gpg
-  echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION $DISTRIB_CODENAME main" > /etc/apt/sources.list.d/nodesource.list
+  curl https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor > /usr/share/keyrings/nodesource.gpg
+  echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION nodistro main" > /etc/apt/sources.list.d/nodesource.list
 
   apt-get update
   apt-get download nodejs
@@ -235,7 +234,6 @@ EOS
 # Build the base Danbooru image. Pull in dependencies from previous layers and install runtime dependencies from apt-get.
 FROM base AS danbooru-base
 WORKDIR /danbooru
-ARG POSTGRESQL_CLIENT_VERSION
 ARG NODE_VERSION
 
 COPY --link --from=build-vips /usr/local /usr/local
@@ -244,9 +242,9 @@ COPY --link --from=build-node /usr/local /usr/local
 
 RUN <<EOS
   apt-get install -y --no-install-recommends \
-    postgresql-client-${POSTGRESQL_CLIENT_VERSION} ca-certificates mkvtoolnix rclone openssl perl perl-modules libpq5 \
-    libgmpxx4ldbl zlib1g libfftw3-3 libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2 libpng16-16 libexpat1 \
-    libglib2.0 libgif7 libexif12 libheif1 libvpx7 libdav1d6 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
+    postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules libpq5 \
+    libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2 libpng16-16 libexpat1 \
+    libglib2.0 libgif7 libexif12 libheif1 libvpx8 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
     libreadline8 libarchive-zip-perl tini busybox less ncdu curl
 
   npm install -g yarn
@@ -309,6 +307,7 @@ RUN <<EOS
   echo $SOURCE_COMMIT > REVISION
   ln -s /tmp tmp
   ln -s packs public/packs-test
+  userdel ubuntu
   useradd --create-home --user-group danbooru
   ldconfig
 EOS
