@@ -54,6 +54,7 @@ class ActiveSupport::TestCase
     storage_manager = StorageManager::Local.new(base_url: "https://www.example.com/data", base_dir: @temp_dir)
     Danbooru.config.stubs(:storage_manager).returns(storage_manager)
     Danbooru.config.stubs(:backup_storage_manager).returns(StorageManager::Null.new)
+    Danbooru.config.stubs(:rate_limits_enabled?).returns(false)
 
     at_exit { FileUtils.rm_rf(@temp_dir) }
   end
