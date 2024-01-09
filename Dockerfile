@@ -22,7 +22,7 @@ ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.0.1.tar.gz
 ARG EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/12.56.tar.gz"
 ARG OPENRESTY_URL="https://openresty.org/download/openresty-1.21.4.1.tar.gz"
 ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.1.tar.gz"
-ARG NODE_VERSION="18.x"
+ARG NODE_VERSION="20.x"
 ARG UBUNTU_VERSION="24.04"
 
 
