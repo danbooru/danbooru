@@ -320,8 +320,7 @@ RUN <<EOS
   ffprobe -version
   exiftool -ver
   openresty -version
-  bin/rails version
-  #bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
+  bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
 EOS
 
 USER danbooru
