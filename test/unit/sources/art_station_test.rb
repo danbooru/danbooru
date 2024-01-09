@@ -111,8 +111,8 @@ module Sources
 
     context "An ArtStation video url" do
       strategy_should_work(
-        "https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4",
-        image_urls: ["https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4"],
+        "https://cdn.artstation.com/p/video_sources/000/466/622/workout.mp4",
+        image_urls: ["https://cdn.artstation.com/p/video_sources/000/466/622/workout.mp4"],
         media_files: [{ file_size: 377_969 }],
       )
     end

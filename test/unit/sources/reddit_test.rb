@@ -47,7 +47,7 @@ module Sources
     context "A reddit post with an external image" do
       strategy_should_work(
         "https://www.reddit.com/r/baramanga/comments/n9cgs3/you_can_now_find_me_on_twitter_too_blankpage/",
-        image_urls: ["https://external-preview.redd.it/VlT1G4JoqAmP_7DG5UKRCJP8eTRef7dCrRvu2ABm_Xg.png?auto=webp&v=enabled&s=65794505bc32d29741d5e1d16fcf3b9be48e50cb"]
+        image_urls: ["https://external-preview.redd.it/VlT1G4JoqAmP_7DG5UKRCJP8eTRef7dCrRvu2ABm_Xg.png?auto=webp&s=6510f9f0a69563988aed7af04f750f92fc35f629"]
       )
     end
 

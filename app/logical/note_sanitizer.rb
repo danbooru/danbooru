@@ -25,7 +25,7 @@ module NoteSanitizer
     border-bottom border-bottom-color border-bottom-left-radius border-bottom-right-radius border-bottom-style border-bottom-width
     border-left border-left-color border-left-style border-left-width
     border-right border-right-color border-right-style border-right-width
-    border-top border-top-color border-top-left-radious border-top-right-radius border-top-style border-top-width
+    border-top border-top-color border-top-left-radius border-top-right-radius border-top-style border-top-width
     bottom left right top
     box-shadow
     color

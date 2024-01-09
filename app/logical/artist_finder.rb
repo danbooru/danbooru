@@ -30,6 +30,7 @@ module ArtistFinder
     "bilibili.com", # https://space.bilibili.com/1500665980
     "booru.org",
     "booru.org/drawfriends", # http://img.booru.org/drawfriends//images/36/de65da5f588b76bc1d9de8af976b540e2dff17e2.jpg
+    "ci-en.net", # https://ci-en.net/creator/11019/
     "comiczin.jp", # https://shop.comiczin.jp/products/list.php?category_id=3394
     "curiouscat.me", # https://curiouscat.me/azurane
     "crepu.net", # https://crepu.net/user/Mizunouchilucia
@@ -201,6 +202,7 @@ module ArtistFinder
     "weibo.cn/p", # https://m.weibo.cn/p/1005055921792975
     "wikipedia.org", # https://en.wikipedia.org/wiki/Hidetaka_Tenjin
     "wp.com",
+    "xfolio.jp",
     "yande.re",
     "yaplog.jp", # http://yaplog.jp/niyang53
     "yfrog.com", # http://yfrog.com/user/0128sinonome/photos

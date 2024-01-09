@@ -198,6 +198,47 @@ class PostTest < ActiveSupport::TestCase
 
   context "Parenting:" do
     context "Assigning a parent to a post" do
+      should "not allow a post to be its own parent" do
+        post = create(:post)
+        post.update(parent_id: post.id)
+
+        assert_equal(["Post cannot have itself as a parent"], post.errors[:base])
+      end
+
+      should "not allow a post to be its own great-grandparent" do
+        p1 = create(:post)
+        p2 = create(:post)
+        p3 = create(:post)
+
+        p1.update(parent: p2)
+        p2.update(parent: p3)
+        p3.update(parent: p1)
+
+        assert_equal(["Post cannot have itself as a parent"], p3.errors[:base])
+      end
+
+      should "not allow parent-child relationships more than 4 levels deep" do
+        p1 = create(:post, parent: nil)
+        p2 = create(:post, parent: p1)
+        p3 = create(:post, parent: nil)
+        p4 = create(:post, parent: p3)
+        p5 = create(:post, parent: p4)
+
+        p3.update(parent: p2)
+
+        assert_equal(["Post cannot have a parent-child chain more than 4 levels deep"], p3.errors[:base])
+      end
+
+      should "not allow a post to have too many children" do
+        p1 = create(:post)
+        p2 = create(:post)
+        create_list(:post, Post::MAX_CHILD_POSTS, parent: p1)
+
+        p2.update(parent: p1)
+
+        assert_equal(["post ##{p1.id} cannot have more than 30 child posts"], p2.errors[:base])
+      end
+
       should "update the has_children flag on the parent" do
         p1 = FactoryBot.create(:post)
         assert(!p1.has_children?, "Parent should not have any children")
@@ -798,25 +839,25 @@ class PostTest < ActiveSupport::TestCase
             @post.update!(tag_string: " a b c ")
             assert_equal("a b c", @post.tag_string)
 
-            @post.update!(tag_string: 'newpool:b\  a')
+            @post.update!(tag_string: 'newpool:b123\  a')
             assert_equal("a", @post.tag_string)
-            assert_equal("b", Pool.last.name)
+            assert_equal("b123", Pool.last.name)
 
-            @post.update!(tag_string: 'a newpool:c\ ')
+            @post.update!(tag_string: 'a newpool:c123\ ')
             assert_equal("a", @post.tag_string)
-            assert_equal("c", Pool.last.name)
+            assert_equal("c123", Pool.last.name)
 
-            @post.update!(tag_string: 'a newpool:d\  ')
+            @post.update!(tag_string: 'a newpool:d123\  ')
             assert_equal("a", @post.tag_string)
-            assert_equal("d", Pool.last.name)
+            assert_equal("d123", Pool.last.name)
 
             @post.update!(tag_string: 'newpool:e\ a')
             assert_equal("tagme", @post.tag_string)
             assert_equal("e_a", Pool.last.name)
 
-            @post.update!(tag_string: 'a newpool:f\\')
+            @post.update!(tag_string: 'a newpool:f123\\')
             assert_equal("a", @post.tag_string)
-            assert_equal("f\\", Pool.last.name)
+            assert_equal("f123\\", Pool.last.name)
           end
         end
 

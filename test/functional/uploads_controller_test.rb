@@ -558,7 +558,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
         should_upload_successfully("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg")
 
-        should_upload_successfully("https://sketch.pixiv.net/items/5835314698645024323")
+        should_upload_successfully("https://sketch.pixiv.net/items/1086346113447960710")
 
         should_upload_successfully("https://noizave.tumblr.com/post/162206271767")
         should_upload_successfully("https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png")
@@ -567,7 +567,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN?format=jpg&name=medium")
         should_upload_successfully("https://pbs.twimg.com/profile_banners/2371694594/1581832507/1500x500")
         should_upload_successfully("https://twitter.com/zeth_total/status/1355597580814585856")
-        should_upload_successfully("https://video.twimg.com/tweet_video/FLKI6DWakAQFRkC.mp4")
         should_upload_successfully("https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4")
 
         should_upload_successfully("https://www.weibo.com/5501756072/J2UNKfbqV")

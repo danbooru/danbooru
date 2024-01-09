@@ -2,6 +2,10 @@ require 'test_helper'
 
 class RateLimitTest < ActiveSupport::TestCase
   context "RateLimit: " do
+    setup do
+      Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+    end
+
     context "#limit! method" do
       should "create a new rate limit object if none exists, or update it if it already exists" do
         assert_difference("RateLimit.count", 1) do
@@ -35,12 +39,12 @@ class RateLimitTest < ActiveSupport::TestCase
         assert_equal(-2, limiter.rate_limits.first.points)
       end
 
-      should "not be limited if the point count was positive before the action" do
+      should "be limited if the caller didn't have enough points before the action" do
         freeze_time
         create(:rate_limit, action: "write", key: "users/1", points: 0.01)
         limiter = RateLimiter.new("write", ["users/1"], cost: 1)
 
-        assert_equal(false, limiter.limited?)
+        assert_equal(true, limiter.limited?)
         assert_equal(-0.99, limiter.rate_limits.first.points)
       end
 

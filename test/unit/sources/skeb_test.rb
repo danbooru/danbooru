@@ -51,7 +51,7 @@ module Sources
     context "A post with a smaller unwatermarked version" do
       should "get the smaller but clean picture" do
         site = Source::Extractor.find("https://skeb.jp/@2gi0gi_/works/13")
-        assert_equal(["https://skeb.imgix.net/requests/191942_0?bg=%23fff&fm=jpg&q=45&w=696&s=5783ee951cc55d183713395926389453"], site.image_urls)
+        assert_equal(["https://si.imgix.net/a5dd8523/requests/191942_0?bg=%23fff&fm=jpg&q=45&w=696&s=52ad749a9440fe471e3b7ceea2a3c1f1"], site.image_urls)
       end
     end
 
@@ -77,8 +77,8 @@ module Sources
       should "get both correctly and in the right order" do
         site = Source::Extractor.find("https://skeb.jp/@LambOic029/works/146")
         image_urls = %w[
-          https://skeb.imgix.net/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=7dbecbeb7b05394537b60c881a081776
-          https://skeb.imgix.net/uploads/origins/e888bb27-e1a6-48ec-a317-7615252ff818?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=64713510bc4a36b3422dff4b93e4ae87
+          https://si.imgix.net/5827955f/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=a526036c5ee23d52045f382ea627511f
+          https://si.imgix.net/51934468/uploads/origins/e888bb27-e1a6-48ec-a317-7615252ff818?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=86103e0336f9199170ec4aebdda7a430
         ]
 
         assert_equal(image_urls, site.image_urls)
@@ -104,7 +104,7 @@ module Sources
       # page: https://skeb.jp/@LambOic029/works/146
       strategy_should_work(
         "https://skeb.imgix.net/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=7dbecbeb7b05394537b60c881a081776",
-        media_files: [{ file_size: 126_690 }],
+        media_files: [{ file_size: 123_820 }],
       )
     end
 

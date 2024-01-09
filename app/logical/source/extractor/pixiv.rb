@@ -11,12 +11,12 @@ module Source
       def self.to_dtext(text)
         return nil if text.nil?
 
-        text = text.gsub(%r{<a href="https?://www\.pixiv\.net/en/artworks/([0-9]+)">illust/[0-9]+</a>}i) do |_match|
+        text = text.gsub(%r{<a href="https?://www\.pixiv\.net/(?:[a-z]+/)?artworks/([0-9]+)">illust/[0-9]+</a>}i) do |_match|
           pixiv_id = $1
           %(pixiv ##{pixiv_id} "»":[#{Routes.posts_path(tags: "pixiv:#{pixiv_id}")}])
         end
 
-        text = text.gsub(%r{<a href="https?://www\.pixiv\.net/en/users/([0-9]+)">user/[0-9]+</a>}i) do |_match|
+        text = text.gsub(%r{<a href="https?://www\.pixiv\.net/(?:[a-z]+/)?users/([0-9]+)">user/[0-9]+</a>}i) do |_match|
           member_id = $1
           profile_url = "https://www.pixiv.net/users/#{member_id}"
 

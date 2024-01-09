@@ -479,6 +479,29 @@ module Danbooru
     def twitter_csrf_token
     end
 
+    # Your Xfolio "xfolio_session" cookie. Login to Xfolio then use the
+    # devtools to find the "xfolio_session" cookie.
+    def xfolio_session
+    end
+
+    # Your Ci-En "ci_en_session" cookie. Login to Ci-En then use the
+    # devtools to find the "ci_en_session" cookie.
+    def ci_en_session_cookie
+    end
+
+    # Your Poipiku "POIPIKU_LK" cookie. Login to Poipiku then use the
+    # devtools to find the "POIPIKU_LK" cookie.
+    def poipiku_session_cookie
+    end
+
+    # Your Zerochan user ID. Login to Zerochan then use the devtools to find the "z_id" cookie.
+    def zerochan_user_id
+    end
+
+    # Your Zerochan "z_hash" cookie. Login to Zerochan then use the devtools to find the "z_hash" cookie.
+    def zerochan_session_cookie
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch

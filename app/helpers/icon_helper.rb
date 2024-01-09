@@ -40,6 +40,7 @@ module IconHelper
     Cafe24
     Carrd
     Catbox
+    Ci-En
     Circle.ms
     Class101
     Clip\ Studio
@@ -50,6 +51,7 @@ module IconHelper
     Curious\ Cat
     DLSite
     Danbooru
+    DC\ Inside
     Deviant\ Art
     Discord
     Doujinshi.org
@@ -222,6 +224,7 @@ module IconHelper
     Willow
     Wix
     WordPress
+    Xfolio
     Yahoo
     Yande.re
     Yfrog

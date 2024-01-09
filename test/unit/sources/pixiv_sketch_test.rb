@@ -4,30 +4,30 @@ module Sources
   class PixivSketchTest < ActiveSupport::TestCase
     context "A Pixiv Sketch post" do
       strategy_should_work(
-        "https://sketch.pixiv.net/items/5835314698645024323",
-        image_urls: ["https://img-sketch.pixiv.net/uploads/medium/file/9986983/8431631593768139653.jpg"],
-        page_url: "https://sketch.pixiv.net/items/5835314698645024323",
-        profile_urls: ["https://sketch.pixiv.net/@user_ejkv8372", "https://www.pixiv.net/users/44772126"],
-        profile_url: "https://sketch.pixiv.net/@user_ejkv8372",
-        artist_name: "user_ejkv8372",
-        other_names: ["user_ejkv8372", "サコ"],
-        artist_commentary_desc: "🍻シャンクスとミホーク誕生日おめでとう🍻（過去絵） ",
-        tags: []
+        "https://sketch.pixiv.net/items/1086346113447960710",
+        image_urls: ["https://img-sketch.pixiv.net/uploads/medium/file/10300644/640285025392668842.jpg"],
+        page_url: "https://sketch.pixiv.net/items/1086346113447960710",
+        profile_urls: ["https://sketch.pixiv.net/@rinnoji522", "https://www.pixiv.net/users/2556276"],
+        profile_url: "https://sketch.pixiv.net/@rinnoji522",
+        artist_name: "rinnoji522",
+        other_names: ["rinnoji522", "りんのじ"],
+        artist_commentary_desc: "#アプリコット #いよわ #いよわガールズ",
+        tags: %w[アプリコット いよわ いよわガールズ],
       )
     end
 
     context "A Pixiv Sketch image with referer" do
       strategy_should_work(
-        "https://img-sketch.pixiv.net/uploads/medium/file/9986983/8431631593768139653.jpg",
-        referer: "https://sketch.pixiv.net/items/5835314698645024323",
-        image_urls: ["https://img-sketch.pixiv.net/uploads/medium/file/9986983/8431631593768139653.jpg"],
-        page_url: "https://sketch.pixiv.net/items/5835314698645024323",
-        profile_urls: ["https://sketch.pixiv.net/@user_ejkv8372", "https://www.pixiv.net/users/44772126"],
-        profile_url: "https://sketch.pixiv.net/@user_ejkv8372",
-        artist_name: "user_ejkv8372",
-        other_names: ["user_ejkv8372", "サコ"],
-        artist_commentary_desc: "🍻シャンクスとミホーク誕生日おめでとう🍻（過去絵） ",
-        tags: []
+        "https://img-sketch.pixiv.net/uploads/medium/file/10300644/640285025392668842.jpg",
+        referer: "https://sketch.pixiv.net/items/1086346113447960710",
+        image_urls: ["https://img-sketch.pixiv.net/uploads/medium/file/10300644/640285025392668842.jpg"],
+        page_url: "https://sketch.pixiv.net/items/1086346113447960710",
+        profile_urls: ["https://sketch.pixiv.net/@rinnoji522", "https://www.pixiv.net/users/2556276"],
+        profile_url: "https://sketch.pixiv.net/@rinnoji522",
+        artist_name: "rinnoji522",
+        other_names: ["rinnoji522", "りんのじ"],
+        artist_commentary_desc: "#アプリコット #いよわ #いよわガールズ",
+        tags: %w[アプリコット いよわ いよわガールズ],
       )
     end
 

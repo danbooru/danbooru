@@ -23,7 +23,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "aaa bbb")
         posts = Post.user_tag_match("aaa", @user)
 
-        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_post_array(posts))
+        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_post_array(posts).map(&:name))
       end
     end
 

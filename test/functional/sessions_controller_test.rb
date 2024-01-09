@@ -108,9 +108,10 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "rate limit logins to 10 per minute per IP" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
         freeze_time
 
-        11.times do
+        10.times do
           post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
           assert_redirected_to posts_path
           assert_equal(@user.id, session[:user_id])
@@ -126,7 +127,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
-        travel 10.seconds
+        travel 65.seconds
         post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_redirected_to posts_path
         assert_equal(@user.id, session[:user_id])
