@@ -33,9 +33,9 @@ class Source::URL::Fandom < Source::URL
     # https://vignette.wikia.nocookie.net/queensblade/images/3/33/WGAIRI1.jpg/
     # https://vignette1.wikia.nocookie.net/valkyriecrusade/images/b/bf/Joan_Of_Arc_H.png/revision/latest?cb=20170801081004
     # https://static.wikia.nocookie.net/valkyriecrusade/images/3/3f/Joan_Of_Arc.png/revision/latest/scale-to-width-down/270?cb=20170801081000
-    in _, "nocookie.net", wiki_db_name, "images", /^\h$/ => subdir1, /^\h\h$/ => subdir2, file, *rest
+    in _, "nocookie.net", wiki_db_name, "images", /^\h$/ => subdir1, /^\h\h$/ => subdir2, filename, *rest
       @wiki_db_name = wiki_db_name
-      @file = file
+      @file = Danbooru::URL.escape(filename)
       @full_image_url = "https://static.wikia.nocookie.net/#{wiki_db_name}/images/#{subdir1}/#{subdir2}/#{file}"
       @page_url = "https://#{wiki}.fandom.com/wiki/Gallery?file=#{file}"
 
