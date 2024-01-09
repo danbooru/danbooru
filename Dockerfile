@@ -242,7 +242,7 @@ COPY --link --from=build-node /usr/local /usr/local
 
 RUN <<EOS
   apt-get install -y --no-install-recommends \
-    postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules libpq5 \
+    postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules libpq5 libpcre3 \
     libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2 libpng16-16 libexpat1 \
     libglib2.0 libgif7 libexif12 libheif1 libvpx8 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
     libreadline8 libarchive-zip-perl tini busybox less ncdu curl
@@ -310,6 +310,18 @@ RUN <<EOS
   userdel ubuntu
   useradd --create-home --user-group danbooru
   ldconfig
+
+  # Test that everything works
+  vips --version
+  node --version
+  ruby --version
+  cjpeg -version
+  ffmpeg -version
+  ffprobe -version
+  exiftool -ver
+  openresty -version
+  bin/rails version
+  #bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
 EOS
 
 USER danbooru
