@@ -59,6 +59,8 @@ class Source::URL::Null < Source::URL
       "DLSite"
     in _, "donmai.us"
       "Danbooru" # hey, that's us!
+    in _, "dcinside.com"
+      "DC Inside"
     in _, ("discordapp.com" | "discordapp.net")
       "Discord"
     in _, "doujinshi.org"
