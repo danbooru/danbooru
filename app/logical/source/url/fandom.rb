@@ -39,6 +39,13 @@ class Source::URL::Fandom < Source::URL
       @full_image_url = "https://static.wikia.nocookie.net/#{wiki_db_name}/images/#{subdir1}/#{subdir2}/#{file}"
       @page_url = "https://#{wiki}.fandom.com/wiki/Gallery?file=#{file}"
 
+    # http://img3.wikia.nocookie.net/__cb20130523100711/typemoon/images/9/96/Caster_Extra_Takeuchi_design_1.png
+    in _, "nocookie.net", subdir1, wiki_db_name, "images", /^\h$/ => subdir2, /^\h\h$/ => subdir3, filename, *rest
+      @wiki_db_name = wiki_db_name
+      @file = Danbooru::URL.escape(filename)
+      @full_image_url = "https://static.wikia.nocookie.net/#{wiki_db_name}/images/#{subdir2}/#{subdir3}/#{file}"
+      @page_url = "https://#{wiki}.fandom.com/wiki/Gallery?file=#{file}"
+
     else
       nil
     end
