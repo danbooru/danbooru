@@ -502,6 +502,10 @@ module Danbooru
     def zerochan_session_cookie
     end
 
+    # https://wiki.inkbunny.net/wiki/API#Quick_Start_Guide
+    def inkbunny_session
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
