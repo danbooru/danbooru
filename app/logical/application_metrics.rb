@@ -458,9 +458,9 @@ class ApplicationMetrics
     end
 
     metrics.set({
-      vips_memory_bytes: Vips.vips_tracked_get_mem,
-      vips_allocations:  Vips.vips_tracked_get_allocs,
-      vips_files:        Vips.vips_tracked_get_files,
+      vips_memory_bytes: Vips.tracked_mem,
+      vips_allocations:  Vips.tracked_allocs,
+      vips_files:        Vips.tracked_files,
     })
 
     if Jemalloc.enabled?
