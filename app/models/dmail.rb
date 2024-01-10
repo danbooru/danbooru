@@ -119,7 +119,8 @@ class Dmail < ApplicationRecord
       # XXX hack so that rails' signed_id mechanism works with our pre-existing dmail keys.
       # https://github.com/rails/rails/blob/main/activerecord/lib/active_record/signed_id.rb
       def signed_id_verifier_secret
-        Rails.application.key_generator.generate_key("dmail_link")
+        key_generator = ActiveSupport::KeyGenerator.new(Rails.application.secret_key_base, iterations: 1000, hash_digest_class: OpenSSL::Digest::SHA1)
+        key_generator.generate_key("dmail_link", 64)
       end
 
       def combine_signed_id_purposes(purpose)

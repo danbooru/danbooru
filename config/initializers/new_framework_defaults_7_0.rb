@@ -23,12 +23,12 @@ Rails.application.config.action_view.apply_stylesheet_media_default = false
 #
 # See upgrading guide for more information on how to build a rotator.
 # https://guides.rubyonrails.org/v7.0/upgrading_ruby_on_rails.html
-# Rails.application.config.active_support.key_generator_hash_digest_class = OpenSSL::Digest::SHA256
+Rails.application.config.active_support.key_generator_hash_digest_class = OpenSSL::Digest::SHA256
 
 # Change the digest class for ActiveSupport::Digest.
 # Changing this default means that for example Etags change and
 # various cache keys leading to cache invalidation.
-# Rails.application.config.active_support.hash_digest_class = OpenSSL::Digest::SHA256
+Rails.application.config.active_support.hash_digest_class = OpenSSL::Digest::SHA256
 
 # Don't override ActiveSupport::TimeWithZone.name and use the default Ruby
 # implementation.
