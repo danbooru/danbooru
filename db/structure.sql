@@ -853,7 +853,8 @@ CREATE TABLE public.good_job_executions (
     serialized_params jsonb,
     scheduled_at timestamp(6) without time zone,
     finished_at timestamp(6) without time zone,
-    error text
+    error text,
+    error_event smallint
 );
 
 
@@ -906,7 +907,9 @@ CREATE TABLE public.good_jobs (
     batch_callback_id uuid,
     is_discrete boolean,
     executions_count integer,
-    job_class text
+    job_class text,
+    error_event smallint,
+    labels text[]
 );
 ALTER TABLE ONLY public.good_jobs ALTER COLUMN finished_at SET STATISTICS 1000;
 
@@ -4354,13 +4357,6 @@ CREATE INDEX index_good_jobs_jobs_on_priority_created_at_when_unfinished ON publ
 
 
 --
--- Name: index_good_jobs_on_active_job_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_good_jobs_on_active_job_id ON public.good_jobs USING btree (active_job_id);
-
-
---
 -- Name: index_good_jobs_on_active_job_id_and_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4389,17 +4385,24 @@ CREATE INDEX index_good_jobs_on_concurrency_key_when_unfinished ON public.good_j
 
 
 --
--- Name: index_good_jobs_on_cron_key_and_created_at; Type: INDEX; Schema: public; Owner: -
+-- Name: index_good_jobs_on_cron_key_and_created_at_cond; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_good_jobs_on_cron_key_and_created_at ON public.good_jobs USING btree (cron_key, created_at);
+CREATE INDEX index_good_jobs_on_cron_key_and_created_at_cond ON public.good_jobs USING btree (cron_key, created_at) WHERE (cron_key IS NOT NULL);
 
 
 --
--- Name: index_good_jobs_on_cron_key_and_cron_at; Type: INDEX; Schema: public; Owner: -
+-- Name: index_good_jobs_on_cron_key_and_cron_at_cond; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_good_jobs_on_cron_key_and_cron_at ON public.good_jobs USING btree (cron_key, cron_at);
+CREATE UNIQUE INDEX index_good_jobs_on_cron_key_and_cron_at_cond ON public.good_jobs USING btree (cron_key, cron_at) WHERE (cron_key IS NOT NULL);
+
+
+--
+-- Name: index_good_jobs_on_labels; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_labels ON public.good_jobs USING gin (labels) WHERE (labels IS NOT NULL);
 
 
 --
@@ -7106,6 +7109,11 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230401013159'),
 ('20230409141638'),
 ('20230522005908'),
-('20230524201206');
+('20230524201206'),
+('20240110180952'),
+('20240110180953'),
+('20240110180954'),
+('20240110180955'),
+('20240110180956');
 
 
