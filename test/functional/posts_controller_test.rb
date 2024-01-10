@@ -587,7 +587,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get_auth post_path(@post), @user
 
           assert_response :success
-          assert_select ".post-flag-reason a:first", true, text: "edit"
+          assert_select ".post-flag-reason a:first", "edit"
         end
       end
 

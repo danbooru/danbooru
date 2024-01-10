@@ -200,7 +200,7 @@ class ServerStatus
   concerning :RedisMethods do
     def redis_info
       return {} if Rails.cache.try(:redis).nil?
-      Rails.cache.redis.info
+      Rails.cache.redis.with(&:info)
     end
 
     def redis_used_memory
