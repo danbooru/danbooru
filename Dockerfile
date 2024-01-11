@@ -267,8 +267,8 @@ COPY --link .yarn/ ./.yarn/
 RUN yarn install
 
 COPY --link postcss.config.js babel.config.json Rakefile ./
-COPY --link bin/rails bin/webpacker ./bin/
-COPY --link config/application.rb config/boot.rb config/danbooru_default_config.rb config/webpacker.yml ./config/
+COPY --link bin/rails bin/shakapacker bin/shakapacker-dev-server ./bin/
+COPY --link config/application.rb config/boot.rb config/danbooru_default_config.rb config/shakapacker.yml ./config/
 COPY --link config/webpack/ ./config/webpack/
 COPY --link public/images ./public/images
 COPY --link public/fonts ./public/fonts
@@ -277,7 +277,7 @@ COPY --link app/javascript/ ./app/javascript/
 
 COPY --link Gemfile Gemfile.lock ./
 COPY --link --from=build-gems /usr/local /usr/local
-RUN bin/rails assets:precompile
+RUN RAILS_ENV=production bin/rails assets:precompile
 
 
 
