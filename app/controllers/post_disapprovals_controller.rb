@@ -3,8 +3,6 @@
 class PostDisapprovalsController < ApplicationController
   respond_to :js, :html, :json, :xml
 
-  rate_limit :destroy, rate: 1.0/1.second, burst: 200
-
   def create
     @post_disapproval = authorize PostDisapproval.new(user: CurrentUser.user, **permitted_attributes(PostDisapproval))
     @post_disapproval.save

@@ -4,7 +4,7 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
-  config.cache_classes = true
+  config.enable_reloading = false
 
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
@@ -13,15 +13,14 @@ Rails.application.configure do
   config.eager_load = true
 
   # Full error reports are disabled and caching is turned on.
-  config.consider_all_requests_local       = false
+  config.consider_all_requests_local = false
   config.action_controller.perform_caching = true
 
-  # Ensures that a master key has been made available in either ENV["RAILS_MASTER_KEY"]
-  # or in config/master.key. This key is used to decrypt credentials (and other encrypted files).
+  # Ensures that a master key has been made available in ENV["RAILS_MASTER_KEY"], config/master.key, or an environment
+  # key such as config/credentials/production.key. This key is used to decrypt credentials (and other encrypted files).
   # config.require_master_key = true
 
-  # Disable serving static files from the `/public` folder by default since
-  # Apache or NGINX already handles this.
+  # Disable serving static files from `public/`, relying on NGINX/Apache to do so instead.
   config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
@@ -35,12 +34,16 @@ Rails.application.configure do
     config.action_dispatch.trusted_proxies = Danbooru.config.trusted_proxies.map { |ip| IPAddr.new(ip) }
   end
 
+  # Assume all access to the app is happening through a SSL-terminating reverse proxy.
+  # Can be used together with config.force_ssl for Strict-Transport-Security and secure cookies.
+  # config.assume_ssl = true
+
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
 
   # Include generic and useful information about system operation, but avoid logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII).
-  config.log_level = :error
+  # config.log_level = :error
 
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
@@ -57,8 +60,6 @@ Rails.application.configure do
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
-
-  config.action_mailer.deliver_later_queue_name = :default
 
   config.action_mailer.default_url_options = { protocol: :https }
 

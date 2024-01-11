@@ -4,7 +4,7 @@ ruby "~> 3.2.1"
 
 gem 'dotenv-rails', :require => "dotenv/rails-now"
 
-gem "rails", "~> 7.0"
+gem "rails", "~> 7.1"
 gem "pg"
 gem "simple_form"
 gem "sanitize"
@@ -53,7 +53,6 @@ gem "crass"
 gem "public_suffix"
 gem "debug"
 gem "ffaker"
-gem "composite_primary_keys"
 gem "resolv"
 gem "rover-df"
 gem "ffi-libarchive"
@@ -70,7 +69,7 @@ gem "drb"
 group :development do
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
-  gem 'meta_request'
+  #gem 'meta_request'
   gem 'rack-mini-profiler'
   gem 'stackprof'
   gem 'flamegraph'
