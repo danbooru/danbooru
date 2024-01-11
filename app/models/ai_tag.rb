@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AITag < ApplicationRecord
-  self.primary_keys = :media_asset_id, :tag_id
+  self.primary_key = :media_asset_id, :tag_id
 
   belongs_to :tag
   belongs_to :media_asset

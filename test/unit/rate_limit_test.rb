@@ -8,19 +8,19 @@ class RateLimitTest < ActiveSupport::TestCase
 
     context "#limit! method" do
       should "create a new rate limit object if none exists, or update it if it already exists" do
-        assert_difference("RateLimit.count", 1) do
+        assert_difference(-> { RateLimit.uncached { RateLimit.count }}) do
           RateLimiter.new("write", ["users/1"]).limited?
         end
 
-        assert_difference("RateLimit.count", 0) do
+        assert_no_difference(-> { RateLimit.uncached { RateLimit.count }}) do
           RateLimiter.new("write", ["users/1"]).limited?
         end
 
-        assert_difference("RateLimit.count", 1) do
+        assert_difference(-> { RateLimit.uncached { RateLimit.count }}) do
           RateLimiter.new("write", ["users/1", "ip/1.2.3.4"]).limited?
         end
 
-        assert_difference("RateLimit.count", 0) do
+        assert_no_difference(-> { RateLimit.uncached { RateLimit.count }}) do
           RateLimiter.new("write", ["users/1", "ip/1.2.3.4"]).limited?
         end
       end

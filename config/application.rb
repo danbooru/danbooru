@@ -4,9 +4,10 @@
 #
 # @see https://guides.rubyonrails.org/initialization.html
 
-require_relative 'boot'
+require_relative "boot"
 
 require "rails"
+# Pick the frameworks you want:
 require "active_model/railtie"
 require "active_job/railtie"
 require "active_record/railtie"
@@ -19,7 +20,8 @@ require "action_view/railtie"
 # require "action_cable/engine"
 require "rails/test_unit/railtie"
 
-# Load the gems for the current Rails environment from the Gemfile.
+# Require the gems listed in Gemfile, including any gems
+# you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
 # Load the default Danbooru configuration from config/danbooru_default_config.rb
@@ -45,9 +47,25 @@ module Danbooru
     config.app_generators.scaffold_controller :responders_controller
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 6.1
+    config.load_defaults 7.0
     config.active_record.schema_format = :sql
-    config.encoding = "utf-8"
+
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    config.autoload_lib(ignore: %w(assets tasks))
+
+    # Configuration for the application, engines, and railties goes here.
+    #
+    # These settings can be overridden in specific environments using the files
+    # in config/environments, which are processed later.
+    #
+    # config.time_zone = "Central Time (US & Canada)"
+    # config.eager_load_paths << Rails.root.join("extras")
+
+    config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical/concerns #{config.root}/app/logical #{config.root}/app/mailers)
+    config.time_zone = 'Eastern Time (US & Canada)'
+    config.active_model.i18n_customize_full_message = true
 
     # Hide sensitive model attributes and request params in exception messages
     # and logs. These are substring matches, so they match any attribute or
@@ -55,13 +73,6 @@ module Danbooru
     #
     # https://guides.rubyonrails.org/configuring.html#config-filter-parameters
     config.filter_parameters += [:password, :api_key, :secret, :ip_addr, :address, :email_verification_key, :signed_user_id] if Rails.env.production?
-
-    # config.assets.enabled = true
-    # config.assets.version = '1.0'
-    config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical/concerns #{config.root}/app/logical #{config.root}/app/mailers)
-    config.plugins = [:all]
-    config.time_zone = 'Eastern Time (US & Canada)'
-    config.active_model.i18n_customize_full_message = true
 
     raise "Danbooru.config.secret_key_base not configured" if Danbooru.config.secret_key_base.blank?
     config.secret_key_base = Danbooru.config.secret_key_base
