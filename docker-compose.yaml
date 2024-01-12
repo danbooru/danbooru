@@ -80,7 +80,7 @@ services:
     image: redis
 
   postgres:
-    image: evazion/postgres
+    image: ghcr.io/danbooru/postgres:16.1
     environment:
       POSTGRES_USER: danbooru
       POSTGRES_HOST_AUTH_METHOD: trust
