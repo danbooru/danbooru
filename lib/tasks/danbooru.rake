@@ -86,19 +86,20 @@ namespace :danbooru do
       end
     end
 
-    # Usage: TAGS="touhou" bin/rails danbooru:images:backup
-    desc "Backup images"
+    desc "Backup images to an archive file. Usage: bin/rails danbooru:images:backup > danbooru-images.tar"
     task backup: :environment do
-      CurrentUser.user = User.system
-      sm = Danbooru.config.backup_storage_manager
-      tags = ENV["TAGS"]
-      posts = Post.system_tag_match(tags)
+      manager = Danbooru.config.storage_manager
+      raise "Can't backup images since images aren't stored locally. Backup your images manually." if !manager.is_a?(StorageManager::Local)
 
-      posts.parallel_find_each do |post|
-        sm.store_file(post.file(:preview), post, :preview) if post.has_preview?
-        sm.store_file(post.file(:sample), post, :sample) if post.has_large?
-        sm.store_file(post.file(:original), post, :original)
-      end
+      system(*%W[tar -cvC #{manager.base_dir} .])
+    end
+
+    desc "Restore images from backup. Usage: bin/rails danbooru:images:restore < danbooru-images.tar"
+    task restore: :environment do
+      manager = Danbooru.config.storage_manager
+      raise "Can't restore images since images aren't stored locally. Restore your images manually." if !manager.is_a?(StorageManager::Local)
+
+      system(*%W[tar -xv -C #{manager.base_dir}])
     end
   end
 
@@ -148,6 +149,22 @@ namespace :danbooru do
     desc "Run monthly maintenance jobs"
     task monthly: :environment do
       DanbooruMaintenance.monthly
+    end
+  end
+
+  namespace :database do
+    desc "Backup the database to a file. Usage: bin/rails danbooru:database:backup > danbooru-backup.pg_dump"
+    task backup: :environment do
+      postgres_url = ActiveRecord::Base.configurations.find_db_config(Rails.env).url
+      STDERR.puts "pg_dumpall --clean --if-exists --verbose --dbname #{postgres_url}"
+      system(*%W[pg_dumpall --clean --if-exists --verbose --dbname #{postgres_url}])
+    end
+
+    desc "Restore the database from a backup. Usage: bin/rails danbooru:database:restore < danbooru-backup.pg_dump"
+    task restore: :environment do
+      postgres_url = ActiveRecord::Base.configurations.find_db_config(Rails.env).url
+      STDERR.puts "psql --echo-all #{postgres_url}"
+      system(*%W[psql --echo-all #{postgres_url}])
     end
   end
 end
