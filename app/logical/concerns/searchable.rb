@@ -653,7 +653,7 @@ module Searchable
           through_association = association.through_reflection
 
           source_subquery = source_association.klass.visible(current_user).search(params[attr], current_user).reorder(nil)
-          through_subquery = through_association.klass.visible(current_user).where(attr => source_subquery)
+          through_subquery = through_association.klass.visible(current_user).where(source_association.name => source_subquery)
           relation = visible(relation, attr).where(through_association.name => through_subquery)
         else
           relation = visible(relation, attr).where(attr => model.visible(current_user).search(params[attr], current_user).reorder(nil))
