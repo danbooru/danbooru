@@ -45,6 +45,7 @@ gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
 gem 'clockwork'
 gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
+gem "rackup"
 gem "parallel"
 gem "ffi"
 gem "rbtrace"

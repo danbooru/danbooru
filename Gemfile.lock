@@ -619,6 +619,7 @@ DEPENDENCIES
   pundit
   rack-mini-profiler
   rack-timeout
+  rackup
   rails (~> 7.1)
   rake
   rakismet
