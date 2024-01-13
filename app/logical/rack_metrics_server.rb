@@ -15,7 +15,7 @@ class RackMetricsServer
   end
 
   def start
-    @server = Rack::Handler.get("webrick")
+    @server = Rackup::Handler.get("webrick")
     @thread = Thread.new do
       @server.run(self, Host: host, Port: port, **options)
     end
