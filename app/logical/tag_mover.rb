@@ -72,6 +72,7 @@ class TagMover
   # Retag the posts from the old tag to the new tag.
   def move_posts!
     Post.raw_tag_match(old_tag.name).reorder(nil).parallel_find_each do |post|
+      DanbooruLogger.info("post ##{post.id}: moving #{old_tag.name} -> #{new_tag.name}")
       post.lock!
       post.remove_tag(old_tag.name)
       post.add_tag(new_tag.name)

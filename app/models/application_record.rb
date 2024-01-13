@@ -273,15 +273,14 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :ConcurrencyMethods do
     class_methods do
-      def parallel_find_each(batch_size: 1000, in_processes: Danbooru.config.max_concurrency.to_i, in_threads: nil, &block)
+      def parallel_find_each(batch_size: 1000, in_threads: Danbooru.config.max_concurrency.to_i, in_processes: nil, &block)
         # XXX We may deadlock if a transaction is open; do a non-parallel each.
         return find_each(&block) if connection.transaction_open?
 
-        # XXX Use threads in testing because processes can't see each other's
-        # database transactions.
-        if Rails.env.test?
+        # XXX Use threads in testing because processes can't see each other's database transactions.
+        if Rails.env.test? && in_processes.present?
+          in_threads = in_processes
           in_processes = nil
-          in_threads = 2
         end
 
         current_user = CurrentUser.user
