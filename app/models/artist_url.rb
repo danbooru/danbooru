@@ -86,6 +86,8 @@ class ArtistURL < ApplicationRecord
       true
     when %r{misskey\.(?:io|art|design)/users}i
       true
+    when %r{inkbunny\.net/user\.php}i
+      true
     else
       false
     end
