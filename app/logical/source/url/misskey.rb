@@ -4,7 +4,9 @@ class Source::URL::Misskey < Source::URL
   attr_reader :username, :user_id, :note_id
 
   def self.match?(url)
-    url.domain.in?(%w[misskey.io misskey.art misskey.design]) || (url.host == "s3.arkjp.net" && url.path.include?("/misskey/"))
+    url.domain.in?(%w[misskey.io misskey.art misskey.design]) ||
+      (url.host == "media.misskeyusercontent.com" && url.path.starts_with?("/io/")) ||
+      (url.host == "s3.arkjp.net" && url.path.starts_with?("/misskey/"))
   end
 
   def parse
@@ -30,7 +32,7 @@ class Source::URL::Misskey < Source::URL
   end
 
   def site_name
-    if host == "s3.arkjp.net"
+    if host.in?(%w[s3.arkjp.net media.misskeyusercontent.com])
       "Misskey.io"
     else
       domain.capitalize
@@ -38,7 +40,9 @@ class Source::URL::Misskey < Source::URL
   end
 
   def image_url?
-    host == "s3.arkjp.net" || (host == "misskey.art" && path.starts_with?("/files/")) || (host == "misskey.design" && path.starts_with?("/post/"))
+    host.in?(%w[s3.arkjp.net media.misskeyusercontent.com]) ||
+      (host == "misskey.art" && path.starts_with?("/files/")) ||
+      (host == "misskey.design" && path.starts_with?("/post/"))
   end
 
   def page_url
