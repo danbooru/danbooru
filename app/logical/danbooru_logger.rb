@@ -6,6 +6,20 @@
 class DanbooruLogger
   HEADERS = %w[referer sec-fetch-dest sec-fetch-mode sec-fetch-site sec-fetch-user]
 
+  attr_reader :logger, :default_level
+
+  # @param logger [Logger] The logger to send messages to.
+  # @param default_level [Integer] The default log level for messages added with `<<`.
+  def initialize(logger: Rails.logger, default_level: Logger::INFO)
+    @logger = logger
+    @default_level = default_level
+  end
+
+  # Log a message at the default log level.
+  def <<(message)
+    logger.add(default_level, message.chomp)
+  end
+
   # Log a message to the Rails log and to the APM.
   #
   # @param message [String] the message to log

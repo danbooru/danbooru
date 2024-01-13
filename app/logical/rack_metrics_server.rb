@@ -17,7 +17,8 @@ class RackMetricsServer
   def start
     @server = Rackup::Handler.get("webrick")
     @thread = Thread.new do
-      @server.run(self, Host: host, Port: port, **options)
+      logger = DanbooruLogger.new(default_level: Logger::DEBUG)
+      @server.run(self, Host: host, Port: port, AccessLog: [[logger, WEBrick::AccessLog::COMBINED_LOG_FORMAT]], **options)
     end
 
     self
