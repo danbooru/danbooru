@@ -60,6 +60,13 @@
 #  # Start a Postgres shell inside the instance (for debugging)
 #  docker compose run --rm danbooru bin/rails dbconsole -p
 #
+#  # Start two instances of Danbooru at the same time, one named `danbooru-latest` and the other
+#  # `danbooru-production`. Good for comparing two different versions of Danbooru.
+#  DANBOORU_PORT=3000 DANBOORU_IMAGE=ghcr.io/danbooru/danbooru:latest docker compose -p danbooru-latest up
+#  DANBOORU_PORT=3001 DANBOORU_IMAGE=ghcr.io/danbooru/danbooru:production docker compose -p danbooru-production up
+#  docker compose -p danbooru-latest down --volumes
+#  docker compose -p danbooru-production down --volumes
+#
 #  # Show the logs for the Danbooru container.
 #  docker compose logs -f danbooru
 #
@@ -90,7 +97,7 @@ x-base-template: &base-template
     # You can set DANBOORU_CANONICAL_URL if you have a domain name for your site.
     # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
     # DANBOORU_HOSTNAME: danbooru.mydomain.com
-    DANBOORU_CANONICAL_URL: http://localhost:3000
+    DANBOORU_CANONICAL_URL: http://localhost:${DANBOORU_PORT:-3000}
 
     # You should set DANBOORU_SECRET_KEY_BASE to a random secret string. If you
     # don't set this, you will be logged out every time you restart the instance.
@@ -120,7 +127,7 @@ services:
   danbooru:
     <<: *base-template
     ports:
-      - "3000:3000"
+      - "${DANBOORU_PORT:-3000}:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -184,8 +191,8 @@ configs:
 
 volumes:
   danbooru-images:
-    name: danbooru-images
+    name: ${COMPOSE_PROJECT_NAME}-images
   danbooru-data:
-    name: danbooru-data
+    name: ${COMPOSE_PROJECT_NAME}-data
   iqdb-data:
-    name: iqdb-data
+    name: ${COMPOSE_PROJECT_NAME}-iqdb-data
