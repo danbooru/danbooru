@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ForumPost < ApplicationRecord
-  attr_readonly :topic_id
+  # attr_readonly :topic_id # XXX broken by accepts_nested_attributes_for in ForumTopic
   attr_accessor :creator_ip_addr
 
   belongs_to :creator, class_name: "User"

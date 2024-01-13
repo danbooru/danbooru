@@ -297,6 +297,13 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to forum_topic_path(@forum_topic)
         assert_equal("test", @forum_topic.reload.title)
       end
+
+      should "allow users to update the OP" do
+        put_auth forum_topic_path(@forum_topic), @user, params: { forum_topic: { original_post_attributes: { body: "test", id: @forum_topic.original_post.id }}}
+
+        assert_redirected_to forum_topic_path(@forum_topic)
+        assert_equal("test", @forum_topic.original_post.reload.body)
+      end
     end
 
     context "destroy action" do
