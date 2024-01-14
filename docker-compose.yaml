@@ -119,8 +119,6 @@ x-base-template: &base-template
   configs:
     - source: danbooru_local_config
       target: /danbooru/config/danbooru_local_config.rb
-    - source: env
-      target: /danbooru/.env.local
 
 services:
   danbooru:
@@ -197,8 +195,6 @@ services:
 configs:
   danbooru_local_config:
     file: config/danbooru_local_config.rb
-  env:
-    file: .env.local
   nginx:
     file: config/nginx.conf
 
