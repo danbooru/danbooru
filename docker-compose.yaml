@@ -105,7 +105,6 @@ x-base-template: &base-template
     # Keep this secret. If someone finds this out, they will be able to log in as any user.
     # DANBOORU_SECRET_KEY_BASE: "<random secret password>"
 
-    RAILS_SERVE_STATIC_FILES: "true"
     DATABASE_URL: postgresql://danbooru@postgres/danbooru
     DANBOORU_REDIS_URL: redis://redis:6379
     DANBOORU_IQDB_URL: http://iqdb:5588
@@ -126,8 +125,6 @@ x-base-template: &base-template
 services:
   danbooru:
     <<: *base-template
-    ports:
-      - "${DANBOORU_PORT:-3000}:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -183,11 +180,27 @@ services:
     volumes:
       - "danbooru-data:/var/lib/postgresql/data"
 
+  nginx:
+    image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:production}
+    command: ["openresty", "-e", "/dev/stderr"]
+    ports:
+      - "${DANBOORU_PORT:-3000}:3000"
+    depends_on:
+      danbooru:
+        condition: service_started
+    configs:
+      - source: nginx
+        target: /usr/local/nginx/conf/nginx.conf
+    volumes:
+      - "danbooru-images:/danbooru/public/data"
+
 configs:
   danbooru_local_config:
     file: config/danbooru_local_config.rb
   env:
     file: .env.local
+  nginx:
+    file: config/nginx.conf
 
 volumes:
   danbooru-images:
