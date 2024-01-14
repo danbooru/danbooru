@@ -108,11 +108,12 @@ x-base-template: &base-template
     DATABASE_URL: postgresql://danbooru@postgres/danbooru
     DANBOORU_REDIS_URL: redis://redis:6379
     DANBOORU_IQDB_URL: http://iqdb:5588
+    DANBOORU_IMAGE_STORAGE_PATH: /images
 
   volumes:
     - target: /tmp
       type: tmpfs
-    - danbooru-images:/danbooru/public/data
+    - danbooru-images:/images
     # If you want to do local development, you can uncomment this line to force the container to use your local changes
     # - "$PWD:/danbooru"
 
@@ -190,7 +191,7 @@ services:
       - source: nginx
         target: /usr/local/nginx/conf/nginx.conf
     volumes:
-      - "danbooru-images:/danbooru/public/data"
+      - "danbooru-images:/images"
 
 configs:
   danbooru_local_config:

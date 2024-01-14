@@ -334,12 +334,17 @@ module Danbooru
       # "/#{variant.type}/#{variant.md5[0..1]}/#{variant.md5[2..3]}/#{custom_filename}#{file_prefix}#{variant.md5}.#{variant.file_ext}"
     end
 
-    # The method to use for storing uploaded files. By default, uploads are stored under `public/data`.
+    # The location where images should be stored. By default, images are stored under `public/data`.
+    def image_storage_path
+      Rails.root.join("public/data")
+    end
+
+    # The method to use for storing uploaded files.
     def storage_manager
       # Store files on the local filesystem.
       # base_dir - where to store files (default: under public/data)
       # base_url - where to serve files from (default: https://#{hostname}/data)
-      StorageManager::Local.new(base_url: "#{Danbooru.config.canonical_url}/data", base_dir: Rails.root.join("public/data"))
+      StorageManager::Local.new(base_url: "#{Danbooru.config.canonical_url}/data", base_dir: Danbooru.config.image_storage_path)
     end
 
     # The method to use for backing up image files.
