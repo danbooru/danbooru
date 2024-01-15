@@ -373,6 +373,20 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(1, upload.media_assets.first.ai_tags.count)
       end
 
+      should "create AI tags if they don't exist" do
+        assert_equal(false, Tag.exists?(name: "new_tag"))
+        assert_equal(false, Tag.exists?(name: "rating:g"))
+
+        mock_autotagger_evaluate({ "new_tag": 0.542, "rating:g": 0.249 })
+        upload = assert_successful_upload("test/files/test.jpg")
+        asset = upload.media_assets.first
+
+        assert_equal(2, asset.ai_tags.count)
+        assert_equal(true, Tag.exists?(name: "new_tag"))
+        assert_equal(true, Tag.exists?(name: "rating:g"))
+        assert_equal([["new_tag", 54], ["rating:g", 25]], asset.ai_tags.map { |ai| [ai.tag.name, ai.score] }.sort)
+      end
+
       should "save the EXIF metadata" do
         upload = assert_successful_upload("test/files/test.jpg")
 

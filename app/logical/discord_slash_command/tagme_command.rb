@@ -36,12 +36,11 @@ class DiscordSlashCommand
       file = extractor.download_file!(image_url)
 
       preview = file.preview(size, size)
-      tags = autotagger.evaluate(preview, limit: limit, confidence: confidence).to_a
-      tags = tags.sort_by { |tag, confidence| [TagCategory.split_header_list.index(tag.category_name.downcase), -confidence] }.to_h
+      ai_tags = autotagger.evaluate!(preview, limit: limit, confidence: confidence)
 
       return {
         embeds: [{
-          description: build_tag_list(tags),
+          description: build_tag_list(ai_tags),
           author: {
             name: "#{Danbooru.config.app_name} Autotagger",
             url: "https://github.com/danbooru/autotagger",
@@ -72,11 +71,15 @@ class DiscordSlashCommand
       nil
     end
 
-    def build_tag_list(tags)
+    def build_tag_list(ai_tags)
       msg = ""
 
-      tags.each do |tag, confidence|
-        msg += "#{(100*confidence).to_i}% [#{tag.name}](#{Routes.posts_url(tags: tag.name)})\n"
+      ai_tags = ai_tags.sort_by do |ai_tag|
+        [TagCategory.split_header_list.index(ai_tag.tag.category_name.downcase), -ai_tag.score]
+      end
+
+      ai_tags.each do |ai_tag|
+        msg += "#{ai_tag.score}% [#{ai_tag.tag.name}](#{Routes.posts_url(tags: ai_tag.tag.name)})\n"
         break if msg.size >= DiscordApiClient::MAX_MESSAGE_LENGTH
       end
 

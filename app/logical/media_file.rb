@@ -242,11 +242,7 @@ class MediaFile
   #
   # @return [Array<AITag>] The list of AI tags.
   def ai_tags(autotagger: AutotaggerClient.new)
-    tags = autotagger.evaluate(self)
-
-    tags.map do |tag, score|
-      AITag.new(tag: tag, score: (100*score).round)
-    end
+    autotagger.evaluate!(self)
   end
 
   def attributes
