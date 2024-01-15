@@ -44,11 +44,13 @@ module Source
         if t_work_id.present?
           data.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.map do |text_node|
             case text_node["type"]
-            when "RICH_TEXT_NODE_TYPE_BV"
+            when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB"
               "<a href='#{URI.join("https://", text_node["jump_url"])}'>#{text_node["text"]}</a>"
             when "RICH_TEXT_NODE_TYPE_EMOJI"
-              " #{text_node.dig("emoji", "icon_url")} "
-            else # RICH_TEXT_NODE_TYPE_AT (mentions), RICH_TEXT_NODE_TYPE_TEXT (text), RICH_TEXT_NODE_TYPE_TOPIC (hashtags)
+              "<a href='#{text_node.dig("emoji", "icon_url")}'>#{text_node["text"]}</a>"
+            when "RICH_TEXT_NODE_TYPE_AT"
+              "<a href='https://space.bilibili.com/#{text_node["rid"]}/dynamic'>#{text_node["text"]}</a>"
+            else # RICH_TEXT_NODE_TYPE_TEXT (text), unrecognized nodes, etc.
               text_node["text"]
             end
           end.join
