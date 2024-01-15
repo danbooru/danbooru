@@ -5,6 +5,8 @@
 # @see https://autotagger.donmai.us
 # @see https://github.com/danbooru/autotagger
 class AutotaggerClient
+  class Error < StandardError; end
+
   attr_reader :autotagger_url, :http
 
   def initialize(autotagger_url: Danbooru.config.autotagger_url.to_s, http: Danbooru::Http.internal)
@@ -28,7 +30,8 @@ class AutotaggerClient
     response.parse.first["tags"].with_indifferent_access
   end
 
-  # Get the AI tags for an image as an array of AITags. Creates new tags if they don't already exist.
+  # Get the AI tags for an image as an array of AITags. Creates new tags if they don't already exist. Raises an error
+  # if the API call fails.
   #
   # @param file [File] The image file.
   # @param limit [Integer] The maximum number of tags to return.
@@ -38,7 +41,7 @@ class AutotaggerClient
     return {} if autotagger_url.blank?
 
     response = http.post("#{autotagger_url}/evaluate", form: { file: HTTP::FormData::File.new(file), threshold: confidence, format: "json" })
-    return {} if autotagger_url.blank?
+    raise Error, "Autotagger failed (code #{response.code})" if !response.status.success?
 
     tag_names_with_scores = response.parse.first["tags"]
     tag_names = tag_names_with_scores.keys
