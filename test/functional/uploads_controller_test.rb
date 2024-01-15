@@ -387,6 +387,14 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal([["new_tag", 54], ["rating:g", 25]], asset.ai_tags.map { |ai| [ai.tag.name, ai.score] }.sort)
       end
 
+      should "fail the upload if the autotagger is enabled but isn't functioning" do
+        mock_autotagger_failure
+        create_upload!("test/files/test.jpg", user: @user)
+
+        assert_response 201
+        assert_match("Autotagger failed", Upload.last.error)
+      end
+
       should "save the EXIF metadata" do
         upload = assert_successful_upload("test/files/test.jpg")
 
