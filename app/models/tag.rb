@@ -6,7 +6,7 @@ class Tag < ApplicationRecord
   # Tags that are permitted to have unbalanced parentheses, as a special exception to the normal rule that parentheses in tags must balanced.
   PERMITTED_UNBALANCED_TAGS = %w[:) :( ;) ;( >:) >:(]
 
-  attr_accessor :updater
+  attr_accessor :updater, :skip_name_validation
 
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
@@ -19,7 +19,8 @@ class Tag < ApplicationRecord
   has_many :reactions, as: :model, dependent: :destroy
   has_many :ai_tags
 
-  validates :name, tag_name: true, uniqueness: true, on: :create
+  validates :name, tag_name: true, on: :create, unless: :skip_name_validation
+  validates :name, uniqueness: true, on: :create
   validates :name, tag_name: true, on: :name
   validates :category, inclusion: { in: TagCategory.category_ids }
   validate :validate_category, if: :category_changed?
@@ -214,18 +215,18 @@ class Tag < ApplicationRecord
         names.map {|x| find_or_create_by_name(x).name}
       end
 
-      def find_or_create_by_name(name, category: nil, current_user: nil)
+      def find_or_create_by_name(name, category: nil, current_user: nil, **options)
         cat_id = categories.value_for(category)
         tag = Tag.find_by(name: normalize_name(name))
 
         if tag.nil?
-          tag = Tag.new(name: normalize_name(name), category: cat_id)
+          tag = Tag.new(name: normalize_name(name), category: cat_id, **options)
           saved = tag.save_if_unique(:name)
           tag = Tag.find_by!(name: normalize_name(name)) if !saved && tag.errors.of_kind?(:name, :taken)
         end
 
         if category.present? && current_user.present? && cat_id != tag.category && Pundit.policy!(current_user, tag).can_change_category?
-          tag.update(category: cat_id, updater: current_user)
+          tag.update(category: cat_id, updater: current_user, **options)
         end
 
         tag
