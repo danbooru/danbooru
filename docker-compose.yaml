@@ -90,6 +90,12 @@ x-base-template: &base-template
   read_only: true
   restart: unless-stopped
 
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
+    start_period: 15s
+    interval: 10s
+    retries: 1
+
   environment:
     # You can set RAILS_ENV to `development` if you plan on editing the code.
     RAILS_ENV: production
@@ -128,10 +134,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://danbooru:3000/up"]
-      start_period: 15s
-      retries: 1
     command: ["bash", "-c", "bin/rails db:prepare && bin/rails server -b 0.0.0.0"]
 
   cron:
@@ -139,10 +141,6 @@ services:
     depends_on:
       danbooru:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://cron:3000/health"]
-      interval: 10s
-      retries: 1
     command: ["bin/rails", "danbooru:cron"]
 
   jobs:
@@ -150,10 +148,6 @@ services:
     depends_on:
       danbooru:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://jobs:3000/health"]
-      interval: 10s
-      retries: 1
     command: ["bin/good_job", "start"]
 
   # https://github.com/danbooru/iqdb
