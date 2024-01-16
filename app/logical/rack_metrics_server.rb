@@ -28,7 +28,7 @@ class RackMetricsServer
     request = Rack::Request.new(env)
 
     case request.path_info
-    when "/health"
+    when "/health", "/healthz", "/up"
       [200, {}, []]
     when "/metrics", "/metrics/instance"
       metrics = ApplicationMetrics.update_process_metrics.to_prom
