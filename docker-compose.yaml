@@ -97,9 +97,6 @@ x-base-template: &base-template
     retries: 1
 
   environment:
-    # You can set RAILS_ENV to `development` if you plan on editing the code.
-    RAILS_ENV: production
-
     # You can set DANBOORU_CANONICAL_URL if you have a domain name for your site.
     # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
     # DANBOORU_HOSTNAME: danbooru.mydomain.com
@@ -111,6 +108,8 @@ x-base-template: &base-template
     # Keep this secret. If someone finds this out, they will be able to log in as any user.
     # DANBOORU_SECRET_KEY_BASE: "<random secret password>"
 
+    # Don't change the options below.
+    RAILS_ENV: production
     DATABASE_URL: postgresql://danbooru@postgres/danbooru
     DANBOORU_REDIS_URL: redis://redis:6379
     DANBOORU_IQDB_URL: http://iqdb:5588
@@ -121,8 +120,6 @@ x-base-template: &base-template
     - target: /tmp
       type: tmpfs
     - danbooru-images:/images
-    # If you want to do local development, you can uncomment this line to force the container to use your local changes
-    # - "$PWD:/danbooru"
 
   configs:
     - source: danbooru_local_config

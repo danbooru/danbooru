@@ -99,7 +99,8 @@ development:
     # Should we use gzip compression?
     compress: true
     # Note that apps that do not check the host are vulnerable to DNS rebinding attacks
-    allowed_hosts: 'auto'
+    # "webpack" is used as the hostname for the shakapacker-dev-server in the docker-compose.yaml file.
+    allowed_hosts: ["localhost", "webpack"]
     # Shows progress and colorizes output of bin/shakapacker[-dev-server]
     pretty: true
     headers:

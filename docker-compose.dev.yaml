@@ -1,0 +1,146 @@
+# This is a Docker Compose file that will launch a Danbooru instance in development mode. Use this
+# if you want to work on the site or make any changes to the code.
+#
+# The difference from a normal instance is that in development mode you can edit the code
+# from outside the container and changes will be picked up immediately, without having to restart the
+# container or rebuild the Docker image. There are also additional tools to make debugging easier.
+#
+# Do not put your development instance on the open internet or let anyone else have access to it.
+# Anyone with access to your development instance will be able to run arbitrary code, for example by
+# triggering an exception and using the Ruby console on the error page.
+#
+# ## Usage
+#
+#   # Check out the code first.
+#   $ git clone https://github.com/danbooru/danbooru
+#   $ cd danbooru
+#
+#   # Start a Devbooru instance on http://localhost:3000.
+#   $ docker compose -f docker-compose.dev.yaml up
+#
+#   # You can use `bin/dev` as a shortcut for `docker compose -f docker-compose.dev.yaml`.
+#   $ bin/dev up
+
+name: devbooru
+
+x-base-template: &base-template
+  # Use the latest unstable version from master, instead of the production version.
+  image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:master}
+
+  read_only: true
+  restart: unless-stopped
+
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
+    start_period: 15s
+    interval: 10s
+    retries: 1
+
+  environment:
+    DANBOORU_APP_NAME: "Devbooru"
+
+    # You can set DANBOORU_CANONICAL_URL if you have a domain name for your site.
+    # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
+    # DANBOORU_HOSTNAME: danbooru.mydomain.com
+    DANBOORU_CANONICAL_URL: http://localhost:${DANBOORU_PORT:-3000}
+
+    # This is insecure because it lets anyone login to your development instance. This is okay
+    # because giving others access is insecure anyway.
+    DANBOORU_SECRET_KEY_BASE: "insecure"
+
+    RAILS_ENV: development
+    DATABASE_URL: postgresql://danbooru@postgres/danbooru
+    DANBOORU_REDIS_URL: redis://redis:6379
+    DANBOORU_IQDB_URL: http://iqdb:5588
+    DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
+    DANBOORU_IMAGE_STORAGE_PATH: /images
+    SHAKAPACKER_DEV_SERVER_HOST: webpack
+
+  volumes:
+    - target: /tmp
+      type: tmpfs
+    - danbooru-images:/images
+    - ./:/danbooru
+
+services:
+  danbooru:
+    <<: *base-template
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["bash", "-c", "bin/rails db:prepare && bin/rails server -b 0.0.0.0"]
+
+  cron:
+    <<: *base-template
+    depends_on:
+      danbooru:
+        condition: service_healthy
+    command: ["bin/rails", "danbooru:cron"]
+
+  jobs:
+    <<: *base-template
+    depends_on:
+      danbooru:
+        condition: service_healthy
+    command: ["bin/good_job", "start"]
+
+  # https://github.com/danbooru/iqdb
+  # https://hub.docker.com/repository/docker/evazion/iqdb
+  iqdb:
+    image: evazion/iqdb
+    volumes:
+      - "iqdb-data:/iqdb/data"
+    command: ["http", "0.0.0.0", "5588", "/iqdb/data/iqdb.sqlite"]
+
+  redis:
+    image: redis
+
+  postgres:
+    image: ghcr.io/danbooru/postgres:16.1
+    environment:
+      POSTGRES_USER: danbooru
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "danbooru"]
+      start_period: 10s
+      interval: 1s
+      retries: 1
+    volumes:
+      - "danbooru-data:/var/lib/postgresql/data"
+
+  nginx:
+    image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:production}
+    command: ["openresty", "-e", "/dev/stderr"]
+    ports:
+      - "${DANBOORU_PORT:-3000}:3000"
+    depends_on:
+      danbooru:
+        condition: service_started
+    configs:
+      - source: nginx
+        target: /usr/local/nginx/conf/nginx.conf
+    volumes:
+      - "danbooru-images:/images"
+
+  autotagger:
+    image: ghcr.io/danbooru/autotagger:latest
+
+  webpack:
+    <<: *base-template
+    ports:
+      - 3035:3035
+    environment:
+      SHAKAPACKER_DEV_SERVER_HOST: 0.0.0.0
+    command: ["bin/shakapacker-dev-server"]
+
+configs:
+  nginx:
+    file: config/nginx.conf
+
+volumes:
+  danbooru-images:
+    name: ${COMPOSE_PROJECT_NAME}-images
+  danbooru-data:
+    name: ${COMPOSE_PROJECT_NAME}-data
+  iqdb-data:
+    name: ${COMPOSE_PROJECT_NAME}-iqdb-data
