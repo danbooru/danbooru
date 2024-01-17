@@ -5,7 +5,7 @@
 Run this to start a basic Danbooru instance:
 
 ```sh
-curl -sSL https://raw.githubusercontent.com/danbooru/danbooru/master/bin/danbooru | sh
+curl -sSL https://raw.githubusercontent.com/danbooru/danbooru/master/bin/setup | sh
 ```
 
 This will install [Docker Compose](https://docs.docker.com/compose/) and use it
@@ -14,14 +14,21 @@ to start Danbooru. When it's done, Danbooru will be running at http://localhost:
 Alternatively, if you already have Docker Compose installed, you can just do:
 
 ```sh
-wget https://raw.githubusercontent.com/danbooru/danbooru/master/docker-compose.yaml
-docker compose up
+git clone http://github.com/danbooru/danbooru
+cd danbooru
+touch .env.local config/danbooru_local_config.rb
+sudo docker compose up
 ```
 
-You will likely need to run docker with elevated permissions.
+If you get any errors, check `docker compose version` and make sure you're running at least Docker Compose v2.21.0.
 
-If you get an error such as `'name' does not match any of the regexes: '^x-'` make sure
-that you're running an updated version of Docker Compose.
+When you're done, you can run the following to delete everything:
+
+```sh
+sudo docker compose down --volumes # Delete all data and images in your Danbooru instance.
+sudo docker image prune            # Clean up all unused Docker images.
+rm -rf ~/danbooru                  # Delete the Danbooru code.
+```
 
 ## Installation
 
