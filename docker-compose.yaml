@@ -4,7 +4,7 @@
 #
 # ## Quickstart
 #
-# Run `docker compose up` to start a Danbooru instance on http://localhost:3000.
+# First run `bin/setup`. Then run `docker compose up` to start a Danbooru instance on http://localhost:3000.
 #
 # Run `docker compose down` to stop the instance.
 #
@@ -124,6 +124,8 @@ x-base-template: &base-template
   configs:
     - source: danbooru_local_config
       target: /danbooru/config/danbooru_local_config.rb
+    - source: env_local
+      target: /danbooru/.env.local
 
 services:
   danbooru:
@@ -191,6 +193,8 @@ services:
 configs:
   danbooru_local_config:
     file: config/danbooru_local_config.rb
+  env_local:
+    file: .env.local
   nginx:
     file: config/nginx.conf
 
