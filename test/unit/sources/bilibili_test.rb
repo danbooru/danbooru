@@ -23,7 +23,9 @@ module Sources
         profile_url: "https://space.bilibili.com/11742550",
         tags: [],
         artist_commentary_title: nil,
-        dtext_artist_commentary_desc: "\"【崩坏3】少女，泳装，夏日时光！\":[https://www.bilibili.com/video/BV1fB4y1Y7zt/]  新视频的图片分享！大家记得来康 https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png "
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          "【崩坏3】少女，泳装，夏日时光！":[https://www.bilibili.com/video/BV1fB4y1Y7zt/]  新视频的图片分享！大家记得来康\"[崩坏3_送你一朵花]\":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
+        EOS
       )
     end
 
@@ -48,7 +50,9 @@ module Sources
         profile_url: "https://space.bilibili.com/11742550",
         tags: [],
         artist_commentary_title: nil,
-        dtext_artist_commentary_desc: "\"【崩坏3】少女，泳装，夏日时光！\":[https://www.bilibili.com/video/BV1fB4y1Y7zt/]  新视频的图片分享！大家记得来康 https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png "
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          "【崩坏3】少女，泳装，夏日时光！":[https://www.bilibili.com/video/BV1fB4y1Y7zt/]  新视频的图片分享！大家记得来康\"[崩坏3_送你一朵花]\":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
+        EOS
       )
     end
 
@@ -69,7 +73,9 @@ module Sources
         tag_name: "bilibili_15817819",
         profile_url: "https://space.bilibili.com/15817819",
         tags: [],
-        artist_commentary_desc: " http://i0.hdslb.com/bfs/emote/fd8aa275d5d91cdf71410bc1a738415fd6e2ab86.png "
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          "[星尘_比心]":[http://i0.hdslb.com/bfs/emote/fd8aa275d5d91cdf71410bc1a738415fd6e2ab86.png]
+        EOS
       )
     end
 
@@ -91,6 +97,10 @@ module Sources
     end
 
     context "A h.bilibili.com/:id post" do
+      setup do
+        skip "h.bilibili.com is dead"
+      end
+
       strategy_should_work(
         "https://h.bilibili.com/83341894",
         image_urls: [
@@ -153,6 +163,17 @@ module Sources
         image_urls: ["https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg"],
         artist_id: "11742550",
         profile_url: "https://space.bilibili.com/11742550"
+      )
+    end
+
+    context "A t.bilibili.com post with hashtags, mentions, emotes" do
+      strategy_should_work(
+        "https://t.bilibili.com/601343542258368998",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          "#吉诺儿kino#":[https://search.bilibili.com/all?keyword=%E5%90%89%E8%AF%BA%E5%84%BFkino] "#唐九夏#":[https://search.bilibili.com/all?keyword=%E5%94%90%E4%B9%9D%E5%A4%8F]
+          今天是大雪！！今天也好冷啊"[冷]":[https://i0.hdslb.com/bfs/emote/cb0ebbd0668640f07ebfc0e03f7a18a8cd00b4ed.png]
+          之前在直播的时候说的，"@唐九夏还想再躺一下":[https://space.bilibili.com/1219196749/dynamic]的原创新曲《檐下雪》就快来啦！！歌肯定是很好听的，但最厉害的是这首曲子可是九夏作词的！！大家记得要来听啊啊啊！！！ 
+        EOS
       )
     end
 
