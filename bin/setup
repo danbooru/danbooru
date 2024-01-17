@@ -32,6 +32,9 @@ confirm() {
 clone_repo() {
   if grep -s danbooru .git/config > /dev/null; then
     return
+  elif grep -s danbooru danbooru/.git/config > /dev/null; then
+    cd danbooru
+    return
   fi
 
   install_git
@@ -115,9 +118,9 @@ start_danbooru() {
 
   # Test whether we need sudo to run docker.
   if docker version > /dev/null 2>&1; then
-    docker compose "${@:-up}"
+    exec docker compose "${@:-up}"
   elif sudo docker version > /dev/null 2>&1; then
-    sudo docker compose "${@:-up}"
+    exec sudo docker compose "${@:-up}"
   else
     echo "Error: Couldn't run Docker. Make sure Docker is installed correctly."
     exit 1
