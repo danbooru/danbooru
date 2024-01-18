@@ -1,0 +1,6 @@
+{
+	"name": "Danbooru",
+	"dockerComposeFile": ["../docker-compose.dev.yaml"],
+	"service": "devcontainer",
+	"workspaceFolder": "/danbooru"
+}
