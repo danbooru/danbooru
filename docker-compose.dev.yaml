@@ -56,10 +56,13 @@ x-base-template: &base-template
     DANBOORU_IMAGE_STORAGE_PATH: /images
     SHAKAPACKER_DEV_SERVER_HOST: webpack
 
+  tmpfs:
+    - "/tmp"
+    - "/danbooru/tmp:uid=1000,gid=1000"
+
   volumes:
-    - target: /tmp
-      type: tmpfs
     - danbooru-images:/images
+    - /danbooru/node_modules
     - ./:/danbooru
 
 services:

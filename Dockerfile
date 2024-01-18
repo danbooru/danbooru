@@ -290,6 +290,7 @@ COPY --link --from=build-exiftool /usr/local /usr/local
 COPY --link --from=build-openresty /usr/local /usr/local
 
 COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
+COPY --link --from=build-assets /danbooru/node_modules /danbooru/node_modules
 COPY --link --from=build-gems /usr/local /usr/local
 COPY --link . /danbooru
 
