@@ -109,7 +109,8 @@ namespace :danbooru do
     # Build a Docker image. Note that uncommited changes won't be included in the image; commit changes to Git first before building the image.
     desc "Build a Docker image"
     task :build do
-      system("git archive HEAD | docker buildx build - --platform linux/amd64 --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --tag danbooru --tag danbooru:x86 --file Dockerfile --load")
+      system("git archive HEAD | docker buildx build - --platform linux/amd64 --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --target development --tag danbooru:development --tag:x86-development --file Dockerfile --load")
+      system("git archive HEAD | docker buildx build - --platform linux/amd64 --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --target production --tag danbooru --tag danbooru:x86 --file Dockerfile --load")
     end
 
     # Usage: bin/rails danbooru:docker:build-arm
@@ -121,7 +122,8 @@ namespace :danbooru do
     # * docker run --rm -it --platform linux/arm64 danbooru:arm -- bash # Test that the Danbooru image works
     desc "Build a Docker image for ARM"
     task :"build-arm" do
-      system("git archive HEAD | docker buildx build - --platform linux/arm64 --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --tag danbooru --tag danbooru:arm --file Dockerfile --load")
+      system("git archive HEAD | docker buildx build - --platform linux/arm64 --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --target development --tag danbooru:development --tag danbooru:arm-development --file Dockerfile --load")
+      system("git archive HEAD | docker buildx build - --platform linux/arm64 --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --target production --tag danbooru --tag danbooru:arm --file Dockerfile --load")
     end
   end
 

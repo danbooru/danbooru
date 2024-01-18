@@ -234,20 +234,17 @@ EOS
 # Build the base Danbooru image. Pull in dependencies from previous layers and install runtime dependencies from apt-get.
 FROM base AS danbooru-base
 WORKDIR /danbooru
-ARG NODE_VERSION
 
 COPY --link --from=build-vips /usr/local /usr/local
 COPY --link --from=build-ruby /usr/local /usr/local
-COPY --link --from=build-node /usr/local /usr/local
 
 RUN <<EOS
   apt-get install -y --no-install-recommends \
     postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules libpq5 libpcre3 \
     libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2 libpng16-16 libexpat1 \
     libglib2.0 libgif7 libexif12 libheif1 libvpx8 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
-    libreadline8 libarchive-zip-perl tini busybox less ncdu curl git
+    libreadline8 libarchive-zip-perl tini busybox less ncdu curl git sudo
 
-  npm install -g yarn
   gem install --no-document foreman
 
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs libglib2.0-bin libglib2.0-doc mount procps python3 tzdata
@@ -265,7 +262,12 @@ FROM danbooru-base AS build-assets
 
 COPY --link .yarnrc.yml package.json yarn.lock ./
 COPY --link .yarn/ ./.yarn/
-RUN yarn install
+COPY --link --from=build-node /usr/local /usr/local
+
+RUN <<EOS
+  npm install -g yarn
+  yarn install
+EOS
 
 COPY --link postcss.config.js babel.config.json Rakefile ./
 COPY --link bin/rails bin/shakapacker bin/shakapacker-dev-server ./bin/
@@ -275,10 +277,13 @@ COPY --link public/images ./public/images
 COPY --link public/fonts ./public/fonts
 COPY --link app/components/ ./app/components/
 COPY --link app/javascript/ ./app/javascript/
-
 COPY --link Gemfile Gemfile.lock ./
 COPY --link --from=build-gems /usr/local /usr/local
-RUN RAILS_ENV=production bin/rails assets:precompile
+
+RUN <<EOS
+  RAILS_ENV=production bin/rails assets:precompile
+  rm public/packs/**/*.{gz,br}
+EOS
 
 
 
@@ -290,7 +295,6 @@ COPY --link --from=build-exiftool /usr/local /usr/local
 COPY --link --from=build-openresty /usr/local /usr/local
 
 COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
-COPY --link --from=build-assets /danbooru/node_modules /danbooru/node_modules
 COPY --link --from=build-gems /usr/local /usr/local
 COPY --link . /danbooru
 
@@ -317,7 +321,6 @@ RUN <<EOS
 
   # Test that everything works
   vips --version
-  node --version
   ruby --version
   cjpeg -version
   ffmpeg -version
@@ -325,6 +328,7 @@ RUN <<EOS
   exiftool -ver
   openresty -version
   bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
+  rm -rf /tmp/*
 EOS
 
 USER danbooru
@@ -333,3 +337,18 @@ CMD ["bin/rails", "server"]
 
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md
 LABEL org.opencontainers.image.source https://github.com/danbooru/danbooru
+
+
+
+# Build the development layer. Enable passwordless sudo, and pull in nodejs and node_modules so that JS/CSS files can be rebuilt.
+FROM production AS development
+
+USER root
+RUN <<EOS
+  groupadd admin -U danbooru
+  passwd -d danbooru
+EOS
+USER danbooru
+
+COPY --link --from=build-assets /usr/local /usr/local
+COPY --link --from=build-assets /danbooru/node_modules /danbooru/node_modules

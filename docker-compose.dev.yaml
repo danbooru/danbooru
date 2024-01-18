@@ -24,8 +24,12 @@
 name: devbooru
 
 x-base-template: &base-template
-  # Use the latest unstable version from master, instead of the production version.
-  image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:master}
+  # Use the latest development image from master, instead of the production image. The development
+  # image contains files needed to rebuild the JS/CSS files.
+  #
+  # If you set DANBOORU_IMAGE to something else, you have to use a development image because
+  # production images don't contain the tools necessary to rebuild the JS/CSS files.
+  image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:development}
 
   read_only: true
   restart: unless-stopped
@@ -119,7 +123,7 @@ services:
       - "danbooru-data:/var/lib/postgresql/data"
 
   nginx:
-    image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:production}
+    image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:development}
     command: ["openresty", "-e", "/dev/stderr"]
     ports:
       - "${DANBOORU_PORT:-3000}:3000"
