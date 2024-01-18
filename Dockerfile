@@ -245,7 +245,7 @@ RUN <<EOS
     postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules libpq5 libpcre3 \
     libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2 libpng16-16 libexpat1 \
     libglib2.0 libgif7 libexif12 libheif1 libvpx8 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
-    libreadline8 libarchive-zip-perl tini busybox less ncdu curl
+    libreadline8 libarchive-zip-perl tini busybox less ncdu curl git
 
   npm install -g yarn
   gem install --no-document foreman
@@ -253,6 +253,7 @@ RUN <<EOS
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs libglib2.0-bin libglib2.0-doc mount procps python3 tzdata
   apt-get autoremove -y
   rm -rf /var/{lib,cache,log} /usr/share/{doc,info}/* /build
+  mkdir -p /var/{lib,cache,log}/apt /var/lib/dpkg
 
   busybox --install -s
 EOS
