@@ -89,6 +89,46 @@ jobs:
           #platforms: linux/amd64,linux/arm64
           platforms: linux/amd64
 
+          target: production
+
+          # https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md#registry-cache
+          # https://dev.to/pst418/speed-up-multi-stage-docker-builds-in-ci-cd-with-buildkit-s-registry-cache-11gi
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+
+          build-args: |
+            SOURCE_COMMIT=${{ github.sha }}
+
+      # Generate Docker tags from Git tags for the development image.
+      - name: Generate Docker tags for development image
+        uses: docker/metadata-action@v4
+        id: development-metadata
+        with:
+          images: |
+            docker.io/evazion/danbooru
+            ghcr.io/danbooru/danbooru
+          tags: |
+            type=sha,format=long,prefix=development-
+            type=ref,event=branch,prefix=development-
+            type=ref,event=tag,prefix=development-
+            type=ref,event=pr,prefix=development-
+            type=raw,value=development,enable={{is_default_branch}}
+          flavor: |
+            latest=false
+
+      # https://github.com/docker/build-push-action
+      - name: Build development image
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ${{ steps.development-metadata.outputs.tags }}
+          labels: ${{ steps.development-metadata.outputs.labels }}
+
+          #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
+
+          target: development
+
           # https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md#registry-cache
           # https://dev.to/pst418/speed-up-multi-stage-docker-builds-in-ci-cd-with-buildkit-s-registry-cache-11gi
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
