@@ -116,9 +116,10 @@ x-base-template: &base-template
     DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
     DANBOORU_IMAGE_STORAGE_PATH: /images
 
+  tmpfs:
+    - /tmp
+
   volumes:
-    - target: /tmp
-      type: tmpfs
     - danbooru-images:/images
 
   configs:
