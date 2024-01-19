@@ -34,12 +34,6 @@ x-base-template: &base-template
   read_only: true
   restart: unless-stopped
 
-  healthcheck:
-    test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
-    start_period: 120s
-    interval: 10s
-    retries: 1
-
   environment:
     DANBOORU_APP_NAME: "Devbooru"
 
@@ -72,33 +66,39 @@ x-base-template: &base-template
     - ./:/danbooru
 
 services:
-  danbooru:
+  migrations:
     <<: *base-template
+    restart: no
     depends_on:
       postgres:
         condition: service_healthy
-    command: ["bash", "-c", "bin/rails db:prepare && bin/rails server -b 0.0.0.0"]
+    command: ["bin/rails", "db:prepare"]
+
+  danbooru:
+    <<: *base-template
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    command: ["bin/rails", "server", "-b", "0.0.0.0"]
 
   cron:
     <<: *base-template
     depends_on:
-      danbooru:
-        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
     command: ["bin/rails", "danbooru:cron"]
 
   jobs:
     <<: *base-template
     depends_on:
-      danbooru:
-        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
     command: ["bin/good_job", "start"]
 
   devcontainer:
     <<: *base-template
     command: ["sleep", "infinity"]
     read_only: false
-    healthcheck:
-      disable: true
 
   # https://github.com/danbooru/iqdb
   # https://hub.docker.com/repository/docker/evazion/iqdb
