@@ -253,6 +253,10 @@ RUN <<EOS
   mkdir -p /var/{lib,cache,log}/apt /var/lib/dpkg
 
   busybox --install -s
+
+  userdel ubuntu
+  useradd --user-group danbooru --home-dir /tmp --shell /bin/bash
+  chown root:root /tmp
 EOS
 
 
@@ -266,8 +270,13 @@ COPY --link --from=build-node /usr/local /usr/local
 
 RUN <<EOS
   npm install -g yarn
-  yarn install
+
+  mkdir -p tmp node_modules public/packs
+  chown danbooru:danbooru /danbooru .yarn tmp node_modules public/packs
 EOS
+
+USER danbooru
+RUN yarn install
 
 COPY --link postcss.config.js babel.config.json Rakefile ./
 COPY --link bin/rails bin/shakapacker bin/shakapacker-dev-server ./bin/
@@ -296,7 +305,6 @@ COPY --link --from=build-openresty /usr/local /usr/local
 
 COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
 COPY --link --from=build-gems /usr/local /usr/local
-COPY --link . /danbooru
 
 # http://jemalloc.net/jemalloc.3.html#tuning
 ENV LD_PRELOAD=libjemalloc.so.2
@@ -308,16 +316,17 @@ ENV RUBY_YJIT_ENABLE=1
 # Disable libvips warning messages
 ENV VIPS_WARNING=0
 
+COPY --chown=danbooru:danbooru . /danbooru
+
 ARG SOURCE_COMMIT=""
 RUN <<EOS
   echo $SOURCE_COMMIT > REVISION
-  ln -s /tmp tmp
-  ln -s packs public/packs-test
-  userdel ubuntu
-  useradd --user-group danbooru --home-dir /tmp
-  mkdir -p public/data /images
-  chown danbooru:danbooru public/data /images
   ldconfig
+
+  mkdir -p /images public/data
+  ln -s packs public/packs-test
+  ln -s /tmp tmp
+  chown --no-dereference danbooru:danbooru REVISION /danbooru /images public/data public/packs public/packs-test tmp
 
   # Test that everything works
   vips --version
@@ -328,7 +337,6 @@ RUN <<EOS
   exiftool -ver
   openresty -version
   bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
-  rm -rf /tmp/*
 EOS
 
 USER danbooru
@@ -348,7 +356,13 @@ RUN <<EOS
   groupadd admin -U danbooru
   passwd -d danbooru
 EOS
-USER danbooru
 
-COPY --link --from=build-assets /usr/local /usr/local
+COPY --link --from=build-node /usr/local /usr/local
+COPY --link --from=build-assets /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --link --from=build-assets /danbooru/node_modules /danbooru/node_modules
+RUN <<EOS
+  ln -s ../lib/node_modules/yarn/bin/yarn.js /usr/local/bin/yarn
+  chown danbooru:danbooru /danbooru node_modules
+EOS
+
+USER danbooru
