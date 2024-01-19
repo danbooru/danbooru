@@ -92,7 +92,7 @@ x-base-template: &base-template
 
   healthcheck:
     test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
-    start_period: 15s
+    start_period: 120s
     interval: 10s
     retries: 1
 
