@@ -67,6 +67,8 @@ x-base-template: &base-template
   volumes:
     - danbooru-images:/images
     - /danbooru/node_modules
+    - /danbooru/public/packs
+    - /danbooru/.yarn
     - ./:/danbooru
 
 services:
