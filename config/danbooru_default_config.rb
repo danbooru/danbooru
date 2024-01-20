@@ -488,6 +488,11 @@ module Danbooru
     def twitter_csrf_token
     end
 
+    # Your Xfolio "xfolio_session" cookie. Login to Xfolio then use the
+    # devtools to find the "xfolio_session" cookie.
+    def xfolio_session
+    end
+
     # Your Ci-En "ci_en_session" cookie. Login to Ci-En then use the
     # devtools to find the "ci_en_session" cookie.
     def ci_en_session_cookie
@@ -506,13 +511,13 @@ module Danbooru
     def zerochan_session_cookie
     end
 
-    # Your Xfolio "xfolio_session" cookie. Login to Xfolio then use the
-    # devtools to find the "xfolio_session" cookie.
-    def xfolio_session
+    # Your Inkbunny username and password. After creating your account, go to https://inkbunny.net/account.php and
+    # enable the "Enable API access" option, then go to https://inkbunny.net/userrate.php and enable all ratings to see
+    # all content.
+    def inkbunny_username
     end
 
-    # https://wiki.inkbunny.net/wiki/API#Quick_Start_Guide
-    def inkbunny_session
+    def inkbunny_password
     end
 
     # A list of tags that should be removed when a post is replaced. Regexes allowed.

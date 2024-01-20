@@ -6,10 +6,10 @@ module Sources
       strategy_should_work(
         "https://inkbunny.net/s/2973731-p2-#pictop",
         page_url: "https://inkbunny.net/s/2973731",
-        image_urls: %w[
-          https://nl.ib.metapix.net/files/full/4441/4441953_Yupa_25-1.jpg
-          https://nl.ib.metapix.net/files/full/4441/4441954_Yupa_25-2.jpg
-          https://nl.ib.metapix.net/files/full/4441/4441955_Yupa_25-3.jpg
+        image_urls: [
+          %r!https://\w+.ib.metapix.net/files/full/4441/4441953_Yupa_25-1.jpg!,
+          %r!https://\w+.ib.metapix.net/files/full/4441/4441954_Yupa_25-2.jpg!,
+          %r!https://\w+.ib.metapix.net/files/full/4441/4441955_Yupa_25-3.jpg!,
         ],
         media_files: [
           { file_size: 500_463 },
@@ -36,6 +36,24 @@ module Sources
         ],
         media_files: [{ file_size: 506_992 }],
         profile_url: nil
+      )
+    end
+
+    context "A stale session ID should automatically refresh the session ID" do
+      setup do
+        Cache.put("inkbunny-session-id", "invalid")
+      end
+
+      strategy_should_work(
+        "https://inkbunny.net/s/2973731-p2-#pictop",
+        page_url: "https://inkbunny.net/s/2973731",
+        image_urls: [
+          %r!https://\w+.ib.metapix.net/files/full/4441/4441953_Yupa_25-1.jpg!,
+          %r!https://\w+.ib.metapix.net/files/full/4441/4441954_Yupa_25-2.jpg!,
+          %r!https://\w+.ib.metapix.net/files/full/4441/4441955_Yupa_25-3.jpg!,
+        ],
+        profile_url: "https://inkbunny.net/Yupa",
+        artist_name: "Yupa",
       )
     end
 
