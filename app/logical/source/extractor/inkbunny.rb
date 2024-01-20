@@ -77,12 +77,47 @@ class Source::Extractor::Inkbunny < Source::Extractor
   memoize def api_response
     return {} unless submission_id.present?
 
-    params = {
-      sid: Danbooru.config.inkbunny_session,
-      show_description_bbcode_parsed: "yes",
-      submission_ids: submission_id,
-    }
-    http.cache(1.minute).parsed_get("https://inkbunny.net/api_submissions.php", params: params) || {}
+    request("https://inkbunny.net/api_submissions.php", show_description_bbcode_parsed: "yes", submission_ids: submission_id)
   end
 
+  # https://wiki.inkbunny.net/wiki/API#Quick_Start_Guide
+  # https://wiki.inkbunny.net/wiki/API#Login
+  memoize def session_id
+    return nil if Danbooru.config.inkbunny_username.blank? || Danbooru.config.inkbunny_password.blank?
+
+    response = http.parsed_get("https://inkbunny.net/api_login.php", params: { username: Danbooru.config.inkbunny_username, password: Danbooru.config.inkbunny_password })
+
+    if response[:error_code].present?
+      DanbooruLogger.info("Inkbunny login failed (#{response[:error_code]} #{response[:error_message]})")
+      nil
+    else
+      response[:sid]
+    end
+  end
+
+  memoize def cached_session_id
+    Cache.get("inkbunny-session-id", 24.hours, skip_nil: true) do
+      session_id
+    end
+  end
+
+  def clear_cached_session_id!
+    flush_cache # clear memoized session id
+    Cache.delete("inkbunny-session-id")
+  end
+
+  def request(url, **params)
+    response = http.cache(1.minute).parsed_get(url, params: params.merge(sid: cached_session_id)) || {}
+
+    # https://wiki.inkbunny.net/wiki/API#Error_Codes
+    # 2 - Invalid Session ID sent as variable 'sid'.
+    # This error will appear if you send a Session ID (sid) that is not valid, has been logged out or has expired.
+    if response[:error_code] == 2
+      DanbooruLogger.info("Inkbunny session ID stale; logging in again")
+      clear_cached_session_id!
+      response = http.cache(1.minute).parsed_get(url, params: params.merge(sid: cached_session_id)) || {}
+    end
+
+    response
+  end
 end

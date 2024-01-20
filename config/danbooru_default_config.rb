@@ -507,8 +507,13 @@ module Danbooru
     def zerochan_session_cookie
     end
 
-    # https://wiki.inkbunny.net/wiki/API#Quick_Start_Guide
-    def inkbunny_session
+    # Your Inkbunny username and password. After creating your account, go to https://inkbunny.net/account.php and
+    # enable the "Enable API access" option, then go to https://inkbunny.net/userrate.php and enable all ratings to see
+    # all content.
+    def inkbunny_username
+    end
+
+    def inkbunny_password
     end
 
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
