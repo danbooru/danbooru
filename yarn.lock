@@ -6950,7 +6950,7 @@ resolve@^1.20.0:
     postcss-preset-env: 8
     sass: 1
     sass-loader: 13
-    shakapacker: 7
+    shakapacker: 7.2.2
     stylelint: 15
     stylelint-config-standard: 31
     stylelint-config-standard-scss: 7
@@ -7190,9 +7190,9 @@ resolve@^1.20.0:
   languageName: node
   linkType: hard
 
-"shakapacker@npm:7":
-  version: 7.2.1
-  resolution: "shakapacker@npm:7.2.1"
+"shakapacker@npm:7.2.2":
+  version: 7.2.2
+  resolution: "shakapacker@npm:7.2.2"
   dependencies:
     glob: ^7.2.0
     js-yaml: ^4.1.0
@@ -7205,7 +7205,7 @@ resolve@^1.20.0:
     "@types/babel__core": ^7.0.0
     "@types/webpack": ^5.0.0
     babel-loader: ^8.2.4 || ^9.0.0
-    compression-webpack-plugin: ^9.0.0 || ^10.0.0
+    compression-webpack-plugin: ^9.0.0 || ^10.0.0|| ^11.0.0
     terser-webpack-plugin: ^5.3.1
     webpack: ^5.72.0
     webpack-assets-manifest: ^5.0.6
@@ -7217,7 +7217,7 @@ resolve@^1.20.0:
       optional: true
     "@types/webpack":
       optional: true
-  checksum: 855700038a683fd51fcd19cf4ac5f2572a1119783e0004f10324e0894d00c25f32f1bd70e971ed735e0d753a96a46afd51e016ce2be6de06aac69cfdec7a02f3
+  checksum: 63c82dffa2d7c89f111b7ba76f127f78be3deb7ed81382ecff10018c456a19627fa45e8e9fca4f1c01a87669145f89ec9c0b2d2f53e6228ddcba390e6889cb64
   languageName: node
   linkType: hard
 
