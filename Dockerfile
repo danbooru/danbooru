@@ -22,6 +22,7 @@ ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.0.1.tar.gz
 ARG EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/12.56.tar.gz"
 ARG OPENRESTY_URL="https://openresty.org/download/openresty-1.25.3.1.tar.gz"
 ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.1.tar.gz"
+ARG RUBY_MINOR_VERSION="3.2.0"
 ARG NODE_VERSION="20.x"
 ARG UBUNTU_VERSION="24.04"
 
@@ -29,10 +30,19 @@ ARG UBUNTU_VERSION="24.04"
 # The base layer for everything.
 FROM ubuntu:$UBUNTU_VERSION AS base
 SHELL ["/bin/bash", "-xeuo", "pipefail", "-O", "globstar", "-O", "dotglob", "-c"]
+
+ARG RUBY_MINOR_VERSION
 ENV DEBIAN_FRONTEND="noninteractive"
+ENV BUNDLE_DEPLOYMENT=1
+ENV GEM_HOME=/home/danbooru/.bundle
+ENV GEM_PATH=/danbooru/vendor/bundle/ruby/$RUBY_MINOR_VERSION:/usr/local/lib/ruby/gems/$RUBY_MINOR_VERSION:/home/danbooru/.bundle
+
 RUN <<EOS
   apt-get update
   rm -rf /usr/local/*
+
+  userdel ubuntu
+  useradd --user-group danbooru --create-home --shell /bin/bash
 EOS
 
 
@@ -217,17 +227,22 @@ EOS
 
 # Build Ruby gems. Output is in /usr/local.
 FROM build-ruby AS build-gems
+WORKDIR /danbooru
 
 RUN apt-get install -y --no-install-recommends libpq-dev libglib2.0-dev
+
 COPY --link Gemfile Gemfile.lock ./
+RUN chown danbooru:danbooru /danbooru
+
+USER danbooru
 RUN <<EOS
-  bundle install --system --no-cache --jobs $(nproc)
+  bundle install --no-cache --jobs $(nproc)
 
-  find /usr/local/lib/ruby/gems -regextype egrep -regex '.*\.(o|a|c|h|hh|hpp|exe|java|md|po|log|out|gem)$' -delete
-  find /usr/local/lib/ruby/gems -regextype egrep -regex '^.*/(Change|CHANGE|NEWS|LICENSE|COPYING|LEGAL|AUTHORS|CONTRIBUTORS|THANK|README|INSTALL|NOTICE|TODO).*$' -delete
-  find /usr/local/lib/ruby/gems -type f -executable -exec strip --strip-unneeded {} \;
+  find vendor -regextype egrep -regex '.*\.(o|a|c|h|hh|hpp|exe|java|md|po|log|out|gem)$' -delete
+  find vendor -regextype egrep -regex '^.*/(Change|CHANGE|NEWS|LICENSE|COPYING|LEGAL|AUTHORS|CONTRIBUTORS|THANK|README|INSTALL|NOTICE|TODO).*$' -delete
+  find vendor -type f -executable -exec strip --strip-unneeded {} \;
 
-  rm -rf *
+  rm -rf ~/.bundle
 EOS
 
 
@@ -245,18 +260,12 @@ RUN <<EOS
     libglib2.0 libgif7 libexif12 libheif1 libvpx8 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
     libreadline8 libarchive-zip-perl tini busybox less ncdu curl git sudo
 
-  gem install --no-document foreman
-
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs libglib2.0-bin libglib2.0-doc mount procps python3 tzdata
   apt-get autoremove -y
   rm -rf /var/{lib,cache,log} /usr/share/{doc,info}/* /build
   mkdir -p /var/{lib,cache,log}/apt /var/lib/dpkg
 
   busybox --install -s
-
-  userdel ubuntu
-  useradd --user-group danbooru --home-dir /tmp --shell /bin/bash
-  chown root:root /tmp
 EOS
 
 
@@ -287,7 +296,8 @@ COPY --link public/fonts ./public/fonts
 COPY --link app/components/ ./app/components/
 COPY --link app/javascript/ ./app/javascript/
 COPY --link Gemfile Gemfile.lock ./
-COPY --link --from=build-gems /usr/local /usr/local
+COPY --link --from=build-ruby /usr/local /usr/local
+COPY --link --from=build-gems /danbooru/vendor /danbooru/vendor
 
 RUN <<EOS
   RAILS_ENV=production bin/rails assets:precompile
@@ -304,7 +314,8 @@ COPY --link --from=build-exiftool /usr/local /usr/local
 COPY --link --from=build-openresty /usr/local /usr/local
 
 COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
-COPY --link --from=build-gems /usr/local /usr/local
+COPY --link --from=build-ruby /usr/local /usr/local
+COPY --link --from=build-gems /danbooru/vendor /danbooru/vendor
 
 # http://jemalloc.net/jemalloc.3.html#tuning
 ENV LD_PRELOAD=libjemalloc.so.2
@@ -326,7 +337,7 @@ RUN <<EOS
   mkdir -p /images public/data
   ln -s packs public/packs-test
   ln -s /tmp tmp
-  chown --no-dereference danbooru:danbooru REVISION /danbooru /images public/data public/packs public/packs-test tmp
+  chown --no-dereference danbooru:danbooru REVISION /danbooru /images public/data public/packs public/packs-test tmp vendor
 
   # Test that everything works
   vips --version
