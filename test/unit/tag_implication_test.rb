@@ -118,7 +118,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       p2 = create(:post, tag_string: "sword weapon")
 
       TagImplication.approve!(antecedent_name: "sword", consequent_name: "weapon", approver: @admin)
-      perform_enqueued_jobs
 
       assert_equal("sword weapon", p1.reload.tag_string)
       assert_equal("sword weapon", p2.reload.tag_string)

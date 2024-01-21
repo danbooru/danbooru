@@ -9,7 +9,7 @@ class BigqueryExportServiceTest < ActiveSupport::TestCase
         skip unless @bigquery.enabled?
 
         BigqueryExportService.async_export_all!(dataset_name: "testbooru_export")
-        perform_enqueued_jobs
+        perform_enqueued_jobs(only: BigqueryExportAllJob)
 
         assert_equal(1, @bigquery.dataset.table("posts").rows_count)
         assert_equal(1, @bigquery.dataset.table("tags").rows_count)

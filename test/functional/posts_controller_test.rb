@@ -464,6 +464,8 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       context "in safe mode" do
         should "not include the rating:s tag in the page title" do
+          Danbooru.config.stubs(:app_name).returns("Safebooru")
+
           get posts_path(tags: "fate/grand_order", safe_mode: true)
           assert_select "title", text: "Fate/Grand Order | Safebooru"
         end

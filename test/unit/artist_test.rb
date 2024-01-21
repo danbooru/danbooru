@@ -64,7 +64,7 @@ class ArtistTest < ActiveSupport::TestCase
         @post = FactoryBot.create(:post, :tag_string => "aaa")
         @admin = FactoryBot.create(:admin_user)
         @artist.ban!(@admin)
-        perform_enqueued_jobs
+        perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
         @post.reload
       end
 

@@ -96,7 +96,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @ss5 = create(:saved_search, query: "123 ...", user: CurrentUser.user)
 
         TagAlias.approve!(antecedent_name: "...", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("123 bbb 456", @ss1.reload.query)
         assert_equal("123 -bbb 456", @ss2.reload.query)
@@ -117,7 +116,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @u7 = create(:user, blacklisted_tags: "111 ...\r\n222 333\n")
 
         TagAlias.approve!(antecedent_name: "...", consequent_name: "aaa", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("111 aaa 222", @u1.reload.blacklisted_tags)
         assert_equal("111 -aaa -222", @u2.reload.blacklisted_tags)
@@ -134,7 +132,6 @@ class TagAliasTest < ActiveSupport::TestCase
       post2 = FactoryBot.create(:post, :tag_string => "ccc ddd")
 
       TagAlias.approve!(antecedent_name: "aaa", consequent_name: "ccc", approver: @admin)
-      perform_enqueued_jobs
 
       assert_equal("bbb ccc", post1.reload.tag_string)
       assert_equal("ccc ddd", post2.reload.tag_string)
@@ -157,7 +154,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki = create(:wiki_page, title: "aaa")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("bbb", @wiki.reload.title)
       end
@@ -167,7 +163,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal(true, @wiki1.reload.is_deleted)
         assert_equal([], @wiki1.other_names)
@@ -183,7 +178,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("This tag has been moved to [[#{@wiki2.title}]].", @wiki1.reload.body)
         assert_equal("first", @wiki2.reload.body)
@@ -194,7 +188,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal(true, @wiki1.reload.is_deleted)
         assert_equal(%w[111 222], @wiki1.other_names)
@@ -209,7 +202,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki = create(:wiki_page, body: "foo [[aaa]] bar")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("foo [[bbb]] bar", @wiki.reload.body)
       end
@@ -218,7 +210,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @pool = create(:pool, description: "foo [[aaa]] bar")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("foo [[bbb]] bar", @pool.reload.description)
       end
@@ -229,7 +220,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @artist = create(:artist, name: "aaa")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("bbb", @artist.reload.name)
       end
@@ -240,7 +230,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal(true, @artist1.reload.is_deleted)
         assert_equal([@artist2.name], @artist1.other_names)
@@ -258,7 +247,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @new_artist = create(:artist, name: "new_artist", is_banned: false)
 
         TagAlias.approve!(antecedent_name: "old_artist", consequent_name: "new_artist", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal(true, @new_artist.reload.is_banned)
         assert_equal(false, @old_artist.reload.is_banned)
@@ -269,7 +257,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal(true, @artist1.reload.is_deleted)
         assert_equal(%w[111 222], @artist1.other_names)
@@ -288,7 +275,6 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "artist", category: 1)
 
       TagAlias.approve!(antecedent_name: "general", consequent_name: "artist", approver: @admin)
-      perform_enqueued_jobs
 
       assert_equal(1, tag1.reload.category)
       assert_equal(1, tag2.reload.category)
@@ -299,7 +285,6 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "general", category: 0)
 
       TagAlias.approve!(antecedent_name: "artist", consequent_name: "general", approver: @admin)
-      perform_enqueued_jobs
 
       assert_equal(1, tag1.reload.category)
       assert_equal(1, tag2.reload.category)
@@ -310,7 +295,6 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "copyright", category: 3)
 
       TagAlias.approve!(antecedent_name: "character", consequent_name: "copyright", approver: @admin)
-      perform_enqueued_jobs
 
       assert_equal(4, tag1.reload.category)
       assert_equal(3, tag2.reload.category)
