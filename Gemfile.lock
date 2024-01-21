@@ -634,7 +634,7 @@ DEPENDENCIES
   view_component
 
 RUBY VERSION
-   ruby 3.2.1p31
+   ruby 3.2.3p157
 
 BUNDLED WITH
    2.5.4
