@@ -4,7 +4,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
   def create_bur!(script, approver)
     bur = create(:bulk_update_request, script: script)
     bur.approve!(approver)
-    perform_enqueued_jobs
+    perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
     bur
   end
 
@@ -691,7 +691,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @bur.approve!(@admin)
         assert_equal("processing", @bur.status)
 
-        assert_raises(RuntimeError) { perform_enqueued_jobs }
+        assert_raises(RuntimeError) { perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob) }
         assert_equal("failed", @bur.reload.status)
 
         assert_equal("active", TagAlias.find_by!(antecedent_name: "one", consequent_name: "two").status)
@@ -707,7 +707,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         TagAlias.any_instance.stubs(:process!).raises(RuntimeError.new("oh no"))
         @bur.approve!(@admin)
-        assert_raises(RuntimeError) { perform_enqueued_jobs }
+        assert_raises(RuntimeError) { perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob) }
 
         assert_equal("aaa foo", @post.reload.tag_string)
 
@@ -722,7 +722,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         TagAlias.any_instance.unstub(:process!)
         @bur.approve!(@admin)
-        perform_enqueued_jobs
+        perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
 
         assert_equal("aaa bar", @post.reload.tag_string)
 
