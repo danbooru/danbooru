@@ -60,6 +60,7 @@ x-base-template: &base-template
 
   volumes:
     - danbooru-images:/images
+    - /danbooru/vendor
     - /danbooru/node_modules
     - /danbooru/public/packs
     - /danbooru/.yarn
