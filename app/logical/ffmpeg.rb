@@ -267,9 +267,9 @@ class FFmpeg
     time_line = lines.grep(/\Aframe=/).last.strip
     time_info = time_line.scan(/\S+=\s*\S+/).map { |pair| pair.split(/=\s*/) }.to_h
 
-    # size_line = "video:36kBkB audio:16kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown"
+    # size_line = "[out#0/null @ 0x7f0b1ba2f300] video:36kBkB audio:16kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown"
     # size_info = { "video" => 36000, "audio" => 16000, "subtitle" => 0, "other streams" => 0, "global headers" => 0, "muxing overhead" => 0 }
-    size_line = lines.grep(/\Avideo:/).last.strip
+    size_line = lines.grep(/\[.*\] video:/).last.to_s.gsub(/\A\[.*\]/, "").strip
     size_info = size_line.scan(/[a-z ]+: *[a-z0-9]+/i).map do |pair|
       key, value = pair.split(/: */)
       [key.strip, value.to_i * 1000] # [" audio", "16kB"] => ["audio", 16000]
