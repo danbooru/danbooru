@@ -152,9 +152,9 @@ ul.list-inline {
 .mobile-only {
   display: none !important;
 
-  @media (max-width: 660px) { display: initial !important; }
+  @media (width <= 660px) { display: initial !important; }
 }
 
 .desktop-only {
-  @media (max-width: 660px) { display: none !important; }
+  @media (width <= 660px) { display: none !important; }
 }

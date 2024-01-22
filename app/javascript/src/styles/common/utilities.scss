@@ -519,7 +519,7 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   }
 }
 
-@media screen and (min-width: 660px) {
+@media screen and (width >= 660px) {
   .md\:inline-block { display: inline-block; }
   .md\:block { display: block; }
   .md\:flex { display: flex; }
@@ -535,7 +535,7 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   .md\:mx-auto { margin-left: auto; margin-right: auto; }
 }
 
-@media screen and (max-width: 660px) {
+@media screen and (width <= 660px) {
   .sm\:text-sm { font-size: var(--text-sm); }
 
   .sm\:text-center { text-align: center; }

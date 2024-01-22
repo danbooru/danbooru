@@ -42,7 +42,7 @@ form.simple_form {
       @extend %fineprint;
       padding-left: 1em;
 
-      @media (max-width: 660px) {
+      @media (width <= 660px) {
         padding-left: 0;
         display: block;
       }

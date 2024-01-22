@@ -35,7 +35,7 @@ div.list-of-messages {
       }
     }
 
-    @media (max-width: 660px) {
+    @media (width <= 660px) {
       display: block;
       margin-top: 2em;
 
