@@ -6,7 +6,7 @@ class Source::URL::Lofter < Source::URL
   attr_reader :username, :work_id, :unescaped_tag
 
   def self.match?(url)
-    url.domain.in?(%w[lofter.com 127.net lf127.net])
+    url.domain.in?(%w[lofter.com 127.net lf127.net 126.net])
   end
 
   def parse
@@ -16,6 +16,10 @@ class Source::URL::Lofter < Source::URL
     # https://imglf3.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJSzFCWFlnUWgzb01DcUdpT1lreG5yQjJVMkhGS09HNGR3PT0.png
     # http://imglf0.nosdn.127.net/img/cHl3bXNZdDRaaHBnNWJuN1Y4OXBqR01CeVBZSVNmU2FWZWtHc1h4ZTZiUGxlRzMwZnFDM1JnPT0.jpg (404)
     in /127\.net$/, "img", _
+      nil
+
+    # https://vodm2lzexwq.vod.126.net/vodm2lzexwq/Pc5jg1nL_3039990631_sd.mp4?resId=254486990bfa2cd7aa860229db639341_3039990631_1&sign=4j02HTHXqNfhaF%2B%2FO14Ny%2F9SMNZj%2FIjpJDCqXfYa4aM%3D
+    in /vod\.126\.net$/, *rest
       nil
 
     # https://www.lofter.com/front/blog/home-page/noshiqian
@@ -46,11 +50,13 @@ class Source::URL::Lofter < Source::URL
   end
 
   def image_url?
-    url.domain.in?(%w[lf127.net 127.net])
+    url.domain.in?(%w[lf127.net 127.net 126.net])
   end
 
   def full_image_url
-    "#{site}#{path}" if image_url?
+    return nil unless image_url?
+    return "#{site}#{path}" unless url.host.match(/vod\.126\.net$/)
+    original_url
   end
 
   def page_url
