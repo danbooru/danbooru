@@ -133,6 +133,19 @@ module Sources
       )
     end
 
+    context "An answer-type lofter post" do
+      strategy_should_work(
+        "https://jiuhaotaiyangdeshexian.lofter.com/post/73f37cdf_2b86a4ae7",
+        image_urls: [
+          "https://imglf4.lf127.net/img/767c7fec4d8e1f50/bnpEMS9YSVpSbzJNaFkvMmdtL3Q4b2IwM3lmY3NPWmZ3VFhMZ05Pb2RxRT0.jpg",
+        ],
+        artist_name: "jiuhaotaiyangdeshexian",
+        other_names: ["jiuhaotaiyangdeshexian", "鸠号太阳的射线-"],
+        dtext_artist_commentary_title: "Q:老师！想问问最近会不会画ITZY？🥰🥰",
+        dtext_artist_commentary_desc: "不好意思现在才看到！那就画一个荔枝猫猫吧😄"
+      )
+    end
+
     context "A lofter post with the character 0xA0 in a tag" do
       strategy_should_work(
         "https://xingfulun16203.lofter.com/post/77a68dc4_2b9f0f00c",

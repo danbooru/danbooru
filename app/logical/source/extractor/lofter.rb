@@ -12,8 +12,13 @@ module Source
         if parsed_url.image_url?
           [parsed_url.full_image_url]
         else
-          images = [*images_from_photo_post, *images_from_text_post]
-          images.map { |url| Source::URL.parse(url).full_image_url }
+          [
+            *images_from_photo_post,
+            *images_from_text_post,
+            *images_from_answer_post,
+          ].map do |url|
+            Source::URL.parse(url).full_image_url
+          end
         end
       end
 
@@ -25,6 +30,10 @@ module Source
         content = page_json.dig("postData", "data", "postData", "postView", "textPostView", "content").to_s
         html = Nokogiri::HTML5.fragment(content)
         html.css("img").pluck("src")
+      end
+
+      def images_from_answer_post
+        page_json.dig("postData", "data", "postData", "postView", "answerPostView", "images").to_a.pluck("orign")
       end
 
       def profile_url
@@ -71,13 +80,32 @@ module Source
       end
 
       def artist_commentary_title
+        title_from_post || title_from_answer_post
+      end
+
+      def title_from_post
         page_json.dig("postData", "data", "postData", "postView", "title")
       end
 
+      def title_from_answer_post
+        question = page_json.dig("postData", "data", "postData", "postView", "answerPostView", "questionInfo", "question")
+        return "Q:#{question}" unless question.nil?
+      end
+
       def artist_commentary_desc
-        desc = page_json.dig("postData", "data", "postData", "postView", "photoPostView", "caption")
-        desc ||= page_json.dig("postData", "data", "postData", "postView", "textPostView", "content")
-        desc.to_s
+        desc_from_photo_post || desc_from_text_post || desc_from_answer_post
+      end
+
+      def desc_from_photo_post
+        page_json.dig("postData", "data", "postData", "postView", "photoPostView", "caption")
+      end
+
+      def desc_from_text_post
+        page_json.dig("postData", "data", "postData", "postView", "textPostView", "content")
+      end
+
+      def desc_from_answer_post
+        page_json.dig("postData", "data", "postData", "postView", "answerPostView", "answer")
       end
 
       def dtext_artist_commentary_desc
