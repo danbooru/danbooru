@@ -4,7 +4,6 @@
     "@alpinejs/morph": "^3.13.3",
     "@alpinejs/persist": "^3.13.3",
     "@babel/core": "^7.23.7",
-    "@babel/plugin-proposal-decorators": "^7.23.7",
     "@babel/plugin-transform-runtime": "^7.23.7",
     "@babel/preset-env": "^7.23.8",
     "@babel/runtime": "^7.23.8",
