@@ -7,7 +7,9 @@ function importAll(r) {
 // everything. See @babel/preset-env.
 import "core-js";
 
-require('@rails/ujs').start();
+import Rails from '@rails/ujs';
+Rails.start();
+
 require('hammerjs');
 require('jquery-hotkeys');
 import morphdom from 'morphdom';
