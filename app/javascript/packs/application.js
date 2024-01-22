@@ -12,7 +12,6 @@ Rails.start();
 
 require('hammerjs');
 require('jquery-hotkeys');
-import morphdom from 'morphdom';
 import Alpine from 'alpinejs';
 import morph from '@alpinejs/morph';
 import persist from '@alpinejs/persist'
@@ -108,7 +107,6 @@ Danbooru.error = Utility.error;
 
 window.$ = jQuery;
 window.jQuery = jQuery;
-window.morphdom = morphdom;
 window.Alpine = Alpine;
 window.Danbooru = Danbooru;
 
