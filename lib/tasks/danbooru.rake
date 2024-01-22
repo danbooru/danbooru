@@ -11,23 +11,61 @@ namespace :danbooru do
     Clockwork::run
   end
 
-  # Usage: bin/rails danbooru:reindex_iqdb
-  #
-  # Schedules all posts to be reindexed in IQDB. Requires the jobs
-  # worker (bin/good_job) to be running.
-  desc "Reindex all posts in IQDB"
-  task reindex_iqdb: :environment do
-    Post.find_each do |post|
-      puts "post ##{post.id}"
-      post.update_iqdb
-    end
-  end
-
-  # Usage: bin/rails danbooru:images:validate
-  #
-  # Check whether any images are missing, corrupt, or don't match the
-  # width/height/size/ext metadata in the database.
   namespace :images do
+    desc 'Reindex posts in IQDB. Usage: COND="created_at > \'2024-01-01\'" DRY_RUN=false bin/rails danbooru:images:reindex_iqdb'
+    task reindex_iqdb: :environment do
+      condition = ENV.fetch("COND", "TRUE")
+      dry_run = ENV.fetch("DRY_RUN", "false").truthy?
+
+      if dry_run
+        STDERR.puts "Not making any changes. Do `DRY_RUN=false bin/rails danbooru:images:reindex_iqdb` to reindex the posts."
+      end
+
+      Post.where(condition).parallel_find_each do |post|
+        puts "post ##{post.id}"
+        post.update_iqdb unless dry_run
+      end
+    end
+
+    desc 'Regenerate metadata for media assets. Usage: COND="created_at > \'2024-01-01\'" DRY_RUN=false bin/rails danbooru:images:regenerate_metadata'
+    task regenerate_metadata: :environment do
+      CurrentUser.user = User.system
+      condition = ENV.fetch("COND", "TRUE")
+      dry_run = ENV.fetch("DRY_RUN", "true").truthy?
+
+      if dry_run
+        STDERR.puts "Not making any changes. Do `DRY_RUN=false bin/rails danbooru:images:regenerate_metadata` to actually update the metadata."
+      end
+
+      MediaAsset.active.where(condition).parallel_find_each do |asset|
+        variant = asset.variant(:original)
+        media_file = variant.open_file
+
+        if media_file.nil?
+          puts ({ id: asset.id, error: "file doesn't exist", path: variant.file_path }).to_json
+          next
+        end
+
+        # Setting `file` updates the metadata if it's different.
+        asset.file = media_file
+        asset.media_metadata.file = media_file
+        asset.post.assign_attributes(image_width: asset.image_width, image_height: asset.image_height, file_ext: asset.file_ext, file_size: asset.file_size) if asset.post.present?
+
+        old = asset.media_metadata.metadata_was.to_h
+        new = asset.media_metadata.metadata.to_h
+        metadata_changes = { added_metadata: (new.to_a - old.to_a).to_h, removed_metadata: (old.to_a - new.to_a).to_h }.compact_blank
+        puts ({ id: asset.id, **asset.changes, **metadata_changes }).to_json
+
+        unless dry_run
+          asset.post.save! if asset.post&.changed?
+          asset.save! if asset.changed?
+          asset.media_metadata.save! if asset.media_metadata.changed?
+        end
+
+        media_file.close
+      end
+    end
+
     task validate: :environment do
       processes = ENV.fetch("PROCESSES", Etc.nprocessors).to_i
 
