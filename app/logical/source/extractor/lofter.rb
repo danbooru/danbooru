@@ -12,9 +12,19 @@ module Source
         if parsed_url.image_url?
           [parsed_url.full_image_url]
         else
-          images = page&.search(".imgclasstag img, .ct .txtcont img")
-          images.to_a.pluck("src").map { |url| Source::URL.parse(url).full_image_url }
+          images = [*images_from_photo_post, *images_from_text_post]
+          images.map { |url| Source::URL.parse(url).full_image_url }
         end
+      end
+
+      def images_from_photo_post
+        page_json.dig("postData", "data", "postData", "postView", "photoPostView", "photoLinks").to_a.pluck("orign")
+      end
+
+      def images_from_text_post
+        content = page_json.dig("postData", "data", "postData", "postView", "textPostView", "content").to_s
+        html = Nokogiri::HTML5.fragment(content)
+        html.css("img").pluck("src")
       end
 
       def profile_url
@@ -28,37 +38,46 @@ module Source
         "#{profile_url}/post/#{illust_id}"
       end
 
+      def http
+        super.headers("User-Agent": "Mozilla/5.0 (Android 14; Mobile; rv:115.0) Gecko/115.0 Firefox/115.0")
+      end
+
       memoize def page
         http.cache(1.minute).parsed_get(page_url)
       end
 
+      memoize def page_json
+        script_text = page&.search("body script").to_a.map(&:text).grep(/\Awindow.__initialize_data__ = /).first.to_s
+        json = script_text.strip.delete_prefix("window.__initialize_data__ = ")
+        return {} if json.blank?
+        JSON.parse(json)
+      end
+
       def tags
-        return [] if artist_name.blank?
-        page&.search("[href*='#{artist_name}.lofter.com/tag/']").to_a.map do |tag|
-          href = tag.attr("href")
+        page_json.dig("postData", "data", "postData", "postView", "tagList").to_a.map do |tag|
+          href = "https://www.lofter.com/tag/#{tag}"
           [Source::URL.parse(href).unescaped_tag.encode!("UTF-8", :invalid => :replace, :replace => ""), href]
           # nasty surprise from some posts like https://xingfulun16203.lofter.com/post/77a68dc4_2b9f0f00c
           # if 0xA0 is present in a tag, it seems the tag search will crash, so not even lofter can handle these properly
         end
       end
 
+      def display_name
+        page_json.dig("postData", "data", "blogInfo", "blogNickName").to_s.strip
+      end
+
+      def other_names
+        [artist_name, display_name].compact.uniq
+      end
+
       def artist_commentary_title
-        title_selectors = ".ct .ttl"
-        page&.search(title_selectors).to_a.compact.first&.to_html
+        page_json.dig("postData", "data", "postData", "postView", "title")
       end
 
       def artist_commentary_desc
-        commentary_selectors = [
-          ".ct .text",
-          ".ct .txtcont",
-          ".content .text",
-          ".posts .photo .text",
-          "#post .description",
-          ".m-post .cont .text",
-          ".cnwrapper > p:nth-child(2)",
-        ].join(", ")
-
-        page&.search(commentary_selectors).to_a.compact.first&.to_html
+        desc = page_json.dig("postData", "data", "postData", "postView", "photoPostView", "caption")
+        desc ||= page_json.dig("postData", "data", "postData", "postView", "textPostView", "content")
+        desc.to_s
       end
 
       def dtext_artist_commentary_desc
