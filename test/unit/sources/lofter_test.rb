@@ -16,7 +16,9 @@ module Sources
         "https://gengar563.lofter.com/post/1e82da8c_1c98dae1b",
         image_urls: image_urls,
         artist_name: "gengar563",
+        other_names: ["gengar563", "续杯超盐酸"],
         profile_url: "https://gengar563.lofter.com",
+        dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           发了三次发不出有毒……
 
@@ -40,7 +42,10 @@ module Sources
       strategy_should_work(
         "https://yuli031458.lofter.com/post/3163d871_1cbdc5f6d",
         image_urls: ["https://imglf5.lf127.net/img/Mm55d3lNK2tJUWpNTjVLN0MvaTRDc1UvQUFLMGszOHRvSjV6S3VSa1lwa3BDWUtVOWpBTHBnPT0.jpg"],
+        artist_name: "yuli031458",
+        other_names: ["yuli031458", "52hertzc"],
         tags: ["明日方舟", "阿米娅"],
+        dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "Amiya"
       )
     end
@@ -49,6 +54,9 @@ module Sources
       strategy_should_work(
         "https://chengyeliuli.lofter.com/post/1d127639_2b6e850c8",
         image_urls: ["https://imglf3.lf127.net/img/d28aeb098a69b1d2/ZmltbmVjOU9BRzFHVTVnTkNmc0V0NDlSRnNrdENIWWwyZkFreTJJd0duRT0.jpg"],
+        artist_name: "chengyeliuli",
+        other_names: ["chengyeliuli", "桃原"],
+        dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           練習
 
@@ -64,6 +72,9 @@ module Sources
           "https://imglf4.lf127.net/img/68d1578576f2e8a0/akFYeFo0L0VFMno5d0JuNHlwQ3VMdEFxYysyN1ZseVduNzFkbG9MdUlFVT0.jpg",
           "https://imglf6.lf127.net/img/9970d5715bd5f72a/akFYeFo0L0VFMno5d0JuNHlwQ3VMZ3QxbkttTHpHZERWZXlVS3FDNmtYcz0.jpg",
         ],
+        artist_name: "qiuchenghanshuang",
+        other_names: ["qiuchenghanshuang", "秋某"],
+        dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "过去与她擦肩而过"
       )
     end
@@ -77,6 +88,9 @@ module Sources
           "https://imglf4.lf127.net/img/323e0e53fec354b8/Sytua1gwSUwyV1k3SXZxY3FiVGJvWWh2MjZSUHdvM3JNWndUS0pSSS9Gdz0.png",
           "https://imglf3.lf127.net/img/304d83b42234fa53/Sytua1gwSUwyV1k3SXZxY3FiVGJvY2xNK3FDQ2lTaDBOdU1lenhtNDJLaz0.png",
         ],
+        artist_name: "sdz013",
+        other_names: ["sdz013", "SDZ"],
+        dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "本来是给外国朋友但是我销号了所以存下()"
       )
     end
@@ -89,6 +103,7 @@ module Sources
         ],
         tag_name: "okitagumi",
         artist_name: "okitagumi",
+        other_names: ["okitagumi", "3626151"],
         page_url: "https://okitagumi.lofter.com/post/1e69aeeb_fbb63ca",
         profile_url: "https://okitagumi.lofter.com",
         media_files: [{ file_size: 154_620 }],
