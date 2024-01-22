@@ -55,6 +55,8 @@ class ActiveSupport::TestCase
     Danbooru.config.stubs(:storage_manager).returns(storage_manager)
     Danbooru.config.stubs(:backup_storage_manager).returns(StorageManager::Null.new)
     Danbooru.config.stubs(:rate_limits_enabled?).returns(false)
+    Danbooru.config.stubs(:autotagger_url).returns(nil)
+    Danbooru.config.stubs(:iqdb_url).returns(nil)
 
     at_exit { FileUtils.rm_rf(@temp_dir) }
   end
