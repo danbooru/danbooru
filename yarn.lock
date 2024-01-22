@@ -5686,13 +5686,6 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"morphdom@npm:^2.7.2":
-  version: 2.7.2
-  resolution: "morphdom@npm:2.7.2"
-  checksum: dcd865d4431730b54edbd7c533afbac0df7e2012d2962051183c517b8a7e0767b6ec8da279dc649f7635886fc2bb719af3b0308535906a09bb21ec1c31142c3f
-  languageName: node
-  linkType: hard
-
 "ms@npm:2.0.0":
   version: 2.0.0
   resolution: "ms@npm:2.0.0"
@@ -6998,7 +6991,6 @@ fsevents@~2.3.2:
     jquery-ui: ^1.13.2
     lodash: ^4.17.21
     mini-css-extract-plugin: ^2.7.7
-    morphdom: ^2.7.2
     postcss: ^8.4.33
     postcss-import: ^16.0.0
     postcss-loader: ^8.0.0
