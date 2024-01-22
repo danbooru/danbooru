@@ -65,6 +65,6 @@
     "stylelint-all": "yarn run stylelint --cache --cache-strategy content --cache-location tmp/ 'app/javascript/src/styles/**/*'"
   },
   "browserslist": [
-    "since 2018"
+    "since 2019"
   ]
 }
