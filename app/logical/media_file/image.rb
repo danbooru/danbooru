@@ -63,7 +63,14 @@ class MediaFile::Image < MediaFile
 
   def duration
     return nil if !is_animated?
-    video.duration
+
+    # XXX ffmpeg 6.1 calculates duration incorrectly for some gif and webp files.
+    case file_ext
+    when :gif, :webp
+      vips_duration
+    else
+      ffmpeg_duration
+    end
   end
 
   def frame_count
@@ -77,6 +84,21 @@ class MediaFile::Image < MediaFile
     else
       nil
     end
+  end
+
+  # @return [Integer, nil] The duration of the animation as calculated by libvips, or possibly nil if the file
+  #   isn't animated or is corrupt. Note that libvips and ffmpeg may disagree on the duration.
+  def vips_duration
+    # XXX Browsers typically raise the frame time to 0.1s if it's less than or equal to 0.01s.
+    image.get("delay").map { |delay| delay <= 10 ? 100 : delay }.sum / 1000.0
+  rescue Vips::Error
+    nil
+  end
+
+  # @return [Integer, nil] The duration of the animation as calculated by ffmpeg, or possibly nil if the file
+  #   isn't animated or is corrupt. Note that libvips and ffmpeg may disagree on the duration.
+  def ffmpeg_duration
+    video.duration
   end
 
   # @return [Integer, nil] The frame count for gif and webp images, or possibly nil if the file doesn't have a frame count or is corrupt.
