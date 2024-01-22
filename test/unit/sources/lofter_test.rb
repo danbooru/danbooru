@@ -146,6 +146,19 @@ module Sources
       )
     end
 
+    context "A video-type lofter post" do
+      strategy_should_work(
+        "https://wooden-brain.lofter.com/post/1e60de5b_1c9bf8efb",
+        image_urls: [
+          "https://vodm2lzexwq.vod.126.net/vodm2lzexwq/Pc5jg1nL_3039990631_sd.mp4?resId=254486990bfa2cd7aa860229db639341_3039990631_1&sign=4j02HTHXqNfhaF%2B%2FO14Ny%2F9SMNZj%2FIjpJDCqXfYa4aM%3D",
+        ],
+        artist_name: "wooden-brain",
+        other_names: ["wooden-brain", "依末"],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "夏 日 活 动"
+      )
+    end
+
     context "A lofter post with the character 0xA0 in a tag" do
       strategy_should_work(
         "https://xingfulun16203.lofter.com/post/77a68dc4_2b9f0f00c",
@@ -164,6 +177,7 @@ module Sources
     should "Parse Lofter URLs correctly" do
       assert(Source::URL.image_url?("https://imglf3.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJSzFCWFlnUWgzb01DcUdpT1lreG5yQjJVMkhGS09HNGR3PT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0"))
       assert(Source::URL.image_url?("http://imglf0.nosdn.127.net/img/cHl3bXNZdDRaaHBnNWJuN1Y4OXBqR01CeVBZSVNmU2FWZWtHc1h4ZTZiUGxlRzMwZnFDM1JnPT0.jpg "))
+      assert(Source::URL.image_url?("https://vodm2lzexwq.vod.126.net/vodm2lzexwq/Pc5jg1nL_3039990631_sd.mp4?resId=254486990bfa2cd7aa860229db639341_3039990631_1&sign=4j02HTHXqNfhaF%2B%2FO14Ny%2F9SMNZj%2FIjpJDCqXfYa4aM%3D"))
 
       assert(Source::URL.page_url?("https://gengar563.lofter.com/post/1e82da8c_1c98dae1b"))
 

@@ -14,6 +14,7 @@ module Source
         else
           [
             *images_from_photo_post,
+            *images_from_video_post,
             *images_from_text_post,
             *images_from_answer_post,
           ].map do |url|
@@ -24,6 +25,10 @@ module Source
 
       def images_from_photo_post
         page_json.dig("postData", "data", "postData", "postView", "photoPostView", "photoLinks").to_a.pluck("orign")
+      end
+
+      def images_from_video_post
+        [page_json.dig("postData", "data", "postData", "postView", "videoPostView", "videoInfo", "originUrl")].compact
       end
 
       def images_from_text_post
@@ -93,11 +98,15 @@ module Source
       end
 
       def artist_commentary_desc
-        desc_from_photo_post || desc_from_text_post || desc_from_answer_post
+        desc_from_photo_post || desc_from_video_post || desc_from_text_post || desc_from_answer_post
       end
 
       def desc_from_photo_post
         page_json.dig("postData", "data", "postData", "postView", "photoPostView", "caption")
+      end
+      
+      def desc_from_video_post
+        page_json.dig("postData", "data", "postData", "postView", "videoPostView", "caption")
       end
 
       def desc_from_text_post
