@@ -38,7 +38,7 @@ class AutotaggerClient
   # @param confidence [Float] The minimum confidence level for each tag.
   # @return [Array<AITag>] A list of new AI tags for this image. The `media_asset` field will be nil.
   def evaluate!(file, limit: 50, confidence: 0.01)
-    return {} if autotagger_url.blank?
+    return [] if autotagger_url.blank?
 
     response = http.post("#{autotagger_url}/evaluate", form: { file: HTTP::FormData::File.new(file), threshold: confidence, format: "json" })
     raise Error, "Autotagger failed (code #{response.code})" if !response.status.success?
