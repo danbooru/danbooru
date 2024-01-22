@@ -160,7 +160,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-create-class-features-plugin@npm:^7.22.15, @babel/helper-create-class-features-plugin@npm:^7.23.7":
+"@babel/helper-create-class-features-plugin@npm:^7.22.15":
   version: 7.23.7
   resolution: "@babel/helper-create-class-features-plugin@npm:7.23.7"
   dependencies:
@@ -449,19 +449,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-decorators@npm:^7.23.7":
-  version: 7.23.7
-  resolution: "@babel/plugin-proposal-decorators@npm:7.23.7"
-  dependencies:
-    "@babel/helper-create-class-features-plugin": ^7.23.7
-    "@babel/helper-plugin-utils": ^7.22.5
-    "@babel/plugin-syntax-decorators": ^7.23.3
-  peerDependencies:
-    "@babel/core": ^7.0.0-0
-  checksum: 27489587ab26e79ef25fdba9ab032b148c29da8007619f061cc4538d91ca58d4b5aa9e7c1d9f89d4d5219ff4f31ee7a7da5a1373f65ebcb7e8e085e132ee5708
-  languageName: node
-  linkType: hard
-
 "@babel/plugin-proposal-private-property-in-object@npm:7.21.0-placeholder-for-preset-env.2":
   version: 7.21.0-placeholder-for-preset-env.2
   resolution: "@babel/plugin-proposal-private-property-in-object@npm:7.21.0-placeholder-for-preset-env.2"
@@ -501,17 +488,6 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.0.0-0
   checksum: 43bef611dd3912e3adcea1bcb587eaba1b8c8f24dfb134f191488e3521453d4f0a36408e6a3e27b512bee6e1b569c889db31a270d5576e9c34a80326bbc6bd7d
-  languageName: node
-  linkType: hard
-
-"@babel/plugin-syntax-decorators@npm:^7.23.3":
-  version: 7.23.3
-  resolution: "@babel/plugin-syntax-decorators@npm:7.23.3"
-  dependencies:
-    "@babel/helper-plugin-utils": ^7.22.5
-  peerDependencies:
-    "@babel/core": ^7.0.0-0
-  checksum: 4d33a74f70480af7ec761d618283fd81607b1cbab995067086d6392addf4aab3b437f9ff6a009655d037b9b577181945e40485ae162816068a76042c5c71f9c2
   languageName: node
   linkType: hard
 
@@ -6989,7 +6965,6 @@ fsevents@~2.3.2:
     "@babel/cli": ^7.23.4
     "@babel/core": ^7.23.7
     "@babel/eslint-parser": ^7.23.3
-    "@babel/plugin-proposal-decorators": ^7.23.7
     "@babel/plugin-transform-runtime": ^7.23.7
     "@babel/preset-env": ^7.23.8
     "@babel/runtime": ^7.23.8
