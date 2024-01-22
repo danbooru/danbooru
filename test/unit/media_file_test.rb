@@ -181,6 +181,46 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
+  context "#duration" do
+    should "get the correct duration for animated files" do
+      assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").duration)
+      assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").duration)
+      assert_equal(0.6,  MediaFile.open("test/files/test-animated-256x256.png").duration)
+      assert_equal(3.35, MediaFile.open("test/files/gif/test-animated-3.35s.gif").duration)
+      assert_equal(1.2,  MediaFile.open("test/files/gif/test-animated-1.2s.gif").duration)
+      assert_equal(2.0,  MediaFile.open("test/files/apng/normal_apng.png").duration)
+      assert_equal(0.84, MediaFile.open("test/files/webp/nyancat.webp").duration)
+      assert_equal(1.92, MediaFile.open("test/files/avif/sequence-with-pitm.avif").duration)
+      assert_equal(3.962292, MediaFile.open("test/files/avif/sequence-without-pitm.avif").duration)
+      assert_equal(0.5,  MediaFile.open("test/files/avif/star-8bpc.avif").duration)
+      assert_equal(1.92, MediaFile.open("test/files/avif/alpha_video.avif").duration)
+
+      assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").vips_duration)
+      assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").vips_duration)
+      assert_nil(MediaFile.open("test/files/test-animated-256x256.png").vips_duration)
+      assert_equal(3.35, MediaFile.open("test/files/gif/test-animated-3.35s.gif").vips_duration)
+      assert_equal(1.2,  MediaFile.open("test/files/gif/test-animated-1.2s.gif").vips_duration)
+      assert_nil(MediaFile.open("test/files/apng/normal_apng.png").vips_duration)
+      assert_equal(0.84, MediaFile.open("test/files/webp/nyancat.webp").vips_duration)
+      assert_nil(MediaFile.open("test/files/avif/sequence-with-pitm.avif").vips_duration)
+      assert_nil(MediaFile.open("test/files/avif/sequence-without-pitm.avif").vips_duration)
+      assert_nil(MediaFile.open("test/files/avif/star-8bpc.avif").vips_duration)
+      assert_nil(MediaFile.open("test/files/avif/alpha_video.avif").vips_duration)
+
+      assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").ffmpeg_duration)
+      assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").ffmpeg_duration)
+      assert_equal(0.6,  MediaFile.open("test/files/test-animated-256x256.png").ffmpeg_duration)
+      assert_equal(1.37, MediaFile.open("test/files/gif/test-animated-3.35s.gif").ffmpeg_duration) # XXX wrong in ffmpeg 6.1
+      assert_equal(0.12, MediaFile.open("test/files/gif/test-animated-1.2s.gif").ffmpeg_duration) # XXX wrong in ffmpeg 6.1
+      assert_equal(2.0,  MediaFile.open("test/files/apng/normal_apng.png").ffmpeg_duration)
+      assert_equal(0.04, MediaFile.open("test/files/webp/nyancat.webp").ffmpeg_duration) # XXX wrong in ffmpg 6.1
+      assert_equal(1.92, MediaFile.open("test/files/avif/sequence-with-pitm.avif").ffmpeg_duration)
+      assert_equal(3.962292,  MediaFile.open("test/files/avif/sequence-without-pitm.avif").ffmpeg_duration)
+      assert_equal(0.5,  MediaFile.open("test/files/avif/star-8bpc.avif").ffmpeg_duration)
+      assert_equal(1.92, MediaFile.open("test/files/avif/alpha_video.avif").ffmpeg_duration)
+    end
+  end
+
   context "#pixel_hash" do
     should "return the file's md5 for corrupted files" do
       assert_equal(MediaFile.md5("test/files/test-blank.jpg"), MediaFile.pixel_hash("test/files/test-blank.jpg"))
@@ -528,6 +568,8 @@ class MediaFileTest < ActiveSupport::TestCase
     should "determine the duration of the animation" do
       file = MediaFile.open("test/files/test-animated-86x52.gif")
       assert_equal(0.4, file.duration)
+      assert_equal(0.4, file.vips_duration)
+      assert_equal(0.4, file.ffmpeg_duration)
       assert_equal(10, file.frame_rate)
       assert_equal(4, file.frame_count)
     end
@@ -553,6 +595,8 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
         assert_equal(2.0, file.duration)
+        assert_equal(nil, file.vips_duration)
+        assert_equal(2.0, file.ffmpeg_duration)
         assert_equal(1.5, file.frame_rate)
         assert_equal(3, file.frame_count)
       end
@@ -577,6 +621,8 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
         assert_equal(0.3, file.duration)
+        assert_equal(nil, file.vips_duration)
+        assert_equal(0.3, file.ffmpeg_duration)
         assert_equal(2, file.frame_count)
         assert_equal(2/0.3, file.frame_rate)
       end
