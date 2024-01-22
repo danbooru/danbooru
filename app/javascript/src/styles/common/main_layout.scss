@@ -16,11 +16,11 @@ div#page {
   #sidebar {
     min-width: 230px;
 
-    @media (min-width: 1080px) {
+    @media (width >= 1080px) {
       min-width: 245px;
     }
 
-    @media (min-width: 1920px) {
+    @media (width >= 1920px) {
       min-width: 280px;
     }
   }

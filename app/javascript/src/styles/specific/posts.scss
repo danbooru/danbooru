@@ -203,7 +203,7 @@ body[data-post-current-image-size="original"] #image-resize-notice {
 
 /* Always show the "Resized to X% of original" notice on mobile when it exists. */
 #image-resize-notice {
-  @media screen and (max-width: 660px) {
+  @media screen and (width <= 660px) {
     display: block !important;
   }
 }
