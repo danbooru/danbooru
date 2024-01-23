@@ -252,6 +252,12 @@ class ApplicationMetrics
       rails_connection_pool_waiting:                   [:gauge, "Current number of threads blocked waiting to checkout a database connection."],
       rails_connection_pool_checkout_timeout:          [:gauge, "Maxmimum amount of time to wait on checking out a database connection."],
 
+      concurrent_ruby_thread_pool_completed_task_count: [:counter, "Total number of tasks completed by this thread pool (not including tasks executed by the caller)."],
+      concurrent_ruby_thread_pool_scheduled_task_count: [:counter, "Total number of tasks scheduled on this thread pool (not including tasks executed by the caller)."],
+      concurrent_ruby_thread_pool_active_task_count:    [:gauge,   "Current number of threads in this pool actively executing tasks."],
+      concurrent_ruby_thread_pool_thread_count:         [:gauge,   "Current number of threads in this pool. Every time a task is executed, idle threads may be pruned."],
+      concurrent_ruby_thread_pool_spawned_thread_count: [:counter, "Total number of threads spawned by this pool."],
+
       ruby_pid:                                        [:gauge,   "Current process ID."],
       ruby_thread_count:                               [:gauge,   "Current number of threads."],
       ruby_vm_constant_cache_invalidations:            [:counter, "Total number of constant cache invalidations."],
@@ -462,6 +468,18 @@ class ApplicationMetrics
       vips_allocations:  Vips.tracked_allocs,
       vips_files:        Vips.tracked_files,
     })
+
+    %i[io fast].each do |name|
+      pool = Concurrent.executor(name)
+
+      metrics.set({
+        concurrent_ruby_thread_pool_completed_task_count: pool.completed_task_count,
+        concurrent_ruby_thread_pool_scheduled_task_count: pool.scheduled_task_count,
+        concurrent_ruby_thread_pool_active_task_count:    pool.active_count,
+        concurrent_ruby_thread_pool_thread_count:         pool.length,
+        concurrent_ruby_thread_pool_spawned_thread_count: pool.instance_eval { @workers_counter },
+      }, { pool: name, max_threads: pool.max_length })
+    end
 
     if Jemalloc.enabled?
       Jemalloc.update_stats!
