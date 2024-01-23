@@ -4,13 +4,6 @@ GIT
   specs:
     dtext_rb (1.12.2)
 
-GIT
-  remote: https://github.com/danbooru/http-cookie
-  revision: 382d8a641e4df226e0e7b0d2bfaeadb2fe71dd84
-  specs:
-    http-cookie (1.0.4)
-      domain_name (~> 0.5)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -258,6 +251,8 @@ GEM
       http-form_data (~> 2.2)
       llhttp-ffi (~> 0.4.0)
     http-accept (1.7.0)
+    http-cookie (1.0.5)
+      domain_name (~> 0.5)
     http-form_data (2.3.0)
     httpclient (2.8.3)
     i18n (1.14.1)
@@ -299,7 +294,6 @@ GEM
     mime-types-data (3.2022.0105)
     mini_histogram (0.3.1)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.5)
     minitest (5.21.2)
     minitest-reporters (1.6.1)
       ansi
@@ -326,8 +320,7 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.0)
-    nokogiri (1.16.0)
-      mini_portile2 (~> 2.8.2)
+    nokogiri (1.16.0-x86_64-linux)
       racc (~> 1.4)
     numo-narray (0.9.2.1)
     oauth2 (2.0.9)
@@ -563,7 +556,7 @@ GEM
     zeitwerk (2.6.12)
 
 PLATFORMS
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
   activemodel-serializers-xml
@@ -599,7 +592,6 @@ DEPENDENCIES
   google-cloud-storage
   hsluv
   http
-  http-cookie!
   ipaddress_2
   listen
   mail
