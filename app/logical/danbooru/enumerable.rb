@@ -3,23 +3,18 @@
 # This class contains custom extensions to the standard library Enumerable class.
 #
 # @see config/initializers/core_extensions.rb
+# @see https://ruby-concurrency.github.io/concurrent-ruby/master/file.promises.out.html
 module Danbooru
   module Enumerable
-    class ParallelError < StandardError; end
-
     # Like `#each`, but perform the block on each item in parallel.
-    def parallel_each(**options, &block)
+    def parallel_each(executor = :io, &block)
       return enum_for(:parallel_each) unless block_given?
 
       promises = map do |item|
-        Concurrent::Promise.execute(**options) { yield item }
+        Concurrent::Promises.future_on(executor, item, &block)
       end
 
-      promises.each(&:wait)
-
-      errors = promises.filter_map(&:reason)
-      raise ParallelError, errors.map(&:inspect).join("; "), cause: errors.first if errors.present?
-
+      Concurrent::Promises.zip(*promises).wait!
       self
     end
   end
