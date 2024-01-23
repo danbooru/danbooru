@@ -192,7 +192,9 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(0, post.tag_count_character)
 
       tag = Tag.find_or_create_by_name("test", category: "char", current_user: @builder)
+      perform_enqueued_jobs(only: UpdateTagCategoryPostCountsJob)
       post.reload
+
       assert_equal(0, post.tag_count_general)
       assert_equal(1, post.tag_count_character)
     end

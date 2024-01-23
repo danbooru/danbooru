@@ -6,7 +6,7 @@ class Tag < ApplicationRecord
   # Tags that are permitted to have unbalanced parentheses, as a special exception to the normal rule that parentheses in tags must balanced.
   PERMITTED_UNBALANCED_TAGS = %w[:) :( ;) ;( >:) >:(]
 
-  attr_accessor :updater, :skip_name_validation
+  attr_accessor :updater, :skip_name_validation, :is_bulk_update_request
 
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
@@ -28,7 +28,7 @@ class Tag < ApplicationRecord
   before_create :create_character_tag_for_cosplay_tag, if: :is_cosplay_tag?
   after_save :update_tag_alias_categories, if: :saved_change_to_category?
   after_save :update_category_cache, if: :saved_change_to_category?
-  after_save :update_category_post_counts, if: :saved_change_to_category?
+  after_save :update_tag_category_post_counts_later, if: :saved_change_to_category?
 
   versionable :name, :category, :is_deprecated, merge_window: nil, delay_first_version: true
 
@@ -163,11 +163,22 @@ class Tag < ApplicationRecord
       TagCategory.reverse_mapping[category].capitalize
     end
 
-    def update_category_post_counts
-      Post.with_timeout(30_000) do
-        Post.raw_tag_match(name).find_each do |post|
-          post.update_tag_category_counts
-          post.save!
+    def update_tag_category_post_counts_later
+      return if empty?
+
+      # BURs already take place in a background job, so we don't need to spawn another one.
+      if is_bulk_update_request
+        update_tag_category_post_counts
+      else
+        UpdateTagCategoryPostCountsJob.perform_later(self)
+      end
+    end
+
+    # Update the tag_count_{category} columns on each post with this tag.
+    def update_tag_category_post_counts
+      posts.parallel_find_each do |post|
+        post.with_lock do
+          post.save! # Saving the post will automatically update the counts via update_tag_category_counts
         end
       end
     end
@@ -429,7 +440,7 @@ class Tag < ApplicationRecord
   end
 
   def posts
-    Post.system_tag_match(name)
+    Post.raw_tag_match(name)
   end
 
   def abbreviation
