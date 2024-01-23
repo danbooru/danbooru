@@ -110,18 +110,12 @@ class DanbooruLogger
   private_class_method
 
   def self.log_attributes(attributes)
-    attributes.each do |key, value|
-      ElasticAPM.set_label(key, value)
-    end
   end
 
   def self.log_exception(exception, expected: false, custom_params: {})
-    ElasticAPM.report(exception, handled: expected)
   end
 
   def self.log_event(level, message: nil, **params)
-    ElasticAPM.set_custom_context(params)
-    ElasticAPM.report_message(message)
   end
 
   # flatten_hash({ foo: { bar: { baz: 42 } } })
