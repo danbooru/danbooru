@@ -609,7 +609,6 @@ DEPENDENCIES
   mock_redis
   nokogiri
   oauth2
-  parallel
   pg
   pry-rails
   public_suffix
