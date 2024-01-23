@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory(:wiki_page) do
-    title {FFaker::Lorem.words.join(" ")}
-    body {FFaker::Lorem.sentences.join(" ")}
+    title { Faker::Internet.unique.username }
+    body { Faker::Lorem.paragraph }
   end
 end

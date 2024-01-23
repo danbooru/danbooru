@@ -34,7 +34,7 @@ def populate_users(n, password: DEFAULT_PASSWORD)
   end
 
   n.times do |i|
-    user = User.create(name: FFaker::Internet.user_name, password: password, password_confirmation: password, level: User::Levels::MEMBER)
+    user = User.create(name: Faker::Internet.unique.username, password: password, password_confirmation: password, level: User::Levels::MEMBER)
     puts "Created user ##{user.id}"
   end
 end
@@ -69,7 +69,7 @@ def populate_comments(n)
   n.times do |i|
     user = User.order("random()").first
     post = Post.order("random()").first
-    comment = CurrentUser.scoped(user) { Comment.create(creator: user, post: post, body: FFaker::Lorem.paragraph) }
+    comment = CurrentUser.scoped(user) { Comment.create(creator: user, post: post, body: Faker::Lorem.paragraph) }
 
     puts "Created comment ##{comment.id}"
   end
@@ -81,7 +81,7 @@ def populate_commentaries(n)
   n.times do |i|
     user = User.order("random()").first
     post = Post.order("random()").first
-    artcomm = CurrentUser.scoped(user) { ArtistCommentary.create(post: post, original_title: FFaker::Lorem.sentence, original_description: FFaker::Lorem.paragraphs.join("\n\n")) }
+    artcomm = CurrentUser.scoped(user) { ArtistCommentary.create(post: post, original_title: Faker::Lorem.sentence, original_description: Faker::Lorem.paragraphs.join("\n\n")) }
 
     puts "Created commentary ##{artcomm.id}"
   end
@@ -98,7 +98,7 @@ def populate_notes(n)
     w = rand(post.image_width - x).clamp(100..post.image_width)
     h = rand(post.image_height - y).clamp(100..post.image_height)
 
-    note = Note.create(post: post, x: x, y: y, width: w, height: h, body: FFaker::Lorem.paragraph)
+    note = Note.create(post: post, x: x, y: y, width: w, height: h, body: Faker::Lorem.paragraph)
 
     puts "Created note ##{note.id}"
   end
@@ -108,8 +108,8 @@ def populate_artists(n)
   puts "*** Creating artists ***"
 
   n.times do |i|
-    url_string = rand(5).times.map { FFaker::Internet.http_url }.join("\n")
-    artist = Artist.create(name: FFaker::Internet.user_name, url_string: url_string)
+    url_string = rand(5).times.map { Faker::Internet.url }.join("\n")
+    artist = Artist.create(name: Faker::Internet.unique.username, url_string: url_string)
 
     puts "Created artist ##{artist.id}"
   end
@@ -119,7 +119,7 @@ def populate_aliases(n)
   puts "*** Creating tag aliases ***"
 
   n.times do |i|
-    tag_alias = TagAlias.create(antecedent_name: FFaker::Internet.user_name, consequent_name: FFaker::Internet.user_name)
+    tag_alias = TagAlias.create(antecedent_name: Faker::Internet.unique.username, consequent_name: Faker::Internet.unique.username)
     puts "Created tag alias ##{tag_alias.id}"
   end
 end
@@ -128,7 +128,7 @@ def populate_implications(n)
   puts "*** Creating tag implications ***"
 
   n.times do |i|
-    tag_implication = TagImplication.create(antecedent_name: FFaker::Internet.user_name, consequent_name: FFaker::Internet.user_name)
+    tag_implication = TagImplication.create(antecedent_name: Faker::Internet.unique.username, consequent_name: Faker::Internet.unique.username)
     puts "Created tag implication ##{tag_implication.id}"
   end
 end
@@ -138,7 +138,7 @@ def populate_pools(n, posts_per_pool: 20)
 
   n.times do |i|
     posts = Post.order("random()").take(rand(posts_per_pool))
-    pool = Pool.create(name: FFaker::Lorem.sentence, description: FFaker::Lorem.paragraph, post_ids: posts.pluck(:id))
+    pool = Pool.create(name: Faker::Lorem.sentence, description: Faker::Lorem.paragraph, post_ids: posts.pluck(:id))
     puts "Created pool ##{pool.id}"
   end
 end
@@ -160,8 +160,8 @@ def populate_wiki_pages(n)
 
   n.times do |i|
     user = User.order("random()").first
-    other_names = rand(5).times.map { FFaker::Internet.user_name }
-    wiki = CurrentUser.scoped(user) { WikiPage.create(title: FFaker::Internet.user_name, other_names: other_names, body: FFaker::Lorem.paragraphs.join("\n\n")) }
+    other_names = rand(5).times.map { Faker::Internet.unique.username }
+    wiki = CurrentUser.scoped(user) { WikiPage.create(title: Faker::Internet.unique.username, other_names: other_names, body: Faker::Lorem.paragraphs.join("\n\n")) }
 
     puts "Created wiki ##{wiki.id}"
   end
@@ -172,11 +172,11 @@ def populate_forum(n, posts_per_topic: 20)
 
   n.times do |i|
     user = User.order("random()").first
-    topic = CurrentUser.scoped(user) { ForumTopic.create(creator: user, title: FFaker::Lorem.sentence, original_post_attributes: { creator: user, body: FFaker::Lorem.paragraphs.join("\n\n") }) }
+    topic = CurrentUser.scoped(user) { ForumTopic.create(creator: user, title: Faker::Lorem.sentence, original_post_attributes: { creator: user, body: Faker::Lorem.paragraphs.join("\n\n") }) }
 
     rand(posts_per_topic).times do
       user = User.order("random()").first
-      CurrentUser.scoped(user) { ForumPost.create(creator: user, topic: topic, body: FFaker::Lorem.paragraphs.join("\n\n")) }
+      CurrentUser.scoped(user) { ForumPost.create(creator: user, topic: topic, body: Faker::Lorem.paragraphs.join("\n\n")) }
     end
 
     puts "Created topic ##{topic.id}"
