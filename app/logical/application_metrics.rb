@@ -69,6 +69,7 @@ class ApplicationMetrics
       libvips_version: status.libvips_version,
       ffmpeg_version: status.ffmpeg_version,
       exiftool_version: status.exiftool_version,
+      jemalloc_version: status.jemalloc_version,
     }
     metrics[:danbooru_info][versions].set(1)
 
@@ -198,10 +199,15 @@ class ApplicationMetrics
     metrics[:target_info][{
       pod_name:         status.container_name,
       node_name:        status.node_name,
+      danbooru_version: status.danbooru_version,
       ruby_version:     status.ruby_version,
       rails_version:    status.rails_version,
       puma_version:     status.puma_version,
-      danbooru_version: status.danbooru_version,
+      distro_version:   status.distro_version,
+      libvips_version:  status.libvips_version,
+      ffmpeg_version:   status.ffmpeg_version,
+      exiftool_version: status.exiftool_version,
+      jemalloc_version: status.jemalloc_version,
     }].set(1)
 
     if puma_running?

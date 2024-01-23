@@ -26,7 +26,11 @@ module Jemalloc
   end
 
   def self.enabled?
-    allocated.present?
+    version.present?
+  end
+
+  def self.version
+    get("version", :string)
   end
 
   def self.thread_count
