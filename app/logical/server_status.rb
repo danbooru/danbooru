@@ -37,6 +37,7 @@ class ServerStatus
         ffmpeg_version: ffmpeg_version,
         mkvmerge_version: mkvmerge_version,
         exiftool_version: exiftool_version,
+        jemalloc_version: jemalloc_version,
         redis_version: redis_version,
         postgres_version: postgres_version,
       },
@@ -182,6 +183,14 @@ class ServerStatus
 
     def exiftool_installed?
       exiftool_version.present?
+    end
+
+    def jemalloc_version
+      Jemalloc.version
+    end
+
+    def jemalloc_installed?
+      jemalloc_version.present?
     end
 
     def instance_error
