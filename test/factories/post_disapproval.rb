@@ -3,6 +3,6 @@ FactoryBot.define do
     user factory: :approver_user
     post factory: :post, is_pending: true
     reason { PostDisapproval::REASONS.sample }
-    message { FFaker::Lorem.sentence }
+    message { Faker::Lorem.sentence }
   end
 end

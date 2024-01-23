@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory(:post_replacement) do
-    post factory: :post, source: FFaker::Internet.http_url
-    original_url { FFaker::Internet.http_url }
+    post factory: :post, source: Faker::Internet.url
+    original_url { Faker::Internet.url }
     replacement_url { "" }
     replacement_file { Rack::Test::UploadedFile.new("test/files/test.jpg") }
     creator

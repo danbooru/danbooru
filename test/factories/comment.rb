@@ -2,6 +2,6 @@ FactoryBot.define do
   factory(:comment) do |f|
     creator
     post
-    body {FFaker::Lorem.sentences.join(" ")}
+    body { Faker::Lorem.paragraph }
   end
 end

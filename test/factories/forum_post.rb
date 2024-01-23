@@ -2,6 +2,6 @@ FactoryBot.define do
   factory(:forum_post) do
     creator
     topic factory: :forum_topic
-    body {FFaker::Lorem.sentences.join(" ")}
+    body { Faker::Lorem.paragraph }
   end
 end

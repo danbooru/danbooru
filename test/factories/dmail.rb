@@ -3,7 +3,7 @@ FactoryBot.define do
     owner factory: :user
     from factory: :user
     to factory: :user
-    title {FFaker::Lorem.words.join(" ")}
-    body {FFaker::Lorem.sentences.join(" ")}
+    title { Faker::Lorem.sentence }
+    body { Faker::Lorem.paragraph }
   end
 end

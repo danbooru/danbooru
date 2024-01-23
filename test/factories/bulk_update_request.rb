@@ -3,6 +3,6 @@ FactoryBot.define do
     user
     title {"xxx"}
     script {"create alias aaa -> bbb"}
-    reason { FFaker::Lorem.sentences.join(" ") }
+    reason { Faker::Lorem.paragraph }
   end
 end

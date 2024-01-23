@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory(:tag) do
-    name {"#{FFaker::Name.first_name.downcase}#{rand(1000)}"}
+    name { Faker::Internet.unique.username }
     post_count { 100 }
     category {Tag.categories.general}
 

@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory(:forum_topic) do
     creator
-    title {FFaker::Lorem.words.join(" ")}
+    title { Faker::Lorem.sentence }
     is_sticky {false}
     is_locked {false}
     category_id {0}
