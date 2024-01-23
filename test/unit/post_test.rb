@@ -411,8 +411,11 @@ class PostTest < ActiveSupport::TestCase
       context "with a new tag" do
         should "create the new tag" do
           tag1 = create(:tag, name: "foo", post_count: 100, category: Tag.categories.character)
-          create(:post, tag_string: "foo bar")
+          post = create(:post, tag_string: "foo bar")
           tag2 = Tag.find_by_name("bar")
+
+          assert_equal(1, post.tag_count_general)
+          assert_equal(1, post.tag_count_character)
 
           assert_equal(101, tag1.reload.post_count)
           assert_equal(Tag.categories.character, tag1.category)
@@ -587,6 +590,8 @@ class PostTest < ActiveSupport::TestCase
           @post.update!(tag_string: "asd char:a_bad_tag")
 
           assert_equal("asd", @post.reload.tag_string)
+          assert_equal(0, @post.tag_count_character)
+          assert_equal(1, @post.tag_count_general)
           assert_match(/The following tags are deprecated and could not be added: \[\[a_bad_tag\]\]/, @post.warnings.full_messages.join)
         end
 
@@ -602,11 +607,13 @@ class PostTest < ActiveSupport::TestCase
       context "tagged with a metatag" do
         context "for a tag category prefix" do
           should "set the category of a new tag" do
-            create(:post, tag_string: "char:chen")
+            post = create(:post, tag_string: "char:chen")
             tag = Tag.find_by_name("chen")
 
             assert_equal(Tag.categories.character, tag.category)
             assert_equal(0, tag.versions.count)
+            assert_equal(1, post.tag_count_character)
+            assert_equal(0, post.tag_count_general)
           end
 
           should "change the category of an existing tag" do
@@ -615,6 +622,8 @@ class PostTest < ActiveSupport::TestCase
             post = as(user) { create(:post, tag_string: "char:hoge") }
 
             assert_equal(Tag.categories.character, tag.reload.category)
+            assert_equal(1, post.tag_count_character)
+            assert_equal(0, post.tag_count_general)
 
             assert_equal(2, tag.versions.count)
             assert_equal(1, tag.first_version.version)
@@ -628,6 +637,26 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(Tag.categories.character, tag.last_version.category)
           end
 
+          should "update the tag category counts for all posts with the tag" do
+            post1 = create(:post, tag_string: "chen")
+            post2 = create(:post, tag_string: "chen")
+
+            assert_equal(1, post1.tag_count_general)
+            assert_equal(0, post1.tag_count_character)
+            assert_equal(1, post2.tag_count_general)
+            assert_equal(0, post2.tag_count_character)
+
+            post1.update!(tag_string: "char:chen")
+            perform_enqueued_jobs(only: UpdateTagCategoryPostCountsJob)
+            post1.reload
+            post2.reload
+
+            assert_equal(0, post1.tag_count_general)
+            assert_equal(1, post1.tag_count_character)
+            assert_equal(0, post2.tag_count_general)
+            assert_equal(1, post2.tag_count_character)
+          end
+
           should "not change the category for an aliased tag" do
             create(:tag_alias, antecedent_name: "hoge", consequent_name: "moge")
             post = create(:post, tag_string: "char:hoge")
@@ -635,6 +664,8 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(["moge"], post.tag_array)
             assert_equal(Tag.categories.general, Tag.find_by_name("moge").category)
             assert_equal(Tag.categories.general, Tag.find_by_name("hoge").category)
+            assert_equal(0, post.tag_count_character)
+            assert_equal(1, post.tag_count_general)
           end
 
           should "not raise an exception for an invalid tag name" do
@@ -643,6 +674,9 @@ class PostTest < ActiveSupport::TestCase
             assert_match(/Couldn't add tag: 'copy:blah' cannot begin with 'copy:'/, post.warnings[:base].join("\n"))
             assert_equal(["tagme"], post.tag_array)
             assert_equal(false, Tag.exists?(name: "copy:blah"))
+            assert_equal(0, post.tag_count_character)
+            assert_equal(0, post.tag_count_copyright)
+            assert_equal(1, post.tag_count_general)
           end
 
           should "not raise an exception for char:newpool:blah" do
@@ -651,6 +685,8 @@ class PostTest < ActiveSupport::TestCase
             assert_match(/Couldn't add tag: 'newpool:blah' cannot begin with 'newpool:'/, post.warnings[:base].join("\n"))
             assert_equal(["tagme"], post.tag_array)
             assert_equal(false, Tag.exists?(name: "newpool:blah"))
+            assert_equal(0, post.tag_count_character)
+            assert_equal(1, post.tag_count_general)
           end
         end
 

@@ -34,6 +34,25 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal("approved", @bur.reload.status)
         end
 
+        should "update the tag category counts for all posts with the tag" do
+          post1 = create(:post, tag_string: "chen")
+          post2 = create(:post, tag_string: "chen")
+
+          assert_equal(1, post1.tag_count_general)
+          assert_equal(0, post1.tag_count_character)
+          assert_equal(1, post2.tag_count_general)
+          assert_equal(0, post2.tag_count_character)
+
+          create_bur!("category chen -> character", @admin)
+          post1.reload
+          post2.reload
+
+          assert_equal(0, post1.tag_count_general)
+          assert_equal(1, post1.tag_count_character)
+          assert_equal(0, post2.tag_count_general)
+          assert_equal(1, post2.tag_count_character)
+        end
+
         should "fail if the tag doesn't already exist" do
           @bur = build(:bulk_update_request, script: "category hello -> artist")
 

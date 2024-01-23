@@ -212,7 +212,7 @@ class BulkUpdateRequestProcessor
 
         when :change_category
           tag = Tag.find_or_create_by_name(args[0])
-          tag.update!(category: Tag.categories.value_for(args[1]), updater: User.system)
+          tag.update!(category: Tag.categories.value_for(args[1]), updater: User.system, is_bulk_update_request: true)
 
         when :deprecate
           tag = Tag.find_or_create_by_name(args[0])
