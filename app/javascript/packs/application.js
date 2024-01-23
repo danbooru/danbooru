@@ -7,9 +7,6 @@ function importAll(r) {
 // everything. See @babel/preset-env.
 import "core-js";
 
-import Rails from '@rails/ujs';
-Rails.start();
-
 require('hammerjs');
 require('jquery-hotkeys');
 import Alpine from 'alpinejs';
@@ -30,6 +27,9 @@ require("jquery-ui/themes/base/autocomplete.css");
 require("jquery-ui/themes/base/button.css");
 require("jquery-ui/themes/base/dialog.css");
 require("jquery-ui/themes/base/theme.css");
+
+import Rails from '@rails/ujs';
+Rails.start();
 
 import 'tippy.js/dist/tippy.css';
 
