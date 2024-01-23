@@ -24,9 +24,9 @@ class DanbooruEnumerableTest < ActiveSupport::TestCase
           executor = Concurrent::ThreadPoolExecutor.new(max_threads: 4)
 
           Timeout.timeout(3.second) do
-            128.times.parallel_each(executor: executor) do
-              8.times.parallel_each(executor: executor)do
-                4.times.parallel_each(executor: executor)do
+            128.times.parallel_each(executor) do
+              8.times.parallel_each(executor) do
+                4.times.parallel_each(executor) do
                   # do nothing
                 end
               end
