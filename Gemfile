@@ -33,7 +33,6 @@ gem 'scenic'
 gem 'ipaddress_2'
 gem 'http'
 gem 'activerecord-hierarchical_query'
-gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
 gem 'mail'
 gem 'nokogiri'
