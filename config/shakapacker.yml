@@ -67,6 +67,9 @@ development:
   compile: true
   compiler_strategy: mtime
 
+  # Output packs to public/packs-dev in development mode so that they're not overridden by the precompiled packs for production.
+  public_output_path: packs-dev
+
   # Reference: https://webpack.js.org/configuration/dev-server/
   # Keys not described there are documented inline and in https://github.com/shakacode/shakapacker/
   dev_server:

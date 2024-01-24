@@ -334,10 +334,10 @@ RUN <<EOS
   echo $SOURCE_COMMIT > REVISION
   ldconfig
 
-  mkdir -p /images public/data
+  mkdir -p /images public/data public/packs-dev
   ln -s packs public/packs-test
   ln -s /tmp tmp
-  chown --no-dereference danbooru:danbooru REVISION /danbooru /images public/data public/packs public/packs-test tmp vendor
+  chown --no-dereference danbooru:danbooru REVISION /danbooru /images public/data public/packs public/packs-dev public/packs-test tmp vendor
 
   # Test that everything works
   vips --version
