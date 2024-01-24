@@ -60,6 +60,7 @@ x-base-template: &base-template
 
   volumes:
     - danbooru-images:/images
+    - webpack-data:/danbooru/public/packs-dev
     - /danbooru/vendor
     - /danbooru/node_modules
     - /danbooru/public/packs
@@ -162,3 +163,5 @@ volumes:
     name: ${COMPOSE_PROJECT_NAME}-data
   iqdb-data:
     name: ${COMPOSE_PROJECT_NAME}-iqdb-data
+  webpack-data:
+    name: ${COMPOSE_PROJECT_NAME}-webpack-data
