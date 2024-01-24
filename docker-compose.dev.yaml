@@ -114,6 +114,7 @@ services:
 
   postgres:
     image: ghcr.io/danbooru/postgres:16.1
+    shm_size: 1gb
     environment:
       POSTGRES_USER: danbooru
       POSTGRES_HOST_AUTH_METHOD: trust
