@@ -33,6 +33,8 @@ x-base-template: &base-template
 
   read_only: true
   restart: unless-stopped
+  stdin_open: true
+  tty: true
 
   environment:
     DANBOORU_APP_NAME: "Devbooru"
