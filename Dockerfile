@@ -33,9 +33,8 @@ SHELL ["/bin/bash", "-xeuo", "pipefail", "-O", "globstar", "-O", "dotglob", "-c"
 
 ARG RUBY_MINOR_VERSION
 ENV DEBIAN_FRONTEND="noninteractive"
-ENV BUNDLE_DEPLOYMENT=1
-ENV GEM_HOME=/home/danbooru/.bundle
-ENV GEM_PATH=/danbooru/vendor/bundle/ruby/$RUBY_MINOR_VERSION:/usr/local/lib/ruby/gems/$RUBY_MINOR_VERSION:/home/danbooru/.bundle
+ENV GEM_HOME=/home/danbooru/bundle
+ENV GEM_PATH=/home/danbooru/bundle/ruby/$RUBY_MINOR_VERSION:/usr/local/lib/ruby/gems/$RUBY_MINOR_VERSION
 
 RUN <<EOS
   apt-get update
@@ -225,7 +224,7 @@ EOS
 
 
 
-# Build Ruby gems. Output is in /usr/local.
+# Build Ruby gems. Output is in /home/danbooru/bundle.
 FROM build-ruby AS build-gems
 WORKDIR /danbooru
 
@@ -236,13 +235,12 @@ RUN chown danbooru:danbooru /danbooru
 
 USER danbooru
 RUN <<EOS
-  bundle install --no-cache --jobs $(nproc)
+  BUNDLE_FROZEN=1 bundle install --no-cache --jobs $(nproc)
 
-  find vendor -regextype egrep -regex '.*\.(o|a|c|h|hh|hpp|exe|java|md|po|log|out|gem)$' -delete
-  find vendor -regextype egrep -regex '^.*/(Change|CHANGE|NEWS|LICENSE|COPYING|LEGAL|AUTHORS|CONTRIBUTORS|THANK|README|INSTALL|NOTICE|TODO).*$' -delete
-  find vendor -type f -executable -exec strip --strip-unneeded {} \;
-
-  rm -rf ~/.bundle
+  cd $GEM_HOME
+  find . -regextype egrep -regex '.*\.(o|a|c|h|hh|hpp|exe|java|md|po|log|out|gem|rdoc)$' -delete
+  find . -regextype egrep -regex '^.*/(Change|CHANGE|NEWS|LICENSE|COPYING|LEGAL|AUTHORS|CONTRIBUTORS|THANK|README|INSTALL|NOTICE|TODO|.github).*$' -delete
+  find . -type f -executable -exec strip --strip-unneeded {} \;
 EOS
 
 
@@ -294,7 +292,7 @@ COPY --link app/components/ ./app/components/
 COPY --link app/javascript/ ./app/javascript/
 COPY --link Gemfile Gemfile.lock ./
 COPY --link --from=build-ruby /usr/local /usr/local
-COPY --link --from=build-gems /danbooru/vendor /danbooru/vendor
+COPY --link --from=build-gems $GEM_HOME $GEM_HOME
 
 RUN <<EOS
   RAILS_ENV=production bin/rails assets:precompile
@@ -312,7 +310,7 @@ COPY --link --from=build-openresty /usr/local /usr/local
 
 COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
 COPY --link --from=build-ruby /usr/local /usr/local
-COPY --link --from=build-gems /danbooru/vendor /danbooru/vendor
+COPY --link --from=build-gems $GEM_HOME $GEM_HOME
 
 # http://jemalloc.net/jemalloc.3.html#tuning
 ENV LD_PRELOAD=libjemalloc.so.2
@@ -334,7 +332,7 @@ RUN <<EOS
   mkdir -p /images public/data public/packs-dev
   ln -s packs public/packs-test
   ln -s /tmp tmp
-  chown --no-dereference danbooru:danbooru REVISION /danbooru /images public/data public/packs public/packs-dev public/packs-test tmp vendor
+  chown --no-dereference danbooru:danbooru /danbooru /images /home/danbooru REVISION public/data public/packs public/packs-dev public/packs-test tmp $GEM_HOME
 
   # Test that everything works
   vips --version
@@ -344,6 +342,7 @@ RUN <<EOS
   ffprobe -version
   exiftool -ver
   openresty -version
+  bin/good_job --help > /dev/null
   bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
 EOS
 
@@ -366,9 +365,9 @@ RUN <<EOS
 EOS
 
 COPY --link --from=build-node /usr/local /usr/local
-COPY --link --from=build-assets /danbooru/node_modules /danbooru/node_modules
+COPY --link --from=build-assets /danbooru/node_modules /node_modules
 RUN <<EOS
-  chown danbooru:danbooru /danbooru node_modules
+  chown danbooru:danbooru /danbooru /node_modules
 EOS
 
 USER danbooru

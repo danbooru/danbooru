@@ -15,12 +15,13 @@ module.exports = merge({}, baseWebpackConfig, {
   },
   plugins: [
     isDevelopment && new ESLintPlugin({
-      cache: true,
+      cacheLocation: "tmp/eslintcache",
       threads: true,
       emitWarning: true
     }),
     isDevelopment && new StylelintPlugin({
       context: "app/javascript/src/styles",
+      cacheLocation: "tmp/stylelintcache",
       threads: true,
     }),
   ].filter(Boolean),

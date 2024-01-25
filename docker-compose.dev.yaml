@@ -63,7 +63,6 @@ x-base-template: &base-template
   volumes:
     - danbooru-images:/images
     - webpack-data:/danbooru/public/packs-dev
-    - /danbooru/vendor
     - /danbooru/node_modules
     - /danbooru/public/packs
     - ./:/danbooru
