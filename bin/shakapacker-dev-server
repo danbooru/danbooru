@@ -2,6 +2,7 @@
 
 ENV["RAILS_ENV"] ||= "development"
 ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../../Gemfile", __FILE__)
+ENV["SHAKAPACKER_USE_PACKAGE_JSON_GEM"] = "true"
 
 require "bundler/setup"
 require "shakapacker"

@@ -270,22 +270,19 @@ EOS
 
 
 
-# Build Javascript and CSS assets. Output is in /danbooru/public/packs.
+# Build Javascript and CSS assets. Output is in /danbooru/public/packs and /danbooru/node_modules.
 FROM danbooru-base AS build-assets
 
-COPY --link .yarnrc.yml package.json yarn.lock ./
-COPY --link .yarn/ ./.yarn/
+COPY --link package.json package-lock.json ./
 COPY --link --from=build-node /usr/local /usr/local
 
 RUN <<EOS
-  npm install -g yarn
-
   mkdir -p tmp node_modules public/packs
-  chown danbooru:danbooru /danbooru .yarn tmp node_modules public/packs
+  chown danbooru:danbooru /danbooru tmp node_modules public/packs
 EOS
 
 USER danbooru
-RUN yarn install
+RUN npm ci
 
 COPY --link postcss.config.js babel.config.json Rakefile ./
 COPY --link bin/rails bin/shakapacker bin/shakapacker-dev-server ./bin/
@@ -369,10 +366,8 @@ RUN <<EOS
 EOS
 
 COPY --link --from=build-node /usr/local /usr/local
-COPY --link --from=build-assets /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --link --from=build-assets /danbooru/node_modules /danbooru/node_modules
 RUN <<EOS
-  ln -s ../lib/node_modules/yarn/bin/yarn.js /usr/local/bin/yarn
   chown danbooru:danbooru /danbooru node_modules
 EOS
 
