@@ -57,7 +57,6 @@ x-base-template: &base-template
     SHAKAPACKER_DEV_SERVER_HOST: webpack
 
   tmpfs:
-    - "/tmp"
     - "/danbooru/tmp:uid=1000,gid=1000"
 
   volumes:
@@ -65,7 +64,7 @@ x-base-template: &base-template
     - webpack-data:/danbooru/public/packs-dev
     - /danbooru/node_modules
     - /danbooru/public/packs
-    - ./:/danbooru
+    - ${DANBOORU_DIR:-./}:/danbooru
 
 services:
   migrations:
