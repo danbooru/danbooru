@@ -316,8 +316,11 @@ GEM
       net-protocol
     net-protocol (0.2.2)
       timeout
+    net-sftp (4.0.0)
+      net-ssh (>= 5.0.0, < 8.0.0)
     net-smtp (0.4.0.1)
       net-protocol
+    net-ssh (7.2.1)
     nio4r (2.7.0)
     nokogiri (1.16.0-x86_64-linux)
       racc (~> 1.4)
@@ -402,6 +405,8 @@ GEM
     rb-fsevent (0.11.2)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rbnacl (7.1.1)
+      ffi
     rbs (2.8.4)
     rbtrace (0.5.1)
       ffi (>= 1.0.6)
@@ -533,6 +538,7 @@ GEM
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    x25519 (1.0.10)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     yard (0.9.34)
@@ -556,6 +562,7 @@ DEPENDENCIES
   capybara
   clockwork
   codecov
+  connection_pool
   crass
   daemons
   debug
@@ -583,6 +590,7 @@ DEPENDENCIES
   minitest-reporters
   mocha
   mock_redis
+  net-sftp
   nokogiri
   oauth2
   pg
@@ -597,6 +605,7 @@ DEPENDENCIES
   rails (~> 7.1)
   rake
   rakismet
+  rbnacl
   rbtrace
   recaptcha
   redis
@@ -619,6 +628,7 @@ DEPENDENCIES
   stripe
   tzinfo-data
   view_component
+  x25519
 
 RUBY VERSION
    ruby 3.2.3p157
