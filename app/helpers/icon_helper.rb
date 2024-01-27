@@ -59,6 +59,7 @@ module IconHelper
     Douyin
     Drawcrowd
     E-Hentai
+    e621
     Enty
     Erogamescape
     Etsy

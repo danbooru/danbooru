@@ -78,6 +78,7 @@ module Source
       Source::URL::CiEn,
       Source::URL::Xfolio,
       Source::URL::Inkbunny,
+      Source::URL::E621,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
