@@ -39,8 +39,6 @@ gem 'tzinfo-data'
 gem 'hsluv'
 gem 'google-cloud-bigquery', require: "google/cloud/bigquery"
 gem 'google-cloud-storage', require: "google/cloud/storage"
-gem 'ed25519'
-gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
 gem 'clockwork'
 gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
@@ -64,6 +62,12 @@ group :discord do
   gem "terminal-table", "~> 3.0"
 end
 gem "drb"
+gem "net-sftp"
+gem "rbnacl"
+gem "x25519"
+gem "ed25519"
+gem "bcrypt_pbkdf"
+gem "connection_pool"
 
 group :development do
   gem 'rubocop', require: false

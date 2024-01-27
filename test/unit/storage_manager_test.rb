@@ -42,6 +42,23 @@ class StorageManagerTest < ActiveSupport::TestCase
     end
   end
 
+  context "StorageManager::SFTP" do
+    setup do
+      # https://www.wftpserver.com/onlinedemo.htm
+      @storage_manager = StorageManager::SFTP.new("demo.wftpserver.com", ssh_options: { port: 2222, user: "demo", password: "demo" })
+    end
+
+    context "#open method" do
+      should "open the file" do
+        file = @storage_manager.open("/download/version.txt")
+
+        assert_equal(107_902, file.read.size)
+
+        file.close
+      end
+    end
+  end
+
   context "StorageManager::Mirror" do
     setup do
       @temp_dir1 = Dir.mktmpdir("danbooru-temp1-")
