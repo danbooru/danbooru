@@ -19,6 +19,25 @@ class NoteSanitizerTest < ActiveSupport::TestCase
       assert_equal('<p style="font-size: 1em;">test</p>', NoteSanitizer.sanitize(body))
     end
 
+    should "not strip allowed style properties" do
+      assert_equal('<p style="position: absolute;">test</p>', NoteSanitizer.sanitize('<p style="position: absolute;">test</p>'))
+      assert_equal('<p style="position: Absolute;">test</p>', NoteSanitizer.sanitize('<p style="position: Absolute;">test</p>'))
+      assert_equal('<p style="position: relative;">test</p>', NoteSanitizer.sanitize('<p style="position: relative;">test</p>'))
+      assert_equal('<p style="position: relative;">test</p>', NoteSanitizer.sanitize('<p style="  position: relative;  ">test</p>'))
+      assert_equal('<p style="color: red;position: relative;color: green;">test</p>', NoteSanitizer.sanitize('<p style="  color: red;; ;; position: relative;; ;;  color: green;; ;;">test</p>'))
+    end
+
+    should "strip disallowed style properties" do
+      assert_equal('<p>test</p>', NoteSanitizer.sanitize('<p style="position: fixed;">test</p>'))
+      assert_equal('<p>test</p>', NoteSanitizer.sanitize('<p style="position: sticky;">test</p>'))
+      assert_equal('<p>test</p>', NoteSanitizer.sanitize('<p style="display: none;">test</p>'))
+
+      assert_equal('<p style="color: red;">test</p>', NoteSanitizer.sanitize('<p style="position: fixed; color: red;">test</p>'))
+      assert_equal('<p style="color: red;">test</p>', NoteSanitizer.sanitize('<p style="position: fixed; ; ; ; color: red;">test</p>'))
+
+      assert_equal('<p>test</p>', NoteSanitizer.sanitize('<p style=";">test</p>'))
+    end
+
     should "mark links as nofollow" do
       body = '<a href="http://www.google.com">google</a>'
       assert_equal('<a href="http://www.google.com" rel="external noreferrer nofollow">google</a>', NoteSanitizer.sanitize(body))
