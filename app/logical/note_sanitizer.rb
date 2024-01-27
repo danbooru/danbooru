@@ -57,6 +57,12 @@ module NoteSanitizer
     vertical-align
   ]
 
+  # The list of values allowed for each CSS property. For properties not on this list, any value is allowed.
+  ALLOWED_PROPERTY_VALUES = {
+    position: %w[absolute relative],
+    display: %w[inline block inline-block flex inline-flex grid inline-grid table table-cell table-row],
+  }.with_indifferent_access
+
   # Sanitize a string of HTML.
   # @param text [String] the HTML to sanitize
   # @return [String] the sanitized HTML
@@ -80,13 +86,58 @@ module NoteSanitizer
         protocols: [],
         properties: ALLOWED_PROPERTIES
       },
-      :transformers => method(:relativize_links)
+      :transformers => [
+        method(:relativize_links!),
+        method(:sanitize_css!)
+      ]
     )
+  end
+
+  # Remove disallowed CSS properties from the HTML element's style attribute.
+  # @param node [Nokogiri::HTML5::DocumentFragment] The HTML element to sanitize.
+  def self.sanitize_css!(node:, **env)
+    node["style"] = sanitize_style(node["style"])
+  end
+
+  # @param style [String] The CSS style attribute.
+  # @return [String] The sanitized CSS style attribute.
+  def self.sanitize_style(style)
+    return nil if style.blank?
+
+    nodes = Crass.parse_properties(style)
+    omit_next_semicolon = false
+
+    nodes.map! do |node|
+      case node[:node]
+      in :property if !allowed_css_property?(node[:name], node[:value])
+        omit_next_semicolon = true
+        nil
+
+      in :semicolon if omit_next_semicolon
+        nil
+
+      in :whitespace
+        nil
+
+      else
+        omit_next_semicolon = false
+        node
+      end
+    end
+
+    Crass::Parser.stringify(nodes).strip
+  end
+
+  # @param name [String] The CSS property name.
+  # @param value [String] The CSS property value.
+  def self.allowed_css_property?(name, value)
+    allowed_values = ALLOWED_PROPERTY_VALUES[name]
+    allowed_values.blank? || value.downcase.in?(allowed_values)
   end
 
   # Convert absolute Danbooru links inside notes to relative links.
   # https://danbooru.donmai.us/posts/1 is converted to /posts/1.
-  def self.relativize_links(node:, **env)
+  def self.relativize_links!(node:, **env)
     return unless node.name == "a" && node["href"].present?
 
     url = Addressable::URI.heuristic_parse(node["href"]).normalize
