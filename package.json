@@ -61,7 +61,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "scripts": {
-    "eslint-all": "npx eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts",
+    "eslint-all": "npx eslint --plugin eslint-plugin-ignore-erb --cache --cache-location tmp/ --ext .js,.js.erb app/javascript/src/javascripts",
     "stylelint-all": "npx stylelint --cache --cache-strategy content --cache-location tmp/ 'app/javascript/src/styles/**/*'"
   },
   "browserslist": [
