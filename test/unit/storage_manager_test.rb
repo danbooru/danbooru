@@ -1,11 +1,31 @@
 require 'test_helper'
 
 class StorageManagerTest < ActiveSupport::TestCase
-  def tempfile(data)
+  def tempfile(data, &block)
     file = Danbooru::Tempfile.new
     file.write(data)
     file.flush
-    file
+
+    if block_given?
+      yield file
+      file.close
+    else
+      file
+    end
+  end
+
+  def sftp
+    host = ENV["DANBOORU_SFTP_HOST"]
+    port = ENV["DANBOORU_SFTP_PORT"]
+    user = ENV["DANBOORU_SFTP_USER"]
+    pass = ENV["DANBOORU_SFTP_PASS"]
+    dir  = ENV["DANBOORU_SFTP_DIR"]
+
+    if host.present? && port.present? && user.present? && pass.present? && dir.present?
+      StorageManager::SFTP.new(host, base_dir: dir, ssh_options: { port: port, user: user, password: pass })
+    else
+      nil
+    end
   end
 
   context "StorageManager::Local" do
@@ -44,16 +64,28 @@ class StorageManagerTest < ActiveSupport::TestCase
 
   context "StorageManager::SFTP" do
     setup do
-      # https://www.wftpserver.com/onlinedemo.htm
-      @storage_manager = StorageManager::SFTP.new("demo.wftpserver.com", ssh_options: { port: 2222, user: "demo", password: "demo" })
+      @storage_manager = sftp
+      skip "SFTP server not configured" if @storage_manager.nil?
     end
 
-    context "#open method" do
-      should "open the file" do
-        file = @storage_manager.open("/download/version.txt")
+    context "#store method" do
+      should "store the file" do
+        tempfile("blah") do |file|
+          @storage_manager.store(file, "blah.txt")
+        end
 
-        assert_equal(107_902, file.read.size)
+        file = @storage_manager.open("blah.txt")
+        assert_equal("blah", file.read)
+        file.close
+      end
 
+      should "create parent directories if they don't already exist" do
+        tempfile("blah") do |file|
+          @storage_manager.store(file, "a/b/c/d/blah.txt")
+        end
+
+        file = @storage_manager.open("a/b/c/d/blah.txt")
+        assert_equal("blah", file.read)
         file.close
       end
     end
