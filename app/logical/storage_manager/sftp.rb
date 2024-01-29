@@ -14,17 +14,21 @@ class StorageManager::SFTP < StorageManager
     non_interactive: true
   }
 
-  attr_reader :host, :pool, :base_dir, :ssh_options
+  attr_reader :host, :pool, :base_dir, :max_requests, :buffer_size, :ssh_options
 
   # @param host [String] The hostname of the remote server.
   # @param base_dir [String] The directory to store files in.
   # @param max_connections [Integer] The maximum number of persistent SFTP connections to allow.
+  # @param max_requests [Integer] The maximum number of simultaneous read/write operations during uploads and downloads. More requests means higher throughput.
+  # @param buffer_size [Integer] The buffer size for read/write operations during uploads and downloads. Bigger buffers means higher throughput. 262,120 is the maximum packet size supported by OpenSSH.
   # @param pool_timeout [Integer] The maximum number of seconds to wait for a SFTP connection to become available.
   # @param ssh_options [Hash] Additional options to pass to Net::SSH.
   # @param options [Hash] Additional options to pass to StorageManager.
-  def initialize(host, base_dir: "/", max_connections: Danbooru.config.max_concurrency, pool_timeout: 15, ssh_options: {}, **options)
+  def initialize(host, base_dir: "/", max_connections: Danbooru.config.max_concurrency, max_requests: 8, buffer_size: 256_000, pool_timeout: 15, ssh_options: {}, **options)
     @host = host
     @base_dir = base_dir.to_s
+    @max_requests = max_requests
+    @buffer_size = buffer_size
     @ssh_options = DEFAULT_SSH_OPTIONS.merge(ssh_options)
     @pool = ConnectionPool.new(size: max_connections, timeout: pool_timeout) do
       SFTPConnection.open(host, **@ssh_options)
@@ -41,7 +45,7 @@ class StorageManager::SFTP < StorageManager
     with_connection do |sftp|
       sftp.mkdir_p!(File.dirname(dest_path))
 
-      sftp.upload!(file.path, temp_upload_path)
+      sftp.upload!(file.path, temp_upload_path, read_size: buffer_size, requests: max_requests)
       sftp.setstat!(temp_upload_path, permissions: DEFAULT_PERMISSIONS)
 
       # `rename!` can't overwrite existing files, so if a file already exists at dest_path we move it out of the way first.
@@ -67,7 +71,7 @@ class StorageManager::SFTP < StorageManager
     file = Tempfile.new(binmode: true)
 
     with_connection do |sftp|
-      sftp.download!(full_path(dest_path), file.path)
+      sftp.download!(full_path(dest_path), file.path, read_size: buffer_size, requests: max_requests)
     end
 
     file
