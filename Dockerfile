@@ -312,6 +312,10 @@ ENV RUBY_YJIT_ENABLE=1
 # Disable libvips warning messages
 ENV VIPS_WARNING=0
 
+# https://github.com/shopify/bootsnap#environment-variables
+ENV BOOTSNAP_CACHE_DIR=/home/danbooru/bootsnap
+ENV BOOTSNAP_READONLY=true
+
 RUN <<EOS
   ldconfig
 
@@ -340,6 +344,8 @@ RUN <<EOS
   mkdir -p public/data public/packs-dev
   ln -s packs public/packs-test
   ln -s /tmp tmp
+
+  bundle exec bootsnap precompile --gemfile app test
 
   # Test that everything works
   vips --version
@@ -371,8 +377,9 @@ EOS
 
 COPY --link --from=build-node /usr/local /usr/local
 COPY --link --from=build-assets /danbooru/node_modules /node_modules
+COPY --link --from=production /home/danbooru/bootsnap /home/danbooru/bootsnap
 COPY --link --from=production /danbooru /danbooru
 
-RUN chown danbooru:danbooru /danbooru /node_modules /home/danbooru/.sudo_as_admin_successful
+RUN chown danbooru:danbooru /danbooru /node_modules /home/danbooru /home/danbooru/bootsnap /home/danbooru/.sudo_as_admin_successful
 
 USER danbooru
