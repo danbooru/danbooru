@@ -293,12 +293,13 @@ class MediaAsset < ApplicationRecord
         media_asset = create!(file: media_file, status: :processing)
         yield media_asset if block_given?
 
-        # XXX should do this in parallel with thumbnail generation.
         # XXX shouldn't generate thumbnail twice (very slow for ugoira)
-        media_asset.update!(ai_tags: media_file.preview!(360, 360).ai_tags)
-        media_asset.update!(media_metadata: MediaMetadata.new(file: media_file))
-
+        task1 = Danbooru.async { media_asset.update!(ai_tags: media_file.preview!(360, 360).ai_tags) }
+        task2 = Danbooru.async { media_asset.update!(media_metadata: MediaMetadata.new(file: media_file)) }
         media_asset.distribute_files!(media_file)
+        task1.wait!
+        task2.wait!
+
         media_asset.update!(status: :active)
         media_asset
 
