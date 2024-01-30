@@ -45,11 +45,11 @@ RUN <<EOS
     postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules libpq5 libpcre3 libsodium23 \
     libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2 libpng16-16 libexpat1 \
     libglib2.0 libgif7 libexif12 libheif1 libvpx8 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
-    libreadline8 libarchive-zip-perl tini busybox less ncdu curl git sudo
+    libreadline8 libarchive-zip-perl tini busybox less ncdu curl
 
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs libglib2.0-bin libglib2.0-doc mount procps python3 tzdata
   apt-get autoremove -y
-  rm -rf /var/{lib,cache,log} /usr/share/{doc,info}/* /usr/local/*
+  rm -rf /etc/gnutls/config /var/{lib,cache,log} /usr/share/{doc,info}/* /usr/local/*
   mkdir -p /var/{lib,cache,log}/apt /var/lib/dpkg
 
   busybox --install -s
@@ -62,7 +62,6 @@ FROM base AS build-base
 WORKDIR /build
 
 RUN <<EOS
-  rm /etc/gnutls/config
   apt-get update
   apt-get install -y --no-install-recommends ca-certificates g++ make pkg-config git
 EOS
@@ -360,14 +359,19 @@ EOS
 FROM danbooru-base AS development
 
 RUN <<EOS
+  apt-get update
+  apt-get install -y --no-install-recommends g++ make git sudo gnupg
+
   groupadd admin -U danbooru
   passwd -d danbooru
+
+  touch /home/danbooru/.sudo_as_admin_successful
 EOS
 
 COPY --link --from=build-node /usr/local /usr/local
 COPY --link --from=build-assets /danbooru/node_modules /node_modules
 COPY --link --from=production /danbooru /danbooru
 
-RUN chown danbooru:danbooru /danbooru /node_modules
+RUN chown danbooru:danbooru /danbooru /node_modules /home/danbooru/.sudo_as_admin_successful
 
 USER danbooru
