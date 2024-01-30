@@ -36,6 +36,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 ENV LANG=C.UTF-8
 ENV GEM_HOME=/home/danbooru/bundle
 ENV GEM_PATH=/home/danbooru/bundle/ruby/$RUBY_MINOR_VERSION:/usr/local/lib/ruby/gems/$RUBY_MINOR_VERSION
+ENV PATH=$GEM_HOME/bin:$PATH
 
 RUN <<EOS
   userdel ubuntu
