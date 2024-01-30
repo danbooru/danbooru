@@ -37,11 +37,22 @@ ENV GEM_HOME=/home/danbooru/bundle
 ENV GEM_PATH=/home/danbooru/bundle/ruby/$RUBY_MINOR_VERSION:/usr/local/lib/ruby/gems/$RUBY_MINOR_VERSION
 
 RUN <<EOS
-  apt-get update
-  rm -rf /usr/local/*
-
   userdel ubuntu
   useradd --user-group danbooru --create-home --shell /bin/bash
+
+  apt-get update
+  apt-get install -y --no-install-recommends \
+    postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules libpq5 libpcre3 libsodium23 \
+    libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2 libpng16-16 libexpat1 \
+    libglib2.0 libgif7 libexif12 libheif1 libvpx8 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
+    libreadline8 libarchive-zip-perl tini busybox less ncdu curl git sudo
+
+  apt-get purge -y --allow-remove-essential pkg-config e2fsprogs libglib2.0-bin libglib2.0-doc mount procps python3 tzdata
+  apt-get autoremove -y
+  rm -rf /var/{lib,cache,log} /usr/share/{doc,info}/* /usr/local/*
+  mkdir -p /var/{lib,cache,log}/apt /var/lib/dpkg
+
+  busybox --install -s
 EOS
 
 
@@ -49,8 +60,12 @@ EOS
 # The base layer for building dependencies. All builds take place inside /build.
 FROM base AS build-base
 WORKDIR /build
-ARG COMMON_BUILD_DEPS="curl ca-certificates build-essential pkg-config git"
-RUN apt-get install -y --no-install-recommends $COMMON_BUILD_DEPS
+
+RUN <<EOS
+  rm /etc/gnutls/config
+  apt-get update
+  apt-get install -y --no-install-recommends ca-certificates g++ make pkg-config git
+EOS
 
 
 
@@ -206,7 +221,8 @@ EOS
 FROM build-base AS build-node
 ARG NODE_VERSION
 RUN <<EOS
-  apt-get install -y --no-install-recommends gnupg
+  apt-get install -y --no-install-recommends gnupg python3
+  rm -rf /usr/local/*
 
   curl https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor > /usr/share/keyrings/nodesource.gpg
   echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION nodistro main" > /etc/apt/sources.list.d/nodesource.list
@@ -244,73 +260,47 @@ RUN <<EOS
 EOS
 
 
-# Build the base Danbooru image. Pull in dependencies from previous layers and install runtime dependencies from apt-get.
-FROM base AS danbooru-base
-WORKDIR /danbooru
-
-COPY --link --from=build-vips /usr/local /usr/local
-COPY --link --from=build-ruby /usr/local /usr/local
-
-RUN <<EOS
-  apt-get install -y --no-install-recommends \
-    postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules libpq5 libpcre3 libsodium23 \
-    libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2 libpng16-16 libexpat1 \
-    libglib2.0 libgif7 libexif12 libheif1 libvpx8 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
-    libreadline8 libarchive-zip-perl tini busybox less ncdu curl git sudo
-
-  apt-get purge -y --allow-remove-essential pkg-config e2fsprogs libglib2.0-bin libglib2.0-doc mount procps python3 tzdata
-  apt-get autoremove -y
-  rm -rf /var/{lib,cache,log} /usr/share/{doc,info}/* /build
-  mkdir -p /var/{lib,cache,log}/apt /var/lib/dpkg
-
-  busybox --install -s
-EOS
-
-
 
 # Build Javascript and CSS assets. Output is in /danbooru/public/packs and /danbooru/node_modules.
-FROM danbooru-base AS build-assets
+FROM build-node AS build-assets
+WORKDIR /danbooru
 
 COPY --link package.json package-lock.json ./
-COPY --link --from=build-node /usr/local /usr/local
 
 RUN <<EOS
-  mkdir -p tmp node_modules public/packs
-  chown danbooru:danbooru /danbooru tmp node_modules public/packs
+  mkdir -p node_modules public/packs
+  chown danbooru:danbooru /danbooru node_modules public/packs
 EOS
 
 USER danbooru
 RUN npm ci
 
-COPY --link postcss.config.js babel.config.json Rakefile ./
-COPY --link bin/rails bin/shakapacker bin/shakapacker-dev-server ./bin/
-COPY --link config/application.rb config/boot.rb config/danbooru_default_config.rb config/shakapacker.yml ./config/
+COPY --link postcss.config.js babel.config.json ./
+COPY --link config/shakapacker.yml ./config/
 COPY --link config/webpack/ ./config/webpack/
 COPY --link public/images ./public/images
 COPY --link public/fonts ./public/fonts
-COPY --link app/components/ ./app/components/
-COPY --link app/javascript/ ./app/javascript/
-COPY --link Gemfile Gemfile.lock ./
-COPY --link --from=build-ruby /usr/local /usr/local
-COPY --link --from=build-gems $GEM_HOME $GEM_HOME
+COPY --link app/components/ ./app/components
+COPY --link app/javascript/ ./app/javascript
 
 RUN <<EOS
-  RAILS_ENV=production bin/rails assets:precompile
-  rm public/packs/**/*.{gz,br}
+  npx webpack --mode production -c config/webpack/webpack.config.js
+  rm -f public/packs/**/*.{gz,br}
 EOS
 
 
 
-# Build the final layer. Pull in the compiled assets and gems on top of the base Danbooru layer.
-FROM danbooru-base AS production
+# The base layer for the production and development layers. Contains everything but the /danbooru directory.
+FROM base AS danbooru-base
+WORKDIR /danbooru
 
 COPY --link --from=build-ffmpeg /usr/local /usr/local
 COPY --link --from=build-exiftool /usr/local /usr/local
 COPY --link --from=build-openresty /usr/local /usr/local
-
-COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
+COPY --link --from=build-vips /usr/local /usr/local
 COPY --link --from=build-ruby /usr/local /usr/local
 COPY --link --from=build-gems $GEM_HOME $GEM_HOME
+COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
 
 # http://jemalloc.net/jemalloc.3.html#tuning
 ENV LD_PRELOAD=libjemalloc.so.2
@@ -322,17 +312,34 @@ ENV RUBY_YJIT_ENABLE=1
 # Disable libvips warning messages
 ENV VIPS_WARNING=0
 
+RUN <<EOS
+  ldconfig
+
+  mkdir -p /images
+  chown danbooru:danbooru /danbooru /images /home/danbooru public/packs $GEM_HOME
+EOS
+
+ENTRYPOINT ["tini", "--"]
+CMD ["bin/rails", "server"]
+
+# https://github.com/opencontainers/image-spec/blob/main/annotations.md
+LABEL org.opencontainers.image.source https://github.com/danbooru/danbooru
+
+
+
+# The production layer. Contains the final /danbooru directory on top of the base Danbooru layer.
+FROM danbooru-base AS production
+USER danbooru
+
 COPY --chown=danbooru:danbooru . /danbooru
 
 ARG SOURCE_COMMIT=""
 RUN <<EOS
   echo $SOURCE_COMMIT > REVISION
-  ldconfig
 
-  mkdir -p /images public/data public/packs-dev
+  mkdir -p public/data public/packs-dev
   ln -s packs public/packs-test
   ln -s /tmp tmp
-  chown --no-dereference danbooru:danbooru /danbooru /images /home/danbooru REVISION public/data public/packs public/packs-dev public/packs-test tmp $GEM_HOME
 
   # Test that everything works
   vips --version
@@ -346,19 +353,12 @@ RUN <<EOS
   bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
 EOS
 
-USER danbooru
-ENTRYPOINT ["tini", "--"]
-CMD ["bin/rails", "server"]
-
-# https://github.com/opencontainers/image-spec/blob/main/annotations.md
-LABEL org.opencontainers.image.source https://github.com/danbooru/danbooru
 
 
+# The development layer. Contains the production layer, plus enables passwordless sudo and includes nodejs
+# and node_modules so that JS/CSS files can be rebuilt.
+FROM danbooru-base AS development
 
-# Build the development layer. Enable passwordless sudo, and pull in nodejs and node_modules so that JS/CSS files can be rebuilt.
-FROM production AS development
-
-USER root
 RUN <<EOS
   groupadd admin -U danbooru
   passwd -d danbooru
@@ -366,8 +366,8 @@ EOS
 
 COPY --link --from=build-node /usr/local /usr/local
 COPY --link --from=build-assets /danbooru/node_modules /node_modules
-RUN <<EOS
-  chown danbooru:danbooru /danbooru /node_modules
-EOS
+COPY --link --from=production /danbooru /danbooru
+
+RUN chown danbooru:danbooru /danbooru /node_modules
 
 USER danbooru
