@@ -33,6 +33,7 @@ SHELL ["/bin/bash", "-xeuo", "pipefail", "-O", "globstar", "-O", "dotglob", "-c"
 
 ARG RUBY_MINOR_VERSION
 ENV DEBIAN_FRONTEND="noninteractive"
+ENV LANG=C.UTF-8
 ENV GEM_HOME=/home/danbooru/bundle
 ENV GEM_PATH=/home/danbooru/bundle/ruby/$RUBY_MINOR_VERSION:/usr/local/lib/ruby/gems/$RUBY_MINOR_VERSION
 
