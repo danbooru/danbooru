@@ -31,7 +31,6 @@ x-base-template: &base-template
   # production images don't contain the tools necessary to rebuild the JS/CSS files.
   image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:development}
 
-  read_only: true
   restart: unless-stopped
   stdin_open: true
   tty: true
@@ -99,7 +98,6 @@ services:
   devcontainer:
     <<: *base-template
     command: ["sleep", "infinity"]
-    read_only: false
 
   # https://github.com/danbooru/iqdb
   # https://hub.docker.com/repository/docker/evazion/iqdb
