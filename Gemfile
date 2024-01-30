@@ -16,7 +16,7 @@ gem 'dtext_rb', git: "https://github.com/danbooru/dtext_rb.git", require: "dtext
 gem 'memoist'
 gem 'daemons'
 gem 'oauth2'
-gem 'bootsnap'
+gem 'bootsnap', require: false
 gem 'addressable'
 gem 'rakismet'
 gem 'recaptcha', require: "recaptcha/rails"
