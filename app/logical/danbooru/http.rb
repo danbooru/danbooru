@@ -1,17 +1,5 @@
 # frozen_string_literal: true
 
-require "danbooru/http/application_client"
-require "danbooru/http/html_adapter"
-require "danbooru/http/json_adapter"
-require "danbooru/http/xml_adapter"
-require "danbooru/http/cache"
-require "danbooru/http/logger"
-require "danbooru/http/redirector"
-require "danbooru/http/retriable"
-require "danbooru/http/session"
-require "danbooru/http/spoof_referrer"
-require "danbooru/http/unpolish_cloudflare"
-
 # The HTTP client used by Danbooru for all outgoing HTTP requests. A wrapper
 # around the http.rb gem that adds some helper methods and custom behavior:
 #
@@ -34,6 +22,17 @@ module Danbooru
     class Error < StandardError; end
     class DownloadError < Error; end
     class FileTooLargeError < Error; end
+
+    Danbooru::Http::HtmlAdapter.register
+    Danbooru::Http::JsonAdapter.register
+    Danbooru::Http::XmlAdapter.register
+    Danbooru::Http::Cache.register
+    Danbooru::Http::Logger.register
+    Danbooru::Http::Redirector.register
+    Danbooru::Http::Retriable.register
+    Danbooru::Http::Session.register
+    Danbooru::Http::SpoofReferrer.register
+    Danbooru::Http::UnpolishCloudflare.register
 
     DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0"
 
