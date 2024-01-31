@@ -3,12 +3,14 @@
 module Danbooru
   class Http
     class Cache < HTTP::Feature
-      HTTP::Options.register_feature :cache, self
-
       attr_reader :expires_in
 
       def initialize(expires_in:)
         @expires_in = expires_in
+      end
+
+      def self.register
+        HTTP::Options.register_feature :cache, self
       end
 
       def perform(request, &block)

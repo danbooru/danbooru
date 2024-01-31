@@ -3,8 +3,10 @@
 module Danbooru
   class Http
     class JsonAdapter < HTTP::MimeType::Adapter
-      HTTP::MimeType.register_adapter "application/json", self
-      HTTP::MimeType.register_adapter "application/ld+json", self
+      def self.register
+        HTTP::MimeType.register_adapter "application/json", self
+        HTTP::MimeType.register_adapter "application/ld+json", self
+      end
 
       def encode(obj)
         return obj.to_json if obj.respond_to?(:to_json)

@@ -11,13 +11,15 @@
 module Danbooru
   class Http
     class Retriable < HTTP::Feature
-      HTTP::Options.register_feature :retriable, self
-
       attr_reader :max_retries, :max_delay
 
       def initialize(max_retries: 2, max_delay: 5.seconds)
         @max_retries = max_retries
         @max_delay = max_delay
+      end
+
+      def self.register
+        HTTP::Options.register_feature :retriable, self
       end
 
       def perform(request, &block)

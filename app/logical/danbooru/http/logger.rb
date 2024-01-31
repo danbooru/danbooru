@@ -3,12 +3,14 @@
 module Danbooru
   class Http
     class Logger < HTTP::Feature
-      HTTP::Options.register_feature :logger, self
-
       attr_reader :logger
 
       def initialize(logger: ::Logger.new(STDERR))
         @logger = logger
+      end
+
+      def self.register
+        HTTP::Options.register_feature :logger, self
       end
 
       def perform(request, &block)

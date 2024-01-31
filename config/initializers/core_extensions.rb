@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "danbooru"
+require_relative "../../app/logical/danbooru"
 require_relative "../../app/logical/danbooru/enumerable"
 
 module Danbooru

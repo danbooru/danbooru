@@ -6,7 +6,7 @@
 # more about custom components.
 # Dir[Rails.root.join('lib/components/**/*.rb')].each { |f| require f }
 
-require "dtext_input"
+require_relative "../../app/logical/dtext_input"
 
 #
 # Use this setup block to configure all options available in SimpleForm.
