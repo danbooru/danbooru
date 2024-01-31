@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ProcessUploadMediaAssetJob < ApplicationJob
-  queue_with_priority 20
+  queue_with_priority -10
 
   def perform(upload_media_asset)
     upload_media_asset.process_upload!
