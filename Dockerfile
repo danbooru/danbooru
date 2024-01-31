@@ -324,7 +324,7 @@ RUN <<EOS
   chown danbooru:danbooru /danbooru /images /home/danbooru public/packs $GEM_HOME
 EOS
 
-ENTRYPOINT ["tini", "--"]
+ENTRYPOINT ["tini", "-g", "--"]
 CMD ["bin/rails", "server"]
 
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md
