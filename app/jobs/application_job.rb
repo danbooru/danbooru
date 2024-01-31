@@ -9,7 +9,11 @@ class ApplicationJob < ActiveJob::Base
 
   queue_as :default
 
-  # Jobs with higher priority are processed first. Higher number = higher priority.
+  # Jobs with lower numbers are processed first. Lower number = higher priority.
+  # ProcessUploadJob:           priority -20
+  # ProcessUploadMediaAssetJob: priority -10
+  # Other jobs:                 priority 0
+  # PopulateSavedSearchJob:     priority 10
   queue_with_priority 0
 
   # Called for background jobs enqueued with `perform_later`. Not called for foreground jobs performed with `perform_now`.

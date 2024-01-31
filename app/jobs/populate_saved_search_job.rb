@@ -3,8 +3,7 @@
 # A job that updates a user's saved searches when they do a search for
 # `search:all` or `search:<label>`.
 class PopulateSavedSearchJob < ApplicationJob
-  queue_as :default
-  queue_with_priority -1
+  queue_with_priority 10
 
   def perform(query)
     SavedSearch.populate(query)
