@@ -8,11 +8,11 @@ module DanbooruMaintenance
     queue PruneRateLimitsJob
     queue RegeneratePostCountsJob
     queue PruneUploadsJob
+    queue PruneJobsJob
     #queue AmcheckDatabaseJob
   end
 
   def daily
-    queue PruneJobsJob
     queue PrunePostDisapprovalsJob
     queue PruneBulkUpdateRequestsJob
     queue PruneBansJob
