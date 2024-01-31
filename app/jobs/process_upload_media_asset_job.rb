@@ -3,6 +3,10 @@
 class ProcessUploadMediaAssetJob < ApplicationJob
   queue_with_priority -10
 
+  def job_timeout
+    10.minutes
+  end
+
   def perform(upload_media_asset)
     upload_media_asset.process_upload!
   rescue Exception => e
