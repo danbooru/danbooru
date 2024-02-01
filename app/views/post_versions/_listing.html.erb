@@ -25,7 +25,7 @@
         <div>
           <b>Tags:</b>
 
-          <% if post_version.tag_array.size <= Post::MAX_TAG_COUNT %>
+          <% if post_version.tag_array.size <= PostVersion::MAX_DISPLAY_TAGS %>
             <%= render_inline_tag_list_from_names(post_version.tag_array) %>
           <% else %>
             <div class="prose">
@@ -44,7 +44,7 @@
         </div>
       <% end %>
       <% t.column "Edits", td: {class: "col-expand"}, width: "40%" do |post_version| %>
-        <% if (post_version.added_tags.size + post_version.removed_tags.size) < Post::MAX_TAG_COUNT %>
+        <% if (post_version.added_tags.size + post_version.removed_tags.size) <= PostVersion::MAX_DISPLAY_TAGS %>
           <%= post_version_diff(post_version, params[:type]) %>
         <% else %>
           <div class="prose">
