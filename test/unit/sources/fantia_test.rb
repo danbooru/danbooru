@@ -64,7 +64,7 @@ module Sources
         assert_equal(tags, source.tags.map(&:first))
         assert_equal("2021年9月更新分[PNG] - September 2021", source.artist_commentary_title)
         assert_match(/This is the same as the image data updated in September 2021/, source.artist_commentary_desc)
-        assert_downloaded(289_848, url)
+        assert_downloaded(289_918, url)
         assert_nothing_raised { source.to_h }
       end
     end
@@ -150,6 +150,25 @@ module Sources
       )
     end
 
+    context "A fantia.jp/posts/$id blog/album type url" do
+      strategy_should_work(
+        "https://fantia.jp/posts/2533616",
+        page_url: "https://fantia.jp/posts/2533616",
+        image_urls: [
+          "https://c.fantia.jp/uploads/post/file/2533616/83e6c07c-c28b-4cb0-9d3c-0e30ae54cd6e.jpg",
+          %r!\Ahttps://cc\.fantia\.jp/uploads/album_image/file/326995/main_00abd740-74d5-4289-be85-782cb8cdd382\.png!,
+          %r!\Ahttps://cc\.fantia\.jp/uploads/album_image/file/326996/12ba15a3-293e-40c8-a872-845bd1277256\.jpg!,
+        ],
+        profile_url: "https://fantia.jp/fanclubs/6088",
+        profile_urls: %w[https://fantia.jp/fanclubs/6088],
+        artist_name: nil,
+        tag_name: nil,
+        tags: [],
+        dtext_artist_commentary_title: "リバーシにまけました",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
     context "A fantia.jp/products/$id url" do
       should "work" do
         url = "https://fantia.jp/products/249638"
@@ -166,7 +185,7 @@ module Sources
         assert_equal("https://fantia.jp/fanclubs/7", source.profile_url)
         assert_equal("https://fantia.jp/products/249638", source.page_url)
 
-        assert_downloaded(289_848, source.image_urls[0])
+        assert_downloaded(289_918, source.image_urls[0])
         assert_downloaded(515_598, source.image_urls[1])
         assert_downloaded(613_103, source.image_urls[2])
         assert_downloaded(146_837, source.image_urls[3])
