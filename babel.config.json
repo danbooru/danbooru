@@ -4,7 +4,7 @@
       "@babel/preset-env", {
         "useBuiltIns": "entry",
         "corejs": "3.27",
-        "debug": true,
+        "debug": false,
         "modules": "auto",
         "bugfixes": true,
         "exclude": ["transform-typeof-symbol"]
