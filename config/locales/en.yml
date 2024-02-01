@@ -70,6 +70,8 @@ en:
       upload:
         uploader: "You"
         uploader_id: "You"
+      user:
+        password_confirmation: ""
       user/email_address:
         address: "Email address"
         normalized_address: "Email address"
