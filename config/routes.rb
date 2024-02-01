@@ -164,6 +164,7 @@ Rails.application.routes.draw do
   resources :note_versions, :only => [:index, :show]
   resource :note_previews, only: [:create, :show]
   resource :password_reset, only: [:create, :show]
+  resource :password, only: [:edit, :update]
   resources :pools do
     member do
       put :revert
@@ -338,7 +339,6 @@ Rails.application.routes.draw do
   get "/profile", to: "users#profile", as: :profile
   get "/settings", to: "users#settings", as: :settings
 
-  #get "/up", to: proc { [204, {}, []] }
   get "/up" => "health#show", as: :rails_health_check
   get "/up/postgres" => "health#postgres"
   get "/up/redis" => "health#redis"
@@ -349,6 +349,7 @@ Rails.application.routes.draw do
   get "/404" => "static#not_found", :as => "not_found"
   get "/2257" => "static#2257", :as => "usc_2257"
   get "/contact" => "static#contact", :as => "contact"
+  get "/.well-known/change-password", to: redirect("/password/edit", status: 302)
 
   get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
