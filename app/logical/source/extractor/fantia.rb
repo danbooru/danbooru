@@ -50,7 +50,11 @@ class Source::Extractor
           image_from_downloadable("https://www.fantia.jp/#{content["download_uri"]}")
         when "blog"
           comment = JSON.parse(content["comment"]) rescue {}
-          comment["ops"].to_a.pluck("insert").pluck("image").compact
+          comment["ops"].to_a.pluck("insert").compact.filter_map do |node|
+            next unless node.is_a?(Hash)
+            next node["image"] if node.key?("image")
+            next node["fantiaImage"]["url"] if node.key?("fantiaImage")
+          end
         end
       end.flatten.compact
 
