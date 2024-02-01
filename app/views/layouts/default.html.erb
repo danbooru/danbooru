@@ -130,7 +130,7 @@
 
     <% if CurrentUser.user.is_banned? %>
       <div class="notice notice-error notice-large" id="ban-notice">
-        <h2>You have been banned <%= humanized_duration CurrentUser.user.active_ban.duration %></h2>
+        <h2>You have been banned <%= CurrentUser.user.active_ban.humanized_duration %></h2>
 
         <div>
           Reason: <span class="prose"><%= format_text CurrentUser.user.active_ban.reason, inline: true %></span>

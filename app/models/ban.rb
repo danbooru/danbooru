@@ -68,7 +68,21 @@ class Ban < ApplicationRecord
   end
 
   def humanized_duration
-    ApplicationController.helpers.humanized_duration(duration)
+    if forever?
+      "forever"
+    elsif duration < 0
+      # In production, the oldest bans have negative duration because in 2013 the database was migrated and the
+      # created_at field was reset to 2013, which made their creation date come after their expiration date.
+      "unknown"
+    elsif duration < 1.month
+      duration.in_days.round.days.inspect
+    elsif duration < 1.year
+      duration.in_months.round.months.inspect
+    elsif duration < 100.years
+      duration.in_years.round.years.inspect
+    else
+      duration.inspect
+    end
   end
 
   def forever?
