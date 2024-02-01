@@ -162,9 +162,10 @@ class SavedSearch < ApplicationRecord
 
       def rewrite_queries!(old_name, new_name)
         has_tag(old_name).find_each do |ss|
-          ss.lock!
-          ss.rewrite_query(old_name, new_name)
-          ss.save!
+          ss.with_lock do
+            ss.rewrite_query(old_name, new_name)
+            ss.save!
+          end
         end
       end
     end

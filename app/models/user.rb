@@ -369,9 +369,10 @@ class User < ApplicationRecord
     class_methods do
       def rewrite_blacklists!(old_name, new_name)
         has_blacklisted_tag(old_name).find_each do |user|
-          user.lock!
-          user.rewrite_blacklist(old_name, new_name)
-          user.save!
+          user.with_lock do
+            user.rewrite_blacklist(old_name, new_name)
+            user.save!
+          end
         end
       end
     end

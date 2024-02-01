@@ -152,8 +152,9 @@ class TagImplication < TagRelationship
       CurrentUser.scoped(User.system) do
         Post.system_tag_match("#{antecedent_name} -#{consequent_name}").reorder(nil).parallel_find_each do |post|
           DanbooruLogger.info("post ##{post.id}: implying #{antecedent_name} -> #{consequent_name}")
-          post.lock!
-          post.save!
+          post.with_lock do
+            post.save!
+          end
         end
       end
     end
