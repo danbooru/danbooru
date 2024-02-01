@@ -1,8 +1,4 @@
 const { globalMutableWebpackConfig: baseWebpackConfig, merge } = require("shakapacker");
-const ESLintPlugin = require("eslint-webpack-plugin");
-const StylelintPlugin = require("stylelint-webpack-plugin");
-
-const isDevelopment = process.env.NODE_ENV === "development";
 
 module.exports = merge({}, baseWebpackConfig, {
 //  output: {
@@ -13,18 +9,6 @@ module.exports = merge({}, baseWebpackConfig, {
       "jquery": "jquery/src/jquery.js",
     }
   },
-  plugins: [
-    isDevelopment && new ESLintPlugin({
-      cacheLocation: "tmp/eslintcache",
-      threads: true,
-      emitWarning: true
-    }),
-    isDevelopment && new StylelintPlugin({
-      context: "app/javascript/src/styles",
-      cacheLocation: "tmp/stylelintcache",
-      threads: true,
-    }),
-  ].filter(Boolean),
   module: {
     rules: [{
       test: /\.wasm$/,
