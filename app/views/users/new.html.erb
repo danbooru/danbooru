@@ -16,8 +16,8 @@
       <%= edit_form_for(@user, html: { id: "signup-form" }, validate: true) do |f| %>
         <%= f.input :name, as: :string, input_html: { autocapitalize: "none", minlength: UserNameValidator::MIN_LENGTH, maxlength: UserNameValidator::MAX_LENGTH }, required: true %>
         <%= f.input :email_address, label: "Email", required: false, as: :email, input_html: { value: "", pattern: Danbooru::EmailAddress::EMAIL_REGEX, title: "your.name@example.com" }, hint: "Optional" %>
-        <%= f.input :password, input_html: { minlength: 5 }, required: true %>
-        <%= f.input :password_confirmation, input_html: { minlength: 5 }, required: true %>
+        <%= f.input :password, input_html: { minlength: 5, autocomplete: "new-password" }, required: true %>
+        <%= f.input :password_confirmation, label: "Confirm password", input_html: { minlength: 5, autocomplete: "new-password" }, required: true %>
 
         <% if Danbooru.config.enable_recaptcha? %>
           <%= invisible_recaptcha_tags callback: 'submitInvisibleRecaptchaForm', text: 'Sign up' %>
