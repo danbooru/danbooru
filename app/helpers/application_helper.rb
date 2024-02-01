@@ -110,14 +110,6 @@ module ApplicationHelper
     tag.time content || datetime, datetime: datetime, title: time.to_formatted_s, **options
   end
 
-  def humanized_duration(duration)
-    if duration >= 100.years
-      "forever"
-    else
-      duration.inspect
-    end
-  end
-
   def duration_to_hhmmss(seconds)
     seconds = seconds.round
     hh = seconds.div(1.hour)
