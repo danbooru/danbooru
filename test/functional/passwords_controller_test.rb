@@ -7,9 +7,31 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "edit action" do
-      should "work" do
+      should "work for a user viewing their own change password page" do
         get_auth edit_user_password_path(@user), @user
         assert_response :success
+      end
+
+      should "work for the owner viewing another users's change password page" do
+        get_auth edit_user_password_path(@user), create(:owner_user)
+        assert_response :success
+      end
+
+      should "not work for a user viewing another users's change password page" do
+        get_auth edit_user_password_path(@user), create(:user)
+        assert_response 403
+      end
+
+      should "redirect to the login page for a logged out user" do
+        get edit_password_path
+        assert_redirected_to login_path(url: edit_password_path)
+      end
+    end
+
+    context "/.well-known/change-password" do
+      should "redirect to the /password/edit page" do
+        get "/.well-known/change-password"
+        assert_redirected_to edit_password_path
       end
     end
 
