@@ -100,7 +100,7 @@ class User < ApplicationRecord
   validates :password, length: { minimum: 5 }, if: ->(rec) { rec.new_record? || rec.password.present? }
   validates :default_image_size, inclusion: { in: %w[large original] }
   validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE) }
-  validates :password, confirmation: true
+  validates :password, confirmation: { message: "Passwords don't match" }
   validates :comment_threshold, inclusion: { in: (-100..5) }
   validate :validate_custom_css, if: :custom_style_changed?
   validate :validate_add_extra_data_attributes, unless: :new_record?
