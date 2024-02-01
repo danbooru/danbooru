@@ -207,7 +207,9 @@ class WikiPage < ApplicationRecord
 
   def self.rewrite_wiki_links!(old_name, new_name)
     WikiPage.linked_to(old_name).each do |wiki|
-      wiki.lock!.update!(body: DText.rewrite_wiki_links(wiki.body, old_name, new_name))
+      wiki.with_lock do
+        wiki.update!(body: DText.rewrite_wiki_links(wiki.body, old_name, new_name))
+      end
     end
   end
 

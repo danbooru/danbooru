@@ -71,12 +71,13 @@ class TagMover
 
   # Retag the posts from the old tag to the new tag.
   def move_posts!
-    Post.raw_tag_match(old_tag.name).reorder(nil).parallel_find_each do |post|
+    old_tag.posts.parallel_find_each do |post|
       DanbooruLogger.info("post ##{post.id}: moving #{old_tag.name} -> #{new_tag.name}")
-      post.lock!
-      post.remove_tag(old_tag.name)
-      post.add_tag(new_tag.name)
-      post.save!
+      post.with_lock do
+        post.remove_tag(old_tag.name)
+        post.add_tag(new_tag.name)
+        post.save!
+      end
     end
   end
 
@@ -150,41 +151,43 @@ class TagMover
   # one. Duplicate information will be automatically stripped when the artist
   # is saved.
   def merge_artists!
-    old_artist.lock!
-    new_artist.lock!
+    ApplicationRecord.transaction do
+      [old_artist, new_artist].sort_by(&:id).each(&:lock!)
 
-    new_artist.other_names += old_artist.other_names
-    new_artist.other_names += [old_artist.name]
-    new_artist.group_name = old_artist.group_name unless new_artist.group_name.present?
-    new_artist.url_string += "\n" + old_artist.url_string
-    new_artist.is_deleted = false
-    new_artist.is_banned = old_artist.is_banned || new_artist.is_banned
-    new_artist.save!
+      new_artist.other_names += old_artist.other_names
+      new_artist.other_names += [old_artist.name]
+      new_artist.group_name = old_artist.group_name unless new_artist.group_name.present?
+      new_artist.url_string += "\n" + old_artist.url_string
+      new_artist.is_deleted = false
+      new_artist.is_banned = old_artist.is_banned || new_artist.is_banned
+      new_artist.save!
 
-    old_artist.other_names = [new_artist.name]
-    old_artist.group_name = ""
-    old_artist.url_string = ""
-    old_artist.is_deleted = true
-    old_artist.is_banned = false
-    old_artist.save!
+      old_artist.other_names = [new_artist.name]
+      old_artist.group_name = ""
+      old_artist.url_string = ""
+      old_artist.is_deleted = true
+      old_artist.is_banned = false
+      old_artist.save!
+    end
   end
 
   # Merge the other names from both wikis. Transfer the body from the old wiki
   # to the new wiki if the new wiki has an empty body. Then mark the old wiki
   # as deleted.
   def merge_wikis!
-    old_wiki.lock!
-    new_wiki.lock!
+    ApplicationRecord.transaction do
+      [old_wiki, new_wiki].sort_by(&:id).each(&:lock!)
 
-    new_wiki.other_names += old_wiki.other_names
-    new_wiki.is_deleted = false
-    new_wiki.body = old_wiki.body if new_wiki.body.blank? && old_wiki.body.present?
-    new_wiki.save!
+      new_wiki.other_names += old_wiki.other_names
+      new_wiki.is_deleted = false
+      new_wiki.body = old_wiki.body if new_wiki.body.blank? && old_wiki.body.present?
+      new_wiki.save!
 
-    old_wiki.body = "This tag has been moved to [[#{new_wiki.title}]]."
-    old_wiki.other_names = []
-    old_wiki.is_deleted = true
-    old_wiki.save!
+      old_wiki.body = "This tag has been moved to [[#{new_wiki.title}]]."
+      old_wiki.other_names = []
+      old_wiki.is_deleted = true
+      old_wiki.save!
+    end
   end
 
   def old_wiki
