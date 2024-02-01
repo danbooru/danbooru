@@ -28,7 +28,15 @@
           <% if post_version.tag_array.size <= Post::MAX_TAG_COUNT %>
             <%= render_inline_tag_list_from_names(post_version.tag_array) %>
           <% else %>
-            <%= post_version.tags %>
+            <div class="prose">
+              <details>
+                <summary><%= post_version.tag_array.size %> tags</summary>
+
+                <div class="thin-scrollbar overflow-auto max-h-180px">
+                  <%= post_version.tags %>
+                </div>
+              </details>
+            </div>
           <% end %>
         </div>
         <div>
@@ -39,8 +47,27 @@
         <% if (post_version.added_tags.size + post_version.removed_tags.size) < Post::MAX_TAG_COUNT %>
           <%= post_version_diff(post_version, params[:type]) %>
         <% else %>
-          <%= post_version.added_tags.map { |tag| "+#{tag} " }.join(" ") %>
-          <%= post_version.removed_tags.map { |tag| "-#{tag} " }.join(" ") %>
+          <div class="prose">
+            <% if post_version.added_tags.present? %>
+              <details>
+                <summary><%= pluralize(post_version.added_tags.size, "tag") %> added</summary>
+
+                <div class="thin-scrollbar overflow-auto max-h-180px">
+                  <%= post_version.added_tags.join(" ") %>
+                </div>
+              </details>
+            <% end %>
+
+            <% if post_version.removed_tags.present? %>
+              <details>
+                <summary><%= pluralize(post_version.removed_tags.size, "tag") %> removed</summary>
+
+                <div class="thin-scrollbar overflow-auto max-h-180px">
+                  <%= post_version.removed_tags.join(" ") %>
+                </div>
+              </details>
+            <% end %>
+          </div>
         <% end %>
       <% end %>
       <% t.column "Changes", width: "5%" do |post_version| %>
