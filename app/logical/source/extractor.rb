@@ -71,6 +71,7 @@ module Source
       Source::Extractor::Xfolio,
       Source::Extractor::CiEn,
       Source::Extractor::Inkbunny,
+      Source::Extractor::Bluesky,
     ]
 
     # Should return true if the extractor is configured correctly. Return false

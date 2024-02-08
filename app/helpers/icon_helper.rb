@@ -34,6 +34,7 @@ module IconHelper
     Biglobe
     Bilibili
     Blogger
+    Bluesky
     Boosty
     Booth
     Buy\ Me\ a\ Coffee
