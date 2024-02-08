@@ -13,6 +13,7 @@ module Sources
           "https://bsky.app/profile/ixy.bsky.social",
           "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w",
         ],
+        page_url: "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
         artist_name: "Ixy(いくしー)",
         tag_name: "ixy",
         tags: [],
