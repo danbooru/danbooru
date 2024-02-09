@@ -61,7 +61,7 @@ class Source::Extractor::Bluesky < Source::Extractor
   def user_did_from_url
     parsed_url.user_did || parsed_referer&.user_did
   end
-  
+
   # https://www.docs.bsky.app/docs/api/com-atproto-identity-resolve-handle
   memoize def user_did_from_api
     return unless user_handle_from_url.present?
@@ -92,11 +92,9 @@ class Source::Extractor::Bluesky < Source::Extractor
 
     request(
       "https://bsky.social/xrpc/app.bsky.feed.getPostThread",
-      params: {
-        uri: "at://#{user_did}/app.bsky.feed.post/#{post_id}",
-        depth: 0,
-        parentHeight: 0,
-      },
+      uri: "at://#{user_did}/app.bsky.feed.post/#{post_id}",
+      depth: 0,
+      parentHeight: 0,
     )
   end
 
@@ -118,7 +116,7 @@ class Source::Extractor::Bluesky < Source::Extractor
   end
 
   memoize def cached_access_token
-    Cache.get("bluesky-access-token", 24.hours, skip_nil: true) do
+    Cache.get("bluesky-access-token", 1.hours, skip_nil: true) do
       access_token
     end
   end
@@ -129,12 +127,12 @@ class Source::Extractor::Bluesky < Source::Extractor
   end
 
   def request(url, **params)
-    response = http.cache(1.minute).headers(Authorization: "Bearer #{cached_access_token}").parsed_get(url, **params) || {}
+    response = http.cache(1.minute).headers(Authorization: "Bearer #{cached_access_token}").get(url, params: params).parse
 
-    if response["error"] == "InvalidToken"
+    if response["error"].in?(%w[InvalidToken ExpiredToken])
       DanbooruLogger.info("Bluesky access token stale; logging in again")
       clear_cached_access_token!
-      response = http.cache(1.minute).headers(Authorization: "Bearer #{cached_access_token}").parsed_get(url, **params) || {}
+      response = http.cache(1.minute).headers(Authorization: "Bearer #{cached_access_token}").get(url, params: params).parse
     end
 
     response

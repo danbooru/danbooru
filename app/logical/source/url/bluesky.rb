@@ -27,7 +27,7 @@ class Source::URL::Bluesky < Source::URL
       else
         @user_handle = user_id
       end
-      
+
       @post_id = post_id
 
     # https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:3jogsxcisdcdzwjobhxbav2w/bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4@jpeg
