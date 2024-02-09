@@ -10,10 +10,24 @@ class Source::Extractor::Bluesky < Source::Extractor
     if parsed_url.image_url?
       [parsed_url.full_image_url]
     else
-      api_response&.dig("thread", "post", "record", "embed", "images").to_a.map do |image|
-        image_cid = image.dig("image", "ref", "$link")
-        "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=#{user_did}&cid=#{image_cid}"
-      end
+      image_urls_from_api
+    end
+  end
+
+  def image_urls_from_api
+    embed = api_response&.dig("thread", "post", "record", "embed").to_h
+
+    if embed["$type"] == "app.bsky.embed.recordWithMedia"
+      embed = embed["media"].to_h
+    end
+
+    images = if embed["$type"] == "app.bsky.embed.images"
+      embed["images"]
+    end.to_a
+
+    images.map do |image|
+      image_cid = image.dig("image", "ref", "$link")
+      "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=#{user_did}&cid=#{image_cid}"
     end
   end
 

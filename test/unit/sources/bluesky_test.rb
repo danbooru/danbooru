@@ -3,7 +3,7 @@ require 'test_helper'
 module Sources
   class BlueskyTest < ActiveSupport::TestCase
 
-    context "A post url" do
+    context "A post url with 'app.bsky.embed.images.view' embed" do
       strategy_should_work(
         "https://bsky.app/profile/ixy.bsky.social/post/3kkvo4d4jd32g",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
@@ -18,6 +18,34 @@ module Sources
         tag_name: "ixy",
         tags: [],
         dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
+      )
+    end
+
+    context "A post url with 'app.bsky.embed.recordWithMedia.view' embed" do
+      strategy_should_work(
+        "https://bsky.app/profile/yourbaguette.bsky.social/post/3kjarhifsmg26",
+        image_urls: [
+          "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:ekm5wgpt6xhazl7xaipt5ewy&cid=bafkreidh7ammduxu7lvwohdfnh6wf2p7f7ty2jh76qe2yysk4vkc3syhbe",
+          "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:ekm5wgpt6xhazl7xaipt5ewy&cid=bafkreifh7gbjj5kmrmzmkofedglkltty2bhmukxkez3nuz6q45yypjv5tm",
+          "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:ekm5wgpt6xhazl7xaipt5ewy&cid=bafkreic52a6ogfui2kqhhu4jb7nixw3pg45bpmfukbjf6ssunxs57ievmq",
+          "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:ekm5wgpt6xhazl7xaipt5ewy&cid=bafkreidzr5uo4mlxxssdluiyhvvbi7k4aner7teuuvex5t6ock3h2byxrm",
+        ],
+        media_files: [
+          { file_size: 773999 },
+          { file_size: 953927 },
+          { file_size: 829658 },
+          { file_size: 831440 },
+        ],
+        profile_url: "https://bsky.app/profile/yourbaguette.bsky.social",
+        profile_urls: [
+          "https://bsky.app/profile/yourbaguette.bsky.social",
+          "https://bsky.app/profile/did:plc:ekm5wgpt6xhazl7xaipt5ewy",
+        ],
+        page_url: "https://bsky.app/profile/did:plc:ekm5wgpt6xhazl7xaipt5ewy/post/3kjarhifsmg26",
+        artist_name: "Baguette",
+        tag_name: "yourbaguette",
+        tags: [],
+        dtext_artist_commentary_desc: "Thanks for the opportunity Bison ! \n\nI'm Baguette, and I mostly draw fanarts of whatever obsession I have ! I will move in Sweden in a week, work on my art and aim to open a little shop this year while working part time ! \n\n#Art #FanArt #Digimon #SteinsGate #Omori #FFXIV",
       )
     end
 
