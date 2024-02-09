@@ -21,6 +21,24 @@ module Sources
       )
     end
 
+    context "A post url with DID as user id" do
+      strategy_should_work(
+        "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
+        image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
+        media_files: [{ file_size: 398747 }],
+        profile_url: "https://bsky.app/profile/ixy.bsky.social",
+        profile_urls: [
+          "https://bsky.app/profile/ixy.bsky.social",
+          "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w",
+        ],
+        page_url: "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
+        artist_name: "Ixy(いくしー)",
+        tag_name: "ixy",
+        tags: [],
+        dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
+      )
+    end
+
     context "A 'https://cdn.bsky.app/img' url" do
       strategy_should_work(
         "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:3jogsxcisdcdzwjobhxbav2w/bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4@jpeg",
