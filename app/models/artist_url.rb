@@ -88,6 +88,8 @@ class ArtistURL < ApplicationRecord
       true
     when %r{inkbunny\.net/user\.php}i
       true
+    when %r{bsky\.app/profile/did:}i
+      true
     else
       false
     end

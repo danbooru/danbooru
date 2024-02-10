@@ -30,6 +30,7 @@ module ArtistFinder
     "bilibili.com", # https://space.bilibili.com/1500665980
     "booru.org",
     "booru.org/drawfriends", # http://img.booru.org/drawfriends//images/36/de65da5f588b76bc1d9de8af976b540e2dff17e2.jpg
+    "bsky.app/profile", # https://bsky.app/profile/ixy.bsky.social
     "civitai.com/user",
     "ci-en.net", # https://ci-en.net/creator/11019/
     "comiczin.jp", # https://shop.comiczin.jp/products/list.php?category_id=3394
