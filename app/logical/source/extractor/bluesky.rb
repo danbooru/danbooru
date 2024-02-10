@@ -119,7 +119,7 @@ class Source::Extractor::Bluesky < Source::Extractor
     response = http.parsed_post(
       "https://bsky.social/xrpc/com.atproto.server.createSession",
       json: { identifier: Danbooru.config.bluesky_identifier, password: Danbooru.config.bluesky_password }
-    )
+    ).to_h
 
     if response["error"].present?
       DanbooruLogger.info("Bluesky login failed (#{response["message"]} #{response["message"]})")
