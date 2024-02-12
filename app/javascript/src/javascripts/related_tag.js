@@ -131,7 +131,7 @@ RelatedTag.toggle_tag = function(e) {
 
   if (RelatedTag.current_tags().includes(tag)) {
     var escaped_tag = Utility.regexp_escape(tag);
-    $field.val($field.val().replace(new RegExp("(^|\\s)" + escaped_tag + "($|\\s)", "gi"), "$1$2"));
+    $field.val($field.val().replace(new RegExp("(?<=^|\\s)" + escaped_tag + "(?=$|\\s)", "gi"), ""));
   } else {
     $field.val($field.val() + " " + tag);
   }
