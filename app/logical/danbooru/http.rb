@@ -178,6 +178,12 @@ module Danbooru
       end
     end
 
+    # @return [Danbooru::URL, nil] Return the URL that the given URL redirects to, or nil on error.
+    def redirect_url(url)
+      redirect_url = head(url)&.uri
+      Danbooru::URL.parse(redirect_url)
+    end
+
     concerning :DownloadMethods do
       # Download a file from `url` and return a {MediaFile}.
       #

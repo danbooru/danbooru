@@ -3,10 +3,10 @@
 module Source
   class URL
     class Reddit < Source::URL
-      attr_reader :subreddit, :work_id, :title, :username, :file
+      attr_reader :subreddit, :work_id, :share_id, :title, :username, :file
 
       def self.match?(url)
-        url.domain.in?(["reddit.com", "redd.it"])
+        url.domain.in?(%w[reddit.com redd.it redditmedia.com])
       end
 
       def parse
@@ -17,10 +17,16 @@ module Source
         in ("i" | "preview"), "redd.it", file
           @file = file
 
+        # https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fds05uzmtd6d61.jpg
+        in _, "reddit.com", "media" if params[:url].present?
+          media_url = Source::URL.parse(params[:url])
+          @file = media_url.file if media_url.is_a?(Reddit) && media_url.image_url?
+
         # https://external-preview.redd.it/92G2gkb545UNlA-PywJqM_F-4TT0xngvmf_gb9sFDqk.jpg?auto=webp&s=0f1e3d0603dbaabe1ead7352202d0de1653d76f6
         # https://external-preview.redd.it/VlT1G4JoqAmP_7DG5UKRCJP8eTRef7dCrRvu2ABm_Xg.png?width=1080&crop=smart&auto=webp&s=d074e9cbfcb2780e6ec0d948daff3cadc91c2a50
         # https://g.redditmedia.com/f-OWw5C5aVumPS4HXVFhTspgzgQB4S77mO-6ad0rzpg.gif?fm=mp4&mp4-fragmented=false&s=ed3d767bf3b0360a50ddd7f503d46225
         # https://i.redditmedia.com/9cYFBDQ3QsqWnF9v7EhW5uOcQNHz1Ak9_E1zVNeSLek.png?s=6fee1bb56e7d926847dc3ece01a1ffd4
+        # https://b.thumbs.redditmedia.com/1NSCseZgx3HZIHS0IYMJlAJ5QGcBul4O3TDAPh4f6is.jpg
         in *rest if image_url?
         # pass
 
@@ -34,6 +40,11 @@ module Source
         # https://www.reddit.com/u/Valshier
         in _, "reddit.com", ("user" | "u"), username
           @username = username
+
+        # https://www.reddit.com/r/tales/s/RtMDlrF5yo
+        in _, "reddit.com", "r", subreddit, "s", share_id
+          @subreddit = subreddit
+          @share_id = share_id
 
         # https://www.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/
         # https://old.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/
@@ -67,7 +78,7 @@ module Source
       end
 
       def image_url?
-        domain == "redditmedia.com" || (domain == "redd.it" && subdomain.in?(%w[i preview external-preview]))
+        domain == "redditmedia.com" || (domain == "redd.it" && subdomain.in?(%w[i preview external-preview])) || file.present?
       end
 
       def page_url
@@ -77,6 +88,8 @@ module Source
           "https://www.reddit.com/user/#{username}/comments/#{work_id}/#{title}"
         elsif subreddit.present? && work_id.present?
           "https://www.reddit.com/r/#{subreddit}/comments/#{work_id}"
+        elsif subreddit.present? && share_id.present?
+          "https://www.reddit.com/r/#{subreddit}/s/#{share_id}"
         elsif work_id.present?
           "https://www.reddit.com/comments/#{work_id}"
         end

@@ -43,11 +43,20 @@ module Source
       end
 
       def work_id
-        parsed_url.work_id || parsed_referer&.work_id
+        if share_url.present?
+          redirect_url = http.redirect_url(share_url)
+          Source::URL.parse(redirect_url)&.work_id
+        else
+          parsed_url.work_id || parsed_referer&.work_id
+        end
       end
 
       def artist_name
         data["author"] || parsed_url.username || parsed_referer&.username
+      end
+
+      def share_url
+        parsed_urls.find(&:share_id)
       end
 
       def api_url
