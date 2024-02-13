@@ -116,6 +116,33 @@ module Sources
       )
     end
 
+    context "A reddit.com/media non-sample url" do
+      strategy_should_work(
+        "https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fds05uzmtd6d61.jpg",
+        image_urls: ["https://i.redd.it/ds05uzmtd6d61.jpg"],
+        media_files: [{ size: 248_183 }],
+      )
+    end
+
+    context "A reddit.com/media sample url" do
+      strategy_should_work(
+        "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fz90lvr65c11a1.jpg%3Fwidth%3D2569%26format%3Dpjpg%26auto%3Dwebp%26s%3D9a81537379db979c285e44b64a548014c45c6cc9",
+        image_urls: ["https://i.redd.it/z90lvr65c11a1.jpg"],
+        media_files: [{ size: 820_454 }],
+      )
+    end
+
+    context "A reddit mobile app share url" do
+      strategy_should_work(
+        "https://www.reddit.com/r/tales/s/RtMDlrF5yo",
+        image_urls: ["https://i.redd.it/ds05uzmtd6d61.jpg"],
+        artist_name: "aelgis",
+        profile_url: "https://www.reddit.com/user/aelgis",
+        page_url: "https://www.reddit.com/r/tales/comments/l3oi00/drew_sheena_for_someone_after_a_long_art_block/",
+        artist_commentary_title: "Drew Sheena for someone after a long art block :')"
+      )
+    end
+
     context "Reddit:" do
       should "Parse Reddit URLs correctly" do
         assert(Source::URL.image_url?("https://i.redd.it/p5utgk06ryq81.png"))
@@ -123,6 +150,7 @@ module Sources
         assert(Source::URL.image_url?("https://external-preview.redd.it/92G2gkb545UNlA-PywJqM_F-4TT0xngvmf_gb9sFDqk.jpg?auto=webp&s=0f1e3d0603dbaabe1ead7352202d0de1653d76f6"))
         assert(Source::URL.image_url?("https://g.redditmedia.com/f-OWw5C5aVumPS4HXVFhTspgzgQB4S77mO-6ad0rzpg.gif?fm=mp4&mp4-fragmented=false&s=ed3d767bf3b0360a50ddd7f503d46225"))
         assert(Source::URL.image_url?("https://i.redditmedia.com/9cYFBDQ3QsqWnF9v7EhW5uOcQNHz1Ak9_E1zVNeSLek.png?s=6fee1bb56e7d926847dc3ece01a1ffd4"))
+        assert(Source::URL.image_url?("https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fds05uzmtd6d61.jpg"))
 
         assert(Source::URL.page_url?("https://www.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/"))
         assert(Source::URL.page_url?("https://old.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/"))
@@ -132,6 +160,7 @@ module Sources
         assert(Source::URL.page_url?("https://www.reddit.com/gallery/ttyccp"))
         assert(Source::URL.page_url?("https://www.reddit.com/ttyccp"))
         assert(Source::URL.page_url?("https://redd.it/ttyccp"))
+        assert(Source::URL.page_url?("https://www.reddit.com/r/tales/s/RtMDlrF5yo"))
 
         assert(Source::URL.profile_url?("https://www.reddit.com/user/xSlimes"))
         assert(Source::URL.profile_url?("https://www.reddit.com/u/Valshier"))
