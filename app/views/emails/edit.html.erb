@@ -1,23 +1,24 @@
+<% page_title "Change Email" %>
+
 <div id="c-emails">
-  <div id="a-edit" class="fixed-width-container">
-    <% page_title "Change Email" %>
-    <h1>Change Email</h1>
+  <div id="a-edit">
+    <div class="card mt-8 p-4 max-w-480px mx-auto flex flex-col items-center">
+      <h1 class="pb-4">Change Email</h1>
 
-    <% if @user.email_address.present? %>
-      <p>Your current email address is <strong><%= @user.email_address.address %></strong>.
-    <% end %>
+      <% if @user.is_restricted? %>
+        <p>Your account is restricted because you signed up from a proxy or VPN.</p>
 
-    <% if @user.is_restricted? %>
-      <p>Your account is restricted because you signed up from a proxy or VPN.
-      You can still use the site, but you won't be able to leave comments, edit
-      tags, or upload posts until you add a verified email address to your
-      account. Disposable or throwaway email addresses can't be used to verify
-      your account.</p>
-    <% end %>
+        <p>You can still use the site, but you won't be able to leave comments, edit
+        tags, or upload posts until you add a verified email address to your
+        account.</p>
 
-    <%= edit_form_for(@user, url: user_email_path(@user)) do |f| %>
-      <%= f.input :email, as: :email, input_html: { value: @user&.email_address&.address } %>
-      <%= f.submit "Save" %>
-    <% end %>
+        <p>Disposable or throwaway email addresses can't be used to verify your account.</p>
+      <% end %>
+
+      <%= edit_form_for(@user, url: user_email_path(@user), html: { class: "w-full stacked-form" }) do |f| %>
+        <%= f.input :email, as: :email, input_html: { value: @user&.email_address&.address } %>
+        <%= f.submit "Save", class: "button-primary" %>
+      <% end %>
+    </div>
   </div>
 </div>

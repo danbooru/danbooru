@@ -1,5 +1,0 @@
-<% content_for(:secondary_links) do %>
-  <%= subnav_link_to "Listing", user_name_change_requests_path %>
-  <%= subnav_link_to "New", change_name_user_path(CurrentUser.user) unless CurrentUser.user.is_anonymous? %>
-  <%= subnav_link_to "Help", wiki_page_path("help:user_name_change_requests") %>
-<% end %>

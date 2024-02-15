@@ -1,40 +1,40 @@
 <div id="c-user-name-change-requests">
-  <div id="a-new" class="fixed-width-container">
-    <% if CurrentUser.user != @change_request.user %>
-      <h1>Change Name: <%= link_to_user @change_request.user %></h1>
-    <% else %>
-      <h1>Change Name</h1>
-    <% end %>
+  <div id="a-new">
+    <div class="card mt-8 p-4 max-w-540px mx-auto flex flex-col items-center">
+      <% if CurrentUser.user != @change_request.user %>
+        <h1>Change Name: <%= link_to_user @change_request.user %></h1>
+      <% else %>
+        <h1>Change Name</h1>
+      <% end %>
 
-    <% if @change_request.user.name_invalid? %>
-      <p> Your current username is invalid. You must change your username to continue
-      using <%= Danbooru.config.canonical_app_name %>.</p>
+      <% if @change_request.user.name_invalid? %>
+        <p> Your current username is invalid. You must change your username to continue
+        using <%= Danbooru.config.canonical_app_name %>.</p>
 
-      <p>
-        Current name: <b><%= @change_request.user.name %></b>.<br>
-        Error: <%= @change_request.user.name_errors.full_messages.join(". ").html_safe %>.
-      </p>
-    <% end %>
+        <p>
+          Current name: <b><%= @change_request.user.name %></b>.<br>
+          Error: <%= @change_request.user.name_errors.full_messages.join(". ").html_safe %>.
+        </p>
+      <% end %>
 
-    <div class="prose mt-4 mb-4">
-      <h6>Rules</h6>
-      <ul>
-        <li>Names can contain only letters, numbers, underscore ('_'), period ('.'), and dash ('-') characters.</li>
-        <li>Names must start and end with a letter or number.</li>
-        <li>Names must be less than 25 characters long.</li>
-        <li>Names can't insult or impersonate other users.</li>
-        <li>Names are case-insensitive.</li>
-        <li>Your previous names will be visible on your profile to logged-in users, but they won't be visible to search engines.</li>
-        <li>You can't change your name more than once per week.</li>
-      </ul>
+      <div class="prose mt-4 mb-4">
+        <h6>Rules</h6>
+        <ul>
+          <li>Names can contain only letters, numbers, underscores ('_'), periods ('.'), and dashes ('-').</li>
+          <li>Names must start and end with a letter or number.</li>
+          <li>Names must be less than 25 characters long.</li>
+          <li>Names can't insult or impersonate other users.</li>
+          <li>Names are case-insensitive.</li>
+          <li>Your previous names will be visible on your profile to logged-in users, but they won't be visible to search engines.</li>
+          <li>You can't change your name more than once per week.</li>
+        </ul>
+      </div>
+
+      <%= edit_form_for(@change_request, html: { class: "w-full stacked-form" }) do |f| %>
+        <%= f.input :user_id, as: :hidden, input_html: { value: @change_request.user_id } %>
+        <%= f.input :desired_name, label: "New name" %>
+        <%= f.submit "Save", class: "button-primary" %>
+      <% end %>
     </div>
-
-    <%= edit_form_for(@change_request) do |f| %>
-      <%= f.input :user_id, as: :hidden, input_html: { value: @change_request.user_id } %>
-      <%= f.input :desired_name, label: "New name" %>
-      <%= f.submit "Submit" %>
-    <% end %>
   </div>
 </div>
-
-<%= render "secondary_links" %>
