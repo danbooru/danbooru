@@ -1,20 +1,15 @@
 <% page_title "Sign up" %>
 <% meta_description "Create a new account for free on #{Danbooru.config.app_name}." %>
 
-<%= render "secondary_links" %>
+<%= render "sessions/secondary_links" %>
 
 <div id="c-users">
-  <div id="a-new" class="fixed-width-container">
-    <h1>Sign Up</h1>
+  <div id="a-new">
+    <div class="card mt-8 p-4 max-w-360px mx-auto flex flex-col items-center">
+      <h1 class="pb-4">Sign Up</h1>
 
-    <p>
-      A basic account is <strong>free</strong> and lets you keep favorites, upload artwork, edit tags, and post
-      comments. If you want more features you can contribute to <%= Danbooru.config.canonical_app_name %> to earn a privileged account.
-    </p>
-
-    <div>
-      <%= edit_form_for(@user, html: { id: "signup-form" }, validate: true) do |f| %>
-        <%= f.input :name, as: :string, input_html: { autocapitalize: "none", minlength: UserNameValidator::MIN_LENGTH, maxlength: UserNameValidator::MAX_LENGTH }, required: true %>
+      <%= edit_form_for(@user, validate: true, html: { id: "signup-form", class: "w-full stacked-form stacked-hints" }) do |f| %>
+        <%= f.input :name, as: :string, label: "Username", input_html: { autocapitalize: "none", minlength: UserNameValidator::MIN_LENGTH, maxlength: UserNameValidator::MAX_LENGTH }, required: true %>
         <%= f.input :email_address, label: "Email", required: false, as: :email, input_html: { value: "", pattern: Danbooru::EmailAddress::EMAIL_REGEX, title: "your.name@example.com" }, hint: "Optional" %>
         <%= f.input :password, input_html: { minlength: 5, autocomplete: "new-password" }, required: true %>
         <%= f.input :password_confirmation, label: "Confirm password", input_html: { minlength: 5, autocomplete: "new-password" }, required: true %>
@@ -22,9 +17,13 @@
         <% if Danbooru.config.enable_recaptcha? %>
           <%= invisible_recaptcha_tags callback: 'submitInvisibleRecaptchaForm', text: 'Sign up' %>
         <% else %>
-          <%= f.submit "Sign up", :data => { :disable_with => "Signing up..." } %>
+          <%= f.submit "Sign up", class: "button-primary", data: { disable_with: "Signing up..." } %>
         <% end %>
       <% end %>
+
+      <p class="fineprint">
+        Already have an account? <%= link_to "Login here", login_path %>.
+      </p>
     </div>
   </div>
 </div>

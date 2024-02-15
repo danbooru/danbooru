@@ -177,6 +177,7 @@ $spacer: 0.25rem; /* 4px */
 .pt-8 { padding-top: 8 * $spacer; }
 
 .pb-2 { padding-bottom: 2 * $spacer; }
+.pb-4 { padding-bottom: 4 * $spacer; }
 
 .pl-2 { padding-left: 2 * $spacer; }
 .pl-4 { padding-left: 4 * $spacer; }
@@ -208,6 +209,9 @@ $spacer: 0.25rem; /* 4px */
 .min-w-0 { min-width: 0; }
 .min-w-4 { min-width: 4 * $spacer; }
 
+.max-w-360px { max-width: 360px; }
+.max-w-480px { max-width: 480px; }
+.max-w-540px { max-width: 540px; }
 .max-w-720px { max-width: 720px; }
 
 .max-w-full { max-width: 100%; }

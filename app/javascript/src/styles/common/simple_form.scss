@@ -217,6 +217,24 @@ form.one-line-form {
   }
 }
 
+form.stacked-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  div.input {
+    width: 100%;
+
+    input[type] {
+      max-width: unset;
+    }
+  }
+
+  div.notice {
+    width: 100%;
+  }
+}
+
 div.ui-dialog {
   textarea, input[type="text"] {
     width: 100%;
