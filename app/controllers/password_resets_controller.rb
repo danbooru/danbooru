@@ -6,20 +6,24 @@ class PasswordResetsController < ApplicationController
   rate_limit :create, rate: 1.0/1.hour, burst: 3
 
   def create
-    @user = User.find_by_name(params.dig(:user, :name))
+    name_or_email = params.dig(:user, :name)
+    @user = User.find_by_name_or_email(name_or_email)
 
-    if @user.blank?
-      flash[:notice] = "That account does not exist"
-      redirect_to password_reset_path
-    elsif @user.can_receive_email?(require_verified_email: false)
+    if @user&.can_receive_email?(require_verified_email: false)
       UserMailer.with_request(request).password_reset(@user).deliver_later
-      UserEvent.create_from_request!(@user, :password_reset, request)
-      flash[:notice] = "Password reset email sent. Check your email"
-      respond_with(@user, location: new_session_path)
-    else
-      flash[:notice] = "Password not reset. This account does not have a valid, verified email address"
-      respond_with(@user)
     end
+
+    if @user.present?
+      UserEvent.create_from_request!(@user, :password_reset, request)
+    end
+
+    if Danbooru::EmailAddress.is_valid?(name_or_email)
+      flash[:notice] = "Check your email. You will be sent a password reset link if an account with this email exists"
+    else
+      flash[:notice] = "Check your email. You will be sent a password reset link if this account has an email address"
+    end
+
+    redirect_to password_reset_path
   end
 
   def show
