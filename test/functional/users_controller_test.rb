@@ -321,10 +321,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "new action" do
-      setup do
-        Danbooru.config.stubs(:enable_recaptcha?).returns(false)
-      end
-
       should "render" do
         get new_user_path
         assert_response :success
@@ -332,6 +328,15 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "render for a logged in user" do
         get_auth new_user_path, @user
+        assert_response :success
+      end
+
+      should "render when captchas are enabled" do
+        Danbooru.config.unstub(:captcha_site_key)
+        Danbooru.config.unstub(:captcha_secret_key)
+        skip unless CaptchaService.new.enabled?
+
+        get new_user_path
         assert_response :success
       end
     end
@@ -381,6 +386,52 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_no_enqueued_emails
+        end
+      end
+
+      context "with a dummy captcha key" do
+        should "not create a user if the captcha response is invalid" do
+          # https://developers.cloudflare.com/turnstile/reference/testing/#dummy-sitekeys-and-secret-keys
+          Danbooru.config.stubs(:captcha_site_key).returns("3x00000000000000000000FF") # forces an interactive challenge
+          Danbooru.config.stubs(:captcha_secret_key).returns("2x0000000000000000000000000000000AA") # always fails
+
+          assert_no_difference(["User.count"]) do
+            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+
+            assert_response :success
+          end
+        end
+
+        should "create a user if the captcha response is valid" do
+          Danbooru.config.stubs(:captcha_site_key).returns("3x00000000000000000000FF") # forces an interactive challenge
+          Danbooru.config.stubs(:captcha_secret_key).returns("1x0000000000000000000000000000000AA") # always passes
+
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+          assert_redirected_to User.last
+          assert_equal("xxx", User.last.name)
+        end
+      end
+
+      context "with a live captcha key" do
+        setup do
+          Danbooru.config.unstub(:captcha_site_key, :captcha_secret_key)
+          skip unless CaptchaService.new.enabled?
+        end
+
+        should "not create a user if the captcha response is missing" do
+          assert_no_difference(["User.count"]) do
+            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" } }
+
+            assert_response :success
+          end
+        end
+
+        should "not create a user if the captcha response is invalid" do
+          assert_no_difference(["User.count"]) do
+            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+
+            assert_response :success
+          end
         end
       end
 

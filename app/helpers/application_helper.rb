@@ -238,6 +238,11 @@ module ApplicationHelper
     tag.div(text, class: "prose #{classes}".strip, **options)
   end
 
+  # Generates a captcha widget inside a form.
+  def captcha_tag(...)
+    CaptchaService.new.captcha_tag(...)
+  end
+
   def dtext_preview_button(preview_field)
     tag.input value: "Preview", type: "button", class: "dtext-preview-button", "data-preview-field": preview_field
   end

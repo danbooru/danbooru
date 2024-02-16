@@ -14,11 +14,8 @@
         <%= f.input :password, input_html: { minlength: 5, autocomplete: "new-password" }, required: true %>
         <%= f.input :password_confirmation, label: "Confirm password", input_html: { minlength: 5, autocomplete: "new-password" }, required: true %>
 
-        <% if Danbooru.config.enable_recaptcha? %>
-          <%= invisible_recaptcha_tags callback: 'submitInvisibleRecaptchaForm', text: 'Sign up' %>
-        <% else %>
-          <%= f.submit "Sign up", class: "button-primary", data: { disable_with: "Signing up..." } %>
-        <% end %>
+        <%= captcha_tag class: "mb-4", action: :login, theme: CurrentUser.user.theme %>
+        <%= f.submit "Sign up", class: "button-primary", data: { disable_with: "Signing up..." } %>
       <% end %>
 
       <p class="fineprint">

@@ -21,7 +21,6 @@ gem 'oauth2'
 gem 'bootsnap', require: false
 gem 'addressable'
 gem 'rakismet'
-gem 'recaptcha', require: "recaptcha/rails"
 gem 'activemodel-serializers-xml'
 gem 'shakapacker'
 gem 'rake'

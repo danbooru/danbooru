@@ -723,16 +723,20 @@ module Danbooru
     def aws_sqs_archives_url
     end
 
-    # Use a recaptcha on the signup page to protect against spambots creating new accounts.
-    # https://developers.google.com/recaptcha/intro
-    def enable_recaptcha?
-      Rails.env.production? && Danbooru.config.recaptcha_site_key.present? && Danbooru.config.recaptcha_secret_key.present?
+    # If `captcha_site_key` and `captcha_secret_key` are set, then captchas will be enabled on the signup page to
+    # protect the site against spambots. This uses the free Cloudflare Turnstile service.
+    #
+    # By default in development mode, we use a dummy captcha that always passes.
+    #
+    # https://developers.cloudflare.com/turnstile/get-started/#get-a-sitekey-and-secret-key
+    def captcha_site_key
+      # https://developers.cloudflare.com/turnstile/reference/testing/#dummy-sitekeys-and-secret-keys
+      "3x00000000000000000000FF" if Rails.env.development? # A dummy key that always forces an interactive challenge
     end
 
-    def recaptcha_site_key
-    end
-
-    def recaptcha_secret_key
+    def captcha_secret_key
+      # https://developers.cloudflare.com/turnstile/reference/testing/#dummy-sitekeys-and-secret-keys
+      "1x0000000000000000000000000000000AA" if Rails.env.development? # A dummy key that always passes
     end
 
     # Akismet API key. Used for Dmail spam detection. http://akismet.com/signup/

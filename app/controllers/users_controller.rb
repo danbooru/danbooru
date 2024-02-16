@@ -81,8 +81,8 @@ class UsersController < ApplicationController
       @user.email_address = EmailAddress.new(address: params[:user][:email_address])
     end
 
-    if Danbooru.config.enable_recaptcha? && !verify_recaptcha(model: @user)
-      @user.errors.add(:base, "Sign up failed")
+    if !CaptchaService.new.verify_request(request)
+      @user.errors.add(:base, "Invalid captcha, try again.")
     elsif @user.email_address&.valid? && @user.email_address&.invalid?(:deliverable)
       @user.errors.add(:email_address, "is invalid or can't receive mail")
     elsif @user.save
