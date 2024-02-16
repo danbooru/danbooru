@@ -184,6 +184,10 @@ class User < ApplicationRecord
         where("lower(name) = ?", normalize_name(name)).limit(1)
       end
 
+      def find_by_name_or_email(name_or_email)
+        find_by_name(name_or_email) || find_by_email(name_or_email)
+      end
+
       def find_by_name(name)
         name_matches(name).first
       end
@@ -348,7 +352,15 @@ class User < ApplicationRecord
     end
   end
 
-  module EmailMethods
+  concerning :EmailMethods do
+    class_methods do
+      # @param email_address [String] The user's email address.
+      def find_by_email(email_address)
+        normalized_address = Danbooru::EmailAddress.canonicalize(email_address).to_s
+        User.joins(:email_address).find_by(email_address: { normalized_address: normalized_address })
+      end
+    end
+
     def can_receive_email?(require_verified_email: true)
       email_address.present? && email_address.is_deliverable? && (email_address.is_verified? || !require_verified_email)
     end
@@ -646,7 +658,6 @@ class User < ApplicationRecord
 
   include BanMethods
   include LevelMethods
-  include EmailMethods
   include ForumMethods
   include ApiMethods
   extend SearchMethods

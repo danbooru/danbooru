@@ -22,11 +22,11 @@ class SessionLoader
 
   # Attempt to log a user in with the given username and password. Records a
   # login attempt event and returns the user if successful.
-  # @param name [String] the username
+  # @param name_or_email [String] The user's username or email address.
   # @param password [String] the user's password
   # @return [User, nil] the user if the password was correct, otherwise nil
-  def login(name, password)
-    user = User.find_by_name(name)
+  def login(name_or_email, password)
+    user = User.find_by_name_or_email(name_or_email)
 
     if user.present? && user.authenticate_password(password)
       # Don't allow logins to privileged or inactive accounts from proxies, even if the password is correct
