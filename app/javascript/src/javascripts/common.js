@@ -24,7 +24,3 @@ $(function() {
     location.hostname = "danbooru.donmai.us";
   }
 });
-
-window.submitInvisibleRecaptchaForm = function () {
-  document.getElementById("signup-form").submit();
-}

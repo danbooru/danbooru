@@ -57,6 +57,8 @@ class ActiveSupport::TestCase
     Danbooru.config.stubs(:rate_limits_enabled?).returns(false)
     Danbooru.config.stubs(:autotagger_url).returns(nil)
     Danbooru.config.stubs(:iqdb_url).returns(nil)
+    Danbooru.config.stubs(:captcha_site_key).returns(nil)
+    Danbooru.config.stubs(:captcha_site_key).returns(nil)
 
     at_exit { FileUtils.rm_rf(@temp_dir) }
   end
