@@ -3,7 +3,7 @@ require 'test_helper'
 class SessionsControllerTest < ActionDispatch::IntegrationTest
   context "the sessions controller" do
     setup do
-      @user = create(:user, password: "password")
+      @user = create(:user, name: "foobar", password: "password", email_address_attributes: { address: "Foo.Bar+nospam@Googlemail.com" })
     end
 
     context "new action" do
@@ -23,12 +23,46 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @user.user_events.login.exists?)
       end
 
-      should "not log the user in when given an incorrect password" do
-        post session_path, params: { name: @user.name, password: "wrong"}
+      should "log the user in when given their email address" do
+        post session_path, params: { name: "Foo.Bar+nospam@Googlemail.com", password: "password" }
+
+        assert_redirected_to posts_path
+        assert_equal(@user.id, session[:user_id])
+        assert_not_nil(@user.reload.last_ip_addr)
+        assert_equal(true, @user.user_events.login.exists?)
+      end
+
+      should "normalize the user's email address when logging in" do
+        post session_path, params: { name: "foobar@gmail.com", password: "password" }
+
+        assert_redirected_to posts_path
+        assert_equal(@user.id, session[:user_id])
+        assert_not_nil(@user.reload.last_ip_addr)
+        assert_equal(true, @user.user_events.login.exists?)
+      end
+
+      should "be case-insensitive towards the user's name when logging in" do
+        post session_path, params: { name: @user.name.upcase, password: "password" }
+
+        assert_redirected_to posts_path
+        assert_equal(@user.id, session[:user_id])
+        assert_not_nil(@user.reload.last_ip_addr)
+        assert_equal(true, @user.user_events.login.exists?)
+      end
+
+      should "not log the user in when given an incorrect username + password combination" do
+        post session_path, params: { name: @user.name, password: "wrong" }
 
         assert_response 401
         assert_nil(nil, session[:user_id])
         assert_equal(true, @user.user_events.failed_login.exists?)
+      end
+
+      should "not log the user in when given an incorrect email" do
+        post session_path, params: { name: "foo@gmail.com", password: "password" }
+
+        assert_response 401
+        assert_nil(nil, session[:user_id])
       end
 
       should "not log the user in when given an incorrect username" do
