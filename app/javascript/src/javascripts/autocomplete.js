@@ -37,6 +37,10 @@ Autocomplete.initialize_all = function() {
 
 Autocomplete.initialize_fields = function($fields, type) {
   $fields.autocomplete({
+    select: function(event, ui) {
+      Autocomplete.insert_completion(this, ui.item.value);
+      return false;
+    },
     source: async function(request, respond) {
       let results = await Autocomplete.autocomplete_source(request.term, type);
       respond(results);
@@ -114,7 +118,8 @@ Autocomplete.insert_completion = function(input, completion) {
   input.value = before_caret_text + after_caret_text;
   input.selectionStart = input.selectionEnd = before_caret_text.length;
 
-  $(input).trigger("input");
+  $(input).trigger("input"); // Manually trigger an input event because programmatically editing the field won't trigger one.
+  $(() => $(input).autocomplete("instance").close()); // XXX Hack to close the autocomplete menu after the input event above retriggers it
 };
 
 // If we press tab while the autocomplete menu is open but nothing is
@@ -133,7 +138,6 @@ Autocomplete.on_tab = function(event) {
     var completion = $first_item.data().uiAutocompleteItem.value;
 
     Autocomplete.insert_completion(input, completion);
-    autocomplete.close();
   }
 
   // Prevent the tab key from moving focus to the next element.
