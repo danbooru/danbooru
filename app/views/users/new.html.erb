@@ -8,14 +8,14 @@
     <div class="card mt-8 p-4 max-w-360px mx-auto flex flex-col items-center">
       <h1 class="pb-4">Sign Up</h1>
 
-      <%= edit_form_for(@user, validate: true, html: { id: "signup-form", class: "w-full stacked-form stacked-hints" }) do |f| %>
+      <%= edit_form_for(@user, validate: true, html: { id: "signup-form", class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
         <%= f.input :name, as: :string, label: "Username", input_html: { autocapitalize: "none", minlength: UserNameValidator::MIN_LENGTH, maxlength: UserNameValidator::MAX_LENGTH }, required: true %>
         <%= f.input :email_address, label: "Email", required: false, as: :email, input_html: { value: "", pattern: Danbooru::EmailAddress::EMAIL_REGEX, title: "your.name@example.com" }, hint: "Optional" %>
-        <%= f.input :password, input_html: { minlength: 5, autocomplete: "new-password" }, required: true %>
-        <%= f.input :password_confirmation, label: "Confirm password", input_html: { minlength: 5, autocomplete: "new-password" }, required: true %>
+        <%= f.input :password, input_html: { autocomplete: "new-password" }, required: true %>
+        <%= f.input :password_confirmation, label: "Confirm password", input_html: { autocomplete: "new-password" }, required: true %>
 
-        <%= captcha_tag class: "mb-4", action: :login, theme: CurrentUser.user.theme %>
-        <%= f.submit "Sign up", class: "button-primary", data: { disable_with: "Signing up..." } %>
+        <%= captcha_tag class: "mb-4", action: :signup %>
+        <%= f.submit "Sign up", class: "button-primary", disabled: true %>
       <% end %>
 
       <p class="fineprint">

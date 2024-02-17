@@ -26,14 +26,15 @@ class CaptchaService
   # when solved, will insert a hidden `cf-turnstile-response` field inside the form. This field is then verified server-side.
   #
   # @param class [String] The CSS class(es) to add to the widget.
+  # @param current_user [User] The current user.
   # @param options [Hash] A hash of data-* attribute options to pass to the captcha widget.
   # @see https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#configurations
-  def captcha_tag(class: "", **options)
+  def captcha_tag(class: "", current_user: CurrentUser.user, **options)
     return nil if !enabled?
 
     <<~EOS.html_safe
       <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer crossorigin></script>
-      #{tag.div(class: "cf-turnstile #{binding.local_variable_get(:class)}", data: { sitekey: site_key, **options })}
+      #{tag.div(class: "cf-turnstile #{binding.local_variable_get(:class)}", data: { sitekey: site_key, theme: current_user.theme, callback: "onCaptchaComplete", **options })}
     EOS
   end
 
