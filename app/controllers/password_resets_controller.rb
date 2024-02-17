@@ -3,7 +3,8 @@
 class PasswordResetsController < ApplicationController
   respond_to :html, :xml, :json
 
-  rate_limit :create, rate: 1.0/1.hour, burst: 3
+  rate_limit :create, rate: 1.0/1.minute, burst: 5
+  verify_captcha only: :create
 
   def create
     name_or_email = params.dig(:user, :name)

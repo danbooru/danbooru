@@ -56,6 +56,10 @@ class ApplicationController < ActionController::Base
     before_action -> { CurrentUser.user = User.anonymous }, **options
   end
 
+  def self.verify_captcha(**options)
+    before_action -> { CaptchaService.new.verify_request!(request) }, **options
+  end
+
   private
 
   def respond_with(subject, *args, model: model_name, **options, &block)
