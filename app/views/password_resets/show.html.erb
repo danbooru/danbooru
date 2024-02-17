@@ -10,10 +10,10 @@
 
       <p class="w-full">If your account doesn't have a working email address, then you can't reset your password.</p>
 
-      <%= edit_form_for(:user, url: password_reset_path, action: :post, html: { class: "w-full stacked-form stacked-hints" }) do |f| %>
+      <%= edit_form_for(:user, url: password_reset_path, action: :post, html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
         <%= f.input :name, label: "Name or Email", input_html: { "data-autocomplete": "user" } %>
         <%= captcha_tag class: "mb-4", action: :password_reset %>
-        <%= f.submit "Reset password", class: "button-primary" %>
+        <%= f.submit "Reset password", class: "button-primary", disabled: true %>
       <% end %>
     </div>
   </div>
