@@ -2184,7 +2184,10 @@ CREATE TABLE public.users (
     unread_dmail_count integer NOT NULL,
     theme integer NOT NULL,
     upload_points integer NOT NULL,
-    is_deleted boolean DEFAULT false NOT NULL
+    is_deleted boolean DEFAULT false NOT NULL,
+    totp_secret character varying,
+    backup_codes_secret character varying,
+    backup_codes_counter integer
 );
 
 

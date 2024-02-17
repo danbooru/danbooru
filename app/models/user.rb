@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  self.ignored_columns = [:totp_secret, :backup_codes_secret, :backup_codes_counter]
+
   extend Memoist
 
   class PrivilegeError < StandardError; end
