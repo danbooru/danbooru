@@ -126,6 +126,18 @@
               <%= link_to_user user %> changed their password.
             <% when "email_change" %>
               <%= link_to_user user %> changed their email address.
+            <% when "totp_enable" %>
+              <%= link_to_user user %> enabled 2FA.
+            <% when "totp_disable" %>
+              <%= link_to_user user %> disabled 2FA.
+            <% when "totp_update" %>
+              <%= link_to_user user %> changed their 2FA secret.
+            <% when "totp_login_pending_verification" %>
+              <%= link_to_user user %> logged in with their password. Awaiting 2FA verification.
+            <% when "totp_login" %>
+              <%= link_to_user user %> logged in with their 2FA code.
+            <% when "totp_failed_login" %>
+              <%= link_to_user user %> entered an incorrect 2FA code.
             <% end %>
           <% when "UserFeedback" %>
             <% case event_type %>

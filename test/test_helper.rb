@@ -87,8 +87,16 @@ class ActionDispatch::IntegrationTest
   register_encoder :atom, response_parser: ->(body) { Nokogiri.XML(body) }
   register_encoder :html, response_parser: ->(body) { Nokogiri.HTML5(body) }
 
-  def method_authenticated(method_name, url, user, **options)
+  def login_as(user)
     post session_path, params: { name: user.name, password: user.password }
+
+    if user.totp.present?
+      post verify_totp_session_path, params: { totp: { user_id: user.signed_id(purpose: :verify_totp), code: user.totp.code } }
+    end
+  end
+
+  def method_authenticated(method_name, url, user, **options)
+    login_as(user)
     send(method_name, url, **options)
   end
 

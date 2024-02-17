@@ -251,6 +251,7 @@ Rails.application.routes.draw do
   resources :robots, only: [:index]
   resources :saved_searches, :except => [:show]
   resource :session, only: [:new, :create, :destroy] do
+    post :verify_totp, on: :collection
     get :confirm_password, on: :collection
     get :sign_out, on: :collection
   end
@@ -286,6 +287,7 @@ Rails.application.routes.draw do
       post :send_confirmation
     end
     resource :password, only: [:edit, :update]
+    resource :totp, only: [:edit, :update, :destroy]
     resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
     resources :uploads, only: [:index]
 

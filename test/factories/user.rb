@@ -37,5 +37,9 @@ FactoryBot.define do
     factory(:uploader) do
       created_at { 2.weeks.ago }
     end
+
+    factory(:user_with_2fa) do
+      totp_secret { TOTP.generate_secret }
+    end
   end
 end

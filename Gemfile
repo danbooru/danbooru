@@ -67,6 +67,8 @@ gem "x25519"
 gem "ed25519"
 gem "bcrypt_pbkdf"
 gem "connection_pool"
+gem "rotp"
+gem "rqrcode"
 
 group :development do
   gem 'rubocop', require: false

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
-  self.ignored_columns = [:totp_secret, :backup_codes_secret, :backup_codes_counter]
-
   extend Memoist
 
   class PrivilegeError < StandardError; end
@@ -244,6 +242,34 @@ class User < ApplicationRecord
 
     def hash_password(password)
       Digest::SHA1.hexdigest("choujin-steiner--#{password}--")
+    end
+  end
+
+  concerning :TOTPMethods do
+    extend Memoist
+
+    # @return [TOTP, nil] Return a 2FA code verifier if the user has 2FA enabled, or nil if 2FA is not enabled.
+    memoize def totp
+      TOTP.new(totp_secret, username: name) if totp_secret.present?
+    end
+
+    # Add a secret to enable 2FA, or delete it to disable 2FA, or change it to use new 2FA codes.
+    #
+    # @param secret [String] The 16-character base-32 encoded secret.
+    # @param request [ActionDispatch::Request] The HTTP request.
+    def update_totp_secret!(secret, request:)
+      with_lock do
+        update!(totp_secret: secret)
+        flush_cache # clear memoized totp
+
+        if totp_secret_before_last_save.nil?
+          UserEvent.create_from_request!(self, :totp_enable, request)
+        elsif secret.nil?
+          UserEvent.create_from_request!(self, :totp_disable, request)
+        else
+          UserEvent.create_from_request!(self, :totp_update, request)
+        end
+      end
     end
   end
 
@@ -736,6 +762,11 @@ class User < ApplicationRecord
 
   def dtext_shortlink(**options)
     "<@#{name}>"
+  end
+
+  def reload(...)
+    flush_cache # flush memoize cache
+    super
   end
 
   def self.available_includes

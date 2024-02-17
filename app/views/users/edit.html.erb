@@ -5,18 +5,13 @@
   <div id="a-edit">
     <h1 class="mb-4">Settings</h1>
 
-    <%= edit_form_for @user do |f| %>
-      <%= render(TabPanelComponent.new do |t| %>
-        <% t.panel("Basic", active: true) do %>
+    <%= render(TabPanelComponent.new(classes: "horizontal-tab-panel fixed-width-container") do |t| %>
+      <% t.panel("Basic", active: true) do %>
+        <%= edit_form_for @user do |f| %>
           <fieldset id="basic-settings-section">
             <div class="input">
               <label>Name</label>
               <p><%= link_to "Change your name", change_name_user_path(@user) %></p>
-            </div>
-
-            <div class="input">
-              <label>Password</label>
-              <p><%= link_to "Change password", edit_user_password_path(user_id: @user.id) %></p>
             </div>
 
             <div class="input">
@@ -46,9 +41,13 @@
             <%= f.input :show_niche_posts, include_blank: false, collection: [["Yes", "true"], ["No", "false"]], hint: "Display posts containing contentious content." %>
             <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, input_html: { data: {autocomplete: "tag-query"}} %>
           </fieldset>
-        <% end %>
 
-        <% t.panel("Advanced") do %>
+          <%= f.button :submit, "Submit" %>
+        <% end %>
+      <% end %>
+
+      <% t.panel("Advanced") do %>
+        <%= edit_form_for @user do |f| %>
           <fieldset id="advanced-settings-section">
             <div class="input">
               <label>Account</label>
@@ -74,10 +73,48 @@
             <%= f.input :favorite_tags, label: "Frequent tags", hint: "A list of tags that you use often. They will appear when using the list of Related Tags.", input_html: { data: { autocomplete: "tag-query" } } %>
             <%= f.input :custom_style, label: "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, hint: "CSS rules to apply to the whole site." %>
           </fieldset>
+          <%= f.button :submit, "Submit" %>
         <% end %>
-      <% end) %>
+      <% end %>
 
-      <%= f.button :submit, "Submit" %>
-    <% end %>
+      <% t.panel("Security") do %>
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <div>
+              <span class="font-bold leading-normal">Password</span>
+              <p class="fineprint max-w-360px">Update your password.</p>
+            </div>
+
+            <div>
+              <%= link_to "Change password", edit_user_password_path(user_id: @user.id), class: "button-primary" %>
+            </div>
+          </div>
+
+          <div class="flex justify-between">
+            <div>
+              <div class="mb-1 space-x-1">
+                <span class="font-bold leading-normal">Two-factor authentication</span>
+
+                <% if @user.totp.present? %>
+                  <span class="chip-green text-success text-xs">Enabled</span>
+                <% else %>
+                  <span class="chip-red text-error text-xs">Disabled</span>
+                <% end %>
+              </div>
+
+              <p class="fineprint max-w-360px">Protect your account by requiring both your password and a security code to login.</p>
+            </div>
+
+            <div>
+              <% if @user.totp.present? %>
+                <%= link_to "Disable", edit_user_totp_path(user_id: @user.id), class: "button-outline-danger" %>
+              <% else %>
+                <%= link_to "Enable", edit_user_totp_path(user_id: @user.id), class: "button-primary" %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end) %>
   </div>
 </div>

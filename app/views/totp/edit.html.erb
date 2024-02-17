@@ -1,0 +1,56 @@
+<% page_title "Setup Two-Factor Authentication" %>
+
+<div id="c-totp">
+  <div id="a-new">
+    <div class="card mt-8 p-4 max-w-540px mx-auto flex flex-col items-center">
+      <h1 class="pb-4">Two-Factor Authentication</h1>
+
+      <% if @user.totp.present? %>
+        <p class="w-full">Two-factor authentication (2FA) is <b>enabled</b> for your account. To add a new device, scan the QR code below.</p>
+
+        <p class="w-full">To disable 2FA, click <b>Disable</b> below.</p>
+      <% else %>
+        <p class="w-full">
+          Enable two-factor authentication (2FA) to make it so you need both a password and a security code to login to your
+          account. This protects you in case your password gets stolen.
+        </p>
+
+        <p class="w-full">
+          To get started, install an authenticator app like
+          <%= external_link_to "https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2", "Google Authenticator", class: "break-words" %> or
+          <%= external_link_to "https://www.microsoft.com/en-us/security/mobile-authenticator-app", "Microsoft Authenticator", class: "break-words" %>, then use it to scan the QR code below.
+        </p>
+      <% end %>
+
+      <div class="card p-2 mb-2">
+        <%= @totp.qr_code.as_svg(offset: 8, module_size: 4, fill: :white).html_safe %>
+      </div>
+
+      <div x-data="{ open: false }">
+        <a href="javascript:void(0)" @click="open = true" class="text-xs" x-show="!open">Can't scan the code?</a>
+
+        <div class="prose" x-show="open" x-cloak>
+          <p>If you can't scan the QR code, then you can enter this code into your app instead:</p>
+
+          <code class="block text-center"><%= @totp.secret %></code>
+        </div>
+      </div>
+
+      <div class="prose w-full mb-4">
+        <hr>
+      </div>
+
+      <% if @user.totp.present? %>
+        <%= edit_form_for(@totp, url: user_totp_path(@user), method: "delete", html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
+          <%= f.submit "Disable", class: "button-outline-danger" %>
+        <% end %>
+      <% else %>
+        <%= edit_form_for(@totp, url: user_totp_path(@user), method: "put", html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
+          <%= f.input :signed_secret, as: :hidden, input_html: { value: @totp.signed_secret } %>
+          <%= f.input :verification_code, placeholder: "123456", hint: "Enter the 6-digit code from your app", required: true, minlength: 6, maxlength: 6, pattern: '\d+', input_html: { value: nil } %>
+          <%= f.submit "Enable", class: "button-primary", disabled: true %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

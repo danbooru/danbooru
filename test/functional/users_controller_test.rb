@@ -200,11 +200,20 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "show hidden attributes to the owner" do
+      should "show hidden attributes to the user themselves" do
         get_auth user_path(@user), @user, as: :json
 
         assert_response :success
         assert_not_nil(response.parsed_body["last_logged_in_at"])
+      end
+
+      should "not show secret attributes to the user themselves" do
+        @user.update!(totp_secret: TOTP.generate_secret)
+        get_auth user_path(@user), @user, as: :json
+
+        assert_response :success
+        assert_equal(false, response.parsed_body.has_key?("bcrypt_password_hash"))
+        assert_equal(false, response.parsed_body.has_key?("totp_secret"))
       end
 
       should "show the last_ip_addr to mods" do
@@ -223,6 +232,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_nil(response.parsed_body["last_logged_in_at"])
         assert_nil(response.parsed_body["last_ip_addr"])
+        assert_nil(response.parsed_body["totp_secret"])
       end
 
       should "strip '?' from attributes" do
