@@ -2182,7 +2182,10 @@ CREATE TABLE public.users (
     unread_dmail_count integer NOT NULL,
     theme integer NOT NULL,
     upload_points integer NOT NULL,
-    is_deleted boolean DEFAULT false NOT NULL
+    is_deleted boolean DEFAULT false NOT NULL,
+    totp_secret character varying,
+    backup_codes_secret character varying,
+    backup_codes_counter integer
 );
 
 
@@ -6798,6 +6801,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240217201829'),
 ('20240131055326'),
 ('20240110180956'),
 ('20240110180955'),
