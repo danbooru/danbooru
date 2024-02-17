@@ -1,0 +1,18 @@
+<% page_title "Verify Login" %>
+
+<div id="c-sessions">
+  <div id="a-confirm-totp">
+    <div class="card mt-8 p-4 max-w-540px mx-auto flex flex-col items-center">
+      <h1 class="pb-4">Verify Login</h1>
+
+      <p class="w-full">Enter the 6-digit code from your authenticator app to continue.</p>
+
+      <%= edit_form_for(@user.totp, url: verify_totp_session_path, method: "post", html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
+        <%= f.input :user_id, as: :hidden, input_html: { value: @user.signed_id(purpose: :verify_totp, expires_in: 10.minutes) } %>
+        <%= f.input :url, as: :hidden, input_html: { value: @url } %>
+        <%= f.input :code, placeholder: "123456", required: true, minlength: 6, maxlength: 6, pattern: '\d+', input_html: { value: nil } %>
+        <%= f.submit "Continue", class: "button-primary" %>
+      <% end %>
+    </div>
+  </div>
+</div>

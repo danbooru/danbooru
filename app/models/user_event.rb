@@ -22,7 +22,7 @@ class UserEvent < ApplicationRecord
   belongs_to :ip_geolocation, foreign_key: :ip_addr, primary_key: :ip_addr, optional: true
 
   enum category: {
-    login: 0,
+    login: 0,                             # The user successfully logged in. Only used for users without 2FA enabled.
     failed_login: 50,
     logout: 100,
     user_creation: 200,
@@ -31,6 +31,12 @@ class UserEvent < ApplicationRecord
     password_reset: 400,
     password_change: 500,
     email_change: 600,
+    totp_enable: 700,                     # The user enabled 2FA.
+    totp_update: 710,                     # The user changed their 2FA secret.
+    totp_disable: 720,                    # The user disabled 2FA.
+    totp_login_pending_verification: 730, # The user successfully entered their password, but has not yet entered their 2FA code.
+    totp_login: 740,                      # The user successfully entered their 2FA code.
+    totp_failed_login: 750,               # The user entered an incorrect 2FA code.
   }
 
   delegate :country, :city, :is_proxy?, to: :ip_geolocation, allow_nil: true

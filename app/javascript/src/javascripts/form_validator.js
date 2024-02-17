@@ -18,6 +18,7 @@ export default class FormValidator {
     this.$form = $(form);
     this.$form.on("input.danbooru paste.danbooru", e => this.onInput(e));
     this.$form.on("submit.danbooru", e => this.onSubmit(e));
+    this.onInput();
   }
 
   // Return true if all form fields are valid, or false if any fields are invalid.

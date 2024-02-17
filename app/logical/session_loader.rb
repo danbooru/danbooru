@@ -33,6 +33,9 @@ class SessionLoader
       if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy?
         UserEvent.create_from_request!(user, :failed_login, request)
         return nil
+      elsif user.totp.present?
+        UserEvent.create_from_request!(user, :totp_login_pending_verification, request)
+        return user
       end
 
       session[:user_id] = user.id
@@ -49,6 +52,28 @@ class SessionLoader
     else
       UserEvent.create_from_request!(user, :failed_login, request)
       nil # password incorrect
+    end
+  end
+
+  # Verify whether a user's 2FA code is correct after they have logged in with their password.
+  #
+  # @param user [User] The user to authenticate.
+  # @param code [String] The 6-digit 2FA code.
+  # @return [Boolean] True if the 2FA code is correct, or false if it's incorrect.
+  def verify_totp!(user, code)
+    if user.totp.verify(code)
+      session[:user_id] = user.id
+      session[:last_authenticated_at] = Time.now.utc.to_s
+
+      UserEvent.build_from_request(user, :totp_login, request)
+      user.last_logged_in_at = Time.now
+      user.last_ip_addr = request.remote_ip
+      user.save!
+
+      true
+    else
+      UserEvent.create_from_request!(user, :totp_failed_login, request)
+      false
     end
   end
 

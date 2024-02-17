@@ -92,6 +92,16 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(nil, session[:user_id])
       end
 
+      should "not log the user in yet if they have 2FA enabled" do
+        user = create(:user_with_2fa, password: "password")
+
+        post session_path, params: { name: user.name, password: "password" }
+
+        assert_response :success
+        assert_nil(nil, session[:user_id])
+        assert_equal(true, user.user_events.totp_login_pending_verification.exists?)
+      end
+
       should "redirect the user when given an url param" do
         post session_path, params: { name: @user.name, password: "password", url: tags_path }
         assert_redirected_to tags_path
@@ -165,6 +175,75 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_redirected_to posts_path
         assert_equal(@user.id, session[:user_id])
+      end
+    end
+
+    context "verify_totp action" do
+      should "log the user in if they enter the correct 2FA code" do
+        @user = create(:user_with_2fa, password: "password")
+
+        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: @user.totp.code, url: users_path } }
+
+        assert_redirected_to users_path
+        assert_equal(@user.id, session[:user_id])
+        assert_not_nil(@user.reload.last_ip_addr)
+        assert_equal(true, @user.user_events.totp_login.exists?)
+      end
+
+      should "log the user in if they enter a 2FA code that was generated less than 30 seconds ago" do
+        @user = create(:user_with_2fa, password: "password")
+        code = travel_to(25.seconds.ago) { @user.totp.code }
+
+        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path } }
+
+        assert_redirected_to users_path
+        assert_equal(@user.id, session[:user_id])
+        assert_not_nil(@user.reload.last_ip_addr)
+        assert_equal(true, @user.user_events.totp_login.exists?)
+      end
+
+      should "log the user in if they enter a 2FA code that was generated less than 30 seconds in the future" do
+        @user = create(:user_with_2fa, password: "password")
+        code = travel_to(25.seconds.from_now) { @user.totp.code }
+
+        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path } }
+
+        assert_redirected_to users_path
+        assert_equal(@user.id, session[:user_id])
+        assert_not_nil(@user.reload.last_ip_addr)
+        assert_equal(true, @user.user_events.totp_login.exists?)
+      end
+
+      should "not log the user in if they enter an incorrect 2FA code" do
+        @user = create(:user_with_2fa, password: "password")
+
+        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: "invalid", url: users_path } }
+
+        assert_response :success
+        assert_nil(nil, session[:user_id])
+        assert_equal(true, @user.user_events.totp_failed_login.exists?)
+      end
+
+      should "not log the user in if they enter a 2FA code that was generated more than a minute ago" do
+        @user = create(:user_with_2fa, password: "password")
+        code = travel_to(65.seconds.ago) { @user.totp.code }
+
+        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path } }
+
+        assert_response :success
+        assert_nil(nil, session[:user_id])
+        assert_equal(true, @user.user_events.totp_failed_login.exists?)
+      end
+
+      should "not log the user in if they enter a 2FA code that was generated more than a minute in the future" do
+        @user = create(:user_with_2fa, password: "password")
+        code = travel_to(65.seconds.from_now) { @user.totp.code }
+
+        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path } }
+
+        assert_response :success
+        assert_nil(nil, session[:user_id])
+        assert_equal(true, @user.user_events.totp_failed_login.exists?)
       end
     end
 

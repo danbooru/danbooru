@@ -60,7 +60,7 @@ $spacer: 0.25rem; /* 4px */
 .scrollbar-stable { scrollbar-gutter: stable; }
 
 .break-all { word-break: break-all; overflow-wrap: anywhere; }
-.break-words { word-break: break-word; overflow-wrap: anywhere; }
+.break-words { word-break: break-word !important; overflow-wrap: anywhere; }
 .whitespace-nowrap { white-space: nowrap; }
 
 .pointer-events-none { pointer-events: none; }
