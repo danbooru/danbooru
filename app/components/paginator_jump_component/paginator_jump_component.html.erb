@@ -1,0 +1,8 @@
+<template id="jumpto-template">
+  <h3> Go to page </h3>
+  <div class="flex">
+    <input type="number" placeholder="Page number" id="jumpto-input-box" min="1" max="<%= @page_count %>"  />
+    <button class="m-0" id="jumpto-button" > go </button>
+  </div>
+    <p class="m-0 text-error" id="jumpto-error"></p>
+</template>

@@ -6,5 +6,9 @@
   > a:hover {
     background: var(--paginator-arrow-color);
     color: var(--paginator-arrow-background-color);
+    
+    > svg {
+      color: var(--paginator-arrow-background-color);
+    }
   }
 }
