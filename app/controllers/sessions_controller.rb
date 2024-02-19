@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
   respond_to :html, :json
   skip_forgery_protection only: :create, if: -> { !request.format.html? }
 
-  rate_limit :create, rate: 1.0/1.minute, burst: 10
+  rate_limit :create, rate: 1.0/10.minutes, burst: 20
   rate_limit :verify_totp, rate: 1.0/30.minutes, burst: 50
 
   def new
