@@ -161,6 +161,23 @@ module Sources
         )
       end
 
+      context "A new anonymous album" do
+        strategy_should_work(
+          "https://imgur.com/a/ngrBZUg",
+          image_urls: %w[
+            https://i.imgur.com/E8CE6BM.jpg
+            https://i.imgur.com/FN1DRIe.png
+            https://i.imgur.com/MdCdHkV.png
+          ],
+          page_url: "https://imgur.com/a/ngrBZUg",
+          profile_url: nil,
+          artist_name: nil,
+          artist_commentary_title: "FuwaMoco reaction faces",
+          dtext_artist_commentary_desc: "",
+          tags: [],
+        )
+      end
+
       should "Parse Imgur URLs correctly" do
         assert(Source::URL.image_url?("https://i.imgur.com/c7EXjJu.jpeg"))
         assert(Source::URL.image_url?("https://i.imgur.io/c7EXjJu.jpeg"))
