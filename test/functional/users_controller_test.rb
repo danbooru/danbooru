@@ -208,12 +208,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not show secret attributes to the user themselves" do
-        @user.update!(totp_secret: TOTP.generate_secret)
+        @user.update!(totp_secret: TOTP.generate_secret, backup_codes: [1, 2, 3])
         get_auth user_path(@user), @user, as: :json
 
         assert_response :success
         assert_equal(false, response.parsed_body.has_key?("bcrypt_password_hash"))
         assert_equal(false, response.parsed_body.has_key?("totp_secret"))
+        assert_equal(false, response.parsed_body.has_key?("backup_codes"))
       end
 
       should "show the last_ip_addr to mods" do

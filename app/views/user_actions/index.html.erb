@@ -144,6 +144,12 @@
               <%= link_to_user user %> entered an incorrect 2FA code.
             <% when "totp_failed_reauthenticate" %>
               <%= link_to_user user %> entered an incorrect 2FA code.
+            <% when "backup_code_generate" %>
+              <%= link_to_user user %> generated new backup codes.
+            <% when "backup_code_login" %>
+              <%= link_to_user user %> logged in with a backup code.
+            <% when "backup_code_reauthenticate" %>
+              <%= link_to_user user %> reauthenticated with a backup code.
             <% end %>
           <% when "UserFeedback" %>
             <% case event_type %>

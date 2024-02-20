@@ -10,7 +10,7 @@
       <%= edit_form_for(@user.totp, url: verify_totp_session_path, method: "post", html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
         <%= f.input :user_id, as: :hidden, input_html: { value: @user.signed_id(purpose: :verify_totp, expires_in: 10.minutes) } %>
         <%= f.input :url, as: :hidden, input_html: { value: @url } %>
-        <%= f.input :code, placeholder: "123456", required: true, minlength: 6, maxlength: 6, pattern: '\d+', input_html: { value: nil } %>
+        <%= f.input :code, placeholder: "123456", required: true, minlength: 6, maxlength: User::BACKUP_CODE_LENGTH, pattern: '\d+', input_html: { value: nil }, hint: "Lost your phone? You can enter a backup code instead." %>
         <%= f.submit "Continue", class: "button-primary" %>
       <% end %>
     </div>

@@ -39,8 +39,11 @@ class UserEvent < ApplicationRecord
     totp_login_pending_verification: 730, # The user entered the correct password on the login page, but has not yet entered their 2FA code.
     totp_login: 740,                      # The user successfully entered their password and 2FA code on the login page.
     totp_reauthenticate: 745,             # The user successfully entered their password and 2FA code on the confirm password page.
-    totp_failed_login: 750,               # The user entered the correct password, but an incorrect 2FA code on the login page.
-    totp_failed_reauthenticate: 755,      # The user entered the correct password, but an incorrect 2FA code on the confirm password page.
+    totp_failed_login: 750,               # The user entered the correct password, but an incorrect 2FA code or backup code on the login page.
+    totp_failed_reauthenticate: 755,      # The user entered the correct password, but an incorrect 2FA code or backup code on the confirm password page.
+    backup_code_generate: 800,            # The user generated new backup codes.
+    backup_code_login: 840,               # The user successfully entered their password and backup code on the login page.
+    backup_code_reauthenticate: 845,      # The user successfully entered their password and backup code on the confirm password page.
   }
 
   delegate :country, :city, :is_proxy?, to: :ip_geolocation, allow_nil: true

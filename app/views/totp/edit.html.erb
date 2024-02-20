@@ -1,5 +1,7 @@
 <% page_title "Setup Two-Factor Authentication" %>
 
+<%= render "users/secondary_links" %>
+
 <div id="c-totp">
   <div id="a-new">
     <div class="card mt-8 p-4 max-w-540px mx-auto flex flex-col items-center">
@@ -51,6 +53,10 @@
           <%= f.submit "Enable", class: "button-primary", disabled: true %>
         <% end %>
       <% end %>
+    </div>
+
+    <div class="mt-4 flex justify-center">
+      <%= link_to "Back to settings", settings_path %>
     </div>
   </div>
 </div>

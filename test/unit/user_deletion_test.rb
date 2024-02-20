@@ -45,7 +45,7 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "a valid user deletion" do
     setup do
-      @user = create(:gold_user, name: "foo", email_address: build(:email_address), totp_secret: TOTP.generate_secret)
+      @user = create(:gold_user, name: "foo", email_address: build(:email_address), totp_secret: TOTP.generate_secret, backup_codes: [1, 2, 3])
       @api_key = create(:api_key, user: @user)
       @favorite = create(:favorite, user: @user)
       @forum_topic_visit = as(@user) { create(:forum_topic_visit, user: @user) }
@@ -84,10 +84,14 @@ class UserDeletionTest < ActiveSupport::TestCase
       assert_equal(false, @user.authenticate_password("password"))
     end
 
-    should "destroy the 2FA secret" do
+    should "destroy the 2FA secret and backup codes" do
       assert_equal(true, @user.totp_secret.present?)
+      assert_equal(true, @user.backup_codes.present?)
+
       perform_enqueued_jobs { @deletion.delete! }
+
       assert_nil(@user.reload.totp_secret)
+      assert_nil(@user.backup_codes)
     end
 
     should "not generate a modaction" do
