@@ -54,7 +54,31 @@ module Source
       end
 
       memoize def api_response
-        http.cache(1.minute).headers(Referer: profile_url, Authorization: "Bearer null").parsed_get(api_url) || {}
+        response = http.cache(1.minute).get(api_url)
+         
+        if response.status == 429
+          self.cached_request_key = response.cookies.cookies.find do
+            |cookie| cookie.name == "request_key"
+          end&.value
+          response = http.cache(1.minute).get(api_url)
+        end
+
+        response.parse
+      rescue
+        {}
+      end
+
+      def http
+        super.headers(Referer: profile_url, Authorization: "Bearer null").cookies(request_key: cached_request_key)
+      end
+
+      memoize def cached_request_key
+        Cache.get("skeb-request-key", 24.hours, skip_nil: true)
+      end
+
+      def cached_request_key=(value)
+        Cache.put("skeb-request-key", value)
+        cached_request_key(true)
       end
 
       def profile_url
