@@ -23,7 +23,9 @@ class UserEvent < ApplicationRecord
 
   enum category: {
     login: 0,                             # The user successfully logged in. Only used for users without 2FA enabled.
-    failed_login: 50,
+    reauthenticate: 25,                   # The user entered the correct password on the confirm password page. Only used for users without 2FA enabled.
+    failed_login: 50,                     # The user entered an incorrect password on the login page.
+    failed_reauthenticate: 75,            # The user entered an incorrect password on the confirm password page.
     logout: 100,
     user_creation: 200,
     user_deletion: 300,
@@ -34,9 +36,11 @@ class UserEvent < ApplicationRecord
     totp_enable: 700,                     # The user enabled 2FA.
     totp_update: 710,                     # The user changed their 2FA secret.
     totp_disable: 720,                    # The user disabled 2FA.
-    totp_login_pending_verification: 730, # The user successfully entered their password, but has not yet entered their 2FA code.
-    totp_login: 740,                      # The user successfully entered their 2FA code.
-    totp_failed_login: 750,               # The user entered an incorrect 2FA code.
+    totp_login_pending_verification: 730, # The user entered the correct password on the login page, but has not yet entered their 2FA code.
+    totp_login: 740,                      # The user successfully entered their password and 2FA code on the login page.
+    totp_reauthenticate: 745,             # The user successfully entered their password and 2FA code on the confirm password page.
+    totp_failed_login: 750,               # The user entered the correct password, but an incorrect 2FA code on the login page.
+    totp_failed_reauthenticate: 755,      # The user entered the correct password, but an incorrect 2FA code on the confirm password page.
   }
 
   delegate :country, :city, :is_proxy?, to: :ip_geolocation, allow_nil: true

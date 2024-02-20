@@ -252,6 +252,7 @@ Rails.application.routes.draw do
   resources :saved_searches, :except => [:show]
   resource :session, only: [:new, :create, :destroy] do
     post :verify_totp, on: :collection
+    post :reauthenticate, on: :collection
     get :confirm_password, on: :collection
     get :sign_out, on: :collection
   end

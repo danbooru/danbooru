@@ -7,6 +7,8 @@
 # @see ApplicationController#set_current_user
 # @see CurrentUser
 class SessionLoader
+  include ActiveModel::API
+
   class AuthenticationFailure < StandardError; end
 
   attr_reader :session, :request, :ip_address, :params
@@ -73,6 +75,32 @@ class SessionLoader
       true
     else
       UserEvent.create_from_request!(user, :totp_failed_login, request)
+      false
+    end
+  end
+
+  # Verify a user's password and 2FA code. Used to confirm a user's password before sensitive actions like adding API
+  # keys or changing the user's email.
+  #
+  # @param user [User] The user to reauthenticate.
+  # @param password [String] The user's password.
+  # @param verification_code [String] The user's 6-digit 2FA code (if they have 2FA enabled).
+  def reauthenticate(user, password, verification_code = nil)
+    if !user.authenticate_password(password) # wrong password
+      UserEvent.create_from_request!(user, :failed_reauthenticate, request)
+      errors.add(:password, "is incorrect")
+      false
+    elsif !user.totp.present? # right password and user doesn't have 2FA
+      UserEvent.create_from_request!(user, :reauthenticate, request)
+      session[:last_authenticated_at] = Time.now.utc.to_s
+      true
+    elsif user.totp.verify(verification_code) # right password and right 2FA code
+      UserEvent.create_from_request!(user, :totp_reauthenticate, request)
+      session[:last_authenticated_at] = Time.now.utc.to_s
+      true
+    else # right password and wrong 2FA code
+      UserEvent.create_from_request!(user, :totp_failed_reauthenticate, request)
+      errors.add(:verification_code, "is incorrect")
       false
     end
   end
