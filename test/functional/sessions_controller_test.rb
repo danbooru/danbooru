@@ -245,6 +245,49 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(nil, session[:user_id])
         assert_equal(true, @user.user_events.totp_failed_login.exists?)
       end
+
+      context "when given a backup code" do
+        should "log the user in if they enter a correct backup code" do
+          @user = create(:user_with_2fa)
+          backup_code = @user.backup_codes.first
+
+          post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path } }
+
+          assert_redirected_to users_path
+          assert_equal(@user.id, session[:user_id])
+          assert_equal(false, @user.reload.backup_codes.include?(backup_code))
+          assert_equal("backup_code_login", @user.user_events.last.category)
+        end
+
+        should "not log the user in if they enter an incorrect backup code" do
+          @user = create(:user_with_2fa)
+          backup_code = "99999999"
+
+          post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path } }
+
+          assert_response :success
+          assert_nil(nil, session[:user_id])
+          assert_equal("totp_failed_login", @user.user_events.last.category)
+        end
+
+        should "not log the user in if they enter a used backup code" do
+          @user = create(:user_with_2fa, backup_codes: [11111111, 22222222, 33333333])
+          backup_code = 11111111
+
+          post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path } }
+          assert_redirected_to users_path
+          assert_equal(@user.id, session[:user_id])
+
+          delete_auth session_path, @user
+          assert_nil(session[:user_id])
+
+          post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path } }
+
+          assert_response :success
+          assert_nil(nil, session[:user_id])
+          assert_equal("totp_failed_login", @user.user_events.last.category)
+        end
+      end
     end
 
     context "confirm_password action" do
@@ -269,6 +312,18 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("totp_reauthenticate", @user.user_events.last.category)
         end
 
+        should "succeed if the user enters the right password and backup code" do
+          backup_code = @user.backup_codes.first
+
+          travel_to(1.day.ago) { login_as(@user) }
+          post reauthenticate_session_path, params: { session: { password: "password", verification_code: backup_code, url: users_path } }
+
+          assert_redirected_to users_path
+          assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) > 1.second.ago)
+          assert_equal(false, @user.reload.backup_codes.include?(backup_code))
+          assert_equal("backup_code_reauthenticate", @user.user_events.last.category)
+        end
+
         should "fail if the user enters the right password but the wrong 2FA code" do
           travel_to(1.day.ago) { login_as(@user) }
           post reauthenticate_session_path, params: { session: { password: "password", verification_code: "wrong", url: users_path } }
@@ -281,6 +336,28 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         should "fail if the user enters the wrong password and the right 2FA code" do
           travel_to(1.day.ago) { login_as(@user) }
           post reauthenticate_session_path, params: { session: { password: "wrong", verification_code: @user.totp.code, url: users_path } }
+
+          assert_response :success
+          assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
+          assert_equal("failed_reauthenticate", @user.user_events.last.category)
+        end
+
+        should "fail if the user enters the right password and the wrong backup code" do
+          backup_code = "99999999"
+
+          travel_to(1.day.ago) { login_as(@user) }
+          post reauthenticate_session_path, params: { session: { password: "password", verification_code: backup_code, url: users_path } }
+
+          assert_response :success
+          assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
+          assert_equal("totp_failed_reauthenticate", @user.user_events.last.category)
+        end
+
+        should "fail if the user enters the wrong password and the right backup code" do
+          backup_code = @user.backup_codes.first
+
+          travel_to(1.day.ago) { login_as(@user) }
+          post reauthenticate_session_path, params: { session: { password: "wrong", verification_code: backup_code, url: users_path } }
 
           assert_response :success
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)

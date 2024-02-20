@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
-  self.ignored_columns = [:backup_codes]
-
   extend Memoist
 
   class PrivilegeError < StandardError; end
@@ -64,6 +62,12 @@ class User < ApplicationRecord
   USER_PREFERENCE_BOOLEAN_ATTRIBUTES = ACTIVE_BOOLEAN_ATTRIBUTES - %w[is_banned requires_verification is_verified]
 
   DEFAULT_BLACKLIST = ["guro", "scat"].join("\n")
+
+  # The number of backup codes to generate for a user.
+  MAX_BACKUP_CODES = 3
+
+  # The number of digits in each backup code.
+  BACKUP_CODE_LENGTH = 8
 
   attribute :id
   attribute :created_at
@@ -266,12 +270,49 @@ class User < ApplicationRecord
 
         if totp_secret_before_last_save.nil?
           UserEvent.create_from_request!(self, :totp_enable, request)
+          generate_backup_codes!(request)
         elsif secret.nil?
           UserEvent.create_from_request!(self, :totp_disable, request)
+          update!(backup_codes: nil)
         else
           UserEvent.create_from_request!(self, :totp_update, request)
         end
       end
+    end
+  end
+
+  concerning :BackupCodeMethods do
+    # Check whether the given backup code is correct. If it is, remove it and generate a new backup code.
+    #
+    # @param backup_code [String] The backup code to verify.
+    def verify_backup_code!(backup_code)
+      with_lock do
+        backup_code = backup_code.strip.to_i
+
+        if backup_code.in?(backup_codes)
+          new_backup_codes = backup_codes.without(backup_code) + [generate_backup_code]
+          update!(backup_codes: new_backup_codes)
+          true
+        else
+          false
+        end
+      end
+    end
+
+    # Generate a new set of backup codes.
+    #
+    # @param request [ActionDispatch::Request] The HTTP request.
+    # @param max_codes [Integer] The number of backup codes to generate.
+    # @param length [Integer] The number of digits in each backup code.
+    def generate_backup_codes!(request, max_codes: MAX_BACKUP_CODES, length: BACKUP_CODE_LENGTH)
+      with_lock do
+        update!(backup_codes: max_codes.times.map { generate_backup_code(length) })
+        UserEvent.create_from_request!(self, :backup_code_generate, request)
+      end
+    end
+
+    def generate_backup_code(length = BACKUP_CODE_LENGTH)
+      SecureRandom.rand(10**length)
     end
   end
 

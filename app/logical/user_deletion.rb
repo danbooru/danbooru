@@ -76,6 +76,7 @@ class UserDeletion
     user.last_logged_in_at = nil
     user.last_forum_read_at = nil
     user.totp_secret = nil
+    user.backup_codes = nil
 
     User::USER_PREFERENCE_BOOLEAN_ATTRIBUTES.each do |attribute|
       user.send("#{attribute}=", false)

@@ -1,0 +1,42 @@
+<% page_title "Backup Codes" %>
+
+<%= render "users/secondary_links" %>
+
+<div id="c-totp">
+  <div id="a-new">
+    <div class="card mt-8 p-4 max-w-540px mx-auto flex flex-col gap-4 items-center">
+      <h1>Backup Codes</h1>
+
+      <div class="prose">
+        <p>
+          Backup codes let you login in case you lose your phone or two-factor authentication app.
+        </p>
+
+        <p>
+          Save these codes. If you lose your phone and don't have your
+          backup codes, then will be locked out of your account permanently.
+        </p>
+
+        <hr>
+
+        <% @user.backup_codes.to_a.each do |code| %>
+          <p class="text-xl text-center"><%= code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0") %></p>
+        <% end %>
+
+        <hr>
+      </div>
+
+      <% if @url.present? %>
+        <%= link_to "Continue", @url, class: "button-primary" %>
+      <% else %>
+        <%= edit_form_for(:backup_codes, url: user_backup_codes_path(@user), method: "post") do |f| %>
+          <%= f.submit "Generate new codes", class: "button-primary" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="mt-4 flex justify-center">
+      <%= link_to "Back to settings", settings_path %>
+    </div>
+  </div>
+</div>

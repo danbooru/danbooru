@@ -79,20 +79,20 @@
 
       <% t.panel("Security") do %>
         <div class="space-y-4">
-          <div class="flex justify-between">
+          <div class="flex justify-between gap-4">
             <div>
               <span class="font-bold leading-normal">Password</span>
               <p class="fineprint max-w-360px">Update your password.</p>
             </div>
 
             <div>
-              <%= link_to "Change password", edit_user_password_path(user_id: @user.id), class: "button-primary" %>
+              <%= link_to "Change password", edit_user_password_path(user_id: @user.id), class: "button-primary button-sm" %>
             </div>
           </div>
 
-          <div class="flex justify-between">
+          <div class="flex justify-between gap-4">
             <div>
-              <div class="mb-1 space-x-1">
+              <div class="mb-1">
                 <span class="font-bold leading-normal">Two-factor authentication</span>
 
                 <% if @user.totp.present? %>
@@ -107,12 +107,25 @@
 
             <div>
               <% if @user.totp.present? %>
-                <%= link_to "Disable", edit_user_totp_path(user_id: @user.id), class: "button-outline-danger" %>
+                <%= link_to "Disable", edit_user_totp_path(user_id: @user.id), class: "button-outline-danger button-sm leading-none" %>
               <% else %>
-                <%= link_to "Enable", edit_user_totp_path(user_id: @user.id), class: "button-primary" %>
+                <%= link_to "Enable", edit_user_totp_path(user_id: @user.id), class: "button-primary button-sm" %>
               <% end %>
             </div>
           </div>
+
+          <% if @user.totp.present? %>
+            <div class="flex justify-between gap-4">
+              <div>
+                <span class="font-bold leading-normal">Backup codes</span>
+                <p class="fineprint max-w-360px">Backup codes let you login in case you lose your two-factor authentication device.</p>
+              </div>
+
+              <div>
+                <%= link_to "View", user_backup_codes_path(@user), class: "button-primary button-sm" %>
+              </div>
+            </div>
+          <% end %>
         </div>
       <% end %>
     <% end) %>

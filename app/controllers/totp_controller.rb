@@ -32,7 +32,7 @@ class TOTPController < ApplicationController
       @totp.errors.add(:verification_code, "is incorrect")
     end
 
-    respond_with(@totp, location: settings_path)
+    respond_with(@totp, location: user_backup_codes_path(@user, url: settings_path))
   end
 
   def destroy

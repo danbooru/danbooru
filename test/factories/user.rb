@@ -40,6 +40,7 @@ FactoryBot.define do
 
     factory(:user_with_2fa) do
       totp_secret { TOTP.generate_secret }
+      backup_codes { User::MAX_BACKUP_CODES.times.map { generate_backup_code } }
     end
   end
 end

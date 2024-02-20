@@ -55,9 +55,10 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
 
           put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code } }
 
-          assert_redirected_to settings_path
+          assert_redirected_to user_backup_codes_path(@user, url: settings_path)
           assert_equal(true, @user.reload.totp.present?)
           assert_equal(true, @user.totp_secret.present?)
+          assert_equal(true, @user.backup_codes.present?)
           assert_equal(true, @user.user_events.totp_enable.exists?)
         end
 
@@ -70,6 +71,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           assert_response 403
           assert_equal(false, @user.reload.totp.present?)
           assert_nil(@user.totp_secret)
+          assert_nil(@user.backup_codes)
           assert_equal(false, @user.user_events.totp_enable.exists?)
         end
 
@@ -82,6 +84,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to confirm_password_session_path(url: user_totp_path(user_id: @user.id))
           assert_equal(false, @user.reload.totp.present?)
           assert_nil(@user.totp_secret)
+          assert_nil(@user.backup_codes)
           assert_equal(false, @user.user_events.totp_enable.exists?)
         end
       end
@@ -96,6 +99,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_equal(false, @user.reload.totp.present?)
           assert_nil(@user.totp_secret)
+          assert_nil(@user.backup_codes)
           assert_equal(false, @user.user_events.totp_enable.exists?)
         end
       end
@@ -110,6 +114,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to settings_path
         assert_equal(false, @user.reload.totp.present?)
         assert_nil(@user.totp_secret)
+        assert_nil(@user.backup_codes)
         assert_equal(true, @user.user_events.totp_disable.exists?)
       end
 
@@ -121,6 +126,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
         assert_equal(true, @user.reload.totp.present?)
         assert_equal(true, @user.totp_secret.present?)
+        assert_equal(true, @user.backup_codes.present?)
         assert_equal(false, @user.user_events.totp_disable.exists?)
       end
 
@@ -133,6 +139,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to confirm_password_session_path(url: user_totp_path(user_id: @user.id))
         assert_equal(true, @user.reload.totp.present?)
         assert_equal(true, @user.totp_secret.present?)
+        assert_equal(true, @user.backup_codes.present?)
         assert_equal(false, @user.user_events.totp_disable.exists?)
       end
     end

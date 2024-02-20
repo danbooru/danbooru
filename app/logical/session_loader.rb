@@ -60,7 +60,7 @@ class SessionLoader
   # Verify whether a user's 2FA code is correct after they have logged in with their password.
   #
   # @param user [User] The user to authenticate.
-  # @param code [String] The 6-digit 2FA code.
+  # @param code [String] The user's 6-digit 2FA code, or their 8-digit backup code.
   # @return [Boolean] True if the 2FA code is correct, or false if it's incorrect.
   def verify_totp!(user, code)
     if user.totp.verify(code)
@@ -68,6 +68,16 @@ class SessionLoader
       session[:last_authenticated_at] = Time.now.utc.to_s
 
       UserEvent.build_from_request(user, :totp_login, request)
+      user.last_logged_in_at = Time.now
+      user.last_ip_addr = request.remote_ip
+      user.save!
+
+      true
+    elsif user.verify_backup_code!(code)
+      session[:user_id] = user.id
+      session[:last_authenticated_at] = Time.now.utc.to_s
+
+      UserEvent.build_from_request(user, :backup_code_login, request)
       user.last_logged_in_at = Time.now
       user.last_ip_addr = request.remote_ip
       user.save!
@@ -84,7 +94,7 @@ class SessionLoader
   #
   # @param user [User] The user to reauthenticate.
   # @param password [String] The user's password.
-  # @param verification_code [String] The user's 6-digit 2FA code (if they have 2FA enabled).
+  # @param verification_code [String] The user's 6-digit 2FA code, or their 8-digit backup code (if they have 2FA enabled).
   def reauthenticate(user, password, verification_code = nil)
     if !user.authenticate_password(password) # wrong password
       UserEvent.create_from_request!(user, :failed_reauthenticate, request)
@@ -98,7 +108,11 @@ class SessionLoader
       UserEvent.create_from_request!(user, :totp_reauthenticate, request)
       session[:last_authenticated_at] = Time.now.utc.to_s
       true
-    else # right password and wrong 2FA code
+    elsif user.verify_backup_code!(verification_code) # right password and right backup code
+      UserEvent.create_from_request!(user, :backup_code_reauthenticate, request)
+      session[:last_authenticated_at] = Time.now.utc.to_s
+      true
+    else # right password and wrong 2FA code or wrong backup code
       UserEvent.create_from_request!(user, :totp_failed_reauthenticate, request)
       errors.add(:verification_code, "is incorrect")
       false
