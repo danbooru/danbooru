@@ -5,13 +5,11 @@ class SessionsController < ApplicationController
   skip_forgery_protection only: :create, if: -> { !request.format.html? }
 
   rate_limit :create, rate: 1.0/10.minutes, burst: 20
+  rate_limit :reauthenticate, rate: 1.0/10.minutes, burst: 20, key: "sessions:create"
   rate_limit :verify_totp, rate: 1.0/30.minutes, burst: 50
 
   def new
     @user = User.new
-  end
-
-  def confirm_password
   end
 
   # Verify the user's password and either log them in, or show them the 2FA page if they have 2FA enabled.
@@ -27,6 +25,26 @@ class SessionsController < ApplicationController
     else
       flash.now[:notice] = "Password was incorrect"
       raise SessionLoader::AuthenticationFailure, "Username or password incorrect"
+    end
+  end
+
+  # Ask for the user's password before sensitive actions.
+  def confirm_password
+    @user = CurrentUser.user
+    @session = SessionLoader.new(request)
+    @url = params.fetch(:session, params).fetch(:url, root_path)
+  end
+
+  # Verify the user's password and 2FA code before sensitive actions.
+  def reauthenticate
+    @user = CurrentUser.user
+    @session = SessionLoader.new(request)
+    @url = params.fetch(:session, params).fetch(:url, root_path)
+
+    if @session.reauthenticate(@user, params.dig(:session, :password), params.dig(:session, :verification_code))
+      redirect_to @url
+    else
+      render :confirm_password
     end
   end
 

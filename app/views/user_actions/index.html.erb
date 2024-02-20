@@ -108,8 +108,12 @@
             <% case model.category %>
             <% when "login" %>
               <%= link_to_user user %> logged in.
+            <% when "reauthenticate" %>
+              <%= link_to_user user %> reauthenticated.
             <% when "failed_login" %>
               Failed login attempt for <%= link_to_user user %>.
+            <% when "failed_reauthenticate" %>
+              Failed reauthentication attempt for <%= link_to_user user %>.
             <% when "logout" %>
               <%= link_to_user user %> logged out.
             <% when "user_creation" %>
@@ -131,10 +135,14 @@
             <% when "totp_update" %>
               <%= link_to_user user %> changed their 2FA secret.
             <% when "totp_login_pending_verification" %>
-              <%= link_to_user user %> logged in with their password. Awaiting 2FA verification.
+              <%= link_to_user user %> entered their password. Awaiting 2FA verification.
             <% when "totp_login" %>
-              <%= link_to_user user %> logged in with their 2FA code.
+              <%= link_to_user user %> logged in with 2FA.
+            <% when "totp_reauthenticate" %>
+              <%= link_to_user user %> reauthenticated with 2FA.
             <% when "totp_failed_login" %>
+              <%= link_to_user user %> entered an incorrect 2FA code.
+            <% when "totp_failed_reauthenticate" %>
               <%= link_to_user user %> entered an incorrect 2FA code.
             <% end %>
           <% when "UserFeedback" %>

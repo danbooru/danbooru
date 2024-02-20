@@ -3,7 +3,7 @@ require 'test_helper'
 class SessionsControllerTest < ActionDispatch::IntegrationTest
   context "the sessions controller" do
     setup do
-      @user = create(:user, name: "foobar", password: "password", email_address_attributes: { address: "Foo.Bar+nospam@Googlemail.com" })
+      @user = create(:user, password: "password", email_address_attributes: { address: "Foo.Bar+nospam@Googlemail.com" })
     end
 
     context "new action" do
@@ -151,11 +151,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(@ip_ban.last_hit_at)
       end
 
-      should "rate limit logins to 10 per minute per IP" do
+      should "rate limit logins to 1 per 10 minutes per IP" do
         Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
         freeze_time
 
-        10.times do
+        20.times do
           post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
           assert_redirected_to posts_path
           assert_equal(@user.id, session[:user_id])
@@ -166,12 +166,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
-        travel 59.seconds
+        travel 9.minutes
         post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
-        travel 65.seconds
+        travel 19.minutes
         post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_redirected_to posts_path
         assert_equal(@user.id, session[:user_id])
@@ -244,6 +244,68 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_nil(nil, session[:user_id])
         assert_equal(true, @user.user_events.totp_failed_login.exists?)
+      end
+    end
+
+    context "confirm_password action" do
+      should "render for a logged in user" do
+        get_auth confirm_password_session_path, @user
+        assert_response :success
+      end
+    end
+
+    context "reauthenticate action" do
+      context "for a user with 2FA enabled" do
+        setup do
+          @user = create(:user_with_2fa, password: "password")
+        end
+
+        should "succeed if the user enters the right password and 2FA code" do
+          travel_to(1.day.ago) { login_as(@user) }
+          post reauthenticate_session_path, params: { session: { password: "password", verification_code: @user.totp.code, url: users_path } }
+
+          assert_redirected_to users_path
+          assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) > 1.second.ago)
+          assert_equal("totp_reauthenticate", @user.user_events.last.category)
+        end
+
+        should "fail if the user enters the right password but the wrong 2FA code" do
+          travel_to(1.day.ago) { login_as(@user) }
+          post reauthenticate_session_path, params: { session: { password: "password", verification_code: "wrong", url: users_path } }
+
+          assert_response :success
+          assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
+          assert_equal("totp_failed_reauthenticate", @user.user_events.last.category)
+        end
+
+        should "fail if the user enters the wrong password and the right 2FA code" do
+          travel_to(1.day.ago) { login_as(@user) }
+          post reauthenticate_session_path, params: { session: { password: "wrong", verification_code: @user.totp.code, url: users_path } }
+
+          assert_response :success
+          assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
+          assert_equal("failed_reauthenticate", @user.user_events.last.category)
+        end
+      end
+
+      context "for a user without 2FA enabled" do
+        should "succeed if the user enters the right password" do
+          travel_to(1.day.ago) { login_as(@user) }
+          post reauthenticate_session_path, params: { session: { password: "password", url: users_path } }
+
+          assert_redirected_to users_path
+          assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) > 1.second.ago)
+          assert_equal("reauthenticate", @user.user_events.last.category)
+        end
+
+        should "fail if the user enters the wrong password" do
+          travel_to(1.day.ago) { login_as(@user) }
+          post reauthenticate_session_path, params: { session: { password: "wrong", url: users_path } }
+
+          assert_response :success
+          assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
+          assert_equal("failed_reauthenticate", @user.user_events.last.category)
+        end
       end
     end
 
