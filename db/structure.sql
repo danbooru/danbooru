@@ -2184,8 +2184,7 @@ CREATE TABLE public.users (
     upload_points integer NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     totp_secret character varying,
-    backup_codes_secret character varying,
-    backup_codes_counter integer
+    backup_codes integer[]
 );
 
 
@@ -6801,6 +6800,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240221060848'),
 ('20240217201829'),
 ('20240131055326'),
 ('20240110180956'),
