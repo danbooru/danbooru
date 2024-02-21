@@ -2186,8 +2186,7 @@ CREATE TABLE public.users (
     upload_points integer NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     totp_secret character varying,
-    backup_codes_secret character varying,
-    backup_codes_counter integer
+    backup_codes integer[]
 );
 
 
