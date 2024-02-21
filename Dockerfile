@@ -44,7 +44,7 @@ RUN <<EOS
 
   apt-get update
   apt-get install -y --no-install-recommends \
-    postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules-5.36 libpq5 libpcre3 libsodium23 \
+    postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre3 libsodium23 \
     libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2 libpng16-16 libexpat1 \
     libglib2.0 libgif7 libexif12 libheif1 libvpx8 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
     libreadline8 libarchive-zip-perl tini busybox less ncdu curl
@@ -173,7 +173,7 @@ EOS
 
 # Build ExifTool. Output is in /usr/local.
 FROM build-base AS build-exiftool
-ARG EXIFTOOL_BUILD_DEPS="perl perl-modules-5.36 libarchive-zip-perl"
+ARG EXIFTOOL_BUILD_DEPS="perl perl-modules-5.38 libarchive-zip-perl"
 ARG EXIFTOOL_URL
 RUN <<EOS
   apt-get install -y --no-install-recommends $EXIFTOOL_BUILD_DEPS
