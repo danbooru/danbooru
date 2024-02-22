@@ -104,7 +104,18 @@ module Sources
       # page: https://skeb.jp/@LambOic029/works/146
       strategy_should_work(
         "https://skeb.imgix.net/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=7dbecbeb7b05394537b60c881a081776",
-        media_files: [{ file_size: 123_820 }],
+        media_files: [{ file_size: 120_524 }],
+      )
+    end
+
+    context "request key should automatically refresh" do
+      setup do
+        Cache.put("skeb-request-key", "invalid")
+      end
+
+      strategy_should_work(
+        "https://skeb.jp/@kokuzou593/works/45",
+        image_urls: ["https://si.imgix.net/1be455b2/uploads/origins/307941e9-dbe0-4e4b-93d4-94accdaff9a0?bg=%23fff&auto=format&fm=webp&w=800&s=ab82c6c148785b1c96d858244ebf68f0"],
       )
     end
 
