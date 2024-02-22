@@ -50,10 +50,12 @@ class SessionLoader
 
       user
     elsif user.nil?
-      nil # username incorrect
+      errors.add(:base, "Incorrect username or password")
+      nil
     else
       UserEvent.create_from_request!(user, :failed_login, request)
-      nil # password incorrect
+      errors.add(:base, "Incorrect username or password")
+      nil
     end
   end
 

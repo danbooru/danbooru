@@ -10,12 +10,14 @@ class SessionsController < ApplicationController
 
   def new
     @user = User.new
+    @session = SessionLoader.new(request)
   end
 
   # Verify the user's password and either log them in, or show them the 2FA page if they have 2FA enabled.
   def create
     name, password, url = params.fetch(:session, params).slice(:name, :password, :url).values
-    @user = SessionLoader.new(request).login(name, password)
+    @session = SessionLoader.new(request)
+    @user = @session.login(name, password)
     @url = url || posts_path
 
     if @user&.totp.present?
@@ -23,8 +25,7 @@ class SessionsController < ApplicationController
     elsif @user
       redirect_to @url
     else
-      flash.now[:notice] = "Password was incorrect"
-      raise SessionLoader::AuthenticationFailure, "Username or password incorrect"
+      render :new, status: 401
     end
   end
 
