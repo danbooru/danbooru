@@ -42,6 +42,13 @@ RUN <<EOS
   userdel ubuntu
   useradd --user-group danbooru --create-home --shell /bin/bash
 
+  cat > /etc/apt/apt.conf.d/local <<EOF
+    Dpkg::Options {
+      "--force-confnew";
+      "--force-confdef";
+    }
+EOF
+
   apt-get update
   apt-get install -y --no-install-recommends \
     postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre3 libsodium23 \
