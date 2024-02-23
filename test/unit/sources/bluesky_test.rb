@@ -95,6 +95,7 @@ module Sources
 
       assert(Source::URL.profile_url?("https://bsky.app/profile/ixy.bsky.social"))
       assert(Source::URL.profile_url?("https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w"))
+      assert(Source::URL.profile_url?("https://ixy.bsky.social"))
 
       assert(Source::URL.page_url?("https://bsky.app/profile/ixy.bsky.social/post/3kkvo4d4jd32g"))
       assert(Source::URL.page_url?("https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g"))

@@ -41,6 +41,10 @@ class Source::URL::Bluesky < Source::URL
       @user_did = params["did"]
       @image_cid = params["cid"]
 
+    # https://ixy.bsky.social
+    in username, "bsky.social"
+      @user_handle = "#{username}.bsky.social"
+
     else
       nil
     end
