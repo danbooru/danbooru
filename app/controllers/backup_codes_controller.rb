@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BackupCodesController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :text, :html, :xml, :json
 
   before_action :requires_reauthentication, only: [:index, :create]
   rate_limit :create, rate: 1.0/1.minute, burst: 10

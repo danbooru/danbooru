@@ -133,6 +133,14 @@ Utility.copyToClipboard = async function(text, message = "Copied!") {
   }
 }
 
+export function printPage(url) {
+  let iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  iframe.onload = () => iframe.contentWindow.print();
+  document.body.appendChild(iframe);
+}
+
 export function createTooltip(name, options = {}) {
   return delegate("body", {
     allowHTML: true,
@@ -173,5 +181,7 @@ Utility.update_field = function($field, value) {
     return true;
   }
 };
+
+Utility.printPage = printPage;
 
 export default Utility
