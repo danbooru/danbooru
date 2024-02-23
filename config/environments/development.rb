@@ -79,5 +79,5 @@ Rails.application.configure do
 
   # https://bigbinary.com/blog/rails-6-adds-guard-against-dns-rebinding-attacks
   # hxxps://github.com/rails/rails/pull/33145
-  config.hosts += [".ngrok.io", ".lvh.me", ".xip.io", ".nip.io", Danbooru.config.hostname]
+  config.hosts += [".ngrok.io", ".ngrok.app", ".ngrok.dev", ".ngrok-free.app", ".ngrok-free.dev", ".github.dev", ".nip.io", ".localhost", ".local", Danbooru.config.hostname]
 end
