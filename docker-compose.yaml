@@ -178,6 +178,14 @@ services:
   nginx:
     image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:production}
     command: ["openresty", "-e", "/dev/stderr"]
+    environment:
+      # The external port to listen on. You can set this to 80 if you have nothing else listening on port 80.
+      DANBOORU_PORT: "${DANBOORU_PORT:-3000}"
+
+      # If your instance is running behind a reverse proxy (such as Cloudflare, Ngrok, etc), then set this to true.
+      #
+      # If you get a `HTTP Origin header didn't match request.base_url` error when creating a new account, then set this to true.
+      DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-false}
     ports:
       - "${DANBOORU_PORT:-3000}:3000"
     depends_on:
