@@ -37,7 +37,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "redirect to the confirm password page if the user hasn't recently authenticated" do
-        post session_path, params: { name: @user.name, password: @user.password }
+        login_as(@user)
         travel_to 2.hours.from_now do
           get user_api_keys_path(@user.id)
         end

@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
-  respond_to :html, :json
-  skip_forgery_protection only: :create, if: -> { !request.format.html? }
+  respond_to :html
 
   rate_limit :create, rate: 1.0/10.minutes, burst: 20
   rate_limit :reauthenticate, rate: 1.0/10.minutes, burst: 20, key: "sessions:create"
   rate_limit :verify_totp, rate: 1.0/30.minutes, burst: 50
+
+  verify_captcha only: :create
 
   def new
     @user = User.new
@@ -15,10 +16,9 @@ class SessionsController < ApplicationController
 
   # Verify the user's password and either log them in, or show them the 2FA page if they have 2FA enabled.
   def create
-    name, password, url = params.fetch(:session, params).slice(:name, :password, :url).values
     @session = SessionLoader.new(request)
-    @user = @session.login(name, password)
-    @url = url || posts_path
+    @user = @session.login(params.dig(:session, :name), params.dig(:session, :password))
+    @url = params.dig(:session, :url).presence || params[:url].presence || root_path
 
     if @user&.totp.present?
       render :confirm_totp
@@ -33,14 +33,14 @@ class SessionsController < ApplicationController
   def confirm_password
     @user = CurrentUser.user
     @session = SessionLoader.new(request)
-    @url = params.fetch(:session, params).fetch(:url, root_path)
+    @url = params.dig(:session, :url).presence || params[:url].presence || root_path
   end
 
   # Verify the user's password and 2FA code before sensitive actions.
   def reauthenticate
     @user = CurrentUser.user
     @session = SessionLoader.new(request)
-    @url = params.fetch(:session, params).fetch(:url, root_path)
+    @url = params.dig(:session, :url).presence || params[:url].presence || root_path
 
     if @session.reauthenticate(@user, params.dig(:session, :password), params.dig(:session, :verification_code))
       redirect_to @url

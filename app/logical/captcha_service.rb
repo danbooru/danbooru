@@ -49,7 +49,7 @@ class CaptchaService
     token = request.params["cf-turnstile-response"]
     response = request(remoteip: request.remote_ip.to_s, response: token, sitekey: site_key, secret: secret_key)
 
-    raise Error, response["error-codes"].join("; ") if response["success"] == false
+    raise Error, "Missing or invalid captcha (error: #{response["error-codes"].join("; ")}" if response["success"] == false
     true
   end
 
