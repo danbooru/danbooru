@@ -425,6 +425,14 @@ module IconHelper
     svg_icon_tag("download", viewBox: "0 0 512 512", **options)
   end
 
+  def print_icon(**options)
+    svg_icon_tag("print", viewBox: "0 0 512 512", **options)
+  end
+
+  def copy_icon(**options)
+    svg_icon_tag("copy", viewBox: "0 0 448 512", **options)
+  end
+
   def image_icon(**options)
     svg_icon_tag("image", viewBox: "0 0 512 512", **options)
   end

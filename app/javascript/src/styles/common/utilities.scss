@@ -43,6 +43,7 @@ $spacer: 0.25rem; /* 4px */
 .text-lg  { font-size: var(--text-lg); }
 .text-xl  { font-size: var(--text-xl); }
 .text-xxl { font-size: var(--text-xxl); }
+.\!text-xxl { font-size: var(--text-xxl) !important; }
 
 .underline { text-decoration-line: underline; }
 .decoration-dotted { text-decoration-style: dotted; }

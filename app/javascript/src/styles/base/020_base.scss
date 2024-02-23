@@ -64,6 +64,10 @@ input, select, textarea {
   font: var(--body-font);
 }
 
+button {
+  font-family: var(--body-font);
+}
+
 textarea {
   font-size: var(--text-sm);
 }

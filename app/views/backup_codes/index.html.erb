@@ -14,14 +14,30 @@
 
         <p>
           Save these codes. If you lose your phone and don't have your
-          backup codes, then will be locked out of your account permanently.
+          backup codes, then you will be locked out of your account permanently.
         </p>
 
         <hr>
 
-        <% @user.backup_codes.to_a.each do |code| %>
-          <p class="text-xl text-center"><%= code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0") %></p>
-        <% end %>
+        <p>
+          <% @user.backup_codes.to_a.each do |code| %>
+            <code class="block !text-xxl text-center"><%= code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0") %></code>
+          <% end %>
+        </p>
+
+        <div class="flex justify-center gap-4">
+          <%= link_to user_backup_codes_path(@user, format: :txt), class: "button-outline-primary button-sm", download: "danbooru-backup-codes.txt" do %>
+            <%= download_icon %> Download
+          <% end %>
+
+          <%= tag.button class: "button-outline-primary button-sm", onclick: "Danbooru.Utility.printPage('#{j user_backup_codes_path(@user, format: :txt)}')" do %>
+            <%= print_icon %> Print
+          <% end %>
+
+          <%= tag.button class: "button-outline-primary button-sm", onclick: "Danbooru.Utility.copyToClipboard('#{j @user.backup_codes.to_a.join("\n")}')" do %>
+            <%= copy_icon %> Copy
+          <% end %>
+        </div>
 
         <hr>
       </div>
