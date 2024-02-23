@@ -45,7 +45,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
     context "#edit" do
       context "for a user who hasn't recently authenticated" do
         should "redirect to the confirm password page" do
-          post session_path, params: { name: @user.name, password: @user.password }
+          login_as(@user)
           travel_to 2.hours.from_now do
             get edit_user_email_path(@user)
           end
@@ -92,7 +92,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
     context "#update" do
       context "for a user who hasn't recently authenticated" do
         should "redirect to the confirm password page" do
-          post session_path, params: { name: @user.name, password: @user.password }
+          login_as(@user)
           travel_to 2.hours.from_now do
             put user_email_path(@user), params: { user: { email: "abc@ogres.net" }}
           end

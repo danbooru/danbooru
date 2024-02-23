@@ -283,8 +283,8 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           token = css_select("form input[name=authenticity_token]").first["value"]
 
           # login
-          post session_path, params: { authenticity_token: token, name: @user.name, password: "password" }
-          assert_redirected_to posts_path
+          post session_path, params: { authenticity_token: token, session: { name: @user.name, password: "password" } }
+          assert_redirected_to root_path
 
           # try to submit a form with cookies but without the csrf token
           put user_path(@user), headers: { HTTP_COOKIE: headers["Set-Cookie"] }, params: { user: { enable_safe_mode: "true" } }
@@ -298,7 +298,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     context "on session cookie authentication" do
       setup do
         @user = create(:user, password: "password")
-        post session_path, params: { name: @user.name, password: "password" }
+        login_as(@user)
       end
 
       should "succeed" do

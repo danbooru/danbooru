@@ -135,8 +135,8 @@ class ApplicationController < ActionController::Base
       render_error_page(400, exception, message: exception.message)
     when RequestBodyNotAllowedError
       render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")
-    when SessionLoader::AuthenticationFailure
-      render_error_page(401, exception, message: exception.message, template: "sessions/new")
+    when SessionLoader::AuthenticationFailure, CaptchaService::Error
+      render_error_page(401, exception, message: exception.message)
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest, ActionController::Redirecting::UnsafeRedirectError
       render_error_page(403, exception, message: exception.message)
     when ActiveSupport::MessageVerifier::InvalidSignature, # raised by `find_signed!`

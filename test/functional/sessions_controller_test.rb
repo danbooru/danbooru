@@ -15,43 +15,43 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "log the user in when given the correct password" do
-        post session_path, params: { name: @user.name, password: "password" }
+        post session_path, params: { session: { name: @user.name, password: "password" } }
 
-        assert_redirected_to posts_path
+        assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
         assert_not_nil(@user.reload.last_ip_addr)
         assert_equal(true, @user.user_events.login.exists?)
       end
 
       should "log the user in when given their email address" do
-        post session_path, params: { name: "Foo.Bar+nospam@Googlemail.com", password: "password" }
+        post session_path, params: { session: { name: "Foo.Bar+nospam@Googlemail.com", password: "password" } }
 
-        assert_redirected_to posts_path
+        assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
         assert_not_nil(@user.reload.last_ip_addr)
         assert_equal(true, @user.user_events.login.exists?)
       end
 
       should "normalize the user's email address when logging in" do
-        post session_path, params: { name: "foobar@gmail.com", password: "password" }
+        post session_path, params: { session: { name: "foobar@gmail.com", password: "password" } }
 
-        assert_redirected_to posts_path
+        assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
         assert_not_nil(@user.reload.last_ip_addr)
         assert_equal(true, @user.user_events.login.exists?)
       end
 
       should "be case-insensitive towards the user's name when logging in" do
-        post session_path, params: { name: @user.name.upcase, password: "password" }
+        post session_path, params: { session: { name: @user.name.upcase, password: "password" } }
 
-        assert_redirected_to posts_path
+        assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
         assert_not_nil(@user.reload.last_ip_addr)
         assert_equal(true, @user.user_events.login.exists?)
       end
 
       should "not log the user in when given an incorrect username + password combination" do
-        post session_path, params: { name: @user.name, password: "wrong" }
+        post session_path, params: { session: { name: @user.name, password: "wrong" } }
 
         assert_response 401
         assert_nil(nil, session[:user_id])
@@ -59,14 +59,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not log the user in when given an incorrect email" do
-        post session_path, params: { name: "foo@gmail.com", password: "password" }
+        post session_path, params: { session: { name: "foo@gmail.com", password: "password" } }
 
         assert_response 401
         assert_nil(nil, session[:user_id])
       end
 
       should "not log the user in when given an incorrect username" do
-        post session_path, params: { name: "dne", password: "password" }
+        post session_path, params: { session: { name: "dne", password: "password" } }
 
         assert_response 401
         assert_nil(nil, session[:user_id])
@@ -76,7 +76,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         user = create(:approver_user, password: "password")
         ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.1.1.1")
 
-        post session_path, params: { name: user.name, password: "password" }
+        post session_path, params: { session: { name: user.name, password: "password" } }
 
         assert_response 401
         assert_nil(nil, session[:user_id])
@@ -86,7 +86,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         user = create(:user, password: "password", last_logged_in_at: 1.year.ago)
         ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.1.1.1")
 
-        post session_path, params: { name: user.name, password: "password" }
+        post session_path, params: { session: { name: user.name, password: "password" } }
 
         assert_response 401
         assert_nil(nil, session[:user_id])
@@ -95,26 +95,50 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       should "not log the user in yet if they have 2FA enabled" do
         user = create(:user_with_2fa, password: "password")
 
-        post session_path, params: { name: user.name, password: "password" }
+        post session_path, params: { session: { name: user.name, password: "password" } }
 
         assert_response :success
         assert_nil(nil, session[:user_id])
         assert_equal(true, user.user_events.totp_login_pending_verification.exists?)
       end
 
+      should "not log the user in if the captcha is invalid" do
+        # https://developers.cloudflare.com/turnstile/reference/testing/#dummy-sitekeys-and-secret-keys
+        Danbooru.config.stubs(:captcha_site_key).returns("3x00000000000000000000FF") # forces an interactive challenge
+        Danbooru.config.stubs(:captcha_secret_key).returns("2x0000000000000000000000000000000AA") # always fails
+
+        post session_path, params: { session: { name: @user.name, password: "password" }, "cf-turnstile-response": "blah" }
+
+        assert_response 401
+        assert_nil(nil, session[:user_id])
+        assert_equal(false, @user.user_events.failed_login.exists?)
+      end
+
+      should "log the user in user if the captcha is valid" do
+        Danbooru.config.stubs(:captcha_site_key).returns("3x00000000000000000000FF") # forces an interactive challenge
+        Danbooru.config.stubs(:captcha_secret_key).returns("1x0000000000000000000000000000000AA") # always passes
+
+        post session_path, params: { session: { name: @user.name, password: "password", url: users_path }, "cf-turnstile-response": "blah" }
+
+        assert_redirected_to users_path
+        assert_equal(@user.id, session[:user_id])
+        assert_not_nil(@user.reload.last_ip_addr)
+        assert_equal("login", @user.user_events.last.category)
+      end
+
       should "redirect the user when given an url param" do
-        post session_path, params: { name: @user.name, password: "password", url: tags_path }
+        post session_path, params: { session: { name: @user.name, password: "password" }, url: tags_path }
         assert_redirected_to tags_path
       end
 
       should "not allow redirects to protocol-relative URLs" do
-        post session_path, params: { name: @user.name, password: "password", url: "//example.com" }
+        post session_path, params: { session: { name: @user.name, password: "password" }, url: "//example.com" }
         assert_response 403
       end
 
       should "not allow deleted users to login" do
         @user.update!(is_deleted: true)
-        post session_path, params: { name: @user.name, password: "password" }
+        post session_path, params: { session: { name: @user.name, password: "password" } }
 
         assert_response 401
         assert_nil(nil, session[:user_id])
@@ -123,7 +147,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow IP banned users to login" do
         @ip_ban = create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
-        post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
 
         assert_response 403
         assert_not_equal(@user.id, session[:user_id])
@@ -133,9 +157,9 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "allow partial IP banned users to login" do
         @ip_ban = create(:ip_ban, category: :partial, ip_addr: "1.2.3.4")
-        post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
 
-        assert_redirected_to posts_path
+        assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
         assert_equal(0, @ip_ban.reload.hit_count)
         assert_nil(@ip_ban.last_hit_at)
@@ -143,9 +167,9 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "ignore deleted IP bans when logging in" do
         @ip_ban = create(:ip_ban, is_deleted: true, category: :full, ip_addr: "1.2.3.4")
-        post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
 
-        assert_redirected_to posts_path
+        assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
         assert_equal(0, @ip_ban.reload.hit_count)
         assert_nil(@ip_ban.last_hit_at)
@@ -156,24 +180,24 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         freeze_time
 
         20.times do
-          post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
-          assert_redirected_to posts_path
+          post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
+          assert_redirected_to root_path
           assert_equal(@user.id, session[:user_id])
           delete_auth session_path, @user
         end
 
-        post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
         travel 9.minutes
-        post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
         travel 19.minutes
-        post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
-        assert_redirected_to posts_path
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
+        assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
       end
     end
