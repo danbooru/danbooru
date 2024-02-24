@@ -38,7 +38,8 @@ class RateLimiter
   # @param ip_addr [String] The user's IP address.
   # @return [RateLimit] The rate limit for the action.
   def self.build(action:, user:, ip_addr: nil, **options)
-    keys = [(user.cache_key unless user.is_anonymous?), ("ip/#{ip_addr.to_s}" if ip_addr.present?)].compact
+    ip_addr = Danbooru::IpAddress.parse(ip_addr) if ip_addr.present?
+    keys = [(user.cache_key unless user.is_anonymous?), ("ip/#{ip_addr.subnet.to_s}" if ip_addr.present?)].compact
     RateLimiter.new(action, keys, **options)
   end
 

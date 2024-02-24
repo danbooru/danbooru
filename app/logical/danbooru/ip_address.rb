@@ -6,7 +6,7 @@
 module Danbooru
   class IpAddress
     attr_reader :ip_address
-    delegate :ipv4?, :ipv6?, :loopback?, :link_local?, :unique_local?, :private?, :to_string, :network, :prefix, :multicast?, :unspecified?, to: :ip_address
+    delegate :ipv4?, :ipv6?, :loopback?, :link_local?, :unique_local?, :private?, :to_string, :network, :prefix, :supernet, :multicast?, :unspecified?, to: :ip_address
     delegate :ip_info, :is_proxy?, to: :ip_lookup
 
     def self.parse(string)
@@ -15,8 +15,15 @@ module Danbooru
       nil
     end
 
-    def initialize(string)
-      @ip_address = ::IPAddress.parse(string.to_s.strip)
+    # @param ip_addr [String, IPAddress] The IP address.
+    def initialize(ip_addr)
+      if ip_addr.is_a?(::IPAddress)
+        @ip_address = ip_addr
+      elsif ip_addr.is_a?(Danbooru::IpAddress)
+        @ip_address = ip_addr.ip_address
+      else
+        @ip_address = ::IPAddress.parse(ip_addr.to_s.strip)
+      end
     end
 
     def ip_lookup
@@ -36,6 +43,17 @@ module Danbooru
     # @see https://blog.cloudflare.com/cloudflare-onion-service/
     def is_tor?
       Danbooru::IpAddress.new("2405:8100:8000::/48").include?(ip_address)
+    end
+
+    # Convert the IP to a /24 or /64 subnet, unless it's a local IP, a Tor IP, or already a subnet.
+    def subnet
+      if is_local? || is_tor? || ip_address.size > 1
+        self
+      elsif ipv4?
+        self.class.new(supernet(24))
+      elsif ipv6?
+        self.class.new(supernet(64))
+      end
     end
 
     def include?(other)
