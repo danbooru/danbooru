@@ -200,6 +200,58 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
       end
+
+      should "rate limit logins to 1 per 10 minutes per IPv4 /24 subnet" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        freeze_time
+
+        20.times do |n|
+          post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.#{n}" }
+          assert_redirected_to root_path
+          assert_equal(@user.id, session[:user_id])
+          delete_auth session_path, @user
+        end
+
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.21" }
+        assert_response 429
+        assert_not_equal(@user.id, session[:user_id])
+
+        travel 9.minutes
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.22" }
+        assert_response 429
+        assert_not_equal(@user.id, session[:user_id])
+
+        travel 19.minutes
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.23" }
+        assert_redirected_to root_path
+        assert_equal(@user.id, session[:user_id])
+      end
+
+      should "rate limit logins to 1 per 10 minutes per IPv6 /64 subnet" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        freeze_time
+
+        20.times do |n|
+          post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1:2:3:4:#{n}::1" }
+          assert_redirected_to root_path
+          assert_equal(@user.id, session[:user_id])
+          delete_auth session_path, @user
+        end
+
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1:2:3:4:21::1" }
+        assert_response 429
+        assert_not_equal(@user.id, session[:user_id])
+
+        travel 9.minutes
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1:2:3:4:22::1" }
+        assert_response 429
+        assert_not_equal(@user.id, session[:user_id])
+
+        travel 19.minutes
+        post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1:2:3:4:23::1" }
+        assert_redirected_to root_path
+        assert_equal(@user.id, session[:user_id])
+      end
     end
 
     context "verify_totp action" do
