@@ -1,0 +1,9 @@
+<% page_title "Logout" %>
+
+<%= simple_form_for(:session, url: session_path, method: "delete", html: { id: "logout", class: "hidden" }) do |f| %>
+  <%= f.submit "Logout" %>
+<% end %>
+
+<script type="text/javascript">
+  document.querySelector("#logout").submit();
+</script>
