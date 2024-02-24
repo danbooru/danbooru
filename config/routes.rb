@@ -254,7 +254,6 @@ Rails.application.routes.draw do
     post :verify_totp, on: :collection
     post :reauthenticate, on: :collection
     get :confirm_password, on: :collection
-    get :sign_out, on: :collection
   end
   resource :source, :only => [:show]
   resource :status, only: [:show], controller: "status"
@@ -349,7 +348,7 @@ Rails.application.routes.draw do
   get "/help/:title" => redirect {|params, req| "/wiki_pages?title=#{CGI.escape('help:' + req.params[:title])}"}
 
   get "/login", to: "sessions#new", as: :login
-  get "/logout", to: "sessions#sign_out", as: :logout
+  get "/logout", to: "sessions#logout", as: :logout
   get "/profile", to: "users#profile", as: :profile
   get "/settings", to: "users#settings", as: :settings
 

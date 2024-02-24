@@ -35,6 +35,6 @@
     <% end %>
 
     <li>|</li>
-    <%= subnav_link_to "Log out", logout_path %>
+    <%= subnav_link_to "Log out", session_path, method: "delete" %>
   <% end %>
 <% end %>

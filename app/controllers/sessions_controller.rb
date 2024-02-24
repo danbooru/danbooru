@@ -64,10 +64,10 @@ class SessionsController < ApplicationController
 
   def destroy
     SessionLoader.new(request).logout
-    redirect_to(posts_path, :notice => "You are now logged out")
+    redirect_to root_path, notice: "You are now logged out", status: 303
   end
 
-  def sign_out
-    destroy
+  def logout
+    render layout: "blank"
   end
 end
