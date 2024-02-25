@@ -245,13 +245,17 @@ class User < ApplicationRecord
       if is_deleted?
         errors.add(:base, "You can't reset the password of a deleted account")
         false
-      elsif totp.present? && !totp.verify(verification_code) && !verify_backup_code!(verification_code)
+      elsif totp.present? && !totp.verify(verification_code) && !has_backup_code?(verification_code)
         UserEvent.create_from_request!(self, :totp_failed_reauthenticate, request)
         errors.add(:verification_code, "is incorrect")
         false
       else
-        UserEvent.build_from_request(self, :password_reset, request)
-        update(password: new_password, password_confirmation: password_confirmation)
+        with_lock do
+          UserEvent.build_from_request(self, :password_reset, request)
+          success = update(password: new_password, password_confirmation: password_confirmation)
+          verify_backup_code!(verification_code) if success
+          success
+        end
       end
     end
 
@@ -263,7 +267,7 @@ class User < ApplicationRecord
         UserEvent.create_from_request!(self, :failed_reauthenticate, request)
         errors.add(:current_password, "is incorrect")
         false
-      elsif totp.present? && !totp.verify(verification_code) && !verify_backup_code!(verification_code)
+      elsif totp.present? && !totp.verify(verification_code)
         UserEvent.create_from_request!(self, :totp_failed_reauthenticate, request)
         errors.add(:verification_code, "is incorrect")
         false
@@ -328,16 +332,27 @@ class User < ApplicationRecord
     #
     # @param backup_code [String] The backup code to verify.
     def verify_backup_code!(backup_code)
-      with_lock do
-        backup_code = backup_code.strip.to_i
+      if has_backup_code?(backup_code)
+        replace_backup_code!(backup_code)
+        true
+      else
+        false
+      end
+    end
 
-        if backup_code.in?(backup_codes)
-          new_backup_codes = backup_codes.without(backup_code) + [generate_backup_code]
-          update!(backup_codes: new_backup_codes)
-          true
-        else
-          false
-        end
+    # Return true if the given backup code is correct.
+    def has_backup_code?(backup_code)
+      return false unless backup_code.to_s.strip.match?(/\A[0-9]+\z/)
+      backup_codes.include?(backup_code.to_s.strip.to_i)
+    end
+
+    # Replace the given backup code with a new one.
+    def replace_backup_code!(backup_code)
+      with_lock do
+        return unless has_backup_code?(backup_code)
+        backup_code = backup_code.strip.to_i
+        new_backup_codes = backup_codes.without(backup_code) + [generate_backup_code]
+        update!(backup_codes: new_backup_codes)
       end
     end
 

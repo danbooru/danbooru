@@ -15,7 +15,7 @@
         <% end %>
 
         <% if @user.totp.present? %>
-          <%= f.input :verification_code, placeholder: "123456", required: true, minlength: 6, maxlength: User::BACKUP_CODE_LENGTH, pattern: '\d+', input_html: { value: nil }, hint: "Lost your phone? You can enter a backup code instead." %>
+          <%= f.input :verification_code, placeholder: "123456", required: true, minlength: 6, maxlength: User::BACKUP_CODE_LENGTH, pattern: '\d+', input_html: { value: nil }, hint: "Lost your phone? #{link_to "Disable two-factor authentication", edit_user_totp_path(@user) }.".html_safe %>
         <% end %>
 
         <%= f.input :password, required: true, label: "New password", input_html: { autocomplete: "new-password" } %>
