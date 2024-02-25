@@ -60,7 +60,7 @@ class OpenGraphComponent < ApplicationComponent
       name: page_title,
       description: meta_description,
       uploadDate: (media_asset.post || media_asset).created_at.iso8601,
-      duration: media_asset.duration.seconds.iso8601,
+      duration: media_asset.duration.ceil.seconds.iso8601,
       thumbnailUrl: image_url,
       contentUrl: video_url,
     })
