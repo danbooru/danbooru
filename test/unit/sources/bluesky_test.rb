@@ -44,7 +44,7 @@ module Sources
         page_url: "https://bsky.app/profile/did:plc:ekm5wgpt6xhazl7xaipt5ewy/post/3kjarhifsmg26",
         artist_name: "Baguette",
         tag_name: "yourbaguette",
-        tags: [],
+        tags: ["Art", "FanArt", "Digimon", "SteinsGate", "Omori", "FFXIV"],
         dtext_artist_commentary_desc: "Thanks for the opportunity Bison ! \n\nI'm Baguette, and I mostly draw fanarts of whatever obsession I have ! I will move in Sweden in a week, work on my art and aim to open a little shop this year while working part time ! \n\n#Art #FanArt #Digimon #SteinsGate #Omori #FFXIV",
       )
     end
