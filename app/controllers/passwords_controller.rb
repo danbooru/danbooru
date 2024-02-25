@@ -3,6 +3,8 @@
 class PasswordsController < ApplicationController
   respond_to :html, :xml, :json
 
+  rate_limit :update, rate: 1.0/10.minute, burst: 20
+
   def edit
     @user = authorize user, policy_class: PasswordPolicy
 
@@ -16,16 +18,20 @@ class PasswordsController < ApplicationController
   def update
     @user = authorize user, policy_class: PasswordPolicy
 
-    if @user.authenticate_password(params[:user][:old_password]) || @user.authenticate_login_key(params[:user][:signed_user_id]) || CurrentUser.user.is_owner?
-      UserEvent.build_from_request(@user, :password_change, request)
-      @user.update(password: params[:user][:password], password_confirmation: params[:user][:password_confirmation])
-    else
-      @user.errors.add(:base, "Incorrect password")
+    success = @user.change_password(
+      current_user: CurrentUser.user,
+      current_password: params.dig(:user, :current_password),
+      new_password: params.dig(:user, :password),
+      password_confirmation: params.dig(:user, :password_confirmation),
+      verification_code: params.dig(:user, :verification_code),
+      request: request
+    )
+
+    if success
+      flash[:notice] = "Password updated"
     end
 
-    flash[:notice] = @user.errors.none? ? "Password updated" : @user.errors.full_messages.join("; ")
-
-    respond_with(@user, location: @user)
+    respond_with(@user)
   end
 
   private

@@ -40,15 +40,7 @@ class SessionLoader
         return user
       end
 
-      session[:user_id] = user.id
-      session[:last_authenticated_at] = Time.now.utc.to_s
-
-      UserEvent.build_from_request(user, :login, request)
-      user.last_logged_in_at = Time.now
-      user.last_ip_addr = request.remote_ip
-      user.save!
-
-      user
+      login_user(user, :login)
     elsif user.nil?
       errors.add(:base, "Incorrect username or password")
       nil
@@ -66,29 +58,27 @@ class SessionLoader
   # @return [Boolean] True if the 2FA code is correct, or false if it's incorrect.
   def verify_totp!(user, code)
     if user.totp.verify(code)
-      session[:user_id] = user.id
-      session[:last_authenticated_at] = Time.now.utc.to_s
-
-      UserEvent.build_from_request(user, :totp_login, request)
-      user.last_logged_in_at = Time.now
-      user.last_ip_addr = request.remote_ip
-      user.save!
-
+      login_user(user, :totp_login)
       true
     elsif user.verify_backup_code!(code)
-      session[:user_id] = user.id
-      session[:last_authenticated_at] = Time.now.utc.to_s
-
-      UserEvent.build_from_request(user, :backup_code_login, request)
-      user.last_logged_in_at = Time.now
-      user.last_ip_addr = request.remote_ip
-      user.save!
-
+      login_user(user, :backup_code_login)
       true
     else
       UserEvent.create_from_request!(user, :totp_failed_login, request)
       false
     end
+  end
+
+  def login_user(user, event_category)
+    session[:user_id] = user.id
+    session[:last_authenticated_at] = Time.now.utc.to_s
+
+    UserEvent.build_from_request(user, event_category, request)
+    user.last_logged_in_at = Time.now
+    user.last_ip_addr = request.remote_ip
+    user.save!
+
+    user
   end
 
   # Verify a user's password and 2FA code. Used to confirm a user's password before sensitive actions like adding API
@@ -145,8 +135,6 @@ class SessionLoader
 
     if has_api_authentication?
       load_session_for_api
-    elsif params[:signed_user_id]
-      load_param_user(params[:signed_user_id])
     elsif session[:user_id]
       load_session_user
     end
@@ -207,13 +195,6 @@ class SessionLoader
     update_api_key(api_key)
     raise User::PrivilegeError if !api_key.has_permission?(request.remote_ip, request.params[:controller], request.params[:action])
     CurrentUser.user = user
-  end
-
-  # Set the current user based on the `signed_user_id` URL param. This param is used by the reset password email.
-  # XXX use rails 6.1 signed ids (https://github.com/rails/rails/blob/6-1-stable/activerecord/CHANGELOG.md)
-  def load_param_user(signed_user_id)
-    session[:user_id] = Danbooru::MessageVerifier.new(:login).verify(signed_user_id)
-    load_session_user
   end
 
   # Set the current user based on the `user_id` session cookie.
