@@ -1,18 +1,16 @@
-<% page_title "Change Password" %>
+<% page_title "Reset Password" %>
 
-<div id="c-passwords">
+<div id="c-password-resets">
   <div id="a-edit">
     <div class="card mt-8 p-4 max-w-480px mx-auto flex flex-col items-center">
-      <h1 class="pb-4">Change Password</h1>
+      <h1 class="pb-4">Reset Password</h1>
 
       <% if @user.totp.present? %>
-        <p class="w-full">Enter your current password and the 6-digit code from your authenticator app to change your password.</p>
+        <p class="w-full">Enter the 6-digit code from your authenticator app to change your password.</p>
       <% end %>
 
-      <%= edit_form_for(@user, url: user_password_path(@user), html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
-        <% if @user == CurrentUser.user %>
-          <%= f.input :current_password, as: :password, input_html: { autocomplete: "current-password" }, hint: link_to("Forgot password?", password_reset_path) %>
-        <% end %>
+      <%= edit_form_for(@user, url: password_reset_path, method: "put", html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
+        <%= f.input :signed_id, as: :hidden, input_html: { value: params.dig(:user, :signed_id) }  %>
 
         <% if @user.totp.present? %>
           <%= f.input :verification_code, placeholder: "123456", required: true, minlength: 6, maxlength: User::BACKUP_CODE_LENGTH, pattern: '\d+', input_html: { value: nil }, hint: "Lost your phone? You can enter a backup code instead." %>
@@ -23,11 +21,7 @@
         <%= f.submit "Save", class: "button-primary" %>
       <% end %>
     </div>
-
-    <div class="mt-4 flex justify-center">
-      <%= link_to "Back to settings", settings_path %>
-    </div>
   </div>
 </div>
 
-<%= render "users/secondary_links" %>
+<%= render "sessions/secondary_links" %>

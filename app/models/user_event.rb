@@ -30,8 +30,9 @@ class UserEvent < ApplicationRecord
     user_creation: 200,
     user_deletion: 300,
     user_undeletion: 310,
-    password_reset: 400,
-    password_change: 500,
+    password_reset_request: 400,          # The user requested a password reset email.
+    password_reset: 450,                  # The user changed their password after requesting a password reset email.
+    password_change: 500,                 # The user changed their password.
     email_change: 600,
     totp_enable: 700,                     # The user enabled 2FA.
     totp_update: 710,                     # The user changed their 2FA secret.

@@ -221,18 +221,56 @@ class User < ApplicationRecord
     end
   end
 
-  concerning :AuthenticationMethods do
+  concerning :PasswordMethods do
     def password=(new_password)
       @password = new_password
       self.bcrypt_password_hash = BCrypt::Password.create(hash_password(new_password))
     end
 
-    # @return [User, Boolean] Return the user if the signed user ID is correct, or false if it isn't.
-    def authenticate_login_key(signed_user_id)
-      return false if is_deleted?
-      signed_user_id.present? && id == Danbooru::MessageVerifier.new(:login).verify(signed_user_id) && self
+    def request_password_reset!(request)
+      with_lock do
+        if can_receive_email?(require_verified_email: false)
+          UserMailer.with_request(request).password_reset(self).deliver_later
+        end
+
+        UserEvent.create_from_request!(self, :password_reset_request, request)
+      end
     end
 
+    def reset_password(new_password:, password_confirmation:, verification_code:, request:)
+      if is_deleted?
+        errors.add(:base, "You can't reset the password of a deleted account")
+        false
+      elsif totp.present? && !totp.verify(verification_code) && !verify_backup_code!(verification_code)
+        UserEvent.create_from_request!(self, :totp_failed_reauthenticate, request)
+        errors.add(:verification_code, "is incorrect")
+        false
+      else
+        UserEvent.build_from_request(self, :password_reset, request)
+        update(password: new_password, password_confirmation: password_confirmation)
+      end
+    end
+
+    def change_password(current_user:, current_password:, new_password:, password_confirmation:, verification_code:, request:)
+      if self != current_user && PasswordPolicy.new(current_user, self).can_change_user_passwords?
+        UserEvent.build_from_request(self, :password_change, request)
+        update(password: new_password, password_confirmation: password_confirmation)
+      elsif !authenticate_password(current_password)
+        UserEvent.create_from_request!(self, :failed_reauthenticate, request)
+        errors.add(:current_password, "is incorrect")
+        false
+      elsif totp.present? && !totp.verify(verification_code) && !verify_backup_code!(verification_code)
+        UserEvent.create_from_request!(self, :totp_failed_reauthenticate, request)
+        errors.add(:verification_code, "is incorrect")
+        false
+      else
+        UserEvent.build_from_request(self, :password_change, request)
+        update(password: new_password, password_confirmation: password_confirmation)
+      end
+    end
+  end
+
+  concerning :AuthenticationMethods do
     # @return [Array<(User, ApiKey)>, Boolean] Return a (User, ApiKey) pair if the API key is correct, or false if it isn't.
     def authenticate_api_key(key)
       return false if is_deleted?

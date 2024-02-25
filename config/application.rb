@@ -75,7 +75,7 @@ module Danbooru
     # request param containing the word 'password' etc.
     #
     # https://guides.rubyonrails.org/configuring.html#config-filter-parameters
-    config.filter_parameters += [:password, :api_key, :secret, :ip_addr, :address, :email_verification_key, :signed_user_id] if Rails.env.production?
+    config.filter_parameters += [:password, :api_key, :secret, :ip_addr, :address, :email_verification_key, :signed_id] if Rails.env.production?
 
     raise "Danbooru.config.secret_key_base not configured" if Danbooru.config.secret_key_base.blank?
     config.secret_key_base = Danbooru.config.secret_key_base

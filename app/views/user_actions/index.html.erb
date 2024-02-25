@@ -124,6 +124,8 @@
               <%= link_to_user user %> deleted their account.
             <% when "user_undeletion" %>
               <%= link_to_user user %>'s account was undeleted.
+            <% when "password_reset_request" %>
+              <%= link_to_user user %> requested a password reset.
             <% when "password_reset" %>
               <%= link_to_user user %> reset their password.
             <% when "password_change" %>

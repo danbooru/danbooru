@@ -171,7 +171,7 @@ Rails.application.routes.draw do
   end
   resources :note_versions, :only => [:index, :show]
   resource :note_previews, only: [:create, :show]
-  resource :password_reset, only: [:create, :show]
+  resource :password_reset, only: [:create, :show, :edit, :update]
   resource :password, only: [:edit, :update]
   resources :pools do
     member do
