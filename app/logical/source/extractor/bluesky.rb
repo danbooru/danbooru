@@ -26,7 +26,7 @@ class Source::Extractor::Bluesky < Source::Extractor
     end.to_a
 
     images.map do |image|
-      image_cid = image.dig("image", "ref", "$link")
+      image_cid = image.dig("image", "ref", "$link") || image.dig("image", "cid")
       "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=#{user_did}&cid=#{image_cid}"
     end
   end

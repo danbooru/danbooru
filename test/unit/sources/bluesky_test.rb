@@ -49,6 +49,24 @@ module Sources
       )
     end
 
+    context "A post url with 'app.bsky.embed.images.view' - 'images' - 'image' - 'cid' embed" do
+      strategy_should_work(
+        "https://bsky.app/profile/go-guiltism.bsky.social/post/3klgth6lilt2l",
+        image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:owc2r2dsewj3hk73rtd746zh&cid=bafkreieuhplc7fpbvi3suvacaf2dqxzvuu4hgl5o6eifqb76tf3uopldmi"],
+        media_files: [{ file_size: 162135 }],
+        profile_url: "https://bsky.app/profile/go-guiltism.bsky.social",
+        profile_urls: [
+          "https://bsky.app/profile/go-guiltism.bsky.social",
+          "https://bsky.app/profile/did:plc:owc2r2dsewj3hk73rtd746zh",
+        ],
+        page_url: "https://bsky.app/profile/did:plc:owc2r2dsewj3hk73rtd746zh/post/3klgth6lilt2l",
+        artist_name: "Hi-GO!",
+        tag_name: "go-guiltism",
+        tags: [],
+        dtext_artist_commentary_desc: "Copy-X FullArmed 2",
+      )
+    end
+
     context "A post url with DID as user id" do
       strategy_should_work(
         "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
