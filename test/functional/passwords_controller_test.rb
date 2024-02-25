@@ -96,12 +96,14 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, @user.user_events.password_change.exists?)
         end
 
-        should "change the user's password when the backup code is correct" do
-          put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde", verification_code: @user.backup_codes.first } }
+        should "not change the user's password when given a backup code" do
+          backup_code = @user.backup_codes.first
+          put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde", verification_code: backup_code } }
 
-          assert_redirected_to @user
-          assert_equal(true, @user.reload.authenticate_password("abcde").present?)
-          assert_equal(true, @user.user_events.password_change.exists?)
+          assert_response :success
+          assert_equal(true, @user.reload.authenticate_password("12345").present?)
+          assert_equal(false, @user.user_events.password_change.exists?)
+          assert_equal(true, @user.backup_codes.include?(backup_code))
         end
 
         should "not change the user's password when the verification code is incorrect" do

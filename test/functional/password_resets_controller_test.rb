@@ -212,13 +212,15 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "change the user's password when the backup code is correct" do
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: @user.backup_codes.first })
+          backup_code = @user.backup_codes.first
+          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: backup_code })
 
           assert_redirected_to @user
           assert_equal(@user.id, session[:user_id])
           assert_equal(true, @user.reload.authenticate_password("password").present?)
           assert_equal(true, @user.user_events.login.exists?)
           assert_equal(true, @user.user_events.password_reset.exists?)
+          assert_equal(false, @user.backup_codes.include?(backup_code))
         end
 
         should "not change the user's password when the verification code is incorrect" do
@@ -229,6 +231,18 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.reload.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
+        end
+
+        should "not spend a backup code when the new password is invalid" do
+          backup_code = @user.backup_codes.first
+          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "12345", verification_code: backup_code })
+
+          assert_response :success
+          assert_nil(session[:user_id])
+          assert_equal(false, @user.reload.authenticate_password("password").present?)
+          assert_equal(false, @user.user_events.login.exists?)
+          assert_equal(false, @user.user_events.password_reset.exists?)
+          assert_equal(true, @user.backup_codes.include?(backup_code))
         end
       end
 
