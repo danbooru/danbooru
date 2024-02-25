@@ -96,8 +96,11 @@ class Source::Extractor::Bluesky < Source::Extractor
   end
 
   def tags
-    # Unsupported
-    []
+    api_response&.dig("thread", "post", "record", "facets").to_a.pluck("features").flatten.select do |f| 
+      f["$type"] == "app.bsky.richtext.facet#tag"
+    end.pluck("tag").map do |tag|
+      [tag, "https://bsky.app/search"]
+    end
   end
 
   # https://www.docs.bsky.app/docs/api/app-bsky-feed-get-post-thread
