@@ -31,7 +31,7 @@
         </tr>
       <% end %>
 
-      <% if policy(UserEvent).show? %>
+      <% if policy(UserEvent).can_see_events_by_others? %>
         <tr>
           <th>User Events</th>
           <td>

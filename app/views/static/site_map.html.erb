@@ -179,7 +179,7 @@
           <li><%= link_to("User Actions", user_actions_path) %></li>
         <% end %>
 
-        <% if policy(UserEvent).index? %>
+        <% if policy(UserEvent).can_see_events_by_others? %>
           <li><%= link_to("User Events", user_events_path) %></li>
         <% end %>
 
