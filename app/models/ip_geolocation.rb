@@ -9,11 +9,7 @@ class IpGeolocation < ApplicationRecord
   has_many :user_sessions, foreign_key: :ip_addr, primary_key: :ip_addr
 
   def self.visible(user)
-    if user.is_moderator?
-      all
-    else
-      none
-    end
+    all
   end
 
   def self.search(params, current_user)

@@ -128,6 +128,26 @@
               </div>
             </div>
           <% end %>
+
+          <div class="flex justify-between gap-4">
+            <div>
+              <span class="font-bold leading-normal">Account history</span>
+
+              <div class="fineprint max-w-360px">
+                View your logins and other account activity.<br>
+              </div>
+
+              <% if @user.user_events.last.present? %>
+                <div class="fineprint max-w-360px">
+                  Last activity: <%= time_ago_in_words_tagged(@user.user_events.last.created_at) %>.
+                </div>
+              <% end %>
+            </div>
+
+            <div>
+              <%= link_to "View", user_user_events_path(@user), class: "button-primary button-sm" %>
+            </div>
+          </div>
         </div>
       <% end %>
     <% end) %>
