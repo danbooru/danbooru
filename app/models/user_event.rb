@@ -6,6 +6,8 @@
 # with the event.
 
 class UserEvent < ApplicationRecord
+  extend Memoist
+
   attribute :id
   attribute :created_at
   attribute :updated_at
@@ -60,7 +62,7 @@ class UserEvent < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :category, :user, :user_session, :ip_addr, :session_id, :user_agent, :metadata], current_user: current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :category, :user, :user_session, :ip_addr, :session_id, :user_agent, :metadata, :ip_geolocation], current_user: current_user)
     q.apply_default_order(params)
   end
 
@@ -83,5 +85,9 @@ class UserEvent < ApplicationRecord
         build_from_request(...).save!
       end
     end
+  end
+
+  memoize def parsed_user_agent
+    UserAgent.new(user_agent)
   end
 end

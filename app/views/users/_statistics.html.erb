@@ -37,7 +37,7 @@
           <td>
             <% if user.last_ip_addr.present? %>
               <%= link_to "By Name", user_events_path(search: { user_name: user.name }) %>,
-              <%= link_to "By IP", user_events_path(search: { user_session: { ip_addr: user.last_ip_addr }}) %>
+              <%= link_to "By IP", user_events_path(search: { ip_addr: user.last_ip_addr }) %>
             <% else %>
               <%= link_to "By Name", user_events_path(search: { user_name: user.name }) %>
             <% end %>

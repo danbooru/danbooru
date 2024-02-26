@@ -6,7 +6,8 @@
 module Danbooru
   class IpAddress
     attr_reader :ip_address
-    delegate :ipv4?, :ipv6?, :loopback?, :link_local?, :unique_local?, :private?, :to_string, :network, :prefix, :supernet, :multicast?, :unspecified?, to: :ip_address
+
+    delegate :ipv4?, :ipv6?, :loopback?, :link_local?, :unique_local?, :private?, :to_string, :network, :prefix, :multicast?, :unspecified?, to: :ip_address
     delegate :ip_info, :is_proxy?, to: :ip_lookup
 
     def self.parse(string)
@@ -45,14 +46,19 @@ module Danbooru
       Danbooru::IpAddress.new("2405:8100:8000::/48").include?(ip_address)
     end
 
+    # Convert the IP to a subnet.
+    def supernet(prefix)
+      self.class.new(ip_address.supernet(prefix))
+    end
+
     # Convert the IP to a /24 or /64 subnet, unless it's a local IP, a Tor IP, or already a subnet.
     def subnet
       if is_local? || is_tor? || ip_address.size > 1
         self
       elsif ipv4?
-        self.class.new(supernet(24))
+        supernet(24)
       elsif ipv6?
-        self.class.new(supernet(64))
+        supernet(64)
       end
     end
 

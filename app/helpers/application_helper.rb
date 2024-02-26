@@ -150,6 +150,27 @@ module ApplicationHelper
     end
   end
 
+  def humanized_time(time)
+    if time.nil?
+      tag.em(tag.time("unknown"))
+    elsif time.past?
+      if time > 1.day.ago
+        human_time = time_ago_in_words(time).gsub(/about|over|less than|almost/, "")
+        time_tag("#{human_time} ago", time)
+      elsif time > Time.zone.today.beginning_of_year
+        time_tag(time.strftime("%b %e"), time)
+      else
+        time_tag(time.strftime("%b %e, %Y"), time)
+      end
+    elsif time.future?
+      if time < 1.day.from_now
+        time_tag("in #{time_ago_in_words(time)}", time)
+      else
+        time_tag(time.strftime("%b %e, %Y"), time)
+      end
+    end
+  end
+
   def time_ago_in_words_tagged(time, compact: false)
     if time.nil?
       tag.em(tag.time("unknown"))
@@ -201,7 +222,7 @@ module ApplicationHelper
   def link_to_ip(ip, shorten: false, **options)
     ip_addr = IPAddr.new(ip.to_s)
     ip_addr.prefix = 64 if ip_addr.ipv6? && shorten
-    link_to ip_addr.to_s, user_events_path(search: { user_session: { ip_addr: ip }}), **options
+    link_to ip_addr.to_s, user_events_path(search: { ip_addr: ip }), **options
   end
 
   def link_to_search(tag, **options)
