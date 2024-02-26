@@ -1,0 +1,138 @@
+<div id="p-list-listing" class="max-w-720px mx-auto">
+  <% if @user.present? %>
+    <h1 class="mb-4 text-center">Account History</h1>
+  <% else %>
+    <h1 class="mb-4 text-center">User Events</h1>
+  <% end %>
+
+  <% if @user_events.empty? %>
+    <p class="text-center">No events found.</p>
+  <% else %>
+    <div class="flex flex-col items-end mb-2">
+      <%= link_to current_page_path(mode: "table"), class: "flex items-center gap-1 text-xs" do %>
+        <%= table_icon %> Table
+      <% end %>
+    </div>
+
+    <div class="divide-y-1 card-outlined">
+      <% @user_events.each do |user_event| %>
+        <% user = user_event.user %>
+        <% ip_addr = user_event.ip_addr %>
+        <% geolocation = user_event.ip_geolocation %>
+        <% user_agent = user_event.parsed_user_agent %>
+
+        <div class="flex justify-between gap-2 p-2">
+          <div class="flex flex-col justify-center gap-1">
+            <div>
+              <% case user_event.category %>
+              <% when "login" %>
+                <%= link_to_user user %> logged in.
+              <% when "reauthenticate" %>
+                <%= link_to_user user %> reauthenticated.
+              <% when "failed_login" %>
+                <%= link_to_user user %> had a failed login attempt.
+              <% when "failed_reauthenticate" %>
+                <%= link_to_user user %> entered an incorrect password.
+              <% when "logout" %>
+                <%= link_to_user user %> logged out.
+              <% when "user_creation" %>
+                <%= link_to_user user %> created their account.
+              <% when "user_deletion" %>
+                <%= link_to_user user %> deleted their account.
+              <% when "user_undeletion" %>
+                <%= link_to_user user %> had their account undeleted.
+              <% when "password_reset_request" %>
+                Someone requested a password reset for <%= link_to_user user %>.
+              <% when "password_reset" %>
+                <%= link_to_user user %> reset their password.
+              <% when "password_change" %>
+                <%= link_to_user user %> changed their password.
+              <% when "email_change" %>
+                <%= link_to_user user %> changed their email address.
+              <% when "totp_enable" %>
+                <%= link_to_user user %> enabled 2FA.
+              <% when "totp_disable" %>
+                <%= link_to_user user %> disabled 2FA.
+              <% when "totp_update" %>
+                <%= link_to_user user %> changed their 2FA secret.
+              <% when "totp_login_pending_verification" %>
+                <%= link_to_user user %> entered their password. Awaiting 2FA verification.
+              <% when "totp_login" %>
+                <%= link_to_user user %> logged in with 2FA.
+              <% when "totp_reauthenticate" %>
+                <%= link_to_user user %> reauthenticated with 2FA.
+              <% when "totp_failed_login" %>
+                <%= link_to_user user %> entered an incorrect 2FA code.
+              <% when "totp_failed_reauthenticate" %>
+                <%= link_to_user user %> entered an incorrect 2FA code.
+              <% when "backup_code_generate" %>
+                <%= link_to_user user %> generated new backup codes.
+              <% when "backup_code_login" %>
+                <%= link_to_user user %> logged in with a backup code.
+              <% when "backup_code_reauthenticate" %>
+                <%= link_to_user user %> reauthenticated with a backup code.
+              <% end %>
+            </div>
+
+            <div class="text-xs text-muted">
+              <span>
+                <%= humanized_time(user_event.created_at) %>
+              </span>
+
+              <span>|</span>
+
+              <span>
+                <%= link_to user_event.category.titleize, current_page_path(search: { category: user_event.category }, page: nil), class: "inactive-link" %>
+              </span>
+            </div>
+          </div>
+
+          <div class="flex flex-col text-right text-xs max-w-1/2">
+            <div class="flex items-center justify-end gap-1">
+              <% if IpAddressPolicy.new(CurrentUser.user, ip_addr).show? && (geolocation&.is_proxy? || ip_addr.is_tor?) %>
+                <%= link_to "Proxy", current_page_path(search: { ip_geolocation: { is_proxy: true } }, page: nil), class: "chip-red text-error text-xxs" %>
+              <% end %>
+
+              <% if ip_addr.is_tor? %>
+                <%= link_to ip_addr.supernet(64), current_page_path(search: { ip_addr: ip_addr.supernet(64) }, page: nil), title: ip_addr, class: "inline-block truncate" %>
+              <% elsif ip_addr.ipv6? %>
+                <%= link_to ip_addr.subnet, current_page_path(search: { ip_addr: ip_addr.subnet }, page: nil), title: ip_addr, class: "inline-block truncate" %>
+              <% else %>
+                <%= link_to ip_addr, current_page_path(search: { ip_addr: ip_addr.subnet }, page: nil), class: "inline-block truncate" %>
+              <% end %>
+
+              <% if IpAddressPolicy.new(CurrentUser.user, ip_addr).show? %>
+                <%= link_to search_icon, ip_address_path(ip_addr) %>
+              <% end %>
+            </div>
+
+            <% if ip_addr&.is_tor? %>
+              <div>
+                <%= link_to "Tor", current_page_path(search: { ip_addr: ip_addr.supernet(64) }, page: nil) %>
+              </div>
+            <% elsif geolocation&.city.present? && geolocation&.country.present? %>
+              <div>
+                <%= link_to geolocation.city, current_page_path(search: { ip_geolocation: { city: geolocation.city, country: geolocation.country } }, page: nil) %>,
+                <%= link_to geolocation.country, current_page_path(search: { ip_geolocation: { country: geolocation.country } }, page: nil) %>
+              </div>
+            <% end %>
+
+            <% if policy(user_event).can_see_session? %>
+              <% if user_agent.name.present? %>
+                <div>
+                  <%= link_to user_agent.name.capitalize, current_page_path(search: { user_agent_ilike: "*#{user_agent.name}*" }, page: nil), title: user_event.user_agent %>
+                </div>
+              <% end %>
+
+              <div>
+                <%= link_to user_event.session_id[0..6], current_page_path(search: { session_id: user_event.session_id }, page: nil), title: user_event.session_id %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= numbered_paginator(@user_events) %>
+</div>

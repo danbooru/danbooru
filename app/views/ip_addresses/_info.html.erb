@@ -20,7 +20,7 @@
         <tr>
           <th>Network</th>
           <td>
-            <%= link_to ip_info[:network], user_events_path(search: { user_session: { ip_addr: ip_info[:network] }}) %>
+            <%= link_to ip_info[:network], user_events_path(search: { ip_addr: ip_info[:network] }) %>
             (<%= link_to "info", "https://ipinfo.io/AS#{ip_info[:asn]}/#{ip_info[:network]}"  %>)
           </td>
         </tr>

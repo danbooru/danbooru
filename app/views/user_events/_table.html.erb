@@ -1,0 +1,145 @@
+<div id="p-table-listing">
+  <% if @user.present? %>
+    <h1 class="mb-4">Account History</h1>
+  <% else %>
+    <h1 class="mb-4">User Events</h1>
+  <% end %>
+
+  <%= search_form_for(user_events_path) do |f| %>
+    <%= f.input :user_name, label: "User", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
+    <%= f.input :ip_addr, label: "IP Address", input_html: { value: params.dig(:search, :ip_addr) } %>
+    <%= f.input :session_id, label: "Session", input_html: { value: params.dig(:search, :session_id) } %>
+    <%= f.simple_fields_for :ip_geolocation do |f1| %>
+      <%= f1.input :city, input_html: { value: params.dig(:search, :ip_geolocation, :city) } %>
+      <%= f1.input :country, as: :string, input_html: { value: params.dig(:search, :ip_geolocation, :country) } %>
+      <%= f1.input :is_proxy, label: "Proxy?", as: :select, include_blank: true, selected: params.dig(:search, :ip_geolocation, :is_proxy) %>
+    <% end %>
+    <%= f.input :category, collection: UserEvent.categories.transform_keys(&:humanize), include_blank: true, selected: params[:search][:category] %>
+    <%= f.submit "Search" %>
+  <% end %>
+
+  <div class="flex flex-col items-end mb-2">
+    <%= link_to current_page_path(mode: "list"), class: "flex items-center gap-1 text-xs" do %>
+      <%= list_icon %> List
+    <% end %>
+  </div>
+
+  <%= table_for @user_events, class: "striped autofit w-full" do |t| %>
+    <% t.column "User" do |user_event| %>
+      <% if CurrentUser.user != user_event.user && user_event.user.is_banned? %>
+        <%= link_to "Banned", current_page_path(search: search_params.deep_merge(user: { is_banned: true }), page: nil), class: "chip-red text-error text-xxs" %>
+      <% end %>
+
+      <%= link_to_user user_event.user %>
+      <%= link_to "»", current_page_path(search: search_params.deep_merge(user_name: user_event.user.name), page: nil) %>
+    <% end %>
+
+    <% t.column "Message", td: { class: "col-expand" } do |user_event| %>
+      <% user = user_event.user %>
+
+      <% case user_event.category %>
+      <% when "login" %>
+        Logged in.
+      <% when "reauthenticate" %>
+        Reauthenticated.
+      <% when "failed_login" %>
+        Had a failed login attempt.
+      <% when "failed_reauthenticate" %>
+        Entered an incorrect password.
+      <% when "logout" %>
+        Logged out.
+      <% when "user_creation" %>
+        Created their account.
+      <% when "user_deletion" %>
+        Deleted their account.
+      <% when "user_undeletion" %>
+        Had their account undeleted.
+      <% when "password_reset_request" %>
+        Had a password reset requested.
+      <% when "password_reset" %>
+        Reset their password.
+      <% when "password_change" %>
+        Changed their password.
+      <% when "email_change" %>
+        Changed their email address.
+      <% when "totp_enable" %>
+        Enabled 2FA.
+      <% when "totp_disable" %>
+        Disabled 2FA.
+      <% when "totp_update" %>
+        Changed their 2FA secret.
+      <% when "totp_login_pending_verification" %>
+        Entered their password. Awaiting 2FA verification.
+      <% when "totp_login" %>
+        Logged in with 2FA.
+      <% when "totp_reauthenticate" %>
+        Reauthenticated with 2FA.
+      <% when "totp_failed_login" %>
+        Entered an incorrect 2FA code.
+      <% when "totp_failed_reauthenticate" %>
+        Entered an incorrect 2FA code.
+      <% when "backup_code_generate" %>
+        Generated new backup codes.
+      <% when "backup_code_login" %>
+        Logged in with a backup code.
+      <% when "backup_code_reauthenticate" %>
+        Reauthenticated with a backup code.
+      <% end %>
+    <% end %>
+
+    <% t.column "Category" do |user_event| %>
+      <%= link_to user_event.category.humanize, current_page_path(search: search_params.deep_merge(category: UserEvent.categories[user_event.category]), page: nil) %>
+    <% end %>
+
+    <% if policy(UserEvent).can_see_session? %>
+      <% t.column "Session" do |user_event| %>
+        <%= link_to user_event.session_id[0..6], current_page_path(search: search_params.deep_merge(session_id: user_event.session_id), page: nil), class: "font-monospace" %>
+      <% end %>
+
+      <% t.column "Browser" do |user_event| %>
+        <% if user_event.parsed_user_agent.name.present? %>
+          <div>
+            <%= link_to user_event.parsed_user_agent.name.capitalize, current_page_path(search: search_params.deep_merge(user_agent_ilike: "*#{user_event.parsed_user_agent.name}*"), page: nil), title: user_event.user_agent %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% t.column "Location" do |user_event| %>
+      <% if user_event.ip_addr.is_tor? %>
+        <%= link_to "Tor", current_page_path(search: search_params.deep_merge(ip_addr: user_event.ip_addr.supernet(64)), page: nil) %>
+      <% elsif user_event.city.present? && user_event.country.present? %>
+        <%= link_to user_event.ip_geolocation.city, current_page_path(search: search_params.deep_merge(ip_geolocation: { city: user_event.ip_geolocation.city, country: user_event.ip_geolocation.country }), page: nil) %>,
+        <%= link_to user_event.ip_geolocation.country, current_page_path(search: search_params.deep_merge(ip_geolocation: { city: nil, country: user_event.ip_geolocation.country }), page: nil) %>
+      <% end %>
+    <% end %>
+
+    <% t.column "IP Address" do |user_event| %>
+      <div class="flex items-center gap-1">
+        <% ip_addr = user_event.ip_addr %>
+
+        <% if IpAddressPolicy.new(CurrentUser.user, ip_addr).show? && (user_event.ip_geolocation&.is_proxy? || ip_addr.is_tor?) %>
+          <%= link_to "Proxy", current_page_path(search: search_params.deep_merge(ip_geolocation: { is_proxy: true }), page: nil), class: "chip-red text-error text-xxs" %>
+        <% end %>
+
+        <% if ip_addr.is_tor? %>
+          <%= link_to ip_addr.supernet(64), current_page_path(search: search_params.deep_merge(ip_addr: ip_addr.supernet(64)), page: nil), title: ip_addr %>
+        <% elsif ip_addr.ipv6? %>
+          <%= link_to ip_addr.subnet, current_page_path(search: search_params.deep_merge(ip_addr: ip_addr.subnet), page: nil), title: ip_addr %>
+        <% else %>
+          <%= link_to ip_addr, current_page_path(search: search_params.deep_merge(ip_addr: ip_addr.subnet), page: nil) %>
+        <% end %>
+
+        <% if IpAddressPolicy.new(CurrentUser.user, ip_addr).show? %>
+          <%= link_to search_icon, ip_address_path(ip_addr) %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% t.column "Date" do |user_event| %>
+      <%= time_ago_in_words_tagged(user_event.created_at) %>
+    <% end %>
+  <% end %>
+
+  <%= numbered_paginator(@user_events) %>
+</div>
