@@ -55,6 +55,9 @@ x-base-template: &base-template
     DANBOORU_IMAGE_STORAGE_PATH: /images
     SHAKAPACKER_DEV_SERVER_HOST: webpack
 
+    # This is true if we're running inside Github Codespaces.
+    CODESPACES: ${CODESPACES:-false}
+
   tmpfs:
     - "/danbooru/tmp:uid=1000,gid=1000"
 

@@ -111,6 +111,12 @@ module Danbooru
       config.x.git_hash = nil
     end
 
+    # XXX Disable the origin check to fix `HTTP Origin header didn't match request.base_url` errors when running in Github
+    # Codespaces. This is necessary because Codespaces sets the Origin header incorrectly.
+    if ENV["CODESPACES"] == "true"
+      config.action_controller.forgery_protection_origin_check = false
+    end
+
     config.after_initialize do
       Rails.application.routes.default_url_options = {
         host: Danbooru.config.hostname
