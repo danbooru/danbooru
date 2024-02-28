@@ -130,9 +130,26 @@ module Danbooru
     end
 
     # The name of the cookie that stores the current user's login session.
+    #
     # Changing this will force all users to login again.
+    #
+    # Normally the only reason to change this is if you're running multiple Danbooru instances on different subdomains,
+    # for example booru.example.com and test.example.com, and you don't want them to share login cookies because they
+    # don't share users.
     def session_cookie_name
       "_danbooru2_session"
+    end
+
+    # The domain of the cookie that stores the current user's login session.
+    #
+    # If you're running Danbooru on multiple subdomains, and you want to share cookies across subdomains so that users
+    # stay logged in when they visit a different subdomain, then you can set this to the base domain.
+    #
+    # For example, if you have booru.example.com, beta.example.com, and test.example.com, then you can set this to
+    # example.com so that cookies are shared between subdomains and users stay logged in if they switch subdomains.
+    #
+    # The default is to not share cookies across subdomains. Normally this should not be changed.
+    def session_cookie_domain
     end
 
     # Debug mode does some things to make testing easier. It outputs more verbose logs, it disables parallel testing,
