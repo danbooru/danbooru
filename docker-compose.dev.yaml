@@ -132,7 +132,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "danbooru"]
-      start_period: 10s
+      start_period: 30s
       interval: 1s
       retries: 1
     volumes:
