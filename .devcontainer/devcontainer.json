@@ -3,16 +3,19 @@
   "dockerComposeFile": ["../docker-compose.dev.yaml"],
   "service": "devcontainer",
   "workspaceFolder": "/danbooru",
-  "forwardPorts": ["nginx:3000", "webpack:3035"],
+  "forwardPorts": [3000, 3035],
   "portsAttributes": {
     "3000": {
       "label": "Danbooru",
-      "onAutoForward": "notify"
+      "onAutoForward": "openBrowser"
     },
     "3035": {
       "label": "Webpack Dev Server",
       "onAutoForward": "silent"
     }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
   },
   "remoteEnv": {
     "DANBOORU_DIR": "${localWorkspaceFolder}",
