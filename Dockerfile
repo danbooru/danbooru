@@ -375,7 +375,7 @@ FROM danbooru-base AS development
 
 RUN <<EOS
   apt-get update
-  apt-get install -y --no-install-recommends g++ make git sudo gnupg
+  apt-get install -y --no-install-recommends g++ make git sudo gnupg socat
 
   groupadd admin -U danbooru
   passwd -d danbooru

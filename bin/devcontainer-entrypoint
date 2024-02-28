@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Proxy /var/run/docker.sock to /var/run/docker-host.sock so the Danbooru user has access to Docker without changing the Docker socket permissions on the host.
+sudo nohup socat UNIX-LISTEN:/var/run/docker.sock,fork,user=$(whoami),mode=660,backlog=128 UNIX-CONNECT:/var/run/docker-host.sock > /dev/null 2>&1 &
+
+exec sh -c "$*";
