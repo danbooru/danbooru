@@ -1,7 +1,32 @@
 {
-	"name": "Danbooru",
-	"dockerComposeFile": ["../docker-compose.dev.yaml"],
-	"service": "devcontainer",
-	"workspaceFolder": "/danbooru",
-	"remoteEnv": { "DANBOORU_DIR": "${localWorkspaceFolder}" }
+  "name": "Danbooru",
+  "dockerComposeFile": ["../docker-compose.dev.yaml"],
+  "service": "devcontainer",
+  "workspaceFolder": "/danbooru",
+  "forwardPorts": ["nginx:3000", "webpack:3035"],
+  "portsAttributes": {
+    "3000": {
+      "label": "Danbooru",
+      "onAutoForward": "notify"
+    },
+    "3035": {
+      "label": "Webpack Dev Server",
+      "onAutoForward": "silent"
+    }
+  },
+  "remoteEnv": {
+    "DANBOORU_DIR": "${localWorkspaceFolder}",
+    "DEVCONTAINER": "true"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "stylelint.vscode-stylelint",
+        "Shopify.ruby-lsp",
+        "KoichiSasada.vscode-rdbg",
+        "eamodio.gitlens"
+      ]
+    }
+  }
 }
