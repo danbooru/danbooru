@@ -3,4 +3,10 @@
 # Proxy /var/run/docker.sock to /var/run/docker-host.sock so the Danbooru user has access to Docker without changing the Docker socket permissions on the host.
 sudo socat UNIX-LISTEN:/var/run/docker.sock,fork,user=$(whoami),mode=660,backlog=128 UNIX-CONNECT:/var/run/docker-host.sock > /dev/null 2>&1 &
 
+# Proxy devcontainer:3000 to nginx:3000
+socat TCP-LISTEN:3000,fork,backlog=128 TCP:nginx:3000 > /dev/null 2>&1 &
+
+# Proxy devcontainer:3035 to webpack:3035
+socat TCP-LISTEN:3035,fork,backlog=128 TCP:webpack:3035 > /dev/null 2>&1 &
+
 exec "$@"
