@@ -100,7 +100,7 @@ services:
 
   devcontainer:
     <<: *base-template
-    entrypoint: ["bin/devcontainer-entrypoint"]
+    entrypoint: ["tini", "-g", "bin/devcontainer-entrypoint", "--"]
     command: ["sleep", "infinity"]
     volumes:
       - ${DANBOORU_DIR:-./}:/danbooru
