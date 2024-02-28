@@ -25,7 +25,8 @@
         "stylelint.vscode-stylelint",
         "Shopify.ruby-lsp",
         "KoichiSasada.vscode-rdbg",
-        "eamodio.gitlens"
+        "eamodio.gitlens",
+        "ms-azuretools.vscode-docker"
       ]
     }
   }
