@@ -137,7 +137,7 @@ services:
       # If your instance is running behind a reverse proxy (such as Cloudflare, Ngrok, etc), then set this to true.
       #
       # If you get a `HTTP Origin header didn't match request.base_url` error when creating a new account, then set this to true.
-      DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-false}
+      DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-${CODESPACES:-false}}
     ports:
       - "${DANBOORU_PORT:-3000}:3000"
     depends_on:
