@@ -26,6 +26,8 @@
 # @see Source::URL
 module Danbooru
   class URL
+    extend Memoist
+
     class Error < StandardError; end
 
     # @return [String] The original URL as a string.
@@ -34,7 +36,7 @@ module Danbooru
     # @return [Addressable:URI] The parsed and normalized URL.
     attr_reader :url
 
-    delegate :domain, :host, :port, :site, :path, :query, :fragment, :password, to: :url
+    delegate :ip_based?, :host, :port, :site, :path, :query, :fragment, :password, to: :url
 
     # Parse a string into a URL, or raise an exception if the string is not a valid HTTP or HTTPS URL.
     #
@@ -52,7 +54,7 @@ module Danbooru
       @url.path = nil if @url.path == "/"
 
       raise Error, "#{original_url} is not an http:// URL" if !@url.normalized_scheme.in?(["http", "https"])
-      raise Error, "#{original_url} is not a valid hostname" if parsed_domain.nil?
+      raise Error, "#{host} is not a valid hostname" if parsed_domain.nil?
     rescue Addressable::URI::InvalidURIError => e
       raise Error, e
     end
@@ -121,24 +123,31 @@ module Danbooru
       basename&.slice(/\.([[:alnum:]]+)$/, 1)
     end
 
-    # The subdomain of the URL, or nil if absent. For example, for "http://senpenbankashiki.hp.infoseek.co.jp", the
-    # subdomain is "senpenbankashiki.hp", the domain is "infoseek.co.jp", the SLD is "infoseek", and the TLD is "co.jp".
-    #
-    # @return [String, nil]
-    def subdomain
-      parsed_domain&.trd
-    end
-
     # @return [String, nil] The username in a `http://username:password@example.com` URL.
     def http_user
       url.user
     end
 
-    # @return [PublicSuffix::Domain, nil]
-    def parsed_domain
-      @parsed_domain ||= PublicSuffix.parse(host)
-    rescue # PublicSuffix::DomainInvalid, PublicSuffix::DomainNotAllowed
-      nil
+    # The subdomain of the URL, or nil if absent. For example, for "http://senpenbankashiki.hp.infoseek.co.jp" the
+    # subdomain is "senpenbankashiki.hp".
+    #
+    # @return [String, nil]
+    delegate :subdomain, to: :parsed_domain, allow_nil: true
+
+    # The base-level domain of the URL, or nil if absent. For example, for "http://senpenbankashiki.hp.infoseek.co.jp"
+    # the base domain is "infoseek.co.jp".
+    #
+    # @return [String, nil]
+    delegate :domain, to: :parsed_domain, allow_nil: true
+
+    # @return [Danbooru::Domain, nil] The domain name of the URL, or nil if the URL doesn't have a domain.
+    memoize def parsed_domain
+      Danbooru::Domain.parse(host) unless host.blank?
+    end
+
+    # @return [Danbooru::IpAddress, nil] The IP address of the URL, if the URL's host is an IP address instead of a domain name.
+    memoize def ip_address
+      Danbooru::IpAddress.parse(host) unless host.blank?
     end
   end
 end
