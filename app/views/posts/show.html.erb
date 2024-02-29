@@ -1,6 +1,6 @@
 <% page_title @post.presenter.humanized_essential_tag_string %>
 <% meta_description "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
-<% canonical_url post_url(@post, host: Danbooru.config.hostname) %>
+<% seo_canonical_url post_path(@post) %>
 <% if Danbooru.config.comments_enabled?.to_s.truthy? %>
   <% atom_feed_tag "Comments for post ##{@post.id}", comments_url(:atom, search: { post_id: @post.id }) %>
 <% end %>

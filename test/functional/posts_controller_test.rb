@@ -1,7 +1,7 @@
 require "test_helper"
 
 class PostsControllerTest < ActionDispatch::IntegrationTest
-  def assert_canonical_url_equals(expected)
+  def assert_seo_canonical_url_equals(expected)
     assert_equal(expected, response.parsed_body.css("link[rel=canonical]").attribute("href").value)
   end
 
@@ -26,6 +26,8 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = travel_to(1.month.ago) {create(:user)}
       @post = as(@user) { create(:post, tag_string: "aaaa") }
+      Danbooru.config.stubs(:canonical_url).returns("http://www.example.com")
+      Danbooru.config.stubs(:hostname).returns("www.example.com")
     end
 
     context "index action" do
@@ -72,21 +74,21 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         should "render the first page" do
           get root_path
           assert_response :success
-          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+          assert_seo_canonical_url_equals(root_url)
 
           get posts_path
           assert_response :success
-          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+          assert_seo_canonical_url_equals(root_url)
 
           get posts_path(page: 1)
           assert_response :success
-          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+          assert_seo_canonical_url_equals(root_url)
         end
 
         should "render the second page" do
           get posts_path(page: 2, limit: 1)
           assert_response :success
-          assert_canonical_url_equals(posts_url(page: 2, limit: 1, host: Danbooru.config.hostname))
+          assert_seo_canonical_url_equals(posts_url(page: 2, limit: 1))
         end
       end
 
@@ -95,7 +97,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "does_not_exist" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 0
-          assert_canonical_url_equals(posts_url(tags: "does_not_exist", host: Danbooru.config.hostname))
+          assert_seo_canonical_url_equals(posts_url(tags: "does_not_exist"))
         end
 
         should "render for an artist tag" do

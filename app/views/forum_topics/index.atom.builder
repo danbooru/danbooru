@@ -1,4 +1,4 @@
-atom_feed(root_url: forum_topics_url(host: Danbooru.config.hostname)) do |feed|
+atom_feed(root_url: forum_topics_url) do |feed|
   feed.title("Forum Topics")
   feed.updated(@forum_topics.first.try(:updated_at))
 
