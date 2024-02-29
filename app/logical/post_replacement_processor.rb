@@ -25,14 +25,14 @@ class PostReplacementProcessor
     end
 
     if replacement.replacement_file.present?
-      canonical_url = "file://#{replacement.replacement_file.original_filename}"
+      replacement_url = "file://#{replacement.replacement_file.original_filename}"
     elsif Source::URL.page_url(image_url).present?
-      canonical_url = image_url
+      replacement_url = image_url
     else
-      canonical_url = replacement.replacement_url.strip
+      replacement_url = replacement.replacement_url.strip
     end
 
-    replacement.replacement_url = canonical_url
+    replacement.replacement_url = replacement_url
     replacement.file_ext = media_asset.file_ext
     replacement.file_size = media_asset.file_size
     replacement.image_height = media_asset.image_height

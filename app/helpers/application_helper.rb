@@ -412,16 +412,20 @@ module ApplicationHelper
     end
   end
 
-  def canonical_url(url = nil)
-    if url.present?
-      content_for(:canonical_url) { url }
-    elsif content_for(:canonical_url).present?
-      content_for(:canonical_url)
+  # Set the URL used in the <link rel="canonical" href="..."> tag for the
+  # current page. If no URL is given, return the current canonical URL.
+  def seo_canonical_url(url = nil, root_url: Danbooru.config.canonical_url)
+    if url.present? && url.starts_with?("/")
+      content_for(:seo_canonical_url) { root_url.chomp("/") + url }
+    elsif url.present?
+      content_for(:seo_canonical_url) { url }
+    elsif content_for(:seo_canonical_url).present?
+      content_for(:seo_canonical_url)
     else
       request_params = request.params.sort.to_h.with_indifferent_access
       request_params.delete(:page) if request_params[:page].to_i == 1
       request_params.delete(:limit)
-      url_for(**request_params, host: Danbooru.config.hostname, only_path: false)
+      root_url.chomp("/") + url_for(**request_params, only_path: true)
     end
   end
 
