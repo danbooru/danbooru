@@ -28,7 +28,7 @@ class Source::Extractor
     end
 
     def artist_name
-      api_response.dig("creator", "displayName") || artist_api_response.dig("createdTokens", 0, "creatorProfile", "displayNameEN")
+      api_response.dig("creator", "displayName") || artist_api_response.dig("creatorProfile", "nameEN")
     end
 
     def other_names
@@ -36,7 +36,7 @@ class Source::Extractor
       if api_response.present?
         other_names << api_response.dig("creator", "displayNameJA")
       elsif artist_api_response
-        other_names << artist_api_response.dig("createdTokens", 0, "creatorProfile", "displayNameJP")
+        other_names << artist_api_response.dig("creatorProfile", "nameJA")
       end
       other_names.compact.uniq
     end
