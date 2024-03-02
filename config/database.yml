@@ -2,16 +2,16 @@
 # this file, set `DATABASE_URL` in .env.local instead.
 #
 # By default, with no configuration, we try to connect to the Postgres server
-# running on localhost with username `danbooru` and database name `danbooru2`.
+# running on localhost with username `danbooru` and database name `danbooru`.
 #
 # Example:
 #
-#   # Connect to the database named `danbooru2` via localhost on port 5432
-#   DATABASE_URL=postgresql://localhost/danbooru2
+#   # Connect to the database named `danbooru` via localhost on port 5432
+#   DATABASE_URL=postgresql://localhost/danbooru
 #
 #   # Connect via Unix domain socket in /var/run/postgresql
 #   # https://zaiste.net/posts/postgresql-unix-socket-tcpip-loopback/
-#   DATABASE_URL=postgresql://%2Fvar%2Frun%2Fpostgresql/danbooru2
+#   DATABASE_URL=postgresql://%2Fvar%2Frun%2Fpostgresql/danbooru
 #
 # The general form for a database URL is:
 #
@@ -19,7 +19,7 @@
 #
 # The default is:
 #
-#   postgresql://danbooru@localhost/danbooru2
+#   postgresql://danbooru@localhost/danbooru
 #
 # @see https://guides.rubyonrails.org/configuring.html#configuring-a-database
 # @see https://www.postgresql.org/docs/current/libpq-connect.html#id-1.7.3.8.3.6
@@ -32,15 +32,15 @@ default: &default
 
 production:
   <<: *default
-  database: danbooru2
+  database: danbooru
 
 development:
   <<: *default
-  database: danbooru2
+  database: danbooru
 
 test:
   <<: *default
-  database: danbooru2_test
+  database: danbooru_test
 
 archive_production:
   <<: *default
