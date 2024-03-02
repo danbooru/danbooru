@@ -26,7 +26,7 @@ class Source::Extractor::Bluesky < Source::Extractor
     end.to_a
 
     images.map do |image|
-      image_cid = image.dig("image", "ref", "$link")
+      image_cid = image.dig("image", "ref", "$link") || image.dig("image", "cid")
       "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=#{user_did}&cid=#{image_cid}"
     end
   end
@@ -96,8 +96,11 @@ class Source::Extractor::Bluesky < Source::Extractor
   end
 
   def tags
-    # Unsupported
-    []
+    api_response&.dig("thread", "post", "record", "facets").to_a.pluck("features").flatten.select do |f| 
+      f["$type"] == "app.bsky.richtext.facet#tag"
+    end.pluck("tag").map do |tag|
+      [tag, "https://bsky.app/search"]
+    end
   end
 
   # https://www.docs.bsky.app/docs/api/app-bsky-feed-get-post-thread
