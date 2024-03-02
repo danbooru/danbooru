@@ -43,11 +43,11 @@ module Sources
           page_url: "https://www.zerochan.net/2831797#full",
           tags: [
             "Male", "Fanart", "Monochrome", "Long Hair", "Black Hair", "Short Hair",
-            "Happy", "Shoes", "Fullmetal Alchemist", "Jacket", "Shirt", "Sweatdrop",
+            "Happy", "Shoes", "Fullmetal Alchemist", "Jacket", "Top", "Sweatdrop",
             "Pants", "Open Mouth", "Muscles", "Grin", "Teeth", "Ling Yao", "Spiky Hair",
             "Fullmetal Alchemist Brotherhood", "Greed (FMA)", "Vest", "Waving", "Standing",
             "Smile", "Smirk", "KANapy", "Open Clothes", "Open Jacket", "Sleeveless", "Homunculi",
-            "Looking At Camera", "Hungry", "Black Pants", "Sleeveless Shirt", "Xing Country",
+            "Looking At Camera", "Hungry", "Black Pants", "Sleeveless Top", "Xing Country",
             "Full Body", "Open Vest", "Twitter", "Exposed Shoulders", "Confidence",
           ]
         )

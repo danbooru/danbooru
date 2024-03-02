@@ -79,7 +79,7 @@ module Sources
           "https://konachan.com/sample/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916%20sample.jpg",
           image_urls: ["https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png"],
           media_files: [{ file_size: 8_167_593 }],
-          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hoodie long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
+          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hood long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
           profile_url: "https://www.pixiv.net/users/22528152"
         )
       end
@@ -89,7 +89,7 @@ module Sources
           "https://konachan.com/jpeg/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916%20anthropomorphism%20bed%20blonde_hair%20bow%20brown_eyes%20doll%20girls_frontline%20hara_shoutarou%20hoodie%20long_hair%20pantyhose%20scar%20skirt%20twintails.jpg",
           image_urls: ["https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png"],
           media_files: [{ file_size: 8_167_593 }],
-          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hoodie long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
+          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hood long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
           profile_url: "https://www.pixiv.net/users/22528152"
         )
       end
@@ -99,7 +99,7 @@ module Sources
           "https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png",
           image_urls: ["https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png"],
           media_files: [{ file_size: 8_167_593 }],
-          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hoodie long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
+          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hood long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
           profile_url: "https://www.pixiv.net/users/22528152"
         )
       end
@@ -109,7 +109,7 @@ module Sources
           "https://konachan.com/post/show/270916",
           image_urls: ["https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png"],
           media_files: [{ file_size: 8_167_593 }],
-          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hoodie long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
+          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hood long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
           profile_url: "https://www.pixiv.net/users/22528152"
         )
       end
@@ -119,7 +119,7 @@ module Sources
           "https://konachan.com/post/show?md5=ca12cdb79a66d242e95a6f958341bf05",
           image_urls: ["https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png"],
           media_files: [{ file_size: 8_167_593 }],
-          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hoodie long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
+          tags: %w[anthropomorphism bed blonde_hair bow brown_eyes doll girls_frontline hara_shoutarou hood long_hair pantyhose scar skirt twintails ump-45_(girls_frontline) ump-9_(girls_frontline)],
           profile_url: "https://www.pixiv.net/users/22528152"
         )
       end

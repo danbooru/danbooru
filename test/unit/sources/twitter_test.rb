@@ -254,7 +254,7 @@ module Sources
         image_urls: ["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"],
         media_files: [{ file_size: 9800 }],
         page_url: "https://twitter.com/nounproject/status/540944400767922176",
-        profile_url: "https://twitter.com/nounproject/status/540944400767922176",
+        profile_url: "https://twitter.com/nounproject",
         profile_urls: ["https://twitter.com/nounproject", "https://twitter.com/intent/user?user_id=88996186"],
         tag_name: "nounproject",
         tags: [],
@@ -372,7 +372,7 @@ module Sources
       strategy_should_work(
         "https://twitter.com/VG_Worklog/status/1587457941418160128",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          Sound by: "@RealAudiodude":[https://twitter.com/RealAudiodude] 
+          Sound by: "@RealAudiodude":[https://twitter.com/RealAudiodude]\x20
           Download: <https://mega.nz/folder/i80gVL7L#111g2XX7bIJ-2KnAHxMt0w>
           Support: <https://www.patreon.com/vgerotica>
         EOS

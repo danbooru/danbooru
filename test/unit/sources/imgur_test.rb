@@ -151,7 +151,7 @@ module Sources
       context "A hidden (unlisted) album" do
         strategy_should_work(
           "https://imgur.com/a/2tWSH1c",
-          image_urls: %w[],
+          image_urls: %w[https://i.imgur.com/Kp9TdlX.gif],
           page_url: "https://imgur.com/a/2tWSH1c",
           profile_url: nil,
           artist_name: nil,

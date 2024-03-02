@@ -7,10 +7,10 @@ module Sources
         "https://misskey.io/notes/9bxaf592x6",
         page_url: "https://misskey.io/notes/9bxaf592x6",
         image_urls: [
-          "https://s3.arkjp.net/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png",
+          "https://media.misskeyusercontent.com/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png",
         ],
         media_files: [
-          { file_size: 197_151 },
+          { file_size: 157_852 },
         ],
         profile_url: "https://misskey.io/@ixy194",
         profile_urls: [
@@ -30,12 +30,12 @@ module Sources
       strategy_should_work(
         "https://misskey.io/notes/9e5pggsolw",
         image_urls: [
-          "https://s3.arkjp.net/misskey/c6909d66-9f53-4050-b46d-643d266995c7.jpg",
-          "https://s3.arkjp.net/misskey/08e1b86c-0d5e-4391-9b02-125a5f7f4794.jpg",
+          "https://media.misskeyusercontent.com/misskey/c6909d66-9f53-4050-b46d-643d266995c7.jpg",
+          "https://media.misskeyusercontent.com/misskey/08e1b86c-0d5e-4391-9b02-125a5f7f4794.jpg",
         ],
         media_files: [
-          { file_size: 81_793 },
-          { file_size: 80_996 },
+          { file_size: 69_120 },
+          { file_size: 68_754 },
         ],
       )
     end
