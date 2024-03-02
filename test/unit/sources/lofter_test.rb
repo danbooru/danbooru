@@ -116,7 +116,7 @@ module Sources
 
           [b]淘宝通贩→[/b]"[b]※※※※[/b]":[https://item.taobao.com/item.htm?id=542050423915&qq-pf-to=pcqq.c2c]
 
-          [b]本宣地址→[/b]"[b]※※※※[/b]":[https://okitagumi.lofter.com/post/1e69aeeb_e30959e]
+          [b]本宣地址→[/b]"[b]※※※※[/b]":[http://okitagumi.lofter.com/post/1e69aeeb_e30959e]
 
           《金平糖》的通贩代理只有[b]@JACKPOT_印刷寄售社团[/b] 一家 ，除此之外全部都是盗印店，还请大家帮忙奔走相告( ´•̥×•̥` )
 

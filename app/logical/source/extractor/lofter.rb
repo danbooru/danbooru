@@ -77,11 +77,11 @@ module Source
       end
 
       def display_name
-        page_json.dig("postData", "data", "blogInfo", "blogNickName").to_s.strip
+        page_json.dig("postData", "data", "blogInfo", "blogNickName")&.strip
       end
 
       def other_names
-        [artist_name, display_name].compact.uniq
+        [artist_name, display_name].compact_blank.uniq
       end
 
       def artist_commentary_title
@@ -104,7 +104,7 @@ module Source
       def desc_from_photo_post
         page_json.dig("postData", "data", "postData", "postView", "photoPostView", "caption")
       end
-      
+
       def desc_from_video_post
         page_json.dig("postData", "data", "postData", "postView", "videoPostView", "caption")
       end
