@@ -37,7 +37,7 @@ module Sources
         profile_url: "https://anifty.jp/@hightree",
         page_url: nil,
         artist_name: "Knoy Konome",
-        other_names: ["hightree"],
+        other_names: ["hightree", "木芽のい"],
         tags: [],
         artist_commentary_title: nil,
         artist_commentary_desc: nil
