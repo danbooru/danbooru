@@ -10,88 +10,103 @@ module Sources
     context "A deviantart post" do
       strategy_should_work(
         "https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484",
-        image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/11a24395-0f24-446d-ae73-a9f812e79e55/d70rm0s-e5b6b5e6-5795-44bb-a0ba-27b5c2349be7\.jpg}],
-        media_files: [{ file_size: 877_987 }],
+        image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/11a24395-0f24-446d-ae73-a9f812e79e55/d70rm0s-e5b6b5e6-5795-44bb-a0ba-27b5c2349be7.jpg\?token=}],
+        media_files: [{ file_size: 877_987, width: 1620, height: 1380 }],
         page_url: "https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484",
         artist_name: "aeror404",
         profile_url: "https://www.deviantart.com/aeror404",
-        artist_commentary_title: "Holiday Elincia"
+        tags: [],
+        artist_commentary_title: "Holiday Elincia",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Christmas sketch commission! \u00a0Elincia from Fire Emblem! \u00a0Thanks!
+          I think it suits her really well. * - * Also you can never go wrong with sexy Christmas sweaters!
+        EOS
       )
     end
 
-    context "A deviantart image" do
+    context "An old deviantart image for a deleted post" do
       strategy_should_work(
         "https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png",
-        image_urls: ["https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png"],
-        media_files: [{ file_size: 833_251 }],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/76184f5d-6a6f-4410-aba9-e8b672c22b80/dbpxdt8-20d2d385-4d92-4314-bafc-46a1310752fd.png"],
+        media_files: [{ file_size: 1_740_425, width: 1093, height: 3331 }],
         page_url: "https://www.deviantart.com/nickbeja/art/Mindflayer-Girl01-708675884",
         artist_name: "nickbeja",
-        profile_url: "https://www.deviantart.com/nickbeja"
+        profile_url: "https://www.deviantart.com/nickbeja",
+        tags: [],
+        artist_commentary_title: nil, # XXX use filename?
+        artist_commentary_desc: nil
       )
     end
 
-    context "Another deviantart image" do
+    context "An old downloadable deviantart image" do
       strategy_should_work(
         "https://pre00.deviantart.net/b5e6/th/pre/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg",
-        image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/b1f96af6-56a3-47a8-b7f4-406f243af3a3/daihpha-9f1fcd2e-7557-4db5-951b-9aedca9a3ae7\.jpg}],
-        media_files: [{ file_size: 906_621 }],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/b1f96af6-56a3-47a8-b7f4-406f243af3a3/daihpha-9f1fcd2e-7557-4db5-951b-9aedca9a3ae7.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2IxZjk2YWY2LTU2YTMtNDdhOC1iN2Y0LTQwNmYyNDNhZjNhM1wvZGFpaHBoYS05ZjFmY2QyZS03NTU3LTRkYjUtOTUxYi05YWVkY2E5YTNhZTcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.YWZwVhPQHRLzRZUU2cTDXuWuA6ExFH57oFfGzAkxO6Y"],
+        media_files: [{ file_size: 906_621, width: 1600, height: 1044 }],
         page_url: "https://www.deviantart.com/hideyoshi/art/Legend-of-Galactic-Heroes-635721022",
-        artist_name: "hideyoshi",
+        artist_name: "Hideyoshi",
         profile_url: "https://www.deviantart.com/hideyoshi",
-        tags: %w[barbarossa bay brunhild flare hangar odin planet ship spaceship sun sunset brünhild legendsofgalacticheroes]
+        tags: %w[barbarossa bay brunhild flare hangar odin planet ship spaceship sun sunset brünhild legendsofgalacticheroes],
+        artist_commentary_title: "Legend of Galactic Heroes",
+        dtext_artist_commentary_desc: "Shamefully I have to say I didn't know this anime show before. wat? o_O Yet was approached to create a commissioned piece.. This is the result - Barbarossa and Brunhild landing on Odin."
       )
     end
 
-    context "A deviantart post with the intermediary version giving 404" do
+    context "A deviantart post without a downloadable or /intermediary/ image" do
       strategy_should_work(
         "https://www.deviantart.com/gregmks/art/Rhino-Castle-811778248",
-        image_urls: [%r{\Ahttps://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/8c03bd02-63bf-407e-9c3e-c3fd21ab4bd5/ddfb83s-64c3b1fd-a554-498c-87dd-7ce83721a3d0\.jpg\?token=}]
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8c03bd02-63bf-407e-9c3e-c3fd21ab4bd5/ddfb83s-64c3b1fd-a554-498c-87dd-7ce83721a3d0.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzhjMDNiZDAyLTYzYmYtNDA3ZS05YzNlLWMzZmQyMWFiNGJkNVwvZGRmYjgzcy02NGMzYjFmZC1hNTU0LTQ5OGMtODdkZC03Y2U4MzcyMWEzZDAuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.ASOB3VvK4P7B2cRWr6mcgqWRIhhttAqVYa_u1WrUmuc"],
+        media_files: [{ size: 662_982, width: 1200, height: 1500 }],
+        page_url: "https://www.deviantart.com/gregmks/art/Rhino-Castle-811778248",
+        artist_name: "gregmks",
+        profile_url: "https://www.deviantart.com/gregmks",
+        tags: [],
+        artist_commentary_title: "Rhino Castle",
+        dtext_artist_commentary_desc: 'Started as a simple Rhino sketch and it escalated quickly ":P (Lick)":[https://e.deviantart.net/emoticons/letters/=p.gif]'
       )
     end
 
-    context "A deviantart origin-orig image" do
-      desc = <<-EOS.strip_heredoc.chomp
-        blah blah
-        "test link":[http://www.google.com]
-
-        h1. lol
-
-
-
-        [b]blah[/b] [i]blah[/i] [u]blah[/u] [s]blah[/s]
-        herp derp
-
-        [quote]this is a quote[/quote]
-
-        * one
-        * two
-        * three
-
-        * one
-        * two
-        * three
-
-        "Heart":[https://e.deviantart.net/emoticons/h/heart.gif]
-      EOS
-
+    context "A downloadable deviantart origin-orig image" do
       strategy_should_work(
         "http://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png",
-        image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png}],
-        media_files: [{ file_size: 3_619 }],
+        image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9.png\?token=}],
+        media_files: [{ file_size: 3_619, width: 1152, height: 648 }],
         page_url: "https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408",
         artist_name: "noizave",
         profile_url: "https://www.deviantart.com/noizave",
         tags: %w[bar baz foo],
         artist_commentary_title: "test post please ignore",
-        dtext_artist_commentary_desc: desc
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          blah blah
+          "test link":[http://www.google.com]
+
+          h1. lol
+
+
+
+          [b]blah[/b] [i]blah[/i] [u]blah[/u] [s]blah[/s]
+          herp derp
+
+          [quote]this is a quote[/quote]
+
+          * one
+          * two
+          * three
+
+          * one
+          * two
+          * three
+
+          "Heart":[https://e.deviantart.net/emoticons/h/heart.gif]
+        EOS
       )
     end
 
     context "A img00.deviantart.net sample" do
       strategy_should_work(
         "https://img00.deviantart.net/a233/i/2017/160/5/1/test_post_please_ignore_by_noizave-dbc3a48.png",
-        image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png}],
-        media_files: [{ file_size: 3_619 }],
+        image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9.png\?token=}],
+        media_files: [{ file_size: 3_619, width: 1152, height: 648 }],
         page_url: "https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408"
       )
     end
@@ -99,28 +114,49 @@ module Sources
     context "A th00.deviantart.net/*/PRE/* thumbnail" do
       strategy_should_work(
         "http://th00.deviantart.net/fs71/PRE/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png",
-        image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/d8995973-0b32-4a7d-8cd8-d847d083689a/d797tit-1eac22e0-38b6-4eae-adcb-1b72843fd62a\.png}],
-        media_files: [{ file_size: 3_391_584 }],
-        page_url: "https://www.deviantart.com/xyelkiltrox/art/Goruto-438744629"
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/d8995973-0b32-4a7d-8cd8-d847d083689a/d797tit-1eac22e0-38b6-4eae-adcb-1b72843fd62a.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2Q4OTk1OTczLTBiMzItNGE3ZC04Y2Q4LWQ4NDdkMDgzNjg5YVwvZDc5N3RpdC0xZWFjMjJlMC0zOGI2LTRlYWUtYWRjYi0xYjcyODQzZmQ2MmEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.lMnggSrSiuWOhlBmd-1D0_SojJzb9LmwoLpbq1n9d4k"],
+        media_files: [{ file_size: 3_391_584, width: 2078, height: 3201 }],
+        page_url: "https://www.deviantart.com/xyelkiltrox/art/Goruto-438744629",
+        artist_name: "XYelkiltroX",
+        profile_url: "https://www.deviantart.com/xyelkiltrox",
+        tags: [],
+        artist_commentary_title: "Goruto",
+        dtext_artist_commentary_desc: "Fusión de Goku y Naruto al estilo de Akira Toriyama"
       )
     end
 
     context "A deviantart page with download disabled" do
       strategy_should_work(
         "https://noizave.deviantart.com/art/test-no-download-697415967",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbj81lr-3306feb1-87dc-4d25-9a4c-da8d2973a8b7\.jpg\?token=}],
-        media_files: [{ file_size: 59_401 }],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbj81lr-3306feb1-87dc-4d25-9a4c-da8d2973a8b7.jpg"],
+        media_files: [{ file_size: 40_036, width: 500, height: 500 }],
         page_url: "https://www.deviantart.com/noizave/art/test-no-download-697415967",
         artist_name: "noizave",
         profile_url: "https://www.deviantart.com/noizave",
-        artist_commentary_title: "test, no download"
+        tags: [],
+        artist_commentary_title: "test, no download",
+        dtext_artist_commentary_desc: ""
       )
     end
 
     context "A deviantart page with download disabled for a huge file" do
       strategy_should_work(
         "https://www.deviantart.com/anatofinnstark/art/The-Blade-of-Miquella-914166242",
-        media_files: [{ file_size: 26_037_561 }]
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3d079e1f-386b-4bd0-84fc-cce9913fbc0c/df49r6q-b19fcb03-8c2e-4638-8c12-98d443c7ee33.jpg/v1/fill/w_900,h_507/the_blade_of_miquella_by_anatofinnstark_df49r6q.jpg\?token=}],
+        media_files: [{ file_size: 155_461, width: 900, height: 507 }],
+        page_url: "https://www.deviantart.com/anatofinnstark/art/The-Blade-of-Miquella-914166242",
+        artist_name: "AnatoFinnstark",
+        profile_url: "https://www.deviantart.com/anatofinnstark",
+        tags: [],
+        artist_commentary_title: "The Blade of Miquella",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Another Malenia Art, and not the last ":) (Smile)":[https://e.deviantart.net/emoticons/s/smile.gif]
+
+
+          Limited Print : "finnstarkillustration.com/blad…":[https://finnstarkillustration.com/blade-of-miquella-moon-only-20-copies-worldwide.html]
+          Common print : "www.redbubble.com/fr/shop/ap/1…":[https://www.redbubble.com/fr/shop/ap/109026235?ref=studio-promote]
+          Displate : "displate.com/anatofinnstark/el…":[https://displate.com/anatofinnstark/eldensouls?art=5eec73f09ab12]
+        EOS
       )
     end
 
@@ -128,9 +164,9 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781",
         image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/a6289ca5-2205-4118-af55-c6934fba0930/dct67m5-51e8db38-9167-4f5c-931d-561ea4d3810d\.jpg}],
-        media_files: [{ file_size: 1_402_017 }],
+        media_files: [{ file_size: 1_402_017, width: 1920, height: 1080 }],
         page_url: "https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781",
-        artist_name: "len1",
+        artist_name: "Len1",
         profile_url: "https://www.deviantart.com/len1",
         artist_commentary_title: "All that Glitters II"
       )
@@ -139,49 +175,90 @@ module Sources
     context "A *.deviantart.net/*/:title_by_:artist.jpg image with an artist name containing underscores" do
       strategy_should_work(
         "https://orig00.deviantart.net/4274/f/2010/230/8/a/pkmn_king_and_queen_by_mikoto_chan.jpg",
-        image_urls: ["https://orig00.deviantart.net/4274/f/2010/230/8/a/pkmn_king_and_queen_by_mikoto_chan.jpg"],
-        artist_name: "mikoto-chan",
-        profile_url: "https://www.deviantart.com/mikoto-chan",
-        page_url: nil
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/654817c0-5ba7-4591-9fd7-badae289cf88/d2wq7wl-b7f18546-753e-4d53-8051-ddb1879776c2.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzY1NDgxN2MwLTViYTctNDU5MS05ZmQ3LWJhZGFlMjg5Y2Y4OFwvZDJ3cTd3bC1iN2YxODU0Ni03NTNlLTRkNTMtODA1MS1kZGIxODc5Nzc2YzIuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.3-uVYYvKA4UvdXCv1cHTgeky5VSGFbMj7oayLgLZAxc"],
+        media_files: [{ size: 401_175, width: 700, height: 543 }],
+        page_url: "https://www.deviantart.com/mikotoazure/art/PKMN-King-and-Queen-175903365",
+        artist_name: "MikotoAzure",
+        profile_url: "https://www.deviantart.com/mikotoazure",
+        tags: [],
+        artist_commentary_title: "PKMN-King and Queen",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Commision for "wolfathegoddess2010":[https://wolfathegoddess2010.deviantart.com/]
+
+          Reference:
+          Nidoran♂ (King) > "[link]":[https://wolfathegoddess2010.deviantart.com/art/King-and-Anna-pokemon-173524307?q=gallery%3Awolfathegoddess2010%2F11255073&qo=10]
+          Nidoran♀ (Queen) > "[link]":[https://wolfathegoddess2010.deviantart.com/art/Aoiro-and-Queen-175776997?q=gallery%3Awolfathegoddess2010%2F11255073&qo=0]
+
+
+          Nidoran ♂ and ♀(c) Pokemon
+          Art (c) Mikoto-chan
+        EOS
       )
     end
 
     context "A *.deviantart.net/*/:hash.jpg image without referer" do
       strategy_should_work(
         "http://pre06.deviantart.net/8497/th/pre/f/2009/173/c/c/cc9686111dcffffffb5fcfaf0cf069fb.jpg",
-        image_urls: ["http://pre06.deviantart.net/8497/th/pre/f/2009/173/c/c/cc9686111dcffffffb5fcfaf0cf069fb.jpg"],
-        profile_url: nil,
-        page_url: nil
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzhiNDcyZDcwLWEwZDYtNDFiNS05YTY2LWMzNTY4NzA5MGFjY1wvZDIzamJyNC04YTA2YWYwMi03MGNiLTQ2ZGEtOGE5Ni00MmE2YmE3M2NkYjQuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.dEDJSkIs-mbcGXDbSL1wRteRaHyl3rpc50EhsU5aZeE"],
+        media_files: [{ file_size: 390_108, width: 791, height: 1_024 }],
+        page_url: "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896",
+        artist_name: "edsfox",
+        profile_url: "https://www.deviantart.com/edsfox",
+        artist_commentary_title: "Silverhawks Quicksilver",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          First of all.. I love this cartoon from the 80's.. so I decide to make this Fan art of Quicksilver flying into the earth's sky..
+
+          I decided this way cuz I was experimenting with the cloud brush XD hahaha.. so pardon me if you expect him surrounded by space and stars.. I know I know.. but.. well I think it looked cool at the end..
+
+          Photoshop CS3, intuos3, few hours, reference on the character by SilverHawks cartoon series..
+
+
+          SilverHawks belongs to WarnerBros.
+
+
+          EDS
+        EOS
       )
     end
 
-    context "A *.deviantart.net/*/:hash.jpg image with referer" do
+    context "A *.deviantart.net/*/:hash.jpg image" do
       strategy_should_work(
         "http://pre06.deviantart.net/8497/th/pre/f/2009/173/c/c/cc9686111dcffffffb5fcfaf0cf069fb.jpg",
-        referer: "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896",
-        image_urls: [%r{\Ahttps://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg}],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzhiNDcyZDcwLWEwZDYtNDFiNS05YTY2LWMzNTY4NzA5MGFjY1wvZDIzamJyNC04YTA2YWYwMi03MGNiLTQ2ZGEtOGE5Ni00MmE2YmE3M2NkYjQuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.dEDJSkIs-mbcGXDbSL1wRteRaHyl3rpc50EhsU5aZeE"],
+        media_files: [{ file_size: 390_108, width: 791, height: 1_024 }],
+        page_url: "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896",
         artist_name: "edsfox",
         profile_url: "https://www.deviantart.com/edsfox",
-        page_url: "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896"
+        artist_commentary_title: "Silverhawks Quicksilver"
       )
     end
 
-    context "A images-wixmp-.* sample" do
+    context "A images-wixmp-.* /intermediary/ sample" do
       strategy_should_work(
         "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg",
-        referer: "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896",
-        image_urls: [%r{\Ahttps://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg}],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzhiNDcyZDcwLWEwZDYtNDFiNS05YTY2LWMzNTY4NzA5MGFjY1wvZDIzamJyNC04YTA2YWYwMi03MGNiLTQ2ZGEtOGE5Ni00MmE2YmE3M2NkYjQuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.dEDJSkIs-mbcGXDbSL1wRteRaHyl3rpc50EhsU5aZeE"],
+        media_files: [{ file_size: 390_108, width: 791, height: 1_024 }],
+        page_url: "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896",
         artist_name: "edsfox",
         profile_url: "https://www.deviantart.com/edsfox",
-        page_url: "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896"
+        artist_commentary_title: "Silverhawks Quicksilver"
       )
     end
 
     context "A api-da.wixmp.com sample" do
       strategy_should_work(
         "https://api-da.wixmp.com/_api/download/file?downloadToken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTU5MDkwMTUzMywiaWF0IjoxNTkwOTAwOTIzLCJqdGkiOiI1ZWQzMzhjNWQ5YjI0Iiwib2JqIjpudWxsLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdLCJwYXlsb2FkIjp7InBhdGgiOiJcL2ZcL2U0NmE0OGViLTNkMGItNDQ5ZS05MGRjLTBhMWIzMWNiMTM2MVwvZGQzcDF4OS1mYjQ3YmM4Zi02NTNlLTQyYTItYmI0ZC1hZmFmOWZjMmI3ODEuanBnIn19.-zo8E2eDmkmDNCK-sMabBajkaGtVYJ2Q20iVrUtt05Q",
-        referer: "https://www.deviantart.com/akizero1510/art/Ten-miles-of-cherry-blossoms-792268029",
-        page_url: "https://www.deviantart.com/akizero1510/art/Ten-miles-of-cherry-blossoms-792268029"
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e46a48eb-3d0b-449e-90dc-0a1b31cb1361/dd3p1x9-fb47bc8f-653e-42a2-bb4d-afaf9fc2b781.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2U0NmE0OGViLTNkMGItNDQ5ZS05MGRjLTBhMWIzMWNiMTM2MVwvZGQzcDF4OS1mYjQ3YmM4Zi02NTNlLTQyYTItYmI0ZC1hZmFmOWZjMmI3ODEuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.NtrspZ7pPL_ZHX62NEKn3x_0DnsmQJnn0xRz3Y0j-to"],
+        media_files: [{ size: 1_289_162, width: 1415, height: 1000 }],
+        page_url: "https://www.deviantart.com/akizero1510/art/Ten-miles-of-cherry-blossoms-792268029",
+        artist_name: "AkiZero1510",
+        profile_url: "https://www.deviantart.com/akizero1510",
+        tags: [],
+        artist_commentary_title: "Ten miles of cherry blossoms",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Commission for\u00a0"shrimpHEBY":[https://www.deviantart.com/shrimpheby]\u00a0
+          Hope you guys enjoy! (｢･ω･)｢
+        EOS
       )
     end
 
@@ -189,15 +266,23 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/heartgear/art/Silent-Night-579982816",
         image_urls: [%r{\Ahttps://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/ea95be00-c5aa-4063-bd55-f5a9183912f7/d9lb1ls-7d625444-0003-4123-bf00-274737ca7fdd.gif\?token=}],
-        media_files: [{ file_size: 350_156 }]
+        media_files: [{ file_size: 350_156, width: 746, height: 977 }]
       )
     end
 
-    context "A non-downloadable video file" do
+    context "A page containing a non-downloadable video file" do
       strategy_should_work(
         "https://www.deviantart.com/gs-mantis/art/Chen-Goes-Fishing-505847233",
         image_urls: ["https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4"],
-        media_files: [{ file_size: 9_739_947 }]
+        media_files: [{ file_size: 9_739_947, width: 1920, height: 1_080 }]
+      )
+    end
+
+    context "A direct non-downloadable video file" do
+      strategy_should_work(
+        "https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4",
+        page_url: "https://www.deviantart.com/gs-mantis/art/Chen-Goes-Fishing-505847233",
+        image_urls: ["https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4"],
       )
     end
 
@@ -205,32 +290,39 @@ module Sources
       strategy_should_work(
         "http://noizave.deviantart.com/art/hidden-work-685458369",
         image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3r29-10c99118-5cfe-4402-ad55-7b57e7c0ca43\.png}],
-        media_files: [{ file_size: 3_619 }]
+        media_files: [{ file_size: 3_619, width: 1152, height: 648 }],
+        page_url: "https://www.deviantart.com/noizave/art/hidden-work-685458369",
+        artist_name: "noizave",
+        profile_url: "https://www.deviantart.com/noizave",
+        tags: %w[bar baz foo],
+        artist_commentary_title: "hidden work"
       )
     end
 
     context "A source with malformed links in the artist commentary" do
-      should "fix the links" do
-        @site = Source::Extractor.find("https://www.deviantart.com/dishwasher1910/art/Solar-Sisters-792488305")
-
-        assert_equal(<<~EOS.chomp, @site.dtext_artist_commentary_desc)
-          Solar sisters 
+      strategy_should_work(
+        "https://www.deviantart.com/dishwasher1910/art/Solar-Sisters-792488305",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Solar sisters\x20
 
           HD images , Psd file and alternative version available on my Patreon :
           "www.patreon.com/Dishwasher1910":[https://www.patreon.com/Dishwasher1910]
           You can buy the print here :
           "www.inprnt.com/gallery/dishwas…":[https://www.inprnt.com/gallery/dishwasher1910/solar-sisters/]
         EOS
-      end
+      )
     end
 
-    context "An artist entry with a profile url that is missing the 'www'" do
-      should "still find the artist" do
-        @site = Source::Extractor.find("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")
-        @artist = create(:artist, name: "noizave", url_string: "https://deviantart.com/noizave")
-
-        assert_equal([@artist], @site.artists)
-      end
+    context "An artistname.deviantart.com page url" do
+      strategy_should_work(
+        "http://noizave.deviantart.com/art/test-post-please-ignore-685436408",
+        image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9.png\?token=}],
+        page_url: "https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408",
+        artist_name: "noizave",
+        profile_url: "https://www.deviantart.com/noizave",
+        tags: %w[bar baz foo],
+        artist_commentary_title: "test post please ignore"
+      )
     end
 
     should "Parse DeviantArt URLs correctly" do
