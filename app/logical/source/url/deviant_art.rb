@@ -18,48 +18,59 @@ module Source
   class URL::DeviantArt < Source::URL
     RESERVED_SUBDOMAINS = %w[www]
 
-    attr_reader :username, :work_id, :stash_id, :title, :file
+    attr_reader :username, :work_id, :stash_id, :title, :file, :jwt
 
     def self.match?(url)
-      url.domain.in?(%w[artworkfolio.com daportfolio.com deviantart.net deviantart.com fav.me sta.sh]) || url.host.in?(%w[images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com wixmp-ed30a86b8c4ca887773594c2.wixmp.com api-da.wixmp.com])
+      url.domain.in?(%w[artworkfolio.com daportfolio.com deviantart.net deviantart.com fav.me sta.sh]) ||
+        url.host.in?(%w[images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com wixmp-ed30a86b8c4ca887773594c2.wixmp.com api-da.wixmp.com img-deviantart.wixmp.com])
     end
 
     def parse
-      case [domain, *path_segments]
+      case [subdomain, domain, *path_segments]
+
+      # https://api-da.wixmp.com/_api/download/file?downloadToken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTU5MDkwMTUzMywiaWF0IjoxNTkwOTAwOTIzLCJqdGkiOiI1ZWQzMzhjNWQ5YjI0Iiwib2JqIjpudWxsLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdLCJwYXlsb2FkIjp7InBhdGgiOiJcL2ZcL2U0NmE0OGViLTNkMGItNDQ5ZS05MGRjLTBhMWIzMWNiMTM2MVwvZGQzcDF4OS1mYjQ3YmM4Zi02NTNlLTQyYTItYmI0ZC1hZmFmOWZjMmI3ODEuanBnIn19.-zo8E2eDmkmDNCK-sMabBajkaGtVYJ2Q20iVrUtt05Q
+      in "api-da", "wixmp.com", "_api", "download", "file" if params[:downloadToken].present?
+        @jwt = parse_jwt(params[:downloadToken])
+        @work_id = work_id_from_token
 
       # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/52c4a3ad-d416-42f0-90f6-570983e36797/dczr28f-bd255304-01bf-4765-8cd3-e53983d3f78a.jpg
       # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg
       # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/76098ac8-04ab-4784-b382-88ca082ba9b1/d9x7lmk-595099de-fe8f-48e5-9841-7254f9b2ab8d.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvNzYwOThhYzgtMDRhYi00Nzg0LWIzODItODhjYTA4MmJhOWIxXC9kOXg3bG1rLTU5NTA5OWRlLWZlOGYtNDhlNS05ODQxLTcyNTRmOWIyYWI4ZC5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.KFOVXAiF8MTlLb3oM-FlD0nnDvODmjqEhFYN5I2X5Bc
       # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/fe7ab27f-7530-4252-99ef-2baaf81b36fd/dddf6pe-1a4a091c-768c-4395-9465-5d33899be1eb.png/v1/fill/w_800,h_1130,q_80,strp/stay_hydrated_and_in_the_shade_by_raikoart_dddf6pe-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTEzMCIsInBhdGgiOiJcL2ZcL2ZlN2FiMjdmLTc1MzAtNDI1Mi05OWVmLTJiYWFmODFiMzZmZFwvZGRkZjZwZS0xYTRhMDkxYy03NjhjLTQzOTUtOTQ2NS01ZDMzODk5YmUxZWIucG5nIiwid2lkdGgiOiI8PTgwMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.J0W4k-iV6Mg8Kt_5Lr_L_JbBq4lyr7aCausWWJ_Fsbw
-      in "wixmp.com", *rest
+      # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_75,strp/cc9686111dcffffffb5fcfaf0cf069fb.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl0sIm9iaiI6W1t7InBhdGgiOiIvZi84YjQ3MmQ3MC1hMGQ2LTQxYjUtOWE2Ni1jMzU2ODcwOTBhY2MvZDIzamJyNC04YTA2YWYwMi03MGNiLTQ2ZGEtOGE5Ni00MmE2YmE3M2NkYjQuanBnIiwid2lkdGgiOiI8PTc4NiIsImhlaWdodCI6Ijw9MTAxNyJ9XV19.EXlDqS_4kMSDO26RTsuqE-H_XI0xSiO3dnAQRV6puqw"
+      # https://img-deviantart.wixmp.com/f/618b1383-fa36-43cf-a5ef-dbcc45695591/dgpak1x-43de07ea-842f-4feb-96eb-5fddb8f96c58.png/v1/fill/w_1280,h_1811/emomei_by_sayohyou_dgpak1x-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTgxMSIsInBhdGgiOiJcL2ZcLzYxOGIxMzgzLWZhMzYtNDNjZi1hNWVmLWRiY2M0NTY5NTU5MVwvZGdwYWsxeC00M2RlMDdlYS04NDJmLTRmZWItOTZlYi01ZmRkYjhmOTZjNTgucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.Vh93ks4buG6phMwmIWQMqw4CYPslAwJYSrlzFVW3o3E
+      # https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4
+      in _, "wixmp.com", *rest
         parse_filename
+        @jwt = parse_jwt(params[:token])
+        @work_id ||= work_id_from_token
 
       # http://orig12.deviantart.net/9b69/f/2017/023/7/c/illustration___tokyo_encount_oei__by_melisaongmiqin-dawi58s.png
       # http://pre15.deviantart.net/81de/th/pre/f/2015/063/5/f/inha_by_inhaestudios-d8kfzm5.jpg
       # http://th00.deviantart.net/fs71/PRE/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png
       # http://fc00.deviantart.net/fs71/f/2013/234/d/8/d84e05f26f0695b1153e9dab3a962f16-d6j8jl9.jpg
       # http://th04.deviantart.net/fs71/PRE/f/2013/337/3/5/35081351f62b432f84eaeddeb4693caf-d6wlrqs.jpg
-      in "deviantart.net", *rest
+      in _, "deviantart.net", *rest
         parse_filename
 
       # http://www.deviantart.com/download/135944599/Touhou___Suwako_Moriya_Colored_by_Turtle_Chibi.png
       # https://www.deviantart.com/download/549677536/countdown_to_midnight_by_kawacy-d939hwg.jpg?token=92090cd3910d52089b566661e8c2f749755ed5f8&ts=1438535525
-      in "deviantart.com", "download", work_id, file
+      in _, "deviantart.com", "download", work_id, file
         parse_filename
         @work_id = work_id.to_i
 
       # https://www.deviantart.com/deviation/685436408
-      in "deviantart.com", "deviation", work_id
+      in _, "deviantart.com", "deviation", work_id
         @work_id = work_id.to_i
 
       # https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408
-      in "deviantart.com", username, "art", /^([a-zA-Z0-9-]+)-(\d+)$/ => title
+      in _, "deviantart.com", username, "art", /^([a-zA-Z0-9-]+)-(\d+)$/ => title
         @username = username
         @title = $1
         @work_id = $2.to_i
 
       # https://noizave.deviantart.com/art/test-post-please-ignore-685436408
-      in "deviantart.com", "art", /^([a-z0-9_-]+)-(\d+)$/i => title unless subdomain.in?(RESERVED_SUBDOMAINS)
+      in _, "deviantart.com", "art", /^([a-z0-9_-]+)-(\d+)$/i => title unless subdomain.in?(RESERVED_SUBDOMAINS)
         @username = subdomain
         @title = $1
         @work_id = $2.to_i
@@ -67,18 +78,18 @@ module Source
       # https://www.deviantart.com/noizave
       # https://deviantart.com/noizave
       # https://www.deviantart.com/nlpsllp/gallery
-      in "deviantart.com", username, *rest
+      in _, "deviantart.com", username, *rest
         @username = username
 
       # https://noizave.deviantart.com
       # http://nemupanart.daportfolio.com
       # http://regi-chan.artworkfolio.com
-      in ("deviantart.com" | "daportfolio.com" | "artworkfolio.com"), *rest unless subdomain.in?(RESERVED_SUBDOMAINS)
+      in _, ("deviantart.com" | "daportfolio.com" | "artworkfolio.com"), *rest unless subdomain.in?(RESERVED_SUBDOMAINS)
         @username = subdomain
 
       # https://fav.me/dbc3a48
       # https://www.fav.me/dbc3a48
-      in "fav.me", base36_id
+      in _, "fav.me", base36_id
         @work_id = base36_id.delete_prefix("d").to_i(36)
 
       # https://sta.sh/21leo8mz87ue (folder)
@@ -86,11 +97,11 @@ module Source
       # https://sta.sh/0wxs31o7nn2 (single image)
       # Ref: https://www.deviantartsupport.com/en/article/what-is-stash-3391708
       # Ref: https://www.deviantart.com/developers/http/v1/20160316/stash_item/4662dd8b10e336486ea9a0b14da62b74
-      in "sta.sh", stash_id
+      in _, "sta.sh", stash_id
         @stash_id = stash_id
 
       # https://sta.sh/zip/21leo8mz87ue
-      in "sta.sh", "zip", stash_id
+      in _, "sta.sh", "zip", stash_id
         @stash_id = stash_id
 
       else
@@ -121,12 +132,14 @@ module Source
 
       # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/52c4a3ad-d416-42f0-90f6-570983e36797/dczr28f-bd255304-01bf-4765-8cd3-e53983d3f78a.jpg
       # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/76098ac8-04ab-4784-b382-88ca082ba9b1/d9x7lmk-595099de-fe8f-48e5-9841-7254f9b2ab8d.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvNzYwOThhYzgtMDRhYi00Nzg0LWIzODItODhjYTA4MmJhOWIxXC9kOXg3bG1rLTU5NTA5OWRlLWZlOGYtNDhlNS05ODQxLTcyNTRmOWIyYWI4ZC5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.KFOVXAiF8MTlLb3oM-FlD0nnDvODmjqEhFYN5I2X5Bc
-      when /^d([a-z0-9]{6})-\h{8}-\h{4}-\h{4}-\h{4}-\h{12}$/
+      # https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4
+      when /^d([a-z0-9]{6})-\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/
         @file = filename
         @work_id = $1.to_i(36)
 
       # http://www.deviantart.com/download/135944599/Touhou___Suwako_Moriya_Colored_by_Turtle_Chibi.png
       # http://th04.deviantart.net/fs70/300W/f/2009/364/4/d/Alphes_Mimic___Rika_by_Juriesute.png
+      # http://img08.deviantart.net/bcb0/a/fit-in/300x900/filters:no_upscale():origin()/pre05/b9f5/th/pre/f/2009/364/4/d/alphes_mimic___rika_by_juriesute.png
       # http://fc02.deviantart.net/fs48/f/2009/186/2/c/Animation_by_epe_tohri.swf
       # http://fc08.deviantart.net/files/f/2007/120/c/9/Cool_Like_Me_by_47ness.jpg
       when /^(.+)_by_(.+)$/
@@ -134,19 +147,85 @@ module Source
         @title = $1
         @username = $2.dasherize
 
+      # http://pre06.deviantart.net/8497/th/pre/f/2009/173/c/c/cc9686111dcffffffb5fcfaf0cf069fb.jpg
       else
         @file = filename
 
       end
     end
 
-    def image_url?
-      file.present?
+    def parse_jwt(token)
+      return {} if token.blank?
+
+      header, payload = token.split(".").take(2).map { |data| JSON.parse(Base64.decode64(data)) }
+
+      { header: header, payload: payload }.with_indifferent_access
+    rescue JSON::ParserError
+      {}
+    end
+
+    # Returns the path, width, and height permissions parsed from the JWT token:
+    #
+    # { "path": "/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg", "width": "<=786", "height": "<=1017" }
+    # { "path": "/f/e46a48eb-3d0b-449e-90dc-0a1b31cb1361/dd3p1x9-fb47bc8f-653e-42a2-bb4d-afaf9fc2b781.jpg" }
+    def jwt_permissions
+      # https://api-da.wixmp.com/_api/download/file?downloadToken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTU5MDkwMTUzMywiaWF0IjoxNTkwOTAwOTIzLCJqdGkiOiI1ZWQzMzhjNWQ5YjI0Iiwib2JqIjpudWxsLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdLCJwYXlsb2FkIjp7InBhdGgiOiJcL2ZcL2U0NmE0OGViLTNkMGItNDQ5ZS05MGRjLTBhMWIzMWNiMTM2MVwvZGQzcDF4OS1mYjQ3YmM4Zi02NTNlLTQyYTItYmI0ZC1hZmFmOWZjMmI3ODEuanBnIn19.-zo8E2eDmkmDNCK-sMabBajkaGtVYJ2Q20iVrUtt05Q
+      # => https://jwt.io/#debugger-io?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTU5MDkwMTUzMywiaWF0IjoxNTkwOTAwOTIzLCJqdGkiOiI1ZWQzMzhjNWQ5YjI0Iiwib2JqIjpudWxsLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdLCJwYXlsb2FkIjp7InBhdGgiOiJcL2ZcL2U0NmE0OGViLTNkMGItNDQ5ZS05MGRjLTBhMWIzMWNiMTM2MVwvZGQzcDF4OS1mYjQ3YmM4Zi02NTNlLTQyYTItYmI0ZC1hZmFmOWZjMmI3ODEuanBnIn19.-zo8E2eDmkmDNCK-sMabBajkaGtVYJ2Q20iVrUtt05Q
+      # => { ..., "payload": { "path": "/f/e46a48eb-3d0b-449e-90dc-0a1b31cb1361/dd3p1x9-fb47bc8f-653e-42a2-bb4d-afaf9fc2b781.jpg" }}
+      #
+      # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_75,strp/cc9686111dcffffffb5fcfaf0cf069fb.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl0sIm9iaiI6W1t7InBhdGgiOiIvZi84YjQ3MmQ3MC1hMGQ2LTQxYjUtOWE2Ni1jMzU2ODcwOTBhY2MvZDIzamJyNC04YTA2YWYwMi03MGNiLTQ2ZGEtOGE5Ni00MmE2YmE3M2NkYjQuanBnIiwid2lkdGgiOiI8PTc4NiIsImhlaWdodCI6Ijw9MTAxNyJ9XV19.EXlDqS_4kMSDO26RTsuqE-H_XI0xSiO3dnAQRV6puqw
+      # => https://jwt.io/#debugger-io?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl0sIm9iaiI6W1t7InBhdGgiOiIvZi84YjQ3MmQ3MC1hMGQ2LTQxYjUtOWE2Ni1jMzU2ODcwOTBhY2MvZDIzamJyNC04YTA2YWYwMi03MGNiLTQ2ZGEtOGE5Ni00MmE2YmE3M2NkYjQuanBnIiwid2lkdGgiOiI8PTc4NiIsImhlaWdodCI6Ijw9MTAxNyJ9XV19.EXlDqS_4kMSDO26RTsuqE-H_XI0xSiO3dnAQRV6puqw
+      # => { ..., "obj": [[{ "path": "/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg", "width": "<=786", "height": "<=1017" }]] }
+
+      jwt.dig(:payload, :payload) || jwt.dig(:payload, :obj)&.flatten&.sole || {}
+    end
+
+    def jwt_path
+      jwt_permissions[:path]
+    end
+
+    def max_width
+      jwt_permissions[:width]&.delete_prefix("<=")&.to_i
+    end
+
+    def max_height
+      jwt_permissions[:height]&.delete_prefix("<=")&.to_i
+    end
+
+    # Parse the deviation ID from the path in the JWT token.
+    def work_id_from_token
+      Source::URL.parse("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com#{jwt_path}").work_id if jwt_path
+    end
+
+    # Convert sample wixmp.com URLs to the best available version. Return nil for non-wixmp.com URLs.
+    #
+    # wixmp.com URLs that contain /v1/ are sample URLs. Some older images can be converted to larger /intermediary/
+    # sample URLs. Otherwise the maximum image size is determined by the width/height restrictions in the JWT token.
+    def full_image_url
+      return nil unless image_url? && domain == "wixmp.com"
+
+      if path.include?("/v1/") && work_id && work_id <= 790_677_560 && file_ext != "gif"
+        # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/d8995973-0b32-4a7d-8cd8-d847d083689a/d797tit-1eac22e0-38b6-4eae-adcb-1b72843fd62a.png/v1/fill/w_720,h_1110,q_75,strp/goruto_by_xyelkiltrox-d797tit.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl0sIm9iaiI6W1t7InBhdGgiOiIvZi9kODk5NTk3My0wYjMyLTRhN2QtOGNkOC1kODQ3ZDA4MzY4OWEvZDc5N3RpdC0xZWFjMjJlMC0zOGI2LTRlYWUtYWRjYi0xYjcyODQzZmQ2MmEucG5nIiwid2lkdGgiOiI8PTcyMCIsImhlaWdodCI6Ijw9MTExMCJ9XV19.vSlSlntfQQ9qwJBv8mldhKRtllVAhUESfQfo6P0lHsU
+        # => https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/d8995973-0b32-4a7d-8cd8-d847d083689a/d797tit-1eac22e0-38b6-4eae-adcb-1b72843fd62a.png
+        "https://#{host}/intermediary#{path}".gsub(%r{/v1/.*}, "")
+      elsif path.include?("/v1/") && max_width.present? && max_height.present?
+        # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/fe7ab27f-7530-4252-99ef-2baaf81b36fd/dddf6pe-1a4a091c-768c-4395-9465-5d33899be1eb.png/v1/fill/w_800,h_1130,q_80,strp/stay_hydrated_and_in_the_shade_by_raikoart_dddf6pe-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTEzMCIsInBhdGgiOiJcL2ZcL2ZlN2FiMjdmLTc1MzAtNDI1Mi05OWVmLTJiYWFmODFiMzZmZFwvZGRkZjZwZS0xYTRhMDkxYy03NjhjLTQzOTUtOTQ2NS01ZDMzODk5YmUxZWIucG5nIiwid2lkdGgiOiI8PTgwMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.J0W4k-iV6Mg8Kt_5Lr_L_JbBq4lyr7aCausWWJ_Fsbw
+        # => https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/fe7ab27f-7530-4252-99ef-2baaf81b36fd/dddf6pe-1a4a091c-768c-4395-9465-5d33899be1eb.png/v1/fill/w_800,h_1130/stay_hydrated_and_in_the_shade_by_raikoart_dddf6pe-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTEzMCIsInBhdGgiOiJcL2ZcL2ZlN2FiMjdmLTc1MzAtNDI1Mi05OWVmLTJiYWFmODFiMzZmZFwvZGRkZjZwZS0xYTRhMDkxYy03NjhjLTQzOTUtOTQ2NS01ZDMzODk5YmUxZWIucG5nIiwid2lkdGgiOiI8PTgwMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.J0W4k-iV6Mg8Kt_5Lr_L_JbBq4lyr7aCausWWJ_Fsbw
+        to_s.gsub(%r{/v1/[^/]+/[^/]+/}, "/v1/fill/w_#{max_width},h_#{max_height}/")
+      elsif path.include?("/v1/")
+        to_s.gsub(%r{,q_\d+,strp/}, "/")
+      else
+        to_s
+      end
+    end
+
+    def stash_url
+      "https://sta.sh/#{stash_id}" if stash_id.present?
     end
 
     def page_url
-      if stash_id.present?
-        "https://sta.sh/#{stash_id}"
+      if stash_url.present?
+        stash_url
       elsif username.present? && pretty_title.present? && work_id.present?
         "https://www.deviantart.com/#{username}/art/#{pretty_title}-#{work_id}"
       elsif work_id.present?
@@ -154,6 +233,24 @@ module Source
       else
         nil
       end
+    end
+
+    # Most old image URLs redirect to new wixmp.com URLs. We can follow this redirect to find the page URL for old image
+    # URLs that don't contain an ID.
+    def page_url_from_redirect(http)
+      if page_url.present?
+        page_url
+
+      # http://fc08.deviantart.net/files/f/2007/120/c/9/Cool_Like_Me_by_47ness.jpg
+      # => https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ece2238f-5c8f-48e4-afda-304cab294acd/dwcohb-8189be91-691d-4212-b3a0-0b77e86a57d1.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTpmaWxlLmRvd25sb2FkIl0sIm9iaiI6W1t7InBhdGgiOiIvZi9lY2UyMjM4Zi01YzhmLTQ4ZTQtYWZkYS0zMDRjYWIyOTRhY2QvZHdjb2hiLTgxODliZTkxLTY5MWQtNDIxMi1iM2EwLTBiNzdlODZhNTdkMS5qcGcifV1dfQ.eplvPT8qU7_a_dqiIfg_0S0540ihF-05iUQc5sn1bVM
+      elsif image_url? && work_id.nil?
+        url = http.cache(1.minute).redirect_url(self)
+        Source::URL::DeviantArt.parse(url)&.page_url
+      end
+    end
+
+    def image_url?
+      file.present?
     end
 
     def profile_url
