@@ -31,6 +31,7 @@ module ArtistFinder
     "booru.org",
     "booru.org/drawfriends", # http://img.booru.org/drawfriends//images/36/de65da5f588b76bc1d9de8af976b540e2dff17e2.jpg
     "civitai.com/user",
+    "ci-en.net", # https://ci-en.net/creator/11019/
     "comiczin.jp", # https://shop.comiczin.jp/products/list.php?category_id=3394
     "curiouscat.me", # https://curiouscat.me/azurane
     "crepu.net", # https://crepu.net/user/Mizunouchilucia

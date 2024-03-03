@@ -70,6 +70,7 @@ module Source
       Source::Extractor::Gumroad,
       Source::Extractor::Civitai,
       Source::Extractor::Misskey,
+      Source::Extractor::CiEn,
     ]
 
     # Should return true if the extractor is configured correctly. Return false

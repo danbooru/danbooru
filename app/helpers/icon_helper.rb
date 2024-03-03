@@ -40,6 +40,7 @@ module IconHelper
     Cafe24
     Carrd
     Catbox
+    Ci-En
     Circle.ms
     Civitai
     Class101

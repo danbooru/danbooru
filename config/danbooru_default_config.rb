@@ -483,6 +483,11 @@ module Danbooru
     def twitter_csrf_token
     end
 
+    # Your Ci-En "ci_en_session" cookie. Login to Ci-En then use the
+    # devtools to find the "ci_en_session" cookie.
+    def ci_en_session_cookie
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
