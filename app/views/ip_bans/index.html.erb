@@ -14,7 +14,8 @@
 
     <%= table_for @ip_bans, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "IP Address" do |ip_ban| %>
-        <%= link_to ip_ban.ip_addr, ip_address_path(ip_ban.ip_addr.to_s) %>
+        <%= link_to ip_ban.ip_addr, user_events_path(search: { ip_addr: ip_ban.ip_addr.to_s }) %>
+        <%= link_to search_icon, ip_address_path(ip_ban.ip_addr.to_s) %>
       <% end %>
       <% t.column "Reason", td: { class: "col-expand" } do |ban| %>
         <div class="prose">
