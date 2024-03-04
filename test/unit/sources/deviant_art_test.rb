@@ -2,8 +2,7 @@ require "test_helper"
 
 module Sources
   class DeviantArtTest < ActiveSupport::TestCase
-    def setup
-      super
+    setup do
       skip "DeviantArt API keys not set" unless Danbooru.config.deviantart_client_id.present?
     end
 
@@ -325,6 +324,66 @@ module Sources
       )
     end
 
+    context "A deviantart page for a Flash file" do
+      strategy_should_work(
+        "https://www.deviantart.com/midorynn/art/NieR-Automata-Anime-703917761",
+        image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e1d5122b-6fee-44df-8b8f-e6e8daa3396d/dbn3ef5-9e051a71-251d-4e0f-b5f1-3beb5e6a8667.swf\?token=}],
+        media_files: [{ size: 4_243_457, width: 700, height: 300 }],
+        artist_name: "midorynn",
+        profile_url: "https://www.deviantart.com/midorynn",
+        tags: %w[animation fanart nier_automata nierautomata nier_automata_2b],
+        artist_commentary_title: "NieR: Automata Anime"
+      )
+    end
+
+    context "For Sta.sh:" do
+      context "A https://sta.sh/:id url" do
+        strategy_should_work(
+          "https://sta.sh/0wxs31o7nn2",
+          image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dcmga0s-a345a815-2436-4ab5-8941-492011e1bff6.png}],
+          media_files: [{ size: 106_741, width: 750, height: 730 }],
+          page_url: "https://sta.sh/0wxs31o7nn2",
+          artist_name: "noizave",
+          profile_url: "https://www.deviantart.com/noizave",
+          tags: [],
+          artist_commentary_title: "A pepe",
+          artist_commentary_desc: "This is a test."
+        )
+      end
+
+      context "A https://orig00.deviantart.net/* image url with a https://sta.sh/:id referer" do
+        strategy_should_work(
+          "https://orig00.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png",
+          image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dcmga0s-a345a815-2436-4ab5-8941-492011e1bff6.png}],
+          media_files: [{ size: 106_741, width: 750, height: 730 }],
+          referer: "https://sta.sh/0wxs31o7nn2",
+          page_url: "https://sta.sh/0wxs31o7nn2",
+          artist_name: "noizave",
+          profile_url: "https://www.deviantart.com/noizave",
+          tags: [],
+          artist_commentary_title: "A pepe",
+          artist_commentary_desc: "This is a test."
+        )
+      end
+
+      context "A https://orig00.deviantart.net/* image url without the referer" do
+        strategy_should_work(
+          "https://orig00.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png",
+          image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dcmga0s-a345a815-2436-4ab5-8941-492011e1bff6.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTpmaWxlLmRvd25sb2FkIl0sIm9iaiI6W1t7InBhdGgiOiIvZi84M2QzZWI0ZC0xM2U1LTRhZWEtYTA4Zi04ZDQzMzFkMDMzYzQvZGNtZ2Ewcy1hMzQ1YTgxNS0yNDM2LTRhYjUtODk0MS00OTIwMTFlMWJmZjYucG5nIn1dXX0.b29qVmG1on0SIwS0KhZjYM_LowH0A1NvO9cyvHde-mw"],
+          media_files: [{ size: 106_741, width: 750, height: 730 }],
+          # if all we have is the image url, then we can't tell that this is really a sta.sh image.
+          site_name: "Deviant Art",
+          # this is the wrong page, but there's no way to know the correct sta.sh page without the referer.
+          page_url: "https://www.deviantart.com/noizave/art/A-Pepe-763305148",
+          artist_name: "noizave",
+          profile_url: "https://www.deviantart.com/noizave",
+          tags: [],
+          artist_commentary_title: nil,
+          artist_commentary_desc: nil
+        )
+      end
+    end
+
     should "Parse DeviantArt URLs correctly" do
       source1 = "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg"
       source2 = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg"
@@ -332,6 +391,7 @@ module Sources
       source4 = "http://fc00.deviantart.net/fs71/f/2013/337/3/5/35081351f62b432f84eaeddeb4693caf-d6wlrqs.jpg"
       source5 = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/76098ac8-04ab-4784-b382-88ca082ba9b1/d9x7lmk-595099de-fe8f-48e5-9841-7254f9b2ab8d.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvNzYwOThhYzgtMDRhYi00Nzg0LWIzODItODhjYTA4MmJhOWIxXC9kOXg3bG1rLTU5NTA5OWRlLWZlOGYtNDhlNS05ODQxLTcyNTRmOWIyYWI4ZC5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.KFOVXAiF8MTlLb3oM-FlD0nnDvODmjqEhFYN5I2X5Bc"
       source6 = "https://fav.me/dbc3a48"
+      source7 = "https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e1d5122b-6fee-44df-8b8f-e6e8daa3396d/dbn3ef5-9e051a71-251d-4e0f-b5f1-3beb5e6a8667.swf?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTcwOTQ2NTcwNywiaWF0IjoxNzA5NDY1MDk3LCJqdGkiOiI2NWU0NWUxMzAxNTk2Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvZTFkNTEyMmItNmZlZS00NGRmLThiOGYtZTZlOGRhYTMzOTZkXC9kYm4zZWY1LTllMDUxYTcxLTI1MWQtNGUwZi1iNWYxLTNiZWI1ZTZhODY2Ny5zd2YifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.6ZShJVsXxVs73R2Akw_9t-BMJKjqPUbNKHkIbzMsqeU"
 
       assert(Source::URL.image_url?(source1))
       assert(Source::URL.image_url?(source2))
@@ -339,6 +399,7 @@ module Sources
       assert(Source::URL.image_url?(source4))
       assert(Source::URL.image_url?(source5))
       assert(Source::URL.page_url?(source6))
+      assert(Source::URL.image_url?(source7))
 
       assert_equal("https://www.deviantart.com/mar11co/art/You-Are-Already-Dead-408921710", Source::URL.page_url(source1))
       assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", Source::URL.page_url(source2))
@@ -346,6 +407,7 @@ module Sources
       assert_equal("https://www.deviantart.com/deviation/417560500", Source::URL.page_url(source4))
       assert_equal("https://www.deviantart.com/deviation/599977532", Source::URL.page_url(source5))
       assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source6))
+      assert_equal("https://www.deviantart.com/deviation/703917761", Source::URL.page_url(source7))
 
       assert_equal("https://www.deviantart.com/noizave", Source::URL.profile_url("https://noizave.daportfolio.com"))
       assert_equal("https://www.deviantart.com/noizave", Source::URL.profile_url("https://noizave.artworkfolio.com"))
