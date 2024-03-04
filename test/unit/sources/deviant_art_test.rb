@@ -298,6 +298,31 @@ module Sources
       )
     end
 
+    context "A subscribers-only DeviantArt image" do
+      strategy_should_work(
+        "https://www.deviantart.com/theneohub/art/Kim-Possible-Subscribers-only-984892832",
+        image_urls: [],
+        media_files: [],
+        artist_name: "TheNeoHub",
+        profile_url: "https://www.deviantart.com/theneohub",
+        artist_commentary_title: "Kim Possible (Subscribers only)",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          I would love to hear what you think so please leave a comment! \u00a0"Heart":[https://e.deviantart.net/emoticons/h/heart.gif]
+        EOS
+      )
+    end
+
+    context "A watchers-only DeviantArt image" do
+      strategy_should_work(
+        "https://www.deviantart.com/theraceai/art/Realistic-Girl-14-1027403734",
+        image_urls: [],
+        media_files: [],
+        artist_name: "TheraceAI",
+        artist_commentary_title: "Realistic Girl - 14",
+        artist_commentary_desc: ""
+      )
+    end
+
     context "A source with malformed links in the artist commentary" do
       strategy_should_work(
         "https://www.deviantart.com/dishwasher1910/art/Solar-Sisters-792488305",

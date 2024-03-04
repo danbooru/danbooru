@@ -37,7 +37,9 @@ module Source
       def sample_image_url
         base_url = deviation.dig("media", "baseUri")
 
-        if base_url.present? && sample_token.present?
+        if subscribers_only? || premium_only?
+          nil
+        elsif base_url.present? && sample_token.present?
           # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/654817c0-5ba7-4591-9fd7-badae289cf88/d2wq7wl-b7f18546-753e-4d53-8051-ddb1879776c2.jpg/v1/fit/w_700,h_543,q_70,strp/pkmn_king_and_queen_by_mikotoazure_d2wq7wl-375w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTQzIiwicGF0aCI6IlwvZlwvNjU0ODE3YzAtNWJhNy00NTkxLTlmZDctYmFkYWUyODljZjg4XC9kMndxN3dsLWI3ZjE4NTQ2LTc1M2UtNGQ1My04MDUxLWRkYjE4Nzk3NzZjMi5qcGciLCJ3aWR0aCI6Ijw9NzAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.5YNpOk20V15EU44A7t_q_rQ_azwfLbsC32-hYgho39E
           # => https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/654817c0-5ba7-4591-9fd7-badae289cf88/d2wq7wl-b7f18546-753e-4d53-8051-ddb1879776c2.jpg/v1/fill/w_700,h_543/pkmn_king_and_queen_by_mikotoazure_d2wq7wl.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTQzIiwicGF0aCI6IlwvZlwvNjU0ODE3YzAtNWJhNy00NTkxLTlmZDctYmFkYWUyODljZjg4XC9kMndxN3dsLWI3ZjE4NTQ2LTc1M2UtNGQ1My04MDUxLWRkYjE4Nzk3NzZjMi5qcGciLCJ3aWR0aCI6Ijw9NzAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.5YNpOk20V15EU44A7t_q_rQ_azwfLbsC32-hYgho39E
           pretty_name = deviation.dig("media", "prettyName")
@@ -84,6 +86,20 @@ module Source
       # A token that can be used to download the full image. Not always present.
       def download_token
         deviation.dig("media", "token").to_a.second
+      end
+
+      # If true, then this a subscribers-only post (a paid reward).
+      # https://www.deviantart.com/team/journal/Subscriptions-Beta-Make-Money-Connect-with-Fans-890005897
+      def subscribers_only?
+        tier_access = deviation.present? ? deviation["tierAccess"] : api_deviation["tier_access"]
+        tier_access == "locked"
+      end
+
+      # If true, then this is either a premium gallery (a paid reward) or a watchers-only post.
+      # https://www.deviantart.com/team/journal/Create-Exclusive-Content-with-Premium-Galleries-847238532
+      def premium_only?
+        has_access = deviation.present? ? deviation.dig("premiumFolderData", "hasAccess") : api_deviation.dig("premium_folder_data", "has_access")
+        has_access == false
       end
 
       def page_url
