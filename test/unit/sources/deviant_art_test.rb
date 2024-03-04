@@ -361,6 +361,13 @@ module Sources
       )
     end
 
+    context "An AI-generated DeviantArt post" do
+      strategy_should_work(
+        "https://www.deviantart.com/izzyrozenberg/art/Makima-looks-back-1-1027063213",
+        tags: %w[anime animegirl cartoon cuteanimegirl drama fanart manga nude oilpainting redhead makimachainsawman makima_chainsaw_man eyesbeautiful makima ai-generated]
+      )
+    end
+
     context "For Sta.sh:" do
       context "A https://sta.sh/:id url" do
         strategy_should_work(

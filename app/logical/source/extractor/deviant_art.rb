@@ -137,14 +137,17 @@ module Source
 
       def tags
         if deviation_extended.present?
-          deviation_extended["tags"].to_a.map do |tag|
+          tags = deviation_extended["tags"].to_a.map do |tag|
             [tag["name"], tag["url"]]
           end
         else # for sta.sh posts
-          api_metadata["tags"].to_a.map do |tag|
+          tags = api_metadata["tags"].to_a.map do |tag|
             [tag["tag_name"], "https://www.deviantart.com/tag/#{Danbooru::URL.escape(tag["tag_name"])}"]
           end
         end
+
+        tags << ["ai-generated", "https://www.deviantart.com/tag/ai"] if deviation["isAiGenerated"]
+        tags
       end
 
       def dtext_artist_commentary_desc
