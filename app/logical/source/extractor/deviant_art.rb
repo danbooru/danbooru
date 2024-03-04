@@ -45,6 +45,9 @@ module Source
           url = "#{base_url}#{v1_path}?token=#{sample_token}"
 
           Source::URL::DeviantArt.parse(url)&.full_image_url
+        elsif api_deviation.dig("content", "src").present? # for sta.sh posts
+          url = api_deviation.dig("content", "src")
+          Source::URL::DeviantArt.parse(url)&.full_image_url
         end
       end
 
@@ -60,6 +63,8 @@ module Source
           # url = deviation_extended.dig("download", "url")      # => https://www.deviantart.com/download/1009941765/dgpak1x-43de07ea-842f-4feb-96eb-5fddb8f96c58.png?token=af97e8685c538f7845bd38a0a2e66f7099c4a35b&ts=1709417243
           # http.cache(1.minute).redirect_url(url).to_s.presence # => https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/618b1383-fa36-43cf-a5ef-dbcc45695591/dgpak1x-43de07ea-842f-4feb-96eb-5fddb8f96c58.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTcwOTQxNzI2NywiaWF0IjoxNzA5NDE2NjU3LCJqdGkiOiI2NWUzYTBkYjBmM2JmIiwib2JqIjpbW3sicGF0aCI6IlwvZlwvNjE4YjEzODMtZmEzNi00M2NmLWE1ZWYtZGJjYzQ1Njk1NTkxXC9kZ3BhazF4LTQzZGUwN2VhLTg0MmYtNGZlYi05NmViLTVmZGRiOGY5NmM1OC5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.yO47UCbiKrSi20vueE0JAXg7ZSBvOGm2wzI5Nz3l9S0&filename=emomei_by_sayohyou_dgpak1x.png
 
+          api_download["src"]
+        elsif deviation.blank? && api_deviation["is_downloadable"] # for sta.sh posts
           api_download["src"]
         elsif videos.present?
           video = videos.max_by { |video| video["f"] } # max filesize
@@ -103,20 +108,26 @@ module Source
       end
 
       def artist_name
-        user["username"].presence || parsed_url.username || parsed_referer&.username
+        user["username"].presence || api_metadata.dig("author", "username") || parsed_url.username || parsed_referer&.username
       end
 
       def artist_commentary_title
-        deviation["title"]
+        deviation["title"] || api_metadata["title"]
       end
 
       def artist_commentary_desc
-        deviation_extended.dig("descriptionText", "html", "markup")
+        deviation_extended.dig("descriptionText", "html", "markup") || api_metadata["description"]
       end
 
       def tags
-        deviation_extended["tags"].to_a.map do |tag|
-          [tag["name"], tag["url"]]
+        if deviation_extended.present?
+          deviation_extended["tags"].to_a.map do |tag|
+            [tag["name"], tag["url"]]
+          end
+        else # for sta.sh posts
+          api_metadata["tags"].to_a.map do |tag|
+            [tag["tag_name"], "https://www.deviantart.com/tag/#{Danbooru::URL.escape(tag["tag_name"])}"]
+          end
         end
       end
 
@@ -159,7 +170,11 @@ module Source
       end
 
       memoize def uuid
-        deviation_extended["deviationUuid"]
+        if deviation_extended.present?
+          deviation_extended["deviationUuid"]
+        else # for sta.sh posts
+          page&.at('meta[property="da:appurl"]')&.attr("content")&.delete_prefix("DeviantArt://deviation/")
+        end
       end
 
       memoize def user
@@ -175,11 +190,12 @@ module Source
       end
 
       memoize def page_json
-        return {} if page.nil?
+        return {} if page.nil? || stash_page
 
         script = page&.css("body script").to_a.map(&:text).grep(/window.__INITIAL_STATE__/).first.to_s
         json = script[/window.__INITIAL_STATE__ = JSON.parse\("(.*)"\);/, 1]
-        unescaped_json = json.gsub('\\"', '"').gsub("\\\\", "\\")
+        unescaped_json = json.to_s.gsub('\\"', '"').gsub("\\\\", "\\")
+        return {} if unescaped_json.blank?
 
         JSON.parse(unescaped_json).with_indifferent_access
       rescue JSON::ParserError
