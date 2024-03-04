@@ -424,6 +424,10 @@ module Sources
       source5 = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/76098ac8-04ab-4784-b382-88ca082ba9b1/d9x7lmk-595099de-fe8f-48e5-9841-7254f9b2ab8d.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvNzYwOThhYzgtMDRhYi00Nzg0LWIzODItODhjYTA4MmJhOWIxXC9kOXg3bG1rLTU5NTA5OWRlLWZlOGYtNDhlNS05ODQxLTcyNTRmOWIyYWI4ZC5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.KFOVXAiF8MTlLb3oM-FlD0nnDvODmjqEhFYN5I2X5Bc"
       source6 = "https://fav.me/dbc3a48"
       source7 = "https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e1d5122b-6fee-44df-8b8f-e6e8daa3396d/dbn3ef5-9e051a71-251d-4e0f-b5f1-3beb5e6a8667.swf?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTcwOTQ2NTcwNywiaWF0IjoxNzA5NDY1MDk3LCJqdGkiOiI2NWU0NWUxMzAxNTk2Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvZTFkNTEyMmItNmZlZS00NGRmLThiOGYtZTZlOGRhYTMzOTZkXC9kYm4zZWY1LTllMDUxYTcxLTI1MWQtNGUwZi1iNWYxLTNiZWI1ZTZhODY2Ny5zd2YifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.6ZShJVsXxVs73R2Akw_9t-BMJKjqPUbNKHkIbzMsqeU"
+      source8 = "https://www.deviantart.com/view/685436408"
+      source9 = "https://www.deviantart.com/view.php?id=685436408"
+      source10 = "https://www.deviantart.com/view-full.php?id=685436408"
+      source11 = "https://www.deviantart.com/noizave/art/685436408"
 
       assert(Source::URL.image_url?(source1))
       assert(Source::URL.image_url?(source2))
@@ -432,6 +436,10 @@ module Sources
       assert(Source::URL.image_url?(source5))
       assert(Source::URL.page_url?(source6))
       assert(Source::URL.image_url?(source7))
+      assert(Source::URL.page_url?(source8))
+      assert(Source::URL.page_url?(source9))
+      assert(Source::URL.page_url?(source10))
+      assert(Source::URL.page_url?(source11))
 
       assert_equal("https://www.deviantart.com/mar11co/art/You-Are-Already-Dead-408921710", Source::URL.page_url(source1))
       assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", Source::URL.page_url(source2))
@@ -440,6 +448,10 @@ module Sources
       assert_equal("https://www.deviantart.com/deviation/599977532", Source::URL.page_url(source5))
       assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source6))
       assert_equal("https://www.deviantart.com/deviation/703917761", Source::URL.page_url(source7))
+      assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source8))
+      assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source9))
+      assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source10))
+      assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source11))
 
       assert_equal("https://www.deviantart.com/noizave", Source::URL.profile_url("https://noizave.daportfolio.com"))
       assert_equal("https://www.deviantart.com/noizave", Source::URL.profile_url("https://noizave.artworkfolio.com"))

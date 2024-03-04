@@ -60,20 +60,27 @@ module Source
         @work_id = work_id.to_i
 
       # https://www.deviantart.com/deviation/685436408
-      in _, "deviantart.com", "deviation", work_id
+      # https://www.deviantart.com/view/685436408
+      in _, "deviantart.com", ("deviation" | "view"), work_id
         @work_id = work_id.to_i
 
       # https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408
-      in _, "deviantart.com", username, "art", /^([a-zA-Z0-9-]+)-(\d+)$/ => title
+      # https://www.deviantart.com/noizave/art/685436408
+      in _, "deviantart.com", username, "art", /^(?:([a-z0-9_-]+)-)?(\d+)$/i
         @username = username
         @title = $1
         @work_id = $2.to_i
 
       # https://noizave.deviantart.com/art/test-post-please-ignore-685436408
-      in _, "deviantart.com", "art", /^([a-z0-9_-]+)-(\d+)$/i => title unless subdomain.in?(RESERVED_SUBDOMAINS)
+      in _, "deviantart.com", "art", /^([a-z0-9_-]+)-(\d+)$/i unless subdomain.in?(RESERVED_SUBDOMAINS)
         @username = subdomain
         @title = $1
         @work_id = $2.to_i
+
+      # https://www.deviantart.com/view.php?id=14864502
+      # https://www.deviantart.com/view-full.php?id=14864502
+      in _, "deviantart.com", ("view.php" | "view-full.php") if params[:id]&.match?(/\A\d+\z/)
+        @work_id = params[:id].to_i
 
       # https://www.deviantart.com/noizave
       # https://deviantart.com/noizave
@@ -89,8 +96,8 @@ module Source
 
       # https://fav.me/dbc3a48
       # https://www.fav.me/dbc3a48
-      in _, "fav.me", base36_id
-        @work_id = base36_id.delete_prefix("d").to_i(36)
+      in _, "fav.me", /\Ad([a-z0-9]+)/i
+        @work_id = $1.to_i(36)
 
       # https://sta.sh/21leo8mz87ue (folder)
       # https://sta.sh/2uk0v5wabdt (subfolder)
