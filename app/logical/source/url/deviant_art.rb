@@ -84,6 +84,10 @@ module Source
       in _, "deviantart.com", ("view.php" | "view-full.php") if params[:id]&.match?(/\A\d+\z/)
         @work_id = params[:id].to_i
 
+      # https://www.deviantart.com/stash/0wxs31o7nn2
+      in _, "deviantart.com", "stash", stash_id
+        @stash_id = stash_id
+
       # https://www.deviantart.com/noizave
       # https://deviantart.com/noizave
       # https://www.deviantart.com/nlpsllp/gallery

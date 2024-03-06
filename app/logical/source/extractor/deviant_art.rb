@@ -211,7 +211,7 @@ module Source
       end
 
       memoize def page_json
-        return {} if page.nil? || stash_page
+        return {} if page.nil?
 
         script = page&.css("body script").to_a.map(&:text).grep(/window.__INITIAL_STATE__/).first.to_s
         json = script[/window.__INITIAL_STATE__ = JSON.parse\("(.*)"\);/, 1]
