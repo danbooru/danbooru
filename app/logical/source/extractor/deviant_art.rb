@@ -59,7 +59,9 @@ module Source
         # because it doesn't require an extra API call and it never expires.
         if download_token.present? && deviation.dig("media", "baseUri").present?
           base_url = deviation.dig("media", "baseUri")
-          "#{base_url}?token=#{download_token}"
+          pretty_name = deviation.dig("media", "prettyName")
+          file_ext = base_url.split(".").last
+          "#{base_url}?token=#{download_token}&filename=#{pretty_name}.#{file_ext}"
         elsif deviation_extended.dig("download", "url").present?
           # # XXX The download url can also be obtained this way, but it requires a login and an auth cookie.
           # url = deviation_extended.dig("download", "url")      # => https://www.deviantart.com/download/1009941765/dgpak1x-43de07ea-842f-4feb-96eb-5fddb8f96c58.png?token=af97e8685c538f7845bd38a0a2e66f7099c4a35b&ts=1709417243
