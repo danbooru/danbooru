@@ -40,8 +40,10 @@ module Source
       # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_75,strp/cc9686111dcffffffb5fcfaf0cf069fb.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl0sIm9iaiI6W1t7InBhdGgiOiIvZi84YjQ3MmQ3MC1hMGQ2LTQxYjUtOWE2Ni1jMzU2ODcwOTBhY2MvZDIzamJyNC04YTA2YWYwMi03MGNiLTQ2ZGEtOGE5Ni00MmE2YmE3M2NkYjQuanBnIiwid2lkdGgiOiI8PTc4NiIsImhlaWdodCI6Ijw9MTAxNyJ9XV19.EXlDqS_4kMSDO26RTsuqE-H_XI0xSiO3dnAQRV6puqw"
       # https://img-deviantart.wixmp.com/f/618b1383-fa36-43cf-a5ef-dbcc45695591/dgpak1x-43de07ea-842f-4feb-96eb-5fddb8f96c58.png/v1/fill/w_1280,h_1811/emomei_by_sayohyou_dgpak1x-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTgxMSIsInBhdGgiOiJcL2ZcLzYxOGIxMzgzLWZhMzYtNDNjZi1hNWVmLWRiY2M0NTY5NTU5MVwvZGdwYWsxeC00M2RlMDdlYS04NDJmLTRmZWItOTZlYi01ZmRkYjhmOTZjNTgucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.Vh93ks4buG6phMwmIWQMqw4CYPslAwJYSrlzFVW3o3E
       # https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4
+      # https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/b1f96af6-56a3-47a8-b7f4-406f243af3a3/daihpha-9f1fcd2e-7557-4db5-951b-9aedca9a3ae7.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTcwOTc0NzEzMCwiaWF0IjoxNzA5NzQ2NTIwLCJqdGkiOiI2NWU4YTk2MmVkNWQ1Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvYjFmOTZhZjYtNTZhMy00N2E4LWI3ZjQtNDA2ZjI0M2FmM2EzXC9kYWlocGhhLTlmMWZjZDJlLTc1NTctNGRiNS05NTFiLTlhZWRjYTlhM2FlNy5qcGcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.2L3RJYuC0hZA6qpNQ9k99Ns4EYqs67jZ8nrk19uKM_g&filename=legend_of_galactic_heroes_by_hideyoshi_daihpha.jpg
       in _, "wixmp.com", *rest
-        parse_filename
+        fname = params[:filename]&.split(".")&.first.presence || self.filename
+        parse_filename(fname)
         @jwt = parse_jwt(params[:token])
         @work_id ||= work_id_from_token
 
@@ -51,12 +53,12 @@ module Source
       # http://fc00.deviantart.net/fs71/f/2013/234/d/8/d84e05f26f0695b1153e9dab3a962f16-d6j8jl9.jpg
       # http://th04.deviantart.net/fs71/PRE/f/2013/337/3/5/35081351f62b432f84eaeddeb4693caf-d6wlrqs.jpg
       in _, "deviantart.net", *rest
-        parse_filename
+        parse_filename(filename)
 
       # http://www.deviantart.com/download/135944599/Touhou___Suwako_Moriya_Colored_by_Turtle_Chibi.png
       # https://www.deviantart.com/download/549677536/countdown_to_midnight_by_kawacy-d939hwg.jpg?token=92090cd3910d52089b566661e8c2f749755ed5f8&ts=1438535525
-      in _, "deviantart.com", "download", work_id, file
-        parse_filename
+      in _, "deviantart.com", "download", work_id, _
+        parse_filename(filename)
         @work_id = work_id.to_i
 
       # https://www.deviantart.com/deviation/685436408
@@ -116,7 +118,7 @@ module Source
       end
     end
 
-    def parse_filename
+    def parse_filename(filename)
       case filename
 
       # http://orig12.deviantart.net/9b69/f/2017/023/7/c/illustration___tokyo_encount_oei__by_melisaongmiqin-dawi58s.png
