@@ -55,8 +55,7 @@ x-base-template: &base-template
     DANBOORU_IMAGE_STORAGE_PATH: /images
     SHAKAPACKER_DEV_SERVER_HOST: webpack
 
-    # This is true if we're running inside Github Codespaces.
-    CODESPACES: ${CODESPACES:-false}
+    DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-true}
 
   tmpfs:
     - "/danbooru/tmp:uid=1000,gid=1000"
@@ -146,10 +145,10 @@ services:
       # The external port to listen on. You can set this to 80 if you have nothing else listening on port 80.
       DANBOORU_PORT: "${DANBOORU_PORT:-3000}"
 
-      # If your instance is running behind a reverse proxy (such as Cloudflare, Ngrok, etc), then set this to true.
-      #
-      # If you get a `HTTP Origin header didn't match request.base_url` error when creating a new account, then set this to true.
-      DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-${CODESPACES:-false}}
+      # If true (the default), assume we may be running behind a reverse proxy (such as Cloudflare, Ngrok, etc), and
+      # trust the X-Forwarded-* headers sent by the client. This assumes untrusted users won't have access to your
+      # dev instance, because they could spoof these headers to spoof their IP or the server hostname.
+      DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-true}
     ports:
       - "${DANBOORU_PORT:-3000}:3000"
     depends_on:

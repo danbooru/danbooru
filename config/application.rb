@@ -111,9 +111,9 @@ module Danbooru
       config.x.git_hash = nil
     end
 
-    # XXX Disable the origin check to fix `HTTP Origin header didn't match request.base_url` errors when running in Github
-    # Codespaces. This is necessary because Codespaces sets the Origin header incorrectly.
-    if ENV["CODESPACES"] == "true"
+    # Disable the origin check to fix `HTTP Origin header didn't match request.base_url` errors when running behind a reverse
+    # proxy. This is necessary because some reverse proxies (such as Github Codespaces) set the Origin header incorrectly.
+    if ENV["DANBOORU_REVERSE_PROXY"] == "true"
       config.action_controller.forgery_protection_origin_check = false
     end
 

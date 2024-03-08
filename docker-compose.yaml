@@ -116,8 +116,7 @@ x-base-template: &base-template
     DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
     DANBOORU_IMAGE_STORAGE_PATH: /images
 
-    # This is true if we're running inside Github Codespaces.
-    CODESPACES: ${CODESPACES:-false}
+    DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-false}
 
   tmpfs:
     - /tmp
