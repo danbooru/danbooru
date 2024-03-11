@@ -15,6 +15,8 @@ module SeoHelper
   end
 
   def json_ld_website_data
+    site_url = Danbooru.config.canonical_url.chomp("/")
+
     urls = [
       Danbooru.config.twitter_url,
       Danbooru.config.discord_server_url,
@@ -27,20 +29,20 @@ module SeoHelper
       "@graph": [
         {
           "@type": "Organization",
-          url: root_url(host: Danbooru.config.hostname),
+          url: site_url,
           name: Danbooru.config.app_name,
-          logo: "#{root_url(host: Danbooru.config.hostname)}images/danbooru-logo-500x500.png",
+          logo: "#{site_url}/images/danbooru-logo-500x500.png",
           sameAs: urls,
         },
         {
           "@type": "WebSite",
-          "@id": root_url(anchor: "website", host: Danbooru.config.hostname),
-          url: root_url(host: Danbooru.config.hostname),
+          "@id": "#{site_url}/#website",
+          url: site_url,
           name: Danbooru.config.app_name,
           description: site_description,
           potentialAction: [{
             "@type": "SearchAction",
-            target: "#{posts_url(host: Danbooru.config.hostname)}?tags={search_term_string}",
+            target: "#{site_url}/posts?tags={search_term_string}",
             "query-input": "required name=search_term_string",
           }]
         }

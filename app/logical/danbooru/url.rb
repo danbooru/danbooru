@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "domain"
+
 # A utility class representing a HTTP URL. A wrapper around Addressable::URI that adds
 # extra utility methods. Anything dealing with URLs inside Danbooru should use this class
 # instead of using `Addressable::URI` or the Ruby `URI` class directly,
@@ -36,7 +38,7 @@ module Danbooru
     # @return [Addressable:URI] The parsed and normalized URL.
     attr_reader :url
 
-    delegate :ip_based?, :host, :port, :site, :path, :query, :fragment, :password, to: :url
+    delegate :ip_based?, :host, :port, :site, :authority, :path, :query, :fragment, :password, to: :url
 
     # Parse a string into a URL, or raise an exception if the string is not a valid HTTP or HTTPS URL.
     #

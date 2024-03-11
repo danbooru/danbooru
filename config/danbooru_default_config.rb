@@ -55,17 +55,6 @@ module Danbooru
       "Danbooru"
     end
 
-    # The public domain name of your site, e.g. "danbooru.donmai.us". If your
-    # site were called `www.mybooru.com`, then you would set this to "www.mybooru.com"
-    #
-    # By default, this is set to the machine hostname. You can use `hostnamectl`
-    # to change the machine hostname.
-    #
-    # You can set this to "localhost" if your site doesn't have a public domain name.
-    def hostname
-      Socket.gethostname
-    end
-
     # A list of alternate domains for your site, if your site is accessible under multiple domains. For example,
     # Danbooru is accessible under danbooru.donmai.us, betabooru.donmai.us, safebooru.donmai.us, etc.
     #
@@ -81,44 +70,53 @@ module Danbooru
       ["safebooru.donmai.us"]
     end
 
-    # The URL of your site, e.g. https://danbooru.donmai.us.
+    # The URL for your site, if you have a custom domain name for your site.
     #
-    # If you support HTTPS, change this to "https://www.mybooru.com". If you set
-    # this to https://, then you *must* use https:// to access your site. You can't
-    # use http:// because in HTTPS mode session cookies won't be sent over HTTP.
+    # For example, if your domain name is `booru.example.com`, then you would set this to "http://booru.example.com".
     #
-    # Images will be served from this URL by default. See the `base_url` option
-    # for the `storage_manager` below if you want to serve images from a
-    # different domain.
+    # If your site supports HTTPS, then set this to `https://`. If you set this to https://, then you must use https://
+    # to access your site, because in HTTPS mode session cookies aren't sent for http:// URLs.
     #
-    # Protip: use ngrok.com for easy HTTPS support during development.
+    # If your site is accessible under multiple domain names, then this should be the primary URL for your site. For
+    # example, Danbooru is available at both https://danbooru.donmai.us and https://betabooru.donmai.us. The canonical
+    # URL for Danbooru is https://danbooru.donmai.us because that's the main version of the site.
+    #
+    # Images will be served from this URL by default. See the `base_url` option for the `storage_manager` below if you
+    # want to serve images from a different domain.
+    #
+    # If you're not running a public site, then you don't need to change this.
     def canonical_url
-      "http://#{Danbooru.config.hostname}"
+      "http://localhost:3000"
+    end
+
+    # The domain name to use for email addresses.
+    def email_domain
+      Danbooru::URL.parse!(Danbooru.config.canonical_url).host
     end
 
     # The email address of the admin user. This email will be publicly displayed on the contact page.
     def contact_email
-      "webmaster@#{Danbooru.config.hostname}"
+      "webmaster@#{email_domain}"
     end
 
     # The email address where DMCA complaints should be sent.
     def dmca_email
-      "dmca@#{Danbooru.config.hostname}"
+      "dmca@#{email_domain}"
     end
 
     # The email address to use for Dmail notifications.
     def notification_email
-      "notifications@#{Danbooru.config.hostname}"
+      "notifications@#{email_domain}"
     end
 
     # The email address to use for password reset and email verification emails.
     def account_security_email
-      "security@#{Danbooru.config.hostname}"
+      "security@#{email_domain}"
     end
 
     # The email address to use for new user signup emails.
     def welcome_user_email
-      "welcome@#{Danbooru.config.hostname}"
+      "welcome@#{email_domain}"
     end
 
     # System actions, such as sending automated dmails, will be performed with
@@ -360,7 +358,7 @@ module Danbooru
     def storage_manager
       # Store files on the local filesystem.
       # base_dir - where to store files (default: under public/data)
-      # base_url - where to serve files from (default: https://#{hostname}/data)
+      # base_url - where to serve files from (default: #{canonical_url}/data)
       StorageManager::Local.new(base_url: "#{Danbooru.config.canonical_url}/data", base_dir: Danbooru.config.image_storage_path)
     end
 
@@ -713,7 +711,7 @@ module Danbooru
     end
 
     def rakismet_url
-      "https://#{hostname}"
+      Danbooru.config.canonical_url
     end
 
     # API key for https://ipregistry.co. Used for looking up IP address

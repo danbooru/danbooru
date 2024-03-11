@@ -99,7 +99,6 @@ x-base-template: &base-template
   environment:
     # You can set DANBOORU_CANONICAL_URL if you have a domain name for your site.
     # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
-    # DANBOORU_HOSTNAME: danbooru.mydomain.com
     DANBOORU_CANONICAL_URL: http://localhost:${DANBOORU_PORT:-3000}
 
     # You should set DANBOORU_SECRET_KEY_BASE to a random secret string. If you

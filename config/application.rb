@@ -119,7 +119,8 @@ module Danbooru
 
     config.after_initialize do
       Rails.application.routes.default_url_options = {
-        host: Danbooru.config.hostname
+        host: Danbooru::URL.parse!(Danbooru.config.canonical_url).host,
+        port: Danbooru::URL.parse!(Danbooru.config.canonical_url).port
       }
     end
   end
