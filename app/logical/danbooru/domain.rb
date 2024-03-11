@@ -53,7 +53,7 @@ module Danbooru
       return false if original_domain.blank?
       return false if original_domain.delete_suffix(".").bytesize > 253
       return false if original_domain.include?("..")
-      return false if original_domain.starts_with?(".")
+      return false if original_domain.start_with?(".")
       return false if original_domain.split(".").any? { |label| label.bytesize > 63 }
 
       true
@@ -77,14 +77,14 @@ module Danbooru
       domain.split(".").each do |label|
         # XXX Should only allow valid Unicode characters, not all of them.
         return false if !label.match?(/\A[[^[:ascii:]]a-zA-Z0-9-]+\z/)
-        return false if label.starts_with?("-") || label.ends_with?("-")
+        return false if label.start_with?("-") || label.end_with?("-")
       end
 
       # Subdomains technically have no rules because the domain owner can do whatever they want. In practice, they
       # usually obey the same rules as base domains, except some sites allow subdomains to contain underscores.
       subdomain.to_s.split(".").each do |label|
         return false if !label.match?(/\A[[^[:ascii:]]a-zA-Z0-9_-]+\z/)
-        return false if label.starts_with?("-") || label.ends_with?("-")
+        return false if label.start_with?("-") || label.end_with?("-")
       end
 
       true

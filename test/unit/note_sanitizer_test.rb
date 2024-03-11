@@ -44,7 +44,7 @@ class NoteSanitizerTest < ActiveSupport::TestCase
     end
 
     should "rewrite absolute links to relative links" do
-      Danbooru.config.stubs(:hostname).returns("sonohara.donmai.us")
+      Danbooru.config.stubs(:canonical_url).returns("http://sonohara.donmai.us")
 
       body = '<a href="http://sonohara.donmai.us/posts?tags=touhou#dtext-intro">touhou</a>'
       assert_equal('<a href="/posts?tags=touhou#dtext-intro" rel="external noreferrer nofollow">touhou</a>', NoteSanitizer.sanitize(body))

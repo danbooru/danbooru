@@ -142,11 +142,15 @@ module NoteSanitizer
 
     url = Addressable::URI.heuristic_parse(node["href"]).normalize
 
-    if url.authority == Danbooru.config.hostname
+    if url.host.in?(hostnames)
       url.site = nil
       node["href"] = url.to_s
     end
   rescue Addressable::URI::InvalidURIError
     # do nothing for invalid urls
+  end
+
+  def self.hostnames
+    [Danbooru::URL.parse!(Danbooru.config.canonical_url).host, *Danbooru.config.alternate_domains].compact.uniq
   end
 end
