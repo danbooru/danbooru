@@ -9,6 +9,8 @@ class SourceURLTest < ActiveSupport::TestCase
         assert_nil(Source::URL.parse("https://"))
         assert_nil(Source::URL.parse("https://./"))
         assert_nil(Source::URL.parse("https://!!!.com"))
+        assert_nil(Source::URL.parse("https://[]"))
+        assert_nil(Source::URL.parse("https://[]:3000"))
         # assert_nil(Source::URL.parse("https://foo@gmail.com"))
       end
 
@@ -16,6 +18,10 @@ class SourceURLTest < ActiveSupport::TestCase
         assert_not_nil(Source::URL.parse("https://foo.com."))
         assert_not_nil(Source::URL.parse("https://user:pass@foo.com:80"))
         assert_not_nil(Source::URL.parse("https://localhost"))
+        assert_not_nil(Source::URL.parse("https://127.0.0.1"))
+        assert_not_nil(Source::URL.parse("https://127.0.0.1:3000"))
+        assert_not_nil(Source::URL.parse("https://[::1]"))
+        assert_not_nil(Source::URL.parse("https://[::1]:3000"))
       end
 
       should "normalize URLs" do
