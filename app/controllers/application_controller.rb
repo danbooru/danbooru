@@ -202,12 +202,14 @@ class ApplicationController < ActionController::Base
   end
 
   def set_current_user
+    CurrentUser.request = request
     SessionLoader.new(request).load
   end
 
   def reset_current_user
     CurrentUser.user = nil
     CurrentUser.safe_mode = false
+    CurrentUser.request = nil
   end
 
   # Skip setting the session cookie if the response is being publicly cached to
