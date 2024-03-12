@@ -38,7 +38,7 @@ module Danbooru
     # @return [Addressable:URI] The parsed and normalized URL.
     attr_reader :url
 
-    delegate :ip_based?, :host, :port, :site, :authority, :path, :query, :fragment, :password, to: :url
+    delegate :ip_based?, :host, :hostname, :port, :site, :authority, :path, :query, :fragment, :password, to: :url
 
     # Parse a string into a URL, or raise an exception if the string is not a valid HTTP or HTTPS URL.
     #
@@ -56,7 +56,7 @@ module Danbooru
       @url.path = nil if @url.path == "/"
 
       raise Error, "#{original_url} is not an http:// URL" if !@url.normalized_scheme.in?(["http", "https"])
-      raise Error, "#{host} is not a valid hostname" if parsed_domain.nil?
+      raise Error, "#{host} is not a valid hostname" if parsed_domain.nil? && ip_address.nil?
     rescue Addressable::URI::InvalidURIError => e
       raise Error, e
     end
@@ -149,7 +149,7 @@ module Danbooru
 
     # @return [Danbooru::IpAddress, nil] The IP address of the URL, if the URL's host is an IP address instead of a domain name.
     memoize def ip_address
-      Danbooru::IpAddress.parse(host) unless host.blank?
+      Danbooru::IpAddress.parse(hostname) unless hostname.blank?
     end
   end
 end
