@@ -40,7 +40,6 @@ x-base-template: &base-template
 
     # You can set DANBOORU_CANONICAL_URL if you have a domain name for your site.
     # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
-    DANBOORU_CANONICAL_URL: http://localhost:${DANBOORU_PORT:-3000}
 
     # This is insecure because it lets anyone login to your development instance. This is okay
     # because giving others access is insecure anyway.

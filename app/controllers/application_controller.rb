@@ -202,6 +202,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_current_user
+    CurrentUser.request = request
     SessionLoader.new(request).load
     Sentry.set_user(id: CurrentUser.user.id, username: CurrentUser.user.name, email: CurrentUser.user.email_address&.address, ip_address: request.remote_ip)
   end
@@ -209,6 +210,7 @@ class ApplicationController < ActionController::Base
   def reset_current_user
     CurrentUser.user = nil
     CurrentUser.safe_mode = false
+    CurrentUser.request = nil
     Sentry.set_user({})
   end
 

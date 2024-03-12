@@ -12,7 +12,6 @@ class MediaAsset < ApplicationRecord
   MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
   MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
-  STORAGE_SERVICE = Danbooru.config.storage_manager
 
   attribute :id
   attribute :created_at
@@ -467,7 +466,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def storage_service
-      STORAGE_SERVICE
+      Danbooru.config.storage_manager
     end
 
     def backup_storage_service

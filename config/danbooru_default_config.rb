@@ -81,12 +81,16 @@ module Danbooru
     # example, Danbooru is available at both https://danbooru.donmai.us and https://betabooru.donmai.us. The canonical
     # URL for Danbooru is https://danbooru.donmai.us because that's the main version of the site.
     #
-    # Images will be served from this URL by default. See the `base_url` option for the `storage_manager` below if you
-    # want to serve images from a different domain.
+    # This is used in various places when we need to know the URL of the site, such as when generating emails or when
+    # generating links to images.
+    #
+    # The default is to determine the URL based on the current HTTP request. This means we use the same URL you see in
+    # the browser address bar. We fall back to `http:/localhost:3000` in various situations when we're outside of a HTTP
+    # request and we can't determine the URL (for example, when generating emails inside background jobs).
     #
     # If you're not running a public site, then you don't need to change this.
     def canonical_url
-      "http://localhost:3000"
+      CurrentUser.request&.base_url.presence || "http://localhost:#{ENV["DANBOORU_PORT"] || 3000}"
     end
 
     # The domain name to use for email addresses.
