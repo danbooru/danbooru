@@ -188,7 +188,10 @@ class PostQueryBuilder
     order_values = relation.order_values.map { |order| order.try(:to_sql) || order.to_s }.map(&:downcase)
     return relation unless order_values.in?([["posts.id desc"], ["posts.id asc"]])
 
-    if post_count.nil?
+    if post_query.is_empty_search?
+      # If there are no tags in the search, then treat it normally because forcing a bitmap scan wouldn't be beneficial.
+      posts = relation
+    elsif post_count.nil?
       # If post_count is nil, then the search took too long to count and we don't
       # know whether it's large or small. First we try it normally assuming it's
       # large, then if that times out we try again assuming it's small.

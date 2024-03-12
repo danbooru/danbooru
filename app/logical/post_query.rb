@@ -215,6 +215,8 @@ class PostQuery
   end
 
   concerning :CountMethods do
+    extend Memoist
+
     # @return [Integer, nil] The number of posts returned by the search, or nil on timeout.
     def post_count
       @post_count ||= fast_count
@@ -235,13 +237,20 @@ class PostQuery
       count
     end
 
-    def estimated_count(timeout = 1_000)
-      if is_empty_search?
-        estimated_row_count
+    # @param timeout [Integer] The maximum amount of time to spend calculating the count.
+    # @param exact_count_threshold [Integer] If the estimate is below this threshold, return an exact count instead.
+    # @return [Integer, nil] The estimated post count, or nil if we can't compute a good estimate.
+    def estimated_count(timeout = 1_000, exact_count_threshold: 20_000)
+      if is_empty_search? || is_metatag?(:rating)
+        # If there's a small number of posts, then the estimate may be noticeably off if the table hasn't been vacuumed
+        # recently. Return the exact number of posts because calculating it is fast enough anyway.
+        if estimated_row_count < exact_count_threshold
+          exact_count(timeout)
+        else
+          estimated_row_count
+        end
       elsif is_simple_tag?
         tag.try(:post_count)
-      elsif is_metatag?(:rating)
-        estimated_row_count
       elsif (is_metatag?(:status) || is_metatag?(:is)) && metatags.sole.value.in?(%w[pending flagged appealed modqueue unmoderated])
         exact_count(timeout)
       elsif is_metatag?(:pool) || is_metatag?(:ordpool)
@@ -267,7 +276,7 @@ class PostQuery
     end
 
     # Estimate the count by parsing the Postgres EXPLAIN output.
-    def estimated_row_count
+    memoize def estimated_row_count
       ExplainParser.new(posts).row_count
     end
 
