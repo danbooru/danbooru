@@ -33,5 +33,16 @@
         "EditorConfig.EditorConfig"
       ]
     }
+  },
+  "secrets": {
+    "DANBOORU_PIXIV_PHPSESSID": {
+      "description": "Your Pixiv `PHPSESSID` cookie. Required for Pixiv upload support."
+    },
+    "DANBOORU_TWITTER_AUTH_TOKEN": {
+      "description": "Your Twitter `auth_token` cookie. Required for Twitter upload support."
+    },
+    "DANBOORU_TWITTER_CSRF_TOKEN": {
+      "description": "Your Twitter `ct0` cookie. Required for Twitter upload support."
+    }
   }
 }
