@@ -1,17 +1,31 @@
-[![codecov](https://codecov.io/gh/danbooru/danbooru/branch/master/graph/badge.svg)](https://codecov.io/gh/danbooru/danbooru) [![Discord](https://img.shields.io/discord/310432830138089472?label=Discord)](https://discord.gg/eSVKkUF)
+[<img src="https://github.com/codespaces/badge.svg" height="20">](https://codespaces.new/danbooru/danbooru?quickstart=1) [![Discord](https://img.shields.io/discord/310432830138089472?label=Discord)](https://discord.gg/danbooru) [![codecov](https://codecov.io/gh/danbooru/danbooru/branch/master/graph/badge.svg)](https://codecov.io/gh/danbooru/danbooru)
 
 ## Quickstart
 
-Run this to start a basic Danbooru instance:
+### Using Github Codespaces
+
+To launch a Danbooru instance in your browser:
+
+1. [Create a Github account](https://github.com/signup).
+2. Click [Open in Github Codespaces](https://codespaces.new/danbooru/danbooru?quickstart=1).
+3. Click the `Create new codespace` button.
+4. Wait a few minutes for it to launch.
+
+When it's done, you'll have a new Danbooru instance with a full development environment running in your browser. This way you can try out Danbooru without installing anything on your computer.
+
+See the [Codespaces section](https://github.com/danbooru/danbooru/wiki/Docker-Guide#user-content-running-in-github-codespaces) in the [Docker Guide](https://github.com/danbooru/danbooru/wiki/Docker-Guide) to learn more.
+
+### Using Docker
+
+Run this to start a Danbooru instance:
 
 ```sh
-curl -sSL https://raw.githubusercontent.com/danbooru/danbooru/master/bin/setup | sh
+sh -c "$(curl -sSL https://raw.githubusercontent.com/danbooru/danbooru/master/bin/setup)"
 ```
 
-This will install [Docker Compose](https://docs.docker.com/compose/) and use it
-to start Danbooru. When it's done, Danbooru will be running at http://localhost:3000.
+This will install [Docker Compose](https://docs.docker.com/compose/) and start Danbooru. When it's done, Danbooru will be running at http://localhost:3000.
 
-Alternatively, if you already have Docker Compose installed, you can just do:
+Alternatively, if you already have Docker Compose installed, you can do:
 
 ```sh
 git clone http://github.com/danbooru/danbooru
@@ -19,8 +33,6 @@ cd danbooru
 touch .env.local config/danbooru_local_config.rb
 sudo docker compose up
 ```
-
-If you get any errors, check `docker compose version` and make sure you're running at least Docker Compose v2.21.0.
 
 When you're done, you can run the following to delete everything:
 
