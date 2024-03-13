@@ -22,7 +22,9 @@
 #
 # You can also set these environment variables in an envfile instead of the
 # command line. See the .env file in the root project directory for details.
-#
+
+require_relative "../app/logical/current_user"
+
 module Danbooru
   class Configuration
     # A secret key used to encrypt session cookies, among other things.
