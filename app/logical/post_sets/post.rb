@@ -41,7 +41,7 @@ module PostSets
 
         "See #{humanized_count} #{page_title} images on #{Danbooru.config.app_name}. #{DText.excerpt(wiki_page&.body)}"
       else
-        ApplicationController.helpers.site_description
+        Danbooru.config.site_description
       end
     end
 

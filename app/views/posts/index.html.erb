@@ -228,19 +228,23 @@
 
 <% content_for(:html_header) do %>
   <% if @post_set.post_query.is_empty_search? %>
-    <% page_title("#{Danbooru.config.app_name}: Anime Image Board", suffix: nil) %>
-    <% meta_description site_description %>
+    <% if Danbooru.config.site_tagline.present? %>
+      <% page_title "#{Danbooru.config.app_name}: #{Danbooru.config.site_tagline}", suffix: nil %>
+    <% else %>
+      <% page_title Danbooru.config.app_name, suffix: nil %>
+    <% end %>
 
     <% atom_feed_tag "Posts", posts_url(format: :atom) %>
   <% else %>
     <% page_title(@post_set.page_title) %>
-    <% meta_description @post_set.meta_description %>
     <% atom_feed_tag "Posts: #{@post_set.page_title}", posts_url(tags: @post_set.tag_string, format: :atom) %>
 
     <% if @post_set.best_post.present? %>
       <%= render OpenGraphComponent.new(media_asset: @post_set.best_post.media_asset, current_user: CurrentUser.user) %>
     <% end %>
   <% end %>
+
+  <% meta_description @post_set.meta_description %>
 
   <% if params[:tags].blank? && @post_set.current_page == 1 %>
     <% seo_canonical_url root_path %>
