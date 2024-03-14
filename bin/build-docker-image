@@ -34,12 +34,15 @@ CURRENT_PLATFORM="linux/$ARCH"
 IMAGE="${1:-ghcr.io/aibooruorg/aibooru}"
 PLATFORM="${2:-$CURRENT_PLATFORM}"
 
+DOCKER_IMAGE_REVISION=$(git rev-parse HEAD)
+DOCKER_IMAGE_BUILD_DATE="$(date --utc +"%Y-%m-%dT%H:%M:%S.%3NZ")"
+
 if [[ $PLATFORM != $CURRENT_PLATFORM && $PLATFORM != *,* ]]; then
   # If we're building for a different platform, and it's not a multi-platform image, then name the image after the platform so it doesn't conflict with images for the native platform.
   TARGET_ARCH="${PLATFORM#*/}" # linux/arm64 -> arm64
-  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --target development --tag $IMAGE:development-$TARGET_ARCH --file Dockerfile --load
-  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --target production  --tag $IMAGE:$TARGET_ARCH --file Dockerfile --load
+  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --target development --tag $IMAGE:development-$TARGET_ARCH --file Dockerfile --load
+  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --target production  --tag $IMAGE:$TARGET_ARCH --file Dockerfile --load
 else
-  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --target development --tag $IMAGE:development --file Dockerfile --load
-  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) --target production  --tag $IMAGE --file Dockerfile --load
+  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --target development --tag $IMAGE:development --file Dockerfile --load
+  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --target production  --tag $IMAGE --file Dockerfile --load
 fi

@@ -324,6 +324,8 @@ ENV VIPS_WARNING=0
 ENV BOOTSNAP_CACHE_DIR=/home/danbooru/bootsnap
 ENV BOOTSNAP_READONLY=true
 
+ENV DOCKER=true
+
 RUN <<EOS
   ldconfig
 
@@ -334,9 +336,6 @@ EOS
 ENTRYPOINT ["tini", "-g", "--"]
 CMD ["bin/rails", "server"]
 
-# https://github.com/opencontainers/image-spec/blob/main/annotations.md
-LABEL org.opencontainers.image.source https://github.com/danbooru/danbooru
-
 
 
 # The production layer. Contains the final /danbooru directory on top of the base Danbooru layer.
@@ -345,10 +344,7 @@ USER danbooru
 
 COPY --chown=danbooru:danbooru . /danbooru
 
-ARG SOURCE_COMMIT=""
 RUN <<EOS
-  echo $SOURCE_COMMIT > REVISION
-
   mkdir -p public/data public/packs-dev
   ln -s packs public/packs-test
   ln -s /tmp tmp
@@ -366,6 +362,11 @@ RUN <<EOS
   bin/good_job --help > /dev/null
   bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
 EOS
+
+ARG DOCKER_IMAGE_REVISION=""
+ARG DOCKER_IMAGE_BUILD_DATE=""
+ENV DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION
+ENV DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE
 
 
 
@@ -389,5 +390,10 @@ COPY --link --from=production /home/danbooru/bootsnap /home/danbooru/bootsnap
 COPY --link --from=production /danbooru /danbooru
 
 RUN chown danbooru:danbooru /danbooru /node_modules /home/danbooru /home/danbooru/bootsnap /home/danbooru/.sudo_as_admin_successful
+
+ARG DOCKER_IMAGE_REVISION=""
+ARG DOCKER_IMAGE_BUILD_DATE=""
+ENV DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION
+ENV DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE
 
 USER danbooru

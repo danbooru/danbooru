@@ -103,8 +103,8 @@ module Danbooru
 
     config.action_controller.action_on_unpermitted_parameters = :raise
 
-    if File.exist?("#{config.root}/REVISION")
-      config.x.git_hash = File.read("#{config.root}/REVISION").strip
+    if ENV["DOCKER_IMAGE_REVISION"].present?
+      config.x.git_hash = ENV["DOCKER_IMAGE_REVISION"]
     elsif system("type git > /dev/null && git rev-parse --show-toplevel > /dev/null")
       config.x.git_hash = `git rev-parse HEAD`.strip
     else
