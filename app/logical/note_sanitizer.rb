@@ -87,7 +87,6 @@ module NoteSanitizer
         properties: ALLOWED_PROPERTIES
       },
       :transformers => [
-        method(:relativize_links!),
         method(:sanitize_css!)
       ]
     )
@@ -133,24 +132,5 @@ module NoteSanitizer
   def self.allowed_css_property?(name, value)
     allowed_values = ALLOWED_PROPERTY_VALUES[name]
     allowed_values.blank? || value.downcase.in?(allowed_values)
-  end
-
-  # Convert absolute Danbooru links inside notes to relative links.
-  # https://danbooru.donmai.us/posts/1 is converted to /posts/1.
-  def self.relativize_links!(node:, **env)
-    return unless node.name == "a" && node["href"].present?
-
-    url = Addressable::URI.heuristic_parse(node["href"]).normalize
-
-    if url.host.in?(hostnames)
-      url.site = nil
-      node["href"] = url.to_s
-    end
-  rescue Addressable::URI::InvalidURIError
-    # do nothing for invalid urls
-  end
-
-  def self.hostnames
-    [Danbooru::URL.parse!(Danbooru.config.canonical_url).host, *Danbooru.config.alternate_domains].compact.uniq
   end
 end
