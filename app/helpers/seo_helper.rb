@@ -10,10 +10,6 @@
 # https://schema.org/WebSite
 
 module SeoHelper
-  def site_description
-    "#{Danbooru.config.canonical_app_name} is the first booru for AI-generated images. Search for AI-generated anime pictures categorized by thousands of tags."
-  end
-
   def json_ld_website_data
     site_url = Danbooru.config.canonical_url.chomp("/")
 
@@ -39,13 +35,13 @@ module SeoHelper
           "@id": "#{site_url}/#website",
           url: site_url,
           name: Danbooru.config.app_name,
-          description: site_description,
+          description: Danbooru.config.site_description,
           potentialAction: [{
             "@type": "SearchAction",
             target: "#{site_url}/posts?tags={search_term_string}",
             "query-input": "required name=search_term_string",
           }]
-        }
+        }.compact
       ]
     })
   end

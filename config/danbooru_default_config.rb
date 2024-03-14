@@ -377,6 +377,17 @@ module Danbooru
       # StorageManager::Local.new(base_dir: "/mnt/backup")
     end
 
+    # A short description of your site that goes in the <meta name="description"> tag. Used by search engines.
+    #
+    # https://developers.google.com/search/docs/crawling-indexing/special-tags#meta-tags
+    # https://developers.google.com/search/docs/appearance/snippet
+    def site_description
+    end
+
+    # A short tagline for your site that goes in the page title on the front page. Used by search engines.
+    def site_tagline
+    end
+
     # Any custom code you want to insert into the default layout without
     # having to modify the templates.
     def custom_html_header_content

@@ -38,11 +38,12 @@
     <%= json_ld_website_data %>
   <% end %>
 
-  <%= tag.meta name: "description", content: meta_description %>
+  <% page_description = meta_description %>
+  <%= tag.meta name: "description", content: page_description if page_description %>
   <%= tag.meta property: "og:type", content: "website" %>
   <%= tag.meta property: "og:site_name", content: Danbooru.config.app_name %>
   <%= tag.meta property: "og:title", content: page_title %>
-  <%= tag.meta property: "og:description", content: meta_description %>
+  <%= tag.meta property: "og:description", content: page_description if page_description %>
   <%= tag.meta property: "og:url", content: request.original_url %>
 
   <% if Danbooru.config.twitter_username.present? %>
@@ -50,7 +51,7 @@
   <% end %>
 
   <%= tag.meta name: "twitter:title", content: page_title %>
-  <%= tag.meta name: "twitter:description", content: meta_description %>
+  <%= tag.meta name: "twitter:description", content: page_description if page_description %>
 
   <%= tag.meta name: "git-hash", content: Rails.application.config.x.git_hash %>
   <%= tag.meta name: "theme-color", content: "hsl(213, 100%, 50%)" %>
