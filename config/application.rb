@@ -111,6 +111,9 @@ module Danbooru
       config.x.git_hash = nil
     end
 
+    # In development mode, allow the site to be embedded in an <iframe> so that it can be viewed inside things like VS Code or Github Codespaces.
+    config.action_dispatch.default_headers.delete("X-Frame-Options") if Rails.env.development?
+
     # Disable the origin check to fix `HTTP Origin header didn't match request.base_url` errors when running behind a reverse
     # proxy. This is necessary because some reverse proxies (such as Github Codespaces) set the Origin header incorrectly.
     if ENV["DANBOORU_REVERSE_PROXY"] == "true"
