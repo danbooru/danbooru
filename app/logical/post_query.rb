@@ -94,7 +94,7 @@ class PostQuery
   # @return [Array<Post>]
   def posts_with_timeout(n, timeout: current_user.statement_timeout, count: post_count, **options)
     Post.with_timeout(timeout, []) do
-      paginated_posts(1, limit: n, count: count, **options)
+      paginated_posts(1, limit: n, count: count, **options).to_a
     end
   end
 
