@@ -168,10 +168,10 @@ class PostQueryBuilder
     relation
   end
 
-  def paginated_posts(post_query, page, count:, small_search_threshold: Danbooru.config.small_search_threshold.to_i, includes: nil, **options)
+  def paginated_posts(post_query, page, count:, small_search_threshold: Danbooru.config.small_search_threshold.to_i, includes: :media_asset, **options)
     posts = posts(post_query, includes: includes).paginate(page, count: count, **options)
     posts = optimize_search(posts, count, small_search_threshold)
-    posts.load
+    posts.to_a
   end
 
   # XXX This is an ugly hack to try to deal with slow searches. By default,

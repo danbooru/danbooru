@@ -17,7 +17,7 @@
 
           <%= render "posts/partials/common/inline_blacklist" %>
 
-          <%= render_post_gallery(PostQuery.new(@artist.name, current_user: CurrentUser.user).posts_with_timeout(8), tags: @artist.name) %>
+          <%= render_post_gallery(PostQuery.normalize(@artist.name, current_user: CurrentUser.user).posts_with_timeout(8), tags: @artist.name) %>
         </div>
       <% end %>
     <% end%>
