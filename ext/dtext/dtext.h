@@ -127,6 +127,10 @@ public:
   const char * d2 = NULL;
   const char * e1 = NULL;
   const char * e2 = NULL;
+  const char * f1 = NULL;
+  const char * f2 = NULL;
+  const char * g1 = NULL;
+  const char * g2 = NULL;
   bool header_mode = false;
   TagAttributes tag_attributes;
 

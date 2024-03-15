@@ -830,13 +830,48 @@ class DTextTest < Minitest::Test
     assert_parse('<p>[<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com/(parentheses)">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
   end
 
-  def test_markdown_links
+  def test_backwards_markdown_links
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a>', '[http://example.com](test)')
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://example.com">test</a>', '[Http://example.com](test)')
     assert_inline_parse('<em>one</em>(two)', '[i]one[/i](two)')
 
     assert_inline_parse(CGI.escapeHTML('[blah](test)'), '[blah](test)')
     assert_inline_parse(CGI.escapeHTML('[](test)'), '[](test)')
+  end
+
+  def test_markdown_links
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a>', "[test](http://example.com)")
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://example.com">test</a>', "[test](Http://example.com)")
+
+    assert_inline_parse('[test](<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>', "[test](http://example.com")
+    assert_inline_parse('[test](<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com/foo">http://example.com/foo</a> bar)', "[test](http://example.com/foo bar)")
+
+    assert_inline_parse("(http://example.com)", "[nodtext](http://example.com)[/nodtext]")
+    assert_inline_parse("(http://example.com)", "[nodtext](http://example.com)")
+    assert_inline_parse('<strong>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>)</strong>', "[b](http://example.com)[/b]")
+    assert_inline_parse('<strong>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>)</strong>', "[b](http://example.com)")
+    assert_inline_parse('[url](<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>)[/url]', "[url](http://example.com)[/url]")
+    assert_inline_parse('[url](<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>)', "[url](http://example.com)")
+    assert_inline_parse('<strong>foo</strong>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>)', "[b]foo[/b](http://example.com)")
+    assert_inline_parse('<a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">foo</a>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a>)', "[[foo]](http://example.com)")
+
+    assert_inline_parse('<a class="dtext-link" href="/posts/1">test</a>', "[test](/posts/1)")
+    assert_inline_parse('<a class="dtext-link" href="#foo">test</a>', "[test](#foo)")
+
+    assert_inline_parse("(/posts)", "[nodtext](/posts)[/nodtext]")
+    assert_inline_parse("(/posts)", "[nodtext](/posts)")
+    assert_inline_parse("<strong>(/posts)</strong>", "[b](/posts)[/b]")
+    assert_inline_parse("<strong>(/posts)</strong>", "[b](/posts)")
+    assert_inline_parse("<strong>foo</strong>(/posts)", "[b]foo[/b](/posts)")
+    assert_inline_parse('<a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">foo</a>(/posts)', "[[foo]](/posts)")
+
+    assert_inline_parse('[test](/posts/1 2)', "[test](/posts/1 2)")
+    assert_inline_parse('[test](#foo bar)', "[test](#foo bar)")
+    assert_inline_parse('[test](/posts', "[test](/posts")
+    assert_inline_parse('[test](#foo', "[test](#foo")
+    assert_inline_parse('[test](foo)', "[test](foo)")
+
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://foo.com">http://bar.com</a>', "[http://foo.com](http://bar.com)")
   end
 
   def test_html_links

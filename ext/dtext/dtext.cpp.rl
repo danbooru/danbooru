@@ -78,6 +78,10 @@ action mark_d1 { sm->d1 = sm->p; }
 action mark_d2 { sm->d2 = sm->p; }
 action mark_e1 { sm->e1 = sm->p; }
 action mark_e2 { sm->e2 = sm->p; }
+action mark_f1 { sm->f1 = sm->p; }
+action mark_f2 { sm->f2 = sm->p; }
+action mark_g1 { sm->g1 = sm->p; }
+action mark_g2 { sm->g2 = sm->p; }
 
 action after_mention_boundary { is_mention_boundary(p[-1]) }
 action mentions_enabled { sm->options.f_mentions }
@@ -156,6 +160,13 @@ bare_username = ([_.]? mention_nonboundary_char mention_char* mention_nonboundar
 bare_mention = ('@' when after_mention_boundary) (bare_username >mark_a1 @mark_a2);
 delimited_mention = '<@' (nonspace nonnewline*) >mark_a1 %mark_a2 :>> '>';
 
+# The list of tags that can appear in brackets (e.g. [quote]).
+bracket_tags = (
+  'spoiler'i | 'spoilers'i | 'nodtext'i | 'quote'i | 'expand'i | 'code'i |
+  'table'i | 'colgroup'i | 'col'i | 'thead'i | 'tbody'i | 'tr'i | 'th'i | 'td'i |
+  'br'i | 'hr'i | 'url'i | 'tn'i | 'b'i | 'i'i | 's'i | 'u'i
+);
+
 http = 'http'i 's'i? '://';
 subdomain = (utf8char | alnum | [_\-])+;
 domain = subdomain ('.' subdomain)+;
@@ -178,7 +189,8 @@ basic_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':' (bare_absolute_url | ba
 bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (delimited_absolute_url | delimited_relative_url) >mark_b1 %mark_b2 :>> ']';
 
 # XXX: internal markdown links aren't allowed to avoid parsing closing tags as links: `[b]foo[/b](bar)`.
-markdown_link = '[' delimited_absolute_url >mark_a1 %mark_a2 :>> '](' nonnewline+ >mark_b1 %mark_b2 :>> ')';
+backwards_markdown_link = '[' delimited_absolute_url >mark_a1 %mark_a2 :>> '](' nonnewline+ >mark_b1 %mark_b2 :>> ')';
+markdown_link = (('[' nonnewline+ >mark_f1 %mark_f2 :>> ']') - ('[' '/'? bracket_tags ']')) '(' (delimited_absolute_url | delimited_relative_url) >mark_g1 %mark_g2 :>> ')';
 html_link = '<a'i ws+ 'href="'i (delimited_absolute_url | delimited_relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
 unquoted_bbcode_url = delimited_absolute_url | delimited_relative_url;
@@ -350,8 +362,12 @@ inline := |*
     append_named_url(sm, { sm->b1, sm->b2 }, { sm->a1, sm->a2 });
   };
 
-  markdown_link | html_link => {
+  backwards_markdown_link | html_link => {
     append_named_url(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 });
+  };
+
+  markdown_link => {
+    append_named_url(sm, { sm->g1, sm->g2 }, { sm->f1, sm->f2 });
   };
 
   bare_absolute_url => {
@@ -1344,6 +1360,10 @@ static void clear_matches(StateMachine * sm) {
   sm->d2 = NULL;
   sm->e1 = NULL;
   sm->e2 = NULL;
+  sm->f1 = NULL;
+  sm->f2 = NULL;
+  sm->g1 = NULL;
+  sm->g2 = NULL;
 }
 
 // True if a mention is allowed to start after this character.
