@@ -2,6 +2,8 @@ gmon.out
 tmp/
 pkg/
 test/files/*.json.gz
+.git
+.ruby-lsp
 *.bundle
 *.o
 *.so
