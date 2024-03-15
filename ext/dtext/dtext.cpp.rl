@@ -44,50 +44,50 @@ static const std::unordered_map<std::string_view, std::function<bool(std::string
 %%{
 machine dtext;
 
-access sm->;
-variable p sm->p;
-variable pe sm->pe;
-variable eof sm->eof;
-variable top sm->top;
-variable ts sm->ts;
-variable te sm->te;
-variable act sm->act;
-variable stack (sm->stack.data());
+variable p p;
+variable pe pe;
+variable eof eof;
+variable cs cs;
+variable top top;
+variable ts ts;
+variable te te;
+variable act act;
+variable stack (stack.data());
 
 prepush {
-  size_t len = sm->stack.size();
+  size_t len = stack.size();
 
   if (len > MAX_STACK_DEPTH) {
     // Should never happen.
     throw DTextError("too many nested elements");
   }
 
-  if (sm->top >= len) {
-    g_debug("growing sm->stack %zi", len + 16);
-    sm->stack.resize(len + 16, 0);
+  if (top >= len) {
+    g_debug("growing stack %zi", len + 16);
+    stack.resize(len + 16, 0);
   }
 }
 
-action mark_a1 { sm->a1 = sm->p; }
-action mark_a2 { sm->a2 = sm->p; }
-action mark_b1 { sm->b1 = sm->p; }
-action mark_b2 { sm->b2 = sm->p; }
-action mark_c1 { sm->c1 = sm->p; }
-action mark_c2 { sm->c2 = sm->p; }
-action mark_d1 { sm->d1 = sm->p; }
-action mark_d2 { sm->d2 = sm->p; }
-action mark_e1 { sm->e1 = sm->p; }
-action mark_e2 { sm->e2 = sm->p; }
-action mark_f1 { sm->f1 = sm->p; }
-action mark_f2 { sm->f2 = sm->p; }
-action mark_g1 { sm->g1 = sm->p; }
-action mark_g2 { sm->g2 = sm->p; }
+action mark_a1 { a1 = p; }
+action mark_a2 { a2 = p; }
+action mark_b1 { b1 = p; }
+action mark_b2 { b2 = p; }
+action mark_c1 { c1 = p; }
+action mark_c2 { c2 = p; }
+action mark_d1 { d1 = p; }
+action mark_d2 { d2 = p; }
+action mark_e1 { e1 = p; }
+action mark_e2 { e2 = p; }
+action mark_f1 { f1 = p; }
+action mark_f2 { f2 = p; }
+action mark_g1 { g1 = p; }
+action mark_g2 { g2 = p; }
 
 action after_mention_boundary { is_mention_boundary(p[-1]) }
-action mentions_enabled { sm->options.f_mentions }
-action in_quote { dstack_is_open(sm, BLOCK_QUOTE) }
-action in_expand { dstack_is_open(sm, BLOCK_EXPAND) }
-action save_tag_attribute { save_tag_attribute(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 }); }
+action mentions_enabled { options.f_mentions }
+action in_quote { dstack_is_open(BLOCK_QUOTE) }
+action in_expand { dstack_is_open(BLOCK_EXPAND) }
+action save_tag_attribute { tag_attributes[{ a1, a2 }] = { b1, b2 }; }
 
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
 eos = '\0';
@@ -284,269 +284,269 @@ close_s = '[/s]'i | '</s>'i;
 close_u = '[/u]'i | '</u>'i;
 
 basic_inline := |*
-  open_b  => { dstack_open_element(sm,  INLINE_B, "<strong>"); };
-  close_b => { dstack_close_element(sm, INLINE_B); };
-  open_i  => { dstack_open_element(sm,  INLINE_I, "<em>"); };
-  close_i => { dstack_close_element(sm, INLINE_I); };
-  open_s  => { dstack_open_element(sm,  INLINE_S, "<s>"); };
-  close_s => { dstack_close_element(sm, INLINE_S); };
-  open_u  => { dstack_open_element(sm,  INLINE_U, "<u>"); };
-  close_u => { dstack_close_element(sm, INLINE_U); };
+  open_b  => { dstack_open_element(INLINE_B, "<strong>"); };
+  close_b => { dstack_close_element(INLINE_B, { ts, te }); };
+  open_i  => { dstack_open_element(INLINE_I, "<em>"); };
+  close_i => { dstack_close_element(INLINE_I, { ts, te }); };
+  open_s  => { dstack_open_element(INLINE_S, "<s>"); };
+  close_s => { dstack_close_element(INLINE_S, { ts, te }); };
+  open_u  => { dstack_open_element(INLINE_U, "<u>"); };
+  close_u => { dstack_close_element(INLINE_U, { ts, te }); };
   eos;
-  any => { append_html_escaped(sm, fc); };
+  any => { append_html_escaped(fc); };
 *|;
 
 inline := |*
-  'post #'i id             => { append_id_link(sm, "post", "post", "/posts/", { sm->a1, sm->a2 }); };
-  'appeal #'i id           => { append_id_link(sm, "appeal", "post-appeal", "/post_appeals/", { sm->a1, sm->a2 }); };
-  'flag #'i id             => { append_id_link(sm, "flag", "post-flag", "/post_flags/", { sm->a1, sm->a2 }); };
-  'note #'i id             => { append_id_link(sm, "note", "note", "/notes/", { sm->a1, sm->a2 }); };
-  'forum #'i id            => { append_id_link(sm, "forum", "forum-post", "/forum_posts/", { sm->a1, sm->a2 }); };
-  'topic #'i id            => { append_id_link(sm, "topic", "forum-topic", "/forum_topics/", { sm->a1, sm->a2 }); };
-  'comment #'i id          => { append_id_link(sm, "comment", "comment", "/comments/", { sm->a1, sm->a2 }); };
-  'dmail #'i id            => { append_id_link(sm, "dmail", "dmail", "/dmails/", { sm->a1, sm->a2 }); };
-  'pool #'i id             => { append_id_link(sm, "pool", "pool", "/pools/", { sm->a1, sm->a2 }); };
-  'user #'i id             => { append_id_link(sm, "user", "user", "/users/", { sm->a1, sm->a2 }); };
-  'artist #'i id           => { append_id_link(sm, "artist", "artist", "/artists/", { sm->a1, sm->a2 }); };
-  'ban #'i id              => { append_id_link(sm, "ban", "ban", "/bans/", { sm->a1, sm->a2 }); };
-  'bur #'i id              => { append_id_link(sm, "BUR", "bulk-update-request", "/bulk_update_requests/", { sm->a1, sm->a2 }); };
-  'alias #'i id            => { append_id_link(sm, "alias", "tag-alias", "/tag_aliases/", { sm->a1, sm->a2 }); };
-  'implication #'i id      => { append_id_link(sm, "implication", "tag-implication", "/tag_implications/", { sm->a1, sm->a2 }); };
-  'favgroup #'i id         => { append_id_link(sm, "favgroup", "favorite-group", "/favorite_groups/", { sm->a1, sm->a2 }); };
-  'mod action #'i id       => { append_id_link(sm, "mod action", "mod-action", "/mod_actions/", { sm->a1, sm->a2 }); };
-  'modreport #'i id        => { append_id_link(sm, "modreport", "moderation-report", "/moderation_reports/", { sm->a1, sm->a2 }); };
-  'feedback #'i id         => { append_id_link(sm, "feedback", "user-feedback", "/user_feedbacks/", { sm->a1, sm->a2 }); };
-  'wiki #'i id             => { append_id_link(sm, "wiki", "wiki-page", "/wiki_pages/", { sm->a1, sm->a2 }); };
-  'asset #'i id            => { append_id_link(sm, "asset", "media-asset", "/media_assets/", { sm->a1, sm->a2 }); };
-  'media asset #'i id      => { append_id_link(sm, "asset", "media-asset", "/media_assets/", { sm->a1, sm->a2 }); };
+  'post #'i id             => { append_id_link("post", "post", "/posts/", { a1, a2 }); };
+  'appeal #'i id           => { append_id_link("appeal", "post-appeal", "/post_appeals/", { a1, a2 }); };
+  'flag #'i id             => { append_id_link("flag", "post-flag", "/post_flags/", { a1, a2 }); };
+  'note #'i id             => { append_id_link("note", "note", "/notes/", { a1, a2 }); };
+  'forum #'i id            => { append_id_link("forum", "forum-post", "/forum_posts/", { a1, a2 }); };
+  'topic #'i id            => { append_id_link("topic", "forum-topic", "/forum_topics/", { a1, a2 }); };
+  'comment #'i id          => { append_id_link("comment", "comment", "/comments/", { a1, a2 }); };
+  'dmail #'i id            => { append_id_link("dmail", "dmail", "/dmails/", { a1, a2 }); };
+  'pool #'i id             => { append_id_link("pool", "pool", "/pools/", { a1, a2 }); };
+  'user #'i id             => { append_id_link("user", "user", "/users/", { a1, a2 }); };
+  'artist #'i id           => { append_id_link("artist", "artist", "/artists/", { a1, a2 }); };
+  'ban #'i id              => { append_id_link("ban", "ban", "/bans/", { a1, a2 }); };
+  'bur #'i id              => { append_id_link("BUR", "bulk-update-request", "/bulk_update_requests/", { a1, a2 }); };
+  'alias #'i id            => { append_id_link("alias", "tag-alias", "/tag_aliases/", { a1, a2 }); };
+  'implication #'i id      => { append_id_link("implication", "tag-implication", "/tag_implications/", { a1, a2 }); };
+  'favgroup #'i id         => { append_id_link("favgroup", "favorite-group", "/favorite_groups/", { a1, a2 }); };
+  'mod action #'i id       => { append_id_link("mod action", "mod-action", "/mod_actions/", { a1, a2 }); };
+  'modreport #'i id        => { append_id_link("modreport", "moderation-report", "/moderation_reports/", { a1, a2 }); };
+  'feedback #'i id         => { append_id_link("feedback", "user-feedback", "/user_feedbacks/", { a1, a2 }); };
+  'wiki #'i id             => { append_id_link("wiki", "wiki-page", "/wiki_pages/", { a1, a2 }); };
+  'asset #'i id            => { append_id_link("asset", "media-asset", "/media_assets/", { a1, a2 }); };
+  'media asset #'i id      => { append_id_link("asset", "media-asset", "/media_assets/", { a1, a2 }); };
 
-  'issue #'i id            => { append_id_link(sm, "issue", "github", "https://github.com/danbooru/danbooru/issues/", { sm->a1, sm->a2 }); };
-  'pull #'i id             => { append_id_link(sm, "pull", "github-pull", "https://github.com/danbooru/danbooru/pull/", { sm->a1, sm->a2 }); };
-  'commit #'i id           => { append_id_link(sm, "commit", "github-commit", "https://github.com/danbooru/danbooru/commit/", { sm->a1, sm->a2 }); };
-  'artstation #'i alnum_id => { append_id_link(sm, "artstation", "artstation", "https://www.artstation.com/artwork/", { sm->a1, sm->a2 }); };
-  'deviantart #'i id       => { append_id_link(sm, "deviantart", "deviantart", "https://www.deviantart.com/deviation/", { sm->a1, sm->a2 }); };
-  'nijie #'i id            => { append_id_link(sm, "nijie", "nijie", "https://nijie.info/view.php?id=", { sm->a1, sm->a2 }); };
-  'pawoo #'i id            => { append_id_link(sm, "pawoo", "pawoo", "https://pawoo.net/web/statuses/", { sm->a1, sm->a2 }); };
-  'pixiv #'i id            => { append_id_link(sm, "pixiv", "pixiv", "https://www.pixiv.net/artworks/", { sm->a1, sm->a2 }); };
-  'seiga #'i id            => { append_id_link(sm, "seiga", "seiga", "https://seiga.nicovideo.jp/seiga/im", { sm->a1, sm->a2 }); };
-  'twitter #'i id          => { append_id_link(sm, "twitter", "twitter", "https://twitter.com/i/web/status/", { sm->a1, sm->a2 }); };
+  'issue #'i id            => { append_id_link("issue", "github", "https://github.com/danbooru/danbooru/issues/", { a1, a2 }); };
+  'pull #'i id             => { append_id_link("pull", "github-pull", "https://github.com/danbooru/danbooru/pull/", { a1, a2 }); };
+  'commit #'i id           => { append_id_link("commit", "github-commit", "https://github.com/danbooru/danbooru/commit/", { a1, a2 }); };
+  'artstation #'i alnum_id => { append_id_link("artstation", "artstation", "https://www.artstation.com/artwork/", { a1, a2 }); };
+  'deviantart #'i id       => { append_id_link("deviantart", "deviantart", "https://www.deviantart.com/deviation/", { a1, a2 }); };
+  'nijie #'i id            => { append_id_link("nijie", "nijie", "https://nijie.info/view.php?id=", { a1, a2 }); };
+  'pawoo #'i id            => { append_id_link("pawoo", "pawoo", "https://pawoo.net/web/statuses/", { a1, a2 }); };
+  'pixiv #'i id            => { append_id_link("pixiv", "pixiv", "https://www.pixiv.net/artworks/", { a1, a2 }); };
+  'seiga #'i id            => { append_id_link("seiga", "seiga", "https://seiga.nicovideo.jp/seiga/im", { a1, a2 }); };
+  'twitter #'i id          => { append_id_link("twitter", "twitter", "https://twitter.com/i/web/status/", { a1, a2 }); };
 
-  'yandere #'i id => { append_id_link(sm, "yandere", "yandere", "https://yande.re/post/show/", { sm->a1, sm->a2 }); };
-  'sankaku #'i id => { append_id_link(sm, "sankaku", "sankaku", "https://chan.sankakucomplex.com/post/show/", { sm->a1, sm->a2 }); };
-  'gelbooru #'i id => { append_id_link(sm, "gelbooru", "gelbooru", "https://gelbooru.com/index.php?page=post&s=view&id=", { sm->a1, sm->a2 }); };
+  'yandere #'i id => { append_id_link("yandere", "yandere", "https://yande.re/post/show/", { a1, a2 }); };
+  'sankaku #'i id => { append_id_link("sankaku", "sankaku", "https://chan.sankakucomplex.com/post/show/", { a1, a2 }); };
+  'gelbooru #'i id => { append_id_link("gelbooru", "gelbooru", "https://gelbooru.com/index.php?page=post&s=view&id=", { a1, a2 }); };
 
-  'dmail #'i id '/' dmail_key => { append_dmail_key_link(sm); };
+  'dmail #'i id '/' dmail_key => { append_dmail_key_link({ a1, a2 }, { b1, b2 }); };
 
-  'topic #'i id '/p'i page => { append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"", "/forum_topics/", "?page="); };
-  'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"", "https://www.pixiv.net/artworks/", "#"); };
+  'topic #'i id '/p'i page => { append_paged_link("topic #", { a1, a2 }, "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"", "/forum_topics/", "?page=", { b1, b2 }); };
+  'pixiv #'i id '/p'i page => { append_paged_link("pixiv #", { a1, a2 }, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"", "https://www.pixiv.net/artworks/", "#", { b1, b2 }); };
 
   basic_post_search_link => {
-    append_post_search_link(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 }, { sm->b1, sm->b2 }, { sm->d1, sm->d2 });
+    append_post_search_link({ a1, a2 }, { b1, b2 }, { b1, b2 }, { d1, d2 });
   };
 
   aliased_post_search_link => {
-    append_post_search_link(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 }, { sm->c1, sm->c2 }, { sm->d1, sm->d2 });
+    append_post_search_link({ a1, a2 }, { b1, b2 }, { c1, c2 }, { d1, d2 });
   };
 
   basic_wiki_link => {
-    append_wiki_link(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 }, { sm->c1, sm->c2 }, { sm->b1, sm->b2 }, { sm->e1, sm->e2 });
+    append_wiki_link({ a1, a2 }, { b1, b2 }, { c1, c2 }, { b1, b2 }, { e1, e2 });
   };
 
   aliased_wiki_link => {
-    append_wiki_link(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 }, { sm->c1, sm->c2 }, { sm->d1, sm->d2 }, { sm->e1, sm->e2 });
+    append_wiki_link({ a1, a2 }, { b1, b2 }, { c1, c2 }, { d1, d2 }, { e1, e2 });
   };
 
   basic_textile_link => {
-    append_bare_named_url(sm, { sm->b1, sm->b2 + 1 }, { sm->a1, sm->a2 });
+    append_bare_named_url({ b1, b2 + 1 }, { a1, a2 });
   };
 
   bracketed_textile_link | named_bbcode_link => {
-    append_named_url(sm, { sm->b1, sm->b2 }, { sm->a1, sm->a2 });
+    append_named_url({ b1, b2 }, { a1, a2 });
   };
 
   backwards_markdown_link | html_link => {
-    append_named_url(sm, { sm->a1, sm->a2 }, { sm->b1, sm->b2 });
+    append_named_url({ a1, a2 }, { b1, b2 });
   };
 
   markdown_link => {
-    append_named_url(sm, { sm->g1, sm->g2 }, { sm->f1, sm->f2 });
+    append_named_url({ g1, g2 }, { f1, f2 });
   };
 
   bare_absolute_url => {
-    append_bare_unnamed_url(sm, { sm->ts, sm->te });
+    append_bare_unnamed_url({ ts, te });
   };
 
   delimited_url | unnamed_bbcode_link => {
-    append_unnamed_url(sm, { sm->a1, sm->a2 });
+    append_unnamed_url({ a1, a2 });
   };
 
   bare_mention when mentions_enabled => {
-    append_mention(sm, { sm->a1, sm->a2 + 1 });
+    append_mention({ a1, a2 + 1 });
   };
 
   delimited_mention when mentions_enabled => {
-    g_debug("delimited mention: <@%.*s>", (int)(sm->a2 - sm->a1), sm->a1);
-    append_mention(sm, { sm->a1, sm->a2 });
+    g_debug("delimited mention: <@%.*s>", (int)(a2 - a1), a1);
+    append_mention({ a1, a2 });
   };
 
   newline list_item => {
     g_debug("inline list");
-    fexec sm->ts + 1;
+    fexec ts + 1;
     fret;
   };
 
-  open_b  => { dstack_open_element(sm,  INLINE_B, "<strong>"); };
-  close_b => { dstack_close_element(sm, INLINE_B); };
-  open_i  => { dstack_open_element(sm,  INLINE_I, "<em>"); };
-  close_i => { dstack_close_element(sm, INLINE_I); };
-  open_s  => { dstack_open_element(sm,  INLINE_S, "<s>"); };
-  close_s => { dstack_close_element(sm, INLINE_S); };
-  open_u  => { dstack_open_element(sm,  INLINE_U, "<u>"); };
-  close_u => { dstack_close_element(sm, INLINE_U); };
+  open_b  => { dstack_open_element(INLINE_B, "<strong>"); };
+  close_b => { dstack_close_element(INLINE_B, { ts, te }); };
+  open_i  => { dstack_open_element(INLINE_I, "<em>"); };
+  close_i => { dstack_close_element(INLINE_I, { ts, te }); };
+  open_s  => { dstack_open_element(INLINE_S, "<s>"); };
+  close_s => { dstack_close_element(INLINE_S, { ts, te }); };
+  open_u  => { dstack_open_element(INLINE_U, "<u>"); };
+  close_u => { dstack_close_element(INLINE_U, { ts, te }); };
 
   open_tn => {
-    dstack_open_element(sm, INLINE_TN, "<span class=\"tn\">");
+    dstack_open_element(INLINE_TN, "<span class=\"tn\">");
   };
 
   newline* close_tn => {
     g_debug("inline [/tn]");
 
-    if (dstack_check(sm, INLINE_TN)) {
-      dstack_close_element(sm, INLINE_TN);
-    } else if (dstack_close_element(sm, BLOCK_TN)) {
+    if (dstack_check(INLINE_TN)) {
+      dstack_close_element(INLINE_TN, { ts, te });
+    } else if (dstack_close_element(BLOCK_TN, { ts, te })) {
       fret;
     }
   };
 
   open_br => {
-    if (sm->header_mode) {
-      append_html_escaped(sm, "<br>");
+    if (header_mode) {
+      append_html_escaped("<br>");
     } else {
-      append(sm, "<br>");
+      append("<br>");
     };
   };
 
   open_code blank_line? => {
-    append_inline_code(sm);
+    append_inline_code();
     fcall code;
   };
 
   open_code_lang blank_line? => {
-    append_inline_code(sm, { sm->a1, sm->a2 });
+    append_inline_code({ a1, a2 });
     fcall code;
   };
 
   newline code_fence => {
-    dstack_close_leaf_blocks(sm);
-    fexec sm->ts;
+    dstack_close_leaf_blocks();
+    fexec ts;
     fret;
   };
 
   newline ws* open_spoilers ws* eol => {
-    dstack_close_leaf_blocks(sm);
-    fexec sm->ts;
+    dstack_close_leaf_blocks();
+    fexec ts;
     fret;
   };
 
   open_spoilers => {
-    dstack_open_element(sm, INLINE_SPOILER, "<span class=\"spoiler\">");
+    dstack_open_element(INLINE_SPOILER, "<span class=\"spoiler\">");
   };
 
   newline? close_spoilers => {
-    if (dstack_is_open(sm, INLINE_SPOILER)) {
-      dstack_close_element(sm, INLINE_SPOILER);
-    } else if (dstack_is_open(sm, BLOCK_SPOILER)) {
-      dstack_close_until(sm, BLOCK_SPOILER);
+    if (dstack_is_open(INLINE_SPOILER)) {
+      dstack_close_element(INLINE_SPOILER, { ts, te });
+    } else if (dstack_is_open(BLOCK_SPOILER)) {
+      dstack_close_until(BLOCK_SPOILER);
       fret;
     } else {
-      append_html_escaped(sm, { sm->ts, sm->te });
+      append_html_escaped({ ts, te });
     }
   };
 
   open_nodtext blank_line? => {
-    dstack_open_element(sm, INLINE_NODTEXT, "");
+    dstack_open_element(INLINE_NODTEXT, "");
     fcall nodtext;
   };
-  
+
   # these are block level elements that should kick us out of the inline
   # scanner
 
   newline (open_code | open_code_lang | open_nodtext) => {
-    dstack_close_leaf_blocks(sm);
-    fexec sm->ts;
+    dstack_close_leaf_blocks();
+    fexec ts;
     fret;
   };
 
   newline (header | header_with_id) => {
-    dstack_close_leaf_blocks(sm);
-    fexec sm->ts;
+    dstack_close_leaf_blocks();
+    fexec ts;
     fret;
   };
 
   open_quote => {
     g_debug("inline [quote]");
-    dstack_close_leaf_blocks(sm);
-    fexec sm->ts;
+    dstack_close_leaf_blocks();
+    fexec ts;
     fret;
   };
 
   newline? close_quote ws* => {
     g_debug("inline [/quote]");
-    dstack_close_until(sm, BLOCK_QUOTE);
+    dstack_close_until(BLOCK_QUOTE);
     fret;
   };
 
   (open_expand | aliased_expand) => {
     g_debug("inline [expand]");
-    dstack_close_leaf_blocks(sm);
-    fexec sm->ts;
+    dstack_close_leaf_blocks();
+    fexec ts;
     fret;
   };
 
   newline? close_expand ws* => {
     g_debug("inline [/expand]");
-    dstack_close_until(sm, BLOCK_EXPAND);
+    dstack_close_until(BLOCK_EXPAND);
     fret;
   };
 
   newline ws* open_table => {
-    dstack_close_leaf_blocks(sm);
-    fexec sm->ts;
+    dstack_close_leaf_blocks();
+    fexec ts;
     fret;
   };
 
   newline* close_th => {
-    if (dstack_close_element(sm, BLOCK_TH)) {
+    if (dstack_close_element(BLOCK_TH, { ts, te })) {
       fret;
     }
   };
 
   newline* close_td => {
-    if (dstack_close_element(sm, BLOCK_TD)) {
+    if (dstack_close_element(BLOCK_TD, { ts, te })) {
       fret;
     }
   };
 
   newline hr => {
-    g_debug("inline [hr] (pos: %ld)", sm->ts - sm->pb);
-    dstack_close_leaf_blocks(sm);
-    fexec sm->ts;
+    g_debug("inline [hr] (pos: %ld)", ts - pb);
+    dstack_close_leaf_blocks();
+    fexec ts;
     fret;
   };
 
   blank_lines => {
     g_debug("inline newline2");
 
-    if (dstack_check(sm, BLOCK_P)) {
-      dstack_rewind(sm);
-    } else if (sm->header_mode) {
-      dstack_close_leaf_blocks(sm);
+    if (dstack_check(BLOCK_P)) {
+      dstack_rewind();
+    } else if (header_mode) {
+      dstack_close_leaf_blocks();
     } else {
-      dstack_close_list(sm);
+      dstack_close_list();
     }
 
-    if (sm->options.f_inline) {
-      append(sm, " ");
+    if (options.f_inline) {
+      append(" ");
     }
 
     fret;
@@ -555,108 +555,108 @@ inline := |*
   newline => {
     g_debug("inline newline");
 
-    if (sm->header_mode) {
-      dstack_close_leaf_blocks(sm);
+    if (header_mode) {
+      dstack_close_leaf_blocks();
       fret;
-    } else if (dstack_is_open(sm, BLOCK_UL)) {
-      dstack_close_list(sm);
+    } else if (dstack_is_open(BLOCK_UL)) {
+      dstack_close_list();
       fret;
     } else {
-      append(sm, "<br>");
+      append("<br>");
     }
   };
 
   '\r' => {
-    append(sm, ' ');
+    append(' ');
   };
 
   eos;
 
   alnum+ | utf8char+ => {
-    append(sm, std::string_view { sm->ts, sm->te });
+    append({ ts, te });
   };
 
   any => {
-    append_html_escaped(sm, fc);
+    append_html_escaped(fc);
   };
 *|;
 
 code := |*
   newline? close_code => {
-    dstack_rewind(sm);
+    dstack_rewind();
     fret;
   };
 
   eos;
 
   any => {
-    append_html_escaped(sm, fc);
+    append_html_escaped(fc);
   };
 *|;
 
 nodtext := |*
   newline? close_nodtext => {
-    dstack_rewind(sm);
+    dstack_rewind();
     fret;
   };
 
   eos;
 
   any => {
-    append_html_escaped(sm, fc);
+    append_html_escaped(fc);
   };
 *|;
 
 table := |*
   open_colgroup => {
-    dstack_open_element(sm, BLOCK_COLGROUP, "colgroup", sm->tag_attributes);
+    dstack_open_element_attributes(BLOCK_COLGROUP, "colgroup");
   };
 
   close_colgroup => {
-    dstack_close_element(sm, BLOCK_COLGROUP);
+    dstack_close_element(BLOCK_COLGROUP, { ts, te });
   };
 
   open_col => {
-    dstack_open_element(sm, BLOCK_COL, "col", sm->tag_attributes);
-    dstack_pop(sm); // XXX [col] has no end tag
+    dstack_open_element_attributes(BLOCK_COL, "col");
+    dstack_pop(); // XXX [col] has no end tag
   };
 
   open_thead => {
-    dstack_open_element(sm, BLOCK_THEAD, "thead", sm->tag_attributes);
+    dstack_open_element_attributes(BLOCK_THEAD, "thead");
   };
 
   close_thead => {
-    dstack_close_element(sm, BLOCK_THEAD);
+    dstack_close_element(BLOCK_THEAD, { ts, te });
   };
 
   open_tbody => {
-    dstack_open_element(sm, BLOCK_TBODY, "tbody", sm->tag_attributes);
+    dstack_open_element_attributes(BLOCK_TBODY, "tbody");
   };
 
   close_tbody => {
-    dstack_close_element(sm, BLOCK_TBODY);
+    dstack_close_element(BLOCK_TBODY, { ts, te });
   };
 
   open_th => {
-    dstack_open_element(sm, BLOCK_TH, "th", sm->tag_attributes);
+    dstack_open_element_attributes(BLOCK_TH, "th");
     fcall inline;
   };
 
   open_tr => {
-    dstack_open_element(sm, BLOCK_TR, "tr", sm->tag_attributes);
+    dstack_open_element_attributes(BLOCK_TR, "tr");
   };
 
   close_tr => {
-    dstack_close_element(sm, BLOCK_TR);
+    dstack_close_element(BLOCK_TR, { ts, te });
   };
 
   open_td => {
-    dstack_open_element(sm, BLOCK_TD, "td", sm->tag_attributes);
+    dstack_open_element_attributes(BLOCK_TD, "td");
     fcall inline;
   };
 
   close_table => {
-    if (dstack_close_element(sm, BLOCK_TABLE)) {
+    if (dstack_close_element(BLOCK_TABLE, { ts, te })) {
       fret;
     }
   };
@@ -666,75 +666,75 @@ table := |*
 
 main := |*
   header | header_with_id => {
-    append_header(sm, *sm->a1, { sm->b1, sm->b2 });
+    append_header(*a1, { b1, b2 });
     fcall inline;
   };
 
   open_quote space* => {
-    dstack_close_leaf_blocks(sm);
-    dstack_open_element(sm, BLOCK_QUOTE, "<blockquote>");
+    dstack_close_leaf_blocks();
+    dstack_open_element(BLOCK_QUOTE, "<blockquote>");
   };
 
   open_spoilers space* => {
-    dstack_close_leaf_blocks(sm);
-    dstack_open_element(sm, BLOCK_SPOILER, "<div class=\"spoiler\">");
+    dstack_close_leaf_blocks();
+    dstack_open_element(BLOCK_SPOILER, "<div class=\"spoiler\">");
   };
 
   open_code blank_line? => {
-    append_block_code(sm);
+    append_block_code();
     fcall code;
   };
 
   open_code_lang blank_line? => {
-    append_block_code(sm, { sm->a1, sm->a2 });
+    append_block_code({ a1, a2 });
     fcall code;
   };
 
   code_fence => {
-    append_code_fence(sm, { sm->b1, sm->b2 }, { sm->a1, sm->a2 });
+    append_code_fence({ b1, b2 }, { a1, a2 });
   };
 
   open_expand space* => {
-    dstack_close_leaf_blocks(sm);
-    dstack_open_element(sm, BLOCK_EXPAND, "<details>");
-    append_block(sm, "<summary>Show</summary><div>");
+    dstack_close_leaf_blocks();
+    dstack_open_element(BLOCK_EXPAND, "<details>");
+    append_block("<summary>Show</summary><div>");
   };
 
   aliased_expand space* => {
     g_debug("block [expand=]");
-    dstack_close_leaf_blocks(sm);
-    dstack_open_element(sm, BLOCK_EXPAND, "<details>");
-    append_block(sm, "<summary>");
-    append_block_html_escaped(sm, { sm->a1, sm->a2 });
-    append_block(sm, "</summary><div>");
+    dstack_close_leaf_blocks();
+    dstack_open_element(BLOCK_EXPAND, "<details>");
+    append_block("<summary>");
+    append_block_html_escaped({ a1, a2 });
+    append_block("</summary><div>");
   };
 
   open_nodtext blank_line? => {
-    dstack_close_leaf_blocks(sm);
-    dstack_open_element(sm, BLOCK_NODTEXT, "<p>");
+    dstack_close_leaf_blocks();
+    dstack_open_element(BLOCK_NODTEXT, "<p>");
     fcall nodtext;
   };
 
   ws* open_table => {
-    dstack_close_leaf_blocks(sm);
-    dstack_open_element(sm, BLOCK_TABLE, "<table class=\"striped\">");
+    dstack_close_leaf_blocks();
+    dstack_open_element(BLOCK_TABLE, "<table class=\"striped\">");
     fcall table;
   };
 
   open_tn => {
-    dstack_open_element(sm, BLOCK_TN, "<p class=\"tn\">");
+    dstack_open_element(BLOCK_TN, "<p class=\"tn\">");
     fcall inline;
   };
 
   hr => {
-    g_debug("write '<hr>' (pos: %ld)", sm->ts - sm->pb);
-    append_block(sm, "<hr>");
+    g_debug("write '<hr>' (pos: %ld)", ts - pb);
+    append_block("<hr>");
   };
 
   list_item => {
     g_debug("block list");
-    dstack_open_list(sm, sm->a2 - sm->a1);
-    fexec sm->b1;
+    dstack_open_list(a2 - a1);
+    fexec b1;
     fcall inline;
   };
 
@@ -746,8 +746,8 @@ main := |*
     g_debug("block char");
     fhold;
 
-    if (sm->dstack.empty() || dstack_check(sm, BLOCK_QUOTE) || dstack_check(sm, BLOCK_SPOILER) || dstack_check(sm, BLOCK_EXPAND)) {
-      dstack_open_element(sm, BLOCK_P, "<p>");
+    if (dstack.empty() || dstack_check(BLOCK_QUOTE) || dstack_check(BLOCK_SPOILER) || dstack_check(BLOCK_EXPAND)) {
+      dstack_open_element(BLOCK_P, "<p>");
     }
 
     fcall inline;
@@ -758,42 +758,42 @@ main := |*
 
 %% write data;
 
-static void dstack_push(StateMachine * sm, element_t element) {
-  sm->dstack.push_back(element);
+void StateMachine::dstack_push(element_t element) {
+  dstack.push_back(element);
 }
 
-static element_t dstack_pop(StateMachine * sm) {
-  if (sm->dstack.empty()) {
+element_t StateMachine::dstack_pop() {
+  if (dstack.empty()) {
     g_debug("dstack pop empty stack");
     return DSTACK_EMPTY;
   } else {
-    auto element = sm->dstack.back();
-    sm->dstack.pop_back();
+    auto element = dstack.back();
+    dstack.pop_back();
     return element;
   }
 }
 
-static element_t dstack_peek(const StateMachine * sm) {
-  return sm->dstack.empty() ? DSTACK_EMPTY : sm->dstack.back();
+element_t StateMachine::dstack_peek() {
+  return dstack.empty() ? DSTACK_EMPTY : dstack.back();
 }
 
-static bool dstack_check(const StateMachine * sm, element_t expected_element) {
-  return dstack_peek(sm) == expected_element;
+bool StateMachine::dstack_check(element_t expected_element) {
+  return dstack_peek() == expected_element;
 }
 
 // Return true if the given tag is currently open.
-static bool dstack_is_open(const StateMachine * sm, element_t element) {
-  return std::find(sm->dstack.begin(), sm->dstack.end(), element) != sm->dstack.end();
+bool StateMachine::dstack_is_open(element_t element) {
+  return std::find(dstack.begin(), dstack.end(), element) != dstack.end();
 }
 
-static int dstack_count(const StateMachine * sm, element_t element) {
-  return std::count(sm->dstack.begin(), sm->dstack.end(), element);
+int StateMachine::dstack_count(element_t element) {
+  return std::count(dstack.begin(), dstack.end(), element);
 }
 
-static bool is_internal_url(StateMachine * sm, const std::string_view url) {
+bool StateMachine::is_internal_url(const std::string_view url) {
   if (url.starts_with("/")) {
     return true;
-  } else if (sm->options.domain.empty() || url.empty()) {
+  } else if (options.domain.empty() || url.empty()) {
     return false;
   } else {
     // Matches the domain name part of a URL.
@@ -801,126 +801,126 @@ static bool is_internal_url(StateMachine * sm, const std::string_view url) {
 
     std::match_results<std::string_view::const_iterator> matches;
     std::regex_search(url.begin(), url.end(), matches, url_regex);
-    return matches[1] == sm->options.domain;
+    return matches[1] == options.domain;
   }
 }
 
-static void append(StateMachine * sm, const auto c) {
-  sm->output += c;
+void StateMachine::append(const auto c) {
+  output += c;
 }
 
-static void append(StateMachine * sm, const char * a, const char * b) {
-  append(sm, std::string_view(a, b));
+void StateMachine::append(const std::string_view string) {
+  output += string;
 }
 
-static void append_html_escaped(StateMachine * sm, char s) {
+void StateMachine::append_html_escaped(char s) {
   switch (s) {
-    case '<': append(sm, "&lt;"); break;
-    case '>': append(sm, "&gt;"); break;
-    case '&': append(sm, "&amp;"); break;
-    case '"': append(sm, "&quot;"); break;
-    default:  append(sm, s);
+    case '<': append("&lt;"); break;
+    case '>': append("&gt;"); break;
+    case '&': append("&amp;"); break;
+    case '"': append("&quot;"); break;
+    default:  append(s);
   }
 }
 
-static void append_html_escaped(StateMachine * sm, const std::string_view string) {
+void StateMachine::append_html_escaped(const std::string_view string) {
   for (const unsigned char c : string) {
-    append_html_escaped(sm, c);
+    append_html_escaped(c);
   }
 }
 
-static void append_uri_escaped(StateMachine * sm, const std::string_view string) {
+void StateMachine::append_uri_escaped(const std::string_view string) {
   static const char hex[] = "0123456789ABCDEF";
 
   for (const unsigned char c : string) {
     if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '-' || c == '_' || c == '.' || c == '~') {
-      append(sm, c);
+      append(c);
     } else {
-      append(sm, '%');
-      append(sm, hex[c >> 4]);
-      append(sm, hex[c & 0x0F]);
+      append('%');
+      append(hex[c >> 4]);
+      append(hex[c & 0x0F]);
     }
   }
 }
 
-static void append_relative_url(StateMachine * sm, const auto url) {
-  if ((url[0] == '/' || url[0] == '#') && !sm->options.base_url.empty()) {
-    append_html_escaped(sm, sm->options.base_url);
+void StateMachine::append_relative_url(const auto url) {
+  if ((url[0] == '/' || url[0] == '#') && !options.base_url.empty()) {
+    append_html_escaped(options.base_url);
   }
 
-  append_html_escaped(sm, url);
+  append_html_escaped(url);
 }
 
-static void append_absolute_link(StateMachine * sm, const std::string_view url, const std::string_view title, bool internal_url, bool escape_title) {
+void StateMachine::append_absolute_link(const std::string_view url, const std::string_view title, bool internal_url, bool escape_title) {
   if (internal_url) {
-    append(sm, "<a class=\"dtext-link\" href=\"");
+    append("<a class=\"dtext-link\" href=\"");
   } else if (url == title) {
-    append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
+    append("<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
   } else {
-    append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"");
+    append("<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"");
   }
 
-  append_html_escaped(sm, url);
-  append(sm, "\">");
+  append_html_escaped(url);
+  append("\">");
 
   if (escape_title) {
-    append_html_escaped(sm, title);
+    append_html_escaped(title);
   } else {
-    append(sm, title);
+    append(title);
   }
 
-  append(sm, "</a>");
+  append("</a>");
 }
 
-static void append_mention(StateMachine * sm, const std::string_view name) {
-  append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
-  append_html_escaped(sm, name);
-  append(sm, "\" href=\"");
-  append_relative_url(sm, "/users?name=");
-  append_uri_escaped(sm, name);
-  append(sm, "\">@");
-  append_html_escaped(sm, name);
-  append(sm, "</a>");
+void StateMachine::append_mention(const std::string_view name) {
+  append("<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
+  append_html_escaped(name);
+  append("\" href=\"");
+  append_relative_url("/users?name=");
+  append_uri_escaped(name);
+  append("\">@");
+  append_html_escaped(name);
+  append("</a>");
 }
 
-static void append_id_link(StateMachine * sm, const char * title, const char * id_name, const char * url, const std::string_view id) {
+void StateMachine::append_id_link(const char * title, const char * id_name, const char * url, const std::string_view id) {
   if (url[0] == '/') {
-    append(sm, "<a class=\"dtext-link dtext-id-link dtext-");
-    append(sm, id_name);
-    append(sm, "-id-link\" href=\"");
-    append_relative_url(sm, url);
+    append("<a class=\"dtext-link dtext-id-link dtext-");
+    append(id_name);
+    append("-id-link\" href=\"");
+    append_relative_url(url);
   } else {
-    append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-");
-    append(sm, id_name);
-    append(sm, "-id-link\" href=\"");
-    append_html_escaped(sm, url);
+    append("<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-");
+    append(id_name);
+    append("-id-link\" href=\"");
+    append_html_escaped(url);
   }
 
-  append_uri_escaped(sm, id);
-  append(sm, "\">");
-  append(sm, title);
-  append(sm, " #");
-  append_html_escaped(sm, id);
-  append(sm, "</a>");
+  append_uri_escaped(id);
+  append("\">");
+  append(title);
+  append(" #");
+  append_html_escaped(id);
+  append("</a>");
 }
 
-static void append_bare_unnamed_url(StateMachine * sm, const std::string_view url) {
+void StateMachine::append_bare_unnamed_url(const std::string_view url) {
   auto [trimmed_url, leftovers] = trim_url(url);
-  append_unnamed_url(sm, trimmed_url);
-  append_html_escaped(sm, leftovers);
+  append_unnamed_url(trimmed_url);
+  append_html_escaped(leftovers);
 }
 
-static void append_unnamed_url(StateMachine * sm, const std::string_view url) {
+void StateMachine::append_unnamed_url(const std::string_view url) {
   DText::URL parsed_url(url);
 
-  if (sm->options.internal_domains.find(std::string(parsed_url.domain)) != sm->options.internal_domains.end()) {
-    append_internal_url(sm, parsed_url);
+  if (options.internal_domains.find(std::string(parsed_url.domain)) != options.internal_domains.end()) {
+    append_internal_url(parsed_url);
   } else {
-    append_absolute_link(sm, url, url, parsed_url.domain == sm->options.domain);
+    append_absolute_link(url, url, parsed_url.domain == options.domain);
   }
 }
 
-static void append_internal_url(StateMachine * sm, const DText::URL& url) {
+void StateMachine::append_internal_url(const DText::URL& url) {
   auto path_components = url.path_components();
   auto query = url.query;
   auto fragment = url.fragment;
@@ -932,33 +932,33 @@ static void append_internal_url(StateMachine * sm, const DText::URL& url) {
     if (!id.empty() && std::all_of(id.begin(), id.end(), ::isdigit)) {
       if (controller == "posts" && fragment.empty()) {
         // https://danbooru.donmai.us/posts/6000000#comment_2288996
-        return append_id_link(sm, "post", "post", "/posts/", id);
+        return append_id_link("post", "post", "/posts/", id);
       } else if (controller == "pools" && query.empty()) {
         // https://danbooru.donmai.us/pools/903?page=2
-        return append_id_link(sm, "pool", "pool", "/pools/", id);
+        return append_id_link("pool", "pool", "/pools/", id);
       } else if (controller == "comments") {
-        return append_id_link(sm, "comment", "comment", "/comments/", id);
+        return append_id_link("comment", "comment", "/comments/", id);
       } else if (controller == "forum_posts") {
-        return append_id_link(sm, "forum", "forum-post", "/forum_posts/", id);
+        return append_id_link("forum", "forum-post", "/forum_posts/", id);
       } else if (controller == "forum_topics" && query.empty() && fragment.empty()) {
         // https://danbooru.donmai.us/forum_topics/1234?page=2
         // https://danbooru.donmai.us/forum_topics/1234#forum_post_5678
-        return append_id_link(sm, "topic", "forum-topic", "/forum_topics/", id);
+        return append_id_link("topic", "forum-topic", "/forum_topics/", id);
       } else if (controller == "users") {
-        return append_id_link(sm, "user", "user", "/users/", id);
+        return append_id_link("user", "user", "/users/", id);
       } else if (controller == "artists") {
-        return append_id_link(sm, "artist", "artist", "/artists/", id);
+        return append_id_link("artist", "artist", "/artists/", id);
       } else if (controller == "notes") {
-        return append_id_link(sm, "note", "note", "/notes/", id);
+        return append_id_link("note", "note", "/notes/", id);
       } else if (controller == "favorite_groups" && query.empty()) {
         // https://danbooru.donmai.us/favorite_groups/1234?page=2
-        return append_id_link(sm, "favgroup", "favorite-group", "/favorite_groups/", id);
+        return append_id_link("favgroup", "favorite-group", "/favorite_groups/", id);
       } else if (controller == "wiki_pages" && fragment.empty()) {
         // http://danbooru.donmai.us/wiki_pages/10933#dtext-self-upload
-        return append_id_link(sm, "wiki", "wiki-page", "/wiki_pages/", id);
+        return append_id_link("wiki", "wiki-page", "/wiki_pages/", id);
       }
     } else if (controller == "wiki_pages" && fragment.empty()) {
-      return append_wiki_link(sm, {}, id, {}, id, {});
+      return append_wiki_link({}, id, {}, id, {});
     }
   } else if (path_components.size() >= 3) {
     // http://danbooru.donmai.us/post/show/1234/touhou
@@ -968,47 +968,47 @@ static void append_internal_url(StateMachine * sm, const DText::URL& url) {
 
     if (!id.empty() && std::all_of(id.begin(), id.end(), ::isdigit)) {
       if (controller == "post" && action == "show") {
-        return append_id_link(sm, "post", "post", "/posts/", id);
+        return append_id_link("post", "post", "/posts/", id);
       }
     }
   }
 
-  append_absolute_link(sm, url.url, url.url, url.domain == sm->options.domain);
+  append_absolute_link(url.url, url.url, url.domain == options.domain);
 }
 
-static void append_named_url(StateMachine * sm, const std::string_view url, const std::string_view title) {
-  auto parsed_title = sm->parse_basic_inline(title);
+void StateMachine::append_named_url(const std::string_view url, const std::string_view title) {
+  auto parsed_title = parse_basic_inline(title);
 
   // protocol-relative url; treat `//example.com` like `http://example.com`
   if (url.size() > 2 && url.starts_with("//")) {
     auto full_url = "http:" + std::string(url);
-    append_absolute_link(sm, full_url, parsed_title, is_internal_url(sm, full_url), false);
+    append_absolute_link(full_url, parsed_title, is_internal_url(full_url), false);
   } else if (url[0] == '/' || url[0] == '#') {
-    append(sm, "<a class=\"dtext-link\" href=\"");
-    append_relative_url(sm, url);
-    append(sm, "\">");
-    append(sm, parsed_title);
-    append(sm, "</a>");
+    append("<a class=\"dtext-link\" href=\"");
+    append_relative_url(url);
+    append("\">");
+    append(parsed_title);
+    append("</a>");
   } else if (url == title) {
-    append_unnamed_url(sm, url);
+    append_unnamed_url(url);
   } else {
-    append_absolute_link(sm, url, parsed_title, is_internal_url(sm, url), false);
+    append_absolute_link(url, parsed_title, is_internal_url(url), false);
   }
 }
 
-static void append_bare_named_url(StateMachine * sm, const std::string_view url, std::string_view title) {
+void StateMachine::append_bare_named_url(const std::string_view url, std::string_view title) {
   auto [trimmed_url, leftovers] = trim_url(url);
-  append_named_url(sm, trimmed_url, title);
-  append_html_escaped(sm, leftovers);
+  append_named_url(trimmed_url, title);
+  append_html_escaped(leftovers);
 }
 
-static void append_post_search_link(StateMachine * sm, const std::string_view prefix, const std::string_view search, const std::string_view title, const std::string_view suffix) {
+void StateMachine::append_post_search_link(const std::string_view prefix, const std::string_view search, const std::string_view title, const std::string_view suffix) {
   auto normalized_title = std::string(title);
 
-  append(sm, "<a class=\"dtext-link dtext-post-search-link\" href=\"");
-  append_relative_url(sm, "/posts?tags=");
-  append_uri_escaped(sm, search);
-  append(sm, "\">");
+  append("<a class=\"dtext-link dtext-post-search-link\" href=\"");
+  append_relative_url("/posts?tags=");
+  append_uri_escaped(search);
+  append("\">");
 
   // 19{{60s}} -> {{60s|1960s}}
   if (!prefix.empty()) {
@@ -1025,13 +1025,13 @@ static void append_post_search_link(StateMachine * sm, const std::string_view pr
     normalized_title.append(suffix);
   }
 
-  append_html_escaped(sm, normalized_title);
-  append(sm, "</a>");
+  append_html_escaped(normalized_title);
+  append("</a>");
 
-  clear_matches(sm);
+  clear_matches();
 }
 
-static void append_wiki_link(StateMachine * sm, const std::string_view prefix, const std::string_view tag, const std::string_view anchor, const std::string_view title, const std::string_view suffix) {
+void StateMachine::append_wiki_link(const std::string_view prefix, const std::string_view tag, const std::string_view anchor, const std::string_view title, const std::string_view suffix) {
   auto normalized_tag = std::string(tag);
   auto title_string = std::string(title);
 
@@ -1058,155 +1058,155 @@ static void append_wiki_link(StateMachine * sm, const std::string_view prefix, c
     title_string.append(suffix);
   }
 
-  append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"");
-  append_relative_url(sm, "/wiki_pages/");
-  append_uri_escaped(sm, normalized_tag);
+  append("<a class=\"dtext-link dtext-wiki-link\" href=\"");
+  append_relative_url("/wiki_pages/");
+  append_uri_escaped(normalized_tag);
 
   if (!anchor.empty()) {
     std::string normalized_anchor(anchor);
     std::transform(normalized_anchor.begin(), normalized_anchor.end(), normalized_anchor.begin(), [](char c) { return isalnum(c) ? tolower(c) : '-'; });
-    append_html_escaped(sm, "#dtext-");
-    append_html_escaped(sm, normalized_anchor);
+    append_html_escaped("#dtext-");
+    append_html_escaped(normalized_anchor);
   }
 
-  append(sm, "\">");
-  append_html_escaped(sm, title_string);
-  append(sm, "</a>");
+  append("\">");
+  append_html_escaped(title_string);
+  append("</a>");
 
-  sm->wiki_pages.insert(std::string(tag));
+  wiki_pages.insert(std::string(tag));
 
-  clear_matches(sm);
+  clear_matches();
 }
 
-static void append_paged_link(StateMachine * sm, const char * title, const char * tag, const char * href, const char * param) {
-  append(sm, tag);
-  append_relative_url(sm, href);
-  append(sm, sm->a1, sm->a2);
-  append(sm, param);
-  append(sm, sm->b1, sm->b2);
-  append(sm, "\">");
-  append(sm, title);
-  append(sm, sm->a1, sm->a2);
-  append(sm, "/p");
-  append(sm, sm->b1, sm->b2);
-  append(sm, "</a>");
+void StateMachine::append_paged_link(const char * title, const std::string_view id, const char * tag, const char * href, const char * param, const std::string_view page) {
+  append(tag);
+  append_relative_url(href);
+  append(id);
+  append(param);
+  append(page);
+  append("\">");
+  append(title);
+  append(id);
+  append("/p");
+  append(page);
+  append("</a>");
 }
 
-static void append_dmail_key_link(StateMachine * sm) {
-  append(sm, "<a class=\"dtext-link dtext-id-link dtext-dmail-id-link\" href=\"");
-  append_relative_url(sm, "/dmails/");
-  append(sm, sm->a1, sm->a2);
-  append(sm, "?key=");
-  append_uri_escaped(sm, { sm->b1, sm->b2 });
-  append(sm, "\">");
-  append(sm, "dmail #");
-  append(sm, sm->a1, sm->a2);
-  append(sm, "</a>");
+void StateMachine::append_dmail_key_link(const std::string_view dmail_id, const std::string_view dmail_key) {
+  append("<a class=\"dtext-link dtext-id-link dtext-dmail-id-link\" href=\"");
+  append_relative_url("/dmails/");
+  append(dmail_id);
+  append("?key=");
+  append_uri_escaped(dmail_key);
+  append("\">");
+  append("dmail #");
+  append(dmail_id);
+  append("</a>");
 }
 
-static void append_code_fence(StateMachine * sm, const std::string_view code, const std::string_view language) {
+void StateMachine::append_code_fence(const std::string_view code, const std::string_view language) {
   if (language.empty()) {
-    append_block(sm, "<pre>");
-    append_html_escaped(sm, code);
-    append_block(sm, "</pre>");
+    append_block("<pre>");
+    append_html_escaped(code);
+    append_block("</pre>");
   } else {
-    append_block(sm, "<pre class=\"language-");
-    append_html_escaped(sm, language);
-    append_block(sm, "\">");
-    append_html_escaped(sm, code);
-    append_block(sm, "</pre>");
+    append_block("<pre class=\"language-");
+    append_html_escaped(language);
+    append_block("\">");
+    append_html_escaped(code);
+    append_block("</pre>");
   }
 }
 
-static void append_inline_code(StateMachine * sm, const std::string_view language = {}) {
+void StateMachine::append_inline_code(const std::string_view language) {
   if (language.empty()) {
-    dstack_open_element(sm, INLINE_CODE, "<code>");
+    dstack_open_element(INLINE_CODE, "<code>");
   } else {
-    dstack_open_element(sm, INLINE_CODE, "<code class=\"language-");
-    append_html_escaped(sm, language);
-    append(sm, "\">");
+    dstack_open_element(INLINE_CODE, "<code class=\"language-");
+    append_html_escaped(language);
+    append("\">");
   }
 }
 
-static void append_block_code(StateMachine * sm, const std::string_view language = {}) {
-  dstack_close_leaf_blocks(sm);
+void StateMachine::append_block_code(const std::string_view language) {
+  dstack_close_leaf_blocks();
 
   if (language.empty()) {
-    dstack_open_element(sm, BLOCK_CODE, "<pre>");
+    dstack_open_element(BLOCK_CODE, "<pre>");
   } else {
-    dstack_open_element(sm, BLOCK_CODE, "<pre class=\"language-");
-    append_html_escaped(sm, language);
-    append(sm, "\">");
+    dstack_open_element(BLOCK_CODE, "<pre class=\"language-");
+    append_html_escaped(language);
+    append("\">");
   }
 }
 
-static void append_header(StateMachine * sm, char header, const std::string_view id) {
-  static element_t blocks[] = { BLOCK_H1, BLOCK_H2, BLOCK_H3, BLOCK_H4, BLOCK_H5, BLOCK_H6 };
+void StateMachine::append_header(char header, const std::string_view id) {
+  static element_t blocks[] = {BLOCK_H1, BLOCK_H2, BLOCK_H3, BLOCK_H4, BLOCK_H5, BLOCK_H6};
   element_t block = blocks[header - '1'];
 
   if (id.empty()) {
-    dstack_open_element(sm, block, "<h");
-    append_block(sm, header);
-    append_block(sm, ">");
+    dstack_open_element(block, "<h");
+    append_block(header);
+    append_block(">");
   } else {
     auto normalized_id = std::string(id);
     std::transform(id.begin(), id.end(), normalized_id.begin(), [](char c) { return isalnum(c) ? tolower(c) : '-'; });
 
-    dstack_open_element(sm, block, "<h");
-    append_block(sm, header);
-    append_block(sm, " id=\"dtext-");
-    append_block(sm, normalized_id);
-    append_block(sm, "\">");
+    dstack_open_element(block, "<h");
+    append_block(header);
+    append_block(" id=\"dtext-");
+    append_block(normalized_id);
+    append_block("\">");
   }
 
-  sm->header_mode = true;
+  header_mode = true;
 }
 
-static void append_block(StateMachine * sm, const auto s) {
-  if (!sm->options.f_inline) {
-    append(sm, s);
-  }
-}
-
-static void append_block_html_escaped(StateMachine * sm, const std::string_view string) {
-  if (!sm->options.f_inline) {
-    append_html_escaped(sm, string);
+void StateMachine::append_block(const auto s) {
+  if (!options.f_inline) {
+    append(s);
   }
 }
 
-static void append_closing_p(StateMachine * sm) {
+void StateMachine::append_block_html_escaped(const std::string_view string) {
+  if (!options.f_inline) {
+    append_html_escaped(string);
+  }
+}
+
+void StateMachine::append_closing_p() {
   g_debug("append closing p");
 
-  if (sm->output.size() > 4 && sm->output.ends_with("<br>")) {
+  if (output.size() > 4 && output.ends_with("<br>")) {
     g_debug("trim last <br>");
-    sm->output.resize(sm->output.size() - 4);
+    output.resize(output.size() - 4);
   }
 
-  if (sm->output.size() > 3 && sm->output.ends_with("<p>")) {
+  if (output.size() > 3 && output.ends_with("<p>")) {
     g_debug("trim last <p>");
-    sm->output.resize(sm->output.size() - 3);
+    output.resize(output.size() - 3);
     return;
   }
 
-  append_block(sm, "</p>");
+  append_block("</p>");
 }
 
-static void dstack_open_element(StateMachine * sm, element_t type, const char * html) {
+void StateMachine::dstack_open_element(element_t type, const char * html) {
   g_debug("opening %s", html);
 
-  dstack_push(sm, type);
+  dstack_push(type);
 
   if (type >= INLINE) {
-    append(sm, html);
+    append(html);
   } else {
-    append_block(sm, html);
+    append_block(html);
   }
 }
 
-static void dstack_open_element(StateMachine * sm, element_t type, std::string_view tag_name, const StateMachine::TagAttributes& tag_attributes) {
-  dstack_push(sm, type);
-  append_block(sm, "<");
-  append_block(sm, tag_name);
+void StateMachine::dstack_open_element_attributes(element_t type, std::string_view tag_name) {
+  dstack_push(type);
+  append_block("<");
+  append_block(tag_name);
 
   auto& permitted_names = permitted_attribute_names.at(tag_name);
   for (auto& [name, value] : tag_attributes) {
@@ -1214,158 +1214,150 @@ static void dstack_open_element(StateMachine * sm, element_t type, std::string_v
       auto validate_value = permitted_attribute_values.at(name);
 
       if (validate_value(value)) {
-        append_block(sm, " ");
-        append_block_html_escaped(sm, name);
-        append_block(sm, "=\"");
-        append_block_html_escaped(sm, value);
-        append_block(sm, "\"");
+        append_block(" ");
+        append_block_html_escaped(name);
+        append_block("=\"");
+        append_block_html_escaped(value);
+        append_block("\"");
       }
     }
   }
 
-  append_block(sm, ">");
-  clear_tag_attributes(sm);
+  append_block(">");
+  tag_attributes.clear();
 }
 
-static bool dstack_close_element(StateMachine * sm, element_t type) {
-  if (dstack_check(sm, type)) {
-    dstack_rewind(sm);
+bool StateMachine::dstack_close_element(element_t type, const std::string_view tag_name) {
+  if (dstack_check(type)) {
+    dstack_rewind();
     return true;
-  } else if (type >= INLINE && dstack_peek(sm) >= INLINE) {
-    g_debug("out-of-order close %s; closing %s instead", element_names[type], element_names[dstack_peek(sm)]);
-    dstack_rewind(sm);
+  } else if (type >= INLINE && dstack_peek() >= INLINE) {
+    g_debug("out-of-order close %s; closing %s instead", element_names[type], element_names[dstack_peek()]);
+    dstack_rewind();
     return true;
   } else if (type >= INLINE) {
     g_debug("out-of-order closing %s", element_names[type]);
-    append_html_escaped(sm, { sm->ts, sm->te });
+    append_html_escaped(tag_name);
     return false;
   } else {
     g_debug("out-of-order closing %s", element_names[type]);
-    append_block_html_escaped(sm, { sm->ts, sm->te });
+    append_block_html_escaped(tag_name);
     return false;
   }
 }
 
 // Close the last open tag.
-static void dstack_rewind(StateMachine * sm) {
-  element_t element = dstack_pop(sm);
+void StateMachine::dstack_rewind() {
+  element_t element = dstack_pop();
   g_debug("dstack rewind %s", element_names[element]);
 
   switch(element) {
-    case BLOCK_P: append_closing_p(sm); break;
-    case INLINE_SPOILER: append(sm, "</span>"); break;
-    case BLOCK_SPOILER: append_block(sm, "</div>"); break;
-    case BLOCK_QUOTE: append_block(sm, "</blockquote>"); break;
-    case BLOCK_EXPAND: append_block(sm, "</div></details>"); break;
-    case BLOCK_NODTEXT: append_block(sm, "</p>"); break;
-    case BLOCK_CODE: append_block(sm, "</pre>"); break;
-    case BLOCK_TD: append_block(sm, "</td>"); break;
-    case BLOCK_TH: append_block(sm, "</th>"); break;
+    case BLOCK_P: append_closing_p(); break;
+    case INLINE_SPOILER: append("</span>"); break;
+    case BLOCK_SPOILER: append_block("</div>"); break;
+    case BLOCK_QUOTE: append_block("</blockquote>"); break;
+    case BLOCK_EXPAND: append_block("</div></details>"); break;
+    case BLOCK_NODTEXT: append_block("</p>"); break;
+    case BLOCK_CODE: append_block("</pre>"); break;
+    case BLOCK_TD: append_block("</td>"); break;
+    case BLOCK_TH: append_block("</th>"); break;
 
     case INLINE_NODTEXT: break;
-    case INLINE_B: append(sm, "</strong>"); break;
-    case INLINE_I: append(sm, "</em>"); break;
-    case INLINE_U: append(sm, "</u>"); break;
-    case INLINE_S: append(sm, "</s>"); break;
-    case INLINE_TN: append(sm, "</span>"); break;
-    case INLINE_CODE: append(sm, "</code>"); break;
+    case INLINE_B: append("</strong>"); break;
+    case INLINE_I: append("</em>"); break;
+    case INLINE_U: append("</u>"); break;
+    case INLINE_S: append("</s>"); break;
+    case INLINE_TN: append("</span>"); break;
+    case INLINE_CODE: append("</code>"); break;
 
-    case BLOCK_TN: append_closing_p(sm); break;
-    case BLOCK_TABLE: append_block(sm, "</table>"); break;
-    case BLOCK_COLGROUP: append_block(sm, "</colgroup>"); break;
-    case BLOCK_THEAD: append_block(sm, "</thead>"); break;
-    case BLOCK_TBODY: append_block(sm, "</tbody>"); break;
-    case BLOCK_TR: append_block(sm, "</tr>"); break;
-    case BLOCK_UL: append_block(sm, "</ul>"); break;
-    case BLOCK_LI: append_block(sm, "</li>"); break;
-    case BLOCK_H6: append_block(sm, "</h6>"); sm->header_mode = false; break;
-    case BLOCK_H5: append_block(sm, "</h5>"); sm->header_mode = false; break;
-    case BLOCK_H4: append_block(sm, "</h4>"); sm->header_mode = false; break;
-    case BLOCK_H3: append_block(sm, "</h3>"); sm->header_mode = false; break;
-    case BLOCK_H2: append_block(sm, "</h2>"); sm->header_mode = false; break;
-    case BLOCK_H1: append_block(sm, "</h1>"); sm->header_mode = false; break;
+    case BLOCK_TN: append_closing_p(); break;
+    case BLOCK_TABLE: append_block("</table>"); break;
+    case BLOCK_COLGROUP: append_block("</colgroup>"); break;
+    case BLOCK_THEAD: append_block("</thead>"); break;
+    case BLOCK_TBODY: append_block("</tbody>"); break;
+    case BLOCK_TR: append_block("</tr>"); break;
+    case BLOCK_UL: append_block("</ul>"); break;
+    case BLOCK_LI: append_block("</li>"); break;
+    case BLOCK_H6: append_block("</h6>"); header_mode = false; break;
+    case BLOCK_H5: append_block("</h5>"); header_mode = false; break;
+    case BLOCK_H4: append_block("</h4>"); header_mode = false; break;
+    case BLOCK_H3: append_block("</h3>"); header_mode = false; break;
+    case BLOCK_H2: append_block("</h2>"); header_mode = false; break;
+    case BLOCK_H1: append_block("</h1>"); header_mode = false; break;
 
     // Should never happen.
     case INLINE: break;
     case DSTACK_EMPTY: break;
-  } 
+  }
 }
 
 // container blocks: [spoiler], [quote], [expand], [tn]
 // leaf blocks: [nodtext], [code], [table], [td]?, [th]?, <h1>, <p>, <li>, <ul>
-static void dstack_close_leaf_blocks(StateMachine * sm) {
+void StateMachine::dstack_close_leaf_blocks() {
   g_debug("dstack close leaf blocks");
 
-  while (!sm->dstack.empty() && !dstack_check(sm, BLOCK_QUOTE) && !dstack_check(sm, BLOCK_SPOILER) && !dstack_check(sm, BLOCK_EXPAND) && !dstack_check(sm, BLOCK_TN)) {
-    dstack_rewind(sm);
+  while (!dstack.empty() && !dstack_check(BLOCK_QUOTE) && !dstack_check(BLOCK_SPOILER) && !dstack_check(BLOCK_EXPAND) && !dstack_check(BLOCK_TN)) {
+    dstack_rewind();
   }
 }
 
 // Close all open tags up to and including the given tag.
-static void dstack_close_until(StateMachine * sm, element_t element) {
-  while (!sm->dstack.empty() && !dstack_check(sm, element)) {
-    dstack_rewind(sm);
+void StateMachine::dstack_close_until(element_t element) {
+  while (!dstack.empty() && !dstack_check(element)) {
+    dstack_rewind();
   }
 
-  dstack_rewind(sm);
+  dstack_rewind();
 }
 
 // Close all remaining open tags.
-static void dstack_close_all(StateMachine * sm) {
-  while (!sm->dstack.empty()) {
-    dstack_rewind(sm);
+void StateMachine::dstack_close_all() {
+  while (!dstack.empty()) {
+    dstack_rewind();
   }
 }
 
-static void dstack_open_list(StateMachine * sm, int depth) {
+void StateMachine::dstack_open_list(int depth) {
   g_debug("open list");
 
-  if (dstack_is_open(sm, BLOCK_LI)) {
-    dstack_close_until(sm, BLOCK_LI);
+  if (dstack_is_open(BLOCK_LI)) {
+    dstack_close_until(BLOCK_LI);
   } else {
-    dstack_close_leaf_blocks(sm);
+    dstack_close_leaf_blocks();
   }
 
-  while (dstack_count(sm, BLOCK_UL) < depth) {
-    dstack_open_element(sm, BLOCK_UL, "<ul>");
+  while (dstack_count(BLOCK_UL) < depth) {
+    dstack_open_element(BLOCK_UL, "<ul>");
   }
 
-  while (dstack_count(sm, BLOCK_UL) > depth) {
-    dstack_close_until(sm, BLOCK_UL);
+  while (dstack_count(BLOCK_UL) > depth) {
+    dstack_close_until(BLOCK_UL);
   }
 
-  dstack_open_element(sm, BLOCK_LI, "<li>");
+  dstack_open_element(BLOCK_LI, "<li>");
 }
 
-static void dstack_close_list(StateMachine * sm) {
-  while (dstack_is_open(sm, BLOCK_UL)) {
-    dstack_close_until(sm, BLOCK_UL);
+void StateMachine::dstack_close_list() {
+  while (dstack_is_open(BLOCK_UL)) {
+    dstack_close_until(BLOCK_UL);
   }
 }
 
-static void save_tag_attribute(StateMachine * sm, const std::string_view name, const std::string_view value) {
-  sm->tag_attributes[name] = value;
-}
-
-static void clear_tag_attributes(StateMachine * sm) {
-  sm->tag_attributes.clear();
-}
-
-static void clear_matches(StateMachine * sm) {
-  sm->a1 = NULL;
-  sm->a2 = NULL;
-  sm->b1 = NULL;
-  sm->b2 = NULL;
-  sm->c1 = NULL;
-  sm->c2 = NULL;
-  sm->d1 = NULL;
-  sm->d2 = NULL;
-  sm->e1 = NULL;
-  sm->e2 = NULL;
-  sm->f1 = NULL;
-  sm->f2 = NULL;
-  sm->g1 = NULL;
-  sm->g2 = NULL;
+void StateMachine::clear_matches() {
+  a1 = NULL;
+  a2 = NULL;
+  b1 = NULL;
+  b2 = NULL;
+  c1 = NULL;
+  c2 = NULL;
+  d1 = NULL;
+  d2 = NULL;
+  e1 = NULL;
+  e2 = NULL;
+  f1 = NULL;
+  f2 = NULL;
+  g1 = NULL;
+  g2 = NULL;
 }
 
 // True if a mention is allowed to start after this character.
@@ -1389,7 +1381,7 @@ static bool is_mention_boundary(unsigned char c) {
 }
 
 // Trim trailing unbalanced ')' characters from the URL.
-static std::tuple<std::string_view, std::string_view> trim_url(const std::string_view url) {
+std::tuple<std::string_view, std::string_view> StateMachine::trim_url(const std::string_view url) {
   std::string_view trimmed = url;
 
   while (!trimmed.empty() && trimmed.back() == ')' && std::count(trimmed.begin(), trimmed.end(), ')') > std::count(trimmed.begin(), trimmed.end(), '(')) {
@@ -1446,17 +1438,16 @@ StateMachine::ParseResult StateMachine::parse_dtext(const std::string_view dtext
 }
 
 std::string StateMachine::parse() {
-  StateMachine* sm = this;
-  g_debug("parse '%.*s'", (int)(sm->input.size() - 2), sm->input.c_str() + 1);
+  g_debug("parse '%.*s'", (int)(input.size() - 2), input.c_str() + 1);
 
   %% write init nocs;
   %% write exec;
 
   g_debug("EOF; closing stray blocks");
-  dstack_close_all(sm);
+  dstack_close_all();
   g_debug("done");
 
-  return sm->output;
+  return output;
 }
 
 /* Everything below is optional, it's only needed to build bin/cdtext.exe. */

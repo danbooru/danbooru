@@ -146,29 +146,57 @@ public:
   std::string parse_inline(const std::string_view dtext);
   std::string parse_basic_inline(const std::string_view dtext);
 
+  void dstack_push(element_t element);
+  element_t dstack_pop();
+  void dstack_rewind();
+  bool dstack_check(element_t expected_element);
+  element_t dstack_peek();
+  bool dstack_is_open(element_t element);
+  void dstack_close_until(element_t element);
+  void dstack_close_all();
+  int dstack_count(element_t element);
+  void dstack_open_element(element_t type, const char *html);
+  void dstack_open_element_attributes(element_t type, std::string_view tag_name);
+  void dstack_open_list(int depth);
+  void dstack_close_list();
+  bool dstack_close_element(element_t type, const std::string_view tag_name);
+  void dstack_close_leaf_blocks();
+
+  void append(const auto c);
+  void append(const std::string_view string);
+  void append_html_escaped(char s);
+  void append_html_escaped(const std::string_view string);
+  void append_uri_escaped(const std::string_view string);
+  void append_relative_url(const auto url);
+  void append_block(const auto s);
+  void append_block_html_escaped(const std::string_view string);
+
+  void append_header(char header, const std::string_view id);
+  void append_mention(const std::string_view name);
+  void append_id_link(const char *title, const char *id_name, const char *url, const std::string_view id);
+  void append_bare_unnamed_url(const std::string_view url);
+  void append_unnamed_url(const std::string_view url);
+  void append_internal_url(const DText::URL &url);
+  void append_named_url(const std::string_view url, const std::string_view title);
+  void append_bare_named_url(const std::string_view url, std::string_view title);
+  void append_absolute_link(const std::string_view url, const std::string_view title, bool internal_url = false, bool escape_title = true);
+  void append_post_search_link(const std::string_view prefix, const std::string_view search, const std::string_view title, const std::string_view suffix);
+  void append_wiki_link(const std::string_view prefix, const std::string_view tag, const std::string_view anchor, const std::string_view title, const std::string_view suffix);
+  void append_paged_link(const char *title, const std::string_view id, const char *tag, const char *href, const char *param, const std::string_view page);
+  void append_dmail_key_link(const std::string_view dmail_id, const std::string_view dmail_key);
+  void append_code_fence(const std::string_view code, const std::string_view language);
+  void append_inline_code(const std::string_view language = {});
+  void append_block_code(const std::string_view language = {});
+  void append_closing_p();
+
+  void clear_matches();
+
+  bool is_internal_url(const std::string_view url);
+  std::tuple<std::string_view, std::string_view> trim_url(const std::string_view url);
+
 private:
   StateMachine(const auto string, int initial_state, const DTextOptions = {});
   std::string parse();
 };
-
-static std::tuple<std::string_view, std::string_view> trim_url(const std::string_view url);
-static std::tuple<std::string_view, std::string_view, std::string_view, std::string_view> parse_url(const std::string_view url);
-static std::vector<std::string_view> split_string(const std::string_view input, char delim = '/');
-static void dstack_rewind(StateMachine * sm);
-static void dstack_open_inline(StateMachine * sm, element_t type, const char * html);
-static void dstack_open_element(StateMachine * sm, element_t type, const char * html);
-static void dstack_open_element(StateMachine * sm, element_t type, std::string_view tag_name, const StateMachine::TagAttributes& tag_attributes);
-static bool dstack_close_element(StateMachine * sm, element_t type);
-static void dstack_close_leaf_blocks(StateMachine * sm);
-static void append_block(StateMachine * sm, const auto s);
-static void append_block_html_escaped(StateMachine * sm, const std::string_view string);
-static void append_relative_url(StateMachine * sm, const auto url);
-static void append_absolute_link(StateMachine * sm, const std::string_view url, const std::string_view title, bool internal_url = false, bool escape_title = true);
-static void append_internal_url(StateMachine * sm, const DText::URL& url);
-static void append_unnamed_url(StateMachine * sm, const std::string_view url);
-static void append_wiki_link(StateMachine * sm, const std::string_view prefix, const std::string_view tag, const std::string_view anchor, const std::string_view title, const std::string_view suffix);
-static void save_tag_attribute(StateMachine * sm, const std::string_view name, const std::string_view value);
-static void clear_tag_attributes(StateMachine * sm);
-static void clear_matches(StateMachine * sm);
 
 #endif
