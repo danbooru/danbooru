@@ -14,13 +14,13 @@ class DTextTest < Minitest::Test
     parse(dtext, inline: true)
   end
 
-  def assert_parse_id_link(class_name, url, input, **options)
+  def assert_parse_id_link(class_name, url, input, text: input, **options)
     if url[0] == "/"
-      assert_parse(%{<p><a class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input, **options)
-      assert_parse(%{<p><a class="dtext-link dtext-id-link #{class_name}" href="http://danbooru.donmai.us#{url}">#{input}</a></p>}, input, base_url: "http://danbooru.donmai.us", **options)
+      assert_parse(%{<p><a class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{text}</a></p>}, input, **options)
+      assert_parse(%{<p><a class="dtext-link dtext-id-link #{class_name}" href="http://danbooru.donmai.us#{url}">#{text}</a></p>}, input, base_url: "http://danbooru.donmai.us", **options)
     else
-      assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input, **options)
-      assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{input}</a></p>}, input, base_url: "http://danbooru.donmai.us", **options)
+      assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{text}</a></p>}, input, **options)
+      assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-id-link #{class_name}" href="#{url}">#{text}</a></p>}, input, base_url: "http://danbooru.donmai.us", **options)
     end
   end
 
@@ -1382,6 +1382,8 @@ class DTextTest < Minitest::Test
 
   def test_id_links
     assert_parse_id_link("dtext-post-id-link", "/posts/1234", "post #1234")
+    assert_parse_id_link("dtext-media-asset-id-link", "/media_assets/1234", "asset #1234")
+    assert_parse_id_link("dtext-media-asset-id-link", "/media_assets/1234", "media asset #1234", text: "asset #1234")
     assert_parse_id_link("dtext-post-appeal-id-link", "/post_appeals/1234", "appeal #1234")
     assert_parse_id_link("dtext-post-flag-id-link", "/post_flags/1234", "flag #1234")
     assert_parse_id_link("dtext-note-id-link", "/notes/1234", "note #1234")

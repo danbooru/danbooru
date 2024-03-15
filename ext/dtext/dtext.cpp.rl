@@ -317,6 +317,8 @@ inline := |*
   'modreport #'i id        => { append_id_link(sm, "modreport", "moderation-report", "/moderation_reports/", { sm->a1, sm->a2 }); };
   'feedback #'i id         => { append_id_link(sm, "feedback", "user-feedback", "/user_feedbacks/", { sm->a1, sm->a2 }); };
   'wiki #'i id             => { append_id_link(sm, "wiki", "wiki-page", "/wiki_pages/", { sm->a1, sm->a2 }); };
+  'asset #'i id            => { append_id_link(sm, "asset", "media-asset", "/media_assets/", { sm->a1, sm->a2 }); };
+  'media asset #'i id      => { append_id_link(sm, "asset", "media-asset", "/media_assets/", { sm->a1, sm->a2 }); };
 
   'issue #'i id            => { append_id_link(sm, "issue", "github", "https://github.com/danbooru/danbooru/issues/", { sm->a1, sm->a2 }); };
   'pull #'i id             => { append_id_link(sm, "pull", "github-pull", "https://github.com/danbooru/danbooru/pull/", { sm->a1, sm->a2 }); };
