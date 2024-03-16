@@ -835,6 +835,26 @@ class DTextTest < Minitest::Test
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://example.com">test</a>', '[Http://example.com](test)')
     assert_inline_parse('<em>one</em>(two)', '[i]one[/i](two)')
 
+    assert_inline_parse('<a class="dtext-link" href="/posts">test</a>', "[/posts](test)")
+    assert_inline_parse("[/b](test)", "[/b](test)")
+    assert_inline_parse("[/b]blah[/b](test)", "[/b]blah[/b](test)")
+
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">foo</a>(test)', '"foo":[http://example.com](test)')
+    assert_inline_parse('<a class="dtext-link" href="/posts">foo</a>(test)', '"foo":[/posts](test)')
+    assert_inline_parse('<a class="dtext-link" href="/posts">foo</a>(/test)', '"foo":[/posts](/test)')
+    assert_inline_parse('<a class="dtext-link" href="/b">foo</a>(/test)', '"foo":[/b](/test)')
+    #assert_inline_parse('<strong>"foo":</strong>(/test)', '[b]"foo":[/b](/test)')
+    #assert_inline_parse('<strong>"foo":</strong>(/test)[/b]', '[b]"foo":[/b](/test)[/b]')
+
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://foo.com">http://bar.com</a>', '[http://foo.com](http://bar.com)')
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://foo.com">/bar</a>', '[http://foo.com](/bar)')
+    assert_inline_parse('<a class="dtext-link" href="/foo">http://bar.com</a>', '[/foo](http://bar.com)')
+    assert_inline_parse('<a class="dtext-link" href="/foo">/bar</a>', '[/foo](/bar)')
+    assert_inline_parse('[/b](<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://bar.com">http://bar.com</a>)', '[/b](http://bar.com)')
+    assert_inline_parse("[/b](/bar)", '[/b](/bar)')
+    assert_inline_parse("<strong>foo</strong>(/bar)", '[b]foo[/b](/bar)')
+    assert_inline_parse("<strong>foo</strong>(bar)", '[b]foo[/b](bar)')
+
     assert_inline_parse(CGI.escapeHTML('[blah](test)'), '[blah](test)')
     assert_inline_parse(CGI.escapeHTML('[](test)'), '[](test)')
   end
