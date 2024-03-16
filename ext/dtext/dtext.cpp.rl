@@ -196,7 +196,8 @@ unquoted_bbcode_url = delimited_absolute_url | delimited_relative_url;
 double_quoted_bbcode_url = '"' unquoted_bbcode_url >mark_b1 %mark_b2 :>> '"';
 single_quoted_bbcode_url = "'" unquoted_bbcode_url >mark_b1 %mark_b2 :>> "'";
 bbcode_url = double_quoted_bbcode_url | single_quoted_bbcode_url | unquoted_bbcode_url >mark_b1 %mark_b2;
-named_bbcode_link   = '[url'i ws* '=' ws* (bbcode_url :>> ws* ']') ws* (nonnewline+ >mark_a1 %mark_a2 :>> ws* '[/url]'i);
+bbcode_title = nonnewline+ - (ws any* | any* ws);
+named_bbcode_link   = '[url'i ws* '=' ws* (bbcode_url :>> ws* ']') ws* (bbcode_title >mark_a1 %mark_a2 ws* :>> '[/url]'i);
 unnamed_bbcode_link = '[url]'i ws* unquoted_bbcode_url >mark_a1 %mark_a2 ws* :>> '[/url]'i;
 
 emoticon_tags = '|' alnum | ':|' | '|_|' | '||_||' | '\\||/' | '<|>_<|>' | '>:|' | '>|3' | '|w|' | ':{' | ':}';
