@@ -217,20 +217,47 @@ class DTextTest < Minitest::Test
     assert_parse('<p>@<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://twitter.com/eshaolang">@eshaolang</a></p>', '@"@eshaolang":[https://twitter.com/eshaolang]', disable_mentions: true)
   end
 
-  def test_sanitize_heart
+  def test_sanitize_html_entities
     assert_parse('<p>&lt;3</p>', "<3")
-  end
-
-  def test_sanitize_less_than
     assert_parse('<p>&lt;</p>', "<")
-  end
-
-  def test_sanitize_greater_than
     assert_parse('<p>&gt;</p>', ">")
+    assert_parse('<p>&amp;</p>', "&")
+    assert_parse('<p>&quot;</p>', '"')
   end
 
-  def test_sanitize_ampersand
-    assert_parse('<p>&amp;</p>', "&")
+  def test_html_entities
+    assert_inline_parse("&amp;", "&amp;")
+    assert_inline_parse("&lt;", "&lt;")
+    assert_inline_parse("&gt;", "&gt;")
+    assert_inline_parse("&quot;", "&quot;")
+    assert_inline_parse("'", "&#39;")
+    assert_inline_parse("'", "&apos;")
+    assert_inline_parse("[", "&lbrack;")
+    assert_inline_parse("*", "&ast;")
+    assert_inline_parse(":", "&colon;")
+    assert_inline_parse("@", "&commat;")
+    assert_inline_parse("`", "&grave;")
+    assert_inline_parse("#", "&num;")
+    assert_inline_parse(".", "&period;")
+
+    assert_inline_parse("&amp;lt;", "&amp;lt;")
+    assert_inline_parse("&lt;b&gt;foo&lt;/b&gt;", "&lt;b&gt;foo&lt;/b&gt;")
+    assert_inline_parse("[b]foo[/b]", "&lbrack;b]foo&lbrack;/b]")
+    assert_inline_parse("{{foo}}", "&lbrace;&lbrace;foo}}")
+    assert_inline_parse("http://google.com", "http&colon;//google.com")
+    assert_inline_parse("&quot;title&quot;:/posts", "&quot;title&quot;:/posts")
+    assert_inline_parse("@user", "&commat;user")
+    assert_inline_parse("post #1", "post &num;1")
+    assert_parse("<p>h4. See also</p>", "h4&period; See also")
+    assert_parse("<p>```<br>code<br>```</p>", "&grave;&grave;&grave;\ncode\n&grave;&grave;&grave;")
+    assert_parse("<p>* list</p>", "&ast; list")
+
+    assert_inline_parse('<a class="dtext-link" href="/posts">&amp;quot;title&amp;quot;</a>', '"&quot;title&quot;":/posts')
+    assert_inline_parse('<a class="dtext-link dtext-wiki-link" href="/wiki_pages/tiger_%26amp%3B_bunny">tiger_&amp;amp;_bunny</a>', '[[tiger_&amp;_bunny]]')
+
+    assert_inline_parse('&amp;lt;', '[nodtext]&lt;[/nodtext]')
+    assert_parse('<pre>&amp;lt;</pre>', '[code]&lt;[/code]')
+    assert_parse('<pre>&amp;lt;</pre>', "```\n&lt;\n```")
   end
 
   def test_wiki_links

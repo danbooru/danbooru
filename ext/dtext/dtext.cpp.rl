@@ -566,6 +566,22 @@ inline := |*
     }
   };
 
+  # Only support HTML character entities that are common, or that are needed to escape DText.
+  '&amp;'i    => { append("&amp;"); };
+  '&lt;'i     => { append("&lt;"); };
+  '&gt;'i     => { append("&gt;"); };
+  '&quot;'i   => { append("&quot;"); };
+  '&#39;'i    => { append("'"); }; # &#39; is more common than &apos; because &apos; wasn't officially supported before HTML5.
+  '&apos;'i   => { append("'"); };
+  '&lbrace;'i => { append('{'); };
+  '&lbrack;'i => { append('['); };
+  '&ast;'i    => { append('*'); };
+  '&colon;'i  => { append(':'); };
+  '&commat;'i => { append('@'); };
+  '&grave;'i  => { append('`'); };
+  '&num;'i    => { append('#'); };
+  '&period;'i => { append('.'); };
+
   '\r' => {
     append(' ');
   };
