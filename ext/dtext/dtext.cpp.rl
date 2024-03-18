@@ -460,7 +460,7 @@ inline := |*
   # these are block level elements that should kick us out of the inline
   # scanner
 
-  newline (code_fence | open_code | open_code_lang | open_nodtext | open_table | hr | header | header_with_id) => {
+  newline (code_fence | open_code | open_code_lang | open_nodtext | open_table | open_expand | aliased_expand | hr | header | header_with_id) => {
     dstack_close_leaf_blocks();
     fexec ts;
     fret;
@@ -472,7 +472,7 @@ inline := |*
     fret;
   };
 
-  (open_quote | open_expand | aliased_expand) => {
+  open_quote => {
     dstack_close_leaf_blocks();
     fexec ts;
     fret;
