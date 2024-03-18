@@ -158,7 +158,7 @@ mention_char = nonspace - (punct - [._/'\-+!]);
 bare_username = ([_.]? mention_nonboundary_char mention_char* mention_nonboundary_char) - (char '@') - (char* '\'' [sd]);
 
 bare_mention = ('@' when after_mention_boundary) (bare_username >mark_a1 @mark_a2);
-delimited_mention = '<@' (nonspace nonnewline*) >mark_a1 %mark_a2 :>> '>';
+delimited_mention = '<@' (nonspace nonnewline*) >mark_a1 @mark_a2 :>> '>';
 
 # The list of tags that can appear in brackets (e.g. [quote]).
 bracket_tags = (
@@ -380,13 +380,8 @@ inline := |*
     append_unnamed_url({ a1, a2 });
   };
 
-  bare_mention when mentions_enabled => {
+  (bare_mention | delimited_mention) when mentions_enabled => {
     append_mention({ a1, a2 + 1 });
-  };
-
-  delimited_mention when mentions_enabled => {
-    g_debug("delimited mention: <@%.*s>", (int)(a2 - a1), a1);
-    append_mention({ a1, a2 });
   };
 
   newline list_item => {
@@ -436,12 +431,6 @@ inline := |*
     fcall code;
   };
 
-  newline code_fence => {
-    dstack_close_leaf_blocks();
-    fexec ts;
-    fret;
-  };
-
   newline ws* open_spoilers ws* eol => {
     dstack_close_leaf_blocks();
     fexec ts;
@@ -471,20 +460,7 @@ inline := |*
   # these are block level elements that should kick us out of the inline
   # scanner
 
-  newline (open_code | open_code_lang | open_nodtext) => {
-    dstack_close_leaf_blocks();
-    fexec ts;
-    fret;
-  };
-
-  newline (header | header_with_id) => {
-    dstack_close_leaf_blocks();
-    fexec ts;
-    fret;
-  };
-
-  open_quote => {
-    g_debug("inline [quote]");
+  newline (code_fence | open_code | open_code_lang | open_nodtext | open_table | hr | header | header_with_id) => {
     dstack_close_leaf_blocks();
     fexec ts;
     fret;
@@ -496,8 +472,7 @@ inline := |*
     fret;
   };
 
-  (open_expand | aliased_expand) => {
-    g_debug("inline [expand]");
+  (open_quote | open_expand | aliased_expand) => {
     dstack_close_leaf_blocks();
     fexec ts;
     fret;
@@ -506,12 +481,6 @@ inline := |*
   newline? close_expand ws* => {
     g_debug("inline [/expand]");
     dstack_close_until(BLOCK_EXPAND);
-    fret;
-  };
-
-  newline ws* open_table => {
-    dstack_close_leaf_blocks();
-    fexec ts;
     fret;
   };
 
@@ -525,13 +494,6 @@ inline := |*
     if (dstack_close_element(BLOCK_TD, { ts, te })) {
       fret;
     }
-  };
-
-  newline hr => {
-    g_debug("inline [hr] (pos: %ld)", ts - pb);
-    dstack_close_leaf_blocks();
-    fexec ts;
-    fret;
   };
 
   blank_lines => {
