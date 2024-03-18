@@ -472,7 +472,7 @@ inline := |*
     fret;
   };
 
-  open_quote => {
+  newline? open_quote => {
     dstack_close_leaf_blocks();
     fexec ts;
     fret;

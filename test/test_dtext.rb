@@ -516,6 +516,11 @@ class DTextTest < Minitest::Test
 
     assert_parse("<p>inline <em>foo</em></p><blockquote><p>blah blah</p></blockquote>", "inline [i]foo\n\n[quote]blah blah[/quote]")
     assert_parse('<p>inline <span class="spoiler">foo </span></p><blockquote><p>blah blah</p></blockquote>', "inline [spoiler]\n\nfoo [quote]blah blah[/quote]")
+
+    assert_parse("<p>blah</p><blockquote><p>blah</p></blockquote>", "blah\n[quote]\nblah\n[/quote]")
+    assert_parse("<p><strong>unclosed</strong></p><blockquote><p>blah</p></blockquote>", "[b]unclosed\n[quote]\nblah\n[/quote]")
+    assert_parse('<p>blah<br><span class="tn"></span></p><blockquote><p>blah</p></blockquote><p>[/tn]</p>', "blah\n[tn]\n[quote]\nblah[/quote]\n[/tn]") # XXX should strip <br> before [tn]
+    assert_parse('<p></p><blockquote><p>blah</p></blockquote>', "[br]\n[quote]\nblah\n[/quote]") # XXX shouldn't strip <br> before [quote]
   end
 
   def test_quote_blocks_with_list
