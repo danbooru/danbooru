@@ -1820,6 +1820,13 @@ class PostTest < ActiveSupport::TestCase
             assert_equal("Blog.", @post.source)
           end
         end
+
+        context "that is an IP address" do
+          should "not raise an exception" do
+            @post.update!(source: "http://127.0.0.1/image.jpg")
+            assert_equal("http://127.0.0.1/image.jpg", @post.source)
+          end
+        end
       end
 
       context "when validating tags" do

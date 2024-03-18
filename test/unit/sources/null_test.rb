@@ -25,6 +25,33 @@ module Sources
       end
     end
 
+    context "A IP-based source" do
+      strategy_should_work(
+        "http://125.6.189.215/kcs2/resources/ship/full/0935_5098_aeltexuflkxs.png?version=52",
+        image_urls: ["http://125.6.189.215/kcs2/resources/ship/full/0935_5098_aeltexuflkxs.png?version=52"],
+        media_files: [{ file_size: 86_605 }],
+        page_url: nil,
+        profile_url: nil,
+        tags: [],
+        tag_name: nil,
+        artist_name: nil,
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil
+      )
+    end
+
+    context "determining the site name" do
+      should "work" do
+        assert_equal("Foo", Source::URL.parse("https://foo.com.").site_name)
+        assert_equal("Foo", Source::URL.parse("https://user:pass@foo.com:80").site_name)
+        assert_equal("Localhost", Source::URL.parse("https://localhost").site_name)
+        assert_equal("127.0.0.1", Source::URL.parse("https://127.0.0.1").site_name)
+        assert_equal("127.0.0.1:3000", Source::URL.parse("https://127.0.0.1:3000").site_name)
+        assert_equal("[::1]", Source::URL.parse("https://[::1]").site_name)
+        assert_equal("[::1]:3000", Source::URL.parse("https://[::1]:3000").site_name)
+      end
+    end
+
     context "normalizing for source" do
       should "normalize karabako links" do
         source = "http://www.karabako.net/images/karabako_38835.jpg"
