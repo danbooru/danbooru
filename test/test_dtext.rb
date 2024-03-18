@@ -520,7 +520,7 @@ class DTextTest < Minitest::Test
     assert_parse("<p>blah</p><blockquote><p>blah</p></blockquote>", "blah\n[quote]\nblah\n[/quote]")
     assert_parse("<p><strong>unclosed</strong></p><blockquote><p>blah</p></blockquote>", "[b]unclosed\n[quote]\nblah\n[/quote]")
     assert_parse('<p>blah<br><span class="tn"></span></p><blockquote><p>blah</p></blockquote><p>[/tn]</p>', "blah\n[tn]\n[quote]\nblah[/quote]\n[/tn]") # XXX should strip <br> before [tn]
-    assert_parse('<p></p><blockquote><p>blah</p></blockquote>', "[br]\n[quote]\nblah\n[/quote]") # XXX shouldn't strip <br> before [quote]
+    assert_parse('<p><br></p><blockquote><p>blah</p></blockquote>', "[br]\n[quote]\nblah\n[/quote]")
   end
 
   def test_quote_blocks_with_list
@@ -1626,6 +1626,11 @@ class DTextTest < Minitest::Test
     assert_parse("<h4>foo&lt;br&gt;bar</h4>", "h4. foo<br>bar")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">bar&lt;br&gt;baz</a></p>', "[[foo|bar<br>baz]]")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">foo&lt;br&gt;bar</a></p>', '"foo<br>bar":http://example.com')
+
+    assert_parse("<p>foo <br></p><p>bar</p>", "foo [br]\n\nbar")
+    assert_parse("<p>foo<br><br><br></p><p>bar</p>", "foo\n[br][br]\n\nbar")
+    assert_parse("<p>foo</p><p><br></p><p>bar</p>", "foo\n\n[br]\n\nbar")
+    assert_parse("<p>foo</p><p><br><br></p><p>bar</p>", "foo\n\n[br][br]\n\nbar")
   end
 
   def test_inline_mode

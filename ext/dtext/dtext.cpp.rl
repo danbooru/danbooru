@@ -1155,11 +1155,6 @@ void StateMachine::append_block_html_escaped(const std::string_view string) {
 void StateMachine::append_closing_p() {
   g_debug("append closing p");
 
-  if (output.size() > 4 && output.ends_with("<br>")) {
-    g_debug("trim last <br>");
-    output.resize(output.size() - 4);
-  }
-
   if (output.size() > 3 && output.ends_with("<p>")) {
     g_debug("trim last <p>");
     output.resize(output.size() - 3);
