@@ -187,7 +187,6 @@ public:
   void append_code_fence(const std::string_view code, const std::string_view language);
   void append_inline_code(const std::string_view language = {});
   void append_block_code(const std::string_view language = {});
-  void append_closing_p();
 
   void clear_matches();
 

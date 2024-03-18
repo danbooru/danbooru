@@ -87,6 +87,7 @@ action after_mention_boundary { is_mention_boundary(p[-1]) }
 action mentions_enabled { options.f_mentions }
 action in_quote { dstack_is_open(BLOCK_QUOTE) }
 action in_expand { dstack_is_open(BLOCK_EXPAND) }
+action in_spoiler { dstack_is_open(BLOCK_SPOILER) }
 action save_tag_attribute { tag_attributes[{ a1, a2 }] = { b1, b2 }; }
 
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
@@ -653,9 +654,17 @@ main := |*
     dstack_open_element(BLOCK_QUOTE, "<blockquote>");
   };
 
+  space* close_quote ws* => {
+    dstack_close_until(BLOCK_QUOTE);
+  };
+
   open_spoilers space* => {
     dstack_close_leaf_blocks();
     dstack_open_element(BLOCK_SPOILER, "<div class=\"spoiler\">");
+  };
+
+  space* (close_spoilers when in_spoiler) ws* => {
+    dstack_close_until(BLOCK_SPOILER);
   };
 
   open_code blank_line? => {
@@ -685,6 +694,10 @@ main := |*
     append_block("<summary>");
     append_block_html_escaped({ a1, a2 });
     append_block("</summary><div>");
+  };
+
+  space* close_expand ws* => {
+    dstack_close_until(BLOCK_EXPAND);
   };
 
   open_nodtext blank_line? => {
@@ -1152,18 +1165,6 @@ void StateMachine::append_block_html_escaped(const std::string_view string) {
   }
 }
 
-void StateMachine::append_closing_p() {
-  g_debug("append closing p");
-
-  if (output.size() > 3 && output.ends_with("<p>")) {
-    g_debug("trim last <p>");
-    output.resize(output.size() - 3);
-    return;
-  }
-
-  append_block("</p>");
-}
-
 void StateMachine::dstack_open_element(element_t type, const char * html) {
   g_debug("opening %s", html);
 
@@ -1225,7 +1226,7 @@ void StateMachine::dstack_rewind() {
   g_debug("dstack rewind %s", element_names[element]);
 
   switch(element) {
-    case BLOCK_P: append_closing_p(); break;
+    case BLOCK_P: append_block("</p>"); break;
     case INLINE_SPOILER: append("</span>"); break;
     case BLOCK_SPOILER: append_block("</div>"); break;
     case BLOCK_QUOTE: append_block("</blockquote>"); break;
@@ -1243,7 +1244,7 @@ void StateMachine::dstack_rewind() {
     case INLINE_TN: append("</span>"); break;
     case INLINE_CODE: append("</code>"); break;
 
-    case BLOCK_TN: append_closing_p(); break;
+    case BLOCK_TN: append_block("</p>"); break;
     case BLOCK_TABLE: append_block("</table>"); break;
     case BLOCK_COLGROUP: append_block("</colgroup>"); break;
     case BLOCK_THEAD: append_block("</thead>"); break;

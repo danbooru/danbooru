@@ -391,6 +391,10 @@ class DTextTest < Minitest::Test
 
     # assert_parse('<p>inline <span class="spoiler">foo</span></p><p>[/spoiler]</p>', "inline [spoiler]foo\n\n[/spoiler]")
     assert_parse('<p>inline <span class="spoiler">foo</span></p>', "inline [spoiler]foo\n\n[/spoiler]") # XXX wrong
+
+    # assert_parse('<div class="spoiler"><p>foo</p></div>', "[spoiler]\nfoo\n [/spoiler]") # XXX
+    assert_parse('<div class="spoiler"><p>foo</p></div>', "[spoiler]\nfoo\n\n [/spoiler]")
+    assert_parse('<div class="spoiler"><ul><li>foo</li></ul></div>', "[spoiler]\n* foo\n [/spoiler]")
   end
 
   def test_paragraphs
@@ -521,6 +525,12 @@ class DTextTest < Minitest::Test
     assert_parse("<p><strong>unclosed</strong></p><blockquote><p>blah</p></blockquote>", "[b]unclosed\n[quote]\nblah\n[/quote]")
     assert_parse('<p>blah<br><span class="tn"></span></p><blockquote><p>blah</p></blockquote><p>[/tn]</p>', "blah\n[tn]\n[quote]\nblah[/quote]\n[/tn]") # XXX should strip <br> before [tn]
     assert_parse('<p><br></p><blockquote><p>blah</p></blockquote>', "[br]\n[quote]\nblah\n[/quote]")
+
+    assert_parse('<blockquote><div class="spoiler"><p>blah</p></div></blockquote>', "[quote][spoiler]blah[/spoiler] [/quote]")
+    assert_parse('<blockquote><p>blah said:</p><p>blah</p></blockquote>', "[quote]\nblah said:\n\nblah\n\n [/quote]")
+    #assert_parse('<blockquote><p>blah</p></blockquote>', "[quote]\nblah\n [/quote]")
+    assert_parse('<blockquote><p>blah</p></blockquote>', "[quote]\nblah\n\n [/quote]")
+    assert_parse('<blockquote><ul><li>blah</li></ul></blockquote>', "[quote]\n* blah\n [/quote]")
   end
 
   def test_quote_blocks_with_list
@@ -1518,6 +1528,10 @@ class DTextTest < Minitest::Test
 
     assert_parse('<details><summary>Show</summary><div><p>test</p></div></details><h4>See also</h4>', "[expand]\ntest\n[/expand]\nh4. See also")
     assert_parse('<details><summary>Show</summary><div><p>test</p></div></details><div class="spoiler"><p>blah</p></div>', "[expand]\ntest\n[/expand]\n[spoiler]blah[/spoiler]")
+
+    # assert_parse("<details><summary>Show</summary><div><p>foo</p></div></details>", "[expand]\nfoo\n [/expand]") XXX
+    assert_parse("<details><summary>Show</summary><div><p>foo</p></div></details>", "[expand]\nfoo\n\n [/expand]")
+    assert_parse("<details><summary>Show</summary><div><ul><li>foo</li></ul></div></details>", "[expand]\n* foo\n [/expand]")
   end
 
   def test_aliased_expand
