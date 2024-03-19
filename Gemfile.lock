@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dtext_rb (1.12.3)
+    dtext_rb (1.12.4)
 
 GEM
   remote: https://rubygems.org/
@@ -31,4 +31,4 @@ DEPENDENCIES
   rake-compiler (~> 1.1)
 
 BUNDLED WITH
-   2.4.3
+   2.5.5
