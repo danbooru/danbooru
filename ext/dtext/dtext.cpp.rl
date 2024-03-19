@@ -467,31 +467,29 @@ inline := |*
     fret;
   };
 
-  newline? close_quote ws* => {
-    g_debug("inline [/quote]");
+  (newline ws*)? close_quote ws* => {
     dstack_close_until(BLOCK_QUOTE);
     fret;
   };
 
-  newline? open_quote => {
+  (newline ws*)? open_quote >mark_a1 => {
     dstack_close_leaf_blocks();
-    fexec ts;
+    fexec a1;
     fret;
   };
 
-  newline? close_expand ws* => {
-    g_debug("inline [/expand]");
+  (newline ws*)? close_expand ws* => {
     dstack_close_until(BLOCK_EXPAND);
     fret;
   };
 
-  newline* close_th => {
+  (newline ws*)? close_th => {
     if (dstack_close_element(BLOCK_TH, { ts, te })) {
       fret;
     }
   };
 
-  newline* close_td => {
+  (newline ws*)? close_td => {
     if (dstack_close_element(BLOCK_TD, { ts, te })) {
       fret;
     }
