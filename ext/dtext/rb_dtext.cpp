@@ -36,7 +36,7 @@ static auto parse_dtext(VALUE input, DTextOptions options = {}) {
   }
 }
 
-static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALUE internal_domains, VALUE f_inline, VALUE f_disable_mentions) {
+static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALUE internal_domains, VALUE f_inline, VALUE f_disable_mentions, VALUE f_media_embeds) {
   if (NIL_P(input)) {
     return Qnil;
   }
@@ -44,6 +44,7 @@ static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALU
   DTextOptions options;
   options.f_inline = RTEST(f_inline);
   options.f_mentions = !RTEST(f_disable_mentions);
+  options.f_media_embeds = RTEST(f_media_embeds);
 
   if (!NIL_P(base_url)) {
     options.base_url = StringValueCStr(base_url); // base_url.to_str # raises ArgumentError if base_url contains null bytes.
@@ -79,6 +80,6 @@ static VALUE c_parse_wiki_pages(VALUE self, VALUE input) {
 extern "C" void Init_dtext() {
   cDText = rb_define_class("DText", rb_cObject);
   cDTextError = rb_define_class_under(cDText, "Error", rb_eStandardError);
-  rb_define_singleton_method(cDText, "c_parse", c_parse, 6);
+  rb_define_singleton_method(cDText, "c_parse", c_parse, 7);
   rb_define_singleton_method(cDText, "c_parse_wiki_pages", c_parse_wiki_pages, 1);
 }

@@ -1363,7 +1363,7 @@ class DTextTest < Minitest::Test
     assert_parse("<p>Tags <strong>(<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/howto%3Atag\">Tagging Guidelines</a> | <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/howto%3Atag_checklist\">Tag Checklist</a> | <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/tag_groups\">Tag Groups</a>)</strong></p>", "Tags [b]([[howto:tag|Tagging Guidelines]] | [[howto:tag_checklist|Tag Checklist]] | [[Tag Groups]])[/b]")
   end
 
-  def text_note_id_link
+  def test_note_id_link
     assert_parse('<p><a class="dtext-link dtext-id-link dtext-note-id-link" href="/notes/1234">note #1234</a></p>', "note #1234")
   end
 
@@ -1501,6 +1501,76 @@ class DTextTest < Minitest::Test
   def test_dmail_key_id_link
     assert_parse(%{<p><a class="dtext-link dtext-id-link dtext-dmail-id-link" href="/dmails/1234?key=abc%3D%3D--DEF123">dmail #1234</a></p>}, "dmail #1234/abc==--DEF123")
     assert_parse(%{<p><a class="dtext-link dtext-id-link dtext-dmail-id-link" href="http://danbooru.donmai.us/dmails/1234?key=abc%3D%3D--DEF123">dmail #1234</a></p>}, "dmail #1234/abc==--DEF123", base_url: "http://danbooru.donmai.us")
+  end
+
+  def test_media_embeds
+    assert_parse('<media-embed data-type="post" data-id="1234"></media-embed>', "!post #1234")
+    assert_parse('<media-embed data-type="asset" data-id="1234"></media-embed>', "!asset #1234")
+    assert_parse('<media-embed data-type="post" data-id="1234"></media-embed>', "!post #1234  ")
+
+    assert_parse('<p>!<a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', "!Post #1234")
+    assert_parse('<p>!<a class="dtext-link dtext-id-link dtext-media-asset-id-link" href="/media_assets/1234">asset #1234</a></p>', "!Asset #1234")
+
+    assert_parse('<p> !<a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', " !post #1234")
+    assert_parse('<p>foo<br> !<a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', "foo\n !post #1234")
+
+    assert_parse('<p>!post  #1234</p>', "!post  #1234")
+    assert_parse('<p>!post #abc</p>', "!post #abc")
+    assert_parse('<p>!post #</p>', "!post #")
+
+    assert_parse('<media-embed data-type="post" data-id="1234">blah</media-embed>', "!post #1234: blah")
+    assert_parse('<media-embed data-type="post" data-id="1234">blah</media-embed>', "!post #1234:    blah")
+    assert_parse('<media-embed data-type="post" data-id="1234">blah   </media-embed>', "!post #1234:    blah   ")
+
+    assert_parse('<media-embed data-type="post" data-id="1234">blah</media-embed><h4>See also</h4>', "!post #1234: blah\nh4. See also")
+    assert_parse('<media-embed data-type="post" data-id="1234">blah</media-embed><ul><li>foo</li></ul>', "!post #1234: blah\n* foo")
+    assert_parse('<media-embed data-type="post" data-id="1234">blah</media-embed><p>foo</p>', "!post #1234: blah\n\nfoo")
+
+    assert_parse('<media-embed data-type="post" data-id="1234">h4. See also</media-embed>', "!post #1234: h4. See also")
+    assert_parse('<media-embed data-type="post" data-id="1234">* foo</media-embed>', "!post #1234: * foo")
+    assert_parse('<media-embed data-type="post" data-id="1234">!<a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/456">post #456</a></media-embed>', "!post #1234: !post #456")
+    assert_parse('<media-embed data-type="post" data-id="1234">* !<a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/456">post #456</a></media-embed>', "!post #1234: * !post #456")
+    assert_parse('<media-embed data-type="post" data-id="1234">foo </media-embed><blockquote><p>blah</p></blockquote>', "!post #1234: foo [quote]blah[/quote]")
+
+    assert_parse('<p>foo</p><media-embed data-type="post" data-id="1234">blah</media-embed>', "foo\n!post #1234: blah")
+    assert_parse('<p><em>foo</em></p><media-embed data-type="post" data-id="1234">blah</media-embed>', "[i]foo\n!post #1234: blah")
+    assert_parse('<h4>See also</h4><media-embed data-type="post" data-id="1234">blah</media-embed>', "h4. See also\n!post #1234: blah")
+    assert_parse('<ul><li>foo</li></ul><media-embed data-type="post" data-id="1234">blah</media-embed>', "* foo\n!post #1234: blah")
+    assert_parse('<div class="spoiler"><media-embed data-type="post" data-id="1234">blah</media-embed></div>', "[spoiler]\n!post #1234: blah\n[/spoiler]")
+    assert_parse('<blockquote><media-embed data-type="post" data-id="1234">blah</media-embed></blockquote>', "[quote]\n!post #1234: blah\n[/quote]")
+    assert_parse('<details><summary>Show</summary><div><media-embed data-type="post" data-id="1234">blah</media-embed></div></details>', "[expand]\n!post #1234: blah\n[/expand]")
+
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">foo</a></p><media-embed data-type="post" data-id="1234"></media-embed>', "[[foo]]\n!post #1234")
+    assert_parse('<media-embed data-type="post" data-id="1234"></media-embed><p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">foo</a></p>', "!post #1234\n[[foo]]")
+
+    assert_parse('<p>!<a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a> blah</p>', "!post #1234 blah")
+    assert_parse('<p>!<a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a>:</p>', "!post #1234:")
+    assert_parse('<p>!<a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a>:  </p>', "!post #1234:  ")
+
+    assert_parse('<p>!<a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', "!post #1234", media_embeds: false)
+  end
+
+  def test_media_galleries
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1"></media-embed></media-gallery>', "* !post #1")
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1">foo</media-embed></media-gallery>', "* !post #1: foo")
+
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1"></media-embed><media-embed data-type="post" data-id="2"></media-embed></media-gallery>', "* !post #1\n* !post #2")
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1">foo</media-embed><media-embed data-type="post" data-id="2">bar</media-embed></media-gallery>', "* !post #1: foo\n* !post #2: bar")
+
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1"></media-embed></media-gallery><media-embed data-type="post" data-id="2"></media-embed><media-gallery><media-embed data-type="post" data-id="3"></media-embed></media-gallery>', "* !post #1\n!post #2\n* !post #3")
+    assert_parse('<media-embed data-type="post" data-id="1"></media-embed><media-gallery><media-embed data-type="post" data-id="2"></media-embed></media-gallery><media-embed data-type="post" data-id="3"></media-embed>', "!post #1\n* !post #2\n!post #3")
+    assert_parse('<ul><li>foo</li></ul><media-gallery><media-embed data-type="post" data-id="1"></media-embed></media-gallery><ul><li>bar</li></ul>', "* foo\n* !post #1\n* bar")
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1"><strong>foo</strong></media-embed><media-embed data-type="post" data-id="2"></media-embed></media-gallery>', "* !post #1: [b]foo\n* !post #2")
+
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1"></media-embed></media-gallery><p>foo</p>', "* !post #1\n\nfoo")
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1"></media-embed></media-gallery><media-gallery><media-embed data-type="post" data-id="2"></media-embed></media-gallery>', "* !post #1\n\n* !post #2")
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1">foo</media-embed></media-gallery><media-gallery><media-embed data-type="post" data-id="2"></media-embed></media-gallery>', "* !post #1: foo\n\n* !post #2")
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1"></media-embed></media-gallery><h4>See also</h4>', "* !post #1\nh4. See also")
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1"></media-embed></media-gallery><pre>foo</pre>', "* !post #1\n[code]\nfoo\n[/code]")
+    # assert_parse('<media-gallery><media-embed data-type="post" data-id="1"></media-embed></media-gallery><hr>', "* !post #1\n[hr]") # XXX
+    # assert_parse('<media-gallery><media-embed data-type="post" data-id="1"></media-embed></media-gallery><pre>foo</pre>', "* !post #1\n```\nfoo\n```") # XXX
+
+    assert_parse('<media-gallery><media-embed data-type="post" data-id="1">foo </media-embed></media-gallery><blockquote><p>blah</p></blockquote>', "* !post #1: foo [quote]blah[/quote]")
   end
 
   def test_boundary_exploit

@@ -34,6 +34,8 @@ typedef enum element_t {
   BLOCK_H4,
   BLOCK_H5,
   BLOCK_H6,
+  BLOCK_MEDIA_EMBED,
+  BLOCK_MEDIA_GALLERY,
   INLINE,
   INLINE_B,
   INLINE_I,
@@ -70,6 +72,8 @@ static const char* element_names[] = {
   "BLOCK_H4",
   "BLOCK_H5",
   "BLOCK_H6",
+  "BLOCK_MEDIA_EMBED",
+  "BLOCK_MEDIA_GALLERY",
   "INLINE",
   "INLINE_B",
   "INLINE_I",
@@ -91,6 +95,9 @@ struct DTextOptions {
 
   // If false, ignore @-mentions (used for artist commentaries).
   bool f_mentions = true;
+
+  // If false, ignore `!post #1234` media embeds.
+  bool f_media_embeds = true;
 
   // If set, convert relative URLs to absolute URLs (used for sending dmails).
   std::string base_url;
@@ -187,9 +194,11 @@ public:
   void append_code_fence(const std::string_view code, const std::string_view language);
   void append_inline_code(const std::string_view language = {});
   void append_block_code(const std::string_view language = {});
+  void append_media_embed(const std::string_view media_type, const std::string_view id, const std::string_view caption, bool media_gallery);
 
   void clear_matches();
 
+  bool is_inline_element(element_t type);
   bool is_internal_url(const std::string_view url);
   std::tuple<std::string_view, std::string_view> trim_url(const std::string_view url);
 

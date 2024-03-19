@@ -85,6 +85,7 @@ action mark_g2 { g2 = p; }
 
 action after_mention_boundary { is_mention_boundary(p[-1]) }
 action mentions_enabled { options.f_mentions }
+action media_embeds_enabled { options.f_media_embeds }
 action in_quote { dstack_is_open(BLOCK_QUOTE) }
 action in_expand { dstack_is_open(BLOCK_EXPAND) }
 action in_spoiler { dstack_is_open(BLOCK_SPOILER) }
@@ -224,6 +225,13 @@ id = digit+ >mark_a1 %mark_a2;
 alnum_id = alnum+ >mark_a1 %mark_a2;
 page = digit+ >mark_b1 %mark_b2;
 dmail_key = (alnum | '=' | '-')+ >mark_b1 %mark_b2;
+
+# !asset #1234
+# !post #1234
+# !post #1234: This is a caption.
+# * !post #1: This is the first image in a media gallery.
+# * !post #2: This is the second image in a media gallery.
+media_embed = '* '? >mark_d1 %mark_d2 ('!' ('post' | 'asset') >mark_b1 %mark_b2 ' #' id (':' ws+ ((nonspace nonnewline*) >mark_c1 %mark_c2))? ws* eol) when media_embeds_enabled;
 
 header_id = (alnum | [_/#!:&\-])+; # XXX '/', '#', '!', ':', and '&' are grandfathered in for old wiki versions.
 header = 'h'i [123456] >mark_a1 %mark_a2 '.' >mark_b1 >mark_b2 ws*;
@@ -461,7 +469,7 @@ inline := |*
   # these are block level elements that should kick us out of the inline
   # scanner
 
-  newline (code_fence | open_code | open_code_lang | open_nodtext | open_table | open_expand | aliased_expand | hr | header | header_with_id) => {
+  newline (code_fence | open_code | open_code_lang | open_nodtext | open_table | open_expand | aliased_expand | hr | header | header_with_id | media_embed) => {
     dstack_close_leaf_blocks();
     fexec ts;
     fret;
@@ -500,7 +508,9 @@ inline := |*
 
     if (dstack_check(BLOCK_P)) {
       dstack_rewind();
-    } else if (header_mode) {
+    } else if (dstack_is_open(BLOCK_MEDIA_GALLERY)) {
+      dstack_close_until(BLOCK_MEDIA_GALLERY);
+    } else if (header_mode || dstack_is_open(BLOCK_MEDIA_EMBED)) {
       dstack_close_leaf_blocks();
     } else {
       dstack_close_list();
@@ -516,7 +526,7 @@ inline := |*
   newline => {
     g_debug("inline newline");
 
-    if (header_mode) {
+    if (header_mode || dstack_is_open(BLOCK_MEDIA_EMBED)) {
       dstack_close_leaf_blocks();
       fret;
     } else if (dstack_is_open(BLOCK_UL)) {
@@ -715,6 +725,21 @@ main := |*
     fcall inline;
   };
 
+  media_embed => {
+    const std::string_view caption = { c1, c2 };
+    const std::string_view prefix = { d1, d2 };
+
+    append_media_embed({ b1, b2 }, { a1, a2 }, caption, !prefix.empty());
+
+    if (!caption.empty()) {
+      fexec caption.begin();
+      fcall inline;
+    } else {
+      // don't swallow final newline
+      fexec te - 1;
+    }
+  };
+
   hr => {
     g_debug("write '<hr>' (pos: %ld)", ts - pb);
     append_block("<hr>");
@@ -727,15 +752,20 @@ main := |*
     fcall inline;
   };
 
-  blank_line+ => {
+  blank_line;
+  blank_lines => {
     g_debug("block blank line(s)");
+
+    if (dstack_check(BLOCK_MEDIA_GALLERY)) {
+      dstack_close_until(BLOCK_MEDIA_GALLERY);
+    }
   };
 
   any => {
     g_debug("block char");
     fhold;
 
-    if (dstack.empty() || dstack_check(BLOCK_QUOTE) || dstack_check(BLOCK_SPOILER) || dstack_check(BLOCK_EXPAND)) {
+    if (dstack.empty() || dstack_check(BLOCK_QUOTE) || dstack_check(BLOCK_SPOILER) || dstack_check(BLOCK_EXPAND) || dstack_check(BLOCK_MEDIA_GALLERY)) {
       dstack_open_element(BLOCK_P, "<p>");
     }
 
@@ -777,6 +807,10 @@ bool StateMachine::dstack_is_open(element_t element) {
 
 int StateMachine::dstack_count(element_t element) {
   return std::count(dstack.begin(), dstack.end(), element);
+}
+
+bool StateMachine::is_inline_element(element_t type) {
+  return type >= INLINE;
 }
 
 bool StateMachine::is_internal_url(const std::string_view url) {
@@ -1151,6 +1185,32 @@ void StateMachine::append_header(char header, const std::string_view id) {
   header_mode = true;
 }
 
+void StateMachine::append_media_embed(const std::string_view media_type, const std::string_view id, const std::string_view caption, bool media_gallery) {
+  if (!media_gallery) {
+    dstack_close_leaf_blocks();
+  }
+
+  if (!media_gallery && dstack_is_open(BLOCK_MEDIA_GALLERY)) {
+    dstack_close_until(BLOCK_MEDIA_GALLERY);
+  }
+
+  if (media_gallery && !dstack_is_open(BLOCK_MEDIA_GALLERY)) {
+    dstack_open_element(BLOCK_MEDIA_GALLERY, "<media-gallery>");
+  }
+
+  dstack_open_element(BLOCK_MEDIA_EMBED, "<media-embed data-type=\"");
+  append_block(media_type);
+  append_block("\" data-id=\"");
+  append_block(id);
+  append_block("\">");
+
+  if (caption.empty()) {
+    dstack_close_element(BLOCK_MEDIA_EMBED, "</media-embed>");
+  }
+
+  clear_matches();
+}
+
 void StateMachine::append_block(const auto s) {
   if (!options.f_inline) {
     append(s);
@@ -1165,6 +1225,11 @@ void StateMachine::append_block_html_escaped(const std::string_view string) {
 
 void StateMachine::dstack_open_element(element_t type, const char * html) {
   g_debug("opening %s", html);
+
+  // Close any open media galleries when opening a new block element that isn't a media embed.
+  if (!is_inline_element(type) && type != BLOCK_MEDIA_EMBED && dstack_is_open(BLOCK_MEDIA_GALLERY)) {
+    dstack_close_until(BLOCK_MEDIA_GALLERY);
+  }
 
   dstack_push(type);
 
@@ -1242,6 +1307,8 @@ void StateMachine::dstack_rewind() {
     case INLINE_TN: append("</span>"); break;
     case INLINE_CODE: append("</code>"); break;
 
+    case BLOCK_MEDIA_EMBED: append_block("</media-embed>"); break;
+    case BLOCK_MEDIA_GALLERY: append_block("</media-gallery>"); break;
     case BLOCK_TN: append_block("</p>"); break;
     case BLOCK_TABLE: append_block("</table>"); break;
     case BLOCK_COLGROUP: append_block("</colgroup>"); break;
@@ -1263,12 +1330,12 @@ void StateMachine::dstack_rewind() {
   }
 }
 
-// container blocks: [spoiler], [quote], [expand], [tn]
+// container blocks: [spoiler], [quote], [expand], [tn], media galleries (`* !post #1`)
 // leaf blocks: [nodtext], [code], [table], [td]?, [th]?, <h1>, <p>, <li>, <ul>
 void StateMachine::dstack_close_leaf_blocks() {
   g_debug("dstack close leaf blocks");
 
-  while (!dstack.empty() && !dstack_check(BLOCK_QUOTE) && !dstack_check(BLOCK_SPOILER) && !dstack_check(BLOCK_EXPAND) && !dstack_check(BLOCK_TN)) {
+  while (!dstack.empty() && !dstack_check(BLOCK_QUOTE) && !dstack_check(BLOCK_SPOILER) && !dstack_check(BLOCK_EXPAND) && !dstack_check(BLOCK_TN) && !dstack_check(BLOCK_MEDIA_GALLERY)) {
     dstack_rewind();
   }
 }
