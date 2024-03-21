@@ -9,7 +9,7 @@
       <%= wiki_page_other_names_list(@wiki_page_version) %>
     <% end %>
 
-    <%= format_text(@wiki_page_version.body) %>
+    <%= format_text(@wiki_page_version.body, media_embeds: true) %>
   </div>
 <% end %>
 

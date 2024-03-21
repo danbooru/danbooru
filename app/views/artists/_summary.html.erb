@@ -47,7 +47,7 @@
 
   <% if artist.wiki_page.present? && !artist.wiki_page.is_deleted? %>
     <div class="artist-wiki prose mt-4">
-      <%= format_text(artist.wiki_page.body, disable_mentions: true) %>
+      <%= format_text(artist.wiki_page.body, disable_mentions: true, media_embeds: true) %>
     </div>
   <% end %>
 
