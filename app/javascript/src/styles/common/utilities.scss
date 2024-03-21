@@ -209,6 +209,7 @@ $spacer: 0.25rem; /* 4px */
 
 .min-w-0 { min-width: 0; }
 .min-w-4 { min-width: 4 * $spacer; }
+.min-w-150px { min-width: 150px; }
 
 .max-w-360px { max-width: 360px; }
 .max-w-480px { max-width: 480px; }
@@ -239,6 +240,7 @@ $spacer: 0.25rem; /* 4px */
 .h-360px { height: 360px; }
 
 .min-h-8 { min-height: 8  * $spacer; }
+.min-h-150px { min-height: 150px; }
 
 .max-h-150px { max-height: 150px; }
 .max-h-180px { max-height: 180px; }

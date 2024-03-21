@@ -15,6 +15,6 @@
     <%= f.input :is_deleted, label: "Deleted", hint: "Check to mark this wiki page as deleted." %>
 
     <%= f.submit "Submit" %>
-    <%= dtext_preview_button "wiki_page_body" %>
+    <%= dtext_preview_button "wiki_page_body", media_embeds: true %>
   <% end %>
 </div>

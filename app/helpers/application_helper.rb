@@ -264,8 +264,8 @@ module ApplicationHelper
     CaptchaService.new.captcha_tag(...)
   end
 
-  def dtext_preview_button(preview_field)
-    tag.input value: "Preview", type: "button", class: "dtext-preview-button", "data-preview-field": preview_field
+  def dtext_preview_button(preview_field, media_embeds: false)
+    tag.input value: "Preview", type: "button", class: "dtext-preview-button", "data-preview-field": preview_field, "data-media-embeds": media_embeds
   end
 
   def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)
