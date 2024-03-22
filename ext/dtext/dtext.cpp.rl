@@ -239,7 +239,7 @@ header_with_id = 'h'i [123456] >mark_a1 %mark_a2 '#' header_id >mark_b1 %mark_b2
 aliased_expand = ('[expand'i (ws* '=' ws* | ws+) ((nonnewline - ']')* >mark_a1 %mark_a2) ']')
                | ('<expand'i (ws* '=' ws* | ws+) ((nonnewline - '>')* >mark_a1 %mark_a2) '>');
 
-list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
+list_item = '*'+ >mark_e1 %mark_e2 ws+ nonnewline+ >mark_f1 %mark_f2;
 
 hr = ws* ('[hr]'i | '<hr>'i) ws* eol+;
 
@@ -746,9 +746,8 @@ main := |*
   };
 
   list_item => {
-    g_debug("block list");
-    dstack_open_list(a2 - a1);
-    fexec b1;
+    dstack_open_list(e2 - e1);
+    fexec f1;
     fcall inline;
   };
 

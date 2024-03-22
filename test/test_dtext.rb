@@ -1571,6 +1571,8 @@ class DTextTest < Minitest::Test
     # assert_parse('<media-gallery><media-embed data-type="post" data-id="1"></media-embed></media-gallery><pre>foo</pre>', "* !post #1\n```\nfoo\n```") # XXX
 
     assert_parse('<media-gallery><media-embed data-type="post" data-id="1">foo </media-embed></media-gallery><blockquote><p>blah</p></blockquote>', "* !post #1: foo [quote]blah[/quote]")
+
+    assert_parse('<ul><li>!<a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a> blah</li></ul>', "* !post #1234 blah")
   end
 
   def test_boundary_exploit
