@@ -459,6 +459,8 @@ class DTextTest < Minitest::Test
     assert_parse('<blockquote><blockquote><h1>header</h1></blockquote></blockquote>', %{[quote]\n\n[quote]\n\nh1. header\n[/quote]\n\n[/quote]})
 
     assert_parse('<blockquote><h1>header</h1></blockquote><p>one<br>two</p>', %{[quote]\nh1. header\n[/quote]\none\ntwo})
+
+    assert_parse('<p>foo <strong>bar</strong></p><h4>See also</h4>', "foo [b]bar\nh4. See also")
   end
 
   def test_inline_elements
@@ -496,6 +498,9 @@ class DTextTest < Minitest::Test
   def test_block_tn
     assert_parse('<p class="tn">bar</p>', "[tn]bar[/tn]")
     assert_parse('<p class="tn">bar</p>', "<tn>bar</tn>")
+
+    assert_parse('<p>foo <strong>bar</strong></p><p class="tn">bar</p>', "foo [b]bar\n\n[tn]bar[/tn]")
+    assert_parse('<p>foo <strong>bar<br><span class="tn"><br>bar</span></strong></p>', "foo [b]bar\n[tn]\nbar\n[/tn]") # XXX should be treated as a block tag?
   end
 
   def test_quote_blocks
@@ -697,6 +702,7 @@ class DTextTest < Minitest::Test
     assert_parse("<pre> ▲\n▲ ▲</pre>", "```\n ▲\n▲ ▲\n```")
 
     assert_parse('<blockquote><pre>code</pre></blockquote>', "[quote]\r\n```\r\ncode\r\n```\r\n[/quote]")
+    assert_parse('<p>foo <strong>bar</strong></p><pre>blah</pre>', "foo [b]bar\n```\nblah\n```")
   end
 
   def test_urls
@@ -1726,6 +1732,8 @@ class DTextTest < Minitest::Test
     assert_parse('<p>inline <span class="tn"></span></p><hr><p>[/tn]</p>', "inline [tn]\n[hr]\n[/tn]")
 
     assert_parse('<p>inline <span class="spoiler"></span></p><hr><p>[/spoiler]</p>', "inline [spoiler]\n[hr]\n[/spoiler]")
+
+    assert_parse('<p>foo <strong>bar</strong></p><hr>', "foo [b]bar\n[hr]")
 
     #assert_parse('<p class="tn"><hr></p>', "[tn][hr][/tn]") # XXX shouldn't work
   end

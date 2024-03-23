@@ -689,6 +689,7 @@ main := |*
   };
 
   code_fence => {
+    dstack_close_leaf_blocks();
     append_code_fence({ b1, b2 }, { a1, a2 });
   };
 
@@ -724,6 +725,7 @@ main := |*
   };
 
   open_tn => {
+    dstack_close_leaf_blocks();
     dstack_open_element(BLOCK_TN, "<p class=\"tn\">");
     fcall inline;
   };
@@ -749,7 +751,7 @@ main := |*
   };
 
   hr => {
-    g_debug("write '<hr>' (pos: %ld)", ts - pb);
+    dstack_close_leaf_blocks();
     append_block("<hr>");
   };
 
@@ -1173,6 +1175,8 @@ void StateMachine::append_block_code(const std::string_view language) {
 void StateMachine::append_header(char header, const std::string_view id) {
   static element_t blocks[] = {BLOCK_H1, BLOCK_H2, BLOCK_H3, BLOCK_H4, BLOCK_H5, BLOCK_H6};
   element_t block = blocks[header - '1'];
+
+  dstack_close_leaf_blocks();
 
   if (id.empty()) {
     dstack_open_element(block, "<h");
