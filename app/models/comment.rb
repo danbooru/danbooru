@@ -30,7 +30,7 @@ class Comment < ApplicationRecord
   mentionable(
     message_field: :body,
     title: ->(_user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},
-    body: ->(user_name) {"@#{creator.name} mentioned you in comment ##{id} on post ##{post_id}:\n\n[quote]\n#{DText.extract_mention(body, "@#{user_name}")}\n[/quote]\n"}
+    body: ->(user_name) {"@#{creator.name} mentioned you in comment ##{id} on post ##{post_id}:\n\n[quote]\n#{DText.new(body).extract_mention("@#{user_name}")}\n[/quote]\n"}
   )
 
   module SearchMethods
@@ -107,7 +107,7 @@ class Comment < ApplicationRecord
   end
 
   def quoted_response
-    DText.quote(body, creator.name)
+    DText.new(body).quote(creator.name)
   end
 
   concerning :DiscordMethods do

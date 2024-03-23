@@ -1,5 +1,5 @@
 <% page_title @pool.pretty_name %>
-<% meta_description("#{number_with_delimiter(@pool.post_count)} posts. #{DText.excerpt(@pool.description)}") %>
+<% meta_description("#{number_with_delimiter(@pool.post_count)} posts. #{DText.new(@pool.description).excerpt}") %>
 
 <%= render_meta_links @posts %>
 <%= render "secondary_links" %>

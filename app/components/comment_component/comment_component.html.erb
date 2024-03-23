@@ -37,7 +37,7 @@
       <% if redact_deleted? %>
         <p>[deleted]</p>
       <% else %>
-        <%= format_text(comment.body, data: dtext_data) %>
+        <%= format_text(comment.body, references: dtext_references) %>
       <% end %>
     <% end %>
 

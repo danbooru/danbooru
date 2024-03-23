@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 class CommentComponent < ApplicationComponent
-  attr_reader :comment, :context, :classes, :dtext_data, :current_user
+  attr_reader :comment, :context, :classes, :dtext_references, :current_user
 
-  def initialize(comment:, current_user:, context: nil, classes: nil, dtext_data: nil)
+  def initialize(comment:, current_user:, context: nil, classes: nil, dtext_references: nil)
     super
     @comment = comment
     @context = context
     @classes = classes
-    @dtext_data = dtext_data
+    @dtext_references = dtext_references
     @current_user = current_user
   end
 

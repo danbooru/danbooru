@@ -41,7 +41,7 @@ module PostSets
         humanized_count = ApplicationController.helpers.humanized_number(post_count, million: " million", thousand: " thousand")
         humanized_count = "over #{humanized_count}" if post_count >= 1_000
 
-        "See #{humanized_count} #{page_title} images on #{Danbooru.config.app_name}. #{DText.excerpt(wiki_page&.body)}"
+        "See #{humanized_count} #{page_title} images on #{Danbooru.config.app_name}. #{DText.new(wiki_page&.body).excerpt}"
       else
         Danbooru.config.site_description
       end

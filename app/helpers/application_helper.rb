@@ -101,7 +101,7 @@ module ApplicationHelper
   end
 
   def strip_dtext(text)
-    DText.strip_dtext(text)
+    DText.new(text).strip_dtext
   end
 
   def time_tag(content, time, **options)

@@ -8,7 +8,7 @@ class ModActionsController < ApplicationController
 
     if request.format.html?
       @mod_actions = @mod_actions.includes(:creator, :subject)
-      @dtext_data = DText.preprocess(@mod_actions.map(&:description))
+      @dtext_references = DText.preprocess(@mod_actions.map(&:description))
     end
 
     respond_with(@mod_actions)
