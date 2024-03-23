@@ -2,11 +2,11 @@ require "test_helper"
 
 class DTextTest < ActiveSupport::TestCase
   def assert_strip_dtext(expected, dtext)
-    assert_equal(expected, DText.strip_dtext(dtext))
+    assert_equal(expected, DText.new(dtext).strip_dtext)
   end
 
   def assert_rewrite_wiki_links(expected, dtext, old, new)
-    assert_equal(expected, DText.rewrite_wiki_links(dtext, old, new))
+    assert_equal(expected, DText.new(dtext).rewrite_wiki_links(old, new).to_s)
   end
 
   context "DText" do
@@ -112,11 +112,11 @@ class DTextTest < ActiveSupport::TestCase
 
     context "#parse_wiki_titles" do
       should "parse wiki links in dtext" do
-        assert_equal(["foo"], DText.parse_wiki_titles("[[foo]] [[FOO]"))
+        assert_equal(["foo"], DText.new("[[foo]] [[FOO]").wiki_titles)
       end
     end
 
-    context "#parse_external_links" do
+    context "#external_links" do
       should "parse external links in dtext" do
         dtext = <<~EOS
           * https://test1.com
@@ -132,7 +132,7 @@ class DTextTest < ActiveSupport::TestCase
           https://test4.com https://test5.com https://test6.com
         ]
 
-        assert_equal(links, DText.parse_external_links(dtext))
+        assert_equal(links, DText.new(dtext).external_links)
       end
     end
 

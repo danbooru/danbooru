@@ -263,7 +263,7 @@ class Pool < ApplicationRecord
   def self.rewrite_wiki_links!(old_name, new_name)
     Pool.linked_to(old_name).each do |pool|
       pool.with_lock do
-        pool.update!(description: DText.rewrite_wiki_links(pool.description, old_name, new_name))
+        pool.update!(description: DText.new(pool.description).rewrite_wiki_links(old_name, new_name).to_s)
       end
     end
   end

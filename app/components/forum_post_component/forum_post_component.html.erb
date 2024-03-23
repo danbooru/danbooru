@@ -11,7 +11,7 @@
 
   <div class="content">
     <div class="prose">
-      <%= format_text(forum_post.body, data: dtext_data) %>
+      <%= format_text(forum_post.body, references: dtext_references) %>
     </div>
     <%= render "application/update_notice", record: forum_post %>
 

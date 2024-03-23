@@ -1,5 +1,5 @@
 <% page_title "#{@wiki_page.pretty_title.startcase} Wiki" %>
-<% meta_description DText.excerpt(@wiki_page.body) %>
+<% meta_description DText.new(@wiki_page.body).excerpt %>
 <% seo_canonical_url wiki_page_path(@wiki_page) %>
 
 <% if @wiki_page.artist.present? && @wiki_page.artist.is_banned? %>

@@ -21,7 +21,7 @@ class DiscordSlashCommand
       else
         respond_with(
           embeds: [{
-            description: DText.to_markdown(wiki_page.body).truncate(500),
+            description: DText.new(wiki_page.body).to_markdown.truncate(500),
             title: wiki_page.pretty_title,
             url: Routes.url_for(wiki_page),
             **example_embed,

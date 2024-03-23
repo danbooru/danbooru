@@ -5,7 +5,7 @@
 
   <div class="list-of-comments list-of-messages">
     <% if comments.present? %>
-      <%= render CommentComponent.with_collection(comments, current_user: current_user, context: :index_by_post, dtext_data: dtext_data) %>
+      <%= render CommentComponent.with_collection(comments, current_user: current_user, context: :index_by_post, dtext_references: dtext_references) %>
     <% else %>
       <p>There are no comments.</p>
     <% end %>

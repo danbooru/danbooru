@@ -16,7 +16,7 @@
 
 <div id="p-index-by-comment" class="comments-for-post">
   <div class="list-of-comments list-of-messages">
-    <% dtext_data = DText.preprocess(@comments.map(&:body)) %>
+    <% dtext_references = DText.preprocess(@comments.map(&:body)) %>
 
     <% @comments.each do |comment| %>
       <%= tag.div id: "post_#{comment.post.id}", **PostPreviewComponent.new(post: comment.post, classes: "post md:flex gap-4").article_attrs do %>
@@ -24,7 +24,7 @@
           <%= post_preview(comment.post, show_deleted: true, classes: "mx-auto") %>
         <% end %>
 
-        <%= render_comment(comment, dtext_data: dtext_data, classes: "flex-1", context: :index_by_comment, current_user: CurrentUser.user) %>
+        <%= render_comment(comment, dtext_references: dtext_references, classes: "flex-1", context: :index_by_comment, current_user: CurrentUser.user) %>
       <% end %>
     <% end %>
   </div>

@@ -24,14 +24,15 @@ class DtextLink < ApplicationRecord
     %w[WikiPage ForumPost Pool]
   end
 
-  def self.new_from_dtext(dtext)
+  def self.new_from_dtext(string)
+    dtext = DText.new(string)
     links = []
 
-    links += DText.parse_wiki_titles(dtext).map do |link|
+    links += dtext.wiki_titles.map do |link|
       DtextLink.new(link_type: :wiki_link, link_target: link)
     end
 
-    links += DText.parse_external_links(dtext).map do |link|
+    links += dtext.external_links.map do |link|
       DtextLink.new(link_type: :external_link, link_target: link)
     end
 

@@ -201,14 +201,14 @@ class WikiPage < ApplicationRecord
   end
 
   def tags
-    titles = DText.parse_wiki_titles(body).uniq
+    titles = DText.new(body).wiki_titles
     Tag.nonempty.undeprecated.named_or_aliased_in_order(titles)
   end
 
   def self.rewrite_wiki_links!(old_name, new_name)
     WikiPage.linked_to(old_name).each do |wiki|
       wiki.with_lock do
-        wiki.update!(body: DText.rewrite_wiki_links(wiki.body, old_name, new_name))
+        wiki.update!(body: DText.new(wiki.body).rewrite_wiki_links(old_name, new_name).to_s)
       end
     end
   end
