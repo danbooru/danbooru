@@ -11,8 +11,6 @@ require "dtext" # Load the C extension.
 class DText
   extend Memoist
 
-  MENTION_REGEXP = /(?<=^| )@\S+/
-
   attr_reader :dtext, :current_user, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains
 
   # Convert a string of DText to HTML.
@@ -249,13 +247,14 @@ class DText
   #
   # @return [Array<String>] The list of mentioned user names.
   memoize def mentions
-    text = strip_blocks("quote")
+    html = DText.parse(dtext)
+    fragment = DText.parse_html(html)
 
-    names = text.scan(MENTION_REGEXP).map do |mention|
-      mention.gsub(/(?:^\s*@)|(?:[:;,.!?\)\]<>]$)/, "")
+    nodes = fragment.css("a.dtext-user-mention-link").select do |mention|
+      mention.ancestors.none? { |ancestor| ancestor.name == "blockquote" }
     end
 
-    names.uniq
+    nodes.pluck("data-user-name").map { |name| User.normalize_name(name) }.uniq
   end
 
   # Return a list of wiki pages mentioned in a string of DText.
