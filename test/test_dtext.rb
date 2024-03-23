@@ -1503,6 +1503,31 @@ class DTextTest < Minitest::Test
     assert_parse(%{<p><a class="dtext-link dtext-id-link dtext-dmail-id-link" href="http://danbooru.donmai.us/dmails/1234?key=abc%3D%3D--DEF123">dmail #1234</a></p>}, "dmail #1234/abc==--DEF123", base_url: "http://danbooru.donmai.us")
   end
 
+  def test_tag_request_embeds
+    assert_parse('<tag-request-embed data-type="tag-alias" data-id="1"></tag-request-embed>', '[ta:1]')
+    assert_parse('<tag-request-embed data-type="tag-implication" data-id="1"></tag-request-embed>', '[ti:1]')
+    assert_parse('<tag-request-embed data-type="bulk-update-request" data-id="1"></tag-request-embed>', '[bur:1]')
+
+    assert_parse('<p>[TA:1]</p>', '[TA:1]')
+    assert_parse('<p>[TI:1]</p>', '[TI:1]')
+    assert_parse('<p>[BUR:1]</p>', '[BUR:1]')
+
+    assert_parse('<p>[bur:x]</p>', '[bur:x]')
+    assert_parse('<p>foo [bur:1]</p>', 'foo [bur:1]')
+    assert_parse('<p> [bur:1]</p>', ' [bur:1]')
+    assert_parse('<pre>[bur:1]</pre>', "[code]\n[bur:1]\n[/code]")
+    assert_parse('<pre>[bur:1]</pre>', "```\n[bur:1]\n```")
+    assert_parse('<p>[bur:1]</p>', '[nodtext][bur:1][/nodtext]')
+
+    assert_parse('<p>foo</p><tag-request-embed data-type="bulk-update-request" data-id="1"></tag-request-embed>', "foo\n[bur:1]")
+    assert_parse('<blockquote><tag-request-embed data-type="bulk-update-request" data-id="1"></tag-request-embed></blockquote>', "[quote]\n[bur:1]\n[/quote]")
+    assert_parse('<h4>See also</h4><tag-request-embed data-type="bulk-update-request" data-id="1"></tag-request-embed>', "h4. See also\n[bur:1]")
+    assert_parse('<ul><li>foo</li></ul><tag-request-embed data-type="bulk-update-request" data-id="1"></tag-request-embed>', "* foo\n[bur:1]")
+
+    assert_parse('<tag-request-embed data-type="bulk-update-request" data-id="1"></tag-request-embed><p> foo</p>', '[bur:1] foo') # XXX
+    assert_parse('<blockquote><tag-request-embed data-type="bulk-update-request" data-id="1"></tag-request-embed></blockquote>', '[quote][bur:1][/quote]') # XXX wrong?
+  end
+
   def test_media_embeds
     assert_parse('<media-embed data-type="post" data-id="1234"></media-embed>', "!post #1234")
     assert_parse('<media-embed data-type="asset" data-id="1234"></media-embed>', "!asset #1234")

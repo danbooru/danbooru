@@ -194,6 +194,7 @@ public:
   void append_code_fence(const std::string_view code, const std::string_view language);
   void append_inline_code(const std::string_view language = {});
   void append_block_code(const std::string_view language = {});
+  void append_tag_request_embed(const std::string_view type, const std::string_view id);
   void append_media_embed(const std::string_view media_type, const std::string_view id, const std::string_view caption, bool media_gallery);
 
   void clear_matches();
