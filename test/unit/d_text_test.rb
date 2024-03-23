@@ -173,5 +173,22 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("<https://www.example.com>", DText.from_html('<a href="https://www.example.com">https://www.example.com</a>'))
       end
     end
+
+    context "#mentions" do
+      should "parse mentions in dtext" do
+        assert_equal(["foo", "bar"], DText.new("@foo @bar").mentions)
+        assert_equal(["foo"], DText.new("@foo @FOO").mentions)
+        assert_equal(["foo"], DText.new("(@foo)").mentions)
+        assert_equal(["foo"], DText.new("<@foo>").mentions)
+        assert_equal(["foo"], DText.new("@foo's").mentions)
+        assert_equal(["foo"], DText.new("[nodtext][quote][/nodtext]@foo[nodtext][/quote][/nodtext]").mentions)
+
+        assert_equal([], DText.new("[quote]@foo[/quote]").mentions)
+        assert_equal([], DText.new("[nodtext]@foo[/nodtext]").mentions)
+        assert_equal([], DText.new("[code]@foo[/code]").mentions)
+        assert_equal([], DText.new("foo@bar.com").mentions)
+        # assert_equal(["foo"], DText.new("@foo", disable_mentions: true).mentions) # XXX
+      end
+    end
   end
 end
