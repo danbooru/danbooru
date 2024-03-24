@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/danbooru/dtext_rb.git
-  revision: b2dff8eb930283abb1b937fbd528e10b10e4c881
+  revision: 95c8344169cad4d3560ffd366ec508532a77c3a9
   specs:
-    dtext_rb (1.12.5)
+    dtext_rb (1.12.6)
 
 GEM
   remote: https://rubygems.org/
