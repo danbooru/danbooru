@@ -3,6 +3,8 @@
 class Ban < ApplicationRecord
   attribute :duration, :interval
 
+  dtext_attribute :reason, inline: true # defines :dtext_reason
+
   after_create :create_feedback
   after_create :create_dmail
   after_create :update_user_on_create

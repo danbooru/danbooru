@@ -3,6 +3,8 @@
 class Dmail < ApplicationRecord
   attr_accessor :creator_ip_addr, :disable_email_notifications
 
+  dtext_attribute :body # defines :dtext_body
+
   validate :validate_sender_is_not_limited, on: :create
   validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
   validates :body, visible_string: true, length: { maximum: 50_000 }, if: :body_changed?

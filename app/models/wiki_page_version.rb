@@ -2,6 +2,8 @@
 
 class WikiPageVersion < ApplicationRecord
   array_attribute :other_names
+  dtext_attribute :body, media_embeds: true # defines :dtext_body
+
   belongs_to :wiki_page
   belongs_to_updater
   belongs_to :tag, primary_key: :name, foreign_key: :title, optional: true

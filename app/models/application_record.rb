@@ -6,6 +6,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Deletable
   include Mentionable
   include Normalizable
+  include DTextAttribute
   include ArrayAttribute
   include HasDtextLinks
   extend HasBitFlags

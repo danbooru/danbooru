@@ -3,6 +3,8 @@
 class ModerationReport < ApplicationRecord
   MODEL_TYPES = %w[Dmail Comment ForumPost]
 
+  dtext_attribute :reason, inline: true # defines :dtext_reason
+
   attr_accessor :updater
 
   belongs_to :model, polymorphic: true

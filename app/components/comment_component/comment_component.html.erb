@@ -37,7 +37,7 @@
       <% if redact_deleted? %>
         <p>[deleted]</p>
       <% else %>
-        <%= format_text(comment.body, references: dtext_references) %>
+        <%= comment.dtext_body.format_text(references: dtext_references) %>
       <% end %>
     <% end %>
 

@@ -11,7 +11,7 @@
   <% end %>
   <% t.column "Reason" do |tag_implication| %>
     <span class="prose">
-      <%= format_text(tag_implication.reason, inline: true) %>
+      <%= tag_implication.dtext_reason.format_text %>
     </span>
   <% end %>
   <% t.column "Topic" do |tag_implication| %>

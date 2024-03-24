@@ -134,7 +134,7 @@
         <h2>You have been banned <%= CurrentUser.user.active_ban.humanized_duration %></h2>
 
         <div>
-          Reason: <span class="prose"><%= format_text CurrentUser.user.active_ban.reason, inline: true %></span>
+          Reason: <span class="prose"><%= CurrentUser.user.active_ban.dtext_reason.format_text %></span>
         </div>
       </div>
     <% end %>

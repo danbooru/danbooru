@@ -13,7 +13,7 @@
       </ul>
 
       <div class="prose">
-        <%= format_text(@dmail.body) %>
+        <%= @dmail.dtext_body.format_text %>
 
         <% if @dmail.is_automated? %>
           <p class="fineprint">

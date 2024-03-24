@@ -15,7 +15,7 @@
     </h1>
 
     <div id="description" class="prose mb-4">
-      <%= format_text(@pool.description) %>
+      <%= @pool.dtext_description.format_text %>
     </div>
 
     <%= render "posts/partials/common/inline_blacklist" %>

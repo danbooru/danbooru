@@ -5,7 +5,7 @@ atom_feed(root_url: forum_topics_url) do |feed|
   @forum_topics.each do |topic|
     feed.entry(topic, published: topic.created_at, updated: topic.updated_at) do |entry|
       entry.title("[#{topic.category_name}] #{topic.title}")
-      entry.content(format_text(topic.original_post.body), type: "html")
+      entry.content(topic.original_post.dtext_body.format_text, type: "html")
 
       entry.author do |author|
         author.name(topic.creator.name)

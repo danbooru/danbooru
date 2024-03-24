@@ -10,7 +10,7 @@
       <% end %>
       <% t.column "Reason" do |post_flag| %>
         <span class="prose">
-          <%= format_text post_flag.reason, inline: true %>
+          <%= post_flag.dtext_reason.format_text %>
         </span>
       <% end %>
       <% t.column "Flags", width: "1%" do |post_flag| %>

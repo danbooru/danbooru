@@ -10,6 +10,11 @@ class ArtistCommentary < ApplicationRecord
     :add_partial_commentary_tag
   )
 
+  dtext_attribute :original_title, disable_mentions: true, inline: true
+  dtext_attribute :translated_title, disable_mentions: true, inline: true
+  dtext_attribute :original_description, disable_mentions: true
+  dtext_attribute :translated_description, disable_mentions: true
+
   before_validation :trim_whitespace
   validates :post_id, uniqueness: true
   belongs_to :post

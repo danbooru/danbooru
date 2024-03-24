@@ -14,7 +14,7 @@
 
       <% t.column "Comment", td: {class: "col-expand"} do |vote| %>
         <div class="prose">
-          <%= format_text(vote.comment.body) %>
+          <%= vote.comment.dtext_body.format_text %>
         </div>
       <% end %>
 

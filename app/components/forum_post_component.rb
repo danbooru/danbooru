@@ -3,7 +3,7 @@
 class ForumPostComponent < ApplicationComponent
   attr_reader :forum_post, :original_forum_post_id, :dtext_references, :current_user
 
-  delegate :link_to_user, :time_ago_in_words_tagged, :format_text, :data_attributes_for, to: :helpers
+  delegate :link_to_user, :time_ago_in_words_tagged, :data_attributes_for, to: :helpers
 
   with_collection_parameter :forum_post
 

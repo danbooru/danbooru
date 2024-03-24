@@ -34,7 +34,7 @@
         <% end %>
       </p>
     <% else %>
-      <%= format_text(@wiki_page.body, media_embeds: true) %>
+      <%= @wiki_page.dtext_body.format_text %>
     <% end %>
 
     <% if @wiki_page.artist.present? && !@wiki_page.artist.is_deleted? %>

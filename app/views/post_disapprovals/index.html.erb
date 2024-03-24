@@ -20,7 +20,7 @@
       <% end %>
       <% t.column "Message", td: {class: "col-expand"} do |post_disapproval| %>
         <div class="prose">
-          <%= format_text(post_disapproval.message) %>
+          <%= post_disapproval.dtext_message.format_text %>
         </div>
       <% end %>
       <% t.column "Reason" do |post_disapproval| %>

@@ -20,7 +20,7 @@
       <% end %>
       <% t.column "Message", td: {class: "col-expand"} do |feedback| %>
         <div class="prose">
-          <%= format_text(feedback.body) %>
+          <%= feedback.dtext_body.format_text %>
         </div>
         <%= render "application/update_notice", record: feedback, interval: 0.minutes %>
       <% end %>

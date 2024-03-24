@@ -11,7 +11,7 @@
     </div>
 
     <div class="prose">
-      <%= format_text(@artist.wiki_page.body, disable_mentions: true, media_embeds: true) %>
+      <%= @artist.wiki_page.dtext_body.format_text %>
     </div>
   <% end %>
 

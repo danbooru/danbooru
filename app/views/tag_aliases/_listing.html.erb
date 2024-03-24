@@ -11,7 +11,7 @@
   <% end %>
   <% t.column "Reason" do |tag_alias| %>
     <span class="prose">
-      <%= format_text(tag_alias.reason, inline: true) %>
+      <%= tag_alias.dtext_reason.format_text %>
     </span>
   <% end %>
   <% t.column "Topic" do |tag_alias| %>

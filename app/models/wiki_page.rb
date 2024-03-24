@@ -12,6 +12,7 @@ class WikiPage < ApplicationRecord
   normalize :other_names, :normalize_other_names
 
   array_attribute :other_names # XXX must come after `normalize :other_names`
+  dtext_attribute :body, media_embeds: true # defines :dtext_body
 
   validates :title, tag_name: true, presence: true, uniqueness: true, if: :title_changed?
   validates :body, visible_string: true, unless: -> { is_deleted? || other_names.present? }

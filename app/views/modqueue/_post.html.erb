@@ -45,7 +45,7 @@
           <% post.disapprovals.sort_by(&:id).select { |disapproval| disapproval.message.present? }.each do |disapproval| %>
             <ul class="post-disapproval-reason list-bulleted">
               <li>
-                <span class="prose"><%= format_text(disapproval.message, inline: true) %></span>
+                <span class="prose"><%= disapproval.dtext_message.format_text %></span>
 
                 <% if policy(disapproval).can_view_creator? %>
                   (<%= link_to_user(disapproval.user) %>, <%= time_ago_in_words_tagged(disapproval.created_at) %>)

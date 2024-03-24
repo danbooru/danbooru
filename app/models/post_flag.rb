@@ -6,6 +6,8 @@ class PostFlag < ApplicationRecord
     REJECTED = "Unapproved in three days after returning to moderation queue%"
   end
 
+  dtext_attribute :reason, inline: true # defines :dtext_reason
+
   belongs_to :creator, class_name: "User"
   belongs_to :post
 

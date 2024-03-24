@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PostAppeal < ApplicationRecord
+  dtext_attribute :reason, inline: true # defines :dtext_reason
+
   belongs_to :creator, :class_name => "User"
   belongs_to :post
 

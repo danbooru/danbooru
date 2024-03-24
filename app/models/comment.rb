@@ -3,6 +3,8 @@
 class Comment < ApplicationRecord
   attr_accessor :creator_ip_addr
 
+  dtext_attribute :body # defines :dtext_body
+
   belongs_to :post
   belongs_to :creator, class_name: "User"
   belongs_to_updater
@@ -27,6 +29,8 @@ class Comment < ApplicationRecord
   end
 
   deletable
+  dtext_attribute :body # defines :dtext_body
+
   mentionable(
     message_field: :body,
     title: ->(_user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},

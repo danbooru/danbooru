@@ -10,7 +10,7 @@
       <% end %>
       <% t.column "Reason" do |post_appeal| %>
         <span class="prose">
-          <%= format_text post_appeal.reason, inline: true %>
+          <%= post_appeal.dtext_reason.format_text %>
         </span>
       <% end %>
       <% t.column "Appeals", width: "1%" do |post_appeal| %>

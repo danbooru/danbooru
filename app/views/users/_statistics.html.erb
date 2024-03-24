@@ -89,7 +89,7 @@
           <th>Ban reason</th>
           <td>
             <span class="prose">
-              <%= format_text user.active_ban.reason, inline: true %>
+              <%= user.active_ban.dtext_reason.format_text %>
               (banned <%= user.active_ban.humanized_duration %>)
             </span>
           </td>
