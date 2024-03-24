@@ -80,7 +80,7 @@ class DTextTest < ActiveSupport::TestCase
 
         BulkUpdateRequest::STATUSES.each do |status|
           @bur.update!(status: status)
-          assert_match(/bulk update request/, DText.format_text("[bur:#{@bur.id}]"))
+          assert_match(/BUR ##{@bur.id}/, DText.format_text("[bur:#{@bur.id}]"))
         end
 
         TagRelationship::STATUSES.each do |status|
@@ -90,6 +90,16 @@ class DTextTest < ActiveSupport::TestCase
           assert_match(/implication ##{@ti.id}/, DText.format_text("[ti:#{@ti.id}]"))
           assert_match(/alias ##{@ta.id}/, DText.format_text("[ta:#{@ta.id}]"))
         end
+      end
+
+      should "not parse [bur:<id>] tags inside [code] blocks" do
+        assert_equal("<pre>[bur:1]</pre>", DText.format_text("[code][bur:1][/code]"))
+      end
+
+      should "not fail if the [bur:<id>] tag has a bad id" do
+        assert_equal("<p>bulk update request #0 does not exist.</p>", DText.format_text("[bur:0]"))
+        assert_equal('<p>tag <a class="dtext-link dtext-id-link dtext-tag-alias-id-link" href="/tag_aliases/0">alias #0</a> does not exist.</p>', DText.format_text("[ta:0]"))
+        assert_equal('<p>tag <a class="dtext-link dtext-id-link dtext-tag-implication-id-link" href="/tag_implications/0">implication #0</a> does not exist.</p>', DText.format_text("[ti:0]"))
       end
 
       should "link artist tags to the artist page instead of the wiki page" do
@@ -113,6 +123,13 @@ class DTextTest < ActiveSupport::TestCase
     context "#parse_wiki_titles" do
       should "parse wiki links in dtext" do
         assert_equal(["foo"], DText.new("[[foo]] [[FOO]").wiki_titles)
+      end
+
+      should "parse wiki links inside [bur:id] tags" do
+        create(:tag, name: "artist", category: Tag.categories.artist)
+        @bur = create(:bulk_update_request, script: "alias bkubb -> bkub\nalias kitten -> cat\n\nalias kitty -> cat")
+
+        assert_equal(%w[bkubb bkub kitten cat kitty], DText.new("[bur:#{@bur.id}]").wiki_titles)
       end
     end
 

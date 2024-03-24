@@ -24,10 +24,19 @@ class DText
   # @param [Array<String>] a list of DText strings
   # @return [Hash<Symbol, ActiveRecord::Relation> The set of wiki pages, tags, artists, posts, and media assets.
   def self.preprocess(dtext_messages)
-    dtext_messages = dtext_messages.map { |message| DText.new(message).parse_embedded_tag_request }
-
     references = dtext_messages.map { |message| parse_dtext_references(message) }
-    references = references.reduce({}) { |all, hash| all.merge(hash) { |_key, left, right| left + right } }.transform_values(&:uniq)
+    references = references.reduce({}) { |all, hash| all.merge(hash) { |_key, left, right| left + right } }
+    references.transform_values!(&:uniq)
+
+    tag_aliases = TagAlias.where(id: references[:tag_aliases]).to_a
+    tag_implications = TagImplication.where(id: references[:tag_implications]).to_a
+    bulk_update_requests = BulkUpdateRequest.includes(:approver).where(id: references[:bulk_update_requests]).to_a
+
+    references[:wiki_pages] ||= []
+    references[:wiki_pages] += tag_aliases.pluck(:antecedent_name, :consequent_name).flatten
+    references[:wiki_pages] += tag_implications.pluck(:antecedent_name, :consequent_name).flatten
+    references[:wiki_pages] += bulk_update_requests.pluck(:tags).flatten
+    references[:wiki_pages].uniq!
 
     wiki_pages = WikiPage.where(title: references[:wiki_pages])
     tags = Tag.where(name: references[:wiki_pages])
@@ -35,7 +44,7 @@ class DText
     media_assets = MediaAsset.where(id: references[:media_assets])
     posts = Post.includes(:media_asset).where(id: references[:posts])
 
-    { wiki_pages:, tags:, artists:, media_assets:, posts: }
+    { wiki_pages:, tags:, artists:, media_assets:, posts:, tag_aliases:, tag_implications:, bulk_update_requests: }
   end
 
   # @param dtext [String] The DText input.
@@ -66,12 +75,12 @@ class DText
   memoize def format_text
     return nil if dtext.nil?
 
-    processed_dtext = parse_embedded_tag_request
-    html = DText.parse(processed_dtext, inline: inline, disable_mentions: disable_mentions, media_embeds: media_embeds, base_url: base_url, domain: domain, internal_domains: [domain, *alternate_domains].compact_blank)
+    html = DText.parse(dtext, inline: inline, disable_mentions: disable_mentions, media_embeds: media_embeds, base_url: base_url, domain: domain, internal_domains: [domain, *alternate_domains].compact_blank)
     fragment = DText.parse_html(html)
 
-    fragment.css("a.dtext-wiki-link").each { |node| replace_wiki_link!(node) }
     fragment.css("media-embed").each { |node| replace_media_embed!(node) }
+    fragment.css("tag-request-embed").each { |node| replace_tag_request_embed!(node) }
+    fragment.css("a.dtext-wiki-link").each { |node| replace_wiki_link!(node) }
 
     fragment.to_s
   rescue DText::Error
@@ -170,77 +179,54 @@ class DText
     node.inner_html += %{<div class="media-embed-caption">#{caption}</div>} if caption.present?
   end
 
-  # Wrap a DText message in a [quote] block.
-  #
-  # @param message [String] the DText to quote
-  # @param creator_name [String] the name of the user to quote.
-  # @return [String] the quoted DText
-  def quote(creator_name)
-    stripped_body = strip_blocks("quote")
-    "[quote]\n#{creator_name} said:\n\n#{stripped_body}\n[/quote]\n\n"
-  end
+  # Replace a <tag-request-embed> node with the contents of the alias, implication, or bulk update request.
+  def replace_tag_request_embed!(node)
+    type = node["data-type"]
+    id = node["data-id"].to_i
+    request = references[type.underscore.pluralize.to_sym].find { _1.id == id } # the TagAlias, TagImplication, or BulkUpdateRequest
 
-  # Convert `[bur:<id>]`, `[ta:<id>]`, `[ti:<id>]` tags to DText.
-  # @param text [String] the DText input
-  # @return [String] the DText output
-  def parse_embedded_tag_request
-    text = dtext
-    text = parse_embedded_tag_request_type(text, TagAlias, /\[ta:(?<id>\d+)\]/m)
-    text = parse_embedded_tag_request_type(text, TagImplication, /\[ti:(?<id>\d+)\]/m)
-    text = parse_embedded_tag_request_type(text, BulkUpdateRequest, /\[bur:(?<id>\d+)\]/m)
-    text
-  end
-
-  # Convert a `[bur:<id>]`, `[ta:<id>]`, or `[ti:<id>]` tag to DText.
-  # @param text [String] the DText input
-  # @param tag_request [BulkUpdateRequest, TagAlias, TagImplication]
-  # @param pattern [Regexp]
-  # @return [String] the DText output
-  def parse_embedded_tag_request_type(text, tag_request, pattern)
-    text.gsub(pattern) do |match|
-      obj = tag_request.find_by_id($~[:id])
-      tag_request_message(obj) || match
-    end
-  end
-
-  # Convert a `[bur:<id>]`, `[ta:<id>]`, or `[ti:<id>]` tag to DText.
-  # @param obj [BulkUpdateRequest, TagAlias, TagImplication] the object to convert
-  # @return [String] the DText output
-  def tag_request_message(obj)
-    if obj.is_a?(TagRelationship)
-      if obj.is_active?
-        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been approved."
-      elsif obj.is_retired?
-        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been retired."
-      elsif obj.is_deleted?
-        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been rejected."
-      elsif obj.is_pending?
-        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] is pending approval."
+    body = case request
+    when TagAlias, TagImplication
+      if request.is_active?
+        "#{request.relationship} ##{id} [[#{request.antecedent_name}]] -> [[#{request.consequent_name}]] has been approved."
+      elsif request.is_retired?
+        "#{request.relationship} ##{id} [[#{request.antecedent_name}]] -> [[#{request.consequent_name}]] has been retired."
+      elsif request.is_deleted?
+        "#{request.relationship} ##{id} [[#{request.antecedent_name}]] -> [[#{request.consequent_name}]] has been rejected."
+      elsif request.is_pending?
+        "#{request.relationship} ##{id} [[#{request.antecedent_name}]] -> [[#{request.consequent_name}]] is pending approval."
       else # should never happen
-        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has an unknown status."
+        "#{request.relationship} ##{id} [[#{request.antecedent_name}]] -> [[#{request.consequent_name}]] has an unknown status."
       end
-    elsif obj.is_a?(BulkUpdateRequest)
-      if obj.script.size < 700
-        embedded_script = obj.processor.to_dtext
+    when BulkUpdateRequest
+      bur = request
+
+      if bur.script.size < 700
+        embedded_script = bur.processor.to_dtext
       else
-        embedded_script = "[expand]#{obj.processor.to_dtext}[/expand]"
+        embedded_script = "[expand]#{bur.processor.to_dtext}[/expand]"
       end
 
-      case obj.status
+      case bur.status
       when "approved"
-        "The \"bulk update request ##{obj.id}\":#{Routes.bulk_update_request_path(obj)} has been approved by <@#{obj.approver.name}>.\n\n#{embedded_script}"
+        "BUR ##{id} has been approved by <@#{bur.approver.name}>.\n\n#{embedded_script}"
       when "pending"
-        "The \"bulk update request ##{obj.id}\":#{Routes.bulk_update_request_path(obj)} is pending approval.\n\n#{embedded_script}"
+        "BUR ##{id} is pending approval.\n\n#{embedded_script}"
       when "rejected"
-        "The \"bulk update request ##{obj.id}\":#{Routes.bulk_update_request_path(obj)} has been rejected.\n\n#{embedded_script}"
+        "BUR ##{id} has been rejected.\n\n#{embedded_script}"
       when "processing"
-        "The \"bulk update request ##{obj.id}\":#{Routes.bulk_update_request_path(obj)} is being processed.\n\n#{embedded_script}"
+        "BUR ##{id} is being processed.\n\n#{embedded_script}"
       when "failed"
-        "The \"bulk update request ##{obj.id}\":#{Routes.bulk_update_request_path(obj)} has failed.\n\n#{embedded_script}"
-      else
-        raise ArgumentError, "unknown bulk update request status"
+        "BUR ##{id} has failed.\n\n#{embedded_script}"
+      else # should never happen
+        "BUR ##{id} has an unknown status.\n\n#{embedded_script}"
       end
+    when nil
+      "#{type.tr("-", " ")} ##{id} does not exist."
     end
+
+    html = DText.parse(body)
+    node.replace(html)
   end
 
   # Return a list of user names mentioned in a string of DText. Ignore mentions in [quote] blocks.
@@ -262,7 +248,12 @@ class DText
   # @param text [String] the string of DText
   # @return [Array<String>] the list of wiki page names
   memoize def wiki_titles
-    DText.parse_dtext_references(dtext)[:wiki_pages]
+    DText.parse_html(format_text).css("a.dtext-wiki-link").pluck("href").map do |href|
+      title = href[%r{\A(?:/wiki_pages/|/artists/show_or_new\?name=)(.*)\z}i, 1]
+      title = CGI.unescape(title)
+      title = WikiPage.normalize_title(title)
+      title
+    end.uniq
   end
 
   # @return [Hash<Symbol, ActiveRecord::Relation> The set of wiki pages, tags, artists, posts, and media assets referenced in this DText.
@@ -270,7 +261,7 @@ class DText
     @references ||= DText.preprocess([dtext])
   end
 
-  # Return a hash of wiki pages, posts, and media assets referenced in a string of DText.
+  # Return a hash of the wiki pages, posts, media assets, aliases, implications, and BURs referenced by a string of DText.
   #
   # @param text [String] the string of DText
   # @return [Hash<Symbol, Array<String>>] The set of items referenced in the DText.
@@ -286,10 +277,14 @@ class DText
     end
 
     # <media-embed data-type="post data-id="1234"></media-embed>
-    post_ids = fragment.css("media-embed").select { |node| node["data-type"] == "post" }.pluck("data-id")
-    media_asset_ids = fragment.css("media-embed").select { |node| node["data-type"] == "asset" }.pluck("data-id")
+    # <tag-request-embed data-type="bulk-update-request data-id="1234"></tag-request-embed>
+    posts = fragment.css("media-embed").select { |node| node["data-type"] == "post" }.pluck("data-id").uniq
+    media_assets = fragment.css("media-embed").select { |node| node["data-type"] == "asset" }.pluck("data-id").uniq
+    tag_aliases = fragment.css("tag-request-embed").select { |node| node["data-type"] == "tag-alias" }.pluck("data-id").uniq
+    tag_implications = fragment.css("tag-request-embed").select { |node| node["data-type"] == "tag-implication" }.pluck("data-id").uniq
+    bulk_update_requests = fragment.css("tag-request-embed").select { |node| node["data-type"] == "bulk-update-request" }.pluck("data-id").uniq
 
-    { wiki_pages: titles.uniq, posts: post_ids.uniq, media_assets: media_asset_ids.uniq }
+    { wiki_pages: titles, posts:, media_assets:, tag_aliases:, tag_implications:, bulk_update_requests: }
   end
 
   # Return a list of external links mentioned in a string of DText.
@@ -360,6 +355,16 @@ class DText
     end
 
     DText.new(rewritten_dtext)
+  end
+
+  # Wrap a DText message in a [quote] block.
+  #
+  # @param message [String] the DText to quote
+  # @param creator_name [String] the name of the user to quote.
+  # @return [String] the quoted DText
+  def quote(creator_name)
+    stripped_body = strip_blocks("quote")
+    "[quote]\n#{creator_name} said:\n\n#{stripped_body}\n[/quote]\n\n"
   end
 
   # Remove all [<tag>] blocks from the DText.
