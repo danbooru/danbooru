@@ -96,8 +96,8 @@ module ApplicationHelper
     tag.li(link_to(text, url, id: "#{id}-link", **options), id: id, class: klass)
   end
 
-  def format_text(text, **options)
-    raw DText.format_text(text, **options)
+  def format_text(text, references: DText.preprocess([text]), **options)
+    DText.new(text, **options).format_text(references:)
   end
 
   def strip_dtext(text)
@@ -255,7 +255,7 @@ module ApplicationHelper
 
   def embed_wiki(title, classes: nil, **options)
     wiki = WikiPage.find_by(title: title)
-    text = format_text(wiki&.body)
+    text = wiki&.dtext_body&.format_text
     tag.div(text, class: "prose #{classes}".strip, **options)
   end
 

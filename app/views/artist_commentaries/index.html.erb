@@ -19,12 +19,12 @@
         <%= post_preview(commentary.post, show_deleted: true) %>
       <% end %>
       <% t.column "Original", td: { class: "break-words" }, width: "50%" do |commentary| %>
-          <%= format_commentary_title(commentary.original_title) %>
-          <%= format_commentary_description(commentary.original_description) %>
+        <h3><span class="prose"><%= commentary.dtext_original_title.format_text %></span></h3>
+        <h3><span class="prose"><%= commentary.dtext_original_description.format_text %></span></h3>
       <% end %>
       <% t.column "Translated", td: { class: "break-words" }, width: "50%" do |commentary| %>
-        <%= format_commentary_title(commentary.translated_title) %>
-        <%= format_commentary_description(commentary.translated_description) %>
+        <h3><span class="prose"><%= commentary.dtext_translated_title.format_text %></span></h3>
+        <h3><span class="prose"><%= commentary.dtext_translated_description.format_text %></span></h3>
       <% end %>
     <% end %>
 

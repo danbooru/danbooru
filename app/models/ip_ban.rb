@@ -2,6 +2,7 @@
 
 class IpBan < ApplicationRecord
   attribute :ip_addr, :ip_address
+  dtext_attribute :reason, inline: true # defines :dtext_reason
 
   belongs_to :creator, class_name: "User"
   has_many :mod_actions, as: :subject, dependent: :destroy

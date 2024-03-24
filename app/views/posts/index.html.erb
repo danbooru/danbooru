@@ -123,7 +123,7 @@
             <%= wiki_page_other_names_list(wiki_page) %>
           <% end %>
 
-          <%= format_text(wiki_page.body, media_embeds: true) %>
+          <%= wiki_page.dtext_body.format_text %>
           <%= render "tag_relationships/alias_and_implication_list", tag: wiki_page.tag %>
 
           <% if wiki_page.tag&.is_deprecated? %>
@@ -146,7 +146,7 @@
         </h2>
 
         <div id="description" class="prose">
-          <%= format_text(@post_set.pool.description) %>
+          <%= @post_set.pool.dtext_description.format_text %>
         </div>
 
         <p class="mt-4">

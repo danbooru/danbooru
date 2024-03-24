@@ -9,6 +9,10 @@ class DTextTest < ActiveSupport::TestCase
     assert_equal(expected, DText.new(dtext).rewrite_wiki_links(old, new).to_s)
   end
 
+  def format_text(dtext, **options)
+    DText.new(dtext, **options).format_text
+  end
+
   context "DText" do
     context "#strip_dtext" do
       should "strip dtext markup from the input" do
@@ -46,31 +50,31 @@ class DTextTest < ActiveSupport::TestCase
     context "#format_text" do
       should "add tag types to wiki links" do
         create(:tag, name: "bkub", category: Tag.categories.artist, post_count: 42)
-        assert_match(/tag-type-#{Tag.categories.artist}/, DText.format_text("[[bkub]]"))
+        assert_match(/tag-type-#{Tag.categories.artist}/, format_text("[[bkub]]"))
       end
 
       should "parse wiki links correctly with the base_url option" do
         create(:tag, name: "bkub", category: Tag.categories.artist, post_count: 42)
-        assert_match(/tag-type-#{Tag.categories.artist}/, DText.format_text("[[bkub]]", base_url: "http://www.example.com"))
+        assert_match(/tag-type-#{Tag.categories.artist}/, format_text("[[bkub]]", base_url: "http://www.example.com"))
       end
 
       should "convert direct links to short links" do
-        assert_equal('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', DText.format_text("https://danbooru.donmai.us/posts/1234", domain: "danbooru.donmai.us"))
-        assert_equal('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', DText.format_text("https://danbooru.donmai.us/posts/1234", domain: "danbooru.donmai.us", alternate_domains: ["betabooru.donmai.us"]))
-        assert_equal('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', DText.format_text("https://danbooru.donmai.us/posts/1234", domain: "betabooru.donmai.us", alternate_domains: ["danbooru.donmai.us"]))
+        assert_equal('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', format_text("https://danbooru.donmai.us/posts/1234", domain: "danbooru.donmai.us"))
+        assert_equal('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', format_text("https://danbooru.donmai.us/posts/1234", domain: "danbooru.donmai.us", alternate_domains: ["betabooru.donmai.us"]))
+        assert_equal('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="/posts/1234">post #1234</a></p>', format_text("https://danbooru.donmai.us/posts/1234", domain: "betabooru.donmai.us", alternate_domains: ["danbooru.donmai.us"]))
 
-        assert_equal('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us/posts/1234">https://danbooru.donmai.us/posts/1234</a></p>', DText.format_text("https://danbooru.donmai.us/posts/1234", domain: "betabooru.donmai.us"))
+        assert_equal('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us/posts/1234">https://danbooru.donmai.us/posts/1234</a></p>', format_text("https://danbooru.donmai.us/posts/1234", domain: "betabooru.donmai.us"))
       end
 
       should "mark links to nonexistent tags or wikis" do
         create(:tag, name: "no_wiki", post_count: 42)
         create(:tag, name: "empty_tag", post_count: 0)
 
-        assert_match(/dtext-wiki-does-not-exist/, DText.format_text("[[no wiki]]"))
-        assert_match(/dtext-tag-does-not-exist/, DText.format_text("[[no tag]]"))
-        assert_match(/dtext-tag-empty/, DText.format_text("[[empty tag]]"))
+        assert_match(/dtext-wiki-does-not-exist/, format_text("[[no wiki]]"))
+        assert_match(/dtext-tag-does-not-exist/, format_text("[[no tag]]"))
+        assert_match(/dtext-tag-empty/, format_text("[[empty tag]]"))
 
-        refute_match(/dtext-tag-does-not-exist/, DText.format_text("[[help:nothing]]"))
+        refute_match(/dtext-tag-does-not-exist/, format_text("[[help:nothing]]"))
       end
 
       should "parse [ta:<id>], [ti:<id>], [bur:<id>] pseudo tags" do
@@ -80,43 +84,40 @@ class DTextTest < ActiveSupport::TestCase
 
         BulkUpdateRequest::STATUSES.each do |status|
           @bur.update!(status: status)
-          assert_match(/BUR ##{@bur.id}/, DText.format_text("[bur:#{@bur.id}]"))
+          assert_match(/BUR ##{@bur.id}/, format_text("[bur:#{@bur.id}]"))
         end
 
         TagRelationship::STATUSES.each do |status|
           @ta.update!(status: status)
           @ti.update!(status: status)
 
-          assert_match(/implication ##{@ti.id}/, DText.format_text("[ti:#{@ti.id}]"))
-          assert_match(/alias ##{@ta.id}/, DText.format_text("[ta:#{@ta.id}]"))
+          assert_match(/implication ##{@ti.id}/, format_text("[ti:#{@ti.id}]"))
+          assert_match(/alias ##{@ta.id}/, format_text("[ta:#{@ta.id}]"))
         end
       end
 
       should "not parse [bur:<id>] tags inside [code] blocks" do
-        assert_equal("<pre>[bur:1]</pre>", DText.format_text("[code][bur:1][/code]"))
+        assert_equal("<pre>[bur:1]</pre>", format_text("[code][bur:1][/code]"))
       end
 
       should "not fail if the [bur:<id>] tag has a bad id" do
-        assert_equal("<p>bulk update request #0 does not exist.</p>", DText.format_text("[bur:0]"))
-        assert_equal('<p>tag <a class="dtext-link dtext-id-link dtext-tag-alias-id-link" href="/tag_aliases/0">alias #0</a> does not exist.</p>', DText.format_text("[ta:0]"))
-        assert_equal('<p>tag <a class="dtext-link dtext-id-link dtext-tag-implication-id-link" href="/tag_implications/0">implication #0</a> does not exist.</p>', DText.format_text("[ti:0]"))
+        assert_equal("<p>bulk update request #0 does not exist.</p>", format_text("[bur:0]"))
+        assert_equal('<p>tag <a class="dtext-link dtext-id-link dtext-tag-alias-id-link" href="/tag_aliases/0">alias #0</a> does not exist.</p>', format_text("[ta:0]"))
+        assert_equal('<p>tag <a class="dtext-link dtext-id-link dtext-tag-implication-id-link" href="/tag_implications/0">implication #0</a> does not exist.</p>', format_text("[ti:0]"))
       end
 
       should "link artist tags to the artist page instead of the wiki page" do
         tag = create(:tag, name: "m&m", category: Tag.categories.artist)
         artist = create(:artist, name: "m&m")
 
-        assert_equal(
-          '<p><a class="dtext-link dtext-wiki-link tag-type-1" href="/artists/show_or_new?name=m%26m">m&amp;m</a></p>',
-          DText.format_text("[[m&m]]")
-        )
+        assert_equal('<p><a class="dtext-link dtext-wiki-link tag-type-1" href="/artists/show_or_new?name=m%26m">m&amp;m</a></p>', format_text("[[m&m]]"))
       end
 
       should "not link general tags to artist pages" do
         tag = create(:tag, name: "cat")
         artist = create(:artist, name: "cat", is_deleted: true)
 
-        assert_match(%r!/wiki_pages/cat!, DText.format_text("[[cat]]"))
+        assert_match(%r!/wiki_pages/cat!, format_text("[[cat]]"))
       end
     end
 

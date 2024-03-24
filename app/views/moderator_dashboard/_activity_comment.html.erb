@@ -16,7 +16,8 @@
         <td><%= link_to activity.comment.dtext_shortlink, activity.comment %></td>
         <td>
           <div class="prose">
-            <%= format_text(activity.comment.body) %>
+            <%= activity.comment.dtext_body.format_text %>
+
             <% if activity.comment.is_deleted? %>
               <span class="inactive">(deleted)</span>
             <% end %>

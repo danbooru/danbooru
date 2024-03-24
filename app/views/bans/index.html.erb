@@ -11,7 +11,7 @@
       <% end %>
       <% t.column "Reason", td: {class: "col-expand"} do |ban| %>
         <div class="prose">
-          <%= format_text ban.reason %>
+          <%= ban.dtext_reason.format_text %>
         </div>
       <% end %>
       <% t.column "Duration" do |ban| %>

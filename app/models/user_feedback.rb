@@ -3,6 +3,8 @@
 class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
 
+  dtext_attribute :body # defines :dtext_body
+
   attr_accessor :disable_dmail_notification, :updater
 
   belongs_to :user

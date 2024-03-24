@@ -9,7 +9,7 @@
     </p>
 
     <div class="prose">
-      <%= format_text(WikiPage.find_by_title("help:bookmarklet_notice")&.body) %>
+      <%= WikiPage.find_by_title("help:bookmarklet_notice")&.dtext_body&.format_text %>
     </div>
   </div>
 </div>

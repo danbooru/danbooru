@@ -4,6 +4,8 @@ class PostDisapproval < ApplicationRecord
   DELETION_THRESHOLD = 1.month
   REASONS = %w[breaks_rules poor_quality disinterest]
 
+  dtext_attribute :message, inline: true # defines :dtext_message
+
   belongs_to :post
   belongs_to :user
   validates :user, uniqueness: { scope: :post, message: "have already hidden this post" }

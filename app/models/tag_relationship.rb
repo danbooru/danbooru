@@ -5,6 +5,8 @@ class TagRelationship < ApplicationRecord
 
   self.abstract_class = true
 
+  dtext_attribute :reason, inline: true # defines :dtext_reason
+
   belongs_to :creator, class_name: "User"
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :forum_post, optional: true
