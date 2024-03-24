@@ -209,7 +209,7 @@ class DText
 
       case bur.status
       when "approved"
-        "BUR ##{id} has been approved by <@#{bur.approver.name}>.\n\n#{embedded_script}"
+        "BUR ##{id} has been approved by <@#{bur.approver&.name}>.\n\n#{embedded_script}"
       when "pending"
         "BUR ##{id} is pending approval.\n\n#{embedded_script}"
       when "rejected"

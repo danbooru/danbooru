@@ -6,7 +6,12 @@
       <table class="aligned-vertical table-xs">
         <tr>
           <th>Forum</th>
-          <td><%= link_to @bulk_update_request.forum_topic.title, @bulk_update_request.forum_post || @bulk_update_rqeuest.forum_topic %></td>
+
+          <% if @bulk_update_request.forum_post.present? %>
+            <td><%= link_to @bulk_update_request.forum_topic.title, @bulk_update_request.forum_post || @bulk_update_rqeuest.forum_topic %></td>
+          <% else %>
+            <td><em>None</em></td>
+          <% end %>
         </tr>
         <tr>
           <th>Creator</th>
