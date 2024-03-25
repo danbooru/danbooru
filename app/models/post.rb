@@ -1254,6 +1254,8 @@ class Post < ApplicationRecord
           where(has_children: true)
         when "child"
           where.not(parent: nil)
+        when "wiki_image"
+          where(id: DtextLink.wiki_page.embedded_post.select("link_target::integer"))
         when *AutocompleteService::POST_STATUSES
           status_matches(value, current_user)
         when *MediaAsset::FILE_TYPES

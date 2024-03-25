@@ -20,6 +20,7 @@ class DtextLink < ApplicationRecord
   scope :wiki_page, -> { where(model_type: "WikiPage") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
   scope :pool, -> { where(model_type: "Pool") }
+  scope :embedded_media, -> { where(link_type: %i[embedded_post embedded_media_asset]) }
 
   def self.visible(user)
     # XXX the double negation is to prevent postgres from choosing a bad query

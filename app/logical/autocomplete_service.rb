@@ -13,7 +13,7 @@ class AutocompleteService
   POST_STATUSES = %w[active deleted pending flagged appealed banned modqueue unmoderated]
 
   STATIC_METATAGS = {
-    is: %w[parent child sfw nsfw] + POST_STATUSES + MediaAsset::FILE_TYPES + Post::RATINGS.values.map(&:downcase),
+    is: %w[parent child sfw nsfw wiki_image] + POST_STATUSES + MediaAsset::FILE_TYPES + Post::RATINGS.values.map(&:downcase),
     has: %w[parent children source appeals flags replacements comments commentary notes pools],
     status: %w[any] + POST_STATUSES,
     child: %w[any none] + POST_STATUSES,

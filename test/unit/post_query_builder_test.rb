@@ -868,6 +868,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "is:blah")
     end
 
+    should "return posts for the is:wiki_image metatag" do
+      post1 = create(:post)
+      post2 = create(:post)
+      create(:wiki_page, body: "!post ##{post1.id}")
+
+      assert_tag_match([post1], "is:wiki_image")
+      assert_tag_match([post2], "-is:wiki_image")
+    end
+
     should "return posts for the has:<value> metatag" do
       parent = create(:post)
       child = create(:post, parent: parent)
