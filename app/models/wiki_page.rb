@@ -26,6 +26,12 @@ class WikiPage < ApplicationRecord
   deletable
   has_dtext_links :body
 
+  # XXX doesn't work; need to cast link_target from string to integer
+  # has_many :embedded_posts, through: :dtext_links, source: :embedded_post
+
+  scope :has_embedded_media, -> { where(id: DtextLink.wiki_page.embedded_media.select(:model_id)) }
+  scope :no_embedded_media,  -> { where.not(id: DtextLink.wiki_page.embedded_media.select(:model_id)) }
+
   module SearchMethods
     def find_by_id_or_title(id)
       if id =~ /\A\d+\z/
@@ -41,6 +47,14 @@ class WikiPage < ApplicationRecord
 
     def title_matches(title)
       where_like(:title, normalize_title(title))
+    end
+
+    def embedded_post_id_matches(post_id)
+      where(id: DtextLink.wiki_page.embedded_media.where(link_target: post_id).select(:model_id))
+    end
+
+    def embedded_media_asset_id_matches(media_asset_id)
+      where(id: DtextLink.wiki_page.embedded_media.where(link_target: media_asset_id).select(:model_id))
     end
 
     def other_names_include(name)
@@ -80,6 +94,14 @@ class WikiPage < ApplicationRecord
         q = q.not_linked_to(params[:not_linked_to])
       end
 
+      if params[:embedded_post_id].present?
+        q = q.embedded_post_id_matches(params[:embedded_post_id])
+      end
+
+      if params[:embedded_media_asset_id].present?
+        q = q.embedded_media_asset_id_matches(params[:embedded_media_asset_id])
+      end
+
       if params[:hide_deleted].to_s.truthy?
         q = q.where("is_deleted = false")
       end
@@ -88,6 +110,12 @@ class WikiPage < ApplicationRecord
         q = q.where("other_names is not null and other_names != '{}'")
       elsif params[:other_names_present].to_s.falsy?
         q = q.where("other_names is null or other_names = '{}'")
+      end
+
+      if params[:has_embedded_media].to_s.truthy?
+        q = q.has_embedded_media
+      elsif params[:has_embedded_media].to_s.falsy?
+        q = q.no_embedded_media
       end
 
       case params[:order]
