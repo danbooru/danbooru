@@ -12,6 +12,9 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "AI"
   inflect.acronym "SFTP"
   inflect.acronym "TOTP"
+  inflect.acronym "VAE"
+  inflect.acronym "UI"
+  inflect.acronym "RNG"
   inflect.uncountable ["totp"]
 #   inflect.plural /^(ox)$/i, '\1en'
 #   inflect.singular /^(ox)en/i, '\1'
