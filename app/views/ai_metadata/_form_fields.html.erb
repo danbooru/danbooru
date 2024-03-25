@@ -1,0 +1,23 @@
+<span id="remove-metadata-row-icon" style="display: none">
+  <%= close_icon %>
+</span>
+
+<div class="input text optional ai_metadata_prompt">
+  <label for="ai_metadata[prompt]" class="text optional">Prompt</label>
+  <textarea class="text optional" name="ai_metadata[prompt]"><%= ai_metadata&.prompt %></textarea>
+</div>
+<div class="input text optional ai_metadata_negative_prompt">
+  <label for="ai_metadata[negative_prompt]" class="text optional">Negative prompt</label>
+  <textarea class="text optional" name="ai_metadata[negative_prompt]"><%= ai_metadata&.negative_prompt %></textarea>
+</div>
+<% ai_metadata&.parameters.to_h.each do |key, value| %>
+  <div class="input text optional custom-metadata-field">
+    <input type="text" value="<%= key %>" class="ui-autocomplete-input text optional custom-metadata-field-name" placeholder="Parameter name" data-autocomplete="ai-metadata-label">
+    <input type="text" class="text optional custom-metadata-field-value" placeholder="Parameter value" value="<%= value %>">
+    <span class="remove-metadata-button">
+      <i><%= close_icon %></i>
+    </span>
+  </div>
+<% end %>
+
+<button id="add-field-button" type="submit" onclick="return false">Add field</button>

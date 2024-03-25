@@ -129,11 +129,7 @@ class Post < ApplicationRecord
     translated_commentary_desc: nil,
     prompt: nil,
     negative_prompt: nil,
-    sampler: nil,
-    seed: nil,
-    steps: nil,
-    cfg_scale: nil,
-    model_hash: nil,
+    ai_metadata: {},
     is_pending: nil,
     add_artist_tag: false
   )
@@ -148,15 +144,11 @@ class Post < ApplicationRecord
       translated_description: translated_commentary_desc,
     )
 
-    ai_metadata = AIMetadata.new_from_metadata(media_asset&.metadata.to_h)
-    ai_metadata.assign_attributes({
-      prompt: prompt,
-      negative_prompt: negative_prompt,
-      sampler: sampler,
-      seed: seed,
-      steps: steps,
-      cfg_scale: cfg_scale,
-      model_hash: model_hash,
+    metadata = AIMetadata.new_from_metadata(media_asset&.metadata.to_h)
+    metadata.assign_attributes({
+      prompt: ai_metadata[:prompt],
+      negative_prompt: ai_metadata[:negative_prompt],
+      parameters: ai_metadata.without(:prompt, :negative_prompt),
     }.compact_blank)
 
     if add_artist_tag
@@ -177,7 +169,7 @@ class Post < ApplicationRecord
       parent_id: parent_id,
       is_pending: !upload.uploader.is_contributor? || is_pending.to_s.truthy?,
       artist_commentary: (commentary if commentary.any_field_present?),
-      ai_metadata: (ai_metadata if ai_metadata.any_field_present?),
+      ai_metadata: (metadata if metadata.any_field_present?),
     )
   end
 

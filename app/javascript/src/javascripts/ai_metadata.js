@@ -1,4 +1,5 @@
 import Utility from "./utility";
+import Autocomplete from "./autocomplete";
 import Rails from "@rails/ujs";
 
 let AIMetadata = {};
@@ -8,9 +9,47 @@ AIMetadata.initialize_all = function() {
     this.initialize_edit_ai_metadata_dialog();
   }
 
-  if ($("#copy-as-webui").length) {
-    this.initialize_copy_button();
+  if ($("#add-field-button").length) {
+    $("#add-field-button").on("click.danbooru", (e) => {
+      e.preventDefault();
+      AIMetadata.add_custom_field(e.target);
+    });
   }
+
+  if ($("#create-post-button").length) {
+    $("#create-post-button").on("click", (e) => {
+      AIMetadata.inject_names();
+    });
+  }
+};
+
+AIMetadata.inject_names = function() {
+  let customFields = document.querySelectorAll(".custom-metadata-field");
+  customFields.forEach(el => {
+    let [name, value] = el.children;
+    if (name.value && value.value) {
+      value.name = `ai_metadata[${name.value}]`;
+    }
+  });
+};
+
+AIMetadata.add_custom_field = function(el, name = "", value = "") {
+  let field = $(`
+    <div class="input text optional custom-metadata-field">
+      <input type="text" class="ui-autocomplete-input optional custom-metadata-field-name" placeholder="Parameter name" data-autocomplete="ai-metadata-label" value="${name}">
+      <input type="text" class="optional custom-metadata-field-value" placeholder="Parameter value" value="${value}">
+    </div>
+  `);
+  let removeButton = $(`
+    <span class="remove-metadata-button">
+      <i>${$("#remove-metadata-row-icon").html()}</i>
+    </span>
+  `);
+  removeButton.on("click", (e) => {
+    field.remove();
+  }).appendTo(field);
+  let newElement = field.insertBefore(el);
+  Autocomplete.initialize_fields(field.children(0), "ai_metadata_label");
 };
 
 AIMetadata.initialize_edit_ai_metadata_dialog = function() {
@@ -23,6 +62,7 @@ AIMetadata.initialize_edit_ai_metadata_dialog = function() {
       },
       "Submit": function() {
         let form = $("#add-ai-metadata-dialog #edit-ai-metadata").get(0);
+        AIMetadata.inject_names();
         Rails.fire(form, "submit");
         $(this).dialog("close");
       },
@@ -40,21 +80,14 @@ AIMetadata.initialize_edit_ai_metadata_dialog = function() {
     e.preventDefault();
     $("#add-ai-metadata-dialog").dialog("open");
   });
-};
 
-AIMetadata.initialize_copy_button = function() {
-  $("#copy-as-webui").on("click.danbooru.ai-metadata", (e) => {
-    e.preventDefault();
-    let content = $("#webui-parameters").text();
-    navigator.clipboard.writeText(content)
-      .then(() => Utility.notice("Copied to clipboard."))
-      .catch(() => Utility.error("Error copying text to clipboard."));
+  $(".remove-metadata-button").on("click", (e) => {
+    $(e.target).closest("div").remove();
   });
 };
 
 AIMetadata.fetch_file_metadata = function() {
-  // XXX this is ugly
-  let media_asset_id = parseInt($("#post-info-size > a:nth-child(2)").attr("href").match(/\/media_assets\/(\d+)$/)[1]);
+  let media_asset_id = parseInt(document.querySelector("[data-media-asset-id]").dataset["mediaAssetId"]);
   return $.get(`/media_assets/${media_asset_id}/metadata.json`);
 };
 
@@ -72,20 +105,19 @@ AIMetadata.load_from_file = function() {
 };
 
 AIMetadata.fill_metadata = function(metadata) {
-  // Update the other fields if they're blank. Return success if none conflict.
+  let el = $("#add-field-button");
+  $(".custom-metadata-field").remove();
+  for (const [name, value] of Object.entries(metadata.parameters)) {
+    AIMetadata.add_custom_field(el, name, value)
+  }
   return [
     Utility.update_field($("#ai_metadata_prompt"), metadata.prompt),
     Utility.update_field($("#ai_metadata_negative_prompt"), metadata.negative_prompt),
-    Utility.update_field($("#ai_metadata_sampler"), metadata.sampler),
-    Utility.update_field($("#ai_metadata_seed"), metadata.seed),
-    Utility.update_field($("#ai_metadata_steps"), metadata.steps),
-    Utility.update_field($("#ai_metadata_cfg_scale"), metadata.cfg_scale),
-    Utility.update_field($("#ai_metadata_model_hash"), metadata.model_hash),
-  ].every(function (i) { return i; });
+  ].every(i => i);
 };
 
 $(function() {
   AIMetadata.initialize_all();
 });
 
-export default AIMetadata
+export default AIMetadata;

@@ -81,11 +81,11 @@
                     <% end %>
 
                     <% if policy(Upload.new).show? %>
-                      <% menu.item do %>
+                      <% menu.with_item do %>
                         <hr class="border">
                       <% end %>
 
-                      <% menu.item do %>
+                      <% menu.with_item do %>
                         <%= link_to upload_media_assets_path(search: { media_asset_id: @media_asset.id }) do %>
                           <%= search_icon %> Find Uploads
                         <% end %>

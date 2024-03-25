@@ -15,7 +15,7 @@ class AIMetadataPolicy < ApplicationPolicy
 
   def permitted_attributes
     %i[
-      prompt negative_prompt sampler seed steps cfg_scale model_hash
+      prompt negative_prompt
     ]
   end
 end

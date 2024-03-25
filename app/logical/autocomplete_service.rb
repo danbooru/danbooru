@@ -80,6 +80,8 @@ class AutocompleteService
       autocomplete_favorite_group(query)
     when :saved_search_label
       autocomplete_saved_search_label(query)
+    when :ai_metadata_label
+      autocomplete_ai_metadata_label(query)
     else
       []
     end.map { |result| Result.new(result) }
@@ -323,6 +325,15 @@ class AutocompleteService
 
     labels.map do |label|
       { label: label.tr("_", " "), value: label }
+    end
+  end
+
+  def autocomplete_ai_metadata_label(string)
+    string = "*" + string + "*" unless string.include?("*")
+    labels = AIMetadata.labels_like(string).take(limit)
+
+    labels.map do |label|
+      { label:, value: label }
     end
   end
 

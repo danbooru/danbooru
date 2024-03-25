@@ -2,6 +2,7 @@
 
 class AIMetadata < ApplicationRecord
   self.table_name = "ai_metadata"
+  self.ignored_columns = [:sampler, :seed, :steps, :cfg_scale, :model_hash]
 
   PARAMETER_REGEX = /\s*([\w ]+):\s*("(?:\\|\"|[^\"])+"|[^,]*)(?:,|$)/
 
@@ -15,20 +16,28 @@ class AIMetadata < ApplicationRecord
   belongs_to :post
 
   # XXX post_id shouldn't be versionable but it needs to be set in new versions due to foreign key.
-  versionable :prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash, :post_id
+  versionable :prompt, :negative_prompt, :parameters, :post_id
 
   scope :nonblank, -> {
-    where("prompt != '' or negative_prompt != '' or sampler != '' or seed is not null or steps is not null or cfg_scale is not null or model_hash != ''")
+    where("prompt != '' or negative_prompt != '' or parameters != '{}'")
   }
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :post, :prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash, :created_at, :updated_at], current_user: current_user)
+    q = search_attributes(params, [:id, :post, :prompt, :negative_prompt, :parameters, :created_at, :updated_at], current_user: current_user)
 
     q.apply_default_order(params)
   end
 
+  def self.all_labels
+    select(Arel.sql("distinct jsonb_object_keys(parameters) as label")).order(:label)
+  end
+
+  def self.labels_like(string)
+    all_labels.select { |ss| ss.label.ilike?(string) }.map(&:label)
+  end
+
   def any_field_present?
-    prompt.present? || negative_prompt.present? || sampler.present? || seed.present? || steps.present? || cfg_scale.present? || model_hash.present?
+    prompt.present? || negative_prompt.present? || parameters.present?
   end
 
   def self.new_from_metadata(metadata)
@@ -37,13 +46,11 @@ class AIMetadata < ApplicationRecord
     if metadata.has_key?("PNG:Comment")
       begin
         params = JSON.parse(metadata["PNG:Comment"])
-        subject.prompt = metadata["PNG:Description"]
-        subject.negative_prompt = params["uc"]
-        subject.sampler = params["sampler"]
-        subject.seed = params["seed"]
-        subject.steps = params["steps"]
-        subject.cfg_scale = params["scale"]
-        subject.model_hash = metadata["PNG:Source"]&.scan(/\b[A-Fa-f0-9]+$/)&.first&.downcase
+        subject.prompt = params.delete("prompt") || metadata["PNG:Description"]
+        subject.negative_prompt = params.delete("uc")
+        subject.parameters = params.filter_map do |key, value|
+          [key.gsub("_", " ").titleize, value] if key.present? && value.present?
+        end.to_h
       rescue JSON::ParserError
       end
     elsif metadata.has_key?("PNG:Parameters") || metadata.has_key?("ExifIFD:UserComment")
@@ -52,27 +59,25 @@ class AIMetadata < ApplicationRecord
       subject.negative_prompt = negative_prompt&.delete_prefix("Negative prompt: ")
       if params.present?
         params = params.scan(PARAMETER_REGEX).map { |field| [field[0].downcase, field[1].tr('"', "")] }.to_h
-        subject.sampler = params["sampler"]
-        subject.seed = params["seed"]
-        subject.steps = params["steps"]
-        subject.cfg_scale = params["cfg scale"]
-        subject.model_hash  = params["model hash"]
+        subject.parameters = params.filter_map do |key, value|
+          [key.gsub("_", " ").titleize, value] if key.present? && value.present?
+        end.to_h
       end
     end
 
     subject
   end
 
-  def self.parse_parameters(parameters)
-    return ["", "", ""] if parameters.blank?
+  def self.parse_parameters(params)
+    return ["", "", ""] if params.blank?
 
-    parameters, _, last_line = parameters.rpartition("\n")
+    params, _, last_line = params.rpartition("\n")
     if !last_line.match?(PARAMETER_REGEX)
-      parameters << "\n" << last_line
+      params << "\n" << last_line
       last_line = ""
     end
 
-    data = parameters.split(/\s*Negative prompt:\s*/)
+    data = params.split(/\s*Negative prompt:\s*/)
     if data.one?
       [*data, nil, last_line]
     elsif data.length > 2
@@ -82,28 +87,23 @@ class AIMetadata < ApplicationRecord
     end
   end
 
-  def to_webui_parameters
-    uc = "Negative prompt: #{negative_prompt}"
-    parameters = ["Steps", "Sampler", "CFG scale", "Seed", "Model hash"].filter_map do |param|
-      value = self.send(param.downcase.gsub(" ", "_").to_sym)
-      "#{param}: #{value}" if value.present?
-    end
-    parameters.push("Size: #{post.image_width}x#{post.image_height}")
-
-    [prompt, uc, parameters.join(", ")].join("\n")
-  end
-
   def normalize_prompts
     self.prompt = prompt&.split(/\s*,\s*/)&.join(", ")
     self.negative_prompt = negative_prompt&.split(/\s*,\s*/)&.join(", ")
   end
 
+  def model_hash_changed?
+    self.parameters["Model hash"].present? && self.parameters["Model hash"] != parameters_was["Model hash"]
+  end
+
   def normalize_model_hash
-    self.model_hash = self.model_hash&.downcase
+    if self.parameters["Model hash"].present?
+      self.parameters["Model hash"] = self.parameters["Model hash"].downcase
+    end
   end
 
   def validate_model_hash
-    if model_hash.present? && !model_hash.match?(/\A[a-f0-9]+\Z/)
+    if self.parameters["Model hash"].present? && !self.parameters["Model hash"].match?(/\A[a-f0-9]+\Z/)
       errors.add(:model_hash, "is invalid")
     end
   end
@@ -115,11 +115,7 @@ class AIMetadata < ApplicationRecord
 
     self.prompt = version.prompt
     self.negative_prompt = version.negative_prompt
-    self.sampler = version.sampler
-    self.seed = version.seed
-    self.steps = version.steps
-    self.cfg_scale = version.cfg_scale
-    self.model_hash = version.model_hash
+    self.parameters = version.parameters
 
     self.updater = CurrentUser.user
   end

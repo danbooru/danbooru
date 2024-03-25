@@ -1,17 +1,18 @@
 <table class="striped">
-  <thead>
-    <tr>
-    </tr>
-  </thead>
-
   <tbody>
-    <% [:prompt, :negative_prompt, :sampler, :seed, :steps, :cfg_scale, :model_hash].each do |field| %>
+    <tr>
+      <th>Prompt</th>
+      <td><%= ai_metadata.prompt.presence || unknown_field %></td>
+    </tr>
+    <tr>
+      <th>Negative prompt</th>
+      <td><%= ai_metadata.negative_prompt.presence || unknown_field %></td>
+    </tr>
+    <% ai_metadata.parameters.each do |name, value| %>
       <tr>
-        <th><%= field.to_s.titleize %></th>
-        <td><%= ai_metadata[field].presence || unknown_field %></td>
+        <th><%= name %></th>
+        <td><%= value.presence || unknown_field %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-<span id="webui-parameters"><%= ai_metadata.to_webui_parameters %></span>
-<a id="copy-as-webui" href="javascript:void 0">Copy for WebUI</a>

@@ -2,6 +2,20 @@ section#ai-metadata-section table th {
   text-align: right;
 }
 
-span#webui-parameters {
-  display: none;
+div.custom-metadata-field,
+div.ui-dialog form.simple_form div.custom-metadata-field {
+  display: flex;
+  margin-bottom: 0.5em;
+
+  input.custom-metadata-field-name {
+    width: 160px;
+    margin-right: 0.5em;
+  }
+
+  svg {
+    color: red;
+    height: 24px;
+    padding-left: 0.5em;
+    cursor: pointer;
+  }
 }

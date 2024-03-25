@@ -139,7 +139,7 @@
               <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
 
               <div class="mb-4">
-                <%= f.submit "Post", class: "button-primary button-sm" %>
+                <%= f.submit "Post", class: "button-primary button-sm", id: "create-post-button" %>
 
                 <% if CurrentUser.is_contributor? %>
                   <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block !m-0" }, input_html: { checked: post.is_pending? } %>
@@ -200,13 +200,7 @@
           <% end %>
 
           <% t.panel("AI Metadata") do %>
-            <%= f.input :prompt, as: :text, input_html: { value: post&.ai_metadata&.prompt } %>
-            <%= f.input :negative_prompt, as: :text, input_html: { value: post&.ai_metadata&.negative_prompt } %>
-            <%= f.input :sampler, as: :string, input_html: { value: post&.ai_metadata&.sampler } %>
-            <%= f.input :seed, as: :integer, input_html: { value: post&.ai_metadata&.seed } %>
-            <%= f.input :steps, as: :integer, input_html: { value: post&.ai_metadata&.steps } %>
-            <%= f.input :cfg_scale, as: :float, input_html: { value: post&.ai_metadata&.cfg_scale } %>
-            <%= f.input :model_hash, as: :string, input_html: { value: post&.ai_metadata&.model_hash } %>
+            <%= render "ai_metadata/form_fields", ai_metadata: post.ai_metadata %>
           <% end %>
 
           <% t.spacer %>

@@ -20,9 +20,14 @@ class AIMetadataController < ApplicationController
   def create_or_update
     post_id = params[:ai_metadata].delete(:post_id) || params[:post_id]
     @ai_metadata = authorize AIMetadata.find_or_initialize_by(post_id: post_id)
-    @ai_metadata.update(updater: CurrentUser.user, **permitted_attributes(@ai_metadata))
+    prompt = params[:ai_metadata].delete(:prompt)
+    negative_prompt = params[:ai_metadata].delete(:negative_prompt)
+    parameters = params[:ai_metadata].permit!.to_h.transform_keys do |name|
+      name.strip.titleize
+    end
+    @ai_metadata.update(updater: CurrentUser.user, prompt:, negative_prompt:, parameters:)
     flash[:notice] = "AI metadata updated" if @ai_metadata.valid?
-    respond_with(@ai_metadata)
+    respond_with(@ai_metadata, location: post_path(post_id))
   end
 
   def undo
