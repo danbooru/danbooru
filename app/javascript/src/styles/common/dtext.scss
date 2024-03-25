@@ -111,6 +111,9 @@ div.prose {
     text-decoration: dotted underline;
   }
 
+  /* Make the underline color match the text color in underlined links. */
+  u a { text-decoration: underline; }
+
   .spoiler:not(:hover), .spoiler:not(:hover) * {
     color: transparent !important;
   }
