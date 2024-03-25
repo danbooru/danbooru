@@ -8,4 +8,8 @@ class AITagPolicy < ApplicationPolicy
   def tag?
     unbanned? && record.post.present? && policy(record.post).update?
   end
+
+  def use_related_tags?
+    user.is_gold?
+  end
 end
