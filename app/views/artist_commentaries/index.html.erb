@@ -20,11 +20,11 @@
       <% end %>
       <% t.column "Original", td: { class: "break-words" }, width: "50%" do |commentary| %>
         <h3><span class="prose"><%= commentary.dtext_original_title.format_text %></span></h3>
-        <h3><span class="prose"><%= commentary.dtext_original_description.format_text %></span></h3>
+        <div class="prose"><%= commentary.dtext_original_description.format_text %></div>
       <% end %>
       <% t.column "Translated", td: { class: "break-words" }, width: "50%" do |commentary| %>
         <h3><span class="prose"><%= commentary.dtext_translated_title.format_text %></span></h3>
-        <h3><span class="prose"><%= commentary.dtext_translated_description.format_text %></span></h3>
+        <div class="prose"><%= commentary.dtext_translated_description.format_text %></div>
       <% end %>
     <% end %>
 
