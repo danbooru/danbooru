@@ -15,14 +15,15 @@ module HasDtextLinks
       before_save :update_dtext_links, if: :dtext_links_changed?
 
       define_method(:dtext_links_changed?) do
-        old_dtext = DText.new(self[attribute])
-        new_dtext = DText.new(attribute_was(attribute))
+        new_dtext = send("dtext_#{attribute}")     # new_dtext = dtext_body
+        old_dtext = send("dtext_#{attribute}_was") # old_dtext = dtext_body_was
 
         attribute_changed?(attribute) && old_dtext.links_differ?(new_dtext)
       end
 
       define_method(:update_dtext_links) do
-        self.dtext_links = DtextLink.new_from_dtext(self[attribute])
+        dtext = send("dtext_#{attribute}")
+        self.dtext_links = DtextLink.new_from_dtext(dtext)
       end
     end
 

@@ -278,6 +278,16 @@ class DText
     end.uniq
   end
 
+  # @return [Array<Integer>] The list of post IDs used by media embeds in this DText.
+  memoize def embedded_post_ids
+    parsed_html.css("media-embed").select { |node| node["data-type"] == "post" }.pluck("data-id").map(&:to_i).uniq
+  end
+
+  # @return [Array<Integer>] The list of media asset IDs used by media embeds in this DText.
+  memoize def embedded_media_asset_ids
+    parsed_html.css("media-embed").select { |node| node["data-type"] == "asset" }.pluck("data-id").map(&:to_i).uniq
+  end
+
   # Return a hash of the wiki pages, posts, media assets, aliases, implications, and BURs referenced by a string of DText.
   #
   # @param text [String] the string of DText
@@ -312,12 +322,15 @@ class DText
     parsed_html.css("a.dtext-external-link").pluck("href").uniq
   end
 
-  # Return whether the two strings of DText have the same set of links.
+  # Return whether the two pieces of DText have the same set of links and media embeds.
   #
-  # @param other [DText] The other string of DText.
+  # @param other [DText] The other piece of DText.
   # @return [Boolean]
   def links_differ?(other)
-    Set.new(wiki_titles) != Set.new(other.wiki_titles) || Set.new(external_links) != Set.new(other.external_links)
+    wiki_titles.to_set != other.wiki_titles.to_set ||
+      external_links.to_set != other.external_links.to_set ||
+      embedded_post_ids.to_set != other.embedded_post_ids.to_set ||
+      embedded_media_asset_ids.to_set != other.embedded_media_asset_ids.to_set
   end
 
   # Rewrite wiki links to [[old_name]] with [[new_name]]. We attempt to match the capitalization of the old tag when

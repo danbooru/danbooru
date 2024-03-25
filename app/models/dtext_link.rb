@@ -4,8 +4,15 @@ class DtextLink < ApplicationRecord
   belongs_to :model, polymorphic: true
   belongs_to :linked_wiki, primary_key: :title, foreign_key: :link_target, class_name: "WikiPage", optional: true
   belongs_to :linked_tag, primary_key: :name, foreign_key: :link_target, class_name: "Tag", optional: true
+  belongs_to :embedded_post, foreign_key: :link_target, class_name: "Post", optional: true
+  belongs_to :embedded_media_asset, foreign_key: :link_target, class_name: "MediaAsset", optional: true
 
-  enum link_type: [:wiki_link, :external_link]
+  enum link_type: {
+    wiki_link: 0,
+    external_link: 1,
+    embedded_post: 2,
+    embedded_media_asset: 3,
+  }
 
   before_validation :normalize_link_target
   # validates :link_target, uniqueness: { scope: [:model_type, :model_id] }
@@ -24,8 +31,8 @@ class DtextLink < ApplicationRecord
     %w[WikiPage ForumPost Pool]
   end
 
-  def self.new_from_dtext(string)
-    dtext = DText.new(string)
+  # @param dtext [DText]
+  def self.new_from_dtext(dtext)
     links = []
 
     links += dtext.wiki_titles.map do |link|
@@ -34,6 +41,14 @@ class DtextLink < ApplicationRecord
 
     links += dtext.external_links.map do |link|
       DtextLink.new(link_type: :external_link, link_target: link)
+    end
+
+    links += dtext.embedded_post_ids.map do |post_id|
+      DtextLink.new(link_type: :embedded_post, link_target: post_id)
+    end
+
+    links += dtext.embedded_media_asset_ids.map do |media_asset_id|
+      DtextLink.new(link_type: :embedded_media_asset, link_target: media_asset_id)
     end
 
     links
@@ -59,6 +74,6 @@ class DtextLink < ApplicationRecord
   end
 
   def self.available_includes
-    [:model, :linked_wiki, :linked_tag]
+    [:model, :linked_wiki, :linked_tag, :embedded_post, :embedded_media_asset]
   end
 end
