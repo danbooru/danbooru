@@ -49,7 +49,7 @@ AIMetadata.add_custom_field = function(el, name = "", value = "") {
     field.remove();
   }).appendTo(field);
   let newElement = field.insertBefore(el);
-  Autocomplete.initialize_fields(field.children(0), "ai_metadata_label");
+  Autocomplete.initialize_fields(field.children(":first-child"), "ai_metadata_label");
 };
 
 AIMetadata.initialize_edit_ai_metadata_dialog = function() {
