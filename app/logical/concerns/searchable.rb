@@ -171,17 +171,22 @@ module Searchable
 
   # @param attr [String] the name of the JSON field
   # @param hash [Hash] the hash of values it should contain
-  def where_json_contains(attr, hash)
+  # @param cast [Boolean] whether or not to automatically cast numerical values
+  def where_json_contains(attr, hash, cast: true)
     # XXX Hack to transform strings to numbers. Needed to match numeric JSON
     # values when given string input values from an URL.
-    hash = hash.transform_values do |value|
-      if Integer(value, exception: false)
-        value.to_i
-      elsif Float(value, exception: false)
-        value.to_f
-      else
-        value
+    hash = if cast
+      hash.transform_values do |value|
+        if Integer(value, exception: false)
+          value.to_i
+        elsif Float(value, exception: false)
+          value.to_f
+        else
+          value
+        end
       end
+    else
+      hash
     end
 
     where("#{qualified_column_for(attr)} @> :hash", hash: hash.to_json)

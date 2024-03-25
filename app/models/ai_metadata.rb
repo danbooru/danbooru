@@ -26,6 +26,14 @@ class AIMetadata < ApplicationRecord
   def self.search(params, current_user)
     q = search_attributes(params, [:id, :post, :prompt, :negative_prompt, :parameters, :created_at, :updated_at], current_user: current_user)
 
+    if params[:parameter_name].present?
+      if params[:parameter_value].present?
+        q = q.where_json_contains(:parameters, { params[:parameter_name].strip => params[:parameter_value].strip }, cast: false)
+      else
+        q = q.where_json_has_key(:parameters, params[:parameter_name].strip)
+      end
+    end
+
     q.apply_default_order(params)
   end
 

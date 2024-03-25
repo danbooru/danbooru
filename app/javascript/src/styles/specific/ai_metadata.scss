@@ -19,3 +19,19 @@ div.ui-dialog form.simple_form div.custom-metadata-field {
     cursor: pointer;
   }
 }
+
+#c-ai-metadata #a-index form.simple_form {
+  div.search_parameter {
+    label {
+      font-weight: normal;
+    }
+  }
+
+  input[type="submit"] {
+    margin-top: 0.5em;
+  }
+
+  .parameter-search-help {
+    margin-left: 0.25em;
+  }
+}

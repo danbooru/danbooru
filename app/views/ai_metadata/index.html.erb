@@ -7,6 +7,13 @@
     <%= search_form_for(ai_metadata_path) do |f| %>
       <%= f.input :prompt_matches, label: "Prompt" %>
       <%= f.input :negative_prompt_matches, label: "Negative prompt" %>
+      <div class="input string optional search_parameter">
+        <label class="string optional" for="search_parameter_value">
+          <input id="search_parameter_name" class="text optional" placeholder="Parameter name" type="text" name="search[parameter_name]" data-autocomplete="ai-metadata-label" value="<%= params.dig(:search, :parameter_name) %>">
+        </label>
+        <input id="search_parameter_value" class="text optional" placeholder="Parameter value" type="text" name="search[parameter_value]" value="<%= params.dig(:search, :parameter_value) %>">
+        <%= help_tooltip "Leave value blank to search for any metadata that has that parameter", link_class: "parameter-search-help" %>
+      </div>
       <%= f.submit "Search" %>
     <% end %>
 
