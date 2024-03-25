@@ -10,7 +10,7 @@
   <label for="ai_metadata[negative_prompt]" class="text optional">Negative prompt</label>
   <textarea class="text optional" name="ai_metadata[negative_prompt]"><%= ai_metadata&.negative_prompt %></textarea>
 </div>
-<% ai_metadata&.parameters.to_h.each do |key, value| %>
+<% ai_metadata&.sorted_parameters.to_h.each do |key, value| %>
   <div class="input text optional custom-metadata-field">
     <input type="text" value="<%= key %>" class="ui-autocomplete-input text optional custom-metadata-field-name" placeholder="Parameter name" data-autocomplete="ai-metadata-label">
     <input type="text" class="text optional custom-metadata-field-value" placeholder="Parameter value" value="<%= value %>">

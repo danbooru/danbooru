@@ -8,7 +8,7 @@
       <th>Negative prompt</th>
       <td><%= ai_metadata.negative_prompt.presence || unknown_field %></td>
     </tr>
-    <% ai_metadata.parameters.each do |name, value| %>
+    <% ai_metadata.sorted_parameters.each do |name, value| %>
       <tr>
         <th><%= name %></th>
         <td><%= value.presence || unknown_field %></td>

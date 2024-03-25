@@ -4,6 +4,7 @@ class AIMetadata < ApplicationRecord
   self.table_name = "ai_metadata"
   self.ignored_columns = [:sampler, :seed, :steps, :cfg_scale, :model_hash]
 
+  PARAMETER_ORDER = ["Sampler", "Seed", "Steps", "Cfg Scale", "Model Hash", "Width", "Height"]
   PARAMETER_REGEX = /\s*([\w ]+):\s*("(?:\\|\"|[^\"])+"|[^,]*)(?:,|$)/
 
   include Versionable
@@ -84,6 +85,12 @@ class AIMetadata < ApplicationRecord
       [data[..-2].join("Negative prompt: "), data[-1], last_line]
     else
       [*data, last_line]
+    end
+  end
+
+  def sorted_parameters
+    parameters.sort do |first, second|
+      [PARAMETER_ORDER.index(first[0]) || PARAMETER_ORDER.length + 1, first[0]] <=> [PARAMETER_ORDER.index(second[0]) || PARAMETER_ORDER.length + 1, second[0]]
     end
   end
 

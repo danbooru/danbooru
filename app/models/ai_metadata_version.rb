@@ -23,6 +23,13 @@ class AIMetadataVersion < ApplicationRecord
     }
   end
 
+  def sorted_parameters
+    parameters.sort do |first, second|
+      [AIMetadata::PARAMETER_ORDER.index(first[0]) || AIMetadata::PARAMETER_ORDER.length + 1, first[0]] <=>
+        [AIMetadata::PARAMETER_ORDER.index(second[0]) || AIMetadata::PARAMETER_ORDER.length + 1, second[0]]
+    end
+  end
+
   def self.available_includes
     [:post, :updater, :ai_metadata]
   end
