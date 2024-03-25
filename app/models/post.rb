@@ -97,6 +97,8 @@ class Post < ApplicationRecord
   has_many :events, class_name: "PostEvent"
   has_many :mod_actions, as: :subject, dependent: :destroy
   has_many :reactions, as: :model, dependent: :destroy, class_name: "Reaction"
+  has_many :dtext_links, -> { embedded_post }, foreign_key: :link_target
+  has_many :embedding_wiki_pages, through: :dtext_links, source: :model, source_type: "WikiPage"
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :post_edit
 
@@ -1974,7 +1976,8 @@ class Post < ApplicationRecord
     %i[
       uploader approver flags appeals events parent children notes
       comments approvals disapprovals replacements
-      artist_commentary media_asset media_metadata ai_tags
+      artist_commentary media_asset media_metadata ai_tags dtext_links
+      embedding_wiki_pages
     ]
   end
 end

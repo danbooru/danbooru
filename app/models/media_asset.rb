@@ -32,6 +32,8 @@ class MediaAsset < ApplicationRecord
   has_many :uploads, through: :upload_media_assets
   has_many :uploaders, through: :uploads, class_name: "User", foreign_key: :uploader_id
   has_many :ai_tags
+  has_many :dtext_links, -> { embedded_media_asset }, foreign_key: :link_target
+  has_many :embedding_wiki_pages, through: :dtext_links, source: :model, source_type: "WikiPage"
 
   delegate :frame_delays, :metadata, to: :media_metadata, allow_nil: true
   delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, :is_ai_generated?, :has_sound?, to: :metadata
@@ -567,6 +569,6 @@ class MediaAsset < ApplicationRecord
   end
 
   def self.available_includes
-    %i[post media_metadata ai_tags]
+    %i[post media_metadata ai_tags dtext_links embedding_wiki_pages]
   end
 end

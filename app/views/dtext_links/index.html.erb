@@ -3,7 +3,7 @@
     <%= search_form_for(dtext_links_path) do |f| %>
       <%= f.input :link_target_ilike, label: "Link", input_html: { value: params[:search][:link_target_ilike], data: { autocomplete: "wiki-page" } } %>
       <%= f.input :model_type, label: "Page Type", collection: DtextLink.model_types.map { [_1.titleize, _1] }, include_blank: true, selected: params[:search][:model_type] %>
-      <%= f.input :link_type, label: "Link Type", collection: [["Wiki", "0"], ["External", "1"]], include_blank: true, selected: params[:search][:link_type] %>
+      <%= f.input :link_type, label: "Link Type", collection: DtextLink.link_types.map { |name, value| [name.titleize, value] }, include_blank: true, selected: params[:search][:link_type] %>
       <%= f.input :has_linked_wiki, label: "Wiki Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:has_linked_wiki] %>
       <%= f.input :has_linked_tag, label: "Tag Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:has_linked_tag] %>
       <%= f.submit "Search" %>
@@ -24,15 +24,21 @@
       <% t.column "Link", td: { class: "col-expand" } do |dtext_link| %>
         <% if dtext_link.external_link? %>
           <%= external_link_to(dtext_link.link_target) %>
+          <%= link_to("»", dtext_links_path(search: { link_type: "external_link", link_target: dtext_link.link_target })) %>
         <% elsif dtext_link.wiki_link? %>
           <%= link_to_wiki dtext_link.link_target, class: tag_class(dtext_link.linked_wiki&.tag) %>
+          <%= link_to("»", dtext_links_path(search: { link_type: "wiki_link", link_target: dtext_link.link_target })) %>
+        <% elsif dtext_link.embedded_post? %>
+          <%= link_to "post ##{dtext_link.link_target}", post_path(dtext_link.link_target) %>
+          <%= link_to("»", dtext_links_path(search: { link_type: "embedded_post", link_target: dtext_link.link_target })) %>
+        <% elsif dtext_link.embedded_media_asset? %>
+          <%= link_to "asset ##{dtext_link.link_target}", media_asset_path(dtext_link.link_target) %>
+          <%= link_to("»", dtext_links_path(search: { link_type: "embedded_media_asset", link_target: dtext_link.link_target })) %>
         <% end %>
-
-        <%= link_to("»", dtext_links_path(search: { link_target: dtext_link.link_target })) %>
       <% end %>
 
       <% t.column "Type" do |dtext_link| %>
-        <%= dtext_link.link_type.delete_suffix("_link").capitalize %>
+        <%= dtext_link.link_type.delete_suffix("_link").humanize.titleize %>
       <% end %>
     <% end %>
 
