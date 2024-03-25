@@ -85,7 +85,7 @@ x-base-template: &base-template
   # or e.g. `ghcr.io/danbooru/danbooru:production-2024.01.12-055003-utc` to get a specific stable version.
   #
   # See https://github.com/danbooru/danbooru/pkgs/container/danbooru for a list of versions
-  image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:production}
+  image: ${DANBOORU_IMAGE:-ghcr.io/aibooruorg/aibooru:production}
 
   read_only: true
   restart: unless-stopped
@@ -176,7 +176,7 @@ services:
       - "danbooru-data:/var/lib/postgresql/data"
 
   nginx:
-    image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:production}
+    image: ${DANBOORU_IMAGE:-ghcr.io/aibooruorg/aibooru:production}
     command: ["openresty", "-e", "/dev/stderr"]
     environment:
       # The external port to listen on. You can set this to 80 if you have nothing else listening on port 80.

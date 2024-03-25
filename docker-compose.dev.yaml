@@ -29,7 +29,7 @@ x-base-template: &base-template
   #
   # If you set DANBOORU_IMAGE to something else, you have to use a development image because
   # production images don't contain the tools necessary to rebuild the JS/CSS files.
-  image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:development}
+  image: ${DANBOORU_IMAGE:-ghcr.io/aibooruorg/aibooru:development}
 
   restart: unless-stopped
   stdin_open: true
@@ -137,7 +137,7 @@ services:
       - "danbooru-data:/var/lib/postgresql/data"
 
   nginx:
-    image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:development}
+    image: ${DANBOORU_IMAGE:-ghcr.io/aibooruorg/aibooru:development}
     command: ["openresty", "-e", "/dev/stderr"]
     environment:
       # The external port to listen on. You can set this to 80 if you have nothing else listening on port 80.
@@ -151,6 +151,8 @@ services:
       - "${DANBOORU_PORT:-3000}:3000"
     depends_on:
       danbooru:
+        condition: service_started
+      webpack:
         condition: service_started
     configs:
       - source: nginx
