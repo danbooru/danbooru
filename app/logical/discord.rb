@@ -59,6 +59,7 @@ module Discord
 
       message = event.message.content.gsub(%r{\b(?!https?:\/\/(?:\w+\.)?aibooru\.(?:online|space)\/posts\/\d+\/\w+)https?:\/\/(?:\w+\.)?aibooru\.(?:online|space)\/posts\/(\d+)\b[^[:space:]]*}i) do |link|
         post_ids << $1.to_i
+        link = link.gsub(/\A<+(.+)>+\z/, "\\1")
         "<#{link}>"
       end
 
