@@ -20,13 +20,12 @@
               <% end %>
             </div>
             <%= yield :content %>
-            <div id="exoclick"  style="order: -1.5;">
-              <% if CurrentUser.user.show_ads? && controller_name == "posts" %>
-                <script async type="application/javascript" src="https://a.magsrv.com/ad-provider.js"></script>
-                <ins class="eas6a97888e" data-zoneid="5031812"></ins>
-                <script>(AdProvider = window.AdProvider || []).push({"serve": {}});</script>
-              <% end %>
-            </div>
+
+            <% if CurrentUser.user.show_ads? && controller_name == "posts" %>
+              <div>
+                <iframe width="100%" height="100%" style="display:block" marginWidth="0" marginHeight="0" frameBorder="no" src="https://go.mnaspm.com/smartpop/ac148b33609ece1e28ad5b9ea6bb177c52b4ce65afb82ebe925be166584dbde1?userId=5187650635637f3653fa6cee9feb43adda609efbe33c90b104809ba2f8973671"></iframe>
+              </div>
+            <% end %>
           </section>
         </div>
       </div>
