@@ -402,14 +402,6 @@ class User < ApplicationRecord
         }
       end
 
-      def promotable_levels(promoter = CurrentUser.user)
-        if promoter.is_owner?
-          level_hash.to_a
-        else
-          level_hash.filter { |_, v| v < User::Levels::APPROVER }.to_a
-        end
-      end
-
       def level_string(value)
         level_hash.key(value)
       end
