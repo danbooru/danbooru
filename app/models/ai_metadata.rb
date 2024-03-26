@@ -74,7 +74,7 @@ class AIMetadata < ApplicationRecord
       end
     end
 
-    subject.parameters["Model Hash"] ||= metadata["PNG:Source"].to_s.scan(/[A-Fa-f0-9]{8}/).last.downcase
+    subject.parameters["Model Hash"] ||= metadata["PNG:Source"].to_s.scan(/[A-Fa-f0-9]{8}/).last&.downcase
 
     subject
   end
