@@ -4,7 +4,7 @@
 
     <%= search_form_for(current_page_path) do |f| %>
       <%= f.input :ai_tags_match, label: "Tags", input_html: { value: params.dig(:search, :ai_tags_match), data: { autocomplete: "tag-query" } } %>
-      <%= f.input :source_like, label: "Source", input_html: { value: params.dig(:search, :source_like) } %>
+      <%= f.input :source_ilike, label: "Source", input_html: { value: params.dig(:search, :source_ilike) } %>
       <%= f.input :status, collection: %w[pending completed error], include_blank: true, selected: params.dig(:search, :status) %>
       <%= f.input :is_posted, as: :hidden, input_html: { value: params.dig(:search, :is_posted) } %>
       <%= f.input :min_score, as: :hidden, input_html: { value: params.dig(:search, :min_score) } %>
