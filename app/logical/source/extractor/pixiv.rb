@@ -44,7 +44,7 @@ module Source
         elsif parsed_url.full_image_url?
           [parsed_url.to_s]
         # If it's a sample image URL, then try to find the full image URL in the API if possible.
-        elsif parsed_url.image_url? && parsed_url.page && original_urls.present?
+        elsif parsed_url.image_url? && page_url && original_urls.present?
           [original_urls[parsed_url.page]]
         # Otherwise if it's a sample image and we can't get the full image from the API (presumably because the post
         # has been deleted), just use the sample version as is.
@@ -60,8 +60,8 @@ module Source
       end
 
       def page_url
-        return nil if illust_id.blank?
-        "https://www.pixiv.net/artworks/#{illust_id}"
+        return unless illust_id.present? || unlisted_id.present?
+        "https://www.pixiv.net/artworks/#{illust_id || unlisted_id}"
       end
 
       def profile_url
@@ -153,20 +153,25 @@ module Source
         parsed_url.work_id || parsed_referer&.work_id
       end
 
+      def unlisted_id
+        return unless (unlisted_id = parsed_url.unlisted_base62_id || parsed_referer&.unlisted_base62_id).present?
+        "unlisted/#{unlisted_id}"
+      end
+
       def api_client
         PixivAjaxClient.new(Danbooru.config.pixiv_phpsessid, http: http)
       end
 
       def api_illust
-        api_client.illust(illust_id)
+        api_client.illust(illust_id || unlisted_id)
       end
 
       def api_pages
-        api_client.pages(illust_id)
+        api_client.pages(illust_id || unlisted_id)
       end
 
       def api_ugoira
-        api_client.ugoira_meta(illust_id)
+        api_client.ugoira_meta(illust_id || unlisted_id)
       end
 
       def moniker
