@@ -116,15 +116,6 @@
         </td>
       </tr>
 
-      <% if policy(Upload.new).show? %>
-        <tr>
-          <th>Unposted Uploads</th>
-          <td>
-            <%= presenter.unposted_upload_count(self) %>
-          </td>
-        </tr>
-      <% end %>
-
       <tr>
         <th>Deleted Uploads</th>
         <td>
@@ -135,6 +126,15 @@
 
         </td>
       </tr>
+
+      <% if policy(Upload.new(uploader: user)).show? %>
+        <tr>
+          <th>Unposted Uploads</th>
+          <td>
+            <%= presenter.unposted_upload_count(self) %>
+          </td>
+        </tr>
+      <% end %>
 
       <tr>
         <th>Favorites</th>
