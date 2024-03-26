@@ -187,7 +187,7 @@
               <% pairs.sort.each do |key, value| %>
                 <tr>
                   <th class="text-left w-1/4"><%= key.split(":").second.scan(/(?:[A-Z][a-z]+|[A-Z]+(?![a-z]))/).join(" ") %></th>
-                  <td class="break-words"><%= link_to value, media_assets_path(search: { metadata: { key => value }}), rel: "nofollow" %></td>
+                  <td class="break-words"><%= link_to value.to_s, media_assets_path(search: { metadata: { key => value }}), rel: "nofollow" %></td>
                 </tr>
               <% end %>
             <% end %>
