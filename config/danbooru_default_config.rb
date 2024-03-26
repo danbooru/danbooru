@@ -793,6 +793,11 @@ module Danbooru
         "192.168.0.0/16", # private IPv4 range 192.168.x.x
       ]
     end
+
+    # A list of custom search terms to show on the front page.
+    def custom_sidebar_tags
+      ["has:metadata", "is:sfw", "order:rank", "order:views", "self_upload", "is:nsfw -photorealistic", "has:prompt score:>9"]
+    end
   end
 
   EnvironmentConfiguration = Struct.new(:config) do

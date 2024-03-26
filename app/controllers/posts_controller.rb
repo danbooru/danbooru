@@ -22,6 +22,11 @@ class PostsController < ApplicationController
 
       @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
       @posts = authorize post_set.posts, policy_class: PostPolicy
+      if params[:page].blank? && params[:tags].blank? && Danbooru.config.custom_sidebar_tags
+        @custom_sidebar_tags = Danbooru.config.custom_sidebar_tags.map do |s|
+          [s, PostQuery.normalize(s).fast_count]
+        end.to_h
+      end
       respond_with(@posts) do |format|
         format.atom
       end

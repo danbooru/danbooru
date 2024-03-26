@@ -22,7 +22,19 @@
 
     <section id="tag-box">
       <h2>Tags</h2>
-      <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?, search_params: { show_votes: params[:show_votes], size: params[:size] }) %>
+      <% if @custom_sidebar_tags.present? %>
+        <ul class="tag-list search-tag-list">
+          <% @custom_sidebar_tags.each do |search, count| %>
+            <%= tag.li class: "tag-type-4", data: { "tag-name": search, "is-deprecated": false } do %>
+              <%= link_to "?", wiki_page_path(search), class: "search-tag" %>
+              <%= link_to search, posts_path(tags: search, z: 2) %>
+              <%= tag.span humanized_number(count), class: "post-count", title: count %>
+            <% end %>
+          <% end %>
+        </ul>
+      <% else %>
+        <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?, search_params: { show_votes: params[:show_votes], size: params[:size] }) %>
+      <% end %>
     </section>
 
     <section id="options-box">

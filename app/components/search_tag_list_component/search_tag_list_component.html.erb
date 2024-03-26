@@ -1,60 +1,22 @@
 <ul class="tag-list search-tag-list">
-  <% if request.path == '/' %>
-    <li class="tag-type-4" data-tag-name="has:metadata" data-is-deprecated="false">
-      <a class="wiki-link" href="/wiki_pages/has:metadata?z=2">?</a>
-      <a class="search-tag" href="/posts?tags=has:metadata&amp;z=2">has:metadata</a>
-      <span class="post-count" title="42383">24k</span>
-    </li>
-    <li class="tag-type-4" data-tag-name="is:sfw" data-is-deprecated="false">
-      <a class="wiki-link" href="/wiki_pages/is:sfw?z=2">?</a>
-      <a class="search-tag" href="/posts?tags=is:sfw&amp;z=2">is:sfw</a>
-      <span class="post-count" title="42383">26k</span>
-    </li>
-    <li class="tag-type-4" data-tag-name="order:rank" data-is-deprecated="false">
-      <a class="wiki-link" href="/wiki_pages/order:rank?z=2">?</a>
-      <a class="search-tag" href="/posts?tags=order:rank&amp;z=2">order:rank</a>
-      <span class="post-count" title="42383">-</span>
-    </li>
-    <li class="tag-type-4" data-tag-name="order:views" data-is-deprecated="false">
-      <a class="wiki-link" href="/wiki_pages/order:views?z=2">?</a>
-      <a class="search-tag" href="/posts?tags=order:views&amp;z=2">order:views</a>
-      <span class="post-count" title="42383">-</span>
-    </li>
-    <li class="tag-type-4" data-tag-name="self_upload" data-is-deprecated="false">
-      <a class="wiki-link" href="/wiki_pages/self_upload?z=2">?</a>
-      <a class="search-tag" href="/posts?tags=self_upload&amp;z=2">self_upload</a>
-      <span class="post-count" title="42383">-</span>
-    </li>
-    <li class="tag-type-4" data-tag-name="is:nsfw -photorealistic" data-is-deprecated="false">
-      <a class="wiki-link" href="/wiki_pages/photorealistic?z=2">?</a>
-      <a class="search-tag" href="/posts?tags=is:nsfw+-photorealistic&amp;z=2">is:nsfw -photorealistic</a>
-      <span class="post-count" title="42383">-</span>
-    </li>
-    <li class="tag-type-4" data-tag-name="has:prompt score:>9" data-is-deprecated="false">
-      <a class="wiki-link" href="/wiki_pages/has:prompt?z=2">?</a>
-      <a class="search-tag" href="/posts?tags=has:prompt+score:>9&amp;z=2">has:prompt score:>9</a>
-      <span class="post-count" title="42383">-</span>
-    </li>
-  <% else %>
-    <% tags.each do |t| %>
-      <li class="tag-type-<%= t.category %>" data-tag-name="<%= t.name %>" data-is-deprecated="<%= t.is_deprecated? %>">
-        <%# ignore search:foo metatags %>
-        <% if t.artist? %>
-          <%= link_to "?", show_or_new_artists_path(name: t.name, z: 2), class: "wiki-link" %>
-        <% elsif t.name =~ /\A\d+\z/ %>
-          <%= link_to "?", wiki_page_path("~#{t.name}", z: 2), class: "wiki-link" %>
-        <% else %>
-          <%= link_to "?", wiki_page_path(t.name, z: 2), class: "wiki-link" %>
-        <% end %>
+  <% tags.each do |t| %>
+    <li class="tag-type-<%= t.category %>" data-tag-name="<%= t.name %>" data-is-deprecated="<%= t.is_deprecated? %>">
+      <%# ignore search:foo metatags %>
+      <% if t.artist? %>
+        <%= link_to "?", show_or_new_artists_path(name: t.name, z: 2), class: "wiki-link" %>
+      <% elsif t.name =~ /\A\d+\z/ %>
+        <%= link_to "?", wiki_page_path("~#{t.name}", z: 2), class: "wiki-link" %>
+      <% else %>
+        <%= link_to "?", wiki_page_path(t.name, z: 2), class: "wiki-link" %>
+      <% end %>
 
-        <% if show_extra_links && current_query.present? %>
-          <%= link_to "+", posts_path(tags: "#{current_query} #{t.name}", z: 4, **search_params), class: "search-inc-tag" %>
-          <%= link_to "-", posts_path(tags: "#{current_query} -#{t.name}", z: 4, **search_params), class: "search-exl-tag" %>
-        <% end %>
+      <% if show_extra_links && current_query.present? %>
+        <%= link_to "+", posts_path(tags: "#{current_query} #{t.name}", z: 4, **search_params), class: "search-inc-tag" %>
+        <%= link_to "-", posts_path(tags: "#{current_query} -#{t.name}", z: 4, **search_params), class: "search-exl-tag" %>
+      <% end %>
 
-        <%= link_to t.pretty_name, posts_path(tags: t.name, **search_params, z: 2), class: "search-tag" %>
-        <%= tag.span humanized_number(t.post_count), class: "post-count", title: t.post_count %>
-      </li>
-    <% end %>
+      <%= link_to t.pretty_name, posts_path(tags: t.name, **search_params, z: 2), class: "search-tag" %>
+      <%= tag.span humanized_number(t.post_count), class: "post-count", title: t.post_count %>
+    </li>
   <% end %>
 </ul>
