@@ -67,8 +67,11 @@ module Sources
     end
 
     should "Parse Misskey URLs correctly" do
-      assert(Source::URL.image_url?("https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp"))
       assert(Source::URL.image_url?("https://s3.arkjp.net/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png"))
+      assert_not(Source::URL.image_sample?("https://s3.arkjp.net/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png"))
+
+      assert(Source::URL.image_url?("https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp"))
+      assert(Source::URL.image_sample?("https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp"))
 
       assert(Source::URL.page_url?("https://misskey.io/notes/9bxaf592x6"))
       assert_equal("https://misskey.io/notes/9bxaf592x6", Source::URL.page_url("https://misskey.io/notes/9bxaf592x6#pswp"))

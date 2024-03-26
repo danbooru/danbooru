@@ -45,6 +45,10 @@ class Source::URL::Misskey < Source::URL
       (host == "misskey.design" && path.starts_with?("/post/"))
   end
 
+  def image_sample?
+    filename.starts_with? "thumbnail-"
+  end
+
   def page_url
     if note_id.present?
       "https://#{domain}/notes/#{note_id}"

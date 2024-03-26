@@ -95,6 +95,10 @@
                   <%= link_to "Bad Source", wiki_page_path("bad_link"), class: "upload-source-warning button-danger button-xs" %>
                 <% end %>
 
+                <% if upload_media_asset.image_sample? %>
+                  <%= link_to "Image Sample", wiki_page_path("image_sample"), class: "upload-sample-warning button-danger button-xs" %>
+                <% end %>
+
                 <% if media_asset.is_ai_generated? %>
                   <%= link_to "AI-Generated", wiki_page_path("ai-generated"), class: "upload-ai-warning button-danger button-xs" %>
                 <% end %>

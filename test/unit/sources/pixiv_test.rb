@@ -377,6 +377,16 @@ module Sources
       assert(Source::URL.image_url?("http://img18.pixiv.net/img/evazion/14901720.png"))
       assert(Source::URL.image_url?("http://i2.pixiv.net/img18/img/evazion/14901720.png"))
 
+      assert_not(Source::URL.image_sample?("https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png"))
+      assert(Source::URL.image_sample?("https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg"))
+      assert_not(Source::URL.image_sample?("https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip"))
+      assert(Source::URL.image_sample?("https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg"))
+      assert_not(Source::URL.image_sample?("https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png"))
+      assert(Source::URL.image_sample?("http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg"))
+      assert(Source::URL.image_sample?("http://img18.pixiv.net/img/evazion/14901720.png"))
+      assert(Source::URL.image_sample?("http://i2.pixiv.net/img18/img/evazion/14901720.png"))
+      assert_not(Source::URL.image_sample?("https://www.pixiv.net/artworks/46324488"))
+
       assert(Source::URL.page_url?("https://www.pixiv.net/en/artworks/46324488"))
       assert(Source::URL.page_url?("https://www.pixiv.net/artworks/46324488"))
       assert(Source::URL.page_url?("http://www.pixiv.net/i/18557054"))

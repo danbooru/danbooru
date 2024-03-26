@@ -131,6 +131,10 @@ module Source
       image_type.in?(%w[img-original img-zip-ugoira])
     end
 
+    def image_sample?
+      image_url? && !full_image_url?
+    end
+
     def is_ugoira?
       @ugoira.present?
     end

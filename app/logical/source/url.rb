@@ -134,6 +134,18 @@ module Source
       file_ext.in?(%w[jpg jpeg png gif webp webm mp4 swf])
     end
 
+    # True if the URL is a direct sample image URL.
+    #
+    # Examples:
+    #
+    # * https://lyjrkow.ksxjubvoouva.hath.network/h/416a7c19fb25549e084876f932e2f6d45a5b2d63-1215161-2400-3589-jpg/keystamp=1683990600-aab6e15ff8;fileindex=119976531;xres=2400/89931055_p0.jpg
+    # * https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp
+    #
+    # @return [Boolean]
+    def image_sample?
+      false
+    end
+
     # True if the URL is a work page URL.
     #
     # Examples:
@@ -210,6 +222,10 @@ module Source
 
     def self.image_url?(url)
       Source::URL.parse(url)&.image_url?
+    end
+
+    def self.image_sample?(url)
+      Source::URL.parse(url)&.image_sample?
     end
 
     def self.page_url?(url)

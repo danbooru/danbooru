@@ -483,6 +483,9 @@ class Post < ApplicationRecord
         else
           tags -= ["bad_source"]
         end
+
+        # Allow image_sample to be manually tagged as well
+        tags << "image_sample" if source_url.image_sample?
       end
 
       # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, videos, and ugoiras are automatically tagged.

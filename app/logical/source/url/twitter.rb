@@ -70,9 +70,9 @@ class Source::URL::Twitter < Source::URL
     # https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
     # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg
     in "twimg.com", ("media" | "tweet_video_thumb" | "ext_tw_video_thumb" | "amplify_video_thumb") => media_type, *subdirs, file
-      # EBGbJe_U8AA4Ekb.jpg:small
       @media_type = media_type
 
+      # EBGbJe_U8AA4Ekb.jpg:small
       @file, @file_size = file.split(":")
       @file, @file_ext = @file.split(".")
 
@@ -89,7 +89,8 @@ class Source::URL::Twitter < Source::URL
     in "twimg.com", "profile_banners" => media_type, /^\d+$/ => user_id, /^\d+$/ => file_id, *dimensions
       @user_id = user_id
       @media_type = media_type
-      @file_path = "profile_banners/#{user_id}/#{file_id}/1500x500"
+      @file_size, = dimensions
+      @file_path = "profile_banners/#{user_id}/#{file_id}"
 
     # https://twitter.com/motty08111213
     # https://twitter.com/motty08111213/likes
@@ -106,6 +107,22 @@ class Source::URL::Twitter < Source::URL
     domain == "twimg.com"
   end
 
+  def image_sample?
+    case [@media_type, @file_size]
+
+    in "media", "orig"
+      false
+    in "media", _
+      true
+    in "profile_banners", "1500x500"
+      false
+    in "profile_banners", _
+      true
+    else
+      false
+    end
+  end
+
   # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
   # https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig
   # https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:orig
@@ -113,7 +130,7 @@ class Source::URL::Twitter < Source::URL
   def full_image_url
     return to_s unless @file_path.present?
     if @media_type == "profile_banners"
-      "#{site}/#{@file_path}"
+      "#{site}/#{@file_path}/1500x500"
     else
       "#{site}/#{@file_path}:orig"
     end
