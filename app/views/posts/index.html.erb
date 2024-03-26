@@ -33,7 +33,7 @@
           <% end %>
         </ul>
       <% else %>
-        <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?, search_params: { show_votes: params[:show_votes], size: params[:size] }) %>
+        <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: CurrentUser.user.show_extra_links?, search_params: { show_votes: params[:show_votes], size: params[:size] }) %>
       <% end %>
     </section>
 

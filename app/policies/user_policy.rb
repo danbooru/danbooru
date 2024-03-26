@@ -50,7 +50,7 @@ class UserPolicy < ApplicationPolicy
       disable_categorized_saved_searches disable_tagged_filenames
       disable_mobile_gestures enable_safe_mode
       enable_desktop_mode disable_post_tooltips
-      show_niche_posts add_extra_data_attributes
+      show_niche_posts add_extra_data_attributes show_extra_links nest_tags
     ].compact
   end
 

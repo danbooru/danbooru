@@ -5,25 +5,14 @@
     </h3>
 
     <ul class="<%= category_name %>-tag-list">
-      <% tags.each do |t| %>
-        <li class="tag-type-<%= t.category %>" data-tag-name="<%= t.name %>" data-is-deprecated="<%= t.is_deprecated? %>">
-          <% if t.artist? %>
-            <%= link_to "?", show_or_new_artists_path(name: t.name, z: 1), class: "wiki-link" %>
-          <% elsif t.name =~ /\A\d+\z/ %>
-            <%= link_to "?", wiki_page_path("~#{t.name}", z: 1), class: "wiki-link" %>
-          <% else %>
-            <%= link_to "?", wiki_page_path(t.name, z: 1), class: "wiki-link" %>
-          <% end %>
-
-          <% if show_extra_links && current_query.present? %>
-            <%= link_to "+", posts_path(tags: "#{current_query} #{t.name}", z: 3), class: "search-inc-tag" %>
-            <%= link_to "-", posts_path(tags: "#{current_query} -#{t.name}", z: 3), class: "search-exl-tag" %>
-          <% end %>
-
-          <%= link_to t.pretty_name, posts_path(tags: t.name, z: 1), class: "search-tag" %>
-
-          <%= tag.span humanized_number(t.post_count), class: ["post-count", ("low-post-count" if is_underused_tag?(t))], title: t.post_count %>
-        </li>
+      <% if category_name.in?(NESTABLE_TAG_CATEGORIES) %>
+        <% tag_tree(tags).each do |t, subtags| %>
+          <%= render CategorizedTagListEntryComponent.new(t, subtags, show_extra_links: show_extra_links, current_query: current_query, level: 0) %>
+        <% end %>
+      <% else %>
+        <% tags.each do |t| %>
+          <%= render CategorizedTagListEntryComponent.new(t, show_extra_links: show_extra_links, current_query: current_query) %>
+        <% end %>
       <% end %>
     </ul>
   <% end %>

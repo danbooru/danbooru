@@ -24,9 +24,9 @@ class User < ApplicationRecord
 
   BOOLEAN_ATTRIBUTES = %w[
     is_banned
-    _unused_has_mail
+    show_extra_links
     receive_email_notifications
-    _unused_always_resize_images
+    nest_tags
     _unused_enable_post_navigation
     new_post_navigation_layout
     _unused_enable_private_favorites

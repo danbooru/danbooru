@@ -65,6 +65,8 @@
             <%= f.input :disable_mobile_gestures, as: :select, hint: "Disable swipe left / swipe right gestures on mobile", collection: [["No", "false"], ["Yes", "true"]], include_blank: false %>
             <%= f.input :disable_post_tooltips, as: :select, hint: "Disable advanced tooltips when hovering over thumbnails", collection: [["No", "false"], ["Yes", "true"]], include_blank: false %>
             <%= f.input :enable_desktop_mode, as: :select, collection: [["No", "false"], ["Yes", "true"]], include_blank: false, hint: "Use the desktop layout on mobile" %>
+            <%= f.input :show_extra_links, as: :select, collection: [["No", "false"], ["Yes", "true"]], include_blank: false, hint: "Show +/- links for modifying searches" %>
+            <%= f.input :nest_tags, as: :select, collection: [["No", "false"], ["Yes", "true"]], include_blank: false, hint: "Nest implicated tags in the tag list" %>
 
             <% if CurrentUser.is_gold? %>
               <%= f.input :add_extra_data_attributes, as: :select, collection: [["No", "false"], ["Yes", "true"]], include_blank: false, hint: "Include extra data attributess in post previews. May cause slower loading time" %>
