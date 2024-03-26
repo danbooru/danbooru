@@ -86,7 +86,7 @@ Rails.application.routes.draw do
       post :undelete
     end
   end
-  resources :counts do
+  resources :counts, only: [] do
     collection do
       get :posts
     end
