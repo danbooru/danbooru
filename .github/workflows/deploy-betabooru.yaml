@@ -1,4 +1,4 @@
-# Deploy the site to https://beta.aibooru.online on every push to the `betabooru` branch.
+# Deploy the site to https://beta.aibooru.online on every push to the `beta` branch.
 
 name: Deploy Betabooru
 
@@ -8,12 +8,15 @@ permissions: read-all
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_run
   workflow_dispatch:
-  push:
-    branches: [betabooru]
+  workflow_run:
+    workflows: [Docker Build]
+    types: [completed]
+    branches: [beta]
 
 jobs:
   deploy-betabooru:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#concurrency
     concurrency: deploy-betabooru
@@ -21,7 +24,7 @@ jobs:
     # The Kubernetes API credentials are kept in the betabooru environment.
     # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idenvironment
     environment:
-      name: betabooru
+      name: beta
       url: https://beta.aibooru.online
 
     steps:
@@ -40,4 +43,4 @@ jobs:
 
     - name: Deploy to Betabooru
       run: |
-        kubectl rollout restart deploy/betabooru
+        kubectl rollout restart deploy/betabooru -n danbooru

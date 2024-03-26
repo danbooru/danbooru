@@ -5,8 +5,7 @@
 # branch name, the git tag, and the 'latest' tag for the latest commit to
 # master.
 #
-# https://github.com/danbooru/danbooru/pkgs/container/danbooru
-# https://hub.docker.com/r/evazion/danbooru
+# https://github.com/aibooruorg/aibooru/pkgs/container/aibooru
 #
 # https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
 # https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions
@@ -106,8 +105,7 @@ jobs:
         id: development-metadata
         with:
           images: |
-            docker.io/evazion/danbooru
-            ghcr.io/danbooru/danbooru
+            ghcr.io/aibooruorg/aibooru
           tags: |
             type=sha,format=long,prefix=development-
             type=ref,event=branch,prefix=development-
