@@ -104,7 +104,7 @@ module Sources
       # page: https://skeb.jp/@LambOic029/works/146
       strategy_should_work(
         "https://skeb.imgix.net/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=7dbecbeb7b05394537b60c881a081776",
-        media_files: [{ file_size: 120_524 }],
+        media_files: [{ file_size: 120_140 }]
       )
     end
 
