@@ -2,11 +2,11 @@
 
 class PostReplacementPolicy < ApplicationPolicy
   def create?
-    user.is_moderator?
+    user.is_approver?
   end
 
   def update?
-    user.is_moderator?
+    user.is_approver?
   end
 
   def permitted_attributes_for_create
