@@ -99,6 +99,49 @@ module Source
         api_illust[:description]
       end
 
+      def dtext_artist_commentary_desc
+        commentary = super
+        return nil if commentary.nil?
+
+        if commission_desc.present?
+          commentary << "\n\n[tn]\nSource: #{page_url}\n[/tn]\n\n"
+          commentary << dtext_commission_desc
+          commentary << "\n\n[tn]\nSource: #{commission_url}\n[/tn]"
+        end
+
+        commentary
+      end
+
+      def commission_id
+        api_illust.dig("request", "request", "requestId")
+      end
+
+      def commission_url
+        return nil if commission_id.blank?
+        "https://www.pixiv.net/requests/#{commission_id}"
+      end
+
+      def commission_desc
+        api_illust.dig("request", "request", "requestProposal", "requestOriginalProposal")
+      end
+
+      def dtext_commission_desc
+        text = commission_desc
+        return nil if text.nil?
+
+        text = text.gsub(%r{(?<=\s|\A)https?://www\.pixiv\.net/(?:[a-z]+/)?artworks/([0-9]+)(?=\s|\z)}i) do |_match|
+          pixiv_id = $1
+          %(<a href="https://www.pixiv.net/artworks/#{illust_id}">illust/#{illust_id}</a>)
+        end
+
+        text = text.gsub(%r{(?<=\s|\A)https?://www\.pixiv\.net/(?:[a-z]+/)?users/([0-9]+)(?=\s|\z)}i) do |_match|
+          member_id = $1
+          %(<a href="https://www.pixiv.net/users/#{member_id}">user/#{member_id}</a>)
+        end
+
+        self.class.to_dtext text
+      end
+
       def tag_name
         moniker
       end

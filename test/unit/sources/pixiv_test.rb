@@ -139,8 +139,30 @@ module Sources
 
       context "A work requested via Pixiv Requests" do
         strategy_should_work(
-          "https://www.pixiv.net/en/artworks/91322075",
-          tags: %w[アイドルマスターシンデレラガールズ 大槻唯 濡れ透け パンツ 透けブラ 裾結び プール掃除 おへそ ぱんつ パンモロにも定評のあるゆいれそ pixiv_commission]
+          "https://www.pixiv.net/en/artworks/101951859",
+          tags: %w[pixiv_commission r-18 つつちゃ よその子 チンコ包囲網 パイズリ レイプ ロリ巨乳 女の子 猫耳 肉便器],
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            Fanbox: <https://herishop213.fanbox.cc>
+            Patreon: <https://www.patreon.com/Herishop>
+            =====
+            Original artist: [b]"user/61121665":[https://www.pixiv.net/users/61121665] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fusers%2F61121665][/b]
+
+            [tn]
+            Source: https://www.pixiv.net/artworks/101951859
+            [/tn]
+
+            Hi boss, I hope you can help me draw original characters from artist "つつちゃ"
+            "user/61121665":[https://www.pixiv.net/users/61121665] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fusers%2F61121665]
+            The character name seems to be "みみ", she is very cute big tit loli and pervert exhibitionist
+            pixiv #101951859 "»":[/posts?tags=pixiv%3A101951859]
+            pixiv #101951859 "»":[/posts?tags=pixiv%3A101951859]
+            pixiv #101951859 "»":[/posts?tags=pixiv%3A101951859]
+            I want to see her get gangbang by a bunch of disgusting guys, all with dicks around her exposed cleavage just doing tit fuck.
+
+            [tn]
+            Source: https://www.pixiv.net/requests/99649
+            [/tn]
+          EOS
         )
       end
 
