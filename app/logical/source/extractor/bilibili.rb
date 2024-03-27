@@ -12,11 +12,7 @@ module Source
         if parsed_url&.full_image_url.present?
           [parsed_url.full_image_url]
         elsif data.present?
-          if t_work_id.present?
-            image_urls = data.dig("modules", "module_dynamic", "major", "draw", "items").to_a.pluck("src")
-          elsif h_work_id.present?
-            image_urls = data.dig("item", "pictures").to_a.pluck("img_src")
-          end
+          image_urls = data.dig("modules", "module_dynamic", "major", "draw", "items").to_a.pluck("src")
           image_urls.to_a.compact.map { |u| Source::URL.parse(u).full_image_url || u }
         elsif article_id.present?
           page&.search("#article-content img").to_a.pluck("data-src").compact.map { |u| Source::URL.parse(URI.join("https://", u)).full_image_url || u }
@@ -54,8 +50,6 @@ module Source
               text_node["text"]
             end
           end.join
-        elsif h_work_id.present?
-          data.dig("item", "description")
         elsif article_id.present?
           page&.at("#article-content")&.to_html
         end
@@ -66,22 +60,17 @@ module Source
       end
 
       def tags
-        if t_work_id.present?
-          tag_list = data.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.select { |n| n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC" }.map { |tag| tag["text"].gsub(/(^#|#$)/, "") }
-        elsif h_work_id.present?
-          tag_list = data.dig("item", "tags").to_a.pluck(:tag)
-        else # bilibili.com/read/:id posts have no tags that I could find
-          return []
+        data.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.select do |n|
+          n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
+        end.map do |tag|
+          tag_name = tag["text"].gsub(/(^#|#$)/, "")
+          [tag_name, "https://t.bilibili.com/topic/name/#{tag_name}"]
         end
-
-        tag_list.map { |tag| [tag, "https://t.bilibili.com/topic/name/#{tag}"] }
       end
 
       def artist_name
         if t_work_id.present?
           data.dig("modules", "module_author", "name")
-        elsif h_work_id.present?
-          data.dig("user", "name")
         elsif article_id.present?
           page&.at(".article-container .up-name")&.text&.squish&.strip
         end
@@ -103,8 +92,6 @@ module Source
       def artist_id_from_data
         if t_work_id.present?
           data.dig("modules", "module_author", "mid")
-        elsif h_work_id.present?
-          data.dig("user", "uid")
         elsif article_id.present?
           artist_url = page&.at(".article-container .up-name")&.[]("href")
           Source::URL.parse(URI.join("https://", artist_url))&.artist_id
@@ -119,10 +106,6 @@ module Source
       def t_work_id
         # for a repost this will be the ID of the repost, not the original one
         parsed_url.t_work_id || parsed_referer&.t_work_id
-      end
-
-      def h_work_id
-        parsed_url.h_work_id || parsed_referer&.h_work_id
       end
 
       def article_id
@@ -143,23 +126,15 @@ module Source
         http.cache(1.minute).parsed_get(page_url)
       end
 
-      def get_json(url)
-        http.cache(1.minute).parsed_get(url) || {}
-      end
-
       memoize def data
-        if t_work_id.present?
-          data = get_json("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?timezone_offset=-60&id=#{t_work_id}")
-          if data.dig("data", "item", "orig", "id_str").present? # it means it's a repost
-            data.dig("data", "item", "orig")
-          else
-            data.dig("data", "item").to_h
-          end
-        elsif h_work_id.present?
-          data = get_json("https://api.vc.bilibili.com/link_draw/v1/doc/detail?doc_id=#{h_work_id}")
-          data["data"].to_h
+        return {} if t_work_id.blank?
+
+        data = http.cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?timezone_offset=-60&id=#{t_work_id}") || {}
+
+        if data.dig("data", "item", "orig", "id_str").present? # it means it's a repost
+          data.dig("data", "item", "orig")
         else
-          {}
+          data.dig("data", "item").to_h
         end
       end
     end
