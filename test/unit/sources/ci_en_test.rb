@@ -61,15 +61,15 @@ module Sources
           この度、新しくLIVE2Dを使った動画やゲームの制作を始めることとなりまして、活動報告の場としてCi-enを始めました。
           現在、イラストレーターのJIMA先生と共同でR-18動画の制作を開始しておりまして、そちらの進捗を紹介します。
           h2. 内容について
-          
-          
+
+
           ・JIMA先生が描かれるキャラクター、「あくまっこちゃん」をテーマにしたR-18動画の制作
           ・アプリ形式で動画を切り替えるシステム
           ・アドベンチャー形式のショートストーリー主にこちらを制作しております！
           JIMA先生の美麗で煽情的なイラストをLIVE2DでよりHに皆様にお届けできればと思いますのでご期待ください！
           また、ショートストーリーについてもJIMA先生監修のもと、制作しております。
           ここでしか見られない「あくまっこちゃん」のキャラクターを是非お楽しみに！
-          
+
           完成後はDLsite等で販売の予定となります。（2023年今冬のリリースを目標）
           ※ゲーム形式の制作をするのは初めてなこともあり作業が遅延しがちになっています。気長に完成をお待ちください。
           h2. 制作中動画を少しだけ特別公開！
@@ -125,16 +125,20 @@ module Sources
         image_urls: [
           %r!https://media\.ci-en\.jp/public/cover/creator/00015496/d9abf3b919895d05a86253172e675dd5307ae7c6667313c20ddc39ab79bdd09f/image-990-c\.jpg!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/763e7e9d7b6180b3b5a96cec735ecfabe993b7b4b4202bd411a471d3b7452a56/upload/1\.png!,
-          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/101ddf6e8874c70b7075b2449cdc106fe66a9a797890f32350bd75d4a6954e5e/upload/05\.jpg!,
-          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/181d03ba9346bedde4e541204fd628464931837f47dbea269ba3fed02e3fc21b/upload/%EF%BC%90%EF%BC%91\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/3fa9791b911ba5b829cfe522d1ad0283893aa3d19c43de4663ea5bb9e4ff440b/upload/1\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/177e0028ad18cf14d6e7b651f8f6db4c2c7e93914a76dc079ffb1865c4102ee6/upload/2\.jpg!,
           %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/775b1249e43702ef746bba5bd2404352844e16d3a45b2de96fb86e8931d1f493/upload/%EF%BC%90%EF%BC%92\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/5cf725ab76a4256d5fcb22582f6e2f0343af6e5445b2ca7649ad11024cb0a416/upload/3\.jpg!,
+          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/2799747b90b7f03a61b25e88688de0ef6bfe0ce20b953380eabb7a9fcd05c041/upload/4\.jpg!,
         ],
         media_files: [
           { file_size: 40_080 },
           { file_size: 8_432_538 },
-          { file_size: 1_056_744 },
-          { file_size: 906_897 },
+          { file_size: 1_234_094 },
+          { file_size: 1_068_671 },
           { file_size: 650_843 },
+          { file_size: 552_952 },
+          { file_size: 480_569 },
         ],
         profile_urls: [
           "https://ci-en.net/creator/15496",

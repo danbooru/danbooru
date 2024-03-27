@@ -59,8 +59,8 @@ module Sources
             https://medibang.com/u/littlegfu3/
             https://medibang.com/author/2176282/
           ],
-          artist_name: "三橫一豎",
-          other_names: ["三橫一豎"],
+          artist_name: "丸思綺",
+          other_names: ["丸思綺"],
           tags: %w[school drama 生活 小故事大道理],
           artist_commentary_title: "Ch. 1 居家的禮儀",
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -111,8 +111,8 @@ module Sources
             https://medibang.com/u/littlegfu3/
             https://medibang.com/author/2176282/
           ],
-          artist_name: "三橫一豎",
-          other_names: ["三橫一豎"],
+          artist_name: "丸思綺",
+          other_names: ["丸思綺"],
           tags: %w[school drama 生活 小故事大道理],
           artist_commentary_title: "Ch. 1 居家的禮儀",
           dtext_artist_commentary_desc: <<~EOS.chomp
