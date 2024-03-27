@@ -4,7 +4,7 @@
 class MediaAssetLinkComponent < ApplicationComponent
   attr_reader :media_asset, :classes
 
-  delegate :image_width, :image_height, :duration, :file_ext, :file_size, :duration, to: :media_asset
+  delegate :image_width, :image_height, :duration, :file_ext, :file_size, to: :media_asset
 
   delegate :number_to_human_size, :duration_to_hhmmss, to: :helpers
 
