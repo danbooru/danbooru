@@ -10,7 +10,7 @@ class PostVotePolicy < ApplicationPolicy
   end
 
   def show?
-    user.is_admin? || record.user == user || (record.is_positive? && !record.is_deleted?)
+    user.is_moderator? || record.user == user || (record.is_positive? && !record.is_deleted?)
   end
 
   def can_see_voter?
