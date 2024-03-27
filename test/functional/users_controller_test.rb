@@ -24,19 +24,58 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User.count, response.parsed_body.css("urlset url loc").size)
       end
 
-      should "redirect to the user's profile for /users?name=<name>" do
-        get users_path, params: { name: @user.name }
-        assert_redirected_to(@user)
-      end
+      context "for the name parameter" do
+        should "redirect to the user's profile" do
+          get users_path, params: { name: @user.name }
+          assert_redirected_to(@user)
+        end
 
-      should "be case-insensitive when redirecting to the user's profile" do
-        get users_path, params: { name: @user.name.capitalize }
-        assert_redirected_to(@user)
-      end
+        should "be case-insensitive when redirecting to the user's profile" do
+          get users_path, params: { name: @user.name.capitalize }
+          assert_redirected_to(@user)
+        end
 
-      should "raise error for /users?name=<nonexistent>" do
-        get users_path, params: { name: "nobody" }
-        assert_response 404
+        should "redirect to the user when logged-in and when given one of the their past names" do
+          name_change = create(:user_name_change_request, user: @user)
+
+          get_auth users_path, @other_user, params: { name: name_change.original_name }
+          assert_redirected_to(@user)
+        end
+
+        should "redirect to the user currently using the name when another user previously used the same name" do
+          create(:user_name_change_request, original_name: @user.name)
+
+          get_auth users_path, @other_user, params: { name: @user.name }
+          assert_redirected_to(@user)
+        end
+
+        should "return the users who previously used the name when nobody is currently it and when multiple people used the same name in the past" do
+          name = SecureRandom.uuid.first(20)
+          create(:user_name_change_request, original_name: name)
+          create(:user_name_change_request, original_name: name)
+
+          get_auth users_path, @other_user, params: { name: name }
+          assert_response :success
+        end
+
+        should "not redirect to a deleted user when given their past name" do
+          @user.update!(name: "user_#{@user.id}", is_deleted: true)
+
+          get_auth users_path, @other_user, params: { name: @user.name_before_last_save }
+          assert_response :success
+        end
+
+        should "not redirect to the user when logged out and when given one of their past names" do
+          name_change = create(:user_name_change_request, user: @user)
+
+          get users_path, params: { name: name_change.original_name }
+          assert_response :success
+        end
+
+        should "return an empty search when given a nonexistent name" do
+          get users_path, params: { name: "nobody" }
+          assert_response :success
+        end
       end
 
       should respond_to_search({}).with { [@uploader, @other_user, @mod_user, @user, User.system] }

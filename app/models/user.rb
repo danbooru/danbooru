@@ -180,10 +180,30 @@ class User < ApplicationRecord
         find_by_name(name).try(:id)
       end
 
-      # XXX should casefold instead of lowercasing.
-      # XXX using lower(name) instead of ilike so we can use the index.
+      # Find the user who is currently using this name, or if nobody is, find the user(s) that have used this name in the past.
+      def name_or_past_name_matches(name, current_user:)
+        users = name_matches(name).load
+
+        if users.one?
+          users
+        else
+          past_name_matches(name, current_user:)
+        end
+      end
+
+      # Find all users that have ever used this name, past or present.
+      def any_name_matches(name, current_user:)
+        # A UNION is faster than an OR for this query because the OR results in a full table scan.
+        # name_matches(name).or(past_name_matches(name, current_user:))
+        where_union(name_matches(name), past_name_matches(name, current_user:))
+      end
+
       def name_matches(name)
-        where("lower(name) = ?", normalize_name(name)).limit(1)
+        where("lower(name) = ?", normalize_name(name))
+      end
+
+      def past_name_matches(name, current_user:)
+        where(id: UserNameChangeRequest.visible(current_user).where_iequals(:original_name, normalize_name(name)).select(:user_id))
       end
 
       def find_by_name_or_email(name_or_email)
@@ -748,6 +768,14 @@ class User < ApplicationRecord
 
       if params[:name_matches].present?
         q = q.where_ilike(:name, normalize_name(params[:name_matches]))
+      end
+
+      if params[:any_name_matches].present?
+        q = q.any_name_matches(params[:any_name_matches], current_user:)
+      end
+
+      if params[:name_or_past_name_matches].present?
+        q = q.name_or_past_name_matches(params[:name_or_past_name_matches], current_user:)
       end
 
       if params[:min_level].present?
