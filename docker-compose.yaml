@@ -1,10 +1,10 @@
-# This is a Docker Compose file that will launch a minimal Danbooru instance.
+# This is a Docker Compose file that will launch a minimal AIBooru instance.
 # This is suitable as a quick demo or for personal use, but is not recommended
 # for a large public-facing site.
 #
 # ## Quickstart
 #
-# First run `bin/setup`. Then run `docker compose up` to start a Danbooru instance on http://localhost:3000.
+# First run `bin/setup`. Then run `docker compose up` to start an AIBooru instance on http://localhost:3000.
 #
 # Run `docker compose down` to stop the instance.
 #
@@ -25,26 +25,26 @@
 #
 # ## Usage
 #
-#  # Start a Danbooru instance on http://localhost:3000.
+#  # Start an AIBooru instance on http://localhost:3000.
 #  docker compose up
 #
 #  # Stop the instance.
 #  docker compose down
 #
-#  # Upgrade the instance to the latest version of Danbooru.
+#  # Upgrade the instance to the latest version of AIBooru.
 #  docker compose pull
 #  docker compose restart
 #
 #  # Backup the database and images.
-#  docker compose run --rm -T danbooru bin/rails danbooru:database:backup > danbooru-database.pg_dump
-#  docker compose run --rm -T danbooru bin/rails danbooru:images:backup > danbooru-images.tar
+#  docker compose run --rm -T aibooru bin/rails danbooru:database:backup > aibooru-database.pg_dump
+#  docker compose run --rm -T aibooru bin/rails danbooru:images:backup > aibooru-images.tar
 #  docker compose cp iqdb:/iqdb/data/iqdb.sqlite ./
 #
 #  # Restore the database and images from backup.
 #  docker compose down
 #  docker volume rm danbooru-data danbooru-images iqdb-data
-#  docker compose run --rm -T danbooru bin/rails danbooru:database:restore < danbooru-database.pg_dump
-#  docker compose run --rm -T danbooru bin/rails danbooru:images:restore < danbooru-images.tar
+#  docker compose run --rm -T danbooru bin/rails danbooru:database:restore < aibooru-database.pg_dump
+#  docker compose run --rm -T danbooru bin/rails danbooru:images:restore < aibooru-images.tar
 #  docker compose cp ./iqdb.sqlite iqdb:/iqdb/data/iqdb.sqlite
 #
 #  # Delete all the data for the instance.
@@ -60,15 +60,15 @@
 #  # Start a Postgres shell inside the instance (for debugging)
 #  docker compose run --rm danbooru bin/rails dbconsole -p
 #
-#  # Start two instances of Danbooru at the same time, one named `danbooru-latest` and the other
-#  # `danbooru-production`. Good for comparing two different versions of Danbooru.
-#  DANBOORU_PORT=3000 DANBOORU_IMAGE=ghcr.io/danbooru/danbooru:latest docker compose -p danbooru-latest up
-#  DANBOORU_PORT=3001 DANBOORU_IMAGE=ghcr.io/danbooru/danbooru:production docker compose -p danbooru-production up
-#  docker compose -p danbooru-latest down --volumes
-#  docker compose -p danbooru-production down --volumes
+#  # Start two instances of AIBooru at the same time, one named `aibooru-latest` and the other
+#  # `aibooru-production`. Good for comparing two different versions of AIBooru.
+#  DANBOORU_PORT=3000 DANBOORU_IMAGE=ghcr.io/aibooruorg/aibooru:latest docker compose -p aibooru-latest up
+#  DANBOORU_PORT=3001 DANBOORU_IMAGE=ghcr.io/aibooruorg/aibooru:production docker compose -p aibooru-production up
+#  docker compose -p aibooru-latest down --volumes
+#  docker compose -p aibooru-production down --volumes
 #
-#  # Show the logs for the Danbooru container.
-#  docker compose logs -f danbooru
+#  # Show the logs for the AIBooru container.
+#  docker compose logs -f aibooru
 #
 # References:
 #
@@ -76,15 +76,15 @@
 # * https://docs.docker.com/compose/install/
 # * https://docs.docker.com/compose/release-notes
 
-# You can change the name to run multiple Danbooru instances simultaneously.
+# You can change the name to run multiple AIBooru instances simultaneously.
 # This doesn't change the name of the site, it only affects the name used by Docker Compose.
 name: danbooru
 
 x-base-template: &base-template
-  # You can set DANBOORU_IMAGE to `ghcr.io/danbooru/danbooru:master` to get the latest unstable release,
-  # or e.g. `ghcr.io/danbooru/danbooru:production-2024.01.12-055003-utc` to get a specific stable version.
+  # You can set DANBOORU_IMAGE to `ghcr.io/aibooruorg/aibooru:master` to get the latest unstable release,
+  # or e.g. `ghcr.io/aibooruorg/aibooru:production-2024.01.12-055003-utc` to get a specific stable version.
   #
-  # See https://github.com/danbooru/danbooru/pkgs/container/danbooru for a list of versions
+  # See https://github.com/aibooruorg/aibooru/pkgs/container/aibooru for a list of versions
   image: ${DANBOORU_IMAGE:-ghcr.io/aibooruorg/aibooru:production}
 
   read_only: true
@@ -98,7 +98,7 @@ x-base-template: &base-template
 
   environment:
     # You can set DANBOORU_CANONICAL_URL if you have a domain name for your site.
-    # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
+    # DANBOORU_CANONICAL_URL: https://aibooru.mydomain.com
 
     # You should set DANBOORU_SECRET_KEY_BASE to a random secret string. If you
     # don't set this, you will be logged out every time you restart the instance.

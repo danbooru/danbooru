@@ -1,4 +1,4 @@
-# This is a Docker Compose file that will launch a Danbooru instance in development mode. Use this
+# This is a Docker Compose file that will launch an AIBooru instance in development mode. Use this
 # if you want to work on the site or make any changes to the code.
 #
 # The difference from a normal instance is that in development mode you can edit the code
@@ -12,8 +12,8 @@
 # ## Usage
 #
 #   # Check out the code first.
-#   $ git clone https://github.com/danbooru/danbooru
-#   $ cd danbooru
+#   $ git clone https://github.com/aibooruorg/aibooru
+#   $ cd aibooru
 #
 #   # Start a Devbooru instance on http://localhost:3000.
 #   $ docker compose -f docker-compose.dev.yaml up
@@ -39,7 +39,7 @@ x-base-template: &base-template
     DANBOORU_APP_NAME: "Devbooru"
 
     # You can set DANBOORU_CANONICAL_URL if you have a domain name for your site.
-    # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
+    # DANBOORU_CANONICAL_URL: https://aibooru.mydomain.com
 
     # This is insecure because it lets anyone login to your development instance. This is okay
     # because giving others access is insecure anyway.

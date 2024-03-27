@@ -3,8 +3,8 @@
 # Build a Docker image. Note that uncommited changes won't be included in the
 # image; commit changes to Git first before building the image.
 #
-# This will build two images, one called `danbooru` and the other called
-# `danbooru:development`. The development image contains additional tools
+# This will build two images under `ghcr.io/aibooruorg/aibooru`, one tagged `latest`
+# and the other tagged `development`. The development image contains additional tools
 # needed to rebuild the JS and CSS files during development.
 #
 # Usage:
@@ -12,19 +12,19 @@
 #    # Commit any changed files first or they won't be included in the build.
 #    $ git commit --all
 #
-#    # Build images named `danbooru` and `danbooru:development`.
-#    $ bin/build-docker-image danbooru
+#    # Build images named `aibooru` and `aibooru:development`.
+#    $ bin/build-docker-image aibooru
 #
-#    # Build ARM images named `danbooru:arm64` and `danbooru:development-arm64`.
+#    # Build ARM images named `aibooru:arm64` and `aibooru:development-arm64`.
 #    # To build ARM images on x86, you must install QEMU first.
 #    $ sudo apt-get install qemu-system-arm qemu-user-static binfmt-support
-#    $ bin/build-docker-image danbooru linux/arm64
+#    $ bin/build-docker-image aibooru linux/arm64
 #
-#    # Build multi-architecture images for ARM and x86 named `danbooru` and `danbooru:development`.
-#    $ bin/build-docker-image danbooru linux/amd64,linux/arm64
+#    # Build multi-architecture images for ARM and x86 named `aibooru` and `aibooru:development`.
+#    $ bin/build-docker-image aibooru linux/amd64,linux/arm64
 #
 #    # Test out the new image.
-#    $ DANBOORU_IMAGE=danbooru:development bin/dev
+#    $ DANBOORU_IMAGE=aibooru:development bin/dev
 
 set -euxo pipefail
 
