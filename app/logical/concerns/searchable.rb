@@ -158,12 +158,17 @@ module Searchable
     where_numeric_matches(qualified_column, value)
   end
 
-  # where_union(A, B, C) is like `WHERE A OR B OR C`, except it may be faster if the conditions are disjoint.
-  # where_union(A, B) does `SELECT * FROM table WHERE id IN (SELECT id FROM table WHERE A UNION ALL SELECT id FROM table WHERE B)`
-  def where_union(*relations, primary_key: :id, foreign_key: :id)
+  # where_union_all(A, B, C) is like `WHERE A OR B OR C`, except it may be faster if the conditions are disjoint.
+  # where_union_all(A, B) does `SELECT * FROM table WHERE id IN (SELECT id FROM table WHERE A UNION ALL SELECT id FROM table WHERE B)`
+  def where_union_all(*, **)
+    where_union(*, **, union_type: Arel::Nodes::UnionAll)
+  end
+
+  # where_union removes duplicate rows, where_union_all does not.
+  def where_union(*relations, primary_key: :id, foreign_key: :id, union_type: Arel::Nodes::Union)
     arels = relations.map { |relation| relation.select(foreign_key).arel }
     union = arels.reduce do |left, right|
-      Arel::Nodes::UnionAll.new(left, right)
+      union_type.new(left, right)
     end
 
     where(arel_table[primary_key].in(union))

@@ -31,10 +31,9 @@ class UsersController < ApplicationController
 
   def index
     if params[:name].present?
-      @user = User.find_by_name(params[:name])
-      raise ActiveRecord::RecordNotFound if @user.blank?
-      redirect_to user_path(@user, variant: params[:variant])
-      return
+      params[:search] ||= {}
+      params[:search][:name_or_past_name_matches] = params[:name]
+      params[:redirect] = "true"
     end
 
     @users = authorize User.paginated_search(params)
