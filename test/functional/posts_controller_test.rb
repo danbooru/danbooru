@@ -192,6 +192,19 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select ".tag-change-notice"
         end
 
+        should "show a notice for a single tag search with multiple pending BURs in multiple topics" do
+          topic1 = as(@user) { create(:forum_topic) }
+          topic2 = as(@user) { create(:forum_topic) }
+          create(:post, tag_string: "foo")
+          create(:bulk_update_request, script: "create alias foo -> bar", forum_topic: topic1)
+          create(:bulk_update_request, script: "create alias foo -> baz", forum_topic: topic1)
+          create(:bulk_update_request, script: "create alias foo -> qux", forum_topic: topic2)
+          create(:bulk_update_request, script: "create alias foo -> blah", forum_topic: topic2)
+
+          get_auth posts_path(tags: "foo"), @user
+          assert_select ".tag-change-notice"
+        end
+
         should "show deleted posts for a status:DELETED search" do
           create(:post, is_deleted: true)
           get_auth posts_path(tags: "status:DELETED"), @user
