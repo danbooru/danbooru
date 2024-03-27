@@ -48,7 +48,7 @@
     <% end %>
   </div>
 
-  <%= render_tag_change_notice(tag: wiki_page.tag, current_user: CurrentUser.user) %>
+  <%= render_tag_change_notice(tag: @wiki_page.tag, current_user: CurrentUser.user) %>
 
   <%= render "wiki_pages/posts", wiki_page: @wiki_page %>
 <% end %>
