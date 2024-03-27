@@ -2,7 +2,7 @@ source 'https://rubygems.org/'
 
 ruby "~> 3.2.3"
 
-gem 'dotenv-rails', :require => "dotenv/rails-now"
+gem 'dotenv-rails', require: "dotenv/load"
 
 gem "rails", "~> 7.1"
 gem "pg"
