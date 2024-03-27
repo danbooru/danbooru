@@ -72,6 +72,7 @@ module Source
       Source::Extractor::CiEn,
       Source::Extractor::Inkbunny,
       Source::Extractor::Bluesky,
+      Source::Extractor::Danbooru2,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
