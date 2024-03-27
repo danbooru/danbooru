@@ -96,31 +96,6 @@ module Sources
       )
     end
 
-    context "A h.bilibili.com/:id post" do
-      setup do
-        skip "h.bilibili.com is dead"
-      end
-
-      strategy_should_work(
-        "https://h.bilibili.com/83341894",
-        image_urls: [
-          "https://i0.hdslb.com/bfs/album/669c0974a2a7508cbbb60b185eddaa0ccf8c5b7a.jpg",
-          "https://i0.hdslb.com/bfs/album/de8043c382b9eb022519380bf6b570285ea3bf81.gif",
-          "https://i0.hdslb.com/bfs/album/0ea658d4a9b2323665b6a5b6df6eff0e23e98c22.gif",
-          "https://i0.hdslb.com/bfs/album/6448067578847d7006c6a94ffc56d6fde30b8b1e.gif",
-          "https://i0.hdslb.com/bfs/album/ef2a9939264ff1e98cb4653c5b427c1d32e5ff24.gif",
-          "https://i0.hdslb.com/bfs/album/6198a9290219be0775d214cfa16afb02e8b357f7.gif",
-        ],
-        artist_commentary_title: nil,
-        artist_name: "明日方舟",
-        other_names: ["明日方舟"],
-        profile_url: "https://space.bilibili.com/161775300",
-        page_url: "https://h.bilibili.com/83341894",
-        tag_name: "bilibili_161775300",
-        artist_commentary_desc: "#明日方舟#\n【新增服饰】\n//灿阳朝露 SD01 - 临光\nMARTHE [珊瑚海岸/CoralCoast]灿阳朝露系列泳衣01款。贴身、透气、轻便，专为夏日而生。\n\n即使是耀骑士，在海边的太阳前依旧要涂好防晒霜竖起遮阳伞。 ​​​​ "
-      )
-    end
-
     context "A bilibili.com/read/:id post" do
       strategy_should_work(
         "https://www.bilibili.com/read/cv7360489",
@@ -172,7 +147,7 @@ module Sources
         dtext_artist_commentary_desc: <<~EOS.chomp
           "#吉诺儿kino#":[https://search.bilibili.com/all?keyword=%E5%90%89%E8%AF%BA%E5%84%BFkino] "#唐九夏#":[https://search.bilibili.com/all?keyword=%E5%94%90%E4%B9%9D%E5%A4%8F]
           今天是大雪！！今天也好冷啊"[冷]":[https://i0.hdslb.com/bfs/emote/cb0ebbd0668640f07ebfc0e03f7a18a8cd00b4ed.png]
-          之前在直播的时候说的，"@唐九夏还想再躺一下":[https://space.bilibili.com/1219196749/dynamic]的原创新曲《檐下雪》就快来啦！！歌肯定是很好听的，但最厉害的是这首曲子可是九夏作词的！！大家记得要来听啊啊啊！！！ 
+          之前在直播的时候说的，"@唐九夏还想再躺一下":[https://space.bilibili.com/1219196749/dynamic]的原创新曲《檐下雪》就快来啦！！歌肯定是很好听的，但最厉害的是这首曲子可是九夏作词的！！大家记得要来听啊啊啊！！！\x20
         EOS
       )
     end
