@@ -177,7 +177,7 @@ class AutocompleteService
   # @param string [String] the string to complete
   # @return [Array<Hash>] the autocomplete results
   def tag_prefix_matches(string)
-    tag_wildcard_matches(string + "*")
+    tag_wildcard_matches(string.escape_wildcards + "*")
   end
 
   # Find tags or tag aliases matching a wildcard search.

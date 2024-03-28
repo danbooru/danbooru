@@ -58,8 +58,19 @@ module Danbooru
         self.match?(/\A(false|f|no|n|off|0)\z/i)
       end
 
+      # Do a case-insensitive wildcard match against `pattern`. The `*` character is treated as a wildcard, `\*` is
+      # treated as a literal `*`, and `\\` is treated as a literal `\`.
       def ilike?(pattern)
-        pattern = Regexp.escape(pattern).gsub(/\\\*/, ".*")
+        return casecmp?(pattern) unless pattern.include?("*")
+
+        pattern = Regexp.escape(pattern).gsub(/\\\*|\\\\\*|\\\\\\\\/) do |str|
+          case str
+          when '\*'       then ".*"
+          when '\\\*'     then '\\\*'
+          when "\\\\\\\\" then "\\\\"
+          end
+        end
+
         match?(/\A#{pattern}\z/i)
       end
 
