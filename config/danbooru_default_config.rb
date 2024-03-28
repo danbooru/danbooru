@@ -287,20 +287,42 @@ module Danbooru
       5
     end
 
+    # Set mail_delivery_url to configure how emails are sent. The format is "smtp://username:password@example.com:587".
+    #
+    # If this is not set, then sending emails will be disabled. Emails are used for sending password resets, verifying
+    # accounts that sign up from a proxy, and for sending notifications when a user receives a private message (Dmail).
+    #
+    # If emails aren't being sent, check the /jobs page for errors.
+    #
+    # For local email testing, you can use MailHog: https://github.com/mailhog/MailHog.
+    #
     # https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
     # https://guides.rubyonrails.org/configuring.html#configuring-action-mailer
-    def mail_delivery_method
-      # :smtp
-      :sendmail
+    # https://github.com/mikel/mail/blob/master/lib/mail/network/delivery_methods/smtp.rb
+    def mail_delivery_url
+      # For Gmail. Replace `username@gmail.com` with your Gmail address.
+      # You'll need to enable 2FA and use an app password: https://myaccount.google.com/apppasswords.
+      # "smtps://username@gmail.com:password@smtp.gmail.com:587"
+
+      # For Amazon SES. https://docs.aws.amazon.com/ses/latest/dg/send-email-smtp.html
+      # "smtps://username:password@email.us-east-1.amazonaws.com"
+
+      # You can set `authentication` to login, plain, or cram_md5 if your server requires LOGIN, PLAIN, or CRAM-MD5 authentication.
+      # "smtp://username:password@example.com:587?authentication=login"
+
+      # You can set `enable_starttls` if your server requires STARTTLS.
+      # "smtp://username:password@example.com:587?enable_starttls=true&authentication=login"
+
+      # You can set `openssl_verify_mode` to `none` to disable verification of the server's SSL certificate if you have a self-signed certificate.
+      # "smtps://username:password@example.com?openssl_verify_mode=none"
     end
 
+    # Deprecated. Use `mail_delivery_url` instead.
+    def mail_delivery_method
+    end
+
+    # Deprecated. Use `mail_delivery_url` instead.
     def mail_settings
-      {
-        # address: "example.com",
-        # user_name: "user",
-        # password: "pass",
-        # authentication: :login
-      }
     end
 
     # The path to where uploaded files are stored. You can change this to change where files are
