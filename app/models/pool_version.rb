@@ -31,7 +31,7 @@ class PoolVersion < ApplicationRecord
 
     def name_contains(name)
       name = normalize_name_for_search(name)
-      name = "*#{name}*" unless name =~ /\*/
+      name = "*#{name.escape_wildcards}*" unless name.include?("*")
       where_ilike(:name, name)
     end
 

@@ -39,7 +39,7 @@ module Danbooru
 
       # escape \ and * characters so that they're treated literally in LIKE searches.
       def escape_wildcards
-        gsub(/\\/, '\\\\').gsub(/\*/, '\*')
+        gsub("\\", "\\\\\\").gsub("*", '\*')
       end
 
       def to_escaped_for_tsquery_split

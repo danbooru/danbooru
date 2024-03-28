@@ -85,6 +85,23 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals([], source: "a1", source_not_eq: "a1")
         assert_search_equals(@p1, source: "a1", source_not_eq: "b2")
       end
+
+      context "for a like search" do
+        subject { WikiPage }
+
+        should "treat backslashes literally when the search doesn't contain a '*' wildcard" do
+          @w1 = create(:wiki_page, title: "foo\\bar")
+          @w2 = create(:wiki_page)
+
+          assert_search_equals([@w1], title_like: "foo\\bar")
+          assert_search_equals([@w1], title_ilike: "FOO\\BAR")
+
+          assert_search_equals([@w2], title_not_like: "foo\\bar")
+          assert_search_equals([@w2], title_not_ilike: "FOO\\BAR")
+
+          assert_search_equals([], title_like: "foo\\\\bar")
+        end
+      end
     end
 
     context "for a boolean attribute" do

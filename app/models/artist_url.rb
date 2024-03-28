@@ -52,7 +52,7 @@ class ArtistURL < ApplicationRecord
       profile_url = Source::URL.profile_url(url) || Source::Extractor.find(url).profile_url || normalize_url(url)
       normalized_url_like(profile_url)
     else
-      where_ilike(:url, "*#{url}*")
+      where_ilike(:url, "*#{url.escape_wildcards}*")
     end
   end
 
