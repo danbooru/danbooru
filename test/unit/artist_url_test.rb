@@ -217,6 +217,12 @@ class ArtistURLTest < ActiveSupport::TestCase
         assert_search_equals([@bkub_url], url_regex: "bkub")
         assert_search_equals([@bkub_url], url_not_regex: "masao")
       end
+
+      should "work when searching for URLs containing backslashes" do
+        @url = create(:artist_url, url: "https://twitter.com/foo\\\\bar")
+
+        assert_search_equals([@url], url_matches: "foo\\\\bar")
+      end
     end
   end
 end

@@ -15,6 +15,7 @@ class PoolTest < ActiveSupport::TestCase
   context "Searching pools" do
     should "find pools by name" do
       @pool = FactoryBot.create(:pool, name: "Test Pool")
+      @pool2 = create(:pool, name: "Yuru_Yuri_-_\\\\Akarin!!//")
 
       assert_equal(@pool.id, Pool.find_by_name("test pool").id)
 
@@ -23,6 +24,9 @@ class PoolTest < ActiveSupport::TestCase
       assert_search_equals(@pool, name_matches: "test pool")
       assert_search_equals(@pool, name_matches: "testing pool")
       assert_search_equals([], name_matches: "tes")
+
+      assert_search_equals(@pool2, name_contains: "Yuru_Yuri_-_\\\\Akarin!!//")
+      assert_search_equals(@pool2, name_matches: "Yuru_Yuri_-_\\\\Akarin!!//")
     end
 
     should "find pools by post id" do

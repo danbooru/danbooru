@@ -78,6 +78,19 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(has_dtext_links: "true").with { @vocaloid }
         end
       end
+
+      context "searching by name" do
+        subject { Tag }
+
+        should "treat backslashes literally when the search doesn't contain a '*' wildcard" do
+          t1 = create(:tag, name: ":\\")    # the literal tag :\
+          t2 = create(:tag, name: "\\\\//") # the literal tag \\//
+
+          assert_search_equals([t1], name_or_alias_matches: ":\\")    # the literal tag :\
+          assert_search_equals([t2], name_or_alias_matches: "\\\\//") # the literal tag \\//
+          assert_search_equals([], name_or_alias_matches: ":\\\\")    # the literal tag :\\
+        end
+      end
     end
 
     context "show action" do
