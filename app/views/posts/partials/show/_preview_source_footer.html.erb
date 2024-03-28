@@ -10,7 +10,4 @@
   <%= link_to link_slash_icon(class: "h-2"), posts_path(tags: "source:none"), title: "no source", class: "align-top" %>
 <% end %>
 
-<%= link_to post.media_asset do %>
-  <%= number_to_human_size(post.media_asset.file_size) %> .<%= post.media_asset.file_ext %>,
-  <%= post.media_asset.image_width %>x<%= post.media_asset.image_height %>
-<% end %>
+<%= render MediaAssetLinkComponent.new(media_asset: post.media_asset) %>
