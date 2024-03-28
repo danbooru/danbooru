@@ -72,7 +72,7 @@ class AutocompleteComponent < ApplicationComponent
     return tag.span(target.tr("_", " ")) if !target.ilike?(pattern.to_s)
 
     words = pattern.split(/(\*)/).compact_blank # "*black*" => ["*", "black", "*"]
-    regexp = words.map { |w| w == "*" ? "(.*)" : "(#{Regexp.escape(w)})" }.join # "*black*" => "(.*)(black)(.*)"
+    regexp = words.map { |w| (w == "*") ? "(.*)" : "(#{Regexp.escape(w.gsub("\\\\", "\\"))})" }.join # "*black*" => "(.*)(black)(.*)"
     regexp = Regexp.new(regexp, "i")
     captures = target.match(regexp).captures # "black_thighhighs" =~ /(.*)(black)(.*)/ => ["", "black", "_thighhighs"]
 

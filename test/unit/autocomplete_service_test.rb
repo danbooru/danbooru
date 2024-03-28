@@ -196,6 +196,25 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_equals([], "x"*200, :tag_query)
         assert_autocomplete_equals([], "http://www.google.com", :tag_query)
       end
+
+      should "autocomplete tags that contain backslashes" do
+        create(:tag, name: '\\\\//', post_count: 30) # the literal tag \\//
+        create(:tag, name: '\\m/', post_count: 20)   # the literal tag \m/
+        create(:tag, name: ":/", post_count: 10)
+        create(:tag_alias, antecedent_name: ":\\", consequent_name: ":/")
+
+        assert_autocomplete_equals(%w[\\\\// \\m/], "\\", :tag_query)
+        assert_autocomplete_equals(%w[\\\\//], "\\\\//", :tag_query)
+
+        assert_autocomplete_equals(%w[:/], ":\\", :tag_query)
+        assert_autocomplete_equals(%w[:/], "*\\", :tag_query)
+        assert_autocomplete_equals(%w[:/], "*\\\\", :tag_query)
+        assert_autocomplete_equals(%w[], "*\\\\\\", :tag_query)
+        assert_autocomplete_equals(%w[], "*\\*", :tag_query)
+
+        assert_autocomplete_equals(%w[\\\\// \\m/ :/], "*\\\\*", :tag_query)
+        assert_autocomplete_equals(%w[\\\\//], "*\\\\\\\\*", :tag_query)
+      end
     end
   end
 end
