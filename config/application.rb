@@ -80,14 +80,6 @@ module Danbooru
     raise "Danbooru.config.secret_key_base not configured" if Danbooru.config.secret_key_base.blank?
     config.secret_key_base = Danbooru.config.secret_key_base
 
-    if Danbooru.config.mail_delivery_method.to_sym == :smtp
-      config.action_mailer.delivery_method = :smtp
-      config.action_mailer.smtp_settings = Danbooru.config.mail_settings
-    elsif Danbooru.config.mail_delivery_method.to_sym == :sendmail
-      config.action_mailer.delivery_method = :sendmail
-      config.action_mailer.sendmail_settings = Danbooru.config.mail_settings
-    end
-
     # https://guides.rubyonrails.org/action_mailer_basics.html#intercepting-and-observing-emails
     # app/logical/email_delivery_logger.rb
     config.action_mailer.interceptors = ["EmailDeliveryLogger"]

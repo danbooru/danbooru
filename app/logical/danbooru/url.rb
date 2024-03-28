@@ -38,12 +38,13 @@ module Danbooru
     # @return [Addressable:URI] The parsed and normalized URL.
     attr_reader :url
 
-    delegate :ip_based?, :host, :hostname, :port, :site, :authority, :path, :query, :fragment, :password, to: :url
+    delegate :ip_based?, :scheme, :host, :hostname, :port, :site, :authority, :path, :query, :fragment, :user, :password, to: :url
 
     # Parse a string into a URL, or raise an exception if the string is not a valid HTTP or HTTPS URL.
     #
     # @param url [String, Danbooru::URL]
-    def initialize(url)
+    # @param schemes [Array<String>] The list of allowed URL schemes.
+    def initialize(url, schemes: %w[http https])
       @original_url = url.to_s
       @url = Addressable::URI.heuristic_parse(original_url)
 
@@ -55,8 +56,8 @@ module Danbooru
       @url.path = @url.path.gsub(/[^[:graph:]]/) { |c| "%%%02X" % c.ord }
       @url.path = nil if @url.path == "/"
 
-      raise Error, "#{original_url} is not an http:// URL" if !@url.normalized_scheme.in?(["http", "https"])
-      raise Error, "#{host} is not a valid hostname" if parsed_domain.nil? && ip_address.nil?
+      raise Error, "#{original_url} is not a #{schemes.map { "#{_1}://" }.to_sentence(two_words_connector: " or ", last_word_connector: ", or ")} URL" if !@url.normalized_scheme.in?(schemes)
+      raise Error, "#{host} is not a valid hostname" if parsed_domain.nil? && ip_address.nil? && @url.normalized_scheme.in?(%w[http https])
     rescue Addressable::URI::InvalidURIError => e
       raise Error, e
     end
@@ -65,16 +66,16 @@ module Danbooru
     #
     # @param url [String, Danbooru::URL]
     # @return [Danbooru::URL]
-    def self.parse!(url)
-      new(url)
+    def self.parse!(url, **options)
+      new(url, **options)
     end
 
     # Parse a string into a URL, or return nil if the string is not a valid HTTP or HTTPS URL.
     #
     # @param url [String, Danbooru::URL]
     # @return [Danbooru::URL]
-    def self.parse(url)
-      parse!(url)
+    def self.parse(url, **options)
+      parse!(url, **options)
     rescue Error
       nil
     end
