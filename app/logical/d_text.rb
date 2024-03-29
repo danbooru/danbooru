@@ -50,7 +50,7 @@ class DText
   # @param domain [String, nil] If present, treat links to this domain as internal links rather than external links.
   # @param alternate_domains [Array<String>] A list of additional domains for this site where direct links will be converted to shortlinks
   #   (e.g on betabooru.donmai.us, https://danbooru.donmai.us/posts/1234 is converted to post #1234).
-  def initialize(dtext, inline: false, disable_mentions: false, media_embeds: false, base_url: nil, domain: Danbooru::URL.parse!(Danbooru.config.canonical_url).host, alternate_domains: Danbooru.config.alternate_domains)
+  def initialize(dtext, inline: false, disable_mentions: false, media_embeds: false, base_url: Rails.application.config.relative_url_root, domain: Danbooru::URL.parse!(Danbooru.config.canonical_url).host, alternate_domains: Danbooru.config.alternate_domains)
     @dtext = dtext
     @inline = inline
     @disable_mentions = disable_mentions

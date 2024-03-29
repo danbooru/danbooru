@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "domain"
+require_relative "ip_address"
 
 # A utility class representing a HTTP URL. A wrapper around Addressable::URI that adds
 # extra utility methods. Anything dealing with URLs inside Danbooru should use this class

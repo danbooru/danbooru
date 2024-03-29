@@ -38,8 +38,8 @@ x-base-template: &base-template
   environment:
     DANBOORU_APP_NAME: "Devbooru"
 
-    # You can set DANBOORU_CANONICAL_URL if you have a domain name for your site.
-    # DANBOORU_CANONICAL_URL: https://danbooru.mydomain.com
+    # The public URL of your site. You can set this if you have a domain name for your site.
+    DANBOORU_CANONICAL_URL: ${DANBOORU_CANONICAL_URL:-}
 
     # This is insecure because it lets anyone login to your development instance. This is okay
     # because giving others access is insecure anyway.
@@ -147,6 +147,9 @@ services:
       # trust the X-Forwarded-* headers sent by the client. This assumes untrusted users won't have access to your
       # dev instance, because they could spoof these headers to spoof their IP or the server hostname.
       DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-true}
+
+      # Used by Nginx to determine the root directory if we're running in a subdirectory (e.g. http://example.com/danbooru).
+      DANBOORU_CANONICAL_URL: ${DANBOORU_CANONICAL_URL:-}
     ports:
       - "${DANBOORU_PORT:-3000}:3000"
     depends_on:
