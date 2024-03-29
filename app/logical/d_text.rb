@@ -95,7 +95,7 @@ class DText
   # Replace an <a class="dtext-wiki-link"> tag with a colorized link.
   def replace_wiki_link!(node, wiki_pages:, tags:, artists:)
     path = Addressable::URI.parse(node["href"]).path
-    name = path[%r!\A/wiki_pages/(.*)\z!i, 1]
+    name = path[%r!/wiki_pages/(.*)\z!i, 1]
     name = CGI.unescape(name)
     name = WikiPage.normalize_title(name)
     wiki = wiki_pages.find { _1.title == name }
@@ -107,7 +107,7 @@ class DText
     end
 
     if tag.present? && tag.artist?
-      node["href"] = "/artists/show_or_new?name=#{CGI.escape(name)}"
+      node["href"] = Routes.show_or_new_artists_path(name: name)
 
       if artist.blank?
         node["class"] += " dtext-artist-does-not-exist"
@@ -271,7 +271,7 @@ class DText
   # @return [Array<String>] the list of wiki page names
   memoize def wiki_titles
     DText.parse_html(format_text).css("a.dtext-wiki-link").pluck("href").map do |href|
-      title = href[%r{\A(?:/wiki_pages/|/artists/show_or_new\?name=)(.*)\z}i, 1]
+      title = href[%r{(?:/wiki_pages/|/artists/show_or_new\?name=)(.*)\z}i, 1]
       title = CGI.unescape(title)
       title = WikiPage.normalize_title(title)
       title
@@ -297,7 +297,7 @@ class DText
     fragment = DText.parse_html(html)
 
     wiki_pages = fragment.css("a.dtext-wiki-link").map do |node|
-      title = node["href"][%r{\A/wiki_pages/(.*)\z}i, 1]
+      title = node["href"][%r{/wiki_pages/(.*)\z}i, 1]
       title = CGI.unescape(title)
       title = WikiPage.normalize_title(title)
       title
