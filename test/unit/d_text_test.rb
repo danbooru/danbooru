@@ -205,6 +205,15 @@ class DTextTest < ActiveSupport::TestCase
       should "convert links to dtext" do
         assert_equal('"example":[https://www.example.com]', DText.from_html('<a href="https://www.example.com">example</a>'))
         assert_equal("<https://www.example.com>", DText.from_html('<a href="https://www.example.com">https://www.example.com</a>'))
+
+        assert_equal("<mailto:user@example.com>", DText.from_html('<a href="mailto:user@example.com">user@example.com</a>'))
+        assert_equal('"user":[mailto:user@example.com]', DText.from_html('<a href="mailto:user@example.com">user</a>'))
+      end
+
+      should "not convert URLs with unsupported schemes to dtext links" do
+        assert_equal("blah", DText.from_html('<a href="ftp://example.com">blah</a>'))
+        assert_equal("blah", DText.from_html('<a href="file:///etc/password">blah</a>'))
+        assert_equal("blah", DText.from_html('<a href="javascript:alert(1)">blah</a>'))
       end
     end
 

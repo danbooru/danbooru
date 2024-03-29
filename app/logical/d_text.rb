@@ -507,7 +507,7 @@ class DText
   def self.from_html(text, inline: false, &block)
     html = DText.parse_html(text)
 
-    dtext = html.children.map do |element|
+    html.children.map do |element|
       block.call(element) if block.present?
 
       case element.name
@@ -541,7 +541,11 @@ class DText
 
         if title.blank? || url.blank?
           ""
+        elsif !url.match?(%r{\A(https?://|mailto:)}i)
+          title
         elsif title == url
+          "<#{url}>"
+        elsif url.starts_with?("mailto:") && url.delete_prefix("mailto:") == title
           "<#{url}>"
         else
           %("#{title}":[#{url}])
@@ -563,8 +567,6 @@ class DText
         from_html(element.inner_html, &block)
       end
     end.join
-
-    dtext
   end
 
   # Return the first paragraph the search string `needle` occurs in.
