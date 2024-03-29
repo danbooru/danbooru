@@ -14,6 +14,16 @@ class UserMailerTest < ActionMailer::TestCase
         assert_emails(1) { mail.deliver_now }
       end
 
+      should "work when the dmail contains wiki links" do
+        create(:tag, name: "touhou")
+        create(:tag, name: "bkub", category: Tag.categories.artist)
+
+        dmail = create(:dmail, owner: @user, to: @user, body: "[[touhou]] [[bkub]]")
+        mail = UserMailer.dmail_notice(dmail)
+
+        assert_emails(1) { mail.deliver_now }
+      end
+
       should "not send an email for a user without an email address" do
         @user = create(:user)
         @dmail = create(:dmail, owner: @user, to: @user)

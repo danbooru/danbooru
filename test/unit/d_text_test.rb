@@ -53,9 +53,19 @@ class DTextTest < ActiveSupport::TestCase
         assert_match(/tag-type-#{Tag.categories.artist}/, format_text("[[bkub]]"))
       end
 
-      should "parse wiki links correctly with the base_url option" do
+      should "parse wiki links correctly when using an absolute base_url" do
         create(:tag, name: "bkub", category: Tag.categories.artist, post_count: 42)
         assert_match(/tag-type-#{Tag.categories.artist}/, format_text("[[bkub]]", base_url: "http://www.example.com"))
+      end
+
+      should "parse wiki links correctly when using an absolute base_url with a subdirectory" do
+        create(:tag, name: "bkub", category: Tag.categories.artist, post_count: 42)
+        assert_match(/tag-type-#{Tag.categories.artist}/, format_text("[[bkub]]", base_url: "http://www.example.com/danbooru"))
+      end
+
+      should "parse wiki links correctly when using a relative base_url" do
+        create(:tag, name: "bkub", category: Tag.categories.artist, post_count: 42)
+        assert_match(/tag-type-#{Tag.categories.artist}/, format_text("[[bkub]]", base_url: "/danbooru"))
       end
 
       should "convert direct links to short links" do
@@ -121,9 +131,15 @@ class DTextTest < ActiveSupport::TestCase
       end
     end
 
-    context "#parse_wiki_titles" do
+    context "#wiki_titles" do
       should "parse wiki links in dtext" do
         assert_equal(["foo"], DText.new("[[foo]] [[FOO]").wiki_titles)
+      end
+
+      should "parse wiki links correctly when using a relative base url" do
+        create(:tag, name: "bkub", category: Tag.categories.artist)
+
+        assert_equal(["foo", "bkub"], DText.new("[[foo]] [[bkub]]", base_url: "/danbooru").wiki_titles)
       end
 
       should "parse wiki links inside [bur:id] tags" do
