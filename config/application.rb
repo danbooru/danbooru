@@ -32,6 +32,8 @@ begin
 rescue LoadError
 end
 
+require_relative "../app/logical/danbooru/url"
+
 module Danbooru
   mattr_accessor :config
 
@@ -112,12 +114,13 @@ module Danbooru
       config.action_controller.forgery_protection_origin_check = false
     end
 
-    config.after_initialize do
-      Rails.application.routes.default_url_options = {
-        host: Danbooru::URL.parse!(Danbooru.config.canonical_url).host,
-        port: Danbooru::URL.parse!(Danbooru.config.canonical_url).port
-      }
-    end
+    canonical_url = Danbooru::URL.parse!(Danbooru.config.canonical_url)
+    config.relative_url_root = canonical_url.path.presence
+
+    Rails.application.routes.default_url_options = {
+      host: canonical_url.host,
+      port: canonical_url.port,
+    }
   end
 
   I18n.enforce_available_locales = false
