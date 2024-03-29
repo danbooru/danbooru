@@ -113,6 +113,19 @@ module Sources
       )
     end
 
+    context "A video post with an embedded Youtube video" do
+      strategy_should_work(
+        "https://ebith1969.tumblr.com/post/48214164804",
+        image_urls: [],
+        page_url: "https://ebith1969.tumblr.com/post/48214164804",
+        profile_url: "https://ebith1969.tumblr.com",
+        artist_name: "ebith1969",
+        tags: [],
+        artist_commentary_title: nil,
+        dtext_artist_commentary_desc: "2009.03.05"
+      )
+    end
+
     context "The source for a 'http://*.tumblr.com/post/*' answer post with inline images" do
       strategy_should_work(
         "https://noizave.tumblr.com/post/171237880542/test-ask",

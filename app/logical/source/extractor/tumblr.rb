@@ -25,7 +25,7 @@ class Source::Extractor
         end
 
       when "video"
-        assets += [post[:video_url]]
+        assets += [post[:video_url]].compact_blank
       end
 
       assets += inline_images
