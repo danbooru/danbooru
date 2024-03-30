@@ -14,8 +14,10 @@ module Source
       end
 
       def image_urls
-        if parsed_url.image_url?
+        if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]
+        elsif parsed_url.image_url?
+          [parsed_url.candidate_full_image_urls.find { |url| http_exists?(url) } || url]
         else
           [api_response.dig(:media_asset, :variants)&.find { _1[:type] == "original" }&.dig(:url)].compact
         end
