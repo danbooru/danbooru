@@ -1135,6 +1135,26 @@ class DTextTest < Minitest::Test
     assert_parse('<p>a 「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">title</a>」 b</p>', 'a 「"title":[http://test.com]」 b')
   end
 
+  def test_mailto_links
+    assert_inline_parse('user@gmail.com', "user@gmail.com")
+
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user@gmail.com</a>', "mailto:user@gmail.com")
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user@gmail.com</a>', "<mailto:user@gmail.com>")
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user@gmail.com</a>', '[url]mailto:user@gmail.com[/url]')
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user</a>', '"user":mailto:user@gmail.com')
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user</a>', '"user":[mailto:user@gmail.com]')
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user</a>', '[user](mailto:user@gmail.com)')
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user</a>', '[mailto:user@gmail.com](user)')
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">http://gmail.com</a>', '[mailto:user@gmail.com](http://gmail.com)') # XXX should be regular markdown link, not backwards markdown link
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user</a>', '[url=mailto:user@gmail.com]user[/url]')
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user</a>', '<a href="mailto:user@gmail.com">user</a>')
+
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user@gmail.com</a>.', "mailto:user@gmail.com.")
+    assert_inline_parse('(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:user@gmail.com">user@gmail.com</a>)', "(mailto:user@gmail.com)")
+
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:foo_bar.baz+qux@test-mail.example.com">foo_bar.baz+qux@test-mail.example.com</a>', "mailto:foo_bar.baz+qux@test-mail.example.com")
+  end
+
   def test_lists
     assert_parse('<ul><li>a</li></ul>', '* a')
     assert_parse('<ul><li>a</li><li>b</li></ul>', "* a\n* b")

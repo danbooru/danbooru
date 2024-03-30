@@ -170,6 +170,9 @@ bracket_tags = (
 );
 
 http = 'http'i 's'i? '://';
+mailto = 'mailto:'i;
+
+scheme = http | mailto;
 subdomain = (utf8char | alnum | [_\-])+;
 domain = subdomain ('.' subdomain)+;
 port = ':' [0-9]+;
@@ -180,10 +183,14 @@ path = '/' (url_char - [?#<>[\]])*;
 query = '?' (url_char - [#])*;
 fragment = '#' (url_char - [#<>[\]])*;
 
-bare_absolute_url = (http domain port? path? query? fragment?) - (char* url_boundary_char);
+email_address = [a-zA-Z0-9+_.\-]+ '@' domain;
+mailto_url = mailto email_address;
+
+bare_http_url = (http domain port? path? query? fragment?) - (char* url_boundary_char);
+bare_absolute_url = bare_http_url | mailto_url;
 bare_relative_url = (path query? fragment? | fragment) - (char* url_boundary_char);
 
-delimited_absolute_url = http nonspace+;
+delimited_absolute_url = scheme nonspace+;
 delimited_relative_url = [/#] nonspace*;
 
 delimited_url = '<' delimited_absolute_url >mark_a1 %mark_a2 :>> '>';
@@ -947,6 +954,10 @@ void StateMachine::append_unnamed_url(const std::string_view url) {
 
   if (options.internal_domains.find(std::string(parsed_url.domain)) != options.internal_domains.end()) {
     append_internal_url(parsed_url);
+  } else if (parsed_url.scheme == "mailto") {
+    auto title = url;
+    title.remove_prefix(sizeof("mailto"));
+    append_absolute_link(url, title, parsed_url.domain == options.domain);
   } else {
     append_absolute_link(url, url, parsed_url.domain == options.domain);
   }
