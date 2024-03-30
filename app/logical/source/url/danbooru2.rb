@@ -2,7 +2,7 @@
 
 # The class is called `Danbooru2` instead of `Danbooru` to avoid ambiguity with the top-level `Danbooru` class.
 class Source::URL::Danbooru2 < Source::URL
-  attr_reader :user_id, :post_id, :md5, :image_url
+  attr_reader :user_id, :post_id, :md5, :image_url, :full_image_url
 
   def self.match?(url)
     url.domain.in?(%w[donmai.us donmai.moe])
@@ -32,6 +32,7 @@ class Source::URL::Danbooru2 < Source::URL
     in _, _, *subdirs, /(\h{32})\.\w+\z/i
       @md5 = $1
       @image_url = true
+      @full_image_url = full_image_url_for(file_ext) if subdirs.first.match?(/\A(original|\h{2})\z/)
 
     else
       nil
@@ -42,8 +43,12 @@ class Source::URL::Danbooru2 < Source::URL
     "Danbooru"
   end
 
-  def full_image_url
-    if image_url? && md5.present? && file_ext.present?
+  def candidate_full_image_urls
+    %w[jpg png gif mp4 webm webp avif zip swf].map { |ext| full_image_url_for(ext) }
+  end
+
+  def full_image_url_for(file_ext)
+    if image_url? && md5.present?
       "https://cdn.donmai.us/original/#{md5[0..1]}/#{md5[2..3]}/#{md5}.#{file_ext}"
     end
   end
