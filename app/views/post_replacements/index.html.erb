@@ -14,7 +14,7 @@
       <% t.column "Post", width: "1%" do |post_replacement| %>
         <%= post_preview(post_replacement.post, show_deleted: true) %>
       <% end %>
-      <% t.column "Source" do |post_replacement| %>
+      <% t.column "Source", td: { class: "col-expand" } do |post_replacement| %>
         <dl>
           <dt>Original Source</dt>
           <dd><%= external_link_to post_replacement.original_url, truncate: 64 %></dd>
