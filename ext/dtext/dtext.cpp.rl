@@ -41,6 +41,8 @@ static const std::unordered_map<std::string_view, std::function<bool(std::string
   { "rowspan", [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
 };
 
+static unsigned char ascii_tolower(unsigned char c);
+
 %%{
 machine dtext;
 
@@ -1079,7 +1081,7 @@ void StateMachine::append_wiki_link(const std::string_view prefix, const std::st
   auto title_string = std::string(title);
 
   // "Kantai Collection" -> "kantai_collection"
-  std::transform(normalized_tag.cbegin(), normalized_tag.cend(), normalized_tag.begin(), [](unsigned char c) { return c == ' ' ? '_' : std::tolower(c); });
+  std::transform(normalized_tag.cbegin(), normalized_tag.cend(), normalized_tag.begin(), [](unsigned char c) { return c == ' ' ? '_' : ascii_tolower(c); });
 
   // [[2019]] -> [[~2019]]
   if (std::all_of(normalized_tag.cbegin(), normalized_tag.cend(), ::isdigit)) {
@@ -1107,7 +1109,7 @@ void StateMachine::append_wiki_link(const std::string_view prefix, const std::st
 
   if (!anchor.empty()) {
     std::string normalized_anchor(anchor);
-    std::transform(normalized_anchor.begin(), normalized_anchor.end(), normalized_anchor.begin(), [](char c) { return isalnum(c) ? tolower(c) : '-'; });
+    std::transform(normalized_anchor.begin(), normalized_anchor.end(), normalized_anchor.begin(), [](char c) { return isalnum(c) ? ascii_tolower(c) : '-'; });
     append_html_escaped("#dtext-");
     append_html_escaped(normalized_anchor);
   }
@@ -1195,7 +1197,7 @@ void StateMachine::append_header(char header, const std::string_view id) {
     append_block(">");
   } else {
     auto normalized_id = std::string(id);
-    std::transform(id.begin(), id.end(), normalized_id.begin(), [](char c) { return isalnum(c) ? tolower(c) : '-'; });
+    std::transform(id.begin(), id.end(), normalized_id.begin(), [](char c) { return isalnum(c) ? ascii_tolower(c) : '-'; });
 
     dstack_open_element(block, "<h");
     append_block(header);
@@ -1468,6 +1470,10 @@ std::tuple<std::string_view, std::string_view> StateMachine::trim_url(const std:
   }
 
   return { trimmed, { trimmed.end(), url.end() } };
+}
+
+static unsigned char ascii_tolower(unsigned char c) {
+  return (c >= 'A' && c <= 'Z') ? c ^ 0x20 : c;
 }
 
 // Replace CRLF sequences with LF.
