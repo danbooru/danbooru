@@ -30,20 +30,23 @@ class IqdbClient
       limit = limit.to_i.clamp(1, 1000)
       similarity = similarity.to_f.clamp(0.0, 100.0)
       high_similarity = high_similarity.to_f.clamp(0.0, 100.0)
+      target_url = url.presence || file_url.presence || image_url.presence
 
       if file.present?
         file = file.tempfile
-      elsif url.present?
-        extractor = Source::Extractor.find(url)
-        raise Error, "Search failed: #{url} has multiple images. Enter the URL of a single image" if extractor.image_urls.size > 1
-        raise Error, "Search failed: #{url} has no images" if extractor.image_urls.size == 0
+      elsif target_url.present?
+        extractor = Source::Extractor.find(target_url)
 
-        download_url = extractor.image_urls.first
+        if extractor.parsed_url.image_url?
+          download_url = target_url
+        else
+          raise Error, "#{url} has multiple images. Enter the URL of a single image" if extractor.image_urls.size > 1
+          raise Error, "#{url} has no images" if extractor.image_urls.empty?
+
+          download_url = extractor.image_urls.first
+        end
+
         file = Source::Extractor.find(download_url).download_file!(download_url)
-      elsif image_url.present?
-        file = Source::Extractor.find(image_url).download_file!(image_url)
-      elsif file_url.present?
-        file = Source::Extractor.find(file_url).download_file!(file_url)
       elsif post_id.present?
         file = Post.find(post_id).file(:"180x180")
       elsif media_asset_id.present?
