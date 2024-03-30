@@ -47,6 +47,7 @@ typedef enum element_t {
   INLINE_NODTEXT,
 } element_t;
 
+#ifdef DEBUG
 static const char* element_names[] = {
   "DSTACK_EMPTY",
   "BLOCK_P",
@@ -84,6 +85,7 @@ static const char* element_names[] = {
   "INLINE_SPOILER",
   "INLINE_NODTEXT",
 };
+#endif
 
 class DTextError : public std::runtime_error {
   using std::runtime_error::runtime_error;

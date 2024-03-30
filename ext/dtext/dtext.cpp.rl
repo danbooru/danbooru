@@ -615,7 +615,7 @@ table := |*
 
   open_col => {
     dstack_open_element_attributes(BLOCK_COL, "col");
-    dstack_pop(); // XXX [col] has no end tag
+    dstack_rewind();
   };
 
   open_thead => {
@@ -1337,6 +1337,7 @@ void StateMachine::dstack_rewind() {
     case BLOCK_CODE: append_block("</pre>"); break;
     case BLOCK_TD: append_block("</td>"); break;
     case BLOCK_TH: append_block("</th>"); break;
+    case BLOCK_COL: break; // <col> doesn't have a closing tag.
 
     case INLINE_NODTEXT: break;
     case INLINE_B: append("</strong>"); break;

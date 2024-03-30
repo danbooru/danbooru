@@ -2,12 +2,11 @@ require "mkmf"
 
 CONFIG["MKMF_VERBOSE"] = "1"
 
-$warnflags = "-Wall -Wextra -Werror -Wno-unused-parameter -Wuninitialized -Wnull-dereference -Wformat=2 -Wformat-overflow=2 -Wstrict-overflow=5"
+$warnflags = "-Wall -Wextra -pedantic -Wno-unused-parameter -Wno-implicit-fallthrough -Wno-unused-const-variable"
+$CXXFLAGS << " -std=c++20 -O2 -pipe -fno-strict-aliasing #{$warnflags}"
 
 if ENV["DTEXT_DEBUG"]
-  $CXXFLAGS << " -std=c++20 -O2 -g3 -pipe -flto=auto -fno-strict-aliasing -fsanitize=undefined,leak -D_GNU_SOURCE -DDEBUG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_SANITIZE_VECTOR -D_FORTIFY_SOURCE=2"
-else
-  $CXXFLAGS << " -std=c++20 -O2 -pipe -flto=auto -fno-strict-aliasing -D_GNU_SOURCE -DNDEBUG"
+  $CXXFLAGS << " -g3 -fsanitize=undefined,leak -DDEBUG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_SANITIZE_VECTOR -D_FORTIFY_SOURCE=3"
 end
 
 create_makefile "dtext/dtext"
