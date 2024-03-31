@@ -203,7 +203,7 @@ Rails.application.routes.draw do
     resources :favorites, only: [:index, :create, :destroy]
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
     resource :ai_metadata, only: [:show] do
-      collection { post :create_or_update }
+      collection { put :create_or_update }
       member do
         put :revert
         put :undo

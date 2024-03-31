@@ -17,14 +17,14 @@ AIMetadata.initialize_all = function() {
   }
 
   if ($("#create-post-button").length) {
-    $("#create-post-button").on("click", (e) => {
-      AIMetadata.inject_names();
+    $("#create-post-button").on("click", (_e) => {
+      AIMetadata.inject_names(document);
     });
   }
 };
 
-AIMetadata.inject_names = function() {
-  let customFields = document.querySelectorAll(".custom-metadata-field");
+AIMetadata.inject_names = function(form) {
+  let customFields = form.querySelectorAll(".custom-metadata-field");
   customFields.forEach(el => {
     let [name, value] = el.children;
     if (name.value && value.value) {
@@ -48,7 +48,7 @@ AIMetadata.add_custom_field = function(el, name = "", value = "") {
   removeButton.on("click", (e) => {
     field.remove();
   }).appendTo(field);
-  let newElement = field.insertBefore(el);
+  field.insertBefore(el);
   Autocomplete.initialize_fields(field.children(":first-child"), "ai_metadata_label");
 };
 
@@ -62,7 +62,7 @@ AIMetadata.initialize_edit_ai_metadata_dialog = function() {
       },
       "Submit": function() {
         let form = $("#add-ai-metadata-dialog #edit-ai-metadata").get(0);
-        AIMetadata.inject_names();
+        AIMetadata.inject_names(form);
         Rails.fire(form, "submit");
         $(this).dialog("close");
       },
