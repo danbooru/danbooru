@@ -63,9 +63,8 @@ class ApplicationController < ActionController::Base
   private
 
   def respond_with(subject, *args, model: model_name, **options, &block)
-    if params[:action] == "index" && is_redirect?(subject)
-      redirect_to_show(subject)
-      return
+    if params[:redirect].to_s.present? && params[:action] == "index" && action_methods.include?("show")
+      redirect_to_show(subject) and return
     end
 
     if subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
@@ -77,24 +76,24 @@ class ApplicationController < ActionController::Base
     super
   end
 
+  # Used to redirect a search directly to the result page when a search returns only one result.
+  # Example: /wiki_pages?search[title]=touhou&redirect=true.
+  def redirect_to_show(items)
+    if params[:redirect].to_s.truthy? && items.one? && item_matches_params(items.sole)
+      format = request.format.symbol unless request.format.html?
+      redirect_to send("#{controller_path.singularize}_path", items.sole, variant: params[:variant], format: format)
+      true
+    else
+      false
+    end
+  end
+
   def set_version_comparison(default_type = "previous")
     params[:type] = %w[previous current].include?(params[:type]) ? params[:type] : default_type
   end
 
   def model_name
     controller_name.classify
-  end
-
-  def redirect_to_show(items)
-    if request.format.html?
-      redirect_to send("#{controller_path.singularize}_path", items.first)
-    else
-      redirect_to send("#{controller_path.singularize}_path", items.first, format: request.format.symbol)
-    end
-  end
-
-  def is_redirect?(items)
-    action_methods.include?("show") && params[:redirect].to_s.truthy? && items.one? && item_matches_params(items.first)
   end
 
   def item_matches_params(*)

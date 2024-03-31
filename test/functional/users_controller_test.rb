@@ -76,6 +76,27 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           get users_path, params: { name: "nobody" }
           assert_response :success
         end
+
+        context "for a user tooltip" do
+          should "redirect to the user's profile" do
+            get users_path, params: { name: @user.name, variant: "tooltip" }
+            assert_redirected_to(user_path(@user, variant: "tooltip"))
+          end
+
+          should "return 404 when the name was used by multiple previous users" do
+            name = SecureRandom.uuid.first(20)
+            create(:user_name_change_request, original_name: name)
+            create(:user_name_change_request, original_name: name)
+
+            get_auth users_path, @other_user, params: { name: name, variant: "tooltip" }
+            assert_response 404
+          end
+
+          should "return 404 when the user doesn't exist" do
+            get users_path, params: { name: "nobody", variant: "tooltip" }
+            assert_response 404
+          end
+        end
       end
 
       should respond_to_search({}).with { [@uploader, @other_user, @mod_user, @user, User.system] }
