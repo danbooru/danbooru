@@ -39,7 +39,11 @@ class UsersController < ApplicationController
     @users = authorize User.paginated_search(params)
     @users = @users.includes(:inviter) if request.format.html?
 
-    respond_with(@users)
+    if params[:variant] == "tooltip" && !@users.load.one?
+      render status: 404
+    else
+      respond_with(@users)
+    end
   end
 
   def show
