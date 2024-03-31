@@ -1,8 +1,14 @@
+@import "./utilities";
+
 .ui-autocomplete.ui-widget {
   font-size: var(--text-sm);
   border: 1px solid var(--autocomplete-border-color);
   box-shadow: var(--shadow-lg);
   max-width: 480px;
+  max-height: 480px;
+
+  @extend %thin-scrollbar;
+  padding-right: 0;
 
   div.ui-menu-item-wrapper {
     padding: 0.25em 0.4em;

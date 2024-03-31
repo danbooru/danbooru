@@ -3,7 +3,10 @@
     <%= tag.li class: "ui-menu-item", "data-autocomplete-type": result.type, "data-autocomplete-value": result.value do %>
       <div class="ui-menu-item-wrapper" tabindex="-1">
         <%= link_to_result result do %>
-          <% if result.antecedent.present? %>
+          <% if result.type == "emoji" %>
+            <div class="inline-block prose"><%= DText.new(result.value, inline: true).format_text %></div>
+            <span class="autocomplete-text"><%= highlight_result(result) %></span>
+          <% elsif result.antecedent.present? %>
             <span class="autocomplete-antecedent"><%= highlight_antecedent(result) %></span>
             <span class="autocomplete-arrow">→</span>
             <%= result.label %>

@@ -16,6 +16,8 @@ class AutocompleteComponent < ApplicationComponent
       link_to user_path(result.id), class: "user-#{result.level}", "@click.prevent": "", &block
     when "pool"
       link_to pool_path(result.id), class: "pool-category-#{result.category}", "@click.prevent": "", &block
+    when "emoji"
+      link_to "javascript:void(0)", class: "tag-type-#{Tag.categories.general}", "@click.prevent": "", &block
     else
       link_to posts_path(tags: result.value), class: "tag-type-#{result.category}", "@click.prevent": "", &block
     end
@@ -44,6 +46,8 @@ class AutocompleteComponent < ApplicationComponent
       highlight_matching_words(result.value, query)
     elsif result.type == "mention"
       highlight_wildcard_match(result.label, query + "*")
+    elsif result.type == "emoji"
+      highlight_wildcard_match(result.label, "*" + query + "*")
     elsif query.include?("*")
       highlight_wildcard_match(result.value, query)
     else
