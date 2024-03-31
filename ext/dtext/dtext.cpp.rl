@@ -257,6 +257,8 @@ hr = ws* ('[hr]'i | '<hr>'i) ws* eol+;
 
 code_fence = ('```' ws* (alnum* >mark_a1 %mark_a2) ws* eol) (any* >mark_b1 %mark_b2) :>> (eol '```' ws* eol);
 
+emoji = (':' when after_mention_boundary) ([a-zA-Z0-9_]+) >mark_f1 %mark_f2 ':';
+
 double_quoted_value = '"' (nonnewline+ >mark_b1 %mark_b2) :>> '"';
 single_quoted_value = "'" (nonnewline+ >mark_b1 %mark_b2) :>> "'";
 unquoted_value = alnum+ >mark_b1 %mark_b2;
@@ -403,6 +405,13 @@ inline := |*
 
   (bare_mention | delimited_mention) when mentions_enabled => {
     append_mention({ a1, a2 + 1 });
+  };
+
+  emoji => {
+    if (!append_emoji({ f1, f2 }, "inline")) {
+      append(":");
+      fexec ts + 1;
+    }
   };
 
   newline list_item => {
@@ -759,6 +768,16 @@ main := |*
     }
   };
 
+  ws* emoji ws* eol+ => {
+    dstack_close_leaf_blocks();
+
+    if (!append_emoji({ f1, f2 }, "block")) {
+      dstack_open_element(BLOCK_P, "<p>");
+      fexec ts;
+      fcall inline;
+    }
+  };
+
   hr => {
     dstack_close_leaf_blocks();
     append_block("<hr>");
@@ -922,6 +941,24 @@ void StateMachine::append_mention(const std::string_view name) {
   append("\">@");
   append_html_escaped(name);
   append("</a>");
+}
+
+bool StateMachine::append_emoji(const std::string_view name, const std::string_view mode) {
+  std::string lowercase_name(name);
+  std::transform(name.begin(), name.end(), lowercase_name.begin(), &ascii_tolower);
+
+  if (options.emojis.contains(lowercase_name)) {
+    dstack_open_element(INLINE_EMOJI, "<emoji data-name=\"");
+    append_uri_escaped(lowercase_name);
+    append("\" data-mode=\"");
+    append_uri_escaped(mode);
+    append("\">");
+    dstack_close_element(INLINE_EMOJI, "</emoji>");
+
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void StateMachine::append_id_link(const char * title, const char * id_name, const char * url, const std::string_view id) {
@@ -1348,6 +1385,7 @@ void StateMachine::dstack_rewind() {
     case INLINE_S: append("</s>"); break;
     case INLINE_TN: append("</span>"); break;
     case INLINE_CODE: append("</code>"); break;
+    case INLINE_EMOJI: append("</emoji>"); break;
 
     case BLOCK_MEDIA_EMBED: append_block("</media-embed>"); break;
     case BLOCK_MEDIA_GALLERY: append_block("</media-gallery>"); break;

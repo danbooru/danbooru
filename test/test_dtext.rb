@@ -1777,6 +1777,24 @@ class DTextTest < Minitest::Test
     assert_parse("<p>foo</p><p><br><br></p><p>bar</p>", "foo\n\n[br][br]\n\nbar")
   end
 
+  def test_emoji
+    emojis = %w[smile]
+
+    assert_parse('<p>foo :smile:</p>', "foo :smile:", emojis: [])
+    assert_parse('<p>:smile:</p>', ":smile:", emojis: [])
+
+    assert_parse('<p>foo <emoji data-name="smile" data-mode="inline"></emoji></p>', "foo :smile:", emojis:)
+    assert_parse('<emoji data-name="smile" data-mode="block"></emoji>', ":smile:", emojis:)
+
+    assert_parse('<p>foo<br><emoji data-name="smile" data-mode="inline"></emoji></p>', "foo\n:smile:", emojis:)
+    assert_parse('<emoji data-name="smile" data-mode="block"></emoji><p>foo</p>', " :smile: \nfoo", emojis:)
+
+    assert_parse('<emoji data-name="smile" data-mode="block"></emoji>', ":Smile:", emojis:)
+    assert_parse('<p>(<emoji data-name="smile" data-mode="inline"></emoji>)</p>', "(:smile:)", emojis:)
+    assert_parse('<p>&quot;<emoji data-name="smile" data-mode="inline"></emoji>&quot;</p>', '":smile:"', emojis:)
+    assert_parse('<p><emoji data-name="smile" data-mode="inline"></emoji>:smile:</p>', ":smile::smile:", emojis:)
+  end
+
   def test_inline_mode
     assert_equal("hello", parse_inline("hello").strip)
   end
