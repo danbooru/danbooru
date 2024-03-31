@@ -245,9 +245,14 @@ class DText
     node.replace(html)
   end
 
+  # Insert the emoji value into an <emoji> node.
   def replace_emoji!(node)
-    name = node["data-name"]
-    node.inner_html = emojis[name]
+    lowercase_name = node["data-name"]
+    proper_name, value = emojis.find { |name, _| name.casecmp?(lowercase_name) }
+
+    node["title"] = ":#{proper_name}:"
+    node["data-mode"] = "inline" if inline
+    node.inner_html = value
   end
 
   # Return the DText parsed to HTML. This is before the HTML is rewritten to colorize wiki links and replace

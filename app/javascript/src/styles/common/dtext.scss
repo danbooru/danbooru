@@ -194,13 +194,20 @@ div.prose {
     }
   }
 
-  emoji[data-mode="inline"] img { max-height: 24px; }
-  emoji[data-mode="block"]  img { max-height: 128px; }
-
   emoji[data-mode="block"] {
     display: inline-block;
     font-size: var(--text-xxl);
     line-height: 1.25;
+  }
+
+  emoji[data-mode="inline"] img {
+    max-height: 24px;
+    max-width: 24px;
+  }
+
+  emoji[data-mode="block"] img {
+    max-height: 128px;
+    max-width: 128px;
   }
 
   details {

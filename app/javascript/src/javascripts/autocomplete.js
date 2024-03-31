@@ -25,7 +25,7 @@ Autocomplete.initialize_all = function() {
   });
 
   this.initialize_tag_autocomplete();
-  this.initialize_mention_autocomplete($("form div.input.dtext textarea"));
+  this.initialize_dtext_autocomplete($("form div.input.dtext textarea"));
   this.initialize_fields($('[data-autocomplete="tag"]'), "tag");
   this.initialize_fields($('[data-autocomplete="artist"]'), "artist");
   this.initialize_fields($('[data-autocomplete="pool"]'), "pool");
@@ -49,34 +49,31 @@ Autocomplete.initialize_fields = function($fields, type) {
   });
 };
 
-Autocomplete.initialize_mention_autocomplete = function($fields) {
+// Autocomplete @-mentions and :emoji: references in DText.
+Autocomplete.initialize_dtext_autocomplete = function($fields) {
   $fields.autocomplete({
     select: function(event, ui) {
       Autocomplete.insert_completion(this, ui.item.value);
       return false;
     },
+    position: {
+      at: "left top",
+      my: "left bottom"
+    },
     source: async function(req, resp) {
       var cursor = this.element.get(0).selectionStart;
-      var name = null;
+      let match = req.term.substring(0, cursor).match(/(?<=[ \r\n/"\\()[\]{}<>]|^)([@:])(\S*)$/);
+      let type = match?.[1];
+      let name = match?.[2];
 
-      for (var i = cursor; i >= 1; --i) {
-        if (req.term[i - 1] === " ") {
-          return;
-        }
-
-        if (req.term[i - 1] === "@") {
-          if (i === 1 || /[ \r\n]/.test(req.term[i - 2])) {
-            name = req.term.substring(i, cursor);
-            break;
-          } else {
-            return;
-          }
-        }
-      }
-
-      if (name) {
+      if (type === "@") {
         let results = await Autocomplete.autocomplete_source(name, "mention");
         resp(results);
+      } else if (type === ":") {
+        let results = await Autocomplete.autocomplete_source(name, "emoji", { limit: 50, allowEmpty: true });
+        resp(results);
+      } else {
+        resp([]);
       }
     }
   });
@@ -150,8 +147,8 @@ Autocomplete.render_item = function(list, item) {
   return list.append(item.html);
 };
 
-Autocomplete.autocomplete_source = async function(query, type) {
-  if (query === "") {
+Autocomplete.autocomplete_source = async function (query, type, { allowEmpty = false, limit = Autocomplete.MAX_RESULTS } = {}) {
+  if (query === "" && !allowEmpty) {
     return [];
   }
 
@@ -159,7 +156,7 @@ Autocomplete.autocomplete_source = async function(query, type) {
     "search[query]": query,
     "search[type]": type,
     "version": Autocomplete.VERSION,
-    "limit": Autocomplete.MAX_RESULTS
+    "limit": limit,
   });
 
   let items = $(html).find("li").toArray().map(item => {
