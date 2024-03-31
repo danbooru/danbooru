@@ -820,6 +820,14 @@ module Danbooru
     def custom_sidebar_tags
       ["has:metadata", "is:sfw", "order:rank", "order:views", "self_upload", "is:nsfw -photorealistic", "has:prompt score:>9"]
     end
+
+    # A list of emojis supported in DText.
+    def dtext_emojis
+      @dtext_emojis ||= {
+        # This defines an emoji called :smile: that is replaced with 😄.
+        "smile" => "😄",
+      }
+    end
   end
 
   EnvironmentConfiguration = Struct.new(:config) do
