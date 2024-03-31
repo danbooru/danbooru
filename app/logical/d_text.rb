@@ -294,14 +294,29 @@ class DText
     end.uniq
   end
 
+  # @return [Array<Nokogiri::HTML5::Node>] The list of media embeds in this DText.
+  memoize def embedded_media
+    parsed_html.css("media-embed")
+  end
+
   # @return [Array<Integer>] The list of post IDs used by media embeds in this DText.
   memoize def embedded_post_ids
-    parsed_html.css("media-embed").select { |node| node["data-type"] == "post" }.pluck("data-id").map(&:to_i).uniq
+    embedded_media.select { |node| node["data-type"] == "post" }.pluck("data-id").map(&:to_i).uniq
   end
 
   # @return [Array<Integer>] The list of media asset IDs used by media embeds in this DText.
   memoize def embedded_media_asset_ids
-    parsed_html.css("media-embed").select { |node| node["data-type"] == "asset" }.pluck("data-id").map(&:to_i).uniq
+    embedded_media.select { |node| node["data-type"] == "asset" }.pluck("data-id").map(&:to_i).uniq
+  end
+
+  # @return [Array<Post>] The list of posts used by media embeds in this DText.
+  memoize def embedded_posts
+    Post.where(id: embedded_post_ids)
+  end
+
+  # @return [Array<MediaAsset>] The list of media assets used by media embeds in this DText.
+  memoize def embedded_media_assets
+    MediaAsset.where(id: embedded_media_asset_ids)
   end
 
   # @return [Array<String>] The list of emoji names used by this DText (normalized to lowercase).

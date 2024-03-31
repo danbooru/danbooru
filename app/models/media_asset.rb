@@ -548,6 +548,28 @@ class MediaAsset < ApplicationRecord
     end
   end
 
+  concerning :RatingMethods do
+    # @return [Hash<String, Integer>] A hash of AI ratings ('g', 's', 'q', or 'e') with their scores.
+    def ai_ratings
+      ratings = ai_tags.includes(:tag).select { |ai| ai.tag.name.starts_with?("rating:") }
+      ratings.to_h { |ai_tag| [ai_tag.tag.name.delete_prefix("rating:"), ai_tag.score] }
+    end
+
+    # @return [Array<String, Integer>] The highest confidence AI rating, along with its score.
+    def ai_rating
+      ai_ratings.max_by(&:second)
+    end
+
+    # g => 0, s => 1, q => 2, e => 3
+    def ai_rating_id
+      Post::RATINGS.keys.index(ai_rating.first)
+    end
+
+    def pretty_ai_rating
+      Post::RATINGS.fetch(ai_rating.first)
+    end
+  end
+
   def source_urls
     urls = upload_media_assets.map { |uma| Source::URL.page_url(uma.source_url) || uma.page_url || uma.source_url }
     urls += [post.normalized_source] if post&.normalized_source.present?
