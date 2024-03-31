@@ -5,7 +5,7 @@ div.prose {
     margin-bottom: 0;
   }
 
-  p, ul, pre, blockquote, details, div.spoiler, table, h1, h2, h3, h4, h5, h6, article, media-gallery {
+  p, ul, pre, blockquote, details, div.spoiler, table, h1, h2, h3, h4, h5, h6, article, media-gallery, emoji[data-mode="block"] {
     margin-bottom: 0.75rem;
   }
 
@@ -192,6 +192,15 @@ div.prose {
       line-height: 1.4;
       color: var(--muted-text-color);
     }
+  }
+
+  emoji[data-mode="inline"] img { max-height: 24px; }
+  emoji[data-mode="block"]  img { max-height: 128px; }
+
+  emoji[data-mode="block"] {
+    display: inline-block;
+    font-size: var(--text-xxl);
+    line-height: 1.25;
   }
 
   details {

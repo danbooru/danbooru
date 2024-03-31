@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Comment < ApplicationRecord
+  MAX_LARGE_EMOJI = 20
+  MAX_SMALL_EMOJI = 100
+
   attr_accessor :creator_ip_addr
 
   dtext_attribute :body # defines :dtext_body
@@ -17,6 +20,7 @@ class Comment < ApplicationRecord
   has_many :mod_actions, as: :subject, dependent: :destroy
 
   validates :body, visible_string: true, length: { maximum: 15_000 }, if: :body_changed?
+  validate :validate_body, if: :body_changed?
 
   before_create :autoreport_spam
   before_save :handle_reports_on_deletion
@@ -74,6 +78,16 @@ class Comment < ApplicationRecord
   end
 
   extend SearchMethods
+
+  def validate_body
+    if dtext_body.block_emoji_names.count > MAX_LARGE_EMOJI
+      errors.add(:base, "Can't use more than #{MAX_LARGE_EMOJI} large emoji in a comment")
+    end
+
+    if dtext_body.inline_emoji_names.count > MAX_SMALL_EMOJI
+      errors.add(:base, "Can't use more than #{MAX_SMALL_EMOJI} emoji in a comment")
+    end
+  end
 
   def autoreport_spam
     if SpamDetector.new(self, user_ip: creator_ip_addr).spam?

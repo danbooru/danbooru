@@ -11,7 +11,7 @@ require "dtext" # Load the C extension.
 class DText
   extend Memoist
 
-  attr_reader :dtext, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains, :options
+  attr_reader :dtext, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains, :emojis, :options
 
   # Preprocess a set of DText messages and collect all tag, artist, wiki page, post, and media asset references. Called
   # before rendering a collection of DText messages (e.g. comments or forum posts) to do all database lookups in one batch.
@@ -50,7 +50,8 @@ class DText
   # @param domain [String, nil] If present, treat links to this domain as internal links rather than external links.
   # @param alternate_domains [Array<String>] A list of additional domains for this site where direct links will be converted to shortlinks
   #   (e.g on betabooru.donmai.us, https://danbooru.donmai.us/posts/1234 is converted to post #1234).
-  def initialize(dtext, inline: false, disable_mentions: false, media_embeds: false, base_url: Rails.application.config.relative_url_root, domain: Danbooru::URL.parse!(Danbooru.config.canonical_url).host, alternate_domains: Danbooru.config.alternate_domains)
+  # @param emojis [Hash<String, String>] A hash of emoji (name, value) pairs. The emoji `:name:` is replaced with the value (which may be an HTML <img> or a plaintext emoji).
+  def initialize(dtext, inline: false, disable_mentions: false, media_embeds: false, base_url: Rails.application.config.relative_url_root, domain: Danbooru::URL.parse!(Danbooru.config.canonical_url).host, alternate_domains: Danbooru.config.alternate_domains, emojis: Danbooru.config.dtext_emojis)
     @dtext = dtext
     @inline = inline
     @disable_mentions = disable_mentions
@@ -58,7 +59,8 @@ class DText
     @base_url = base_url
     @domain = domain
     @alternate_domains = alternate_domains
-    @options = { inline:, disable_mentions:, media_embeds:, base_url:, domain:, alternate_domains: }
+    @emojis = emojis
+    @options = { inline:, disable_mentions:, media_embeds:, base_url:, domain:, alternate_domains:, emojis: }
   end
 
   # Convert a string of DText to HTML.
@@ -85,6 +87,10 @@ class DText
 
     fragment.css("a.dtext-wiki-link").each do |node|
       replace_wiki_link!(node, wiki_pages: references[:wiki_pages], tags: references[:tags], artists: references[:artists])
+    end
+
+    fragment.css("emoji").each do |node|
+      replace_emoji!(node)
     end
 
     fragment.to_s.html_safe
@@ -239,12 +245,17 @@ class DText
     node.replace(html)
   end
 
+  def replace_emoji!(node)
+    name = node["data-name"]
+    node.inner_html = emojis[name]
+  end
+
   # Return the DText parsed to HTML. This is before the HTML is rewritten to colorize wiki links and replace
   # <media-embed> and <tag-request-embed> tags.
   #
   # @return [String] The HTML.
   memoize def to_html
-    DText.parse(dtext, inline: inline, disable_mentions: disable_mentions, media_embeds: media_embeds, base_url: base_url, domain: domain, internal_domains: [domain, *alternate_domains].compact_blank)
+    DText.parse(dtext, inline: inline, disable_mentions: disable_mentions, media_embeds: media_embeds, base_url: base_url, domain: domain, internal_domains: [domain, *alternate_domains].compact_blank, emojis: emojis.keys.map(&:downcase))
   end
 
   # Return the DText after parsing it to a Nokogiri HTML5 object.
@@ -286,6 +297,21 @@ class DText
   # @return [Array<Integer>] The list of media asset IDs used by media embeds in this DText.
   memoize def embedded_media_asset_ids
     parsed_html.css("media-embed").select { |node| node["data-type"] == "asset" }.pluck("data-id").map(&:to_i).uniq
+  end
+
+  # @return [Array<String>] The list of emoji names used by this DText (normalized to lowercase).
+  memoize def emoji_names
+    parsed_html.css("emoji").pluck("data-name")
+  end
+
+  # @return [Array<String>] The list of block (large) emojis used by this DText.
+  memoize def block_emoji_names
+    parsed_html.css("emoji").select { |node| node["data-mode"] == "block" }.pluck("data-name")
+  end
+
+  # @return [Array<String>] The list of inline (small) emojis used by this DText.
+  memoize def inline_emoji_names
+    parsed_html.css("emoji").select { |node| node["data-mode"] == "inline" }.pluck("data-name")
   end
 
   # Return a hash of the wiki pages, posts, media assets, aliases, implications, and BURs referenced by a string of DText.

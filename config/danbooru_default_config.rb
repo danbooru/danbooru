@@ -856,6 +856,14 @@ module Danbooru
     def winter_sale_forum_topic_id
     end
 
+    # A list of emojis supported in DText.
+    def dtext_emojis
+      @dtext_emojis ||= {
+        # This defines an emoji called :smile: that is replaced with 😄.
+        "smile" => "😄",
+      }
+    end
+
     def reactions
       {}
     end
