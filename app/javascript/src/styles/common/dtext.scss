@@ -264,6 +264,11 @@ div.prose {
   }
 }
 
+article.comment article.dtext-media-embed,
+article.forum-post article.dtext-media-embed {
+  --media-embed-size: 225px;
+}
+
 div.dtext-preview {
   display: none;
 
