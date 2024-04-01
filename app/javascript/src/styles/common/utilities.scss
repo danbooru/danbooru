@@ -252,6 +252,8 @@ $spacer: 0.25rem; /* 4px */
 .max-h-screen { max-height: 100vh; }
 .max-h-inherit { max-height: inherit; }
 
+.\!max-h-75px { max-height: 75px !important; }
+
 .space-x-1 > * + * { margin-left: 1 * $spacer; }
 .space-x-2 > * + * { margin-left: 2 * $spacer; }
 .space-x-4 > * + * { margin-left: 4 * $spacer; }

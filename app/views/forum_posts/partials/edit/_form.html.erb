@@ -1,6 +1,6 @@
 <%= edit_form_for(forum_post, namespace: "forum_post_#{forum_post.id}") do |f| %>
-  <%= f.input :body, as: :dtext %>
+  <%= f.input :body, label: false, as: :dtext, placeholder: "Type :#{Danbooru.config.dtext_emojis.keys.sample}: or !post #1234 to add an image." %>
 
-  <%= f.button :submit, "Submit" %>
-  <%= dtext_preview_button "forum_post_body" %>
+  <%= f.button :submit, "Submit", class: "button-primary" %>
+  <%= dtext_preview_button "forum_post_body", class: "button-outline-primary" %>
 <% end %>
