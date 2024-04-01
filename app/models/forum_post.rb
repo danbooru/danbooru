@@ -28,6 +28,7 @@ class ForumPost < ApplicationRecord
   validate :validate_deletion_of_original_post
   validate :validate_undeletion_of_post
   validate :validate_body
+  validate :validate_post
 
   before_create :autoreport_spam
   before_save :handle_reports_on_deletion
@@ -125,6 +126,12 @@ class ForumPost < ApplicationRecord
 
     if dtext_body.embedded_media_assets.any? { |embedded_asset| embedded_asset.ai_rating.first.in?(%w[q e]) }
       errors.add(:base, "Can't post non-rating:G images")
+    end
+  end
+
+  def validate_post
+    if CurrentUser.user.is_anonymous? && Danbooru::IpAddress.new(creator_ip_addr).is_proxy?
+      errors.add(:base, "Your IP range is banned")
     end
   end
 

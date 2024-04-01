@@ -157,7 +157,7 @@ class ApplicationController < ActionController::Base
     when UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
       render_error_page(422, exception, message: exception.message)
     when RateLimiter::RateLimitError
-      render_error_page(429, exception, message: "Rate limit exceeded. You're doing that too fast")
+      render_error_page(429, exception, message: "You're doing that too fast. Wait a minute and try again.")
     when PageRemovedError
       render_error_page(451, exception, template: "static/page_removed_error", message: "This page has been removed because of a takedown request")
     when Rack::Timeout::RequestTimeoutException

@@ -3,7 +3,8 @@
 class ForumPostsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  rate_limit :create, rate: 1.0/1.minute, burst: 50
+  rate_limit :create, rate: 1.0/1.minute, burst: 1,  if: -> { CurrentUser.user.is_anonymous? }
+  rate_limit :create, rate: 1.0/1.minute, burst: 10, if: -> { !CurrentUser.user.is_anonymous? }
 
   def new
     @forum_post = authorize ForumPost.new_reply(params)
@@ -38,6 +39,8 @@ class ForumPostsController < ApplicationController
   end
 
   def create
+    CurrentUser.user = User.find_by_name("MD Anonymous") || User.anonymous if CurrentUser.user.is_anonymous?
+
     @forum_post = authorize ForumPost.new(creator: CurrentUser.user, creator_ip_addr: request.remote_ip, topic_id: params.dig(:forum_post, :topic_id))
     @forum_post.update(permitted_attributes(@forum_post))
 
