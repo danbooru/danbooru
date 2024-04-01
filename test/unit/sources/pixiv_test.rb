@@ -30,7 +30,7 @@ module Sources
           tag_name: "nardack",
           tags: %w[神崎蘭子 双葉杏 アイドルマスターシンデレラガールズ Star!! アイマス10000users入り],
           artist_commentary_title: "ツイログ",
-          dtext_artist_commentary_desc: "",
+          dtext_artist_commentary_desc: ""
         )
       end
 
@@ -47,7 +47,7 @@ module Sources
           tag_name: "user_myeg3558",
           tags: %w[Ugoira png blue],
           artist_commentary_title: "ugoira",
-          dtext_artist_commentary_desc: "",
+          dtext_artist_commentary_desc: ""
         )
       end
 
@@ -64,7 +64,7 @@ module Sources
           tag_name: "user_myeg3558",
           tags: %w[Ugoira png blue],
           artist_commentary_title: "ugoira",
-          dtext_artist_commentary_desc: "",
+          dtext_artist_commentary_desc: ""
         )
       end
 
@@ -78,7 +78,7 @@ module Sources
           tag_name: "itiri",
           tags: %w[Fate/GrandOrder フランケンシュタイン(Fate) 水着 バーサーかわいい 新宿のアーチャー パパ製造機 Fate/GO5000users入り フランケンシュタイン(水着) セイバー(Fate)],
           artist_commentary_title: "水着フランたそ",
-          dtext_artist_commentary_desc: "ますたーもひかげですずむ？",
+          dtext_artist_commentary_desc: "ますたーもひかげですずむ？"
         )
       end
 
@@ -93,7 +93,7 @@ module Sources
           tags: [],
           artist_commentary_title: nil,
           dtext_artist_commentary_desc: nil,
-          deleted: true,
+          deleted: true
         )
       end
 
@@ -106,7 +106,7 @@ module Sources
           artist_name: "影おじ (隠れエリア)",
           profile_url: "https://www.pixiv.net/users/6570768",
           profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
-          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber30000users入り 両手に茎 乱交],
+          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber30000users入り 両手に茎 乱交]
         )
       end
 
@@ -122,7 +122,7 @@ module Sources
           artist_name: "影おじ (隠れエリア)",
           profile_url: "https://www.pixiv.net/users/6570768",
           profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
-          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber30000users入り 両手に茎 乱交],
+          tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber30000users入り 両手に茎 乱交]
         )
       end
 
@@ -133,7 +133,7 @@ module Sources
           artist_commentary_title: "Rem's present",
           artist_name: "Anzatiridonia",
           profile_url: "https://www.pixiv.net/users/33589885",
-          tags: %w[AI Re:ゼロから始める異世界生活 レム リゼロ レム(リゼロ) AIイラスト AnythingV3 Present sweater],
+          tags: %w[AI Re:ゼロから始める異世界生活 レム リゼロ レム(リゼロ) AIイラスト AnythingV3 Present sweater]
         )
       end
 
@@ -147,7 +147,7 @@ module Sources
       context "A work with HTML in the commentary should convert the commentary to DText" do
         strategy_should_work(
           "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65985331",
-          dtext_artist_commentary_desc: "[b]bold[/b]\n[i]italic[/i]\nred",
+          dtext_artist_commentary_desc: "[b]bold[/b]\n[i]italic[/i]\nred"
         )
       end
 
@@ -199,7 +199,7 @@ module Sources
         strategy_should_work(
           "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981746",
           tags: %w[test 風景 Fate/GrandOrder 伊19/陸奥 鉛筆 風景10users入り foo FOO],
-          translated_tags: %w[test_paper scenery fate/grand_order i-19_(kancolle) mutsu_(kancolle) foo],
+          translated_tags: %w[test_paper scenery fate/grand_order i-19_(kancolle) mutsu_(kancolle) foo]
         )
       end
 
@@ -213,7 +213,7 @@ module Sources
         strategy_should_work(
           "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=60665428",
           tags: %w[1000users入り Fate/GrandOrder 「両儀式」 アルジュナ(Fate) アルトリア・ペンドラゴン イシュタル(Fate) グランブルーファンタジー マシュ・キリエライト マーリン(Fate) 手袋],
-          translated_tags: %w[fate/grand_order],
+          translated_tags: %w[fate/grand_order]
         )
       end
 
@@ -222,7 +222,7 @@ module Sources
           "https://www.pixiv.net/en/artworks/88487025",
           artist_name: "éé",
           other_names: ["éé"],
-          profile_url: "https://www.pixiv.net/users/66422392",
+          profile_url: "https://www.pixiv.net/users/66422392"
         )
       end
 
@@ -237,7 +237,7 @@ module Sources
           tag_name: "user_myeg3558",
           tags: %w[blue png],
           artist_commentary_title: "single image",
-          dtext_artist_commentary_desc: "description here",
+          dtext_artist_commentary_desc: "description here"
         )
       end
 
@@ -252,7 +252,7 @@ module Sources
           tag_name: "user_myeg3558",
           tags: %w[blue png],
           artist_commentary_title: "single image",
-          dtext_artist_commentary_desc: "description here",
+          dtext_artist_commentary_desc: "description here"
         )
       end
 
@@ -267,7 +267,7 @@ module Sources
           tag_name: "user_myeg3558",
           tags: %w[blue png],
           artist_commentary_title: "single image",
-          dtext_artist_commentary_desc: "description here",
+          dtext_artist_commentary_desc: "description here"
         )
       end
 
@@ -282,7 +282,7 @@ module Sources
           tag_name: nil,
           tags: [],
           artist_commentary_title: nil,
-          dtext_artist_commentary_desc: nil,
+          dtext_artist_commentary_desc: nil
         )
       end
 
@@ -297,7 +297,7 @@ module Sources
           tag_name: nil,
           tags: [],
           artist_commentary_title: nil,
-          dtext_artist_commentary_desc: nil,
+          dtext_artist_commentary_desc: nil
         )
       end
 
@@ -312,10 +312,40 @@ module Sources
           tag_name: nil,
           tags: [],
           artist_commentary_title: nil,
-          dtext_artist_commentary_desc: nil,
+          dtext_artist_commentary_desc: nil
         )
       end
 
+      context "A private page url" do
+        strategy_should_work(
+          "https://www.pixiv.net/en/artworks/unlisted/ntQchboUi1CsqMhDpo5j",
+          image_urls: ["https://i.pximg.net/img-original/img/2021/06/01/00/45/05/90237981-673ede4b6e1780f98dcba5241972ce7b_p0.jpg"],
+          media_files: [{file_size: 662_787}],
+          page_url: "https://www.pixiv.net/artworks/unlisted/ntQchboUi1CsqMhDpo5j",
+          artist_name: "33回転",
+          tag_name: "user_xmfa7574",
+          tags: ["オリジナル"],
+          artist_commentary_title: "Zoom",
+          dtext_artist_commentary_desc: "THANK YOU!!"
+        )
+      end
+
+      context "A private image url" do
+        strategy_should_work(
+          "https://i.pximg.net/img-original/img/2021/06/01/00/45/05/90237981-673ede4b6e1780f98dcba5241972ce7b_p0.jpg",
+          image_urls: ["https://i.pximg.net/img-original/img/2021/06/01/00/45/05/90237981-673ede4b6e1780f98dcba5241972ce7b_p0.jpg"],
+          media_files: [{file_size: 662_787}],
+          page_url: nil,
+          profile_url: nil,
+          artist_name: nil,
+          tag_name: nil,
+          tags: [],
+          artist_commentary_title: nil,
+          dtext_artist_commentary_desc: nil
+        )
+      end
+
+      # rubocop:disable Style/NumericLiterals
       context "parsing illust ids" do
         should "parse ids from illust urls" do
           assert_illust_id(46785915, "https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg")
@@ -358,8 +388,14 @@ module Sources
           assert_nil_illust_id("https://www.pixiv.net/member_illust.php")
           assert_illust_id(64476642, "https://www.pixiv.net/member_illust.php?illust_id=64476642&mode=medium")
         end
+
+        should "not try to parse IDs from private urls" do
+          assert_nil_illust_id("https://i.pximg.net/img-original/img/2021/06/01/00/45/05/90237981-673ede4b6e1780f98dcba5241972ce7b_p0.jpg")
+          assert_nil_illust_id("https://www.pixiv.net/artworks/unlisted/ntQchboUi1CsqMhDpo5j")
+        end
       end
     end
+    # rubocop:enable Style/NumericLiterals
 
     should "Parse Pixiv URLs correctly" do
       assert_equal("https://www.pixiv.net/artworks/39749565", Source::URL.page_url("http://i2.pixiv.net/img12/img/zenze/39749565.png"))
@@ -368,8 +404,11 @@ module Sources
       assert_equal("https://www.pixiv.net/artworks/14901720", Source::URL.page_url("http://i1.pixiv.net/img-original/img/2010/11/30/08/39/58/14901720_p0.png"))
       assert_equal("https://www.pixiv.net/artworks/44524589", Source::URL.page_url("http://i2.pixiv.net/img-zip-ugoira/img/2014/08/05/06/01/10/44524589_ugoira1920x1080.zip"))
 
+      assert_not_equal("https://www.pixiv.net/artworks/90237981", Source::URL.page_url("https://i.pximg.net/img-original/img/2021/06/01/00/45/05/90237981-673ede4b6e1780f98dcba5241972ce7b_p0.jpg"))
+
       assert(Source::URL.image_url?("https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png"))
       assert(Source::URL.image_url?("https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg"))
+      assert(Source::URL.image_url?("https://i.pximg.net/img-original/img/2021/06/01/00/45/05/90237981-673ede4b6e1780f98dcba5241972ce7b_p0.jpg"))
       assert(Source::URL.image_url?("https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip"))
       assert(Source::URL.image_url?("https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg"))
       assert(Source::URL.image_url?("https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png"))
@@ -379,6 +418,7 @@ module Sources
 
       assert(Source::URL.page_url?("https://www.pixiv.net/en/artworks/46324488"))
       assert(Source::URL.page_url?("https://www.pixiv.net/artworks/46324488"))
+      assert(Source::URL.page_url?("https://www.pixiv.net/artworks/unlisted/ntQchboUi1CsqMhDpo5j"))
       assert(Source::URL.page_url?("http://www.pixiv.net/i/18557054"))
       assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054"))
       assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054"))
