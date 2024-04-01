@@ -8,7 +8,8 @@ class CommentsController < ApplicationController
     redirect_to root_path
   end
 
-  rate_limit :create, rate: 1.0/1.minute, burst: 50
+  rate_limit :create, rate: 1.0/1.minute, burst: 1,  if: -> { CurrentUser.user.is_anonymous? }
+  rate_limit :create, rate: 1.0/1.minute, burst: 10, if: -> { !CurrentUser.user.is_anonymous? }
 
   def index
     params[:group_by] ||= "comment" if params[:search].present?
@@ -40,6 +41,8 @@ class CommentsController < ApplicationController
   end
 
   def create
+    CurrentUser.user = User.find_by_name("MD Anonymous") || User.anonymous if CurrentUser.user.is_anonymous?
+
     @comment = authorize Comment.new(creator: CurrentUser.user, creator_ip_addr: request.remote_ip)
     @comment.update(permitted_attributes(@comment))
     flash[:notice] = @comment.valid? ? "Comment posted" : @comment.errors.full_messages.join("; ")
