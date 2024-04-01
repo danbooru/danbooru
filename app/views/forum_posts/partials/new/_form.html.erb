@@ -8,5 +8,5 @@
   <%= f.input :body, label: false, as: :dtext, placeholder: "Type :#{Danbooru.config.dtext_emojis.keys.sample}: or !post #1234 to add an image." %>
 
   <%= f.button :submit, "Submit", class: "button-primary" %>
-  <%= dtext_preview_button "forum_post_body", class: "button-outline-primary" %>
+  <%= dtext_preview_button "forum_post_body", class: "button-outline-primary", media_embeds: forum_post.dtext_body.media_embeds %>
 <% end %>

@@ -7,7 +7,7 @@
 
   <span class="flex gap-2">
     <%= f.button :submit, "Comment", class: "button-primary" %>
-    <%= dtext_preview_button "comment_body", class: "button-outline-primary" %>
+    <%= dtext_preview_button "comment_body", class: "button-outline-primary", media_embeds: comment.dtext_body.media_embeds  %>
     <%= render EmojiSelectorComponent.new %>
   </span>
 <% end %>

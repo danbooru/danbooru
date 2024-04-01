@@ -264,9 +264,10 @@ div.prose {
   }
 }
 
-article.comment article.dtext-media-embed,
-article.forum-post article.dtext-media-embed {
-  --media-embed-size: 225px;
+.new-comment, .edit_comment, .new_forum_post, article.comment, article.forum-post {
+  article.dtext-media-embed {
+    --media-embed-size: 225px;
+  }
 }
 
 div.dtext-preview {
