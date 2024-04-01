@@ -108,11 +108,11 @@ class Comment < ApplicationRecord
   end
 
   def validate_comment
-    if CurrentUser.user.is_anonymous? && Danbooru::IpAddress.new(creator_ip_addr).is_proxy?
+    if creator.name == "MD_Anonymous" && Danbooru::IpAddress.new(creator_ip_addr).is_proxy?
       errors.add(:base, "Your IP range is banned")
     end
 
-    if CurrentUser.user.is_anonymous? && body.match?(Regexp.union(Danbooru.config.comment_blacklist))
+    if creator.name == "MD_Anonymous" && body.match?(Regexp.union(Danbooru.config.comment_blacklist))
       errors.add(:base, "Whoops, can't say that on a Christian imageboard!")
     end
   end
