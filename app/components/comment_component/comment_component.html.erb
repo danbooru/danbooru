@@ -146,9 +146,5 @@
         <% end %>
       <% end %>
     </menu>
-
-    <% if policy(comment).update? && !redact_deleted? %>
-      <%= render "comments/form", comment: comment, hidden: true %>
-    <% end %>
   </div>
 </article>
