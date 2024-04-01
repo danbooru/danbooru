@@ -1,0 +1,21 @@
+<span class="inline-flex flex-wrap gap-1 justify-center items-center min-h-8" x-data="{ search: '' }">
+  <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
+    <% menu.with_button do %>
+      <%= add_reaction_icon(class: "h-6", "x-on:click": "$nextTick(() => $refs?.search?.focus())") %>
+    <% end %>
+
+    <% menu.with_item do %>
+      <div>
+        <input type="text" placeholder="Search emoji..." class="emoji-search w-full mb-2" x-ref="search" x-model="search" x-on:keyup.escape="Danbooru.Shortcuts.hide_tooltips()">
+
+        <div class="h-225px w-320px thin-scrollbar prose">
+          <% Danbooru.config.dtext_emojis.each do |name, value| %>
+            <%= tag.span class: "inline-block w-24px h-24px my-0.5 cursor-pointer hover:opacity-50", "x-on:click": %{$($event.target).closest("form").find("textarea").val((i, text) => text + ":#{name}:\\n"); Danbooru.Shortcuts.hide_tooltips()}, "x-show": "'#{j name}'.toLowerCase().includes(search.toLowerCase().replace(/[^a-zA-Z0-9]/g, ''))" do %>
+              <%= tag.emoji value.html_safe, "data-name": name.downcase, "data-mode": "inline", title: ":#{name}:" %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</span>
