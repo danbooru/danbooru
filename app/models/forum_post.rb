@@ -28,7 +28,7 @@ class ForumPost < ApplicationRecord
   validate :validate_deletion_of_original_post
   validate :validate_undeletion_of_post
   validate :validate_body
-  validate :validate_post
+  validate :validate_post, if: :body_changed?
 
   before_create :autoreport_spam
   before_save :handle_reports_on_deletion
@@ -130,7 +130,7 @@ class ForumPost < ApplicationRecord
   end
 
   def validate_post
-    if creator.name == "MD_Anonymous" && Danbooru::IpAddress.new(creator_ip_addr).is_proxy?
+    if creator.name == "MD_Anonymous" && creator_ip_addr.present? && Danbooru::IpAddress.new(creator_ip_addr).is_proxy?
       errors.add(:base, "Your IP range is banned")
     end
 
