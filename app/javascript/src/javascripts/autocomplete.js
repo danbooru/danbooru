@@ -61,9 +61,11 @@ Autocomplete.initialize_dtext_autocomplete = function($fields) {
     },
     source: async function(req, resp) {
       var cursor = this.element.get(0).selectionStart;
-      let match = req.term.substring(0, cursor).match(/(?<=[ \r\n/"\\()[\]{}<>]|^)([@:])(\S*)$/);
-      let type = match?.[1];
-      let name = match?.[2];
+      let match = req.term.substring(0, cursor).match(/([ \r\n/"\\()[\]{}<>]|^)([@:])(\S*)$/);
+
+      let prefix = match?.[1];
+      let type = match?.[2];
+      let name = match?.[3];
 
       if (type === "@") {
         let results = await Autocomplete.autocomplete_source(name, "mention");
