@@ -20,7 +20,7 @@ class Comment < ApplicationRecord
 
   validates :body, visible_string: true, length: { maximum: 15_000 }, if: :body_changed?
   validate :validate_body, if: :body_changed?
-  validate :validate_comment
+  validate :validate_comment, if: :body_changed?
 
   before_create :autoreport_spam
   before_save :handle_reports_on_deletion
@@ -107,7 +107,7 @@ class Comment < ApplicationRecord
   end
 
   def validate_comment
-    if creator.name == "MD_Anonymous" && Danbooru::IpAddress.new(creator_ip_addr).is_proxy?
+    if creator.name == "MD_Anonymous" && creator_ip_addr.present? && Danbooru::IpAddress.new(creator_ip_addr).is_proxy?
       errors.add(:base, "Your IP range is banned")
     end
 
