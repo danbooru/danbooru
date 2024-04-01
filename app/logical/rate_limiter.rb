@@ -35,11 +35,16 @@ class RateLimiter
   # @param burst [Float] The burst limit (the maximum number of actions you can
   #   perform in one burst before being rate limited).
   # @param user [User] The current user.
-  # @param ip_addr [String] The user's IP address.
+  # @param request [ActionDispatch::Request] The HTTP request.
   # @return [RateLimit] The rate limit for the action.
-  def self.build(action:, user:, ip_addr: nil, **options)
-    ip_addr = Danbooru::IpAddress.parse(ip_addr) if ip_addr.present?
-    keys = [(user.cache_key unless user.is_anonymous?), ("ip/#{ip_addr.subnet.to_s}" if ip_addr.present?)].compact
+  def self.build(action:, user:, request: nil, **options)
+    ip_addr = Danbooru::IpAddress.parse(request.remote_ip) if request&.remote_ip.present?
+
+    keys = []
+    keys << user.cache_key unless user.is_anonymous?
+    keys << "ip/#{ip_addr.subnet.to_s}" if ip_addr.present?
+    keys << "session/#{request.session.id}" if request&.session.present?
+
     RateLimiter.new(action, keys, **options)
   end
 

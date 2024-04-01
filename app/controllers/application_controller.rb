@@ -41,7 +41,7 @@ class ApplicationController < ActionController::Base
 
     before_action(only: action, if: if_proc) do
       key = "#{controller_name}:#{action}"
-      rate_limiter = RateLimiter.build(action: key, rate: rate, burst: burst, user: CurrentUser.user, ip_addr: request.remote_ip)
+      rate_limiter = RateLimiter.build(action: key, rate: rate, burst: burst, user: CurrentUser.user, request: request)
       headers["X-Rate-Limit"] = rate_limiter.to_json
       rate_limiter.limit!
     end
@@ -117,7 +117,7 @@ class ApplicationController < ActionController::Base
       rate: CurrentUser.user.api_regen_multiplier,
       burst: 200,
       user: CurrentUser.user,
-      ip_addr: request.remote_ip,
+      request: request,
     )
 
     headers["X-Rate-Limit"] = rate_limiter.to_json
