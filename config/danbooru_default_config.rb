@@ -230,6 +230,11 @@ module Danbooru
       []
     end
 
+    # An array of regexes containing disallowed words in comments and forum posts.
+    def comment_blacklist
+      []
+    end
+
     # Large resize image width. Set to nil to disable.
     def large_image_width
       850
