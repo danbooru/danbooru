@@ -12,8 +12,8 @@ gem 'ruby-vips'
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
 gem 'responders'
-gem 'dtext_rb', git: "https://github.com/danbooru/dtext_rb.git", require: "dtext"
-# gem 'dtext_rb', git: "/danbooru/lib/dtext_rb", require: "dtext"
+gem 'dtext_rb', require: "dtext"
+# gem 'dtext_rb', path: "lib/dtext_rb", require: "dtext"
 gem 'memoist'
 gem 'daemons'
 gem 'oauth2'
