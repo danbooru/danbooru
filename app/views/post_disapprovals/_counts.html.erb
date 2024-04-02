@@ -15,7 +15,10 @@
     <% end %>
 
     <% if disapprovals.map(&:message).any?(&:present?) %>
-      Messages: <%= disapprovals.map(&:message).select(&:present?).map { |msg| "\"#{format_text(msg, inline: true)}\"" }.to_sentence.html_safe %>.
+      Messages:
+      <span class="prose">
+        <%= disapprovals.select { _1.message.present? }.map { |disapproval| %{"#{disapproval.dtext_message.format_text}"} }.to_sentence.html_safe %>.
+      </span>
     <% end %>
   </p>
 <% end %>
