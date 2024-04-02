@@ -6,6 +6,8 @@ class PostDisapprovalsController < ApplicationController
   def create
     @post_disapproval = authorize PostDisapproval.new(user: CurrentUser.user, **permitted_attributes(PostDisapproval))
     @post_disapproval.save
+
+    flash[:notice] = @post_disapproval.errors.none? ? "Post disapproved" : @post_disapproval.errors.full_messages.join("; ")
     respond_with(@post_disapproval)
   end
 
