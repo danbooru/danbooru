@@ -11,7 +11,7 @@
 # @see https://guides.rubyonrails.org/active_record_validations.html#custom-validators
 class VisibleStringValidator < ActiveModel::EachValidator
   def validate_each(record, attr, string)
-    return if options[:allow_empty] && string.empty?
+    return if options[:allow_empty] && string.to_s.empty?
 
     if string.nil? || string.invisible?
       record.errors.add(attr, "can't be blank")
