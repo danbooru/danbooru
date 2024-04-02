@@ -3,11 +3,15 @@
     <%= f.hidden_field :post_id %>
   <% end %>
 
-  <%= f.input :body, label: false, as: :dtext, placeholder: "Type :#{Danbooru.config.dtext_emojis.keys.sample}: or !post #1234 to add an image.", input_html: { class: "!max-h-75px" } %>
+  <%= f.input :body, label: false, as: :dtext, placeholder: "Post a comment", input_html: { class: "!max-h-120px" } %>
 
-  <span class="flex gap-2">
+  <span class="flex gap-2 items-center">
     <%= f.button :submit, "Comment", class: "button-primary" %>
-    <%= dtext_preview_button "comment_body", class: "button-outline-primary", media_embeds: comment.dtext_body.media_embeds  %>
+    <%= dtext_preview_button "comment_body", class: "button-outline-primary", media_embeds: comment.dtext_body.media_embeds %>
     <%= render EmojiSelectorComponent.new %>
+
+    <% if comment.new_record? %>
+      <%= f.input :do_not_bump_post, label: "No bump", wrapper_html: { class: "!m-0" } %>
+    <% end %>
   </span>
 <% end %>

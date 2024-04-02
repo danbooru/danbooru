@@ -13,12 +13,8 @@
 
   <% if policy(Comment).create? %>
     <div class="new-comment">
-      <% if limit.present? %>
-        <p><%= link_to "Post comment", new_comment_path(comment: { post_id: post.id }), class: "expand-comment-response" %></p>
-        <%= render "comments/form", comment: post.comments.new, hidden: true %>
-      <% else %>
-        <%= render "comments/form", comment: post.comments.new, hidden: false %>
-      <% end %>
+      <p><%= link_to "Post comment", new_comment_path(comment: { post_id: post.id }), class: "expand-comment-response" %></p>
+      <%= render "comments/form", comment: post.comments.new, hidden: true %>
     </div>
   <% end %>
 </div>

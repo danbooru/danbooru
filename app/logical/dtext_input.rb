@@ -26,7 +26,7 @@ class DtextInput < SimpleForm::Inputs::Base
       end
 
       t.concat t.tag.div(id: "dtext-preview", class: "dtext-preview prose")
-      # t.concat t.tag.span(t.link_to("Formatting help", t.dtext_help_path, remote: true, method: :get), class: "hint dtext-hint")
+      t.concat t.tag.span(t.link_to("Formatting help", t.dtext_help_path, remote: true, method: :get), class: "hint dtext-hint")
     end
   end
 end
