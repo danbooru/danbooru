@@ -254,10 +254,15 @@ WORKDIR /danbooru
 
 RUN apt-get install -y --no-install-recommends libpq-dev libglib2.0-dev
 
-COPY --link Gemfile Gemfile.lock ./
-RUN chown danbooru:danbooru /danbooru
-
+COPY --chown=danbooru:danbooru lib/dtext_rb/ lib/dtext_rb/
 USER danbooru
+
+RUN <<EOS
+  cd lib/dtext_rb
+  bin/install
+EOS
+
+COPY --link Gemfile Gemfile.lock ./
 RUN <<EOS
   BUNDLE_FROZEN=1 bundle install --no-cache --jobs $(nproc)
 
