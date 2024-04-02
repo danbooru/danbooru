@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+
+exec Gem.bin_path("dtext_rb", "cdtext.exe"), *ARGV
