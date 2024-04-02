@@ -74,7 +74,9 @@
 
       <% if policy(comment).reply? %>
         <li class="comment-reply">
-          <% if context == :index_by_comment %>
+          <% if current_user.is_anonymous? %>
+            <%= link_to "Reply", login_path(url: request.fullpath) %>
+          <% elsif context == :index_by_comment %>
             <%= link_to "Reply", new_comment_path(id: comment, comment: { post_id: comment.post_id }) %>
           <% else %>
             <%= link_to "Reply", new_comment_path(id: comment, comment: { post_id: comment.post_id }), remote: true %>
