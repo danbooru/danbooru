@@ -20,7 +20,6 @@ class Comment < ApplicationRecord
 
   validates :body, visible_string: true, length: { maximum: 15_000 }, if: :body_changed?
   validate :validate_body, if: :body_changed?
-  validate :validate_comment, if: :body_changed?
 
   before_create :autoreport_spam
   before_save :handle_reports_on_deletion
@@ -103,16 +102,6 @@ class Comment < ApplicationRecord
 
     if (embedded_asset = dtext_body.embedded_media_assets.find { |embedded_asset| embedded_asset.ai_rating_id > post.rating_id })
       errors.add(:base, "Can't post a #{embedded_asset.pretty_ai_rating.downcase} image on a #{post.pretty_rating.downcase} post")
-    end
-  end
-
-  def validate_comment
-    if creator.name == "MD_Anonymous" && creator_ip_addr.present? && Danbooru::IpAddress.new(creator_ip_addr).is_proxy?
-      errors.add(:base, "Your IP range is banned")
-    end
-
-    if creator.name == "MD_Anonymous" && body.match?(Regexp.union(Danbooru.config.comment_blacklist))
-      errors.add(:base, "Whoops, can't say that on a Christian imageboard!")
     end
   end
 

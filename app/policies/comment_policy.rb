@@ -2,7 +2,7 @@
 
 class CommentPolicy < ApplicationPolicy
   def create?
-    unbanned? || user.is_anonymous?
+    unbanned?
   end
 
   def update?
