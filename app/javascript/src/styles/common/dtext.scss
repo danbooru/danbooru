@@ -1,4 +1,7 @@
 div.prose {
+  --max-sticker-size: 64px;
+  --max-emoji-size: 24px;
+
   word-break: break-word;
 
   *:last-child {
@@ -201,13 +204,13 @@ div.prose {
   }
 
   emoji[data-mode="inline"] img {
-    max-height: 24px;
-    max-width: 24px;
+    max-height: var(--max-emoji-size);
+    max-width: var(--max-emoji-size);
   }
 
   emoji[data-mode="block"] img {
-    max-height: 128px;
-    max-width: 128px;
+    max-height: var(--max-sticker-size);
+    max-width: var(--max-sticker-size);
   }
 
   details {
