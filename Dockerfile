@@ -252,7 +252,7 @@ EOS
 FROM build-ruby AS build-gems
 WORKDIR /danbooru
 
-RUN apt-get install -y --no-install-recommends libpq-dev libglib2.0-dev
+RUN apt-get install -y --no-install-recommends libpq-dev ragel=6.10-4
 
 COPY --chown=danbooru:danbooru lib/dtext_rb/ lib/dtext_rb/
 USER danbooru
@@ -381,7 +381,7 @@ FROM danbooru-base AS development
 
 RUN <<EOS
   apt-get update
-  apt-get install -y --no-install-recommends g++ make git sudo gpg socat
+  apt-get install -y --no-install-recommends g++ make ragel=6.10-4 git sudo gpg socat
 
   groupadd admin -U danbooru
   passwd -d danbooru

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dtext_rb (1.12.8)
+    dtext_rb (1.13.0)
 
 GEM
   remote: https://rubygems.org/
@@ -10,8 +10,6 @@ GEM
     cgi (0.4.1)
     minitest (5.22.3)
     rake (13.2.0)
-    rake-compiler (1.2.7)
-      rake
 
 PLATFORMS
   ruby
@@ -22,7 +20,6 @@ DEPENDENCIES
   dtext_rb!
   minitest (~> 5.15)
   rake (~> 13)
-  rake-compiler (~> 1.1)
 
 BUNDLED WITH
    2.5.5
