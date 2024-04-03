@@ -3,17 +3,9 @@
 # ENV["G_MESSAGES_DEBUG"] = "all"
 
 require "bundler/gem_tasks"
-require "rake/extensiontask"
 require "rake/testtask"
 
-Rake::ExtensionTask.new "dtext" do |ext|
-  # this goes here to ensure ragel runs *before* the extension is compiled.
-  task :compile => ["ext/dtext/dtext.cpp", "ext/dtext/rb_dtext.cpp"]
-  ext.lib_dir = "lib/dtext"
-end
-
-CLOBBER.include %w[ext/dtext/dtext.cpp]
-CLEAN.include %w[lib/dtext/dtext.so bin/cdtext.exe]
+CLEAN.include FileList["**/*.{so,o}", "ext/dtext/Makefile", "bin/cdtext.exe", "pkg"]
 
 #task compile: "bin/cdtext.exe"
 #file "bin/cdtext.exe" => "ext/dtext/dtext.cpp" do
@@ -22,17 +14,19 @@ CLEAN.include %w[lib/dtext/dtext.so bin/cdtext.exe]
 #  sh "g++ -DCDTEXT -o bin/cdtext.exe ext/dtext/dtext.cpp #{flags} #{libs}"
 #end
 
-file "ext/dtext/dtext.cpp" => Dir["ext/dtext/dtext.{cpp.rl,h}", "Rakefile"] do
-  sh "ragel -G2 ext/dtext/dtext.cpp.rl -o ext/dtext/dtext.cpp"
-end
-
-task test: :compile
 Rake::TestTask.new(:test) do |t|
   t.test_files = FileList["test/**/test_*.rb"]
 end
 
 task bench: :compile do
-  require_relative "test/bench_dtext.rb"
+  require_relative "test/bench_dtext"
 end
 
+file "lib/dtext/dtext.so" => FileList["ext/dtext/*.{cpp,rl,h}"] do
+  system "cd ext/dtext && ruby extconf.rb && make && mv dtext.so ../../lib/dtext"
+end
+
+task compile: "lib/dtext/dtext.so"
+task build: :compile
+task test: :compile
 task default: :test
