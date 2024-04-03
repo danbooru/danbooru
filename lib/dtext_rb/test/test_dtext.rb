@@ -3,7 +3,6 @@
 require "dtext"
 require "cgi"
 require "minitest/autorun"
-require "nokogiri"
 
 class DTextTest < Minitest::Test
   def parse(*args, **options)
@@ -38,9 +37,9 @@ class DTextTest < Minitest::Test
 
   def assert_mention(expected_username, input, **options)
     html = parse(input)
-    actual_username = Nokogiri::HTML5.fragment(html).css("a.dtext-user-mention-link").text
+    actual_username = html[/data-user-name="(.*?)"/, 1]
 
-    assert_equal("@" + expected_username, actual_username)
+    assert_equal(expected_username, actual_username)
   end
 
   def assert_wiki_pages(expected, dtext)
