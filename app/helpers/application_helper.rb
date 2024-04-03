@@ -242,6 +242,14 @@ module ApplicationHelper
     to_sentence(links, **options)
   end
 
+  def link_to_media_asset(media_asset, url: media_asset, classes: nil, **options)
+    duration_text = media_asset.duration.present? ? " (#{duration_to_hhmmss(media_asset.duration)})" : ""
+    size_text = "#{media_asset.image_width}x#{media_asset.image_height}"
+    file_text = "#{number_to_human_size(media_asset.file_size)} .#{media_asset.file_ext}"
+
+    link_to("#{file_text}, #{size_text}#{duration_text}", url, class: classes, **options)
+  end
+
   def link_to_user(user, text = nil, url: user, classes: nil, **options)
     return "anonymous" if user.blank?
 

@@ -1,4 +1,0 @@
-<%= link_to media_asset, class: classes do %>
-  <%= number_to_human_size(file_size) %> .<%= file_ext %>, <%= image_width %>x<%= image_height %>
-  <% if duration.present? %>(<%= duration_to_hhmmss(duration) %>)<% end %>
-<% end %>

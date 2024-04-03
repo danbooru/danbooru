@@ -58,7 +58,7 @@
           <% end %>
 
           <% if model.old_media_asset.present? %>
-            <%= render MediaAssetLinkComponent.new(media_asset: model.old_media_asset) %>
+            <%= link_to_media_asset model.old_media_asset %>
           <% elsif model.old_file_size && model.old_file_ext && model.old_image_width && model.old_image_height %>
             <%= model.old_file_size.to_fs(:human_size, precision: 4) %>
             .<%= model.old_file_ext %>
@@ -76,7 +76,7 @@
           <% end %>
 
           <% if model.media_asset.present? %>
-            <%= render MediaAssetLinkComponent.new(media_asset: model.media_asset) %>
+            <%= link_to_media_asset model.media_asset %>
           <% elsif model.file_size && model.file_ext && model.image_width && model.image_height %>
             <%= model.file_size.to_fs(:human_size, precision: 4) %>
             .<%= model.file_ext %>

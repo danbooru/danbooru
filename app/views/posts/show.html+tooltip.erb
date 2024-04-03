@@ -19,7 +19,7 @@
   <% end %>
 
   <%= link_to "#{@post.rating.upcase}", posts_path(tags: "rating:#{@post.pretty_rating}"), class: "post-tooltip-rating inactive-link" %>
-  <%= render MediaAssetLinkComponent.new(media_asset: @post.media_asset, classes: "post-tooltip-dimensions inactive-link") %>
+  <%= link_to_media_asset @post.media_asset, classes: "post-tooltip-dimensions inactive-link" %>
 
   <% if @post.parsed_source.present? %>
     <%= external_link_to @post.normalized_source, external_site_icon(@post.parsed_source.site_name, class: "h-3"), title: @post.normalized_source, class: "post-tooltip-source" %>

@@ -10,4 +10,4 @@
   <%= link_to link_slash_icon(class: "h-2"), posts_path(tags: "source:none"), title: "no source", class: "align-top" %>
 <% end %>
 
-<%= render MediaAssetLinkComponent.new(media_asset: post.media_asset) %>
+<%= link_to_media_asset post.media_asset %>

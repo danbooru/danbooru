@@ -29,7 +29,7 @@
                 </span>
               <% end %>
 
-              <%= render MediaAssetLinkComponent.new(media_asset: media_asset) %>
+              <%= link_to_media_asset post.media_asset %>
 
               <span>
                 <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
