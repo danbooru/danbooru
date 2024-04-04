@@ -2,4 +2,4 @@
 
 require 'dtext'
 
-puts DTextRagel.parse(ARGF.read)
+puts DText.parse(ARGF.read)
