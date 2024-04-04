@@ -91,6 +91,7 @@ action media_embeds_enabled { options.f_media_embeds }
 action in_quote { dstack_is_open(BLOCK_QUOTE) }
 action in_expand { dstack_is_open(BLOCK_EXPAND) }
 action in_spoiler { dstack_is_open(BLOCK_SPOILER) }
+action is_allowed_emoji { is_allowed_emoji({ f1, f2 + 1 }) }
 action save_tag_attribute { tag_attributes[{ a1, a2 }] = { b1, b2 }; }
 
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
@@ -257,7 +258,8 @@ hr = ws* ('[hr]'i | '<hr>'i) ws* eol+;
 
 code_fence = ('```' ws* (alnum* >mark_a1 %mark_a2) ws* eol) (any* >mark_b1 %mark_b2) :>> (eol '```' ws* eol);
 
-emoji = (':' when after_mention_boundary) ([a-zA-Z0-9_]+) >mark_f1 %mark_f2 ':';
+# %mark_f2 doesn't work because it doesn't run until after is_allowed_emoji is called.
+emoji = ':' ([a-zA-Z0-9_]+) >mark_f1 @mark_f2 (':' when is_allowed_emoji);
 
 double_quoted_value = '"' (nonnewline+ >mark_b1 %mark_b2) :>> '"';
 single_quoted_value = "'" (nonnewline+ >mark_b1 %mark_b2) :>> "'";
@@ -408,10 +410,7 @@ inline := |*
   };
 
   emoji => {
-    if (!append_emoji({ f1, f2 }, "inline")) {
-      append(":");
-      fexec ts + 1;
-    }
+    append_emoji({ f1, f2 + 1 }, "inline");
   };
 
   newline list_item => {
@@ -522,6 +521,12 @@ inline := |*
     if (dstack_close_element(BLOCK_TD, { ts, te })) {
       fret;
     }
+  };
+
+  newline ws* emoji ws* eol => {
+    dstack_close_leaf_blocks();
+    fexec ts;
+    fret;
   };
 
   blank_lines => {
@@ -770,12 +775,7 @@ main := |*
 
   ws* emoji ws* eol+ => {
     dstack_close_leaf_blocks();
-
-    if (!append_emoji({ f1, f2 }, "block")) {
-      dstack_open_element(BLOCK_P, "<p>");
-      fexec ts;
-      fcall inline;
-    }
+    append_emoji({ f1, f2 + 1 }, "block");
   };
 
   hr => {
@@ -943,22 +943,16 @@ void StateMachine::append_mention(const std::string_view name) {
   append("</a>");
 }
 
-bool StateMachine::append_emoji(const std::string_view name, const std::string_view mode) {
+void StateMachine::append_emoji(const std::string_view name, const std::string_view mode) {
   std::string lowercase_name(name);
   std::transform(name.begin(), name.end(), lowercase_name.begin(), &ascii_tolower);
 
-  if (options.emojis.contains(lowercase_name)) {
-    dstack_open_element(INLINE_EMOJI, "<emoji data-name=\"");
-    append_uri_escaped(lowercase_name);
-    append("\" data-mode=\"");
-    append_uri_escaped(mode);
-    append("\">");
-    dstack_close_element(INLINE_EMOJI, "</emoji>");
-
-    return true;
-  } else {
-    return false;
-  }
+  dstack_open_element(INLINE_EMOJI, "<emoji data-name=\"");
+  append_uri_escaped(lowercase_name);
+  append("\" data-mode=\"");
+  append_uri_escaped(mode);
+  append("\">");
+  dstack_close_element(INLINE_EMOJI, "</emoji>");
 }
 
 void StateMachine::append_id_link(const char * title, const char * id_name, const char * url, const std::string_view id) {
@@ -1477,6 +1471,13 @@ void StateMachine::clear_matches() {
   f2 = NULL;
   g1 = NULL;
   g2 = NULL;
+}
+
+bool StateMachine::is_allowed_emoji(const std::string_view name) {
+  std::string lowercase_name(name);
+  std::transform(name.begin(), name.end(), lowercase_name.begin(), &ascii_tolower);
+
+  return options.emojis.contains(lowercase_name);
 }
 
 // True if a mention is allowed to start after this character.
