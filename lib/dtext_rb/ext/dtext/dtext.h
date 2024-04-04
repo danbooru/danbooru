@@ -159,6 +159,7 @@ public:
 
   std::string parse_inline(const std::string_view dtext);
   std::string parse_basic_inline(const std::string_view dtext);
+  void register_emoji_list(const std::string list_name, std::vector<std::string_view> emoji_names);
 
   void dstack_push(element_t element);
   element_t dstack_pop();
@@ -203,12 +204,13 @@ public:
   void append_block_code(const std::string_view language = {});
   void append_tag_request_embed(const std::string_view type, const std::string_view id);
   void append_media_embed(const std::string_view media_type, const std::string_view id, const std::string_view caption, bool media_gallery);
-  bool append_emoji(const std::string_view name, const std::string_view mode);
+  void append_emoji(const std::string_view name, const std::string_view mode);
 
   void clear_matches();
 
   bool is_inline_element(element_t type);
   bool is_internal_url(const std::string_view url);
+  bool is_allowed_emoji(const std::string_view name);
   std::tuple<std::string_view, std::string_view> trim_url(const std::string_view url);
 
 private:
