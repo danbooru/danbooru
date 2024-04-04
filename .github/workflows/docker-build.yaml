@@ -149,6 +149,7 @@ jobs:
     if: github.ref == 'refs/heads/beta'
     needs: docker-build
     concurrency: deploy-beta
+
     environment:
       name: beta
       url: https://beta.aibooru.online
@@ -170,3 +171,30 @@ jobs:
     - name: Deploy to Betabooru
       run: |
         kubectl rollout restart deploy/betabooru -n danbooru
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/production'
+    needs: docker-build
+    concurrency: deploy-production
+
+    environment:
+      name: production
+      url: https://aibooru.online
+
+    steps:
+    - name: Install Kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: v1.21.5
+
+    - name: Configure Kubectl
+      run: |
+        mkdir -p ~/.kube
+        echo "$KUBECONFIG_YAML" > ~/.kube/config
+      env:
+        KUBECONFIG_YAML: ${{secrets.KUBECONFIG_YAML}}
+
+    - name: Deploy to Production
+      run: |
+        kubectl rollout restart deploy/danbooru deploy/jobs deploy/cron -n danbooru
