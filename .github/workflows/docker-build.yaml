@@ -198,3 +198,24 @@ jobs:
     - name: Deploy to Production
       run: |
         kubectl rollout restart deploy/danbooru deploy/jobs deploy/cron -n danbooru
+
+  tag-production:
+    runs-on: ubuntu-latest
+    needs: deploy-production
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set env
+      run: echo "::set-env name=NOW::$(date +'%Y-%m-%dT%H:%M:%S')"
+
+    - name: Create tag
+      uses: rickstaa/action-create-tag@v1
+      id: tag_create
+      with:
+        tag: production-${{ env.NOW }}
+        message: "Production deployment"
+        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+        gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
