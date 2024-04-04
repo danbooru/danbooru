@@ -1477,7 +1477,7 @@ bool StateMachine::is_allowed_emoji(const std::string_view name) {
   std::string lowercase_name(name);
   std::transform(name.begin(), name.end(), lowercase_name.begin(), &ascii_tolower);
 
-  return options.emojis.contains(lowercase_name);
+  return options.emoji_list->contains(lowercase_name);
 }
 
 // True if a mention is allowed to start after this character.

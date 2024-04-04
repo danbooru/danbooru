@@ -36,12 +36,41 @@ static auto parse_dtext(VALUE input, DTextOptions options = {}) {
   }
 }
 
+// Convert a Ruby emoji list (an array of strings) to a C++ emoji list (an unordered set of strings).
+static EmojiList rb_array_to_emoji_list(VALUE rb_emoji_list) {
+  Check_Type(rb_emoji_list, T_ARRAY);
+  EmojiList emoji_list(RARRAY_LEN(rb_emoji_list));
+
+  for (int i = 0; i < RARRAY_LEN(rb_emoji_list); i++) {
+    VALUE rb_emoji = rb_ary_entry(rb_emoji_list, i);
+    std::string emoji = StringValueCStr(rb_emoji);
+    emoji_list.insert(emoji);
+  }
+
+  return emoji_list;
+}
+
+// Register a named list of emojis. You can then call `DText.parse(":smile:", emojis: "list_name")` to use the named
+// list of emojis. This is more efficient than passing the whole list every time a piece of DText is parsed.
+//
+// @param rb_list_name [String] The name of the emoji list. If it already exists, it is overwritten.
+// @param rb_emoji_list [Array<String>] The list of emoji names.
+static VALUE add_emoji_list(VALUE self, VALUE rb_list_name, VALUE rb_emoji_list) {
+  std::string list_name = StringValueCStr(rb_list_name);
+  StateMachine::emoji_lists[list_name] = rb_array_to_emoji_list(rb_emoji_list);
+
+  return rb_emoji_list;
+}
+
 static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALUE internal_domains, VALUE emojis, VALUE f_inline, VALUE f_disable_mentions, VALUE f_media_embeds) {
   if (NIL_P(input)) {
     return Qnil;
   }
 
   DTextOptions options;
+  EmojiList emoji_list;
+
+  options.emoji_list = &emoji_list;
   options.f_inline = RTEST(f_inline);
   options.f_mentions = !RTEST(f_disable_mentions);
   options.f_media_embeds = RTEST(f_media_embeds);
@@ -62,12 +91,14 @@ static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALU
     options.internal_domains.insert(domain);
   }
 
-  Check_Type(emojis, T_ARRAY); // raises TypeError if the argument isn't an array.
-
-  for (int i = 0; i < RARRAY_LEN(emojis); i++) {
-    VALUE rb_emoji = rb_ary_entry(emojis, i);
-    std::string_view emoji = StringValueCStr(rb_emoji); // raise ArgumentError if the emoji name contains null bytes.
-    options.emojis.insert(emoji);
+  if (TYPE(emojis) == T_STRING) {
+    auto list_name = StringValueCStr(emojis);
+    options.emoji_list = &StateMachine::emoji_lists[list_name];
+  } else if (TYPE(emojis) == T_ARRAY) {
+    emoji_list = rb_array_to_emoji_list(emojis);
+    options.emoji_list = &emoji_list;
+  } else {
+    rb_raise(rb_eTypeError, "emojis must be a string or array");
   }
 
   auto [html, _wiki_pages] = parse_dtext(input, options);
@@ -91,4 +122,5 @@ extern "C" void Init_dtext() {
   cDTextError = rb_define_class_under(cDText, "Error", rb_eStandardError);
   rb_define_singleton_method(cDText, "c_parse", c_parse, 8);
   rb_define_singleton_method(cDText, "c_parse_wiki_pages", c_parse_wiki_pages, 1);
+  rb_define_singleton_method(cDText, "add_emoji_list", add_emoji_list, 2);
 }

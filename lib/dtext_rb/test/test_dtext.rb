@@ -1800,6 +1800,12 @@ class DTextTest < Minitest::Test
     assert_parse('<h4><emoji data-name="smile" data-mode="inline"></emoji></h4>', "h4.:smile:", emojis:)
   end
 
+  def test_emoji_lists
+    DText.add_emoji_list("default", %w[smile cry])
+
+    assert_parse('<p><emoji data-name="smile" data-mode="inline"></emoji> <emoji data-name="cry" data-mode="inline"></emoji> :sob:</p>', ":smile: :cry: :sob:", emojis: "default")
+  end
+
   def test_inline_mode
     assert_equal("hello", parse_inline("hello").strip)
   end

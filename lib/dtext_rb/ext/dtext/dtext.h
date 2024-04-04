@@ -89,6 +89,8 @@ static const char* element_names[] = {
 };
 #endif
 
+using EmojiList = std::unordered_set<std::string>;
+
 class DTextError : public std::runtime_error {
   using std::runtime_error::runtime_error;
 };
@@ -113,14 +115,14 @@ struct DTextOptions {
   std::unordered_set<std::string> internal_domains;
 
   // The list of emojis recognized in this piece of DText.
-  std::unordered_set<std::string_view> emojis;
+  EmojiList* emoji_list;
 };
 
 class StateMachine {
 public:
   using TagAttributes = std::map<std::string_view, std::string_view>;
 
-  const DTextOptions options;
+  static inline std::map<std::string, EmojiList> emoji_lists;
 
   size_t top = 0;
   int cs;
@@ -153,13 +155,13 @@ public:
   std::vector<int> stack;
   std::vector<element_t> dstack;
   std::unordered_set<std::string> wiki_pages;
+  const DTextOptions options;
 
   using ParseResult = std::tuple<std::string, decltype(wiki_pages)>;
   static ParseResult parse_dtext(const std::string_view dtext, const DTextOptions options);
 
   std::string parse_inline(const std::string_view dtext);
   std::string parse_basic_inline(const std::string_view dtext);
-  void register_emoji_list(const std::string list_name, std::vector<std::string_view> emoji_names);
 
   void dstack_push(element_t element);
   element_t dstack_pop();
