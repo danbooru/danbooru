@@ -28,7 +28,7 @@ class PostFlag < ApplicationRecord
 
   scope :by_users, -> { where.not(creator: User.system) }
   scope :by_system, -> { where(creator: User.system) }
-  scope :in_cooldown, -> { by_users.where("created_at >= ?", Danbooru.config.moderation_period.ago) }
+  scope :in_cooldown, -> { by_users.where("created_at >= ?", Danbooru.config.flag_expiry.ago) }
   scope :expired, -> { pending.where("post_flags.created_at < ?", Danbooru.config.moderation_period.ago) }
   scope :active, -> { pending.or(rejected.in_cooldown) }
 
@@ -93,7 +93,7 @@ class PostFlag < ApplicationRecord
 
     flag = post.flags.in_cooldown.last
     if !is_deletion && !creator.is_approver? && flag.present?
-      errors.add(:post, "cannot be flagged more than once every #{Danbooru.config.moderation_period.inspect} (last flagged: #{flag.created_at.to_formatted_s(:long)})")
+      errors.add(:post, "cannot be flagged more than once every #{Danbooru.config.flag_expiry.inspect} (last flagged: #{flag.created_at.to_formatted_s(:long)})")
     end
   end
 

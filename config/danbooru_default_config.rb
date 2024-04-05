@@ -276,6 +276,11 @@ module Danbooru
       3.days
     end
 
+    # How long flags should prevent a post from being flagged again. Approver and above users bypass this period.
+    def flag_expiry
+      30.days
+    end
+
     # Upload points can be earned or lost by users. They punish and reward users by adding and removing upload slots.
     # 1000 points is enough for 10 uploads. See app/logical/upload_limit.rb for details on the level system.
     def initial_upload_points
