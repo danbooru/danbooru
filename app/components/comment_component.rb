@@ -3,7 +3,7 @@
 class CommentComponent < ApplicationComponent
   attr_reader :comment, :context, :classes, :dtext_references, :current_user
 
-  def initialize(comment:, current_user:, context: nil, classes: nil, dtext_references: nil)
+  def initialize(comment:, current_user:, context: nil, classes: nil, dtext_references: DText.preprocess(comment.body))
     super
     @comment = comment
     @context = context
