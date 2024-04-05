@@ -600,8 +600,9 @@ module Danbooru
 
     # Posts with these tags will be highlighted in the modqueue.
     def modqueue_warning_tags
-      %w[ai-generated ai-assisted anime_screencap bad_source duplicate hard_translated image_sample md5_mismatch
-      nude_filter off-topic paid_reward resized third-party_edit]
+      %w[bad_anatomy bad_arm bad_feet bad_hands bad_head bad_horizon bad_leg bad_reflection
+      bad_shadow duplicate error extra_finger extra_toes image_sample jpeg_artifacts md5_mismatch
+      missing_finger missing_toe off-topic paid_reward]
     end
 
     # Whether to enable API rate limits.
