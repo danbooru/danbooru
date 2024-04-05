@@ -562,7 +562,7 @@ class MediaAsset < ApplicationRecord
 
     # g => 0, s => 1, q => 2, e => 3
     def ai_rating_id
-      Post::RATINGS.keys.index(ai_rating.first)
+      Post::RATINGS.keys.index(ai_rating.first.first)
     end
 
     def pretty_ai_rating
