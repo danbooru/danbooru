@@ -1,9 +1,7 @@
 <div id="related-tags-container" class="related-tags fixed-width-container flex flex-col gap-2" data-media-asset-id="<%= media_asset.id %>">
-  <%= render "related_tags/related_tags", related_tags: nil, collapsed: true %>
-  <%= render "related_tags/translated_tags", source: nil %>
-  <% if policy(AITag).use_related_tags? %>
-    <%= render "related_tags/ai_tags", related_tags: nil %>
-  <% end %>
-  <%= render "related_tags/frequent_tags", related_tags: nil %>
-  <%= render "related_tags/recent_tags", related_tags: nil %>
+  <%= render "related_tags/related_tags", related_tags: nil, collapsed: true, selectable: true %>
+  <%= render "related_tags/translated_tags", source: nil, selectable: true %>
+  <%= render "related_tags/ai_tags", related_tags: nil, selectable: policy(AITag).use_related_tags? %>
+  <%= render "related_tags/frequent_tags", related_tags: nil, selectable: true %>
+  <%= render "related_tags/recent_tags", related_tags: nil, selectable: true %>
 </div>

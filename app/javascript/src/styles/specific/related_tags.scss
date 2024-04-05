@@ -19,4 +19,13 @@
       input[type="checkbox"] { visibility: visible; }
     }
   }
+
+  ul.no-select {
+    margin-left: 1rem;
+
+    span > a {
+      cursor: default;
+      user-select: none;
+    }
+  }
 }

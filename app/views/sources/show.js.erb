@@ -1,6 +1,6 @@
 $(".source-data").replaceWith("<%= j render_source_data(@source) %>");
 
-$(".translated-tags-related-tags-column").replaceWith("<%= j render "related_tags/translated_tags", source: @source %>");
+$(".translated-tags-related-tags-column").replaceWith("<%= j render "related_tags/translated_tags", source: @source, selectable: true %>");
 Danbooru.RelatedTag.update_selected();
 
 if ($("#c-uploads #a-show").length) {
