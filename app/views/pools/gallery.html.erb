@@ -15,6 +15,7 @@
           <% preview.with_footer do %>
             <div class="text-center">
               <%= link_to pool.pretty_name, pool, class: "text-sm pool-category-#{pool.category}" %>
+              <% if pool.is_deleted %><span class="inactive">(deleted)</span><% end %>
             </div>
           <% end %>
         <% end %>

@@ -25,9 +25,8 @@ class PoolsController < ApplicationController
 
   def gallery
     limit = params[:limit].presence || CurrentUser.user.per_page
-    search = search_params.presence || ActionController::Parameters.new(category: "series")
 
-    @pools = authorize Pool.search(search, CurrentUser.user).paginate(params[:page], limit: limit, search_count: params[:search])
+    @pools = authorize Pool.search(search_params, CurrentUser.user).paginate(params[:page], limit: limit, search_count: params[:search])
     respond_with(@pools)
   end
 

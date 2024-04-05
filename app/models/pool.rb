@@ -70,6 +70,12 @@ class Pool < ApplicationRecord
         q = q.collection
       end
 
+      if params[:include_deleted] == "Only"
+        q = q.deleted
+      elsif !params[:include_deleted].to_s.truthy?
+        q = q.undeleted
+      end
+
       case params[:order]
       when "name"
         q = q.order("pools.name")
