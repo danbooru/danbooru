@@ -17,7 +17,7 @@ class ForumPostComponent < ApplicationComponent
     super(forum_posts, dtext_references: dtext_references, original_forum_post_id: original_forum_post_id, current_user: current_user)
   end
 
-  def initialize(forum_post:, original_forum_post_id: nil, dtext_references: nil, current_user: User.anonymous)
+  def initialize(forum_post:, original_forum_post_id: nil, dtext_references: DText.preprocess(forum_post.body), current_user: User.anonymous)
     super
     @forum_post = forum_post
     @original_forum_post_id = original_forum_post_id

@@ -19,7 +19,7 @@ class DText
   # @param [Array<String>] a list of DText strings
   # @return [Hash<Symbol, ActiveRecord::Relation>] The set of wiki pages, tags, artists, posts, and media assets.
   def self.preprocess(dtext_messages)
-    references = dtext_messages.map { |message| parse_dtext_references(message) }
+    references = Array.wrap(dtext_messages).map { |message| parse_dtext_references(message) }
     references = references.reduce({}) { |all, hash| all.merge(hash) { |_key, left, right| left + right } }
     references.transform_values!(&:uniq)
 
