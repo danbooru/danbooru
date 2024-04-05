@@ -11,6 +11,7 @@ class AIMetadata < ApplicationRecord
   attr_accessor :updater
 
   before_save :normalize_prompts
+  before_save :normalize_parameters
   before_validation :normalize_model_hash
   validate :validate_model_hash, if: :model_hash_changed?
   validates :post_id, uniqueness: true
@@ -109,18 +110,24 @@ class AIMetadata < ApplicationRecord
     self.negative_prompt = negative_prompt&.split(/\s*,\s*/)&.join(", ")
   end
 
+  def normalize_parameters
+    self.parameters = self.parameters.filter_map do |key, value|
+      [key.gsub("_", " ").strip.titleize, value.strip] if key.present? && value.present?
+    end.to_h
+  end
+
   def model_hash_changed?
-    self.parameters["Model hash"].present? && self.parameters["Model hash"] != parameters_was["Model hash"]
+    self.parameters["Model Hash"].present? && self.parameters["Model Hash"] != parameters_was["Model Hash"]
   end
 
   def normalize_model_hash
-    if self.parameters["Model hash"].present?
-      self.parameters["Model hash"] = self.parameters["Model hash"].downcase
+    if self.parameters["Model Hash"].present?
+      self.parameters["Model Hash"] = self.parameters["Model Hash"].downcase
     end
   end
 
   def validate_model_hash
-    if self.parameters["Model hash"].present? && !self.parameters["Model hash"].match?(/\A[a-f0-9]+\Z/)
+    if self.parameters["Model Hash"].present? && !self.parameters["Model Hash"].match?(/\A[a-f0-9]+\Z/)
       errors.add(:model_hash, "is invalid")
     end
   end
