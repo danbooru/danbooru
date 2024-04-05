@@ -29,14 +29,7 @@
                 </span>
               <% end %>
 
-              <%= link_to media_asset do %>
-                <%= number_to_human_size(media_asset.file_size) %> .<%= media_asset.file_ext %>,
-                <%= media_asset.image_width %>x<%= media_asset.image_height %>
-
-                <% if media_asset.duration.present? %>
-                  (<%= duration_to_hhmmss(media_asset.duration) %>)
-                <% end %>
-              <% end %>
+              <%= link_to_media_asset post.media_asset %>
 
               <span>
                 <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
