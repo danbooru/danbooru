@@ -239,6 +239,11 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("example", DText.from_html('<a>example</a>'))
       end
 
+      should "omit redundant nested formatting tags" do
+        assert_equal("[b]foo[/b]", DText.from_html("<b><strong><b>foo</b></strong></b>"))
+        assert_equal('[b]"foo":[https://www.google.com][/b]', DText.from_html('<b><a href="https://www.google.com"><b>foo</b></a></b>'))
+      end
+
       should "not convert URLs with unsupported schemes to dtext links" do
         assert_equal("blah", DText.from_html('<a href="ftp://example.com">blah</a>'))
         assert_equal("blah", DText.from_html('<a href="file:///etc/password">blah</a>'))
