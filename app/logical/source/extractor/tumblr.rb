@@ -85,7 +85,7 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      DText.from_html(artist_commentary_desc).strip
+      DText.from_html(artist_commentary_desc, base_url: "https://www.tumblr.com").strip
     end
 
     def find_largest(image_url)

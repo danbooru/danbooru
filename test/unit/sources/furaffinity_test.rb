@@ -49,6 +49,27 @@ module Sources
       )
     end
 
+    context "A furaffinity post with relative URLs in the commentary" do
+      strategy_should_work(
+        "https://www.furaffinity.net/view/24228367",
+        image_urls: ["https://d.furaffinity.net/art/mazen234/1500679554/1500679554.mazen234_foxgirl.png"],
+        artist_name: "mazen234",
+        artist_commentary_title: "Miko Sleeping at the beach~",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Mikey went to get some things from the shop, so Miko probably took some time to herself to rest! Not saying Mikey might be a handful sometimes :P
+
+
+          Glad you loved this piece, Sheep! ^_^
+
+
+          Miko @ The Lovely "silentsheep\u00a0silentsheep":[https://www.furaffinity.net/user/silentsheep]
+
+
+          Art @ CuteSexyRoButts from DeviantArt
+        EOS
+      )
+    end
+
     should "Parse Furaffinity URLs correctly" do
       assert(Source::URL.image_url?("https://d.furaffinity.net/art/iwbitu/1650222955/1650222955.iwbitu_yubi.jpg"))
       assert(Source::URL.page_url?("https://www.furaffinity.net/view/46821705/"))

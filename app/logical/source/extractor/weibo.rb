@@ -74,14 +74,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc) do |element|
-          if element["href"].present?
-            href = Addressable::URI.heuristic_parse(element["href"])
-            href.site ||= "https://www.weibo.com"
-            href.scheme ||= "https"
-            element["href"] = href.to_s
-          end
-
+        DText.from_html(artist_commentary_desc, base_url: "https://www.weibo.com") do |element|
           if element["src"].present?
             src = Addressable::URI.heuristic_parse(element["src"])
             src.scheme ||= "https"

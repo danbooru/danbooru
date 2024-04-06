@@ -150,7 +150,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc) do |element|
+        DText.from_html(artist_commentary_desc, base_url: "https://www.deviantart.com") do |element|
           # Convert embedded thumbnails of journal posts to 'deviantart #123'
           # links. Strip embedded thumbnails of image posts. Example:
           # https://sa-dui.deviantart.com/art/Commission-Meinos-Kaen-695905927.
@@ -168,13 +168,6 @@ module Source
 
           if element.name == "a" && element["href"].present?
             element["href"] = element["href"].gsub(%r{\Ahttps?://www\.deviantart\.com/users/outgoing\?}i, "")
-
-            # href may be missing the `http://` bit (ex: `inprnt.com`, `//inprnt.com`). Add it if missing.
-            uri = Addressable::URI.heuristic_parse(element["href"]) rescue nil
-            if uri.present? && uri.path.present?
-              uri.scheme ||= "http"
-              element["href"] = uri.to_s
-            end
           end
         end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
       end

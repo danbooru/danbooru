@@ -56,7 +56,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc)
+        DText.from_html(artist_commentary_desc, base_url: "https://t.bilibili.com")
       end
 
       def tags

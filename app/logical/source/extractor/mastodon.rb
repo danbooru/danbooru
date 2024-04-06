@@ -85,11 +85,11 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      DText.from_html(artist_commentary_desc) do |element|
+      DText.from_html(artist_commentary_desc, base_url: "https://#{domain}") do |element|
         if element.name == "a"
           # don't include links to the toot itself.
           media_urls = api_response.dig("media_attachments").pluck("text_url")
-          element["href"] = nil if element["href"].in?(media_urls)
+          element.content = nil if element["href"].in?(media_urls)
         end
       end.strip
     end

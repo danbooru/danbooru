@@ -95,7 +95,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc) do |element|
+        DText.from_html(artist_commentary_desc, base_url: "https://www.plurk.com") do |element|
           if element.name == "a"
             element.content = ""
           end

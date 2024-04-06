@@ -118,7 +118,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc)&.normalize_whitespace&.gsub(/\r\n/, "\n")&.gsub(/ *\n */, "\n")&.strip
+        DText.from_html(artist_commentary_desc, base_url: "https://www.lofter.com")&.normalize_whitespace&.gsub(/\r\n/, "\n")&.gsub(/ *\n */, "\n")&.strip
       end
 
       def illust_id

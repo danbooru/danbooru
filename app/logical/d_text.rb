@@ -555,10 +555,12 @@ class DText
   end
 
   # Convert HTML to DText.
-  # @param html [String] the HTML input
-  # @param inline [Boolean] if true, convert <img> tags to plaintext
+  #
+  # @param html [String] The HTML input.
+  # @param base_url [String] The base URL to use for relative URLs.
+  # @param inline [Boolean] If true, convert <img> tags to plaintext.
   # @return [String] the DText output
-  def self.from_html(text, inline: false, &block)
+  def self.from_html(text, base_url: nil, inline: false, &block)
     html = DText.parse_html(text)
 
     html.children.map do |element|
@@ -570,36 +572,46 @@ class DText
       when "br"
         "\n"
       when "p", "ul", "ol"
-        from_html(element.inner_html, &block).strip + "\n\n"
+        from_html(element.inner_html, base_url:, &block).strip + "\n\n"
       when "blockquote"
-        "[quote]#{from_html(element.inner_html, &block).strip}[/quote]\n\n" if element.inner_html.present?
+        "[quote]#{from_html(element.inner_html, base_url:, &block).strip}[/quote]\n\n" if element.inner_html.present?
       when "small", "sub"
-        "[tn]#{from_html(element.inner_html, &block)}[/tn]" if element.inner_html.present?
+        "[tn]#{from_html(element.inner_html, base_url:, &block)}[/tn]" if element.inner_html.present?
       when "b", "strong"
-        "[b]#{from_html(element.inner_html, &block)}[/b]" if element.inner_html.present?
+        "[b]#{from_html(element.inner_html, base_url:, &block)}[/b]" if element.inner_html.present?
       when "i", "em"
-        "[i]#{from_html(element.inner_html, &block)}[/i]" if element.inner_html.present?
+        "[i]#{from_html(element.inner_html, base_url:, &block)}[/i]" if element.inner_html.present?
       when "u"
-        "[u]#{from_html(element.inner_html, &block)}[/u]" if element.inner_html.present?
+        "[u]#{from_html(element.inner_html, base_url:, &block)}[/u]" if element.inner_html.present?
       when "s", "strike"
-        "[s]#{from_html(element.inner_html, &block)}[/s]" if element.inner_html.present?
+        "[s]#{from_html(element.inner_html, base_url:, &block)}[/s]" if element.inner_html.present?
       when "li"
-        "* #{from_html(element.inner_html, &block)}\n" if element.inner_html.present?
+        "* #{from_html(element.inner_html, base_url:, &block)}\n" if element.inner_html.present?
       when "h1", "h2", "h3", "h4", "h5", "h6"
         hN = element.name
-        title = from_html(element.inner_html, &block)
+        title = from_html(element.inner_html, base_url:, &block)
         "#{hN}. #{title}\n\n"
       when "a"
-        title = from_html(element.inner_html, inline: true, &block).strip
-        url = element["href"]
+        title = from_html(element.inner_html, base_url:, inline: true, &block).strip
+        url = element["href"].to_s
 
-        if title.blank? || url.blank?
+        if title.blank?
           ""
-        elsif !url.match?(%r{\A(https?://|mailto:)}i)
+        elsif !url.match?(%r{\A(https?://|mailto:|//|/)}i)
+          title
+        elsif url.starts_with?("mailto:") && url.delete_prefix("mailto:") == title
+          "<#{url}>"
+        elsif url.starts_with?("//") && title == url # protocol-relative url
+          "<https:#{url}>"
+        elsif url.starts_with?("//") && title != url # protocol-relative url
+          %{"#{title.gsub('"', "&quot;")}":[https:#{url}]}
+        elsif url.starts_with?("/") && base_url.present? && title == url
+          "<#{File.join(base_url, url)}>"
+        elsif url.starts_with?("/") && base_url.present? && title != url
+          %{"#{title.gsub('"', "&quot;")}":[#{File.join(base_url, url)}]}
+        elsif url.starts_with?("/")
           title
         elsif title == url
-          "<#{url}>"
-        elsif url.starts_with?("mailto:") && url.delete_prefix("mailto:") == title
           "<#{url}>"
         else
           %{"#{title.gsub('"', "&quot;")}":[#{url}]}
@@ -618,7 +630,7 @@ class DText
       when "comment"
         # ignored
       else
-        from_html(element.inner_html, &block)
+        from_html(element.inner_html, base_url:, &block)
       end
     end.join
   end
