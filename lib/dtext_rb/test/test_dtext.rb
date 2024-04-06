@@ -232,6 +232,11 @@ class DTextTest < Minitest::Test
     assert_inline_parse("'", "&#39;")
     assert_inline_parse("'", "&apos;")
     assert_inline_parse("[", "&lbrack;")
+    assert_inline_parse("]", "&rbrack;")
+    assert_inline_parse("{", "&lbrace;")
+    assert_inline_parse("}", "&rbrace;")
+    assert_inline_parse("(", "&lpar;")
+    assert_inline_parse(")", "&rpar;")
     assert_inline_parse("*", "&ast;")
     assert_inline_parse(":", "&colon;")
     assert_inline_parse("@", "&commat;")
@@ -251,7 +256,13 @@ class DTextTest < Minitest::Test
     assert_parse("<p>```<br>code<br>```</p>", "&grave;&grave;&grave;\ncode\n&grave;&grave;&grave;")
     assert_parse("<p>* list</p>", "&ast; list")
 
-    assert_inline_parse('<a class="dtext-link" href="/posts">&amp;quot;title&amp;quot;</a>', '"&quot;title&quot;":/posts')
+    assert_inline_parse('<a class="dtext-link" href="/posts">&quot;title&quot;</a>', '"&quot;title&quot;":/posts')
+    assert_inline_parse('<a class="dtext-link" href="/posts">&quot;title&quot;</a>', '"&quot;title&quot;":[/posts]')
+    assert_inline_parse('<a class="dtext-link" href="/posts">[title]</a>', '[&lbrack;title&rbrack;](/posts)')
+    assert_inline_parse('<a class="dtext-link" href="/posts">(title)</a>', '[/posts](&lpar;title&rpar;)')
+    assert_inline_parse('<a class="dtext-link" href="/posts">[title]</a>', '[url=/posts]&lbrack;title&rbrack;[/url]')
+    assert_inline_parse('<a class="dtext-link" href="/posts">&lt;title&gt;</a>', '<a href="/posts">&lt;title&gt;</a>')
+
     assert_inline_parse('<a class="dtext-link dtext-wiki-link" href="/wiki_pages/tiger_%26amp%3B_bunny">tiger_&amp;amp;_bunny</a>', '[[tiger_&amp;_bunny]]')
 
     assert_inline_parse('&amp;lt;', '[nodtext]&lt;[/nodtext]')

@@ -58,6 +58,21 @@ module Sources
       strategy_should_work("https://hentai-foundry.com/pictures/user/LumiNyu/867562/Mona-patreon-winner")
     end
 
+    context "A post with commentary containing quote marks inside the links" do
+      strategy_should_work(
+        "https://www.hentai-foundry.com/pictures/user/QueenComplex/1079933/Fucc",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          It's a 4th piece in a set of 6
+          Previous ones being - This is a sequel to my drawings\u00a0"[b]&quot;Butts&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/butts],\u00a0"[b]&quot;Bubbs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/bubbs]\u00a0and\u00a0"[b]&quot;Diccs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/diccs]
+          "[b]QUEENCOMPLEX.NET[/b]":[https://queencomplex.net/]
+          The place to see my newest drawings
+          and the place to support my work.
+          "[b]@Queen_Complexxx[/b]":[https://twitter.com/Queen_Complexxx]\u00a0-\u00a0My Twitter
+          "[b]mail@queencomplex.net[/b]":[mailto:<span style=]"&quot;>":[mailto:<span style=][b]<mailto:mail@queencomplex.net>[/b]\u00a0- My main Email
+        EOS
+      )
+    end
+
     should "Parse HentaiFoundry URLs correctly" do
       assert(Source::URL.image_url?("https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png"))
       assert(Source::URL.image_url?("http://pictures.hentai-foundry.com//s/soranamae/363663.jpg"))
