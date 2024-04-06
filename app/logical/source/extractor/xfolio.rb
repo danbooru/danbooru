@@ -47,7 +47,7 @@ class Source::Extractor::Xfolio < Source::Extractor
   end
 
   def artist_name
-    page&.search(".creatorInfo").to_a.first&.attr("data-creator-name") 
+    page&.search(".creatorInfo").to_a.first&.attr("data-creator-name")
   end
 
   def work_id
@@ -67,7 +67,7 @@ class Source::Extractor::Xfolio < Source::Extractor
   end
 
   def dtext_artist_commentary_desc
-    DText.from_html(artist_commentary_desc)
+    DText.from_html(artist_commentary_desc, base_url: "https://xfolio.jp")
   end
 
   def tags

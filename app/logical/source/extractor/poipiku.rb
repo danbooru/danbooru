@@ -53,7 +53,7 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      DText.from_html(artist_commentary_desc)
+      DText.from_html(artist_commentary_desc, base_url: "https://poipiku.com")
     end
 
     def tags

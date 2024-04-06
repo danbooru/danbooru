@@ -89,7 +89,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc) do |element|
+        DText.from_html(artist_commentary_desc, base_url: "https://seiga.nicovideo.jp") do |element|
           if element.name == "font" && element["color"] == "white"
             element.content = "[spoiler]#{element.content}[/spoiler]"
           end

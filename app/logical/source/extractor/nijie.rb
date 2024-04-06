@@ -92,7 +92,7 @@ module Source
       def self.to_dtext(text)
         text = text.to_s.gsub(/\r\n|\r/, "<br>")
 
-        dtext = DText.from_html(text) do |element|
+        dtext = DText.from_html(text, base_url: "https://nijie.info") do |element|
           if element.name == "a" && element["href"]&.start_with?("/jump.php")
             element["href"] = element.text
           end

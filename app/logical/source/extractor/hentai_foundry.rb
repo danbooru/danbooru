@@ -58,7 +58,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc).gsub(/\A[[:space:]]+|[[:space:]]+\z/, "").gsub(/\n+/, "\n")
+        DText.from_html(artist_commentary_desc, base_url: "https://www.hentai-foundry.com").gsub(/\A[[:space:]]+|[[:space:]]+\z/, "").gsub(/\n+/, "\n")
       end
 
       def illust_id

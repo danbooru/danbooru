@@ -208,6 +208,20 @@ class DTextTest < ActiveSupport::TestCase
 
         assert_equal("<mailto:user@example.com>", DText.from_html('<a href="mailto:user@example.com">user@example.com</a>'))
         assert_equal('"user":[mailto:user@example.com]', DText.from_html('<a href="mailto:user@example.com">user</a>'))
+
+        assert_equal("<https://example.com>", DText.from_html('<a href="//example.com">//example.com</a>'))
+        assert_equal('"example":[https://example.com]', DText.from_html('<a href="//example.com">example</a>'))
+
+        assert_equal("<https://example.com/index>", DText.from_html('<a href="/index">/index</a>', base_url: "https://example.com"))
+        assert_equal('"example":[https://example.com/index]', DText.from_html('<a href="/index">example</a>', base_url: "https://example.com"))
+        assert_equal("/index", DText.from_html('<a href="/index">/index</a>'))
+        assert_equal("example", DText.from_html('<a href="/index">example</a>'))
+
+        assert_equal('"&quot;example&quot;":[https://www.example.com]', DText.from_html('<a href="https://www.example.com">"example"</a>'))
+
+        assert_equal("", DText.from_html('<a href="http://example.com"></a>'))
+        assert_equal("", DText.from_html('<a href="http://example.com"> </a>'))
+        assert_equal("example", DText.from_html('<a>example</a>'))
       end
 
       should "not convert URLs with unsupported schemes to dtext links" do

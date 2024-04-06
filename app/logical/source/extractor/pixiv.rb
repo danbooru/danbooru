@@ -25,7 +25,7 @@ module Source
           %("user/#{member_id}":[#{profile_url}] "»":[#{artist_search_url}])
         end
 
-        DText.from_html(text) do |element|
+        DText.from_html(text, base_url: "https://www.pixiv.net") do |element|
           if element.name == "a" && element["href"].match?(%r!\A/jump\.php\?!)
             element["href"] = Addressable::URI.heuristic_parse(element["href"]).normalized_query
           end

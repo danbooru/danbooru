@@ -48,7 +48,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc).squeeze("\n\n").strip
+        DText.from_html(artist_commentary_desc, base_url: "https://arca.live").squeeze("\n\n").strip
       end
 
       memoize def page

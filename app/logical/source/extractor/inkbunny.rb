@@ -48,7 +48,7 @@ class Source::Extractor::Inkbunny < Source::Extractor
   end
 
   def dtext_artist_commentary_desc
-    DText.from_html(artist_commentary_desc) do |element|
+    DText.from_html(artist_commentary_desc, base_url: "https://inkbunny.net") do |element|
       if element.name == "table"
         mention = element.at ".widget_userNameSmall"
         if mention.present?
