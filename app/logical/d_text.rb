@@ -588,7 +588,7 @@ class DText
         elsif url.starts_with?("mailto:") && url.delete_prefix("mailto:") == title
           "<#{url}>"
         else
-          %("#{title}":[#{url}])
+          %{"#{title.gsub('"', "&quot;")}":[#{url}]}
         end
       when "img"
         alt_text = element.attributes["title"] || element.attributes["alt"] || ""

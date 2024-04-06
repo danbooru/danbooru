@@ -317,6 +317,26 @@ basic_inline := |*
   close_s => { dstack_close_element(INLINE_S, { ts, te }); };
   open_u  => { dstack_open_element(INLINE_U, "<u>"); };
   close_u => { dstack_close_element(INLINE_U, { ts, te }); };
+
+  '&amp;'i    => { append("&amp;"); };
+  '&lt;'i     => { append("&lt;"); };
+  '&gt;'i     => { append("&gt;"); };
+  '&quot;'i   => { append("&quot;"); };
+  '&#39;'i    => { append("'"); };
+  '&apos;'i   => { append("'"); };
+  '&lbrace;'i => { append('{'); };
+  '&rbrace;'i => { append('}'); };
+  '&lbrack;'i => { append('['); };
+  '&rbrack;'i => { append(']'); };
+  '&lpar;'i   => { append('('); };
+  '&rpar;'i   => { append(')'); };
+  '&ast;'i    => { append('*'); };
+  '&colon;'i  => { append(':'); };
+  '&commat;'i => { append('@'); };
+  '&grave;'i  => { append('`'); };
+  '&num;'i    => { append('#'); };
+  '&period;'i => { append('.'); };
+
   eos;
   any => { append_html_escaped(fc); };
 *|;
@@ -571,7 +591,11 @@ inline := |*
   '&#39;'i    => { append("'"); }; # &#39; is more common than &apos; because &apos; wasn't officially supported before HTML5.
   '&apos;'i   => { append("'"); };
   '&lbrace;'i => { append('{'); };
+  '&rbrace;'i => { append('}'); };
   '&lbrack;'i => { append('['); };
+  '&rbrack;'i => { append(']'); };
+  '&lpar;'i   => { append('('); };
+  '&rpar;'i   => { append(')'); };
   '&ast;'i    => { append('*'); };
   '&colon;'i  => { append(':'); };
   '&commat;'i => { append('@'); };
