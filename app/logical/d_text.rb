@@ -11,6 +11,9 @@ require "dtext" # Load the C extension.
 class DText
   extend Memoist
 
+  DEFAULT_EMOJI_MAP = Danbooru.config.dtext_emojis
+  DEFAULT_EMOJI_LIST = DEFAULT_EMOJI_MAP.keys.map(&:downcase)
+
   attr_reader :dtext, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains, :emoji_list, :emoji_map, :options
 
   # Preprocess a set of DText messages and collect all tag, artist, wiki page, post, and media asset references. Called
@@ -50,8 +53,9 @@ class DText
   # @param domain [String, nil] If present, treat links to this domain as internal links rather than external links.
   # @param alternate_domains [Array<String>] A list of additional domains for this site where direct links will be converted to shortlinks
   #   (e.g on betabooru.donmai.us, https://danbooru.donmai.us/posts/1234 is converted to post #1234).
-  # @param emojis [Hash<String, String>, nil] A hash of emoji (name, value) pairs to override the default emoji list. The emoji `:name:` is replaced with the value (which may be an HTML <img> or a plaintext emoji).
-  def initialize(dtext, inline: false, disable_mentions: false, media_embeds: false, base_url: Rails.application.config.relative_url_root, domain: Danbooru::URL.parse!(Danbooru.config.canonical_url).host, alternate_domains: Danbooru.config.alternate_domains, emojis: nil)
+  # @param emoji_map [Hash<String, String>] A hash of emoji (name, value) pairs. The emoji `:name:` is replaced with the value (which may be an HTML <img> or a plaintext emoji).
+  # @param emoji_list [Array<String>] The list of valid emoji names.
+  def initialize(dtext, inline: false, disable_mentions: false, media_embeds: false, base_url: Rails.application.config.relative_url_root, domain: Danbooru::URL.parse!(Danbooru.config.canonical_url).host, alternate_domains: Danbooru.config.alternate_domains, emoji_map: DEFAULT_EMOJI_MAP, emoji_list: DEFAULT_EMOJI_LIST)
     @dtext = dtext
     @inline = inline
     @disable_mentions = disable_mentions
@@ -59,16 +63,9 @@ class DText
     @base_url = base_url
     @domain = domain
     @alternate_domains = alternate_domains
-
-    if emojis.is_a?(Hash)
-      @emoji_list = emojis.keys.map(&:downcase)
-      @emoji_map = emojis
-    else
-      @emoji_list = "default"
-      @emoji_map = Danbooru.config.dtext_emojis
-    end
-
-    @options = { inline:, disable_mentions:, media_embeds:, base_url:, domain:, alternate_domains:, emojis: @emoji_list }
+    @emoji_map = emoji_map
+    @emoji_list = emoji_list
+    @options = { inline:, disable_mentions:, media_embeds:, base_url:, domain:, alternate_domains:, emoji_list: }
   end
 
   # Convert a string of DText to HTML.
@@ -268,7 +265,7 @@ class DText
   #
   # @return [String] The HTML.
   memoize def to_html
-    DText.parse(dtext, inline: inline, disable_mentions: disable_mentions, media_embeds: media_embeds, base_url: base_url, domain: domain, internal_domains: [domain, *alternate_domains].compact_blank, emojis: emoji_list)
+    DText.parse(dtext, inline:, disable_mentions:, media_embeds:, base_url:, domain:, internal_domains: [domain, *alternate_domains].compact_blank, emoji_list:)
   end
 
   # Return the DText after parsing it to a Nokogiri HTML5 object.

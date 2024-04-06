@@ -91,7 +91,7 @@ action media_embeds_enabled { options.f_media_embeds }
 action in_quote { dstack_is_open(BLOCK_QUOTE) }
 action in_expand { dstack_is_open(BLOCK_EXPAND) }
 action in_spoiler { dstack_is_open(BLOCK_SPOILER) }
-action is_allowed_emoji { is_allowed_emoji({ f1, f2 + 1 }) }
+action is_allowed_emoji { options.is_allowed_emoji({ f1, f2 + 1 }) }
 action save_tag_attribute { tag_attributes[{ a1, a2 }] = { b1, b2 }; }
 
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
@@ -258,8 +258,8 @@ hr = ws* ('[hr]'i | '<hr>'i) ws* eol+;
 
 code_fence = ('```' ws* (alnum* >mark_a1 %mark_a2) ws* eol) (any* >mark_b1 %mark_b2) :>> (eol '```' ws* eol);
 
-# %mark_f2 doesn't work because it doesn't run until after is_allowed_emoji is called.
-emoji = ':' ([a-zA-Z0-9_]+) >mark_f1 @mark_f2 (':' when is_allowed_emoji);
+emoji_name = ([a-zA-Z0-9_]{3,32}) - ('http'i | 'https'i | [0-9]+);
+emoji = ':' emoji_name >mark_f1 @mark_f2 (':' when is_allowed_emoji); # %mark_f2 doesn't work because it doesn't run until after is_allowed_emoji is called.
 
 double_quoted_value = '"' (nonnewline+ >mark_b1 %mark_b2) :>> '"';
 single_quoted_value = "'" (nonnewline+ >mark_b1 %mark_b2) :>> "'";
@@ -1495,13 +1495,6 @@ void StateMachine::clear_matches() {
   f2 = NULL;
   g1 = NULL;
   g2 = NULL;
-}
-
-bool StateMachine::is_allowed_emoji(const std::string_view name) {
-  std::string lowercase_name(name);
-  std::transform(name.begin(), name.end(), lowercase_name.begin(), &ascii_tolower);
-
-  return options.emoji_list->contains(lowercase_name);
 }
 
 // True if a mention is allowed to start after this character.
