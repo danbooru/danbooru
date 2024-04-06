@@ -553,12 +553,13 @@ class DText
 
   # Convert HTML to DText.
   #
-  # @param html [String] The HTML input.
+  # @param html [Nokogiri::HTML5::DocumentFragment, String] The HTML input.
   # @param base_url [String] The base URL to use for relative URLs.
   # @param inline [Boolean] If true, convert <img> tags to plaintext.
   # @return [String] the DText output
-  def self.from_html(text, base_url: nil, inline: false, &block)
-    html = DText.parse_html(text)
+  def self.from_html(html, base_url: nil, inline: false, &block)
+    html = parse_html(html) if html.is_a?(String)
+    return "" if html.nil?
 
     html.children.map do |element|
       block.call(element) if block.present?
@@ -569,27 +570,35 @@ class DText
       when "br"
         "\n"
       when "p", "ul", "ol"
-        from_html(element.inner_html, base_url:, &block).strip + "\n\n"
+        content = from_html(element, base_url:, &block).strip
+        "#{content}\n\n"
       when "blockquote"
-        "[quote]#{from_html(element.inner_html, base_url:, &block).strip}[/quote]\n\n" if element.inner_html.present?
+        content = from_html(element, base_url:, &block).strip
+        "[quote]#{content}[/quote]\n\n" if content.present?
       when "small", "sub"
-        "[tn]#{from_html(element.inner_html, base_url:, &block)}[/tn]" if element.inner_html.present?
+        content = from_html(element, base_url:, &block)
+        "[tn]#{content}[/tn]" if content.present?
       when "b", "strong"
-        "[b]#{from_html(element.inner_html, base_url:, &block)}[/b]" if element.inner_html.present?
+        content = from_html(element, base_url:, &block)
+        "[b]#{content}[/b]" if content.present?
       when "i", "em"
-        "[i]#{from_html(element.inner_html, base_url:, &block)}[/i]" if element.inner_html.present?
+        content = from_html(element, base_url:, &block)
+        "[i]#{content}[/i]" if content.present?
       when "u"
-        "[u]#{from_html(element.inner_html, base_url:, &block)}[/u]" if element.inner_html.present?
+        content = from_html(element, base_url:, &block)
+        "[u]#{content}[/u]" if content.present?
       when "s", "strike"
-        "[s]#{from_html(element.inner_html, base_url:, &block)}[/s]" if element.inner_html.present?
+        content = from_html(element, base_url:, &block)
+        "[s]#{content}[/s]" if content.present?
       when "li"
-        "* #{from_html(element.inner_html, base_url:, &block)}\n" if element.inner_html.present?
+        content = from_html(element, &block)
+        "* #{content}\n" if content.present?
       when "h1", "h2", "h3", "h4", "h5", "h6"
-        hN = element.name
-        title = from_html(element.inner_html, base_url:, &block)
-        "#{hN}. #{title}\n\n"
+        hn = element.name
+        title = from_html(element, base_url:, &block)
+        "#{hn}. #{title}\n\n"
       when "a"
-        title = from_html(element.inner_html, base_url:, inline: true, &block).strip
+        title = from_html(element, base_url:, inline: true, &block).strip
         url = element["href"].to_s
 
         if title.blank?
@@ -620,14 +629,14 @@ class DText
         if inline
           alt_text
         elsif alt_text.present? && src.present?
-          %("#{alt_text}":[#{src}]\n\n)
+          %{"#{alt_text}":[#{src}]\n\n}
         else
           ""
         end
       when "comment"
         # ignored
       else
-        from_html(element.inner_html, base_url:, &block)
+        from_html(element, base_url:, &block)
       end
     end.join
   end

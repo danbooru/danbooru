@@ -55,7 +55,13 @@ module Sources
     end
 
     context "A post with deeply nested commentary" do
-      strategy_should_work("https://hentai-foundry.com/pictures/user/LumiNyu/867562/Mona-patreon-winner")
+      strategy_should_work(
+        "https://www.hentai-foundry.com/pictures/user/LumiNyu/867562/Mona-patreon-winner",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          [b]If you like this picture don't forget to\u00a0thumbs up\u00a0and\u00a0favorite\u00a0
+          [/b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b][b]"Also you can support my art on\u00a0":[https://picarto.tv/LumiNyu][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][/b][b][b][b]"[b]Patreon[/b]":[https://www.patreon.com/LumiNyu]\u00a0and gain instant access to exclusive\u00a0"patreon":[https://www.patreon.com/LumiNyu]\u00a0content and also be able to vote for the future set of girls I should draw.[/b][/b][/b]
+        EOS
+      )
     end
 
     context "A post with commentary containing quote marks inside the links" do

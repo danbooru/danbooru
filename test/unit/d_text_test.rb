@@ -13,6 +13,10 @@ class DTextTest < ActiveSupport::TestCase
     DText.new(dtext, **options).format_text
   end
 
+  def assert_parse(expected, dtext, **options)
+    assert_equal(expected, format_text(dtext, **options))
+  end
+
   context "DText" do
     context "#strip_dtext" do
       should "strip dtext markup from the input" do
@@ -207,6 +211,10 @@ class DTextTest < ActiveSupport::TestCase
     context "#from_html" do
       should "convert basic html to dtext" do
         assert_equal("[b]abc[/b] [i]def[/i] [u]ghi[/u]", DText.from_html("<b>abc</b> <i>def</i> <u>ghi</u>"))
+      end
+
+      should "not fail for deeply nested HTML" do
+        assert_equal("foo", DText.from_html("#{"<div>" * 1_000}foo#{"</div>" * 1_000}"))
       end
 
       should "convert links to dtext" do

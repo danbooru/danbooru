@@ -361,6 +361,51 @@ module Sources
       )
     end
 
+    context "An AI-generated DeviantArt post" do
+      strategy_should_work(
+        "https://www.deviantart.com/izzyrozenberg/art/Makima-looks-back-1-1027063213",
+        tags: %w[anime animegirl cartoon cuteanimegirl drama fanart manga nude oilpainting redhead makimachainsawman makima_chainsaw_man eyesbeautiful makima ai-generated]
+      )
+    end
+
+    context "A DeviantArt post with deeply nested commentary" do
+      strategy_should_work(
+        "https://www.deviantart.com/sakimichan/art/Tifa-Pullup-pinup-841327466",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          [b]"[b]Pixiv [/b]":[https://www.pixiv.net/member.php?id=3384404][/b][b]ll"[b]facebook[/b]\u00a0":[https://www.facebook.com/Sakimichanart/] [/b]ll"Online Store":[https://sakimichanart.storenvy.com/]\u00a0ll\u00a0"Tumblr":[https://sakimichan.tumblr.com/]\u00a0ll [b]"[b]Patreon[/b]":[https://www.patreon.com/sakimichan][/b]ll[b]"Artstation":[https://www.artstation.com/artist/sakimichan][/b]l[b]"[b]Instagram[/b]":[https://instagram.com/sakimi.chan/][/b] [b]"[b]gumroad(tutorial store)[/b]":[https://gumroad.com/sakimichan][/b]\u00a0 [b]cubebrush"[b](new tutorial store)[/b]":[https://cubebrush.co/sakimichan][/b]
+
+          Tifa is my favorite female character in the final fantasy series ! Also the pull boss was one of my favorite section of the game so i wanted to try painting her doing some (struggled to paint out this idea)^u^~
+
+          * High res jpg steps
+          * layer PSD\u00a0
+          * video process
+
+          h4. ❅"available on patreon":[https://www.patreon.com/posts/36972487]
+
+
+
+
+
+
+
+
+
+
+
+          "Patreon reward archive\u00a0":[https://sakimichan.deviantart.com/journal/Patreon-Rewards-Archive-498302321]( see what rewards you can get by helping support me !)
+
+          FREE RELEASE! Enjoy ^_^
+
+          ____________________
+          Hair voice over tutorial
+          please go: "gumroad.com/l/ojqB":[https://gumroad.com/l/ojqB]
+          used the promo code: hairy ( unlimited )
+
+          more tutorials here :"gumroad.com/sakimichan":[https://gumroad.com/sakimichan#] if you guys are interested !                                    "www.patreon.com/posts/18431891":[https://www.patreon.com/posts/18431891]
+        EOS
+      )
+    end
+
     context "For Sta.sh:" do
       context "A https://sta.sh/:id url" do
         strategy_should_work(
