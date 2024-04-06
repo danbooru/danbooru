@@ -89,8 +89,6 @@ static const char* element_names[] = {
 };
 #endif
 
-using EmojiList = std::unordered_set<std::string>;
-
 class DTextError : public std::runtime_error {
   using std::runtime_error::runtime_error;
 };
@@ -114,15 +112,14 @@ struct DTextOptions {
   // Links to these domains are converted to shortlinks (used so links to https://danbooru.donmai.us/posts/1234 are converted to post #1234).
   std::unordered_set<std::string> internal_domains;
 
-  // The list of emojis recognized in this piece of DText.
-  EmojiList* emoji_list;
+  // A function that returns true if the given emoji is on the list of allowed emojis.
+  // E.g., when the parser encounters `:smile:`, the function should return true if "smile" is a valid emoji.
+  std::function<bool(const std::string_view)> is_allowed_emoji;
 };
 
 class StateMachine {
 public:
   using TagAttributes = std::map<std::string_view, std::string_view>;
-
-  static inline std::map<std::string, EmojiList> emoji_lists;
 
   size_t top = 0;
   int cs;
@@ -212,7 +209,6 @@ public:
 
   bool is_inline_element(element_t type);
   bool is_internal_url(const std::string_view url);
-  bool is_allowed_emoji(const std::string_view name);
   std::tuple<std::string_view, std::string_view> trim_url(const std::string_view url);
 
 private:

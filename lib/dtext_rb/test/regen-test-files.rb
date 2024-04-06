@@ -6,6 +6,8 @@ require "zlib"
 require "securerandom"
 require "fileutils"
 
+$emoji_list = %w[smile]
+
 def regen_file(input_filename, **options)
   print "#{input_filename}: "
 
@@ -16,7 +18,7 @@ def regen_file(input_filename, **options)
         print "." if (i % 10000).zero?
         json = JSON.parse(line)
 
-        output.puts({ **json, dtext: DText.parse(json["text"], domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us], **options) }.to_json)
+        output.puts({ **json, dtext: DText.parse(json["text"], domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us], emoji_list: $emoji_list, **options) }.to_json)
       end
     end
   end

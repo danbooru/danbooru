@@ -3,5 +3,3 @@ Rails.application.reloader.to_prepare do
   # once in app/logical, and the one in the gem takes precedence over the one in app/logical.
   require_relative "../../app/logical/d_text"
 end
-
-DText.add_emoji_list("default", Danbooru.config.dtext_emojis.keys.map(&:downcase))

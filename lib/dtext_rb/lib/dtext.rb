@@ -18,7 +18,7 @@ end
 class DText
   class Error < StandardError; end
 
-  def self.parse(str, inline: false, media_embeds: true, disable_mentions: false, base_url: nil, domain: nil, internal_domains: [], emojis: [])
-    c_parse(str, base_url, domain, internal_domains, emojis, inline, disable_mentions, media_embeds)
+  def self.parse(str, inline: false, media_embeds: true, disable_mentions: false, base_url: nil, domain: nil, internal_domains: [], emoji_list: [])
+    c_parse(str, base_url, domain, internal_domains, emoji_list, inline, disable_mentions, media_embeds)
   end
 end

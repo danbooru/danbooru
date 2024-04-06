@@ -76,6 +76,13 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://danbooru.donmai.us/posts/1234">https://danbooru.donmai.us/posts/1234</a></p>', format_text("https://danbooru.donmai.us/posts/1234", domain: "betabooru.donmai.us"))
       end
 
+      should "parse emojis" do
+        emoji_map = { "smile" => "😀", "sob" => "😭" }
+        emoji_list = emoji_map.keys
+
+        assert_parse('<p><emoji data-name="smile" data-mode="inline" title=":smile:">😀</emoji> <emoji data-name="sob" data-mode="inline" title=":sob:">😭</emoji></p>', ":smile: :sob:", emoji_list:, emoji_map:)
+      end
+
       should "mark links to nonexistent tags or wikis" do
         create(:tag, name: "no_wiki", post_count: 42)
         create(:tag, name: "empty_tag", post_count: 0)

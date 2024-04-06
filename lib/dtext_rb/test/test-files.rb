@@ -7,6 +7,8 @@ require "active_support/all"
 
 $failures = 0
 
+$emoji_list = %w[smile]
+
 def assert_equal(expected, actual, dtext:, model:, id:)
   success = expected == actual
 
@@ -17,16 +19,15 @@ def assert_equal(expected, actual, dtext:, model:, id:)
 
       puts
       puts
-      puts "Old: http://192.168.0.101:3000/#{model}/#{id}"
-      puts "New: https://danbooru.donmai.us/#{model}/#{id}"
+      puts "Old: https://danbooru.donmai.us/#{model}/#{id}"
+      puts "New: http://localhost:3000/#{model}/#{id}"
       puts
       puts "DText: \n```\n#{dtext}\n```"
       puts
       #puts "Expected: #{expected}"
       #puts
       #puts "Actual:   #{actual}"
-      puts `dwdiff -P -c /tmp/expected.txt /tmp/actual.txt`
-      #puts `dwdiff -W'' -P -c /tmp/expected.txt /tmp/actual.txt`
+      puts `git diff --word-diff=color /tmp/expected.txt /tmp/actual.txt`
       puts
     end
   end
@@ -46,7 +47,7 @@ def test_file(filename, field = "body", dtext_field: "#{field}_dtext", **options
     file.each_line.with_index do |line, i|
       print "." if (i % 10000).zero?
       json = JSON.parse(line)
-      success = assert_equal(json["dtext"], DText.parse(json["text"], domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us], **options), dtext: json["text"], model: model, id: json["id"])
+      success = assert_equal(json["dtext"], DText.parse(json["text"], domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us], emoji_list: $emoji_list, **options), dtext: json["text"], model: model, id: json["id"])
       failures += !success ? 1 : 0
     end
   end
