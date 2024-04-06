@@ -565,39 +565,39 @@ class DText
       block.call(element) if block.present?
 
       case element.name
-      when "text"
+      in "text"
         element.content.gsub(/(?:\r|\n)+$/, "")
-      when "br"
+      in "br"
         "\n"
-      when "p", "ul", "ol"
+      in ("p" | "ul" | "ol")
         content = from_html(element, base_url:, &block).strip
         "#{content}\n\n"
-      when "blockquote"
+      in "blockquote"
         content = from_html(element, base_url:, &block).strip
         "[quote]#{content}[/quote]\n\n" if content.present?
-      when "small", "sub"
+      in ("small" | "sub") unless element.ancestors.any? { |e| e.name.in?(%w[small sub]) }
         content = from_html(element, base_url:, &block)
         "[tn]#{content}[/tn]" if content.present?
-      when "b", "strong"
+      in ("b" | "strong") unless element.ancestors.any? { |e| e.name.in?(%w[b strong]) }
         content = from_html(element, base_url:, &block)
         "[b]#{content}[/b]" if content.present?
-      when "i", "em"
+      in ("i" | "em") unless element.ancestors.any? { |e| e.name.in?(%w[i em]) }
         content = from_html(element, base_url:, &block)
         "[i]#{content}[/i]" if content.present?
-      when "u"
+      in "u" unless element.ancestors.any? { |e| e.name == "u" }
         content = from_html(element, base_url:, &block)
         "[u]#{content}[/u]" if content.present?
-      when "s", "strike"
+      in ("s" | "strike") unless element.ancestors.any? { |e| e.name.in?(%w[s strike]) }
         content = from_html(element, base_url:, &block)
         "[s]#{content}[/s]" if content.present?
-      when "li"
+      in "li"
         content = from_html(element, &block)
         "* #{content}\n" if content.present?
-      when "h1", "h2", "h3", "h4", "h5", "h6"
+      in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")
         hn = element.name
         title = from_html(element, base_url:, &block)
         "#{hn}. #{title}\n\n"
-      when "a"
+      in "a"
         title = from_html(element, base_url:, inline: true, &block).strip
         url = element["href"].to_s
 
@@ -622,7 +622,7 @@ class DText
         else
           %{"#{title.gsub('"', "&quot;")}":[#{url}]}
         end
-      when "img"
+      in "img"
         alt_text = element.attributes["title"] || element.attributes["alt"] || ""
         src = element["src"]
 
@@ -633,7 +633,7 @@ class DText
         else
           ""
         end
-      when "comment"
+      in "comment"
         # ignored
       else
         from_html(element, base_url:, &block)
