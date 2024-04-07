@@ -156,7 +156,7 @@ class Comment < ApplicationRecord
     end
 
     def discord_body
-      DText.new(body).to_markdown.truncate(2000)
+      DText.new(body, media_embeds: true).to_markdown.truncate(2000)
     end
 
     def discord_footer
