@@ -547,9 +547,26 @@ class DText
     html = parse_html(html) if html.is_a?(String)
     return "" if html.nil?
 
-    html.children.map do |element|
-      block.call(element) if block.present?
+    # Allow caller to rewrite elements before processing them.
+    html.children.each { |element| block.call(element) } if block.present?
 
+    children = []
+    html.children.each do |current|
+      # Normalize equivalent elements
+      current.name = "b" if current.name == "strong"
+      current.name = "i" if current.name == "em"
+      current.name = "s" if current.name == "strike"
+      current.name = "small" if current.name == "sub"
+
+      # Merge adjacent elements of the same type: <b>foo</b><b>bar</b> -> <b>foobar</b>
+      if current.name.in?(%w[b i u s small]) && children.last&.name == current.name
+        children.last.add_child(current.children)
+      else
+        children << current
+      end
+    end
+
+    children.map do |element|
       case element.name
       in "text"
         element.content.gsub(/(?:\r|\n)+$/, "")
@@ -561,19 +578,19 @@ class DText
       in "blockquote"
         content = from_html(element, base_url:, &block).strip
         "[quote]#{content}[/quote]\n\n" if content.present?
-      in ("small" | "sub") unless element.ancestors.any? { |e| e.name.in?(%w[small sub]) }
+      in "small" unless element.ancestors.any? { |e| e.name == "small" }
         content = from_html(element, base_url:, &block)
         "[tn]#{content}[/tn]" if content.present?
-      in ("b" | "strong") unless element.ancestors.any? { |e| e.name.in?(%w[b strong]) }
+      in "b" unless element.ancestors.any? { |e| e.name == "b" }
         content = from_html(element, base_url:, &block)
         "[b]#{content}[/b]" if content.present?
-      in ("i" | "em") unless element.ancestors.any? { |e| e.name.in?(%w[i em]) }
+      in "i" unless element.ancestors.any? { |e| e.name == "i" }
         content = from_html(element, base_url:, &block)
         "[i]#{content}[/i]" if content.present?
       in "u" unless element.ancestors.any? { |e| e.name == "u" }
         content = from_html(element, base_url:, &block)
         "[u]#{content}[/u]" if content.present?
-      in ("s" | "strike") unless element.ancestors.any? { |e| e.name.in?(%w[s strike]) }
+      in "s" unless element.ancestors.any? { |e| e.name == "s" }
         content = from_html(element, base_url:, &block)
         "[s]#{content}[/s]" if content.present?
       in "li"

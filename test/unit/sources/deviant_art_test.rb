@@ -372,7 +372,7 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/sakimichan/art/Tifa-Pullup-pinup-841327466",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          [b]"Pixiv":[https://www.pixiv.net/member.php?id=3384404][/b][b]ll"facebook\u00a0":[https://www.facebook.com/Sakimichanart/] [/b]ll"Online Store":[https://sakimichanart.storenvy.com/]\u00a0ll\u00a0"Tumblr":[https://sakimichan.tumblr.com/]\u00a0ll [b]"Patreon":[https://www.patreon.com/sakimichan][/b]ll[b]"Artstation":[https://www.artstation.com/artist/sakimichan][/b]l[b]"Instagram":[https://instagram.com/sakimi.chan/][/b] [b]"gumroad(tutorial store)":[https://gumroad.com/sakimichan][/b]\u00a0 [b]cubebrush"(new tutorial store)":[https://cubebrush.co/sakimichan][/b]
+          [b]"Pixiv":[https://www.pixiv.net/member.php?id=3384404]ll"facebook\u00a0":[https://www.facebook.com/Sakimichanart/] [/b]ll"Online Store":[https://sakimichanart.storenvy.com/]\u00a0ll\u00a0"Tumblr":[https://sakimichan.tumblr.com/]\u00a0ll [b]"Patreon":[https://www.patreon.com/sakimichan][/b]ll[b]"Artstation":[https://www.artstation.com/artist/sakimichan][/b]l[b]"Instagram":[https://instagram.com/sakimi.chan/][/b] [b]"gumroad(tutorial store)":[https://gumroad.com/sakimichan][/b]\u00a0 [b]cubebrush"(new tutorial store)":[https://cubebrush.co/sakimichan][/b]
 
           Tifa is my favorite female character in the final fantasy series ! Also the pull boss was one of my favorite section of the game so i wanted to try painting her doing some (struggled to paint out this idea)^u^~
 
