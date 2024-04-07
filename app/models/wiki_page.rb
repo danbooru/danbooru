@@ -247,6 +247,18 @@ class WikiPage < ApplicationRecord
       pretty_title
     end
 
+    def discord_image(channel)
+      if channel.nsfw?
+        dtext_body.embedded_posts.find do |post|
+          post.visible?(User.anonymous)
+        end
+      else
+        dtext_body.embedded_posts.find do |post|
+          post.visible?(User.anonymous) && post.rating == 'g'
+        end
+      end&.discord_image(channel)
+    end
+
     def discord_body
       DText.new(body).to_markdown.truncate(2000)
     end

@@ -40,6 +40,22 @@ module Discord
 
       if wiki_page.present?
         wiki_page.send_embed(event.channel)
+      else
+        image = if event.channel.nsfw?
+          Post.anon_tag_match(title).order(score: :desc).limit(1)
+        else
+          Post.anon_tag_match("#{title} rating:g").order(score: :desc).limit(1)
+        end.first&.discord_image(event.channel)
+
+        if image.present?
+          event.channel.send_embed do |embed|
+            embed.title = title.tr("_", " ")
+            embed.url = Routes.new_wiki_page_url(wiki_page: { title: })
+            embed.image = image
+
+            embed.description = "No wiki page found for this tag."
+          end
+        end
       end
     end
 
