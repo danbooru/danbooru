@@ -35,3 +35,14 @@ div.ui-dialog form.simple_form div.custom-metadata-field {
     margin-left: 0.25em;
   }
 }
+
+table.ai-metadata-table {
+  th {
+    width: 160px;
+    word-wrap: anywhere;
+  }
+
+  td {
+    word-wrap: anywhere;
+  }
+}
