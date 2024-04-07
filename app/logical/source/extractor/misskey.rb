@@ -78,7 +78,7 @@ class Source::Extractor::Misskey < Source::Extractor
   end
 
   def dtext_artist_commentary_desc
-    DText.from_html(artist_commentary_desc, base_url: "https://#{domain}")&.strip
+    DText.from_html(artist_commentary_desc, base_url: "https://#{domain}")
   end
 
   memoize def api_response

@@ -17,7 +17,7 @@ module Sources
         tags: [],
         artist_commentary_title: "Holiday Elincia",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          Christmas sketch commission! \u00a0Elincia from Fire Emblem! \u00a0Thanks!
+          Christmas sketch commission! Elincia from Fire Emblem! Thanks!
           I think it suits her really well. * - * Also you can never go wrong with sexy Christmas sweaters!
         EOS
       )
@@ -81,9 +81,7 @@ module Sources
 
           h1. lol
 
-
-
-          [b]blah[/b] [i]blah[/i] [u]blah[/u] [s]blah[/s]
+          [b]blah[/b] [i]blah[/i] [u]blah[/u] [s]blah[/s]
           herp derp
 
           [quote]this is a quote[/quote]
@@ -151,7 +149,6 @@ module Sources
         dtext_artist_commentary_desc: <<~EOS.chomp
           Another Malenia Art, and not the last ":) (Smile)":[https://e.deviantart.net/emoticons/s/smile.gif]
 
-
           Limited Print : "finnstarkillustration.com/blad…":[https://finnstarkillustration.com/blade-of-miquella-moon-only-20-copies-worldwide.html]
           Common print : "www.redbubble.com/fr/shop/ap/1…":[https://www.redbubble.com/fr/shop/ap/109026235?ref=studio-promote]
           Displate : "displate.com/anatofinnstark/el…":[https://displate.com/anatofinnstark/eldensouls?art=5eec73f09ab12]
@@ -188,7 +185,6 @@ module Sources
           Nidoran♂ (King) > "[link]":[https://wolfathegoddess2010.deviantart.com/art/King-and-Anna-pokemon-173524307?q=gallery%3Awolfathegoddess2010%2F11255073&qo=10]
           Nidoran♀ (Queen) > "[link]":[https://wolfathegoddess2010.deviantart.com/art/Aoiro-and-Queen-175776997?q=gallery%3Awolfathegoddess2010%2F11255073&qo=0]
 
-
           Nidoran ♂ and ♀(c) Pokemon
           Art (c) Mikoto-chan
         EOS
@@ -211,9 +207,7 @@ module Sources
 
           Photoshop CS3, intuos3, few hours, reference on the character by SilverHawks cartoon series..
 
-
           SilverHawks belongs to WarnerBros.
-
 
           EDS
         EOS
@@ -255,7 +249,7 @@ module Sources
         tags: [],
         artist_commentary_title: "Ten miles of cherry blossoms",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          Commission for\u00a0"shrimpHEBY":[https://www.deviantart.com/shrimpheby]\u00a0
+          Commission for "shrimpHEBY":[https://www.deviantart.com/shrimpheby]
           Hope you guys enjoy! (｢･ω･)｢
         EOS
       )
@@ -307,7 +301,7 @@ module Sources
         profile_url: "https://www.deviantart.com/theneohub",
         artist_commentary_title: "Kim Possible (Subscribers only)",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          I would love to hear what you think so please leave a comment! \u00a0"Heart":[https://e.deviantart.net/emoticons/h/heart.gif]
+          I would love to hear what you think so please leave a comment! "Heart":[https://e.deviantart.net/emoticons/h/heart.gif]
         EOS
       )
     end
@@ -327,7 +321,7 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/dishwasher1910/art/Solar-Sisters-792488305",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          Solar sisters\x20
+          Solar sisters
 
           HD images , Psd file and alternative version available on my Patreon :
           "www.patreon.com/Dishwasher1910":[https://www.patreon.com/Dishwasher1910]
@@ -372,27 +366,17 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/sakimichan/art/Tifa-Pullup-pinup-841327466",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          [b]"Pixiv":[https://www.pixiv.net/member.php?id=3384404]ll"facebook\u00a0":[https://www.facebook.com/Sakimichanart/] [/b]ll"Online Store":[https://sakimichanart.storenvy.com/]\u00a0ll\u00a0"Tumblr":[https://sakimichan.tumblr.com/]\u00a0ll [b]"Patreon":[https://www.patreon.com/sakimichan][/b]ll[b]"Artstation":[https://www.artstation.com/artist/sakimichan][/b]l[b]"Instagram":[https://instagram.com/sakimi.chan/][/b] [b]"gumroad(tutorial store)":[https://gumroad.com/sakimichan][/b]\u00a0 [b]cubebrush"(new tutorial store)":[https://cubebrush.co/sakimichan][/b]
+          [b]"Pixiv ":[https://www.pixiv.net/member.php?id=3384404]ll"facebook ":[https://www.facebook.com/Sakimichanart/] [/b]ll"Online Store":[https://sakimichanart.storenvy.com/] ll "Tumblr":[https://sakimichan.tumblr.com/] ll [b]"Patreon":[https://www.patreon.com/sakimichan][/b]ll[b]"Artstation":[https://www.artstation.com/artist/sakimichan][/b]l[b]"Instagram":[https://instagram.com/sakimi.chan/][/b] [b]"gumroad(tutorial store)":[https://gumroad.com/sakimichan][/b] [b]cubebrush"(new tutorial store)":[https://cubebrush.co/sakimichan][/b]
 
           Tifa is my favorite female character in the final fantasy series ! Also the pull boss was one of my favorite section of the game so i wanted to try painting her doing some (struggled to paint out this idea)^u^~
 
           * High res jpg steps
-          * layer PSD\u00a0
+          * layer PSD
           * video process
 
-          h4. ❅"available on patreon":[https://www.patreon.com/posts/36972487]
+          h4. ❅"available on patreon ":[https://www.patreon.com/posts/36972487]
 
-
-
-
-
-
-
-
-
-
-
-          "Patreon reward archive\u00a0":[https://sakimichan.deviantart.com/journal/Patreon-Rewards-Archive-498302321]( see what rewards you can get by helping support me !)
+          " Patreon reward archive ":[https://sakimichan.deviantart.com/journal/Patreon-Rewards-Archive-498302321]( see what rewards you can get by helping support me !)
 
           FREE RELEASE! Enjoy ^_^
 

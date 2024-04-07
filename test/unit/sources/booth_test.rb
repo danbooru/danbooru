@@ -72,7 +72,27 @@ module Sources
         other_names: ["Re:fAce Music Production SHOP", "re-face"],
         tags: %w[music original re:face ricchan\ * virtual\ youtuber くるみ だてんちゆあ ひなの羽衣 りふぇいす。 アイドル 千草はな 白乃クロミ 白咲べる 赤坂まさか 音楽],
         artist_commentary_title: "RwithV vol.1 -アイドルはじめます！-",
-        dtext_artist_commentary_desc: /注文が殺到した際は、発送が遅れてしまう場合もございますので予めご了承ください。/
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Re:fAce 2020秋新作アルバム「R with V vol.1 -アイドルはじめます！-」
+
+          Re:fAce×Vtuberコラボアルバム第一弾は7人のVtuberとRe:fAceがコラボした全12曲の豪華フルアルバム。
+
+          千草はな https://twitter.com/hanachigusa_ch
+          白咲べる https://twitter.com/bell_srsk
+          くるみ https://twitter.com/kurumi_UoxoU
+          白乃クロミ https://twitter.com/shirono_kuromi
+          ひなの羽衣 https://twitter.com/HinanoUi
+          だてんちゆあ https://twitter.com/datenti_yua
+          赤坂まさか https://twitter.com/Masaka_asobu
+
+          注文が殺到した際は、発送が遅れてしまう場合もございますので予めご了承ください。
+
+          最新情報をお届け！各種ページをチェック！！
+
+          Re:fAce公式ツイッター  https://twitter.com/RefAce_official
+          りふぇいす。公式キャラクター りふぇ子 https://twitter.com/refA_ko
+          Re:fAce/りふぇいす。公式HP https://www.reface-music.com
+        EOS
       )
     end
 

@@ -113,7 +113,7 @@ module Sources
           tag_name: "kino",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
-            丹穹　R-18 (※攻めローションガーゼ)
+            丹穹 R-18 (※攻めローションガーゼ)
             普段水を操っている丹が自分から出る水分を制御できないのえっちだよね！のらくがきです
 
             ⚠︎なんでも大丈夫な方向け

@@ -159,7 +159,7 @@ module Sources
         tag_name: "hosi_na",
         artist_commentary_title: "The Queen 여왕",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          The keywords of this concept are absolute Power, The Queen, and a cool-headed person.\x20
+          The keywords of this concept are absolute Power, The Queen, and a cool-headed person.
           컨셉 키워드는 '힘,여왕,냉정함'
         EOS
       )
@@ -202,7 +202,7 @@ module Sources
 
           These were featured as part of the art for the "Tal'dorei Campaign Setting" book by Matt Mercer and James Haeck. Based on locations on the continent of Tal'dorei from the D&D web series "Critical Role" by Geek & Sundry.
 
-          Copyright 2017\x20
+          Copyright 2017
           Green Ronin Publishing, LLC
         EOS
       )

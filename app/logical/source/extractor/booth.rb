@@ -38,7 +38,7 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      DText.from_html(artist_commentary_desc, base_url: "https://booth.pm").strip
+      DText.from_plaintext(artist_commentary_desc)
     end
 
     def tags

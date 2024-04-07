@@ -71,7 +71,7 @@ class Source::Extractor::CiEn < Source::Extractor
   end
 
   def dtext_artist_commentary_desc
-    DText.from_html(artist_commentary_desc, base_url: "https://ci-en.net")&.strip&.gsub("\n\n", "\n")
+    DText.from_html(artist_commentary_desc, base_url: "https://ci-en.net")
   end
 
   def tags

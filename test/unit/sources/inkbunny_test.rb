@@ -24,7 +24,11 @@ module Sources
         artist_name: "Yupa",
         tag_name: "yupa",
         tags: ["cub", "cum", "cum in pussy", "cum inside", "cumming", "female", "fox", "furry", "girl", "nude", "pussy", "underwear"],
-        dtext_artist_commentary_desc: "commission work for \n\t\t\t\t\t\"Okamii\":[https://inkbunny.net/Okamii]\n\nThank you!"
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          commission work for "Okamii":[https://inkbunny.net/Okamii]
+
+          Thank you!
+        EOS
       )
     end
 

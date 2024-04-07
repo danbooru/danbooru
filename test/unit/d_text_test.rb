@@ -265,6 +265,22 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("[b]foo[/b] [b]bar[/b]", DText.from_html("<b>foo</b> <b>bar</b>"))
       end
 
+      should "normalize whitespace" do
+        assert_equal("[b]foo bar[/b]", DText.from_html("<b>foo&nbsp;bar</b>"))
+        assert_equal("[b]foo bar[/b]", DText.from_html("<b>foo\tbar</b>"))
+        assert_equal("[b]foo bar[/b]", DText.from_html("<b>foo\r\nbar</b>"))
+        assert_equal("[b]foo bar[/b]", DText.from_html("<b>foo\r\n\r\nbar</b>"))
+        assert_equal("[b]foobar[/b]", DText.from_html("<b>foo\u200Bbar</b>"))
+
+        assert_equal("foo\nbar", DText.from_html("foo<br>bar"))
+        assert_equal("foo\nbar", DText.from_html(" foo <br>bar "))
+        assert_equal("foo\nbar", DText.from_html("foo <br> bar"))
+        assert_equal("h1. foo bar", DText.from_html("<h1>foo<br>bar</h1>"))
+        assert_equal('"foo bar":[http://google.com]', DText.from_html('<a href="http://google.com">foo<br>bar</a>'))
+        assert_equal("* foo bar", DText.from_html("<ul><li>foo<br>bar</li></ul>"))
+        assert_equal('foo" bar baz ":[http://google.com]quux', DText.from_html('foo<a href="http://google.com">  bar  baz  </a>quux'))
+      end
+
       should "not convert URLs with unsupported schemes to dtext links" do
         assert_equal("blah", DText.from_html('<a href="ftp://example.com">blah</a>'))
         assert_equal("blah", DText.from_html('<a href="file:///etc/password">blah</a>'))

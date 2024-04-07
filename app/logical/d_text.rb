@@ -481,46 +481,48 @@ class DText
   #
   # @return [String] the plain text output
   def strip_dtext
-    html = DText.parse(dtext)
-    DText.to_plaintext(html)
+    html = DText.parse_html(format_text)
+    DText.html_to_plaintext(html).strip
   end
 
-  # Remove all formatting from a string of HTML, converting it to plain text.
+  # Convert HTML to plaintext.
   #
-  # @param html [String] the HTML input
+  # @param html [Nokogiri::HTML5::DocumentFragment] the HTML input
   # @return [String] the plain text output
-  def self.to_plaintext(html)
-    text = from_html(html) do |node|
+  def self.html_to_plaintext(html)
+    html.children.map do |node|
       case node.name
-      when "a", "strong", "em", "u", "s", "h1", "h2", "h3", "h4", "h5", "h6"
-        node.name = "span"
-        node.content = node.text
+      when "p", "h1", "h2", "h3", "h4", "h5", "h6"
+        "#{html_to_plaintext(node)}\n\n"
+      when "li"
+        "* #{html_to_plaintext(node)}\n"
+      when "br"
+        "\n"
       when "blockquote"
-        node.name = "span"
-        node.content = to_plaintext(node.inner_html).gsub(/^/, "> ")
+        html_to_plaintext(node).strip.gsub(/^/, "> ")
       when "details"
-        node.name = "span"
-        node.content = to_plaintext(node.css("div").inner_html)
+        html_to_plaintext(node.css("div"))
+      when "text"
+        node.text
+      else
+        html_to_plaintext(node)
       end
-    end
-
-    text.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    end.join
   end
 
   # Convert DText formatting to Markdown.
   #
   # @return [String] the Markdown output
   def to_markdown
-    html_to_markdown(format_text)
+    html = DText.parse_html(format_text)
+    DText.html_to_markdown(html)
   end
 
   # Convert HTML to Markdown.
   #
-  # @param html [String] the HTML input
+  # @param html [Nokogiri::HTML5::DocumentFragment] the HTML input
   # @return [String] the Markdown output
-  def html_to_markdown(string)
-    html = DText.parse_html(string)
-
+  def self.html_to_markdown(html)
     html.children.map do |node|
       case node.name
       when "div", "blockquote", "table"
@@ -530,11 +532,19 @@ class DText
       when "text"
         node.text.gsub(/_/, '\_').gsub(/\*/, '\*')
       when "p", "h1", "h2", "h3", "h4", "h5", "h6"
-        html_to_markdown(node.inner_html) + "\n\n"
+        html_to_markdown(node) + "\n\n"
       else
-        html_to_markdown(node.inner_html)
+        html_to_markdown(node)
       end
     end.join
+  end
+
+  # Convert plain text to DText.
+  #
+  # @param text [String] The plain text input.
+  # @return [StringT the DText output
+  def self.from_plaintext(text)
+    text.to_s.normalize_whitespace(eol: "\n").gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").strip
   end
 
   # Convert HTML to DText.
@@ -545,6 +555,11 @@ class DText
   # @return [String] the DText output
   def self.from_html(html, base_url: nil, inline: false, &block)
     html = parse_html(html) if html.is_a?(String)
+    dtext = html_to_dtext(html, base_url:, inline:, &block)
+    dtext.gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").strip
+  end
+
+  def self.html_to_dtext(html, base_url: nil, inline: false, &block)
     return "" if html.nil?
 
     # Allow caller to rewrite elements before processing them.
@@ -569,39 +584,44 @@ class DText
     children.map do |element|
       case element.name
       in "text"
-        element.content.gsub(/(?:\r|\n)+$/, "")
+        element.content.normalize_whitespace(eol: "\n").gsub(/ *\n+ */, "\n").gsub(/[ \n]+/, " ")
+      in "br" if element.ancestors.any? { |e| e.name.in?(%w[a li h1 h2 h3 h4 h5 h6]) }
+        " "
       in "br"
         "\n"
       in ("p" | "ul" | "ol")
-        content = from_html(element, base_url:, &block).strip
+        content = html_to_dtext(element, base_url:, &block).strip
         "#{content}\n\n"
       in "blockquote"
-        content = from_html(element, base_url:, &block).strip
+        content = html_to_dtext(element, base_url:, &block).strip
         "[quote]#{content}[/quote]\n\n" if content.present?
+      in "spoiler" # fake tag added by source extractors
+        content = html_to_dtext(element, base_url:, &block).strip
+        "[spoiler]\n#{content}\n[/spoiler]\n\n" if content.present?
       in "small" unless element.ancestors.any? { |e| e.name == "small" }
-        content = from_html(element, base_url:, &block)
+        content = html_to_dtext(element, base_url:, &block)
         "[tn]#{content}[/tn]" if content.present?
       in "b" unless element.ancestors.any? { |e| e.name == "b" }
-        content = from_html(element, base_url:, &block)
+        content = html_to_dtext(element, base_url:, &block)
         "[b]#{content}[/b]" if content.present?
       in "i" unless element.ancestors.any? { |e| e.name == "i" }
-        content = from_html(element, base_url:, &block)
+        content = html_to_dtext(element, base_url:, &block)
         "[i]#{content}[/i]" if content.present?
       in "u" unless element.ancestors.any? { |e| e.name == "u" }
-        content = from_html(element, base_url:, &block)
+        content = html_to_dtext(element, base_url:, &block)
         "[u]#{content}[/u]" if content.present?
       in "s" unless element.ancestors.any? { |e| e.name == "s" }
-        content = from_html(element, base_url:, &block)
+        content = html_to_dtext(element, base_url:, &block)
         "[s]#{content}[/s]" if content.present?
       in "li"
-        content = from_html(element, &block)
+        content = html_to_dtext(element, &block).strip
         "* #{content}\n" if content.present?
       in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")
         hn = element.name
-        title = from_html(element, base_url:, &block)
+        title = html_to_dtext(element, base_url:, &block).strip
         "#{hn}. #{title}\n\n"
       in "a"
-        title = from_html(element, base_url:, inline: true, &block).strip
+        title = html_to_dtext(element, base_url:, inline: true, &block).squeeze(" ")
         url = element["href"].to_s
 
         if title.blank?
@@ -639,7 +659,7 @@ class DText
       in "comment"
         # ignored
       else
-        from_html(element, base_url:, &block)
+        html_to_dtext(element, base_url:, &block)
       end
     end.join
   end
