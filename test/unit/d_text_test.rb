@@ -244,6 +244,27 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal('[b]"foo":[https://www.google.com][/b]', DText.from_html('<b><a href="https://www.google.com"><b>foo</b></a></b>'))
       end
 
+      should "coalesce redundant adjacent formatting tags" do
+        assert_equal("[b]foobar[/b]", DText.from_html("<b>foo</b><b>bar</b>"))
+        assert_equal("[b]foobar[/b]", DText.from_html("<b>foo</b><strong>bar</strong>"))
+
+        assert_equal("[i]foobar[/i]", DText.from_html("<i>foo</i><i>bar</i>"))
+        assert_equal("[i]foobar[/i]", DText.from_html("<i>foo</i><em>bar</em>"))
+
+        assert_equal("[s]foobar[/s]", DText.from_html("<s>foo</s><s>bar</s>"))
+        assert_equal("[s]foobar[/s]", DText.from_html("<s>foo</s><strike>bar</strike>"))
+
+        assert_equal("[u]foobar[/u]", DText.from_html("<u>foo</u><u>bar</u>"))
+
+        assert_equal("[tn]foobar[/tn]", DText.from_html("<small>foo</small><small>bar</small>"))
+        assert_equal("[tn]foobar[/tn]", DText.from_html("<small>foo</small><sub>bar</sub>"))
+
+        assert_equal("[b]foo[i]bar[/i][/b]", DText.from_html("<b>foo</b><b><i>bar</i></b>"))
+        assert_equal("[b]foobar[/b]", DText.from_html("<b>foo</b><b><b>bar</b></b>"))
+
+        assert_equal("[b]foo[/b] [b]bar[/b]", DText.from_html("<b>foo</b> <b>bar</b>"))
+      end
+
       should "not convert URLs with unsupported schemes to dtext links" do
         assert_equal("blah", DText.from_html('<a href="ftp://example.com">blah</a>'))
         assert_equal("blah", DText.from_html('<a href="file:///etc/password">blah</a>'))
