@@ -162,7 +162,7 @@ class ForumTopic < ApplicationRecord
     end
 
     def discord_body
-      DText.to_markdown(original_post.body).truncate(2000)
+      DText.new(original_post.body).to_markdown.truncate(2000)
     end
   end
 

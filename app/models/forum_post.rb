@@ -230,7 +230,7 @@ class ForumPost < ApplicationRecord
     end
 
     def discord_body
-      DText.to_markdown(body).truncate(2000)
+      DText.new(body).to_markdown.truncate(2000)
     end
   end
 
