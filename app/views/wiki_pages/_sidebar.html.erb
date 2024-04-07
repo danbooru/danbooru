@@ -9,6 +9,7 @@
       <% unless @wiki_page.is_meta_wiki? %>
         <% if @wiki_page.tag.present? %>
           <li><%= link_to "Tag History", tag_versions_path(search: { tag_id: @wiki_page.tag&.id }) %></li>
+          <li><%= link_to "Edit Tag", edit_tag_path(@wiki_page.tag) %></li>
         <% end %>
 
         <li><%= link_to "Post History", post_versions_path(search: { changed_tags: @wiki_page.title }) %></li>
