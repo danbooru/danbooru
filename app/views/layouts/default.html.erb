@@ -106,7 +106,6 @@
           <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
         <% end %>
         <% if CurrentUser.user.show_ads?%>
-          <li id="nav-ad-0"><a id="ad-soulfun" href="https://redirect.aibooru.online/nav-ad-0?location=https%3A%2F%2Failand.to%2Fr%2Fsf_landing_anime&utm_source=link-abr&cp_id=navbar&click_location=nav-ad-0&page=<%= CGI.escape(request.original_url) %>" style="color: #F784C6 !important;">AI Sexting</a></li>
         <% end %>
 
         <%= nav_link_to("More »", site_map_path) %>
