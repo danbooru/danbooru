@@ -58,8 +58,8 @@ module Sources
       strategy_should_work(
         "https://www.hentai-foundry.com/pictures/user/LumiNyu/867562/Mona-patreon-winner",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          [b]If you like this picture don't forget to\u00a0thumbs up\u00a0and\u00a0favorite\u00a0
-          [/b][b]"Also you can support my art on\u00a0":[https://picarto.tv/LumiNyu][/b][b]"Patreon":[https://www.patreon.com/LumiNyu]\u00a0and gain instant access to exclusive\u00a0"patreon":[https://www.patreon.com/LumiNyu]\u00a0content and also be able to vote for the future set of girls I should draw.[/b]
+          [b]If you like this picture don't forget to thumbs up and favorite
+          [/b][b]"Also you can support my art on ":[https://picarto.tv/LumiNyu][/b][b]"Patreon":[https://www.patreon.com/LumiNyu] and gain instant access to exclusive "patreon":[https://www.patreon.com/LumiNyu] content and also be able to vote for the future set of girls I should draw.[/b]
         EOS
       )
     end
@@ -69,12 +69,12 @@ module Sources
         "https://www.hentai-foundry.com/pictures/user/QueenComplex/1079933/Fucc",
         dtext_artist_commentary_desc: <<~EOS.chomp
           It's a 4th piece in a set of 6
-          Previous ones being - This is a sequel to my drawings\u00a0"[b]&quot;Butts&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/butts],\u00a0"[b]&quot;Bubbs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/bubbs]\u00a0and\u00a0"[b]&quot;Diccs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/diccs]
+          Previous ones being - This is a sequel to my drawings "[b]&quot;Butts&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/butts], "[b]&quot;Bubbs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/bubbs] and "[b]&quot;Diccs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/diccs]
           "[b]QUEENCOMPLEX.NET[/b]":[https://queencomplex.net/]
           The place to see my newest drawings
           and the place to support my work.
-          "[b]@Queen_Complexxx[/b]":[https://twitter.com/Queen_Complexxx]\u00a0-\u00a0My Twitter
-          "[b]mail@queencomplex.net[/b]":[mailto:<span style=]"&quot;>":[mailto:<span style=][b]<mailto:mail@queencomplex.net>[/b]\u00a0- My main Email
+          "[b]@Queen_Complexxx[/b]":[https://twitter.com/Queen_Complexxx] - My Twitter
+          "[b]mail@queencomplex.net[/b]":[mailto:<span style=]"&quot;>":[mailto:<span style=][b]<mailto:mail@queencomplex.net>[/b] - My main Email
         EOS
       )
     end

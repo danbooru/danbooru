@@ -22,7 +22,7 @@ module Sources
         dtext_artist_commentary_desc: <<~EOS.chomp
           发了三次发不出有毒……
 
-          二部运动au  性转ac注意
+          二部运动au 性转ac注意
 
           失去耐心.jpg
         EOS

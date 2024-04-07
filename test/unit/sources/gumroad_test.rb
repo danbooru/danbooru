@@ -26,9 +26,9 @@ module Sources
 
             psd x 5
 
-            wip psd x2  ,  mp4 x 1
+            wip psd x2 , mp4 x 1
 
-            animation gif x 2 ,  mp4 x 2
+            animation gif x 2 , mp4 x 2
           EOS
         )
       end
@@ -66,9 +66,9 @@ module Sources
 
             psd x 5
 
-            wip psd x2  ,  mp4 x 1
+            wip psd x2 , mp4 x 1
 
-            animation gif x 2 ,  mp4 x 2
+            animation gif x 2 , mp4 x 2
           EOS
         )
       end

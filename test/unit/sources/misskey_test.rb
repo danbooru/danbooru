@@ -21,7 +21,7 @@ module Sources
         tag_name: "ixy194",
         tags: ["村上さん"],
         dtext_artist_commentary_desc: <<~EOS.chomp
-          村上さん "#村上さん":[https://misskey.io/tags/村上さん]　村上アート
+          村上さん "#村上さん":[https://misskey.io/tags/村上さん] 村上アート
         EOS
       )
     end

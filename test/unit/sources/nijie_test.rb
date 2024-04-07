@@ -70,9 +70,7 @@ module Sources
         title = "ラミアの里"
         desc = <<~EOS.chomp
           サークルaskot様より販売されました「ラミアの里 ～ラミアはぁれむで搾られて～」にて前回に引き続きフラウのイラストを担当させて頂きました。
-
           前作を知らなくても問題なく愉しめる内容となっております。体験版もありますので気になりましたら是非ダウンロードしてみて下さい。
-
           DLsite【<http://www.dlsite.com/maniax/work/=/product_id/RJ226998.html>】
         EOS
 

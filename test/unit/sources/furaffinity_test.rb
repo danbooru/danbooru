@@ -58,12 +58,9 @@ module Sources
         dtext_artist_commentary_desc: <<~EOS.chomp
           Mikey went to get some things from the shop, so Miko probably took some time to herself to rest! Not saying Mikey might be a handful sometimes :P
 
-
           Glad you loved this piece, Sheep! ^_^
 
-
-          Miko @ The Lovely "silentsheep\u00a0silentsheep":[https://www.furaffinity.net/user/silentsheep]
-
+          Miko @ The Lovely "silentsheep silentsheep":[https://www.furaffinity.net/user/silentsheep]
 
           Art @ CuteSexyRoButts from DeviantArt
         EOS

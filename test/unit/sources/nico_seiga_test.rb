@@ -116,14 +116,10 @@ module Sources
         dtext_artist_commentary_desc: <<~EOS.chomp
           アソビ大全を買おうかどうしようか悩み中
 
-
           ※ファンティアにはイラストをアップしてるのでフォローよろしくどうぞ
-
           https://fantia.jp/fanclubs/3263
 
-
           ※公開中100話以外の回はCG集(描き下ろし多数)に収録、よろしくどうぞ
-
           https://www.dlsite.com/home/circle/profile/=/maker_id/RG44783.html
         EOS
       )
@@ -248,22 +244,24 @@ module Sources
       should "correctly add spoiler tags" do
         site = Source::Extractor.find("https://seiga.nicovideo.jp/seiga/im8992650")
 
-        commentary = <<~COMM.chomp
+        commentary = <<~EOS.chomp
           SLVN大好き。ホントニアコガレテル。
 
           [spoiler]
           「魔理沙とアリスのクッキーKiss」
+
           企画者HZNの企画した東方合同動画企画
           苦行を称する東方ボイスドラマ
           遥か昔、東方界隈のはずれ
           その偏境に消えぬボイスドラマの火を見出したとき
           若き健常者HZNの心にも
           消えぬ野心が灯ったのだろう
+
           戦技は「義務教育」
           クッキー☆を終わるまで視聴させる技
           27分にわたる苦行からのエンディングで視聴者はぬわ疲に包まれる
           [/spoiler]
-        COMM
+        EOS
 
         assert_equal(commentary, site.dtext_artist_commentary_desc)
       end

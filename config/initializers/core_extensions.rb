@@ -74,18 +74,26 @@ module Danbooru
         match?(/\A#{pattern}\z/i)
       end
 
-      def normalize_whitespace
-        # Normalize various horizontal space characters to ASCII space.
-        text = gsub(/\p{Zs}|\t/, " ")
+      # Normalize horizontal and vertical whitespace characters, and strip zero-width space characters.
+      #
+      # https://en.wikipedia.org/wiki/Whitespace_character
+      def normalize_whitespace(eol: "\r\n")
+        strip_zwsp.normalize_spaces.normalize_eol(eol)
+      end
 
-        # Strip various zero width space characters. Zero width joiner (200D)
-        # is allowed because it's used in emoji.
-        text = text.gsub(/[\u180E\u200B\u200C\u2060\uFEFF]/, "")
+      # Strip various zero-width space characters. Zero-width joiner (200D) is allowed because it's used in emoji.
+      def strip_zwsp
+        gsub(/[\u180E\u200B\u200C\u2060\uFEFF]/, "")
+      end
 
-        # Normalize various line ending characters to CRLF.
-        text = text.gsub(/\r?\n|\r|\v|\f|\u0085|\u2028|\u2029/, "\r\n")
+      # Normalize various horizontal space characters to ASCII space.
+      def normalize_spaces
+        gsub(/\p{Zs}|\t/, " ")
+      end
 
-        text
+      # Normalize various line ending characters to CRLF.
+      def normalize_eol(eol = "\r\n")
+        gsub(/\r?\n|\r|\v|\f|\u0085|\u2028|\u2029/, eol)
       end
 
       # Capitalize every word in the string. Like `titleize`, but doesn't remove underscores, apply inflection rules, or strip the `_id` suffix.
