@@ -28,14 +28,14 @@
 
 set -euxo pipefail
 
-ARCH="$(dpkg --print-architecture)"
+ARCH="$(docker info -f '{{ .ClientInfo.Arch }}')"
 CURRENT_PLATFORM="linux/$ARCH"
 
 IMAGE="${1:-danbooru}"
 PLATFORM="${2:-$CURRENT_PLATFORM}"
 
 DOCKER_IMAGE_REVISION=$(git rev-parse HEAD)
-DOCKER_IMAGE_BUILD_DATE="$(date --utc +"%Y-%m-%dT%H:%M:%S.%3NZ")"
+DOCKER_IMAGE_BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")"
 
 if [[ $PLATFORM != $CURRENT_PLATFORM && $PLATFORM != *,* ]]; then
   # If we're building for a different platform, and it's not a multi-platform image, then name the image after the platform so it doesn't conflict with images for the native platform.
