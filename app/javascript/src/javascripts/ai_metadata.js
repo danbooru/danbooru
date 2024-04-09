@@ -21,6 +21,12 @@ AIMetadata.initialize_all = function() {
       AIMetadata.inject_names(document);
     });
   }
+
+  if ($(".remove-metadata-button").length) {
+    $(".remove-metadata-button").on("click", (e) => {
+      $(e.target).closest("div").remove();
+    });
+  }
 };
 
 AIMetadata.inject_names = function(form) {
@@ -79,10 +85,6 @@ AIMetadata.initialize_edit_ai_metadata_dialog = function() {
   $("#add-ai-metadata").on("click.danbooru", (e) => {
     e.preventDefault();
     $("#add-ai-metadata-dialog").dialog("open");
-  });
-
-  $(".remove-metadata-button").on("click", (e) => {
-    $(e.target).closest("div").remove();
   });
 };
 
