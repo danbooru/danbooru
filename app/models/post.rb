@@ -456,17 +456,17 @@ class Post < ApplicationRecord
         tags << "tagme"
       end
 
-      if image_width >= 10_000 || image_height >= 10_000
-        tags << "incredibly_absurdres"
-      end
-      if image_width >= 3200 || image_height >= 2400
-        tags << "absurdres"
-      end
-      if image_width >= 1600 || image_height >= 1200
-        tags << "highres"
-      end
-      if image_width <= 500 && image_height <= 500
+      case image_width * image_height
+      when 0..(768*512)
         tags << "lowres"
+      when (768*512)...(1920*1080)
+        # do nothing
+      when (1920*1080)...(2560*1440)
+        tags << "highres"
+      when (2560*1440)..(3840*2160)
+        tags << "absurdres"
+      else
+        tags << "incredibly_absurdres"
       end
 
       if image_width >= 1024 && image_width.to_f / image_height >= 4
