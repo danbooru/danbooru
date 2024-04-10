@@ -92,6 +92,11 @@ module Danbooru
       Addressable::URI.encode_component(string, /[\/?#&+%]/).force_encoding("UTF-8")
     end
 
+    # Unescape URL-encoded characters in a string.
+    def self.unescape(string)
+      Addressable::URI.unencode_component(string)
+    end
+
     # @return [String] the URL in unnormalized form
     def to_s
       original_url
