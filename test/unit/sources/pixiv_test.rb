@@ -176,6 +176,25 @@ module Sources
         )
       end
 
+      context "A work with jump.php links in the commentary should URL-decode the query string in the links" do
+        strategy_should_work(
+          "https://www.pixiv.net/en/artworks/117099495",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            あなたの貴方の後ろにいるよ。
+            右手の先には…（ｶﾞｸﾌﾞﾙ）
+            ということで、サークル『玉乃露』、東方名華祭18の新作クリアファイル②です。
+
+            イラスト:あおい
+            (pixiv:[b]"user/240943":[https://www.pixiv.net/users/240943] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fusers%2F240943][/b])
+            (X 旧Twitter:[b]"twitter/wobumi":[https://twitter.com/wobumi][/b])
+
+            ＜委託取扱店（予約開始はお店によって違います…）＞
+            <https://www.melonbooks.co.jp/detail/detail.php?product_id=2344184>
+            <https://shop.akbh.jp/collections/vendors?q=%E7%8E%89%E4%B9%83%E9%9C%B2&sort_by=created-descending>
+          EOS
+        )
+      end
+
       context "A Pixiv post should translate the tags correctly" do
         setup do
           create(:tag, name: "comic")

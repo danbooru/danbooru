@@ -26,8 +26,10 @@ module Source
         end
 
         DText.from_html(text, base_url: "https://www.pixiv.net") do |element|
-          if element.name == "a" && element["href"].match?(%r!\A/jump\.php\?!)
-            element["href"] = Addressable::URI.heuristic_parse(element["href"]).normalized_query
+          # <a href="/jump.php?https%3A%2F%2Fshop.akbh.jp%2Fcollections%2Fvendors%3Fq%3D%25E7%258E%2589%25E4%25B9%2583%25E9%259C%25B2%26sort_by%3Dcreated-descending" target="_blank" rel="noopener">https://shop.akbh.jp/collections/vendors?q=%E7%8E%89%E4%B9%83%E9%9C%B2&amp;sort_by=created-descending</a>
+          if element.name == "a" && element["href"]&.starts_with?("/jump.php")
+            url = element["href"].delete_prefix("/jump.php?")
+            element["href"] = Danbooru::URL.unescape(url)
           end
         end
       end
