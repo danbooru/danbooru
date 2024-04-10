@@ -14,6 +14,14 @@ class DText
   DEFAULT_EMOJI_MAP = Danbooru.config.dtext_emojis
   DEFAULT_EMOJI_LIST = DEFAULT_EMOJI_MAP.keys.map(&:downcase)
 
+  # post #1234, pixiv #1234, etc. The canonical list is in lib/dtext_rb/ext/dtext/dtext.cpp.rl.
+  SHORTLINKS = %w[
+    alias appeal artist asset ban bur comment dmail dmail favgroup feedback flag forum implication mod action modreport
+    note pool post topic topic user wiki
+    issue pull commit
+    artstation deviantart gelbooru nijie pawoo pixiv pixiv sankaku seiga twitter yandere
+  ]
+
   attr_reader :dtext, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains, :emoji_list, :emoji_map, :options
 
   # Preprocess a set of DText messages and collect all tag, artist, wiki page, post, and media asset references. Called
@@ -566,15 +574,18 @@ class DText
   # @param html [Nokogiri::HTML5::DocumentFragment, String] The HTML input.
   # @param base_url [String] The base URL to use for relative URLs.
   # @param inline [Boolean] If true, convert <img> tags to plaintext.
+  # @param allowed_shortlinks [Array<String>] The list of shortlinks to allow in the DText (e.g. ["pixiv"] to not escape `pixiv #1234` shortlinks).
   # @return [String] the DText output
-  def self.from_html(html, base_url: nil, inline: false, &block)
+  def self.from_html(html, base_url: nil, inline: false, allowed_shortlinks: [], &block)
     html = parse_html(html) if html.is_a?(String)
-    dtext = html_to_dtext(html, base_url:, inline:, &block)
+    dtext = html_to_dtext(html, base_url:, inline:, allowed_shortlinks:, &block)
     dtext.gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").strip
   end
 
-  def self.html_to_dtext(html, base_url: nil, inline: false, &block)
+  def self.html_to_dtext(html, base_url: nil, inline: false, allowed_shortlinks: [], &block)
     return "" if html.nil?
+
+    options = { base_url:, inline:, allowed_shortlinks: }
 
     # Allow caller to rewrite elements before processing them.
     html.children.each { |element| block.call(element) } if block.present?
@@ -598,44 +609,44 @@ class DText
     children.map do |element|
       case element.name
       in "text"
-        element.content.normalize_whitespace(eol: "\n").gsub(/ *\n+ */, "\n").gsub(/[ \n]+/, " ")
+        escape(element.content, allowed_shortlinks:).normalize_whitespace(eol: "\n").gsub(/ *\n+ */, "\n").gsub(/[ \n]+/, " ")
       in "br" if element.ancestors.any? { |e| e.name.in?(%w[a li h1 h2 h3 h4 h5 h6]) }
         " "
       in "br"
         "\n"
       in ("p" | "ul" | "ol")
-        content = html_to_dtext(element, base_url:, &block).strip
+        content = html_to_dtext(element, **options, &block).strip
         "#{content}\n\n"
       in "blockquote"
-        content = html_to_dtext(element, base_url:, &block).strip
+        content = html_to_dtext(element, **options, &block).strip
         "[quote]#{content}[/quote]\n\n" if content.present?
       in "spoiler" # fake tag added by source extractors
-        content = html_to_dtext(element, base_url:, &block).strip
+        content = html_to_dtext(element, **options, &block).strip
         "[spoiler]\n#{content}\n[/spoiler]\n\n" if content.present?
       in "small" unless element.ancestors.any? { |e| e.name == "small" }
-        content = html_to_dtext(element, base_url:, &block)
+        content = html_to_dtext(element, **options, &block)
         "[tn]#{content}[/tn]" if content.present?
       in "b" unless element.ancestors.any? { |e| e.name == "b" }
-        content = html_to_dtext(element, base_url:, &block)
+        content = html_to_dtext(element, **options, &block)
         "[b]#{content}[/b]" if content.present?
       in "i" unless element.ancestors.any? { |e| e.name == "i" }
-        content = html_to_dtext(element, base_url:, &block)
+        content = html_to_dtext(element, **options, &block)
         "[i]#{content}[/i]" if content.present?
       in "u" unless element.ancestors.any? { |e| e.name == "u" }
-        content = html_to_dtext(element, base_url:, &block)
+        content = html_to_dtext(element, **options, &block)
         "[u]#{content}[/u]" if content.present?
       in "s" unless element.ancestors.any? { |e| e.name == "s" }
-        content = html_to_dtext(element, base_url:, &block)
+        content = html_to_dtext(element, **options, &block)
         "[s]#{content}[/s]" if content.present?
       in "li"
-        content = html_to_dtext(element, &block).strip
+        content = html_to_dtext(element, **options, &block).strip
         "* #{content}\n" if content.present?
       in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")
         hn = element.name
-        title = html_to_dtext(element, base_url:, &block).strip
+        title = html_to_dtext(element, **options, &block).strip
         "#{hn}. #{title}\n\n"
       in "a"
-        title = html_to_dtext(element, base_url:, inline: true, &block).squeeze(" ")
+        title = html_to_dtext(element, **options, inline: true, &block).squeeze(" ")
         url = element["href"].to_s
 
         if title.blank?
@@ -660,22 +671,29 @@ class DText
           %{"#{title.gsub('"', "&quot;")}":[#{url}]}
         end
       in "img"
-        alt_text = element.attributes["title"] || element.attributes["alt"] || ""
+        alt_text = element["title"] || element["alt"] || ""
         src = element["src"]
 
         if inline
-          alt_text
+          escape(alt_text, allowed_shortlinks:)
         elsif alt_text.present? && src.present?
-          %{"#{alt_text}":[#{src}]\n\n}
+          %{"#{alt_text.gsub('"', "&quot;")}":[#{src}]\n\n}
         else
           ""
         end
       in "comment"
         # ignored
       else
-        html_to_dtext(element, base_url:, &block)
+        html_to_dtext(element, **options, &block)
       end
     end.join
+  end
+
+  # Escape a piece of plain text so that special characters aren't interpreted as DText.
+  #
+  # @param allowed_shortlinks [Array<String>] The list of shortlinks to allow in the text (e.g. ["pixiv"] to not escape `pixiv #1234` shortlinks).
+  def self.escape(text, allowed_shortlinks: [])
+    text.gsub(/(#{Regexp.union(SHORTLINKS - allowed_shortlinks)}) #(\d+)/i, '\1 &num;\2') # post #1234 -> post &num;1234
   end
 
   # Return the first paragraph the search string `needle` occurs in.

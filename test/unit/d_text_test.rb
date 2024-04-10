@@ -286,6 +286,15 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("blah", DText.from_html('<a href="file:///etc/password">blah</a>'))
         assert_equal("blah", DText.from_html('<a href="javascript:alert(1)">blah</a>'))
       end
+
+      should "escape DText shortlinks in HTML" do
+        assert_equal("issue &num;1", DText.from_html("issue #1"))
+        assert_equal("issue &num;1", DText.from_html('<a href="invalid">issue #1</a>'))
+        assert_equal("issue &num;1", DText.from_html('<a href="/relative">issue #1</a>'))
+        assert_equal("issue &num;1", DText.from_html('<a href="/image"><img src="/image.jpg" alt="issue #1"></a>'))
+
+        assert_equal("issue #1", DText.from_html("issue #1", allowed_shortlinks: ["issue"]))
+      end
     end
 
     context "#mentions" do
