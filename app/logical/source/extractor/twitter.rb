@@ -124,14 +124,13 @@ class Source::Extractor
 
       i = 0
       entities.each do |entity|
-        dtext << desc[i..entity[:first]-1] if i < entity[:first]
+        dtext << DText.escape(CGI.unescapeHTML(desc[i..entity[:first] - 1])) if i < entity[:first]
         dtext << entity[:dtext]
         i = entity[:last]
       end
 
-      dtext << desc[i..desc.size]
-      dtext = CGI.unescapeHTML(dtext).strip
-      dtext
+      dtext << DText.escape(CGI.unescapeHTML(desc[i..desc.size]))
+      dtext.strip
     end
 
     memoize def syndication_api_response

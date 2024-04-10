@@ -400,6 +400,25 @@ module Sources
       )
     end
 
+    context "A tweet with escaped HTML characters" do
+      strategy_should_work(
+        "https://twitter.com/takobe_t/status/1777662729890730410",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          ロザリンデ&エルトリンデ
+          "#ユニコーンオーバーロード":[https://twitter.com/hashtag/ユニコーンオーバーロード]
+        EOS
+      )
+    end
+
+    context "A tweet with 'issue #1'" do
+      strategy_should_work(
+        "https://twitter.com/Persona_Central/status/1750173292588097879",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          The new Shigenori Soejima illustration for Persona 3 Reload in Weekly Famitsu magazine issue &num;1834. "#P3R":[https://twitter.com/hashtag/P3R]
+        EOS
+      )
+    end
+
     should "Parse Twitter URLs correctly" do
       assert(Source::URL.image_url?("https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg"))
       assert(Source::URL.image_url?("https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:small"))

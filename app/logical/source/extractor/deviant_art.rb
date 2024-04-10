@@ -153,7 +153,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc, base_url: "https://www.deviantart.com") do |element|
+        DText.from_html(artist_commentary_desc, base_url: "https://www.deviantart.com", allowed_shortlinks: ["deviantart"]) do |element|
           # Convert embedded thumbnails of journal posts to 'deviantart #123'
           # links. Strip embedded thumbnails of image posts. Example:
           # https://sa-dui.deviantart.com/art/Commission-Meinos-Kaen-695905927.
