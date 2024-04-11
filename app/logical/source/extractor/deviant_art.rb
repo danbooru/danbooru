@@ -166,6 +166,11 @@ module Source
             end
           end
 
+          # Ignore <sub> and <small> tags.
+          if element.name.in?(%w[sub small])
+            element.name = "div"
+          end
+
           if element.name == "a" && element["href"].present?
             element["href"] = element["href"].gsub(%r{\Ahttps?://www\.deviantart\.com/users/outgoing\?}i, "")
           end

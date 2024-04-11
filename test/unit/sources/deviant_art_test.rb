@@ -390,6 +390,25 @@ module Sources
       )
     end
 
+    context "A DeviantArt post with <sub> tags in the commentary" do
+      strategy_should_work(
+        "https://www.deviantart.com/hoshi-pan/art/Speedpaint-Dolphins-And-Lemon-Juice-700265840",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          h1. SPEEDPAINT: "www.youtube.com/watch?v=M72Kg9…":[https://www.youtube.com/watch?v=M72Kg9KhPQc]
+
+          [s]Coughs random title for the win[/s]
+
+          I haven't drawn something original in a while this was so much fun!! At first I wasn't going to add a BG but then I realized how hard it is for me not to add a bg xD [s]bc if I don't I feel like I'm lazy and a failure//slapped[/s].It was fun painting the sky and water,though I have a lot to improve on >q</
+
+          Hope you like it! Speedpaint will be up soon "luvluvplz":[https://luvluvplz.deviantart.com/] !
+
+          ________________________________________________________
+
+          [b]CM info | "fav.me/dbaalkv":[http://fav.me/dbaalkv][/b]
+        EOS
+      )
+    end
+
     context "For Sta.sh:" do
       context "A https://sta.sh/:id url" do
         strategy_should_work(
