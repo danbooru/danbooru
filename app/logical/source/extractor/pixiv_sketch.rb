@@ -40,9 +40,22 @@ module Source
         api_response.dig("data", "text")
       end
 
+      def dtext_artist_commentary_desc
+        dtext = api_response.dig("data", "text_fragments").to_a.map do |fragment|
+          case fragment["type"]
+          when "tag"
+            %{"#{fragment["body"].gsub('"', "&quot;")}":[https://sketch.pixiv.net/tags/#{Danbooru::URL.escape(fragment["normalized_body"])}]}
+          else
+            DText.escape(fragment["normalized_body"])
+          end
+        end.join
+
+        DText.normalize_whitespace(dtext)
+      end
+
       def tags
         api_response.dig("data", "tags").to_a.map do |tag|
-          [tag, "https://sketch.pixiv.net/tags/#{tag}"]
+          [tag, "https://sketch.pixiv.net/tags/#{Danbooru::URL.escape(tag)}"]
         end
       end
 
