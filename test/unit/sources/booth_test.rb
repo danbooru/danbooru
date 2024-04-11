@@ -89,7 +89,7 @@ module Sources
 
           最新情報をお届け！各種ページをチェック！！
 
-          Re:fAce公式ツイッター  https://twitter.com/RefAce_official
+          Re:fAce公式ツイッター https://twitter.com/RefAce_official
           りふぇいす。公式キャラクター りふぇ子 https://twitter.com/refA_ko
           Re:fAce/りふぇいす。公式HP https://www.reface-music.com
         EOS

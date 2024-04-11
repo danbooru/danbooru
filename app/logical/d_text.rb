@@ -564,9 +564,18 @@ class DText
   # Convert plain text to DText.
   #
   # @param text [String] The plain text input.
-  # @return [StringT the DText output
-  def self.from_plaintext(text)
-    text.to_s.normalize_whitespace(eol: "\n").gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").strip
+  # @param options [Hash] The options to pass to DText.escape.
+  # @return [String] the DText output.
+  def self.from_plaintext(text, **options)
+    escape(text.to_s, **options).then { normalize_whitespace(_1) }
+  end
+
+  # Normalize the whitespace in a piece of DText, and remove any unnecessary whitespace.
+  #
+  # @param text [String] The DText input.
+  # @return [String] The normalized DText output.
+  def self.normalize_whitespace(text)
+    text.to_s.normalize_whitespace(eol: "\n").gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").squeeze(" ").strip
   end
 
   # Convert HTML to DText.
