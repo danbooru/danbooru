@@ -106,6 +106,7 @@
           <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
         <% end %>
         <% if CurrentUser.user.show_ads?%>
+          <li id="nav-ad-0"><a id="ad-candyai" href="https://redirect-offsite.aibooru.online/redirect/candy_ai_tab_link?location=https%3A%2F%2Fcandy.ai%2F&category=anime&gender=female&via=aibooru47&fp_sid=tablink&page=<%= CGI.escape(request.original_url) %>" style="color: #F784C6 !important;">AI Sex Chat</a></li>
         <% end %>
 
         <%= nav_link_to("More »", site_map_path) %>
