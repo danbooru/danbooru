@@ -1387,8 +1387,6 @@ class Post < ApplicationRecord
           where(AIMetadata.nonblank.where("ai_metadata.post_id = posts.id").arel.exists)
         when "prompt"
           where(AIMetadata.where("ai_metadata.post_id = posts.id and prompt != ''").arel.exists)
-        when "seed"
-          where(AIMetadata.where("ai_metadata.post_id = posts.id and seed is not null").arel.exists)
         else
           none
         end
