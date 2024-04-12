@@ -24,7 +24,7 @@ class Source::Extractor
     end
 
     def profile_url
-      "https://civitai.com/user/#{artist_name}"
+      "https://civitai.com/user/#{artist_name}" if artist_name.present?
     end
 
     memoize def html_response
@@ -36,7 +36,7 @@ class Source::Extractor
     end
 
     memoize def next_data
-      JSON.parse(html_response&.at("#__NEXT_DATA__") || "{}").dig("props", "pageProps", "trpcState", "json")
+      JSON.parse(html_response&.at("#__NEXT_DATA__") || "{}").dig("props", "pageProps", "trpcState", "json") || {}
     end
 
     def image_id
