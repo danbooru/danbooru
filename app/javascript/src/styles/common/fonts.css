@@ -329,3 +329,26 @@
     local("Gisele Script"),
     url("~/public/fonts/gisele.ttf") format("truetype");
 }
+
+/*
+ * https://github.com/jdecked/twemoji
+ * https://github.com/mozilla/twemoji-colr
+ * https://github.com/mrdrogdrog/twemoji-color-font
+ */
+@font-face {
+  font-family: "Twemoji";
+  font-display: swap;
+
+  /*
+   * Make it so the font is only loaded when emoji characters are present. This range includes some non-emoji, but
+   * that's okay because it just means the font may be loaded for non-emoji, but it won't actually be used. An exact
+   * list would be enormous.
+   *
+   * https://en.wikipedia.org/wiki/List_of_emojis
+   */
+  unicode-range: U+00A9, U+00AE, U+203C-2B55, U+3030, U+303D, U+3297, U+3299, U+1F000-1FFFF;
+
+  src:
+    /* url("https://cdn.jsdelivr.net/npm/twemoji-colr-font@15.0.3/twemoji.woff2") format("woff2"); */
+    url("twemoji-colr-font/twemoji.woff2") format("woff2");
+}

@@ -6,8 +6,9 @@
   --text-lg: 1rem;       // 16px
   --text-xl: 1.3125rem;  // 21px
   --text-xxl: 1.75rem;   // 28px
-  --header-font: "Tahoma", "Verdana", "Helvetica", sans-serif;
-  --body-font: "Verdana", "Helvetica", sans-serif;
+  --emoji-font: "Twemoji";
+  --header-font: "Tahoma", "Verdana", "Helvetica", var(--emoji-font), sans-serif;
+  --body-font: "Verdana", "Helvetica", var(--emoji-font), sans-serif;
   --monospace-font: 0.875rem monospace; // 14px
   --arial-font: "Arial", "Helvetica", sans-serif;
 }
