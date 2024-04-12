@@ -28,7 +28,7 @@
             <%= tag.li class: "tag-type-4", data: { "tag-name": search, "is-deprecated": false } do %>
               <%= link_to "?", wiki_page_path(search), class: "search-tag" %>
               <%= link_to search, posts_path(tags: search, z: 2) %>
-              <%= tag.span humanized_number(count), class: "post-count", title: count %>
+              <%= tag.span humanized_number(count || 0), class: "post-count", title: count %>
             <% end %>
           <% end %>
         </ul>
