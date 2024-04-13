@@ -126,6 +126,32 @@ module Sources
       )
     end
 
+    context "A text post with an inline video" do
+      strategy_should_work(
+        "https://www.tumblr.com/yraa/736364675654123520/the-divorce-is-going-well-original",
+        image_urls: ["https://va.media.tumblr.com/tumblr_s5g5gyT1oY1rnax4f_720.mp4"],
+        page_url: "https://yraa.tumblr.com/post/736364675654123520",
+        profile_url: "https://yraa.tumblr.com",
+        artist_name: "yraa",
+        tags: [
+          "or maybe it is just... going",
+          "genshin impact",
+          "haikaveh",
+          "bad animatic",
+          "i'm sorry",
+          "was imagining this for a while and then procreate released their animation app and i had to",
+          "today yra desperately tries to figure out procreate dreams. tomorrow?? who knows",
+          "crawls back into cave",
+        ],
+        artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          the divorce is going well
+
+          (edit: added subs) ("original":[https://youtu.be/6youGMi8m-Y?si=XX6Z-KNPOS6BIdr3])
+        EOS
+      )
+    end
+
     context "The source for a 'http://*.tumblr.com/post/*' answer post with inline images" do
       strategy_should_work(
         "https://noizave.tumblr.com/post/171237880542/test-ask",
