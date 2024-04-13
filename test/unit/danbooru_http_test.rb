@@ -197,6 +197,20 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
     end
 
+    context "public_only feature" do
+      should "disallow connections to non-public IPs" do
+        response = Danbooru::Http.public_only.get("http://127.0.0.1/foo.txt")
+
+        assert_equal(591, response.status)
+      end
+
+      should "not raise an exception if the domain doesnt't exist" do
+        response = Danbooru::Http.public_only.get("http://google.dne")
+
+        assert_equal(598, response.status)
+      end
+    end
+
     context "#download method" do
       should "download files" do
         response, file = Danbooru::Http.download_media(httpbin_url("bytes/1000"))
