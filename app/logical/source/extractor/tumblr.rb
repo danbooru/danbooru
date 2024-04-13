@@ -28,7 +28,7 @@ class Source::Extractor
         assets += [post[:video_url]].compact_blank
       end
 
-      assets += inline_images
+      assets += inline_media
       assets = assets.map { |url| find_largest(url) }
       assets.compact
     end
@@ -120,9 +120,8 @@ class Source::Extractor
       resp.parse
     end
 
-    def inline_images
-      html = Nokogiri::HTML5.fragment(artist_commentary_desc)
-      html.css("img").map { |node| node["src"] }
+    memoize def inline_media
+      Nokogiri::HTML5.fragment(artist_commentary_desc).css("img, video source").pluck(:src)
     end
 
     def artist_name
