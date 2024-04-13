@@ -106,6 +106,15 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
     end
 
+    context "#redirect_url method" do
+      should "follow redirects to the final URL" do
+        assert_equal("http://www.google.com/", Danbooru::Http.redirect_url("http://google.com").to_s)
+        assert_equal("https://www.google.com/", Danbooru::Http.redirect_url("https://google.com").to_s)
+
+        assert_equal(nil, Danbooru::Http.redirect_url("https://google.dne"))
+      end
+    end
+
     context "cache feature" do
       should "cache multiple requests to the same url" do
         http = Danbooru::Http.cache(1.hour)
