@@ -2,27 +2,21 @@ require 'test_helper'
 
 module Sources
   class NullTest < ActiveSupport::TestCase
-    context "A source from an unknown site" do
-      setup do
-        @site = Source::Extractor.find("http://oremuhax.x0.com/yoro1603.jpg", "http://oremuhax.x0.com/yo125.htm")
-      end
-
-      should "be handled by the null strategy" do
-        assert(@site.is_a?(Source::Extractor::Null))
-      end
-
-      should "find the metadata" do
-        assert_equal(["http://oremuhax.x0.com/yoro1603.jpg"], @site.image_urls)
-        assert_nil(@site.artist_name)
-        assert_nil(@site.profile_url)
-        assert_nothing_raised { @site.to_h }
-      end
-
-      should "find the artist" do
-        a1 = FactoryBot.create(:artist, name: "test1", url_string: "http://oremuhax.x0.com")
-
-        assert_equal([a1], @site.artists)
-      end
+    context "An image from an unknown site" do
+      strategy_should_work(
+        # "http://oremuhax.x0.com/yo125.htm"
+        "http://oremuhax.x0.com/yoro1603.jpg",
+        image_urls: ["http://oremuhax.x0.com/yoro1603.jpg"],
+        media_files: [{ file_size: 263_253 }],
+        page_url: nil,
+        profile_url: nil,
+        tags: [],
+        tag_name: nil,
+        other_names: [],
+        artist_name: nil,
+        dtext_artist_commentary_title: nil,
+        dtext_artist_commentary_desc: nil,
+      )
     end
 
     context "A IP-based source" do

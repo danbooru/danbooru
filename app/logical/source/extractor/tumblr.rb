@@ -109,8 +109,13 @@ class Source::Extractor
         url = Source::URL.parse(response.request.uri)
         url if url.page_url?
       elsif parsed_url.image_url? && parsed_url.file_ext&.in?(%w[jpg png pnj gif])
-        extracted = image_url_html(parsed_url)&.at("[href*='/post/']")&.[](:href)
-        Source::URL.parse(extracted)
+        # https://compllege.tumblr.com/post/179415753146/codl-0001-c-experiment-2018%E5%B9%B410%E6%9C%8828%E6%97%A5-m3
+        # https://yra.sixc.me/post/188271069189
+        post_url = image_url_html(parsed_url)&.at("[href*='/post/']")&.[](:href)
+        return nil if post_url.blank?
+
+        # The post URL may be a regular Tumblr post or a custom domain; custom domains are extracted to get the real Tumblr page URL.
+        Source::Extractor.find(post_url).page_url.then { Source::URL.parse(_1) }
       end
     end
 
