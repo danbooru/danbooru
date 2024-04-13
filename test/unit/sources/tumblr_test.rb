@@ -262,17 +262,89 @@ module Sources
       )
     end
 
-    #context "A tumblr image url for which the extractable post url is a custom domain" do
-    #  strategy_should_work(
-    #    "https://64.media.tumblr.com/591b370b9deb7c6ef33d8c18dc2c8db5/tumblr_ph5huubDdz1w0f6yio1_1280.jpg",
-    #    image_urls: ["https://media.tumblr.com/591b370b9deb7c6ef33d8c18dc2c8db5/tumblr_ph5huubDdz1w0f6yio1_1280.jpg"],
-    #    profile_url: nil,
-    #    page_url: "https://compllege.com/post/181217216191"
-    #    # XXX this fails on purpose pending implementation of support for custom Tumblr domains
-    #    # Right now, if we extract and save the custom url as source, then next time the source is fetched the user won't be able to fetch anything from it, which can be confusing.
-    #    # A possible solution could be doing a head request for unknown domains in Source::Extractor::Null to check if they're custom tumblr domains
-    #  )
-    #end
+    context "A tumblr image url from a regular tumblr post" do
+      strategy_should_work(
+        "https://64.media.tumblr.com/591b370b9deb7c6ef33d8c18dc2c8db5/tumblr_ph5huubDdz1w0f6yio1_1280.jpg",
+        image_urls: ["https://media.tumblr.com/591b370b9deb7c6ef33d8c18dc2c8db5/tumblr_ph5huubDdz1w0f6yio1_1280.jpg"],
+        page_url: "https://compllege.tumblr.com/post/179415753146",
+        profile_url: "https://compllege.tumblr.com",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          CODL-0001 “C-Experiment”
+
+          2018年10月28日 M3
+          第一展示場 I-05ab “compllege” & “wavforme” にて
+          ダウンロードカードを頒布予定
+          後日DL版も販売予定
+          ￥500
+
+          ※wavformeと合同会計です。
+
+          Track List
+
+          01. Opening
+
+          02. Encounter (feat. Nhato)
+
+          03. Human relations (feat. MK)
+
+          04. The Angels
+
+          05. A Moment of Silence (feat. Tomohiko Togashi)
+
+          KORG Gadget for Nintendo Switchを使用し、楽曲を制作しました。
+
+          今回はゲストにNhato氏、MK氏、Tomohiko Togashi氏を招いて共作しております。
+
+          今回はCDではなく、ダウンロードカードの頒布となります。
+
+          デザインは"LiGHTEN":[https://twitter.com/LiGHTEN]、ジャケットイラストは"東山エイト":[http://08b.tokyo/]が担当しています。
+
+          今回は折角なので、制作している風景を撮影し、動画をYoutubeにアップロードいたしました。  第1段はNhato氏との共作です。是非ご覧ください。
+        EOS
+      )
+    end
+
+    context "A tumblr image url from a custom blog domain" do
+      strategy_should_work(
+        "https://64.media.tumblr.com/68e6c4db6bac37cf9d6a166c133cf758/b81004325e350a36-c3/s1280x1920/a23c96c128b296219ff41a0178fe3e53f05e6680.png",
+        image_urls: ["https://64.media.tumblr.com/68e6c4db6bac37cf9d6a166c133cf758/b81004325e350a36-c3/s21000x21000/4d7ef161fe11d1395fd86890a3680b6313352d63.png"],
+        page_url: "https://yraa.tumblr.com/post/188271069189",
+        profile_url: "https://yraa.tumblr.com",
+        artist_name: "yraa",
+        tags: ["ffxiv", "draw", "i'm a cat i'm a kitty cat and i dance dance dance", "is anyone still even here", "crawls back into damp cave"],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          "@phantom-miria":[https://tmblr.co/m08AoE-xy5kbQnjed6Tcmng]
+        EOS
+      )
+    end
+
+    context "A tumblr post url from a custom blog domain (1)" do
+      strategy_should_work(
+        "https://yra.sixc.me/post/188271069189",
+        image_urls: ["https://64.media.tumblr.com/68e6c4db6bac37cf9d6a166c133cf758/b81004325e350a36-c3/s21000x21000/4d7ef161fe11d1395fd86890a3680b6313352d63.png"],
+        page_url: "https://yraa.tumblr.com/post/188271069189",
+        profile_url: "https://yraa.tumblr.com",
+        artist_name: "yraa",
+        tags: ["ffxiv", "draw", "i'm a cat i'm a kitty cat and i dance dance dance", "is anyone still even here", "crawls back into damp cave"],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          "@phantom-miria":[https://tmblr.co/m08AoE-xy5kbQnjed6Tcmng]
+        EOS
+      )
+    end
+
+    context "A tumblr post url from a custom blog domain (2)" do
+      strategy_should_work(
+        "https://d-floe.art/post/190738927749/commission-of-kat-from-gravity-rush",
+        image_urls: ["https://64.media.tumblr.com/faab3d1d9537b9e4e3fe8f04487a1210/42ecfb675692be33-70/s21000x21000/16b1914c6c4834363f30782eebbe045a3721de3b.png"],
+        page_url: "https://d-floe.tumblr.com/post/190738927749",
+        profile_url: "https://d-floe.tumblr.com",
+        artist_name: "d-floe",
+        tags: ["2x2F3", "d-floe", "Illustration", "gravity rush", "kat"],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Commission of Kat from Gravity Rush
+        EOS
+      )
+    end
 
     context "A *.media.tumblr.com/*/*_500.jpg sample image URL" do
       strategy_should_work(
