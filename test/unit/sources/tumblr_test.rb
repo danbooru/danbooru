@@ -313,7 +313,7 @@ module Sources
         artist_name: "yraa",
         tags: ["ffxiv", "draw", "i'm a cat i'm a kitty cat and i dance dance dance", "is anyone still even here", "crawls back into damp cave"],
         dtext_artist_commentary_desc: <<~EOS.chomp
-          "@phantom-miria":[https://tmblr.co/m08AoE-xy5kbQnjed6Tcmng]
+          "@phantom-miria":[https://www.tumblr.com/phantom-miria]
         EOS
       )
     end
@@ -327,7 +327,7 @@ module Sources
         artist_name: "yraa",
         tags: ["ffxiv", "draw", "i'm a cat i'm a kitty cat and i dance dance dance", "is anyone still even here", "crawls back into damp cave"],
         dtext_artist_commentary_desc: <<~EOS.chomp
-          "@phantom-miria":[https://tmblr.co/m08AoE-xy5kbQnjed6Tcmng]
+          "@phantom-miria":[https://www.tumblr.com/phantom-miria]
         EOS
       )
     end

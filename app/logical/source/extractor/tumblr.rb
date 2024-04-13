@@ -85,7 +85,12 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      DText.from_html(artist_commentary_desc, base_url: "https://www.tumblr.com").strip
+      DText.from_html(artist_commentary_desc, base_url: "https://www.tumblr.com") do |element|
+        # https://tmblr.co/m08AoE-xy5kbQnjed6Tcmng -> https://www.tumblr.com/phantom-miria
+        if element.name == "a" && Source::URL.parse(element["href"])&.domain == "tmblr.co"
+          element["href"] = Source::Extractor::Tumblr.new(element["href"]).redirect_url.to_s
+        end
+      end
     end
 
     def find_largest(image_url)
