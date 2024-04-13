@@ -113,13 +113,17 @@ module Source
       end
 
       def http
-        browser_ver = 109 + (Date.today - Date.new(2023, 1, 18)).days.in_weeks.to_i / 4
-        browser_ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:#{browser_ver}.0) Gecko/20100101 Firefox/#{browser_ver}.0"
-
         super.headers(
           Referer: parsed_url.page_url || parsed_referer&.page_url || "https://www.bilibili.com",
-          "User-Agent": browser_ua,
+          "User-Agent": user_agent
         )
+      end
+
+      def user_agent
+        # API requests fail unless we spoof the latest Firefox version. Firefox releases every 4 weeks.
+        # https://whattrainisitnow.com/calendar/
+        browser_ver = Time.use_zone("UTC") { 122 + ((Time.zone.today - Date.new(2024, 1, 23)).days.in_weeks.to_i / 4) }
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:#{browser_ver}.0) Gecko/20100101 Firefox/#{browser_ver}.0"
       end
 
       memoize def page
@@ -129,7 +133,7 @@ module Source
       memoize def data
         return {} if t_work_id.blank?
 
-        data = http.cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?timezone_offset=-60&id=#{t_work_id}") || {}
+        data = http.cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=#{t_work_id}") || {}
 
         if data.dig("data", "item", "orig", "id_str").present? # it means it's a repost
           data.dig("data", "item", "orig")
