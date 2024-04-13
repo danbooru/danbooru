@@ -240,7 +240,7 @@ module Danbooru
       fake_response(596, method, url)
     rescue HTTP::TimeoutError
       fake_response(597, method, url)
-    rescue HTTP::ConnectionError
+    rescue HTTP::ConnectionError, Resolv::ResolvError
       fake_response(598, method, url)
     rescue HTTP::Error
       fake_response(599, method, url)
