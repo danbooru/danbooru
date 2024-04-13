@@ -42,7 +42,7 @@ module Danbooru
     attr_accessor :max_size, :http
 
     class << self
-      delegate :get, :head, :put, :post, :delete, :parsed_get, :parsed_post, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :proxy, :public_only, :with_legacy_ssl, :download_media, to: :new
+      delegate :get, :head, :put, :post, :delete, :parsed_get, :parsed_post, :redirect_url, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :proxy, :public_only, :with_legacy_ssl, :download_media, to: :new
     end
 
     # The default HTTP client.
@@ -180,8 +180,10 @@ module Danbooru
 
     # @return [Danbooru::URL, nil] Return the URL that the given URL redirects to, or nil on error.
     def redirect_url(url)
-      redirect_url = head(url)&.uri
-      Danbooru::URL.parse(redirect_url)
+      response = head(url)
+      return nil unless response.status.in?(200..299)
+
+      Danbooru::URL.parse(response.uri)
     end
 
     concerning :DownloadMethods do
@@ -231,17 +233,17 @@ module Danbooru
 
       response
     rescue OpenSSL::SSL::SSLError
-      fake_response(590)
+      fake_response(590, method, url)
     rescue ValidatingSocket::ProhibitedIpError
-      fake_response(591)
+      fake_response(591, method, url)
     rescue HTTP::Redirector::TooManyRedirectsError
-      fake_response(596)
+      fake_response(596, method, url)
     rescue HTTP::TimeoutError
-      fake_response(597)
+      fake_response(597, method, url)
     rescue HTTP::ConnectionError
-      fake_response(598)
+      fake_response(598, method, url)
     rescue HTTP::Error
-      fake_response(599)
+      fake_response(599, method, url)
     end
 
     # Perform a HTTP request for the given URL, raising an error on 4xx or 5xx
@@ -276,8 +278,8 @@ module Danbooru
       response.parse
     end
 
-    def fake_response(status)
-      ::HTTP::Response.new(status: status, version: "1.1", body: "", request: nil)
+    def fake_response(status, method, url)
+      ::HTTP::Response.new(status: status, version: "1.1", body: "", request: ::HTTP::Request.new(verb: method, uri: url))
     end
   end
 end
