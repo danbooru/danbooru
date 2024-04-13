@@ -133,6 +133,7 @@ class Post < ApplicationRecord
     negative_prompt: nil,
     ai_metadata: {},
     is_pending: nil,
+    load_metadata: false,
     add_artist_tag: false
   )
     upload = upload_media_asset.upload
@@ -146,7 +147,12 @@ class Post < ApplicationRecord
       translated_description: translated_commentary_desc,
     )
 
-    metadata = AIMetadata.new_from_metadata(media_asset&.metadata.to_h)
+    metadata = if load_metadata
+      AIMetadata.new_from_metadata(media_asset&.metadata.to_h)
+    else
+      AIMetadata.new(updater: CurrentUser.user)
+    end
+
     metadata.assign_attributes({
       prompt: ai_metadata[:prompt],
       negative_prompt: ai_metadata[:negative_prompt],
