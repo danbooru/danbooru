@@ -34,11 +34,11 @@ class Source::Extractor
     end
 
     def page_url
-      parsed_url.page_url || parsed_referer&.page_url || post_url_from_image_html&.page_url
+      "https://#{artist_name}.tumblr.com/post/#{work_id}" if artist_name.present? && work_id.present?
     end
 
     def profile_url
-      parsed_url.profile_url || parsed_referer&.profile_url || post_url_from_image_html&.profile_url
+      "https://#{artist_name}.tumblr.com" if artist_name.present?
     end
 
     def artist_commentary_title
@@ -130,11 +130,19 @@ class Source::Extractor
     end
 
     def artist_name
-      parsed_url.blog_name || parsed_referer&.blog_name || post_url_from_image_html&.try(:blog_name)  # Don't crash with custom domains
+      parsed_url.blog_name || parsed_referer&.blog_name || redirect_url&.blog_name || post_url_from_image_html&.try(:blog_name)  # Don't crash with custom domains
     end
 
-    def work_id
-      parsed_url.work_id || parsed_referer&.work_id || post_url_from_image_html&.try(:work_id)
+    memoize def work_id
+      parsed_url.work_id || parsed_referer&.work_id || redirect_url&.work_id || post_url_from_image_html&.try(:work_id)
+    end
+
+    # @return [Source::URL, nil] The actual URL, if this is a tmblr.co short URL.
+    memoize def redirect_url
+      return nil unless parsed_url.domain == "tmblr.co"
+
+      # https://tmblr.co/ZdPV4t2OHwdv5 -> https://techsupportdog.tumblr.com/post/163509337669?
+      http.cache(1.minute).redirect_url(parsed_url)&.then { Source::URL.parse(_1) }
     end
 
     memoize def api_response

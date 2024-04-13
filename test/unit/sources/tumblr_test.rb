@@ -416,6 +416,20 @@ module Sources
       )
     end
 
+    context "A tmblr.co post URL" do
+      strategy_should_work(
+        "https://tmblr.co/ZdPV4t2OHwdv5",
+        image_urls: ["https://media.tumblr.com/605632aa2d218410edaa2f9e2f3a1646/tumblr_ots53vjhn61s5nooco1_1280.png"],
+        media_files: [{ file_size: 462_572 }],
+        page_url: "https://techsupportdog.tumblr.com/post/163509337669",
+        profile_url: "https://techsupportdog.tumblr.com",
+        artist_name: "techsupportdog",
+        tag_name: "techsupportdog",
+        tags: ["anime art", "anime girl", "binkan", "shimoneta", "spiderman", "superior spider-man"],
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
     context "generating page urls" do
       should "work" do
         source1 = "https://octrain1020.tumblr.com/post/190713122589"
