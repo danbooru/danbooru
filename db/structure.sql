@@ -1,10 +1,3 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 15.0
--- Dumped by pg_dump version 15.2
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -95,6 +88,17 @@ $_$;
 
 
 --
+-- Name: object_keys(jsonb); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.object_keys(jsonb) RETURNS text[]
+    LANGUAGE sql IMMUTABLE
+    AS $_$
+  SELECT array_agg(jsonb_object_keys) FROM jsonb_object_keys($1)
+$_$;
+
+
+--
 -- Name: reverse_textregexeq(text, text); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -124,7 +128,7 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.ai_metadata (
     id bigint NOT NULL,
-    post_id bigint,
+    post_id bigint NOT NULL,
     prompt text,
     negative_prompt text,
     sampler character varying,
@@ -133,7 +137,8 @@ CREATE TABLE public.ai_metadata (
     cfg_scale double precision,
     model_hash character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    parameters jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 
@@ -175,7 +180,8 @@ CREATE TABLE public.ai_metadata_versions (
     cfg_scale double precision,
     model_hash character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    parameters jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 
@@ -949,7 +955,7 @@ CREATE TABLE public.good_job_executions (
 --
 
 CREATE TABLE public.good_job_processes (
-    id uuid DEFAULT public.gen_random_uuid() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     state jsonb
@@ -974,7 +980,7 @@ CREATE TABLE public.good_job_settings (
 --
 
 CREATE TABLE public.good_jobs (
-    id uuid DEFAULT public.gen_random_uuid() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     queue_name text,
     priority integer,
     serialized_params jsonb,
@@ -997,7 +1003,6 @@ CREATE TABLE public.good_jobs (
     error_event smallint,
     labels text[]
 );
-ALTER TABLE ONLY public.good_jobs ALTER COLUMN finished_at SET STATISTICS 1000;
 
 
 --
@@ -1824,7 +1829,7 @@ WITH (fillfactor='50');
 -- Name: rate_limits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.rate_limits_id_seq
+CREATE UNLOGGED SEQUENCE public.rate_limits_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2082,7 +2087,8 @@ CREATE TABLE public.uploads (
     updated_at timestamp without time zone NOT NULL,
     referer_url character varying,
     error text,
-    media_asset_count integer DEFAULT 0 NOT NULL
+    media_asset_count integer DEFAULT 0 NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -3499,10 +3505,10 @@ CREATE UNIQUE INDEX idx_ai_metadata_versions_on_metadata_id_and_prev_id ON publi
 
 
 --
--- Name: idx_users_on_level; Type: INDEX; Schema: public; Owner: -
+-- Name: index_ai_metadata_on_parameters; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX idx_users_on_level ON public.users USING btree (level) WHERE (level = 60);
+CREATE INDEX index_ai_metadata_on_parameters ON public.ai_metadata USING gin (public.object_keys(parameters));
 
 
 --
@@ -4783,7 +4789,7 @@ CREATE INDEX index_notes_on_post_id ON public.notes USING btree (post_id);
 -- Name: index_pool_versions_on_added_post_ids; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_pool_versions_on_added_post_ids ON public.pool_versions USING btree (added_post_ids);
+CREATE INDEX index_pool_versions_on_added_post_ids ON public.pool_versions USING gin (added_post_ids);
 
 
 --
@@ -4818,14 +4824,14 @@ CREATE INDEX index_pool_versions_on_pool_id ON public.pool_versions USING btree 
 -- Name: index_pool_versions_on_post_ids; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_pool_versions_on_post_ids ON public.pool_versions USING btree (post_ids);
+CREATE INDEX index_pool_versions_on_post_ids ON public.pool_versions USING gin (post_ids);
 
 
 --
 -- Name: index_pool_versions_on_removed_post_ids; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_pool_versions_on_removed_post_ids ON public.pool_versions USING btree (removed_post_ids);
+CREATE INDEX index_pool_versions_on_removed_post_ids ON public.pool_versions USING gin (removed_post_ids);
 
 
 --
@@ -5091,7 +5097,7 @@ CREATE INDEX index_post_replacements_on_post_id ON public.post_replacements USIN
 -- Name: index_post_versions_on_added_tags; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_post_versions_on_added_tags ON public.post_versions USING btree (added_tags);
+CREATE INDEX index_post_versions_on_added_tags ON public.post_versions USING gin (added_tags);
 
 
 --
@@ -5126,7 +5132,7 @@ CREATE INDEX index_post_versions_on_rating_changed ON public.post_versions USING
 -- Name: index_post_versions_on_removed_tags; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_post_versions_on_removed_tags ON public.post_versions USING btree (removed_tags);
+CREATE INDEX index_post_versions_on_removed_tags ON public.post_versions USING gin (removed_tags);
 
 
 --
@@ -5253,6 +5259,13 @@ CREATE INDEX index_posts_on_last_noted_at ON public.posts USING btree (last_note
 --
 
 CREATE UNIQUE INDEX index_posts_on_md5 ON public.posts USING btree (md5);
+
+
+--
+-- Name: index_posts_on_mpixels; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_mpixels ON public.posts USING btree (((((image_width * image_height))::numeric / 1000000.0)));
 
 
 --
@@ -5604,6 +5617,13 @@ CREATE INDEX index_uploads_on_created_at ON public.uploads USING btree (created_
 --
 
 CREATE INDEX index_uploads_on_error ON public.uploads USING btree (error) WHERE (error IS NOT NULL);
+
+
+--
+-- Name: index_uploads_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_is_deleted ON public.uploads USING btree (is_deleted) WHERE (is_deleted = true);
 
 
 --
@@ -6549,14 +6569,6 @@ ALTER TABLE ONLY public.uploads
 
 
 --
--- Name: ai_metadata fk_rails_d81005f88c; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.ai_metadata
-    ADD CONSTRAINT fk_rails_d81005f88c FOREIGN KEY (post_id) REFERENCES public.posts(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: tag_implications fk_rails_dba2c19f93; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6655,3 +6667,342 @@ ALTER TABLE ONLY public.upload_media_assets
 --
 -- PostgreSQL database dump complete
 --
+
+SET search_path TO "$user", public;
+
+INSERT INTO "schema_migrations" (version) VALUES
+('20240413060557'),
+('20240324223203'),
+('20240221060848'),
+('20240217201829'),
+('20240131055326'),
+('20240110180956'),
+('20240110180955'),
+('20240110180954'),
+('20240110180953'),
+('20240110180952'),
+('20230604114816'),
+('20230524201206'),
+('20230522005908'),
+('20230409141638'),
+('20230309014439'),
+('20230222230650'),
+('20230209060757'),
+('20230104064916'),
+('20221230011825'),
+('20221228232240'),
+('20221116155052'),
+('20221116142726'),
+('20221109052923'),
+('20221106062419'),
+('20221027000931'),
+('20221026084656'),
+('20221026084655'),
+('20221012055008'),
+('20221010070458'),
+('20221010035855'),
+('20221009230933'),
+('20221003080342'),
+('20220930224600'),
+('20220926050108'),
+('20220925045236'),
+('20220924092056'),
+('20220923010905'),
+('20220922014326'),
+('20220921022408'),
+('20220920224005'),
+('20220919041622'),
+('20220918031429'),
+('20220917204044'),
+('20220913191309'),
+('20220913191300'),
+('20220909211649'),
+('20220909205433'),
+('20220829184824'),
+('20220627211714'),
+('20220623052547'),
+('20220525214746'),
+('20220514175125'),
+('20220504235329'),
+('20220410050628'),
+('20220407203236'),
+('20220403220558'),
+('20220403042706'),
+('20220318082614'),
+('20220211075129'),
+('20220210200157'),
+('20220210171310'),
+('20220207195123'),
+('20220204075610'),
+('20220203040648'),
+('20220124195900'),
+('20220120233850'),
+('20220110171024'),
+('20220110171023'),
+('20220110171022'),
+('20220110171021'),
+('20220109163815'),
+('20220109032042'),
+('20220107014433'),
+('20220106172910'),
+('20220106171727'),
+('20220104214319'),
+('20220101224048'),
+('20211121080239'),
+('20211023225730'),
+('20211018062916'),
+('20211018045429'),
+('20211015223510'),
+('20211014063943'),
+('20211013011619'),
+('20211011044400'),
+('20211010181657'),
+('20211008091234'),
+('20210926125826'),
+('20210926123414'),
+('20210921170444'),
+('20210921164936'),
+('20210908015203'),
+('20210901230931'),
+('20210330093133'),
+('20210330003356'),
+('20210310221248'),
+('20210303195217'),
+('20210214101614'),
+('20210214095121'),
+('20210127012303'),
+('20210127000201'),
+('20210123112752'),
+('20210115015308'),
+('20210110090656'),
+('20210110015410'),
+('20210108030724'),
+('20210108030723'),
+('20210108030722'),
+('20210106212805'),
+('20201224101208'),
+('20201219201007'),
+('20201213052805'),
+('20201201211748'),
+('20200816175151'),
+('20200803022359'),
+('20200427190519'),
+('20200406054838'),
+('20200403210353'),
+('20200325074859'),
+('20200325073456'),
+('20200318224633'),
+('20200309043653'),
+('20200309035334'),
+('20200307021204'),
+('20200306202253'),
+('20200223234015'),
+('20200223042415'),
+('20200217044719'),
+('20200123184743'),
+('20200119193110'),
+('20200119184442'),
+('20200118015014'),
+('20200117220602'),
+('20200115010442'),
+('20200114204550'),
+('20191223032633'),
+('20191119061018'),
+('20191117200404'),
+('20191117081229'),
+('20191117080647'),
+('20191117074642'),
+('20191116224228'),
+('20191116021759'),
+('20191116001441'),
+('20191111024520'),
+('20191111004329'),
+('20191024194544'),
+('20191023191749'),
+('20190926000912'),
+('20190923071044'),
+('20190919175836'),
+('20190908035317'),
+('20190908031103'),
+('20190902224045'),
+('20190829055758'),
+('20190829052629'),
+('20190828005453'),
+('20190827234625'),
+('20190827233235'),
+('20190827014726'),
+('20190827013252'),
+('20190712174818'),
+('20190129012253'),
+('20190109210822'),
+('20181202172145'),
+('20181130004740'),
+('20181114202744'),
+('20181114185032'),
+('20181114180205'),
+('20181113174914'),
+('20181108205842'),
+('20181108162204'),
+('20180916002448'),
+('20180913184128'),
+('20180912185624'),
+('20180816230604'),
+('20180804203201'),
+('20180518175154'),
+('20180517190048'),
+('20180516222413'),
+('20180425194016'),
+('20180413224239'),
+('20180403231351'),
+('20180116001101'),
+('20180113211343'),
+('20171230220225'),
+('20171219001521'),
+('20171218213037'),
+('20171127195124'),
+('20171106075030'),
+('20170914200122'),
+('20170709190409'),
+('20170613200356'),
+('20170608043651'),
+('20170526183928'),
+('20170519204506'),
+('20170515235205'),
+('20170512221200'),
+('20170428220448'),
+('20170416224142'),
+('20170414233617'),
+('20170414233426'),
+('20170414005856'),
+('20170413000209'),
+('20170330230231'),
+('20170329185605'),
+('20170319000519'),
+('20170316224630'),
+('20170314235626'),
+('20170302014435'),
+('20170218104710'),
+('20170117233040'),
+('20170112060921'),
+('20170112021922'),
+('20170106012138'),
+('20161229001201'),
+('20161227003428'),
+('20161221225849'),
+('20161101003139'),
+('20161024220345'),
+('20161018221128'),
+('20160919234407'),
+('20160822230752'),
+('20160820003534'),
+('20160526174848'),
+('20160222211328'),
+('20160219172840'),
+('20160219010854'),
+('20160219004022'),
+('20151217213321'),
+('20150805010245'),
+('20150728170433'),
+('20150721214646'),
+('20150705014135'),
+('20150629235905'),
+('20150623191904'),
+('20150613010904'),
+('20150403224949'),
+('20150128005954'),
+('20150120005624'),
+('20150119191042'),
+('20141120045943'),
+('20141017231608'),
+('20141009231234'),
+('20140725003232'),
+('20140722225753'),
+('20140701224800'),
+('20140613004559'),
+('20140604002414'),
+('20140603225334'),
+('20140505000956'),
+('20140428015134'),
+('20140221213349'),
+('20140204233337'),
+('20140111191413'),
+('20131225002748'),
+('20131217025233'),
+('20131209181023'),
+('20131130190411'),
+('20131118153503'),
+('20131117150705'),
+('20131006193238'),
+('20130914175431'),
+('20130712162600'),
+('20130620215658'),
+('20130618230158'),
+('20130606224559'),
+('20130506154136'),
+('20130424121410'),
+('20130417221643'),
+('20130409191950'),
+('20130401013601'),
+('20130331182719'),
+('20130331180246'),
+('20130328092739'),
+('20130326035904'),
+('20130323160259'),
+('20130322173859'),
+('20130322173202'),
+('20130322162059'),
+('20130320070700'),
+('20130318231740'),
+('20130318030619'),
+('20130318012517'),
+('20130318002652'),
+('20130308204213'),
+('20130307225324'),
+('20130305005138'),
+('20130302214500'),
+('20130221214811'),
+('20130221035518'),
+('20130221032344'),
+('20130219184743'),
+('20130219171111'),
+('20130114154400'),
+('20130106210658'),
+('20111101212358'),
+('20110815233456'),
+('20110722211855'),
+('20110717010705'),
+('20110607194023'),
+('20110328215701'),
+('20110328215652'),
+('20100826232512'),
+('20100318213503'),
+('20100309211553'),
+('20100307073438'),
+('20100224172146'),
+('20100224171915'),
+('20100223001012'),
+('20100221005812'),
+('20100221003655'),
+('20100219230537'),
+('20100215230642'),
+('20100215225710'),
+('20100215224635'),
+('20100215224629'),
+('20100215223541'),
+('20100215213756'),
+('20100215182234'),
+('20100214080605'),
+('20100214080557'),
+('20100214080549'),
+('20100213183712'),
+('20100213181847'),
+('20100211191716'),
+('20100211191709'),
+('20100211181944'),
+('20100211025616'),
+('20100205224030'),
+('20100205163027'),
+('20100205162521'),
+('20100204214746'),
+('20100204211522');
+
