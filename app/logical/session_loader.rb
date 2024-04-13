@@ -31,8 +31,8 @@ class SessionLoader
     user = User.find_by_name_or_email(name_or_email)
 
     if user.present? && user.authenticate_password(password)
-      # Don't allow logins to privileged or inactive accounts from proxies, even if the password is correct
-      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy?
+      # Don't allow approvers or inactive accounts to login from proxies, unless the user has 2FA enabled.
+      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy? && user.totp.nil?
         UserEvent.create_from_request!(user, :failed_login, request)
         return nil
       elsif user.totp.present?

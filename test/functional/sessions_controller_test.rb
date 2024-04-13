@@ -72,7 +72,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(nil, session[:user_id])
       end
 
-      should "not log the user in when attempting to login to a privileged account from a proxy" do
+      should "not allow approvers without 2FA to login from a proxy" do
         user = create(:approver_user, password: "password")
         ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.1.1.1")
 
@@ -82,7 +82,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(nil, session[:user_id])
       end
 
-      should "not log the user in when attempting to login to a inactive account from a proxy" do
+      should "not allow inactive accounts without 2FA to login from a proxy" do
         user = create(:user, password: "password", last_logged_in_at: 1.year.ago)
         ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.1.1.1")
 
@@ -90,6 +90,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 401
         assert_nil(nil, session[:user_id])
+      end
+
+      should "allow approvers with 2FA enabled to login from a proxy" do
+        user = create(:user_with_2fa, password: "password", level: User::Levels::APPROVER)
+        ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.1.1.1")
+
+        post session_path, params: { session: { name: user.name, password: "password" } }
+
+        assert_response :success
+        assert_nil(nil, session[:user_id])
+        assert_equal(true, user.user_events.totp_login_pending_verification.exists?)
       end
 
       should "not log the user in yet if they have 2FA enabled" do
