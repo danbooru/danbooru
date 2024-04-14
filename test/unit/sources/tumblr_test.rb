@@ -42,7 +42,9 @@ module Sources
         * one
         * two
 
-        [quote]quote[/quote]
+        [quote]
+        quote
+        [/quote]
 
         "link":[http://www.google.com]
       EOS
@@ -427,6 +429,80 @@ module Sources
         tag_name: "techsupportdog",
         tags: ["anime art", "anime girl", "binkan", "shimoneta", "spiderman", "superior spider-man"],
         dtext_artist_commentary_desc: "",
+      )
+    end
+
+    context "A commentary with alt text containing multiple paragraphs" do
+      strategy_should_work(
+        "https://dee-toraburu.tumblr.com/post/697041312401309696/fanart-of-alphonse-made-for-the-ee-anthology",
+        image_urls: %w[
+          https://64.media.tumblr.com/29f28e784f0c37b28546dddfab759b66/683448bbce5cf754-41/s21000x21000/febb7581082b418f8ced5fa5f3d65eb7d1773680.jpg
+        ],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          [quote]
+          h6. Image description
+
+          A digital illustration of a bust of Al in his human body. The highly symbolic illustration style is reminiscent of Art Nouveau from the Belle Epoque. It uses flat colors and bold, round lines.
+
+          In the center of the image, Al is shown in profile, completely facing the left side of the image. The bust cuts off at Al’s neck. Al’s long hair, in various shades of gold, falls in front of his face on the side not facing the viewer and falls in whirling curls down towards the bottom left corner of the image. On the visible side of Al’s face, his hair is tucked behind his left ear, extending in a swoop behind him and out of the frame of the image. Two strands fall loosely over his left cheek. Looking vaguely melancholic and pensive, Al’s visible golden eye is wide open, with stylistically thick eyelashes. His mouth is slightly parted and his eyebrows barely raised.
+
+          Behind Al’s neck, a deep red arc highlights the edge of his bust, reminiscent of blood. Its bottom edge is broken up, like it is fraying or dripping. Delicate wrought iron fences run across the middle of the illustration behind Al, starting at neck level on the left and stepping up to eye level on the right. On the left, there are purple flowers and bright green leaves behind the fence, but on the right, the same flowers in a paler purple reach through the fence to curl around the back of Al’s head.
+
+          Slightly above Al on the left border of the image is a stylized sun in dark gold. Text underneath it reads “Anima” - the Latin for ‘soul’ - in all caps. A matching moon is on the right, with text that reads “Spiritus” - Latin for ‘spirit’ - in all caps beneath it.
+
+          Between them at the very top of the image, a combined sun and moon is drawn in dark gold and black. It is bordered by two curving black arms extending toward it from either side, like the arms that reach out from The Gate of Truth. Behind the arms and combined sun and moon, a horizontal rectangle of orange sunset, surrounded by a gold border.
+
+          The bottom of the combined sun and moon is dark with blood, blood dripping off of its rays. Between the bottom of the sun-moon symbol and the top of Al’s head sits a small philosopher’s stone. The top of Al’s head is cast in a reddish light, either from the sunset or the stone.
+
+          Small shards of philosopher’s stone are strewn across the top half of the image. The sun and moon combination has dripped blood across flowers behind the fence near Al and the flowers around his head.
+
+          At the very bottom of the image on the right, there is text that reads “Fullmetal Alchemist” in a curvy Art Nouveau font. The “T” in Fullmetal is replaced by a Flamel symbol, like Ed wears on the back of his red coat. The text is underlined with a thick, curving black border, a dark green vine, and an array of golden gears in the right hand corner.
+          [/quote]
+
+          [b]B[/b][b]o[/b][b]d[/b][b]y[/b][b],[/b][b]M[/b][b]i[/b][b]n[/b][b]d[/b][b]&[/b][b]S[/b][b]o[/b][b]u[/b][b]l[/b]
+
+          [tn]Fanart of Alphonse, made for the E.E. Anthology – [/tn]"[tn]@equivalentexchangeanthology[/tn]":[https://www.tumblr.com/equivalentexchangeanthology][tn] ⚕️[/tn]
+          [tn]▪︎ [/tn]"[tn]Image description (audio available)[/tn]":[https://href.li/?https://ee-anthology.dreamwidth.org/tag/artist:+dee+trowble]
+        EOS
+      )
+    end
+
+    context "A commentary with mulitple images with alt text" do
+      strategy_should_work(
+        "https://timestables.tumblr.com/post/672495082090430464",
+        image_urls: %w[
+          https://64.media.tumblr.com/05c6636c72a93a59f3e480e4c8fb0933/862b6ac896d7b4d7-10/s21000x21000/5e35c58a2f70c34eefefaadb7f7f5265e90dfc4f.png
+          https://64.media.tumblr.com/99cc150f9604305c040b3c2729b2aabf/862b6ac896d7b4d7-a0/s21000x21000/be90b779ece79d49d5c1360bafa51c104e3439f0.png
+          https://64.media.tumblr.com/828e84cc37a0f3ec64190ca6d1bd9e57/862b6ac896d7b4d7-77/s21000x21000/e579296c67dcf4bc718c274a9c634de208a65167.png
+          https://64.media.tumblr.com/eb8a0a4150334a3df969bab389b7ba64/862b6ac896d7b4d7-1d/s21000x21000/a82cdcd150ded8b37f4b013eac91004d617f66a9.png
+        ],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          [quote]
+          h6. Image description
+
+          page of Kim Dokja drawings from omniscient readers viewpoint. One of him looking at the ground like an investigator, one as demon king of salvation looking gentle with biyoo. and one of him with a very smug expression as he is held by the scruff by (implied) yoo joonghyuk
+          [/quote]
+
+          [quote]
+          h6. Image description
+
+          drawing of kdj and yjh. They are sitting next to eachother facing away. yjh is calm with his eyes closed, a thought bubble is shown above his head showing a crude drawing of him murdering kdj. kdj is looking up at the thought bubble with a nervous discomfort.
+          [/quote]
+
+          [quote]
+          h6. Image description
+
+          small comic of han sooyoung wearing a white jacket, a text bubble reads "Kim Dokja read my mind right now". she then looks up with confrontational expression. the text bubble reads in large letters "[Bitch]"
+          [/quote]
+
+          [quote]
+          h6. Image description
+
+          drawings of Kim Dokja from omniscient readers viewpoint. He is smiling and the text reads "heres where i would brag about my cool best friend yoo joonghyuk to the three ways to survive a ruined world fanbase". Below he is drawn with an angry and frustrated expression, the text reads "... IF there were any other readers." Below that is another small drawing of kdj leaning against the wall looking defeated.
+          [/quote]
+
+          hmm
+        EOS
       )
     end
 

@@ -86,9 +86,27 @@ class Source::Extractor
 
     def dtext_artist_commentary_desc
       DText.from_html(artist_commentary_desc, base_url: "https://www.tumblr.com") do |element|
+        case element.name
         # https://tmblr.co/m08AoE-xy5kbQnjed6Tcmng -> https://www.tumblr.com/phantom-miria
-        if element.name == "a" && Source::URL.parse(element["href"])&.domain == "tmblr.co"
+        in "a" if Source::URL.parse(element["href"])&.domain == "tmblr.co"
           element["href"] = Source::Extractor::Tumblr.new(element["href"]).redirect_url.to_s
+
+        # <span class="tmblr-alt-text-helper">ALT</span>
+        in "span" if element["class"] == "tmblr-alt-text-helper"
+          element.content = nil
+
+        # https://localapparently.tumblr.com/post/744819709718003712
+        # <figure><img alt="..."></figure>
+        in "img" if element["alt"].present?
+          element.name = "blockquote"
+          element.inner_html = <<~EOS
+            <h6>Image description</h6>
+
+            <p>#{CGI.escapeHTML(element["alt"]).gsub(/\n\n+/, "<p>")}</p>
+          EOS
+
+        else
+          nil
         end
       end
     end

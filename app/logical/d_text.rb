@@ -628,7 +628,7 @@ class DText
         "#{content}\n\n"
       in "blockquote"
         content = html_to_dtext(element, **options, &block).strip
-        "[quote]#{content}[/quote]\n\n" if content.present?
+        "[quote]\n#{content}\n[/quote]\n\n" if content.present?
       in "spoiler" # fake tag added by source extractors
         content = html_to_dtext(element, **options, &block).strip
         "[spoiler]\n#{content}\n[/spoiler]\n\n" if content.present?
