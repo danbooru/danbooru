@@ -1775,6 +1775,18 @@ class Post < ApplicationRecord
         when "rank"
           where("posts.score > 0 and posts.created_at >= ?", 2.days.ago).reorder(Arel.sql("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC"))
 
+        when "rank2"
+          where("posts.score > 0 and posts.created_at >= ?", 7.days.ago).reorder(Arel.sql(<<~SQL
+            (posts.score + posts.fav_count + 7) / log(3, posts.views + 100) / (case
+              when rating = 'e' then 3.5
+              when rating = 'q' then 3.0
+              when rating = 's' then 1.5
+              else 1.0
+            end)
+            DESC
+          SQL
+          ))
+
         when "modqueue", "modqueue_desc"
           with_queued_at.reorder("queued_at DESC, posts.id DESC")
 
