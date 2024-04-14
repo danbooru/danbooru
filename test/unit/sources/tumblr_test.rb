@@ -217,10 +217,19 @@ module Sources
     context "A *.media.tumblr.com/tumblr_$id_$size.pnj URL" do
       strategy_should_work(
         "https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj",
-        image_urls: ["https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj"],
+        image_urls: ["https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.png"],
         page_url: nil,
         artist_name: nil,
-        media_files: [{ file_size: 296_595 }]
+        media_files: [{ file_size: 296_595, file_ext: :jpg }]
+      )
+    end
+
+    context "A *.media.tumblr.com/.../$size/$hash.pnj URL" do
+      strategy_should_work(
+        "https://64.media.tumblr.com/3da3970775ba820dbc80ef3c5dae479e/dcc12b025632aa86-5f/s540x810/6433414944c280dfd6e8bb482e1d9f6466433901.pnj",
+        image_urls: ["https://64.media.tumblr.com/3da3970775ba820dbc80ef3c5dae479e/dcc12b025632aa86-5f/s21000x21000/05f92acb893af4b0f738f1518b49d624038c9c5e.png"],
+        page_url: "https://esper-eclipse.tumblr.com/post/686575447718395904",
+        media_files: [{ file_size: 340_827, file_ext: :png }]
       )
     end
 
