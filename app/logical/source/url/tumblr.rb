@@ -14,10 +14,13 @@ class Source::URL::Tumblr < Source::URL
 
     # https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
     # https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s500x750/4f92bbaaf95c0b4e7970e62b1d2e1415859dd659.png
+    # https://64.media.tumblr.com/3da3970775ba820dbc80ef3c5dae479e/dcc12b025632aa86-5f/s540x810/6433414944c280dfd6e8bb482e1d9f6466433901.pnj
+    # https://64.media.tumblr.com/3da3970775ba820dbc80ef3c5dae479e/dcc12b025632aa86-5f/s540x810/6433414944c280dfd6e8bb482e1d9f6466433901.png
     in _, "tumblr.com", *directories, /s\d+x\d+/ => dimensions, file if image_url?
       @directory = directories.first
       max_size = Integer.sqrt(Danbooru.config.max_image_resolution)
-      @full_image_url = url.to_s.gsub(%r{/s\d+x\d+/\w+\.\w+\z}i, "/s#{max_size}x#{max_size}/#{file}")
+      ext = (file_ext == "pnj") ? "png" : file_ext
+      @full_image_url = url.to_s.gsub(%r{/s\d+x\d+/\w+\.\w+\z}i, "/s#{max_size}x#{max_size}/#{filename}.#{ext}")
 
     # http://data.tumblr.com/07e7bba538046b2b586433976290ee1f/tumblr_o3gg44HcOg1r9pi29o1_raw.jpg
     # https://40.media.tumblr.com/de018501416a465d898d24ad81d76358/tumblr_nfxt7voWDX1rsd4umo1_r23_1280.jpg
@@ -149,7 +152,8 @@ class Source::URL::Tumblr < Source::URL
     media_host = video_url? ? "va.media.tumblr.com" : "media.tumblr.com"
     sizes = %w[1280 720 640 540 500h 500 400 250 100]
 
-    sizes.map { |size| "https://#{media_host}/#{directory}#{@filename}_#{size}.#{file_ext}" }
+    ext = (file_ext == "pnj") ? "png" : file_ext
+    sizes.map { |size| "https://#{media_host}/#{directory}#{@filename}_#{size}.#{ext}" }
   end
 
   def page_url
