@@ -46,9 +46,6 @@ class Source::Extractor
       when "text", "link"
         post[:title]
 
-      when "answer"
-        "#{post[:asking_name]} asked: #{post[:question]}"
-
       else
         nil
       end
@@ -84,26 +81,92 @@ class Source::Extractor
       super(tag)
     end
 
+    # The commentary with reblogs presented as a linear list of quotes, rather than as nested quotes.
+    def linear_artist_commentary_desc
+      return artist_commentary_desc if post[:trail].blank?
+
+      post[:trail].to_a.map do |item|
+        post_url = "https://#{item.dig(:blog, :name)}.tumblr.com/post/#{item.dig(:post, :id)}"
+
+        # https://www.tumblr.com/noizave/171237880542/test-ask
+        if item[:is_root_item] && item[:is_current_item] && post[:type] == "answer"
+          <<~EOS.chomp
+            <blockquote>
+              <p>#{post[:asking_name]} asked:</p>
+
+              #{post[:question]}
+            </blockquote>
+
+            #{item[:content_raw]}
+          EOS
+        # https://www.tumblr.com/shortgremlinman/707877745599905792/get-asked-idiot
+        elsif item[:is_root_item] && !item[:is_current_item] && post[:type] == "answer"
+          <<~EOS.chomp
+            <blockquote>
+              <p>#{post[:asking_name]} asked:</p>
+
+              #{post[:question]}
+            </blockquote>
+
+            <blockquote>
+              <p><a href="#{post_url}">#{item.dig(:blog, :name)}</a> answered:</p>
+
+              #{item[:content_raw]}
+            </blockquote>
+          EOS
+        elsif item[:is_current_item]
+          item[:content_raw]
+        else
+          <<~EOS.chomp
+            <blockquote>
+              <p><a href="#{post_url}">#{item.dig(:blog, :name)}</a>:</p>
+
+              #{item[:content_raw]}
+            </blockquote>
+          EOS
+        end
+      end.join
+    end
+
     def dtext_artist_commentary_desc
-      DText.from_html(artist_commentary_desc, base_url: "https://www.tumblr.com") do |element|
+      DText.from_html(linear_artist_commentary_desc, base_url: "https://www.tumblr.com") do |element|
         case element.name
         # https://tmblr.co/m08AoE-xy5kbQnjed6Tcmng -> https://www.tumblr.com/phantom-miria
         in "a" if Source::URL.parse(element["href"])&.domain == "tmblr.co"
           element["href"] = Source::Extractor::Tumblr.new(element["href"]).redirect_url.to_s
+
+        # <a href="https://www.tumblr.com/blog/view/professionalchaoticdumbass/707743740292382721" class="poll-row"><p>idiot.</p></a>
+        in "a" if element[:class] == "poll-row"
+          element.name = "li"
+
+        # <a href="https://www.tumblr.com/blog/view/professionalchaoticdumbass/707743740292382721">See Results</a><
+        in "a" if element.text == "See Results" && element.parent&.css(".poll-question").present?
+          element.content = nil
 
         # <span class="tmblr-alt-text-helper">ALT</span>
         in "span" if element["class"] == "tmblr-alt-text-helper"
           element.content = nil
 
         # https://localapparently.tumblr.com/post/744819709718003712
-        # <figure><img alt="..."></figure>
-        in "img" if element["alt"].present?
+        in "img" if element["alt"].present? && element.next&.attr(:class) == "tmblr-alt-text-helper"
           element.name = "blockquote"
           element.inner_html = <<~EOS
             <h6>Image description</h6>
 
             <p>#{CGI.escapeHTML(element["alt"]).gsub(/\n\n+/, "<p>")}</p>
           EOS
+
+        # Include images inside quotes to provide context for responses.
+        in "img" if element.ancestors.any? { |e| e.name == "blockquote" }
+          element.name = "p"
+          element.inner_html = %{<a href="#{element[:src]}">[image]</a>}
+
+        # Skip images that don't have alt text or that aren't inside quotes
+        in "img"
+          element.name = "span"
+
+        in "text" if element.text.strip == "[[MORE]]"
+          element.content = nil
 
         else
           nil

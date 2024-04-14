@@ -158,9 +158,17 @@ module Sources
       strategy_should_work(
         "https://noizave.tumblr.com/post/171237880542/test-ask",
         image_urls: ["https://media.tumblr.com/cb481f031010e8ddad564b2150149c9a/tumblr_inline_p4nxoyLrSh1v11u29_1280.png"],
-        artist_commentary_title: "Anonymous asked: test ask",
-        dtext_artist_commentary_desc: "test answer",
-        page_url: "https://noizave.tumblr.com/post/171237880542"
+        page_url: "https://noizave.tumblr.com/post/171237880542",
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          [quote]
+          Anonymous asked:
+
+          test ask
+          [/quote]
+
+          test answer
+        EOS
       )
     end
 
@@ -511,6 +519,100 @@ module Sources
           [/quote]
 
           hmm
+        EOS
+      )
+    end
+
+    context "A commentary with nested reblogs" do
+      strategy_should_work(
+        "https://www.tumblr.com/shortgremlinman/707877745599905792/get-asked-idiot",
+        image_urls: %w[
+          https://64.media.tumblr.com/7f86ced76c3bdb3d1f7e37b94300a0f8/8a2f1b95cb77a442-0c/s21000x21000/36a0d5cb2df6bb50297ad954ab9309ab5425931c.jpg
+          https://64.media.tumblr.com/05fe1dc5f2d2df669ddc349dd127e1c3/68bdc9162a0dc343-a4/s21000x21000/4c9382331f028eb4f236c93ca315ac53face5178.jpg
+          https://64.media.tumblr.com/f6a26f624875be4f1d367abfef0e37b1/f75fe728063ddfea-79/s21000x21000/ab729cb17785b3724bf5142c39442110e59ca378.png
+          https://64.media.tumblr.com/e4a1800a1be40f81acf00eebe43107b9/81439051814a73c3-7c/s21000x21000/21fe610b46d2f3b880a868468a1ac223cd0d2c75.jpg
+          https://64.media.tumblr.com/f27e13b72ea6b435e96ca087bc8efa7e/adadfdda93422e04-54/s21000x21000/5f7710b8ac194ec4e87bf1fcaccb8d05c1d0f11a.png
+          https://64.media.tumblr.com/a2d9051a56877325cc97dd1d4a44b335/29c31c5d4773345f-37/s21000x21000/e01081a0c6cf5a6f4bd78862130e1b7cef0d861d.jpg
+        ],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          [quote]
+          Anonymous asked:
+
+          Get asked. Idiot
+          [/quote]
+
+          [quote]
+          "mlarayoukai":[https://mlarayoukai.tumblr.com/post/705514137627852800] answered:
+
+          Get answered. Idiot
+          [/quote]
+
+          [quote]
+          "mlarayoukai":[https://mlarayoukai.tumblr.com/post/705515061923479553]:
+
+          "[image]":[https://64.media.tumblr.com/7f86ced76c3bdb3d1f7e37b94300a0f8/8a2f1b95cb77a442-0c/s640x960/b61020fc02ca7d336ef607d9e92b9640664bcf75.jpg]
+
+          Get screenshotted. Idiot
+          [/quote]
+
+          [quote]
+          "leafgreen6":[https://leafgreen6.tumblr.com/post/705541898577821696]:
+
+          Get reblogged. Idiot
+          [/quote]
+
+          [quote]
+          "secondimpact":[https://secondimpact.tumblr.com/post/707478301796614144]:
+
+          [quote]
+          h6. Image description
+
+          Text ID: #Get tagged #Idiot
+          [/quote]
+
+          Get peer reviewed. Idiot.
+          [/quote]
+
+          [quote]
+          "leonardburton":[https://leonardburton.tumblr.com/post/707502587639939072]:
+
+          [image description:
+
+          1. a screenshot of a reply that reads “Get replied. Idiot”
+
+          2. a screenshot of tumblr tags reading “#get tagged #idiot”/ end ID]
+
+          get image described. idiot
+          [/quote]
+
+          [quote]
+          "professionalchaoticdumbass":[https://professionalchaoticdumbass.tumblr.com/post/707743740292382721]:
+
+          get polled.
+
+          * idiot.
+          * idiot.
+          [/quote]
+
+          [quote]
+          "chongoblog":[https://chongoblog.tumblr.com/post/707833854516396032]:
+
+          "[image]":[https://64.media.tumblr.com/f6a26f624875be4f1d367abfef0e37b1/f75fe728063ddfea-79/s640x960/3f62c9e9166ccf7df919a563c1bb7902673cb3a0.png]
+          [/quote]
+
+          [quote]
+          "spinji":[https://spinji.tumblr.com/post/707835443054592000]:
+
+          "[image]":[https://64.media.tumblr.com/e4a1800a1be40f81acf00eebe43107b9/81439051814a73c3-7c/s640x960/7b483b9d0b74c63910d5de276e53e0fba3231b2a.jpg]
+          [/quote]
+
+          [quote]
+          "totallyjazzed":[https://totallyjazzed.tumblr.com/post/707835856285843456]:
+
+          "[image]":[https://64.media.tumblr.com/f27e13b72ea6b435e96ca087bc8efa7e/adadfdda93422e04-54/s640x960/96e6f10ba5d86ced934f4bea52bb8e53b2466bad.png]
+          [/quote]
+
+          Get photographed. Idiot
         EOS
       )
     end
