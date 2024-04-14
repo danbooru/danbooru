@@ -9,6 +9,7 @@ class PostVersion < ApplicationRecord
   extend Memoist
 
   belongs_to :post
+  belongs_to :parent, class_name: "Post"
   belongs_to_updater counter_cache: "post_update_count"
 
   module SearchMethods
@@ -34,7 +35,7 @@ class PostVersion < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :updated_at, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version], current_user: current_user)
+      q = search_attributes(params, [:id, :updater, :post, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent, :parent_changed, :source, :source_changed, :version, :updated_at], current_user: current_user)
 
       if params[:changed_tags]
         q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
