@@ -87,12 +87,13 @@ class Source::Extractor
       end
     end
 
-    def other_names
+    def artist_name
       case work_type
       when "post"
-        [api_response&.dig("post", "fanclub", "creator_name")].compact
+        api_response&.dig("post", "fanclub", "creator_name")
       when "product"
-        [html_response&.at(".fanclub-name a")&.text].compact
+        # "⚡️電波暗室⚡️ (弱電波@JackDempa)"
+        html_response&.at(".fanclub-name a")&.text&.slice(/\A(.*) \((.*)\)\z/, 2)
       end
     end
 
