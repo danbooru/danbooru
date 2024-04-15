@@ -13,7 +13,7 @@ module Sources
         media_files: [{ file_size: 3_694_873 }],
         page_url: "https://fantia.jp/posts/1070093",
         profile_url: "https://fantia.jp/fanclubs/27264",
-        other_names: ["豆ラッコ"],
+        artist_name: "豆ラッコ",
         tags: [],
         dtext_artist_commentary_title: "大きく育った心春ちゃん1",
         dtext_artist_commentary_desc: "色々やります"
@@ -26,7 +26,7 @@ module Sources
         referer: "https://fantia.jp/posts/1132267",
         page_url: "https://fantia.jp/posts/1132267",
         profile_url: "https://fantia.jp/fanclubs/1096",
-        other_names: ["稲光伸二"],
+        artist_name: "稲光伸二",
         tags: %w[オリジナル 漫画],
         dtext_artist_commentary_title: "黒い歴史(5)",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -44,6 +44,7 @@ module Sources
         image_urls: ["https://cc.fantia.jp/uploads/post_content_photo/file/14978435/86ec43ba-8121-43ac-9d3c-aec86f5238a2.jpg?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9wb3N0X2NvbnRlbnRfcGhvdG8vZmlsZS8xNDk3ODQzNS84NmVjNDNiYS04MTIxLTQzYWMtOWQzYy1hZWM4NmY1MjM4YTIuanBnIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNjk1MTM4MDI1fX19XX0_&Signature=ypwGfl0VivNcjmsfC5Cu6qNXhnXpuKTHnukMwBEgdWlENuAbVBi0napKC~39NN0e~FBNpgoOW2OqY0BX5zgeMdbz2RAGI1eFsfYpRRNfHDpEvh6dOVgBrHopZvXZzMf1G12yiBnKmXAvNyzwD1cDhnCW0mvcy9RbCJro1ELQ4qWt4BuBUzOtYX5h6OV-WvGnOdys25p~t4n8h15MhaWyIVx32W0wIsbs~cHnaScwgOIJAinBkgp4Mp1AwqYtvmgw28PjJrzohhFDrLGZeM6yjlvLQKnYqjQn5D8CR9l0TLADtMYc65hL92ywG0BXf1zGnGJ86gmqSiZjZ077rl9FVw__"],
         page_url: "https://fantia.jp/posts/2245222",
         profile_url: "https://fantia.jp/fanclubs/476367",
+        artist_name: "4040(4059)",
         tags: %w[アイドルマスターシンデレラガールズ U149 橘ありす 櫻井桃華 赤城みりあ 佐々木千枝 龍崎薫 チアガール スパッツ アンスコ 放尿 R-18],
         dtext_artist_commentary_title: "チアコス感謝祭（高解像度版+アンスコ生🍞🍋☕差分α 計13枚）",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -64,7 +65,7 @@ module Sources
         media_files: [{ file_size: 289_918 }],
         page_url: "https://fantia.jp/products/249638",
         profile_url: "https://fantia.jp/fanclubs/7",
-        other_names: ["⚡️電波暗室⚡️ (弱電波@JackDempa)"],
+        artist_name: "弱電波@JackDempa",
         tags: %w[イラスト集 CG集 PNG オリジナル 宮前詩帆 春川朱璃愛 夏川黒羽 ASMR 音声 原神 シニョーラ],
         dtext_artist_commentary_title: "2021年9月更新分[PNG] - September 2021",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -142,7 +143,7 @@ module Sources
         "https://fantia.jp/posts/1143951/download/1830956",
         image_urls: [%r{https://cc.fantia.jp/uploads/post_content/file/1830956/cbcdfcbe_20220224_120_040_100.png}],
         media_files: [{ file_size: 14_371_816 }],
-        other_names: ["松永紅葉"],
+        artist_name: "松永紅葉",
         profile_url: "https://fantia.jp/fanclubs/322",
         page_url: "https://fantia.jp/posts/1143951",
         tags: [],
@@ -164,7 +165,7 @@ module Sources
         ],
         page_url: "https://fantia.jp/posts/1143951",
         profile_url: "https://fantia.jp/fanclubs/322",
-        other_names: ["松永紅葉"],
+        artist_name: "松永紅葉",
         tags: [],
         dtext_artist_commentary_title: "今日の一枚3186 (1:20+0:40+1:00)",
         dtext_artist_commentary_desc: "今日の一枚3186 (1:20+0:40+1:00)"
@@ -183,8 +184,7 @@ module Sources
         ],
         profile_url: "https://fantia.jp/fanclubs/7",
         profile_urls: %w[https://fantia.jp/fanclubs/7],
-        artist_name: nil,
-        tag_name: nil,
+        artist_name: "弱電波@JackDempa",
         tags: [],
         dtext_artist_commentary_desc: <<~EOS.chomp
           つば広お帽子すきです。
@@ -217,8 +217,7 @@ module Sources
         ],
         profile_url: "https://fantia.jp/fanclubs/6088",
         profile_urls: %w[https://fantia.jp/fanclubs/6088],
-        artist_name: nil,
-        tag_name: nil,
+        artist_name: "すづめ",
         tags: [],
         dtext_artist_commentary_title: "リバーシにまけました",
         dtext_artist_commentary_desc: ""
