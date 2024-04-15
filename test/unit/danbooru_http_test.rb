@@ -92,6 +92,18 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal(200, resp.status)
         assert_equal(httpbin_url("anything/東方"), resp.parse["url"])
       end
+
+      should "work for a Source::URL" do
+        resp = Danbooru::Http.get(Source::URL.parse("https://www.google.com"))
+
+        assert_equal(200, resp.status)
+      end
+
+      should "work for a Source::URL that returns an error" do
+        resp = Danbooru::Http.get(Source::URL.parse("https://www.google.dne"))
+
+        assert_equal(598, resp.status)
+      end
     end
 
     context "#post method" do
