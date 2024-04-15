@@ -14,7 +14,7 @@ class Source::Extractor
 
     def image_urls
       return [parsed_url.full_image_url] if parsed_url.full_image_url.present?
-      return [image_from_downloadable(parsed_url)] if parsed_url.downloadable?
+      return [image_from_downloadable(parsed_url)].compact if parsed_url.downloadable?
 
       images = images_for_post.presence || images_for_product.presence || []
 
@@ -33,8 +33,7 @@ class Source::Extractor
 
     def image_from_downloadable(url)
       resp = http.head(url)
-      return url if resp.status != 200
-      resp.uri.to_s
+      resp.uri.to_s if resp.status == 200 && resp.mime_type != "text/html"
     end
 
     def images_for_post
