@@ -246,6 +246,15 @@ module Sources
       )
     end
 
+    context "A fantia.jp .webp sample image url" do
+      strategy_should_work(
+        "https://c.fantia.jp/uploads/post/file/1132267/main_webp_2a265470-e551-409c-b7cb-04437fd6ab2c.webp",
+        image_urls: ["https://c.fantia.jp/uploads/post/file/1132267/2a265470-e551-409c-b7cb-04437fd6ab2c.jpg"],
+        media_files: [{ file_size: 240_919 }],
+        page_url: "https://fantia.jp/posts/1132267"
+      )
+    end
+
     context "A product url with no images" do
       strategy_should_work(
         "https://fantia.jp/products/10000",
