@@ -7,7 +7,7 @@ module Source
       extend Memoist
 
       def image_urls
-        sub_extractor&.image_urls || [url]
+        sub_extractor&.image_urls || [parsed_url.to_s].compact_blank
       end
 
       def page_url
@@ -59,7 +59,7 @@ module Source
       end
 
       memoize def response
-        http.cache(1.minute).get(url) unless parsed_url.file_ext.in?(%w[jpg jpeg png gif avif webp webm mp4])
+        http.cache(1.minute).get(url) if parsed_url.present? && !parsed_url.file_ext&.in?(%w[jpg jpeg png gif avif webp webm mp4])
       end
 
       memoize def page
