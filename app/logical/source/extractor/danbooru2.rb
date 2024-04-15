@@ -73,7 +73,9 @@ module Source
         end
 
         def sub_extractor
-          @sub_extractor ||= Source::Extractor.find(api_response[:source], default: nil)
+          return nil if parent_extractor.present?
+
+          @sub_extractor ||= Source::Extractor.find(api_response[:source], default: nil, parent_extractor: self)
         end
       end
     end

@@ -68,7 +68,7 @@ module Source
 
       memoize def sub_extractor
         if tumblr_url.present?
-          Source::Extractor.find(tumblr_url)
+          Source::Extractor.find(tumblr_url, parent_extractor: self)
         end
       end
 
