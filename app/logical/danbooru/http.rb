@@ -223,6 +223,7 @@ module Danbooru
     # @param options [Hash] the URL parameters
     # @return [HTTP::Response] the HTTP response
     def request(method, url, format: nil, **options)
+      url = url.to_s
       response = http.send(method, url, **options)
 
       if format
