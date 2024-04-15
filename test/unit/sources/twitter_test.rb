@@ -328,6 +328,17 @@ module Sources
         "https://pbs.twimg.com/profile_banners/16298441/1394248006/600x200",
         image_urls: ["https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500"],
         media_files: [{ file_size: 108_605 }],
+        page_url: nil,
+        profile_url: nil
+      )
+    end
+
+    context "An /ad_img/ image sample" do
+      strategy_should_work(
+        "https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=small",
+        image_urls: ["https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=orig"],
+        media_files: [{ file_size: 159_186 }],
+        page_url: nil,
         profile_url: nil
       )
     end
