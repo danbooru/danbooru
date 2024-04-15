@@ -26,7 +26,7 @@ module Source
     # The http timeout to download a file.
     DOWNLOAD_TIMEOUT = 60
 
-    attr_reader :url, :referer_url, :parsed_url, :parsed_referer
+    attr_reader :url, :referer_url, :parsed_url, :parsed_referer, :parent_extractor
 
     delegate :site_name, to: :parsed_url
 
@@ -93,9 +93,10 @@ module Source
     #
     # @param url [String] The URL to extract information from.
     # @param referer_url [String, nil] The page URL if `url` is an image URL.
+    # @param parent_extractor [Source::Extractor, nil] The parent of this extractor, if this is a sub extractor.
     # @return [Source::Extractor]
-    def self.find(url, referer_url = nil, default: Extractor::Null)
-      extractor = SUBCLASSES.lazy.map { |extractor| extractor.new(url, referer_url) }.find(&:match?)
+    def self.find(url, referer_url = nil, default: Extractor::Null, parent_extractor: nil)
+      extractor = SUBCLASSES.lazy.map { |extractor| extractor.new(url, referer_url, parent_extractor:) }.find(&:match?)
       extractor || default&.new(url, referer_url)
     end
 
@@ -104,9 +105,11 @@ module Source
     #
     # @param url [String] The URL to extract information form.
     # @param referer_url [String, nil] The page URL if `url` is an image URL.
-    def initialize(url, referer_url = nil)
+    # @param parent_extractor [Source::Extractor, nil] The parent of this extractor, if this is a sub extractor.
+    def initialize(url, referer_url = nil, parent_extractor: nil)
       @url = url.to_s
       @referer_url = referer_url&.to_s
+      @parent_extractor = parent_extractor
 
       @parsed_url = Source::URL.parse(url)
       @parsed_referer = Source::URL.parse(referer_url) if referer_url.present?

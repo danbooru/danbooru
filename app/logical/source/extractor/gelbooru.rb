@@ -74,8 +74,9 @@ module Source
       end
 
       def sub_extractor
-        return nil if !api_response[:source].to_s.match?(%r{\Ahttps?://}i)
-        @sub_extractor ||= Source::Extractor.find(api_response[:source], default: nil)
+        return nil if parent_extractor.present? || !api_response[:source].to_s.match?(%r{\Ahttps?://}i)
+
+        @sub_extractor ||= Source::Extractor.find(api_response[:source], default: nil, parent_extractor: self)
       end
     end
   end
