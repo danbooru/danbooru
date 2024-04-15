@@ -120,9 +120,8 @@ class UploadMediaAsset < ApplicationRecord
     Source::URL.parse(canonical_url) unless file_upload?
   end
 
-  def source_extractor
-    return nil if source_url.blank?
-    Source::Extractor.find(source_url, page_url)
+  memoize def source_extractor
+    Source::Extractor.find(source_url, page_url) unless file_upload?
   end
 
   # Calls `process_upload!`
@@ -164,6 +163,4 @@ class UploadMediaAsset < ApplicationRecord
       end
     end
   end
-
-  memoize :source_extractor
 end

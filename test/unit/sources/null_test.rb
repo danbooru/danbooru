@@ -34,6 +34,20 @@ module Sources
       )
     end
 
+    context "A file:// source" do
+      strategy_should_work(
+        "file://image.jpg",
+        image_urls: [],
+        page_url: nil,
+        profile_url: nil,
+        tags: [],
+        tag_name: nil,
+        artist_name: nil,
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil
+      )
+    end
+
     context "determining the site name" do
       should "work" do
         assert_equal("Foo", Source::URL.parse("https://foo.com.").site_name)
