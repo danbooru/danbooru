@@ -32,8 +32,10 @@ class Source::Extractor
       elsif parsed&.downloadable?
         resp = http.head(parsed)
         resp.uri.to_s if resp.status == 200 && resp.mime_type != "text/html"
+      elsif parsed.candidate_full_image_urls.present?
+        parsed.candidate_full_image_urls.find { |url| http_exists?(url) } || url.to_s
       else
-        url
+        url.to_s
       end
     end
 
