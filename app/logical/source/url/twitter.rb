@@ -24,7 +24,7 @@ class Source::URL::Twitter < Source::URL
   # https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration
   RESERVED_USERNAMES = %w[home i intent search]
 
-  attr_reader :status_id, :username, :user_id
+  attr_reader :status_id, :username, :user_id, :full_image_url
 
   def self.match?(url)
     return false if Source::URL::TwitPic.match?(url) # TwitPic uses https://o.twimg.com/ URLs
@@ -71,8 +71,6 @@ class Source::URL::Twitter < Source::URL
     # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg
     in "twimg.com", ("media" | "tweet_video_thumb" | "ext_tw_video_thumb" | "amplify_video_thumb") => media_type, *subdirs, file
       # EBGbJe_U8AA4Ekb.jpg:small
-      @media_type = media_type
-
       @file, @file_size = file.split(":")
       @file, @file_ext = @file.split(".")
 
@@ -82,14 +80,17 @@ class Source::URL::Twitter < Source::URL
 
       # /media/EBGbJe_U8AA4Ekb.jpg
       # /ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
-      @file_path = File.join(@media_type, subdirs.join("/"), "#{@file}.#{@file_ext}")
+      @full_image_url = File.join(site, media_type, *subdirs, "#{@file}.#{@file_ext}:orig")
 
     # https://pbs.twimg.com/profile_banners/780804311529906176/1475001696
     # https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/600x200
     in "twimg.com", "profile_banners" => media_type, /^\d+$/ => user_id, /^\d+$/ => file_id, *dimensions
       @user_id = user_id
-      @media_type = media_type
-      @file_path = "profile_banners/#{user_id}/#{file_id}/1500x500"
+      @full_image_url = "#{site}/#{media_type}/#{user_id}/#{file_id}/1500x500"
+
+    # https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=small
+    in "twimg.com", "ad_img" => media_type, media_id, file if params[:format].present?
+      @full_image_url = "#{site}/#{media_type}/#{media_id}/#{file}?format=#{params[:format]}&name=orig"
 
     # https://twitter.com/motty08111213
     # https://twitter.com/motty08111213/likes
@@ -104,19 +105,6 @@ class Source::URL::Twitter < Source::URL
 
   def image_url?
     domain == "twimg.com"
-  end
-
-  # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
-  # https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig
-  # https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:orig
-  # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:orig
-  def full_image_url
-    return to_s unless @file_path.present?
-    if @media_type == "profile_banners"
-      "#{site}/#{@file_path}"
-    else
-      "#{site}/#{@file_path}:orig"
-    end
   end
 
   def page_url
