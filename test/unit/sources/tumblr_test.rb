@@ -93,7 +93,7 @@ module Sources
           https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_inline_os2zkg02xH1v11u29_1280.jpg
         ],
         dtext_artist_commentary_title: "test post",
-        artist_commentary_desc: %r{<p>description</p><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://\d+.media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os2zhkfhY01v11u29_540.png" data-orig-height="3000" data-orig-width="3000"/></figure><figure class="tmblr-full" data-orig-height="3000" data-orig-width="3000"><img src="https://\d+.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_inline_os2zkg02xH1v11u29_540.jpg" data-orig-height="3000" data-orig-width="3000"/></figure>}
+        dtext_artist_commentary_desc: "description"
       )
     end
 
@@ -449,6 +449,32 @@ module Sources
       )
     end
 
+    context "A reblogged post" do
+      strategy_should_work(
+        "https://www.tumblr.com/lizalfosrise/731136514455666688/can-you-draw-shiki-from-senran-kagura",
+        image_urls: [],
+        profile_url: "https://lizalfosrise.tumblr.com",
+        tags: ["adorable"],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          [quote]
+          Anonymous asked:
+
+          Can you draw Shiki from Senran Kagura?
+          [/quote]
+
+          [quote]
+          "pencilanon":[https://pencilanon.tumblr.com/post/172837943488] answered:
+
+          "[image]":[https://64.media.tumblr.com/a4269a8e3442a025223561525fac778e/tumblr_inline_p71hzjtrPh1u6mv10_540.png]
+
+          Sure
+
+          *EDIT full version [b]"here":[https://files.catbox.moe/fxhzs4.png][/b]
+          [/quote]
+        EOS
+      )
+    end
+
     context "A commentary with alt text containing multiple paragraphs" do
       strategy_should_work(
         "https://dee-toraburu.tumblr.com/post/697041312401309696/fanart-of-alphonse-made-for-the-ee-anthology",
@@ -527,11 +553,6 @@ module Sources
       strategy_should_work(
         "https://www.tumblr.com/shortgremlinman/707877745599905792/get-asked-idiot",
         image_urls: %w[
-          https://64.media.tumblr.com/7f86ced76c3bdb3d1f7e37b94300a0f8/8a2f1b95cb77a442-0c/s21000x21000/36a0d5cb2df6bb50297ad954ab9309ab5425931c.jpg
-          https://64.media.tumblr.com/05fe1dc5f2d2df669ddc349dd127e1c3/68bdc9162a0dc343-a4/s21000x21000/4c9382331f028eb4f236c93ca315ac53face5178.jpg
-          https://64.media.tumblr.com/f6a26f624875be4f1d367abfef0e37b1/f75fe728063ddfea-79/s21000x21000/ab729cb17785b3724bf5142c39442110e59ca378.png
-          https://64.media.tumblr.com/e4a1800a1be40f81acf00eebe43107b9/81439051814a73c3-7c/s21000x21000/21fe610b46d2f3b880a868468a1ac223cd0d2c75.jpg
-          https://64.media.tumblr.com/f27e13b72ea6b435e96ca087bc8efa7e/adadfdda93422e04-54/s21000x21000/5f7710b8ac194ec4e87bf1fcaccb8d05c1d0f11a.png
           https://64.media.tumblr.com/a2d9051a56877325cc97dd1d4a44b335/29c31c5d4773345f-37/s21000x21000/e01081a0c6cf5a6f4bd78862130e1b7cef0d861d.jpg
         ],
         dtext_artist_commentary_desc: <<~EOS.chomp
