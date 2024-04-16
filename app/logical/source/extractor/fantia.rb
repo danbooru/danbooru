@@ -54,7 +54,11 @@ class Source::Extractor
           comment = JSON.parse(content["comment"]) rescue {}
 
           comment["ops"].to_a.pluck("insert").grep(Hash).filter_map do |node|
-            node["image"] || node.dig("fantiaImage", "url")
+            if node.dig("fantiaImage", "original_url").present?
+              "https://fantia.jp#{node.dig("fantiaImage", "original_url")}"
+            else
+              node["image"]
+            end
           end
         end
       end.flatten.compact
