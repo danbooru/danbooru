@@ -1,0 +1,31 @@
+<% page_title "Stealth Metadata" %>
+
+<div id="c-prompt-protector">
+  <div id="a-index">
+    <h1>Stealth metadata decoder</h1>
+
+    <section id="input">
+      <label for="file">
+        <input type="file" id="file" name="file" accept=".png, .jpg, .jpeg, .webp">
+        <div class="prose">
+          <span>Choose file or drag image here</span>
+          <br>
+          <span class="tn" id="filename">No file selected</span>
+        </div>
+      </label>
+      <canvas></canvas>
+    </section>
+
+    <section id="instructions" class="prose">
+      <span class="tn">Drop an image to load its stealth metadata.</span>
+      <br>
+      <span class="tn">Images are decoded locally. No data is transmitted on this page.</span>
+    </section>
+
+    <section id="output">
+      <textarea readonly></textarea>
+    </section>
+  </div>
+</div>
+
+<%= render "ai_metadata/secondary_links" %>

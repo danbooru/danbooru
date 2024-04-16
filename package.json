@@ -32,6 +32,7 @@
     "jquery-ui": "^1.13.2",
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^2.7.7",
+    "pako": "^2.1.0",
     "postcss": "^8.4.33",
     "postcss-import": "^16.0.0",
     "postcss-loader": "^8.0.0",

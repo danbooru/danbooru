@@ -51,7 +51,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :ai_metadata, only: [:index, :show]
+  resources :ai_metadata, only: [:index, :show] do
+    get :stealth, on: :collection, to: "prompt_protector#index"
+  end
   resources :ai_metadata_versions, only: [:index, :show]
   resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
 
