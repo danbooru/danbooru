@@ -81,16 +81,12 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal({ abc: "1", def: "3", ghi: "4" }, resp4.parse["cookies"].symbolize_keys)
       end
 
-      should "work for a URL containing spaces" do
-        resp = Danbooru::Http.get(httpbin_url("anything/foo bar"))
-        assert_equal(200, resp.status)
-        assert_equal(httpbin_url("anything/foo%20bar"), resp.parse["url"])
-      end
+      should "work for a URL containing special characters" do
+        resp = Danbooru::Http.get(httpbin_url("anything/foo 😃`~!@$%^&*()_-+={}[]|\\:;\"'<>,./?bar=baz 😃`~!@$^&*()_-+={}[]|\\:;\"'<>,./&blah😃#hash"))
 
-      should "work for a URL containing the '|' character" do
-        resp = Danbooru::Http.get(httpbin_url("anything/foo|bar"))
         assert_equal(200, resp.status)
-        assert_equal(httpbin_url("anything/foo%7Cbar"), resp.parse["url"])
+        assert_equal(httpbin_url("anything/foo%20%F0%9F%98%83%60~!@$%25%5E&*()_-+=%7B%7D%5B%5D%7C%5C:;%22'%3C%3E,./?bar=baz%20%F0%9F%98%83`~!@$^&*()_-+={}[]|\\:;\"'<>,./&blah%F0%9F%98%83#hash"), resp.request.uri.to_s)
+        assert_equal(httpbin_url("anything/foo%20😃%60~%21%40%24%25%5E%26%2A%28%29_-%2B%3D%7B%7D%5B%5D%7C%5C:%3B%22%27%3C%3E%2C./?bar=baz%20😃%60~!%40$%5E&*()_-+=%7B%7D%5B%5D%7C%5C:%3B%22'%3C%3E,.%2F&blah😃"), resp.parse["url"])
       end
 
       should "work for a URL containing Unicode characters" do

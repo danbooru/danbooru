@@ -50,7 +50,7 @@ module Danbooru
       Danbooru::Http::ApplicationClient.new
         .timeout(DEFAULT_TIMEOUT)
         .headers("Accept-Encoding": "gzip")
-        .use(normalize_uri: { normalizer: ->(uri) { HTTP::URI.parse(Addressable::URI.encode_component(uri, "[[:ascii:]&&[^ |]]")) } }) # XXX Percent-encode Unicode and space characters to avoid "URI::InvalidURIError: URI must be ascii only" error
+        .use(normalize_uri: { normalizer: method(:normalize_uri) })
         .use(:auto_inflate)
         .use(redirector: { max_redirects: MAX_REDIRECTS })
         .use(:session)
@@ -70,6 +70,20 @@ module Danbooru
     # The default HTTP client for API calls to internal services controlled by Danbooru.
     def self.internal
       new.headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
+    end
+
+    # Normalizes the URI before performing a request. Percent-encodes special characters to avoid "URI must be ascii only"
+    # and "bad URI(is not URI?)" errors.
+    def self.normalize_uri(uri)
+      parsed_uri = Addressable::URI.parse(uri)
+
+      HTTP::URI.new(
+        scheme: parsed_uri.scheme,
+        authority: parsed_uri.authority,
+        path: parsed_uri.normalized_path,
+        query: Addressable::URI.encode_component(parsed_uri.query, "[[:ascii:]&&[^ ]]"),
+        fragment: parsed_uri.fragment
+      )
     end
 
     def initialize
