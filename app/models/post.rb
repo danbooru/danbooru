@@ -945,7 +945,7 @@ class Post < ApplicationRecord
       parent_changed = previous.nil? || parent_id != previous.parent_id
       source_changed = previous.nil? || source != previous.source
 
-      subject.update(
+      subject.update!(
         tags: tag_array.join(" "),
         added_tags: added_tags,
         removed_tags: removed_tags,
@@ -975,7 +975,7 @@ class Post < ApplicationRecord
         removed_tags = []
       end
 
-      PostVersion.create(
+      PostVersion.create!(
         post_id: id,
         tags: tag_array.join(" "),
         added_tags: added_tags,
