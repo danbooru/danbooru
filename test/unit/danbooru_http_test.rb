@@ -87,6 +87,12 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal(httpbin_url("anything/foo%20bar"), resp.parse["url"])
       end
 
+      should "work for a URL containing the '|' character" do
+        resp = Danbooru::Http.get(httpbin_url("anything/foo|bar"))
+        assert_equal(200, resp.status)
+        assert_equal(httpbin_url("anything/foo%7Cbar"), resp.parse["url"])
+      end
+
       should "work for a URL containing Unicode characters" do
         resp = Danbooru::Http.get(httpbin_url("anything/東方"))
         assert_equal(200, resp.status)
