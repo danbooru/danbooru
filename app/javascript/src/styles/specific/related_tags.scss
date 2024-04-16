@@ -23,7 +23,7 @@
   ul.no-select {
     margin-left: 1rem;
 
-    span > a {
+    span.related-tag > a {
       cursor: default;
       user-select: none;
     }

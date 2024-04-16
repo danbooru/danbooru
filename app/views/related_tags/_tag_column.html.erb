@@ -18,7 +18,15 @@
             <input type="checkbox" tabindex="-1">
           <% end %>
 
-          <span>
+          <span class="wiki-link">
+            <% if t.name =~ /\A\d+\z/ %>
+              <%= link_to "?", wiki_page_path("~#{t.name}", z: 6), class: "wiki-link", target: "_blank" %>
+            <% else %>
+              <%= link_to "?", wiki_page_path(t.name, z: 6), class: "wiki-link", target: "_blank" %>
+            <% end %>
+          </span>
+
+          <span class="related-tag">
             <% if t.is_a?(AITag) %>
               <% at = t.to_aliased_tag %>
               <% if selectable %>
