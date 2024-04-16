@@ -75,6 +75,7 @@ module Source
       Source::Extractor::Inkbunny,
       Source::Extractor::Bluesky,
       Source::Extractor::Danbooru2,
+      Source::Extractor::Pinterest,
     ]
 
     # Should return true if the extractor is configured correctly. Return false
