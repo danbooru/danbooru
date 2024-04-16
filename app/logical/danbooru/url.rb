@@ -40,6 +40,7 @@ module Danbooru
     attr_reader :url
 
     delegate :ip_based?, :scheme, :host, :hostname, :port, :site, :authority, :path, :query, :fragment, :user, :password, to: :url
+    delegate :sld, :tld, :etld, to: :parsed_domain, allow_nil: true
 
     # Parse a string into a URL, or raise an exception if the string is not a valid HTTP or HTTPS URL.
     #
