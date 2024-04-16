@@ -26,6 +26,11 @@ class Source::URL::Fantia < Source::URL
     # https://c.fantia.jp/uploads/product/image/249638/main_fd5aef8f-c217-49d0-83e8-289efb33dfc4.jpg
     # https://c.fantia.jp/uploads/product_image/file/219407/main_bd7419c2-2450-4c53-a28a-90101fa466ab.jpg (sample)
     # https://c.fantia.jp/uploads/product_image/file/219407/bd7419c2-2450-4c53-a28a-90101fa466ab.jpg
+    #
+    # blog:
+    # https://fantia.jp/posts/2533616/album_image?query=YsSkcpdnlam4JOy5dGHafbrSgfCZoMUmfrWD1XEouNkfO9Qk%2BC5Arv7ovxaiIo%2FEeJe5TI9mWDodDBp%2BzIIh70HJ6c0sWH8wMCc%2FM6IhDIKpxE%2BM1Zc1--Ol9M7yLd5TswwnZ5--wZ7u4P1tCVaAoL5ymFfA5Q%3D%3D
+    # https://cc.fantia.jp/uploads/album_image/file/326995/00abd740-74d5-4289-be85-782cb8cdd382.png?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9hbGJ1bV9pbWFnZS9maWxlLzMyNjk5NS8wMGFiZDc0MC03NGQ1LTQyODktYmU4NS03ODJjYjhjZGQzODIucG5nIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzEzMjM2OTYxfX19XX0_&Signature=XSpRUwWyKOpR53aImaRQeBQx1R4e8hShO6cm-bmqXtJVchiigbTKsV-kCBMox1aeISAcN-O8VhujVlYwtOV1pw6WmE8kIrKeMnWteA17lYd6wAW2BUcVlQb6TBdpPA38V0UTRlmM0cypgw1ipmmDTKtjQ8-Tmo368bZqi4w4M6EukgK~L8Ss42K0JBwfiv0VuLTw49hK9-jGjA1gyQdzZXZwXkuClelV7VVHWxTX06yT8Anv6giOyOM1IP35LxfYG9ZhbTkN78TqAviZhQ9aLEceYG8Ua65f0bGMWCSnjeox5-UpiQ4irAlLDAVkKT~Lz5otNzQd2UnFkRiqbRB32A__
+    # https://cc.fantia.jp/uploads/album_image/file/326995/main_00abd740-74d5-4289-be85-782cb8cdd382.png?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9hbGJ1bV9pbWFnZS9maWxlLzMyNjk5NS9tYWluXzAwYWJkNzQwLTc0ZDUtNDI4OS1iZTg1LTc4MmNiOGNkZDM4Mi5wbmciLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MTMyMjAzODN9fX1dfQ__&Signature=Wmw~M4FjxgpDFYfQmtSE6bmIybdLbsby-SLCMcEPImK1ObbSeCq7GeOuOlwggxFTHU-O2juo-x8f8BCG~YKW1OGHBmHXpQJStw1f5juwHr7gtnM-GKmC3FIXCbWbmsMSpr~8frXOJX0AMHWKBN3aJAnZ01kXF5g9YrC8o31~hlHqDodh9zGNEGFlYkBisfh73Gn6f~Lvu4N8-tdfhedKnPkhy95sc2HTdbIlvfM7hq191BbeGWUwagKtrKIkTFJDWgaLinoZCMFqZDgQ4l8PmdK9UF6wi60iqSeWh~CEsHWinOprdAQVzrg~QDlSOLm2GiPnJjcwYO6D42DbFFmvxw__
     in _, "uploads", image_type, ("file" | "image"), image_id, /(\w+_)?([\w-]+\.\w+)/
       sample = $1
       file = $2
@@ -53,6 +58,12 @@ class Source::URL::Fantia < Source::URL
     in _, "posts", post_id, "download", image_id
       @post_id = post_id
       @download_id = image_id
+      @downloadable = true
+
+    # https://fantia.jp/posts/2533616/album_image?query=YsSkcpdnlam4JOy5dGHafbrSgfCZoMUmfrWD1XEouNkfO9Qk%2BC5Arv7ovxaiIo%2FEeJe5TI9mWDodDBp%2BzIIh70HJ6c0sWH8wMCc%2FM6IhDIKpxE%2BM1Zc1--Ol9M7yLd5TswwnZ5--wZ7u4P1tCVaAoL5ymFfA5Q%3D%3D
+    in _, "posts", post_id, "album_image" if params[:query].present?
+      @post_id = post_id
+      @downloadable = true
 
     # https://fantia.jp/posts/1148334
     # https://fantia.jp/posts/2245222/post_content_photo/14978435
@@ -84,7 +95,7 @@ class Source::URL::Fantia < Source::URL
   end
 
   def downloadable?
-    @download_id.present?
+    @downloadable == true
   end
 
   def page_url

@@ -212,8 +212,13 @@ module Sources
         page_url: "https://fantia.jp/posts/2533616",
         image_urls: [
           "https://c.fantia.jp/uploads/post/file/2533616/83e6c07c-c28b-4cb0-9d3c-0e30ae54cd6e.jpg",
-          %r{\Ahttps://cc\.fantia\.jp/uploads/album_image/file/326995/main_00abd740-74d5-4289-be85-782cb8cdd382\.png},
-          %r{\Ahttps://cc\.fantia\.jp/uploads/album_image/file/326996/12ba15a3-293e-40c8-a872-845bd1277256\.jpg},
+          %r{https://cc.fantia.jp/uploads/album_image/file/326995/00abd740-74d5-4289-be85-782cb8cdd382.png},
+          %r{https://cc.fantia.jp/uploads/album_image/file/326996/12ba15a3-293e-40c8-a872-845bd1277256.jpg},
+        ],
+        media_files: [
+          { file_size: 657_812 },
+          { file_size: 3_086_271 },
+          { file_size: 444_283 },
         ],
         profile_url: "https://fantia.jp/fanclubs/6088",
         profile_urls: %w[https://fantia.jp/fanclubs/6088],
