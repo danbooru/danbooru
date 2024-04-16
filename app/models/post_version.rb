@@ -9,7 +9,7 @@ class PostVersion < ApplicationRecord
   extend Memoist
 
   belongs_to :post
-  belongs_to :parent, class_name: "Post"
+  belongs_to :parent, class_name: "Post", optional: true
   belongs_to_updater counter_cache: "post_update_count"
 
   module SearchMethods
