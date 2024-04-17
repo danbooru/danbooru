@@ -1948,7 +1948,11 @@ class Post < ApplicationRecord
   end
 
   def self.normalize_source(source)
-    source.to_s.strip.unicode_normalize(:nfc)
+    if source.match?(%r{\Ahttps?://}i)
+      source.to_s
+    else
+      source.to_s.strip.unicode_normalize(:nfc)
+    end
   end
 
   def mark_as_translated(params)

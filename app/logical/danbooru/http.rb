@@ -80,7 +80,7 @@ module Danbooru
       HTTP::URI.new(
         scheme: parsed_uri.scheme,
         authority: parsed_uri.authority,
-        path: parsed_uri.normalized_path,
+        path: Addressable::URI.encode_component(parsed_uri.path, Addressable::URI::CharacterClasses::PATH),
         query: Addressable::URI.encode_component(parsed_uri.query, "[[:ascii:]&&[^ ]]"),
         fragment: parsed_uri.fragment
       )
