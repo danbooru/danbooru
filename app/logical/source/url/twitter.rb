@@ -28,14 +28,14 @@ class Source::URL::Twitter < Source::URL
 
   def self.match?(url)
     return false if Source::URL::TwitPic.match?(url) # TwitPic uses https://o.twimg.com/ URLs
-    url.domain.in?(%w[twitter.com twimg.com t.co x.com])
+    url.domain.in?(%w[twitter.com fxtwitter.com vxtwitter.com twimg.com t.co x.com])
   end
 
   def parse
     case [domain, *path_segments]
 
     # https://twitter.com/i/web/status/943446161586733056
-    in ("twitter.com" | "x.com"), "i", "web", "status", status_id
+    in (/twitter.com/ | "x.com"), "i", "web", "status", status_id
       @status_id = status_id
 
     # https://twitter.com/i/status/943446161586733056
@@ -44,21 +44,21 @@ class Source::URL::Twitter < Source::URL
     # https://twitter.com/motty08111213/status/943446161586733056?s=19
     # https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
     # https://twitter.com/sato_1_11/status/1496489742791475201/photo/2
-    in ("twitter.com" | "x.com"), username, "status", status_id, *rest
+    in (/twitter.com/ | "x.com"), username, "status", status_id, *rest
       username = username.delete_prefix("@")
       @username = username unless username.in?(RESERVED_USERNAMES)
       @status_id = status_id
 
     # https://twitter.com/intent/user?user_id=1485229827984531457
-    in ("twitter.com" | "x.com"), "intent", "user" if params[:user_id].present?
+    in (/twitter.com/ | "x.com"), "intent", "user" if params[:user_id].present?
       @user_id = params[:user_id]
 
     # https://twitter.com/intent/user?screen_name=ryuudog_NFT
-    in ("twitter.com" | "x.com"), "intent", "user" if params[:screen_name].present?
+    in (/twitter.com/ | "x.com"), "intent", "user" if params[:screen_name].present?
       @username = params[:screen_name]
 
     # https://twitter.com/i/user/889592953
-    in ("twitter.com" | "x.com"), "i", "user", user_id
+    in (/twitter.com/ | "x.com"), "i", "user", user_id
       @user_id = user_id
 
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg
@@ -94,14 +94,14 @@ class Source::URL::Twitter < Source::URL
       @full_image_url = "#{site}/#{media_type}/#{media_id}/#{file}?format=#{params[:format]}&name=orig"
 
     # https://twitter.com/merry_bongbong/header_photo
-    in ("twitter.com" | "x.com"), username, "header_photo" unless username.in?(RESERVED_USERNAMES)
+    in (/twitter.com/ | "x.com"), username, "header_photo" unless username.in?(RESERVED_USERNAMES)
       @profile_banner = true
       @username = username.delete_prefix("@")
 
     # https://twitter.com/motty08111213
     # https://twitter.com/motty08111213/likes
     # https://twitter.com/@eemapso
-    in ("twitter.com" | "x.com"), username, *rest unless username.in?(RESERVED_USERNAMES)
+    in (/twitter.com/ | "x.com"), username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username.delete_prefix("@")
 
     else

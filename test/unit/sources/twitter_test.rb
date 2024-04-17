@@ -312,6 +312,32 @@ module Sources
       )
     end
 
+    context "A https://fxtwitter.com/:username/status/:id url" do
+      strategy_should_work(
+        "https://fxtwitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        image_urls: [
+          "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
+        ],
+        profile_url: "https://twitter.com/motty08111213"
+      )
+    end
+
+    context "A https://vxtwitter.com/:username/status/:id url" do
+      strategy_should_work(
+        "https://vxtwitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        image_urls: [
+          "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
+        ],
+        profile_url: "https://twitter.com/motty08111213"
+      )
+    end
+
     context "A profile banner image" do
       strategy_should_work(
         "https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500",
@@ -460,6 +486,22 @@ module Sources
       assert(Source::URL.profile_url?("https://x.com/intent/user?user_id=1485229827984531457"))
       assert(Source::URL.profile_url?("https://x.com/intent/user?screen_name=ryuudog_NFT"))
       assert(Source::URL.profile_url?("https://x.com/i/user/889592953"))
+
+      assert(Source::URL.page_url?("https://vxtwitter.com/i/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://vxtwitter.com/i/web/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://vxtwitter.com/@BOW999/status/1261877313349640194"))
+      assert(Source::URL.profile_url?("https://vxtwitter.com/irt_5433"))
+      assert(Source::URL.profile_url?("https://vxtwitter.com/intent/user?user_id=1485229827984531457"))
+      assert(Source::URL.profile_url?("https://vxtwitter.com/intent/user?screen_name=ryuudog_NFT"))
+      assert(Source::URL.profile_url?("https://vxtwitter.com/i/user/889592953"))
+
+      assert(Source::URL.page_url?("https://fxtwitter.com/i/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://fxtwitter.com/i/web/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://fxtwitter.com/@BOW999/status/1261877313349640194"))
+      assert(Source::URL.profile_url?("https://fxtwitter.com/irt_5433"))
+      assert(Source::URL.profile_url?("https://fxtwitter.com/intent/user?user_id=1485229827984531457"))
+      assert(Source::URL.profile_url?("https://fxtwitter.com/intent/user?screen_name=ryuudog_NFT"))
+      assert(Source::URL.profile_url?("https://fxtwitter.com/i/user/889592953"))
 
       assert_not(Source::URL.profile_url?("https://twitter.com/home"))
 
