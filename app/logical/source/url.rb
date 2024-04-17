@@ -209,6 +209,29 @@ module Source
       nil
     end
 
+    # True if the URL is considered a "bad source". A bad source is an URL that should never be used as the source of a
+    # post because it's never a valid source. For example, a profile URL or some other random URL that isn't a page URL
+    # or an image URL.
+    #
+    # Posts will be tagged "bad_source" if this returns true for the post's source URL.
+    #
+    # @return [Boolean]
+    def bad_source?
+      !image_url? && !page_url?
+    end
+
+    # True if the URL is considered a "bad link". A bad link is an image URL that shouldn't be used as the source of a
+    # post. For example, Twitter image URLs are bad links because it's not possible to convert Twitter image URLs to the
+    # actual Twitter post. A Pixiv image URL is a good link because it is possible to convert Pixiv image URLs to the
+    # actual Pixiv post.
+    #
+    # Posts will be tagged "bad_link" if this returns true for the post's source URL.
+    #
+    # @return [Boolean]
+    def bad_link?
+      image_url? && page_url.nil?
+    end
+
     def self.site_name(url)
       Source::URL.parse(url)&.site_name
     end
@@ -223,6 +246,14 @@ module Source
 
     def self.profile_url?(url)
       Source::URL.parse(url)&.profile_url?
+    end
+
+    def self.bad_link?(url)
+      Source::URL.parse(url)&.bad_link?
+    end
+
+    def self.bad_source?(url)
+      Source::URL.parse(url)&.bad_source?
     end
 
     def self.page_url(url)
