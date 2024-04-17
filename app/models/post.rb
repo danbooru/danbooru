@@ -471,14 +471,14 @@ class Post < ApplicationRecord
       source_url = parsed_source
       if source_url.present? && source_url.recognized?
         # A bad_link is an image URL from a recognized site that can't be converted to a page URL.
-        if source_url.image_url? && source_url.page_url.nil?
+        if source_url.bad_link?
           tags << "bad_link"
         else
           tags -= ["bad_link"]
         end
 
         # A bad_source is a source from a recognized site that isn't an image url or a page url.
-        if !source_url.image_url? && !source_url.page_url?
+        if source_url.bad_source?
           tags << "bad_source"
         else
           tags -= ["bad_source"]
@@ -1948,7 +1948,7 @@ class Post < ApplicationRecord
   end
 
   def self.normalize_source(source)
-    if source.match?(%r{\Ahttps?://}i)
+    if source&.match?(%r{\Ahttps?://}i)
       source.to_s
     else
       source.to_s.strip.unicode_normalize(:nfc)

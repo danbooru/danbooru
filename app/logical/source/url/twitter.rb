@@ -86,11 +86,17 @@ class Source::URL::Twitter < Source::URL
     # https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/600x200
     in "twimg.com", "profile_banners" => media_type, /^\d+$/ => user_id, /^\d+$/ => file_id, *dimensions
       @user_id = user_id
+      @profile_banner = true
       @full_image_url = "#{site}/#{media_type}/#{user_id}/#{file_id}/1500x500"
 
     # https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=small
     in "twimg.com", "ad_img" => media_type, media_id, file if params[:format].present?
       @full_image_url = "#{site}/#{media_type}/#{media_id}/#{file}?format=#{params[:format]}&name=orig"
+
+    # https://twitter.com/merry_bongbong/header_photo
+    in ("twitter.com" | "x.com"), username, "header_photo" unless username.in?(RESERVED_USERNAMES)
+      @profile_banner = true
+      @username = username.delete_prefix("@")
 
     # https://twitter.com/motty08111213
     # https://twitter.com/motty08111213/likes
@@ -103,8 +109,16 @@ class Source::URL::Twitter < Source::URL
     end
   end
 
+  def profile_banner?
+    @profile_banner == true
+  end
+
   def image_url?
     domain == "twimg.com"
+  end
+
+  def bad_link?
+    image_url? && !profile_banner?
   end
 
   def page_url
@@ -112,6 +126,8 @@ class Source::URL::Twitter < Source::URL
       "https://twitter.com/#{username}/status/#{status_id}"
     elsif status_id.present?
       "https://twitter.com/i/web/status/#{status_id}"
+    elsif profile_banner? && username.present?
+      "https://twitter.com/#{username}/header_photo"
     end
   end
 

@@ -463,6 +463,11 @@ module Sources
 
       assert_not(Source::URL.profile_url?("https://twitter.com/home"))
 
+      assert_not(Source::URL.bad_link?("https://pbs.twimg.com/profile_banners/780804311529906176/1475001696"))
+      assert_not(Source::URL.bad_source?("https://pbs.twimg.com/profile_banners/780804311529906176/1475001696"))
+      assert_not(Source::URL.bad_link?("https://twitter.com/merry_bongbong/header_photo"))
+      assert_not(Source::URL.bad_source?("https://twitter.com/merry_bongbong/header_photo"))
+
       assert_nil(Source::URL.parse("https://twitter.com/i/status/1261877313349640194").username)
       assert_nil(Source::URL.parse("https://twitter.com/i/web/status/1261877313349640194").username)
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/BOW999/status/1261877313349640194").username)
