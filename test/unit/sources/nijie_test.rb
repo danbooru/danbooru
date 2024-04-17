@@ -283,7 +283,6 @@ module Sources
       end
     end
 
-
     should "Parse Nijie URLs correctly" do
       assert_equal("https://nijie.info/view.php?id=218856", Source::URL.page_url("https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png"))
       assert_equal("https://nijie.info/view.php?id=287736", Source::URL.page_url("https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png"))
@@ -304,6 +303,8 @@ module Sources
 
       assert(Source::URL.profile_url?("https://nijie.info/members.php?id=236014"))
       assert(Source::URL.profile_url?("https://nijie.info/members_illust.php?id=236014"))
+
+      assert_nil(Source::URL.page_url("http://pic02.nijie.info/nijie_picture/diff/main/0_23473_141_20120913002158.jpg"))
     end
 
     context "an unsupported image url" do
