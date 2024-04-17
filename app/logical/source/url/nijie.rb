@@ -43,6 +43,7 @@ class Source::URL::Nijie < Source::URL
     # https://pic01.nijie.info/nijie_picture/diff/main/218856_1_236014_20170620101330.png
     # https://pic05.nijie.info/nijie_picture/diff/main/559053_20180604023346_1.png (page: http://nijie.info/view_popup.php?id=265428#diff_2)
     # https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png (page: http://nijie.info/view_popup.php?id=287736#diff_2)
+    # https://pic02.nijie.info/nijie_picture/diff/main/0_23473_141_20120913002158.jpg
     # https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg (page: https://www.nijie.info/view.php?id=64240)
     # https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png (page: https://www.nijie.info/view.php?id=218856)
     # https://pic.nijie.net/03/nijie_picture/236014_20170620101426_0.png (page: https://www.nijie.info/view.php?id=218856)
@@ -70,9 +71,11 @@ class Source::URL::Nijie < Source::URL
     in /^\d+$/ => user_id, /^\d{14}$/ => timestamp, *rest
       @user_id = user_id
 
+    # 0_23473_141_20120913002158.jpg
     # 218856_0_236014_20170620101329.png
     in /^\d+$/ => work_id, /^\d+$/, /^\d+$/ => user_id, /^\d{14}$/ => timestamp
-      @work_id, @user_id = work_id, user_id
+      @work_id = work_id if work_id.to_i != 0
+      @user_id = user_id
 
     # 287736_161475_20181112032855_1.png
     in /^\d+$/ => work_id, /^\d+$/ => user_id, /^\d{14}$/ => timestamp, /^\d+$/
