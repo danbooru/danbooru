@@ -21,6 +21,11 @@ class Source::URL::Instagram < Source::URL
     in "instagram.com", ("p" | "reel" | "tv"), work_id
       @work_id = work_id
 
+    # https://www.instagram.com/peachmomoko60/p/CyyRYaBxp25/
+    in "instagram.com", username, ("p" | "reel" | "tv"), work_id
+      @work_id = work_id
+      @username = username
+
     # https://www.instagram.com/itomugi/
     # https://www.instagram.com/itomugi/tagged/
     in "instagram.com", username, *rest

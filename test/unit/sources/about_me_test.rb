@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Sources
-  class AboutMe < ActiveSupport::TestCase
+  class AboutMeTest < ActiveSupport::TestCase
     context "About.me:" do
       should "Parse About.me URLs correctly" do
         assert(Source::URL.image_url?("https://about.me/cdn-cgi/image/q=40,dpr=2,f=auto,fit=cover,w=120,h=120,gravity=auto/https://assets.about.me/background/users/s/g/r/sgr_sk_1369590004_43.jpg"))
