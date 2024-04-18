@@ -11,23 +11,8 @@ module Source
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]
-        elsif api_response.dig("props", "pageProps", "artwork").present?
-          artwork = api_response.dig("props", "pageProps", "artwork")
-          asset_id = artwork["assetId"]
-
-          # Reverse engineered from the Foundation.app Javascript; look for buildVideoUrl in utils/assets.ts.
-          if artwork["mimeType"].starts_with?("video/")
-            if artwork["assetVersion"] == 5
-              url = "#{artwork["assetScheme"]}#{artwork["assetHost"]}#{artwork["assetPath"]}/nft.mp4"
-            elsif artwork["assetVersion"] == 3
-              url = "https://assets.foundation.app/#{asset_id[-4..-3]}/#{asset_id[-2..-1]}/#{asset_id}/nft_q4.mp4"
-            else
-              url = "https://assets.foundation.app/#{asset_id[-4..-3]}/#{asset_id[-2..-1]}/#{asset_id}/nft.mp4"
-            end
-          else
-            url = "#{artwork["assetScheme"]}#{artwork["assetHost"]}/#{artwork["assetPath"]}"
-          end
-
+        elsif nft.dig("media", "url").present?
+          url = nft.dig("media", "url")
           [Source::URL.parse(url).full_image_url].compact
         else
           []
@@ -35,20 +20,36 @@ module Source
       end
 
       def page_url
-        parsed_url.page_url || parsed_referer&.page_url
+        if nft["contractAddress"].present? && nft["tokenId"].present?
+          "https://foundation.app/mint/eth/#{nft["contractAddress"]}/#{nft["tokenId"]}"
+        else
+          parsed_url.page_url || parsed_referer&.page_url
+        end
       end
 
       memoize def page
-        http.cache(1.minute).parsed_get(page_url)
+        url = parsed_url.page_url || parsed_referer&.page_url
+        http.cache(1.minute).parsed_get(url)
       end
 
       def artist_name
-        parsed_url.username || parsed_referer&.username || api_response.dig("props", "pageProps", "artwork", "creator", "username")
+        display_name
+      end
+
+      def other_names
+        [display_name, username].compact_blank.uniq
+      end
+
+      def display_name
+        nft.dig("creator", "name")
+      end
+
+      def username
+        parsed_url.username || parsed_referer&.username || nft.dig("creator", "username")
       end
 
       def profile_url
-        return nil if artist_name.blank?
-        "https://foundation.app/@#{artist_name}"
+        "https://foundation.app/@#{username}" if username.present?
       end
 
       def profile_urls
@@ -56,27 +57,27 @@ module Source
       end
 
       def creator_public_key_url
-        return nil if creator_public_key.nil?
-        "https://foundation.app/#{creator_public_key}"
+        "https://foundation.app/#{creator_public_key}" if creator_public_key.present?
       end
 
       def creator_public_key
-        api_response.dig("props", "pageProps", "artwork", "creator", "publicKey")
+        nft.dig("creator", "publicKey")
       end
 
       def artist_commentary_title
-        return nil if page.blank?
-        page.at("meta[property='og:title']")["content"].gsub(/ \| Foundation$/, "")
+        nft["name"]
       end
 
       def artist_commentary_desc
-        header = page&.xpath("//h2[text()='Description']")&.first
-        return nil if header.blank?
-        header&.parent&.search("div").first&.to_html
+        nft["description"]
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc, base_url: "https://foundation.app")
+        DText.from_plaintext(artist_commentary_desc)
+      end
+
+      memoize def nft
+        api_response.dig("props", "pageProps", "pageData", "nft") || {}
       end
 
       memoize def api_response
