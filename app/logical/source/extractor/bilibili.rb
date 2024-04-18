@@ -11,34 +11,44 @@ module Source
       def image_urls
         if parsed_url&.full_image_url.present?
           [parsed_url.full_image_url]
-        elsif data.present?
-          image_urls = data.dig("modules", "module_dynamic", "major", "draw", "items").to_a.pluck("src")
+        elsif post_json.present?
+          image_urls = post_json.dig("modules", "module_dynamic", "major", "opus", "pics").to_a.pluck("url")
           image_urls.to_a.compact.map { |u| Source::URL.parse(u).full_image_url || u }
-        elsif article_id.present?
-          page&.search("#article-content img").to_a.pluck("data-src").compact.map { |u| Source::URL.parse(URI.join("https://", u)).full_image_url || u }
+        elsif article_image_urls.present?
+          article_image_urls
         else
           [parsed_url.original_url]
         end
       end
 
-      def page_url
-        t_work_page || parsed_url.page_url || parsed_referer&.page_url
-      end
+      memoize def article_image_urls
+        return [] unless article_json.present?
 
-      def t_work_page
-        return unless t_work_id.present?
-        "https://t.bilibili.com/#{data["id_str"]}"
-      end
-
-      def artist_commentary_title
-        if article_id.present?
-          page&.at(".article-container .title")&.text&.squish&.strip
+        html = Nokogiri::HTML5.fragment(artist_commentary_desc)
+        html.css("img").pluck("data-src").map do |url|
+          Source::URL.parse(URI.join("https://", url)).full_image_url || url
         end
       end
 
+      def page_url
+        work_page || parsed_url.page_url || parsed_referer&.page_url
+      end
+
+      def work_page
+        if post_json["id_str"].present?
+          "https://t.bilibili.com/#{post_json["id_str"]}"
+        elsif article_json["cvid"].present?
+          "https://www.bilibili.com/read/cv#{article_json["cvid"]}/"
+        end
+      end
+
+      def artist_commentary_title
+        post_json.dig("modules", "module_dynamic", "major", "opus", "title") || article_json.dig("readInfo", "title")
+      end
+
       def artist_commentary_desc
-        if t_work_id.present?
-          data.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.map do |text_node|
+        if post_json.present?
+          post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes").to_a.map do |text_node|
             case text_node["type"]
             when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB"
               "<a href='#{URI.join("https://", text_node["jump_url"])}'>#{text_node["text"]}</a>"
@@ -50,8 +60,10 @@ module Source
               text_node["text"]
             end
           end.join
-        elsif article_id.present?
-          page&.at("#article-content")&.to_html
+        elsif article_json.present?
+          article_json.dig("readInfo", "content")
+        else
+          nil
         end
       end
 
@@ -60,25 +72,20 @@ module Source
       end
 
       def tags
-        data.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.select do |n|
+        post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes").to_a.select do |n|
           n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
         end.map do |tag|
           tag_name = tag["text"].gsub(/(^#|#$)/, "")
-          [tag_name, "https://t.bilibili.com/topic/name/#{tag_name}"]
+          [tag_name, "https://t.bilibili.com/topic/name/#{Danbooru::URL.escape(tag_name)}"]
         end
       end
 
       def artist_name
-        if t_work_id.present?
-          data.dig("modules", "module_author", "name")
-        elsif article_id.present?
-          page&.at(".article-container .up-name")&.text&.squish&.strip
-        end
+        post_json.dig("modules", "module_author", "name") || article_json.dig("readInfo", "author", "name")
       end
 
       def tag_name
-        return unless artist_id.present?
-        "bilibili_#{artist_id}"
+        "bilibili_#{artist_id}" if artist_id.present?
       end
 
       def other_names
@@ -90,17 +97,11 @@ module Source
       end
 
       def artist_id_from_data
-        if t_work_id.present?
-          data.dig("modules", "module_author", "mid")
-        elsif article_id.present?
-          artist_url = page&.at(".article-container .up-name")&.[]("href")
-          Source::URL.parse(URI.join("https://", artist_url))&.artist_id
-        end
+        post_json.dig("modules", "module_author", "mid") || article_json.dig("readInfo", "author", "mid")
       end
 
       def profile_url
-        return nil if artist_id.blank?
-        "https://space.bilibili.com/#{artist_id}"
+        "https://space.bilibili.com/#{artist_id}" if artist_id.present?
       end
 
       def t_work_id
@@ -127,19 +128,32 @@ module Source
       end
 
       memoize def page
-        http.cache(1.minute).parsed_get(page_url)
+        url = parsed_url.page_url || parsed_referer&.page_url
+        http.cache(1.minute).parsed_get(url)
       end
 
-      memoize def data
+      memoize def post_json
         return {} if t_work_id.blank?
 
-        data = http.cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=#{t_work_id}") || {}
+        data = http.cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=#{t_work_id}&features=itemOpusStyle") || {}
 
         if data.dig("data", "item", "orig", "id_str").present? # it means it's a repost
           data.dig("data", "item", "orig")
         else
           data.dig("data", "item").to_h
         end
+      end
+
+      memoize def article_json
+        return {} if article_id.nil? || page.nil?
+
+        script = page&.css("body script").to_a.map(&:text).grep(/window.__INITIAL_STATE__/).first.to_s
+        json = script[/window.__INITIAL_STATE__=(.*);\(function\(\){[^"]*}\(\)\);\z/, 1]
+        return {} if json.blank?
+
+        JSON.parse(json).with_indifferent_access
+      rescue JSON::ParserError
+        {}
       end
     end
   end
