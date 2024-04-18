@@ -12,7 +12,7 @@ module Source
       attr_reader :file, :t_work_id, :h_work_id, :video_id, :article_id, :artist_id
 
       def self.match?(url)
-        url.domain.in?(["bilibili.com", "hdslb.com"])
+        url.domain.in?(%w[bilibili.com biliimg.com hdslb.com])
       end
 
       def parse
@@ -20,18 +20,21 @@ module Source
 
         # https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg@1036w.webp
         # https://i0.hdslb.com/bfs/new_dyn/716a9733fc804d11d823cfacb7a3c78b11742550.jpg@208w_208h_1e_1c.webp
-        in _, "hdslb.com", "bfs", "new_dyn", /^(\w{32}(\d{8,})\.\w+)(?:@\w+\.\w+)?$/ => file
+        # https://album.biliimg.com/bfs/new_dyn/4cf244d3fb706a5726b6383143960931504164361.jpg
+        in _, ("hdslb.com" | "biliimg.com"), "bfs", "new_dyn", /^(\w{32}(\d{8,})\.\w+)(?:@\w+\.\w+)?$/ => file
           @file = $1
           @artist_id = $2
 
         # https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif@1036w.webp
         # https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif
         # https://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp
-        in  _, "hdslb.com", "bfs", subsite, /^(\w{40}\.\w+)(?:@\w+\.\w+)?$/ => file
+        # https://album.biliimg.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp
+        in  _, ("hdslb.com" | "biliimg.com"), "bfs", subsite, /^(\w{40}\.\w+)(?:@\w+\.\w+)?$/ => file
           @file = $1
 
         # https://i0.hdslb.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png
-        in  _, "hdslb.com", "bfs", subsite, "static", subpath, /^\w+\.\w+$/ => file
+        # https://album.biliimg.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png
+        in  _, ("hdslb.com" | "biliimg.com"), "bfs", subsite, "static", subpath, /^\w+\.\w+$/ => file
         # pass
 
         # https://t.bilibili.com/686082748803186697
@@ -80,7 +83,7 @@ module Source
       end
 
       def image_url?
-        domain == "hdslb.com"
+        url.domain.in?(%w[biliimg.com hdslb.com])
       end
 
       def full_image_url
@@ -95,9 +98,9 @@ module Source
         elsif h_work_id.present?
           "https://h.bilibili.com/#{h_work_id}"
         elsif article_id.present?
-          "https://www.bilibili.com/read/cv#{article_id}"
+          "https://www.bilibili.com/read/cv#{article_id}/"
         elsif video_id.present?
-          "https://www.bilibili.com/video/#{video_id}"
+          "https://www.bilibili.com/video/#{video_id}/"
         end
       end
 
