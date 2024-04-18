@@ -9,7 +9,7 @@
 # * https://foundation.app/collection/kgfgen
 
 class Source::URL::Foundation < Source::URL
-  attr_reader :username, :user_id, :token_id, :work_id, :hash
+  attr_reader :username, :user_id, :token_id, :work_id, :hash, :collection
 
   IMAGE_HOSTS = %w[assets.foundation.app f8n-ipfs-production.imgix.net f8n-production-collection-assets.imgix.net d2ybmb80bbm9ts.cloudfront.net]
 
@@ -47,13 +47,20 @@ class Source::URL::Foundation < Source::URL
       @username = username.delete_prefix("@")
       @work_id = slug.split("-").last
 
+    # https://foundation.app/mint/eth/0xFb0a8e1bB97fD7231Cd73c489dA4732Ae87995F0/4
+    # https://foundation.app/mint/eth/0xFb0a8e1bB97fD7231Cd73c489dA4732Ae87995F0/6
+    # https://foundation.app/mint/eth/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/109433
+    in "foundation.app", "mint", "eth", /^0x\h{39}/ => token_id, work_id
+      @token_id = token_id
+      @work_id = work_id
+
     # https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png
     # https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png?q=80&auto=format%2Ccompress&cs=srgb&max-w=1680&max-h=1680
     in "f8n-ipfs-production.imgix.net", hash, file
       @hash = hash
 
     # https://f8n-production-collection-assets.imgix.net/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/128711/QmcBfbeCMSxqYB3L1owPAxFencFx3jLzCPFx6xUBxgSCkH/nft.png
-    in "f8n-production-collection-assets.imgix.net", token_id, work_id, hash, file
+    in "f8n-production-collection-assets.imgix.net", /^0x\w{40}$/ => token_id, work_id, hash, file
       @token_id = token_id
       @work_id = work_id
       @hash = hash
@@ -87,13 +94,11 @@ class Source::URL::Foundation < Source::URL
   end
 
   def page_url
-    return nil unless work_id.present?
-    return nil if host.in?(IMAGE_HOSTS) && @hash.blank?
-    # https://f8n-production-collection-assets.imgix.net/0xAcf67a11D93D22bbB51fddD9B039d43d5Db484Bc/3/nft.png cannot be normalized to a correct page url
-
-    username = @username || "foundation"
-    collection = @collection || "foundation"
-    "https://foundation.app/@#{username}/#{collection}/#{work_id}"
+    if token_id.present? && work_id.present?
+      "https://foundation.app/mint/eth/#{token_id}/#{work_id}"
+    elsif work_id.present?
+      "https://foundation.app/@#{username || "foundation"}/#{collection || "foundation"}/#{work_id}"
+    end
   end
 
   def full_image_url
@@ -107,7 +112,6 @@ class Source::URL::Foundation < Source::URL
   end
 
   def ipfs_url
-    return nil unless hash.present? && file_ext.present?
-    "ipfs://#{hash}/nft.#{file_ext}"
+    "ipfs://#{hash}/nft.#{file_ext}" if hash.present? && file_ext.present?
   end
 end
