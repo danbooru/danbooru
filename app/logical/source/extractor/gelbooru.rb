@@ -14,10 +14,6 @@ module Source
     class Gelbooru < Source::Extractor
       delegate :artist_name, :profile_url, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
 
-      def match?
-        Source::URL::Gelbooru === parsed_url
-      end
-
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]
@@ -76,7 +72,7 @@ module Source
       def sub_extractor
         return nil if parent_extractor.present? || !api_response[:source].to_s.match?(%r{\Ahttps?://}i)
 
-        @sub_extractor ||= Source::Extractor.find(api_response[:source], default: nil, parent_extractor: self)
+        @sub_extractor ||= Source::Extractor.find(api_response[:source], default_extractor: nil, parent_extractor: self)
       end
     end
   end

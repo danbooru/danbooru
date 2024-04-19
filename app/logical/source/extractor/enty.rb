@@ -5,10 +5,6 @@
 module Source
   class Extractor
     class Enty < Source::Extractor
-      def match?
-        Source::URL::Enty === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [parsed_url.to_s]

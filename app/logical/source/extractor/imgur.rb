@@ -10,10 +10,6 @@ module Source
       # 2019, so hardcoding it should be fine.
       IMGUR_CLIENT_ID = "546c25a59c58ad7"
 
-      def match?
-        Source::URL::Imgur === parsed_url
-      end
-
       def image_urls
         # For .mp4 files (e.g. https://i.imgur.com/Kp9TdlX.mp4), we have to use the API to tell whether the original image is a .gif or not.
         if parsed_url.image_url? && parsed_url.file_ext == "mp4"

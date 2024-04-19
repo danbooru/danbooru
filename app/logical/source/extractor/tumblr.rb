@@ -7,10 +7,6 @@ class Source::Extractor
       Danbooru.config.tumblr_consumer_key.present?
     end
 
-    def match?
-      Source::URL::Tumblr === parsed_url
-    end
-
     def image_urls
       return [find_largest(parsed_url)].compact if parsed_url.image_url?
 
@@ -133,7 +129,7 @@ class Source::Extractor
         case element.name
         # https://tmblr.co/m08AoE-xy5kbQnjed6Tcmng -> https://www.tumblr.com/phantom-miria
         in "a" if Source::URL.parse(element["href"])&.domain == "tmblr.co"
-          element["href"] = Source::Extractor::Tumblr.new(element["href"]).redirect_url.to_s
+          element["href"] = Source::URL.parse(element["href"])&.extractor&.redirect_url.to_s
 
         # <a href="https://www.tumblr.com/blog/view/professionalchaoticdumbass/707743740292382721" class="poll-row"><p>idiot.</p></a>
         in "a" if element[:class] == "poll-row"

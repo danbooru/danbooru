@@ -8,10 +8,6 @@ module Source
         Danbooru.config.nico_seiga_user_session.present?
       end
 
-      def match?
-        Source::URL::NicoSeiga === parsed_url
-      end
-
       def image_urls
         if image_id.present?
           [image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}") || url]

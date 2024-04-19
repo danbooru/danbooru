@@ -4,10 +4,6 @@
 module Source
   class Extractor
     class HentaiFoundry < Source::Extractor
-      def match?
-        Source::URL::HentaiFoundry === parsed_url
-      end
-
       def image_urls
         image = page&.search("#picBox img")
 

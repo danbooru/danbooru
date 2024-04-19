@@ -4,10 +4,6 @@
 module Source
   class Extractor
     class Foundation < Source::Extractor
-      def match?
-        Source::URL::Foundation === parsed_url
-      end
-
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]

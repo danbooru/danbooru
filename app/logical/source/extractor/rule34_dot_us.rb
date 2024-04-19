@@ -9,10 +9,6 @@
 module Source
   class Extractor
     class Rule34DotUs < Source::Extractor
-      def match?
-        Source::URL::Rule34DotUs === parsed_url
-      end
-
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]

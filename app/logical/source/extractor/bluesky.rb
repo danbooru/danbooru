@@ -2,10 +2,6 @@
 
 # @see Source::URL::Bluesky
 class Source::Extractor::Bluesky < Source::Extractor
-  def match?
-    Source::URL::Bluesky === parsed_url
-  end
-
   def image_urls
     if parsed_url.image_url?
       [parsed_url.full_image_url]
@@ -96,7 +92,7 @@ class Source::Extractor::Bluesky < Source::Extractor
   end
 
   def tags
-    api_response&.dig("thread", "post", "record", "facets").to_a.pluck("features").flatten.select do |f| 
+    api_response&.dig("thread", "post", "record", "facets").to_a.pluck("features").flatten.select do |f|
       f["$type"] == "app.bsky.richtext.facet#tag"
     end.pluck("tag").map do |tag|
       [tag, "https://bsky.app/search"]

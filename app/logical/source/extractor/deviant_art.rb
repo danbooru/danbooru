@@ -7,10 +7,6 @@ module Source
         Danbooru.config.deviantart_client_id.present? && Danbooru.config.deviantart_client_secret.present?
       end
 
-      def match?
-        Source::URL::DeviantArt === parsed_url
-      end
-
       def image_urls
         [image_url].compact
       end

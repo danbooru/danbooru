@@ -7,10 +7,6 @@ class Source::Extractor::Inkbunny < Source::Extractor
     Danbooru.config.inkbunny_session.present?
   end
 
-  def match?
-    Source::URL::Inkbunny === parsed_url
-  end
-
   def image_urls
     if parsed_url.image_url?
       [parsed_url.to_s]

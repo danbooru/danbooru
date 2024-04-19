@@ -5,10 +5,6 @@ class Source::Extractor
   class Poipiku < Source::Extractor
     delegate :page_url, :profile_url, :user_id, :post_id, to: :parsed_url
 
-    def match?
-      Source::URL::Poipiku === parsed_url
-    end
-
     def image_urls
       if parsed_url.image_url?
         [parsed_url.full_image_url]

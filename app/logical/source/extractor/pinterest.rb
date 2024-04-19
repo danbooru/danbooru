@@ -2,10 +2,6 @@
 
 # @see Source::URL::Pinterest
 class Source::Extractor::Pinterest < Source::Extractor
-  def match?
-    Source::URL::Pinterest === parsed_url
-  end
-
   def image_urls
     if parsed_url.full_image_url.present?
       [parsed_url.full_image_url]

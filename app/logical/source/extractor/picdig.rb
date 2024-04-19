@@ -5,10 +5,6 @@
 module Source
   class Extractor
     class Picdig < Source::Extractor
-      def match?
-        Source::URL::Picdig === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [parsed_url.to_s]

@@ -3,10 +3,6 @@
 # @see Source::URL::Booth
 class Source::Extractor
   class Booth < Source::Extractor
-    def match?
-      Source::URL::Booth === parsed_url
-    end
-
     def image_urls
       if parsed_url.full_image_url?
         [parsed_url.to_s]

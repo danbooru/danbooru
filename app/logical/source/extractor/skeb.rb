@@ -4,10 +4,6 @@
 module Source
   class Extractor
     class Skeb < Extractor
-      def match?
-        Source::URL::Skeb === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [url]
@@ -55,7 +51,7 @@ module Source
 
       memoize def api_response
         response = http.cache(1.minute).get(api_url)
-         
+
         if response.status == 429
           self.cached_request_key = response.cookies.cookies.find do
             |cookie| cookie.name == "request_key"

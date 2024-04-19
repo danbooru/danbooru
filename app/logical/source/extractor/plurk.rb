@@ -4,10 +4,6 @@
 module Source
   class Extractor
     class Plurk < Source::Extractor
-      def match?
-        Source::URL::Plurk === parsed_url
-      end
-
       def image_urls
         # * Posts can have up to 10 images.
         # * Artists commonly post extra images by replying to their own post.

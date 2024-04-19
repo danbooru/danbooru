@@ -6,10 +6,6 @@ class Source::Extractor::CiEn < Source::Extractor
     Danbooru.config.ci_en_session_cookie.present?
   end
 
-  def match?
-    Source::URL::CiEn === parsed_url
-  end
-
   def image_urls
     if parsed_url.image_url?
       [parsed_url.to_s]

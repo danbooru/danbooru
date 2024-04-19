@@ -4,10 +4,6 @@
 module Source
   class Extractor
     class Newgrounds < Source::Extractor
-      def match?
-        Source::URL::Newgrounds === parsed_url
-      end
-
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]

@@ -8,10 +8,6 @@ class Source::Extractor
       Danbooru.config.fantia_session_id.present?
     end
 
-    def match?
-      Source::URL::Fantia === parsed_url
-    end
-
     def image_urls
       if parsed_url.image_url?
         [full_image_for(parsed_url)].compact

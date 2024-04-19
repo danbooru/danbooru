@@ -89,7 +89,9 @@ module Source
     # @param url [String, Danbooru::URL]
     # @return [Source::URL]
     def self.parse!(url)
-      url = Danbooru::URL.new(url)
+      return url if url.is_a?(Source::URL)
+
+      url = Danbooru::URL.parse!(url)
       subclass = SUBCLASSES.find { |c| c.match?(url) } || Source::URL::Null
       subclass.new(url)
     end
@@ -109,6 +111,16 @@ module Source
     # @param url [Danbooru::URL] The source URL.
     def self.match?(url)
       raise NotImplementedError
+    end
+
+    # Return the extractor corresponding to this URL. By default, it's the Source::Extractor subclass with the same name
+    # as this Source::URL subclass. Subclasses can override this to provide a different extractor.
+    #
+    # @param options [Hash] The options to pass to the extractor.
+    # @return [Source::Extractor, nil] The extractor for this URL, or nil if one doesn't exist.
+    def extractor(**options)
+      extractor_class = "Source::Extractor::#{self.class.name.demodulize}".safe_constantize
+      extractor_class&.new(self, **options)
     end
 
     # The name of the site this URL belongs to.
