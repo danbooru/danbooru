@@ -28,8 +28,10 @@ module Source
         # https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif@1036w.webp
         # https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif
         # https://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp
+        # https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png
+        # https://i0.hdslb.com/bfs/article/card/f33ebbfe66a0f8ac4868f48b5b6f3ce478d0234c.png
         # https://album.biliimg.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp
-        in  _, ("hdslb.com" | "biliimg.com"), "bfs", subsite, /^(\w{40}\.\w+)(?:@\w+\.\w+)?$/ => file
+        in  _, ("hdslb.com" | "biliimg.com"), "bfs", *subdirs, /^(\w{40}\.\w+)(?:@\w+\.\w+)?$/ => file
           @file = $1
 
         # https://i0.hdslb.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png
@@ -77,6 +79,7 @@ module Source
         in ("www" | "m" | ""), ("bilibili.com" | "bilibili.tv"), "s", "video", video_id
           @video_id = video_id
 
+        # https://i0.hdslb.com/bfs/article/card/1-1card416202622_web.png
         else
           nil
         end

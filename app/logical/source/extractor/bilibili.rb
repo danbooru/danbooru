@@ -11,13 +11,15 @@ module Source
       def image_urls
         if parsed_url&.full_image_url.present?
           [parsed_url.full_image_url]
+        elsif parsed_url.image_url?
+          [parsed_url.original_url]
         elsif post_json.present?
           image_urls = post_json.dig("modules", "module_dynamic", "major", "opus", "pics").to_a.pluck("url")
           image_urls.to_a.compact.map { |u| Source::URL.parse(u).full_image_url || u }
-        elsif article_image_urls.present?
+        elsif article_json.present?
           article_image_urls
         else
-          [parsed_url.original_url]
+          []
         end
       end
 
@@ -25,8 +27,21 @@ module Source
         return [] unless article_json.present?
 
         html = Nokogiri::HTML5.fragment(artist_commentary_desc)
-        html.css("img").pluck("data-src").map do |url|
-          Source::URL.parse(URI.join("https://", url)).full_image_url || url
+        html.css("img").filter_map do |img|
+          # Skip:
+          #   <img data-src="//i0.hdslb.com/bfs/article/4adb9255ada5b97061e610b682b8636764fe50ed.png" class="cut-off-5">
+          #   <img data-src="//i0.hdslb.com/bfs/article/card/1-1card458718717_web.png" width="1320" height="188" data-size="37499" aid="458718717" class="video-card nomal" type="nomal">
+          #   <img data-src="//i0.hdslb.com/bfs/article/card/ef6b00f9d998c52e9a4bffb9051235c7ab288719.png" width="1320" height="224" data-size="44498" aid="20190469" class="article-card" type="normal">
+          #   <img alt="琉绮RUKI立绘.png" width="280" height="522">
+          #
+          # Keep:
+          #   <img data-src="//i0.hdslb.com/bfs/article/cf18da941f612502e994d8b9f991175dbfbbc7d9.png" width="650" height="180" data-size="11948" class="seamless" type="seamlessImage">
+          #   <img data-src="//i0.hdslb.com/bfs/article/82f9cb60d3f83b73a7c550d3142d65bc772a2527.png" width="476" height="2112" data-size="533862">
+          #   <img data-src="//i0.hdslb.com/bfs/article/watermark/ec0897d1aa461471149315f4b24e18a8a609853f.png" width="750" height="929" data-size="1486140">
+          next if img["class"]&.match?(/card|cut-off/) || img["data-src"].blank?
+
+          url = URI.join("https://", img["data-src"]).to_s
+          Source::URL.parse(url).full_image_url || url
         end
       end
 
@@ -72,11 +87,19 @@ module Source
       end
 
       def tags
-        post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes").to_a.select do |n|
-          n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
-        end.map do |tag|
-          tag_name = tag["text"].gsub(/(^#|#$)/, "")
-          [tag_name, "https://t.bilibili.com/topic/name/#{Danbooru::URL.escape(tag_name)}"]
+        if post_json.present?
+          post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes").to_a.select do |n|
+            n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
+          end.map do |tag|
+            tag_name = tag["text"].gsub(/(^#|#$)/, "")
+            [tag_name, "https://t.bilibili.com/topic/name/#{Danbooru::URL.escape(tag_name)}"]
+          end
+        elsif article_json.present?
+          article_json.dig("readInfo", "tags").to_a.map do |tag|
+            [tag["name"], "https://search.bilibili.com/article?keyword=#{Danbooru::URL.escape(tag["name"])}"]
+          end
+        else
+          []
         end
       end
 
