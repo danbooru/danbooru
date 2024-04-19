@@ -89,6 +89,14 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal(httpbin_url("anything/foo%20😃%60~%21%40%24%25%5E%26%2A%28%29_-%2B%3D%7B%7D%5B%5D%7C%5C:%3B%22%27%3C%3E%2C./?bar=baz%20😃%60~!%40$%5E&*()_-+=%7B%7D%5B%5D%7C%5C:%3B%22'%3C%3E,.%2F&blah😃"), resp.parse["url"])
       end
 
+      should "work for a URL containing percent-encoded characters" do
+        resp = Danbooru::Http.get(httpbin_url("anything/foo%20bar"))
+
+        assert_equal(200, resp.status)
+        assert_equal(httpbin_url("anything/foo%20bar"), resp.request.uri.to_s)
+        assert_equal(httpbin_url("anything/foo%20bar"), resp.parse["url"])
+      end
+
       should "work for a URL containing Unicode characters" do
         resp = Danbooru::Http.get(httpbin_url("anything/東方"))
         assert_equal(200, resp.status)
