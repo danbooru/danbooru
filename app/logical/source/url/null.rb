@@ -316,16 +316,6 @@ class Source::URL::Null < Source::URL
       @work_id = $1
       @page_url = "https://www.facebook.com/photo.php?fbid=#{work_id}"
 
-    # https://fori.io/comori22
-    in _, "fori.io", username
-      @username = username
-      @profile_url = "https://www.foriio.com/#{username}"
-
-    # https://www.foriio.com/comori22
-    in _, "foriio.com", username
-      @username = username
-      @profile_url = "https://www.foriio.com/#{username}"
-
     # https://a.hitomi.la/galleries/907838/1.png
     # https://0a.hitomi.la/galleries/1169701/23.png
     # https://aa.hitomi.la/galleries/990722/003_01_002.jpg
