@@ -192,9 +192,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
         20.times do
           post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
+
           assert_redirected_to root_path
           assert_equal(@user.id, session[:user_id])
-          delete_auth session_path, @user
+
+          reset! # clear session id
         end
 
         post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
@@ -218,9 +220,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
         20.times do |n|
           post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.#{n}" }
+
           assert_redirected_to root_path
           assert_equal(@user.id, session[:user_id])
-          delete_auth session_path, @user
+
+          reset! # clear session id
         end
 
         post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.21" }
@@ -244,9 +248,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
         20.times do |n|
           post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1:2:3:4:#{n}::1" }
+
           assert_redirected_to root_path
           assert_equal(@user.id, session[:user_id])
-          delete_auth session_path, @user
+
+          reset! # clear session id
         end
 
         post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1:2:3:4:21::1" }

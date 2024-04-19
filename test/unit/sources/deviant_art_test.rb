@@ -296,14 +296,27 @@ module Sources
 
     context "A subscribers-only DeviantArt image" do
       strategy_should_work(
-        "https://www.deviantart.com/theneohub/art/Kim-Possible-Subscribers-only-984892832",
+        "https://www.deviantart.com/bnjacob/art/Celestial-Muse-1-1007346855",
         image_urls: [],
         media_files: [],
-        artist_name: "TheNeoHub",
-        profile_url: "https://www.deviantart.com/theneohub",
-        artist_commentary_title: "Kim Possible (Subscribers only)",
+        page_url: "https://www.deviantart.com/bnjacob/art/Celestial-Muse-1-1007346855",
+        profile_url: "https://www.deviantart.com/bnjacob",
+        artist_name: "BNJacob",
+        other_names: ["BNJacob", "bnjacob"],
+        dtext_artist_commentary_title: "Celestial Muse #1",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          I would love to hear what you think so please leave a comment! "Heart":[https://e.deviantart.net/emoticons/h/heart.gif]
+          [i][b]*Purchase by points on DeviantArt could help reduce the fee on me*
+          [/b][u]
+          P[/u][/i][u][i]urchase to download high quality image with no address watermark and support me in practically way.[/i]
+          [i]Ratio: 16:9[/i][/u][b]
+
+          Censored preview:
+
+          [/b][i][b]Support my work and access all of my images at best quality on Patreon:
+          "www.patreon.com/BNJacob":[https://www.patreon.com/BNJacob]
+
+          [/b][/i][b]This image on Patreon:
+          "www.patreon.com/posts/95711276":[https://www.patreon.com/posts/95711276][/b]"Follow me on other sites":[https://linktr.ee/726sHSArt]
         EOS
       )
     end
