@@ -171,6 +171,120 @@ module Sources
       )
     end
 
+    context "A bilibili.com/read/:id post with /watermark/ image URLs" do
+      strategy_should_work(
+        "https://www.bilibili.com/read/cv10137473",
+        image_urls: %w[
+          https://i0.hdslb.com/bfs/article/watermark/7e52215ee182b02bda3d9f6b6aac4007a5d65171.png
+          https://i0.hdslb.com/bfs/article/watermark/ad00dbd28f53723a0f833a301969a31b5ac0ba06.png
+          https://i0.hdslb.com/bfs/article/watermark/25427e45717c371cc77b2235e4c20151435e5305.png
+          https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png
+          https://i0.hdslb.com/bfs/article/875d230b773b7f4810fdecdd2acc75f2b55f2724.png
+        ],
+        media_files: [
+          { file_size: 256_343 },
+          { file_size: 173_741 },
+          { file_size: 173_201 },
+          { file_size: 184_165 },
+          { file_size: 1_111_444 },
+        ],
+        page_url: "https://www.bilibili.com/read/cv10137473/",
+        profile_url: "https://space.bilibili.com/413748120",
+        profile_urls: %w[https://space.bilibili.com/413748120],
+        artist_name: "VirtuaReal",
+        other_names: ["VirtuaReal"],
+        tag_name: "bilibili_413748120",
+        tags: [
+          ["出道新闻", "https://search.bilibili.com/article?keyword=出道新闻"],
+          ["虚拟UP主", "https://search.bilibili.com/article?keyword=虚拟UP主"],
+          ["VTUBER", "https://search.bilibili.com/article?keyword=VTUBER"],
+          ["VUP", "https://search.bilibili.com/article?keyword=VUP"],
+          ["VirtuaReal", "https://search.bilibili.com/article?keyword=VirtuaReal"],
+        ],
+        dtext_artist_commentary_title: "VirtuaReal Project新成员公布！长期开启招募中~",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          VirtuaReal新一期成员来啦！
+
+          废话不说，上正文——
+
+          新成员介绍
+
+          * 勾檀Mayumi
+
+          勾檀Mayumi对于勾檀她究竟是“原本就是金毛的小狗狗”还是“她只是被装上了这样的配件吧你这个lsp！”到底哪边才对的讨论，已经在我们内部进行很久了。我们对她的身体很感兴趣，但出于各种各样的原因最终还是放弃了解剖她的计划。
+
+          一来，没有人会对一个初见时满身伤痕的女孩有着大过保护欲的伤害欲，二来......经过一段时间的相处我们发现她似乎已经身有所属了——她总是把一个叫做master的人挂在嘴边，而她一直确信为master带来快乐，帮助master解决问题和困扰便是她的存在意义。
+
+          为了让她知道世界上并不是只有master的存在，我们一致决定让这个打游戏唱歌都不太行的少女去进行直播活动，只有面对更多的人，她才能慢慢的自信起来或者在走偏的道路上愈发不可收拾吧。
+
+          虽然她接受的理由是为了给master带来更多的快乐，但总之结果是这样就好了吧。
+
+          "勾檀Mayumi":[https://space.bilibili.com/690608693]的个人空间：<https://space.bilibili.com/690608693>
+
+          * 犬童Kendou
+
+          犬童Kendou天堂在左地狱在右，从小便生活在天堂里的犬童对自己的生活非常的满意，它庆幸自己没有生在隔壁那个既没有帅哥与帅哥相恋也没有彰显少年深厚友谊杂志发售的地狱。作为天堂的看门犬，它也从未料到自己会因为摸鱼这点事情而被踹到人间来。
+
+          虽说它并不在意呆在这个能第一手获得更多不可描述之画本的人间，但在这地方可没有人给它无端的投食，而它也并不打算重操旧业的去为普通人看大门。
+
+          在久经思量后，它决定做一名好文明的布道者，通过直播这一似乎在人间十分火热的手段把自己满脑子的货都分享给大家，以此来得到更多的共鸣者和支持者。
+
+          希望动物保护协会不会早日将其进行安置。——某听过布道的不知名红脸群众。
+
+          "犬童Kendou":[https://space.bilibili.com/690608701]的个人空间：<https://space.bilibili.com/690608701>
+
+          * 九十九Tsukumo
+
+          九十九Tsukumo这位来自于隐秘黑手党的继承者完全没有一点大小姐脾气，甚至在她和我们的对话中，我们的某位黑道片爱好者同僚因为幻想破灭而流下了泪水。毕竟一心想要用自个儿的钱买地种田的人切实是庞大黑手党的千金这件事也太让人难以相信了。
+
+          而除此以外，九十九小姐的各类习惯简直让人大跌眼镜。她在这个年纪已经习得一手好茶艺与咖啡研磨技术，而比起格斗技的她明确表示自己对音乐尤其是爵士乐更加感兴趣。
+
+          这位酷到爆的小姐并不希望利用家里的东西达成自己的目的——这太不黑手党了，但或许我们该为此感到庆幸，至少她没有用刀而是用直播这一和平的手段来达到她那可以说是和黑手党八竿子打不着的梦想了。
+
+          "九十九Tsukumo":[https://space.bilibili.com/690608702]的个人空间：<https://space.bilibili.com/690608702>
+
+          * 蕾米Remi
+
+          蕾米Remi我们对于这只自行从水族馆逃命而出的海兔小姐十分的敬佩，在如今这个兽娘被逮住就基本就宣告一生完蛋的奇特时代，如果不是出于责任心就算是我们大概也忍不住把她监禁起来吧。
+
+          我们旁敲侧击了这位小姐好多次，最终成功的让她明白自个儿想要在人类社会立足是很麻烦的，至少不是每天做光合作用与仰泳就可以活下去的。而更加为难的是，她非常希望与某个“不知名的声音”（听说她们还是他们已经见面了，也不知道是什么关系）一起住进海景房，也因此才来找到我们寻求帮助。
+
+          在我们的各方面思量下，最终我们为她架设起了最好的设备，想来这位海兔小姐的声音一定能让她直播间里的少年少女们为之愉悦吧。
+
+          "蕾米Remi":[https://space.bilibili.com/690608687]的个人空间：<https://space.bilibili.com/690608687>
+
+          VirtuaReal Project [b]长期开启招募中[/b]！只需要你轻轻扫描以下链接上传答题卡和短视频， 就有机会加入VirtuaReal Project，来经历这场“宛如魔法般的体验“！
+
+          以下招募信息[b]长期有效[/b]，欢迎有趣的你随时加入！
+
+          报名资格
+
+          * 年满18岁
+          * 热爱分享，性格外向
+          * 有一技之长（直播、游戏、唱歌、跳舞、琴棋书画、谈天说地等等）
+          * 如果你满足以上条件，热切期待和你产生连接！
+
+          报名方法
+
+          * 请在 vup.link/join 填写答题卡
+
+          招募方式
+
+          * 第一轮：资料审查
+          * 第二轮：电话/面谈（仅限通过第一轮的小伙伴）
+          * 第三轮：现场测试
+          * 第四轮：签约
+
+          其他
+
+          * 报名和甄选不收取任何费用，请放心！
+          * 报名链接长期开放，欢迎有趣的你随时加入！
+          * 欢迎全国各地以及海外小伙伴前来面试！
+          * 如有问题，请随时戳我们的官方账号VirtuaReal咨询！
+        EOS
+      )
+    end
+
     context "A bilibili image url" do
       strategy_should_work(
         "https://i0.hdslb.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png",
@@ -229,6 +343,13 @@ module Sources
       assert(Source::URL.image_url?("https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg"))
       assert(Source::URL.image_url?("https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif"))
       assert(Source::URL.image_url?("https://album.biliimg.com/bfs/new_dyn/4cf244d3fb706a5726b6383143960931504164361.jpg"))
+
+      assert_equal("https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg", Source::URL.parse("https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg@1036w.webp").full_image_url)
+      assert_equal("https://i0.hdslb.com/bfs/new_dyn/716a9733fc804d11d823cfacb7a3c78b11742550.jpg", Source::URL.parse("https://i0.hdslb.com/bfs/new_dyn/716a9733fc804d11d823cfacb7a3c78b11742550.jpg@208w_208h_1e_1c.webp").full_image_url)
+      assert_equal("https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif", Source::URL.parse("https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif@1036w.webp").full_image_url)
+      assert_equal("https://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg", Source::URL.parse("https://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp").full_image_url)
+      assert_equal("https://album.biliimg.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg", Source::URL.parse("https://album.biliimg.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp").full_image_url)
+      assert_equal("https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png", Source::URL.parse("https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png").full_image_url)
 
       assert(Source::URL.profile_url?("https://space.bilibili.com/355143"))
 
