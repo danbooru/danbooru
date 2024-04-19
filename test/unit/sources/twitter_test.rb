@@ -117,6 +117,15 @@ module Sources
       )
     end
 
+    context "A /tweet_video/ URL" do
+      strategy_should_work(
+        "https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4",
+        image_urls: ["https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4"],
+        media_files: [{ file_size: 542_833 }],
+        page_url: nil
+      )
+    end
+
     context "A tweet with an animated gif" do
       strategy_should_work(
         "https://twitter.com/i/web/status/1252517866059907073",
