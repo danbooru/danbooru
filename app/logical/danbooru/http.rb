@@ -76,11 +76,13 @@ module Danbooru
     # and "bad URI(is not URI?)" errors.
     def self.normalize_uri(uri)
       parsed_uri = Addressable::URI.parse(uri)
+      normalized_path = Addressable::URI.unencode_component(parsed_uri.path)
+      normalized_path = Addressable::URI.encode_component(normalized_path, Addressable::URI::CharacterClasses::PATH)
 
       HTTP::URI.new(
         scheme: parsed_uri.scheme,
         authority: parsed_uri.authority,
-        path: Addressable::URI.encode_component(parsed_uri.path, Addressable::URI::CharacterClasses::PATH),
+        path: normalized_path,
         query: Addressable::URI.encode_component(parsed_uri.query, "[[:ascii:]&&[^ ]]"),
         fragment: parsed_uri.fragment
       )
