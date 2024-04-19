@@ -21,8 +21,10 @@ class Source::Extractor
 
     def image_urls
       # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
-      if parsed_url.image_url?
+      if parsed_url.full_image_url.present?
         [parsed_url.full_image_url]
+      elsif parsed_url.image_url?
+        [parsed_url.to_s]
       else
         graphql_tweet.dig(:legacy, :extended_entities, :media).to_a.map do |media|
           if media[:type] == "photo"
