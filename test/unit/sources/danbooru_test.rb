@@ -65,6 +65,17 @@ module Sources
           artist_commentary_title: nil
         )
       end
+
+      context "A post with a source pointing to itself" do
+        strategy_should_work(
+          "https://danbooru.donmai.us/posts/4542652",
+          image_urls: ["https://cdn.donmai.us/original/b4/44/b44417c286c090059150a5148c36e034.jpg"],
+          page_url: "https://danbooru.donmai.us/posts/4542652",
+          profile_url: nil,
+          artist_name: nil,
+          artist_commentary_title: nil
+        )
+      end
     end
 
     should "Parse URLs correctly" do

@@ -123,7 +123,7 @@ module Sources
         ],
         artist_name: "あまちゃ/おぽぽわーるど",
         tag_name: "cien_12924",
-        tags: %w[ゲーム ロリ R-18],
+        tags: %w[r-18 つるぺた ゲーム]
       )
     end
 
