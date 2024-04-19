@@ -4,10 +4,6 @@
 module Source
   class Extractor
     class Fanbox < Source::Extractor
-      def match?
-        Source::URL::Fanbox === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [parsed_url.full_image_url]

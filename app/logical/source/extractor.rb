@@ -7,7 +7,6 @@
 #
 # To add a new site, create a subclass of Source::Extractor and implement the following methods:
 #
-# * match? - True if the extractor should be used for this URL.
 # * image_urls - The list of images or videos at this URL. Used during uploads.
 # * page_url - The page containing the images. Used for post sources.
 # * profile_url - The URL of the artist's profile page. Used for artist finding.
@@ -30,52 +29,6 @@ module Source
 
     delegate :site_name, to: :parsed_url
 
-    SUBCLASSES = [
-      Source::Extractor::Pixiv,
-      Source::Extractor::Twitter,
-      Source::Extractor::Tumblr,
-      Source::Extractor::NicoSeiga,
-      Source::Extractor::DeviantArt,
-      Source::Extractor::Moebooru,
-      Source::Extractor::Nijie,
-      Source::Extractor::ArtStation,
-      Source::Extractor::Gelbooru,
-      Source::Extractor::HentaiFoundry,
-      Source::Extractor::Fanbox,
-      Source::Extractor::Mastodon,
-      Source::Extractor::PixivSketch,
-      Source::Extractor::Weibo,
-      Source::Extractor::Newgrounds,
-      Source::Extractor::Skeb,
-      Source::Extractor::Lofter,
-      Source::Extractor::Foundation,
-      Source::Extractor::Plurk,
-      Source::Extractor::Tinami,
-      Source::Extractor::Fantia,
-      Source::Extractor::Booth,
-      Source::Extractor::Anifty,
-      Source::Extractor::Furaffinity,
-      Source::Extractor::Reddit,
-      Source::Extractor::Bilibili,
-      Source::Extractor::Rule34DotUs,
-      Source::Extractor::FourChan,
-      Source::Extractor::Picdig,
-      Source::Extractor::Enty,
-      Source::Extractor::ArcaLive,
-      Source::Extractor::Imgur,
-      Source::Extractor::Zerochan,
-      Source::Extractor::Poipiku,
-      Source::Extractor::ArtStreet,
-      Source::Extractor::Gumroad,
-      Source::Extractor::Misskey,
-      Source::Extractor::Xfolio,
-      Source::Extractor::CiEn,
-      Source::Extractor::Inkbunny,
-      Source::Extractor::Bluesky,
-      Source::Extractor::Danbooru2,
-      Source::Extractor::Pinterest,
-    ]
-
     # Should return true if the extractor is configured correctly. Return false
     # if the extractor requires api keys that have not been configured.
     def self.enabled?
@@ -92,20 +45,22 @@ module Source
     #
     # @param url [String] The URL to extract information from.
     # @param referer_url [String, nil] The page URL if `url` is an image URL.
+    # @param default_extractor [Source::Extractor, nil] The extractor to use if no other extractor is found for this URL.
     # @param parent_extractor [Source::Extractor, nil] The parent of this extractor, if this is a sub extractor.
-    # @return [Source::Extractor]
-    def self.find(url, referer_url = nil, default: Extractor::Null, parent_extractor: nil)
-      extractor = SUBCLASSES.lazy.map { |extractor| extractor.new(url, referer_url, parent_extractor:) }.find(&:match?)
-      extractor || default&.new(url, referer_url)
+    # @return [Source::Extractor, nil] The extractor, or nil if the URL couldn't be parsed and the default extractor is nil.
+    def self.find(url, referer_url = nil, default_extractor: Extractor::Null, parent_extractor: nil)
+      parsed_url = Source::URL.parse(url)
+      parsed_referer = Source::URL.parse(referer_url)
+      parsed_url&.extractor(referer_url: parsed_referer, parent_extractor:) || default_extractor&.new(url, referer_url: referer_url, parent_extractor:)
     end
 
     # Initialize an extractor. Normally one should call `Source::Extractor.find`
     # instead of instantiating an extractor directly.
     #
-    # @param url [String] The URL to extract information form.
-    # @param referer_url [String, nil] The page URL if `url` is an image URL.
+    # @param url [Source::URL, String] The URL to extract information form.
+    # @param referer_url [Source::URL, String, nil] The page URL if `url` is an image URL.
     # @param parent_extractor [Source::Extractor, nil] The parent of this extractor, if this is a sub extractor.
-    def initialize(url, referer_url = nil, parent_extractor: nil)
+    def initialize(url, referer_url: nil, parent_extractor: nil)
       @url = url.to_s
       @referer_url = referer_url&.to_s
       @parent_extractor = parent_extractor
@@ -113,14 +68,6 @@ module Source
       @parsed_url = Source::URL.parse(url)
       @parsed_referer = Source::URL.parse(referer_url) if referer_url.present?
       @parsed_referer = nil if parsed_url&.site_name != parsed_referer&.site_name
-    end
-
-    # Should return true if this extractor should be used for this URL.
-    # Normally, this should check if the URL is from the right site.
-    #
-    # @return [Boolean]
-    def match?
-      false
     end
 
     # The list of input URLs. Includes both the primary URL and the secondary referer URL, if it exists.

@@ -4,10 +4,6 @@
 module Source
   class Extractor
     class Tinami < Source::Extractor
-      def match?
-        Source::URL::Tinami === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [url]

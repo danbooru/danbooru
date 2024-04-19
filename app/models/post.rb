@@ -1763,12 +1763,7 @@ class Post < ApplicationRecord
   concerning :PixivMethods do
     def parse_pixiv_id
       self.pixiv_id = nil
-      return unless web_source?
-
-      site = Source::Extractor::Pixiv.new(source)
-      if site.match?
-        self.pixiv_id = site.illust_id
-      end
+      self.pixiv_id = parsed_source.work_id if parsed_source.is_a?(Source::URL::Pixiv)
     end
   end
 

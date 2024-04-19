@@ -3,10 +3,6 @@
 # @see Source::URL::Gumroad
 class Source::Extractor
   class Gumroad < Source::Extractor
-    def match?
-      Source::URL::Gumroad === parsed_url
-    end
-
     def image_urls
       if parsed_url.full_image_url.present?
         [parsed_url.full_image_url]

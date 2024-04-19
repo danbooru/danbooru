@@ -19,10 +19,6 @@ class Source::Extractor
       /(?<!\A)版お絵描き60分一本勝負(?:_\d+)?\z/
     ]
 
-    def match?
-      Source::URL::Twitter === parsed_url
-    end
-
     def image_urls
       # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
       if parsed_url.image_url?

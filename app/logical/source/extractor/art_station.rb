@@ -3,10 +3,6 @@
 # @see Source::URL::ArtStation
 class Source::Extractor
   class ArtStation < Source::Extractor
-    def match?
-      Source::URL::ArtStation === parsed_url
-    end
-
     def image_urls
       if parsed_url.image_url?
         [asset_url(url)]

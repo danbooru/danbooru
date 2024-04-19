@@ -3,10 +3,6 @@
 # @see Source::URL::Misskey
 # @see https://misskey-hub.net/docs/api/
 class Source::Extractor::Misskey < Source::Extractor
-  def match?
-    Source::URL::Misskey === parsed_url
-  end
-
   def domain
     site_name.downcase
   end

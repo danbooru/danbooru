@@ -4,10 +4,6 @@
 module Source
   class Extractor
     class Bilibili < Source::Extractor
-      def match?
-        Source::URL::Bilibili === parsed_url
-      end
-
       def image_urls
         if parsed_url&.full_image_url.present?
           [parsed_url.full_image_url]

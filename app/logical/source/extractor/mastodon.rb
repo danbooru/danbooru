@@ -4,10 +4,6 @@
 # @see https://docs.joinmastodon.org/api
 class Source::Extractor
   class Mastodon < Source::Extractor
-    def match?
-      Source::URL::Mastodon === parsed_url
-    end
-
     def domain
       case site_name
       when "Pawoo" then "pawoo.net"

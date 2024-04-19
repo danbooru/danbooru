@@ -8,10 +8,6 @@ class Source::Extractor
       Danbooru.config.furaffinity_cookie_a.present? && Danbooru.config.furaffinity_cookie_b.present?
     end
 
-    def match?
-      Source::URL::Furaffinity === parsed_url
-    end
-
     def image_urls
       if parsed_url.image_url?
         [parsed_url.to_s]

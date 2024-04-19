@@ -6,10 +6,6 @@ class Source::Extractor::Xfolio < Source::Extractor
     Danbooru.config.xfolio_session.present?
   end
 
-  def match?
-    Source::URL::Xfolio === parsed_url
-  end
-
   def image_urls
     if work_id.present? && image_id.present?
       ["https://xfolio.jp/user_asset.php?id=#{image_id}&work_id=#{work_id}&work_image_id=#{image_id}&type=work_image"]

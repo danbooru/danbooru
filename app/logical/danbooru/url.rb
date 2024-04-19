@@ -69,6 +69,8 @@ module Danbooru
     # @param url [String, Danbooru::URL]
     # @return [Danbooru::URL]
     def self.parse!(url, **options)
+      return url if url.is_a?(Danbooru::URL)
+
       new(url, **options)
     end
 

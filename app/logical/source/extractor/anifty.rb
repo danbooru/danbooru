@@ -3,10 +3,6 @@
 # @see Source::URL::Anifty
 class Source::Extractor
   class Anifty < Source::Extractor
-    def match?
-      Source::URL::Anifty === parsed_url
-    end
-
     def image_urls
       if parsed_url.image_url?
         [parsed_url.full_image_url].compact

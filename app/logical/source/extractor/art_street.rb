@@ -3,10 +3,6 @@
 # @see Source::URL::ArtStreet
 class Source::Extractor
   class ArtStreet < Source::Extractor
-    def match?
-      Source::URL::ArtStreet === parsed_url
-    end
-
     def image_urls
       if parsed_url.full_image_url.present?
         [parsed_url.full_image_url]

@@ -34,10 +34,6 @@ module Source
         end
       end
 
-      def match?
-        Source::URL::Pixiv === parsed_url
-      end
-
       def image_urls
         if is_ugoira?
           [api_ugoira[:originalSrc]]

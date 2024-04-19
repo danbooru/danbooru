@@ -8,10 +8,6 @@ module Source
         Danbooru.config.nijie_login.present? && Danbooru.config.nijie_password.present?
       end
 
-      def match?
-        Source::URL::Nijie === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [parsed_url.full_image_url]
