@@ -48,6 +48,8 @@ module Source
       end
 
       memoize def api_response
+        return {} unless api_url.present?
+
         response = http.cache(1.minute).get(api_url)
 
         if response.status == 429
@@ -57,9 +59,8 @@ module Source
           response = http.cache(1.minute).get(api_url)
         end
 
+        return {} if response.mime_type == "text/html"
         response.parse
-      rescue
-        {}
       end
 
       def http
