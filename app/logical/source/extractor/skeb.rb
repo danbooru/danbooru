@@ -40,13 +40,11 @@ module Source
       end
 
       def page_url
-        return unless artist_name.present? && illust_id.present?
-        "https://skeb.jp/@#{artist_name}/works/#{illust_id}"
+        "https://skeb.jp/@#{username}/works/#{illust_id}" if username.present? && illust_id.present?
       end
 
       def api_url
-        return nil unless artist_name.present? && illust_id.present?
-        "https://skeb.jp/api/users/#{artist_name}/works/#{illust_id}"
+        "https://skeb.jp/api/users/#{username}/works/#{illust_id}" if username.present? && illust_id.present?
       end
 
       memoize def api_response
@@ -78,24 +76,27 @@ module Source
       end
 
       def profile_url
-        return nil if artist_name.blank?
-        "https://skeb.jp/@#{artist_name}"
+        "https://skeb.jp/@#{username}" if username.present?
       end
 
       def artist_name
-        parsed_url.username || parsed_referer&.username
+        api_response&.dig("creator", "name")
       end
 
-      def display_name
-        api_response&.dig("creator", "name")
+      def tag_name
+        username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
+      end
+
+      def other_names
+        [artist_name, username].compact_blank.uniq
+      end
+
+      def username
+        parsed_url.username || parsed_referer&.username
       end
 
       def illust_id
         parsed_url.work_id || parsed_referer&.work_id
-      end
-
-      def other_names
-        [display_name].compact.uniq
       end
 
       def artist_commentary_desc
