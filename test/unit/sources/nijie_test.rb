@@ -64,16 +64,30 @@ module Sources
       )
     end
 
-    context "A Nijie post" do
-      should "normalize （）characters in tags" do
-        create(:tag, name: "kaga")
-        create(:wiki_page, title: "kaga", other_names: "加賀(艦これ)")
-
-        @site = Source::Extractor.find("https://nijie.info/view.php?id=208316")
-
-        assert_includes(@site.tags.map(&:first), "加賀（艦これ）")
-        assert_includes(@site.translated_tags.map(&:name), "kaga")
-      end
+    context "A Nijie post with （）characters in tags" do
+      strategy_should_work(
+        "https://nijie.info/view.php?id=208316",
+        image_urls: %w[https://pic.nijie.net/01/nijie/17/73/715273/illust/0_0_95c084a0a9926fec_97f8d2.jpg],
+        media_files: [{ file_size: 394_275 }],
+        page_url: "https://nijie.info/view.php?id=208316",
+        profile_url: "https://nijie.info/members.php?id=715273",
+        profile_urls: %w[https://nijie.info/members.php?id=715273],
+        artist_name: "雪代あるて",
+        other_names: ["雪代あるて"],
+        tag_name: "nijie_715273",
+        tags: [
+          ["艦隊これくしょん", "https://nijie.info/search.php?word=%E8%89%A6%E9%9A%8A%E3%81%93%E3%82%8C%E3%81%8F%E3%81%97%E3%82%87%E3%82%93"],
+          ["艦これ", "https://nijie.info/search.php?word=%E8%89%A6%E3%81%93%E3%82%8C"],
+          ["加賀（艦これ）", "https://nijie.info/search.php?word=%E5%8A%A0%E8%B3%80%EF%BC%88%E8%89%A6%E3%81%93%E3%82%8C%EF%BC%89"],
+          ["加賀(艦これ)", "https://nijie.info/search.php?word=%E5%8A%A0%E8%B3%80%28%E8%89%A6%E3%81%93%E3%82%8C%29"],
+          ["正規空母", "https://nijie.info/search.php?word=%E6%AD%A3%E8%A6%8F%E7%A9%BA%E6%AF%8D"],
+          ["航空母艦", "https://nijie.info/search.php?word=%E8%88%AA%E7%A9%BA%E6%AF%8D%E8%89%A6"],
+        ],
+        dtext_artist_commentary_title: "加賀さん",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          おはようゴザイマスヾ(o´∀｀o)ﾉ
+        EOS
+      )
     end
 
     context "A Nijie post with a long commentary that may be truncated" do

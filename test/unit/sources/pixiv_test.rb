@@ -7,13 +7,11 @@ module Sources
     end
 
     def assert_illust_id(illust_id, url)
-      site = Source::Extractor.find(url)
-      assert_equal(illust_id, site.illust_id.to_i)
-    end
-
-    def assert_nil_illust_id(url)
-      site = Source::Extractor.find(url)
-      assert_nil(site.illust_id)
+      if illust_id.nil?
+        assert_nil(Source::URL.parse(url).work_id)
+      else
+        assert_equal(illust_id, Source::URL.parse(url).work_id.to_i)
+      end
     end
 
     context "Pixiv:" do
@@ -368,13 +366,13 @@ module Sources
         end
 
         should "not misparse ids from novel urls" do
-          assert_nil_illust_id("https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg")
-          assert_nil_illust_id("https://i.pximg.net/c/600x600/novel-cover-master/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42_master1200.jpg")
-          assert_nil_illust_id("https://www.pixiv.net/novel/show.php?id=10617324")
+          assert_illust_id(nil, "https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg")
+          assert_illust_id(nil, "https://i.pximg.net/c/600x600/novel-cover-master/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42_master1200.jpg")
+          assert_illust_id(nil, "https://www.pixiv.net/novel/show.php?id=10617324")
         end
 
         should "not misparse /member_illust.php urls" do
-          assert_nil_illust_id("https://www.pixiv.net/member_illust.php")
+          assert_illust_id(nil, "https://www.pixiv.net/member_illust.php")
           assert_illust_id(64476642, "https://www.pixiv.net/member_illust.php?illust_id=64476642&mode=medium")
         end
       end

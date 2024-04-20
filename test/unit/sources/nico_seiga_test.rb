@@ -240,11 +240,30 @@ module Sources
       )
     end
 
-    context "A commentary with spoiler" do
-      should "correctly add spoiler tags" do
-        site = Source::Extractor.find("https://seiga.nicovideo.jp/seiga/im8992650")
-
-        commentary = <<~EOS.chomp
+    context "A commentary with spoiler tags" do
+      strategy_should_work(
+        "https://seiga.nicovideo.jp/seiga/im8992650",
+        image_urls: [%r{https://lohas.nicoseiga.jp/priv/\h+/\d+/8992650}],
+        media_files: [{ file_size: 404_811 }],
+        page_url: "https://seiga.nicovideo.jp/seiga/im8992650",
+        profile_url: "https://seiga.nicovideo.jp/user/illust/11890767",
+        profile_urls: %w[https://seiga.nicovideo.jp/user/illust/11890767],
+        artist_name: "歯に挟まった昆布",
+        other_names: ["歯に挟まった昆布"],
+        tag_name: "nicoseiga_11890767",
+        tags: [
+          ["キャラクター", "https://seiga.nicovideo.jp/tag/キャラクター"],
+          ["クッキー☆", "https://seiga.nicovideo.jp/tag/クッキー☆"],
+          ["HZN", "https://seiga.nicovideo.jp/tag/HZN"],
+          ["蓮奈理緒", "https://seiga.nicovideo.jp/tag/蓮奈理緒"],
+          ["ダクッソー☆", "https://seiga.nicovideo.jp/tag/ダクッソー☆"],
+          ["クッキー☆投稿者", "https://seiga.nicovideo.jp/tag/クッキー☆投稿者"],
+          ["強キャラ", "https://seiga.nicovideo.jp/tag/強キャラ"],
+          ["なにこれやばそう", "https://seiga.nicovideo.jp/tag/なにこれやばそう"],
+          ["禍々しい", "https://seiga.nicovideo.jp/tag/禍々しい"],
+        ],
+        dtext_artist_commentary_title: "HZNN",
+        dtext_artist_commentary_desc: <<~EOS.chomp
           SLVN大好き。ホントニアコガレテル。
 
           [spoiler]
@@ -262,9 +281,7 @@ module Sources
           27分にわたる苦行からのエンディングで視聴者はぬわ疲に包まれる
           [/spoiler]
         EOS
-
-        assert_equal(commentary, site.dtext_artist_commentary_desc)
-      end
+      )
     end
 
     should "Parse NicoSeiga URLs correctly" do
