@@ -30,7 +30,6 @@ class ActiveSupport::TestCase
   include ReportbooruHelper
   include AutotaggerHelper
   include DatabaseTestHelper
-  include DownloadTestHelper
   include IqdbTestHelper
   include UploadTestHelper
   include SourceTestHelper
