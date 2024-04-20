@@ -18,7 +18,7 @@ module Sources
           こんにちは
           リゼ・ヘルエスタをリクエストします。
           服装はへそ出しのぴっちりしたニット。色はお任せします。
-          （以前投稿されていた　https://skeb.jp/@kokuzou593/works/32　みたいな）
+          （以前投稿されていた https://skeb.jp/@kokuzou593/works/32 みたいな）
           下はローライズのレザースキニー。
 
           こくぞうさんの描かれる腹筋がとても好きなので、
@@ -61,18 +61,18 @@ module Sources
           是非1枚お引き受けいただけると嬉しいです。
 
           ・スマホの壁紙に使えるサイズのイラストをお願いしたいです。
-          　当方iPhone 12 Proを使用していますので、
-          　できれば「縦位置の1170×2532px(9:19.5)」で作成をお願いできますと…
+          当方iPhone 12 Proを使用していますので、
+          できれば「縦位置の1170×2532px(9:19.5)」で作成をお願いできますと…
           ・キャラクターは、にじさんじの椎名唯華さんでお願いします。
           ・服装は「ゲームの日衣装（パーカー、ヘッドホン、
-          　ショートパンツのものです）」でお願いします。
+          ショートパンツのものです）」でお願いします。
           ・背景は可能ならお願いします。白地でも問題ないです。
           ・壁紙として使用した際、時刻表示が出る上3分の1は、空白でお願いします。
           ・椎名さんのポースですが、「上に出ている時刻を見上げている」、
-          　「上に出ている時刻を両手で指さしている」みたいな感じでお願いします。
-          　可愛くなりそうなら、指定は無視していただいて構いません。
+          「上に出ている時刻を両手で指さしている」みたいな感じでお願いします。
+          可愛くなりそうなら、指定は無視していただいて構いません。
           ・他の要素はお任せします。
-          　椎名さんを最高に可愛らしく描いていただけますと幸いです。
+          椎名さんを最高に可愛らしく描いていただけますと幸いです。
         EOS
       )
     end
@@ -98,7 +98,7 @@ module Sources
         tag_name: "tontaro_",
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          h6. Original Request:
+          h6. Original Request
 
           Hello~! I'd like to request my character cutely and happily swaying from side to side please!
           Character: https://i.imgur.com/ehYg8PE.jpg
@@ -106,7 +106,7 @@ module Sources
           I'd appreciate it if you make the background transparent.
           Thank you!
 
-          h6. Client Response:
+          h6. Client Response
 
           Thank you very much! Very cute!
         EOS
@@ -202,7 +202,7 @@ module Sources
           https://twitter.com/_kinami/status/1312228283002441728
 
           Here is her bedroom: https://gyazo.com/2296cadac880241ddea299105873e98c
-          You can change it to your liking.\x20
+          You can change it to your liking.
           Her big feature is her ears twitch, like in this video: https://www.youtube.com/watch?v=K8yGSfZ3Z7M&t=11s
           Her new hairstyle is like this: https://i.imgur.com/ZhueKCW.jpg
 

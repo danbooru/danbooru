@@ -109,9 +109,17 @@ module Source
 
       def dtext_artist_commentary_desc
         if client_response.present? && artist_commentary_desc.present?
-          "h6. Original Request:\n\n#{artist_commentary_desc}\n\nh6. Client Response:\n\n#{client_response}"
+          <<~EOS.chomp
+            h6. Original Request
+
+            #{DText.from_plaintext(artist_commentary_desc)}
+
+            h6. Client Response
+
+            #{DText.from_plaintext(client_response)}
+          EOS
         else
-          artist_commentary_desc
+          DText.from_plaintext(artist_commentary_desc)
         end
       end
     end
