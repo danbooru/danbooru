@@ -102,11 +102,8 @@ module Sources
           dtext_artist_commentary_title: "レムのクリアドレス：リゼロ",
           dtext_artist_commentary_desc: <<~EOS.chomp
             リゼロのレムのプライズをクリアドレス仕様にリペイント。透け透けキラキラな感じに改装してみたものです。
-
-            >https://youtu.be/nkjZkEALg94\x20
-
+            ><https://youtu.be/nkjZkEALg94>
             製作日記的な動画です( ´∀｀ )
-
             需要ありましたらご笑覧を
           EOS
         )

@@ -67,7 +67,11 @@ module Source
       end
 
       def artist_commentary_desc
-        page&.at("#view .comment .description")&.text.to_s.strip.delete("\t")
+        page&.at("#view .comment .description")&.to_html
+      end
+
+      def dtext_artist_commentary_desc
+        DText.from_html(artist_commentary_desc, base_url: "http://www.tinami.com")
       end
 
       def user_id
