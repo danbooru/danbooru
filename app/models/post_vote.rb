@@ -22,10 +22,10 @@ class PostVote < ApplicationRecord
   deletable
 
   def self.visible(user)
-    if user.is_admin?
+    if user.is_moderator?
       all
     else
-      active.where(user: user).or(positive)
+      active.where(user: user).or(active.positive)
     end
   end
 
