@@ -34,7 +34,7 @@ module PaginationExtension
   # @param count [Integer] the precalculated number of search results, or nil to calculate it
   # @param search_count [Object] if truthy, don't calculate the number of results; assume a large number of results
   def paginate(page, limit: nil, max_limit: 1000, page_limit: CurrentUser.user.page_limit, count: nil, search_count: nil)
-    @records_per_page = limit || Danbooru.config.posts_per_page
+    @records_per_page = limit || CurrentUser.user.per_page
     @records_per_page = @records_per_page.to_i.clamp(1, max_limit)
     @paginator_page_limit = page_limit
 
