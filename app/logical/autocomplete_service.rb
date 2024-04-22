@@ -14,7 +14,7 @@ class AutocompleteService
 
   STATIC_METATAGS = {
     is: %w[parent child sfw nsfw wiki_image] + POST_STATUSES + MediaAsset::FILE_TYPES + Post::RATINGS.values.map(&:downcase),
-    has: %w[parent children source appeals flags replacements comments commentary notes pools metadata prompt seed],
+    has: %w[parent children source appeals flags replacements comments commentary notes pools metadata prompt parameters],
     status: %w[any] + POST_STATUSES,
     child: %w[any none] + POST_STATUSES,
     parent: %w[any none] + POST_STATUSES,
@@ -262,7 +262,8 @@ class AutocompleteService
   def autocomplete_metatag(metatag, value)
     results = case metatag.to_sym
     when :user, :approver, :commenter, :comm, :noter, :noteupdater, :commentaryupdater,
-         :artcomm, :fav, :ordfav, :appealer, :flagger, :upvote, :downvote, :updater
+         :artcomm, :fav, :ordfav, :appealer, :flagger, :upvote, :downvote, :updater,
+         :metadataupdater
       autocomplete_user(value)
     when :pool, :ordpool
       autocomplete_pool(value)

@@ -24,26 +24,36 @@ class AIMetadata < ApplicationRecord
     where("prompt != '' or negative_prompt != '' or parameters != '{}'")
   }
 
-  def self.search(params, current_user)
-    q = search_attributes(params, [:id, :post, :prompt, :negative_prompt, :parameters, :created_at, :updated_at], current_user: current_user)
+  concerning :SearchMethods do
+    class_methods do
+      def search(params, current_user)
+        q = search_attributes(params, [:id, :post, :prompt, :negative_prompt, :parameters, :created_at, :updated_at], current_user: current_user)
 
-    if params[:parameter_name].present?
-      if params[:parameter_value].present?
-        q = q.where_json_contains(:parameters, { params[:parameter_name].strip => params[:parameter_value].strip }, cast: false)
-      else
-        q = q.where_json_has_key(:parameters, params[:parameter_name].strip)
+        q = q.parameter_matches(params[:parameter_name], params[:parameter_value])
+
+        q.apply_default_order(params)
+      end
+
+      def parameter_matches(name, value)
+        if name.present?
+          if value&.downcase == "none"
+            where_json_has_key(:parameters, name).invert_where
+          elsif value.present?
+            where_json_contains(:parameters, { name.strip => value.strip }, cast: false)
+          else
+            where_json_has_key(:parameters, name.strip)
+          end
+        end
+      end
+
+      def all_labels
+        select(Arel.sql("distinct jsonb_object_keys(parameters) as label")).order(:label)
+      end
+
+      def labels_like(string)
+        all_labels.select { |ss| ss.label.ilike?(string) }.map(&:label)
       end
     end
-
-    q.apply_default_order(params)
-  end
-
-  def self.all_labels
-    select(Arel.sql("distinct jsonb_object_keys(parameters) as label")).order(:label)
-  end
-
-  def self.labels_like(string)
-    all_labels.select { |ss| ss.label.ilike?(string) }.map(&:label)
   end
 
   def any_field_present?

@@ -1329,6 +1329,10 @@ class Post < ApplicationRecord
           user_subquery_matches(PostVote.active.positive.visible(current_user), value, current_user, field: :user)
         when "downvoter", "downvote"
           user_subquery_matches(PostVote.active.negative.visible(current_user), value, current_user, field: :user)
+        when "metadataupdater"
+          user_subquery_matches(AIMetadataVersion.unscoped, value, current_user, field: :updater)
+        when "modelhash"
+          model_hash_matches(value)
         when *PostQueryBuilder::CATEGORY_COUNT_METATAGS
           short_category = name.delete_suffix("tags")
           category = TagCategory.short_name_mapping[short_category]
@@ -1393,6 +1397,8 @@ class Post < ApplicationRecord
           where(AIMetadata.nonblank.where("ai_metadata.post_id = posts.id").arel.exists)
         when "prompt"
           where(AIMetadata.where("ai_metadata.post_id = posts.id and prompt != ''").arel.exists)
+        when "parameters"
+          where(AIMetadata.where("ai_metadata.post_id = posts.id and parameters != '{}'").arel.exists)
         else
           none
         end
@@ -1599,6 +1605,10 @@ class Post < ApplicationRecord
           ai_tags = AITag.joins(:media_asset).where(tag: tag).where_numeric_matches(:score, confidence)
           where(ai_tags.where("media_assets.md5 = posts.md5").arel.exists)
         end
+      end
+
+      def model_hash_matches(value)
+        joins(:ai_metadata).merge(AIMetadata.parameter_matches("Model Hash", value))
       end
 
       def uploader_matches(username)
