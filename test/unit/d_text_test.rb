@@ -295,6 +295,10 @@ class DTextTest < ActiveSupport::TestCase
 
         assert_equal("issue #1", DText.from_html("issue #1", allowed_shortlinks: ["issue"]))
       end
+
+      should "put headers on a line by themselves" do
+        assert_equal("foo\n\nh4. bar\n\nbaz", DText.from_html("<span>foo</span><h4>bar</h4><span>baz</span>"))
+      end
     end
 
     context "#mentions" do
