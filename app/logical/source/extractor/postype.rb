@@ -62,6 +62,9 @@ class Source::Extractor::Postype < Source::Extractor
       in "section" if element.classes.include?("pay")
         element.content = nil
 
+      in "div" if element.classes.include?("membership-only")
+        element.content = nil
+
       else
         nil
       end
