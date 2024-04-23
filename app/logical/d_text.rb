@@ -676,8 +676,8 @@ class DText
         else
           ""
         end
-      in "comment"
-        # ignored
+      in "comment" | "script"
+        element.content = nil
       else
         html_to_dtext(element, **options, &block)
       end
