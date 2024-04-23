@@ -639,7 +639,7 @@ class DText
       in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")
         hn = element.name
         title = html_to_dtext(element, **options, &block).strip
-        "\n\n#{hn}. #{title}\n\n"
+        "\n\n#{hn}. #{title}\n\n" if title.present?
       in "a"
         title = html_to_dtext(element, **options, inline: true, &block).squeeze(" ")
         url = element["href"].to_s

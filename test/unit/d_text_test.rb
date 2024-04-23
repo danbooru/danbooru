@@ -299,6 +299,11 @@ class DTextTest < ActiveSupport::TestCase
       should "put headers on a line by themselves" do
         assert_equal("foo\n\nh4. bar\n\nbaz", DText.from_html("<span>foo</span><h4>bar</h4><span>baz</span>"))
       end
+
+      should "omit empty headers" do
+        assert_equal("", DText.from_html("<h4> </h4>"))
+        assert_equal("", DText.from_html("<h4><br></h4>"))
+      end
     end
 
     context "#mentions" do
