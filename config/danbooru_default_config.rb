@@ -600,6 +600,12 @@ module Danbooru
     def reddit_session_cookie
     end
 
+    # Your Postype "PSE3" cookie. Login to Postype then use the devtools to find the "PSE3" cookie.
+    # After creating your account, go to https://www.postype.com/account/settings and enable the "Viewing adult content
+    # by foreigners" setting to see all content.
+    def postype_session_cookie
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
