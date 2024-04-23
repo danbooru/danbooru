@@ -281,6 +281,10 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal('foo" bar baz ":[http://google.com]quux', DText.from_html('foo<a href="http://google.com">  bar  baz  </a>quux'))
       end
 
+      should "ignore <script> tags" do
+        assert_equal("", DText.from_html("<script>alert('lol')</script>"))
+      end
+
       should "not convert URLs with unsupported schemes to dtext links" do
         assert_equal("blah", DText.from_html('<a href="ftp://example.com">blah</a>'))
         assert_equal("blah", DText.from_html('<a href="file:///etc/password">blah</a>'))
