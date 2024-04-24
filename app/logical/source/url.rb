@@ -87,6 +87,7 @@ module Source
       Source::URL::Postype,
       Source::URL::Artistree,
       Source::URL::Galleria,
+      Source::URL::Dotpict,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
