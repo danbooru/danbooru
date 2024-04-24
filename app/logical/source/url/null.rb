@@ -145,20 +145,12 @@ class Source::URL::Null < Source::URL
       "Piapro.jp"
     in _, ("paypal.com" | "paypal.me" | "paypalobjects.com")
       "PayPal"
-    in _, ("pinterest.com" | "pinimg.com")
-      "Pinterest"
     in _, "pixeljoint.com"
       "Pixel Joint"
-    in _, "postype.com"
-      "Postype"
-    in _, "cloudfront.net" if host == "d33pksfia2a94m.cloudfront.net"
-      "Postype"
     in _, ("joyreactor.cc" | "reactor.cc")
       "Joyreactor"
     in _, "redgifs.com"
       "RedGIFs"
-    in _, "rule34.us"
-      "Rule34.us"
     in _, "sakura.ne.jp"
       "Sakura.ne.jp"
     in _, "sankakucomplex.com"

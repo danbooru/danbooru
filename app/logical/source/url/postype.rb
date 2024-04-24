@@ -6,7 +6,7 @@ class Source::URL::Postype < Source::URL
   attr_reader :full_image_url, :post_id, :series_id, :blogname, :username
 
   def self.match?(url)
-    url.domain == "postype.com" || url.host.in?(%w[d2ufj6gm1gtdrc.cloudfront.net d3mcojo3jv0dbr.cloudfront.net])
+    url.domain == "postype.com" || url.host.in?(%w[d2ufj6gm1gtdrc.cloudfront.net d3mcojo3jv0dbr.cloudfront.net d33pksfia2a94m.cloudfront.net])
   end
 
   def parse
@@ -41,6 +41,7 @@ class Source::URL::Postype < Source::URL
     in _, "postype.com", "profile", username, *rest
       @username = username.delete_prefix("@")
 
+    # https://d33pksfia2a94m.cloudfront.net/assets/img/brand/favicon.png
     else
       nil
     end
