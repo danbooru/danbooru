@@ -56,6 +56,7 @@ module IconHelper
     DC\ Inside
     Deviant\ Art
     Discord
+    Dotpict
     Doujinshi.org
     Douyin
     Drawcrowd
