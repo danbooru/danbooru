@@ -79,6 +79,7 @@ module IconHelper
     Foundation
     Furaffinity
     Fusetter
+    Galleria
     Gelbooru
     Geocities
     Giftee
