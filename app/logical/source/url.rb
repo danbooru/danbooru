@@ -85,6 +85,7 @@ module Source
       Source::URL::Foriio,
       Source::URL::Itaku,
       Source::URL::Postype,
+      Source::URL::Artistree,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.

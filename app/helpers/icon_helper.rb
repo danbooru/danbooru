@@ -9,6 +9,7 @@ module IconHelper
     4chan
     Adobe\ Portfolio
     AllMyLinks
+    Artistree
     ArtStreet
     Amazon
     Ameblo
