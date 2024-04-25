@@ -43,6 +43,8 @@ class AIMetadata < ApplicationRecord
           else
             where_json_has_key(:parameters, name.strip)
           end
+        else
+          all
         end
       end
 
