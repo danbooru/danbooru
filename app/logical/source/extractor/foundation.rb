@@ -73,7 +73,7 @@ module Source
       end
 
       memoize def nft
-        api_response.dig("props", "pageProps", "pageData", "nft") || {}
+        api_response.dig("props", "pageProps", "pageData", "token") || {}
       end
 
       memoize def api_response
