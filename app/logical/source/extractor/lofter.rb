@@ -58,9 +58,7 @@ module Source
 
       memoize def page_json
         script_text = page&.search("body script").to_a.map(&:text).grep(/\Awindow.__initialize_data__ = /).first.to_s
-        json = script_text.strip.delete_prefix("window.__initialize_data__ = ")
-        return {} if json.blank?
-        JSON.parse(json)
+        script_text.strip.delete_prefix("window.__initialize_data__ = ").parse_json || {}
       end
 
       def tags

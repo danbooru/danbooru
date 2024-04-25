@@ -85,8 +85,7 @@ module Source
 
       memoize def api_response
         html = http.cache(1.minute).parsed_get(mobile_page_url)
-        json_string = html.to_s[/var \$render_data = \[(.*)\]\[0\]/m, 1] || "{}"
-        JSON.parse(json_string)["status"] || {}
+        html.to_s[/var \$render_data = \[(.*)\]\[0\]/m, 1]&.parse_json&.dig("status") || {}
       end
     end
   end

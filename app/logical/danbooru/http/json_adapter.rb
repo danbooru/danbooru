@@ -2,7 +2,7 @@
 
 module Danbooru
   class Http
-    class JsonAdapter < HTTP::MimeType::Adapter
+    class JSONAdapter < HTTP::MimeType::Adapter
       def self.register
         HTTP::MimeType.register_adapter "application/json", self
         HTTP::MimeType.register_adapter "application/ld+json", self
@@ -15,11 +15,7 @@ module Danbooru
       end
 
       def decode(str)
-        json = JSON.parse(str)
-        json = json.with_indifferent_access if json.is_a?(Hash)
-        json
-      rescue JSON::ParserError
-        {}
+        Danbooru::JSON.parse(str) || {}
       end
     end
   end

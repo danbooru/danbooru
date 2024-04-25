@@ -103,6 +103,13 @@ module Danbooru
         self.gsub(/(?<![a-z'])([a-z]+)/i, &:capitalize)
       end
 
+      # Parse a JSON string into a Ruby object.
+      #
+      # @return [Object, nil] The JSON object, or nil if the string was blank or there was a syntax error.
+      def parse_json
+        Danbooru::JSON.parse(self)
+      end
+
       # @return [Boolean] True if the string contains only balanced parentheses; false if the string contains unbalanced parentheses.
       def has_balanced_parens?(open = "(", close = ")")
         parens = 0

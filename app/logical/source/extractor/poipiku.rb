@@ -60,25 +60,15 @@ class Source::Extractor
     end
 
     memoize def page
-      return nil if page_url.blank?
-
-      response = http.cache(1.minute).get(page_url)
-      return nil unless response.status == 200
-
-      response.parse
+      http.cache(1.minute).parsed_get(page_url)
     end
 
     memoize def additional_images_html
       return nil if user_id.blank? || post_id.blank?
 
-      response = http.cookies(POIPIKU_LK: Danbooru.config.poipiku_session_cookie).use(:spoof_referrer).cache(1.minute).post("https://poipiku.com/f/ShowAppendFileF.jsp", form: { UID: user_id, IID: post_id })
-      return nil unless response.status == 200
-
-      json = JSON.parse(response.to_s)
-      html = Nokogiri::HTML5.fragment(json["html"])
-      html
-    rescue JSON::ParserError
-      nil
+      html = http.cookies(POIPIKU_LK: Danbooru.config.poipiku_session_cookie).use(:spoof_referrer).cache(1.minute).parsed_post("https://poipiku.com/f/ShowAppendFileF.jsp", form: { UID: user_id, IID: post_id })
+      json = html&.text&.parse_json || {}
+      Nokogiri::HTML5.fragment(json["html"])
     end
   end
 end

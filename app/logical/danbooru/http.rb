@@ -24,7 +24,7 @@ module Danbooru
     class FileTooLargeError < Error; end
 
     Danbooru::Http::HtmlAdapter.register
-    Danbooru::Http::JsonAdapter.register
+    Danbooru::Http::JSONAdapter.register
     Danbooru::Http::XmlAdapter.register
     Danbooru::Http::Cache.register
     Danbooru::Http::Logger.register

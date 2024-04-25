@@ -67,10 +67,8 @@ class Source::Extractor::Xfolio < Source::Extractor
   end
 
   def tags
-    data = page&.search(".article--detailInfo__tags").to_a.first&.attr("data-tags")
-    return [] unless data
-
-    JSON.parse(data).map do |tag| [tag["name"], tag["link"]] end
+    tags = page&.at(".article--detailInfo__tags")&.attr("data-tags")&.parse_json.to_a
+    tags.map { |tag| [tag["name"], tag["link"]] }
   end
 
   memoize def page
@@ -80,5 +78,4 @@ class Source::Extractor::Xfolio < Source::Extractor
   def http
     super.cookies(xfolio_session: Danbooru.config.xfolio_session)
   end
-
 end

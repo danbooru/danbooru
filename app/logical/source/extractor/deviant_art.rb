@@ -209,12 +209,7 @@ module Source
 
         script = page&.css("body script").to_a.map(&:text).grep(/window.__INITIAL_STATE__/).first.to_s
         json = script[/window.__INITIAL_STATE__ = JSON.parse\("(.*)"\);/, 1]
-        unescaped_json = json.to_s.gsub('\\"', '"').gsub("\\\\", "\\")
-        return {} if unescaped_json.blank?
-
-        JSON.parse(unescaped_json).with_indifferent_access
-      rescue JSON::ParserError
-        {}
+        json.to_s.gsub('\\"', '"').gsub("\\\\", "\\").parse_json || {}
       end
 
       memoize def api_client

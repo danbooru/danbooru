@@ -51,10 +51,7 @@ class Source::Extractor
     end
 
     memoize def api_response
-      text = page&.css("script.js-react-on-rails-component")&.text || "{}"
-      JSON.parse(text).with_indifferent_access
-    rescue JSON::ParserError
-      {}
+      page&.at("script.js-react-on-rails-component")&.text&.parse_json || {}
     end
   end
 end

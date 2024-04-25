@@ -35,8 +35,7 @@ module Source
 
       def image_urls_from_gallery
         script = page&.css("script")&.find { |node| node.text.match?(/let imageData =/) }
-        json = script&.text.to_s[/let imageData =(.*?);/m, 1]
-        images = JSON.parse(json) rescue []
+        images = script&.text.to_s[/let imageData =(.*?);/m, 1]&.parse_json || []
         images.pluck("image")
       end
 

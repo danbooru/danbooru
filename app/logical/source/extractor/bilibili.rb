@@ -167,12 +167,7 @@ module Source
         return {} if article_id.nil? || page.nil?
 
         script = page&.css("body script").to_a.map(&:text).grep(/window.__INITIAL_STATE__/).first.to_s
-        json = script[/window.__INITIAL_STATE__=(.*);\(function\(\){[^"]*}\(\)\);\z/, 1]
-        return {} if json.blank?
-
-        JSON.parse(json).with_indifferent_access
-      rescue JSON::ParserError
-        {}
+        script[/window.__INITIAL_STATE__=(.*);\(function\(\){[^"]*}\(\)\);\z/, 1]&.parse_json || {}
       end
     end
   end
