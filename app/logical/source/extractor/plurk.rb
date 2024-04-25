@@ -59,8 +59,7 @@ module Source
       memoize def page_json
         script_text = page&.search("body script").to_a.map(&:text).grep(/plurk =/).first.to_s
         json = script_text.strip.delete_prefix("plurk = ").delete_suffix(";").gsub(/new Date\((.*?)\)/) { $1 }
-        return {} if json.blank?
-        JSON.parse(json)
+        json.parse_json
       end
 
       memoize def api_replies

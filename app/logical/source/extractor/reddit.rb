@@ -66,11 +66,8 @@ module Source
       memoize def data
         html = http.cache(1.minute).parsed_get(api_url)
 
-        json_string = html&.at("script#data").to_s[/\s({.*})/, 1].to_s
-        data = JSON.parse(json_string).with_indifferent_access
-        data.dig("posts", "models").values.min_by { |p| p["created"].to_i } || {} # to avoid reposts
-      rescue JSON::ParserError
-        {}
+        data = html&.at("script#data").to_s[/\s({.*})/, 1]&.parse_json || {}
+        data.dig("posts", "models")&.values&.min_by { |p| p["created"].to_i } || {} # to avoid reposts
       end
     end
   end

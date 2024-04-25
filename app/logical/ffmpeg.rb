@@ -47,8 +47,7 @@ class FFmpeg
   # @return [Hash] A hash of the file's metadata. Will be empty if reading the file failed for any reason.
   def metadata
     output = shell!("ffprobe -v quiet -print_format json -show_format -show_streams -show_packets #{file.path.shellescape}")
-    json = JSON.parse(output)
-    json.with_indifferent_access
+    output.parse_json || {}
   rescue Error => e
     { error: e.message.strip }.with_indifferent_access
   end

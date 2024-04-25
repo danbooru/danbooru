@@ -90,7 +90,7 @@ module Source
         end
 
         memoize def tumblr_data
-          page&.at("noscript#bootloader")&.attr("data-bootstrap")&.then { JSON.parse(_1) } || {}
+          page&.at("noscript#bootloader")&.attr("data-bootstrap")&.parse_json || {}
         end
       end
     end

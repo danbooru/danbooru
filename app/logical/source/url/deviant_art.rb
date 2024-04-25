@@ -170,7 +170,7 @@ module Source
     def parse_jwt(token)
       return {} if token.blank?
 
-      header, payload = token.split(".").take(2).map { |data| JSON.parse(Base64.decode64(data)) }
+      header, payload = token.split(".").take(2).map { |data| Base64.decode64(data).parse_json }
 
       { header: header, payload: payload }.with_indifferent_access
     rescue JSON::ParserError

@@ -62,12 +62,7 @@ class Source::Extractor::Foriio < Source::Extractor
 
   memoize def page_json
     script = page&.css("script").to_a.map(&:text).grep(/window.__PRELOADED_STATE__/).first.to_s
-    json = script[/window.__PRELOADED_STATE__ = (.*);$/, 1]
-    return {} if json.blank?
-
-    JSON.parse(json).with_indifferent_access
-  rescue JSON::ParserError
-    {}
+    script[/window.__PRELOADED_STATE__ = (.*);$/, 1]&.parse_json || {}
   end
 
   memoize def page

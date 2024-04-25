@@ -47,7 +47,7 @@ class Source::Extractor
         when "file"
           full_image_for("https://www.fantia.jp/#{content["download_uri"]}")
         when "blog"
-          comment = JSON.parse(content["comment"]) rescue {}
+          comment = content["comment"]&.parse_json || {}
 
           comment["ops"].to_a.pluck("insert").grep(Hash).filter_map do |node|
             if node.dig("fantiaImage", "original_url").present?

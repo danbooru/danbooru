@@ -77,12 +77,7 @@ module Source
       end
 
       memoize def api_response
-        return {} if page.nil?
-
-        data = page.at("#__NEXT_DATA__")&.text
-        return {} if data.blank?
-
-        JSON.parse(data).with_indifferent_access
+        page&.at("#__NEXT_DATA__")&.text&.parse_json || {}
       end
     end
   end
