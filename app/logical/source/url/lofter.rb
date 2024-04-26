@@ -36,10 +36,6 @@ class Source::URL::Lofter < Source::URL
       @username = $1
       @work_id = work_id
 
-    # https://gengar563.lofter.com/tag/%E5%BA%9F%E5%BC%83%E7%9B%90%E9%85%B8%E5%A4%84%E7%90%86%E5%8E%82
-    in /^([a-z0-9-]+)\.lofter\.com$/, "tag", tag
-      @unescaped_tag = CGI.unescape(tag)
-
     # http://gengar563.lofter.com
     in /^([a-z0-9-]+)\.lofter\.com$/, *rest unless host.in?(RESERVED_SUBDOMAINS)
       @username = $1

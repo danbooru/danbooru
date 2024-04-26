@@ -163,7 +163,7 @@ module Sources
       strategy_should_work(
         "https://xingfulun16203.lofter.com/post/77a68dc4_2b9f0f00c",
         image_urls: ["https://imglf4.lf127.net/img/b7c3e00acd19f7c0/azVib0c4ZHd2WVd6UEhkWG93c1QxRXM3V3VVM2pab0pqaXB3UFV4WG1tVT0.png"],
-        tags: %w[夸奈 我推的孩子 夸奈24h:海蓝苏打七夕特供]
+        tags: ["夸奈", "我推的孩子", "夸奈24h:\u00A0海蓝苏打七夕特供"]
       )
     end
 
