@@ -180,6 +180,7 @@ module Sources
       assert(Source::URL.image_url?("https://vodm2lzexwq.vod.126.net/vodm2lzexwq/Pc5jg1nL_3039990631_sd.mp4?resId=254486990bfa2cd7aa860229db639341_3039990631_1&sign=4j02HTHXqNfhaF%2B%2FO14Ny%2F9SMNZj%2FIjpJDCqXfYa4aM%3D"))
 
       assert(Source::URL.page_url?("https://gengar563.lofter.com/post/1e82da8c_1c98dae1b"))
+      assert(Source::URL.page_url?("https://gengar563.lofter.com/front/post/1e82da8c_1c98dae1b"))
 
       assert(Source::URL.profile_url?("https://www.lofter.com/front/blog/home-page/noshiqian"))
       assert(Source::URL.profile_url?("http://www.lofter.com/app/xiaokonggedmx"))
