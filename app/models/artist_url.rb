@@ -62,6 +62,11 @@ class ArtistURL < ApplicationRecord
     where_like("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'", url) # this is indexed
   end
 
+  def self.normalized_url_equals_any(urls)
+    urls = urls.map { |url| url.to_s.downcase.gsub(%r{\Ahttps?://|/\z}i, "") + "/" } # "https://example.com/A/B/C" => "example.com/a/b/c/"
+    where(["regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/' IN (:urls)", { urls: }]) # this is indexed
+  end
+
   def domain
     parsed_url&.domain.to_s
   end
