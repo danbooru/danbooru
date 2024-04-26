@@ -55,7 +55,7 @@ module Source
       end
 
       def artists
-        sub_extractor&.artists || ArtistFinder.find_artists(url)
+        sub_extractor&.artists || super
       end
 
       memoize def response

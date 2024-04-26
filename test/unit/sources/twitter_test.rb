@@ -465,6 +465,13 @@ module Sources
       )
     end
 
+    context "A Twitter artist with only an intent URL in the artist profile" do
+      should "find the artist" do
+        @artist = create(:artist, url_string: "https://twitter.com/intent/user?user_id=940159421677690880")
+        assert_equal([@artist], Source::Extractor.find("https://twitter.com/ebihurya332/status/1759409576095711667").artists)
+      end
+    end
+
     should "Parse Twitter URLs correctly" do
       assert(Source::URL.image_url?("https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg"))
       assert(Source::URL.image_url?("https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:small"))

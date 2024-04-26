@@ -178,8 +178,18 @@ module Source
       http.timeout(DOWNLOAD_TIMEOUT).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
     end
 
+    # Find the artist(s) associated with this source URL. For known sites (e.g., art platforms shared by many artists),
+    # we extract the profile URL(s) and look for artist entries with a matching profile URL. For URLs from unknown sites
+    # (e.g., personal artist websites), we look for a prefix match of the URL (that is, we look for artist URLs that are
+    # from the same site and that have the same subfolders).
+    #
+    # @return [ActiveRecord::Relation<Artist>]
     def artists
-      ArtistFinder.find_artists(profile_url)
+      if parsed_url&.recognized?
+        Artist.active.has_normalized_url(profile_urls).limit(5)
+      else
+        ArtistFinder.find_artists(url)
+      end
     end
 
     # A new artist entry with suggested defaults for when the artist doesn't
