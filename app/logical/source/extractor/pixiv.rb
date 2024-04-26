@@ -147,24 +147,27 @@ module Source
         original_urls.any? { |url| Source::URL.parse(url).is_ugoira? }
       end
 
-      def illust_id
+      memoize def illust_id
         parsed_url.work_id || parsed_referer&.work_id
       end
 
-      def api_client
-        PixivAjaxClient.new(Danbooru.config.pixiv_phpsessid, http: http)
+      def http
+        super.cookies(PHPSESSID: Danbooru.config.pixiv_phpsessid)
       end
 
-      def api_illust
-        api_client.illust(illust_id)
+      memoize def api_illust
+        # curl "https://www.pixiv.net/ajax/illust/87598468" | jq
+        http.cache(1.minute).parsed_get("https://www.pixiv.net/ajax/illust/#{illust_id}")&.dig("body") || {}
       end
 
-      def api_pages
-        api_client.pages(illust_id)
+      memoize def api_pages
+        # curl "https://www.pixiv.net/ajax/illust/87598468/pages" | jq
+        http.cache(1.minute).parsed_get("https://www.pixiv.net/ajax/illust/#{illust_id}/pages")&.dig("body") || {}
       end
 
-      def api_ugoira
-        api_client.ugoira_meta(illust_id)
+      memoize def api_ugoira
+        # curl "https://www.pixiv.net/ajax/illust/74932152/ugoira_meta" | jq
+        http.cache(1.minute).parsed_get("https://www.pixiv.net/ajax/illust/#{illust_id}/ugoira_meta")&.dig("body") || {}
       end
 
       def moniker
@@ -174,8 +177,6 @@ module Source
       def ugoira_frame_delays
         api_ugoira[:frames].pluck("delay")
       end
-
-      memoize :illust_id, :api_client, :api_illust, :api_pages, :api_ugoira
     end
   end
 end
