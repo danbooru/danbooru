@@ -63,10 +63,7 @@ module Source
 
       def tags
         page_json.dig("postData", "data", "postData", "postView", "tagList").to_a.map do |tag|
-          href = "https://www.lofter.com/tag/#{tag}"
-          [Source::URL.parse(href).unescaped_tag.encode!("UTF-8", :invalid => :replace, :replace => ""), href]
-          # nasty surprise from some posts like https://xingfulun16203.lofter.com/post/77a68dc4_2b9f0f00c
-          # if 0xA0 is present in a tag, it seems the tag search will crash, so not even lofter can handle these properly
+          [tag, "https://www.lofter.com/tag/#{Danbooru::URL.escape(tag)}"]
         end
       end
 
