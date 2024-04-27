@@ -35,9 +35,15 @@ class Artist < ApplicationRecord
   module UrlMethods
     extend ActiveSupport::Concern
 
+    def naturalize(string)
+      string.scan(/\D+|\d+/).map do |block|
+        block.match(/\d+/) ? [block.to_i, block.index(/[^0]/)] : block
+      end
+    end
+
     def sorted_urls
       urls.sort_by do |url|
-        [url.is_active? ? 0 : 1, url.priority, url.domain, url.secondary_url? ? 1 : 0, url.url]
+        [url.is_active? ? 0 : 1, url.priority, url.domain, url.secondary_url? ? 1 : 0, naturalize(url.url)]
       end
     end
 
