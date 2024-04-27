@@ -61,8 +61,6 @@ class Source::URL::Null < Source::URL
       "Danbooru" # hey, that's us!
     in _, "dcinside.com"
       "DC Inside"
-    in _, ("discordapp.com" | "discordapp.net")
-      "Discord"
     in _, "doujinshi.org"
       "Doujinshi.org"
     in "doujinshi", "mugimugi.org"
@@ -325,10 +323,6 @@ class Source::URL::Null < Source::URL
     in _, _, *subdirs, "diarypro", "diary.cgi" if params[:mode] == "image" && params[:upfile].present?
       @work_id = params[:upfile][/^\d+/]
       @page_url = [site, *subdirs, "diarypro/diary.cgi?no=#{@work_id}"].join("/")
-
-    # https://discord.gg/fM8rJZ7SRM
-    in _, ("discord.gg" | "discord.com" | "discordapp.com" | "discordapp.net"), *rest
-      nil
 
     in _, "dlsite.com", *rest
       nil
