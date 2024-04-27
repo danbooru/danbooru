@@ -224,6 +224,11 @@ class Source::URL::Null < Source::URL
       @username = username
       @profile_url = "https://about.me/#{username}"
 
+    # https://allmylinks.com/hieumayart
+    in _, "allmylinks.com", username
+      @username = username
+      @profile_url = "https://allmylinks.com/#{username}"
+
     # http://marilyn77.ameblo.jp/
     in username, "ameblo.jp", *rest unless subdomain.in?(["www", "s", nil])
       @username = username
@@ -269,6 +274,44 @@ class Source::URL::Null < Source::URL
       @username = username
       @profile_url = "https://ask.fm/#{username}"
 
+    # http://hi.baidu.com/lizzydom
+    # http://hi.baidu.com/longbb1127/home
+    # http://hi.baidu.com/new/mocaorz
+    in _, "baidu.com", *rest
+      nil
+
+    # https://bcy.net/u/1617969
+    in _, "bcy.net", "u", user_id
+      @profile_url = "https://bcy.net/u/#{user_id}"
+
+    # https://img9.bcyimg.com/drawer/32360/post/178vu/46229ec06e8111e79558c1b725ebc9e6.jpg
+    in _, ("bcy.net" | "bcyimg.com"), *rest
+      nil
+
+    # "https://www.behance.net/webang111
+    in _, "behance.net", *rest
+      nil
+
+    # http://img.booru.org/drawfriends//images/36/de65da5f588b76bc1d9de8af976b540e2dff17e2.jpg
+    in _, "booru.org", *rest
+      nil
+
+    # https://shop.comiczin.jp/products/list.php?category_id=3394
+    in _, "comiczin.jp", *rest
+      nil
+
+    # https://curiouscat.me/azurane
+    in _, "curiouscat.me", *rest
+      nil
+
+    # https://crepu.net/user/Mizunouchilucia
+    in _, "crepu.net", *rest
+      nil
+
+    # https://derpibooru.org/tags/artist-colon-checkerboardazn
+    in _, "derpibooru.org", *rest
+      nil
+
     # http://nekomataya.net/diarypro/data/upfile/66-1.jpg
     # http://www117.sakura.ne.jp/~cat_rice/diarypro/data/upfile/31-1.jpg
     # http://webknight0.sakura.ne.jp/cgi-bin/diarypro/data/upfile/9-1.jpg
@@ -283,16 +326,55 @@ class Source::URL::Null < Source::URL
       @work_id = params[:upfile][/^\d+/]
       @page_url = [site, *subdirs, "diarypro/diary.cgi?no=#{@work_id}"].join("/")
 
+    # https://discord.gg/fM8rJZ7SRM
+    in _, ("discord.gg" | "discord.com" | "discordapp.com" | "discordapp.net"), *rest
+      nil
+
+    in _, "dlsite.com", *rest
+      nil
+
     # http://com2.doujinantena.com/contents_jpg/cf0224563cf7a75450596308fe651d5f/018.jpg
     # http://sozai.doujinantena.com/contents_jpg/cf0224563cf7a75450596308fe651d5f/009.jpg
     in _, "doujinantena.com", "contents_jpg", /^\h{32}$/ => md5, *rest
       @md5 = md5
       @page_url = "http://doujinantena.com/page.php?id=#{md5}"
 
+    # http://www.doujinshi.org/browse/circle/65368/
+    # http://www.doujinshi.org/browse/author/979/23/
+    in _, "doujinshi.org", *rest
+      nil
+
+    # http://doujinshi.mugimugi.org/browse/author/3029/
+    # http://doujinshi.mugimugi.org/browse/circle/7210/
+    in "doujinshi", "mugimugi.org", *rest
+      nil
+
+    # https://drawcrowd.com/agussw
+    in _, "drawcrowd.com", *rest
+      nil
+
+    # http://drawr.net/matsu310
+    in _, "drawr.net", *rest
+      nil
+
+    # https://www.dropbox.com/sh/gz9okupqycr2vj2/GHt_oHDKsR
+    # http://dl.dropbox.com/u/76682289/daitoHP-WP/pict/
+    in _, "dropbox.com", *rest
+      nil
+
+    # https://e-hentai.org/tag/artist:spirale
+    # https://e-hentai.org/uploader/Spirale
+    in _, "e-hentai.org", *rest
+      nil
+
     # https://e-shuushuu.net/images/2017-07-19-915628.jpeg
     in _, "e-shuushuu.net", "images", /^\d{4}-\d{2}-\d{2}-(\d+)\.(jpeg|jpg|png|gif)$/i
       @work_id = $1
       @page_url = "https://e-shuushuu.net/image/#{@work_id}"
+
+    # https://www.etsy.com/shop/yeurei
+    in _, "etsy.com", *rest
+      nil
 
     # https://scontent.fmnl9-2.fna.fbcdn.net/v/t1.6435-9/196345051_961754654392125_8855002558147907833_n.jpg?_nc_cat=103&ccb=1-5&_nc_sid=0debeb&_nc_ohc=EB1RGiEOtyEAX9XE7aL&_nc_ht=scontent.fmnl9-2.fna&oh=00_AT8NNz_keqQ6VJeC1UVSMULhjaP3iykm-ONSMR7IrtarUQ&oe=6257862E
     # https://scontent.fmnl8-2.fna.fbcdn.net/v/t1.6435-9/fr/cp0/e15/q65/80900683_480934615898749_6481759463945535488_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=8024bb&_nc_ohc=cCYFUzyHDmUAX-YHJIw&_nc_ht=scontent.fmnl8-2.fna&oh=e45c3837afcfefb6a4d93adfecef88c1&oe=60F6E392
@@ -302,11 +384,40 @@ class Source::URL::Null < Source::URL
       @work_id = $1
       @page_url = "https://www.facebook.com/photo?fbid=#{@work_id}"
 
+    # https://www.facebook.com/LuutenantsLoot
+    in _, ("facebook.com" | "fbcdn.net"), *rest
+      nil
+
     # https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-xlp1/t31.0-8/s960x960/13173066_623015164516858_1844421675339995359_o.jpg
     # https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-xpf1/v/t1.0-9/s720x720/12032214_991569624217563_4908408819297057893_n.png?oh=efe6ea26aed89c8a12ddc1832b1f0157&oe=5667D5B1&__gda__=1453845772_c742c726735047f2feb836b845ff296f
     in /fbcdn/, "akamaihd.net", *subdirs, /^\d_(\d+)_(?:\d+_){1,3}[no]\.(jpg|png)$/
       @work_id = $1
       @page_url = "https://www.facebook.com/photo.php?fbid=#{work_id}"
+
+    # http://blog71.fc2.com/a/abk00/file/20080220194219.jpg
+    in _, "fc2.com", *rest
+      nil
+
+    # https://www.flickr.com/people/shirasaki408/
+    # https://www.flickr.com/photos/shirasaki408/
+    # https://www.flickr.com/photos/shirasaki408/albums
+    # https://www.flickr.com/photos/hizna/sets/72157629448846789/
+    # https://www.flickr.com/photos/shirasaki408/49398982266/
+    in _, "flickr.com", ("people" | "photos"), username, *rest
+      @profile_url = "https://www.flickr.com/people/#{username}"
+
+    # # http://www.furaffinity.net/user/achthenuts
+    in _, "furaffinity.net", *rest
+      nil
+
+    # http://www.geocities.jp/nanp002001
+    in _, "geocities.jp", *rest
+      nil
+
+    # https://plus.google.com/111509637967078773143/posts
+    # http://sites.google.com/site/dorumentaiko/
+    in _, "google.com", *rest
+      nil
 
     # https://a.hitomi.la/galleries/907838/1.png
     # https://0a.hitomi.la/galleries/1169701/23.png
@@ -322,11 +433,68 @@ class Source::URL::Null < Source::URL
       @gallery_id = gallery_id
       @page_url = "https://hitomi.la/galleries/#{gallery_id}.html"
 
+    # https://www.inprnt.com/gallery/zuyuancesartoo/
+    in _, "inprnt.com", *rest
+      nil
+
+    # http://ecchi.iwara.tv/users/marumega
+    in _, "iwara.tv", *rest
+      nil
+
     # http://www.karabako.net/images/karabako_43878.jpg
     # http://www.karabako.net/imagesub/karabako_43222_215.jpg
     in _, "karabako.net", ("images" | "imagesub"), /^karabako_(\d+)/
       @work_id = $1
       @page_url = "http://www.karabako.net/post/view/#{work_id}"
+
+    # https://ko-fi.com/johndaivid
+    in _, "ko-fi.com", *rest
+      nil
+
+    in _, "kym-cdn.com", *rest
+      nil
+
+    # https://linktr.ee/cxlinray
+    # https://linktr.ee/seamonkey_op?utm_source=linktree_admin_share
+    in _, "linktr.ee", username
+      @profile_url = "https://linktr.ee/#{username}"
+
+    in "livedoor", "blogimg.jp", *rest
+      nil
+
+    # http://blog.livedoor.jp/ac370ml
+    in "blog", "livedoor.jp", *rest
+      nil
+
+    # http://www.mangaupdates.com/authors.html?id=15780
+    in _, "mangaupdates.com", *rest
+      nil
+
+    # https://marshmallow-qa.com/nlo74593630
+    in _, "marshmallow-qa.com", *rest
+      nil
+
+    # http://mblg.tv/ikusanin01/
+    in _, "mblg.tv", *rest
+      nil
+
+    # https://www.melonbooks.co.jp/circle/index.php?circle_id=15547
+    in _, "melonbooks.co.jp", *rest
+      nil
+
+    # http://www.melonbooks.com/index.php?main_page=maker_info&makers_id=MK0000016413
+    in _, "melonbooks.com", *rest
+      nil
+
+    # https://mega.nz/file/9zxwxCDD#TJn7S7sPag30wDVD-kaVhFkeROzz-fE7_ZOb3gIZPTA
+    # https://mega.nz/file/9zxwxCDD#TJn7S7sPag30wDVD-kaVhFkeROzz-fE7_ZOb3gIZPTA
+    # https://mega.nz/folder/8d4E0LxK#yzYqKHoGFu92RzMNWnoZEw/file/tUgAQZJA
+    in _, "mega.nz", *rest
+      nil
+
+    # https://www.mihuashi.com/profiles/75614
+    in _, "mihuashi.com", *rest
+      nil
 
     # http://static.minitokyo.net/downloads/31/33/764181.jpg
     in _, "minitokyo.net", "downloads", /^\d{2}$/, /^\d{2}$/, file
@@ -339,10 +507,50 @@ class Source::URL::Null < Source::URL
       @work_id = $1
       @page_url = "http://minus.com/i/#{@work_id}"
 
+    # http://mixi.jp/show_friend.pl?id=310102
+    in _, "mixi.jp", *rest
+      nil
+
+    # https://monappy.jp/u/abara_bone
+    in _, "monappy.jp", *rest
+      nil
+
+    # https://mstdn.jp/@oneb
+    in _, "mstdn.jp", *rest
+      nil
+
+    # http://nanos.jp/riku65/
+    in _, "nanos.jp", *rest
+      nil
+
+    # https://blog.naver.com/yanusunya
+    in _, "naver.com", *rest
+      nil
+
     # http://jpg.nijigen-daiaru.com/7364/013.jpg
     in "jpg", "nijigen-daiaru.com", /^\d+$/ => work_id, file
       @work_id = work_id
       @page_url = "http://nijigen-daiaru.com/book.php?idb=#{@work_id}"
+
+    # https://odaibako.net/u/NLO74593630
+    in _, "odaibako.net", *rest
+      nil
+
+    # https://onlyfans.com/evviart
+    in _, "onlyfans.com", *rest
+      nil
+
+    # https://opensea.io/hebitsukai
+    in _, "opensea.io", *rest
+      nil
+
+    # http://patreon.com/serafleur
+    in _, "patreon.com", *rest
+      nil
+
+    # https://peing.net/ja/scape0505kigkig
+    in _, "peing.net", *rest
+      nil
 
     # http://art59.photozou.jp/pub/212/1986212/photo/118493247_org.v1534644005.jpg
     # http://kura3.photozou.jp/pub/741/2662741/photo/160341863_624.v1353780834.jpg
@@ -351,6 +559,49 @@ class Source::URL::Null < Source::URL
       @work_id = $1
       @page_url = "https://photozou.jp/photo/show/#{@user_id}/#{@work_id}"
 
+    # http://photozou.jp/photo/top/941038
+    in _, "photozou.jp", *rest
+      nil
+
+    # https://piapro.jp/mmm0
+    in _, "piapro.jp", *rest
+      nil
+
+    # https://picarto.tv/CheckerBoardAZN
+    # https://www.picarto.tv/live/channel.php?watch=aaaninja
+    in _, "picarto.tv", *rest
+      nil
+
+    # http://www.pictaram.com/user/5ish/3048385011/1350040096769940245_3048385011
+    in _, "pictaram.com", *rest
+      nil
+
+    # http://tegaki.pipa.jp/515745
+    in _, "pipa.jp", *rest
+      nil
+
+    # https://pomf.tv/oozutsucannon
+    # https://pomf.tv/stream/Kukseleg
+    in _, "pomf.tv", *rest
+      nil
+
+    # http://www7.plala.or.jp/reirei
+    in _, "plala.or.jp", *rest
+      nil
+
+    # https://www.pornhub.com/model/mizzpeachy
+    in _, "pornhub.com", *rest
+      nil
+
+    # https://privatter.net/u/minami_152133
+    # https://privatter.net/m/minami_152133
+    in _, "privatter.net", ("u" | "m"), username
+      @profile_url = "https://privatter.net/u/#{username}"
+
+    # https://www.redbubble.com/people/limb
+    in _, "redbubble.com", *rest
+      nil
+
     # https://tulip.paheal.net/_images/4f309b2b680da9c3444ed462bb172214/3910816%20-%20Dark_Magician_Girl%20MINK343%20Yu-Gi-Oh!.jpg
     # http://rule34-data-002.paheal.net/_images/2ab55f9291c8f2c68cdbeac998714028/2401510%20-%20Ash_Ketchum%20Lillie%20Porkyman.jpg
     # http://rule34-images.paheal.net/c4710f05e76bdee22fcd0d62bf1ac840/262685%20-%20mabinogi%20nao.jpg
@@ -358,6 +609,10 @@ class Source::URL::Null < Source::URL
       @md5 = md5
       @work_id = $1
       @page_url = "https://rule34.paheal.net/post/view/#{@work_id}"
+
+    # http://rule34.paheal.net/post/list/Reach025/
+    in _, "paheal.net", *rest
+      nil
 
     # https://api-cdn-mp4.rule34.xxx/images/4330/2f85040320f64c0e42128a8b8f6071ce.mp4
     # https://ny5webm.rule34.xxx//images/4653/3c63956b940d0ff565faa8c7555b4686.mp4?5303486
@@ -377,10 +632,62 @@ class Source::URL::Null < Source::URL
       @md5 = $1
       @page_url = "https://chan.sankakucomplex.com/post/show?md5=#{@md5}"
 
+    # https://chan.sankakucomplex.com/?tags=user%3ASubridet
+    in _, "sankakucomplex.com", *rest
+      nil
+
     # http://shimmie.katawa-shoujo.com/image/3657.jpg
     in "shimmie", "katawa-shoujo.com", "image", file
       @work_id = filename
       @page_url = "https://shimmie.katawa-shoujo.com/post/view/#{@work_id}"
+
+    # https://smutba.se/project/431/
+    in _, "smutba.se", *rest
+      nil
+
+    # http://society6.com/serafleur/
+    in _, "society6.com", *rest
+      nil
+
+    # https://soundcloud.com/uwmx4hwforgm
+    in _, "soundcloud.com", *rest
+      nil
+
+    # https://soundgasm.net/MilkteaMomoko
+    in _, "soundgasm.net", *rest
+      nil
+
+    # https://steamcommunity.com/id/sobchan
+    in _, ("steamcommunity.com" | "steamstatic.com"), *rest
+      nil
+
+    # https://www.stickam.jp/profile/gyroscope
+    in _, "stickam.jp", *rest
+      nil
+
+    # https://subscribestar.adult/daivijohn
+    in _, ("subscribestar.adult" | "subscribestar.com"), *rest
+      nil
+
+    # https://superrare.com/mcbess
+    in _, "superrare.com", *rest
+      nil
+
+    # https://tapas.io/Paroro
+    in _, "tapas.io", *rest
+      nil
+
+    # https://www.teepublic.com/user/ejsu28
+    in _, "teepublic.com", *rest
+      nil
+
+    # https://t.me/lystrahut
+    in _, "t.me", *rest
+      nil
+
+    # http://theinterviews.jp/ruixiang
+    in _, "theinterviews.jp", *rest
+      nil
 
     # http://img.toranoana.jp/popup_img/04/0030/09/76/040030097695-2p.jpg
     # http://img.toranoana.jp/popup_img18/04/0010/22/87/040010228714-1p.jpg
@@ -390,12 +697,67 @@ class Source::URL::Null < Source::URL
       @work_id = $1
       @page_url = "https://ec.toranoana.jp/tora_r/ec/item/#{@work_id}"
 
+    # https://toyhou.se/Dreaming-Witch
+    in _, "toyhou.se", *rest
+      nil
+
+    # https://twitcasting.tv/satecoon
+    in _, "twitcasting.tv", *rest
+      nil
+
+    # https://www.twitch.tv/5ish
+    in _, "twitch.tv", *rest
+      nil
+
     # http://p.twpl.jp/show/orig/DTaCZ
     # http://p.twpl.jp/show/large/5zack
     # http://p.twipple.jp/show/orig/vXqaU
     in _, ("twpl.jp" | "twipple.jp"), "show", ("large" | "orig"), work_id
       @work_id = work_id
       @page_url = "http://p.twipple.jp/#{work_id}"
+
+    # https://twpf.jp/swacoro
+    in _, "twpl.jp", username
+      @profile_url = "https://twpf.jp/#{username}"
+
+    # http://www.ustream.tv/channel/633b
+    # http://www.ustream.tv/user/kazaputi
+    in _, "ustream.tv", *rest
+      nil
+
+    # https://vk.com/id425850679
+    in _, "vk.com", *rest
+      nil
+
+    # http://spibal.webclap.com
+    in "spibal", "webclap.com", *rest
+      nil
+
+    # https://www.webtoons.com/en/creator/37u4n
+    in _, "webtoons.com", *rest
+      nil
+
+    # https://en.wikipedia.org/wiki/Hidetaka_Tenjin
+    in _, "wikipedia.org", *rest
+      nil
+
+    in _, "wp.com", *rest
+      nil
+
+    # http://yaplog.jp/niyang53
+    in _, "yaplog.jp", *rest
+      nil
+
+    # http://yfrog.com/user/0128sinonome/photos
+    in _, "yfrog.com", *rest
+      nil
+
+    # https://www.youtube.com/c/ruichnonomarui
+    # https://www.youtube.com/user/nonomaRui/videos
+    # https://www.youtube.com/channel/UCfrCa2Y6VulwHD3eNd3HBRA
+    # https://youtu.be/dQw4w9WgXcQ?si=i9hAbs3VV0ewqq6F
+    in _, ("youtube.com" | "youtu.be"), *rest
+      nil
 
     else
       @recognized = false
