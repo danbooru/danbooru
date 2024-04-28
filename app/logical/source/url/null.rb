@@ -286,10 +286,6 @@ class Source::URL::Null < Source::URL
     in _, ("bcy.net" | "bcyimg.com"), *rest
       nil
 
-    # "https://www.behance.net/webang111
-    in _, "behance.net", *rest
-      nil
-
     # http://img.booru.org/drawfriends//images/36/de65da5f588b76bc1d9de8af976b540e2dff17e2.jpg
     in _, "booru.org", *rest
       nil

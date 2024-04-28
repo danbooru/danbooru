@@ -90,6 +90,7 @@ module Source
       Source::URL::Dotpict,
       Source::URL::Discord,
       Source::URL::Opensea,
+      Source::URL::Behance,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
