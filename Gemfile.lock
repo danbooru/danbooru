@@ -610,6 +610,7 @@ DEPENDENCIES
   hsluv
   http
   ipaddress_2
+  kramdown
   listen
   mail
   memoist

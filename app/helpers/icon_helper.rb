@@ -48,6 +48,7 @@ module IconHelper
     Class101
     Clip\ Studio
     Coconala
+    Cohost
     Colors\ Live
     Commishes
     Creatorlink
