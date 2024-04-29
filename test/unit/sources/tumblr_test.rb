@@ -551,6 +551,38 @@ module Sources
       )
     end
 
+    context "A commentary with alt text containing quote marks" do
+      strategy_should_work(
+        "https://dumpsterf11re.tumblr.com/post/745620363722047488",
+        image_urls: %w[https://64.media.tumblr.com/b823b6e057a6cca109a0b081d541b1e2/e6da9f752eeebab0-96/s21000x21000/64688ba897ef51f3928c4e24ac4901531c6f5144.png],
+        media_files: [{ file_size: 541_679 }],
+        page_url: "https://dumpsterf11re.tumblr.com/post/745620363722047488",
+        profile_url: "https://dumpsterf11re.tumblr.com",
+        profile_urls: %w[https://dumpsterf11re.tumblr.com],
+        artist_name: "dumpsterf11re",
+        tag_name: "dumpsterf11re",
+        other_names: ["dumpsterf11re"],
+        tags: [
+          ["dungeon meshi", "https://tumblr.com/tagged/dungeon meshi"],
+          ["tw blood", "https://tumblr.com/tagged/tw blood"],
+          ["july says things", "https://tumblr.com/tagged/july says things"],
+          ["july draws things", "https://tumblr.com/tagged/july draws things"],
+          ["my art", "https://tumblr.com/tagged/my art"],
+          ["marcille", "https://tumblr.com/tagged/marcille"],
+          ["chilchuck", "https://tumblr.com/tagged/chilchuck"],
+          ["fanart", "https://tumblr.com/tagged/fanart"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          [quote]
+          h6. Image description
+
+          Chilchuck from Dungeon Meshi yells at Marcille, and in his speech bubble is a screenshot of a Tumblr post saying "bro stop chanting in dead languages you're scaring the hoes", and a blood-stained Marcille standing over a dark magic circle replies with another screenshot saying "im summoning the hoes fool"
+          [/quote]
+        EOS
+      )
+    end
+
     context "A commentary with nested reblogs" do
       strategy_should_work(
         "https://www.tumblr.com/shortgremlinman/707877745599905792/get-asked-idiot",

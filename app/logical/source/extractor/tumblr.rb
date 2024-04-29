@@ -84,6 +84,10 @@ class Source::Extractor
       post[:trail].to_a.map do |item|
         post_url = "https://#{item.dig(:blog, :name)}.tumblr.com/post/#{item.dig(:post, :id)}"
 
+        # Hack to forcibly escape raw quotes inside alt text. Necessary because Tumblr incorrectly doesn't escape quote
+        # marks inside alt text in the `content_raw` attribute.
+        content = item[:content_raw].gsub(/alt="(.*?)" srcset=/) { %{alt="#{$1.gsub('"', "&quot;")}" srcset=} }
+
         # https://www.tumblr.com/noizave/171237880542/test-ask
         if item[:is_root_item] && item[:is_current_item] && post[:type] == "answer"
           <<~EOS.chomp
@@ -93,7 +97,7 @@ class Source::Extractor
               #{post[:question]}
             </blockquote>
 
-            #{item[:content_raw]}
+            #{content}
           EOS
         # https://www.tumblr.com/shortgremlinman/707877745599905792/get-asked-idiot
         elsif item[:is_root_item] && !item[:is_current_item] && post[:type] == "answer"
@@ -107,17 +111,17 @@ class Source::Extractor
             <blockquote>
               <p><a href="#{post_url}">#{item.dig(:blog, :name)}</a> answered:</p>
 
-              #{item[:content_raw]}
+              #{content}
             </blockquote>
           EOS
         elsif item[:is_current_item]
-          item[:content_raw]
+          content
         else
           <<~EOS.chomp
             <blockquote>
               <p><a href="#{post_url}">#{item.dig(:blog, :name)}</a>:</p>
 
-              #{item[:content_raw]}
+              #{content}
             </blockquote>
           EOS
         end
