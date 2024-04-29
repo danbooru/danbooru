@@ -293,6 +293,7 @@ module Source
     end
 
     def http_exists?(url)
+      return false if url.blank?
       http_downloader.head(url).status.success?
     end
 
