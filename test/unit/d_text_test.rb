@@ -277,7 +277,6 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("foo\nbar", DText.from_html("foo <br> bar"))
         assert_equal("h1. foo bar", DText.from_html("<h1>foo<br>bar</h1>"))
         assert_equal('"foo bar":[http://google.com]', DText.from_html('<a href="http://google.com">foo<br>bar</a>'))
-        assert_equal("* foo bar", DText.from_html("<ul><li>foo<br>bar</li></ul>"))
         assert_equal('foo" bar baz ":[http://google.com]quux', DText.from_html('foo<a href="http://google.com">  bar  baz  </a>quux'))
       end
 
@@ -307,6 +306,24 @@ class DTextTest < ActiveSupport::TestCase
       should "omit empty headers" do
         assert_equal("", DText.from_html("<h4> </h4>"))
         assert_equal("", DText.from_html("<h4><br></h4>"))
+      end
+
+      should "convert <hr> tags to [hr] tags" do
+        assert_equal("foo\n\n[hr]\n\nbar", DText.from_html("<p>foo</p><hr><p>bar</p>"))
+      end
+
+      should "convert <details> tags to [expand] blocks" do
+        assert_equal("[expand]\nfoo\n\nbar\n[/expand]", DText.from_html("<details><p>foo</p><p>bar</p></details>"))
+        assert_equal("[expand=title]\nfoo\n\nbar\n[/expand]", DText.from_html("<details><p>foo</p><p>bar</p><summary>title</summary></details>"))
+      end
+
+      should "convert <ul> lists to DText" do
+        assert_equal("* foo\n* bar", DText.from_html("<ul><li>foo</li><li>bar</li></ul>"))
+        assert_equal("* foo bar", DText.from_html("<ul><li>foo\nbar</li></ul>"))
+
+        assert_equal("* foo[br]bar", DText.from_html("<ul><li>foo<br>bar</li></ul>"))
+        assert_equal("* foo", DText.from_html("<ul><li>foo<br></li></ul>"))
+        assert_equal("* foo\n* bar", DText.from_html("<ul><li>foo<br></li><li>bar</li></ul>"))
       end
     end
 

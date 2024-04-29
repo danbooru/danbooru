@@ -34,6 +34,8 @@ module Sources
       commentary_desc_dtext = <<~EOS.chomp
         h2. header
 
+        [hr]
+
         plain [b]bold[/b] [i]italics[/i] [s]strike[/s]
 
         * one
