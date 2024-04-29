@@ -605,10 +605,14 @@ class DText
       case element.name
       in "text"
         escape(element.content, allowed_shortlinks:).normalize_whitespace(eol: "\n").gsub(/ *\n+ */, "\n").gsub(/[ \n]+/, " ")
-      in "br" if element.ancestors.any? { |e| e.name.in?(%w[a li h1 h2 h3 h4 h5 h6]) }
+      in "br" if element.ancestors.any? { |e| e.name.in?(%w[a h1 h2 h3 h4 h5 h6]) }
         " "
+      in "br" if element.ancestors.any? { |e| e.name == "li" } && element.next.present?
+        "[br]"
       in "br"
         "\n"
+      in "hr"
+        "\n\n[hr]\n\n"
       in ("p" | "ul" | "ol")
         content = html_to_dtext(element, **options, &block).strip
         "#{content}\n\n"
@@ -676,7 +680,16 @@ class DText
         else
           ""
         end
-      in "comment" | "script"
+      in "details"
+        title = element.at("summary")&.text.to_s.strip.tr("\n", " ").delete("]")
+        content = html_to_dtext(element, **options, &block).strip
+
+        if title.present? && content.present?
+          "[expand=#{title}]\n#{content}\n[/expand]\n\n"
+        elsif content.present?
+          "[expand]\n#{content}\n[/expand]\n\n"
+        end
+      in "comment" | "script" | "summary"
         element.content = nil
       else
         html_to_dtext(element, **options, &block)
