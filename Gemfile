@@ -65,6 +65,7 @@ gem "bcrypt_pbkdf"
 gem "connection_pool"
 gem "rotp"
 gem "rqrcode"
+gem "kramdown"
 
 group :development do
   gem 'rubocop', require: false
