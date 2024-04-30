@@ -139,8 +139,6 @@ class Source::URL::Null < Source::URL
       "Overdoll"
     in _, ("patreon.com" | "patreonusercontent.com")
       "Patreon"
-    in _, "piapro.jp"
-      "Piapro.jp"
     in _, ("paypal.com" | "paypal.me" | "paypalobjects.com")
       "PayPal"
     in _, "pixeljoint.com"
@@ -551,10 +549,6 @@ class Source::URL::Null < Source::URL
 
     # http://photozou.jp/photo/top/941038
     in _, "photozou.jp", *rest
-      nil
-
-    # https://piapro.jp/mmm0
-    in _, "piapro.jp", *rest
       nil
 
     # https://picarto.tv/CheckerBoardAZN
