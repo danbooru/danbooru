@@ -39,13 +39,15 @@ module Source
           [api_ugoira[:originalSrc]]
         # If it's a full image URL, then use it as-is instead of looking it up in the API, because it could be the
         # original version of an image that has since been revised.
-        elsif parsed_url.full_image_url?
-          [parsed_url.to_s]
-        # If it's a sample image URL, then try to find the full image URL in the API if possible.
+        elsif parsed_url.full_image_url.present?
+          [parsed_url.full_image_url]
+        # If it's a sample image URL, then try to get the full image URL without the API in case the post has been deleted.
+        elsif parsed_url.candidate_full_image_urls.present?
+          [parsed_url.candidate_full_image_urls.find { |url| http_exists?(url) } || url.to_s]
+        # If it's a very old sample image URL with a page number but no date, then try to find the full image URL in the API if possible.
         elsif parsed_url.image_url? && parsed_url.page && original_urls.present?
           [original_urls[parsed_url.page]]
-        # Otherwise if it's a sample image and we can't get the full image from the API (presumably because the post
-        # has been deleted), just use the sample version as is.
+        # Otherwise if it's an unknown image URL, then just use the image as is.
         elsif parsed_url.image_url?
           [parsed_url.to_s]
         else

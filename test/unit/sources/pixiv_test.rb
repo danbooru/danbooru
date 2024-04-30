@@ -288,6 +288,56 @@ module Sources
         )
       end
 
+      context "A /c/ic:*:*:*/img-original/ sample image URL" do
+        strategy_should_work(
+          "https://i.pximg.net/c/ic0:900:1280/img-original/img/2024/04/26/13/03/41/118168794_p8.jpg",
+          image_urls: %w[https://i.pximg.net/img-original/img/2024/04/26/13/03/41/118168794_p8.jpg],
+          media_files: [{ file_size: 1_055_784 }],
+          page_url: "https://www.pixiv.net/artworks/118168794",
+          profile_url: "https://www.pixiv.net/users/65299569",
+          profile_urls: %w[https://www.pixiv.net/users/65299569 https://www.pixiv.net/stacc/3md0m2ng],
+          artist_name: "病んだ犬",
+          tag_name: "3md0m2ng",
+          other_names: ["病んだ犬", "3md0m2ng"],
+          tags: [
+            ["ひろがるスカイ!プリキュア", "https://www.pixiv.net/tags/ひろがるスカイ!プリキュア/artworks"],
+            ["百合", "https://www.pixiv.net/tags/百合/artworks"],
+            ["ひろプリ", "https://www.pixiv.net/tags/ひろプリ/artworks"],
+            ["ソラまし", "https://www.pixiv.net/tags/ソラまし/artworks"],
+            ["虹ヶ丘ましろ", "https://www.pixiv.net/tags/虹ヶ丘ましろ/artworks"],
+            ["エル(プリキュア)", "https://www.pixiv.net/tags/エル(プリキュア)/artworks"],
+            ["ソラ・ハレワタール", "https://www.pixiv.net/tags/ソラ・ハレワタール/artworks"],
+            ["夕凪ツバサ", "https://www.pixiv.net/tags/夕凪ツバサ/artworks"],
+            ["聖あげは", "https://www.pixiv.net/tags/聖あげは/artworks"],
+            ["入れ替わり", "https://www.pixiv.net/tags/入れ替わり/artworks"],
+          ],
+          dtext_artist_commentary_title: "ひプまとめ",
+          dtext_artist_commentary_desc: "主にX(旧:Twitter)に載せた絵の寄せ集めです。"
+        )
+      end
+
+      context "A /c/{width}x{height}/custom-thumb/ sample image url" do
+        strategy_should_work(
+          "https://i.pximg.net/c/360x360_70/custom-thumb/img/2022/03/08/00/00/56/96755248_p0_custom1200.jpg",
+          image_urls: %w[https://i.pximg.net/img-original/img/2022/03/08/00/00/56/96755248_p0.jpg],
+          media_files: [{ file_size: 267_022 }],
+          page_url: "https://www.pixiv.net/artworks/96755248",
+          profile_url: "https://www.pixiv.net/users/2188232",
+          profile_urls: %w[https://www.pixiv.net/users/2188232 https://www.pixiv.net/stacc/wlop],
+          artist_name: "wlop",
+          tag_name: "wlop",
+          other_names: ["wlop"],
+          tags: [
+            ["ghostblade", "https://www.pixiv.net/tags/ghostblade/artworks"],
+            ["wlop", "https://www.pixiv.net/tags/wlop/artworks"],
+            ["海琴烟", "https://www.pixiv.net/tags/海琴烟/artworks"],
+            ["オリジナル10000users入り", "https://www.pixiv.net/tags/オリジナル10000users入り/artworks"],
+          ],
+          dtext_artist_commentary_title: "Destination",
+          dtext_artist_commentary_desc: ""
+        )
+      end
+
       context "A profile image URL" do
         strategy_should_work(
           "https://i.pximg.net/user-profile/img/2014/12/18/10/31/23/8733472_7dc7310db6cc37163af145d04499e411_170.jpg",
