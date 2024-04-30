@@ -592,6 +592,10 @@ module Danbooru
     def behance_session_cookie
     end
 
+    # Your Piapro.jp "piapro_s" cookie. Login to Piapro then use the devtools to find the "piapro_s" cookie.
+    def piapro_session_cookie
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
