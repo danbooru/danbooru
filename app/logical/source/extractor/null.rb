@@ -68,15 +68,18 @@ module Source
 
       memoize def sub_extractor
         if tumblr_url.present?
-          Source::Extractor.find(tumblr_url, parent_extractor: self)
+          Source::URL::Tumblr.new(tumblr_url).extractor(parent_extractor: self)
         elsif twitter_site == "@AdobePortfolio"
-          portfolio_url = Source::URL::MyPortfolio.new(url)
-          Source::Extractor::MyPortfolio.new(portfolio_url, parent_extractor: self)
+          Source::URL::MyPortfolio.new(url).extractor(parent_extractor: self)
+        elsif twitter_site == "@note_PR"
+          Source::URL::Note.new(url).extractor(parent_extractor: self)
         end
       end
 
       memoize def twitter_site
-        page&.at('meta[name="twitter:site"]')&.attr("content")
+        # <meta name="twitter:site" content="@AdobePortfolio" />
+        # <meta data-n-head="ssr" data-hid="twitter:site" property="twitter:site" content="@note_PR">
+        page&.at('meta[name="twitter:site"], meta[property="twitter:site"]')&.attr("content")
       end
 
       concerning :TumblrMethods do

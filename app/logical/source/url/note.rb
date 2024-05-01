@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+# Note.com is a Japanese blog site that supports both on-site blogs like https://note.com/koma_labo and custom domains
+# like https://sanriotimes.sanrio.co.jp.
+#
+# For custom domains we detect that the site is using Note in Source::Extractor::Null and instantiate
+# Source::URL::Note directly. In this case we bypass the `match?` method, so we have to be careful to handle
+# custom domains in `parse`, `page_url`, and `profile_url`.
+#
+# @see https://note.com/topic/noteprolist (list of custom domains)
 # @see Source::Extractor::Note
 class Source::URL::Note < Source::URL
   RESERVED_USERNAMES = %w[hashtag intent login magazine signup terms topic users]
@@ -31,7 +39,7 @@ class Source::URL::Note < Source::URL
 
     # https://note.com/koma_labo/n/n32fb90fac512
     # https://note.mu/koma_labo/n/n32fb90fac512
-    in _, ("note.com" | "note.mu"), username, "n", post_id
+    in _, ("note.com" | "note.mu"), username, "n", /^n\h{12}$/ => post_id
       @username = username
       @post_id = post_id
 
@@ -41,21 +49,29 @@ class Source::URL::Note < Source::URL
     in _, ("note.com" | "note.mu"), username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username
 
-    # https://d291vdycu0ht11.cloudfront.net/nuxt/production/img/ebc825f.png
     # https://biz.note.com/n/n45e0b603c87e
     # https://note.finetoday.com/n/n419c467ac34e
     # https://spodge.sports-f.co.jp/n/n7413cfd77176
     # https://ur-toshikikou-gov.note.jp/n/nc13367bbd73c
+    in _, _, "n", /^n\h{12}$/ => post_id
+      @post_id = post_id
+
+    # https://d291vdycu0ht11.cloudfront.net/nuxt/production/img/ebc825f.png
     else
       nil
     end
   end
 
   def page_url
-    "https://note.com/#{username}/n/#{post_id}" if username.present? && post_id.present?
+    "#{profile_url}/n/#{post_id}" if profile_url.present? && post_id.present?
   end
 
   def profile_url
-    "https://note.com/#{username}" if username.present?
+    if username.present?
+      "https://note.com/#{username}"
+    # https://note.finetoday.com/n/n419c467ac34e -> https://note.finetoday.com
+    elsif post_id.present?
+      "https://#{host}"
+    end
   end
 end
