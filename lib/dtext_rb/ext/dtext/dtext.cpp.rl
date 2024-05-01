@@ -292,7 +292,7 @@ open_u = '[u]'i | '<u>'i;
 
 close_spoilers = ('[/spoiler'i 's'i? ']') | ('</spoiler'i 's'i? '>');
 close_nodtext = '[/nodtext]'i | '</nodtext>'i;
-close_quote = '[/quote'i (']' when in_quote) | '</quote'i ('>' when in_quote) | '</blockquote'i (']' when in_quote);
+close_quote = '[/quote'i (']' when in_quote) | '</quote'i ('>' when in_quote) | '</blockquote'i ('>' when in_quote);
 close_expand = '[/expand'i (']' when in_expand) | '</expand'i ('>' when in_expand);
 close_code = '[/code]'i | '</code>'i;
 close_table = '[/table]'i | '</table>'i;
