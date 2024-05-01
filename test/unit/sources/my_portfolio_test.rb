@@ -267,7 +267,7 @@ module Sources
         )
       end
 
-      context "A MyPortfile gallery page with a custom domain" do
+      context "A MyPortfolio gallery page with a custom domain" do
         strategy_should_work(
           "https://artgerm.com/dc-comics-b",
           image_urls: %w[
@@ -334,10 +334,46 @@ module Sources
         )
       end
 
+      context "A MyPortfolio post page with a custom domain" do
+        strategy_should_work(
+          "https://tooco.com.ar/6-of-diamonds-paradise-bird",
+          image_urls: %w[
+            https://pro2-bar-s3-cdn-cf3.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/4e578de7400d3ffa7566376b.jpg?h=d4175c45d88c67e51c1cbfce49decc3b
+            https://pro2-bar-s3-cdn-cf6.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/af57cb30368b3d3b3576fe81.jpg?h=d656289b0092beab1297ad678ef12647
+            https://pro2-bar-s3-cdn-cf3.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/42e3fff0107e417fde1053a5.jpg?h=a1ea27ce8ed8ca8c19d6fc9a8f761815
+          ],
+          media_files: [
+            { file_size: 1_073_457 },
+            { file_size: 720_852 },
+            { file_size: 703_521 },
+          ],
+          page_url: "https://tooco.com.ar/6-of-diamonds-paradise-bird",
+          profile_url: "https://tooco.com.ar",
+          profile_urls: %w[https://tooco.com.ar],
+          artist_name: "TOOCO",
+          tag_name: nil,
+          other_names: ["TOOCO"],
+          tags: [],
+          dtext_artist_commentary_title: "Visual Art, Illustration & Design - 6 of Diamonds Paradise Bird",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            Illustration and card design for Playing Arts Cards, Edition 3.
+
+            "[image]":[https://pro2-bar-s3-cdn-cf3.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/4e578de7400d3ffa7566376b_rw_1920.jpg?h=70c316859053e0140e6102f60ecfb13c]
+
+            "[image]":[https://pro2-bar-s3-cdn-cf6.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/af57cb30368b3d3b3576fe81_rw_1920.jpg?h=7a34fa585a387d6fe534680114fd77f4]
+
+            "[image]":[https://pro2-bar-s3-cdn-cf3.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/42e3fff0107e417fde1053a5_rw_1920.jpg?h=599fb064e15bd811b81745569dc5c7e3]
+
+            ◊ - ◊ - ◊
+          EOS
+        )
+      end
+
       should "parse URLs correctly" do
         assert(Source::URL.image_url?("https://cdn.myportfolio.com/86bfb012-1d8f-427f-bbbb-287c3b8c0057/2a0c99c7-d94d-4812-87b4-1690d7a13983_car_202x158.png?h=e698f363e29b0f60d61181c64016a99a"))
         assert(Source::URL.image_url?("https://cdn.myportfolio.com/86bfb012-1d8f-427f-bbbb-287c3b8c0057/bb0394ab-0ffd-414b-9748-2a8a751c645a_rw_1200.png?h=fdde829a19fbd8534d6f85d3914f419c"))
         assert(Source::URL.image_url?("https://pro2-bar-s3-cdn-cf6.myportfolio.com/59753a162c5d8748646b051378da184f/77f237b4-25e9-46ed-b8ef-2b3709c92491.jpg?h=021034439a138a0920b78342343cb37e"))
+        assert(Source::URL.image_url?("https://pro2-bar-s3-cdn-cf6.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/af57cb30368b3d3b3576fe81.jpg?h=d656289b0092beab1297ad678ef12647"))
 
         assert(Source::URL.page_url?("https://sekigahara023.myportfolio.com/eaapexlegends5"))
 

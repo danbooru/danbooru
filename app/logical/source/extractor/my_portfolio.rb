@@ -6,11 +6,8 @@ class Source::Extractor::MyPortfolio < Source::Extractor
     if parsed_url.image_url?
       [parsed_url.to_s]
     else
-      # Grab the data-src attribute from all <div> and <img> tags. This may grab multiple versions of the same image. In
-      # that case we pick the first URL for each image (which is assumed to be the largest version of the image).
-      page&.css("#project-modules [data-src]").to_a.pluck("data-src").uniq do |url|
-        Source::URL.parse(url)&.image_uuid
-      end
+      page&.css("#project-modules div[data-src]").to_a.pluck("data-src").presence ||
+        page&.css("#project-modules img[data-src]").to_a.pluck("data-src")
     end
   end
 
@@ -23,6 +20,7 @@ class Source::Extractor::MyPortfolio < Source::Extractor
   end
 
   def artist_name
+    # <title>TOOCO - Visual Art, Illustration &amp; Design - 6 of Diamonds Paradise Bird</title>
     page&.at("title")&.text&.split(" - ")&.first&.normalize_whitespace
   end
 
@@ -35,7 +33,7 @@ class Source::Extractor::MyPortfolio < Source::Extractor
   end
 
   def artist_commentary_title
-    page&.at("title")&.text&.split(" - ")&.second&.normalize_whitespace
+    page&.at("title")&.text&.split(" - ")&.slice(1..)&.join(" - ")&.normalize_whitespace
   end
 
   def artist_commentary_desc
