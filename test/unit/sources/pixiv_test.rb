@@ -27,7 +27,7 @@ module Sources
           artist_name: "Nardack",
           tag_name: "nardack",
           tags: %w[神崎蘭子 双葉杏 アイドルマスターシンデレラガールズ Star!! アイマス10000users入り],
-          artist_commentary_title: "ツイログ",
+          dtext_artist_commentary_title: "ツイログ",
           dtext_artist_commentary_desc: "",
         )
       end
@@ -44,7 +44,7 @@ module Sources
           artist_name: "uroobnad2",
           tag_name: "user_myeg3558",
           tags: %w[Ugoira png blue],
-          artist_commentary_title: "ugoira",
+          dtext_artist_commentary_title: "ugoira",
           dtext_artist_commentary_desc: "",
         )
       end
@@ -61,7 +61,7 @@ module Sources
           artist_name: "uroobnad2",
           tag_name: "user_myeg3558",
           tags: %w[Ugoira png blue],
-          artist_commentary_title: "ugoira",
+          dtext_artist_commentary_title: "ugoira",
           dtext_artist_commentary_desc: "",
         )
       end
@@ -75,7 +75,7 @@ module Sources
           artist_name: "イチリ",
           tag_name: "itiri",
           tags: %w[Fate/GrandOrder フランケンシュタイン(Fate) 水着 バーサーかわいい 新宿のアーチャー パパ製造機 Fate/GO5000users入り フランケンシュタイン(水着) セイバー(Fate)],
-          artist_commentary_title: "水着フランたそ",
+          dtext_artist_commentary_title: "水着フランたそ",
           dtext_artist_commentary_desc: "ますたーもひかげですずむ？",
         )
       end
@@ -89,8 +89,8 @@ module Sources
           artist_name: nil,
           tag_name: nil,
           tags: [],
-          artist_commentary_title: nil,
-          dtext_artist_commentary_desc: nil,
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: "",
           deleted: true,
         )
       end
@@ -100,7 +100,7 @@ module Sources
           "https://i.pximg.net/img-original/img/2022/08/14/19/23/06/100474393_p0.png",
           deleted: true,
           image_urls: ["https://i.pximg.net/img-original/img/2022/08/14/19/23/06/100474393_p0.png"],
-          artist_commentary_title: "シャイリリー",
+          dtext_artist_commentary_title: "シャイリリー",
           artist_name: "影おじ (隠れエリア)",
           profile_url: "https://www.pixiv.net/users/6570768",
           profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
@@ -116,7 +116,7 @@ module Sources
             https://i.pximg.net/img-original/img/2022/08/14/21/21/24/100474393_p1.png
             https://i.pximg.net/img-original/img/2022/08/14/21/21/24/100474393_p2.png
           ],
-          artist_commentary_title: "シャイリリー",
+          dtext_artist_commentary_title: "シャイリリー",
           artist_name: "影おじ (隠れエリア)",
           profile_url: "https://www.pixiv.net/users/6570768",
           profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
@@ -128,7 +128,7 @@ module Sources
         strategy_should_work(
           "https://www.pixiv.net/en/artworks/103291492",
           image_urls: ["https://i.pximg.net/img-original/img/2022/12/03/05/06/51/103291492_p0.png"],
-          artist_commentary_title: "Rem's present",
+          dtext_artist_commentary_title: "Rem's present",
           artist_name: "Anzatiridonia",
           profile_url: "https://www.pixiv.net/users/33589885",
           tags: %w[AI Re:ゼロから始める異世界生活 レム リゼロ レム(リゼロ) AIイラスト AnythingV3 Present sweater],
@@ -253,7 +253,7 @@ module Sources
           artist_name: "uroobnad2",
           tag_name: "user_myeg3558",
           tags: %w[blue png],
-          artist_commentary_title: "single image",
+          dtext_artist_commentary_title: "single image",
           dtext_artist_commentary_desc: "description here",
         )
       end
@@ -268,7 +268,7 @@ module Sources
           artist_name: "uroobnad2",
           tag_name: "user_myeg3558",
           tags: %w[blue png],
-          artist_commentary_title: "single image",
+          dtext_artist_commentary_title: "single image",
           dtext_artist_commentary_desc: "description here",
         )
       end
@@ -283,7 +283,7 @@ module Sources
           artist_name: "uroobnad2",
           tag_name: "user_myeg3558",
           tags: %w[blue png],
-          artist_commentary_title: "single image",
+          dtext_artist_commentary_title: "single image",
           dtext_artist_commentary_desc: "description here",
         )
       end
@@ -348,8 +348,8 @@ module Sources
           artist_name: nil,
           tag_name: nil,
           tags: [],
-          artist_commentary_title: nil,
-          dtext_artist_commentary_desc: nil,
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: "",
         )
       end
 
@@ -363,23 +363,176 @@ module Sources
           artist_name: nil,
           tag_name: nil,
           tags: [],
-          artist_commentary_title: nil,
-          dtext_artist_commentary_desc: nil,
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: "",
         )
       end
 
-      context "A novel image URL" do
+      context "A novel cover image sample URL" do
+        strategy_should_work(
+          "https://i.pximg.net/c/600x600/novel-cover-master/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b_master1200.jpg",
+          image_urls: %w[https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg],
+          media_files: [{ file_size: 532_037 }],
+          page_url: "https://www.pixiv.net/novel/show.php?id=8465454"
+        )
+      end
+
+      context "A novel cover image full size URL" do
         strategy_should_work(
           "https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg",
           image_urls: ["https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg"],
           media_files: [{ file_size: 532_037 }],
+          page_url: "https://www.pixiv.net/novel/show.php?id=8465454",
+          profile_url: "https://www.pixiv.net/users/2255721",
+          profile_urls: %w[https://www.pixiv.net/users/2255721],
+          artist_name: "緋錬",
+          tag_name: nil,
+          other_names: ["緋錬"],
+          tags: [
+            ["ガールズ&パンツァー", "https://www.pixiv.net/tags/ガールズ%26パンツァー/novels"],
+            ["ガルパン", "https://www.pixiv.net/tags/ガルパン/novels"],
+            ["西住みほ", "https://www.pixiv.net/tags/西住みほ/novels"],
+            ["逸見エリカ", "https://www.pixiv.net/tags/逸見エリカ/novels"],
+            ["エリみほ", "https://www.pixiv.net/tags/エリみほ/novels"],
+            ["みほエリ", "https://www.pixiv.net/tags/みほエリ/novels"],
+            ["百合", "https://www.pixiv.net/tags/百合/novels"],
+            ["ガルパン小説100users入り", "https://www.pixiv.net/tags/ガルパン小説100users入り/novels"],
+          ],
+          dtext_artist_commentary_title: "さよならのその先へ 後編",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            前回[b]"novel/8414084":[https://www.pixiv.net/novel/show.php?id=8414084][/b]の続きです。
+
+            エリカさんとみほさんの半同棲もこれでお終い……でしょうか。
+
+            最初の投稿から一年と幾月……全９話（書き下ろしを含めれば１０話）長々とお付き合いくださりましてありがとうございました。
+
+            前編にも書いてありますが、こちらのお話を含んだ本を夏コミ（Ｃ９２）で頒布致します。
+
+            収録するお話は
+            幸せの形（[b]"novel/7132764":[https://www.pixiv.net/novel/show.php?id=7132764][/b]）
+            あなたは私だけのもの（[b]"novel/7382096":[https://www.pixiv.net/novel/show.php?id=7382096][/b]）
+            永遠に咲く桜（[b]"novel/8383409":[https://www.pixiv.net/novel/show.php?id=8383409][/b]）
+            さよならのその先へ 前編（[b]"novel/8414084":[https://www.pixiv.net/novel/show.php?id=8414084][/b]）
+            さよならのその先へ 後編（この作品）
+            二人の証明（書き下ろし。二人が新しい生活に向けて家具などを見に行くお話）
+            です。
+
+            表紙挿絵はうーろんさん（[b]"user/1778852":[https://www.pixiv.net/users/1778852] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fusers%2F1778852][/b]）、章末挿絵は栗林さんに描いて頂きました。
+            とても素敵な表紙と挿絵なのでそれだけでも楽しみにして頂けたらと思います。
+            フルカラーカバー付き ２２６Ｐ 予価１０００円です。
+            当日は８月１２日土曜日 東Ｂ－０９ｂ にてお待ちしております。
+
+            メロンブックスさんで委託もして頂いているのでよろしければー！
+            <https://www.melonbooks.co.jp/detail/detail.php?product_id=229407>
+
+            一冊目の既刊も是非に……！
+            <https://www.melonbooks.co.jp/detail/detail.php?product_id=203181>
+          EOS
+        )
+      end
+
+      context "A novel embedded image sample URL" do
+        strategy_should_work(
+          "https://i.pximg.net/c/1200x1200/novel-cover-master/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5_master1200.jpg",
+          image_urls: %w[https://i.pximg.net/novel-cover-original/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5.jpg],
+          media_files: [{ file_size: 1_038_927 }],
           page_url: nil,
           profile_url: nil,
+          profile_urls: %w[],
           artist_name: nil,
           tag_name: nil,
+          other_names: [],
           tags: [],
-          artist_commentary_title: nil,
-          dtext_artist_commentary_desc: nil,
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: ""
+        )
+      end
+
+      context "A novel page URL" do
+        strategy_should_work(
+          "https://www.pixiv.net/novel/show.php?id=18588597",
+          image_urls: %w[
+            https://i.pximg.net/novel-cover-original/img/2022/10/23/21/11/17/ci18588597_c36ebfb6da3a9eba3ad559feebbaf7e5.jpg
+            https://i.pximg.net/novel-cover-original/img/2022/11/02/09/50/08/tei56527215193_81725fe943e2f36608cf01a839b6b762.jpg
+            https://i.pximg.net/novel-cover-original/img/2022/11/02/09/55/24/tei829762318070_03560cf6e9838a9ee411e17d45cc672f.jpg
+            https://i.pximg.net/novel-cover-original/img/2022/11/02/09/55/42/tei852368151856_f581b161200fb1bb57215785763eb86e.jpg
+            https://i.pximg.net/novel-cover-original/img/2022/11/02/10/03/30/tei85585543976_edde8b66ed7ccd5e22d46166ac066931.jpg
+          ],
+          media_files: [
+            { file_size: 953_730 },
+            { file_size: 1_020_523 },
+            { file_size: 901_436 },
+            { file_size: 1_612_851 },
+            { file_size: 1_219_383 },
+          ],
+          page_url: "https://www.pixiv.net/novel/show.php?id=18588597",
+          profile_url: "https://www.pixiv.net/users/66091066",
+          profile_urls: %w[https://www.pixiv.net/users/66091066],
+          artist_name: "しゅか",
+          tag_name: nil,
+          other_names: ["しゅか"],
+          tags: [
+            ["オリキャラ", "https://www.pixiv.net/tags/オリキャラ/novels"],
+            ["ファンタジー", "https://www.pixiv.net/tags/ファンタジー/novels"],
+            ["pixivファンタジアSOZ", "https://www.pixiv.net/tags/pixivファンタジアSOZ/novels"],
+            ["【SOZアロイスとユーゴ】", "https://www.pixiv.net/tags/【SOZアロイスとユーゴ】/novels"],
+            ["アラディア院", "https://www.pixiv.net/tags/アラディア院/novels"],
+          ],
+          dtext_artist_commentary_title: "【PFSOZ】身バレ【アラディア院】",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            リーリンの息子であることは隠していましたが、一部の人間に身バレしました。
+            絵投稿版[b]pixiv #102168503 "»":[/posts?tags=pixiv%3A102168503][/b]
+            ----------------------------
+            PFSOZの自キャラのSS、読みやすいように小説投稿もしてあります。
+            詳しくはプロローグとキャラシをどうぞ
+            アロイス[b]pixiv #101966594 "»":[/posts?tags=pixiv%3A101966594][/b]
+            幼少期ユーゴ[b]pixiv #101966826 "»":[/posts?tags=pixiv%3A101966826][/b]
+            成人後ユーゴ[b]pixiv #101966594 "»":[/posts?tags=pixiv%3A101966594][/b]
+            プロローグ１[b]pixiv #101966734 "»":[/posts?tags=pixiv%3A101966734][/b] プロローグ０[b]pixiv #101966965 "»":[/posts?tags=pixiv%3A101966965][/b]
+          EOS
+        )
+      end
+
+      context "A novel series URL" do
+        strategy_should_work(
+          "https://www.pixiv.net/novel/series/9593812",
+          image_urls: %w[https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg],
+          media_files: [{ file_size: 1_770_646 }],
+          page_url: "https://www.pixiv.net/novel/series/9593812",
+          profile_url: "https://www.pixiv.net/users/66091066",
+          profile_urls: %w[https://www.pixiv.net/users/66091066],
+          artist_name: "しゅか",
+          tag_name: nil,
+          other_names: ["しゅか"],
+          tags: [
+            ["pixivファンタジアSOZ", "https://www.pixiv.net/tags/pixivファンタジアSOZ/novels"],
+            ["オリキャラ", "https://www.pixiv.net/tags/オリキャラ/novels"],
+            ["ファンタジー", "https://www.pixiv.net/tags/ファンタジー/novels"],
+            ["アラディア院", "https://www.pixiv.net/tags/アラディア院/novels"],
+            ["エイリル教団", "https://www.pixiv.net/tags/エイリル教団/novels"],
+            ["イスリアド家", "https://www.pixiv.net/tags/イスリアド家/novels"],
+            ["【SOZアロイスとユーゴ】", "https://www.pixiv.net/tags/【SOZアロイスとユーゴ】/novels"],
+            ["創作", "https://www.pixiv.net/tags/創作/novels"],
+          ],
+          dtext_artist_commentary_title: "ユーゴとアロイス",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            PFSOZの自キャラのSS。傾向はブロマンス。友情と家族愛。魔術師リーリンの息子であるユーゴは正体を隠した父親に育てられるが、彼との関係に行き詰まり、外の世界を知ろうとアラディア院の門をたたくのだった。
+            詳しくはプロローグとキャラシをどうぞ
+            アロイスhttps://www.pixiv.net/artworks/101966594
+            幼少期ユーゴhttps://www.pixiv.net/artworks/101966826
+            成人後ユーゴhttps://www.pixiv.net/artworks/101966594
+            プロローグ１https://www.pixiv.net/artworks/101966734 プロローグ０https://www.pixiv.net/artworks/101966965
+          EOS
+        )
+      end
+
+      context "A novel series cover image sample URL" do
+        strategy_should_work(
+          "https://i.pximg.net/c/480x960/novel-cover-master/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc_master1200.jpg",
+          image_urls: %w[https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg],
+          media_files: [{ file_size: 1_770_646 }],
+          page_url: "https://www.pixiv.net/novel/series/9593812",
+          profile_url: "https://www.pixiv.net/users/66091066"
         )
       end
 
@@ -451,6 +604,9 @@ module Sources
       assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054"))
       assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054"))
       assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1"))
+      assert(Source::URL.page_url?("https://www.pixiv.net/novel/series/9593812"))
+      assert(Source::URL.page_url?("https://www.pixiv.net/novel/show.php?id=18588585"))
+      assert(Source::URL.page_url?("https://embed.pixiv.net/novel.php?id=18588585&mdate=20221102100423"))
 
       assert(Source::URL.profile_url?("https://www.pixiv.net/member.php?id=339253"))
       assert(Source::URL.profile_url?("https://www.pixiv.net/u/9202877"))
@@ -459,6 +615,18 @@ module Sources
       assert(Source::URL.profile_url?("https://www.pixiv.net/stacc/noizave"))
       assert(Source::URL.profile_url?("http://www.pixiv.me/noizave"))
       assert(Source::URL.profile_url?("https://pixiv.cc/zerousagi/"))
+
+      assert_equal("https://www.pixiv.net/novel/series/9593812", Source::URL.page_url("https://i.pximg.net/c/480x960/novel-cover-master/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc_master1200.jpg"))
+      assert_equal("https://www.pixiv.net/novel/series/9593812", Source::URL.page_url("https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg"))
+
+      assert_equal("https://www.pixiv.net/novel/show.php?id=18588585", Source::URL.page_url("https://embed.pixiv.net/novel.php?id=18588585&mdate=20221102100423"))
+      assert_equal("https://www.pixiv.net/novel/show.php?id=18588585", Source::URL.page_url("https://i.pximg.net/c/600x600/novel-cover-master/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4_master1200.jpg"))
+      assert_equal("https://www.pixiv.net/novel/show.php?id=18588585", Source::URL.page_url("https://i.pximg.net/novel-cover-original/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4.jpg"))
+      assert_equal("https://www.pixiv.net/novel/show.php?id=9434677",  Source::URL.page_url("https://i.pximg.net/novel-cover-original/img/2018/04/02/19/38/29/9434677_6ab6c651d5568ff39e2ba6ab45edaf28.jpg"))
+      assert_equal("https://www.pixiv.net/novel/show.php?id=7463785",  Source::URL.page_url("http://i1.pixiv.net/novel-cover-original/img/2016/11/11/20/11/46/7463785_0e2446dc1671dd3a4937dfaee39c227f.jpg"))
+
+      assert_nil(Source::URL.page_url("https://i.pximg.net/c/1200x1200/novel-cover-master/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5_master1200.jpg"))
+      assert_nil(Source::URL.page_url("https://i.pximg.net/novel-cover-original/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5.jpg"))
     end
   end
 end
