@@ -90,6 +90,7 @@ module Source
       Source::URL::Behance,
       Source::URL::Cohost,
       Source::URL::Piapro,
+      Source::URL::MyPortfolio,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.

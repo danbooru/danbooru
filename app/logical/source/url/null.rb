@@ -9,10 +9,6 @@ class Source::URL::Null < Source::URL
 
   def site_name
     case [subdomain, domain]
-    in _, "myportfolio.com"
-      "Adobe Portfolio"
-    in _, "adobe.com" if host == "portfolio.adobe.com"
-      "Adobe Portfolio"
     in _, "allmylinks.com"
       "AllMyLinks"
     in _, "animenewsnetwork.com"
