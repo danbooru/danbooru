@@ -164,6 +164,7 @@ module IconHelper
     Pixai
     Pixel\ Joint
     Pixiv
+    Pixiv\ Comic
     Pixiv\ Sketch
     Plurk
     Poipiku
