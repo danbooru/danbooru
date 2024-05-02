@@ -67,7 +67,7 @@ module Source
 
       @parsed_url = Source::URL.parse(url)
       @parsed_referer = Source::URL.parse(referer_url) if referer_url.present?
-      @parsed_referer = nil if parsed_url&.site_name != parsed_referer&.site_name
+      @parsed_referer = nil unless parsed_url&.site_name == parsed_referer&.site_name && parsed_url&.image_url?
     end
 
     # The list of input URLs. Includes both the primary URL and the secondary referer URL, if it exists.
