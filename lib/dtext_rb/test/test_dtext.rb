@@ -516,6 +516,7 @@ class DTextTest < Minitest::Test
   def test_quote_blocks
     assert_parse('<blockquote><p>test</p></blockquote>', "[quote]\ntest\n[/quote]")
     assert_parse('<blockquote><p>test</p></blockquote>', "<quote>\ntest\n</quote>")
+    assert_parse('<blockquote><p>test</p></blockquote>', "<blockquote>\ntest\n</blockquote>")
 
     assert_parse('<blockquote><p>test</p></blockquote>', "[quote]\ntest\n[/quote] ")
     assert_parse('<blockquote><p>test</p></blockquote><p>blah</p>', "[quote]\ntest\n[/quote] blah")
