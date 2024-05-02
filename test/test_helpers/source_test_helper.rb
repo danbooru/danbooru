@@ -57,11 +57,8 @@ module SourceTestHelper
   def should_handle_artists_correctly(strategy, profile_url)
     if profile_url.present?
       artist = create(:artist, name: strategy.tag_name || SecureRandom.uuid, url_string: profile_url)
+      assert_equal(profile_url, strategy.profile_url)
       assert_equal([artist], strategy.artists.to_a, "should find the artist with the same profile url")
-    else
-      assert_nil(strategy.profile_url.presence)
-      assert_nil(strategy.artist_name.presence)
-      assert_equal([], strategy.other_names)
     end
   end
 

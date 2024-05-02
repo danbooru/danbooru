@@ -162,6 +162,7 @@ module IconHelper
     Pinterest
     Pixel\ Joint
     Pixiv
+    Pixiv\ Comic
     Pixiv\ Sketch
     Plurk
     Poipiku
