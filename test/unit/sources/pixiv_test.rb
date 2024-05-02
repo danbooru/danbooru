@@ -526,6 +526,40 @@ module Sources
         )
       end
 
+      context "A novel series URL with a novel page referer" do
+        strategy_should_work(
+          "https://www.pixiv.net/novel/series/9593812",
+          referer: "https://www.pixiv.net/novel/show.php?id=18588585",
+          image_urls: %w[https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg],
+          media_files: [{ file_size: 1_770_646 }],
+          page_url: "https://www.pixiv.net/novel/series/9593812",
+          profile_url: "https://www.pixiv.net/users/66091066",
+          profile_urls: %w[https://www.pixiv.net/users/66091066],
+          artist_name: "しゅか",
+          tag_name: nil,
+          other_names: ["しゅか"],
+          tags: [
+            ["pixivファンタジアSOZ", "https://www.pixiv.net/tags/pixivファンタジアSOZ/novels"],
+            ["オリキャラ", "https://www.pixiv.net/tags/オリキャラ/novels"],
+            ["ファンタジー", "https://www.pixiv.net/tags/ファンタジー/novels"],
+            ["アラディア院", "https://www.pixiv.net/tags/アラディア院/novels"],
+            ["エイリル教団", "https://www.pixiv.net/tags/エイリル教団/novels"],
+            ["イスリアド家", "https://www.pixiv.net/tags/イスリアド家/novels"],
+            ["【SOZアロイスとユーゴ】", "https://www.pixiv.net/tags/【SOZアロイスとユーゴ】/novels"],
+            ["創作", "https://www.pixiv.net/tags/創作/novels"],
+          ],
+          dtext_artist_commentary_title: "ユーゴとアロイス",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            PFSOZの自キャラのSS。傾向はブロマンス。友情と家族愛。魔術師リーリンの息子であるユーゴは正体を隠した父親に育てられるが、彼との関係に行き詰まり、外の世界を知ろうとアラディア院の門をたたくのだった。
+            詳しくはプロローグとキャラシをどうぞ
+            アロイスhttps://www.pixiv.net/artworks/101966594
+            幼少期ユーゴhttps://www.pixiv.net/artworks/101966826
+            成人後ユーゴhttps://www.pixiv.net/artworks/101966594
+            プロローグ１https://www.pixiv.net/artworks/101966734 プロローグ０https://www.pixiv.net/artworks/101966965
+          EOS
+        )
+      end
+
       context "A novel series cover image sample URL" do
         strategy_should_work(
           "https://i.pximg.net/c/480x960/novel-cover-master/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc_master1200.jpg",
