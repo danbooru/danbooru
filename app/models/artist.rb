@@ -36,8 +36,8 @@ class Artist < ApplicationRecord
     extend ActiveSupport::Concern
 
     def sorted_urls
-      urls.sort_by do |url|
-        [url.is_active? ? 0 : 1, url.priority, url.domain, url.secondary_url? ? 1 : 0, url.url]
+      Danbooru.natural_sort_by(urls, &:url).sort_by.with_index do |url, i|
+        [url.is_active? ? 0 : 1, url.priority, url.domain, url.secondary_url? ? 1 : 0, i]
       end
     end
 
