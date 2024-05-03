@@ -96,7 +96,7 @@ module Sources
           * two
           * three
 
-          "Heart":[https://e.deviantart.net/emoticons/h/heart.gif]
+          ":Heart:":[https://e.deviantart.net/emoticons/h/heart.gif]
         EOS
       )
     end
@@ -420,6 +420,54 @@ module Sources
           ________________________________________________________
 
           [b]CM info | "fav.me/dbaalkv":[http://fav.me/dbaalkv][/b]
+        EOS
+      )
+    end
+
+    context "A DeviantPost with a commentary created using the WYSIWYG text editor" do
+      strategy_should_work(
+        "https://www.deviantart.com/noizave/art/1-Image-No-Contribution-1048220942",
+        image_urls: %w[https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dhc30ge-d2c07e30-3914-479d-8098-72ad01dc1209.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzgzZDNlYjRkLTEzZTUtNGFlYS1hMDhmLThkNDMzMWQwMzNjNFwvZGhjMzBnZS1kMmMwN2UzMC0zOTE0LTQ3OWQtODA5OC03MmFkMDFkYzEyMDkuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.zmr9cWpT_6WNXHCYvhbTDn9j1TXiSFWRWJEHV_MRi_c&filename=_1_image_no_contribution_by_noizave_dhc30ge.jpg],
+        media_files: [{ file_size: 213_868 }],
+        page_url: "https://www.deviantart.com/noizave/art/1-Image-No-Contribution-1048220942",
+        profile_url: "https://www.deviantart.com/noizave",
+        profile_urls: %w[https://www.deviantart.com/noizave],
+        artist_name: "noizave",
+        tag_name: "noizave",
+        other_names: ["noizave"],
+        tags: [],
+        dtext_artist_commentary_title: "-1 Image No Contribution",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          h2. title
+
+          test 😀 [b]bold[/b] [i]italic[/i] [u]underline[/u] [b]abc[/b][b][i]def[/i][/b][b]gh[/b][b][i][u]ijk[/u][/i][/b][b]lmn[/b] "asdf":[http://google.com] asf
+
+          [quote]
+          quote
+          [/quote]
+
+          * list one
+
+          * list two
+
+          centered
+
+          right
+
+          justified
+
+          ":hemolami:":[https://www.deviantart.com/hemolami] asdf
+
+          <https://www.youtube.com/embed/dQw4w9WgXcQ>
+
+          <https://www.deviantart.com/noizave/art/test-no-download-697415967>
+
+          * "[image]":[http://google.com]
+          * "[image]":[https://www.deviantart.com/noizave/art/Untitled-2-691140743]
+          * "[image]":[https://www.deviantart.com/noizave/art/hidden-work-685458369]
+          * "[image]":[https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408]
+
+          "[image]":[https://media3.giphy.com/media/DDr3u60PjEFlWlitei/giphy.gif]
         EOS
       )
     end
