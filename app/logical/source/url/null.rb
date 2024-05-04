@@ -503,10 +503,6 @@ class Source::URL::Null < Source::URL
     in _, "nanos.jp", *rest
       nil
 
-    # https://blog.naver.com/yanusunya
-    in _, "naver.com", *rest
-      nil
-
     # http://jpg.nijigen-daiaru.com/7364/013.jpg
     in "jpg", "nijigen-daiaru.com", /^\d+$/ => work_id, file
       @work_id = work_id
