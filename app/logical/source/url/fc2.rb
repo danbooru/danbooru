@@ -113,7 +113,6 @@ class Source::URL::Fc2 < Source::URL
       @subsite = "diary"
       @year, @month = date.split("_")
       @day = filename
-      @page_url = "http://#{host}/cgi-sys/ed.cgi/#{username}?Y=#{@year}&M=#{@month}&D=#{@day}"
 
     # http://diary.fc2.com/cgi-sys/ed.cgi/kazuharoom/?Y=2012&M=10&D=22
     in /diary\d*$/, "fc2", "com", "cgi-sys", "ed.cgi", username
@@ -143,6 +142,10 @@ class Source::URL::Fc2 < Source::URL
     # http://swordsouls.blog131.fc2blog.us/?mode=image&filename=20141009132121fb7.jpg
     elsif username.present? && album_filename.present?
       "http://#{username}.blog.#{domain}/img/#{album_filename}/"
+
+    # http://diary.fc2.com/user/kazuharoom/img/2015_5/22.jpg
+    elsif @subsite == "diary" && username.present? && @year.present? && @month.present? && @day.present?
+      "http://#{host}/cgi-sys/ed.cgi/#{username}?Y=#{@year}&M=#{@month}&D=#{@day}"
     end
   end
 

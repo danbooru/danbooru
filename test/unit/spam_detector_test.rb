@@ -15,14 +15,14 @@ class SpamDetectorTest < ActiveSupport::TestCase
         Dmail.create_split(from: @spammer, to: @user, title: "spam", body: "wonderful spam", creator_ip_addr: "127.0.0.1")
 
         dmail = @user.dmails.last
-        assert(SpamDetector.new(dmail).spam?)
+        assert(SpamDetector.new(dmail, user_ip: "127.0.0.1").spam?)
       end
 
       should "not detect gold users as spammers" do
         Dmail.create_split(from: @user, to: @spammer, title: "spam", body: "wonderful spam", creator_ip_addr: "127.0.0.1")
 
         dmail = @spammer.dmails.last
-        refute(SpamDetector.new(dmail).spam?)
+        refute(SpamDetector.new(dmail, user_ip: "127.0.0.1").spam?)
       end
 
       should "not detect old users as spammers" do
@@ -30,7 +30,7 @@ class SpamDetectorTest < ActiveSupport::TestCase
         Dmail.create_split(from: @user, to: @spammer, title: "spam", body: "wonderful spam", creator_ip_addr: "127.0.0.1")
 
         dmail = @spammer.dmails.last
-        refute(SpamDetector.new(dmail).spam?)
+        refute(SpamDetector.new(dmail, user_ip: "127.0.0.1").spam?)
       end
 
       should "generate a moderation report when spam is detected" do
@@ -42,7 +42,7 @@ class SpamDetectorTest < ActiveSupport::TestCase
         Rakismet.stubs(:akismet_call).raises(StandardError)
         dmail = create(:dmail, from: @spammer, to: @user, owner: @user, title: "spam", body: "wonderful spam", creator_ip_addr: "127.0.0.1")
 
-        refute(SpamDetector.new(dmail).spam?)
+        refute(SpamDetector.new(dmail, user_ip: "127.0.0.1").spam?)
       end
 
       should "autoban the user if they send too many spam dmails" do
@@ -72,7 +72,7 @@ class SpamDetectorTest < ActiveSupport::TestCase
         as(@user) do
           forum_post = create(:forum_post, creator: @user, topic: @forum_topic)
 
-          refute(SpamDetector.new(forum_post).spam?)
+          refute(SpamDetector.new(forum_post, user_ip: "127.0.0.1").spam?)
           assert_equal(0, forum_post.moderation_reports.count)
         end
       end
@@ -83,7 +83,7 @@ class SpamDetectorTest < ActiveSupport::TestCase
         as(@spammer) do
           comment = create(:comment, creator: @spammer)
 
-          assert(SpamDetector.new(comment).spam?)
+          assert(SpamDetector.new(comment, user_ip: "127.0.0.1").spam?)
           assert_equal(1, comment.moderation_reports.count)
         end
       end
@@ -92,7 +92,7 @@ class SpamDetectorTest < ActiveSupport::TestCase
         as(@user) do
           comment = create(:comment, creator: @user)
 
-          refute(SpamDetector.new(comment).spam?)
+          refute(SpamDetector.new(comment, user_ip: "127.0.0.1").spam?)
           assert_equal(0, comment.moderation_reports.count)
         end
       end

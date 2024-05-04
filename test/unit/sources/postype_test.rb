@@ -485,6 +485,7 @@ module Sources
             https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/10/01/12/c3beaf6cf39540eac3c7f777d04868b1.png
             https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/10/01/12/9e395efb744332f5a58eb5a02a28c6b2.png
             https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/16/15/19/a558ad7fb6a7743359ea80e2b6f369cc.png
+            https://d2ufj6gm1gtdrc.cloudfront.net/2024/05/02/18/18/1f222c14c268b27e84e898b168f03b4e.png
           ],
           media_files: [
             { file_size: 8_537 },
@@ -504,13 +505,14 @@ module Sources
             { file_size: 297_318 },
             { file_size: 462_469 },
             { file_size: 566_921 },
+            { file_size: 1_631_025 },
           ],
           page_url: "https://rottenmustard.postype.com/post/15534076",
           profile_url: "https://rottenmustard.postype.com",
           profile_urls: %w[https://rottenmustard.postype.com https://www.postype.com/profile/@46axcn],
           artist_name: "라쿤맨",
-          other_names: ["라쿤맨", "46axcn"],
           tag_name: "46axcn",
+          other_names: ["라쿤맨", "46axcn"],
           tags: [
             ["커미션", "https://www.postype.com/search?options_tags=1&keyword=%EC%BB%A4%EB%AF%B8%EC%85%98"],
           ],
@@ -522,11 +524,11 @@ module Sources
 
             [s]슬롯:[/s]
 
-            [s]●●●●●[/s]
-
             "[s]https://open.kakao.com/o/sLKkfiOf[/s]":[https://open.kakao.com/o/sLKkfiOf]
 
             (신청 X)
+
+            [hr]
 
             h4. 타입 설명
 
@@ -564,6 +566,8 @@ module Sources
 
             "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/02/27/18/06/15a33b9962fb95d6368ae06c023cc0f3.png?w=1200&q=90]
 
+            [hr]
+
             h4. [b]주의사항[/b]
 
             * 오로지 근육떡대남만 그립니다. (정말 자신이 없어요!!: 여캐x, 마른체형x, 중년x)
@@ -574,6 +578,8 @@ module Sources
             * [b]작업불가장르: 헤타리아, 림버스컴퍼니(프문 장르), 원신[/b]
             * [b][u]작품은 한국식으로 검열되어 전달드립니다. (성기, 항문이 보이지 않는 흰색 광선)[/u][/b]
 
+            [hr]
+
             h4. 신청서 양식
 
             * 닉네임:
@@ -582,6 +588,8 @@ module Sources
             * 캐릭터 자료: (채팅으로 여러 장 보내시면 자료 관리가 어렵습니다. 에버노트와 같은 외부링크를 활용해주시거나 1~2장으로 정돈해서 보내주세요!)
             * 구도/소재: (오마카세 불가능합니다. 꼭 말씀주세요!!!)
             * 기타: (빠지면 안되는 주요사항. 불호소재. etc)
+
+            [hr]
 
             실제 작업물
 
@@ -604,6 +612,8 @@ module Sources
             "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/10/01/12/9e395efb744332f5a58eb5a02a28c6b2.png?w=1200&q=90]
 
             "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/16/15/19/a558ad7fb6a7743359ea80e2b6f369cc.png?w=1200&q=90]
+
+            "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/05/02/18/18/1f222c14c268b27e84e898b168f03b4e.png?w=1200&q=90]
           EOS
         )
       end

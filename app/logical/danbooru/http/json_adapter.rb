@@ -11,7 +11,7 @@ module Danbooru
       def encode(obj)
         return obj.to_json if obj.respond_to?(:to_json)
 
-        JSON.dump(obj)
+        ::JSON.dump(obj)
       end
 
       def decode(str)

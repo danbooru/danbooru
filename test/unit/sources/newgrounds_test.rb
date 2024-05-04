@@ -195,7 +195,7 @@ module Sources
 
           --------------------------------------------------------------
 
-          Follow me on twitter if you liked! Im posting a lot of wips for my upcoming nsfw animation project there <https://twitter.com/jakada_ani>
+          Follow me on twitter if you liked! Im posting a lot of wips for my upcoming nsfw animation project there <https://twitter.com/jakada_ani>
         EOS
       )
     end

@@ -1476,7 +1476,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a post with a https:// source" do
         should "remove the non-web_source tag" do
-          @post.update!(source: "https://www.google.com", tag_string: "non-web_source")
+          @post.update!(source: "https://www.example.com", tag_string: "non-web_source")
           @post.save!
           assert_equal("tagme", @post.tag_string)
         end

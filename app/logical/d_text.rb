@@ -371,6 +371,8 @@ class DText
     bulk_update_requests = fragment.css("tag-request-embed").select { |node| node["data-type"] == "bulk-update-request" }.pluck("data-id").uniq
 
     { wiki_pages:, posts:, media_assets:, tag_aliases:, tag_implications:, bulk_update_requests: }
+  rescue DText::Error
+    { wiki_pages: [], posts: [], media_assets: [], tag_aliases: [], tag_implications: [], bulk_update_requests: [] }
   end
 
   # Return a list of external links mentioned in a string of DText.

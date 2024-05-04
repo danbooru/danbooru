@@ -39,7 +39,7 @@ module Sources
           artist_name: "𝗇𝖾𝗄𝗈𝗆𝗈🐾",
           other_names: ["𝗇𝖾𝗄𝗈𝗆𝗈🐾", "yumenkmc"],
           tag_name: "yumenkmc",
-          dtext_artist_commentary_title: "おどロボ / 海茶 feat. 琴葉姉妹 with ずんだもん - MV用イラスト",
+          dtext_artist_commentary_title: "おどロボ / 海茶 feat. 琴葉姉妹 with ずんだもん - MV用イラスト・ドットアニメーション",
           dtext_artist_commentary_desc: <<~EOS.chomp
             海茶さんの「おどロボ / 琴葉姉妹 with ずんだもん」のMV用イラストとピクセルアートを制作させていただきました。
 

@@ -258,8 +258,7 @@ class Artist < ApplicationRecord
       query = query.strip
 
       if query =~ %r{\Ahttps?://}i
-        url = Source::Extractor.find(query).profile_url || query
-        ArtistFinder.find_artists(url)
+        Source::Extractor.find(query).artists
       else
         where(id: ArtistURL.url_matches(query).select(:artist_id))
       end
