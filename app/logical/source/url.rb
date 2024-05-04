@@ -96,6 +96,7 @@ module Source
       Source::URL::MyPortfolio,
       Source::URL::Note,
       Source::URL::PixivComic,
+      Source::URL::NaverBlog,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
@@ -162,7 +163,7 @@ module Source
     #
     # @return [Boolean]
     def image_url?
-      file_ext.in?(%w[jpg jpeg png gif webp webm mp4 swf])
+      file_ext.to_s.downcase.in?(%w[jpg jpeg png gif webp webm avif mp4 swf])
     end
 
     # True if the URL is a work page URL.
