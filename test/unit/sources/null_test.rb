@@ -71,14 +71,6 @@ module Sources
         assert_equal("http://p.twipple.jp/mI2c3", Source::URL.page_url(source))
       end
 
-      should "normalize fc2 links" do
-        source1 = "https://blog-imgs-41.fc2.com/t/u/y/tuyadasi/file.png"
-        source2 = "http://diary.fc2.com/user/kazuharoom/img/2020_1/29.jpg"
-
-        assert_equal("http://tuyadasi.blog.fc2.com/img/file.png", Source::URL.page_url(source1))
-        assert_equal("http://diary.fc2.com/cgi-sys/ed.cgi/kazuharoom?Y=2020&M=1&D=29", Source::URL.page_url(source2))
-      end
-
       should "normalize facebook links" do
         source = "https://scontent-sin1-1.xx.fbcdn.net/hphotos-xtp1/t31.0-8/11254493_576443445841777_7716273903390212288_o.jpg"
         assert_equal("https://www.facebook.com/photo?fbid=576443445841777", Source::URL.page_url(source))

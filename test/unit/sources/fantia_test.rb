@@ -94,7 +94,7 @@ module Sources
           ・[changing clothes] cum dumpster https://fantia.jp/posts/879616
           ・after-school underwear club https://fantia.jp/posts/888100
           ・Let's play with the lady https://fantia.jp/posts/901611
-          ・[ASMR] Chapter 6: Restraint and Two-Hole Torture https://fantia.jp/posts/908473 *Audio file.
+          ・[ASMR] Chapter 6: Restraint and Two-Hole 〇〇〇〇〇〇〇 https://fantia.jp/posts/908473 *Audio file.
           ・La Signora https://fantia.jp/posts/911526
 
           Even those who do not use the paid plan can purchase it, so please come!

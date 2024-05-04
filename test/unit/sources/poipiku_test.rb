@@ -185,27 +185,19 @@ module Sources
       context "A page url that is followers only" do
         strategy_should_work(
           "https://poipiku.com/16109/8284794.html",
+          image_urls: [],
           page_url: "https://poipiku.com/16109/8284794.html",
-          image_urls: %w[https://img-org.poipiku.com/user_img03/000016109/008284794_BnnZHAgTQ.jpeg],
           profile_url: "https://poipiku.com/16109/",
-          profile_urls: %w[
-            https://poipiku.com/16109/
-            https://www.pixiv.net/users/46937590
-          ],
-          #profile_urls: %w[
-          #  https://profcard.info/u/HvGjxxr2zKep8GCdEuK1T5Mu3cY2
-          #  https://www.pixiv.net/users/46937590
-          #  https://marshmallow-qa.com/_otsubo_
-          #  https://wavebox.me/wave/7rjgokpzrv4326x8/
-          #  https://odaibako.net/u/kmbkshbnlss
-          #],
+          profile_urls: %w[https://poipiku.com/16109/ https://www.pixiv.net/users/46937590],
           artist_name: "緊縛師ボンレス（ル×ガの民）",
           tag_name: "poipiku_16109",
+          other_names: ["緊縛師ボンレス（ル×ガの民）", "poipiku_16109"],
           tags: [
             ["腐向け", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=腐向け"],
             ["TOBL", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=TOBL"],
-            ["ルクガイ", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=ルクガイ"]
+            ["ルクガイ", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=ルクガイ"],
           ],
+          dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
             乳揉まれて気持ち良くなってそうなところ描きたいなと思って描きました。先日描いたやつはまだ「お坊ちゃん可愛い」が勝っている状態。これは「もうそろそろイくかな？」と思われてそうな状態。乳に垂れてる汁は何ですかね。汗？オイル？唾液？うちのルク坊やは唾液でお口ニュルニュルするの気持ちいいボーイなので、きっとお口で遊んだ後（いま決めた）。
           EOS
