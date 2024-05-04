@@ -53,8 +53,6 @@ class Source::URL::Null < Source::URL
       "Curious Cat"
     in _, ("dlsite.com" | "dlsite.net" | "dlsite.jp")
       "DLSite"
-    in _, "donmai.us"
-      "Danbooru" # hey, that's us!
     in _, "dcinside.com"
       "DC Inside"
     in _, "doujinshi.org"
@@ -125,8 +123,6 @@ class Source::URL::Null < Source::URL
       "OCN"
     in _, "onlyfans.com"
       "OnlyFans"
-    in _, "opensea.io"
-      "OpenSea"
     in _, ("overdoll.com" | "dollycdn.net")
       "Overdoll"
     in _, ("patreon.com" | "patreonusercontent.com")
@@ -181,7 +177,7 @@ class Source::URL::Null < Source::URL
       "Vimeo"
     in _, "webtoons.com"
       "Webtoons"
-    in "webtoons-static", "pstatic.net"
+    in "webtoons-static"
       "Webtoons"
     in _, ("weebly.com" | "weeblysite.com")
       "Weebly"
@@ -374,10 +370,6 @@ class Source::URL::Null < Source::URL
       @work_id = $1
       @page_url = "https://www.facebook.com/photo.php?fbid=#{work_id}"
 
-    # http://blog71.fc2.com/a/abk00/file/20080220194219.jpg
-    in _, "fc2.com", *rest
-      nil
-
     # https://www.flickr.com/people/shirasaki408/
     # https://www.flickr.com/photos/shirasaki408/
     # https://www.flickr.com/photos/shirasaki408/albums
@@ -385,10 +377,6 @@ class Source::URL::Null < Source::URL
     # https://www.flickr.com/photos/shirasaki408/49398982266/
     in _, "flickr.com", ("people" | "photos"), username, *rest
       @profile_url = "https://www.flickr.com/people/#{username}"
-
-    # # http://www.furaffinity.net/user/achthenuts
-    in _, "furaffinity.net", *rest
-      nil
 
     # http://www.geocities.jp/nanp002001
     in _, "geocities.jp", *rest
@@ -514,10 +502,6 @@ class Source::URL::Null < Source::URL
 
     # https://onlyfans.com/evviart
     in _, "onlyfans.com", *rest
-      nil
-
-    # https://opensea.io/hebitsukai
-    in _, "opensea.io", *rest
       nil
 
     # http://patreon.com/serafleur
