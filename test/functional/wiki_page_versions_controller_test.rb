@@ -46,6 +46,16 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
         get diff_wiki_page_versions_path, params: { thispage: @wiki_page.versions.first.id, otherpage: @wiki_page.versions.last.id }
         assert_response :success
       end
+
+      should "work if only one version to diff is selected" do
+        get diff_wiki_page_versions_path, params: { thispage: @wiki_page.versions.first.id }
+        assert_response :success
+      end
+
+      should "fail if no version is selected" do
+        get diff_wiki_page_versions_path
+        assert_redirected_to wiki_pages_path
+      end
     end
   end
 end
