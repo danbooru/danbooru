@@ -136,7 +136,8 @@ module IconHelper
     Mottohomete
     MyAnimeList
     MyFigureCollection
-    Naver
+    Naver\ Blog
+    Naver\ Post
     Newgrounds
     Nico\ Seiga
     Nijie
