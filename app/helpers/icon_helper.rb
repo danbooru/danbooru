@@ -232,6 +232,7 @@ module IconHelper
     Willow
     Wix
     WordPress
+    Xiaohongshu
     Xfolio
     Yahoo
     Yande.re
