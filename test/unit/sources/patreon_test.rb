@@ -87,6 +87,49 @@ module Sources
         )
       end
 
+      context "A public post with multiple inline images" do
+        strategy_should_work(
+          "https://www.patreon.com/posts/ishtar-fgo-30623038",
+          image_urls: [
+            %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/30623038/0588a269179a40ebac77f6d6853d6bbc/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png},
+            %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/30623038/ee83c86ecd85424e8798126bc7471970/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png},
+            %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/30623038/b652dbe138f844f6af14068ea3fd78a0/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png},
+            %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/30623038/da56dcc5b0684cc0802e4ed46f26c791/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png},
+          ],
+          media_files: [
+            { file_size: 1_304_374 },
+            { file_size: 256_576 },
+            { file_size: 278_551 },
+            { file_size: 294_563 },
+          ],
+          page_url: "https://www.patreon.com/posts/ishtar-fgo-30623038",
+          profile_url: "https://www.patreon.com/haruhisky",
+          profile_urls: %w[https://www.patreon.com/haruhisky https://www.patreon.com/user?u=7453087],
+          artist_name: "haruhisky",
+          tag_name: "haruhisky",
+          other_names: ["haruhisky"],
+          tags: [
+            ["FGO", "https://www.patreon.com/haruhisky/posts?filters[tag]=FGO"],
+          ],
+          dtext_artist_commentary_title: "Ishtar (FGO)",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            "[image]":[https://www.patreon.com/posts/ishtar-fgo-30623038]
+
+            In order to draw this picture, I used a drawing method called the Grizaille method.
+
+            In this method, you first shade in monotone and then apply a colormap to it.
+
+            By doing so, you can do a harmonious shading overall.
+
+            "[image]":[https://www.patreon.com/posts/ishtar-fgo-30623038]
+
+            "[image]":[https://www.patreon.com/posts/ishtar-fgo-30623038]
+
+            "[image]":[https://www.patreon.com/posts/ishtar-fgo-30623038]
+          EOS
+        )
+      end
+
       context "A public post with attachments" do
         strategy_should_work(
           "https://www.patreon.com/posts/precious-metal-23563293",
@@ -114,7 +157,7 @@ module Sources
         )
       end
 
-      context "A public post with a poll" do
+      context "A public post with a poll and an inline image that is not in the text" do
         strategy_should_work(
           "https://www.patreon.com/posts/56127163",
           image_urls: [
@@ -171,18 +214,18 @@ module Sources
         )
       end
 
-      # XXX This doesn't get the video file. The video is a .m3u8 playlist file, so it's not uploadable anyway.
+      # XXX The video is a .m3u8 playlist file, which is not uploadable.
       context "A public post with a video" do
         strategy_should_work(
           "https://www.patreon.com/posts/meu8-94714289",
           image_urls: [
-            # %r{https://stream.mux.com/NLrxTLdxyGStpOgapJAtB8uPGAaokEcj8YovML00y2DY.m3u8},
+            %r{https://stream.mux.com/NLrxTLdxyGStpOgapJAtB8uPGAaokEcj8YovML00y2DY.m3u8},
             %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/94714289/be3d8eb994ae44eca4baffcdc6dd25fc/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png},
           ],
-          media_files: [
-            # { file_size: 2_688 }, # XXX This filesize changes on every request
-            { file_size: 1_174_587 },
-          ],
+          # media_files: [
+          #   { file_size: 2_688 }, # XXX This filesize changes on every request
+          #   { file_size: 1_174_587 },
+          # ],
           page_url: "https://www.patreon.com/posts/meu8-94714289",
           profile_url: "https://www.patreon.com/Kurzgesagt",
           profile_urls: %w[https://www.patreon.com/Kurzgesagt https://www.patreon.com/user?u=43579],
