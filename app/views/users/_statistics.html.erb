@@ -100,7 +100,7 @@
           <td>
             <span class="prose">
               <%= user.active_ban.dtext_reason.format_text %>
-              (banned <%= humanized_duration(user.active_ban.duration) %>)
+              (banned <%= user.active_ban.humanized_duration %>)
             </span>
           </td>
         </tr>

@@ -171,24 +171,6 @@ module ApplicationHelper
     end
   end
 
-  def humanized_duration(duration)
-    if duration >= 100.years
-      "forever"
-    elsif duration < 0
-      # In production, the oldest bans have negative duration because in 2013 the database was migrated and the
-      # created_at field was reset to 2013, which made their creation date come after their expiration date.
-      "unknown"
-    elsif duration < 1.month
-      duration.in_days.round.days.inspect
-    elsif duration < 1.year
-      duration.in_months.round.months.inspect
-    elsif duration < 100.years
-      duration.in_years.round.years.inspect
-    else
-      duration.inspect
-    end
-  end
-
   def time_ago_in_words_tagged(time, compact: false)
     if time.nil?
       tag.em(tag.time("unknown"))

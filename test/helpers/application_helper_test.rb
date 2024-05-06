@@ -33,31 +33,5 @@ class ApplicationHelperTest < ActionView::TestCase
         assert_match(/#{Regexp.quote(text)}/, link)
       end
     end
-
-    context "humanized_duration method" do
-      should "return forever" do
-        assert_equal("forever", humanized_duration(100.years))
-      end
-
-      should "return unknown" do
-        assert_equal("unknown", humanized_duration(-1.day))
-      end
-
-      should "return in days for values less than a month" do
-        assert_equal("1 day", humanized_duration(1.month - 29.days))
-      end
-
-      should "return in months for values greater or equal than a month and less than a year" do
-        assert_equal("1 month", humanized_duration(1.year - 11.months))
-      end
-
-      should "return in months for values greater or equal than a year and less than forever" do
-        assert_equal("1 year", humanized_duration(100.years - 99.years))
-      end
-
-      should "return duration as it is for 0" do
-        assert_equal("0 days", humanized_duration(0.days))
-      end
-    end
   end
 end
