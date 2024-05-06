@@ -103,7 +103,7 @@ class ServerStatistics
     {
       forum_posts: delim(ForumPost.count),
       forum_topics: delim(ForumTopic.maximum(:id)),
-      average_posts_per_topic: ForumPost.count / ForumTopic.count
+      average_posts_per_topic: ForumTopic.count > 0 ? ForumPost.count / ForumTopic.count : 0
     }
   end
 
