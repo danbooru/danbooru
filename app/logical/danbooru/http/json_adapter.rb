@@ -6,6 +6,7 @@ module Danbooru
       def self.register
         HTTP::MimeType.register_adapter "application/json", self
         HTTP::MimeType.register_adapter "application/ld+json", self
+        HTTP::MimeType.register_adapter "application/vnd.api+json", self
       end
 
       def encode(obj)
