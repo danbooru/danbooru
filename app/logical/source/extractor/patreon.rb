@@ -14,9 +14,11 @@ class Source::Extractor::Patreon < Source::Extractor
   end
 
   memoize def image_urls_from_api
-    media_ids = post.dig("post_metadata", "image_order") || media.pluck("id") || []
-    ordered_media = media.group_by { _1["id"] }.values_at(*media_ids).flatten
-    ordered_media.pluck("attributes").pluck("display").pluck("url").compact
+    # The list of media objects can contain duplicate files. This happens for old posts with inline images where the
+    # first image was made the post's cover image. These files have unique URLs despite being MD5-identical, so we
+    # filter them out by their name/size/dimensions. Ex: https://www.patreon.com/posts/sailormoonredraw-37219108.
+    unique_media = media.uniq { _1.values_at(*%w[file_name dimensions size_bytes mimetype]) }
+    unique_media.pluck("display").pluck("url").compact
   end
 
   memoize def image_url_from_api
@@ -96,7 +98,7 @@ class Source::Extractor::Patreon < Source::Extractor
   end
 
   def media
-    api_response["included"].to_a.select { _1["type"] == "media" }
+    api_response["included"].to_a.select { _1["type"] == "media" }.pluck("attributes")
   end
 
   def poll
