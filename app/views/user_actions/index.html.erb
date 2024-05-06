@@ -34,7 +34,7 @@
             <%= link_to_user user %> <%= link_to "updated", model %> the <%= link_to_wiki model.title %> wiki.
           <% when "Ban" %>
             <div class="prose">
-              <%= link_to_user user %> was <%= link_to (model.forever? ? "banned forever" : "banned for #{model.humanized_duration}"), model %> by <%= link_to_user model.banner %> (<%= format_text(model.reason.chomp(".").strip, inline: true) %>).
+              <%= link_to_user user %> was <%= link_to (model.forever? ? "banned forever" : "banned for #{humanized_duration(model.duration)}"), model %> by <%= link_to_user model.banner %> (<%= format_text(model.reason.chomp(".").strip, inline: true) %>).
             </div>
           <% when "BulkUpdateRequest" %>
             <%= link_to_user user %> created a <%= link_to "new BUR", model %> in <%= link_to model.forum_topic.title, model.forum_post %>.

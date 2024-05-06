@@ -15,7 +15,7 @@
         </div>
       <% end %>
       <% t.column "Duration" do |ban| %>
-        <%= ban.humanized_duration %>
+        <%= humanized_duration(ban.duration) %>
       <% end %>
       <% t.column "Banner" do |ban| %>
         <%= link_to_user ban.banner %>
