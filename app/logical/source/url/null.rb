@@ -33,10 +33,6 @@ class Source::URL::Null < Source::URL
       "BCY"
     in _, "bigcartel.com"
       "Big Cartel"
-    in _, ("blogger.com" | /blogspot\.(com|ca|de|jp|kr|tw)\z/i)
-      "Blogger"
-    in "blogger", "googleusercontent.com"
-      "Blogger"
     in _, "buymeacoffee.com"
       "Buy Me a Coffee"
     in _, "carrd.co"
