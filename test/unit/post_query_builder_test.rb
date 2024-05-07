@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PostQueryBuilderTest < ActiveSupport::TestCase
   def assert_tag_match(posts, query, relation: Post.all, current_user: CurrentUser.user, tag_limit: nil, **options)
-    assert_equal(posts.map(&:id), relation.user_tag_match(query, current_user, tag_limit: tag_limit, **options).pluck("posts.id"))
+    assert_equal(posts.map(&:id), relation.user_tag_match(query, current_user, tag_limit: tag_limit, **options).map(&:id))
   end
 
   def assert_search_error(query, current_user: CurrentUser.user, **options)
@@ -1422,6 +1422,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post = create(:post)
 
       assert_tag_match([post], "order:random")
+    end
+
+    should "return posts for order:modqueue" do
+      post = create(:post)
+
+      assert_tag_match([post], "order:modqueue")
     end
 
     should "return posts for a filesize search" do
