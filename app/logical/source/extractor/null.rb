@@ -73,6 +73,8 @@ module Source
           Source::URL::MyPortfolio.new(url).extractor(parent_extractor: self)
         elsif twitter_site == "@note_PR"
           Source::URL::Note.new(url).extractor(parent_extractor: self)
+        elsif page&.at('meta[name="generator"]')&.attr("content") == "blogger"
+          Source::URL::Blogger.new(url).extractor(parent_extractor: self)
         end
       end
 
