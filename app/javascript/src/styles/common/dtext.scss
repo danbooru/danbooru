@@ -140,6 +140,10 @@
     background: var(--dtext-spoiler-background-color);
   }
 
+  .spoiler:not(:hover) > * {
+    visibility: hidden;
+  }
+
   media-gallery {
     --media-gallery-size: 180px;
 
