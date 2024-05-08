@@ -64,7 +64,11 @@ class Source::URL::Plurk < Source::URL
   end
 
   def page_url
-    "https://www.plurk.com/p/#{work_id}" if work_id.present?
+    if work_id.present? && response_id.present?
+      "https://www.plurk.com/p/#{work_id}?r=#{response_id}"
+    elsif work_id.present?
+      "https://www.plurk.com/p/#{work_id}"
+    end
   end
 
   def profile_url
