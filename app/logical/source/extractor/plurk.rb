@@ -109,8 +109,18 @@ module Source
 
       def dtext_artist_commentary_desc
         DText.from_html(artist_commentary_desc, base_url: "https://www.plurk.com") do |element|
-          if element.name == "a"
-            element.content = ""
+          case element.name
+          # Put image links on a line by themselves. Ex: https://www.plurk.com/p/omc64y.
+          in "a" if element.css("img").present?
+            element.name = "p"
+            element.inner_html = %{<a href="#{element["href"]}">#{element["href"]}</a>}
+
+          # Replace external link card previews with just the link. Ex: https://www.plurk.com/p/3fqo1xpr2g.
+          in "a" if element.classes.include?("meta")
+            element.content = element[:href]
+
+          else
+            nil
           end
         end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
       end
