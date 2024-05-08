@@ -16,7 +16,6 @@ module Sources
       strategy_should_work(
         "https://www.plurk.com/p/om6zv4",
         image_urls: %w[https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg],
-        # XXX Flaky test due to Cloudflare Polish changing the file size.
         # media_files: [{ file_size: 627_697 }],
         page_url: "https://plurk.com/p/om6zv4",
         profile_url: "https://www.plurk.com/redeyehare",
@@ -27,6 +26,8 @@ module Sources
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
+          <https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg>
+
           Trick or Treat!
           很久沒畫萬聖賀圖了，畫一波大的  感覺持續復健中
         EOS
@@ -93,7 +94,28 @@ module Sources
         other_names: ["BOW🔞", "BOW99"],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "[十月號]"
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          [十月號]
+          <https://images.plurk.com/yfnumBJqqoQt50Em6xKwf.png>
+
+          <https://images.plurk.com/5NaqqO3Yi6bQW1wKXq1Dc2.png>
+
+          <https://images.plurk.com/3HzNcbMhCozHPk5YY8j9fI.png>
+
+          <https://images.plurk.com/2e0duwn8BpSW9MGuUvbrim.png>
+
+          <https://images.plurk.com/1OuiMDp82hYPEUn64CWFFB.png>
+
+          <https://images.plurk.com/3F3KzZOabeMYkgTeseEZ0r.png>
+
+          <https://images.plurk.com/7onKKTAIXkY4pASszrBys8.png>
+
+          <https://images.plurk.com/6aotmjLGbtMLiI3slN7ODv.png>
+
+          <https://images.plurk.com/6pzn7jE2nkj9EV7H25L0x1.png>
+
+          <https://images.plurk.com/yA8egjDuhy0eNG9yxRj1d.png>
+        EOS
       )
     end
 
@@ -114,9 +136,12 @@ module Sources
         ],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
+          <https://images.plurk.com/4ZvWUcIEgaOKclXC9AcW37.png>
+
           Smily~ uncle Wediz
 
-          support my OC here :
+          support my OC here :<https://www.patreon.com/sollyz_gallery>
+
           #furry #wediz
         EOS
       )
