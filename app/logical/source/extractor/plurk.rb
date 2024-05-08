@@ -41,19 +41,23 @@ module Source
       # For non-adult works, returns both the main images and the images posted by the artist in the replies.
       # For adult works, returns only the main images.
       def images_from_page
-        page&.search(".bigplurk .content a img, .response.highlight_owner .content a img").to_a.pluck("alt")
+        page&.css(".bigplurk .content a img, .response.highlight_owner .content a img").to_a.pluck("alt").compact.select do |url|
+          Source::URL.parse(url)&.host == "images.plurk.com"
+        end
       end
 
       # Returns only the main images, not the images posted in the replies. Used for adult works.
       def images_from_script_tag
-        URI.extract(page_json["content_raw"])
+        URI.extract(page_json["content_raw"]).select do |url|
+          Source::URL.parse(url)&.host == "images.plurk.com"
+        end
       end
 
       # Returns images posted by the artist in the replies. Used for adult works.
       def images_from_replies
         artist_responses = api_replies["responses"].to_a.select { _1["user_id"].to_i == artist_id.to_i }
         urls = artist_responses.pluck("content_raw").flat_map { URI.extract(_1) }
-        urls.select { Source::URL.parse(_1)&.image_url? }.uniq
+        urls.select { Source::URL.parse(_1)&.host == "images.plurk.com" }.uniq
       end
 
       memoize def page_json
