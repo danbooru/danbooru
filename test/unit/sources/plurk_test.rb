@@ -128,12 +128,17 @@ module Sources
 
       assert(Source::URL.page_url?("https://www.plurk.com/p/om6zv4"))
       assert(Source::URL.page_url?("https://www.plurk.com/m/p/okxzae"))
+      assert(Source::URL.page_url?("https://www.plurk.com/s/p/3frqa0mcw9"))
 
       assert(Source::URL.profile_url?("https://www.plurk.com/m/redeyehare"))
+      assert(Source::URL.profile_url?("https://www.plurk.com/m/redeyehare/fans"))
       assert(Source::URL.profile_url?("https://www.plurk.com/u/ddks2923"))
       assert(Source::URL.profile_url?("https://www.plurk.com/m/u/leiy1225"))
       assert(Source::URL.profile_url?("https://www.plurk.com/s/u/salmonroe13"))
       assert(Source::URL.profile_url?("https://www.plurk.com/redeyehare"))
+      assert(Source::URL.profile_url?("https://www.plurk.com/redeyehare/fans"))
+
+      assert_not(Source::URL.profile_url?("https://www.plurk.com/search?q=blah"))
     end
   end
 end
