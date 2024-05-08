@@ -596,6 +596,10 @@ module Danbooru
     def piapro_session_cookie
     end
 
+    # Your Plurk "plurktokena" cookie. Login to Plurk then use the devtools to find the "plurktokena" cookie.
+    def plurk_session_cookie
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
