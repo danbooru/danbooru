@@ -194,9 +194,12 @@ module Danbooru
       end
     end
 
-    # @return [Danbooru::URL, nil] Return the URL that the given URL redirects to, or nil on error.
-    def redirect_url(url)
-      response = head(url)
+    # Return the URL that the given URL redirects to, or nil on error.
+    #
+    # @param method [String] The HTTP method to use, GET or HEAD. HEAD may be faster, but may fail for some sites.
+    # @return [Danbooru::URL, nil]
+    def redirect_url(url, method: "HEAD")
+      response = request(method.downcase, url)
       return nil unless response.status.in?(200..299)
 
       Danbooru::URL.parse(response.uri)
