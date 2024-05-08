@@ -2,6 +2,16 @@ require "test_helper"
 
 module Sources
   class PlurkTest < ActiveSupport::TestCase
+    context "An image URL" do
+      strategy_should_work(
+        "https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg",
+        image_urls: %w[https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg],
+        # XXX Flaky test due to Cloudflare Polish changing the file size.
+        # media_files: [{ file_size: 627_697 }],
+        page_url: nil
+      )
+    end
+
     context "A plurk post" do
       strategy_should_work(
         "https://www.plurk.com/p/om6zv4",
@@ -84,7 +94,10 @@ module Sources
         artist_name: "SollyzSundyz",
         tag_name: "SollyzSundyz",
         other_names: ["SollyzSundyz"],
-        tags: [],
+        tags: [
+          ["furry", "https://www.plurk.com/search?q=furry"],
+          ["wediz", "https://www.plurk.com/search?q=wediz"],
+        ],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           Smily~ uncle Wediz
