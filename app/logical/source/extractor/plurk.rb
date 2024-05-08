@@ -72,7 +72,7 @@ module Source
         http.cache(1.minute).parsed_post("https://www.plurk.com/Responses/get", form: { plurk_id: illust_id.to_i(36), from_response_id: 0 }) || {}
       end
 
-      def tag_name
+      def username
         page&.at(".bigplurk .user a")&.[](:href)&.gsub(%r{^/}, "")
       end
 
@@ -80,13 +80,20 @@ module Source
         page&.at(".bigplurk .user a")&.text
       end
 
+      def tag_name
+        username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
+      end
+
+      def other_names
+        [artist_name, username].compact_blank.uniq(&:downcase)
+      end
+
       def artist_id
         page&.at("a[data-uid]")&.attr("data-uid").to_i
       end
 
       def profile_url
-        return nil if artist_name.blank?
-        "https://www.plurk.com/#{tag_name}"
+        "https://www.plurk.com/#{username}" if username.present?
       end
 
       def tags
