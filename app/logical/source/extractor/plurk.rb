@@ -63,7 +63,7 @@ module Source
       memoize def page_json
         script_text = page&.search("body script").to_a.map(&:text).grep(/plurk =/).first.to_s
         json = script_text.strip.delete_prefix("plurk = ").delete_suffix(";").gsub(/new Date\((.*?)\)/) { $1 }
-        json.parse_json
+        json.parse_json || {}
       end
 
       memoize def api_replies
@@ -87,6 +87,13 @@ module Source
       def profile_url
         return nil if artist_name.blank?
         "https://www.plurk.com/#{tag_name}"
+      end
+
+      def tags
+        Nokogiri::HTML5.fragment(page_json["content"]).css("span.hashtag").map do |element|
+          tag = element.text.delete_prefix("#")
+          [tag, "https://www.plurk.com/search?q=#{Danbooru::URL.escape(tag)}"]
+        end
       end
 
       def artist_commentary_desc
