@@ -73,6 +73,28 @@ module Sources
       )
     end
 
+    context "A plurk post with an external link card in the commentary" do
+      strategy_should_work(
+        "https://www.plurk.com/p/3fqo1xpr2g",
+        image_urls: %w[https://images.plurk.com/4ZvWUcIEgaOKclXC9AcW37.png],
+        media_files: [{ file_size: 336_881 }],
+        page_url: "https://plurk.com/p/3fqo1xpr2g",
+        profile_url: "https://www.plurk.com/SollyzSundyz",
+        profile_urls: %w[https://www.plurk.com/SollyzSundyz],
+        artist_name: "SollyzSundyz",
+        tag_name: "SollyzSundyz",
+        other_names: ["SollyzSundyz"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Smily~ uncle Wediz
+
+          support my OC here :
+          #furry #wediz
+        EOS
+      )
+    end
+
     should "Parse Plurk URLs correctly" do
       assert(Source::URL.image_url?("https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg"))
       assert(Source::URL.image_url?("https://images.plurk.com/mx_5wj6WD0r6y4rLN0DL3sqag.jpg"))
