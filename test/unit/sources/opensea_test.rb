@@ -16,10 +16,28 @@ module Sources
 
       context "An Opensea /gae/ sample image URL" do
         strategy_should_work(
-          "https://i.seadn.io/gae/CnA27YghZgRXfI35roMJts6x43S6xwjkBqXF2ujywUl5ibx9Gd16TKsPwVBEyYyszO96XbWx85HzoGxQ6JI6FHQpjZ5YvEZo1CHxVA?auto=format&dpr=1&w=1000 ",
-          image_urls: %w[https://i.seadn.io/gae/CnA27YghZgRXfI35roMJts6x43S6xwjkBqXF2ujywUl5ibx9Gd16TKsPwVBEyYyszO96XbWx85HzoGxQ6JI6FHQpjZ5YvEZo1CHxVA?w=99999],
+          "https://i.seadn.io/gae/CnA27YghZgRXfI35roMJts6x43S6xwjkBqXF2ujywUl5ibx9Gd16TKsPwVBEyYyszO96XbWx85HzoGxQ6JI6FHQpjZ5YvEZo1CHxVA?auto=format&dpr=1&w=1000",
+          image_urls: %w[https://lh3.googleusercontent.com/CnA27YghZgRXfI35roMJts6x43S6xwjkBqXF2ujywUl5ibx9Gd16TKsPwVBEyYyszO96XbWx85HzoGxQ6JI6FHQpjZ5YvEZo1CHxVA=d],
           media_files: [{ file_size: 1_186_411 }],
           page_url: nil
+        )
+      end
+
+      context "An lh3.googleusercontent.com image URL with a Opensea referer" do
+        strategy_should_work(
+          "https://lh3.googleusercontent.com/CnA27YghZgRXfI35roMJts6x43S6xwjkBqXF2ujywUl5ibx9Gd16TKsPwVBEyYyszO96XbWx85HzoGxQ6JI6FHQpjZ5YvEZo1CHxVA=d",
+          referer: "https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/25498143383868488060407396481663496375452486694447065582311815598428410347521",
+          image_urls: %w[https://lh3.googleusercontent.com/CnA27YghZgRXfI35roMJts6x43S6xwjkBqXF2ujywUl5ibx9Gd16TKsPwVBEyYyszO96XbWx85HzoGxQ6JI6FHQpjZ5YvEZo1CHxVA=d],
+          media_files: [{ file_size: 1_186_411 }],
+          page_url: "https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/25498143383868488060407396481663496375452486694447065582311815598428410347521",
+          profile_url: "https://opensea.io/tororotororo",
+          profile_urls: %w[https://opensea.io/tororotororo https://opensea.io/0x385f700eb49ec720cdc1adc3d91e42cdf8325878],
+          artist_name: "tororotororo",
+          tag_name: "tororotororo",
+          other_names: ["tororotororo"],
+          tags: [],
+          dtext_artist_commentary_title: "牛乳を飲む/Drink milk",
+          dtext_artist_commentary_desc: ""
         )
       end
 

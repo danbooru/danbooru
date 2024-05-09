@@ -132,13 +132,17 @@ module Source
       raise NotImplementedError
     end
 
-    # Return the extractor corresponding to this URL. By default, it's the Source::Extractor subclass with the same name
+    # Return the extractor class to use for this URL. By default, it's the Source::Extractor subclass with the same name
     # as this Source::URL subclass. Subclasses can override this to provide a different extractor.
+    def extractor_class
+      "Source::Extractor::#{self.class.name.demodulize}".safe_constantize
+    end
+
+    # Return the extractor corresponding to this URL.
     #
     # @param options [Hash] The options to pass to the extractor.
     # @return [Source::Extractor, nil] The extractor for this URL, or nil if one doesn't exist.
     def extractor(**options)
-      extractor_class = "Source::Extractor::#{self.class.name.demodulize}".safe_constantize
       extractor_class&.new(self, **options)
     end
 

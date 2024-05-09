@@ -20,8 +20,8 @@ class Source::URL::Opensea < Source::URL
 
     # https://i.seadn.io/gae/CnA27YghZgRXfI35roMJts6x43S6xwjkBqXF2ujywUl5ibx9Gd16TKsPwVBEyYyszO96XbWx85HzoGxQ6JI6FHQpjZ5YvEZo1CHxVA?auto=format&dpr=1&w=1000 (sample)
     # https://i.seadn.io/gae/CnA27YghZgRXfI35roMJts6x43S6xwjkBqXF2ujywUl5ibx9Gd16TKsPwVBEyYyszO96XbWx85HzoGxQ6JI6FHQpjZ5YvEZo1CHxVA?w=99999 (full)
-    in "i", "seadn.io", "gae", _
-      @full_image_url = "#{url.omit(:query)}?w=99999"
+    in "i", "seadn.io", "gae", file
+      @full_image_url = "https://lh3.googleusercontent.com/#{file}=d"
 
     # https://opensea.io/assets/matic/0x2953399124f0cbb46d2cbacd8a89cf0599974963/73367181727578658379392940909024713110943326450271164125938382654208802291713
     # https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/47707087614834185592401815072389651465878170492683018350293856127512379129861
@@ -45,6 +45,8 @@ class Source::URL::Opensea < Source::URL
     in _, "opensea.io", username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username
 
+    # https://openseauserdata.com/files/56abded53392efcc6898d0680892bf5e.png
+    # https://dl.openseauserdata.com/cache/originImage/files/56abded53392efcc6898d0680892bf5e.png
     # https://i.seadn.io/s/primary-drops/0xc274a97f1691ef390f662067e95a6eff1f99b504/31341974:about:media:98e2f8a2-a8aa-46d9-9267-87108353c759.jpeg?auto=format&dpr=1&w=1920 (profile banner)
     # https://opensea.io/collection/illustration-ainousoko
     else
