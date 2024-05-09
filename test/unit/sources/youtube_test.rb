@@ -23,13 +23,13 @@ module Sources
         )
       end
 
-      # XXX Should use the playlist URL as the page URL
       context "A playlist album cover image URL with a playlist referer" do
         strategy_should_work(
           "https://lh3.googleusercontent.com/-o3R2xYfE_i2CnlCKGuGdd_l2etaZUHo-pWraD83isUZdkZpBhdAdt5Q7oQGsRf5TFHpnr2i1wD1YKLrgA=w544-h544-l90-rj",
+          referer: "https://music.youtube.com/playlist?list=OLAK5uy_noU123lqMHztLaZkpu00qEBr0thoaq1c4",
           image_urls: %w[https://lh3.googleusercontent.com/-o3R2xYfE_i2CnlCKGuGdd_l2etaZUHo-pWraD83isUZdkZpBhdAdt5Q7oQGsRf5TFHpnr2i1wD1YKLrgA=d],
           media_files: [{ file_size: 4_329_101 }],
-          page_url: nil
+          page_url: "https://music.youtube.com/playlist?list=OLAK5uy_noU123lqMHztLaZkpu00qEBr0thoaq1c4"
         )
       end
 

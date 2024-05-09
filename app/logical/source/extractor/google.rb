@@ -8,6 +8,11 @@
 class Source::Extractor::Google < Source::Extractor
   delegate :page_url, :profile_url, :artist_name, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
 
+  # Don't ignore the referer URL when it's from a different site (Youtube, Blogger, Opensea, etc).
+  def allow_referer?
+    true
+  end
+
   def image_urls
     if sub_extractor.present?
       sub_extractor.image_urls
@@ -33,10 +38,10 @@ class Source::Extractor::Google < Source::Extractor
   end
 
   def artists
-    sub_extractor&.tags || []
+    sub_extractor&.artists || []
   end
 
   memoize def sub_extractor
-    parsed_referer&.extractor&.class&.new(parsed_url, referer_url: parsed_referer, parent_extractor: self)
+    parsed_referer&.extractor_class&.new(parsed_url, referer_url: parsed_referer, parent_extractor: self)
   end
 end

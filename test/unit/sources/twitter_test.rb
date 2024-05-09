@@ -301,6 +301,16 @@ module Sources
       )
     end
 
+    context "A direct image url with a referer url from a different site" do
+      strategy_should_work(
+        "https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg",
+        referer: "https://www.pixiv.net/en/artworks/60344190",
+        image_urls: ["https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg:orig"],
+        media_files: [{ file_size: 842_373 }],
+        page_url: nil
+      )
+    end
+
     context "A deleted tweet" do
       strategy_should_work(
         "https://twitter.com/masayasuf/status/870734961778630656",
