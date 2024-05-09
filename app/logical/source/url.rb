@@ -99,6 +99,8 @@ module Source
       Source::URL::Patreon,
       Source::URL::Blogger,
       Source::URL::Vk,
+      Source::URL::Google,
+      Source::URL::Youtube,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.

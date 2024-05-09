@@ -6,7 +6,7 @@ class Source::URL::Blogger < Source::URL
   attr_reader :page_name, :user_id, :year, :month, :title, :full_image_url
 
   def self.match?(url)
-    url.domain == "blogger.com" || url.sld == "blogspot" || url.host.match?(/^(lh\d+|blogger)\.googleusercontent\.com$/)
+    url.domain == "blogger.com" || url.sld == "blogspot" || url.host == "blogger.googleusercontent.com"
   end
 
   def parse
@@ -29,14 +29,6 @@ class Source::URL::Blogger < Source::URL
     in "blogger", "googleusercontent.com", "img", "a", image_id, *rest
       image_id = image_id.split("=").first
       @full_image_url = "https://blogger.googleusercontent.com/img/a/#{image_id}=d"
-
-    # https://lh3.googleusercontent.com/qAhRBhfciCcosUoYHPJr5WtNYSJ81vpSqcQwbQitZtsR3mB2aCUj7J5LvhJOCfWn-CWqiLB18SyTr1VJvm_HI7B72opIAMZiZvg=s0 (sample)
-    # https://lh3.googleusercontent.com/qAhRBhfciCcosUoYHPJr5WtNYSJ81vpSqcQwbQitZtsR3mB2aCUj7J5LvhJOCfWn-CWqiLB18SyTr1VJvm_HI7B72opIAMZiZvg=d (original)
-    # https://lh3.googleusercontent.com/C6yBYozE1sXc9o_jsrh29_AYQ6ffCKO-fpooQ5nwuu7FSgQvdGtfSbcJVBUGSDi1VXE9TqYT2g=s0?imgmax=s0 (sample)
-    # https://lh3.googleusercontent.com/C6yBYozE1sXc9o_jsrh29_AYQ6ffCKO-fpooQ5nwuu7FSgQvdGtfSbcJVBUGSDi1VXE9TqYT2g=d (original)
-    in /^lh\d+$/, "googleusercontent.com", image_id, *rest
-      image_id = image_id.split("=").first
-      @full_image_url = "#{site}/#{image_id}=d"
 
     # https://1.bp.blogspot.com/-3JxbVuKpLkU/XQgmusYgJlI/AAAAAAAAAi4/SgRSOt9tXswtgBF_V95UROBJGx9EhjVhACLcBGAs/s1600/Blog%2BImage%2B3%2B%25281%2529.png (sample; 1211x1600)
     # https://1.bp.blogspot.com/-3JxbVuKpLkU/XQgmusYgJlI/AAAAAAAAAi4/SgRSOt9tXswtgBF_V95UROBJGx9EhjVhACLcBGAs/s0/Blog%2BImage%2B3%2B%25281%2529.png (sample; 1437x1899, modified exif data)

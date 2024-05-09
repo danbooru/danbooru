@@ -704,13 +704,6 @@ class Source::URL::Null < Source::URL
     in _, "yfrog.com", *rest
       nil
 
-    # https://www.youtube.com/c/ruichnonomarui
-    # https://www.youtube.com/user/nonomaRui/videos
-    # https://www.youtube.com/channel/UCfrCa2Y6VulwHD3eNd3HBRA
-    # https://youtu.be/dQw4w9WgXcQ?si=i9hAbs3VV0ewqq6F
-    in _, ("youtube.com" | "youtu.be"), *rest
-      nil
-
     else
       @recognized = false
 
