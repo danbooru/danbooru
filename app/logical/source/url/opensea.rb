@@ -10,6 +10,10 @@ class Source::URL::Opensea < Source::URL
     url.domain.in?(%w[opensea.io openseauserdata.com seadn.io])
   end
 
+  def site_name
+    "OpenSea"
+  end
+
   def parse
     case [subdomain, domain, *path_segments]
 
