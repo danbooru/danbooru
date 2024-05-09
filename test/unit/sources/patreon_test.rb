@@ -67,9 +67,7 @@ module Sources
       context "A public post with an inline image that is a duplicate of the header image" do
         strategy_should_work(
           "https://www.patreon.com/posts/sailormoonredraw-37219108",
-          image_urls: %w[
-            https://c10.patreonusercontent.com/4/patreon-media/p/post/37219108/ede9a2c74f3e45389f4ca233b86b597c/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png?token-time=1716249600&token-hash=C0iulUnhZ7KxDBGRvn0g79WTqXMduP-b-5XV47AbIO4%3D
-          ],
+          image_urls: [%r{https://c10.patreonusercontent.com/4/patreon-media/p/post/37219108/ede9a2c74f3e45389f4ca233b86b597c/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png}],
           media_files: [
             { file_size: 687_920 },
           ],

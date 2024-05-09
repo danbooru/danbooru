@@ -35,7 +35,7 @@ module Sources
       context "A document post" do
         strategy_should_work(
           "https://vk.com/doc495199190_630536868",
-          image_urls: %w[https://pp.userapi.com/c235131/u495199190/docs/d59/b94c28ecfbf7/Strakh_Pakhnet_Lyubovyu.png],
+          image_urls: [%r{https://pp.userapi.com/c235131/u495199190/docs/d59/\h{12}/Strakh_Pakhnet_Lyubovyu.png}],
           media_files: [{ file_size: 1_437_077 }],
           page_url: "https://vk.com/doc495199190_630536868" # XXX wrong?
         )
@@ -173,7 +173,7 @@ module Sources
       context "A wall post with an attached doc file that is an image" do
         strategy_should_work(
           "https://vk.com/wall-191516762_1706",
-          image_urls: %w[https://pp.userapi.com/c235131/u495199190/docs/d59/b94c28ecfbf7/Strakh_Pakhnet_Lyubovyu.png],
+          image_urls: [%r{https://pp.userapi.com/c235131/u495199190/docs/d59/\h{12}/Strakh_Pakhnet_Lyubovyu.png}],
           media_files: [{ file_size: 1_437_077 }],
           page_url: "https://vk.com/wall-191516762_1706",
           profile_url: "https://vk.com/cloospi",
@@ -190,17 +190,17 @@ module Sources
       context "A wall post with multiple attached doc files" do
         strategy_should_work(
           "https://vk.com/raw_files_raw?w=wall-184253008_27",
-          image_urls: %w[
-            https://pp.userapi.com/bDB7jkzI-jt-AH4PYJSaSu4fgcZkk6LmkS8kOQ/MUr1-PtWzeE.jpg
-            https://pp.userapi.com/AcpmintgwJ8ZhbYqGLcTODDHp0JESS3SwA81JA/vTyhIPllNqg.jpg
-            https://pp.userapi.com/6_9o9t6Edk2ZmK3dmXphXuu4sjOMsnflqjnJPw/YJQ237Sddy4.jpg
-            https://pp.userapi.com/11RZLv9b-6pLrXjyvpJ9bZRC2uqI3u9bnMvZrg/VpVaJMQjFLY.jpg
-            https://pp.userapi.com/Z8rYUU0dAWLmrpa1xtfunVDrG9vvsNM2ytUI_Q/XhdUKOkaaak.jpg
-            https://pp.userapi.com/c536436/u421323995/docs/d7/4d7239232517/Sasha03811.nef
-            https://pp.userapi.com/c536436/u421323995/docs/d46/426d6a2d161c/Sasha03842.nef
-            https://pp.userapi.com/c536436/u421323995/docs/d22/26d44b0b535a/Sasha03843.nef
-            https://pp.userapi.com/c536436/u421323995/docs/d21/92fca788e1a4/Sasha03853.nef
-            https://pp.userapi.com/c536436/u421323995/docs/d21/8fb0d281dc09/Sasha03869.nef
+          image_urls: [
+            "https://pp.userapi.com/bDB7jkzI-jt-AH4PYJSaSu4fgcZkk6LmkS8kOQ/MUr1-PtWzeE.jpg",
+            "https://pp.userapi.com/AcpmintgwJ8ZhbYqGLcTODDHp0JESS3SwA81JA/vTyhIPllNqg.jpg",
+            "https://pp.userapi.com/6_9o9t6Edk2ZmK3dmXphXuu4sjOMsnflqjnJPw/YJQ237Sddy4.jpg",
+            "https://pp.userapi.com/11RZLv9b-6pLrXjyvpJ9bZRC2uqI3u9bnMvZrg/VpVaJMQjFLY.jpg",
+            "https://pp.userapi.com/Z8rYUU0dAWLmrpa1xtfunVDrG9vvsNM2ytUI_Q/XhdUKOkaaak.jpg",
+            %r{https://pp.userapi.com/c536436/u421323995/docs/d7/\h{12}/Sasha03811.nef},
+            %r{https://pp.userapi.com/c536436/u421323995/docs/d46/\h{12}/Sasha03842.nef},
+            %r{https://pp.userapi.com/c536436/u421323995/docs/d22/\h{12}/Sasha03843.nef},
+            %r{https://pp.userapi.com/c536436/u421323995/docs/d21/\h{12}/Sasha03853.nef},
+            %r{https://pp.userapi.com/c536436/u421323995/docs/d21/\h{12}/Sasha03869.nef},
           ],
           media_files: [
             { file_size: 2_192_319 },
@@ -232,7 +232,7 @@ module Sources
       context "A wall post with a `w` param" do
         strategy_should_work(
           "https://vk.com/public191516762?w=wall-191516762_2283",
-          image_urls: %w[https://pp.userapi.com/c236331/u495199190/docs/d20/0fe566580e60/gift_1.png],
+          image_urls: [%r{https://pp.userapi.com/c236331/u495199190/docs/d20/\h{12}/gift_1.png}],
           media_files: [{ file_size: 4_252_200 }],
           page_url: "https://vk.com/wall-191516762_2283",
           profile_url: "https://vk.com/cloospi",

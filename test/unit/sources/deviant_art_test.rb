@@ -267,17 +267,39 @@ module Sources
 
     context "A page containing a non-downloadable video file" do
       strategy_should_work(
-        "https://www.deviantart.com/gs-mantis/art/Chen-Goes-Fishing-505847233",
-        image_urls: ["https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4"],
-        media_files: [{ file_size: 9_739_947, width: 1920, height: 1_080 }]
+        "https://www.deviantart.com/cutenikechan/art/Amelia-900276912",
+        image_urls: %w[https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/d204f74b-728d-4a3e-9d85-217e5f4fffa3/dew0240-8051caf7-f08a-4727-a974-7f5396644c2a.VideoQualities.res_1080p.23d4baf83a244c979bc3378b2643dfb6.mp4],
+        media_files: [{ file_size: 13_369_722, width: 1920, height: 1080 }],
+        page_url: "https://www.deviantart.com/cutenikechan/art/Amelia-900276912",
+        profile_url: "https://www.deviantart.com/cutenikechan",
+        profile_urls: %w[https://www.deviantart.com/cutenikechan],
+        artist_name: "CuteNikeChan",
+        tag_name: "cutenikechan",
+        other_names: ["CuteNikeChan", "cutenikechan"],
+        tags: [
+          ["chakraguardians", "https://www.deviantart.com/tag/chakraguardians"],
+          ["animation", "https://www.deviantart.com/tag/animation"],
+        ],
+        dtext_artist_commentary_title: "Amelia",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          my baby 💙💙💙
+          i finally finished this! gave myself a week and ended up taking 3 months LOL 💦
+          thanks for all the support! <3
+
+          available on youtube: "youtu.be/q_ZvkSLZL8Y":[https://youtu.be/q_ZvkSLZL8Y]
+          ♫ : damper – deeper (ft. cookie) - "youtu.be/38gqxMmNo7Q":[https://youtu.be/38gqxMmNo7Q]
+
+          (c) chakra guardians
+        EOS
       )
     end
 
     context "A direct non-downloadable video file" do
       strategy_should_work(
-        "https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4",
-        page_url: "https://www.deviantart.com/gs-mantis/art/Chen-Goes-Fishing-505847233",
-        image_urls: ["https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4"],
+        "https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/d204f74b-728d-4a3e-9d85-217e5f4fffa3/dew0240-8051caf7-f08a-4727-a974-7f5396644c2a.VideoQualities.res_1080p.23d4baf83a244c979bc3378b2643dfb6.mp4",
+        image_urls: %w[https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/d204f74b-728d-4a3e-9d85-217e5f4fffa3/dew0240-8051caf7-f08a-4727-a974-7f5396644c2a.VideoQualities.res_1080p.23d4baf83a244c979bc3378b2643dfb6.mp4],
+        media_files: [{ file_size: 13_369_722, width: 1920, height: 1080 }],
+        page_url: "https://www.deviantart.com/cutenikechan/art/Amelia-900276912"
       )
     end
 
