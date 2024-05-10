@@ -22,8 +22,7 @@ module Source
       memoize def article_image_urls
         return [] unless article_json.present?
 
-        html = Nokogiri::HTML5.fragment(artist_commentary_desc)
-        html.css("img").filter_map do |img|
+        artist_commentary_desc.to_s.parse_html.css("img").filter_map do |img|
           # Skip:
           #   <img data-src="//i0.hdslb.com/bfs/article/4adb9255ada5b97061e610b682b8636764fe50ed.png" class="cut-off-5">
           #   <img data-src="//i0.hdslb.com/bfs/article/card/1-1card458718717_web.png" width="1320" height="188" data-size="37499" aid="458718717" class="video-card nomal" type="nomal">

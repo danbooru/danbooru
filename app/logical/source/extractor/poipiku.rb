@@ -67,8 +67,7 @@ class Source::Extractor
       return nil if user_id.blank? || post_id.blank?
 
       html = http.cookies(POIPIKU_LK: Danbooru.config.poipiku_session_cookie).use(:spoof_referrer).cache(1.minute).parsed_post("https://poipiku.com/f/ShowAppendFileF.jsp", form: { UID: user_id, IID: post_id })
-      json = html&.text&.parse_json || {}
-      Nokogiri::HTML5.fragment(json["html"])
+      html&.text&.parse_json&.dig("html")&.parse_html
     end
   end
 end

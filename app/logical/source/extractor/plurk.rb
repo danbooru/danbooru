@@ -10,7 +10,7 @@ module Source
         if parsed_url.image_url?
           [url]
         else
-          Nokogiri::HTML5.fragment(artist_commentary_desc).css("a.pictureservices img").pluck("alt")
+          artist_commentary_desc.to_s.parse_html.css("a.pictureservices img").pluck("alt")
         end
       end
 
@@ -74,7 +74,7 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        return "" if Nokogiri::HTML5.fragment(artist_commentary_desc).text.blank?
+        return "" if artist_commentary_desc.to_s.parse_html.text.blank?
 
         DText.from_html(artist_commentary_desc, base_url: "https://www.plurk.com") do |element|
           case element.name

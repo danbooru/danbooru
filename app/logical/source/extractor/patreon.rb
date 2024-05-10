@@ -78,7 +78,7 @@ class Source::Extractor::Patreon < Source::Extractor
 
   def dtext_artist_commentary_desc
     # Ignore commentary if it only contains inline images with no actual text.
-    return "" if Nokogiri::HTML5.fragment(post["content"]).text.blank?
+    return "" if post["content"].to_s.parse_html.text.blank?
 
     DText.from_html(artist_commentary_desc, base_url: "https://www.patreon.com") do |element|
       if element.name == "img"

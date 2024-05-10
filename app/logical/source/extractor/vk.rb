@@ -49,7 +49,7 @@ class Source::Extractor::Vk < Source::Extractor
     if page_type == "wall"
       page&.at(".wall_item .pi_author")&.text
     elsif page_type == "photo"
-      Nokogiri::HTML5.fragment(photo["album_info_subtitle"])&.at("a")&.text
+      photo["album_info_subtitle"]&.parse_html&.at("a")&.text
     end
   end
 

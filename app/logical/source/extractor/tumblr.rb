@@ -214,7 +214,7 @@ class Source::Extractor
     memoize def inline_media
       # If this post is a reblog, only include images from it, not from the parent post(s).
       comment = post[:parent_post_url].present? ? post.dig(:reblog, :comment) : artist_commentary_desc
-      Nokogiri::HTML5.fragment(comment).css("img, video source").pluck(:src)
+      comment.to_s.parse_html.css("img, video source").pluck(:src)
     end
 
     def artist_name

@@ -31,8 +31,7 @@ module Source
 
       def images_from_text_post
         content = page_json.dig("postData", "data", "postData", "postView", "textPostView", "content").to_s
-        html = Nokogiri::HTML5.fragment(content)
-        html.css("img").pluck("src")
+        content.parse_html.css("img").pluck("src")
       end
 
       def images_from_answer_post

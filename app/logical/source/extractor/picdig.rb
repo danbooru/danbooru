@@ -9,13 +9,8 @@ module Source
         if parsed_url.image_url?
           [parsed_url.to_s]
         else
-          image_urls_from_commentary
+          artist_commentary_desc.to_s.parse_html.css("img").pluck("src")
         end
-      end
-
-      def image_urls_from_commentary
-          html = Nokogiri::HTML5.fragment(artist_commentary_desc)
-          html.css("img").map { |img| img[:src] }
       end
 
       def page_url
