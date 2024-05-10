@@ -744,6 +744,53 @@ module Sources
         )
       end
 
+      context "A Postype post with images but no text in the commentary" do
+        strategy_should_work(
+          "https://ansdj8181.postype.com/post/15493366",
+          image_urls: %w[
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/6486472d8fb33260fda91f57a543a3d1.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/d8d1805775f5de2337c686951543d8ad.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/73f44ae2fdb96f7bd2c58dd56ea42559.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/ed587778cc9e70802f8f731203c326d9.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/cc1d2ad2c5c32f7f0719863620b0810a.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/ea37a663dd8fdbe1838afdb9253f890e.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/17/00/34/1b37c5349372bb2694b58dae489a937e.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/14/45/2e8b6191827e6c18d4461c62cc79d9ec.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/3609f03cfdac44b6edeb32c15fb77214.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/e83c4f621f0aca0d1d274e591d719160.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/92d68223de97aa48aac4d26f8f4b5832.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/457be792f81e5f4d9d29793c6030c593.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/6fee38ed54d7e91c77f5eed2079f5fc3.jpeg
+            https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/16/13/27/cf11aa9cce528a582336aacf5bdff0a1.jpeg
+          ],
+          media_files: [
+            { file_size: 746_115 },
+            { file_size: 677_171 },
+            { file_size: 739_227 },
+            { file_size: 812_278 },
+            { file_size: 797_612 },
+            { file_size: 898_144 },
+            { file_size: 760_613 },
+            { file_size: 822_691 },
+            { file_size: 705_406 },
+            { file_size: 751_220 },
+            { file_size: 504_816 },
+            { file_size: 731_975 },
+            { file_size: 752_746 },
+            { file_size: 118_919 },
+          ],
+          page_url: "https://ansdj8181.postype.com/post/15493366",
+          profile_url: "https://ansdj8181.postype.com",
+          profile_urls: %w[https://ansdj8181.postype.com https://www.postype.com/profile/@53g0ab],
+          artist_name: "박펩",
+          tag_name: "53g0ab",
+          other_names: ["박펩", "53g0ab"],
+          tags: [],
+          dtext_artist_commentary_title: "[소요타키]",
+          dtext_artist_commentary_desc: ""
+        )
+      end
+
       context "A membership-only Postype post" do
         strategy_should_work(
           "https://bbunny-backstreet.postype.com/post/12206917",

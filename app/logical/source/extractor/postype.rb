@@ -45,6 +45,8 @@ class Source::Extractor::Postype < Source::Extractor
   end
 
   def dtext_artist_commentary_desc
+    return "" if artist_commentary_desc.to_s.parse_html.tap { _1.css("section, script").remove }.text.blank?
+
     DText.from_html(artist_commentary_desc, base_url: blog_url) do |element|
       case element.name
       in "figure"
