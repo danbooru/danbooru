@@ -142,6 +142,13 @@ module Sources
         )
       end
 
+      context "A work with the isOriginal flag but not tagged オリジナル" do
+        strategy_should_work(
+          "https://www.pixiv.net/en/artworks/116168818",
+          tags: %w[むちむち VTuber タンクトップ 褐色 ぽっちゃり BBW chubby pixiv_commission original]
+        )
+      end
+
       context "A work with HTML in the commentary should convert the commentary to DText" do
         strategy_should_work(
           "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65985331",
@@ -329,6 +336,7 @@ module Sources
           other_names: ["wlop"],
           tags: [
             ["ghostblade", "https://www.pixiv.net/tags/ghostblade/artworks"],
+            ["original", "https://www.pixiv.net/tags/オリジナル/artworks"],
             ["wlop", "https://www.pixiv.net/tags/wlop/artworks"],
             ["海琴烟", "https://www.pixiv.net/tags/海琴烟/artworks"],
             ["オリジナル10000users入り", "https://www.pixiv.net/tags/オリジナル10000users入り/artworks"],
@@ -472,6 +480,7 @@ module Sources
           tag_name: nil,
           other_names: ["しゅか"],
           tags: [
+            ["original", "https://www.pixiv.net/tags/オリジナル/novels"],
             ["オリキャラ", "https://www.pixiv.net/tags/オリキャラ/novels"],
             ["ファンタジー", "https://www.pixiv.net/tags/ファンタジー/novels"],
             ["pixivファンタジアSOZ", "https://www.pixiv.net/tags/pixivファンタジアSOZ/novels"],
@@ -505,6 +514,7 @@ module Sources
           tag_name: nil,
           other_names: ["しゅか"],
           tags: [
+            ["original", "https://www.pixiv.net/tags/オリジナル/novels"],
             ["pixivファンタジアSOZ", "https://www.pixiv.net/tags/pixivファンタジアSOZ/novels"],
             ["オリキャラ", "https://www.pixiv.net/tags/オリキャラ/novels"],
             ["ファンタジー", "https://www.pixiv.net/tags/ファンタジー/novels"],
@@ -539,6 +549,7 @@ module Sources
           tag_name: nil,
           other_names: ["しゅか"],
           tags: [
+            ["original", "https://www.pixiv.net/tags/オリジナル/novels"],
             ["pixivファンタジアSOZ", "https://www.pixiv.net/tags/pixivファンタジアSOZ/novels"],
             ["オリキャラ", "https://www.pixiv.net/tags/オリキャラ/novels"],
             ["ファンタジー", "https://www.pixiv.net/tags/ファンタジー/novels"],
