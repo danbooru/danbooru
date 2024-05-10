@@ -9,7 +9,7 @@ class Source::Extractor
       elsif api_response["product"].present? # product
         api_response.dig("product", "covers").pluck("original_url")
       elsif artist_commentary_desc.present? # post
-        urls = Nokogiri::HTML5.fragment(artist_commentary_desc).css("img").pluck("src")
+        urls = artist_commentary_desc.to_s.parse_html.css("img").pluck("src")
         urls.select { |url| Source::URL::Gumroad.parse(url)&.image_url? }
       end
     end

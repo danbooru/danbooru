@@ -12,7 +12,7 @@ class Source::Extractor::Blogger < Source::Extractor
     elsif parsed_url.image_url?
       [parsed_url.to_s]
     else
-      Nokogiri::HTML5.fragment(artist_commentary_desc).css("img").map do |img|
+      artist_commentary_desc.to_s.parse_html.css("img").map do |img|
         url = img["data-src"] || img["src"]
         Source::URL.parse(url).try(:full_image_url) || url
       end
@@ -61,7 +61,7 @@ class Source::Extractor::Blogger < Source::Extractor
 
   def dtext_artist_commentary_desc
     # Ignore commentary if it only contains images with no actual text.
-    return "" if Nokogiri::HTML5.fragment(artist_commentary_desc).text.blank?
+    return "" if artist_commentary_desc.to_s.parse_html.text.blank?
 
     DText.from_html(artist_commentary_desc, base_url: blog_url) do |element|
       case element.name

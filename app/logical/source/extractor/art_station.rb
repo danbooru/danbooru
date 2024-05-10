@@ -54,7 +54,7 @@ class Source::Extractor
         if asset[:asset_type] == "image"
           asset_url(asset[:image_url])
         elsif asset[:asset_type] == "video_clip"
-          url = Nokogiri::HTML5.parse(asset[:player_embedded]).at("iframe").attr("src")
+          url = asset[:player_embedded].to_s.parse_html.at("iframe")&.attr("src")
           page = http.cache(1.minute).parsed_get(url)
           page&.at("video source")&.attr("src")
         end

@@ -8,7 +8,7 @@ class Source::Extractor::Postype < Source::Extractor
     elsif parsed_url.image_url?
       [parsed_url.to_s]
     else
-      html = Nokogiri::HTML5.fragment(artist_commentary_desc)
+      html = artist_commentary_desc.to_s.parse_html
       html.css("figure img").pluck("src").map { |url| Source::URL.parse(url).try(:full_image_url) || url }
     end
   end

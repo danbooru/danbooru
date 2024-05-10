@@ -79,7 +79,7 @@ class Source::Extractor::NaverPost < Source::Extractor
   end
 
   memoize def html
-    Nokogiri::HTML5.fragment(page&.at("script#__clipContent")&.content)
+    page&.at("script#__clipContent")&.content&.parse_html
   end
 
   memoize def page
