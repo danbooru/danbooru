@@ -185,6 +185,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(any_name_matches: "masao", order: "post_count").with { @masao }
         should respond_to_search(url_matches: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg").with { @masao }
         should respond_to_search(url_matches: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939").with { @masao }
+        should respond_to_search(url_matches: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939 https://example.com/1234").with { @masao }
 
         context "ignoring whitespace" do
           should respond_to_search(url_matches: " http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939 ").with { @masao }
