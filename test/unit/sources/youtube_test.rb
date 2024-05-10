@@ -23,6 +23,15 @@ module Sources
         )
       end
 
+      context "A channel banner sample image URL" do
+        strategy_should_work(
+          "https://yt3.googleusercontent.com/5eDKuCEpw0-fZVUX29AF7XCAQY7t3FeocoiBrmQd1PGQemBcCQZlkqazoDwSvR7mbEc_IiRgNko=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj",
+          image_urls: %w[https://yt3.googleusercontent.com/5eDKuCEpw0-fZVUX29AF7XCAQY7t3FeocoiBrmQd1PGQemBcCQZlkqazoDwSvR7mbEc_IiRgNko=d],
+          media_files: [{ file_size: 3_431_132 }],
+          page_url: nil
+        )
+      end
+
       context "A playlist album cover image URL with a playlist referer" do
         strategy_should_work(
           "https://lh3.googleusercontent.com/-o3R2xYfE_i2CnlCKGuGdd_l2etaZUHo-pWraD83isUZdkZpBhdAdt5Q7oQGsRf5TFHpnr2i1wD1YKLrgA=w544-h544-l90-rj",

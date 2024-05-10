@@ -8,7 +8,7 @@ class Source::URL::Youtube < Source::URL
   attr_reader :username, :handle, :channel_name, :channel_id, :bare_id, :video_id, :post_id, :playlist_id, :full_image_url
 
   def self.match?(url)
-    url.domain.in?(%w[youtube.com youtu.be ytimg.com]) || url.host.match?(/^yt\d+\.ggpht\.com$/)
+    url.domain.in?(%w[youtube.com youtu.be ytimg.com]) || ([url.subdomain, url.domain] in /yt/, ("ggpht.com" | "googleusercontent.com"))
   end
 
   def parse
@@ -19,7 +19,8 @@ class Source::URL::Youtube < Source::URL
     # https://yt3.ggpht.com/U3N1xsa0RLryoiEUvEug69qB3Ke8gSdqXOld3kEU6T8DGCTRnAZdqW9QDt4zSRDKq_Sotb0YpZqG0RY=s1600-rw-nd-v1
     # https://yt3.ggpht.com/a/AATXAJw4dDQ19NyBDauQOSCTypEdS8pGleIVH81mo_Xj=s900-c-k-c0xffffffff-no-rj-mo
     # https://yt3.ggpht.com/a-/AAuE7mA3PVjbd2Cq5Nixkf7WCC1vAdf_e4KOk7P45w=s100-mo-c-c0xffffffff-rj-k-no
-    in /^yt\d+$/, "ggpht.com", *subdirs, image_id
+    # https://yt3.googleusercontent.com/5eDKuCEpw0-fZVUX29AF7XCAQY7t3FeocoiBrmQd1PGQemBcCQZlkqazoDwSvR7mbEc_IiRgNko=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj (channel banner)
+    in /^yt\d+$/, ("ggpht.com" | "googleusercontent.com"), *subdirs, image_id
       image_id = image_id.split("=").first
       @full_image_url = ["https://#{host}", *subdirs, "#{image_id}=d"].join("/")
 
