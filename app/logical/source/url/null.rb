@@ -697,4 +697,14 @@ class Source::URL::Null < Source::URL
   def recognized?
     @recognized
   end
+
+  # Return `nil` to indicate that we don't know whether it's a bad source or not, since most sites here aren't fully
+  # handled. Returning nil means the tag won't be added to or removed from the post.
+  def bad_source?
+    nil
+  end
+
+  def bad_link?
+    nil
+  end
 end
