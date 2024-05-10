@@ -29,8 +29,6 @@ class Source::URL::Null < Source::URL
       "Ask.fm"
     in _, ("bandcamp.com" | "bcbits.com")
       "Bandcamp"
-    in _, ("bcy.net" | "bcyimg.com")
-      "BCY"
     in _, "bigcartel.com"
       "Big Cartel"
     in _, "buymeacoffee.com"
@@ -121,8 +119,6 @@ class Source::URL::Null < Source::URL
       "OnlyFans"
     in _, ("overdoll.com" | "dollycdn.net")
       "Overdoll"
-    in _, ("patreon.com" | "patreonusercontent.com")
-      "Patreon"
     in _, ("paypal.com" | "paypal.me" | "paypalobjects.com")
       "PayPal"
     in _, "pixeljoint.com"
@@ -258,14 +254,6 @@ class Source::URL::Null < Source::URL
     # http://hi.baidu.com/longbb1127/home
     # http://hi.baidu.com/new/mocaorz
     in _, "baidu.com", *rest
-      nil
-
-    # https://bcy.net/u/1617969
-    in _, "bcy.net", "u", user_id
-      @profile_url = "https://bcy.net/u/#{user_id}"
-
-    # https://img9.bcyimg.com/drawer/32360/post/178vu/46229ec06e8111e79558c1b725ebc9e6.jpg
-    in _, ("bcy.net" | "bcyimg.com"), *rest
       nil
 
     # http://img.booru.org/drawfriends//images/36/de65da5f588b76bc1d9de8af976b540e2dff17e2.jpg
@@ -498,10 +486,6 @@ class Source::URL::Null < Source::URL
 
     # https://onlyfans.com/evviart
     in _, "onlyfans.com", *rest
-      nil
-
-    # http://patreon.com/serafleur
-    in _, "patreon.com", *rest
       nil
 
     # https://peing.net/ja/scape0505kigkig
