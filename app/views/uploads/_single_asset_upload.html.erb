@@ -84,7 +84,7 @@
               <div class="inline-block">
                 <% if upload_media_asset.file_upload? %>
                   <%= external_link_to "https://saucenao.com/search.php?url=#{Danbooru::URL.escape(media_asset.original.file_url)}", "No Source", target: "_blank", class: "upload-no-source-warning button-danger button-xs" %>
-                <% elsif upload_media_asset.bad_source? %>
+                <% elsif upload_media_asset.bad_link? %>
                   <%= link_to "Bad Source", wiki_page_path("bad_link"), class: "upload-source-warning button-danger button-xs" %>
                 <% end %>
 

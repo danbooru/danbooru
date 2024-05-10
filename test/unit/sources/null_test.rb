@@ -196,5 +196,19 @@ module Sources
         assert_nil(Source::URL.page_url("https://example.com/Folder/中央大学.html"))
       end
     end
+
+    context "The bad_source? method" do
+      should "not treat recognized but unhandled sites as bad sources" do
+        assert_nil(Source::URL.parse("https://www.etsy.com/shop/yeurei").bad_source?)
+        assert_nil(Source::URL.parse("https://i.etsystatic.com/isbl/ef769d/65460303/isbl_3360x840.65460303_idqpnurw.jpg").bad_source?)
+      end
+    end
+
+    context "The bad_link? method" do
+      should "not treat recognized but unhandled sites as bad links" do
+        assert_nil(Source::URL.parse("https://www.etsy.com/shop/yeurei").bad_link?)
+        assert_nil(Source::URL.parse("https://i.etsystatic.com/isbl/ef769d/65460303/isbl_3360x840.65460303_idqpnurw.jpg").bad_link?)
+      end
+    end
   end
 end
