@@ -19,6 +19,7 @@ module Searchable
     q = q.select(q.select_values + relation.select_values) if !relation.select_values.empty?
     q = q.from(relation.from_clause.value) if !relation.from_clause.empty?
     q = q.joins(relation.joins_values + q.joins_values) if relation.joins_values.present?
+    q = q.left_outer_joins(relation.left_outer_joins_values + q.left_outer_joins_values) if relation.left_outer_joins_values.present?
     q = q.where(relation.where_clause.ast) if relation.where_clause.present?
     q = q.group(relation.group_values) if relation.group_values.present?
     q = q.order(relation.order_values) if relation.order_values.present? && !relation.reordering_value
