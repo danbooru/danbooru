@@ -1428,6 +1428,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post = create(:post)
 
       assert_tag_match([post], "order:modqueue")
+      assert_tag_match([post], "order:modqueue random:1")
     end
 
     should "return posts for a filesize search" do
