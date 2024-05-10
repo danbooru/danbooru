@@ -509,6 +509,7 @@ class ArtistTest < ActiveSupport::TestCase
       assert_search_equals(bkub, url_matches: "*bkub*")
       assert_search_equals(bkub, url_matches: "/rifyu|bkub/")
       assert_search_equals(bkub, url_matches: "http://bkub.com/test.jpg")
+      assert_search_equals(bkub, url_matches: "http://bkub.com/test.jpg https://www.pixiv.net/users/9948")
     end
 
     should "search on has_tag and return matches" do
