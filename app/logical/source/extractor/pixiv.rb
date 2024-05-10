@@ -145,6 +145,10 @@ module Source
           tags += [["pixiv_commission", "https://www.pixiv.net/tags/依頼絵/#{tag_type}"]]
         end
 
+        if api_response["isOriginal"].present?
+          tags += [["original", "https://www.pixiv.net/tags/オリジナル/#{tag_type}"]]
+        end
+
         tags
       end
 
