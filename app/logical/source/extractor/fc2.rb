@@ -19,7 +19,7 @@ module Source
 
       def page_url
         if parsed_url.candidate_page_urls.present?
-          parsed_url.candidate_page_urls.find { |url| http_exists?(url) } || url.to_s
+          parsed_url.candidate_page_urls.find { |url| http_exists?(url) }
         else
           parsed_url.page_url || parsed_referer&.page_url
         end
