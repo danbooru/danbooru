@@ -12,9 +12,10 @@ class Source::URL::Twitter < Source::URL
   attr_reader :status_id, :username, :user_id, :full_image_url
 
   def self.match?(url)
-    # TwitPic uses https://o.twimg.com/ URLs
+    # https://o.twimg.com URLs are handled by Source::URL::TwitPic.
+    # https://pic.twitter.com and https://t.co URLs are handled by Source::URL::URLShortener.
     # fxtwitter.com, etc are from https://github.com/FixTweet/FxTwitter.
-    url.domain.in?(%w[twitter.com fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com twimg.com t.co x.com]) && url.host != "o.twimg.com"
+    url.domain.in?(%w[twitter.com fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com twimg.com x.com]) && !url.host.in?(%w[o.twimg.com pic.twitter.com])
   end
 
   def parse
@@ -72,14 +73,6 @@ class Source::URL::Twitter < Source::URL
     # https://pbs-0.twimg.com/media/C9xkZf7UMAEbsf7.jpg
     # https://p.twimg.com/A1zDhzxCMAA0vtj.jpg:large
     in _, "twimg.com", *rest
-      nil
-
-    # https://t.co/Dxn7CuVErW => https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
-    in _, "t.co", *rest
-      nil
-
-    # https://pic.twitter.com/Dxn7CuVErW => https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
-    in "pic", "twitter.com", *rest
       nil
 
     # https://twitter.com/i/web/status/943446161586733056

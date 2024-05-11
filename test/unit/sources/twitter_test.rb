@@ -550,8 +550,8 @@ module Sources
 
       assert_nil(Source::URL.parse("https://twitter.com/i/status/1261877313349640194").username)
       assert_nil(Source::URL.parse("https://twitter.com/i/web/status/1261877313349640194").username)
-      assert_nil(Source::URL.parse("https://t.co/Dxn7CuVErW").username)
-      assert_nil(Source::URL.parse("https://pic.twitter.com/Dxn7CuVErW").username)
+      assert_nil(Source::URL.parse("https://t.co/Dxn7CuVErW").try(:username))
+      assert_nil(Source::URL.parse("https://pic.twitter.com/Dxn7CuVErW").try(:username))
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/BOW999/status/1261877313349640194").username)
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/@BOW999/status/1261877313349640194").username)
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/@BOW999").username)

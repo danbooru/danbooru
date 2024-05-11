@@ -128,8 +128,12 @@ module Danbooru
       parsed_request(:post, url, **options)
     end
 
-    def follow(*args)
-      dup.tap { |o| o.http = o.http.follow(*args) }
+    def follow(max_redirects: MAX_REDIRECTS)
+      use(redirector: { max_redirects: })
+    end
+
+    def no_follow
+      disable_feature(:redirector)
     end
 
     def max_size(size)
@@ -158,6 +162,14 @@ module Danbooru
 
     def use(*args)
       dup.tap { |o| o.http = o.http.use(*args) }
+    end
+
+    def disable_feature(*features)
+      dup.tap do |o|
+        options = o.http.default_options.dup
+        options.features = options.features.without(*features)
+        o.http = o.http.branch(options)
+      end
     end
 
     def cache(expires_in)
