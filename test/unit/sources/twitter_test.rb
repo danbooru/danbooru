@@ -2,6 +2,16 @@ require 'test_helper'
 
 module Sources
   class TwitterTest < ActiveSupport::TestCase
+    context "A Twitter profile picture sample image" do
+      strategy_should_work(
+        "https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs_400x400.jpeg",
+        image_urls: %w[https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs.jpeg],
+        media_files: [{ file_size: 203_927, width: 1252, height: 1252 }],
+        page_url: nil,
+        profile_urls: %w[https://twitter.com/intent/user?user_id=417182061145780225]
+      )
+    end
+
     context "A https://twitter.com/:username/status/:id url" do
       strategy_should_work(
         "https://twitter.com/motty08111213/status/943446161586733056",
