@@ -29,12 +29,13 @@ class Source::URL::Pinterest < Source::URL
       @pin_id = pin_id
 
     # https://www.pinterest.com/uchihajake/
-    # https://www.pinterest.com/uchihajake/_saved
     # https://www.pinterest.com/uchihajake/hands/
-    in _, "pinterest", _, username, *rest unless username.in?(RESERVED_NAMES)
+    # https://jp.pinterest.com/uchihajake/
+    in _, "pinterest", _, username, *rest unless username.in?(RESERVED_NAMES) || subdomain == "api"
       @username = username
 
     # https://www.pinterest.com/ideas/people/935950727927/
+    # https://api.pinterest.com/url_shortener/4A1N0Rd5W/redirect/
     else
       nil
     end

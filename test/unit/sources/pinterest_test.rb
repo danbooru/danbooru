@@ -99,7 +99,8 @@ module Sources
         assert(Source::URL.profile_url?("https://pl.pinterest.com/uchihajake/"))
         assert(Source::URL.profile_url?("https://www.pinterest.jp/totikuma/自作イラスト-my-illustrations/"))
 
-        refute(Source::URL.profile_url?("https://www.pinterest.com/ideas/people/935950727927/"))
+        assert_not(Source::URL.profile_url?("https://www.pinterest.com/ideas/people/935950727927/"))
+        assert_not(Source::URL.profile_url?("https://api.pinterest.com/url_shortener/4A1N0Rd5W/redirect/"))
       end
     end
   end

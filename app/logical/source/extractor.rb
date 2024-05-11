@@ -305,6 +305,22 @@ module Source
       http_downloader.head(url).status.success?
     end
 
+    # @return [Enumerator] An enumerator that lets you iterate across the chain of parent extractors.
+    def each_parent
+      return enum_for(:each_parent) unless block_given?
+
+      parent = parent_extractor
+      while parent.present?
+        yield parent
+        parent = parent.parent_extractor
+      end
+    end
+
+    # @return [Array<Source::Extractor>] Return the list of parent extractors.
+    def parent_extractors
+      each_parent.to_a
+    end
+
     # Convert commentary to dtext by stripping html tags. Sites can override
     # this to customize how their markup is translated to dtext.
     def self.to_dtext(text)
