@@ -33,5 +33,44 @@ class SourceURLTest < ActiveSupport::TestCase
         assert_equal("/20140924_45/dnflgmldus_1411489948549jC2ma_PNG/%BD%C3%C1%EE%C7%C3%B7%B9%BE%EE.png", Source::URL.parse("https://cafeptthumb-phinf.pstatic.net/20140924_45/dnflgmldus_1411489948549jC2ma_PNG/%BD%C3%C1%EE%C7%C3%B7%B9%BE%EE.png?type=w1600")&.path)
       end
     end
+
+    context "the == operator" do
+      should "compare URLs strictly" do
+        assert(Source::URL.parse("http://google.com") == Source::URL.parse("http://google.com"))
+
+        assert(Source::URL.parse("http://google.com")   != Danbooru::URL.parse("http://google.com"))
+        assert(Danbooru::URL.parse("http://google.com") != Source::URL.parse("http://google.com"))
+        assert(Source::URL.parse("http://google.com")   != Addressable::URI.parse("http://google.com"))
+        assert(Source::URL.parse("http://google.com")   != URI.parse("http://google.com"))
+        assert(Source::URL.parse("http://google.com")   != "http://google.com")
+
+        assert(Source::URL.parse("http://google.com") != Source::URL.parse("https://google.com"))
+        assert(Source::URL.parse("http://google.com") != Source::URL.parse("http://GOOGLE.com"))
+        assert(Source::URL.parse("http://google.com") != Source::URL.parse("http://google.com/"))
+        assert(Source::URL.parse("http://google.com") != Source::URL.parse("http://google.com?"))
+        assert(Source::URL.parse("http://google.com") != Source::URL.parse("http://google.com#"))
+        assert(Source::URL.parse("http://google.com") != Source::URL.parse("http://user:pass@google.com#"))
+      end
+    end
+
+    context "the === operator" do
+      should "compare URLs loosely" do
+        assert(Source::URL.parse("http://google.com") === Source::URL.parse("http://google.com"))
+
+        assert(Source::URL.parse("http://google.com")   === Danbooru::URL.parse("http://google.com"))
+        assert(Danbooru::URL.parse("http://google.com") === Source::URL.parse("http://google.com"))
+        assert(Source::URL.parse("http://google.com")   === Addressable::URI.parse("http://google.com"))
+        assert(Source::URL.parse("http://google.com")   === URI.parse("http://google.com"))
+        assert(Source::URL.parse("http://google.com")   === "http://google.com")
+
+        assert(Source::URL.parse("http://google.com") === Source::URL.parse("http://GOOGLE.com"))
+        assert(Source::URL.parse("http://google.com") === Source::URL.parse("http://google.com/"))
+
+        assert_not(Source::URL.parse("http://google.com") === Source::URL.parse("https://google.com"))
+        assert_not(Source::URL.parse("http://google.com") === Source::URL.parse("http://google.com?"))
+        assert_not(Source::URL.parse("http://google.com") === Source::URL.parse("http://google.com#"))
+        assert_not(Source::URL.parse("http://google.com") === Source::URL.parse("http://user:pass@google.com#"))
+      end
+    end
   end
 end

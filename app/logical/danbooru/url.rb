@@ -161,5 +161,30 @@ module Danbooru
     memoize def ip_address
       Danbooru::IpAddress.parse(hostname) unless hostname.blank?
     end
+
+    # Strict equality on unnormalized URLs. `Danbooru::URL.parse("https://google.com") == Danbooru::URL.parse("https://google.com/")` is false.
+    def ==(other)
+      self.class == other.class && to_s == other.to_s
+    end
+
+    # Case equality on normalized URLs. Allows comparisons with strings or regexps. `Danbooru::URL.parse("https://www.google.com") === "https://WWW.google.com/"` is true.
+    def ===(other)
+      case other
+      when Regexp
+        to_normalized_s.match?(other)
+      when Danbooru::URL
+        to_normalized_s == other.to_normalized_s
+      else
+        to_normalized_s == Danbooru::URL.parse(other.try(:to_str))&.to_normalized_s
+      end
+    end
+
+    # Hash key equality.
+    alias_method :eql?, :==
+
+    # Hash the URL for when it's used as a hash key.
+    def hash
+      [self.class, original_url].hash
+    end
   end
 end
