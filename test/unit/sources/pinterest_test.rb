@@ -85,6 +85,7 @@ module Sources
         assert(Source::URL.page_url?("https://jp.pinterest.com/pin/551409548144250908/"))
 
         assert(Source::URL.page_url?("https://www.pinterest.com/pin/AVBZICDCT7hRTla-jHiJ6w2eVUK1wuq7WRYG8P_uqZIziXisjxatHMA/"))
+        assert(Source::URL.page_url?("https://www.pinterest.com/pin/580612576989556785/sent/?invite_code=9e94baa7faae405d84a7787593fa46fd&sender=580612714368486682&sfo=1"))
         assert(Source::URL.page_url?("https://www.pinterest.co.uk/pin/super-mario--600175087827955508/"))
 
         assert(Source::URL.profile_url?("https://pinterest.com/uchihajake/"))
