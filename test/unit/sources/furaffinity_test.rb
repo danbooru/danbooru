@@ -75,6 +75,11 @@ module Sources
       assert(Source::URL.profile_url?("https://www.furaffinity.net/gallery/iwbitu"))
       assert(Source::URL.profile_url?("https://www.furaffinity.net/gallery/iwbitu/folder/133763/Regular-commissions"))
       assert(Source::URL.profile_url?("https://www.furaffinity.net/stats/duskmoor/submissions/"))
+
+      assert_equal("https://www.furaffinity.net/view/1234", Source::URL.page_url("https://fxraffinity.net/view/1234"))
+      assert_equal("https://www.furaffinity.net/view/1234", Source::URL.page_url("https://fxfuraffinity.net/view/1234"))
+      assert_equal("https://www.furaffinity.net/view/1234", Source::URL.page_url("https://vxfuraffinity.net/view/1234"))
+      assert_equal("https://www.furaffinity.net/view/1234", Source::URL.page_url("https://xfuraffinity.net/view/1234"))
     end
   end
 end
