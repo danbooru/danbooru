@@ -42,6 +42,7 @@ module Sources
       end
 
       context "A valid shortened URL" do
+        assert_redirects_to("https://amzn.to/4afHvyL", "https://www.amazon.com/Portable-Shortwave-Operated-Reception-Earphone/dp/B0BPKJ1XP1")
         assert_redirects_to("http://bit.ly/4aAVa4y", "https://fantia.jp/posts/2679869?utm_source=pixiv&utm_medium=referral")
         assert_redirects_to("http://j.mp/cKV0uf", "http://blog-imgs-32-origin.fc2.com/c/o/n/connyac/20100314032806e94.jpg")
         assert_redirects_to("http://cutt.ly/GfQ2szk", "https://www.youtube.com/channel/UCTeu1oeRYy8Kz_tpv0mASYg?view_as=subscriber")
@@ -61,6 +62,7 @@ module Sources
       end
 
       context "A deleted or nonexistent shortened URL" do
+        assert_redirects_to("https://amzn.to/bad", nil)
         assert_redirects_to("https://bit.ly/qwo9iqwe9ogqerg", nil)
         assert_redirects_to("https://cutt.ly/qwoifjqwio", nil)
         assert_redirects_to("https://goo.gl/bad", nil)

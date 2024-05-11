@@ -47,7 +47,7 @@ class Source::Extractor::URLShortener < Source::Extractor
 
     # amzn.to returns a 302 redirect to http://www.amazon.com on error.
     in "amzn.to"
-      location&.host == "www.amazon.com"
+      location&.host == "www.amazon.com" && location&.path.blank?
 
     # ow.ly returns a 301 relative redirect to /url/invalid on error.
     in "ow.ly"
