@@ -1,28 +1,13 @@
 # frozen_string_literal: true
 
-# Unhandled:
-#
-# Video URLs:
-#
-# * https://video.twimg.com/tweet_video/E_8lAMJUYAIyenr.mp4
-# * https://video.twimg.com/ext_tw_video/1496554514312269828/pu/pl/Srzcr2EsBK5Mwlvf.m3u8?tag=12&container=fmp4
-# * https://video.twimg.com/ext_tw_video/1496554514312269828/pu/vid/360x270/SygSrUcDpCr1AnOf.mp4?tag=12
-# * https://video.twimg.com/ext_tw_video/1496554514312269828/pu/vid/960x720/wiC1XIw8QehhL5JL.mp4?tag=12
-# * https://video.twimg.com/ext_tw_video/1496554514312269828/pu/vid/480x360/amWjOw0MmLdnPMPB.mp4?tag=12
-#
 # Profile image URLs:
 # * https://pbs.twimg.com/profile_images/1493345400929112064/lF1mY1i2_normal.jpg
-#
-# Shortened URLs:
-#
-# * https://t.co/Dxn7CuVErW => https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
-# * https://pic.twitter.com/Dxn7CuVErW => https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
 
 class Source::URL::Twitter < Source::URL
   # Twitter provides a list of reserved usernames but it's inaccurate; some names ('intent') aren't
   # included and other names in the list aren't actually reserved.
   # https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration
-  RESERVED_USERNAMES = %w[home i intent search]
+  RESERVED_USERNAMES = %w[home explore i intent messages notifications privacy search tos]
 
   attr_reader :status_id, :username, :user_id, :full_image_url
 
@@ -34,34 +19,6 @@ class Source::URL::Twitter < Source::URL
 
   def parse
     case [subdomain, domain, *path_segments]
-
-    # https://twitter.com/i/web/status/943446161586733056
-    in _, _, "i", "web", "status", status_id
-      @status_id = status_id
-
-    # https://twitter.com/i/status/943446161586733056
-    # https://twitter.com/motty08111213/status/943446161586733056
-    # https://twitter.com/@motty08111213/status/943446161586733056
-    # https://twitter.com/motty08111213/status/943446161586733056?s=19
-    # https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
-    # https://twitter.com/sato_1_11/status/1496489742791475201/photo/2
-    # https://fxtwitter.com/example/status/1548117889437208581.jpg
-    in _, _, username, "status", status_id, *rest
-      username = username.delete_prefix("@")
-      @username = username unless username.in?(RESERVED_USERNAMES)
-      @status_id = status_id.split(".").first
-
-    # https://twitter.com/intent/user?user_id=1485229827984531457
-    in _, _, "intent", "user" if params[:user_id].present?
-      @user_id = params[:user_id]
-
-    # https://twitter.com/intent/user?screen_name=ryuudog_NFT
-    in _, _, "intent", "user" if params[:screen_name].present?
-      @username = params[:screen_name]
-
-    # https://twitter.com/i/user/889592953
-    in _, _, "i", "user", user_id
-      @user_id = user_id
 
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:small
@@ -94,6 +51,50 @@ class Source::URL::Twitter < Source::URL
     # https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=small
     in _, "twimg.com", "ad_img" => media_type, media_id, file if params[:format].present?
       @full_image_url = "#{site}/#{media_type}/#{media_id}/#{file}?format=#{params[:format]}&name=orig"
+
+    # https://video.twimg.com/tweet_video/E_8lAMJUYAIyenr.mp4
+    # https://video.twimg.com/ext_tw_video/1496554514312269828/pu/pl/Srzcr2EsBK5Mwlvf.m3u8?tag=12&container=fmp4
+    # https://video.twimg.com/ext_tw_video/1496554514312269828/pu/vid/360x270/SygSrUcDpCr1AnOf.mp4?tag=12
+    # https://video.twimg.com/ext_tw_video/1496554514312269828/pu/vid/960x720/wiC1XIw8QehhL5JL.mp4?tag=12
+    # https://video.twimg.com/ext_tw_video/1496554514312269828/pu/vid/480x360/amWjOw0MmLdnPMPB.mp4?tag=12
+    in _, "twimg.com", *rest
+      nil
+
+    # https://t.co/Dxn7CuVErW => https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
+    in _, "t.co", *rest
+      nil
+
+    # https://pic.twitter.com/Dxn7CuVErW => https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
+    in "pic", "twitter.com", *rest
+      nil
+
+    # https://twitter.com/i/web/status/943446161586733056
+    in _, _, "i", "web", "status", status_id
+      @status_id = status_id
+
+    # https://twitter.com/i/status/943446161586733056
+    # https://twitter.com/motty08111213/status/943446161586733056
+    # https://twitter.com/@motty08111213/status/943446161586733056
+    # https://twitter.com/motty08111213/status/943446161586733056?s=19
+    # https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
+    # https://twitter.com/sato_1_11/status/1496489742791475201/photo/2
+    # https://fxtwitter.com/example/status/1548117889437208581.jpg
+    in _, _, username, "status", status_id, *rest
+      username = username.delete_prefix("@")
+      @username = username unless username.in?(RESERVED_USERNAMES)
+      @status_id = status_id.split(".").first
+
+    # https://twitter.com/intent/user?user_id=1485229827984531457
+    in _, _, "intent", "user" if params[:user_id].present?
+      @user_id = params[:user_id]
+
+    # https://twitter.com/intent/user?screen_name=ryuudog_NFT
+    in _, _, "intent", "user" if params[:screen_name].present?
+      @username = params[:screen_name]
+
+    # https://twitter.com/i/user/889592953
+    in _, _, "i", "user", user_id
+      @user_id = user_id
 
     # https://twitter.com/merry_bongbong/header_photo
     in _, _, username, "header_photo" unless username.in?(RESERVED_USERNAMES)
