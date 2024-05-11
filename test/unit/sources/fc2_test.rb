@@ -36,6 +36,22 @@ module Sources
         )
       end
 
+      context "A deleted image URL" do
+        strategy_should_work(
+          "http://blog-imgs-32-origin.fc2.com/c/o/n/connyac/20100314032806e94.jpg",
+          image_urls: %w[http://blog-imgs-32-origin.fc2.com/c/o/n/connyac/20100314032806e94.jpg],
+          page_url: nil,
+          profile_url: "http://connyac.blog.fc2.com",
+          profile_urls: %w[http://connyac.blog.fc2.com],
+          artist_name: "connyac",
+          tag_name: "connyac",
+          other_names: ["connyac"],
+          tags: [],
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: ""
+        )
+      end
+
       context "A blog post with a mobile version" do
         strategy_should_work(
           "https://niyamalog.blog.fc2.com/blog-entry-3.html",

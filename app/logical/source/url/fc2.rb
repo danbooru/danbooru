@@ -102,7 +102,7 @@ class Source::URL::Fc2 < Source::URL
           http://#{username}.blog.#{domain}/img/#{basename}/
         ]
       else
-        @candidate_page_urls = "http://#{username}.blog.#{domain}/img/#{basename}/"
+        @candidate_page_urls = ["http://#{username}.blog.#{domain}/img/#{basename}/"]
       end
 
     # http://diary.fc2.com/user/yuuri/img/2005_12/26.jpg
