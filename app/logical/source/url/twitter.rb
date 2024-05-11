@@ -27,15 +27,16 @@ class Source::URL::Twitter < Source::URL
   attr_reader :status_id, :username, :user_id, :full_image_url
 
   def self.match?(url)
-    return false if Source::URL::TwitPic.match?(url) # TwitPic uses https://o.twimg.com/ URLs
-    url.domain.in?(%w[twitter.com fxtwitter.com vxtwitter.com twimg.com t.co x.com])
+    # TwitPic uses https://o.twimg.com/ URLs
+    # fxtwitter.com, etc are from https://github.com/FixTweet/FxTwitter.
+    url.domain.in?(%w[twitter.com fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com twimg.com t.co x.com]) && url.host != "o.twimg.com"
   end
 
   def parse
-    case [domain, *path_segments]
+    case [subdomain, domain, *path_segments]
 
     # https://twitter.com/i/web/status/943446161586733056
-    in (/twitter.com/ | "x.com"), "i", "web", "status", status_id
+    in _, _, "i", "web", "status", status_id
       @status_id = status_id
 
     # https://twitter.com/i/status/943446161586733056
@@ -44,21 +45,22 @@ class Source::URL::Twitter < Source::URL
     # https://twitter.com/motty08111213/status/943446161586733056?s=19
     # https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
     # https://twitter.com/sato_1_11/status/1496489742791475201/photo/2
-    in (/twitter.com/ | "x.com"), username, "status", status_id, *rest
+    # https://fxtwitter.com/example/status/1548117889437208581.jpg
+    in _, _, username, "status", status_id, *rest
       username = username.delete_prefix("@")
       @username = username unless username.in?(RESERVED_USERNAMES)
-      @status_id = status_id
+      @status_id = status_id.split(".").first
 
     # https://twitter.com/intent/user?user_id=1485229827984531457
-    in (/twitter.com/ | "x.com"), "intent", "user" if params[:user_id].present?
+    in _, _, "intent", "user" if params[:user_id].present?
       @user_id = params[:user_id]
 
     # https://twitter.com/intent/user?screen_name=ryuudog_NFT
-    in (/twitter.com/ | "x.com"), "intent", "user" if params[:screen_name].present?
+    in _, _, "intent", "user" if params[:screen_name].present?
       @username = params[:screen_name]
 
     # https://twitter.com/i/user/889592953
-    in (/twitter.com/ | "x.com"), "i", "user", user_id
+    in _, _, "i", "user", user_id
       @user_id = user_id
 
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg
@@ -69,7 +71,7 @@ class Source::URL::Twitter < Source::URL
     # https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg
     # https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
     # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg
-    in "twimg.com", ("media" | "tweet_video_thumb" | "ext_tw_video_thumb" | "amplify_video_thumb") => media_type, *subdirs, file
+    in _, "twimg.com", ("media" | "tweet_video_thumb" | "ext_tw_video_thumb" | "amplify_video_thumb") => media_type, *subdirs, file
       # EBGbJe_U8AA4Ekb.jpg:small
       @file, @file_size = file.split(":")
       @file, @file_ext = @file.split(".")
@@ -84,24 +86,24 @@ class Source::URL::Twitter < Source::URL
 
     # https://pbs.twimg.com/profile_banners/780804311529906176/1475001696
     # https://pbs.twimg.com/profile_banners/780804311529906176/1475001696/600x200
-    in "twimg.com", "profile_banners" => media_type, /^\d+$/ => user_id, /^\d+$/ => file_id, *dimensions
+    in _, "twimg.com", "profile_banners" => media_type, /^\d+$/ => user_id, /^\d+$/ => file_id, *dimensions
       @user_id = user_id
       @profile_banner = true
       @full_image_url = "#{site}/#{media_type}/#{user_id}/#{file_id}/1500x500"
 
     # https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=small
-    in "twimg.com", "ad_img" => media_type, media_id, file if params[:format].present?
+    in _, "twimg.com", "ad_img" => media_type, media_id, file if params[:format].present?
       @full_image_url = "#{site}/#{media_type}/#{media_id}/#{file}?format=#{params[:format]}&name=orig"
 
     # https://twitter.com/merry_bongbong/header_photo
-    in (/twitter.com/ | "x.com"), username, "header_photo" unless username.in?(RESERVED_USERNAMES)
+    in _, _, username, "header_photo" unless username.in?(RESERVED_USERNAMES)
       @profile_banner = true
       @username = username.delete_prefix("@")
 
     # https://twitter.com/motty08111213
     # https://twitter.com/motty08111213/likes
     # https://twitter.com/@eemapso
-    in (/twitter.com/ | "x.com"), username, *rest unless username.in?(RESERVED_USERNAMES)
+    in _, _, username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username.delete_prefix("@")
 
     else

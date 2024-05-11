@@ -541,6 +541,11 @@ module Sources
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/BOW999/status/1261877313349640194").username)
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/@BOW999/status/1261877313349640194").username)
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/@BOW999").username)
+
+      assert_equal("https://twitter.com/BOW999/status/1261877313349640194", Source::URL.parse("https://fixvx.com/BOW999/status/1261877313349640194").page_url)
+      assert_equal("https://twitter.com/BOW999/status/1261877313349640194", Source::URL.parse("https://fixupx.com/BOW999/status/1261877313349640194").page_url)
+      assert_equal("https://twitter.com/BOW999/status/1261877313349640194", Source::URL.parse("https://twittpr.com/BOW999/status/1261877313349640194").page_url)
+      assert_equal("https://twitter.com/BOW999/status/1261877313349640194", Source::URL.parse("https://fxtwitter.com/BOW999/status/1261877313349640194.jpg").page_url)
     end
   end
 end
