@@ -11,9 +11,11 @@ module Sources
         assert(Source::URL.page_url?("https://www.instagram.com/reel/CV7mHEwgbeF/?utm_medium=copy_link"))
         assert(Source::URL.page_url?("https://www.instagram.com/tv/CMjUD1epVWW/"))
         assert(Source::URL.page_url?("https://www.instagram.com/peachmomoko60/p/CyyRYaBxp25/"))
+        assert(Source::URL.page_url?("https://instagr.am/p/CJVuiRZjrB9/"))
 
         assert(Source::URL.profile_url?("https://www.instagram.com/itomugi/"))
         assert(Source::URL.profile_url?("https://www.instagram.com/stories/itomugi/"))
+        assert(Source::URL.profile_url?("https://instagr.am/Zurasuta"))
       end
     end
   end
