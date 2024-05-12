@@ -229,6 +229,54 @@ module Sources
       )
     end
 
+    context "A fantia.jp/posts/$id blog type url with cloudinary images" do
+      strategy_should_work(
+        "https://fantia.jp/posts/2702869",
+        image_urls: %w[
+          https://c.fantia.jp/uploads/post/file/2702869/b4ae077d-b630-42c8-859e-59ab42c3009d.gif
+          https://res.cloudinary.com/dwtbde1cn/image/upload/v1713199481/202403_nmaswi.gif
+          https://res.cloudinary.com/dwtbde1cn/image/upload/v1713199481/202402_ddevft.gif
+          https://res.cloudinary.com/dwtbde1cn/image/upload/v1713199481/202401_olz4f7.gif
+          https://res.cloudinary.com/dwtbde1cn/image/upload/v1713199481/202312_xgh7vg.gif
+          https://res.cloudinary.com/dwtbde1cn/image/upload/v1675146855/CG%E9%9B%86%E3%83%90%E3%83%8A%E3%83%BC_nabisc.jpg
+        ],
+        media_files: [
+          { file_size: 930_471 },
+          { file_size: 1_425_844 },
+          { file_size: 1_596_901 },
+          { file_size: 1_490_525 },
+          { file_size: 1_382_098 },
+          { file_size: 183_419 },
+        ],
+        page_url: "https://fantia.jp/posts/2702869",
+        profile_url: "https://fantia.jp/fanclubs/20795",
+        profile_urls: %w[https://fantia.jp/fanclubs/20795],
+        artist_name: "ぐらんで",
+        tag_name: nil,
+        other_names: ["ぐらんで"],
+        tags: [
+          ["オリジナル", "https://fantia.jp/posts?tag=オリジナル"],
+          ["フェチ", "https://fantia.jp/posts?tag=フェチ"],
+          ["タイツ", "https://fantia.jp/posts?tag=タイツ"],
+          ["R18", "https://fantia.jp/posts?tag=R18"],
+          ["おっぱい", "https://fantia.jp/posts?tag=おっぱい"],
+          ["セックス", "https://fantia.jp/posts?tag=セックス"],
+          ["2024年4月", "https://fantia.jp/posts?tag=2024年4月"],
+          ["かかかの", "https://fantia.jp/posts?tag=かかかの"],
+          ["可愛川美遊", "https://fantia.jp/posts?tag=可愛川美遊"],
+        ],
+        dtext_artist_commentary_title: "ムラムラしてセッ◯スしちゃう嫁💖",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          あそんでつくろ💖
+          ※無料プランでも全体図を閲覧可能です！
+          右上の【⭐】を押していただければ嬉しいです👌
+          ▼３月のおすすめ人気記事：子種を注がれる妻💖
+
+          🔽🔞下スクロールでR18イラスト🔞🔽
+        EOS
+      )
+    end
+
     context "A fantia.jp/products/$id url" do
       strategy_should_work(
         "https://fantia.jp/products/249638",
