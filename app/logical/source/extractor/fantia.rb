@@ -12,10 +12,8 @@ class Source::Extractor
       elsif parsed_url.candidate_full_image_urls.present?
         url = parsed_url.candidate_full_image_urls.find { |url| http_exists?(url) } || parsed_url.to_s
         [url]
-      elsif parsed_url.downloadable?
-        resp = http.head(parsed_url)
-        url = resp.uri.to_s if resp.status == 200 && resp.mime_type != "text/html"
-        [url].compact
+      elsif parsed_url.download_url.present?
+        [http.cache(1.minute).redirect_url(parsed_url.download_url).to_s].compact_blank
       elsif parsed_url.image_url?
         [parsed_url.to_s]
       elsif work_type == "post"
@@ -37,7 +35,7 @@ class Source::Extractor
         when "photo_gallery"
           content["post_content_photos"].to_a.map { |i| i.dig("url", "original") }
         when "file"
-          "https://www.fantia.jp/#{content["download_uri"]}"
+          [URI.join("https://fantia.jp", content["download_uri"]).to_s]
         when "blog"
           comment = content["comment"]&.parse_json || {}
 

@@ -206,15 +206,14 @@ module Danbooru
       end
     end
 
-    # Return the URL that the given URL redirects to, or nil on error.
+    # Return the URL that the given URL redirects to, or nil on error. This does not follow multiple redirects.
     #
     # @param method [String] The HTTP method to use, GET or HEAD. HEAD may be faster, but may fail for some sites.
-    # @return [Danbooru::URL, nil]
+    # @return [Danbooru::URL, nil] The URL this URL redirects to, or nil on error.
     def redirect_url(url, method: "HEAD")
-      response = request(method.downcase, url)
-      return nil unless response.status.in?(200..299)
-
-      Danbooru::URL.parse(response.uri)
+      response = no_follow.request(method.downcase, url)
+      return nil unless response.status.redirect?
+      Danbooru::URL.parse(response.headers["Location"])
     end
 
     concerning :DownloadMethods do
