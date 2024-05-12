@@ -9,7 +9,7 @@ class Source::URL::Instagram < Source::URL
   attr_reader :username, :work_id
 
   def self.match?(url)
-    url.domain.in?(%w[instagram.com cdninstagram.com]) || (url.domain == "fbcdn.net" && url.subdomain.include?("instagram"))
+    url.domain.in?(%w[instagram.com instagr.am cdninstagram.com]) || (url.domain == "fbcdn.net" && url.subdomain.include?("instagram"))
   end
 
   def parse
@@ -33,6 +33,14 @@ class Source::URL::Instagram < Source::URL
 
     # https://www.instagram.com/stories/itomugi/
     in "instagram.com", "stories", username, *rest
+      @username = username
+
+    # https://instagr.am/p/CJVuiRZjrB9/
+    in "instagr.am", "p", work_id
+      @work_id = work_id
+
+    # https://instagr.am/Zurasuta
+    in "instagr.am", username
       @username = username
 
     else
