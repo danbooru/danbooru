@@ -602,6 +602,7 @@ module Sources
 
           assert_illust_id(18557054, "http://www.pixiv.net/en/artworks/18557054")
           assert_illust_id(18557054, "http://www.pixiv.net/artworks/18557054")
+          assert_illust_id(18557054, "http://p.tl/i/18557054")
         end
 
         should "parse ids from expicit/guro illust urls" do
@@ -645,6 +646,7 @@ module Sources
       assert(Source::URL.page_url?("https://www.pixiv.net/en/artworks/46324488"))
       assert(Source::URL.page_url?("https://www.pixiv.net/artworks/46324488"))
       assert(Source::URL.page_url?("http://www.pixiv.net/i/18557054"))
+      assert(Source::URL.page_url?("http://p.tl/i/18557054"))
       assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054"))
       assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054"))
       assert(Source::URL.page_url?("http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054"))
@@ -660,6 +662,7 @@ module Sources
       assert(Source::URL.profile_url?("https://www.pixiv.net/stacc/noizave"))
       assert(Source::URL.profile_url?("http://www.pixiv.me/noizave"))
       assert(Source::URL.profile_url?("https://pixiv.cc/zerousagi/"))
+      assert(Source::URL.profile_url?("https://p.tl/m/9202877"))
 
       assert_equal("https://www.pixiv.net/novel/series/9593812", Source::URL.page_url("https://i.pximg.net/c/480x960/novel-cover-master/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc_master1200.jpg"))
       assert_equal("https://www.pixiv.net/novel/series/9593812", Source::URL.page_url("https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg"))

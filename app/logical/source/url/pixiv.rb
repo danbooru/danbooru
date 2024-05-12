@@ -7,7 +7,7 @@ module Source
     def self.match?(url)
       return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url) || Source::URL::PixivComic.match?(url) || Source::URL::Booth.match?(url)
 
-      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc])
+      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl])
     end
 
     def parse
@@ -112,6 +112,15 @@ module Source
       in _, "pixiv.cc", username
         @username = username
 
+      # http://p.tl/i/40009777
+      in _, "p.tl", "i", work_id
+        @work_id = work_id
+
+      # http://p.tl/m/755548
+      in _, "p.tl", "m", user_id
+        @user_id = user_id
+
+      # http://p.tl/dcYB/ (dead; Pixiv's URL shortening service, closed in 2017)
       else
         nil
       end
