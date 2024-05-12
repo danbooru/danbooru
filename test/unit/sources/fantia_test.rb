@@ -152,6 +152,15 @@ module Sources
       )
     end
 
+    context "A www.fantia.jp/posts/$id/download url" do
+      strategy_should_work(
+        "https://www.fantia.jp/posts/1143951/download/1830956",
+        image_urls: [%r{https://cc.fantia.jp/uploads/post_content/file/1830956/cbcdfcbe_20220224_120_040_100.png}],
+        media_files: [{ file_size: 14_371_816 }],
+        page_url: "https://fantia.jp/posts/1143951"
+      )
+    end
+
     context "A fantia.jp/posts/$id url" do
       strategy_should_work(
         "https://fantia.jp/posts/1143951",

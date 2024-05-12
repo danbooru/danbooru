@@ -24,8 +24,7 @@ class Source::Extractor::Vk < Source::Extractor
       [Source::URL.parse(photo["photo"]).try(:full_image_url) || photo["photo"]].compact
     elsif page_type == "doc"
       # https://m.vk.com/doc495199190_630536868 -> https://psv4.userapi.com/c235131/u495199190/docs/d59/b94c28ecfbf7/Strakh_Pakhnet_Lyubovyu.png
-      # XXX This isn't cached with `http.cache(1.minute)` because it caches the entire response, which can be very slow.
-      url = http.redirect_url(mobile_url, method: "GET").to_s
+      url = http.cache(1.minute).redirect_url(mobile_url, method: "GET").to_s
       [Source::URL.parse(url).try(:full_image_url) || url].compact_blank
     else
       []
