@@ -2,36 +2,28 @@
 
 class Source::Extractor
   class Fantia < Source::Extractor
-    extend Memoist
-
     def self.enabled?
       Danbooru.config.fantia_session_id.present?
     end
 
     def image_urls
-      if parsed_url.image_url?
-        [full_image_for(parsed_url)].compact
+      if parsed_url.full_image_url.present?
+        [parsed_url.full_image_url]
+      elsif parsed_url.candidate_full_image_urls.present?
+        url = parsed_url.candidate_full_image_urls.find { |url| http_exists?(url) } || parsed_url.to_s
+        [url]
+      elsif parsed_url.downloadable?
+        resp = http.head(parsed_url)
+        url = resp.uri.to_s if resp.status == 200 && resp.mime_type != "text/html"
+        [url].compact
+      elsif parsed_url.image_url?
+        [parsed_url.to_s]
       elsif work_type == "post"
-        images_for_post.map { |url| full_image_for(url) }.compact.uniq
+        images_for_post.flat_map { |url| Source::URL.parse(url)&.extractor&.image_urls }.compact.uniq
       elsif work_type == "product"
-        images_for_product.map { |url| full_image_for(url) }.compact.uniq
+        images_for_product.flat_map { |url| Source::URL.parse(url)&.extractor&.image_urls }.compact.uniq
       else
         []
-      end
-    end
-
-    def full_image_for(url)
-      parsed = Source::URL.parse(url)
-
-      if parsed&.full_image_url.present?
-        parsed.full_image_url
-      elsif parsed&.downloadable?
-        resp = http.head(parsed)
-        resp.uri.to_s if resp.status == 200 && resp.mime_type != "text/html"
-      elsif parsed.candidate_full_image_urls.present?
-        parsed.candidate_full_image_urls.find { |url| http_exists?(url) } || url.to_s
-      else
-        url.to_s
       end
     end
 
@@ -45,7 +37,7 @@ class Source::Extractor
         when "photo_gallery"
           content["post_content_photos"].to_a.map { |i| i.dig("url", "original") }
         when "file"
-          full_image_for("https://www.fantia.jp/#{content["download_uri"]}")
+          "https://www.fantia.jp/#{content["download_uri"]}"
         when "blog"
           comment = content["comment"]&.parse_json || {}
 
