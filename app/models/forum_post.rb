@@ -194,7 +194,7 @@ class ForumPost < ApplicationRecord
   end
 
   def forum_topic_page
-    (ForumPost.where("topic_id = ? and created_at <= ?", topic_id, created_at).count / Danbooru.config.posts_per_page.to_f).ceil
+    (ForumPost.where("topic_id = ? and created_at <= ?", topic_id, created_at).count / CurrentUser.user.per_page.to_f).ceil
   end
 
   def is_original_post?(original_post_id = nil)

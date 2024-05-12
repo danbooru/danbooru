@@ -190,11 +190,11 @@ class ForumTopic < ApplicationRecord
   end
 
   def page_for(post_id)
-    (forum_posts.where("id < ?", post_id).count / Danbooru.config.posts_per_page.to_f).ceil
+    (forum_posts.where("id < ?", post_id).count / CurrentUser.user.per_page.to_f).ceil
   end
 
   def last_page
-    (response_count / Danbooru.config.posts_per_page.to_f).ceil
+    (response_count / CurrentUser.user.per_page.to_f).ceil
   end
 
   # Delete all posts when the topic is deleted. Undelete all posts when the topic is undeleted.
