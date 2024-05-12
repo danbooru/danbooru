@@ -5,6 +5,7 @@
 # TODO: Add more shorteners from https://wiki.archiveteam.org/index.php/URLTeam. Use data dumps to unshorten dead URLs?
 class Source::Extractor::URLShortener < Source::Extractor
   delegate :page_url, :profile_url, :artist_name, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
+  delegate :domain, :site, :host, :path, :path_segments, to: :parsed_url
 
   def image_urls
     sub_extractor&.image_urls || []
@@ -27,48 +28,53 @@ class Source::Extractor::URLShortener < Source::Extractor
   end
 
   memoize def sub_extractor
-    redirect_url&.extractor(parent_extractor: self)
-  end
-
-  memoize def redirect_url
     # In case the URL leads to a chain of URL shorteners, don't go more than five redirects deep.
     return nil if parent_extractors.grep(Source::Extractor::URLShortener).size > 5
 
-    response = http.no_follow.head(parsed_url.redirect_url)
-    redirect_url = response.headers["Location"] if response.status.redirect?
-    redirect_url = URI.join(parsed_url.site, redirect_url) if redirect_url&.starts_with?("/")
-    redirect_url = Source::URL.parse(redirect_url)
-
-    redirect_url unless bad_redirect?(redirect_url)
+    Source::URL.parse(redirect_url)&.extractor(parent_extractor: self)
   end
 
-  def bad_redirect?(location)
-    case parsed_url.domain
+  memoize def redirect_url
+    https_url = URI.join("https://#{host}", path)
 
-    # amzn.to returns a 302 redirect to http://www.amazon.com on error.
-    in "amzn.to"
-      location&.host == "www.amazon.com" && location&.path.blank?
+    case [domain, *path_segments]
 
-    # ow.ly returns a 301 relative redirect to /url/invalid on error.
-    in "ow.ly"
-      location&.host == "ow.ly" && location.path == "/url/invalid"
+    # curl -I https:///amzn.to/2oaTatI
+    # Returns 301 on success and a 302 redirect to http://www.amazon.com on error.
+    in "amzn.to", id
+      response = http.no_follow.head(https_url)
+      response.headers["Location"] if response.status.code == 301
 
-    # pin.it returns a redirect to https://api.pinterest.com/url_shortener/#{id}/redirect/None or https://www.pinterest.com on error.
-    in "pin.it"
-      location&.host == "api.pinterest.com" || location.to_s == "https://www.pinterest.com"
+    # curl -v https://naver.me/FABhCw8Z
+    # HEAD not supported; https://naver.me redirects to http://naver.me; returns 307 on success and 404 on error.
+    in "naver.me", id
+      response = http.no_follow.get("http://naver.me/#{id}")
+      response.headers["Location"] if response.status.redirect?
+
+    # curl -I https://pin.it/4A1N0Rd5W
+    # https://pin.it/4A1N0Rd5W redirects to https://api.pinterest.com/url_shortener/#{id}/redirect/.
+    # Returns 302 on success and a 302 redirect to https://api.pinterest.com/url_shortener/:id/redirect/None or https://www.pinterest.com on error.
+    in "pin.it", id
+      response = http.no_follow.head("https://api.pinterest.com/url_shortener/#{id}/redirect/")
+      url = response.headers["Location"] if response.status.redirect?
+      url unless url.in?(%W[https://api.pinterest.com/url_shortener/#{id}/redirect/None https://www.pinterest.com])
+
+    # curl -v https://reurl.cc/E2zlnA
+    # HEAD not supported; Returns 200 OK with 'Target' header on success and no 'Target' header on error.
+    in "reurl.cc", id
+      response = http.no_follow.get(https_url)
+      response.headers["Target"] if response.status.code == 200
+
+    # curl -I https://bit.ly/4aAVa4y
+    # Can't use a browser user agent for these shorteners, otherwise we get a HTML response instead of a 301 redirect.
+    in "bit.ly" | "j.mp" | "t.co" | "twitter.com" | "pse.is", id
+      response = http.no_follow.headers("User-Agent": "curl/8.2.1").head(https_url)
+      response.headers["Location"] if response.status.redirect?
 
     else
-      false
-    end
-  end
-
-  def http
-    case parsed_url.domain
-    in "bit.ly" | "j.mp" | "t.co" | "twitter.com"
-      # Don't use a browser user agent for these shorteners because then we get a HTML response instead of a 301 redirect.
-      super.headers("User-Agent": "curl/8.2.1")
-    else
-      super
+      response = http.no_follow.head(https_url)
+      url = response.headers["Location"] if response.status.redirect?
+      url unless url&.starts_with?("/") # Treat relative redirects as errors.
     end
   end
 end
