@@ -5,21 +5,18 @@ module Sources
     context "A https://misskey.io/notes/:note_id url" do
       strategy_should_work(
         "https://misskey.io/notes/9bxaf592x6",
+        image_urls: %w[https://media.misskeyusercontent.jp/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png],
+        media_files: [{ file_size: 197_151 }],
         page_url: "https://misskey.io/notes/9bxaf592x6",
-        image_urls: [
-          "https://media.misskeyusercontent.jp/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png",
-        ],
-        media_files: [
-          { file_size: 197_151 },
-        ],
         profile_url: "https://misskey.io/@ixy194",
-        profile_urls: [
-          "https://misskey.io/@ixy194",
-          "https://misskey.io/users/9bpemdns40",
-        ],
+        profile_urls: %w[https://misskey.io/@ixy194 https://misskey.io/users/9bpemdns40],
         artist_name: "Ｉｘｙ（いくしー）",
         tag_name: "ixy194",
-        tags: ["村上さん"],
+        other_names: ["Ｉｘｙ（いくしー）", "ixy194"],
+        tags: [
+          ["村上さん", "https://misskey.io/tags/村上さん"],
+        ],
+        dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           村上さん "#村上さん":[https://misskey.io/tags/村上さん] 村上アート
         EOS
@@ -29,14 +26,23 @@ module Sources
     context "A note with multiple files" do
       strategy_should_work(
         "https://misskey.io/notes/9e5pggsolw",
-        image_urls: [
-          "https://media.misskeyusercontent.jp/misskey/c6909d66-9f53-4050-b46d-643d266995c7.jpg",
-          "https://media.misskeyusercontent.jp/misskey/08e1b86c-0d5e-4391-9b02-125a5f7f4794.jpg",
+        image_urls: %w[
+          https://media.misskeyusercontent.jp/misskey/c6909d66-9f53-4050-b46d-643d266995c7.jpg
+          https://media.misskeyusercontent.jp/misskey/08e1b86c-0d5e-4391-9b02-125a5f7f4794.jpg
         ],
         media_files: [
           { file_size: 81_793 },
           { file_size: 80_996 },
         ],
+        page_url: "https://misskey.io/notes/9e5pggsolw",
+        profile_url: "https://misskey.io/@ixy194",
+        profile_urls: %w[https://misskey.io/@ixy194 https://misskey.io/users/9bpemdns40],
+        artist_name: "Ｉｘｙ（いくしー）",
+        tag_name: "ixy194",
+        other_names: ["Ｉｘｙ（いくしー）", "ixy194"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "おりきゃら"
       )
     end
 
@@ -44,12 +50,49 @@ module Sources
       strategy_should_work(
         "https://misskey.io/notes/9ef8xtot2m",
         image_urls: [],
+        page_url: "https://misskey.io/notes/9ef8xtot2m",
+        profile_url: "https://misskey.io/@ixy194",
+        profile_urls: %w[https://misskey.io/@ixy194 https://misskey.io/users/9bpemdns40],
+        artist_name: "Ｉｘｙ（いくしー）",
+        tag_name: "ixy194",
+        other_names: ["Ｉｘｙ（いくしー）", "ixy194"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          【お絵描き雑談】息抜き <https://www.youtube.com/live/7wNu09QE0SU?feature=share> "@YouTube":[https://misskey.io/@YouTube]より
+        EOS
+      )
+    end
+
+    context "A renote of another note" do
+      strategy_should_work(
+        "https://misskey.io/notes/9t8uyeog9an508vj",
+        image_urls: [],
+        media_files: [],
+        page_url: "https://misskey.io/notes/9t8uyeog9an508vj",
+        profile_url: "https://misskey.io/@77Pokomoko",
+        profile_urls: %w[https://misskey.io/@77Pokomoko https://misskey.io/users/9t6jyv4n69zb085t],
+        artist_name: "DP",
+        tag_name: "77pokomoko",
+        other_names: ["DP", "77Pokomoko"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "RE: <https://misskey.io/notes/9t8uxi3tcjpg026q>"
       )
     end
 
     context "A note with content warning" do
       strategy_should_work(
         "https://misskey.io/notes/9eh2m7ir57",
+        image_urls: [],
+        page_url: "https://misskey.io/notes/9eh2m7ir57",
+        profile_url: "https://misskey.io/@sasanosuke00",
+        profile_urls: %w[https://misskey.io/@sasanosuke00 https://misskey.io/users/9bvodr8oee],
+        artist_name: "朝之助",
+        tag_name: "sasanosuke00",
+        other_names: ["朝之助", "sasanosuke00"],
+        tags: [],
+        dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           RNしてくれたフォロワーさんの第一印象を答えます！
           (知らねぇやつばっかだからプロフィールとアイコンと直近のノートを参照しよう…。)
@@ -62,7 +105,7 @@ module Sources
         "https://s3.arkjp.net/misskey/99ae6116-2896-4cf3-9abc-e9746cd2408e.jpg",
         image_urls: ["https://s3.arkjp.net/misskey/99ae6116-2896-4cf3-9abc-e9746cd2408e.jpg"],
         media_files: [{ file_size: 100_766 }],
-        profile_url: nil
+        page_url: nil
       )
     end
 
@@ -70,7 +113,8 @@ module Sources
       strategy_should_work(
         "https://media.misskeyusercontent.jp/io/webpublic-806fd8e2-3425-486f-975e-2fb57d8e651a.png",
         image_urls: ["https://media.misskeyusercontent.jp/io/webpublic-806fd8e2-3425-486f-975e-2fb57d8e651a.png"],
-        media_files: [{ file_size: 386_451 }]
+        media_files: [{ file_size: 386_451 }],
+        page_url: nil
       )
     end
 
@@ -96,7 +140,8 @@ module Sources
       strategy_should_work(
         "https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp",
         image_urls: ["https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp"],
-        media_files: [{ file_size: 35_338 }]
+        media_files: [{ file_size: 35_338 }],
+        page_url: nil
       )
     end
 
@@ -104,7 +149,8 @@ module Sources
       strategy_should_work(
         "https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp",
         image_urls: ["https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp"],
-        media_files: [{ file_size: 188_294 }]
+        media_files: [{ file_size: 188_294 }],
+        page_url: nil
       )
     end
 
@@ -265,6 +311,23 @@ module Sources
         tags: [],
         dtext_artist_commentary_title: nil,
         dtext_artist_commentary_desc: nil
+      )
+    end
+
+    context "A note that is deleted or nonexistent" do
+      strategy_should_work(
+        "https://misskey.io/notes/9pwis0jctbci003d",
+        image_urls: [],
+        media_files: [],
+        page_url: "https://misskey.io/notes/9pwis0jctbci003d",
+        profile_url: nil,
+        profile_urls: %w[],
+        artist_name: nil,
+        tag_name: nil,
+        other_names: [],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: ""
       )
     end
 
