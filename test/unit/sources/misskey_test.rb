@@ -124,6 +124,29 @@ module Sources
       )
     end
 
+    context "A note with an image with ALT text" do
+      strategy_should_work(
+        "https://misskey.io/notes/9s5obplljspt0cgi",
+        image_urls: %w[https://media.misskeyusercontent.jp/io/webpublic-7d39c2bf-c743-415d-b839-277c01414d91.png],
+        media_files: [{ file_size: 280_884 }],
+        page_url: "https://misskey.io/notes/9s5obplljspt0cgi",
+        profile_url: "https://misskey.io/@MishimaHiaka",
+        profile_urls: %w[https://misskey.io/@MishimaHiaka https://misskey.io/users/9cb3x9itt0],
+        artist_name: "三島ひあか🔞📐📕",
+        tag_name: "mishimahiaka",
+        other_names: ["三島ひあか🔞📐📕", "MishimaHiaka"],
+        tags: [
+          ["blobcat", "https://misskey.io/tags/blobcat"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          動かない方も見て:ablobcatangel:💘 "#blobcat":[https://misskey.io/tags/blobcat]
+
+          キューピッドのにゃんぷっぷー(動かない方) :ablobcatangel:を元に私が描きました。
+        EOS
+      )
+    end
+
     context "A note with a .wav file and an artist name containing emojis" do
       strategy_should_work(
         "https://misskey.io/notes/9t8taey8ejc402is",
@@ -279,6 +302,7 @@ module Sources
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           $[shake :nekonohanao_nadetai:]
+          横になっている猫の写真
         EOS
       )
     end
