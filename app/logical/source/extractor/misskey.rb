@@ -16,15 +16,23 @@ class Source::Extractor::Misskey < Source::Extractor
   end
 
   def profile_url
-    "#{base_url}/@#{username}" if base_url.present? && username.present?
+    if base_url.present? && username.present? && remote_host.present?
+      "#{base_url}/@#{username}@#{remote_host}"
+    elsif base_url.present? && username.present?
+      "#{base_url}/@#{username}"
+    end
   end
 
   def account_url
-    "#{base_url}/users/#{user_id}" if base_url.present? && user_id.present?
+    "#{base_url}/users/#{user_id}" if base_url.present? && user_id.present? && remote_host.nil?
+  end
+
+  def remote_username_url
+    "#{remote_instance_url}/@#{username}" if remote_instance_url.present? && username.present?
   end
 
   def profile_urls
-    [profile_url, account_url].compact
+    [profile_url, account_url, remote_username_url].compact
   end
 
   def username
@@ -75,7 +83,7 @@ class Source::Extractor::Misskey < Source::Extractor
     return [] unless base_url.present?
 
     note["tags"].to_a.map do |tag|
-      [tag, "#{base_url}/tags/#{tag}"]
+      [tag, "#{origin_instance_url}/tags/#{tag}"]
     end
   end
 
@@ -83,6 +91,7 @@ class Source::Extractor::Misskey < Source::Extractor
     DText.from_html(artist_commentary_desc, base_url: base_url)
   end
 
+  # The base URL of the current instance.
   memoize def base_url
     # Images are usually hosted on a separate domain, so we only take the base URL from the page URL (if present).
     if parsed_url.page_url?
@@ -90,6 +99,21 @@ class Source::Extractor::Misskey < Source::Extractor
     elsif parsed_referer&.page_url?
       parsed_referer&.site
     end
+  end
+
+  # The base URL of the remote instance, if this note came from a remote instance.
+  def remote_instance_url
+    "https://#{remote_host}" if remote_host.present?
+  end
+
+  # The base URL of the instance this note originally came from.
+  def origin_instance_url
+    remote_instance_url || base_url
+  end
+
+  # The remote instance hostname, if this note came from a remote instance.
+  def remote_host
+    user["host"]
   end
 
   memoize def user

@@ -81,6 +81,30 @@ module Sources
       )
     end
 
+    context "A note crossposted from a remote instance" do
+      strategy_should_work(
+        "https://misskey.io/notes/9t3ulxtf6ydq00na",
+        image_urls: %w[https://proxy.misskeyusercontent.jp/image.webp?url=https%3A%2F%2Fmedia.nijimissusercontent.app%2Fnull%2F0c368eb5-3ded-4d3b-a0b6-f729b3447ccf.webp],
+        media_files: [{ file_size: 537_234 }],
+        page_url: "https://misskey.io/notes/9t3ulxtf6ydq00na",
+        profile_url: "https://misskey.io/@orizanin@nijimiss.moe",
+        profile_urls: %w[https://misskey.io/@orizanin@nijimiss.moe https://nijimiss.moe/@orizanin],
+        artist_name: "イケメン雌堕ちさせたい",
+        tag_name: "orizanin",
+        other_names: ["イケメン雌堕ちさせたい", "orizanin"],
+        tags: [
+          ["にじみすお絵描き部", "https://nijimiss.moe/tags/にじみすお絵描き部"],
+          ["にじみすメイドの日", "https://nijimiss.moe/tags/にじみすメイドの日"],
+          ["blobcat", "https://nijimiss.moe/tags/blobcat"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          :nyanpuppu:がメイドの日でメイド服を着てくれたよ！
+          :kawaiidesune: "#にじみすお絵描き部":[https://nijimiss.moe/tags/にじみすお絵描き部] "#にじみすメイドの日":[https://nijimiss.moe/tags/にじみすメイドの日] "#blobcat":[https://nijimiss.moe/tags/blobcat]
+        EOS
+      )
+    end
+
     context "A note with content warning" do
       strategy_should_work(
         "https://misskey.io/notes/9eh2m7ir57",
@@ -273,27 +297,6 @@ module Sources
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "伊草ハルカ誕"
-      )
-    end
-
-    # XXX Shouldn't grab notes reposted from another instance (user should upload the original note instead)
-    context "A note on https://lesbian.energy from a remote instance" do
-      strategy_should_work(
-        "https://lesbian.energy/notes/995ig09wqy",
-        image_urls: %w[https://mk.yopo.work/files/webpublic-efe09ee9-d3b8-4cf5-9763-e6607b3e183e],
-        media_files: [{ file_size: 70_693 }],
-        page_url: "https://lesbian.energy/notes/995ig09wqy",
-        profile_url: "https://lesbian.energy/@nano",
-        profile_urls: %w[https://lesbian.energy/@nano https://lesbian.energy/users/94zihh5b2c],
-        artist_name: "菜乃",
-        tag_name: "nano",
-        other_names: ["菜乃", "nano"],
-        tags: [],
-        dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
-          今日から菜乃は、ピュアホワイトピンクアラモーゼザ・ボルテーニョだ、、
-          略して菜乃と呼んでくれ
-        EOS
       )
     end
 
