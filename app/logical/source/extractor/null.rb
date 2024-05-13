@@ -6,6 +6,11 @@ module Source
     class Null < Source::Extractor
       extend Memoist
 
+      # Don't ignore the referer URL if it comes from a different site, since we may need it to figure out which site the image URL is from.
+      def allow_referer?
+        true
+      end
+
       def image_urls
         sub_extractor&.image_urls || [parsed_url.to_s].compact_blank
       end
@@ -66,6 +71,10 @@ module Source
         response&.parse if response&.mime_type == "text/html"
       end
 
+      memoize def referer_page
+        http.cache(1.minute).parsed_get(parsed_referer) if parsed_referer.present?
+      end
+
       memoize def sub_extractor
         if tumblr_url.present?
           Source::URL::Tumblr.new(tumblr_url).extractor(parent_extractor: self)
@@ -75,6 +84,21 @@ module Source
           Source::URL::Note.new(url).extractor(parent_extractor: self)
         elsif page&.at('meta[name="generator"]')&.attr("content") == "blogger"
           Source::URL::Blogger.new(url).extractor(parent_extractor: self)
+        elsif is_misskey?
+          misskey_referer = Source::URL::Misskey.new(referer_url) unless referer_url.nil?
+          Source::URL::Misskey.new(url).extractor(referer_url: misskey_referer, parent_extractor: self)
+        end
+      end
+
+      def is_misskey?
+        # https://mk.yopo.work/notes/995ig09wop
+        if Source::URL::Misskey.new(url).page_url? && page&.at('meta[name="application-name"]')&.attr("content") == "Misskey"
+          true
+        # https://mk.yopo.work/files/webpublic-dcab49b3-4ad3-4455-aea0-28aa81ecca48
+        elsif Source::URL::Misskey.new(url).image_url? && referer_url.present? && Source::URL::Misskey.new(referer_url).page_url? && referer_page&.at('meta[name="application-name"]')&.attr("content") == "Misskey"
+          true
+        else
+          false
         end
       end
 

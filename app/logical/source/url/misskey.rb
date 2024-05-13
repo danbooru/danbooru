@@ -21,6 +21,7 @@ class Source::URL::Misskey < Source::URL
       @user_id = user_id
 
     # https://misskey.io/notes/9bxaf592x6
+    # https://nijimiss.moe/notes/01H72HQKW2BNR81VEBZQPSVZWN
     in _, _, "notes", note_id
       @note_id = note_id
 
@@ -33,25 +34,25 @@ class Source::URL::Misskey < Source::URL
     # https://s3.arkjp.net/misskey/930fe4fb-c07b-4439-804e-06fb472d698f.gif | https://misskey.io/notes/9dd5xo5zda
     # https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp | https://misskey.art/notes/9pjpq1zrcy
     # https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp | https://misskey.design/notes/9r8c6x1n1p
-    in _, _, *path if file_ext.in?(%w[jpg jpeg png gif webp webm mp4])
-      @image_url = true
-
     else
       nil
     end
   end
 
+  def image_url?
+    # https://media.misskeyusercontent.jp/io/dfca7bd4-c073-4ea0-991f-313ab3a77847.png
+    # https://proxy.misskeyusercontent.com/image.webp?url=https%3A%2F%2Fimg.pawoo.net%2Fmedia_attachments%2Ffiles%2F111%2F232%2F575%2F490%2F284%2F147%2Foriginal%2F9aaf0c71a41b5647.jpeg | https://misskey.io/notes/9ktdpaq840
+    # https://mk.yopo.work/files/webpublic-dcab49b3-4ad3-4455-aea0-28aa81ecca48
+    super || basename.match?(/\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/)
+  end
+
   def site_name
     case domain
-    in "arkjp.net", "misskeyusercontent.com", "misskeyusercontent.jp"
+    in "arkjp.net" | "misskeyusercontent.com" | "misskeyusercontent.jp"
       "Misskey.io"
     else
       domain.capitalize
     end
-  end
-
-  def image_url?
-    @image_url
   end
 
   def page_url
