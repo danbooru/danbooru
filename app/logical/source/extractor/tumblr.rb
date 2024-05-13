@@ -133,7 +133,7 @@ class Source::Extractor
         case element.name
         # https://tmblr.co/m08AoE-xy5kbQnjed6Tcmng -> https://www.tumblr.com/phantom-miria
         in "a" if Source::URL.parse(element["href"])&.domain == "tmblr.co"
-          element["href"] = Source::URL.parse(element["href"])&.extractor&.redirect_url.to_s
+          element["href"] = Source::Extractor::URLShortener.new(element["href"]).redirect_url || element["href"]
 
         # <a href="https://www.tumblr.com/blog/view/professionalchaoticdumbass/707743740292382721" class="poll-row"><p>idiot.</p></a>
         in "a" if element[:class] == "poll-row"
@@ -218,19 +218,11 @@ class Source::Extractor
     end
 
     def artist_name
-      parsed_url.blog_name || parsed_referer&.blog_name || redirect_url&.blog_name || post_url_from_image_html&.try(:blog_name)  # Don't crash with custom domains
+      parsed_url.blog_name || parsed_referer&.blog_name || post_url_from_image_html&.try(:blog_name) # Don't crash with custom domains
     end
 
     memoize def work_id
-      parsed_url.work_id || parsed_referer&.work_id || redirect_url&.work_id || post_url_from_image_html&.try(:work_id)
-    end
-
-    # @return [Source::URL, nil] The actual URL, if this is a tmblr.co short URL.
-    memoize def redirect_url
-      return nil unless parsed_url.domain == "tmblr.co"
-
-      # https://tmblr.co/ZdPV4t2OHwdv5 -> https://techsupportdog.tumblr.com/post/163509337669?
-      http.cache(1.minute).redirect_url(parsed_url)&.then { Source::URL.parse(_1) }
+      parsed_url.work_id || parsed_referer&.work_id || post_url_from_image_html&.try(:work_id)
     end
 
     memoize def api_response

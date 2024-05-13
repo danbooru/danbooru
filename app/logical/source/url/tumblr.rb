@@ -6,7 +6,7 @@ class Source::URL::Tumblr < Source::URL
   attr_reader :work_id, :blog_name, :directory, :full_image_url
 
   def self.match?(url)
-    url.domain.in?(%w[tumblr.com tmblr.co])
+    url.domain.in?(%w[tumblr.com])
   end
 
   def parse
