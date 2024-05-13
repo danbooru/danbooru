@@ -32,11 +32,15 @@ class Source::Extractor::Misskey < Source::Extractor
   end
 
   def tag_name
-    username
+    username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
   end
 
   def artist_name
     api_response.dig("user", "name").presence
+  end
+
+  def other_names
+    [artist_name, username].compact.uniq(&:downcase)
   end
 
   def user_id
