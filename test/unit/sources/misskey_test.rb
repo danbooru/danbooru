@@ -74,6 +74,24 @@ module Sources
       )
     end
 
+    context "A media.misskeyusercontent.jp direct image url with referer" do
+      strategy_should_work(
+        "https://media.misskeyusercontent.jp/io/webpublic-806fd8e2-3425-486f-975e-2fb57d8e651a.png",
+        referer: "https://misskey.io/notes/9ralx49uwpls07uy",
+        image_urls: %w[https://media.misskeyusercontent.jp/io/webpublic-806fd8e2-3425-486f-975e-2fb57d8e651a.png],
+        media_files: [{ file_size: 386_451 }],
+        page_url: "https://misskey.io/notes/9ralx49uwpls07uy",
+        profile_url: "https://misskey.io/@naga_U_",
+        profile_urls: %w[https://misskey.io/@naga_U_ https://misskey.io/users/9e2h6b7kbv],
+        artist_name: "ながユー@ｺﾐﾃｨｱ148【か05a】",
+        tag_name: "naga_u",
+        other_names: ["ながユー@ｺﾐﾃｨｱ148【か05a】", "naga_U_"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: ""
+      )
+    end
+
     context "A files.misskey.art direct image url" do
       strategy_should_work(
         "https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp",
@@ -87,6 +105,166 @@ module Sources
         "https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp",
         image_urls: ["https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp"],
         media_files: [{ file_size: 188_294 }]
+      )
+    end
+
+    context "A note on https://oekakiskey.com" do
+      strategy_should_work(
+        "https://oekakiskey.com/notes/9t6ylo4flx",
+        image_urls: %w[https://storage.googleapis.com/oekakiskey/drive/aecec9c1-5b1f-4781-abe1-3c94596aa2c1.webp],
+        media_files: [{ file_size: 153_986 }],
+        page_url: "https://oekakiskey.com/notes/9t6ylo4flx",
+        profile_url: "https://oekakiskey.com/@zarame_zarame00",
+        profile_urls: %w[https://oekakiskey.com/@zarame_zarame00 https://oekakiskey.com/users/9jf8m9wlo5],
+        artist_name: "ざらめ",
+        tag_name: "zarame_zarame00",
+        other_names: ["ざらめ", "zarame_zarame00"],
+        tags: [
+          ["ざら博", "https://oekakiskey.com/tags/ざら博"],
+          ["描いたよ", "https://oekakiskey.com/tags/描いたよ"],
+          ["二次創作", "https://oekakiskey.com/tags/二次創作"],
+          ["崩壊スターレイル", "https://oekakiskey.com/tags/崩壊スターレイル"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Dr.レイシオ
+          "#ざら博":[https://oekakiskey.com/tags/ざら博] "#描いたよ":[https://oekakiskey.com/tags/描いたよ]
+          "#二次創作":[https://oekakiskey.com/tags/二次創作] "#崩壊スターレイル":[https://oekakiskey.com/tags/崩壊スターレイル]
+        EOS
+      )
+    end
+
+    context "A note on https://voskey.icalo.net" do
+      strategy_should_work(
+        "https://voskey.icalo.net/notes/9t87js83lp",
+        image_urls: %w[https://voskeyfiles.icalo.net/drv/9ef122da-5431-4e80-a147-96a8e3e3a412.webp],
+        media_files: [{ file_size: 315_422 }],
+        page_url: "https://voskey.icalo.net/notes/9t87js83lp",
+        profile_url: "https://voskey.icalo.net/@charks",
+        profile_urls: %w[https://voskey.icalo.net/@charks https://voskey.icalo.net/users/9lgkn1xlpu],
+        artist_name: "ちゃーくす",
+        tag_name: "charks",
+        other_names: ["ちゃーくす", "charks"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          いつものノリで言おうとしたけど、ひよっちゃったウナちゃん
+        EOS
+      )
+    end
+
+    context "A note on https://nijimiss.moe" do
+      strategy_should_work(
+        "https://nijimiss.moe/notes/01HPZQPJ6M9Y2DP134PRQ548EX",
+        image_urls: %w[https://media.nijimiss.app/null/webpublic-ac9c1b40-8059-435b-b6b5-122a823d3594.webp],
+        media_files: [{ file_size: 29_610 }],
+        page_url: "https://nijimiss.moe/notes/01HPZQPJ6M9Y2DP134PRQ548EX",
+        profile_url: "https://nijimiss.moe/@GAtturi_",
+        profile_urls: %w[https://nijimiss.moe/@GAtturi_ https://nijimiss.moe/users/01GV09J8CQ19F0Z3T0D3PNDRRN],
+        artist_name: "がっつり太郎",
+        tag_name: "GAtturi_",
+        other_names: ["がっつり太郎", "GAtturi_"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          $[shake :nekonohanao_nadetai:]
+        EOS
+      )
+    end
+
+    context "A note on https://sushi.ski" do
+      strategy_should_work(
+        "https://sushi.ski/notes/9t78mwgf9v",
+        image_urls: %w[https://media.sushi.ski/files/webpublic-530bd137-d146-4cd4-b1f0-676d7ce39db7.png],
+        media_files: [{ file_size: 1_045_802 }],
+        page_url: "https://sushi.ski/notes/9t78mwgf9v",
+        profile_url: "https://sushi.ski/@Ru47me",
+        profile_urls: %w[https://sushi.ski/@Ru47me https://sushi.ski/users/9rikwnr0fj],
+        artist_name: "するめ",
+        tag_name: "Ru47me",
+        other_names: ["するめ", "Ru47me"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "伊草ハルカ誕"
+      )
+    end
+
+    # XXX Shouldn't grab notes reposted from another instance (user should upload the original note instead)
+    context "A note on https://lesbian.energy from a remote instance" do
+      strategy_should_work(
+        "https://lesbian.energy/notes/995ig09wqy",
+        image_urls: %w[https://mk.yopo.work/files/webpublic-efe09ee9-d3b8-4cf5-9763-e6607b3e183e],
+        media_files: [{ file_size: 70_693 }],
+        page_url: "https://lesbian.energy/notes/995ig09wqy",
+        profile_url: "https://lesbian.energy/@nano",
+        profile_urls: %w[https://lesbian.energy/@nano https://lesbian.energy/users/94zihh5b2c],
+        artist_name: "菜乃",
+        tag_name: "nano",
+        other_names: ["菜乃", "nano"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          今日から菜乃は、ピュアホワイトピンクアラモーゼザ・ボルテーニョだ、、
+          略して菜乃と呼んでくれ
+        EOS
+      )
+    end
+
+    context "A note on https://mk.yopo.work" do
+      strategy_should_work(
+        "https://mk.yopo.work/notes/995ig09wop",
+        image_urls: %w[https://mk.yopo.work/files/webpublic-dcab49b3-4ad3-4455-aea0-28aa81ecca48],
+        media_files: [{ file_size: 70_693 }],
+        page_url: "https://mk.yopo.work/notes/995ig09wop",
+        profile_url: "https://mk.yopo.work/@nano",
+        profile_urls: %w[https://mk.yopo.work/@nano https://mk.yopo.work/users/9414vv7ush],
+        artist_name: "菜乃",
+        tag_name: "nano",
+        other_names: ["菜乃", "nano"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          今日から菜乃は、ピュアホワイトピンクアラモーゼザ・ボルテーニョだ、、
+          略して菜乃と呼んでくれ
+        EOS
+      )
+    end
+
+    context "An image URL on https://mk.yopo.work with a referer" do
+      strategy_should_work(
+        "https://mk.yopo.work/files/webpublic-dcab49b3-4ad3-4455-aea0-28aa81ecca48",
+        referer: "https://mk.yopo.work/notes/995ig09wop",
+        image_urls: %w[https://mk.yopo.work/files/webpublic-dcab49b3-4ad3-4455-aea0-28aa81ecca48],
+        media_files: [{ file_size: 70_693 }],
+        page_url: "https://mk.yopo.work/notes/995ig09wop",
+        profile_url: "https://mk.yopo.work/@nano",
+        profile_urls: %w[https://mk.yopo.work/@nano https://mk.yopo.work/users/9414vv7ush],
+        artist_name: "菜乃",
+        tag_name: "nano",
+        other_names: ["菜乃", "nano"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          今日から菜乃は、ピュアホワイトピンクアラモーゼザ・ボルテーニョだ、、
+          略して菜乃と呼んでくれ
+        EOS
+      )
+    end
+
+    context "An image URL on https://mk.yopo.work without a referer" do
+      strategy_should_work(
+        "https://mk.yopo.work/files/webpublic-dcab49b3-4ad3-4455-aea0-28aa81ecca48",
+        image_urls: %w[https://mk.yopo.work/files/webpublic-dcab49b3-4ad3-4455-aea0-28aa81ecca48],
+        media_files: [{ file_size: 70_693 }],
+        page_url: nil,
+        profile_url: nil,
+        profile_urls: %w[],
+        artist_name: nil,
+        tag_name: nil,
+        other_names: [],
+        tags: [],
+        dtext_artist_commentary_title: nil,
+        dtext_artist_commentary_desc: nil
       )
     end
 
