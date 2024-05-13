@@ -7,12 +7,12 @@ class Source::Extractor::Misskey < Source::Extractor
     if parsed_url.image_url?
       [parsed_url.to_s]
     else
-      api_response.dig("files").to_a.pluck("url")
+      note["files"].to_a.pluck("url")
     end
   end
 
   def page_url
-    "#{base_url}/notes/#{note_id}" if base_url.present? && note_id.present?
+    parsed_url.page_url || parsed_referer&.page_url
   end
 
   def profile_url
@@ -28,7 +28,7 @@ class Source::Extractor::Misskey < Source::Extractor
   end
 
   def username
-    api_response.dig("user", "username") || parsed_url.username || parsed_referer&.username
+    user["username"] || parsed_url.username || parsed_referer&.username
   end
 
   def tag_name
@@ -36,7 +36,7 @@ class Source::Extractor::Misskey < Source::Extractor
   end
 
   def artist_name
-    api_response.dig("user", "name")&.gsub(/:[a-z0-9@_]+:/i, "")&.normalize_whitespace&.squeeze(" ")&.strip # strip emoji
+    user["name"]&.gsub(/:[a-z0-9@_]+:/i, "")&.normalize_whitespace&.squeeze(" ")&.strip # strip emoji
   end
 
   def other_names
@@ -44,27 +44,37 @@ class Source::Extractor::Misskey < Source::Extractor
   end
 
   def user_id
-    parsed_url.user_id || parsed_referer&.user_id || api_response.dig("user", "id")
+    parsed_url.user_id || parsed_referer&.user_id || user["id"]
   end
 
   def note_id
     parsed_url.note_id || parsed_referer&.note_id
   end
 
+  def play_id
+    parsed_url.play_id || parsed_referer&.play_id
+  end
+
+  def artist_commentary_title
+    if play.present?
+      play["title"]
+    end
+  end
+
   def artist_commentary_desc
     if ap_api_response.present?
-      [ap_api_response["summary"], ap_api_response["content"]]
-    elsif api_response.present?
-      [api_response["cw"], api_response["text"]]
-    else
-      []
-    end.compact.join("<br>")
+      [ap_api_response["summary"], ap_api_response["content"]].compact.join("<br>")
+    elsif note.present?
+      [note["cw"], note["text"]].compact.join("<br>")
+    elsif play.present?
+      play["summary"]&.gsub("\n", "<br>")
+    end
   end
 
   def tags
     return [] unless base_url.present?
 
-    api_response.dig("tags").to_a.map do |tag|
+    note["tags"].to_a.map do |tag|
       [tag, "#{base_url}/tags/#{tag}"]
     end
   end
@@ -82,7 +92,11 @@ class Source::Extractor::Misskey < Source::Extractor
     end
   end
 
-  memoize def api_response
+  memoize def user
+    note["user"] || play["user"] || {}
+  end
+
+  memoize def note
     return {} unless base_url.present? && note_id.present?
 
     http.cache(1.minute).parsed_post("#{base_url}/api/notes/show##{note_id}", json: { noteId: note_id }) || {}
@@ -92,5 +106,11 @@ class Source::Extractor::Misskey < Source::Extractor
     return {} unless base_url.present? && note_id.present?
 
     http.cache(1.minute).headers(accept: "application/ld+json").parsed_get("#{base_url}/notes/#{note_id}") || {}
+  end
+
+  memoize def play
+    return {} unless base_url.present? && play_id.present?
+
+    http.cache(1.minute).parsed_post("#{base_url}/api/flash/show", json: { flashId: play_id }) || {}
   end
 end
