@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Misskey < Source::URL
-  attr_reader :username, :user_id, :note_id
+  attr_reader :username, :user_id, :note_id, :play_id
 
   def self.match?(url)
     url.domain.in?(%w[misskey.io misskey.art misskey.design misskeyusercontent.com misskeyusercontent.jp]) || url.host.match?(/\A(s3|nos3)\.arkjp\.net\z/)
@@ -24,6 +24,10 @@ class Source::URL::Misskey < Source::URL
     # https://nijimiss.moe/notes/01H72HQKW2BNR81VEBZQPSVZWN
     in _, _, "notes", note_id
       @note_id = note_id
+
+    # https://misskey.io/play/9p3itbedgcal048f
+    in _, _,  "play", play_id
+      @play_id = play_id
 
     # https://media.misskeyusercontent.jp/io/dfca7bd4-c073-4ea0-991f-313ab3a77847.png
     # https://media.misskeyusercontent.com/io/thumbnail-e9f307e4-3fad-435f-91b6-3768d688491d.webp | https://misskey.io/notes/9hfx0ezipu
@@ -58,6 +62,8 @@ class Source::URL::Misskey < Source::URL
   def page_url
     if note_id.present?
       "https://#{host}/notes/#{note_id}"
+    elsif play_id.present?
+      "https://#{host}/play/#{play_id}"
     end
   end
 

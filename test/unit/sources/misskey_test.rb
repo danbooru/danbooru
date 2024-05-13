@@ -119,6 +119,28 @@ module Sources
       )
     end
 
+    context "A /play/ URL" do
+      strategy_should_work(
+        "https://misskey.io/play/9p3itbedgcal048f",
+        image_urls: [],
+        page_url: "https://misskey.io/play/9p3itbedgcal048f",
+        profile_url: "https://misskey.io/@ruruke",
+        profile_urls: %w[https://misskey.io/@ruruke https://misskey.io/users/9go6zwzccc],
+        artist_name: "ruru (瑠々)",
+        tag_name: "ruruke",
+        other_names: ["ruru (瑠々)", "ruruke"],
+        tags: [],
+        dtext_artist_commentary_title: "にゃんぷっぷーとあそぼう！",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          あなただけのにゃんぷっぷーと共に、2人(1人と1匹？)だけのひとときを過ごしましょう！
+
+          正常にプレイが出来ない場合リロードをお願いいたします
+
+          [tn]代理で運用しております[/tn]
+        EOS
+      )
+    end
+
     context "A s3.arkjp.net direct image url" do
       strategy_should_work(
         "https://s3.arkjp.net/misskey/99ae6116-2896-4cf3-9abc-e9746cd2408e.jpg",
