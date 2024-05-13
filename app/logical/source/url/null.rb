@@ -9,6 +9,8 @@ class Source::URL::Null < Source::URL
 
   def site_name
     case [subdomain, domain]
+    in "myship", "7-11.com.tw"
+      "7-Eleven MyShip"
     in _, "allmylinks.com"
       "AllMyLinks"
     in _, "animenewsnetwork.com"
@@ -27,20 +29,30 @@ class Source::URL::Null < Source::URL
       "Artists&Clients"
     in _, "ask.fm"
       "Ask.fm"
+    in _, "gamer.com.tw"
+      "Bahamut"
     in _, ("bandcamp.com" | "bcbits.com")
       "Bandcamp"
+    in _, "theshop.jp" | "thebase.com"
+      "BASE"
     in _, "bigcartel.com"
       "Big Cartel"
     in _, "buymeacoffee.com"
       "Buy Me a Coffee"
     in _, "carrd.co"
       "Carrd"
+    in _, "cash.app"
+      "Cash App"
     in _, "circle.ms"
       "Circle.ms"
     in _, ("class101.co" | "class101.net")
       "Class101"
+    in _, "cli-bo.com" | "clibo.tw"
+      "Clibo"
     in _, "colorslive.com"
       "Colors Live"
+    in "comicvine", "gamespot.com"
+      "Comic Vine"
     # XXX curiouscat.qa is possibly a different site
     # https://www.bleepingcomputer.com/news/security/popular-qanda-app-curious-cat-loses-domain-posts-bizarre-tweets/
     in _, ("curiouscat.live" | "curiouscat.me" | "curiouscat.qa")
@@ -49,6 +61,8 @@ class Source::URL::Null < Source::URL
       "DLSite"
     in _, "dcinside.com"
       "DC Inside"
+    in _, "direct.me"
+      "Direct.me"
     in _, "doujinshi.org"
       "Doujinshi.org"
     in "doujinshi", "mugimugi.org"
@@ -57,6 +71,8 @@ class Source::URL::Null < Source::URL
       "Drawcrowd"
     in _, ("e-hentai.org" | "exhentai.org" | "hath.network")
       "E-Hentai"
+    in _, "eth.co"
+      "Eth.co"
     in _, "exblog.jp"
       "Excite Blog"
     in _, ("facebook.com" | "fbcdn.net")
@@ -65,8 +81,14 @@ class Source::URL::Null < Source::URL
       "Fandom"
     in _, "fanfiction.net"
       "FanFiction.Net"
+    in _, "finalfantasyxiv.com"
+      "Final Fantasy XIV"
     in _, ("flickr.com" | "staticflickr.com")
       "Flickr"
+    in "gamefaqs", "gamespot.com"
+      "GameFAQs"
+    in _, "ganknow.com"
+      "Gank"
     in _, ("github.com" | "githubassets.com")
       "GitHub"
     in _, "gumpla.jp"
@@ -79,8 +101,14 @@ class Source::URL::Null < Source::URL
       "HoYoLAB"
     in _, "html.co.jp"
       "html.co.jp"
+    in _, "imagecomics.com"
+      "Image Comics"
+    in _, "instabio.cc" | "linkbio.co"
+      "Instabio"
     in _, "itch.io"
       "Itch.io"
+    in _, "leagueofcomicgeeks.com"
+      "League of Comic Geeks"
     in _, ("line.me" | "line-apps.com")
       "Line"
     in _, ("linkedin.com" | "licdn.com")
@@ -105,8 +133,16 @@ class Source::URL::Null < Source::URL
       "Ko-fi"
     in _, "last.fm"
       "Last.fm"
+    in _, "mangaz.com"
+      "Manga Library Z"
+    in _, "manga-no.com"
+      "Mangano"
+    in _, "marpple.shop"
+      "MarppleShop"
     in _, ("mastodon.cloud" | "mstdn.jp")
       "Mastodon"
+    in _, "msha.ke" | "milkshake.app"
+      "Milkshake"
     in _, "myanimelist.net"
       "MyAnimeList"
     in _, "myfigurecollection.net"
@@ -117,24 +153,44 @@ class Source::URL::Null < Source::URL
       "OCN"
     in _, "onlyfans.com"
       "OnlyFans"
+    in _, "ouxiangxiezhen.com"
+      "Ou Xiang Xie Zhen"
     in _, ("overdoll.com" | "dollycdn.net")
       "Overdoll"
     in _, ("paypal.com" | "paypal.me" | "paypalobjects.com")
       "PayPal"
     in _, "pixeljoint.com"
       "Pixel Joint"
+    in _, "planetminecraft.com"
+      "Planet Minecraft"
+    in _, "pronouns.page"
+      "Pronouns.page"
+    in _, "pronouny.xyz"
+      "Pronouny.xyz"
     in _, ("joyreactor.cc" | "reactor.cc")
       "Joyreactor"
+    in "rookie", "shonenjump.com"
+      "Jump Rookie!"
     in _, "redgifs.com"
       "RedGIFs"
     in _, "sakura.ne.jp"
       "Sakura.ne.jp"
     in _, "sankakucomplex.com"
       "Sankaku Complex"
-    in _, ("spotify.com" | "spotifycdn.com")
-      "Spotify"
+    in "scratch", "mit.edu"
+      "Scratch"
+    in "drawme", "share-on.me"
+      "Secret Drawing Box"
+    in _, "sheezy.art"
+      "Sheezy.art"
+    in _, "solo.to"
+      "Solo.to"
     in _, ("soundcloud.com" | "sndcdn.com")
       "SoundCloud"
+    in _, ("spotify.com" | "spotifycdn.com")
+      "Spotify"
+    in _, "square.site" | "squareup.com"
+      "Square"
     in _, ("steamstatic.com" | "steamcommunity.com")
       "Steam"
     in _, ("subscribestar.adult" | "subscribestar.com")
@@ -145,8 +201,8 @@ class Source::URL::Null < Source::URL
       "Suzuri"
     in _, "cloudfront.net" if host == "dijsur42hqnz1.cloudfront.net"
       "Suzuri"
-    in _, "theinterviews.jp"
-      "The Interviews"
+    in _, "doujin.com.tw"
+      "Taiwan Doujinshi Center"
     in _, "tapas.io"
       "Tapas"
     in _, "cloudfront.net" if host == "d30womf5coomej.cloudfront.net"
@@ -155,6 +211,10 @@ class Source::URL::Null < Source::URL
       "TeePublic"
     in _, ("telegram.org" | "t.me")
       "Telegram"
+    in _, "tensor.art"
+      "TensorArt"
+    in _, "theinterviews.jp"
+      "The Interviews"
     in _, "tistory.com"
       "Tistory"
     in "t1", "daumcdn.net"
