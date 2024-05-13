@@ -71,9 +71,9 @@ class Source::Extractor::Misskey < Source::Extractor
 
   def artist_commentary_desc
     if ap_api_response.present?
-      [ap_api_response["summary"], ap_api_response["content"]].compact.join("<br>")
+      [ap_api_response["summary"], ap_api_response["content"], *ap_api_response["attachment"].to_a.pluck("name")].compact.join("<br>")
     elsif note.present?
-      [note["cw"], note["text"]].compact.join("<br>")
+      [note["cw"], note["text"], *note["files"].to_a.pluck("comment")].compact.join("<br>")
     elsif play.present?
       play["summary"]&.gsub("\n", "<br>")
     end
