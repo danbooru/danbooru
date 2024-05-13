@@ -6,7 +6,7 @@ class Source::URL::URLShortener < Source::URL
 
   def self.match?(url)
     # https://0rz.tw/Gwl0j
-    # https:///amzn.to/2oaTatI
+    # https://amzn.to/2oaTatI
     # https://bit.ly/4aAVa4y
     # https://bit.ly/4aAVa4y+ (trick: you can add '+' to the end to see where the link goes)
     # https://cutt.ly/GfQ2szk
@@ -22,10 +22,11 @@ class Source::URL::URLShortener < Source::URL
     # https://t.ly/x8f4j
     # https://tiny.cc/6ut5vz
     # https://tinyurl.com/3avx9w4r
+    # https://tmblr.co/ZdPV4t2OHwdv5
     # https://t.co/Dxn7CuVErW
     # https://wp.me/p32Sjo-oJ
     # https://x.gd/uysub
-    url.domain.in?(%w[0rz.tw amzn.to bit.ly j.mp cutt.ly dlvr.it goo.gl is.gd naver.me pin.it pse.is reurl.cc t.ly tiny.cc tinyurl.com t.co wp.me x.gd]) ||
+    url.domain.in?(%w[0rz.tw amzn.to bit.ly j.mp cutt.ly dlvr.it goo.gl is.gd naver.me pin.it pse.is reurl.cc t.ly tiny.cc tinyurl.com tmblr.co t.co wp.me x.gd]) ||
 
     # https://pic.twitter.com/Dxn7CuVErW
     url.host.in?(%w[pic.twitter.com]) ||
@@ -52,6 +53,8 @@ class Source::URL::URLShortener < Source::URL
       "Google"
     in _, "tinyurl.com"
       "TinyURL"
+    in _, "tmblr.co"
+      "Tumblr"
     else # ow.ly, is.gd, etc
       host.capitalize
     end
