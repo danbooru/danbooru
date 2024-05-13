@@ -100,6 +100,25 @@ module Sources
       )
     end
 
+    context "A note with a .wav file and an artist name containing emojis" do
+      strategy_should_work(
+        "https://misskey.io/notes/9t8taey8ejc402is",
+        image_urls: %w[https://media.misskeyusercontent.jp/io/9a757584-3c18-42eb-a09a-ed41d716511e.wav],
+        media_files: [{ file_size: 18_630_318 }],
+        page_url: "https://misskey.io/notes/9t8taey8ejc402is",
+        profile_url: "https://misskey.io/@asatsukininica",
+        profile_urls: %w[https://misskey.io/@asatsukininica https://misskey.io/users/9bwwabvrw2],
+        artist_name: "糸葱ににか",
+        tag_name: "asatsukininica",
+        other_names: ["糸葱ににか", "asatsukininica"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          チャリ乗りながらぶーんって言ってるだけの音声
+        EOS
+      )
+    end
+
     context "A s3.arkjp.net direct image url" do
       strategy_should_work(
         "https://s3.arkjp.net/misskey/99ae6116-2896-4cf3-9abc-e9746cd2408e.jpg",

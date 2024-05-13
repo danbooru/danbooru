@@ -173,7 +173,7 @@ module Source
     #
     # @return [Boolean]
     def image_url?
-      file_ext.to_s.downcase.in?(%w[jpg jpeg png gif webp webm avif mp4 swf])
+      file_ext.to_s.downcase.in?(%w[jpg jpeg png gif webp webm avif mp4 swf flac mp3 ogg wav])
     end
 
     # True if the URL is a work page URL.

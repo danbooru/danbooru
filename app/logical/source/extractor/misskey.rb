@@ -36,7 +36,7 @@ class Source::Extractor::Misskey < Source::Extractor
   end
 
   def artist_name
-    api_response.dig("user", "name").presence
+    api_response.dig("user", "name")&.gsub(/:[a-z0-9@_]+:/i, "")&.normalize_whitespace&.squeeze(" ")&.strip # strip emoji
   end
 
   def other_names
