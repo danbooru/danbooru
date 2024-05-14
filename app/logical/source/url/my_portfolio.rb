@@ -12,7 +12,7 @@
 class Source::URL::MyPortfolio < Source::URL
   RESERVED_USERNAMES = %w[cdn www]
 
-  attr_reader :username, :artist_uuid, :image_uuid, :image_size
+  attr_reader :username, :artist_uuid, :image_uuid, :image_size, :page_title
 
   def self.match?(url)
     url.domain == "myportfolio.com"
@@ -36,15 +36,22 @@ class Source::URL::MyPortfolio < Source::URL
       @image_uuid = $1
       @image_size = $2
 
-    # https://sekigahara023.myportfolio.com/
     # https://sekigahara023.myportfolio.com/eaapexlegends5
     # https://sekigahara023.myportfolio.com/about
     # https://shiori-shii.myportfolio.com/portfolio
     # https://shiori-shii.myportfolio.com/work-1
-    in username, "myportfolio.com", *rest unless username.in?(RESERVED_USERNAMES) || image_url?
+    in username, "myportfolio.com", /^[a-z0-9-]+$/ => page_title unless username.in?(RESERVED_USERNAMES) || image_url?
+      @username = username
+      @page_title = page_title
+
+    # https://sekigahara023.myportfolio.com/
+    in username, "myportfolio.com" unless username.in?(RESERVED_USERNAMES)
       @username = username
 
     # https://artgerm.com/copy-of-dc-comics-a
+    in _, _, /^[a-z0-9-]+$/ => page_title unless image_url?
+      @page_title = page_title
+
     else
       nil
     end
@@ -53,7 +60,7 @@ class Source::URL::MyPortfolio < Source::URL
   def page_url
     # https://shiori-shii.myportfolio.com/portfolio
     # https://artgerm.com/copy-of-dc-comics-a
-    url.omit(:query).to_s if path.present? && !image_url?
+    "#{profile_url}/#{page_title}" if profile_url.present? && page_title.present?
   end
 
   def profile_url

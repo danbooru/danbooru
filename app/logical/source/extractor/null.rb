@@ -76,13 +76,15 @@ module Source
       end
 
       memoize def sub_extractor
-        if tumblr_url.present?
+        if parsed_url.nil? || !parsed_url.scheme.in?(%w[http https])
+          nil
+        elsif tumblr_url.present?
           Source::URL::Tumblr.new(tumblr_url).extractor(parent_extractor: self)
-        elsif twitter_site == "@AdobePortfolio"
+        elsif Source::URL::MyPortfolio.new(url).page_url? && twitter_site == "@AdobePortfolio"
           Source::URL::MyPortfolio.new(url).extractor(parent_extractor: self)
-        elsif twitter_site == "@note_PR"
+        elsif Source::URL::Note.new(url).page_url? && twitter_site == "@note_PR"
           Source::URL::Note.new(url).extractor(parent_extractor: self)
-        elsif page&.at('meta[name="generator"]')&.attr("content") == "blogger"
+        elsif Source::URL::Blogger.new(url).page_url? && page&.at('meta[name="generator"]')&.attr("content") == "blogger"
           Source::URL::Blogger.new(url).extractor(parent_extractor: self)
         elsif is_misskey?
           misskey_referer = Source::URL::Misskey.new(referer_url) unless referer_url.nil?
@@ -112,13 +114,12 @@ module Source
         extend Memoist
 
         memoize def tumblr_url
-          "https://www.tumblr.com/#{tumblr_name}/#{tumblr_post_id}" if tumblr_name.present? && tumblr_post_id.present?
+          "https://www.tumblr.com/#{tumblr_name}/#{tumblr_post_id}" if tumblr_post_id.present? && tumblr_name.present?
         end
 
         memoize def tumblr_post_id
           # https://yra.sixc.me/post/736364675654123520/the-divorce-is-going-well-original
-          parsed_url.path_segments => ["post", /\A\d+\z/ => post_id, *]
-          post_id
+          Source::URL::Tumblr.new(url)&.work_id
         end
 
         memoize def tumblr_name

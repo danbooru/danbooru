@@ -47,8 +47,9 @@ class Source::URL::Tumblr < Source::URL
     # https://superboin.tumblr.com/post/141169066579/photoset_iframe/superboin/tumblr_o45miiAOts1u6rxu8/500/false
     # https://make-do5.tumblr.com/post/619663949657423872
     # http://raspdraws.tumblr.com/image/70021467381
+    # https://yra.sixc.me/post/736364675654123520/the-divorce-is-going-well-original
     in _, _, ("post" | "image"), /^\d+$/ => work_id, *rest unless image_url?
-      @blog_name = subdomain unless subdomain == "www"
+      @blog_name = subdomain if domain == "tumblr.com" && subdomain != "www"
       @work_id = work_id
 
     # https://tumblr.com/munespice/683613396085719040 # new dashboard links
@@ -95,11 +96,6 @@ class Source::URL::Tumblr < Source::URL
     # http://whereisnovember.tumblr.com/tagged/art
     in _, "tumblr.com", *rest unless image_url? || subdomain == "www"
       @blog_name = subdomain
-
-    # https://tmblr.co/ZdPV4t2OHwdv5 -> https://techsupportdog.tumblr.com/post/163509337669?
-    # https://tmblr.co/M_UqbSYVSiq-2jG0cmc7mOQ -> https://www.tumblr.com/opflowerszine
-    in nil, "tmblr.co", *rest
-      nil
 
     else
       nil
@@ -157,10 +153,16 @@ class Source::URL::Tumblr < Source::URL
   end
 
   def page_url
-    "https://#{blog_name}.tumblr.com/post/#{work_id}" if blog_name.present? && work_id.present?
+    "#{profile_url}/post/#{work_id}" if profile_url.present? && work_id.present?
   end
 
   def profile_url
-    "https://#{blog_name}.tumblr.com" if blog_name.present?
+    if blog_name.present?
+      "https://#{blog_name}.tumblr.com"
+
+    # https://yra.sixc.me
+    elsif domain != "tumblr.com"
+      site
+    end
   end
 end
