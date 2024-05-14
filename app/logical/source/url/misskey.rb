@@ -47,7 +47,7 @@ class Source::URL::Misskey < Source::URL
     # https://media.misskeyusercontent.jp/io/dfca7bd4-c073-4ea0-991f-313ab3a77847.png
     # https://proxy.misskeyusercontent.com/image.webp?url=https%3A%2F%2Fimg.pawoo.net%2Fmedia_attachments%2Ffiles%2F111%2F232%2F575%2F490%2F284%2F147%2Foriginal%2F9aaf0c71a41b5647.jpeg | https://misskey.io/notes/9ktdpaq840
     # https://mk.yopo.work/files/webpublic-dcab49b3-4ad3-4455-aea0-28aa81ecca48
-    super || basename.match?(/\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/)
+    super || basename&.match?(/\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/)
   end
 
   def site_name
