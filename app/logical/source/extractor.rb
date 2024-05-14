@@ -193,7 +193,9 @@ module Source
     #
     # @return [ActiveRecord::Relation<Artist>]
     def artists
-      if parsed_url&.recognized?
+      if parsed_url&.profile_url?
+        Artist.active.has_normalized_url([parsed_url.profile_url])
+      elsif parsed_url&.recognized?
         Artist.active.has_normalized_url(profile_urls)
       else
         ArtistFinder.find_artists(url)

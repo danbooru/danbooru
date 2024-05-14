@@ -265,7 +265,7 @@ class Artist < ApplicationRecord
     end
 
     def has_normalized_url(urls)
-      where(id: ArtistURL.active.normalized_url_equals_any(urls).select(:artist_id))
+      where(id: ArtistURL.normalized_url_equals_any(urls).select(:artist_id))
     end
 
     def any_name_or_url_matches(query)
