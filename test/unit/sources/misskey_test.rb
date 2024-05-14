@@ -411,6 +411,7 @@ module Sources
       assert(Source::URL.image_url?("https://s3.arkjp.net/misskey/930fe4fb-c07b-4439-804e-06fb472d698f.gif"))
       assert(Source::URL.image_url?("https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp"))
       assert(Source::URL.image_url?("https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp"))
+      assert_not(Source::URL.image_url?("https://media.misskeyusercontent.com"))
 
       assert(Source::URL.page_url?("https://misskey.io/notes/9bxaf592x6"))
       assert_equal("https://misskey.io/notes/9bxaf592x6", Source::URL.page_url("https://misskey.io/notes/9bxaf592x6#pswp"))
