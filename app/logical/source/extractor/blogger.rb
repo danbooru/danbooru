@@ -2,10 +2,6 @@
 
 # @see Source::URL::Blogger
 class Source::Extractor::Blogger < Source::Extractor
-  # Taken from gallery-dl
-  # https://github.com/search?q=AIzaSyCN9ax34oMMyM07g_M-5pjeDp_312eITK8
-  API_KEY = "AIzaSyCN9ax34oMMyM07g_M-5pjeDp_312eITK8"
-
   def image_urls
     if parsed_url.full_image_url.present?
       [parsed_url.full_image_url]
@@ -102,7 +98,7 @@ class Source::Extractor::Blogger < Source::Extractor
   memoize def blog
     # https://developers.google.com/blogger/docs/3.0/reference/blogs/getByUrl
     # curl 'https://www.googleapis.com/blogger/v3/blogs/byurl?key=AIzaSyCN9ax34oMMyM07g_M-5pjeDp_312eITK8&url=https://benbotport.blogspot.com'
-    url = "https://www.googleapis.com/blogger/v3/blogs/byurl?key=#{API_KEY}&url=#{blog_url}" if blog_url.present?
+    url = "https://www.googleapis.com/blogger/v3/blogs/byurl?key=#{api_key}&url=#{blog_url}" if api_key.present? && blog_url.present?
     http.cache(1.minute).parsed_get(url) || {}
   end
 
@@ -110,18 +106,22 @@ class Source::Extractor::Blogger < Source::Extractor
     # https://developers.google.com/blogger/docs/3.0/reference/posts/getByPath
     # curl 'https://www.googleapis.com/blogger/v3/blogs/4063061489843530714/posts/bypath?key=AIzaSyCN9ax34oMMyM07g_M-5pjeDp_312eITK8&path=/2011/06/mass-effect-2.html'
     blog_path = Source::URL.parse(page_url)&.path
-    url = "https://www.googleapis.com/blogger/v3/blogs/#{blog["id"]}/posts/bypath?key=#{API_KEY}&path=#{blog_path}" if blog_path.present? && blog["id"].present?
+    url = "https://www.googleapis.com/blogger/v3/blogs/#{blog["id"]}/posts/bypath?key=#{api_key}&path=#{blog_path}" if api_key.present? && blog_path.present? && blog["id"].present?
     http.cache(1.minute).parsed_get(url) || {}
   end
 
   memoize def pages
     # https://developers.google.com/blogger/docs/3.0/reference/pages/list
     # curl 'https://www.googleapis.com/blogger/v3/blogs/2199400548823551998/pages?key=AIzaSyCN9ax34oMMyM07g_M-5pjeDp_312eITK8
-    url = "https://www.googleapis.com/blogger/v3/blogs/#{blog["id"]}/pages?key=#{API_KEY}" if blog["id"].present?
+    url = "https://www.googleapis.com/blogger/v3/blogs/#{blog["id"]}/pages?key=#{api_key}" if api_key.present? && blog["id"].present?
     http.cache(1.minute).parsed_get(url)&.dig(:items) || []
   end
 
   memoize def page
     pages.find { |page| Source::URL.parse(page["url"]).try(:page_name) == page_name } || {}
+  end
+
+  def api_key
+    Danbooru.config.blogger_api_key
   end
 end
