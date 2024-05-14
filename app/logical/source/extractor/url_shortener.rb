@@ -59,11 +59,23 @@ class Source::Extractor::URLShortener < Source::Extractor
       url = response.headers["Location"] if response.status.redirect?
       url unless url.in?(%W[https://api.pinterest.com/url_shortener/#{id}/redirect/None https://www.pinterest.com])
 
+    # curl -I https://skfb.ly/GXzZ
+    # https://skfb.ly/GXzZ -> https://sketchfab.com:443/s/GXzZa -> https://sketchfab.com/3d-models/my-dnd-map-falkirk-91a1199bda5e45cb84260bac20502f28
+    in "skfb.ly", id
+      http.redirect_url("https://sketchfab.com/s/#{id}")&.to_s
+
     # curl -v https://reurl.cc/E2zlnA
     # HEAD not supported; Returns 200 OK with 'Target' header on success and no 'Target' header on error.
     in "reurl.cc", id
       response = http.no_follow.get(https_url)
       response.headers["Target"] if response.status.code == 200
+
+    # curl -I https://shorturl.at/uMS23
+    # http://shorturl.at/uMS23 -> https://shorturl.at/uMS23 -> https://www.shorturl.at/uMS23 -> https://drive.google.com/drive/folders/1NL1iwZb8o52ieGt-Tkt8AAZu79rqmekj?usp=sharing
+    # Returns 302 on success and a 302 redirect to https://www.shorturl.at/ on error
+    in "shorturl.at", id
+      url = http.redirect_url("https://www.shorturl.at/#{id}")&.to_s
+      url unless url == "https://www.shorturl.at/"
 
     # curl -I https://bit.ly/4aAVa4y
     # Can't use a browser user agent for these shorteners, otherwise we get a HTML response instead of a 301 redirect.

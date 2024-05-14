@@ -11,6 +11,8 @@ class Source::URL::URLShortener < Source::URL
     # https://bit.ly/4aAVa4y+ (trick: you can add '+' to the end to see where the link goes)
     # https://cutt.ly/GfQ2szk
     # https://dlvr.it/SWKqJ0
+    # https://eepurl.com/j5st
+    # https://forms.gle/CK6UER39rK5qKnnT8
     # https://j.mp/cKV0uf
     # https://photos.app.goo.gl/eHfTwV866X4Vf7Zt5 (Google Photos share link)
     # https://images.app.goo.gl/5uBga7TuPKHxyyR1A (Google Images share link)
@@ -19,6 +21,8 @@ class Source::URL::URLShortener < Source::URL
     # https://pin.it/4A1N0Rd5W
     # https://pse.is/4b4tda
     # https://reurl.cc/E2zlnA
+    # https://shorturl.at/uMS23
+    # https://skfb.ly/GXzZ
     # https://t.ly/x8f4j
     # https://tiny.cc/6ut5vz
     # https://tinyurl.com/3avx9w4r
@@ -26,7 +30,7 @@ class Source::URL::URLShortener < Source::URL
     # https://t.co/Dxn7CuVErW
     # https://wp.me/p32Sjo-oJ
     # https://x.gd/uysub
-    url.domain.in?(%w[0rz.tw amzn.to bit.ly j.mp cutt.ly dlvr.it goo.gl is.gd naver.me pin.it pse.is reurl.cc t.ly tiny.cc tinyurl.com tmblr.co t.co wp.me x.gd]) ||
+    url.domain.in?(%w[0rz.tw amzn.to bit.ly j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl is.gd naver.me pin.it pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.co wp.me x.gd]) ||
 
     # https://pic.twitter.com/Dxn7CuVErW
     url.host.in?(%w[pic.twitter.com]) ||
@@ -45,12 +49,16 @@ class Source::URL::URLShortener < Source::URL
       "Bitly"
     in _, "twitter.com" | "t.co"
       "Twitter"
+    in _, "eepurl.com"
+      "Mailchimp"
     in _, "naver.me"
       "Naver"
     in _, "pin.it"
       "Pinterest"
-    in _, "goo.gl"
+    in _, "goo.gl" | "forms.gle"
       "Google"
+    in _, "skfb.ly"
+      "Sketchfab"
     in _, "tinyurl.com"
       "TinyURL"
     in _, "tmblr.co"
