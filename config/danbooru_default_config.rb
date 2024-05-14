@@ -600,6 +600,12 @@ module Danbooru
     def plurk_session_cookie
     end
 
+    # Your Google Blogger API key. Go to https://developers.google.com/blogger/docs/3.0/using#APIKey to create an API key.
+    # You can also use gallery-dl's API key, but you might get rate-limited if others are using it.
+    # https://github.com/mikf/gallery-dl/blob/07d962d60aed598f0ee8578df914c38e5fc939aa/gallery_dl/extractor/blogger.py#L162
+    def blogger_api_key
+    end
+
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
