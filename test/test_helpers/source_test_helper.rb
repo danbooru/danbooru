@@ -10,10 +10,13 @@ module SourceTestHelper
   class_methods do
     def strategy_should_work(url, arguments = {})
       # XXX: can't use **kwargs because of a bug with shoulda-context
-      referer, deleted, media_files = [:referer, :deleted, :media_files].map { |arg| arguments.delete(arg) }
+      referer = arguments.delete(:referer)
+      deleted = arguments.delete(:deleted)
+      media_files = arguments.delete(:media_files)
+      options = arguments.delete(:options).to_h
 
       should "work" do
-        strategy = Source::Extractor.find(url, referer)
+        strategy = Source::Extractor.find(url, referer, **options)
 
         assert_nothing_raised { strategy.to_h }
 
