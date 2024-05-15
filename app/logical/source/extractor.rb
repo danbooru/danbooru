@@ -25,7 +25,7 @@ module Source
     # The http timeout to download a file.
     DOWNLOAD_TIMEOUT = 60
 
-    attr_reader :url, :referer_url, :parsed_url, :parsed_referer, :parent_extractor
+    attr_reader :url, :referer_url, :parsed_url, :parsed_referer, :parent_extractor, :options
 
     delegate :site_name, to: :parsed_url
 
@@ -46,12 +46,11 @@ module Source
     # @param url [String] The URL to extract information from.
     # @param referer_url [String, nil] The page URL if `url` is an image URL.
     # @param default_extractor [Source::Extractor, nil] The extractor to use if no other extractor is found for this URL.
-    # @param parent_extractor [Source::Extractor, nil] The parent of this extractor, if this is a sub extractor.
     # @return [Source::Extractor, nil] The extractor, or nil if the URL couldn't be parsed and the default extractor is nil.
-    def self.find(url, referer_url = nil, default_extractor: Extractor::Null, parent_extractor: nil)
+    def self.find(url, referer_url = nil, default_extractor: Extractor::Null, **options)
       parsed_url = Source::URL.parse(url)
       parsed_referer = Source::URL.parse(referer_url)
-      parsed_url&.extractor(referer_url: parsed_referer, parent_extractor:) || default_extractor&.new(url, referer_url: referer_url, parent_extractor:)
+      parsed_url&.extractor(referer_url: parsed_referer, **options) || default_extractor&.new(url, referer_url: referer_url, **options)
     end
 
     # Initialize an extractor. Normally one should call `Source::Extractor.find`
@@ -60,10 +59,12 @@ module Source
     # @param url [Source::URL, String] The URL to extract information form.
     # @param referer_url [Source::URL, String, nil] The page URL if `url` is an image URL.
     # @param parent_extractor [Source::Extractor, nil] The parent of this extractor, if this is a sub extractor.
-    def initialize(url, referer_url: nil, parent_extractor: nil)
+    # @param options [Hash] Additional extractor-specific options to pass to the extractor.
+    def initialize(url, referer_url: nil, parent_extractor: nil, **options)
       @url = url.to_s
       @referer_url = referer_url&.to_s
       @parent_extractor = parent_extractor
+      @options = options
 
       @parsed_url = Source::URL.parse(url)
       @parsed_referer = Source::URL.parse(referer_url) if referer_url.present?
