@@ -19,7 +19,7 @@ class Source::URL::Xiaohongshu < Source::URL
     # https://ci.xiaohongshu.com/bd871b0f-f9e7-54da-fd39-80b6af034dad (full)
     # https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8 (full)
     in "ci", "xiaohongshu.com", image_id
-      @full_image_url = url.omit(:query).to_s
+      @full_image_url = without(:query).to_s
 
     # https://img.xiaohongshu.com/avatar/5b56be0014de415b2db830a6.jpg@160w_160h_92q_1e_1c_1x.jpg (profile picture, sample)
     # https://img.xiaohongshu.com/avatar/5b56be0014de415b2db830a6.jpg (full)

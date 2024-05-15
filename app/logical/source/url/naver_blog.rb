@@ -43,7 +43,7 @@ class Source::URL::NaverBlog < Source::URL
     # https://blogpfthumb-phinf.pstatic.net/MjAyMzAzMThfMzIg/MDAxNjc5MDY4MjkxNzUz.ODdLT6VGaauXq9_jT-TpO878xZ--5lv0llIDclJvvTYg.yqLsxucKuBCz-auOTjpX2RRyLV_0WLCcBwb206KeCSIg.PNG.kkid9624/%EC%A0%9C%EB%B3%B8.PNG/%25EC%25A0%259C%25EB%25B3%25B8.PNG (full)
     # http://blogpfthumb.phinf.naver.net/MjAyMzAzMThfMzIg/MDAxNjc5MDY4MjkxNzUz.ODdLT6VGaauXq9_jT-TpO878xZ--5lv0llIDclJvvTYg.yqLsxucKuBCz-auOTjpX2RRyLV_0WLCcBwb206KeCSIg.PNG.kkid9624/%EC%A0%9C%EB%B3%B8.PNG/%25EC%25A0%259C%25EB%25B3%25B8.PNG (full)
     in /phinf$/, ("naver.net" | "pstatic.net"), *rest
-      @full_image_url = url.omit(:query).to_s
+      @full_image_url = without(:query).to_s
 
     # https://blog.naver.com/kkid9624/223421884109
     # https://m.blog.naver.com/goam2/221647025085

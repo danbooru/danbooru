@@ -107,7 +107,7 @@ class Source::URL::Foundation < Source::URL
     elsif host == "f8n-production-collection-assets.imgix.net" && token_id.present? && work_id.present? && file_ext.present?
       "https://f8n-production-collection-assets.imgix.net/#{token_id}/#{work_id}/nft.#{file_ext}"
     elsif file_ext.present?
-      url.omit(:query).to_s
+      without(:query).to_s
     end
   end
 

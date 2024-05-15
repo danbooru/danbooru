@@ -124,7 +124,7 @@ module Danbooru
     def basename
       path_segments.last
     end
-    #
+
     # @return [String, nil] The name of the file without the file extension, or nil if not present.
     def filename
       basename&.slice(/^(.*)\./, 1)
@@ -138,6 +138,67 @@ module Danbooru
     # @return [String, nil] The username in a `http://username:password@example.com` URL.
     def http_user
       url.user
+    end
+
+    # Return a new URL with the components set to the given values. For example, return a new URL with the filename or
+    # file extension set to different values.
+    #
+    # @param components [Hash] The URL components to override (scheme, authority, userinfo, user, password, site, host,
+    #   port, path, basename, filename, file_ext, query, params, or fragment).
+    # @return [Danbooru::URL] The new URL.
+    def with(components)
+      components = components.dup.symbolize_keys
+
+      if components.key?(:params)
+        components[:query] = components.delete(:params).to_h.map do |key, value|
+          "#{Danbooru::URL.escape(key)}=#{Danbooru::URL.escape(value)}"
+        end.join("&").presence
+      end
+
+      if components.key?(:site)
+        site = Danbooru::URL.parse(components.delete(:site))
+        components[:scheme] = site.scheme
+        components[:authority] = site.authority
+      end
+
+      if components.key?(:file_ext)
+        new_ext = components.delete(:file_ext)
+        new_basename = [filename, new_ext].compact_blank.join(".")
+        components[:path] = "/" + [*path_segments[0..-2], new_basename].compact_blank.join("/")
+      end
+
+      if components.key?(:filename)
+        new_filename = components.delete(:filename)
+        new_basename = [new_filename, file_ext].compact_blank.join(".")
+        components[:path] = "/" + [*path_segments[0..-2], new_basename].compact_blank.join("/")
+      end
+
+      if components.key?(:basename)
+        new_basename = components.delete(:basename)
+        components[:path] = "/" + [*path_segments[0..-2], new_basename].compact_blank.join("/")
+      end
+
+      # Return the existing URL if none of the components are going to change. This is to avoid reparsing the URL if nothing will change.
+      return self if components.none? { |name, value| send(name) != value }
+
+      self.class.new(url.merge(components))
+    end
+
+    # Return a new URL with the given components removed. For example, return a new URL with the path or query params removed.
+    #
+    # @param components [Array<String, Symbol>] The URL components to override (scheme, authority, userinfo, user,
+    #   password, site, host, port, path, basename, filename, file_ext, query, params, or fragment).
+    # @return [Danbooru::URL] The new URL.
+    def without(*components)
+      with(**components.index_with(nil))
+    end
+
+    # Return a new URL with the given query params removed.
+    #
+    # @param names [Array<String, Symbol>] The names of the query params to remove.
+    # @return [Danbooru::URL] The new URL.
+    def without_params(*names)
+      with(params: params.without(*names))
     end
 
     # The subdomain of the URL, or nil if absent. For example, for "http://senpenbankashiki.hp.infoseek.co.jp" the
