@@ -19,7 +19,7 @@ class Source::URL::Cohost < Source::URL
     # https://staging.cohostcdn.org/header/42892-7cd2e652-82fd-464d-b544-4bdd4bea429a-profile.jpeg (profile banner)
     # https://staging.cohostcdn.org/avatar/42892-471e51cc-d0d5-4e86-a52c-eec635fc4a2c-profile.gif?dpr=2&width=80&height=80&fit=cover&auto=webp (profile picture)
     in "staging", "cohostcdn.org", *rest
-      @full_image_url = url.omit(:query).to_s
+      @full_image_url = without(:query).to_s
 
     # https://cohost.org/Karuu/post/2605252-nigiri-evil
     in _, "cohost.org", username, "post", /^(\d+)-(.*)$/ => slug

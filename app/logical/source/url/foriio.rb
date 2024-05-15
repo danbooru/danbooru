@@ -16,7 +16,7 @@ class Source::URL::Foriio < Source::URL
     # https://foriio.imgix.net/store/46d77f4f772f191d04c9360180cc907d.jpg?ixlib=rb-4.1.0&w=2184&auto=compress&s=a9a14e871e2f6dbdc28f87c915e8684f (sample)
     # https://foriio.imgix.net/store/46d77f4f772f191d04c9360180cc907d.jpg (full)
     in _, "imgix.net", *rest
-      @full_image_url = url.omit(:query).to_s
+      @full_image_url = without(:query).to_s
 
     # https://www.foriio.com/works/600743
     in _, _, "works", work_id

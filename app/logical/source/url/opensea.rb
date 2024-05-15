@@ -20,7 +20,7 @@ class Source::URL::Opensea < Source::URL
     # https://i.seadn.io/s/raw/files/473d8a4978c86ede320b8372dfe2a8b3.png?auto=format&dpr=1&w=384 (sample)
     # https://i.seadn.io/s/raw/files/473d8a4978c86ede320b8372dfe2a8b3.png (full)
     in "i", "seadn.io", "s", "raw", "files", _
-      @full_image_url = url.omit(:query).to_s
+      @full_image_url = without(:query).to_s
 
     # https://i.seadn.io/gae/CnA27YghZgRXfI35roMJts6x43S6xwjkBqXF2ujywUl5ibx9Gd16TKsPwVBEyYyszO96XbWx85HzoGxQ6JI6FHQpjZ5YvEZo1CHxVA?auto=format&dpr=1&w=1000 (sample)
     # https://i.seadn.io/gae/CnA27YghZgRXfI35roMJts6x43S6xwjkBqXF2ujywUl5ibx9Gd16TKsPwVBEyYyszO96XbWx85HzoGxQ6JI6FHQpjZ5YvEZo1CHxVA?w=99999 (full)

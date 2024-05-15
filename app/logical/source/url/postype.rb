@@ -18,7 +18,7 @@ class Source::URL::Postype < Source::URL
     # https://i.postype.com/2017/01/27/01/28/22c423dd569a1c2aaec66bc551c54d5b.png?w=1000 (old images, no longer used)
     # https://c3.postype.com/2017/07/04/21/29/42fc32581770dd593788cce89652f757.png
     in _, _, /^\d{4}$/, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, file
-      @full_image_url = url.omit(:query).to_s
+      @full_image_url = without(:query).to_s
 
     # https://luland.postype.com/post/11659399
     # https://www.postype.com/post/11659399
