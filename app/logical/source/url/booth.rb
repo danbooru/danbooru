@@ -7,7 +7,7 @@ module Source
   class URL::Booth < Source::URL
     RESERVED_SUBDOMAINS = ["www", "s", "s2", "asset", "accounts", nil]
 
-    attr_reader :work_id, :user_id, :user_uuid, :username
+    attr_reader :work_id, :user_id, :user_uuid, :username, :full_image_url
 
     def self.match?(url)
       url.domain == "booth.pm" || url.host == "booth.pximg.net"
@@ -26,24 +26,24 @@ module Source
       #
       # https://s.booth.pm/1c9bc77f-8ac1-4fa4-94e5-839772ab72cb/i/750997/774dc881-ce6e-45c6-871b-f6c3ca6914d5_base_resized.jpg (sample)
       # https://s.booth.pm/1c9bc77f-8ac1-4fa4-94e5-839772ab72cb/i/750997/774dc881-ce6e-45c6-871b-f6c3ca6914d5.png (full)
-      in _, _, *, /\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/i => user_uuid, "i", /^\d+$/ => work_id, file
+      in _, _, *, /\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/i => user_uuid, "i", /^\d+$/ => work_id, _
         @user_uuid = user_uuid
         @work_id = work_id
-        @file = file
+        @full_image_url = to_s if basename.exclude?("_base_resized.jpg")
 
       # profile icons
       # https://booth.pximg.net/c/128x128/users/3193929/icon_image/5be9eff4-1d9e-4a79-b097-33c1cd4ad314_base_resized.jpg (sample)
       # https://booth.pximg.net/users/3193929/icon_image/5be9eff4-1d9e-4a79-b097-33c1cd4ad314.png (full)
-      in _, _, *, "users", user_id, "icon_image", file
+      in _, _, *, "users", user_id, "icon_image", /^([\h-])+_base_resized/
         @user_id = user_id
-        @file = file
+        @full_image_url = to_s if basename.exclude?("_base_resized.jpg")
 
       # profile cover images
       # https://s2.booth.pm/8bb9e4e3-d171-4027-88df-84480480f79d/3d70de06-8e7c-444e-b8eb-a8a95bf20638_base_resized.jpg (sample)
       # https://s2.booth.pm/8bb9e4e3-d171-4027-88df-84480480f79d/3d70de06-8e7c-444e-b8eb-a8a95bf20638.png (full)
-      in _, _, *, /\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/i => user_uuid, file
+      in _, _, *, /\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/i => user_uuid, _
         @user_uuid = user_uuid
-        @file = file
+        @full_image_url = to_s if basename.exclude?("_base_resized.jpg")
 
       # https://booth.pm/en/items/2864768
       # https://booth.pm/ja/items/2864768
@@ -70,21 +70,19 @@ module Source
       host.in?(%w[booth.pximg.net s.booth.pm s2.booth.pm])
     end
 
-    def full_image_url?
-      image_url? && @file.exclude?("_base_resized")
-    end
+    def candidate_full_image_urls
+      return [] unless image_url? && full_image_url.nil?
 
-    def full_image_url_for(extension)
-      return unless @file.present?
-      full_file = @file.gsub(/_base_resized\.\w+$/, ".#{extension}")
-      if user_uuid
-        if work_id
-          "https://#{host}/#{user_uuid}/i/#{work_id}/#{full_file}"
-        else
-          "https://#{host}/#{user_uuid}/#{full_file}"
+      %w[png jpg jpeg].map do |ext|
+        full_filename = filename.delete_suffix("_base_resized")
+
+        if user_uuid && work_id.present?
+          "https://#{host}/#{user_uuid}/i/#{work_id}/#{full_filename}.#{ext}"
+        elsif user_uuid.present?
+          "https://#{host}/#{user_uuid}/#{full_filename}.#{ext}"
+        elsif user_id
+          "https://#{host}/users/#{user_id}/icon_image/#{full_filename}.#{ext}"
         end
-      elsif user_id
-        "https://#{host}/users/#{user_id}/icon_image/#{full_file}"
       end
     end
 
