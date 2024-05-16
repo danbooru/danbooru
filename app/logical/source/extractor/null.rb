@@ -89,16 +89,31 @@ module Source
         elsif is_misskey?
           misskey_referer = Source::URL::Misskey.new(referer_url) unless referer_url.nil?
           Source::URL::Misskey.new(url).extractor(referer_url: misskey_referer, parent_extractor: self)
+        elsif is_carrd?
+          carrd_referer = Source::URL::Carrd.new(referer_url) unless referer_url.nil?
+          Source::URL::Carrd.new(url).extractor(referer_url: carrd_referer, parent_extractor: self)
+        end
+      end
+
+      def is_carrd?
+        # https://hyphensam.com/#test-image
+        if Source::URL::Carrd.new(url).page_url?
+          page&.at("body.is-loading > div#wrapper > div#main > div.inner").present?
+        # https://hyphensam.com/assets/images/image04.jpg?v=208ad020
+        elsif Source::URL::Carrd.new(url).image_url? && referer_url.present? && Source::URL::Carrd.new(referer_url).page_url?
+          referer_page&.at("body.is-loading > div#wrapper > div#main > div.inner").present?
+        else
+          false
         end
       end
 
       def is_misskey?
         # https://mk.yopo.work/notes/995ig09wop
-        if Source::URL::Misskey.new(url).page_url? && page&.at('meta[name="application-name"]')&.attr("content") == "Misskey"
-          true
+        if Source::URL::Misskey.new(url).page_url?
+          page&.at('meta[name="application-name"]')&.attr("content") == "Misskey"
         # https://mk.yopo.work/files/webpublic-dcab49b3-4ad3-4455-aea0-28aa81ecca48
-        elsif Source::URL::Misskey.new(url).image_url? && referer_url.present? && Source::URL::Misskey.new(referer_url).page_url? && referer_page&.at('meta[name="application-name"]')&.attr("content") == "Misskey"
-          true
+        elsif Source::URL::Misskey.new(url).image_url? && referer_url.present? && Source::URL::Misskey.new(referer_url).page_url?
+          referer_page&.at('meta[name="application-name"]')&.attr("content") == "Misskey"
         else
           false
         end
