@@ -39,8 +39,6 @@ class Source::URL::Null < Source::URL
       "Big Cartel"
     in _, "buymeacoffee.com"
       "Buy Me a Coffee"
-    in _, "carrd.co"
-      "Carrd"
     in _, "cash.app"
       "Cash App"
     in _, "circle.ms"
