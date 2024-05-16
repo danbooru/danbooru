@@ -12,7 +12,7 @@ class Source::Extractor::Carrd < Source::Extractor
     else
       page_section&.css("img, video").to_a.flat_map do |element|
         image_url = extract_image_url(element)
-        Source::Extractor.find(image_url).image_urls
+        Source::URL::Carrd.new(image_url).extractor.image_urls
       end
     end
   end

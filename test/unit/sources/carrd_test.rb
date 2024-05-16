@@ -299,6 +299,61 @@ module Sources
         )
       end
 
+      context "For a custom domain:" do
+        context "A page URL" do
+          strategy_should_work(
+            "https://hyphensam.com/#test-image",
+            image_urls: %w[https://hyphensam.com/assets/images/image04.jpg?v=2cc95429],
+            media_files: [{ file_size: 14_413 }],
+            page_url: "https://hyphensam.com/#test-image",
+            profile_url: "https://hyphensam.com",
+            profile_urls: %w[https://hyphensam.com],
+            artist_name: nil,
+            tag_name: nil,
+            other_names: [],
+            tags: [],
+            dtext_artist_commentary_title: "",
+            dtext_artist_commentary_desc: <<~EOS.chomp
+              "[image]":[https://hyphensam.com/assets/images/image04.jpg?v=2cc95429]
+
+              Test text blah blah blah
+            EOS
+          )
+        end
+
+        context "An image URL with a referer" do
+          strategy_should_work(
+            "https://hyphensam.com/assets/images/image04.jpg?v=2cc95429",
+            referer: "https://hyphensam.com/#test-image",
+            image_urls: %w[https://hyphensam.com/assets/images/image04.jpg?v=2cc95429],
+            media_files: [{ file_size: 14_413 }],
+            page_url: "https://hyphensam.com/#test-image",
+            profile_url: "https://hyphensam.com",
+            profile_urls: %w[https://hyphensam.com],
+            artist_name: nil,
+            tag_name: nil,
+            other_names: [],
+            tags: [],
+            dtext_artist_commentary_title: "",
+            dtext_artist_commentary_desc: <<~EOS.chomp
+              "[image]":[https://hyphensam.com/assets/images/image04.jpg?v=2cc95429]
+
+              Test text blah blah blah
+            EOS
+          )
+        end
+
+        context "An image URL without a referer" do
+          strategy_should_work(
+            "https://hyphensam.com/assets/images/image04.jpg?v=2cc95429",
+            image_urls: %w[https://hyphensam.com/assets/images/image04.jpg?v=2cc95429],
+            media_files: [{ file_size: 14_413 }],
+            page_url: nil,
+            profile_url: nil
+          )
+        end
+      end
+
       should "Parse URLs correctly" do
         assert(Source::URL.image_url?("https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg?v=c6f079b5"))
 
@@ -306,6 +361,7 @@ module Sources
         assert(Source::URL.page_url?("https://caminukai-art.carrd.co/#home"))
 
         assert(Source::URL.profile_url?("https://caminukai-art.carrd.co"))
+        assert(Source::URL.profile_url?("https://caminukai-art.carrd.co#"))
       end
     end
   end

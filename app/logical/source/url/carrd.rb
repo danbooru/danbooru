@@ -18,8 +18,10 @@ class Source::URL::Carrd < Source::URL
     # https://rosymiz.carrd.co/assets/videos/video02.mp4.jpg?v=c6f079b5 (video cover)
     # https://rosymiz.carrd.co/assets/videos/video02.mp4?v=c6f079b5 (video)
     # https://rosymiz.carrd.co/assets/images/image01.jpg?v=c6f079b5 (profile image)
-    in username, "carrd.co", "assets", *rest unless username.in?(RESERVED_SUBDOMAINS)
-      @username = username
+    # https://hyphensam.com/assets/images/image04.jpg?v=208ad020
+    in _, _, "assets", ("images" | "videos"), *rest
+      @username = subdomain if domain == "carrd.co" && !subdomain.in?(RESERVED_SUBDOMAINS)
+      @image_url = true
 
       if basename.ends_with?(".mp4") || filename.ends_with?("_original")
         @full_image_url = without(:query).to_s
@@ -33,11 +35,19 @@ class Source::URL::Carrd < Source::URL
     # https://lytell.carrd.co/#portfolio (gallery page with multiple images)
     in username, "carrd.co" unless username.in?(RESERVED_SUBDOMAINS)
       @username = username
+      @page_id = fragment.presence
+
+    # https://hyphensam.com/#test-image
+    in _, _ if fragment in /^[a-zA-Z0-9-]+$/
       @page_id = fragment
 
     else
       nil
     end
+  end
+
+  def image_url?
+    @image_url == true
   end
 
   def page_url
