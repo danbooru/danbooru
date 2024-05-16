@@ -621,9 +621,15 @@ class DText
       in "blockquote"
         content = html_to_dtext(element, **options, &block).strip
         "\n\n[quote]\n#{content}\n[/quote]\n\n" if content.present?
-      in "spoiler" # fake tag added by source extractors
+      in "pre"
+        content = html_to_dtext(element, **options, &block)
+        "\n\n[code]\n#{content}\n[/code]\n\n" if content.present?
+      in "block-spoiler" # fake tag added by source extractors
         content = html_to_dtext(element, **options, &block).strip
-        "[spoiler]\n#{content}\n[/spoiler]\n\n" if content.present?
+        "\n\n[spoiler]\n#{content}\n[/spoiler]\n\n" if content.present?
+      in "inline-spoiler" # fake tag added by source extractors
+        content = html_to_dtext(element, **options, &block).strip
+        "[spoiler]#{content}[/spoiler]" if content.present?
       in "small" unless element.ancestors.any? { |e| e.name == "small" }
         content = html_to_dtext(element, **options, &block)
         "[tn]#{content}[/tn]" if content.present?
@@ -639,9 +645,14 @@ class DText
       in "s" unless element.ancestors.any? { |e| e.name == "s" }
         content = html_to_dtext(element, **options, &block)
         "[s]#{content}[/s]" if content.present?
+      in "code" unless element.ancestors.any? { |e| e.name == "code" }
+        content = html_to_dtext(element, **options, &block)
+        "[code]#{content}[/code]" if content.present?
       in "li"
-        content = html_to_dtext(element, **options, &block).strip
-        "* #{content}\n" if content.present?
+        content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
+        depth = element.ancestors.count { _1.name in "ul" | "ol" }
+        list = "*" * depth
+        "#{list} #{content}\n" if content.present?
       in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")
         hn = element.name
         title = html_to_dtext(element, **options, &block).strip

@@ -317,13 +317,31 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("[expand=title]\nfoo\n\nbar\n[/expand]", DText.from_html("<details><p>foo</p><p>bar</p><summary>title</summary></details>"))
       end
 
-      should "convert <ul> lists to DText" do
+      should "convert <ul> and <ol> lists to DText" do
         assert_equal("* foo\n* bar", DText.from_html("<ul><li>foo</li><li>bar</li></ul>"))
         assert_equal("* foo bar", DText.from_html("<ul><li>foo\nbar</li></ul>"))
+        assert_equal("* foo\n** bar", DText.from_html("<ul><li>foo<ul><li>bar</li></ul></li></ul>"))
+        assert_equal("* foo\n** bar", DText.from_html("<ol><li>foo<ol><li>bar</li></ol></li></ol>"))
 
         assert_equal("* foo[br]bar", DText.from_html("<ul><li>foo<br>bar</li></ul>"))
         assert_equal("* foo", DText.from_html("<ul><li>foo<br></li></ul>"))
         assert_equal("* foo\n* bar", DText.from_html("<ul><li>foo<br></li><li>bar</li></ul>"))
+      end
+
+      should "convert <block-spoiler> tags to DText" do
+        assert_equal("foo\n\n[spoiler]\nbar\n[/spoiler]\n\nbaz", DText.from_html("<p>foo</p><block-spoiler>bar</block-spoiler><p>baz</p>"))
+      end
+
+      should "convert <inline-spoiler> tags to DText" do
+        assert_equal("foo [spoiler]bar[/spoiler] baz", DText.from_html("<p>foo <inline-spoiler>bar</inline-spoiler> baz</p>"))
+      end
+
+      should "convert <pre> tags to DText" do
+        assert_equal("foo\n\n[code]\nbar\n[/code]\n\nbaz", DText.from_html("<p>foo</p><pre>bar</pre><p>baz</p>"))
+      end
+
+      should "convert <code> tags to DText" do
+        assert_equal("foo [code]bar[/code] baz", DText.from_html("<p>foo <code>bar</code> baz</p>"))
       end
     end
 
