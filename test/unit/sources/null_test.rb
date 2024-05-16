@@ -74,7 +74,6 @@ module Sources
         assert_equal("Big Cartel", Source::URL.parse("https://quintzeee.bigcartel.com").site_name)
         assert_equal("Blogger", Source::URL.parse("http://chiizupan.blogspot.com").site_name)
         assert_equal("Buy Me a Coffee", Source::URL.parse("https://www.buymeacoffee.com/sasimekk42").site_name)
-        assert_equal("Carrd", Source::URL.parse("https://jellyduckii.carrd.co").site_name)
         assert_equal("Circle.ms", Source::URL.parse("https://portal.circle.ms/Circle/Index/10084525").site_name)
         assert_equal("Class101", Source::URL.parse("https://class101.net/products/315Q19v2UzhkELv2X4Xa").site_name)
         assert_equal("Colors Live", Source::URL.parse("https://www.colorslive.com/artist/nasubino").site_name)

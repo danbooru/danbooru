@@ -617,7 +617,7 @@ class DText
         "\n\n[hr]\n\n"
       in ("p" | "ul" | "ol")
         content = html_to_dtext(element, **options, &block).strip
-        "#{content}\n\n"
+        "\n\n#{content}\n\n"
       in "blockquote"
         content = html_to_dtext(element, **options, &block).strip
         "\n\n[quote]\n#{content}\n[/quote]\n\n" if content.present?
