@@ -179,7 +179,7 @@ module Source
       end
 
       def api_url
-        "https://reddit.com/gallery/#{work_id}" if work_id.present?
+        "https://www.reddit.com/gallery/#{work_id}" if work_id.present?
       end
 
       memoize def subreddit
