@@ -28,14 +28,6 @@ module Source
         http.cache(1.minute).parsed_get(url)
       end
 
-      def artist_name
-        display_name
-      end
-
-      def other_names
-        [display_name, username].compact_blank.uniq
-      end
-
       def display_name
         nft.dig("creator", "name")
       end

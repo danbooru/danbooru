@@ -28,8 +28,12 @@ class Source::Extractor
       tags.map {|tag| [tag, "https://www.furaffinity.net/search/@keywords #{tag}"] }
     end
 
-    def artist_name
-      html_response&.at(".submission-id-sub-container a")&.text || parsed_url.username || parsed_referer&.username
+    def display_name
+      html_response&.at(".submission-id-sub-container a")&.text
+    end
+
+    def username
+      parsed_url.username || parsed_referer&.username
     end
 
     def profile_url

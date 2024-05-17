@@ -6,7 +6,7 @@
 #
 # @see Source::URL::Google
 class Source::Extractor::Google < Source::Extractor
-  delegate :page_url, :profile_url, :artist_name, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
+  delegate :page_url, :profile_url, :artist_name, :display_name, :username, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
 
   # Don't ignore the referer URL when it's from a different site (Youtube, Blogger, Opensea, etc).
   def allow_referer?

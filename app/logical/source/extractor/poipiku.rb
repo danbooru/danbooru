@@ -40,7 +40,7 @@ class Source::Extractor
       end
     end
 
-    def artist_name
+    def display_name
       page&.css(".UserInfoUserName")&.first&.text
     end
 

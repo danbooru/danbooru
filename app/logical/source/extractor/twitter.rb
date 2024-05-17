@@ -40,13 +40,11 @@ class Source::Extractor
     end
 
     def page_url
-      return nil if status_id.blank? || tag_name.blank?
-      "https://twitter.com/#{tag_name}/status/#{status_id}"
+      "https://twitter.com/#{username}/status/#{status_id}" if status_id.present? && username.present?
     end
 
     def profile_url
-      return nil if tag_name.blank?
-      "https://twitter.com/#{tag_name}"
+      "https://twitter.com/#{username}" if username.present?
     end
 
     def intent_url
@@ -62,12 +60,12 @@ class Source::Extractor
       parsed_url.user_id || parsed_referer&.user_id || graphql_tweet.dig(:legacy, :user_id_str)
     end
 
-    def tag_name
-      tag_name_from_url || graphql_tweet.dig(:core, :user_results, :result, :legacy, :screen_name)
+    def username
+      parsed_url.username || parsed_referer&.username || graphql_tweet.dig(:core, :user_results, :result, :legacy, :screen_name)
     end
 
-    def artist_name
-      graphql_tweet.dig(:core, :user_results, :result, :legacy, :name) || tag_name
+    def display_name
+      graphql_tweet.dig(:core, :user_results, :result, :legacy, :name)
     end
 
     def artist_commentary_desc
@@ -203,10 +201,6 @@ class Source::Extractor
 
     def status_id
       parsed_url.status_id || parsed_referer&.status_id
-    end
-
-    def tag_name_from_url
-      parsed_url.username || parsed_referer&.username
     end
   end
 end

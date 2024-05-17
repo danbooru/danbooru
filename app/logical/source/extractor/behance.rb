@@ -32,11 +32,11 @@ module Source
         project["url"] || parsed_url.page_url || parsed_referer&.page_url
       end
 
-      def artist_name
+      def display_name
         project.dig("creator", "displayName")
       end
 
-      def tag_name
+      def username
         project.dig("creator", "username")
       end
 

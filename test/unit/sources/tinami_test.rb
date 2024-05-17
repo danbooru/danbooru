@@ -11,7 +11,7 @@ module Sources
           page_url: "https://www.tinami.com/view/1087268",
           profile_url: "https://www.tinami.com/creator/profile/66493",
           profile_urls: %w[https://www.tinami.com/creator/profile/66493],
-          artist_name: "みぐめ",
+          display_name: "みぐめ",
           other_names: ["みぐめ"],
           tag_name: "tinami_66493",
           tags: [
@@ -41,7 +41,7 @@ module Sources
           page_url: "https://www.tinami.com/view/1087271",
           profile_url: "https://www.tinami.com/creator/profile/27790",
           profile_urls: %w[https://www.tinami.com/creator/profile/27790],
-          artist_name: "Shimaken",
+          display_name: "Shimaken",
           other_names: ["Shimaken"],
           tag_name: "tinami_27790",
           tags: [
@@ -87,7 +87,7 @@ module Sources
           page_url: "https://www.tinami.com/view/1087270",
           profile_url: "https://www.tinami.com/creator/profile/38168",
           profile_urls: %w[https://www.tinami.com/creator/profile/38168],
-          artist_name: "セラ箱",
+          display_name: "セラ箱",
           other_names: ["セラ箱"],
           tag_name: "tinami_38168",
           tags: [
@@ -117,7 +117,7 @@ module Sources
           page_url: nil,
           profile_url: nil,
           profile_urls: %w[],
-          artist_name: nil,
+          display_name: nil,
           other_names: [],
           tag_name: nil,
           tags: [],
@@ -135,7 +135,7 @@ module Sources
           page_url: "https://www.tinami.com/view/1087268",
           profile_url: "https://www.tinami.com/creator/profile/66493",
           profile_urls: %w[https://www.tinami.com/creator/profile/66493],
-          artist_name: "みぐめ",
+          display_name: "みぐめ",
           other_names: ["みぐめ"],
           tag_name: "tinami_66493",
           tags: [
@@ -156,7 +156,7 @@ module Sources
           page_url: "https://www.tinami.com/view/774077",
           profile_url: nil,
           profile_urls: %w[],
-          artist_name: nil,
+          display_name: nil,
           other_names: [],
           tag_name: nil,
           tags: [],

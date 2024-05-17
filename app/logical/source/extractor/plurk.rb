@@ -42,20 +42,12 @@ module Source
         end
       end
 
-      def username
-        plurk_html&.attr("data-nick")
-      end
-
-      def artist_name
+      def display_name
         plurk_html&.at(".nick")&.text&.strip
       end
 
-      def tag_name
-        username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
-      end
-
-      def other_names
-        [artist_name, username].compact_blank.uniq(&:downcase)
+      def username
+        plurk_html&.attr("data-nick")
       end
 
       def profile_url

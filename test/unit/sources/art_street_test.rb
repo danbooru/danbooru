@@ -16,7 +16,7 @@ module Sources
             https://medibang.com/u/16672238/
             https://medibang.com/author/8769655/
           ],
-          artist_name: "PogoRabbit",
+          display_name: "PogoRabbit",
           tag_name: "pogorabbit",
           other_names: ["PogoRabbit"],
           tags: %w[hutao Zhongli(GenshinImpact) GenshinImpact],
@@ -38,7 +38,7 @@ module Sources
             https://medibang.com/u/16672238/
             https://medibang.com/author/8769655/
           ],
-          artist_name: "PogoRabbit",
+          display_name: "PogoRabbit",
           tag_name: "pogorabbit",
           other_names: ["PogoRabbit"],
           tags: %w[hutao Zhongli(GenshinImpact) GenshinImpact],
@@ -59,7 +59,7 @@ module Sources
             https://medibang.com/u/littlegfu3/
             https://medibang.com/author/2176282/
           ],
-          artist_name: "丸思綺",
+          display_name: "丸思綺",
           other_names: ["丸思綺"],
           tags: %w[school drama 生活 小故事大道理],
           artist_commentary_title: "Ch. 1 居家的禮儀",
@@ -111,7 +111,7 @@ module Sources
             https://medibang.com/u/littlegfu3/
             https://medibang.com/author/2176282/
           ],
-          artist_name: "丸思綺",
+          display_name: "丸思綺",
           other_names: ["丸思綺"],
           tags: %w[school drama 生活 小故事大道理],
           artist_commentary_title: "Ch. 1 居家的禮儀",
@@ -145,7 +145,7 @@ module Sources
           profile_urls: %w[
             https://medibang.com/author/749476/
           ],
-          artist_name: "チッタ",
+          display_name: "チッタ",
           other_names: ["チッタ"],
           tags: [],
           artist_commentary_title: "空想に浸る",
@@ -164,7 +164,7 @@ module Sources
             https://medibang.com/author/10136798/
             https://medibang.com/u/Sweetie/
           ],
-          artist_name: "아시아꿈",
+          display_name: "아시아꿈",
           other_names: ["아시아꿈"],
           tags: %w[R-18 furry hatsunemiku Ecchi anthro medibangpaint Butt Lewd],
           artist_commentary_title: "하츠네 미쿠 (R-18)",
@@ -184,7 +184,7 @@ module Sources
           profile_urls: %w[
             https://medibang.com/author/329446/
           ],
-          artist_name: nil,
+          display_name: nil,
           other_names: [],
           tags: [],
           artist_commentary_title: "",

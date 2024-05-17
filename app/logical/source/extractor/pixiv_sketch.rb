@@ -17,15 +17,15 @@ module Source
       end
 
       def profile_url
-        "https://sketch.pixiv.net/@#{artist_name}" if artist_name.present?
+        "https://sketch.pixiv.net/@#{username}" if username.present?
       end
 
-      def artist_name
-        api_response.dig("data", "user", "unique_name")
+      def display_name
+        api_response.dig("data", "user", "name")
       end
 
-      def other_names
-        [artist_name, display_name].compact
+      def username
+        api_response.dig("data", "user", "unique_name") || parsed_url.username || parsed_referer&.username
       end
 
       def profile_urls
@@ -53,10 +53,6 @@ module Source
         api_response.dig("data", "tags").to_a.map do |tag|
           [tag, "https://sketch.pixiv.net/tags/#{Danbooru::URL.escape(tag)}"]
         end
-      end
-
-      def display_name
-        api_response.dig("data", "user", "name")
       end
 
       def pixiv_profile_url

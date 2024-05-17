@@ -28,7 +28,7 @@ module Source
       end
 
       def profile_url
-        "https://enty.jp/#{tag_name}" if tag_name.present?
+        "https://enty.jp/#{username}" if username.present?
       end
 
       def profile_urls
@@ -36,11 +36,11 @@ module Source
         urls.filter_map { |url| Source::URL.parse(url).profile_url }.sort.uniq
       end
 
-      def tag_name
+      def username
         page&.css("#breadcrumbs-one > li:nth-child(1) > a")&.attr("href")&.to_s&.delete_prefix("/")
       end
 
-      def artist_name
+      def display_name
         page&.css("#breadcrumbs-one > li:nth-child(1) > a")&.text&.normalize_whitespace&.strip
       end
 

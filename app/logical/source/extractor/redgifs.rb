@@ -39,16 +39,12 @@ class Source::Extractor::Redgifs < Source::Extractor
     "https://www.redgifs.com/users/#{username}" if username.present?
   end
 
-  def artist_name
+  def display_name
     user["name"]
   end
 
-  def tag_name
-    username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
-  end
-
-  def other_names
-    [artist_name, username].compact.uniq(&:downcase)
+  def username
+    parsed_url.username || parsed_referer&.username || user[:username]
   end
 
   def tags
@@ -78,10 +74,6 @@ class Source::Extractor::Redgifs < Source::Extractor
 
   def gif_id
     parsed_url.gif_id || parsed_referer&.gif_id
-  end
-
-  def username
-    parsed_url.username || parsed_referer&.username || user[:username]
   end
 
   def gallery_id

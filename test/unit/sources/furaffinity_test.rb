@@ -8,7 +8,8 @@ module Sources
         image_urls: ["https://d.furaffinity.net/art/iwbitu/1650222955/1650222955.iwbitu_yubi.jpg"],
         profile_url: "https://www.furaffinity.net/user/iwbitu",
         page_url: "https://www.furaffinity.net/view/46821705",
-        artist_name: "iwbitu",
+        display_name: "iwbitu",
+        username: nil,
         artist_commentary_title: "Yubi",
         artist_commentary_desc: /little gift doodle for/
       )
@@ -19,7 +20,8 @@ module Sources
         "https://d.furaffinity.net/art/iwbitu/1650222955/1650222955.iwbitu_yubi.jpg",
         image_urls: ["https://d.furaffinity.net/art/iwbitu/1650222955/1650222955.iwbitu_yubi.jpg"],
         profile_url: "https://www.furaffinity.net/user/iwbitu",
-        artist_name: "iwbitu",
+        display_name: nil,
+        username: "iwbitu",
         page_url: nil,
         artist_commentary_title: nil
       )
@@ -31,7 +33,8 @@ module Sources
         image_urls: ["https://d.furaffinity.net/art/iwbitu/1648803766/1648803766.iwbitu_nyopu_tori.jpg"],
         profile_url: "https://www.furaffinity.net/user/iwbitu",
         page_url: "https://www.furaffinity.net/view/46590097",
-        artist_name: "iwbitu",
+        display_name: "iwbitu",
+        username: nil,
         tags: [],
         artist_commentary_title: "Nyopu and Tori",
         artist_commentary_desc: /UwU/
@@ -53,7 +56,8 @@ module Sources
       strategy_should_work(
         "https://www.furaffinity.net/view/24228367",
         image_urls: ["https://d.furaffinity.net/art/mazen234/1500679554/1500679554.mazen234_foxgirl.png"],
-        artist_name: "mazen234",
+        display_name: "mazen234",
+        username: nil,
         artist_commentary_title: "Miko Sleeping at the beach~",
         dtext_artist_commentary_desc: <<~EOS.chomp
           Mikey went to get some things from the shop, so Miko probably took some time to herself to rest! Not saying Mikey might be a handful sometimes :P

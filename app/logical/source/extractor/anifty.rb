@@ -12,7 +12,7 @@ class Source::Extractor
     end
 
     def profile_url
-      if artist_name.present?
+      if username.present?
         "https://anifty.jp/@#{username}"
       else
         parsed_url.profile_url || parsed_referer&.profile_url
@@ -20,21 +20,15 @@ class Source::Extractor
     end
 
     def username
-      api_response.dig("creator", "userName") || artist_api_response["userName"]
+      api_response.dig("creator", "userName") || artist_api_response["userName"] || parsed_url.username || parsed_referer&.username
     end
 
-    def artist_name
+    def display_name
       api_response.dig("creator", "displayName") || artist_api_response.dig("creatorProfile", "nameEN")
     end
 
     def other_names
-      other_names = [username]
-      if api_response.present?
-        other_names << api_response.dig("creator", "displayNameJA")
-      elsif artist_api_response
-        other_names << artist_api_response.dig("creatorProfile", "nameJA")
-      end
-      other_names.compact.uniq
+      [display_name, username, api_response.dig("creator", "displayNameJA"), artist_api_response.dig("creatorProfile", "nameJA")].compact_blank.uniq(&:downcase)
     end
 
     def artist_commentary_title

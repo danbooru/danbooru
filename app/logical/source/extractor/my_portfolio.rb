@@ -19,17 +19,13 @@ class Source::Extractor::MyPortfolio < Source::Extractor
     parsed_url.profile_url || parsed_referer&.profile_url
   end
 
-  def artist_name
+  def display_name
     # <title>TOOCO - Visual Art, Illustration &amp; Design - 6 of Diamonds Paradise Bird</title>
     page&.at("title")&.text&.split(" - ")&.first&.normalize_whitespace
   end
 
-  def tag_name
-    username
-  end
-
-  def other_names
-    [artist_name, username].compact_blank.uniq
+  def username
+    parsed_url.username || parsed_referer&.username
   end
 
   def artist_commentary_title
@@ -64,10 +60,6 @@ class Source::Extractor::MyPortfolio < Source::Extractor
         element.name = "p"
       end
     end
-  end
-
-  def username
-    parsed_url.username || parsed_referer&.username
   end
 
   memoize def page

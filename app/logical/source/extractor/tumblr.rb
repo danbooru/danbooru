@@ -30,11 +30,11 @@ class Source::Extractor
     end
 
     def page_url
-      "https://#{artist_name}.tumblr.com/post/#{work_id}" if artist_name.present? && work_id.present?
+      "https://#{username}.tumblr.com/post/#{work_id}" if username.present? && work_id.present?
     end
 
     def profile_url
-      "https://#{artist_name}.tumblr.com" if artist_name.present?
+      "https://#{username}.tumblr.com" if username.present?
     end
 
     def artist_commentary_title
@@ -217,7 +217,7 @@ class Source::Extractor
       comment.to_s.parse_html.css("img, video source").pluck(:src)
     end
 
-    def artist_name
+    def username
       parsed_url.blog_name || parsed_referer&.blog_name || post_url_from_image_html&.try(:blog_name) # Don't crash with custom domains
     end
 
@@ -227,10 +227,10 @@ class Source::Extractor
 
     memoize def api_response
       return {} unless self.class.enabled?
-      return {} unless artist_name.present? && work_id.present?
+      return {} unless username.present? && work_id.present?
 
       params = { id: work_id, api_key: Danbooru.config.tumblr_consumer_key }
-      http.cache(1.minute).parsed_get("https://api.tumblr.com/v2/blog/#{artist_name}/posts", params: params) || {}
+      http.cache(1.minute).parsed_get("https://api.tumblr.com/v2/blog/#{username}/posts", params: params) || {}
     end
 
     def post

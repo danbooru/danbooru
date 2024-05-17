@@ -28,12 +28,12 @@ class Source::Extractor::Pinterest < Source::Extractor
     [profile_url, domain_url].compact_blank.uniq
   end
 
-  def artist_name
-    display_name
+  def display_name
+    api_response.dig("native_creator", "full_name")
   end
 
-  def other_names
-    [display_name, username].compact_blank.uniq
+  def username
+    api_response.dig("native_creator", "username")
   end
 
   def artist_commentary_title
@@ -50,14 +50,6 @@ class Source::Extractor::Pinterest < Source::Extractor
 
   def tags
     []
-  end
-
-  def username
-    api_response.dig("native_creator", "username")
-  end
-
-  def display_name
-    api_response.dig("native_creator", "full_name")
   end
 
   def domain_url

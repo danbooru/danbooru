@@ -10,9 +10,10 @@ module Sources
         page_url: "https://skeb.jp/@kokuzou593/works/45",
         profile_url: "https://skeb.jp/@kokuzou593",
         profile_urls: %w[https://skeb.jp/@kokuzou593],
-        artist_name: "こくぞう",
-        other_names: %w[こくぞう kokuzou593],
+        display_name: "こくぞう",
+        username: "kokuzou593",
         tag_name: "kokuzou593",
+        other_names: %w[こくぞう kokuzou593],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           こんにちは
@@ -36,9 +37,10 @@ module Sources
         page_url: "https://skeb.jp/@qweoigjqewoirgjqerwiogqewroig/works/2",
         profile_url: "https://skeb.jp/@qweoigjqewoirgjqerwiogqewroig",
         profile_urls: %w[https://skeb.jp/@qweoigjqewoirgjqerwiogqewroig],
-        artist_name: nil,
-        other_names: ["qweoigjqewoirgjqerwiogqewroig"],
+        display_name: nil,
+        username: "qweoigjqewoirgjqerwiogqewroig",
         tag_name: "qweoigjqewoirgjqerwiogqewroig",
+        other_names: ["qweoigjqewoirgjqerwiogqewroig"],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: ""
       )
@@ -52,9 +54,10 @@ module Sources
         page_url: "https://skeb.jp/@2gi0gi_/works/13",
         profile_url: "https://skeb.jp/@2gi0gi_",
         profile_urls: %w[https://skeb.jp/@2gi0gi_],
-        artist_name: "もわちち🌵",
-        other_names: %w[もわちち🌵 2gi0gi_],
+        display_name: "もわちち🌵",
+        username: "2gi0gi_",
         tag_name: "2gi0gi",
+        other_names: %w[もわちち🌵 2gi0gi_],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           先生のイラストが本当に大好きです！
@@ -93,9 +96,10 @@ module Sources
         page_url: "https://skeb.jp/@tontaro_/works/316",
         profile_url: "https://skeb.jp/@tontaro_",
         profile_urls: %w[https://skeb.jp/@tontaro_],
-        artist_name: "たろー",
-        other_names: %w[たろー tontaro_],
+        display_name: "たろー",
+        username: "tontaro_",
         tag_name: "tontaro",
+        other_names: %w[たろー tontaro_],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           h6. Original Request
@@ -121,9 +125,10 @@ module Sources
         page_url: "https://skeb.jp/@goma_feet/works/1",
         profile_url: "https://skeb.jp/@goma_feet",
         profile_urls: %w[https://skeb.jp/@goma_feet],
-        artist_name: "ごましお",
-        other_names: %w[ごましお goma_feet],
+        display_name: "ごましお",
+        username: "goma_feet",
         tag_name: "goma_feet",
+        other_names: %w[ごましお goma_feet],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           こんにちは！
@@ -151,9 +156,10 @@ module Sources
         page_url: "https://skeb.jp/@LambOic029/works/146",
         profile_url: "https://skeb.jp/@LambOic029",
         profile_urls: %w[https://skeb.jp/@LambOic029],
-        artist_name: "lamb",
-        other_names: %w[lamb LambOic029],
+        display_name: "lamb",
+        username: "LambOic029",
         tag_name: "lamboic029",
+        other_names: %w[lamb LambOic029],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           リクエストお願いします：
@@ -192,9 +198,10 @@ module Sources
         page_url: "https://skeb.jp/@kaisouafuro/works/112",
         profile_url: "https://skeb.jp/@kaisouafuro",
         profile_urls: %w[https://skeb.jp/@kaisouafuro],
-        artist_name: "まめすず",
-        other_names: %w[まめすず kaisouafuro],
+        display_name: "まめすず",
+        username: "kaisouafuro",
         tag_name: "kaisouafuro",
+        other_names: %w[まめすず kaisouafuro],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           I would like to request an animation screen for my Twitch channel. My character is a catgirl, and has a comfortable and shy personality. Her eyes are blue with pink gradient at the bottom. Her hair is straight at the top and then wavy at the bottom. The theme is "getting ready to live stream". I want you to draw her putting on makeup, like lip gloss. Maybe she can brush her hair, or puts on her cardigan and looking into the mirror, or drink tea.

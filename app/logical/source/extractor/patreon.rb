@@ -38,16 +38,12 @@ class Source::Extractor::Patreon < Source::Extractor
     [profile_url, ("https://www.patreon.com/user?u=#{user_id}" if user_id.present?)].compact
   end
 
-  def artist_name
+  def display_name
     user.dig("attributes", "full_name")&.strip
   end
 
-  def tag_name
-    username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
-  end
-
-  def other_names
-    [artist_name, username].compact_blank.uniq(&:downcase)
+  def username
+    parsed_url.username || parsed_referer&.username || user.dig("attributes", "vanity")
   end
 
   def tags
@@ -115,10 +111,6 @@ class Source::Extractor::Patreon < Source::Extractor
 
   def user_id
     parsed_url.user_id || parsed_referer&.user_id || user["id"]
-  end
-
-  def username
-    parsed_url.username || parsed_referer&.username || user.dig("attributes", "vanity")
   end
 
   memoize def api_response

@@ -23,7 +23,7 @@ module Sources
         page_url: "https://www.weibo.com/5501756072/J2UNKfbqV",
         profile_url: "https://www.weibo.com/u/5501756072",
         profile_urls: %w[https://www.weibo.com/u/5501756072],
-        artist_name: "阿尔托莉雅厨",
+        display_name: "阿尔托莉雅厨",
         other_names: ["阿尔托莉雅厨"],
         tag_name: "weibo_5501756072",
         tags: [
@@ -50,7 +50,7 @@ module Sources
         page_url: "https://www.weibo.com/5501756072/J2UNKfbqV",
         profile_url: "https://www.weibo.com/u/5501756072",
         profile_urls: %w[https://www.weibo.com/u/5501756072],
-        artist_name: "阿尔托莉雅厨",
+        display_name: "阿尔托莉雅厨",
         other_names: ["阿尔托莉雅厨"],
         tag_name: "weibo_5501756072",
         tags: [
@@ -74,7 +74,7 @@ module Sources
         page_url: "https://www.weibo.com/5501756072/IF9fugHzj",
         profile_url: "https://www.weibo.com/u/5501756072",
         profile_urls: %w[https://www.weibo.com/u/5501756072],
-        artist_name: "阿尔托莉雅厨",
+        display_name: "阿尔托莉雅厨",
         other_names: ["阿尔托莉雅厨"],
         tag_name: "weibo_5501756072",
         tags: [
@@ -97,7 +97,7 @@ module Sources
         page_url: nil,
         profile_url: nil,
         profile_urls: %w[],
-        artist_name: nil,
+        display_name: nil,
         other_names: [],
         tag_name: nil,
         tags: [],
@@ -115,7 +115,7 @@ module Sources
         page_url: "https://www.weibo.com/2125874520/FDKGo4Lk0",
         profile_url: "https://www.weibo.com/u/2125874520",
         profile_urls: %w[https://www.weibo.com/u/2125874520],
-        artist_name: "偷菜佬TC",
+        display_name: "偷菜佬TC",
         other_names: ["偷菜佬TC"],
         tag_name: "weibo_2125874520",
         tags: [
@@ -140,7 +140,7 @@ module Sources
         page_url: nil,
         profile_url: "https://www.weibo.com/u/5265069929",
         profile_urls: %w[https://www.weibo.com/u/5265069929],
-        artist_name: nil,
+        display_name: nil,
         other_names: [],
         tag_name: "weibo_5265069929",
         tags: [],
@@ -157,7 +157,7 @@ module Sources
         page_url: "https://www.weibo.com/6582241007/Lsp2YCmJ6",
         profile_url: "https://www.weibo.com/u/6582241007",
         profile_urls: %w[https://www.weibo.com/u/6582241007],
-        artist_name: "号布谷鸟",
+        display_name: "号布谷鸟",
         other_names: ["号布谷鸟"],
         tag_name: "weibo_6582241007",
         tags: [

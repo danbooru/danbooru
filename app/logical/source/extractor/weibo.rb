@@ -51,12 +51,8 @@ module Source
         "weibo_#{artist_id}" if artist_id.present?
       end
 
-      def artist_name
+      def display_name
         api_response&.dig("user", "screen_name")
-      end
-
-      def other_names
-        [artist_name].compact
       end
 
       def artist_id

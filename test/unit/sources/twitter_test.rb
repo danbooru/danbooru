@@ -27,8 +27,8 @@ module Sources
           { file_size: 188_553 },
         ],
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "丸茂_えのぐマネージャー",
-        tag_name: "motty08111213",
+        display_name: "丸茂_えのぐマネージャー",
+        username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
         dtext_artist_commentary_desc: <<~EOS.chomp
           岩本町芸能社女優部のタレント3名がHPに公開されました。
@@ -51,8 +51,8 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "丸茂_えのぐマネージャー",
-        tag_name: "motty08111213",
+        display_name: "丸茂_えのぐマネージャー",
+        username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
     end
@@ -67,8 +67,8 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "丸茂_えのぐマネージャー",
-        tag_name: "motty08111213",
+        display_name: "丸茂_えのぐマネージャー",
+        username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
     end
@@ -83,8 +83,8 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "丸茂_えのぐマネージャー",
-        tag_name: "motty08111213",
+        display_name: "丸茂_えのぐマネージャー",
+        username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
     end
@@ -154,8 +154,8 @@ module Sources
           https://video.twimg.com/tweet_video/FeWVcf4VQAAIPTe.mp4
         ],
         page_url: "https://twitter.com/twotenky/status/1577831592227000320",
-        tag_name: "twotenky",
-        artist_name: "通天機",
+        display_name: "通天機",
+        username: "twotenky",
         profile_url: "https://twitter.com/twotenky",
         artist_commentary_desc: "動画と静止画がセットでお得と聞いて https://t.co/hWvKoHLN7y",
         dtext_artist_commentary_desc: "動画と静止画がセットでお得と聞いて",
@@ -170,8 +170,8 @@ module Sources
         page_url: "https://twitter.com/Strangestone/status/556440271961858051",
         profile_url: "https://twitter.com/Strangestone",
         profile_urls: ["https://twitter.com/Strangestone", "https://twitter.com/intent/user?user_id=93332575"],
-        tag_name: "Strangestone",
-        artist_name: "比村奇石",
+        display_name: "比村奇石",
+        username: "Strangestone",
         dtext_artist_commentary_desc: "ブレザーが描きたかったのでJK鈴谷"
       )
     end
@@ -183,9 +183,9 @@ module Sources
         page_url: "https://twitter.com/shoka_bg/status/1644344692107268097",
         profile_url: "https://twitter.com/shoka_bg",
         profile_urls: ["https://twitter.com/shoka_bg", "https://twitter.com/intent/user?user_id=1109709388049051649"],
-        tag_name: "shoka_bg",
+        display_name: "shooka @土曜 西 “ね” 41a",
+        username: "shoka_bg",
         tags: %w[ブルアカ],
-        artist_name: "shooka @土曜 西 “ね” 41a",
         dtext_artist_commentary_desc: <<~EOS.chomp
           風紀委員の実態
           "#ブルアカ":[https://twitter.com/hashtag/ブルアカ]
@@ -200,8 +200,8 @@ module Sources
         page_url: "https://twitter.com/loveremi_razoku/status/1637647185969041408",
         profile_url: "https://twitter.com/loveremi_razoku",
         profile_urls: ["https://twitter.com/loveremi_razoku", "https://twitter.com/intent/user?user_id=293443351"],
-        tag_name: "loveremi_razoku",
-        artist_name: "ラブレミ@うぉるやふぁんくらぶ",
+        display_name: "ラブレミ@うぉるやふぁんくらぶ",
+        username: "loveremi_razoku",
         tags: [],
         dtext_artist_commentary_desc: <<~EOS.chomp
           「ラリアッ党の野望チョコ」
@@ -239,9 +239,9 @@ module Sources
         page_url: "https://twitter.com/emurin/status/912861472916508672",
         profile_url: "https://twitter.com/emurin",
         profile_urls: ["https://twitter.com/emurin", "https://twitter.com/intent/user?user_id=30642502"],
-        tag_name: "emurin",
+        display_name: "えむりん",
+        username: "emurin",
         tags: %w[odaibako],
-        artist_name: "えむりん",
         dtext_artist_commentary_desc: <<~EOS.chomp
           > ほわほわ系クーデレギロチンおねがいします <https://odaibako.net/detail/request/277bac5ea1b34b1abc7ac21dd1031690> "#odaibako":[https://twitter.com/hashtag/odaibako]
 
@@ -257,9 +257,9 @@ module Sources
         page_url: "https://twitter.com/enaiC31/status/1644997451626221568",
         profile_url: "https://twitter.com/enaiC31",
         profile_urls: ["https://twitter.com/enaiC31", "https://twitter.com/intent/user?user_id=1444938344891240452"],
-        tag_name: "enaiC31",
+        display_name: "えない🚀",
+        username: "enaiC31",
         tags: [],
-        artist_name: "えない🚀",
         dtext_artist_commentary_desc: <<~EOS.chomp
           すろぉもぉしょん💊
         EOS
@@ -275,9 +275,9 @@ module Sources
         page_url: "https://twitter.com/nounproject/status/540944400767922176",
         profile_url: "https://twitter.com/nounproject",
         profile_urls: ["https://twitter.com/nounproject", "https://twitter.com/intent/user?user_id=88996186"],
-        tag_name: "nounproject",
+        display_name: "Noun Project",
+        username: "nounproject",
         tags: [],
-        artist_name: "Noun Project",
         dtext_artist_commentary_desc: <<~EOS.chomp
           More is better. Unlimited is best. NounPro Members now get unlimited icon downloads <http://bit.ly/1yn2KWn>
         EOS
@@ -325,7 +325,7 @@ module Sources
       strategy_should_work(
         "https://twitter.com/masayasuf/status/870734961778630656",
         deleted: true,
-        tag_name: "masayasuf",
+        username: "masayasuf",
         profile_url: "https://twitter.com/masayasuf",
         dtext_artist_commentary_desc: nil,
       )
@@ -334,7 +334,7 @@ module Sources
     context "A tweet from a suspended user" do
       strategy_should_work(
         "https://twitter.com/tanso_panz/status/1192429800717029377",
-        tag_name: "tanso_panz",
+        username: "tanso_panz",
         profile_url: "https://twitter.com/tanso_panz",
         image_urls: [],
         dtext_artist_commentary_desc: nil,

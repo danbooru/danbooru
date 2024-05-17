@@ -10,7 +10,8 @@ module Sources
           media_files: [{ file_size: 465_970 }],
           page_url: nil,
           profile_url: nil,
-          artist_name: nil,
+          display_name: nil,
+          username: nil,
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: ""
         )
@@ -23,7 +24,8 @@ module Sources
           media_files: [{ file_size: 465_970 }],
           page_url: nil,
           profile_url: nil,
-          artist_name: nil,
+          display_name: nil,
+          username: nil,
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: ""
         )
@@ -37,7 +39,9 @@ module Sources
           page_url: "https://www.pinterest.com/pin/1066086543015109244/",
           profile_url: "https://www.pinterest.com/EDO_ARTY/",
           profile_urls: ["https://www.pinterest.com/EDO_ARTY/"],
-          artist_name: "Arty EDO",
+          display_name: "Arty EDO",
+          username: "EDO_ARTY",
+          tag_name: "edo_arty",
           other_names: ["Arty EDO", "EDO_ARTY"],
           dtext_artist_commentary_title: "Flat_Head Boy Naruto Fanart Naruto Anime",
           dtext_artist_commentary_desc: ""
@@ -52,7 +56,8 @@ module Sources
           page_url: "https://www.pinterest.com/pin/668292032234493917/",
           profile_url: nil,
           profile_urls: [],
-          artist_name: nil,
+          display_name: nil,
+          username: nil,
           other_names: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: ""
@@ -67,7 +72,8 @@ module Sources
           page_url: "https://www.pinterest.com/pin/AVBZICDCT7hRTla-jHiJ6w2eVUK1wuq7WRYG8P_uqZIziXisjxatHMA/",
           profile_url: nil,
           profile_urls: [],
-          artist_name: nil,
+          display_name: nil,
+          username: nil,
           other_names: [],
           dtext_artist_commentary_title: "となみ (@tona_bnkz) on Twitter",
           dtext_artist_commentary_desc: "Embedded"

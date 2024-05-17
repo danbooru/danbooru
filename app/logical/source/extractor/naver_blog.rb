@@ -22,16 +22,12 @@ class Source::Extractor::NaverBlog < Source::Extractor
     parsed_url.profile_url || parsed_referer&.profile_url
   end
 
-  def artist_name
+  def display_name
     page&.at('meta[property="naverblog:nickname"]')&.attr("content")
   end
 
-  def tag_name
-    username
-  end
-
-  def other_names
-    [artist_name, username].compact_blank.uniq
+  def username
+    parsed_url.username || parsed_referer&.username
   end
 
   def tags
@@ -100,10 +96,6 @@ class Source::Extractor::NaverBlog < Source::Extractor
         nil
       end
     end
-  end
-
-  def username
-    parsed_url.username || parsed_referer&.username
   end
 
   def post_id

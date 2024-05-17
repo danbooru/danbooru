@@ -23,7 +23,7 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
     "https://www.xiaohongshu.com/user/profile/#{user_id}" if user_id.present?
   end
 
-  def artist_name
+  def display_name
     note.dig("user", "nickname")
   end
 

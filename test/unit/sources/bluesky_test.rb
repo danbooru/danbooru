@@ -2,7 +2,6 @@ require 'test_helper'
 
 module Sources
   class BlueskyTest < ActiveSupport::TestCase
-
     context "A post url with 'app.bsky.embed.images.view' embed" do
       strategy_should_work(
         "https://bsky.app/profile/ixy.bsky.social/post/3kkvo4d4jd32g",
@@ -14,8 +13,8 @@ module Sources
           "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w",
         ],
         page_url: "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
-        artist_name: "Ixy(いくしー)",
-        tag_name: "ixy",
+        display_name: "Ixy(いくしー)",
+        username: "ixy",
         tags: [],
         dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
       )
@@ -42,8 +41,8 @@ module Sources
           "https://bsky.app/profile/did:plc:ekm5wgpt6xhazl7xaipt5ewy",
         ],
         page_url: "https://bsky.app/profile/did:plc:ekm5wgpt6xhazl7xaipt5ewy/post/3kjarhifsmg26",
-        artist_name: "Baguette",
-        tag_name: "yourbaguette",
+        display_name: "Baguette",
+        username: "yourbaguette",
         tags: ["Art", "FanArt", "Digimon", "SteinsGate", "Omori", "FFXIV"],
         dtext_artist_commentary_desc: "Thanks for the opportunity Bison ! \n\nI'm Baguette, and I mostly draw fanarts of whatever obsession I have ! I will move in Sweden in a week, work on my art and aim to open a little shop this year while working part time ! \n\n#Art #FanArt #Digimon #SteinsGate #Omori #FFXIV",
       )
@@ -60,8 +59,8 @@ module Sources
           "https://bsky.app/profile/did:plc:owc2r2dsewj3hk73rtd746zh",
         ],
         page_url: "https://bsky.app/profile/did:plc:owc2r2dsewj3hk73rtd746zh/post/3klgth6lilt2l",
-        artist_name: "Hi-GO!",
-        tag_name: "go-guiltism",
+        display_name: "Hi-GO!",
+        username: "go-guiltism",
         tags: [],
         dtext_artist_commentary_desc: "Copy-X FullArmed 2",
       )
@@ -78,8 +77,8 @@ module Sources
           "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w",
         ],
         page_url: "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
-        artist_name: "Ixy(いくしー)",
-        tag_name: "ixy",
+        display_name: "Ixy(いくしー)",
+        username: "ixy",
         tags: [],
         dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
       )

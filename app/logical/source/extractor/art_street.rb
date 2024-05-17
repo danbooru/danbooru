@@ -41,12 +41,8 @@ class Source::Extractor
       "https://medibang.com/author/#{parsed_url.author_id}/" if parsed_url.author_id.present?
     end
 
-    def artist_name
+    def display_name
       page&.css(".pictureDetails-authorArea2 .pictureDetails__authorName, .book_info-author-name")&.text&.strip
-    end
-
-    def other_names
-      [artist_name].compact_blank
     end
 
     def tags

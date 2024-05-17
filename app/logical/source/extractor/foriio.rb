@@ -24,12 +24,12 @@ class Source::Extractor::Foriio < Source::Extractor
     [profile_url, work.dig("data", "author", "profile", "twitter_url")].compact_blank
   end
 
-  def artist_name
+  def display_name
     work.dig("data", "author", "profile", "name")
   end
 
-  def tag_name
-    username
+  def username
+    work.dig("data", "author", "screen_name")
   end
 
   def artist_commentary_title
@@ -46,10 +46,6 @@ class Source::Extractor::Foriio < Source::Extractor
 
   def tags
     []
-  end
-
-  def username
-    work.dig("data", "author", "screen_name")
   end
 
   def work_id

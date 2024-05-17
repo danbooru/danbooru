@@ -57,22 +57,23 @@ module Source
       end
 
       def stacc_url
-        return nil if moniker.blank?
-        "https://www.pixiv.net/stacc/#{moniker}"
+        "https://www.pixiv.net/stacc/#{username}" if username.present?
       end
 
       def profile_urls
         [profile_url, stacc_url].compact
       end
 
-      def artist_name
+      def display_name
         api_response[:userName]
       end
 
+      def username
+        parsed_url.username || parsed_referer&.username || api_illust[:userAccount]
+      end
+
       def other_names
-        other_names = [artist_name]
-        other_names << moniker unless moniker&.starts_with?("user_")
-        other_names.compact.uniq
+        [display_name, (username unless username&.starts_with?("user_"))].compact_blank.uniq(&:downcase)
       end
 
       def artist_commentary_title
@@ -111,10 +112,6 @@ module Source
             end
           end
         end
-      end
-
-      def tag_name
-        moniker
       end
 
       def tags
@@ -235,10 +232,6 @@ module Source
 
       memoize def api_response
         api_illust.presence || api_novel.presence || api_novel_series.presence || {}
-      end
-
-      def moniker
-        parsed_url.username || api_illust[:userAccount]
       end
 
       def ugoira_frame_delays

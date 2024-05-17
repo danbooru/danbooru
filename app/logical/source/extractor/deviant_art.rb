@@ -118,11 +118,15 @@ module Source
       end
 
       def profile_url
-        "https://www.deviantart.com/#{artist_name.downcase}" if artist_name.present?
+        "https://www.deviantart.com/#{username}" if username.present?
       end
 
-      def artist_name
-        user["username"].presence || api_metadata.dig("author", "username") || parsed_url.username || parsed_referer&.username
+      def display_name
+        user["username"].presence || api_metadata.dig("author", "username")
+      end
+
+      def username
+        display_name&.downcase || parsed_url.username || parsed_referer&.username
       end
 
       def artist_commentary_title

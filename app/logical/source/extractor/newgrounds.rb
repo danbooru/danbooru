@@ -54,16 +54,16 @@ module Source
         super(tag)
       end
 
-      def artist_name
-        page&.at(".item-user .item-details h4 a")&.text&.strip || user_name
+      def display_name
+        page&.at(".item-user .item-details h4 a")&.text&.strip
       end
 
-      def other_names
-        [artist_name, (user_name if user_name != artist_name&.downcase)].compact.uniq
+      def username
+        Source::URL.parse(page&.at(".item-user .item-details h4 a")&.attr("href"))&.username || parsed_url.username || parsed_referer&.username
       end
 
       def profile_url
-        page&.at(".item-user .item-details h4 a")&.attr("href") || parsed_url.profile_url || parsed_referer&.profile_url
+        "https://#{username}.newgrounds.com" if username.present?
       end
 
       def artist_commentary_title
@@ -77,10 +77,6 @@ module Source
 
       def dtext_artist_commentary_desc
         DText.from_html(artist_commentary_desc, base_url: "https://www.newgrounds.com").strip
-      end
-
-      def user_name
-        parsed_url.username || parsed_referer&.username
       end
 
       def illust_title

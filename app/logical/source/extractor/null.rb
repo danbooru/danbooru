@@ -31,6 +31,14 @@ module Source
         sub_extractor&.artist_name
       end
 
+      def display_name
+        sub_extractor&.display_name
+      end
+
+      def username
+        sub_extractor&.username
+      end
+
       def tag_name
         sub_extractor&.tag_name
       end

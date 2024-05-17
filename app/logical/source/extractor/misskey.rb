@@ -35,20 +35,12 @@ class Source::Extractor::Misskey < Source::Extractor
     [profile_url, account_url, remote_username_url].compact
   end
 
-  def username
-    user["username"] || parsed_url.username || parsed_referer&.username
-  end
-
-  def tag_name
-    username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
-  end
-
-  def artist_name
+  def display_name
     user["name"]&.gsub(/:[a-z0-9@_]+:/i, "")&.normalize_whitespace&.squeeze(" ")&.strip # strip emoji
   end
 
-  def other_names
-    [artist_name, username].compact.uniq(&:downcase)
+  def username
+    user["username"] || parsed_url.username || parsed_referer&.username
   end
 
   def user_id

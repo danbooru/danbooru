@@ -15,8 +15,9 @@ module Sources
       strategy_should_work(
         "https://gengar563.lofter.com/post/1e82da8c_1c98dae1b",
         image_urls: image_urls,
-        artist_name: "gengar563",
-        other_names: ["gengar563", "续杯超盐酸"],
+        display_name: "续杯超盐酸",
+        username: "gengar563",
+        other_names: ["续杯超盐酸", "gengar563"],
         profile_url: "https://gengar563.lofter.com",
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -42,8 +43,9 @@ module Sources
       strategy_should_work(
         "https://yuli031458.lofter.com/post/3163d871_1cbdc5f6d",
         image_urls: ["https://imglf5.lf127.net/img/Mm55d3lNK2tJUWpNTjVLN0MvaTRDc1UvQUFLMGszOHRvSjV6S3VSa1lwa3BDWUtVOWpBTHBnPT0.jpg"],
-        artist_name: "yuli031458",
-        other_names: ["yuli031458", "52hertzc"],
+        display_name: "52hertzc",
+        username: "yuli031458",
+        other_names: ["52hertzc", "yuli031458"],
         tags: ["明日方舟", "阿米娅"],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "Amiya"
@@ -54,8 +56,9 @@ module Sources
       strategy_should_work(
         "https://chengyeliuli.lofter.com/post/1d127639_2b6e850c8",
         image_urls: ["https://imglf3.lf127.net/img/d28aeb098a69b1d2/ZmltbmVjOU9BRzFHVTVnTkNmc0V0NDlSRnNrdENIWWwyZkFreTJJd0duRT0.jpg"],
-        artist_name: "chengyeliuli",
-        other_names: ["chengyeliuli", "桃原"],
+        display_name: "桃原",
+        username: "chengyeliuli",
+        other_names: ["桃原", "chengyeliuli"],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           練習
@@ -72,8 +75,9 @@ module Sources
           "https://imglf4.lf127.net/img/68d1578576f2e8a0/akFYeFo0L0VFMno5d0JuNHlwQ3VMdEFxYysyN1ZseVduNzFkbG9MdUlFVT0.jpg",
           "https://imglf6.lf127.net/img/9970d5715bd5f72a/akFYeFo0L0VFMno5d0JuNHlwQ3VMZ3QxbkttTHpHZERWZXlVS3FDNmtYcz0.jpg",
         ],
-        artist_name: "qiuchenghanshuang",
-        other_names: ["qiuchenghanshuang", "秋某"],
+        display_name: "秋某",
+        username: "qiuchenghanshuang",
+        other_names: ["秋某", "qiuchenghanshuang"],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "过去与她擦肩而过"
       )
@@ -88,8 +92,9 @@ module Sources
           "https://imglf4.lf127.net/img/323e0e53fec354b8/Sytua1gwSUwyV1k3SXZxY3FiVGJvWWh2MjZSUHdvM3JNWndUS0pSSS9Gdz0.png",
           "https://imglf3.lf127.net/img/304d83b42234fa53/Sytua1gwSUwyV1k3SXZxY3FiVGJvY2xNK3FDQ2lTaDBOdU1lenhtNDJLaz0.png",
         ],
-        artist_name: "sdz013",
-        other_names: ["sdz013", "SDZ"],
+        display_name: "SDZ",
+        username: "sdz013",
+        other_names: ["SDZ", "sdz013"],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "本来是给外国朋友但是我销号了所以存下()"
       )
@@ -101,9 +106,9 @@ module Sources
         image_urls: [
           "https://imglf4.lf127.net/img/d2ZIUXlGd2FraFNMMC9KUTNGdTFjVkZydjlsNUxhVyt2MHpUanhaeld5Vy8zZEQzUE5XMXhBPT0.jpg",
         ],
-        tag_name: "okitagumi",
-        artist_name: "okitagumi",
-        other_names: ["okitagumi", "3626151"],
+        display_name: "3626151",
+        username: "okitagumi",
+        other_names: ["3626151", "okitagumi"],
         page_url: "https://okitagumi.lofter.com/post/1e69aeeb_fbb63ca",
         profile_url: "https://okitagumi.lofter.com",
         media_files: [{ file_size: 154_620 }],
@@ -139,8 +144,9 @@ module Sources
         image_urls: [
           "https://imglf4.lf127.net/img/767c7fec4d8e1f50/bnpEMS9YSVpSbzJNaFkvMmdtL3Q4b2IwM3lmY3NPWmZ3VFhMZ05Pb2RxRT0.jpg",
         ],
-        artist_name: "jiuhaotaiyangdeshexian",
-        other_names: ["jiuhaotaiyangdeshexian", "鸠号太阳的射线-"],
+        display_name: "鸠号太阳的射线-",
+        username: "jiuhaotaiyangdeshexian",
+        other_names: ["鸠号太阳的射线-", "jiuhaotaiyangdeshexian"],
         dtext_artist_commentary_title: "Q:老师！想问问最近会不会画ITZY？🥰🥰",
         dtext_artist_commentary_desc: "不好意思现在才看到！那就画一个荔枝猫猫吧😄"
       )
@@ -152,8 +158,9 @@ module Sources
         image_urls: [
           "https://vodm2lzexwq.vod.126.net/vodm2lzexwq/Pc5jg1nL_3039990631_sd.mp4?resId=254486990bfa2cd7aa860229db639341_3039990631_1&sign=4j02HTHXqNfhaF%2B%2FO14Ny%2F9SMNZj%2FIjpJDCqXfYa4aM%3D",
         ],
-        artist_name: "wooden-brain",
-        other_names: ["wooden-brain", "依末"],
+        display_name: "依末",
+        username: "wooden-brain",
+        other_names: ["依末", "wooden-brain"],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "夏 日 活 动"
       )
