@@ -7,11 +7,13 @@ module Source
       def image_urls
         if parsed_url&.full_image_url.present?
           [parsed_url.full_image_url]
+        elsif parsed_url.image_url?
+          [parsed_url.to_s]
         elsif data.present?
           images = []
-          images += [data.dig("media", "content")].compact unless crosspost?
+          images += [data.dig("media", "content")].compact unless crosspost? || data.dig("media", "type") == "embed"
           images += ordered_gallery_images
-          images.compact.uniq.map { |i| Source::URL.parse(i)&.full_image_url }.compact
+          images.compact.uniq.map { |url| Source::URL.parse(url)&.full_image_url || url }.compact
         else
           []
         end

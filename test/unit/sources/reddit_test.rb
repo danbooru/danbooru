@@ -227,6 +227,24 @@ module Sources
       )
     end
 
+    context "A www.redditmedia.com/mediaembed/ URL" do
+      strategy_should_work(
+        "https://www.redditmedia.com/mediaembed/wi4nfq",
+        image_urls: [],
+        page_url: "https://www.reddit.com/r/nier/comments/wi4nfq/i_rebuilt_2bs_room_in_blender_and_made_ultrawide/",
+        profile_url: "https://www.reddit.com/user/magisterium_art",
+        profile_urls: %w[https://www.reddit.com/user/magisterium_art],
+        artist_name: "magisterium_art",
+        tag_name: "magisterium_art",
+        other_names: ["magisterium_art"],
+        tags: [
+          ["Fanart", "https://www.reddit.com/r/nier/?f=flair_name:\"Fanart\""],
+        ],
+        dtext_artist_commentary_title: "I rebuilt 2B's room in Blender and made ultrawide and 4K wallpapers out of it.",
+        dtext_artist_commentary_desc: ""
+      )
+    end
+
     context "A reddit post with rich text commentary" do
       strategy_should_work(
         "https://www.reddit.com/r/grandorder/comments/1cnaruv/cerejeira_relaxing_commission/",
@@ -368,6 +386,7 @@ module Sources
         assert(Source::URL.page_url?("https://www.reddit.com/ttyccp"))
         assert(Source::URL.page_url?("https://redd.it/ttyccp"))
         assert(Source::URL.page_url?("https://www.reddit.com/r/tales/s/RtMDlrF5yo"))
+        assert(Source::URL.page_url?("https://www.redditmedia.com/mediaembed/wi4nfq"))
 
         assert(Source::URL.profile_url?("https://www.reddit.com/user/xSlimes"))
         assert(Source::URL.profile_url?("https://www.reddit.com/u/Valshier"))
