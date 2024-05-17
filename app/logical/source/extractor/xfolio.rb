@@ -38,11 +38,7 @@ class Source::Extractor::Xfolio < Source::Extractor
     parsed_url.username || parsed_referer&.username
   end
 
-  def tag_name
-    username
-  end
-
-  def artist_name
+  def display_name
     page&.search(".creatorInfo").to_a.first&.attr("data-creator-name")
   end
 

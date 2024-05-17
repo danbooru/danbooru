@@ -20,10 +20,6 @@ class Source::Extractor::Artistree < Source::Extractor
     parsed_url.profile_url || parsed_referer&.profile_url
   end
 
-  def artist_name
-    username
-  end
-
   def artist_commentary_title
     commission["name"]
   end

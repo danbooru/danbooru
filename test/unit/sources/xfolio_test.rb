@@ -17,7 +17,7 @@ module Sources
           "https://xfolio.jp/portfolio/ben1shoga",
         ],
         artist_name: "くれない",
-        tag_name: "ben1shoga",
+        username: "ben1shoga",
         tags: ["くれない", "イラスト", "ブルアカ二次創作", "ブルーアーカイブ", "ミドリ(ブルーアーカイブ)", "モモイ(ブルーアーカイブ)", "二次創作"],
         artist_commentary_title: "モモミドビキニ！",
         dtext_artist_commentary_desc: "ビキニだ！モモミドだ！",
@@ -54,6 +54,8 @@ module Sources
         media_files: [
           { file_size: 79_118 },
         ],
+        display_name: "望月りく",
+        username: "riku_mochiduki"
       )
     end
 

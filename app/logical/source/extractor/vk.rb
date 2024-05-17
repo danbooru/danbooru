@@ -44,7 +44,7 @@ class Source::Extractor::Vk < Source::Extractor
     [profile_url, wall_url].compact
   end
 
-  def artist_name
+  def display_name
     if page_type == "wall"
       page&.at(".wall_item .pi_author")&.text
     elsif page_type == "photo"
@@ -52,12 +52,16 @@ class Source::Extractor::Vk < Source::Extractor
     end
   end
 
-  def tag_name
-    username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
-  end
-
-  def other_names
-    [artist_name, username].compact.uniq(&:downcase)
+  def username
+    if parsed_url.username.present?
+      parsed_url.username
+    elsif parsed_referer&.username.present?
+      parsed_url.referer
+    elsif page_type == "wall"
+      page&.at(".wi_head .Avatar")&.attr("aria-label")
+    elsif page_type == "photo"
+      photo["author_href"]&.delete_prefix("/")
+    end
   end
 
   def tags
@@ -131,18 +135,6 @@ class Source::Extractor::Vk < Source::Extractor
 
   def repost?
     original_post_id.present?
-  end
-
-  def username
-    if parsed_url.username.present?
-      parsed_url.username
-    elsif parsed_referer&.username.present?
-      parsed_url.referer
-    elsif page_type == "wall"
-      page&.at(".wi_head .Avatar")&.attr("aria-label")
-    elsif page_type == "photo"
-      photo["author_href"]&.delete_prefix("/")
-    end
   end
 
   memoize def page

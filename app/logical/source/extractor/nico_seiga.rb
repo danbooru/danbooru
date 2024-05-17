@@ -66,7 +66,7 @@ module Source
         "https://seiga.nicovideo.jp/user/illust/#{artist_id}" if artist_id.present?
       end
 
-      def artist_name
+      def display_name
         api_response["nickname"] || user_api_response["nickname"]
       end
 
@@ -88,10 +88,6 @@ module Source
 
       def tag_name
         "nicoseiga_#{artist_id}" if artist_id.present?
-      end
-
-      def other_names
-        [artist_name].compact
       end
 
       def tags

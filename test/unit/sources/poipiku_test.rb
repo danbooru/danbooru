@@ -13,7 +13,7 @@ module Sources
           media_files: [{ file_size: 209_902 }],
           profile_url: "https://poipiku.com/583/",
           profile_urls: %w[https://poipiku.com/583/ https://twitter.com/avocado_0w0],
-          artist_name: "リアクションありがとう～～",
+          display_name: "リアクションありがとう～～",
           tag_name: "poipiku_583",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -33,7 +33,7 @@ module Sources
           ],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
-          artist_name: "omo_chi2",
+          display_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
           artist_commentary_desc: <<~EOS.chomp,
@@ -57,7 +57,7 @@ module Sources
           media_files: [{ file_size: 343_562 }],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
-          artist_name: "omo_chi2",
+          display_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
           artist_commentary_desc: <<~EOS.chomp,
@@ -81,7 +81,7 @@ module Sources
           media_files: [{ file_size: 343_562 }],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
-          artist_name: "omo_chi2",
+          display_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
           artist_commentary_desc: <<~EOS.chomp,
@@ -109,7 +109,7 @@ module Sources
           ],
           profile_url: "https://poipiku.com/8566613/",
           profile_urls: %w[https://poipiku.com/8566613/],
-          artist_name: "kino",
+          display_name: "kino",
           tag_name: "kino",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -132,7 +132,7 @@ module Sources
           ],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
-          artist_name: "omo_chi2",
+          display_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -153,7 +153,7 @@ module Sources
           ],
           profile_url: "https://poipiku.com/927572/",
           profile_urls: %w[https://poipiku.com/927572/],
-          artist_name: "KAIFEI",
+          display_name: "KAIFEI",
           tag_name: "kaifei",
           tags: [],
           dtext_artist_commentary_desc: "博士出浴(裸體"
@@ -167,7 +167,7 @@ module Sources
           page_url: "https://poipiku.com/6849873/8141991.html",
           image_urls: [],
           profile_url: "https://poipiku.com/6849873/",
-          artist_name: "omo_chi2",
+          display_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -189,9 +189,9 @@ module Sources
           page_url: "https://poipiku.com/16109/8284794.html",
           profile_url: "https://poipiku.com/16109/",
           profile_urls: %w[https://poipiku.com/16109/ https://www.pixiv.net/users/46937590],
-          artist_name: "緊縛師ボンレス（ル×ガの民）",
+          display_name: "緊縛師ボンレス（ル×ガの民）",
           tag_name: "poipiku_16109",
-          other_names: ["緊縛師ボンレス（ル×ガの民）", "poipiku_16109"],
+          other_names: ["緊縛師ボンレス（ル×ガの民）"],
           tags: [
             ["腐向け", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=腐向け"],
             ["TOBL", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=TOBL"],
@@ -211,8 +211,8 @@ module Sources
           page_url: "https://poipiku.com/2210523/4916104.html",
           image_urls: %w[],
           profile_url: "https://poipiku.com/2210523/",
-          artist_name: "るーとzakkubarannnn",
-          tag_name: "poipiku_2210523",
+          display_name: "るーとzakkubarannnn",
+          tag_name: "zakkubarannnn",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
             今日はここまでにしとく
@@ -227,7 +227,7 @@ module Sources
           page_url: "https://poipiku.com/302292/6598662.html",
           image_urls: [],
           profile_url: "https://poipiku.com/302292/",
-          artist_name: "(　˙👅˙　)",
+          display_name: "(　˙👅˙　)",
           tag_name: "poipiku_302292",
           tags: [
             ["突発", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=突発"],
@@ -248,7 +248,7 @@ module Sources
           page_url: "https://poipiku.com/1727580/6661073.html",
           image_urls: [],
           profile_url: "https://poipiku.com/1727580/",
-          artist_name: nil,
+          display_name: nil,
           tag_name: "poipiku_1727580",
           tags: [],
           dtext_artist_commentary_desc: ""

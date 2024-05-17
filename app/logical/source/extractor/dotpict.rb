@@ -26,11 +26,11 @@ class Source::Extractor::Dotpict < Source::Extractor
     [profile_url, account_url].compact_blank.uniq
   end
 
-  def artist_name
+  def display_name
     api_response.dig("data", "work", "user", "name")&.strip
   end
 
-  def tag_name
+  def username
     api_response.dig("data", "work", "user", "account").presence
   end
 

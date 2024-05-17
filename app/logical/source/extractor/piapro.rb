@@ -38,16 +38,12 @@ class Source::Extractor::Piapro < Source::Extractor
       page&.at(".contents_creator > a")&.attr("href")&.then { |url| URI.join("https://piapro.jp", url).to_s }
   end
 
-  def artist_name
+  def display_name
     page&.at(".contents_creator .contents_creator_txt")&.text
   end
 
-  def tag_name
-    username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
-  end
-
-  def other_names
-    [artist_name, username].compact_blank.uniq
+  def username
+    Source::URL.parse(profile_url)&.username
   end
 
   def artist_commentary_title
@@ -73,6 +69,10 @@ class Source::Extractor::Piapro < Source::Extractor
     end
   end
 
+  def downloads_enabled?
+    page.present? && page.at(".contents_license_list .no_license").nil?
+  end
+
   memoize def post_type
     # <div class="page_contents_inner"><section class="contents_box contents_illust">...
     classes = page&.at("div.page_contents_inner > section.contents_box")&.classes.to_a
@@ -85,10 +85,6 @@ class Source::Extractor::Piapro < Source::Extractor
 
   memoize def sub_id
     page&.at("#DownloadContent_subId")&.attr("value")
-  end
-
-  memoize def username
-    Source::URL.parse(profile_url)&.username
   end
 
   # The download token seems to be the same for all posts for the duration of the login session.

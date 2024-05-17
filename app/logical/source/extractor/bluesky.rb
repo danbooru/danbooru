@@ -43,12 +43,12 @@ class Source::Extractor::Bluesky < Source::Extractor
     [profile_url, account_url].compact
   end
 
-  def tag_name
+  def username
     # ixy.bsky.social -> ixy
     user_handle.to_s.split(".").first
   end
 
-  def artist_name
+  def display_name
     api_response&.dig("thread", "post", "author", "displayName")
   end
 

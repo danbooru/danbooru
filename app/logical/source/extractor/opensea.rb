@@ -18,16 +18,12 @@ module Source
         parsed_url.page_url || parsed_referer&.page_url
       end
 
-      def artist_name
-        creator["displayName"]
-      end
-
-      def other_names
-        [artist_name].compact_blank
+      def username
+        creator["displayName"] || parsed_url.username || parsed_referer&.username
       end
 
       def profile_url
-        "https://opensea.io/#{artist_name}" if artist_name.present?
+        "https://opensea.io/#{username}" if username.present?
       end
 
       def creator_public_key_url

@@ -44,18 +44,10 @@ class Source::Extractor
     end
 
     def username
-      api_response.dig("account", "username") || artist_name_from_url
+      api_response.dig("account", "username") || parsed_url.username || parsed_referer&.username
     end
 
-    def tag_name
-      username
-    end
-
-    def artist_name_from_url
-      parsed_url.username || parsed_referer&.username
-    end
-
-    def artist_name
+    def display_name
       api_response.dig("account", "display_name").presence
     end
 

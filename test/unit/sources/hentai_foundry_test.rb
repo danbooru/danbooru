@@ -6,7 +6,7 @@ module Sources
       strategy_should_work(
         "https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda",
         image_urls: ["https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png"],
-        artist_name: "Afrobull",
+        username: "Afrobull",
         artist_commentary_title: "kuroeda",
         profile_url: "https://www.hentai-foundry.com/user/Afrobull",
         media_files: [{ file_size: 1_349_887 }],
@@ -18,7 +18,7 @@ module Sources
       strategy_should_work(
         "https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda",
         image_urls: ["https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png"],
-        artist_name: "Afrobull",
+        username: "Afrobull",
         artist_commentary_title: "kuroeda",
         profile_url: "https://www.hentai-foundry.com/user/Afrobull",
         media_files: [{ file_size: 1_349_887 }],
@@ -30,7 +30,7 @@ module Sources
       strategy_should_work(
         "https://www.hentai-foundry.com/pictures/user/faustsketcher/279498",
         image_urls: [],
-        artist_name: "faustsketcher",
+        username: "faustsketcher",
         profile_url: "https://www.hentai-foundry.com/user/faustsketcher",
         deleted: true
       )

@@ -13,12 +13,10 @@ module Source
       end
 
       def page_url
-        return nil if illust_id.blank?
-
-        if artist_name.blank?
+        if username.present? && illust_id.present?
+          "https://www.hentai-foundry.com/pictures/user/#{username}/#{illust_id}"
+        elsif illust_id.present?
           "https://www.hentai-foundry.com/pic-#{illust_id}"
-        else
-          "https://www.hentai-foundry.com/pictures/user/#{artist_name}/#{illust_id}"
         end
       end
 
@@ -36,13 +34,12 @@ module Source
         end
       end
 
-      def artist_name
+      def username
         parsed_url.username || parsed_referer&.username
       end
 
       def profile_url
-        return nil if artist_name.blank?
-        "https://www.hentai-foundry.com/user/#{artist_name}"
+        "https://www.hentai-foundry.com/user/#{username}" if username.present?
       end
 
       def artist_commentary_title

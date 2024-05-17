@@ -25,12 +25,12 @@ module Source
         end
       end
 
-      def artist_name
+      def username
         parsed_url.username || parsed_referer&.username
       end
 
       def other_names
-        [artist_name, blog_name].compact_blank.uniq
+        [username, blog_name].compact_blank.uniq
       end
 
       def profile_url

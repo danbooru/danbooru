@@ -39,8 +39,7 @@ module Source
       end
 
       def profile_url
-        return nil if artist_name.blank?
-        "https://#{artist_name}.lofter.com"
+        "https://#{username}.lofter.com" if username.present?
       end
 
       def page_url
@@ -72,8 +71,8 @@ module Source
         page_json.dig("postData", "data", "blogInfo", "blogNickName")&.strip
       end
 
-      def other_names
-        [artist_name, display_name].compact_blank.uniq
+      def username
+        parsed_url.username || parsed_referer&.username
       end
 
       def artist_commentary_title
@@ -115,10 +114,6 @@ module Source
 
       def illust_id
         parsed_url.work_id || parsed_referer&.work_id
-      end
-
-      def artist_name
-        parsed_url.username || parsed_referer&.username
       end
     end
   end

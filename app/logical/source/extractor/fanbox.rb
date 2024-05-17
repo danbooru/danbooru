@@ -34,32 +34,28 @@ module Source
       end
 
       def page_url
-        if artist_name.present? && illust_id.present?
-          "https://#{artist_name}.fanbox.cc/posts/#{illust_id}"
-        elsif parsed_url.image_url? && artist_name.present?
+        if username.present? && illust_id.present?
+          "https://#{username}.fanbox.cc/posts/#{illust_id}"
+        elsif parsed_url.image_url? && username.present?
           # Cover images
-          "https://#{artist_name}.fanbox.cc"
+          "https://#{username}.fanbox.cc"
         end
       end
 
       def profile_url
-        if artist_name.present?
-          "https://#{artist_name}.fanbox.cc"
+        if username.present?
+          "https://#{username}.fanbox.cc"
         elsif artist_id_from_url.present?
           "https://www.pixiv.net/fanbox/creator/#{artist_id_from_url}"
         end
-      end
-
-      def artist_name
-        artist_name_from_url || api_response["creatorId"] || artist_api_response.dig("body", "creatorId")
       end
 
       def display_name
         api_response.dig("user", "name") || artist_api_response.dig("body", "user", "name")
       end
 
-      def other_names
-        [artist_name, display_name].compact.uniq
+      def username
+        parsed_url.username || parsed_referer&.username || api_response["creatorId"] || artist_api_response.dig("body", "creatorId")
       end
 
       def tags
@@ -97,10 +93,6 @@ module Source
 
       def artist_id_from_url
         parsed_url.user_id || parsed_referer&.user_id
-      end
-
-      def artist_name_from_url
-        parsed_url.username || parsed_referer&.username
       end
 
       def post_api_url

@@ -12,22 +12,22 @@ class Source::Extractor
     end
 
     def page_url
-      if tag_name.present? && project_id.present?
-        "https://#{tag_name}.artstation.com/projects/#{project_id}"
+      if username.present? && project_id.present?
+        "https://#{username}.artstation.com/projects/#{project_id}"
       elsif project_id.present?
         "https://www.artstation.com/artwork/#{project_id}"
       end
     end
 
     def profile_url
-      "https://www.artstation.com/#{tag_name}" if tag_name.present?
+      "https://www.artstation.com/#{username}" if username.present?
     end
 
-    def artist_name
+    def display_name
       api_response.dig(:user, :full_name)
     end
 
-    def tag_name
+    def username
       api_response.dig(:user, :username) || parsed_url.username || parsed_referer&.username
     end
 

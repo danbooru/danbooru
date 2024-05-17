@@ -56,7 +56,7 @@ module Sources
         image_urls: ["https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png"],
         media_files: [{ file_size: 3655 }],
         page_url: "https://noizave.tumblr.com/post/162206271767",
-        artist_name: "noizave",
+        username: "noizave",
         profile_url: "https://noizave.tumblr.com",
         tags: ["tag", "red hair", "red-hair", "red_hair"],
         normalized_tags: ["red_hair", "tag"],
@@ -81,7 +81,7 @@ module Sources
         "https://78.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_540.jpg",
         image_urls: ["https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"],
         page_url: "https://noizave.tumblr.com/post/162094447052",
-        artist_name: "noizave",
+        username: "noizave",
         profile_url: "https://noizave.tumblr.com",
         tags: ["tag1", "tag2"]
       )
@@ -123,7 +123,7 @@ module Sources
         image_urls: [],
         page_url: "https://ebith1969.tumblr.com/post/48214164804",
         profile_url: "https://ebith1969.tumblr.com",
-        artist_name: "ebith1969",
+        username: "ebith1969",
         tags: [],
         artist_commentary_title: nil,
         dtext_artist_commentary_desc: "2009.03.05"
@@ -136,7 +136,7 @@ module Sources
         image_urls: ["https://va.media.tumblr.com/tumblr_s5g5gyT1oY1rnax4f_720.mp4"],
         page_url: "https://yraa.tumblr.com/post/736364675654123520",
         profile_url: "https://yraa.tumblr.com",
-        artist_name: "yraa",
+        username: "yraa",
         tags: [
           "or maybe it is just... going",
           "genshin impact",
@@ -188,7 +188,7 @@ module Sources
       strategy_should_work(
         "http://shimetsukage.tumblr.com/post/176805588268/20180809-ssb-coolboy",
         deleted: true,
-        artist_name: "shimetsukage",
+        username: "shimetsukage",
         profile_url: "https://shimetsukage.tumblr.com",
         page_url: "https://shimetsukage.tumblr.com/post/176805588268",
         image_urls: [],
@@ -229,7 +229,7 @@ module Sources
         "https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj",
         image_urls: ["https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.png"],
         page_url: nil,
-        artist_name: nil,
+        username: nil,
         media_files: [{ file_size: 296_595, file_ext: :jpg }]
       )
     end
@@ -248,7 +248,7 @@ module Sources
         "https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4",
         image_urls: ["https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4"],
         page_url: nil,
-        artist_name: nil,
+        username: nil,
         media_files: [{ file_size: 7_960_082 }]
       )
     end
@@ -257,7 +257,7 @@ module Sources
       strategy_should_work(
         "https://tumblr.com/munespice/683613396085719040",
         image_urls: ["https://64.media.tumblr.com/fd6b4692f6e902af861fbc242736ae61/010fd31ffbc70e84-a8/s21000x21000/e0587516e05bae4cec244921f220b45bed08335c.jpg"],
-        artist_name: "munespice",
+        username: "munespice",
         page_url: "https://munespice.tumblr.com/post/683613396085719040",
         profile_url: "https://munespice.tumblr.com"
       )
@@ -267,7 +267,7 @@ module Sources
       strategy_should_work(
         "https://www.tumblr.com/munespice/683613396085719040/saur-family",
         image_urls: ["https://64.media.tumblr.com/fd6b4692f6e902af861fbc242736ae61/010fd31ffbc70e84-a8/s21000x21000/e0587516e05bae4cec244921f220b45bed08335c.jpg"],
-        artist_name: "munespice",
+        username: "munespice",
         page_url: "https://munespice.tumblr.com/post/683613396085719040",
         profile_url: "https://munespice.tumblr.com"
       )
@@ -277,7 +277,7 @@ module Sources
       strategy_should_work(
         "https://at.tumblr.com/munespice/683613396085719040/vzs8ma5elvnc",
         image_urls: ["https://64.media.tumblr.com/fd6b4692f6e902af861fbc242736ae61/010fd31ffbc70e84-a8/s21000x21000/e0587516e05bae4cec244921f220b45bed08335c.jpg"],
-        artist_name: "munespice",
+        username: "munespice",
         page_url: "https://munespice.tumblr.com/post/683613396085719040",
         profile_url: "https://munespice.tumblr.com"
       )
@@ -331,7 +331,7 @@ module Sources
         image_urls: ["https://64.media.tumblr.com/68e6c4db6bac37cf9d6a166c133cf758/b81004325e350a36-c3/s21000x21000/4d7ef161fe11d1395fd86890a3680b6313352d63.png"],
         page_url: "https://yraa.tumblr.com/post/188271069189",
         profile_url: "https://yraa.tumblr.com",
-        artist_name: "yraa",
+        username: "yraa",
         tags: ["ffxiv", "draw", "i'm a cat i'm a kitty cat and i dance dance dance", "is anyone still even here", "crawls back into damp cave"],
         dtext_artist_commentary_desc: <<~EOS.chomp
           "@phantom-miria":[https://www.tumblr.com/phantom-miria]
@@ -345,7 +345,7 @@ module Sources
         image_urls: ["https://64.media.tumblr.com/68e6c4db6bac37cf9d6a166c133cf758/b81004325e350a36-c3/s21000x21000/4d7ef161fe11d1395fd86890a3680b6313352d63.png"],
         page_url: "https://yraa.tumblr.com/post/188271069189",
         profile_url: "https://yraa.tumblr.com",
-        artist_name: "yraa",
+        username: "yraa",
         tags: ["ffxiv", "draw", "i'm a cat i'm a kitty cat and i dance dance dance", "is anyone still even here", "crawls back into damp cave"],
         dtext_artist_commentary_desc: <<~EOS.chomp
           "@phantom-miria":[https://www.tumblr.com/phantom-miria]
@@ -359,7 +359,7 @@ module Sources
         image_urls: ["https://64.media.tumblr.com/faab3d1d9537b9e4e3fe8f04487a1210/42ecfb675692be33-70/s21000x21000/16b1914c6c4834363f30782eebbe045a3721de3b.png"],
         page_url: "https://d-floe.tumblr.com/post/190738927749",
         profile_url: "https://d-floe.tumblr.com",
-        artist_name: "d-floe",
+        username: "d-floe",
         tags: ["2x2F3", "d-floe", "Illustration", "gravity rush", "kat"],
         dtext_artist_commentary_desc: <<~EOS.chomp
           Commission of Kat from Gravity Rush
@@ -374,8 +374,7 @@ module Sources
         media_files: [{ file_size: 118_315 }],
         page_url: "https://nagian.tumblr.com/post/38061868112",
         profile_url: "https://nagian.tumblr.com",
-        artist_name: "nagian",
-        tag_name: "nagian",
+        username: "nagian",
         tags: [],
         dtext_artist_commentary_desc: "ゆいあず",
       )
@@ -388,8 +387,7 @@ module Sources
         media_files: [{ file_size: 42_997 }],
         page_url: nil,
         profile_url: nil,
-        artist_name: nil,
-        tag_name: nil,
+        username: nil,
         tags: [],
         dtext_artist_commentary_desc: "",
       )
@@ -402,8 +400,7 @@ module Sources
         media_files: [{ file_size: 62_658 }],
         page_url: nil,
         profile_url: nil,
-        artist_name: nil,
-        tag_name: nil,
+        username: nil,
         tags: [],
         dtext_artist_commentary_desc: "",
       )
@@ -416,8 +413,7 @@ module Sources
         media_files: [{ file_size: 1_234_017 }],
         page_url: "https://jonroru.tumblr.com/post/121126557895",
         profile_url: "https://jonroru.tumblr.com",
-        artist_name: "jonroru",
-        tag_name: "jonroru",
+        username: "jonroru",
         tags: ["splatoon", "pixel art", "inkling", "super nes", "animation", "nintendo", "wiiu", "gaming", "gif", "animated gif", "saltspray rig", "ink", "i'm a kid now", "i'm a squid now", "squid"],
         dtext_artist_commentary_desc: "[b]“SPLATOON SUPER NES VERSION (or more like GBA according to some XD)”[/b]",
       )
@@ -430,8 +426,7 @@ module Sources
         media_files: [{ file_size: 110_348 }],
         page_url: nil,
         profile_url: nil,
-        artist_name: nil,
-        tag_name: nil,
+        username: nil,
         tags: [],
         dtext_artist_commentary_desc: "",
       )
@@ -444,8 +439,7 @@ module Sources
         media_files: [{ file_size: 462_572 }],
         page_url: "https://techsupportdog.tumblr.com/post/163509337669",
         profile_url: "https://techsupportdog.tumblr.com",
-        artist_name: "techsupportdog",
-        tag_name: "techsupportdog",
+        username: "techsupportdog",
         tags: ["anime art", "anime girl", "binkan", "shimoneta", "spiderman", "superior spider-man"],
         dtext_artist_commentary_desc: "",
       )
@@ -559,8 +553,7 @@ module Sources
         page_url: "https://dumpsterf11re.tumblr.com/post/745620363722047488",
         profile_url: "https://dumpsterf11re.tumblr.com",
         profile_urls: %w[https://dumpsterf11re.tumblr.com],
-        artist_name: "dumpsterf11re",
-        tag_name: "dumpsterf11re",
+        username: "dumpsterf11re",
         other_names: ["dumpsterf11re"],
         tags: [
           ["dungeon meshi", "https://tumblr.com/tagged/dungeon meshi"],

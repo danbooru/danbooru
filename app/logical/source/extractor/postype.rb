@@ -28,11 +28,11 @@ class Source::Extractor::Postype < Source::Extractor
     [profile_url, profile_page_url].compact_blank
   end
 
-  def artist_name
+  def display_name
     page&.at(".post-header .article-author a")&.text
   end
 
-  def tag_name
+  def username
     Source::URL.parse(profile_page_url)&.username
   end
 

@@ -22,12 +22,12 @@ class Source::Extractor::Note < Source::Extractor
     parsed_url.profile_url || parsed_referer&.profile_url
   end
 
-  def artist_name
+  def display_name
     api_response.dig("user", "nickname")
   end
 
-  def tag_name
-    username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
+  def username
+    parsed_url.username || parsed_referer&.username || api_response.dig("user", "urlname")
   end
 
   def tags
@@ -82,10 +82,6 @@ class Source::Extractor::Note < Source::Extractor
     else
       ""
     end
-  end
-
-  def username
-    parsed_url.username || parsed_referer&.username || api_response.dig("user", "urlname")
   end
 
   def post_id

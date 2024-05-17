@@ -21,11 +21,11 @@ class Source::Extractor
       parsed_url.profile_url || parsed_referer&.profile_url || Source::URL.profile_url(api_response.dig("shop", "url"))
     end
 
-    def tag_name
+    def username
       api_response.dig("shop", "subdomain")
     end
 
-    def artist_name
+    def display_name
       api_response.dig("shop", "name")
     end
 

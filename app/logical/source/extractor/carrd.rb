@@ -25,10 +25,6 @@ class Source::Extractor::Carrd < Source::Extractor
     parsed_url.profile_url || parsed_referer&.profile_url
   end
 
-  def artist_name
-    username
-  end
-
   def artist_commentary_desc
     page_section&.to_html
   end

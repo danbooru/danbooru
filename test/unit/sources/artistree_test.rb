@@ -12,8 +12,7 @@ module Sources
           media_files: [{ file_size: 180_714 }],
           page_url: "https://artistree.io/alysonsega",
           profile_url: "https://artistree.io/alysonsega",
-          artist_name: "alysonsega",
-          tag_name: "alysonsega",
+          username: "alysonsega",
           dtext_artist_commentary_title: "Full render (Character and/or Background/Object)",
           dtext_artist_commentary_desc: <<~EOS.chomp
             • Price varies on the complexity and the amount of detailed required.
@@ -44,8 +43,7 @@ module Sources
           ],
           page_url: "https://artistree.io/alysonsega#d23e6743-5fbe-46f8-bf5f-e6f76f74bc80",
           profile_url: "https://artistree.io/alysonsega",
-          artist_name: "alysonsega",
-          tag_name: "alysonsega",
+          username: "alysonsega",
           dtext_artist_commentary_title: "Full render (Character and/or Background/Object)",
           dtext_artist_commentary_desc: <<~EOS.chomp
             • Price varies on the complexity and the amount of detailed required.
@@ -61,8 +59,7 @@ module Sources
           image_urls: [],
           page_url: "https://artistree.io/does-not-exist#d23e6743-5fbe-46f8-bf5f-e6f76f74bc80",
           profile_url: "https://artistree.io/does-not-exist",
-          artist_name: "does-not-exist",
-          tag_name: "does-not-exist",
+          username: "does-not-exist",
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: ""
         )

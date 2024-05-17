@@ -45,7 +45,7 @@ module Source
         end
       end
 
-      def artist_name
+      def display_name
         artist_anchor&.text
       end
 
@@ -79,10 +79,6 @@ module Source
 
       def tag_name
         "nijie_#{artist_id}" if artist_id.present?
-      end
-
-      def other_names
-        [artist_name].compact
       end
 
       def self.to_dtext(text)

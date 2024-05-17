@@ -98,16 +98,12 @@ module Source
         end
       end
 
-      def artist_name
+      def display_name
         post_json.dig("modules", "module_author", "name") || article_json.dig("readInfo", "author", "name")
       end
 
       def tag_name
         "bilibili_#{artist_id}" if artist_id.present?
-      end
-
-      def other_names
-        [artist_name].compact
       end
 
       def artist_id

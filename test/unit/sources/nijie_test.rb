@@ -12,7 +12,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"],
         media_files: [{ file_size: 132_555 }],
         profile_url: "https://nijie.info/members.php?id=728995",
-        artist_name: "莚",
+        display_name: "莚",
         dtext_artist_commentary_title: "ジャージの下は",
         dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です"
       )
@@ -24,7 +24,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"],
         media_files: [{ file_size: 132_555 }],
         profile_url: "https://nijie.info/members.php?id=728995",
-        artist_name: nil,
+        display_name: nil,
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: ""
       )
@@ -36,7 +36,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/01/nijie_picture/diff/main/218856_0_236014_20170620101329.png"],
         page_url: "https://nijie.info/view.php?id=218856",
         profile_url: "https://nijie.info/members.php?id=236014",
-        artist_name: "名無しのチンポップ"
+        display_name: "名無しのチンポップ"
       )
     end
 
@@ -46,7 +46,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/03/nijie_picture/236014_20170620101426_0.png"],
         page_url: nil,
         profile_url: "https://nijie.info/members.php?id=236014",
-        artist_name: nil
+        display_name: nil
       )
     end
 
@@ -55,7 +55,7 @@ module Sources
         "https://nijie.info/view.php?id=213043",
         image_urls: ["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"],
         media_files: [{ file_size: 132_555 }],
-        artist_name: "莚",
+        display_name: "莚",
         other_names: ["莚"],
         profile_url: "https://nijie.info/members.php?id=728995",
         artist_commentary_title: "ジャージの下は",
@@ -72,7 +72,7 @@ module Sources
         page_url: "https://nijie.info/view.php?id=208316",
         profile_url: "https://nijie.info/members.php?id=715273",
         profile_urls: %w[https://nijie.info/members.php?id=715273],
-        artist_name: "雪代あるて",
+        display_name: "雪代あるて",
         other_names: ["雪代あるて"],
         tag_name: "nijie_715273",
         tags: [
@@ -109,7 +109,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg"],
         page_url: "https://nijie.info/view.php?id=213043",
         profile_url: "https://nijie.info/members.php?id=728995",
-        artist_name: "莚"
+        display_name: "莚"
       )
     end
 
@@ -119,7 +119,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"],
         page_url: "https://nijie.info/view.php?id=213043",
         profile_url: "https://nijie.info/members.php?id=728995",
-        artist_name: "莚"
+        display_name: "莚"
       )
     end
 
@@ -157,7 +157,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/03/nijie_picture/diff/main/218856_4_236014_20170620101333.png"],
         page_url: "https://nijie.info/view.php?id=218856",
         profile_url: "https://nijie.info/members.php?id=236014",
-        artist_name: "名無しのチンポップ"
+        display_name: "名無しのチンポップ"
       )
     end
 
@@ -167,7 +167,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/04/nijie_picture/diff/main/287736_161475_20181112032855_1.png"],
         page_url: "https://nijie.info/view.php?id=287736",
         profile_url: "https://nijie.info/members.php?id=161475",
-        artist_name: "みな本"
+        display_name: "みな本"
       )
     end
 
@@ -211,7 +211,7 @@ module Sources
         "http://www.nijie.info/view_popup.php?id=212355",
         page_url: "https://nijie.info/view.php?id=212355",
         profile_url: nil,
-        artist_name: nil,
+        display_name: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: ""
@@ -246,7 +246,7 @@ module Sources
         referer: "https://nijie.info/view.php?id=53023",
         image_urls: ["https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700%E3%82%B3%E3%83%94%E3%83%BC%20%EF%BD%9E%200011%E3%81%AE%E3%82%B3%E3%83%94%E3%83%BC.jpg"],
         profile_url: "https://nijie.info/members.php?id=334",
-        artist_name: "リック・ロガニー",
+        display_name: "リック・ロガニー",
         tags: %w[中出し フェラ TS ほのぼの],
         dtext_artist_commentary_title: "作品情報",
         dtext_artist_commentary_desc: <<~EOS.chomp

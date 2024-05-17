@@ -17,14 +17,14 @@ class Source::Extractor::Itaku < Source::Extractor
   end
 
   def profile_url
-    "https://itaku.ee/#{tag_name}" if tag_name.present?
+    "https://itaku.ee/#{username}" if username.present?
   end
 
-  def artist_name
+  def display_name
     api_response["owner_displayname"]
   end
 
-  def tag_name
+  def username
     api_response["owner_username"]
   end
 

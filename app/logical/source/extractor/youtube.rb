@@ -33,16 +33,12 @@ class Source::Extractor::Youtube < Source::Extractor
     [handle_url, channel_url].compact
   end
 
-  def artist_name
+  def display_name
     community_post.dig("authorText", "runs", 0, "text")
   end
 
-  def tag_name
-    handle.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
-  end
-
-  def other_names
-    [artist_name, handle].compact_blank.uniq(&:downcase)
+  def username
+    handle
   end
 
   def tags

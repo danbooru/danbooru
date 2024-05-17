@@ -9,8 +9,8 @@ module Sources
         page_url: "https://sketch.pixiv.net/items/1086346113447960710",
         profile_urls: ["https://sketch.pixiv.net/@rinnoji522", "https://www.pixiv.net/users/2556276"],
         profile_url: "https://sketch.pixiv.net/@rinnoji522",
-        artist_name: "rinnoji522",
-        other_names: ["rinnoji522", "りんのじ"],
+        display_name: "りんのじ",
+        username: "rinnoji522",
         tags: %w[アプリコット いよわ いよわガールズ],
         dtext_artist_commentary_desc: <<~EOS.chomp
           "#アプリコット":[https://sketch.pixiv.net/tags/アプリコット] "#いよわ":[https://sketch.pixiv.net/tags/いよわ] "#いよわガールズ":[https://sketch.pixiv.net/tags/いよわガールズ]
@@ -26,8 +26,8 @@ module Sources
         page_url: "https://sketch.pixiv.net/items/1086346113447960710",
         profile_urls: ["https://sketch.pixiv.net/@rinnoji522", "https://www.pixiv.net/users/2556276"],
         profile_url: "https://sketch.pixiv.net/@rinnoji522",
-        artist_name: "rinnoji522",
-        other_names: ["rinnoji522", "りんのじ"],
+        display_name: "りんのじ",
+        username: "rinnoji522",
         tags: %w[アプリコット いよわ いよわガールズ],
         dtext_artist_commentary_desc: <<~EOS.chomp
           "#アプリコット":[https://sketch.pixiv.net/tags/アプリコット] "#いよわ":[https://sketch.pixiv.net/tags/いよわ] "#いよわガールズ":[https://sketch.pixiv.net/tags/いよわガールズ]
@@ -41,7 +41,8 @@ module Sources
         "https://img-sketch.pixiv.net/uploads/medium/file/9988973/7216948861306830496.jpg",
         page_url: nil,
         profile_url: nil,
-        artist_name: nil,
+        display_name: nil,
+        username: nil,
         tags: [],
         dtext_artist_commentary_desc: ""
       )
@@ -53,8 +54,8 @@ module Sources
         image_urls: ["https://img-sketch.pixiv.net/uploads/medium/file/884876/4909517173982299587.jpg"],
         page_url: "https://sketch.pixiv.net/items/193462611994864256",
         profile_url: "https://sketch.pixiv.net/@lithla",
-        artist_name: "lithla",
-        other_names: ["lithla", "リリスラウダ"],
+        display_name: "リリスラウダ",
+        username: "lithla",
         dtext_artist_commentary_desc: "チビッコ露出プレイ ピース",
         tags: []
       )
@@ -75,7 +76,8 @@ module Sources
           https://img-sketch.pixiv.net/uploads/medium/file/9988972/2641925439408057307.jpg
           https://img-sketch.pixiv.net/uploads/medium/file/9988973/7216948861306830496.jpg
         ],
-        artist_name: "op-one",
+        display_name: "俺P１号",
+        username: "op-one",
         page_url: "https://sketch.pixiv.net/items/8052785510155853613",
         profile_url: "https://sketch.pixiv.net/@op-one",
         tags: %w[制作過程 このすば この素晴らしい世界に祝福を セナ バニー 3月3日 巨乳 黒髪巨乳 タイツ],

@@ -80,16 +80,8 @@ module Source
         "https://skeb.jp/@#{username}" if username.present?
       end
 
-      def artist_name
+      def display_name
         api_response&.dig("creator", "name")
-      end
-
-      def tag_name
-        username.to_s.downcase.gsub(/\A_+|_+\z/, "").squeeze("_").presence
-      end
-
-      def other_names
-        [artist_name, username].compact_blank.uniq
       end
 
       def username

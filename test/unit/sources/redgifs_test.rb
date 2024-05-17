@@ -19,7 +19,8 @@ module Sources
           page_url: "https://www.redgifs.com/watch/thunderousverifiablescoter",
           profile_url: "https://www.redgifs.com/users/kreamu",
           profile_urls: %w[https://www.redgifs.com/users/kreamu],
-          artist_name: "kreamu",
+          display_name: "kreamu",
+          username: "kreamu",
           tag_name: "kreamu",
           other_names: ["kreamu"],
           tags: [
@@ -41,7 +42,8 @@ module Sources
           page_url: "https://www.redgifs.com/watch/diligentfluidbichonfrise",
           profile_url: "https://www.redgifs.com/users/throwmeafterdark",
           profile_urls: %w[https://www.redgifs.com/users/throwmeafterdark],
-          artist_name: "throwmeafterdark",
+          display_name: "throwmeafterdark",
+          username: "throwmeafterdark",
           tag_name: "throwmeafterdark",
           other_names: ["throwmeafterdark"],
           tags: [],
@@ -74,7 +76,8 @@ module Sources
           page_url: "https://www.redgifs.com/watch/diligentfluidbichonfrise",
           profile_url: "https://www.redgifs.com/users/throwmeafterdark",
           profile_urls: %w[https://www.redgifs.com/users/throwmeafterdark],
-          artist_name: "throwmeafterdark",
+          display_name: "throwmeafterdark",
+          username: "throwmeafterdark",
           tag_name: "throwmeafterdark",
           other_names: ["throwmeafterdark"],
           tags: [
@@ -109,7 +112,8 @@ module Sources
           page_url: "https://www.redgifs.com/watch/diligentfluidbichonfrise",
           profile_url: "https://www.redgifs.com/users/throwmeafterdark",
           profile_urls: %w[https://www.redgifs.com/users/throwmeafterdark],
-          artist_name: "throwmeafterdark",
+          display_name: "throwmeafterdark",
+          username: "throwmeafterdark",
           tag_name: "throwmeafterdark",
           other_names: ["throwmeafterdark"],
           tags: [
@@ -144,7 +148,8 @@ module Sources
           page_url: "https://www.redgifs.com/watch/thunderousverifiablescoter",
           profile_url: "https://www.redgifs.com/users/kreamu",
           profile_urls: %w[https://www.redgifs.com/users/kreamu],
-          artist_name: "kreamu",
+          display_name: "kreamu",
+          username: "kreamu",
           tag_name: "kreamu",
           other_names: ["kreamu"],
           tags: [
@@ -168,7 +173,7 @@ module Sources
           image_urls: [%r{https://thumbs\d+.redgifs.com/ThunderousVerifiableScoter.mp4\?expires=.*&signature=.*\z}],
           page_url: "https://www.redgifs.com/watch/thunderousverifiablescoter",
           profile_urls: %w[https://www.redgifs.com/users/kreamu],
-          artist_name: "kreamu"
+          display_name: "kreamu"
         )
       end
 
@@ -179,7 +184,8 @@ module Sources
           page_url: "https://www.redgifs.com/watch/bad",
           profile_url: nil,
           profile_urls: [],
-          artist_name: nil,
+          display_name: nil,
+          username: nil,
           tag_name: nil,
           other_names: [],
           tags: [],

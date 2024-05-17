@@ -44,16 +44,9 @@ module Source
         end
       end
 
-      def artist_name
-        username
-      end
-
-      def tag_name
-        username.to_s.downcase.gsub(/\A[^a-zA-Z0-9]+|[^a-zA-Z0-9]+\z/, "").squeeze("_").presence
-      end
-
-      def other_names
-        [artist_name].compact
+      def username
+        username = data["author"] || parsed_url.username || parsed_referer&.username
+        username unless username == "[deleted]"
       end
 
       def artist_commentary_title
@@ -177,11 +170,6 @@ module Source
         else
           parsed_url.work_id || parsed_referer&.work_id
         end
-      end
-
-      def username
-        username = data["author"] || parsed_url.username || parsed_referer&.username
-        username unless username == "[deleted]"
       end
 
       def share_url

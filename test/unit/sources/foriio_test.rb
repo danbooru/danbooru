@@ -12,9 +12,9 @@ module Sources
           page_url: "https://www.foriio.com/works/364622",
           profile_url: "https://www.foriio.com/mokoxmoko2",
           profile_urls: %w[https://www.foriio.com/mokoxmoko2 https://twitter.com/gumaguma_m],
-          artist_name: "moko",
+          display_name: "moko",
+          username: "mokoxmoko2",
           other_names: ["moko", "mokoxmoko2"],
-          tag_name: "mokoxmoko2",
           dtext_artist_commentary_title: "221004 2",
           dtext_artist_commentary_desc: ""
         )
@@ -36,9 +36,9 @@ module Sources
           page_url: "https://www.foriio.com/works/698354",
           profile_url: "https://www.foriio.com/yumenkmc",
           profile_urls: %w[https://www.foriio.com/yumenkmc https://twitter.com/yumenkmc],
-          artist_name: "𝗇𝖾𝗄𝗈𝗆𝗈🐾",
+          display_name: "𝗇𝖾𝗄𝗈𝗆𝗈🐾",
+          username: "yumenkmc",
           other_names: ["𝗇𝖾𝗄𝗈𝗆𝗈🐾", "yumenkmc"],
-          tag_name: "yumenkmc",
           dtext_artist_commentary_title: "おどロボ / 海茶 feat. 琴葉姉妹 with ずんだもん - MV用イラスト・ドットアニメーション",
           dtext_artist_commentary_desc: <<~EOS.chomp
             海茶さんの「おどロボ / 琴葉姉妹 with ずんだもん」のMV用イラストとピクセルアートを制作させていただきました。
@@ -70,9 +70,9 @@ module Sources
           page_url: "https://www.foriio.com/works/508125",
           profile_url: "https://www.foriio.com/piyu-ruru",
           profile_urls: %w[https://www.foriio.com/piyu-ruru https://twitter.com/piyu_ruru],
-          artist_name: "ぴゆるる",
+          display_name: "ぴゆるる",
+          username: "piyu-ruru",
           other_names: ["ぴゆるる", "piyu-ruru"],
-          tag_name: "piyu-ruru",
           dtext_artist_commentary_title: "●●★●●●●● / Sample",
           dtext_artist_commentary_desc: <<~EOS.chomp
             Skeb向けサンプル① / 脱ぎ差分
@@ -90,9 +90,9 @@ module Sources
           page_url: "https://www.foriio.com/works/275072",
           profile_url: nil,
           profile_urls: %w[],
-          artist_name: nil,
+          display_name: nil,
+          username: nil,
           other_names: [],
-          tag_name: nil,
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: ""
         )
