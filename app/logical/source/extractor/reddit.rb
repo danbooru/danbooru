@@ -48,6 +48,14 @@ module Source
         username
       end
 
+      def tag_name
+        username.to_s.downcase.gsub(/\A[^a-zA-Z0-9]+|[^a-zA-Z0-9]+\z/, "").squeeze("_").presence
+      end
+
+      def other_names
+        [artist_name].compact
+      end
+
       def artist_commentary_title
         data["title"]
       end

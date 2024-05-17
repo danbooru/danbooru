@@ -3,7 +3,7 @@
 module Source
   class URL
     class Reddit < Source::URL
-      attr_reader :subreddit, :work_id, :share_id, :title, :username, :full_image_url
+      attr_reader :subreddit, :work_id, :comment_id, :share_id, :title, :username, :full_image_url
 
       def self.match?(url)
         url.domain.in?(%w[reddit.com redd.it redditmedia.com])
@@ -14,8 +14,10 @@ module Source
 
         # https://i.redd.it/p5utgk06ryq81.png
         # https://preview.redd.it/qoyhz3o8yde71.jpg?width=1440&format=pjpg&auto=webp&s=5cbe3b0b097d6e7263761c461dae19a43038db22
-        in ("i" | "preview"), "redd.it", file
-          @full_image_url = "https://i.redd.it/#{file}"
+        # https://preview.redd.it/thank-you-for-the-great-responses-to-my-seika-drawings-here-v0-tvapvd0fph0d1.png?width=2549&format=png&auto=webp&s=115a8f1c99df4a0ddb8c61f769a28548abe4ee17 (image in comment)
+        in ("i" | "preview"), "redd.it", _
+          @title, _, image_id = filename.rpartition("-")
+          @full_image_url = "https://i.redd.it/#{image_id}.#{file_ext}"
 
         # https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fds05uzmtd6d61.jpg
         in _, "reddit.com", "media" if params[:url].present?
@@ -53,10 +55,21 @@ module Source
           @work_id = work_id
           @title = title
 
+        # https://www.reddit.com/r/BocchiTheRock/comments/1cruel0/comment/l43980q/
+        in _, "reddit.com", "r", subreddit, "comments", work_id, "comment", comment_id
+          @subreddit = subreddit
+          @work_id = work_id
+          @comment_id = comment_id
+
         # https://www.reddit.com/r/arknights/comments/ttyccp/
         in _, "reddit.com", "r", subreddit, "comments", work_id
           @subreddit = subreddit
           @work_id = work_id
+
+        # https://www.reddit.com/comments/1cruel0/comment/l43980q/
+        in _, "reddit.com", "comments", work_id, "comment", comment_id
+          @work_id = work_id
+          @comment_id = comment_id
 
         # https://www.reddit.com/comments/ttyccp
         # https://www.reddit.com/gallery/ttyccp
@@ -80,6 +93,14 @@ module Source
         end
       end
 
+      def extractor_class
+        if comment_id.present?
+          Source::Extractor::RedditComment
+        else
+          Source::Extractor::Reddit
+        end
+      end
+
       def image_url?
         super || full_image_url.present?
       end
@@ -89,10 +110,14 @@ module Source
           "https://www.reddit.com/r/#{subreddit}/comments/#{work_id}/#{title}"
         elsif username.present? && work_id.present? && title.present?
           "https://www.reddit.com/user/#{username}/comments/#{work_id}/#{title}"
+        elsif subreddit.present? && work_id.present? && comment_id.present?
+          "https://www.reddit.com/r/#{subreddit}/comments/#{work_id}/comment/#{comment_id}"
         elsif subreddit.present? && work_id.present?
           "https://www.reddit.com/r/#{subreddit}/comments/#{work_id}"
         elsif subreddit.present? && share_id.present?
           "https://www.reddit.com/r/#{subreddit}/s/#{share_id}"
+        elsif work_id.present? && comment_id.present?
+          "https://www.reddit.com/comments/#{work_id}/comment/#{comment_id}"
         elsif work_id.present?
           "https://www.reddit.com/comments/#{work_id}"
         end
