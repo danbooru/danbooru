@@ -22,7 +22,7 @@ module Sources
         profile_urls: %w[https://www.reddit.com/user/Darksin31],
         artist_name: "Darksin31",
         tag_name: "darksin31",
-        other_names: ["Darksin31", "darksin31"],
+        other_names: ["Darksin31"],
         tags: [
           ["OC Fanart", "https://www.reddit.com/r/arknights/?f=flair_name:\"OC Fanart\""],
         ],
@@ -49,7 +49,7 @@ module Sources
         profile_urls: %w[https://www.reddit.com/user/MelancholicMelanie],
         artist_name: "MelancholicMelanie",
         tag_name: "melancholicmelanie",
-        other_names: ["MelancholicMelanie", "melancholicmelanie"],
+        other_names: ["MelancholicMelanie"],
         tags: [],
         dtext_artist_commentary_title: "Pulling Ahri's Cheeks",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -245,6 +245,34 @@ module Sources
       )
     end
 
+    context "A reddit comment URL" do
+      strategy_should_work(
+        "https://www.reddit.com/r/BocchiTheRock/comments/1cruel0/comment/l43980q/",
+        image_urls: %w[https://i.redd.it/tvapvd0fph0d1.png],
+        media_files: [{ file_size: 1_763_231 }],
+        page_url: "https://www.reddit.com/r/BocchiTheRock/comments/1cruel0/thank_you_for_the_great_responses_to_my_seika/",
+        profile_url: "https://www.reddit.com/user/-Thu-",
+        profile_urls: %w[https://www.reddit.com/user/-Thu-],
+        artist_name: "-Thu-",
+        tag_name: "thu",
+        other_names: ["-Thu-"],
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          How about some education from her instead?
+        EOS
+      )
+    end
+
+    context "A reddit comment image URL" do
+      strategy_should_work(
+        "https://preview.redd.it/thank-you-for-the-great-responses-to-my-seika-drawings-here-v0-tvapvd0fph0d1.png?width=2549&format=png&auto=webp&s=115a8f1c99df4a0ddb8c61f769a28548abe4ee17",
+        image_urls: %w[https://i.redd.it/tvapvd0fph0d1.png],
+        media_files: [{ file_size: 1_763_231 }],
+        page_url: nil
+      )
+    end
+
     context "A reddit post with rich text commentary" do
       strategy_should_work(
         "https://www.reddit.com/r/grandorder/comments/1cnaruv/cerejeira_relaxing_commission/",
@@ -255,7 +283,7 @@ module Sources
         profile_urls: %w[https://www.reddit.com/user/Yatsu003],
         artist_name: "Yatsu003",
         tag_name: "yatsu003",
-        other_names: ["Yatsu003", "yatsu003"],
+        other_names: ["Yatsu003"],
         tags: [
           ["Fluff", "https://www.reddit.com/r/grandorder/?f=flair_name:\"Fluff\""],
         ],
@@ -288,7 +316,7 @@ module Sources
         profile_urls: %w[https://www.reddit.com/user/SolariaHues],
         artist_name: "SolariaHues",
         tag_name: "solariahues",
-        other_names: ["SolariaHues", "solariahues"],
+        other_names: ["SolariaHues"],
         tags: [
           ["LTR Guide", "https://www.reddit.com/r/LearnToReddit/?f=flair_name:\"LTR Guide\""],
         ],
@@ -372,6 +400,7 @@ module Sources
       should "Parse Reddit URLs correctly" do
         assert(Source::URL.image_url?("https://i.redd.it/p5utgk06ryq81.png"))
         assert(Source::URL.image_url?("https://preview.redd.it/qoyhz3o8yde71.jpg?width=1440&format=pjpg&auto=webp&s=5cbe3b0b097d6e7263761c461dae19a43038db22"))
+        assert(Source::URL.image_url?("https://preview.redd.it/thank-you-for-the-great-responses-to-my-seika-drawings-here-v0-tvapvd0fph0d1.png?width=2549&format=png&auto=webp&s=115a8f1c99df4a0ddb8c61f769a28548abe4ee17"))
         assert(Source::URL.image_url?("https://external-preview.redd.it/92G2gkb545UNlA-PywJqM_F-4TT0xngvmf_gb9sFDqk.jpg?auto=webp&s=0f1e3d0603dbaabe1ead7352202d0de1653d76f6"))
         assert(Source::URL.image_url?("https://g.redditmedia.com/f-OWw5C5aVumPS4HXVFhTspgzgQB4S77mO-6ad0rzpg.gif?fm=mp4&mp4-fragmented=false&s=ed3d767bf3b0360a50ddd7f503d46225"))
         assert(Source::URL.image_url?("https://i.redditmedia.com/9cYFBDQ3QsqWnF9v7EhW5uOcQNHz1Ak9_E1zVNeSLek.png?s=6fee1bb56e7d926847dc3ece01a1ffd4"))
@@ -387,6 +416,8 @@ module Sources
         assert(Source::URL.page_url?("https://redd.it/ttyccp"))
         assert(Source::URL.page_url?("https://www.reddit.com/r/tales/s/RtMDlrF5yo"))
         assert(Source::URL.page_url?("https://www.redditmedia.com/mediaembed/wi4nfq"))
+        assert(Source::URL.page_url?("https://www.reddit.com/r/BocchiTheRock/comments/1cruel0/comment/l43980q/"))
+        assert(Source::URL.page_url?("https://www.reddit.com/comments/1cruel0/comment/l43980q/"))
 
         assert(Source::URL.profile_url?("https://www.reddit.com/user/xSlimes"))
         assert(Source::URL.profile_url?("https://www.reddit.com/u/Valshier"))
