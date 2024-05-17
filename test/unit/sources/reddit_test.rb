@@ -104,16 +104,17 @@ module Sources
     context "A crosspost" do
       strategy_should_work(
         "https://www.reddit.com/gallery/yc0b8g",
-        image_urls: %w[https://i.redd.it/eao0je8wzlv91.jpg],
-        media_files: [{ file_size: 39_385 }],
-        page_url: "https://www.reddit.com/r/furrymemes/comments/ybr04z/_/",
-        profile_url: "https://www.reddit.com/user/lightmare69",
-        profile_urls: %w[https://www.reddit.com/user/lightmare69],
-        artist_name: "lightmare69",
-        tag_name: "lightmare69",
-        other_names: ["lightmare69"],
-        tags: [],
-        dtext_artist_commentary_title: "🫵😐",
+        image_urls: [],
+        page_url: "https://www.reddit.com/r/MonsterMusume/comments/yc0b8g/rachnera_moment/",
+        profile_url: nil,
+        profile_urls: [],
+        artist_name: nil,
+        tag_name: nil,
+        other_names: [],
+        tags: [
+          ["Meme/Shitpost", "https://www.reddit.com/r/MonsterMusume/?f=flair_name:\"Meme%2FShitpost\""],
+        ],
+        dtext_artist_commentary_title: "Rachnera moment",
         dtext_artist_commentary_desc: ""
       )
     end
