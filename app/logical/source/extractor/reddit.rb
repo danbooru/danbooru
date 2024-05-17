@@ -8,7 +8,8 @@ module Source
         if parsed_url&.full_image_url.present?
           [parsed_url.full_image_url]
         elsif data.present?
-          images = [data.dig("media", "content")].compact
+          images = []
+          images += [data.dig("media", "content")].compact unless crosspost?
           images += ordered_gallery_images
           images.compact.uniq.map { |i| Source::URL.parse(i)&.full_image_url }.compact
         else
@@ -26,8 +27,7 @@ module Source
       end
 
       def profile_url
-        return nil if artist_name.blank?
-        "https://www.reddit.com/user/#{artist_name}"
+        "https://www.reddit.com/user/#{username}" if username.present?
       end
 
       def page_url
@@ -40,6 +40,10 @@ module Source
         data["flair"].to_a.pluck("text").compact_blank.uniq.map do |flair|
           [flair, %{https://www.reddit.com/r/#{subreddit}/?f=flair_name:"#{Danbooru::URL.escape(flair)}"}]
         end
+      end
+
+      def artist_name
+        username
       end
 
       def artist_commentary_title
@@ -152,6 +156,10 @@ module Source
         output
       end
 
+      def crosspost?
+        data["crosspostParentId"].present?
+      end
+
       def work_id
         if share_url.present?
           redirect_url = http.redirect_url(share_url)
@@ -161,8 +169,9 @@ module Source
         end
       end
 
-      def artist_name
-        data["author"] || parsed_url.username || parsed_referer&.username
+      def username
+        username = data["author"] || parsed_url.username || parsed_referer&.username
+        username unless username == "[deleted]"
       end
 
       def share_url
@@ -181,7 +190,7 @@ module Source
         html = http.cache(1.minute).parsed_get(api_url)
 
         data = html&.at("script#data").to_s[/\s({.*})/, 1]&.parse_json || {}
-        data.dig("posts", "models")&.values&.min_by { |p| p["created"].to_i } || {} # to avoid reposts
+        data.dig("posts", "models", "t3_#{work_id}") || {}
       end
     end
   end
