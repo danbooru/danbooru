@@ -3,7 +3,7 @@
 module Source
   class URL
     class Reddit < Source::URL
-      attr_reader :subreddit, :work_id, :share_id, :title, :username, :file
+      attr_reader :subreddit, :work_id, :share_id, :title, :username, :full_image_url
 
       def self.match?(url)
         url.domain.in?(%w[reddit.com redd.it redditmedia.com])
@@ -15,12 +15,11 @@ module Source
         # https://i.redd.it/p5utgk06ryq81.png
         # https://preview.redd.it/qoyhz3o8yde71.jpg?width=1440&format=pjpg&auto=webp&s=5cbe3b0b097d6e7263761c461dae19a43038db22
         in ("i" | "preview"), "redd.it", file
-          @file = file
+          @full_image_url = "https://i.redd.it/#{file}"
 
         # https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fds05uzmtd6d61.jpg
         in _, "reddit.com", "media" if params[:url].present?
-          media_url = Source::URL.parse(params[:url])
-          @file = media_url.file if media_url.is_a?(Reddit) && media_url.image_url?
+          @full_image_url = Source::URL.parse(params[:url]).try(:full_image_url)
 
         # https://external-preview.redd.it/92G2gkb545UNlA-PywJqM_F-4TT0xngvmf_gb9sFDqk.jpg?auto=webp&s=0f1e3d0603dbaabe1ead7352202d0de1653d76f6
         # https://external-preview.redd.it/VlT1G4JoqAmP_7DG5UKRCJP8eTRef7dCrRvu2ABm_Xg.png?width=1080&crop=smart&auto=webp&s=d074e9cbfcb2780e6ec0d948daff3cadc91c2a50
@@ -68,6 +67,10 @@ module Source
         in _, "reddit.com" , work_id
           @work_id = work_id
 
+        # https://www.redditmedia.com/mediaembed/wi4nfq
+        in _, "redditmedia.com" , "mediaembed", work_id
+          @work_id = work_id
+
         # https://redd.it/ttyccp
         in nil, "redd.it" , work_id
           @work_id = work_id
@@ -78,7 +81,7 @@ module Source
       end
 
       def image_url?
-        domain == "redditmedia.com" || (domain == "redd.it" && subdomain.in?(%w[i preview external-preview])) || file.present?
+        super || full_image_url.present?
       end
 
       def page_url
@@ -97,12 +100,6 @@ module Source
 
       def profile_url
         "https://www.reddit.com/user/#{username}" if username.present?
-      end
-
-      def full_image_url
-        return unless image_url?
-        return "https://i.redd.it/#{file}" if file.present?
-        original_url
       end
     end
   end
