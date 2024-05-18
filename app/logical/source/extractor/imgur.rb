@@ -39,7 +39,7 @@ module Source
 
       def username
         # v3_api_response[:account_url] is actually just the username
-        v1_api_response.dig(:account, :username).presence || v3_api_response[:account_url]
+        v1_api_response.dig(:account, :username).presence || v3_api_response[:account_url] || parsed_url.username || parsed_referer&.username
       end
 
       # XXX Each image in an album can have a separate title, tags, and description.

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Imgur < Source::URL
-  attr_reader :image_id, :album_id, :image, :username
+  attr_reader :image_id, :album_id, :image, :username, :slug
 
   def self.match?(url)
     url.domain.in?(%w[imgur.com imgur.io])
@@ -35,22 +35,17 @@ class Source::URL::Imgur < Source::URL
       @image_id = image_id
       @image = true
 
-    # https://imgur.com/c7EXjJu
-    # https://imgur.io/c7EXjJu
-    # https://m.imgur.com/c7EXjJu
-    in _, _, /^[a-zA-Z0-9]+$/ => image_id
-      @image_id = image_id
-
     # https://imgur.com/gallery/0BDNq
+    # https://imgur.com/gallery/i-would-be-villain-jessie-from-pok-mon-i-would-be-villain-jessie-from-pok-mon-g0ua0kg#/t/anime
     # https://imgur.com/a/0BDNq
     # https://imgur.com/a/0BDNq/zip (zip download)
     # https://imgur.com/a/0BDNq/all (old layout)
     # https://imgur.com/a/2tWSH1c (hidden (unlisted) album; https://imgur.com/gallery/2tWSH1c doesn't work)
     # https://alanbox.imgur.com/a/lDRB2 (very old album)
     in _, _, ("gallery" | "a"), album_id, *rest
-      @album_id = album_id
+      @slug, _, @album_id = album_id.rpartition("-")
 
-    # https://imgur.com/t/anime/g0ua0kg
+    # https://imgur.com/t/anime/g0ua0kg (redirect: https://imgur.com/gallery/i-would-be-villain-jessie-from-pok-mon-i-would-be-villain-jessie-from-pok-mon-g0ua0kg#/t/anime)
     in _, _, "t", tag, album_id
       @album_id = album_id
 
@@ -64,7 +59,16 @@ class Source::URL::Imgur < Source::URL
     in _, _, "user", username, *rest
       @username = username
 
+    # https://imgur.com/c7EXjJu
+    # https://imgur.io/c7EXjJu
+    # https://m.imgur.com/c7EXjJu
+    # https://imgur.com/arknights-tv-animation-prelude-to-dawn-new-character-visuals-tallulah-w-5Os4IW2
+    in _, _, /[a-zA-Z0-9]{5,7}$/ => image_id
+      @slug, _, @image_id = image_id.rpartition("-")
+
+    # https://imgur.com/t/anime
     else
+      nil
     end
   end
 
@@ -82,8 +86,12 @@ class Source::URL::Imgur < Source::URL
   end
 
   def page_url
-    if album_id.present?
+    if album_id.present? && slug.present?
+      "https://imgur.com/a/#{slug}-#{album_id}"
+    elsif album_id.present?
       "https://imgur.com/a/#{album_id}"
+    elsif image_id.present? && slug.present?
+      "https://imgur.com/#{slug}-#{image_id}"
     elsif image_id.present?
       "https://imgur.com/#{image_id}"
     end
