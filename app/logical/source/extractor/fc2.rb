@@ -75,12 +75,16 @@ module Source
       memoize def blog_page
         return nil if blog_entry.blank?
 
-        # curl -H "User-Agent: Android Mobile" http://afice.blog131.fc2.com/img/20170129ss.png/
+        # curl -H "User-Agent: Android Mobile" -H "Cookies: age_check=1" http://afice.blog131.fc2.com/img/20170129ss.png/
         # curl http://afice.blog131.fc2.com/img/20170129ss.png/?sp
-        page = http.headers("User-Agent": "Android Mobile").cache(1.minute).parsed_get(page_url)
+        page = http.cache(1.minute).parsed_get(page_url)
         return nil if page&.css("script")&.none? { |script| script["src"] == "https://static.fc2.com/js/blog/sp_autopager.js" }
 
         page
+      end
+
+      def http
+        super.headers("User-Agent": "Android Mobile").cookies(age_check: 1)
       end
     end
   end
