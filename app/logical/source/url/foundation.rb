@@ -9,7 +9,7 @@
 # * https://foundation.app/collection/kgfgen
 
 class Source::URL::Foundation < Source::URL
-  attr_reader :username, :user_id, :token_id, :work_id, :hash, :collection
+  attr_reader :username, :user_id, :token_id, :work_id, :slug, :hash, :collection
 
   IMAGE_HOSTS = %w[assets.foundation.app f8n-ipfs-production.imgix.net f8n-production-collection-assets.imgix.net d2ybmb80bbm9ts.cloudfront.net]
 
@@ -29,23 +29,19 @@ class Source::URL::Foundation < Source::URL
     in "foundation.app", /^0x\h{39}/ => user_id
       @user_id = user_id
 
-    # https://foundation.app/@mochiiimo/~/97376
-    in "foundation.app", /^@/ => username, "~", /^\d+/ => work_id
-      @username = username.delete_prefix("@")
-      @collection = "foundation"
-      @work_id = work_id
-
     # https://foundation.app/@mochiiimo/foundation/97376
     # https://foundation.app/@KILLERGF/kgfgen/4
+    # https://foundation.app/@mochiiimo/~/97376
+    # https://foundation.app/@~/~/6792
     in "foundation.app", /^@/ => username, collection, /^\d+/ => work_id
-      @username = username.delete_prefix("@")
-      @collection = collection
+      @username = username.delete_prefix("@") unless username == "@~"
+      @collection = collection unless collection == "~"
       @work_id = work_id
 
     # https://foundation.app/@asuka111art/dinner-with-cats-82426
-    in "foundation.app", /^@/ => username, /^.+-\d+$/ => slug
+    in "foundation.app", /^@/ => username, /\d+$/ => slug
       @username = username.delete_prefix("@")
-      @work_id = slug.split("-").last
+      @slug, _, @work_id = slug.rpartition("-")
 
     # https://foundation.app/mint/eth/0xFb0a8e1bB97fD7231Cd73c489dA4732Ae87995F0/4
     # https://foundation.app/mint/eth/0xFb0a8e1bB97fD7231Cd73c489dA4732Ae87995F0/6
