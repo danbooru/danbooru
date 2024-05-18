@@ -39,10 +39,6 @@ module Source
         images.pluck("image")
       end
 
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
-      end
-
       def tags
         page&.css("#sidestats .tags a").to_a.map do |tag|
           [tag.text, "https://www.newgrounds.com/search/conduct/art?match=tags&tags=#{tag.text}"]

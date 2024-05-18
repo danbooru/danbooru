@@ -14,10 +14,6 @@ module Source
         end
       end
 
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
-      end
-
       def display_name
         # Display name can be blank (example: https://cohost.org/fish)
         post.dig("postingProject", "displayName").presence

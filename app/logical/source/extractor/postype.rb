@@ -13,10 +13,6 @@ class Source::Extractor::Postype < Source::Extractor
     end
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def profile_url
     # https://fruitsnoir.postype.com/
     blog_url

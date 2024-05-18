@@ -26,10 +26,6 @@ class Source::Extractor::Patreon < Source::Extractor
     image_urls_from_api.find { |url| Source::URL.parse(url).try(:media_hash) == parsed_url.media_hash }
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def profile_url
     "https://www.patreon.com/#{username}" if username.present?
   end

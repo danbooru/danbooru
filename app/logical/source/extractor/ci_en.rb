@@ -32,10 +32,6 @@ class Source::Extractor::CiEn < Source::Extractor
     end
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def tag_name
     "cien_#{artist_id}" if artist_id.present?
   end

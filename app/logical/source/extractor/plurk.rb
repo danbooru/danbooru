@@ -14,10 +14,6 @@ module Source
         end
       end
 
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
-      end
-
       def illust_id
         parsed_url.work_id || parsed_referer&.work_id
       end

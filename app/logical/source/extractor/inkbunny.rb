@@ -15,10 +15,6 @@ class Source::Extractor::Inkbunny < Source::Extractor
     end
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def username
     submission[:username] || parsed_url.username || parsed_referer&.username
   end

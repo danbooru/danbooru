@@ -21,10 +21,6 @@ module Source
         end
       end
 
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
-      end
-
       def profile_url
         # We do it like this we can handle users like https://arca.live/u/@크림/55256970 or https://arca.live/u/@Nauju/45320365
         url = page&.css(".member-info > .user-info > a")&.attr("href")

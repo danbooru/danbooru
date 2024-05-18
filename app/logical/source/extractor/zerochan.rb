@@ -12,10 +12,6 @@ module Source
         end
       end
 
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
-      end
-
       def tags
         api_response[:tags].to_a.map do |tag|
           [tag, "https://www.zerochan.net/#{CGI.escape(tag)}"]

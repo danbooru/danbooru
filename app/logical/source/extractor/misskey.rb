@@ -11,10 +11,6 @@ class Source::Extractor::Misskey < Source::Extractor
     end
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def profile_url
     if base_url.present? && username.present? && remote_host.present?
       "#{base_url}/@#{username}@#{remote_host}"
