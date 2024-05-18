@@ -116,6 +116,37 @@ module Sources
         )
       end
 
+      context "A gallery URL with slug" do
+        strategy_should_work(
+          "https://imgur.com/gallery/i-would-be-villain-jessie-from-pok-mon-i-would-be-villain-jessie-from-pok-mon-g0ua0kg#/t/anime",
+          image_urls: %w[
+            https://i.imgur.com/nXIaBfY.png
+            https://i.imgur.com/1J55j4t.jpeg
+            https://i.imgur.com/efWu3Rj.jpeg
+            https://i.imgur.com/ULYuSjL.png
+          ],
+          media_files: [
+            { file_size: 620_472 },
+            { file_size: 41_844 },
+            { file_size: 92_214 },
+            { file_size: 538_315 },
+          ],
+          page_url: "https://imgur.com/a/g0ua0kg",
+          profile_url: "https://imgur.com/user/Waifuhunter34",
+          profile_urls: %w[https://imgur.com/user/Waifuhunter34],
+          username: "Waifuhunter34",
+          tags: [
+            ["waifu", "https://imgur.com/t/waifu"],
+            ["anime", "https://imgur.com/t/anime"],
+            ["pokemon", "https://imgur.com/t/pokemon"],
+            ["anime_girl", "https://imgur.com/t/anime_girl"],
+            ["pokemon_fan_art", "https://imgur.com/t/pokemon_fan_art"],
+          ],
+          dtext_artist_commentary_title: "I would be a villain for Jessie from Pokémon",
+          dtext_artist_commentary_desc: ""
+        )
+      end
+
       context "A .gifv URL" do
         strategy_should_work(
           "https://i.imgur.com/Kp9TdlX.gifv",
@@ -186,7 +217,9 @@ module Sources
 
         assert(Source::URL.page_url?("https://imgur.com/c7EXjJu"))
         assert(Source::URL.page_url?("https://imgur.io/c7EXjJu"))
+        assert(Source::URL.page_url?("https://imgur.com/arknights-tv-animation-prelude-to-dawn-new-character-visuals-tallulah-w-5Os4IW2"))
         assert(Source::URL.page_url?("https://imgur.com/gallery/0BDNq"))
+        assert(Source::URL.page_url?("https://imgur.com/gallery/i-would-be-villain-jessie-from-pok-mon-i-would-be-villain-jessie-from-pok-mon-g0ua0kg#/t/anime"))
         assert(Source::URL.page_url?("https://imgur.com/a/0BDNq"))
         assert(Source::URL.page_url?("https://imgur.com/t/anime/g0ua0kg"))
 
