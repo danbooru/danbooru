@@ -294,6 +294,46 @@ module Sources
         )
       end
 
+      context "A crd.co page" do
+        strategy_should_work(
+          "https://popuru.crd.co/#illustration",
+          image_urls: %w[
+            https://popuru.crd.co/assets/images/gallery01/0a55b9f2_original.jpg
+            https://popuru.crd.co/assets/images/gallery01/5e8d0711_original.jpg
+            https://popuru.crd.co/assets/images/gallery01/0501db00_original.jpg
+            https://popuru.crd.co/assets/images/gallery01/e54a6ffe_original.jpg
+            https://popuru.crd.co/assets/images/gallery01/5c0c81b5_original.jpg
+          ],
+          media_files: [
+            { file_size: 90_888 },
+            { file_size: 118_584 },
+            { file_size: 210_944 },
+            { file_size: 164_972 },
+            { file_size: 197_111 },
+          ],
+          page_url: "https://popuru.crd.co/#illustration",
+          profile_url: "https://popuru.crd.co",
+          profile_urls: %w[https://popuru.crd.co],
+          display_name: "popuru",
+          username: "popuru",
+          tags: [],
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            h1. [b]PEDRO SCHMIDT[/b]
+
+            h2. 2d animation and storyboard
+
+            "[email protected]":[https://popuru.crd.co/cdn-cgi/l/email-protection]
+
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/0a55b9f2_original.jpg?v=ea05d439]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/5e8d0711_original.jpg?v=ea05d439]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/0501db00_original.jpg?v=ea05d439]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/e54a6ffe_original.jpg?v=ea05d439]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/5c0c81b5_original.jpg?v=ea05d439]
+          EOS
+        )
+      end
+
       context "For a custom domain:" do
         context "A page URL" do
           strategy_should_work(
@@ -349,12 +389,15 @@ module Sources
 
       should "Parse URLs correctly" do
         assert(Source::URL.image_url?("https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg?v=c6f079b5"))
+        assert(Source::URL.image_url?("https://popuru.crd.co/assets/images/gallery01/0a55b9f2_original.jpg?v=ea05d439"))
 
         assert(Source::URL.page_url?("https://caminukai-art.carrd.co/#fanart-shadowheartguidance"))
         assert(Source::URL.page_url?("https://caminukai-art.carrd.co/#home"))
+        assert(Source::URL.page_url?("https://otonokj.crd.co/#info"))
 
         assert(Source::URL.profile_url?("https://caminukai-art.carrd.co"))
         assert(Source::URL.profile_url?("https://caminukai-art.carrd.co#"))
+        assert(Source::URL.profile_url?("https://otonokj.crd.co"))
       end
     end
   end
