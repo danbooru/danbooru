@@ -93,10 +93,8 @@ module Sources
         page_url: "https://misskey.io/notes/9t3ulxtf6ydq00na",
         profile_url: "https://misskey.io/@orizanin@nijimiss.moe",
         profile_urls: %w[https://misskey.io/@orizanin@nijimiss.moe https://nijimiss.moe/@orizanin],
-        display_name: "イケメン雌堕ちさせたい",
+        display_name: nil,
         username: "orizanin",
-        tag_name: "orizanin",
-        other_names: ["イケメン雌堕ちさせたい", "orizanin"],
         tags: [
           ["にじみすお絵描き部", "https://nijimiss.moe/tags/にじみすお絵描き部"],
           ["にじみすメイドの日", "https://nijimiss.moe/tags/にじみすメイドの日"],
@@ -125,6 +123,7 @@ module Sources
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           RNしてくれたフォロワーさんの第一印象を答えます！
+
           (知らねぇやつばっかだからプロフィールとアイコンと直近のノートを参照しよう…。)
         EOS
       )

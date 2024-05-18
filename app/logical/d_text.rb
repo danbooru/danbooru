@@ -650,7 +650,7 @@ class DText
         "[code]#{content}[/code]" if content.present?
       in "li"
         content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
-        depth = element.ancestors.count { _1.name in "ul" | "ol" }
+        depth = element.ancestors.count { _1.name in "ul" | "ol" }.clamp(1..)
         list = "*" * depth
         "#{list} #{content}\n" if content.present?
       in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")

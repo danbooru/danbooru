@@ -7,50 +7,6 @@ module Sources
     end
 
     context "The source for a 'http://*.tumblr.com/post/*' photo post with a single image" do
-      commentary_desc = <<~EOS.chomp
-        <h2>header</h2>
-
-        <hr><p>plain <b>bold</b> <i>italics</i> <strike>strike</strike></p>
-
-        <!-- more -->
-
-        <ol>
-        <li>one</li>
-        <li>two</li>
-        </ol>
-
-        <ul>
-        <li>one</li>
-        <ul>
-        <li>two</li>
-        </ul>
-        </ul>
-
-        <blockquote><p>quote</p></blockquote>
-
-        <p><a href=\"http://www.google.com\">link</a></p>
-      EOS
-
-      commentary_desc_dtext = <<~EOS.chomp
-        h2. header
-
-        [hr]
-
-        plain [b]bold[/b] [i]italics[/i] [s]strike[/s]
-
-        * one
-        * two
-
-        * one
-        * two
-
-        [quote]
-        quote
-        [/quote]
-
-        "link":[http://www.google.com]
-      EOS
-
       strategy_should_work(
         "https://noizave.tumblr.com/post/162206271767",
         image_urls: ["https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png"],
@@ -60,9 +16,27 @@ module Sources
         profile_url: "https://noizave.tumblr.com",
         tags: ["tag", "red hair", "red-hair", "red_hair"],
         normalized_tags: ["red_hair", "tag"],
-        artist_commentary_title: nil,
-        artist_commentary_desc: commentary_desc,
-        dtext_artist_commentary_desc: commentary_desc_dtext
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          h2. header
+
+          [hr]
+
+          plain [b]bold[/b] [i]italics[/i] [s]strike[/s]
+
+          * one
+          * two
+
+          * one
+
+          ** two
+
+          [quote]
+          quote
+          [/quote]
+
+          "link":[http://www.google.com]
+        EOS
       )
     end
 
