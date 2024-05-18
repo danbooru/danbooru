@@ -59,7 +59,6 @@ module Sources
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
             * "[image]":[https://caminukai-art.carrd.co/assets/images/gallery21/a86d9fc4_original.jpg?v=3850522b]
-
             Shadowheart guidance - Baldur's Gate 3
 
             Illustration of Shadowheart casting guidance, a character from the game Baldur's Gate 3.
@@ -314,7 +313,7 @@ module Sources
           page_url: "https://popuru.crd.co/#illustration",
           profile_url: "https://popuru.crd.co",
           profile_urls: %w[https://popuru.crd.co],
-          display_name: "popuru",
+          display_name: nil,
           username: "popuru",
           tags: [],
           dtext_artist_commentary_title: "",

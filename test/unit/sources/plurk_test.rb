@@ -61,6 +61,7 @@ module Sources
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           [十月號]
+
           <https://images.plurk.com/yfnumBJqqoQt50Em6xKwf.png>
 
           <https://images.plurk.com/5NaqqO3Yi6bQW1wKXq1Dc2.png>
@@ -134,7 +135,9 @@ module Sources
 
           Smily~ uncle Wediz
 
-          support my OC here :<https://www.patreon.com/sollyz_gallery>
+          support my OC here :
+
+          <https://www.patreon.com/sollyz_gallery>
 
           #furry #wediz
         EOS
@@ -159,6 +162,7 @@ module Sources
         dtext_artist_commentary_desc: <<~EOS.chomp
           <https://4.bp.blogspot.com/-HPXVpK9ukb4/USX0700w-uI/AAAAAAAALok/7MSx8yVhR7M/s1600/18_GWTB6.jpg> #隨爆而逝
           感謝噗友 "emilwu":[http://www.plurk.com/emilwu] 整理:
+
           <https://imgur.com/a/Y8YFV>
         EOS
       )

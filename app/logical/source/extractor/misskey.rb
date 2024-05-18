@@ -32,7 +32,7 @@ class Source::Extractor::Misskey < Source::Extractor
   end
 
   def display_name
-    user["name"]&.gsub(/:[a-z0-9@_]+:/i, "")&.normalize_whitespace&.squeeze(" ")&.strip # strip emoji
+    user["name"]&.gsub(/:[a-z0-9@_]+:/i, "")&.normalize_whitespace&.squeeze(" ")&.strip&.presence # strip emoji
   end
 
   def username

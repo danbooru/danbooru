@@ -323,6 +323,8 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("* foo\n** bar", DText.from_html("<ul><li>foo<ul><li>bar</li></ul></li></ul>"))
         assert_equal("* foo\n** bar", DText.from_html("<ol><li>foo<ol><li>bar</li></ol></li></ol>"))
 
+        assert_equal("* foo\n* bar", DText.from_html("<li>foo</li><li>bar</li>"))
+
         assert_equal("* foo[br]bar", DText.from_html("<ul><li>foo<br>bar</li></ul>"))
         assert_equal("* foo", DText.from_html("<ul><li>foo<br></li></ul>"))
         assert_equal("* foo\n* bar", DText.from_html("<ul><li>foo<br></li><li>bar</li></ul>"))
