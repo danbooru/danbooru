@@ -61,10 +61,6 @@ class Source::Extractor
       end.compact
     end
 
-    def page_url
-      parsed_url.page_url || parsed_referer&.page_url
-    end
-
     def tags
       case work_type
       when "post"

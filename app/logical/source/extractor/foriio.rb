@@ -12,10 +12,6 @@ class Source::Extractor::Foriio < Source::Extractor
     end
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def profile_url
     "https://www.foriio.com/#{username}" if username.present?
   end

@@ -15,10 +15,6 @@ class Source::Extractor::Galleria < Source::Extractor
     end
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def profile_url
     parsed_url.profile_url || parsed_referer&.profile_url
   end

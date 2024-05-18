@@ -108,7 +108,7 @@ module Source
     #
     # @return [String, nil]
     def page_url
-      nil
+      parsed_url.page_url || parsed_referer&.page_url
     end
 
     # A name to suggest as the artist's tag name when creating a new artist. It should follow the rules for tag names

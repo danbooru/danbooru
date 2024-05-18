@@ -36,10 +36,6 @@ module Source
         page&.css(".viewbody #controller_model .thumbnail_list").to_a.map { |td| td.attr("sub_id") }
       end
 
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
-      end
-
       def tags
         page&.css("#view .tag a[href^='/search/list']").to_a.map do |tag|
           [tag.text, "https://www.tinami.com/search/list?keyword=#{Danbooru::URL.escape(tag.text)}"]

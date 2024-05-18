@@ -18,10 +18,6 @@ class Source::Extractor
       end
     end
 
-    def page_url
-      parsed_url.page_url
-    end
-
     def profile_url
       author_url
     end

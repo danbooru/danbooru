@@ -68,10 +68,6 @@ module Source
         http.cache(1.minute).parsed_get(api_url) || {}
       end
 
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
-      end
-
       def api_url
         parsed_url.api_url || parsed_referer&.api_url
       end

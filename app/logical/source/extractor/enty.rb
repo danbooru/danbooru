@@ -23,10 +23,6 @@ module Source
         urls.select { |url| Source::URL.parse(url)&.image_url? }
       end
 
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
-      end
-
       def profile_url
         "https://enty.jp/#{username}" if username.present?
       end

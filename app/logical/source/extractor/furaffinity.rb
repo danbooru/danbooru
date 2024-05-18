@@ -19,10 +19,6 @@ class Source::Extractor
       end
     end
 
-    def page_url
-      parsed_url.page_url || parsed_referer&.page_url
-    end
-
     def tags
       tags = html_response&.css(".tags").to_a.map!(&:text).compact.uniq
       tags.map {|tag| [tag, "https://www.furaffinity.net/search/@keywords #{tag}"] }

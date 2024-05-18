@@ -16,10 +16,6 @@ class Source::Extractor::Pinterest < Source::Extractor
     [api_response.dig("images", "orig", "url")].compact_blank
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def profile_url
     "https://www.pinterest.com/#{username}/" if username.present?
   end

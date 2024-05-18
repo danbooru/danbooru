@@ -47,10 +47,6 @@ class Source::Extractor
       end
     end
 
-    def page_url
-      parsed_url.page_url || parsed_referer&.page_url
-    end
-
     memoize def api_response
       http.cache(1.minute).cookies(adult: "t").parsed_get(parsed_url.api_url) || {}
     end

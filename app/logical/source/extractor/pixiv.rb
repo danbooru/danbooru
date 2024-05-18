@@ -44,10 +44,6 @@ module Source
         end
       end
 
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
-      end
-
       def profile_url
         if api_response[:userId].present?
           "https://www.pixiv.net/users/#{api_response[:userId]}"

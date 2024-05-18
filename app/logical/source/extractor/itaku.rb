@@ -12,10 +12,6 @@ class Source::Extractor::Itaku < Source::Extractor
     end
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def profile_url
     "https://itaku.ee/#{username}" if username.present?
   end

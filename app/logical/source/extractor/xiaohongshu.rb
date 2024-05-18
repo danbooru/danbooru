@@ -15,10 +15,6 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
     end
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def profile_url
     "https://www.xiaohongshu.com/user/profile/#{user_id}" if user_id.present?
   end

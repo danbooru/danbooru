@@ -31,10 +31,6 @@ class Source::Extractor::PixivComic < Source::Extractor
     end
   end
 
-  def page_url
-    parsed_url.page_url || parsed_referer&.page_url
-  end
-
   def artist_name
     if work.present?
       work.dig("official_work", "author")
