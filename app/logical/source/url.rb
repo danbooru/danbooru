@@ -97,6 +97,7 @@ module Source
       Source::URL::Note,
       Source::URL::PixivComic,
       Source::URL::NaverBlog,
+      Source::URL::NaverCafe,
       Source::URL::NaverPost,
       Source::URL::Xiaohongshu,
       Source::URL::Patreon,
