@@ -21,7 +21,7 @@
 
 module Source
   class URL::NicoSeiga < Source::URL
-    attr_reader :illust_id, :manga_id, :image_id, :oekaki_id, :sm_video_id, :nm_video_id, :user_id, :username, :profile_url
+    attr_reader :illust_id, :manga_id, :image_id, :oekaki_id, :video_id, :user_id, :username, :profile_url
 
     def self.match?(url)
       url.domain.in?(%w[nicovideo.jp nicoseiga.jp nicomanga.jp nimg.jp nico.ms])
@@ -42,13 +42,13 @@ module Source
       in /seiga\.nicovideo\.jp$/, "watch", /^mg(\d+)/ => manga_id
         @manga_id = $1
 
-      # https://www.nicovideo.jp/watch/sm36465441
-      in "www.nicovideo.jp", "watch", /^sm(\d+)/
-        @sm_video_id = $1
-
-      # https://www.nicovideo.jp/watch/nm36465441
-      in "www.nicovideo.jp", "watch", /^nm(\d+)/
-        @nm_video_id = $1
+      # See https://wiki.archiveteam.org/index.php/Niconico#Overview_of_Video_IDs
+      # https://www.nicovideo.jp/watch/sm36465441 (sm = SMILEVIDEO videos. Can be attached to almost any video)
+      # https://www.nicovideo.jp/watch/nm36465441 (nm = originally SWF videos, converted to mp4s in 2018)
+      # https://www.nicovideo.jp/watch/so40968812 (so = SmileOfficial, for official videos)
+      # https://www.nicovideo.jp/watch/1488526447 (???)
+      in "www.nicovideo.jp", "watch", /^(..)\d+$/ => video_id
+        @video_id = video_id
 
       # https://seiga.nicovideo.jp/image/source/3521156 (single image; page: https://seiga.nicovideo.jp/seiga/im3312222)
       # https://seiga.nicovideo.jp/image/source/4744553 (manga image; page: https://seiga.nicovideo.jp/watch/mg122274)
@@ -110,12 +110,11 @@ module Source
         @manga_id = $1
 
       # https://nico.ms/sm36465441
-      in "nico.ms", /^sm(\d+)$/
-        @sm_video_id = $1
-
       # https://nico.ms/nm36465441
-      in "nico.ms", /^nm(\d+)$/
-        @nm_video_id = $1
+      # https://nico.ms/so40968812
+      # https://nico.ms/1488526447
+      in "nico.ms", /^..\d+$/ => video_id
+        @video_id = video_id
 
       # https://seiga.nicovideo.jp/user/illust/456831
       # https://sp.seiga.nicovideo.jp/user/illust/20542122
@@ -186,10 +185,8 @@ module Source
         "https://seiga.nicovideo.jp/seiga/im#{illust_id}"
       elsif manga_id.present?
         "https://seiga.nicovideo.jp/watch/mg#{manga_id}"
-      elsif nm_video_id.present?
-        "https://www.nicovideo.jp/watch/nm#{nm_video_id}"
-      elsif sm_video_id.present?
-        "https://www.nicovideo.jp/watch/sm#{sm_video_id}"
+      elsif video_id.present?
+        "https://www.nicovideo.jp/watch/#{video_id}"
       elsif oekaki_id.present?
         "https://dic.nicovideo.jp/oekaki_id/#{oekaki_id}"
       # elsif image_id.present?
