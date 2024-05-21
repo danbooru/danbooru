@@ -42,6 +42,11 @@ module Source
         http.cache(1.minute).parsed_get("https://#{domain}/post.json", params: params)&.first&.with_indifferent_access || {}
       end
 
+      def http_downloader
+        # Yande.re redirects image URLs to the HTML page if we spoof the referer.
+        super.disable_feature(:spoof_referrer)
+      end
+
       concerning :HelperMethods do
         def sub_extractor
           return nil if parent_extractor.present?
