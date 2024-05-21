@@ -5,7 +5,7 @@ class Source::URL::Xiaohongshu < Source::URL
   attr_reader :user_id, :post_id, :full_image_url
 
   def self.match?(url)
-    url.domain.in?(%w[xiaohongshu.com xhscdn.com xhslink.com])
+    url.domain.in?(%w[xiaohongshu.com xhscdn.com])
   end
 
   def parse

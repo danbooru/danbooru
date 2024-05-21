@@ -68,8 +68,10 @@ module Sources
         assert_redirects_to("http://tmblr.co/ZdPV4t2OHwdv5", "https://techsupportdog.tumblr.com/post/163509337669?")
         assert_redirects_to("http://t.co/Dxn7CuVErW", "https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1")
         assert_redirects_to("http://pic.twitter.com/Dxn7CuVErW", "https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1")
+        assert_redirects_to("http://pic.x.com/Dxn7CuVErW", "https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1")
         assert_redirects_to("http://wp.me/p32Sjo-oJ", "http://xn--t8jf3evasg9m.com/?p=1533")
         assert_redirects_to("http://x.gd/uysub", "https://nohito.fanbox.cc/posts/7903482")
+        assert_redirects_to("http://xhslink.com/WNd9gI", "https://www.xiaohongshu.com/discovery/item/65880524000000000700a643?source=webshare")
       end
 
       context "A deleted or nonexistent shortened URL" do
@@ -96,8 +98,11 @@ module Sources
         assert_redirects_to("https://tinyurl.com/qwoifjqwio", nil)
         assert_redirects_to("https://tmblr.co/bad", nil)
         assert_redirects_to("https://t.co/bad", nil)
+        assert_redirects_to("https://pic.twitter.com/bad", nil)
+        assert_redirects_to("https://pic.x.com/bad", nil)
         assert_redirects_to("https://wp.me/qwoifjqwio", nil)
         assert_redirects_to("https://x.gd/bad", nil)
+        assert_redirects_to("https://xhslink.com/asdoifjiowf", nil)
       end
 
       should "parse URLs correctly" do

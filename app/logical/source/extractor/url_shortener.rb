@@ -77,11 +77,23 @@ class Source::Extractor::URLShortener < Source::Extractor
       url = http.redirect_url("https://www.shorturl.at/#{id}")&.to_s
       url unless url == "https://www.shorturl.at/"
 
+    # curl -I http://xhslink.com/WNd9gI
+    # Returns 307 on success, 307 redirect to http://www.xiaohongshu.com on error, and 500 if id is too long.
+    in "xhslink.com", id
+      url = http.redirect_url(https_url)&.to_s
+      url unless url == "http://www.xiaohongshu.com"
+
+    # curl -I https://t.co/Dxn7CuVErW
+    # curl -I https://pic.twitter.com/Dxn7CuVErW
+    # curl -I https://pic.x.com/Dxn7CuVErW
+    # All the same, except pic.x.com redirects to pic.twitter.com.
+    in "twitter.com" | "x.com" | "t.co", id
+      http.headers("User-Agent": "curl/8.2.1").redirect_url("https://t.co/#{id}")&.to_s
+
     # curl -I https://bit.ly/4aAVa4y
     # Can't use a browser user agent for these shorteners, otherwise we get a HTML response instead of a 301 redirect.
-    in "bit.ly" | "j.mp" | "t.co" | "twitter.com" | "pse.is", id
-      response = http.no_follow.headers("User-Agent": "curl/8.2.1").head(https_url)
-      response.headers["Location"] if response.status.redirect?
+    in "bit.ly" | "j.mp" | "pse.is", id
+      http.headers("User-Agent": "curl/8.2.1").redirect_url(https_url)&.to_s
 
     else
       response = http.no_follow.head(https_url)
