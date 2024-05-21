@@ -86,7 +86,7 @@ class Source::URL::Twitter < Source::URL
     # https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
     # https://twitter.com/sato_1_11/status/1496489742791475201/photo/2
     # https://fxtwitter.com/example/status/1548117889437208581.jpg
-    in _, _, username, "status", status_id, *rest
+    in _, _, username, ("status" | "statuses"), status_id, *rest
       username = username.delete_prefix("@")
       @username = username unless username.in?(RESERVED_USERNAMES)
       @status_id = status_id.split(".").first

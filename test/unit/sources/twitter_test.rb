@@ -503,6 +503,7 @@ module Sources
       assert(Source::URL.page_url?("https://twitter.com/i/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://twitter.com/i/web/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://twitter.com/BOW999/statuses/1261877313349640194"))
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194/photo/1"))
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194?s=19"))
       assert(Source::URL.page_url?("https://twitter.com/@BOW999/status/1261877313349640194"))
@@ -510,6 +511,7 @@ module Sources
       assert(Source::URL.page_url?("https://x.com/i/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://x.com/i/web/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://x.com/BOW999/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://x.com/BOW999/statuses/1261877313349640194"))
 
       assert(Source::URL.profile_url?("https://www.twitter.com/irt_5433"))
       assert(Source::URL.profile_url?("https://www.twitter.com/@irt_5433"))
