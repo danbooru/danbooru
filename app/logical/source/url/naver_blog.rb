@@ -9,7 +9,7 @@ class Source::URL::NaverBlog < Source::URL
   attr_reader :username, :post_id, :full_image_url
 
   def self.match?(url)
-    url.domain.in?(%w[naver.com blog.me naver.net pstatic.net]) && !Source::URL::NaverPost.match?(url)
+    url.domain.in?(%w[naver.com blog.me naver.net pstatic.net]) && !Source::URL::NaverPost.match?(url) && !Source::URL::NaverCafe.match?(url)
   end
 
   def parse
