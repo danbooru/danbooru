@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# @see Source::Extractor::Xiaohongshu
 class Source::URL::Xiaohongshu < Source::URL
   attr_reader :user_id, :post_id, :full_image_url
 
@@ -10,10 +11,13 @@ class Source::URL::Xiaohongshu < Source::URL
   def parse
     case [subdomain, domain, *path_segments]
 
-    # http://sns-webpic-qc.xhscdn.com/202405050857/60985d4963cfb500a9b0838667eb3adc/1000g00828idf6nofk05g5ohki5uk137o8beqcv8!nd_dft_wgth_webp_3 (sample)
-    in _, "xhscdn.com", /^\d{12}$/, /^\h{32}$/, /^([a-z0-9]+)!/
+    # https://sns-webpic-qc.xhscdn.com/202405050857/60985d4963cfb500a9b0838667eb3adc/1000g00828idf6nofk05g5ohki5uk137o8beqcv8!nd_dft_wgth_webp_3 (sample)
+    # https://sns-webpic-qc.xhscdn.com/202405210829/7c81f7805428d2268d2d0723e0f52ce2/spectrum/1040g0k030p06mpo4k0005ovbk4n9t3fq5ms4iu0!nd_dft_wlteh_webp_3 (sample)
+    # https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8 (full)
+    # https://ci.xiaohongshu.com/spectrum/1040g0k030p06mpo4k0005ovbk4n9t3fq5ms4iu0 (full)
+    in _, "xhscdn.com", /^\d{12}$/, /^\h{32}$/, *subdirs, /^([a-z0-9]+)!/
       image_id = basename.split("!").first
-      @full_image_url = "https://ci.xiaohongshu.com/#{image_id}"
+      @full_image_url = ["https://ci.xiaohongshu.com", *subdirs, image_id].join("/")
 
     # https://ci.xiaohongshu.com/bd871b0f-f9e7-54da-fd39-80b6af034dad?imageView2/2/w/100/h/100/q/75 (sample)
     # https://ci.xiaohongshu.com/bd871b0f-f9e7-54da-fd39-80b6af034dad (full)
