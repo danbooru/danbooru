@@ -40,11 +40,16 @@ module Source
       end
 
       def page_url
-        "https://skeb.jp/@#{username}/works/#{illust_id}" if username.present? && illust_id.present?
+        if api_response[:path].present?
+          # https://skeb.jp/@kotora_hu/works/1
+          "https://skeb.jp#{api_response[:path]}"
+        else
+          parsed_url.page_url || parsed_referer&.page_url
+        end
       end
 
       def api_url
-        "https://skeb.jp/api/users/#{username}/works/#{illust_id}" if username.present? && illust_id.present?
+        parsed_url.api_url || parsed_referer&.api_url
       end
 
       memoize def api_response
@@ -64,7 +69,7 @@ module Source
       end
 
       def http
-        super.headers(Referer: profile_url, Authorization: "Bearer null").cookies(request_key: cached_request_key)
+        super.headers(Authorization: "Bearer null").cookies(request_key: cached_request_key)
       end
 
       memoize def cached_request_key
@@ -85,11 +90,7 @@ module Source
       end
 
       def username
-        parsed_url.username || parsed_referer&.username
-      end
-
-      def illust_id
-        parsed_url.work_id || parsed_referer&.work_id
+        Source::URL.parse(page_url)&.username
       end
 
       def artist_commentary_desc

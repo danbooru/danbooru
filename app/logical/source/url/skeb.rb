@@ -3,7 +3,7 @@
 class Source::URL::Skeb < Source::URL
   RESERVED_USERNAMES = %w[works users about terms creator client company]
 
-  attr_reader :username, :work_id, :image_id, :image_uuid
+  attr_reader :username, :illust_id, :work_id, :image_id, :image_uuid
 
   def self.match?(url)
     url.host.in?(%w[www.skeb.jp fcdn.skeb.jp cdn.skeb.jp skeb.jp skeb.imgix.net si.imgix.net skeb-production.s3.ap-northeast-1.amazonaws.com])
@@ -17,8 +17,12 @@ class Source::URL::Skeb < Source::URL
     # https://skeb.jp/@asanagi/works/16 (age-restricted, watermarked)
     # https://skeb.jp/@asanagi/works/6 (private, returns 404)
     # https://skeb.jp/@nasuno42/works/30 (multi-image post)
-    in _, "skeb.jp", /^@/ => username, "works", work_id
+    in _, "skeb.jp", /^@/ => username, "works", illust_id
       @username = username.delete_prefix("@")
+      @illust_id = illust_id
+
+    # https://skeb.jp/works/133404
+    in _, "skeb.jp", "works", work_id
       @work_id = work_id
 
     # https://skeb.jp/@asanagi
@@ -61,7 +65,19 @@ class Source::URL::Skeb < Source::URL
   end
 
   def page_url
-    "https://skeb.jp/@#{username}/works/#{work_id}" if username.present? && work_id.present?
+    if username.present? && illust_id.present?
+      "https://skeb.jp/@#{username}/works/#{illust_id}"
+    elsif work_id.present?
+      "https://skeb.jp/works/#{work_id}"
+    end
+  end
+
+  def api_url
+    if username.present? && illust_id.present?
+      "https://skeb.jp/api/users/#{username}/works/#{illust_id}"
+    elsif work_id.present?
+      "https://skeb.jp/api/works/#{work_id}"
+    end
   end
 
   def profile_url

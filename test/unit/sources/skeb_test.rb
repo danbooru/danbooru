@@ -91,7 +91,7 @@ module Sources
         media_files: [
           { file_size: 166_207 },
           { file_size: 169_696 },
-          { file_size: 174_195 },
+          { file_size: 174_119 },
         ],
         page_url: "https://skeb.jp/@tontaro_/works/316",
         profile_url: "https://skeb.jp/@tontaro_",
@@ -220,6 +220,32 @@ module Sources
       )
     end
 
+    context "A https://skeb.jp/works/:id URL" do
+      strategy_should_work(
+        "https://skeb.jp/works/133404",
+        image_urls: %w[https://si.imgix.net/5f2e397a/requests/133404_0?bg=%23fff&auto=format&fm=webp&w=800&s=a45810e69658dcc227f8dc056e7c645d],
+        media_files: [{ file_size: 157_342 }],
+        page_url: "https://skeb.jp/@kotora_hu/works/1",
+        profile_url: "https://skeb.jp/@kotora_hu",
+        profile_urls: %w[https://skeb.jp/@kotora_hu],
+        display_name: "風ことら kotora Hu",
+        username: "kotora_hu",
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          h6. Original Request
+
+          私のオリジナルキャラクターを描いてくだされば本当にありがたいです ! ヘアースタイルは解けた髪で 表情はツンデレのように描いてくだされば ありがたいです。衣装とポーズは自由に描いてください！ ありがとうございました！
+
+          https://sta.sh/21hlqv84ub0x
+
+          h6. Client Response
+
+          とてもきれいに描いてくださって本当にありがとうございます ! ! 衣装もポーズもすごく気に入ってます !
+        EOS
+      )
+    end
+
     context "A watermarked sample URL" do
       # Test that we don't alter the percent encoding of the URL, otherwise the signature will be wrong
       # page: https://skeb.jp/@LambOic029/works/146
@@ -246,7 +272,10 @@ module Sources
       assert(Source::URL.image_url?("https://skeb-production.s3.ap-northeast-1.amazonaws.com/uploads/outputs/20f9d68f-50ec-44ae-8630-173fc38a2d6a?response-content-disposition=attachment%3B%20filename%3D%22458093-1.output.mp4%22%3B%20filename%2A%3DUTF-8%27%27458093-1.output.mp4&response-content-type=video%2Fmp4&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIVPUTFQBBL7UDSUA%2F20220221%2Fap-northeast-1%2Fs3%2Faws4_request&X-Amz-Date=20220221T200057Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=7f028cfd9a56344cf1d42410063fad3ef30a1e47b83cef047247e0c37df01df0"))
       assert(Source::URL.image_url?("https://fcdn.skeb.jp/uploads/outputs/734e0c33-878c-4a83-bbf8-6212be31abbe?response-content-disposition=inline&Expires=1676373664&Signature=MpNqM4OiJIdkdG0o7q~22bmEA39FFhi4XXRQp5jb3RC0JxH5w6uDd6vJ552v08JGafajn-BaHYnMBg3kH86xUM8w5ySzqYB9fqHbdeIu2iiTtttQif6IdQEJnBPYrH56KXsFMftkf1nn18~GX~HSount0wnYPfPZ7bts7AepbeqOmPEspfnFMkJfemVWGCFKK-cIW1jfi2ZiAEOeSSBqxGDBJhD0LP9eJEZMJkk3ZTeFMJcTFHFXfa35wEzaZP7c6pFNKeIC8SVa2zqER46HrGPsAW316kVgfzFCP9vQ~XgZevjGJRC9BBhHLpuOKEZR-QG1ucQvPQg38cVP5DhwcQ__&Key-Pair-Id=K1GS3H53SEO647"))
       assert(Source::URL.image_url?("https://cdn.skeb.jp/uploads/outputs/734e0c33-878c-4a83-bbf8-6212be31abbe?response-content-disposition=inline&Expires=1676373664&Signature=MpNqM4OiJIdkdG0o7q~22bmEA39FFhi4XXRQp5jb3RC0JxH5w6uDd6vJ552v08JGafajn-BaHYnMBg3kH86xUM8w5ySzqYB9fqHbdeIu2iiTtttQif6IdQEJnBPYrH56KXsFMftkf1nn18~GX~HSount0wnYPfPZ7bts7AepbeqOmPEspfnFMkJfemVWGCFKK-cIW1jfi2ZiAEOeSSBqxGDBJhD0LP9eJEZMJkk3ZTeFMJcTFHFXfa35wEzaZP7c6pFNKeIC8SVa2zqER46HrGPsAW316kVgfzFCP9vQ~XgZevjGJRC9BBhHLpuOKEZR-QG1ucQvPQg38cVP5DhwcQ__&Key-Pair-Id=K1GS3H53SEO647"))
-      assert(Source::URL.page_url?("https://skeb.jp/@OrvMZ/works/3 "))
+
+      assert(Source::URL.page_url?("https://skeb.jp/@OrvMZ/works/3"))
+      assert(Source::URL.page_url?("https://skeb.jp/works/133404"))
+
       assert(Source::URL.profile_url?("https://skeb.jp/@asanagi"))
       assert(Source::URL.profile_url?("https://www.skeb.jp/@asanagi"))
       assert(Source::URL.profile_url?("https://skeb.jp/asanagi"))
