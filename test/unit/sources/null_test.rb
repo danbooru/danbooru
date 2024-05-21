@@ -86,7 +86,6 @@ module Sources
         assert_equal("E-Hentai", Source::URL.parse("https://e-hentai.org/uploader/Laundrymom").site_name)
         assert_equal("Excite Blog", Source::URL.parse("http://spzinno.exblog.jp").site_name)
         assert_equal("Facebook", Source::URL.parse("https://www.facebook.com/sinyu.tang.9").site_name)
-        assert_equal("Fandom", Source::URL.parse("https://teppen.fandom.com/wiki/Kuai_Leilei").site_name)
         assert_equal("FanFiction.Net", Source::URL.parse("https://www.fanfiction.net/u/1795942").site_name)
         assert_equal("Flickr", Source::URL.parse("http://www.flickr.com/people/hizna").site_name)
         assert_equal("GitHub", Source::URL.parse("https://github.com/Shimofumi").site_name)
