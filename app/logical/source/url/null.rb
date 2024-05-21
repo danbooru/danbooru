@@ -75,8 +75,6 @@ class Source::URL::Null < Source::URL
       "Excite Blog"
     in _, ("facebook.com" | "fbcdn.net")
       "Facebook"
-    in _, ("fandom.com" | "wikia.com")
-      "Fandom"
     in _, "fanfiction.net"
       "FanFiction.Net"
     in _, "finalfantasyxiv.com"

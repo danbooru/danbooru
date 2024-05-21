@@ -1,50 +1,124 @@
 # frozen_string_literal: true
 
 class Source::URL::Fandom < Source::URL
-  WIKI_DB_NAMES = {
-    "age-of-ishtaria": "ishtaria",
-    "atelierseries": "atelier",
-    "b-dapedia": "bdaman",
-    "dragalialost_gamepedia_en": "dragalialost",
-    "dungeon-ni-deai-o-motomeru": "danmachi",
-    "gensin-impact": "genshin-impact",
-    "guilty-gear": "guiltygear",
-    "honkaiimpact3_gamepedia_en": "honkaiimpact3",
-    "kagura": "senrankagura",
-    "langrisser_gamepedia_en": "langrisser",
-    "magic-school-lussid": "sid-story",
-    "masterofeternity_gamepedia_en": "masterofeternity",
-    "rockman_x_dive": "rockman-x-dive",
-    "strikewitches": "worldwitches",
-    "sword-art-online": "swordartonline",
-    "talesofseries-the-tales-of": "tales-of",
-    "to-aru-majutsu-no-index": "toarumajutsunoindex",
+  WIKI_NAMES = {
+    # [Lang, Database name] => Wiki name
+    [nil,  "adventuretimewithfinnandjake"] =>   "adventuretime",
+    [nil,  "age-of-ishtaria"] =>                "ishtaria",
+    [nil,  "atelierseries"] =>                  "atelier",
+    [nil,  "b-dapedia"] =>                      "bdaman",
+    [nil,  "blackbullet2"] =>                   "blackbullet",
+    [nil,  "blacksurvival_gamepedia_en"] =>     "blacksurvival",
+    [nil,  "capcomdatabase"] =>                 "capcom",
+    [nil,  "dragalialost_gamepedia_en"] =>      "dragalialost",
+    [nil,  "dragonauttheresonance"] =>          "dragonaut",
+    [nil,  "dungeon-ni-deai-o-motomeru"] =>     "danmachi",
+    [nil,  "dynastywarriors"] =>                "koei",
+    [nil,  "fault-milestone8968"] =>            "fault-series",
+    [nil,  "genjitsushugisha"] =>               "genkoku",
+    [nil,  "gen-impact"] =>                     "genshin-impact",
+    [nil,  "gensin-impact"] =>                  "genshin-impact",
+    [nil,  "grimm-notes-jp"] =>                 "grimms-notes-jp",
+    [nil,  "guilty-gear"] =>                    "guiltygear",
+    [nil,  "harvestmoonrunefactory"] =>         "therunefactory",
+    [nil,  "honkaiimpact3_gamepedia_en"] =>     "honkaiimpact3",
+    [nil,  "isekai-maou-to-shoukan-shoujo-dorei-majutstu"] => "isekai-maou",
+    [nil,  "kagura"] =>                         "senrankagura",
+    [nil,  "langrisser_gamepedia_en"] =>        "langrisser",
+    [nil,  "littlewitch"] =>                    "little-witch-academia",
+    [nil,  "madannooutovanadis"] =>             "madan",
+    [nil,  "magiarecord-en"] =>                 "magireco",
+    [nil,  "magic-school-lussid"] =>            "sid-story",
+    [nil,  "mahousenseinegima"] =>              "negima",
+    [nil,  "masterofeternity_gamepedia_en"] =>  "masterofeternity",
+    [nil,  "ninehourspersonsdoors"] =>          "zeroescape",
+    [nil,  "onigiri-en"] =>                     "onigiri",
+    [nil,  "ritualofthenight"] =>               "bloodstained",
+    [nil,  "rockman_x_dive"] =>                 "rockman-x-dive",
+    [nil,  "romancingsaga"] =>                  "saga",
+    [nil,  "shirocolle"] =>                     "shiropro",
+    [nil,  "silent"] =>                         "silenthill",
+    [nil,  "strikewitches"] =>                  "worldwitches",
+    [nil,  "sword-art-online"] =>               "swordartonline",
+    ["ru", "sword-art-online"] =>               "sword-art-online",
+    ["es", "sao"] =>                            "swordartonline",
+    [nil,  "senkizesshousymphogear"] =>         "symphogear",
+    [nil,  "talesofseries-the-tales-of"] =>     "tales-of",
+    [nil,  "tensei-shitara-slime-datta-ken"] => "tensura",
+    [nil,  "the-dreath-mage-who-doesnt-want-a-fourth-time"] => "death-mage",
+    [nil,  "to-aru-majutsu-no-index"] =>        "toarumajutsunoindex",
+    [nil,  "utawareru"] =>                      "utawarerumono",
+    [nil,  "yorukuni"] =>                       "nightsofazure",
+    [nil,  "youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e"] => "you-zitsu",
+    [nil,  "zoe"] =>                            "zoneoftheenders",
+
+    # XXX Different images; not the same wiki?
+    # https://static.wikia.nocookie.net/p__/protagonist/images/3/3f/Yukiko_Amagi_(BlazBlue_Cross_Tag_Battle%2C_Character_Select_Artwork).png
+    # https://static.wikia.nocookie.net/megamitensei/images/3/3f/Yukiko_Amagi_(BlazBlue_Cross_Tag_Battle%2C_Character_Select_Artwork).png
+    # https://megamitensei.fandom.com/wiki/Gallery?file=Yukiko_Amagi_%28BlazBlue_Cross_Tag_Battle%2C_Character_Select_Artwork%29.png
+    # [nil,  "p__"] =>                            "megamitensei",
   }.with_indifferent_access
 
-  attr_reader :wiki_db_name, :file, :page_url, :full_image_url
+  attr_reader :wiki_db_name, :file, :path_prefix, :image_uuid, :full_image_path
 
   def self.match?(url)
-    url.domain.in?(%w[nocookie.net fandom.com])
+    url.domain.in?(%w[nocookie.net fandom.com wikia.com])
   end
 
   def parse
     case [subdomain, domain, *path_segments]
 
-    # https://vignette.wikia.nocookie.net/queensblade/images/3/33/WGAIRI1.jpg/
-    # https://vignette1.wikia.nocookie.net/valkyriecrusade/images/b/bf/Joan_Of_Arc_H.png/revision/latest?cb=20170801081004
-    # https://static.wikia.nocookie.net/valkyriecrusade/images/3/3f/Joan_Of_Arc.png/revision/latest/scale-to-width-down/270?cb=20170801081000
-    in _, "nocookie.net", wiki_db_name, "images", /^\h$/ => subdir1, /^\h\h$/ => subdir2, filename, *rest
-      @wiki_db_name = wiki_db_name
-      @file = Danbooru::URL.escape(filename)
-      @full_image_url = "https://static.wikia.nocookie.net/#{wiki_db_name}/images/#{subdir1}/#{subdir2}/#{file}"
-      @page_url = "https://#{wiki}.fandom.com/wiki/Gallery?file=#{file}"
+    # https://static.wikia.nocookie.net/74a9f058-f816-4856-8aad-c398aa8a4c81/thumbnail/width/400/height/400 (user profile picture)
+    # https://static.wikia.nocookie.net/74a9f058-f816-4856-8aad-c398aa8a4c81?format=original (full)
+    in _, "nocookie.net", /^\h{8}-\h{4}-\h{4}-\h{4}-\h{12}$/ => image_uuid, *rest
+      @image_uuid = image_uuid
 
-    # http://img3.wikia.nocookie.net/__cb20130523100711/typemoon/images/9/96/Caster_Extra_Takeuchi_design_1.png
-    in _, "nocookie.net", subdir1, wiki_db_name, "images", /^\h$/ => subdir2, /^\h\h$/ => subdir3, filename, *rest
+    # https://static.wikia.nocookie.net/queensblade/images/3/33/WGAIRI1.jpg
+    in _, "nocookie.net", *rest
+      parse_path
+
+    # http://images3.wikia.nocookie.net/fireemblem/images/archive/2/2b/20080623085034%21Dorothy.JPG
+    else
+      nil
+    end
+  end
+
+  def parse_path
+    segments = path_segments.dup
+    segments.shift if path_segments.first in /^__cb\d+$/
+
+    case segments
+    # https://vignette.wikia.nocookie.net/p__/images/3/3f/Yukiko_Amagi_%28BlazBlue_Cross_Tag_Battle%2C_Character_Select_Artwork%29.png/revision/latest?cb=20171119153335&path-prefix=protagonist (.webp sample)
+    # https://static.wikia.nocookie.net/valkyriecrusade/images/3/3f/Joan_Of_Arc.png/revision/latest/scale-to-width-down/270?cb=20170801081000 (.webp sample)
+    # https://img3.wikia.nocookie.net/__cb20140404214519/typemoon/images/f/fd/Aozaki_Aoko_Blue.png/revision/latest?path-prefix=fr (.webp sample)
+    # https://img3.wikia.nocookie.net/__cb20130523100711/typemoon/images/9/96/Caster_Extra_Takeuchi_design_1.png (.webp sample)
+    # https://img3.wikia.nocookie.net/typemoon/images/9/96/Caster_Extra_Takeuchi_design_1.png (.webp sample)
+    in wiki_db_name, "images", /^\h$/, /^\h\h$/, file, *rest
       @wiki_db_name = wiki_db_name
-      @file = Danbooru::URL.escape(filename)
-      @full_image_url = "https://static.wikia.nocookie.net/#{wiki_db_name}/images/#{subdir2}/#{subdir3}/#{file}"
-      @page_url = "https://#{wiki}.fandom.com/wiki/Gallery?file=#{file}"
+      @path_prefix = params["path-prefix"]
+      @file = file
+
+    # http://images1.wikia.nocookie.net/__cb20121102042049/disgaea/en/images/1/15/DD2_Publicity_02.jpg (.webp sample)
+    # https://vignette.wikia.nocookie.net/p__/protagonist/images/3/3f/Yukiko_Amagi_(BlazBlue_Cross_Tag_Battle%2C_Character_Select_Artwork).png
+    # https://static.wikia.nocookie.net/typemoon/fr/images/f/fd/Aozaki_Aoko_Blue.png
+    in wiki_db_name, path_prefix, "images", /^\h$/, /^\h\h$/, file, *rest
+      @wiki_db_name = wiki_db_name
+      @path_prefix = path_prefix
+      @file = file
+
+    # http://img3.wikia.nocookie.net/__cb20130520180921/allanimefanon/images/thumb/8/82/2560-1600-104761.jpg/2000px-2560-1600-104761.jpg
+    # http://img3.wikia.nocookie.net/allanimefanon/images/thumb/8/82/2560-1600-104761.jpg/2000px-2560-1600-104761.jpg
+    in wiki_db_name, "images", "thumb", /^\h$/, /^\h\h$/, file, *rest
+      @wiki_db_name = wiki_db_name
+      @path_prefix = params[:path_prefix]
+      @file = file
+
+    # https://img3.wikia.nocookie.net/__cb20140404214519/typemoon/fr/images/thumb/f/fd/Aozaki_Aoko_Blue.png/500px-Aozaki_Aoko_Blue.png
+    # https://img3.wikia.nocookie.net/typemoon/fr/images/thumb/f/fd/Aozaki_Aoko_Blue.png/500px-Aozaki_Aoko_Blue.png
+    in wiki_db_name, path_prefix, "images", "thumb", /^\h$/, /^\h\h$/, file, *rest
+      @wiki_db_name = wiki_db_name
+      @path_prefix = path_prefix
+      @file = file
 
     else
       nil
@@ -52,10 +126,38 @@ class Source::URL::Fandom < Source::URL
   end
 
   def image_url?
-    full_image_url.present?
+    domain == "nocookie.net"
+  end
+
+  def full_image_url
+    if file.present?
+      subdir = Digest::MD5.hexdigest(file)
+      full_image_path = [wiki_db_name, path_prefix, "images", subdir[0], subdir[0..1], file].compact.join("/")
+      URI.join("https://static.wikia.nocookie.net", full_image_path, "?format=original").to_s
+    elsif image_uuid.present?
+      "https://static.wikia.nocookie.net/#{image_uuid}?format=original"
+    end
+  end
+
+  def page_url
+    if profile_url.present? && file.present?
+      "#{profile_url}/wiki/Gallery?file=#{Danbooru::URL.escape(file)}"
+    end
+  end
+
+  def profile_url
+    if wiki.present? && lang.present?
+      "https://#{wiki}.fandom.com/#{lang}"
+    elsif wiki.present?
+      "https://#{wiki}.fandom.com"
+    end
+  end
+
+  def lang
+    @path_prefix unless @path_prefix == "en"
   end
 
   def wiki
-    WIKI_DB_NAMES.fetch(wiki_db_name, wiki_db_name)
+    WIKI_NAMES[[lang, wiki_db_name]] || wiki_db_name
   end
 end
