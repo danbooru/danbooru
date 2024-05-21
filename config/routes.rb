@@ -141,7 +141,6 @@ Rails.application.routes.draw do
   resource :iqdb_queries, :only => [:show, :create] do
     collection do
       get :preview
-      get :check, to: redirect {|path_params, req| "/iqdb_queries?#{req.query_string}"}
     end
   end
   resources :media_assets, only: [:index, :show, :destroy] do
@@ -321,35 +320,6 @@ Rails.application.routes.draw do
     get :template
   end
 
-  # Legacy Danbooru 1 API endpoints
-  get "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"
-  get "/tag/index.json", :controller => "legacy", :action => "tags", :format => "json"
-  get "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
-  get "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
-
-  # Legacy Danbooru 1 redirects.
-  get "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI.escape(req.params[:name].to_s)}"}
-  get "/artist/show/:id" => redirect("/artists/%{id}")
-  get "/artist/show" => redirect {|params, req| "/artists?name=#{CGI.escape(req.params[:name].to_s)}"}
-
-  get "/forum" => redirect {|params, req| "/forum_topics?page=#{req.params[:page]}"}
-  get "/forum/show/:id" => redirect {|params, req| "/forum_posts/#{req.params[:id]}?page=#{req.params[:page]}"}
-
-  get "/pool/show/:id" => redirect("/pools/%{id}")
-
-  get "/post/index" => redirect {|params, req| "/posts?tags=#{CGI.escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
-  get "/post/atom" => redirect {|params, req| "/posts.atom?tags=#{CGI.escape(req.params[:tags].to_s)}"}
-  get "/post/show/:id/:tag_title" => redirect("/posts/%{id}")
-  get "/post/show/:id" => redirect("/posts/%{id}")
-
-  get "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI.escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}&search[category]=#{req.params[:type]}"}
-  get "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI.escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}"}
-
-  get "/user/show/:id" => redirect("/users/%{id}")
-
-  get "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{CGI.escape(req.params[:title].to_s)}"}
-  get "/help/:title" => redirect {|params, req| "/wiki_pages?title=#{CGI.escape('help:' + req.params[:title])}"}
-
   get "/login", to: "sessions#new", as: :login
   get "/logout", to: "sessions#logout", as: :logout
   get "/profile", to: "users#profile", as: :profile
@@ -374,8 +344,6 @@ Rails.application.routes.draw do
   get "/static/dtext_help" => "static#dtext_help", :as => "dtext_help"
   get "/static/terms_of_service", to: redirect("/terms_of_service")
   get "/static/contact", to: redirect("/contact")
-  get "/delayed_jobs", to: redirect("/jobs")
-  get "/maintenance/user/deletion", to: redirect("/users/deactivate")
 
   get "/mock/recommender/recommend/:user_id" => "mock_services#recommender_recommend", as: "mock_recommender_recommend"
   get "/mock/recommender/similiar/:post_id" => "mock_services#recommender_similar", as: "mock_recommender_similar"

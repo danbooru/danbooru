@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<tags type="array">
-  <% @tags.each do |tag| %>
-    <tag name="<%= tag.name %>" id="<%= tag.id %>" ambiguous="false" created_at="<%= tag.created_at.try(:strftime, '%Y-%m-%d %H:%M') %>" count="<%= tag.post_count %>" type="<%= tag.category %>"></tag>
-  <% end %>
-</tags>
