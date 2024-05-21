@@ -67,6 +67,35 @@ module Sources
         )
       end
 
+      context "A post with /spectrum/ image URLs" do
+        strategy_should_work(
+          "https://www.xiaohongshu.com/explore/650293e4000000001e022308",
+          image_urls: %w[
+            https://ci.xiaohongshu.com/spectrum/1040g0k030p06mpo4k0005ovbk4n9t3fq5ms4iu0
+            https://ci.xiaohongshu.com/spectrum/1040g0k030p06mpkdju005ovbk4n9t3fqveguc70
+          ],
+          media_files: [
+            { file_size: 1_164_038 },
+            { file_size: 930_250 },
+          ],
+          page_url: "https://www.xiaohongshu.com/explore/650293e4000000001e022308",
+          profile_url: "https://www.xiaohongshu.com/user/profile/63eba12e0000000027028dfa",
+          profile_urls: %w[https://www.xiaohongshu.com/user/profile/63eba12e0000000027028dfa],
+          display_name: "三水吉吉",
+          username: nil,
+          tags: [
+            ["绘画", "https://www.xiaohongshu.com/search_result/?keyword=绘画"],
+            ["私人稿件禁止使用", "https://www.xiaohongshu.com/search_result/?keyword=私人稿件禁止使用"],
+            ["立绘", "https://www.xiaohongshu.com/search_result/?keyword=立绘"],
+          ],
+          dtext_artist_commentary_title: "一对立绘",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            最近画图动力大大up，真的很努力在稿了！！ #绘画[话题]# #私人稿件禁止使用[话题]# #立绘[话题]#
+            ps：暂不接稿~
+          EOS
+        )
+      end
+
       context "A deleted or nonexistent post" do
         strategy_should_work(
           "https://www.xiaohongshu.com/explore/999999999",
