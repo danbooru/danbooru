@@ -418,6 +418,7 @@ module Sources
         assert(Source::URL.page_url?("https://www.redditmedia.com/mediaembed/wi4nfq"))
         assert(Source::URL.page_url?("https://www.reddit.com/r/BocchiTheRock/comments/1cruel0/comment/l43980q/"))
         assert(Source::URL.page_url?("https://www.reddit.com/comments/1cruel0/comment/l43980q/"))
+        assert(Source::URL.page_url?("https://old.reddit.com/r/Xenoblade_Chronicles/comments/11etwdd/monolith_soft_2023_brochure_art/jahip48/"))
 
         assert(Source::URL.profile_url?("https://www.reddit.com/user/xSlimes"))
         assert(Source::URL.profile_url?("https://www.reddit.com/u/Valshier"))
