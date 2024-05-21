@@ -8,7 +8,7 @@ module Sources
       context "An image URL that doesn't have an _original version" do
         strategy_should_work(
           "https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg?v=c6f079b5",
-          image_urls: %w[https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg?v=c6f079b5],
+          image_urls: %w[https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg],
           media_files: [{ file_size: 75_371 }],
           page_url: nil,
           profile_urls: %w[https://rosymiz.carrd.co]
@@ -38,7 +38,7 @@ module Sources
       context "A video cover image" do
         strategy_should_work(
           "https://rosymiz.carrd.co/assets/videos/video02.mp4.jpg?v=c6f079b5",
-          image_urls: %w[https://rosymiz.carrd.co/assets/videos/video02.mp4.jpg?v=c6f079b5],
+          image_urls: %w[https://rosymiz.carrd.co/assets/videos/video02.mp4.jpg],
           media_files: [{ file_size: 454_589 }],
           page_url: nil,
           profile_urls: %w[https://rosymiz.carrd.co]
@@ -58,7 +58,7 @@ module Sources
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            * "[image]":[https://caminukai-art.carrd.co/assets/images/gallery21/a86d9fc4_original.jpg?v=3850522b]
+            * "[image]":[https://caminukai-art.carrd.co/assets/images/gallery21/a86d9fc4_original.jpg]
             Shadowheart guidance - Baldur's Gate 3
 
             Illustration of Shadowheart casting guidance, a character from the game Baldur's Gate 3.
@@ -98,13 +98,13 @@ module Sources
             illustrations - chibis - sketches
             [i]for designs, 2d animation, motion graphic animation please refer to my commission pages for those respective categories for samples[/i]
 
-            * "[image]":[https://lytell.carrd.co/assets/images/gallery04/bca0b2f2_original.jpg?v=2df9c738]
-            * "[image]":[https://lytell.carrd.co/assets/images/gallery04/47493cd2_original.jpg?v=2df9c738]
-            * "[image]":[https://lytell.carrd.co/assets/images/gallery04/3ac05b2e_original.jpg?v=2df9c738]
+            * "[image]":[https://lytell.carrd.co/assets/images/gallery04/bca0b2f2_original.jpg]
+            * "[image]":[https://lytell.carrd.co/assets/images/gallery04/47493cd2_original.jpg]
+            * "[image]":[https://lytell.carrd.co/assets/images/gallery04/3ac05b2e_original.jpg]
 
-            * "[image]":[https://lytell.carrd.co/assets/images/gallery05/0b8d3183_original.jpg?v=2df9c738]
-            * "[image]":[https://lytell.carrd.co/assets/images/gallery05/a9a31be0_original.jpg?v=2df9c738]
-            * "[image]":[https://lytell.carrd.co/assets/images/gallery05/75d61bc7_original.jpg?v=2df9c738]
+            * "[image]":[https://lytell.carrd.co/assets/images/gallery05/0b8d3183_original.jpg]
+            * "[image]":[https://lytell.carrd.co/assets/images/gallery05/a9a31be0_original.jpg]
+            * "[image]":[https://lytell.carrd.co/assets/images/gallery05/75d61bc7_original.jpg]
 
             click for full playlist!
           EOS
@@ -115,20 +115,20 @@ module Sources
         strategy_should_work(
           "https://badkrol.carrd.co/#commission",
           image_urls: %w[
-            https://badkrol.carrd.co/assets/images/gallery01/42c1e32a.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery01/08d85bf2.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery01/fc3f91db.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery01/548929a2.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery01/9be3f1d6.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery02/2973b8cd.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery02/a22539e3.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery02/0db4767e.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery02/8b01a93d.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery02/95c2ed27.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery02/4451caa0.jpg?v=7a5e418b
-            https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg?v=7a5e418b
+            https://badkrol.carrd.co/assets/images/gallery01/42c1e32a.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/08d85bf2.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/fc3f91db.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/548929a2.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/9be3f1d6.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/2973b8cd.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/a22539e3.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/0db4767e.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/8b01a93d.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/95c2ed27.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/4451caa0.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg
           ],
           media_files: [
             { file_size: 9_104 },
@@ -163,23 +163,23 @@ module Sources
 
             Anime Style ( *some examples have incomplete rendering)
 
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/42c1e32a.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/08d85bf2.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/fc3f91db.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/548929a2.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/9be3f1d6.jpg?v=7a5e418b]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/42c1e32a.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/08d85bf2.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/fc3f91db.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/548929a2.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/9be3f1d6.jpg]
 
             Illustration
 
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/2973b8cd.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/a22539e3.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/0db4767e.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/8b01a93d.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/95c2ed27.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/4451caa0.jpg?v=7a5e418b]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg?v=7a5e418b]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/2973b8cd.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/a22539e3.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/0db4767e.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/8b01a93d.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/95c2ed27.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/4451caa0.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg]
 
             Backgrounds
 
@@ -192,10 +192,10 @@ module Sources
         strategy_should_work(
           "https://rosymiz.carrd.co/#home",
           image_urls: %w[
-            https://rosymiz.carrd.co/assets/images/image01.jpg?v=c6f079b5
-            https://rosymiz.carrd.co/assets/images/gallery01/1a46013e.jpg?v=c6f079b5
-            https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg?v=c6f079b5
-            https://rosymiz.carrd.co/assets/images/gallery01/f335f692.jpg?v=c6f079b5
+            https://rosymiz.carrd.co/assets/images/image01.jpg
+            https://rosymiz.carrd.co/assets/images/gallery01/1a46013e.jpg
+            https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg
+            https://rosymiz.carrd.co/assets/images/gallery01/f335f692.jpg
             https://rosymiz.carrd.co/assets/videos/video02.mp4
             https://rosymiz.carrd.co/assets/videos/video03.mp4
           ],
@@ -215,7 +215,7 @@ module Sources
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            "[image]":[https://rosymiz.carrd.co/assets/images/image01.jpg?v=c6f079b5]
+            "[image]":[https://rosymiz.carrd.co/assets/images/image01.jpg]
 
             h1. [b]Alice Choi[/b]
 
@@ -231,18 +231,18 @@ module Sources
 
             h3. 3D Character Art
 
-            * "[image]":[https://rosymiz.carrd.co/assets/images/gallery01/1a46013e.jpg?v=c6f079b5]
-            * "[image]":[https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg?v=c6f079b5]
-            * "[image]":[https://rosymiz.carrd.co/assets/images/gallery01/f335f692.jpg?v=c6f079b5]
+            * "[image]":[https://rosymiz.carrd.co/assets/images/gallery01/1a46013e.jpg]
+            * "[image]":[https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg]
+            * "[image]":[https://rosymiz.carrd.co/assets/images/gallery01/f335f692.jpg]
 
             h3. Motion Design
 
-            "[video]":[https://rosymiz.carrd.co/assets/videos/video02.mp4?v=c6f079b5]
+            "[video]":[https://rosymiz.carrd.co/assets/videos/video02.mp4]
 
             @GenshinTarot
             Artist: @ddengart
 
-            "[video]":[https://rosymiz.carrd.co/assets/videos/video03.mp4?v=c6f079b5]
+            "[video]":[https://rosymiz.carrd.co/assets/videos/video03.mp4]
 
             @GenshinTarot
             Artist: @sorryoutofrice
@@ -254,8 +254,8 @@ module Sources
         strategy_should_work(
           "https://silvivtuber.carrd.co/#ref",
           image_urls: %w[
-            https://silvivtuber.carrd.co/assets/images/image06.jpg?v=c127f7bb
-            https://silvivtuber.carrd.co/assets/images/image14.png?v=c127f7bb
+            https://silvivtuber.carrd.co/assets/images/image06.jpg
+            https://silvivtuber.carrd.co/assets/images/image14.png
           ],
           media_files: [
             { file_size: 399_974 },
@@ -269,9 +269,9 @@ module Sources
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            "[image]":[https://silvivtuber.carrd.co/assets/images/image06.jpg?v=c127f7bb]
+            "[image]":[https://silvivtuber.carrd.co/assets/images/image06.jpg]
 
-            "[image]":[https://silvivtuber.carrd.co/assets/images/image14.png?v=c127f7bb]
+            "[image]":[https://silvivtuber.carrd.co/assets/images/image14.png]
 
             h2. ・BLOOD SILVI ・ REFERENCE
 
@@ -324,11 +324,11 @@ module Sources
 
             "[email protected]":[https://popuru.crd.co/cdn-cgi/l/email-protection]
 
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/0a55b9f2_original.jpg?v=ea05d439]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/5e8d0711_original.jpg?v=ea05d439]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/0501db00_original.jpg?v=ea05d439]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/e54a6ffe_original.jpg?v=ea05d439]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/5c0c81b5_original.jpg?v=ea05d439]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/0a55b9f2_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/5e8d0711_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/0501db00_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/e54a6ffe_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/5c0c81b5_original.jpg]
           EOS
         )
       end
@@ -337,7 +337,7 @@ module Sources
         context "A page URL" do
           strategy_should_work(
             "https://hyphensam.com/#test-image",
-            image_urls: %w[https://hyphensam.com/assets/images/image04.jpg?v=2cc95429],
+            image_urls: %w[https://hyphensam.com/assets/images/image04.jpg],
             media_files: [{ file_size: 14_413 }],
             page_url: "https://hyphensam.com/#test-image",
             profile_url: "https://hyphensam.com",
@@ -347,7 +347,7 @@ module Sources
             tags: [],
             dtext_artist_commentary_title: "",
             dtext_artist_commentary_desc: <<~EOS.chomp
-              "[image]":[https://hyphensam.com/assets/images/image04.jpg?v=2cc95429]
+              "[image]":[https://hyphensam.com/assets/images/image04.jpg]
 
               Test text blah blah blah
             EOS
@@ -358,7 +358,7 @@ module Sources
           strategy_should_work(
             "https://hyphensam.com/assets/images/image04.jpg?v=2cc95429",
             referer: "https://hyphensam.com/#test-image",
-            image_urls: %w[https://hyphensam.com/assets/images/image04.jpg?v=2cc95429],
+            image_urls: %w[https://hyphensam.com/assets/images/image04.jpg],
             media_files: [{ file_size: 14_413 }],
             page_url: "https://hyphensam.com/#test-image",
             profile_url: "https://hyphensam.com",
@@ -368,7 +368,7 @@ module Sources
             tags: [],
             dtext_artist_commentary_title: "",
             dtext_artist_commentary_desc: <<~EOS.chomp
-              "[image]":[https://hyphensam.com/assets/images/image04.jpg?v=2cc95429]
+              "[image]":[https://hyphensam.com/assets/images/image04.jpg]
 
               Test text blah blah blah
             EOS
