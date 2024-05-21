@@ -55,6 +55,13 @@ module Source
           @work_id = work_id
           @title = title
 
+        # https://old.reddit.com/r/Xenoblade_Chronicles/comments/11etwdd/monolith_soft_2023_brochure_art/jahip48/
+        in _, "reddit.com", "r", subreddit, "comments", work_id, title, comment_id
+          @subreddit = subreddit
+          @work_id = work_id
+          @title = title
+          @comment_id = comment_id
+
         # https://www.reddit.com/r/BocchiTheRock/comments/1cruel0/comment/l43980q/
         in _, "reddit.com", "r", subreddit, "comments", work_id, "comment", comment_id
           @subreddit = subreddit
