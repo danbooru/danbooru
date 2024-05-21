@@ -30,10 +30,12 @@ class Source::URL::URLShortener < Source::URL
     # https://t.co/Dxn7CuVErW
     # https://wp.me/p32Sjo-oJ
     # https://x.gd/uysub
-    url.domain.in?(%w[0rz.tw amzn.to bit.ly j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl is.gd naver.me pin.it pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.co wp.me x.gd]) ||
+    # http://xhslink.com/WNd9gI
+    url.domain.in?(%w[0rz.tw amzn.to bit.ly j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl is.gd naver.me pin.it pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.co wp.me x.gd xhslink.com]) ||
 
     # https://pic.twitter.com/Dxn7CuVErW
-    url.host.in?(%w[pic.twitter.com]) ||
+    # https://pic.x.com/Dxn7CuVErW
+    url.host.in?(%w[pic.twitter.com pic.x.com]) ||
 
     # http://ow.ly/WmrYu
     # http://ow.ly/i/3oHVc (not a redirect)
@@ -63,6 +65,8 @@ class Source::URL::URLShortener < Source::URL
       "TinyURL"
     in _, "tmblr.co"
       "Tumblr"
+    in _, "xhslink.com"
+      "Xiaohongshu"
     else # ow.ly, is.gd, etc
       host.capitalize
     end

@@ -15,7 +15,7 @@ class Source::URL::Twitter < Source::URL
     # https://o.twimg.com URLs are handled by Source::URL::TwitPic.
     # https://pic.twitter.com and https://t.co URLs are handled by Source::URL::URLShortener.
     # fxtwitter.com, etc are from https://github.com/FixTweet/FxTwitter.
-    url.domain.in?(%w[twitter.com fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com twimg.com x.com]) && !url.host.in?(%w[o.twimg.com pic.twitter.com])
+    url.domain.in?(%w[twitter.com fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com twimg.com x.com]) && !url.host.in?(%w[o.twimg.com pic.twitter.com pic.x.com])
   end
 
   def parse
