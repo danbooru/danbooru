@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Fandom < Source::URL
+  RESERVED_WIKI_NAMES = [nil, "auth", "www"]
+
   WIKI_NAMES = {
     # [Lang, Database name] => Wiki name
     [nil,  "adventuretimewithfinnandjake"] =>   "adventuretime",
@@ -59,7 +61,7 @@ class Source::URL::Fandom < Source::URL
     # [nil,  "p__"] =>                            "megamitensei",
   }.with_indifferent_access
 
-  attr_reader :wiki_db_name, :file, :path_prefix, :image_uuid, :full_image_path
+  attr_reader :wiki_db_name, :file, :path_prefix, :image_uuid, :full_image_path, :page
 
   def self.match?(url)
     url.domain.in?(%w[nocookie.net fandom.com wikia.com])
@@ -76,6 +78,28 @@ class Source::URL::Fandom < Source::URL
     # https://static.wikia.nocookie.net/queensblade/images/3/33/WGAIRI1.jpg
     in _, "nocookie.net", *rest
       parse_path
+
+    # https://typemoon.fandom.com/wiki/Gallery?file=Caster_Extra_Takeuchi_design_1.png
+    # https://typemoon.fandom.com/wiki/Tamamo-no-Mae?file=Caster_Extra_Takeuchi_design_1.png
+    # https://typemoon.fandom.com/wiki/User:Lemostr00
+    # https://typemoon.fandom.com/wiki/File:Memories_of_Trifas.png
+    in wiki, "fandom.com", "wiki", page unless wiki.in?(RESERVED_WIKI_NAMES)
+      @wiki = wiki
+      @page = page
+      @file = page.starts_with?("File:") ? page.delete_prefix("File:") : params[:file]
+
+    # https://typemoon.fandom.com/Gallery?file=Caster_Extra_Takeuchi_design_1.png
+    # https://typemoon.fandom.com/Tamamo-no-Mae?file=Caster_Extra_Takeuchi_design_1.png
+    # https://typemoon.fandom.com/User:Lemostr00
+    # https://typemoon.fandom.com/File:Memories_of_Trifas.png
+    in wiki, "fandom.com", page unless wiki.in?(RESERVED_WIKI_NAMES)
+      @wiki = wiki
+      @page = page
+      @file = page.starts_with?("File:") ? page.delete_prefix("File:") : params[:file]
+
+    # https://typemoon.fandom.com/f/p/4400000000000077950
+    in wiki, "fandom.com", *rest unless wiki.in?(RESERVED_WIKI_NAMES)
+      @wiki = wiki
 
     # http://images3.wikia.nocookie.net/fireemblem/images/archive/2/2b/20080623085034%21Dorothy.JPG
     else
@@ -130,7 +154,7 @@ class Source::URL::Fandom < Source::URL
   end
 
   def full_image_url
-    if file.present?
+    if wiki_db_name.present? && file.present?
       subdir = Digest::MD5.hexdigest(file)
       full_image_path = [wiki_db_name, path_prefix, "images", subdir[0], subdir[0..1], file].compact.join("/")
       URI.join("https://static.wikia.nocookie.net", full_image_path, "?format=original").to_s
@@ -142,6 +166,8 @@ class Source::URL::Fandom < Source::URL
   def page_url
     if profile_url.present? && file.present?
       "#{profile_url}/wiki/Gallery?file=#{Danbooru::URL.escape(file)}"
+    elsif profile_url.present? && page.present?
+      "#{profile_url}/wiki/#{page}"
     end
   end
 
@@ -158,6 +184,6 @@ class Source::URL::Fandom < Source::URL
   end
 
   def wiki
-    WIKI_NAMES[[lang, wiki_db_name]] || wiki_db_name
+    @wiki || WIKI_NAMES[[lang, wiki_db_name]] || wiki_db_name
   end
 end
