@@ -131,6 +131,7 @@ module Sources
         assert_equal("https://typemoon.fandom.com/fr/wiki/Gallery?file=Aozaki_Aoko_Blue.png", Source::URL.page_url("http://img3.wikia.nocookie.net/__cb20140404214519/typemoon/images/f/fd/Aozaki_Aoko_Blue.png/revision/latest?path-prefix=fr"))
         assert_equal("https://typemoon.fandom.com/fr/wiki/Gallery?file=Aozaki_Aoko_Blue.png", Source::URL.page_url("http://img3.wikia.nocookie.net/__cb20140404214519/typemoon/fr/images/thumb/f/fd/Aozaki_Aoko_Blue.png/500px-Aozaki_Aoko_Blue.png"))
         assert_equal("https://allanimefanon.fandom.com/wiki/Gallery?file=2560-1600-104761.jpg", Source::URL.page_url("http://img3.wikia.nocookie.net/__cb20130520180921/allanimefanon/images/thumb/8/82/2560-1600-104761.jpg/2000px-2560-1600-104761.jpg"))
+        assert_equal("https://hero.fandom.com/protagonist/wiki/Gallery?file=Yukiko_Amagi_(BlazBlue_Cross_Tag_Battle,_Character_Select_Artwork).png", Source::URL.page_url("https://static.wikia.nocookie.net/p__/protagonist/images/3/3f/Yukiko_Amagi_(BlazBlue_Cross_Tag_Battle%2C_Character_Select_Artwork).png"))
       end
 
       should "parse URLs correctly" do

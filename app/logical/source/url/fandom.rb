@@ -35,6 +35,7 @@ class Source::URL::Fandom < Source::URL
     [nil,  "masterofeternity_gamepedia_en"] =>  "masterofeternity",
     [nil,  "ninehourspersonsdoors"] =>          "zeroescape",
     [nil,  "onigiri-en"] =>                     "onigiri",
+    ["protagonist", "p__"] =>                   "hero",
     [nil,  "ritualofthenight"] =>               "bloodstained",
     [nil,  "rockman_x_dive"] =>                 "rockman-x-dive",
     [nil,  "romancingsaga"] =>                  "saga",
@@ -53,12 +54,6 @@ class Source::URL::Fandom < Source::URL
     [nil,  "yorukuni"] =>                       "nightsofazure",
     [nil,  "youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e"] => "you-zitsu",
     [nil,  "zoe"] =>                            "zoneoftheenders",
-
-    # XXX Different images; not the same wiki?
-    # https://static.wikia.nocookie.net/p__/protagonist/images/3/3f/Yukiko_Amagi_(BlazBlue_Cross_Tag_Battle%2C_Character_Select_Artwork).png
-    # https://static.wikia.nocookie.net/megamitensei/images/3/3f/Yukiko_Amagi_(BlazBlue_Cross_Tag_Battle%2C_Character_Select_Artwork).png
-    # https://megamitensei.fandom.com/wiki/Gallery?file=Yukiko_Amagi_%28BlazBlue_Cross_Tag_Battle%2C_Character_Select_Artwork%29.png
-    # [nil,  "p__"] =>                            "megamitensei",
   }.with_indifferent_access
 
   attr_reader :wiki_db_name, :file, :path_prefix, :image_uuid, :full_image_path, :page
