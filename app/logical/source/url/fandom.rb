@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Source::URL::Fandom < Source::URL
+  # Matches language codes like 'ja' or 'pt-br'
+  LANG_CODE_REGEX = /^[a-z]{2,3}(-[a-z]{2,3})?$/
+
   RESERVED_WIKI_NAMES = [nil, "auth", "www"]
 
   WIKI_NAMES = {
@@ -35,7 +38,7 @@ class Source::URL::Fandom < Source::URL
     [nil,  "masterofeternity_gamepedia_en"] =>  "masterofeternity",
     [nil,  "ninehourspersonsdoors"] =>          "zeroescape",
     [nil,  "onigiri-en"] =>                     "onigiri",
-    ["protagonist", "p__"] =>                   "hero",
+    [nil,  "p__"] =>                            "hero",
     [nil,  "ritualofthenight"] =>               "bloodstained",
     [nil,  "rockman_x_dive"] =>                 "rockman-x-dive",
     [nil,  "romancingsaga"] =>                  "saga",
@@ -79,7 +82,7 @@ class Source::URL::Fandom < Source::URL
 
       # https://genshin-impact.fandom.com/pt-br/f
       # https://genshin-impact.fandom.com/ja/wiki/凝光/ギャラリー
-      @path_prefix = segments.shift if segments.first&.match?(/^[a-z]{2,3}(-[a-z]{2,3})?$/)
+      @path_prefix = segments.shift if segments.first&.match?(LANG_CODE_REGEX)
 
       # https://typemoon.fandom.com/f/p/4400000000000077950
       return if segments.first == "f"
@@ -158,8 +161,10 @@ class Source::URL::Fandom < Source::URL
   end
 
   def page_url
-    if profile_url.present? && file.present?
-      "#{profile_url}/wiki/Gallery?file=#{Danbooru::URL.escape(file)}"
+    if profile_url.present? && page.present? && file.present? && !page.starts_with?("File:")
+      "#{profile_url}/wiki/#{page}?file=#{Danbooru::URL.escape(file)}"
+    elsif profile_url.present? && file.present?
+      "#{profile_url}/wiki/File:#{Danbooru::URL.escape(file)}"
     elsif profile_url.present? && page.present?
       "#{profile_url}/wiki/#{page}"
     end
@@ -174,7 +179,7 @@ class Source::URL::Fandom < Source::URL
   end
 
   def lang
-    @path_prefix unless @path_prefix == "en"
+    path_prefix unless path_prefix == "en" || !path_prefix&.match?(LANG_CODE_REGEX)
   end
 
   def wiki
