@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Lofter < Source::URL
-  RESERVED_USERNAMES = %w[www i]
+  RESERVED_USERNAMES = %w[i uls www]
 
   attr_reader :username, :work_id, :full_image_url
 
@@ -42,6 +42,12 @@ class Source::URL::Lofter < Source::URL
     # http://gengar563.lofter.com/view
     in username, "lofter.com", *rest unless username.in?(RESERVED_USERNAMES)
       @username = username
+
+    # https://uls.lofter.com/?h5url=https%3A%2F%2Flesegeng.lofter.com%2Fpost%2F1f0aec07_2bbc5ce0b
+    in "uls", "lofter.com", *rest if params[:h5url].present?
+      url = Source::URL.parse(params[:h5url])
+      @username = url.try(:username)
+      @work_id = url.try(:work_id)
 
     # https://www.lofter.com/tag/初音ミク
     else
