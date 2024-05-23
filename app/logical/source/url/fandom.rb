@@ -74,27 +74,26 @@ class Source::URL::Fandom < Source::URL
     in _, "nocookie.net", *rest
       parse_path
 
-    # https://typemoon.fandom.com/wiki/Gallery?file=Caster_Extra_Takeuchi_design_1.png
-    # https://typemoon.fandom.com/wiki/Tamamo-no-Mae?file=Caster_Extra_Takeuchi_design_1.png
-    # https://typemoon.fandom.com/wiki/User:Lemostr00
-    # https://typemoon.fandom.com/wiki/File:Memories_of_Trifas.png
-    in wiki, "fandom.com", "wiki", page unless wiki.in?(RESERVED_WIKI_NAMES)
+    in wiki, "fandom.com", *segments unless wiki.in?(RESERVED_WIKI_NAMES)
       @wiki = wiki
-      @page = page
-      @file = page.starts_with?("File:") ? page.delete_prefix("File:") : params[:file]
 
-    # https://typemoon.fandom.com/Gallery?file=Caster_Extra_Takeuchi_design_1.png
-    # https://typemoon.fandom.com/Tamamo-no-Mae?file=Caster_Extra_Takeuchi_design_1.png
-    # https://typemoon.fandom.com/User:Lemostr00
-    # https://typemoon.fandom.com/File:Memories_of_Trifas.png
-    in wiki, "fandom.com", page unless wiki.in?(RESERVED_WIKI_NAMES)
-      @wiki = wiki
-      @page = page
-      @file = page.starts_with?("File:") ? page.delete_prefix("File:") : params[:file]
+      # https://genshin-impact.fandom.com/pt-br/f
+      # https://genshin-impact.fandom.com/ja/wiki/凝光/ギャラリー
+      @path_prefix = segments.shift if segments.first&.match?(/^[a-z]{2,3}(-[a-z]{2,3})?$/)
 
-    # https://typemoon.fandom.com/f/p/4400000000000077950
-    in wiki, "fandom.com", *rest unless wiki.in?(RESERVED_WIKI_NAMES)
-      @wiki = wiki
+      # https://typemoon.fandom.com/f/p/4400000000000077950
+      return if segments.first == "f"
+
+      # https://typemoon.fandom.com/wiki/Tamamo-no-Mae
+      segments.shift if segments.first == "wiki"
+
+      # https://typemoon.fandom.com/Tamamo-no-Mae?file=Caster_Extra_Takeuchi_design_1.png
+      # https://typemoon.fandom.com/User:Lemostr00
+      # https://typemoon.fandom.com/File:Memories_of_Trifas.png
+      # https://genshin-impact.fandom.com/Ningguang/Gallery
+      # https://genshin-impact.fandom.com/ja/凝光/ギャラリー
+      @page = segments.join("/")
+      @file = @page.starts_with?("File:") ? @page.delete_prefix("File:") : params[:file]
 
     # http://images3.wikia.nocookie.net/fireemblem/images/archive/2/2b/20080623085034%21Dorothy.JPG
     else
