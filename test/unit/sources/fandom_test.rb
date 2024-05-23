@@ -147,7 +147,16 @@ module Sources
         assert(Source::URL.page_url?("https://typemoon.fandom.com/User:Lemostr00"))
         assert(Source::URL.page_url?("https://typemoon.fandom.com/File:Memories_of_Trifas.png"))
 
+        assert(Source::URL.page_url?("https://genshin-impact.fandom.com/wiki/Ningguang/Gallery"))
+        assert(Source::URL.page_url?("https://genshin-impact.fandom.com/Ningguang/Gallery"))
+        assert(Source::URL.page_url?("https://genshin-impact.fandom.com/ja/wiki/凝光/ギャラリー"))
+        assert(Source::URL.page_url?("https://genshin-impact.fandom.com/ja/凝光/ギャラリー"))
+
+        assert_not(Source::URL.page_url?("https://typemoon.fandom.com/f/p/4400000000000077950"))
+        assert_not(Source::URL.page_url?("https://genshin-impact.fandom.com/pt-br/f"))
+
         assert(Source::URL.profile_url?("https://typemoon.fandom.com"))
+        assert(Source::URL.profile_url?("https://genshin-impact.fandom.com/pt-br"))
       end
     end
   end
