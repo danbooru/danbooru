@@ -106,6 +106,7 @@ module Source
       Source::URL::URLShortener,
       Source::URL::Redgifs,
       Source::URL::Carrd,
+      Source::URL::Toyhouse,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
