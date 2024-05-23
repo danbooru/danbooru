@@ -571,7 +571,10 @@ class MediaAsset < ApplicationRecord
   end
 
   def source_urls
-    urls = upload_media_assets.map { |uma| Source::URL.page_url(uma.source_url) || uma.page_url || uma.source_url }
+    urls = upload_media_assets.map do |uma|
+      Source::URL.page_url(uma.source_url) || Source::URL.page_url(uma.page_url) || uma.page_url || uma.source_url
+    end
+
     urls += [post.normalized_source] if post&.normalized_source.present?
 
     urls.compact.select do |url|
