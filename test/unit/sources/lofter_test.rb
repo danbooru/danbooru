@@ -174,6 +174,27 @@ module Sources
       )
     end
 
+    context "A uls.lofter.com/?h5url= URL" do
+      strategy_should_work(
+        "https://uls.lofter.com/?h5url=https%3A%2F%2Flesegeng.lofter.com%2Fpost%2F1f0aec07_2bbc5ce0b",
+        image_urls: %w[https://imglf6.lf127.net/img/c1e3b9c3e508baaf/TTVWeTVSYWgxZ1pkdnluQnhlbC9Fc25Zd0hQZzN0ZUxuUjQzdVdzL2dYWT0.jpg],
+        media_files: [{ file_size: 2_228_804 }],
+        page_url: "https://lesegeng.lofter.com/post/1f0aec07_2bbc5ce0b",
+        profile_url: "https://lesegeng.lofter.com",
+        profile_urls: %w[https://lesegeng.lofter.com],
+        display_name: "羔",
+        username: "lesegeng",
+        tags: [
+          ["幻密", "https://www.lofter.com/tag/幻密"],
+          ["apex", "https://www.lofter.com/tag/apex"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          泰俊欧巴🥰超绝可爱🔥有趣灵魂💖全能爱豆 ✨人间水蜜桃🍑 舞蹈天才💃🏻 快乐源泉😊 小甜豆‍🍬 人间治愈🍭 小精灵🧚‍♀️ 露脸即吸粉🎉 性格魅力无限♾️ 肩宽腿长🦾完美身材😛 肤白貌美🌸 笑容甜美💖 人间花仙子🥰 不断超越自己💃🏻 励志爱豆👐 完美爱豆来了🤚 快让开🔥 氛围美学大师🍬 实力吸粉🍑 镜头捕捉能力者📷 直拍匠人🔥 完美舞台表现力✨
+        EOS
+      )
+    end
+
     context "A dead link" do
       strategy_should_work(
         "https://gxszdddd.lofter.com/post/322595b1_1ca5e6f66",
@@ -188,6 +209,7 @@ module Sources
 
       assert(Source::URL.page_url?("https://gengar563.lofter.com/post/1e82da8c_1c98dae1b"))
       assert(Source::URL.page_url?("https://gengar563.lofter.com/front/post/1e82da8c_1c98dae1b"))
+      assert(Source::URL.page_url?("https://uls.lofter.com/?h5url=https%3A%2F%2Flesegeng.lofter.com%2Fpost%2F1f0aec07_2bbc5ce0b"))
 
       assert(Source::URL.profile_url?("https://www.lofter.com/front/blog/home-page/noshiqian"))
       assert(Source::URL.profile_url?("http://www.lofter.com/app/xiaokonggedmx"))
