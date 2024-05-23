@@ -150,6 +150,10 @@ class Source::URL::Fandom < Source::URL
     domain == "nocookie.net"
   end
 
+  def bad_source?
+    !image_url? && file.blank?
+  end
+
   def full_image_url
     if wiki_db_name.present? && file.present?
       subdir = Digest::MD5.hexdigest(file)

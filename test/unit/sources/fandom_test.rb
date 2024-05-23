@@ -158,6 +158,17 @@ module Sources
         assert(Source::URL.profile_url?("https://typemoon.fandom.com"))
         assert(Source::URL.profile_url?("https://genshin-impact.fandom.com/pt-br"))
       end
+
+      should "identify bad sources correctly" do
+        assert_not(Source::URL.parse("https://vignette.wikia.nocookie.net/valkyriecrusade/images/c/c5/Crimson_Hatsune_H.png/revision/latest?cb=20180702031954").bad_source?)
+        assert_not(Source::URL.parse("https://typemoon.fandom.com/wiki/Tamamo-no-Mae?file=Caster_Extra_Takeuchi_design_1.png").bad_source?)
+        assert_not(Source::URL.parse("https://typemoon.fandom.com/wiki/File:Memories_of_Trifas.png").bad_source?)
+
+        assert(Source::URL.parse("https://typemoon.fandom.com").bad_source?)
+        assert(Source::URL.parse("https://typemoon.fandom.com/wiki/User:Lemostr00").bad_source?)
+        assert(Source::URL.parse("https://typemoon.fandom.com/f/p/4400000000000077950").bad_source?)
+        assert(Source::URL.parse("https://genshin-impact.fandom.com/wiki/Ningguang/Gallery").bad_source?)
+      end
     end
   end
 end
