@@ -1,22 +1,4 @@
 div#news-updates {
-  padding: 5px;
   background: var(--news-updates-background);
   border-bottom: 2px solid var(--news-updates-border-color);
-  font-size: var(--text-sm);
-
-  ul {
-    float: left;
-    margin: 0;
-    padding: 0;
-  }
-
-  li {
-    float: left;
-    margin: 0 2em 0 0;
-    padding: 0;
-  }
-
-  a#close-news-ticker-link {
-    float: right;
-  }
 }
