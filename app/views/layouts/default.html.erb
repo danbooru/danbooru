@@ -62,14 +62,14 @@
 
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item, @exception) do %>
   <% if NewsUpdate.recent.present? %>
-    <div id="news-updates" data-id="<%= NewsUpdate.recent.first.try(:id) %>" style="display: none;">
-      <ul>
+    <div id="news-updates" data-id="<%= NewsUpdate.recent.first.try(:id) %>" class="flex gap-1 p-1 items-center text-center text-xs <%= ("hidden" if cookies["news-ticker"].to_i == NewsUpdate.recent.first.try(:id)) %>">
+      <div class="flex-grow-1">
         <% NewsUpdate.recent.each do |news_update| %>
-          <li><%= news_update.message.html_safe %></li>
+          <div><%= news_update.message.html_safe %></div>
         <% end %>
-      </ul>
+      </div>
 
-      <a href="#" id="close-news-ticker-link"><%= close_icon %></a>
+      <a href="#" id="close-news-ticker-link" class="px-2 py-1"><%= close_icon %></a>
     </div>
   <% end %>
 
