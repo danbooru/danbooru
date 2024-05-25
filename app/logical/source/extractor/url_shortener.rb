@@ -5,7 +5,7 @@
 # TODO: Add more shorteners from https://wiki.archiveteam.org/index.php/URLTeam. Use data dumps to unshorten dead URLs?
 class Source::Extractor::URLShortener < Source::Extractor
   delegate :page_url, :profile_url, :artist_name, :display_name, :username, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
-  delegate :domain, :site, :host, :path, :path_segments, to: :parsed_url
+  delegate :domain, :site, :host, :path, :path_segments, :params, to: :parsed_url
 
   def image_urls
     sub_extractor&.image_urls || []
@@ -44,6 +44,17 @@ class Source::Extractor::URLShortener < Source::Extractor
     in "amzn.to", id
       response = http.no_follow.head(https_url)
       response.headers["Location"] if response.status.code == 301
+
+    # curl -I https://hoyo.link/aifgFBAL
+    # curl -I https://hoyo.link/80GCFBAL?q=25tufAgwB8N
+    in "hoyo.link", id
+      if params[:q].present?
+        url = http.redirect_url("https://bbs-api-os.hoyolab.com/community/misc/api/transit?q=#{params[:q]}", method: "GET")
+        url&.params&.dig(:url) || url&.to_s
+      else
+        url = http.redirect_url("https://sg-public-api.hoyoverse.com/common/short_link_user/v1/transit?code=#{id}", method: "GET").to_s
+        url unless url == "https://webstatic.hoyoverse.com/short_link/404_v2.html"
+      end
 
     # curl -v https://naver.me/FABhCw8Z
     # HEAD not supported; https://naver.me redirects to http://naver.me; returns 307 on success and 404 on error.

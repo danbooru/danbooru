@@ -30,8 +30,10 @@ class Source::URL::URLShortener < Source::URL
     # https://t.co/Dxn7CuVErW
     # https://wp.me/p32Sjo-oJ
     # https://x.gd/uysub
-    # http://xhslink.com/WNd9gI
-    url.domain.in?(%w[0rz.tw amzn.to bit.ly j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl is.gd naver.me pin.it pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.co wp.me x.gd xhslink.com]) ||
+    # https://xhslink.com/WNd9gI
+    # https://hoyo.link/80GCFBAL?q=25tufAgwB8N
+    # https://hoyo.link/aifgFBAL
+    url.domain.in?(%w[0rz.tw amzn.to bit.ly j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl hoyo.link is.gd naver.me pin.it pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.co wp.me x.gd xhslink.com]) ||
 
     # https://pic.twitter.com/Dxn7CuVErW
     # https://pic.x.com/Dxn7CuVErW
@@ -51,6 +53,8 @@ class Source::URL::URLShortener < Source::URL
       "Bitly"
     in _, "twitter.com" | "t.co"
       "Twitter"
+    in _, "hoyo.link"
+      "Hoyolab"
     in _, "eepurl.com"
       "Mailchimp"
     in _, "naver.me"
