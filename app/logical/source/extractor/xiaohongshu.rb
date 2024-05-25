@@ -9,6 +9,10 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
       [parsed_url.full_image_url]
     elsif parsed_url.image_url?
       [parsed_url.to_s]
+    elsif note[:type] == "video"
+      key = note.dig(:video, :consumer, :originVideoKey)
+      video_url = "https://sns-video-bd.xhscdn.com/#{key}" if key.present?
+      [video_url].compact
     else
       note["imageList"].to_a.pluck("urlDefault").map do |url|
         Source::URL.parse(url).try(:full_image_url) || url

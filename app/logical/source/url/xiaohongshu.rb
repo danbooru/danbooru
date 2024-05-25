@@ -47,6 +47,8 @@ class Source::URL::Xiaohongshu < Source::URL
     in _, "xiaohongshu.com", "user", "profile", user_id
       @user_id = user_id
 
+    # http://sns-video-bd.xhscdn.com/stream/110/258/01e62cb7e42033da010370018f1eb04fee_258.mp4 (video sample)
+    # https://sns-video-al.xhscdn.com/pre_post/1040g2t03123bm2b13q6g5o56b7k085i9gkig2ho (video full)
     # https://sns-avatar-qc.xhscdn.com/avatar/1040g2jo30s5tg4ugig605ohki5uk137o34ug2fo (profile picture)
     # https://picasso-static.xiaohongshu.com/fe-platform/81cedd016ad9d8bef38b2cd0c1e725454df53598.png (emoji)
     # http://xhslink.com/WNd9gI

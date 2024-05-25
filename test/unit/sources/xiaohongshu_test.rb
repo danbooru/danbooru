@@ -96,6 +96,29 @@ module Sources
         )
       end
 
+      context "A video post" do
+        strategy_should_work(
+          "https://www.xiaohongshu.com/explore/662cb841000000000d030cbd",
+          image_urls: %w[https://sns-video-bd.xhscdn.com/pre_post/1040g2t03123bm2b13q6g5o56b7k085i9gkig2ho],
+          media_files: [{ file_size: 31_213_453 }],
+          page_url: "https://www.xiaohongshu.com/explore/662cb841000000000d030cbd",
+          profile_url: "https://www.xiaohongshu.com/user/profile/60a659e80000000001001649",
+          profile_urls: %w[https://www.xiaohongshu.com/user/profile/60a659e80000000001001649],
+          display_name: "白歌",
+          username: nil,
+          tags: [
+            ["崩坏星穹铁道创作者激励计划", "https://www.xiaohongshu.com/search_result/?keyword=崩坏星穹铁道创作者激励计划"],
+            ["崩坏星穹铁道", "https://www.xiaohongshu.com/search_result/?keyword=崩坏星穹铁道"],
+            ["星穹铁道生日会", "https://www.xiaohongshu.com/search_result/?keyword=星穹铁道生日会"],
+            ["开拓时间到", "https://www.xiaohongshu.com/search_result/?keyword=开拓时间到"],
+          ],
+          dtext_artist_commentary_title: "第一次看到砂金输的这么惨，青雀深藏不露啊",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            第一次看到砂金输的这么惨，青雀深藏不露啊#崩坏星穹铁道创作者激励计划[话题]# #崩坏星穹铁道[话题]# #星穹铁道生日会[话题]# #开拓时间到[话题]#
+          EOS
+        )
+      end
+
       context "A deleted or nonexistent post" do
         strategy_should_work(
           "https://www.xiaohongshu.com/explore/999999999",
