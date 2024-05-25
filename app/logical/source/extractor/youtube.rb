@@ -38,18 +38,39 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def tags
-    []
+    community_post.dig(:contentText, :runs).to_a.filter_map do |run|
+      url = run.dig(:navigationEndpoint, :commandMetadata, :webCommandMetadata, :url)&.then { |u| Danbooru::URL.unescape(u) }
+      next unless url&.starts_with?("/hashtag/")
+
+      [url.delete_prefix("/hashtag/"), "https://www.youtube.com#{url}"]
+    end
   end
 
   def artist_commentary_title
   end
 
   def artist_commentary_desc
-    community_post.dig("contentText", "runs").to_a.pluck("text").join
+    community_post[:contentText]&.to_json
   end
 
   def dtext_artist_commentary_desc
-    DText.from_plaintext(artist_commentary_desc)
+    DText.from_html(html_artist_commentary_desc, base_url: "https://www.youtube.com")
+  end
+
+  def html_artist_commentary_desc
+    community_post.dig(:contentText, :runs).to_a.map do |run|
+      text = CGI.escapeHTML(run[:text].to_s).gsub("\r\n", "\n").gsub("\r", "").normalize_whitespace.gsub("\n", "<br>")
+      url = run.dig(:navigationEndpoint, :commandMetadata, :webCommandMetadata, :url)
+
+      if url&.starts_with?("/")
+        url = Danbooru::URL.unescape(url)
+        %{<a href="https://www.youtube.com#{CGI.escapeHTML(url)}">#{text}</a>}
+      elsif url&.starts_with?("https://www.youtube.com/redirect")
+        %{<a href="#{text}">#{text}</a>}
+      else
+        "<span>#{text}</span>"
+      end
+    end.join
   end
 
   def community_post_id
