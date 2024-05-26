@@ -288,11 +288,11 @@ module ApplicationHelper
     end
   end
 
-  def search_form_for(url, classes: "inline-form", method: :get, &block)
+  def search_form_for(url, attribute: :search, classes: "inline-form", method: :get, &block)
     defaults = { required: false }
     html_options = { autocomplete: "off", novalidate: true, class: "search-form #{classes}" }
 
-    simple_form_for(:search, method: method, url: url, defaults: defaults, html: html_options) do |f|
+    simple_form_for(attribute, method: method, url: url, defaults: defaults, html: html_options) do |f|
       out = "".html_safe
       out += tag.input(type: :hidden, name: :limit, value: params[:limit]) if params[:limit].present?
       out += capture { yield f } if block_given?

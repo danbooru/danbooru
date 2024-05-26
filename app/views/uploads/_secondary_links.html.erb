@@ -2,6 +2,7 @@
   <%= subnav_link_to "Upload", new_upload_path %> |
   <%= subnav_link_to "My Uploads", user_uploads_path(CurrentUser.user.id.to_i) %>
   <%= subnav_link_to "All Uploads", media_assets_path %>
-  <%= subnav_link_to "Reverse Image Search", iqdb_queries_path %> |
+  <%= subnav_link_to "Reverse Image Search", iqdb_queries_path %>
+  <%= subnav_link_to "Source Info", source_path %> |
   <%= subnav_link_to "Help", wiki_page_path("help:upload") %>
 <% end %>

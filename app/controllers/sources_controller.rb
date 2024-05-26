@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 class SourcesController < ApplicationController
-  respond_to :js, :json, :xml
+  respond_to :js, :json, :xml, :html
 
   def show
-    @source = Source::Extractor.find(params[:url], params[:ref])
+    @source = Source::Extractor.find(params[:url], params[:ref]) if params[:url].present?
+    @mode = params[:mode] || "card"
 
     respond_with(@source.to_h) do |format|
       format.xml { render xml: @source.to_h.to_xml(root: "source") }
