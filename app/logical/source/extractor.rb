@@ -315,26 +315,21 @@ module Source
 
     def to_h
       {
-        :artist => {
-          :name => artist_name,
-          :tag_name => tag_name,
-          :other_names => other_names,
-          :profile_url => profile_url,
-          :profile_urls => profile_urls
+        page_url: page_url,
+        image_urls: image_urls,
+        artist: {
+          display_name: display_name,
+          username: username,
+          profile_urls: profile_urls,
+          artists: artists.as_json(only: %i[id name]),
         },
-        :artists => artists.as_json(include: :sorted_urls),
-        :image_urls => image_urls,
-        :page_url => page_url,
-        :tags => tags,
-        :normalized_tags => normalized_tags,
-        :translated_tags => translated_tags,
-        :artist_commentary => {
-          :title => artist_commentary_title,
-          :description => artist_commentary_desc,
-          :dtext_title => dtext_artist_commentary_title,
-          :dtext_description => dtext_artist_commentary_desc
+        tags: tags,
+        artist_commentary: {
+          title: artist_commentary_title,
+          description: artist_commentary_desc,
+          dtext_title: dtext_artist_commentary_title,
+          dtext_description: dtext_artist_commentary_desc,
         },
-        :api_response => api_response
       }
     end
 
