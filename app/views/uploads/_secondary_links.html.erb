@@ -10,5 +10,7 @@
       <%= subnav_link_to "Delete", upload_path(@upload), remote: true, method: :delete, data: { shortcut: "shift-d", confirm: "Are you sure you want to delete this upload?" } %>
     <% end %>
   <% end %>
+  <%= subnav_link_to "Reverse Image Search", iqdb_queries_path %>
+  <%= subnav_link_to "Source Info", source_path %> |
   <%= subnav_link_to "Help", wiki_page_path("help:upload") %>
 <% end %>
