@@ -363,6 +363,57 @@ module Source
       each_parent.to_a
     end
 
+    memoize def test_case
+      file_sizes = image_urls.filter_map do |url|
+        response = http_downloader.head(url)
+        file_size = response["Content-Length"] || "0"
+        file_size = "0" if !response.status.in?(200..299)
+
+        pretty_file_size = file_size.reverse.chars.each_slice(3).map(&:join).join("_").reverse # "1234567" -> "1_234_567"
+        "{ file_size: #{pretty_file_size} }"
+      end
+
+      template = Erubi::Engine.new <<~TEST.chomp
+        strategy_should_work(
+          <%= url.inspect %>,
+        <% if image_urls.empty? -%>
+          image_urls: [],
+        <% elsif image_urls.one? %>
+          image_urls: %w[<%= image_urls.first %>],
+          media_files: [<%= file_sizes.first %>],
+        <% else %>
+          image_urls: %w[
+            <%= image_urls.join("\n    ") %>
+          ],
+          media_files: [
+            <%= file_sizes.join(",\n    ") %>
+          ],
+        <% end %>
+          page_url: <%= page_url.inspect %>,
+          profile_urls: %w[<%= profile_urls.join(" ") %>],
+          display_name: <%= display_name.inspect %>,
+          username: <%= username.inspect %>,
+        <% if tags.empty? %>
+          tags: [],
+        <% else %>
+          tags: [
+            <%= tags.map(&:inspect).join(",\n    ") %>,
+          ],
+        <% end %>
+          dtext_artist_commentary_title: <%= dtext_artist_commentary_title.inspect %>,
+        <% if dtext_artist_commentary_desc.lines.size <= 1 %>
+          dtext_artist_commentary_desc: <%= dtext_artist_commentary_desc.inspect %>
+        <% else %>
+          dtext_artist_commentary_desc: <<~EOS.chomp
+        <%= dtext_artist_commentary_desc.to_s.gsub(/^/, "    ") %>
+          EOS
+        <% end %>
+        )
+      TEST
+
+      eval(template.src)
+    end
+
     # Convert commentary to dtext by stripping html tags. Sites can override
     # this to customize how their markup is translated to dtext.
     def self.to_dtext(text)
@@ -370,6 +421,12 @@ module Source
       text = Rails::Html::FullSanitizer.new.sanitize(text, encode_special_chars: false)
       text = CGI.unescapeHTML(text)
       text.strip
+    end
+
+    def inspect
+      variables = instance_values.reject { |key, _| key.starts_with?("_memoized") }.compact_blank
+      state = variables.map { |name, value| "@#{name}=#{value.inspect}" }.join(" ")
+      "#<#{self.class.name} #{state}>"
     end
 
     memoize :http, :http_downloader, :related_posts
