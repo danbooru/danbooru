@@ -320,5 +320,11 @@ module Source
     # the URL. This is called when the URL is initialized.
     protected def parse
     end
+
+    def inspect
+      variables = instance_values.without("url").reject { |key, _| key.starts_with?("_memoized") }.compact_blank
+      state = variables.map { |name, value| "@#{name}=#{value.inspect}" }.join(" ")
+      "#<#{self.class.name} #{state}>"
+    end
   end
 end

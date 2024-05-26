@@ -15,10 +15,16 @@
         <div class="flex gap-2 text-xs absolute top-4 right-4">
           <%= link_to multiple_images_icon, current_page_path(mode: "card"), class: [("inactive-link" if @mode != "card")] %>
           <%= link_to code_icon, current_page_path(mode: "json"), class: [("inactive-link" if @mode != "json")] %>
+
+          <% if Rails.env.local? %>
+            <%= link_to file_lines_icon, current_page_path(mode: "test"), class: [("inactive-link" if @mode != "test")] %>
+          <% end %>
         </div>
 
         <% if @mode == "json" %>
           <div class="whitespace-pre font-monospace text-sm overflow-auto"><%= JSON.pretty_generate(@source.to_json.parse_json) %></div>
+        <% elsif @mode == "test" && Rails.env.local? %>
+          <div class="whitespace-pre font-monospace text-sm overflow-auto"><%= @source.test_case %></div>
         <% else %>
           <div class="flex flex-col gap-2">
             <% if @source.display_name.present? || @source.username.present? || @source.profile_urls.present? %>

@@ -35,6 +35,12 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
       end
+
+      should "work for a HTML response with mode=test" do
+        get source_path, params: { url: "https://twitter.com/ttguweiz/status/1794358058526892509", mode: "test" }
+
+        assert_response :success
+      end
     end
   end
 end
