@@ -97,6 +97,7 @@ class Source::URL::Tumblr < Source::URL
     in _, "tumblr.com", *rest unless image_url? || subdomain == "www"
       @blog_name = subdomain
 
+    # https://static.tumblr.com/923d3a1b85bdabcb6276ea921911497f/w3ze2u2/mdHpc3im5/tumblr_static_cd6gq50ia8oc8s04kcok44gkc.jpg (page: https://eierschecke-gp.tumblr.com)
     else
       nil
     end
@@ -133,7 +134,8 @@ class Source::URL::Tumblr < Source::URL
     # http://data.tumblr.com/07e7bba538046b2b586433976290ee1f/tumblr_o3gg44HcOg1r9pi29o1_raw.jpg
     # https://40.media.tumblr.com/de018501416a465d898d24ad81d76358/tumblr_nfxt7voWDX1rsd4umo1_r23_1280.jpg
     # https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4
-    subdomain&.ends_with?(".media") || subdomain&.in?(%w[data media])
+    # https://static.tumblr.com/923d3a1b85bdabcb6276ea921911497f/w3ze2u2/mdHpc3im5/tumblr_static_cd6gq50ia8oc8s04kcok44gkc.jpg
+    subdomain&.ends_with?(".media") || subdomain&.in?(%w[data media static])
   end
 
   def video_url?
