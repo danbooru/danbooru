@@ -8,25 +8,34 @@ class Source::Extractor
     end
 
     def image_urls
-      return [find_largest(parsed_url)].compact if parsed_url.image_url?
+      if parsed_url.full_image_url.present?
+        extractor = Source::Extractor.find(parsed_url.full_image_url)
+        image_url = extractor.image_page_json.dig(:ImageUrlPage, :requestedImage)
+        [image_url || parsed_url.to_s]
+      elsif parsed_url.candidate_full_image_urls.present?
+        image_url = parsed_url.candidate_full_image_urls.find { |url| http_exists?(url) }
+        [image_url || parsed_url.to_s]
+      elsif parsed_url.image_url?
+        [parsed_url.to_s]
+      else
+        assets = []
 
-      assets = []
+        case post[:type]
+        when "photo"
+          assets += post[:photos].map do |photo|
+            sizes = [photo[:original_size]] + photo[:alt_sizes]
+            biggest = sizes.max_by { |x| x[:width] * x[:height] }
+            biggest[:url]
+          end
 
-      case post[:type]
-      when "photo"
-        assets += post[:photos].map do |photo|
-          sizes = [photo[:original_size]] + photo[:alt_sizes]
-          biggest = sizes.max_by { |x| x[:width] * x[:height] }
-          biggest[:url]
+        when "video"
+          assets += [post[:video_url]].compact_blank
         end
 
-      when "video"
-        assets += [post[:video_url]].compact_blank
+        assets += inline_media
+        assets = assets.flat_map { |url| Source::Extractor.find(url).image_urls }
+        assets.compact
       end
-
-      assets += inline_media
-      assets = assets.map { |url| find_largest(url) }
-      assets.compact
     end
 
     def page_url
@@ -174,18 +183,6 @@ class Source::Extractor
       end
     end
 
-    def find_largest(image_url)
-      parsed_image = Source::URL.parse(image_url)
-      if parsed_image.full_image_url.present?
-        image_url_html(parsed_image.full_image_url)&.at("img[src*='/#{parsed_image.directory}/']")&.[](:src)
-      elsif parsed_image.variants.present?
-        # Look for the biggest available version on media.tumblr.com. A bigger version may or may not exist.
-        parsed_image.variants.find { |variant| http_exists?(variant) } || image_url
-      else
-        parsed_image.original_url
-      end
-    end
-
     memoize def post_url_from_image_html
       # https://at.tumblr.com/everythingfox/everythingfox-so-sleepy/d842mqsx8lwd
       if parsed_url.subdomain == "at"
@@ -197,7 +194,7 @@ class Source::Extractor
       elsif parsed_url.image_url? && parsed_url.file_ext&.in?(%w[jpg png pnj gif])
         # https://compllege.tumblr.com/post/179415753146/codl-0001-c-experiment-2018%E5%B9%B410%E6%9C%8828%E6%97%A5-m3
         # https://yra.sixc.me/post/188271069189
-        post_url = image_url_html(parsed_url)&.at('meta[name="parsely-link"]')&.attr(:content)
+        post_url = image_page&.at('meta[name="parsely-link"]')&.attr(:content)
         return nil if post_url.blank?
 
         # The post URL may be a regular Tumblr post or a custom domain; custom domains are extracted to get the real Tumblr page URL.
@@ -205,10 +202,16 @@ class Source::Extractor
       end
     end
 
-    def image_url_html(image_url)
-      resp = http.cache(1.minute).headers(accept: "text/html").get(image_url)
+    # curl -H "User-Agent: Mozilla/5.0" -H "Accept: text/html" https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
+    memoize def image_page
+      return nil unless parsed_url.image_url?
+      resp = http.cache(1.minute).headers(accept: "text/html").get(parsed_url)
       return nil if resp.code != 200 || resp.mime_type != "text/html"
       resp.parse
+    end
+
+    memoize def image_page_json
+      image_page&.at("#___INITIAL_STATE___")&.text&.parse_json || {}
     end
 
     memoize def inline_media
