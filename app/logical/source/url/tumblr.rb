@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 class Source::URL::Tumblr < Source::URL
+  IMAGE_SIZES = %w[1280 720 640 540 500h 500 400 250 100]
   RESERVED_NAMES = %w[about app blog dashboard developers explore jobs login logo policy press register security tagged tips]
 
-  attr_reader :work_id, :blog_name, :directory, :full_image_url
+  attr_reader :work_id, :blog_name, :full_image_url, :candidate_full_image_urls
 
   def self.match?(url)
     url.domain.in?(%w[tumblr.com])
@@ -16,11 +17,10 @@ class Source::URL::Tumblr < Source::URL
     # https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s500x750/4f92bbaaf95c0b4e7970e62b1d2e1415859dd659.png
     # https://64.media.tumblr.com/3da3970775ba820dbc80ef3c5dae479e/dcc12b025632aa86-5f/s540x810/6433414944c280dfd6e8bb482e1d9f6466433901.pnj
     # https://64.media.tumblr.com/3da3970775ba820dbc80ef3c5dae479e/dcc12b025632aa86-5f/s540x810/6433414944c280dfd6e8bb482e1d9f6466433901.png
-    in _, "tumblr.com", *directories, /s\d+x\d+/ => dimensions, file if image_url?
-      @directory = directories.first
-      max_size = Integer.sqrt(Danbooru.config.max_image_resolution)
+    in _, "tumblr.com", /^\h{32}$/ => subdir1, /^\h{16}-[a-z0-9]{2}$/ => subdir2, /^s\d+x\d+$/, _
+      max_size = 21_000
       ext = (file_ext == "pnj") ? "png" : file_ext
-      @full_image_url = url.to_s.gsub(%r{/s\d+x\d+/\w+\.\w+\z}i, "/s#{max_size}x#{max_size}/#{filename}.#{ext}")
+      @full_image_url = "https://#{host}/#{subdir1}/#{subdir2}/s#{max_size}x#{max_size}/#{filename}.#{ext}"
 
     # http://data.tumblr.com/07e7bba538046b2b586433976290ee1f/tumblr_o3gg44HcOg1r9pi29o1_raw.jpg
     # https://40.media.tumblr.com/de018501416a465d898d24ad81d76358/tumblr_nfxt7voWDX1rsd4umo1_r23_1280.jpg
@@ -30,17 +30,21 @@ class Source::URL::Tumblr < Source::URL
     # https://media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_500.gif
     # https://66.media.tumblr.com/b9395771b2d0435fe4efee926a5a7d9c/tumblr_pg2wu1L9DM1trd056o2_500h.png
     # https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj
-    in _, "tumblr.com", directory, file if image_url?
-      @directory = directory
-      parse_filename
-
+    # https://64.media.tumblr.com/4b7fecf9a5a8284fbaefb051a2369b55/tumblr_npozqfwc9h1rt6u7do1_r1_540.gifv
+    #
     # https://25.media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png
     # https://media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_1280.png
     # https://media.tumblr.com/0DNBGJovY5j3smfeQs8nB53z_500.jpg
     # https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
     # https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4
-    in _, "tumblr.com", file if image_url?
-      parse_filename
+    # https://va.media.tumblr.com/tumblr_rjoh0hR8Xe1teimlz_720.mp4
+    in _, "tumblr.com", *subdirs, _ if image_url? && filename&.split("_")&.last&.in?(IMAGE_SIZES + ["raw"])
+      @candidate_full_image_urls = IMAGE_SIZES.map do |size|
+        media_host = (file_ext == "mp4") ? "https://va.media.tumblr.com" : "https://media.tumblr.com"
+        ext = (file_ext == "pnj") ? "png" : file_ext
+        file = filename.split("_").slice(0..-2).join("_")
+        [media_host, *subdirs, "#{file}_#{size}.#{ext}"].join("/")
+      end
 
     # https://marmaladica.tumblr.com/post/188237914346/saved
     # https://emlan.tumblr.com/post/189469423572/kuro-attempts-to-buy-a-racy-book-at-comiket-but
@@ -103,55 +107,12 @@ class Source::URL::Tumblr < Source::URL
     end
   end
 
-  def parse_filename
-    return if filename.blank?
-
-    case filename.split("_")
-
-    # http://data.tumblr.com/07e7bba538046b2b586433976290ee1f/tumblr_o3gg44HcOg1r9pi29o1_raw.jpg
-    # https://40.media.tumblr.com/de018501416a465d898d24ad81d76358/tumblr_nfxt7voWDX1rsd4umo1_r23_1280.jpg
-    # https://media.tumblr.com/de018501416a465d898d24ad81d76358/tumblr_nfxt7voWDX1rsd4umo1_r23_raw.jpg
-    # https://68.media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_250.gif
-    # https://media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_500.gif
-    # https://66.media.tumblr.com/b9395771b2d0435fe4efee926a5a7d9c/tumblr_pg2wu1L9DM1trd056o2_500h.png
-    # https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj
-    # https://25.media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png
-    # https://media.tumblr.com/0DNBGJovY5j3smfeQs8nB53z_500.jpg
-    in *words, /\A\d+h?|raw\z/ => size
-      @filename = words.join("_")
-      @sample_size = size
-
-    # https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4
-    # https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
-    # https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s500x750/4f92bbaaf95c0b4e7970e62b1d2e1415859dd659.png
-    else
-      @filename = filename
-      @sample_size = nil
-    end
-  end
-
   def image_url?
     # http://data.tumblr.com/07e7bba538046b2b586433976290ee1f/tumblr_o3gg44HcOg1r9pi29o1_raw.jpg
     # https://40.media.tumblr.com/de018501416a465d898d24ad81d76358/tumblr_nfxt7voWDX1rsd4umo1_r23_1280.jpg
     # https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4
     # https://static.tumblr.com/923d3a1b85bdabcb6276ea921911497f/w3ze2u2/mdHpc3im5/tumblr_static_cd6gq50ia8oc8s04kcok44gkc.jpg
     subdomain&.ends_with?(".media") || subdomain&.in?(%w[data media static])
-  end
-
-  def video_url?
-    # https://va.media.tumblr.com/tumblr_rjoh0hR8Xe1teimlz_720.mp4
-    image_url? && file_ext.in?(%w[mp4 webm])
-  end
-
-  def variants
-    return [] unless @sample_size.present? && @filename.present?
-    directory = "#{@directory}/" if @directory.present?
-
-    media_host = video_url? ? "va.media.tumblr.com" : "media.tumblr.com"
-    sizes = %w[1280 720 640 540 500h 500 400 250 100]
-
-    ext = (file_ext == "pnj") ? "png" : file_ext
-    sizes.map { |size| "https://#{media_host}/#{directory}#{@filename}_#{size}.#{ext}" }
   end
 
   def page_url

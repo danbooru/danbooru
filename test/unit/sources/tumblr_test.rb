@@ -49,7 +49,7 @@ module Sources
         )
       end
 
-      context "A *.media.tumblr.com/$hash/tumblr_$id_rN_$size image URL" do
+      context "A *.media.tumblr.com/$hash/tumblr_$id_rN_$size.gif URL" do
         strategy_should_work(
           "https://33.media.tumblr.com/4b7fecf9a5a8284fbaefb051a2369b55/tumblr_npozqfwc9h1rt6u7do1_r1_500.gif",
           image_urls: %w[https://media.tumblr.com/4b7fecf9a5a8284fbaefb051a2369b55/tumblr_npozqfwc9h1rt6u7do1_r1_1280.gif],
@@ -122,6 +122,24 @@ module Sources
           image_urls: %w[https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.png],
           media_files: [{ file_size: 296_595, file_ext: :jpg }],
           page_url: nil
+        )
+      end
+
+      context "A *.media.tumblr.com/$key/$size/$hash.jpg URL" do
+        strategy_should_work(
+          "https://64.media.tumblr.com/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s1280x1920/46f4af7ec94456f8fef380ee6311eb81178ce7e9.jpg",
+          image_urls: %w[https://64.media.tumblr.com/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s21000x21000/402eb21f2ae48d0d3822cb2cb943eb247e735f2f.jpg],
+          media_files: [{ file_size: 7_428_704 }],
+          page_url: "https://make-do5.tumblr.com/post/619663949657423872",
+          profile_urls: %w[https://make-do5.tumblr.com],
+          display_name: nil,
+          username: "make-do5",
+          tags: [
+            ["original", "https://tumblr.com/tagged/original"],
+            ["illustration", "https://tumblr.com/tagged/illustration"],
+          ],
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: ""
         )
       end
 
@@ -336,24 +354,6 @@ module Sources
 
             test answer
           EOS
-        )
-      end
-
-      context "A post with new image URLs" do
-        strategy_should_work(
-          "https://64.media.tumblr.com/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s1280x1920/46f4af7ec94456f8fef380ee6311eb81178ce7e9.jpg",
-          image_urls: %w[https://64.media.tumblr.com/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s21000x21000/402eb21f2ae48d0d3822cb2cb943eb247e735f2f.jpg],
-          media_files: [{ file_size: 7_428_704 }],
-          page_url: "https://make-do5.tumblr.com/post/619663949657423872",
-          profile_urls: %w[https://make-do5.tumblr.com],
-          display_name: nil,
-          username: "make-do5",
-          tags: [
-            ["original", "https://tumblr.com/tagged/original"],
-            ["illustration", "https://tumblr.com/tagged/illustration"],
-          ],
-          dtext_artist_commentary_title: "",
-          dtext_artist_commentary_desc: ""
         )
       end
 
