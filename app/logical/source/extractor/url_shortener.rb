@@ -35,7 +35,7 @@ class Source::Extractor::URLShortener < Source::Extractor
   end
 
   memoize def redirect_url
-    https_url = URI.join("https://#{host}", path)
+    https_url = Addressable::URI.join("https://#{host}", path)
 
     case [domain, *path_segments]
 
@@ -91,6 +91,8 @@ class Source::Extractor::URLShortener < Source::Extractor
     # curl -I http://xhslink.com/WNd9gI
     # Returns 307 on success, 307 redirect to http://www.xiaohongshu.com on error, and 500 if id is too long.
     in "xhslink.com", id
+      # http://xhslink.com/ErpbmK，复制本条信息，打开【小红书】App查看精彩内容！
+      id, _ = id.split("，")
       url = http.redirect_url(https_url)&.to_s
       url unless url == "http://www.xiaohongshu.com"
 
