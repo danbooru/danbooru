@@ -109,6 +109,7 @@ module Source
       Source::URL::Toyhouse,
       Source::URL::Skland,
       Source::URL::Miyoushe,
+      Source::URL::Grafolio,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
