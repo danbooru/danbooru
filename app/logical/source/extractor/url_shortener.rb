@@ -39,6 +39,11 @@ class Source::Extractor::URLShortener < Source::Extractor
 
     case [domain, *path_segments]
 
+    # curl -v https://amzn.asia/bGjatHL
+    # Returns 301 on success and 404 on error. Doesn't support HEAD.
+    in "amzn.asia", *rest
+      http.redirect_url(https_url, method: "GET")&.to_s
+
     # curl -I https:///amzn.to/2oaTatI
     # Returns 301 on success and a 302 redirect to http://www.amazon.com on error.
     in "amzn.to", id
@@ -95,6 +100,13 @@ class Source::Extractor::URLShortener < Source::Extractor
       id, _ = id.split("，")
       url = http.redirect_url(https_url)&.to_s
       url unless url == "http://www.xiaohongshu.com"
+
+    # curl -v https://t.cn/A6pONxY1 # -> https://video.weibo.com/show?fid=1034:4914351942074379
+    # Returns 302 redirect for trusted URLs, 200 success with Location header for untrusted URLs, and 302 redirect to http://weibo.com/sorry on error. Requires browser user agent and GET method.
+    in "t.cn", id
+      response = http.no_follow.get(https_url)
+      url = response.headers["Location"] if response.status.code.in?(200..399)
+      url unless url == "http://weibo.com/sorry"
 
     # curl -I https://t.co/Dxn7CuVErW
     # curl -I https://pic.twitter.com/Dxn7CuVErW
