@@ -8,7 +8,7 @@ class Source::URL::NaverPost < Source::URL
   attr_reader :username, :user_id, :post_id, :full_image_url
 
   def self.match?(url)
-    url.host.in?(%w[post.naver.com m.post.naver.com post-phinf.pstatic.net post.phinf.naver.net blog.kakaocdn.net])
+    url.host.in?(%w[post.naver.com m.post.naver.com post-phinf.pstatic.net post.phinf.naver.net])
   end
 
   def parse
@@ -21,10 +21,6 @@ class Source::URL::NaverPost < Source::URL
     # http://post-phinf.pstatic.net/20160324_74/1458783545129zPGJg_JPEG/%B0%AD%B3%B2TV_%B0%C9%B1%D7%B7%EC_%BD%BA%C0%A7%C4%A1%BA%A3%B8%AE_%B0%A1%BB%F3%C7%F6%BD%C7_360VR_%BC%EE%C4%C9%C0%CC%BD%BA_%B9%C2%C1%F7%BA%F1%B5%F0%BF%C0_%BB%E7%C1%F82.jpg/IT8SeAh7YSaM55bq7KMOEE5ImDlU.jpg
     # http://post.phinf.naver.net/20160324_74/1458783545129zPGJg_JPEG/%B0%AD%B3%B2TV_%B0%C9%B1%D7%B7%EC_%BD%BA%C0%A7%C4%A1%BA%A3%B8%AE_%B0%A1%BB%F3%C7%F6%BD%C7_360VR_%BC%EE%C4%C9%C0%CC%BD%BA_%B9%C2%C1%F7%BA%F1%B5%F0%BF%C0_%BB%E7%C1%F82.jpg/IT8SeAh7YSaM55bq7KMOEE5ImDlU.jpg
     in /phinf$/, ("naver.net" | "pstatic.net"), *rest
-      @full_image_url = without(:query).to_normalized_s
-
-    # https://blog.kakaocdn.net/dn/cJSXhs/btqHBRGLYvT/uJXMz48vCSKHMWs4aN8ytK/img.jpg
-    in _, "kakaocdn.net", *rest
       @full_image_url = without(:query).to_normalized_s
 
     # https://post.naver.com/viewer/image.nhn?src=https://post-phinf.pstatic.net/MjAxODEyMjZfMiAg/MDAxNTQ1NzgzMzAwMDkz.uFFOHZ8HeFnn-9_qpr3kl4QAt4pvMBi1O1evmSIp8Y4g.PMJ-2dLbfuqMxzEg62Bc84vUn7v0Cjttfaxd8HaY9TIg.JPEG/%25EA%25B0%259C%25EC%259D%25B8%25EC%259E%2591_%25EB%25B8%2594%25EC%2586%258C%25EB%25A6%25B0%25EC%25A1%25B1.jpg
@@ -52,6 +48,7 @@ class Source::URL::NaverPost < Source::URL
     in _, "naver.com", username, *rest unless username.in?(RESERVED_USERNAMES) || username.match?(/\.(nhn|naver)$/)
       @username = username
 
+    # https://blog.kakaocdn.net/dn/cJSXhs/btqHBRGLYvT/uJXMz48vCSKHMWs4aN8ytK/img.jpg
     else
       nil
     end
