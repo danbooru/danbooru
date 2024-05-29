@@ -32,6 +32,17 @@ module Sources
         )
       end
 
+      context "A blog.kakaocdn.net image URL with a Naver Post referer" do
+        strategy_should_work(
+          "https://blog.kakaocdn.net/dn/cOHAHD/btqE562vL5q/y07jEFcA4KijDg57EY44c0/img.png",
+          referer: "https://post.naver.com/viewer/postView.naver?volumeNo=28956950&memberNo=23461945",
+          image_urls: %w[https://blog.kakaocdn.net/dn/cOHAHD/btqE562vL5q/y07jEFcA4KijDg57EY44c0/img.png],
+          media_files: [{ file_size: 14_347 }],
+          page_url: "https://post.naver.com/viewer/postView.naver?volumeNo=28956950&memberNo=23461945",
+          profile_urls: %w[https://post.naver.com/my.naver?memberNo=23461945]
+        )
+      end
+
       context "A postView.naver page with a complex commentary" do
         strategy_should_work(
           "https://post.naver.com/viewer/postView.naver?volumeNo=28956950&memberNo=23461945",

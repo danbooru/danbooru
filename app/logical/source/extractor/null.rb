@@ -94,6 +94,8 @@ module Source
           Source::URL::Note.new(url).extractor(parent_extractor: self)
         elsif Source::URL::Blogger.new(url).page_url? && page&.at('meta[name="generator"]')&.attr("content") == "blogger"
           Source::URL::Blogger.new(url).extractor(parent_extractor: self)
+        elsif Source::URL::Tistory.new(url).page_url? && twitter_site == "@TISTORY"
+          Source::URL::Tistory.new(url).extractor(parent_extractor: self)
         elsif is_misskey?
           misskey_referer = Source::URL::Misskey.new(referer_url) unless referer_url.nil?
           Source::URL::Misskey.new(url).extractor(referer_url: misskey_referer, parent_extractor: self)
