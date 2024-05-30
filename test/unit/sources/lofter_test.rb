@@ -200,6 +200,94 @@ module Sources
       )
     end
 
+    context "A photo-type lofter post with photo captions" do
+      strategy_should_work(
+        "https://honkai.lofter.com/post/1ff23f93_12d66a85b",
+        image_urls: %w[
+          https://imglf6.lf127.net/img/TjdteWU3UmU0SkpHOUVVV3RjK0MzdFNwTjlLeHkwbEdyc3FwRGZvblNFbWtyTW4xY0lqeEFBPT0.png
+          https://imglf5.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHYVp5WW5DbzZNbld4cFArZGxGSXZhbmxhR3cvR04weFVBPT0.png
+          https://imglf5.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHVy92V3lBeTZlRUxzMC9RditVc3BCSGxzYVlaMTBvWXlBPT0.png
+          https://imglf3.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHZmM3SzdBdGRWQmZScWtQYzR3YWlBcDB6RHZBSDBJbnFnPT0.png
+          https://imglf6.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHVWY1ZTVQVTNCaklscjF6M3ZyeUlrNWZEQldPR0tmY3h3PT0.png
+          https://imglf6.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHV3ZZbXB0UFVWUUEwUDk5aWJ3M25odGJtUFBTN0hTMkh3PT0.png
+          https://imglf4.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHWnpnSzBMTnJpL0h1ZmJuY1U4ZVlYRXNzaHJxMGVsc2l3PT0.png
+          https://imglf6.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHZHM4aHhCdW1xR2pOOHJDSng2WGxVYmdoS2h0Vkg1cVpnPT0.png
+          https://imglf6.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHVzlCRW5kSy9zSGpPait1QW9EZkRNMU91T3NCZWdqcnRRPT0.png
+          https://imglf6.lf127.net/img/TjdteWU3UmU0SktZaGlOalFHeXdoREhDUXBYT3Z5YldkK3lXUHd5Z0l1OXdNNjhOUUNHRWlnPT0.png
+        ],
+        media_files: [
+          { file_size: 7_046_333 },
+          { file_size: 4_346_073 },
+          { file_size: 4_423_483 },
+          { file_size: 3_761_709 },
+          { file_size: 4_608_582 },
+          { file_size: 4_862_937 },
+          { file_size: 3_859_898 },
+          { file_size: 4_379_177 },
+          { file_size: 3_962_693 },
+          { file_size: 5_450_938 },
+        ],
+        page_url: "https://honkai.lofter.com/post/1ff23f93_12d66a85b",
+        profile_urls: %w[https://honkai.lofter.com],
+        display_name: "崩崩CG Collection",
+        username: "honkai",
+        tags: [
+          ["崩坏学园2", "https://www.lofter.com/tag/崩坏学园2"],
+          ["登陆CG", "https://www.lofter.com/tag/登陆CG"],
+          ["琪亚娜", "https://www.lofter.com/tag/琪亚娜"],
+          ["德丽莎", "https://www.lofter.com/tag/德丽莎"],
+          ["布洛妮娅", "https://www.lofter.com/tag/布洛妮娅"],
+          ["杏玛尔", "https://www.lofter.com/tag/杏玛尔"],
+          ["雷电芽衣", "https://www.lofter.com/tag/雷电芽衣"],
+          ["九霄", "https://www.lofter.com/tag/九霄"],
+          ["希儿", "https://www.lofter.com/tag/希儿"],
+          ["姬子", "https://www.lofter.com/tag/姬子"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          "[image]":[https://imglf6.lf127.net/img/TjdteWU3UmU0SkpHOUVVV3RjK0MzdFNwTjlLeHkwbEdyc3FwRGZvblNFbWtyTW4xY0lqeEFBPT0.png]
+
+          "[image]":[https://imglf5.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHYVp5WW5DbzZNbld4cFArZGxGSXZhbmxhR3cvR04weFVBPT0.png]
+
+          Kiana Kaslana / 琪亚娜·卡斯兰娜
+
+          "[image]":[https://imglf5.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHVy92V3lBeTZlRUxzMC9RditVc3BCSGxzYVlaMTBvWXlBPT0.png]
+
+          Raiden Mei / 雷电芽衣
+
+          "[image]":[https://imglf3.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHZmM3SzdBdGRWQmZScWtQYzR3YWlBcDB6RHZBSDBJbnFnPT0.png]
+
+          Bronya Zaychik / 布洛妮娅·扎伊切克
+
+          "[image]":[https://imglf6.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHVWY1ZTVQVTNCaklscjF6M3ZyeUlrNWZEQldPR0tmY3h3PT0.png]
+
+          Theresa Apocalypse / 德丽莎·阿波卡利斯
+
+          "[image]":[https://imglf6.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHV3ZZbXB0UFVWUUEwUDk5aWJ3M25odGJtUFBTN0hTMkh3PT0.png]
+
+          Murata Himeko / 无量塔姬子
+
+          "[image]":[https://imglf4.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHWnpnSzBMTnJpL0h1ZmJuY1U4ZVlYRXNzaHJxMGVsc2l3PT0.png]
+
+          Sin Mal / 杏·玛尔
+
+          "[image]":[https://imglf6.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHZHM4aHhCdW1xR2pOOHJDSng2WGxVYmdoS2h0Vkg1cVpnPT0.png]
+
+          Seele Vollerei / 希儿·芙乐艾
+
+          "[image]":[https://imglf6.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHVzlCRW5kSy9zSGpPait1QW9EZkRNMU91T3NCZWdqcnRRPT0.png]
+
+          Houraiji Kyuusyou / 蓬莱寺九霄
+
+          "[image]":[https://imglf6.lf127.net/img/TjdteWU3UmU0SktZaGlOalFHeXdoREhDUXBYT3Z5YldkK3lXUHd5Z0l1OXdNNjhOUUNHRWlnPT0.png]
+
+          Yssring Leavtruth / 伊瑟琳·利维休斯
+
+          和风特辑1【第二部分请点这："和风特辑2":[https://honkai.lofter.com/post/1ff23f93_1c7d228e5]】
+        EOS
+      )
+    end
+
     context "An answer-type lofter post" do
       strategy_should_work(
         "https://jiuhaotaiyangdeshexian.lofter.com/post/73f37cdf_2b86a4ae7",
