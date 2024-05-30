@@ -327,7 +327,7 @@ module Sources
         deleted: true,
         username: "masayasuf",
         profile_url: "https://twitter.com/masayasuf",
-        dtext_artist_commentary_desc: nil,
+        dtext_artist_commentary_desc: ""
       )
     end
 
@@ -337,7 +337,7 @@ module Sources
         username: "tanso_panz",
         profile_url: "https://twitter.com/tanso_panz",
         image_urls: [],
-        dtext_artist_commentary_desc: nil,
+        dtext_artist_commentary_desc: ""
       )
     end
 
@@ -438,7 +438,7 @@ module Sources
       strategy_should_work(
         "https://twitter.com/VG_Worklog/status/1587457941418160128",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          Sound by: "@RealAudiodude":[https://twitter.com/RealAudiodude]\x20
+          Sound by: "@RealAudiodude":[https://twitter.com/RealAudiodude]
           Download: <https://mega.nz/folder/i80gVL7L#111g2XX7bIJ-2KnAHxMt0w>
           Support: <https://www.patreon.com/vgerotica>
         EOS
@@ -481,6 +481,116 @@ module Sources
         "https://twitter.com/Persona_Central/status/1750173292588097879",
         dtext_artist_commentary_desc: <<~EOS.chomp
           The new Shigenori Soejima illustration for Persona 3 Reload in Weekly Famitsu magazine issue &num;1834. "#P3R":[https://twitter.com/hashtag/P3R]
+        EOS
+      )
+    end
+
+    context "A tweet with alt text" do
+      strategy_should_work(
+        "https://x.com/maruyo_/status/1521844593804906496",
+        image_urls: %w[
+          https://pbs.twimg.com/media/FRu0eYvVgAA83Et.jpg:orig
+          https://pbs.twimg.com/media/FRu0eYwVEAAso2d.jpg:orig
+          https://pbs.twimg.com/media/FRu0eY2UUAE54PD.jpg:orig
+          https://pbs.twimg.com/media/FRu0eY9VcAEZluY.jpg:orig
+        ],
+        media_files: [
+          { file_size: 215_152 },
+          { file_size: 131_131 },
+          { file_size: 151_909 },
+          { file_size: 128_702 }
+        ],
+        page_url: "https://twitter.com/maruyo_/status/1521844593804906496",
+        profile_urls: %w[https://twitter.com/maruyo_ https://twitter.com/intent/user?user_id=115694863],
+        display_name: "まるよ",
+        username: "maruyo_",
+        tags: [
+          ["スーパーカブ", "https://twitter.com/hashtag/スーパーカブ"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          GWなので再放送です☺
+          "#スーパーカブ":[https://twitter.com/hashtag/スーパーカブ]
+
+          [quote]
+          h6. Image Description
+
+          江ノ電カブネキからすっかりネタに走ってますがたまにまじめに描いてはいるのです。トークショーからもうそろそろ１か月でスタンプラリーももうすぐ終わりですね。5/8までなのでまだ間に合いますYO
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          これはメタルギアがネタですねｗ
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          トークショー脳内作画。礼子さんがおしとやかで小熊はそのまんまという感じですｗ バイク歴は真逆なのでライディング講座をするとか面白かったです。現地にいた人は優勝。なんと外からでも見ることができるようにしてくれるという神対応だったので最後まで居残った人は全員見られたはず（と思う）
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          情報量の多い画像です。配役はすぐこれだ！と思ったわけですｗ
+          [/quote]
+        EOS
+      )
+    end
+
+    context "A tweet with alt text containing multiple paragraphs" do
+      strategy_should_work(
+        "https://x.com/yamada999_anime/status/1642195121319071748",
+        image_urls: %w[https://pbs.twimg.com/media/FsjUfK9aYAYjmvP.jpg:orig],
+        media_files: [{ file_size: 1_656_293 }],
+        page_url: "https://twitter.com/yamada999_anime/status/1642195121319071748",
+        profile_urls: %w[https://twitter.com/yamada999_anime https://twitter.com/intent/user?user_id=1559447246646935552],
+        display_name: "TVアニメ「山田くんとLv999の恋をする」公式",
+        username: "yamada999_anime",
+        tags: [
+          ["山田999", "https://twitter.com/hashtag/山田999"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          💕••┈┈┈┈┈┈┈┈•• 💕
+          𝗕𝗹𝘂-𝗿𝗮𝘆&𝗗𝗩𝗗 𝗩𝗼𝗹.𝟭
+          𝟲.𝟮𝟴 𝗢𝗡 𝗦𝗔𝗟𝗘
+          🎮••┈┈┈┈┈┈┈┈•• 🎮
+
+          『山田くんとLv999の恋をする』
+          Blu-ray&DVD発売決定🎮
+
+          Vol.1は6/28発売💜
+
+          描き下ろしジャケットイラスト解禁💫
+
+          ▼CMはこちら
+          <https://youtu.be/ZNbTEIawZN4>
+
+          "#山田999":[https://twitter.com/hashtag/山田999]
+
+          [quote]
+          h6. Image Description
+
+          『山田くんとLv999の恋をする 1』
+          2023.6.28(wed) Release
+
+          完全生産限定版 Blu-ray 6,800円+税
+          完全生産限定版 DVD 5,800円+税
+          収録話数：Lv.01/Lv.02
+
+          🎮完全生産限定版特典🎮
+          ●原作：ましろ描き下ろし全巻収納BOX
+          ●キャラクターデザイン：濱田邦彦描き下ろし三方背ケース仕様
+          ●ランダムトレカ（※各巻に全3種中ランダム1枚を封入予定）
+          ●特製ブックレット（8P）
+          ●特典CD
+          水瀬いのり・内山昂輝のラジオLv999～気のせいかな。リスナーとのこの距離の名前、知ってるよ～ vol.1
+          ●特典映像
+          ①PV・CM集
+          ②ノンクレジットOPED
+          [/quote]
         EOS
       )
     end

@@ -89,44 +89,59 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
+      DText.from_html(html_artist_commentary_desc, base_url: "https://twitter.com")
+    end
+
+    def html_artist_commentary_desc
       return nil if artist_commentary_desc.blank?
 
-      dtext = "".dup
+      html = "".dup
       desc = artist_commentary_desc
       entities = []
       api_entities = graphql_tweet.dig(:note_tweet, :note_tweet_results, :result, :entity_set) || graphql_tweet.dig(:legacy, :entities)
 
       entities += api_entities[:hashtags].to_a.pluck(:indices, :text).map do |e|
-        { first: e[0][0], last: e[0][1], text: e[1], dtext: %Q("##{e[1]}":[https://twitter.com/hashtag/#{Danbooru::URL.escape(e[1])}]) }
+        { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="https://twitter.com/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(e[1]))}">##{CGI.escapeHTML(e[1])}</a>} }
       end
 
       entities += api_entities[:urls].to_a.pluck(:indices, :expanded_url).map do |e|
-        { first: e[0][0], last: e[0][1], text: e[1], dtext: "<#{e[1]}>" }
+        { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="#{CGI.escapeHTML(e[1])}">#{CGI.escapeHTML(e[1])}</a>} }
       end
 
       entities += api_entities[:user_mentions].to_a.pluck(:indices, :screen_name).map do |e|
-        { first: e[0][0], last: e[0][1], text: e[1], dtext: %Q("@#{e[1]}":[https://twitter.com/#{CGI.escape(e[1])}]) }
+        { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="https://twitter.com/#{CGI.escapeHTML(Danbooru::URL.escape(e[1]))}">@#{CGI.escapeHTML(e[1])}</a>} }
       end
 
       entities += api_entities[:symbols].to_a.pluck(:indices, :text).map do |e|
-        { first: e[0][0], last: e[0][1], text: e[1], dtext: %Q("$#{e[1]}":[https://twitter.com/search?q=$#{CGI.escape(e[1])}]) }
+        { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="https://twitter.com/search?q=$#{CGI.escapeHTML(Danbooru::URL.escape(e[1]))}">$#{CGI.escapeHTML(e[1])}</a>} }
       end
 
       entities += api_entities[:media].to_a.pluck(:indices, :expanded_url).map do |e|
-        { first: e[0][0], last: e[0][1], text: e[1], dtext: "" }
+        { first: e[0][0], last: e[0][1], text: e[1], html: "" }
       end
 
       entities.sort_by! { _1[:first] }
 
       i = 0
       entities.each do |entity|
-        dtext << DText.escape(CGI.unescapeHTML(desc[i..entity[:first] - 1])) if i < entity[:first]
-        dtext << entity[:dtext]
+        # HTML characters in `desc` are already escaped by Twitter, so we don't have to escape them ourselves.
+        html << desc[i..entity[:first] - 1].gsub("\n", "<br>") if i < entity[:first]
+        html << entity[:html]
         i = entity[:last]
       end
 
-      dtext << DText.escape(CGI.unescapeHTML(desc[i..desc.size]))
-      dtext.strip
+      html << desc[i..desc.size].gsub("\n", "<br>")
+
+      graphql_tweet.dig(:legacy, :entities, :media).to_a.pluck(:ext_alt_text).compact_blank.each do |alt_text|
+        html << <<~EOS.chomp
+          <blockquote>
+          <h6>Image Description</h6>
+          <p>#{CGI.escapeHTML(alt_text).gsub("\n", "<br>")}</p>
+          </blockquote>
+        EOS
+      end
+
+      html
     end
 
     memoize def syndication_api_response
