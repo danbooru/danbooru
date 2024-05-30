@@ -73,7 +73,30 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc, base_url: "https://www.lofter.com")
+        DText.from_html(html_artist_commentary_desc, base_url: profile_url)
+      end
+
+      def html_artist_commentary_desc
+        if post.dig(:photoPostView, :photoCaptions).present?
+          "#{image_captions} #{post.dig(:photoPostView, :caption)}"
+        else
+          artist_commentary_desc
+        end
+      end
+
+      def image_captions
+        image_urls = post.dig(:photoPostView, :photoLinks).to_a.pluck(:orign).map { |url| Source::URL.parse(url).full_image_url || url }
+        captions = post.dig(:photoPostView, :photoCaptions)
+
+        return nil unless captions.compact_blank.present?
+
+        image_urls.zip(captions).map do |image_url, caption|
+          <<~EOS.chomp
+            <img src="#{CGI.escapeHTML(image_url)}" alt="[image]">
+
+            <p>#{CGI.escapeHTML(caption)}</p>
+          EOS
+        end.join.presence
       end
 
       def http
