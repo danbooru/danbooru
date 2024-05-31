@@ -15,7 +15,7 @@ class Source::Extractor
       if parsed_url.image_url?
         [parsed_url.full_image_url]
       else
-        api_response.dig("media_attachments").to_a.pluck("url")
+        api_response["media_attachments"].to_a.pluck("url")
       end
     end
 
@@ -67,7 +67,7 @@ class Source::Extractor
     end
 
     def tags
-      api_response.dig("tags").to_a.map do |tag|
+      api_response["tags"].to_a.map do |tag|
         [tag["name"], tag["url"]]
       end
     end
@@ -76,7 +76,7 @@ class Source::Extractor
       DText.from_html(artist_commentary_desc, base_url: "https://#{domain}") do |element|
         if element.name == "a"
           # don't include links to the toot itself.
-          media_urls = api_response.dig("media_attachments").pluck("text_url")
+          media_urls = api_response["media_attachments"].pluck("text_url")
           element.content = nil if element["href"].in?(media_urls)
         end
       end.strip

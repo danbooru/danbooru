@@ -59,9 +59,9 @@ module Source
 
       def artist_commentary_desc
         if doujin?
-          page&.search("#dojin_text p:not(.title)")&.to_html
+          page&.css("#dojin_text p:not(.title)")&.to_html
         else
-          page&.search('#illust_text > p')&.to_html
+          page&.css("#illust_text > p")&.to_html
         end
       end
 
@@ -73,7 +73,7 @@ module Source
         end
 
         search_links.map do |node|
-          [node.inner_text, "https://nijie.info" + node.attr("href")]
+          [node.inner_text, "https://nijie.info#{node.attr("href")}"]
         end
       end
 
@@ -162,13 +162,13 @@ module Source
           password: Danbooru.config.nijie_password,
           url: login_page.at("input[name='url']")&.fetch("value"),
           save: "on",
-          ticket: ""
+          ticket: "",
         }
 
         response = http.post("https://nijie.info/login_int.php", form: form)
 
         if response.status == 200
-          response.cookies.cookies.map { |cookie| [cookie.name, cookie.value] }.to_h
+          response.cookies.cookies.to_h { |cookie| [cookie.name, cookie.value] }
         else
           DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})"
           nil

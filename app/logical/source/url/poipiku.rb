@@ -68,7 +68,7 @@ class Source::URL::Poipiku < Source::URL
     if image_dir && user_id && post_id && image_id && image_hash && original_file_ext
       "https://img-org.poipiku.com/#{image_dir}/#{"%.9d" % user_id}/#{"%.9d" % post_id}_#{"%.9d" % image_id}_#{image_hash}.#{original_file_ext}"
 
-   # https://img-org.poipiku.com/user_img03/000013318/007865949_WuckPeoQk.png
+    # https://img-org.poipiku.com/user_img03/000013318/007865949_WuckPeoQk.png
     elsif image_dir && user_id && post_id && image_hash && original_file_ext
       "https://img-org.poipiku.com/#{image_dir}/#{"%.9d" % user_id}/#{"%.9d" % post_id}_#{image_hash}.#{original_file_ext}"
 

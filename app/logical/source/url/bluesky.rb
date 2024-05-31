@@ -69,5 +69,4 @@ class Source::URL::Bluesky < Source::URL
       "https://bsky.app/profile/#{user_did}"
     end
   end
-
 end

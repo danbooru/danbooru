@@ -21,7 +21,7 @@ class Source::URL::Toyhouse < Source::URL
     # https://file.toyhou.se/images/2362055_rxkHiEqZOFFaOtX.png
     # https://file.toyhou.se/thumbnails/2362055_rxk.png
     in *, ("thumbnails" | "watermarks" | "images"), /^\d+_[a-zA-Z0-9]+\./ if image_url?
-      @image_id, _ = filename.split("_")
+      @image_id, _rest = filename.split("_")
 
     # https://toyhou.se/~images/58037599
     in _, "toyhou.se", "~images", image_id

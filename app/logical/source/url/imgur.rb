@@ -74,7 +74,7 @@ class Source::URL::Imgur < Source::URL
 
   def full_image_url
     if image_id.present? && file_ext.present?
-      ext = (file_ext == "gifv" ? "gif" : file_ext)
+      ext = (file_ext == "gifv") ? "gif" : file_ext
       "https://i.imgur.com/#{image_id}.#{ext}"
     elsif image_id.present?
       "https://imgur.com/download/#{image_id}"

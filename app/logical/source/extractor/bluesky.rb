@@ -107,7 +107,7 @@ class Source::Extractor::Bluesky < Source::Extractor
       "https://bsky.social/xrpc/app.bsky.feed.getPostThread",
       uri: "at://#{user_did}/app.bsky.feed.post/#{post_id}",
       depth: 0,
-      parentHeight: 0,
+      parentHeight: 0
     )
   end
 
@@ -129,7 +129,7 @@ class Source::Extractor::Bluesky < Source::Extractor
   end
 
   memoize def cached_access_token
-    Cache.get("bluesky-access-token", 1.hours, skip_nil: true) do
+    Cache.get("bluesky-access-token", 1.hour, skip_nil: true) do
       access_token
     end
   end

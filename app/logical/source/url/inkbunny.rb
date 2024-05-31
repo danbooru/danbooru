@@ -9,7 +9,7 @@ class Source::URL::Inkbunny < Source::URL
 
   def parse
     case [domain, *path_segments]
-  
+
     # https://inkbunny.net/s/3200751
     in "inkbunny.net", "s", /^(\d+)[a-zA-Z0-9-]*$/ => submission_id
       @submission_id = $1.to_i
@@ -21,7 +21,7 @@ class Source::URL::Inkbunny < Source::URL
     # https://inkbunny.net/DAGASI
     in "inkbunny.net", /^[a-zA-Z0-9]+$/ => username
       @username = username
-      
+
     # https://inkbunny.net/user.php?user_id=152800
     in "inkbunny.net", "user.php" if params[:user_id].present?
       @user_id = params[:user_id].to_i

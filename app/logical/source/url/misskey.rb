@@ -26,7 +26,7 @@ class Source::URL::Misskey < Source::URL
       @note_id = note_id
 
     # https://misskey.io/play/9p3itbedgcal048f
-    in _, _,  "play", play_id
+    in _, _, "play", play_id
       @play_id = play_id
 
     # https://media.misskeyusercontent.jp/io/dfca7bd4-c073-4ea0-991f-313ab3a77847.png

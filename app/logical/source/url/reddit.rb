@@ -84,15 +84,15 @@ module Source
           @work_id = work_id
 
         # https://www.reddit.com/ttyccp
-        in _, "reddit.com" , work_id
+        in _, "reddit.com", work_id
           @work_id = work_id
 
         # https://www.redditmedia.com/mediaembed/wi4nfq
-        in _, "redditmedia.com" , "mediaembed", work_id
+        in _, "redditmedia.com", "mediaembed", work_id
           @work_id = work_id
 
         # https://redd.it/ttyccp
-        in nil, "redd.it" , work_id
+        in nil, "redd.it", work_id
           @work_id = work_id
 
         else

@@ -25,7 +25,7 @@ class Source::URL::Tinami < Source::URL
     # https://img.tinami.com/comic/naomao/naomao_002_01.jpg (page: http://www.tinami.com/comic/naomao/2)
     # https://img.tinami.com/comic/naomao/naomao_topillust.gif
     in "img.tinami.com", *rest
-      # pass
+      nil
 
     # http://www.tinami.com/creator/profile/1624
     in _, "creator", "profile", user_id

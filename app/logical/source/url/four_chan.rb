@@ -31,7 +31,7 @@ class Source::URL::FourChan < Source::URL
     in ("i" | "is" | "is2"), _, board, /\A([0-9]+)(s?)\./
       @board = board
       @image_id = $1.to_i
-      @image_type = $2 == "s" ? :preview : :original
+      @image_type = ($2 == "s") ? :preview : :original
       @full_image_url = url.to_s if @image_type == :original
 
     # http://images.4chan.org/vg/src/1378607754334.jpg
@@ -43,7 +43,7 @@ class Source::URL::FourChan < Source::URL
     in _, "4chan.org", board, "src", /\A([0-9]+)(s?)\./
       @board = board
       @image_id = $1.to_i
-      @image_type = $2 == "s" ? :preview : :original
+      @image_type = ($2 == "s") ? :preview : :original
       @full_image_url = url.to_s if @image_type == :original
 
     else

@@ -50,7 +50,7 @@ class Source::URL::Newgrounds < Source::URL
         # https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.jpg?f1702161372
         # https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.webp?f1702161372
         @candidate_full_image_urls = %w[png jpg gif webp].map do |file_ext|
-          original_url.to_s.gsub(%r!/medium_views/!, "/images/").gsub(/\.webp/, ".#{file_ext}")
+          original_url.to_s.gsub("/medium_views/", "/images/").gsub(".webp", ".#{file_ext}")
         end
       end
 

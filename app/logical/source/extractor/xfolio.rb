@@ -10,7 +10,7 @@ class Source::Extractor::Xfolio < Source::Extractor
     if work_id.present? && image_id.present?
       ["https://xfolio.jp/user_asset.php?id=#{image_id}&work_id=#{work_id}&work_image_id=#{image_id}&type=work_image"]
     elsif page.present?
-      page&.search(".article__wrap_img").map do |wrap_img|
+      page&.css(".article__wrap_img").to_a.map do |wrap_img|
         a = wrap_img.search("a").first
         img = wrap_img.search("img").first
         if a

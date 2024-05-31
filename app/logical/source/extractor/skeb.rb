@@ -58,9 +58,7 @@ module Source
         response = http.cache(1.minute).get(api_url)
 
         if response.status == 429
-          self.cached_request_key = response.cookies.cookies.find do
-            |cookie| cookie.name == "request_key"
-          end&.value
+          self.cached_request_key = response.cookies.cookies.find { |cookie| cookie.name == "request_key" }&.value
           response = http.cache(1.minute).get(api_url)
         end
 

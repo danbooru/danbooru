@@ -238,8 +238,8 @@ class Source::URL::Null < Source::URL
     in _, "youtu.be"
       "Youtube"
     in _, nil
-       # "http://125.6.189.215/kcs2/resources/ship/full/0935_5098_aeltexuflkxs.png?version=52" => "125.6.189.215"
-       authority
+      # "http://125.6.189.215/kcs2/resources/ship/full/0935_5098_aeltexuflkxs.png?version=52" => "125.6.189.215"
+      authority
     else
       # "www.melonbooks.co.jp" => "Melonbooks"
       parsed_domain.sld.titleize

@@ -29,8 +29,8 @@ class Source::URL::ArcaLive < Source::URL
 
     # https://arca.live/b/arknights/66031722
     in _, "arca.live", "b", channel, post_id
-     @channel = channel
-     @post_id = post_id
+      @channel = channel
+      @post_id = post_id
 
     # https://arca.live/u/@Nauju/45320365
     in _, "arca.live", "u", /\A@/ => username, /\A\d+\z/ => user_id

@@ -19,7 +19,7 @@ class Source::Extractor
 
       [first_image, *additional_images].map do |url|
         # url = "//img.poipiku.com/user_img03/000013318/007865949_015701153_EcvKNO8Dt.png_640.jpg"
-        url = "https:" + url if url.starts_with?("//")
+        url = "https:#{url}" if url.starts_with?("//")
         Source::URL.parse(url)&.full_image_url
       end.compact
     end

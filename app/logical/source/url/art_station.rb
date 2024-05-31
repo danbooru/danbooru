@@ -29,7 +29,7 @@ class Source::URL::ArtStation < Source::URL
 
     # https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4
     in "cdn-animation.artstation.com", "p", "video_sources", *subdirs, file
-      # pass
+      nil
 
     # https://www.artstation.com/artwork/04XA4
     # https://www.artstation.com/artwork/cody-from-sf (old; redirects to https://www.artstation.com/artwork/3JJA)
