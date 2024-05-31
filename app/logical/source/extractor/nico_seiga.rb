@@ -142,7 +142,7 @@ module Source
         return {} unless manga_id.present?
 
         # curl "https://api.nicomanga.jp/api/v1/app/manga/episodes/470189/frames?enable_webp=false" | jq
-        json = http.cache(1.minute).parsed_get("https://api.nicomanga.jp/api/v1/app/manga/episodes/#{manga_id}/frames?enable_webp=false")
+        json = http.cache(1.minute).parsed_get("https://api.nicomanga.jp/api/v1/app/manga/episodes/#{manga_id}/frames?enable_webp=false") || {}
         json.dig("data", "result") || {}
       end
 
@@ -150,7 +150,7 @@ module Source
         return {} unless artist_id.present?
 
         # curl "https://seiga.nicovideo.jp/api/user/info?id=123720050"
-        xml = http.cache(1.minute).parsed_get("https://seiga.nicovideo.jp/api/user/info?id=#{artist_id}")
+        xml = http.cache(1.minute).parsed_get("https://seiga.nicovideo.jp/api/user/info?id=#{artist_id}") || {}
         xml.dig("response", "user") || {}
       end
     end
