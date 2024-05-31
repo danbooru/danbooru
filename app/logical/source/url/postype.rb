@@ -20,10 +20,19 @@ class Source::URL::Postype < Source::URL
     in _, _, /^\d{4}$/, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, file
       @full_image_url = without(:query).to_s
 
+    # https://www.postype.com/_next/image?url=https%3A%2F%2Fd3mcojo3jv0dbr.cloudfront.net%2F2024%2F04%2F03%2F12%2F46%2F1ffb36f1881b16a5c5881fc6eaa06179.jpeg%3Fw%3D1000%26h%3D700%26q%3D65&w=3840&q=75
+    in _, "postype.com", "_next", "image" if params[:url].present?
+      @full_image_url = Source::URL.parse(params[:url]).try(:full_image_url)
+
     # https://luland.postype.com/post/11659399
     # https://www.postype.com/post/11659399
     in blogname, "postype.com", "post", post_id unless blogname.in?(RESERVED_SUBDOMAINS)
       @blogname = blogname
+      @post_id = post_id
+
+    # https://www.postype.com/@fruitsnoir/post/5316533
+    in _, "postype.com", /^@/ => blogname, "post", /^\d+$/ => post_id
+      @blogname = blogname.delete_prefix("@")
       @post_id = post_id
 
     # https://nanbongman0.postype.com/series/964724/타투리소스
@@ -31,10 +40,20 @@ class Source::URL::Postype < Source::URL
       @blogname = blogname
       @series_id = series_id
 
+    # https://www.postype.com/@fruitsnoir/series/450088
+    in _, "postype.com", /^@/ => blogname, "series", /^\d+$/ => series_id
+      @blogname = blogname.delete_prefix("@")
+      @series_id = series_id
+
     # https://luland.postype.com
     # https://luland.postype.com/posts
     in blogname, "postype.com", *rest unless blogname.in?(RESERVED_SUBDOMAINS)
       @blogname = blogname
+
+    # https://www.postype.com/@fruitsnoir
+    # https://www.postype.com/@fruitsnoir/post
+    in _, "postype.com", /^@/ => blogname, *rest
+      @blogname = blogname.delete_prefix("@")
 
     # https://www.postype.com/profile/@ep58bc
     # https://www.postype.com/profile/@ep58bc/posts
@@ -47,13 +66,17 @@ class Source::URL::Postype < Source::URL
     end
   end
 
+  def image_url?
+    super || full_image_url.present?
+  end
+
   def page_url
-    "https://#{blogname}.postype.com/post/#{post_id}" if blogname.present? && post_id.present?
+    "https://www.postype.com/@#{blogname}/post/#{post_id}" if blogname.present? && post_id.present?
   end
 
   def profile_url
     if blogname.present?
-      "https://#{blogname}.postype.com"
+      "https://www.postype.com/@#{blogname}"
     elsif username.present?
       "https://www.postype.com/profile/@#{username}"
     end

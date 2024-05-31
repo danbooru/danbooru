@@ -5,20 +5,21 @@ require "test_helper"
 module Sources
   class PostypeTest < ActiveSupport::TestCase
     context "Postype:" do
+      context "A https://www.postype.com/_next/image URL" do
+        strategy_should_work(
+          "https://www.postype.com/_next/image?url=https%3A%2F%2Fd3mcojo3jv0dbr.cloudfront.net%2F2024%2F04%2F03%2F12%2F46%2F1ffb36f1881b16a5c5881fc6eaa06179.jpeg%3Fw%3D1000%26h%3D700%26q%3D65&w=3840&q=75",
+          image_urls: %w[https://d3mcojo3jv0dbr.cloudfront.net/2024/04/03/12/46/1ffb36f1881b16a5c5881fc6eaa06179.jpeg],
+          media_files: [{ file_size: 35_970 }],
+          page_url: nil
+        )
+      end
+
       context "A Postype sample image URL" do
         strategy_should_work(
           "https://d2ufj6gm1gtdrc.cloudfront.net/2018/09/10/22/49/e91aea7d82404cdfcb12ecbc99ef856f.jpg?w=1200&q=90",
           image_urls: %w[https://d2ufj6gm1gtdrc.cloudfront.net/2018/09/10/22/49/e91aea7d82404cdfcb12ecbc99ef856f.jpg],
           media_files: [{ file_size: 791_613 }],
-          page_url: nil,
-          profile_url: nil,
-          profile_urls: %w[],
-          display_name: nil,
-          username: nil,
-          other_names: [],
-          tags: [],
-          dtext_artist_commentary_title: "",
-          dtext_artist_commentary_desc: ""
+          page_url: nil
         )
       end
 
@@ -27,15 +28,7 @@ module Sources
           "https://d2ufj6gm1gtdrc.cloudfront.net/2018/09/10/22/49/e91aea7d82404cdfcb12ecbc99ef856f.jpg",
           image_urls: %w[https://d2ufj6gm1gtdrc.cloudfront.net/2018/09/10/22/49/e91aea7d82404cdfcb12ecbc99ef856f.jpg],
           media_files: [{ file_size: 791_613 }],
-          page_url: nil,
-          profile_url: nil,
-          profile_urls: %w[],
-          display_name: nil,
-          username: nil,
-          other_names: [],
-          tags: [],
-          dtext_artist_commentary_title: "",
-          dtext_artist_commentary_desc: ""
+          page_url: nil
         )
       end
 
@@ -154,12 +147,10 @@ module Sources
             { file_size: 43_137 },
             { file_size: 1_736_147 },
           ],
-          page_url: "https://athanjccgg.postype.com/post/15762592",
-          profile_url: "https://athanjccgg.postype.com",
-          profile_urls: %w[https://athanjccgg.postype.com https://www.postype.com/profile/@2g2740],
+          page_url: "https://www.postype.com/@athanjccgg/post/15762592",
+          profile_urls: %w[https://www.postype.com/@athanjccgg https://www.postype.com/profile/@2g2740],
           display_name: "얼음비데",
           username: "2g2740",
-          other_names: ["얼음비데", "2g2740"],
           tags: [],
           dtext_artist_commentary_title: "스파 로그",
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -507,14 +498,12 @@ module Sources
             { file_size: 566_921 },
             { file_size: 1_631_025 },
           ],
-          page_url: "https://rottenmustard.postype.com/post/15534076",
-          profile_url: "https://rottenmustard.postype.com",
-          profile_urls: %w[https://rottenmustard.postype.com https://www.postype.com/profile/@46axcn],
+          page_url: "https://www.postype.com/@rottenmustard/post/15534076",
+          profile_urls: %w[https://www.postype.com/@rottenmustard https://www.postype.com/profile/@46axcn],
           display_name: "라쿤맨",
           username: "46axcn",
-          other_names: ["라쿤맨", "46axcn"],
           tags: [
-            ["커미션", "https://www.postype.com/search?options_tags=1&keyword=%EC%BB%A4%EB%AF%B8%EC%85%98"],
+            ["커미션", "https://www.postype.com/search?options_tags=1&keyword=커미션"],
           ],
           dtext_artist_commentary_title: "수위 커미션",
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -665,15 +654,13 @@ module Sources
             { file_size: 1_168_028 },
             { file_size: 1_559_593 },
           ],
-          page_url: "https://jadedrop.postype.com/post/11998130",
-          profile_url: "https://jadedrop.postype.com",
-          profile_urls: %w[https://jadedrop.postype.com https://www.postype.com/profile/@gbv1wt],
+          page_url: "https://www.postype.com/@jadedrop/post/11998130",
+          profile_urls: %w[https://www.postype.com/@jadedrop https://www.postype.com/profile/@gbv1wt],
           display_name: "제이드",
           username: "gbv1wt",
-          other_names: ["제이드", "gbv1wt"],
           tags: [
-            ["도로헤도로", "https://www.postype.com/search?options_tags=1&keyword=%EB%8F%84%EB%A1%9C%ED%97%A4%EB%8F%84%EB%A1%9C"],
-            ["팬창작", "https://www.postype.com/search?options_tags=1&keyword=%ED%8C%AC%EC%B0%BD%EC%9E%91"],
+            ["도로헤도로", "https://www.postype.com/search?options_tags=1&keyword=도로헤도로"],
+            ["팬창작", "https://www.postype.com/search?options_tags=1&keyword=팬창작"],
           ],
           dtext_artist_commentary_title: "도로헤도로 로그 모음 - 6",
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -779,12 +766,10 @@ module Sources
             { file_size: 752_746 },
             { file_size: 118_919 },
           ],
-          page_url: "https://ansdj8181.postype.com/post/15493366",
-          profile_url: "https://ansdj8181.postype.com",
-          profile_urls: %w[https://ansdj8181.postype.com https://www.postype.com/profile/@53g0ab],
+          page_url: "https://www.postype.com/@ansdj8181/post/15493366",
+          profile_urls: %w[https://www.postype.com/@ansdj8181 https://www.postype.com/profile/@53g0ab],
           display_name: "박펩",
           username: "53g0ab",
-          other_names: ["박펩", "53g0ab"],
           tags: [],
           dtext_artist_commentary_title: "[소요타키]",
           dtext_artist_commentary_desc: ""
@@ -795,13 +780,10 @@ module Sources
         strategy_should_work(
           "https://bbunny-backstreet.postype.com/post/12206917",
           image_urls: [],
-          media_files: [],
-          page_url: "https://bbunny-backstreet.postype.com/post/12206917",
-          profile_url: "https://bbunny-backstreet.postype.com",
-          profile_urls: %w[https://bbunny-backstreet.postype.com https://www.postype.com/profile/@5faubu],
+          page_url: "https://www.postype.com/@bbunny-backstreet/post/12206917",
+          profile_urls: %w[https://www.postype.com/@bbunny-backstreet https://www.postype.com/profile/@5faubu],
           display_name: "Bbunny",
           username: "5faubu",
-          other_names: ["Bbunny", "5faubu"],
           tags: [],
           dtext_artist_commentary_title: "작년에 왔던 오타쿠 죽지도 않고 또왔소",
           dtext_artist_commentary_desc: ""
@@ -811,13 +793,11 @@ module Sources
       context "A deleted or nonexistent Postype post" do
         strategy_should_work(
           "https://somebody.postype.com/post/999999999999",
-          image_urls: [ ],
-          page_url: "https://somebody.postype.com/post/999999999999",
-          profile_url: "https://somebody.postype.com",
-          profile_urls: %w[https://somebody.postype.com],
+          image_urls: [],
+          page_url: "https://www.postype.com/@somebody/post/999999999999",
+          profile_urls: %w[https://www.postype.com/@somebody],
           display_name: nil,
           username: nil,
-          other_names: [],
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: ""
@@ -829,13 +809,17 @@ module Sources
         assert(Source::URL.image_url?("https://d2ufj6gm1gtdrc.cloudfront.net/2018/09/10/22/49/e91aea7d82404cdfcb12ecbc99ef856f.jpg"))
         assert(Source::URL.image_url?("https://i.postype.com/2017/01/27/01/28/22c423dd569a1c2aaec66bc551c54d5b.png?w=1000"))
         assert(Source::URL.image_url?("https://c3.postype.com/2017/07/04/21/29/42fc32581770dd593788cce89652f757.png"))
+        assert(Source::URL.image_url?("https://www.postype.com/_next/image?url=https%3A%2F%2Fd3mcojo3jv0dbr.cloudfront.net%2F2024%2F04%2F03%2F12%2F46%2F1ffb36f1881b16a5c5881fc6eaa06179.jpeg%3Fw%3D1000%26h%3D700%26q%3D65&w=3840&q=75"))
 
         assert(Source::URL.page_url?("https://luland.postype.com/post/11659399"))
+        assert(Source::URL.page_url?("https://www.postype.com/@fruitsnoir/post/5316533"))
 
         assert(Source::URL.profile_url?("https://luland.postype.com"))
         assert(Source::URL.profile_url?("https://luland.postype.com/posts"))
         assert(Source::URL.profile_url?("https://www.postype.com/profile/@ep58bc"))
         assert(Source::URL.profile_url?("https://www.postype.com/profile/@ep58bc/posts"))
+        assert(Source::URL.profile_url?("https://www.postype.com/@fruitsnoir"))
+        assert(Source::URL.profile_url?("https://www.postype.com/@fruitsnoir/post"))
       end
     end
   end

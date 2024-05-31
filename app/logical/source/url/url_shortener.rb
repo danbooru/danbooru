@@ -20,6 +20,7 @@ class Source::URL::URLShortener < Source::URL
     # https://is.gd/UeUnvf
     # https://naver.me/FABhCw8Z
     # https://pin.it/4A1N0Rd5W
+    # https://posty.pe/343rpc
     # https://pse.is/4b4tda
     # https://reurl.cc/E2zlnA
     # https://shorturl.at/uMS23
@@ -35,7 +36,7 @@ class Source::URL::URLShortener < Source::URL
     # https://xhslink.com/WNd9gI
     # https://hoyo.link/80GCFBAL?q=25tufAgwB8N
     # https://hoyo.link/aifgFBAL
-    url.domain.in?(%w[0rz.tw amzn.asia amzn.to bit.ly j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl hoyo.link is.gd naver.me pin.it pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.cn t.co wp.me x.gd xhslink.com]) ||
+    url.domain.in?(%w[0rz.tw amzn.asia amzn.to bit.ly j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl hoyo.link is.gd naver.me pin.it posty.pe pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.cn t.co wp.me x.gd xhslink.com]) ||
 
     # https://pic.twitter.com/Dxn7CuVErW
     # https://pic.x.com/Dxn7CuVErW
@@ -63,6 +64,8 @@ class Source::URL::URLShortener < Source::URL
       "Naver"
     in _, "pin.it"
       "Pinterest"
+    in _, "posty.pe"
+      "Postype"
     in _, "goo.gl" | "forms.gle"
       "Google"
     in _, "skfb.ly"

@@ -14,36 +14,40 @@ class Source::Extractor::Postype < Source::Extractor
   end
 
   def profile_url
-    # https://fruitsnoir.postype.com/
-    blog_url
+    # https://www.postype.com/profile/@fq7uvp
+    profile_page_url
   end
 
   def profile_urls
-    # https://fruitsnoir.postype.com/
+    # https://www.postype.com/@fruitsnoir
     # https://www.postype.com/profile/@fq7uvp
-    [profile_url, profile_page_url].compact_blank
+    [blog_url, profile_page_url].compact_blank
   end
 
   def display_name
-    page&.at(".post-header .article-author a")&.text
+    post.dig(:profile, :nickname)
   end
 
   def username
-    Source::URL.parse(profile_page_url)&.username
+    parsed_url.username || parsed_referer&.username || post.dig(:profile, :hash)
+  end
+
+  def blog_name
+    parsed_url.blogname || parsed_referer&.blogname || post.dig(:channel, :name)
   end
 
   def artist_commentary_title
-    page&.at("article#post")&.attr("data-post-title")
+    post[:title]
   end
 
   def artist_commentary_desc
-    api_response.dig("data", "html")
+    post_content.dig(:data, :html)
   end
 
   def dtext_artist_commentary_desc
     return "" if artist_commentary_desc.to_s.parse_html.tap { _1.css("section, script").remove }.text.blank?
 
-    DText.from_html(artist_commentary_desc, base_url: blog_url) do |element|
+    DText.from_html(artist_commentary_desc, base_url: "https://www.postype.com") do |element|
       case element.name
       in "figure"
         element.name = "p"
@@ -70,19 +74,17 @@ class Source::Extractor::Postype < Source::Extractor
   end
 
   def tags
-    page&.css(".tag-list a").to_a.map do |element|
-      [element.text, element["href"]]
+    post[:tags].to_a.map do |tag|
+      [tag, "https://www.postype.com/search?options_tags=1&keyword=#{Danbooru::URL.escape(tag)}"]
     end
   end
 
   def blog_url
-    # https://fruitsnoir.postype.com/
-    parsed_url.profile_url || parsed_referer&.profile_url || page&.at("a#blog-logo-wrapper")&.attr("href")
+    "https://www.postype.com/@#{blog_name}" if blog_name.present?
   end
 
   def profile_page_url
-    # https://www.postype.com/profile/@fq7uvp
-    page&.at(".post-header a.profile-avatar")&.attr("href")
+    "https://www.postype.com/profile/@#{username}" if username.present?
   end
 
   def post_id
@@ -93,13 +95,13 @@ class Source::Extractor::Postype < Source::Extractor
     super.cookies(PSE3: Danbooru.config.postype_session_cookie).headers(Referer: "https://postype.com")
   end
 
-  memoize def page
-    http.cache(1.minute).parsed_get(page_url)
+  memoize def post_content
+    api_url = "https://www.postype.com/api/post/content/#{post_id}" if post_id.present?
+    http.cache(1.minute).parsed_get(api_url) || {}
   end
 
-  memoize def api_response
-    return {} if post_id.blank?
-
-    http.cache(1.minute).parsed_get("https://www.postype.com/api/post/content/#{post_id}") || {}
+  memoize def post
+    api_url = "https://api.postype.com/api/v1/posts/#{post_id}" if post_id.present?
+    http.cache(1.minute).parsed_get(api_url) || {}
   end
 end
