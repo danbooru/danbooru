@@ -75,6 +75,11 @@ class Source::Extractor::URLShortener < Source::Extractor
       url = response.headers["Location"] if response.status.redirect?
       url unless url.in?(%W[https://api.pinterest.com/url_shortener/#{id}/redirect/None https://www.pinterest.com])
 
+    # curl -I https://posty.pe/343rpc
+    in "posty.pe", id
+      url = http.redirect_url(https_url)&.to_s
+      url unless url.in?(%w[https://www.postype.com https://www.postype.com/404])
+
     # curl -I https://skfb.ly/GXzZ
     # https://skfb.ly/GXzZ -> https://sketchfab.com:443/s/GXzZa -> https://sketchfab.com/3d-models/my-dnd-map-falkirk-91a1199bda5e45cb84260bac20502f28
     in "skfb.ly", id
