@@ -101,7 +101,7 @@ module Source
 
       # https://deliver.cdn.nicomanga.jp/thumb/aHR0cHM6Ly9kZWxpdmVyLmNkbi5uaWNvbWFuZ2EuanAvdGh1bWIvODEwMDk2OHA_MTU2NTY5OTg4MA.webp (page: https://seiga.nicovideo.jp/watch/mg316708, full image: https://lohas.nicoseiga.jp/priv/1f6d38ef2ba6fc9d9e27823babc4cf721cef16ec/1646906617/8100969)
       in "deliver.cdn", "nicomanga.jp", *rest
-        # unhandled
+        nil
 
       # https://drm.cdn.nicomanga.jp/image/d4a2faa68ec34f95497db6601a4323fde2ccd451_9537/8017978p?1570012695
       in "drm.cdn", "nicomanga.jp", "image", _, /^(\d+)p$/ => image_id

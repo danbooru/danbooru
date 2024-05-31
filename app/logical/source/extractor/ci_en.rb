@@ -17,7 +17,7 @@ class Source::Extractor::CiEn < Source::Extractor
         urls << og_url.to_s
       end
 
-      urls += page&.css(".l-creatorPage-main article vue-l-image, .l-creatorPage-main article vue-file-player").map do |node|
+      urls += page&.css(".l-creatorPage-main article vue-l-image, .l-creatorPage-main article vue-file-player").to_a.map do |node|
         case node.name
         when "vue-l-image"
           node["data-raw"]
@@ -80,7 +80,7 @@ class Source::Extractor::CiEn < Source::Extractor
     # Same cookie works for both all-ages and R18 sites
     super.cookies(
       ci_en_session: Danbooru.config.ci_en_session_cookie,
-      accepted_rating: "r18g",
+      accepted_rating: "r18g"
     )
   end
 end

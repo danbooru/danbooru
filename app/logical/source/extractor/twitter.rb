@@ -16,7 +16,7 @@ class Source::Extractor
       /(?<!\A)深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
       /(?<!\A)版深夜のお絵描き60分一本勝負(?:_\d+)?\z/,
       /(?<!\A)版真剣お絵描き60分一本勝(?:_\d+)?\z/,
-      /(?<!\A)版お絵描き60分一本勝負(?:_\d+)?\z/
+      /(?<!\A)版お絵描き60分一本勝負(?:_\d+)?\z/,
     ]
 
     def image_urls
@@ -200,17 +200,16 @@ class Source::Extractor
       entries = graphql_api_response.dig("data", "threaded_conversation_with_injections_v2", "instructions", 0, "entries")
       entry = entries&.find { |entry| entry["entryId"] == "tweet-#{status_id}" }
       result = entry&.dig("content", "itemContent", "tweet_results", "result") || {}
-      tweet = result["tweet"] || result
-      tweet
+      result["tweet"] || result
     end
 
     def http
       super.headers(
-        "authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA", # non-secret; used by the official client
-        "x-csrf-token": Danbooru.config.twitter_csrf_token,
+        authorization: "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA", # non-secret; used by the official client
+        "x-csrf-token": Danbooru.config.twitter_csrf_token
       ).cookies(
-        "auth_token": Danbooru.config.twitter_auth_token,
-        "ct0": Danbooru.config.twitter_csrf_token,
+        auth_token: Danbooru.config.twitter_auth_token,
+        ct0: Danbooru.config.twitter_csrf_token
       )
     end
 

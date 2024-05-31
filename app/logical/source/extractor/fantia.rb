@@ -146,7 +146,7 @@ class Source::Extractor
 
       http.cache(1.minute).headers(
         "X-CSRF-Token": csrf_token,
-        "X-Requested-With": "XMLHttpRequest",
+        "X-Requested-With": "XMLHttpRequest"
       ).parsed_get("https://fantia.jp/api/v1/posts/#{work_id}") || {}
     end
 

@@ -97,7 +97,7 @@ module Source
 
       memoize def video_data
         # flash files return {"error"=>{"code"=>404, "msg"=>"The submission you are looking for does not have a video."}}
-        response = http.headers("X-Requested-With": "XMLHttpRequest").cache(1.minute).parsed_get(video_page_url, format: :json)
+        http.headers("X-Requested-With": "XMLHttpRequest").cache(1.minute).parsed_get(video_page_url, format: :json)
       end
     end
   end

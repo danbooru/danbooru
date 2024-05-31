@@ -7,7 +7,7 @@ class Source::Extractor
       if parsed_url.full_image_url.present?
         [parsed_url.full_image_url]
       elsif book_id.present?
-        cover_url = book_api_response.dig("coverUrl")
+        cover_url = book_api_response["coverUrl"]
         image_urls = book_api_response.dig("chapterList", 0, "pageList").to_a.pluck("publicBgImage")
 
         [cover_url, *image_urls].compact_blank
@@ -29,7 +29,7 @@ class Source::Extractor
     def user_url
       # https://medibang.com/u/16672238/ or https://medibang.com/author/749476/
       url = author_page&.at("a.contentsTab[data-tgt=0]")&.attr("href")
-      return url if Source::URL.parse(url)&.user_id.present?
+      url if Source::URL.parse(url)&.user_id.present?
     end
 
     def author_url
@@ -48,7 +48,7 @@ class Source::Extractor
     end
 
     def artist_commentary_title
-      page&.css(".pictureDetails__titleLink, .series_title_area h1.name")&.text.to_s.normalize_whitespace.strip.gsub(/\r\n/, " ").squeeze(" ")
+      page&.css(".pictureDetails__titleLink, .series_title_area h1.name")&.text.to_s.normalize_whitespace.strip.gsub("\r\n", " ").squeeze(" ")
     end
 
     def artist_commentary_desc

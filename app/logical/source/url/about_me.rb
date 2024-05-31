@@ -18,7 +18,7 @@ class Source::URL::AboutMe < Source::URL
       @username = $1
 
     # https://assets.about.me/background/users/w/o/k/wokada156_1411467603_49.jpg
-      in "assets", "about.me", "background", "users", a, b, c, /^(.+)_\d+_\d+/
+    in "assets", "about.me", "background", "users", a, b, c, /^(.+)_\d+_\d+/
       @full_image_url = to_s
       @username = $1
 

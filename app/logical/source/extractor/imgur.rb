@@ -22,7 +22,7 @@ module Source
       end
 
       def image_urls_from_api
-        v1_api_response.dig(:media).to_a.pluck(:url).presence || v3_api_response.dig(:images).to_a.pluck(:link)
+        v1_api_response[:media].to_a.pluck(:url).presence || v3_api_response[:images].to_a.pluck(:link)
       end
 
       def page_url

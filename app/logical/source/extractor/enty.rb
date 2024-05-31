@@ -49,7 +49,7 @@ module Source
       end
 
       memoize def page
-        response = http.cache(1.minute).parsed_get(page_url)
+        http.cache(1.minute).parsed_get(page_url)
       end
 
       memoize def profile_page

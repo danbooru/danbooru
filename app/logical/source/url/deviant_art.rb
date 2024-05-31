@@ -42,7 +42,7 @@ module Source
       # https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4
       # https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/b1f96af6-56a3-47a8-b7f4-406f243af3a3/daihpha-9f1fcd2e-7557-4db5-951b-9aedca9a3ae7.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTcwOTc0NzEzMCwiaWF0IjoxNzA5NzQ2NTIwLCJqdGkiOiI2NWU4YTk2MmVkNWQ1Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvYjFmOTZhZjYtNTZhMy00N2E4LWI3ZjQtNDA2ZjI0M2FmM2EzXC9kYWlocGhhLTlmMWZjZDJlLTc1NTctNGRiNS05NTFiLTlhZWRjYTlhM2FlNy5qcGcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.2L3RJYuC0hZA6qpNQ9k99Ns4EYqs67jZ8nrk19uKM_g&filename=legend_of_galactic_heroes_by_hideyoshi_daihpha.jpg
       in _, "wixmp.com", *rest
-        fname = params[:filename]&.split(".")&.first.presence || self.filename
+        fname = params[:filename]&.split(".")&.first.presence || filename
         parse_filename(fname)
         @jwt = parse_jwt(params[:token])
         @work_id ||= work_id_from_token

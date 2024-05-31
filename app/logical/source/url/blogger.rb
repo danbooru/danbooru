@@ -78,7 +78,7 @@ class Source::URL::Blogger < Source::URL
   def blog_name
     # http://benbotport.blogspot.com
     # http://vincentmcart.blogspot.com.es
-    subdomain if sld == "blogspot" && !subdomain.in?(RESERVED_SUBDOMAINS) && !subdomain.include?(".")
+    subdomain if sld == "blogspot" && !subdomain.in?(RESERVED_SUBDOMAINS) && subdomain.exclude?(".")
   end
 
   def blog_url

@@ -46,7 +46,7 @@ module Source
       memoize def page
         # We need to spoof both the User-Agent (done by default in `Danbooru::Http.external`) and the Accept header,
         # otherwise we start getting hCaptchas if the request rate is too high.
-        headers = { "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" }
+        headers = { Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" }
         http.cache(1.minute).headers(headers).parsed_get(page_url)
       end
     end
