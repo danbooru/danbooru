@@ -34,12 +34,10 @@ module Sources
 
     context "A direct image url" do
       strategy_should_work(
-        "https://nl.ib.metapix.net/files/full/4441/4441954_Yupa_25-2.jpg",
-        image_urls: %w[
-          https://nl.ib.metapix.net/files/full/4441/4441954_Yupa_25-2.jpg
-        ],
+        "https://tx.ib.metapix.net/files/full/4441/4441954_Yupa_25-2.jpg",
+        image_urls: %w[https://tx.ib.metapix.net/files/full/4441/4441954_Yupa_25-2.jpg],
         media_files: [{ file_size: 506_992 }],
-        profile_url: nil
+        page_url: nil
       )
     end
 

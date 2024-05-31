@@ -120,6 +120,9 @@ module Sources
             https://badkrol.carrd.co/assets/images/gallery01/fc3f91db.jpg
             https://badkrol.carrd.co/assets/images/gallery01/548929a2.jpg
             https://badkrol.carrd.co/assets/images/gallery01/9be3f1d6.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/1b735c39.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/7aa51f1c.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/f375193f.jpg
             https://badkrol.carrd.co/assets/images/gallery02/2973b8cd.jpg
             https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg
             https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg
@@ -136,6 +139,9 @@ module Sources
             { file_size: 5_546 },
             { file_size: 9_944 },
             { file_size: 8_669 },
+            { file_size: 21_915 },
+            { file_size: 6_460 },
+            { file_size: 7_012 },
             { file_size: 8_388 },
             { file_size: 19_498 },
             { file_size: 8_746 },
@@ -147,10 +153,9 @@ module Sources
             { file_size: 17_550 },
           ],
           page_url: "https://badkrol.carrd.co/#commission",
-          profile_url: "https://badkrol.carrd.co",
           profile_urls: %w[https://badkrol.carrd.co],
+          display_name: nil,
           username: "badkrol",
-          other_names: ["badkrol"],
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -168,6 +173,9 @@ module Sources
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/fc3f91db.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/548929a2.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/9be3f1d6.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/1b735c39.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/7aa51f1c.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/f375193f.jpg]
 
             Illustration
 
