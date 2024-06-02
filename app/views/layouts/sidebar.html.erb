@@ -16,7 +16,6 @@
           <section id="content" class="flex-1 min-w-0 sm:order-1">
             <div id="canyai-banner">
               <% if CurrentUser.user.show_ads? && controller_name == "posts" %>
-                <iframe src="https://assets.mediacandy.ai/aib/square.html" width="300" height="250" scrolling="no" margin-width="0" margin-height="0" frameborder="0"></iframe>
               <% end %>
             </div>
             <%= yield :content %>

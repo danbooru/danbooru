@@ -93,9 +93,8 @@
       <% end %>
 
       <a class="mobile-only" href="#search-box">Search &raquo;</a>
-      <% if CurrentUser.user.show_ads?%>
-        <a  class="mobile-only" id="ad-candyai" href="https://redirect-offsite.aibooru.online/redirect/candy_ai_tab_link?location=https%3A%2F%2Fcandy.ai%2F&category=anime&gender=female&via=aibooru47&fp_sid=tablink&page=<%= CGI.escape(request.original_url) %>" style="color: #F784C6 !important;">AI Sex Chat</a>
-      <% end %>
+    </li>
+
     <li class="flex items-center gap-2">
       <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
 
