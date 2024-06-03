@@ -112,6 +112,7 @@ module Source
       Source::URL::Grafolio,
       Source::URL::Kakao,
       Source::URL::Tistory,
+      Source::URL::Kofi,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
