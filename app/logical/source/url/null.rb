@@ -125,8 +125,6 @@ class Source::URL::Null < Source::URL
       "Kiru Made"
     in _, "kemono.party"
       "Kemono Party"
-    in _, "ko-fi.com"
-      "Ko-fi"
     in _, "last.fm"
       "Last.fm"
     in _, "mangaz.com"
@@ -454,10 +452,6 @@ class Source::URL::Null < Source::URL
     in _, "karabako.net", ("images" | "imagesub"), /^karabako_(\d+)/
       @work_id = $1
       @page_url = "http://www.karabako.net/post/view/#{work_id}"
-
-    # https://ko-fi.com/johndaivid
-    in _, "ko-fi.com", *rest
-      nil
 
     in _, "kym-cdn.com", *rest
       nil
