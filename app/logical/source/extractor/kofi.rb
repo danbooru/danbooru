@@ -33,7 +33,7 @@ class Source::Extractor::Kofi < Source::Extractor
   end
 
   def username
-    parsed_url.username || parsed_referer&.username || profile_page&.at('link[rel="canonical"]')&.attr(:href)&.delete_prefix("https://ko-fi.com/")
+    parsed_url.username || parsed_referer&.username || profile_page&.at('link[rel="canonical"]')&.attr(:href)&.then { |url| Source::URL.parse(url)&.username }
   end
 
   def user_id
