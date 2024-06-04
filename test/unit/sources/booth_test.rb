@@ -96,6 +96,42 @@ module Sources
       )
     end
 
+    context "A booth post with a factory.pixiv.net image" do
+      strategy_should_work(
+        "https://dai-xt.booth.pm/items/5701118",
+        image_urls: %w[
+          https://booth.pximg.net/1b715ca5-f3dc-484e-9406-eec4047c5ad0/i/5701118/1eabc2c5-e2a1-4079-89ce-061226edeb85.png
+          https://booth.pximg.net/1b715ca5-f3dc-484e-9406-eec4047c5ad0/i/5701118/3deaf844-0f03-4bb9-ad32-58b158e787ba.png
+          https://booth.pximg.net/1b715ca5-f3dc-484e-9406-eec4047c5ad0/i/5701118/3a461bed-40a5-42bf-b216-676a1303b691.png
+          https://factory.pixiv.net/files/uploads/i/conceptual_drawing/3a6f3742-03b6-4968-9599-20dc2c0e1172/canvas_f2605b12ed.png
+        ],
+        media_files: [
+          { file_size: 606_453 },
+          { file_size: 785_702 },
+          { file_size: 287_766 },
+          { file_size: 321_775 },
+        ],
+        page_url: "https://booth.pm/en/items/5701118",
+        profile_urls: %w[https://dai-xt.booth.pm],
+        display_name: "シーウィード・ヴィレッジ",
+        username: "dai-xt",
+        tags: [
+          ["ライブ・ア・ヒーロー!", "https://booth.pm/en/items?tags%5B%5D=%E3%83%A9%E3%82%A4%E3%83%96%E3%83%BB%E3%82%A2%E3%83%BB%E3%83%92%E3%83%BC%E3%83%AD%E3%83%BC%21"],
+          ["ダンゾー", "https://booth.pm/en/items?tags%5B%5D=%E3%83%80%E3%83%B3%E3%82%BE%E3%83%BC"],
+        ],
+        dtext_artist_commentary_title: "ダンゾー(ライブ・ア・ヒーロー！) 非公式アクリルフィギュア",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          この商品はpixivFACTORYで作られた商品です。サンプル画像は完成イメージのため、実物と異なる場合があります。
+
+          -----
+          画集『SCHRANZ NINJA』の表紙を飾るダンゾーのアクリルフィギュア。
+          公式とは無関係のファングッズですのでご了承ください。
+
+          ロゴデザイン：Poyoshi 様
+        EOS
+      )
+    end
+
     context "A profile background picture" do
       strategy_should_work(
         "https://s2.booth.pm/8bb9e4e3-d171-4027-88df-84480480f79d/3d70de06-8e7c-444e-b8eb-a8a95bf20638_base_resized.jpg",
