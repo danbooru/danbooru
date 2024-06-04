@@ -78,9 +78,14 @@ class Source::URL::Kofi < Source::URL
   end
 
   def extractor_class
-    # XXX: Not implemented: commission, shop item, and post extractors.
     if gallery_item_id.present?
       Source::Extractor::KofiGalleryItem
+    elsif shop_item_id.present?
+      Source::Extractor::KofiShopItem
+    elsif commission_id.present?
+      Source::Extractor::KofiCommission
+    elsif post_id.present?
+      Source::Extractor::KofiPost
     else
       Source::Extractor::Kofi
     end
