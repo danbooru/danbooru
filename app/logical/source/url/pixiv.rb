@@ -5,7 +5,7 @@ module Source
     attr_reader :work_id, :image_type, :page, :date, :username, :user_id, :novel_id, :novel_series_id, :novel_embedded_image_id
 
     def self.match?(url)
-      return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url) || Source::URL::PixivComic.match?(url) || Source::URL::Booth.match?(url)
+      return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url) || Source::URL::PixivComic.match?(url) || Source::URL::PixivFactory.match?(url) || Source::URL::Booth.match?(url)
 
       url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl])
     end
