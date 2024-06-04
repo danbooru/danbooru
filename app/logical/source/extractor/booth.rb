@@ -12,7 +12,7 @@ class Source::Extractor
         [parsed_url.to_s]
       else
         api_response["images"].to_a.pluck("original").flat_map do |url|
-          Source::Extractor::Booth.new(url).image_urls
+          Source::Extractor.find(url).image_urls
         end
       end
     end
