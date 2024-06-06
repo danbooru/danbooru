@@ -76,8 +76,13 @@ module Danbooru
     # and "bad URI(is not URI?)" errors.
     def self.normalize_uri(uri)
       parsed_uri = Addressable::URI.parse(uri)
-      normalized_path = Addressable::URI.unencode_component(parsed_uri.path)
-      normalized_path = Addressable::URI.encode_component(normalized_path, Addressable::URI::CharacterClasses::PATH)
+
+      normalized_path = parsed_uri.path.split(%r{(/)}).map do |segment|
+        next segment if segment == "/"
+        segment = Addressable::URI.unencode_component(segment)
+        segment = Addressable::URI.encode_component(segment, Addressable::URI::CharacterClasses::PATH.gsub(%r{\\/}, ""))
+        segment
+      end.join
 
       HTTP::URI.new(
         scheme: parsed_uri.scheme,

@@ -90,11 +90,11 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "work for a URL containing percent-encoded characters" do
-        resp = Danbooru::Http.get(httpbin_url("anything/foo%20bar"))
+        resp = Danbooru::Http.get(httpbin_url("anything/foo%20bar%2Fbaz"))
 
         assert_equal(200, resp.status)
-        assert_equal(httpbin_url("anything/foo%20bar"), resp.request.uri.to_s)
-        assert_equal(httpbin_url("anything/foo%20bar"), resp.parse["url"])
+        assert_equal(httpbin_url("anything/foo%20bar%2Fbaz"), resp.request.uri.to_s)
+        assert_equal(httpbin_url("anything/foo%20bar/baz"), resp.parse["url"]) # httpbin decodes the %2F
       end
 
       should "work for a URL containing Unicode characters" do
