@@ -9,7 +9,7 @@
 # @see config/application.rb (config.action_mailer.delivery_job = "MailDeliveryJob")
 class MailDeliveryJob < ApplicationJob
   # Retry for about 2.5 hours.
-  retry_on Net::ReadTimeout, wait: :polynomially_longer, attempts: 8
+  retry_on Net::ReadTimeout, Net::OpenTimeout, wait: :polynomially_longer, attempts: 8
 
   def perform(mailer, mail_method, delivery_method, args:, kwargs: nil, params: nil)
     mailer_class = mailer.constantize.with(params.to_h)                # mailer_class = UserMailer.with(params)
