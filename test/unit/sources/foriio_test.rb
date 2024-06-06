@@ -34,16 +34,13 @@ module Sources
             { file_size: 2_371_766 },
           ],
           page_url: "https://www.foriio.com/works/698354",
-          profile_url: "https://www.foriio.com/yumenkmc",
           profile_urls: %w[https://www.foriio.com/yumenkmc https://twitter.com/yumenkmc],
           display_name: "𝗇𝖾𝗄𝗈𝗆𝗈🐾",
           username: "yumenkmc",
-          other_names: ["𝗇𝖾𝗄𝗈𝗆𝗈🐾", "yumenkmc"],
+          tags: [],
           dtext_artist_commentary_title: "おどロボ / 海茶 feat. 琴葉姉妹 with ずんだもん - MV用イラスト・ドットアニメーション",
           dtext_artist_commentary_desc: <<~EOS.chomp
             海茶さんの「おどロボ / 琴葉姉妹 with ずんだもん」のMV用イラストとピクセルアートを制作させていただきました。
-
-            ※画像の権利は海茶さんに譲渡しております。ご入用の際は海茶さんの許諾を頂くようお願いいたします。任意でnekomoのクレジット表記をいただけますと幸いです。
 
             ボカコレ2023夏 ルーキーランキング1位作品
 

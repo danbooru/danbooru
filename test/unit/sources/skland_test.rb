@@ -87,8 +87,8 @@ module Sources
           username: nil,
           tags: [
             ["明日方舟", "https://skland.com"],
+            ["森空岛视频激励计划", "https://skland.com"],
             ["鸿雪", "https://skland.com"],
-            ["至简", "https://skland.com"],
           ],
           dtext_artist_commentary_title: "鸿雪大战小杜林！",
           dtext_artist_commentary_desc: ""

@@ -79,7 +79,7 @@ module Sources
         assert_redirects_to("http://pic.x.com/Dxn7CuVErW", "https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1")
         assert_redirects_to("http://wp.me/p32Sjo-oJ", "http://xn--t8jf3evasg9m.com/?p=1533")
         assert_redirects_to("http://x.gd/uysub", "https://nohito.fanbox.cc/posts/7903482")
-        assert_redirects_to("http://xhslink.com/WNd9gI", "https://www.xiaohongshu.com/discovery/item/65880524000000000700a643?source=webshare")
+        assert_redirects_to("http://xhslink.com/xkcbDL", "https://www.xiaohongshu.com/discovery/item/65880524000000000700a643?source=webshare")
         assert_redirects_to("http://xhslink.com/ErpbmK，复制本条信息，打开【小红书】App查看精彩内容！", "https://www.xiaohongshu.com/discovery/item/663c6669000000001e037ad9?app_platform=android&app_version=8.11.9&author_share=1&ignoreEngage=true&share_from_user_hidden=true&type=normal&xhsshare=CopyLink&appuid=6651d57c00000000030307c4&apptime=1716639206")
       end
 

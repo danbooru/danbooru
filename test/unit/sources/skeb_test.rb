@@ -156,10 +156,8 @@ module Sources
         page_url: "https://skeb.jp/@LambOic029/works/146",
         profile_url: "https://skeb.jp/@LambOic029",
         profile_urls: %w[https://skeb.jp/@LambOic029],
-        display_name: "lamb",
+        display_name: "lamb@Skeb OPEN",
         username: "LambOic029",
-        tag_name: "lamboic029",
-        other_names: %w[lamb LambOic029],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           リクエストお願いします：
@@ -250,8 +248,8 @@ module Sources
       # Test that we don't alter the percent encoding of the URL, otherwise the signature will be wrong
       # page: https://skeb.jp/@LambOic029/works/146
       strategy_should_work(
-        "https://skeb.imgix.net/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=7dbecbeb7b05394537b60c881a081776",
-        media_files: [{ file_size: 120_140 }]
+        "https://si.imgix.net/5827955f/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=a526036c5ee23d52045f382ea627511f",
+        media_files: [{ file_size: 120_184 }]
       )
     end
 
