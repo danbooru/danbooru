@@ -36,7 +36,7 @@ module Sources
         tags: %w[],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          "【崩坏3】少女，泳装，夏日时光！":[https://www.bilibili.com/video/BV1fB4y1Y7zt/] 新视频的图片分享！大家记得来康"[崩坏3_送你一朵花]":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
+          "BV1fB4y1Y7zt":[https://www.bilibili.com/video/av598699440] 新视频的图片分享！大家记得来康"[崩坏3_送你一朵花]":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
         EOS
       )
     end
@@ -64,7 +64,7 @@ module Sources
         tags: %w[],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          "【崩坏3】少女，泳装，夏日时光！":[https://www.bilibili.com/video/BV1fB4y1Y7zt/] 新视频的图片分享！大家记得来康"[崩坏3_送你一朵花]":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
+          "BV1fB4y1Y7zt":[https://www.bilibili.com/video/av598699440] 新视频的图片分享！大家记得来康"[崩坏3_送你一朵花]":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
         EOS
       )
     end

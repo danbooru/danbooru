@@ -408,9 +408,8 @@ module Sources
           page_url: "https://cohost.org/waste/post/5680704-hi-im-glad-you-asked",
           profile_url: "https://cohost.org/waste",
           profile_urls: %w[https://cohost.org/waste],
-          display_name: "Gears",
+          display_name: nil,
           username: "waste",
-          tag_name: "waste",
           tags: [
             ["aplatonic", "https://cohost.org/rc/tagged/aplatonic"],
             ["Queer", "https://cohost.org/rc/tagged/Queer"],

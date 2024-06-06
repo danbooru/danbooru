@@ -70,6 +70,7 @@ module Source
         in "space", "bilibili.com", /^\d+$/ => artist_id, *rest
           @artist_id = artist_id
 
+        # https://www.bilibili.com/video/av598699440/
         # https://www.bilibili.com/video/BV1dY4y1u7Vi/
         # http://www.bilibili.tv/video/av439451/
         in ("www" | "m" | ""), ("bilibili.com" | "bilibili.tv"), "video", video_id

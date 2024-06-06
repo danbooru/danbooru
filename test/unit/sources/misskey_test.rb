@@ -223,10 +223,9 @@ module Sources
         page_url: "https://misskey.io/notes/9ralx49uwpls07uy",
         profile_url: "https://misskey.io/@naga_U_",
         profile_urls: %w[https://misskey.io/@naga_U_ https://misskey.io/users/9e2h6b7kbv],
-        display_name: "ながユー@ｺﾐﾃｨｱ148【か05a】",
+        display_name: "ながユー",
         username: "naga_U_",
         tag_name: "naga_u",
-        other_names: ["ながユー@ｺﾐﾃｨｱ148【か05a】", "naga_U_"],
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: ""
@@ -306,10 +305,9 @@ module Sources
         page_url: "https://nijimiss.moe/notes/01HPZQPJ6M9Y2DP134PRQ548EX",
         profile_url: "https://nijimiss.moe/@GAtturi_",
         profile_urls: %w[https://nijimiss.moe/@GAtturi_ https://nijimiss.moe/users/01GV09J8CQ19F0Z3T0D3PNDRRN],
-        display_name: "がっつり太郎",
+        display_name: nil,
         username: "GAtturi_",
         tag_name: "gatturi",
-        other_names: ["がっつり太郎", "GAtturi_"],
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
