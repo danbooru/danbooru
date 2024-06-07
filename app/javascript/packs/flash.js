@@ -1,5 +1,5 @@
 import "@ruffle-rs/ruffle/ruffle.js";
-import "@ruffle-rs/ruffle/core.ruffle.acef68c032af24bfd8c8.js";
-import "@ruffle-rs/ruffle/core.ruffle.bb26a71ccb0aa747c8a7.js";
-import "@ruffle-rs/ruffle/ca182dee324f8e0b099a.wasm";
-import "@ruffle-rs/ruffle/e4ac35563b7246e7d3c0.wasm";
+import "@ruffle-rs/ruffle/core.ruffle.5010a85e56f5e95d73a4.js";
+import "@ruffle-rs/ruffle/core.ruffle.14bc4cd87652213df02f.js";
+import "@ruffle-rs/ruffle/72478294b75d4a239072.wasm";
+import "@ruffle-rs/ruffle/fd97f55bfd1ccd82a8d8.wasm";
