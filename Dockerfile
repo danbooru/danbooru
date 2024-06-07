@@ -21,8 +21,8 @@ ARG VIPS_URL="https://github.com/libvips/libvips/releases/download/v8.14.2/vips-
 ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.1.1.tar.gz"
 ARG EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/12.70.tar.gz"
 ARG OPENRESTY_URL="https://openresty.org/download/openresty-1.25.3.1.tar.gz"
-ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.3.tar.gz"
-ARG RUBY_MINOR_VERSION="3.2.0"
+ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.2.tar.gz"
+ARG RUBY_MINOR_VERSION="3.3.0"
 ARG NODE_VERSION="20.x"
 ARG UBUNTU_VERSION="24.04"
 

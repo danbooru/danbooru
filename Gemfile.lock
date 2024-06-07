@@ -647,7 +647,7 @@ DEPENDENCIES
   x25519
 
 RUBY VERSION
-   ruby 3.2.3p157
+   ruby 3.3.2p78
 
 BUNDLED WITH
    2.5.5
