@@ -1,6 +1,6 @@
-const { globalMutableWebpackConfig: baseWebpackConfig, merge } = require("shakapacker");
+const { generateWebpackConfig } = require("shakapacker");
 
-module.exports = merge({}, baseWebpackConfig, {
+module.exports = generateWebpackConfig({
 //  output: {
 //    library: "Danbooru",
 //  },
