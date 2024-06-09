@@ -41,7 +41,8 @@ end
 if ENV.has_key?("PUMA_WORKERS")
   workers ENV["PUMA_WORKERS"]
 elsif ENV["RAILS_ENV"] == "production"
-  workers ENV.fetch("PUMA_WORKERS", Etc.nprocessors)
+  require "concurrent-ruby"
+  workers Concurrent.available_processor_count.to_i.clamp(1..)
 else
   # Use single worker mode in development for easier debugging
   workers 0

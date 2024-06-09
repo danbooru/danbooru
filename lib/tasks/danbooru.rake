@@ -67,8 +67,6 @@ namespace :danbooru do
     end
 
     task validate: :environment do
-      processes = ENV.fetch("PROCESSES", Etc.nprocessors).to_i
-
       MediaAsset.active.parallel_find_each do |asset|
         media_file = asset.variant(:original).open_file
 
