@@ -25,7 +25,7 @@ module Source
     end
 
     def image_url?
-      uuid.present? && filename.present?
+      uuid.present?
     end
 
     def page_url

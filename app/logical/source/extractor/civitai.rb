@@ -8,7 +8,7 @@ class Source::Extractor
     end
 
     def image_urls
-      if image_uuid.present? && width.present? && image_name.present?
+      if image_uuid.present?
         ["https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/#{image_uuid}/original=true"]
       else
         []
