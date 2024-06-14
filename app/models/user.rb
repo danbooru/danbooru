@@ -113,42 +113,42 @@ class User < ApplicationRecord
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_owner_if_first_user
 
-  has_many :ai_metadata_versions, foreign_key: :updater_id
-  has_many :artist_versions, foreign_key: :updater_id
-  has_many :artist_commentary_versions, foreign_key: :updater_id
-  has_many :comments, foreign_key: :creator_id
+  has_many :ai_metadata_versions, foreign_key: :updater_id, dependent: :destroy
+  has_many :artist_versions, foreign_key: :updater_id, dependent: :destroy
+  has_many :artist_commentary_versions, foreign_key: :updater_id, dependent: :destroy
+  has_many :comments, foreign_key: :creator_id, dependent: :destroy
   has_many :comment_votes, dependent: :destroy
-  has_many :wiki_page_versions, foreign_key: :updater_id
-  has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
-  has_many :forum_post_votes, dependent: :destroy, foreign_key: :creator_id
+  has_many :wiki_page_versions, foreign_key: :updater_id, dependent: :destroy
+  has_many :feedback, class_name: "UserFeedback", dependent: :destroy
+  has_many :forum_post_votes, foreign_key: :creator_id, dependent: :destroy
   has_many :forum_topic_visits, dependent: :destroy
-  has_many :visited_forum_topics, through: :forum_topic_visits, source: :forum_topic
-  has_many :moderation_reports, as: :model
-  has_many :pool_versions, foreign_key: :updater_id
-  has_many :posts, :foreign_key => "uploader_id"
-  has_many :post_appeals, foreign_key: :creator_id
-  has_many :post_approvals, :dependent => :destroy
-  has_many :post_disapprovals, :dependent => :destroy
-  has_many :post_events, class_name: "PostEvent", foreign_key: :creator_id
-  has_many :post_flags, foreign_key: :creator_id
-  has_many :post_votes
-  has_many :post_versions, foreign_key: :updater_id
-  has_many :bans, -> {order("bans.id desc")}
+  has_many :visited_forum_topics, through: :forum_topic_visits, source: :forum_topic, dependent: :destroy
+  has_many :moderation_reports, as: :model, dependent: :destroy
+  has_many :pool_versions, foreign_key: :updater_id, dependent: :destroy
+  has_many :posts, foreign_key: "uploader_id", dependent: :destroy
+  has_many :post_appeals, foreign_key: :creator_id, dependent: :destroy
+  has_many :post_approvals, dependent: :destroy
+  has_many :post_disapprovals, dependent: :destroy
+  has_many :post_events, class_name: "PostEvent", foreign_key: :creator_id, dependent: :destroy
+  has_many :post_flags, foreign_key: :creator_id, dependent: :destroy
+  has_many :post_votes, dependent: :destroy
+  has_many :post_versions, foreign_key: :updater_id, dependent: :destroy
+  has_many :bans, -> {order("bans.id desc")}, dependent: :destroy
   has_many :user_events, dependent: :destroy
-  has_one :active_ban, -> { active }, class_name: "Ban"
+  has_one :active_ban, -> { active }, class_name: "Ban", dependent: :destroy
   has_one :email_address, dependent: :destroy
   has_many :api_keys, dependent: :destroy
-  has_many :note_versions, :foreign_key => "updater_id"
-  has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
-  has_many :saved_searches
-  has_many :forum_topics, :foreign_key => "creator_id"
-  has_many :forum_posts, -> {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
-  has_many :user_name_change_requests, -> {order("user_name_change_requests.created_at desc")}
-  has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
-  has_many :favorites
-  has_many :ip_bans, foreign_key: :creator_id
-  has_many :tag_aliases, foreign_key: :creator_id
-  has_many :tag_implications, foreign_key: :creator_id
+  has_many :note_versions, foreign_key: "updater_id", dependent: :destroy
+  has_many :dmails, -> {order("dmails.id desc")}, foreign_key: "owner_id", dependent: :destroy
+  has_many :saved_searches, dependent: :destroy
+  has_many :forum_topics, foreign_key: "creator_id", dependent: :destroy
+  has_many :forum_posts, -> {order("forum_posts.created_at, forum_posts.id")}, foreign_key: "creator_id", dependent: :destroy
+  has_many :user_name_change_requests, -> {order("user_name_change_requests.created_at desc")}, dependent: :destroy
+  has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id, dependent: :destroy
+  has_many :favorites, dependent: :destroy
+  has_many :ip_bans, foreign_key: :creator_id, dependent: :destroy
+  has_many :tag_aliases, foreign_key: :creator_id, dependent: :destroy
+  has_many :tag_implications, foreign_key: :creator_id, dependent: :destroy
   has_many :uploads, foreign_key: :uploader_id, dependent: :destroy
   has_many :upload_media_assets, through: :uploads, dependent: :destroy
   has_many :mod_actions, as: :subject, dependent: :destroy
