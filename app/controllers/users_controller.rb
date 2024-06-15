@@ -63,6 +63,7 @@ class UsersController < ApplicationController
   end
 
   def create
+    raise User::PrivilegeError if Danbooru::IpAddress.new(request.remote_ip).is_proxy?
     user_verifier = UserVerifier.new(CurrentUser.user, request)
 
     @user = authorize User.new(
