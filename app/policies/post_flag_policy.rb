@@ -14,7 +14,7 @@ class PostFlagPolicy < ApplicationPolicy
   end
 
   def can_view_flagger?
-    record.creator_id == user.id || (user.is_moderator? && record.post&.uploader_id != user.id)
+    record.creator_id == user.id || user.is_moderator?
   end
 
   def permitted_attributes_for_create
@@ -33,9 +33,7 @@ class PostFlagPolicy < ApplicationPolicy
 
   def visible_for_search(relation, attribute)
     case attribute
-    in :creator | :creator_id if can_search_flagger?
-      relation.where(creator: user).or(relation.where.not(post: user.posts))
-    in :creator | :creator_id
+    in :creator | :creator_id if !can_search_flagger?
       relation.where(creator: user)
     else
       relation
