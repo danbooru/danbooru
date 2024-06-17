@@ -55,7 +55,7 @@ RelatedTag.current_tag = function() {
   // 8. | abc def  -> abc
 
   var $field = $("#post_tag_string");
-  var string = $field.val();
+  var string = $field.val() || "";
   var n = string.length;
   var a = $field.prop('selectionStart');
   var b = $field.prop('selectionStart');
@@ -121,7 +121,7 @@ RelatedTag.update_selected = function(e) {
 }
 
 RelatedTag.current_tags = function() {
-  let tagString = $("#post_tag_string").val().toLowerCase();
+  let tagString = ($("#post_tag_string").val() || "").toLowerCase();
   return Utility.splitWords(tagString);
 }
 
