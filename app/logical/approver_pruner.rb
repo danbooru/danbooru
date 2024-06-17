@@ -15,8 +15,7 @@ module ApproverPruner
   # Get the list of inactive approvers.
   # @return [Array<User>] the list of inactive approvers
   def inactive_approvers
-    recently_promoted_approvers = UserFeedback.where("created_at >= ?", APPROVAL_PERIOD.ago).where_like(:body, "*You gained the ability to approve posts*").pluck(:user_id) # XXX remove in two months
-    recently_promoted_approvers += UserFeedback.where("created_at >= ?", APPROVAL_PERIOD.ago).where_like(:body, "*You have been promoted to an Approver*").pluck(:user_id)
+    recently_promoted_approvers = UserFeedback.where("created_at >= ?", APPROVAL_PERIOD.ago).where_like(:body, "*You have been promoted to an Approver*").pluck(:user_id)
 
     approvers = User.where(level: User::Levels::APPROVER).where.not(id: recently_promoted_approvers)
     approvers.select do |approver|
@@ -46,7 +45,7 @@ module ApproverPruner
     return unless days_until_next_month <= 21
 
     inactive_approvers.each do |user|
-      Dmail.create_automated(to: user, title: "You will lose approval privileges soon", body: <<~BODY)
+      Dmail.create_automated(to: user, title: "You will lose approval privileges soon", body: <<~BODY.squish)
         You've approved fewer than #{MINIMUM_APPROVALS} posts in the past
         #{APPROVAL_PERIOD.inspect}. You will lose your approval privileges in
         #{days_until_next_month} #{"day".pluralize(days_until_next_month)}

@@ -23,7 +23,9 @@ module Clockwork
     DanbooruMaintenance.weekly
   end
 
-  every(1.month, "monthly", at: "00:00") do
+  # XXX every 1.month will vary the day it runs on based on when the cron container starts.
+  # Doing it this way means it will only run on the first day of the month.
+  every(1.day, "monthly", at: "00:00", if: lambda { |t| t.day == 1 }) do
     DanbooruMaintenance.monthly
   end
 end
