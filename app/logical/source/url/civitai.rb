@@ -2,7 +2,7 @@
 
 module Source
   class URL::Civitai < Source::URL
-    attr_reader :image_id, :uuid, :width, :filename
+    attr_reader :image_id, :uuid
 
     def self.match?(url)
       url.domain == "civitai.com"
@@ -14,10 +14,8 @@ module Source
       in _, "civitai.com", "images", image_id
         @image_id = image_id
 
-      in "images", "civitai.com", "xG1nkqKTMzGDvpLrqFT7WA", uuid, /width=(\d+)/ => width, filename
+      in ("image" | "images"), "civitai.com", "xG1nkqKTMzGDvpLrqFT7WA", uuid, *rest
         @uuid = uuid
-        @width = width
-        @filename = filename
 
       else
         nil
@@ -26,6 +24,10 @@ module Source
 
     def image_url?
       uuid.present?
+    end
+
+    def full_image_url
+      "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/#{uuid}/original=true" if uuid.present?
     end
 
     def page_url
