@@ -2,7 +2,7 @@
 
 module Source
   class URL::Civitai < Source::URL
-    attr_reader :image_id, :uuid
+    attr_reader :image_id, :post_id, :uuid
 
     def self.match?(url)
       url.domain == "civitai.com"
@@ -14,7 +14,10 @@ module Source
       in _, "civitai.com", "images", image_id
         @image_id = image_id
 
-      in ("image" | "images"), "civitai.com", "xG1nkqKTMzGDvpLrqFT7WA", uuid, *rest
+      in _, "civitai.com", "posts", post_id
+        @post_id = post_id
+
+      in ("image" | "images" | "imagecache"), "civitai.com", "xG1nkqKTMzGDvpLrqFT7WA", uuid, *rest
         @uuid = uuid
 
       else
@@ -31,7 +34,11 @@ module Source
     end
 
     def page_url
-      "https://civitai.com/images/#{image_id}" if image_id.present?
+      if image_id.present?
+        "https://civitai.com/images/#{image_id}"
+      elsif post_id.present?
+        "https://civitai.com/posts/#{post_id}"
+      end
     end
   end
 end
