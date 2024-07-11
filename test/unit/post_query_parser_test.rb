@@ -195,6 +195,13 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("(and (not (wildcard *)) a c)", "a -* c")
     end
 
+    should "parse search tags correctly" do
+      assert_parse_equals("(search a=)", '[a]:')
+      assert_parse_equals("(search a=foo)", "[a]:foo")
+      assert_parse_equals("(search a.b=foo)", "[a][b]:foo")
+      assert_parse_equals('(search a.b="")', '[a][b]:""')
+    end
+
     should "parse single tag queries correctly" do
       assert_parse_equals("a", "a")
       assert_parse_equals("a", "a ")
@@ -383,6 +390,16 @@ class PostQueryParserTest < ActiveSupport::TestCase
 
       assert_parse_equals("none", 'source:"foo')
       assert_parse_equals("none", 'source:"foo bar')
+
+      assert_parse_equals("none", '[')
+      assert_parse_equals("none", '[]')
+      assert_parse_equals("none", '[]:foo')
+      assert_parse_equals("none", '[a')
+      assert_parse_equals("none", '[a:foo')
+      assert_parse_equals("none", '[a]')
+      assert_parse_equals("none", '[a][:')
+      assert_parse_equals("none", '[a][]:')
+      assert_parse_equals("none", '[a][][b]:')
     end
 
     context "#to_infix" do
@@ -418,6 +435,11 @@ class PostQueryParserTest < ActiveSupport::TestCase
         assert_equal('a source:"b c"', to_infix('a source:"b c"'))
         assert_equal('a source:"\\""', to_infix('a source:"\\""'))
         assert_equal('a source:""', to_infix('a source:""'))
+
+        assert_equal("a [b]:c", to_infix("a [b]:c"))
+        assert_equal('a [b]:"c d"', to_infix('a [b]:"c d"'))
+        assert_equal('a [b]:"\\""', to_infix('a [b]:"\\""'))
+        assert_equal('a [b]:""', to_infix('a [b]:""'))
 
         assert_equal("a* b", to_infix("a* b"))
 

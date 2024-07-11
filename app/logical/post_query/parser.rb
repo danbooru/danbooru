@@ -18,13 +18,16 @@
 #               | "~" expr
 #               | expr
 # expr          = "(" or_clause ")" | term
-# term          = metatag | tag | wildcard
+# term          = metatag | tag | wildcard | search
 # metatag       = metatag_name ":" quoted_string
 # metatag_name  = "user" | "fav" | "pool" | "order" | ...
 # quoted_string = '"' /[^"]+/ '"'
 #               | "'" /[^']+/ "'"
 # tag           = /[^ *]+/
 # wildcard      = /[^ ]+/
+# search        = search_path ":" quoted_string
+# search_path   = "[" search_param "]" [search_path]
+# search_param  = "uploader" | "approver" | "parent" | ...
 
 class PostQuery
   class Parser
@@ -151,6 +154,7 @@ class PostQuery
           method(:tag),
           method(:metatag),
           method(:wildcard),
+          method(:search),
         ]
       end
 
@@ -177,20 +181,40 @@ class PostQuery
         end
       end
 
-      # A wildcard is a string that contains a '*' character and that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
+      # A wildcard is a string that contains a '*' character and that begins with a nonspace, non-')', non-'[', non-'~', or non-'-' character, followed by nonspace characters.
       def wildcard
-        t = string(/(?=[^ ]*\*)[^ \)~-][^ ]*/, skip_balanced_parens: true)
+        t = string(/(?=[^ ]*\*)[^ \)\[~-][^ ]*/, skip_balanced_parens: true)
         error("Invalid tag name: #{t}") if t.match?(/\A#{metatag_regex}/)
         space
         AST.wildcard(t)
       end
 
-      # A tag is a string that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
+      # A tag is a string that begins with a nonspace, non-')', non-`[`, non-'~', or non-'-' character, followed by nonspace characters.
       def tag
-        t = string(/[^ \)~-][^ ]*/, skip_balanced_parens: true)
+        t = string(/[^ \)\[~-][^ ]*/, skip_balanced_parens: true)
         error("Invalid tag name: #{t}") if t.downcase.in?(%w[and or]) || t.include?("*") || t.match?(/\A#{metatag_regex}/)
         space
         AST.tag(t)
+      end
+
+      # search       = search_path ":" quoted_string
+      # search_path  = "[" search_param "]" [search_path]
+      # search_param = "uploader" | "approver" | "parent" | ...
+      def search
+        path = search_path
+        expect(":")
+        quoted, value = quoted_string
+        space
+        AST.search(path, value, quoted)
+      end
+
+      def search_path
+        one_or_more {
+          expect("[")
+          path_component = string(/[^ \]]+/, skip_balanced_parens: true)
+          expect("]")
+          path_component
+        }
       end
 
       def string(pattern, skip_balanced_parens: false)

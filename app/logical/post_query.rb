@@ -22,7 +22,7 @@ class PostQuery
   attr_reader :current_user
   private attr_reader :tag_limit, :safe_mode, :builder
 
-  delegate :tag?, :metatag?, :wildcard?, :metatags, :wildcards, :tag_names, :to_infix, :to_pretty_string, to: :ast
+  delegate :tag?, :metatag?, :wildcard?, :search?, :metatags, :wildcards, :tag_names, :searches, :to_infix, :to_pretty_string, to: :ast
   alias_method :safe_mode?, :safe_mode
   alias_method :to_s, :to_infix
 
@@ -132,9 +132,9 @@ class PostQuery
     end
   end
 
-  # True if the search consists of a single tag, metatag, or wildcard.
+  # True if the search consists of a single tag, metatag, wildcard, or search tag.
   def is_single_term?
-    tag_names.size + metatags.size + wildcards.size == 1
+    tag_names.size + metatags.size + wildcards.size + searches.size == 1
   end
 
   # True if this search consists only of a single non-negated tag, with no other metatags or operators.
@@ -154,7 +154,7 @@ class PostQuery
       metatag.name.in?(%w[date upvoter upvote downvoter downvote commenter comm search flagger fav ordfav favgroup ordfavgroup]) ||
       metatag.name == "status" && metatag.value == "unmoderated" ||
       metatag.name == "disapproved" && !metatag.value.downcase.in?(PostDisapproval::REASONS)
-    end
+    end || searches.present?
   end
 
   def select_metatags(*names)
