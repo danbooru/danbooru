@@ -4,13 +4,14 @@
 # `PostQuery::Parser#parse`. It has methods for printing, manipulating, and
 # simpifying ASTs returned by the parser.
 #
-# There are nine AST node types:
+# There are ten AST node types:
 #
 # * :all (representing the search that returns everything, aka the empty search)
 # * :none (representing the search that returns nothing)
 # * :tag (a single tag)
 # * :metatag (a metatag with a name and value)
 # * :wildcard (a wildcard tag, e.g. `blue_*`)
+# * :search (a search tag, e.g. `[uploader][level_gt]:30`)
 # * :and (an n-ary AND clause)
 # * :or (an n-nary OR clause)
 # * :not (a unary NOT clause)
@@ -43,7 +44,7 @@ class PostQuery
 
     attr_reader :type, :args, :parent
     protected attr_writer :parent
-    delegate :all?, :none?, :and?, :or?, :not?, :opt?, :tag?, :metatag?, :wildcard?, to: :inquirer
+    delegate :all?, :none?, :and?, :or?, :not?, :opt?, :tag?, :metatag?, :wildcard?, :search?, to: :inquirer
 
     # Create an AST node.
     #
@@ -100,6 +101,10 @@ class PostQuery
           end
 
           AST.new(:metatag, [name, value, quoted])
+        end
+
+        def search(path, value, quoted = false)
+          AST.new(:search, [path.map(&:downcase), value.downcase, quoted])
         end
       end
 
@@ -255,6 +260,8 @@ class PostQuery
           name
         in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
+        in [:search, path, value, quoted]
+          "(search #{path.join(".")}=#{quoted_value})"
         in [:wildcard, name]
           "(wildcard #{name})"
         in [type, *args]
@@ -275,6 +282,8 @@ class PostQuery
           name
         in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
+        in [:search, path, value, quoted]
+          "#{path.map { "[#{_1}]" }.join("")}:#{quoted_value}"
         in :not, child
           child.term? ? "-#{child.to_infix}" : "-(#{child.to_infix})"
         in :opt, child
@@ -299,6 +308,8 @@ class PostQuery
           name.tr("_", " ").startcase
         in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
+        in [:search, path, value, quoted]
+          "#{path.map { "[#{_1}]" }.join("")}:#{quoted_value}"
         in :not, child
           child.term? ? "-#{child.to_pretty_string}" : "-(#{child.to_pretty_string})"
         in :opt, child
@@ -400,6 +411,11 @@ class PostQuery
         nodes.select(&:wildcard?).uniq.sort
       end
 
+      # @return [Array<AST>] A list of all unique search nodes in the AST.
+      def searches
+        nodes.select(&:search?).uniq.sort
+      end
+
       # @return [Array<String>] The names of all unique tags in the AST.
       def tag_names
         tags.map(&:name)
@@ -420,7 +436,7 @@ class PostQuery
 
       # True if the AST is a simple node, that is a leaf node with no child nodes.
       def term?
-        type.in?(%i[tag metatag wildcard all none])
+        type.in?(%i[tag metatag wildcard search all none])
       end
 
       # @return [String, nil] The name of the tag, metatag, or wildcard, if one of these nodes.
@@ -428,19 +444,24 @@ class PostQuery
         args.first if tag? || metatag? || wildcard?
       end
 
-      # @return [String, nil] The value of the metatag, if a metatag node.
+      # @return [Array<String>, nil] The path of the search, if a search node.
+      def path
+        args.first if search?
+      end
+
+      # @return [String, nil] The value of the metatag, or search, if one of these nodes.
       def value
-        args.second if metatag?
+        args.second if metatag? || search?
       end
 
-      # @return [String, nil] True if the metatag's value was enclosed in quotes.
+      # @return [String, nil] True if the metatag's or search tag's value was enclosed in quotes.
       def quoted?
-        args.third if metatag?
+        args.third if metatag? || search?
       end
 
-      # @return [String, nil] The value of the metatag as a quoted string, if a metatag node.
+      # @return [String, nil] The value of the metatag or search tag as a quoted string, if one of these nodes.
       def quoted_value
-        return nil unless metatag?
+        return nil unless metatag? || search?
 
         if quoted?
           %Q{"#{value.gsub(/"/, '\\"')}"}
