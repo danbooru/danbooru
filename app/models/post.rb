@@ -1748,6 +1748,16 @@ class Post < ApplicationRecord
           current_user: current_user
         )
 
+        if params[:pools].present?
+          pools = Pool.search(params[:pools], current_user)
+          q = q.where(id: pools.select("unnest(post_ids)"))
+        end
+
+        if params[:favorite_groups].present?
+          favorite_groups = FavoriteGroup.search(params[:favorite_groups], current_user)
+          q = q.where(id: favorite_groups.select("unnest(post_ids)"))
+        end
+
         if params[:tags].present?
           q = q.where(id: user_tag_match(params[:tags], current_user).select(:id))
         end
