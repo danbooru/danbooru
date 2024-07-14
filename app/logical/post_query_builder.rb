@@ -119,7 +119,7 @@ class PostQueryBuilder
         tag_names = Tag.wildcard_matches(node.name).limit(MAX_WILDCARD_TAGS).pluck(:name)
         relation.where_array_includes_any("string_to_array(posts.tag_string, ' ')", tag_names)
       in :search
-        params = node.path.reverse.reduce(node.value) do |params, path| { path => params } end
+        params = node.path.reverse.reduce(node.value) do |params, path| { path => params } end.with_indifferent_access
         filtered = relation.search(params, current_user)
         # XXX hack to make invalid searches return no results
         filtered = relation.none if relation.arel.constraints == filtered.arel.constraints
