@@ -104,7 +104,7 @@ class PostQuery
         end
 
         def search(path, is_array, value, quoted = false)
-          AST.new(:search, [path.map(&:downcase), is_array, value.downcase, quoted])
+          AST.new(:search, [path, is_array, value, quoted])
         end
       end
 
