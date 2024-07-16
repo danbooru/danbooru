@@ -201,20 +201,22 @@ class PostQuery
       # search_path  = "[" search_param "]" [search_path]
       # search_param = "uploader" | "approver" | "parent" | ...
       def search
-        path = search_path
+        path, is_array = search_path
         expect(":")
         quoted, value = quoted_string
         space
-        AST.search(path, value, quoted)
+        AST.search(path, is_array, value, quoted)
       end
 
       def search_path
-        one_or_more {
+        path = one_or_more {
           expect("[")
           path_component = string(/[^ \]]+/, skip_balanced_parens: true)
           expect("]")
           path_component
         }
+        is_array = accept("[]").present?
+        [path, is_array]
       end
 
       def string(pattern, skip_balanced_parens: false)

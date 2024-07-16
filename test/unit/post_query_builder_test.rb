@@ -1320,6 +1320,22 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "[invalid]:nobody")
     end
 
+    should "return posts for [] array search syntax" do
+      posts1 = create_list(:post, 3)
+      posts2 = create_list(:post, 2)
+      posts3 = [posts1.first, posts1.last, posts2.last]
+      pool1 = create(:pool, post_ids: posts1.pluck(:id), category: "collection")
+      pool2 = create(:pool, post_ids: posts2.pluck(:id), category: "collection")
+      pool3 = create(:pool, post_ids: posts3.pluck(:id), category: "collection")
+
+      assert_tag_match(posts2.reverse, "[pools][post_ids_include_any_array][]:#{posts2.first.id}")
+
+      # NYI
+      # assert_tag_match((posts1 + posts2).reverse, "[pools][post_ids_include_any_array][]:#{posts1.first.id} [pools][post_ids_include_any_array][]:#{posts2.first.id}")
+      # assert_tag_match([], "[pools][post_ids_include_all_array][]:#{posts1.first.id} [pools][post_ids_include_all_array][]:#{posts2.first.id}")
+      # assert_tag_match(posts3.reverse, "[pools][post_ids_include_all_array][]:#{posts1.first.id} [pools][post_ids_include_all_array][]:#{posts2.last.id}")
+    end
+
     should "return posts ordered by a particular attribute" do
       posts = (1..2).map do |n|
         tags = ["tagme", "gentag1 gentag2 artist:arttag char:chartag copy:copytag"]

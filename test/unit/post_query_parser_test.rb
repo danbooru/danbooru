@@ -199,6 +199,7 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("(search a=)", '[a]:')
       assert_parse_equals("(search a=foo)", "[a]:foo")
       assert_parse_equals("(search a.b=foo)", "[a][b]:foo")
+      assert_parse_equals("(search a.b[]=foo)", "[a][b][]:foo")
       assert_parse_equals('(search a.b="")', '[a][b]:""')
     end
 
@@ -398,7 +399,6 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("none", '[a:foo')
       assert_parse_equals("none", '[a]')
       assert_parse_equals("none", '[a][:')
-      assert_parse_equals("none", '[a][]:')
       assert_parse_equals("none", '[a][][b]:')
     end
 
@@ -437,6 +437,7 @@ class PostQueryParserTest < ActiveSupport::TestCase
         assert_equal('a source:""', to_infix('a source:""'))
 
         assert_equal("a [b]:c", to_infix("a [b]:c"))
+        assert_equal("a [b][]:c", to_infix("a [b][]:c"))
         assert_equal('a [b]:"c d"', to_infix('a [b]:"c d"'))
         assert_equal('a [b]:"\\""', to_infix('a [b]:"\\""'))
         assert_equal('a [b]:""', to_infix('a [b]:""'))

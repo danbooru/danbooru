@@ -582,11 +582,19 @@ module Searchable
       end
 
       if params[:"#{name}_include_any_array"]
-        relation = visible(relation, name).where_array_includes_any(name, params[:"#{name}_include_any_array"])
+        items = params[:"#{name}_include_any_array"]
+        items = [items] unless items.is_a?(Array)
+        items = items.map(&:to_i) if type == :integer
+
+        relation = visible(relation, name).where_array_includes_any(name, items)
       end
 
       if params[:"#{name}_include_all_array"]
-        relation = visible(relation, name).where_array_includes_all(name, params[:"#{name}_include_all_array"])
+        items = params[:"#{name}_include_all_array"]
+        items = [items] unless items.is_a?(Array)
+        items = items.map(&:to_i) if type == :integer
+
+        relation = visible(relation, name).where_array_includes_all(name, items)
       end
 
       if params[:"#{name}_include_any_lower"]
@@ -604,11 +612,19 @@ module Searchable
       end
 
       if params[:"#{name}_include_any_lower_array"]
-        relation = visible(relation, name).where_array_includes_any_lower(name, params[:"#{name}_include_any_lower_array"])
+        items = params[:"#{name}_include_any_lower_array"]
+        items = [items] unless items.is_a?(Array)
+        items = items.map(&:to_i) if type == :integer
+
+        relation = visible(relation, name).where_array_includes_any_lower(name, items)
       end
 
       if params[:"#{name}_include_all_lower_array"]
-        relation = visible(relation, name).where_array_includes_all_lower(name, params[:"#{name}_include_all_lower_array"])
+        items = params[:"#{name}_include_all_lower_array"]
+        items = [items] unless items.is_a?(Array)
+        items = items.map(&:to_i) if type == :integer
+
+        relation = visible(relation, name).where_array_includes_all_lower(name, items)
       end
 
       if params[:"any_#{singular_name}_matches_regex"]

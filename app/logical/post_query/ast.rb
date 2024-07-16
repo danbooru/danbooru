@@ -103,8 +103,8 @@ class PostQuery
           AST.new(:metatag, [name, value, quoted])
         end
 
-        def search(path, value, quoted = false)
-          AST.new(:search, [path.map(&:downcase), value.downcase, quoted])
+        def search(path, is_array, value, quoted = false)
+          AST.new(:search, [path.map(&:downcase), is_array, value.downcase, quoted])
         end
       end
 
@@ -260,8 +260,8 @@ class PostQuery
           name
         in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
-        in [:search, path, value, quoted]
-          "(search #{path.join(".")}=#{quoted_value})"
+        in [:search, path, is_array, value, quoted]
+          "(search #{path.join(".")}#{is_array ? "[]" : ""}=#{quoted_value})"
         in [:wildcard, name]
           "(wildcard #{name})"
         in [type, *args]
@@ -282,8 +282,8 @@ class PostQuery
           name
         in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
-        in [:search, path, value, quoted]
-          "#{path.map { "[#{_1}]" }.join("")}:#{quoted_value}"
+        in [:search, path, is_array, value, quoted]
+          "#{path.map { "[#{_1}]" }.join("")}#{is_array ? "[]" : ""}:#{quoted_value}"
         in :not, child
           child.term? ? "-#{child.to_infix}" : "-(#{child.to_infix})"
         in :opt, child
@@ -308,8 +308,8 @@ class PostQuery
           name.tr("_", " ").startcase
         in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
-        in [:search, path, value, quoted]
-          "#{path.map { "[#{_1}]" }.join("")}:#{quoted_value}"
+        in [:search, path, is_array, value, quoted]
+          to_infix
         in :not, child
           child.term? ? "-#{child.to_pretty_string}" : "-(#{child.to_pretty_string})"
         in :opt, child
@@ -449,14 +449,21 @@ class PostQuery
         args.first if search?
       end
 
+      # @return [Array<String>, nil] True if search value is an array.
+      def is_array
+        args.second if search?
+      end
+
       # @return [String, nil] The value of the metatag, or search, if one of these nodes.
       def value
-        args.second if metatag? || search?
+        return args.second if metatag?
+        return args.third if search?
       end
 
       # @return [String, nil] True if the metatag's or search tag's value was enclosed in quotes.
       def quoted?
-        args.third if metatag? || search?
+        return args[2] if metatag?
+        return args[3] if search?
       end
 
       # @return [String, nil] The value of the metatag or search tag as a quoted string, if one of these nodes.
