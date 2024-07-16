@@ -1316,7 +1316,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "[uploader_name]:#{post.uploader.name}")
       assert_tag_match([post], "[uploader][name]:#{post.uploader.name}")
       assert_tag_match([], "[uploader_name]:nobody")
-      assert_tag_match([], "[invalid]:nobody")
+      # Match ?search[] behavior
+      assert_tag_match([post], "[invalid]:nobody")
     end
 
     should "return posts ordered by a particular attribute" do
