@@ -196,11 +196,19 @@ class PostQueryParserTest < ActiveSupport::TestCase
     end
 
     should "parse search tags correctly" do
-      assert_parse_equals("(search a=)", '[a]:')
-      assert_parse_equals("(search a=foo)", "[a]:foo")
-      assert_parse_equals("(search a.b=foo)", "[a][b]:foo")
-      assert_parse_equals("(search a.b[]=foo)", "[a][b][]:foo")
-      assert_parse_equals('(search a.b="")', '[a][b]:""')
+      assert_parse_equals("(search [a]:)", '[a]:')
+      assert_parse_equals("(search [a]:foo)", "[a]:foo")
+      assert_parse_equals("(search [a]:bar)", "[a]:foo [a]:bar")
+      assert_parse_equals("(search [a][b]:foo)", "[a][b]:foo")
+      assert_parse_equals("(search [a][b][]:foo)", "[a][b][]:foo")
+      assert_parse_equals("(search [a][b][]:bar [a][b][]:foo)", "[a][b][]:foo [a][b][]:bar")
+      assert_parse_equals('(search [a][b]:)', '[a][b]:""')
+      assert_parse_equals('(search [a][b]:"c d")', '[a][b]:"c d"')
+      assert_parse_equals('(search [a][b]:"\\"")', '[a][b]:"\\""')
+      assert_parse_equals('(search [a][b]:d)', '[a][b]:c [a][b]:d')
+      assert_parse_equals('(search [a][b]:c [a][d]:e)', '[a][d]:e [a][b]:c')
+      assert_parse_equals('(and (search [a]:b [c]:d) (search [e]:f [g]:h))', '([a]:b [c]:d) ([e]:f [g]:h)')
+      assert_parse_equals('(and (search [a][b]:c [a][d]:e) f)', '[a][b]:c [a][d]:e f')
     end
 
     should "parse single tag queries correctly" do

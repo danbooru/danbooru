@@ -205,7 +205,7 @@ class PostQuery
         expect(":")
         quoted, value = quoted_string
         space
-        AST.search(path, is_array, value, quoted)
+        AST.search_param(path, is_array, value, quoted)
       end
 
       def search_path

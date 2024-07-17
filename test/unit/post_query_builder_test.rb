@@ -1329,11 +1329,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       pool3 = create(:pool, post_ids: posts3.pluck(:id), category: "collection")
 
       assert_tag_match(posts2.reverse, "[pools][post_ids_include_any_array][]:#{posts2.first.id}")
-
-      # NYI
-      # assert_tag_match((posts1 + posts2).reverse, "[pools][post_ids_include_any_array][]:#{posts1.first.id} [pools][post_ids_include_any_array][]:#{posts2.first.id}")
-      # assert_tag_match([], "[pools][post_ids_include_all_array][]:#{posts1.first.id} [pools][post_ids_include_all_array][]:#{posts2.first.id}")
-      # assert_tag_match(posts3.reverse, "[pools][post_ids_include_all_array][]:#{posts1.first.id} [pools][post_ids_include_all_array][]:#{posts2.last.id}")
+      assert_tag_match((posts1 + posts2).reverse, "[pools][post_ids_include_any_array][]:#{posts1.first.id} [pools][post_ids_include_any_array][]:#{posts2.first.id}")
+      assert_tag_match([], "[pools][post_ids_include_all_array][]:#{posts1.first.id} [pools][post_ids_include_all_array][]:#{posts2.first.id}")
+      assert_tag_match(posts3.reverse, "[pools][post_ids_include_all_array][]:#{posts1.first.id} [pools][post_ids_include_all_array][]:#{posts2.last.id}")
     end
 
     should "return posts ordered by a particular attribute" do
