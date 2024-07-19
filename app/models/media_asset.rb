@@ -499,7 +499,7 @@ class MediaAsset < ApplicationRecord
         variants = []
         variants = %i[180x180 360x360 720x720] unless is_flash?
         variants << :sample if is_ugoira? || (is_static_image? && image_width > LARGE_IMAGE_WIDTH)
-        variants << :full if is_webp? || is_avif?
+        variants << :full if (is_webp? || is_avif?) && !is_animated?
         variants << :original
         variants
       end
