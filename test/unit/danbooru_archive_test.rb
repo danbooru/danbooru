@@ -176,5 +176,40 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       assert_equal(1, archive.file_count)
       assert_equal(1_048_576_000, archive.uncompressed_size)
     end
+
+    context ".create! method" do
+      should "work" do
+        archive = Dir.mktmpdir do |tmpdir|
+          # Test normal files work
+          FileUtils.cp "test/files/test.gif", tmpdir
+
+          # Test utf8 filenames work
+          FileUtils.cp "test/files/test.jpg", File.join(tmpdir, "テスト.jpg")
+
+          # Test subdirectories work
+          FileUtils.mkdir_p File.join(tmpdir, "subdir")
+          FileUtils.cp "test/files/test.png", File.join(tmpdir, "subdir")
+
+          Danbooru::Archive.create!(tmpdir)
+        end
+
+        assert_equal(3, archive.file_count)
+        assert_equal(
+          ["subdir/test.png", "test.gif", "テスト.jpg"],
+          archive.entries.map(&:pathname).map { _1.force_encoding("UTF-8") }
+        )
+
+        dir, filenames = archive.extract!
+
+        # Archived files md5 should match
+        assert_equal(
+          ["081a5c3b92d8980d1aadbd215bfac5b9", "1e2edf6bdbd971d8c3cc4da0f98f38ab", "ecef68c44edb8a0d6a3070b5f8e8ee76"],
+          filenames.map { MediaFile.md5 _1 }
+        )
+
+        # md5 of the archive should always be the same
+        assert_equal("c48d71c7f6878ea5e52dc87e5fc41448", MediaFile.md5(archive.file.path))
+      end
+    end
   end
 end

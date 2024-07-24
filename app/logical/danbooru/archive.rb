@@ -12,6 +12,8 @@
 # @see https://www.rubydoc.info/gems/ffi-libarchive/0.4.2
 # @see https://github.com/libarchive/libarchive/wiki/ManualPages
 
+require "find"
+
 module Archive
   module C
     # XXX Monkey patch ffi-libarchive to add some functions we need.
@@ -80,6 +82,14 @@ module Danbooru
       end
     end
 
+    def self.create!(directory, filelike = nil, compression: ::Archive::COMPRESSION_NONE, format: ::Archive::FORMAT_ZIP, &block)
+      filelike = Danbooru::Tempfile.new("danbooru-archive-", binmode: true) if filelike.nil?
+      open!(filelike) do |archive|
+        archive.create!(directory, compression: compression, format: format)
+      end
+      open!(filelike, &block)
+    end
+
     # @param file [File] The archive file.
     def initialize(file)
       @file = file
@@ -146,6 +156,34 @@ module Danbooru
 
         path = "#{directory}/#{entry.pathname_utf8}"
         entry.extract!(path, flags: flags)
+      end
+    end
+
+    # Create the archive from the contents of a specified directory. Overwrites existing file.
+
+    # @param directory [String] The directory that contains files to archive.
+    # @param compression [Integer] Archive compression. By default, create an uncompressed archive.
+    # @param compression [Integer] Archive format. By default, create a zip archive.
+    # @return [(String, Array<String>)] The path to the directory, and the list of extracted files in the directory.
+    def create!(directory, compression: ::Archive::COMPRESSION_NONE, format: ::Archive::FORMAT_ZIP)
+      ::Archive::Writer.open_filename(file.path, compression, format) do |archive|
+        Find.find(directory).lazy.map do |path|
+          Pathname.new path
+        end.select(&:file?).each do |pn|
+          archive.new_entry do |e|
+            e.pathname = pn.relative_path_from(directory).to_s.force_encoding("ASCII-8BIT")
+            e.size = pn.size
+            e.filetype = ::Archive::Entry::FILE
+            e.perm = 0644
+            archive.write_header e
+            File.open(pn) do |f|
+              until f.eof? do
+                chunk = f.read ::Archive::C::DATA_BUFFER_SIZE
+                archive.write_data chunk
+              end
+            end
+          end
+        end
       end
     end
 
