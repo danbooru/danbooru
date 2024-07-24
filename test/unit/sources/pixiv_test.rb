@@ -37,7 +37,7 @@ module Sources
           "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364",
           image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"],
           media_files: [
-            { file_size: 2804, frame_delays: [125, 125] },
+            { file_size: 32676, frame_delays: [125, 125] },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -54,7 +54,7 @@ module Sources
           "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip",
           image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"],
           media_files: [
-            { file_size: 2804, frame_delays: [125, 125] },
+            { file_size: 32676, frame_delays: [125, 125] },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
