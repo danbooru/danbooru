@@ -21,6 +21,19 @@ module Archive
     attach_function_maybe :archive_format_name, [:pointer], :string
     attach_function_maybe :archive_filter_name, [:pointer, :int], :string
     attach_function_maybe :archive_filter_count, [:pointer], :int
+    attach_function_maybe :archive_write_set_option, [:pointer, :string, :string, :string], :int
+
+    # XXX: Hack to force 'Store' compression on zip archives.
+    class << self
+      alias_method :_archive_write_set_format, :archive_write_set_format
+      def archive_write_set_format(archive, format)
+        _archive_write_set_format(archive, format)
+
+        if format == FORMAT_ZIP
+          archive_write_set_option(archive, "zip", "compression", "store")
+        end
+      end
+    end
   end
 end
 
@@ -82,10 +95,10 @@ module Danbooru
       end
     end
 
-    def self.create!(directory, filelike = nil, compression: ::Archive::COMPRESSION_NONE, format: ::Archive::FORMAT_ZIP, &block)
-      filelike = Danbooru::Tempfile.new("danbooru-archive-", binmode: true) if filelike.nil?
+    def self.create!(directory, filelike = nil, &block)
+      filelike = Danbooru::Tempfile.new(["danbooru-archive-", ".zip"], binmode: true) if filelike.nil?
       open!(filelike) do |archive|
-        archive.create!(directory, compression: compression, format: format)
+        archive.create!(directory)
       end
       open!(filelike, &block)
     end
@@ -159,14 +172,12 @@ module Danbooru
       end
     end
 
-    # Create the archive from the contents of a specified directory. Overwrites existing file.
+    # Create an uncompressed ZIP archive from the contents of a specified directory. Overwrites existing file.
 
     # @param directory [String] The directory that contains files to archive.
-    # @param compression [Integer] Archive compression. By default, create an uncompressed archive.
-    # @param compression [Integer] Archive format. By default, create a zip archive.
     # @return [(String, Array<String>)] The path to the directory, and the list of extracted files in the directory.
-    def create!(directory, compression: ::Archive::COMPRESSION_NONE, format: ::Archive::FORMAT_ZIP)
-      ::Archive::Writer.open_filename(file.path, compression, format) do |archive|
+    def create!(directory)
+      ::Archive::Writer.open_filename(file.path, :none, :zip) do |archive|
         Find.find(directory).lazy.map do |path|
           Pathname.new path
         end.select(&:file?).each do |pn|

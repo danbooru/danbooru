@@ -208,7 +208,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         )
 
         # md5 of the archive should always be the same
-        assert_equal("c48d71c7f6878ea5e52dc87e5fc41448", MediaFile.md5(archive.file.path))
+        assert_equal("19875680007d7f56b9c2b39a2c3c62b8", MediaFile.md5(archive.file.path))
       end
     end
   end
