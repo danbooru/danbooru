@@ -183,22 +183,26 @@ module Source
     end
 
     def is_ugoira?
-      # https://i.pximg.net/img-original/img/2019/05/27/17/59/33/74932152_ugoira0.jpg
-      # https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip
-      filename.include?("ugoira")
+      # https://i.pximg.net/c/48x48/img-master/img/2024/07/24/08/46/41/120834265_square1200.jpg
+      # https://i.pximg.net/c/250x250_80_a2/img-master/img/2024/07/24/08/46/41/120834265_square1200.jpg
+      # https://i.pximg.net/c/540x540_70/img-master/img/2024/07/24/08/46/41/120834265_master1200.jpg
+      # https://i.pximg.net/img-master/img/2024/07/24/08/46/41/120834265_master1200.jpg
+      # https://i.pximg.net/img-zip-ugoira/img/2024/07/24/08/46/41/120834265_ugoira600x600.zip
+      # https://i.pximg.net/img-zip-ugoira/img/2024/07/24/08/46/41/120834265_ugoira1920x1080.zip
+      # https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira0.png
+      image_type.in?(%w[img-original img-master img-zip-ugoira]) && page.nil?
     end
 
     def full_image_url
       # https://i.pximg.net/c/ic0:400:1280/img-original/img/2010/10/20/00/11/54/13992705_p0.png
       # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
-      # https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip
       # https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png
       # http://i1.pixiv.net/novel-cover-original/img/2016/11/11/20/11/46/7463785_0e2446dc1671dd3a4937dfaee39c227f.jpg
       # https://i.pximg.net/novel-cover-original/img/2018/04/02/19/38/29/9434677_6ab6c651d5568ff39e2ba6ab45edaf28.jpg
       # https://i.pximg.net/novel-cover-original/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4.jpg
       # https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg
       # https://i.pximg.net/novel-cover-original/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5.jpg
-      if image_url? && image_type.in?(%w[img-original img-zip-ugoira novel-cover-original]) && date.present?
+      if image_url? && image_type.in?(%w[img-original novel-cover-original]) && date.present?
         "https://i.pximg.net/#{image_type}/img/#{date.join("/")}/#{basename}"
       end
     end
@@ -213,6 +217,9 @@ module Source
       if work_id.present? && page.present?
         %w[jpg png gif].map { |ext| "https://i.pximg.net/img-original/img/#{date.join("/")}/#{work_id}_p#{page}.#{ext}" }
 
+      elsif is_ugoira?
+        %w[jpg png gif].map { |ext| "https://i.pximg.net/img-original/img/#{date.join("/")}/#{work_id}_ugoira0.#{ext}" }
+
       # https://i.pximg.net/c/600x600/novel-cover-master/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4_master1200.jpg
       # https://i.pximg.net/c/480x960/novel-cover-master/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc_master1200.jpg
       # https://i.pximg.net/c/1200x1200/novel-cover-master/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5_master1200.jpg
@@ -221,6 +228,12 @@ module Source
       else
         []
       end
+    end
+
+    def ugoira_frame_url(n = 0)
+      return unless is_ugoira? && image_type == "img-original"
+
+      "https://i.pximg.net/img-original/img/#{date.join("/")}/#{work_id}_ugoira#{n}.#{file_ext}"
     end
 
     def page_url

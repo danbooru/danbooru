@@ -9,8 +9,10 @@ module Source
       end
 
       def image_urls
+        # If it's an ugoira, then grab the latest revision from the API right away,
+        # since it will be used to look up the frame metadata anyway.
         if is_ugoira?
-          [api_ugoira[:originalSrc]]
+          original_urls
         # If it's a full image URL, then use it as-is instead of looking it up in the API, because it could be the
         # original version of an image that has since been revised.
         elsif parsed_url.full_image_url.present?
@@ -150,8 +152,33 @@ module Source
       end
 
       def download_file!(url)
-        media_file = super(url)
-        media_file.frame_delays = ugoira_frame_delays if is_ugoira?
+        if is_ugoira?
+          download_ugoira(url)
+        else
+          super(url)
+        end
+      end
+
+      def download_ugoira(url)
+        url = Source::URL.parse url
+        return unless url.is_ugoira?
+
+        file = Danbooru::Tempfile.new(["danbooru-ugoira-", ".zip"], binmode: true)
+
+        Dir.mktmpdir do |tmpdir|
+          (0...ugoira_frame_delays.size).each do |n|
+            frame_url = Source::URL.parse url.ugoira_frame_url(n)
+            file_path = File.join tmpdir, "#{"%06d" % n}.#{frame_url.file_ext}"
+            File.open(file_path, "w+", binmode: true) do |file|
+              http_downloader.download_media(frame_url, file: file)
+            end
+          end
+
+          Danbooru::Archive.create!(tmpdir, file)
+        end
+
+        media_file = MediaFile.open(file)
+        media_file.frame_delays = ugoira_frame_delays
         media_file
       end
 
