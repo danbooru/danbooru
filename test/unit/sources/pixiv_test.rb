@@ -35,9 +35,9 @@ module Sources
       context "A ugoira page URL" do
         strategy_should_work(
           "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364",
-          image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"],
+          image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 32676, frame_delays: [125, 125] },
+            { file_size: 32876, frame_delays: [125, 125], md5: "d3c88941f0f55425de0f2970538e7dd4" },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -49,12 +49,12 @@ module Sources
         )
       end
 
-      context "A https://i.pximg.net/img-zip/ugoira/* image URL" do
+      context "A https://i.pximg.net/img-zip-ugoira/* image URL" do
         strategy_should_work(
           "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip",
-          image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"],
+          image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 32676, frame_delays: [125, 125] },
+            { file_size: 32876, frame_delays: [125, 125], md5: "d3c88941f0f55425de0f2970538e7dd4" },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -63,6 +63,29 @@ module Sources
           tags: %w[Ugoira png blue],
           dtext_artist_commentary_title: "ugoira",
           dtext_artist_commentary_desc: "",
+        )
+      end
+
+      context "A high resolution png ugoira post" do
+        # https://www.pixiv.net/artworks/95586458
+        # https://www.pixiv.net/artworks/97127572
+        # https://www.pixiv.net/artworks/100977136
+        # https://www.pixiv.net/artworks/101003492
+        # https://www.pixiv.net/artworks/108198142
+        # https://www.pixiv.net/artworks/113760314
+        # https://www.pixiv.net/artworks/115856599
+        strategy_should_work(
+          "https://www.pixiv.net/artworks/113760314",
+          image_urls: ["https://i.pximg.net/img-original/img/2023/11/27/19/51/28/113760314_ugoira0.png"],
+          media_files: [
+            {
+              file_size: 5319206,
+              width: 3600,
+              height: 2560,
+              frame_delays: [125] * 42,
+              md5: "ce55540a4159dcd7836a8a3747632656"
+            }
+          ],
         )
       end
 
