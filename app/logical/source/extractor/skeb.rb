@@ -57,26 +57,16 @@ module Source
 
         response = http.cache(1.minute).get(api_url)
 
-        if response.status == 429
-          self.cached_request_key = response.cookies.cookies.find { |cookie| cookie.name == "request_key" }&.value
-          response = http.cache(1.minute).get(api_url)
-        end
-
         return {} if response.mime_type == "text/html"
         response.parse
       end
 
       def http
-        super.headers(Authorization: "Bearer null").cookies(request_key: cached_request_key)
-      end
-
-      memoize def cached_request_key
-        Cache.get("skeb-request-key", 24.hours, skip_nil: true)
-      end
-
-      def cached_request_key=(value)
-        Cache.put("skeb-request-key", value)
-        cached_request_key(true)
+        super.headers(
+          Authorization: "Bearer null",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+        )
       end
 
       def profile_url

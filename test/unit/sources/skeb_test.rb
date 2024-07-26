@@ -89,9 +89,9 @@ module Sources
           https://si.imgix.net/06b2de18/uploads/origins/38a00949-a726-45c8-82b3-9aec4e8255ba?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=1bbe6796bb3a379732f4255c629f1ac0
         ],
         media_files: [
-          { file_size: 166_207 },
-          { file_size: 169_696 },
-          { file_size: 174_119 },
+          { file_size: 166_445 },
+          { file_size: 169_402 },
+          { file_size: 173_947 },
         ],
         page_url: "https://skeb.jp/@tontaro_/works/316",
         profile_url: "https://skeb.jp/@tontaro_",
@@ -150,8 +150,8 @@ module Sources
           https://si.imgix.net/51934468/uploads/origins/e888bb27-e1a6-48ec-a317-7615252ff818?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=86103e0336f9199170ec4aebdda7a430
         ],
         media_files: [
-          { file_size: 120_184 },
-          { file_size: 110_008 },
+          { file_size: 120_362 },
+          { file_size: 109_932 },
         ],
         page_url: "https://skeb.jp/@LambOic029/works/146",
         profile_url: "https://skeb.jp/@LambOic029",
@@ -249,18 +249,7 @@ module Sources
       # page: https://skeb.jp/@LambOic029/works/146
       strategy_should_work(
         "https://si.imgix.net/5827955f/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=a526036c5ee23d52045f382ea627511f",
-        media_files: [{ file_size: 120_184 }]
-      )
-    end
-
-    context "request key should automatically refresh" do
-      setup do
-        Cache.put("skeb-request-key", "invalid")
-      end
-
-      strategy_should_work(
-        "https://skeb.jp/@kokuzou593/works/45",
-        image_urls: ["https://si.imgix.net/1be455b2/uploads/origins/307941e9-dbe0-4e4b-93d4-94accdaff9a0?bg=%23fff&auto=format&fm=webp&w=800&s=ab82c6c148785b1c96d858244ebf68f0"],
+        media_files: [{ file_size: 120_362 }]
       )
     end
 
