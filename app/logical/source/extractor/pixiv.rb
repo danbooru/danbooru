@@ -166,11 +166,12 @@ module Source
         file = Danbooru::Tempfile.new(["danbooru-ugoira-", ".zip"], binmode: true)
 
         Dir.mktmpdir do |tmpdir|
-          (0...ugoira_frame_delays.size).each do |n|
+          ugoira_frame_delays.parallel_each.each_with_index do |delay, n|
             frame_url = Source::URL.parse url.ugoira_frame_url(n)
             file_path = File.join tmpdir, "#{"%06d" % n}.#{frame_url.file_ext}"
             File.open(file_path, "w+", binmode: true) do |file|
-              http_downloader.download_media(frame_url, file: file)
+              # XXX: thread-unsafe, therefore dup
+              http_downloader.deep_dup.download_media(frame_url, file: file)
             end
           end
 

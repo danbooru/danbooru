@@ -97,6 +97,10 @@ module Danbooru
       @http ||= Danbooru::Http.default
     end
 
+    def deep_dup
+      dup.tap { |o| o.http = o.http.dup }
+    end
+
     def get(url, **options)
       request(:get, url, **options)
     end
