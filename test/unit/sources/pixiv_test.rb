@@ -66,6 +66,23 @@ module Sources
         )
       end
 
+      context "A ugoira sample URL" do
+        strategy_should_work(
+          "https://i.pximg.net/img-master/img/2017/04/04/08/57/38/62247364_master1200.jpg",
+          image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
+          media_files: [
+            { file_size: 32876, frame_delays: [125, 125], md5: "d3c88941f0f55425de0f2970538e7dd4" },
+          ],
+          page_url: "https://www.pixiv.net/artworks/62247364",
+          profile_url: "https://www.pixiv.net/users/22252953",
+          display_name: "uroobnad2",
+          username: "user_myeg3558",
+          tags: %w[Ugoira png blue],
+          dtext_artist_commentary_title: "ugoira",
+          dtext_artist_commentary_desc: "",
+        )
+      end
+
       context "A high resolution png ugoira post" do
         # https://www.pixiv.net/artworks/95586458
         # https://www.pixiv.net/artworks/97127572
@@ -86,6 +103,13 @@ module Sources
               md5: "ce55540a4159dcd7836a8a3747632656"
             }
           ],
+        )
+      end
+
+      context "A revised ugoira direct URL should fail" do
+        strategy_should_work(
+          "https://i.pximg.net/img-zip-ugoira/img/2024/03/24/07/15/10/117197872_ugoira1920x1080.zip",
+          image_urls: []
         )
       end
 

@@ -231,7 +231,7 @@ module Source
     end
 
     def ugoira_frame_url(n = 0)
-      return unless is_ugoira? && image_type == "img-original"
+      return unless is_ugoira? && full_image_url.present?
 
       "https://i.pximg.net/img-original/img/#{date.join("/")}/#{work_id}_ugoira#{n}.#{file_ext}"
     end
