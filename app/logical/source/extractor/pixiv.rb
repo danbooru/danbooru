@@ -9,10 +9,16 @@ module Source
       end
 
       def image_urls
-        # If it's an ugoira, then grab the latest revision from the API right away,
-        # since it will be used to look up the frame metadata anyway.
+        # For ugoira we have to fetch the frame metadata from API,
+        # which may be incorrect for revisions.
+        # Therefore, get the latest revision URL from API,
+        # and, if we know the revision date, check that it matches.
         if is_ugoira?
-          original_urls
+          if parsed_url.date.present?
+            original_urls.select{ |url| Source::URL.parse(url).date == parsed_url.date }
+          else
+            original_urls
+          end
         # If it's a full image URL, then use it as-is instead of looking it up in the API, because it could be the
         # original version of an image that has since been revised.
         elsif parsed_url.full_image_url.present?
@@ -161,7 +167,7 @@ module Source
 
       def download_ugoira(url)
         url = Source::URL.parse url
-        return unless url.is_ugoira?
+        return unless url.ugoira_frame_url(0).present?
 
         file = Danbooru::Tempfile.new(["danbooru-ugoira-", ".zip"], binmode: true)
 
