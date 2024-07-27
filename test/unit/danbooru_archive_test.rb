@@ -192,6 +192,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
           Danbooru::Archive.create!(tmpdir)
         end
+        media_file = MediaFile.open(archive.file)
 
         assert_equal(3, archive.file_count)
         assert_equal(
@@ -199,16 +200,19 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
           archive.entries.map(&:pathname).map { _1.force_encoding("UTF-8") }
         )
 
-        dir, filenames = archive.extract!
+        archive.extract! do |dir, filenames|
+          # Archived files md5 should match
+          assert_equal(
+            ["081a5c3b92d8980d1aadbd215bfac5b9", "1e2edf6bdbd971d8c3cc4da0f98f38ab", "ecef68c44edb8a0d6a3070b5f8e8ee76"],
+            filenames.map { MediaFile.md5 _1 }
+          )
+        end
 
-        # Archived files md5 should match
-        assert_equal(
-          ["081a5c3b92d8980d1aadbd215bfac5b9", "1e2edf6bdbd971d8c3cc4da0f98f38ab", "ecef68c44edb8a0d6a3070b5f8e8ee76"],
-          filenames.map { MediaFile.md5 _1 }
-        )
+        # archive should have no compression
+        assert_equal("None", media_file.metadata["ZIP:ZipCompression"])
 
         # md5 of the archive should always be the same
-        assert_equal("19875680007d7f56b9c2b39a2c3c62b8", MediaFile.md5(archive.file.path))
+        assert_equal("19875680007d7f56b9c2b39a2c3c62b8", media_file.md5)
       end
     end
   end

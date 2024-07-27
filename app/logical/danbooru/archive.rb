@@ -25,14 +25,17 @@ module Archive
 
     # XXX: Hack to force 'Store' compression on zip archives.
     class << self
-      alias_method :_archive_write_set_format, :archive_write_set_format
-      def archive_write_set_format(archive, format)
-        _archive_write_set_format(archive, format)
+      module Extension
+        def archive_write_set_format(archive, format)
+          super archive, format
 
-        if format == FORMAT_ZIP
-          archive_write_set_option(archive, "zip", "compression", "store")
+          if format == FORMAT_ZIP
+            archive_write_set_option archive, "zip", "compression", "store"
+          end
         end
       end
+
+      prepend Extension
     end
   end
 end
