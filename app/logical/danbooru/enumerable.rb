@@ -10,8 +10,8 @@ module Danbooru
     def parallel_each(executor = :io, &block)
       return enum_for(:parallel_each) unless block_given?
 
-      promises = map do |item|
-        Concurrent::Promises.future_on(executor, item, &block)
+      promises = map do |*item|
+        Concurrent::Promises.future_on(executor, *item, &block)
       end
 
       Concurrent::Promises.zip(*promises).wait!
