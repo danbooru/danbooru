@@ -167,18 +167,30 @@ module Source
 
       def download_ugoira(url)
         url = Source::URL.parse url
-        return unless url.ugoira_frame_url(0).present?
+        frame0 = Source::URL.parse url.ugoira_frame_url(0)
+        return unless frame0.present?
+
+        animation_meta = {
+          mime_type: Mime::Type.lookup_by_extension(frame0.file_ext).to_s,
+          frames: ugoira_frame_delays.map.with_index do |delay, n|
+            { file: "#{"%06d" % n}.#{frame0.file_ext}", delay: delay }
+          end,
+        }
 
         file = Danbooru::Tempfile.new(["danbooru-ugoira-", ".zip"], binmode: true)
 
         Dir.mktmpdir do |tmpdir|
-          ugoira_frame_delays.parallel_each.each_with_index do |delay, n|
-            frame_url = Source::URL.parse url.ugoira_frame_url(n)
-            file_path = File.join tmpdir, "#{"%06d" % n}.#{frame_url.file_ext}"
+          animation_meta[:frames].to_enum.with_index.parallel_each do |frame, n|
+            frame_url = url.ugoira_frame_url(n)
+            file_path = File.join tmpdir, frame[:file]
             File.open(file_path, "w+", binmode: true) do |file|
               # XXX: thread-unsafe, therefore dup
               http_downloader.deep_dup.download_media(frame_url, file: file)
             end
+          end
+
+          File.open(File.join(tmpdir, "animation.json"), "w+") do |file|
+            file.write animation_meta.to_json
           end
 
           Danbooru::Archive.create!(tmpdir, file)
