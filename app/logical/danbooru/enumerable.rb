@@ -11,7 +11,7 @@ module Danbooru
       return enum_for(:parallel_map) unless block_given?
 
       promises = map do |*item|
-        Concurrent::Promises.delay_on(executor, *item, &block)
+        Concurrent::Promises.future_on(executor, *item, &block)
       end
 
       Concurrent::Promises.zip_futures_on(:immediate, *promises).value!
