@@ -28,7 +28,7 @@ class Source::Extractor
     end
 
     def artist_name
-      user_json["username"] || api_user["username"]
+      user_json["username"]
     end
 
     def profile_url
