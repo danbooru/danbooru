@@ -6,22 +6,15 @@
 # @see https://ruby-concurrency.github.io/concurrent-ruby/master/file.promises.out.html
 module Danbooru
   module Enumerable
-    # Like `#map`, but perform the block on each item in parallel.
-    def parallel_map(executor = :io, &block)
-      return enum_for(:parallel_map) unless block_given?
+    # Like `#each`, but perform the block on each item in parallel.
+    def parallel_each(executor = :io, &block)
+      return enum_for(:parallel_each) unless block_given?
 
       promises = map do |*item|
         Concurrent::Promises.future_on(executor, *item, &block)
       end
 
-      Concurrent::Promises.zip_futures_on(:immediate, *promises).value!
-    end
-
-    # Like `#each`, but perform the block on each item in parallel.
-    def parallel_each(executor = :io, &block)
-      return enum_for(:parallel_each) unless block_given?
-
-      parallel_map(executor, &block)
+      Concurrent::Promises.zip_futures_on(:immediate, *promises).wait!
       self
     end
 
