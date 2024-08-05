@@ -358,7 +358,7 @@ class Note {
       let ratio = $container.width() / large_width;
       let font_percentage = ratio * 100;
 
-      $container.css('font-size', font_percentage + '%');
+      $container.css('--note-font-size', font_percentage + '%');
     }
 
     static toggle_all() {

@@ -282,10 +282,10 @@
         <%= tag.canvas(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, "data-ugoira-frame-delays": @post.media_metadata.metadata["Ugoira:FrameDelays"].to_json) %>
 
         <div id="ugoira-controls">
-          <div id="ugoira-control-panel" class="mb-2 flex items-center" style="width: <%= [@post.image_width, 350].max %>px;">
+          <div id="ugoira-control-panel" class="mb-2 flex items-center">
             <button id="ugoira-play" style="display: none;">Play</button>
             <button id="ugoira-pause">Pause</button>
-            <div id="seek-slider" class="ml-4" style="width: <%= [@post.image_width, 350].max - 81 %>px;"></div>
+            <div id="seek-slider" class="ml-4 flex-1"></div>
           </div>
 
           <p><%= link_to "View WebM", current_page_path(size: "webm") %></p>

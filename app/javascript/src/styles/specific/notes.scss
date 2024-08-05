@@ -110,6 +110,7 @@
     opacity: 0.5;
     z-index: 100;
     box-sizing: content-box;
+    font-size: var(--note-font-size);
 
     /* Raise notes on hover so overlapping embedded notes are readable. */
     &:hover {

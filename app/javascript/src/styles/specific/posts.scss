@@ -87,6 +87,10 @@ div#c-posts {
   }
 
   #ugoira-controls {
+    div#ugoira-control-panel {
+      width: calc(max(350px, 100%));
+    }
+
     div#seek-slider {
       overflow: visible;
       background: var(--ugoira-seek-slider-background);
