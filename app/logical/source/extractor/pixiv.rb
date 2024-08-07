@@ -216,7 +216,7 @@ module Source
       end
 
       def is_ugoira?
-        original_urls.any? { |url| Source::URL.parse(url).is_ugoira? }
+        parsed_url.is_ugoira? || original_urls.any? { |url| Source::URL.parse(url).is_ugoira? }
       end
 
       memoize def illust_id
