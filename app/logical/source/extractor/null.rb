@@ -16,11 +16,11 @@ module Source
       end
 
       def page_url
-        sub_extractor&.page_url
+        sub_extractor&.page_url || parsed_url.page_url || parsed_referer&.page_url
       end
 
       def profile_url
-        sub_extractor&.profile_url
+        sub_extractor&.profile_url || parsed_url.profile_url || parsed_referer&.profile_url
       end
 
       def profile_urls
