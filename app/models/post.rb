@@ -1908,6 +1908,32 @@ class Post < ApplicationRecord
         ModAction.log("regenerated image samples for post ##{id}", :post_regenerate, subject: self, user: user)
       end
     end
+
+    def self.regenerate_incorrect_scores!
+      Post.find_by_sql(<<~SQL.squish)
+        UPDATE posts
+        SET
+          up_score = true_counts.up_score,
+          down_score = true_counts.down_score,
+          score = true_counts.score
+        FROM (
+          SELECT
+            post_id,
+            COUNT(*) FILTER (WHERE score > 0) AS up_score,
+            -COUNT(*) FILTER (WHERE score < 0) AS down_score,
+            SUM(score) AS score
+          FROM post_votes
+          WHERE NOT is_deleted
+          GROUP BY post_id
+        ) true_counts
+        WHERE posts.id = true_counts.post_id AND (
+          true_counts.up_score != posts.up_score OR
+          true_counts.down_score != posts.down_score OR
+          posts.score != true_counts.score
+        )
+        RETURNING posts.*;
+      SQL
+    end
   end
 
   concerning :IqdbMethods do
