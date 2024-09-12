@@ -27,6 +27,10 @@ class Source::Extractor
       end
     end
 
+    def tags_api_url
+      "https://civitai.com/api/trpc/tag.getVotableTags?input={%22json%22%3A{%22id%22%3A#{image_id}%2C%22type%22%3A%22image%22}}"
+    end
+
     def artist_name
       user_json["username"]
     end
@@ -35,10 +39,17 @@ class Source::Extractor
       "https://civitai.com/user/#{artist_name}" if artist_name.present?
     end
 
+    def tags
+      return [] unless image_id.present?
+
+      response = http.cache(1.minute).parsed_get(tags_api_url)
+      response.dig("result", "data", "json").to_a.map do |tag|
+        [tag["name"], "https://civitai.com/images?tags=#{tag['id']}"]
+      end
+    end
+
     memoize def html_response
-      # XXX Can't use page_url here, because posts require an API call.
-      # return nil unless image_id.present?
-      http.cache(1.minute).parsed_get(page_url) || Nokogiri::XML::Document.new
+      http.cache(1.minute).parsed_get(page_url)
     end
 
     memoize def next_queries
