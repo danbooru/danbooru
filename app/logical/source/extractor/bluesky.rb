@@ -88,14 +88,34 @@ class Source::Extractor::Bluesky < Source::Extractor
   end
 
   def artist_commentary_desc
-    api_response&.dig("thread", "post", "record", "text")
+    api_response&.dig("thread", "post", "record", "text") || ""
+  end
+
+  def dtext_artist_commentary_desc
+    DText.from_html(html_artist_commentary_desc, base_url: "https://bsky.app")
+  end
+
+  def html_artist_commentary_desc
+    text = artist_commentary_desc.dup.force_encoding("ASCII-8BIT")
+
+    api_response&.dig("thread", "post", "record", "facets").to_a.reverse.each do |facet|
+      tag = facet["features"].to_a.find {|f| f["$type"] == "app.bsky.richtext.facet#tag"}
+      next if tag.nil?
+
+      tag_name = tag["tag"]
+      byte_start = facet.dig("index", "byteStart")
+      byte_end = facet.dig("index", "byteEnd")
+      text[byte_start...byte_end] = %{<a href="https://bsky.app/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(tag_name))}">##{CGI.escapeHTML(tag_name)}</a>}.force_encoding("ASCII-8BIT")
+    end
+
+    text.force_encoding("UTF-8").gsub("\n", "<br>")
   end
 
   def tags
     api_response&.dig("thread", "post", "record", "facets").to_a.pluck("features").flatten.select do |f|
       f["$type"] == "app.bsky.richtext.facet#tag"
     end.pluck("tag").map do |tag|
-      [tag, "https://bsky.app/search"]
+      [tag, "https://bsky.app/hashtag/#{Danbooru::URL.escape(tag)}"]
     end
   end
 

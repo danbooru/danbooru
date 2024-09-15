@@ -44,7 +44,13 @@ module Sources
         display_name: "Baguette",
         username: "yourbaguette",
         tags: ["Art", "FanArt", "Digimon", "SteinsGate", "Omori", "FFXIV"],
-        dtext_artist_commentary_desc: "Thanks for the opportunity Bison ! \n\nI'm Baguette, and I mostly draw fanarts of whatever obsession I have ! I will move in Sweden in a week, work on my art and aim to open a little shop this year while working part time ! \n\n#Art #FanArt #Digimon #SteinsGate #Omori #FFXIV",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Thanks for the opportunity Bison !
+
+          I'm Baguette, and I mostly draw fanarts of whatever obsession I have ! I will move in Sweden in a week, work on my art and aim to open a little shop this year while working part time !
+
+          "#Art":[https://bsky.app/hashtag/Art] "#FanArt":[https://bsky.app/hashtag/FanArt] "#Digimon":[https://bsky.app/hashtag/Digimon] "#SteinsGate":[https://bsky.app/hashtag/SteinsGate] "#Omori":[https://bsky.app/hashtag/Omori] "#FFXIV":[https://bsky.app/hashtag/FFXIV]
+        EOS
       )
     end
 
@@ -81,6 +87,29 @@ module Sources
         username: "ixy",
         tags: [],
         dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
+      )
+    end
+
+    context "A post with Unicode tags" do
+      strategy_should_work(
+        "https://bsky.app/profile/mzmanjo.bsky.social/post/3l46kshfnjt2t",
+        image_urls: %w[https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:4ix5icku4nehfgpkyhtrpto6&cid=bafkreiblyhv7hrjeaft44lx2l2kdtqcru5uzqumimnlhqopjh2gvyvm7ca],
+        media_files: [{ file_size: 475_001 }],
+        page_url: "https://bsky.app/profile/did:plc:4ix5icku4nehfgpkyhtrpto6/post/3l46kshfnjt2t",
+        profile_urls: %w[https://bsky.app/profile/mzmanjo.bsky.social https://bsky.app/profile/did:plc:4ix5icku4nehfgpkyhtrpto6],
+        display_name: "アンジョー",
+        username: "mzmanjo",
+        tags: [
+          ["100日チャレンジ", "https://bsky.app/hashtag/100日チャレンジ"],
+          ["逃げ若", "https://bsky.app/hashtag/逃げ若"],
+          ["逃げ上手の若君", "https://bsky.app/hashtag/逃げ上手の若君"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          8日目 北条時行
+          "#100日チャレンジ":[https://bsky.app/hashtag/100日チャレンジ]
+          "#逃げ若":[https://bsky.app/hashtag/逃げ若] "#逃げ上手の若君":[https://bsky.app/hashtag/逃げ上手の若君]
+        EOS
       )
     end
 
