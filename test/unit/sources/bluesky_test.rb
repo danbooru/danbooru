@@ -72,6 +72,20 @@ module Sources
       )
     end
 
+    context "A post with a video" do
+      strategy_should_work(
+        "https://bsky.app/profile/tuyoki.bsky.social/post/3l47ij5osb32u",
+        image_urls: %w[https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:mymwxdm4zedrqufkotuxn72k&cid=bafkreih2h3eretfhugjzao5af3jc5zxfydsdyvyijhfi7ij4et55jqrqfi],
+        media_files: [{ file_size: 1_172_768 }],
+        page_url: "https://bsky.app/profile/did:plc:mymwxdm4zedrqufkotuxn72k/post/3l47ij5osb32u",
+        profile_urls: %w[https://bsky.app/profile/tuyoki.bsky.social https://bsky.app/profile/did:plc:mymwxdm4zedrqufkotuxn72k],
+        display_name: "temmie",
+        username: "tuyoki",
+        tags: [],
+        dtext_artist_commentary_desc: "victory pose"
+      )
+    end
+
     context "A post url with DID as user id" do
       strategy_should_work(
         "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",

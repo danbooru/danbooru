@@ -17,13 +17,18 @@ class Source::Extractor::Bluesky < Source::Extractor
       embed = embed["media"].to_h
     end
 
-    images = if embed["$type"] == "app.bsky.embed.images"
-      embed["images"]
-    end.to_a
+    blobs = case embed["$type"]
+    when "app.bsky.embed.images"
+      embed["images"].pluck("image")
+    when "app.bsky.embed.video"
+      [embed["video"]]
+    else
+      []
+    end
 
-    images.map do |image|
-      image_cid = image.dig("image", "ref", "$link") || image.dig("image", "cid")
-      "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=#{user_did}&cid=#{image_cid}"
+    blobs.map do |blob|
+      blob_cid = blob.dig("ref", "$link") || blob.dig("cid")
+      "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=#{user_did}&cid=#{blob_cid}"
     end
   end
 
