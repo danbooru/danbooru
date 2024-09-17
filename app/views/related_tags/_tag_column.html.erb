@@ -1,4 +1,4 @@
-<%# tags, title, class, selectable %>
+<%# tags, title, class %>
 
 <%= tag.div "x-data": { collapsed: false }.to_json, class: ["tag-column", ("card p-2 h-fit space-y-1" if title.present?), local_assigns[:class], ("hidden" if tags.blank?)] do %>
   <% if tags.present? %>
@@ -11,12 +11,10 @@
       </div>
     <% end %>
 
-    <ul class="tag-list <%= !selectable ? 'no-select' : ''%>" x-cloak x-show="!collapsed">
+    <ul class="tag-list" x-cloak x-show="!collapsed">
       <% tags.each do |t| %>
         <li class="flex items-center gap-1 w-fit leading-none">
-          <% if selectable %>
-            <input type="checkbox" tabindex="-1">
-          <% end %>
+          <input type="checkbox" tabindex="-1">
 
           <span class="wiki-link">
             <% if t.name =~ /\A\d+\z/ %>
@@ -29,11 +27,7 @@
           <span class="related-tag">
             <% if t.is_a?(AITag) %>
               <% at = t.to_aliased_tag %>
-              <% if selectable %>
-                <%= link_to at.pretty_name, posts_path(tags: at.name), class: "break-words #{tag_class(at)}", "data-tag-name": at.name %>
-              <% else %>
-                <%= link_to at.pretty_name, posts_path(tags: at.name), class: "break-words #{tag_class(at)}", "data-tag-name": "" %>
-              <% end %>
+              <%= link_to at.pretty_name, posts_path(tags: at.name), class: "break-words #{tag_class(at)}", "data-tag-name": at.name %>
               <%= tag.span "#{t.score}%", class: "text-muted text-xs" %>
             <% else %>
               <%= link_to t.pretty_name, posts_path(tags: t.name), class: "break-words #{tag_class(t)}", "data-tag-name": t.name %>
