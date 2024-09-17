@@ -208,10 +208,28 @@ class PostQuery
 
   # Implicit metatags are metatags added by the user's account settings. rating:g,s is implicit under safe mode.
   def implicit_metatags
-    return [] unless safe_mode?
+    tags = []
 
-    tags = Danbooru.config.safe_mode_restricted_tags.map { |tag| -AST.tag(tag) }
-    [AST.metatag("rating", "g"), *tags]
+    if safe_mode?
+      tags = Danbooru.config.safe_mode_restricted_tags.map { |tag| -AST.tag(tag) }
+      [AST.metatag("rating", "g"), *tags]
+    end
+
+    unless show_deleted?
+      tags << AST.metatag("status", "deleted").-@
+    end
+
+    tags
+  end
+
+  def show_deleted?
+    current_user.show_deleted_posts? || has_status_metatag?
+  end
+
+  def has_status_metatag?
+    select_metatags("is", "status").any? do |metatag|
+      metatag.value.downcase.in?(%w[all any active unmoderated modqueue deleted appealed])
+    end
   end
 
   concerning :CountMethods do
