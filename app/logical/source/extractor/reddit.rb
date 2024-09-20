@@ -59,6 +59,10 @@ module Source
         parsed_urls.find(&:share_id)
       end
 
+      def http
+        super.cookies(reddit_session: Danbooru.config.reddit_session_cookie)
+      end
+
       def api_url
         "https://reddit.com/gallery/#{work_id}" if work_id.present?
       end
