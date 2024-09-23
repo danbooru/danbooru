@@ -39,7 +39,7 @@ module Danbooru
     # generated every time the server starts, which will log out all users on
     # every restart.
     #
-    # Use `rake secret` to generate a random secret key.
+    # Use `rails secret` to generate a random secret key.
     def secret_key_base
       SecureRandom.uuid
     end
