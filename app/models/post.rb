@@ -410,7 +410,7 @@ class Post < ApplicationRecord
 
     # XXX should be a `validate` hook instead of `before_validation` hook
     def validate_new_tags
-      return if CurrentUser.user.is_builder?
+      return if CurrentUser.user.nil? || CurrentUser.user.is_builder?
 
       new_tags = post_edit.effective_added_tag_names.select { |name| !Tag.exists?(name: name) }
 
@@ -1834,7 +1834,7 @@ class Post < ApplicationRecord
     end
 
     def validate_changed_tags
-      return if uploader == CurrentUser.user || CurrentUser.user.is_builder?
+      return if CurrentUser.user.nil? || uploader == CurrentUser.user || CurrentUser.user.is_builder?
 
       changed_tags = added_tags + removed_tags
 
