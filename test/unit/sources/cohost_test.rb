@@ -4,6 +4,10 @@ require "test_helper"
 
 module Sources
   class CohostTest < ActiveSupport::TestCase
+    setup do
+      skip "Cohost cookie not configured" unless Source::Extractor::Cohost.enabled?
+    end
+
     context "Cohost:" do
       context "A sample image URL" do
         strategy_should_work(
