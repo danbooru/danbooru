@@ -1,4 +1,4 @@
-version: 2
+version: "2"
 checks:
   argument-count:
     enabled: false
@@ -30,7 +30,7 @@ plugins:
         - .js.erb
   rubocop:
     enabled: true
-    channel: "rubocop-1-20-0"
+    channel: "rubocop-1-56-3"
   stylelint:
     enabled: true
 exclude_patterns:
