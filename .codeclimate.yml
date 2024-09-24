@@ -31,8 +31,9 @@ plugins:
   rubocop:
     enabled: true
     channel: "rubocop-1-56-3"
-  stylelint:
-    enabled: true
+  # stylelint:
+  #   enabled: true
+  # codeclimate does not support stylelint-config-standard-scss: https://github.com/gilbarbara/codeclimate-stylelint/issues/55
 exclude_patterns:
   - "app/javascript/vendor"
   - "config/"
