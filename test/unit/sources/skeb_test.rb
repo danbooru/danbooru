@@ -83,15 +83,15 @@ module Sources
     context "An animated post with a smaller static unwatermarked version" do
       strategy_should_work(
         "https://skeb.jp/@tontaro_/works/316",
-        image_urls: %w[
-          https://si.imgix.net/17e73ecf/uploads/origins/5097b1e1-18ce-418e-82f0-e7e2cdab1cea?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=701f0e4a2c63865fe7e295b6c66b543b
-          https://si.imgix.net/4aeeffe6/uploads/origins/23123cfd-9b03-40f6-a8ae-7d74f9118c6f?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=1ac2bf12b04e3c12b65038e953fa5009
-          https://si.imgix.net/06b2de18/uploads/origins/38a00949-a726-45c8-82b3-9aec4e8255ba?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=1bbe6796bb3a379732f4255c629f1ac0
+        image_urls: [
+          %r{si.imgix.net/17e73ecf/uploads/origins/5097b1e1-18ce-418e-82f0-e7e2cdab1cea?.*&fm=mp4&w=800&s=},
+          %r{si.imgix.net/4aeeffe6/uploads/origins/23123cfd-9b03-40f6-a8ae-7d74f9118c6f?.*&fm=mp4&w=800&s=},
+          %r{si.imgix.net/06b2de18/uploads/origins/38a00949-a726-45c8-82b3-9aec4e8255ba?.*&fm=mp4&w=800&s=},
         ],
         media_files: [
           { file_size: 166_445 },
           { file_size: 169_402 },
-          { file_size: 173_947 },
+          { file_size: 174_205 },
         ],
         page_url: "https://skeb.jp/@tontaro_/works/316",
         profile_url: "https://skeb.jp/@tontaro_",
@@ -145,9 +145,9 @@ module Sources
     context "A post with two images" do
       strategy_should_work(
         "https://skeb.jp/@LambOic029/works/146",
-        image_urls: %w[
-          https://si.imgix.net/5827955f/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=a526036c5ee23d52045f382ea627511f
-          https://si.imgix.net/51934468/uploads/origins/e888bb27-e1a6-48ec-a317-7615252ff818?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=86103e0336f9199170ec4aebdda7a430
+        image_urls: [
+          %r{si.imgix.net/5827955f/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?.*&w=800},
+          %r{si.imgix.net/51934468/uploads/origins/e888bb27-e1a6-48ec-a317-7615252ff818?.*&w=800},
         ],
         media_files: [
           { file_size: 120_362 },
