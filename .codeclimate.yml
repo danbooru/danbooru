@@ -1,4 +1,4 @@
-version: 2
+version: "2"
 checks:
   argument-count:
     enabled: false
@@ -30,9 +30,10 @@ plugins:
         - .js.erb
   rubocop:
     enabled: true
-    channel: "rubocop-1-20-0"
-  stylelint:
-    enabled: true
+    channel: "rubocop-1-56-3"
+  # stylelint:
+  #   enabled: true
+  # codeclimate does not support stylelint-config-standard-scss: https://github.com/gilbarbara/codeclimate-stylelint/issues/55
 exclude_patterns:
   - "app/javascript/vendor"
   - "config/"
