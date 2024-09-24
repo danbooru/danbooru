@@ -13,6 +13,14 @@ FactoryBot.define do
     source { Faker::Internet.url }
     media_asset { build(:media_asset) }
 
+    after(:build) do |post|
+      CurrentUser.stubs(:user).returns(post.uploader)
+    end
+
+    after(:create) do
+      CurrentUser.unstub(:user)
+    end
+
     factory(:post_with_file) do
       transient do
         filename { "test.jpg" }
