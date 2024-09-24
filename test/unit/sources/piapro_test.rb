@@ -4,6 +4,10 @@ require "test_helper"
 
 module Sources
   class PiaproTest < ActiveSupport::TestCase
+    setup do
+      skip "Piapro cookie not configured" unless Source::Extractor::Piapro.enabled?
+    end
+
     context "Piapro:" do
       context "A sample image URL" do
         strategy_should_work(

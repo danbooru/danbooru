@@ -4,6 +4,10 @@ require "test_helper"
 
 module Sources
   class BehanceTest < ActiveSupport::TestCase
+    setup do
+      skip "Behance cookie not configured" unless Source::Extractor::Behance.enabled?
+    end
+
     context "Behance:" do
       context "A mir-s3-cdn-cf.behance.net sample image URL" do
         strategy_should_work(

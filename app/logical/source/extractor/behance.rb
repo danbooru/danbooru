@@ -4,6 +4,10 @@
 module Source
   class Extractor
     class Behance < Source::Extractor
+      def self.enabled?
+        Danbooru.config.behance_session_cookie.present?
+      end
+
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]

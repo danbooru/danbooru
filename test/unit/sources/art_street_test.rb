@@ -154,6 +154,10 @@ module Sources
       end
 
       context "A R-18 page url" do
+        setup do
+          skip "ArtStreet cookie not configured" unless Danbooru.config.art_street_session_cookie.present?
+        end
+
         strategy_should_work(
           "https://medibang.com/picture/ln1908221547595430010136798/",
           page_url: "https://medibang.com/picture/ln1908221547595430010136798/",

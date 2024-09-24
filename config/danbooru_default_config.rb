@@ -600,6 +600,10 @@ module Danbooru
     def plurk_session_cookie
     end
 
+    # Your Cohost "connect.sid" cookie. Login to Cohost then use the devtools to find the "connect.sid" cookie.
+    def cohost_session_cookie
+    end
+
     # Your Google Blogger API key. Go to https://developers.google.com/blogger/docs/3.0/using#APIKey to create an API key.
     # You can also use gallery-dl's API key, but you might get rate-limited if others are using it.
     # https://github.com/mikf/gallery-dl/blob/07d962d60aed598f0ee8578df914c38e5fc939aa/gallery_dl/extractor/blogger.py#L162
