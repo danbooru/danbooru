@@ -2,6 +2,10 @@
 
 # @see Source::URL::Bluesky
 class Source::Extractor::Bluesky < Source::Extractor
+  def self.enabled?
+    Danbooru.config.bluesky_identifier.present? && Danbooru.config.bluesky_password.present?
+  end
+
   def image_urls
     if parsed_url.image_url?
       [parsed_url.full_image_url]
@@ -138,8 +142,6 @@ class Source::Extractor::Bluesky < Source::Extractor
 
   # https://www.docs.bsky.app/docs/api/com-atproto-server-create-session
   memoize def access_token
-    return nil if Danbooru.config.bluesky_identifier.blank? || Danbooru.config.bluesky_password.blank?
-
     response = http.parsed_post(
       "https://bsky.social/xrpc/com.atproto.server.createSession",
       json: { identifier: Danbooru.config.bluesky_identifier, password: Danbooru.config.bluesky_password }
