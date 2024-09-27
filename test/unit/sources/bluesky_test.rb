@@ -1,12 +1,16 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class BlueskyTest < ActiveSupport::TestCase
+    setup do
+      skip "Bluesky credentials not configured" unless Source::Extractor::Bluesky.enabled?
+    end
+
     context "A post url with 'app.bsky.embed.images.view' embed" do
       strategy_should_work(
         "https://bsky.app/profile/ixy.bsky.social/post/3kkvo4d4jd32g",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
-        media_files: [{ file_size: 398747 }],
+        media_files: [{ file_size: 398_747 }],
         profile_url: "https://bsky.app/profile/ixy.bsky.social",
         profile_urls: [
           "https://bsky.app/profile/ixy.bsky.social",
@@ -30,10 +34,10 @@ module Sources
           "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:ekm5wgpt6xhazl7xaipt5ewy&cid=bafkreidzr5uo4mlxxssdluiyhvvbi7k4aner7teuuvex5t6ock3h2byxrm",
         ],
         media_files: [
-          { file_size: 773999 },
-          { file_size: 953927 },
-          { file_size: 829658 },
-          { file_size: 831440 },
+          { file_size: 773_999 },
+          { file_size: 953_927 },
+          { file_size: 829_658 },
+          { file_size: 831_440 },
         ],
         profile_url: "https://bsky.app/profile/yourbaguette.bsky.social",
         profile_urls: [
@@ -58,7 +62,7 @@ module Sources
       strategy_should_work(
         "https://bsky.app/profile/go-guiltism.bsky.social/post/3klgth6lilt2l",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:owc2r2dsewj3hk73rtd746zh&cid=bafkreieuhplc7fpbvi3suvacaf2dqxzvuu4hgl5o6eifqb76tf3uopldmi"],
-        media_files: [{ file_size: 162135 }],
+        media_files: [{ file_size: 162_135 }],
         profile_url: "https://bsky.app/profile/go-guiltism.bsky.social",
         profile_urls: [
           "https://bsky.app/profile/go-guiltism.bsky.social",
@@ -90,7 +94,7 @@ module Sources
       strategy_should_work(
         "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
-        media_files: [{ file_size: 398747 }],
+        media_files: [{ file_size: 398_747 }],
         profile_url: "https://bsky.app/profile/ixy.bsky.social",
         profile_urls: [
           "https://bsky.app/profile/ixy.bsky.social",
@@ -131,7 +135,7 @@ module Sources
       strategy_should_work(
         "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:3jogsxcisdcdzwjobhxbav2w/bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4@jpeg",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
-        media_files: [{ file_size: 398747 }],
+        media_files: [{ file_size: 398_747 }],
         profile_urls: ["https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w"],
       )
     end

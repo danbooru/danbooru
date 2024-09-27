@@ -575,7 +575,7 @@ module Danbooru
     def inkbunny_password
     end
 
-    # Your Bluesky identifier and password.
+    # Your Bluesky identifier and password. The identifier must include the domain that you see on your profile, ie "username.bsky.social"
     def bluesky_identifier
     end
 
