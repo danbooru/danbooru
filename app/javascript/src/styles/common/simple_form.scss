@@ -70,10 +70,10 @@ form.simple_form {
       textarea {
         width: 100%;
         max-width: 60rem;
-        max-height: 15rem;
+        max-height: 40rem;
 
-        &.text  { height: 20vh; }
-        &.dtext { height: 40vh; }
+        &.text  { height: min(15rem, 20vh); }
+        &.dtext { height: min(15rem, 40vh); }
       }
     }
 
