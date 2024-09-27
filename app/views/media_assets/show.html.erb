@@ -129,6 +129,15 @@
               </tr>
             <% end %>
 
+            <% @media_asset.uploads.each do |upload| %>
+              <% if policy(upload).show? %>
+                <tr>
+                  <th class="text-left">Upload</th>
+                  <td class="break-all"><%= link_to "##{upload.id}", upload %> (<%= link_to "@#{upload.uploader.name}", upload.uploader %>)</td>
+                </tr>
+              <% end %>
+            <% end %>
+
             <% if policy(@media_asset).can_see_image? %>
               <tr>
                 <th class="text-left">MD5</th>

@@ -15,7 +15,7 @@ class MediaAssetsController < ApplicationController
   end
 
   def show
-    @media_asset = authorize MediaAsset.find(params[:id])
+    @media_asset = authorize MediaAsset.includes(uploads: :uploader).find(params[:id])
     @post = Post.find_by_md5(@media_asset.md5)
 
     if CurrentUser.is_owner? && request.format.symbol.in?(%i[jpeg webp avif])
