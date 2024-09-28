@@ -32,6 +32,7 @@ class MediaAsset < ApplicationRecord
   has_many :uploads, through: :upload_media_assets
   has_many :uploaders, through: :uploads, class_name: "User", foreign_key: :uploader_id
   has_many :ai_tags
+  has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
   has_many :dtext_links, -> { embedded_media_asset }, foreign_key: :link_target
   has_many :embedding_wiki_pages, through: :dtext_links, source: :model, source_type: "WikiPage"
 
@@ -439,6 +440,7 @@ class MediaAsset < ApplicationRecord
         purge_cached_urls!
         update!(status: :expunged)
         ModAction.log("expunged media asset ##{id} (md5=#{md5})", :media_asset_expunge, subject: self, user: current_user) if log
+        pending_moderation_reports.update!(status: :handled, updater: current_user)
       end
     rescue
       update!(status: :failed)
@@ -451,6 +453,7 @@ class MediaAsset < ApplicationRecord
         purge_cached_urls!
         update!(status: :deleted)
         ModAction.log("deleted media asset ##{id} (md5=#{md5})", :media_asset_delete, subject: self, user: current_user) if log
+        pending_moderation_reports.update!(status: :handled, updater: current_user)
       end
     rescue
       update!(status: :failed)

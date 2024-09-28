@@ -32,9 +32,10 @@
         <%= link_to report.status.capitalize, moderation_reports_path(search: { status: report.status }) %>
       <% end %>
 
-      <% t.column "Reported user" do |report| %>
-        <%= link_to_user report.reported_user %>
-        <%= link_to "»", moderation_reports_path(search: { recipient_name: report.reported_user.name }) %>
+      <% t.column "Reported users" do |report| %>
+        <%= report.reported_users.map do |reported_user|
+          "#{link_to_user(reported_user)} #{link_to('»', moderation_reports_path(search: { recipient_name: reported_user.name }))}"
+        end.join(', ').html_safe %>
       <% end %>
 
       <% t.column "Reporter" do |report| %>

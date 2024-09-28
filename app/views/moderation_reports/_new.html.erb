@@ -1,5 +1,9 @@
 <div class="report-dialog-body">
-  <%= embed_wiki("help:report_notice") %>
+  <% if @moderation_report.model_type == "MediaAsset" %>
+    <%= embed_wiki("help:media_asset_report_notice") %>
+  <% else %>
+    <%= embed_wiki("help:report_notice") %>
+  <% end %>
 
   <%= edit_form_for(moderation_report, format: :js, remote: true) do |f| %>
     <%= f.hidden_field :model_type %>

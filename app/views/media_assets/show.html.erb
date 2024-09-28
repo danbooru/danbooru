@@ -25,11 +25,23 @@
 
                 <%= link_to_media_asset @media_asset, url: @media_asset.original.file_url %>
 
+                <% if policy(ModerationReport).can_see_moderation_reports? && @media_asset.pending_moderation_reports.present? %>
+                  <span class="moderation-report-notice font-bold">
+                    Reported (<%= link_to pluralize(@media_asset.pending_moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "MediaAsset", model_id: @media_asset.id, status: "pending" }) %>)
+                  </span>
+                <% end %>
+
                 <span>
                   <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
                     <% menu.with_item(hide_on_click: true) do %>
                       <%= link_to "#{@media_asset.original.file_url}?download=1", download: @media_asset.original.file_name do %>
                         <%= download_icon %> Download
+                      <% end %>
+
+                      <% if policy(@media_asset).reportable? %>
+                        <%= link_to new_moderation_report_path(moderation_report: { model_type: "MediaAsset", model_id: @media_asset.id }), remote: true, title: "Report this media asset to the moderators" do %>
+                          <%= flag_icon  %> Report
+                        <% end %>
                       <% end %>
                     <% end %>
 
