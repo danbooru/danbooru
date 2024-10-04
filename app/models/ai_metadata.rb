@@ -80,7 +80,7 @@ class AIMetadata < ApplicationRecord
       subject.prompt = prompt
       subject.negative_prompt = negative_prompt&.delete_prefix("Negative prompt: ")
       if params.present?
-        params = params.scan(PARAMETER_REGEX).map { |field| [field[0].downcase, field[1].tr('"', "")] }.to_h
+        params = params.scan(PARAMETER_REGEX).map { |field| [field[0].downcase, field[1].tr('"', "")] }.to_h unless params.is_a?(Hash)
         subject.parameters = params.filter_map do |key, value|
           [key.gsub("_", " ").titleize, value] if key.present? && value.present?
         end.to_h
@@ -96,6 +96,14 @@ class AIMetadata < ApplicationRecord
 
   def self.parse_parameters(params)
     return ["", "", ""] if params.blank?
+
+    if params.include?("sui_image_params")
+      params = JSON.parse(params)["sui_image_params"]
+      prompt = params["prompt"]
+      negative_prompt = params["negativeprompt"]
+      parameters = params.without("prompt", "negativeprompt")
+      return [prompt, negative_prompt, parameters]
+    end
 
     params, _, last_line = params.rpartition("\n")
     if !last_line.match?(PARAMETER_REGEX)
