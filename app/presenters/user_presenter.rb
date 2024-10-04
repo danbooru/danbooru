@@ -60,7 +60,7 @@ class UserPresenter
   end
 
   def commented_posts_count(template)
-    count = user.comments.distinct.count(:post_id)
+    count = user.comments.visible_for_search(:creator, CurrentUser.user).distinct.count(:post_id)
     template.link_to(count, template.posts_path(tags: "commenter:#{user.name} order:comment_bumped"), rel: "nofollow")
   end
 
