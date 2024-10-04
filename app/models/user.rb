@@ -110,6 +110,7 @@ class User < ApplicationRecord
   validates :comment_threshold, inclusion: { in: (-100..5) }
   validate :validate_custom_css, if: :custom_style_changed?
   validate :validate_add_extra_data_attributes, unless: :new_record?
+  validate :validate_not_signing_up_from_proxy, if: :new_record?
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_owner_if_first_user
 
@@ -228,6 +229,12 @@ class User < ApplicationRecord
     def validate_add_extra_data_attributes
       if !add_extra_data_attributes_was && add_extra_data_attributes_was && !Pundit.policy!(self, self).add_extra_data_attributes?
         errors.add(:base, "Can't enable extra data attributes without a Gold account")
+      end
+    end
+
+    def validate_not_signing_up_from_proxy
+      if last_ip_addr&.is_proxy?
+        errors.add(:base, "Sign ups are not allowed from that IP address.")
       end
     end
 
