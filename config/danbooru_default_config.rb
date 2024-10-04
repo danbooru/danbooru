@@ -728,22 +728,6 @@ module Danbooru
       # "http://localhost:5000"
     end
 
-    def aws_credentials
-      Aws::Credentials.new(Danbooru.config.aws_access_key_id, Danbooru.config.aws_secret_access_key)
-    end
-
-    def aws_access_key_id
-    end
-
-    def aws_secret_access_key
-    end
-
-    def aws_sqs_region
-    end
-
-    def aws_sqs_archives_url
-    end
-
     # If `captcha_site_key` and `captcha_secret_key` are set, then captchas will be enabled on the signup page to
     # protect the site against spambots. This uses the free Cloudflare Turnstile service.
     #
