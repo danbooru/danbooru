@@ -62,7 +62,7 @@ class Source::Extractor
 
     def image_json
       # Only on post pages.
-      next_queries.dig(1, "state", "data").to_h
+      next_queries.dig(1, "state", "data").to_h if post_id.present?
     end
 
     def image_id
