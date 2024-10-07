@@ -233,6 +233,7 @@ class User < ApplicationRecord
     end
 
     def validate_not_signing_up_from_proxy
+      return unless Danbooru.config.new_user_verification?.to_s.truthy? && Danbooru.config.disable_proxy_signup?.to_s.truthy?
       if last_ip_addr&.is_proxy?
         errors.add(:base, "Sign ups are not allowed from that IP address.")
       end

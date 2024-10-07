@@ -225,6 +225,11 @@ module Danbooru
       true
     end
 
+    # If true, new accounts created through a proxy or VPN will not be allowed.
+    def disable_proxy_signup?
+      false
+    end
+
     # An array of regexes containing disallowed usernames.
     def user_name_blacklist
       []
