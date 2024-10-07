@@ -1,8 +1,9 @@
+import Post from "./posts";
 import Utility from "./utility";
 import uniq from "lodash/uniq";
 
 export default class TagCounter {
-  static highCount = 20;
+  static highCount = Post.HIGH_TAG_COUNT;
 
   constructor($element) {
     this.$element = $element;
