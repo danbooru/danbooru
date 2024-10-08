@@ -800,6 +800,8 @@ class User < ApplicationRecord
         elsif params[:is_banned].to_s.falsy?
           q = q.bit_prefs_match(:is_banned, false)
         end
+      elsif !current_user.is_moderator?
+        q = q.bit_prefs_match(:is_banned, false)
       end
 
       if params[:current_user_first].to_s.truthy? && !CurrentUser.is_anonymous?
@@ -817,6 +819,10 @@ class User < ApplicationRecord
         q = q.order(post_update_count: :desc)
       else
         q = q.apply_default_order(params)
+      end
+
+      if params.keys.none? { _1.match?(/level/) } && !current_user.is_moderator?
+        q = q.where("level > 10")
       end
 
       q

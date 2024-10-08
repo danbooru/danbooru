@@ -6,6 +6,7 @@
       <%= f.input :name_matches, label: "Name", input_html: { value: params[:search][:name_matches], data: { autocomplete: "user" } } %>
       <%= f.input :level, collection: User.level_hash.to_a, include_blank: true, selected: params[:search][:level] %>
       <%= f.input :order, collection: [["Joined", "date"], ["Name", "name"], ["Posts", "post_upload_count"], ["Edits", "post_update_count"], ["Notes", "note_count"]], include_blank: true, selected: params[:search][:order] %>
+      <%= f.input :is_banned, label: "Banned?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:is_banned] %>
       <%= f.submit "Search" %>
     <% end %>
 
