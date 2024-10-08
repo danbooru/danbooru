@@ -4,6 +4,21 @@
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
+    <%= search_form_for(ai_metadata_versions_path) do |f| %>
+      <%= f.input :prompt_matches, label: "Prompt", input_html: { value: params.dig(:search, :prompt_matches) } %>
+      <%= f.input :negative_prompt_matches, label: "Negative prompt", input_html: { value: params.dig(:search, :negative_prompt_matches) } %>
+      <div class="input string optional search_parameter">
+        <label class="string optional" for="search_parameter_value">
+          <input id="search_parameter_name" class="text optional" placeholder="Parameter name" type="text" name="search[parameter_name]" data-autocomplete="ai-metadata-label" value="<%= params.dig(:search, :parameter_name) %>">
+        </label>
+        <input id="search_parameter_value" class="text optional" placeholder="Parameter value" type="text" name="search[parameter_value]" value="<%= params.dig(:search, :parameter_value) %>">
+        <%= help_tooltip "Leave value blank to search for any metadata that has that parameter", link_class: "parameter-search-help" %>
+      </div>
+      <%= f.input :updater_name, label: "Updater", input_html: { value: params.dig(:search, :updater_name), "data-autocomplete": "user" } %>
+      <%= f.input :version, input_html: { value: params.dig(:search, :version) } %>
+      <%= f.submit "Search" %>
+    <% end %>
+
     <div id="p-<%= listing_type(:post_id) %>-listing">
       <% if listing_type(:post_id) == :revert && @ai_metadata_versions.present? %>
         <%= post_preview(@ai_metadata_versions.first.post, show_deleted: true) %>
@@ -16,7 +31,7 @@
           <% end %>
 
           <% t.column "Version", width: "3%" do |metadata_version| %>
-            <%= link_to "#{metadata_version.post_id}.#{metadata_version.id}&nbsp;»".html_safe, ai_metadata_versions_path(search: { post_id: metadata_version.post_id }, anchor: "ai-metadata-version-#{metadata_version.id}") %>
+            <%= link_to "#{metadata_version.post_id}.#{metadata_version.version}&nbsp;»".html_safe, ai_metadata_versions_path(search: { post_id: metadata_version.post_id }, anchor: "ai-metadata-version-#{metadata_version.id}") %>
           <% end %>
         <% end %>
 

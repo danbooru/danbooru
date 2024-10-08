@@ -20,19 +20,21 @@ div.ui-dialog form.simple_form div.custom-metadata-field {
   }
 }
 
-#c-ai-metadata #a-index form.simple_form {
-  div.search_parameter {
-    label {
-      font-weight: normal;
+#c-ai-metadata, #c-ai-metadata-versions {
+  #a-index form.simple_form {
+    div.search_parameter {
+      label {
+        font-weight: normal;
+      }
     }
-  }
 
-  input[type="submit"] {
-    margin-top: 0.5em;
-  }
+    input[type="submit"] {
+      margin-top: 0.5em;
+    }
 
-  .parameter-search-help {
-    margin-left: 0.25em;
+    .parameter-search-help {
+      margin-left: 0.25em;
+    }
   }
 }
 
