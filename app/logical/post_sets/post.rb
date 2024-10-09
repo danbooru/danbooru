@@ -13,7 +13,7 @@ module PostSets
     MAX_WILDCARD_TAGS = PostQueryBuilder::MAX_WILDCARD_TAGS
 
     attr_reader :current_user, :page, :format, :tag_string, :post_query, :normalized_query, :show_votes, :add_extra_data_attributes
-    delegate :tag, :show_deleted?, to: :post_query
+    delegate :tag, to: :post_query
     alias_method :show_votes?, :show_votes
     alias_method :add_extra_data_attributes?, :add_extra_data_attributes
 
@@ -131,6 +131,16 @@ module PostSets
 
     def best_post
       posts.reject(&:is_deleted).select(&:visible?).max_by { |post| [-post.rating_id, post.score] }
+    end
+
+    def show_deleted?
+      current_user.show_deleted_posts? || has_status_metatag?
+    end
+
+    def has_status_metatag?
+      post_query.select_metatags("is", "status").any? do |metatag|
+        metatag.value.downcase.in?(%w[all any active unmoderated modqueue deleted appealed])
+      end
     end
 
     def banned_artist?
