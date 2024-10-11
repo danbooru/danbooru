@@ -129,7 +129,7 @@ module Discord
       query = PostQuery.normalize(args.join(" "))
       count = query.fast_count
       if count.present?
-        event.send_message("Post count for [`#{query}`](#{Routes.posts_url(tags: query)}): #{count}", false, nil, nil, false)
+        event.send_message("Post count for [`#{query}`](<#{Routes.posts_url(tags: query)}>): #{count}", false, nil, nil, false)
       else
         event << "Error fetching count"
       end
