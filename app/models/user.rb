@@ -402,7 +402,7 @@ class User < ApplicationRecord
 
     module ClassMethods
       def owner
-        User.find_by!(level: Levels::OWNER)
+        User.where(level: Levels::OWNER).order(id: :asc).take!
       end
 
       def system
