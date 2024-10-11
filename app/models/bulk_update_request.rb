@@ -124,6 +124,41 @@ class BulkUpdateRequest < ApplicationRecord
     status == "rejected"
   end
 
+  concerning :DiscordMethods do
+    def discord_author
+      Discordrb::Webhooks::EmbedAuthor.new(name: "@#{user.pretty_name}", url: user.discord_url)
+    end
+
+    def discord_color
+      case status
+      when "pending"
+        0x0000FF # blue
+      when "approved"
+        # default color
+      when "rejected"
+        0xFFFFFF # white
+      when "proecssing"
+        0x00FF00 # green
+      when "failed"
+        0xC41C19 # red
+      else
+        # should never happen
+      end
+    end
+
+    def discord_body
+      script
+    end
+
+    def discord_footer
+      votes = forum_post.votes.map(&:vote_type).tally
+      vote_info = "#{votes['up'].presence || 0}⇧ #{votes['down'].presence || 0}⇩ #{votes['meh'].presence || 0}∅"
+      timestamp = "#{created_at.strftime("%F")}"
+
+      Discordrb::Webhooks::EmbedFooter.new(text: "#{vote_info} | #{timestamp}")
+    end
+  end
+
   def self.available_includes
     [:user, :forum_topic, :forum_post, :approver]
   end

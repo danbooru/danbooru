@@ -7,7 +7,8 @@ module Discord
       @@messages << [name, regex]
 
       define_method(:"do_#{name}") do |event|
-        matches = event.text.scan(/(?<!`)#{regex}(?!`)/)
+        text = event.text.gsub(/```.*```/m, "")
+        matches = text.scan(/(?<!`)#{regex}(?!`)/)
 
         matches.each do |match|
           instance_exec(event, match, &block)
@@ -25,10 +26,12 @@ module Discord
       end
     end
 
-    respond_to_id Post
-    respond_to_id ForumTopic, "topic"
-    respond_to_id ForumPost, "forum"
+    respond_to_id BulkUpdateRequest, "bur"
     respond_to_id Comment
+    respond_to_id ForumPost, "forum"
+    respond_to_id ForumTopic, "topic"
+    # respond_to_id MediaAsset, "asset"
+    respond_to_id Post
     respond_to_id User
 
     respond(:wiki_link, /\[\[ [^\]]+ \]\]/x) do |event, text|
@@ -73,7 +76,7 @@ module Discord
     def do_convert_post_links(event, *args)
       post_ids = []
 
-      message = event.message.content.gsub(%r{\b(?!https?:\/\/(?:\w+\.)?aibooru\.(?:online|space)\/posts\/\d+\/\w+)https?:\/\/(?:\w+\.)?aibooru\.(?:online|space)\/posts\/(\d+)\b[^[:space:]]*}i) do |link|
+      message = event.message.content.gsub(%r{\b(?!https?:\/\/(?:\w+\.)?aibooru\.(?:online|ovh|download)\/posts\/\d+\/\w+)https?:\/\/(?:\w+\.)?aibooru\.(?:online|ovh|download)\/posts\/(\d+)\b[^[:space:]]*}i) do |link|
         post_ids << $1.to_i
         link = link.gsub(/\A<+(.+)>+\z/, "\\1")
         "<#{link}>"
@@ -102,15 +105,34 @@ module Discord
     def do_sql(event, *args)
       return unless event.user.id == event.bot.bot_application.owner.id
 
+      event.channel.start_typing
+
       sql = args.join(" ")
       result = ActiveRecord::Base.connection.execute(sql)
-      table = Terminal::Table.new(headings: result.fields, rows: result.map(&:values).take(10))
+      table = Terminal::Table.new(headings: result.fields, rows: result.map(&:values).take(10)).to_s
+      rows = table.split("\n")
+      num = (1950.0 / rows[0].length.to_f).floor
+      table = rows.take(num).join("\n")
 
-      event << "```\n#{table}\n```"
+      more = if num < rows.count
+        "\n[#{rows.count - num} rows omitted]"
+      else
+        ""
+      end
+
+      event << "```\n#{table}#{more}\n```"
     end
 
     def do_count(event, *args)
-      event << PostQuery.normalize(args.join(" ")).fast_count
+      event.channel.start_typing
+
+      query = PostQuery.normalize(args.join(" "))
+      count = query.fast_count
+      if count.present?
+        event.send_message("Post count for [`#{query}`](#{Routes.posts_url(tags: query)}): #{count}", false, nil, nil, false)
+      else
+        event << "Error fetching count"
+      end
     end
   end
 
@@ -132,7 +154,7 @@ module Discord
     end
 
     def register_commands
-      @bot.message(contains: %r!https?:\/\/(?:\w+\.)?aibooru\.(?:online|space)\/posts\/\d+!i, &method(:do_convert_post_links))
+      @bot.message(contains: %r!https?:\/\/(?:\w+\.)?aibooru\.(?:online|ovh|download)\/posts\/\d+!i, &method(:do_convert_post_links))
       @bot.command(:eval, &method(:do_eval))
       @bot.command(:count, &method(:do_count))
       @bot.command(:sql, &method(:do_sql))
