@@ -88,6 +88,14 @@ class ForumPost < ApplicationRecord
     votes.exists?(creator_id: user.id, score: score)
   end
 
+  def tallied_votes
+    votes.map(&:vote_type).tally
+  end
+
+  def formatted_votes
+    "#{tallied_votes['up'].presence || 0}⇧ #{tallied_votes['down'].presence || 0}⇩ #{tallied_votes['meh'].presence || 0}∅"
+  end
+
   def validate_deletion_of_original_post
     if is_original_post? && is_deleted? && !topic.is_deleted?
       errors.add(:base, "Can't delete original post without deleting the topic first")

@@ -134,6 +134,19 @@ module Discord
         event << "Error fetching count"
       end
     end
+
+    def do_pendingburs(event, *args)
+      burs = BulkUpdateRequest.pending.order(created_at: :asc).includes(:user, forum_post: [:votes]).take(10)
+      if burs.present?
+        rows = burs.map do |bur|
+          ["BUR ##{bur.id}", bur.user.pretty_name, bur.forum_topic.title, bur.forum_post.formatted_votes, bur.expires_at.strftime("%F")]
+        end
+        table = Terminal::Table.new(headings: ["ID", "User", "Title", "Votes", "Expires"], rows: rows)
+        event << "```\n#{table}\n```"
+      else
+        event << "No pending BURs."
+      end
+    end
   end
 
   class Bot
@@ -158,6 +171,7 @@ module Discord
       @bot.command(:eval, &method(:do_eval))
       @bot.command(:count, &method(:do_count))
       @bot.command(:sql, &method(:do_sql))
+      @bot.command(:pendingburs, &method(:do_pendingburs))
 
       @@messages.each do |name, regex|
         @bot.message(contains: regex, &method(:"do_#{name}"))

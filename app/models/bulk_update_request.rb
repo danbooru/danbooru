@@ -124,6 +124,11 @@ class BulkUpdateRequest < ApplicationRecord
     status == "rejected"
   end
 
+  def expires_at
+    date = created_at + 46.days
+    Time.new(date.year, date.month, date.day, 0, 0, 0)
+  end
+
   concerning :DiscordMethods do
     def discord_author
       Discordrb::Webhooks::EmbedAuthor.new(name: "@#{user.pretty_name}", url: user.discord_url)
@@ -146,16 +151,21 @@ class BulkUpdateRequest < ApplicationRecord
       end
     end
 
+    def discord_title
+      forum_topic.title
+    end
+
     def discord_body
-      script
+      dtext = DText.new(processor.to_dtext).to_markdown
+      last_index = dtext[0..1950].rindex("\n")
+      omitted = dtext[last_index..].count("\n")
+      "#{dtext[0..last_index]}\n[omitted #{omitted} lines]"
     end
 
     def discord_footer
-      votes = forum_post.votes.map(&:vote_type).tally
-      vote_info = "#{votes['up'].presence || 0}⇧ #{votes['down'].presence || 0}⇩ #{votes['meh'].presence || 0}∅"
       timestamp = "#{created_at.strftime("%F")}"
 
-      Discordrb::Webhooks::EmbedFooter.new(text: "#{vote_info} | #{timestamp}")
+      Discordrb::Webhooks::EmbedFooter.new(text: "#{forum_post.formatted_votes} | #{timestamp}")
     end
   end
 
