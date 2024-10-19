@@ -73,7 +73,7 @@ class Source::URL::Null < Source::URL
       "Eth.co"
     in _, "exblog.jp"
       "Excite Blog"
-    in _, ("facebook.com" | "fbcdn.net")
+    in _, ("facebook.com" | "fb.com" | "fbcdn.net")
       "Facebook"
     in _, "fanfiction.net"
       "FanFiction.Net"
@@ -398,8 +398,14 @@ class Source::URL::Null < Source::URL
       @work_id = $1
       @page_url = "https://www.facebook.com/photo?fbid=#{@work_id}"
 
-    # https://www.facebook.com/LuutenantsLoot
-    in _, ("facebook.com" | "fbcdn.net"), *rest
+    # https://www.facebook.com/sinyu.tang.9
+    # https://fb.com/sinyu.tang.9
+    in _, ("facebook.com" | "fb.com"), username
+      @username = username
+      @profile_url = "https://www.facebook.com/#{username}"
+
+    # https://www.facebook.com/sinyu.tang.9/posts/pfbid032uCXimgsnuYgJMK2WvvYHb3WZ1gd5PjBCdkXrKVM91nTzPHeQ4CLGPqGBsqvQ9q1l
+    in _, ("facebook.com" | "fb.com" | "fbcdn.net"), *rest
       nil
 
     # https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-xlp1/t31.0-8/s960x960/13173066_623015164516858_1844421675339995359_o.jpg
