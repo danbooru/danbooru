@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
   context "The media assets controller" do
@@ -19,6 +19,13 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "show action" do
+      setup do
+        @user1 = create(:user)
+        @user2 = create(:user)
+        @upload1 = create(:completed_source_upload, uploader: @user1)
+        @upload2 = create(:completed_source_upload, uploader: @user2, upload_media_assets: [build(:upload_media_asset, media_asset: @upload1.media_assets.first)])
+      end
+
       should "render" do
         @media_asset = create(:media_asset)
         @ai_tags = create_list(:ai_tag, 10, media_asset: @media_asset)
@@ -42,6 +49,28 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         get media_asset_path(@media_asset)
 
         assert_response :success
+      end
+
+      should "show a user their own upload ID" do
+        get_auth media_asset_path(@upload1.media_assets.first), @user1
+        assert_select "a[href='/uploads/#{@upload1.id}']", count: 1, text: "##{@upload1.id}"
+
+        get_auth media_asset_path(@upload2.media_assets.first), @user2
+        assert_select "a[href='/uploads/#{@upload2.id}']", count: 1, text: "##{@upload2.id}"
+      end
+
+      should "not show a user's upload ID to another user" do
+        get_auth media_asset_path(@upload2.media_assets.first), @user1
+        assert_select "a[href='/uploads/#{@upload2.id}']", count: 0
+
+        get_auth media_asset_path(@upload1.media_assets.first), @user2
+        assert_select "a[href='/uploads/#{@upload1.id}']", count: 0
+      end
+
+      should "show all upload IDs to an admin" do
+        get_auth media_asset_path(@upload1.media_assets.first), create(:admin_user)
+        assert_select "a[href='/uploads/#{@upload1.id}']", count: 1, text: "##{@upload1.id}"
+        assert_select "a[href='/uploads/#{@upload2.id}']", count: 1, text: "##{@upload2.id}"
       end
     end
 
