@@ -45,7 +45,7 @@ class RelatedTagCalculator
 
     # The estimated number of posts in common between tag A and tag B; that is, the intersection between A and B.
     def overlap
-      [frequency * search_count, tag.post_count].min
+      [frequency * search_count, tag.post_count].min.to_f
     end
 
     # The estimated percentage of posts in common between tag A and tag B; that is, how frequently tag A appears together with tag B.
