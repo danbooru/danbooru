@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class NullTest < ActiveSupport::TestCase
@@ -15,7 +15,7 @@ module Sources
         other_names: [],
         artist_name: nil,
         dtext_artist_commentary_title: nil,
-        dtext_artist_commentary_desc: nil,
+        dtext_artist_commentary_desc: nil
       )
     end
 
@@ -85,6 +85,7 @@ module Sources
         assert_equal("E-Hentai", Source::URL.parse("https://e-hentai.org/uploader/Laundrymom").site_name)
         assert_equal("Excite Blog", Source::URL.parse("http://spzinno.exblog.jp").site_name)
         assert_equal("Facebook", Source::URL.parse("https://www.facebook.com/sinyu.tang.9").site_name)
+        assert_equal("Facebook", Source::URL.parse("https://www.fb.com/sinyu.tang.9").site_name)
         assert_equal("FanFiction.Net", Source::URL.parse("https://www.fanfiction.net/u/1795942").site_name)
         assert_equal("Flickr", Source::URL.parse("http://www.flickr.com/people/hizna").site_name)
         assert_equal("GitHub", Source::URL.parse("https://github.com/Shimofumi").site_name)
@@ -113,6 +114,8 @@ module Sources
       should "normalize facebook links" do
         source = "https://scontent-sin1-1.xx.fbcdn.net/hphotos-xtp1/t31.0-8/11254493_576443445841777_7716273903390212288_o.jpg"
         assert_equal("https://www.facebook.com/photo?fbid=576443445841777", Source::URL.page_url(source))
+
+        assert_equal("https://www.facebook.com/sinyu.tang.9", Source::URL.parse("https://www.fb.com/sinyu.tang.9").profile_url)
       end
 
       should "normalize sankaku links" do
