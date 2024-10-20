@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class InstagramTest < ActiveSupport::TestCase
@@ -16,6 +16,7 @@ module Sources
         assert(Source::URL.profile_url?("https://www.instagram.com/itomugi/"))
         assert(Source::URL.profile_url?("https://www.instagram.com/stories/itomugi/"))
         assert(Source::URL.profile_url?("https://instagr.am/Zurasuta"))
+        assert(Source::URL.profile_url?("https://www.instagram.com/uid/25025320"))
       end
     end
   end

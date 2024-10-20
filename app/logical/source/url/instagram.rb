@@ -6,7 +6,7 @@
 # https://instagram.fgyn2-1.fna.fbcdn.net/v/t51.2885-15/260126945_125485689990401_3753783352853967169_n.webp?stp=dst-jpg_e35_s750x750_sh0.08&_nc_ht=instagram.fgyn2-1.fna.fbcdn.net&_nc_cat=105&_nc_ohc=7njl7WM7D1cAX_oe4xv&tn=ZvUMUWKqovKgvpX-&edm=AABBvjUBAAAA&ccb=7-4&ig_cache_key=Mjc2NTM3ODUzMDE2MTA4OTMyNw==.2-ccb7-4&oh=00_AT9T3WAiFaHEf1labFFZiXHjy-8nacOA13AWl6hDEPz_EQ&oe=6230B686&_nc_sid=83d603
 
 class Source::URL::Instagram < Source::URL
-  attr_reader :username, :work_id
+  attr_reader :username, :user_id, :work_id
 
   def self.match?(url)
     url.domain.in?(%w[instagram.com instagr.am cdninstagram.com]) || (url.domain == "fbcdn.net" && url.subdomain.include?("instagram"))
@@ -25,6 +25,10 @@ class Source::URL::Instagram < Source::URL
     in "instagram.com", username, ("p" | "reel" | "tv"), work_id
       @work_id = work_id
       @username = username
+
+    # https://www.instagram.com/uid/25025320
+    in "instagram.com", "uid", user_id
+      @user_id = user_id
 
     # https://www.instagram.com/itomugi/
     # https://www.instagram.com/itomugi/tagged/
@@ -57,7 +61,11 @@ class Source::URL::Instagram < Source::URL
   end
 
   def profile_url
-    # Instagram URLs canonically end with "/"
-    "https://www.instagram.com/#{username}/" if username.present?
+    if username.present?
+      # Instagram URLs canonically end with "/"
+      "https://www.instagram.com/#{username}/"
+    elsif user_id.present?
+      "https://www.instagram.com/uid/#{user_id}"
+    end
   end
 end
