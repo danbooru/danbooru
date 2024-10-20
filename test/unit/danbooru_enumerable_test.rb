@@ -35,5 +35,26 @@ class DanbooruEnumerableTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "#cancellable method" do
+      should "work" do
+        Danbooru.config.stubs(:max_concurrency).returns(4)
+
+        e = assert_raises do
+          Timeout.timeout(3.second) do
+            100.times.parallel_each.cancellable do |n, cancelled|
+              100.times do
+                next if cancelled.true?
+                sleep 1
+                raise
+              end
+            end
+          end
+        end
+
+        e = e.errors.first if e.is_a?(Concurrent::MultipleErrors)
+        assert_instance_of(RuntimeError, e)
+      end
+    end
   end
 end
