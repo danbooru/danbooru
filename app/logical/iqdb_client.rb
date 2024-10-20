@@ -133,7 +133,7 @@ class IqdbClient
     def request(method, url, **options)
       return [] if !enabled?
       response = http.timeout(30).send(method, "#{iqdb_url}/#{url}", **options)
-      raise Error, "IQDB error: #{response.parse}" if response.status != 200
+      raise Error, "IQDB error: #{response.parse[:message]}" if response.status != 200
       response.parse
     end
   end

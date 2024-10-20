@@ -10,7 +10,7 @@
       <%= search_form_for(iqdb_queries_path, method: :post) do |f| %>
         <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
         <%= f.input :url, input_html: { value: params[:search][:url] } %>
-        <%= f.input :hash, input_html: { value: params[:search][:hash] } %>
+        <%= f.input :hash, input_html: { value: params[:search][:hash] }, placeholder: "A valid IQDB hash" %>
         <%= f.input :file, as: :file %>
         <%= f.submit "Search" %>
       <% end %>
