@@ -194,7 +194,8 @@ class UserAgent
     # Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36 OPR/77.0.4054.90
     # Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36 OPR/77.0.4054.90
     # Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36 OPR/77.0.4054.90 (Edition Yx 05)
-    elsif user_agent =~ %r{AppleWebKit/[^ ]+ \(KHTML, like Gecko\) Chrome/[^ ]+ Safari/[^ ]+ OPR/[^ ]+}
+    # Mozilla/5.0 (Linux; Android 10; Mi A2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.149 Mobile Safari/537.36 OPR/81.6.4292.79147
+    elsif user_agent =~ %r{AppleWebKit/[^ ]+ \(KHTML, like Gecko\) Chrome/[^ ]+ (Mobile )?Safari/[^ ]+ OPR/[^ ]+}
       "opera"
 
     # Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko
