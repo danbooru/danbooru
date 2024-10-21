@@ -219,7 +219,7 @@ class Sandbox
   end
 
   # Move our process to a new mount namespace. Inside the namespace, our process has its own
-  # unique view of of the filesystem.
+  # unique view of the filesystem.
   def new_mount_namespace!
     Linux.unshare!([:clone_newns])
     mount!("tmpfs", "/tmp", fstype: "tmpfs")
