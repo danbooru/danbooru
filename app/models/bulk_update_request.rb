@@ -158,8 +158,15 @@ class BulkUpdateRequest < ApplicationRecord
     def discord_body
       dtext = DText.new(processor.to_dtext).to_markdown
       last_index = dtext[0..1950].rindex("\n")
-      omitted = dtext[last_index..].count("\n")
-      "#{dtext[0..last_index]}\n[omitted #{omitted} lines]"
+      omitted = dtext[last_index..].strip.count("\n")
+
+      omitted_str = if omitted > 0
+        "\n[omitted #{omitted} lines]"
+      else
+        ""
+      end
+
+      "#{dtext[0..last_index]}#{omitted_str}"
     end
 
     def discord_footer
