@@ -123,7 +123,7 @@ class TagImplication < TagRelationship
       if antecedent_tag.post_count < MINIMUM_TAG_COUNT
         errors.add(:base, "'#{antecedent_name}' must have at least #{MINIMUM_TAG_COUNT} posts")
       elsif antecedent_tag.post_count < (MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count)
-        errors.add(:base, "'#{antecedent_name}' must have at least #{(MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count).to_i} posts")
+        errors.add(:base, "'#{antecedent_name}' must have at least #{(MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count).ceil.to_i} posts")
       end
 
       max_count = MAXIMUM_TAG_PERCENTAGE * PostQuery.new("~#{antecedent_name} ~#{consequent_name}").fast_count(timeout: 0).to_i

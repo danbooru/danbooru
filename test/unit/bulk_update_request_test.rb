@@ -247,7 +247,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         should "fail for a child tag that is too small" do
           @t1 = create(:tag, name: "white_shirt", post_count: 9)
-          @t2 = create(:tag, name: "shirt", post_count: 1000000)
+          @t2 = create(:tag, name: "shirt", post_count: 1_000_000)
           create(:wiki_page, title: "white_shirt")
           create(:wiki_page, title: "shirt")
           @bur = build(:bulk_update_request, script: "imply white_shirt -> shirt")
@@ -258,6 +258,19 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @t1.update!(post_count: 99)
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't create implication white_shirt -> shirt ('white_shirt' must have at least 100 posts)"], @bur.errors.full_messages)
+        end
+
+        should "display the correct amount of required posts" do
+          create(:tag, name: "speech_bubble_censor", post_count: 20)
+          create(:wiki_page, title: "speech_bubble_censor")
+
+          create(:tag, name: "speech_bubble", post_count: 202_174)
+          create(:wiki_page, title: "speech_bubble")
+
+          @bur = build(:bulk_update_request, script: "imply speech_bubble_censor -> speech_bubble")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create implication speech_bubble_censor -> speech_bubble ('speech_bubble_censor' must have at least 21 posts)"], @bur.errors.full_messages)
         end
 
         should "fail if the antecedent name is invalid" do
