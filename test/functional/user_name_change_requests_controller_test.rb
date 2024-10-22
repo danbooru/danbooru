@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
   context "The user name change requests controller" do
@@ -14,7 +14,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render when the current user's name is invalid" do
-        @user.update_columns(name: "foo__bar")
+        @user.update_columns(name: "foo__bar") # rubocop:disable Rails/SkipsModelValidations
         get_auth change_name_user_path(@user), @user
 
         assert_response :success
@@ -66,6 +66,17 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("bkub", @user.reload.name)
       end
 
+      should "fail for a regular user with an invalid name trying to change another user's name" do
+        @user = create(:user, name: "bkub")
+        @user.update_columns(name: "foo__bar") # rubocop:disable Rails/SkipsModelValidations
+        @another_user = create(:builder_user, name: "not_zun")
+        post_auth user_name_change_requests_path, @another_user, params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}
+
+        assert_response 403
+        assert_equal("foo__bar", @user.reload.name)
+        assert_equal("not_zun", @another_user.reload.name)
+      end
+
       should "fail for a moderator trying to change the name of someone above Builder level" do
         @user = create(:moderator_user, name: "bob")
         post_auth user_name_change_requests_path, create(:moderator_user), params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}
@@ -80,6 +91,32 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 403
         assert_equal("sockpuppet", @banned.reload.name)
+      end
+
+      should "fail for a restricted user trying to change their own name" do
+        @restricted = create(:restricted_user, name: "sockpuppet")
+        post_auth user_name_change_requests_path, @restricted, params: { user_name_change_request: { user_id: @restricted.id, desired_name: "zun" }}
+
+        assert_response 403
+        assert_equal("sockpuppet", @restricted.reload.name)
+      end
+
+      should "allow a banned user with an invalid name to change their own name" do
+        @banned = create(:banned_user, name: "sockpuppet")
+        @banned.update_columns(name: "foo__bar") # rubocop:disable Rails/SkipsModelValidations
+        post_auth user_name_change_requests_path, @banned, params: { user_name_change_request: { user_id: @banned.id, desired_name: "zun" }}
+
+        assert_redirected_to @banned
+        assert_equal("zun", @banned.reload.name)
+      end
+
+      should "allow a restricted user with an invalid name to change their own name" do
+        @restricted = create(:restricted_user, name: "sockpuppet")
+        @restricted.update_columns(name: "foo__bar") # rubocop:disable Rails/SkipsModelValidations
+        post_auth user_name_change_requests_path, @restricted, params: { user_name_change_request: { user_id: @restricted.id, desired_name: "zun" }}
+
+        assert_redirected_to @restricted
+        assert_equal("zun", @restricted.reload.name)
       end
     end
 
