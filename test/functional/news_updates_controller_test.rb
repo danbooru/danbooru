@@ -36,7 +36,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(news_updates_path)
 
         get_auth posts_path, @admin
-        assert_select ".news-update", count: 1, text: "zzz"
+        assert_select "#news-updates > div > div", count: 1, text: "zzz"
       end
     end
 
@@ -48,9 +48,9 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(news_updates_path)
 
         get_auth posts_path, @admin
-        assert_select ".news-update", count: 2
-        assert_select ".news-update", count: 1, text: @news_update.message
-        assert_select ".news-update", count: 1, text: "zzz"
+        assert_select "#news-updates > div > div", count: 2
+        assert_select "#news-updates > div > div", count: 1, text: @news_update.message
+        assert_select "#news-updates > div > div", count: 1, text: "zzz"
       end
     end
 
@@ -61,7 +61,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         end
         assert_redirected_to(news_updates_path)
         get_auth posts_path, @admin
-        assert_select ".news-update", count: 0
+        assert_select "#news-updates > div > div", count: 0
       end
     end
 
@@ -71,7 +71,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(news_updates_path)
 
         get_auth posts_path, @admin
-        assert_select ".news-update", count: 1, text: @news_update.message
+        assert_select "#news-updates > div > div", count: 1, text: @news_update.message
       end
     end
   end
