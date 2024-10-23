@@ -5,7 +5,10 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
     setup do
       @admin = create(:admin_user)
       as(@admin) do
-        @news_update = create(:news_update, creator: @admin)
+        @news_update = create(:news_update, creator: @admin, message: "test news", duration_in_days: 10)
+        travel_to(1.month.ago) do
+          @old_news_update = create(:news_update, creator: @admin, message: "old news", duration_in_days: 7)
+        end
       end
     end
 
@@ -34,6 +37,9 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
       should "work" do
         put_auth news_update_path(@news_update), @admin, params: {:news_update => {:message => "zzz"}}
         assert_redirected_to(news_updates_path)
+
+        get_auth posts_path, @admin
+        assert_select "#news-updates > div > div", count: 1, text: "zzz"
       end
     end
 
@@ -43,6 +49,11 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
           post_auth news_updates_path, @admin, params: {:news_update => {:message => "zzz"}}
         end
         assert_redirected_to(news_updates_path)
+
+        get_auth posts_path, @admin
+        assert_select "#news-updates > div > div", count: 2
+        assert_select "#news-updates > div > div", count: 1, text: @news_update.message
+        assert_select "#news-updates > div > div", count: 1, text: "zzz"
       end
     end
 
@@ -53,6 +64,8 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         end
         assert(@news_update.reload.is_deleted)
         assert_redirected_to(news_updates_path)
+        get_auth posts_path, @admin
+        assert_select "#news-updates > div > div", count: 0
       end
     end
 
@@ -65,6 +78,9 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         end
         refute(@news_update.reload.is_deleted)
         assert_redirected_to(news_updates_path)
+
+        get_auth posts_path, @admin
+        assert_select "#news-updates > div > div", count: 1, text: @news_update.message
       end
     end
   end
