@@ -5,7 +5,10 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
     setup do
       @admin = create(:admin_user)
       as(@admin) do
-        @news_update = create(:news_update, creator: @admin, message: "test news")
+        @news_update = create(:news_update, creator: @admin, message: "test news", duration_in_days: 10)
+        travel_to(1.month.ago) do
+          @old_news_update = create(:news_update, creator: @admin, message: "old news", duration_in_days: 7)
+        end
       end
     end
 
@@ -36,7 +39,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(news_updates_path)
 
         get_auth posts_path, @admin
-        assert_select ".news-update", count: 1, text: "zzz"
+        assert_select "#news-updates > div > div", count: 1, text: "zzz"
       end
     end
 
@@ -48,9 +51,9 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(news_updates_path)
 
         get_auth posts_path, @admin
-        assert_select ".news-update", count: 2
-        assert_select ".news-update", count: 1, text: @news_update.message
-        assert_select ".news-update", count: 1, text: "zzz"
+        assert_select "#news-updates > div > div", count: 2
+        assert_select "#news-updates > div > div", count: 1, text: @news_update.message
+        assert_select "#news-updates > div > div", count: 1, text: "zzz"
       end
     end
 
@@ -61,7 +64,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         end
         assert_redirected_to(news_updates_path)
         get_auth posts_path, @admin
-        assert_select ".news-update", count: 0
+        assert_select "#news-updates > div > div", count: 0
       end
     end
 
@@ -71,7 +74,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(news_updates_path)
 
         get_auth posts_path, @admin
-        assert_select ".news-update", count: 1, text: @news_update.message
+        assert_select "#news-updates > div > div", count: 1, text: @news_update.message
       end
     end
   end

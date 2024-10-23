@@ -10,7 +10,7 @@ class NewsUpdatesController < ApplicationController
   end
 
   def new
-    @news_update = authorize NewsUpdate.new
+    @news_update = authorize NewsUpdate.new(permitted_attributes(NewsUpdate))
     respond_with(@news_update)
   end
 

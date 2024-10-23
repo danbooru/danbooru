@@ -73,6 +73,8 @@ class ApplicationController < ActionController::Base
     end
 
     @current_item = subject
+
+    @visible_news_updates = NewsUpdate.active.order(created_at: :desc).to_a
     super
   end
 

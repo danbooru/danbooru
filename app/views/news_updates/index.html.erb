@@ -2,11 +2,14 @@
   <div id="a-index">
     <h1>News Updates</h1>
 
-    <%= table_for @news_updates, width: "100%" do |t| %>
+    <%= table_for @news_updates, width: "100%", class: "striped autofit" do |t| %>
       <% t.column "Creator" do |news_update| %>
         <%= link_to_user news_update.creator %>
       <% end %>
-      <% t.column :message %>
+      <% t.column :message, td: { class: "col-expand" }  %>
+      <% t.column :duration do |news_update| %>
+        <%= news_update.duration.in_days.round.days.inspect %>
+      <% end %>
       <% t.column :created do |news_update| %>
         <%= time_ago_in_words_tagged(news_update.created_at) %>
       <% end %>
