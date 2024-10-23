@@ -1153,7 +1153,8 @@ CREATE TABLE public.news_updates (
     creator_id integer NOT NULL,
     updater_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -6826,6 +6827,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20241022174253'),
 ('20240607200251'),
 ('20240607200250'),
 ('20240607200249'),

@@ -65,7 +65,7 @@
     <div id="news-updates" data-id="<%= NewsUpdate.recent.first.try(:id) %>" class="flex gap-1 p-1 items-center text-center text-xs <%= ("hidden" if cookies["news-ticker"].to_i == NewsUpdate.recent.first.try(:id)) %>">
       <div class="flex-grow-1">
         <% NewsUpdate.recent.each do |news_update| %>
-          <div><%= news_update.message.html_safe %></div>
+          <div class="news-update"><%= news_update.message.html_safe %></div>
         <% end %>
       </div>
 
