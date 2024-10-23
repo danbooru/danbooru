@@ -61,10 +61,10 @@
 </head>
 
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item, @exception) do %>
-  <% if NewsUpdate.recent.present? %>
-    <div id="news-updates" data-id="<%= NewsUpdate.recent.first.try(:id) %>" class="flex gap-1 p-1 items-center text-center text-xs <%= ("hidden" if cookies["news-ticker"].to_i == NewsUpdate.recent.first.try(:id)) %>">
+  <% if NewsUpdate.active.unexpired.present? %>
+    <div id="news-updates" data-id="<%= NewsUpdate.active.unexpired.first.try(:id) %>" class="flex gap-1 p-1 items-center text-center text-xs <%= ("hidden" if cookies["news-ticker"].to_i == NewsUpdate.active.unexpired.first.try(:id)) %>">
       <div class="flex-grow-1">
-        <% NewsUpdate.recent.each do |news_update| %>
+        <% NewsUpdate.active.unexpired.each do |news_update| %>
           <div class="news-update"><%= news_update.message.html_safe %></div>
         <% end %>
       </div>

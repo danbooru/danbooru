@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
 class NewsUpdate < ApplicationRecord
-  EXPIRE_TIME = 2.weeks
-
   belongs_to :creator, class_name: "User"
   belongs_to_updater
 
   deletable
-  scope :recent, -> {active.where(created_at: EXPIRE_TIME.ago..).order(created_at: :desc).limit(5)}
+  scope :unexpired, -> { where("created_at + duration >= ?", Time.zone.now) }
+  scope :expired, -> { where("created_at + duration < ?", Time.zone.now) }
 
   def self.visible(user)
     if user.is_admin?
@@ -25,7 +24,7 @@ class NewsUpdate < ApplicationRecord
   def status
     flags = []
 
-    flags << "Expired" if created_at <= EXPIRE_TIME.ago
+    flags << "Expired" if expired?
     flags << "Deleted" if is_deleted
 
     flags << "Active" if flags.empty?
@@ -33,7 +32,11 @@ class NewsUpdate < ApplicationRecord
     flags.join(", ")
   end
 
+  def expired?
+    expired_at < Time.zone.now
+  end
+
   def expired_at
-    created_at + EXPIRE_TIME
+    created_at + duration
   end
 end
