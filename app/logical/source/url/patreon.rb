@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Patreon < Source::URL
-  RESERVED_USERNAMES = %w[api bePatron card-teaser-image collection checkout file home join login m messages notifications policy posts search settings user]
+  RESERVED_USERNAMES = %w[api bePatron card-teaser-image collection checkout file home join
+                          login m messages notifications policy posts profile search settings user]
 
   attr_reader :username, :user_id, :post_id, :attachment_id, :title, :media_hash, :media_params
 
@@ -35,11 +36,6 @@ class Source::URL::Patreon < Source::URL
     in _, "patreon.com", "m", "posts", slug, *rest
       @title, _, @post_id = slug.rpartition("-")
 
-    # https://www.patreon.com/1041uuu
-    # https://www.patreon.com/1041uuu/about
-    in _, "patreon.com", username, *rest unless username.in?(RESERVED_USERNAMES)
-      @username = username
-
     # https://www.patreon.com/checkout/1041uuu?rid=0
     # https://www.patreon.com/join/twistedgrim/checkout?rid=704013&redirect_uri=/posts/noi-dorohedoro-39394158
     # https://www.patreon.com/m/1041uuu/about
@@ -64,6 +60,11 @@ class Source::URL::Patreon < Source::URL
     # https://www.patreon.com/api/user/4045578
     in _, "patreon.com", "api", "user", user_id
       @user_id = user_id
+
+    # https://www.patreon.com/1041uuu
+    # https://www.patreon.com/1041uuu/about
+    in _, "patreon.com", username, *rest unless username.in?(RESERVED_USERNAMES)
+      @username = username
 
     # https://www.patreon.com/collection/90818
     # https://c10.patreonusercontent.com/4/patreon-media/p/campaign/518884/e980febbb38c4d33adf077458b7c3e03/eyJ3Ijo2MjB9/1.jpeg?token-time=1716163200&token-hash=PmbmjS7ldbk8xs0kqUaPO_cN4IM9Pn6nwvWNg5mRXuI%3D

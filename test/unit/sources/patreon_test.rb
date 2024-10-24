@@ -302,6 +302,7 @@ module Sources
         assert(Source::URL.profile_url?("https://www.patreon.com/user?u=5993691"))
         assert(Source::URL.profile_url?("https://www.patreon.com/user/posts?u=84592583"))
         assert(Source::URL.profile_url?("https://www.patreon.com/api/user/4045578"))
+        assert(Source::URL.profile_url?("https://www.patreon.com/profile/creators?u=7422057"))
       end
     end
   end
