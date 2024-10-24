@@ -44,14 +44,16 @@
         <div><%= time_ago_in_words_tagged(report.created_at) %></div>
       <% end %>
 
-      <% t.column column: "control" do |report| %>
-        <%= render PopupMenuComponent.new do |menu| %>
-          <% menu.with_item do %>
-            <%= link_to "Mark as handled", moderation_report_path(report.id), method: :put, remote: true, "data-params": "moderation_report[status]=handled" %>
-          <% end %>
+      <% if policy(ModerationReport).update? %>
+        <% t.column column: "control" do |report| %>
+          <%= render PopupMenuComponent.new do |menu| %>
+            <% menu.with_item do %>
+              <%= link_to "Mark as handled", moderation_report_path(report.id), method: :put, remote: true, "data-params": "moderation_report[status]=handled" %>
+            <% end %>
 
-          <% menu.with_item do %>
-            <%= link_to "Reject", moderation_report_path(report.id), method: :put, remote: true, "data-params": "moderation_report[status]=rejected" %>
+            <% menu.with_item do %>
+              <%= link_to "Reject", moderation_report_path(report.id), method: :put, remote: true, "data-params": "moderation_report[status]=rejected" %>
+            <% end %>
           <% end %>
         <% end %>
       <% end %>
