@@ -1306,6 +1306,34 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "random:1 filetype:png")
     end
 
+    should "return posts for [] search syntax" do
+      post = create(:post)
+
+      assert_tag_match([post], "[uploader_id]:#{post.uploader.id}")
+      assert_tag_match([post], "[uploader][id]:#{post.uploader.id}")
+      assert_tag_match([post], "[uploader][id_gteq]:#{post.uploader.id}")
+      assert_tag_match([], "[uploader][id_gt]:#{post.uploader.id}")
+      assert_tag_match([post], "[uploader_name]:#{post.uploader.name}")
+      assert_tag_match([post], "[uploader][name]:#{post.uploader.name}")
+      assert_tag_match([], "[uploader_name]:nobody")
+      # Match ?search[] behavior
+      assert_tag_match([post], "[invalid]:nobody")
+    end
+
+    should "return posts for [] array search syntax" do
+      posts1 = create_list(:post, 3)
+      posts2 = create_list(:post, 2)
+      posts3 = [posts1.first, posts1.last, posts2.last]
+      pool1 = create(:pool, post_ids: posts1.pluck(:id), category: "collection")
+      pool2 = create(:pool, post_ids: posts2.pluck(:id), category: "collection")
+      pool3 = create(:pool, post_ids: posts3.pluck(:id), category: "collection")
+
+      assert_tag_match(posts2.reverse, "[pools][post_ids_include_any_array][]:#{posts2.first.id}")
+      assert_tag_match((posts1 + posts2).reverse, "[pools][post_ids_include_any_array][]:#{posts1.first.id} [pools][post_ids_include_any_array][]:#{posts2.first.id}")
+      assert_tag_match([], "[pools][post_ids_include_all_array][]:#{posts1.first.id} [pools][post_ids_include_all_array][]:#{posts2.first.id}")
+      assert_tag_match(posts3.reverse, "[pools][post_ids_include_all_array][]:#{posts1.first.id} [pools][post_ids_include_all_array][]:#{posts2.last.id}")
+    end
+
     should "return posts ordered by a particular attribute" do
       posts = (1..2).map do |n|
         tags = ["tagme", "gentag1 gentag2 artist:arttag char:chartag copy:copytag"]
@@ -1720,6 +1748,19 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
         assert_equal(1, PostQuery.new("comm:#{@user.name}", current_user: @user).fast_count)
         assert_equal(0, PostQuery.new("comm:#{@user.name}").fast_count)
+      end
+    end
+
+    context "for a user-dependent []-search query" do
+      should "cache the count separately for different users" do
+        user = create(:user)
+        post = create(:post, uploader: user)
+        flagger = create(:user)
+        flag = create(:post_flag, post: post, creator: flagger)
+
+        assert_equal(1, PostQuery.new("[flags][creator_name]:#{flagger.name}", current_user: flagger).fast_count)
+        assert_equal(0, PostQuery.new("[flags][creator_name]:#{flagger.name}", current_user: user).fast_count)
+        assert_equal(0, PostQuery.new("[flags][creator_name]:#{flagger.name}").fast_count)
       end
     end
   end
