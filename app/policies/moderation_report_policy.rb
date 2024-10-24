@@ -21,6 +21,10 @@ class ModerationReportPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def can_view_reported_user?
+    record.model.class != MediaAsset || can_see_moderation_reports?
+  end
+
   def permitted_attributes_for_create
     [:model_type, :model_id, :reason]
   end
