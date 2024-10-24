@@ -65,16 +65,19 @@ module SourceTestHelper
     end
   end
 
-  def should_validate_tags(strategy, tags = nil)
-    assert_equal(Array, strategy.tags.class, "tags should be an Array")
-    assert(strategy.tags.all?(Array), "tags should be an Array of Arrays")
+  def should_validate_tags(strategy, expected_tags = nil)
+    actual_tags = strategy.tags
+    assert_equal(Array, actual_tags.class, "tags should be an Array")
+    assert(actual_tags.all?(Array), "tags should be an Array of Arrays")
 
-    return unless tags.present?
+    return unless expected_tags.present?
 
-    if tags&.first.instance_of?(Array)
-      assert_equal(tags.sort, strategy.tags.sort)
-    elsif tags&.first.instance_of?(String)
-      assert_equal(tags.map(&:downcase).sort, strategy.tags.map(&:first).map(&:downcase).sort)
+    if expected_tags&.first.instance_of?(Array)
+      assert_equal(expected_tags.sort, actual_tags.sort, "Tags expected but not found: #{expected_tags.difference(actual_tags)}. Tags found but not expected: #{actual_tags.difference(expected_tags)}")
+    elsif expected_tags&.first.instance_of?(String)
+      expected = expected_tags.map(&:downcase).sort
+      actual = actual_tags.map(&:first).map(&:downcase).sort
+      assert_equal(expected, actual, "Tags expected but not found: #{expected.difference(actual)}. Tags found but not expected: #{actual.difference(expected)}")
     end
   end
 

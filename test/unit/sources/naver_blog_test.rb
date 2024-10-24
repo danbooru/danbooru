@@ -9,7 +9,7 @@ module Sources
         strategy_should_work(
           "https://blogthumb.pstatic.net/MjAyMzA3MTFfMjkz/MDAxNjg5MDQ2NTMwMTkw.2bAkaa4r8P5vcbpyyNH3X5ysDig6q_sJ2llYrNHQ_3Ag.7b3Pxl-DcaqTAM69oiYsGHGWKOlgwWXp5BbOpVDZ98Ag.PNG.kkid9624/230623%C6%F7%B5%F0%BE%C6%B4%D4.PNG?type=w2",
           image_urls: %w[http://blogfiles.naver.net/MjAyMzA3MTFfMjkz/MDAxNjg5MDQ2NTMwMTkw.2bAkaa4r8P5vcbpyyNH3X5ysDig6q_sJ2llYrNHQ_3Ag.7b3Pxl-DcaqTAM69oiYsGHGWKOlgwWXp5BbOpVDZ98Ag.PNG.kkid9624/230623%C6%F7%B5%F0%BE%C6%B4%D4.PNG],
-          media_files: [{ file_size: 69_223 }],
+          media_files: [{ file_size: 69_205 }],
           page_url: nil
         )
       end
@@ -18,7 +18,7 @@ module Sources
         strategy_should_work(
           "https://postfiles.pstatic.net/MjAyNDA0MjBfMzQg/MDAxNzEzNjIyMjM5MjY1.bA-t3pRhCcZ6t4TJKGCChhTFaO-ddv9m1tyLcdMW-4Ug.KvTzrwFNrFuB9AgQYuk0dBIGwAzeg1c3QVSrXC7TeB0g.PNG/240420%ED%91%B8%EB%A5%B4%EB%8A%AC%EB%8B%98_2.png?type=w966",
           image_urls: %w[http://blogfiles.naver.net/MjAyNDA0MjBfMzQg/MDAxNzEzNjIyMjM5MjY1.bA-t3pRhCcZ6t4TJKGCChhTFaO-ddv9m1tyLcdMW-4Ug.KvTzrwFNrFuB9AgQYuk0dBIGwAzeg1c3QVSrXC7TeB0g.PNG/240420푸르늬님_2.png],
-          media_files: [{ file_size: 8_644_053 }],
+          media_files: [{ file_size: 8_644_035 }],
           page_url: nil
         )
       end
@@ -27,7 +27,7 @@ module Sources
         strategy_should_work(
           "https://blogpfthumb-phinf.pstatic.net/MjAyMzAzMThfMzIg/MDAxNjc5MDY4MjkxNzUz.ODdLT6VGaauXq9_jT-TpO878xZ--5lv0llIDclJvvTYg.yqLsxucKuBCz-auOTjpX2RRyLV_0WLCcBwb206KeCSIg.PNG.kkid9624/%EC%A0%9C%EB%B3%B8.PNG/%25EC%25A0%259C%25EB%25B3%25B8.PNG?type=s1",
           image_urls: %w[https://blogpfthumb-phinf.pstatic.net/MjAyMzAzMThfMzIg/MDAxNjc5MDY4MjkxNzUz.ODdLT6VGaauXq9_jT-TpO878xZ--5lv0llIDclJvvTYg.yqLsxucKuBCz-auOTjpX2RRyLV_0WLCcBwb206KeCSIg.PNG.kkid9624/제본.PNG/%25EC%25A0%259C%25EB%25B3%25B8.PNG],
-          media_files: [{ file_size: 1_104_915 }],
+          media_files: [{ file_size: 1_104_897 }],
           page_url: nil
         )
       end
@@ -36,7 +36,7 @@ module Sources
         strategy_should_work(
           "http://blogfiles.pstatic.net/MjAyNDA0MjBfMzQg/MDAxNzEzNjIyMjM5MjY1.bA-t3pRhCcZ6t4TJKGCChhTFaO-ddv9m1tyLcdMW-4Ug.KvTzrwFNrFuB9AgQYuk0dBIGwAzeg1c3QVSrXC7TeB0g.PNG/240420푸르늬님_2.png",
           image_urls: %w[http://blogfiles.naver.net/MjAyNDA0MjBfMzQg/MDAxNzEzNjIyMjM5MjY1.bA-t3pRhCcZ6t4TJKGCChhTFaO-ddv9m1tyLcdMW-4Ug.KvTzrwFNrFuB9AgQYuk0dBIGwAzeg1c3QVSrXC7TeB0g.PNG/240420푸르늬님_2.png],
-          media_files: [{ file_size: 8_644_053 }],
+          media_files: [{ file_size: 8_644_035 }],
           page_url: nil
         )
       end
@@ -270,7 +270,6 @@ module Sources
             ["난죠히카루", "https://m.blog.naver.com/BlogTagView.naver?tagName=난죠히카루"],
             ["각주", "https://m.blog.naver.com/BlogTagView.naver?tagName=각주"],
             ["각주_괄호", "https://m.blog.naver.com/BlogTagView.naver?tagName=각주_괄호"],
-            ["신데마스", "https://blog.naver.com/PostList.naver?blogId=goam2&categoryName=신데마스"],
           ],
           dtext_artist_commentary_title: "2019년 카이자(913)의 날 기념 배우 무라카미 코우헤이 트윗 + 난죠 히카루(신데마스) 2019년 생일 기념 팬 축전 모음",
           dtext_artist_commentary_desc: <<~EOS.chomp

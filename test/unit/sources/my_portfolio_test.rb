@@ -230,6 +230,8 @@ module Sources
 
             ・画期的株式会社様 Youtube漫画動画作成
 
+            ・DMM様その他企業様イラスト制作協力多数
+
             🌟個人様ご依頼
 
             ・Fleur Rose 愛華様 アルバム「Miss you」全曲イラスト

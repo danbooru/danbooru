@@ -146,7 +146,7 @@ module Sources
         ],
         page_url: "https://sdz013.lofter.com/post/1ec04eca_1ccabb5df",
         profile_urls: %w[https://sdz013.lofter.com],
-        display_name: "SDZ",
+        display_name: "𝐒𝐃𝐙",
         username: "sdz013",
         tags: [
           ["军团要塞2", "https://www.lofter.com/tag/军团要塞2"],
@@ -295,7 +295,7 @@ module Sources
         media_files: [{ file_size: 854_991 }],
         page_url: "https://jiuhaotaiyangdeshexian.lofter.com/post/73f37cdf_2b86a4ae7",
         profile_urls: %w[https://jiuhaotaiyangdeshexian.lofter.com],
-        display_name: "鸠号太阳的射线-",
+        display_name: "鸠是这么爽",
         username: "jiuhaotaiyangdeshexian",
         tags: [],
         dtext_artist_commentary_title: "Q:老师！想问问最近会不会画ITZY？🥰🥰",
