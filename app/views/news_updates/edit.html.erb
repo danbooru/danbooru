@@ -4,6 +4,8 @@
 
     <%= edit_form_for(@news_update) do |f| %>
       <%= f.input :message, hint: "Use HTML for formatting" %>
+      <%= f.input :duration, collection: [["1 day", 1.day.iso8601], ["3 days", 3.days.iso8601],  ["5 days", 5.days.iso8601], ["1 week", 1.week.iso8601], ["2 weeks", 2.weeks.iso8601]], selected: @news_update.duration&.iso8601 %>
+
       <%= f.button :submit, "Submit" %>
     <% end %>
   </div>
