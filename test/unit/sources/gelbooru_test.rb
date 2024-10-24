@@ -11,7 +11,7 @@ module Sources
         tags: %w[1girl back_bow black_pantyhose blue_bow blue_hair blue_ribbon boots bow cape chibi chinese_commentary closed_eyes full_body hair_between_eyes hair_ribbon hat hatsune_miku indai_(3330425) on_ground pantyhose pom_pom_(clothes) rabbit rabbit_yukine rating:general ribbon simple_background sitting solo twintails vocaloid white_background white_cape white_hat witch_hat yuki_miku yuki_miku_(2014) 初音ミク 雪ミク],
         artist_commentary_title: "2010~2021雪ミク",
         artist_commentary_desc: "动作参考@速写班长",
-        media_files: [{ file_size: 480_621 }],
+        media_files: [{ file_size: 480_621 }]
       )
     end
 
@@ -25,7 +25,7 @@ module Sources
         tags: %w[1girl back_bow black_pantyhose blue_bow blue_hair blue_ribbon boots bow cape chibi chinese_commentary closed_eyes full_body hair_between_eyes hair_ribbon hat hatsune_miku indai_(3330425) on_ground pantyhose pom_pom_(clothes) rabbit rabbit_yukine rating:general ribbon simple_background sitting solo twintails vocaloid white_background white_cape white_hat witch_hat yuki_miku yuki_miku_(2014) 初音ミク 雪ミク],
         artist_commentary_title: "2010~2021雪ミク",
         artist_commentary_desc: "动作参考@速写班长",
-        media_files: [{ file_size: 480_621 }],
+        media_files: [{ file_size: 480_621 }]
       )
     end
 
@@ -38,7 +38,7 @@ module Sources
         tags: %w[1girl back_bow black_pantyhose blue_bow blue_hair blue_ribbon boots bow cape chibi chinese_commentary closed_eyes full_body hair_between_eyes hair_ribbon hat hatsune_miku indai_(3330425) on_ground pantyhose pom_pom_(clothes) rabbit rabbit_yukine rating:general ribbon simple_background sitting solo twintails vocaloid white_background white_cape white_hat witch_hat yuki_miku yuki_miku_(2014) 初音ミク 雪ミク],
         artist_commentary_title: "2010~2021雪ミク",
         artist_commentary_desc: "动作参考@速写班长",
-        media_files: [{ file_size: 480_621 }],
+        media_files: [{ file_size: 480_621 }]
       )
     end
 
@@ -51,7 +51,7 @@ module Sources
         tags: %w[1girl back_bow black_pantyhose blue_bow blue_hair blue_ribbon boots bow cape chibi chinese_commentary closed_eyes full_body hair_between_eyes hair_ribbon hat hatsune_miku indai_(3330425) on_ground pantyhose pom_pom_(clothes) rabbit rabbit_yukine rating:general ribbon simple_background sitting solo twintails vocaloid white_background white_cape white_hat witch_hat yuki_miku yuki_miku_(2014) 初音ミク 雪ミク],
         artist_commentary_title: "2010~2021雪ミク",
         artist_commentary_desc: "动作参考@速写班长",
-        media_files: [{ file_size: 480_621 }],
+        media_files: [{ file_size: 480_621 }]
       )
     end
 
@@ -64,7 +64,7 @@ module Sources
         tags: %w[1girl back_bow black_pantyhose blue_bow blue_hair blue_ribbon boots bow cape chibi chinese_commentary closed_eyes full_body hair_between_eyes hair_ribbon hat hatsune_miku indai_(3330425) on_ground pantyhose pom_pom_(clothes) rabbit rabbit_yukine rating:general ribbon simple_background sitting solo twintails vocaloid white_background white_cape white_hat witch_hat yuki_miku yuki_miku_(2014) 初音ミク 雪ミク],
         artist_commentary_title: "2010~2021雪ミク",
         artist_commentary_desc: "动作参考@速写班长",
-        media_files: [{ file_size: 480_621 }],
+        media_files: [{ file_size: 480_621 }]
       )
     end
 
@@ -76,7 +76,7 @@ module Sources
         profile_url: nil,
         tags: %w[],
         artist_commentary_title: nil,
-        artist_commentary_desc: nil,
+        artist_commentary_desc: nil
       )
     end
 
@@ -88,7 +88,7 @@ module Sources
         profile_url: nil,
         tags: %w[],
         artist_commentary_title: nil,
-        artist_commentary_desc: nil,
+        artist_commentary_desc: nil
       )
     end
 
@@ -102,7 +102,7 @@ module Sources
         other_names: [],
         tags: [],
         artist_commentary_title: nil,
-        artist_commentary_desc: nil,
+        artist_commentary_desc: nil
       )
     end
 
@@ -138,7 +138,7 @@ module Sources
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume violet_eyes white_shirt wings rating:q ウマ娘 ライスシャワー ハロウィンイラスト 二次創作 ウマ娘プリティーダービー ライスシャワー(ウマ娘) 更衣室 Make_up_Vampire! ドラキュライス 困り顔],
           artist_commentary_title: "ハロウィンライス",
           artist_commentary_desc: "更衣室でハロウィン衣装に着替えたあと「がおーっ！」のポーズを鏡の前で密かに練習してたら、見つかっちゃってあわてるライスシャワーを描きました。",
-          media_files: [{ file_size: 771_175 }],
+          media_files: [{ file_size: 771_175 }]
         )
       end
 
@@ -151,7 +151,7 @@ module Sources
           profile_url: nil,
           tags: [],
           artist_commentary_title: nil,
-          artist_commentary_desc: nil,
+          artist_commentary_desc: nil
         )
       end
 
@@ -166,7 +166,7 @@ module Sources
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume violet_eyes white_shirt wings rating:q ウマ娘 ライスシャワー ハロウィンイラスト 二次創作 ウマ娘プリティーダービー ライスシャワー(ウマ娘) 更衣室 Make_up_Vampire! ドラキュライス 困り顔],
           artist_commentary_title: "ハロウィンライス",
           artist_commentary_desc: "更衣室でハロウィン衣装に着替えたあと「がおーっ！」のポーズを鏡の前で密かに練習してたら、見つかっちゃってあわてるライスシャワーを描きました。",
-          media_files: [{ file_size: 771_175 }],
+          media_files: [{ file_size: 771_175 }]
         )
       end
 
@@ -180,7 +180,7 @@ module Sources
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume violet_eyes white_shirt wings rating:q ウマ娘 ライスシャワー ハロウィンイラスト 二次創作 ウマ娘プリティーダービー ライスシャワー(ウマ娘) 更衣室 Make_up_Vampire! ドラキュライス 困り顔],
           artist_commentary_title: "ハロウィンライス",
           artist_commentary_desc: "更衣室でハロウィン衣装に着替えたあと「がおーっ！」のポーズを鏡の前で密かに練習してたら、見つかっちゃってあわてるライスシャワーを描きました。",
-          media_files: [{ file_size: 771_175 }],
+          media_files: [{ file_size: 771_175 }]
         )
       end
 
@@ -194,7 +194,7 @@ module Sources
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume violet_eyes white_shirt wings rating:q ウマ娘 ライスシャワー ハロウィンイラスト 二次創作 ウマ娘プリティーダービー ライスシャワー(ウマ娘) 更衣室 Make_up_Vampire! ドラキュライス 困り顔],
           artist_commentary_title: "ハロウィンライス",
           artist_commentary_desc: "更衣室でハロウィン衣装に着替えたあと「がおーっ！」のポーズを鏡の前で密かに練習してたら、見つかっちゃってあわてるライスシャワーを描きました。",
-          media_files: [{ file_size: 771_175 }],
+          media_files: [{ file_size: 771_175 }]
         )
       end
 
@@ -213,7 +213,7 @@ module Sources
             yorha_no._2_type_b
           ],
           artist_commentary_title: nil,
-          artist_commentary_desc: nil,
+          artist_commentary_desc: nil
         )
       end
     end
@@ -226,10 +226,10 @@ module Sources
           image_urls: ["https://tbib.org//images/10725/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg?11480218"],
           artist_name: "チー之介",
           profile_url: "https://www.pixiv.net/users/57673194",
-          tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
+          tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bow_skirt bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim locker locker_room long_hair looking_at_viewer make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
           artist_commentary_title: "ハロウィンライス",
           artist_commentary_desc: "更衣室でハロウィン衣装に着替えたあと「がおーっ！」のポーズを鏡の前で密かに練習してたら、見つかっちゃってあわてるライスシャワーを描きました。",
-          media_files: [{ file_size: 771_175 }],
+          media_files: [{ file_size: 771_175 }]
         )
       end
 
@@ -242,7 +242,7 @@ module Sources
           profile_url: nil,
           tags: [],
           artist_commentary_title: nil,
-          artist_commentary_desc: nil,
+          artist_commentary_desc: nil
         )
       end
 
@@ -254,10 +254,10 @@ module Sources
           image_urls: ["https://tbib.org//images/10725/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg"],
           artist_name: "チー之介",
           profile_url: "https://www.pixiv.net/users/57673194",
-          tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
+          tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bow_skirt bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim locker locker_room long_hair looking_at_viewer make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
           artist_commentary_title: "ハロウィンライス",
           artist_commentary_desc: "更衣室でハロウィン衣装に着替えたあと「がおーっ！」のポーズを鏡の前で密かに練習してたら、見つかっちゃってあわてるライスシャワーを描きました。",
-          media_files: [{ file_size: 771_175 }],
+          media_files: [{ file_size: 771_175 }]
         )
       end
 
@@ -268,10 +268,10 @@ module Sources
           image_urls: ["https://tbib.org/images/10725/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg"],
           artist_name: "チー之介",
           profile_url: "https://www.pixiv.net/users/57673194",
-          tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
+          tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bow_skirt bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim locker locker_room long_hair looking_at_viewer make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
           artist_commentary_title: "ハロウィンライス",
           artist_commentary_desc: "更衣室でハロウィン衣装に着替えたあと「がおーっ！」のポーズを鏡の前で密かに練習してたら、見つかっちゃってあわてるライスシャワーを描きました。",
-          media_files: [{ file_size: 771_175 }],
+          media_files: [{ file_size: 771_175 }]
         )
       end
 
@@ -282,10 +282,10 @@ module Sources
           image_urls: ["https://tbib.org/images/10725/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg"],
           artist_name: "チー之介",
           profile_url: "https://www.pixiv.net/users/57673194",
-          tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
+          tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bow_skirt bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim locker locker_room long_hair looking_at_viewer make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
           artist_commentary_title: "ハロウィンライス",
           artist_commentary_desc: "更衣室でハロウィン衣装に着替えたあと「がおーっ！」のポーズを鏡の前で密かに練習してたら、見つかっちゃってあわてるライスシャワーを描きました。",
-          media_files: [{ file_size: 771_175 }],
+          media_files: [{ file_size: 771_175 }]
         )
       end
     end
@@ -298,9 +298,9 @@ module Sources
           image_urls: ["https://api-cdn.rule34.xxx/images/6120/0a8fff70045826d2b39fcde4eed17584.jpeg"],
           artist_name: "丸新(MaruShin)",
           profile_url: "https://twitter.com/marushin_0214",
-          tags: %w[bangs big_breasts black_shirt bloomers blue_archive blue_eyes blue_hair blue_jacket blush breasts check_commentary commentary commentary_request cowboy_shot curvy female halo highres holding hourglass_figure huge_breasts jacket lanyard large_breasts long_hair looking_at_viewer marushin_(denwa0214) millennium_science_school_logo_(blue_archive) millennium_science_school_student official_alternate_costume parted_lips partially_unzipped rating:e seminar_(blue_archive) shirt short_sleeves shorts simple_background solo student_id sweat thick_thighs thigh_gap undressing voluptuous wet wet_clothes wet_shirt white_background yuuka_(blue_archive) yuuka_(gym_uniform)_(blue_archive)],
+          tags: %w[bangs big_breasts black_shirt bloomers blue_archive blue_eyes blue_hair blue_jacket blush breasts buruma check_commentary commentary commentary_request cowboy_shot curvy female gym_uniform halo highres holding hourglass_figure huge_breasts jacket lanyard large_breasts long_hair looking_at_viewer marushin_(denwa0214) millennium_science_school_logo_(blue_archive) millennium_science_school_student official_alternate_costume parted_lips partially_unzipped rating:e seminar_(blue_archive) shirt short_sleeves shorts simple_background solo student_id sweat thick_thighs thigh_gap undressing voluptuous wet wet_clothes wet_shirt white_background yuuka_(blue_archive) yuuka_(gym_uniform)_(blue_archive)],
           artist_commentary_desc: "いっぱい走ったね… https://t.co/n3ic5BIONP",
-          media_files: [{ file_size: 201_643 }],
+          media_files: [{ file_size: 201_643 }]
         )
       end
 
@@ -311,9 +311,9 @@ module Sources
           image_urls: ["https://api-cdn.rule34.xxx/images/6120/0a8fff70045826d2b39fcde4eed17584.jpeg"],
           artist_name: "丸新(MaruShin)",
           profile_url: "https://twitter.com/marushin_0214",
-          tags: %w[bangs big_breasts black_shirt bloomers blue_archive blue_eyes blue_hair blue_jacket blush breasts check_commentary commentary commentary_request cowboy_shot curvy female halo highres holding hourglass_figure huge_breasts jacket lanyard large_breasts long_hair looking_at_viewer marushin_(denwa0214) millennium_science_school_logo_(blue_archive) millennium_science_school_student official_alternate_costume parted_lips partially_unzipped rating:e seminar_(blue_archive) shirt short_sleeves shorts simple_background solo student_id sweat thick_thighs thigh_gap undressing voluptuous wet wet_clothes wet_shirt white_background yuuka_(blue_archive) yuuka_(gym_uniform)_(blue_archive)],
+          tags: %w[bangs big_breasts black_shirt bloomers blue_archive blue_eyes blue_hair blue_jacket blush breasts buruma check_commentary commentary commentary_request cowboy_shot curvy female gym_uniform halo highres holding hourglass_figure huge_breasts jacket lanyard large_breasts long_hair looking_at_viewer marushin_(denwa0214) millennium_science_school_logo_(blue_archive) millennium_science_school_student official_alternate_costume parted_lips partially_unzipped rating:e seminar_(blue_archive) shirt short_sleeves shorts simple_background solo student_id sweat thick_thighs thigh_gap undressing voluptuous wet wet_clothes wet_shirt white_background yuuka_(blue_archive) yuuka_(gym_uniform)_(blue_archive)],
           artist_commentary_desc: "いっぱい走ったね… https://t.co/n3ic5BIONP",
-          media_files: [{ file_size: 201_643 }],
+          media_files: [{ file_size: 201_643 }]
         )
       end
 
@@ -324,9 +324,9 @@ module Sources
           image_urls: ["https://rule34.xxx//images/6120/0a8fff70045826d2b39fcde4eed17584.jpeg?6961597"],
           artist_name: "丸新(MaruShin)",
           profile_url: "https://twitter.com/marushin_0214",
-          tags: %w[bangs big_breasts black_shirt bloomers blue_archive blue_eyes blue_hair blue_jacket blush breasts check_commentary commentary commentary_request cowboy_shot curvy female halo highres holding hourglass_figure huge_breasts jacket lanyard large_breasts long_hair looking_at_viewer marushin_(denwa0214) millennium_science_school_logo_(blue_archive) millennium_science_school_student official_alternate_costume parted_lips partially_unzipped rating:e seminar_(blue_archive) shirt short_sleeves shorts simple_background solo student_id sweat thick_thighs thigh_gap undressing voluptuous wet wet_clothes wet_shirt white_background yuuka_(blue_archive) yuuka_(gym_uniform)_(blue_archive)],
+          tags: %w[bangs big_breasts black_shirt bloomers blue_archive blue_eyes blue_hair blue_jacket blush breasts buruma check_commentary commentary commentary_request cowboy_shot curvy female gym_uniform halo highres holding hourglass_figure huge_breasts jacket lanyard large_breasts long_hair looking_at_viewer marushin_(denwa0214) millennium_science_school_logo_(blue_archive) millennium_science_school_student official_alternate_costume parted_lips partially_unzipped rating:e seminar_(blue_archive) shirt short_sleeves shorts simple_background solo student_id sweat thick_thighs thigh_gap undressing voluptuous wet wet_clothes wet_shirt white_background yuuka_(blue_archive) yuuka_(gym_uniform)_(blue_archive)],
           artist_commentary_desc: "いっぱい走ったね… https://t.co/n3ic5BIONP",
-          media_files: [{ file_size: 201_643 }],
+          media_files: [{ file_size: 201_643 }]
         )
       end
 

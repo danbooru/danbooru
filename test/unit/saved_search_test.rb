@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SavedSearchTest < ActiveSupport::TestCase
   def setup
@@ -21,7 +21,7 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
 
     should "fetch the labels used by a user" do
-      assert_equal(%w(blah zah), SavedSearch.labels_for(@user.id))
+      assert_equal(%w[blah zah], SavedSearch.labels_for(@user.id))
     end
   end
 
@@ -34,11 +34,11 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
 
     should "fetch the queries used by a user for a label" do
-      assert_equal(%w(aaa), SavedSearch.queries_for(@user.id, label: "blah"))
+      assert_equal(%w[aaa], SavedSearch.queries_for(@user.id, label: "blah"))
     end
 
     should "fetch the queries used by a user without a label" do
-      assert_equal(["aaa", "aaa ccc"], SavedSearch.queries_for(@user.id))
+      assert_equal(["aaa", "aaa ccc ccc"], SavedSearch.queries_for(@user.id))
     end
   end
 

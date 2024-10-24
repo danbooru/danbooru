@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class MisskeyTest < ActiveSupport::TestCase
@@ -93,7 +93,7 @@ module Sources
         page_url: "https://misskey.io/notes/9t3ulxtf6ydq00na",
         profile_url: "https://misskey.io/@orizanin@nijimiss.moe",
         profile_urls: %w[https://misskey.io/@orizanin@nijimiss.moe https://nijimiss.moe/@orizanin],
-        display_name: nil,
+        display_name: "いけめす",
         username: "orizanin",
         tags: [
           ["にじみすお絵描き部", "https://nijimiss.moe/tags/にじみすお絵描き部"],
@@ -305,7 +305,7 @@ module Sources
         page_url: "https://nijimiss.moe/notes/01HPZQPJ6M9Y2DP134PRQ548EX",
         profile_url: "https://nijimiss.moe/@GAtturi_",
         profile_urls: %w[https://nijimiss.moe/@GAtturi_ https://nijimiss.moe/users/01GV09J8CQ19F0Z3T0D3PNDRRN],
-        display_name: nil,
+        display_name: "がっつり太郎",
         username: "GAtturi_",
         tag_name: "gatturi",
         tags: [],

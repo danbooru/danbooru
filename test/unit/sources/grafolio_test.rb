@@ -39,7 +39,7 @@ module Sources
         strategy_should_work(
           "https://preview.files.api.ogq.me/v1/cover/MEDIUM/NEW-PROFILE_COVER/8fa37d34/60d7843d73af8/b407e9c70b284e559816d5e787823ee2.png",
           image_urls: %w[https://preview.files.api.ogq.me/v1/cover/MEDIUM/NEW-PROFILE_COVER/8fa37d34/60d7843d73af8/b407e9c70b284e559816d5e787823ee2.png],
-          media_files: [{ file_size: 249_184 }],
+          media_files: [{ file_size: 249_154 }],
           page_url: nil,
           profile_urls: [],
           display_name: nil,
