@@ -115,15 +115,23 @@ module Sources
         strategy_should_work(
           "https://badkrol.carrd.co/#commission",
           image_urls: %w[
-            https://badkrol.carrd.co/assets/images/gallery01/42c1e32a.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/08d85bf2.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/fc3f91db.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/548929a2.jpg
             https://badkrol.carrd.co/assets/images/gallery01/9be3f1d6.jpg
             https://badkrol.carrd.co/assets/images/gallery01/1b735c39.jpg
             https://badkrol.carrd.co/assets/images/gallery01/7aa51f1c.jpg
             https://badkrol.carrd.co/assets/images/gallery01/f375193f.jpg
-            https://badkrol.carrd.co/assets/images/gallery02/2973b8cd.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/e1f24a6d.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/06ab2b47.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/1f27675c.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/68efbc17.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/b3a4117b.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/1092c7c0.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/5cb6a551.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/b7d14035.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/b13b55a8.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/8fad7dc7.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/b6527092.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/24fa71b4.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/e9db9481.jpg
             https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg
             https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg
             https://badkrol.carrd.co/assets/images/gallery02/a22539e3.jpg
@@ -132,17 +140,33 @@ module Sources
             https://badkrol.carrd.co/assets/images/gallery02/95c2ed27.jpg
             https://badkrol.carrd.co/assets/images/gallery02/4451caa0.jpg
             https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/7438d70f.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/2803a091.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/5599d4f0.jpg
+            https://badkrol.carrd.co/assets/images/gallery03/78ef819e.jpg
+            https://badkrol.carrd.co/assets/images/gallery03/0034c012.jpg
+            https://badkrol.carrd.co/assets/images/gallery03/f4349834.jpg
+            https://badkrol.carrd.co/assets/images/gallery03/6373c204.jpg
+            https://badkrol.carrd.co/assets/images/gallery03/aa6317be.jpg
           ],
           media_files: [
-            { file_size: 9_104 },
-            { file_size: 10_874 },
-            { file_size: 5_546 },
-            { file_size: 9_944 },
             { file_size: 8_669 },
             { file_size: 21_915 },
             { file_size: 6_460 },
             { file_size: 7_012 },
-            { file_size: 8_388 },
+            { file_size: 6_942 },
+            { file_size: 11_353 },
+            { file_size: 10_785 },
+            { file_size: 7_025 },
+            { file_size: 11_246 },
+            { file_size: 9_316 },
+            { file_size: 9_375 },
+            { file_size: 10_727 },
+            { file_size: 20_635 },
+            { file_size: 7_429 },
+            { file_size: 9_311 },
+            { file_size: 11_381 },
+            { file_size: 9_222 },
             { file_size: 19_498 },
             { file_size: 8_746 },
             { file_size: 5_604 },
@@ -151,6 +175,14 @@ module Sources
             { file_size: 14_529 },
             { file_size: 7_488 },
             { file_size: 17_550 },
+            { file_size: 6_787 },
+            { file_size: 7_166 },
+            { file_size: 18_659 },
+            { file_size: 7_161 },
+            { file_size: 8_806 },
+            { file_size: 5_017 },
+            { file_size: 8_059 },
+            { file_size: 7_606 },
           ],
           page_url: "https://badkrol.carrd.co/#commission",
           profile_urls: %w[https://badkrol.carrd.co],
@@ -168,18 +200,28 @@ module Sources
 
             Anime Style ( *some examples have incomplete rendering)
 
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/42c1e32a.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/08d85bf2.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/fc3f91db.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/548929a2.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/9be3f1d6.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/1b735c39.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/7aa51f1c.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/f375193f.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/e1f24a6d.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/06ab2b47.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/1f27675c.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/68efbc17.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b3a4117b.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/1092c7c0.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/5cb6a551.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b7d14035.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b13b55a8.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/8fad7dc7.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b6527092.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/24fa71b4.jpg]
+
+            🎈Note:for additional difficulty of a character or artwork as a whole, additional fees may be added.🎈
 
             Illustration
 
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/2973b8cd.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/e9db9481.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/a22539e3.jpg]
@@ -188,10 +230,19 @@ module Sources
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/95c2ed27.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/4451caa0.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/7438d70f.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/2803a091.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/5599d4f0.jpg]
+
+            Line Sketch ( Anime or Semi-real)
+
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/78ef819e.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/0034c012.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/f4349834.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/6373c204.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/aa6317be.jpg]
 
             Backgrounds
-
-            Note: Simple backgrounds (such as plain colours and basic patterns) are free.
           EOS
         )
       end
@@ -304,19 +355,25 @@ module Sources
       context "A crd.co page" do
         strategy_should_work(
           "https://popuru.crd.co/#illustration",
-          image_urls: %w[
-            https://popuru.crd.co/assets/images/gallery01/0a55b9f2_original.jpg
-            https://popuru.crd.co/assets/images/gallery01/5e8d0711_original.jpg
-            https://popuru.crd.co/assets/images/gallery01/0501db00_original.jpg
-            https://popuru.crd.co/assets/images/gallery01/e54a6ffe_original.jpg
-            https://popuru.crd.co/assets/images/gallery01/5c0c81b5_original.jpg
-          ],
+          image_urls: %w[https://popuru.crd.co/assets/images/gallery01/a622b4b6_original.jpg
+                         https://popuru.crd.co/assets/images/gallery01/0501db00_original.jpg
+                         https://popuru.crd.co/assets/images/gallery01/5e8d0711_original.jpg
+                         https://popuru.crd.co/assets/images/gallery01/40b852eb_original.jpg
+                         https://popuru.crd.co/assets/images/gallery01/cef0e40c_original.jpg
+                         https://popuru.crd.co/assets/images/gallery01/ef72e15e_original.jpg
+                         https://popuru.crd.co/assets/images/gallery01/6e7c7eab_original.jpg
+                         https://popuru.crd.co/assets/images/gallery01/b514a7af_original.jpg
+                         https://popuru.crd.co/assets/images/gallery01/2b0f92a9_original.jpg],
           media_files: [
-            { file_size: 90_888 },
-            { file_size: 118_584 },
-            { file_size: 210_944 },
-            { file_size: 164_972 },
-            { file_size: 197_111 },
+            { file_size: 1_388_427},
+            { file_size: 210_944},
+            { file_size: 118_584},
+            { file_size: 1_362_867},
+            { file_size: 701_534},
+            { file_size: 1_553_022},
+            { file_size: 1_210_898},
+            { file_size: 1_258_618},
+            { file_size: 433_682},
           ],
           page_url: "https://popuru.crd.co/#illustration",
           profile_url: "https://popuru.crd.co",
@@ -326,17 +383,21 @@ module Sources
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            h1. [b]PEDRO SCHMIDT[/b]
+            h2. [b]PEDRO SCHMIDT[/b]
 
-            h2. 2d animation and storyboard
+            2d animation and storyboard
 
             "[email protected]":[https://popuru.crd.co/cdn-cgi/l/email-protection]
 
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/0a55b9f2_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/5e8d0711_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/a622b4b6_original.jpg]
             * "[image]":[https://popuru.crd.co/assets/images/gallery01/0501db00_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/e54a6ffe_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/5c0c81b5_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/5e8d0711_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/40b852eb_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/cef0e40c_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/ef72e15e_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/6e7c7eab_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/b514a7af_original.jpg]
+            * "[image]":[https://popuru.crd.co/assets/images/gallery01/2b0f92a9_original.jpg]
           EOS
         )
       end
