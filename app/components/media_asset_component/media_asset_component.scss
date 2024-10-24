@@ -63,6 +63,11 @@
     }
   }
 
+  .moderation-report-notice {
+    font-weight: bold;
+    color: var(--moderation-report-text-color);
+  }
+
   .media-asset-image {
     user-select: none;
     width: auto;
