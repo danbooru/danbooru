@@ -19,6 +19,8 @@ WIKI_PAGES   = ENV.fetch("WIKI_PAGES",   POSTS * 0.1).to_i
 COMMENTS     = ENV.fetch("COMMENTS",     POSTS * 0.2).to_i
 COMMENTARIES = ENV.fetch("COMMENTARIES", POSTS * 0.5).to_i
 FAVORITES    = ENV.fetch("FAVORITES",    POSTS * 5.0).to_i
+FEEDBACKS    = ENV.fetch("FEEDBACKS",    USERS * 0.5).to_i
+BANS         = ENV.fetch("BANS",         USERS * 0.1).to_i
 
 # The default password for all user accounts. The default is `password`.
 DEFAULT_PASSWORD = ENV.fetch("DEFAULT_PASSWORD", "password")
@@ -26,21 +28,21 @@ DEFAULT_PASSWORD = ENV.fetch("DEFAULT_PASSWORD", "password")
 CurrentUser.user = User.system
 
 def populate_users(n, password: DEFAULT_PASSWORD)
-  puts "*** Creating users ***"
+  Rails.logger.info "*** Creating users ***"
 
   User::Levels.constants.without(:ANONYMOUS).each do |level|
     user = User.create(name: "#{level.to_s.downcase}_user", password: password, password_confirmation: password, level: User::Levels.const_get(level))
-    puts "Created user ##{user.id} (#{user.name})"
+    Rails.logger.info "Created user ##{user.id} (#{user.name})"
   end
 
-  n.times do |i|
+  n.times do
     user = User.create(name: Faker::Internet.unique.username, password: password, password_confirmation: password, level: User::Levels::MEMBER)
-    puts "Created user ##{user.id}"
+    Rails.logger.info "Created user ##{user.id}"
   end
 end
 
 def populate_posts(n, search: "rating:s", batch_size: 200, timeout: 30.seconds)
-  puts "*** Creating posts ***"
+  Rails.logger.info "*** Creating posts ***"
 
   # Generate posts in batches of 200 (by default)
   n.times.each_slice(batch_size).map(&:size).each do |count|
@@ -55,42 +57,42 @@ def populate_posts(n, search: "rating:s", batch_size: 200, timeout: 30.seconds)
         post = Post.new_from_upload(upload.upload_media_assets.first, tag_string: danbooru_post["tag_string"], source: danbooru_post["source"], rating: danbooru_post["rating"])
         post.save
 
-        puts "Created post ##{post.id}"
+        Rails.logger.info "Created post ##{post.id}"
       end
-    rescue
+    rescue StandardError
       # ignore errors
     end
   end
 end
 
 def populate_comments(n)
-  puts "*** Creating comments ***"
+  Rails.logger.info "*** Creating comments ***"
 
-  n.times do |i|
+  n.times do
     user = User.order("random()").first
     post = Post.order("random()").first
     comment = CurrentUser.scoped(user) { Comment.create(creator: user, post: post, body: Faker::Lorem.paragraph) }
 
-    puts "Created comment ##{comment.id}"
+    Rails.logger.info "Created comment ##{comment.id}"
   end
 end
 
 def populate_commentaries(n)
-  puts "*** Creating artist commentaries ***"
+  Rails.logger.info "*** Creating artist commentaries ***"
 
-  n.times do |i|
+  n.times do
     user = User.order("random()").first
     post = Post.order("random()").first
     artcomm = CurrentUser.scoped(user) { ArtistCommentary.create(post: post, original_title: Faker::Lorem.sentence, original_description: Faker::Lorem.paragraphs.join("\n\n")) }
 
-    puts "Created commentary ##{artcomm.id}"
+    Rails.logger.info "Created commentary ##{artcomm.id}"
   end
 end
 
 def populate_notes(n)
-  puts "*** Creating notes ***"
+  Rails.logger.info "*** Creating notes ***"
 
-  n.times do |i|
+  n.times do
     user = User.order("random()").first
     post = Post.order("random()").first
     x = rand(post.image_width).clamp(0..post.image_width - 100)
@@ -100,77 +102,108 @@ def populate_notes(n)
 
     note = Note.create(post: post, x: x, y: y, width: w, height: h, body: Faker::Lorem.paragraph)
 
-    puts "Created note ##{note.id}"
+    Rails.logger.info "Created note ##{note.id}"
   end
 end
 
 def populate_artists(n)
-  puts "*** Creating artists ***"
+  Rails.logger.info "*** Creating artists ***"
 
-  n.times do |i|
+  n.times do
     url_string = rand(5).times.map { Faker::Internet.url }.join("\n")
     artist = Artist.create(name: Faker::Internet.unique.username, url_string: url_string)
 
-    puts "Created artist ##{artist.id}"
+    Rails.logger.info "Created artist ##{artist.id}"
   end
 end
 
 def populate_aliases(n)
-  puts "*** Creating tag aliases ***"
+  Rails.logger.info "*** Creating tag aliases ***"
 
-  n.times do |i|
+  n.times do
     tag_alias = TagAlias.create(antecedent_name: Faker::Internet.unique.username, consequent_name: Faker::Internet.unique.username)
-    puts "Created tag alias ##{tag_alias.id}"
+    Rails.logger.info "Created tag alias ##{tag_alias.id}"
   end
 end
 
 def populate_implications(n)
-  puts "*** Creating tag implications ***"
+  Rails.logger.info "*** Creating tag implications ***"
 
-  n.times do |i|
+  n.times do
     tag_implication = TagImplication.create(antecedent_name: Faker::Internet.unique.username, consequent_name: Faker::Internet.unique.username)
-    puts "Created tag implication ##{tag_implication.id}"
+    Rails.logger.info "Created tag implication ##{tag_implication.id}"
   end
 end
 
 def populate_pools(n, posts_per_pool: 20)
-  puts "*** Creating pools ***"
+  Rails.logger.info "*** Creating pools ***"
 
-  n.times do |i|
+  n.times do
     posts = Post.order("random()").take(rand(posts_per_pool))
     pool = Pool.create(name: Faker::Lorem.sentence, description: Faker::Lorem.paragraph, post_ids: posts.pluck(:id))
-    puts "Created pool ##{pool.id}"
+    Rails.logger.info "Created pool ##{pool.id}"
   end
 end
 
 def populate_favorites(n)
-  puts "*** Creating pools ***"
+  Rails.logger.info "*** Creating pools ***"
 
-  n.times do |i|
+  n.times do
     user = User.order("random()").first
     post = Post.order("random()").first
     favorite = Favorite.create(user: user, post: post)
 
-    puts "Created favorite ##{favorite.id}"
+    Rails.logger.info "Created favorite ##{favorite.id}"
+  end
+end
+
+def populate_feedbacks(n)
+  Rails.logger.info "*** Creating feedbacks ***"
+
+  # Generate feedbacks
+  n.times do
+    user = User.order("random()").first
+    creator = User.where.not(id: user.id).order("random()").first
+    created_at = Faker::Time.between(from: 1.year.ago, to: Time.zone.now)
+
+    feedback = UserFeedback.create(user: user, creator: creator, category: %w[positive negative neutral].sample, body: Faker::Lorem.paragraph, created_at: created_at)
+
+    Rails.logger.info "Created feedback ##{feedback.id}"
+  end
+end
+
+def populate_bans(n)
+  Rails.logger.info "*** Creating bans ***"
+
+  # Generate bans
+  n.times do
+    creator = User.where(level: User::Levels::MODERATOR..).order("random()").first
+    recipient = User.where(level: ..User::Levels::APPROVER).order("random()").first
+    duration = [1.day, 1.week, 1.year, 100.years].sample
+    created_at = Faker::Time.between(from: 1.year.ago, to: Time.zone.now)
+
+    ban = Ban.create(banner: creator, user: recipient, duration: duration, reason: Faker::Lorem.sentence, created_at: created_at)
+
+    Rails.logger.info "Created ban ##{ban.id}"
   end
 end
 
 def populate_wiki_pages(n)
-  puts "*** Creating wiki pages ***"
+  Rails.logger.info "*** Creating wiki pages ***"
 
-  n.times do |i|
+  n.times do
     user = User.order("random()").first
     other_names = rand(5).times.map { Faker::Internet.unique.username }
     wiki = CurrentUser.scoped(user) { WikiPage.create(title: Faker::Internet.unique.username, other_names: other_names, body: Faker::Lorem.paragraphs.join("\n\n")) }
 
-    puts "Created wiki ##{wiki.id}"
+    Rails.logger.info "Created wiki ##{wiki.id}"
   end
 end
 
 def populate_forum(n, posts_per_topic: 20)
-  puts "*** Creating forum topics ***"
+  Rails.logger.info "*** Creating forum topics ***"
 
-  n.times do |i|
+  n.times do
     user = User.order("random()").first
     topic = CurrentUser.scoped(user) { ForumTopic.create(creator: user, title: Faker::Lorem.sentence, original_post_attributes: { creator: user, body: Faker::Lorem.paragraphs.join("\n\n") }) }
 
@@ -179,7 +212,7 @@ def populate_forum(n, posts_per_topic: 20)
       CurrentUser.scoped(user) { ForumPost.create(creator: user, topic: topic, body: Faker::Lorem.paragraphs.join("\n\n")) }
     end
 
-    puts "Created topic ##{topic.id}"
+    Rails.logger.info "Created topic ##{topic.id}"
   end
 end
 
@@ -195,3 +228,5 @@ populate_wiki_pages(WIKI_PAGES)
 populate_comments(COMMENTS)
 populate_commentaries(COMMENTARIES)
 populate_favorites(FAVORITES)
+populate_feedbacks(FEEDBACKS)
+populate_bans(BANS)
