@@ -7,6 +7,7 @@
       <%= f.input :creator_name, input_html: { value: params.dig(:search, :creator_name), "data-autocomplete": "user" } %>
       <%= f.input :body_matches, label: "Message", input_html: { value: params.dig(:search, :body_matches) } %>
       <%= f.input :category, collection: %w[positive neutral negative], include_blank: true, selected: params.dig(:search, :category) %>
+      <%= f.input :hide_bans, label: "Hide bans?", collection: %w[No Yes], selected: params.dig(:search, :hide_bans) %>
       <% if policy(UserFeedback).can_view_deleted? %>
         <%= f.input :is_deleted, label: "Deleted", collection: %w[Yes No], include_blank: true, selected: params.dig(:search, :is_deleted) %>
       <% end %>
