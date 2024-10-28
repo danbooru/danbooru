@@ -66,6 +66,15 @@ module Sources
         )
       end
 
+      context "an ugoira" do
+        strategy_should_work(
+          "https://cdn.donmai.us/original/22/30/2230a9de4ceecec50228cbb6e37630bd.zip",
+          image_urls: %w[https://cdn.donmai.us/original/22/30/2230a9de4ceecec50228cbb6e37630bd.zip],
+          media_files: [{ file_size: 3_433_318, frame_delays: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100] }],
+          page_url: "https://danbooru.donmai.us/posts/7271978",
+        )
+      end
+
       context "A post with a source pointing to itself" do
         strategy_should_work(
           "https://danbooru.donmai.us/posts/4542652",

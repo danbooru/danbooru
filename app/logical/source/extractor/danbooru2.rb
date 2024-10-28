@@ -15,7 +15,7 @@ module Source
         elsif parsed_url.image_url?
           [parsed_url.candidate_full_image_urls.find { |url| http_exists?(url) } || url]
         else
-          [api_response.dig(:media_asset, :variants)&.find { _1[:type] == "original" }&.dig(:url)].compact
+          [api_response[:variants]&.find { _1[:type] == "original" }&.dig(:url)].compact
         end
       end
 
@@ -24,7 +24,7 @@ module Source
       end
 
       def tags
-        api_response[:tag_string].to_s.split.map do |tag|
+        api_response.dig(:post, :tag_string).to_s.split.map do |tag|
           [tag, "https://danbooru.donmai.us/posts?tags=#{::Danbooru::URL.escape(tag)}"]
         end
       end
@@ -43,21 +43,32 @@ module Source
         super.headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
       end
 
-      memoize def api_response
-        fields = %w[id source tag_string tag_string_artist media_asset artist_commentary].join(",")
+      def download_file!(url)
+        media_file = super(url)
+        media_file.frame_delays = ugoira_frame_delays if ugoira_frame_delays.present?
+        media_file
+      end
 
-        if post_id_from_url.present?
-          http.cache(1.minute).parsed_get("https://danbooru.donmai.us/posts/#{post_id_from_url}.json?only=#{fields}") || {}
-        elsif post_md5_from_url.present?
-          http.cache(1.minute).parsed_get("https://danbooru.donmai.us/posts.json?md5=#{post_md5_from_url}&only=#{fields}") || {}
-        else
-          {}
+      def ugoira_frame_delays
+        api_response.dig(:media_metadata, :metadata, :"Ugoira:FrameDelays")
+      end
+
+      memoize def api_response
+        fields = %w[variants media_metadata[metadata] post[id,tag_string,source]].join(",")
+
+        api_url = if post_md5_from_url.present?
+          "https://danbooru.donmai.us/media_assets.json?search[md5]=#{post_md5_from_url}&only=#{fields}"
+        elsif post_id_from_url.present?
+          "https://danbooru.donmai.us/media_assets.json?search[post][id]=#{post_id_from_url}&only=#{fields}"
         end
+
+        response = http.cache(1.minute).parsed_get(api_url) if api_url.present?
+        (response || []).first.to_h.with_indifferent_access
       end
 
       concerning :HelperMethods do
         def post_id
-          post_id_from_url || api_response[:id]
+          post_id_from_url || api_response.dig(:post, :id)
         end
 
         def post_id_from_url
@@ -71,7 +82,7 @@ module Source
         def sub_extractor
           return nil if parent_extractor.present?
 
-          @sub_extractor ||= Source::Extractor.find(api_response[:source], default_extractor: nil, parent_extractor: self)
+          @sub_extractor ||= Source::Extractor.find(api_response.dig(:post, :source), default_extractor: nil, parent_extractor: self)
         end
       end
     end
