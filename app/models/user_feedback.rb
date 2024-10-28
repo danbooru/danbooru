@@ -32,6 +32,16 @@ class UserFeedback < ApplicationRecord
     def search(params, current_user)
       q = search_attributes(params, [:id, :created_at, :updated_at, :category, :body, :is_deleted, :creator, :user], current_user: current_user)
 
+      if params[:hide_bans].to_s.truthy?
+        # Feedback generation from bans has changed several times over the years. However they all start like one of the following:
+        # "Blocked: "
+        # "Banned: "
+        # "Banned forever: "
+        # "Banned for <duration>: "
+        # "Banned <duration>: "
+        q = q.where("body ~ '^(?!Banned(:| for| [0-9])|Blocked:)'")
+      end
+
       q.apply_default_order(params)
     end
   end
