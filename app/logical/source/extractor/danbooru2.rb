@@ -53,17 +53,32 @@ module Source
         api_response.dig(:media_metadata, :metadata, :"Ugoira:FrameDelays")
       end
 
-      memoize def api_response
+      def post_api_response
+        return unless post_id_from_url.present?
+
+        fields = %w[id tag_string source media_asset[variants,media_metadata[metadata]]].join(",")
+        api_url = "https://danbooru.donmai.us/posts/#{post_id_from_url}.json?only=#{fields}"
+
+        response = http.cache(1.minute).parsed_get(api_url)
+        return {} unless response.present?
+
+        media_asset = response.delete(:media_asset)
+        media_asset[:post] = response
+        media_asset
+      end
+
+      def media_asset_api_response
+        return unless post_md5_from_url.present?
+
         fields = %w[variants media_metadata[metadata] post[id,tag_string,source]].join(",")
+        api_url = "https://danbooru.donmai.us/media_assets.json?search[md5]=#{post_md5_from_url}&only=#{fields}"
 
-        api_url = if post_md5_from_url.present?
-          "https://danbooru.donmai.us/media_assets.json?search[md5]=#{post_md5_from_url}&only=#{fields}"
-        elsif post_id_from_url.present?
-          "https://danbooru.donmai.us/media_assets.json?search[post][id]=#{post_id_from_url}&only=#{fields}"
-        end
-
-        response = http.cache(1.minute).parsed_get(api_url) if api_url.present?
+        response = http.cache(1.minute).parsed_get(api_url)
         (response || []).first.to_h.with_indifferent_access
+      end
+
+      memoize def api_response
+        media_asset_api_response || post_api_response || {}
       end
 
       concerning :HelperMethods do
