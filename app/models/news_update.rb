@@ -9,8 +9,9 @@ class NewsUpdate < ApplicationRecord
   deletable
   scope :active, -> { undeleted.where("created_at + duration >= ?", Time.zone.now) }
 
-  validates :duration, inclusion: { in: Array(1..30).map {|d| d.days.iso8601}, message: "%{value} is not a valid duration" }, if: :duration_changed?
-  before_save :parse_duration_in_days
+  before_validation :parse_duration_in_days
+  validate :validate_duration, if: :duration_changed?
+  validates :message, presence: true, if: :message_changed?
 
   def self.visible(user)
     if user.is_admin?
@@ -27,6 +28,10 @@ class NewsUpdate < ApplicationRecord
 
   def parse_duration_in_days
     self.duration = duration_in_days.to_i.days if duration_in_days.present?
+  end
+
+  def validate_duration
+    errors.add(:duration, "must be between 1 and 30 days") unless Array(1..30).map(&:days).include?(duration)
   end
 
   def status

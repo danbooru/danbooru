@@ -77,5 +77,20 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_select "#news-updates > div > div", count: 1, text: @news_update.message
       end
     end
+
+    should "not allow a news update without a body" do
+      news_update = build(:news_update, creator: @admin, message: "", duration: 12.days)
+      assert_not(news_update.valid?)
+    end
+
+    should "not allow a news update with no duration" do
+      news_update = build(:news_update, creator: @admin, message: "asd", duration: 0.days)
+      assert_not(news_update.valid?)
+    end
+
+    should "not allow a duration that's too long" do
+      news_update = build(:news_update, creator: @admin, message: "asd", duration: 1.year)
+      assert_not(news_update.valid?)
+    end
   end
 end
