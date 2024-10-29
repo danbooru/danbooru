@@ -22,7 +22,7 @@ class NewsUpdatesController < ApplicationController
   def update
     @news_update = authorize NewsUpdate.find(params[:id])
     @news_update.update(permitted_attributes(@news_update))
-    respond_with(@news_update, :location => news_updates_path)
+    respond_with(@news_update, location: news_updates_path)
   end
 
   def create
