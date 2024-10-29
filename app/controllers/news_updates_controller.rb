@@ -37,6 +37,6 @@ class NewsUpdatesController < ApplicationController
   def destroy
     @news_update = authorize NewsUpdate.find(params[:id])
     @news_update.soft_delete!
-    respond_with(@news_update, :location => news_updates_path)
+    respond_with(@news_update, location: news_updates_path)
   end
 end

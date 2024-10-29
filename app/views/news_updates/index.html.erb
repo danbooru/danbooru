@@ -20,9 +20,9 @@
       <% t.column column: "control" do |news_update| %>
         <%= link_to "Edit", edit_news_update_path(news_update) %>
           <% if news_update.is_deleted? %>
-        | <%= link_to "Undelete", news_update_path(news_update), :method => :put, remote: true, "data-params": "news_update[is_deleted]=false", "data-confirm": "Are you sure you want to undelete this news update?" %>
+        | <%= link_to "Undelete", news_update_path(news_update), method: :put, remote: true, "data-params": "news_update[is_deleted]=false", "data-confirm": "Are you sure you want to undelete this news update?" %>
           <% else %>
-        | <%= link_to "Delete", news_update_path(news_update), :method => :delete, "data-confirm": "Are you sure you want to delete this news update?" %>
+        | <%= link_to "Delete", news_update_path(news_update), method: :delete, "data-confirm": "Are you sure you want to delete this news update?" %>
           <% end %>
       <% end %>
     <% end %>

@@ -70,7 +70,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
 
     context "undelete action" do
       should "work" do
-        put_auth news_update_path(@news_update), @admin, params: {:news_update => {:is_deleted => false}}
+        put_auth news_update_path(@news_update), @admin, params: { news_update: { is_deleted: false } }
         assert_redirected_to(news_updates_path)
 
         get_auth posts_path, @admin
