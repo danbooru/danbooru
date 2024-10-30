@@ -180,12 +180,11 @@ module Source
         file = Danbooru::Tempfile.new(["danbooru-ugoira-", ".zip"], binmode: true)
 
         Dir.mktmpdir do |tmpdir|
-          animation_meta[:frames].to_enum.with_index.parallel_each.cancellable do |frame, n, cancelled|
+          animation_meta[:frames].each_with_index do |frame, n|
             frame_url = url.ugoira_frame_url(n)
             file_path = File.join tmpdir, frame[:file]
             File.open(file_path, "w+", binmode: true) do |file|
-              # XXX: thread-unsafe, therefore dup
-              http_downloader.deep_dup.download_media(frame_url, file: file, cancelled: cancelled)
+              http_downloader.download_media(frame_url, file: file)
             end
           end
 
