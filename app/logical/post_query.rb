@@ -324,7 +324,16 @@ class PostQuery
 
     # The number of unique tags, wildcards, and metatags in the search, excluding metatags that don't count against the user's tag limit.
     def term_count
-      tag_names.size + wildcards.size + metatags.count { !_1.name.in?(UNLIMITED_METATAGS) } + search_params.size
+      tag_names.size +
+        wildcards.size +
+        metatags.count { !_1.name.in?(UNLIMITED_METATAGS) } +
+        search_params.sum do |param|
+          if param.path.last == "tags" || param.path.last.ends_with?("_tags_match")
+            build(param.value).term_count
+          else
+            1
+          end
+        end
     end
   end
 

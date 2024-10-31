@@ -1523,6 +1523,39 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "aaa bbb filesize:<100mb width:<10000 height:<10000 limit:20")
     end
 
+    should "account for user's search limit in nested search params" do
+      post1 = create(:post, rating: "s", tag_string: "aaa bbb zzz")
+      post2 = create(:post, parent: post1, rating: "q", tag_string: "ccc ddd zzz")
+
+      assert_tag_match([post2], %{zzz [parent][tags]:"aaa"}, tag_limit: 2)
+      assert_tag_match([post2], %{[parent][tags]:"zzz" [parent][tags]:"aaa"}, tag_limit: 2)
+      assert_tag_match([post2], %{[parent][tags]:"aaa zzz"}, tag_limit: 2)
+      assert_tag_match([post2], %{zzz [parent][tags]:"user:#{post1.uploader.name}"}, tag_limit: 2)
+      assert_tag_match([post2], %{zzz rating:q [parent][tags]:"aaa"}, tag_limit: 2)
+      assert_tag_match([post2], %{zzz [parent][tags]:"aaa rating:s"}, tag_limit: 2)
+      assert_tag_match([post2], %{zzz rating:q [parent][tags]:"aaa rating:s"}, tag_limit: 2)
+      assert_tag_match([post2], %{[parent][id]:#{post1.id} [parent][tags]:"aaa"}, tag_limit: 2)
+
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{zzz ccc [parent][tags]:"aaa"}, tag_limit: 2)
+      end
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{zzz ([parent][tags]:"bbb") ([parent][tags]:"aaa")}, tag_limit: 2)
+      end
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{([parent][tags]:"zzz") ([parent][tags]:"bbb") ([parent][tags]:"aaa")}, tag_limit: 2)
+      end
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{[parent][tags]:"aaa bbb zzz"}, tag_limit: 2)
+      end
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{zzz [parent][tags]:"user:#{post1.uploader.name} fav:#{post1.uploader.name}"}, tag_limit: 2)
+      end
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{zzz [parent][id]:#{post1.id} [parent][tags]:"aaa"}, tag_limit: 2)
+      end
+    end
+
     should "succeed for exclusive tag searches with no other tag" do
       post1 = create(:post, rating: "s", tag_string: "aaa")
       assert_tag_match([], "-aaa")
