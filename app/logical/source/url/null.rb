@@ -585,11 +585,6 @@ class Source::URL::Null < Source::URL
     in _, "pornhub.com", *rest
       nil
 
-    # https://privatter.net/u/minami_152133
-    # https://privatter.net/m/minami_152133
-    in _, "privatter.net", ("u" | "m"), username
-      @profile_url = "https://privatter.net/u/#{username}"
-
     # https://www.redbubble.com/people/limb
     in _, "redbubble.com", *rest
       nil
