@@ -9,19 +9,13 @@ class NewsUpdatesController < ApplicationController
     respond_with(@news_updates)
   end
 
-  def edit
-    @news_update = authorize NewsUpdate.find(params[:id])
+  def new
+    @news_update = authorize NewsUpdate.new(permitted_attributes(NewsUpdate))
     respond_with(@news_update)
   end
 
-  def update
+  def edit
     @news_update = authorize NewsUpdate.find(params[:id])
-    @news_update.update(permitted_attributes(@news_update))
-    respond_with(@news_update, :location => news_updates_path)
-  end
-
-  def new
-    @news_update = authorize NewsUpdate.new
     respond_with(@news_update)
   end
 
@@ -31,11 +25,15 @@ class NewsUpdatesController < ApplicationController
     respond_with(@news_update, :location => news_updates_path)
   end
 
+  def update
+    @news_update = authorize NewsUpdate.find(params[:id])
+    @news_update.update(permitted_attributes(@news_update))
+    respond_with(@news_update, location: news_updates_path)
+  end
+
   def destroy
     @news_update = authorize NewsUpdate.find(params[:id])
-    @news_update.destroy
-    respond_with(@news_update) do |format|
-      format.js
-    end
+    @news_update.soft_delete!
+    respond_with(@news_update, location: news_updates_path)
   end
 end

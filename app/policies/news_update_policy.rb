@@ -14,6 +14,6 @@ class NewsUpdatePolicy < ApplicationPolicy
   end
 
   def permitted_attributes
-    [:message]
+    [:message, :duration, :duration_in_days, :is_deleted]
   end
 end

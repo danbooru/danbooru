@@ -1,0 +1,6 @@
+<%= edit_form_for(news_update) do |f| %>
+    <%= f.input :message, hint: "Use HTML for formatting" %>
+    <%= f.label :duration_in_days, "Duration:" %>
+    <p><%= f.number_field :duration_in_days, label: "Days", min: 1, max: 30, value: news_update.duration.in_days.to_i %> days</p>
+    <%= f.button :submit, "Submit" %>
+<% end %>
