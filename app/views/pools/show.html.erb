@@ -6,21 +6,34 @@
 
 <div id="c-pools">
   <div id="a-show">
-    <h1>
-      <%= @pool.pretty_category %>:
-      <%= link_to @pool.pretty_name, posts_path(:tags => "pool:#{@pool.id}"), :class => "pool-category-#{@pool.category}" %>
-      <% if @pool.is_deleted? %>
-        <span class="inactive">(deleted)</span>
-      <% end %>
-    </h1>
+    <div class="flex mb-4">
+      <div>
+        <h1>
+          <%= @pool.pretty_category %>:
+          <%= link_to @pool.pretty_name, posts_path(:tags => "pool:#{@pool.id}"), :class => "pool-category-#{@pool.category}" %>
+          <% if @pool.is_deleted? %>
+            <span class="inactive">(deleted)</span>
+          <% end %>
 
-    <div id="description" class="prose mb-4">
-      <%= @pool.dtext_description.format_text %>
+        </h1>
+
+        <div id="description" class="prose mb-4">
+          <%= @pool.dtext_description.format_text %>
+        </div>
+      </div>
+
+      <span class="flex-grow-1"></span>
+      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+      <%= render PopupMenuComponent.new(classes: "post-preview-options-menu") do |menu| %>
+        <% menu.with_item do %>
+          <% menu.render_votes_toggle(@show_votes) %>
+        <% end %>
+      <% end %>
     </div>
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= render_post_gallery(@posts, tags: "pool:#{@pool.id}", show_deleted: @pool.is_series?) do |gallery| %>
+    <%= render_post_gallery(@posts, tags: "pool:#{@pool.id}", show_deleted: @pool.is_series?, size: @preview_size, show_votes: @show_votes) do |gallery| %>
       <% gallery.with_footer do %>
         <%= numbered_paginator(@posts) %>
       <% end %>

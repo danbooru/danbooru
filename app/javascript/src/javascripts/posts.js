@@ -43,6 +43,16 @@ Post.initialize_all = function() {
     this.initialize_edit_dialog();
   }
 
+  if ($("#c-explore-posts").length && $("#a-popular, #a-viewed").length) {
+    this.initialize_post_preview_size_menu();
+    this.initialize_post_preview_options_menu();
+  }
+
+  if ($("#c-pools").length && $("#a-show").length) {
+    this.initialize_post_preview_size_menu();
+    this.initialize_post_preview_options_menu();
+  }
+
   this.initialize_ruffle_player();
 
   $(window).on('danbooru:initialize_saved_seraches', () => {

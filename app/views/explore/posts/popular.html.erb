@@ -5,12 +5,21 @@
 
 <div id="c-explore-posts">
   <div id="a-popular">
-    <h1>Popular: <%= date_range_description(@date, @scale, @min_date, @max_date) %></h1>
+    <div class="flex mb-4">
+      <h1>Popular: <%= date_range_description(@date, @scale, @min_date, @max_date) %></h1>
+      <span class="flex-grow-1"></span>
+      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+      <%= render PopupMenuComponent.new(classes: "post-preview-options-menu") do |menu| %>
+        <% menu.with_item do %>
+          <% menu.render_votes_toggle(@show_votes) %>
+        <% end %>
+      <% end %>
+    </div>
 
     <%= render "explore/posts/nav_links", path: :popular_explore_posts_path, date: @date, scale: @scale %>
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= render_post_gallery(@posts) do |gallery| %>
+    <%= render_post_gallery(@posts, size: @preview_size, show_votes: @show_votes) do |gallery| %>
       <% gallery.with_footer do %>
         <%= numbered_paginator(@posts) %>
       <% end %>
