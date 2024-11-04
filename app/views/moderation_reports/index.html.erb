@@ -32,9 +32,12 @@
         <%= link_to report.status.capitalize, moderation_reports_path(search: { status: report.status }) %>
       <% end %>
 
-      <% t.column "Reported user" do |report| %>
-        <%= link_to_user report.reported_user %>
-        <%= link_to "»", moderation_reports_path(search: { recipient_name: report.reported_user.name }) %>
+      <% t.column "Reported users" do |report| %>
+        <% if policy(report).can_view_reported_user? %>
+          <%= report.reported_users.map do |reported_user|
+            "#{link_to_user(reported_user)} #{link_to('»', moderation_reports_path(search: { recipient_name: reported_user.name }))}"
+          end.join(', ').html_safe %>
+        <% end %>
       <% end %>
 
       <% t.column "Reporter" do |report| %>
@@ -43,14 +46,16 @@
         <div><%= time_ago_in_words_tagged(report.created_at) %></div>
       <% end %>
 
-      <% t.column column: "control" do |report| %>
-        <%= render PopupMenuComponent.new do |menu| %>
-          <% menu.with_item do %>
-            <%= link_to "Mark as handled", moderation_report_path(report.id), method: :put, remote: true, "data-params": "moderation_report[status]=handled" %>
-          <% end %>
+      <% if policy(ModerationReport).update? %>
+        <% t.column column: "control" do |report| %>
+          <%= render PopupMenuComponent.new do |menu| %>
+            <% menu.with_item do %>
+              <%= link_to "Mark as handled", moderation_report_path(report.id), method: :put, remote: true, "data-params": "moderation_report[status]=handled" %>
+            <% end %>
 
-          <% menu.with_item do %>
-            <%= link_to "Reject", moderation_report_path(report.id), method: :put, remote: true, "data-params": "moderation_report[status]=rejected" %>
+            <% menu.with_item do %>
+              <%= link_to "Reject", moderation_report_path(report.id), method: :put, remote: true, "data-params": "moderation_report[status]=rejected" %>
+            <% end %>
           <% end %>
         <% end %>
       <% end %>
