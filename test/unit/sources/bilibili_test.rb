@@ -27,7 +27,7 @@ module Sources
           { file_size: 3_641_366 },
           { file_size: 6_552_286 },
         ],
-        page_url: "https://t.bilibili.com/686082748803186697",
+        page_url: "https://www.bilibili.com/opus/686082748803186697",
         profile_url: "https://space.bilibili.com/11742550",
         profile_urls: %w[https://space.bilibili.com/11742550],
         display_name: "哈米伦的弄笛者",
@@ -55,7 +55,7 @@ module Sources
           https://i0.hdslb.com/bfs/new_dyn/da95475b858be577fc8c79bd22b7519e11742550.jpg
           https://i0.hdslb.com/bfs/new_dyn/60a3c652b362c54bc61ea3365258d1d111742550.jpg
         ],
-        page_url: "https://t.bilibili.com/686082748803186697",
+        page_url: "https://www.bilibili.com/opus/686082748803186697",
         profile_url: "https://space.bilibili.com/11742550",
         profile_urls: %w[https://space.bilibili.com/11742550],
         display_name: "哈米伦的弄笛者",
@@ -88,7 +88,7 @@ module Sources
           { file_size: 192_652 },
           { file_size: 422_392 },
         ],
-        page_url: "https://t.bilibili.com/722702993036673113",
+        page_url: "https://www.bilibili.com/opus/722702993036673113",
         profile_url: "https://space.bilibili.com/15817819",
         profile_urls: %w[https://space.bilibili.com/15817819],
         display_name: "星尘Official",
@@ -106,24 +106,28 @@ module Sources
       strategy_should_work(
         "https://t.bilibili.com/707554407156285477",
         image_urls: [],
-        page_url: "https://t.bilibili.com/707554407156285477",
+        page_url: "https://www.bilibili.com/opus/707554407156285477",
         profile_url: "https://space.bilibili.com/476720460",
         profile_urls: %w[https://space.bilibili.com/476720460],
         display_name: "凯迪拉克官方",
         other_names: ["凯迪拉克官方"],
         tag_name: "bilibili_476720460",
         tags: [
-          ["一起用原神痛车", "https://t.bilibili.com/topic/name/一起用原神痛车"],
-          ["凯迪拉克原神联名座驾", "https://t.bilibili.com/topic/name/凯迪拉克原神联名座驾"],
-          ["原神", "https://t.bilibili.com/topic/name/原神"],
-          ["凯迪拉克原神联动", "https://t.bilibili.com/topic/name/凯迪拉克原神联动"],
-          ["风起雷涌特别的旅途", "https://t.bilibili.com/topic/name/风起雷涌特别的旅途"],
-          ["凯迪拉克CT4", "https://t.bilibili.com/topic/name/凯迪拉克CT4"],
-          ["凯迪拉克XT4", "https://t.bilibili.com/topic/name/凯迪拉克XT4"],
+          ["一起用原神痛车", "https://search.bilibili.com/all?keyword=一起用原神痛车"],
+          ["凯迪拉克原神联名座驾", "https://search.bilibili.com/all?keyword=凯迪拉克原神联名座驾"],
+          ["原神", "https://search.bilibili.com/all?keyword=原神"],
+          ["凯迪拉克原神联动", "https://search.bilibili.com/all?keyword=凯迪拉克原神联动"],
+          ["风起雷涌特别的旅途", "https://search.bilibili.com/all?keyword=风起雷涌特别的旅途"],
+          ["凯迪拉克CT4", "https://search.bilibili.com/all?keyword=凯迪拉克CT4"],
+          ["凯迪拉克XT4", "https://search.bilibili.com/all?keyword=凯迪拉克XT4"],
         ],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          风起雷涌，特别的旅途！ 芜湖～"[星星眼]":[https://i0.hdslb.com/bfs/emote/63c9d1a31c0da745b61cdb35e0ecb28635675db2.png]凯迪拉克诚邀各路达人参与"#一起用原神痛车#":[https://search.bilibili.com/all?keyword=%E4%B8%80%E8%B5%B7%E7%94%A8%E5%8E%9F%E7%A5%9E%E7%97%9B%E8%BD%A6]大赛，利用指定素材创作你心目中特别的旅途，上传别具创意的痛车设计或同人作品，一起瓜分10万大奖~ 还有还有！你们心心念念的"[打call]":[https://i0.hdslb.com/bfs/emote/431432c43da3ee5aab5b0e4f8931953e649e9975.png]凯迪拉克X原神 限定周边大放送哟！ 快点击上方话题页参与，一同解锁尘世新冒险！✿ヽ(°▽°)ノ✿ "#凯迪拉克原神联名座驾#":[https://search.bilibili.com/all?keyword=%E5%87%AF%E8%BF%AA%E6%8B%89%E5%85%8B%E5%8E%9F%E7%A5%9E%E8%81%94%E5%90%8D%E5%BA%A7%E9%A9%BE] "#原神#":[https://search.bilibili.com/all?keyword=%E5%8E%9F%E7%A5%9E] "#凯迪拉克原神联动#":[https://search.bilibili.com/all?keyword=%E5%87%AF%E8%BF%AA%E6%8B%89%E5%85%8B%E5%8E%9F%E7%A5%9E%E8%81%94%E5%8A%A8] "#风起雷涌特别的旅途#":[https://search.bilibili.com/all?keyword=%E9%A3%8E%E8%B5%B7%E9%9B%B7%E6%B6%8C%E7%89%B9%E5%88%AB%E7%9A%84%E6%97%85%E9%80%94] "#凯迪拉克CT4#":[https://search.bilibili.com/all?keyword=%E5%87%AF%E8%BF%AA%E6%8B%89%E5%85%8BCT4] "#凯迪拉克XT4#":[https://search.bilibili.com/all?keyword=%E5%87%AF%E8%BF%AA%E6%8B%89%E5%85%8BXT4]
+          风起雷涌，特别的旅途！
+          芜湖～"[星星眼]":[https://i0.hdslb.com/bfs/emote/63c9d1a31c0da745b61cdb35e0ecb28635675db2.png]凯迪拉克诚邀各路达人参与"#一起用原神痛车#":[https://search.bilibili.com/all?keyword=%E4%B8%80%E8%B5%B7%E7%94%A8%E5%8E%9F%E7%A5%9E%E7%97%9B%E8%BD%A6]大赛，利用指定素材创作你心目中特别的旅途，上传别具创意的痛车设计或同人作品，一起瓜分10万大奖~
+          还有还有！你们心心念念的"[打call]":[https://i0.hdslb.com/bfs/emote/431432c43da3ee5aab5b0e4f8931953e649e9975.png]凯迪拉克X原神 限定周边大放送哟！
+          快点击上方话题页参与，一同解锁尘世新冒险！✿ヽ(°▽°)ノ✿
+          "#凯迪拉克原神联名座驾#":[https://search.bilibili.com/all?keyword=%E5%87%AF%E8%BF%AA%E6%8B%89%E5%85%8B%E5%8E%9F%E7%A5%9E%E8%81%94%E5%90%8D%E5%BA%A7%E9%A9%BE] "#原神#":[https://search.bilibili.com/all?keyword=%E5%8E%9F%E7%A5%9E] "#凯迪拉克原神联动#":[https://search.bilibili.com/all?keyword=%E5%87%AF%E8%BF%AA%E6%8B%89%E5%85%8B%E5%8E%9F%E7%A5%9E%E8%81%94%E5%8A%A8] "#风起雷涌特别的旅途#":[https://search.bilibili.com/all?keyword=%E9%A3%8E%E8%B5%B7%E9%9B%B7%E6%B6%8C%E7%89%B9%E5%88%AB%E7%9A%84%E6%97%85%E9%80%94] "#凯迪拉克CT4#":[https://search.bilibili.com/all?keyword=%E5%87%AF%E8%BF%AA%E6%8B%89%E5%85%8BCT4] "#凯迪拉克XT4#":[https://search.bilibili.com/all?keyword=%E5%87%AF%E8%BF%AA%E6%8B%89%E5%85%8BXT4]
         EOS
       )
     end
@@ -155,7 +159,7 @@ module Sources
           { file_size: 189_218 },
           { file_size: 5_434_169 },
         ],
-        page_url: "https://www.bilibili.com/read/cv7360489/",
+        page_url: "https://www.bilibili.com/opus/428178320677065986",
         profile_url: "https://space.bilibili.com/285452636",
         profile_urls: %w[https://space.bilibili.com/285452636],
         display_name: "时光印记2016",
@@ -164,9 +168,27 @@ module Sources
         tags: [],
         dtext_artist_commentary_title: "斗罗大陆 4，觉醒后的古月娜（第一期）",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          超喜欢2345678910
+        超喜欢
 
-          不定时更新，兴趣爱好！
+        2
+
+        3
+
+        4
+
+        5
+
+        6
+
+        7
+
+        8
+
+        9
+
+        10
+
+        不定时更新，兴趣爱好！
         EOS
       )
     end
@@ -188,18 +210,18 @@ module Sources
           { file_size: 184_165 },
           { file_size: 1_111_444 },
         ],
-        page_url: "https://www.bilibili.com/read/cv10137473/",
+        page_url: "https://www.bilibili.com/opus/498661195017002415",
         profile_url: "https://space.bilibili.com/413748120",
         profile_urls: %w[https://space.bilibili.com/413748120],
         display_name: "VirtuaReal",
         other_names: ["VirtuaReal"],
         tag_name: "bilibili_413748120",
         tags: [
-          ["出道新闻", "https://search.bilibili.com/article?keyword=出道新闻"],
-          ["虚拟UP主", "https://search.bilibili.com/article?keyword=虚拟UP主"],
-          ["VTUBER", "https://search.bilibili.com/article?keyword=VTUBER"],
-          ["VUP", "https://search.bilibili.com/article?keyword=VUP"],
-          ["VirtuaReal", "https://search.bilibili.com/article?keyword=VirtuaReal"],
+          ["出道新闻", "https://search.bilibili.com/all?keyword=出道新闻"],
+          ["虚拟UP主", "https://search.bilibili.com/all?keyword=虚拟UP主"],
+          ["VTUBER", "https://search.bilibili.com/all?keyword=VTUBER"],
+          ["VUP", "https://search.bilibili.com/all?keyword=VUP"],
+          ["VirtuaReal", "https://search.bilibili.com/all?keyword=VirtuaReal"],
         ],
         dtext_artist_commentary_title: "VirtuaReal Project新成员公布！长期开启招募中~",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -221,7 +243,7 @@ module Sources
 
           虽然她接受的理由是为了给master带来更多的快乐，但总之结果是这样就好了吧。
 
-          "勾檀Mayumi":[https://space.bilibili.com/690608693]的个人空间：<https://space.bilibili.com/690608693>
+          //space.bilibili.com/690608693的个人空间：https://space.bilibili.com/690608693
 
           * 犬童Kendou
 
@@ -235,7 +257,7 @@ module Sources
 
           希望动物保护协会不会早日将其进行安置。——某听过布道的不知名红脸群众。
 
-          "犬童Kendou":[https://space.bilibili.com/690608701]的个人空间：<https://space.bilibili.com/690608701>
+          "犬童Kendou":[https://space.bilibili.com/690608701]的个人空间：https://space.bilibili.com/690608701
 
           * 九十九Tsukumo
 
@@ -247,7 +269,7 @@ module Sources
 
           这位酷到爆的小姐并不希望利用家里的东西达成自己的目的——这太不黑手党了，但或许我们该为此感到庆幸，至少她没有用刀而是用直播这一和平的手段来达到她那可以说是和黑手党八竿子打不着的梦想了。
 
-          "九十九Tsukumo":[https://space.bilibili.com/690608702]的个人空间：<https://space.bilibili.com/690608702>
+          "九十九Tsukumo":[https://space.bilibili.com/690608702]的个人空间：https://space.bilibili.com/690608702
 
           * 蕾米Remi
 
@@ -259,7 +281,7 @@ module Sources
 
           在我们的各方面思量下，最终我们为她架设起了最好的设备，想来这位海兔小姐的声音一定能让她直播间里的少年少女们为之愉悦吧。
 
-          "蕾米Remi":[https://space.bilibili.com/690608687]的个人空间：<https://space.bilibili.com/690608687>
+          "蕾米Remi":[https://space.bilibili.com/690608687]的个人空间：https://space.bilibili.com/690608687
 
           VirtuaReal Project [b]长期开启招募中[/b]！只需要你轻轻扫描以下链接上传答题卡和短视频， 就有机会加入VirtuaReal Project，来经历这场“宛如魔法般的体验“！
 
@@ -320,15 +342,15 @@ module Sources
         "https://t.bilibili.com/601343542258368998",
         image_urls: %w[https://i0.hdslb.com/bfs/album/fc95e4685aee6fdbe6b440e4fc1629a255c762aa.jpg],
         media_files: [{ file_size: 6_513_174 }],
-        page_url: "https://t.bilibili.com/601343542258368998",
+        page_url: "https://www.bilibili.com/opus/601343542258368998",
         profile_url: "https://space.bilibili.com/1383815813",
         profile_urls: %w[https://space.bilibili.com/1383815813],
         display_name: "吉诺儿kino",
         other_names: ["吉诺儿kino"],
         tag_name: "bilibili_1383815813",
         tags: [
-          ["吉诺儿kino", "https://t.bilibili.com/topic/name/吉诺儿kino"],
-          ["唐九夏", "https://t.bilibili.com/topic/name/唐九夏"],
+          ["吉诺儿kino", "https://search.bilibili.com/all?keyword=吉诺儿kino"],
+          ["唐九夏", "https://search.bilibili.com/all?keyword=唐九夏"],
         ],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -339,8 +361,8 @@ module Sources
 
     should "Parse Bilibili URLs correctly" do
       assert_equal("https://h.bilibili.com/8773541", Source::URL.page_url("https://www.bilibili.com/p/h5/8773541"))
-      assert_equal("https://t.bilibili.com/612214375070704555", Source::URL.page_url("https://m.bilibili.com/dynamic/612214375070704555"))
-      assert_equal("https://t.bilibili.com/612214375070704555", Source::URL.page_url("https://www.bilibili.com/opus/612214375070704555"))
+      assert_equal("https://www.bilibili.com/opus/612214375070704555", Source::URL.page_url("https://m.bilibili.com/dynamic/612214375070704555"))
+      assert_equal("https://www.bilibili.com/opus/612214375070704555", Source::URL.page_url("https://t.bilibili.com/612214375070704555"))
 
       assert(Source::URL.page_url?("https://t.bilibili.com/612214375070704555"))
       assert(Source::URL.page_url?("https://www.bilibili.com/opus/612214375070704555"))
