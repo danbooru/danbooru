@@ -98,7 +98,7 @@ module Source
 
       def page_url
         if t_work_id.present?
-          "https://t.bilibili.com/#{t_work_id}"
+          "https://www.bilibili.com/opus/#{t_work_id}"
         elsif h_work_id.present?
           "https://h.bilibili.com/#{h_work_id}"
         elsif article_id.present?
