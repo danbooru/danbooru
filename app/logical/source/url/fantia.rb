@@ -35,6 +35,8 @@ class Source::URL::Fantia < Source::URL
       sample = $1
       file = $2
 
+      @image_sample = sample.present?
+
       #  post_id/product_id == image_id only for the first image in a post/product
       case image_type
       in "post" if sample.present? && file_ext == "webp"
@@ -59,12 +61,14 @@ class Source::URL::Fantia < Source::URL
     in _, "posts", post_id, "download", image_id
       @post_id = post_id
       @download_url = "https://fantia.jp/posts/#{post_id}/download/#{image_id}"
+      @image_sample = false
 
     # https://fantia.jp/posts/2533616/album_image?query=YsSkcpdnlam4JOy5dGHafbrSgfCZoMUmfrWD1XEouNkfO9Qk%2BC5Arv7ovxaiIo%2FEeJe5TI9mWDodDBp%2BzIIh70HJ6c0sWH8wMCc%2FM6IhDIKpxE%2BM1Zc1--Ol9M7yLd5TswwnZ5--wZ7u4P1tCVaAoL5ymFfA5Q%3D%3D
     # https://www.fantia.jp/posts/2533616/album_image?query=ohnfy48oGygFMkmdllgpHQQK61Mvm%2Bxy6%2FukgHOUMsbje%2BKMFaiKmLbP9hYDmeDNbJyiCbzSdN9cj3ovNY2T6N4LnRpH1%2Bpvk69f28QLG8T2zoVz%2BRNr--dGXRIUR3eSWXfSk1--IXeq0EUIc9%2Fmct%2BvbAbPqQ%3D%3D
     in _, "posts", post_id, "album_image" if params[:query].present?
       @post_id = post_id
       @download_url = "https://fantia.jp/posts/#{post_id}/album_image?query=#{Danbooru::URL.escape(params[:query])}"
+      @image_sample = false
 
     # https://fantia.jp/posts/1148334
     # https://fantia.jp/posts/2245222/post_content_photo/14978435
@@ -93,6 +97,11 @@ class Source::URL::Fantia < Source::URL
 
   def image_url?
     path.starts_with?("/uploads/") || download_url.present?
+  end
+
+  def image_sample?
+    return nil unless image_url?
+    @image_sample
   end
 
   def page_url
