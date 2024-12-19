@@ -14,10 +14,13 @@ module Source
       end
 
       def image_urls_from_commentary
-        urls = page&.css(".article-content img:not(.arca-emoticon), .article-content video:not(.arca-emoticon)")&.pluck(:src).to_a
-        urls.filter_map do |url|
+        urls = page&.css(".article-content img:not(.arca-emoticon), .article-content video:not(.arca-emoticon)")&.to_a.filter_map do |element|
+          url = element.attr("src")
           url = "https:#{url}" if url.starts_with?("//")
-          Source::URL.parse(url).try(:full_image_url)
+          url = Source::URL.parse(url)
+          ext = element.attr("data-orig")
+          url = url.with(file_ext: ext) if ext.present?
+          url.try(:full_image_url)
         end
       end
 
@@ -25,6 +28,10 @@ module Source
         # We do it like this we can handle users like https://arca.live/u/@크림/55256970 or https://arca.live/u/@Nauju/45320365
         url = page&.css(".member-info > .user-info > a")&.attr("href")
         Addressable::URI.join("https://arca.live", CGI.unescape(url)).to_s if url.present?
+      end
+
+      def page_url
+        page&.css(".article-link a")&.attr("href")&.value || parsed_url.page_url || parsed_referer&.page_url
       end
 
       def artist_name
@@ -40,14 +47,19 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc, base_url: "https://arca.live").squeeze("\n\n").strip
+        DText.from_html(artist_commentary_desc, base_url: "https://arca.live") do |element|
+          if element.name == "a" && element["href"].present?
+            element["href"] = element["href"].gsub(%r{\Ahttps?://unsafelink\.com/}i, "")
+          end
+        end.squeeze("\n\n").strip
       end
 
       memoize def page
         # We need to spoof both the User-Agent (done by default in `Danbooru::Http.external`) and the Accept header,
         # otherwise we start getting hCaptchas if the request rate is too high.
         headers = { Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" }
-        http.cache(1.minute).headers(headers).parsed_get(page_url)
+        url = parsed_url.page_url || parsed_referer&.page_url
+        http.cache(1.minute).headers(headers).parsed_get(url)
       end
     end
   end
