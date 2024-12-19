@@ -44,7 +44,11 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc, base_url: "https://arca.live").squeeze("\n\n").strip
+        DText.from_html(artist_commentary_desc, base_url: "https://arca.live") do |element|
+          if element.name == "a" && element["href"].present?
+            element["href"] = element["href"].gsub(%r{\Ahttps?://unsafelink\.com/}i, "")
+          end
+        end.squeeze("\n\n").strip
       end
 
       memoize def page
