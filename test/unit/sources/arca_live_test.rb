@@ -9,6 +9,7 @@ module Sources
           image_urls: %w[
             https://ac.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg?type=orig
           ],
+          media_files: [{ file_size: 273_206 }],
           profile_url: "https://arca.live/u/@Si리링",
           page_url: "https://arca.live/b/arknights/66031722",
           tag_name: nil,
@@ -26,6 +27,7 @@ module Sources
           image_urls: %w[
             https://ac.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg?type=orig
           ],
+          media_files: [{ file_size: 273_206 }],
           profile_url: "https://arca.live/u/@Si리링",
           page_url: "https://arca.live/b/arknights/66031722",
           tag_name: nil,
@@ -42,6 +44,7 @@ module Sources
           image_urls: %w[
             https://ac2.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg?type=orig
           ],
+          media_files: [{ file_size: 273_206 }],
           profile_url: nil,
           page_url: nil,
           tag_name: nil,
@@ -52,13 +55,35 @@ module Sources
         )
       end
 
-      context "An Arca.live page URL with a .gif" do
+      context "An Arca.live /b/breaking page URL" do
+        strategy_should_work(
+          "https://arca.live/b/breaking/66031722",
+          image_urls: %w[
+            https://ac.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg?type=orig
+          ],
+          media_files: [{ file_size: 273_206 }],
+          profile_url: "https://arca.live/u/@Si리링",
+          page_url: "https://arca.live/b/arknights/66031722",
+          tag_name: nil,
+          artist_name: "Si리링",
+          artist_commentary_title: "엑샤 스작함",
+          dtext_artist_commentary_desc: "알게또 뽑으려했는데 못뽑아서 엑샤 스작함\n엑샤에 보카디 3스나 와파린 2스 붙이는거 맞음?",
+          tags: [],
+        )
+      end
+
+      context "An Arca.live page URL with an animated .gif" do
         strategy_should_work(
           "https://arca.live/b/bluearchive/65031202",
           image_urls: %w[
             https://ac.namu.la/20221211sac/5ea7fbca5e49ec16beb099fc6fc991690d37552e599b1de8462533908346241e.png?type=orig
             https://ac.namu.la/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9.gif?type=orig
             https://ac.namu.la/20221211sac2/3e72f9e05ca97c0c3c0fe5f25632b06eb21ab9f211e9ea22816e16468ee241ca.png?type=orig
+          ],
+          media_files: [
+            { file_size: 28_519 },
+            { file_size: 2_016_818 },
+            { file_size: 887_464 }
           ],
           profile_url: "https://arca.live/u/@맛있는팥양갱",
           page_url: "https://arca.live/b/bluearchive/65031202",
@@ -67,6 +92,48 @@ module Sources
           artist_commentary_title: "스포)부들부들 떠는 아리스 그림 점프 추가해봤어",
           dtext_artist_commentary_desc: "스포방지짤\n움짤 만들기 귀찮은데 재밌다\n안움직이는 버젼",
           tags: [],
+        )
+      end
+
+      context "An Arca.live page URL with an animated .webp" do
+        strategy_should_work(
+          "https://arca.live/b/arknights/122263340",
+          image_urls: %w[
+            https://ac.namu.la/20241126sac/b2175d9ef4504945d3d989526120dbb6aded501ddedfba8ecc44a64e7aae9059.gif?type=orig
+            https://ac.namu.la/20241126sac/bc1f3cb388a3a2d099ab67bc09b28f0a93c2c4755152b3ef9190690a9f0a28fb.webp?type=orig
+          ],
+          media_files: [
+            { file_size: 749_653 },
+            { file_size: 3_918_854 }
+          ],
+          page_url: "https://arca.live/b/arknights/122263340",
+          profile_urls: %w[https://arca.live/u/@음악한모금],
+          artist_name: "음악한모금",
+          tags: [],
+          dtext_artist_commentary_title: "스즈맘 모금콘 마따끄, 코로스 콘 추가했습니다",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            많이 써주세요
+            감사합니다
+          EOS
+        )
+      end
+
+      context "An Arca.live page URL with an .mp4 video" do
+        strategy_should_work(
+          "https://arca.live/b/bluearchive/124146827",
+          image_urls: %w[https://ac.namu.la/20241219sac/148cc68a79262f44d3ebbeab0d418583a0e7312d196c538ca65cb65cdb977666.mp4?type=orig],
+          media_files: [{ file_size: 1_142_041 }],
+          page_url: "https://arca.live/b/bluearchive/124146827",
+          profile_urls: %w[https://arca.live/u/@horuhara/77430289],
+          artist_name: "horuhara",
+          tags: [],
+          dtext_artist_commentary_title: "말랑 고양이 바로 한입에 쏙!!!!!!!!!.mp4",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            맛잇갯다....
+            <https://x.com/horuhara/status/1869620187575747057?t=O9IJ0vapecigSkL3cD9FmA&s=19>
+            12코 선입금 마감 임박!! 현장판매 소량
+            <https://witchform.com/formViewer/payform.php?uuid=KFC5QBD9DB>
+          EOS
         )
       end
 
