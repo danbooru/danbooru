@@ -14,10 +14,13 @@ module Source
       end
 
       def image_urls_from_commentary
-        urls = page&.css(".article-content img:not(.arca-emoticon), .article-content video:not(.arca-emoticon)")&.pluck(:src).to_a
-        urls.filter_map do |url|
+        urls = page&.css(".article-content img:not(.arca-emoticon), .article-content video:not(.arca-emoticon)")&.to_a.filter_map do |element|
+          url = element.attr("src")
           url = "https:#{url}" if url.starts_with?("//")
-          Source::URL.parse(url).try(:full_image_url)
+          url = Source::URL.parse(url)
+          ext = element.attr("data-orig")
+          url = url.with(file_ext: ext) if ext.present?
+          url.try(:full_image_url)
         end
       end
 
