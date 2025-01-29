@@ -87,10 +87,13 @@ class ModerationReport < ApplicationRecord
   end
 
   def self.received_by(user)
+    user = [user] if user.is_a?(User)
+
     where(model: Comment.where(creator: user))
       .or(where(model: ForumPost.where(creator: user)))
       .or(where(model: Dmail.received.where(from: user)))
-      .or(where(model: Upload.where(uploader: user).find_each.flat_map(&:media_assets)))
+      # .or(where(model: Upload.where(uploader: user).find_each.flat_map(&:media_assets)))
+      .or(where(model_type: "MediaAsset", model_id: user.flat_map { _1.upload_media_assets.pluck(:media_asset_id) }))
   end
 
   def self.search(params, current_user)
