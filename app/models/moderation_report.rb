@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ModerationReport < ApplicationRecord
-  MODEL_TYPES = %w[Dmail Comment ForumPost MediaAsset]
+  MODEL_TYPES = %w[Dmail Comment ForumPost]
 
   dtext_attribute :reason, inline: true # defines :dtext_reason
 
@@ -14,16 +14,15 @@ class ModerationReport < ApplicationRecord
   before_validation(on: :create) { model.lock! }
   validates :reason, visible_string: true
   validates :model_type, inclusion: { in: MODEL_TYPES }
-  validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this." }, on: :create
+  validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }, on: :create
 
-  after_create :autoban_reported_users, unless: -> { model_type == "MediaAsset" }
+  after_create :autoban_reported_user
   after_save :notify_reporter
   after_save :create_modaction
 
   scope :dmail, -> { where(model_type: "Dmail") }
   scope :comment, -> { where(model_type: "Comment") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
-  scope :media_asset, -> { where(model_type: "MediaAsset") }
   scope :recent, -> { where("moderation_reports.created_at >= ?", 1.week.ago) }
 
   enum status: {
@@ -46,11 +45,9 @@ class ModerationReport < ApplicationRecord
     end
   end
 
-  def autoban_reported_users
-    reported_users.each do |reported_user|
-      if SpamDetector.is_spammer?(reported_user)
-        SpamDetector.ban_spammer!(reported_user)
-      end
+  def autoban_reported_user
+    if SpamDetector.is_spammer?(reported_user)
+      SpamDetector.ban_spammer!(reported_user)
     end
   end
 
@@ -73,24 +70,19 @@ class ModerationReport < ApplicationRecord
     end
   end
 
-  def reported_users
+  def reported_user
     case model
     when Comment, ForumPost
-      [model.creator]
+      model.creator
     when Dmail
-      [model.from]
-    when MediaAsset
-      model.uploaders
+      model.from
     else
       raise NotImplementedError
     end
   end
 
   def self.received_by(user)
-    where(model: Comment.where(creator: user))
-      .or(where(model: ForumPost.where(creator: user)))
-      .or(where(model: Dmail.received.where(from: user)))
-      .or(where(model: Upload.where(uploader: user).find_each.flat_map(&:media_assets)))
+    where(model: Comment.where(creator: user)).or(where(model: ForumPost.where(creator: user))).or(where(model: Dmail.received.where(from: user)))
   end
 
   def self.search(params, current_user)
