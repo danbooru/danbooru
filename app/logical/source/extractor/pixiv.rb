@@ -9,8 +9,16 @@ module Source
       end
 
       def image_urls
+        # For ugoira we have to fetch the frame metadata from API,
+        # which may be incorrect for revisions.
+        # Therefore, get the latest revision URL from API,
+        # and, if we know the revision date, check that it matches.
         if is_ugoira?
-          [api_ugoira[:originalSrc]]
+          if parsed_url.date.present?
+            original_urls.select{ |url| Source::URL.parse(url).date == parsed_url.date }
+          else
+            original_urls
+          end
         # If it's a full image URL, then use it as-is instead of looking it up in the API, because it could be the
         # original version of an image that has since been revised.
         elsif parsed_url.full_image_url.present?
@@ -150,8 +158,45 @@ module Source
       end
 
       def download_file!(url)
-        media_file = super(url)
-        media_file.frame_delays = ugoira_frame_delays if is_ugoira?
+        if is_ugoira?
+          download_ugoira(url)
+        else
+          super(url)
+        end
+      end
+
+      def download_ugoira(url)
+        url = Source::URL.parse url
+        frame0 = Source::URL.parse url.ugoira_frame_url(0)
+        return unless frame0.present?
+
+        animation_meta = {
+          mime_type: Mime::Type.lookup_by_extension(frame0.file_ext).to_s,
+          frames: ugoira_frame_delays.map.with_index do |delay, n|
+            { file: "#{"%06d" % n}.#{frame0.file_ext}", delay: delay }
+          end,
+        }
+
+        file = Danbooru::Tempfile.new(["danbooru-ugoira-", ".zip"], binmode: true)
+
+        Dir.mktmpdir do |tmpdir|
+          animation_meta[:frames].each_with_index do |frame, n|
+            frame_url = url.ugoira_frame_url(n)
+            file_path = File.join tmpdir, frame[:file]
+            File.open(file_path, "w+", binmode: true) do |file|
+              http_downloader.download_media(frame_url, file: file)
+            end
+          end
+
+          File.open(File.join(tmpdir, "animation.json"), "w+") do |file|
+            file.write animation_meta.to_json
+          end
+
+          Danbooru::Archive.create!(tmpdir, file)
+        end
+
+        media_file = MediaFile.open(file)
+        media_file.frame_delays = ugoira_frame_delays
         media_file
       end
 
@@ -170,7 +215,7 @@ module Source
       end
 
       def is_ugoira?
-        original_urls.any? { |url| Source::URL.parse(url).is_ugoira? }
+        parsed_url.is_ugoira? || original_urls.any? { |url| Source::URL.parse(url).is_ugoira? }
       end
 
       memoize def illust_id
