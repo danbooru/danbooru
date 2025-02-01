@@ -1,4 +1,4 @@
-[<img src="https://github.com/codespaces/badge.svg" height="20">](https://codespaces.new/danbooru/danbooru?quickstart=1) [![Discord](https://img.shields.io/discord/310432830138089472?label=Discord)](https://discord.gg/danbooru) [![codecov](https://codecov.io/gh/danbooru/danbooru/branch/master/graph/badge.svg)](https://codecov.io/gh/danbooru/danbooru)
+[<img src="https://github.com/codespaces/badge.svg" height="20">](https://codespaces.new/danbooru/danbooru?quickstart=1) [![Discord](https://img.shields.io/discord/310432830138089472?label=Discord)](https://discord.gg/danbooru) [![codecov](https://codecov.io/gh/danbooru/danbooru/branch/master/graph/badge.svg)](https://codecov.io/gh/danbooru/danbooru) [![Explore database with Azimutt](https://img.shields.io/badge/PostgreSQL-browse_online-gray?labelColor=4169E1&logo=postgresql&logoColor=fff&style=flat)](https://azimutt.app/create?sql=https://raw.githubusercontent.com/danbooru/danbooru/refs/heads/master/db/structure.sql&name=danbooru)
 
 ## Quickstart
 
