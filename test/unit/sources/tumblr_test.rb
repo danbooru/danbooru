@@ -604,7 +604,7 @@ module Sources
         )
       end
 
-      context "A commentary with mulitple images with alt text" do
+      context "A commentary with multiple images with alt text" do
         strategy_should_work(
           "https://timestables.tumblr.com/post/672495082090430464",
           image_urls: %w[
