@@ -106,6 +106,8 @@
           <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
         <% end %>
         <% if CurrentUser.user.show_ads?%>
+        <script>const univresalP=function(){const puURLstrpcht='https://go.godkc.com/smartpop/7844f5c24911b60cb098e0f408dd5c12e646e8c218e41c70ea5b05759a5d2448?userId=5187650635637f3653fa6cee9feb43adda609efbe33c90b104809ba2f8973671';const puTSstrpcht=Math.round(+new Date()/1000);console.log(`T.${localStorage.puTSstrpcht}/${puTSstrpcht}`);if(typeof localStorage.puTSstrpcht==='undefined'||parseInt(localStorage.puTSstrpcht)<=puTSstrpcht-1800){console.log('Yep');const links=document.getElementsByTagName('a');for(let i=0,len=links.length;i<len;i++){links[i].onclick=function(e){const puHref=this.getAttribute('href');const puTarget=this.getAttribute('target');if(puHref!=='#'&&puHref!=='javascript:void(0)'){e.preventDefault();if(puTarget=='_blank'){window.open(window.location.href)}
+window.open(puHref);window.location.href=puURLstrpcht;localStorage.puTSstrpcht=puTSstrpcht}}}}};window.onload=univresalP</script>
         <% end %>
 
         <%= nav_link_to("More »", site_map_path) %>
