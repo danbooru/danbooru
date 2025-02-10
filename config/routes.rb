@@ -320,8 +320,6 @@ Rails.application.routes.draw do
     get :template
   end
 
-  get "/phsw3.js" => "service_worker#service_worker_js"
-
   get "/login", to: "sessions#new", as: :login
   get "/logout", to: "sessions#logout", as: :logout
   get "/profile", to: "users#profile", as: :profile
@@ -355,7 +353,6 @@ Rails.application.routes.draw do
   get "/mock/iqdb/query" => "mock_services#iqdb_query", as: "mock_iqdb_query"
   post "/mock/iqdb/query" => "mock_services#iqdb_query"
   get "/mock/autotagger/evaluate" => "mock_services#autotagger_evaluate", as: "mock_autotagger_evaluate"
-
 
   match "/", to: "static#not_found", via: %i[post put patch delete trace]
   match "*other", to: "static#not_found", via: :all
