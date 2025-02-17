@@ -165,11 +165,29 @@ module Source
 
       def work_id
         if share_url.present?
-          redirect_url = http.redirect_url(share_url)
-          Source::URL.parse(redirect_url)&.work_id
+          work_id_from_share
+        elsif parsed_url&.full_image_url.present?
+          work_id_from_media
         else
           parsed_url.work_id || parsed_referer&.work_id
         end
+      end
+
+      memoize def work_id_from_share
+        return unless share_url.present?
+        redirect_url = http.redirect_url(share_url)
+        Source::URL.parse(redirect_url)&.work_id
+      end
+
+      memoize def work_id_from_media
+        return unless parsed_url&.full_image_url.present?
+        redirect_url = "https://www.reddit.com/media?url=#{CGI.escape(parsed_url.full_image_url)}"
+        response = http.get(redirect_url)
+        html = response.parse
+        relative_url = html&.at('post-bottom-bar')&.attr(:permalink)
+        return unless relative_url.present?
+        url = URI.join(response.uri, relative_url)
+        Source::URL.parse(url)&.work_id
       end
 
       def share_url
@@ -177,7 +195,7 @@ module Source
       end
 
       def api_url
-        "https://www.reddit.com/gallery/#{work_id}" if work_id.present?
+        "https://www.reddit.com/gallery/#{work_id}/" if work_id.present?
       end
 
       memoize def subreddit

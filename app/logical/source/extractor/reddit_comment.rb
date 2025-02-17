@@ -3,7 +3,7 @@
 # @see Source::Extractor::Reddit
 class Source::Extractor::RedditComment < Source::Extractor::Reddit
   def image_urls
-    page&.css("#embed-container faceplate-img").to_a.pluck("src").map do |url|
+    page&.css("#embed-container figure.rte-media img").to_a.pluck("src").map do |url|
       Source::URL.parse(url).try(:full_image_url) || url
     end
   end
@@ -16,7 +16,9 @@ class Source::Extractor::RedditComment < Source::Extractor::Reddit
   end
 
   def artist_commentary_desc
-    page&.at("#embed-container > div.relative")&.to_html
+    page&.dup.at("#embed-container > div.relative")&.tap do |comment|
+      comment.css('figure.rte-media').remove
+    end&.to_html
   end
 
   def dtext_artist_commentary_desc

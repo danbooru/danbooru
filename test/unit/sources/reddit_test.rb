@@ -83,20 +83,17 @@ module Sources
 
     context "A reddit post with an external image" do
       strategy_should_work(
-        "https://www.reddit.com/r/baramanga/comments/n9cgs3/you_can_now_find_me_on_twitter_too_blankpage/",
-        image_urls: %w[https://external-preview.redd.it/VlT1G4JoqAmP_7DG5UKRCJP8eTRef7dCrRvu2ABm_Xg.png?auto=webp&s=6510f9f0a69563988aed7af04f750f92fc35f629],
-        media_files: [{ file_size: 1_008_084 }],
-        page_url: "https://www.reddit.com/r/baramanga/comments/n9cgs3/you_can_now_find_me_on_twitter_too_blankpage/",
-        profile_url: "https://www.reddit.com/user/blank_page_drawings",
-        profile_urls: %w[https://www.reddit.com/user/blank_page_drawings],
-        artist_name: "blank_page_drawings",
-        tag_name: "blank_page_drawings",
-        other_names: ["blank_page_drawings"],
+        "https://www.reddit.com/r/arknights/comments/yvp2nq/exu_i_drew/",
+        image_urls: %w[https://external-preview.redd.it/jPz8FBG6HWNVbsExGaYBlMZ50FIV52Rt8HuOFLJdZHU.jpg?auto=webp&s=59c1ba98be858b4f3a5f4d4a4fa4fd3792e3eeab],
+        media_files: [{ file_size: 234_375 }],
+        page_url: "https://www.reddit.com/r/arknights/comments/yvp2nq/exu_i_drew/",
+        profile_urls: %w[https://www.reddit.com/user/pidjun],
+        display_name: nil,
+        username: "pidjun",
         tags: [
-          ["Non-Explicit", "https://www.reddit.com/r/baramanga/?f=flair_name:\"Non-Explicit\""],
-          ["nsfw", "https://www.reddit.com/r/baramanga/?f=flair_name:\"nsfw\""],
+          ["OC Fanart", "https://www.reddit.com/r/arknights/?f=flair_name:\"OC Fanart\""],
         ],
-        dtext_artist_commentary_title: "You can now find me on Twitter too ! (@blankpage_)",
+        dtext_artist_commentary_title: "Exu I drew !",
         dtext_artist_commentary_desc: ""
       )
     end
@@ -157,18 +154,34 @@ module Sources
     context "A reddit image" do
       strategy_should_work(
         "https://i.redd.it/oc5y8k06ryq81.png",
-        image_urls: ["https://i.redd.it/oc5y8k06ryq81.png"],
+        image_urls: %w[https://i.redd.it/oc5y8k06ryq81.png],
         media_files: [{ file_size: 940_616 }],
-        page_url: nil
+        page_url: "https://www.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/",
+        profile_urls: %w[https://www.reddit.com/user/Darksin31],
+        display_name: nil,
+        username: "Darksin31",
+        tags: [
+          ["OC Fanart", "https://www.reddit.com/r/arknights/?f=flair_name:\"OC Fanart\""],
+        ],
+        dtext_artist_commentary_title: "Maria Nearl Versus the Left-Armed Knight (@dankestsin)",
+        dtext_artist_commentary_desc: ""
       )
     end
 
     context "A reddit image sample" do
       strategy_should_work(
         "https://preview.redd.it/qtdv0k06ryq81.png?width=960&crop=smart&auto=webp&s=3b1505f76f3c8b7ce47da5ab2dd17c511d3c2a44",
-        image_urls: ["https://i.redd.it/qtdv0k06ryq81.png"],
+        image_urls: %w[https://i.redd.it/qtdv0k06ryq81.png],
         media_files: [{ file_size: 699_898 }],
-        page_url: nil
+        page_url: "https://www.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/",
+        profile_urls: %w[https://www.reddit.com/user/Darksin31],
+        display_name: nil,
+        username: "Darksin31",
+        tags: [
+          ["OC Fanart", "https://www.reddit.com/r/arknights/?f=flair_name:\"OC Fanart\""],
+        ],
+        dtext_artist_commentary_title: "Maria Nearl Versus the Left-Armed Knight (@dankestsin)",
+        dtext_artist_commentary_desc: ""
       )
     end
 
@@ -193,18 +206,34 @@ module Sources
     context "A reddit.com/media non-sample url" do
       strategy_should_work(
         "https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fds05uzmtd6d61.jpg",
-        image_urls: ["https://i.redd.it/ds05uzmtd6d61.jpg"],
-        media_files: [{ size: 248_183 }],
-        page_url: nil
+        image_urls: %w[https://i.redd.it/ds05uzmtd6d61.jpg],
+        media_files: [{ file_size: 248_183 }],
+        page_url: "https://www.reddit.com/r/tales/comments/l3oi00/drew_sheena_for_someone_after_a_long_art_block/",
+        profile_urls: %w[https://www.reddit.com/user/aelgis],
+        display_name: nil,
+        username: "aelgis",
+        tags: [
+          ["Fan Art", "https://www.reddit.com/r/tales/?f=flair_name:\"Fan Art\""],
+        ],
+        dtext_artist_commentary_title: "Drew Sheena for someone after a long art block :')",
+        dtext_artist_commentary_desc: ""
       )
     end
 
     context "A reddit.com/media sample url" do
       strategy_should_work(
         "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fz90lvr65c11a1.jpg%3Fwidth%3D2569%26format%3Dpjpg%26auto%3Dwebp%26s%3D9a81537379db979c285e44b64a548014c45c6cc9",
-        image_urls: ["https://i.redd.it/z90lvr65c11a1.jpg"],
-        media_files: [{ size: 820_454 }],
-        page_url: nil
+        image_urls: %w[https://i.redd.it/z90lvr65c11a1.jpg],
+        media_files: [{ file_size: 820_454 }],
+        page_url: "https://www.reddit.com/r/Genshin_Impact/comments/yzv9jt/painting_studyturned_albedo/",
+        profile_urls: %w[https://www.reddit.com/user/amusation],
+        display_name: nil,
+        username: "amusation",
+        tags: [
+          ["OC", "https://www.reddit.com/r/Genshin_Impact/?f=flair_name:\"OC\""],
+        ],
+        dtext_artist_commentary_title: "Painting study-turned Albedo",
+        dtext_artist_commentary_desc: ""
       )
     end
 
