@@ -71,7 +71,9 @@ class Source::URL::Xiaohongshu < Source::URL
       "https://www.xiaohongshu.com/explore/#{post_id}"
     end
 
-    url += "?xsec_token=#{xsec_token}" if xsec_token.present?
+    if url.present? && xsec_token.present?
+      url += "?xsec_token=#{xsec_token}"
+    end
 
     url
   end
