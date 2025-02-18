@@ -2,7 +2,7 @@
 
 # @see Source::Extractor::Xiaohongshu
 class Source::URL::Xiaohongshu < Source::URL
-  attr_reader :user_id, :post_id, :full_image_url
+  attr_reader :user_id, :post_id, :full_image_url, :xsec_token
 
   def self.match?(url)
     url.domain.in?(%w[xiaohongshu.com xhscdn.com])
@@ -31,17 +31,20 @@ class Source::URL::Xiaohongshu < Source::URL
       @full_image_url = "https://img.xiaohongshu.com/avatar/#{basename.split("@").first}"
 
     # https://www.xiaohongshu.com/explore/6421b331000000002702901f
-    in _, "xiaohongshu.com", "explore", post_id
+    in _, "xiaohongshu.com", ("explore" | "search_result"), post_id
       @post_id = post_id
+      @xsec_token = params[:xsec_token]
 
     # https://www.xiaohongshu.com/discovery/item/65880524000000000700a643
     in _, "xiaohongshu.com", "discovery", "item", post_id
       @post_id = post_id
+      @xsec_token = params[:xsec_token]
 
     # https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8/6421b331000000002702901f
     in _, "xiaohongshu.com", "user", "profile", user_id, post_id
       @user_id = user_id
       @post_id = post_id
+      @xsec_token = params[:xsec_token]
 
     # https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8
     in _, "xiaohongshu.com", "user", "profile", user_id
@@ -62,11 +65,17 @@ class Source::URL::Xiaohongshu < Source::URL
   end
 
   def page_url
-    if user_id.present? && post_id.present?
+    url = if user_id.present? && post_id.present?
       "https://www.xiaohongshu.com/user/profile/#{user_id}/#{post_id}"
     elsif post_id.present?
       "https://www.xiaohongshu.com/explore/#{post_id}"
     end
+
+    if url.present? && xsec_token.present?
+      url += "?xsec_token=#{xsec_token}"
+    end
+
+    url
   end
 
   def profile_url
