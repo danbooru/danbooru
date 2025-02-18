@@ -31,7 +31,7 @@ class Source::URL::Xiaohongshu < Source::URL
       @full_image_url = "https://img.xiaohongshu.com/avatar/#{basename.split("@").first}"
 
     # https://www.xiaohongshu.com/explore/6421b331000000002702901f
-    in _, "xiaohongshu.com", "explore", post_id
+    in _, "xiaohongshu.com", ("explore" | "search_result"), post_id
       @post_id = post_id
       @xsec_token = params[:xsec_token]
 
