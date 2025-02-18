@@ -34,35 +34,48 @@ module Sources
 
       context "A post with multiple images" do
         strategy_should_work(
-          "https://www.xiaohongshu.com/explore/66200ed0000000001c008538",
+          "https://www.xiaohongshu.com/explore/676692a9000000000b022e4d?xsec_token=ABp9YCBRRqv5v30dlFfxzHw8HBaoViPhFHlY2eTE035AM=",
           image_urls: %w[
-            https://ci.xiaohongshu.com/1040g008311n01khrnk005ortooqnru0rsc2ko0o
-            https://ci.xiaohongshu.com/1040g008311n01khrnk205ortooqnru0rva292bo
-            https://ci.xiaohongshu.com/1040g008311n01khrnk305ortooqnru0rp5tic5g
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5gcag8005o752t9g90v028pbu80
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c005o752t9g90v0ah6ctv0
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c0g5o752t9g90v0r22nlj0
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c105o752t9g90v0lp9ibqg
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c1g5o752t9g90v0uc58cj0
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c205o752t9g90v02hsbnk8
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c2g5o752t9g90v0ff1s0s0
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c305o752t9g90v0ke7vp40
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c3g5o752t9g90v00g8uka8
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c405o752t9g90v03m2llno
           ],
           media_files: [
-            { file_size: 598_968 },
-            { file_size: 594_026 },
-            { file_size: 603_928 },
+            { file_size: 2_432_700 },
+            { file_size: 1_543_097 },
+            { file_size: 1_475_318 },
+            { file_size: 1_552_256 },
+            { file_size: 1_485_541 },
+            { file_size: 1_512_886 },
+            { file_size: 1_348_828 },
+            { file_size: 1_531_060 },
+            { file_size: 1_523_305 },
+            { file_size: 1_613_587 }
           ],
-          page_url: "https://www.xiaohongshu.com/explore/66200ed0000000001c008538",
-          profile_url: "https://www.xiaohongshu.com/user/profile/637dc635000000001f01f81b",
-          profile_urls: %w[https://www.xiaohongshu.com/user/profile/637dc635000000001f01f81b],
-          display_name: "MG_G",
-          other_names: ["MG_G"],
+          page_url: "https://www.xiaohongshu.com/user/profile/60e5175300000000010083e0/676692a9000000000b022e4d?xsec_token=ABp9YCBRRqv5v30dlFfxzHw8HBaoViPhFHlY2eTE035AM=",
+          profile_urls: %w[https://www.xiaohongshu.com/user/profile/60e5175300000000010083e0],
+          display_name: "面包棍棍",
+          username: nil,
           tags: [
-            ["军舰", "https://www.xiaohongshu.com/search_result/?keyword=军舰"],
-            ["画画", "https://www.xiaohongshu.com/search_result/?keyword=画画"],
-            ["procreate", "https://www.xiaohongshu.com/search_result/?keyword=procreate"],
-            ["德军", "https://www.xiaohongshu.com/search_result/?keyword=德军"],
-            ["海军", "https://www.xiaohongshu.com/search_result/?keyword=海军"],
+            ["明日方舟", "https://www.xiaohongshu.com/search_result/?keyword=明日方舟"],
+            ["搬空罗德岛食堂", "https://www.xiaohongshu.com/search_result/?keyword=搬空罗德岛食堂"],
+            ["comike105", "https://www.xiaohongshu.com/search_result/?keyword=comike105"],
+            ["cpgz07", "https://www.xiaohongshu.com/search_result/?keyword=cpgz07"],
           ],
-          dtext_artist_commentary_title: "沙恩霍斯特号战列舰",
+          dtext_artist_commentary_title: "搬空食堂DLC全收录🍽",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            沙恩霍斯特永远向前！
-            （最喜欢的军舰，尤其是北角海战涂装的沙恩真的是太帅了）
-            KM成员记得4月20日到9月30日期间佩戴白色的帽子哦
-            #军舰[话题]# #画画[话题]# #procreate[话题]# #德军[话题]# #海军[话题]#
+            做完了两年的企划怎么不算是2023-2024小结呢……挺能画啊我自己！（叉会腰）
+
+            整理了本DLC插图全收录的48P小图册，会参加年底的冬コミ（C105），如果有去CM的朋友欢迎来東7/U39b找我玩——！
+            国内的话，因为还有食品补充和收纳盒的部分待制作所以会稍晚一点，预计首发会是明年二月广州CPG07，已火速申摊香菇莫辜负🙏
+            "#明日方舟":[https://www.xiaohongshu.com/search_result?keyword=%25E6%2598%258E%25E6%2597%25A5%25E6%2596%25B9%25E8%2588%259F&type=54&source=web_note_detail_r10] "#搬空罗德岛食堂":[https://www.xiaohongshu.com/search_result?keyword=%25E6%2590%25AC%25E7%25A9%25BA%25E7%25BD%2597%25E5%25BE%25B7%25E5%25B2%259B%25E9%25A3%259F%25E5%25A0%2582&type=54&source=web_note_detail_r10] "#comike105":[https://www.xiaohongshu.com/search_result?keyword=comike105&type=54&source=web_note_detail_r10] "#cpgz07":[https://www.xiaohongshu.com/search_result?keyword=cpgz07&type=54&source=web_note_detail_r10]
           EOS
         )
       end

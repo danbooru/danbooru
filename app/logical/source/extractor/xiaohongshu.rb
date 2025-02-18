@@ -20,6 +20,27 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
     end
   end
 
+  def page_url
+    page_url_from_api || page_url_from_parsed_urls
+  end
+
+  def page_url_from_api
+    url = if user_id.present? && post_id.present?
+      "https://www.xiaohongshu.com/user/profile/#{user_id}/#{post_id}"
+    elsif post_id.present?
+      "https://www.xiaohongshu.com/explore/#{post_id}"
+    end
+
+    xsec_token = parsed_url.xsec_token || parsed_referer&.xsec_token
+    if url.present? && xsec_token.present?
+      url += "?xsec_token=#{xsec_token}"
+    end
+  end
+
+  def page_url_from_parsed_urls
+    parsed_url.page_url || parsed_referer&.page_url
+  end
+
   def profile_url
     "https://www.xiaohongshu.com/user/profile/#{user_id}" if user_id.present?
   end
@@ -35,15 +56,15 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   def artist_commentary_title
-    note["title"]
+    page&.at('#detail-title')&.text&.strip
   end
 
   def artist_commentary_desc
-    note["desc"]
+    page&.at('#detail-desc')&.to_html&.gsub("\n", "<br>")
   end
 
   def dtext_artist_commentary_desc
-    DText.from_plaintext(artist_commentary_desc)
+    DText.from_html(artist_commentary_desc, base_url: "https://www.xiaohongshu.com")&.strip
   end
 
   def post_id
@@ -59,7 +80,7 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   memoize def page
-    http.cache(1.minute).parsed_get(page_url)
+    http.cache(1.minute).parsed_get(page_url_from_parsed_urls)
   end
 
   memoize def page_json
