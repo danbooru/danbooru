@@ -166,6 +166,44 @@ module Sources
         )
       end
 
+      context "A mixed post with videos and images" do
+        strategy_should_work(
+          "https://www.xiaohongshu.com/explore/67a396a7000000002503cbd3?xsec_token=CBRIrPInWF5UjSI0_h4-v2v6nT1TXLzRXVwp_ng-vPOLQ=",
+          image_urls: %w[
+            https://ci.xiaohongshu.com/1040g00831dhec8sn16005ps3g6f23fi49d2j5ao
+            https://ci.xiaohongshu.com/1040g00831dhec8sn160g5ps3g6f23fi4fohe6vo
+            http://sns-video-yc.xhscdn.com/stream/1/10/19/01e7a396a34b27470100500394d7049ff0_19.mp4
+          ],
+          media_files: [
+            { file_size: 627_574 },
+            { file_size: 294_766 },
+            { file_size: 867_997 }
+          ],
+          page_url: "https://www.xiaohongshu.com/explore/67a396a7000000002503cbd3?xsec_token=CBRIrPInWF5UjSI0_h4-v2v6nT1TXLzRXVwp_ng-vPOLQ=",
+          profile_urls: %w[https://www.xiaohongshu.com/user/profile/6783819e000000000801be44],
+          display_name: "梦游蝴蝶的日常",
+          username: nil,
+          tags: [
+            ["Mbti", "https://www.xiaohongshu.com/search_result?keyword=Mbti"],
+            ["infp", "https://www.xiaohongshu.com/search_result?keyword=infp"],
+            ["小蝴蝶", "https://www.xiaohongshu.com/search_result?keyword=小蝴蝶"],
+            ["生日快乐", "https://www.xiaohongshu.com/search_result?keyword=生日快乐"],
+            ["mbti16人格", "https://www.xiaohongshu.com/search_result?keyword=mbti16人格"],
+          ],
+          dtext_artist_commentary_title: "小蝴蝶| 你会给玩偶过生日吗？",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            "#Mbti":[https://www.xiaohongshu.com/search_result?keyword=Mbti] "#infp":[https://www.xiaohongshu.com/search_result?keyword=infp] "#小蝴蝶":[https://www.xiaohongshu.com/search_result?keyword=%25E5%25B0%258F%25E8%259D%25B4%25E8%259D%25B6] "#生日快乐":[https://www.xiaohongshu.com/search_result?keyword=%25E7%2594%259F%25E6%2597%25A5%25E5%25BF%25AB%25E4%25B9%2590]
+
+            很喜欢史迪仔，陪伴了七八年的玩偶，会抱着他说很多很多话。于是在没有人关心的夜晚，买了一个小蛋糕，拉上窗帘，大声歌唱，郑重其事给我的玩偶朋友过了生日。
+
+            这种事情从5岁的我发生到25岁的我，可能只有善良温暖的INFP会一以贯之吧。
+
+            "#mbti16人格":[https://www.xiaohongshu.com/search_result?keyword=mbti16%25E4%25BA%25BA%25E6%25A0%25BC]
+            封面来自：九言绘一
+          EOS
+        )
+      end
+
       context "A deleted or nonexistent post" do
         strategy_should_work(
           "https://www.xiaohongshu.com/explore/999999999",

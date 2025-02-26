@@ -14,8 +14,13 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
       video_url = "https://sns-video-bd.xhscdn.com/#{key}" if key.present?
       [video_url].compact
     else
-      note["imageList"].to_a.pluck("urlDefault").map do |url|
-        Source::URL.parse(url).try(:full_image_url) || url
+      note["imageList"].to_a.flat_map do |image|
+        if image["stream"].present?
+          image.dig(:stream, :h264).to_a.pluck("masterUrl")
+        else
+          url = image["urlDefault"]
+          Source::URL.parse(url).try(:full_image_url) || url
+        end
       end
     end
   end
