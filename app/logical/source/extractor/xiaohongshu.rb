@@ -34,7 +34,7 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
 
   def tags
     note["tagList"].to_a.pluck("name").map do |tag|
-      [tag, "https://www.xiaohongshu.com/search_result/?keyword=#{Danbooru::URL.escape(tag)}"]
+      [tag, "https://www.xiaohongshu.com/search_result?keyword=#{Danbooru::URL.escape(tag)}"]
     end
   end
 
@@ -47,7 +47,15 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   def dtext_artist_commentary_desc
-    DText.from_html(artist_commentary_desc, base_url: "https://www.xiaohongshu.com")&.strip
+    DText.from_html(artist_commentary_desc, base_url: "https://www.xiaohongshu.com") do |element|
+      case element.name
+      in "a" if element.classes.include?("tag")
+        tag = Addressable::URI.parse(element[:href]).query_values["keyword"]
+        element[:href] = "https://www.xiaohongshu.com/search_result?keyword=#{Danbooru::URL.escape(tag)}" if tag.present?
+      else
+        nil
+      end
+    end&.strip
   end
 
   def post_id
