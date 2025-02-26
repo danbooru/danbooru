@@ -45,6 +45,34 @@ module Sources
             { file_size: 699_830 },
             { file_size: 844_990 }
           ],
+          page_url: "https://www.xiaohongshu.com/explore/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqACnVpHeS-InXHcQ2BeoLJKfU=",
+          profile_urls: %w[https://www.xiaohongshu.com/user/profile/5af06707db2e600283b2ffd3],
+          display_name: "撸卜🥕",
+          username: nil,
+          tags: [
+            ["绘画", "https://www.xiaohongshu.com/search_result/?keyword=绘画"],
+            ["明日方舟", "https://www.xiaohongshu.com/search_result/?keyword=明日方舟"],
+            ["铃兰", "https://www.xiaohongshu.com/search_result/?keyword=铃兰"],
+            ["忍冬", "https://www.xiaohongshu.com/search_result/?keyword=忍冬"],
+          ],
+          dtext_artist_commentary_title: "妈妈的伞☂️",
+          dtext_artist_commentary_desc: "\"#绘画\":[https://www.xiaohongshu.com/search_result?keyword=%25E7%25BB%2598%25E7%2594%25BB&type=54&source=web_note_detail_r10] \"#明日方舟\":[https://www.xiaohongshu.com/search_result?keyword=%25E6%2598%258E%25E6%2597%25A5%25E6%2596%25B9%25E8%2588%259F&type=54&source=web_note_detail_r10] \"#铃兰\":[https://www.xiaohongshu.com/search_result?keyword=%25E9%2593%2583%25E5%2585%25B0&type=54&source=web_note_detail_r10] \"#忍冬\":[https://www.xiaohongshu.com/search_result?keyword=%25E5%25BF%258D%25E5%2586%25AC&type=54&source=web_note_detail_r10]"
+        )
+      end
+
+      context "A post with user id in url" do
+        strategy_should_work(
+          "https://www.xiaohongshu.com/user/profile/5af06707db2e600283b2ffd3/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqACnVpHeS-InXHcQ2BeoLJKfU=&xsec_source=pc_user",
+          image_urls: %w[
+            https://ci.xiaohongshu.com/1040g2sg31aqeccv4mo704a54lgjgfvujhe954v8
+            https://ci.xiaohongshu.com/1040g2sg31aqeccv4mo7g4a54lgjgfvujfhua5oo
+            https://ci.xiaohongshu.com/1040g2sg31aqeccv4mo804a54lgjgfvuj16g2iho
+          ],
+          media_files: [
+            { file_size: 1_427_202 },
+            { file_size: 699_830 },
+            { file_size: 844_990 }
+          ],
           page_url: "https://www.xiaohongshu.com/user/profile/5af06707db2e600283b2ffd3/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqACnVpHeS-InXHcQ2BeoLJKfU=",
           profile_urls: %w[https://www.xiaohongshu.com/user/profile/5af06707db2e600283b2ffd3],
           display_name: "撸卜🥕",
