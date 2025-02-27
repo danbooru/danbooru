@@ -56,7 +56,7 @@ module Sources
             ["忍冬", "https://www.xiaohongshu.com/search_result?keyword=忍冬"],
           ],
           dtext_artist_commentary_title: "妈妈的伞☂️",
-          dtext_artist_commentary_desc: "\"#绘画\":[https://www.xiaohongshu.com/search_result?keyword=%25E7%25BB%2598%25E7%2594%25BB] \"#明日方舟\":[https://www.xiaohongshu.com/search_result?keyword=%25E6%2598%258E%25E6%2597%25A5%25E6%2596%25B9%25E8%2588%259F] \"#铃兰\":[https://www.xiaohongshu.com/search_result?keyword=%25E9%2593%2583%25E5%2585%25B0] \"#忍冬\":[https://www.xiaohongshu.com/search_result?keyword=%25E5%25BF%258D%25E5%2586%25AC]"
+          dtext_artist_commentary_desc: "\"#绘画\":[https://www.xiaohongshu.com/search_result?keyword=绘画] \"#明日方舟\":[https://www.xiaohongshu.com/search_result?keyword=明日方舟] \"#铃兰\":[https://www.xiaohongshu.com/search_result?keyword=铃兰] \"#忍冬\":[https://www.xiaohongshu.com/search_result?keyword=忍冬]"
         )
       end
 
@@ -84,7 +84,7 @@ module Sources
             ["忍冬", "https://www.xiaohongshu.com/search_result?keyword=忍冬"],
           ],
           dtext_artist_commentary_title: "妈妈的伞☂️",
-          dtext_artist_commentary_desc: "\"#绘画\":[https://www.xiaohongshu.com/search_result?keyword=%25E7%25BB%2598%25E7%2594%25BB] \"#明日方舟\":[https://www.xiaohongshu.com/search_result?keyword=%25E6%2598%258E%25E6%2597%25A5%25E6%2596%25B9%25E8%2588%259F] \"#铃兰\":[https://www.xiaohongshu.com/search_result?keyword=%25E9%2593%2583%25E5%2585%25B0] \"#忍冬\":[https://www.xiaohongshu.com/search_result?keyword=%25E5%25BF%258D%25E5%2586%25AC]"
+          dtext_artist_commentary_desc: "\"#绘画\":[https://www.xiaohongshu.com/search_result?keyword=绘画] \"#明日方舟\":[https://www.xiaohongshu.com/search_result?keyword=明日方舟] \"#铃兰\":[https://www.xiaohongshu.com/search_result?keyword=铃兰] \"#忍冬\":[https://www.xiaohongshu.com/search_result?keyword=忍冬]"
         )
       end
 
@@ -131,7 +131,7 @@ module Sources
 
             整理了本DLC插图全收录的48P小图册，会参加年底的冬コミ（C105），如果有去CM的朋友欢迎来東7/U39b找我玩——！
             国内的话，因为还有食品补充和收纳盒的部分待制作所以会稍晚一点，预计首发会是明年二月广州CPG07，已火速申摊香菇莫辜负🙏
-            "#明日方舟":[https://www.xiaohongshu.com/search_result?keyword=%25E6%2598%258E%25E6%2597%25A5%25E6%2596%25B9%25E8%2588%259F] "#搬空罗德岛食堂":[https://www.xiaohongshu.com/search_result?keyword=%25E6%2590%25AC%25E7%25A9%25BA%25E7%25BD%2597%25E5%25BE%25B7%25E5%25B2%259B%25E9%25A3%259F%25E5%25A0%2582] "#comike105":[https://www.xiaohongshu.com/search_result?keyword=comike105] "#cpgz07":[https://www.xiaohongshu.com/search_result?keyword=cpgz07]
+            "#明日方舟":[https://www.xiaohongshu.com/search_result?keyword=明日方舟] "#搬空罗德岛食堂":[https://www.xiaohongshu.com/search_result?keyword=搬空罗德岛食堂] "#comike105":[https://www.xiaohongshu.com/search_result?keyword=comike105] "#cpgz07":[https://www.xiaohongshu.com/search_result?keyword=cpgz07]
           EOS
         )
       end
@@ -161,7 +161,7 @@ module Sources
           dtext_artist_commentary_desc: <<~EOS.chomp
             血色将至🩸There will be blood.
             🥲本来想做隐藏图的但是后面尝试发现只能做饱和度非常低的版本，效果很差，所以放弃啦~
-            "#锈湖":[https://www.xiaohongshu.com/search_result?keyword=%25E9%2594%2588%25E6%25B9%2596] "#锈湖系列":[https://www.xiaohongshu.com/search_result?keyword=%25E9%2594%2588%25E6%25B9%2596%25E7%25B3%25BB%25E5%2588%2597] "#锈湖天堂岛":[https://www.xiaohongshu.com/search_result?keyword=%25E9%2594%2588%25E6%25B9%2596%25E5%25A4%25A9%25E5%25A0%2582%25E5%25B2%259B] "#锈湖旅馆":[https://www.xiaohongshu.com/search_result?keyword=%25E9%2594%2588%25E6%25B9%2596%25E6%2597%2585%25E9%25A6%2586] "#同人":[https://www.xiaohongshu.com/search_result?keyword=%25E5%2590%258C%25E4%25BA%25BA] "#锈湖同人":[https://www.xiaohongshu.com/search_result?keyword=%25E9%2594%2588%25E6%25B9%2596%25E5%2590%258C%25E4%25BA%25BA] "#rustylake":[https://www.xiaohongshu.com/search_result?keyword=rustylake] "#fanart":[https://www.xiaohongshu.com/search_result?keyword=fanart] "#插画":[https://www.xiaohongshu.com/search_result?keyword=%25E6%258F%2592%25E7%2594%25BB] "#二创":[https://www.xiaohongshu.com/search_result?keyword=%25E4%25BA%258C%25E5%2588%259B]
+            "#锈湖":[https://www.xiaohongshu.com/search_result?keyword=锈湖] "#锈湖系列":[https://www.xiaohongshu.com/search_result?keyword=锈湖系列] "#锈湖天堂岛":[https://www.xiaohongshu.com/search_result?keyword=锈湖天堂岛] "#锈湖旅馆":[https://www.xiaohongshu.com/search_result?keyword=锈湖旅馆] "#同人":[https://www.xiaohongshu.com/search_result?keyword=同人] "#锈湖同人":[https://www.xiaohongshu.com/search_result?keyword=锈湖同人] "#rustylake":[https://www.xiaohongshu.com/search_result?keyword=rustylake] "#fanart":[https://www.xiaohongshu.com/search_result?keyword=fanart] "#插画":[https://www.xiaohongshu.com/search_result?keyword=插画] "#二创":[https://www.xiaohongshu.com/search_result?keyword=二创]
           EOS
         )
       end
@@ -172,7 +172,7 @@ module Sources
           image_urls: %w[
             https://ci.xiaohongshu.com/1040g00831dhec8sn16005ps3g6f23fi49d2j5ao
             https://ci.xiaohongshu.com/1040g00831dhec8sn160g5ps3g6f23fi4fohe6vo
-            http://sns-video-yc.xhscdn.com/stream/1/10/19/01e7a396a34b27470100500394d7049ff0_19.mp4
+            http://sns-video-ak.xhscdn.com/stream/1/10/19/01e7a396a34b27470100500394d7049ff0_19.mp4
           ],
           media_files: [
             { file_size: 627_574 },
@@ -192,13 +192,13 @@ module Sources
           ],
           dtext_artist_commentary_title: "小蝴蝶| 你会给玩偶过生日吗？",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            "#Mbti":[https://www.xiaohongshu.com/search_result?keyword=Mbti] "#infp":[https://www.xiaohongshu.com/search_result?keyword=infp] "#小蝴蝶":[https://www.xiaohongshu.com/search_result?keyword=%25E5%25B0%258F%25E8%259D%25B4%25E8%259D%25B6] "#生日快乐":[https://www.xiaohongshu.com/search_result?keyword=%25E7%2594%259F%25E6%2597%25A5%25E5%25BF%25AB%25E4%25B9%2590]
+            "#Mbti":[https://www.xiaohongshu.com/search_result?keyword=Mbti] "#infp":[https://www.xiaohongshu.com/search_result?keyword=infp] "#小蝴蝶":[https://www.xiaohongshu.com/search_result?keyword=小蝴蝶] "#生日快乐":[https://www.xiaohongshu.com/search_result?keyword=生日快乐]
 
             很喜欢史迪仔，陪伴了七八年的玩偶，会抱着他说很多很多话。于是在没有人关心的夜晚，买了一个小蛋糕，拉上窗帘，大声歌唱，郑重其事给我的玩偶朋友过了生日。
 
             这种事情从5岁的我发生到25岁的我，可能只有善良温暖的INFP会一以贯之吧。
 
-            "#mbti16人格":[https://www.xiaohongshu.com/search_result?keyword=mbti16%25E4%25BA%25BA%25E6%25A0%25BC]
+            "#mbti16人格":[https://www.xiaohongshu.com/search_result?keyword=mbti16人格]
             封面来自：九言绘一
           EOS
         )

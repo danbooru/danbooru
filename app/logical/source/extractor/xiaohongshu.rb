@@ -55,7 +55,8 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
     DText.from_html(artist_commentary_desc, base_url: "https://www.xiaohongshu.com") do |element|
       case element.name
       in "a" if element.classes.include?("tag")
-        tag = Addressable::URI.parse(element[:href]).query_values["keyword"]
+        href = CGI.unescape(element[:href].to_s)  # double-encoded
+        tag = Addressable::URI.parse(href).query_values["keyword"].to_s
         element[:href] = "https://www.xiaohongshu.com/search_result?keyword=#{Danbooru::URL.escape(tag)}" if tag.present?
       else
         nil
