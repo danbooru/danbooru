@@ -57,6 +57,9 @@ module Source
           case element.name
           in "a" if element["href"].present?
             element["href"] = element["href"].gsub(%r{\Ahttps?://unsafelink\.com/}i, "")
+          in "video"
+            # Placeholder text for unsupported browsers.
+            element.content = nil
           else
             nil
           end

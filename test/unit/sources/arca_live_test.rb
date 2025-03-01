@@ -120,19 +120,17 @@ module Sources
 
       context "An Arca.live page URL with an .mp4 video" do
         strategy_should_work(
-          "https://arca.live/b/bluearchive/124146827",
-          image_urls: %w[https://ac.namu.la/20241219sac/148cc68a79262f44d3ebbeab0d418583a0e7312d196c538ca65cb65cdb977666.mp4?type=orig],
-          media_files: [{ file_size: 1_142_041 }],
-          page_url: "https://arca.live/b/bluearchive/124146827",
+          "https://arca.live/b/bluearchive/117240135",
+          image_urls: %w[https://ac.namu.la/20240926sac/16f07778a97f91b935c8a3394ead01a223d96b2a619fdb25c4628ddba88b5fad.mp4?type=orig],
+          media_files: [{ file_size: 1_687_382 }],
+          page_url: "https://arca.live/b/bluearchive/117240135",
           profile_urls: %w[https://arca.live/u/@horuhara/77430289],
           artist_name: "horuhara",
           tags: [],
-          dtext_artist_commentary_title: "말랑 고양이 바로 한입에 쏙!!!!!!!!!.mp4",
+          dtext_artist_commentary_title: "말랑고양이 마구 흔들기.mp4",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            맛잇갯다....
-            <https://x.com/horuhara/status/1869620187575747057?t=O9IJ0vapecigSkL3cD9FmA&s=19>
-            12코 선입금 마감 임박!! 현장판매 소량
-            <https://witchform.com/formViewer/payform.php?uuid=KFC5QBD9DB>
+            말랑하네요
+            "더 말랑하고 귀여운 그림 보러가기":[https://x.com/horuhara/status/1839132898785636671?t=RtemijMNpG1bdpziXac6-Q&s=19]
           EOS
         )
       end
