@@ -14,7 +14,7 @@ module Source
       end
 
       def image_urls_from_commentary
-        urls = page&.css(".article-content img:not(.arca-emoticon), .article-content video:not(.arca-emoticon)")&.to_a.filter_map do |element|
+        urls = artist_commentary_desc.to_s.parse_html.css("img:not(.arca-emoticon), video:not(.arca-emoticon)")&.to_a.filter_map do |element|
           url = element.attr("src")
           url = "https:#{url}" if url.starts_with?("//")
           url = Source::URL.parse(url)
@@ -25,41 +25,58 @@ module Source
       end
 
       def profile_url
-        # We do it like this we can handle users like https://arca.live/u/@크림/55256970 or https://arca.live/u/@Nauju/45320365
-        url = page&.css(".member-info > .user-info > a")&.attr("href")
-        Addressable::URI.join("https://arca.live", CGI.unescape(url)).to_s if url.present?
+        url = "https://arca.live/u/@#{artist_name}"
+        url += "/#{artist_id}" if artist_id.present?
+        url
       end
 
       def page_url
-        page&.css(".article-link a")&.attr("href")&.value || parsed_url.page_url || parsed_referer&.page_url
+        channel = api_response.dig("boardSlug") || parsed_url.channel || parsed_referer&.channel || "breaking"
+        post_id = api_response.dig("id") || parsed_url.post_id || parsed_referer&.post_id
+        "https://arca.live/b/#{channel}/#{post_id}" if channel.present? && post_id.present?
       end
 
       def artist_name
-        page&.css(".member-info > .user-info > a")&.text
+        api_response.dig("nickname")
+      end
+
+      def artist_id
+        api_response.dig("publicId")
       end
 
       def artist_commentary_title
-        page&.css(".title-row > .title")&.children&.last&.text&.strip
+        api_response.dig("title")
       end
 
       def artist_commentary_desc
-        page&.css(".article-content")&.to_s
+        api_response.dig("content")
       end
 
       def dtext_artist_commentary_desc
         DText.from_html(artist_commentary_desc, base_url: "https://arca.live") do |element|
-          if element.name == "a" && element["href"].present?
+          case element.name
+          in "a" if element["href"].present?
             element["href"] = element["href"].gsub(%r{\Ahttps?://unsafelink\.com/}i, "")
+          else
+            nil
           end
         end.squeeze("\n\n").strip
       end
 
-      memoize def page
-        # We need to spoof both the User-Agent (done by default in `Danbooru::Http.external`) and the Accept header,
-        # otherwise we start getting hCaptchas if the request rate is too high.
-        headers = { Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" }
-        url = parsed_url.page_url || parsed_referer&.page_url
-        http.cache(1.minute).headers(headers).parsed_get(url)
+      def post_id
+        parsed_url.post_id || parsed_referer&.post_id
+      end
+
+      def api_url
+        "https://arca.live/api/app/view/article/breaking/#{post_id}" if post_id.present?
+      end
+
+      def http
+        super.headers("User-Agent": "net.umanle.arca.android.playstore/0.9.75")
+      end
+
+      memoize def api_response
+        http.cache(1.minute).parsed_get(api_url) || {}
       end
     end
   end
