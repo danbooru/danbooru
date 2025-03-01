@@ -135,6 +135,24 @@ module Sources
         )
       end
 
+      context "An Arca.live page URL with a fake .mp4 GIF" do
+        strategy_should_work(
+          "https://arca.live/b/bluearchive/111191955",
+          image_urls: %w[https://ac.namu.la/20240714sac/c8fcadeb0b578e5121eb7a7e8fb05984cb87c68e7a6e0481a1c8869bf0ecfd2b.gif?type=orig],
+          media_files: [{ file_size: 1_284_465 }],
+          page_url: "https://arca.live/b/bluearchive/111191955",
+          profile_urls: %w[https://arca.live/u/@horuhara/77430289],
+          display_name: nil,
+          username: nil,
+          tags: [],
+          dtext_artist_commentary_title: "바로 들기 마려운 말랑말랑 마리.gif",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            바로 들어서 높이높이 할거임
+            <https://x.com/horuhara/status/1812316701817811068?t=8SumD241f8myyzgB8bobSA&s=19>
+          EOS
+        )
+      end
+
       context "An Arca.live page URL with a static emoticon" do
         strategy_should_work(
           "https://arca.live/b/arknights/49406926",

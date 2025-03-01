@@ -15,13 +15,25 @@ module Source
 
       def image_urls_from_commentary
         urls = artist_commentary_desc.to_s.parse_html.css("img:not(.arca-emoticon), video:not(.arca-emoticon)")&.to_a.filter_map do |element|
-          url = element.attr("src")
-          url = "https:#{url}" if url.starts_with?("//")
-          url = Source::URL.parse(url)
-          ext = element.attr("data-orig")
-          url = url.with(file_ext: ext) if ext.present?
-          url.try(:full_image_url)
+          extract_image_url(element)
         end
+      end
+
+      def extract_image_url(element)
+        url = element.attr("src")
+        url = "https:#{url}" if url.starts_with?("//")
+        url = Source::URL.parse(url)
+        url = url.try(:full_image_url)
+        return unless url.present?
+
+        url = Source::URL.parse(url)
+        ext = element.attr("data-orig")
+        unless ext.present?
+          gif_response = http.cache(1.minute).head(url.with(file_ext: "gif").to_s)
+          ext = "gif" if gif_response.status == 200
+        end
+        url = url.with(file_ext: ext) if ext.present?
+        url.try(:full_image_url)
       end
 
       def profile_url
