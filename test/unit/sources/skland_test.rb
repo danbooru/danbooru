@@ -54,9 +54,9 @@ module Sources
             { file_size: 51_398 },
           ],
           page_url: "https://www.skland.com/article?id=1913385",
-          profile_urls: [],
+          profile_urls: %w[https://www.skland.com/profile?id=5247252700052],
           display_name: "煌色的凯喵",
-          username: nil,
+          username: "skland_5247252700052",
           tags: [
             ["阿米娅", "https://skland.com"],
           ],
@@ -78,13 +78,12 @@ module Sources
       context "An article with a video" do
         strategy_should_work(
           "https://www.skland.com/article?id=1957041",
-          image_urls: [%r{https://skland-vod.hycdn.cn/302baa34192071efbfae5017f0e90102/507915004148ecaf55d6244e88e976f5-ld.m3u8\?auth_key=.*}],
+          image_urls: [%r{https://skland-vod.hycdn.cn/302baa34192071efbfae5017f0e90102/96cc446b88a6338b2b8de003142cc1e7-hd.m3u8\?auth_key=.*}],
           media_files: [{ file_size: 2_239 }],
           page_url: "https://www.skland.com/article?id=1957041",
-          profile_url: nil,
-          profile_urls: %w[],
+          profile_urls: %w[https://www.skland.com/profile?id=7238060044158],
           display_name: "D咸鱼仔",
-          username: nil,
+          username: "skland_7238060044158",
           tags: [
             ["明日方舟", "https://skland.com"],
             ["森空岛视频激励计划", "https://skland.com"],
@@ -101,13 +100,13 @@ module Sources
           image_urls: %w[https://bbs.hycdn.cn/image/2024/02/24/636267/02a9b6efe9083d8c53476363704c67e9.webp],
           media_files: [{ file_size: 147_202 }],
           page_url: "https://www.skland.com/article?id=1624373",
-          profile_urls: [],
-          display_name: "Whisperain买外敷",
-          username: nil,
+          profile_urls: %w[https://www.skland.com/profile?id=8260318933515],
+          display_name: "Monic是絮雨厨",
+          username: "skland_8260318933515",
           tags: [
             ["互助问答", "https://skland.com"],
           ],
-          dtext_artist_commentary_title: "国际服新号求好友",
+          dtext_artist_commentary_title: "【水】国际服新号求好友",
           dtext_artist_commentary_desc: <<~EOS.chomp
             絮雨买外敷#2243
 
@@ -139,6 +138,8 @@ module Sources
         assert(Source::URL.page_url?("https://www.skland.com/article?id=1827735"))
         assert(Source::URL.page_url?("https://www.skland.com/h/detail?id=1827735"))
         assert(Source::URL.page_url?("https://m.skland.com/article?id=1827735"))
+
+        assert(Source::URL.profile_url?("https://www.skland.com/profile?id=4040407836824"))
       end
     end
   end

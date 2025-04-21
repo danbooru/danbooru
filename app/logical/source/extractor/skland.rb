@@ -19,8 +19,24 @@ class Source::Extractor::Skland < Source::Extractor
     end
   end
 
+  def username
+    "skland_#{profile_id}" if profile_id.present?
+  end
+
   def display_name
     article.dig(:user, :nickname)
+  end
+
+  def profile_id
+    article.dig(:user, :id)
+  end
+
+  def profile_url
+    if profile_id.present?
+      "https://www.skland.com/profile?id=#{profile_id}"
+    else
+      parsed_url.profile_url || parsed_referer&.profile_url
+    end
   end
 
   def tags
@@ -95,11 +111,28 @@ class Source::Extractor::Skland < Source::Extractor
   end
 
   memoize def article
-    api_response.dig(:data, :list, 0) || {}
+    api_response.dig(:data) || {}
   end
 
   memoize def api_response
-    api_url = "https://zonai.skland.com/h5/v1/item/list?ids=#{article_id}" if article_id.present?
-    http.headers(platform: "3").cache(1.minute).parsed_get(api_url) || {}
+    return {} unless article_id.present?
+    api_url = Addressable::URI.parse "https://zonai.skland.com/web/v1/item?id=#{article_id}"
+
+    timestamp = Time.now.to_i.to_s
+    headers = {
+      platform: '3',
+      timestamp: timestamp,
+      dId: "1",
+      vName: "1.0.0",
+    }
+    token_response = http.headers(**headers).parsed_get("https://zonai.skland.com/web/v1/auth/refresh") || {}
+    token = token_response.dig(:data, :token)
+    return {} unless token.present?
+
+    str = "#{api_url.path}#{api_url.query}#{timestamp}#{headers.to_json}"
+    hmac_sha256 = OpenSSL::HMAC.hexdigest("SHA256", token, str)
+    headers[:sign] = Digest::MD5.hexdigest(hmac_sha256)
+
+    http.headers(**headers).cache(1.minute).parsed_get(api_url.to_s) || {}
   end
 end

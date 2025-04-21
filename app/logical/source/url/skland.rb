@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Skland < Source::URL
-  attr_reader :article_id, :full_image_url
+  attr_reader :article_id, :profile_id, :full_image_url
 
   def self.match?(url)
     url.domain.in?(%w[skland.com hycdn.cn])
@@ -22,6 +22,10 @@ class Source::URL::Skland < Source::URL
     # https://skland-vod.hycdn.cn/302baa34192071efbfae5017f0e90102/ceae138088e6ffb74cde2f255256f43d-sd-00012.ts?auth_key=1716481288-d3ee979fabcb40ba81081ceb020d6c61-0-2d3d2648e49baf37d8bacd91cf9db666
     in "skland-vod", "hycdn.cn", *rest
       @full_image_url = to_s
+
+    # https://www.skland.com/profile?id=4040407836824
+    in _, "skland.com", "profile"
+      @profile_id = params[:id]
 
     # https://www.skland.com/article?id=1827735
     # https://m.skland.com/article?id=1827735
@@ -44,5 +48,9 @@ class Source::URL::Skland < Source::URL
 
   def page_url
     "https://www.skland.com/article?id=#{article_id}" if article_id.present?
+  end
+
+  def profile_url
+    "https://www.skland.com/profile?id=#{profile_id}" if profile_id.present?
   end
 end
