@@ -149,10 +149,16 @@ class TwitterTransactionIdGenerator
     value * (max - min) / 255 + min
   end
 
+  # @return [Float] A percentage from 0.0-1.0, determining how long to run the animation, based on a product of bytes
+  #   from the verification key.
+  memoize def frame_time
+    target_time = indices[1..].map { |i| key_bytes[i] % 16 }.reduce(:*)
+    target_time = (target_time / 10.0).round * 10
+    target_time / 4096.0
+  end
+
   # @return [Float] A cubic-bezier interpolation of 3 bytes taken from the verification key.
   memoize def cubic
-    frame_time = indices[1..].map { |i| key_bytes[i] % 16 }.reduce(:*) / 4096.0
-
     if frame_time <= 0.0
       if curves[0] > 0.0
         start_gradient = curves[1] / curves[0]
@@ -198,7 +204,7 @@ class TwitterTransactionIdGenerator
   def color
     from_color = frame_row[0..2].map(&:to_f) + [1.0]
     to_color = frame_row[3..5].map(&:to_f) + [1.0]
-    interpolate(from_color, to_color, cubic).map { |c| c.clamp(0..) }
+    interpolate(from_color, to_color, cubic).map { |c| c.clamp(0..255.0) }
   end
 
   # @return [Float] An angle (in degrees), based on a rotation of the Twitter logo.
