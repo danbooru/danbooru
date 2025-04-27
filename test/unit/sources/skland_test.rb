@@ -58,7 +58,7 @@ module Sources
           display_name: "煌色的凯喵",
           username: "skland_5247252700052",
           tags: [
-            ["阿米娅", "https://skland.com"],
+            ["阿米娅", "https://www.skland.com/tag?id=123"],
           ],
           dtext_artist_commentary_title: "（转载，已授权）ヤモリ老师兔兔合集",
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -85,9 +85,9 @@ module Sources
           display_name: "D咸鱼仔",
           username: "skland_7238060044158",
           tags: [
-            ["明日方舟", "https://skland.com"],
-            ["森空岛视频激励计划", "https://skland.com"],
-            ["鸿雪", "https://skland.com"],
+            ["明日方舟", "https://www.skland.com/tag?id=474"],
+            ["森空岛视频激励计划", "https://www.skland.com/tag?id=716"],
+            ["鸿雪", "https://www.skland.com/tag?id=37"],
           ],
           dtext_artist_commentary_title: "鸿雪大战小杜林！",
           dtext_artist_commentary_desc: ""
@@ -104,7 +104,7 @@ module Sources
           display_name: "Monic是絮雨厨",
           username: "skland_8260318933515",
           tags: [
-            ["互助问答", "https://skland.com"],
+            ["互助问答", "https://www.skland.com/tag?id=593"],
           ],
           dtext_artist_commentary_title: "【水】国际服新号求好友",
           dtext_artist_commentary_desc: <<~EOS.chomp

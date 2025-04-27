@@ -41,7 +41,7 @@ class Source::Extractor::Skland < Source::Extractor
 
   def tags
     article[:tags].to_a.map do |tag|
-      [tag[:name], "https://skland.com"]
+      [tag[:name], "https://www.skland.com/tag?id=#{tag[:id]}"]
     end
   end
 
