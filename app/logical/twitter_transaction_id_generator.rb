@@ -164,6 +164,8 @@ class TwitterTransactionIdGenerator
         start_gradient = curves[1] / curves[0]
       elsif curves[1] == 0.0 && curves[2] > 0.0
         start_gradient = curves[3] / curves[2]
+      else
+        start_gradient = 0.0
       end
 
       return start_gradient * frame_time
@@ -172,6 +174,8 @@ class TwitterTransactionIdGenerator
         end_gradient = (curves[3] - 1.0) / (curves[2] - 1.0)
       elsif curves[2] == 1.0 && self.curves[0] < 1.0
         end_gradient = (curves[1] - 1.0) / (curves[0] - 1.0)
+      else
+        end_gradient = 0.0
       end
 
       return 1.0 + end_gradient * (frame_time - 1.0)
