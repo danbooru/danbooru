@@ -227,7 +227,7 @@ class Source::Extractor
       headers = { "x-client-transaction-id": tid_generator.transaction_id(path) }
       response = http.cache(1.minute).headers(headers).get("https://x.com#{path}", params: params)
       # puts ({ status: response.status, **headers, time: tid_generator.time, xor_key: tid_generator.xor_key, key: tid_generator.twitter_site_verification_key, rate_limit: response.headers["x-rate-limit-remaining"] }).to_json
-      response.parse unless response.status == 404
+      response.parse if response.status.success?
     end
 
     memoize def tid_generator
