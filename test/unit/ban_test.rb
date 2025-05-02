@@ -28,6 +28,66 @@ class BanTest < ActiveSupport::TestCase
       end
     end
 
+    context "deleting user data" do
+      setup do
+        @banner = create(:moderator_user)
+        CurrentUser.user = @banner
+        @bannee = create(:user)
+      end
+
+      should "delete the user's pending posts" do
+        @pending_post = create(:post, uploader: @bannee, is_pending: true)
+        @active_post = create(:post)
+        create(:ban, user: @bannee, banner: @banner, delete_posts: true, post_deletion_reason: "off-topic")
+        assert_equal("deleted", @pending_post.reload.status)
+        assert_equal("off-topic", @pending_post.flags.last.reason)
+        assert_equal("active", @active_post.reload.status)
+      end
+
+      should "delete the user's comments" do
+        @comment = create(:comment, creator: @bannee)
+        create(:ban, user: @bannee, banner: @banner, delete_comments: true)
+        assert(@comment.reload.is_deleted)
+      end
+
+      should "delete the user's forum posts" do
+        @forum_topic = create(:forum_topic, creator: @bannee)
+        @other_forum_topic = create(:forum_topic, original_post: create(:forum_post))
+        @forum_post = create(:forum_post, creator: @bannee, topic: @other_forum_topic)
+        create(:ban, user: @bannee, banner: @banner, delete_forum_posts: true)
+        assert(@forum_topic.reload.is_deleted)
+        assert(@forum_post.reload.is_deleted)
+      end
+
+      should "not allow mods to delete votes" do
+        @post_vote = create(:post_vote, user: @bannee)
+        @ban = build(:ban, user: @bannee, banner: @banner, delete_votes: true)
+        assert_not(@ban.valid?)
+        assert_equal(["Delete votes is not allowed by Moderator"], @ban.errors.full_messages)
+        assert_not(@post_vote.reload.is_deleted)
+      end
+
+      should "allow admins to delete votes" do
+        @comment_vote = create(:comment_vote, user: @bannee)
+        @post_vote = create(:post_vote, user: @bannee)
+        create(:ban, user: @bannee, banner: create(:admin_user), delete_votes: true)
+        assert(@comment_vote.reload.is_deleted)
+        assert(@post_vote.reload.is_deleted)
+      end
+
+      should "not delete anything unwanted" do
+        @post = create(:post, uploader: @bannee, is_pending: true)
+        @comment = create(:comment, creator: @bannee)
+        @forum_post = create(:forum_post, creator: @bannee)
+        @post_vote = create(:post_vote, user: @bannee)
+        create(:ban, user: @bannee, banner: @banner)
+        assert(@post.reload.status == "pending")
+        assert_not(@comment.reload.is_deleted)
+        assert_not(@forum_post.reload.is_deleted)
+        assert_not(@post_vote.reload.is_deleted)
+      end
+    end
+
     should "initialize the expiration date" do
       user = FactoryBot.create(:user)
       admin = FactoryBot.create(:admin_user)
