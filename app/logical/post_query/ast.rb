@@ -4,13 +4,14 @@
 # `PostQuery::Parser#parse`. It has methods for printing, manipulating, and
 # simpifying ASTs returned by the parser.
 #
-# There are nine AST node types:
+# There are ten AST node types:
 #
 # * :all (representing the search that returns everything, aka the empty search)
 # * :none (representing the search that returns nothing)
 # * :tag (a single tag)
 # * :metatag (a metatag with a name and value)
 # * :wildcard (a wildcard tag, e.g. `blue_*`)
+# * :search (a search tag, e.g. `[uploader][level_gt]:30`)
 # * :and (an n-ary AND clause)
 # * :or (an n-nary OR clause)
 # * :not (a unary NOT clause)
@@ -43,7 +44,7 @@ class PostQuery
 
     attr_reader :type, :args, :parent
     protected attr_writer :parent
-    delegate :all?, :none?, :and?, :or?, :not?, :opt?, :tag?, :metatag?, :wildcard?, to: :inquirer
+    delegate :all?, :none?, :and?, :or?, :not?, :opt?, :tag?, :metatag?, :wildcard?, :search_param?, :search?, to: :inquirer
 
     # Create an AST node.
     #
@@ -101,6 +102,14 @@ class PostQuery
 
           AST.new(:metatag, [name, value, quoted])
         end
+
+        def search_param(path, is_array, value, quoted = false)
+          AST.new(:search_param, [path, is_array, value, quoted])
+        end
+
+        def search(params)
+          AST.new(:search, params)
+        end
       end
 
       def &(other)
@@ -133,7 +142,11 @@ class PostQuery
       #
       # @return [AST] A new AST in conjunctive normal form.
       def to_cnf
-        rewrite_opts.simplify.sort
+        rewrite_partials.simplify.sort
+      end
+
+      def rewrite_partials
+        rewrite_opts.rewrite_search_params
       end
 
       # Rewrite the `~` operator to `or` clauses.
@@ -147,6 +160,40 @@ class PostQuery
             opts, non_opts = ast.children.partition(&:opt?)
             or_node = node(:or, *opts.flat_map(&:children))
             node(ast.type, or_node, *non_opts)
+          else
+            ast
+          end
+        end
+      end
+
+      def rewrite_search_params
+        rewrite do |ast|
+          if !ast.search? && ast.children.any?(&:search_param?)
+            params, non_params = ast.children.partition(&:search_param?)
+            search_hash = node(:search, *params).search_hash
+
+            def hash_to_args(hash)
+              hash.flat_map do |k, v|
+                case v
+                when Hash
+                  hash_to_args(v).map do |path, *etc|
+                    [[k, *path], *etc]
+                  end
+                when Array
+                  v.map do |v|
+                    [[k], true, v, /\A['"]| /.match?(v)]
+                  end
+                else
+                  [
+                    [[k], false, v, /\A['"]| /.match?(v)]
+                  ]
+                end
+              end
+            end
+
+            params = hash_to_args(search_hash).map { |args| node(:search_param, *args) }
+            search_node = node(:search, *params)
+            node(ast.type, search_node, *non_params)
           else
             ast
           end
@@ -255,6 +302,8 @@ class PostQuery
           name
         in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
+        in [:search_param, path, is_array, value, quoted]
+          to_infix
         in [:wildcard, name]
           "(wildcard #{name})"
         in [type, *args]
@@ -275,6 +324,10 @@ class PostQuery
           name
         in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
+        in [:search_param, path, is_array, value, quoted]
+          "#{path.map { "[#{_1}]" }.join}#{is_array ? "[]" : ""}:#{quoted_value}"
+        in [:search, *params]
+          params.map(&:to_infix).join(" ")
         in :not, child
           child.term? ? "-#{child.to_infix}" : "-(#{child.to_infix})"
         in :opt, child
@@ -299,6 +352,10 @@ class PostQuery
           name.tr("_", " ").startcase
         in [:metatag, name, value, quoted]
           "#{name}:#{quoted_value}"
+        in [:search_param, path, is_array, value, quoted]
+          to_infix
+        in [:search, *params]
+          to_infix
         in :not, child
           child.term? ? "-#{child.to_pretty_string}" : "-(#{child.to_pretty_string})"
         in :opt, child
@@ -400,6 +457,16 @@ class PostQuery
         nodes.select(&:wildcard?).uniq.sort
       end
 
+      # @return [Array<AST>] A list of all unique search param nodes in the AST.
+      def search_params
+        nodes.select(&:search_param?).uniq.sort
+      end
+
+      # @return [Array<AST>] A list of all unique search nodes in the AST.
+      def searches
+        nodes.select(&:search?).uniq.sort
+      end
+
       # @return [Array<String>] The names of all unique tags in the AST.
       def tag_names
         tags.map(&:name)
@@ -420,7 +487,7 @@ class PostQuery
 
       # True if the AST is a simple node, that is a leaf node with no child nodes.
       def term?
-        type.in?(%i[tag metatag wildcard all none])
+        type.in?(%i[tag metatag wildcard search_param all none])
       end
 
       # @return [String, nil] The name of the tag, metatag, or wildcard, if one of these nodes.
@@ -428,19 +495,50 @@ class PostQuery
         args.first if tag? || metatag? || wildcard?
       end
 
-      # @return [String, nil] The value of the metatag, if a metatag node.
+      # @return [Array<String>, nil] The path of the search param, if a search param node.
+      def path
+        args.first if search_param?
+      end
+
+      # @return [Array<String>, nil] True if search value is an array.
+      def is_array
+        args.second if search_param?
+      end
+
+      def search_hash
+        case type
+        when :search_param
+          path.reverse.reduce(is_array ? [value] : value) do |params, path| { path => params } end.with_indifferent_access
+        when :search
+          children.map(&:search_hash).reduce do |a, v|
+            a.deep_merge(v) do |key, this, other|
+              if this.is_a?(Array) && other.is_a?(Array)
+                this + other
+              else
+                other
+              end
+            end
+          end
+        else
+          nil
+        end
+      end
+
+      # @return [String, nil] The value of the metatag or search param, if one of these nodes.
       def value
-        args.second if metatag?
+        return args.second if metatag?
+        return args.third if search_param?
       end
 
-      # @return [String, nil] True if the metatag's value was enclosed in quotes.
+      # @return [String, nil] True if the metatag's or search param's value was enclosed in quotes.
       def quoted?
-        args.third if metatag?
+        return args[2] if metatag?
+        return args[3] if search_param?
       end
 
-      # @return [String, nil] The value of the metatag as a quoted string, if a metatag node.
+      # @return [String, nil] The value of the metatag or search param as a quoted string, if one of these nodes.
       def quoted_value
-        return nil unless metatag?
+        return nil unless metatag? || search_param?
 
         if quoted?
           %Q{"#{value.gsub(/"/, '\\"')}"}
@@ -469,6 +567,6 @@ class PostQuery
       end
     end
 
-    memoize :to_cnf, :simplify, :simplify_once, :rewrite_opts, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_pretty_string, :to_tree, :nodes, :tags, :metatags, :tag_names, :parents
+    memoize :to_cnf, :simplify, :simplify_once, :rewrite_partials, :rewrite_opts, :rewrite_search_params, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_pretty_string, :to_tree, :nodes, :tags, :metatags, :tag_names, :parents
   end
 end
