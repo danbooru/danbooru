@@ -3,7 +3,7 @@
 class SourcesController < ApplicationController
   respond_to :js, :json, :xml, :html
 
-  rate_limit :show, rate: 20.0/1.minute, burst: 50
+  rate_limit :show, rate: 5.0/1.minute, burst: 20
 
   def show
     @source = Source::Extractor.find(params[:url], params[:ref]) if params[:url].present?
