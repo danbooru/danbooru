@@ -1,0 +1,29 @@
+<div id="c-user-events">
+  <div id="a-compare-fingerprint">
+    <h2>Comparing <%= @user_event_a.fingerprint_hash[...8] %> to <%= @user_event_b.fingerprint_hash[...8] %></h2>
+    <% fingerprint_a = @user_event_a.fingerprint.reduce({}) { |last, (k, v)| v.is_a?(Hash) ? last.update(**v.map { |k2, v2| ["#{k}.#{k2}", v2] }.to_h) : last.update(k: v) }.compact %>
+    <% fingerprint_b = @user_event_b.fingerprint.reduce({}) { |last, (k, v)| v.is_a?(Hash) ? last.update(**v.map { |k2, v2| ["#{k}.#{k2}", v2] }.to_h) : last.update(k: v) }.compact %>
+    <% keys = fingerprint_a.keys.union(fingerprint_b.keys).sort %>
+
+    <table class="striped">
+      <thead>
+        <tr>
+          <th>Property</th>
+          <th><%= @user_event_a.fingerprint_hash[...8] %></th>
+          <th><%= @user_event_b.fingerprint_hash[...8] %></th>
+        </tr>
+      </thead>
+      <% keys.each do |key| %>
+        <tr>
+          <th><%= key %></th>
+          <%= tag.td class: { missing: (fingerprint_a[key].nil? && !fingerprint_b[key].nil?), changed: (!fingerprint_a[key].nil? && !fingerprint_b[key].nil? && fingerprint_a[key] != fingerprint_b[key]) } do %>
+            <%= fingerprint_a[key] %>
+          <% end %>
+          <%= tag.td class: { missing: (fingerprint_b[key].nil? && !fingerprint_a[key].nil?), changed: (!fingerprint_a[key].nil? && !fingerprint_b[key].nil? && fingerprint_a[key] != fingerprint_b[key]) } do %>
+            <%= fingerprint_b[key] %>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

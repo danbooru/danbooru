@@ -2132,7 +2132,9 @@ CREATE TABLE public.user_events (
     ip_addr inet,
     session_id uuid,
     user_agent character varying,
-    metadata jsonb
+    metadata jsonb,
+    fingerprint jsonb,
+    fingerprint_hash text
 );
 
 
@@ -6698,6 +6700,7 @@ ALTER TABLE ONLY public.upload_media_assets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250502093010'),
 ('20241023091114'),
 ('20240607200251'),
 ('20240607200250'),

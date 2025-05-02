@@ -62,7 +62,7 @@ class UserEvent < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :category, :user, :user_session, :ip_addr, :session_id, :user_agent, :metadata, :ip_geolocation], current_user: current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :category, :user, :user_session, :ip_addr, :session_id, :user_agent, :metadata, :ip_geolocation, :fingerprint, :fingerprint_hash], current_user: current_user)
     q.apply_default_order(params)
   end
 
@@ -74,11 +74,28 @@ class UserEvent < ApplicationRecord
     class_methods do
       # Build an event but don't save it yet. The caller is expected to update the user, which will save the event.
       def build_from_request(user, category, request)
+        json, hash = begin
+          if request.params[:fp].present?
+            json, hash = Base64.decode64(request.params[:fp] || "").split("\n")
+            parsed_json = Danbooru::JSON.parse(json) || {invalid: true}
+            if !hash&.match(/[a-z0-9]{32}/) && parsed_json[:invalid].nil?
+              # Hash was absent for some reason. May occur without HTTPS context.
+              hash = Digest::SHA512.hexdigest(json)[...32]
+              # Should be the same as the JS result, but that is not guaranteed
+              # if the JSON is parsed to a hash then dumped back to a JSON string.
+            elsif parsed_json[:invalid].nil?
+              hash = "00000000000000000000000000000000" unless hash&.match(/[a-z0-9]{32}/)
+            end
+            [parsed_json, hash]
+          else
+            [nil, nil]
+          end
+        end
         ip_addr = request.remote_ip
         IpGeolocation.create_or_update!(ip_addr)
         user_session = UserSession.new(session_id: request.session[:session_id], ip_addr: ip_addr, user_agent: request.user_agent)
 
-        user.user_events.build(user: user, category: category, user_session: user_session, ip_addr: ip_addr, session_id: request.session[:session_id], user_agent: request.user_agent)
+        user.user_events.build(user: user, category: category, user_session: user_session, ip_addr: ip_addr, session_id: request.session[:session_id], user_agent: request.user_agent, fingerprint: json, fingerprint_hash: hash)
       end
 
       def create_from_request!(...)

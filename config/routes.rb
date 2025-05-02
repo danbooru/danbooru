@@ -299,7 +299,12 @@ Rails.application.routes.draw do
     get :deactivate, on: :member     # /users/:id/deactivate
     get :deactivate, on: :collection # /users/deactivate
   end
-  resources :user_events, only: [:index]
+  resources :user_events, only: [:index] do
+    member do
+      get "/fingerprint", to: "user_events#fingerprint", as: :fingerprint
+      get "/fingerprint/compare/:other_user_event_id", to: "user_events#compare_fingerprint", as: :compare_fingerprint
+    end
+  end
   resources :user_feedbacks, except: [:destroy]
   resources :user_sessions, only: [:index]
   resources :user_name_change_requests, only: [:new, :create, :show, :index]

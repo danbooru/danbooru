@@ -1,0 +1,37 @@
+<div id="c-user-events">
+  <div id="a-fingerprint">
+    <h1>Device Fingerprint</h1>
+
+    <table class="striped autofit">
+      <tr>
+        <th>User</th>
+        <td><%= link_to_user @user_event.user %></td>
+      </tr>
+      <% %w[session_id ip_addr category user_agent metadata fingerprint_hash].each do |item| %>
+        <tr>
+          <th><%= item.titleize %></th>
+          <td><%= @user_event.send(item).presence || tag.i("Unknown") %></td>
+        </tr>
+      <% end %>
+    </table>
+
+    <h3>Fingerprint</h3>
+    <table class="striped autofit">
+      <% @user_event.fingerprint.each do |k, v| %>
+        <% if v.is_a?(Hash) %>
+          <% v.each do |k2, v2| %>
+            <tr>
+              <th><%= "#{k}.#{k2}" %></th>
+              <td><%= v2 %></td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <th><%= k %></th>
+            <td><%= v %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </table>
+  </div>
+</div>

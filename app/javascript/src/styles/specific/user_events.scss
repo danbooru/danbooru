@@ -1,0 +1,11 @@
+#c-user-events {
+  #a-compare-fingerprint {
+    td.missing {
+      background-color: var(--red-8);
+    }
+
+    td.changed {
+      background-color: var(--orange-6);
+    }
+  }
+}

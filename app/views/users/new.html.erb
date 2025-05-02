@@ -13,6 +13,7 @@
         <%= f.input :email_address, label: "Email", required: false, as: :email, input_html: { value: "", pattern: Danbooru::EmailAddress::EMAIL_REGEX, title: "your.name@example.com" }, hint: "Optional" %>
         <%= f.input :password, input_html: { autocomplete: "new-password" }, required: true %>
         <%= f.input :password_confirmation, label: "Confirm password", input_html: { autocomplete: "new-password" }, required: true %>
+        <input id="fp" name="fp" type="hidden">
 
         <%= captcha_tag class: "mb-4", action: :signup %>
         <%= f.submit "Sign up", class: "button-primary", disabled: true %>

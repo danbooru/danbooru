@@ -9,6 +9,9 @@
     <%= f.input :user_name, label: "User", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
     <%= f.input :ip_addr, label: "IP Address", input_html: { value: params.dig(:search, :ip_addr) } %>
     <%= f.input :session_id, label: "Session", input_html: { value: params.dig(:search, :session_id) } %>
+    <% if policy(UserEvent).fingerprint? %>
+      <%= f.input :fingerprint_hash, label: "Fingerprint", input_html: { value: params.dig(:search, :fingerprint_hash) } %>
+    <% end %>
     <%= f.simple_fields_for :ip_geolocation do |f1| %>
       <%= f1.input :city, input_html: { value: params.dig(:search, :ip_geolocation, :city) } %>
       <%= f1.input :country, as: :string, input_html: { value: params.dig(:search, :ip_geolocation, :country) } %>
@@ -94,6 +97,13 @@
     <% if policy(UserEvent).can_see_session? %>
       <% t.column "Session" do |user_event| %>
         <%= link_to user_event.session_id[0..6], current_page_path(search: search_params.deep_merge(session_id: user_event.session_id), page: nil), class: "font-monospace" %>
+      <% end %>
+
+      <% t.column "Fingerprint" do |user_event| %>
+        <% if user_event.fingerprint.present? && user_event.fingerprint_hash.present? %>
+          <%= link_to user_event.fingerprint_hash[0..6], current_page_path(search: search_params.deep_merge(fingerprint_hash: user_event.fingerprint_hash), page: nil), class: "font-monospace" %>
+          <%= link_to "»", fingerprint_user_event_path(user_event.id) %>
+        <% end %>
       <% end %>
 
       <% t.column "Browser" do |user_event| %>

@@ -1,4 +1,5 @@
 import { find as lodashFind, memoize } from "lodash";
+import { getFingerprint, getFingerprintData } from "@thumbmarkjs/thumbmarkjs";
 
 // Collects information about the user's browser and computer. Used for detecting bots and ban evaders.
 export default class Device {
@@ -207,3 +208,11 @@ export default class Device {
 
 Device.frameRate = memoize(Device.frameRate);
 Device.userAgentData = memoize(Device.userAgentData);
+
+$(async () => {
+  if ($("input#fp").length) {
+    let metadata = JSON.stringify(await getFingerprintData());
+    let hash = await getFingerprint()
+    $("input#fp").val(btoa(`${metadata}\n${hash}`));
+  }
+});
