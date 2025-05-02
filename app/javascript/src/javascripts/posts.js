@@ -106,7 +106,7 @@ Post.open_edit_dialog = function() {
   $(".upload-container").css("display", "block");
 
   var $tag_string = $("#post_tag_string");
-  $("body.c-uploads .docking-menu-tab").hide();
+  $("body.c-uploads .docking-menu-tab, body.c-upload-media-assets .docking-menu-tab").hide();
 
   var dialog = $("<div/>").attr("id", "edit-dialog");
   $("#form").appendTo(dialog);
@@ -166,7 +166,7 @@ Post.close_edit_dialog = function(e, ui) {
   $("#edit-dialog").remove();
   var $tag_string = $("#post_tag_string");
   $("div.input").has($tag_string).prevAll().show();
-  $("body.c-uploads .docking-menu-tab").show();
+  $("body.c-uploads .docking-menu-tab, body.c-upload-media-assets .docking-menu-tab").show();
   $tag_string.css({"resize": "", "width": ""});
   $(document).trigger("danbooru:close-post-edit-dialog");
 }
