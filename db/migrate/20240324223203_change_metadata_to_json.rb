@@ -1,4 +1,4 @@
-class ChangeMetadataToJson < ActiveRecord::Migration[7.1]
+class ChangeMetadataToJSON < ActiveRecord::Migration[7.1]
   def change
     add_column :ai_metadata, :parameters, :jsonb, default: {}, null: false
     add_column :ai_metadata_versions, :parameters, :jsonb, default: {}, null: false

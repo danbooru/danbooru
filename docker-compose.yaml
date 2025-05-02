@@ -78,7 +78,7 @@
 
 # You can change the name to run multiple AIBooru instances simultaneously.
 # This doesn't change the name of the site, it only affects the name used by Docker Compose.
-name: danbooru
+name: aibooru
 
 x-base-template: &base-template
   # You can set DANBOORU_IMAGE to `ghcr.io/aibooruorg/aibooru:master` to get the latest unstable release,

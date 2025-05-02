@@ -21,7 +21,7 @@
 #   # You can use `bin/dev` as a shortcut for `docker compose -f docker-compose.dev.yaml`.
 #   $ bin/dev up
 
-name: devbooru
+name: dev_aibooru
 
 x-base-template: &base-template
   # Use the latest development image from master, instead of the production image. The development
