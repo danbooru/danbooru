@@ -2,6 +2,11 @@
 
 class Ban < ApplicationRecord
   attribute :duration, :interval
+  attribute :delete_posts, :boolean
+  attribute :post_deletion_reason, :string
+  attribute :delete_forum_posts, :boolean
+  attribute :delete_comments, :boolean
+  attribute :delete_votes, :boolean
 
   dtext_attribute :reason, inline: true # defines :dtext_reason
 
@@ -9,6 +14,7 @@ class Ban < ApplicationRecord
   after_create :create_dmail
   after_create :update_user_on_create
   after_create :create_ban_mod_action
+  after_create :delete_user_data
   after_destroy :update_user_on_destroy
   after_destroy :create_unban_mod_action
   belongs_to :user
@@ -18,6 +24,7 @@ class Ban < ApplicationRecord
   validates :duration, inclusion: { in: [1.day, 3.days, 1.week, 1.month, 3.months, 6.months, 1.year, 100.years], message: "%{value} is not a valid ban duration" }, if: :duration_changed?
   validates :reason, visible_string: true
   validate :user, :validate_user_is_bannable, on: :create
+  validate :validate_deletions, on: :create
 
   scope :unexpired, -> { where("bans.created_at + bans.duration > ?", Time.zone.now) }
   scope :expired, -> { where("bans.created_at + bans.duration <= ?", Time.zone.now) }
@@ -47,6 +54,16 @@ class Ban < ApplicationRecord
 
   def validate_user_is_bannable
     errors.add(:user, "is already banned") if user&.is_banned?
+  end
+
+  def validate_deletions
+    if delete_posts && !post_deletion_reason.present?
+      errors.add(:post_deletion_reason, "is required")
+    end
+
+    if delete_votes && !Pundit.policy!(banner, PostVote.new).destroy?
+      errors.add(:delete_votes, "is not allowed by #{banner.level_string}")
+    end
   end
 
   def update_user_on_create
@@ -109,6 +126,31 @@ class Ban < ApplicationRecord
 
   def create_unban_mod_action
     ModAction.log(%{unbanned <@#{user_name}>}, :user_unban, subject: user, user: CurrentUser.user)
+  end
+
+  def delete_user_data
+    if delete_posts
+      user.posts.pending.parallel_find_each do |post|
+        post.delete!(post_deletion_reason)
+      end
+    end
+
+    if delete_forum_posts
+      user.forum_topics.undeleted.each(&:soft_delete!)
+      user.forum_posts.undeleted.each(&:soft_delete!)
+    end
+
+    if delete_comments
+      user.comments.undeleted.each(&:soft_delete!)
+    end
+
+    if delete_votes
+      user.post_votes.undeleted.each(&:soft_delete!)
+      user.comment_votes.undeleted.each do |vote|
+        vote.updater = banner
+        vote.soft_delete!
+      end
+    end
   end
 
   def self.available_includes

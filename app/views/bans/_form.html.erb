@@ -5,6 +5,19 @@
 
   <%= f.input :duration, collection: [["1 day", 1.day.iso8601], ["3 days", 3.days.iso8601], ["1 week", 1.week.iso8601], ["1 month", 1.month.iso8601], ["3 months", 3.months.iso8601], ["6 months", 6.months.iso8601], ["1 year", 1.year.iso8601], ["forever", 100.years.iso8601]], selected: ban.duration&.iso8601 %>
   <%= f.input :reason, as: :dtext %>
+
+  <% if ban.new_record? %>
+    <%= tag.div "x-data": { showReason: ban.delete_posts }.to_json do %>
+      <%= f.input :delete_posts, as: :boolean, label: "Delete pending posts", input_html: { "@click": "showReason = $event.target.checked" } %>
+      <%= f.input :post_deletion_reason, as: :string, label: "With reason", wrapper_html: { "x-show": "showReason" } %>
+    <% end %>
+    <%= f.input :delete_comments, as: :boolean %>
+    <%= f.input :delete_forum_posts, as: :boolean %>
+    <% if policy(PostVote.new).destroy? %>
+      <%= f.input :delete_votes, as: :boolean %>
+    <% end %>
+  <% end %>
+
   <%= f.button :submit %>
   <%= dtext_preview_button "ban_reason" %>
 <% end %>

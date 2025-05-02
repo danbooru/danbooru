@@ -33,6 +33,7 @@ class ForumTopic < ApplicationRecord
 
   accepts_nested_attributes_for :original_post
 
+  before_save :create_mod_action
   after_update :update_posts_on_deletion_or_undeletion
   after_update :update_original_post
   after_save(:if => ->(rec) {rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
@@ -181,12 +182,12 @@ class ForumTopic < ApplicationRecord
     min_level > MIN_LEVELS[:None]
   end
 
-  def create_mod_action_for_delete
-    ModAction.log("deleted forum topic ##{id} (title: #{title})", :forum_topic_delete, subject: self, user: CurrentUser.user)
-  end
-
-  def create_mod_action_for_undelete
-    ModAction.log("undeleted forum topic ##{id} (title: #{title})", :forum_topic_undelete, subject: self, user: CurrentUser.user)
+  def create_mod_action
+    if is_deleted && !is_deleted_was
+      ModAction.log("deleted forum topic ##{id} (title: #{title})", :forum_topic_delete, subject: self, user: CurrentUser.user)
+    elsif !is_deleted && is_deleted_was
+      ModAction.log("undeleted forum topic ##{id} (title: #{title})", :forum_topic_undelete, subject: self, user: CurrentUser.user)
+    end
   end
 
   def page_for(post_id)
