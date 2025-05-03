@@ -76,14 +76,23 @@ class AIMetadata < ApplicationRecord
       rescue JSON::ParserError
       end
     elsif metadata.has_key?("PNG:Parameters") || metadata.has_key?("ExifIFD:UserComment")
-      prompt, negative_prompt, params = parse_parameters(metadata["PNG:Parameters"] || metadata["ExifIFD:UserComment"])
-      subject.prompt = prompt
-      subject.negative_prompt = negative_prompt&.delete_prefix("Negative prompt: ")
-      if params.present?
-        params = params.scan(PARAMETER_REGEX).map { |field| [field[0].downcase, field[1].tr('"', "")] }.to_h unless params.is_a?(Hash)
-        subject.parameters = params.filter_map do |key, value|
-          [key.gsub("_", " ").titleize, value] if key.present? && value.present?
-        end.to_h
+      user_comment = Danbooru::JSON.parse(metadata["ExifIFD:UserComment"])
+      if user_comment.present? && user_comment["extraMetadata"].present?
+        extra_metadata = user_comment["extraMetadata"]&.gsub(/\\u([\da-fA-F]{4})/) { [$1].pack("H*").unpack("n*").pack("U*") } || ""
+        extra_metadata = Danbooru::JSON.parse(extra_metadata) || {}
+        subject.prompt = extra_metadata.delete("prompt")
+        subject.negative_prompt = extra_metadata.delete("negativePrompt")
+        subject.parameters = user_comment.without("extraMetadata").update(extra_metadata).transform_keys(&:titleize)
+      else
+        prompt, negative_prompt, params = parse_parameters(metadata["PNG:Parameters"] || metadata["ExifIFD:UserComment"])
+        subject.prompt = prompt
+        subject.negative_prompt = negative_prompt&.delete_prefix("Negative prompt: ")
+        if params.present?
+          params = params.scan(PARAMETER_REGEX).map { |field| [field[0].downcase, field[1].tr('"', "")] }.to_h unless params.is_a?(Hash)
+          subject.parameters = params.filter_map do |key, value|
+            [key.gsub("_", " ").titleize, value] if key.present? && value.present?
+          end.to_h
+        end
       end
     end
 
