@@ -10,6 +10,7 @@
   <% upload = upload_media_asset.upload %>
   <% media_asset = upload_media_asset.media_asset %>
   <% source = upload_media_asset.source_extractor %>
+  <% help_updated = WikiPage.find_by_title("help:upload_notice")&.updated_at.to_i > CurrentUser.user.posts.maximum(:created_at).to_i %>
 
   <%= tag.div class: "upload-container h-full",
               "x-data": "{ dock: $persist('#{j JSON.parse(cookies.fetch(:upload_edit_panel_dock, "auto".to_json))}').as('upload_edit_panel_dock').using(Danbooru.Cookie) }",
@@ -112,6 +113,9 @@
 
         <%= render(TabPanelComponent.new do |t| %>
           <% t.panel("Tags", active: true) do %>
+            <% if help_updated %>
+              <div id="upload-rules-warning">Read the <a href="javascript:$('a.tab.help-tab').get(0).click()">upload rules</a> before uploading.</div>
+            <% end %>
             <%= f.input :rating,
                         label: "Rating #{help_tooltip embed_wiki("help:rating_notice", classes: "text-xs"), link_class: "inactive-link" }".html_safe,
                         wrapper_html: { class: "radio-button-group text-xs", "x-on:input": "$el.classList.remove('field_with_errors')" },
@@ -198,7 +202,6 @@
 
           <% t.spacer %>
 
-          <% help_updated = WikiPage.find_by_title("help:upload_notice")&.updated_at.to_i > CurrentUser.user.posts.maximum(:created_at).to_i %>
           <% help_icon = exclamation_icon(class: "text-warning") if help_updated %>
           <% t.panel("#{help_icon} Help".strip.html_safe, id: "help-tab") do %>
             <%= embed_wiki("help:upload_notice") %>

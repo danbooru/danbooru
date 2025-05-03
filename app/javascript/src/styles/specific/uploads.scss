@@ -84,5 +84,14 @@ div#c-uploads {
         color: var(--link-color);
       }
     }
+
+    #upload-rules-warning {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      border-width: 1px;
+      background-color: var(--blue-8);
+      margin-top: -0.5rem;
+      margin-bottom: 0.5em;
+    }
   }
 }
