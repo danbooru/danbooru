@@ -39,7 +39,8 @@ class Source::URL::Patreon < Source::URL
     # https://www.patreon.com/checkout/1041uuu?rid=0
     # https://www.patreon.com/join/twistedgrim/checkout?rid=704013&redirect_uri=/posts/noi-dorohedoro-39394158
     # https://www.patreon.com/m/1041uuu/about
-    in _, "patreon.com", ("checkout" | "join" | "m"), username, *rest unless username.in?(RESERVED_USERNAMES)
+    # https://www.patreon.com/c/shrimpcake/posts
+    in _, "patreon.com", ("checkout" | "join" | "m" | "c"), username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username
 
     # https://www.patreon.com/bePatron?u=4045578
