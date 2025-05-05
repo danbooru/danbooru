@@ -4,6 +4,9 @@ class Ban < ApplicationRecord
   attribute :duration, :interval
   attribute :delete_posts, :boolean
   attribute :post_deletion_reason, :string
+  attribute :post_deletion_tags, :string
+  attribute :post_deletion_tags_nuke, :boolean
+  attribute :post_deletion_metadata_nuke, :boolean
   attribute :delete_forum_posts, :boolean
   attribute :delete_comments, :boolean
   attribute :delete_votes, :boolean
@@ -131,6 +134,14 @@ class Ban < ApplicationRecord
   def delete_user_data
     if delete_posts
       user.posts.pending.parallel_find_each do |post|
+        if post_deletion_tags.present?
+          if post_deletion_tags_nuke
+            post.update!(tag_string: post_deletion_tags)
+          else
+            post.update!(tag_string: "#{post.tag_string} #{post_deletion_tags}".strip)
+          end
+        end
+        post.ai_metadata.update!(prompt: "", negative_prompt: "", parameters: {}, updater: banner) if post_deletion_metadata_nuke
         post.delete!(post_deletion_reason)
       end
     end

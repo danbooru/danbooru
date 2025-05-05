@@ -7,9 +7,14 @@
   <%= f.input :reason, as: :dtext %>
 
   <% if ban.new_record? %>
-    <%= tag.div "x-data": { showReason: ban.delete_posts }.to_json do %>
+    <%= tag.div "x-data": { showReason: ban.delete_posts, nukeEnabled: ban.post_deletion_tags }.to_json do %>
       <%= f.input :delete_posts, as: :boolean, label: "Delete pending posts", input_html: { "@click": "showReason = $event.target.checked" } %>
       <%= f.input :post_deletion_reason, as: :string, label: "With reason", wrapper_html: { "x-show": "showReason" } %>
+      <div x-show="showReason">
+        <%= f.input :post_deletion_tags, as: :string, label: "With tags", placeholder: "(optional)", input_html: { "@input": "nukeEnabled = !!$event.target.value" } %>
+        <%= f.input :post_deletion_tags_nuke, as: :boolean, label: "Remove existing tags", input_html: { "x-bind:disabled": "!nukeEnabled" } %>
+        <%= f.input :post_deletion_metadata_nuke, as: :boolean, label: "Remove AI metadata" %>
+      </div>
     <% end %>
     <%= f.input :delete_comments, as: :boolean %>
     <%= f.input :delete_forum_posts, as: :boolean %>

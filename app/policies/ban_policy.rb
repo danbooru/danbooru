@@ -14,7 +14,8 @@ class BanPolicy < ApplicationPolicy
     [
       :reason, :duration, :user_id, :user_name, :delete_posts,
       :delete_comments, :delete_forum_posts, :post_deletion_reason,
-      :delete_votes
+      :delete_votes, :post_deletion_tags, :post_deletion_tags_nuke,
+      :post_deletion_metadata_nuke
     ]
   end
 
