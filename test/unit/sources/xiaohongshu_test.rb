@@ -34,87 +34,172 @@ module Sources
 
       context "A post with multiple images" do
         strategy_should_work(
-          "https://www.xiaohongshu.com/explore/66200ed0000000001c008538",
+          "https://www.xiaohongshu.com/explore/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqACnVpHeS-InXHcQ2BeoLJKfU=&xsec_source=pc_user",
           image_urls: %w[
-            https://ci.xiaohongshu.com/1040g008311n01khrnk005ortooqnru0rsc2ko0o
-            https://ci.xiaohongshu.com/1040g008311n01khrnk205ortooqnru0rva292bo
-            https://ci.xiaohongshu.com/1040g008311n01khrnk305ortooqnru0rp5tic5g
+            https://ci.xiaohongshu.com/1040g2sg31aqeccv4mo704a54lgjgfvujhe954v8
+            https://ci.xiaohongshu.com/1040g2sg31aqeccv4mo7g4a54lgjgfvujfhua5oo
+            https://ci.xiaohongshu.com/1040g2sg31aqeccv4mo804a54lgjgfvuj16g2iho
           ],
           media_files: [
-            { file_size: 598_968 },
-            { file_size: 594_026 },
-            { file_size: 603_928 },
+            { file_size: 1_427_202 },
+            { file_size: 699_830 },
+            { file_size: 844_990 }
           ],
-          page_url: "https://www.xiaohongshu.com/explore/66200ed0000000001c008538",
-          profile_url: "https://www.xiaohongshu.com/user/profile/637dc635000000001f01f81b",
-          profile_urls: %w[https://www.xiaohongshu.com/user/profile/637dc635000000001f01f81b],
-          display_name: "MG_G",
-          other_names: ["MG_G"],
+          page_url: "https://www.xiaohongshu.com/explore/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqACnVpHeS-InXHcQ2BeoLJKfU=",
+          profile_urls: %w[https://www.xiaohongshu.com/user/profile/5af06707db2e600283b2ffd3],
+          display_name: "撸卜🥕",
+          username: nil,
           tags: [
-            ["军舰", "https://www.xiaohongshu.com/search_result/?keyword=军舰"],
-            ["画画", "https://www.xiaohongshu.com/search_result/?keyword=画画"],
-            ["procreate", "https://www.xiaohongshu.com/search_result/?keyword=procreate"],
-            ["德军", "https://www.xiaohongshu.com/search_result/?keyword=德军"],
-            ["海军", "https://www.xiaohongshu.com/search_result/?keyword=海军"],
+            ["绘画", "https://www.xiaohongshu.com/search_result?keyword=绘画"],
+            ["明日方舟", "https://www.xiaohongshu.com/search_result?keyword=明日方舟"],
+            ["铃兰", "https://www.xiaohongshu.com/search_result?keyword=铃兰"],
+            ["忍冬", "https://www.xiaohongshu.com/search_result?keyword=忍冬"],
           ],
-          dtext_artist_commentary_title: "沙恩霍斯特号战列舰",
-          dtext_artist_commentary_desc: <<~EOS.chomp
-            沙恩霍斯特永远向前！
-            （最喜欢的军舰，尤其是北角海战涂装的沙恩真的是太帅了）
-            KM成员记得4月20日到9月30日期间佩戴白色的帽子哦
-            #军舰[话题]# #画画[话题]# #procreate[话题]# #德军[话题]# #海军[话题]#
-          EOS
+          dtext_artist_commentary_title: "妈妈的伞☂️",
+          dtext_artist_commentary_desc: "\"#绘画\":[https://www.xiaohongshu.com/search_result?keyword=绘画] \"#明日方舟\":[https://www.xiaohongshu.com/search_result?keyword=明日方舟] \"#铃兰\":[https://www.xiaohongshu.com/search_result?keyword=铃兰] \"#忍冬\":[https://www.xiaohongshu.com/search_result?keyword=忍冬]"
+        )
+      end
+
+      context "A post with user id in url" do
+        strategy_should_work(
+          "https://www.xiaohongshu.com/user/profile/5af06707db2e600283b2ffd3/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqACnVpHeS-InXHcQ2BeoLJKfU=&xsec_source=pc_user",
+          image_urls: %w[
+            https://ci.xiaohongshu.com/1040g2sg31aqeccv4mo704a54lgjgfvujhe954v8
+            https://ci.xiaohongshu.com/1040g2sg31aqeccv4mo7g4a54lgjgfvujfhua5oo
+            https://ci.xiaohongshu.com/1040g2sg31aqeccv4mo804a54lgjgfvuj16g2iho
+          ],
+          media_files: [
+            { file_size: 1_427_202 },
+            { file_size: 699_830 },
+            { file_size: 844_990 }
+          ],
+          page_url: "https://www.xiaohongshu.com/user/profile/5af06707db2e600283b2ffd3/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqACnVpHeS-InXHcQ2BeoLJKfU=",
+          profile_urls: %w[https://www.xiaohongshu.com/user/profile/5af06707db2e600283b2ffd3],
+          display_name: "撸卜🥕",
+          username: nil,
+          tags: [
+            ["绘画", "https://www.xiaohongshu.com/search_result?keyword=绘画"],
+            ["明日方舟", "https://www.xiaohongshu.com/search_result?keyword=明日方舟"],
+            ["铃兰", "https://www.xiaohongshu.com/search_result?keyword=铃兰"],
+            ["忍冬", "https://www.xiaohongshu.com/search_result?keyword=忍冬"],
+          ],
+          dtext_artist_commentary_title: "妈妈的伞☂️",
+          dtext_artist_commentary_desc: "\"#绘画\":[https://www.xiaohongshu.com/search_result?keyword=绘画] \"#明日方舟\":[https://www.xiaohongshu.com/search_result?keyword=明日方舟] \"#铃兰\":[https://www.xiaohongshu.com/search_result?keyword=铃兰] \"#忍冬\":[https://www.xiaohongshu.com/search_result?keyword=忍冬]"
         )
       end
 
       context "A post with /spectrum/ image URLs" do
         strategy_should_work(
-          "https://www.xiaohongshu.com/explore/650293e4000000001e022308",
+          "https://www.xiaohongshu.com/explore/676692a9000000000b022e4d?xsec_token=ABp9YCBRRqv5v30dlFfxzHw8HBaoViPhFHlY2eTE035AM=",
           image_urls: %w[
-            https://ci.xiaohongshu.com/spectrum/1040g0k030p06mpo4k0005ovbk4n9t3fq5ms4iu0
-            https://ci.xiaohongshu.com/spectrum/1040g0k030p06mpkdju005ovbk4n9t3fqveguc70
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5gcag8005o752t9g90v028pbu80
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c005o752t9g90v0ah6ctv0
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c0g5o752t9g90v0r22nlj0
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c105o752t9g90v0lp9ibqg
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c1g5o752t9g90v0uc58cj0
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c205o752t9g90v02hsbnk8
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c2g5o752t9g90v0ff1s0s0
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c305o752t9g90v0ke7vp40
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c3g5o752t9g90v00g8uka8
+            https://ci.xiaohongshu.com/spectrum/1040g0k031blr5mbl0c405o752t9g90v03m2llno
           ],
           media_files: [
-            { file_size: 1_164_038 },
-            { file_size: 930_250 },
+            { file_size: 2_432_700 },
+            { file_size: 1_543_097 },
+            { file_size: 1_475_318 },
+            { file_size: 1_552_256 },
+            { file_size: 1_485_541 },
+            { file_size: 1_512_886 },
+            { file_size: 1_348_828 },
+            { file_size: 1_531_060 },
+            { file_size: 1_523_305 },
+            { file_size: 1_613_587 }
           ],
-          page_url: "https://www.xiaohongshu.com/explore/650293e4000000001e022308",
-          profile_url: "https://www.xiaohongshu.com/user/profile/63eba12e0000000027028dfa",
-          profile_urls: %w[https://www.xiaohongshu.com/user/profile/63eba12e0000000027028dfa],
-          display_name: "三水吉吉",
+          page_url: "https://www.xiaohongshu.com/explore/676692a9000000000b022e4d?xsec_token=ABp9YCBRRqv5v30dlFfxzHw8HBaoViPhFHlY2eTE035AM=",
+          profile_urls: %w[https://www.xiaohongshu.com/user/profile/60e5175300000000010083e0],
+          display_name: "面包棍棍",
           username: nil,
           tags: [
-            ["绘画", "https://www.xiaohongshu.com/search_result/?keyword=绘画"],
-            ["私人稿件禁止使用", "https://www.xiaohongshu.com/search_result/?keyword=私人稿件禁止使用"],
-            ["立绘", "https://www.xiaohongshu.com/search_result/?keyword=立绘"],
+            ["明日方舟", "https://www.xiaohongshu.com/search_result?keyword=明日方舟"],
+            ["搬空罗德岛食堂", "https://www.xiaohongshu.com/search_result?keyword=搬空罗德岛食堂"],
+            ["comike105", "https://www.xiaohongshu.com/search_result?keyword=comike105"],
+            ["cpgz07", "https://www.xiaohongshu.com/search_result?keyword=cpgz07"],
           ],
-          dtext_artist_commentary_title: "一对立绘",
+          dtext_artist_commentary_title: "搬空食堂DLC全收录🍽",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            最近画图动力大大up，真的很努力在稿了！！ #绘画[话题]# #私人稿件禁止使用[话题]# #立绘[话题]#
-            ps：暂不接稿~
+            做完了两年的企划怎么不算是2023-2024小结呢……挺能画啊我自己！（叉会腰）
+
+            整理了本DLC插图全收录的48P小图册，会参加年底的冬コミ（C105），如果有去CM的朋友欢迎来東7/U39b找我玩——！
+            国内的话，因为还有食品补充和收纳盒的部分待制作所以会稍晚一点，预计首发会是明年二月广州CPG07，已火速申摊香菇莫辜负🙏
+            "#明日方舟":[https://www.xiaohongshu.com/search_result?keyword=明日方舟] "#搬空罗德岛食堂":[https://www.xiaohongshu.com/search_result?keyword=搬空罗德岛食堂] "#comike105":[https://www.xiaohongshu.com/search_result?keyword=comike105] "#cpgz07":[https://www.xiaohongshu.com/search_result?keyword=cpgz07]
           EOS
         )
       end
 
       context "A video post" do
         strategy_should_work(
-          "https://www.xiaohongshu.com/explore/662cb841000000000d030cbd",
-          image_urls: %w[https://sns-video-bd.xhscdn.com/pre_post/1040g2t03123bm2b13q6g5o56b7k085i9gkig2ho],
-          media_files: [{ file_size: 31_213_453 }],
-          page_url: "https://www.xiaohongshu.com/explore/662cb841000000000d030cbd",
-          profile_url: "https://www.xiaohongshu.com/user/profile/60a659e80000000001001649",
-          profile_urls: %w[https://www.xiaohongshu.com/user/profile/60a659e80000000001001649],
-          display_name: "白歌",
+          "https://www.xiaohongshu.com/explore/6789d20f000000001d011d4b?xsec_token=ABYRoRr3DGE29GWtiam4UBANcw79-RNRRc1VdpIJVdz1A=",
+          image_urls: %w[https://sns-video-bd.xhscdn.com/spectrum/1040g0jg31co8l51912005nrar8808fbnkchvk1o],
+          media_files: [{ file_size: 21_449_849 }],
+          page_url: "https://www.xiaohongshu.com/explore/6789d20f000000001d011d4b?xsec_token=ABYRoRr3DGE29GWtiam4UBANcw79-RNRRc1VdpIJVdz1A=",
+          profile_urls: %w[https://www.xiaohongshu.com/user/profile/5f6ada100000000001003d77],
+          display_name: "✨Rocky",
           username: nil,
           tags: [
-            ["崩坏星穹铁道创作者激励计划", "https://www.xiaohongshu.com/search_result/?keyword=崩坏星穹铁道创作者激励计划"],
-            ["崩坏星穹铁道", "https://www.xiaohongshu.com/search_result/?keyword=崩坏星穹铁道"],
-            ["星穹铁道生日会", "https://www.xiaohongshu.com/search_result/?keyword=星穹铁道生日会"],
-            ["开拓时间到", "https://www.xiaohongshu.com/search_result/?keyword=开拓时间到"],
+            ["锈湖", "https://www.xiaohongshu.com/search_result?keyword=锈湖"],
+            ["锈湖系列", "https://www.xiaohongshu.com/search_result?keyword=锈湖系列"],
+            ["锈湖天堂岛", "https://www.xiaohongshu.com/search_result?keyword=锈湖天堂岛"],
+            ["锈湖旅馆", "https://www.xiaohongshu.com/search_result?keyword=锈湖旅馆"],
+            ["同人", "https://www.xiaohongshu.com/search_result?keyword=同人"],
+            ["锈湖同人", "https://www.xiaohongshu.com/search_result?keyword=锈湖同人"],
+            ["rustylake", "https://www.xiaohongshu.com/search_result?keyword=rustylake"],
+            ["fanart", "https://www.xiaohongshu.com/search_result?keyword=fanart"],
+            ["插画", "https://www.xiaohongshu.com/search_result?keyword=插画"],
+            ["二创", "https://www.xiaohongshu.com/search_result?keyword=二创"],
           ],
-          dtext_artist_commentary_title: "第一次看到砂金输的这么惨，青雀深藏不露啊",
+          dtext_artist_commentary_title: "◾️没有伟大的牺牲，就没有锈湖。",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            第一次看到砂金输的这么惨，青雀深藏不露啊#崩坏星穹铁道创作者激励计划[话题]# #崩坏星穹铁道[话题]# #星穹铁道生日会[话题]# #开拓时间到[话题]#
+            血色将至🩸There will be blood.
+            🥲本来想做隐藏图的但是后面尝试发现只能做饱和度非常低的版本，效果很差，所以放弃啦~
+            "#锈湖":[https://www.xiaohongshu.com/search_result?keyword=锈湖] "#锈湖系列":[https://www.xiaohongshu.com/search_result?keyword=锈湖系列] "#锈湖天堂岛":[https://www.xiaohongshu.com/search_result?keyword=锈湖天堂岛] "#锈湖旅馆":[https://www.xiaohongshu.com/search_result?keyword=锈湖旅馆] "#同人":[https://www.xiaohongshu.com/search_result?keyword=同人] "#锈湖同人":[https://www.xiaohongshu.com/search_result?keyword=锈湖同人] "#rustylake":[https://www.xiaohongshu.com/search_result?keyword=rustylake] "#fanart":[https://www.xiaohongshu.com/search_result?keyword=fanart] "#插画":[https://www.xiaohongshu.com/search_result?keyword=插画] "#二创":[https://www.xiaohongshu.com/search_result?keyword=二创]
+          EOS
+        )
+      end
+
+      context "A mixed post with videos and images" do
+        strategy_should_work(
+          "https://www.xiaohongshu.com/explore/67a396a7000000002503cbd3?xsec_token=CBRIrPInWF5UjSI0_h4-v2v6nT1TXLzRXVwp_ng-vPOLQ=",
+          image_urls: %w[
+            https://ci.xiaohongshu.com/1040g00831dhec8sn16005ps3g6f23fi49d2j5ao
+            https://ci.xiaohongshu.com/1040g00831dhec8sn160g5ps3g6f23fi4fohe6vo
+            http://sns-video-ak.xhscdn.com/stream/1/10/19/01e7a396a34b27470100500394d7049ff0_19.mp4
+          ],
+          media_files: [
+            { file_size: 627_574 },
+            { file_size: 294_766 },
+            { file_size: 867_997 }
+          ],
+          page_url: "https://www.xiaohongshu.com/explore/67a396a7000000002503cbd3?xsec_token=CBRIrPInWF5UjSI0_h4-v2v6nT1TXLzRXVwp_ng-vPOLQ=",
+          profile_urls: %w[https://www.xiaohongshu.com/user/profile/6783819e000000000801be44],
+          display_name: "梦游蝴蝶的日常",
+          username: nil,
+          tags: [
+            ["Mbti", "https://www.xiaohongshu.com/search_result?keyword=Mbti"],
+            ["infp", "https://www.xiaohongshu.com/search_result?keyword=infp"],
+            ["小蝴蝶", "https://www.xiaohongshu.com/search_result?keyword=小蝴蝶"],
+            ["生日快乐", "https://www.xiaohongshu.com/search_result?keyword=生日快乐"],
+            ["mbti16人格", "https://www.xiaohongshu.com/search_result?keyword=mbti16人格"],
+          ],
+          dtext_artist_commentary_title: "小蝴蝶| 你会给玩偶过生日吗？",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            "#Mbti":[https://www.xiaohongshu.com/search_result?keyword=Mbti] "#infp":[https://www.xiaohongshu.com/search_result?keyword=infp] "#小蝴蝶":[https://www.xiaohongshu.com/search_result?keyword=小蝴蝶] "#生日快乐":[https://www.xiaohongshu.com/search_result?keyword=生日快乐]
+
+            很喜欢史迪仔，陪伴了七八年的玩偶，会抱着他说很多很多话。于是在没有人关心的夜晚，买了一个小蛋糕，拉上窗帘，大声歌唱，郑重其事给我的玩偶朋友过了生日。
+
+            这种事情从5岁的我发生到25岁的我，可能只有善良温暖的INFP会一以贯之吧。
+
+            "#mbti16人格":[https://www.xiaohongshu.com/search_result?keyword=mbti16人格]
+            封面来自：九言绘一
           EOS
         )
       end

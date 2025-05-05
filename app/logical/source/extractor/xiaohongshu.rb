@@ -14,10 +14,19 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
       video_url = "https://sns-video-bd.xhscdn.com/#{key}" if key.present?
       [video_url].compact
     else
-      note["imageList"].to_a.pluck("urlDefault").map do |url|
-        Source::URL.parse(url).try(:full_image_url) || url
+      note["imageList"].to_a.flat_map do |image|
+        if image["stream"].present?
+          image.dig(:stream, :h264).to_a.pluck("masterUrl")
+        else
+          url = image["urlDefault"]
+          Source::URL.parse(url).try(:full_image_url) || url
+        end
       end
     end
+  end
+
+  def page_url
+    parsed_url.page_url || parsed_referer&.page_url
   end
 
   def profile_url
@@ -30,20 +39,29 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
 
   def tags
     note["tagList"].to_a.pluck("name").map do |tag|
-      [tag, "https://www.xiaohongshu.com/search_result/?keyword=#{Danbooru::URL.escape(tag)}"]
+      [tag, "https://www.xiaohongshu.com/search_result?keyword=#{Danbooru::URL.escape(tag)}"]
     end
   end
 
   def artist_commentary_title
-    note["title"]
+    page&.at('#detail-title')&.text&.strip
   end
 
   def artist_commentary_desc
-    note["desc"]
+    page&.at('#detail-desc')&.to_html&.gsub("\n", "<br>")
   end
 
   def dtext_artist_commentary_desc
-    DText.from_plaintext(artist_commentary_desc)
+    DText.from_html(artist_commentary_desc, base_url: "https://www.xiaohongshu.com") do |element|
+      case element.name
+      in "a" if element.classes.include?("tag")
+        href = CGI.unescape(element[:href].to_s)  # double-encoded
+        tag = Addressable::URI.parse(href).query_values["keyword"].to_s
+        element[:href] = "https://www.xiaohongshu.com/search_result?keyword=#{Danbooru::URL.escape(tag)}" if tag.present?
+      else
+        nil
+      end
+    end&.strip
   end
 
   def post_id
