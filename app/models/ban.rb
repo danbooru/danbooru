@@ -141,7 +141,7 @@ class Ban < ApplicationRecord
             post.update!(tag_string: "#{post.tag_string} #{post_deletion_tags}".strip)
           end
         end
-        post.ai_metadata.update!(prompt: "", negative_prompt: "", parameters: {}, updater: banner) if post_deletion_metadata_nuke
+        post&.ai_metadata.update!(prompt: "", negative_prompt: "", parameters: {}, updater: banner) if post_deletion_metadata_nuke
         post.delete!(post_deletion_reason)
       end
     end
