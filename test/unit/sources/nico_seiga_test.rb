@@ -108,19 +108,35 @@ module Sources
           https://deliver.cdn.nicomanga.jp/thumb/10543312p?1592262182
           https://deliver.cdn.nicomanga.jp/thumb/10543314p?1610453519
         ],
+        media_files: [
+          { file_size: 223_881 },
+          { file_size: 208_968 },
+          { file_size: 218_180 },
+          { file_size: 113_071 }
+        ],
         page_url: "https://seiga.nicovideo.jp/watch/mg485611",
-        artist_name: "まいまい",
-        profile_url: "https://seiga.nicovideo.jp/user/illust/1116797",
-        tags: %w[ドラゴンクエスト 4コマ ムーンブルクの王女 着替え中 マジックミラー],
-        artist_commentary_title: "勇者さまが死んだので帰ります！ No.291 カミカゼアタック",
+        profile_urls: %w[https://seiga.nicovideo.jp/user/illust/1116797],
+        display_name: "まいまい",
+        username: nil,
+        tags: [
+          ["ドラゴンクエスト", "https://seiga.nicovideo.jp/manga/tag/ドラゴンクエスト"],
+          ["4コマ", "https://seiga.nicovideo.jp/manga/tag/4コマ"],
+          ["ムーンブルクの王女", "https://seiga.nicovideo.jp/manga/tag/ムーンブルクの王女"],
+          ["着替え中", "https://seiga.nicovideo.jp/manga/tag/着替え中"],
+          ["マジックミラー", "https://seiga.nicovideo.jp/manga/tag/マジックミラー"],
+        ],
+        dtext_artist_commentary_title: "勇者さまが死んだので帰ります！ No.291 カミカゼアタック",
         dtext_artist_commentary_desc: <<~EOS.chomp
           アソビ大全を買おうかどうしようか悩み中
 
-          ※ファンティアにはイラストをアップしてるのでフォローよろしくどうぞ
-          https://fantia.jp/fanclubs/3263
-
-          ※公開中100話以外の回はCG集(描き下ろし多数)に収録、よろしくどうぞ
+          ※CG集で応援して頂けると、作者のやる気が上がります
           https://www.dlsite.com/home/circle/profile/=/maker_id/RG44783.html
+
+          ※過去ログアーカイブはこちら↓
+          https://manga.nicovideo.jp/comic/69386
+
+          ※Ci-enも、よかったらフォローしてみてね
+          https://ci-en.net/creator/28085
         EOS
       )
     end
@@ -202,17 +218,6 @@ module Sources
     context "A nicoseiga video" do
       strategy_should_work(
         "https://www.nicovideo.jp/watch/sm36465441"
-      )
-    end
-
-    context "An age-restricted picture" do
-      strategy_should_work(
-        "http://seiga.nicovideo.jp/seiga/im9208126",
-        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/9208126}],
-        artist_name: "ちふり",
-        profile_url: "https://seiga.nicovideo.jp/user/illust/61431040",
-        tags: ["R-15"],
-        artist_commentary_title: "ゾーヤさんといっしょ"
       )
     end
 

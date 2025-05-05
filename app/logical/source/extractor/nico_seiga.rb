@@ -118,11 +118,18 @@ module Source
       end
 
       def http
+        http = super
+
         if parsed_url.oekaki_id.present?
-          super.with_legacy_ssl.cookies(skip_fetish_warning: "1", user_session: Danbooru.config.nico_seiga_user_session)
-        else
-          super.cookies(skip_fetish_warning: "1", user_session: Danbooru.config.nico_seiga_user_session)
+          http = super.with_legacy_ssl
         end
+
+        http.cookies(
+          skip_fetish_warning: "1",
+          user_session: Danbooru.config.nico_seiga_user_session,
+        ).headers(
+          "User-Agent": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/W.X.Y.Z Safari/537.36",
+        )
       end
 
       memoize def api_response
