@@ -37,9 +37,11 @@ module Source
       end
 
       def profile_url
-        url = "https://arca.live/u/@#{artist_name}"
-        url += "/#{artist_id}" if artist_id.present?
-        url
+        if username.present? && artist_id.present?
+          "https://arca.live/u/@#{username}/#{artist_id}"
+        elsif username.present?
+          "https://arca.live/u/@#{username}"
+        end
       end
 
       def page_url
@@ -48,7 +50,7 @@ module Source
         "https://arca.live/b/#{channel}/#{post_id}" if channel.present? && post_id.present?
       end
 
-      def artist_name
+      def username
         api_response.dig("nickname")
       end
 
