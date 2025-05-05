@@ -21,11 +21,7 @@ class Source::URL::ArcaLive < Source::URL
     # https://ac-o.namu.la/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9.gif?type=orig
     # https://ac.namu.la/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9.mp4 (.gif sample)
     in _, "namu.la", date, /\A\h{64}/
-      if file_ext == "mp4"
-        @full_image_url = "#{site}/#{date}/#{filename}.gif?type=orig"
-      else
-        @full_image_url = "#{site}/#{date}/#{filename}.#{file_ext}?type=orig"
-      end
+      @full_image_url = "#{site}/#{date}/#{filename}.#{file_ext}?type=orig"
 
     # https://arca.live/b/arknights/66031722
     in _, "arca.live", "b", channel, post_id
