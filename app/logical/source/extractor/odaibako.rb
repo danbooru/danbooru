@@ -43,12 +43,12 @@ class Source::Extractor::Odaibako < Source::Extractor
   end
 
   def odai_id
-    href = page&.css("main > section:nth-child(1) > div > div:nth-child(2) > a")&.attr("href")
+    href = page&.css("main > section:nth-child(1) > div > div > div:nth-child(3) > a[href^='/odais/']")&.attr("href")
     Source::URL.parse(URI.join("https://odaibako.net/", href)).odai_id if href.present?
   end
 
   def artist_request
-    page&.css("main > section:nth-child(1) > div > div:nth-child(1)")&.inner_html&.strip
+    page&.css("main > section:nth-child(1) > div > div:nth-child(1) > div:nth-child(2)")&.inner_html&.strip
   end
 
   def artist_response
