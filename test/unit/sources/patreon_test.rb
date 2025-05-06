@@ -9,7 +9,7 @@ module Sources
         strategy_should_work(
           "https://c10.patreonusercontent.com/4/patreon-media/p/post/71057815/d48874de48aa49f7878d32144de631fc/eyJ3Ijo2MjB9/1.jpg?token-time=1668384000&token-hash=9ORWv7LJBzmvzmHTi_xGFQ47Uis9fNzTPp2WweThDj4%3D",
           image_urls: [%r{https://c10.patreonusercontent.com/4/patreon-media/p/post/71057815/d48874de48aa49f7878d32144de631fc/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg}],
-          media_files: [{ file_size: 184_501 }],
+          media_files: [{ file_size: 449_004 }],
           page_url: "https://www.patreon.com/posts/71057815",
           profile_url: "https://www.patreon.com/1041uuu",
           profile_urls: %w[https://www.patreon.com/1041uuu https://www.patreon.com/user?u=4045578],
@@ -45,7 +45,7 @@ module Sources
         strategy_should_work(
           "https://www.patreon.com/posts/free-post-12497641",
           image_urls: [%r{https://c10.patreonusercontent.com/4/patreon-media/p/post/12497641/3d99f5f5b635428ca237fedf0f223f1a/eyJhIjoxLCJwIjoxfQ%3D%3D/1.JPG}],
-          media_files: [{ file_size: 405_509 }],
+          media_files: [{ file_size: 831_091 }],
           page_url: "https://www.patreon.com/posts/free-post-12497641",
           profile_url: "https://www.patreon.com/Reedandweep",
           profile_urls: %w[https://www.patreon.com/Reedandweep https://www.patreon.com/user?u=3204144],
@@ -172,8 +172,8 @@ module Sources
           ],
           media_files: [
             { file_size: 536_985 },
-            { file_size: 1_540_435 },
-            { file_size: 2_832_749 },
+            { file_size: 819_289 },
+            { file_size: 2_558_103 },
             { file_size: 1_037_050 },
           ],
           page_url: "https://www.patreon.com/posts/56127163",
