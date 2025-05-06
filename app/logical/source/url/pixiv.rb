@@ -49,6 +49,7 @@ module Source
       # http://i2.pixiv.net/img18/img/evazion/14901720_s.png
       # http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png
       # http://i1.pixiv.net/img53/img/themare/39735353_big_p1.jpg
+      # http://img25.pixiv.net/img/master4th/16024681
       in *, "img", username, file if image_url?
         parse_filename
         @username = username
@@ -127,7 +128,7 @@ module Source
     end
 
     def parse_filename
-      case filename.split("_")
+      case filename&.split("_").to_a
 
       # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
       # https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg

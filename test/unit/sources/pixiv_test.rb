@@ -624,6 +624,10 @@ module Sources
           assert_illust_id(nil, "https://www.pixiv.net/member_illust.php")
           assert_illust_id(64476642, "https://www.pixiv.net/member_illust.php?illust_id=64476642&mode=medium")
         end
+
+        should "not misparse broken image urls" do
+          assert_illust_id(nil, "http://img25.pixiv.net/img/master4th/16024681")
+        end
       end
     end
 
