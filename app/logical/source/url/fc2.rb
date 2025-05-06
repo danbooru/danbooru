@@ -173,10 +173,11 @@ class Source::URL::Fc2 < Source::URL
     # http://xkilikox.fc2web.com
     # http://yappaga.fc2web.com/gallery.html (404: http://yappaga.fc2web.com)
     # http://naokimk2.fc2web.com/HP2/TOP.html (404: http://naokimk2.fc2web.com)
+    # http://oss4224.web.fc2.com/こ
     #
     # http://xkilikox.fc2web.com/image/haguruma.html (XXX: should be page url, not a profile url)
     elsif (subsite.in?(%w[bbs web h x]) || domain == "fc2web.com") && !image_url?
-      URI.join("http://#{host}", path).to_s.chomp("/")
+      Addressable::URI.join("http://#{host}", path).to_s.chomp("/")
 
     # http://rxsdm.h.fc2.com/f/061201_2.jpg
     # http://xkilikox.fc2web.com/image/haguruma00.jpg
