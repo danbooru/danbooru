@@ -367,6 +367,9 @@ module Sources
       assert(Source::URL.profile_url?("https://space.bilibili.com/355143"))
 
       assert_not(Source::URL.profile_url?("https://space.bilibili.com"))
+
+      assert_nil(Source::URL.bad_source?("https://live.bilibili.com/blackboard/era/VSuE0f27CnXe3VSY.html"))
+      assert_nil(Source::URL.bad_source?("https://live.bilibili.com/10049889?from=search&seid=8525275464641122982"))
     end
   end
 end

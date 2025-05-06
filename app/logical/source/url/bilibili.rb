@@ -12,7 +12,7 @@ module Source
       attr_reader :file, :t_work_id, :h_work_id, :video_id, :article_id, :artist_id
 
       def self.match?(url)
-        url.domain.in?(%w[bilibili.com biliimg.com hdslb.com])
+        url.domain.in?(%w[bilibili.com biliimg.com hdslb.com]) && url.host != "live.bilibili.com"
       end
 
       def parse
@@ -80,6 +80,10 @@ module Source
         in ("www" | "m" | ""), ("bilibili.com" | "bilibili.tv"), "s", "video", video_id
           @video_id = video_id
 
+        # https://live.bilibili.com/10049889?from=search&seid=8525275464641122982
+        # https://live.bilibili.com/blackboard/era/VSuE0f27CnXe3VSY.html
+        # https://live.bilibili.com/blackboard/activity-lAFdFMqMOQ.html
+        # https://live.bilibili.com/activity/qixi-festival-2020-pc/index.html#/battle
         # https://i0.hdslb.com/bfs/article/card/1-1card416202622_web.png
         else
           nil
