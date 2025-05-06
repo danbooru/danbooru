@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ForumPost < ApplicationRecord
-  MAX_IMAGES = 1
+  MAX_IMAGES = 5
   MAX_VIDEO_SIZE = 1.megabyte
   MAX_LARGE_EMOJI = 1
   MAX_SMALL_EMOJI = 100
