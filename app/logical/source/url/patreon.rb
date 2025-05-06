@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Patreon < Source::URL
-  RESERVED_USERNAMES = %w[api bePatron card-teaser-image collection checkout file home join
+  RESERVED_USERNAMES = %w[api bePatron c card-teaser-image collection checkout file home join
                           login m messages notifications policy posts profile search settings user]
 
   attr_reader :username, :user_id, :post_id, :attachment_id, :title, :media_hash, :media_params
@@ -39,12 +39,14 @@ class Source::URL::Patreon < Source::URL
     # https://www.patreon.com/checkout/1041uuu?rid=0
     # https://www.patreon.com/join/twistedgrim/checkout?rid=704013&redirect_uri=/posts/noi-dorohedoro-39394158
     # https://www.patreon.com/m/1041uuu/about
-    in _, "patreon.com", ("checkout" | "join" | "m"), username, *rest unless username.in?(RESERVED_USERNAMES)
+    # https://www.patreon.com/c/yaisirdrawz
+    in _, "patreon.com", ("checkout" | "join" | "m" | "c"), username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username
 
     # https://www.patreon.com/bePatron?u=4045578
     # https://www.patreon.com/user?u=5993691
     # https://www.patreon.com/user/posts?u=84592583
+    # https://www.patreon.com/profile/creators?u=32306860
     in _, "patreon.com", *rest if params[:u].present?
       @user_id = params[:u]
 
