@@ -73,8 +73,6 @@ class Source::URL::Null < Source::URL
       "Eth.co"
     in _, "exblog.jp"
       "Excite Blog"
-    in _, ("facebook.com" | "fb.com" | "fbcdn.net")
-      "Facebook"
     in _, "fanfiction.net"
       "FanFiction.Net"
     in _, "finalfantasyxiv.com"
@@ -389,30 +387,6 @@ class Source::URL::Null < Source::URL
     # https://www.etsy.com/shop/yeurei
     in _, "etsy.com", *rest
       nil
-
-    # https://scontent.fmnl9-2.fna.fbcdn.net/v/t1.6435-9/196345051_961754654392125_8855002558147907833_n.jpg?_nc_cat=103&ccb=1-5&_nc_sid=0debeb&_nc_ohc=EB1RGiEOtyEAX9XE7aL&_nc_ht=scontent.fmnl9-2.fna&oh=00_AT8NNz_keqQ6VJeC1UVSMULhjaP3iykm-ONSMR7IrtarUQ&oe=6257862E
-    # https://scontent.fmnl8-2.fna.fbcdn.net/v/t1.6435-9/fr/cp0/e15/q65/80900683_480934615898749_6481759463945535488_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=8024bb&_nc_ohc=cCYFUzyHDmUAX-YHJIw&_nc_ht=scontent.fmnl8-2.fna&oh=e45c3837afcfefb6a4d93adfecef88c1&oe=60F6E392
-    # https://scontent.fmnl13-1.fna.fbcdn.net/v/t31.18172-8/22861751_1362164640578443_432921612329393062_o.jpg
-    # https://scontent-sin1-1.xx.fbcdn.net/hphotos-xlp1/t31.0-8/s960x960/12971037_586686358150819_495608200196301072_o.jpg
-    in _, "fbcdn.net", *subdirs, /^\d+_(\d+)_(?:\d+_){1,3}[no]\.(jpg|png)$/
-      @work_id = $1
-      @page_url = "https://www.facebook.com/photo?fbid=#{@work_id}"
-
-    # https://www.facebook.com/sinyu.tang.9
-    # https://fb.com/sinyu.tang.9
-    in _, ("facebook.com" | "fb.com"), username
-      @username = username
-      @profile_url = "https://www.facebook.com/#{username}"
-
-    # https://www.facebook.com/sinyu.tang.9/posts/pfbid032uCXimgsnuYgJMK2WvvYHb3WZ1gd5PjBCdkXrKVM91nTzPHeQ4CLGPqGBsqvQ9q1l
-    in _, ("facebook.com" | "fb.com" | "fbcdn.net"), *rest
-      nil
-
-    # https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-xlp1/t31.0-8/s960x960/13173066_623015164516858_1844421675339995359_o.jpg
-    # https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-xpf1/v/t1.0-9/s720x720/12032214_991569624217563_4908408819297057893_n.png?oh=efe6ea26aed89c8a12ddc1832b1f0157&oe=5667D5B1&__gda__=1453845772_c742c726735047f2feb836b845ff296f
-    in /fbcdn/, "akamaihd.net", *subdirs, /^\d_(\d+)_(?:\d+_){1,3}[no]\.(jpg|png)$/
-      @work_id = $1
-      @page_url = "https://www.facebook.com/photo.php?fbid=#{work_id}"
 
     # https://www.flickr.com/people/shirasaki408/
     # https://www.flickr.com/photos/shirasaki408/
