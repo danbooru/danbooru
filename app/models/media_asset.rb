@@ -568,6 +568,10 @@ class MediaAsset < ApplicationRecord
     def pretty_ai_rating
       Post::RATINGS.fetch(ai_rating.first)
     end
+
+    def is_ai_nsfw?
+      ai_rating.first.in?(%w[q e])
+    end
   end
 
   def source_urls

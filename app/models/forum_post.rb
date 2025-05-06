@@ -119,12 +119,12 @@ class ForumPost < ApplicationRecord
       errors.add(:base, "Can't include videos larger than #{MAX_VIDEO_SIZE.to_fs(:human_size)}")
     end
 
-    if dtext_body.embedded_posts.any? { |embedded_post| embedded_post.rating != "g" }
-      errors.add(:base, "Can't post non-rating:G images")
+    if dtext_body.embedded_posts.any? { |embedded_post| embedded_post.is_nsfw? }
+      errors.add(:base, "Can't post NSFW images")
     end
 
-    if dtext_body.embedded_media_assets.any? { |embedded_asset| embedded_asset.ai_rating.first.in?(%w[q e]) }
-      errors.add(:base, "Can't post non-rating:G images")
+    if dtext_body.embedded_media_assets.any? { |embedded_asset| embedded_asset.is_ai_nsfw? }
+      errors.add(:base, "Can't post NSFW images")
     end
   end
 

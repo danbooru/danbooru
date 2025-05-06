@@ -101,7 +101,7 @@ class Comment < ApplicationRecord
       errors.add(:base, "Can't post a #{embedded_post.pretty_rating.downcase} image on a #{post.pretty_rating.downcase} post")
     end
 
-    if (embedded_asset = dtext_body.embedded_media_assets.find { |embedded_asset| embedded_asset.ai_rating_id > post.rating_id })
+    if (embedded_asset = dtext_body.embedded_media_assets.find { |embedded_asset| embedded_asset.ai_rating_id > post.rating_id && embedded_asset.is_ai_nsfw? })
       errors.add(:base, "Can't post a #{embedded_asset.pretty_ai_rating.downcase} image on a #{post.pretty_rating.downcase} post")
     end
   end

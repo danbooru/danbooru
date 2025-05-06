@@ -327,6 +327,10 @@ class Post < ApplicationRecord
       RATINGS.fetch(rating)
     end
 
+    def is_nsfw?
+      rating.in?(%w[q e])
+    end
+
     def parsed_source
       Source::URL.parse(source) if web_source?
     end
