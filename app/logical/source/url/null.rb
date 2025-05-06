@@ -536,10 +536,6 @@ class Source::URL::Null < Source::URL
       @work_id = work_id
       @page_url = "http://nijigen-daiaru.com/book.php?idb=#{@work_id}"
 
-    # https://odaibako.net/u/NLO74593630
-    in _, "odaibako.net", *rest
-      nil
-
     # https://onlyfans.com/evviart
     in _, "onlyfans.com", *rest
       nil
