@@ -36,7 +36,7 @@ module Sources
         tags: %w[],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          "BV1fB4y1Y7zt":[https://www.bilibili.com/video/av598699440] 新视频的图片分享！大家记得来康"[崩坏3_送你一朵花]":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
+          "【崩坏3】少女，泳装，夏日时光！":[https://www.bilibili.com/video/BV1fB4y1Y7zt/] 新视频的图片分享！大家记得来康"[崩坏3_送你一朵花]":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
         EOS
       )
     end
@@ -64,12 +64,12 @@ module Sources
         tags: %w[],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          "BV1fB4y1Y7zt":[https://www.bilibili.com/video/av598699440] 新视频的图片分享！大家记得来康"[崩坏3_送你一朵花]":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
+          "【崩坏3】少女，泳装，夏日时光！":[https://www.bilibili.com/video/BV1fB4y1Y7zt/] 新视频的图片分享！大家记得来康"[崩坏3_送你一朵花]":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
         EOS
       )
     end
 
-    context "A t.bilibili.com:id repost" do
+    context "A t.bilibili.com/:id repost" do
       strategy_should_work(
         "https://t.bilibili.com/723052706467414039?spm_id_from=333.999.0.0",
         image_urls: %w[
@@ -162,8 +162,8 @@ module Sources
         page_url: "https://www.bilibili.com/opus/428178320677065986",
         profile_url: "https://space.bilibili.com/285452636",
         profile_urls: %w[https://space.bilibili.com/285452636],
-        display_name: "时光印记2016",
-        other_names: ["时光印记2016"],
+        display_name: "花田里的碴",
+        other_names: ["花田里的碴"],
         tag_name: "bilibili_285452636",
         tags: [],
         dtext_artist_commentary_title: "斗罗大陆 4，觉醒后的古月娜（第一期）",
