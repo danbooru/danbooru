@@ -1592,6 +1592,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_search_error("a or limit:20")
       assert_search_error("a or random:20")
     end
+
+    should "allow duplicated one-use-only metatags" do
+      post = create(:post)
+
+      assert_tag_match([post], "order:score order:score")
+      assert_tag_match([post], "order:score ORDER:SCORE")
+      assert_tag_match([post], "limit:1 limit:1")
+      assert_tag_match([post], "random:1 random:1")
+    end
   end
 
   context "#fast_count" do
