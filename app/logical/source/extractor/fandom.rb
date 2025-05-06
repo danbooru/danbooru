@@ -46,8 +46,9 @@ class Source::Extractor::Fandom < Source::Extractor
 
   memoize def media_detail
     # curl "https://kancolle.fandom.com/wikia.php?controller=Lightbox&method=getMediaDetail&fileTitle=Mutsuki_Full_Damaged.png" | jq
+    # This API returns [] if the file doesn't exist.
     url = "#{wiki_url}/wikia.php?controller=Lightbox&method=getMediaDetail&fileTitle=#{Danbooru::URL.escape(file)}" if wiki_url.present? && file.present?
-    http.cache(1.minute).parsed_get(url) || {}
+    http.cache(1.minute).parsed_get(url).to_h
   end
 
   memoize def file_usage

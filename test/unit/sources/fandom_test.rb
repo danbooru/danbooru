@@ -118,6 +118,20 @@ module Sources
         )
       end
 
+      context "An invalid wiki file" do
+        strategy_should_work(
+          "https://sonic.fandom.com/wiki/File:Shadow_the_Hedgehog_2015.png https://static.wikia.nocookie.net/sonic/images/6/6c/Shadow_the_Hedgehog_2015.png",
+          image_urls: [],
+          page_url: "https://sonic.fandom.com/wiki/File:Shadow_the_Hedgehog_2015.png%2520https:%2Fstatic.wikia.nocookie.net%2Fsonic%2Fimages%2F6%2F6c%2FShadow_the_Hedgehog_2015.png",
+          profile_urls: %w[https://sonic.fandom.com],
+          display_name: nil,
+          username: nil,
+          tags: [],
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: ""
+        )
+      end
+
       should "convert fandom image urls to page urls" do
         assert_equal("https://valkyriecrusade.fandom.com/wiki/File:Crimson_Hatsune_H.png", Source::URL.page_url("https://vignette.wikia.nocookie.net/valkyriecrusade/images/c/c5/Crimson_Hatsune_H.png/revision/latest?cb=20180702031954"))
         assert_equal("https://ishtaria.fandom.com/wiki/File:Union-List.png", Source::URL.page_url("https://static.wikia.nocookie.net/age-of-ishtaria/images/f/f9/Union-List.png/revision/latest/scale-to-width-down/670?cb=20141219153314"))
