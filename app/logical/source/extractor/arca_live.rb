@@ -23,17 +23,14 @@ module Source
         url = element.attr("src")
         url = "https:#{url}" if url.starts_with?("//")
         url = Source::URL.parse(url)
-        url = url.try(:full_image_url)
-        return unless url.present?
 
-        url = Source::URL.parse(url)
-        ext = element.attr("data-orig")
-        unless ext.present?
-          gif_response = http.cache(1.minute).head(url.with(file_ext: "gif").to_s)
-          ext = "gif" if gif_response.status == 200
+        if url.full_image_url.present?
+          url.full_image_url
+        elsif url.candidate_full_image_urls.present? && element["data-orig"].present?
+          url.candidate_full_image_urls.find { |u| Source::URL.parse(u).file_ext == element["data-orig"] && http_exists?(u) } || url.to_s
+        else
+          url.candidate_full_image_urls.find { |u| http_exists?(u) } || url.to_s
         end
-        url = url.with(file_ext: ext) if ext.present?
-        url.try(:full_image_url)
       end
 
       def profile_url
