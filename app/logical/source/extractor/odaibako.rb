@@ -17,7 +17,7 @@ class Source::Extractor::Odaibako < Source::Extractor
   end
 
   def profile_url
-    "https://odaibako.net/u/#{username}"
+    "https://odaibako.net/u/#{username}" if username.present?
   end
 
   def page_url

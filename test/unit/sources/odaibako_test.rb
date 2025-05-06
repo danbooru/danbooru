@@ -90,21 +90,17 @@ module Sources
         )
       end
 
-      context "a request without the response" do
+      context "a deleted or nonexistent post" do
         strategy_should_work(
           "https://odaibako.net/odais/4d17c9a0-6125-4a5c-a6ed-243795e69516",
           image_urls: [],
           page_url: "https://odaibako.net/odais/4d17c9a0-6125-4a5c-a6ed-243795e69516",
-          profile_urls: %w[https://odaibako.net/u/bourgeon],
-          display_name: "bourgeon",
-          username: "bourgeon",
+          profile_urls: %w[],
+          display_name: nil,
+          username: nil,
           tags: [],
           dtext_artist_commentary_title: "",
-          dtext_artist_commentary_desc: <<~EOS.chomp
-            h6. Original Request
-
-            サトノダイヤモンドのビキニをお願いします
-          EOS
+          dtext_artist_commentary_desc: ""
         )
       end
 
