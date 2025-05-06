@@ -69,35 +69,18 @@ module Sources
       )
     end
 
-    context "A t.bilibili.com/:id repost" do
+    context "A t.bilibili.com/:id quote-post" do
       strategy_should_work(
         "https://t.bilibili.com/723052706467414039?spm_id_from=333.999.0.0",
-        image_urls: %w[
-          https://i0.hdslb.com/bfs/new_dyn/fd40435a0ff15d2eed45da7c0f890bdf15817819.jpg
-          https://i0.hdslb.com/bfs/new_dyn/1beb12760dc8790f7443515307225ad015817819.jpg
-          https://i0.hdslb.com/bfs/new_dyn/113aacf139984f808721f50883e908b815817819.jpg
-          https://i0.hdslb.com/bfs/new_dyn/ad1537c506b87ce2c30e19e4ef54204715817819.jpg
-          https://i0.hdslb.com/bfs/new_dyn/4a098d62f90d17bf516e3edded670d5e15817819.jpg
-          https://i0.hdslb.com/bfs/new_dyn/89397fe05083ee25879962afba60a70515817819.jpg
-        ],
-        media_files: [
-          { file_size: 164_886 },
-          { file_size: 268_756 },
-          { file_size: 238_327 },
-          { file_size: 155_331 },
-          { file_size: 192_652 },
-          { file_size: 422_392 },
-        ],
-        page_url: "https://www.bilibili.com/opus/722702993036673113",
-        profile_url: "https://space.bilibili.com/15817819",
-        profile_urls: %w[https://space.bilibili.com/15817819],
-        display_name: "星尘Official",
-        other_names: ["星尘Official"],
-        tag_name: "bilibili_15817819",
-        tags: %w[],
+        image_urls: [],
+        page_url: "https://t.bilibili.com/723052706467414039",
+        profile_urls: %w[https://space.bilibili.com/355143],
+        display_name: "原子Dan",
+        username: nil,
+        tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          "[星尘_比心]":[http://i0.hdslb.com/bfs/emote/fd8aa275d5d91cdf71410bc1a738415fd6e2ab86.png]
+          "[海伊_打call]":[http://i0.hdslb.com/bfs/emote/462e4aa7dba54497f3692ad445ff31c3c176474d.png]//"@海伊Official":[https://space.bilibili.com/277698869/dynamic]:平行四界作词课预计寒假开始，以下是大纲及介绍"[星尘_比心]":[http://i0.hdslb.com/bfs/emote/fd8aa275d5d91cdf71410bc1a738415fd6e2ab86.png]"[海伊_比心]":[http://i0.hdslb.com/bfs/emote/c548b527593a3d21e5082c26abbf61c63701f11a.png]
         EOS
       )
     end
