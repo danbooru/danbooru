@@ -1,0 +1,81 @@
+<%= render "secondary_links" %>
+
+<div id="c-site-credentials">
+  <div id="a-index">
+    <h1>Credentials</h1>
+
+    <%= table_for @site_credentials, class: "striped autofit" do |t| %>
+      <% t.column :site do |site_credential| %>
+        <%= site_credential.site %>
+
+        <span class="inline-flex flex-row gap-1">
+          <% if site_credential.is_enabled? %>
+            <span class="chip-green text-success text-xs px-2 rounded">Enabled</span>
+          <% else %>
+            <span class="chip-red text-error text-xs px-2 rounded">Disabled</span>
+          <% end %>
+
+          <% if site_credential.is_valid? %>
+            <span class="chip-green text-success text-xs px-2 rounded"><%= site_credential.status.humanize %></span>
+          <% elsif site_credential.is_unknown? %>
+            <span class="chip-yellow text-warning text-xs px-2 rounded"><%= site_credential.status.humanize %></span>
+          <% else %>
+            <span class="chip-red text-error text-xs px-2 rounded"><%= site_credential.status.humanize %></span>
+          <% end %>
+
+          <% if !site_credential.is_public? %>
+            <span class="chip-blue link-color text-xs px-2 rounded">Personal</span>
+          <% end %>
+        </span>
+      <% end %>
+
+      <% t.column :credential, td: { class: "col-expand" } do |site_credential| %>
+        <% site_credential.credential.each do |name, value| %>
+          <div>
+            <strong><%= name.humanize.titleize %></strong>
+            <span class="font-monospace break-all"><%= value %></span>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% t.column :metadata do |site_credential| %>
+        <% DanbooruLogger.flatten_hash(site_credential.metadata).each do |name, value| %>
+          <div class="break-words">
+            <h6><%= name.humanize.titleize %></h6>
+            <div><%= value %></div>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% t.column :status do |site_credential| %>
+        <% if site_credential.last_used_at.present? %>
+          <h6>Last Used</h6>
+          <div><%= time_ago_in_words_tagged(site_credential.last_used_at) %>
+        <% end %>
+
+        <% if site_credential.last_error_at.present? %>
+          <h6>Last Error</h6>
+          <div><%= time_ago_in_words_tagged(site_credential.last_error_at) %>
+        <% end %>
+
+        <h6>Uses</h6>
+        <div><%= site_credential.usage_count %></div>
+
+        <h6>Errors</h6>
+        <div><%= site_credential.error_count %></div>
+      <% end %>
+
+      <% t.column "Created" do |site_credential| %>
+        <div><%= link_to_user site_credential.creator %></div>
+        <div><%= time_ago_in_words_tagged(site_credential.created_at) %></div>
+      <% end %>
+
+      <% t.column column: "control" do |site_credential| %>
+        <%= link_to "Edit", edit_site_credential_path(site_credential) %> |
+        <%= link_to "Delete", site_credential_path(site_credential), method: :delete, remote: true %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@site_credentials) %>
+  </div>
+</div>

@@ -185,6 +185,10 @@
         <% if policy(NewsUpdate).index? %>
           <li><%= link_to("News Updates", news_updates_path) %></li>
         <% end %>
+
+        <% if policy(SiteCredential).create? %>
+          <li><%= link_to("Site Credentials", site_credentials_path) %></li>
+        <% end %>
       </ul>
 
       <ul>

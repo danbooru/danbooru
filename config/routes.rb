@@ -292,6 +292,7 @@ Rails.application.routes.draw do
   resources :user_feedbacks, except: [:destroy]
   resources :user_sessions, only: [:index]
   resources :user_name_change_requests, only: [:new, :create, :show, :index]
+  resources :site_credentials
   resources :webhooks do
     post :receive, on: :collection
     post :authorize_net, on: :collection

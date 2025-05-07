@@ -1,0 +1,13 @@
+<%= render "secondary_links" %>
+
+<div id="c-site-credentials">
+  <div id="a-new">
+    <h1>New Credential</h1>
+
+    <%= edit_form_for(@site_credential) do |f| %>
+      <%= f.input :site, as: :select, collection: SiteCredential.sites.keys %>
+      <%= f.input :credential, as: :text %>
+      <%= f.submit "Create" %>
+    <% end %>
+  </div>
+</div>
