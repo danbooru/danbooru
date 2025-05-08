@@ -60,13 +60,13 @@ class Source::Extractor
     end
 
     memoize def page
-      http.cache(1.minute).parsed_get(page_url)
+      parsed_get(page_url)
     end
 
     memoize def additional_images_html
       return nil if user_id.blank? || post_id.blank?
 
-      html = http.cookies(POIPIKU_LK: Danbooru.config.poipiku_session_cookie).use(:spoof_referrer).cache(1.minute).parsed_post("https://poipiku.com/f/ShowAppendFileF.jsp", form: { UID: user_id, IID: post_id })
+      html = http.cookies(POIPIKU_LK: credentials[:session_cookie]).use(:spoof_referrer).cache(1.minute).parsed_post("https://poipiku.com/f/ShowAppendFileF.jsp", form: { UID: user_id, IID: post_id })
       html&.text&.parse_json&.dig("html")&.parse_html
     end
   end

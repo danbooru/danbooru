@@ -3,7 +3,7 @@
 # @see Source::URL::Xfolio
 class Source::Extractor::Xfolio < Source::Extractor
   def self.enabled?
-    Danbooru.config.xfolio_session.present?
+    SiteCredential.for_site("Xfolio").present?
   end
 
   def image_urls
@@ -68,10 +68,10 @@ class Source::Extractor::Xfolio < Source::Extractor
   end
 
   memoize def page
-    http.cache(1.minute).parsed_get(page_url)
+    parsed_get(page_url)
   end
 
   def http
-    super.cookies(xfolio_session: Danbooru.config.xfolio_session)
+    super.cookies(xfolio_session: credentials[:session_cookie])
   end
 end

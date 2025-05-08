@@ -90,11 +90,11 @@ module Source
       end
 
       memoize def page
-        http.cache(1.minute).parsed_get(page_url)
+        parsed_get(page_url)
       end
 
       def http
-        super.cookies(Tinami2SESSID: Danbooru.config.tinami_session_id).use(:spoof_referrer)
+        super.cookies(Tinami2SESSID: credentials[:session_id]).use(:spoof_referrer)
       end
 
       memoize :user_id, :work_id, :ethna_csrf, :image_urls, :image_sub_ids, :nv_body_image_urls

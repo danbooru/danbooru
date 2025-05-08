@@ -3,7 +3,7 @@
 # @see Source::URL::CiEn
 class Source::Extractor::CiEn < Source::Extractor
   def self.enabled?
-    Danbooru.config.ci_en_session_cookie.present?
+    SiteCredential.for_Site("CiEn").present?
   end
 
   def image_urls
@@ -73,13 +73,13 @@ class Source::Extractor::CiEn < Source::Extractor
   end
 
   memoize def page
-    http.cache(1.minute).parsed_get(page_url)
+    parsed_get(page_url)
   end
 
   def http
     # Same cookie works for both all-ages and R18 sites
     super.cookies(
-      ci_en_session: Danbooru.config.ci_en_session_cookie,
+      ci_en_session: credentials[:session_cookie],
       accepted_rating: "r18g"
     )
   end

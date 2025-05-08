@@ -5,7 +5,7 @@ module Source
   class Extractor
     class Behance < Source::Extractor
       def self.enabled?
-        Danbooru.config.behance_session_cookie.present?
+        SiteCredential.for_site("Behance").present?
       end
 
       def image_urls
@@ -72,11 +72,15 @@ module Source
 
       memoize def page
         url = parsed_url.page_url || parsed_referer&.page_url
-        http.cookies(ilo0: true, iat0: Danbooru.config.behance_session_cookie).cache(1.minute).parsed_get(url)
+        parsed_get(url)
       end
 
       memoize def api_response
         page&.at("script#beconfig-store_state")&.text&.parse_json || {}
+      end
+
+      def http
+        super.cookies(ilo0: true, iat0: credentials[:session_cookie])
       end
     end
   end

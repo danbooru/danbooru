@@ -216,18 +216,50 @@ class Source::Extractor
     def http
       super.headers(
         authorization: "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA", # non-secret; used by the official client
-        "x-csrf-token": Danbooru.config.twitter_csrf_token
+        "x-csrf-token": credentials[:csrf_token]
       ).cookies(
-        auth_token: Danbooru.config.twitter_auth_token,
-        ct0: Danbooru.config.twitter_csrf_token
+        auth_token: credentials[:auth_token],
+        ct0: credentials[:csrf_token]
       )
     end
 
-    def parsed_get(path, **params)
+    def parsed_get(path, cache: 1.minute, **params)
       headers = { "x-client-transaction-id": tid_generator.transaction_id(path) }
-      response = http.cache(1.minute).headers(headers).get("https://x.com#{path}", params: params)
+      response = http.cache(cache).headers(headers).get("https://x.com#{path}", params: params)
       # puts ({ status: response.status, **headers, time: tid_generator.time, xor_key: tid_generator.xor_key, key: tid_generator.twitter_site_verification_key, rate_limit: response.headers["x-rate-limit-remaining"] }).to_json
+      update_credentials!(response)
       response.parse if response.status.success?
+    end
+
+    def update_credentials!(response)
+      return if site_credential.blank?
+
+      endpoint = response.uri.path.split("/").last # /i/api/graphql/_8aYOgEDz35BrBcBal1-_w/TweetDetail -> TweetDetail
+      metadata = {
+        rate_limit: {
+          endpoint => {
+            remaining: response.headers["x-rate-limit-remaining"].to_i,
+            limit: response.headers["x-rate-limit-limit"].to_i,
+            reset: response.headers["x-rate-limit-reset"].to_i,
+          },
+        },
+      }
+
+      # XXX Cached responses still increment the credential usage count, even though it didn't really get used.
+      if response.status == 429
+        site_credential.error!(:rate_limited, **metadata)
+      else
+        site_credential.success!(**metadata)
+      end
+    end
+
+    def site_credentials
+      super.reject do |credential|
+        # Filter out credentials that are rate limited. XXX Assumes we're using the TweetDetail endpoint.
+        remaining_requests = credential.metadata.dig("rate_limit", "TweetDetail", "remaining")&.to_i || 150
+        reset_time = credential.metadata.dig("rate_limit", "TweetDetails", "reset").to_i
+        remaining_requests < 3 && Time.zone.now.to_i < reset_time
+      end
     end
 
     memoize def tid_generator

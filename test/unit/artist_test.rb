@@ -231,7 +231,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding deviantart artists" do
       setup do
-        skip "DeviantArt API keys not set" unless Danbooru.config.deviantart_client_id.present?
+        skip "DeviantArt API keys not set" unless Source::Extractor::DeviantArt.enabled?
         FactoryBot.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
         FactoryBot.create(:artist, :name => "trixia",  :url_string => "http://trixdraws.deviantart.com/")
       end
@@ -345,7 +345,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding pawoo artists" do
       setup do
-        skip "Pawoo keys not set" unless Danbooru.config.pawoo_access_token
+        skip "Pawoo keys not set" unless SiteCredential.for_site("Pawoo").present?
         FactoryBot.create(:artist, :name => "evazion", :url_string => "https://pawoo.net/@evazion")
         FactoryBot.create(:artist, :name => "yasumo01", :url_string => "https://pawoo.net/web/accounts/28816")
       end

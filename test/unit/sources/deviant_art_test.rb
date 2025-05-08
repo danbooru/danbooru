@@ -3,7 +3,7 @@ require "test_helper"
 module Sources
   class DeviantArtTest < ActiveSupport::TestCase
     setup do
-      skip "DeviantArt API keys not set" unless Danbooru.config.deviantart_client_id.present?
+      skip "DeviantArt API keys not set" unless Source::Extractor::DeviantArt.enabled?
     end
 
     context "A deviantart post" do

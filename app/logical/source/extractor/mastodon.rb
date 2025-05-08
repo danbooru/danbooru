@@ -87,18 +87,11 @@ class Source::Extractor
     end
 
     memoize def api_response
-      http.cache(1.minute).parsed_get(status_api_url) || {}
+      parsed_get(status_api_url) || {}
     end
 
     def http
-      super.headers(Authorization: "Bearer #{access_token}")
-    end
-
-    def access_token
-      case site_name
-      when "Pawoo" then Danbooru.config.pawoo_access_token
-      when "Baraag" then Danbooru.config.baraag_access_token
-      end
+      super.headers(Authorization: "Bearer #{credentials[:access_token]}")
     end
   end
 end

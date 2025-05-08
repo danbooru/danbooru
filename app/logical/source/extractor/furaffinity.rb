@@ -5,7 +5,7 @@ class Source::Extractor
     def self.enabled?
       # https://www.furaffinity.net/controls/settings/
       # For this strategy to work properly, in the above settings "Enable Adult Artwork" must be set to "General, Mature, Adult".
-      Danbooru.config.furaffinity_cookie_a.present? && Danbooru.config.furaffinity_cookie_b.present?
+      SiteCredential.for_site("Furaffinity").present?
     end
 
     def image_urls
@@ -55,11 +55,11 @@ class Source::Extractor
     end
 
     memoize def html_response
-      http.cache(1.minute).parsed_get(page_url)
+      parsed_get(page_url)
     end
 
     def http
-      super.cookies(a: Danbooru.config.furaffinity_cookie_a, b: Danbooru.config.furaffinity_cookie_b, sfw: 0)
+      super.cookies(a: credentials[:cookie_a], b: credentials[:cookie_b], sfw: 0)
     end
   end
 end

@@ -3,7 +3,7 @@
 class Source::Extractor
   class Fantia < Source::Extractor
     def self.enabled?
-      Danbooru.config.fantia_session_id.present?
+      SiteCredential.for_site("Fantia").present?
     end
 
     def image_urls
@@ -131,9 +131,9 @@ class Source::Extractor
     memoize def page
       case work_type
       when "post"
-        http.cache(1.minute).parsed_get("https://fantia.jp/posts/#{work_id}")
+        parsed_get("https://fantia.jp/posts/#{work_id}")
       when "product"
-        http.cache(1.minute).parsed_get("https://fantia.jp/products/#{work_id}")
+        parsed_get("https://fantia.jp/products/#{work_id}")
       end
     end
 
@@ -151,7 +151,7 @@ class Source::Extractor
     end
 
     def http
-      super.cookies(_session_id: Danbooru.config.fantia_session_id)
+      super.cookies(_session_id: credentials[:session_id])
     end
   end
 end

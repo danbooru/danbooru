@@ -3,7 +3,7 @@ require "test_helper"
 module Sources
   class FantiaTest < ActiveSupport::TestCase
     def setup
-      skip "session_id cookie not set" unless Danbooru.config.fantia_session_id.present?
+      skip "session_id cookie not set" unless Source::Extractor::Fantia.enabled?
     end
 
     context "A c.fantia.jp/uploads/post/file/ url" do

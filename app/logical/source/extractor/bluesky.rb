@@ -3,7 +3,7 @@
 # @see Source::URL::Bluesky
 class Source::Extractor::Bluesky < Source::Extractor
   def self.enabled?
-    Danbooru.config.bluesky_identifier.present? && Danbooru.config.bluesky_password.present?
+    SiteCredential.for_site("Bluesky").present?
   end
 
   def image_urls
@@ -144,13 +144,15 @@ class Source::Extractor::Bluesky < Source::Extractor
   memoize def access_token
     response = http.parsed_post(
       "https://bsky.social/xrpc/com.atproto.server.createSession",
-      json: { identifier: Danbooru.config.bluesky_identifier, password: Danbooru.config.bluesky_password }
+      json: { identifier: credentials[:identifier], password: credentials[:password] }
     ).to_h
 
     if response["error"].present?
       DanbooruLogger.info("Bluesky login failed (#{response["message"]} #{response["message"]})")
+      site_credential.error!(:invalid)
       nil
     else
+      site_credential.success!
       response["accessJwt"]
     end
   end

@@ -4,7 +4,7 @@ module Source
   class Extractor
     class DeviantArt < Source::Extractor
       def self.enabled?
-        Danbooru.config.deviantart_client_id.present? && Danbooru.config.deviantart_client_secret.present?
+        SiteCredential.for_site("DeviantArt").present?
       end
 
       def image_urls
@@ -269,7 +269,7 @@ module Source
       end
 
       memoize def api_client
-        api_client = DeviantArtApiClient.new(Danbooru.config.deviantart_client_id, Danbooru.config.deviantart_client_secret, http)
+        api_client = DeviantArtApiClient.new(credentials[:client_id], credentials[:client_secret], http)
         api_client.access_token = Cache.get("da-access-token", 11.weeks) do
           api_client.access_token.to_hash
         end

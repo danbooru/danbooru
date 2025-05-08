@@ -5,7 +5,7 @@ module Source
   class Extractor
     class Nijie < Source::Extractor
       def self.enabled?
-        Danbooru.config.nijie_login.present? && Danbooru.config.nijie_password.present?
+        SiteCredential.for_site("Nijie").present?
       end
 
       def image_urls
@@ -158,8 +158,8 @@ module Source
         login_page = http.get("https://nijie.info/login.php").parse
 
         form = {
-          email: Danbooru.config.nijie_login,
-          password: Danbooru.config.nijie_password,
+          email: credentials[:login],
+          password: credentials[:password],
           url: login_page.at("input[name='url']")&.fetch("value"),
           save: "on",
           ticket: "",
@@ -168,9 +168,11 @@ module Source
         response = http.post("https://nijie.info/login_int.php", form: form)
 
         if response.status == 200
+          site_credential.success!
           response.cookies.cookies.to_h { |cookie| [cookie.name, cookie.value] }
         else
           DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})"
+          site_credential.error!(:invalid)
           nil
         end
       end

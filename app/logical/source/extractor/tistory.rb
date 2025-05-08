@@ -81,7 +81,7 @@ class Source::Extractor::Tistory < Source::Extractor
   end
 
   memoize def page
-    http.cache(1.minute).parsed_get(mobile_page_url)
+    parsed_get(mobile_page_url)
   end
 
   memoize def page_json

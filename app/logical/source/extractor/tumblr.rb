@@ -4,7 +4,7 @@
 class Source::Extractor
   class Tumblr < Source::Extractor
     def self.enabled?
-      Danbooru.config.tumblr_consumer_key.present?
+      SiteCredential.for_site("Tumblr").present?
     end
 
     def image_urls
@@ -232,8 +232,8 @@ class Source::Extractor
       return {} unless self.class.enabled?
       return {} unless username.present? && work_id.present?
 
-      params = { id: work_id, api_key: Danbooru.config.tumblr_consumer_key }
-      http.cache(1.minute).parsed_get("https://api.tumblr.com/v2/blog/#{username}/posts", params: params) || {}
+      params = { id: work_id, api_key: credentials[:consumer_key] }
+      parsed_get("https://api.tumblr.com/v2/blog/#{username}/posts", params: params) || {}
     end
 
     def post

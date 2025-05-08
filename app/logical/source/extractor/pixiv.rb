@@ -5,7 +5,7 @@ module Source
   class Extractor
     class Pixiv < Source::Extractor
       def self.enabled?
-        Danbooru.config.pixiv_phpsessid.present?
+        SiteCredential.for_site("Pixiv").present?
       end
 
       def image_urls
@@ -186,28 +186,28 @@ module Source
       end
 
       def http
-        super.cookies(PHPSESSID: Danbooru.config.pixiv_phpsessid)
+        super.cookies(PHPSESSID: credentials[:phpsessid])
       end
 
       memoize def api_illust
         return {} unless illust_id.present?
 
         # curl "https://www.pixiv.net/ajax/illust/87598468" | jq
-        http.cache(1.minute).parsed_get("https://www.pixiv.net/ajax/illust/#{illust_id}")&.dig("body") || {}
+        parsed_get("https://www.pixiv.net/ajax/illust/#{illust_id}")&.dig("body") || {}
       end
 
       memoize def api_pages
         return {} unless illust_id.present?
 
         # curl "https://www.pixiv.net/ajax/illust/87598468/pages" | jq
-        http.cache(1.minute).parsed_get("https://www.pixiv.net/ajax/illust/#{illust_id}/pages")&.dig("body") || {}
+        parsed_get("https://www.pixiv.net/ajax/illust/#{illust_id}/pages")&.dig("body") || {}
       end
 
       memoize def api_ugoira
         return {} unless illust_id.present?
 
         # curl "https://www.pixiv.net/ajax/illust/74932152/ugoira_meta" | jq
-        http.cache(1.minute).parsed_get("https://www.pixiv.net/ajax/illust/#{illust_id}/ugoira_meta")&.dig("body") || {}
+        parsed_get("https://www.pixiv.net/ajax/illust/#{illust_id}/ugoira_meta")&.dig("body") || {}
       end
 
       memoize def api_novel
@@ -215,7 +215,7 @@ module Source
 
         # curl "https://www.pixiv.net/ajax/novel/74932152" | jq
         # curl "https://www.pixiv.net/ajax/user/66091066/novels/tags" | jq
-        http.cache(1.minute).parsed_get("https://www.pixiv.net/ajax/novel/#{novel_id}")&.dig("body") || {}
+        parsed_get("https://www.pixiv.net/ajax/novel/#{novel_id}")&.dig("body") || {}
       end
 
       memoize def api_novel_series
@@ -223,7 +223,7 @@ module Source
 
         # curl "https://www.pixiv.net/ajax/novel/series/9593812" | jq
         # curl "https://www.pixiv.net/ajax/novel/series_content/9593812" | jq
-        http.cache(1.minute).parsed_get("https://www.pixiv.net/ajax/novel/series/#{novel_series_id}")&.dig("body") || {}
+        parsed_get("https://www.pixiv.net/ajax/novel/series/#{novel_series_id}")&.dig("body") || {}
       end
 
       memoize def api_response

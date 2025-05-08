@@ -25,7 +25,7 @@ module Source
     # The http timeout to download a file.
     DOWNLOAD_TIMEOUT = 60
 
-    attr_reader :url, :referer_url, :parsed_url, :parsed_referer, :parent_extractor, :options
+    attr_reader :url, :referer_url, :parsed_url, :parsed_referer, :parent_extractor, :default_credentials, :options
 
     delegate :site_name, to: :parsed_url
 
@@ -59,11 +59,13 @@ module Source
     # @param url [Source::URL, String] The URL to extract information form.
     # @param referer_url [Source::URL, String, nil] The page URL if `url` is an image URL.
     # @param parent_extractor [Source::Extractor, nil] The parent of this extractor, if this is a sub extractor.
+    # @param credentials [Hash<String, String>] The credentials to use for this site (optional). If present, overrides any credentials from the database or config.
     # @param options [Hash] Additional extractor-specific options to pass to the extractor.
-    def initialize(url, referer_url: nil, parent_extractor: nil, **options)
+    def initialize(url, referer_url: nil, parent_extractor: nil, credentials: {}, **options)
       @url = url.to_s
       @referer_url = referer_url&.to_s
       @parent_extractor = parent_extractor
+      @default_credentials = credentials
       @options = options
 
       @parsed_url = Source::URL.parse(url)
@@ -216,14 +218,68 @@ module Source
       file
     end
 
-    # A http client for API requests.
+    # @return [Danbooru::Http] The HTTP client to use for API or HTML requests. Extractors can override this to add custom headers or cookies.
     def http
       Danbooru::Http.external
     end
 
-    # A http client for downloading files.
+    # @return [Danbooru::Http] The HTTP client to use for downloading files. Extractors can override this to add custom headers or cookies.
     def http_downloader
       http.timeout(DOWNLOAD_TIMEOUT).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
+    end
+
+    # Fetch the given URL and return the parsed response, or nil on a non-2xx response. Also tracks whether the
+    # credentials succeeded or failed if the site uses credentials.
+    #
+    # @param url [String] The URL to fetch.
+    # @param cache [ActiveSupport::Duration] The duration to cache the response for. Defaults to 1 minute.
+    # @return [Object, nil] The parsed response. For HTML requests this will be a Nokogiri document; for JSON or XML
+    #   requests it will be a hash or array. If the request fails, returns nil.
+    def parsed_get(url, cache: 1.minute)
+      return nil if url.blank?
+
+      response = http.cache(cache).get(url)
+      update_credentials!(response)
+
+      response.parse if response.status.success?
+    end
+
+    # Called after each HTTP request to track whether the credentials succeeded or failed. Extractors can override this
+    # to customize how errors are handled.
+    #
+    # @param response [HTTP::Response] The response from the HTTP request.
+    def update_credentials!(response)
+      return if site_credential.nil?
+
+      if response.status == 429
+        site_credential.error!(:rate_limited)
+      else
+        site_credential.success!
+      end
+    end
+
+    # @return [Array<SiteCredential>] All credentials available for this site. May be empty if none are configured or working.
+    #   May be overriden by extractors to filter out rate-limited credentials. Credentials are taken from the constructor,
+    #   the environment, the config file, or the database, in that order.
+    memoize def site_credentials
+      if default_credentials.present?
+        SiteCredential.for_site(site_name, default_credentials: default_credentials)
+      else
+        SiteCredential.for_site(site_name)
+      end
+    end
+
+    # @return [SiteCredential, nil] Which credential to use for this site. May be nil if none are configured or working.
+    #   Extractors can override this to pick the best credential if multiple are available. The default is to choose the
+    #   least recently used credential.
+    memoize def site_credential
+      site_credentials.min_by { |c| c.last_used_at.to_i }
+    end
+
+    # @return [Hash<String, String>] A hash containing the credentials to use for this site. The format of this hash is
+    #   different for each site; see models/site_credential.rb to see what it contains.
+    memoize def credentials
+      site_credential&.credential&.with_indifferent_access || {}
     end
 
     # Find the artist(s) associated with this source URL. For known sites (e.g., art platforms shared by many artists),

@@ -5,7 +5,7 @@ module Source
   class Extractor
     class Cohost < Source::Extractor
       def self.enabled?
-        Danbooru.config.cohost_session_cookie.present?
+        SiteCredential.for_site("Cohost").present?
       end
 
       def image_urls
@@ -95,7 +95,11 @@ module Source
       end
 
       memoize def page
-        http.cookies("connect.sid": Danbooru.config.cohost_session_cookie).cache(1.minute).parsed_get(page_url)
+        parsed_get(page_url)
+      end
+
+      def http
+        super.cookies("connect.sid": credentials[:session_cookie])
       end
     end
   end

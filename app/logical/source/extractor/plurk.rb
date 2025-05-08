@@ -27,7 +27,7 @@ module Source
       end
 
       memoize def page
-        http.cache(1.minute).parsed_get("https://www.plurk.com/s/p/#{illust_id}") if illust_id.present?
+        parsed_get("https://www.plurk.com/s/p/#{illust_id}") if illust_id.present?
       end
 
       memoize def plurk_html
@@ -82,7 +82,7 @@ module Source
       end
 
       def http
-        super.cookies(plurktokena: Danbooru.config.plurk_session_cookie)
+        super.cookies(plurktokena: credentials[:session_cookie])
       end
     end
   end

@@ -84,7 +84,7 @@ module Source
       end
 
       def http
-        super.cookies(vmkIdu5l8m: Danbooru.config.newgrounds_session_cookie)
+        super.cookies(vmkIdu5l8m: credentials[:session_cookie])
       end
 
       def video_page_url
@@ -92,7 +92,7 @@ module Source
       end
 
       memoize def page
-        http.cache(1.minute).parsed_get(page_url)
+        parsed_get(page_url)
       end
 
       memoize def video_data

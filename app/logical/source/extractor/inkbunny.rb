@@ -4,7 +4,7 @@
 # @see https://wiki.inkbunny.net/wiki/API
 class Source::Extractor::Inkbunny < Source::Extractor
   def self.enabled?
-    Danbooru.config.inkbunny_session.present?
+    SiteCredential.for_site("Inkbunny").present?
   end
 
   def image_urls
@@ -75,14 +75,16 @@ class Source::Extractor::Inkbunny < Source::Extractor
   # https://wiki.inkbunny.net/wiki/API#Quick_Start_Guide
   # https://wiki.inkbunny.net/wiki/API#Login
   memoize def session_id
-    return nil if Danbooru.config.inkbunny_username.blank? || Danbooru.config.inkbunny_password.blank?
+    return nil if credentials[:username].blank? || credentials[:password].blank?
 
-    response = http.parsed_get("https://inkbunny.net/api_login.php", params: { username: Danbooru.config.inkbunny_username, password: Danbooru.config.inkbunny_password })
+    response = http.parsed_get("https://inkbunny.net/api_login.php", params: { username: credentials[:username], password: credentials[:password] })
 
     if response[:error_code].present?
       DanbooruLogger.info("Inkbunny login failed (#{response[:error_code]} #{response[:error_message]})")
+      site_credential.error!(:invalid)
       nil
     else
+      site_credential.success!
       response[:sid]
     end
   end

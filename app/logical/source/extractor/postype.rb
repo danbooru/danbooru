@@ -92,16 +92,16 @@ class Source::Extractor::Postype < Source::Extractor
   end
 
   def http
-    super.cookies(PSE3: Danbooru.config.postype_session_cookie).headers(Referer: "https://postype.com")
+    super.cookies(PSE3: credentials[:session_cookie]).headers(Referer: "https://postype.com")
   end
 
   memoize def post_content
     api_url = "https://www.postype.com/api/post/content/#{post_id}" if post_id.present?
-    http.cache(1.minute).parsed_get(api_url) || {}
+    parsed_get(api_url) || {}
   end
 
   memoize def post
     api_url = "https://api.postype.com/api/v1/posts/#{post_id}" if post_id.present?
-    http.cache(1.minute).parsed_get(api_url) || {}
+    parsed_get(api_url) || {}
   end
 end

@@ -4,7 +4,7 @@ module Sources
   class MastodonTest < ActiveSupport::TestCase
     context "For Pawoo," do
       setup do
-        skip "Pawoo keys not set" unless Danbooru.config.pawoo_access_token
+        skip "Pawoo keys not set" unless SiteCredential.for_site("Pawoo").present?
       end
 
       context "a https://pawoo.net/web/status/$id url" do
@@ -68,7 +68,7 @@ module Sources
 
     context "For Baraag," do
       setup do
-        skip "Baraag keys not set" unless Danbooru.config.baraag_access_token
+        skip "Baraag keys not set" unless SiteCredential.for_site("Baraag").present?
       end
 
       context "a baraag.net/$user/$id url" do

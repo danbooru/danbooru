@@ -3,6 +3,10 @@
 # @see Source::URL::ArtStreet
 class Source::Extractor
   class ArtStreet < Source::Extractor
+    def self.enabled?
+      SiteCredential.for_site("ArtStreet").present?
+    end
+
     def image_urls
       if parsed_url.full_image_url.present?
         [parsed_url.full_image_url]
@@ -68,19 +72,19 @@ class Source::Extractor
     end
 
     memoize def book_api_response
-      http.cache(1.minute).parsed_get(book_api_url) || {}
+      parsed_get(book_api_url) || {}
     end
 
     memoize def page
-      http.cache(1.minute).parsed_get(page_url)
+      parsed_get(page_url)
     end
 
     memoize def author_page
-      http.cache(1.minute).parsed_get(author_url)
+      parsed_get(author_url)
     end
 
     def http
-      super.cookies(MSID: Danbooru.config.art_street_session_cookie)
+      super.cookies(MSID: credentials[:session_cookie])
     end
   end
 end

@@ -155,7 +155,7 @@ module Sources
 
       context "A R-18 page url" do
         setup do
-          skip "ArtStreet cookie not configured" unless Danbooru.config.art_street_session_cookie.present?
+          skip "ArtStreet cookie not configured" unless Source::Extractor::ArtStreet.enabled?
         end
 
         strategy_should_work(

@@ -3,7 +3,7 @@ require 'test_helper'
 module Sources
   class CiEnTest < ActiveSupport::TestCase
     def setup
-      skip "ci_en_session cookie not set" unless Danbooru.config.ci_en_session_cookie.present?
+      skip "ci_en_session cookie not set" unless Source::Extractor::CiEn.enabled?
     end
 
     context "An all-ages article url" do
