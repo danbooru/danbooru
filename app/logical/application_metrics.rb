@@ -106,8 +106,8 @@ class ApplicationMetrics
       metrics[:danbooru_comment_votes_total][type: score > 0 ? "up" : "down"].set(count)
     end
 
-    FavoriteGroup.group(:is_public).pluck(Arel.sql("is_public, COUNT(*)")).each do |is_public, count|
-      metrics[:danbooru_favorite_groups_total][public: is_public].set(count)
+    FavoriteGroup.pluck(Arel.sql("COUNT(*)")).each do |count|
+      metrics[:danbooru_favorite_groups_total].set(count)
     end
 
     ForumPost.group(:is_deleted).pluck(Arel.sql("is_deleted, COUNT(*)")).each do |deleted, count|
