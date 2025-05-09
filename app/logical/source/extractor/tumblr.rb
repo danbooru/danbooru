@@ -194,8 +194,7 @@ class Source::Extractor
       elsif parsed_url.image_url? && parsed_url.file_ext&.in?(%w[jpg png pnj gif])
         # https://compllege.tumblr.com/post/179415753146/codl-0001-c-experiment-2018%E5%B9%B410%E6%9C%8828%E6%97%A5-m3
         # https://yra.sixc.me/post/188271069189
-        post_url = image_page&.at('meta[name="parsely-link"]')&.attr(:content)
-        return nil if post_url.blank?
+        post_url = image_page_json.dig(:ImageUrlPage, :post, :postUrl)
 
         # The post URL may be a regular Tumblr post or a custom domain; custom domains are extracted to get the real Tumblr page URL.
         Source::Extractor.find(post_url).page_url.then { Source::URL.parse(_1) }
