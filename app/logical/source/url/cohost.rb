@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# @see Source::Extractor::Cohost
 class Source::URL::Cohost < Source::URL
   RESERVED_USERNAMES = %w[rc static]
 

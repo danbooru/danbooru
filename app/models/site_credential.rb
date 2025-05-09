@@ -33,12 +33,9 @@ class SiteCredential < ApplicationRecord
       name: "CiEn",
       default_credential: { session_cookie: Danbooru.config.ci_en_session_cookie },
       help: %{Your "Ci-En":https://ci-en.net 'ci_en_session' cookie.},
-    }, {
-      id: 700,
-      name: "Cohost",
-      default_credential: { session_cookie: Danbooru.config.cohost_session_cookie },
-      help: %{Your "Cohost":https://cohost.org 'connect.sid' cookie.},
-    }, {
+    },
+    # { id: 700, name: "Cohost" },
+    {
       id: 800,
       name: "DeviantArt",
       default_credential: { client_id: Danbooru.config.deviantart_client_id, client_secret: Danbooru.config.deviantart_client_secret },
