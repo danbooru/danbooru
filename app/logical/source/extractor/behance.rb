@@ -23,10 +23,14 @@ module Source
       def image_urls_from_module(mod)
         case mod["__typename"]
         in "ImageModule"
-          [mod.dig("imageSizes", "size_original", "url")].compact
+          url = mod.dig(:imageSizes, :allAvailable)&.max_by { |i| i[:width].to_i }&.dig(:url)
+          url = Source::URL.parse(url).try(:full_image_url) || url
+          [url].compact
         in "MediaCollectionModule"
-          urls = mod["components"].to_a.pluck("imageSizes").pluck("size_max_1200").pluck("url")
-          urls.map { |url| Source::URL.parse(url).try(:full_image_url) || url }
+          mod[:components].to_a.pluck(:imageSizes).pluck(:allAvailable).map do |images|
+            url = images.max_by { |image| image[:width].to_i * image[:height].to_i }&.dig(:url)
+            Source::URL.parse(url).try(:full_image_url) || url
+          end
         else
           []
         end
@@ -41,7 +45,7 @@ module Source
       end
 
       def username
-        project.dig("creator", "username")
+        Source::URL.parse(profile_url)&.username
       end
 
       def profile_url
