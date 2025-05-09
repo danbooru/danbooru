@@ -32,15 +32,11 @@ class Source::Extractor::CiEn < Source::Extractor
     end
   end
 
-  def tag_name
-    "cien_#{artist_id}" if artist_id.present?
-  end
-
   def artist_id
     parsed_url.creator_id || parsed_referer&.creator_id
   end
 
-  def artist_name
+  def display_name
     page&.css(".c-accountInfo .e-userName")&.text&.strip
   end
 

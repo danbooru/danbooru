@@ -31,7 +31,7 @@ class Source::Extractor::PixivComic < Source::Extractor
     end
   end
 
-  def artist_name
+  def display_name
     if work.present?
       work.dig("official_work", "author")
     elsif novel_work.present?

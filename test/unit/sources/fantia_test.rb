@@ -12,8 +12,9 @@ module Sources
         image_urls: ["https://c.fantia.jp/uploads/post/file/1070093/16faf0b1-58d8-4aac-9e86-b243063eaaf1.jpeg"],
         media_files: [{ file_size: 3_694_873 }],
         page_url: "https://fantia.jp/posts/1070093",
-        profile_url: "https://fantia.jp/fanclubs/27264",
-        artist_name: "豆ラッコ",
+        profile_urls: %w[https://fantia.jp/fanclubs/27264],
+        display_name: "豆ラッコ",
+        username: nil,
         tags: [],
         dtext_artist_commentary_title: "大きく育った心春ちゃん1",
         dtext_artist_commentary_desc: "色々やります"
@@ -25,8 +26,9 @@ module Sources
         "https://cc.fantia.jp/uploads/post_content_photo/file/7087182/main_7f04ff3c-1f08-450f-bd98-796c290fc2d1.jpg?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9wb3N0X2NvbnRlbnRfcGhvdG8vZmlsZS83MDg3MTgyL21haW5fN2YwNGZmM2MtMWYwOC00NTBmLWJkOTgtNzk2YzI5MGZjMmQxLmpwZyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTY0NjkyODAzN319fV19&Signature=wl2Nr9i1O5R5dDc7FB-8CKtRvyZPS6ZEFXn7Q74rBh9R2PZkpKuQUDDsJubgkYaHrqHEapcOdZczzZaM5kbRLXGPOnVFUE7vHKnXZTO~Z1-Z8Cqt823NKCR-AXBjYPhQoGP0pITLYkjhofy0FXg6RYJ0oNJPdKkdjcnwzr-nZfyaFgkrrQ5~LRDhW5HOgSNfvhJleMRLRgLtXbbgNnVwHmpFWNkFSwwmDcUTXTh4hrhQrOJ~xJmiQesSP1wPAE5ZZSBGsbUstOa5Y1nVu540wItR4VWLm-jjuMk9OIr-Nvxg0ocoP9WU13WrRbeMeL5X0xhxBYSxgVIKXko2BqMf5w__",
         referer: "https://fantia.jp/posts/1132267",
         page_url: "https://fantia.jp/posts/1132267",
-        profile_url: "https://fantia.jp/fanclubs/1096",
-        artist_name: "稲光伸二",
+        profile_urls: %w[https://fantia.jp/fanclubs/1096],
+        display_name: "稲光伸二",
+        username: nil,
         tags: %w[オリジナル 漫画],
         dtext_artist_commentary_title: "黒い歴史(5)",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -43,8 +45,9 @@ module Sources
         referer: "https://fantia.jp/posts/2245222/post_content_photo/14978435",
         image_urls: ["https://cc.fantia.jp/uploads/post_content_photo/file/14978435/86ec43ba-8121-43ac-9d3c-aec86f5238a2.jpg?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9wb3N0X2NvbnRlbnRfcGhvdG8vZmlsZS8xNDk3ODQzNS84NmVjNDNiYS04MTIxLTQzYWMtOWQzYy1hZWM4NmY1MjM4YTIuanBnIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNjk1MTM4MDI1fX19XX0_&Signature=ypwGfl0VivNcjmsfC5Cu6qNXhnXpuKTHnukMwBEgdWlENuAbVBi0napKC~39NN0e~FBNpgoOW2OqY0BX5zgeMdbz2RAGI1eFsfYpRRNfHDpEvh6dOVgBrHopZvXZzMf1G12yiBnKmXAvNyzwD1cDhnCW0mvcy9RbCJro1ELQ4qWt4BuBUzOtYX5h6OV-WvGnOdys25p~t4n8h15MhaWyIVx32W0wIsbs~cHnaScwgOIJAinBkgp4Mp1AwqYtvmgw28PjJrzohhFDrLGZeM6yjlvLQKnYqjQn5D8CR9l0TLADtMYc65hL92ywG0BXf1zGnGJ86gmqSiZjZ077rl9FVw__"],
         page_url: "https://fantia.jp/posts/2245222",
-        profile_url: "https://fantia.jp/fanclubs/476367",
-        artist_name: "4040(4059)",
+        profile_urls: %w[https://fantia.jp/fanclubs/476367],
+        display_name: "4040(4059)",
+        username: nil,
         tags: %w[アイドルマスターシンデレラガールズ U149 橘ありす 櫻井桃華 赤城みりあ 佐々木千枝 龍崎薫 チアガール スパッツ アンスコ 放尿 R-18],
         dtext_artist_commentary_title: "チアコス感謝祭（高解像度版+アンスコ生🍞🍋☕差分α 計13枚）",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -64,8 +67,9 @@ module Sources
         image_urls: ["https://c.fantia.jp/uploads/product/image/249638/fd5aef8f-c217-49d0-83e8-289efb33dfc4.jpg"],
         media_files: [{ file_size: 289_918 }],
         page_url: "https://fantia.jp/products/249638",
-        profile_url: "https://fantia.jp/fanclubs/7",
-        artist_name: "弱電波@JackDempa",
+        profile_urls: %w[https://fantia.jp/fanclubs/7],
+        display_name: "弱電波@JackDempa",
+        username: nil,
         tags: %w[asmr cg集 illustration\ collection png オリジナル シニョーラ 原神 夏川黒羽 宮前詩帆 春川朱璃愛 音声],
         dtext_artist_commentary_title: "2021年9月更新分[PNG] - September 2021",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -143,9 +147,10 @@ module Sources
         "https://fantia.jp/posts/1143951/download/1830956",
         image_urls: [%r{https://cc.fantia.jp/uploads/post_content/file/1830956/cbcdfcbe_20220224_120_040_100.png}],
         media_files: [{ file_size: 14_371_816 }],
-        artist_name: "松永紅葉",
-        profile_url: "https://fantia.jp/fanclubs/322",
         page_url: "https://fantia.jp/posts/1143951",
+        profile_urls: %w[https://fantia.jp/fanclubs/322],
+        display_name: "松永紅葉",
+        username: nil,
         tags: [],
         dtext_artist_commentary_title: "今日の一枚3186 (1:20+0:40+1:00)",
         dtext_artist_commentary_desc: "今日の一枚3186 (1:20+0:40+1:00)"
@@ -164,8 +169,9 @@ module Sources
           { file_size: 14_371_816 },
         ],
         page_url: "https://fantia.jp/posts/1143951",
-        profile_url: "https://fantia.jp/fanclubs/322",
-        artist_name: "松永紅葉",
+        profile_urls: %w[https://fantia.jp/fanclubs/322],
+        display_name: "松永紅葉",
+        username: nil,
         tags: [],
         dtext_artist_commentary_title: "今日の一枚3186 (1:20+0:40+1:00)",
         dtext_artist_commentary_desc: "今日の一枚3186 (1:20+0:40+1:00)"
@@ -189,7 +195,7 @@ module Sources
         ],
         page_url: "https://fantia.jp/posts/1734300",
         profile_urls: %w[https://fantia.jp/fanclubs/7],
-        display_name: nil,
+        display_name: "弱電波@JackDempa",
         username: nil,
         tags: [
           ["オリジナル", "https://fantia.jp/posts?tag=オリジナル"],
@@ -237,9 +243,9 @@ module Sources
           { file_size: 3_086_271 },
           { file_size: 444_283 },
         ],
-        profile_url: "https://fantia.jp/fanclubs/6088",
         profile_urls: %w[https://fantia.jp/fanclubs/6088],
-        artist_name: "すづめ",
+        display_name: "すづめ",
+        username: nil,
         tags: [],
         dtext_artist_commentary_title: "リバーシにまけました",
         dtext_artist_commentary_desc: ""
@@ -247,10 +253,6 @@ module Sources
     end
 
     context "A fantia.jp/posts/$id blog type url with cloudinary images" do
-      setup do
-        skip "Final image URL is valid but returns 404"
-      end
-
       strategy_should_work(
         "https://fantia.jp/posts/2702869",
         image_urls: %w[
@@ -261,20 +263,18 @@ module Sources
           https://res.cloudinary.com/dwtbde1cn/image/upload/v1713199481/202312_xgh7vg.gif
           https://res.cloudinary.com/dwtbde1cn/image/upload/v1675146855/CG%E9%9B%86%E3%83%90%E3%83%8A%E3%83%BC_nabisc.jpg
         ],
-        media_files: [
-          { file_size: 930_471 },
-          { file_size: 1_425_844 },
-          { file_size: 1_596_901 },
-          { file_size: 1_490_525 },
-          { file_size: 1_382_098 },
-          { file_size: 183_419 },
-        ],
+        # media_files: [
+        #   { file_size: 930_471 },
+        #   { file_size: 1_425_844 },
+        #   { file_size: 1_596_901 },
+        #   { file_size: 1_490_525 },
+        #   { file_size: 1_382_098 },
+        #   { file_size: 183_419 }, # This image URL is valid but returns 404
+        # ],
         page_url: "https://fantia.jp/posts/2702869",
-        profile_url: "https://fantia.jp/fanclubs/20795",
         profile_urls: %w[https://fantia.jp/fanclubs/20795],
-        artist_name: "ぐらんで",
-        tag_name: nil,
-        other_names: ["ぐらんで"],
+        display_name: "ぐらんで",
+        username: nil,
         tags: [
           ["オリジナル", "https://fantia.jp/posts?tag=オリジナル"],
           ["フェチ", "https://fantia.jp/posts?tag=フェチ"],
@@ -316,7 +316,7 @@ module Sources
           { file_size: 78_316 },
         ],
         page_url: "https://fantia.jp/products/249638",
-        profile_url: "https://fantia.jp/fanclubs/7"
+        profile_urls: %w[https://fantia.jp/fanclubs/7]
       )
     end
 
@@ -327,7 +327,7 @@ module Sources
         media_files: [{ file_size: 240_919 }],
         page_url: "https://fantia.jp/posts/1132267",
         profile_urls: %w[https://fantia.jp/fanclubs/1096],
-        display_name: nil,
+        display_name: "稲光伸二",
         username: nil,
         tags: [
           ["オリジナル", "https://fantia.jp/posts?tag=オリジナル"],
@@ -348,7 +348,7 @@ module Sources
         image_urls: [],
         page_url: "https://fantia.jp/products/10000",
         profile_urls: %w[https://fantia.jp/fanclubs/7217],
-        display_name: nil,
+        display_name: "ねわん",
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",

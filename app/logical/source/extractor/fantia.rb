@@ -77,7 +77,7 @@ class Source::Extractor
       end
     end
 
-    def artist_name
+    def display_name
       case work_type
       when "post"
         api_response&.dig("post", "fanclub", "creator_name")

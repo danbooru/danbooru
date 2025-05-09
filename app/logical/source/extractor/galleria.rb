@@ -19,7 +19,7 @@ class Source::Extractor::Galleria < Source::Extractor
     parsed_url.profile_url || parsed_referer&.profile_url
   end
 
-  def artist_name
+  def display_name
     page&.at(".TimeLineUserName > span")&.text
   end
 
