@@ -95,20 +95,20 @@ module Source
         parsed_url.user_id || parsed_referer&.user_id
       end
 
-      def post_api_url
-        "https://api.fanbox.cc/post.info?postId=#{illust_id}" if illust_id.present?
-      end
-
-      def artist_api_url
-        "https://api.fanbox.cc/creator.get?userId=#{artist_id_from_url}" if artist_id_from_url.present?
+      memoize def username_from_artist_id
+        url = http.cache(1.minute).redirect_url("https://www.pixiv.net/fanbox/creator/#{artist_id_from_url}") if artist_id_from_url.present?
+        Source::URL.parse(url).try(:username)
       end
 
       memoize def api_response
-        http.cache(1.minute).parsed_get(post_api_url)&.dig(:body) || {}
+        url = "https://api.fanbox.cc/post.info?postId=#{illust_id}" if illust_id.present?
+        parsed_get(url)&.dig(:body) || {}
       end
 
       memoize def artist_api_response
-        http.cache(1.minute).parsed_get(artist_api_url) || {}
+        creator_id = parsed_url.username || parsed_referer&.username || api_response["creatorId"] || username_from_artist_id
+        url = "https://api.fanbox.cc/creator.get?creatorId=#{creator_id}"
+        parsed_get(url) || {}
       end
 
       def http

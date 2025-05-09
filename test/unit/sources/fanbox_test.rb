@@ -91,12 +91,22 @@ module Sources
 
     context "A fanbox post with a single embedded video" do
       strategy_should_work(
-        "https://naochi.fanbox.cc/posts/4657540",
-        image_urls: [
-          "https://downloads.fanbox.cc/files/post/4657540/Pos3gwyHP4MKeI5JQS4Cl5sb.mp4",
+        "https://hisha.fanbox.cc/posts/7268460",
+        image_urls: %w[https://downloads.fanbox.cc/files/post/7268460/33CriopgBCfntPh4CQIupnFo.mp4],
+        media_files: [{ file_size: 12_112_390 }],
+        page_url: "https://hisha.fanbox.cc/posts/7268460",
+        profile_urls: %w[https://hisha.fanbox.cc],
+        display_name: "飛者",
+        username: "hisha",
+        tags: [
+          ["タイムラプス", "https://fanbox.cc/tags/タイムラプス"],
+          ["全体公開", "https://fanbox.cc/tags/全体公開"],
         ],
-        display_name: "なおち",
-        username: "naochi"
+        dtext_artist_commentary_title: "さとり タイムラプス",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          あけましておめでとうございます～
+          今年もぼちぼち頑張っていきますよー
+        EOS
       )
     end
 
@@ -112,20 +122,36 @@ module Sources
 
     context "A post in the old pixiv format" do
       strategy_should_work(
-        "https://www.pixiv.net/fanbox/creator/1566167/post/39714",
-        page_url: "https://omu001.fanbox.cc/posts/39714",
-        profile_url: "https://omu001.fanbox.cc",
-        display_name: "むっしゅ",
-        username: "omu001"
+        "https://www.pixiv.net/fanbox/creator/1539728/post/319269",
+        image_urls: %w[https://downloads.fanbox.cc/images/post/319269/4NB24h1Zde4wjspQiw8Y1HGm.jpeg],
+        media_files: [{ file_size: 2_023_770 }],
+        page_url: "https://intokuinfo.fanbox.cc/posts/319269",
+        profile_urls: %w[https://intokuinfo.fanbox.cc],
+        display_name: "遠藤弘土",
+        username: "intokuinfo",
+        tags: [],
+        dtext_artist_commentary_title: "【みんな向け】落書きその２　ドラクエ１１のベロニカ　支援者向け高解像度版（横1920 縦1080）",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          間が空いちゃって済みません！商業の方、無事に終わりまして、シュクラの方を詰めてました。
+          すげーわかりやすくいうと、余剰なエッチな気をある地区に集めて、それを男たちに憑依させてエッチして解消するのがシュノン
+          みたいな感じです！明日からはモノクロでチマチマあげられると思います！コーランも合わせて薦めます！
+
+          明日から挽回したいと思いますので、明日も更新する感じでオナシャス！
+        EOS
       )
     end
 
     context "A dead profile picture in the old pixiv format" do
       strategy_should_work(
         "https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/29999491/profile/Ew6fOhLGPvmUcwU6FyH8JAMX.jpeg",
-        profile_url: "https://deaver0211.fanbox.cc",
-        display_name: "Deaver",
-        username: "deaver0211"
+        image_urls: %w[https://pixiv.pximg.net/fanbox/public/images/creator/29999491/profile/Ew6fOhLGPvmUcwU6FyH8JAMX.jpeg], # 404
+        page_url: "https://verdey1104.fanbox.cc",
+        profile_urls: %w[https://verdey1104.fanbox.cc],
+        display_name: "Verdey",
+        username: "verdey1104",
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: ""
       )
     end
 
