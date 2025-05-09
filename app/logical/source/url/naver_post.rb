@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# @see Source::Extractor::NaverPost
 # @see https://post.naver.com
 class Source::URL::NaverPost < Source::URL
   RESERVED_USERNAMES = %w[author contents my viewer]
