@@ -41,6 +41,7 @@ class Source::URL::Poipiku < Source::URL
       @original_file_ext = $2
 
     # https://poipiku.com/6849873/8271386.html
+    # https://poipiku.com/8566613/9625938.html (redirects to https://poipiku.com/8566613/11413167.html)
     in _, "poipiku.com", user_id, /(\d+)\.html$/i
       @user_id = user_id
       @post_id = $1.to_i

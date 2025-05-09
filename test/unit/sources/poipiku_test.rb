@@ -49,8 +49,7 @@ module Sources
       context "A https://img.poipiku.com/:dir/:user_id/:post_id_:image_id_:hash.jpeg full image URL" do
         strategy_should_work(
           "https://img-org.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg",
-          # XXX redirects to the correct URL of https://poipiku.com/6849873/8271386.html
-          page_url: "https://poipiku.com/6849873/8271096.html",
+          page_url: "https://poipiku.com/6849873/8271386.html",
           image_urls: %w[
             https://img-org.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg
           ],
@@ -73,8 +72,7 @@ module Sources
       context "A https://img.poipiku.com/:dir/:user_id/:post_id_:image_id_:hash.jpeg_640.jpg sample image URL" do
         strategy_should_work(
           "https://img.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg_640.jpg",
-          # XXX redirects to the correct URL of https://poipiku.com/6849873/8271386.html
-          page_url: "https://poipiku.com/6849873/8271096.html",
+          page_url: "https://poipiku.com/6849873/8271386.html",
           image_urls: %w[
             https://img-org.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg
           ],
@@ -97,7 +95,7 @@ module Sources
       context "A page that requires a login" do
         strategy_should_work(
           "https://poipiku.com/8566613/9625938.html",
-          page_url: "https://poipiku.com/8566613/9625938.html",
+          page_url: "https://poipiku.com/8566613/11413167.html",
           image_urls: %w[
             https://img-org.poipiku.com/user_img03/008566613/009625669_020612310_toCYdeSNu.jpeg
             https://img-org.poipiku.com/user_img02/008566613/009625669_020612311_woW7C76Mm.jpeg
@@ -188,7 +186,7 @@ module Sources
           image_urls: [],
           page_url: "https://poipiku.com/16109/8284794.html",
           profile_url: "https://poipiku.com/16109/",
-          profile_urls: %w[https://poipiku.com/16109/ https://www.pixiv.net/users/46937590],
+          profile_urls: %w[https://poipiku.com/16109/ https://www.pixiv.net/users/46937590 https://skeb.jp/@kmbkshbnlss],
           display_name: "緊縛師ボンレス（ル×ガの民）",
           tag_name: "poipiku_16109",
           other_names: ["緊縛師ボンレス（ル×ガの民）"],

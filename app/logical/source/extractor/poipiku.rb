@@ -3,7 +3,7 @@
 # @see Source::URL::Poipiku
 class Source::Extractor
   class Poipiku < Source::Extractor
-    delegate :page_url, :profile_url, :user_id, :post_id, to: :parsed_url
+    delegate :profile_url, :user_id, to: :parsed_url
 
     def image_urls
       if parsed_url.image_url?
@@ -59,8 +59,17 @@ class Source::Extractor
       end
     end
 
+    def page_url
+      # The original parsed_url.page_url may redirect to a different page with a different post ID; get the final page.
+      page&.at_css('link[rel="canonical"]')&.attr(:href) || parsed_url.page_url
+    end
+
+    def post_id
+      Source::URL.parse(page_url).try(:post_id)
+    end
+
     memoize def page
-      parsed_get(page_url)
+      parsed_get(parsed_url.page_url)
     end
 
     memoize def additional_images_html
