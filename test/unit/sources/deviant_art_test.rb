@@ -363,11 +363,133 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/theraceai/art/Realistic-Girl-14-1027403734",
         image_urls: [],
-        media_files: [],
+        page_url: "https://www.deviantart.com/theraceai/art/Ling-1027403734",
+        profile_urls: %w[https://www.deviantart.com/theraceai],
         display_name: "TheraceAI",
         username: "theraceai",
-        artist_commentary_title: "Realistic Girl - 14",
-        artist_commentary_desc: ""
+        tags: [
+          ["3d", "https://www.deviantart.com/tag/3d"],
+          ["adventure", "https://www.deviantart.com/tag/adventure"],
+          ["anime", "https://www.deviantart.com/tag/anime"],
+          ["beauty", "https://www.deviantart.com/tag/beauty"],
+          ["cartoon", "https://www.deviantart.com/tag/cartoon"],
+          ["characterdesign", "https://www.deviantart.com/tag/characterdesign"],
+          ["comics", "https://www.deviantart.com/tag/comics"],
+          ["digitalart", "https://www.deviantart.com/tag/digitalart"],
+          ["drama", "https://www.deviantart.com/tag/drama"],
+          ["fanart", "https://www.deviantart.com/tag/fanart"],
+          ["fantasy", "https://www.deviantart.com/tag/fantasy"],
+          ["fashion", "https://www.deviantart.com/tag/fashion"],
+          ["glitchart", "https://www.deviantart.com/tag/glitchart"],
+          ["horror", "https://www.deviantart.com/tag/horror"],
+          ["illustration", "https://www.deviantart.com/tag/illustration"],
+          ["landscape", "https://www.deviantart.com/tag/landscape"],
+          ["manga", "https://www.deviantart.com/tag/manga"],
+          ["music", "https://www.deviantart.com/tag/music"],
+          ["mystery", "https://www.deviantart.com/tag/mystery"],
+          ["nature", "https://www.deviantart.com/tag/nature"],
+          ["oilpainting", "https://www.deviantart.com/tag/oilpainting"],
+          ["photography", "https://www.deviantart.com/tag/photography"],
+          ["pixelart", "https://www.deviantart.com/tag/pixelart"],
+          ["portrait", "https://www.deviantart.com/tag/portrait"],
+          ["romance", "https://www.deviantart.com/tag/romance"],
+          ["scifi", "https://www.deviantart.com/tag/scifi"],
+          ["traditionalart", "https://www.deviantart.com/tag/traditionalart"],
+          ["videogamefanart", "https://www.deviantart.com/tag/videogamefanart"],
+          ["wallpapers", "https://www.deviantart.com/tag/wallpapers"],
+          ["aiartcommunity", "https://www.deviantart.com/tag/aiartcommunity"],
+          ["ai-generated", "https://www.deviantart.com/tag/ai"],
+        ],
+        dtext_artist_commentary_title: "Ling",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          - For Exclusives & Adoptables
+
+          ✅ You become the only Owner, after purchase.
+
+          ✅ No Watermark after purchase.
+
+          ✅ Free to do as you please with your new Art, after purchase.
+
+          ✅ HD resolution.
+
+          -----
+
+          😎 Become the Owner of my Exclusive Arts/ Adoptables:
+
+          <https://www.deviantart.com/theraceai/shop/exclusives>
+
+          🔥 Check out my Hot NSFW Premium Galleries:
+
+          <https://www.deviantart.com/theraceai/shop/premium_folders>
+
+          😈🔥 Subscribe to 18+ NSFW content here:
+
+          <https://www.deviantart.com/theraceai/subscriptions>
+
+          😋 Give me Commissions or Requests (Let me Serve you, daddy):
+
+          <https://www.deviantart.com/theraceai/shop/commissions>
+
+          🏞️ Get 4K HD Wallpapers here:
+
+          <https://www.deviantart.com/theraceai/gallery/91506132/wallpapers-for-pc-and-mobile>
+
+          🤓 Learn how to make High-fidelity Art in just 7 days:
+
+          <https://www.deviantart.com/theraceai/commission/I-Teach-you-everything-My-Secret-AI-Formulas-1691785>
+
+          --------------------------------------------------------------------
+
+          --------------------------------------------------------------------
+
+          BUY MY MERCH 🍵👕🏜️📗🖊️
+
+          Get the Physical Art version shipped to you, anywhere in the world.
+
+          For DeviantArt, we print all our 4K HD wallpapers, Extremely Cute animals, Graveyard & Waifus Art into a wide variety of products for you.
+
+          Get it from Teepublic:
+
+          "www.teepublic.com/user/theraceai":[https://www.teepublic.com/user/theraceai]
+
+          Get it from ThreadlessArtistShops (Recommended):
+
+          "theraceai.threadless.com":[https://theraceai.threadless.com]
+
+          Get it from FineArtAmerica (Collab):
+
+          "www.fineartamerica.com/profiles/1-paul-omoregie":[https://www.fineartamerica.com/profiles/1-paul-omoregie]
+
+          Each Store offers different types of products showcasing our art e.g Stickers, posters, phone cases, desk mats, notebooks etc.
+
+          So, browse🔎 through all Merch stores to see which one you prefer.
+
+          --------------------------------------------------------------------
+
+          --------------------------------------------------------------------
+
+          CHECK OUT OUR OTHER CREATIONS
+
+          We create stuff on other platforms too, you know 🤠...Like Comics, Books, 3D Assets, Movies, Music, Apps, Games, YouTube & Freelancing platforms.
+
+          Check them out:
+
+          "www.linktr.ee/TheraceAI":[https://www.linktr.ee/TheraceAI]
+
+          --------------------------------------------------------------------
+
+          --------------------------------------------------------------------
+
+          FOLLOW US ON SOCIAL MEDIA
+
+          Stay up-to-date on any new stuff we create, both on DeviantArt & beyond.
+
+          Instagram: "www.instagram.com/theraceai":[https://www.instagram.com/theraceai]
+
+          Twitter: "www.twitter.com/@theraceai":[https://www.twitter.com/@theraceai]
+
+          TikTok: "www.tiktok.com/@theraceai":[https://www.tiktok.com/@theraceai]
+        EOS
       )
     end
 

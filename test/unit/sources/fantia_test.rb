@@ -66,7 +66,7 @@ module Sources
         page_url: "https://fantia.jp/products/249638",
         profile_url: "https://fantia.jp/fanclubs/7",
         artist_name: "弱電波@JackDempa",
-        tags: %w[イラスト集 CG集 PNG オリジナル 宮前詩帆 春川朱璃愛 夏川黒羽 ASMR 音声 原神 シニョーラ],
+        tags: %w[asmr cg集 illustration\ collection png オリジナル シニョーラ 原神 夏川黒羽 宮前詩帆 春川朱璃愛 音声],
         dtext_artist_commentary_title: "2021年9月更新分[PNG] - September 2021",
         dtext_artist_commentary_desc: <<~EOS.chomp
           2021年9月に更新した分の画像データと同じものとなります。
@@ -247,6 +247,10 @@ module Sources
     end
 
     context "A fantia.jp/posts/$id blog type url with cloudinary images" do
+      setup do
+        skip "Final image URL is valid but returns 404"
+      end
+
       strategy_should_work(
         "https://fantia.jp/posts/2702869",
         image_urls: %w[

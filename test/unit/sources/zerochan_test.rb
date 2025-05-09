@@ -6,9 +6,31 @@ module Sources
       context "A SFW post url" do
         strategy_should_work(
           "https://www.zerochan.net/4090352",
-          image_urls: ["https://static.zerochan.net/Kira.Yamato.full.4090352.jpg"],
+          image_urls: %w[https://static.zerochan.net/Kira.Yamato.full.4090352.jpg],
+          media_files: [{ file_size: 1_604_018 }],
           page_url: "https://www.zerochan.net/4090352#full",
-          tags: ["Male", "Fanart", "Brown Hair", "Purple Eyes", "Short Hair", "Kira Yamato", "Mobile Suit Gundam SEED Destiny", "Mobile Suit Gundam SEED", "Pixiv", "Solo", "Fanart from Pixiv", "ususio 11"]
+          profile_urls: [],
+          display_name: nil,
+          username: nil,
+          tags: [
+            ["Male", "https://www.zerochan.net/Male"],
+            ["Fanart", "https://www.zerochan.net/Fanart"],
+            ["Brown Hair", "https://www.zerochan.net/Brown+Hair"],
+            ["Purple Eyes", "https://www.zerochan.net/Purple+Eyes"],
+            ["Short Hair", "https://www.zerochan.net/Short+Hair"],
+            ["Uniform", "https://www.zerochan.net/Uniform"],
+            ["Military Uniform", "https://www.zerochan.net/Military+Uniform"],
+            ["Kira Yamato", "https://www.zerochan.net/Kira+Yamato"],
+            ["Mobile Suit Gundam SEED Destiny", "https://www.zerochan.net/Mobile+Suit+Gundam+SEED+Destiny"],
+            ["Mobile Suit Gundam SEED", "https://www.zerochan.net/Mobile+Suit+Gundam+SEED"],
+            ["Pixiv", "https://www.zerochan.net/Pixiv"],
+            ["Solo", "https://www.zerochan.net/Solo"],
+            ["Fanart from Pixiv", "https://www.zerochan.net/Fanart+from+Pixiv"],
+            ["ususio 11", "https://www.zerochan.net/ususio+11"],
+            ["Kira Yamato (Orb Military Uniform)", "https://www.zerochan.net/Kira+Yamato+%28Orb+Military+Uniform%29"],
+          ],
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: ""
         )
       end
 
@@ -16,14 +38,40 @@ module Sources
         strategy_should_work(
           "http://www.zerochan.net/full/90674",
           image_urls: ["https://static.zerochan.net/Full.Moon.wo.Sagashite.full.90674.jpg"],
+          media_files: [{ file_size: 2_600_709 }],
           page_url: "https://www.zerochan.net/90674#full",
+          profile_urls: [],
+          display_name: nil,
+          username: nil,
           tags: [
-            "Female", "Ecchi", "Fanart", "Twin Tails", "Wings", "Brown Hair",
-            "Red Eyes", "Strawberry", "Gloves", "Pink Hair", "Hat",
-            "Full Moon wo Sagashite", "Meroko Yui", "Usagimimi", "Bows (Fashion)",
-            "Two Girls", "Black Eyes", "Kemonomimi", "Duo", "Text", "Red Gloves",
-            "Japanese Text", "Hat Bow", "Kouyama Mitsuki", "Red Handwear",
-          ]
+            ["Female", "https://www.zerochan.net/Female"],
+            ["Ecchi", "https://www.zerochan.net/Ecchi"],
+            ["Fanart", "https://www.zerochan.net/Fanart"],
+            ["Twin Tails", "https://www.zerochan.net/Twin+Tails"],
+            ["Wings", "https://www.zerochan.net/Wings"],
+            ["Brown Hair", "https://www.zerochan.net/Brown+Hair"],
+            ["Red Eyes", "https://www.zerochan.net/Red+Eyes"],
+            ["Strawberry", "https://www.zerochan.net/Strawberry"],
+            ["Gloves", "https://www.zerochan.net/Gloves"],
+            ["Pink Hair", "https://www.zerochan.net/Pink+Hair"],
+            ["Hat", "https://www.zerochan.net/Hat"],
+            ["Full Moon wo Sagashite", "https://www.zerochan.net/Full+Moon+wo+Sagashite"],
+            ["Meroko Yui", "https://www.zerochan.net/Meroko+Yui"],
+            ["Usagimimi", "https://www.zerochan.net/Usagimimi"],
+            ["Bow (Fashion)", "https://www.zerochan.net/Bow+%28Fashion%29"],
+            ["Two Girls", "https://www.zerochan.net/Two+Girls"],
+            ["Black Eyes", "https://www.zerochan.net/Black+Eyes"],
+            ["Kemonomimi", "https://www.zerochan.net/Kemonomimi"],
+            ["Duo", "https://www.zerochan.net/Duo"],
+            ["Text", "https://www.zerochan.net/Text"],
+            ["Red Gloves", "https://www.zerochan.net/Red+Gloves"],
+            ["Japanese Text", "https://www.zerochan.net/Japanese+Text"],
+            ["Hat Bow", "https://www.zerochan.net/Hat+Bow"],
+            ["Kouyama Mitsuki", "https://www.zerochan.net/Kouyama+Mitsuki"],
+            ["Red Handwear", "https://www.zerochan.net/Red+Handwear"],
+          ],
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: ""
         )
       end
 
@@ -43,7 +91,7 @@ module Sources
           image_urls: %w[https://static.zerochan.net/Fullmetal.Alchemist.full.2831797.png],
           media_files: [{ file_size: 247_504 }],
           page_url: "https://www.zerochan.net/2831797#full",
-          profile_urls: %w[],
+          profile_urls: [],
           display_name: nil,
           username: nil,
           tags: [
@@ -106,14 +154,40 @@ module Sources
         strategy_should_work(
           "http://static.zerochan.net/full/24/13/90674.jpg",
           image_urls: ["https://static.zerochan.net/full/24/13/90674.jpg"],
+          media_files: [{ file_size: 2_600_709 }],
           page_url: "https://www.zerochan.net/90674#full",
+          profile_urls: [],
+          display_name: nil,
+          username: nil,
           tags: [
-            "Female", "Ecchi", "Fanart", "Twin Tails", "Wings", "Brown Hair",
-            "Red Eyes", "Strawberry", "Gloves", "Pink Hair", "Hat",
-            "Full Moon wo Sagashite", "Meroko Yui", "Usagimimi", "Bows (Fashion)",
-            "Two Girls", "Black Eyes", "Kemonomimi", "Duo", "Text", "Red Gloves",
-            "Japanese Text", "Hat Bow", "Kouyama Mitsuki", "Red Handwear",
-          ]
+            ["Female", "https://www.zerochan.net/Female"],
+            ["Ecchi", "https://www.zerochan.net/Ecchi"],
+            ["Fanart", "https://www.zerochan.net/Fanart"],
+            ["Twin Tails", "https://www.zerochan.net/Twin+Tails"],
+            ["Wings", "https://www.zerochan.net/Wings"],
+            ["Brown Hair", "https://www.zerochan.net/Brown+Hair"],
+            ["Red Eyes", "https://www.zerochan.net/Red+Eyes"],
+            ["Strawberry", "https://www.zerochan.net/Strawberry"],
+            ["Gloves", "https://www.zerochan.net/Gloves"],
+            ["Pink Hair", "https://www.zerochan.net/Pink+Hair"],
+            ["Hat", "https://www.zerochan.net/Hat"],
+            ["Full Moon wo Sagashite", "https://www.zerochan.net/Full+Moon+wo+Sagashite"],
+            ["Meroko Yui", "https://www.zerochan.net/Meroko+Yui"],
+            ["Usagimimi", "https://www.zerochan.net/Usagimimi"],
+            ["Bow (Fashion)", "https://www.zerochan.net/Bow+%28Fashion%29"],
+            ["Two Girls", "https://www.zerochan.net/Two+Girls"],
+            ["Black Eyes", "https://www.zerochan.net/Black+Eyes"],
+            ["Kemonomimi", "https://www.zerochan.net/Kemonomimi"],
+            ["Duo", "https://www.zerochan.net/Duo"],
+            ["Text", "https://www.zerochan.net/Text"],
+            ["Red Gloves", "https://www.zerochan.net/Red+Gloves"],
+            ["Japanese Text", "https://www.zerochan.net/Japanese+Text"],
+            ["Hat Bow", "https://www.zerochan.net/Hat+Bow"],
+            ["Kouyama Mitsuki", "https://www.zerochan.net/Kouyama+Mitsuki"],
+            ["Red Handwear", "https://www.zerochan.net/Red+Handwear"],
+          ],
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: ""
         )
       end
 

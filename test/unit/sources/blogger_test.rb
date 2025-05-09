@@ -113,14 +113,14 @@ module Sources
         strategy_should_work(
           "http://jenolab.blogspot.com/p/bd.html",
           image_urls: %w[
-            https://1.bp.blogspot.com/-gFYxDsgG8iA/UgZvCWk10pI/AAAAAAAAAg8/iHVaK5NGg8o/d/01.jpg
-            https://1.bp.blogspot.com/-A-fxc8zPwOE/UgZvGnKqQNI/AAAAAAAAAhE/yGExUNMVqoI/d/02.jpg
-            https://1.bp.blogspot.com/-SZGjvHeGRp8/UgZvQ2b38ZI/AAAAAAAAAhM/vt19VigNQxY/d/03.jpg
-            https://1.bp.blogspot.com/-ad7nJ4yBldk/UgZvr9J2-jI/AAAAAAAAAhs/7ngB3S775bE/d/04.jpg
-            https://1.bp.blogspot.com/-FABjITxmfZ8/UgZvqOFi0zI/AAAAAAAAAhc/dzeBfGAk3IE/d/05.jpg
-            https://1.bp.blogspot.com/-ENqI2ZjzmeQ/UgZvsHP6H6I/AAAAAAAAAho/oRMVzajcz2c/d/06.jpg
-            https://1.bp.blogspot.com/-6ChPE0tvwWA/UgZvuh4ssQI/AAAAAAAAAh0/KdXmt79GhHk/d/07.jpg
-            https://1.bp.blogspot.com/-jRB0Xhu8aWY/UgZvuzv0cXI/AAAAAAAAAh8/hK7W_absNSk/d/08.jpg
+            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgKOx3SfHzVaaj8G19RfDnm-6NKRjHj197jucylgMJsH9OyGGcdqK0yWRTHeDygGeQGT-aDkr9szOFlQHoCo2F8HcLmbk5qeL4NC_Atl8NV603CdALUfVj0yO62GJCzscEgWdSiA0lNaLiF/d/01.jpg
+            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhUFuuGoCNva89j420q0QigLKNhXKZ8fQtPmONGXQ-7uoeX4Nd6DQ5CSe5zQ2dbmBODUbZdGSi4JCpDC7exb8xZY4yLS5dLTQwWL3AnK3uEMnQam0U07l0NtacGbX5mp09d7Hm49kn2BVwb/d/02.jpg
+            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiNVG52GdvN2_Lv2b0e2majD694aOsD8qcRc2wrhEnQEGK-5lX0nSU64Eub9chSWnSp8yrhK-x8x6EeQniVDsrbytfzPpg17PXroUUaaqF_37HWYqAlE3od3cSrkF9-fFPQC_kDqvysgAE-/d/03.jpg
+            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgv_tjOnu7onl5WqclEz64hO6Q85Xdo6nQpqlZ4q7ykNTnkwmtWlQIb0M0RgYFA1jNcZGFDseHzjOZ0Mf0xH6XptpTS78nP9c3IW6GVl9CQhYkg9q2P0VA01eyPYYTiXMmjRaM4YmR5YFQx/d/04.jpg
+            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhSwZvVlnTaG3zvqa4jb7wYzwv_j7N7WZ99jn6KR5fNxzwZFt9wXdKnmMb7BiM5_sR2peGr8_X9MyHBS4rUmy9KpDVifwl9ldw0AtWP6NpxFRrndGVSRL-DjpAKUhitts8JhClNSVzMhQGi/d/05.jpg
+            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgJ9gqIywKnhJa6JDUC2hAuaYj4xybCAOEbW8BOlABdRC8TXXn6rQhj_MJGeq4ob30WuI-N66R7-FvuoMC7KwclWKhToD45KAp_Uws_PcL9RX7-s-FP_bdBwqvuS5CFu5ZvS-oYoLalmLuH/d/06.jpg
+            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiJJ-VM-_HH4JvU5BvFVufgUCrsIkVIwowMgCghVEeVmdRoNqwg07rzVlgbFjBaoZM6hoN3H0AM6CXWdhfbHhDdvwLaGjxFayZBwrVmhuwwUTnVaEYWHXwaOi_GD-Bl0qVLmtDWZ8Z0xUMx/d/07.jpg
+            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgJed6c__jHMNY4OcHi0_LzPF3jQ8KlYMPa-msoZ4CaWuMEp94WwLIjt1HbnjoUXFVULH58hVRhrwRd1kyIPD97Jp2Zq6_oree3lRy3DMfOdR1bXv8Uv1hPGwQd5pKHVGaquzL6l5cnBZE4/d/08.jpg
           ],
           media_files: [
             { file_size: 621_610 },
@@ -133,80 +133,101 @@ module Sources
             { file_size: 469_124 },
           ],
           page_url: "https://jenolab.blogspot.com/p/bd.html",
-          profile_url: "https://jenolab.blogspot.com",
           profile_urls: %w[https://jenolab.blogspot.com https://www.blogger.com/profile/01791927505974594309],
           display_name: "Jeno",
           username: "jenolab",
-          tag_name: "jenolab",
-          other_names: ["Jeno", "jenolab"],
           tags: [],
           dtext_artist_commentary_title: "BD",
           dtext_artist_commentary_desc: <<~EOS.chomp
             "Folie" publié dans "Envie 2 Fraises" -Oroproductions-
 
-            "[image]":[https://1.bp.blogspot.com/-gFYxDsgG8iA/UgZvCWk10pI/AAAAAAAAAg8/iHVaK5NGg8o/d/01.jpg]
+            "[image]":[https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgKOx3SfHzVaaj8G19RfDnm-6NKRjHj197jucylgMJsH9OyGGcdqK0yWRTHeDygGeQGT-aDkr9szOFlQHoCo2F8HcLmbk5qeL4NC_Atl8NV603CdALUfVj0yO62GJCzscEgWdSiA0lNaLiF/d/01.jpg]
 
-            "[image]":[https://1.bp.blogspot.com/-A-fxc8zPwOE/UgZvGnKqQNI/AAAAAAAAAhE/yGExUNMVqoI/d/02.jpg]
+            "[image]":[https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhUFuuGoCNva89j420q0QigLKNhXKZ8fQtPmONGXQ-7uoeX4Nd6DQ5CSe5zQ2dbmBODUbZdGSi4JCpDC7exb8xZY4yLS5dLTQwWL3AnK3uEMnQam0U07l0NtacGbX5mp09d7Hm49kn2BVwb/d/02.jpg]
 
-            "[image]":[https://1.bp.blogspot.com/-SZGjvHeGRp8/UgZvQ2b38ZI/AAAAAAAAAhM/vt19VigNQxY/d/03.jpg]
+            "[image]":[https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiNVG52GdvN2_Lv2b0e2majD694aOsD8qcRc2wrhEnQEGK-5lX0nSU64Eub9chSWnSp8yrhK-x8x6EeQniVDsrbytfzPpg17PXroUUaaqF_37HWYqAlE3od3cSrkF9-fFPQC_kDqvysgAE-/d/03.jpg]
 
-            "[image]":[https://1.bp.blogspot.com/-ad7nJ4yBldk/UgZvr9J2-jI/AAAAAAAAAhs/7ngB3S775bE/d/04.jpg]
+            "[image]":[https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgv_tjOnu7onl5WqclEz64hO6Q85Xdo6nQpqlZ4q7ykNTnkwmtWlQIb0M0RgYFA1jNcZGFDseHzjOZ0Mf0xH6XptpTS78nP9c3IW6GVl9CQhYkg9q2P0VA01eyPYYTiXMmjRaM4YmR5YFQx/d/04.jpg]
 
-            "[image]":[https://1.bp.blogspot.com/-FABjITxmfZ8/UgZvqOFi0zI/AAAAAAAAAhc/dzeBfGAk3IE/d/05.jpg]
+            "[image]":[https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhSwZvVlnTaG3zvqa4jb7wYzwv_j7N7WZ99jn6KR5fNxzwZFt9wXdKnmMb7BiM5_sR2peGr8_X9MyHBS4rUmy9KpDVifwl9ldw0AtWP6NpxFRrndGVSRL-DjpAKUhitts8JhClNSVzMhQGi/d/05.jpg]
 
-            "[image]":[https://1.bp.blogspot.com/-ENqI2ZjzmeQ/UgZvsHP6H6I/AAAAAAAAAho/oRMVzajcz2c/d/06.jpg]
+            "[image]":[https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgJ9gqIywKnhJa6JDUC2hAuaYj4xybCAOEbW8BOlABdRC8TXXn6rQhj_MJGeq4ob30WuI-N66R7-FvuoMC7KwclWKhToD45KAp_Uws_PcL9RX7-s-FP_bdBwqvuS5CFu5ZvS-oYoLalmLuH/d/06.jpg]
 
-            "[image]":[https://1.bp.blogspot.com/-6ChPE0tvwWA/UgZvuh4ssQI/AAAAAAAAAh0/KdXmt79GhHk/d/07.jpg]
+            "[image]":[https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiJJ-VM-_HH4JvU5BvFVufgUCrsIkVIwowMgCghVEeVmdRoNqwg07rzVlgbFjBaoZM6hoN3H0AM6CXWdhfbHhDdvwLaGjxFayZBwrVmhuwwUTnVaEYWHXwaOi_GD-Bl0qVLmtDWZ8Z0xUMx/d/07.jpg]
 
-            "[image]":[https://1.bp.blogspot.com/-jRB0Xhu8aWY/UgZvuzv0cXI/AAAAAAAAAh8/hK7W_absNSk/d/08.jpg]
+            "[image]":[https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgJed6c__jHMNY4OcHi0_LzPF3jQ8KlYMPa-msoZ4CaWuMEp94WwLIjt1HbnjoUXFVULH58hVRhrwRd1kyIPD97Jp2Zq6_oree3lRy3DMfOdR1bXv8Uv1hPGwQd5pKHVGaquzL6l5cnBZE4/d/08.jpg]
           EOS
         )
       end
 
       context "A blog post on a custom domain" do
         strategy_should_work(
-          "https://www.micmicidol.club/2024/04/weekly-playboy-20240506-no19-46.html",
+          "https://blogger.googleblog.com/2020/05/a-better-blogger-experience-on-web.html",
           image_urls: %w[
-            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhkW0FeG5zkbXPNPO6Fw999yH4YTJ8_7d9kULElPpW2ihaoXwVyN5MRmojnWUv9Ig1ovf7TkaWN5JnYvEc6WUq7YqbYywOD29XKBIaDiCxIVPJWWaZDxHfPC0Y_D9lMS2hiWauhQ2-6JXRYTd_RLj4oErtHFh4OPHGgnIXHM6jbzpAoHekVyBVbYbwMmy2-/d/2-001-micmicidol.jpg
-            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGRsWqvuTqSt6DLZU3tvv61TZTKHcBeLE63t8rCULvXFbye-ZZrvTp_hIbI1ytaSLFS1CI_4Xa-ivqVtsooFG1TIu8nXcYvlT5mCW5RMLxR54G6wdXrnpouCsjjOpkN8TMAalv8OtkgxoRcn81QldYxapDTzK78fFDnUW2EZw0aZYeD-1AX3ZLRjBgsveB/d/2-002-micmicidol.jpg
-            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi-3DQKi5VlhOt-H0Q21UhF1bAAquFjk_MK3w_Ivb_e-OFH8sFgCsa5t0e6ga4nVRKpUItIm7y2WUjdRadJ1E0IFT79W7A4P1QZNRfC_8-PLibw42iwV_66c_YGi5QA8-q8VDHSGqgy_YES8FW21AksHDZfWL5JScKaz9SX9M120nl-4Jyx8Tc4tCevoPor/d/2-003-micmicidol.jpg
-            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgJYLPFZrLno6V8dhpLztuFmFtP5eYfiQ_1Znc-2q3buCL-_CNFMc379xvrX9nfdAHPMhoKGacndWoU7wHXduMC8ZW3EJ5e9Wlk5LIVZ5MASY8ZZaS11BwA_Jyh5HrCf2aPgTrFqOp1Xjvr0PLg8Q0NJRynVN76Psievuuo4QScO7QsXQ6Dr05WjZiqq436/d/2-004-micmicidol.jpg
-            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjFoWHsNG69HVuMjAgx4I-xacQtxNW2ik0c0LOYQ6QPRrvhBoc5lTFWwFQoyIATkoF4mJWkkB7XQarKT7ph9IpzBY_bNae7AKhzpZ6DnU0FMYKZCUpGeaKPcO88fsBqMC_GGmqvfm_OlMEA5Jyu32x5bSQeDOqRCJPAjzaN7xcxRGgyEbgK8pFJni0WKIE2/d/2-005-micmicidol.jpg
-            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjJRgBfvTgLlHkWLeB0E_MEMMk6cwrTsbvxX2ufmehTJTouSeps6-xW20sAPcb1gaNJwVkSIjxV_4UY-6kW-5Ef69J60Ede2nCys2zO1iIeKQyHaQRGLhGXiYoLHgaUKAv5gWKEnwWkx9lKRO1l1u9-ekmQJbjF7VNiVP_jWiyQgphPcqgviHxu1N44Z_eS/d/2-006-micmicidol.jpg
-            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj3ZzDaTavY7UtDHz5BZbiGNzCBmc6-TV163xFw-TeWo0VzxTbIo39VCFLrKKwZRSU975f_gtEAW4qAIg950z9zj9yZSf0KVhha_FhuBD6gG7R9QIT3hLTjcB0R5IhhWWTSzt9JoqemJw29RE73Ngvdgs5PXLJ77qhaPjB1AtuhkwT_agYsfYJDzftuIlyu/d/2-007-micmicidol.jpg
-            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhJejVPsHzKPXU1Xjr8w33K3W7yIvDOmafQY8Y5WqqpHmyY4QdHDOPN6FH34Ub7lOVx2tL25BXAgSfi6fEKEIKEzsTnI7eLkiIHwTA1u_PgO7UR_aWaL7os3gwD8BgcAnCAS8HZQAxUb010WPYjaynSiOcDUy16rBvBs-FN4Q_8yu1QXiVdEtQ2N1OpxQI1/d/2-008-micmicidol.jpg
-            https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiXW1A2VLq4XC21P6UCArcJxoWoD9F-EQ_uyWJhLKxFJ6fcYc3is-Utz7mLKQF2uway5_CAg9zNrRJAc-4XZOl3IROuPXNFAlpyD6vVguVnIduCCKNvc95yDJB3aT7BXRHbW94iio9SN8TovTGnKNWGOBQhxLjAA1FeiobP5ca35rZnPYqJ0gm5ZQ6xOe49/d/2-b01-micmicidol.jpg
+            https://lh5.googleusercontent.com/kWHfhyDmS0K6WMbTlfDV8Hq9RKq7Cs2sbPVl0otK3zDV5jNDO0SxM5-Ot89Wo3E11QvmNMI7VYMimqP-Vg9li-cz0cimWiGpJM65-uOSCmAvSN5n7M-lGcNWNW2u0cAfA54ZsGhZ=d
+            https://lh4.googleusercontent.com/B-Tx1tl3m3_sH_4HiCg0XxhlTka0IV82jwT2LT4T9kzbXF15nMxjwNGe3NUAz-F42irNGdDINUiw4DM---nX_87Bb0X3OL_s5L19Rlyfhtm6oyEMNR1R4473TzkgsuxWQ3HXOIOV=d
           ],
           media_files: [
-            { file_size: 585_511 },
-            { file_size: 655_733 },
-            { file_size: 1_215_986 },
-            { file_size: 1_539_545 },
-            { file_size: 1_041_313 },
-            { file_size: 1_004_377 },
-            { file_size: 987_982 },
-            { file_size: 1_279_556 },
-            { file_size: 68_596 },
+            { file_size: 228_413 },
+            { file_size: 233_651 },
           ],
-          page_url: "https://www.micmicidol.club/2024/04/weekly-playboy-20240506-no19-46.html",
-          profile_url: "https://www.micmicidol.club",
-          profile_urls: %w[https://www.micmicidol.club https://www.blogger.com/profile/02481205275454122028],
-          display_name: "MIC MIC IDOL",
+          page_url: "https://blogger.googleblog.com/2020/05/a-better-blogger-experience-on-web.html",
+          profile_urls: %w[https://blogger.googleblog.com https://www.blogger.com/profile/04878303798219763289],
+          display_name: "A Googler",
           username: nil,
-          tag_name: "mic_mic_idol",
-          other_names: ["MIC MIC IDOL"],
-          tags: [
-            ["- Japan Magazine", "https://www.micmicidol.club/search/label/- Japan Magazine"],
-            ["Weekly Playboy", "https://www.micmicidol.club/search/label/Weekly Playboy"],
-            ["丹生明里", "https://www.micmicidol.club/search/label/丹生明里"],
-            ["日向坂46", "https://www.micmicidol.club/search/label/日向坂46"],
-          ],
-          dtext_artist_commentary_title: "Weekly Playboy 2024.05.06 No.19 丹生明里（日向坂46）『海へ行く日』",
-          dtext_artist_commentary_desc: ""
+          tags: [],
+          dtext_artist_commentary_title: "A better Blogger experience on the web",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            Since 1999, millions of people have expressed themselves on Blogger. From detailed posts about almost every "apple variety":[https://adamapples.blogspot.com/] you could ever imagine to a blog dedicated to "the art of blogging":[https://howtoblog.krishnainfotron.com/] itself, the ability to easily share, publish and express oneself on the web is at the core of Blogger’s mission. As the web constantly evolves, we want to ensure anyone using Blogger has an easy and intuitive experience publishing their content to the web.
+
+            That’s why we’ve been slowly introducing an improved web experience for Blogger. Give the fresh interface a spin by clicking “Try the New Blogger” in the left-hand navigation pane.
+
+            Click the “Try the New Blogger” button to see Blogger’s refreshed look and feel.
+
+            In addition to a fresh feel, Blogger is now responsive on the web, making it easier to use on mobile devices. By investing in an improved web platform, it allows the potential for new features in the future.
+
+            Blogger’s new responsive design makes it easy to manage your blog on-the-go.
+
+            Learn more about the page-specific updates we’ve released to make your Blogger experience even better:
+
+            Stats
+
+            The redesigned Stats page helps you focus on the most important data from your blog by highlighting your most recent post.
+
+            Comments
+
+            A fresh Comments page helps you connect with readers more easily by surfacing areas that need your attention, like comment moderation.
+
+            Posts
+
+            We’ve improved support for "Search Operators":[https://support.google.com/blogger/answer/9675453?hl=en] on the Posts page to help you filter your Blogger posts and page search results more easily.
+
+            Editor
+
+            The newly enhanced Editor page introduces table support, enables better transliteration, and includes an improved image/video upload experience.
+
+            Reading List
+
+            Even if you don’t create from your phone, it’s now easier than ever to read blogs from other creators while you’re on the go.
+
+            Settings
+
+            We’ve streamlined the Settings page to help you manage all your controls from one place.
+
+            We’ll be moving everyone to the new interface over the coming months. Starting in late June, many Blogger creators will see the new interface become their default, though they can revert to the old interface by clicking “Revert to legacy Blogger” in the left-hand navigation. By late July, creators will no longer be able to revert to the legacy Blogger interface.
+
+            We recommend getting ahead of the transition by opting into the experience today. Be sure to let us know what you think about the new design by tapping the Help icon in the top navigation bar. We can’t wait to see how Blogger creators use the latest updates to share their voice with the world.
+
+            [i]Posted by Fontaine on behalf of the Blogger team[/i]
+          EOS
         )
       end
 
       context "A blog post with image URLs in the `img[data-src]` attribute" do
+        setup do
+          skip "Dead site"
+        end
+
         strategy_should_work(
           "https://www.kefblog.com.ng/2022/05/gta-v-5-download-install-apk-obb.html",
           image_urls: %w[

@@ -27,7 +27,7 @@ module Sources
           { file_size: 188_553 },
         ],
         profile_url: "https://twitter.com/motty08111213",
-        display_name: "丸茂_えのぐマネージャー",
+        display_name: "丸茂(元えのぐマネージャー)",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -51,7 +51,7 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        display_name: "丸茂_えのぐマネージャー",
+        display_name: "丸茂(元えのぐマネージャー)",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
@@ -67,7 +67,7 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        display_name: "丸茂_えのぐマネージャー",
+        display_name: "丸茂(元えのぐマネージャー)",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
@@ -83,7 +83,7 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        display_name: "丸茂_えのぐマネージャー",
+        display_name: "丸茂(元えのぐマネージャー)",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
@@ -183,7 +183,7 @@ module Sources
         page_url: "https://twitter.com/shoka_bg/status/1644344692107268097",
         profile_url: "https://twitter.com/shoka_bg",
         profile_urls: ["https://twitter.com/shoka_bg", "https://twitter.com/intent/user?user_id=1109709388049051649"],
-        display_name: "shooka @土曜 西 “ね” 41a",
+        display_name: "ショカ",
         username: "shoka_bg",
         tags: %w[ブルアカ],
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -252,17 +252,15 @@ module Sources
 
     context "A tweet that from an account that is set to followers-only" do
       strategy_should_work(
-        "https://twitter.com/enaiC31/status/1644997451626221568",
-        image_urls: ["https://pbs.twimg.com/media/FtQ0ddcaAAAkSvS.jpg:orig"],
-        page_url: "https://twitter.com/enaiC31/status/1644997451626221568",
-        profile_url: "https://twitter.com/enaiC31",
-        profile_urls: ["https://twitter.com/enaiC31", "https://twitter.com/intent/user?user_id=1444938344891240452"],
-        display_name: "えない🚀",
-        username: "enaiC31",
+        "https://twitter.com/star_ukmgr/status/1917596971143160173",
+        image_urls: [],
+        page_url: "https://twitter.com/star_ukmgr/status/1917596971143160173",
+        profile_urls: %w[https://twitter.com/star_ukmgr],
+        display_name: nil,
+        username: "star_ukmgr",
         tags: [],
-        dtext_artist_commentary_desc: <<~EOS.chomp
-          すろぉもぉしょん💊
-        EOS
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: ""
       )
     end
 
@@ -449,7 +447,7 @@ module Sources
       strategy_should_work(
         "https://twitter.com/Chanta_in_inari/status/1031042032934871041",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          政長さん（<https://twitter.com/naga_masanaga>）の藍様線画を塗ってましたあ。
+          政長さん（<https://x.com/naga_masanaga>）の藍様線画を塗ってましたあ。
           うーん、かわいい。
         EOS
       )

@@ -482,6 +482,10 @@ module Sources
       end
 
       context "A post from a custom blog domain (2)" do
+        setup do
+          skip "Dead domain"
+        end
+
         strategy_should_work(
           "https://d-floe.art/post/190738927749/commission-of-kat-from-gravity-rush",
           image_urls: %w[https://64.media.tumblr.com/faab3d1d9537b9e4e3fe8f04487a1210/42ecfb675692be33-70/s21000x21000/16b1914c6c4834363f30782eebbe045a3721de3b.png],
