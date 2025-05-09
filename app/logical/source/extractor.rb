@@ -233,12 +233,13 @@ module Source
     #
     # @param url [String] The URL to fetch.
     # @param cache [ActiveSupport::Duration] The duration to cache the response for. Defaults to 1 minute.
+    # @param params [Hash] The query params for the URL.
     # @return [Object, nil] The parsed response. For HTML requests this will be a Nokogiri document; for JSON or XML
     #   requests it will be a hash or array. If the request fails, returns nil.
-    def parsed_get(url, cache: 1.minute)
+    def parsed_get(url, cache: 1.minute, params: {})
       return nil if url.blank?
 
-      response = http.cache(cache).get(url)
+      response = http.cache(cache).get(url, params: params)
       update_credentials!(response)
 
       response.parse if response.status.success?
