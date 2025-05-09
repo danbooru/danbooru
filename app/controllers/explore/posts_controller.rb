@@ -12,12 +12,19 @@ module Explore
       limit = params.fetch(:limit, CurrentUser.user.per_page)
       @posts = popular_posts(@min_date, @max_date).paginate(params[:page], limit: limit, search_count: false)
 
+      @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
+      @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostPreviewComponent::DEFAULT_SIZE
+
       respond_with(@posts)
     end
 
     def viewed
       @date, @scale, @min_date, @max_date = parse_date(params)
       @posts = ReportbooruService.new.popular_posts(@date)
+
+      @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
+      @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostPreviewComponent::DEFAULT_SIZE
+
       respond_with(@posts)
     end
 
