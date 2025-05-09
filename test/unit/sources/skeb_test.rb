@@ -46,7 +46,7 @@ module Sources
       )
     end
 
-    context "A post with a smaller unwatermarked version" do
+    context "A watermarked post with a smaller unwatermarked version" do
       strategy_should_work(
         "https://skeb.jp/@2gi0gi_/works/13",
         image_urls: %w[https://si.imgix.net/a5dd8523/requests/191942_0?bg=%23fff&fm=jpg&q=45&w=696&s=52ad749a9440fe471e3b7ceea2a3c1f1],
@@ -80,44 +80,40 @@ module Sources
       )
     end
 
-    context "An animated post with a smaller static unwatermarked version" do
+    context "A watermarked animated post with a smaller static unwatermarked version" do
       strategy_should_work(
-        "https://skeb.jp/@tontaro_/works/316",
-        image_urls: [
-          %r{si.imgix.net/17e73ecf/uploads/origins/5097b1e1-18ce-418e-82f0-e7e2cdab1cea?.*&fm=mp4&w=800&s=},
-          %r{si.imgix.net/4aeeffe6/uploads/origins/23123cfd-9b03-40f6-a8ae-7d74f9118c6f?.*&fm=mp4&w=800&s=},
-          %r{si.imgix.net/06b2de18/uploads/origins/38a00949-a726-45c8-82b3-9aec4e8255ba?.*&fm=mp4&w=800&s=},
+        "https://skeb.jp/@63ntm/works/9",
+        image_urls: %w[
+          https://si.imgix.net/30af0acc/uploads/origins/ff464279-61f1-483a-a3b3-eb541b80dd0c?bg=%23fff&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=mp4&w=800&s=153fc19de62af4e31dcbbc96ff111853
+          https://si.imgix.net/5189de71/uploads/origins/b7fd6358-aed9-4b35-be4d-2f86b8773836?bg=%23fff&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&auto=format&fm=webp&w=800&s=468fa4953b31b9ba03285d7391106d06
         ],
         media_files: [
-          { file_size: 166_445 },
-          { file_size: 169_402 },
-          { file_size: 174_205 },
+          { file_size: 118_871 },
+          { file_size: 120_824 },
         ],
-        page_url: "https://skeb.jp/@tontaro_/works/316",
-        profile_url: "https://skeb.jp/@tontaro_",
-        profile_urls: %w[https://skeb.jp/@tontaro_],
-        display_name: "たろー",
-        username: "tontaro_",
-        tag_name: "tontaro",
-        other_names: %w[たろー tontaro_],
+        page_url: "https://skeb.jp/@63ntm/works/9",
+        profile_urls: %w[https://skeb.jp/@63ntm],
+        display_name: "ഒ",
+        username: "63ntm",
+        tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          h6. Original Request
+          はじめまして、ナツメ様！
+          ナツメ様のスタイルが本当に大好きで、良ければ、こちらの創作キャラクターを描いていただきたいです！
 
-          Hello~! I'd like to request my character cutely and happily swaying from side to side please!
-          Character: https://i.imgur.com/ehYg8PE.jpg
-          Animation Reference: https://imgur.com/a/y9lcwi1
-          I'd appreciate it if you make the background transparent.
-          Thank you!
+          ・絆創膏だらけと病みかわな雰囲気
+          ・泣き顔／天然／無表情
+          ・服装はセーラー服とメイド服（セーラー服+エプロンのデザイン、フリル多めだとうれしいです）
+          ・背景と小物は全て自由にお願いします
 
-          h6. Client Response
+          キャラデザインの一部を変更しても構いませんのでお好きなように描いていただい、どうぞ宜しくお願い致します♡
 
-          Thank you very much! Very cute!
+          https://drive.google.com/drive/folders/1a7LmxJvHyTfM7xEgATZ2BaFAwBQ9Gxte
         EOS
       )
     end
 
-    context "A post with both the small and large version clean" do
+    context "A post with both the small and large version unwatermarked" do
       strategy_should_work(
         "https://skeb.jp/@goma_feet/works/1",
         image_urls: %w[https://si.imgix.net/74d299ef/uploads/origins/78ca23dc-a053-4ebe-894f-d5a06e228af8?bg=%23fff&auto=format&fm=webp&w=800&s=0f091c291e3eeaa8ffe4e35a314b153e],
@@ -142,7 +138,7 @@ module Sources
       )
     end
 
-    context "A post with two images" do
+    context "A post with two watermarked images" do
       strategy_should_work(
         "https://skeb.jp/@LambOic029/works/146",
         image_urls: [
@@ -188,7 +184,7 @@ module Sources
       )
     end
 
-    context "A post with a video" do
+    context "A post with an unwatermarked video" do
       strategy_should_work(
         "https://skeb.jp/@kaisouafuro/works/112",
         image_urls: [%r{https://fcdn.skeb.jp/uploads/outputs/20f9d68f-50ec-44ae-8630-173fc38a2d6a\?response-content-disposition=inline&Expires=.*&Signature=.*&Key-Pair-.*}],
@@ -218,28 +214,27 @@ module Sources
       )
     end
 
-    context "A https://skeb.jp/works/:id URL" do
+    context "A https://skeb.jp/works/:id post with an unwatermarked image" do
       strategy_should_work(
-        "https://skeb.jp/works/133404",
-        image_urls: %w[https://si.imgix.net/5f2e397a/requests/133404_0?bg=%23fff&auto=format&fm=webp&w=800&s=a45810e69658dcc227f8dc056e7c645d],
-        media_files: [{ file_size: 157_342 }],
-        page_url: "https://skeb.jp/@kotora_hu/works/1",
-        profile_url: "https://skeb.jp/@kotora_hu",
-        profile_urls: %w[https://skeb.jp/@kotora_hu],
-        display_name: "風ことら kotora Hu",
-        username: "kotora_hu",
+        "https://skeb.jp/@kz12_nb/works/13",
+        image_urls: %w[https://si.imgix.net/ea5bad96/uploads/origins/18def21b-d39c-44f7-be5b-b5c2b7e9c467?bg=%23fff&auto=format&fm=webp&w=800&s=941a593992956f23f1812fb148809ad9],
+        media_files: [{ file_size: 174_000 }],
+        page_url: "https://skeb.jp/@kz12_nb/works/13",
+        profile_urls: %w[https://skeb.jp/@kz12_nb],
+        display_name: "弱。",
+        username: "kz12_nb",
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           h6. Original Request
 
-          私のオリジナルキャラクターを描いてくだされば本当にありがたいです ! ヘアースタイルは解けた髪で 表情はツンデレのように描いてくだされば ありがたいです。衣装とポーズは自由に描いてください！ ありがとうございました！
-
-          https://sta.sh/21hlqv84ub0x
+          はじめまして、以前描かれていた鈴原るるや、鈴木あんずがとても魅力的です。
+          私の推しであるプリンセスコネクトのアオイちゃんを描いてほしいです。
+          構図等はおまかせしますが、参考までに前回描かれていた、赤い眼鏡をかけた鈴木あんずの雰囲気に似せていただけると嬉しいです。
 
           h6. Client Response
 
-          とてもきれいに描いてくださって本当にありがとうございます ! ! 衣装もポーズもすごく気に入ってます !
+          ありがとうございました！！！！！とっっってもキュートです！！！！！！！！！！！
         EOS
       )
     end

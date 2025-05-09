@@ -45,7 +45,7 @@ module Sources
           ],
           media_files: [
             { file_size: 168_376 },
-            { file_size: 8_532_043 },
+            { file_size: 8_532_022 },
             { file_size: 1_649_911 },
           ],
           page_url: "https://cafe.naver.com/ca-fe/cafes/29314033/articles/28725",
@@ -193,8 +193,8 @@ module Sources
           ],
           media_files: [
             { file_size: 262_117 },
-            { file_size: 1_721_885 },
-            { file_size: 464_062 },
+            { file_size: 1_720_958 },
+            { file_size: 463_898 },
           ],
           page_url: "https://cafe.naver.com/honkaistarrail/229677",
           profile_url: "https://cafe.naver.com/ca-fe/cafes/30487825/members/Vto2qFWaBkptLlqVHADCbw",

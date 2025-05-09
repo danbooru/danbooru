@@ -33,6 +33,7 @@ class Source::URL::Misskey < Source::URL
     # https://media.misskeyusercontent.com/io/thumbnail-e9f307e4-3fad-435f-91b6-3768d688491d.webp | https://misskey.io/notes/9hfx0ezipu
     # https://media.misskeyusercontent.com/io/webpublic-a2cdd9c7-0449-4a61-b453-b5c7b2134677.png
     # https://proxy.misskeyusercontent.com/image.webp?url=https%3A%2F%2Fimg.pawoo.net%2Fmedia_attachments%2Ffiles%2F111%2F232%2F575%2F490%2F284%2F147%2Foriginal%2F9aaf0c71a41b5647.jpeg | https://misskey.io/notes/9ktdpaq840
+    # https://proxy.misskeyusercontent.jp/image/media.nijimissusercontent.app%2Fnull%2F0c368eb5-3ded-4d3b-a0b6-f729b3447ccf.webp?
     # https://media.misskeyusercontent.com/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png | https://misskey.io/notes/9bxaf592x6
     # https://nos3.arkjp.net/image.webp?url=https%3A%2F%2Fimg.pawoo.net%2Fmedia_attachments%2Ffiles%2F110%2F314%2F466%2F230%2F358%2F806%2Foriginal%2F6fbcc38659d3cb97.jpeg | https://misskey.io/notes/9edoxxq8h8
     # https://s3.arkjp.net/misskey/930fe4fb-c07b-4439-804e-06fb472d698f.gif | https://misskey.io/notes/9dd5xo5zda

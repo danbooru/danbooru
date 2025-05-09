@@ -47,9 +47,8 @@ module Sources
           page_url: "https://dotpict.net/works/4834127",
           profile_url: "https://dotpict.net/users/786555",
           profile_urls: %w[https://dotpict.net/users/786555 https://dotpict.net/@ycsawampfp],
-          display_name: "+{《YCSAWAMPFP/YCS》}+",
+          display_name: "•🥖🥖🥖《YCSAWAMPFP/YCS》🔻🔴🔻•",
           username: "ycsawampfp",
-          other_names: ["+{《YCSAWAMPFP/YCS》}+", "ycsawampfp"],
           tags: [
             ["RainyDay2023", "https://dotpict.net/search/works/tag/RainyDay2023"],
             ["YCSAWAMPFP's Art", "https://dotpict.net/search/works/tag/YCSAWAMPFP's Art"],

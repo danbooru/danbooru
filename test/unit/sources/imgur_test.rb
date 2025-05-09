@@ -186,7 +186,7 @@ module Sources
           page_url: "https://imgur.com/a/2tWSH1c",
           profile_url: nil,
           username: nil,
-          artist_commentary_title: nil,
+          dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: "",
           tags: [],
         )
@@ -196,7 +196,7 @@ module Sources
         strategy_should_work(
           "https://imgur.com/a/ngrBZUg",
           image_urls: %w[
-            https://i.imgur.com/E8CE6BM.jpg
+            https://i.imgur.com/E8CE6BM.jpeg
             https://i.imgur.com/FN1DRIe.png
             https://i.imgur.com/MdCdHkV.png
           ],

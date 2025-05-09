@@ -14,14 +14,18 @@ module Sources
       context "A fully extracted shortened URL" do
         strategy_should_work(
           "https://bit.ly/4aAVa4y",
-          image_urls: %w[https://c.fantia.jp/uploads/post/file/2679869/9e73556f-22fa-47d5-a0a5-f4c158718883.png],
-          media_files: [{ file_size: 784_717 }],
+          image_urls: [
+            "https://c.fantia.jp/uploads/post/file/2679869/9e73556f-22fa-47d5-a0a5-f4c158718883.png",
+            %r{https://cc.fantia.jp/uploads/post_content_photo/file/18078682/10300716-1855-4ba0-ab16-f8eb51c125fc.png},
+          ],
+          media_files: [
+            { file_size: 784_717 },
+            { file_size: 7_223_404 },
+          ],
           page_url: "https://fantia.jp/posts/2679869",
-          profile_url: "https://fantia.jp/fanclubs/63436",
           profile_urls: %w[https://fantia.jp/fanclubs/63436],
-          artist_name: "師走ほりお",
-          tag_name: nil,
-          other_names: ["師走ほりお"],
+          display_name: "師走ほりお",
+          username: nil,
           tags: [
             ["オリジナル", "https://fantia.jp/posts?tag=オリジナル"],
             ["無料公開", "https://fantia.jp/posts?tag=無料公開"],

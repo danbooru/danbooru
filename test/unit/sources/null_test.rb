@@ -4,16 +4,14 @@ module Sources
   class NullTest < ActiveSupport::TestCase
     context "An image from an unknown site" do
       strategy_should_work(
-        # "http://oremuhax.x0.com/yo125.htm"
-        "http://oremuhax.x0.com/yoro1603.jpg",
-        image_urls: ["http://oremuhax.x0.com/yoro1603.jpg"],
-        media_files: [{ file_size: 263_253 }],
+        "https://www.marv.jp/uploads/title/10787/6722f3b818ad4.jpg",
+        image_urls: %w[https://www.marv.jp/uploads/title/10787/6722f3b818ad4.jpg],
+        media_files: [{ file_size: 410_739 }],
         page_url: nil,
-        profile_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
         tags: [],
-        tag_name: nil,
-        other_names: [],
-        artist_name: nil,
         dtext_artist_commentary_title: nil,
         dtext_artist_commentary_desc: nil
       )
@@ -21,16 +19,17 @@ module Sources
 
     context "A IP-based source" do
       strategy_should_work(
-        "http://125.6.189.215/kcs2/resources/ship/full/0935_5098_aeltexuflkxs.png?version=52",
-        image_urls: ["http://125.6.189.215/kcs2/resources/ship/full/0935_5098_aeltexuflkxs.png?version=52"],
-        media_files: [{ file_size: 86_605 }],
+        # "http://nghttp2.org/httpbin/image/jpeg",
+        "http://139.162.123.134/httpbin/image/jpeg",
+        image_urls: %w[http://139.162.123.134/httpbin/image/jpeg],
+        media_files: [{ file_size: 35_588 }],
         page_url: nil,
-        profile_url: nil,
+        profile_urls: %w[],
+        display_name: nil,
+        username: nil,
         tags: [],
-        tag_name: nil,
-        artist_name: nil,
-        artist_commentary_title: nil,
-        artist_commentary_desc: nil
+        dtext_artist_commentary_title: nil,
+        dtext_artist_commentary_desc: nil
       )
     end
 

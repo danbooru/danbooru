@@ -25,9 +25,9 @@ module Sources
 
       context "A channel banner sample image URL" do
         strategy_should_work(
-          "https://yt3.googleusercontent.com/lJ61iTeHxuSjr1hqx032Z7hIcaFEa9vFAMlh_r8QExwcw8M6-bI9MVsrb6f6H5yAcqPd2QPp=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj",
-          image_urls: %w[https://yt3.googleusercontent.com/lJ61iTeHxuSjr1hqx032Z7hIcaFEa9vFAMlh_r8QExwcw8M6-bI9MVsrb6f6H5yAcqPd2QPp=d],
-          media_files: [{ file_size: 198_493 }],
+          "https://yt3.googleusercontent.com/UoIkWN_y0G0Q8GAjnE_zTSNd78MYoWK3ZcsOLb7Yg3puumfVlRtHb-kvpGrdy-JL-OrfH1qa3Q=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj",
+          image_urls: %w[https://yt3.googleusercontent.com/UoIkWN_y0G0Q8GAjnE_zTSNd78MYoWK3ZcsOLb7Yg3puumfVlRtHb-kvpGrdy-JL-OrfH1qa3Q=d],
+          media_files: [{ file_size: 757_033 }],
           page_url: nil
         )
       end
@@ -119,7 +119,7 @@ module Sources
           media_files: [{ file_size: 1_379_490 }],
           page_url: "https://www.youtube.com/post/UgkxPM838FMMDlZd0fooRblYR4zysjfbgYhv",
           profile_urls: %w[https://www.youtube.com/@RitaKamishiro https://www.youtube.com/channel/UCBJFsaCvgBa1a9BnEaxu97Q],
-          display_name: "Rita Kamishiro / 神代りた",
+          display_name: "Rita Kamishiro / 神代りた【NOA】",
           username: "RitaKamishiro",
           tags: [
             ["kamiscribble", "https://www.youtube.com/hashtag/kamiscribble"],

@@ -66,17 +66,16 @@ module Sources
 
       context "A Pinterest pin with a non-numeric ID" do
         strategy_should_work(
-          "https://www.pinterest.com/pin/AVBZICDCT7hRTla-jHiJ6w2eVUK1wuq7WRYG8P_uqZIziXisjxatHMA/",
-          image_urls: ["https://i.pinimg.com/originals/2e/7a/35/2e7a35193c293902b896863a7f7d2a18.jpg"],
-          media_files: [{ file_size: 171_954 }],
-          page_url: "https://www.pinterest.com/pin/AVBZICDCT7hRTla-jHiJ6w2eVUK1wuq7WRYG8P_uqZIziXisjxatHMA/",
-          profile_url: nil,
-          profile_urls: [],
+          "https://www.pinterest.com/pin/AWmv0p_rB3LBl0lwa6L4DYNr6WTtDB5lPFXvbO-_QmBcRjNUTxY5MTU/",
+          image_urls: %w[https://i.pinimg.com/originals/9f/27/6f/9f276f58706ac7b78401115fd59b9ce6.png],
+          media_files: [{ file_size: 120_389 }],
+          page_url: "https://www.pinterest.com/pin/AWmv0p_rB3LBl0lwa6L4DYNr6WTtDB5lPFXvbO-_QmBcRjNUTxY5MTU/",
+          profile_urls: %w[],
           display_name: nil,
           username: nil,
-          other_names: [],
-          dtext_artist_commentary_title: "となみ (@tona_bnkz) on Twitter",
-          dtext_artist_commentary_desc: "Embedded"
+          tags: [],
+          dtext_artist_commentary_title: "X. It’s what’s happening",
+          dtext_artist_commentary_desc: "From breaking news and entertainment to sports and politics, get the full story with all the live commentary."
         )
       end
 

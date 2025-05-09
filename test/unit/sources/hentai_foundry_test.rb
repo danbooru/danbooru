@@ -67,6 +67,23 @@ module Sources
     context "A post with commentary containing quote marks inside the links" do
       strategy_should_work(
         "https://www.hentai-foundry.com/pictures/user/QueenComplex/1079933/Fucc",
+        image_urls: %w[https://pictures.hentai-foundry.com/q/QueenComplex/1079933/QueenComplex-1079933-Fucc.jpg],
+        media_files: [{ file_size: 239_826 }],
+        page_url: "https://www.hentai-foundry.com/pictures/user/QueenComplex/1079933",
+        profile_urls: %w[https://www.hentai-foundry.com/user/QueenComplex],
+        display_name: nil,
+        username: "QueenComplex",
+        tags: [
+          ["Beast_Boy", "https://www.hentai-foundry.com/pictures/tagged/Beast_Boy"],
+          ["Foursome", "https://www.hentai-foundry.com/pictures/tagged/Foursome"],
+          ["Orgy", "https://www.hentai-foundry.com/pictures/tagged/Orgy"],
+          ["QueenComplex", "https://www.hentai-foundry.com/pictures/tagged/QueenComplex"],
+          ["Raven", "https://www.hentai-foundry.com/pictures/tagged/Raven"],
+          ["Robin", "https://www.hentai-foundry.com/pictures/tagged/Robin"],
+          ["Starfire", "https://www.hentai-foundry.com/pictures/tagged/Starfire"],
+          ["Teen-Titans", "https://www.hentai-foundry.com/pictures/tagged/Teen-Titans"],
+        ],
+        dtext_artist_commentary_title: "Fucc",
         dtext_artist_commentary_desc: <<~EOS.chomp
           It's a 4th piece in a set of 6
           Previous ones being - This is a sequel to my drawings "[b]&quot;Butts&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/butts], "[b]&quot;Bubbs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/bubbs] and "[b]&quot;Diccs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/diccs]
@@ -74,7 +91,7 @@ module Sources
           The place to see my newest drawings
           and the place to support my work.
           "[b]@Queen_Complexxx[/b]":[https://twitter.com/Queen_Complexxx] - My Twitter
-          "[b]mail@queencomplex.net[/b]":[mailto:<span style=]"&quot;>":[mailto:<span style=][b]<mailto:mail@queencomplex.net>[/b] - My main Email
+          "[b]mail@queencomplex.net[/b]":[mailto:<span style=]"&quot;>[b]mail@queencomplex.net[/b]":[mailto:<span style=] - My main Email
         EOS
       )
     end

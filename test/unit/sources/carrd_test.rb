@@ -17,21 +17,31 @@ module Sources
 
       context "A sample image URL that has an _original version" do
         strategy_should_work(
-          "https://caminukai-art.carrd.co/assets/images/gallery21/a86d9fc4.jpg?v=3850522b",
-          image_urls: %w[https://caminukai-art.carrd.co/assets/images/gallery21/a86d9fc4_original.jpg],
-          media_files: [{ file_size: 223_270 }],
+          "https://caminukai-art.carrd.co/assets/images/gallery27/042ca1a3.jpg?v=b2230a53",
+          image_urls: %w[https://caminukai-art.carrd.co/assets/images/gallery27/042ca1a3_original.jpg],
+          media_files: [{ file_size: 1_025_083 }],
           page_url: nil,
-          profile_urls: %w[https://caminukai-art.carrd.co]
+          profile_urls: %w[https://caminukai-art.carrd.co],
+          display_name: nil,
+          username: "caminukai-art",
+          tags: [],
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: ""
         )
       end
 
       context "An _original full image URL" do
         strategy_should_work(
-          "https://caminukai-art.carrd.co/assets/images/gallery13/ddc31be4_original.jpg?v=3850522b",
-          image_urls: %w[https://caminukai-art.carrd.co/assets/images/gallery13/ddc31be4_original.jpg],
-          media_files: [{ file_size: 193_864 }],
+          "https://caminukai-art.carrd.co/assets/images/gallery27/042ca1a3_original.jpg",
+          image_urls: %w[https://caminukai-art.carrd.co/assets/images/gallery27/042ca1a3_original.jpg],
+          media_files: [{ file_size: 1_025_083 }],
           page_url: nil,
-          profile_urls: %w[https://caminukai-art.carrd.co]
+          profile_urls: %w[https://caminukai-art.carrd.co],
+          display_name: nil,
+          username: "caminukai-art",
+          tags: [],
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: ""
         )
       end
 
@@ -47,21 +57,21 @@ module Sources
 
       context "A page with a single image" do
         strategy_should_work(
-          "https://caminukai-art.carrd.co/#fanart-shadowheartguidance",
-          image_urls: %w[https://caminukai-art.carrd.co/assets/images/gallery21/a86d9fc4_original.jpg],
-          media_files: [{ file_size: 223_270 }],
-          page_url: "https://caminukai-art.carrd.co/#fanart-shadowheartguidance",
-          profile_url: "https://caminukai-art.carrd.co",
-          profile_urls: %w[https://caminukai-art.carrd.co],
-          username: "caminukai-art",
-          other_names: ["caminukai-art"],
+          "https://amyahue.carrd.co/#about",
+          image_urls: %w[https://amyahue.carrd.co/assets/images/gallery01/4a05ad8e.png],
+          media_files: [{ file_size: 153_385 }],
+          page_url: "https://amyahue.carrd.co/#about",
+          profile_urls: %w[https://amyahue.carrd.co],
+          display_name: nil,
+          username: "amyahue",
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            * "[image]":[https://caminukai-art.carrd.co/assets/images/gallery21/a86d9fc4_original.jpg]
-            Shadowheart guidance - Baldur's Gate 3
+            hello !! i'm [b]aya[/b] ⭐
 
-            Illustration of Shadowheart casting guidance, a character from the game Baldur's Gate 3.
+            * "[image]":[https://amyahue.carrd.co/assets/images/gallery01/4a05ad8e.png]
+
+            i'm a 19 year old artist who enjoys drawing webcomics & fanart !!! based in california ~ ≧◡≦
           EOS
         )
       end
@@ -86,10 +96,9 @@ module Sources
             { file_size: 59_213 },
           ],
           page_url: "https://lytell.carrd.co/#portfolio",
-          profile_url: "https://lytell.carrd.co",
           profile_urls: %w[https://lytell.carrd.co],
+          display_name: nil,
           username: "lytell",
-          other_names: ["lytell"],
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -115,74 +124,82 @@ module Sources
         strategy_should_work(
           "https://badkrol.carrd.co/#commission",
           image_urls: %w[
-            https://badkrol.carrd.co/assets/images/gallery01/9be3f1d6.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/f385f1b5.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/2be61c25.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/06811411.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/470ab7cc.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/b7d14035.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/1092c7c0.jpg
             https://badkrol.carrd.co/assets/images/gallery01/1b735c39.jpg
             https://badkrol.carrd.co/assets/images/gallery01/7aa51f1c.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/24fa71b4.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/b13b55a8.jpg
             https://badkrol.carrd.co/assets/images/gallery01/f375193f.jpg
             https://badkrol.carrd.co/assets/images/gallery01/e1f24a6d.jpg
             https://badkrol.carrd.co/assets/images/gallery01/06ab2b47.jpg
             https://badkrol.carrd.co/assets/images/gallery01/1f27675c.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/68efbc17.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/b3a4117b.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/1092c7c0.jpg
             https://badkrol.carrd.co/assets/images/gallery01/5cb6a551.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/b7d14035.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/b13b55a8.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/8fad7dc7.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/b6527092.jpg
-            https://badkrol.carrd.co/assets/images/gallery01/24fa71b4.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/33dfc438.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/4105a942.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/6c23bf4e.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/91533ed2.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/914faf8b.jpg
+            https://badkrol.carrd.co/assets/images/gallery01/64209a6e.jpg
             https://badkrol.carrd.co/assets/images/gallery02/e9db9481.jpg
             https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg
             https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg
-            https://badkrol.carrd.co/assets/images/gallery02/a22539e3.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/84339c57.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg
             https://badkrol.carrd.co/assets/images/gallery02/0db4767e.jpg
             https://badkrol.carrd.co/assets/images/gallery02/8b01a93d.jpg
-            https://badkrol.carrd.co/assets/images/gallery02/95c2ed27.jpg
             https://badkrol.carrd.co/assets/images/gallery02/4451caa0.jpg
-            https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/2b66ac8f.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/2ee5d457.jpg
             https://badkrol.carrd.co/assets/images/gallery02/7438d70f.jpg
             https://badkrol.carrd.co/assets/images/gallery02/2803a091.jpg
             https://badkrol.carrd.co/assets/images/gallery02/5599d4f0.jpg
-            https://badkrol.carrd.co/assets/images/gallery03/78ef819e.jpg
-            https://badkrol.carrd.co/assets/images/gallery03/0034c012.jpg
-            https://badkrol.carrd.co/assets/images/gallery03/f4349834.jpg
-            https://badkrol.carrd.co/assets/images/gallery03/6373c204.jpg
-            https://badkrol.carrd.co/assets/images/gallery03/aa6317be.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/d8c12b40.jpg
+            https://badkrol.carrd.co/assets/images/gallery02/79557ece.jpg
+            https://badkrol.carrd.co/assets/images/gallery03/79cda577.jpg
           ],
           media_files: [
-            { file_size: 8_669 },
+            { file_size: 7_608 },
+            { file_size: 7_395 },
+            { file_size: 5_239 },
+            { file_size: 8_874 },
+            { file_size: 10_727 },
+            { file_size: 9_316 },
             { file_size: 21_915 },
             { file_size: 6_460 },
+            { file_size: 11_381 },
+            { file_size: 20_635 },
             { file_size: 7_012 },
             { file_size: 6_942 },
             { file_size: 11_353 },
             { file_size: 10_785 },
-            { file_size: 7_025 },
-            { file_size: 11_246 },
-            { file_size: 9_316 },
             { file_size: 9_375 },
-            { file_size: 10_727 },
-            { file_size: 20_635 },
-            { file_size: 7_429 },
-            { file_size: 9_311 },
-            { file_size: 11_381 },
+            { file_size: 16_611 },
+            { file_size: 10_317 },
+            { file_size: 12_118 },
+            { file_size: 8_038 },
+            { file_size: 8_608 },
+            { file_size: 9_687 },
             { file_size: 9_222 },
             { file_size: 19_498 },
             { file_size: 8_746 },
-            { file_size: 5_604 },
+            { file_size: 18_136 },
+            { file_size: 17_550 },
             { file_size: 11_945 },
             { file_size: 22_405 },
-            { file_size: 14_529 },
             { file_size: 7_488 },
-            { file_size: 17_550 },
+            { file_size: 8_433 },
+            { file_size: 16_564 },
             { file_size: 6_787 },
             { file_size: 7_166 },
             { file_size: 18_659 },
-            { file_size: 7_161 },
-            { file_size: 8_806 },
-            { file_size: 5_017 },
-            { file_size: 8_059 },
-            { file_size: 7_606 },
+            { file_size: 9_956 },
+            { file_size: 11_345 },
+            { file_size: 43_359 },
           ],
           page_url: "https://badkrol.carrd.co/#commission",
           profile_urls: %w[https://badkrol.carrd.co],
@@ -200,22 +217,27 @@ module Sources
 
             Anime Style ( *some examples have incomplete rendering)
 
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/9be3f1d6.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/f385f1b5.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/2be61c25.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/06811411.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/470ab7cc.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b7d14035.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/1092c7c0.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/1b735c39.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/7aa51f1c.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/24fa71b4.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b13b55a8.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/f375193f.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/e1f24a6d.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/06ab2b47.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/1f27675c.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/68efbc17.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b3a4117b.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/1092c7c0.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/5cb6a551.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b7d14035.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b13b55a8.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/8fad7dc7.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b6527092.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/24fa71b4.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/33dfc438.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/4105a942.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/6c23bf4e.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/91533ed2.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/914faf8b.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/64209a6e.jpg]
 
             🎈Note:for additional difficulty of a character or artwork as a whole, additional fees may be added.🎈
 
@@ -224,23 +246,22 @@ module Sources
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/e9db9481.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/a22539e3.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/84339c57.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/0db4767e.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/8b01a93d.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/95c2ed27.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/4451caa0.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/2b66ac8f.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/2ee5d457.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/7438d70f.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/2803a091.jpg]
             * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/5599d4f0.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/d8c12b40.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/79557ece.jpg]
 
-            Line Sketch ( Anime or Semi-real)
+            Character Sheet ( Anime and Semi-r)
 
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/78ef819e.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/0034c012.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/f4349834.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/6373c204.jpg]
-            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/aa6317be.jpg]
+            * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/79cda577.jpg]
 
             Backgrounds
           EOS
@@ -354,50 +375,53 @@ module Sources
 
       context "A crd.co page" do
         strategy_should_work(
-          "https://popuru.crd.co/#illustration",
-          image_urls: %w[https://popuru.crd.co/assets/images/gallery01/a622b4b6_original.jpg
-                         https://popuru.crd.co/assets/images/gallery01/0501db00_original.jpg
-                         https://popuru.crd.co/assets/images/gallery01/5e8d0711_original.jpg
-                         https://popuru.crd.co/assets/images/gallery01/40b852eb_original.jpg
-                         https://popuru.crd.co/assets/images/gallery01/cef0e40c_original.jpg
-                         https://popuru.crd.co/assets/images/gallery01/ef72e15e_original.jpg
-                         https://popuru.crd.co/assets/images/gallery01/6e7c7eab_original.jpg
-                         https://popuru.crd.co/assets/images/gallery01/b514a7af_original.jpg
-                         https://popuru.crd.co/assets/images/gallery01/2b0f92a9_original.jpg],
-          media_files: [
-            { file_size: 1_388_427},
-            { file_size: 210_944},
-            { file_size: 118_584},
-            { file_size: 1_362_867},
-            { file_size: 701_534},
-            { file_size: 1_553_022},
-            { file_size: 1_210_898},
-            { file_size: 1_258_618},
-            { file_size: 433_682},
+          "https://soycatate.crd.co/#portfolio",
+          image_urls: %w[
+            https://soycatate.crd.co/assets/images/gallery02/8b38245f_original.jpg
+            https://soycatate.crd.co/assets/images/gallery02/7927e76f_original.jpg
+            https://soycatate.crd.co/assets/images/gallery02/870dbb00_original.jpg
+            https://soycatate.crd.co/assets/images/gallery03/c4f9ba75_original.jpg
+            https://soycatate.crd.co/assets/images/gallery03/5035b188_original.jpg
+            https://soycatate.crd.co/assets/images/gallery03/372cdeb2_original.jpg
+            https://soycatate.crd.co/assets/images/gallery01/c0d06614_original.jpg
+            https://soycatate.crd.co/assets/images/gallery01/029db4d2_original.jpg
+            https://soycatate.crd.co/assets/images/gallery01/5a949634_original.jpg
+            https://soycatate.crd.co/assets/images/image04.png
           ],
-          page_url: "https://popuru.crd.co/#illustration",
-          profile_url: "https://popuru.crd.co",
-          profile_urls: %w[https://popuru.crd.co],
+          media_files: [
+            { file_size: 227_835 },
+            { file_size: 182_706 },
+            { file_size: 196_199 },
+            { file_size: 425_891 },
+            { file_size: 210_504 },
+            { file_size: 202_039 },
+            { file_size: 316_880 },
+            { file_size: 318_048 },
+            { file_size: 189_924 },
+            { file_size: 17_248 },
+          ],
+          page_url: "https://soycatate.crd.co/#portfolio",
+          profile_urls: %w[https://soycatate.crd.co],
           display_name: nil,
-          username: "popuru",
+          username: "soycatate",
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            h2. [b]PEDRO SCHMIDT[/b]
+            h1. Portfolio
 
-            2d animation and storyboard
+            * "[image]":[https://soycatate.crd.co/assets/images/gallery02/8b38245f_original.jpg]
+            * "[image]":[https://soycatate.crd.co/assets/images/gallery02/7927e76f_original.jpg]
+            * "[image]":[https://soycatate.crd.co/assets/images/gallery02/870dbb00_original.jpg]
 
-            "[email protected]":[https://popuru.crd.co/cdn-cgi/l/email-protection]
+            * "[image]":[https://soycatate.crd.co/assets/images/gallery03/c4f9ba75_original.jpg]
+            * "[image]":[https://soycatate.crd.co/assets/images/gallery03/5035b188_original.jpg]
+            * "[image]":[https://soycatate.crd.co/assets/images/gallery03/372cdeb2_original.jpg]
 
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/a622b4b6_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/0501db00_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/5e8d0711_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/40b852eb_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/cef0e40c_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/ef72e15e_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/6e7c7eab_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/b514a7af_original.jpg]
-            * "[image]":[https://popuru.crd.co/assets/images/gallery01/2b0f92a9_original.jpg]
+            * "[image]":[https://soycatate.crd.co/assets/images/gallery01/c0d06614_original.jpg]
+            * "[image]":[https://soycatate.crd.co/assets/images/gallery01/029db4d2_original.jpg]
+            * "[image]":[https://soycatate.crd.co/assets/images/gallery01/5a949634_original.jpg]
+
+            "[image]":[https://soycatate.crd.co/assets/images/image04.png]
           EOS
         )
       end

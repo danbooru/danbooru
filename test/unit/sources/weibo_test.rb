@@ -137,15 +137,15 @@ module Sources
       strategy_should_work(
         "https://weibo.com/2427303621/MxojLlLgQ",
         image_urls: [
-          %r{http://f.video.weibocdn.com/o0/6UFmijY5lx083Tat3dUY010412005WK80E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
+          %r{https://f.video.weibocdn.com/o0/6UFmijY5lx083Tat3dUY010412005WK80E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
           "https://wx2.sinaimg.cn/large/90adb6c5ly1hc0l7kfkooj20zk44gb29.jpg",
-          %r{http://f.video.weibocdn.com/o0/o1opApPDlx083Tauz3te01041200aOTe0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
+          %r{https://f.video.weibocdn.com/o0/o1opApPDlx083Tauz3te01041200aOTe0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
           "https://wx3.sinaimg.cn/large/90adb6c5ly1hc0l85w0aaj214072qnpe.jpg",
-          %r{http://f.video.weibocdn.com/o0/8JvVQ4I5lx083TatVmHK010412006WqC0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
+          %r{https://f.video.weibocdn.com/o0/8JvVQ4I5lx083TatVmHK010412006WqC0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
           "https://wx3.sinaimg.cn/large/90adb6c5ly1hc0l83x05ij21402s01kx.jpg",
-          %r{http://f.video.weibocdn.com/o0/OyGhsHWNlx083TauIlJu01041200m8h90E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
-          %r{http://f.video.weibocdn.com/o0/rYbzvUcjlx083TatZhji01041200arLc0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
-          %r{http://f.video.weibocdn.com/o0/Xq5qKYgVlx083TawknVK01041200O1lT0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
+          %r{https://f.video.weibocdn.com/o0/OyGhsHWNlx083TauIlJu01041200m8h90E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
+          %r{https://f.video.weibocdn.com/o0/rYbzvUcjlx083TatZhji01041200arLc0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
+          %r{https://f.video.weibocdn.com/o0/Xq5qKYgVlx083TawknVK01041200O1lT0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
         ],
         media_files: [
           { file_size: 1_417_452 },
@@ -214,14 +214,12 @@ module Sources
 
     context "A deleted or not existing Weibo post" do
       strategy_should_work(
-        "https://weibo.com/5265069929/LiLnMENgs",
+        "https://www.weibo.com/6476636003/Ks2qO3Hfy",
         image_urls: [],
-        page_url: "https://www.weibo.com/5265069929/LiLnMENgs",
-        profile_url: "https://www.weibo.com/u/5265069929",
-        profile_urls: %w[https://www.weibo.com/u/5265069929],
+        page_url: "https://www.weibo.com/6476636003/Ks2qO3Hfy",
+        profile_urls: %w[https://www.weibo.com/u/6476636003],
         display_name: nil,
-        other_names: [],
-        tag_name: "weibo_5265069929",
+        username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: ""

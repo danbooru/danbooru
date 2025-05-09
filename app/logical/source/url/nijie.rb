@@ -56,6 +56,7 @@ class Source::URL::Nijie < Source::URL
     in _, /^\d+$/, *subdir, "dojin_main", "dojin_sam", file if image_url?
       nil
 
+    # https://pic.nijie.net/__s4__/d7e38dee79ff08328ccdb0b5a2edeb7e5454f3ad2e3ec8bf044d47c0faf317fd2cfc650ebe4361ce3b43062b23cf44638f9ac782ce690f1db4b7f5fff72ee91fffebe1c4ae6fb677b43854f3c9ec4c9dcc418dd165e834839f381a2c.jpg
     else
       nil
     end

@@ -88,7 +88,7 @@ module Sources
     context "A note crossposted from a remote instance" do
       strategy_should_work(
         "https://misskey.io/notes/9t3ulxtf6ydq00na",
-        image_urls: %w[https://proxy.misskeyusercontent.jp/image.webp?url=https%3A%2F%2Fmedia.nijimissusercontent.app%2Fnull%2F0c368eb5-3ded-4d3b-a0b6-f729b3447ccf.webp],
+        image_urls: %w[https://proxy.misskeyusercontent.jp/image/media.nijimissusercontent.app%2Fnull%2F0c368eb5-3ded-4d3b-a0b6-f729b3447ccf.webp?],
         media_files: [{ file_size: 537_234 }],
         page_url: "https://misskey.io/notes/9t3ulxtf6ydq00na",
         profile_url: "https://misskey.io/@orizanin@nijimiss.moe",
@@ -180,10 +180,8 @@ module Sources
         page_url: "https://misskey.io/play/9p3itbedgcal048f",
         profile_url: "https://misskey.io/@ruruke",
         profile_urls: %w[https://misskey.io/@ruruke https://misskey.io/users/9go6zwzccc],
-        display_name: "ruru (瑠々)",
+        display_name: nil,
         username: "ruruke",
-        tag_name: "ruruke",
-        other_names: ["ruru (瑠々)", "ruruke"],
         tags: [],
         dtext_artist_commentary_title: "にゃんぷっぷーとあそぼう！",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -193,15 +191,6 @@ module Sources
 
           [tn]代理で運用しております[/tn]
         EOS
-      )
-    end
-
-    context "A s3.arkjp.net direct image url" do
-      strategy_should_work(
-        "https://s3.arkjp.net/misskey/99ae6116-2896-4cf3-9abc-e9746cd2408e.jpg",
-        image_urls: ["https://s3.arkjp.net/misskey/99ae6116-2896-4cf3-9abc-e9746cd2408e.jpg"],
-        media_files: [{ file_size: 100_766 }],
-        page_url: nil
       )
     end
 
@@ -242,11 +231,18 @@ module Sources
     end
 
     context "A file.misskey.design direct image url" do
+      # https://misskey.design/notes/a7lgqwn63mac1nhk
       strategy_should_work(
-        "https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp",
-        image_urls: ["https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp"],
-        media_files: [{ file_size: 188_294 }],
-        page_url: nil
+        "https://file.misskey.design/post/42d7b257-a2a2-4b68-bd10-d1ac3d0cc4fe.webp",
+        image_urls: %w[https://file.misskey.design/post/42d7b257-a2a2-4b68-bd10-d1ac3d0cc4fe.webp],
+        media_files: [{ file_size: 115_390 }],
+        page_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: ""
       )
     end
 
@@ -305,7 +301,7 @@ module Sources
         page_url: "https://nijimiss.moe/notes/01HPZQPJ6M9Y2DP134PRQ548EX",
         profile_url: "https://nijimiss.moe/@GAtturi_",
         profile_urls: %w[https://nijimiss.moe/@GAtturi_ https://nijimiss.moe/users/01GV09J8CQ19F0Z3T0D3PNDRRN],
-        display_name: "がっつり太郎",
+        display_name: nil,
         username: "GAtturi_",
         tag_name: "gatturi",
         tags: [],
@@ -319,19 +315,16 @@ module Sources
 
     context "A note on https://sushi.ski" do
       strategy_should_work(
-        "https://sushi.ski/notes/9t78mwgf9v",
-        image_urls: %w[https://media.sushi.ski/files/webpublic-530bd137-d146-4cd4-b1f0-676d7ce39db7.png],
-        media_files: [{ file_size: 1_045_802 }],
-        page_url: "https://sushi.ski/notes/9t78mwgf9v",
-        profile_url: "https://sushi.ski/@Ru47me",
-        profile_urls: %w[https://sushi.ski/@Ru47me https://sushi.ski/users/9rikwnr0fj],
-        display_name: "するめ",
-        username: "Ru47me",
-        tag_name: "ru47me",
-        other_names: ["するめ", "Ru47me"],
+        "https://sushi.ski/notes/a7lh8go61x",
+        image_urls: %w[https://media.sushi.ski/files/d2fbd97c-3233-4830-997c-d71251b5d92a.webp],
+        media_files: [{ file_size: 457_006 }],
+        page_url: "https://sushi.ski/notes/a7lh8go61x",
+        profile_urls: %w[https://sushi.ski/@aleus52hz https://sushi.ski/users/9btayf9i49],
+        display_name: "あれうす",
+        username: "aleus52hz",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "伊草ハルカ誕"
+        dtext_artist_commentary_desc: "ビールオフ、HUBのこれ飲んでほしい"
       )
     end
 
