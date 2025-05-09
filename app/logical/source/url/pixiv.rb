@@ -224,6 +224,11 @@ module Source
       end
     end
 
+    def image_sample?
+      # TODO: img-zip-ugoira are also samples per #5793
+      image_url? && !image_type.in?(%w[img-original img-zip-ugoira novel-cover-original])
+    end
+
     def page_url
       if work_id.present?
         "https://www.pixiv.net/artworks/#{work_id}"

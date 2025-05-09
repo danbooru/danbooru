@@ -397,6 +397,23 @@ module Sources
 
       assert(Source::URL.profile_url?("https://fantia.jp/fanclubs/64496"))
       assert(Source::URL.profile_url?("https://fantia.jp/asanagi"))
+
+      assert(Source::URL.image_sample?("https://c.fantia.jp/uploads/post/file/1070093/main_16faf0b1-58d8-4aac-9e86-b243063eaaf1.jpeg"))
+      assert(Source::URL.image_sample?("https://c.fantia.jp/uploads/post/file/1132267/main_webp_2a265470-e551-409c-b7cb-04437fd6ab2c.webp"))
+      assert_not(Source::URL.image_sample?("https://c.fantia.jp/uploads/post/file/1070093/16faf0b1-58d8-4aac-9e86-b243063eaaf1.jpeg"))
+
+      assert(Source::URL.image_sample?("https://cc.fantia.jp/uploads/post_content_photo/file/7087182/main_7f04ff3c-1f08-450f-bd98-796c290fc2d1.jpg?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9wb3N0X2NvbnRlbnRfcGhvdG8vZmlsZS83MDg3MTgyL21haW5fN2YwNGZmM2MtMWYwOC00NTBmLWJkOTgtNzk2YzI5MGZjMmQxLmpwZyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTcyNDM1MTk4M319fV19&Signature=AiEKd1dnB4i2ifJLfpb1AW9dg5gaDbNgZ8pbifkt-MQaj9XtL1LLS3CMuBlV9wlbQ7YQ03iiafuVUWQ9iuxVEgdmYzl7UOiH1ntBTraJ50CD1xfiybbPMxLOCR9pAJq-B~-bh-LYXT1Yf2B3ZSQa-C2dZwjqjJnCZSA6M~BDESmi-GFcG0fLPfAMo~I2qxNoY1qt98ibDAlws5ZRHLXzFnKyigY55-3I5F~MK5xj6sncVp1m21pTYUwp2whf9kstSbFkHB08y~xEB7-a21-p5xJZC6qvuVBSwEDhfls~~umUCqgycR0UXNLrbcjnuHbXzfS278oK5Wq2jTboQoIgBw__"))
+      assert_not(Source::URL.image_sample?("https://cc.fantia.jp/uploads/post_content_photo/file/7087182/7f04ff3c-1f08-450f-bd98-796c290fc2d1.jpg?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9wb3N0X2NvbnRlbnRfcGhvdG8vZmlsZS83MDg3MTgyLzdmMDRmZjNjLTFmMDgtNDUwZi1iZDk4LTc5NmMyOTBmYzJkMS5qcGciLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MjQzNTIwMTJ9fX1dfQ__&Signature=otcg8CwBlSDM2DPeEop1OEbgvmnjChV6gR0SgleEDxh3eb49f36KZ33RdKgN8eb9X8Mk9Oyd1MwLk0fsXd7aACUmEDxIrZnipU1Xmlkz-fhobW3QKtvTk1XXWcMxEhmnv-XQzUXG9SwM1vrqMsE17eh5R14aTiUYfPNIrq~UvmusWas-orDBDKAEyNrg1U3DujL75-4Tq4y73Enpyxa5w51fLYN8D2QTx9nJwrsQvJOircpjPvEs1Pg1K~qJLzHdBxCwoWT0QqgMfmamuW0z~5p1AUnnul9v9vXZxT2j1lUzNEwLrX2ZTUni3JyMjp7wDC2mUWkZvTfsQP~572LrRA__"))
+
+      assert(Source::URL.image_sample?("https://c.fantia.jp/uploads/product/image/249638/main_fd5aef8f-c217-49d0-83e8-289efb33dfc4.jpg"))
+      assert(Source::URL.image_sample?("https://c.fantia.jp/uploads/product_image/file/219407/main_bd7419c2-2450-4c53-a28a-90101fa466ab.jpg"))
+      assert_not(Source::URL.image_sample?("https://c.fantia.jp/uploads/product_image/file/219407/bd7419c2-2450-4c53-a28a-90101fa466ab.jpg"))
+
+      assert(Source::URL.image_sample?("https://cc.fantia.jp/uploads/album_image/file/326995/main_00abd740-74d5-4289-be85-782cb8cdd382.png?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9hbGJ1bV9pbWFnZS9maWxlLzMyNjk5NS9tYWluXzAwYWJkNzQwLTc0ZDUtNDI4OS1iZTg1LTc4MmNiOGNkZDM4Mi5wbmciLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MTMyMjAzODN9fX1dfQ__&Signature=Wmw~M4FjxgpDFYfQmtSE6bmIybdLbsby-SLCMcEPImK1ObbSeCq7GeOuOlwggxFTHU-O2juo-x8f8BCG~YKW1OGHBmHXpQJStw1f5juwHr7gtnM-GKmC3FIXCbWbmsMSpr~8frXOJX0AMHWKBN3aJAnZ01kXF5g9YrC8o31~hlHqDodh9zGNEGFlYkBisfh73Gn6f~Lvu4N8-tdfhedKnPkhy95sc2HTdbIlvfM7hq191BbeGWUwagKtrKIkTFJDWgaLinoZCMFqZDgQ4l8PmdK9UF6wi60iqSeWh~CEsHWinOprdAQVzrg~QDlSOLm2GiPnJjcwYO6D42DbFFmvxw__"))
+      assert_not(Source::URL.image_sample?("https://cc.fantia.jp/uploads/album_image/file/326995/00abd740-74d5-4289-be85-782cb8cdd382.png?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9hbGJ1bV9pbWFnZS9maWxlLzMyNjk5NS8wMGFiZDc0MC03NGQ1LTQyODktYmU4NS03ODJjYjhjZGQzODIucG5nIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzEzMjM2OTYxfX19XX0_&Signature=XSpRUwWyKOpR53aImaRQeBQx1R4e8hShO6cm-bmqXtJVchiigbTKsV-kCBMox1aeISAcN-O8VhujVlYwtOV1pw6WmE8kIrKeMnWteA17lYd6wAW2BUcVlQb6TBdpPA38V0UTRlmM0cypgw1ipmmDTKtjQ8-Tmo368bZqi4w4M6EukgK~L8Ss42K0JBwfiv0VuLTw49hK9-jGjA1gyQdzZXZwXkuClelV7VVHWxTX06yT8Anv6giOyOM1IP35LxfYG9ZhbTkN78TqAviZhQ9aLEceYG8Ua65f0bGMWCSnjeox5-UpiQ4irAlLDAVkKT~Lz5otNzQd2UnFkRiqbRB32A__"))
+
+      assert_not(Source::URL.image_sample?("https://fantia.jp/posts/1143951/download/1830956"))
+      assert_not(Source::URL.image_sample?("https://fantia.jp/posts/2533616/album_image?query=YsSkcpdnlam4JOy5dGHafbrSgfCZoMUmfrWD1XEouNkfO9Qk%2BC5Arv7ovxaiIo%2FEeJe5TI9mWDodDBp%2BzIIh70HJ6c0sWH8wMCc%2FM6IhDIKpxE%2BM1Zc1--Ol9M7yLd5TswwnZ5--wZ7u4P1tCVaAoL5ymFfA5Q%3D%3D"))
     end
   end
 end

@@ -415,7 +415,6 @@ module Sources
     end
 
     should "Parse Misskey URLs correctly" do
-      assert(Source::URL.image_url?("https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp"))
       assert(Source::URL.image_url?("https://s3.arkjp.net/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png"))
       assert(Source::URL.image_url?("https://media.misskeyusercontent.jp/io/dfca7bd4-c073-4ea0-991f-313ab3a77847.png"))
       assert(Source::URL.image_url?("https://media.misskeyusercontent.com/io/thumbnail-e9f307e4-3fad-435f-91b6-3768d688491d.webp"))
@@ -427,6 +426,10 @@ module Sources
       assert(Source::URL.image_url?("https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp"))
       assert(Source::URL.image_url?("https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp"))
       assert_not(Source::URL.image_url?("https://media.misskeyusercontent.com"))
+      assert_not(Source::URL.image_sample?("https://s3.arkjp.net/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png"))
+
+      assert(Source::URL.image_url?("https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp"))
+      assert(Source::URL.image_sample?("https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp"))
 
       assert(Source::URL.page_url?("https://misskey.io/notes/9bxaf592x6"))
       assert_equal("https://misskey.io/notes/9bxaf592x6", Source::URL.page_url("https://misskey.io/notes/9bxaf592x6#pswp"))

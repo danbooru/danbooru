@@ -493,6 +493,18 @@ class Post < ApplicationRecord
         # it's unknown whether it's a bad source or not; don't add or remove the tag
       end
 
+      # An image_sample is a source from a recognized site that points to the direct sample image.
+      if parsed_source&.image_url?
+        case parsed_source&.image_sample?
+        when true
+          tags << "image_sample"
+        when false
+          tags -= ["image_sample"]
+        when nil
+          # it's unknown whether it's an image sample or not; don't add or remove the tag
+        end
+      end
+
       # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, videos, and ugoiras are automatically tagged.
       tags -= ["animated"] unless is_flash?
       tags << "animated" if media_asset.is_animated?
