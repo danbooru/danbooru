@@ -318,7 +318,6 @@ Post.view_large = function(e = null) {
 Post.toggle_fit_window = function(e) {
   $("#image").toggleClass("fit-width");
   Note.Box.scale_all();
-  Post.resize_ugoira_controls();
   e.preventDefault();
 };
 
@@ -400,7 +399,6 @@ Post.initialize_ugoira_player = function() {
     let file_url = $(".image-container").data("file-url");
 
     Ugoira.create_player(frame_delays, file_url);
-    $(window).on("resize.danbooru.ugoira_scale", Post.resize_ugoira_controls);
   }
 };
 
@@ -415,13 +413,6 @@ Post.initialize_ruffle_player = function() {
     player.load(src);
   }
 };
-
-Post.resize_ugoira_controls = function() {
-  var $img = $("#image");
-  var width = Math.max($img.width(), 350);
-  $("#ugoira-control-panel").css("width", width);
-  $("#seek-slider").css("width", width - 81);
-}
 
 Post.show_pending_update_notice = function() {
   if (Post.pending_update_count === 0) {
