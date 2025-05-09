@@ -61,7 +61,38 @@ module Source
       end
 
       def dtext_artist_commentary_desc
-        DText.from_plaintext(artist_commentary_desc)
+        dtext = [DText.from_plaintext(artist_commentary_desc)]
+
+        if project["modules"]&.any? { |mod| mod["__typename"].in?(%w[TextModule EmbedModule]) }
+          dtext += project[:modules].to_a.map do |mod|
+            case mod["__typename"]
+            in "TextModule"
+              DText.from_html(mod[:text], base_url: "https://www.behance.net") do |element|
+                case element.name
+                in "div" unless element.at("div").present?
+                  element.name = "p"
+                else
+                  nil
+                end
+              end
+            in "EmbedModule"
+              DText.from_html(mod[:originalEmbed], base_url: "https://www.behance.net") do |element|
+                if element.name == "iframe"
+                  element.name = "p"
+                  element.inner_html = %{<a href="#{element["src"]}">#{element["src"]}</a>}
+                end
+              end
+            in "ImageModule" | "MediaCollectionModule"
+              image_urls_from_module(mod).map do |url|
+                %{"[image]":[#{url}]}
+              end.join("\n")
+            else
+              ""
+            end
+          end
+        end
+
+        dtext.join("\n\n").strip
       end
 
       def tags
