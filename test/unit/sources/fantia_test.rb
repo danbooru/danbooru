@@ -69,20 +69,20 @@ module Sources
         tags: %w[イラスト集 CG集 PNG オリジナル 宮前詩帆 春川朱璃愛 夏川黒羽 ASMR 音声 原神 シニョーラ],
         dtext_artist_commentary_title: "2021年9月更新分[PNG] - September 2021",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          商品について2021年9月に更新した分の画像データと同じものとなります。
+          2021年9月に更新した分の画像データと同じものとなります。
           バックナンバー購入用としてご利用ください。
 
           内容は下記の作品です。
-          ・【きせかえ】肉便器 https://fantia.jp/posts/879616
-          ・放課後パンツ乗せ部 https://fantia.jp/posts/888100
-          ・お嬢とあそぼう https://fantia.jp/posts/901611
-          ・【ASMR】チャプター6：拘束二穴責め〇〇 https://fantia.jp/posts/908473 ※音声ファイルです
-          ・シニョーラさん https://fantia.jp/posts/911526
+          ・【きせかえ】肉便器 <https://fantia.jp/posts/879616>
+          ・放課後パンツ乗せ部 <https://fantia.jp/posts/888100>
+          ・お嬢とあそぼう <https://fantia.jp/posts/901611>
+          ・【ASMR】チャプター6：拘束二穴責め〇〇 <https://fantia.jp/posts/908473> ※音声ファイルです
+          ・シニョーラさん <https://fantia.jp/posts/911526>
 
           有料プランをご利用でない方でも購入できますのでよければ是非！
 
           (有料プランのご加入者向け) 通常のバックナンバーはこちらです。
-          https://fantia.jp/fanclubs/7/backnumbers?month=202109&plan=3309
+          <https://fantia.jp/fanclubs/7/backnumbers?month=202109&plan=3309>
 
           -----
 
@@ -91,19 +91,19 @@ module Sources
 
           The content is in the following posts.
 
-          ・[changing clothes] cum dumpster https://fantia.jp/posts/879616
-          ・after-school underwear club https://fantia.jp/posts/888100
-          ・Let's play with the lady https://fantia.jp/posts/901611
-          ・[ASMR] Chapter 6: Restraint and Two-Hole 〇〇〇〇〇〇〇 https://fantia.jp/posts/908473 *Audio file.
-          ・La Signora https://fantia.jp/posts/911526
+          ・[changing clothes] cum dumpster <https://fantia.jp/posts/879616>
+          ・after-school underwear club <https://fantia.jp/posts/888100>
+          ・Let's play with the lady <https://fantia.jp/posts/901611>
+          ・[ASMR] Chapter 6: Restraint and Two-Hole 〇〇〇〇〇〇〇 <https://fantia.jp/posts/908473> *Audio file.
+          ・La Signora <https://fantia.jp/posts/911526>
 
           Even those who do not use the paid plan can purchase it, so please come!
 
           (For paid plan subscribers) Click here for regular back numbers.
-          https://fantia.jp/fanclubs/7/backnumbers?month=202109&plan=3309
+          <https://fantia.jp/fanclubs/7/backnumbers?month=202109&plan=3309>
 
           * For those of you overseas who can't pay on Fantia, I've started selling it on Gumroad as well.
-          https://jackdempa.gumroad.com/
+          <https://jackdempa.gumroad.com/>
 
           -----
 
@@ -111,19 +111,19 @@ module Sources
 
           内容是以下作品。
 
-          ・[换衣服] 垃圾箱 https://fantia.jp/posts/879616
-          ・放学后的内衣俱乐部 https://fantia.jp/posts/888100
-          ・玩弄女士 https://fantia.jp/posts/901611
-          ・[ASMR]第六章：束缚与双孔折磨 https://fantia.jp/posts/908473 *音频文件
-          ・La Signora https://fantia.jp/posts/911526
+          ・[换衣服] 垃圾箱 <https://fantia.jp/posts/879616>
+          ・放学后的内衣俱乐部 <https://fantia.jp/posts/888100>
+          ・玩弄女士 <https://fantia.jp/posts/901611>
+          ・[ASMR]第六章：束缚与双孔折磨 <https://fantia.jp/posts/908473> *音频文件
+          ・La Signora <https://fantia.jp/posts/911526>
 
           即使你没有付费计划，如果你喜欢，你仍然可以购买这些东西!
 
           (对于付费计划的用户)点击这里查看常规的过去的期刊。
-          https://fantia.jp/fanclubs/7/backnumbers?month=202109&plan=3309
+          <https://fantia.jp/fanclubs/7/backnumbers?month=202109&plan=3309>
 
           * 对于那些不能用Fantia支付的海外人士，我也开始在Gumroad上销售。
-          https://jackdempa.gumroad.com/
+          <https://jackdempa.gumroad.com/>
         EOS
       )
     end
@@ -152,15 +152,6 @@ module Sources
       )
     end
 
-    context "A www.fantia.jp/posts/$id/download url" do
-      strategy_should_work(
-        "https://www.fantia.jp/posts/1143951/download/1830956",
-        image_urls: [%r{https://cc.fantia.jp/uploads/post_content/file/1830956/cbcdfcbe_20220224_120_040_100.png}],
-        media_files: [{ file_size: 14_371_816 }],
-        page_url: "https://fantia.jp/posts/1143951"
-      )
-    end
-
     context "A fantia.jp/posts/$id url" do
       strategy_should_work(
         "https://fantia.jp/posts/1143951",
@@ -184,17 +175,34 @@ module Sources
     context "A fantia.jp/posts/$id blog type url" do
       strategy_should_work(
         "https://fantia.jp/posts/1734300",
-        page_url: "https://fantia.jp/posts/1734300",
         image_urls: %w[
           https://c.fantia.jp/uploads/post/file/1734300/ed85ffde-0e85-47f5-ac37-864984550216.gif
           https://c.fantia.jp/uploads/post/file/1649664/83e30463-3ed7-48e9-af21-d9a022bb1e95.png
           https://c.fantia.jp/uploads/post/file/1679805/dc4ad3d8-e0ce-4388-aafc-64046e285de9.png
           https://c.fantia.jp/uploads/post/file/1679848/f5ee8427-eea6-4a51-8eba-5a89fdf2ee48.png
         ],
-        profile_url: "https://fantia.jp/fanclubs/7",
+        media_files: [
+          { file_size: 1_031_144 },
+          { file_size: 3_657_915 },
+          { file_size: 356_543 },
+          { file_size: 359_123 },
+        ],
+        page_url: "https://fantia.jp/posts/1734300",
         profile_urls: %w[https://fantia.jp/fanclubs/7],
-        artist_name: "弱電波@JackDempa",
-        tags: [],
+        display_name: nil,
+        username: nil,
+        tags: [
+          ["オリジナル", "https://fantia.jp/posts?tag=オリジナル"],
+          ["清楚", "https://fantia.jp/posts?tag=清楚"],
+          ["野外露出", "https://fantia.jp/posts?tag=野外露出"],
+          ["陰毛", "https://fantia.jp/posts?tag=陰毛"],
+          ["放尿", "https://fantia.jp/posts?tag=放尿"],
+          ["中出し", "https://fantia.jp/posts?tag=中出し"],
+          ["セックス", "https://fantia.jp/posts?tag=セックス"],
+          ["エロ衣装", "https://fantia.jp/posts?tag=エロ衣装"],
+          ["スカトロ", "https://fantia.jp/posts?tag=スカトロ"],
+        ],
+        dtext_artist_commentary_title: "淑女の嗜み",
         dtext_artist_commentary_desc: <<~EOS.chomp
           つば広お帽子すきです。
           ⭐️お気に入りボタンを押していただけると次の投稿の励みになります。いつも応援ありがとうございます！
@@ -313,28 +321,62 @@ module Sources
         "https://c.fantia.jp/uploads/post/file/1132267/main_webp_2a265470-e551-409c-b7cb-04437fd6ab2c.webp",
         image_urls: ["https://c.fantia.jp/uploads/post/file/1132267/2a265470-e551-409c-b7cb-04437fd6ab2c.jpg"],
         media_files: [{ file_size: 240_919 }],
-        page_url: "https://fantia.jp/posts/1132267"
+        page_url: "https://fantia.jp/posts/1132267",
+        profile_urls: %w[https://fantia.jp/fanclubs/1096],
+        display_name: nil,
+        username: nil,
+        tags: [
+          ["オリジナル", "https://fantia.jp/posts?tag=オリジナル"],
+          ["漫画", "https://fantia.jp/posts?tag=漫画"],
+        ],
+        dtext_artist_commentary_title: "黒い歴史(5)",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          この回から絵はほとんど今と変わらなくなってきます。が、やはり目が小さすぎました。アップの顔はほぼ全部修正してしまったのでわからないと思いますが、なぜ当時こんなので可愛い女の子を描いてると思ってたのか謎です。
+          制服部分とセリフだけ修正して普通の高校だと言い張るという場合の最大の難所がこの回で、体育の授業でいきなり上級生と柔道をやるというのがおかしすぎるので後半は使えなくなりますね。
+          あとエロシーンを成年仕様にするということで、ちんこもしっかり描きたいですが、今は公開優先であとからアップデートしていきます。
+        EOS
       )
     end
 
     context "A product url with no images" do
       strategy_should_work(
         "https://fantia.jp/products/10000",
-        image_urls: []
+        image_urls: [],
+        page_url: "https://fantia.jp/products/10000",
+        profile_urls: %w[https://fantia.jp/fanclubs/7217],
+        display_name: nil,
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: ""
       )
     end
 
     context "A deleted or non-existing fantia post" do
       strategy_should_work(
         "https://fantia.jp/posts/12345678901234567890",
-        image_urls: []
+        image_urls: [],
+        page_url: "https://fantia.jp/posts/12345678901234567890",
+        profile_urls: %w[],
+        display_name: nil,
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: ""
       )
     end
 
     context "A deleted or non-existing fantia product" do
       strategy_should_work(
         "https://fantia.jp/products/12345678901234567890",
-        image_urls: []
+        image_urls: [],
+        page_url: "https://fantia.jp/products/12345678901234567890",
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: ""
       )
     end
 

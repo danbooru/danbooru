@@ -112,12 +112,17 @@ class Source::Extractor
       when "post"
         api_response&.dig("post", "comment")
       when "product"
-        page&.at(".product-description")&.text
+        page&.at(".product-description > div")&.inner_html
       end
     end
 
     def dtext_artist_commentary_desc
-      DText.from_plaintext(artist_commentary_desc)
+      case work_type
+      when "post"
+        DText.from_plaintext(artist_commentary_desc)
+      when "product"
+        DText.from_html(artist_commentary_desc, base_url: "https://fantia.jp")
+      end
     end
 
     def work_type
