@@ -4,7 +4,7 @@ module Source
   class Extractor
     class DeviantArt < Source::Extractor
       def self.enabled?
-        SiteCredential.for_site("DeviantArt").present?
+        SiteCredential.for_site("Deviant Art").present?
       end
 
       def image_urls

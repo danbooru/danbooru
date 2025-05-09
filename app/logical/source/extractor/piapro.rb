@@ -3,7 +3,7 @@
 # @see Source::URL::Piapro
 class Source::Extractor::Piapro < Source::Extractor
   def self.enabled?
-    SiteCredential.for_site("Piapro").present?
+    SiteCredential.for_site("Piapro.jp").present?
   end
 
   def image_urls

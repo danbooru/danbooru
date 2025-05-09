@@ -30,14 +30,14 @@ class SiteCredential < ApplicationRecord
       help: %{Your "Bluesky":https://bsky.app identifier and password. The identifier must include the domain that you see on your profile, e.g. 'username.bsky.social'.},
     }, {
       id: 600,
-      name: "CiEn",
+      name: "Ci-En",
       default_credential: { session_cookie: Danbooru.config.ci_en_session_cookie },
       help: %{Your "Ci-En":https://ci-en.net 'ci_en_session' cookie.},
     },
     # { id: 700, name: "Cohost" },
     {
       id: 800,
-      name: "DeviantArt",
+      name: "Deviant Art",
       default_credential: { client_id: Danbooru.config.deviantart_client_id, client_secret: Danbooru.config.deviantart_client_secret },
       help: %{Your "DeviantArt":https://www.deviantart.com client ID and client secret. Go to https://www.deviantart.com/developers/ to create a new application.},
     }, {
@@ -62,7 +62,7 @@ class SiteCredential < ApplicationRecord
       help: %{Your "Newgrounds":https://www.newgrounds.com 'vmkIdu5l8m' cookie.},
     }, {
       id: 1300,
-      name: "NicoSeiga",
+      name: "Nico Seiga",
       default_credential: { user_session: Danbooru.config.nico_seiga_user_session },
       help: %{Your "NicoSeiga":https://seiga.nicovideo.jp 'user_session' cookie.},
     }, {
@@ -77,7 +77,7 @@ class SiteCredential < ApplicationRecord
       help: %{Your "Pawoo":https://pawoo.net access token. Go to "Preferences > Development":[https://pawoo.net/settings/applications], create a new application with the 'read' scope, and copy the access token.},
     }, {
       id: 1600,
-      name: "Piapro",
+      name: "Piapro.jp",
       default_credential: { session_cookie: Danbooru.config.piapro_session_cookie },
       help: %{Your "Piapro":https://piapro.jp 'piapro_s' cookie.},
     }, {

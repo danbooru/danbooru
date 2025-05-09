@@ -5,7 +5,7 @@ module Source
   class Extractor
     class NicoSeiga < Source::Extractor
       def self.enabled?
-        SiteCredential.for_site("NiceSeiga").present?
+        SiteCredential.for_site("Nico Seiga").present?
       end
 
       def image_urls

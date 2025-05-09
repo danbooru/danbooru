@@ -3,7 +3,7 @@
 # @see Source::URL::CiEn
 class Source::Extractor::CiEn < Source::Extractor
   def self.enabled?
-    SiteCredential.for_Site("CiEn").present?
+    SiteCredential.for_site("Ci-En").present?
   end
 
   def image_urls
