@@ -117,7 +117,10 @@ class Source::Extractor::Misskey < Source::Extractor
   memoize def ap_api_response
     return {} unless base_url.present? && note_id.present?
 
-    http.cache(1.minute).headers(accept: "application/ld+json").parsed_get("#{base_url}/notes/#{note_id}") || {}
+    # XXX The random query param is to work around a caching issue where this endpoint may return the same cached
+    # results when called twice with different Accept headers.
+    # Ex: `curl -H "Accept: text/html" https://oekakiskey.com/notes/9t6ylo4flx`, `curl -H "Accept: application/ld+json" https://oekakiskey.com/notes/9t6ylo4flx`
+    http.cache(1.minute).headers(accept: "application/ld+json").parsed_get("#{base_url}/notes/#{note_id}?#{SecureRandom.alphanumeric}") || {}
   end
 
   memoize def play
