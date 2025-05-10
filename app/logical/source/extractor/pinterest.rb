@@ -61,7 +61,8 @@ class Source::Extractor::Pinterest < Source::Extractor
 
     # curl -v "https://www.pinterest.com/resource/PinResource/get/?data=%7B%22options%22:%7B%22id%22:%22551409548145105776%22,%22field_set_key%22:%22detailed%22%7D%7D"
     options = { options: { id: pin_id, field_set_key: "detailed" } }
-    json = http.cache(1.minute).parsed_get("https://www.pinterest.com/resource/PinResource/get/", params: { data: options.to_json })
+    headers = { "X-Pinterest-PWS-Handler": "www/[username].js" }
+    json = http.cache(1.minute).headers(headers).parsed_get("https://www.pinterest.com/resource/PinResource/get/", params: { data: options.to_json })
     json&.dig("resource_response", "data") || {}
   end
 end
