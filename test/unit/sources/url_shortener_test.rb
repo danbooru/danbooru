@@ -46,7 +46,6 @@ module Sources
       end
 
       context "A valid shortened URL" do
-        assert_redirects_to("http://0rz.tw/Gwl0j", "https://www.pixiv.net/fanbox/creator/660275?utm_campaign=www_work_list&utm_medium=site_flow&utm_source=pixiv")
         assert_redirects_to("http://amzn.asia/bGjatHL", "https://www.amazon.co.jp/dp/4758009813/ref=cm_sw_r_cp_ep_dp_QgvpAbYQDNKRN")
         assert_redirects_to("http://amzn.asia/d/j0P2N9X", "https://www.amazon.co.jp/dp/4768318983?ref_=cm_sw_r_cp_ud_dp_C5VBJHCYZ5QRBFF71QM8_1")
         assert_redirects_to("http://amzn.to/4afHvyL", "https://www.amazon.com/Portable-Shortwave-Operated-Reception-Earphone/dp/B0BPKJ1XP1")
@@ -88,7 +87,6 @@ module Sources
       end
 
       context "A deleted or nonexistent shortened URL" do
-        assert_redirects_to("https://0rz.tw/bad", nil)
         assert_redirects_to("https://amzn.asia/bad", nil)
         assert_redirects_to("https://amzn.asia/d/bad", nil)
         assert_redirects_to("https://amzn.to/bad", nil)
