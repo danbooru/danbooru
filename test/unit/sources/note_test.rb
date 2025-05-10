@@ -212,7 +212,7 @@ module Sources
         )
       end
 
-      context "A Note post with a custom domain" do
+      context "A Note post with a custom domain (1)" do
         strategy_should_work(
           "https://sanriotimes.sanrio.co.jp/n/nf3fa7f0c4c9d",
           image_urls: %w[
@@ -401,6 +401,85 @@ module Sources
             （おわり）
 
             ©︎2023 SANRIO CO.,LTD. 著作：（株）サンリオ
+          EOS
+        )
+      end
+
+      context "A note post with a custom domain (2)" do
+        strategy_should_work(
+          "https://sunmarkweb.com/n/n8260501ff8b3",
+          image_urls: %w[
+            https://d2l930y2yx77uc.cloudfront.net/img/1738650973-5dju8SUeONzsEV7GMPWQwxyo.jpg
+            https://d2l930y2yx77uc.cloudfront.net/img/1738651227-MFlqXBJUStOc5ufekTn6a8m1.jpg
+            https://d2l930y2yx77uc.cloudfront.net/img/1738651029-2yVrMQw7CTEhzL6K14aOWHet.jpg
+            https://d2l930y2yx77uc.cloudfront.net/img/1738651060-78Mb4tTWmNv9AVzdRuLoY3Ol.png
+          ],
+          media_files: [
+            { file_size: 17_566_237 },
+            { file_size: 4_066_442 },
+            { file_size: 164_299 },
+            { file_size: 842_602 },
+          ],
+          page_url: "https://sunmarkweb.com/n/n8260501ff8b3",
+          profile_urls: %w[https://sunmarkweb.com],
+          display_name: "SUNMARK WEB",
+          username: "sunmarkweb",
+          tags: [
+            ["カメラ", "https://note.com/hashtag/カメラ"],
+            ["本紹介", "https://note.com/hashtag/本紹介"],
+            ["サンマーク出版", "https://note.com/hashtag/サンマーク出版"],
+            ["英語語源辞典", "https://note.com/hashtag/英語語源辞典"],
+          ],
+          dtext_artist_commentary_title: "カメラの語源を探るとイギリスの歴史的建造物に行き着いた",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            スマートフォンの普及で、誰もが日常的に使うようになった「カメラ」。SNSに写真を投稿したり、思い出を記録したり、ちょっとしたメモがわりにしたりなど、もはや生活必需品です。"『アッと驚く英語の語源』":[https://amzn.to/3ElWDQS]は、この言葉の意外な歴史を紐解いています。
+
+            "[image]":[https://amzn.to/3ElWDQS]『アッと驚く英語の語源』
+
+            h2. camera［カメラ］／丸天井
+
+            イギリスのオクスフォードにRadcliffe Camera「ラドクリフ・カメラ」という丸天井の建物があります。18世紀に建てられ、長い間オクスフォード大学の図書館として使われていましたが、いまは閲覧室となっています。1階のホールの中央に階段があり、昇ると丸屋根の外側に出ます。まわりをぐるりと1周する狭い通路があり、そこからはオクスフォードの町が一望できます。
+
+            "[image]":[https://assets.st-note.com/img/1738650973-5dju8SUeONzsEV7GMPWQwxyo.jpg]
+
+            「ラドクリフ」はJohn Radcliffe「ジョン・ラドクリフ」という医師の名前からきています。彼は新しい大学図書館の建設を計画したのですが、すぐに亡くなってしまいます。しかし、最終的には彼の遺産を使って建設が進められ1748年に無事完成したのです。
+
+            ではcamera「カメラ」とは何でしょうか？ [b]もともとギリシア語で「丸天井」「丸屋根」のことをkamarā「カマラー」と言いました。それが「丸天井の建物」となり、ラテン語で「部屋」とか「箱」という意味に変化しました。[/b]
+
+            h3. 「暗い部屋」「暗箱」が不可欠だった理由
+
+            真っ暗な部屋の壁に小さな穴を開けると、向かい側の壁に外の景色が映し出されることは、紀元前の昔から知られていました。上下は逆さまになりますが、絵の下絵を描くなどの目的で使われるようになります。
+
+            15世紀には、この原理を応用したcamera obscūra「カメラ・オプスクーラ」という装置が発明されます。ラテン語で「暗い部屋」という意味ですが、中を暗くした「箱」のことで日本語では「暗箱」と言います。ひとつの面に凸レンズを取りつけて、外の物体をガラス板や白い紙に映し出すものでした。
+
+            17世紀のオランダの画家ヨハネス・フェルメール（1632～1675）も、この装置でトレースして人物や背景の輪郭と細部を描いたのではないかという説もあるのです。
+
+            1824年、フランスのニセフォール・ニエプス（1765～1833）という発明家が、8時間もかかってカメラ・オプスクーラに投影された画像を板に定着させることに成功し、1839年には同じくフランスの写真家ルイ・ダゲール（1789～1851）が銀メッキした銅板を感光させるという技術を完成させました。1841年にはネガフィルムも開発され、焼き増しもできるようになったのです。
+
+            "[image]":[https://assets.st-note.com/img/1738651227-MFlqXBJUStOc5ufekTn6a8m1.jpg]
+
+            [b] その後、暗箱もだんだんコンパクトになり、さまざまに改良されるうちにcamera obscūraからobscūraが取れて、camera「カメラ」という英語になりました。[/b]
+
+            いまではスマホで簡単に写真が撮れ、そのままデータが保存され即座に送信もできます。写真の色調補正も思いのままです。何という凄まじい進歩なのでしょうか。
+
+            ＜本稿は『アッと驚く英語の語源』（サンマーク出版）から一部抜粋して再構成したものです＞
+
+            （編集：サンマーク出版 SUNMARK WEB編集部）
+            Photo by shutterstock
+
+            <https://amzn.to/3ElWDQS>
+
+            【著者】
+            小泉牧夫（こいずみ・まきお）
+            英語表現研究家、英語書籍・雑誌編集者
+
+            ◎関連記事
+
+            <https://sunmarkweb.com/n/nfd651638a501>
+
+            <https://sunmarkweb.com/n/nbfefd1ff39d6>
+
+            "[image]":[https://sunmarkweb.com/n/nfdb87d960b06]
           EOS
         )
       end

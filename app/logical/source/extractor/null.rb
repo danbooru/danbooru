@@ -90,7 +90,8 @@ module Source
           Source::URL::Tumblr.new(tumblr_url).extractor(parent_extractor: self)
         elsif Source::URL::MyPortfolio.new(url).page_url? && twitter_site == "@AdobePortfolio"
           Source::URL::MyPortfolio.new(url).extractor(parent_extractor: self)
-        elsif Source::URL::Note.new(url).page_url? && twitter_site == "@note_PR"
+        # <meta data-n-head="ssr" data-hid="twitter:app:url:googleplay" property="twitter:app:url:googleplay" content="note.mu://note/nf3fa7f0c4c9d">
+        elsif Source::URL::Note.new(url).page_url? && page&.at('meta[property="twitter:app:url:googleplay"]')&.attr("content")&.starts_with?("note.mu://note/")
           Source::URL::Note.new(url).extractor(parent_extractor: self)
         elsif Source::URL::Blogger.new(url).page_url? && page&.at('meta[name="generator"]')&.attr("content") == "blogger"
           Source::URL::Blogger.new(url).extractor(parent_extractor: self)
