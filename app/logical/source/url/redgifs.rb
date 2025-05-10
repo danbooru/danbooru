@@ -19,6 +19,12 @@ class Source::URL::Redgifs < Source::URL
       @gif_id = filename.split("-").first.downcase
       @file_url = without_params(:for, :hash).to_s
 
+    # https://media.redgifs.com/ThunderousVerifiableScoter-mobile.jpg
+    # https://media.redgifs.com/DrearyMatureZebu-large.jpg
+    in "media", "redgifs.com", _
+      @gif_id = filename.split("-").first.downcase
+      @file_url = to_s
+
     # https://www.redgifs.com/watch/thunderousverifiablescoter
     # https://www.redgifs.com/ifr/thunderousverifiablescoter
     in _, "redgifs.com", ("watch" | "ifr"), gif_id

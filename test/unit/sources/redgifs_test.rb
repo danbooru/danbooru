@@ -14,15 +14,12 @@ module Sources
       context "A sample video URL" do
         strategy_should_work(
           "https://thumbs44.redgifs.com/ThunderousVerifiableScoter-mobile.mp4?expires=1715892000&signature=v2:c89b477640c90093677fe353622dffc7624869e28a7444b050f4b2cb52f1ed3c&for=198.54.135&hash=7011125643",
-          image_urls: [%r{https://thumbs\d+.redgifs.com/ThunderousVerifiableScoter.mp4\?expires=.*&signature=.*\z}],
+          image_urls: %w[https://media.redgifs.com/ThunderousVerifiableScoter.mp4],
           media_files: [{ file_size: 2_491_883 }],
           page_url: "https://www.redgifs.com/watch/thunderousverifiablescoter",
-          profile_url: "https://www.redgifs.com/users/kreamu",
           profile_urls: %w[https://www.redgifs.com/users/kreamu],
           display_name: "kreamu",
           username: "kreamu",
-          tag_name: "kreamu",
-          other_names: ["kreamu"],
           tags: [
             ["3D", "https://www.redgifs.com/gifs/3d"],
             ["Animation", "https://www.redgifs.com/gifs/animation"],
@@ -37,33 +34,44 @@ module Sources
       context "An individual image from an image gallery" do
         strategy_should_work(
           "https://thumbs44.redgifs.com/JauntyHandmadePoodle-large.jpg?expires=1715898000&signature=v2:fdcee3e97772b01f3061b7ebd09b9bcc37a05c36a7195c77e3e7fb91da8db472&for=198.54.135&hash=7011125643",
-          image_urls: [%r{https://thumbs\d+.redgifs.com/JauntyHandmadePoodle-large.jpg\?expires=.*&signature=.*\z}],
+          image_urls: %w[https://media.redgifs.com/JauntyHandmadePoodle-large.jpg],
           media_files: [{ file_size: 1_263_405 }],
           page_url: "https://www.redgifs.com/watch/diligentfluidbichonfrise",
-          profile_url: "https://www.redgifs.com/users/throwmeafterdark",
           profile_urls: %w[https://www.redgifs.com/users/throwmeafterdark],
           display_name: "throwmeafterdark",
           username: "throwmeafterdark",
-          tag_name: "throwmeafterdark",
-          other_names: ["throwmeafterdark"],
-          tags: [],
+          tags: [
+            ["Ass", "https://www.redgifs.com/gifs/ass"],
+            ["Babe", "https://www.redgifs.com/gifs/babe"],
+            ["Creampie", "https://www.redgifs.com/gifs/creampie"],
+            ["Cum", "https://www.redgifs.com/gifs/cum"],
+            ["Freeuse", "https://www.redgifs.com/gifs/freeuse"],
+            ["Jeans", "https://www.redgifs.com/gifs/jeans"],
+            ["Panties", "https://www.redgifs.com/gifs/panties"],
+            ["Pawg", "https://www.redgifs.com/gifs/pawg"],
+            ["cumslut", "https://www.redgifs.com/gifs/cumslut"],
+            ["r/RearPussy", "https://www.redgifs.com/gifs/r%2Frearpussy"],
+            ["creampies", "https://www.redgifs.com/niches/creampies"],
+            ["phat-ass-white-girls", "https://www.redgifs.com/niches/phat-ass-white-girls"],
+            ["pussy", "https://www.redgifs.com/niches/pussy"],
+            ["pussy-from-behind", "https://www.redgifs.com/niches/pussy-from-behind"],
+            ["thick-booty", "https://www.redgifs.com/niches/thick-booty"],
+          ],
           dtext_artist_commentary_title: "",
-          dtext_artist_commentary_desc: <<~EOS.chomp
-            A naughty story in 6 parts 💦💦
-          EOS
+          dtext_artist_commentary_desc: "A naughty story in 6 parts 💦💦"
         )
       end
 
       context "An image gallery" do
         strategy_should_work(
           "https://www.redgifs.com/watch/diligentfluidbichonfrise",
-          image_urls: [
-            %r{https://thumbs\d+.redgifs.com/DiligentFluidBichonfrise-large.jpg\?expires=.*&signature=.*\z},
-            %r{https://thumbs\d+.redgifs.com/JauntyHandmadePoodle-large.jpg\?expires=.*&signature=.*\z},
-            %r{https://thumbs\d+.redgifs.com/LameDirectHornedtoad-large.jpg\?expires=.*&signature=.*\z},
-            %r{https://thumbs\d+.redgifs.com/DrearyMatureZebu-large.jpg\?expires=.*&signature=.*\z},
-            %r{https://thumbs\d+.redgifs.com/FemaleWelldocumentedFox-large.jpg\?expires=.*&signature=.*\z},
-            %r{https://thumbs\d+.redgifs.com/RigidGoldShrew-large.jpg\?expires=.*&signature=.*\z},
+          image_urls: %w[
+            https://media.redgifs.com/DiligentFluidBichonfrise-large.jpg
+            https://media.redgifs.com/JauntyHandmadePoodle-large.jpg
+            https://media.redgifs.com/LameDirectHornedtoad-large.jpg
+            https://media.redgifs.com/DrearyMatureZebu-large.jpg
+            https://media.redgifs.com/FemaleWelldocumentedFox-large.jpg
+            https://media.redgifs.com/RigidGoldShrew-large.jpg
           ],
           media_files: [
             { file_size: 1_533_554 },
@@ -74,12 +82,9 @@ module Sources
             { file_size: 935_412 },
           ],
           page_url: "https://www.redgifs.com/watch/diligentfluidbichonfrise",
-          profile_url: "https://www.redgifs.com/users/throwmeafterdark",
           profile_urls: %w[https://www.redgifs.com/users/throwmeafterdark],
           display_name: "throwmeafterdark",
           username: "throwmeafterdark",
-          tag_name: "throwmeafterdark",
-          other_names: ["throwmeafterdark"],
           tags: [
             ["Ass", "https://www.redgifs.com/gifs/ass"],
             ["Babe", "https://www.redgifs.com/gifs/babe"],
@@ -98,24 +103,19 @@ module Sources
             ["thick-booty", "https://www.redgifs.com/niches/thick-booty"],
           ],
           dtext_artist_commentary_title: "",
-          dtext_artist_commentary_desc: <<~EOS.chomp
-            A naughty story in 6 parts 💦💦
-          EOS
+          dtext_artist_commentary_desc: "A naughty story in 6 parts 💦💦"
         )
       end
 
       context "An individual post from an image gallery" do
         strategy_should_work(
           "https://www.redgifs.com/watch/jauntyhandmadepoodle",
-          image_urls: [%r{https://thumbs\d+.redgifs.com/JauntyHandmadePoodle-large.jpg\?expires=.*&signature=.*\z}],
+          image_urls: %w[https://media.redgifs.com/JauntyHandmadePoodle-large.jpg],
           media_files: [{ file_size: 1_263_405 }],
           page_url: "https://www.redgifs.com/watch/diligentfluidbichonfrise",
-          profile_url: "https://www.redgifs.com/users/throwmeafterdark",
           profile_urls: %w[https://www.redgifs.com/users/throwmeafterdark],
           display_name: "throwmeafterdark",
           username: "throwmeafterdark",
-          tag_name: "throwmeafterdark",
-          other_names: ["throwmeafterdark"],
           tags: [
             ["Ass", "https://www.redgifs.com/gifs/ass"],
             ["Babe", "https://www.redgifs.com/gifs/babe"],
@@ -134,24 +134,19 @@ module Sources
             ["thick-booty", "https://www.redgifs.com/niches/thick-booty"],
           ],
           dtext_artist_commentary_title: "",
-          dtext_artist_commentary_desc: <<~EOS.chomp
-            A naughty story in 6 parts 💦💦
-          EOS
+          dtext_artist_commentary_desc: "A naughty story in 6 parts 💦💦"
         )
       end
 
       context "A video post" do
         strategy_should_work(
           "https://www.redgifs.com/watch/thunderousverifiablescoter",
-          image_urls: [%r{https://thumbs\d+.redgifs.com/ThunderousVerifiableScoter.mp4\?expires=.*&signature=.*\z}],
+          image_urls: %w[https://media.redgifs.com/ThunderousVerifiableScoter.mp4],
           media_files: [{ file_size: 2_491_883 }],
           page_url: "https://www.redgifs.com/watch/thunderousverifiablescoter",
-          profile_url: "https://www.redgifs.com/users/kreamu",
           profile_urls: %w[https://www.redgifs.com/users/kreamu],
           display_name: "kreamu",
           username: "kreamu",
-          tag_name: "kreamu",
-          other_names: ["kreamu"],
           tags: [
             ["3D", "https://www.redgifs.com/gifs/3d"],
             ["Animation", "https://www.redgifs.com/gifs/animation"],
@@ -170,7 +165,7 @@ module Sources
 
         strategy_should_work(
           "https://www.redgifs.com/watch/thunderousverifiablescoter",
-          image_urls: [%r{https://thumbs\d+.redgifs.com/ThunderousVerifiableScoter.mp4\?expires=.*&signature=.*\z}],
+          image_urls: %w[https://media.redgifs.com/ThunderousVerifiableScoter.mp4],
           page_url: "https://www.redgifs.com/watch/thunderousverifiablescoter",
           profile_urls: %w[https://www.redgifs.com/users/kreamu],
           display_name: "kreamu"

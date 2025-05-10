@@ -22,8 +22,9 @@ class Source::Extractor::Redgifs < Source::Extractor
   memoize def image_urls_from_api
     gifs = gallery_id.present? ? gallery[:gifs].to_a : [gif].compact_blank
 
-    gifs.map do |gif|
-      Source::URL.parse(gif.dig(:urls, :hd)).file_url
+    gifs.filter_map do |gif|
+      url = gif.dig(:urls, :hd)
+      Source::URL.parse(url).file_url || url
     end
   end
 
