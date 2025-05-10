@@ -227,151 +227,69 @@ module Sources
 
       context "A blog post with editorversion = 2" do
         strategy_should_work(
-          "https://blog.naver.com/goam2/221647025085",
+          "https://m.blog.naver.com/mazingcaizer/40199782739",
           image_urls: %w[
-            http://blogfiles.naver.net/MjAxOTA5MTNfMjQ4/MDAxNTY4MzAzNTg2MDEz.f5aL5tvfgCQ8861BLXT4zdlVZtIBm6s1rsI0-EPEuo8g.HGoozlzX15QDEkTAgwpo1CJoP3bf87IuAKrfve7prEkg.JPEG.goam2/EERhklgU4AELySe-ranga_2st_-_20190913_0024_1172169096957284352.jpg
-            http://blogfiles.naver.net/MjAxOTA5MTNfMjcg/MDAxNTY4MzAzODA4NTM4.bkoxLvqiCwpUz1_9hT6aTaN0lDcgnVY244XUxZOAm2Ug.XPScZ34-4aACLs-Ala-D0kYR1Rs_UCJ6nUNu9YjH_J0g.PNG.goam2/%EB%AC%B4%EB%9D%BC%EC%B9%B4%EB%AF%B8_%EC%BD%94%EC%9A%B0%ED%97%A4%EC%9D%B4_%ED%8A%B8%EC%9C%97_1.png
-            http://blogfiles.naver.net/MjAxOTA5MTNfMTA2/MDAxNTY4MzAzODA4ODEw.JM1a_hko_v89BGC3odi3K1vrnTmhmF9WfURvHWaf73wg.DrrdMB9HatEYU5_UV9RE6zD92J3fah0Rs7IuB1YFhWAg.PNG.goam2/%EB%AC%B4%EB%9D%BC%EC%B9%B4%EB%AF%B8_%EC%BD%94%EC%9A%B0%ED%97%A4%EC%9D%B4_%ED%8A%B8%EC%9C%97_2.png
-            http://blogfiles.naver.net/MjAxOTA5MTNfMjc3/MDAxNTY4MzA0NDMxNTA5.HX-OEYzhBlFCSw7o3n410LwbUavYfIaf_0cKX8-wHKog.QGNzkHr5QvOrPDShWguI5E1QHZsTPP9okCloydfP4iAg.JPEG.goam2/EERf-C1UcAA4TrV-thewatchertmk_-_20190913_0017_1172167329209208837.jpg
-            http://blogfiles.naver.net/MjAxOTA5MTNfNDUg/MDAxNTY4MzA0NDMxNzk4.SFvrsqc89__egiyc6Cuhqryc1M8HLJmSw_-jUa3f5H0g.R25vrS61zCepYnOx-WoxA65pnpIpZ2Vp8Btl3i0aoZAg.JPEG.goam2/EERN5p1UwAEiYeY-HitorinoNight_-_20190913_0000_1172162955728711680.jpg
-            http://blogfiles.naver.net/MjAxOTA5MTNfODYg/MDAxNTY4MzA0NDMyMDk5.bM8rqyvx5kcNEKSfPZtIYcMlamQYFi9RDCmdiQTBqgwg.cewHm07h_rHzCbeDC4aY3oyPPE415P_54Ui_jr8DaDog.JPEG.goam2/EERjUBeUEAAIN7x-HatikouDx_-_20190913_0032_1172171005487284230.jpg
-            http://blogfiles.naver.net/MjAxOTA5MTNfNzUg/MDAxNTY4MzA0NDMyMzMy.9rxAyvY1bydYFHBzRqVA1vjhS_4HtakjDt-iwn7GXjog.YGzRn0gXJWt6hFR3ERSO69hy43COxAAoRB2PfZ_8CTsg.JPEG.goam2/EERdFpuU4AAV1_a-tozimeteyauyu_-_20190913_0004_1172164158898372609.jpg
-            http://blogfiles.naver.net/MjAxOTA5MTNfMTE3/MDAxNTY4MzA0NDMyNjMy.m95WyCF2OIEs-Yss_z5O5ZeZQIzH3m2CaKwF7bXA2pUg.8x37IVYn1oP82LlvBw0vXTwvy7xEDvZ5le_LQG--1pwg.JPEG.goam2/EEQZcm1U4AABZSx-AwaraChikuwa_-_20190912_1909_1172089788465201152.jpg
-            http://blogfiles.naver.net/MjAxOTA5MTNfNyAg/MDAxNTY4MzA0NDMyOTEy.716JwQiel3SiDiIhN3AfkpyMb5gh6-SjqUm45YmRlr8g.6HOZVMt7XpKBLCWEr7tY7ina31BP_pmG_KZ1A5rdGtkg.JPEG.goam2/42232.jpg
+            http://blogfiles.naver.net/20131028_63/mazingcaizer_13829653348023Lofl_JPEG/%EC%97%94%EC%BF%A4%EC%8A%A4%ED%83%80_(1).jpg
+            http://blogfiles.naver.net/20131028_173/mazingcaizer_13829653351091drVF_JPEG/%EC%97%94%EC%BF%A4%EC%8A%A4%ED%83%80_(2).jpg
+            http://blogfiles.naver.net/20131028_284/mazingcaizer_13829653354772FnCs_JPEG/%EC%97%94%EC%BF%A4%EC%8A%A4%ED%83%80_(3).jpg
+            http://blogfiles.naver.net/20131028_259/mazingcaizer_1382965335948e61kQ_JPEG/%EC%97%94%EC%BF%A4%EC%8A%A4%ED%83%80_(4).jpg
+            http://blogfiles.naver.net/20131028_216/mazingcaizer_1382965336298MiSMk_JPEG/%EC%97%94%EC%BF%A4%EC%8A%A4%ED%83%80_(5).jpg
           ],
           media_files: [
-            { file_size: 1_143_156 },
-            { file_size: 207_173 },
-            { file_size: 72_428 },
-            { file_size: 182_998 },
-            { file_size: 149_359 },
-            { file_size: 380_839 },
-            { file_size: 215_862 },
-            { file_size: 636_123 },
-            { file_size: 69_285 },
+            { file_size: 81_136 },
+            { file_size: 118_583 },
+            { file_size: 90_793 },
+            { file_size: 104_815 },
+            { file_size: 101_310 },
           ],
-          page_url: "https://blog.naver.com/goam2/221647025085",
-          profile_url: "https://blog.naver.com/goam2",
-          profile_urls: %w[https://blog.naver.com/goam2],
-          display_name: "애쉬",
-          username: "goam2",
-          tag_name: "goam2",
-          other_names: ["애쉬", "goam2"],
+          page_url: "https://blog.naver.com/mazingcaizer/40199782739",
+          profile_urls: %w[https://blog.naver.com/mazingcaizer],
+          display_name: "마신황제",
+          username: "mazingcaizer",
           tags: [
-            ["기념일", "https://m.blog.naver.com/BlogTagView.naver?tagName=기념일"],
-            ["기념일모음", "https://m.blog.naver.com/BlogTagView.naver?tagName=기념일모음"],
-            ["가면라이더파이즈", "https://m.blog.naver.com/BlogTagView.naver?tagName=가면라이더파이즈"],
-            ["가면라이더카이자", "https://m.blog.naver.com/BlogTagView.naver?tagName=가면라이더카이자"],
-            ["카이자의날", "https://m.blog.naver.com/BlogTagView.naver?tagName=카이자의날"],
-            ["생일", "https://m.blog.naver.com/BlogTagView.naver?tagName=생일"],
-            ["아이돌마스터", "https://m.blog.naver.com/BlogTagView.naver?tagName=아이돌마스터"],
-            ["아이돌마스터신데렐라걸즈", "https://m.blog.naver.com/BlogTagView.naver?tagName=아이돌마스터신데렐라걸즈"],
-            ["신데마스", "https://m.blog.naver.com/BlogTagView.naver?tagName=신데마스"],
-            ["난죠히카루", "https://m.blog.naver.com/BlogTagView.naver?tagName=난죠히카루"],
-            ["각주", "https://m.blog.naver.com/BlogTagView.naver?tagName=각주"],
-            ["각주_괄호", "https://m.blog.naver.com/BlogTagView.naver?tagName=각주_괄호"],
+            ["메카무스메", "https://m.blog.naver.com/BlogTagView.naver?tagName=메카무스메"],
+            ["모바일게임", "https://m.blog.naver.com/BlogTagView.naver?tagName=모바일게임"],
+            ["라인제타", "https://m.blog.naver.com/BlogTagView.naver?tagName=라인제타"],
+            ["엔쿤스타", "https://m.blog.naver.com/BlogTagView.naver?tagName=엔쿤스타"],
+            ["메이첸아머", "https://m.blog.naver.com/BlogTagView.naver?tagName=메이첸아머"],
+            ["파우스트아머", "https://m.blog.naver.com/BlogTagView.naver?tagName=파우스트아머"],
+            ["비리디안라이", "https://m.blog.naver.com/BlogTagView.naver?tagName=비리디안라이"],
+            ["레디언트리펄서", "https://m.blog.naver.com/BlogTagView.naver?tagName=레디언트리펄서"],
+            ["슈페리얼랜서", "https://m.blog.naver.com/BlogTagView.naver?tagName=슈페리얼랜서"],
+            ["클라인라이터", "https://m.blog.naver.com/BlogTagView.naver?tagName=클라인라이터"],
+            ["메카관련 일러스트", "https://blog.naver.com/PostList.naver?blogId=mazingcaizer&categoryName=메카관련 일러스트"],
           ],
-          dtext_artist_commentary_title: "2019년 카이자(913)의 날 기념 배우 무라카미 코우헤이 트윗 + 난죠 히카루(신데마스) 2019년 생일 기념 팬 축전 모음",
+          dtext_artist_commentary_title: "모바일게임 <라인제타> 메이첸 아머",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            "[image]":[http://blogfiles.naver.net/MjAxOTA5MTNfMjQ4/MDAxNTY4MzAzNTg2MDEz.f5aL5tvfgCQ8861BLXT4zdlVZtIBm6s1rsI0-EPEuo8g.HGoozlzX15QDEkTAgwpo1CJoP3bf87IuAKrfve7prEkg.JPEG.goam2/EERhklgU4AELySe-ranga_2st_-_20190913_0024_1172169096957284352.jpg]
+            "[image]":[http://blogfiles.naver.net/20131028_63/mazingcaizer_13829653348023Lofl_JPEG/%BF%A3%C4%EF%BD%BA%C5%B8_(1).jpg]
+            "[image]":[http://blogfiles.naver.net/20131028_173/mazingcaizer_13829653351091drVF_JPEG/%BF%A3%C4%EF%BD%BA%C5%B8_(2).jpg]
+            "[image]":[http://blogfiles.naver.net/20131028_284/mazingcaizer_13829653354772FnCs_JPEG/%BF%A3%C4%EF%BD%BA%C5%B8_(3).jpg]
+            "[image]":[http://blogfiles.naver.net/20131028_259/mazingcaizer_1382965335948e61kQ_JPEG/%BF%A3%C4%EF%BD%BA%C5%B8_(4).jpg]
+            "[image]":[http://blogfiles.naver.net/20131028_216/mazingcaizer_1382965336298MiSMk_JPEG/%BF%A3%C4%EF%BD%BA%C5%B8_(5).jpg]
 
-            (트위터의 "嵐牙("@ranga_2st":[https://twitter.com/ranga_2st/status/1172169096957284352])"님 코스프레)
+            [b]<라인제타>[/b]
 
-            ※출처와 연결된 트윗에서 1장의 사진을 더 볼 수 있습니다. ("링크":[https://twitter.com/border_less_/status/1172169702925160449?s=19])
+            메이첸 아머 5인방
 
-            오늘은 2003년작 <가면라이더 파이즈>의 2호 라이더, 가면라이더 카이자를 상징하는 날입니다.
+            .
 
-            이에 카이자의 주요 장착자 쿠사카 마사토의 배우 무라카미 코우헤이 씨가 기념 트윗들을 올려주셨길래 한번 번역해봤습니다.
+            .
 
-            평소 자신의 배역에 애정이 많은 무라카미 씨 다워서 좋았습니다.
+            .
 
-            더불어 오늘은 추석 + 카이자의 날 + 난죠 히카루 생일 + 13일의 금요일이라는 여러모로 혼파망적인 날이기도(...)
+            엔쿤스타 메카닉 모바일게임 라인제타에 들어간 기체들입니다.
 
-            이 글이 올라갈 때쯤이면 저는 가족들과 함께 시골로 향하고 있겠네요.
+            저 모습은 개조가 완료된 상위기체 모습들이고
 
-            모두 좋은 추석 되시길 바랍니다.
+            하위기체 모습들은 업데이트 기간에 맞추기 위해 급조된 녀석들인지라
 
-            "[image]":[http://blogfiles.naver.net/MjAxOTA5MTNfMjcg/MDAxNTY4MzAzODA4NTM4.bkoxLvqiCwpUz1_9hT6aTaN0lDcgnVY244XUxZOAm2Ug.XPScZ34-4aACLs-Ala-D0kYR1Rs_UCJ6nUNu9YjH_J0g.PNG.goam2/무라카미_코우헤이_트윗_1.png]
+            조만간 정식 이미지로 교체될 예정입니다.
 
-            [quote]
-            9월 13일은 카이자의 날!
+            오래간만에 그리는 메카무스메 타입의 그림이었던지라
 
-            평상시에는 조금 말하기 힘든 비뚤어진 성격의 히어로, 카이자에 대한, 쿠사카 마사토에 대한 사랑을 마음껏 털어놓을 수 있는 날!
+            즐겁게 그렸던 기억이 나네요.
 
-            올해는 일 관계상, 오전 9시 13분에 "카이자" 콜 합니다!
-
-            블로그 업데이트 했습니다!
-
-            "http://blog.koheimurakami.com/?eid=2179":[https://t.co/aoi1gcMwuv?amp=1]
-
-            <http://blog.koheimurakami.com/?eid=2179>
-            [/quote]
-
-            (트윗 출처 → "링크":[https://twitter.com/kohei__murakami/status/1172164271427293189])
-
-            ※이하 번역은 모두 필자가 직접 했습니다. [s]오랜만에 보는 쿠쎀커 썩소[/s]
-
-            "[image]":[http://blogfiles.naver.net/MjAxOTA5MTNfMTA2/MDAxNTY4MzAzODA4ODEw.JM1a_hko_v89BGC3odi3K1vrnTmhmF9WfURvHWaf73wg.DrrdMB9HatEYU5_UV9RE6zD92J3fah0Rs7IuB1YFhWAg.PNG.goam2/무라카미_코우헤이_트윗_2.png]
-
-            [quote]
-            드디어! 그 캐릭터 송을 무라카미 코헤이가 부른다!
-
-            무라카미 코헤이
-
-            「existence~KAIXA-nized dice / Red Rock」
-
-            돌체스터 레코드를 통해
-
-            2019년 9월 13일 오늘 출시!
-
-            "amazon.co.jp/dp/B07XMNLQ7Z?...":[https://t.co/q4X6b98jMK?amp=1]
-
-            (뮤직비디오) 시청은 이쪽!
-
-            <https://youtu.be/m0yrbR_m7VY>
-            [/quote]
-
-            (트윗 출처 → "링크":[https://twitter.com/kohei__murakami/status/1172166797887340545])
-
-            ※가면라이더 카이자의 테마곡을 무라카미 코헤이 씨가 부른 버전으로 새로 녹음해 당일 출시했다고 합니다. 정말이지 대단한 애정 ㅋㅋㅋ
-
-            "[image]":[http://blogfiles.naver.net/MjAxOTA5MTNfMjc3/MDAxNTY4MzA0NDMxNTA5.HX-OEYzhBlFCSw7o3n410LwbUavYfIaf_0cKX8-wHKog.QGNzkHr5QvOrPDShWguI5E1QHZsTPP9okCloydfP4iAg.JPEG.goam2/EERf-C1UcAA4TrV-thewatchertmk_-_20190913_0017_1172167329209208837.jpg]
-
-            (트위터의 "マッタマッタ/・ワ・("@thewatchertmk":[https://twitter.com/thewatchertmk/status/1172167329209208837])"님 작품)
-
-            [s]깨알 같은 겐무[/s]
-
-            "[image]":[http://blogfiles.naver.net/MjAxOTA5MTNfNDUg/MDAxNTY4MzA0NDMxNzk4.SFvrsqc89__egiyc6Cuhqryc1M8HLJmSw_-jUa3f5H0g.R25vrS61zCepYnOx-WoxA65pnpIpZ2Vp8Btl3i0aoZAg.JPEG.goam2/EERN5p1UwAEiYeY-HitorinoNight_-_20190913_0000_1172162955728711680.jpg]
-
-            (트위터의 "ものろーぐ("@HitorinoNight":[https://twitter.com/HitorinoNight/status/1172162955728711680])"님 작품)
-
-            ※벨트는 가면라이더 지오의 시공 드라이버 오마쥬
-
-            "[image]":[http://blogfiles.naver.net/MjAxOTA5MTNfODYg/MDAxNTY4MzA0NDMyMDk5.bM8rqyvx5kcNEKSfPZtIYcMlamQYFi9RDCmdiQTBqgwg.cewHm07h_rHzCbeDC4aY3oyPPE415P_54Ui_jr8DaDog.JPEG.goam2/EERjUBeUEAAIN7x-HatikouDx_-_20190913_0032_1172171005487284230.jpg]
-
-            (트위터의 "はちこう😈カラマス9/29("@HatikouDx":[https://twitter.com/HatikouDx/status/1172171005487284230])"님 작품)
-
-            "[image]":[http://blogfiles.naver.net/MjAxOTA5MTNfNzUg/MDAxNTY4MzA0NDMyMzMy.9rxAyvY1bydYFHBzRqVA1vjhS_4HtakjDt-iwn7GXjog.YGzRn0gXJWt6hFR3ERSO69hy43COxAAoRB2PfZ_8CTsg.JPEG.goam2/EERdFpuU4AAV1_a-tozimeteyauyu_-_20190913_0004_1172164158898372609.jpg]
-
-            (트위터의 "作画傭兵ヤウユ("@tozimeteyauyu":[https://twitter.com/tozimeteyauyu/status/1172164158898372609])"님 작품)
-
-            ※가면라이더 쿠우가 변신 포즈
-
-            "[image]":[http://blogfiles.naver.net/MjAxOTA5MTNfMTE3/MDAxNTY4MzA0NDMyNjMy.m95WyCF2OIEs-Yss_z5O5ZeZQIzH3m2CaKwF7bXA2pUg.8x37IVYn1oP82LlvBw0vXTwvy7xEDvZ5le_LQG--1pwg.JPEG.goam2/EEQZcm1U4AABZSx-AwaraChikuwa_-_20190912_1909_1172089788465201152.jpg]
-
-            (트위터의 "芦原ちくわ("@AwaraChikuwa":[https://twitter.com/AwaraChikuwa/status/1172089788465201152])"님 작품)
-
-            ※코스튬은 신데마스 오리지널이지만, 일러스트 컨셉은 가면라이더 크로즈 마그마로 추정
-
-            "[image]":[http://blogfiles.naver.net/MjAxOTA5MTNfNyAg/MDAxNTY4MzA0NDMyOTEy.716JwQiel3SiDiIhN3AfkpyMb5gh6-SjqUm45YmRlr8g.6HOZVMt7XpKBLCWEr7tY7ina31BP_pmG_KZ1A5rdGtkg.JPEG.goam2/42232.jpg]
-
-            오늘은 <아이돌 마스터 신데렐라 걸즈>에 등장하는 특촬물 매니아 아이돌 난죠 히카루의 생일입니다.
-
-            특촬물 매니아라는 설정에 9월 13일이라...새삼스레 제작진이 뭔가 여러모로 노렸다[1]는 것을 깨닫게 되네요. (...)
-
-            생일 축하합니다!
-
-            1. (각주) 실제로 히카루는 데레스테 슈로대 이벤트에서 슈로대 OG의 기체 컴패터블 카이저에 탑승하고 등장한 전적이 있습니다. 컴패터블 카이저의 색상 등이 히카루의 코스튬과 닮긴 했지만 하필 '카이저'라 아무리 봐도 노린 것 같습니다. (...)
+            시간나시면 한번쯤 플레이해주시길~~
           EOS
         )
       end

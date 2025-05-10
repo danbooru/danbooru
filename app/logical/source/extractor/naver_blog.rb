@@ -27,12 +27,16 @@ class Source::Extractor::NaverBlog < Source::Extractor
   end
 
   def tags
-    tags = page&.css(".post_tag a").to_a.map do |element|
-      tag = element.text.delete_prefix("#")
+    script = page&.at('script[text()*="gsTagName"]')&.text.to_s
+
+    # var gsTagName = "포토덤프챌린지,스페셜포토덤프";
+    tags = script.slice(/var gsTagName = "(.*?)";/, 1)&.split(",").to_a.map do |tag|
       [tag, "https://m.blog.naver.com/BlogTagView.naver?tagName=#{Danbooru::URL.escape(tag)}"]
     end
 
-    category = page&.at(".lst_m .td.tit .ell")&.text
+    # category = page&.at(".blog_category a, .post_tit_area .tit_category a._categoryName")&.text
+    # var gsCategoryName = "[\uBE14\uCC4C] \uC2A4\uD398\uC15C \uD3EC\uD1A0\uB364\uD504";
+    category = script.slice(/var gsCategoryName = (".*?");/, 1)&.undump
     if username.present? && category.present?
       tags += [[category, "https://blog.naver.com/PostList.naver?blogId=#{Danbooru::URL.escape(username)}&categoryName=#{Danbooru::URL.escape(category)}"]]
     end
