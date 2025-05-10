@@ -20,15 +20,15 @@ module Sources
     context "An anifty image hosted on imgix" do
       strategy_should_work(
         "https://anifty.imgix.net/creation/0x9942a21fdc78fe2c3973d219a1d705a4efd056b4/22f4c9694dd2f1f32b610d1d75a18621c5c2d6d8.jpg?w=3840&q=undefined&auto=compress",
-        image_urls: ["https://storage.googleapis.com/anifty-media/creation/0x9942a21fdc78fe2c3973d219a1d705a4efd056b4/22f4c9694dd2f1f32b610d1d75a18621c5c2d6d8.jpg"],
-        profile_url: "https://anifty.jp/@unagi189",
-        page_url: "https://anifty.jp/creations/1585",
+        image_urls: %w[https://storage.googleapis.com/anifty-media/creation/0x9942a21fdc78fe2c3973d219a1d705a4efd056b4/22f4c9694dd2f1f32b610d1d75a18621c5c2d6d8.jpg],
+        media_files: [{ file_size: 20_607_538 }],
+        page_url: nil,
+        profile_urls: %w[https://anifty.jp/@unagi189],
         display_name: "yunagi",
         username: "unagi189",
-        other_names: ["yunagi", "unagi189"],
-        tags: ["background", "girl", "uniform"],
-        artist_commentary_title: "Sound!",
-        artist_commentary_desc: "This work was created in 2017 and partially modified for exhibition.I created this work with the image of after-school for the girls in the brass band."
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: ""
       )
     end
 

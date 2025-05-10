@@ -59,18 +59,7 @@ class Source::Extractor
     end
 
     def work_id
-      parsed_url.work_id || parsed_referer&.work_id || work_id_from_artist_api
-    end
-
-    def work_id_from_artist_api
-      # Try to get the work ID from the artist's list of tokens
-      return nil unless parsed_url.file.present? && parsed_url.work_type == "creation"
-      artist_api_response["createdTokens"].to_a.map do |token|
-        if Source::URL.parse(token["imageURL"])&.file == parsed_url.file
-          return token["creationID"]
-        end
-      end
-      nil
+      parsed_url.work_id || parsed_referer&.work_id
     end
 
     def artist_hash
