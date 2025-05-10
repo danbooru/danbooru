@@ -3,8 +3,10 @@
 # @see Source::URL::Foriio
 class Source::Extractor::Foriio < Source::Extractor
   def image_urls
-    if parsed_url.image_url?
+    if parsed_url.full_image_url.present?
       [parsed_url.full_image_url]
+    elsif parsed_url.image_url?
+      [parsed_url.url]
     else
       work.dig("data", "images")&.pluck("urls")&.pluck("list").to_a.map do |url|
         Source::URL.parse(url).full_image_url || url
