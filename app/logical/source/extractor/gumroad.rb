@@ -49,7 +49,7 @@ class Source::Extractor
     end
 
     memoize def api_response
-      page&.at("script.js-react-on-rails-component")&.text&.parse_json || {}
+      page&.at("script.js-react-on-rails-component[data-component-name!='Alert']")&.text&.parse_json || {}
     end
   end
 end
