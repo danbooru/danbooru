@@ -2,8 +2,6 @@
 
 # @see Source::URL::PixivComic
 class Source::Extractor::PixivComic < Source::Extractor
-  CLIENT_HASH_SALT = "mAtW1X8SzGS880fsjEXlM73QpS1i4kUMBhyhdaYySk8nWz533nrEunaSplg63fzT"
-
   def image_urls
     if parsed_url.full_image_url.present?
       [parsed_url.full_image_url]
@@ -101,46 +99,59 @@ class Source::Extractor::PixivComic < Source::Extractor
   memoize def magazine
     return {} unless magazine_id.present?
 
-    http.cache(1.minute).parsed_get("https://comic.pixiv.net/api/app/magazines/v2/#{magazine_id}")&.dig("data") || {}
+    api_get("https://comic.pixiv.net/api/app/magazines/v2/#{magazine_id}")&.dig("data") || {}
   end
 
   memoize def work
     return {} unless work_id.present?
 
-    http.cache(1.minute).parsed_get("https://comic.pixiv.net/api/app/works/v5/#{work_id}")&.dig("data") || {}
+    api_get("https://comic.pixiv.net/api/app/works/v5/#{work_id}")&.dig("data") || {}
   end
 
   memoize def work_stories
     return {} unless work_id.present?
 
-    http.cache(1.minute).parsed_get("https://comic.pixiv.net/api/app/works/#{work_id}/episodes/v2?order=desc")&.dig("data", "episodes") || {}
+    api_get("https://comic.pixiv.net/api/app/works/#{work_id}/episodes/v2?order=desc")&.dig("data", "episodes") || {}
   end
 
   memoize def story
     return {} unless story_id.present?
 
-    http.cache(1.minute).parsed_get("https://comic.pixiv.net/api/app/episodes/#{story_id}/read_v4")&.dig("data", "reading_episode") || {}
+    api_get("https://comic.pixiv.net/api/app/episodes/#{story_id}/read_v4")&.dig("data", "reading_episode") || {}
   end
 
   memoize def novel_work
     return {} unless novel_work_id.present?
 
-    http.cache(1.minute).parsed_get("https://comic.pixiv.net/api/app/novel/works/#{novel_work_id}")&.dig("data") || {}
+    api_get("https://comic.pixiv.net/api/app/novel/works/#{novel_work_id}")&.dig("data") || {}
   end
 
   memoize def novel_story
     return {} unless novel_story_id.present?
 
-    http.cache(1.minute).parsed_get("https://comic.pixiv.net/api/app/novel/episodes/#{novel_story_id}/read_v4")&.dig("data", "reading_episode") || {}
+    api_get("https://comic.pixiv.net/api/app/novel/episodes/#{novel_story_id}/read_v4")&.dig("data", "reading_episode") || {}
   end
 
-  def http
+  def api_get(url)
     time = Time.zone.now.rfc3339.to_s
+    hash = Digest::SHA256.hexdigest(time + salt) if salt.present?
 
-    super.headers(
-      "X-Requested-With": "pixivcomic",
-      "X-Client-Hash": Digest::SHA256.hexdigest(time + CLIENT_HASH_SALT),
-      "X-Client-Time": time
-    )
+    http.headers("X-Requested-With": "pixivcomic", "X-Client-Hash": hash, "X-Client-Time": time).cache(1.minute).parsed_get(url)
+  end
+
+  def salt
+    page_json.dig(:props, :pageProps, :salt).to_s
+  end
+
+  memoize def page_json
+    page&.at("#__NEXT_DATA__")&.text&.parse_json || {}
+  end
+
+  memoize def page
+    parsed_get(page_url)
+  end
+
+  def http_downloader
+    super.headers(Referer: "https://comic.pixiv.net")
   end
 end

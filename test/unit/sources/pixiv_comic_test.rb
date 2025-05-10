@@ -9,7 +9,7 @@ module Sources
         strategy_should_work(
           "https://public-img-comic.pximg.net/images/magazine_cover/e772MnFuZZ5oQsadLQ2b/317.jpg?20240120120001",
           image_urls: %w[https://public-img-comic.pximg.net/images/magazine_cover/e772MnFuZZ5oQsadLQ2b/317.jpg],
-          media_files: [{ file_size: 150_123 }],
+          media_files: [{ file_size: 153_724 }],
           page_url: "https://comic.pixiv.net/magazines/317",
           profile_urls: [],
           display_name: nil,
@@ -65,7 +65,7 @@ module Sources
           ],
           dtext_artist_commentary_title: "今日もとなりへ猫詣で!",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。"にゃんにゃんコミックス、発売中!!":[https://www.amazon.co.jp/dp/B0BJ15P135]
+            片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。"にゃんにゃんコミックス、発売中!!":[https://comic.pixiv.net/store/products/1236533]
           EOS
         )
       end
@@ -147,7 +147,7 @@ module Sources
           ],
           dtext_artist_commentary_title: "今日もとなりへ猫詣で!",
           dtext_artist_commentary_desc: <<~EOS.chomp
-            片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。"にゃんにゃんコミックス、発売中!!":[https://www.amazon.co.jp/dp/B0BJ15P135]
+            片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。"にゃんにゃんコミックス、発売中!!":[https://comic.pixiv.net/store/products/1236533]
           EOS
         )
       end
