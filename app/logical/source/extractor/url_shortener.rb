@@ -57,14 +57,14 @@ class Source::Extractor::URLShortener < Source::Extractor
         url = http.redirect_url("https://bbs-api-os.hoyolab.com/community/misc/api/transit?q=#{params[:q]}", method: "GET")
         url&.params&.dig(:url) || url&.to_s
       else
-        url = http.redirect_url("https://sg-public-api.hoyoverse.com/common/short_link_user/v1/transit?code=#{id}", method: "GET").to_s
+        url = http.redirect_url(https_url, method: "GET")&.to_s
         url unless url == "https://webstatic.hoyoverse.com/short_link/404_v2.html"
       end
 
     # curl -v https://naver.me/FABhCw8Z
     # HEAD not supported; https://naver.me redirects to http://naver.me; returns 307 on success and 404 on error.
     in "naver.me", id
-      response = http.no_follow.get("http://naver.me/#{id}")
+      response = http.no_follow.get("https://naver.me/#{id}")
       response.headers["Location"] if response.status.redirect?
 
     # curl -I https://pin.it/4A1N0Rd5W
