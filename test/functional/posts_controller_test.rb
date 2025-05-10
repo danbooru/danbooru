@@ -737,9 +737,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       should "not create a post when the uploader is upload-limited" do
         @user = create(:user, upload_points: 0)
 
-        @user.upload_limit.upload_slots.times do
+        @user.upload_limit.upload_slots.times do |n|
           assert_difference("Post.count", 1) do
-            create_post!(user: @user)
+            travel(n.hour) do
+              create_post!(user: @user)
+            end
           end
         end
 
@@ -837,10 +839,10 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_post_source_equals("https://h.bilibili.com/83341894", "https://i0.hdslb.com/bfs/album/669c0974a2a7508cbbb60b185eddaa0ccf8c5b7a.jpg", "https://h.bilibili.com/83341894")
 
         assert_post_source_equals("https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg", "https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg")
-        assert_post_source_equals("https://t.bilibili.com/686082748803186697", "https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg", "https://t.bilibili.com/686082748803186697")
+        assert_post_source_equals("https://www.bilibili.com/opus/686082748803186697", "https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg", "https://t.bilibili.com/686082748803186697")
 
-        assert_post_source_equals("https://i.4cdn.org/vt/1611919211191.jpg", "https://i.4cdn.org/vt/1611919211191.jpg")
-        assert_post_source_equals("https://boards.4channel.org/vt/thread/1#p1", "https://i.4cdn.org/vt/1611919211191.jpg", "https://boards.4channel.org/vt/thread/1")
+        assert_post_source_equals("https://i.4cdn.org/vt/1745613423284732.jpg", "https://i.4cdn.org/vt/1745613423284732.jpg")
+        assert_post_source_equals("https://boards.4chan.org/vt/thread/99394683#p99394683", "https://i.4cdn.org/vt/1745613423284732.jpg", "https://boards.4chan.org/vt/thread/99394683")
       end
 
       should "not normalize source URLs to NFC form" do

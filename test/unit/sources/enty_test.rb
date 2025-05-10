@@ -4,6 +4,8 @@ module Sources
   class EntyTest < ActiveSupport::TestCase
     context "Enty:" do
       context "A public Enty page URL" do
+        setup { skip "Dead site?" }
+
         strategy_should_work(
           "https://enty.jp/posts/141598?ref=newest_post_pc",
           image_urls: [
@@ -30,6 +32,8 @@ module Sources
       end
 
       context "A public Enty image URL with a referer" do
+        setup { skip "Dead site?" }
+
         strategy_should_work(
           "https://img01.enty.jp/uploads/ckeditor/pictures/194353/content_20211227_130_030_100.png",
           referer: "https://enty.jp/posts/141598?ref=newest_post_pc",
@@ -55,6 +59,8 @@ module Sources
       end
 
       context "A public Enty image URL without a referer" do
+        setup { skip "Dead site?" }
+
         strategy_should_work(
           "https://img01.enty.jp/uploads/ckeditor/pictures/194353/content_20211227_130_030_100.png",
           image_urls: %w[

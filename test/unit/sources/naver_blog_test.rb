@@ -122,6 +122,10 @@ module Sources
 
             <https://www.pixiv.net/users/41156437>
 
+            인스타 : <https://www.instagram.com/biyamoftwitter>
+
+            <https://www.instagram.com/biyamoftwitter>
+
             포스타입 : <https://www.postype.com/profile/@39cusc>
 
             <https://www.postype.com/profile/@39cusc>

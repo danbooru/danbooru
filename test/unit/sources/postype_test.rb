@@ -486,6 +486,8 @@ module Sources
             https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/75ec3915095232435142738584.png
             https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/07f72417152836831668158350.png
             https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/d93da214214883177591385839.png
+            https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/e0495910488976549975147777.png
+            https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/95d9e88921357639619368656.png
           ],
           media_files: [
             { file_size: 8_537 },
@@ -506,7 +508,9 @@ module Sources
             { file_size: 3_780_100 },
             { file_size: 1_326_900 },
             { file_size: 2_500_660 },
-            { file_size: 2_502_081 }
+            { file_size: 2_502_081 },
+            { file_size: 1_737_186 },
+            { file_size: 1_056_481 },
           ],
           page_url: "https://www.postype.com/@rottenmustard/post/15534076",
           profile_urls: %w[https://www.postype.com/@rottenmustard https://www.postype.com/profile/@46axcn],
@@ -606,6 +610,10 @@ module Sources
             "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/07f72417152836831668158350.png?w=1000&q=90]
 
             "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/d93da214214883177591385839.png?w=1000&q=90]
+
+            "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/e0495910488976549975147777.png?w=1000&q=90]
+
+            "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/95d9e88921357639619368656.png?w=1000&q=90]
           EOS
         )
       end
@@ -780,6 +788,10 @@ module Sources
       end
 
       context "A membership-only Postype post" do
+        setup do
+          skip "Dead post (site returns 404, but somehow the API still returns the data for it)"
+        end
+
         strategy_should_work(
           "https://bbunny-backstreet.postype.com/post/12206917",
           image_urls: [],

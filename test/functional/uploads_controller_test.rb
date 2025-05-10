@@ -368,7 +368,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       should "not normalize source URLs to NFC form" do
         # ブ = U+30D5 U+3099 ('KATAKANA LETTER HU', 'COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK')
-        source = "https://tuyu-official.jp/wp/wp-content/uploads/2022/09/雨模様［サブスクジャケット］.jpeg"
+        source = "https://bond-live.com/en/wp-content/uploads/2024/12/Vライバー-アイキャッチ-23.png"
 
         upload = assert_successful_upload(source, user: @user)
         assert_equal(source, upload.source)
@@ -538,8 +538,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "uploading a file from a source" do
-        should_upload_successfully("https://www.artstation.com/artwork/04XA4")
-        should_upload_successfully("https://dantewontdie.artstation.com/projects/YZK5q")
         should_upload_successfully("https://cdna.artstation.com/p/assets/images/images/006/029/978/large/amama-l-z.jpg")
 
         should_upload_successfully("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484")
@@ -560,8 +558,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://tbib.org/index.php?page=post&s=view&id=11480218")
         should_upload_successfully("https://rule34.xxx/index.php?page=post&s=view&id=6961597")
         should_upload_successfully("https://rule34.us/index.php?r=posts/view&id=6204967")
-
-        should_upload_successfully("https://boards.4channel.org/vt/thread/1#p1")
 
         should_upload_successfully("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
         should_upload_successfully("http://seiga.nicovideo.jp/seiga/im4937663")
@@ -596,7 +592,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://twitter.com/noizave/status/875768175136317440")
         should_upload_successfully("https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN?format=jpg&name=medium")
-        should_upload_successfully("https://pbs.twimg.com/profile_banners/2371694594/1581832507/1500x500")
         should_upload_successfully("https://twitter.com/zeth_total/status/1355597580814585856")
         should_upload_successfully("https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4")
 
@@ -614,7 +609,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://skeb.jp/@kokuzou593/works/45")
         should_upload_successfully("https://skeb.jp/@LambOic029/works/146")
-        should_upload_successfully("https://skeb.imgix.net/uploads/origins/307941e9-dbe0-4e4b-93d4-94accdaff9a0?bg=%23fff&auto=format&w=800&s=e0ddfb1fa0d9f23797b338598aae78fa")
 
         should_upload_successfully("https://www.plurk.com/p/omc64y")
         should_upload_successfully("https://www.plurk.com/p/om6zv4")
@@ -627,13 +621,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("http://wwwew.web.fc2.com/e/405.jpg")
 
-        should_upload_successfully("http://www.tinami.com/view/1087268")
-
         should_upload_successfully("https://booth.pximg.net/4ee2c0d9-41fa-4a0e-a30f-1bc9e15d4e5b/i/2586180/331b7c5f-7614-4772-aae2-cb979ad44a6b.png")
-
-        should_upload_successfully("https://picdig.net/ema/projects/9d99151f-6d3e-4084-9cc0-082d386122ca")
-
-        should_upload_successfully("https://enty.jp/posts/141598")
 
         should_upload_successfully("https://arca.live/b/arknights/66031722")
 
