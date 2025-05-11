@@ -61,6 +61,8 @@
 </head>
 
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item, @exception) do %>
+  <% @visible_news_updates = NewsUpdate.active.order(created_at: :desc).to_a %>
+
   <% if @visible_news_updates.present? %>
     <div id="news-updates" data-id="<%= @visible_news_updates.first.try(:id) %>" class="flex gap-1 p-1 items-center text-center text-xs <%= ("hidden" if cookies["news-ticker"].to_i == @visible_news_updates.first.try(:id)) %>">
       <div class="flex-grow-1">
