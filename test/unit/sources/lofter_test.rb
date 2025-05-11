@@ -39,7 +39,7 @@ module Sources
           { file_size: 3_374_972 },
         ],
         page_url: "https://gengar563.lofter.com/post/1e82da8c_1c98dae1b",
-        profile_urls: %w[https://gengar563.lofter.com],
+        profile_urls: %w[https://gengar563.lofter.com https://www.lofter.com/mentionredirect.do?blogId=511892108],
         display_name: "续杯超盐酸",
         username: "gengar563",
         tags: [
@@ -69,7 +69,7 @@ module Sources
         image_urls: %w[https://imglf5.lf127.net/img/Mm55d3lNK2tJUWpNTjVLN0MvaTRDc1UvQUFLMGszOHRvSjV6S3VSa1lwa3BDWUtVOWpBTHBnPT0.jpg],
         media_files: [{ file_size: 5_773_611 }],
         page_url: "https://yuli031458.lofter.com/post/3163d871_1cbdc5f6d",
-        profile_urls: %w[https://yuli031458.lofter.com],
+        profile_urls: %w[https://yuli031458.lofter.com https://www.lofter.com/mentionredirect.do?blogId=828627057],
         display_name: "52hertzc",
         username: "yuli031458",
         tags: [
@@ -87,7 +87,7 @@ module Sources
         image_urls: %w[https://imglf3.lf127.net/img/d28aeb098a69b1d2/ZmltbmVjOU9BRzFHVTVnTkNmc0V0NDlSRnNrdENIWWwyZkFreTJJd0duRT0.jpg],
         media_files: [{ file_size: 256_345 }],
         page_url: "https://chengyeliuli.lofter.com/post/1d127639_2b6e850c8",
-        profile_urls: %w[https://chengyeliuli.lofter.com],
+        profile_urls: %w[https://chengyeliuli.lofter.com https://www.lofter.com/mentionredirect.do?blogId=487749177],
         display_name: "桃原",
         username: "chengyeliuli",
         tags: [
@@ -116,7 +116,7 @@ module Sources
           { file_size: 809_021 },
         ],
         page_url: "https://qiuchenghanshuang.lofter.com/post/1f9d6464_2b736607b",
-        profile_urls: %w[https://qiuchenghanshuang.lofter.com],
+        profile_urls: %w[https://qiuchenghanshuang.lofter.com https://www.lofter.com/mentionredirect.do?blogId=530408548],
         display_name: "秋某",
         username: "qiuchenghanshuang",
         tags: [
@@ -145,7 +145,7 @@ module Sources
           { file_size: 91_011 },
         ],
         page_url: "https://sdz013.lofter.com/post/1ec04eca_1ccabb5df",
-        profile_urls: %w[https://sdz013.lofter.com],
+        profile_urls: %w[https://sdz013.lofter.com https://www.lofter.com/mentionredirect.do?blogId=515919562],
         display_name: "闪闪电电鼠",
         username: "sdz013",
         tags: [
@@ -163,7 +163,7 @@ module Sources
         image_urls: %w[https://imglf4.lf127.net/img/d2ZIUXlGd2FraFNMMC9KUTNGdTFjVkZydjlsNUxhVyt2MHpUanhaeld5Vy8zZEQzUE5XMXhBPT0.jpg],
         media_files: [{ file_size: 154_620 }],
         page_url: "https://okitagumi.lofter.com/post/1e69aeeb_fbb63ca",
-        profile_urls: %w[https://okitagumi.lofter.com],
+        profile_urls: %w[https://okitagumi.lofter.com https://www.lofter.com/mentionredirect.do?blogId=510242539],
         display_name: "3626151",
         username: "okitagumi",
         tags: [
@@ -228,7 +228,7 @@ module Sources
           { file_size: 5_450_938 },
         ],
         page_url: "https://honkai.lofter.com/post/1ff23f93_12d66a85b",
-        profile_urls: %w[https://honkai.lofter.com],
+        profile_urls: %w[https://honkai.lofter.com https://www.lofter.com/mentionredirect.do?blogId=535969683],
         display_name: "崩崩CG Collection",
         username: "honkai",
         tags: [
@@ -294,7 +294,7 @@ module Sources
         image_urls: %w[https://imglf4.lf127.net/img/767c7fec4d8e1f50/bnpEMS9YSVpSbzJNaFkvMmdtL3Q4b2IwM3lmY3NPWmZ3VFhMZ05Pb2RxRT0.jpg],
         media_files: [{ file_size: 854_991 }],
         page_url: "https://jiuhaotaiyangdeshexian.lofter.com/post/73f37cdf_2b86a4ae7",
-        profile_urls: %w[https://jiuhaotaiyangdeshexian.lofter.com],
+        profile_urls: %w[https://jiuhaotaiyangdeshexian.lofter.com https://www.lofter.com/mentionredirect.do?blogId=1945337055],
         display_name: "鸠号太阳的射线-",
         username: "jiuhaotaiyangdeshexian",
         tags: [],
@@ -309,7 +309,7 @@ module Sources
         image_urls: %w[https://vodm2lzexwq.vod.126.net/vodm2lzexwq/Pc5jg1nL_3039990631_sd.mp4?resId=254486990bfa2cd7aa860229db639341_3039990631_1&sign=4j02HTHXqNfhaF%2B%2FO14Ny%2F9SMNZj%2FIjpJDCqXfYa4aM%3D],
         media_files: [{ file_size: 647_902 }],
         page_url: "https://wooden-brain.lofter.com/post/1e60de5b_1c9bf8efb",
-        profile_urls: %w[https://wooden-brain.lofter.com],
+        profile_urls: %w[https://wooden-brain.lofter.com https://www.lofter.com/mentionredirect.do?blogId=509664859],
         display_name: "依末",
         username: "wooden-brain",
         tags: [
@@ -328,7 +328,7 @@ module Sources
         image_urls: %w[https://imglf4.lf127.net/img/b7c3e00acd19f7c0/azVib0c4ZHd2WVd6UEhkWG93c1QxRXM3V3VVM2pab0pqaXB3UFV4WG1tVT0.png],
         media_files: [{ file_size: 827_495 }],
         page_url: "https://xingfulun16203.lofter.com/post/77a68dc4_2b9f0f00c",
-        profile_urls: %w[https://xingfulun16203.lofter.com],
+        profile_urls: %w[https://xingfulun16203.lofter.com https://www.lofter.com/mentionredirect.do?blogId=2007403972],
         display_name: "高考去了",
         username: "xingfulun16203",
         tags: [
@@ -355,7 +355,7 @@ module Sources
         image_urls: %w[https://imglf6.lf127.net/img/c1e3b9c3e508baaf/TTVWeTVSYWgxZ1pkdnluQnhlbC9Fc25Zd0hQZzN0ZUxuUjQzdVdzL2dYWT0.jpg],
         media_files: [{ file_size: 2_228_804 }],
         page_url: "https://lesegeng.lofter.com/post/1f0aec07_2bbc5ce0b",
-        profile_urls: %w[https://lesegeng.lofter.com],
+        profile_urls: %w[https://lesegeng.lofter.com https://www.lofter.com/mentionredirect.do?blogId=520809479],
         display_name: "羔",
         username: "lesegeng",
         tags: [
@@ -396,6 +396,7 @@ module Sources
       assert(Source::URL.profile_url?("http://www.lofter.com/app/xiaokonggedmx"))
       assert(Source::URL.profile_url?("http://www.lofter.com/blog/semblance"))
       assert(Source::URL.profile_url?("http://gengar563.lofter.com"))
+      assert(Source::URL.profile_url?("https://www.lofter.com/mentionredirect.do?blogId=1278105311"))
     end
   end
 end
