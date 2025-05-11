@@ -97,10 +97,9 @@ class BulkUpdateRequestProcessor
         when :remove_implication
           tag_implication = TagImplication.active.find_by(antecedent_name: args[0], consequent_name: args[1])
 
-          if validation_context == :approval
+          if tag_implication.nil?
             # ignore non-existing implication when approving a BUR
-          elsif tag_implication.nil?
-            errors.add(:base, "Can't remove implication #{args[0]} -> #{args[1]} (implication doesn't exist)")
+            errors.add(:base, "Can't remove implication #{args[0]} -> #{args[1]} (implication doesn't exist)") unless validation_context == :approval
           else
             tag_implication.update(status: "deleted")
           end

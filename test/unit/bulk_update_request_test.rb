@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class BulkUpdateRequestTest < ActiveSupport::TestCase
   def create_bur!(script, approver)
@@ -8,7 +8,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     bur
   end
 
-  context "a bulk update request" do
+  context "for a bulk update request" do
     setup do
       @admin = FactoryBot.create(:admin_user)
       CurrentUser.user = @admin
@@ -382,6 +382,29 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(true, @ti.is_deleted?)
           assert_equal("approved", @bur.reload.status)
         end
+
+        should "allow the flattening of an implication tree, ie (a -> b -> c) to (a -> c)" do
+          @ti1 = create(:tag_implication, antecedent_name: "character_(costume)_(swimsuit)_(fate)", consequent_name: "character_(costume)_(fate)")
+          @ti2 = create(:tag_implication, antecedent_name: "character_(costume)_(fate)", consequent_name: "character_(fate)")
+
+          @script = <<~EOS
+            unimply character_(costume)_(swimsuit)_(fate) -> character_(costume)_(fate)
+            imply character_(costume)_(swimsuit)_(fate) -> character_(fate)
+          EOS
+          @bur = build(:bulk_update_request, script: @script)
+
+          assert_equal(true, @bur.valid?)
+          @bur.approve!(@admin)
+          assert_equal("processing", @bur.reload.status)
+
+          perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
+          assert_equal("approved", @bur.reload.status)
+
+          assert_equal(true, @ti1.reload.is_deleted?)
+
+          @ti = TagImplication.find_by(antecedent_name: "character_(costume)_(swimsuit)_(fate)", consequent_name: "character_(fate)")
+          assert_equal(true, @ti.is_active?)
+        end
       end
 
       context "the mass update command" do
@@ -630,7 +653,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_equal(%w[aaa bbb], @bur.tags)
 
         @bur.update!(script: @script)
-        assert_equal(%w(000 111 222 333 444 555 aaa bbb ccc ddd eee fff ggg iii), @bur.tags)
+        assert_equal(%w[000 111 222 333 444 555 aaa bbb ccc ddd eee fff ggg iii], @bur.tags)
       end
     end
 
