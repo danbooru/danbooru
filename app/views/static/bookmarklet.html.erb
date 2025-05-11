@@ -5,7 +5,7 @@
     <h1>Bookmarklet</h1>
 
     <p>
-      <%= link_to "Post to #{Danbooru.config.app_name}", "javascript:location.href='#{request.protocol + request.host_with_port}/uploads/new?url='+encodeURIComponent(location.href)+'&ref='+encodeURIComponent(document.referrer)" %>
+      <%= link_to "Post to #{Danbooru.config.app_name}", "javascript:void(location.href='#{request.protocol + request.host_with_port}/uploads/new?url='+encodeURIComponent(location.href)+'&ref='+encodeURIComponent(document.referrer))" %>
     </p>
 
     <div class="prose">
