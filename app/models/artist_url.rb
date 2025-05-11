@@ -95,6 +95,8 @@ class ArtistURL < ApplicationRecord
       true
     when %r{bsky\.app/profile/did:}i
       true
+    when %r{lofter\.com/mentionredirect.do}i
+      true
     else
       false
     end

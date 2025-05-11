@@ -38,7 +38,15 @@ module Source
       end
 
       def profile_url
-        parsed_url.profile_url || parsed_referer&.profile_url
+        "https://#{username}.lofter.com" if username.present?
+      end
+
+      def account_url
+        "https://www.lofter.com/mentionredirect.do?blogId=#{user_id}" if user_id.present?
+      end
+
+      def profile_urls
+        [profile_url, account_url].compact
       end
 
       def tags
@@ -48,11 +56,15 @@ module Source
       end
 
       def display_name
-        page_json.dig(:postData, :data, :blogInfo, :blogNickName)&.strip
+        blog[:blogNickName]&.strip
       end
 
       def username
-        parsed_url.username || parsed_referer&.username
+        blog[:blogName] || parsed_url.username || parsed_referer&.username
+      end
+
+      def user_id
+        blog[:blogId] || parsed_url.user_id || parsed_referer&.user_id
       end
 
       def artist_commentary_title
@@ -110,6 +122,10 @@ module Source
       memoize def page_json
         script_text = page&.search("body script").to_a.map(&:text).grep(/\Awindow.__initialize_data__ = /).first.to_s
         script_text.strip.delete_prefix("window.__initialize_data__ = ").parse_json || {}
+      end
+
+      memoize def blog
+        page_json.dig(:postData, :data, :blogInfo) || {}
       end
 
       memoize def post

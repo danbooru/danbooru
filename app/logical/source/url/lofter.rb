@@ -3,7 +3,7 @@
 class Source::URL::Lofter < Source::URL
   RESERVED_USERNAMES = %w[i uls www]
 
-  attr_reader :username, :work_id, :full_image_url
+  attr_reader :username, :user_id, :work_id, :full_image_url
 
   def self.match?(url)
     url.domain.in?(%w[lofter.com 127.net lf127.net 126.net])
@@ -31,6 +31,10 @@ class Source::URL::Lofter < Source::URL
     # http://www.lofter.com/blog/semblance
     in _, "lofter.com", ("app" | "blog"), username
       @username = username
+
+    # https://www.lofter.com/mentionredirect.do?blogId=1278105311
+    in _, "lofter.com", "mentionredirect.do" if params[:blogId].present?
+      @user_id = params[:blogId]
 
     # https://gengar563.lofter.com/post/1e82da8c_1c98dae1b
     # https://gengar563.lofter.com/front/post/1e82da8c_1c98dae1b
@@ -64,6 +68,10 @@ class Source::URL::Lofter < Source::URL
   end
 
   def profile_url
-    "https://#{username}.lofter.com" if username.present?
+    if username.present?
+      "https://#{username}.lofter.com"
+    elsif user_id.present?
+      "https://www.lofter.com/mentionredirect.do?blogId=#{user_id}"
+    end
   end
 end
