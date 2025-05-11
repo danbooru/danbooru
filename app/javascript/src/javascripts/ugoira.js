@@ -44,7 +44,12 @@ Ugoira.create_player = (frames, file_url) => {
   });
 
   $("#seek-slider").progressbar({
-    value: 0
+    value: 0,
+    change: e => {
+      // Use % instead of px
+      const $progressbar = $(e.target);
+      $progressbar.find(".ui-progressbar-value").css("width", $progressbar.progressbar("value") + "%");
+    }
   });
 
   $("#seek-slider").slider({
