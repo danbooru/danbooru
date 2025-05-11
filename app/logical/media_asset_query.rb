@@ -23,7 +23,7 @@ class MediaAssetQuery
   end
 
   def normalized_ast
-    @normalized_ast ||= ast.to_cnf.rewrite_opts.trim
+    @normalized_ast ||= ast.to_cnf.rewrite_partials.trim
   end
 
   def search(relation: MediaAsset.all, foreign_key: :id, score_range: (50..))
@@ -40,6 +40,11 @@ class MediaAssetQuery
         metatag_matches(node.name, node.value, relation)
       in :wildcard
         relation.none
+      # TODO:
+      in :search_param
+        raise "not implemented"
+      in :search
+        raise "not implemented"
       in :not
         children.first.negate_relation
       in :and
