@@ -66,6 +66,7 @@ gem "connection_pool"
 gem "rotp"
 gem "rqrcode"
 gem "kramdown"
+gem "abbrev"
 
 group :development do
   gem 'rubocop', require: false
