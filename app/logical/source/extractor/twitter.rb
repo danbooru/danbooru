@@ -258,7 +258,7 @@ class Source::Extractor
       super.reject do |credential|
         # Filter out credentials that are rate limited. XXX Assumes we're using the TweetDetail endpoint.
         remaining_requests = credential.metadata.dig("rate_limit", "TweetDetail", "remaining")&.to_i || 150
-        reset_time = credential.metadata.dig("rate_limit", "TweetDetails", "reset").to_i
+        reset_time = credential.metadata.dig("rate_limit", "TweetDetail", "reset").to_i
         remaining_requests < 3 && Time.zone.now.to_i < reset_time
       end
     end
