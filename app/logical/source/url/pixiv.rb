@@ -241,5 +241,9 @@ module Source
         "https://www.pixiv.net/stacc/#{username}"
       end
     end
+
+    def secondary_url?
+      profile_url? && username.present?
+    end
   end
 end
