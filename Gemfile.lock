@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    abbrev (0.1.2)
     actioncable (7.1.3.4)
       actionpack (= 7.1.3.4)
       activesupport (= 7.1.3.4)
@@ -562,6 +563,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  abbrev
   activemodel-serializers-xml
   activerecord-hierarchical_query
   addressable
