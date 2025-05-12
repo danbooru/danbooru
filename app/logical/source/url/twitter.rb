@@ -201,6 +201,10 @@ class Source::URL::Twitter < Source::URL
     end
   end
 
+  def secondary_url?
+    profile_url? && user_id.present?
+  end
+
   def parsed_date
     if base10_snowflake_id
       self.class.parse_time_from_snowflake_id(base10_snowflake_id.to_i)

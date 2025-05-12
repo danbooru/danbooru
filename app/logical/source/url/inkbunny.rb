@@ -46,4 +46,8 @@ class Source::URL::Inkbunny < Source::URL
       "https://inkbunny.net/user.php?user_id=#{user_id}"
     end
   end
+
+  def secondary_url?
+    profile_url? && user_id.present?
+  end
 end
