@@ -1,9 +1,14 @@
 {
   "name": "Danbooru",
-  "dockerComposeFile": ["../docker-compose.dev.yaml"],
+  "dockerComposeFile": [
+    "../docker-compose.dev.yaml"
+  ],
   "service": "devcontainer",
   "workspaceFolder": "/danbooru",
-  "forwardPorts": [3000, 3035],
+  "forwardPorts": [
+    3000,
+    3035
+  ],
   "portsAttributes": {
     "3000": {
       "label": "Danbooru",
@@ -19,7 +24,8 @@
   },
   "remoteEnv": {
     "DANBOORU_DIR": "${localWorkspaceFolder}",
-    "DEVCONTAINER": "true"
+    "DEVCONTAINER": "true",
+    "GIT_EDITOR": "code --wait"
   },
   "customizations": {
     "vscode": {
