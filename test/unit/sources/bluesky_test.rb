@@ -130,6 +130,22 @@ module Sources
       )
     end
 
+    context "A post with a video and an alt text" do
+      strategy_should_work(
+        # note: currently the alt text isn't actually visible from bluesky's web interface, because their native video player doesn't support it
+        "https://bsky.app/profile/rningscissors.bsky.social/post/3lozjurmajk25",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          current vibe:
+
+          [quote]
+          h6. Video Description
+
+          Timon from The Lion King singing the lyric “disaster’s in the air” from Can You Feel The Love Tonight
+          [/quote]
+        EOS
+      )
+    end
+
     context "A post url with DID as user id" do
       strategy_should_work(
         "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",

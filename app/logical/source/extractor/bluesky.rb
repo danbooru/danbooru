@@ -117,14 +117,16 @@ class Source::Extractor::Bluesky < Source::Extractor
       text[byte_start...byte_end] = %{<a href="https://bsky.app/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(tag_name))}">##{CGI.escapeHTML(tag_name)}</a>}.force_encoding("ASCII-8BIT")
     end
 
-    embed&.dig("images").to_a.pluck(:alt).compact_blank.each do |alt_text|
+    alt_tags = embed&.dig("images").to_a.pluck(:alt).presence || [embed&.dig("alt")]
+    alt_tags.compact_blank.each do |alt_text|
       text << <<~EOS.chomp
         <blockquote>
-        <h6>Image Description</h6>
+        <h6>#{(embed["$type"] == "app.bsky.embed.video") ? "Video" : "Image"} Description</h6>
         <p>#{CGI.escapeHTML(alt_text).gsub("\n", "<br>")}</p>
         </blockquote>
       EOS
     end
+
     text.force_encoding("UTF-8").gsub("\n", "<br>")
   end
 
