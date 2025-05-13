@@ -74,7 +74,7 @@ module Sources
             { file_size: 464_286 },
             { file_size: 451_581 },
             { file_size: 429_118 },
-            { file_size: 473_379 }
+            { file_size: 473_379 },
           ],
           page_url: "https://odaibako.net/odais/5260af76-be64-447c-9701-c2d74b104643",
           profile_urls: %w[https://odaibako.net/u/zn_bi_nh],
@@ -101,6 +101,24 @@ module Sources
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: ""
+        )
+      end
+
+      context "a request without the response" do
+        strategy_should_work(
+          "https://odaibako.net/odais/21fa2dad-7c69-48ef-9768-885fa6dadf2b",
+          image_urls: [],
+          page_url: "https://odaibako.net/odais/21fa2dad-7c69-48ef-9768-885fa6dadf2b",
+          profile_urls: %w[https://odaibako.net/u/Weakest_Mash],
+          display_name: "菌糸🔞",
+          username: "Weakest_Mash",
+          tags: [],
+          dtext_artist_commentary_title: "",
+          dtext_artist_commentary_desc: <<~EOS.chomp
+            h6. Original Request
+
+            馬乗りになっておっぱいでちんちん擦るのに夢中になってる穹くんを優しい表情で見つめながら受け入れてくれる花火ちゃんをお願いします！
+          EOS
         )
       end
 
