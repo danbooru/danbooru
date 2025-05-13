@@ -68,7 +68,7 @@ import TimeSeriesComponent from "../src/javascripts/time_series_component.js";
 import Upload from "../src/javascripts/uploads.js";
 import UserTooltip from "../src/javascripts/user_tooltips.js";
 import Utility from "../src/javascripts/utility.js";
-import Ugoira from "../src/javascripts/ugoira.js"
+import Ugoira from "../src/javascripts/ugoira.js";
 
 let Danbooru = {};
 Danbooru.Autocomplete = Autocomplete;

@@ -279,23 +279,7 @@
       <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_file_url) %>
     <% elsif @post.is_ugoira? -%>
       <% if params[:size] == "original" || (CurrentUser.user.default_image_size == "original" && params[:size].blank?) %>
-        <div class="ugoira-container relative flex justify-center mb-2" data-playing="false" tabindex="0">
-          <%= tag.canvas(id: "image", class: "fit-width object-contain", width: @post.image_width, height: @post.image_height, "data-ugoira-frame-delays": @post.media_metadata.metadata["Ugoira:FrameDelays"].to_json) %>
-
-          <div class="ugoira-controls flex items-center absolute bottom-0 w-full h-8 px-2 gap-2">
-            <%= play_icon(class: "ugoira-play w-8 h-full py-2 cursor-pointer hidden") %>
-            <%= pause_icon(class: "ugoira-pause w-8 h-full py-2 cursor-pointer") %>
-            <%= tag.input type: "range", class: "ugoira-slider h-full w-full appearance-none border-0 outline-0 bg-transparent p-0 cursor-pointer", tabindex: -1, value: 0, step: "any", min: 0, max: @post.media_metadata.metadata["Ugoira:FrameDelays"].sum / 1000.0 %>
-
-            <span class="flex gap-1 text-sm select-none">
-              <span class="ugoira-time">0:00</span> /
-              <span class="ugoira-duration">0:00</span>
-            </span>
-
-            <%= expand_icon(class: "ugoira-fullscreen w-8 h-full py-2 cursor-pointer") %>
-            <%= minimize_icon(class: "ugoira-exit-fullscreen hidden w-8 h-full py-2 cursor-pointer") %>
-          </div>
-        </div>
+        <%= render UgoiraComponent.new(@post.media_asset, file_url: (@post.file_url if policy(@post).visible?), html: { id: "image" }) %>
 
         <p><%= link_to "View WebM", current_page_path(size: "webm") %></p>
       <% else %>

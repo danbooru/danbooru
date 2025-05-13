@@ -1,7 +1,7 @@
 import { ZipImagePlayer } from '../../vendor/pixiv-ugoira-player';
 
 export default class Ugoira {
-  constructor($ugoiraContainer, frames, fileUrl) {
+  constructor($ugoiraContainer) {
     this.$ugoiraContainer = $ugoiraContainer;
     this.$canvas = $ugoiraContainer.find("canvas");
     this.$playButton = $ugoiraContainer.find(".ugoira-play");
@@ -12,7 +12,9 @@ export default class Ugoira {
     this.$currentTime = $ugoiraContainer.find(".ugoira-time");
     this.$duration = $ugoiraContainer.find(".ugoira-duration");
 
-    this.frames = frames;           // The array of frame delays (in milliseconds).
+    this.fileUrl = $ugoiraContainer.attr("src");         // The URL of the ugoira .zip file.
+    this.frames = $ugoiraContainer.data("frame-delays"); // The array of frame delays (in milliseconds).
+
     this.previousTime = 0;          // The time in seconds when we last updated the ugoira. Used for measuring elapsed time.
     this.currentTime = 0;           // The current playback time of the ugoira (e.g 3.2 means we're 3.2 seconds into the ugoira).
     this.currentFrame = null;       // The current ugoira frame number.
@@ -23,12 +25,12 @@ export default class Ugoira {
     this.playing = false;           // Whether the ugoira is currently playing or paused.
     this.resumePlayback = false;    // Whether to resume playback after we stop scrubbing the playback slider or when we tab back in.
     this.animationId = null;        // The handle for the requestAnimationFrame callback that renders the next ugoira frame.
-    this.duration = frames.reduce((sum, n) => sum + n, 0) / 1000; // The total duration of the ugoira in seconds.
+    this.duration = this.frames.reduce((sum, n) => sum + n, 0) / 1000; // The total duration of the ugoira in seconds.
 
     this.player = new ZipImagePlayer({
       canvas: this.$canvas.get(0),
-      source: fileUrl,
-      metadata: { frames: frames },
+      source: this.fileUrl,
+      metadata: { frames: this.frames },
       chunkSize: 300000,
       loop: true,
       autoStart: false,
@@ -39,6 +41,9 @@ export default class Ugoira {
   }
 
   initialize() {
+    this.$ugoiraContainer.data("ugoira", this);
+    this.$ugoiraContainer.get(0).ugoira = this;
+
     this.$duration.text(this.formatTime(Math.round(this.duration)));
 
     this.$canvas.on("click.danbooru", event => this.toggle(event));

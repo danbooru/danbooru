@@ -1,0 +1,21 @@
+<%= tag.div class: "ugoira-container relative flex justify-center mb-2", tabindex: 0, src: file_url, "data-frame-delays": frame_delays.to_json, **html_options do %>
+  <%= tag.canvas class: "fit-width object-contain", width: media_asset.image_width, height: media_asset.image_height %>
+
+  <div class="ugoira-controls flex items-center absolute bottom-0 w-full h-8 px-2 gap-2">
+    <%= play_icon(class: "ugoira-play w-8 h-full py-2 cursor-pointer hidden") %>
+    <%= pause_icon(class: "ugoira-pause w-8 h-full py-2 cursor-pointer") %>
+    <%= tag.input type: "range", class: "ugoira-slider h-full w-full appearance-none border-0 outline-0 bg-transparent p-0 cursor-pointer", tabindex: -1, value: 0, step: "any", min: 0, max: frame_delays.sum / 1000.0 %>
+
+    <span class="flex gap-1 text-sm select-none">
+      <span class="ugoira-time">0:00</span> /
+      <span class="ugoira-duration">0:00</span>
+    </span>
+
+    <%= expand_icon(class: "ugoira-fullscreen w-8 h-full py-2 cursor-pointer") %>
+    <%= minimize_icon(class: "ugoira-exit-fullscreen hidden w-8 h-full py-2 cursor-pointer") %>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  new Danbooru.Ugoira($(".ugoira-container")).play();
+</script>
