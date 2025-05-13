@@ -278,8 +278,11 @@ html, body[data-current-user-theme="light"] {
 
   --remove-favorite-button: var(--red-4);
 
-  --ugoira-seek-slider-background: var(--grey-0);
-  --ugoira-seek-slider-progressbar-background: var(--white);
+  --ugoira-controls-icon-color: var(--white);
+  --ugoira-controls-icon-hover-color: var(--azure-3);
+  --ugoira-slider-playback-color: var(--azure-3);
+  --ugoira-slider-loading-color: var(--grey-3);
+  --ugoira-slider-unloaded-color: var(--grey-5);
 
   --keyboard-shortcut-color: var(--inverse-text-color);
   --keyboard-shortcut-background-color: var(--grey-6);
@@ -508,8 +511,11 @@ html, body[data-current-user-theme="light"] {
 
   --remove-favorite-button: var(--red-4);
 
-  --ugoira-seek-slider-background: var(--grey-2);
-  --ugoira-seek-slider-progressbar-background: var(--grey-0);
+  --ugoira-controls-icon-color: var(--white);
+  --ugoira-controls-icon-hover-color: var(--azure-4);
+  --ugoira-slider-playback-color: var(--azure-4);
+  --ugoira-slider-loading-color: var(--grey-3);
+  --ugoira-slider-unloaded-color: var(--grey-5);
 
   --keyboard-shortcut-color: var(--grey-0);
   --keyboard-shortcut-background-color: var(--grey-7);

@@ -268,6 +268,22 @@ module IconHelper
     svg_icon_tag("code", viewBox: "0 0 640 512", **options)
   end
 
+  def play_icon(**options)
+    svg_icon_tag("play", viewBox: "0 0 384 512", **options)
+  end
+
+  def pause_icon(**options)
+    svg_icon_tag("pause", viewBox: "0 0 320 512", **options)
+  end
+
+  def expand_icon(**options)
+    svg_icon_tag("expand", viewBox: "0 0 448 512", **options)
+  end
+
+  def minimize_icon(**options)
+    svg_icon_tag("minimize", viewBox: "0 0 512 512", **options)
+  end
+
   def discord_icon(**options)
     image_icon_tag("discord-logo.png", **options)
   end

@@ -19,6 +19,7 @@ $spacer: 0.25rem; /* 4px */
 .cursor-wait { cursor: wait; }
 .cursor-col-resize { cursor: col-resize; }
 
+.appearance-none { appearance: none; }
 .hidden { display: none !important; }
 .inline-block { display: inline-block; }
 .inline-flex { display: inline-flex; }
@@ -103,11 +104,14 @@ $spacer: 0.25rem; /* 4px */
 
 .border, %border { border-width: 1px; }
 
+.border-0   { border-width: 0; }
 .border-b   { border-bottom-width: 1px; }
 .border-b-2 { border-bottom-width: 0.5 * $spacer; }
 .border-t   { border-top-width: 1px; }
 
 .border-current { border-color: currentcolor; }
+
+.outline-0 { outline-width: 0; }
 
 .rounded-sm, %rounded-sm { border-radius: 0.5 * $spacer; }
 .rounded,    %rounded    { border-radius: 1   * $spacer; }
@@ -197,9 +201,10 @@ $spacer: 0.25rem; /* 4px */
 .w-max  { width: max-content; }
 .w-fit  { width: fit-content; }
 .w-1    { width: 1 * $spacer; }
-.w-2    { width: 3 * $spacer; }
+.w-2    { width: 2 * $spacer; }
 .w-3    { width: 3 * $spacer; }
 .w-4    { width: 4 * $spacer; }
+.w-8    { width: 8 * $spacer; }
 .w-sm   { width: 24rem; }
 .w-md   { width: 28rem; }
 .w-1\/4 { width: 25%; }
@@ -367,6 +372,7 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
 
 .bg\:primary-color { background-color: var(--link-color); }
 .bg\:error-color { background-color: var(--error-color); }
+.bg-transparent { background-color: transparent; }
 
 .transition-opacity {
   transition: opacity 0.15s ease;
