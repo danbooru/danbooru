@@ -205,6 +205,21 @@ class DTextTest < ActiveSupport::TestCase
         assert_rewrite_wiki_links("[[Zelda_no_Densetsu]]", "[[Zelda_no_Densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
 
         assert_rewrite_wiki_links("[[Mario (series)|]]", "[[Mario]]", "mario", "mario_(series)")
+
+        assert_rewrite_wiki_links("[[Sakura Kyoko (swimsuit costume)|]]", "[[Sakura Kyouko (swimsuit costume)]]", "sakura kyouko (swimsuit costume)", "sakura kyoko (swimsuit costume)")
+
+        assert_rewrite_wiki_links("[[:(]]", "[[:)]]", ":)", ":(")
+
+        assert_rewrite_wiki_links("[[A~Chan]]", "[[Test Tag]]", "test_tag", "a~chan")
+        assert_rewrite_wiki_links("[[a~chan]]", "[[test tag]]", "test_tag", "a~chan")
+
+        assert_rewrite_wiki_links("[[Copyright: ~Long Test Subtitle~]]", "[[Test Tag]]", "test_tag", "copyright:_~long_test_subtitle~")
+        assert_rewrite_wiki_links("[[Copyright: ~long test subtitle~]]", "[[Test tag]]", "test_tag", "copyright:_~long_test_subtitle~")
+
+        assert_rewrite_wiki_links("[[Shin(())code]]", "[[Test Tag]]", "test_tag", "shin(())code")
+
+        assert_rewrite_wiki_links("[[00 qan[t] (cosplay)|]]", "[[Test tag]]", "test_tag", "00_qan[t]_(cosplay)")
+        assert_rewrite_wiki_links("[[00 Qan[T] (cosplay)|]]", "[[Test Tag]]", "test_tag", "00_qan[t]_(cosplay)")
       end
     end
 

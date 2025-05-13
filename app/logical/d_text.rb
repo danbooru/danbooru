@@ -420,12 +420,13 @@ class DText
       # If old tag was lowercase, e.g. [[ink tank (Splatoon)]], then keep new tag in lowercase.
       if unqualified_name == unqualified_name.downcase
         final_name = new_name
-      # If old tag was capitalized, e.g. [[Colored pencil (medium)]], then capitialize new tag.
+      # If old tag was capitalized, e.g. [[Colored pencil (medium)]], then capitalize new tag.
       elsif unqualified_name == unqualified_name.downcase.capitalize
         final_name = new_name.capitalize
       # If old tag was in titlecase, e.g. [[Hatsune Miku (cosplay)]], then titlecase new tag.
       elsif unqualified_name == unqualified_name.split.map(&:capitalize).join(" ")
-        final_name = new_name.split.map(&:capitalize).join(" ")
+        new_base_name, qualifiers = new_name.split(/(?=\()/, 2) # split on first qualifier
+        final_name = "#{new_base_name.titleize}#{qualifiers}"
       # If we can't determine how to capitalize the new tag, then keep the old tag.
       # e.g. [[Suzumiya Haruhi no Yuuutsu]] -> [[The Melancholy of Haruhi Suzumiya]]
       else
