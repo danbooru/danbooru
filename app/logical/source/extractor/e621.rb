@@ -64,7 +64,7 @@ class Source::Extractor::E621 < Source::Extractor
   memoize def uploader_linked_artists
     api_response.dig(:tags, :artist).map do |artist_name|
       url = "https://e621.net/artists.json?search[name]=#{Danbooru::URL.escape(artist_name)}"
-      request(url)&.first.with_indifferent_access || {}
+      request(url)&.first.to_h.with_indifferent_access
     end.select do |artist|
       artist[:linked_user_id] == api_response[:uploader_id]
     end
