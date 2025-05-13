@@ -20,11 +20,27 @@ module Sources
         display_name: "Ixy(いくしー)",
         username: "ixy",
         tags: [],
-        dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
+        dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます"
       )
     end
 
-    context "A post url with 'app.bsky.embed.recordWithMedia.view' embed" do
+    context "A post with 'app.bsky.embed.images.view' embed and alt text" do
+      strategy_should_work(
+        "https://bsky.app/profile/magicianhero.bsky.social/post/3ljtkgqzwvc2t",
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          renmerry "#東方Project":[https://bsky.app/hashtag/東方Project] "#touhou":[https://bsky.app/hashtag/touhou]
+
+          [quote]
+          h6. Image Description
+
+          chibis of renko usami and maribel hearn. in two figures they're separated and in one figure they are both dancing.
+          [/quote]
+        EOS
+      )
+    end
+
+    context "A post url with 'app.bsky.embed.recordWithMedia.view' embed and alt text" do
       strategy_should_work(
         "https://bsky.app/profile/yourbaguette.bsky.social/post/3kjarhifsmg26",
         image_urls: [
@@ -54,6 +70,30 @@ module Sources
           I'm Baguette, and I mostly draw fanarts of whatever obsession I have ! I will move in Sweden in a week, work on my art and aim to open a little shop this year while working part time !
 
           "#Art":[https://bsky.app/hashtag/Art] "#FanArt":[https://bsky.app/hashtag/FanArt] "#Digimon":[https://bsky.app/hashtag/Digimon] "#SteinsGate":[https://bsky.app/hashtag/SteinsGate] "#Omori":[https://bsky.app/hashtag/Omori] "#FFXIV":[https://bsky.app/hashtag/FFXIV]
+
+          [quote]
+          h6. Image Description
+
+          A fanart of Togemon from the digimon universe
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          A Fanart from Basil, from Omori
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          A fanart of two silly lalafells from ffxiv
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          A fanart of Mayushii from Stein's Gate
+          [/quote]
         EOS
       )
     end
@@ -72,7 +112,7 @@ module Sources
         display_name: "Hi-GO!",
         username: "go-guiltism",
         tags: [],
-        dtext_artist_commentary_desc: "Copy-X FullArmed 2",
+        dtext_artist_commentary_desc: "Copy-X FullArmed 2"
       )
     end
 
@@ -104,7 +144,7 @@ module Sources
         display_name: "Ixy(いくしー)",
         username: "ixy",
         tags: [],
-        dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
+        dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます"
       )
     end
 
@@ -130,13 +170,56 @@ module Sources
         EOS
       )
     end
+    context "A post that requires sign-in to view" do
+      strategy_should_work(
+        "https://bsky.app/profile/masarustrongest.bsky.social/post/3lntvzjfhbs2u",
+        image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:pz2wk53vr3jjy3fssbfhndjs&cid=bafkreihcks5qjilktm74zjfqyoh6h2z5kydkyj7ymronl57qfnnj5ugx3y"],
+        media_files: [{ file_size: 834_447 }],
+        profile_url: "https://bsky.app/profile/masarustrongest.bsky.social",
+        profile_urls: [
+          "https://bsky.app/profile/masarustrongest.bsky.social",
+          "https://bsky.app/profile/did:plc:pz2wk53vr3jjy3fssbfhndjs",
+        ],
+        page_url: "https://bsky.app/profile/did:plc:pz2wk53vr3jjy3fssbfhndjs/post/3lntvzjfhbs2u",
+        display_name: "轟将",
+        username: "masarustrongest",
+        tags: [],
+        dtext_artist_commentary_desc: "Happy 6th Anniversary🌿"
+      )
+    end
+
+    context "A post from a bluesky instance other than bsky.social" do
+      strategy_should_work(
+        "https://bsky.app/profile/banditelli.org/post/3lp2aj326uc25",
+        image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:555c53zqgqs55yh6gvttf5uv&cid=bafkreibu3cy5u667yqob77q3vlj3f6ifwhs2wkatxcow6qhttipu3qpqny"],
+        media_files: [{ file_size: 508_085 }],
+        profile_url: "https://bsky.app/profile/banditelli.org",
+        profile_urls: [
+          "https://bsky.app/profile/banditelli.org",
+          "https://bsky.app/profile/did:plc:555c53zqgqs55yh6gvttf5uv",
+        ],
+        page_url: "https://bsky.app/profile/did:plc:555c53zqgqs55yh6gvttf5uv/post/3lp2aj326uc25",
+        display_name: /Banditelli/,
+        username: "banditelli",
+        tags: [],
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Hops for all. "#birds":[https://bsky.app/hashtag/birds]
+
+          [quote]
+          h6. Image Description
+
+          a female western bluebird hopping
+          [/quote]
+        EOS
+      )
+    end
 
     context "A 'https://cdn.bsky.app/img' url" do
       strategy_should_work(
         "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:3jogsxcisdcdzwjobhxbav2w/bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4@jpeg",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
         media_files: [{ file_size: 398_747 }],
-        profile_urls: ["https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w"],
+        profile_urls: ["https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w"]
       )
     end
 
@@ -148,7 +231,7 @@ module Sources
 
       strategy_should_work(
         "https://bsky.app/profile/ixy.bsky.social/post/3kkvo4d4jd32g",
-        image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
+        image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"]
       )
     end
 

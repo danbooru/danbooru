@@ -23,18 +23,15 @@ class SiteCredential < ApplicationRecord
       name: "Blogger",
       default_credential: { api_key: Danbooru.config.blogger_api_key },
       help: %{Your "Blogger":https://blogger.com API key. Go to https://developers.google.com/blogger/docs/3.0/using#APIKey to create an API key.},
-    }, {
-      id: 500,
-      name: "Bluesky",
-      default_credential: { identifier: Danbooru.config.bluesky_identifier, password: Danbooru.config.bluesky_password },
-      help: %{Your "Bluesky":https://bsky.app identifier and password. The identifier must include the domain that you see on your profile, e.g. 'username.bsky.social'.},
-    }, {
+    },
+    # { id: 500, name: "Bluesky" }, # we now use a loginless method
+    {
       id: 600,
       name: "Ci-En",
       default_credential: { session_cookie: Danbooru.config.ci_en_session_cookie },
       help: %{Your "Ci-En":https://ci-en.net 'ci_en_session' cookie.},
     },
-    # { id: 700, name: "Cohost" },
+    # { id: 700, name: "Cohost" }, # site was shut down
     {
       id: 800,
       name: "Deviant Art",
@@ -181,7 +178,7 @@ class SiteCredential < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :creator, :is_enabled, :is_public, :status, :usage_count, :error_count, :last_used_at, :last_error_at, :credential, :metadata], current_user: current_user)
+    q = search_attributes(params, %i[id created_at updated_at creator is_enabled is_public status usage_count error_count last_used_at last_error_at credential metadata], current_user: current_user)
     q.apply_default_order(params)
   end
 

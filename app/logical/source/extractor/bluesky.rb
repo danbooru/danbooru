@@ -2,10 +2,6 @@
 
 # @see Source::URL::Bluesky
 class Source::Extractor::Bluesky < Source::Extractor
-  def self.enabled?
-    SiteCredential.for_site("Bluesky").present?
-  end
-
   def image_urls
     if parsed_url.image_url?
       [parsed_url.full_image_url]
@@ -15,25 +11,29 @@ class Source::Extractor::Bluesky < Source::Extractor
   end
 
   def image_urls_from_api
+    case embed["$type"]
+    when "app.bsky.embed.images"
+      blobs = embed["images"].pluck("image")
+    when "app.bsky.embed.video"
+      blobs = [embed["video"]]
+    else
+      blobs = []
+    end
+
+    blobs.map do |blob|
+      blob_cid = blob.dig("ref", "$link") || blob["cid"]
+      "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=#{user_did}&cid=#{blob_cid}"
+    end
+  end
+
+  def embed
     embed = api_response&.dig("thread", "post", "record", "embed").to_h
 
     if embed["$type"] == "app.bsky.embed.recordWithMedia"
       embed = embed["media"].to_h
     end
 
-    blobs = case embed["$type"]
-    when "app.bsky.embed.images"
-      embed["images"].pluck("image")
-    when "app.bsky.embed.video"
-      [embed["video"]]
-    else
-      []
-    end
-
-    blobs.map do |blob|
-      blob_cid = blob.dig("ref", "$link") || blob.dig("cid")
-      "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=#{user_did}&cid=#{blob_cid}"
-    end
+    embed
   end
 
   def page_url
@@ -86,7 +86,7 @@ class Source::Extractor::Bluesky < Source::Extractor
     return unless user_handle_from_url.present?
 
     response = http.cache(1.minute).parsed_get(
-      "https://bsky.social/xrpc/com.atproto.identity.resolveHandle",
+      "https://api.bsky.app/xrpc/com.atproto.identity.resolveHandle",
       params: { handle: user_handle_from_url }
     ) || {}
     response["did"]
@@ -117,6 +117,14 @@ class Source::Extractor::Bluesky < Source::Extractor
       text[byte_start...byte_end] = %{<a href="https://bsky.app/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(tag_name))}">##{CGI.escapeHTML(tag_name)}</a>}.force_encoding("ASCII-8BIT")
     end
 
+    embed&.dig("images").to_a.pluck(:alt).compact_blank.each do |alt_text|
+      text << <<~EOS.chomp
+        <blockquote>
+        <h6>Image Description</h6>
+        <p>#{CGI.escapeHTML(alt_text).gsub("\n", "<br>")}</p>
+        </blockquote>
+      EOS
+    end
     text.force_encoding("UTF-8").gsub("\n", "<br>")
   end
 
@@ -132,51 +140,12 @@ class Source::Extractor::Bluesky < Source::Extractor
   memoize def api_response
     return {} unless post_id.present?
 
-    request(
-      "https://bsky.social/xrpc/app.bsky.feed.getPostThread",
+    params = {
       uri: "at://#{user_did}/app.bsky.feed.post/#{post_id}",
       depth: 0,
-      parentHeight: 0
-    )
-  end
+      parentHeight: 0,
+    }
 
-  # https://www.docs.bsky.app/docs/api/com-atproto-server-create-session
-  memoize def access_token
-    response = http.parsed_post(
-      "https://bsky.social/xrpc/com.atproto.server.createSession",
-      json: { identifier: credentials[:identifier], password: credentials[:password] }
-    ).to_h
-
-    if response["error"].present?
-      DanbooruLogger.info("Bluesky login failed (#{response["message"]} #{response["message"]})")
-      site_credential.error!(:invalid)
-      nil
-    else
-      site_credential.success!
-      response["accessJwt"]
-    end
-  end
-
-  memoize def cached_access_token
-    Cache.get("bluesky-access-token", 1.hour, skip_nil: true) do
-      access_token
-    end
-  end
-
-  def clear_cached_access_token!
-    flush_cache # clear memoized access token
-    Cache.delete("bluesky-access-token")
-  end
-
-  def request(url, **params)
-    response = http.cache(1.minute).headers(Authorization: "Bearer #{cached_access_token}").get(url, params: params).parse
-
-    if response["error"].in?(%w[InvalidToken ExpiredToken])
-      DanbooruLogger.info("Bluesky access token stale; logging in again")
-      clear_cached_access_token!
-      response = http.cache(1.minute).headers(Authorization: "Bearer #{cached_access_token}").get(url, params: params).parse
-    end
-
-    response
+    http.cache(1.minute).parsed_get("https://api.bsky.app/xrpc/app.bsky.feed.getPostThread", params: params)
   end
 end
