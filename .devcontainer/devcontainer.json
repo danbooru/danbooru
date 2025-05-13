@@ -25,6 +25,8 @@
   "remoteEnv": {
     "DANBOORU_DIR": "${localWorkspaceFolder}",
     "DEVCONTAINER": "true",
+  },
+  "containerEnv": {
     "GIT_EDITOR": "code --wait"
   },
   "customizations": {
