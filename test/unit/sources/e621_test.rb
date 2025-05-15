@@ -61,42 +61,38 @@ module Sources
 
     context "A self-uploaded post with external source" do
       strategy_should_work(
-        "https://e621.net/posts/4835259",
-        image_urls: %w[https://static1.e621.net/data/9e/be/9ebe277e202ef0a8e275fe0598c0527d.png],
-        # media_files: [{ file_size: 1_786_869 }],
-        page_url: "https://e621.net/posts/4835259",
-        profile_urls: %w[https://e621.net/users/205980 https://inkbunny.net/DAGASI https://www.pixiv.net/users/1549213 https://fantia.jp/fanclubs/34875 https://www.furaffinity.net/user/dagasl https://dagasi.fanbox.cc https://twitter.com/DAGASl https://baraag.net/@DAGASI https://x.com/DAGASl2 https://www.pixiv.net/stacc/daga2626],
-        display_name: "DAGASI",
-        username: "daga2626",
-        dtext_artist_commentary_title: "ロボを狂わせる度し難いニオイ",
-        dtext_artist_commentary_desc: <<~EOS.chomp
-          その後
-          FANBOX【<https://dagasi.fanbox.cc/posts/8017927>】
-          fantia【<https://fantia.jp/posts/2785563>】
-        EOS
+        "https://e621.net/posts/5497488",
+        image_urls: %w[https://static1.e621.net/data/94/c3/94c307b4e9c680f99e85f7cc5c212b58.png],
+        media_files: [{ file_size: 376_646 }],
+        page_url: "https://e621.net/posts/5497488",
+        profile_urls: %w[https://e621.net/users/103838 https://www.deviantart.com/marsminer/ https://inkbunny.net/MarsMiner https://martian-canine.newgrounds.com/ https://twitter.com/MarsMinerNsfw https://marsminersfw.newtumbl.com/ https://marsminernsfw.newtumbl.com/ https://mars-venussfw.tumblr.com/ https://marsminer-venusspring.tumblr.com/ https://foxearedastronaut.tumblr.com/ https://ouremptyworld.tumblr.com/ https://www.furaffinity.net/user/marsminer/ https://beta.furrynetwork.com/otterastronaut/ https://volsk.sofurry.com/ https://twitter.com/xVenusSpringx https://www.facebook.com/marsminervenusspring https://keefkeefthings.tumblr.com/ https://picarto.tv/MarsMiner https://www.twitch.tv/martiancanine https://derpibooru.org/profiles/marsminer https://www.patreon.com/martiancanine https://ko-fi.com/J3J35DMV https://streamlabs.com/MarsMiner https://discord.gg/0zeschOe4893oaue https://www.pillowfort.social/MarsMiner https://twitter.com/martiancanine https://twitter.com/mars_miner https://twitter.com/intent/user?user_id=729707557],
+        display_name: "MarsMiner",
+        username: "mars_miner",
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "Me assuming many different things that turn out to be wildly false. What an otter clown XD"
       )
     end
 
     context "A sourceless self-uploaded post" do
       strategy_should_work(
-        "https://e621.net/posts/3599343",
-        image_urls: %w[https://static1.e621.net/data/53/98/53983ea953512a86c81d6fdb5f9b1df1.png],
-        # media_files: [{ file_size: 3_058_658 }],
-        page_url: "https://e621.net/posts/3599343",
-        profile_urls: %w[https://e621.net/users/366015 https://linktr.ee/bnbigus https://bnbigus.tumblr.com https://twitter.com/bnbigus https://www.patreon.com/Bnbigus https://www.furaffinity.net/user/bnbigus https://bnbigus.newgrounds.com https://discord.com/invite/8kpwCUm https://twitter.com/intent/user?user_id=1069662959243313153],
-        display_name: "BnBigus",
+        "https://e621.net/posts/3250507",
+        image_urls: %w[https://static1.e621.net/data/21/bc/21bc4c5cb770d6e3d28724b6f2ba3a5e.png],
+        media_files: [{ file_size: 765_164 }],
+        page_url: "https://e621.net/posts/3250507",
+        profile_urls: %w[https://e621.net/users/366015 https://linktr.ee/bnbigus https://bnbigus.tumblr.com https://twitter.com/bnbigus https://www.patreon.com/Bnbigus https://www.furaffinity.net/user/bnbigus https://bnbigus.newgrounds.com https://discord.com/invite/8kpwCUm],
+        display_name: nil,
         username: "bnbigus",
-        dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "Man accidentally buys a sapient sex machine, an honest mistake really."
+        dtext_artist_commentary_title: nil,
+        dtext_artist_commentary_desc: nil
       )
     end
 
     context "A sourceless second-party post" do
       strategy_should_work(
-        "https://e621.net/posts/4574233",
-        image_urls: %w[https://static1.e621.net/data/6a/96/6a962c7056db60fba0c4ca52d8d5266d.png],
-        # media_files: [{ file_size: 13_919_143 }],
-        page_url: "https://e621.net/posts/4574233",
+        "https://e621.net/posts/5311521",
+        image_urls: %w[https://static1.e621.net/data/fb/ce/fbce0d0a27d620f37c614ff992b8bc43.png],
+        media_files: [{ file_size: 8_275_236 }],
+        page_url: "https://e621.net/posts/5311521",
         profile_urls: %w[],
         display_name: nil,
         username: nil,
@@ -107,15 +103,29 @@ module Sources
 
     context "A login-blocked post" do
       strategy_should_work(
-        "https://e621.net/posts/2816118",
-        image_urls: %w[https://static1.e621.net/data/a7/f4/a7f439e253c82433656ad7ce62bc9b64.png],
-        # media_files: [{ file_size: 5_623_796 }],
-        page_url: "https://e621.net/posts/2816118",
-        profile_urls: %w[https://baraag.net/@Butterchalk],
+        "https://e621.net/posts/3381431",
+        image_urls: %w[https://static1.e621.net/data/8f/89/8f892998f59d7f74ab93abd551acd77d.png],
+        media_files: [{ file_size: 2_676_305 }],
+        page_url: "https://e621.net/posts/3381431",
+        profile_urls: %w[],
         display_name: nil,
-        username: "Butterchalk",
+        username: nil,
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: ""
+      )
+    end
+
+    context "A post with arttag without artist entry" do
+      strategy_should_work(
+        "https://e621.net/posts/1857735",
+        image_urls: %w[https://static1.e621.net/data/af/2d/af2d4d798faf80f122018a552dde76e6.jpg],
+        media_files: [{ file_size: 81_799 }],
+        page_url: "https://e621.net/posts/1857735",
+        profile_urls: %w[https://twitter.com/Sonicjeremy https://twitter.com/intent/user?user_id=852701820090822656],
+        display_name: "JeremySide",
+        username: "Sonicjeremy",
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "Spent the last couple days modelin some of the designs from \"@JeremeyChinshue\":[https://twitter.com/JeremeyChinshue]'s \"#somethingseries\":[https://twitter.com/hashtag/somethingseries]. It's one of the funniest video game parodies I've seen and I had a lotta fun making these guys."
       )
     end
 
