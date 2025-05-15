@@ -13,9 +13,6 @@ import Alpine from 'alpinejs';
 import morph from '@alpinejs/morph';
 import persist from '@alpinejs/persist'
 
-// should start looking for nodejs replacements
-importAll(require.context('../vendor', true, /\.js$/));
-
 require.context("../../../public/images", true);
 
 import jQuery from 'jquery';

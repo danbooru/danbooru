@@ -1,4 +1,4 @@
-<%= tag.div class: "ugoira-container relative flex justify-center mb-2", tabindex: 0, src: file_url, "data-frame-delays": frame_delays.to_json, **html_options do %>
+<%= tag.div class: "ugoira-container relative flex justify-center mb-2", tabindex: 0, src: file_url, "data-frame-delays": frame_delays.to_json, "data-file-size": media_asset.file_size, **html_options do %>
   <%= tag.canvas class: "fit-width object-contain", width: media_asset.image_width, height: media_asset.image_height %>
 
   <div class="ugoira-controls flex items-center absolute bottom-0 w-full h-8 px-2 gap-2">

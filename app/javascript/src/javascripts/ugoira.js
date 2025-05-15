@@ -1,7 +1,7 @@
-import { ZipImagePlayer } from '../../vendor/pixiv-ugoira-player';
+import UgoiraLoader from './ugoira_loader.js';
 
 export default class Ugoira {
-  constructor($ugoiraContainer) {
+  constructor($ugoiraContainer, { fileUrl = null, frameDelays = null, fileSize = null } = {}) {
     this.$ugoiraContainer = $ugoiraContainer;
     this.$canvas = $ugoiraContainer.find("canvas");
     this.$playButton = $ugoiraContainer.find(".ugoira-play");
@@ -12,30 +12,26 @@ export default class Ugoira {
     this.$currentTime = $ugoiraContainer.find(".ugoira-time");
     this.$duration = $ugoiraContainer.find(".ugoira-duration");
 
-    this.fileUrl = $ugoiraContainer.attr("src");         // The URL of the ugoira .zip file.
-    this.frames = $ugoiraContainer.data("frame-delays"); // The array of frame delays (in milliseconds).
+    this.fileUrl = fileUrl || $ugoiraContainer.attr("src");
+    this.frames = frameDelays || $ugoiraContainer.data("frame-delays");
+    this.fileSize = fileSize || $ugoiraContainer.data("file-size");
+    this.context = this.$canvas.get(0).getContext("2d");
+    this.width = this.$canvas.get(0).width;
+    this.height = this.$canvas.get(0).height;
 
-    this.previousTime = 0;          // The time in seconds when we last updated the ugoira. Used for measuring elapsed time.
-    this.currentTime = 0;           // The current playback time of the ugoira (e.g 3.2 means we're 3.2 seconds into the ugoira).
-    this.currentFrame = null;       // The current ugoira frame number.
-    this.previousFrame = null;      // The previous ugoira frame number. Used for detecting when the frame has changed and the canvas needs to be rerendered.
-    this.loadedFrames = 0;          // The number of ugoira frames that have been downloaded.
-    this.loadProgress = 0;          // The percentage of ugoira frames that have been downloaded.
-    this.scrubbing = false;         // Whether we're currently dragging the playback slider.
-    this.playing = false;           // Whether the ugoira is currently playing or paused.
-    this.resumePlayback = false;    // Whether to resume playback after we stop scrubbing the playback slider or when we tab back in.
-    this.animationId = null;        // The handle for the requestAnimationFrame callback that renders the next ugoira frame.
+    this.previousTime = 0;       // The time in seconds when we last updated the ugoira. Used for measuring elapsed time.
+    this.currentTime = 0;        // The current playback time of the ugoira (e.g 3.2 means we're 3.2 seconds into the ugoira).
+    this.currentFrame = null;    // The current ugoira frame number.
+    this.previousFrame = null;   // The previous ugoira frame number. Used for detecting when the frame has changed and the canvas needs to be rerendered.
+    this.loadedFrame = null;     // The frame number of the latest frame that is ready to be drawn.
+    this.loadProgress = 0;       // The percentage of ugoira frames that have been downloaded.
+    this.scrubbing = false;      // Whether we're currently dragging the playback slider.
+    this.playing = false;        // Whether the ugoira is currently playing or paused.
+    this.resumePlayback = false; // Whether to resume playback after we stop scrubbing the playback slider or when we tab back in.
+    this.animationId = null;     // The handle for the requestAnimationFrame callback that renders the next ugoira frame.
+
     this.duration = this.frames.reduce((sum, n) => sum + n, 0) / 1000; // The total duration of the ugoira in seconds.
-
-    this.player = new ZipImagePlayer({
-      canvas: this.$canvas.get(0),
-      source: this.fileUrl,
-      metadata: { frames: this.frames },
-      chunkSize: 300000,
-      loop: true,
-      autoStart: false,
-      debug: false,
-    });
+    this.loader = new UgoiraLoader(this.fileUrl, { frameCount: this.frames.length, fileSize: fileSize });
 
     this.initialize();
   }
@@ -45,6 +41,7 @@ export default class Ugoira {
     this.$ugoiraContainer.get(0).ugoira = this;
 
     this.$duration.text(this.formatTime(Math.round(this.duration)));
+    this.context.clearRect(0, 0, this.width, this.height);
 
     this.$canvas.on("click.danbooru", event => this.toggle(event));
     this.$playButton.on("click.danbooru", event => this.toggle(event));
@@ -56,8 +53,10 @@ export default class Ugoira {
     this.$playbackSlider.on("pointerdown.danbooru", event => this.onDragStart(event));
     this.$playbackSlider.on("input.danbooru", event => this.onDrag(event));
     this.$playbackSlider.on("pointerup.danbooru", event => this.onDragEnd(event));
-    $(this.player).on("frameLoaded.danbooru", (event, frame) => this.onLoadFrame(frame));
     $(document).on("visibilitychange", event => this.onVisibilityChange(event));
+
+    this.loader.onload = frame => this.onLoadFrame(frame);
+    this.loader.load();
   }
 
   // Starts playing the ugoira. Sets up a callback to animate the ugoira frames and update the UI as time passes.
@@ -129,17 +128,31 @@ export default class Ugoira {
 
   // Sets the current playback time and renders the frame if the frame has changed. Doesn't allow seeking past loaded frames.
   setTime(seconds) {
-    this.currentTime = Math.min(this.frameStart(this.loadedFrames + 1), Math.max(0, seconds));
+    this.currentTime = this.loadedFrame ? Math.min(this.frameStart(this.loadedFrame + 1), Math.max(0, seconds)) : 0;
     this.previousFrame = this.currentFrame;
-    this.currentFrame = Math.min(this.loadedFrames, this.frameAt(this.currentTime));
+    this.currentFrame = Math.min(this.loadedFrame, this.frameAt(this.currentTime));
 
     if (this.currentFrame !== this.previousFrame) {
-      this.player._frame = this.currentFrame;
-      this.player._displayFrame();
-      // console.log(`[${this.formatTime(this.currentTime)}]: draw frame frame=${this.currentFrame}`);
+      let drawn = this.drawFrame(this.currentFrame);
+
+      if (!drawn) {
+        this.currentFrame = null;
+      }
     }
 
     this.updateUI();
+  }
+
+  // Draws frame N if it's loaded, or does nothing if the frame isn't loaded yet.
+  drawFrame(n) {
+    let image = this.loader._frames[n]?.image;
+
+    if (image) {
+      this.context.clearRect(0, 0, this.width, this.height);
+      this.context.drawImage(image, 0, 0);
+    }
+
+    return image;
   }
 
   // Called every ~16ms by the browser to update the UI and render a ugoira frame.
@@ -149,7 +162,6 @@ export default class Ugoira {
     let time = (this.currentTime + elapsedTime) % this.duration;
 
     this.setTime(time);
-    // console.log(`[${this.formatTime(time)}]: update UI fps=${Math.round(1 / elapsedTime)}`);
 
     this.previousTime = now;
     this.animationId = requestAnimationFrame(() => this.onAnimationFrame());
@@ -192,6 +204,8 @@ export default class Ugoira {
       this.advance(this.duration * -0.01);
     } else if (event.key === "ArrowRight") {
       this.advance(this.duration * 0.01);
+    } else {
+      return;
     }
 
     event.preventDefault();
@@ -199,7 +213,9 @@ export default class Ugoira {
 
   // Called each time a frame is downloaded. Updates the playback slider to indicate download progress.
   onLoadFrame(frame) {
-    this.loadedFrames = frame;
+    frame = Math.max(this.loadedFrame, frame);
+
+    this.loadedFrame = frame;
     this.loadProgress = Math.round(100 * (this.frameStart(frame + 1) / this.duration));
     this.$playbackSlider.css("--load-progress", `${this.loadProgress}%`);
   }
@@ -208,11 +224,9 @@ export default class Ugoira {
   onVisibilityChange(event) {
     if (document.hidden) {
       this.pause();
-      // console.log(`[${this.formatTime(this.currentTime)}]: hide now=${this.now()}`);
     } else {
       this.resume();
       this.previousTime = null; // Clear the time to ignore the time spent while tabbed out.
-      // console.log(`[${this.formatTime(this.currentTime)}]: unhidden now=${this.now()}`);
     }
   }
 
@@ -227,11 +241,11 @@ export default class Ugoira {
 
   // Returns the current time in seconds.
   now() {
-    return document.timeline.currentTime / 1000;
+    return performance.now() / 1000;
   }
 
   // Convert a frame number to the time in seconds when the frame starts.
-  frameStart(frame = this.player._frame) {
+  frameStart(frame) {
     return this.frames.slice(0, frame).reduce((sum, n) => sum + n, 0) / 1000;
   }
 
