@@ -50,6 +50,6 @@ class Source::URL::Odaibako < Source::URL
   end
 
   def profile_url
-    "https://skeb.jp/@#{username}" if username.present?
+    "https://odaibako.net/@#{username}" if username.present?
   end
 end
