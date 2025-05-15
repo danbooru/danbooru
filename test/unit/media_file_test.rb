@@ -157,7 +157,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([150, 105], MediaFile.open("test/files/test-animated-400x281.gif").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test-animated-256x256.png").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/apng/normal_apng.png").preview(150, 150).dimensions)
-      # assert_equal([150, 150], MediaFile.open("test/files/webp/nyancat.webp").preview(150, 150).dimensions) # XXX not supported by FFmpeg (https://trac.ffmpeg.org/ticket/4907)
+      assert_equal([150, 150], MediaFile.open("test/files/webp/nyancat.webp").preview(150, 150).dimensions)
       assert_equal([150, 113], MediaFile.open("test/files/avif/sequence-with-pitm.avif").preview(150, 150).dimensions)
       assert_equal([150, 84], MediaFile.open("test/files/avif/sequence-without-pitm.avif").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/avif/star-8bpc.avif").preview(150, 150).dimensions)
@@ -665,11 +665,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(true, MediaFile.open("test/files/webp/nyancat.webp").is_animated?)
       assert_equal(true, MediaFile.open("test/files/webp/nyancat.webp").is_animated_webp?)
       assert_equal(true, MediaFile.open("test/files/webp/nyancat.webp").metadata.is_animated?)
-      assert_equal(false, MediaFile.open("test/files/webp/nyancat.webp").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/webp/nyancat.webp").is_supported?)
       assert_equal(12, MediaFile.open("test/files/webp/nyancat.webp").frame_count)
       assert_equal(Float::INFINITY, MediaFile.open("test/files/webp/nyancat.webp").metadata.loop_count)
-
-      # assert_equal(0.84, MediaFile.open("test/files/webp/nyancat.webp").duration)
+      assert_equal(0.84, MediaFile.open("test/files/webp/nyancat.webp").duration)
     end
 
     should "be able to generate a preview" do

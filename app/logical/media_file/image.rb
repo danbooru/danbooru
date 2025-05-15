@@ -5,6 +5,8 @@
 # @see https://github.com/libvips/ruby-vips
 # @see https://libvips.github.io/libvips/API/current
 class MediaFile::Image < MediaFile
+  class Error < StandardError; end
+
   delegate :thumbnail_image, to: :image
 
   def close
@@ -28,8 +30,6 @@ class MediaFile::Image < MediaFile
     when :avif
       # XXX Mirrored AVIFs should be unsupported too, but we currently can't detect the mirrored flag using exiftool or ffprobe.
       !metadata.is_rotated? && !metadata.is_cropped? && !metadata.is_grid_image? && !metadata.is_animated_avif?
-    when :webp
-      !is_animated?
     else
       true
     end
@@ -257,9 +257,27 @@ class MediaFile::Image < MediaFile
     FFmpeg.new(self)
   end
 
+  def animated_webp_preview_frame
+    # https://www.libvips.org/2017/03/16/What's-new-in-8.5.html#toilet-roll-images
+    tr = Danbooru::Tempfile.new(["danbooru-toilet-roll-#{md5}-", ".png"], binmode: true)
+    n = [n_pages, 300].min
+    tr_image = open_image(fail: false, n: n)
+    tr_image.write_to_file(tr.path)
+
+    vp = Danbooru::Tempfile.new(["danbooru-video-preview-#{md5}-", ".png"], binmode: true)
+    ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tr.path.shellescape} -vf untile=1x#{n},thumbnail=300 -frames:v 1 -y #{vp.path.shellescape}")
+    raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
+
+    MediaFile.open(vp)
+  ensure
+    tr&.close
+  end
+
   def preview_frame
     @preview_frame ||= begin
-      if is_animated?
+      if is_animated_webp?
+        animated_webp_preview_frame
+      elsif is_animated?
         video.smart_video_preview || self
       else
         self
