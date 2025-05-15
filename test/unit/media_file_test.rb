@@ -454,7 +454,9 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "handle all supported video types" do
       Dir.glob("test/files/mp4/*.{mp4,m4v}").grep_v(/corrupt/).each do |file|
-        assert_equal(false, MediaFile.open(file).is_corrupt?)
+        media = MediaFile.open(file) do |media|
+          assert_equal(false, media.is_corrupt?, "#{file} #{media.error}")
+        end
       end
     end
 
@@ -467,11 +469,12 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(true, MediaFile.open("test/files/mp4/test-audio.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-audio-mp3.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-audio-opus.mp4").is_supported?)
-      assert_equal(true, MediaFile.open("test/files/mp4/test-audio-vorbis.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-invalid-utf8-metadata.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-h265.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-av1.mp4").is_supported?)
+      
+      #assert_equal(true, MediaFile.open("test/files/mp4/test-audio-flac.mp4").is_supported?)
 
-      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-h265.mp4").is_supported?)
-      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-av1.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-yuv444p-h264.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-av1.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-h264.mp4").is_supported?)
@@ -479,6 +482,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(false, MediaFile.open("test/files/mp4/test-audio-ac3.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-audio-mp2.mp4").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-audio-vorbis.mp4").is_supported?)
     end
 
     should "not fail during decoding if the video contains invalid UTF-8 characters in the file metadata" do
@@ -542,9 +546,12 @@ class MediaFileTest < ActiveSupport::TestCase
     should "detect supported files" do
       assert_equal(true, MediaFile.open("test/files/webm/test-512x512.webm").is_supported?)
       assert_equal(true, MediaFile.open("test/files/webm/test-gbrp-vp9.webm").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/webm/test-av1.webm").is_supported?)
 
       assert_equal(false, MediaFile.open("test/files/webm/test-512x512.mkv").is_supported?)
       assert_equal(false, MediaFile.open("test/files/webm/test-yuv420p10le-vp9.webm").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/webm/test-hevc.webm").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/webm/test-aac.webm").is_supported?)
     end
 
     should "handle all supported video types" do
