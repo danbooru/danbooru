@@ -111,6 +111,10 @@ class Source::URL::Fantia < Source::URL
     end
   end
 
+  def secondary_url?
+    profile_url? && username.present?
+  end
+
   def work_id
     @post_id || @product_id
   end

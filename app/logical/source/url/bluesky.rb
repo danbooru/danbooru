@@ -69,4 +69,8 @@ class Source::URL::Bluesky < Source::URL
       "https://bsky.app/profile/#{user_did}"
     end
   end
+
+  def secondary_url?
+    profile_url? && user_did.present?
+  end
 end

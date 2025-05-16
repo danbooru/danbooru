@@ -149,4 +149,8 @@ class Source::URL::Twitter < Source::URL
       "https://twitter.com/intent/user?user_id=#{user_id}"
     end
   end
+
+  def secondary_url?
+    profile_url? && user_id.present?
+  end
 end
