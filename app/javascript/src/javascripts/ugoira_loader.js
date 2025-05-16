@@ -4,16 +4,20 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-export default class UgoiraLoader {
-  constructor(fileUrl, { frameCount = null, fileSize = null } = {}) {
+export class UgoiraLoader {
+  constructor(fileUrl, frameDelays, fileSize = null) {
     this.fileUrl = fileUrl; // The URL of the .zip file.
-    this.failed = false;    // True if any errors occured while loading the ugoira.
-    this.onload = null;     // An optional callback called when a frame is loaded.
 
-    this._frameCount = frameCount;
     this._fileSize = fileSize;
     this._endOfCentralDirectory = null;
+    this._centralDirectoryLoaded = false;
+
     this._frames = [];
+    for (let i = 0, frameStart = 0; i < frameDelays.length; i++) {
+      let duration = frameDelays[i] / 1000;
+      this._frames[i] = { index: i, duration, frameStart, frameEnd: frameStart + duration };
+      frameStart += duration;
+    }
   }
 
   // Read a range of bytes from the remote .zip file.
@@ -52,8 +56,8 @@ export default class UgoiraLoader {
   async endOfCentralDirectory() {
     if (this._endOfCentralDirectory) { return this._endOfCentralDirectory; }
 
-    if (this._frameCount && this._fileSize) {
-      let cdEntries = this._frameCount;              // The number of entries in the central directory is just the number of frames.
+    if (this._fileSize) {
+      let cdEntries = this._frames.length;           // The number of entries in the central directory is just the number of frames.
       let cdLength = cdEntries * 56;                 // Each central directory entry is assumed to be 56 bytes long (46 byte header + 10 byte file name).
       let cdOffset = this._fileSize - cdLength - 22; // The end of the central directory record starts 22 bytes before the end of the file (assuming no file comment).
 
@@ -78,18 +82,17 @@ export default class UgoiraLoader {
   // Return the list of frames in the ugoira. Each frame will have `fileOffset` and `fileSize` properties indicating the
   // location of the frame in the zip file. Frames will have an `image` property after the frame is loaded by loadFrames().
   async frames() {
-    if (this._frames.length) { return this._frames; }
+    if (this._centralDirectoryLoaded) { return this._frames; }
 
     let { cdOffset, cdLength, cdEntries } = await this.endOfCentralDirectory();
     let cdBuffer = await this.read(cdOffset, cdLength);
-    let entries = [];
 
     // Parse the entries from the central directory. Each entry is 46 bytes long, plus a variable-length file name,
     // extra field, and file comment. The file name is always 10 bytes long, and the extra field and file comment are
     // always 0 bytes long, so each entry is always 56 bytes long. Each entry points to a 40-byte file header followed
     // by the file data.
     for (let i = 0, offset = 0; i < cdEntries; i++) {
-      let entry = {};
+      let entry = this._frames[i];
 
       let signature = cdBuffer.getUint32(offset, true);
       let compressionMethod = cdBuffer.getUint16(offset + 10, true);
@@ -113,16 +116,15 @@ export default class UgoiraLoader {
       this.assert(entry.fileOffset + entry.fileSize <= cdOffset, `centralDirectory() failed (bad file length, entry: ${i}, fileOffset: ${entry.fileOffset}, fileSize: ${entry.fileSize}, cdOffset: ${cdOffset})`);
       this.assert(entryLength === 56, `centralDirectory() failed (bad entry length, entry: ${i}, length: ${entryLength})`);
 
-      entries.push(entry);
       offset += entryLength;
     }
 
-    this._frames = entries;
+    this._centralDirectoryLoaded = true;
     return this._frames;
   }
 
   // Load the frames from N to N + count. Multiple images can be loaded at once to reduce the number of HTTP requests.
-  async loadFrames(n, count = 1) {
+  async loadFrames(n, count = 1, loadFrameCallback = null) {
     let frames = await this.frames();
 
     count = clamp(count, 1, frames.length - n);
@@ -154,7 +156,7 @@ export default class UgoiraLoader {
         image.onload = () => {
           frame.image = image;
           URL.revokeObjectURL(url);
-          this.onload?.(i, frame);
+          loadFrameCallback?.(i);
           resolve(image);
         };
 
@@ -172,7 +174,7 @@ export default class UgoiraLoader {
   }
 
   // Load all frames in the ugoira. Frames are loaded in chunks of around 500kb, with 4 chunks loading in parallel.
-  async load(chunkSize = 500000, chunks = 4) {
+  async load(chunkSize = 500000, chunks = 4, loadFrameCallback = null) {
     let frames = await this.frames();
     let fileSize = await this.fileSize();
     let framesPerChunk = clamp(Math.round(chunkSize / (fileSize / frames.length)), 1, frames.length);
@@ -182,7 +184,7 @@ export default class UgoiraLoader {
         let chunkStart = frame + framesPerChunk * chunk;
 
         if (chunkStart < frames.length) {
-          return this.loadFrames(chunkStart, framesPerChunk);
+          return this.loadFrames(chunkStart, framesPerChunk, loadFrameCallback);
         }
       });
 
@@ -192,8 +194,113 @@ export default class UgoiraLoader {
 
   assert(condition, message) {
     if (!condition) {
-      this.failed = true;
       throw new Error(`[Ugoira] ${message}`);
     }
+  }
+}
+
+export default class UgoiraPlayer {
+  constructor(fileUrl, canvas, frameDelays, { fileSize = null } = {}) {
+    this.currentSrc = fileUrl;
+    this.paused = true;
+    this.width = canvas.width;
+    this.height = canvas.height;
+    this.duration = frameDelays.reduce((sum, n) => sum + n, 0) / 1000;
+
+    this._canvas = canvas;      // The <canvas> element the ugoira is drawn on.
+    this._previousTime = null;  // The time in seconds before the last requestAnimationFrame call. Used for measuring elapsed time.
+    this._currentTime = 0;      // The current playback time in seceonds (e.g 3.2 means we're 3.2 seconds into the ugoira).
+    this._animationId = null;   // The handle for the requestAnimationFrame callback that updates the canvas.
+    this._loadedFrame = null;   // The frame number of the latest frame that is ready to be drawn.
+    this._currentFrame = null;  // The frame that is currently being displayed on the canvas.
+    this._loader = new UgoiraLoader(fileUrl, frameDelays, fileSize);
+    this._frames = this._loader._frames;
+
+    this._context = this._canvas.getContext("2d");
+    this._context.clearRect(0, 0, this.width, this.height);
+  }
+
+  // Starts loading the ugoira asynchronously.
+  async load() {
+    return this._loader.load(500000, 4, frame => {
+      this._loadedFrame = Math.max(this._loadedFrame, frame);
+      this.triggerEvent("progress", { frame: this._loadedFrame });
+    });
+  }
+
+  // Plays the ugoira. Starts the callback that renders the ugoira frames.
+  play() {
+    this.paused = false;
+
+    this._previousTime = null;
+    this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
+    this.triggerEvent("play");
+  }
+
+  // Pauses the ugoira. Removes the callback that renders the ugoira frames.
+  pause() {
+    this.paused = true;
+
+    cancelAnimationFrame(this._animationId);
+    this.triggerEvent("pause");
+  }
+
+  // Called every ~16ms by the browser to advance playback and render a new frame. Loops playback when it reaches the end.
+  onAnimationFrame() {
+    let now = this.now();
+    let elapsedTime = now - (this._previousTime ?? now);
+
+    this.currentTime = (this.currentTime + elapsedTime) % this.duration;
+    this._previousTime = now;
+    this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
+  }
+
+  get currentTime() {
+    return this._currentTime;
+  }
+
+  // Sets the current playback time and redraws the frame if it has changed. Doesn't allow seeking past loaded frames.
+  set currentTime(seconds) {
+    this._currentTime = clamp(seconds, 0, this.buffered.end(0));
+    this.drawFrame(this.currentTime);
+    this.triggerEvent("timeupdate");
+  }
+
+  // Renders the frame at the given time. Only redraws the frame if it has changed.
+  drawFrame(time) {
+    let frame = this.frameAt(time);
+
+    if (frame !== this._currentFrame && frame.image) {
+      this._context.clearRect(0, 0, this.width, this.height);
+      this._context.drawImage(frame.image, 0, 0);
+      this._currentFrame = frame;
+    }
+  }
+
+  // Returns an object representing the time ranges that have been downloaded and are ready to play. This indicates when
+  // the last loaded frame ends. Conforms to the TimeRanges interface.
+  //
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/buffered
+  // https://developer.mozilla.org/en-US/docs/Web/API/TimeRanges
+  get buffered() {
+    let endTime = this._loadedFrame ? this._frames[this._loadedFrame].frameEnd : 0;
+
+    return { length: 1, start: n => 0, end: n => endTime };
+  }
+
+  // Finds the frame at the given time.
+  frameAt(seconds) {
+    return this._frames.find(frame => frame.frameStart <= seconds && seconds < frame.frameEnd);
+  }
+
+  // Dispatches a custom event on the <canvas> element.
+  triggerEvent(eventName, detail = {}) {
+    let event = new CustomEvent(eventName, { bubbles: false, cancelable: false, detail });
+    this._canvas.dispatchEvent(event);
+  }
+
+  // Returns the current time in seconds.
+  now() {
+    return performance.now() / 1000;
   }
 }

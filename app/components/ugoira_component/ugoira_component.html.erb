@@ -4,7 +4,7 @@
   <div class="ugoira-controls flex items-center absolute bottom-0 w-full h-8 px-2 gap-2">
     <%= play_icon(class: "ugoira-play w-8 h-full py-2 cursor-pointer hidden") %>
     <%= pause_icon(class: "ugoira-pause w-8 h-full py-2 cursor-pointer") %>
-    <%= tag.input type: "range", class: "ugoira-slider h-full w-full appearance-none border-0 outline-0 bg-transparent p-0 cursor-pointer", tabindex: -1, value: 0, step: "any", min: 0, max: frame_delays.sum / 1000.0 %>
+    <%= tag.input type: "range", class: "ugoira-slider h-full w-full appearance-none border-0 outline-0 bg-transparent p-0 cursor-pointer", tabindex: -1, value: 0, step: "any", min: 0, max: media_asset.duration %>
 
     <span class="flex gap-1 text-sm select-none">
       <span class="ugoira-time">0:00</span> /
