@@ -1,20 +1,46 @@
-.ugoira-container:not(:hover) .ugoira-controls {
-  opacity: 0%;
-  transition: 0.2s;
+/* Show the controls only when the video is hovered, paused, or when the options menu is open */
+.ugoira-container:hover, .ugoira-container[data-paused="true"], .ugoira-container:has(a.popup-menu-button[aria-expanded="true"]) {
+  .ugoira-controls {
+    opacity: 100%;
+  }
 }
 
-.ugoira-container:hover .ugoira-controls, .ugoira-container[data-playing="false"] .ugoira-controls {
-  opacity: 100%;
-  transition: 0.2s;
+/* Stretch the video to fit the screen in fullscreen mode */
+.ugoira-container:fullscreen video {
+  width: 100%;
 }
 
 .ugoira-controls {
-  background-color: #1f202cc0; // XXX fallback
-  background-color: rgb(from var(--ugoira-controls-background-color) r g b / 80%);
-  color: var(--ugoira-controls-icon-color);
+  &, .tippy-box {
+    background-color: #1f202cc0; // fallback
+    background-color: rgb(from var(--ugoira-controls-background-color) r g b / 80%);
+    border: 0;
+  }
 
-  .ugoira-play:hover, .ugoira-pause:hover, .ugoira-fullscreen:hover, .ugoira-exit-fullscreen:hover {
+  /* XXX Fix corners not being rounded when hovering over last item in options menu */
+  .popup-menu:has(a.popup-menu-button[aria-expanded="true"]) .tippy-box {
+    overflow: hidden;
+  }
+
+  &, a.popup-menu-button, .tippy-content li, .tippy-content a {
+    color: var(--ugoira-controls-icon-color);
+  }
+
+  .icon:hover {
     color: var(--ugoira-controls-icon-hover-color);
+  }
+
+  .tippy-content {
+    padding: 0;
+
+    li:has(a):hover {
+      background-color: #3f4058cc; // fallback
+      background-color: rgb(from var(--ugoira-controls-popup-hover-background-color) r g b / 80%);
+    }
+
+    hr {
+      border-color: var(--ugoira-controls-divider-color);
+    }
   }
 
   .ugoira-slider {

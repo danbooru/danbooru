@@ -4,6 +4,8 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+// A UgoiraLoader loads a ugoira from a remote .zip file. It reads the .zip file in chunks using range requests, parses
+// the file to find the frames, and returns the frames as <img src="blob:..."> elements.
 export class UgoiraLoader {
   constructor(fileUrl, frameDelays, fileSize = null) {
     this.fileUrl = fileUrl; // The URL of the .zip file.
@@ -199,6 +201,10 @@ export class UgoiraLoader {
   }
 }
 
+// A UgoiraPlayer renders a ugoira on a <canvas>. It loads frames using a UgoiraLoader and animates them using
+// requestAnimationFrame. It implements the HTMLMediaElement interface so it can be used as a <video> element.
+//
+// https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
 export default class UgoiraPlayer {
   constructor(fileUrl, canvas, frameDelays, { fileSize = null } = {}) {
     this.currentSrc = fileUrl;
@@ -207,8 +213,11 @@ export default class UgoiraPlayer {
     this.height = canvas.height;
     this.duration = frameDelays.reduce((sum, n) => sum + n, 0) / 1000;
 
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/networkState
+    this.networkState = HTMLMediaElement.NETWORK_EMPTY; // EMPTY, IDLE, LOADING, NO_SOURCE
+
     this._canvas = canvas;      // The <canvas> element the ugoira is drawn on.
-    this._previousTime = null;  // The time in seconds before the last requestAnimationFrame call. Used for measuring elapsed time.
+    this._previousTime = null;  // The time in seconds of the last requestAnimationFrame call. Used for measuring elapsed time.
     this._currentTime = 0;      // The current playback time in seceonds (e.g 3.2 means we're 3.2 seconds into the ugoira).
     this._animationId = null;   // The handle for the requestAnimationFrame callback that updates the canvas.
     this._loadedFrame = null;   // The frame number of the latest frame that is ready to be drawn.
@@ -220,12 +229,17 @@ export default class UgoiraPlayer {
     this._context.clearRect(0, 0, this.width, this.height);
   }
 
-  // Starts loading the ugoira asynchronously.
+  // Starts loading the ugoira asynchronously. Does nothing if the ugoira is already loading or has been loaded.
   async load() {
-    return this._loader.load(500000, 4, frame => {
+    if (this.networkState !== HTMLMediaElement.NETWORK_EMPTY) { return; }
+    this.networkState = HTMLMediaElement.NETWORK_LOADING;
+
+    this._loader.load(500000, 4, frame => {
       this._loadedFrame = Math.max(this._loadedFrame, frame);
       this.triggerEvent("progress", { frame: this._loadedFrame });
     });
+
+    this.networkState = HTMLMediaElement.NETWORK_IDLE;
   }
 
   // Plays the ugoira. Starts the callback that renders the ugoira frames.
@@ -270,7 +284,7 @@ export default class UgoiraPlayer {
   drawFrame(time) {
     let frame = this.frameAt(time);
 
-    if (frame !== this._currentFrame && frame.image) {
+    if (frame !== this._currentFrame && frame?.image) {
       this._context.clearRect(0, 0, this.width, this.height);
       this._context.drawImage(frame.image, 0, 0);
       this._currentFrame = frame;

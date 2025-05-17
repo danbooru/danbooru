@@ -6,7 +6,8 @@
   display: none !important;
 }
 
-html {
+/* Reserve space for the scrollbar so the layout doesn't shift when the scrollbar appears/disappears, except in fullscreen mode. */
+html:not(:has(:fullscreen)) {
   scrollbar-gutter: stable;
 }
 

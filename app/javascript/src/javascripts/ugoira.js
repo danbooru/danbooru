@@ -1,59 +1,52 @@
-import UgoiraPlayer from './ugoira_loader.js';
+import UgoiraRenderer from './ugoira_renderer.js';
 
 export default class Ugoira {
-  constructor($ugoiraContainer, { fileUrl = null, frameDelays = null, fileSize = null } = {}) {
-    fileUrl ??= $ugoiraContainer.attr("src");
-    frameDelays ??= $ugoiraContainer.data("frame-delays");
-    fileSize ??= fileSize || $ugoiraContainer.data("file-size");
+  constructor(ugoiraContainer) {
+    this.$ugoiraContainer = $(ugoiraContainer);
+    this.paused = true;
+    this.duration = 0;
 
-    this.$ugoiraContainer = $ugoiraContainer;
-    this.$canvas = $ugoiraContainer.find("canvas");
-    this.$playButton = $ugoiraContainer.find(".ugoira-play");
-    this.$pauseButton = $ugoiraContainer.find(".ugoira-pause");
-    this.$fullscreenButton = $ugoiraContainer.find(".ugoira-fullscreen");
-    this.$exitFullscreenButton = $ugoiraContainer.find(".ugoira-exit-fullscreen");
-    this.$playbackSlider = $ugoiraContainer.find(".ugoira-slider");
-    this.$currentTime = $ugoiraContainer.find(".ugoira-time");
-    this.$duration = $ugoiraContainer.find(".ugoira-duration");
+    let $canvas = this.$ugoiraContainer.find("canvas");
+    let fileUrl = $canvas.data("src");
+    let fileSize = $canvas.data("file-size");
+    let frameDelays = $canvas.data("frame-delays");
 
-    this.scrubbing = false;      // Whether we're currently dragging the playback slider.
-    this.resumePlayback = false; // Whether to resume playback after we stop scrubbing the playback slider or when we tab back in.
-    this.video = new UgoiraPlayer(fileUrl, this.$canvas.get(0), frameDelays, { fileSize });
-
-    this.initialize();
+    this._currentTime = 0;
+    this._ugoira = new UgoiraRenderer(fileUrl, $canvas.get(0), frameDelays, { fileSize });
+    this._sample = this.$ugoiraContainer.find("video").get(0);
   }
 
   initialize() {
     this.$ugoiraContainer.data("ugoira", this);
     this.$ugoiraContainer.get(0).ugoira = this;
 
-    this.$video.on("click.danbooru", event => this.toggle(event));
-    this.$playButton.on("click.danbooru", event => this.toggle(event));
-    this.$pauseButton.on("click.danbooru", event => this.toggle(event));
-    // this.$canvas.on("dblclick.danbooru", event => this.toggleFullscreen(event)); // XXX click event interferes with this.
-    this.$fullscreenButton.on("click.danbooru", event => this.toggleFullscreen(event));
-    this.$exitFullscreenButton.on("click.danbooru", event => this.toggleFullscreen(event));
-    this.$ugoiraContainer.on("keydown.danbooru", event => this.onKeypress(event));
-    this.$playbackSlider.on("pointerdown.danbooru", event => this.onDragStart(event));
-    this.$playbackSlider.on("input.danbooru", event => this.onDrag(event));
-    this.$playbackSlider.on("pointerup.danbooru", event => this.onDragEnd(event));
     $(document).on("visibilitychange", event => this.onVisibilityChange(event));
+    this.$ugoiraContainer.on("keydown", event => this.onKeypress(event));
+    this.$ugoiraContainer.on("fullscreenchange", event => this.fullscreen = document.fullscreenElement !== null);
+    this.$ugoiraContainer.find("canvas, video").on("click", event => this.togglePlaying());
+    this.$ugoiraContainer.find("canvas, video").on("dblclick", event => this.toggleFullscreen(event));
+    this.$ugoiraContainer.find("canvas, video").on("seeking", event => this.currentTime = this.video.currentTime);
+    this.$ugoiraContainer.find("canvas, video").on("progress", event => this.currentTime = this.video.currentTime);
+    this.$ugoiraContainer.find("canvas, video").on("timeupdate", event => this.currentTime = this.video.currentTime);
+    this.$ugoiraContainer.find("canvas, video").on("durationchange", event => this.duration = this.video.duration);
+    this.$ugoiraContainer.find(".ugoira-slider").on("pointerdown", event => this.onDragStart(event));
+    this.$ugoiraContainer.find(".ugoira-slider").on("pointerup", event => this.onDragEnd(event));
+    this.$ugoiraContainer.find(".ugoira-slider").on("input", event => this.onDrag(event));
 
-    this.$video.on("play", event => this.updateUI(event));
-    this.$video.on("pause", event => this.updateUI(event));
-    this.$video.on("timeupdate", event => this.updateUI(event));
-    this.$video.on("progress", event => this.onLoadFrame());
-
-    this.video.load();
+    let quality = this.$ugoiraContainer.data("quality");
+    this.setQuality(quality);
+    this.play();
   }
 
   play() {
-    this.video.play();
+    this.video?.play();
+    this.paused = false;
   }
 
   pause() {
-    this.resumePlayback = !this.video.paused;
-    this.video.pause();
+    this.resumePlayback = !this.paused;
+    this.video?.pause();
+    this.paused = true;
   }
 
   // Resumes playing the ugoira if it was previously playing before it was last paused.
@@ -63,34 +56,12 @@ export default class Ugoira {
     }
   }
 
-  // Toggles between playing and paused.
-  toggle(event = null) {
-    if (this.video.paused) {
+  togglePlaying() {
+    if (this.paused) {
       this.play();
     } else {
       this.pause();
     }
-
-    event?.preventDefault();
-  }
-
-  // Updates the playback slider and the time display.
-  updateUI() {
-    let duration = this.video.duration || 0;
-    let currentTime = this.video.currentTime;
-    let progress = Math.round(100 * (currentTime / duration));
-
-    this.$currentTime.text(this.formatTime(currentTime));
-    this.$duration.text(this.formatTime(duration));
-    this.$playbackSlider.css("--playback-progress", `${progress}%`);
-    this.$playbackSlider.val(currentTime);
-    this.$ugoiraContainer.attr("data-playing", !this.video.paused);
-
-    this.$playButton.toggleClass("hidden", this.video.paused);
-    this.$pauseButton.toggleClass("hidden", !this.video.paused);
-
-    this.$fullscreenButton.toggleClass("hidden", document.fullscreenElement !== null);
-    this.$exitFullscreenButton.toggleClass("hidden", document.fullscreenElement === null);
   }
 
   // Called when the playback slider starts being dragged. Pauses the ugoira while the user drags the playback slider.
@@ -105,7 +76,7 @@ export default class Ugoira {
   // Called as the playback slider is being dragged. Updates the current time based on the playback slider position.
   onDrag(event) {
     if (this.scrubbing) {
-      this.video.currentTime = parseFloat(event.target.value);
+      this.currentTime = parseFloat(event.target.value);
     }
   }
 
@@ -124,25 +95,16 @@ export default class Ugoira {
     }
 
     if (event.key === " ") {
-      this.toggle(event);
+      this.togglePlaying();
     } else if (event.key === "ArrowLeft") {
-      this.video.currentTime -= this.video.duration * 0.01;
+      this.currentTime -= this.duration * 0.01;
     } else if (event.key === "ArrowRight") {
-      this.video.currentTime += this.video.duration * 0.01;
+      this.currentTime += this.duration * 0.01;
     } else {
       return;
     }
 
     event.preventDefault();
-  }
-
-  // Called each time a frame is downloaded. Updates the playback slider to indicate how much of the video has been downloaded.
-  onLoadFrame() {
-    let buffered = this.video.buffered;
-    let bufferedDuration = buffered.length > 0 ? buffered.end(buffered.length - 1) : 0;
-    let loadProgress = Math.round(100 * (bufferedDuration / this.video.duration));
-
-    this.$playbackSlider.css("--load-progress", `${loadProgress}%`);
   }
 
   // Pauses the video while the user is tabbed out.
@@ -154,6 +116,30 @@ export default class Ugoira {
     }
   }
 
+  // Sets the video to either the original ugoira video or the webm sample video. Playback will continue from the
+  // current time when the video is switched.
+  setQuality(quality) {
+    if (quality === this.quality) {
+      return;
+    }
+
+    this.pause();
+    this.quality = quality;
+
+    if (quality === "original") {
+      this.video = this._ugoira;
+      this.duration = this._ugoira.duration || 0;
+      this.currentTime = this._sample.currentTime || 0;
+      this.video.load();
+    } else if (quality === "sample") {
+      this.video = this._sample;
+      this.duration = this._sample.duration || 0;
+      this.currentTime = this._ugoira.currentTime || 0;
+    }
+
+    this.resume();
+  }
+
   // Toggle fullscreen mode.
   toggleFullscreen(event) {
     if (document.fullscreenElement) {
@@ -163,11 +149,47 @@ export default class Ugoira {
     }
   }
 
+  get currentTime() {
+    return this._currentTime;
+  }
+
+  set currentTime(time) {
+    this._currentTime = time;
+
+    if (this.video.currentTime !== time) {
+      this.video.currentTime = time;
+    }
+  }
+
+  // The percentage of the video that has been played.
+  get playbackProgress() {
+    return this.formatPercentage(this.currentTime / this.duration);
+  }
+
+  // The percentage of the video that has been downloaded.
+  get loadProgress() {
+    // XXX Hack to force Alpine to update the progress bar every time the time is updated, because browsers don't always
+    // send the final progress event when the video finishes loading, which causes the loading bar to get stuck below 100%.
+    this.currentTime;
+
+    let buffered = this.video.buffered;
+    let bufferedDuration = buffered.length > 0 ? buffered.end(buffered.length - 1) : 0;
+
+    // XXX Some webm samples have an incorrect duration, which causes the load progress to get stuck below 100% in Firefox.
+    // Ex: https://danbooru.donmai.us/posts/3448662
+    return this.formatPercentage(bufferedDuration / this.duration);
+  }
+
   // Format a time in seconds as "0:00".
   formatTime(seconds) {
-    const mm = Math.floor(seconds / 60).toString().padStart(1, '0');
-    const ss = Math.floor(seconds % 60).toString().padStart(2, '0');
+    const mm = Math.round(seconds / 60).toString().padStart(1, '0');
+    const ss = Math.round(seconds % 60).toString().padStart(2, '0');
 
     return `${mm}:${ss}`;
+  }
+
+  // Format a float as "12.3%"
+  formatPercentage(percentage, precision = 1) {
+    return `${Math.round(Math.pow(10, precision) * 100 * (percentage || 0)) / Math.pow(10, precision)}%`;
   }
 }

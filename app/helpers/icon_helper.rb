@@ -284,6 +284,14 @@ module IconHelper
     svg_icon_tag("minimize", viewBox: "0 0 512 512", **options)
   end
 
+  def gear_icon(**options)
+    svg_icon_tag("gear", viewBox: "0 0 512 512", **options)
+  end
+
+  def check_icon(**options)
+    svg_icon_tag("check", viewBox: "0 0 448 512", **options)
+  end
+
   def discord_icon(**options)
     image_icon_tag("discord-logo.png", **options)
   end

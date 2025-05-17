@@ -69,6 +69,7 @@ $spacer: 0.25rem; /* 4px */
 .pointer-events-none { pointer-events: none; }
 .select-none { user-select: none; }
 
+.opacity-0 { opacity: 0; }
 .opacity-50 { opacity: 0.5; }
 .hover\:opacity-50:hover { opacity: 0.5; }
 
@@ -111,7 +112,7 @@ $spacer: 0.25rem; /* 4px */
 
 .border-current { border-color: currentcolor; }
 
-.outline-0 { outline-width: 0; }
+.focus\:outline-0:focus { outline-width: 0; }
 
 .rounded-sm, %rounded-sm { border-radius: 0.5 * $spacer; }
 .rounded,    %rounded    { border-radius: 1   * $spacer; }
@@ -175,6 +176,7 @@ $spacer: 0.25rem; /* 4px */
 
 .px-1 { padding-left: 1 * $spacer; padding-right: 1 * $spacer; }
 .px-2 { padding-left: 2 * $spacer; padding-right: 2 * $spacer; }
+.px-3 { padding-left: 3 * $spacer; padding-right: 3 * $spacer; }
 .px-4 { padding-left: 4 * $spacer; padding-right: 4 * $spacer; }
 .px-8 { padding-left: 8 * $spacer; padding-right: 8 * $spacer; }
 

@@ -278,15 +278,7 @@
     <% elsif @post.is_video? -%>
       <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_file_url) %>
     <% elsif @post.is_ugoira? -%>
-      <% if params[:size] == "original" || (CurrentUser.user.default_image_size == "original" && params[:size].blank?) %>
-        <%= render UgoiraComponent.new(@post.media_asset, file_url: (@post.file_url if policy(@post).visible?), html: { id: "image" }) %>
-
-        <p><%= link_to "View WebM", current_page_path(size: "webm") %></p>
-      <% else %>
-        <%= tag.video(id: "image", class: "fit-width mb-2", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_large_file_url) %>
-
-        <p><%= link_to "View original", current_page_path(size: "original") %></p>
-      <% end %>
+      <%= render UgoiraComponent.new(@post.media_asset, default_quality: (params.fetch(:size, CurrentUser.user.default_image_size) == "original" ? "original" : "sample"), html: { id: "image" }) %>
     <% elsif @post.is_image? -%>
       <picture>
         <%= tag.source media: "(max-width: 660px)", srcset: @post.tagged_large_file_url %>

@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 class UgoiraComponent < ApplicationComponent
-  delegate :play_icon, :pause_icon, :expand_icon, :minimize_icon, to: :helpers
+  delegate :play_icon, :pause_icon, :expand_icon, :minimize_icon, :gear_icon, :check_icon, to: :helpers
 
-  attr_reader :media_asset, :file_url, :html_options
+  attr_reader :media_asset, :default_quality, :html_options
 
-  def initialize(media_asset, file_url:, html: {})
+  def initialize(media_asset, default_quality: :original, html: {})
     super
     @media_asset = media_asset
-    @file_url = file_url
+    @default_quality = default_quality
     @html_options = html
   end
 

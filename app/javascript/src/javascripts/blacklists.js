@@ -190,7 +190,7 @@ Blacklist.post_hide = function(post) {
   var $post = $(post);
   $post.addClass("blacklisted blacklisted-active");
 
-  var $video = $post.find("video").get(0);
+  var $video = $post.find("video#image").get(0);
   if ($video) {
     $video.pause();
     $video.currentTime = 0;
@@ -201,7 +201,7 @@ Blacklist.post_unhide = function(post) {
   var $post = $(post);
   $post.addClass("blacklisted").removeClass("blacklisted-active");
 
-  var $video = $post.find("video").get(0);
+  var $video = $post.find("video#image").get(0);
   if ($video) {
     $video.play();
   }
