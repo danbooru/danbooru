@@ -245,6 +245,10 @@ export default class UgoiraRenderer {
         this.readyState = Math.max(this.readyState, HTMLMediaElement.HAVE_FUTURE_DATA);
       }
 
+      if (this._currentFrame === null) {
+        this.drawFrame(this.currentTime);
+      }
+
       this.triggerEvent("progress", { frame: this._loadedFrame });
     });
 
