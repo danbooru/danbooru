@@ -10,6 +10,10 @@
   width: 100%;
 }
 
+.ugoira-container {
+  background-color: var(--ugoira-background-color);
+}
+
 .ugoira-controls {
   &, .tippy-box {
     background-color: #1f202cc0; // fallback

@@ -8,7 +8,7 @@ class UgoiraComponent < ApplicationComponent
   def initialize(media_asset, default_quality: :original, html: {})
     super
     @media_asset = media_asset
-    @default_quality = default_quality
+    @default_quality = default_quality.to_s.inquiry
     @html_options = html
   end
 
