@@ -135,6 +135,7 @@ export default class Ugoira {
       this.video = this._sample;
       this.duration = this._sample.duration || 0;
       this.currentTime = this._ugoira.currentTime || 0;
+      this.video.load();
     }
 
     this.resume();
