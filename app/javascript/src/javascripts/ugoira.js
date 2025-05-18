@@ -163,7 +163,7 @@ export default class Ugoira {
 
   // The percentage of the video that has been played.
   get playbackProgress() {
-    return this.formatPercentage(this.currentTime / this.duration);
+    return this.formatPercentage(this.currentTime, this.duration);
   }
 
   // The percentage of the video that has been downloaded.
@@ -175,9 +175,19 @@ export default class Ugoira {
     let buffered = this.video.buffered;
     let bufferedDuration = buffered.length > 0 ? buffered.end(buffered.length - 1) : 0;
 
-    // XXX Some webm samples have an incorrect duration, which causes the load progress to get stuck below 100% in Firefox.
-    // Ex: https://danbooru.donmai.us/posts/3448662
-    return this.formatPercentage(bufferedDuration / this.duration);
+    // Sometimes the browser has buffered part of the video and started playback, but it hasn't finished downloading
+    // the metadata and so doesn't know the duration yet. Just say we've loaded something in that case.
+    if (bufferedDuration > 0 && this.duration === 0) {
+      return "1%";
+    // Sometimes the browser says it hasn't buffered anything yet, but it says the video is ready and has already
+    // started playback, so it's at least downloaded something.
+    } else if (bufferedDuration === 0 && this.video.readyState > 1) {
+      return "1%"
+    } else {
+      // XXX Some webm samples have an incorrect duration, which causes the load progress to be wrong.
+      // Ex: https://danbooru.donmai.us/posts/3448662
+      return this.formatPercentage(bufferedDuration, this.duration);
+    }
   }
 
   // Format a time in seconds as "0:00".
@@ -188,8 +198,13 @@ export default class Ugoira {
     return `${mm}:${ss}`;
   }
 
-  // Format a float as "12.3%"
-  formatPercentage(percentage, precision = 1) {
-    return `${Math.round(Math.pow(10, precision) * 100 * (percentage || 0)) / Math.pow(10, precision)}%`;
+  // Format a ratio as "12.3%"
+  formatPercentage(numerator, denominator, precision = 1) {
+    if (denominator) {
+      let roundedRatio = Math.round(Math.pow(10, precision) * 100 * (numerator / denominator)) / Math.pow(10, precision);
+      return `${roundedRatio}%`;
+    } else {
+      return "0%";
+    }
   }
 }

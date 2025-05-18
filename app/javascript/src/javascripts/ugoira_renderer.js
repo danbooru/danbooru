@@ -201,11 +201,11 @@ export class UgoiraLoader {
   }
 }
 
-// A UgoiraPlayer renders a ugoira on a <canvas>. It loads frames using a UgoiraLoader and animates them using
+// A UgoiraRenderer renders a ugoira on a <canvas>. It uses a UgoiraLoader to load frames and animates them using
 // requestAnimationFrame. It implements the HTMLMediaElement interface so it can be used as a <video> element.
 //
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
-export default class UgoiraPlayer {
+export default class UgoiraRenderer {
   constructor(fileUrl, canvas, frameDelays, { fileSize = null } = {}) {
     this.currentSrc = fileUrl;
     this.paused = true;
@@ -214,7 +214,9 @@ export default class UgoiraPlayer {
     this.duration = frameDelays.reduce((sum, n) => sum + n, 0) / 1000;
 
     // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/networkState
-    this.networkState = HTMLMediaElement.NETWORK_EMPTY; // EMPTY, IDLE, LOADING, NO_SOURCE
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/readyState
+    this.networkState = HTMLMediaElement.NETWORK_IDLE; // EMPTY, IDLE, LOADING, NO_SOURCE
+    this.readyState = HTMLMediaElement.HAVE_METADATA; // HAVE_NOTHING, HAVE_METADATA, HAVE_CURRENT_DATA, HAVE_FUTURE_DATA, HAVE_ENOUGH_DATA
 
     this._canvas = canvas;      // The <canvas> element the ugoira is drawn on.
     this._previousTime = null;  // The time in seconds of the last requestAnimationFrame call. Used for measuring elapsed time.
@@ -231,15 +233,23 @@ export default class UgoiraPlayer {
 
   // Starts loading the ugoira asynchronously. Does nothing if the ugoira is already loading or has been loaded.
   async load() {
-    if (this.networkState !== HTMLMediaElement.NETWORK_EMPTY) { return; }
-    this.networkState = HTMLMediaElement.NETWORK_LOADING;
+    if (this.networkState === HTMLMediaElement.NETWORK_LOADING || this.readyState === HTMLMediaElement.HAVE_ENOUGH_DATA) {
+      return;
+    }
 
-    this._loader.load(500000, 4, frame => {
+    this.networkState = HTMLMediaElement.NETWORK_LOADING;
+    await this._loader.load(500000, 4, frame => {
       this._loadedFrame = Math.max(this._loadedFrame, frame);
+
+      if (this.buffered.end(0) >= this.currentTime) {
+        this.readyState = Math.max(this.readyState, HTMLMediaElement.HAVE_FUTURE_DATA);
+      }
+
       this.triggerEvent("progress", { frame: this._loadedFrame });
     });
 
     this.networkState = HTMLMediaElement.NETWORK_IDLE;
+    this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
   }
 
   // Plays the ugoira. Starts the callback that renders the ugoira frames.
@@ -297,7 +307,7 @@ export default class UgoiraPlayer {
   // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/buffered
   // https://developer.mozilla.org/en-US/docs/Web/API/TimeRanges
   get buffered() {
-    let endTime = this._loadedFrame ? this._frames[this._loadedFrame].frameEnd : 0;
+    let endTime = this._loadedFrame !== null ? this._frames[this._loadedFrame].frameEnd : 0;
 
     return { length: 1, start: n => 0, end: n => endTime };
   }
