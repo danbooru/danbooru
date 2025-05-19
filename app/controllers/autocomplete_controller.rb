@@ -11,9 +11,10 @@ class AutocompleteController < ApplicationController
 
     @results = @autocomplete.autocomplete_results
     @expires_in = @autocomplete.cache_duration
+    @stale_while_revalidate = @autocomplete.stale_while_revalidate_duration
     @public = @autocomplete.cache_publicly?
 
-    expires_in @expires_in, public: @public unless response.cache_control.present?
+    expires_in @expires_in, stale_while_revalidate: @stale_while_revalidate, public: @public unless response.cache_control.present?
     respond_with(@results, layout: false)
   end
 end

@@ -404,16 +404,14 @@ class AutocompleteService
     [query, results]
   end
 
-  # How long autocomplete results can be cached. Cache short result lists (<10
-  # results) for less time because they're more likely to change.
+  # How long autocomplete results can be cached by the browser. Stale results will be refreshed in the background.
   def cache_duration
-    if type == :emoji
-      5.minutes
-    elsif autocomplete_results.size == limit
-      24.hours
-    else
-      1.hour
-    end
+    10.minutes
+  end
+
+  # How long stale results can be used while they're refreshed in the background.
+  def stale_while_revalidate_duration
+    1.day
   end
 
   # Whether the results can be safely cached with `Cache-Control: public`.
