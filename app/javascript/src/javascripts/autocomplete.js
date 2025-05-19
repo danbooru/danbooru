@@ -60,8 +60,10 @@ Autocomplete.initialize_dtext_autocomplete = function($fields) {
       my: "left bottom"
     },
     source: async function(req, resp) {
-      var cursor = this.element.get(0).selectionStart;
-      let match = req.term.substring(0, cursor).match(/([ \r\n/"\\()[\]{}<>]|^)([@:])(\S*)$/);
+      let caret = this.element.get(0).selectionStart;
+      let term_after_caret = req.term.substring(caret).match(/\S*/)[0];
+      caret += term_after_caret.length;
+      let match = req.term.substring(0, caret).match(/([ \r\n/"\\()[\]{}<>]|^)([@:])(\S*)$/);
 
       let prefix = match?.[1];
       let type = match?.[2];
@@ -99,6 +101,8 @@ Autocomplete.initialize_tag_autocomplete = function() {
 Autocomplete.current_term = function($input) {
   let query = $input.get(0).value;
   let caret = $input.get(0).selectionStart;
+  let term_after_caret = query.substring(caret).match(/\S*/)[0];
+  caret += term_after_caret.length;
   let regexp = new RegExp(`^[-~(]*(${Autocomplete.tag_prefixes().join("|")})?`);
   let match = query.substring(0, caret).match(/\S*$/)[0].replace(regexp, "").toLowerCase();
   return match;
@@ -107,9 +111,13 @@ Autocomplete.current_term = function($input) {
 // Update the input field with the item currently focused in the
 // autocomplete menu, then position the caret just after the inserted completion.
 Autocomplete.insert_completion = function(input, completion) {
+  let caret = input.selectionStart;
+  let term_after_caret = input.value.substring(caret).match(/\S*/)[0];
+  caret += term_after_caret.length;
+
   // Trim all whitespace (tabs, spaces) except for line returns
-  var before_caret_text = input.value.substring(0, input.selectionStart).replace(/^[ \t]+|[ \t]+$/gm, "");
-  var after_caret_text = input.value.substring(input.selectionStart).replace(/^[ \t]+|[ \t]+$/gm, "");
+  var before_caret_text = input.value.substring(0, caret).replace(/^[ \t]+|[ \t]+$/gm, "");
+  var after_caret_text = input.value.substring(caret).replace(/^[ \t]+|[ \t]+$/gm, "");
 
   var regexp = new RegExp(`([-~(]*(?:${Autocomplete.tag_prefixes().join("|")})?)\\S+$`, "g");
   before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
