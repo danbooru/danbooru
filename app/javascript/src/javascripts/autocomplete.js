@@ -63,7 +63,7 @@ Autocomplete.initialize_dtext_autocomplete = function($fields) {
       let caret = this.element.get(0).selectionStart;
       let term_after_caret = req.term.substring(caret).match(/\S*/)[0];
       caret += term_after_caret.length;
-      let match = req.term.substring(0, caret).match(/([ \r\n/"\\()[\]{}<>]|^)([@:])(\S*)$/);
+      let match = req.term.substring(0, caret).match(/([ \r\n/\\()[\]{}<>]|^)([@:])([a-zA-Z0-9_]*)$/);
 
       let prefix = match?.[1];
       let type = match?.[2];
