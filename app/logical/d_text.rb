@@ -180,23 +180,25 @@ class DText
     end
 
     node.name = "article"
-    node["class"] = "dtext-media-embed"
+    node["class"] = "dtext-media-embed w-fit h-fit"
     node["data-type"] = type
     node["data-id"] = id
 
     if asset.nil? || !asset.active? || asset.is_flash? || !asset.policy(current_user).can_see_image?
-      link_attributes = %{class="inactive-link flex items-center justify-center border rounded min-w-150px min-h-150px"}
-      asset_html = ApplicationController.helpers.image_icon
+      link_attributes = %{class="inactive-link flex items-center justify-center border rounded max-w-150px w-full aspect-square"}
+      asset_html = %{<a #{link_attributes} href="#{href}">#{ApplicationController.helpers.image_icon}</a>}
       caption ||= "This #{type} is unavailable."
     elsif asset.is_image?
       variant = asset.variant(:"720x720")
-      asset_html = %{<img src="#{variant.file_url}" width="#{variant.width}" height="#{variant.height}">}
-    elsif asset.is_video? || asset.is_ugoira?
-      variant = asset.is_ugoira? ? asset.variant(:sample) : asset.variant(:original)
+      asset_html = %{<a href="#{href}"><img src="#{variant.file_url}" width="#{variant.width}" height="#{variant.height}"></a>}
+    elsif asset.is_ugoira?
+      asset_html = ApplicationController.new.view_context.render(UgoiraComponent.new(asset, default_quality: :sample))
+    elsif asset.is_video?
+      variant = asset.variant(:original)
       asset_html = %{<video src="#{variant.file_url}" width="#{variant.width}" height="#{variant.height}" autoplay controls muted loop>}
     end
 
-    node.inner_html  = %{<div class="media-embed-image"><a #{link_attributes} href="#{href}">#{asset_html}</a></div>}
+    node.inner_html  = %{<div class="media-embed-image">#{asset_html}</div>}
     node.inner_html += %{<div class="media-embed-caption">#{caption}</div>} if caption.present?
   end
 

@@ -206,6 +206,7 @@ $spacer: 0.25rem; /* 4px */
 .w-2    { width: 2 * $spacer; }
 .w-3    { width: 3 * $spacer; }
 .w-4    { width: 4 * $spacer; }
+.w-6    { width: 6 * $spacer; }
 .w-8    { width: 8 * $spacer; }
 .w-sm   { width: 24rem; }
 .w-md   { width: 28rem; }
@@ -226,6 +227,7 @@ $spacer: 0.25rem; /* 4px */
 .min-w-4 { min-width: 4 * $spacer; }
 .min-w-150px { min-width: 150px; }
 
+.max-w-150px { max-width: 150px; }
 .max-w-360px { max-width: 360px; }
 .max-w-480px { max-width: 480px; }
 .max-w-540px { max-width: 540px; }
@@ -235,6 +237,7 @@ $spacer: 0.25rem; /* 4px */
 
 .max-w-1\/2 { max-width: 50%; }
 .max-w-full { max-width: 100%; }
+.max-h-1\/4 { max-height: 25%; }
 .max-h-full { max-height: 100%; }
 
 .\!max-w-full { max-width: 100% !important; }
@@ -251,7 +254,9 @@ $spacer: 0.25rem; /* 4px */
 .h-10   { height: 10 * $spacer; }
 .h-12   { height: 12 * $spacer; }
 .h-16   { height: 16 * $spacer; }
-.h-full { height: 100%; }
+// round() is to avoid inconsistent subpixel rounding that causes off-by-1px layout issues in responsive elements.
+// https: //css-tip.com/pixel-rounding/
+.h-full { height: 100%; height: round(100%, 1px); }
 .h-24px { height: 24px; }
 .h-150px { height: 150px; }
 .h-180px { height: 180px; }
@@ -579,4 +584,16 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   .sm\:order-2 { order: 2; }
 
   .\!sm\:w-full { width: 100% !important; }
+}
+
+.\@container {
+  container-type: inline-size;
+}
+
+@container (max-width: 120px) {
+  .\@max-120px\:hidden { display: none; }
+}
+
+@container (max-width: 270px) {
+  .\@max-270px\:hidden { display: none; }
 }
