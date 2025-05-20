@@ -148,7 +148,7 @@ ARG FFMPEG_BUILD_OPTIONS="\
     --enable-demuxer=apng --enable-demuxer=gif \
   --disable-filters \
     --enable-filter=scale --enable-filter=thumbnail --enable-filter=silencedetect --enable-filter=ebur128 \
-    --enable-filter=aresample --enable-filter=anull --enable-filter=null --enable-filter=copy \
+    --enable-filter=aresample --enable-filter=anull --enable-filter=null --enable-filter=copy --enable-filter=untile \
   --disable-encoders \
     --enable-encoder=libvpx_vp8 --enable-encoder=libvpx_vp9 --enable-encoder=png --enable-encoder=null \
     --enable-encoder=wrapped_avframe --enable-encoder=pcm_s16le \
