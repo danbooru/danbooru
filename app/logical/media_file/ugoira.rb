@@ -54,6 +54,7 @@ class MediaFile::Ugoira < MediaFile
 
     Danbooru::Archive.extract!(file) do |tmpdir, filenames|
       output_file = Danbooru::Tempfile.new(["danbooru-ugoira-conversion-#{md5}-", ".webm"], binmode: true)
+      filenames = filenames.without File.join(tmpdir, "animation.json")
 
       # Duplicate last frame to avoid it being displayed only for a very short amount of time.
       last_file_name = File.basename(filenames.last)
