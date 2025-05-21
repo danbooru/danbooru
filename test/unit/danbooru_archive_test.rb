@@ -4,18 +4,18 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
   context "Danbooru::Archive" do
     context ".open! method" do
       should "work without a block" do
-        archive = Danbooru::Archive.open!("test/files/ugoira.zip")
+        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
         assert_equal(5, archive.entries.count)
       end
 
       should "work with a block" do
-        Danbooru::Archive.open!("test/files/ugoira.zip") do |archive|
+        Danbooru::Archive.open!("test/files/ugoira/ugoira.zip") do |archive|
           assert_equal(5, archive.entries.count)
         end
       end
 
       should "raise an error if the block raises an error" do
-        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open!("test/files/ugoira.zip") { raise "failed" } }
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open!("test/files/ugoira/ugoira.zip") { raise "failed" } }
       end
 
       should "raise an error if the file doesn't exist" do
@@ -25,18 +25,18 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context ".open method" do
       should "work without a block" do
-        archive = Danbooru::Archive.open("test/files/ugoira.zip")
+        archive = Danbooru::Archive.open("test/files/ugoira/ugoira.zip")
         assert_equal(5, archive.entries.count)
       end
 
       should "work with a block" do
-        Danbooru::Archive.open("test/files/ugoira.zip") do |archive|
+        Danbooru::Archive.open("test/files/ugoira/ugoira.zip") do |archive|
           assert_equal(5, archive.entries.count)
         end
       end
 
       should "return nil if the block raises an error" do
-        assert_nil(Danbooru::Archive.open("test/files/ugoira.zip") { raise "failed" })
+        assert_nil(Danbooru::Archive.open("test/files/ugoira/ugoira.zip") { raise "failed" })
       end
 
       should "return nil if the file doesn't exist" do
@@ -46,7 +46,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context ".extract! method" do
       should "extract to temp directory if not given a block or directory" do
-        dir, filenames = Danbooru::Archive.extract!("test/files/ugoira.zip")
+        dir, filenames = Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip")
 
         assert_equal(true, File.directory?(dir))
         assert_equal(5, filenames.size)
@@ -56,7 +56,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
 
       should "extract to a temp directory and delete it afterwards if given a block" do
-        Danbooru::Archive.extract!("test/files/ugoira.zip") do |dir, filenames|
+        Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip") do |dir, filenames|
           @tmpdir = dir
           assert_equal(true, File.directory?(dir))
           assert_equal(5, filenames.size)
@@ -69,7 +69,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
       should "extract to given directory if given a directory" do
         Dir.mktmpdir do |tmpdir|
-          dir, filenames = Danbooru::Archive.extract!("test/files/ugoira.zip", tmpdir)
+          dir, filenames = Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip", tmpdir)
           assert_equal(dir, tmpdir)
           assert_equal(5, filenames.size)
           filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
@@ -100,14 +100,14 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context "#uncompressed_size method" do
       should "work" do
-        archive = Danbooru::Archive.open!("test/files/ugoira.zip")
+        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
         assert_equal(6161, archive.uncompressed_size)
       end
     end
 
     context "#exists? method" do
       should "work" do
-        archive = Danbooru::Archive.open!("test/files/ugoira.zip")
+        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
         assert_equal(true, archive.exists? { |entry, count| count > 4 })
       end
     end
@@ -134,7 +134,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context "#ls method" do
       should "work" do
-        archive = Danbooru::Archive.open!("test/files/ugoira.zip")
+        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
         output = StringIO.new
 
         archive.ls(output)

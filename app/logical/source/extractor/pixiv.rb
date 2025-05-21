@@ -195,9 +195,7 @@ module Source
           Danbooru::Archive.create!(tmpdir, file)
         end
 
-        media_file = MediaFile.open(file)
-        media_file.frame_delays = ugoira_frame_delays
-        media_file
+        MediaFile.open(file, frame_delays: ugoira_frame_delays)
       end
 
       def translate_tag(tag)

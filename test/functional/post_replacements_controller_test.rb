@@ -122,12 +122,12 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_equal(80, @post.reload.image_width)
           assert_equal(82, @post.image_height)
-          assert_equal(2804, @post.file_size)
+          assert_equal(33_140, @post.file_size)
           assert_equal("zip", @post.file_ext)
-          assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.md5)
-          assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.media_asset.variant(:original).open_file.md5)
+          assert_equal("716b128aa50bd22a65cb28e726382128", @post.md5)
+          assert_equal("716b128aa50bd22a65cb28e726382128", @post.media_asset.variant(:original).open_file.md5)
 
-          assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
+          assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png", @post.source)
           assert_equal([125, 125], @post.media_asset.frame_delays)
         end
       end
@@ -199,7 +199,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             post_auth post_replacements_path, create(:moderator_user), params: {
               post_id: @post.id,
               post_replacement: {
-                replacement_file: Rack::Test::UploadedFile.new("test/files/ugoira.json"),
+                replacement_file: Rack::Test::UploadedFile.new("test/files/ugoira/animation.json"),
               }
             }
 

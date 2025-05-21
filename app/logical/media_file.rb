@@ -79,6 +79,12 @@ class MediaFile
     @file = file
   end
 
+  # Close the file if it is open.
+  def close
+    @file&.close
+    @file = nil
+  end
+
   # @return [Array<(Integer, Integer)>] the width and height of the file
   def dimensions
     [0, 0]
