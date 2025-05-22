@@ -37,7 +37,7 @@ module Sources
           "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364",
           image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 33_140, frame_delays: [125, 125], md5: "716b128aa50bd22a65cb28e726382128" },
+            { file_size: 33_365, frame_delays: [125, 125], md5: "35e3d3a71cb61d04f10e41979d29ee4b" }
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -47,6 +47,16 @@ module Sources
           dtext_artist_commentary_title: "ugoira",
           dtext_artist_commentary_desc: "",
         )
+
+        should "include the Pixiv info in the animation.json file" do
+          source = Source::Extractor.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+          json = source.ugoira_file.animation_json
+
+          assert_equal(62_247_364, json[:illustId])
+          assert_equal(22_252_953, json[:userId])
+          assert_equal("2017-04-03T23:57:00+00:00", json[:createDate])
+          assert_equal("2017-04-03T23:57:00+00:00", json[:uploadDate])
+        end
       end
 
       context "A https://i.pximg.net/img-zip-ugoira/* image URL" do
@@ -54,7 +64,7 @@ module Sources
           "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip",
           image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 33_140, frame_delays: [125, 125], md5: "716b128aa50bd22a65cb28e726382128" },
+            { file_size: 33_365, frame_delays: [125, 125], md5: "35e3d3a71cb61d04f10e41979d29ee4b" },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -71,7 +81,7 @@ module Sources
           "https://i.pximg.net/img-master/img/2017/04/04/08/57/38/62247364_master1200.jpg",
           image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 33_140, frame_delays: [125, 125], md5: "716b128aa50bd22a65cb28e726382128" },
+            { file_size: 33_365, frame_delays: [125, 125], md5: "35e3d3a71cb61d04f10e41979d29ee4b" },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -96,11 +106,11 @@ module Sources
           image_urls: ["https://i.pximg.net/img-original/img/2023/11/27/19/51/28/113760314_ugoira0.png"],
           media_files: [
             {
-              file_size: 5_320_830,
+              file_size: 5_322_700,
               width: 3600,
               height: 2560,
               frame_delays: [125] * 42,
-              md5: "5b1b38db3e0533a5e01c3f18b350f6bf"
+              md5: "9d8fb171a990e936687e35d9b49bb731"
             }
           ],
         )

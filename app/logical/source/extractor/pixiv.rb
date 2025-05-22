@@ -159,43 +159,42 @@ module Source
 
       def download_file!(url)
         if is_ugoira?
-          download_ugoira(url)
+          ugoira_file
         else
           super(url)
         end
       end
 
-      def download_ugoira(url)
-        url = Source::URL.parse url
-        frame0 = Source::URL.parse url.ugoira_frame_url(0)
-        return unless frame0.present?
+      # @return [Array<String>] The list of URLs to the individual frames in the original ugoira.
+      memoize def ugoira_frame_urls
+        base_url = Source::URL.parse(original_urls.first)
 
-        animation_meta = {
-          mime_type: Mime::Type.lookup_by_extension(frame0.file_ext).to_s,
-          frames: ugoira_frame_delays.map.with_index do |delay, n|
-            { file: "#{"%06d" % n}.#{frame0.file_ext}", delay: delay }
-          end,
-        }
-
-        file = Danbooru::Tempfile.new(["danbooru-ugoira-", ".zip"], binmode: true)
-
-        Dir.mktmpdir do |tmpdir|
-          animation_meta[:frames].each_with_index do |frame, n|
-            frame_url = url.ugoira_frame_url(n)
-            file_path = File.join tmpdir, frame[:file]
-            File.open(file_path, "w+", binmode: true) do |file|
-              http_downloader.download_media(frame_url, file: file)
-            end
-          end
-
-          File.open(File.join(tmpdir, "animation.json"), "w+") do |file|
-            file.write animation_meta.to_json
-          end
-
-          Danbooru::Archive.create!(tmpdir, file)
+        ugoira_frame_delays.size.times.map do |n|
+          base_url.ugoira_frame_url(n)
         end
+      end
 
-        MediaFile.open(file, frame_delays: ugoira_frame_delays)
+      # @return [Array<MediaFile>] The list of individual frames in the original ugoira.
+      memoize def ugoira_frames
+        ugoira_frame_urls.map do |url|
+          _, file = http_downloader.download_media(url)
+          file
+        end
+      end
+
+      # @return [MediaFile, nil] The original ugoira built from the individual frames.
+      memoize def ugoira_file
+        return unless ugoira_frames.present? && ugoira_frame_delays.present?
+
+        MediaFile::Ugoira.create(ugoira_frames, frame_delays: ugoira_frame_delays) do |animation_json|
+          animation_json.replace(
+            illustId: api_response[:illustId].to_i,
+            userId: api_response[:userId].to_i,
+            createDate: api_response[:createDate], # when the ugoira was first uploaded
+            uploadDate: api_response[:uploadDate], # when the ugoira was last revised (same as the creation date if not revised)
+            **animation_json
+          )
+        end
       end
 
       def translate_tag(tag)
@@ -274,7 +273,7 @@ module Source
       end
 
       def ugoira_frame_delays
-        api_ugoira[:frames].pluck("delay")
+        api_ugoira[:frames].to_a.pluck("delay")
       end
     end
   end

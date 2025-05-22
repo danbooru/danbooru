@@ -61,7 +61,7 @@ class MediaFile::Ugoira < MediaFile
   end
 
   memoize def dimensions
-    preview_frame.dimensions
+    frames.first.dimensions
   end
 
   def preview!(width, height, **options)
@@ -125,7 +125,46 @@ class MediaFile::Ugoira < MediaFile
   # @return [String] The path to the temporary directory where the ugoira was extracted.
   def tmpdir
     synchronize do
-      @tmpdir ||= Danbooru::Tempdir.create(["danbooru-ugoira-", "-#{File.basename(file.path)}"])
+      @tmpdir ||= Danbooru::Tempdir.create(["danbooru-ugoira-", "-#{File.basename(file&.path.to_s)}"])
+    end
+  end
+
+  # Create a new ugoira from the given images and frame delays.
+  #
+  # @param frames [Array<MediaFile>] The list of images to include in the ugoira, in the order they should be displayed.
+  # @param frame_delays [Array<Integer>] The frame delays in milliseconds.
+  # @param block [Proc] An optional block that will be called with the animation.json data to allow the caller to add extra data to it.
+  # @return [MediaFile] The new ugoira.
+  def self.create(frames, frame_delays:, &block)
+    new(frames, frame_delays:).create_copy(&block)
+  end
+
+  # Create a copy of the current ugoira, with a new animation.json file added to it.
+  #
+  # @param file [File] The output file to write the new ugoira to.
+  # @param block [Proc] An optional block that will be called with the animation.json data to allow the caller to add extra data to it.
+  # @return [MediaFile] The new ugoira.
+  def create_copy(file: Danbooru::Tempfile.new(["danbooru-ugoira-", ".zip"], binmode: true), &block)
+    Danbooru::Tempdir.create do |tmpdir|
+      animation_meta = {
+        width: width,
+        height: height,
+        mime_type: frames.first&.mime_type.to_s,
+        frames: frames.map.with_index do |frame, n|
+          { file: "#{"%06d" % n}.#{frame.file_ext}", delay: frame_delays[n], md5: frame.md5 }
+        end,
+      }
+
+      yield animation_meta if block_given?
+
+      frames.each_with_index do |frame, n|
+        FileUtils.cp(frame.path, "#{tmpdir.path}/#{"%06d" % n}.#{frame.file_ext}")
+      end
+
+      File.write("#{tmpdir.path}/animation.json", animation_meta.to_json)
+
+      Danbooru::Archive.create!(tmpdir.path, file)
+      MediaFile::Ugoira.new(file)
     end
   end
 
@@ -137,7 +176,7 @@ class MediaFile::Ugoira < MediaFile
         raise NotImplementedError, "can't convert ugoira to webm: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?
         raise RuntimeError, "can't convert ugoira to webm: no ugoira frame data was provided" unless frame_delays.present?
 
-        output_file = Danbooru::Tempfile.new(["danbooru-ugoira-conversion-#{md5}-", ".webm"], binmode: true)
+        output_file = Danbooru::Tempfile.new(["danbooru-ugoira-conversion-", "-#{File.basename(file&.path.to_s)}"], binmode: true)
         tmpdir_path = tmpdir.path
 
         # Duplicate last frame to avoid it being displayed only for a very short amount of time.

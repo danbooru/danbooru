@@ -54,6 +54,8 @@ module Danbooru
 
     attr_reader :file
 
+    delegate :path, to: :file
+
     # Open an archive, or raise an error if the archive can't be opened. If given a block, pass the archive to the block
     # and close the archive after the block finishes.
     #
@@ -61,7 +63,7 @@ module Danbooru
     # @yieldparam [Danbooru::Archive] The archive.
     # @return [Danbooru::Archive] The archive.
     def self.open!(filelike, &block)
-      file = filelike.is_a?(File) ? filelike : Kernel.open(filelike, binmode: true)
+      file = filelike.respond_to?(:path) ? filelike : Kernel.open(filelike, binmode: true)
       archive = new(file)
 
       if block_given?

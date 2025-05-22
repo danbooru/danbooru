@@ -381,6 +381,19 @@ class MediaFileTest < ActiveSupport::TestCase
         assert(paths.none? { |path| File.exist?(path) })
         assert_not(File.exist?(tmpdir))
       end
+
+      should "be able to create a new ugoira with an animation.json file" do
+        new_ugoira = MediaFile::Ugoira.create(@ugoira.frames, frame_delays: @ugoira.frame_delays)
+
+        assert_equal(6, new_ugoira.files.size)
+        assert_equal(5, new_ugoira.frame_count)
+        assert_equal(60, new_ugoira.animation_json[:width])
+        assert_equal(60, new_ugoira.animation_json[:height])
+        assert_equal("image/jpeg", new_ugoira.animation_json[:mime_type])
+        assert_equal([200, 200, 200, 200, 250], new_ugoira.animation_json[:frames].pluck("delay"))
+        assert_equal(%w[000000.jpg 000001.jpg 000002.jpg 000003.jpg 000004.jpg], new_ugoira.animation_json[:frames].pluck("file"))
+        assert_equal(@ugoira.frames.map(&:md5), new_ugoira.animation_json[:frames].pluck("md5"))
+      end
     end
 
     context "A ugoira .zip file with an animation.json in gallery-dl format" do
