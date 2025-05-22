@@ -176,8 +176,9 @@ module Source
 
       # @return [Array<MediaFile>] The list of individual frames in the original ugoira.
       memoize def ugoira_frames
-        ugoira_frame_urls.map do |url|
-          _, file = http_downloader.download_media(url)
+        ugoira_frame_urls.parallel_map do |url|
+          # XXX dup the downloader to avoid sharing it across threads because the underlying HTTP.rb library isn't thread-safe.
+          _, file = http_downloader.dup.download_media(url)
           file
         end
       end

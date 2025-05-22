@@ -219,12 +219,12 @@ module Source
     end
 
     # @return [Danbooru::Http] The HTTP client to use for API or HTML requests. Extractors can override this to add custom headers or cookies.
-    def http
+    memoize def http
       Danbooru::Http.external
     end
 
     # @return [Danbooru::Http] The HTTP client to use for downloading files. Extractors can override this to add custom headers or cookies.
-    def http_downloader
+    memoize def http_downloader
       http.timeout(DOWNLOAD_TIMEOUT).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
     end
 
@@ -481,6 +481,6 @@ module Source
       "#<#{self.class.name} #{state}>"
     end
 
-    memoize :http, :http_downloader, :related_posts
+    memoize :related_posts
   end
 end

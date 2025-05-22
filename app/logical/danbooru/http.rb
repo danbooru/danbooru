@@ -97,6 +97,10 @@ module Danbooru
       @http ||= Danbooru::Http.default
     end
 
+    def initialize_dup(old)
+      @http = old.http.dup
+    end
+
     def get(url, **options)
       request(:get, url, **options)
     end
