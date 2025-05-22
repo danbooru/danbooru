@@ -353,11 +353,18 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal([60, 60], @ugoira.preview(150, 150).dimensions)
       end
 
-      should "get the duration" do
+      should "get the metadata" do
         assert_equal(1.05, @ugoira.duration)
         assert_equal(4.76, @ugoira.frame_rate.round(2))
         assert_equal(5, @ugoira.files.size)
         assert_equal(5, @ugoira.frame_count)
+
+        assert_equal([200, 200, 200, 200, 250], @ugoira.metadata["Ugoira:FrameDelays"])
+        assert_equal([1639, 1869, 1561, 760, 332], @ugoira.metadata["Ugoira:FrameSizes"])
+        assert_equal(5, @ugoira.metadata["Ugoira:FrameCount"])
+        assert_equal(4.76, @ugoira.metadata["Ugoira:FrameRate"].round(2))
+        assert_equal("none", @ugoira.metadata["Ugoira:AnimationJsonFormat"])
+
         assert_nil(@ugoira.animation_json)
       end
 
@@ -402,6 +409,7 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal(6, ugoira.files.size)
           assert_equal(5, ugoira.frame_count)
           assert_equal(5, ugoira.animation_json.size)
+          assert_equal("gallery-dl", ugoira.animation_json_format)
           assert_equal(1.05, ugoira.duration)
         end
       end
@@ -413,6 +421,7 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal(6, ugoira.files.size)
           assert_equal(5, ugoira.frame_count)
           assert_equal(5, ugoira.animation_json[:frames].size)
+          assert_equal("PixivUtil2", ugoira.animation_json_format)
           assert_equal(1.05, ugoira.duration)
         end
       end
@@ -424,6 +433,7 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal(6, ugoira.files.size)
           assert_equal(5, ugoira.frame_count)
           assert_equal(5, ugoira.animation_json.dig(:ugokuIllustData, :frames).size)
+          assert_equal("PixivToolkit", ugoira.animation_json_format)
           assert_equal(1.05, ugoira.duration)
         end
       end
@@ -439,6 +449,7 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal(5, ugoira.files.size)
           assert_equal(5, ugoira.frame_count)
           assert_equal(1.05, ugoira.duration)
+          assert_equal("none", ugoira.animation_json_format)
 
           ugoira.close
         end
@@ -454,6 +465,7 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal(6, ugoira.files.size)
           assert_equal(5, ugoira.frame_count)
           assert_equal(1.05, ugoira.duration)
+          assert_equal("gallery-dl", ugoira.animation_json_format)
 
           ugoira.close
         end

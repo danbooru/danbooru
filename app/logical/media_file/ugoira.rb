@@ -57,7 +57,13 @@ class MediaFile::Ugoira < MediaFile
 
   # @return [ExifTool::Metadata] The metadata for the file.
   memoize def metadata
-    super.merge("Ugoira:FrameDelays" => frame_delays)
+    super.merge(
+      "Ugoira:FrameDelays" => frame_delays,
+      "Ugoira:FrameSizes" => frames.map(&:size),
+      "Ugoira:FrameCount" => frame_delays.size,
+      "Ugoira:FrameRate" => frame_rate,
+      "Ugoira:AnimationJsonFormat" => animation_json_format
+    )
   end
 
   memoize def dimensions
@@ -98,6 +104,29 @@ class MediaFile::Ugoira < MediaFile
       else
         []
       end
+  end
+
+  # @return [String] The format of the animation.json file.
+  def animation_json_format
+    case animation_json
+    # [{ "file": "000001.jpg", "delay": 100 }]
+    in Array => frames if frames.map(&:symbolize_keys).all? { |frame| frame in { file: String, delay: Integer } }
+      "gallery-dl"
+    # { "frames": [{ "file": "000001.jpg", "delay": 100, size: 123456, md5: "..." }] }
+    in { frames: Array => frames } if frames.map(&:symbolize_keys).all? { |frame| frame in { file: String, delay: Integer, md5: String } }
+      "Danbooru"
+    # { "frames": [{ "file": "000001.jpg", "delay": 100 }] }
+    in { frames: Array => frames } if frames.map(&:symbolize_keys).all? { |frame| frame in { file: String, delay: Integer } }
+      "PixivUtil2"
+    # { "ugokuIllustData": { "frames": [{ "file": "000001.jpg", "delay": 100 }] } }
+    in { ugokuIllustData: { frames: Array => frames } } if frames.map(&:symbolize_keys).all? { |frame| frame in { file: String, delay: Integer } }
+      "PixivToolkit"
+    # No animation.json file
+    in nil
+      "none"
+    else
+      "unknown"
+    end
   end
 
   # @return [Hash, Array, nil] The contents of the animation.json file, if present. May be in gallery-dl, PixivUtil2, or PixivTookit format.
