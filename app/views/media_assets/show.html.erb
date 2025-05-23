@@ -129,7 +129,7 @@
               </tr>
             <% end %>
 
-            <% @media_asset.uploads.each do |upload| %>
+            <% @media_asset.uploads.sort_by(&:created_at).each do |upload| %>
               <% if policy(upload).show? %>
                 <tr>
                   <th class="text-left">Upload</th>
