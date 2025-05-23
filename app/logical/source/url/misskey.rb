@@ -75,4 +75,8 @@ class Source::URL::Misskey < Source::URL
       "https://#{host}/users/#{user_id}"
     end
   end
+
+  def secondary_url?
+    profile_url? && user_id.present?
+  end
 end
