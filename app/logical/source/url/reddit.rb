@@ -47,6 +47,12 @@ module Source
           @subreddit = subreddit
           @share_id = share_id
 
+        # https://www.reddit.com/r/BocchiTheRock/comments/1cruel0/comment/l43980q/
+        in _, "reddit.com", "r", subreddit, "comments", work_id, "comment", comment_id
+          @subreddit = subreddit
+          @work_id = work_id
+          @comment_id = comment_id
+
         # https://www.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/
         # https://old.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/
         # https://i.reddit.com/r/arknights/comments/ttyccp/maria_nearl_versus_the_leftarmed_knight_dankestsin/
@@ -60,12 +66,6 @@ module Source
           @subreddit = subreddit
           @work_id = work_id
           @title = title
-          @comment_id = comment_id
-
-        # https://www.reddit.com/r/BocchiTheRock/comments/1cruel0/comment/l43980q/
-        in _, "reddit.com", "r", subreddit, "comments", work_id, "comment", comment_id
-          @subreddit = subreddit
-          @work_id = work_id
           @comment_id = comment_id
 
         # https://www.reddit.com/r/arknights/comments/ttyccp/

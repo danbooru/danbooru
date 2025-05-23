@@ -33,7 +33,7 @@ module Source
       end
 
       def page_url
-        data["permalink"] || parsed_url.page_url || parsed_referer&.page_url
+        "https://www.reddit.com#{post_data["permalink"]}"
       end
 
       def tags
@@ -45,8 +45,12 @@ module Source
       end
 
       def username
-        username = data["author"] || parsed_url.username || parsed_referer&.username
+        username = post_data["author"] || parsed_url.username || parsed_referer&.username
         username unless username == "[deleted]"
+      end
+
+      def display_name
+        username
       end
 
       def artist_commentary_title
@@ -177,18 +181,36 @@ module Source
       end
 
       def api_url
-        "https://www.reddit.com/gallery/#{work_id}" if work_id.present?
+        "https://www.reddit.com/comments/#{work_id}.json" if work_id.present?
       end
 
-      memoize def subreddit
-        Source::URL.parse(data["permalink"]).try(:subreddit) || parsed_url.subreddit || parsed_referer&.subreddit
+      def find_comment(id, parent_comments: comments)
+        parent_comments.to_a.each do |reply|
+          return reply["data"] if reply.dig("data", "id") == id
+
+          next if reply.dig("data", "replies").is_a?(String)
+
+          candidate = find_comment(id, parent_comments: reply.dig("data", "replies", "data", "children"))
+          return candidate if candidate
+        end
+
+        nil
       end
 
-      memoize def data
-        html = http.cache(1.minute).parsed_get(api_url)
+      def subreddit
+        post_data["subreddit"]
+      end
 
-        data = html&.at("script#data").to_s[/\s({.*})/, 1]&.parse_json || {}
-        data.dig("posts", "models", "t3_#{work_id}") || {}
+      memoize def api_response
+        http.cache(1.minute).parsed_get(api_url)
+      end
+
+      memoize def post_data
+        api_response.dig(0, "data", "children", 0, "data")
+      end
+
+      memoize def comments
+        api_response.dig(1, "data", "children")
       end
     end
   end
