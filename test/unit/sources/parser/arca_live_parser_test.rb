@@ -15,9 +15,6 @@ module Source::URL::Tests
       "https://arca.live/u/@Nauju/45320365",
     )
 
-    url_parser_should_work(
-      "https://arca.live/u/@%EC%9C%BE%ED%8C%8C",
-      username: "윾파",
-    )
+    url_parser_should_work("https://arca.live/u/@%EC%9C%BE%ED%8C%8C", username: "윾파")
   end
 end

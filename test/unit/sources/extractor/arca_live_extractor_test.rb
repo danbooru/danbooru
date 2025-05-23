@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Extractor::Tests
-  class ArcaLiveTest < ActiveSupport::TestCase
+  class ArcaLiveExtractorTest < ActiveSupport::TestCase
     context "Arca.live:" do
       context "An Arca.live page URL" do
         strategy_should_work(

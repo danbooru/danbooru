@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
-module Sources
-  class ArtStationTest < ActiveSupport::TestCase
+module Source::Extractor::Tests
+  class ArtStationExtractorTest < ActiveSupport::TestCase
     context "An ArtStation /artwork/:id URL" do
       strategy_should_work(
         "https://www.artstation.com/artwork/04XA4",
@@ -12,7 +12,7 @@ module Sources
         username: "jeyrain",
         tags: [],
         artist_commentary_title: "pink",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -27,7 +27,7 @@ module Sources
         tags: %w[gantz Reika],
         artist_commentary_title: "Reika ",
         dtext_artist_commentary_desc: "From Gantz.",
-        media_files: [{ file_size: 210_899 }]
+        media_files: [{ file_size: 210_899 }],
       )
     end
 
@@ -48,7 +48,7 @@ module Sources
         "https://cdna.artstation.com/p/assets/images/images/006/029/978/large/amama-l-z.jpg",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/006/029/978/4k/amama-l-z.jpg"],
         page_url: nil,
-        profile_url: nil
+        profile_url: nil,
       )
     end
 
@@ -67,7 +67,7 @@ module Sources
     context "An ArtStation cover url" do
       strategy_should_work(
         "https://cdna.artstation.com/p/assets/covers/images/007/262/828/large/monica-kyrie-1.jpg?1504865060",
-        image_urls: ["https://cdn.artstation.com/p/assets/covers/images/007/262/828/original/monica-kyrie-1.jpg?1504865060"]
+        image_urls: ["https://cdn.artstation.com/p/assets/covers/images/007/262/828/original/monica-kyrie-1.jpg?1504865060"],
       )
     end
 
@@ -99,7 +99,7 @@ module Sources
         display_name: "ucupumar",
         username: "ucupumar",
         artist_commentary_title: "Workout",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Workout. Created using Blender 2.93 and rendered using Eevee.
           Blend file is available on:
           <https://www.artstation.com/marketplace/p/v9YrA>
@@ -124,7 +124,7 @@ module Sources
         display_name: nil,
         username: "fiship",
         profile_url: "https://www.artstation.com/fiship",
-        page_url: "https://fiship.artstation.com/projects/x8n8XT"
+        page_url: "https://fiship.artstation.com/projects/x8n8XT",
       )
     end
 
@@ -132,7 +132,7 @@ module Sources
       strategy_should_work(
         "https://cdnb3.artstation.com/p/assets/images/images/003/716/071/small/aoi-ogata-hate-city.jpg?1476754974",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/003/716/071/4k/aoi-ogata-hate-city.jpg?1476754974"],
-        media_files: [{ file_size: 1_816_628 }]
+        media_files: [{ file_size: 1_816_628 }],
       )
     end
 
@@ -140,7 +140,7 @@ module Sources
       strategy_should_work(
         "https://cdnb.artstation.com/p/assets/images/images/003/716/071/large/aoi-ogata-hate-city.jpg?1476754974",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/003/716/071/4k/aoi-ogata-hate-city.jpg?1476754974"],
-        media_files: [{ file_size: 1_816_628 }]
+        media_files: [{ file_size: 1_816_628 }],
       )
     end
 
@@ -148,7 +148,7 @@ module Sources
       strategy_should_work(
         "https://cdna.artstation.com/p/assets/images/images/004/730/278/large/mendel-oh-dragonll.jpg",
         image_urls: ["https://cdn.artstation.com/p/assets/images/images/004/730/278/4k/mendel-oh-dragonll.jpg"],
-        media_files: [{ file_size: 452_985 }]
+        media_files: [{ file_size: 452_985 }],
       )
     end
 
@@ -158,7 +158,7 @@ module Sources
         display_name: "somi kim",
         username: "hosi_na",
         artist_commentary_title: "The Queen 여왕",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           The keywords of this concept are absolute Power, The Queen, and a cool-headed person.
           컨셉 키워드는 '힘,여왕,냉정함'
         EOS
@@ -171,7 +171,7 @@ module Sources
         display_name: "Titapa Khemakavat (Sa-Dui)",
         username: "sa-dui",
         artist_commentary_title: "Commission : Srevere",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Commission for Srevere.
           Cover image for her Pokemon-based fandom series.
         EOS
@@ -194,7 +194,7 @@ module Sources
         profile_url: "https://www.artstation.com/idrawbagman",
         tags: [],
         artist_commentary_title: "Landscapes of Tal'dorei Part 1",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "Wildemount Castle"
           "The Insatiable Sanctuary"
           "Stilben"
@@ -206,26 +206,6 @@ module Sources
           Green Ronin Publishing, LLC
         EOS
       )
-    end
-
-    should "Parse ArtStation URLs correctly" do
-      assert_equal("https://www.artstation.com/artwork/ghost-in-the-shell-fandom", Source::URL.page_url("https://www.artstation.com/artwork/ghost-in-the-shell-fandom"))
-      assert_equal("https://www.artstation.com/artwork/qPVGP", Source::URL.page_url("https://anubis1982918.artstation.com/projects/qPVGP/"))
-      assert_equal("https://www.artstation.com/artwork/NoNmD", Source::URL.page_url("https://dudeunderscore.artstation.com/projects/NoNmD?album_id=23041"))
-
-      assert(Source::URL.page_url?("https://www.artstation.com/artwork/ghost-in-the-shell-fandom"))
-      assert(Source::URL.page_url?("https://artstation.com/artwork/04XA4"))
-
-      assert(Source::URL.image_url?("http://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236"))
-      assert(Source::URL.image_url?("https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4"))
-
-      assert(Source::URL.profile_url?("https://www.artstation.com/sa-dui"))
-      assert(Source::URL.profile_url?("https://artstation.com/artist/sa-dui"))
-      assert(Source::URL.profile_url?("https://anubis1982918.artstation.com"))
-
-      assert_not(Source::URL.profile_url?("https://anubis1982918.artstation.com/projects/qPVGP"))
-      assert_not(Source::URL.profile_url?("https://www.artstation.com"))
-      assert_not(Source::URL.profile_url?("https://artstation.com"))
     end
   end
 end

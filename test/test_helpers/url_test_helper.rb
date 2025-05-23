@@ -41,7 +41,11 @@ module UrlTestHelper
       context url do
         attributes.each do |attribute, expected_value|
           should "find the correct value for '#{attribute}'" do
-            assert_equal url.public_send(attribute), expected_value
+            if expected_value.nil?
+              assert_nil url.public_send(attribute)
+            else
+              assert_equal url.public_send(attribute), expected_value
+            end
           end
         end
       end
