@@ -300,21 +300,29 @@ module ApplicationHelper
     end
   end
 
-  def edit_form_for(model, validate: false, error_notice: true, warning_notice: true, error_separator: "; ", **options, &block)
+  def edit_form_for(model, validate: false, error_notice: true, warning_notice: true, formatted_errors: false, **options, &block)
     options[:html] = { autocomplete: "off", novalidate: !validate, **options[:html].to_h }
     options[:authenticity_token] = true if options[:remote] == true
 
     simple_form_for(model, **options) do |form|
       if error_notice && model.try(:errors).try(:any?)
-        concat tag.div(format_text(model.errors.full_messages.join(error_separator)), class: "notice notice-error notice-small prose")
+        error_msg = formatted_errors ? format_errors(model.errors) : model.errors.full_messages.join("; ")
+        concat tag.div(format_text(error_msg), class: "notice notice-error notice-small prose")
       end
 
       if warning_notice && model.try(:warnings).try(:any?)
-        concat tag.div(format_text(model.warnings.full_messages.join(error_separator)), class: "notice notice-info notice-small prose")
+        warning_msg = formatted_errors ? format_errors(model.warnings) : model.warnings.full_messages.join("; ")
+        concat tag.div(format_text(warning_msg), class: "notice notice-info notice-small prose")
       end
 
       block.call(form)
     end
+  end
+
+  def format_errors(errors)
+    messages = errors.full_messages
+    messages = messages.map {|e| "* #{e}"} if messages.count > 1
+    messages.join("\n")
   end
 
   def table_for(...)
