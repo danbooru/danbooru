@@ -1,6 +1,6 @@
 require "test_helper"
 
-module Sources
+module Source::Extractor::Tests
   class ArcaLiveTest < ActiveSupport::TestCase
     context "Arca.live:" do
       context "An Arca.live page URL" do
@@ -83,7 +83,7 @@ module Sources
           media_files: [
             { file_size: 28_519 },
             { file_size: 2_016_818 },
-            { file_size: 887_464 }
+            { file_size: 887_464 },
           ],
           profile_urls: %w[https://arca.live/u/@맛있는팥양갱],
           page_url: "https://arca.live/b/bluearchive/65031202",
@@ -104,7 +104,7 @@ module Sources
           ],
           media_files: [
             { file_size: 749_653 },
-            { file_size: 3_918_854 }
+            { file_size: 3_918_854 },
           ],
           page_url: "https://arca.live/b/arknights/122263340",
           profile_urls: %w[https://arca.live/u/@음악한모금],
@@ -112,7 +112,7 @@ module Sources
           username: "음악한모금",
           tags: [],
           dtext_artist_commentary_title: "스즈맘 모금콘 마따끄, 코로스 콘 추가했습니다",
-          dtext_artist_commentary_desc: <<~EOS.chomp
+          dtext_artist_commentary_desc: <<~EOS.chomp,
             많이 써주세요
             감사합니다
           EOS
@@ -130,7 +130,7 @@ module Sources
           username: "horuhara",
           tags: [],
           dtext_artist_commentary_title: "말랑고양이 마구 흔들기.mp4",
-          dtext_artist_commentary_desc: <<~EOS.chomp
+          dtext_artist_commentary_desc: <<~EOS.chomp,
             말랑하네요
             "더 말랑하고 귀여운 그림 보러가기":[https://x.com/horuhara/status/1839132898785636671?t=RtemijMNpG1bdpziXac6-Q&s=19]
           EOS
@@ -148,7 +148,7 @@ module Sources
           username: "horuhara",
           tags: [],
           dtext_artist_commentary_title: "바로 들기 마려운 말랑말랑 마리.gif",
-          dtext_artist_commentary_desc: <<~EOS.chomp
+          dtext_artist_commentary_desc: <<~EOS.chomp,
             바로 들어서 높이높이 할거임
             <https://x.com/horuhara/status/1812316701817811068?t=8SumD241f8myyzgB8bobSA&s=19>
           EOS
@@ -186,15 +186,6 @@ module Sources
           dtext_artist_commentary_desc: "울이쁜이들과함께 같이 다과회를 즐겨요",
           tags: [],
         )
-      end
-
-      should "Parse Arca.live URLs correctly" do
-        assert(Source::URL.image_url?("https://ac2.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg?type=orig"))
-        assert(Source::URL.page_url?("https://arca.live/b/arknights/66031722?p=1"))
-        assert(Source::URL.profile_url?("https://arca.live/u/@Si리링"))
-        assert(Source::URL.profile_url?("https://arca.live/u/@Nauju/45320365"))
-
-        assert_equal("윾파", Source::URL.parse("https://arca.live/u/@%EC%9C%BE%ED%8C%8C").username)
       end
     end
   end
