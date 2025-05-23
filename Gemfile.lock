@@ -606,6 +606,7 @@ DEPENDENCIES
   rubocop
   rubocop-rails
   ruby-vips
+  rubyzip
   sanitize
   scenic
   selenium-webdriver

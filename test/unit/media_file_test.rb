@@ -366,6 +366,7 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal("none", @ugoira.metadata["Ugoira:AnimationJsonFormat"])
 
         assert_nil(@ugoira.animation_json)
+        assert_nil(@ugoira.error)
       end
 
       should "convert to a webm" do
@@ -400,41 +401,51 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal([200, 200, 200, 200, 250], new_ugoira.animation_json[:frames].pluck("delay"))
         assert_equal(%w[000000.jpg 000001.jpg 000002.jpg 000003.jpg 000004.jpg], new_ugoira.animation_json[:frames].pluck("file"))
         assert_equal(@ugoira.frames.map(&:md5), new_ugoira.animation_json[:frames].pluck("md5"))
+        assert_nil(new_ugoira.error)
       end
     end
 
     context "A ugoira .zip file with an animation.json in gallery-dl format" do
       should "find the files and frame delays" do
-        MediaFile.open("test/files/ugoira/ugoira-gallery-dl.zip") do |ugoira|
-          assert_equal(6, ugoira.files.size)
-          assert_equal(5, ugoira.frame_count)
-          assert_equal(5, ugoira.animation_json.size)
+        MediaFile.open("test/files/ugoira/ugoira-95239241-gallery-dl.zip") do |ugoira|
+          assert_equal(79_276, ugoira.size)
+          assert_equal("7fe767b4e202415a2b2dec2a82be3b69", ugoira.md5)
+          assert_equal(11, ugoira.files.size)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(10, ugoira.animation_json.size)
           assert_equal("gallery-dl", ugoira.animation_json_format)
-          assert_equal(1.05, ugoira.duration)
+          assert_equal(1.7, ugoira.duration)
+          assert_nil(ugoira.error)
         end
       end
     end
 
     context "A ugoira .zip file with an animation.json in PixivUtil2 format" do
       should "find the files and frame delays" do
-        MediaFile.open("test/files/ugoira/ugoira-pixivutil2.zip") do |ugoira|
-          assert_equal(6, ugoira.files.size)
-          assert_equal(5, ugoira.frame_count)
-          assert_equal(5, ugoira.animation_json[:frames].size)
+        MediaFile.open("test/files/ugoira/ugoira-95239241-pixivutil2.zip") do |ugoira|
+          assert_equal(41_745, ugoira.size)
+          assert_equal("dbfe1d5764eb24f3d55224f85ef3383c", ugoira.md5)
+          assert_equal(11, ugoira.files.size)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(10, ugoira.animation_json[:frames].size)
           assert_equal("PixivUtil2", ugoira.animation_json_format)
-          assert_equal(1.05, ugoira.duration)
+          assert_equal(1.7, ugoira.duration)
+          assert_nil(ugoira.error)
         end
       end
     end
 
     context "A ugoira .zip file with an animation.json in PixivToolkit format" do
       should "find the files and frame delays" do
-        MediaFile.open("test/files/ugoira/ugoira-pixivtoolkit.zip") do |ugoira|
-          assert_equal(6, ugoira.files.size)
-          assert_equal(5, ugoira.frame_count)
-          assert_equal(5, ugoira.animation_json.dig(:ugokuIllustData, :frames).size)
+        MediaFile.open("test/files/ugoira/ugoira-95239241-pixivtoolkit.zip") do |ugoira|
+          assert_equal(41_747, ugoira.size)
+          assert_equal("8d03702cc61e625b03cca3d556a163a1", ugoira.md5)
+          assert_equal(11, ugoira.files.size)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(10, ugoira.animation_json.dig(:ugokuIllustData, :frames).size)
           assert_equal("PixivToolkit", ugoira.animation_json_format)
-          assert_equal(1.05, ugoira.duration)
+          assert_equal(1.7, ugoira.duration)
+          assert_nil(ugoira.error)
         end
       end
     end
@@ -458,13 +469,13 @@ class MediaFileTest < ActiveSupport::TestCase
 
     context "An unpacked ugoira with an animation.json file in gallery-dl format" do
       should "find the files and frame delays" do
-        Danbooru::Archive.extract!("test/files/ugoira/ugoira-gallery-dl.zip") do |tmpdir|
+        Danbooru::Archive.extract!("test/files/ugoira/ugoira-95239241-gallery-dl.zip") do |tmpdir|
           files = Pathname.new(tmpdir).glob("*")
           ugoira = MediaFile::Ugoira.new(files)
 
-          assert_equal(6, ugoira.files.size)
-          assert_equal(5, ugoira.frame_count)
-          assert_equal(1.05, ugoira.duration)
+          assert_equal(11, ugoira.files.size)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(1.7, ugoira.duration)
           assert_equal("gallery-dl", ugoira.animation_json_format)
 
           ugoira.close

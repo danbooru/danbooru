@@ -16,6 +16,11 @@
 class MediaFile::Ugoira < MediaFile
   class Error < StandardError; end
 
+  MIN_DELAY = 10 # The mininum delay allowed for a single frame in a ugoira. 10ms is the minimum on Pixiv.
+  MAX_DELAY = 30_000 # The maximum delay allowed for a single frame in a ugoira. 30s is the max on Pixiv.
+  MAX_FRAME_COUNT = 500 # The maximum number of frames allowed in a ugoira. 500 is the max on Pixiv.
+  MAX_ANIMATION_JSON_SIZE = 50.kilobytes # The maximum size of the animation.json file. This is enough for 500 frames + extra.
+
   # @return [Concurrent::ReentrantReadWriteLock] A lock to make sure we don't extract the .zip file more than once when
   #   called from multiple threads (such as during upload when generating samples in parallel).
   attr_reader :lock
@@ -55,6 +60,71 @@ class MediaFile::Ugoira < MediaFile
     end
   end
 
+  # @return [String, nil] Return the error message if the ugoira is invalid, or nil if it is valid.
+  memoize def error
+    zip = Zip::File.open(file.path)
+    stream = Zip::InputStream.open(file.path)
+    file_n = 0
+    frame_n = 0
+
+    while (entry = stream.get_next_entry)
+      if entry.name == "animation.json"
+        return "animation.json file must come first or last" if file_n != 0 && file_n + 1 != zip.size
+        return "animation.json file is too large" if entry.size > MAX_ANIMATION_JSON_SIZE
+      else
+        return "cannot have more than #{MAX_FRAME_COUNT} frames" if frame_n + 1 > MAX_FRAME_COUNT
+
+        if !entry.name.match?(/\A#{"%06d" % frame_n}\.(jpg|png|gif)\z/)
+          return "file '#{entry.name}' has invalid name (expected '#{"%06d" % frame_n}#{File.extname(entry.name)}')"
+        end
+      end
+
+      return "file '#{entry.name}' cannot have comments" if entry.comment_size > 0
+      return "file '#{entry.name}' cannot have extra fields (fields: #{entry.extra.keys.join(", ")})" if entry.extra_size > 0
+      return "file '#{entry.name}' cannot be compressed" if entry.compression_method != Zip::Entry::STORED
+      return "file '#{entry.name}' cannot be compressed" if entry.compressed_size != entry.size
+      return "file '#{entry.name}' cannot be a #{entry.ftype}" if entry.ftype != :file
+      # return "file '#{entry.name}' has invalid CRC" if entry.crc != Zlib.crc32(entry.get_input_stream.read) # XXX this reads the entire file into memory
+
+      %i[crc name extra_size comment_size ftype compression_method compressed_size size].each do |field|
+        if entry.send(field) != zip.entries[file_n].send(field)
+          return "field '#{field}' in file '#{entry.name}' is inconsistent with central directory"
+        end
+      end
+
+      file_n += 1
+      frame_n += 1 unless entry.name == "animation.json"
+    end
+
+    return "number of files is inconsistent with end-of-central-directory count" if file_n != zip.size
+    return "number of files is inconsistent with central directory count" if file_n != zip.entries.size
+    return "number of files is inconsistent with animation.json" if animation_json.present? && file_n != animation_json_frames.size + 1
+    return "unrecognized animation.json format" if animation_json_format == "unknown"
+
+    animation_json_frames.each_with_index do |json, i|
+      # skip animation.json if it's the first entry in the zip file
+      entry = (zip.entries.first.name == "animation.json") ? zip.entries[i + 1] : zip.entries[i]
+
+      return "'#{json["file"]}' in animation.json doesn't match '#{entry.name}' in zip file" if json["file"] != entry.name
+      return "'#{json["file"]}' in animation.json has invalid delay" if !json["delay"].in?(MIN_DELAY..MAX_DELAY)
+    end
+
+    frames.each do |frame|
+      return "file '#{File.basename(frame.path)}' is not an image file" if !frame.file_ext.in?(%i[jpg gif png])
+      return "file '#{File.basename(frame.path)}' is animated" if frame.is_animated?
+      return "file '#{File.basename(frame.path)}' is corrupt" if frame.is_corrupt?
+    end
+
+    return "must have at least two frames" if frames.size < 2
+    return "frames must have the same dimensions" if frames.map(&:dimensions).uniq.size > 1
+    return "frames must have the same file type" if frames.map(&:file_ext).uniq.size > 1
+
+    nil
+  ensure
+    zip&.close rescue nil # work around for https://github.com/rubyzip/rubyzip/issues/216; triggered by files with UniversalTime extra field
+    stream&.close
+  end
+
   # @return [ExifTool::Metadata] The metadata for the file.
   memoize def metadata
     super.merge(
@@ -87,39 +157,39 @@ class MediaFile::Ugoira < MediaFile
     frame_count / duration
   end
 
-  # @return [Array<Integer>] The list of frame delays in milliseconds. Frame delays are taken from either the delays
-  #   passed in to the constructor, or from the animation.json file.
+  # @return [Array<Integer>] The list of frame delays in milliseconds.
   def frame_delays
-    @frame_delays ||=
-      case animation_json
-      # gallery-dl format: [{ "file": "000001.jpg", "delay": 100 }]
-      in Array => frames
-        frames.pluck("delay").compact_blank
-      # PixivUtil2 format: { "frames": [{ "file": "000001.jpg", "delay": 100 }] }
-      in { frames: frames }
-        frames.pluck("delay").compact_blank
-      # PixivTookit format: { "ugokuIllustData": { "frames": [{ "file": "000001.jpg", "delay": 100 }] } }
-      in { ugokuIllustData: { frames: frames } }
-        frames.pluck("delay").compact_blank
-      else
-        []
-      end
+    @frame_delays ||= animation_json_frames.pluck("delay")
+  end
+
+  # @return [Array<Hash>, nil] The 'frames' array from the animation.json file, if present.
+  memoize def animation_json_frames
+    case animation_json
+    in Array => frames
+      frames.map(&:with_indifferent_access)
+    in { frames: Array => frames }
+      frames.map(&:with_indifferent_access)
+    in { ugokuIllustData: { frames: Array => frames } }
+      frames.map(&:with_indifferent_access)
+    else
+      []
+    end
   end
 
   # @return [String] The format of the animation.json file.
   def animation_json_format
     case animation_json
     # [{ "file": "000001.jpg", "delay": 100 }]
-    in Array => frames if frames.map(&:symbolize_keys).all? { |frame| frame in { file: String, delay: Integer } }
+    in Array if animation_json_frames.all? { |frame| frame in { file: String, delay: Integer, **nil } }
       "gallery-dl"
-    # { "frames": [{ "file": "000001.jpg", "delay": 100, size: 123456, md5: "..." }] }
-    in { frames: Array => frames } if frames.map(&:symbolize_keys).all? { |frame| frame in { file: String, delay: Integer, md5: String } }
+    # { "frames": [{ "file": "000001.jpg", "delay": 100, md5: "..." }] }
+    in { frames: Array } if animation_json_frames.all? { |frame| frame in { file: String, delay: Integer, md5: String, **nil } }
       "Danbooru"
     # { "frames": [{ "file": "000001.jpg", "delay": 100 }] }
-    in { frames: Array => frames } if frames.map(&:symbolize_keys).all? { |frame| frame in { file: String, delay: Integer } }
+    in { frames: Array } if animation_json_frames.all? { |frame| frame in { file: String, delay: Integer, **nil } }
       "PixivUtil2"
     # { "ugokuIllustData": { "frames": [{ "file": "000001.jpg", "delay": 100 }] } }
-    in { ugokuIllustData: { frames: Array => frames } } if frames.map(&:symbolize_keys).all? { |frame| frame in { file: String, delay: Integer } }
+    in { ugokuIllustData: { frames: Array } } if animation_json_frames.all? { |frame| frame in { file: String, delay: Integer, **nil } }
       "PixivToolkit"
     # No animation.json file
     in nil
