@@ -73,14 +73,14 @@ class BulkUpdateRequestProcessor
           tag_alias = TagAlias.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1])
           tag_alias.save(context: validation_context)
           if tag_alias.errors.present?
-            errors.add(:base, "Can't create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name} (#{tag_alias.errors.full_messages.join("; ")})")
+            errors.add(:base, "Can't create alias [[#{tag_alias.antecedent_name}]] -> [[#{tag_alias.consequent_name}]] (#{tag_alias.errors.full_messages.join("; ")})")
           end
 
         when :create_implication
           tag_implication = TagImplication.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], status: "active")
           tag_implication.save(context: validation_context)
           if tag_implication.errors.present?
-            errors.add(:base, "Can't create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name} (#{tag_implication.errors.full_messages.join("; ")})")
+            errors.add(:base, "Can't create implication [[#{tag_implication.antecedent_name}]] -> [[#{tag_implication.consequent_name}]] (#{tag_implication.errors.full_messages.join("; ")})")
           end
 
         when :remove_alias
@@ -89,7 +89,7 @@ class BulkUpdateRequestProcessor
           if validation_context == :approval
             # ignore non-existing aliases when approving a BUR
           elsif tag_alias.nil?
-            errors.add(:base, "Can't remove alias #{args[0]} -> #{args[1]} (alias doesn't exist)")
+            errors.add(:base, "Can't remove alias [[#{args[0]}]] -> [[#{args[1]}]] (alias doesn't exist)")
           else
             tag_alias.update(status: "deleted")
           end
@@ -99,7 +99,7 @@ class BulkUpdateRequestProcessor
 
           if tag_implication.nil?
             # ignore non-existing implication when approving a BUR
-            errors.add(:base, "Can't remove implication #{args[0]} -> #{args[1]} (implication doesn't exist)") unless validation_context == :approval
+            errors.add(:base, "Can't remove implication [[#{args[0]}]] -> [[#{args[1]}]] (implication doesn't exist)") unless validation_context == :approval
           else
             tag_implication.update(status: "deleted")
           end
@@ -107,7 +107,7 @@ class BulkUpdateRequestProcessor
         when :change_category
           tag = Tag.find_by_name(args[0])
           if tag.nil?
-            errors.add(:base, "Can't change category #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)")
+            errors.add(:base, "Can't change category [[#{args[0]}]] -> [[#{args[1]}]] ([[#{args[0]}]] doesn't exist)")
           end
 
         when :rename
@@ -115,18 +115,18 @@ class BulkUpdateRequestProcessor
           new_tag = Tag.find_by_name(args[1]) || Tag.new(name: args[1])
 
           if old_tag.nil?
-            errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)")
+            errors.add(:base, "Can't rename [[#{args[0]}]] -> [[#{args[1]}]] ([[#{args[0]}]] doesn't exist)")
           elsif old_tag.post_count > MAXIMUM_RENAME_COUNT
-            errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} ('#{args[0]}' has more than #{MAXIMUM_RENAME_COUNT} posts, use an alias instead)")
+            errors.add(:base, "Can't rename [[#{args[0]}]] -> [[#{args[1]}]] ([[#{args[0]}]] has more than #{MAXIMUM_RENAME_COUNT} posts, use an alias instead)")
           elsif new_tag.invalid?(:name)
-            errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} (#{new_tag.errors.full_messages.join("; ")})")
+            errors.add(:base, "Can't rename [[#{args[0]}]] -> [[#{args[1]}]] (#{new_tag.errors.full_messages.join("; ")})")
           end
 
         when :mass_update
           query = PostQuery.new(args[0])
 
           if query.is_null_search?
-            errors.add(:base, "Can't mass update #{args[0]} -> #{args[1]} (the search `#{args[0]}` has a syntax error)")
+            errors.add(:base, "Can't mass update {{#{args[0]}}} -> {{#{args[1]}}} (the search {{#{args[0]}}} has a syntax error)")
           end
 
         when :nuke
@@ -138,11 +138,11 @@ class BulkUpdateRequestProcessor
           if validation_context == :approval
             # ignore already deprecated tags and missing wikis when approving a tag deprecation.
           elsif tag.nil?
-            errors.add(:base, "Can't deprecate #{args[0]} (tag doesn't exist)")
+            errors.add(:base, "Can't deprecate [[#{args[0]}]] (tag doesn't exist)")
           elsif tag.is_deprecated?
-            errors.add(:base, "Can't deprecate #{args[0]} (tag is already deprecated)")
+            errors.add(:base, "Can't deprecate [[#{args[0]}]] (tag is already deprecated)")
           elsif tag.wiki_page.blank?
-            errors.add(:base, "Can't deprecate #{args[0]} (tag must have a wiki page)")
+            errors.add(:base, "Can't deprecate [[#{args[0]}]] (tag must have a wiki page)")
           end
 
         when :undeprecate
@@ -151,9 +151,9 @@ class BulkUpdateRequestProcessor
           if validation_context == :approval
             # ignore already deprecated tags and missing wikis when removing a tag deprecation.
           elsif tag.nil?
-            errors.add(:base, "Can't undeprecate #{args[0]} (tag doesn't exist)")
+            errors.add(:base, "Can't undeprecate [[#{args[0]}]] (tag doesn't exist)")
           elsif !tag.is_deprecated?
-            errors.add(:base, "Can't undeprecate #{args[0]} (tag is not deprecated)")
+            errors.add(:base, "Can't undeprecate [[#{args[0]}]] (tag is not deprecated)")
           end
 
         when :invalid_line
