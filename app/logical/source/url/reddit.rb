@@ -31,6 +31,11 @@ module Source
         in *rest if image_url?
         # pass
 
+        # https://www.reddit.com/user/blank_page_drawings/comments/nfjz0d/
+        in _, "reddit.com", ("user" | "u"), username, "comments", work_id
+          @username = username
+          @work_id = work_id
+
         # https://www.reddit.com/user/blank_page_drawings/comments/nfjz0d/a_sleepy_orc/
         in _, "reddit.com", ("user" | "u"), username, "comments", work_id, title
           @username = username

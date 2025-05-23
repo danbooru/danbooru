@@ -81,22 +81,36 @@ module Sources
       )
     end
 
-    context "A reddit post with an external image" do
+    context "A reddit post with username but no title" do
       strategy_should_work(
-        "https://www.reddit.com/r/baramanga/comments/n9cgs3/you_can_now_find_me_on_twitter_too_blankpage/",
-        image_urls: %w[https://external-preview.redd.it/VlT1G4JoqAmP_7DG5UKRCJP8eTRef7dCrRvu2ABm_Xg.png?auto=webp&s=6510f9f0a69563988aed7af04f750f92fc35f629],
-        media_files: [{ file_size: 1_008_084 }],
-        page_url: "https://www.reddit.com/r/baramanga/comments/n9cgs3/you_can_now_find_me_on_twitter_too_blankpage/",
+        "https://www.reddit.com/user/blank_page_drawings/comments/nfjz0d/a_sleepy_orc/",
+        image_urls: %w[https://i.redd.it/ruh00hxilxz61.png],
+        media_files: [{ file_size: 1_837_090 }],
+        page_url: "https://www.reddit.com/user/blank_page_drawings/comments/nfjz0d/a_sleepy_orc/",
         profile_url: "https://www.reddit.com/user/blank_page_drawings",
         profile_urls: %w[https://www.reddit.com/user/blank_page_drawings],
         artist_name: "blank_page_drawings",
         tag_name: "blank_page_drawings",
         other_names: ["blank_page_drawings"],
-        tags: [
-          ["Non-Explicit", "https://www.reddit.com/r/baramanga/?f=flair_name:\"Non-Explicit\""],
-          ["nsfw", "https://www.reddit.com/r/baramanga/?f=flair_name:\"nsfw\""],
-        ],
-        dtext_artist_commentary_title: "You can now find me on Twitter too ! (@blankpage_)",
+        tags: [],
+        dtext_artist_commentary_title: "A sleepy orc",
+        dtext_artist_commentary_desc: ""
+      )
+    end
+
+    context "A reddit post with an external image" do
+      strategy_should_work(
+        "https://www.reddit.com/r/yuri_jp/comments/1kis50l/七海_x_たきうみ/",
+        image_urls: %w[https://pbs.twimg.com/media/Gjkgt0IbIAA7322.jpg:orig],
+        media_files: [{ file_size: 1_920_013 }],
+        page_url: "https://www.reddit.com/r/yuri_jp/comments/1kis50l/七海_x_たきうみ/",
+        profile_url: "https://www.reddit.com/user/praha_the_botv",
+        profile_urls: %w[https://www.reddit.com/user/praha_the_botv],
+        artist_name: "praha_the_botv",
+        tag_name: "praha_the_botv",
+        other_names: ["praha_the_botv"],
+        tags: [],
+        dtext_artist_commentary_title: "七海 @x たきうみ",
         dtext_artist_commentary_desc: ""
       )
     end
@@ -132,7 +146,6 @@ module Sources
         other_names: ["onethingidkwhy"],
         tags: [
           ["OC", "https://www.reddit.com/r/Genshin_Impact/?f=flair_name:\"OC\""],
-          ["nsfw", "https://www.reddit.com/r/Genshin_Impact/?f=flair_name:\"nsfw\""],
         ],
         dtext_artist_commentary_title: "cookie shinobu",
         dtext_artist_commentary_desc: ""
@@ -300,15 +313,11 @@ module Sources
       strategy_should_work(
         "https://www.reddit.com/r/LearnToReddit/comments/qgk0nt/how_to_format_posts_and_comments/",
         image_urls: %w[
-          https://i.redd.it/6elegzumuvv71.png
-          https://i.redd.it/ijov1js0vvv71.png
-          https://i.redd.it/5jhkl2o4vvv71.png
+          https://i.redd.it/vcpxapxpcxoe1.png
           https://i.redd.it/q9m395duxvv71.png
         ],
         media_files: [
-          { file_size: 44_817 },
-          { file_size: 5_319 },
-          { file_size: 14_496 },
+          { file_size: 17_206 },
           { file_size: 3_996 },
         ],
         page_url: "https://www.reddit.com/r/LearnToReddit/comments/qgk0nt/how_to_format_posts_and_comments/",
@@ -322,25 +331,25 @@ module Sources
         ],
         dtext_artist_commentary_title: "How to format posts and comments",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          h1. Formatting in new Reddit
+          h1. Formatting on desktop
 
-          [b]In new Reddit[/b] the 'Fancy pants editor' is the default mode for post and comment creation and means you can use the formatting buttons, though you can switch to markdown mode if you wish (more on that below).
+          [b]On desktop[/b] the rich text editor is the default mode for post and comment creation and means you can use the formatting buttons, though you can switch to markdown mode if you wish.
 
-          This image shows the formatting bar and the button to switch to markdown mode.
+          In this image (below), the blue circle shows the button (Aa) to reveal the formatting bar (across the top) if it is not visible.
 
-          "[image]":[https://i.redd.it/6elegzumuvv71.png]
+          And the option, in the red rectangle, to switch to markdown if you prefer.
 
-          And you can switch back to Fancy pants too.
+          "[image]":[https://i.redd.it/vcpxapxpcxoe1.png]
 
-          "[image]":[https://i.redd.it/ijov1js0vvv71.png]
+          When in markdown mode, a button will appear to move back to the rich text editor.
 
-          Each button does something different. Hover your pointer over them to see what they do.
+          Each formatting button does something different. Hover your pointer over them to see what they do.
 
-          "[image]":[https://i.redd.it/5jhkl2o4vvv71.png]
+          In order, the formatting buttons are:
 
-          In order the formatting buttons are:
+          Bold, Italics, Strikethrough, Superscript, Heading, Link, Bullets, Numbered bullets, quote, Inline code, code block, Table, Spoiler, and for posts only, also; Image, Video, and/or the overflow menu. On comments, options for images, gifs, and emojis are at the bottom.
 
-          Bold, Italics, Link, Strikethrough, Inline code, Superscript, Spoiler, Heading, Bullets, Numbered bullets, quote, Code block, Table, Image, Video.
+          [i]Which buttons are available can depend on the types of content a community allows when it comes to media.[/i]
 
           They work much like the formatting buttons in a Word document editor.
 
@@ -367,7 +376,7 @@ module Sources
 
           (make sure not to leave a space between [code]>![/code] and your text or the formatting won't work correctly for those viewing old.reddit)
 
-          To insert a link use [code][link]([/code]<https://www.reddit.com/wiki/markdown>[code])[/code] , which becomes: "link":[https://www.reddit.com/wiki/markdown]
+          To insert a link use [code][link](https://www.reddit.com/wiki/markdown)[/code] , which becomes: "link":[https://www.reddit.com/wiki/markdown]
 
           For quotes start the paragraph you're quoting with `>`
 
@@ -377,7 +386,7 @@ module Sources
           this is the start of a paragraph
           [/quote]
 
-          h2. More markdown
+          h1. More markdown
 
           For further formatting help see: "Reddit's guide":[https://www.reddit.com/wiki/markdown] | "Reddit's commenting guide":[https://www.reddit.com/wiki/commenting] | "Raerth's guide":[https://www.reddit.com/r/raerth/comments/cw70q/reddit_comment_formatting/] | "Markdown primer":[https://www.reddit.com/r/reddit.com/comments/6ewgt/reddit_markdown_primer_or_how_do_you_do_all_that/c03nik6/] | "Preview your post":[https://redditpreview.com/]
 
@@ -387,7 +396,7 @@ module Sources
 
           For usernames, you use u/ in the same way, similar to using @ on Twitter.
 
-          For example <https://www.reddit.com/r/NewToReddit/> or <https://www.reddit.com/user/llamageddon01/>
+          For example "r/NewToReddit":[https://www.reddit.com/r/NewToReddit] or "u/llamageddon01":[https://www.reddit.com/u/llamageddon01]
 
           ---
 

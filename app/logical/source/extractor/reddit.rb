@@ -9,10 +9,19 @@ module Source
           [parsed_url.full_image_url]
         elsif parsed_url.image_url?
           [parsed_url.to_s]
-        elsif data.present?
+        elsif post_data.present?
+          # images += [data.dig("media", "content")].compact unless crosspost? || data.dig("media", "type") == "embed"
+          return [external_image] if external_image.present?
+          return [] if crosspost?
+
           images = []
-          images += [data.dig("media", "content")].compact unless crosspost? || data.dig("media", "type") == "embed"
-          images += ordered_gallery_images
+
+          if post_data.include?("preview") && post_data["is_reddit_media_domain"]
+            images += post_data.dig("preview", "images")&.pluck("source")&.pluck("url").to_a
+          elsif post_data.include?("media_metadata")
+            images += ordered_gallery_images
+          end
+
           images.compact.uniq.map { |url| Source::URL.parse(url)&.full_image_url || url }.compact
         else
           []
@@ -20,12 +29,18 @@ module Source
       end
 
       def ordered_gallery_images
-        gallery_images = data.dig("media", "mediaMetadata")
+        gallery_images = post_data["media_metadata"]
+        gallery_order = post_data.dig("gallery_data", "items").to_a.pluck("media_id")
 
-        gallery_order = data.dig("media", "gallery", "items").to_a.pluck("mediaId")
-        gallery_order = data.dig("media", "richtextContent", "document").to_a.pluck("id").compact if gallery_order.blank?
+        return gallery_images.to_h.values.pluck("s").pluck("u") unless gallery_order.present?
 
         gallery_images.to_h.values_at(*gallery_order).compact.pluck("s").pluck("u")
+      end
+
+      def external_image
+        if post_data["post_hint"] == "image" && !post_data["is_reddit_media_domain"]
+          Source::URL.parse(post_data["url"])&.full_image_url
+        end
       end
 
       def profile_url
@@ -33,15 +48,27 @@ module Source
       end
 
       def page_url
-        "https://www.reddit.com#{post_data["permalink"]}"
+        return parsed_url.page_url unless post_data.present?
+
+        if user_post?
+          "https://www.reddit.com#{post_data["permalink"].sub(%r{^/r/u_}, "/user/")}"
+        else
+          "https://www.reddit.com#{post_data["permalink"]}"
+        end
       end
 
       def tags
         return [] unless subreddit.present?
 
-        data["flair"].to_a.pluck("text").compact_blank.uniq.map do |flair|
-          [flair, %{https://www.reddit.com/r/#{subreddit}/?f=flair_name:"#{Danbooru::URL.escape(flair)}"}]
-        end
+        flair = post_data["link_flair_text"]
+
+        return [] unless flair.is_a?(String)
+
+        [[flair, %{https://www.reddit.com/#{subreddit}/?f=flair_name:"#{Danbooru::URL.escape(flair)}"}]]
+
+        # post_data["link_flair_text"].to_a.pluck("text").compact_blank.uniq.map do |flair|
+        #   [flair, %{https://www.reddit.com/r/#{subreddit}/?f=flair_name:"#{Danbooru::URL.escape(flair)}"}]
+        # end
       end
 
       def username
@@ -54,117 +81,43 @@ module Source
       end
 
       def artist_commentary_title
-        data["title"]
+        post_data["title"]
       end
 
       def artist_commentary_desc
-        data.dig("media", "richtextContent", "document")&.to_json
+        post_data["selftext"]
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(html_artist_commentary_desc, base_url: "https://www.reddit.com")
+        DText.from_html(html_artist_commentary_desc, base_url: "https://www.reddit.com") do |element|
+          case element.name
+          in "a"
+            # Format embedded images properly
+            if element[:href]
+              parsed_href = Source::URL.parse(element[:href])
+
+              if parsed_href && parsed_href.class != Source::URL::Null && image_urls.include?(parsed_href.full_image_url)
+                element.content = "[image]"
+                element[:href] = parsed_href.full_image_url
+              end
+            end
+          in "span"
+            # Transform spoiler tags
+            if element.classes.include?("md-spoiler-text")
+              element.name = "inline-spoiler"
+            end
+          else
+            nil
+          end
+        end
       end
 
       def html_artist_commentary_desc
-        nodes = data.dig("media", "richtextContent", "document").to_a
-        rich_text_to_html(nodes)
-      end
-
-      # Convert Reddit's rich text formatting language from JSON to HTML. The document is structured as a list of JSON
-      # nodes, where each node has an element type ("e") and nested node content ("c"). Text nodes have "t" content and
-      # an "f" array that denotes bold/italics/etc formatting tags as a list of character ranges.
-      def rich_text_to_html(nodes)
-        nodes.map do |node|
-          case node["e"]
-          in "raw"
-            CGI.escapeHTML(node["t"])
-          in "text"
-            text_node_to_html(node["t"], node["f"])
-          in "br"
-            "<br>"
-          in "hr"
-            "<hr>"
-          in "par"
-            "<p>#{rich_text_to_html(node["c"])}</p>"
-          in "li"
-            "<li>#{rich_text_to_html(node["c"])}</li>"
-          in "list"
-            "<ul>#{rich_text_to_html(node["c"])}</ul>"
-          in "blockquote"
-            "<blockquote>#{rich_text_to_html(node["c"])}</blockquote>"
-          in "code"
-            "<pre>#{rich_text_to_html(node["c"])}</pre>"
-          in "spoilertext"
-            "<inline-spoiler>#{rich_text_to_html(node["c"])}</inline-spoiler>"
-          in "h"
-            level = node["l"] || "1"
-            tag = "h#{level}"
-            "<#{tag}>#{rich_text_to_html(node["c"])}</#{tag}>"
-          in "r/"
-            url = "https://www.reddit.com/r/#{Danbooru::URL.escape(node["t"])}/"
-            %{<a href="#{CGI.escapeHTML(url)}">#{CGI.escapeHTML(url)}</a>}
-          in "u/"
-            url = "https://www.reddit.com/user/#{Danbooru::URL.escape(node["t"])}/"
-            %{<a href="#{CGI.escapeHTML(url)}">#{CGI.escapeHTML(url)}</a>}
-          in "link"
-            %{<a href="#{CGI.escapeHTML(node["u"])}">#{CGI.escapeHTML(node["t"])}</a>}
-          in "img"
-            url = data.dig("media", "mediaMetadata", node["id"], "s", "u")
-            url = Source::URL.parse(url).try(:full_image_url).to_s || url
-            %{<img src="#{CGI.escapeHTML(url)}" alt="[image]">}
-          in "table"
-            "" # XXX Not supported
-          else
-            ""
-          end
-        end.join
-      end
-
-      # Convert a text node to HTML. `format_ranges` is a list of `[formatting_code, offset, length]` triples that
-      # denote bold/italics/etc tags as (offset, length) ranges in the string.
-      def text_node_to_html(text, format_ranges, formatting_codes: { 1 => :b, 2 => :em, 8 => :s, 32 => :sup, 64 => :code })
-        return CGI.escapeHTML(text) if format_ranges.blank?
-
-        output = "".dup
-
-        # The list of active formatting tags. This contains e.g `:b` if we're inside a <b> tag.
-        open_formatting_tags = [].to_set
-
-        # The list of formatting tags used somewhere in this text.
-        formats = format_ranges.map(&:first).map(&formatting_codes).compact
-
-        # Output characters one at a time, adding <b> and </b> tags based on whether the current character should be
-        # bold and whether it's already inside a <b> tag.
-        text.chars.each_with_index do |char, i|
-          # The list of formatting tags active for this character. This contains e.g. `:b` if this character should be in a <b> tag.
-          active_formats = format_ranges.select { |_, offset, length| i.in?(offset...offset + length) }.map do |code, _, _|
-            formatting_codes[code]
-          end
-
-          formats.each do |tag|
-            # Output a <b> tag if this character is bold and we're not in a <b> tag.
-            if active_formats.include?(tag) && !open_formatting_tags.include?(tag)
-              output << "<#{tag}>"
-              open_formatting_tags.add(tag)
-            # Output a </b> tag if this character is not bold and we're in a <b> tag.
-            elsif !active_formats.include?(tag) && open_formatting_tags.include?(tag)
-              output << "</#{tag}>"
-              open_formatting_tags.delete(tag)
-            end
-          end
-
-          output << CGI.escapeHTML(char)
-        end
-
-        open_formatting_tags.each do |tag|
-          output << "</#{tag}>"
-        end
-
-        output
+        CGI.unescapeHTML(post_data["selftext_html"].to_s)
       end
 
       def crosspost?
-        data["crosspostParentId"].present?
+        post_data["crosspost_parent"].present?
       end
 
       def work_id
@@ -180,10 +133,6 @@ module Source
         parsed_urls.find(&:share_id)
       end
 
-      def api_url
-        "https://www.reddit.com/comments/#{work_id}.json" if work_id.present?
-      end
-
       def find_comment(id, parent_comments: comments)
         parent_comments.to_a.each do |reply|
           return reply["data"] if reply.dig("data", "id") == id
@@ -197,20 +146,32 @@ module Source
         nil
       end
 
+      def user_post?
+        post_data["subreddit_name_prefixed"].to_s.starts_with?("u/")
+      end
+
       def subreddit
-        post_data["subreddit"]
+        post_data["subreddit_name_prefixed"]
+      end
+
+      def api_url
+        "https://www.reddit.com/comments/#{work_id}.json" if work_id.present?
       end
 
       memoize def api_response
         http.cache(1.minute).parsed_get(api_url)
       end
 
+      def banned?
+        api_response.blank? || (api_response.try("error") == 404 && api_response["reason"] == "banned")
+      end
+
       memoize def post_data
-        api_response.dig(0, "data", "children", 0, "data")
+        api_response&.dig(0, "data", "children", 0, "data").to_h
       end
 
       memoize def comments
-        api_response.dig(1, "data", "children")
+        api_response&.dig(1, "data", "children").to_a
       end
     end
   end

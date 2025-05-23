@@ -15,15 +15,25 @@ class Source::Extractor::RedditComment < Source::Extractor::Reddit
   def artist_commentary_title
   end
 
-  def artist_commentary_desc
+  def html_artist_commentary_desc
     CGI.unescapeHTML(comment["body_html"])
   end
 
   def dtext_artist_commentary_desc
-    DText.from_html(artist_commentary_desc, base_url: "https://www.reddit.com") do |element|
-      # Remove embedded images (if they appear in image_urls)
-      if element.name == "a" && element[:href] && image_urls.include?(Source::URL.parse(element[:href]).full_image_url)
-        element.content = ""
+    DText.from_html(html_artist_commentary_desc, base_url: "https://www.reddit.com") do |element|
+      case element.name
+      in "a"
+        # Remove embedded images (if they appear in image_urls)
+        if element[:href] && image_urls.include?(Source::URL.parse(element[:href]).full_image_url)
+          element.content = ""
+        end
+      in "span"
+        # Transform spoiler tags
+        if element.classes.include?("md-spoiler-text")
+          element.name = "inline-spoiler"
+        end
+      else
+        nil
       end
     end
   end
