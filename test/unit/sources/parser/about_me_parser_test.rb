@@ -12,12 +12,12 @@ module Source::URL::Tests
       "https://about.me/sgr_sk",
     )
 
-    should_extract_from_url(
+    url_parser_should_work(
       "https://about.me/cdn-cgi/image/q=40,dpr=2,f=auto,fit=cover,w=120,h=120,gravity=auto/https://assets.about.me/background/users/s/g/r/sgr_sk_1369590004_43.jpg",
       profile_url: "https://about.me/sgr_sk",
     )
 
-    should_extract_from_url(
+    url_parser_should_work(
       "https://about.me/cdn-cgi/image/q=40,dpr=2,f=auto,fit=contain,w=1200,h=1799.9100044997751/https://assets.about.me/background/users/u/dot/n/u.no_1471830904_68.jpg",
       profile_url: "https://about.me/u.no",
     )

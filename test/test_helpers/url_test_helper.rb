@@ -33,7 +33,7 @@ module UrlTestHelper
       end
     end
 
-    def should_extract_from_url(url, **attributes)
+    def url_parser_should_work(url, **attributes)
       setup do
         url = Source::URL.parse(url)
       end
