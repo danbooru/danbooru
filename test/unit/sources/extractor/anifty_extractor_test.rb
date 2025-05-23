@@ -1,7 +1,7 @@
 require "test_helper"
 
-module Sources
-  class AniftyTest < ActiveSupport::TestCase
+module Source::Extractor::Tests
+  class AniftyExtractorTest < ActiveSupport::TestCase
     context "An anifty post" do
       strategy_should_work(
         "https://anifty.jp/ja/creations/1500",
@@ -13,7 +13,7 @@ module Sources
         other_names: ["inami hatoko", "inamihatoko", "井波ハトコ"],
         tags: ["background", "girl"],
         artist_commentary_title: "Escape",
-        artist_commentary_desc: "Let's get out of there."
+        artist_commentary_desc: "Let's get out of there.",
       )
     end
 
@@ -28,7 +28,7 @@ module Sources
         username: "unagi189",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -43,19 +43,12 @@ module Sources
         other_names: ["Knoy Konome", "hightree", "木芽のい"],
         tags: [],
         artist_commentary_title: nil,
-        artist_commentary_desc: nil
+        artist_commentary_desc: nil,
       )
     end
 
     context "A deleted or non-existing anifty post" do
       strategy_should_work("https://anifty.jp/zh/creations/373123123", deleted: true, profile_url: nil)
-    end
-
-    should "Parse Anifty URLs correctly" do
-      assert(Source::URL.image_url?("https://anifty.imgix.net/creation/0x961d09077b4a9f7a27f6b7ee78cb4c26f0e72c18/20d5ce5b5163a71258e1d0ee152a0347bf40c7da.png?w=660&h=660&fit=crop&crop=focalpoint&fp-x=0.76&fp-y=0.5&fp-z=1&auto=compress"))
-      assert(Source::URL.image_url?("https://storage.googleapis.com/anifty-media/creation/0x961d09077b4a9f7a27f6b7ee78cb4c26f0e72c18/20d5ce5b5163a71258e1d0ee152a0347bf40c7da.png"))
-      assert(Source::URL.page_url?("https://anifty.jp/creations/373"))
-      assert(Source::URL.profile_url?("https://anifty.jp/@hightree"))
     end
   end
 end
