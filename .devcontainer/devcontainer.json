@@ -24,7 +24,7 @@
   },
   "remoteEnv": {
     "DANBOORU_DIR": "${localWorkspaceFolder}",
-    "DEVCONTAINER": "true",
+    "DEVCONTAINER": "true"
   },
   "containerEnv": {
     "GIT_EDITOR": "code --wait"
@@ -52,5 +52,8 @@
     "DANBOORU_TWITTER_CSRF_TOKEN": {
       "description": "Your Twitter `ct0` cookie. Required for Twitter upload support."
     }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   }
 }
