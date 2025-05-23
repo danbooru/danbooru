@@ -111,7 +111,6 @@ module ApplicationHelper
   end
 
   def duration_to_hhmmss(seconds)
-    seconds = seconds.round
     hh = seconds.div(1.hour)
     mm = (seconds.seconds - hh.hours.seconds).div(1.minute)
     ss = "%.2d" % (seconds % 1.minute)

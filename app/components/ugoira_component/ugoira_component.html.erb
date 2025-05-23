@@ -12,7 +12,7 @@
 
     <span class="flex gap-1 text-sm select-none whitespace-nowrap @max-270px:hidden">
       <span x-text="player.formatTime(player.currentTime)">0:00</span> /
-      <span x-text="player.formatTime(player.duration)">0:00</span>
+      <span x-text="player.formatTime(Math.max(player.duration, 1))">0:01</span>
     </span>
 
     <%= render PopupMenuComponent.new(classes: "h-full", button_classes: "h-full focus:outline-0", button_html: { "data-tippy-placement": "top", "data-tippy-arrow": "false" }) do |menu| %>
