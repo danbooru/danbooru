@@ -53,7 +53,5 @@
       "description": "Your Twitter `ct0` cookie. Required for Twitter upload support."
     }
   },
-  "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
-  }
+  "postCreateCommand": "bin/rails db:test:prepare"
 }
