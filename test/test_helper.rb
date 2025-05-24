@@ -33,6 +33,7 @@ class ActiveSupport::TestCase
   include IqdbTestHelper
   include UploadTestHelper
   include SourceTestHelper
+  include UrlTestHelper
   extend StripeTestHelper
   extend NormalizeAttributeHelper
 
