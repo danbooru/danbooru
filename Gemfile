@@ -80,7 +80,6 @@ group :development do
   gem 'binding_of_caller'
   gem 'benchmark-ips', require: "benchmark/ips"
   gem 'listen'
-  gem 'solargraph'
   gem 'derailed_benchmarks'
 end
 
