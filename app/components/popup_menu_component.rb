@@ -19,4 +19,12 @@ class PopupMenuComponent < ApplicationComponent
     @button_classes = button_classes
     @button_html = button_html
   end
+
+  def render_votes_toggle(show_votes)
+    if show_votes
+      link_to "Hide scores", url_for(**params.merge(show_votes: nil).except(:z).permit!), class: "post-preview-hide-votes", rel: "nofollow"
+    else
+      link_to "Show scores", url_for(**params.merge(show_votes: true).except(:z).permit!), class: "post-preview-show-votes", rel: "nofollow"
+    end
+  end
 end

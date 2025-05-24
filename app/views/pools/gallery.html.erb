@@ -5,13 +5,16 @@
 
 <div id="c-pools">
   <div id="a-gallery">
-    <%= render "search", :path => gallery_pools_path %>
+    <div class="flex mb-4">
+      <%= render "search", :path => gallery_pools_path %>
+      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+    </div>
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= render(PostGalleryComponent.new) do |gallery| %>
+    <%= render(PostGalleryComponent.new(size: @preview_size)) do |gallery| %>
       <% @pools.each do |pool| %>
-        <% gallery.with_post(post: pool.cover_post, link_target: pool, show_deleted: true) do |preview| %>
+        <% gallery.with_post(post: pool.cover_post, size: @preview_size, link_target: pool, show_deleted: true) do |preview| %>
           <% preview.with_footer do %>
             <div class="text-center">
               <%= link_to pool.pretty_name, pool, class: "text-sm pool-category-#{pool.category}" %>

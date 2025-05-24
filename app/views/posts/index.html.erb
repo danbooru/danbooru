@@ -87,11 +87,7 @@
 
       <%= render PopupMenuComponent.new(classes: "post-preview-options-menu") do |menu| %>
         <% menu.with_item do %>
-          <% if @post_set.show_votes %>
-            <%= link_to "Hide scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: nil, size: params[:size]), class: "post-preview-hide-votes", rel: "nofollow" %>
-          <% else %>
-            <%= link_to "Show scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: true, size: params[:size]), class: "post-preview-show-votes", rel: "nofollow" %>
-          <% end %>
+          <% menu.render_votes_toggle(@post_set.show_votes) %>
         <% end %>
       <% end %>
     </li>
