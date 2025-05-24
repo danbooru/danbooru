@@ -48,8 +48,9 @@ class MediaFile::Video < MediaFile
     return false if audio_streams.size > 1
     return false if is_webm? && exif_metadata["Matroska:DocType"] != "webm"
     return false if is_webm? && !video_codec.in?(%w[vp8 vp9 av1])
-    return false if is_mp4? && !video_codec.in?(["h264", "vp9"])
-    return false if has_audio? && !audio_codec.in?(%w[aac opus vorbis mp3])
+    return false if is_mp4? && !video_codec.in?(%w[h264 hevc vp9 av1])
+    return false if has_audio? && is_webm? && !audio_codec.in?(%w[opus vorbis])
+    return false if has_audio? && is_mp4? && !audio_codec.in?(%w[aac mp3 opus])
 
     # Only allow pixel formats supported by most browsers. Don't allow 10-bit video or 4:4:4 subsampling (neither are supported by Firefox).
     #
