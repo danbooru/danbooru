@@ -3,8 +3,8 @@
 # @see Source::Extractor::Reddit
 class Source::Extractor::RedditComment < Source::Extractor::Reddit
   def image_urls
-    page&.css("#embed-container faceplate-img").to_a.pluck("src").map do |url|
-      Source::URL.parse(url).try(:full_image_url) || url
+    comment["media_metadata"].to_h.map do |_, media|
+      Source::URL.parse(media.dig("s", "u")).full_image_url
     end
   end
 
@@ -15,27 +15,38 @@ class Source::Extractor::RedditComment < Source::Extractor::Reddit
   def artist_commentary_title
   end
 
-  def artist_commentary_desc
-    page&.at("#embed-container > div.relative")&.to_html
+  def html_artist_commentary_desc
+    CGI.unescapeHTML(comment["body_html"])
   end
 
   def dtext_artist_commentary_desc
-    DText.from_html(artist_commentary_desc, base_url: "https://www.reddit.com")
+    DText.from_html(html_artist_commentary_desc, base_url: "https://www.reddit.com") do |element|
+      case element.name
+      in "a"
+        # Remove embedded images (if they appear in image_urls)
+        if element[:href] && image_urls.include?(Source::URL.parse(element[:href]).full_image_url)
+          element.content = ""
+        end
+      in "span"
+        # Transform spoiler tags
+        if element.classes.include?("md-spoiler-text")
+          element.name = "inline-spoiler"
+        end
+      else
+        nil
+      end
+    end
   end
 
   def username
-    page&.at('a[data-testid="user-name"]')&.text&.strip
+    comment["author"]
   end
 
   def comment_id
     parsed_url.comment_id || parsed_referer&.comment_id
   end
 
-  def embed_url
-    "https://embed.reddit.com/r/#{subreddit}/comments/#{work_id}/comment/#{comment_id}" if subreddit.present? && work_id.present? && comment_id.present?
-  end
-
-  memoize def page
-    http.cache(1.minute).parsed_get(embed_url)
+  memoize def comment
+    find_comment(comment_id)
   end
 end
