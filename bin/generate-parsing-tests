@@ -25,7 +25,7 @@ STRATEGY_NAME="${STRATEGY_FILE##*/}" # only the file
 STRATEGY_NAME="${STRATEGY_NAME%.*}" # without the ext
 
 PARSER_TESTS_FILE="$PARSER_TESTS_LOCATION/${STRATEGY_NAME}_parser_test.rb"
-EXTRACTOR_TESTS_FILE="$PARSER_TESTS_LOCATION/${STRATEGY_NAME}_extractor_test.rb"
+EXTRACTOR_TESTS_FILE="$EXTRACTOR_TESTS_LOCATION/${STRATEGY_NAME}_extractor_test.rb"
 
 STRATEGY_CLASS_NAME="$(echo "$STRATEGY_NAME" | sed -E 's/(^|[_[:space:]])([a-z])/\U\2/g')"
 
@@ -60,6 +60,15 @@ module Source::URL::Tests
     context "when parsing" do
       # url_parser_should_work("https://username.site.com, username: "site")
       # url_parser_should_work("https://site.com/artist/post/1", page_url: "https://site.com/artist")
+    end
+
+
+    context "when checking false positives" do
+      should_not_find_false_positives(
+        profile_urls: [],
+        image_urls: [],
+        page_urls: [],
+      )
     end
   end
 end
