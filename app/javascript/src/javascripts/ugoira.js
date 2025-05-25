@@ -10,9 +10,10 @@ export default class Ugoira {
     let fileUrl = $canvas.data("src");
     let fileSize = $canvas.data("file-size");
     let frameDelays = $canvas.data("frame-delays");
+    let frameOffsets = $canvas.data("frame-offsets");
 
     this._currentTime = 0;
-    this._ugoira = new UgoiraRenderer(fileUrl, $canvas.get(0), frameDelays, { fileSize });
+    this._ugoira = new UgoiraRenderer(fileUrl, $canvas.get(0), frameDelays, { frameOffsets, fileSize });
     this._sample = this.$ugoiraContainer.find("video").get(0);
   }
 

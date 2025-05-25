@@ -7,19 +7,33 @@ function clamp(value, min, max) {
 // A UgoiraLoader loads a ugoira from a remote .zip file. It reads the .zip file in chunks using range requests, parses
 // the file to find the frames, and returns the frames as <img src="blob:..."> elements.
 export class UgoiraLoader {
-  constructor(fileUrl, frameDelays, fileSize = null) {
+  constructor(fileUrl, frameDelays, frameOffsets = null, fileSize = null) {
     this.fileUrl = fileUrl; // The URL of the .zip file.
 
     this._fileSize = fileSize;
     this._endOfCentralDirectory = null;
-    this._centralDirectoryLoaded = false;
+    this._frames = this.initFrames(frameDelays, frameOffsets, fileSize);
+  }
 
-    this._frames = [];
-    for (let i = 0, frameStart = 0; i < frameDelays.length; i++) {
-      let duration = frameDelays[i] / 1000;
-      this._frames[i] = { index: i, duration, frameStart, frameEnd: frameStart + duration };
+  // Calculate the start and end times of each frame in the ugoira, and the file offsets and sizes if provided.
+  initFrames(frameDelays, frameOffsets = null, fileSize = null) {
+    let frameStart = 0;
+
+    return frameDelays.map((frameDelay, i) => {
+      let frame = {};
+      let duration = frameDelay / 1000;
+
+      frame.frameStart = frameStart;
+      frame.frameEnd = frameStart + duration;
+
+      if (frameOffsets?.[i] != null && fileSize != null) {
+        frame.fileOffset = frameOffsets[i] + 40; // 40 bytes for the zip file header
+        frame.fileSize = (frameOffsets[i + 1] ?? fileSize) - frame.fileOffset;
+      }
+
       frameStart += duration;
-    }
+      return frame;
+    });
   }
 
   // Read a range of bytes from the remote .zip file.
@@ -51,32 +65,21 @@ export class UgoiraLoader {
   }
 
   // Return the end of central directory record. This is the last 22 bytes of the zip file, which contains the size and
-  // location of the central directory, which contains the list of files in the zip file. If we know the file size and
-  // frame count, we can calculate the location of the central directory without having to read the file based on the
-  // assumption that filenames are always 10 bytes long and there are no extra fields or comments. This should always be
-  // true, but if it's wrong, we'll detect it when we parse the central directory.
+  // location of the central directory, which contains the list of files in the zip file.
   async endOfCentralDirectory() {
     if (this._endOfCentralDirectory) { return this._endOfCentralDirectory; }
 
-    if (this._fileSize) {
-      let cdEntries = this._frames.length;           // The number of entries in the central directory is just the number of frames.
-      let cdLength = cdEntries * 56;                 // Each central directory entry is assumed to be 56 bytes long (46 byte header + 10 byte file name).
-      let cdOffset = this._fileSize - cdLength - 22; // The end of the central directory record starts 22 bytes before the end of the file (assuming no file comment).
+    let fileSize = await this.fileSize();
+    let eocd = await this.read(fileSize - 22, 22);
+    let signature = eocd.getUint32(0, true);
+    let cdEntries = eocd.getUint16(10, true);
+    let cdLength = eocd.getUint32(12, true);
+    let cdOffset = eocd.getUint32(16, true);
 
-      this._endOfCentralDirectory = { cdLength, cdOffset, cdEntries };
-    } else {
-      let fileSize = await this.fileSize();
-      let eocd = await this.read(fileSize - 22, 22);
-      let signature = eocd.getUint32(0, true);
-      let cdEntries = eocd.getUint16(10, true);
-      let cdLength = eocd.getUint32(12, true);
-      let cdOffset = eocd.getUint32(16, true);
+    this.assert(signature === 0x06054b50, `endOfCentralDirectory() failed (bad signature, signature=${signature.toString(16)})`);
+    this.assert(cdOffset + cdLength <= fileSize, `endOfCentralDirectory() failed (bad central directory size, cdLength: ${cdLength}, fileSize: ${fileSize})`);
 
-      this.assert(signature === 0x06054b50, `endOfCentralDirectory() failed (bad signature, signature=${signature.toString(16)})`);
-      this.assert(cdOffset + cdLength <= fileSize, `endOfCentralDirectory() failed (bad central directory size, cdLength: ${cdLength}, fileSize: ${fileSize})`);
-
-      this._endOfCentralDirectory = { cdLength, cdOffset, cdEntries };
-    }
+    this._endOfCentralDirectory = { cdLength, cdOffset, cdEntries };
 
     return this._endOfCentralDirectory;
   }
@@ -84,7 +87,7 @@ export class UgoiraLoader {
   // Return the list of frames in the ugoira. Each frame will have `fileOffset` and `fileSize` properties indicating the
   // location of the frame in the zip file. Frames will have an `image` property after the frame is loaded by loadFrames().
   async frames() {
-    if (this._centralDirectoryLoaded) { return this._frames; }
+    if (this._frames[0].fileOffset != null) { return this._frames; }
 
     let { cdOffset, cdLength, cdEntries } = await this.endOfCentralDirectory();
     let cdBuffer = await this.read(cdOffset, cdLength);
@@ -121,7 +124,6 @@ export class UgoiraLoader {
       offset += entryLength;
     }
 
-    this._centralDirectoryLoaded = true;
     return this._frames;
   }
 
@@ -206,7 +208,7 @@ export class UgoiraLoader {
 //
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
 export default class UgoiraRenderer {
-  constructor(fileUrl, canvas, frameDelays, { fileSize = null } = {}) {
+  constructor(fileUrl, canvas, frameDelays, { frameOffsets = null, fileSize = null } = {}) {
     this.currentSrc = fileUrl;
     this.paused = true;
     this.width = canvas.width;
@@ -224,7 +226,7 @@ export default class UgoiraRenderer {
     this._animationId = null;   // The handle for the requestAnimationFrame callback that updates the canvas.
     this._loadedFrame = null;   // The frame number of the latest frame that is ready to be drawn.
     this._currentFrame = null;  // The frame that is currently being displayed on the canvas.
-    this._loader = new UgoiraLoader(fileUrl, frameDelays, fileSize);
+    this._loader = new UgoiraLoader(fileUrl, frameDelays, frameOffsets, fileSize);
     this._frames = this._loader._frames;
 
     this._context = this._canvas.getContext("2d");

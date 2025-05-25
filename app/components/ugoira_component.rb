@@ -20,4 +20,8 @@ class UgoiraComponent < ApplicationComponent
   def frame_delays
     media_asset.media_metadata.metadata["Ugoira:FrameDelays"]
   end
+
+  def frame_offsets
+    media_asset.media_metadata.metadata["Ugoira:FrameOffsets"]
+  end
 end

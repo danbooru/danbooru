@@ -131,11 +131,20 @@ class MediaFile::Ugoira < MediaFile
   memoize def metadata
     super.merge(
       "Ugoira:FrameDelays" => frame_delays,
-      "Ugoira:FrameSizes" => frames.map(&:size),
+      "Ugoira:FrameOffsets" => frame_offsets,
       "Ugoira:FrameCount" => frame_delays.size,
       "Ugoira:FrameRate" => frame_rate,
+      "Ugoira:FrameMimeType" => frames.first&.mime_type.to_s,
       "Ugoira:AnimationJsonFormat" => animation_json_format
     )
+  end
+
+  # @return [Array<Integer>] The list of offsets to each frame in the .zip file. Used by the ugoira player to locate
+  #   frames without needing to parse the zip file first.
+  memoize def frame_offsets
+    Zip::File.open(file.path) do |zip|
+      zip.entries.reject { |entry| entry.name == "animation.json" }.map(&:local_header_offset)
+    end
   end
 
   memoize def dimensions

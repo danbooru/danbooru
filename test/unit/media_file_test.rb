@@ -360,9 +360,10 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal(5, @ugoira.frame_count)
 
         assert_equal([200, 200, 200, 200, 250], @ugoira.metadata["Ugoira:FrameDelays"])
-        assert_equal([1639, 1869, 1561, 760, 332], @ugoira.metadata["Ugoira:FrameSizes"])
+        assert_equal([0, 1679, 3588, 5189, 5989], @ugoira.metadata["Ugoira:FrameOffsets"])
         assert_equal(5, @ugoira.metadata["Ugoira:FrameCount"])
         assert_equal(4.76, @ugoira.metadata["Ugoira:FrameRate"].round(2))
+        assert_equal("image/jpeg", @ugoira.metadata["Ugoira:FrameMimeType"])
         assert_equal("none", @ugoira.metadata["Ugoira:AnimationJsonFormat"])
 
         assert_nil(@ugoira.animation_json)
@@ -406,6 +407,10 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal([200, 200, 200, 200, 250], new_ugoira.animation_json[:frames].pluck("delay"))
         assert_equal(%w[000000.jpg 000001.jpg 000002.jpg 000003.jpg 000004.jpg], new_ugoira.animation_json[:frames].pluck("file"))
         assert_equal(@ugoira.frames.map(&:md5), new_ugoira.animation_json[:frames].pluck("md5"))
+        assert_equal([0, 1679, 3588, 5189, 5989], new_ugoira.metadata["Ugoira:FrameOffsets"])
+        assert_equal("image/jpeg", new_ugoira.metadata["Ugoira:FrameMimeType"])
+        assert_equal("Danbooru", new_ugoira.metadata["Ugoira:AnimationJsonFormat"])
+
         assert_nil(new_ugoira.error)
       end
     end
@@ -419,6 +424,7 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal(10, ugoira.frame_count)
           assert_equal(10, ugoira.animation_json.size)
           assert_equal("gallery-dl", ugoira.animation_json_format)
+          assert_equal([0, 7817, 15_616, 23_444, 31_274, 39_087, 46_931, 54_807, 62_599, 70_394], ugoira.frame_offsets)
           assert_equal(1.7, ugoira.duration)
           assert_nil(ugoira.error)
         end
@@ -434,6 +440,7 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal(10, ugoira.frame_count)
           assert_equal(10, ugoira.animation_json[:frames].size)
           assert_equal("PixivUtil2", ugoira.animation_json_format)
+          assert_equal([0, 4046, 8074, 12_123, 16_169, 20_204, 24_262, 28_337, 32_372, 36_405], ugoira.frame_offsets)
           assert_equal(1.7, ugoira.duration)
           assert_nil(ugoira.error)
         end
@@ -449,6 +456,7 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal(10, ugoira.frame_count)
           assert_equal(10, ugoira.animation_json.dig(:ugokuIllustData, :frames).size)
           assert_equal("PixivToolkit", ugoira.animation_json_format)
+          assert_equal([639, 4685, 8713, 12_762, 16_808, 20_843, 24_901, 28_976, 33_011, 37_044], ugoira.frame_offsets)
           assert_equal(1.7, ugoira.duration)
           assert_nil(ugoira.error)
         end
@@ -464,6 +472,7 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal(10, ugoira.frame_count)
           assert_equal(10, ugoira.animation_json[:frames].size)
           assert_equal("Danbooru", ugoira.animation_json_format)
+          assert_equal([0, 7817, 15_616, 23_444, 31_274, 39_087, 46_931, 54_807, 62_599, 70_394], ugoira.frame_offsets)
           assert_equal(1.7, ugoira.duration)
           assert_nil(ugoira.error)
         end
