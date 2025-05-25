@@ -254,5 +254,10 @@ module Source
         "https://www.pixiv.net/stacc/#{username}"
       end
     end
+
+    def parsed_date
+      # Dates in image URLs are in JST (UTC+9)
+      Time.new(*date, "+09:00").in_time_zone("UTC") if date.present?
+    end
   end
 end

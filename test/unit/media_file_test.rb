@@ -397,6 +397,11 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal(5, new_ugoira.frame_count)
         assert_equal(60, new_ugoira.animation_json[:width])
         assert_equal(60, new_ugoira.animation_json[:height])
+        assert_equal(7_202, new_ugoira.size)
+        assert_equal("e0bd8afa96e30605e4bc4a3f9585afd6", new_ugoira.md5)
+
+        assert_equal(60, new_ugoira.animation_json[:width])
+        assert_equal(60, new_ugoira.animation_json[:height])
         assert_equal("image/jpeg", new_ugoira.animation_json[:mime_type])
         assert_equal([200, 200, 200, 200, 250], new_ugoira.animation_json[:frames].pluck("delay"))
         assert_equal(%w[000000.jpg 000001.jpg 000002.jpg 000003.jpg 000004.jpg], new_ugoira.animation_json[:frames].pluck("file"))
@@ -444,6 +449,21 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal(10, ugoira.frame_count)
           assert_equal(10, ugoira.animation_json.dig(:ugokuIllustData, :frames).size)
           assert_equal("PixivToolkit", ugoira.animation_json_format)
+          assert_equal(1.7, ugoira.duration)
+          assert_nil(ugoira.error)
+        end
+      end
+    end
+
+    context "A ugoira .zip file with an animation.json in Danbooru format" do
+      should "find the files and frame delays" do
+        MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip") do |ugoira|
+          assert_equal(79_865, ugoira.size)
+          assert_equal("72e8c2f6c6783efaeb4830d26ddfd17d", ugoira.md5)
+          assert_equal(11, ugoira.files.size)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(10, ugoira.animation_json[:frames].size)
+          assert_equal("Danbooru", ugoira.animation_json_format)
           assert_equal(1.7, ugoira.duration)
           assert_nil(ugoira.error)
         end

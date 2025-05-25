@@ -37,7 +37,7 @@ module Sources
           "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364",
           image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 33_365, frame_delays: [125, 125], md5: "35e3d3a71cb61d04f10e41979d29ee4b" }
+            { file_size: 33_197, frame_delays: [125, 125], md5: "87ddf73e2c6fccef8dd6870cdfc0f245" }
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -64,7 +64,7 @@ module Sources
           "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip",
           image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 33_365, frame_delays: [125, 125], md5: "35e3d3a71cb61d04f10e41979d29ee4b" },
+            { file_size: 33_197, frame_delays: [125, 125], md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -81,7 +81,7 @@ module Sources
           "https://i.pximg.net/img-master/img/2017/04/04/08/57/38/62247364_master1200.jpg",
           image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 33_365, frame_delays: [125, 125], md5: "35e3d3a71cb61d04f10e41979d29ee4b" },
+            { file_size: 33_197, frame_delays: [125, 125], md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -106,11 +106,11 @@ module Sources
           image_urls: ["https://i.pximg.net/img-original/img/2023/11/27/19/51/28/113760314_ugoira0.png"],
           media_files: [
             {
-              file_size: 5_322_700,
+              file_size: 5_320_292,
               width: 3600,
               height: 2560,
               frame_delays: [125] * 42,
-              md5: "9d8fb171a990e936687e35d9b49bb731"
+              md5: "cc72a104755b7e032444742d84d74425"
             }
           ],
         )

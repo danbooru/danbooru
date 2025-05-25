@@ -84,6 +84,8 @@ class MediaFile::Ugoira < MediaFile
       return "file '#{entry.name}' cannot be compressed" if entry.compression_method != Zip::Entry::STORED
       return "file '#{entry.name}' cannot be compressed" if entry.compressed_size != entry.size
       return "file '#{entry.name}' cannot be a #{entry.ftype}" if entry.ftype != :file
+      return "file '#{entry.name}' has unsupported general purpose flags (#{"%.8b" % entry.gp_flags})" if entry.gp_flags != 0
+      return "file '#{entry.name}' has unsupported header size (expected #{entry.name.size + 30}, got #{entry.calculate_local_header_size})" if entry.calculate_local_header_size != entry.name.size + 30
       # return "file '#{entry.name}' has invalid CRC" if entry.crc != Zlib.crc32(entry.get_input_stream.read) # XXX this reads the entire file into memory
 
       %i[crc name extra_size comment_size ftype compression_method compressed_size size].each do |field|
@@ -232,39 +234,57 @@ class MediaFile::Ugoira < MediaFile
   #
   # @param frames [Array<MediaFile>] The list of images to include in the ugoira, in the order they should be displayed.
   # @param frame_delays [Array<Integer>] The frame delays in milliseconds.
-  # @param block [Proc] An optional block that will be called with the animation.json data to allow the caller to add extra data to it.
+  # @param mtime [Time] The timestamp to set on the files in the zip file.
+  # @param data [Hash] Extra data to include in the animation.json file.
   # @return [MediaFile] The new ugoira.
-  def self.create(frames, frame_delays:, &block)
-    new(frames, frame_delays:).create_copy(&block)
+  def self.create(frames, frame_delays:, mtime: Time.new(1980, 1, 1), data: {})
+    new(frames, frame_delays:).create_copy(data:, mtime:)
   end
 
   # Create a copy of the current ugoira, with a new animation.json file added to it.
   #
   # @param file [File] The output file to write the new ugoira to.
-  # @param block [Proc] An optional block that will be called with the animation.json data to allow the caller to add extra data to it.
+  # @param mtime [Time] The timestamp to set on the files in the zip file.
+  # @param data [Hash] Extra data to include in the animation.json file.
   # @return [MediaFile] The new ugoira.
-  def create_copy(file: Danbooru::Tempfile.new(["danbooru-ugoira-", ".zip"], binmode: true), &block)
-    Danbooru::Tempdir.create do |tmpdir|
-      animation_meta = {
-        width: width,
-        height: height,
-        mime_type: frames.first&.mime_type.to_s,
-        frames: frames.map.with_index do |frame, n|
-          { file: "#{"%06d" % n}.#{frame.file_ext}", delay: frame_delays[n], md5: frame.md5 }
-        end,
-      }
+  def create_copy(file: Danbooru::Tempfile.new(%w[danbooru-ugoira- .zip]), mtime: Time.new(1980, 1, 1), data: {})
+    ziptime = Zip::DOSTime.new(mtime.year, mtime.month, mtime.day, mtime.hour, mtime.min, mtime.sec)
 
-      yield animation_meta if block_given?
+    animation_meta = {
+      **data,
+      width: width,
+      height: height,
+      mime_type: frames.first&.mime_type.to_s,
+      frames: frames.map.with_index do |frame, n|
+        { file: "#{"%06d" % n}.#{frame.file_ext}", delay: frame_delays[n], md5: frame.md5 }
+      end,
+    }
 
-      frames.each_with_index do |frame, n|
-        FileUtils.cp(frame.path, "#{tmpdir.path}/#{"%06d" % n}.#{frame.file_ext}")
+    # XXX Use rubyzip because libarchive adds some things to the zip that we don't want (extra UniversalTime fields for
+    # timestamps and CRCs after the file data).
+    Danbooru::Tempfile.create do |animation_json_file|
+      Zip::File.open(file, create: true) do |zip|
+        entries = frames.map.with_index do |frame, n|
+          [Zip::Entry.new(zip, "#{"%06d" % n}.#{frame.file_ext}"), frame]
+        end
+
+        animation_json_file.pwrite(animation_meta.to_json, 0)
+        entries << [Zip::Entry.new(zip, "animation.json"), animation_json_file]
+
+        entries.each do |entry, filepath|
+          zip.add(entry, filepath)
+
+          entry.compression_method = Zip::Entry::STORED
+          entry.unix_perms = 0o0644
+          entry.internal_file_attributes = 0 # 0 for binary filetype, 1 for text
+          entry.instance_variable_set(:@time, ziptime) # set manually to avoid rubyzip creating UniversalTime extra field
+        end
       end
-
-      File.write("#{tmpdir.path}/animation.json", animation_meta.to_json)
-
-      Danbooru::Archive.create!(tmpdir.path, file)
-      MediaFile::Ugoira.new(file)
     end
+
+    # XXX rubyzip writes to a different file then moves it on top of the file we passed in, so we need to reopen our file to get the new file.
+    file.reopen(file, "rb")
+    MediaFile::Ugoira.new(file)
   end
 
   # Convert a ugoira to a webm.

@@ -187,15 +187,16 @@ module Source
       memoize def ugoira_file
         return unless ugoira_frames.present? && ugoira_frame_delays.present?
 
-        MediaFile::Ugoira.create(ugoira_frames, frame_delays: ugoira_frame_delays) do |animation_json|
-          animation_json.replace(
-            illustId: api_response[:illustId].to_i,
-            userId: api_response[:userId].to_i,
-            createDate: api_response[:createDate], # when the ugoira was first uploaded
-            uploadDate: api_response[:uploadDate], # when the ugoira was last revised (same as the creation date if not revised)
-            **animation_json
-          )
-        end
+        # Use the date from the URL for timestamps in the zipfile because it includes the seconds and the uploadDate
+        # from the API doesn't, and because it's what gallery-dl does.
+        mtime = Source::URL.parse(ugoira_frame_urls.first).parsed_date
+
+        MediaFile::Ugoira.create(ugoira_frames, frame_delays: ugoira_frame_delays, mtime: mtime, data: {
+          illustId: api_response[:illustId].to_i,
+          userId: api_response[:userId].to_i,
+          createDate: api_response[:createDate], # when the ugoira was first uploaded
+          uploadDate: api_response[:uploadDate], # when the ugoira was last revised (same as the creation date if not revised)
+        })
       end
 
       def translate_tag(tag)
