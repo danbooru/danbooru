@@ -3,26 +3,13 @@ module UrlTestHelper
   # An abstract class to automate all parsing checks for external urls
 
   class_methods do
-    def should_recognize_image_urls(*image_urls)
-      image_urls.each do |image_url|
-        should "identify #{image_url} as an image url" do
-          assert(Source::URL.image_url?(image_url))
-        end
-      end
-    end
-
-    def should_recognize_profile_urls(*profile_urls)
-      profile_urls.each do |profile_url|
-        should "identify #{profile_url} as a profile url" do
-          assert(Source::URL.profile_url?(profile_url))
-        end
-      end
-    end
-
-    def should_recognize_page_urls(*page_urls)
-      page_urls.each do |page_url|
-        should "identify #{page_url} as a page url" do
-          assert(Source::URL.page_url?(page_url))
+    def should_identify_url_types(arguments = {})
+      arguments.each do |url_type, urls|
+        url_type = url_type.to_s.singularize
+        urls.each do |url|
+          should "correctly identify #{url} as a #{url_type.tr("_", " ")}" do
+            assert Source::URL.public_send("#{url_type}?", url)
+          end
         end
       end
     end

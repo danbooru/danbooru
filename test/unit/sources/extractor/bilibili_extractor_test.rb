@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
-module Sources
-  class BilibiliTest < ActiveSupport::TestCase
+module Source::Extractor::Tests
+  class BilibiliExtractorTest < ActiveSupport::TestCase
     context "A t.bilibili.com/:id post" do
       strategy_should_work(
         "https://t.bilibili.com/686082748803186697",
@@ -35,7 +35,7 @@ module Sources
         tag_name: "bilibili_11742550",
         tags: %w[],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "【崩坏3】少女，泳装，夏日时光！":[https://www.bilibili.com/video/BV1fB4y1Y7zt/] 新视频的图片分享！大家记得来康"[崩坏3_送你一朵花]":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
         EOS
       )
@@ -63,7 +63,7 @@ module Sources
         tag_name: "bilibili_11742550",
         tags: %w[],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "【崩坏3】少女，泳装，夏日时光！":[https://www.bilibili.com/video/BV1fB4y1Y7zt/] 新视频的图片分享！大家记得来康"[崩坏3_送你一朵花]":[https://i0.hdslb.com/bfs/emote/d8c665db9fdc69b3b90c71de3fe05536ac795409.png]
         EOS
       )
@@ -79,7 +79,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "[海伊_打call]":[http://i0.hdslb.com/bfs/emote/462e4aa7dba54497f3692ad445ff31c3c176474d.png]//"@海伊Official":[https://space.bilibili.com/277698869/dynamic]:平行四界作词课预计寒假开始，以下是大纲及介绍"[星尘_比心]":[http://i0.hdslb.com/bfs/emote/fd8aa275d5d91cdf71410bc1a738415fd6e2ab86.png]"[海伊_比心]":[http://i0.hdslb.com/bfs/emote/c548b527593a3d21e5082c26abbf61c63701f11a.png]
         EOS
       )
@@ -105,7 +105,7 @@ module Sources
           ["凯迪拉克XT4", "https://search.bilibili.com/all?keyword=凯迪拉克XT4"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           风起雷涌，特别的旅途！
           芜湖～"[星星眼]":[https://i0.hdslb.com/bfs/emote/63c9d1a31c0da745b61cdb35e0ecb28635675db2.png]凯迪拉克诚邀各路达人参与"#一起用原神痛车#":[https://search.bilibili.com/all?keyword=%E4%B8%80%E8%B5%B7%E7%94%A8%E5%8E%9F%E7%A5%9E%E7%97%9B%E8%BD%A6]大赛，利用指定素材创作你心目中特别的旅途，上传别具创意的痛车设计或同人作品，一起瓜分10万大奖~
           还有还有！你们心心念念的"[打call]":[https://i0.hdslb.com/bfs/emote/431432c43da3ee5aab5b0e4f8931953e649e9975.png]凯迪拉克X原神 限定周边大放送哟！
@@ -150,28 +150,28 @@ module Sources
         tag_name: "bilibili_285452636",
         tags: [],
         dtext_artist_commentary_title: "斗罗大陆 4，觉醒后的古月娜（第一期）",
-        dtext_artist_commentary_desc: <<~EOS.chomp
-        超喜欢
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          超喜欢
 
-        2
+          2
 
-        3
+          3
 
-        4
+          4
 
-        5
+          5
 
-        6
+          6
 
-        7
+          7
 
-        8
+          8
 
-        9
+          9
 
-        10
+          10
 
-        不定时更新，兴趣爱好！
+          不定时更新，兴趣爱好！
         EOS
       )
     end
@@ -207,7 +207,7 @@ module Sources
           ["VirtuaReal", "https://search.bilibili.com/all?keyword=VirtuaReal"],
         ],
         dtext_artist_commentary_title: "VirtuaReal Project新成员公布！长期开启招募中~",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           VirtuaReal新一期成员来啦！
 
           废话不说，上正文——
@@ -305,7 +305,7 @@ module Sources
         media_files: [{ file_size: 515_583 }],
         page_url: nil,
         profile_url: nil,
-        tag_name: nil
+        tag_name: nil,
       )
     end
 
@@ -316,7 +316,7 @@ module Sources
         media_files: [{ file_size: 1_536_450 }],
         page_url: nil,
         profile_url: "https://space.bilibili.com/11742550",
-        tag_name: "bilibili_11742550"
+        tag_name: "bilibili_11742550",
       )
     end
 
@@ -336,40 +336,10 @@ module Sources
           ["唐九夏", "https://search.bilibili.com/all?keyword=唐九夏"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "#吉诺儿kino#":[https://search.bilibili.com/all?keyword=%E5%90%89%E8%AF%BA%E5%84%BFkino] "#唐九夏#":[https://search.bilibili.com/all?keyword=%E5%94%90%E4%B9%9D%E5%A4%8F] 今天是大雪！！今天也好冷啊"[冷]":[https://i0.hdslb.com/bfs/emote/cb0ebbd0668640f07ebfc0e03f7a18a8cd00b4ed.png] 之前在直播的时候说的，"@唐九夏还想再躺一下 ":[https://space.bilibili.com/1219196749/dynamic]的原创新曲《檐下雪》就快来啦！！歌肯定是很好听的，但最厉害的是这首曲子可是九夏作词的！！大家记得要来听啊啊啊！！！
         EOS
       )
-    end
-
-    should "Parse Bilibili URLs correctly" do
-      assert_equal("https://h.bilibili.com/8773541", Source::URL.page_url("https://www.bilibili.com/p/h5/8773541"))
-      assert_equal("https://www.bilibili.com/opus/612214375070704555", Source::URL.page_url("https://m.bilibili.com/dynamic/612214375070704555"))
-      assert_equal("https://www.bilibili.com/opus/612214375070704555", Source::URL.page_url("https://t.bilibili.com/612214375070704555"))
-
-      assert(Source::URL.page_url?("https://t.bilibili.com/612214375070704555"))
-      assert(Source::URL.page_url?("https://www.bilibili.com/opus/612214375070704555"))
-      assert(Source::URL.page_url?("https://h.bilibili.com/8773541"))
-      assert(Source::URL.page_url?("https://www.bilibili.com/read/cv7360489"))
-      assert(Source::URL.page_url?("https://www.bilibili.com/video/BV1dY4y1u7Vi"))
-
-      assert(Source::URL.image_url?("https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg"))
-      assert(Source::URL.image_url?("https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif"))
-      assert(Source::URL.image_url?("https://album.biliimg.com/bfs/new_dyn/4cf244d3fb706a5726b6383143960931504164361.jpg"))
-
-      assert_equal("https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg", Source::URL.parse("https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg@1036w.webp").full_image_url)
-      assert_equal("https://i0.hdslb.com/bfs/new_dyn/716a9733fc804d11d823cfacb7a3c78b11742550.jpg", Source::URL.parse("https://i0.hdslb.com/bfs/new_dyn/716a9733fc804d11d823cfacb7a3c78b11742550.jpg@208w_208h_1e_1c.webp").full_image_url)
-      assert_equal("https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif", Source::URL.parse("https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif@1036w.webp").full_image_url)
-      assert_equal("https://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg", Source::URL.parse("https://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp").full_image_url)
-      assert_equal("https://album.biliimg.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg", Source::URL.parse("https://album.biliimg.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp").full_image_url)
-      assert_equal("https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png", Source::URL.parse("https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png").full_image_url)
-
-      assert(Source::URL.profile_url?("https://space.bilibili.com/355143"))
-
-      assert_not(Source::URL.profile_url?("https://space.bilibili.com"))
-
-      assert_nil(Source::URL.bad_source?("https://live.bilibili.com/blackboard/era/VSuE0f27CnXe3VSY.html"))
-      assert_nil(Source::URL.bad_source?("https://live.bilibili.com/10049889?from=search&seid=8525275464641122982"))
     end
   end
 end
