@@ -93,7 +93,7 @@ class BulkUpdateRequest < ApplicationRecord
 
   def validate_script
     if processor.invalid?(:request)
-      errors.add(:base, processor.errors.full_messages.join("; "))
+      processor.errors.full_messages.each { |error| errors.add(:base, error) }
     end
   end
 

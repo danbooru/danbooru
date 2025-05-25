@@ -121,24 +121,24 @@ class TagImplication < TagRelationship
       return if antecedent_tag.empty? || consequent_tag.empty?
 
       if antecedent_tag.post_count < MINIMUM_TAG_COUNT
-        errors.add(:base, "'#{antecedent_name}' must have at least #{MINIMUM_TAG_COUNT} posts")
+        errors.add(:base, "[[#{antecedent_name}]] must have at least #{MINIMUM_TAG_COUNT} posts")
       elsif antecedent_tag.post_count < (MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count)
-        errors.add(:base, "'#{antecedent_name}' must have at least #{(MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count).ceil.to_i} posts")
+        errors.add(:base, "[[#{antecedent_name}]] must have at least #{(MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count).ceil.to_i} posts")
       end
 
       max_count = MAXIMUM_TAG_PERCENTAGE * PostQuery.new("~#{antecedent_name} ~#{consequent_name}").fast_count(timeout: 0).to_i
       if antecedent_tag.post_count > max_count && max_count > 0
-        errors.add(:base, "'#{antecedent_name}' can't make up more than #{(MAXIMUM_TAG_PERCENTAGE * 100).to_i}% of '#{consequent_name}'")
+        errors.add(:base, "[[#{antecedent_name}]] can't make up more than #{(MAXIMUM_TAG_PERCENTAGE * 100).to_i}% of [[#{consequent_name}]]")
       end
     end
 
     def has_wiki_page
       if !antecedent_tag.empty? && antecedent_wiki.blank?
-        errors.add(:base, "'#{antecedent_name}' must have a wiki page")
+        errors.add(:base, "[[#{antecedent_name}]] must have a wiki page")
       end
 
       if !consequent_tag.empty? && consequent_wiki.blank?
-        errors.add(:base, "'#{consequent_name}' must have a wiki page")
+        errors.add(:base, "[[#{consequent_name}]] must have a wiki page")
       end
     end
   end
