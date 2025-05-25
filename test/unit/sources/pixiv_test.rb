@@ -37,7 +37,7 @@ module Sources
           "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364",
           image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 33_197, frame_delays: [125, 125], md5: "87ddf73e2c6fccef8dd6870cdfc0f245" }
+            { file_size: 33_197, frame_delays: [125, 125], pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -64,7 +64,7 @@ module Sources
           "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip",
           image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 33_197, frame_delays: [125, 125], md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
+            { file_size: 33_197, frame_delays: [125, 125], pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -81,7 +81,7 @@ module Sources
           "https://i.pximg.net/img-master/img/2017/04/04/08/57/38/62247364_master1200.jpg",
           image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 33_197, frame_delays: [125, 125], md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
+            { file_size: 33_197, frame_delays: [125, 125], pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -110,6 +110,7 @@ module Sources
               width: 3600,
               height: 2560,
               frame_delays: [125] * 42,
+              pixel_hash: "0fc604bc072fbb4bce9326ef5e70172a",
               md5: "cc72a104755b7e032444742d84d74425",
               animation_json: {
                 "illustId" => 113_760_314,

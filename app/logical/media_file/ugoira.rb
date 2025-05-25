@@ -173,6 +173,17 @@ class MediaFile::Ugoira < MediaFile
     @frame_delays ||= animation_json_frames.pluck("delay")
   end
 
+  # @return [String] The pixel hash of the ugoira.
+  memoize def pixel_hash
+    data = {
+      frames: frames.map.with_index do |frame, i|
+        { pixel_hash: frame.pixel_hash, duration: frame_delays[i] }
+      end,
+    }
+
+    Digest::MD5.hexdigest(data.to_json)
+  end
+
   # @return [Array<Hash>, nil] The 'frames' array from the animation.json file, if present.
   memoize def animation_json_frames
     case animation_json

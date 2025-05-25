@@ -358,6 +358,8 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal(4.76, @ugoira.frame_rate.round(2))
         assert_equal(5, @ugoira.files.size)
         assert_equal(5, @ugoira.frame_count)
+        assert_equal("af38ac9842a0afe344a66d377d91c842", @ugoira.pixel_hash)
+        assert_equal("0d94800c4b520bf3d8adda08f95d31e2", @ugoira.md5)
 
         assert_equal([200, 200, 200, 200, 250], @ugoira.metadata["Ugoira:FrameDelays"])
         assert_equal([0, 1679, 3588, 5189, 5989], @ugoira.metadata["Ugoira:FrameOffsets"])
@@ -399,6 +401,7 @@ class MediaFileTest < ActiveSupport::TestCase
         assert_equal(60, new_ugoira.animation_json[:width])
         assert_equal(60, new_ugoira.animation_json[:height])
         assert_equal(7_202, new_ugoira.size)
+        assert_equal("af38ac9842a0afe344a66d377d91c842", new_ugoira.pixel_hash)
         assert_equal("e0bd8afa96e30605e4bc4a3f9585afd6", new_ugoira.md5)
 
         assert_equal(60, new_ugoira.animation_json[:width])
@@ -419,6 +422,7 @@ class MediaFileTest < ActiveSupport::TestCase
       should "find the files and frame delays" do
         MediaFile.open("test/files/ugoira/ugoira-95239241-gallery-dl.zip") do |ugoira|
           assert_equal(79_276, ugoira.size)
+          assert_equal("68007e305a081faae3be65d3edbd4eb1", ugoira.pixel_hash)
           assert_equal("7fe767b4e202415a2b2dec2a82be3b69", ugoira.md5)
           assert_equal(11, ugoira.files.size)
           assert_equal(10, ugoira.frame_count)
@@ -435,6 +439,7 @@ class MediaFileTest < ActiveSupport::TestCase
       should "find the files and frame delays" do
         MediaFile.open("test/files/ugoira/ugoira-95239241-pixivutil2.zip") do |ugoira|
           assert_equal(41_745, ugoira.size)
+          assert_equal("68007e305a081faae3be65d3edbd4eb1", ugoira.pixel_hash)
           assert_equal("dbfe1d5764eb24f3d55224f85ef3383c", ugoira.md5)
           assert_equal(11, ugoira.files.size)
           assert_equal(10, ugoira.frame_count)
@@ -451,6 +456,7 @@ class MediaFileTest < ActiveSupport::TestCase
       should "find the files and frame delays" do
         MediaFile.open("test/files/ugoira/ugoira-95239241-pixivtoolkit.zip") do |ugoira|
           assert_equal(41_747, ugoira.size)
+          assert_equal("68007e305a081faae3be65d3edbd4eb1", ugoira.pixel_hash)
           assert_equal("8d03702cc61e625b03cca3d556a163a1", ugoira.md5)
           assert_equal(11, ugoira.files.size)
           assert_equal(10, ugoira.frame_count)
@@ -467,6 +473,7 @@ class MediaFileTest < ActiveSupport::TestCase
       should "find the files and frame delays" do
         MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip") do |ugoira|
           assert_equal(79_865, ugoira.size)
+          assert_equal("68007e305a081faae3be65d3edbd4eb1", ugoira.pixel_hash)
           assert_equal("72e8c2f6c6783efaeb4830d26ddfd17d", ugoira.md5)
           assert_equal(11, ugoira.files.size)
           assert_equal(10, ugoira.frame_count)
