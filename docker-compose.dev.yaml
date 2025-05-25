@@ -72,7 +72,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: ["bin/rails", "db:prepare"]
+    command: ["bin/rails", "db:prepare", "db:test:prepare"]
 
   danbooru:
     <<: *base-template

@@ -52,6 +52,5 @@
     "DANBOORU_TWITTER_CSRF_TOKEN": {
       "description": "Your Twitter `ct0` cookie. Required for Twitter upload support."
     }
-  },
-  "postCreateCommand": "bin/rails db:test:prepare"
+  }
 }
