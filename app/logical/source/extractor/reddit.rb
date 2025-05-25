@@ -10,8 +10,7 @@ module Source
         elsif parsed_url.image_url?
           [parsed_url.to_s]
         elsif post_data.present?
-          # images += [data.dig("media", "content")].compact unless crosspost? || data.dig("media", "type") == "embed"
-          return [external_image] if external_image.present?
+          return [] if is_external_image?
           return [] if crosspost?
 
           images = []
@@ -41,6 +40,10 @@ module Source
         if post_data["post_hint"] == "image" && !post_data["is_reddit_media_domain"]
           Source::URL.parse(post_data["url"])&.full_image_url
         end
+      end
+
+      def is_external_image?
+        post_data["post_hint"] == "image" && !post_data["is_reddit_media_domain"]
       end
 
       def profile_url

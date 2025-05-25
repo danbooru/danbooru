@@ -101,8 +101,7 @@ module Sources
     context "A reddit post with an external image" do
       strategy_should_work(
         "https://www.reddit.com/r/yuri_jp/comments/1kis50l/七海_x_たきうみ/",
-        image_urls: %w[https://pbs.twimg.com/media/Gjkgt0IbIAA7322.jpg:orig],
-        media_files: [{ file_size: 1_920_013 }],
+        image_urls: %w[],
         page_url: "https://www.reddit.com/r/yuri_jp/comments/1kis50l/七海_x_たきうみ/",
         profile_url: "https://www.reddit.com/user/praha_the_botv",
         profile_urls: %w[https://www.reddit.com/user/praha_the_botv],
