@@ -127,6 +127,15 @@ class MediaFile::Ugoira < MediaFile
     stream&.close
   end
 
+  def file_ext
+    :zip # XXX Should return :ugoira in the future.
+  end
+
+  # @return [Mime::Type] The MIME type of the ugoira.
+  def mime_type
+    Mime::Type.lookup("video/x-ugoira")
+  end
+
   # @return [ExifTool::Metadata] The metadata for the file.
   memoize def metadata
     super.merge(

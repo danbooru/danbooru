@@ -244,12 +244,6 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal("1f9a43dbebb2195a8f7d9e0eede51e4b", MediaFile.pixel_hash("test/files/compressed.swf"))
     end
 
-    should "return the file's md5 for Ugoira files" do
-      frame_delays = JSON.parse(File.read("test/files/ugoira/animation.json")).pluck("delay")
-      ugoira = MediaFile.open("test/files/ugoira/ugoira.zip", frame_delays: frame_delays)
-      assert_equal("0d94800c4b520bf3d8adda08f95d31e2", ugoira.pixel_hash)
-    end
-
     should "return the file's md5 for video files" do
       assert_equal("34dd2489f7aaa9e57eda1b996ff26ff7", MediaFile.pixel_hash("test/files/webm/test-512x512.webm"))
       assert_equal("865c93102cad3e8a893d6aac6b51b0d2", MediaFile.pixel_hash("test/files/mp4/test-300x300.mp4"))
@@ -343,7 +337,17 @@ class MediaFileTest < ActiveSupport::TestCase
   end
 
   context "A ugoira:" do
-    context "a ugoira .zip file without an animation.json file" do
+    context "a .zip file without an animation.json file or separate frame delays" do
+      should "not be recognized as a ugoira" do
+        file = MediaFile.open("test/files/ugoira/ugoira.zip")
+
+        assert_equal(MediaFile, file.class)
+        assert_equal(:zip, file.file_ext)
+        assert_equal("application/zip", file.mime_type.to_s)
+      end
+    end
+
+    context "a ugoira .zip file without an animation.json file but with separate frame delays" do
       setup do
         frame_delays = JSON.parse(File.read("test/files/ugoira/animation.json")).pluck("delay")
         @ugoira = MediaFile.open("test/files/ugoira/ugoira.zip", frame_delays: frame_delays)
@@ -354,6 +358,8 @@ class MediaFileTest < ActiveSupport::TestCase
       end
 
       should "get the metadata" do
+        assert_equal(:zip, @ugoira.file_ext)
+        assert_equal("video/x-ugoira", @ugoira.mime_type.to_s)
         assert_equal(1.05, @ugoira.duration)
         assert_equal(4.76, @ugoira.frame_rate.round(2))
         assert_equal(5, @ugoira.files.size)

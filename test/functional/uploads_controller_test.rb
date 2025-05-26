@@ -148,7 +148,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file } }}
 
         assert_response 201
-        assert_match("File is not an image or video", Upload.last.error)
+        assert_equal("File is not an image or video", Upload.last.error)
       end
 
       context "for a file larger than the file size limit" do
@@ -490,6 +490,47 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "uploading a ugoira file from your computer" do
+        should "work for a ugoira in gallery-dl format" do
+          upload = assert_successful_upload("test/files/ugoira/ugoira-95239241-gallery-dl.zip", user: @user)
+          media_asset = upload.media_assets.first
+          metadata = media_asset.metadata
+
+          assert_equal(1, upload.media_asset_count)
+          assert_equal(1, upload.upload_media_assets.size)
+          assert_equal("file://ugoira-95239241-gallery-dl.zip", upload.upload_media_assets.first.source_url)
+          assert_equal("zip", media_asset.file_ext)
+          assert_equal("7fe767b4e202415a2b2dec2a82be3b69", media_asset.md5)
+          assert_equal([170] * 10, metadata["Ugoira:FrameDelays"])
+        end
+
+        should "work for a ugoira in PixivUtil2 format" do
+          upload = assert_successful_upload("test/files/ugoira/ugoira-95239241-pixivutil2.zip", user: @user)
+          media_asset = upload.media_assets.first
+          metadata = media_asset.metadata
+
+          assert_equal(1, upload.media_asset_count)
+          assert_equal(1, upload.upload_media_assets.size)
+          assert_equal("file://ugoira-95239241-pixivutil2.zip", upload.upload_media_assets.first.source_url)
+          assert_equal("zip", media_asset.file_ext)
+          assert_equal("dbfe1d5764eb24f3d55224f85ef3383c", media_asset.md5)
+          assert_equal([170] * 10, metadata["Ugoira:FrameDelays"])
+        end
+
+        should "work for a ugoira in PixivToolkit format" do
+          upload = assert_successful_upload("test/files/ugoira/ugoira-95239241-pixivtoolkit.zip", user: @user)
+          media_asset = upload.media_assets.first
+          metadata = media_asset.metadata
+
+          assert_equal(1, upload.media_asset_count)
+          assert_equal(1, upload.upload_media_assets.size)
+          assert_equal("file://ugoira-95239241-pixivtoolkit.zip", upload.upload_media_assets.first.source_url)
+          assert_equal("zip", media_asset.file_ext)
+          assert_equal("8d03702cc61e625b03cca3d556a163a1", media_asset.md5)
+          assert_equal([170] * 10, metadata["Ugoira:FrameDelays"])
+        end
+      end
+
       context "uploading a .rar file from your computer" do
         should "work" do
           upload = assert_successful_upload("test/files/archive/ugoira.rar", user: @user)
@@ -528,12 +569,35 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "uploading a ugoira" do
-        should "work" do
+      context "uploading a ugoira from a source" do
+        should "work for a ugoira from Pixiv" do
           upload = assert_successful_upload("https://www.pixiv.net/en/artworks/45982180", user: @user)
 
           assert_equal([60] * 70, upload.media_assets.first.metadata["Ugoira:FrameDelays"])
           assert_equal(:webm, upload.media_assets.first.variant(:sample).open_file.file_ext)
+        end
+
+        should "work for a ugoira from another site" do
+          upload = assert_successful_upload("https://files.catbox.moe/e60b4y.zip", user: @user)
+          media_asset = upload.media_assets.first
+          metadata = media_asset.metadata
+
+          assert_equal(1, upload.media_asset_count)
+          assert_equal(1, upload.upload_media_assets.size)
+          assert_equal("https://files.catbox.moe/e60b4y.zip", upload.upload_media_assets.first.source_url)
+          assert_equal("zip", media_asset.file_ext)
+          assert_equal("7fe767b4e202415a2b2dec2a82be3b69", media_asset.md5)
+          assert_equal([170] * 10, metadata["Ugoira:FrameDelays"])
+        end
+      end
+
+      context "uploading a .zip file from a source" do
+        should "not work" do
+          create_upload!("https://files.catbox.moe/afau3v.zip", user: @user)
+
+          assert_response 201
+          assert_equal(true, Upload.last.is_errored?)
+          assert_equal("File is not an image or video", Upload.last.error)
         end
       end
 

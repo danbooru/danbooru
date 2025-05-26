@@ -4,6 +4,7 @@ class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
   FILE_TYPES = %w[jpg png gif webp avif mp4 webm swf zip]
+  FILE_MIME_TYPES = %w[image/jpeg image/png image/gif image/webp image/avif video/mp4 video/webm application/x-shockwave-flash video/x-ugoira]
   FILE_KEY_LENGTH = 9
   VARIANTS = %i[180x180 360x360 720x720 sample full original]
   MAX_FILE_SIZE = Danbooru.config.max_file_size.to_i
@@ -337,7 +338,7 @@ class MediaAsset < ApplicationRecord
       end
 
       def validate_media_file!(media_file, uploader)
-        if !media_file.file_ext.to_s.in?(FILE_TYPES)
+        if !media_file.mime_type.to_s.in?(FILE_MIME_TYPES)
           raise Error, "File is not an image or video"
         elsif !media_file.is_supported?
           raise Error, "File type is not supported"
