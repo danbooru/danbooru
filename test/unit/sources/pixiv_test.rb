@@ -35,7 +35,7 @@ module Sources
       context "A ugoira page URL" do
         strategy_should_work(
           "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364",
-          image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
+          image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip?original"],
           media_files: [
             { file_size: 33_197, frame_delays: [125, 125], pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
           ],
@@ -59,10 +59,10 @@ module Sources
         end
       end
 
-      context "A https://i.pximg.net/img-zip-ugoira/* image URL" do
+      context "A ugoira zip URL" do
         strategy_should_work(
           "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip",
-          image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
+          image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip?original"],
           media_files: [
             { file_size: 33_197, frame_delays: [125, 125], pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
           ],
@@ -76,12 +76,12 @@ module Sources
         )
       end
 
-      context "A ugoira sample URL" do
+      context "A ugoira sample frame URL" do
         strategy_should_work(
           "https://i.pximg.net/img-master/img/2017/04/04/08/57/38/62247364_master1200.jpg",
           image_urls: ["https://i.pximg.net/img-original/img/2017/04/04/08/57/38/62247364_ugoira0.png"],
           media_files: [
-            { file_size: 33_197, frame_delays: [125, 125], pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
+            { file_size: 16_275, md5: "4ceadc314938bc27f3574053a3e1459a" },
           ],
           page_url: "https://www.pixiv.net/artworks/62247364",
           profile_url: "https://www.pixiv.net/users/22252953",
@@ -90,6 +90,16 @@ module Sources
           tags: %w[Ugoira png blue],
           dtext_artist_commentary_title: "ugoira",
           dtext_artist_commentary_desc: "",
+        )
+      end
+
+      context "A ugoira original frame URL" do
+        strategy_should_work(
+          "https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira1.png",
+          image_urls: %w[https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira1.png],
+          media_files: [{ file_size: 10_155 }],
+          page_url: "https://www.pixiv.net/artworks/120834265",
+          profile_urls: %w[https://www.pixiv.net/users/1802419 https://www.pixiv.net/stacc/thejunebug]
         )
       end
 
@@ -103,7 +113,7 @@ module Sources
         # https://www.pixiv.net/artworks/115856599
         strategy_should_work(
           "https://www.pixiv.net/artworks/113760314",
-          image_urls: ["https://i.pximg.net/img-original/img/2023/11/27/19/51/28/113760314_ugoira0.png"],
+          image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2023/11/27/19/51/28/113760314_ugoira1920x1080.zip?original"],
           media_files: [
             {
               file_size: 5_320_292,
@@ -170,7 +180,7 @@ module Sources
         )
       end
 
-      context "A revised ugoira direct URL should fail" do
+      context "A revised ugoira zip URL should fail" do
         strategy_should_work(
           "https://i.pximg.net/img-zip-ugoira/img/2024/03/24/07/15/10/117197872_ugoira1920x1080.zip",
           image_urls: []

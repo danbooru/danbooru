@@ -9,16 +9,13 @@ module Source
       end
 
       def image_urls
-        # For ugoira we have to fetch the frame metadata from API,
-        # which may be incorrect for revisions.
-        # Therefore, get the latest revision URL from API,
-        # and, if we know the revision date, check that it matches.
-        if is_ugoira?
-          if parsed_url.date.present?
-            original_urls.select{ |url| Source::URL.parse(url).date == parsed_url.date }
-          else
-            original_urls
-          end
+        # For ugoira we have to fetch the frame metadata from the API, which may be incorrect for revisions.
+        # Therefore, check that the date in the URL matches the date of the latest revision URL from the API.
+        #
+        # https://i.pximg.net/img-zip-ugoira/img/2024/10/17/12/31/43/123406986_ugoira1920x1080.zip
+        # https://i.pximg.net/img-zip-ugoira/img/2024/10/22/02/32/43/123406986_ugoira1920x1080.zip
+        if parsed_url.ugoira_zip_url? && parsed_url.date != ugoira_zip_url.date
+          [] # Return nothing because the ugoira has been revised, so we can't be sure we have the correct frame delays.
         # If it's a full image URL, then use it as-is instead of looking it up in the API, because it could be the
         # original version of an image that has since been revised.
         elsif parsed_url.full_image_url.present?
@@ -38,7 +35,9 @@ module Source
       end
 
       def original_urls
-        if api_pages.present?
+        if ugoira_zip_url.present?
+          [ugoira_zip_url.to_s]
+        elsif api_pages.present?
           api_pages.pluck("urls").pluck("original").to_a
         elsif api_novel.present?
           cover_url = Source::URL.parse(api_novel[:coverUrl]).candidate_full_image_urls.find { |url| http_exists?(url) } || api_novel[:coverUrl]
@@ -158,19 +157,29 @@ module Source
       end
 
       def download_file!(url)
-        if is_ugoira?
+        url = Source::URL.parse(url)
+
+        if url.ugoira_zip_url? && url.params.key?(:original)
           ugoira_file
         else
-          super(url)
+          super(url.to_s)
         end
+      end
+
+      # @return [Source::URL, nil] The URL to the current ugoira zip file, or nil if this is not a ugoira.
+      memoize def ugoira_zip_url
+        frame_url = api_pages.pluck("urls")&.pick("original")
+        zip_url = Source::URL.parse(frame_url)&.ugoira_zip_url
+
+        Source::URL.parse(zip_url)
       end
 
       # @return [Array<String>] The list of URLs to the individual frames in the original ugoira.
       memoize def ugoira_frame_urls
-        base_url = Source::URL.parse(original_urls.first)
+        base_frame_url = api_pages.pluck("urls")&.pick("original")&.then { |url| Source::URL.parse(url) }
 
         ugoira_frame_delays.size.times.map do |n|
-          base_url.ugoira_frame_url(n)
+          base_frame_url.ugoira_frame_url(n)
         end
       end
 
