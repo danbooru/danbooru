@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
-module Sources
-  class FanboxTest < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class FanboxExtractorTest < ActiveSupport::TestCase
     context "A free Pixiv Fanbox post" do
       strategy_should_work(
         "https://yanmi0308.fanbox.cc/posts/1141325",
@@ -26,7 +26,7 @@ module Sources
         tags: [
           ["栗山やんみ", "https://fanbox.cc/tags/栗山やんみ"], ["VTuber", "https://fanbox.cc/tags/VTuber"], ["三面図", "https://fanbox.cc/tags/三面図"],
           ["イラスト", "https://fanbox.cc/tags/イラスト"], ["ロゴデザイン", "https://fanbox.cc/tags/ロゴデザイン"], ["モデリング", "https://fanbox.cc/tags/モデリング"],
-        ]
+        ],
       )
     end
 
@@ -48,7 +48,7 @@ module Sources
           { file_size: 245_678 },
           { file_size: 320_056 },
           { file_size: 666_681 },
-        ]
+        ],
       )
     end
 
@@ -62,7 +62,7 @@ module Sources
         profile_url: "https://chanxco.fanbox.cc",
         media_files: [{ file_size: 320_056 }],
         display_name: "CHANxCO",
-        username: "chanxco"
+        username: "chanxco",
       )
     end
 
@@ -73,7 +73,7 @@ module Sources
         artist_commentary_desc: "これからセックスしまーす♪と言ってるシーン(･ω･｀)\nhttps://downloads.fanbox.cc/images/post/1306390/VOXblkyvltL5fRhMoR7RdSkk.png\n※海苔強化して再アップしました( 'A`;)\n",
         profile_url: "https://mfr.fanbox.cc",
         display_name: "もふりる",
-        username: "mfr"
+        username: "mfr",
       )
     end
 
@@ -85,7 +85,7 @@ module Sources
           "https://downloads.fanbox.cc/files/post/3975317/hbydNywJEmIlUeL5lTQfQjJi.mp4",
         ],
         display_name: "懈怠の心",
-        username: "gomeifuku"
+        username: "gomeifuku",
       )
     end
 
@@ -103,7 +103,7 @@ module Sources
           ["全体公開", "https://fanbox.cc/tags/全体公開"],
         ],
         dtext_artist_commentary_title: "さとり タイムラプス",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           あけましておめでとうございます～
           今年もぼちぼち頑張っていきますよー
         EOS
@@ -116,7 +116,7 @@ module Sources
         media_files: [{ file_size: 562_582 }],
         profile_url: "https://omu001.fanbox.cc",
         display_name: "むっしゅ",
-        username: "omu001"
+        username: "omu001",
       )
     end
 
@@ -131,7 +131,7 @@ module Sources
         username: "intokuinfo",
         tags: [],
         dtext_artist_commentary_title: "【みんな向け】落書きその２　ドラクエ１１のベロニカ　支援者向け高解像度版（横1920 縦1080）",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           間が空いちゃって済みません！商業の方、無事に終わりまして、シュクラの方を詰めてました。
           すげーわかりやすくいうと、余剰なエッチな気をある地区に集めて、それを男たちに憑依させてエッチして解消するのがシュノン
           みたいな感じです！明日からはモノクロでチマチマあげられると思います！コーランも合わせて薦めます！
@@ -151,7 +151,7 @@ module Sources
         username: "verdey1104",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -191,33 +191,6 @@ module Sources
         artist_commentary_desc: nil,
         tags: [],
       )
-    end
-
-    should "Parse Fanbox URLs correctly" do
-      assert_equal("https://www.pixiv.net/fanbox/creator/1566167", Source::URL.page_url("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg"))
-
-      assert(Source::URL.image_url?("https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg"))
-      assert(Source::URL.image_url?("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg"))
-      assert(Source::URL.image_url?("https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png"))
-
-      assert(Source::URL.page_url?("https://www.fanbox.cc/@tsukiori/posts/1080657"))
-      assert(Source::URL.page_url?("https://www.pixiv.net/fanbox/creator/1566167/post/39714"))
-      assert(Source::URL.page_url?("https://omu001.fanbox.cc/posts/39714"))
-
-      assert(Source::URL.profile_url?("https://www.pixiv.net/fanbox/creator/1566167"))
-      assert(Source::URL.profile_url?("https://pixiv.net/fanbox/creator/1566167"))
-      assert(Source::URL.profile_url?("https://www.pixiv.net/fanbox/member.php?user_id=3410642"))
-      assert(Source::URL.profile_url?("https://pixiv.net/fanbox/member.php?user_id=3410642"))
-      assert(Source::URL.profile_url?("https://omu001.fanbox.cc"))
-      assert(Source::URL.profile_url?("https://www.fanbox.cc/@tsukiori"))
-      assert_not(Source::URL.profile_url?("https://www.fanbox.cc"))
-      assert_not(Source::URL.profile_url?("https://fanbox.cc"))
-
-      assert_equal("omu001", Source::URL.parse("https://fanbox.cc/@omu001").username)
-      assert_equal("omu001", Source::URL.parse("https://www.fanbox.cc/@omu001").username)
-      assert_equal("omu001", Source::URL.parse("https://www.fanbox.cc/@omu001/posts/39714").username)
-      assert_equal("omu001", Source::URL.parse("https://fanbox.cc/@omu001/posts/39714").username)
-      assert_equal("omu001", Source::URL.parse("https://omu001.fanbox.cc/posts/39714").username)
     end
   end
 end

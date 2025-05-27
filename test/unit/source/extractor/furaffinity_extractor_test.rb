@@ -1,7 +1,7 @@
 require "test_helper"
 
-module Sources
-  class FuraffinityTest < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class FuraffinityExtractorTest < ActiveSupport::TestCase
     context "A furaffinity post" do
       strategy_should_work(
         "https://www.furaffinity.net/view/46821705/",
@@ -11,7 +11,7 @@ module Sources
         display_name: "iwbitu",
         username: nil,
         artist_commentary_title: "Yubi",
-        artist_commentary_desc: /little gift doodle for/
+        artist_commentary_desc: /little gift doodle for/,
       )
     end
 
@@ -23,7 +23,7 @@ module Sources
         display_name: nil,
         username: "iwbitu",
         page_url: nil,
-        artist_commentary_title: nil
+        artist_commentary_title: nil,
       )
     end
 
@@ -37,7 +37,7 @@ module Sources
         username: nil,
         tags: [],
         artist_commentary_title: "Nyopu and Tori",
-        artist_commentary_desc: /UwU/
+        artist_commentary_desc: /UwU/,
       )
     end
 
@@ -48,7 +48,7 @@ module Sources
     context "A furaffinity post with non-ascii image url" do
       strategy_should_work(
         "https://www.furaffinity.net/view/20762907/",
-        image_urls: ["https://d.furaffinity.net/art/fhedge/1470365580/1470365580.fhedge_ミストランサーまとめアートボード_1.jpg"]
+        image_urls: ["https://d.furaffinity.net/art/fhedge/1470365580/1470365580.fhedge_ミストランサーまとめアートボード_1.jpg"],
       )
     end
 
@@ -59,7 +59,7 @@ module Sources
         display_name: "mazen234",
         username: nil,
         artist_commentary_title: "Miko Sleeping at the beach~",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Mikey went to get some things from the shop, so Miko probably took some time to herself to rest! Not saying Mikey might be a handful sometimes :P
 
           Glad you loved this piece, Sheep! ^_^
@@ -69,21 +69,6 @@ module Sources
           Art @ CuteSexyRoButts from DeviantArt
         EOS
       )
-    end
-
-    should "Parse Furaffinity URLs correctly" do
-      assert(Source::URL.image_url?("https://d.furaffinity.net/art/iwbitu/1650222955/1650222955.iwbitu_yubi.jpg"))
-      assert(Source::URL.page_url?("https://www.furaffinity.net/view/46821705/"))
-      assert(Source::URL.page_url?("https://www.furaffinity.net/full/46821705/"))
-      assert(Source::URL.profile_url?("https://www.furaffinity.net/user/iwbitu"))
-      assert(Source::URL.profile_url?("https://www.furaffinity.net/gallery/iwbitu"))
-      assert(Source::URL.profile_url?("https://www.furaffinity.net/gallery/iwbitu/folder/133763/Regular-commissions"))
-      assert(Source::URL.profile_url?("https://www.furaffinity.net/stats/duskmoor/submissions/"))
-
-      assert_equal("https://www.furaffinity.net/view/1234", Source::URL.page_url("https://fxraffinity.net/view/1234"))
-      assert_equal("https://www.furaffinity.net/view/1234", Source::URL.page_url("https://fxfuraffinity.net/view/1234"))
-      assert_equal("https://www.furaffinity.net/view/1234", Source::URL.page_url("https://vxfuraffinity.net/view/1234"))
-      assert_equal("https://www.furaffinity.net/view/1234", Source::URL.page_url("https://xfuraffinity.net/view/1234"))
     end
   end
 end

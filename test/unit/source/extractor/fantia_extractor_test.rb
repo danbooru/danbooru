@@ -1,7 +1,7 @@
 require "test_helper"
 
-module Sources
-  class FantiaTest < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class FantiaExtractorTest < ActiveSupport::TestCase
     def setup
       skip "session_id cookie not set" unless Source::Extractor::Fantia.enabled?
     end
@@ -17,7 +17,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "大きく育った心春ちゃん1",
-        dtext_artist_commentary_desc: "色々やります"
+        dtext_artist_commentary_desc: "色々やります",
       )
     end
 
@@ -31,7 +31,7 @@ module Sources
         username: nil,
         tags: %w[オリジナル 漫画],
         dtext_artist_commentary_title: "黒い歴史(5)",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           この回から絵はほとんど今と変わらなくなってきます。が、やはり目が小さすぎました。アップの顔はほぼ全部修正してしまったのでわからないと思いますが、なぜ当時こんなので可愛い女の子を描いてると思ってたのか謎です。
           制服部分とセリフだけ修正して普通の高校だと言い張るという場合の最大の難所がこの回で、体育の授業でいきなり上級生と柔道をやるというのがおかしすぎるので後半は使えなくなりますね。
           あとエロシーンを成年仕様にするということで、ちんこもしっかり描きたいですが、今は公開優先であとからアップデートしていきます。
@@ -50,7 +50,7 @@ module Sources
         username: nil,
         tags: %w[アイドルマスターシンデレラガールズ U149 橘ありす 櫻井桃華 赤城みりあ 佐々木千枝 龍崎薫 チアガール スパッツ アンスコ 放尿 R-18],
         dtext_artist_commentary_title: "チアコス感謝祭（高解像度版+アンスコ生🍞🍋☕差分α 計13枚）",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           U149のアクリルスタンドで描き下ろしされてた新規チアコス。
           色々加えていたら時間がかかりました💦
           この後上部カットインや🍋☕差分を描いていたら地獄を見ることに。
@@ -70,9 +70,9 @@ module Sources
         profile_urls: %w[https://fantia.jp/fanclubs/7],
         display_name: "弱電波@JackDempa",
         username: nil,
-        tags: %w[asmr cg集 illustration\ collection png オリジナル シニョーラ 原神 夏川黒羽 宮前詩帆 春川朱璃愛 音声],
+        tags: ["asmr", "cg集", "illustration collection", "png", "オリジナル", "シニョーラ", "原神", "夏川黒羽", "宮前詩帆", "春川朱璃愛", "音声"],
         dtext_artist_commentary_title: "2021年9月更新分[PNG] - September 2021",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           2021年9月に更新した分の画像データと同じものとなります。
           バックナンバー購入用としてご利用ください。
 
@@ -138,7 +138,7 @@ module Sources
         referer: "https://fantia.jp/products/249638",
         image_urls: ["https://c.fantia.jp/uploads/product_image/file/219407/bd7419c2-2450-4c53-a28a-90101fa466ab.jpg"],
         media_files: [{ file_size: 613_103 }],
-        page_url: "https://fantia.jp/products/249638"
+        page_url: "https://fantia.jp/products/249638",
       )
     end
 
@@ -153,7 +153,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "今日の一枚3186 (1:20+0:40+1:00)",
-        dtext_artist_commentary_desc: "今日の一枚3186 (1:20+0:40+1:00)"
+        dtext_artist_commentary_desc: "今日の一枚3186 (1:20+0:40+1:00)",
       )
     end
 
@@ -174,7 +174,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "今日の一枚3186 (1:20+0:40+1:00)",
-        dtext_artist_commentary_desc: "今日の一枚3186 (1:20+0:40+1:00)"
+        dtext_artist_commentary_desc: "今日の一枚3186 (1:20+0:40+1:00)",
       )
     end
 
@@ -209,7 +209,7 @@ module Sources
           ["スカトロ", "https://fantia.jp/posts?tag=スカトロ"],
         ],
         dtext_artist_commentary_title: "淑女の嗜み",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           つば広お帽子すきです。
           ⭐️お気に入りボタンを押していただけると次の投稿の励みになります。いつも応援ありがとうございます！
 
@@ -248,7 +248,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "リバーシにまけました",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -287,7 +287,7 @@ module Sources
           ["可愛川美遊", "https://fantia.jp/posts?tag=可愛川美遊"],
         ],
         dtext_artist_commentary_title: "ムラムラしてセッ◯スしちゃう嫁💖",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           あそんでつくろ💖
           ※無料プランでも全体図を閲覧可能です！
           右上の【⭐】を押していただければ嬉しいです👌
@@ -316,7 +316,7 @@ module Sources
           { file_size: 78_316 },
         ],
         page_url: "https://fantia.jp/products/249638",
-        profile_urls: %w[https://fantia.jp/fanclubs/7]
+        profile_urls: %w[https://fantia.jp/fanclubs/7],
       )
     end
 
@@ -334,7 +334,7 @@ module Sources
           ["漫画", "https://fantia.jp/posts?tag=漫画"],
         ],
         dtext_artist_commentary_title: "黒い歴史(5)",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           この回から絵はほとんど今と変わらなくなってきます。が、やはり目が小さすぎました。アップの顔はほぼ全部修正してしまったのでわからないと思いますが、なぜ当時こんなので可愛い女の子を描いてると思ってたのか謎です。
           制服部分とセリフだけ修正して普通の高校だと言い張るという場合の最大の難所がこの回で、体育の授業でいきなり上級生と柔道をやるというのがおかしすぎるので後半は使えなくなりますね。
           あとエロシーンを成年仕様にするということで、ちんこもしっかり描きたいですが、今は公開優先であとからアップデートしていきます。
@@ -352,7 +352,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -366,7 +366,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -380,23 +380,8 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
-    end
-
-    should "Parse Fantia URLs correctly" do
-      assert(Source::URL.image_url?("https://c.fantia.jp/uploads/post/file/1070093/16faf0b1-58d8-4aac-9e86-b243063eaaf1.jpeg"))
-      assert(Source::URL.image_url?("https://c.fantia.jp/uploads/product/image/249638/main_fd5aef8f-c217-49d0-83e8-289efb33dfc4.jpg"))
-      assert(Source::URL.image_url?("https://c.fantia.jp/uploads/product_image/file/219407/bd7419c2-2450-4c53-a28a-90101fa466ab.jpg"))
-      assert(Source::URL.image_url?("https://cc.fantia.jp/uploads/post_content_photo/file/4563389/main_a9763427-3ccd-4e51-bcde-ff5e1ce0aa56.jpg?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9wb3N0X2NvbnRlbnRfcGhvdG8vZmlsZS80NTYzMzg5L21haW5fYTk3NjM0MjctM2NjZC00ZTUxLWJjZGUtZmY1ZTFjZTBhYTU2LmpwZyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTY0NjkxMzk3OH19fV19&Signature=jyW5ankfO9uCHlKkozYU9RPpO3jzKTW2HuyXgS81i~cRgrXcI9orYU0IXuiit~0TznIyXbB7F~6Z790t7lX948PYAb9luYIREJC2u7pRMP3OBbsANbbFE0o4VR-6O3ZKbYQ4aG~ofVEZfiFVGoKoVtdJxj0bBNQV29eeFylGQATkFmywne1YMtJMqDirRBFMIatqNuunGsiWCQHqLYNHCeS4dZXlOnV8JQq0u1rPkeAQBmDCStFMA5ywjnWTfSZK7RN6RXKCAsMTXTl5X~I6EZASUPoGQy2vHUj5I-veffACg46jpvqTv6mLjQEw8JG~JLIOrZazKZR9O2kIoLNVGQ__"))
-      assert(Source::URL.image_url?("https://cc.fantia.jp/uploads/post_content/file/1830956/cbcdfcbe_20220224_120_040_100.png?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9wb3N0X2NvbnRlbnQvZmlsZS8xODMwOTU2L2NiY2RmY2JlXzIwMjIwMjI0XzEyMF8wNDBfMTAwLnBuZyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTY0NjkxNDU4Nn19fV19&Signature=d1nw8gs9vcshIAeEH4oESm9-7z6y4A7MfoIRRvtUtV9iqTNA8KM0ORuCI7NwEoYc1VHsxy9ByeuSBpNaJoknnc3TOmHFhVRcLn~OWpnWqiHEPpMcSEG7uGlorysjEPmYYRGHjE7LJYcWiiJxjZ~fSBbYzxxwsjroPm-fyGUtNhdJWEMNp52vHe5P9KErb7M8tP01toekGdOqO-pkWm1t9xm2Tp5P7RWcbtQPOixgG4UgOhE0f3LVwHGHYJV~-lB5RjrDbTTO3ezVi7I7ybZjjHotVUK5MbHHmXzC1NqI-VN3vHddTwTbTK9xEnPMR27NHSlho3-O18WcNs1YgKD48w__"))
-      assert(Source::URL.image_url?("https://fantia.jp/posts/1143951/download/1830956"))
-
-      assert(Source::URL.page_url?("https://fantia.jp/posts/1148334"))
-      assert(Source::URL.page_url?("https://fantia.jp/products/249638"))
-
-      assert(Source::URL.profile_url?("https://fantia.jp/fanclubs/64496"))
-      assert(Source::URL.profile_url?("https://fantia.jp/asanagi"))
     end
   end
 end

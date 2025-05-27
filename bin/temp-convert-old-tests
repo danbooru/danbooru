@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 
+require "active_support/inflector"
+
 assert_normal_pattern = /assert[\( ]?Source::URL\.(\w+)\??\((".*")\)(?:\.(\w+)\?)?/
 assert_equal_pattern = /assert_equal[\( ](".*"), Source::URL\.(\w+\??)\((".*")\)(?:\.(\w+\??))?/
-assert_nil_pattern = /assert_(nil|not)[\( ]Source::URL\.(\w+\??)\((".*")\)(?:\.(\w+))?/
+assert_nil_pattern = /assert_(nil|not)[\( ]Source::URL\.(\w+\??)\((".*")\)(?:\.(\w+\?))?/
 
 normal_cases = {}
 false_positive_cases = {}
@@ -44,7 +46,7 @@ File.read(input_file).each_line do |line|
       false_positive_cases[method_name] ||= []
       false_positive_cases[method_name] << original
     else
-      assert nil_or_not == "nil"
+      raise "'#{nil_or_not}' is not nil -> #{method_name}" unless nil_or_not == "nil"
       equal_cases << [original, method_name, "nil"]
     end
     next
@@ -53,11 +55,20 @@ File.read(input_file).each_line do |line|
   unparsed += [line]
 end
 
-
+puts input_file
+class_name = input_file.delete_suffix("_test.rb").split("/")[-1].camelize
 
 puts <<~EOF
-context "when parsing" do
-  should_identify_url_types(
+###########################
+
+
+require "test_helper"
+
+module Source::Tests::URL
+  class #{class_name}UrlTest < ActiveSupport::TestCase
+
+    context "when parsing" do
+      should_identify_url_types(
 EOF
 
 normal_cases.each do |type, urls|
@@ -88,11 +99,9 @@ if !false_positive_cases.empty?
   end
 end
 
-puts <<~EOF
-  )
-
-
-end
+puts <<-EOF
+      )
+      end
 
 EOF
 
@@ -114,11 +123,19 @@ if !equal_cases.empty?
     EOF
 
   end
-  puts <<~EOF
-  end
+  puts <<-EOF
+      end
 
   EOF
 end
+
+puts <<~EOF
+  end
+end
+
+
+###########################
+EOF
 
 unparsed.each do |line|
   puts "Unparsed: #{line}"
