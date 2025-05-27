@@ -138,6 +138,8 @@ class MediaFile::Ugoira < MediaFile
 
   # @return [ExifTool::Metadata] The metadata for the file.
   memoize def metadata
+    data = super.reject { |key, value| key.starts_with?("ZIP:") }
+
     super.merge(
       "Ugoira:FrameDelays" => frame_delays,
       "Ugoira:FrameOffsets" => frame_offsets,

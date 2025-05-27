@@ -47,8 +47,12 @@ class ExifTool
       @metadata = metadata
     end
 
-    def merge(hash)
-      Metadata.new(metadata.merge(hash))
+    def merge(...)
+      Metadata.new(metadata.merge(...))
+    end
+
+    def reject(...)
+      Metadata.new(metadata.reject(...))
     end
 
     def is_animated?
