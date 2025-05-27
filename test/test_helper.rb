@@ -122,3 +122,5 @@ class ActionDispatch::IntegrationTest
     method_authenticated(:delete, url, user, **)
   end
 end
+
+module Source::Tests; end

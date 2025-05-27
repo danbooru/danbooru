@@ -19,7 +19,7 @@ The following method is defined under test/test_helpers/extractor_test_helper.rb
       )
 ```
 
-This method takes dynamic argument matching the ones available on Source::Extractor.
+This method takes dynamic argument matching the ones available on `Source::Extractor`.
 
 To generate a new test case for a given url you can copy paste the output of the following command into the strategy's test file:
 
