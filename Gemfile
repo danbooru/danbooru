@@ -1,6 +1,6 @@
 source 'https://rubygems.org/'
 
-ruby "~> 3.3.2"
+ruby "~> 3.4.4"
 
 gem 'dotenv-rails', require: "dotenv/load"
 
