@@ -2,9 +2,11 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class EntyExtractorTest < ActiveSupport::TestCase
-    context "A public Enty page URL" do
-      setup { skip "Dead site?" }
+    setup do
+      skip "Dead site?"
+    end
 
+    context "A public Enty page URL" do
       strategy_should_work(
         "https://enty.jp/posts/141598?ref=newest_post_pc",
         image_urls: [
@@ -31,8 +33,6 @@ module Source::Tests::Extractor
     end
 
     context "A public Enty image URL with a referer" do
-      setup { skip "Dead site?" }
-
       strategy_should_work(
         "https://img01.enty.jp/uploads/ckeditor/pictures/194353/content_20211227_130_030_100.png",
         referer: "https://enty.jp/posts/141598?ref=newest_post_pc",
@@ -58,8 +58,6 @@ module Source::Tests::Extractor
     end
 
     context "A public Enty image URL without a referer" do
-      setup { skip "Dead site?" }
-
       strategy_should_work(
         "https://img01.enty.jp/uploads/ckeditor/pictures/194353/content_20211227_130_030_100.png",
         image_urls: %w[
