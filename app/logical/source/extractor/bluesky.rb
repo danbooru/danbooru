@@ -117,6 +117,8 @@ class Source::Extractor::Bluesky < Source::Extractor
       text[byte_start...byte_end] = %{<a href="https://bsky.app/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(tag_name))}">##{CGI.escapeHTML(tag_name)}</a>}.force_encoding("ASCII-8BIT")
     end
 
+    text = text.force_encoding("UTF-8")
+
     alt_tags = embed&.dig("images").to_a.pluck(:alt).presence || [embed&.dig("alt")]
     alt_tags.compact_blank.each do |alt_text|
       text << <<~EOS.chomp
@@ -127,7 +129,7 @@ class Source::Extractor::Bluesky < Source::Extractor
       EOS
     end
 
-    text.force_encoding("UTF-8").gsub("\n", "<br>")
+    text.gsub("\n", "<br>")
   end
 
   def tags

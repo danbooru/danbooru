@@ -146,6 +146,21 @@ module Sources
       )
     end
 
+    context "A post with unicode alt text" do
+      strategy_should_work(
+        "https://bsky.app/profile/did:plc:p5mbisiuaimkju4r2uyzyo7s/post/3lnwlami6fk2t",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          見えない
+
+          [quote]
+          h6. Image Description
+
+          リスフラ
+          [/quote]
+        EOS
+      )
+    end
+
     context "A post url with DID as user id" do
       strategy_should_work(
         "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
