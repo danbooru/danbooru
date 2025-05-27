@@ -29,7 +29,7 @@ class StorageManager::Rclone < StorageManager
   def open(path)
     file = Danbooru::Tempfile.new(binmode: true)
     rclone "copyto", key(path), file.path
-    file
+    file.reopen(file.path, "rb")
   end
 
   def rclone(*args)
