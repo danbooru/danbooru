@@ -5,8 +5,8 @@
 set -uo pipefail
 
 PARSER_STRATEGIES_LOCATION="app/logical/source/url"
-PARSER_TESTS_LOCATION="test/unit/sources/parser"
-EXTRACTOR_TESTS_LOCATION="test/unit/sources/extractor"
+PARSER_TESTS_LOCATION="test/unit/source/url"
+EXTRACTOR_TESTS_LOCATION="test/unit/source/extractor"
 
 if [ -z "$1" ]; then
     echo "ERROR: No parameter passed."
@@ -24,7 +24,7 @@ fi
 STRATEGY_NAME="${STRATEGY_FILE##*/}" # only the file
 STRATEGY_NAME="${STRATEGY_NAME%.*}" # without the ext
 
-PARSER_TESTS_FILE="$PARSER_TESTS_LOCATION/${STRATEGY_NAME}_parser_test.rb"
+PARSER_TESTS_FILE="$PARSER_TESTS_LOCATION/${STRATEGY_NAME}_url_test.rb"
 EXTRACTOR_TESTS_FILE="$EXTRACTOR_TESTS_LOCATION/${STRATEGY_NAME}_extractor_test.rb"
 
 STRATEGY_CLASS_NAME="$(echo "$STRATEGY_NAME" | sed -E 's/(^|[_[:space:]])([a-z])/\U\2/g')"
@@ -32,13 +32,13 @@ STRATEGY_CLASS_NAME="$(echo "$STRATEGY_NAME" | sed -E 's/(^|[_[:space:]])([a-z])
 
 if [ ! -f $PARSER_TESTS_FILE ]; then
 
-echo "Generating a skeleton for ${STRATEGY_CLASS_NAME}ParserTest at $PARSER_TESTS_FILE"
+echo "Generating a skeleton for ${STRATEGY_CLASS_NAME}UrlTest at $PARSER_TESTS_FILE"
 
   cat > "$PARSER_TESTS_FILE" <<EOF
 require "test_helper"
 
-module Source::URL::Tests
-  class ${STRATEGY_CLASS_NAME}ParserTest < ActiveSupport::TestCase
+module Source::Tests::URL
+  class ${STRATEGY_CLASS_NAME}UrlTest < ActiveSupport::TestCase
     context "when parsing" do
       should_identify_url_types(
         image_urls: [
@@ -80,7 +80,7 @@ if [ ! -f $EXTRACTOR_TESTS_FILE ]; then
   cat > "$EXTRACTOR_TESTS_FILE" <<EOF
 require "test_helper"
 
-module Source::Extractor::Tests
+module Source::Tests::Extractor
   class ${STRATEGY_CLASS_NAME}ExtractorTest < ActiveSupport::TestCase
     context "A post" do
       strategy_should_work(

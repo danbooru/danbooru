@@ -4,7 +4,7 @@
 
 
 PARSER_STRATEGIES_LOCATION="app/logical/source/url"
-PARSER_TESTS_LOCATION="test/unit/sources/parser"
+PARSER_TESTS_LOCATION="test/unit/source/url"
 
 longest=""
 longest_len=0
