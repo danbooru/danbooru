@@ -73,11 +73,13 @@ class FFmpeg
     end
   end
 
-  # @return [Integer, nil] The number of frames in the video or animation, or nil if unknown.
+  # @return [Integer, nil] The number of frames in the video or animation, or nil if unknown. If the video has multiple
+  #   streams, this will be the frame count of the longest stream. Note that a static AVIF image can contain up to four
+  #   streams: one for the static image, one for an auxiliary video, and an optional alpha channel stream for each.
   def frame_count
-    if video_stream.has_key?(:nb_frames)
-      video_stream[:nb_frames].to_i
-    elsif playback_info.has_key?(:frame)
+    if video_streams.pluck(:nb_frames).compact.present?
+      video_streams.pluck(:nb_frames).map(&:to_i).max
+    elsif playback_info.key?(:frame)
       playback_info[:frame].to_i
     else
       nil

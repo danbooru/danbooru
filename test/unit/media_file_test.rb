@@ -185,10 +185,10 @@ class MediaFileTest < ActiveSupport::TestCase
     should "get the correct duration for animated files" do
       assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").duration)
       assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").duration)
-      assert_equal(0.6,  MediaFile.open("test/files/test-animated-256x256.png").duration)
+      assert_equal(0.75, MediaFile.open("test/files/test-animated-256x256.png").duration)
       assert_equal(3.35, MediaFile.open("test/files/gif/test-animated-3.35s.gif").duration)
       assert_equal(1.2,  MediaFile.open("test/files/gif/test-animated-1.2s.gif").duration)
-      assert_equal(2.0,  MediaFile.open("test/files/apng/normal_apng.png").duration)
+      assert_equal(5.0,  MediaFile.open("test/files/apng/normal_apng.png").duration)
       assert_equal(0.84, MediaFile.open("test/files/webp/nyancat.webp").duration)
       assert_equal(1.92, MediaFile.open("test/files/avif/sequence-with-pitm.avif").duration)
       assert_equal(3.962292, MediaFile.open("test/files/avif/sequence-without-pitm.avif").duration)
@@ -209,11 +209,11 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").ffmpeg_duration)
       assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").ffmpeg_duration)
-      assert_equal(0.6,  MediaFile.open("test/files/test-animated-256x256.png").ffmpeg_duration)
-      assert_equal(1.37, MediaFile.open("test/files/gif/test-animated-3.35s.gif").ffmpeg_duration) # XXX wrong in ffmpeg 6.1
-      assert_equal(0.12, MediaFile.open("test/files/gif/test-animated-1.2s.gif").ffmpeg_duration) # XXX wrong in ffmpeg 6.1
-      assert_equal(2.0,  MediaFile.open("test/files/apng/normal_apng.png").ffmpeg_duration)
-      assert_equal(0.04, MediaFile.open("test/files/webp/nyancat.webp").ffmpeg_duration) # XXX wrong in ffmpg 6.1
+      assert_equal(0.75, MediaFile.open("test/files/test-animated-256x256.png").ffmpeg_duration)
+      assert_equal(1.37, MediaFile.open("test/files/gif/test-animated-3.35s.gif").ffmpeg_duration) # XXX wrong in ffmpeg 7.1
+      assert_equal(0.12, MediaFile.open("test/files/gif/test-animated-1.2s.gif").ffmpeg_duration) # XXX wrong in ffmpeg 7.1
+      assert_equal(5.0,  MediaFile.open("test/files/apng/normal_apng.png").ffmpeg_duration)
+      assert_equal(0.04, MediaFile.open("test/files/webp/nyancat.webp").ffmpeg_duration) # XXX wrong in ffmpeg 7.1
       assert_equal(1.92, MediaFile.open("test/files/avif/sequence-with-pitm.avif").ffmpeg_duration)
       assert_equal(3.962292,  MediaFile.open("test/files/avif/sequence-without-pitm.avif").ffmpeg_duration)
       assert_equal(0.5,  MediaFile.open("test/files/avif/star-8bpc.avif").ffmpeg_duration)
@@ -632,7 +632,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-invalid-utf8-metadata.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-h265.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-av1.mp4").is_supported?)
-      
+
       #assert_equal(true, MediaFile.open("test/files/mp4/test-audio-flac.mp4").is_supported?)
 
       assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-yuv444p-h264.mp4").is_supported?)
@@ -761,10 +761,10 @@ class MediaFileTest < ActiveSupport::TestCase
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
-        assert_equal(2.0, file.duration)
+        assert_equal(5.0, file.duration)
         assert_nil(file.vips_duration)
-        assert_equal(2.0, file.ffmpeg_duration)
-        assert_equal(1.5, file.frame_rate)
+        assert_equal(5.0, file.ffmpeg_duration)
+        assert_equal(0.6, file.frame_rate)
         assert_equal(3, file.frame_count)
       end
     end
@@ -787,11 +787,11 @@ class MediaFileTest < ActiveSupport::TestCase
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
-        assert_equal(0.3, file.duration)
+        assert_equal(0.6, file.duration)
         assert_nil(file.vips_duration)
-        assert_equal(0.3, file.ffmpeg_duration)
+        assert_equal(0.6, file.ffmpeg_duration)
         assert_equal(2, file.frame_count)
-        assert_equal(2/0.3, file.frame_rate)
+        assert_equal(2 / 0.6, file.frame_rate)
       end
     end
 
@@ -879,10 +879,14 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(false, MediaFile.open("test/files/avif/sequence-without-pitm.avif").is_supported?)
       assert_equal(false, MediaFile.open("test/files/avif/star-8bpc.avif").is_supported?)
 
-      # XXX These should be unsupported, but aren't.
-      # assert_equal(false, MediaFile.open("test/files/avif/alpha_video.avif").is_supported?)
-      # assert_equal(false, MediaFile.open("test/files/avif/plum-blossom-small-profile0.8bpc.yuv420.alpha-full.avif").is_supported?)
-      # assert_equal(false, MediaFile.open("test/files/avif/kimono.mirror-horizontal.avif").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/avif/alpha_video.avif").is_supported?)
+    end
+
+    should "detect unsupported AVIF files" do
+      skip "These should be unsupported, but aren't."
+
+      assert_equal(false, MediaFile.open("test/files/avif/plum-blossom-small.profile0.8bpc.yuv420.alpha-full.avif").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/avif/kimono.mirror-horizontal.avif").is_supported?)
     end
 
     should "detect animated files" do
@@ -899,8 +903,8 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "detect static images with an auxiliary image sequence" do
       assert_equal(true, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").metadata.is_animated_avif?)
-      assert_equal(false, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").is_animated?)
-      assert_equal(1, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").frame_count)
+      assert_equal(true, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").is_animated?)
+      assert_equal(48, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").frame_count)
     end
 
     should "detect rotated images" do

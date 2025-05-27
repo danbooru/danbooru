@@ -64,7 +64,7 @@ class MediaFile::Image < MediaFile
   def duration
     return nil if !is_animated?
 
-    # XXX ffmpeg 6.1 calculates duration incorrectly for some gif and webp files.
+    # XXX ffmpeg 7.1 calculates duration incorrectly for some gif and webp files.
     case file_ext
     when :gif, :webp
       vips_duration
