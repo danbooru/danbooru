@@ -1,4 +1,4 @@
-module SourceTestHelper
+module ExtractorTestHelper
   extend ActiveSupport::Concern
 
   # A helper method to automate all the checks needed to make sure that a strategy does not break.
