@@ -4,8 +4,8 @@ require "simplecov"
 require_relative "../config/environment"
 require "rails/test_help"
 
-Dir["#{Rails.root.join("test/factories/*.rb")}"].sort.each { |file| require file }
-Dir["#{Rails.root.join("test/test_helpers/*.rb")}"].sort.each { |file| require file }
+Dir["#{Rails.root}/test/factories/*.rb"].sort.each { |file| require file }
+Dir["#{Rails.root}/test/test_helpers/*.rb"].sort.each { |file| require file }
 
 Minitest::Reporters.use!([
   Minitest::Reporters::ProgressReporter.new,
@@ -74,8 +74,8 @@ class ActiveSupport::TestCase
     Cache.clear
   end
 
-  def as(user, &)
-    CurrentUser.scoped(user, &)
+  def as(user, &block)
+    CurrentUser.scoped(user, &block)
   end
 
   def assert_search_equals(expected_results, current_user: User.anonymous, **params)
@@ -101,25 +101,25 @@ class ActionDispatch::IntegrationTest
     end
   end
 
-  def method_authenticated(method_name, url, user, **)
+  def method_authenticated(method_name, url, user, **options)
     login_as(user)
-    send(method_name, url, **)
+    send(method_name, url, **options)
   end
 
-  def get_auth(url, user, **)
-    method_authenticated(:get, url, user, **)
+  def get_auth(url, user, **options)
+    method_authenticated(:get, url, user, **options)
   end
 
-  def post_auth(url, user, **)
-    method_authenticated(:post, url, user, **)
+  def post_auth(url, user, **options)
+    method_authenticated(:post, url, user, **options)
   end
 
-  def put_auth(url, user, **)
-    method_authenticated(:put, url, user, **)
+  def put_auth(url, user, **options)
+    method_authenticated(:put, url, user, **options)
   end
 
-  def delete_auth(url, user, **)
-    method_authenticated(:delete, url, user, **)
+  def delete_auth(url, user, **options)
+    method_authenticated(:delete, url, user, **options)
   end
 end
 
