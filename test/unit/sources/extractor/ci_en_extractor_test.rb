@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
-module Sources
-  class CiEnTest < ActiveSupport::TestCase
+module Source::Extractor::Tests
+  class CiEnExtractorTest < ActiveSupport::TestCase
     def setup
       skip "ci_en_session cookie not set" unless Source::Extractor::CiEn.enabled?
     end
@@ -17,7 +17,7 @@ module Sources
         username: nil,
         tags: %w[リクエスト バトルメイド キック],
         dtext_artist_commentary_title: "戦うバトルメイド！",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           カラーラフリクエストで描いたキックするバトルメイドです。
 
           関連のあるキャラ退魔シスターをメインにしたCG集もあります。
@@ -36,9 +36,9 @@ module Sources
         "https://ci-en.dlsite.com/creator/12924/article/733140",
         page_url: "https://ci-en.net/creator/12924/article/733140",
         image_urls: [
-          %r!https://media\.ci-en\.jp/public/article_cover/creator/00012924/e3325a27a31c22516c8b717e729fcc09a89c3d8485af6f1af3013917d3181290/image-1280-c\.jpg!,
-          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/89d0417b09c3aafda23e7a02931d60fb179ee0f1a0f77d245797accd2979371d/upload/main_378b7bcd-3a89-4f98-b51e-4188ad802509\.jpg!,
-          %r!https://media\.ci-en\.jp/private/attachment/creator/00012924/b06a35213c77ef64d72a19fbf0981097d1151393e855bd271688ffe1af1df2ed/video-web\.mp4!,
+          %r{https://media\.ci-en\.jp/public/article_cover/creator/00012924/e3325a27a31c22516c8b717e729fcc09a89c3d8485af6f1af3013917d3181290/image-1280-c\.jpg},
+          %r{https://media\.ci-en\.jp/private/attachment/creator/00012924/89d0417b09c3aafda23e7a02931d60fb179ee0f1a0f77d245797accd2979371d/upload/main_378b7bcd-3a89-4f98-b51e-4188ad802509\.jpg},
+          %r{https://media\.ci-en\.jp/private/attachment/creator/00012924/b06a35213c77ef64d72a19fbf0981097d1151393e855bd271688ffe1af1df2ed/video-web\.mp4},
         ],
         media_files: [
           { file_size: 126_100 },
@@ -52,7 +52,7 @@ module Sources
         username: nil,
         tags: ["動画", "アニメ", "ゲーム", "R-18"],
         dtext_artist_commentary_title: "ショートストーリー付きR-18動画ゲーム制作のお知らせ",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           h1. R-18動画制作のお知らせ
 
           初めまして、あまちゃと申します。
@@ -148,7 +148,7 @@ module Sources
           ["R-18", "https://ci-en.dlsite.com/creator/12924/article/tag?name=R-18"],
         ],
         dtext_artist_commentary_title: "ロリハーレムRPG（仮）制作進捗報告⑥",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           h1. 三人目のヒロイン制作、ゲーム内シナリオ制作進行中
 
           お疲れ様です。あまちゃです。
@@ -261,13 +261,13 @@ module Sources
       strategy_should_work(
         "https://ci-en.dlsite.com/creator/15496",
         image_urls: [
-          %r!https://media\.ci-en\.jp/public/cover/creator/00015496/d9abf3b919895d05a86253172e675dd5307ae7c6667313c20ddc39ab79bdd09f/image-990-c\.jpg!,
-          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/763e7e9d7b6180b3b5a96cec735ecfabe993b7b4b4202bd411a471d3b7452a56/upload/1\.png!,
-          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/3fa9791b911ba5b829cfe522d1ad0283893aa3d19c43de4663ea5bb9e4ff440b/upload/1\.jpg!,
-          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/177e0028ad18cf14d6e7b651f8f6db4c2c7e93914a76dc079ffb1865c4102ee6/upload/2\.jpg!,
-          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/775b1249e43702ef746bba5bd2404352844e16d3a45b2de96fb86e8931d1f493/upload/%EF%BC%90%EF%BC%92\.jpg!,
-          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/5cf725ab76a4256d5fcb22582f6e2f0343af6e5445b2ca7649ad11024cb0a416/upload/3\.jpg!,
-          %r!https://media\.ci-en\.jp/private/attachment/creator/00015496/2799747b90b7f03a61b25e88688de0ef6bfe0ce20b953380eabb7a9fcd05c041/upload/4\.jpg!,
+          %r{https://media\.ci-en\.jp/public/cover/creator/00015496/d9abf3b919895d05a86253172e675dd5307ae7c6667313c20ddc39ab79bdd09f/image-990-c\.jpg},
+          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/763e7e9d7b6180b3b5a96cec735ecfabe993b7b4b4202bd411a471d3b7452a56/upload/1\.png},
+          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/3fa9791b911ba5b829cfe522d1ad0283893aa3d19c43de4663ea5bb9e4ff440b/upload/1\.jpg},
+          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/177e0028ad18cf14d6e7b651f8f6db4c2c7e93914a76dc079ffb1865c4102ee6/upload/2\.jpg},
+          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/775b1249e43702ef746bba5bd2404352844e16d3a45b2de96fb86e8931d1f493/upload/%EF%BC%90%EF%BC%92\.jpg},
+          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/5cf725ab76a4256d5fcb22582f6e2f0343af6e5445b2ca7649ad11024cb0a416/upload/3\.jpg},
+          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/2799747b90b7f03a61b25e88688de0ef6bfe0ce20b953380eabb7a9fcd05c041/upload/4\.jpg},
         ],
         media_files: [
           { file_size: 40_080 },
@@ -284,7 +284,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           h1. こんにちは！
 
           ci-enにはゲーム制作やアップデート作業の進捗を公開しています。
@@ -318,48 +318,6 @@ module Sources
           頑張ってゲームを作ってまいりますので、御興味がありましたら、どうぞよろしくお願いいたします！
         EOS
       )
-    end
-
-    should "Parse Ci-En URLs correctly" do
-      assert(Source::URL.image_url?("https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-800.jpg?px-time=1700517240&px-hash=eb626eafb7e5733c96fb0891188848dac10cb84c"))
-      assert(Source::URL.image_url?("https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/upload/%E3%81%B0%E3%81%AB%E3%81%A3%E3%81%A1A.jpg?px-time=1700517240&px-hash=eb626eafb7e5733c96fb0891188848dac10cb84c"))
-
-      assert(Source::URL.page_url?("https://ci-en.jp/creator/922/article/23700"))
-      assert(Source::URL.page_url?("https://ci-en.net/creator/11019/article/921762"))
-      assert(Source::URL.page_url?("https://ci-en.dlsite.com/creator/5290/article/998146"))
-      assert_not(Source::URL.profile_url?("https://ci-en.jp/creator/922/article/23700"))
-      assert_not(Source::URL.profile_url?("https://ci-en.net/creator/11019/article/921762"))
-      assert_not(Source::URL.profile_url?("https://ci-en.dlsite.com/creator/5290/article/998146"))
-      assert_equal("https://ci-en.net/creator/922/article/23700", Source::URL.page_url("https://ci-en.jp/creator/922/article/23700"))
-      assert_equal("https://ci-en.net/creator/5290/article/998146", Source::URL.page_url("https://ci-en.dlsite.com/creator/5290/article/998146"))
-
-      assert(Source::URL.page_url?("https://ci-en.jp/creator/922"))
-      assert(Source::URL.page_url?("https://ci-en.net/creator/11019"))
-      assert(Source::URL.page_url?("https://ci-en.dlsite.com/creator/5290"))
-      assert(Source::URL.profile_url?("https://ci-en.jp/creator/922"))
-      assert(Source::URL.profile_url?("https://ci-en.net/creator/11019"))
-      assert(Source::URL.profile_url?("https://ci-en.dlsite.com/creator/5290"))
-      assert_equal("https://ci-en.net/creator/5290", Source::URL.page_url("https://ci-en.dlsite.com/creator/5290"))
-      assert_equal("https://ci-en.net/creator/5290", Source::URL.profile_url("https://ci-en.dlsite.com/creator/5290"))
-      assert_equal("https://ci-en.net/creator/922", Source::URL.page_url("https://ci-en.jp/creator/922"))
-      assert_equal("https://ci-en.net/creator/922", Source::URL.profile_url("https://ci-en.jp/creator/922"))
-
-      assert(Source::URL.page_url?("https://ci-en.net/creator/11019/article/"))
-      assert(Source::URL.profile_url?("https://ci-en.net/creator/11019/article/"))
-
-      assert_not(Source::URL.profile_url?("https://ci-en.net/creator"))
-
-      assert_equal("11019", Source::URL.parse("https://ci-en.net/creator/11019/article/921762").creator_id)
-      assert_equal("921762", Source::URL.parse("https://ci-en.net/creator/11019/article/921762").article_id)
-
-      assert_equal("11019", Source::URL.parse("https://ci-en.net/creator/11019").creator_id)
-      assert_nil(Source::URL.parse("https://ci-en.net/creator/11019").article_id)
-
-      assert_equal("11019", Source::URL.parse("https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-web.jpg?px-time=1703968668&px-hash=9497dce5fa56c5081413ad1126e06d6f44f0ab3e").creator_id)
-      assert_equal("11019", Source::URL.parse("https://media.ci-en.jp/public/cover/creator/00011019/ae96c79d7626c8127bfe9823111601d3b566977d19c3aa0409de4ef838f8dc12/image-990-c.jpg").creator_id)
-
-      assert_not(Source::URL.page_url?("https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-web.jpg?px-time=1703968668&px-hash=9497dce5fa56c5081413ad1126e06d6f44f0ab3e"))
-      assert_not(Source::URL.page_url?("https://media.ci-en.jp/public/cover/creator/00011019/ae96c79d7626c8127bfe9823111601d3b566977d19c3aa0409de4ef838f8dc12/image-990-c.jpg"))
     end
   end
 end

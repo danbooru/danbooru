@@ -1,7 +1,7 @@
 require "test_helper"
 
-module Sources
-  class DcInsideTest < ActiveSupport::TestCase
+module Source::Extractor::Tests
+  class DcInsideExtractorTest < ActiveSupport::TestCase
     context "A page URL" do
       strategy_should_work(
         "https://gall.dcinside.com/mgallery/board/view?id=projectmx&no=14994409",
@@ -19,7 +19,7 @@ module Sources
         username: "wd3h8jz2hdnf",
         tags: [],
         dtext_artist_commentary_title: "[🎨창작] 지뢰계 히카리/노조미 그림그렸어요",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "2caed427f6d63cb16aa8c5b158c12a3a1ad241f0fad285a362abf5ad4a":[https://dcimg4.dcinside.co.kr/viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de885fa1bd62531058478fac3157bc024e4bab3a06677d6d31d4957ed12b900e4a4ff1ad5734a6e5c0f5d163c4901cdb8e4f7c6616fd39a3109f70107]
           "2caed427f6d63cb16aa8c5b132f5020e75544ba9563d9cf99c8ea652d451ad6b3b1a":[https://dcimg4.dcinside.co.kr/viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de885fa1bd62531058478fac3157bc024e4bab3a06677d6d31d4957ed12b900e4a4ff1ad5734a6e5c0f5d163c4901cdb8e1f3926f6ad29a25dea500f8]
           5일페 ［난선생님에게아무것도아니야사라져도누구도신경쓰지않을거야그렇지만날계속봐줬으면좋겠...］부스에 굿즈로 나가는 친구들입니다
@@ -44,7 +44,7 @@ module Sources
         username: "wd3h8jz2hdnf",
         tags: [],
         dtext_artist_commentary_title: "[🎨창작] 지뢰계 히카리/노조미 그림그렸어요",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "2caed427f6d63cb16aa8c5b158c12a3a1ad241f0fad285a362abf5ad4a":[https://dcimg4.dcinside.co.kr/viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de885fa1bd62531058478fac3157bc024e4bab3a06677d6d31d4957ed12b900e4a4ff1ad5734a6e5c0f5d163c4901cdb8e4f7c6616fd39a3109f70107]
           "2caed427f6d63cb16aa8c5b132f5020e75544ba9563d9cf99c8ea652d451ad6b3b1a":[https://dcimg4.dcinside.co.kr/viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de885fa1bd62531058478fac3157bc024e4bab3a06677d6d31d4957ed12b900e4a4ff1ad5734a6e5c0f5d163c4901cdb8e1f3926f6ad29a25dea500f8]
           5일페 ［난선생님에게아무것도아니야사라져도누구도신경쓰지않을거야그렇지만날계속봐줬으면좋겠...］부스에 굿즈로 나가는 친구들입니다
@@ -68,7 +68,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -83,7 +83,7 @@ module Sources
         username: "",
         tags: [],
         dtext_artist_commentary_title: "[창작🎨] 꼬술이 그림",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "7fe88072b78676ac7eb8f68b12d21a1d0cf382bbf066db":[https://dcimg4.dcinside.co.kr/viewimage.php?id=20b4d22c&no=24b0d769e1d32ca73ce885fa1bd6253138ca63577cd68a52ea2273d44e23221455bf85eaff144adaeee5566732fd26352d7749bb84bec21da42bf63865caf93f]
           그렸으니 나오겠지?
           다들 행복가챠하자
@@ -124,7 +124,7 @@ module Sources
         username: "kimin3424",
         tags: [],
         dtext_artist_commentary_title: "[창작🎨] 로도스의 빛 볼겜이랑 콜라보하기앱에서 작성",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           배치
           걷기
           그로기
@@ -151,7 +151,7 @@ module Sources
         username: "4756qwer",
         tags: [],
         dtext_artist_commentary_title: "[🎨창작] 아로나 그린거 보실분",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de98efa1bd62531416b0cf072989a548cbc1d4adf4728efb2c5786b58077507144c5e8b424ba8d4f071e5f71bb7f51881cd678a6d59e4c5bf7874b906":[https://dcimg1.dcinside.com/viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de98efa1bd62531416b0cf072989a548cbc1d4adf4728efb2c5786b58077507144c5e8b424ba8d4f071e5f71bb7f51881cd678a6d59e4c5bf7874b906]
           "11":[https://dcimg5.dcinside.com/dccon.php?no=62b5df2be09d3ca567b1c5bc12d46b394aa3b1058c6e4d0ca41648b65fe8266eadc328cfdea5b74810026b505984e855639060800d4d06195f505e37f50b07e65e55156664b2e18c4d318c15]
           "[b]イブ님(@IV70311741) [/b]
@@ -173,19 +173,11 @@ module Sources
         username: "mission7804",
         tags: [],
         dtext_artist_commentary_title: "[창작🎨] 카르띳띠 그렸음다",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "0ebcc232e0c630bf67be9bb619dc6a373d1058f1942ff49dbfce9ab3f7bf":[https://dcimg8.dcinside.co.kr/viewimage.php?id=3aa8c42ee0c031a869a8d7a313c2&no=24b0d769e1d32ca73de882fa1bd62531b6b898211a669f8109c0200b5f38eee53cbc0166b03709dfe09883156a5b650175adb480faac5778fa1858b1221531f2e4f250522e52de0ab12ca7]
           개미는 오늘도 열심히 ...!!!
         EOS
       )
-    end
-
-    should "Parse DC Inside URLs correctly" do
-      assert(Source::URL.image_url?("https://dcimg1.dcinside.com/viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de983fa11d02831c6c0b61130e4349ff064c41af1d8cfaa7bc90ab6ee250a394179b720ead53a80d89030c996204118d07dadf713bafb452d54f081&orgExt"))
-      assert(Source::URL.image_url?("https://image.dcinside.com/viewimagePop.php?no=24b0d769e1d32ca73de983fa11d02831c6c0b61130e4349ff064c41af1d8cfaa7bc90ab6ee250a39413de77786d73886cfa2363761a2fb20d49c71cc9afa601b"))
-      assert(Source::URL.image_url?("https://image.dcinside.com/viewimage.php?id=&no=24b0d769e1d32ca73de983fa11d02831c6c0b61130e4349ff064c41af1d8cfaa7bc90ab6ee250a39413de77786d73886cfa2363761a2fb20d49c71cc9afa601b"))
-      assert(Source::URL.page_url?("https://gall.dcinside.com/mgallery/board/view?id=projectmx&no=11076518"))
-      assert(Source::URL.profile_url?("https://gallog.dcinside.com/mannack0106"))
     end
   end
 end

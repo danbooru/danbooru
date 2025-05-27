@@ -1,7 +1,7 @@
 require "test_helper"
 
-module Sources
-  class DeviantArtTest < ActiveSupport::TestCase
+module Source::Extractor::Tests
+  class DeviantArtExtractorTest < ActiveSupport::TestCase
     setup do
       skip "DeviantArt API keys not set" unless Source::Extractor::DeviantArt.enabled?
     end
@@ -17,7 +17,7 @@ module Sources
         profile_url: "https://www.deviantart.com/aeror404",
         tags: [],
         artist_commentary_title: "Holiday Elincia",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Christmas sketch commission! Elincia from Fire Emblem! Thanks!
           I think it suits her really well. * - * Also you can never go wrong with sexy Christmas sweaters!
         EOS
@@ -35,7 +35,7 @@ module Sources
         profile_url: "https://www.deviantart.com/nickbeja",
         tags: [],
         artist_commentary_title: nil, # XXX use filename?
-        artist_commentary_desc: nil
+        artist_commentary_desc: nil,
       )
     end
 
@@ -50,7 +50,7 @@ module Sources
         profile_url: "https://www.deviantart.com/hideyoshi",
         tags: %w[barbarossa bay brunhild flare hangar odin planet ship spaceship sun sunset brünhild legendsofgalacticheroes],
         artist_commentary_title: "Legend of Galactic Heroes",
-        dtext_artist_commentary_desc: "Shamefully I have to say I didn't know this anime show before. wat? o_O Yet was approached to create a commissioned piece.. This is the result - Barbarossa and Brunhild landing on Odin."
+        dtext_artist_commentary_desc: "Shamefully I have to say I didn't know this anime show before. wat? o_O Yet was approached to create a commissioned piece.. This is the result - Barbarossa and Brunhild landing on Odin.",
       )
     end
 
@@ -65,7 +65,7 @@ module Sources
         profile_url: "https://www.deviantart.com/gregmks",
         tags: [],
         artist_commentary_title: "Rhino Castle",
-        dtext_artist_commentary_desc: 'Started as a simple Rhino sketch and it escalated quickly ":P (Lick)":[https://e.deviantart.net/emoticons/letters/=p.gif]'
+        dtext_artist_commentary_desc: 'Started as a simple Rhino sketch and it escalated quickly ":P (Lick)":[https://e.deviantart.net/emoticons/letters/=p.gif]',
       )
     end
 
@@ -80,7 +80,7 @@ module Sources
         profile_url: "https://www.deviantart.com/noizave",
         tags: %w[bar baz foo],
         artist_commentary_title: "test post please ignore",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           blah blah
           "test link":[http://www.google.com]
 
@@ -111,7 +111,7 @@ module Sources
         "https://img00.deviantart.net/a233/i/2017/160/5/1/test_post_please_ignore_by_noizave-dbc3a48.png",
         image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9.png\?token=}],
         media_files: [{ file_size: 3_619, width: 1152, height: 648 }],
-        page_url: "https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408"
+        page_url: "https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408",
       )
     end
 
@@ -126,7 +126,7 @@ module Sources
         profile_url: "https://www.deviantart.com/xyelkiltrox",
         tags: [],
         artist_commentary_title: "Goruto",
-        dtext_artist_commentary_desc: "Fusión de Goku y Naruto al estilo de Akira Toriyama"
+        dtext_artist_commentary_desc: "Fusión de Goku y Naruto al estilo de Akira Toriyama",
       )
     end
 
@@ -141,7 +141,7 @@ module Sources
         profile_url: "https://www.deviantart.com/noizave",
         tags: [],
         artist_commentary_title: "test, no download",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -156,7 +156,7 @@ module Sources
         profile_url: "https://www.deviantart.com/anatofinnstark",
         tags: [],
         artist_commentary_title: "The Blade of Miquella",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Another Malenia Art, and not the last ":) (Smile)":[https://e.deviantart.net/emoticons/s/smile.gif]
 
           Limited Print : "finnstarkillustration.com/blad…":[https://finnstarkillustration.com/blade-of-miquella-moon-only-20-copies-worldwide.html]
@@ -175,7 +175,7 @@ module Sources
         display_name: "Len1",
         username: "len1",
         profile_url: "https://www.deviantart.com/len1",
-        artist_commentary_title: "All that Glitters II"
+        artist_commentary_title: "All that Glitters II",
       )
     end
 
@@ -190,7 +190,7 @@ module Sources
         profile_url: "https://www.deviantart.com/mikotoazure",
         tags: [],
         artist_commentary_title: "PKMN-King and Queen",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Commision for "wolfathegoddess2010":[https://wolfathegoddess2010.deviantart.com/]
 
           Reference:
@@ -213,7 +213,7 @@ module Sources
         username: "edsfox",
         profile_url: "https://www.deviantart.com/edsfox",
         artist_commentary_title: "Silverhawks Quicksilver",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           First of all.. I love this cartoon from the 80's.. so I decide to make this Fan art of Quicksilver flying into the earth's sky..
 
           I decided this way cuz I was experimenting with the cloud brush XD hahaha.. so pardon me if you expect him surrounded by space and stars.. I know I know.. but.. well I think it looked cool at the end..
@@ -236,7 +236,7 @@ module Sources
         display_name: "edsfox",
         username: "edsfox",
         profile_url: "https://www.deviantart.com/edsfox",
-        artist_commentary_title: "Silverhawks Quicksilver"
+        artist_commentary_title: "Silverhawks Quicksilver",
       )
     end
 
@@ -249,7 +249,7 @@ module Sources
         display_name: "edsfox",
         username: "edsfox",
         profile_url: "https://www.deviantart.com/edsfox",
-        artist_commentary_title: "Silverhawks Quicksilver"
+        artist_commentary_title: "Silverhawks Quicksilver",
       )
     end
 
@@ -264,7 +264,7 @@ module Sources
         profile_url: "https://www.deviantart.com/akizero1510",
         tags: [],
         artist_commentary_title: "Ten miles of cherry blossoms",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Commission for "shrimpHEBY":[https://www.deviantart.com/shrimpheby]
           Hope you guys enjoy! (｢･ω･)｢
         EOS
@@ -275,7 +275,7 @@ module Sources
       strategy_should_work(
         "https://www.deviantart.com/heartgear/art/Silent-Night-579982816",
         image_urls: [%r{\Ahttps://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/ea95be00-c5aa-4063-bd55-f5a9183912f7/d9lb1ls-7d625444-0003-4123-bf00-274737ca7fdd.gif\?token=}],
-        media_files: [{ file_size: 350_156, width: 746, height: 977 }]
+        media_files: [{ file_size: 350_156, width: 746, height: 977 }],
       )
     end
 
@@ -295,7 +295,7 @@ module Sources
           ["animation", "https://www.deviantart.com/tag/animation"],
         ],
         dtext_artist_commentary_title: "Amelia",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           my baby 💙💙💙
           i finally finished this! gave myself a week and ended up taking 3 months LOL 💦
           thanks for all the support! <3
@@ -313,7 +313,7 @@ module Sources
         "https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/d204f74b-728d-4a3e-9d85-217e5f4fffa3/dew0240-8051caf7-f08a-4727-a974-7f5396644c2a.VideoQualities.res_1080p.23d4baf83a244c979bc3378b2643dfb6.mp4",
         image_urls: %w[https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/d204f74b-728d-4a3e-9d85-217e5f4fffa3/dew0240-8051caf7-f08a-4727-a974-7f5396644c2a.VideoQualities.res_1080p.23d4baf83a244c979bc3378b2643dfb6.mp4],
         media_files: [{ file_size: 13_369_722, width: 1920, height: 1080 }],
-        page_url: "https://www.deviantart.com/cutenikechan/art/Amelia-900276912"
+        page_url: "https://www.deviantart.com/cutenikechan/art/Amelia-900276912",
       )
     end
 
@@ -327,7 +327,7 @@ module Sources
         username: "noizave",
         profile_url: "https://www.deviantart.com/noizave",
         tags: %w[bar baz foo],
-        artist_commentary_title: "hidden work"
+        artist_commentary_title: "hidden work",
       )
     end
 
@@ -342,7 +342,7 @@ module Sources
         username: "bnjacob",
         other_names: ["BNJacob"],
         dtext_artist_commentary_title: "Celestial Muse #1",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           [i][b]*Purchase by points on DeviantArt could help reduce the fee on me*
           [/b][u]
           P[/u][/i][u][i]urchase to download high quality image with no address watermark and support me in practically way.[/i]
@@ -401,7 +401,7 @@ module Sources
           ["ai-generated", "https://www.deviantart.com/tag/ai"],
         ],
         dtext_artist_commentary_title: "Ling",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           - For Exclusives & Adoptables
 
           ✅ You become the only Owner, after purchase.
@@ -496,7 +496,7 @@ module Sources
     context "A source with malformed links in the artist commentary" do
       strategy_should_work(
         "https://www.deviantart.com/dishwasher1910/art/Solar-Sisters-792488305",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Solar sisters
 
           HD images , Psd file and alternative version available on my Patreon :
@@ -516,7 +516,7 @@ module Sources
         username: "noizave",
         profile_url: "https://www.deviantart.com/noizave",
         tags: %w[bar baz foo],
-        artist_commentary_title: "test post please ignore"
+        artist_commentary_title: "test post please ignore",
       )
     end
 
@@ -529,21 +529,21 @@ module Sources
         username: "midorynn",
         profile_url: "https://www.deviantart.com/midorynn",
         tags: %w[animation fanart nier_automata nierautomata nier_automata_2b],
-        artist_commentary_title: "NieR: Automata Anime"
+        artist_commentary_title: "NieR: Automata Anime",
       )
     end
 
     context "An AI-generated DeviantArt post" do
       strategy_should_work(
         "https://www.deviantart.com/izzyrozenberg/art/Makima-looks-back-1-1027063213",
-        tags: %w[anime animegirl cartoon cuteanimegirl drama fanart manga nude oilpainting redhead makimachainsawman makima_chainsaw_man eyesbeautiful makima ai-generated]
+        tags: %w[anime animegirl cartoon cuteanimegirl drama fanart manga nude oilpainting redhead makimachainsawman makima_chainsaw_man eyesbeautiful makima ai-generated],
       )
     end
 
     context "A DeviantArt post with deeply nested commentary" do
       strategy_should_work(
         "https://www.deviantart.com/sakimichan/art/Tifa-Pullup-pinup-841327466",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           [b]"Pixiv ":[https://www.pixiv.net/member.php?id=3384404]ll"facebook ":[https://www.facebook.com/Sakimichanart/] [/b]ll"Online Store":[https://sakimichanart.storenvy.com/] ll "Tumblr":[https://sakimichan.tumblr.com/] ll [b]"Patreon":[https://www.patreon.com/sakimichan][/b]ll[b]"Artstation":[https://www.artstation.com/artist/sakimichan][/b]l[b]"Instagram":[https://instagram.com/sakimi.chan/][/b] [b]"gumroad(tutorial store)":[https://gumroad.com/sakimichan][/b] [b]cubebrush"(new tutorial store)":[https://cubebrush.co/sakimichan][/b]
 
           Tifa is my favorite female character in the final fantasy series ! Also the pull boss was one of my favorite section of the game so i wanted to try painting her doing some (struggled to paint out this idea)^u^~
@@ -571,7 +571,7 @@ module Sources
     context "A DeviantArt post with <sub> tags in the commentary" do
       strategy_should_work(
         "https://www.deviantart.com/hoshi-pan/art/Speedpaint-Dolphins-And-Lemon-Juice-700265840",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           h1. SPEEDPAINT: "www.youtube.com/watch?v=M72Kg9…":[https://www.youtube.com/watch?v=M72Kg9KhPQc]
 
           [s]Coughs random title for the win[/s]
@@ -600,7 +600,7 @@ module Sources
         other_names: ["noizave"],
         tags: [],
         dtext_artist_commentary_title: "-1 Image No Contribution",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           h2. title
 
           test 😀 [b]bold[/b] [i]italic[/i] [u]underline[/u] [b]abc[/b][b][i]def[/i][/b][b]gh[/b][b][i][u]ijk[/u][/i][/b][b]lmn[/b] "asdf":[http://google.com] asf
@@ -647,7 +647,7 @@ module Sources
           profile_url: "https://www.deviantart.com/noizave",
           tags: [],
           artist_commentary_title: "A pepe",
-          artist_commentary_desc: "This is a test."
+          artist_commentary_desc: "This is a test.",
         )
       end
 
@@ -663,7 +663,7 @@ module Sources
           profile_url: "https://www.deviantart.com/noizave",
           tags: [],
           artist_commentary_title: "A pepe",
-          artist_commentary_desc: "This is a test."
+          artist_commentary_desc: "This is a test.",
         )
       end
 
@@ -681,62 +681,9 @@ module Sources
           profile_url: "https://www.deviantart.com/noizave",
           tags: [],
           artist_commentary_title: nil,
-          artist_commentary_desc: nil
+          artist_commentary_desc: nil,
         )
       end
-    end
-
-    should "Parse DeviantArt URLs correctly" do
-      source1 = "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg"
-      source2 = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg"
-      source3 = "http://orig12.deviantart.net/9b69/f/2017/023/7/c/illustration___tokyo_encount_oei__by_melisaongmiqin-dawi58s.png"
-      source4 = "http://fc00.deviantart.net/fs71/f/2013/337/3/5/35081351f62b432f84eaeddeb4693caf-d6wlrqs.jpg"
-      source5 = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/76098ac8-04ab-4784-b382-88ca082ba9b1/d9x7lmk-595099de-fe8f-48e5-9841-7254f9b2ab8d.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvNzYwOThhYzgtMDRhYi00Nzg0LWIzODItODhjYTA4MmJhOWIxXC9kOXg3bG1rLTU5NTA5OWRlLWZlOGYtNDhlNS05ODQxLTcyNTRmOWIyYWI4ZC5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.KFOVXAiF8MTlLb3oM-FlD0nnDvODmjqEhFYN5I2X5Bc"
-      source6 = "https://fav.me/dbc3a48"
-      source7 = "https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e1d5122b-6fee-44df-8b8f-e6e8daa3396d/dbn3ef5-9e051a71-251d-4e0f-b5f1-3beb5e6a8667.swf?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTcwOTQ2NTcwNywiaWF0IjoxNzA5NDY1MDk3LCJqdGkiOiI2NWU0NWUxMzAxNTk2Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvZTFkNTEyMmItNmZlZS00NGRmLThiOGYtZTZlOGRhYTMzOTZkXC9kYm4zZWY1LTllMDUxYTcxLTI1MWQtNGUwZi1iNWYxLTNiZWI1ZTZhODY2Ny5zd2YifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.6ZShJVsXxVs73R2Akw_9t-BMJKjqPUbNKHkIbzMsqeU"
-      source8 = "https://www.deviantart.com/view/685436408"
-      source9 = "https://www.deviantart.com/view.php?id=685436408"
-      source10 = "https://www.deviantart.com/view-full.php?id=685436408"
-      source11 = "https://www.deviantart.com/noizave/art/685436408"
-
-      assert(Source::URL.image_url?(source1))
-      assert(Source::URL.image_url?(source2))
-      assert(Source::URL.image_url?(source3))
-      assert(Source::URL.image_url?(source4))
-      assert(Source::URL.image_url?(source5))
-      assert(Source::URL.page_url?(source6))
-      assert(Source::URL.image_url?(source7))
-      assert(Source::URL.page_url?(source8))
-      assert(Source::URL.page_url?(source9))
-      assert(Source::URL.page_url?(source10))
-      assert(Source::URL.page_url?(source11))
-
-      assert_equal("https://www.deviantart.com/mar11co/art/You-Are-Already-Dead-408921710", Source::URL.page_url(source1))
-      assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", Source::URL.page_url(source2))
-      assert_equal("https://www.deviantart.com/melisaongmiqin/art/Illustration-Tokyo-Encount-Oei-659256076", Source::URL.page_url(source3))
-      assert_equal("https://www.deviantart.com/deviation/417560500", Source::URL.page_url(source4))
-      assert_equal("https://www.deviantart.com/deviation/599977532", Source::URL.page_url(source5))
-      assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source6))
-      assert_equal("https://www.deviantart.com/deviation/703917761", Source::URL.page_url(source7))
-      assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source8))
-      assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source9))
-      assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source10))
-      assert_equal("https://www.deviantart.com/deviation/685436408", Source::URL.page_url(source11))
-      assert_equal("https://www.deviantart.com/hideyoshi/art/Legend-Of-Galactic-Heroes-635721022", Source::URL.page_url("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/b1f96af6-56a3-47a8-b7f4-406f243af3a3/daihpha-9f1fcd2e-7557-4db5-951b-9aedca9a3ae7.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2IxZjk2YWY2LTU2YTMtNDdhOC1iN2Y0LTQwNmYyNDNhZjNhM1wvZGFpaHBoYS05ZjFmY2QyZS03NTU3LTRkYjUtOTUxYi05YWVkY2E5YTNhZTcuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.YWZwVhPQHRLzRZUU2cTDXuWuA6ExFH57oFfGzAkxO6Y&filename=legend_of_galactic_heroes_by_hideyoshi_daihpha.jpg"))
-      assert_equal("https://sta.sh/0wxs31o7nn2", Source::URL.page_url("https://www.deviantart.com/stash/0wxs31o7nn2"))
-
-      assert_equal("https://www.deviantart.com/noizave", Source::URL.profile_url("https://noizave.daportfolio.com"))
-      assert_equal("https://www.deviantart.com/noizave", Source::URL.profile_url("https://noizave.artworkfolio.com"))
-
-      assert(Source::URL.image_url?("http://www.deviantart.com/download/135944599/Touhou___Suwako_Moriya_Colored_by_Turtle_Chibi.png"))
-      assert(Source::URL.image_url?("http://fc08.deviantart.net/images3/i/2004/088/8/f/Blackrose_for_MuzicFreq.jpg"))
-      assert(Source::URL.image_url?("http://prnt00.deviantart.net/9b74/b/2016/101/4/468a9d89f52a835d4f6f1c8caca0dfb2-pnjfbh.jpg"))
-      assert(Source::URL.page_url?("https://sta.sh/0wxs31o7nn2"))
-      assert(Source::URL.profile_url?("https://www.deviantart.com/noizave"))
-      assert(Source::URL.profile_url?("https://noizave.deviantart.com"))
-      assert(Source::URL.profile_url?("https://noizave.daportfolio.com"))
-      assert(Source::URL.profile_url?("https://noizave.artworkfolio.com"))
-      assert_not(Source::URL.profile_url?("https://deviantart.net"))
     end
   end
 end

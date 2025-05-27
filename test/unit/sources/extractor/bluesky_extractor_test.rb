@@ -1,7 +1,7 @@
 require "test_helper"
 
-module Sources
-  class BlueskyTest < ActiveSupport::TestCase
+module Source::Extractor::Tests
+  class BlueskyExtractorTest < ActiveSupport::TestCase
     setup do
       skip "Bluesky credentials not configured" unless Source::Extractor::Bluesky.enabled?
     end
@@ -20,7 +20,7 @@ module Sources
         display_name: "Ixy(いくしー)",
         username: "ixy",
         tags: [],
-        dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます"
+        dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
       )
     end
 
@@ -28,7 +28,7 @@ module Sources
       strategy_should_work(
         "https://bsky.app/profile/magicianhero.bsky.social/post/3ljtkgqzwvc2t",
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           renmerry "#東方Project":[https://bsky.app/hashtag/東方Project] "#touhou":[https://bsky.app/hashtag/touhou]
 
           [quote]
@@ -64,7 +64,7 @@ module Sources
         display_name: "Baguette",
         username: "yourbaguette",
         tags: ["Art", "FanArt", "Digimon", "SteinsGate", "Omori", "FFXIV"],
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Thanks for the opportunity Bison !
 
           I'm Baguette, and I mostly draw fanarts of whatever obsession I have ! I will move in Sweden in a week, work on my art and aim to open a little shop this year while working part time !
@@ -112,7 +112,7 @@ module Sources
         display_name: "Hi-GO!",
         username: "go-guiltism",
         tags: [],
-        dtext_artist_commentary_desc: "Copy-X FullArmed 2"
+        dtext_artist_commentary_desc: "Copy-X FullArmed 2",
       )
     end
 
@@ -126,7 +126,7 @@ module Sources
         display_name: "temmie",
         username: "tuyoki",
         tags: [],
-        dtext_artist_commentary_desc: "victory pose"
+        dtext_artist_commentary_desc: "victory pose",
       )
     end
 
@@ -134,7 +134,7 @@ module Sources
       strategy_should_work(
         # note: currently the alt text isn't actually visible from bluesky's web interface, because their native video player doesn't support it
         "https://bsky.app/profile/rningscissors.bsky.social/post/3lozjurmajk25",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           current vibe:
 
           [quote]
@@ -149,7 +149,7 @@ module Sources
     context "A post with unicode alt text" do
       strategy_should_work(
         "https://bsky.app/profile/did:plc:p5mbisiuaimkju4r2uyzyo7s/post/3lnwlami6fk2t",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           見えない
 
           [quote]
@@ -175,7 +175,7 @@ module Sources
         display_name: "Ixy(いくしー)",
         username: "ixy",
         tags: [],
-        dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます"
+        dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
       )
     end
 
@@ -194,7 +194,7 @@ module Sources
           ["逃げ上手の若君", "https://bsky.app/hashtag/逃げ上手の若君"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           8日目 北条時行
           "#100日チャレンジ":[https://bsky.app/hashtag/100日チャレンジ]
           "#逃げ若":[https://bsky.app/hashtag/逃げ若] "#逃げ上手の若君":[https://bsky.app/hashtag/逃げ上手の若君]
@@ -215,7 +215,7 @@ module Sources
         display_name: "轟将",
         username: "masarustrongest",
         tags: [],
-        dtext_artist_commentary_desc: "Happy 6th Anniversary🌿"
+        dtext_artist_commentary_desc: "Happy 6th Anniversary🌿",
       )
     end
 
@@ -233,7 +233,7 @@ module Sources
         display_name: /Banditelli/,
         username: "banditelli",
         tags: [],
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Hops for all. "#birds":[https://bsky.app/hashtag/birds]
 
           [quote]
@@ -250,7 +250,7 @@ module Sources
         "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:3jogsxcisdcdzwjobhxbav2w/bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4@jpeg",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
         media_files: [{ file_size: 398_747 }],
-        profile_urls: ["https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w"]
+        profile_urls: ["https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w"],
       )
     end
 
@@ -262,21 +262,8 @@ module Sources
 
       strategy_should_work(
         "https://bsky.app/profile/ixy.bsky.social/post/3kkvo4d4jd32g",
-        image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"]
+        image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
       )
-    end
-
-    should "Parse Bluesky URLs correctly" do
-      assert(Source::URL.image_url?("https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:3jogsxcisdcdzwjobhxbav2w/bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4@jpeg"))
-      assert(Source::URL.image_url?("https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"))
-      assert(Source::URL.image_url?("https://morel.us-east.host.bsky.network/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"))
-
-      assert(Source::URL.profile_url?("https://bsky.app/profile/ixy.bsky.social"))
-      assert(Source::URL.profile_url?("https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w"))
-      assert(Source::URL.profile_url?("https://ixy.bsky.social"))
-
-      assert(Source::URL.page_url?("https://bsky.app/profile/ixy.bsky.social/post/3kkvo4d4jd32g"))
-      assert(Source::URL.page_url?("https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g"))
     end
   end
 end
