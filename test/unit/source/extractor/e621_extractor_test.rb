@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
-module Sources
-  class E621Test < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class E621ExtractorTest < ActiveSupport::TestCase
     context "A normal post URL" do
       strategy_should_work(
         "https://e621.net/posts/3728701",
@@ -46,7 +46,7 @@ module Sources
           ["rating:s", "https://e621.net/posts?tags=rating:s"],
         ],
         dtext_artist_commentary_title: "とても良い子に育ちました",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -69,7 +69,7 @@ module Sources
         display_name: "MarsMiner",
         username: "mars_miner",
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "Me assuming many different things that turn out to be wildly false. What an otter clown XD"
+        dtext_artist_commentary_desc: "Me assuming many different things that turn out to be wildly false. What an otter clown XD",
       )
     end
 
@@ -83,7 +83,7 @@ module Sources
         display_name: nil,
         username: "bnbigus",
         dtext_artist_commentary_title: nil,
-        dtext_artist_commentary_desc: nil
+        dtext_artist_commentary_desc: nil,
       )
     end
 
@@ -97,7 +97,7 @@ module Sources
         display_name: nil,
         username: nil,
         dtext_artist_commentary_title: nil,
-        dtext_artist_commentary_desc: nil
+        dtext_artist_commentary_desc: nil,
       )
     end
 
@@ -111,7 +111,7 @@ module Sources
         display_name: nil,
         username: nil,
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -125,22 +125,8 @@ module Sources
         display_name: "JeremySide",
         username: "Sonicjeremy",
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "Spent the last couple days modelin some of the designs from \"@JeremeyChinshue\":[https://twitter.com/JeremeyChinshue]'s \"#somethingseries\":[https://twitter.com/hashtag/somethingseries]. It's one of the funniest video game parodies I've seen and I had a lotta fun making these guys."
+        dtext_artist_commentary_desc: "Spent the last couple days modelin some of the designs from \"@JeremeyChinshue\":[https://twitter.com/JeremeyChinshue]'s \"#somethingseries\":[https://twitter.com/hashtag/somethingseries]. It's one of the funniest video game parodies I've seen and I had a lotta fun making these guys.",
       )
-    end
-
-    should "Parse e621 URLs correctly" do
-      assert(Source::URL.image_url?("https://static1.e621.net/data/sample/ae/ae/aeaed0dfba6468ec992c6e5cc46763c1_720p.mp4"))
-      assert(Source::URL.image_url?("https://static1.e926.net/data/preview/6d/1a/6d1a6090ea82c2524212499797e7e53a.jpg"))
-      assert(Source::URL.image_url?("https://static1.e926.net/data/6d/1a/6d1a6090ea82c2524212499797e7e53a.png"))
-
-      assert_equal("https://e621.net/posts?md5=6d1a6090ea82c2524212499797e7e53a", Source::URL.page_url("https://static1.e926.net/data/6d/1a/6d1a6090ea82c2524212499797e7e53a.png"))
-
-      assert(Source::URL.page_url?("https://e621.net/posts?md5=6d1a6090ea82c2524212499797e7e53a"))
-      assert(Source::URL.page_url?("https://e621.net/posts/3728701"))
-      assert(Source::URL.page_url?("https://e926.net/posts/3728701"))
-
-      assert(Source::URL.profile_url?("https://e621.net/users/205980"))
     end
   end
 end
