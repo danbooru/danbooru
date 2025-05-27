@@ -140,7 +140,7 @@ class MediaFile::Ugoira < MediaFile
   memoize def metadata
     data = super.reject { |key, value| key.starts_with?("ZIP:") }
 
-    super.merge(
+    data.merge(
       "Ugoira:FrameDelays" => frame_delays,
       "Ugoira:FrameOffsets" => frame_offsets,
       "Ugoira:FrameCount" => frame_delays.size,
