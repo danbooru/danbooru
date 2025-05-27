@@ -96,6 +96,9 @@ class FFmpeg
     metadata.dig(:format, :tags, :major_brand)
   end
 
+  # @return [String, nil] The pixel format of the video stream, or nil if unknown. Common values include yuv420p,
+  #   yuv422p, yuv444p, rgb24, bgr24, gray, etc.
+  # @see https://github.com/FFmpeg/FFmpeg/blob/master/libavutil/pixfmt.h
   def pix_fmt
     video_stream[:pix_fmt]
   end

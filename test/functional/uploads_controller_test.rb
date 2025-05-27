@@ -242,16 +242,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_match("File type is not supported", Upload.last.error)
         end
 
-        should "fail for a .mp4 file encoded with h265" do
-          create_upload!("test/files/mp4/test-300x300-h265.mp4", user: @user)
-          assert_match("File type is not supported", Upload.last.error)
-        end
-
-        should "fail for a .mp4 file encoded with av1" do
-          create_upload!("test/files/mp4/test-300x300-av1.mp4", user: @user)
-          assert_match("File type is not supported", Upload.last.error)
-        end
-
         should "fail for a 10-bit color .mp4 file encoded with av1" do
           create_upload!("test/files/mp4/test-yuv420p10le-av1.mp4", user: @user)
           assert_match("File type is not supported", Upload.last.error)
@@ -445,6 +435,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/mp4/test-300x300-vp9.mp4")
         should_upload_successfully("test/files/mp4/test-300x300-yuvj420p-h264.mp4")
         should_upload_successfully("test/files/mp4/test-300x300-iso4.mp4")
+        should_upload_successfully("test/files/mp4/test-300x300-h265.mp4")
+        should_upload_successfully("test/files/mp4/test-300x300-av1.mp4")
         should_upload_successfully("test/files/mp4/test-audio.mp4")
         should_upload_successfully("test/files/mp4/test-audio.m4v")
         should_upload_successfully("test/files/mp4/test-iso5.mp4")
@@ -666,7 +658,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg")
         should_upload_successfully("https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat")
 
-        should_upload_successfully("https://kmyama.fanbox.cc/posts/104708")
         should_upload_successfully("https://downloads.fanbox.cc/images/post/104708/wsF73EC5Fq0CIK84W0LGYk2p.jpeg")
 
         should_upload_successfully("https://foundation.app/@KILLERGF/kgfgen/4")

@@ -61,7 +61,7 @@ class MediaFile::Video < MediaFile
     # gbrp: 8-bit RGB (used by VP9). Uncommon, but widely supported.
     #
     # https://github.com/FFmpeg/FFmpeg/blob/master/libavutil/pixfmt.h
-    return false if !pix_fmt.in?(%w[yuv420p yuvj420p gbrp])
+    return false if pix_fmt.present? && !pix_fmt.in?(%w[yuv420p yuvj420p gbrp])
 
     true
   end
