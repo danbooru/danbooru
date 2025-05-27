@@ -28,3 +28,7 @@ To generate a new test case for a given url you can copy paste the output of the
 puts Source::Extractor.find("https://my.url").test_case
 
 ```
+
+You can also visit your local instance at `http://your-instance-url/source?mode=test&url=your-url` to see this test case.
+
+For example, if you are using the default GitHub codespace, and you wanted to generate the test case for https://www.pixiv.net/en/artworks/12345678, you would visit http://127.0.0.1:3000/source?mode=test&url=https://www.pixiv.net/en/artworks/12345678.
