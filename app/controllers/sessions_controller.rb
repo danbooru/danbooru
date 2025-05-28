@@ -10,8 +10,13 @@ class SessionsController < ApplicationController
   verify_captcha only: :create
 
   def new
-    @user = User.new
     @session = SessionLoader.new(request)
+
+    if params[:signed_login_event].present? && @session.authorize_login_event!(params[:signed_login_event])
+      flash.now[:notice] = "New location verified. Login again to continue"
+    end
+
+    respond_with(@session)
   end
 
   # Verify the user's password and either log them in, or show them the 2FA page if they have 2FA enabled.

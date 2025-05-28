@@ -318,6 +318,36 @@ class User < ApplicationRecord
     end
   end
 
+  concerning :LoginVerificationMethods do
+    extend Memoist
+
+    # @return [Array<Danbooru::IpAddress>] The list of IP addresses that have been used by this account before.
+    def authorized_ip_addresses
+      user_events.authorized.distinct.pluck(:ip_addr)
+    end
+
+    # @return [Array<Danbooru::IpAddress>] The list of /24 or /64 subnets that have been used by this account before.
+    def authorized_subnets
+      user_events.authorized.distinct.pluck(Arel.sql("network(set_masklen(ip_addr, CASE WHEN family(ip_addr) = 4 THEN 24 ELSE 64 END)) AS ip_addr"))
+    end
+
+    # @param ip_addr [Danbooru::IpAddress] The IP address or subnet to check.
+    # @return [Boolean] True if this IP address or subnet has been used by this account before.
+    def authorized_ip?(ip_addr)
+      user_events.authorized.exists?(["ip_addr <<= ?", ip_addr.subnet.to_s])
+    end
+
+    # Send the user a login verification email when they try to login from a new location.
+    #
+    # @param request [ActionDispatch::Request] The HTTP request of the login attempt that triggered this email.
+    # @param user_event [UserEvent] The user event that triggered this email.
+    def send_login_verification_email!(request, user_event)
+      if can_receive_email?(require_verified_email: false)
+        UserMailer.with_request(request).login_verification(self, user_event).deliver_later
+      end
+    end
+  end
+
   concerning :TOTPMethods do
     extend Memoist
 

@@ -40,6 +40,10 @@
       <% case user_event.category %>
       <% when "login" %>
         Logged in.
+      <% when "login_pending_verification" %>
+        Tried to login from a new location. Awaiting verification.
+      <% when "login_verification" %>
+        Verified a new login location.
       <% when "reauthenticate" %>
         Reauthenticated.
       <% when "failed_login" %>

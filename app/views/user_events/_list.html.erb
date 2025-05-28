@@ -27,6 +27,10 @@
               <% case user_event.category %>
               <% when "login" %>
                 <%= link_to_user user %> logged in.
+              <% when "login_pending_verification" %>
+                <%= link_to_user user %> tried to login from a new location. Awaiting verification.
+              <% when "login_verification" %>
+                <%= link_to_user user %> verified a new login location.
               <% when "reauthenticate" %>
                 <%= link_to_user user %> reauthenticated.
               <% when "failed_login" %>

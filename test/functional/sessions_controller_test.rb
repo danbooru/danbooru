@@ -11,6 +11,45 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         get new_session_path
         assert_response :success
       end
+
+      should "authorize a valid login event" do
+        login_event = create(:user_event, user: @user, category: :login_pending_verification)
+        signed_login_event = login_event.signed_id(purpose: :login_verification, expires_in: 15.minutes)
+
+        assert_difference(-> { @user.user_events.login_verification.count }, 1) do
+          get new_session_path, params: { signed_login_event: signed_login_event }
+        end
+
+        assert_response :success
+        assert_equal("login_verification", @user.user_events.last.category)
+        assert_equal("New location verified. Login again to continue", flash[:notice])
+      end
+
+      should "not authorize an expired login event" do
+        login_event = create(:user_event, user: @user, category: :login_pending_verification)
+        signed_login_event = login_event.signed_id(purpose: :login_verification, expires_at: 1.minute.ago)
+
+        assert_no_difference(-> { @user.user_events.login_verification.count }) do
+          get new_session_path, params: { signed_login_event: signed_login_event }
+        end
+
+        assert_response :success
+        assert_equal("login_pending_verification", @user.user_events.last.category)
+        assert_nil(flash[:notice])
+      end
+
+      should "not authorize an invalid login event" do
+        login_event = create(:user_event, user: @user, category: :login_pending_verification)
+        signed_login_event = login_event.signed_id(purpose: :login_verification, expires_at: 1.minute.ago)
+
+        assert_no_difference(-> { @user.user_events.login_verification.count }) do
+          get new_session_path, params: { signed_login_event: signed_login_event.chop }
+        end
+
+        assert_response :success
+        assert_equal("login_pending_verification", @user.user_events.last.category)
+        assert_nil(flash[:notice])
+      end
     end
 
     context "create action" do
@@ -186,11 +225,78 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(@ip_ban.last_hit_at)
       end
 
-      should "rate limit logins to 1 per 10 minutes per IP" do
+      context "for a builder" do
+        context "with 2FA and with an email address" do
+          should "not send a login verification email when logging in from a new IP address" do
+            user = create(:user_with_2fa, level: User::Levels::BUILDER, password: "password", email_address_attributes: { address: "user@example.com" })
+
+            post session_path, params: { session: { name: user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+            assert_response :success
+            assert_nil(nil, session[:user_id])
+            assert_equal(true, user.user_events.totp_login_pending_verification.exists?)
+            assert_no_enqueued_jobs
+          end
+        end
+
+        context "without 2FA but with an email address" do
+          should "send a login verification email when logging in from a new IP address" do
+            user = create(:builder_user, password: "password", email_address_attributes: { address: "user@example.com" })
+
+            post session_path, params: { session: { name: user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+            assert_response 401
+            assert_nil(nil, session[:user_id])
+            assert_equal(true, user.user_events.login_pending_verification.exists?)
+            assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer login_verification] })
+          end
+
+          should "not send a login verification email when logging in from an authorized IP address" do
+            user = create(:builder_user, password: "password", email_address_attributes: { address: "user@example.com" })
+            create(:user_event, user: user, category: :login_verification, ip_addr: "1.2.3.4")
+
+            post session_path, params: { session: { name: user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+            assert_redirected_to root_path
+            assert_equal(user.id, session[:user_id])
+            assert_equal("1.2.3.4", user.reload.last_ip_addr.to_s)
+            assert_equal(true, user.user_events.login.exists?)
+            assert_no_enqueued_jobs
+          end
+
+          should "not count failed login attempts as authorized IPs" do
+            user = create(:builder_user, password: "password", email_address_attributes: { address: "user@example.com" })
+            create(:user_event, user: user, category: :failed_login, ip_addr: "1.2.3.4")
+
+            post session_path, params: { session: { name: user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+            assert_response 401
+            assert_nil(nil, session[:user_id])
+            assert_equal(true, user.user_events.login_pending_verification.exists?)
+            assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer login_verification] })
+          end
+        end
+
+        context "without 2FA or an email address" do
+          should "not send a login verification email when logging in from a new IP address" do
+            user = create(:builder_user, password: "password")
+
+            post session_path, params: { session: { name: user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+            assert_redirected_to root_path
+            assert_equal(user.id, session[:user_id])
+            assert_equal("1.2.3.4", user.reload.last_ip_addr.to_s)
+            assert_equal(true, user.user_events.login.exists?)
+            assert_no_enqueued_jobs
+          end
+        end
+      end
+
+      should "rate limit logins to 1 per 5 minutes per IP" do
         Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
         freeze_time
 
-        20.times do
+        5.times do
           post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
 
           assert_redirected_to root_path
@@ -203,22 +309,22 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
-        travel 9.minutes
+        travel 4.minutes
         post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
-        travel 19.minutes
+        travel 9.minutes
         post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
       end
 
-      should "rate limit logins to 1 per 10 minutes per IPv4 /24 subnet" do
+      should "rate limit logins to 1 per 5 minutes per IPv4 /24 subnet" do
         Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
         freeze_time
 
-        20.times do |n|
+        5.times do |n|
           post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.#{n}" }
 
           assert_redirected_to root_path
@@ -231,22 +337,22 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
-        travel 9.minutes
+        travel 4.minutes
         post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.22" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
-        travel 19.minutes
+        travel 9.minutes
         post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1.2.3.23" }
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
       end
 
-      should "rate limit logins to 1 per 10 minutes per IPv6 /64 subnet" do
+      should "rate limit logins to 1 per 5 minutes per IPv6 /64 subnet" do
         Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
         freeze_time
 
-        20.times do |n|
+        5.times do |n|
           post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1:2:3:4:#{n}::1" }
 
           assert_redirected_to root_path
@@ -259,12 +365,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
-        travel 9.minutes
+        travel 4.minutes
         post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1:2:3:4:22::1" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
-        travel 19.minutes
+        travel 9.minutes
         post session_path, params: { session: { name: @user.name, password: "password" } }, headers: { REMOTE_ADDR: "1:2:3:4:23::1" }
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])

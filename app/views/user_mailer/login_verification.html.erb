@@ -1,0 +1,39 @@
+<h2>Hi <%= @user.name %>,</h2>
+
+<p>
+  Someone tried to log into your <%= Danbooru.config.canonical_app_name %> account from a new location. If this is you,
+  click the link below to verify the login.
+</p>
+
+<p style="margin-left: 2em">
+  <table>
+    <% if @user_event.ip_geolocation&.city.present? && @user_event.ip_geolocation&.region.present? %>
+      <tr>
+        <td><strong>Location</strong></td>
+        <td><%= @user_event.ip_geolocation.city %>, <%= @user_event.ip_geolocation.region %></td>
+      </tr>
+    <% end %>
+
+    <tr>
+      <td style="padding-right: 1em"><strong>IP Address</strong></td>
+      <td><%= @user_event.ip_addr.to_s %> <%= "(#{@user_event.ip_geolocation&.organization})" if @user_event&.ip_geolocation&.organization.present? %></td>
+    </tr>
+
+    <tr>
+      <td style="padding-right: 1em"><strong>Device</strong></td>
+      <td><%= @user_event.user_agent %></td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 1em; margin-bottom: 1em;">
+    <tr>
+      <td align="center">
+        <%= link_to "Verify login", login_url(signed_login_event: @user_event.signed_id(expires_in: 15.minutes, purpose: :login_verification)), style: "display: inline-block; padding: 16px; border-radius: 4px; color: white; background-color: #0075f8;" %>
+      </td>
+    </tr>
+  </table>
+</p>
+
+<p>
+  If this wasn't you, you should login to your account and change your password immediately.
+</p>

@@ -8,6 +8,14 @@
 class UserEvent < ApplicationRecord
   extend Memoist
 
+  # Events that were performed by the user while logged in, for tracking the user's authorized IP addresses. This does not
+  # include failed login attempts, password reset requests, or other events that may not have been performed by the user.
+  AUTHORIZED_EVENTS = %i[
+    login login_verification reauthenticate logout user_creation user_deletion user_undeletion
+    password_reset password_change email_change totp_enable totp_update totp_disable
+    totp_login totp_reauthenticate backup_code_generate backup_code_login backup_code_reauthenticate
+  ]
+
   attribute :id
   attribute :created_at
   attribute :updated_at
@@ -25,6 +33,9 @@ class UserEvent < ApplicationRecord
 
   enum category: {
     login: 0,                             # The user successfully logged in. Only used for users without 2FA enabled.
+    login_pending_verification: 10,       # The user entered the correct password on the login page, but logged in from a new
+                                          # location. Only used for users with a valid email but without 2FA enabled.
+    login_verification: 15,               # The user clicked the link in the email sent to verify their new login location.
     reauthenticate: 25,                   # The user entered the correct password on the confirm password page. Only used for users without 2FA enabled.
     failed_login: 50,                     # The user entered an incorrect password on the login page.
     failed_reauthenticate: 75,            # The user entered an incorrect password on the confirm password page.
@@ -50,6 +61,8 @@ class UserEvent < ApplicationRecord
   }
 
   delegate :country, :city, :is_proxy?, to: :ip_geolocation, allow_nil: true
+
+  scope :authorized, -> { where(category: AUTHORIZED_EVENTS) }
 
   def self.visible(user)
     if user.is_moderator?
@@ -82,7 +95,9 @@ class UserEvent < ApplicationRecord
       end
 
       def create_from_request!(...)
-        build_from_request(...).save!
+        event = build_from_request(...)
+        event.save!
+        event
       end
     end
   end

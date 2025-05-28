@@ -34,13 +34,23 @@ class SessionLoader
       # Don't allow approvers or inactive accounts to login from proxies, unless the user has 2FA enabled.
       if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy? && user.totp.nil?
         UserEvent.create_from_request!(user, :failed_login, request)
+        errors.add(:base, "You cannot login from a proxy unless you have 2FA enabled")
+
         return nil
       elsif user.totp.present?
         UserEvent.create_from_request!(user, :totp_login_pending_verification, request)
-        return user
-      end
 
-      login_user(user, :login)
+        return user
+      # Require email verification for builders without 2FA enabled who are logging in from a new location.
+      elsif user.is_builder? && user.can_receive_email?(require_verified_email: false) && !user.authorized_ip?(ip_address)
+        user_event = UserEvent.create_from_request!(user, :login_pending_verification, request)
+        user.send_login_verification_email!(request, user_event)
+        errors.add(:base, "New login location detected. Check your email to continue")
+
+        return nil
+      else
+        login_user(user, :login)
+      end
     elsif user.nil?
       errors.add(:base, "Incorrect username or password")
       nil
@@ -48,6 +58,22 @@ class SessionLoader
       UserEvent.create_from_request!(user, :failed_login, request)
       errors.add(:base, "Incorrect username or password")
       nil
+    end
+  end
+
+  # Authorize a new login location for a user who was sent a login verification email.
+  #
+  # @param signed_login_event [String] The signed login event from the login verification email.
+  # @return [Boolean] True if the location was authorized, false otherwise.
+  def authorize_login_event!(signed_login_event)
+    user_event = UserEvent.find_signed(signed_login_event, purpose: :login_verification)
+
+    if user_event.present?
+      UserEvent.create_from_request!(user_event.user, :login_verification, request)
+      true
+    else
+      errors.add(:base, "Expired link. Please login again")
+      false
     end
   end
 

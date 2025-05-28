@@ -306,6 +306,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "for a user with an email address" do
         setup do
+          @user = create(:user)
           create(:email_address, user: @user)
         end
 

@@ -20,6 +20,13 @@ class UserMailerPreview < ActionMailer::Preview
     UserMailer.welcome_user(user)
   end
 
+  def login_verification
+    user = params[:id].present? ? User.find(params[:id]) : User.owner
+    user_event = user.user_events.login_pending_verification.last
+
+    UserMailer.login_verification(user_event)
+  end
+
   def dmca_complaint
     dmca = {
       name: "John Doe",

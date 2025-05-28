@@ -17,8 +17,8 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "let mods see emails belonging to themselves and all users below mod level" do
-        @mod1 = create(:moderator_user, email_address: build(:email_address))
-        @mod2 = create(:moderator_user, email_address: build(:email_address))
+        @mod1 = create(:user_with_2fa, level: User::Levels::MODERATOR, email_address: build(:email_address))
+        @mod2 = create(:user_with_2fa, level: User::Levels::MODERATOR, email_address: build(:email_address))
 
         get_auth emails_path, @mod1
 
