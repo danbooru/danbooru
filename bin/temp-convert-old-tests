@@ -3,8 +3,8 @@
 require "active_support/inflector"
 
 assert_normal_pattern = /assert[\( ]?Source::URL\.(\w+)\??\((".*")\)(?:\.(\w+)\?)?/
-assert_equal_pattern = /assert_equal[\( ](".*"), Source::URL\.(\w+\??)\((".*")\)(?:\.(\w+\??))?/
-assert_nil_pattern = /assert_(nil|not)[\( ]Source::URL\.(\w+\??)\((".*")\)(?:\.(\w+\?))?/
+assert_equal_pattern = /assert_equal[\( ](.*), Source::URL\.(\w+\??)\((".*")\)(?:\.(\w+\??))?/
+assert_nil_pattern = /assert_(nil|not)[\( ]Source::URL\.(\w+\??)\((".*")\)(?:\.(\w+\??))?/
 
 normal_cases = {}
 false_positive_cases = {}
@@ -35,12 +35,10 @@ File.read(input_file).each_line do |line|
     next
   end
 
-
   match = line[assert_nil_pattern]
   if match
     nil_or_not, method_name, original, true_method_name = $1, $2, $3, $4
     method_name = true_method_name if method_name == "parse"
-
     if method_name.end_with?("?")
       method_name = method_name.delete_suffix("?")
       false_positive_cases[method_name] ||= []
@@ -49,10 +47,14 @@ File.read(input_file).each_line do |line|
       raise "'#{nil_or_not}' is not nil -> #{method_name}" unless nil_or_not == "nil"
       equal_cases << [original, method_name, "nil"]
     end
+
     next
   end
 
   unparsed += [line]
+rescue
+  puts "\nError on line: #{line}\n"
+  raise
 end
 
 puts input_file
