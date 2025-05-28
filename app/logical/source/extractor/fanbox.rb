@@ -36,6 +36,8 @@ module Source
       def page_url
         if username.present? && illust_id.present?
           "https://#{username}.fanbox.cc/posts/#{illust_id}"
+        elsif illust_id.present?
+          "https://www.fanbox.cc/manage/posts/#{illust_id}"
         elsif parsed_url.image_url? && username.present?
           # Cover images
           "https://#{username}.fanbox.cc"
