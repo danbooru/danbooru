@@ -1,7 +1,7 @@
 require "test_helper"
 
-module Sources
-  class MisskeyTest < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class MisskeyExtractorTest < ActiveSupport::TestCase
     context "A https://misskey.io/notes/:note_id url" do
       strategy_should_work(
         "https://misskey.io/notes/9bxaf592x6",
@@ -18,7 +18,7 @@ module Sources
           ["村上さん", "https://misskey.io/tags/村上さん"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           村上さん "#村上さん":[https://misskey.io/tags/村上さん] 村上アート
         EOS
       )
@@ -44,7 +44,7 @@ module Sources
         other_names: ["Ｉｘｙ（いくしー）", "ixy194"],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "おりきゃら"
+        dtext_artist_commentary_desc: "おりきゃら",
       )
     end
 
@@ -61,7 +61,7 @@ module Sources
         other_names: ["Ｉｘｙ（いくしー）", "ixy194"],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           【お絵描き雑談】息抜き <https://www.youtube.com/live/7wNu09QE0SU?feature=share> "@YouTube":[https://misskey.io/@YouTube]より
         EOS
       )
@@ -81,7 +81,7 @@ module Sources
         other_names: ["DP", "77Pokomoko"],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "RE: <https://misskey.io/notes/9t8uxi3tcjpg026q>"
+        dtext_artist_commentary_desc: "RE: <https://misskey.io/notes/9t8uxi3tcjpg026q>",
       )
     end
 
@@ -101,7 +101,7 @@ module Sources
           ["blobcat", "https://nijimiss.moe/tags/blobcat"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           :nyanpuppu:がメイドの日でメイド服を着てくれたよ！
           :kawaiidesune: "#にじみすお絵描き部":[https://nijimiss.moe/tags/にじみすお絵描き部] "#にじみすメイドの日":[https://nijimiss.moe/tags/にじみすメイドの日] "#blobcat":[https://nijimiss.moe/tags/blobcat]
         EOS
@@ -121,7 +121,7 @@ module Sources
         other_names: ["朝之助", "sasanosuke00"],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           RNしてくれたフォロワーさんの第一印象を答えます！
 
           (知らねぇやつばっかだからプロフィールとアイコンと直近のノートを参照しよう…。)
@@ -145,7 +145,7 @@ module Sources
           ["blobcat", "https://misskey.io/tags/blobcat"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           動かない方も見て:ablobcatangel:💘 "#blobcat":[https://misskey.io/tags/blobcat]
 
           キューピッドのにゃんぷっぷー(動かない方) :ablobcatangel:を元に私が描きました。
@@ -167,7 +167,7 @@ module Sources
         other_names: ["糸葱ににか", "asatsukininica"],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           チャリ乗りながらぶーんって言ってるだけの音声
         EOS
       )
@@ -184,7 +184,7 @@ module Sources
         username: "ruruke",
         tags: [],
         dtext_artist_commentary_title: "にゃんぷっぷーとあそぼう！",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           あなただけのにゃんぷっぷーと共に、2人(1人と1匹？)だけのひとときを過ごしましょう！
 
           正常にプレイが出来ない場合リロードをお願いいたします
@@ -199,7 +199,7 @@ module Sources
         "https://media.misskeyusercontent.jp/io/webpublic-806fd8e2-3425-486f-975e-2fb57d8e651a.png",
         image_urls: ["https://media.misskeyusercontent.jp/io/webpublic-806fd8e2-3425-486f-975e-2fb57d8e651a.png"],
         media_files: [{ file_size: 386_451 }],
-        page_url: nil
+        page_url: nil,
       )
     end
 
@@ -217,7 +217,7 @@ module Sources
         tag_name: "naga_u",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -226,7 +226,7 @@ module Sources
         "https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp",
         image_urls: ["https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp"],
         media_files: [{ file_size: 35_338 }],
-        page_url: nil
+        page_url: nil,
       )
     end
 
@@ -242,7 +242,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -265,7 +265,7 @@ module Sources
           ["崩壊スターレイル", "https://oekakiskey.com/tags/崩壊スターレイル"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           Dr.レイシオ
           "#ざら博":[https://oekakiskey.com/tags/ざら博] "#描いたよ":[https://oekakiskey.com/tags/描いたよ]
           "#二次創作":[https://oekakiskey.com/tags/二次創作] "#崩壊スターレイル":[https://oekakiskey.com/tags/崩壊スターレイル]
@@ -287,7 +287,7 @@ module Sources
         other_names: ["ちゃーくす", "charks"],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           いつものノリで言おうとしたけど、ひよっちゃったウナちゃん
         EOS
       )
@@ -306,7 +306,7 @@ module Sources
         tag_name: "gatturi",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           $[shake :nekonohanao_nadetai:]
           横になっている猫の写真
         EOS
@@ -324,7 +324,7 @@ module Sources
         username: "aleus52hz",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "ビールオフ、HUBのこれ飲んでほしい"
+        dtext_artist_commentary_desc: "ビールオフ、HUBのこれ飲んでほしい",
       )
     end
 
@@ -342,7 +342,7 @@ module Sources
         other_names: ["菜乃", "nano"],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           今日から菜乃は、ピュアホワイトピンクアラモーゼザ・ボルテーニョだ、、
           略して菜乃と呼んでくれ
         EOS
@@ -364,7 +364,7 @@ module Sources
         other_names: ["菜乃", "nano"],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           今日から菜乃は、ピュアホワイトピンクアラモーゼザ・ボルテーニョだ、、
           略して菜乃と呼んでくれ
         EOS
@@ -385,7 +385,7 @@ module Sources
         other_names: [],
         tags: [],
         dtext_artist_commentary_title: nil,
-        dtext_artist_commentary_desc: nil
+        dtext_artist_commentary_desc: nil,
       )
     end
 
@@ -403,40 +403,8 @@ module Sources
         other_names: [],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
-    end
-
-    should "Parse Misskey URLs correctly" do
-      assert(Source::URL.image_url?("https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp"))
-      assert(Source::URL.image_url?("https://s3.arkjp.net/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png"))
-      assert(Source::URL.image_url?("https://media.misskeyusercontent.jp/io/dfca7bd4-c073-4ea0-991f-313ab3a77847.png"))
-      assert(Source::URL.image_url?("https://media.misskeyusercontent.com/io/thumbnail-e9f307e4-3fad-435f-91b6-3768d688491d.webp"))
-      assert(Source::URL.image_url?("https://media.misskeyusercontent.com/io/webpublic-a2cdd9c7-0449-4a61-b453-b5c7b2134677.png"))
-      assert(Source::URL.image_url?("https://proxy.misskeyusercontent.com/image.webp?url=https%3A%2F%2Fimg.pawoo.net%2Fmedia_attachments%2Ffiles%2F111%2F232%2F575%2F490%2F284%2F147%2Foriginal%2F9aaf0c71a41b5647.jpeg"))
-      assert(Source::URL.image_url?("https://media.misskeyusercontent.com/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png"))
-      assert(Source::URL.image_url?("https://nos3.arkjp.net/image.webp?url=https%3A%2F%2Fimg.pawoo.net%2Fmedia_attachments%2Ffiles%2F110%2F314%2F466%2F230%2F358%2F806%2Foriginal%2F6fbcc38659d3cb97.jpeg"))
-      assert(Source::URL.image_url?("https://s3.arkjp.net/misskey/930fe4fb-c07b-4439-804e-06fb472d698f.gif"))
-      assert(Source::URL.image_url?("https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp"))
-      assert(Source::URL.image_url?("https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp"))
-      assert_not(Source::URL.image_url?("https://media.misskeyusercontent.com"))
-
-      assert(Source::URL.page_url?("https://misskey.io/notes/9bxaf592x6"))
-      assert_equal("https://misskey.io/notes/9bxaf592x6", Source::URL.page_url("https://misskey.io/notes/9bxaf592x6#pswp"))
-
-      assert(Source::URL.profile_url?("https://misskey.io/@ixy194"))
-      assert(Source::URL.profile_url?("https://misskey.io/users/9bpemdns40"))
-      assert_equal("https://misskey.io/users/9bpemdns40", Source::URL.profile_url("https://misskey.io/user-info/9bpemdns40"))
-
-      assert_not(Source::URL.profile_url?("https://misskey.io/@"))
-      assert_not(Source::URL.profile_url?("https://misskey.io/users/"))
-      assert_not(Source::URL.profile_url?("https://misskey.io/user-info/"))
-
-      assert_nil(Source::URL.parse("https://misskey.io/@ixy194").user_id)
-      assert_equal("ixy194", Source::URL.parse("https://misskey.io/@ixy194").username)
-
-      assert_equal("9bpemdns40", Source::URL.parse("https://misskey.io/users/9bpemdns40").user_id)
-      assert_nil(Source::URL.parse("https://misskey.io/users/9bpemdns40").username)
     end
   end
 end

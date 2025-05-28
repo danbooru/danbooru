@@ -1,7 +1,7 @@
 require "test_helper"
 
-module Sources
-  class LofterTest < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class LofterExtractorTest < ActiveSupport::TestCase
     context "A lofter sample image url" do
       strategy_should_work(
         "https://imglf4.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJUFczb2RKSVlpMHJkNy9kc3BSQVQvQm5DNzB4eVhxay9nPT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0",
@@ -13,7 +13,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -53,7 +53,7 @@ module Sources
           ["西撒齐贝林", "https://www.lofter.com/tag/西撒齐贝林"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           发了三次发不出有毒……
 
           二部运动au 性转ac注意
@@ -77,7 +77,7 @@ module Sources
           ["阿米娅", "https://www.lofter.com/tag/阿米娅"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "Amiya"
+        dtext_artist_commentary_desc: "Amiya",
       )
     end
 
@@ -96,7 +96,7 @@ module Sources
           ["明日方舟", "https://www.lofter.com/tag/明日方舟"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           練習
 
           画画卡姐～
@@ -125,7 +125,7 @@ module Sources
           ["德克萨斯", "https://www.lofter.com/tag/德克萨斯"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "过去与她擦肩而过"
+        dtext_artist_commentary_desc: "过去与她擦肩而过",
       )
     end
 
@@ -153,7 +153,7 @@ module Sources
           ["TF2", "https://www.lofter.com/tag/TF2"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "本来是给外国朋友但是我销号了所以存下()"
+        dtext_artist_commentary_desc: "本来是给外国朋友但是我销号了所以存下()",
       )
     end
 
@@ -176,7 +176,7 @@ module Sources
           ["刀剑乱舞", "https://www.lofter.com/tag/刀剑乱舞"],
         ],
         dtext_artist_commentary_title: "冲田组原主与刀温馨向合志《金平糖》补货及预售通贩告知",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           非常感谢各位一直以来的支持和厚爱，冲田组原主与刀温馨向合志[b]《金平糖》二刷[/b]的通贩现货目前已经完售
 
           但由于淘宝上存在数家对《金平糖》进行盗印的不法商家，并且已经有数位受骗上当、购买了盗印的同好，为了不让这些无耻的盗印商得逞，我们决定继续对本子加印补货
@@ -244,7 +244,7 @@ module Sources
           ["姬子", "https://www.lofter.com/tag/姬子"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "[image]":[https://imglf6.lf127.net/img/TjdteWU3UmU0SkpHOUVVV3RjK0MzdFNwTjlLeHkwbEdyc3FwRGZvblNFbWtyTW4xY0lqeEFBPT0.png]
 
           "[image]":[https://imglf5.lf127.net/img/TjdteWU3UmU0SktNUXg5YTJ6UHhHYVp5WW5DbzZNbld4cFArZGxGSXZhbmxhR3cvR04weFVBPT0.png]
@@ -299,7 +299,7 @@ module Sources
         username: "jiuhaotaiyangdeshexian",
         tags: [],
         dtext_artist_commentary_title: "Q:老师！想问问最近会不会画ITZY？🥰🥰",
-        dtext_artist_commentary_desc: "不好意思现在才看到！那就画一个荔枝猫猫吧😄"
+        dtext_artist_commentary_desc: "不好意思现在才看到！那就画一个荔枝猫猫吧😄",
       )
     end
 
@@ -318,7 +318,7 @@ module Sources
           ["阿米娅", "https://www.lofter.com/tag/阿米娅"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "夏 日 活 动"
+        dtext_artist_commentary_desc: "夏 日 活 动",
       )
     end
 
@@ -337,7 +337,7 @@ module Sources
           ["夸奈24h:\u00A0海蓝苏打七夕特供", "https://www.lofter.com/tag/夸奈24h:\u00A0海蓝苏打七夕特供"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           【海蓝苏打七夕特供 13:14】
 
           cafe打工中但是得意猫猫
@@ -363,7 +363,7 @@ module Sources
           ["apex", "https://www.lofter.com/tag/apex"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           泰俊欧巴🥰超绝可爱🔥有趣灵魂💖全能爱豆 ✨人间水蜜桃🍑 舞蹈天才💃🏻 快乐源泉😊 小甜豆‍🍬 人间治愈🍭 小精灵🧚‍♀️ 露脸即吸粉🎉 性格魅力无限♾️ 肩宽腿长🦾完美身材😛 肤白貌美🌸 笑容甜美💖 人间花仙子🥰 不断超越自己💃🏻 励志爱豆👐 完美爱豆来了🤚 快让开🔥 氛围美学大师🍬 实力吸粉🍑 镜头捕捉能力者📷 直拍匠人🔥 完美舞台表现力✨
         EOS
       )
@@ -379,24 +379,8 @@ module Sources
         username: "gxszdddd",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
-    end
-
-    should "Parse Lofter URLs correctly" do
-      assert(Source::URL.image_url?("https://imglf3.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJSzFCWFlnUWgzb01DcUdpT1lreG5yQjJVMkhGS09HNGR3PT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0"))
-      assert(Source::URL.image_url?("http://imglf0.nosdn.127.net/img/cHl3bXNZdDRaaHBnNWJuN1Y4OXBqR01CeVBZSVNmU2FWZWtHc1h4ZTZiUGxlRzMwZnFDM1JnPT0.jpg "))
-      assert(Source::URL.image_url?("https://vodm2lzexwq.vod.126.net/vodm2lzexwq/Pc5jg1nL_3039990631_sd.mp4?resId=254486990bfa2cd7aa860229db639341_3039990631_1&sign=4j02HTHXqNfhaF%2B%2FO14Ny%2F9SMNZj%2FIjpJDCqXfYa4aM%3D"))
-
-      assert(Source::URL.page_url?("https://gengar563.lofter.com/post/1e82da8c_1c98dae1b"))
-      assert(Source::URL.page_url?("https://gengar563.lofter.com/front/post/1e82da8c_1c98dae1b"))
-      assert(Source::URL.page_url?("https://uls.lofter.com/?h5url=https%3A%2F%2Flesegeng.lofter.com%2Fpost%2F1f0aec07_2bbc5ce0b"))
-
-      assert(Source::URL.profile_url?("https://www.lofter.com/front/blog/home-page/noshiqian"))
-      assert(Source::URL.profile_url?("http://www.lofter.com/app/xiaokonggedmx"))
-      assert(Source::URL.profile_url?("http://www.lofter.com/blog/semblance"))
-      assert(Source::URL.profile_url?("http://gengar563.lofter.com"))
-      assert(Source::URL.profile_url?("https://www.lofter.com/mentionredirect.do?blogId=1278105311"))
     end
   end
 end

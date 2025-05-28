@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
-module Sources
-  class NewgroundsTest < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class NewgroundsExtractorTest < ActiveSupport::TestCase
     context "A newgrounds post url" do
       strategy_should_work(
         "https://www.newgrounds.com/art/view/hcnone/sephiroth",
@@ -16,7 +16,7 @@ module Sources
           ["supersmashbros", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=supersmashbros"],
         ],
         dtext_artist_commentary_title: "Sephiroth",
-        dtext_artist_commentary_desc: "it's sephiroth, from super smash bros ultimate"
+        dtext_artist_commentary_desc: "it's sephiroth, from super smash bros ultimate",
       )
     end
 
@@ -34,7 +34,7 @@ module Sources
           ["supersmashbros", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=supersmashbros"],
         ],
         dtext_artist_commentary_title: "Sephiroth",
-        dtext_artist_commentary_desc: "it's sephiroth, from super smash bros ultimate"
+        dtext_artist_commentary_desc: "it's sephiroth, from super smash bros ultimate",
       )
     end
 
@@ -54,7 +54,7 @@ module Sources
           ["zelda", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=zelda"],
         ],
         dtext_artist_commentary_title: "Link's Barrel Beat",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           *This is a LOOP, but things change as you watch for the first few plays*
 
           Hahahaha, thanks so much everybody for the daily feature and the... SUPER front page :D I'm honored...
@@ -93,7 +93,7 @@ module Sources
           ["retro-anime", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=retro-anime"],
         ],
         dtext_artist_commentary_title: "[ANIMATION W/ SOUND] Jack-O' Valentine [GUILTY GEAR]",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           [b]FULL LENGTH VIDEO WITH SOUND HERE[/b]: <https://www.pornhub.com/view_video.php?viewkey=ph5ef177b125770>
 
           Oh yummy! [b]Jack-O' Valentine[/b] gets a surprise trick-or-treat~
@@ -122,7 +122,7 @@ module Sources
 
       strategy_should_work(
         "https://www.newgrounds.com/portal/view/734778",
-        image_urls: ["https://uploads.ungrounded.net/alternate/1352000/1352451_alternate_80350.1080p.mp4?1563167480"]
+        image_urls: ["https://uploads.ungrounded.net/alternate/1352000/1352451_alternate_80350.1080p.mp4?1563167480"],
       )
     end
 
@@ -137,7 +137,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -161,7 +161,7 @@ module Sources
           ["spider", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=spider"],
         ],
         dtext_artist_commentary_title: "Weaver",
-        dtext_artist_commentary_desc: "\"iu_199826_7115981.jpg\":[https://art.ngfiles.com/comments/199000/iu_199826_7115981.jpg]"
+        dtext_artist_commentary_desc: "\"iu_199826_7115981.jpg\":[https://art.ngfiles.com/comments/199000/iu_199826_7115981.jpg]",
       )
     end
 
@@ -195,7 +195,7 @@ module Sources
           ["x-ray", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=x-ray"],
         ],
         dtext_artist_commentary_title: "\"Princess of the Thorns\" pages 7-8!❤️‍🔥",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "Princess of the Thorns" pages 7-8, halfway there!
 
           And, of course, pages 9-10 are also available for my "Patreon":[https://www.patreon.com/sphenodaile] supporters as early access.
@@ -229,7 +229,7 @@ module Sources
           ["princess-of-the-thorns", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=princess-of-the-thorns"],
         ],
         dtext_artist_commentary_title: "\"Princess of the Thorns\" pages 11-12 + afterwords🌹",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           I DID IT! 🎉
 
           Still can't believe I actually finished it😁
@@ -250,7 +250,7 @@ module Sources
         username: "sphenodaile",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -265,7 +265,7 @@ module Sources
         username: "sphenodaile",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -279,7 +279,7 @@ module Sources
         username: "natthelich",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -288,7 +288,7 @@ module Sources
         "https://www.newgrounds.com/portal/view/802594",
         deleted: true,
         image_urls: [],
-        profile_url: nil
+        profile_url: nil,
       )
     end
 
@@ -302,7 +302,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -320,7 +320,7 @@ module Sources
           ["iron-giant", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=iron-giant"],
         ],
         dtext_artist_commentary_title: "Annie Hughes 1",
-        dtext_artist_commentary_desc: "Commission of Annie Hughes, the mom from The Iron Giant, for \"@ManStawberry\":[https://twitter.com/ManStawberry]."
+        dtext_artist_commentary_desc: "Commission of Annie Hughes, the mom from The Iron Giant, for \"@ManStawberry\":[https://twitter.com/ManStawberry].",
       )
     end
 
@@ -342,7 +342,7 @@ module Sources
           ["vtuber", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=vtuber"],
         ],
         dtext_artist_commentary_title: "Selen Tatsuki",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           VA&SFX courtesy of BrittanyBabbles
 
           --------------------------------------------------------------
@@ -350,28 +350,6 @@ module Sources
           Follow me on twitter if you liked! Im posting a lot of wips for my upcoming nsfw animation project there <https://twitter.com/jakada_ani>
         EOS
       )
-    end
-
-    should "Parse Newgrounds URLs correctly" do
-      assert_equal("https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic", Source::URL.page_url("https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181"))
-
-      assert(Source::URL.image_url?("https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg"))
-      assert(Source::URL.image_url?("https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg"))
-      assert(Source::URL.image_url?("https://art.ngfiles.com/thumbnails/1254000/1254985.png?f1588263349"))
-      assert(Source::URL.image_url?("https://art.ngfiles.com/medium_views/5225000/5225108_220662_nanobutts_untitled-5225108.4a602f9525d0d55d8add3dcfb1485507.webp?f1700595860"))
-      assert(Source::URL.image_url?("https://art.ngfiles.com/images/5225000/5225108_220662_nanobutts_untitled-5225108.4a602f9525d0d55d8add3dcfb1485507.webp?f1700595860"))
-      assert(Source::URL.image_url?("https://uploads.ungrounded.net/alternate/1801000/1801343_alternate_165104.mp4?1639666238"))
-
-      assert(Source::URL.page_url?("https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat"))
-      assert(Source::URL.page_url?("https://www.newgrounds.com/portal/view/830293"))
-
-      assert(Source::URL.profile_url?("https://natthelich.newgrounds.com"))
-      assert_not(Source::URL.profile_url?("https://www.newgrounds.com"))
-      assert_not(Source::URL.profile_url?("https://newgrounds.com"))
-
-      assert_nil(Source::URL.page_url("https://art.ngfiles.com/medium_views/5225000/5225108_220662_nanobutts_untitled-5225108.4a602f9525d0d55d8add3dcfb1485507.webp?f1700595860"))
-      assert_equal("https://www.newgrounds.com/art/view/natthelich/pandora", Source::URL.page_url("https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg")) # XXX dead page
-      assert_equal("https://www.newgrounds.com/art/view/natthelich/pandora-2", Source::URL.page_url("https://art.ngfiles.com/images/1543000/1543982_natthelich_pandora-2.jpg?f1607971817"))
     end
   end
 end
