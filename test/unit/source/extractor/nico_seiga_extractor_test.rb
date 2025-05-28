@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
-module Sources
-  class NicoSeigaTest < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class NicoSeigaExtractorTest < ActiveSupport::TestCase
     setup do
       skip "NicoSeiga credentials not configured" unless Source::Extractor::NicoSeiga.enabled?
     end
@@ -26,7 +26,7 @@ module Sources
         tag_name: "nicoseiga_7017777",
         profile_url: "https://seiga.nicovideo.jp/user/illust/7017777",
         artist_commentary_title: "コジコジ",
-        artist_commentary_desc: "コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）"
+        artist_commentary_desc: "コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）",
       )
     end
 
@@ -50,7 +50,7 @@ module Sources
         tag_name: "nicoseiga_7017777",
         profile_url: "https://seiga.nicovideo.jp/user/illust/7017777",
         artist_commentary_title: "コジコジ",
-        artist_commentary_desc: "コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）"
+        artist_commentary_desc: "コジコジのドット絵\nこんなかわいらしい容姿で毒を吐くコジコジが堪らん（切実）",
       )
     end
 
@@ -74,7 +74,7 @@ module Sources
         artist_name: "風呂",
         profile_url: "https://seiga.nicovideo.jp/user/illust/20797022",
         artist_commentary_title: "ハコ女子 1ハコ目",
-        artist_commentary_desc: "同じクラスの箱田さんはいつもハコを被っている。しかしてその素顔は…？　twitter(@hakojoshi1)にてだいたい毎日更新中。こっちだともうちょっと先まで読めるよ。"
+        artist_commentary_desc: "同じクラスの箱田さんはいつもハコを被っている。しかしてその素顔は…？　twitter(@hakojoshi1)にてだいたい毎日更新中。こっちだともうちょっと先まで読めるよ。",
       )
     end
 
@@ -95,7 +95,7 @@ module Sources
         profile_url: "https://seiga.nicovideo.jp/user/illust/123720050",
         tags: %w[DIY 日常],
         artist_commentary_title: "工作少女 Do It Yourself !!",
-        artist_commentary_desc: "作業中のひとにいきなり話しかけるのはやめましょう"
+        artist_commentary_desc: "作業中のひとにいきなり話しかけるのはやめましょう",
       )
     end
 
@@ -112,7 +112,7 @@ module Sources
           { file_size: 223_881 },
           { file_size: 208_968 },
           { file_size: 218_180 },
-          { file_size: 113_071 }
+          { file_size: 113_071 },
         ],
         page_url: "https://seiga.nicovideo.jp/watch/mg485611",
         profile_urls: %w[https://seiga.nicovideo.jp/user/illust/1116797],
@@ -126,7 +126,7 @@ module Sources
           ["マジックミラー", "https://seiga.nicovideo.jp/manga/tag/マジックミラー"],
         ],
         dtext_artist_commentary_title: "勇者さまが死んだので帰ります！ No.291 カミカゼアタック",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           アソビ大全を買おうかどうしようか悩み中
 
           ※CG集で応援して頂けると、作者のやる気が上がります
@@ -145,7 +145,7 @@ module Sources
       strategy_should_work(
         "https://lohas.nicoseiga.jp/thumb/6844226i",
         image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/6844226}],
-        page_url: "https://seiga.nicovideo.jp/seiga/im6844226"
+        page_url: "https://seiga.nicovideo.jp/seiga/im6844226",
       )
     end
 
@@ -154,14 +154,14 @@ module Sources
         "https://seiga.nicovideo.jp/image/source/9146749",
         referer: "https://seiga.nicovideo.jp/watch/mg389884",
         image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/9146749}],
-        page_url: "https://seiga.nicovideo.jp/watch/mg389884"
+        page_url: "https://seiga.nicovideo.jp/watch/mg389884",
       )
     end
 
     context "A drm.cdn.nicomanga.jp image url" do
       strategy_should_work(
         "https://drm.cdn.nicomanga.jp/image/d4a2faa68ec34f95497db6601a4323fde2ccd451_9537/8017978p?1570012695",
-        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017978}]
+        image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/8017978}],
       )
     end
 
@@ -170,7 +170,7 @@ module Sources
         "https://nico.ms/im10922621",
         image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10922621}],
         page_url: "https://seiga.nicovideo.jp/seiga/im10922621",
-        profile_url: "https://seiga.nicovideo.jp/user/illust/2258804"
+        profile_url: "https://seiga.nicovideo.jp/user/illust/2258804",
       )
     end
 
@@ -202,7 +202,7 @@ module Sources
         image_urls: image_urls,
         artist_name: nil,
         profile_url: nil,
-        artist_commentary_title: "ライブダンジョン！ 第1話前半"
+        artist_commentary_title: "ライブダンジョン！ 第1話前半",
       )
     end
 
@@ -211,20 +211,20 @@ module Sources
         "https://seiga.nicovideo.jp/seiga/im520647",
         image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/520647}],
         artist_name: nil,
-        profile_url: nil
+        profile_url: nil,
       )
     end
 
     context "A nicoseiga video" do
       strategy_should_work(
-        "https://www.nicovideo.jp/watch/sm36465441"
+        "https://www.nicovideo.jp/watch/sm36465441",
       )
     end
 
     context "An oekaki direct url" do
       strategy_should_work(
         "https://dic.nicovideo.jp/oekaki/52833.png",
-        image_urls: ["https://dic.nicovideo.jp/oekaki/52833.png"]
+        image_urls: ["https://dic.nicovideo.jp/oekaki/52833.png"],
       )
     end
 
@@ -241,7 +241,7 @@ module Sources
         tags: [["ロリ", "https://seiga.nicovideo.jp/manga/tag/ロリ"]],
         artist_name: "とろてい",
         other_names: ["とろてい"],
-        tag_name: "nicoseiga_1848060"
+        tag_name: "nicoseiga_1848060",
       )
     end
 
@@ -268,7 +268,7 @@ module Sources
           ["禍々しい", "https://seiga.nicovideo.jp/tag/禍々しい"],
         ],
         dtext_artist_commentary_title: "HZNN",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           SLVN大好き。ホントニアコガレテル。
 
           [spoiler]
@@ -287,54 +287,6 @@ module Sources
           [/spoiler]
         EOS
       )
-    end
-
-    should "Parse NicoSeiga URLs correctly" do
-      assert_equal("https://seiga.nicovideo.jp/seiga/im4937663", Source::URL.page_url("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663"))
-
-      assert(Source::URL.image_url?("http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf"))
-      assert(Source::URL.image_url?("http://lohas.nicoseiga.jp/priv/b80f86c0d8591b217e7513a9e175e94e00f3c7a1/1384936074/3583893"))
-      assert(Source::URL.image_url?("https://lohas.nicoseiga.jp/o/971eb8af9bbcde5c2e51d5ef3a2f62d6d9ff5552/1589933964/3583893"))
-      assert(Source::URL.image_url?("http://seiga.nicovideo.jp/image/source?id=3312222"))
-      assert(Source::URL.image_url?("https://seiga.nicovideo.jp/image/source/3521156"))
-      assert(Source::URL.image_url?("https://sp.seiga.nicovideo.jp/image/source/3521156"))
-      assert(Source::URL.image_url?("https://seiga.nicovideo.jp/image/redirect?id=3583893"))
-      assert(Source::URL.image_url?("https://lohas.nicoseiga.jp/thumb/2163478i"))
-      assert(Source::URL.image_url?("https://lohas.nicoseiga.jp/thumb/4744553p"))
-      assert(Source::URL.image_url?("https://dcdn.cdn.nimg.jp/priv/62a56a7f67d3d3746ae5712db9cac7d465f4a339/1592186183/10466669"))
-      assert(Source::URL.image_url?("https://drm.cdn.nicomanga.jp/image/d4a2faa68ec34f95497db6601a4323fde2ccd451_9537/8017978p?1570012695"))
-
-      assert(Source::URL.page_url?("https://seiga.nicovideo.jp/seiga/im520647"))
-      assert(Source::URL.page_url?("https://sp.seiga.nicovideo.jp/seiga/im3521156"))
-      assert(Source::URL.page_url?("https://seiga.nicovideo.jp/watch/mg316708"))
-      assert(Source::URL.page_url?("https://www.nicovideo.jp/watch/sm36465441"))
-      assert(Source::URL.page_url?("https://www.nicovideo.jp/watch/nm36465441"))
-      assert(Source::URL.page_url?("https://www.nicovideo.jp/watch/so40968812"))
-      assert(Source::URL.page_url?("https://www.nicovideo.jp/watch/1488526447"))
-      assert(Source::URL.page_url?("https://nicovideo.jp/watch/sm36465441"))
-      assert(Source::URL.page_url?("https://sp.nicovideo.jp/watch/sm36465441"))
-      assert(Source::URL.page_url?("https://embed.nicovideo.jp/watch/sm36465441"))
-      assert(Source::URL.page_url?("https://nico.ms/im10922621"))
-      assert(Source::URL.page_url?("https://nico.ms/mg310193"))
-      assert(Source::URL.page_url?("https://nico.ms/sm36465441"))
-      assert(Source::URL.page_url?("https://nico.ms/nm36465441"))
-      assert(Source::URL.page_url?("https://nico.ms/so40968812"))
-      assert(Source::URL.page_url?("https://nico.ms/1488526447"))
-
-      assert(Source::URL.profile_url?("https://seiga.nicovideo.jp/user/illust/456831"))
-      assert(Source::URL.profile_url?("https://ext.seiga.nicovideo.jp/user/illust/20542122"))
-      assert(Source::URL.profile_url?("http://seiga.nicovideo.jp/manga/list?user_id=23839737"))
-      assert(Source::URL.profile_url?("https://www.nicovideo.jp/user/4572975"))
-      assert(Source::URL.profile_url?("https://nicovideo.jp/user/4572975"))
-      assert(Source::URL.profile_url?("https://sp.nicovideo.jp/user/4572975"))
-      assert(Source::URL.profile_url?("https://commons.nicovideo.jp/user/696839"))
-      assert(Source::URL.profile_url?("https://q.nicovideo.jp/users/18700356"))
-      assert(Source::URL.profile_url?("https://dic.nicovideo.jp/u/11141663"))
-      assert(Source::URL.profile_url?("https://3d.nicovideo.jp/users/109584"))
-      assert(Source::URL.profile_url?("https://3d.nicovideo.jp/u/siobi"))
-      assert(Source::URL.profile_url?("http://game.nicovideo.jp/atsumaru/users/7757217"))
-
-      assert_not(Source::URL.profile_url?("https://seiga.nicovideo.jp"))
     end
   end
 end

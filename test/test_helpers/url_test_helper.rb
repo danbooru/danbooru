@@ -28,7 +28,7 @@ module UrlTestHelper
     def url_parser_should_work(url, attributes = {})
       url = Source::URL.parse(url)
 
-      context url do
+      context "the parser #{url.class} for #{url}" do
         attributes.each do |attribute, expected_value|
           should "find the correct value for '#{attribute}'" do
             if expected_value.nil?

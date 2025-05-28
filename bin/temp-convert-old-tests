@@ -12,6 +12,16 @@ equal_cases = []
 unparsed = []
 
 input_file = File.expand_path(ARGV.first)
+output_file = File.expand_path(ARGV[1])
+
+class File
+  class << self
+    def append(path, content)
+      File.open(path, "a") { |f| f << content }
+    end
+  end
+end
+
 
 File.read(input_file).each_line do |line|
   next unless line =~ /Source::URL/
@@ -57,11 +67,11 @@ rescue
   raise
 end
 
-puts input_file
 class_name = input_file.delete_suffix("_test.rb").split("/")[-1].camelize
 
-puts <<~EOF
-###########################
+File.write(output_file, "")
+
+File.append output_file, <<~EOF
 
 
 require "test_helper"
@@ -76,7 +86,7 @@ EOF
 normal_cases.each do |type, urls|
   next if urls.empty?
   urls = urls.join(",\n        ")
-    puts <<-EOF
+    File.append output_file,  <<-EOF
       #{type}s: [
         #{urls},
       ],
@@ -84,7 +94,7 @@ normal_cases.each do |type, urls|
 end
 
 if !false_positive_cases.empty?
-  puts <<~EOF
+  File.append output_file,  <<~EOF
     )
 
     should_not_find_false_positives(
@@ -93,7 +103,7 @@ if !false_positive_cases.empty?
   false_positive_cases.each do |type, urls|
     next if urls.empty?
     urls = urls.join(",\n        ")
-      puts <<-EOF
+      File.append output_file,  <<-EOF
         #{type}s: [
           #{urls},
         ],
@@ -101,7 +111,7 @@ if !false_positive_cases.empty?
   end
 end
 
-puts <<-EOF
+File.append output_file,  <<-EOF
       )
       end
 
@@ -109,7 +119,7 @@ EOF
 
 if !equal_cases.empty?
 
-  puts <<~EOF
+  File.append output_file,  <<~EOF
 
   context "when extracting attributes" do
   EOF
@@ -120,23 +130,22 @@ if !equal_cases.empty?
     else
       newline=" "
     end
-    puts <<-EOF
+    File.append output_file,  <<-EOF
       url_parser_should_work(#{original},#{newline}#{method_name}: #{expected},)#{newline}
     EOF
 
   end
-  puts <<-EOF
+  File.append output_file,  <<-EOF
       end
 
   EOF
 end
 
-puts <<~EOF
+File.append output_file,  <<~EOF
   end
 end
 
 
-###########################
 EOF
 
 unparsed.each do |line|

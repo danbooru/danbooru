@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
-module Sources
-  class PixivSketchTest < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class PixivSketchExtractorTest < ActiveSupport::TestCase
     context "A Pixiv Sketch post" do
       strategy_should_work(
         "https://sketch.pixiv.net/items/1086346113447960710",
@@ -12,7 +12,7 @@ module Sources
         display_name: "りんのじ",
         username: "rinnoji522",
         tags: %w[アプリコット いよわ いよわガールズ],
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "#アプリコット":[https://sketch.pixiv.net/tags/アプリコット] "#いよわ":[https://sketch.pixiv.net/tags/いよわ] "#いよわガールズ":[https://sketch.pixiv.net/tags/いよわガールズ]
         EOS
       )
@@ -29,7 +29,7 @@ module Sources
         display_name: "りんのじ",
         username: "rinnoji522",
         tags: %w[アプリコット いよわ いよわガールズ],
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "#アプリコット":[https://sketch.pixiv.net/tags/アプリコット] "#いよわ":[https://sketch.pixiv.net/tags/いよわ] "#いよわガールズ":[https://sketch.pixiv.net/tags/いよわガールズ]
         EOS
       )
@@ -44,7 +44,7 @@ module Sources
         display_name: nil,
         username: nil,
         tags: [],
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -57,7 +57,7 @@ module Sources
         display_name: "リリスラウダ",
         username: "lithla",
         dtext_artist_commentary_desc: "チビッコ露出プレイ ピース",
-        tags: []
+        tags: [],
       )
     end
 
@@ -81,7 +81,7 @@ module Sources
         page_url: "https://sketch.pixiv.net/items/8052785510155853613",
         profile_url: "https://sketch.pixiv.net/@op-one",
         tags: %w[制作過程 このすば この素晴らしい世界に祝福を セナ バニー 3月3日 巨乳 黒髪巨乳 タイツ],
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           3月3日は「うさぎの日」らしいので
 
           ▼制作過程
@@ -137,18 +137,10 @@ module Sources
         artist_commentary_desc: <<~EOS.chomp,
           \x20\x20配信で描いたやつ　        ＃カルナ　＃FGO\x20
         EOS
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           配信で描いたやつ "＃カルナ":[https://sketch.pixiv.net/tags/カルナ] "＃FGO":[https://sketch.pixiv.net/tags/FGO]
         EOS
       )
-    end
-
-    should "Parse Pixiv Sketch URLs correctly" do
-      assert(Source::URL.image_url?("https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg "))
-      assert(Source::URL.image_url?("https://img-sketch.pximg.net/c!/w=540,f=webp:jpeg/uploads/medium/file/4463372/8906921629213362989.jpg"))
-      assert(Source::URL.image_url?("https://img-sketch.pixiv.net/c/f_540/uploads/medium/file/9986983/8431631593768139653.jpg"))
-      assert(Source::URL.page_url?("https://sketch.pixiv.net/items/5835314698645024323"))
-      assert(Source::URL.profile_url?("https://sketch.pixiv.net/@user_ejkv8372"))
     end
   end
 end

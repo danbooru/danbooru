@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
-module Sources
-  class NijieTest < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class NijieExtractorTest < ActiveSupport::TestCase
     setup do
       skip "Nijie credentials not configured" unless Source::Extractor::Nijie.enabled?
     end
@@ -14,7 +14,7 @@ module Sources
         profile_url: "https://nijie.info/members.php?id=728995",
         display_name: "莚",
         dtext_artist_commentary_title: "ジャージの下は",
-        dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です"
+        dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です",
       )
     end
 
@@ -26,7 +26,7 @@ module Sources
         profile_url: "https://nijie.info/members.php?id=728995",
         display_name: nil,
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -36,7 +36,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/01/nijie_picture/diff/main/218856_0_236014_20170620101329.png"],
         page_url: "https://nijie.info/view.php?id=218856",
         profile_url: "https://nijie.info/members.php?id=236014",
-        display_name: "名無しのチンポップ"
+        display_name: "名無しのチンポップ",
       )
     end
 
@@ -46,7 +46,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/03/nijie_picture/236014_20170620101426_0.png"],
         page_url: nil,
         profile_url: "https://nijie.info/members.php?id=236014",
-        display_name: nil
+        display_name: nil,
       )
     end
 
@@ -61,7 +61,7 @@ module Sources
         username: nil,
         tags: %w[眼鏡 リトルウィッチアカデミア アーシュラ先生],
         dtext_artist_commentary_title: "ジャージの下は",
-        dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です"
+        dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です",
       )
     end
 
@@ -85,7 +85,7 @@ module Sources
           ["航空母艦", "https://nijie.info/search.php?word=%E8%88%AA%E7%A9%BA%E6%AF%8D%E8%89%A6"],
         ],
         dtext_artist_commentary_title: "加賀さん",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           おはようゴザイマスヾ(o´∀｀o)ﾉ
         EOS
       )
@@ -102,7 +102,7 @@ module Sources
         username: nil,
         tags: %w[人外 褐色 モンスター娘 ラミア],
         dtext_artist_commentary_title: "ラミアの里",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           サークルaskot様より販売されました「ラミアの里 ～ラミアはぁれむで搾られて～」にて前回に引き続きフラウのイラストを担当させて頂きました。
           前作を知らなくても問題なく愉しめる内容となっております。体験版もありますので気になりましたら是非ダウンロードしてみて下さい。
           DLsite【<http://www.dlsite.com/maniax/work/=/product_id/RJ226998.html>】
@@ -122,7 +122,7 @@ module Sources
         username: nil,
         tags: %w[眼鏡 リトルウィッチアカデミア アーシュラ先生],
         dtext_artist_commentary_title: "ジャージの下は",
-        dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です"
+        dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です",
       )
     end
 
@@ -137,7 +137,7 @@ module Sources
         username: nil,
         tags: %w[眼鏡 リトルウィッチアカデミア アーシュラ先生],
         dtext_artist_commentary_title: "ジャージの下は",
-        dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です"
+        dtext_artist_commentary_desc: "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です",
       )
     end
 
@@ -166,7 +166,7 @@ module Sources
         username: nil,
         tags: %w[BAR foo baz],
         dtext_artist_commentary_title: "public - r18 - gallery",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           foo [b]bold[/b] [i]italics[/i] [s]strike[/s] red
 
           <http://nijie.info/view.php?id=218944>
@@ -184,7 +184,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -194,7 +194,7 @@ module Sources
         image_urls: ["https://pic.nijie.net/03/nijie_picture/diff/main/218856_4_236014_20170620101333.png"],
         page_url: "https://nijie.info/view.php?id=218856",
         profile_url: "https://nijie.info/members.php?id=236014",
-        display_name: "名無しのチンポップ"
+        display_name: "名無しのチンポップ",
       )
     end
 
@@ -208,7 +208,7 @@ module Sources
         username: nil,
         tags: %w[オリジナル 制服 R-18 バック JK],
         dtext_artist_commentary_title: "がっこうのかいだん",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           ニジエの効果音再生が使いたくて描きました。
           あれは本当にいい機能だ、、、特に環境音、趣がある
 
@@ -244,7 +244,7 @@ module Sources
           ["MP4", "https://nijie.info/search.php?word=MP4"],
         ],
         dtext_artist_commentary_title: "【GIF】霊夢パイズリ",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           嫌々パイズリをしてくれる霊夢のGIF
           2枚目：ループ部分
         EOS
@@ -256,7 +256,7 @@ module Sources
         "https://nijie.info/members_illust.php?id=236014",
         image_urls: [],
         page_url: nil,
-        profile_url: "https://nijie.info/members.php?id=236014"
+        profile_url: "https://nijie.info/members.php?id=236014",
       )
     end
 
@@ -264,7 +264,7 @@ module Sources
       strategy_should_work(
         "http://nijie.info/index.php",
         image_urls: [],
-        page_url: nil
+        page_url: nil,
       )
     end
 
@@ -278,7 +278,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -292,7 +292,7 @@ module Sources
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -313,7 +313,7 @@ module Sources
         username: nil,
         tags: %w[全裸 看板娘 巨乳 手ブラ バレンタイン 輪チラ 誘ってやがる あいり],
         dtext_artist_commentary_title: "バレンタイン",
-        dtext_artist_commentary_desc: "食べちゃってください"
+        dtext_artist_commentary_desc: "食べちゃってください",
       )
     end
 
@@ -340,7 +340,7 @@ module Sources
         username: nil,
         tags: %w[中出し フェラ TS ほのぼの],
         dtext_artist_commentary_title: "作品情報",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           ある日目がさめると女の子になっていたいつき
           そこへ幼馴染の小梅が現れて…
           2010年コミックマーケット78で販売したコピー本のDL版で
@@ -360,32 +360,8 @@ module Sources
         username: nil,
         tags: %w[漫画 RO C82 アークビショップ ラグナロクオンライン],
         dtext_artist_commentary_title: "ABさん 色いじり",
-        dtext_artist_commentary_desc: "C82新刊表紙イラストの、服色を弄ってみました。 黒も捨てがたかったのですけど、EXカラーは青→黒になっただけなのか不安だったので、結局青に～。 本文サンプルは今月末頃に出せたらイイナと思ってます。ABさんのいちゃラブ成人向け本です。 ■C82では他にも新刊とグッズを出す予定です。詳細はサイトで順次出して行きますのでよろしくお願いします <http://sailr.sakura.ne.jp/>"
+        dtext_artist_commentary_desc: "C82新刊表紙イラストの、服色を弄ってみました。 黒も捨てがたかったのですけど、EXカラーは青→黒になっただけなのか不安だったので、結局青に～。 本文サンプルは今月末頃に出せたらイイナと思ってます。ABさんのいちゃラブ成人向け本です。 ■C82では他にも新刊とグッズを出す予定です。詳細はサイトで順次出して行きますのでよろしくお願いします <http://sailr.sakura.ne.jp/>",
       )
-    end
-
-    should "Parse Nijie URLs correctly" do
-      assert_equal("https://nijie.info/view.php?id=218856", Source::URL.page_url("https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png"))
-      assert_equal("https://nijie.info/view.php?id=287736", Source::URL.page_url("https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png"))
-
-      assert(Source::URL.image_url?("https://pic04.nijie.info/omata/4829_20161128012012.png"))
-      assert(Source::URL.image_url?("https://pic01.nijie.info/nijie_picture/20120211210359.jpg"))
-      assert(Source::URL.image_url?("https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg"))
-      assert(Source::URL.image_url?("https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png "))
-      assert(Source::URL.image_url?("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"))
-      assert(Source::URL.image_url?("https://pic.nijie.net/06/nijie/17/14/236014/illust/218856_1_7646cf57f6f1c695_f2ed81.png"))
-      assert(Source::URL.image_url?("https://pic.nijie.net/03/nijie_picture/236014_20170620101426_0.png "))
-      assert(Source::URL.image_url?("https://pic.nijie.net/01/nijie_picture/diff/main/196201_20150201033106_0.jpg"))
-
-      assert(Source::URL.page_url?("https://nijie.info/view.php?id=218856"))
-      assert(Source::URL.page_url?("https://nijie.info/view_popup.php?id=218856"))
-      assert(Source::URL.page_url?("https://www.nijie.info/view.php?id=218856"))
-      assert(Source::URL.page_url?("https://sp.nijie.info/view.php?id=218856"))
-
-      assert(Source::URL.profile_url?("https://nijie.info/members.php?id=236014"))
-      assert(Source::URL.profile_url?("https://nijie.info/members_illust.php?id=236014"))
-
-      assert_nil(Source::URL.page_url("http://pic02.nijie.info/nijie_picture/diff/main/0_23473_141_20120913002158.jpg"))
     end
   end
 end
