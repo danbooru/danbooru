@@ -3,7 +3,7 @@
 class DmailsController < ApplicationController
   respond_to :html, :xml, :js, :json
 
-  rate_limit :create, rate: 1.0/1.minute, burst: 50
+  rate_limit :create, rate: 1.0/2.minute, burst: 5
 
   def new
     if params[:respond_to_id]

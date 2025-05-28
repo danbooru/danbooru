@@ -4,6 +4,8 @@ class WikiPagesController < ApplicationController
   respond_to :html, :xml, :json, :js
   layout "sidebar"
 
+  rate_limit :create, rate: 1.0/2.minute, burst: 5
+
   def new
     @wiki_page = authorize WikiPage.new(permitted_attributes(WikiPage))
     respond_with(@wiki_page)

@@ -3,6 +3,8 @@
 class ArtistsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
+  rate_limit :create, rate: 1.0/1.minute, burst: 20
+
   def new
     @artist = authorize Artist.new_with_defaults(permitted_attributes(Artist))
     respond_with(@artist)
