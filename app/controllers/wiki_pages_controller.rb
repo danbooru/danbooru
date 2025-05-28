@@ -4,8 +4,10 @@ class WikiPagesController < ApplicationController
   respond_to :html, :xml, :json, :js
   layout "sidebar"
 
-  rate_limit :create, rate: 1.0 / 1.minute, burst: 50, if: -> { CurrentUser.is_builder? }
-  rate_limit :create, rate: 1.0 / 1.minute, burst: 10, if: -> { !CurrentUser.is_builder? }
+  %[create update destroy revert].each do |action|
+    rate_limit action, rate: 1.0 / 1.minute, burst: 50, if: -> { CurrentUser.is_builder? }
+    rate_limit action, rate: 1.0 / 1.minute, burst: 10, if: -> { !CurrentUser.is_builder? }
+  end
 
   def new
     @wiki_page = authorize WikiPage.new(permitted_attributes(WikiPage))
