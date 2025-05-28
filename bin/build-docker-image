@@ -37,6 +37,8 @@ PLATFORM="${2:-$CURRENT_PLATFORM}"
 DOCKER_IMAGE_REVISION=$(git rev-parse HEAD)
 DOCKER_IMAGE_BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")"
 
+docker buildx create --use --name nonparallel-builder --config buildkitd.toml 2> /dev/null || true;
+
 if [[ $PLATFORM != $CURRENT_PLATFORM && $PLATFORM != *,* ]]; then
   # If we're building for a different platform, and it's not a multi-platform image, then name the image after the platform so it doesn't conflict with images for the native platform.
   TARGET_ARCH="${PLATFORM#*/}" # linux/arm64 -> arm64
