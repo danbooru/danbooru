@@ -16,13 +16,16 @@
 #
 # See https://github.com/danbooru/danbooru/wiki/Docker-Guide for more details.
 
+# You must also update .ruby-version and the Gemfile when updating this.
+ARG RUBY_VERSION="3.4.4"
+ARG RUBY_MAJOR_VERSION="3.4"
+
 ARG MOZJPEG_URL="https://github.com/mozilla/mozjpeg/archive/refs/tags/v4.1.5.tar.gz"
 ARG VIPS_URL="https://github.com/libvips/libvips/releases/download/v8.14.2/vips-8.14.2.tar.xz"
 ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n7.1.1.tar.gz"
 ARG EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/13.30.tar.gz"
 ARG OPENRESTY_URL="https://openresty.org/download/openresty-1.27.1.2.tar.gz"
-ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/3.4/ruby-3.4.4.tar.gz"
-ARG RUBY_MINOR_VERSION="3.4.0"
+ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR_VERSION}/ruby-${RUBY_VERSION}.tar.gz"
 ARG NODE_VERSION="20.x"
 ARG UBUNTU_VERSION="24.04"
 
@@ -31,11 +34,11 @@ ARG UBUNTU_VERSION="24.04"
 FROM ubuntu:$UBUNTU_VERSION AS base
 SHELL ["/bin/bash", "-xeuo", "pipefail", "-O", "globstar", "-O", "dotglob", "-c"]
 
-ARG RUBY_MINOR_VERSION
+ARG RUBY_MAJOR_VERSION
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV LANG=C.UTF-8
 ENV GEM_HOME=/home/danbooru/bundle
-ENV GEM_PATH=/home/danbooru/bundle/ruby/$RUBY_MINOR_VERSION:/usr/local/lib/ruby/gems/$RUBY_MINOR_VERSION
+ENV GEM_PATH=/home/danbooru/bundle/ruby/${RUBY_MAJOR_VERSION}.0:/usr/local/lib/ruby/gems/${RUBY_MAJOR_VERSION}.0
 ENV PATH=$GEM_HOME/bin:$PATH
 
 RUN <<EOS
@@ -400,5 +403,7 @@ ARG DOCKER_IMAGE_REVISION=""
 ARG DOCKER_IMAGE_BUILD_DATE=""
 ENV DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION
 ENV DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE
+ENV RUBY_VERSION=$RUBY_VERSION
+ENV RUBY_MAJOR_VERSION=$RUBY_MAJOR_VERSION
 
 USER danbooru
