@@ -5,8 +5,10 @@ module Source
   class Extractor
     class Fanbox < Source::Extractor
       def image_urls
-        if parsed_url.image_url?
+        if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]
+        elsif parsed_url.candidate_full_image_urls.present?
+          [parsed_url.candidate_full_image_urls.find { |url| http_exists?(url) } || url.to_s]
         elsif api_response.present?
           file_list
         else
@@ -36,6 +38,8 @@ module Source
       def page_url
         if username.present? && illust_id.present?
           "https://#{username}.fanbox.cc/posts/#{illust_id}"
+        elsif illust_id.present?
+          "https://www.fanbox.cc/manage/posts/#{illust_id}"
         elsif parsed_url.image_url? && username.present?
           # Cover images
           "https://#{username}.fanbox.cc"
