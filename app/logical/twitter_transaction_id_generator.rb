@@ -66,8 +66,10 @@ class TwitterTransactionIdGenerator
   #
   # @param path [String] The URL path of the API endpoint.
   # @param method [String] The HTTP method for the API endpoint.
-  # @return [String] The transaction ID.
+  # @return [String, nil] The transaction ID.
   def transaction_id(path, method: "GET")
+    return nil unless animation_key.present?
+
     time_delta = ((time.to_f * 1000 - 1682924400 * 1000) / 1000).floor
     time_delta_bytes = (0..3).map { |i| (time_delta >> (i * 8) & 0xFF) }
 
@@ -83,7 +85,7 @@ class TwitterTransactionIdGenerator
 
   # Below are internal methods used to calculate the transaction ID.
 
-  # @return [Nokogiri::HTML5::DocumentFragment] The Twitter homepage (used to extract the verification key, Twitter logo, and ondemand.s.js file).
+  # @return [Nokogiri::HTML5::DocumentFragment, nil] The Twitter homepage (used to extract the verification key, Twitter logo, and ondemand.s.js file).
   memoize def homepage
     headers = {
       "Authority": "x.com",
@@ -102,6 +104,7 @@ class TwitterTransactionIdGenerator
   memoize def on_demand_js
     id = homepage&.at('script[text()*="__SCRIPTS_LOADED__"]')&.text&.slice(/"ondemand\.s":"(\h*)"/, 1)
     url = "https://abs.twimg.com/responsive-web/client-web/ondemand.s.#{id}a.js"
+
     http.cache(1.minute).get(url)&.to_s
   end
 
@@ -111,21 +114,25 @@ class TwitterTransactionIdGenerator
     on_demand_js&.scan(/\(\w\[(\d{1,2})\],16\)/)&.flatten.to_a.map(&:to_i)
   end
 
-  # @return [String] The value of the <meta name="twitter-site-verification"> element.
+  # @return [String, nil] The value of the <meta name="twitter-site-verification"> element.
   def twitter_site_verification_key
     @twitter_site_verification_key ||= homepage&.at("meta[name='twitter-site-verification']")&.attr("content")
   end
 
   # @return [Array<Integer>] The decoded bytes of the site verification key.
   memoize def key_bytes
-    Base64.decode64(twitter_site_verification_key).bytes if twitter_site_verification_key.present?
+    return [] unless twitter_site_verification_key.present?
+
+    Base64.decode64(twitter_site_verification_key).bytes
   end
 
   # @return [Array<Array<Integer>>] A 11x16 2D array of integers taken from the coordinates of one of the frames of the
   #   X logo (chosen by a byte from the verification key).
   memoize def frame_data
     logo_frames = homepage&.css("svg[id^='loading-x-anim']").to_a
-    logo_frame = logo_frames[key_bytes[5] % logo_frames.size] # The 6th byte of the verification key determines which of the four frames to use.
+    return [] unless logo_frames.present? && key_bytes.present?
+
+    logo_frame = logo_frames[key_bytes[5].to_i % logo_frames.size] # The 6th byte of the verification key determines which of the four frames to use.
 
     # Convert the SVG coordinates to a matrix of integers.
     logo_frame&.at("path:nth-child(2)")&.attr("d")&.slice(/C .*/)&.split(/C/).to_a.compact_blank.map { |item| item.scan(/\d+/).map(&:to_i) }
@@ -134,11 +141,15 @@ class TwitterTransactionIdGenerator
   # @return [Array<Integer>] A row taken from one of the frames of the X logo (chosen by a byte from the verification
   #   key, itself chosen by an index extracted from the ondemand.s.js file).
   memoize def frame_row
-    frame_data[key_bytes[indices[0]] % frame_data.size]
+    return [] unless indices.present? && frame_data.present?
+
+    frame_data[key_bytes[indices[0].to_i].to_i % frame_data.size].to_a
   end
 
   # @return [Array<Float>] An array of four floats, based on the frame row.
   memoize def curves
+    return [] unless frame_row.present?
+
     frame_row[7..].map.with_index do |item, i|
       min = i % 2 == 1 ? -1.0 : 0.0
       scale(item.to_f, min, 1.0).round(2)
@@ -149,16 +160,20 @@ class TwitterTransactionIdGenerator
     value * (max - min) / 255 + min
   end
 
-  # @return [Float] A percentage from 0.0-1.0, determining how long to run the animation, based on a product of bytes
-  #   from the verification key.
+  # @return [Float, nil] A percentage from 0.0-1.0, determining how long to run the animation, based on a product of
+  #   bytes from the verification key.
   memoize def frame_time
-    target_time = indices[1..].map { |i| key_bytes[i] % 16 }.reduce(:*)
+    return nil unless indices.present? && key_bytes.present?
+
+    target_time = indices[1..].map { |i| key_bytes[i].to_i % 16 }.reduce(:*)
     target_time = (target_time / 10.0).round * 10
     target_time / 4096.0
   end
 
   # @return [Float] A cubic-bezier interpolation of 3 bytes taken from the verification key.
   memoize def cubic
+    return [] unless frame_time.present? && curves.present?
+
     if frame_time <= 0.0
       if curves[0] > 0.0
         start_gradient = curves[1] / curves[0]
@@ -204,18 +219,22 @@ class TwitterTransactionIdGenerator
     3.0 * a * (1 - m) * (1 - m) * m + 3.0 * b * (1 - m) * m * m + m * m * m
   end
 
-  # @return [Array<Float>] An array of four floats (a RGBA color), based on a color transformation of the Twitter logo.
+  # @return [Array<Float>, nil] An array of four floats (a RGBA color), based on a color transformation of the Twitter logo.
   def color
+    return [] unless frame_row.present? && cubic.present?
+
     from_color = frame_row[0..2].map(&:to_f) + [1.0]
     to_color = frame_row[3..5].map(&:to_f) + [1.0]
     interpolate(from_color, to_color, cubic).map { |c| c.clamp(0..255.0) }
   end
 
-  # @return [Float] An angle (in degrees), based on a rotation of the Twitter logo.
+  # @return [Float, nil] An angle (in degrees), based on a rotation of the Twitter logo.
   def rotation
+    return nil unless frame_row.present?
+
     from_rotation = [0.0]
     to_rotation = [scale(frame_row[6].to_f, 60.0, 360.0).floor]
-    interpolate(from_rotation, to_rotation, cubic)
+    interpolate(from_rotation, to_rotation, cubic).first
   end
 
   def interpolate(from_list, to_list, f)
@@ -226,13 +245,16 @@ class TwitterTransactionIdGenerator
 
   # @return [Array<Float>] The logo rotation expressed as a matrix.
   def matrix
-    angle = rotation[0]
-    rad = (angle / 180.0) * Math::PI
+    return [] unless rotation.present?
+
+    rad = (rotation / 180.0) * Math::PI
     [Math.cos(rad), -Math.sin(rad), Math.sin(rad), Math.cos(rad)]
   end
 
-  # @return [String] The color and rotation transformations, concatenated together into a string.
+  # @return [String, nil] The color and rotation transformations, concatenated together into a string.
   def animation_key
+    return nil unless color.present? && matrix.present?
+
     array = color[..-2].map { |c| c.round.to_s(16) }
     array += matrix.map { |num| float_to_hex(num.round(2).abs) }
 
