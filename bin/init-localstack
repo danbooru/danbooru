@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# A script to init a SQS mock queue using localstack. Used by the docker compose files.
+
+set -x
+
+awslocal sqs create-queue --queue-name danbooru.fifo --attributes '{"FifoQueue": "true", "ContentBasedDeduplication": "true"}'
+
+awslocal sqs list-queues
