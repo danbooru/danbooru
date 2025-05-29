@@ -2,7 +2,13 @@
 
 <% if record.nil? %>
 <% elsif record.respond_to?(:updater) && record.respond_to?(:updater_id) && record.updater_id != record.creator_id  %>
-  <p class="fineprint edit-notice my-2">Updated by <%= link_to_user record.updater %> <%= time_ago_in_words_tagged(record.updated_at) %></p>
+  <% if record.updater.is_moderator? && record.try(:is_deleted?) %>
+    <p class="fineprint edit-notice my-2">Deleted by a moderator <%= time_ago_in_words_tagged(record.updated_at) %></p>
+  <% elsif record.updater.is_moderator? %>
+    <p class="fineprint edit-notice my-2">Updated by a moderator <%= time_ago_in_words_tagged(record.updated_at) %></p>
+  <% else %>
+    <p class="fineprint edit-notice my-2">Updated by <%= link_to_user record.updater %> <%= time_ago_in_words_tagged(record.updated_at) %></p>
+  <% end %>
 <% elsif record.updated_at - record.created_at > (local_assigns[:interval] || 5.minutes) %>
   <p class="fineprint edit-notice my-2">Updated <%= time_ago_in_words_tagged(record.updated_at) %></p>
 <% end %>
