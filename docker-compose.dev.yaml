@@ -23,6 +23,14 @@
 
 name: devbooru
 
+x-sqs-env: &sqs-env
+  # Required to have working post and pool versions
+  DANBOORU_AWS_SQS_REGION: us-east-1
+  DANBOORU_AWS_ACCESS_KEY_ID: dummy
+  DANBOORU_AWS_SECRET_ACCESS_KEY: dummy
+  DANBOORU_AWS_SQS_ARCHIVES_URL: http://sqs:9324/000000000000/danbooru.fifo
+  DANBOORU_AWS_SQS_HOST: http://sqs:9324
+
 x-base-template: &base-template
   # Use the latest development image from master, instead of the production image. The development
   # image contains files needed to rebuild the JS/CSS files.
@@ -38,6 +46,8 @@ x-base-template: &base-template
   entrypoint: ["tini", "-g", "bin/danbooru-dev-entrypoint", "--"]
 
   environment:
+    <<: *sqs-env
+
     DANBOORU_APP_NAME: "Devbooru"
 
     # The public URL of your site. You can set this if you have a domain name for your site.
@@ -174,6 +184,36 @@ services:
       SHAKAPACKER_DEV_SERVER_HOST: 0.0.0.0
     command: ["bin/shakapacker-dev-server"]
 
+  sqs:
+    image: softwaremill/elasticmq-native
+    expose:
+    - 9324
+    volumes:
+      - sqs-data:/data"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+  archives-service:
+    depends_on:
+      sqs:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    image: ghcr.io/danbooru/archives:latest
+    environment:
+      <<: *sqs-env
+      RUN: 1
+      #db config
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: danbooru
+      POSTGRES_USER: danbooru
+      # POSTGRES_PASSWORD=
+    command: ["scripts/docker-bootstrap.sh"]
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
 configs:
   nginx:
     file: config/nginx.conf
@@ -187,3 +227,5 @@ volumes:
     name: ${COMPOSE_PROJECT_NAME}-iqdb-data
   webpack-data:
     name: ${COMPOSE_PROJECT_NAME}-webpack-data
+  sqs-data:
+    name: ${COMPOSE_PROJECT_NAME}-sqs-data
