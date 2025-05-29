@@ -8,10 +8,10 @@
     </tr>
   </thead>
   <tbody>
-    <% @dashboard.posts.each do |activity| %>
+    <% @dashboard.posts.each do |user, count| %>
       <tr>
-        <td><%= link_to_user(activity.user) %></td>
-        <td><%= link_to activity.count, posts_path(:tags => "user:#{activity.user.name}") %></td>
+        <td><%= link_to_user(user) %></td>
+        <td><%= link_to count, posts_path(tags: "user:#{user.name}") %></td>
       </tr>
     <% end %>
   </tbody>

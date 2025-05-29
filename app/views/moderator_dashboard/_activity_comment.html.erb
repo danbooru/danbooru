@@ -11,21 +11,21 @@
     </tr>
   </thead>
   <tbody>
-    <% @dashboard.comments.each do |activity| %>
+    <% @dashboard.comments.each do |comment, count| %>
       <tr>
-        <td><%= link_to activity.comment.dtext_shortlink, activity.comment %></td>
+        <td><%= link_to comment.dtext_shortlink, comment %></td>
         <td>
           <div class="prose">
-            <%= activity.comment.dtext_body.format_text %>
+            <%= comment.dtext_body.format_text %>
 
-            <% if activity.comment.is_deleted? %>
+            <% if comment.is_deleted? %>
               <span class="inactive">(deleted)</span>
             <% end %>
           </div>
         </td>
-        <td><%= link_to_user(activity.comment.creator) %></td>
-        <td><%= activity.count %></td>
-        <td><%= activity.comment.score %></td>
+        <td><%= link_to_user(comment.creator) %></td>
+        <td><%= count %></td>
+        <td><%= comment.score %></td>
       </tr>
     <% end %>
   </tbody>

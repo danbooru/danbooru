@@ -225,7 +225,9 @@ class ApplicationController < ActionController::Base
   end
 
   def check_get_body
-    raise RequestBodyNotAllowedError if request.method.in?(%w[GET HEAD OPTIONS]) && request.body.size > 0
+    if request.body&.size.to_i > 0 && (request.get? || request.head? || request.options?) && request.method == request.request_method
+      raise RequestBodyNotAllowedError
+    end
   end
 
   # allow api clients to force errors for testing purposes.

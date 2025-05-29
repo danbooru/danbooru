@@ -53,13 +53,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     context "on a PaginationError" do
       should "return 410 Gone even with a bad file extension" do
-        get posts_path, params: { page: 999999999 }, as: :json
+        get posts_path(page: 999_999_999), as: :json
         assert_response 410
 
-        get posts_path, params: { page: 999999999 }, as: :jpg
+        get posts_path(page: 999_999_999), as: :jpg
         assert_response 410
 
-        get posts_path, params: { page: 999999999 }, as: :blah
+        get posts_path(page: 999_999_999), as: :blah
         assert_response 410
       end
     end
@@ -353,7 +353,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
   context "all index methods" do
     should "support searching by the id attribute" do
       tags = create_list(:tag, 2, post_count: 42)
-      get tags_path(format: :json), params: { search: { id: tags.first.id } }
+      get tags_path(format: :json, search: { id: tags.first.id })
 
       assert_response :success
       assert_equal(1, response.parsed_body.size)
@@ -362,7 +362,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "support ordering by search[order]=custom" do
       tags = create_list(:tag, 2, post_count: 42)
-      get tags_path, params: { search: { id: "#{tags[0].id},#{tags[1].id}", order: "custom" } }, as: :json
+      get tags_path(search: { id: "#{tags[0].id},#{tags[1].id}", order: "custom" }), as: :json
 
       assert_response :success
       assert_equal(tags.pluck(:id), response.parsed_body.pluck("id"))
@@ -370,7 +370,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "return nothing if the search[order]=custom param isn't accompanied by search[id]" do
       tags = create_list(:tag, 2, post_count: 42)
-      get tags_path, params: { search: { order: "custom" } }, as: :json
+      get tags_path(search: { order: "custom" }), as: :json
 
       assert_response :success
       assert_equal(0, response.parsed_body.size)
@@ -378,7 +378,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "return nothing if the search[order]=custom param isn't accompanied by a valid search[id]" do
       tags = create_list(:tag, 2, post_count: 42)
-      get tags_path, params: { search: { id: ">1", order: "custom" } }, as: :json
+      get tags_path(search: { id: ">1", order: "custom" }), as: :json
 
       assert_response :success
       assert_equal(0, response.parsed_body.size)
@@ -386,7 +386,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "work if the search[order]=custom param is used with a single id" do
       tags = create_list(:tag, 2, post_count: 42)
-      get tags_path, params: { search: { id: tags[0].id, order: "custom" } }, as: :json
+      get tags_path(search: { id: tags[0].id, order: "custom" }), as: :json
 
       assert_response :success
       assert_equal([tags[0].id], response.parsed_body.pluck("id"))
@@ -407,14 +407,14 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     end
 
     should "support the expiry parameter" do
-      get posts_path, as: :json, params: { expiry: "1" }
+      get posts_path(expiry: "1"), as: :json
 
       assert_response :success
       assert_equal("max-age=#{1.day}, private", response.headers["Cache-Control"])
     end
 
     should "support the expires_in parameter" do
-      get posts_path, as: :json, params: { expires_in: "5min" }
+      get posts_path(expires_in: "5min"), as: :json
 
       assert_response :success
       assert_equal("max-age=#{5.minutes}, private", response.headers["Cache-Control"])
@@ -422,7 +422,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "support the only parameter" do
       create(:post)
-      get posts_path, as: :json, params: { only: "id,rating,score" }
+      get posts_path(only: "id,rating,score"), as: :json
 
       assert_response :success
       assert_equal(%w[id rating score].sort, response.parsed_body.first.keys.sort)

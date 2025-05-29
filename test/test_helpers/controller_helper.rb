@@ -24,12 +24,13 @@ module ControllerHelper
 
       @test_case.instance_eval do
         # calls e.g. "wiki_pages_path" if we're in WikiPagesControllerTest.
-        index_url = send("#{subject.controller_path}_path")
+        index_url = send("#{subject.controller_path}_path", **search_params)
+
         # Allows for different authorization levels to be used, instead of just anonymous
         if CurrentUser.user.present?
-          get_auth index_url, CurrentUser.user, as: :json, params: search_params
+          get_auth index_url, CurrentUser.user, as: :json
         else
-          get index_url, as: :json, params: search_params
+          get index_url, as: :json
         end
 
         # Don't continue processing if there was an error
