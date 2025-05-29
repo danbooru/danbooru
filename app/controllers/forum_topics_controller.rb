@@ -72,16 +72,14 @@ class ForumTopicsController < ApplicationController
 
   def destroy
     @forum_topic = authorize ForumTopic.find(params[:id])
-    @forum_topic.update(is_deleted: true)
-    @forum_topic.create_mod_action_for_delete
+    @forum_topic.soft_delete!
     flash[:notice] = "Topic deleted"
     respond_with(@forum_topic)
   end
 
   def undelete
     @forum_topic = authorize ForumTopic.find(params[:id])
-    @forum_topic.update(is_deleted: false)
-    @forum_topic.create_mod_action_for_undelete
+    @forum_topic.undelete!
     flash[:notice] = "Topic undeleted"
     respond_with(@forum_topic)
   end
