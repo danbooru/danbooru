@@ -61,7 +61,6 @@ x-base-template: &base-template
     DANBOORU_AWS_SECRET_ACCESS_KEY: dummy
     DANBOORU_AWS_SQS_ARCHIVES_URL: http://localstack:4566/queue/us-east-1/000000000000/danbooru.fifo
 
-
   tmpfs:
     - "/danbooru/tmp:uid=1000,gid=1000"
 
@@ -195,6 +194,22 @@ services:
     volumes:
       - localstack-data:/var/lib/localstack"
       - ${DANBOORU_DIR:-./}/bin/init-localstack:/etc/localstack/init/ready.d/init-aws.sh
+
+  archives-service:
+    image: ghcr.io/danbooru/archives:latest
+    environment:
+      RAILS_ENV: development
+      # sqs mock
+      AMAZON_SQS_REGION: us-east-1
+      AMAZON_KEY: dummy
+      AMAZON_SECRET: dummy
+      SQS_ARCHIVES_URL: http://localstack:4566/queue/us-east-1/000000000000/danbooru.fifo
+      #db config
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: danbooru
+      POSTGRES_USER: danbooru
+      # POSTGRES_PASSWORD=
+    command: ["bundle", "exec", "ruby", "services/sqs_processor.rb"]
 
 configs:
   nginx:
