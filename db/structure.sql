@@ -5262,6 +5262,13 @@ CREATE INDEX index_post_versions_on_version ON public.post_versions USING btree 
 
 
 --
+-- Name: index_post_versons_on_updater_id_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versons_on_updater_id_and_id ON public.post_versions USING btree (updater_id, id);
+
+
+--
 -- Name: index_post_votes_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6962,6 +6969,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250529164359'),
 ('20250529164357'),
 ('20250529164355'),
 ('20250507024608'),
@@ -7297,3 +7305,4 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20100205162521'),
 ('20100204214746'),
 ('20100204211522');
+
