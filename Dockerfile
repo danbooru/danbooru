@@ -375,13 +375,13 @@ ENV DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE
 
 
 
-# The development layer. Contains the production layer, plus enables passwordless sudo and includes nodejs
-# and node_modules so that JS/CSS files can be rebuilt.
+# The development layer. Contains the production layer, plus enables passwordless sudo, includes nodejs and node_modules
+# for building JS/CSS files, and includes tools and libraries needed for building certain Ruby gems.
 FROM danbooru-base AS development
 
 RUN <<EOS
   apt-get update
-  apt-get install -y --no-install-recommends g++ make ragel=6.10-4 git sudo gpg socat
+  apt-get install -y --no-install-recommends g++ make ragel=6.10-4 git sudo gpg socat libyaml-dev libpq-dev
 
   groupadd admin -U danbooru
   passwd -d danbooru
