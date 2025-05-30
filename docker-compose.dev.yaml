@@ -35,6 +35,8 @@ x-base-template: &base-template
   stdin_open: true
   tty: true
 
+  entrypoint: ["tini", "-g", "bin/danbooru-dev-entrypoint", "--"]
+
   environment:
     DANBOORU_APP_NAME: "Devbooru"
 

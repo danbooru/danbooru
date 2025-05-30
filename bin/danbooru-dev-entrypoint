@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# This is the entrypoint for Docker containers started with `bin/dev` or `docker compose -f docker-compose.dev.yaml`.
+
+# Warn if the programs listed in .tool-versions don't match the versions installed in the Docker image.
+warn_if_outdated_image() {
+  while read -r tool required_version; do
+    installed_version=${tool^^}_VERSION # RUBY_VERSION, NODE_VERSION, etc
+
+    if [[ -z ${!installed_version} ]]; then
+      out_of_date=true
+    elif [[ $required_version != ${!installed_version} ]]; then
+      echo "Warning: $tool-${!installed_version} is installed, but $tool-$required_version is required."
+      out_of_date=true
+    fi
+  done < <(sed -e 's/[[:space:]]*#.*// ; /^[[:space:]]*$/d' .tool-versions)
+
+  if [[ -n $out_of_date ]]; then
+    echo 'Warning: Your docker image is out of date. Run `bin/dev pull` to update if you encounter any errors.'
+  fi
+}
+
+warn_if_outdated_image
+exec "$@"

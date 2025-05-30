@@ -9,4 +9,4 @@ socat TCP-LISTEN:3000,fork,backlog=128 TCP:nginx:3000 > /dev/null 2>&1 &
 # Proxy devcontainer:3035 to webpack:3035
 socat TCP-LISTEN:3035,fork,backlog=128 TCP:webpack:3035 > /dev/null 2>&1 &
 
-exec "$@"
+exec bin/danbooru-dev-entrypoint "$@"
