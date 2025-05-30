@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+
+# Generate skeleton parsing and extracting tests for an url strategy
+
+set -uo pipefail
+
+PARSER_STRATEGIES_LOCATION="app/logical/source/url"
+PARSER_TESTS_LOCATION="test/unit/source/url"
+EXTRACTOR_TESTS_LOCATION="test/unit/source/extractor"
+
+if [ -z "$1" ]; then
+    echo "ERROR: No parameter passed."
+    echo "Usage: bin/generate-source-tests $PARSER_STRATEGIES_LOCATION/my_strategy.rb"
+    exit 1
+fi
+
+STRATEGY_FILE=$1
+
+if [ ! -f $STRATEGY_FILE ]; then
+    echo "Error: $STRATEGY_FILE does not exists."
+    exit 1
+fi
+
+STRATEGY_NAME="${STRATEGY_FILE##*/}" # only the file
+STRATEGY_NAME="${STRATEGY_NAME%.*}" # without the ext
+
+PARSER_TESTS_FILE="$PARSER_TESTS_LOCATION/${STRATEGY_NAME}_url_test.rb"
+EXTRACTOR_TESTS_FILE="$EXTRACTOR_TESTS_LOCATION/${STRATEGY_NAME}_extractor_test.rb"
+
+STRATEGY_CLASS_NAME="$(echo "$STRATEGY_NAME" | sed -E 's/(^|[_[:space:]])([a-z])/\U\2/g')"
+
+
+if [ ! -f $PARSER_TESTS_FILE ]; then
+
+echo "Generating a skeleton for ${STRATEGY_CLASS_NAME}UrlTest at $PARSER_TESTS_FILE"
+
+  cat > "$PARSER_TESTS_FILE" <<EOF
+require "test_helper"
+
+module Source::Tests::URL
+  class ${STRATEGY_CLASS_NAME}UrlTest < ActiveSupport::TestCase
+    context "when parsing" do
+      should_identify_url_types(
+        image_urls: [
+        ],
+        page_urls: [
+        ],
+        profile_urls: [
+        ],
+      )
+
+      should_not_find_false_positives(
+        image_urls: [
+        ],
+        page_urls: [
+        ],
+        profile_urls: [
+        ],
+      )
+    end
+
+    context "when extracting attributes" do
+      url_parser_should_work(
+        # "https://site.url/artist-url/image-url",
+        # profile_url: "https://site.url/artist-url",
+      )
+    end
+  end
+end
+EOF
+else
+  echo "$PARSER_TESTS_FILE already exists, skipping."
+fi
+
+
+if [ ! -f $EXTRACTOR_TESTS_FILE ]; then
+
+  echo "Generating a skeleton for ${STRATEGY_CLASS_NAME}ExtractorTest at $EXTRACTOR_TESTS_FILE"
+
+  cat > "$EXTRACTOR_TESTS_FILE" <<EOF
+require "test_helper"
+
+module Source::Tests::Extractor
+  class ${STRATEGY_CLASS_NAME}ExtractorTest < ActiveSupport::TestCase
+    context "A post" do
+      strategy_should_work(
+        "https://site.name/post",
+        image_urls: [],
+        media_files: [{ file_size: 123 }],
+        profile_url: "",
+        page_url: "",
+        display_name: "",
+        username: "",
+        other_names: [],
+        tags: [],
+        artist_commentary_title: "",
+        artist_commentary_desc: "",
+      )
+    end
+
+    context "A deleted or non-existing post" do
+      strategy_should_work(
+        "https://site.name/post",
+        deleted: true,
+        profile_url: nil,
+      )
+    end
+  end
+end
+EOF
+else
+  echo "$EXTRACTOR_TESTS_FILE already exists, skipping."
+fi
+
+
+
+if [[ -n "$CODESPACES" ]] || $(grep "vscode" || grep "danbooru"); then
+    if command -v code >/dev/null 2>&1; then
+        echo "Opening the tests files in vscode."
+        code "$PARSER_TESTS_FILE"
+        code "$EXTRACTOR_TESTS_FILE"
+    else
+        echo "Couldn't open the files in vscode. Make sure you edit it: $TESTS_FILE"
+    fi
+fi

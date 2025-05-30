@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Cycles through app/logical/source/url/*.rb and finds commented URLs that aren't present in the parser tests
+
+
+PARSER_STRATEGIES_LOCATION="app/logical/source/url"
+PARSER_TESTS_LOCATION="test/unit/source/url"
+
+longest=""
+longest_len=0
+for rb_file in "$PARSER_STRATEGIES_LOCATION"/*.rb; do
+    if [[ ${#rb_file} -gt $longest_len ]]; then
+        longest="$rb_file"
+        longest_len=${#rb_file}
+    fi
+done
+
+# loop through each parsing file
+for rb_file in "$PARSER_STRATEGIES_LOCATION"/*.rb; do
+    echo "Urls found in $rb_file:"
+
+    # loop through each line found by grep
+    grep -oE '#.*https?://[^ ]+' "$rb_file" | grep -oE 'https?://[^ )]+' | grep -v "#{" | while read -r comment_line; do
+        # search the line in all the parsing tests
+        grep -q "$comment_line" $PARSER_TESTS_LOCATION/*.rb || echo "Found an url missing tests from $(printf "%-${longest_len}s" "$rb_file")=>  $comment_line"
+    done
+done

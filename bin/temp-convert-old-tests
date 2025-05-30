@@ -1,0 +1,153 @@
+#!/usr/bin/env ruby
+
+require "active_support/inflector"
+
+assert_normal_pattern = /assert[\( ]?Source::URL\.(\w+)\??\((".*")\)(?:\.(\w+)\?)?/
+assert_equal_pattern = /assert_equal[\( ](.*), Source::URL\.(\w+\??)\((".*")\)(?:\.(\w+\??))?/
+assert_nil_pattern = /assert_(nil|not)[\( ]Source::URL\.(\w+\??)\((".*")\)(?:\.(\w+\??))?/
+
+normal_cases = {}
+false_positive_cases = {}
+equal_cases = []
+unparsed = []
+
+input_file = File.expand_path(ARGV.first)
+output_file = File.expand_path(ARGV[1])
+
+class File
+  class << self
+    def append(path, content)
+      File.open(path, "a") { |f| f << content }
+    end
+  end
+end
+
+
+File.read(input_file).each_line do |line|
+  next unless line =~ /Source::URL/
+
+  match = line[assert_normal_pattern] # Extract the method name
+  if match
+    method_name, original, true_method_name = $1, $2, $3
+    method_name = true_method_name if method_name == "parse"
+    normal_cases[method_name] ||= []
+    normal_cases[method_name] << original
+    next
+  end
+
+  match = line[assert_equal_pattern] # Extract the method name and arguments
+  if match
+    expected, method_name, original, true_method_name = $1, $2, $3, $4
+    method_name = true_method_name if method_name == "parse"
+
+
+    equal_cases << [original, method_name, expected]
+    next
+  end
+
+  match = line[assert_nil_pattern]
+  if match
+    nil_or_not, method_name, original, true_method_name = $1, $2, $3, $4
+    method_name = true_method_name if method_name == "parse"
+    if method_name.end_with?("?")
+      method_name = method_name.delete_suffix("?")
+      false_positive_cases[method_name] ||= []
+      false_positive_cases[method_name] << original
+    else
+      raise "'#{nil_or_not}' is not nil -> #{method_name}" unless nil_or_not == "nil"
+      equal_cases << [original, method_name, "nil"]
+    end
+
+    next
+  end
+
+  unparsed += [line]
+rescue
+  puts "\nError on line: #{line}\n"
+  raise
+end
+
+class_name = input_file.delete_suffix("_test.rb").split("/")[-1].camelize
+
+File.write(output_file, "")
+
+File.append output_file, <<~EOF
+
+
+require "test_helper"
+
+module Source::Tests::URL
+  class #{class_name}UrlTest < ActiveSupport::TestCase
+
+    context "when parsing" do
+      should_identify_url_types(
+EOF
+
+normal_cases.each do |type, urls|
+  next if urls.empty?
+  urls = urls.join(",\n        ")
+    File.append output_file,  <<-EOF
+      #{type}s: [
+        #{urls},
+      ],
+    EOF
+end
+
+if !false_positive_cases.empty?
+  File.append output_file,  <<~EOF
+    )
+
+    should_not_find_false_positives(
+  EOF
+
+  false_positive_cases.each do |type, urls|
+    next if urls.empty?
+    urls = urls.join(",\n        ")
+      File.append output_file,  <<-EOF
+        #{type}s: [
+          #{urls},
+        ],
+      EOF
+  end
+end
+
+File.append output_file,  <<-EOF
+      )
+      end
+
+EOF
+
+if !equal_cases.empty?
+
+  File.append output_file,  <<~EOF
+
+  context "when extracting attributes" do
+  EOF
+
+  equal_cases.each do |original, method_name, expected|
+    if "#{original}, #{method_name}: #{expected}".size > 80
+      newline="\n"
+    else
+      newline=" "
+    end
+    File.append output_file,  <<-EOF
+      url_parser_should_work(#{original},#{newline}#{method_name}: #{expected},)#{newline}
+    EOF
+
+  end
+  File.append output_file,  <<-EOF
+      end
+
+  EOF
+end
+
+File.append output_file,  <<~EOF
+  end
+end
+
+
+EOF
+
+unparsed.each do |line|
+  puts "Unparsed: #{line}"
+end

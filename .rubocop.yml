@@ -200,6 +200,9 @@ Style/SymbolProc:
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
 
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: consistent_comma
+
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: consistent_comma
 
