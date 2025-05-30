@@ -21,4 +21,6 @@ warn_if_outdated_image() {
 }
 
 warn_if_outdated_image
+bundle install --prefer-local > /dev/null
+
 exec "$@"
