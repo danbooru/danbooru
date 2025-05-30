@@ -20,9 +20,14 @@ module Source
       end
 
       memoize def article_image_urls
-        article_json.dig("detail", "modules", "module_content", "paragraphs").to_a.select do |paragraph|
+        urls = []
+
+        urls += article_json.dig("detail", "modules", "module_top", "display", "album", "pics").to_a.pluck("url")
+        urls += article_json.dig("detail", "modules", "module_content", "paragraphs").to_a.select do |paragraph|
           paragraph["para_type"] == 2
         end.pluck(:pic).pluck(:pics).flatten.pluck(:url)
+
+        urls
       end
 
       def page_url
@@ -99,7 +104,6 @@ module Source
         end.join("")
       end
 
-
       def dtext_artist_commentary_desc
         DText.from_html(artist_commentary_desc, base_url: "https://www.bilibili.com")
       end
@@ -117,13 +121,22 @@ module Source
           end.map do |tag|
             tag.dig('rich', 'text').gsub(/(^#|#$)/, "")
           end
-        end + article_json.dig("detail", "modules", "module_extend", "items").to_a.map do |tag|
-          tag["text"]
         end
 
-        tag_names.map do |tag_name|
+        tag_names += article_json.dig("detail", "modules", "module_extend", "items").to_a.pluck("text")
+
+        tags = tag_names.map do |tag_name|
           [tag_name, "https://search.bilibili.com/all?keyword=#{Danbooru::URL.escape(tag_name)}"]
         end
+
+        if article_json.dig("detail", "modules", "module_topic").present?
+          tags << [
+            article_json.dig("detail", "modules", "module_topic", "name"),
+            "https://www.bilibili.com/v/topic/detail/?topic_id=#{article_json.dig("detail", "modules", "module_topic", "id")}",
+          ].compact
+        end
+
+        tags
       end
 
       def post_tags
