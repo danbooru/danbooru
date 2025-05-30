@@ -55,6 +55,12 @@ x-base-template: &base-template
 
     DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-true}
 
+    # Required to have working post and pool versions
+    DANBOORU_AWS_SQS_REGION: us-east-1
+    DANBOORU_AWS_ACCESS_KEY_ID: dummy
+    DANBOORU_AWS_SECRET_ACCESS_KEY: dummy
+    DANBOORU_AWS_SQS_ARCHIVES_URL: http://localstack:4566/queue/us-east-1/000000000000/danbooru.fifo
+
   tmpfs:
     - "/danbooru/tmp:uid=1000,gid=1000"
 
@@ -172,6 +178,39 @@ services:
       SHAKAPACKER_DEV_SERVER_HOST: 0.0.0.0
     command: ["bin/shakapacker-dev-server"]
 
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"            # LocalStack Gateway
+      # - "4510-4559:4510-4559"  # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      DEBUG: ${LOCALSTACK_DEBUG:-0}
+      # https://docs.localstack.cloud/user-guide/aws/sqs/#configuration
+      # we need the following to generate an url that docker can understand
+      SERVICES: sqs
+      SQS_ENDPOINT_STRATEGY: path
+      LOCALSTACK_HOST: localstack
+    volumes:
+      - localstack-data:/var/lib/localstack"
+      - ${DANBOORU_DIR:-./}/bin/init-localstack:/etc/localstack/init/ready.d/init-aws.sh
+
+  archives-service:
+    image: ghcr.io/danbooru/archives:latest
+    environment:
+      RAILS_ENV: development
+      # sqs mock
+      AMAZON_SQS_REGION: us-east-1
+      AMAZON_KEY: dummy
+      AMAZON_SECRET: dummy
+      SQS_ARCHIVES_URL: http://localstack:4566/queue/us-east-1/000000000000/danbooru.fifo
+      #db config
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: danbooru
+      POSTGRES_USER: danbooru
+      # POSTGRES_PASSWORD=
+    command: ["bundle", "exec", "ruby", "services/sqs_processor.rb"]
+
 configs:
   nginx:
     file: config/nginx.conf
@@ -185,3 +224,5 @@ volumes:
     name: ${COMPOSE_PROJECT_NAME}-iqdb-data
   webpack-data:
     name: ${COMPOSE_PROJECT_NAME}-webpack-data
+  localstack-data:
+    name: ${COMPOSE_PROJECT_NAME}-localstack
