@@ -23,6 +23,14 @@ module Deletable
       define_method(:soft_delete!) do |**options|
         update!(is_deleted: true, **options)
       end
+
+      define_method(:undelete) do |**options|
+        update(is_deleted: false, **options)
+      end
+
+      define_method(:undelete!) do |**options|
+        update!(is_deleted: false, **options)
+      end
     end
   end
 end

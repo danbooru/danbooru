@@ -33,7 +33,7 @@ class ForumTopic < ApplicationRecord
 
   accepts_nested_attributes_for :original_post
 
-  before_save :create_mod_action
+  before_update :create_mod_action
   after_update :update_posts_on_deletion_or_undeletion
   after_update :update_original_post
   after_save(:if => ->(rec) {rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
