@@ -26,7 +26,7 @@ ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n7.1.1.tar.gz
 ARG EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/13.30.tar.gz"
 ARG OPENRESTY_URL="https://openresty.org/download/openresty-1.27.1.2.tar.gz"
 ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR_VERSION}/ruby-${RUBY_VERSION}.tar.gz"
-ARG NODE_VERSION="20.x"
+ARG NODE_VERSION="22.16.0"
 ARG UBUNTU_VERSION="24.04"
 
 
@@ -232,21 +232,17 @@ EOS
 FROM build-base AS build-node
 ARG NODE_VERSION
 RUN <<EOS
-  apt-get install -y --no-install-recommends gpg python3
-  rm -rf /usr/local/*
+  apt-get install -y --no-install-recommends xz-utils
 
-  curl https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor > /usr/share/keyrings/nodesource.gpg
-  echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION nodistro main" > /etc/apt/sources.list.d/nodesource.list
+  curl -L https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | tar --strip-components=1 -xJvf -
 
-  apt-get update
-  apt-get download nodejs
-  dpkg --instdir=/build --force-all --install ./nodejs*.deb
-  mv -i usr/bin usr/lib /usr/local
-
+  cp -rdv ./bin /usr/local
+  cp -rdv ./lib /usr/local
   find /usr/local -type f -executable -exec strip --strip-unneeded {} \;
-  rm -rf *
+  rm -rf ./*
 
   node --version
+  npm --version
 EOS
 
 
@@ -405,5 +401,6 @@ ENV DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION
 ENV DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE
 ENV RUBY_VERSION=$RUBY_VERSION
 ENV RUBY_MAJOR_VERSION=$RUBY_MAJOR_VERSION
+ENV NODE_VERSION=$NODE_VERSION
 
 USER danbooru
