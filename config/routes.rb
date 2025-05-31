@@ -376,6 +376,8 @@ Rails.application.routes.draw do
   post "/mock/iqdb/query" => "mock_services#iqdb_query"
   get "/mock/autotagger/evaluate" => "mock_services#autotagger_evaluate", as: "mock_autotagger_evaluate"
 
+  mount GoodJob::Engine => "good_job"
+
   match "/", to: "static#not_found", via: %i[post put patch delete trace]
   match "*other", to: "static#not_found", via: :all
 end
