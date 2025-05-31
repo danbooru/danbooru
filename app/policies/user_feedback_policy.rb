@@ -17,6 +17,10 @@ class UserFeedbackPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def can_see_updater_notice?
+    user.is_moderator?
+  end
+
   def permitted_attributes_for_create
     [:body, :category, :user_id, :user_name]
   end

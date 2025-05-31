@@ -23,7 +23,7 @@
         <div class="prose">
           <%= feedback.dtext_body.format_text %>
         </div>
-        <%= render "application/update_notice", record: feedback, interval: 0.minutes %>
+        <%= render "application/update_notice", record: feedback, interval: 0.minutes, current_user: CurrentUser.user %>
       <% end %>
       <% if policy(UserFeedback).can_view_deleted? %>
         <% t.column "Status" do |feedback| %>

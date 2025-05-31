@@ -202,7 +202,7 @@
           <% help_icon = exclamation_icon(class: "text-warning") if help_updated %>
           <% t.panel("#{help_icon} Help".strip.html_safe, id: "help-tab") do %>
             <%= embed_wiki("help:upload_notice") %>
-            <%= render "application/update_notice", record: WikiPage.find_by_title("help:upload_notice") %>
+            <%= render "application/update_notice", record: WikiPage.find_by_title("help:upload_notice"), current_user: CurrentUser.user %>
           <% end %>
 
           <% t.menu_item(id: "docking-menu-tab") do %>

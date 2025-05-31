@@ -41,6 +41,10 @@ class ForumPostPolicy < ApplicationPolicy
     !record.is_deleted? || user.is_moderator?
   end
 
+  def can_see_updater_notice?
+    user.is_moderator?
+  end
+
   def permitted_attributes_for_create
     [:body, :topic_id]
   end

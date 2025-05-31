@@ -41,7 +41,7 @@
       <% end %>
     <% end %>
 
-    <%= render "application/update_notice", record: comment %>
+    <%= render "application/update_notice", record: comment, current_user: current_user %>
 
     <menu class="mt-2">
       <% if votable? %>

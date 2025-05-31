@@ -13,6 +13,10 @@ class WikiPagePolicy < ApplicationPolicy
     user.is_builder?
   end
 
+  def can_see_updater_notice?
+    user.is_moderator?
+  end
+
   def permitted_attributes
     [:title, :body, :other_names, :other_names_string, :is_deleted, (:is_locked if can_edit_locked?)].compact
   end
