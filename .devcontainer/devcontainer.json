@@ -38,8 +38,34 @@
         "KoichiSasada.vscode-rdbg",
         "eamodio.gitlens",
         "ms-azuretools.vscode-docker",
-        "EditorConfig.EditorConfig"
-      ]
+        "EditorConfig.EditorConfig",
+        "ms-ossdata.vscode-pgsql"
+      ],
+      "settings": {
+        "pgsql.connections": [
+          {
+            "id": "7AA6DA49-EA28-4480-94B0-06D6C0EAE2EE",
+            "groupId": "353453E9-70EA-4F2A-98D7-9BA0DBD3C28F",
+            "authenticationType": "SqlLogin",
+            "connectTimeout": 15,
+            "applicationName": "vscode-pgsql",
+            "clientEncoding": "utf8",
+            "sslmode": "disable",
+            "server": "postgres",
+            "user": "danbooru",
+            "profileName": "Development",
+            "expiresOn": 0,
+            "emptyPasswordInput": true
+          }
+        ],
+        "pgsql.serverGroups": [
+          {
+            "id": "353453E9-70EA-4F2A-98D7-9BA0DBD3C28F",
+            "name": "Danbooru",
+            "description": ""
+          }
+        ]
+      }
     }
   }
 }
