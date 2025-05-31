@@ -24,28 +24,22 @@ Utility.test_max_width = function(width) {
   return mq.matches;
 }
 
-Utility.notice_timeout_id = undefined;
+Utility.notice = async function (html, permanent = false, type = "info") {
+  $(() => {
+    let notice = $("#notice").get(0).alpine;
+    notice.message = html;
+    notice.type = type;
+    notice.open = true;
 
-Utility.notice = function(msg, permanent) {
-  $('#notice').addClass("notice-info").removeClass("notice-error").fadeIn("fast").children("span").html(msg);
-
-  if (Utility.notice_timeout_id !== undefined) {
-    clearTimeout(Utility.notice_timeout_id)
-  }
-  if (!permanent) {
-    Utility.notice_timeout_id = setTimeout(function() {
-      $("#close-notice-link").click();
-      Utility.notice_timeout_id = undefined;
-    }, 6000);
-  }
+    clearTimeout(notice.timeout);
+    if (!permanent) {
+      notice.timeout = setTimeout(() => notice.open = false, 6000);
+    }
+  });
 }
 
-Utility.error = function(msg) {
-  $('#notice').removeClass("notice-info").addClass("notice-error").fadeIn("fast").children("span").html(msg);
-
-  if (Utility.notice_timeout_id !== undefined) {
-    clearTimeout(Utility.notice_timeout_id)
-  }
+Utility.error = function(html) {
+  Utility.notice(html, true, "error");
 }
 
 Utility.dialog = function(title, html) {

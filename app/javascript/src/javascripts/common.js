@@ -28,11 +28,6 @@ $(function() {
     e.preventDefault();
   });
 
-  $("#close-notice-link").on("click.danbooru", function(e) {
-    $('#notice').fadeOut("fast");
-    e.preventDefault();
-  });
-
   if (location.hostname.endsWith("danbooru.me")) {
     location.hostname = "danbooru.donmai.us";
   }
