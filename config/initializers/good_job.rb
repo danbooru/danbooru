@@ -15,3 +15,29 @@ if GoodJob::CLI.within_exe?
     RackMetricsServer.new.start
   end
 end
+
+ActiveSupport.on_load(:good_job_application_controller) do
+  # Here we are inside GoodJob::ApplicationController. This doesn't inherit from our own ApplicationController, so
+  # we need to include our own authentication and exception handling methods.
+
+  include ApplicationController::AuthenticationMethods
+  include ApplicationController::ExceptionHandlingMethods
+  include Pundit::Authorization
+
+  # Needed to render the default layout for error pages.
+  helper ApplicationHelper
+  helper IconHelper
+  helper UsersHelper
+
+  before_action :set_current_user
+  before_action :authorize_user
+  rescue_from Exception, with: :rescue_exception
+
+  def authorize_user
+    authorize(self, :can_view_good_job_dashboard?, policy_class: BackgroundJobPolicy)
+  end
+
+  def current_user
+    CurrentUser.user
+  end
+end

@@ -13,6 +13,11 @@ class BackgroundJobPolicy < ApplicationPolicy
     user.is_admin?
   end
 
+  # Whether the user can view the /good_job page.
+  def can_view_good_job_dashboard?
+    user.is_admin?
+  end
+
   alias_method :cancel?, :update?
   alias_method :destroy?, :update?
   alias_method :retry?, :update?
