@@ -85,7 +85,7 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   def http
-    super.cookies(webId: 1, web_session: 1)
+    super.cookies(webId: 1, web_session: 1, gid: credentials[:session_cookie])
   end
 
   def http_downloader
