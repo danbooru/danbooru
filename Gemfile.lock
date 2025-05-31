@@ -487,6 +487,8 @@ GEM
       rack (>= 1.1)
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.44.0, < 2.0)
+    ruby-lsp-shoulda-context (0.4.9)
+      dotenv (>= 2.7.6, < 4.0)
     ruby-progressbar (1.13.0)
     ruby-statistics (4.1.0)
     ruby-vips (2.2.3)
@@ -638,6 +640,7 @@ DEPENDENCIES
   rqrcode
   rubocop
   rubocop-rails
+  ruby-lsp-shoulda-context
   ruby-vips
   rubyzip
   sanitize
