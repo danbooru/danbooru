@@ -33,11 +33,11 @@
       <% t.column :status %>
 
       <% t.column "Duration" do |job| %>
-        <%= duration_to_hhmmssms(job.job_duration) if job.job_duration %>
+        <%= duration_to_hhmmssms(job.runtime_latency) if job.runtime_latency %>
       <% end %>
 
       <% t.column "Queue Delay" do |job| %>
-        <%= duration_to_hhmmssms(job.queue_delay) if job.queue_delay %>
+        <%= duration_to_hhmmssms(job.queue_latency) if job.queue_latency %>
       <% end %>
 
       <% t.column "Created" do |job| %>
