@@ -343,7 +343,7 @@ class User < ApplicationRecord
     # @param user_event [UserEvent] The user event that triggered this email.
     def send_login_verification_email!(request, user_event)
       if can_receive_email?(require_verified_email: false)
-        UserMailer.with_request(request).login_verification(self, user_event).deliver_later
+        UserMailer.with_request(request).login_verification(user_event).deliver_later
       end
     end
   end

@@ -249,6 +249,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
             assert_nil(nil, session[:user_id])
             assert_equal(true, user.user_events.login_pending_verification.exists?)
             assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer login_verification] })
+            perform_enqueued_jobs
+            assert_performed_jobs(1, only: MailDeliveryJob)
           end
 
           should "not send a login verification email when logging in from an authorized IP address" do
@@ -274,6 +276,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
             assert_nil(nil, session[:user_id])
             assert_equal(true, user.user_events.login_pending_verification.exists?)
             assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer login_verification] })
+            perform_enqueued_jobs
+            assert_performed_jobs(1, only: MailDeliveryJob)
           end
         end
 
