@@ -122,6 +122,10 @@ class SiteCredential < ApplicationRecord
       name: "Zerochan",
       default_credential: { user_id: Danbooru.config.zerochan_user_id, session_cookie: Danbooru.config.zerochan_session_cookie },
       help: %{Your "Zerochan":https://www.zerochan.net 'z_id' and 'z_hash' cookies.},
+    }, {
+      id: 1_000_001,
+      name: "Xiaohongshu",
+      default_credential: { session_cookie: Danbooru.config.xiaohongshu_session_cookie },
     },
   ]
 
