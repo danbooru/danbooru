@@ -743,6 +743,12 @@ class DText
     Nokogiri::HTML5.fragment(html, max_tree_depth: -1)
   end
 
+  # @param dtext [String] The DText input.
+  # @return [String] The HTML-formatted DText output.
+  def self.format_inline(dtext)
+    DText.new(dtext, inline: true).format_text
+  end
+
   def to_s
     dtext
   end

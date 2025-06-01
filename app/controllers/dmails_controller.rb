@@ -45,9 +45,8 @@ class DmailsController < ApplicationController
   def update
     @dmail = authorize Dmail.find(params[:id])
     @dmail.update(permitted_attributes(@dmail))
-    flash[:notice] = "Dmail updated"
 
-    respond_with(@dmail)
+    respond_with(@dmail, notice: "Dmail updated")
   end
 
   def mark_all_as_read

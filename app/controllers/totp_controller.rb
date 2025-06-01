@@ -27,19 +27,18 @@ class TOTPController < ApplicationController
       @user.update_totp_secret!(@totp.secret, request: request)
       @totp = @user.totp
 
-      flash[:notice] = "Two-factor authentication enabled"
+      notice = "Two-factor authentication enabled"
     else
       @totp.errors.add(:verification_code, "is incorrect")
     end
 
-    respond_with(@totp, location: user_backup_codes_path(@user, url: settings_path))
+    respond_with(@totp, notice: notice, location: user_backup_codes_path(@user, url: settings_path))
   end
 
   def destroy
     @user = authorize User.find(params[:user_id]), policy_class: TOTPPolicy
     @user.update_totp_secret!(nil, request: request)
 
-    flash[:notice] = "Two-factor authentication disabled"
-    respond_with(@totp, location: settings_path)
+    respond_with(@totp, notice: "Two-factor authentication disabled", location: settings_path)
   end
 end

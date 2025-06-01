@@ -24,7 +24,6 @@ class PostVotesController < ApplicationController
     @post_vote.save
     @post = @post_vote.post.reload
 
-    flash.now[:notice] = @post_vote.errors.full_messages.join("; ") if @post_vote.errors.present?
     respond_with(@post_vote)
   end
 

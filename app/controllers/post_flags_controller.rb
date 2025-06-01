@@ -23,8 +23,8 @@ class PostFlagsController < ApplicationController
   def create
     @post_flag = authorize PostFlag.new(creator: CurrentUser.user, **permitted_attributes(PostFlag))
     @post_flag.save
-    flash[:notice] = @post_flag.errors.none? ? "Post flagged" : @post_flag.errors.full_messages.join("; ")
-    respond_with(@post_flag)
+
+    respond_with(@post_flag, notice: "Post flagged")
   end
 
   def show

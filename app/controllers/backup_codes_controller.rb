@@ -18,7 +18,6 @@ class BackupCodesController < ApplicationController
     @user = authorize User.find(params[:user_id]), policy_class: BackupCodePolicy
     @user.generate_backup_codes!(request)
 
-    flash[:notice] = "Backup codes regenerated"
-    respond_with(@user, location: user_backup_codes_path(@user))
+    respond_with(@user, notice: "Backup codes regenerated", location: user_backup_codes_path(@user))
   end
 end

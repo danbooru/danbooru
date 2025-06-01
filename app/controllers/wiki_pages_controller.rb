@@ -56,9 +56,9 @@ class WikiPagesController < ApplicationController
     authorize @wiki_page
 
     @wiki_page.update(permitted_attributes(@wiki_page))
-    flash[:notice] = @wiki_page.warnings.full_messages.join(".\n \n") if @wiki_page.warnings.any?
 
-    respond_with(@wiki_page)
+    notice = @wiki_page.warnings.full_messages.join(".\n \n") if @wiki_page.warnings.any?
+    respond_with(@wiki_page, notice: notice)
   end
 
   def destroy
@@ -75,8 +75,8 @@ class WikiPagesController < ApplicationController
 
     @version = @wiki_page.versions.find(params[:version_id])
     @wiki_page.revert_to!(@version)
-    flash[:notice] = "Page was reverted"
-    respond_with(@wiki_page)
+
+    respond_with(@wiki_page, notice: "Page was reverted")
   end
 
   def show_or_new

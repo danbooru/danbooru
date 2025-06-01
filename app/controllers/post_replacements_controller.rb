@@ -16,8 +16,7 @@ class PostReplacementsController < ApplicationController
       flash[:notice] = @post_replacement.errors.full_messages.join("; ")
       redirect_to @post_replacement.post
     else
-      flash[:notice] = "Post replaced"
-      respond_with(@post_replacement, location: @post_replacement.post)
+      respond_with(@post_replacement, notice: "Post replaced", location: @post_replacement.post)
     end
   end
 

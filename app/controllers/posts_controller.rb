@@ -76,18 +76,14 @@ class PostsController < ApplicationController
     @post.save_if_unique(:md5)
 
     if @post.errors.none?
-      if @post.warnings.any?
-        flash[:notice] = @post.warnings.full_messages.join(".\n \n")
-      end
-
-      respond_with(@post)
+      notice = @post.warnings.full_messages.join(".\n \n") if @post.warnings.any?
+      respond_with(@post, notice: notice)
     elsif @post.errors.of_kind?(:md5, :taken)
       @original_post = Post.find_by!(md5: @post.md5)
       @original_post.update(rating: @post.rating, parent_id: @post.parent_id, tag_string: "#{@original_post.tag_string} #{@post.tag_string}")
       flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
       redirect_to @original_post
     else
-      flash.now[:notice] = @post.errors.full_messages.join("; ")
       @post.tag_string = params.dig(:post, :tag_string) # Preserve original tag string on validation error
       respond_with(@post, render: { template: "upload_media_assets/show" })
     end

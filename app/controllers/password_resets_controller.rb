@@ -54,9 +54,9 @@ class PasswordResetsController < ApplicationController
 
     if success
       SessionLoader.new(request).login_user(@user, :login)
-      flash[:notice] = "Password updated"
+      notice = "Password updated"
     end
 
-    respond_with(@user)
+    respond_with(@user, notice: notice)
   end
 end

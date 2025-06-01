@@ -32,10 +32,8 @@ class EmailsController < ApplicationController
     @user.change_email(params[:user][:email], request)
 
     if @user.errors.none?
-      flash[:notice] = "Email updated. Check your email to confirm your new address"
-      respond_with(@user, location: settings_url)
+      respond_with(@user, notice: "Email updated. Check your email to confirm your new address", location: settings_url)
     else
-      flash[:notice] = @user.errors.full_messages.join("; ")
       respond_with(@user)
     end
   end

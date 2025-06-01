@@ -15,8 +15,8 @@ class UserNameChangeRequestsController < ApplicationController
     user = User.find(params.dig(:user_name_change_request, :user_id))
     @change_request = authorize UserNameChangeRequest.new(updater: CurrentUser.user, original_name: user.name, **permitted_attributes(UserNameChangeRequest))
     @change_request.save
-    flash[:notice] = "Name changed" if @change_request.valid?
-    respond_with(@change_request, location: @change_request.user)
+
+    respond_with(@change_request, notice: "Name changed", location: @change_request.user)
   end
 
   def show

@@ -35,7 +35,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal("login_pending_verification", @user.user_events.last.category)
-        assert_nil(flash[:notice])
+        assert_equal("Expired link. Please login again", flash[:notice])
       end
 
       should "not authorize an invalid login event" do
@@ -48,7 +48,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal("login_pending_verification", @user.user_events.last.category)
-        assert_nil(flash[:notice])
+        assert_equal("Expired link. Please login again", flash[:notice])
       end
     end
 

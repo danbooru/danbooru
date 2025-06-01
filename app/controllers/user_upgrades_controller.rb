@@ -34,9 +34,8 @@ class UserUpgradesController < ApplicationController
   def refund
     @user_upgrade = authorize UserUpgrade.find(params[:id])
     @user_upgrade.refund!
-    flash[:notice] = "Upgrade refunded"
 
-    respond_with(@user_upgrade)
+    respond_with(@user_upgrade, notice: "Upgrade refunded")
   end
 
   def receipt

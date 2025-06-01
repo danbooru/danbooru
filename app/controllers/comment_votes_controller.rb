@@ -34,7 +34,6 @@ class CommentVotesController < ApplicationController
       @comment_vote.save
     end
 
-    flash.now[:notice] = @comment_vote.errors.full_messages.join("; ") if @comment_vote.errors.present?
     respond_with(@comment_vote)
   end
 

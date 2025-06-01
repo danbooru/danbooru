@@ -27,11 +27,8 @@ class PasswordsController < ApplicationController
       request: request
     )
 
-    if success
-      flash[:notice] = "Password updated"
-    end
-
-    respond_with(@user)
+    notice = "Password updated" if success
+    respond_with(@user, notice: notice)
   end
 
   private

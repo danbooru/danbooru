@@ -13,10 +13,10 @@ class SessionsController < ApplicationController
     @session = SessionLoader.new(request)
 
     if params[:signed_login_event].present? && @session.authorize_login_event!(params[:signed_login_event])
-      flash.now[:notice] = "New location verified. Login again to continue"
+      notice = "New location verified. Login again to continue"
     end
 
-    respond_with(@session)
+    respond_with(@session, notice: notice)
   end
 
   # Verify the user's password and either log them in, or show them the 2FA page if they have 2FA enabled.

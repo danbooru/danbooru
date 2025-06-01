@@ -62,7 +62,15 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def respond_with(subject, *args, model: model_name, **options, &block)
+  # Responds to a request and returns either an HTML, JS, JSON, or XML response, depending on the requested response format.
+  #
+  # If the model has errors, an error notice will be shown for HTML or JS responses.
+  #
+  # @param subject [ActiveRecord::Base, ActiveRecord::Relation>] The model or collection to return in response.
+  # @param notice [String, nil] An optional notice message to display for HTML or JS responses. The notice should be in DText.
+  #
+  # @see https://github.com/heartcombo/responders
+  def respond_with(subject, *args, model: model_name, notice: nil, **options, &block)
     if params[:redirect].to_s.present? && params[:action] == "index" && action_methods.include?("show")
       redirect_to_show(subject) and return
     end
@@ -70,6 +78,20 @@ class ApplicationController < ActionController::Base
     if subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
       associations = ParameterBuilder.includes_parameters(params[:only], model)
       subject = subject.includes(associations)
+    end
+
+    if subject.respond_to?(:errors) && subject.errors.present?
+      notice = subject.errors.full_messages.join("; ")
+    end
+
+    if notice.present? && (request.format.html? || request.format.js?)
+      if request.format.html? && !request.get?
+        flash[:notice] = notice
+      elsif request.format.js?
+        flash.now[:notice] = DText.new(notice, inline: true).format_text
+      else
+        flash.now[:notice] = notice
+      end
     end
 
     @current_item = subject

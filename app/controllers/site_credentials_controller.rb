@@ -41,7 +41,6 @@ class SiteCredentialsController < ApplicationController
     @site_credential = authorize SiteCredential.find(params[:id])
     @site_credential.destroy
 
-    flash[:notice] = "Credential deleted"
-    respond_with(@site_credential)
+    respond_with(@site_credential, notice: "Credential deleted")
   end
 end

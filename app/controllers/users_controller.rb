@@ -101,13 +101,7 @@ class UsersController < ApplicationController
     @user = authorize User.find(params[:id])
     @user.update(permitted_attributes(@user))
 
-    if @user.errors.any?
-      flash[:notice] = @user.errors.full_messages.join("; ")
-    else
-      flash[:notice] = "Settings updated"
-    end
-
-    respond_with(@user) do |format|
+    respond_with(@user, notice: "Settings updated") do |format|
       format.html { redirect_back fallback_location: edit_user_path(@user) }
     end
   end
@@ -129,8 +123,7 @@ class UsersController < ApplicationController
     user_deletion.delete!
 
     if user_deletion.errors.none?
-      flash[:notice] = "Your account has been deactivated"
-      respond_with(user_deletion, location: posts_path)
+      respond_with(user_deletion, notice: "Your account has been deactivated", location: posts_path)
     else
       flash[:notice] = user_deletion.errors.full_messages.join("; ")
       redirect_to deactivate_user_path(@user)

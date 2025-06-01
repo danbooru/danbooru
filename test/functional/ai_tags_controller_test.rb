@@ -62,6 +62,7 @@ class AITagsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal(false, @post.reload.has_tag?("touhou"))
+        assert_equal(DText.format_inline("Post ##{@post.id}: Removed [[touhou]]."), flash[:notice])
       end
 
       should "work for adding an AI tag" do
@@ -69,6 +70,7 @@ class AITagsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal(true, @post.reload.has_tag?("touhou"))
+        assert_equal(DText.format_inline("Post ##{@post.id}: Added [[touhou]]."), flash[:notice])
       end
 
       should "work for adding a custom tag" do
@@ -76,6 +78,7 @@ class AITagsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal("e", @post.reload.rating)
+        assert_equal(DText.format_inline("Post ##{@post.id}: Reverted to [[rating:e]]."), flash[:notice])
       end
 
       should "not allow unauthorized users to edit tags" do
@@ -83,6 +86,15 @@ class AITagsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 403
         assert_equal(false, @post.reload.has_tag?("touhou"))
+      end
+
+      should "show an error message if the post couldn't be updated" do
+        @post.update!(tag_string: Post::MAX_TAG_COUNT.times.to_a.join(" "))
+        put_auth tag_ai_tag_path(media_asset_id: @ai_tag.media_asset, tag_id: @ai_tag.tag), @user, params: { mode: "add" }, xhr: true
+
+        assert_response :success
+        assert_equal(false, @post.reload.has_tag?("touhou"))
+        assert_equal(DText.format_inline("Couldn't update post ##{@post.id}: Post cannot have more than #{Post::MAX_TAG_COUNT} tags"), flash[:notice])
       end
     end
   end
