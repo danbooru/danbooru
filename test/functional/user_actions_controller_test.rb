@@ -43,17 +43,17 @@ class UserActionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render for the owner" do
-        get_auth user_events_path(limit: 1000), create(:admin_user)
+        get_auth user_actions_path(limit: 1000), create(:owner_user)
         assert_response :success
       end
 
       should "render for an admin" do
-        get_auth user_events_path(limit: 1000), create(:admin_user)
+        get_auth user_actions_path(limit: 1000), create(:admin_user)
         assert_response :success
       end
 
       should "render for a mod" do
-        get_auth user_events_path(limit: 1000), create(:moderator_user)
+        get_auth user_actions_path(limit: 1000), create(:moderator_user)
         assert_response :success
       end
 
@@ -63,10 +63,14 @@ class UserActionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render when filtering on a single user" do
-        get_auth user_events_path(user_id: @user.id, limit: 1000), create(:owner_user)
+        get_auth user_actions_path(user_id: @user.id, limit: 1000), create(:moderator_user)
+        assert_response :success
+      end
+
+      should "render for /user/:id/actions" do
+        get_auth user_user_actions_path(@user, limit: 1000), create(:moderator_user)
         assert_response :success
       end
     end
   end
 end
-
