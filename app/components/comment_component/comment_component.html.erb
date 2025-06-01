@@ -134,6 +134,14 @@
             <% end %>
           <% end %>
 
+          <% if !comment.creator.is_banned? && policy(Ban.new(user: comment.creator)).create? %>
+            <% menu.with_item do %>
+              <%= link_to new_ban_path(ban: { user_id: comment.creator.id }) do %>
+                <%= ban_icon %> Ban User
+              <% end %>
+            <% end %>
+          <% end %>
+
           <% menu.with_item do %>
             <%= link_to comment_path(comment.id), class: "comment-copy-id" do %>
               <%= hashtag_icon %> Copy ID

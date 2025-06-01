@@ -69,6 +69,14 @@
           <% end %>
         <% end %>
 
+        <% if !forum_post.creator.is_banned? && policy(Ban.new(user: forum_post.creator)).create? %>
+          <% menu.with_item do %>
+            <%= link_to new_ban_path(ban: { user_id: forum_post.creator.id }) do %>
+              <%= ban_icon %> Ban User
+            <% end %>
+          <% end %>
+        <% end %>
+
         <% menu.with_item do %>
           <%= link_to forum_post_path(forum_post.id), class: "forum-post-copy-id" do %>
             <%= hashtag_icon %> Copy ID
