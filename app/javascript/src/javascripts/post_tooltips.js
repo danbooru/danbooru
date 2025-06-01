@@ -80,7 +80,7 @@ PostTooltip.on_show = async function (instance) {
     $tooltip.removeClass("tooltip-loading");
   } catch (error) {
     if (error.status !== 0 && error.statusText !== "abort") {
-      Utility.error(`Error displaying tooltip for post #${post_id} (error: ${error.status} ${error.statusText})`);
+      Notice.error(`Error displaying tooltip for post #${post_id} (error: ${error.status} ${error.statusText})`);
     }
   }
 };
@@ -100,12 +100,12 @@ PostTooltip.on_disable_tooltips = async function (event) {
   hideAll();
 
   if (CurrentUser.data("is-anonymous")) {
-    Utility.notice('You must <a href="/session/new">login</a> to disable tooltips');
+    Notice.info('You must <a href="/session/new">login</a> to disable tooltips');
     return;
   }
 
   await CurrentUser.update({ disable_post_tooltips: true });
-  Utility.notice(`Tooltips disabled; check your <a href="/settings">account settings</a> to re-enable.`);
+  Notice.info(`Tooltips disabled; check your <a href="/settings">account settings</a> to re-enable.`);
   PostTooltip.instance[0].destroy();
 };
 

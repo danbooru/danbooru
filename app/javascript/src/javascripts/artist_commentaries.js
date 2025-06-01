@@ -1,4 +1,4 @@
-import Utility from "./utility";
+import Notice from "./notice";
 import Rails from "@rails/ujs";
 
 let ArtistCommentary = {};
@@ -63,7 +63,7 @@ ArtistCommentary.initialize_edit_commentary_dialog = function() {
 
 ArtistCommentary.fetch_commentary = function() {
   var commentary = "";
-  Utility.notice("Fetching artist commentary...");
+  Notice.info("Fetching artist commentary...");
 
   var type = $('#fetch-commentary select[name="commentary_source_type"]').val();
   if (type === "Source") {
@@ -76,9 +76,9 @@ ArtistCommentary.fetch_commentary = function() {
 
   commentary.then(ArtistCommentary.fill_commentary).then(function (success) {
     var message = success ? "Artist commentary copied." : "Artist commentary copied; conflicting fields ignored.";
-    Utility.notice(message);
+    Notice.info(message);
   }).catch(function () {
-    Utility.notice("Fetching artist commentary failed.");
+    Notice.error("Fetching artist commentary failed.");
   });
 
   return false;

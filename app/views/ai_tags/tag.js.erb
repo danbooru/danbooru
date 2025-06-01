@@ -3,5 +3,5 @@ $(function() {
   let html = "<%= j render("ai_tags/preview", ai_tag: @ai_tag, media_asset: @ai_tag.media_asset, post: @post, size: @preview_size) %>";
   Alpine.morph($el, html);
 
-  Danbooru.Utility.notice("<%= j flash[:notice] %>");
+  Danbooru.Notice.info("<%= j flash[:notice] %>");
 });

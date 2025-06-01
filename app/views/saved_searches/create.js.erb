@@ -1,5 +1,5 @@
 <% if @saved_search.errors.any? %>
-  Danbooru.error("<%= j @saved_search.errors.full_messages.join(', ') %>");
+  Danbooru.Notice.error("<%= j @saved_search.errors.full_messages.join(', ') %>");
 <% else %>
-  Danbooru.notice("Search '<%= j @saved_search.query %>' was saved");
+  Danbooru.Notice.info("Search '<%= j @saved_search.query %>' was saved");
 <% end %>

@@ -169,17 +169,7 @@
       </div>
     <% end %>
 
-    <div id="notice"
-         class="notice flex fixed top-2 left-2 right-2 p-2 mx-auto max-w-720px max-h-150px thin-scrollbar z-9999 sm:text-sm"
-         x-init="$root.alpine = $data"
-         x-data="<%= { type: "info", open: flash[:notice].present?, message: (format_text(flash[:notice], inline: true) if flash[:notice].present?) }.to_json %>"
-         x-bind:class="type === 'error' ? 'notice-error' : 'notice-info'"
-         x-show="open"
-         x-transition.opacity.400ms
-         x-cloak>
-      <span class="prose flex-1" x-html="message"></span>
-      <a href="javascript:void(0)" id="close-notice-link" class="flex self-center text-lg" data-shortcut="esc" x-on:click="open = false; clearTimeout(notice.timeout)"><%= close_icon %></a>
-    </div>
+    <%= render NoticeComponent.new(flash[:notice]) %>
 
     <%= yield :layout %>
   </div>

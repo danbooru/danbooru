@@ -1,4 +1,4 @@
-import Utility from "./utility";
+import Notice from "./notice";
 import { createTooltip } from "./utility";
 
 class PostVotesTooltipComponent {
@@ -35,7 +35,7 @@ class PostVotesTooltipComponent {
       $tooltip.removeClass("tooltip-loading");
     } catch (error) {
       if (error.status !== 0 && error.statusText !== "abort") {
-        Utility.error(`Error displaying votes for post #${postId} (error: ${error.status} ${error.statusText})`);
+        Notice.error(`Error displaying votes for post #${postId} (error: ${error.status} ${error.statusText})`);
       }
     }
   }

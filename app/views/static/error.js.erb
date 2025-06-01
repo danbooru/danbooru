@@ -1,7 +1,7 @@
 console.error(<%= raw @api_response.to_json %>);
 
 <% if @message.present? %>
-  Danbooru.Utility.error("<%= j @message %>");
+  Danbooru.Notice.error("<%= j @message %>");
 <% else %>
-  Danbooru.Utility.error("<%= j "Unexpected error: #{@exception.class}" %>");
+  Danbooru.Notice.error("<%= j "Unexpected error: #{@exception.class}" %>");
 <% end %>

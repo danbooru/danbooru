@@ -1,4 +1,4 @@
-import Utility from './utility';
+import Notice from './notice';
 
 let PostVersion = {};
 
@@ -37,7 +37,7 @@ PostVersion.undo_selected = async function () {
     await $.ajax(`/post_versions/${id}/undo.json`, { method: "PUT" });
 
     updated++;
-    Utility.notice(`${updated}/${selected_rows.length} changes undone.`);
+    Notice.info(`${updated}/${selected_rows.length} changes undone.`);
   }
 };
 

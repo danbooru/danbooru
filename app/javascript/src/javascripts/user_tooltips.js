@@ -1,4 +1,4 @@
-import Utility from './utility';
+import Notice from './notice';
 import { createTooltip } from './utility';
 
 let UserTooltip = {};
@@ -66,7 +66,7 @@ UserTooltip.on_show = async function (instance) {
     $tooltip.removeClass("tooltip-loading");
   } catch (error) {
     if (error.status !== 0 && error.statusText !== "abort") {
-      Utility.error(`Error displaying tooltip (error: ${error.status} ${error.statusText})`);
+      Notice.error(`Error displaying tooltip (error: ${error.status} ${error.statusText})`);
     }
   }
 };

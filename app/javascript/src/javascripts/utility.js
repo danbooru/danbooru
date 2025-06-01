@@ -24,24 +24,6 @@ Utility.test_max_width = function(width) {
   return mq.matches;
 }
 
-Utility.notice = async function (html, permanent = false, type = "info") {
-  $(() => {
-    let notice = $("#notice").get(0).alpine;
-    notice.message = html;
-    notice.type = type;
-    notice.open = true;
-
-    clearTimeout(notice.timeout);
-    if (!permanent) {
-      notice.timeout = setTimeout(() => notice.open = false, 6000);
-    }
-  });
-}
-
-Utility.error = function(html) {
-  Utility.notice(html, true, "error");
-}
-
 Utility.dialog = function(title, html) {
   const $dialog = $(html).dialog({
     title: title,
@@ -121,9 +103,9 @@ Utility.splitWords = function(string) {
 Utility.copyToClipboard = async function(text, message = "Copied!") {
   try {
     await navigator.clipboard.writeText(text);
-    Utility.notice(message);
+    Notice.info(message);
   } catch (error) {
-    Utility.error("Couldn't copy to clipboard");
+    Notice.error("Couldn't copy to clipboard");
   }
 }
 

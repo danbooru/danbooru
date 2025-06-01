@@ -1,7 +1,7 @@
 <% if @post.errors.any? %>
-  Danbooru.error("<%= j @post.errors.full_messages.join('; ') %>");
+  Danbooru.Notice.error("<%= j @post.errors.full_messages.join('; ') %>");
 <% elsif @error %>
-  Danbooru.error("<%= j @error.to_s %>");
+  Danbooru.Notice.error("<%= j @error.to_s %>");
 <% else %>
-  Danbooru.notice("Post was permanently deleted");
+  Danbooru.Notice.info("Post was permanently deleted");
 <% end %>

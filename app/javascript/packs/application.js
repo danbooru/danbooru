@@ -51,6 +51,7 @@ import FormValidator from "../src/javascripts/form_validator.js";
 import HelpTooltipComponent from "../src/javascripts/help_tooltip_component.js";
 import IqdbQuery from "../src/javascripts/iqdb_queries.js";
 import Note from "../src/javascripts/notes.js";
+import Notice from "../src/javascripts/notice.js";
 import MediaAssetComponent from "../src/javascripts/media_asset_component.js";
 import PopupMenuComponent from "../src/javascripts/popup_menu_component.js";
 import Post from "../src/javascripts/posts.js";
@@ -86,6 +87,7 @@ Danbooru.HelpTooltipComponent = HelpTooltipComponent;
 Danbooru.IqdbQuery = IqdbQuery;
 Danbooru.MediaAssetComponent = MediaAssetComponent;
 Danbooru.Note = Note;
+Danbooru.Notice = Notice;
 Danbooru.PopupMenuComponent = PopupMenuComponent;
 Danbooru.Post = Post;
 Danbooru.PostModeMenu = PostModeMenu;
@@ -101,8 +103,11 @@ Danbooru.UserTooltip = UserTooltip;
 Danbooru.Utility = Utility;
 Danbooru.Ugoira = Ugoira;
 
-Danbooru.notice = Utility.notice;
-Danbooru.error = Utility.error;
+// Aliases for backwards compatibility with userscripts.
+Utility.notice = Notice.info;
+Utility.error = Notice.error;
+Danbooru.notice = Notice.info;
+Danbooru.error = Notice.error;
 
 window.$ = jQuery;
 window.jQuery = jQuery;

@@ -1,5 +1,6 @@
 import Dropzone from 'dropzone';
 import Utility from "./utility";
+import Notice from "./notice";
 import capitalize from "lodash/capitalize";
 
 export default class FileUploadComponent {
@@ -116,7 +117,7 @@ export default class FileUploadComponent {
       this.$dropzone.removeClass("success");
       this.loadingStop();
 
-      Utility.error(`Upload failed: ${upload.error}.`);
+      Notice.error(`Upload failed: ${upload.error}.`);
     } else {
       let params = new URLSearchParams(window.location.search);
       let isBookmarklet = params.has("url");

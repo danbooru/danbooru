@@ -1,10 +1,10 @@
 <% if @approval.errors.any? %>
-  Danbooru.error("Error: " + <%= @approval.errors.full_messages.join("; ").to_json.html_safe %>);
+  Danbooru.Notice.error("Error: " + <%= @approval.errors.full_messages.join("; ").to_json.html_safe %>);
 <% else %>
   if ($("#c-posts #a-show").length) {
     location.reload();
   } else if ($("#c-modqueue").length) {
     $("#post_<%= @approval.post.id %>").hide();
-    Danbooru.notice("<%= j format_text("Post ##{@approval.post.id} was approved.", inline: true) %>");
+    Danbooru.Notice.info("<%= j format_text("Post ##{@approval.post.id} was approved.", inline: true) %>");
   }
 <% end %>

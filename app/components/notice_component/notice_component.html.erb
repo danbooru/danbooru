@@ -1,0 +1,11 @@
+<div id="notice"
+      class="notice flex fixed top-2 left-2 right-2 p-2 mx-auto max-w-720px max-h-150px thin-scrollbar z-9999 shadow-lg sm:text-sm"
+      x-init="$root.notice = $data.notice"
+      x-data="{ notice: new Danbooru.Notice(<%= message.to_json %>) }"
+      x-bind:class="notice.type === 'error' ? 'notice-error' : 'notice-info'"
+      x-show="notice.isOpen"
+      x-transition.opacity.400ms
+      x-cloak>
+  <span class="prose flex-1" x-html="notice.message"><%= message %></span>
+  <a href="javascript:void(0)" id="close-notice-link" class="flex self-center text-lg" data-shortcut="esc" x-on:click="notice.close()"><%= helpers.close_icon %></a>
+</div>

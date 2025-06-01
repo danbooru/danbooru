@@ -1,5 +1,6 @@
 import CurrentUser from './current_user'
 import Utility from './utility'
+import Notice from './notice'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'
 import Note from './notes'
@@ -198,15 +199,15 @@ Post.initialize_links = function() {
           other_post_id: other_post_id
         },
         success: function(data) {
-          Utility.notice("Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+          Notice.info("Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
         },
         error: function(data) {
           if (data.status === 404) {
-            Utility.error("Error: Invalid destination post");
+            Notice.error("Error: Invalid destination post");
           } else if (data.responseJSON && data.responseJSON.reason) {
-            Utility.error("Error: " + data.responseJSON.reason);
+            Notice.error("Error: " + data.responseJSON.reason);
           } else {
-            Utility.error("There was an error copying notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+            Notice.error("There was an error copying notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
           }
         }
       });
@@ -406,9 +407,9 @@ Post.initialize_ruffle_player = function() {
 
 Post.show_pending_update_notice = function() {
   if (Post.pending_update_count === 0) {
-    Utility.notice("Posts updated");
+    Notice.info("Posts updated");
   } else {
-    Utility.notice(`Updating posts (${Post.pending_update_count} pending)...`, true);
+    Notice.info(`Updating posts (${Post.pending_update_count} pending)...`, false);
   }
 }
 
