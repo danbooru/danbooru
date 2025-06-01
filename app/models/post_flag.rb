@@ -20,7 +20,7 @@ class PostFlag < ApplicationRecord
   after_create :prune_disapprovals
   attr_accessor :is_deletion
 
-  enum status: {
+  enum :status, {
     pending: 0,
     succeeded: 1,
     rejected: 2,

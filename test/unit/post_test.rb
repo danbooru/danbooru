@@ -2019,12 +2019,6 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 
-  context "Pools:" do
-    setup do
-      SqsService.any_instance.stubs(:send_message)
-    end
-  end
-
   context "Uploading:" do
     context "Uploading a post" do
       should "capture who uploaded the post" do

@@ -16,7 +16,7 @@ class UploadMediaAsset < ApplicationRecord
   validates :source_url, format: { with: %r{\A(https?|file)://}i, message: "is not a valid URL" }
   validates :page_url, format: { with: %r{\A(https?)://}i, message: "is not a valid URL" }, allow_nil: true
 
-  enum status: {
+  enum :status, {
     pending: 0,
     processing: 100,
     active: 200,

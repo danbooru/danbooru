@@ -97,7 +97,7 @@ class User < ApplicationRecord
   attribute :is_deleted, default: false
 
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
-  enum theme: { auto: 0, light: 50, dark: 100 }, _suffix: true
+  enum :theme, { auto: 0, light: 50, dark: 100 }, suffix: true
 
   attr_reader :password
 

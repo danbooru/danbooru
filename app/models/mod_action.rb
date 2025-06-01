@@ -17,7 +17,7 @@ class ModAction < ApplicationRecord
   # Ban:      4
   # Unban:    5
   # Misc:     6-19
-  enum category: {
+  enum :category, {
     user_delete: 2,
     user_undelete: 3,
     user_ban: 4,

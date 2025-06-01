@@ -51,7 +51,7 @@ class MediaAsset < ApplicationRecord
   # Expunged: The asset's files have been permanently deleted.
   # Failed: The asset failed to upload. The asset may be in a partially uploaded state, with some
   #         files missing or incompletely transferred.
-  enum status: {
+  enum :status, {
     processing: 100,
     active: 200,
     deleted: 300,

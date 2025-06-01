@@ -13,10 +13,10 @@ class IpBan < ApplicationRecord
   after_save :create_mod_action
 
   deletable
-  enum category: {
+  enum :category, {
     full: 0,
     partial: 100,
-  }, _suffix: "ban"
+  }, suffix: "ban"
 
   def self.visible(user)
     if user.is_moderator?

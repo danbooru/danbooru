@@ -16,7 +16,7 @@ class UpgradeCode < ApplicationRecord
   belongs_to :redeemer, class_name: "User", optional: true
   belongs_to :user_upgrade, optional: true
 
-  enum status: {
+  enum :status, {
     unsold: 0,
     unredeemed: 100,
     redeemed: 200,

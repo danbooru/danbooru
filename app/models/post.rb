@@ -707,7 +707,7 @@ class Post < ApplicationRecord
 
   concerning :PoolMethods do
     def pools
-      Pool.where("pools.post_ids && array[?]", id)
+      Pool.where_array_includes_all(:post_ids, [id])
     end
 
     def has_active_pools?

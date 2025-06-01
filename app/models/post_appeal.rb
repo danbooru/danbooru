@@ -12,7 +12,7 @@ class PostAppeal < ApplicationRecord
   validates :creator, uniqueness: { scope: :post, message: "have already appealed this post" }, on: :create
   after_create :prune_disapprovals
 
-  enum status: {
+  enum :status, {
     pending: 0,
     succeeded: 1,
     rejected: 2,

@@ -31,7 +31,7 @@ class UserEvent < ApplicationRecord
   belongs_to :user_session
   belongs_to :ip_geolocation, foreign_key: :ip_addr, primary_key: :ip_addr, optional: true
 
-  enum category: {
+  enum :category, {
     login: 0,                             # The user successfully logged in. Only used for users without 2FA enabled.
     login_pending_verification: 10,       # The user entered the correct password on the login page, but logged in from a new
                                           # location. Only used for users with a valid email but without 2FA enabled.

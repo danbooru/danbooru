@@ -7,7 +7,7 @@ class DtextLink < ApplicationRecord
   belongs_to :embedded_post, foreign_key: :link_target, class_name: "Post", optional: true
   belongs_to :embedded_media_asset, foreign_key: :link_target, class_name: "MediaAsset", optional: true
 
-  enum link_type: {
+  enum :link_type, {
     wiki_link: 0,
     external_link: 1,
     embedded_post: 2,

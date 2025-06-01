@@ -25,7 +25,7 @@ class ModerationReport < ApplicationRecord
   scope :forum_post, -> { where(model_type: "ForumPost") }
   scope :recent, -> { where("moderation_reports.created_at >= ?", 1.week.ago) }
 
-  enum status: {
+  enum :status, {
     pending: 0,
     rejected: 1,
     handled: 2,
