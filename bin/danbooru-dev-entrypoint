@@ -20,7 +20,15 @@ warn_if_outdated_image() {
   fi
 }
 
+update_gems() {
+  if ! bundle check 2> /dev/null; then
+    echo 'Warning: Your docker image is out of date. Run `bin/dev pull` to update.'
+    echo 'Installing gems...'
+    bundle install --prefer-local > /dev/null
+  fi
+}
+
 warn_if_outdated_image
-bundle install --prefer-local > /dev/null
+update_gems
 
 exec "$@"
