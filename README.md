@@ -57,10 +57,9 @@ implement certain features.
 
 ### Amazon Web Services
 
-The following features require an Amazon AWS account:
+In the production environment, for historical reasons, Danbooru relies on Amazon AWS to send pool/post versions to a SQS queue, and on a separate archives service ([available here](https://github.com/danbooru/archives/)) to extract the versions from that queue and insert them into a database.
 
-* Pool history
-* Post history
+The Docker Compose files in this repository come with a preconfigured archives service and an SQS mock using [ElasticMQ](https://github.com/softwaremill/elasticmq), so following the docker tutorial at the start of this file is sufficient to have post/pool versions working for a new instance.
 
 ### Google APIs
 
