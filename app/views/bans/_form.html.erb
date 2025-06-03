@@ -1,6 +1,8 @@
 <%= edit_form_for(ban) do |f| %>
   <% if ban.user.blank? %>
     <%= f.input :user_name, as: :string, input_html: { "data-autocomplete": "user" } %>
+  <% elsif ban.new_record? %>
+    <%= f.input :user_id, as: :hidden, input_html: { value: ban.user.id } %>
   <% end %>
 
   <%= f.input :duration, collection: Ban::DURATIONS.map { |duration| [duration == Ban::FOREVER ? "forever" : duration.inspect, duration.iso8601] }, selected: ban.duration&.iso8601 %>
