@@ -42,19 +42,14 @@ module Source::Tests::URL
     end
 
     context "when extracting attributes" do
-      url_parser_should_work("https://ci-en.dlsite.com/creator/5290", page_url: "https://ci-en.net/creator/5290")
-      url_parser_should_work("https://ci-en.dlsite.com/creator/5290", profile_url: "https://ci-en.net/creator/5290")
+      url_parser_should_work("https://ci-en.dlsite.com/creator/5290", page_url: "https://ci-en.net/creator/5290", profile_url: "https://ci-en.net/creator/5290")
       url_parser_should_work("https://ci-en.dlsite.com/creator/5290/article/998146", page_url: "https://ci-en.net/creator/5290/article/998146")
 
-      url_parser_should_work("https://ci-en.jp/creator/922", page_url: "https://ci-en.net/creator/922")
-      url_parser_should_work("https://ci-en.jp/creator/922", profile_url: "https://ci-en.net/creator/922")
+      url_parser_should_work("https://ci-en.jp/creator/922", page_url: "https://ci-en.net/creator/922", profile_url: "https://ci-en.net/creator/922")
       url_parser_should_work("https://ci-en.jp/creator/922/article/23700", page_url: "https://ci-en.net/creator/922/article/23700")
 
-      url_parser_should_work("https://ci-en.net/creator/11019", creator_id: "11019")
-      url_parser_should_work("https://ci-en.net/creator/11019", article_id: nil)
-
-      url_parser_should_work("https://ci-en.net/creator/11019/article/921762", creator_id: "11019")
-      url_parser_should_work("https://ci-en.net/creator/11019/article/921762", article_id: "921762")
+      url_parser_should_work("https://ci-en.net/creator/11019", creator_id: "11019", article_id: nil)
+      url_parser_should_work("https://ci-en.net/creator/11019/article/921762", creator_id: "11019", article_id: "921762")
 
       url_parser_should_work("https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-web.jpg?px-time=1703968668&px-hash=9497dce5fa56c5081413ad1126e06d6f44f0ab3e", creator_id: "11019")
       url_parser_should_work("https://media.ci-en.jp/public/cover/creator/00011019/ae96c79d7626c8127bfe9823111601d3b566977d19c3aa0409de4ef838f8dc12/image-990-c.jpg", creator_id: "11019")

@@ -29,13 +29,10 @@ module Source::Tests::URL
     context "when extracting attributes" do
       url_parser_should_work("https://inkbunny.net/s/3200751", page_url: "https://inkbunny.net/s/3200751")
       url_parser_should_work("https://inkbunny.net/s/3200751-p1-", page_url: "https://inkbunny.net/s/3200751")
-      url_parser_should_work("https://inkbunny.net/submissionview.php?id=3200751",
-                             page_url: "https://inkbunny.net/s/3200751",)
+      url_parser_should_work("https://inkbunny.net/submissionview.php?id=3200751", page_url: "https://inkbunny.net/s/3200751")
 
-      url_parser_should_work("https://inkbunny.net/DAGASI", user_id: nil)
-      url_parser_should_work("https://inkbunny.net/DAGASI", username: "DAGASI")
-      url_parser_should_work("https://inkbunny.net/user.php?user_id=152800", user_id: 152_800)
-      url_parser_should_work("https://inkbunny.net/user.php?user_id=152800", username: nil)
+      url_parser_should_work("https://inkbunny.net/DAGASI", username: "DAGASI", user_id: nil)
+      url_parser_should_work("https://inkbunny.net/user.php?user_id=152800", username: nil, user_id: 152_800)
     end
   end
 end

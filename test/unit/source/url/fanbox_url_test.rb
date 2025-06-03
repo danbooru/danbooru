@@ -34,13 +34,14 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg",
-                             page_url: "https://www.pixiv.net/fanbox/creator/1566167",)
+                             page_url: "https://www.pixiv.net/fanbox/creator/1566167",
+                             user_id: "1566167",)
 
       url_parser_should_work("https://fanbox.cc/@omu001", username: "omu001")
       url_parser_should_work("https://www.fanbox.cc/@omu001", username: "omu001")
-      url_parser_should_work("https://www.fanbox.cc/@omu001/posts/39714", username: "omu001")
-      url_parser_should_work("https://fanbox.cc/@omu001/posts/39714", username: "omu001")
-      url_parser_should_work("https://omu001.fanbox.cc/posts/39714", username: "omu001")
+      url_parser_should_work("https://www.fanbox.cc/@omu001/posts/39714", username: "omu001", work_id: "39714")
+      url_parser_should_work("https://fanbox.cc/@omu001/posts/39714", username: "omu001", work_id: "39714")
+      url_parser_should_work("https://omu001.fanbox.cc/posts/39714", username: "omu001", work_id: "39714")
     end
   end
 end

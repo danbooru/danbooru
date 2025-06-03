@@ -40,15 +40,18 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("https://misskey.io/notes/9bxaf592x6#pswp",
-                             page_url: "https://misskey.io/notes/9bxaf592x6",)
+                             page_url: "https://misskey.io/notes/9bxaf592x6",
+                             note_id: "9bxaf592x6",
+                             user_id: nil,
+                             username: nil,)
 
       url_parser_should_work("https://misskey.io/user-info/9bpemdns40",
-                             profile_url: "https://misskey.io/users/9bpemdns40",)
+                             profile_url: "https://misskey.io/users/9bpemdns40",
+                             user_id: "9bpemdns40",
+                             username: nil,)
 
-      url_parser_should_work("https://misskey.io/@ixy194", user_id: nil)
-      url_parser_should_work("https://misskey.io/@ixy194", username: "ixy194")
-      url_parser_should_work("https://misskey.io/users/9bpemdns40", user_id: "9bpemdns40")
-      url_parser_should_work("https://misskey.io/users/9bpemdns40", username: nil)
+      url_parser_should_work("https://misskey.io/@ixy194", user_id: nil, username: "ixy194")
+      url_parser_should_work("https://misskey.io/users/9bpemdns40", user_id: "9bpemdns40", username: nil)
     end
   end
 end

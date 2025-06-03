@@ -69,7 +69,7 @@ module Source::Tests::URL
       url_parser_should_work("https://at.tumblr.com/pizza-and-ramen/118684413624/uqndb20nkyob",
                              page_url: "https://pizza-and-ramen.tumblr.com/post/118684413624",)
 
-      url_parser_should_work("https://octrain1020.tumblr.com/", page_url: nil)
+      url_parser_should_work("https://octrain1020.tumblr.com/", page_url: nil, blog_name: "octrain1020")
 
       url_parser_should_work("https://at.tumblr.com/cyanideqpoison/u2czj612ttzq",
                              profile_url: "https://cyanideqpoison.tumblr.com",)
