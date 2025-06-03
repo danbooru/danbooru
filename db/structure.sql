@@ -5916,6 +5916,17 @@ CREATE INDEX index_user_events_on_ip_addr ON public.user_events USING btree (ip_
 
 
 --
+-- Name: index_user_events_on_ip_addr_subnet; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_ip_addr_subnet ON public.user_events USING btree (network(set_masklen(ip_addr,
+CASE
+    WHEN (family(ip_addr) = 4) THEN 24
+    ELSE 64
+END)));
+
+
+--
 -- Name: index_user_events_on_metadata; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6978,6 +6989,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250603085358'),
 ('20250601164359'),
 ('20250601164357'),
 ('20250601164355'),

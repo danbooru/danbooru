@@ -74,6 +74,30 @@ class UserEvent < ApplicationRecord
     end
   end
 
+  concerning :SockpuppetMethods do
+    class_methods do
+      # @return [ActiveRecord::Relation<UserEvent>] A list of user events that share a session ID with the given user.
+      def shared_session_ids_for(user)
+        authorized
+          .where.not(user_id: user.id)
+          .where(session_id: where(user: user).select(:session_id))
+          .group([:session_id, :user_id])
+          .select(:session_id, :user_id)
+      end
+
+      # @return [ActiveRecord::Relation<UserEvent>] A list of user events that share an IP /24 or /64 subnet with the given user.
+      def shared_ip_addresses_for(user)
+        subnet = "network(set_masklen(user_events.ip_addr, CASE WHEN family(user_events.ip_addr) = 4 THEN 24 ELSE 64 END))"
+
+        authorized
+          .where.not(user_id: user.id)
+          .where("#{subnet} IN (?)", where(user: user).joins(:ip_geolocation).where(ip_geolocation: { is_proxy: false }).select(subnet))
+          .group([subnet, :user_id])
+          .select(Arel.sql("#{subnet} AS ip_addr, user_id"))
+      end
+    end
+  end
+
   def self.search(params, current_user)
     q = search_attributes(params, [:id, :created_at, :updated_at, :category, :user, :user_session, :ip_addr, :session_id, :user_agent, :metadata, :ip_geolocation], current_user: current_user)
     q.apply_default_order(params)

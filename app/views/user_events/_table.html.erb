@@ -1,8 +1,25 @@
 <div id="p-table-listing">
   <% if @user.present? %>
-    <h1 class="mb-4">Account History</h1>
+    <h1 class="mb-2">Account History: <%= link_to_user @user %></h1>
   <% else %>
-    <h1 class="mb-4">User Events</h1>
+    <h1 class="mb-2">User Events</h1>
+  <% end %>
+
+  <%= render "users/sockpuppets", user: @user %>
+
+    <% if sockpuppet_accounts.present? %>
+      <div class="flex flex-wrap sm:flex-col items-center gap-2 mb-2">
+        <strong>Other Accounts</strong>
+
+        <% sockpuppet_accounts.map(&:values).each do |(user, session_id, ip_address)| %>
+          <% if session_id.present? %>
+            <%= link_to user.name, user_events_path(search: { session_id: session_id }), class: "inline-block chip-primary text-sm truncate" %>
+          <% else %>
+            <%= link_to user.name, user_events_path(search: { ip_addr: ip_address }), class: "inline-block chip-primary text-sm truncate" %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
 
   <%= search_form_for(user_events_path) do |f| %>

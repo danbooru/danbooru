@@ -1,5 +1,5 @@
 <%= edit_form_for(ban) do |f| %>
-  <% if ban.new_record? %>
+  <% if ban.user.blank? %>
     <%= f.input :user_name, as: :string, input_html: { "data-autocomplete": "user" } %>
   <% end %>
 

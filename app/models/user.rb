@@ -321,16 +321,6 @@ class User < ApplicationRecord
   concerning :LoginVerificationMethods do
     extend Memoist
 
-    # @return [Array<Danbooru::IpAddress>] The list of IP addresses that have been used by this account before.
-    def authorized_ip_addresses
-      user_events.authorized.distinct.pluck(:ip_addr)
-    end
-
-    # @return [Array<Danbooru::IpAddress>] The list of /24 or /64 subnets that have been used by this account before.
-    def authorized_subnets
-      user_events.authorized.distinct.pluck(Arel.sql("network(set_masklen(ip_addr, CASE WHEN family(ip_addr) = 4 THEN 24 ELSE 64 END)) AS ip_addr"))
-    end
-
     # @param ip_addr [Danbooru::IpAddress] The IP address or subnet to check.
     # @return [Boolean] True if this IP address or subnet has been used by this account before.
     def authorized_ip?(ip_addr)
@@ -345,6 +335,19 @@ class User < ApplicationRecord
       if can_receive_email?(require_verified_email: false)
         UserMailer.with_request(request).login_verification(user_event).deliver_later
       end
+    end
+  end
+
+  concerning :SockpuppetMethods do
+    # @return [Array<Hash>] An array of hashes of users that share session IDs or IP addresses with this user.
+    def sockpuppet_accounts
+      shared_session_ids = UserEvent.shared_session_ids_for(self).includes(:user)
+      shared_ip_addresses = UserEvent.shared_ip_addresses_for(self).includes(:user)
+      events = shared_session_ids + shared_ip_addresses
+
+      events.group_by(&:user).map do |user, events|
+        { user: user, session_ids: events.map { it.try(:session_id) }.compact, ip_addresses: events.map { it.try(:ip_addr)&.subnet }.compact }
+      end.sort_by { it[:user].id }
     end
   end
 
