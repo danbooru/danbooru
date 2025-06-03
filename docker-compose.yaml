@@ -80,6 +80,14 @@
 # This doesn't change the name of the site, it only affects the name used by Docker Compose.
 name: danbooru
 
+x-sqs-env: &sqs-env
+  # Required to have working post and pool versions
+  DANBOORU_AWS_SQS_REGION: us-east-1
+  DANBOORU_AWS_ACCESS_KEY_ID: dummy
+  DANBOORU_AWS_SECRET_ACCESS_KEY: dummy
+  DANBOORU_AWS_SQS_ARCHIVES_URL: http://sqs:9324/000000000000/danbooru.fifo
+  DANBOORU_AWS_SQS_HOST: http://sqs:9324
+
 x-base-template: &base-template
   # You can set DANBOORU_IMAGE to `ghcr.io/danbooru/danbooru:master` to get the latest unstable release,
   # or e.g. `ghcr.io/danbooru/danbooru:production-2024.01.12-055003-utc` to get a specific stable version.
@@ -97,6 +105,7 @@ x-base-template: &base-template
     retries: 1
 
   environment:
+    <<: *sqs-env
     # The public URL of your site. You can set this if you have a domain name for your site.
     DANBOORU_CANONICAL_URL: ${DANBOORU_CANONICAL_URL:-}
 
@@ -204,6 +213,36 @@ services:
   autotagger:
     image: ghcr.io/danbooru/autotagger:latest
 
+  sqs:
+    image: softwaremill/elasticmq-native
+    expose:
+    - 9324
+    volumes:
+      - sqs-data:/data"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+  archives-service:
+    depends_on:
+      sqs:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    image: ghcr.io/danbooru/archives:latest
+    environment:
+      <<: *sqs-env
+      RUN: 1
+      #db config
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: danbooru
+      POSTGRES_USER: danbooru
+      # POSTGRES_PASSWORD=
+    command: ["scripts/docker-bootstrap.sh"]
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
 configs:
   danbooru_local_config:
     file: config/danbooru_local_config.rb
@@ -219,3 +258,5 @@ volumes:
     name: ${COMPOSE_PROJECT_NAME}-data
   iqdb-data:
     name: ${COMPOSE_PROJECT_NAME}-iqdb-data
+  sqs-data:
+    name: ${COMPOSE_PROJECT_NAME}-sqs-data

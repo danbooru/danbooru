@@ -1266,22 +1266,23 @@ ALTER SEQUENCE public.notes_id_seq OWNED BY public.notes.id;
 --
 
 CREATE TABLE public.pool_versions (
-    id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    pool_id bigint NOT NULL,
-    updater_id bigint NOT NULL,
+    id integer NOT NULL,
+    created_at timestamp(6) without time zone,
+    updated_at timestamp(6) without time zone,
+    pool_id integer NOT NULL,
+    updater_id integer,
     version integer DEFAULT 1 NOT NULL,
-    name text NOT NULL,
-    description text DEFAULT ''::text NOT NULL,
-    category character varying NOT NULL,
+    name text,
+    description text,
+    category character varying,
     is_active boolean DEFAULT true NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     description_changed boolean DEFAULT false NOT NULL,
     name_changed boolean DEFAULT false NOT NULL,
     post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
     added_post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
-    removed_post_ids integer[] DEFAULT '{}'::integer[] NOT NULL
+    removed_post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
+    "boolean" boolean DEFAULT false NOT NULL
 );
 
 
@@ -1632,19 +1633,18 @@ ALTER SEQUENCE public.post_replacements_id_seq OWNED BY public.post_replacements
 --
 
 CREATE TABLE public.post_versions (
-    id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    post_id bigint NOT NULL,
-    updater_id bigint NOT NULL,
+    id integer NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    post_id integer NOT NULL,
+    updater_id integer,
     version integer DEFAULT 1 NOT NULL,
     parent_changed boolean DEFAULT false NOT NULL,
     rating_changed boolean DEFAULT false NOT NULL,
     source_changed boolean DEFAULT false NOT NULL,
     parent_id integer,
-    rating character varying(1) NOT NULL,
-    source text DEFAULT ''::text NOT NULL,
-    tags text DEFAULT ''::text NOT NULL,
+    rating character varying(1),
+    source text,
+    tags text NOT NULL,
     added_tags text[] DEFAULT '{}'::text[] NOT NULL,
     removed_tags text[] DEFAULT '{}'::text[] NOT NULL
 );
@@ -5215,13 +5215,6 @@ CREATE INDEX index_post_versions_on_added_tags ON public.post_versions USING btr
 
 
 --
--- Name: index_post_versions_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_post_versions_on_created_at ON public.post_versions USING btree (created_at);
-
-
---
 -- Name: index_post_versions_on_parent_changed; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5275,6 +5268,13 @@ CREATE INDEX index_post_versions_on_updater_id ON public.post_versions USING btr
 --
 
 CREATE INDEX index_post_versions_on_version ON public.post_versions USING btree (version);
+
+
+--
+-- Name: index_post_versons_on_updater_id_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versons_on_updater_id_and_id ON public.post_versions USING btree (updater_id, id);
 
 
 --
@@ -6978,6 +6978,9 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250601164359'),
+('20250601164357'),
+('20250601164355'),
 ('20250530193107'),
 ('20250530193106'),
 ('20250530091115'),
