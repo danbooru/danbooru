@@ -6,15 +6,51 @@
   <%= f.input :duration, collection: Ban::DURATIONS.map { |duration| [duration == Ban::FOREVER ? "forever" : duration.inspect, duration.iso8601] }, selected: ban.duration&.iso8601 %>
   <%= f.input :reason, as: :dtext %>
 
-  <% if ban.new_record? %>
-    <%= tag.div "x-data": { showReason: ban.delete_posts }.to_json do %>
-      <%= f.input :delete_posts, as: :boolean, label: "Delete pending posts", input_html: { "@click": "showReason = $event.target.checked" } %>
-      <%= f.input :post_deletion_reason, as: :string, label: "With reason", wrapper_html: { "x-show": "showReason" } %>
+  <% if ban.new_record? && ban.user.present? %>
+    <% post_count = ban.user.posts.pending.async_count %>
+    <% forum_topic_count = ban.user.forum_topics.undeleted.async_count %>
+    <% forum_post_count = ban.user.forum_posts.undeleted.async_count %>
+    <% comment_count = ban.user.comments.undeleted.async_count %>
+    <% post_vote_count = ban.user.post_votes.undeleted.async_count %>
+    <% comment_vote_count = ban.user.comment_votes.undeleted.async_count %>
+
+    <% if post_count.value > 0 %>
+      <%= tag.div "x-data": { showReason: ban.delete_posts }.to_json do %>
+        <div class="flex gap-2">
+          <%= f.input :delete_posts, as: :boolean, label: "Delete #{post_count.value} pending posts", input_html: { "x-model": "showReason" } %>
+          <span class="leading-normal">(<%= link_to "list", posts_path(tags: "user:#{ban.user.name} status:pending") %>)</span>
+        </div>
+
+        <%= f.input :post_deletion_reason, as: :string, label: "With reason", wrapper_html: { "x-show": "showReason", "x-cloak": true } %>
+      <% end %>
     <% end %>
-    <%= f.input :delete_comments, as: :boolean %>
-    <%= f.input :delete_forum_posts, as: :boolean %>
-    <% if policy(PostVote.new).destroy? %>
-      <%= f.input :delete_votes, as: :boolean %>
+
+    <% if comment_count.value > 0 %>
+      <div class="flex gap-2">
+        <%= f.input :delete_comments, as: :boolean, label: "Delete #{comment_count.value} comments" %>
+        <span class="leading-normal">(<%= link_to "list", comments_path(search: { creator_id: ban.user.id }) %>)</span>
+      </div>
+    <% end %>
+
+    <% if forum_post_count.value > 0 || forum_topic_count.value > 0 %>
+      <div class="flex gap-2">
+        <%= f.input :delete_forum_posts, as: :boolean, label: tag.span("Delete #{forum_post_count.value} forum posts #{"and #{forum_topic_count.value} forum topics" if forum_topic_count.value > 0}".squeeze) %>
+        <span class="leading-normal">(<%= link_to "list", forum_posts_path(search: { creator_id: ban.user.id }) %>)</span>
+      </div>
+    <% end %>
+
+    <% if post_vote_count.value > 0 && policy(PostVote.new).destroy? %>
+      <div class="flex gap-2">
+        <%= f.input :delete_post_votes, as: :boolean, label: "Delete #{post_vote_count.value} post votes" if post_vote_count.value > 0 %>
+        <span class="leading-normal">(<%= link_to "list", post_votes_path(search: { user_id: ban.user.id }) %>)</span>
+      </div>
+    <% end %>
+
+    <% if comment_vote_count.value > 0 && policy(CommentVote.new).destroy? %>
+      <div class="flex gap-2">
+        <%= f.input :delete_comment_votes, as: :boolean, label: "Delete #{comment_vote_count.value} comment votes" if comment_vote_count.value > 0 %>
+        <span class="leading-normal">(<%= link_to "list", comment_votes_path(search: { user_id: ban.user.id }) %>)</span>
+      </div>
     <% end %>
   <% end %>
 

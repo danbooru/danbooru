@@ -51,26 +51,32 @@ class BanTest < ActiveSupport::TestCase
       end
 
       should "delete the user's forum posts" do
-        @forum_topic = create(:forum_topic, creator: @bannee)
+        @forum_topic = create(:forum_topic, creator: @bannee, original_post: create(:forum_post, creator: @bannee))
         @other_forum_topic = create(:forum_topic, original_post: create(:forum_post))
-        @forum_post = create(:forum_post, creator: @bannee, topic: @other_forum_topic)
+        @other_forum_post = create(:forum_post, creator: @bannee, topic: @other_forum_topic)
         create(:ban, user: @bannee, banner: @banner, delete_forum_posts: true)
-        assert(@forum_topic.reload.is_deleted)
-        assert(@forum_post.reload.is_deleted)
+
+        assert_equal(true, @forum_topic.reload.is_deleted)
+        assert_equal(true, @forum_topic.original_post.is_deleted)
+        assert_equal(false, @other_forum_topic.is_deleted)
+        assert_equal(false, @other_forum_topic.original_post.is_deleted)
+        assert_equal(true, @other_forum_post.reload.is_deleted)
       end
 
       should "not allow mods to delete votes" do
         @post_vote = create(:post_vote, user: @bannee)
-        @ban = build(:ban, user: @bannee, banner: @banner, delete_votes: true)
+        @ban = build(:ban, user: @bannee, banner: @banner, delete_post_votes: true)
+
         assert_not(@ban.valid?)
-        assert_equal(["Delete votes is not allowed by Moderator"], @ban.errors.full_messages)
+        assert_equal(["Delete post votes is not allowed by Moderator"], @ban.errors.full_messages)
         assert_not(@post_vote.reload.is_deleted)
       end
 
       should "allow admins to delete votes" do
         @comment_vote = create(:comment_vote, user: @bannee)
         @post_vote = create(:post_vote, user: @bannee)
-        create(:ban, user: @bannee, banner: create(:admin_user), delete_votes: true)
+
+        create(:ban, user: @bannee, banner: create(:admin_user), delete_post_votes: true, delete_comment_votes: true)
         assert(@comment_vote.reload.is_deleted)
         assert(@post_vote.reload.is_deleted)
       end
@@ -81,6 +87,7 @@ class BanTest < ActiveSupport::TestCase
         @forum_post = create(:forum_post, creator: @bannee)
         @post_vote = create(:post_vote, user: @bannee)
         create(:ban, user: @bannee, banner: @banner)
+
         assert(@post.reload.status == "pending")
         assert_not(@comment.reload.is_deleted)
         assert_not(@forum_post.reload.is_deleted)

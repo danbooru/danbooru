@@ -11,11 +11,7 @@ class BanPolicy < ApplicationPolicy
   alias_method :destroy?, :bannable?
 
   def permitted_attributes_for_create
-    [
-      :reason, :duration, :user_id, :user_name, :delete_posts,
-      :delete_comments, :delete_forum_posts, :post_deletion_reason,
-      :delete_votes
-    ]
+    %i[reason duration user_id user_name delete_posts post_deletion_reason delete_comments delete_forum_posts delete_post_votes delete_comment_votes]
   end
 
   def permitted_attributes_for_update
