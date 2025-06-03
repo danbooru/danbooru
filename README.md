@@ -71,11 +71,6 @@ The following features require a Google Cloud account:
 
 IQDB integration is delegated to the [IQDB service](https://github.com/danbooru/iqdb).
 
-### Archive Service
-
-In order to access pool and post histories you will need to install and
-configure the [Archives service](https://github.com/danbooru/archives).
-
 ### Reportbooru Service
 
 The following features are delegated to the [Reportbooru service](https://github.com/danbooru/reportbooru):
