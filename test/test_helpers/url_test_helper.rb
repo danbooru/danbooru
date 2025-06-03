@@ -1,8 +1,14 @@
 module UrlTestHelper
   extend ActiveSupport::Concern
-  # An abstract class to automate all parsing checks for external urls
+  # A helper class to automate all parsing checks for external urls
 
   class_methods do
+    # Takes arbitrary input parameters, such as
+    # should_identify_url_types(
+    # profile_urls: [],
+    # secondary_urls: []
+    # )
+    # Each url in each array is then matched with the corresponding method such as profile_url? and secondary_url?
     def should_identify_url_types(arguments = {})
       arguments.each do |url_type, urls|
         url_type = url_type.to_s.singularize
@@ -14,6 +20,7 @@ module UrlTestHelper
       end
     end
 
+    # Works the same as the method above but with negative assert
     def should_not_find_false_positives(arguments = {})
       arguments.each do |url_type, false_positives|
         url_type = url_type.to_s.singularize
@@ -25,6 +32,8 @@ module UrlTestHelper
       end
     end
 
+    # Takes an url and arbitrary properties to match against it.
+    # url_parser_should_work(image_url, page_url: page_url, full_image_url: full_image_url)
     def url_parser_should_work(url, attributes = {})
       url = Source::URL.parse(url)
 
