@@ -7,21 +7,6 @@
 
   <%= render "users/sockpuppets", user: @user %>
 
-    <% if sockpuppet_accounts.present? %>
-      <div class="flex flex-wrap sm:flex-col items-center gap-2 mb-2">
-        <strong>Other Accounts</strong>
-
-        <% sockpuppet_accounts.map(&:values).each do |(user, session_id, ip_address)| %>
-          <% if session_id.present? %>
-            <%= link_to user.name, user_events_path(search: { session_id: session_id }), class: "inline-block chip-primary text-sm truncate" %>
-          <% else %>
-            <%= link_to user.name, user_events_path(search: { ip_addr: ip_address }), class: "inline-block chip-primary text-sm truncate" %>
-          <% end %>
-        <% end %>
-      </div>
-    <% end %>
-  <% end %>
-
   <%= search_form_for(user_events_path) do |f| %>
     <%= f.input :user_name, label: "User", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
     <%= f.input :ip_addr, label: "IP Address", input_html: { value: params.dig(:search, :ip_addr) } %>
