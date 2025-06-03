@@ -36,14 +36,15 @@
 
         <% if policy(UserEvent).can_see_events_by_others? %>
           <tr>
-            <th>User Events</th>
+            <th>User Activity</th>
             <td>
+              <%= link_to "Account", user_user_events_path(user.id, mode: "table") %>,
+
               <% if user.last_ip_addr.present? %>
-                <%= link_to "By Name", user_events_path(search: { user_name: user.name }) %>,
-                <%= link_to "By IP", user_events_path(search: { ip_addr: user.last_ip_addr }) %>
-              <% else %>
-                <%= link_to "By Name", user_events_path(search: { user_name: user.name }) %>
+                <%= link_to "IP", user_events_path(search: { ip_addr: user.last_ip_addr.subnet }) %>,
               <% end %>
+
+              <%= link_to "All", user_user_actions_path(user) %>
             <td>
           </tr>
         <% end %>
