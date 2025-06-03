@@ -849,10 +849,6 @@ class User < ApplicationRecord
     self.new_post_navigation_layout = true
   end
 
-  def presenter
-    @presenter ||= UserPresenter.new(self)
-  end
-
   def dtext_shortlink(**options)
     "<@#{name}>"
   end
