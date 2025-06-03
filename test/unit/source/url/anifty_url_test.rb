@@ -10,9 +10,11 @@ module Source::Tests::URL
         ],
         profile_urls: [
           "https://anifty.jp/@hightree",
+          "https://anifty.jp/ja/@hightree",
         ],
         page_urls: [
           "https://anifty.jp/creations/373",
+          "https://anifty.jp/zh-Hant/creations/373",
         ],
       )
     end

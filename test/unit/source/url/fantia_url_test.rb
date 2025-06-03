@@ -19,6 +19,7 @@ module Source::Tests::URL
         profile_urls: [
           "https://fantia.jp/fanclubs/64496",
           "https://fantia.jp/asanagi",
+          "https://job.fantia.jp/fanclubs/5734",
         ],
       )
     end

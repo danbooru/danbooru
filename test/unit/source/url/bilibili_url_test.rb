@@ -18,6 +18,7 @@ module Source::Tests::URL
         ],
         profile_urls: [
           "https://space.bilibili.com/355143",
+          "https://space.bilibili.com/476725595/video",
         ],
       )
 

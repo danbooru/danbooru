@@ -16,6 +16,7 @@ module Source::Tests::URL
         profile_urls: [
           "https://www.facebook.com/profile.php?id=100007366415557&name=xhp_nt__fblite__profile__tab_bar",
           "https://www.facebook.com/sinyu.tang.9",
+          "https://fb.com/sinyu.tang.9",
         ],
       )
 

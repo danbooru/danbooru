@@ -11,9 +11,11 @@ module Source::Tests::URL
         ],
         page_urls: [
           "https://gall.dcinside.com/mgallery/board/view?id=projectmx&no=11076518",
+          "https://m.dcinside.com/board/projectmx/11076518",
         ],
         profile_urls: [
           "https://gallog.dcinside.com/mannack0106",
+          "https://m.dcinside.com/gallog/mannack0106",
         ],
       )
     end

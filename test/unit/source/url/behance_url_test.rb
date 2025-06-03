@@ -16,6 +16,7 @@ module Source::Tests::URL
         ],
         profile_urls: [
           "https://www.behance.net/Kensukecreations",
+          "https://www.behance.net/Kensukecreations/projects",
         ],
       )
     end
