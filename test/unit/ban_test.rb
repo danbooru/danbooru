@@ -93,6 +93,13 @@ class BanTest < ActiveSupport::TestCase
         assert_not(@forum_post.reload.is_deleted)
         assert_not(@post_vote.reload.is_deleted)
       end
+
+      should "not delete data more than 3 days old" do
+        @comment = create(:comment, creator: @bannee, created_at: 4.days.ago)
+        create(:ban, user: @bannee, delete_comments: true)
+
+        assert_not(@comment.reload.is_deleted)
+      end
     end
 
     should "initialize the expiration date" do

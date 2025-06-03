@@ -7,12 +7,12 @@
   <%= f.input :reason, as: :dtext %>
 
   <% if ban.new_record? && ban.user.present? %>
-    <% post_count = ban.user.posts.pending.async_count %>
-    <% forum_topic_count = ban.user.forum_topics.undeleted.async_count %>
-    <% forum_post_count = ban.user.forum_posts.undeleted.async_count %>
-    <% comment_count = ban.user.comments.undeleted.async_count %>
-    <% post_vote_count = ban.user.post_votes.undeleted.async_count %>
-    <% comment_vote_count = ban.user.comment_votes.undeleted.async_count %>
+    <% post_count = ban.user.posts.pending.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+    <% forum_topic_count = ban.user.forum_topics.undeleted.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+    <% forum_post_count = ban.user.forum_posts.undeleted.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+    <% comment_count = ban.user.comments.undeleted.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+    <% post_vote_count = ban.user.post_votes.undeleted.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+    <% comment_vote_count = ban.user.comment_votes.undeleted.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
 
     <% if post_count.value > 0 %>
       <%= tag.div "x-data": { showReason: ban.delete_posts }.to_json do %>

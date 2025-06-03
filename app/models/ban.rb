@@ -4,6 +4,9 @@ class Ban < ApplicationRecord
   FOREVER = 100.years
   DURATIONS = [1.day, 3.days, 7.days, 1.month, 3.months, 6.months, 1.year, FOREVER]
 
+  # How far back to delete user data when a ban is created.
+  MAX_DELETION_AGE = 3.days
+
   attribute :duration, :interval
   attribute :delete_posts, :boolean
   attribute :post_deletion_reason, :string
@@ -136,20 +139,20 @@ class Ban < ApplicationRecord
     ModAction.log(%{unbanned <@#{user_name}>}, :user_unban, subject: user, user: CurrentUser.user)
   end
 
-  def delete_user_data
+  def delete_user_data(since: MAX_DELETION_AGE.ago)
     if delete_posts
-      user.posts.pending.find_each do |post|
+      user.posts.pending.where(created_at: since..).find_each do |post|
         post.delete!(post_deletion_reason)
       end
     end
 
-    user.forum_topics.undeleted.find_each(&:soft_delete!) if delete_forum_posts
-    user.forum_posts.undeleted.find_each(&:soft_delete!) if delete_forum_posts
-    user.comments.undeleted.find_each(&:soft_delete!) if delete_comments
-    user.post_votes.undeleted.find_each(&:soft_delete!) if delete_post_votes
+    user.forum_topics.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_forum_posts
+    user.forum_posts.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_forum_posts
+    user.comments.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_comments
+    user.post_votes.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_post_votes
 
     if delete_comment_votes
-      user.comment_votes.undeleted.find_each do |vote|
+      user.comment_votes.undeleted.where(created_at: since..).find_each do |vote|
         vote.soft_delete!(updater: banner)
       end
     end
