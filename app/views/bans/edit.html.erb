@@ -1,6 +1,6 @@
 <div id="c-bans">
   <div id="a-edit">
-    <h1>Edit Ban</h1>
+    <h1>Edit Ban: <%= link_to_user @ban.user %></h1>
 
     <%= render "form", ban: @ban %>
   </div>
