@@ -39,15 +39,19 @@ class BanTest < ActiveSupport::TestCase
         @pending_post = create(:post, uploader: @bannee, is_pending: true)
         @active_post = create(:post)
         create(:ban, user: @bannee, banner: @banner, delete_posts: true, post_deletion_reason: "off-topic")
+
         assert_equal("deleted", @pending_post.reload.status)
         assert_equal("off-topic", @pending_post.flags.last.reason)
         assert_equal("active", @active_post.reload.status)
+        assert(ModAction.exists?(category: "post_delete", subject: @pending_post, creator: @banner))
       end
 
       should "delete the user's comments" do
         @comment = create(:comment, creator: @bannee)
+
         create(:ban, user: @bannee, banner: @banner, delete_comments: true)
         assert(@comment.reload.is_deleted)
+        assert(ModAction.exists?(category: "comment_delete", subject: @comment, creator: @banner))
       end
 
       should "delete the user's forum posts" do
@@ -61,6 +65,8 @@ class BanTest < ActiveSupport::TestCase
         assert_equal(false, @other_forum_topic.is_deleted)
         assert_equal(false, @other_forum_topic.original_post.is_deleted)
         assert_equal(true, @other_forum_post.reload.is_deleted)
+        assert(ModAction.exists?(category: "forum_topic_delete", subject: @forum_topic, creator: @banner))
+        assert(ModAction.exists?(category: "forum_post_delete", subject: @other_forum_post, creator: @banner))
       end
 
       should "not allow mods to delete votes" do
@@ -75,10 +81,13 @@ class BanTest < ActiveSupport::TestCase
       should "allow admins to delete votes" do
         @comment_vote = create(:comment_vote, user: @bannee)
         @post_vote = create(:post_vote, user: @bannee)
+        @banner = create(:admin_user)
 
-        create(:ban, user: @bannee, banner: create(:admin_user), delete_post_votes: true, delete_comment_votes: true)
+        create(:ban, user: @bannee, banner: @banner, delete_post_votes: true, delete_comment_votes: true)
         assert(@comment_vote.reload.is_deleted)
         assert(@post_vote.reload.is_deleted)
+        assert(ModAction.exists?(category: "post_vote_delete", subject: @post_vote, creator: @banner))
+        assert(ModAction.exists?(category: "comment_vote_delete", subject: @comment_vote, creator: @banner))
       end
 
       should "not delete anything unwanted" do

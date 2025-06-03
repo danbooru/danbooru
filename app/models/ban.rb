@@ -149,7 +149,12 @@ class Ban < ApplicationRecord
     user.forum_topics.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_forum_posts
     user.forum_posts.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_forum_posts
     user.comments.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_comments
-    user.post_votes.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_post_votes
+
+    if delete_post_votes
+      user.post_votes.undeleted.where(created_at: since..).find_each do |vote|
+        vote.soft_delete!(updater: banner)
+      end
+    end
 
     if delete_comment_votes
       user.comment_votes.undeleted.where(created_at: since..).find_each do |vote|
