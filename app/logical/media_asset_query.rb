@@ -34,7 +34,10 @@ class MediaAssetQuery
       in :none
         relation.none
       in :tag
-        ai_tag = AITag.named(node.name).where(score: score_range)
+        tag_name, score = node.name.split(",")
+        score_range = score&.delete("%").presence || score_range
+
+        ai_tag = AITag.named(tag_name).where_numeric_matches(:score, score_range.to_s)
         relation.where(ai_tag.where(AITag.arel_table[:media_asset_id].eq(relation.arel_table[foreign_key])).arel.exists)
       in :metatag
         metatag_matches(node.name, node.value, relation)

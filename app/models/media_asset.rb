@@ -573,6 +573,11 @@ class MediaAsset < ApplicationRecord
     def is_ai_nsfw?
       ai_rating.first.in?(%w[q e])
     end
+
+    # @param tags [String] The AI tag query.
+    def ai_tags_match?(tags)
+      MediaAsset.where(id: id).ai_tags_match(tags).exists?
+    end
   end
 
   def source_urls

@@ -435,6 +435,12 @@ module Danbooru
       []
     end
 
+    # If a new user uploads a post with any of these AI tags, the post will be blocked.
+    def new_uploader_blocked_ai_tags
+      # "tag1,>50% or tag2,>75% or tag3,>90%"
+      nil
+    end
+
     # If present, the 404 page will show a random post from this pool.
     def page_not_found_pool_id
       nil

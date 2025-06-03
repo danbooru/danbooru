@@ -850,6 +850,30 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         source = "https://tuyu-official.jp/wp/wp-content/uploads/2022/09/雨模様［サブスクジャケット］.jpeg"
         assert_post_source_equals(source, source)
       end
+
+      context "when Danbooru.config.new_uploader_blocked_ai_tags is set" do
+        setup do
+          @user = create(:user)
+          @media_asset = create(:media_asset)
+          @media_asset.ai_tags.create!(tag: create(:tag, name: "touhou"), score: 90)
+        end
+
+        should "not create a post when the post is blocked" do
+          Danbooru.config.stubs(:new_uploader_blocked_ai_tags).returns("touhou,>80%")
+
+          assert_no_difference("Post.count") do
+            create_post!(user: @user, media_asset: @media_asset)
+          end
+        end
+
+        should "create a post when the post is not blocked" do
+          Danbooru.config.stubs(:new_uploader_blocked_ai_tags).returns("touhou,>95%")
+
+          assert_difference("Post.count", 1) do
+            create_post!(user: @user, media_asset: @media_asset)
+          end
+        end
+      end
     end
 
     context "update action" do
