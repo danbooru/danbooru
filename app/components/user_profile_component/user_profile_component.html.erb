@@ -124,10 +124,6 @@
             <% if has_uploads? %>
               (<%= link_to "tag changes report", post_versions_path(search: { updater_name: user.name, version: 1 }, type: "current") %>)
             <% end %>
-
-            <% if current_user.is_moderator? %>
-              [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:#{PostSets::Post::MAX_PER_PAGE}") %>]
-            <% end %>
           </td>
         </tr>
 
@@ -135,10 +131,6 @@
           <th>Deleted Posts</th>
           <td>
             <%= link_to user.posts.deleted.count, posts_path(tags: "status:deleted user:#{user.name}"), rel: "nofollow" %>
-
-            <% if current_user.is_moderator? %>
-              [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:#{PostSets::Post::MAX_PER_PAGE} status:deleted") %>]
-            <% end %>
           </td>
         </tr>
 
@@ -146,10 +138,6 @@
           <th>Favorites</th>
           <td>
             <%= link_to user.favorite_count, posts_path(tags: "ordfav:#{user.name}"), rel: "nofollow" %>
-
-            <% if current_user.is_moderator? %>
-              [<%= link_to "sample", posts_path(:tags => "fav:#{user.name} order:random limit:#{PostSets::Post::MAX_PER_PAGE}") %>]
-            <% end %>
           </td>
         </tr>
 
