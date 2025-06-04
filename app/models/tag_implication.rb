@@ -22,15 +22,17 @@ class TagImplication < TagRelationship
   concerning :HierarchyMethods do
     class_methods do
       def ancestors_of(names)
-        join_recursive do |query|
-          query.start_with(antecedent_name: names).connect_by(consequent_name: :antecedent_name)
-        end
+        with_recursive(recursive: [
+          where(antecedent_name: names),
+          joins("INNER JOIN recursive ON recursive.consequent_name = tag_implications.antecedent_name"),
+        ]).joins("INNER JOIN recursive ON recursive.id = tag_implications.id")
       end
 
       def descendants_of(names)
-        join_recursive do |query|
-          query.start_with(consequent_name: names).connect_by(antecedent_name: :consequent_name)
-        end
+        with_recursive(recursive: [
+          where(consequent_name: names),
+          joins("INNER JOIN recursive ON recursive.antecedent_name = tag_implications.consequent_name"),
+        ]).joins("INNER JOIN recursive ON recursive.id = tag_implications.id")
       end
 
       def tags_implied_by(names)
