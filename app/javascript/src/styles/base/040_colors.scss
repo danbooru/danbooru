@@ -133,6 +133,7 @@ html, body[data-current-user-theme="light"] {
   --card-background-color: var(--body-background-color);
 
   --chip-primary-background-color: var(--blue-0);
+  --chip-secondary-background-color: var(--white);
   --chip-red-background-color: var(--red-0);
   --chip-green-background-color: var(--green-0);
   --chip-blue-background-color: var(--blue-0);
@@ -339,7 +340,7 @@ html, body[data-current-user-theme="light"] {
   --user-gold-color: var(--meta-tag-color);
   --user-member-color: var(--general-tag-color);
   --user-restricted-color: var(--general-tag-color);
-  --user-banned-color: var(--grey-8);
+  --user-banned-color: var(--grey-7);
 
   --user-verified-email-color: var(--green-4);
   --user-unverified-email-color: var(--yellow-2);
@@ -383,6 +384,7 @@ html, body[data-current-user-theme="light"] {
   --card-background-color: var(--grey-8);
 
   --chip-primary-background-color: var(--grey-8);
+  --chip-secondary-background-color: var(--grey-7);
   --chip-red-background-color: var(--red-8);
   --chip-green-background-color: var(--green-8);
   --chip-blue-background-color: var(--blue-8);
@@ -576,7 +578,7 @@ html, body[data-current-user-theme="light"] {
   --user-gold-color: var(--meta-tag-color);
   --user-member-color: var(--general-tag-color);
   --user-restricted-color: var(--general-tag-color);
-  --user-banned-color: var(--grey-6);
+  --user-banned-color: var(--grey-5);
 
   --user-verified-email-color: var(--green-3);
   --user-unverified-email-color: var(--yellow-2);

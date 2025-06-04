@@ -1,17 +1,42 @@
 <% if user.present? && CurrentUser.user.is_moderator? && user.level < User::Levels::MODERATOR %>
   <% sockpuppet_accounts = user.sockpuppet_accounts %>
 
-  <% if sockpuppet_accounts.present? %>
-    <div class="flex flex-wrap sm:flex-col items-center gap-2 mb-2">
-      <strong>Other Accounts</strong>
+  <% if sockpuppet_accounts[:session_ids].present? || sockpuppet_accounts[:ip_addresses].present? %>
+    <strong>Other Accounts</strong>
 
-      <% sockpuppet_accounts.map(&:values).each do |(user, session_ids, ip_addresses)| %>
-        <% if session_ids.present? %>
-          <%= link_to user.name, user_events_path(search: { session_id: session_ids.join(" ") }), class: "inline-block chip-primary text-sm truncate" %>
-        <% else %>
-          <%= link_to user.name, user_events_path(search: { ip_addr: ip_addresses.join(" ") }), class: "inline-block chip-primary text-sm truncate" %>
-        <% end %>
+    <div class="flex flex-wrap sm:flex-col gap-2 my-2 fixed-width-container">
+      <% sockpuppet_accounts[:session_ids].each do |session_id, users| %>
+        <span class="chip-primary-bg rounded border flex flex-col items-stretch">
+          <span class="m-1 text-sm leading-normal">
+            <%= users.sort_by(&:id).map { |user| link_to_user(user, classes: ("!user-banned-color" if user.is_banned?)) }.join(", ").html_safe %>
+          </span>
+
+          <span class="chip-secondary-bg px-1 font-monospace text-muted">
+            <%= link_to session_id[0..6], user_events_path(search: { session_id: session_id }), class: "leading-normal inactive-link text-xs" %>
+          </span>
+        </span>
+      <% end %>
+
+      <% sockpuppet_accounts[:ip_addresses].each do |ip_address, users| %>
+        <% ip_geolocation = sockpuppet_accounts[:ip_geolocations][ip_address] %>
+        <% city = ip_geolocation&.city %>
+        <% country = ip_geolocation&.country %>
+
+        <span class="chip-primary-bg rounded border flex flex-col items-stretch">
+          <span class="m-1 text-sm leading-normal">
+            <%= users.sort_by(&:id).map { |user| link_to_user(user, classes: ("!user-banned-color" if user.is_banned?)) }.join(", ").html_safe %>
+          </span>
+
+          <span class="chip-secondary-bg px-1 font-monospace text-muted">
+            <%= link_to ip_address, user_events_path(search: { ip_addr: ip_address }), class: "leading-normal inactive-link text-xs" %>,
+            <%= link_to "#{city}, #{country}", user_events_path(search: { ip_geolocation: { city: city, country: country } }), class: "leading-normal inactive-link text-xs" %>
+          </span>
+        </span>
       <% end %>
     </div>
+
+    <% if sockpuppet_accounts[:ip_addresses].present? %>
+      <p class="fineprint">Accounts with the same IP may not be the same user.</p>
+    <% end %>
   <% end %>
 <% end %>

@@ -92,8 +92,8 @@ class UserEvent < ApplicationRecord
         authorized
           .where.not(user_id: user.id)
           .where("#{subnet} IN (?)", where(user: user).joins(:ip_geolocation).where(ip_geolocation: { is_proxy: false }).select(subnet))
-          .group([subnet, :user_id])
-          .select(Arel.sql("#{subnet} AS ip_addr, user_id"))
+          .group([subnet, :ip_addr, :user_id])
+          .select(Arel.sql("#{subnet} AS subnet, ip_addr, user_id"))
       end
     end
   end

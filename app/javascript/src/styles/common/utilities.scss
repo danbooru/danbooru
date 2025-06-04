@@ -135,6 +135,7 @@ $spacer: 0.25rem; /* 4px */
 .\!m-0  { margin: 0 !important; }
 .m-px   { margin: 1px; }
 .m-0\.5 { margin: 0.5 * $spacer; }
+.m-1    { margin: 1   * $spacer; }
 
 .mx-auto { margin-left: auto; margin-right: auto; }
 .mx-0\.5 { margin-left: 0.5 * $spacer; margin-right: 0.5 * $spacer; }
@@ -407,6 +408,14 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
 .chip-primary {
   @extend %chip;
   background-color: var(--chip-primary-background-color);
+}
+
+.chip-primary-bg {
+  background-color: var(--chip-primary-background-color);
+}
+
+.chip-secondary-bg {
+  background-color: var(--chip-secondary-background-color);
 }
 
 .chip-red {

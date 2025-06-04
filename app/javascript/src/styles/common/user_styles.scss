@@ -1,41 +1,12 @@
-body {
-  a.user-owner {
-    color: var(--user-admin-color);
-  }
+a.user-owner { color: var(--user-admin-color); }
+a.user-admin { color: var(--user-admin-color); }
+a.user-moderator { color: var(--user-moderator-color); }
+a.user-approver { color: var(--user-builder-color); }
+a.user-contributor { color: var(--user-builder-color); }
+a.user-builder { color: var(--user-builder-color); }
+a.user-platinum { color: var(--user-platinum-color); }
+a.user-gold { color: var(--user-gold-color); }
+a.user-member { color: var(--user-member-color); }
+a.user-restricted { color: var(--user-restricted-color); }
 
-  a.user-admin {
-    color: var(--user-admin-color);
-  }
-
-  a.user-moderator {
-    color: var(--user-moderator-color);
-  }
-
-  a.user-approver {
-    color: var(--user-builder-color);
-  }
-
-  a.user-contributor {
-    color: var(--user-builder-color);
-  }
-
-  a.user-builder {
-    color: var(--user-builder-color);
-  }
-
-  a.user-platinum {
-    color: var(--user-platinum-color);
-  }
-
-  a.user-gold {
-    color: var(--user-gold-color);
-  }
-
-  a.user-member {
-    color: var(--user-member-color);
-  }
-
-  a.user-restricted {
-    color: var(--user-restricted-color);
-  }
-}
+.\!user-banned-color { color: var(--user-banned-color) !important; }
