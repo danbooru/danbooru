@@ -48,14 +48,14 @@ class PoolsController < ApplicationController
     @pool = authorize Pool.new(permitted_attributes(Pool))
     @pool.save
 
-    respond_with(@pool, "Pool created")
+    respond_with(@pool, notice: "Pool created")
   end
 
   def update
     @pool = authorize Pool.find(params[:id])
     @pool.update(permitted_attributes(@pool))
 
-    respond_with(@pool, "Pool updated")
+    respond_with(@pool, notice: "Pool updated")
   end
 
   def destroy
