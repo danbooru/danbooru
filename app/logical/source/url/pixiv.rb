@@ -261,8 +261,10 @@ module Source
     end
 
     def image_sample?
-      # TODO: img-zip-ugoira are also samples per #5793
-      image_url? && !image_type.in?(%w[img-original img-zip-ugoira novel-cover-original])
+      image_url? && !(
+        image_type.in?(%w[img-original novel-cover-original]) ||
+        ugoira_zip_url? && to_s == ugoira_zip_url
+      )
     end
 
     def page_url
