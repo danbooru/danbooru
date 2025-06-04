@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   end
   namespace :moderator do
     namespace :post do
-      resources :posts, :only => [:delete, :expunge, :confirm_delete] do
+      resources :posts, only: [] do
         member do
           post :expunge
           get :confirm_move_favorites
@@ -211,7 +211,7 @@ Rails.application.routes.draw do
   resources :post_flags
   resources :post_approvals, only: [:create, :index, :show]
   resources :post_disapprovals
-  resources :post_versions, :only => [:index, :search] do
+  resources :post_versions, only: [:index] do
     member do
       put :undo
     end
@@ -301,7 +301,7 @@ Rails.application.routes.draw do
     put :revert, on: :member
     get :show_or_new, on: :collection
   end
-  resources :wiki_page_versions, :only => [:index, :show, :diff] do
+  resources :wiki_page_versions, only: [:index, :show] do
     collection do
       get :diff
     end
