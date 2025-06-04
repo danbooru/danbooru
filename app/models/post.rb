@@ -921,6 +921,10 @@ class Post < ApplicationRecord
   end
 
   concerning :NoteMethods do
+    def can_have_notes?
+      is_image?
+    end
+
     def has_notes?
       last_noted_at.present?
     end

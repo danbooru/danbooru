@@ -63,6 +63,13 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(["Body can't be blank"], @note.errors.full_messages)
       end
 
+      should "not validate if the post is a video" do
+        @note = build(:note, post: create(:post, file_ext: "webm"))
+
+        assert_equal(false, @note.valid?)
+        assert_equal(["Post cannot have notes"], @note.errors.full_messages)
+      end
+
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
           travel(1.day) do

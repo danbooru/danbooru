@@ -51,6 +51,7 @@ module PostsHelper
       "data-uploader-id" => post.uploader_id,
       "data-source" => post.source,
       "data-normalized-source" => post.normalized_source,
+      "data-can-have-notes" => post.can_have_notes?,
     }
 
     if post.visible?(current_user)

@@ -40,10 +40,20 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a note" do
         assert_difference("Note.count", 1) do
-          @post = create(:post)
-          post_auth notes_path, @user, params: {:note => {:x => 0, :y => 0, :width => 10, :height => 10, :body => "abc", :post_id => @post.id}, :format => :json}
+          post = create(:post)
+          post_auth notes_path, @user, params: { note: { x: 0, y: 0, width: 10, height: 10, body: "abc", post_id: post.id }, format: :json }
+
           assert_response :success
+          assert_equal(1, post.notes.count)
         end
+      end
+
+      should "not create a note on a post that cannot have notes" do
+        post = create(:post, file_ext: "webm")
+        post_auth notes_path, @user, params: { note: { x: 0, y: 0, width: 10, height: 10, body: "abc", post_id: post.id }, format: :json }
+
+        assert_response 422
+        assert_equal(0, post.notes.count)
       end
     end
 

@@ -13,6 +13,7 @@ class Note < ApplicationRecord
   validates :height, presence: true
   validates :body, visible_string: true
   validate :note_within_image
+  validate :validate_post_can_have_notes, on: :create
   after_save :update_post
   after_save :create_version
 
@@ -33,6 +34,10 @@ class Note < ApplicationRecord
     if x < 0 || y < 0 || (x > post.image_width) || (y > post.image_height) || width < 0 || height < 0 || (x + width > post.image_width) || (y + height > post.image_height)
       errors.add(:note, "must be inside the image")
     end
+  end
+
+  def validate_post_can_have_notes
+    errors.add(:post, "cannot have notes") if post.present? && !post.can_have_notes?
   end
 
   def rescale!(x_scale, y_scale)

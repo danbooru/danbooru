@@ -123,9 +123,11 @@
         <li id="post-option-edit"><%= link_to "Edit", "#edit", id: "side-edit-link" %></li>
         <li id="post-option-add-to-pool"><%= link_to "Add to pool", "#", id: "pool" %></li>
 
-        <li id="post-option-add-note">
-          <%= link_to "Add note", "#", id: "translate", "data-shortcut": "n" %>
-        </li>
+        <% if @post.can_have_notes? %>
+          <li id="post-option-add-note">
+            <%= link_to "Add note", "javascript:void(0)", id: "translate", "data-shortcut": "n" %>
+          </li>
+        <% end %>
 
         <% if @post.has_notes? %>
           <li id="post-option-copy-notes"><%= link_to "Copy notes", "#", id: "copy-notes" %></li>

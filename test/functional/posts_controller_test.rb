@@ -576,27 +576,42 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         should "render for an anonymous user" do
           get post_path(@post)
+
           assert_response :success
+          assert_select "img#image"
+          assert_not_select "#translate"
         end
 
         should "render for a member" do
           get_auth post_path(@post), @user
+
           assert_response :success
+          assert_select "img#image"
+          assert_select "#translate"
         end
 
         should "render for a builder" do
           get_auth post_path(@post), @approver
+
           assert_response :success
+          assert_select "img#image"
+          assert_select "#translate"
         end
 
         should "render for an admin" do
           get_auth post_path(@post), @admin
+
           assert_response :success
+          assert_select "img#image"
+          assert_select "#translate"
         end
 
         should "render for a builder with a search query" do
           get_auth post_path(@post, q: "tagme"), @approver
+
           assert_response :success
+          assert_select "img#image"
+          assert_select "#translate"
         end
 
         should "render the flag edit link for the flagger" do
@@ -621,6 +636,17 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get post_path(id: 9_999_999)
 
           assert_response 404
+        end
+      end
+
+      context "for a video post" do
+        should "render" do
+          post = create(:post, file_ext: "mp4", media_asset: build(:media_asset, file_ext: "mp4", duration: 1.0))
+          get_auth post_path(post), @user
+
+          assert_response :success
+          assert_select "video#image"
+          assert_not_select "#translate"
         end
       end
 
