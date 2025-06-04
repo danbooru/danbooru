@@ -340,17 +340,19 @@ class User < ApplicationRecord
 
   concerning :SockpuppetMethods do
     # @return [Hash<Symbol, Hash>] A hash of users that share session IDs or IP addresses with this user.
-    def sockpuppet_accounts
+    def sockpuppet_accounts(limit: 100)
       shared_session_ids = UserEvent.shared_session_ids_for(self).includes(:user)
       shared_ip_addresses = UserEvent.shared_ip_addresses_for(self).includes(:user, :ip_geolocation)
-      events = shared_session_ids + shared_ip_addresses
+      events = (shared_session_ids + shared_ip_addresses).take(limit)
       accounts = { session_ids: {}, ip_addresses: {}, ip_geolocations: {} }
 
       events.each do |event|
+        next if event.user.in?(accounts[:session_ids].values.flatten) || event.user.in?(accounts[:ip_addresses].values.flatten)
+
         if event.try(:session_id).present?
           accounts[:session_ids][event.session_id] ||= []
           accounts[:session_ids][event.session_id] << event.user
-        elsif event.try(:ip_addr).present? && !event.user.in?(accounts[:session_ids].values.flatten)
+        elsif event.try(:ip_addr).present?
           accounts[:ip_addresses][event.ip_addr.subnet] ||= []
           accounts[:ip_addresses][event.ip_addr.subnet] << event.user
           accounts[:ip_geolocations][event.ip_addr.subnet] = event.ip_geolocation

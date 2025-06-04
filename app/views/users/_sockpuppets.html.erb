@@ -28,8 +28,11 @@
           </span>
 
           <span class="chip-secondary-bg px-1 font-monospace text-muted">
-            <%= link_to ip_address, user_events_path(search: { ip_addr: ip_address }), class: "leading-normal inactive-link text-xs" %>,
-            <%= link_to "#{city}, #{country}", user_events_path(search: { ip_geolocation: { city: city, country: country } }), class: "leading-normal inactive-link text-xs" %>
+            <%= link_to ip_address, user_events_path(search: { ip_addr: ip_address }), class: "leading-normal inactive-link text-xs" %>
+
+            <% if city.present? && country.present? %>
+              <%= link_to "#{city}, #{country}", user_events_path(search: { ip_geolocation: { city: city, country: country } }), class: "leading-normal inactive-link text-xs" %>
+            <% end %>
           </span>
         </span>
       <% end %>
