@@ -290,9 +290,6 @@ module Source
 
     # Determine if the URL is considered an "image sample".
     #
-    # Posts will be tagged "image_sample" if this returns true for the post's source URL. If this returns false, then the
-    # image_sample tag will be removed. If this returns nil, then the image_sample tag will not be added or removed.
-    #
     # @return [Boolean, nil] True if the URL is an image sample, false if it's not an image sample, or nil if we don't know
     #   whether it's an image sample or not.
     def image_sample?
