@@ -650,6 +650,7 @@ DEPENDENCIES
   stackprof
   stripe
   tzinfo-data
+  useragent
   view_component
   webrick
   x25519

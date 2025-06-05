@@ -103,9 +103,17 @@
       <% end %>
 
       <% t.column "Browser" do |user_event| %>
-        <% if user_event.parsed_user_agent.name.present? %>
+        <% if user_event.parsed_user_agent.product_version.present? %>
           <div>
-            <%= link_to user_event.parsed_user_agent.name.capitalize, current_page_path(search: search_params.deep_merge(user_agent_ilike: "*#{user_event.parsed_user_agent.name}*"), page: nil), title: user_event.user_agent %>
+            <%= link_to user_event.parsed_user_agent.product_version, current_page_path(search: search_params.deep_merge(user_agent_ilike: "*#{user_event.parsed_user_agent.full_product_version}*"), page: nil), title: user_event.user_agent %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% t.column "OS" do |user_event| %>
+        <% if user_event.parsed_user_agent.os.present? %>
+          <div>
+            <%= link_to user_event.parsed_user_agent.os, current_page_path(search: search_params.deep_merge(user_agent_ilike: "*#{user_event.parsed_user_agent.platform}*"), page: nil), title: user_event.user_agent %>
           </div>
         <% end %>
       <% end %>

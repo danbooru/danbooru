@@ -127,6 +127,6 @@ class UserEvent < ApplicationRecord
   end
 
   memoize def parsed_user_agent
-    UserAgent.new(user_agent)
+    Danbooru::UserAgent.new(user_agent)
   end
 end

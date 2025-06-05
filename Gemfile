@@ -68,6 +68,7 @@ gem "kramdown"
 gem "abbrev"
 gem "rubyzip", require: "zip"
 gem "webrick"
+gem "useragent"
 
 group :development do
   gem 'rubocop', require: false
