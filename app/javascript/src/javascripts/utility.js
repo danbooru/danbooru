@@ -1,6 +1,7 @@
 import Rails from '@rails/ujs';
 import { delegate, hideAll } from 'tippy.js';
 import words from "lodash/words";
+import Notice from './notice';
 
 let Utility = {};
 
