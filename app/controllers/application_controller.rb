@@ -81,16 +81,16 @@ class ApplicationController < ActionController::Base
     end
 
     if subject.respond_to?(:errors) && subject.errors.present?
-      notice = subject.errors.full_messages.join("; ")
+      notice = subject.errors.full_messages.first
     end
 
     if notice.present? && (request.format.html? || request.format.js?)
       if request.format.html? && !request.get?
-        flash[:notice] = notice
+        flash[:notice] = notice.truncate(500)
       elsif request.format.js?
-        flash.now[:notice] = DText.new(notice, inline: true).format_text
+        flash.now[:notice] = DText.new(notice.truncate(500), inline: true).format_text
       else
-        flash.now[:notice] = notice
+        flash.now[:notice] = notice.truncate(500)
       end
     end
 
