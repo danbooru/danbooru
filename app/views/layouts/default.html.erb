@@ -14,9 +14,6 @@
   <% unless CurrentUser.enable_desktop_mode? %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
   <% end %>
-  <% if CurrentUser.user.blacklisted_tags.present? %>
-    <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
-  <% end %>
 
   <%= tag.meta name: "autocomplete-tag-prefixes", content: AutocompleteService::TAG_PREFIXES.to_json %>
 

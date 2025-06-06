@@ -9,7 +9,7 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
     <%= render partial: "index" %>
   </div>
 </div>

@@ -18,7 +18,7 @@
       </section>
     <% end %>
 
-    <%= render "posts/partials/index/blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user) %>
 
     <section id="tag-box">
       <h2>Tags</h2>

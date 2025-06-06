@@ -12,7 +12,7 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <%= table_for @commentaries, width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |commentary| %>

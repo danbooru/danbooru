@@ -1,0 +1,19 @@
+<div id="blacklist-box" class="mb-4 <%= inline ? "inline-blacklist" : "sidebar-blacklist" %>" x-data="{ blacklist: new Danbooru.Blacklist($root) }" x-init="blacklist.initialize(<%= rules.to_json %>)" x-show="blacklist.activeRules.length > 0" x-cloak>
+  <% if inline %>
+    <strong>Blacklisted</strong>
+  <% else %>
+    <h2>Blacklisted (<%= link_to_wiki "help", "help:blacklists" %>)</h2>
+  <% end %>
+
+  <ul id="blacklist-list" class="<%= inline ? "inline" : "list-bulleted" %>">
+    <% rules.each_with_index do |rule, i| %>
+      <li class="<%= inline ? "inline mr-4" : "" %>" x-data="{ rule: blacklist.rules[<%= i %>] }" x-show="rule.active">
+        <%= link_to rule, posts_path(tags: rule), title: rule, class: "inline-block align-bottom truncate #{inline ? "max-w-1/4" : "max-w-3/4"}", "x-bind:class": '{ "blacklisted-inactive line-through": !rule.enabled }', "x-on:click.prevent": "rule.toggle()" %>
+        <span class="count" x-text="rule.posts.size"></span>
+      </li>
+    <% end %>
+  </ul>
+
+  <%= link_to "Disable all", "javascript:void(0)", id: "disable-all-blacklists", "x-show": "blacklist.enabled", "x-on:click": "blacklist.enabled = false" %>
+  <%= link_to "Re-enable all", "javascript:void(0)", id: "re-enable-all-blacklists", "x-show": "!blacklist.enabled", "x-on:click": "blacklist.enabled = true" %>
+</div>

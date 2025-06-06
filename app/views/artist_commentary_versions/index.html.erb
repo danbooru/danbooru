@@ -4,7 +4,7 @@
 
     <%= render "versions/types" %>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <%= render "listing" %>
 

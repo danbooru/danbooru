@@ -9,7 +9,7 @@
       <% if @pool.post_count <= Pool::POOL_ORDER_LIMIT %>
         <p>Drag and drop the list below to determine ordering.</p>
 
-        <%= render "posts/partials/common/inline_blacklist" %>
+        <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
         <ul id="sortable">
           <% @pool.posts.includes(:media_asset).each do |post| %>

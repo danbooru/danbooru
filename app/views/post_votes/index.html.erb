@@ -4,7 +4,7 @@
   <div id="a-index">
     <h1>Post Votes</h1>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
     <%= render "search" %>
 
     <%= table_for @post_votes, class: "striped autofit" do |t| %>

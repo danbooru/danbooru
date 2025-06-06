@@ -4,7 +4,7 @@
   <div id="a-upload-tags">
     <h1>Upload tag changes report for <%= @user.pretty_name %></h1>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <%= table_for @upload_reports do |t| %>
       <% t.column "Post ID", width: "10%" do |upload_report| %>

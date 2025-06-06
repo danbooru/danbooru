@@ -1,8 +1,9 @@
 <% if @post.valid? %>
-  var $post = $("#post_<%= @post.id %>");
-  var $new_post = $("<%= j post_preview(@post, fit: :compact, show_deleted: true, show_votes: @show_votes, size: @preview_size) %>");
-  Danbooru.Blacklist.apply_post($new_post.get(0));
-  $("#post_<%= @post.id %>").replaceWith($new_post);
+  var postElement = $("#post_<%= @post.id %>").get(0);
+  var html = "<%= j post_preview(@post, fit: :compact, show_deleted: true, show_votes: @show_votes, size: @preview_size) %>";
+  Alpine.morph(postElement, html);
+  postElement.post.applyRules();
+
   <% if params[:mode] == "quick-edit" %>
     Danbooru.PostModeMenu.close_edit_form();
   <% end %>

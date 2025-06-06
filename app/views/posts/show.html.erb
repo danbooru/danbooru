@@ -10,7 +10,7 @@
 <% content_for(:sidebar) do %>
   <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:q], :tags_dom_id => "tags" %>
 
-  <%= render "posts/partials/index/blacklist" %>
+  <%= render BlacklistComponent.new(user: CurrentUser.user) %>
 
   <section id="tag-list">
     <%= render_categorized_tag_list(@post, current_query: params[:q]) %>

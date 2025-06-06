@@ -289,7 +289,7 @@
     </table>
   </div>
 
-  <%= render "posts/partials/common/inline_blacklist" %>
+  <%= render BlacklistComponent.new(user: current_user, inline: true) %>
 
   <% if has_uploads? %>
     <div class="user-uploads recent-posts">

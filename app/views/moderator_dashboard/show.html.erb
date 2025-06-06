@@ -12,7 +12,7 @@
       <% end %>
     </div>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <section class="md:grid grid-cols-2 gap-4">
       <div class="space-y-4">

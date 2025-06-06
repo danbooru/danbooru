@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Post Replacements</h1>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <%= search_form_for(post_replacements_path) do |f| %>
       <%= f.input :creator_name, label: "Replacer", input_html: { value: params[:search][:creator_name], data: { autocomplete: "user" } } %>

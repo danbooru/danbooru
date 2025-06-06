@@ -1,7 +1,7 @@
 <div id="c-post-approvals">
   <div id="a-index">
     <h1>Approvals</h1>
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <%= search_form_for(post_approvals_path) do |f| %>
       <%= f.input :user_name, label: "Approver", input_html: { value: params[:search][:user_name], data: { autocomplete: "user" } } %>

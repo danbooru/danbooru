@@ -8,7 +8,7 @@
     <h1>Popular: <%= date_range_description(@date, @scale, @min_date, @max_date) %></h1>
 
     <%= render "explore/posts/nav_links", path: :popular_explore_posts_path, date: @date, scale: @scale %>
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <%= render_post_gallery(@posts) do |gallery| %>
       <% gallery.with_footer do %>

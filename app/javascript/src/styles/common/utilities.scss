@@ -21,6 +21,7 @@ $spacer: 0.25rem; /* 4px */
 
 .appearance-none { appearance: none; }
 .hidden { display: none !important; }
+.inline { display: inline; }
 .inline-block { display: inline-block; }
 .inline-flex { display: inline-flex; }
 .block { display: block; }
@@ -47,6 +48,7 @@ $spacer: 0.25rem; /* 4px */
 .\!text-xxl { font-size: var(--text-xxl) !important; }
 
 .underline { text-decoration-line: underline; }
+.line-through { text-decoration-line: line-through; }
 .decoration-dotted { text-decoration-style: dotted; }
 
 .truncate {
@@ -236,7 +238,9 @@ $spacer: 0.25rem; /* 4px */
 .max-w-960px { max-width: 960px; }
 .max-w-1080px { max-width: 1080px; }
 
+.max-w-1\/4 { max-width: 25%; }
 .max-w-1\/2 { max-width: 50%; }
+.max-w-3\/4 { max-width: 75%; }
 .max-w-full { max-width: 100%; }
 .max-h-1\/4 { max-height: 25%; }
 .max-h-full { max-height: 100%; }

@@ -587,6 +587,11 @@ class User < ApplicationRecord
       return unless blacklisted_tags.present?
       self.blacklisted_tags = blacklisted_tags.lines.map(&:strip).join("\n")
     end
+
+    # @return [Array<String>] The list of blacklist rules. Each line in the blacklist is a rule.
+    def blacklist_rules
+      blacklisted_tags.downcase.gsub(/(rating:\w)\w+/, '\1').lines.map(&:strip).compact_blank
+    end
   end
 
   module ForumMethods

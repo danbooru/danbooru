@@ -3,7 +3,7 @@
     <h1>Order Favorite Group: <%= @favorite_group.pretty_name %></h1>
     <p>Drag and drop the list below to determine ordering.</p>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <ul id="sortable">
       <% @favorite_group.posts.includes(:media_asset).limit(1_000).each do |post| %>
