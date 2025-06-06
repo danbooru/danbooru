@@ -63,39 +63,6 @@ Utility.keydown = function(keys, namespace, handler, selector = document) {
   $(selector).on("keydown.danbooru." + namespace, null, keys, handler);
 };
 
-Utility.is_subset = function(array, subarray) {
-  var all = true;
-
-  $.each(subarray, function(i, val) {
-    if ($.inArray(val, array) === -1) {
-      all = false;
-    }
-  });
-
-  return all;
-}
-
-Utility.intersect = function(a, b) {
-  a = a.slice(0).sort();
-  b = b.slice(0).sort();
-  var result = [];
-  while (a.length > 0 && b.length > 0) {
-    if (a[0] < b[0]) {
-      a.shift();
-    } else if (a[0] > b[0]) {
-      b.shift();
-    } else {
-      result.push(a.shift());
-      b.shift();
-    }
-  }
-  return result;
-}
-
-Utility.regexp_escape = function(string) {
-  return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
-}
-
 export function splitWords(string) {
   return string?.match(/\S+/g) || [];
 }

@@ -9,9 +9,9 @@ Blacklist.entries = [];
 Blacklist.parse_entry = function(string) {
   var entry = {
     "tags": string,
-    "require": [],
-    "exclude": [],
-    "optional": [],
+    "require": new Set(),
+    "exclude": new Set(),
+    "optional": new Set(),
     "disabled": false,
     "hits": 0,
     "min_score": null
@@ -20,14 +20,14 @@ Blacklist.parse_entry = function(string) {
   let tags = splitWords(string);
   tags.forEach(function(tag) {
     if (tag.charAt(0) === '-') {
-      entry.exclude.push(tag.slice(1));
+      entry.exclude.add(tag.slice(1));
     } else if (tag.charAt(0) === '~') {
-      entry.optional.push(tag.slice(1));
+      entry.optional.add(tag.slice(1));
     } else if (tag.match(/^score:<.+/)) {
       var score = tag.match(/^score:<(.+)/)[1];
       entry.min_score = parseInt(score);
     } else {
-      entry.require.push(tag);
+      entry.require.add(tag);
     }
   });
   return entry;
@@ -174,17 +174,16 @@ Blacklist.post_match = function(post, entry) {
   var score = parseInt($post.attr("data-score"));
   var score_test = entry.min_score === null || score < entry.min_score;
 
-  var tags = splitWords($post.attr("data-tags"));
-  tags.push(...splitWords($post.attr("data-pools")));
-  tags.push("rating:" + $post.data("rating"));
-  tags.push("uploaderid:" + $post.attr("data-uploader-id"));
-  splitWords($post.data("flags")).forEach(function(v) {
-    tags.push("status:" + v);
-  });
+  var tags = new Set([
+    ...splitWords($post.attr("data-tags")),
+    ...splitWords($post.attr("data-flags")).map(s => `status:${s}`),
+    `rating:${$post.attr("data-rating")}`,
+    `uploaderid:${$post.attr("data-uploader-id")}`,
+  ]);
 
-  return (Utility.is_subset(tags, entry.require) && score_test)
-    && (!entry.optional.length || Utility.intersect(tags, entry.optional).length)
-    && !Utility.intersect(tags, entry.exclude).length;
+  return (entry.require.isSubsetOf(tags) && score_test)
+    && (entry.optional.size === 0 || !entry.optional.isDisjointFrom(tags))
+    && entry.exclude.isDisjointFrom(tags);
 }
 
 Blacklist.post_hide = function(post) {
