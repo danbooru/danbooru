@@ -1,4 +1,4 @@
-<%= tag.article class: "forum-post message", id: "forum_post_#{forum_post.id}", data: { "is-reported": reported?, **data_attributes_for(forum_post, "", forum_post.html_data_attributes) } do %>
+<%= tag.article class: "forum-post message", id: "forum_post_#{forum_post.id}", data: { "is-reported": reported?, **data_attributes_for(forum_post, "", forum_post.html_data_attributes) }, "x-data": "{}" do %>
   <div class="author">
     <div class="author-name">
       <%= link_to_user forum_post.creator %>
@@ -78,13 +78,13 @@
         <% end %>
 
         <% menu.with_item do %>
-          <%= link_to forum_post_path(forum_post.id), class: "forum-post-copy-id" do %>
+          <%= link_to "javascript:void(0)", class: "forum-post-copy-id", "x-on:click": "Danbooru.Utility.copyToClipboard('forum ##{j forum_post.id}')" do %>
             <%= hashtag_icon %> Copy ID
           <% end %>
         <% end %>
 
         <% menu.with_item do %>
-          <%= link_to forum_post_path(forum_post.id), class: "forum-post-copy-link" do %>
+          <%= link_to "javascript:void(0)", class: "forum-post-copy-link", "x-on:click": "Danbooru.Utility.copyToClipboard('#{j forum_post_url(forum_post)}')" do %>
             <%= link_icon %> Copy Link
           <% end %>
         <% end %>

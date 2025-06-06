@@ -143,13 +143,13 @@
           <% end %>
 
           <% menu.with_item do %>
-            <%= link_to comment_path(comment.id), class: "comment-copy-id" do %>
+            <%= link_to "javascript:void(0)", class: "comment-copy-id", "x-on:click": "Danbooru.Utility.copyToClipboard('comment ##{j comment.id}')" do %>
               <%= hashtag_icon %> Copy ID
             <% end %>
           <% end %>
 
           <% menu.with_item do %>
-            <%= link_to comment_path(comment.id), class: "comment-copy-link" do %>
+            <%= link_to "javascript:void(0)", class: "comment-copy-link", "x-on:click": "Danbooru.Utility.copyToClipboard('#{j comment_url(comment)}')" do %>
               <%= link_icon %> Copy Link
             <% end %>
           <% end %>
