@@ -1,5 +1,5 @@
 import Dropzone from 'dropzone';
-import Utility from "./utility";
+import { delay } from "./utility";
 import Notice from "./notice";
 import capitalize from "lodash/capitalize";
 
@@ -69,7 +69,7 @@ export default class FileUploadComponent {
     dropzone.on("error", (file, msg) => {
       this.$dropzone.find(".dropzone-hint").show();
       dropzone.removeFile(file);
-      Utility.error(msg);
+      Notice.error(msg);
     });
 
     return dropzone;
@@ -109,7 +109,7 @@ export default class FileUploadComponent {
     this.loadingStart();
 
     while (upload.media_asset_count <= 1 && upload.status !== "completed" && upload.status !== "error") {
-      await Utility.delay(FileUploadComponent.POLL_DELAY);
+      await delay(FileUploadComponent.POLL_DELAY);
       upload = await $.get(`/uploads/${upload.id}.json`);
     }
 
@@ -148,7 +148,7 @@ export default class FileUploadComponent {
       });
     }).join("; ");
 
-    Utility.error(message);
+    Notice.error(message);
   }
 
   get $dropzone() {

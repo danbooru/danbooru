@@ -1,4 +1,4 @@
-import clamp from "lodash/clamp";
+import { clamp } from "./utility";
 
 export default class MediaAssetComponent {
   static initialize() {

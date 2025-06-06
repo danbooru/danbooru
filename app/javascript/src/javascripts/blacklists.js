@@ -1,4 +1,5 @@
 import Utility from './utility'
+import { splitWords } from './utility';
 import Cookie from './cookie'
 
 let Blacklist = {};
@@ -16,7 +17,7 @@ Blacklist.parse_entry = function(string) {
     "min_score": null
   };
 
-  let tags = Utility.splitWords(string);
+  let tags = splitWords(string);
   tags.forEach(function(tag) {
     if (tag.charAt(0) === '-') {
       entry.exclude.push(tag.slice(1));
@@ -173,11 +174,11 @@ Blacklist.post_match = function(post, entry) {
   var score = parseInt($post.attr("data-score"));
   var score_test = entry.min_score === null || score < entry.min_score;
 
-  var tags = Utility.splitWords($post.attr("data-tags"));
-  tags.push(...Utility.splitWords($post.attr("data-pools")));
+  var tags = splitWords($post.attr("data-tags"));
+  tags.push(...splitWords($post.attr("data-pools")));
   tags.push("rating:" + $post.data("rating"));
   tags.push("uploaderid:" + $post.attr("data-uploader-id"));
-  Utility.splitWords($post.data("flags")).forEach(function(v) {
+  splitWords($post.data("flags")).forEach(function(v) {
     tags.push("status:" + v);
   });
 

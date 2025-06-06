@@ -1,6 +1,5 @@
 import Rails from '@rails/ujs';
 import { delegate, hideAll } from 'tippy.js';
-import words from "lodash/words";
 import Notice from './notice';
 
 let Utility = {};
@@ -9,7 +8,7 @@ export function clamp(value, low, high) {
   return Math.max(low, Math.min(value, high));
 }
 
-Utility.delay = function(milliseconds) {
+export function delay(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
@@ -97,8 +96,8 @@ Utility.regexp_escape = function(string) {
   return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 }
 
-Utility.splitWords = function(string) {
-  return words(string, /\S+/g);
+export function splitWords(string) {
+  return string?.match(/\S+/g) || [];
 }
 
 export async function copyToClipboard(text, message = "Copied!") {
