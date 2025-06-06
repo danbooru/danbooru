@@ -4,7 +4,7 @@ import "jquery-ui/themes/base/draggable.css";
 import "jquery-ui/themes/base/resizable.css";
 
 import CurrentUser from './current_user';
-import Utility, { clamp } from './utility';
+import Utility, { clamp, isTouchscreen } from './utility';
 import Notice from "./notice";
 
 class Note {
@@ -70,7 +70,7 @@ class Note {
     }
 
     on_click() {
-      if (!Utility.test_max_width(660)) {
+      if (!isTouchscreen()) {
         this.note.toggle_selected();
       } else if (this.$note_box.hasClass("viewing")) {
         this.note.body.hide();

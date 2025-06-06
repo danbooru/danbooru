@@ -16,12 +16,12 @@ Utility.meta = function(key) {
   return $("meta[name=" + key + "]").attr("content");
 }
 
-Utility.test_max_width = function(width) {
-  if (!window.matchMedia) {
-    return false;
-  }
-  var mq = window.matchMedia('(max-width: ' + width + 'px)');
-  return mq.matches;
+export function isTouchscreen() {
+  return window.matchMedia("(pointer: coarse)").matches;
+}
+
+export function isMobile() {
+  return window.matchMedia("(max-width: 660px)").matches;
 }
 
 Utility.dialog = function(title, html) {

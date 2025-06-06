@@ -1,6 +1,6 @@
 import CurrentUser from './current_user'
 import Utility from './utility'
-import { delay }  from './utility'
+import { delay, isMobile, isTouchscreen }  from './utility'
 import Notice from './notice'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'
@@ -51,14 +51,11 @@ Post.initialize_all = function() {
 }
 
 Post.initialize_gestures = function() {
-  if (CurrentUser.data("disable-mobile-gestures")) {
+  if (!isTouchscreen() || CurrentUser.data("disable-mobile-gestures")) {
     return;
   }
   var $body = $("body");
   if ($body.data("hammer")) {
-    return;
-  }
-  if (!Utility.test_max_width(660)) {
     return;
   }
   $(".image-container").css({overflow: "visible"});
@@ -276,7 +273,7 @@ Post.initialize_post_preview_options_menu = function() {
 }
 
 Post.view_original = function(e = null) {
-  if (Utility.test_max_width(660)) {
+  if (isMobile()) {
     // Do the default behavior (navigate to image)
     return;
   }
@@ -296,7 +293,7 @@ Post.view_original = function(e = null) {
 }
 
 Post.view_large = function(e = null) {
-  if (Utility.test_max_width(660)) {
+  if (isMobile()) {
     // Do the default behavior (navigate to image)
     return;
   }
