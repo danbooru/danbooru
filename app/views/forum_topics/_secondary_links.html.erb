@@ -13,8 +13,13 @@
   <% else %>
     <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path %>
   <% end %>
-  
-  <%= subnav_link_to "Bulk Update Requests", bulk_update_requests_path %>
+
+  <% if @forum_topic %>
+    <%= subnav_link_to "BURs (#{@forum_topic.bulk_update_requests.pending.count} pending here)", bulk_update_requests_path(:search => {:forum_topic_id => @forum_topic.id, :status => "pending"}) %>
+  <% else %>
+    <%= subnav_link_to "BURs (#{BulkUpdateRequest.pending.count} pending)", bulk_update_requests_path(:search => {:status => "pending"}) %>
+  <% end %>
+
   <%= subnav_link_to "Search", search_forum_posts_path %>
   <%= subnav_link_to "Help", wiki_page_path("help:forum") %>
   <% if !CurrentUser.user.is_anonymous? && @forum_topic && !@forum_topic.new_record? %>
