@@ -251,10 +251,13 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       should "work" do
         as(@user) do
           @artist.update(name: "xyz")
-          @artist.update(name: "abc")
+          travel(2.hours) { @artist.update(name: "abc") }
         end
         version = @artist.versions.first
         put_auth revert_artist_path(@artist.id), @user, params: {version_id: version.id}
+
+        assert_redirected_to @artist
+        assert_equal("xyz", @artist.reload.name)
       end
 
       should "not allow reverting to a previous version of another artist" do

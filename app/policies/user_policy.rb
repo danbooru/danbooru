@@ -9,6 +9,10 @@ class UserPolicy < ApplicationPolicy
     true
   end
 
+  def custom_style?
+    record == user
+  end
+
   def update?
     record.id == user.id || user.is_admin?
   end

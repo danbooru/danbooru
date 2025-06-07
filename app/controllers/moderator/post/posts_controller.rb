@@ -6,7 +6,7 @@ module Moderator
       respond_to :html, :json, :xml, :js
 
       def confirm_move_favorites
-        @post = ::Post.find(params[:id])
+        @post = authorize ::Post.find(params[:id])
       end
 
       def move_favorites

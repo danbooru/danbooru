@@ -29,6 +29,10 @@ class PostPolicy < ApplicationPolicy
     update?
   end
 
+  def confirm_move_favorites?
+    user.is_approver?
+  end
+
   def move_favorites?
     user.is_approver? && record.fav_count > 0 && record.parent_id.present?
   end

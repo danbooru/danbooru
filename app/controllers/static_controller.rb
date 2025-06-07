@@ -4,6 +4,8 @@ class StaticController < ApplicationController
   respond_to :html, :json, :xml
   skip_forgery_protection only: :not_found, if: -> { request.format.js? }
 
+  after_action :skip_authorization
+
   def privacy_policy
   end
 

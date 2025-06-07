@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class WikiPagePolicy < ApplicationPolicy
+  def show_or_new?
+    true
+  end
+
   def update?
     unbanned? && (can_edit_locked? || !record.is_locked?)
   end

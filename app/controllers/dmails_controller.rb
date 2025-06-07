@@ -26,6 +26,7 @@ class DmailsController < ApplicationController
   def show
     if params[:key].present?
       @dmail = Dmail.find_signed!(params[:key], purpose: "dmail_link")
+      skip_authorization
     else
       @dmail = authorize Dmail.find(params[:id])
     end

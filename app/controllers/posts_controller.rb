@@ -16,12 +16,13 @@ class PostsController < ApplicationController
       end
     elsif params[:random].to_s.truthy?
       query = "#{post_set.normalized_query.to_s} random:#{post_set.per_page}".strip
+      authorize Post
       redirect_to posts_path(tags: query, page: params[:page], limit: params[:limit], format: request.format.symbol)
     else
+      @posts = authorize post_set.posts, policy_class: PostPolicy
+      @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
       raise PageRemovedError if request.format.html? && post_set.banned_artist?
 
-      @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
-      @posts = authorize post_set.posts, policy_class: PostPolicy
       respond_with(@posts) do |format|
         format.atom
       end
@@ -126,8 +127,9 @@ class PostsController < ApplicationController
 
   def random
     @post = Post.user_tag_match(params[:tags]).random(1).take
+    authorize @post, policy_class: PostPolicy
+
     raise ActiveRecord::RecordNotFound if @post.nil?
-    authorize @post
     respond_with(@post) do |format|
       format.html { redirect_to post_path(@post, q: params[:tags]) }
     end

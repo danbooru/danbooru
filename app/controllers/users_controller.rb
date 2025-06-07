@@ -131,7 +131,8 @@ class UsersController < ApplicationController
   end
 
   def custom_style
-    @custom_css = CurrentUser.user.custom_css
+    @user = authorize CurrentUser.user
+    @custom_css = @user.custom_css
     expires_in 10.years
   end
 

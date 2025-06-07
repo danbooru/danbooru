@@ -6,6 +6,7 @@ class ReportsController < ApplicationController
   rate_limit :show, rate: 1.0/3.seconds, burst: 15
 
   def index
+    authorize nil, policy_class: ReportPolicy
   end
 
   def show
@@ -17,6 +18,7 @@ class ReportsController < ApplicationController
     @columns = params.dig(:search, :columns).to_s.split(/[[:space:],]/).map(&:to_sym)
     @group = params.dig(:search, :group)&.downcase&.tr(" ", "_")
     @group_limit = params.dig(:search, :group_limit)&.to_i || 10
+    authorize nil, policy_class: ReportPolicy
 
     case @report
     when "posts"

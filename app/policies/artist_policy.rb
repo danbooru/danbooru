@@ -24,4 +24,7 @@ class ArtistPolicy < ApplicationPolicy
   def permitted_attributes_for_new
     permitted_attributes + [:source]
   end
+
+  alias_method :banned?, :index?
+  alias_method :show_or_new?, :show?
 end

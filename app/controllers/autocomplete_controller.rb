@@ -7,7 +7,7 @@ class AutocompleteController < ApplicationController
     @query = params.dig(:search, :query)
     @type = params.dig(:search, :type)
     @limit = params.fetch(:limit, 10).to_i
-    @autocomplete = AutocompleteService.new(@query, @type, current_user: CurrentUser.user, limit: @limit)
+    @autocomplete = authorize AutocompleteService.new(@query, @type, current_user: CurrentUser.user, limit: @limit)
 
     @results = @autocomplete.autocomplete_results
     @expires_in = @autocomplete.cache_duration

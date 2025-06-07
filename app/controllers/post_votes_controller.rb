@@ -39,6 +39,8 @@ class PostVotesController < ApplicationController
     if @post_vote.present?
       authorize(@post_vote).soft_delete(updater: CurrentUser.user)
       @post.reload
+    else
+      skip_authorization
     end
 
     respond_with(@post_vote)

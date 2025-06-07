@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class NotePolicy < ApplicationPolicy
+  def preview?
+    true
+  end
+
   def revert?
     update?
   end

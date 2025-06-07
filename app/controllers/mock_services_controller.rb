@@ -6,6 +6,7 @@ class MockServicesController < ApplicationController
 
   before_action do
     raise User::PrivilegeError if Rails.env.production?
+    skip_authorization
   end
 
   def recommender_recommend

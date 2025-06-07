@@ -498,6 +498,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         get_auth confirm_password_session_path, @user
         assert_response :success
       end
+
+      should "fail for a user who is not logged in" do
+        get confirm_password_session_path
+
+        assert_response 403
+      end
     end
 
     context "reauthenticate action" do
@@ -587,6 +593,15 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("failed_reauthenticate", @user.user_events.last.category)
         end
       end
+
+      context "for a user who is not logged in" do
+        should "fail" do
+          post reauthenticate_session_path, params: { session: { password: "password", url: users_path } }
+
+          assert_response 403
+          assert_nil(session[:user_id])
+        end
+      end
     end
 
     context "destroy action" do
@@ -613,6 +628,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_equal(@user.id, session[:user_id])
         assert_equal(false, @user.user_events.logout.exists?)
+      end
+
+      should "not fail if the user is already logged out" do
+        get logout_path
+
+        assert_response :success
       end
     end
   end

@@ -81,19 +81,20 @@ class CommentsController < ApplicationController
 
   def index_for_post
     @post = Post.find(params[:post_id])
-    @comments = @post.comments
+    @comments = authorize @post.comments
     render :action => "index_for_post"
   end
 
   def index_by_post
     @limit = params.fetch(:limit, 20)
     @posts = Post.where.not(last_comment_bumped_at: nil).user_tag_match(params[:tags]).reorder("last_comment_bumped_at DESC NULLS LAST").paginate(params[:page], limit: @limit, search_count: params[:search])
+    authorize @posts
 
     respond_with(@posts)
   end
 
   def index_by_comment
-    @comments = Comment.paginated_search(params)
+    @comments = authorize Comment.paginated_search(params)
 
     if request.format.atom?
       @comments = @comments.includes(:creator, post: [:media_asset])

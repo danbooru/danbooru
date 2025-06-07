@@ -6,6 +6,7 @@ class LegacyController < ApplicationController
   def posts
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], format: "json")
     @posts = @post_set.posts.includes(:uploader).map(&:legacy_attributes)
+    authorize @posts, policy_class: LegacyControllerPolicy
 
     respond_with(@posts) do |format|
       format.xml do
@@ -21,6 +22,7 @@ class LegacyController < ApplicationController
 
   def tags
     @tags = Tag.limit(100).search(params, CurrentUser.user).paginate(params[:page], :limit => params[:limit])
+    authorize @tags, policy_class: LegacyControllerPolicy
   end
 
   def unavailable

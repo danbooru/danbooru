@@ -12,11 +12,13 @@ module Maintenance
       rescue_with VerificationError, status: 403
 
       def show
+        authorize nil, policy_class: EmailNotificationPolicy
       end
 
       def destroy
         @user = ::User.find(params[:user_id])
         @user.update!(receive_email_notifications: false)
+        authorize @user, policy_class: EmailNotificationPolicy
 
         # https://www.rfc-editor.org/rfc/rfc8058#section-3.1
         #
