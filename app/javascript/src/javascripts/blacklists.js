@@ -1,5 +1,6 @@
 import { splitWords } from './utility';
-import Cookie from './cookie'
+import Alpine from 'alpinejs';
+import Cookie from './cookie';
 
 // A blacklist represents a set of blacklist rules that match against a set of posts.
 class Blacklist {
@@ -7,6 +8,8 @@ class Blacklist {
   constructor(element) {
     // Attach the blacklist instance to the DOM element for access with `$("#blacklist-box").get(0).blacklist`
     element.blacklist = this;
+    this.rules = [];
+    this.posts = [];
   }
 
   // @param {Array<String>} rules - The list of blacklist rules.
@@ -14,6 +17,7 @@ class Blacklist {
     this.rules = rules.map(rule => new Rule(this, rule));
     this.posts = $(".post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview").toArray().map(post => new Post(post, this));
     this.apply();
+    this.cleanupStorage();
   }
 
   // Apply all blacklist rules to all posts.
@@ -22,19 +26,27 @@ class Blacklist {
   }
 
   get enabled() {
-    return Cookie.get("dab") !== "1";
+    return this.activeRules.every(rule => rule.enabled);
   }
 
   set enabled(value) {
-    Cookie.put("dab", value ? "0" : "1");
-
-    this.rules.forEach(rule => rule.enabled = Boolean(value));
+    this.activeRules.forEach(rule => rule.enabled = Boolean(value));
     this.posts.forEach(post => post.update());
   }
 
   // @returns {Array<Rule>} - The set of rules that match at least one post (whether the rule is enabled or not).
   get activeRules() {
     return this.rules.filter(rule => rule.active);
+  }
+
+  // Remove from storage any rules that have been removed from the blacklist.
+  cleanupStorage() {
+    Cookie.remove("dab");
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith("blacklist.enabled:") && !this.rules.some(rule => key === `blacklist.enabled:${rule.string}`)) {
+        localStorage.removeItem(key);
+      }
+    });
   }
 }
 
@@ -113,7 +125,7 @@ class Rule {
     this.exclude = [];
     this.optional = [];
     this.posts = new Set();
-    this.enabled = blacklist.enabled;
+    this.enabled = Alpine.$persist(true).as(`blacklist.enabled:${string}`);
     this.min_score = null;
 
     this.tags.forEach(tag => {
