@@ -17,6 +17,10 @@ Autocomplete.initialize_all = function() {
     },
     _renderItem: Autocomplete.render_item,
     search: function(value, event) {
+      if (!event.originalEvent || event.originalEvent.inputType === "") {
+        // Ignore. Not a real input event triggered by the user.
+        return;
+      }
       if ($(this).data("ui-autocomplete")) {
         $(this).data("ui-autocomplete").menu.bindings = $();
       }
