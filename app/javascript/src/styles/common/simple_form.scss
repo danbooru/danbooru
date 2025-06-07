@@ -1,5 +1,5 @@
-@import "../base/020_base";
-@import "../common/utilities";
+@use "../base/020_base" as *;
+@use "../common/utilities";
 
 form.simple_form {
   margin: 0 0 1em 0;

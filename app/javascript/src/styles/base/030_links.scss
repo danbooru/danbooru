@@ -1,4 +1,4 @@
-@import "./000_vars";
+@use "./000_vars" as *;
 
 a {
   color: var(--link-color);

@@ -1,4 +1,4 @@
-@import "../../javascript/src/styles/base/000_vars";
+@use "../../javascript/src/styles/base/000_vars" as *;
 
 div.popup-menu {
   a.default-popup-menu-button {
