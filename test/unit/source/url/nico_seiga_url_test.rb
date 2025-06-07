@@ -20,7 +20,6 @@ module Source::Tests::URL
         page_urls: [
           "https://seiga.nicovideo.jp/seiga/im520647",
           "https://sp.seiga.nicovideo.jp/seiga/im3521156",
-          "https://seiga.nicovideo.jp/watch/mg316708",
           "https://www.nicovideo.jp/watch/sm36465441",
           "https://www.nicovideo.jp/watch/nm36465441",
           "https://www.nicovideo.jp/watch/so40968812",
@@ -29,11 +28,17 @@ module Source::Tests::URL
           "https://sp.nicovideo.jp/watch/sm36465441",
           "https://embed.nicovideo.jp/watch/sm36465441",
           "https://nico.ms/im10922621",
-          "https://nico.ms/mg310193",
           "https://nico.ms/sm36465441",
           "https://nico.ms/nm36465441",
           "https://nico.ms/so40968812",
           "https://nico.ms/1488526447",
+
+          # manga
+          "https://seiga.nicovideo.jp/watch/mg316708",
+          "https://sp.seiga.nicovideo.jp/watch/mg925907",
+          "https://manga.nicovideo.jp/watch/mg566097",
+          "https://sp.manga.nicovideo.jp/watch/mg925907",
+          "https://nico.ms/mg310193",
         ],
         profile_urls: [
           "https://seiga.nicovideo.jp/user/illust/456831",
@@ -61,6 +66,12 @@ module Source::Tests::URL
     context "when extracting attributes" do
       url_parser_should_work("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663",
                              page_url: "https://seiga.nicovideo.jp/seiga/im4937663",)
+
+      url_parser_should_work("https://seiga.nicovideo.jp/watch/mg316708",
+                             page_url: "https://manga.nicovideo.jp/watch/mg316708",)
+
+      url_parser_should_work("https://sp.manga.nicovideo.jp/watch/mg316708",
+                             page_url: "https://manga.nicovideo.jp/watch/mg316708",)
     end
   end
 end
