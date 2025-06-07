@@ -87,7 +87,7 @@ class Source::Extractor::Bluesky < Source::Extractor
 
     response = http.cache(1.minute).parsed_get(
       "https://api.bsky.app/xrpc/com.atproto.identity.resolveHandle",
-      params: { handle: user_handle_from_url }
+      params: { handle: user_handle_from_url },
     ) || {}
     response["did"]
   end
@@ -108,13 +108,18 @@ class Source::Extractor::Bluesky < Source::Extractor
     text = artist_commentary_desc.dup.force_encoding("ASCII-8BIT")
 
     api_response&.dig("thread", "post", "record", "facets").to_a.reverse.each do |facet|
-      tag = facet["features"].to_a.find {|f| f["$type"] == "app.bsky.richtext.facet#tag"}
-      next if tag.nil?
-
-      tag_name = tag["tag"]
-      byte_start = facet.dig("index", "byteStart")
-      byte_end = facet.dig("index", "byteEnd")
-      text[byte_start...byte_end] = %{<a href="https://bsky.app/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(tag_name))}">##{CGI.escapeHTML(tag_name)}</a>}.force_encoding("ASCII-8BIT")
+      if (tag = facet["features"].to_a.find {|f| f["$type"] == "app.bsky.richtext.facet#tag"}).present?
+        tag_name = tag["tag"]
+        byte_start = facet.dig("index", "byteStart")
+        byte_end = facet.dig("index", "byteEnd")
+        text[byte_start...byte_end] = %{<a href="https://bsky.app/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(tag_name))}">##{CGI.escapeHTML(tag_name)}</a>}.force_encoding("ASCII-8BIT")
+      elsif (mention = facet["features"].to_a.find {|f| f["$type"] == "app.bsky.richtext.facet#mention"}).present?
+        did = mention["did"]
+        byte_start = facet.dig("index", "byteStart")
+        byte_end = facet.dig("index", "byteEnd")
+        username = text[byte_start...byte_end]
+        text[byte_start...byte_end] = %{<a href="https://bsky.app/profile/#{CGI.escapeHTML(Danbooru::URL.escape(did))}">#{CGI.escapeHTML(username)}</a>}.force_encoding("ASCII-8BIT")
+      end
     end
 
     text = text.force_encoding("UTF-8")

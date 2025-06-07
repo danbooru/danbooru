@@ -245,6 +245,13 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A post mentioning another user" do
+      strategy_should_work(
+        "https://bsky.app/profile/did:plc:hd3rni5gped4mfzeu3qwymoo/post/3lquu2ozng22q",
+        html_artist_commentary_desc: 'kofi swimsuit request of <a href="https://bsky.app/profile/did:plc:qp3pms6cajl5wdnr3fjquugn">@darksteele0224.bsky.social</a> \'s OC, Lilac (^-^)',
+      )
+    end
+
     context "A 'https://cdn.bsky.app/img' url" do
       strategy_should_work(
         "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:3jogsxcisdcdzwjobhxbav2w/bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4@jpeg",
