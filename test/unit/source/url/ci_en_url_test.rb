@@ -10,6 +10,9 @@ module Source::Tests::URL
           "https://media.ci-en.jp/public/article_cover/creator/00020980/a65e3c05e2082018f4f28e99e7bc69b67ae96bb6f40b4a4b580ca939f435430d/image-1280-c.jpg",
           "https://media.ci-en.jp/public/cover/creator/00013341/cc4ec0e58b9ad36c8f36aca9faee334239761b4b2969d379d6629a5e07a52a6c/image-990-c.jpg",
         ],
+        image_samples: [
+          "https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-800.jpg?px-time=1700517240&px-hash=eb626eafb7e5733c96fb0891188848dac10cb84c",
+        ],
         page_urls: [
           "https://ci-en.jp/creator/922/article/23700",
           "https://ci-en.net/creator/11019/article/921762",
@@ -28,6 +31,12 @@ module Source::Tests::URL
       )
 
       should_not_find_false_positives(
+        image_samples: [
+          "https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/upload/ばにっちA.jpg?px-time=1724352407&px-hash=7011c254c4f87a29937ac40ac00c89d919d2f3ec",
+          "https://media.ci-en.jp/private/attachment/creator/00012924/19f0db879cebbd78ddd8a4292088d0b0bd6bfe1af900081e89ae29c144f9e8a5/video-web.mp4?px-time=1724353317&px-hash=48e980878e385163d79bbd2e2ada5589c7520452",
+          "https://media.ci-en.jp/public/article_cover/creator/00020980/a65e3c05e2082018f4f28e99e7bc69b67ae96bb6f40b4a4b580ca939f435430d/image-1280-c.jpg",
+          "https://media.ci-en.jp/public/cover/creator/00013341/cc4ec0e58b9ad36c8f36aca9faee334239761b4b2969d379d6629a5e07a52a6c/image-990-c.jpg",
+        ],
         page_urls: [
           "https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-web.jpg?px-time=1703968668&px-hash=9497dce5fa56c5081413ad1126e06d6f44f0ab3e",
           "https://media.ci-en.jp/public/cover/creator/00011019/ae96c79d7626c8127bfe9823111601d3b566977d19c3aa0409de4ef838f8dc12/image-990-c.jpg",

@@ -71,6 +71,15 @@ module Source::Tests::URL
           "http://img18.pixiv.net/img/evazion/14901720.png",
           "http://i2.pixiv.net/img18/img/evazion/14901720.png",
         ],
+        image_samples: [
+          "https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg",
+          "https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira600x600.zip",
+          "https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip",
+          "https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg",
+          "http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg",
+          "http://img18.pixiv.net/img/evazion/14901720.png",
+          "http://i2.pixiv.net/img18/img/evazion/14901720.png",
+        ],
         page_urls: [
           "https://www.pixiv.net/en/artworks/46324488",
           "https://www.pixiv.net/artworks/46324488",
@@ -93,6 +102,14 @@ module Source::Tests::URL
           "http://www.pixiv.me/noizave",
           "https://pixiv.cc/zerousagi/",
           "https://p.tl/m/9202877",
+        ],
+      )
+      should_not_find_false_positives(
+        image_samples: [
+          "https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png",
+          "https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip?original",
+          "https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png",
+          "https://www.pixiv.net/artworks/46324488",
         ],
       )
     end

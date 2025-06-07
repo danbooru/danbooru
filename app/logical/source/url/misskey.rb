@@ -60,6 +60,11 @@ class Source::URL::Misskey < Source::URL
     end
   end
 
+  def image_sample?
+    return nil unless image_url?
+    filename.starts_with? "thumbnail-"
+  end
+
   def page_url
     if note_id.present?
       "https://#{host}/notes/#{note_id}"

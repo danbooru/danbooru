@@ -17,6 +17,9 @@ module Source::Tests::URL
           "https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp",
           "https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp",
         ],
+        image_samples: [
+          "https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp",
+        ],
         page_urls: [
           "https://misskey.io/notes/9bxaf592x6",
         ],
@@ -29,6 +32,9 @@ module Source::Tests::URL
       should_not_find_false_positives(
         image_urls: [
           "https://media.misskeyusercontent.com",
+        ],
+        image_samples: [
+          "https://s3.arkjp.net/misskey/7d2adf4a-b2dd-40b4-ba27-916e44f7bd48.png",
         ],
         profile_urls: [
           "https://misskey.io/@",

@@ -288,12 +288,24 @@ module Source
       recognized? && image_url? && page_url.nil?
     end
 
+    # Determine if the URL is considered an "image sample".
+    #
+    # @return [Boolean, nil] True if the URL is an image sample, false if it's not an image sample, or nil if we don't know
+    #   whether it's an image sample or not.
+    def image_sample?
+      nil
+    end
+
     def self.site_name(url)
       Source::URL.parse(url)&.site_name
     end
 
     def self.image_url?(url)
       Source::URL.parse(url)&.image_url?
+    end
+
+    def self.image_sample?(url)
+      Source::URL.parse(url)&.image_sample?
     end
 
     def self.page_url?(url)

@@ -260,6 +260,13 @@ module Source
       "https://i.pximg.net/img-original/img/#{date.join("/")}/#{work_id}_ugoira#{n}.#{ext}" if ugoira_frame_url?
     end
 
+    def image_sample?
+      image_url? && !(
+        image_type.in?(%w[img-original novel-cover-original]) ||
+        ugoira_zip_url? && to_s == ugoira_zip_url
+      )
+    end
+
     def page_url
       if work_id.present?
         "https://www.pixiv.net/artworks/#{work_id}"
