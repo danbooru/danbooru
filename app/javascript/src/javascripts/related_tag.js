@@ -143,8 +143,8 @@ RelatedTag.toggle_tag = function(e) {
   setTimeout(function () { $field.prop('selectionStart', $field.val().length); }, 100);
   e.preventDefault();
 
-  // Artificially trigger input event so the tag counter updates.
-  $field.trigger("input");
+  // Update the tag counter without triggering an input event.
+  $field.trigger("danbooru:update-tag-counter");
 }
 
 RelatedTag.show = function(e) {

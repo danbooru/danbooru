@@ -6,7 +6,7 @@ export default class TagCounter {
 
   constructor($element) {
     this.$element = $element;
-    this.$target.on("input", (event) => this.update(event));
+    this.$target.on("input danbooru:update-tag-counter", (event) => this.update(event));
     this.update();
   }
 
