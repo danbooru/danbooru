@@ -207,6 +207,8 @@ class Source::URL::Null < Source::URL
       "The Interviews"
     in _, "tistory.com"
       "Tistory"
+    in _, "tiktok.com"
+      "TikTok"
     in "t1", "daumcdn.net"
       "Tistory"
     in _, "toyhou.se"
@@ -383,7 +385,11 @@ class Source::URL::Null < Source::URL
     # https://lyjrkow.ksxjubvoouva.hath.network/h/416a7c19fb25549e084876f932e2f6d45a5b2d63-1215161-2400-3589-jpg/keystamp=1683990600-aab6e15ff8;fileindex=119976531;xres=2400/89931055_p0.jpg
     # https://drjvktq.miqlthdkffuu.hath.network/h/dce4b9677c8f769c12c8889e2581b989a3edd1bb-280532-642-802-png/keystamp=1683992100-6e1bddc318;fileindex=116114230;xres=org/1667196644017_fe0ug7p4.png
     in _, "hath.network", "h", _, params_string, _
-      params = params_string.split(";").map { |s| s.split("=", 2) }.to_h rescue {}
+      params = begin
+        params_string.split(";").map { |s| s.split("=", 2) }.to_h
+      rescue StandardError
+        {}
+      end
       @bad_link = true
       @image_sample = params["xres"] != "org"
 
@@ -664,6 +670,13 @@ class Source::URL::Null < Source::URL
     # http://theinterviews.jp/ruixiang
     in _, "theinterviews.jp", *rest
       nil
+
+    # https://www.tiktok.com/@ajmarekart?_t=ZM-8wmxRtoZXjq&_r=1
+    # https://www.tiktok.com/@s5oyaa_
+    # https://www.tiktok.com/@h.panda_12
+    # https://www.tiktok.com/@lenn0n__?
+    in _, "tiktok.com", /^@[\w\.]+$/ => username
+      @profile_url = "https://www.tiktok.com/#{username}"
 
     # http://img.toranoana.jp/popup_img/04/0030/09/76/040030097695-2p.jpg
     # http://img.toranoana.jp/popup_img18/04/0010/22/87/040010228714-1p.jpg

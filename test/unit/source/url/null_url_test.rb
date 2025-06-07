@@ -48,6 +48,7 @@ module Source::Tests::URL
         assert_equal("Line", Source::URL.parse("https://store.line.me/stickershop/author/103126").site_name)
         assert_equal("LinkedIn", Source::URL.parse("https://www.linkedin.com/in/star-ren/").site_name)
         assert_equal("Linktree", Source::URL.parse("https://linktr.ee/crankbot").site_name)
+        assert_equal("TikTok", Source::URL.parse("https://www.tiktok.com/@lenn0n__?").site_name)
       end
     end
 
@@ -131,6 +132,17 @@ module Source::Tests::URL
                              page_url: "https://hitomi.la/galleries/883451.html",)
       url_parser_should_work("https://la.hitomi.la/galleries/1054851/001_main_image.jpg",
                              page_url: "https://hitomi.la/reader/1054851.html#1",)
+    end
+
+    context "For tiktok links" do
+      url_parser_should_work("https://www.tiktok.com/@ajmarekart?_t=ZM-8wmxRtoZXjq&_r=1",
+                             profile_url: "https://www.tiktok.com/@ajmarekart",)
+
+      url_parser_should_work("https://www.tiktok.com/@lenn0n__?",
+                             profile_url: "https://www.tiktok.com/@lenn0n__",)
+
+      url_parser_should_work("https://www.tiktok.com/@h.panda_12",
+                             profile_url: "https://www.tiktok.com/@h.panda_12",)
     end
 
     context "For e-hentai links" do
