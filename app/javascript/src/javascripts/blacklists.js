@@ -1,5 +1,4 @@
 import { splitWords } from './utility';
-import Alpine from 'alpinejs';
 import Cookie from './cookie';
 
 // A blacklist represents a set of blacklist rules that match against a set of posts.
@@ -125,7 +124,6 @@ class Rule {
     this.exclude = [];
     this.optional = [];
     this.posts = new Set();
-    this.enabled = Alpine.$persist(true).as(`blacklist.enabled:${string}`);
     this.min_score = null;
 
     this.tags.forEach(tag => {
@@ -145,6 +143,14 @@ class Rule {
   // A rule is active if it matches at least one post, regardless of whether the rule is enabled or not.
   get active() {
     return this.posts.size > 0;
+  }
+
+  get enabled() {
+    return JSON.parse(localStorage.getItem(`blacklist.enabled:${this.string}`)) ?? true;
+  }
+
+  set enabled(value) {
+    localStorage.setItem(`blacklist.enabled:${this.string}`, JSON.stringify(value));
   }
 
   toggle() {
