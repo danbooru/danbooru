@@ -16,4 +16,8 @@ class CommentVotePolicy < ApplicationPolicy
   def can_see_votes?
     user.is_moderator?
   end
+
+  def rate_limit_for_write(**_options)
+    { rate: 1.0 / 1.second, burst: 200 }
+  end
 end

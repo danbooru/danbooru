@@ -3,8 +3,6 @@
 class PasswordsController < ApplicationController
   respond_to :html, :xml, :json
 
-  rate_limit :update, rate: 1.0/10.minute, burst: 20
-
   def edit
     @user = authorize user, policy_class: PasswordPolicy
 

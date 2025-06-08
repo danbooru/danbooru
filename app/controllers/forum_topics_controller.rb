@@ -9,8 +9,6 @@ class ForumTopicsController < ApplicationController
     redirect_to root_path
   end
 
-  rate_limit :create, rate: 1.0/2.minute, burst: 3
-
   def new
     @forum_topic = authorize ForumTopic.new
     @forum_topic.original_post = ForumPost.new

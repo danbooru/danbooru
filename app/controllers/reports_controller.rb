@@ -3,8 +3,6 @@
 class ReportsController < ApplicationController
   respond_to :html, :json, :xml
 
-  rate_limit :show, rate: 1.0/3.seconds, burst: 15
-
   def index
     authorize nil, policy_class: ReportPolicy
   end

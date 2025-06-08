@@ -3,9 +3,6 @@
 class ForumPostsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  rate_limit :create, rate: 1.0 / 1.minute, burst: 50, if: -> { CurrentUser.user.is_builder? }
-  rate_limit :create, rate: 1.0 / 2.minutes, burst: 5, if: -> { !CurrentUser.user.is_builder? }
-
   def new
     @forum_post = authorize ForumPost.new_reply(params)
     respond_with(@forum_post)

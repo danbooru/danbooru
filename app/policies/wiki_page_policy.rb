@@ -21,6 +21,14 @@ class WikiPagePolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def rate_limit_for_write(**_options)
+    if user.is_builder?
+      { rate: 1.0 / 1.minute, burst: 50 }
+    else
+      { rate: 1.0 / 1.minute, burst: 10 }
+    end
+  end
+
   def permitted_attributes
     [:title, :body, :other_names, :other_names_string, :is_deleted, (:is_locked if can_edit_locked?)].compact
   end

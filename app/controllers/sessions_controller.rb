@@ -3,10 +3,6 @@
 class SessionsController < ApplicationController
   respond_to :html
 
-  rate_limit :create, rate: 1.0/5.minutes, burst: 5
-  rate_limit :reauthenticate, rate: 1.0/5.minutes, burst: 5, key: "sessions:create"
-  rate_limit :verify_totp, rate: 1.0/30.minutes, burst: 50
-
   verify_captcha only: :create
 
   def new

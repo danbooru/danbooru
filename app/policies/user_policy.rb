@@ -49,6 +49,10 @@ class UserPolicy < ApplicationPolicy
     user.is_gold?
   end
 
+  def rate_limit_for_create(**_options)
+    { rate: 1.0 / 5.minutes, burst: 5 }
+  end
+
   def permitted_attributes_for_create
     [:name, :password, :password_confirmation, { email_address_attributes: [:address] }]
   end

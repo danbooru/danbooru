@@ -6,7 +6,6 @@ class PostsController < ApplicationController
 
   before_action :log_search_query, only: :index
   after_action :log_search_count, only: :index, if: -> { request.format.html? && response.successful? }
-  rate_limit :index, rate: 1.0/2.seconds, burst: 50, if: -> { request.format.atom? }, key: "posts:index.atom"
 
   def index
     if params[:md5].present?

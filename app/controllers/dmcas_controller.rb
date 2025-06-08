@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class DmcasController < ApplicationController
-  rate_limit :create, rate: 1.0/15.minutes, burst: 3
-
   def create
     @dmca = params[:dmca].slice(:name, :email, :address, :infringing_urls, :original_urls, :proof, :perjury_agree, :good_faith_agree, :signature)
     authorize @dmca, policy_class: DmcaPolicy

@@ -17,6 +17,14 @@ class ArtistPolicy < ApplicationPolicy
     !user.is_anonymous?
   end
 
+  def rate_limit_for_write(**_options)
+    if user.is_builder?
+      { rate: 1.0 / 1.minute, burst: 50 }
+    else
+      { rate: 1.0 / 1.minute, burst: 10 }
+    end
+  end
+
   def permitted_attributes
     [:name, :other_names, :other_names_string, :group_name, :url_string, :is_deleted]
   end

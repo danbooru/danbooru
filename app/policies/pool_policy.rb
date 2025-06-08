@@ -21,6 +21,14 @@ class PoolPolicy < ApplicationPolicy
     update?
   end
 
+  def rate_limit_for_write(**_options)
+    if user.is_builder?
+      { rate: 1.0 / 1.minute, burst: 50 }
+    else
+      { rate: 1.0 / 1.minute, burst: 10 }
+    end
+  end
+
   def permitted_attributes
     [:name, :description, :category, :post_ids, :post_ids_string, { post_ids: [] }]
   end

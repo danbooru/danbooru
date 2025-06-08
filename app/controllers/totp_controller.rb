@@ -7,9 +7,6 @@
 class TOTPController < ApplicationController
   respond_to :html, :xml, :json
 
-  rate_limit :update,  rate: 1.0/1.minute, burst: 10
-  rate_limit :destroy, rate: 1.0/1.minute, burst: 10
-
   before_action :requires_reauthentication, only: [:edit, :update, :destroy]
 
   def edit

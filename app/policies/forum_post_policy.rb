@@ -45,6 +45,14 @@ class ForumPostPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def rate_limit_for_create(**_options)
+    if user.is_builder?
+      { rate: 1.0 / 1.minute, burst: 50 }
+    else
+      { rate: 1.0 / 2.minutes, burst: 5 }
+    end
+  end
+
   def permitted_attributes_for_create
     [:body, :topic_id]
   end

@@ -4,7 +4,6 @@ class BackupCodesController < ApplicationController
   respond_to :text, :html, :xml, :json
 
   before_action :requires_reauthentication, only: [:index, :create]
-  rate_limit :create, rate: 1.0/1.minute, burst: 10
 
   def index
     @user = authorize User.find(params[:user_id]), policy_class: BackupCodePolicy

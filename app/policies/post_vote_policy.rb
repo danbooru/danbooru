@@ -17,6 +17,10 @@ class PostVotePolicy < ApplicationPolicy
     show?
   end
 
+  def rate_limit_for_write(**_options)
+    { rate: 1.0 / 1.second, burst: 200 }
+  end
+
   def api_attributes
     attributes = super
     attributes -= [:user_id] unless can_see_voter?

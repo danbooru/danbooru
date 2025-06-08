@@ -33,6 +33,10 @@ class CommentPolicy < ApplicationPolicy
     !record.is_deleted?
   end
 
+  def rate_limit_for_create(**_options)
+    { rate: 1.0 / 2.minutes, burst: 5 }
+  end
+
   def permitted_attributes_for_create
     [:body, :post_id, :do_not_bump_post, (:is_sticky if can_sticky_comment?)].compact
   end

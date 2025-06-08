@@ -33,6 +33,10 @@ class ForumTopicPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def rate_limit_for_create(**_options)
+    { rate: 1.0 / 2.minutes, burst: 3 }
+  end
+
   def permitted_attributes
     [
       :title, :category_id, { original_post_attributes: [:id, :body] },

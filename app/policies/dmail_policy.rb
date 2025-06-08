@@ -26,6 +26,10 @@ class DmailPolicy < ApplicationPolicy
     unbanned? && record.owner_id == user.id && record.is_recipient? && !record.is_automated? && !record.from.is_moderator? && record.created_at.after?(1.year.ago)
   end
 
+  def rate_limit_for_create(**_options)
+    { rate: 1.0 / 2.minutes, burst: 5 }
+  end
+
   def permitted_attributes_for_create
     [:title, :body, :to_name, :to_id]
   end

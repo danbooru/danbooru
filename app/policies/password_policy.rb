@@ -8,4 +8,8 @@ class PasswordPolicy < ApplicationPolicy
   def can_change_user_passwords?
     user.is_owner?
   end
+
+  def rate_limit_for_update(**_options)
+    { rate: 1.0 / 10.minutes, burst: 20 }
+  end
 end

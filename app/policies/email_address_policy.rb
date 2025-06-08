@@ -22,4 +22,8 @@ class EmailAddressPolicy < ApplicationPolicy
     # XXX record is a user, not the email address.
     record.id == user.id
   end
+
+  def rate_limit_for_update(**_options)
+    { rate: 1.0 / 1.minute, burst: 10 }
+  end
 end

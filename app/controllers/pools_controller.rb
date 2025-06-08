@@ -3,11 +3,6 @@
 class PoolsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  %i[create update destroy undelete revert].each do |action|
-    rate_limit action, rate: 1.0 / 1.minute, burst: 50, if: -> { CurrentUser.is_builder? }
-    rate_limit action, rate: 1.0 / 1.minute, burst: 10, if: -> { !CurrentUser.is_builder? }
-  end
-
   def new
     @pool = authorize Pool.new(permitted_attributes(Pool))
     respond_with(@pool)

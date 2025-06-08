@@ -16,6 +16,18 @@ class SessionLoaderPolicy < ApplicationPolicy
     !user.is_anonymous?
   end
 
+  def rate_limit_for_create(**_options)
+    { rate: 1.0 / 5.minutes, burst: 5 }
+  end
+
+  def rate_limit_for_reauthenticate(**_options)
+    { rate: 1.0 / 5.minutes, burst: 5, action: "sessions:create" }
+  end
+
+  def rate_limit_for_verify_totp(**_options)
+    { rate: 1.0 / 30.minutes, burst: 50 }
+  end
+
   alias_method :new?, :create?
   alias_method :verify_totp?, :create?
   alias_method :logout?, :destroy?

@@ -3,11 +3,6 @@
 class ArtistsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  %i[create update destroy revert].each do |action|
-    rate_limit action, rate: 1.0 / 1.minute, burst: 50, if: -> { CurrentUser.is_builder? }
-    rate_limit action, rate: 1.0 / 1.minute, burst: 10, if: -> { !CurrentUser.is_builder? }
-  end
-
   def new
     @artist = authorize Artist.new_with_defaults(permitted_attributes(Artist))
     respond_with(@artist)

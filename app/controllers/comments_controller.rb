@@ -8,8 +8,6 @@ class CommentsController < ApplicationController
     redirect_to root_path
   end
 
-  rate_limit :create, rate: 1.0/2.minute, burst: 5
-
   def index
     params[:group_by] ||= "comment" if params[:search].present?
 
