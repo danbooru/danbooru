@@ -123,6 +123,7 @@ class User < ApplicationRecord
   has_many :forum_topic_visits, dependent: :destroy
   has_many :visited_forum_topics, through: :forum_topic_visits, source: :forum_topic
   has_many :moderation_reports, as: :model
+  has_many :pool_versions, foreign_key: :updater_id
   has_many :posts, :foreign_key => "uploader_id"
   has_many :post_appeals, foreign_key: :creator_id
   has_many :post_approvals, :dependent => :destroy
