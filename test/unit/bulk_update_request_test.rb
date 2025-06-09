@@ -57,7 +57,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "category hello -> artist")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't change category [[hello]] -> [[artist]] ([[hello]] doesn't exist)"], @bur.errors[:base])
+          assert_equal(["Can't change category of [[hello]] to artist ([[hello]] doesn't exist)"], @bur.errors[:base])
         end
       end
 
@@ -542,14 +542,44 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal("approved", @bur.reload.status)
         end
 
-        should "remove pools" do
-          @pool = create(:pool)
-          @post = create(:post, tag_string: "bar pool:#{@pool.id}")
-          @bur = create_bur!("nuke pool:#{@pool.id}", @admin)
+        should "remove pools by id" do
+          @pool = create(:pool, id: 123)
+          @post = create(:post, tag_string: "bar pool:123")
+          @bur = create_bur!("nuke pool:123", @admin)
 
           assert_equal([], @pool.post_ids)
           assert_equal("approved", @bur.reload.status)
           assert_equal(User.system, @pool.versions.last.updater)
+        end
+
+        should "remove pools by name" do
+          @pool = create(:pool, name: "asd")
+          @post = create(:post, tag_string: "bar pool:asd")
+          @bur = create_bur!("nuke pool:asd", @admin)
+
+          assert_equal([], @pool.post_ids)
+          assert_equal("approved", @bur.reload.status)
+          assert_equal(User.system, @pool.versions.last.updater)
+        end
+
+        should "raise an error when trying to nuke a pool that doesn't exist (by name)" do
+          @bur = build(:bulk_update_request, script: "nuke pool:mario_quest")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't nuke {{pool:mario_quest}} (pool doesn't exist)"], @bur.errors.full_messages)
+        end
+
+        should "raise an error when trying to nuke a pool that doesn't exist (by ID)" do
+          @bur = build(:bulk_update_request, script: "nuke pool:12345678")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't nuke {{pool:12345678}} (pool doesn't exist)"], @bur.errors.full_messages)
+        end
+
+        should "not raise a validation error for updates containing nonexisting pools" do
+          @bur = create_bur!("update pool:123 -> test", @admin)
+
+          assert_equal("approved", @bur.reload.status)
         end
       end
 
