@@ -449,7 +449,6 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
 %badge {
   padding: 0.125rem 0.25rem;
   border-radius: 2 * $spacer;
-  vertical-align: text-bottom;
   font-size: var(--text-xs);
   color: var(--inverse-text-color);
 }

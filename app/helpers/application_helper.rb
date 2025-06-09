@@ -76,14 +76,15 @@ module ApplicationHelper
     url_for(request.query_parameters.merge(params))
   end
 
-  def nav_link_to(text, url, **options)
+  def nav_link_to(*args, **options, &block)
     klass = options.delete(:class)
+    url = args.last
 
     if nav_link_match(params[:controller], url)
       klass = "#{klass} current"
     end
 
-    li_link_to(text, url, id_prefix: "nav-", class: klass, **options)
+    li_link_to(*args, id_prefix: "nav-", class: klass, **options, &block)
   end
 
   def subnav_link_to(*args, **options, &block)
