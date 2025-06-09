@@ -6,7 +6,7 @@ class ForumPostPolicy < ApplicationPolicy
   end
 
   def show?
-    user.level >= record.topic.min_level
+    policy(record.topic).show?
   end
 
   def create?

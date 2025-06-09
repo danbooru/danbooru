@@ -17,7 +17,7 @@
     <% end %>
 
     <% if topic.is_private? %>
-      <%= link_to private_icon, forum_topics_path(search: { is_private: true }), class: "topic-status icon private", title: "#{User.level_string(topic.min_level)} only" %>
+      <%= link_to private_icon, forum_topics_path(search: { is_private: true }), class: "topic-status icon private", title: "#{topic.min_level} only" %>
     <% end %>
 
     <% if forum_topic_status(topic).present? %>

@@ -93,6 +93,17 @@ class ForumTopicTest < ActiveSupport::TestCase
       should allow_value(1).for(:category_id)
       should allow_value(2).for(:category_id)
 
+      should allow_value("None").for(:min_level)
+      should allow_value("Member").for(:min_level)
+      should allow_value("Gold").for(:min_level)
+      should allow_value("Builder").for(:min_level)
+      should allow_value("Moderator").for(:min_level)
+      should allow_value("Admin").for(:min_level)
+
+      should allow_value(0).for(:min_level)
+      should allow_value(20).for(:min_level)
+      should allow_value(30).for(:min_level)
+
       should_not allow_value("unknown").for(:category)
       should_not allow_value(123_456_789).for(:category)
 

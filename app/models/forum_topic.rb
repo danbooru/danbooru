@@ -9,14 +9,10 @@ class ForumTopic < ApplicationRecord
     "Bugs & Features": 2,
   }, scopes: false, instance_methods: false, validate: true, default: "General"
 
-  MIN_LEVELS = {
+  enum :min_level, {
     None: 0,
-    Member: User::Levels::MEMBER,
-    Gold: User::Levels::GOLD,
-    Builder: User::Levels::BUILDER,
-    Moderator: User::Levels::MODERATOR,
-    Admin: User::Levels::ADMIN,
-  }
+    **User.level_hash,
+  }, scopes: false, instance_methods: false, validate: true, default: "None"
 
   belongs_to :creator, class_name: "User"
   belongs_to_updater
@@ -30,7 +26,6 @@ class ForumTopic < ApplicationRecord
   has_many :mod_actions, as: :subject, dependent: :destroy
 
   validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
-  validates :min_level, inclusion: { in: MIN_LEVELS.values }
 
   accepts_nested_attributes_for :original_post
 
@@ -43,15 +38,15 @@ class ForumTopic < ApplicationRecord
 
   deletable
 
-  scope :public_only, -> { where(min_level: MIN_LEVELS[:None]) }
-  scope :private_only, -> { where.not(min_level: MIN_LEVELS[:None]) }
+  scope :public_only, -> { where(min_level: "None") }
+  scope :private_only, -> { where.not(min_level: "None") }
   scope :pending, -> { where(id: BulkUpdateRequest.has_topic.pending.select(:forum_topic_id)) }
   scope :approved, -> { where(category_id: 1).where(id: BulkUpdateRequest.approved.has_topic.select(:forum_topic_id)).where.not(id: BulkUpdateRequest.has_topic.pending.or(BulkUpdateRequest.has_topic.rejected).select(:forum_topic_id)) }
   scope :rejected, -> { where(category_id: 1).where(id: BulkUpdateRequest.rejected.has_topic.select(:forum_topic_id)).where.not(id: BulkUpdateRequest.has_topic.pending.or(BulkUpdateRequest.has_topic.approved).select(:forum_topic_id)) }
 
   module SearchMethods
     def visible(user)
-      where("min_level <= ?", user.level)
+      where(min_level: ..user.level)
     end
 
     def read_by_user(user)
@@ -139,6 +134,10 @@ class ForumTopic < ApplicationRecord
     self.class.categories[category]
   end
 
+  def min_level_id
+    self.class.min_levels[min_level]
+  end
+
   # XXX forum_topic_visit_by_current_user is a hack to reduce queries on the forum index.
   def is_read?
     return true if CurrentUser.is_anonymous?
@@ -151,7 +150,7 @@ class ForumTopic < ApplicationRecord
   end
 
   def is_private?
-    min_level > MIN_LEVELS[:None]
+    min_level != "None"
   end
 
   def create_mod_action

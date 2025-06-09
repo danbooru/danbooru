@@ -11,7 +11,7 @@
       <%= @forum_topic.title %>
 
       <% if @forum_topic.is_private? %>
-        <span class="level-topic">(<%= User.level_string(@forum_topic.min_level).downcase %>+ only)</span>
+        <span class="level-topic">(<%= @forum_topic.min_level.downcase %>+ only)</span>
       <% end %>
 
       <% if @forum_topic.is_deleted? %>

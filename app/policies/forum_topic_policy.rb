@@ -6,7 +6,7 @@ class ForumTopicPolicy < ApplicationPolicy
   end
 
   def show?
-    user.level >= record.min_level
+    user.level >= record.min_level_id
   end
 
   def update?

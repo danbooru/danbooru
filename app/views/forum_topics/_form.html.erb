@@ -8,7 +8,7 @@
     <% end %>
 
     <% if policy(forum_topic).moderate? %>
-      <%= f.input :min_level, :include_blank => false, :collection => available_min_user_levels %>
+      <%= f.input :min_level, collection: ForumTopic.min_levels.keys, selected: forum_topic.min_level %>
       <%= f.input :is_sticky, :label => "Sticky" %>
       <%= f.input :is_locked, :label => "Locked" %>
     <% end %>
