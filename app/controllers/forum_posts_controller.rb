@@ -21,6 +21,7 @@ class ForumPostsController < ApplicationController
   end
 
   def search
+    authorize ForumPost
   end
 
   def show

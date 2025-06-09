@@ -112,6 +112,14 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "search action" do
+      should "render" do
+        get search_forum_posts_path
+
+        assert_response :success
+      end
+    end
+
     context "show action" do
       should "raise an error if the user doesn't have permission to view the topic" do
         as(@user) { @forum_post.topic.update(min_level: User::Levels::ADMIN) }

@@ -10,9 +10,6 @@ class ArtistCommentariesController < ApplicationController
     respond_with(@commentaries)
   end
 
-  def search
-  end
-
   def show
     if params[:id]
       @commentary = authorize ArtistCommentary.find(params[:id])
