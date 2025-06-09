@@ -11,7 +11,7 @@
       Categories:
       <%= link_to "All", forum_topics_path %>,
       <%= link_to "New", forum_topics_path(search: { is_read: false }) %>,
-      <% if policy(ForumTopic).moderate? %>
+      <% if CurrentUser.user.is_builder? %>
         <%= link_to "Private", forum_topics_path(search: { is_private: true }) %>,
       <% end %>
       <%= ForumTopic.categories.map { |name, id| link_to_unless_current(name, forum_topics_path(search: { category_id: id })) }.join(", ").html_safe %>
