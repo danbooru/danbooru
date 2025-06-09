@@ -86,6 +86,16 @@ class ForumTopicTest < ActiveSupport::TestCase
     context "during validation" do
       subject { build(:forum_topic) }
 
+      should allow_value("General").for(:category)
+      should allow_value("Tags").for(:category)
+      should allow_value("Bugs & Features").for(:category)
+      should allow_value(0).for(:category_id)
+      should allow_value(1).for(:category_id)
+      should allow_value(2).for(:category_id)
+
+      should_not allow_value("unknown").for(:category)
+      should_not allow_value(123_456_789).for(:category)
+
       should_not allow_value("").for(:title)
       should_not allow_value(" ").for(:title)
       should_not allow_value("\u200B").for(:title)

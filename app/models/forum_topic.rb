@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 class ForumTopic < ApplicationRecord
-  CATEGORIES = {
-    0 => "General",
-    1 => "Tags",
-    2 => "Bugs & Features",
-  }
+  alias_attribute :category, :category_id
+
+  enum :category, {
+    General: 0,
+    Tags: 1,
+    "Bugs & Features": 2,
+  }, scopes: false, instance_methods: false, validate: true, default: "General"
 
   MIN_LEVELS = {
     None: 0,
@@ -28,7 +30,6 @@ class ForumTopic < ApplicationRecord
   has_many :mod_actions, as: :subject, dependent: :destroy
 
   validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
-  validates :category_id, inclusion: { in: CATEGORIES.keys }
   validates :min_level, inclusion: { in: MIN_LEVELS.values }
 
   accepts_nested_attributes_for :original_post
@@ -47,24 +48,6 @@ class ForumTopic < ApplicationRecord
   scope :pending, -> { where(id: BulkUpdateRequest.has_topic.pending.select(:forum_topic_id)) }
   scope :approved, -> { where(category_id: 1).where(id: BulkUpdateRequest.approved.has_topic.select(:forum_topic_id)).where.not(id: BulkUpdateRequest.has_topic.pending.or(BulkUpdateRequest.has_topic.rejected).select(:forum_topic_id)) }
   scope :rejected, -> { where(category_id: 1).where(id: BulkUpdateRequest.rejected.has_topic.select(:forum_topic_id)).where.not(id: BulkUpdateRequest.has_topic.pending.or(BulkUpdateRequest.has_topic.approved).select(:forum_topic_id)) }
-
-  module CategoryMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
-      def categories
-        CATEGORIES.values
-      end
-
-      def reverse_category_mapping
-        @reverse_category_mapping ||= CATEGORIES.invert
-      end
-    end
-
-    def category_name
-      CATEGORIES[category_id]
-    end
-  end
 
   module SearchMethods
     def visible(user)
@@ -93,7 +76,7 @@ class ForumTopic < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_sticky, :is_locked, :is_deleted, :category_id, :title, :response_count, :creator, :updater, :forum_posts, :bulk_update_requests, :tag_aliases, :tag_implications], current_user: current_user)
+      q = search_attributes(params, [:id, :created_at, :updated_at, :is_sticky, :is_locked, :is_deleted, :category, :category_id, :title, :response_count, :creator, :updater, :forum_posts, :bulk_update_requests, :tag_aliases, :tag_implications], current_user: current_user)
 
       if params[:is_private].to_s.truthy?
         q = q.private_only
@@ -150,8 +133,11 @@ class ForumTopic < ApplicationRecord
   end
 
   extend SearchMethods
-  include CategoryMethods
   include VisitMethods
+
+  def category_id
+    self.class.categories[category]
+  end
 
   # XXX forum_topic_visit_by_current_user is a hack to reduce queries on the forum index.
   def is_read?

@@ -10,7 +10,7 @@
       <%= f.input :creator_name, label: "Creator", input_html: { "data-autocomplete": "user" } %>
       <%= f.input :linked_to, label: "Tag", hint: "Find posts mentioning a tag", input_html: { "data-autocomplete": "tag" } %>
       <%= f.simple_fields_for :topic do |pf| %>
-        <%= pf.input :category_id, label: "Category", collection: ForumTopic::CATEGORIES.invert.to_a, include_blank: true %>
+        <%= pf.input :category, collection: ForumTopic.categories, include_blank: true %>
       <% end %>
       <%= f.submit "Search" %>
     <% end %>

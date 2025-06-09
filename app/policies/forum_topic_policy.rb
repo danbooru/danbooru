@@ -39,7 +39,7 @@ class ForumTopicPolicy < ApplicationPolicy
 
   def permitted_attributes
     [
-      :title, :category_id, { original_post_attributes: [:id, :body] },
+      :title, :category, :category_id, { original_post_attributes: [:id, :body] },
       ([:is_sticky, :is_locked, :min_level] if moderate?),
     ].compact.flatten
   end

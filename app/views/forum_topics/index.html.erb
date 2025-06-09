@@ -14,7 +14,7 @@
       <% if policy(ForumTopic).moderate? %>
         <%= link_to "Private", forum_topics_path(search: { is_private: true }) %>,
       <% end %>
-      <%= ForumTopic::CATEGORIES.map {|id, name| link_to_unless_current(name, forum_topics_path(:search => {:category_id => id}))}.join(", ").html_safe %>
+      <%= ForumTopic.categories.map { |name, id| link_to_unless_current(name, forum_topics_path(search: { category_id: id })) }.join(", ").html_safe %>
     </p>
 
     <%= render "listing", forum_topics: @forum_topics %>
