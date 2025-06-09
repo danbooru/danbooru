@@ -33,7 +33,14 @@
   <% t.column "Status", width: "1%", td: { class: "whitespace-nowrap text-right" } do |topic| %>
     <% status = forum_topic_status(topic) %>
     <% if status.present? %>
-      <%= link_to status, forum_topics_path(search: { status: status }), class: "topic-status label #{status}" %>
+      <%= link_to forum_topics_path(search: { status: status }), class: "topic-status label #{status}" do %>
+        <% if status == :pending %>
+          <%= topic.bulk_update_requests.pending.size %>
+        <% end %>
+
+        <%= status %>
+      <% end %>
+    <% else %>
     <% end %>
   <% end %>
   <% t.column "Creator", width: "8%", th: { class: "desktop-only"}, td: { class: "whitespace-nowrap desktop-only" } do |topic| %>

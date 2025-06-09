@@ -14,10 +14,16 @@
     <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path %>
   <% end %>
 
-  <% if @forum_topic %>
-    <%= subnav_link_to "BURs (#{@forum_topic.bulk_update_requests.pending.count} pending here)", bulk_update_requests_path(:search => {:forum_topic_id => @forum_topic.id, :status => "pending"}) %>
+  <% if @forum_topic && @forum_topic.bulk_update_requests.pending.count > 0 %>
+    <%= subnav_link_to bulk_update_requests_path(search: { forum_topic_id: @forum_topic.id, status: "pending" }), id: "burs" do %>
+      BURs <span class="badge-blue"><%= @forum_topic.bulk_update_requests.pending.count %></span>
+    <% end %>
+  <% elsif @forum_topic.nil? && BulkUpdateRequest.pending.count > 0 %>
+    <%= subnav_link_to bulk_update_requests_path(search: { status: "pending" }), id: "burs" do %>
+      BURs <span class="badge-blue"><%= BulkUpdateRequest.pending.count %></span>
+    <% end %>
   <% else %>
-    <%= subnav_link_to "BURs (#{BulkUpdateRequest.pending.count} pending)", bulk_update_requests_path(:search => {:status => "pending"}) %>
+    <%= subnav_link_to "BURs", bulk_update_requests_path %>
   <% end %>
 
   <%= subnav_link_to "Search", search_forum_posts_path %>

@@ -86,14 +86,16 @@ module ApplicationHelper
     li_link_to(text, url, id_prefix: "nav-", class: klass, **options)
   end
 
-  def subnav_link_to(text, url, **options)
-    li_link_to(text, url, id_prefix: "subnav-", **options)
+  def subnav_link_to(*args, **options, &block)
+    li_link_to(*args, id_prefix: "subnav-", **options, &block)
   end
 
-  def li_link_to(text, url, id_prefix: "", **options)
+  def li_link_to(*args, id: nil, id_prefix: nil, **options, &block)
     klass = options.delete(:class)
-    id = id_prefix + text.downcase.gsub(/[^a-z ]/, "").parameterize
-    tag.li(link_to(text, url, id: "#{id}-link", **options), id: id, class: klass)
+    text = args.first if args.size == 2
+    id = text.downcase.gsub(/[^a-z ]/, "").parameterize if text.present? && id.blank?
+
+    tag.li(link_to(*args, id: "#{id_prefix}#{id}-link", **options, &block), id: id, class: klass)
   end
 
   def format_text(text, references: DText.preprocess([text]), **options)
