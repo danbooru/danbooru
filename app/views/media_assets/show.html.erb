@@ -34,7 +34,7 @@
                     <% end %>
 
                     <% menu.with_item(hide_on_click: true) do %>
-                      <%= link_to "javascript:void(0)", class: "media-asset-copy-id", "x-on:click": "Danbooru.Utility.copyToClipboard('asset ##{j media_asset.id}')" do %>
+                      <%= link_to "javascript:void(0)", class: "media-asset-copy-id", "x-on:click": "Danbooru.Utility.copyToClipboard('asset ##{j @media_asset.id}')" do %>
                         <%= hashtag_icon %> Copy ID
                       <% end %>
                     <% end %>
