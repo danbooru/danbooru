@@ -95,8 +95,9 @@ module ApplicationHelper
     klass = options.delete(:class)
     text = args.first if args.size == 2
     id = text.downcase.gsub(/[^a-z ]/, "").parameterize if text.present? && id.blank?
+    id = id_prefix.to_s + id.to_s
 
-    tag.li(link_to(*args, id: "#{id_prefix}#{id}-link", **options, &block), id: id, class: klass)
+    tag.li(link_to(*args, id: "#{id}-link", **options, &block), id: id, class: klass)
   end
 
   def format_text(text, references: DText.preprocess([text]), **options)
