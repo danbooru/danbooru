@@ -93,7 +93,7 @@ class UploadMediaAsset < ApplicationRecord
   end
 
   def image_sample?
-    parsed_canonical_url&.image_sample?
+    parsed_source_url&.image_sample?
   end
 
   # The source of the post after upload. This is either the image URL, if the image URL is convertible to a page URL
@@ -118,6 +118,10 @@ class UploadMediaAsset < ApplicationRecord
     else
       source_url
     end
+  end
+
+  memoize def parsed_source_url
+    Source::URL.parse(source_url) unless file_upload?
   end
 
   memoize def parsed_canonical_url
