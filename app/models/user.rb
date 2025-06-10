@@ -591,7 +591,7 @@ class User < ApplicationRecord
 
     # @return [Array<String>] The list of blacklist rules. Each line in the blacklist is a rule.
     def blacklist_rules
-      blacklisted_tags.downcase.gsub(/(rating:\w)\w+/, '\1').lines.map(&:strip).compact_blank
+      blacklisted_tags.to_s.downcase.gsub(/(rating:\w)\w+/, '\1').lines.map(&:strip).compact_blank
     end
   end
 
