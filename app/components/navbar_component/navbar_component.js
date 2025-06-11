@@ -1,1 +1,0 @@
-../../javascript/src/javascripts/navbar_component.js

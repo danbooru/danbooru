@@ -86,7 +86,7 @@ module ApplicationHelper
     id = text.downcase.gsub(/[^a-z ]/, "").parameterize if text.present? && id.blank?
     id = id_prefix.to_s + id.to_s
 
-    tag.li(link_to(*args, id: "#{id}-link", **options, &block), id: id, class: klass)
+    link_to(*args, id: id, class: "py-1.5 px-3 #{klass}", **options, &block)
   end
 
   def format_text(text, references: DText.preprocess([text]), **options)
@@ -270,13 +270,11 @@ module ApplicationHelper
   end
 
   def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)
-    tag.li do
-      search_form_for(url, classes: "quick-search-form one-line-form") do |f|
-        out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { id: nil, "data-autocomplete": autocomplete }
-        out += tag.input type: :hidden, name: :redirect, value: redirect
-        out += capture { yield f } if block_given?
-        out
-      end
+    search_form_for(url, classes: "quick-search-form one-line-form py-1.5 px-3 md:w-180px w-full") do |f|
+      out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { id: nil, "data-autocomplete": autocomplete }
+      out += tag.input type: :hidden, name: :redirect, value: redirect
+      out += capture { yield f } if block_given?
+      out
     end
   end
 

@@ -12,6 +12,7 @@ $spacer: 0.25rem; /* 4px */
 .font-monospace { font: var(--monospace-font); }
 .font-header { font-family: var(--header-font); }
 .font-bold { font-weight: bold; }
+.font-italic { font-style: italic; }
 
 .cursor-pointer { cursor: pointer; }
 .cursor-zoom-in { cursor: zoom-in; }
@@ -74,6 +75,7 @@ $spacer: 0.25rem; /* 4px */
 .opacity-0 { opacity: 0; }
 .opacity-50 { opacity: 0.5; }
 .hover\:opacity-50:hover { opacity: 0.5; }
+.hover\:brightness-125:hover { filter: brightness(125%); }
 
 .leading-none   { line-height: 1; }
 .leading-normal { line-height: 1.5; }
@@ -144,6 +146,7 @@ $spacer: 0.25rem; /* 4px */
 .mx-1    { margin-left: 1   * $spacer; margin-right: 1   * $spacer; }
 .mx-2    { margin-left: 2   * $spacer; margin-right: 2   * $spacer; }
 .mx-4    { margin-left: 4   * $spacer; margin-right: 4   * $spacer; }
+.mx-8    { margin-left: 8   * $spacer; margin-right: 8   * $spacer; }
 
 .my-0\.5 { margin-top: 0.5 * $spacer; margin-bottom: 0.5 * $spacer; }
 .my-1    { margin-top: 1   * $spacer; margin-bottom: 1   * $spacer; }
@@ -181,9 +184,11 @@ $spacer: 0.25rem; /* 4px */
 .px-2 { padding-left: 2 * $spacer; padding-right: 2 * $spacer; }
 .px-3 { padding-left: 3 * $spacer; padding-right: 3 * $spacer; }
 .px-4 { padding-left: 4 * $spacer; padding-right: 4 * $spacer; }
+.px-5 { padding-left: 5 * $spacer; padding-right: 5 * $spacer; }
 .px-8 { padding-left: 8 * $spacer; padding-right: 8 * $spacer; }
 
 .py-1 { padding-top: 1 * $spacer; padding-bottom: 1 * $spacer; }
+.py-1\.5 { padding-top: 1.5 * $spacer; padding-bottom: 1.5 * $spacer; }
 .py-2 { padding-top: 2 * $spacer; padding-bottom: 2 * $spacer; }
 .py-3 { padding-top: 3 * $spacer; padding-bottom: 3 * $spacer; }
 .py-4 { padding-top: 4 * $spacer; padding-bottom: 4 * $spacer; }
@@ -256,6 +261,7 @@ $spacer: 0.25rem; /* 4px */
 .h-6    { height: 6  * $spacer; }
 .h-7    { height: 7  * $spacer; }
 .h-8    { height: 8  * $spacer; }
+.h-9    { height: 9  * $spacer; }
 .h-10   { height: 10 * $spacer; }
 .h-12   { height: 12 * $spacer; }
 .h-16   { height: 16 * $spacer; }
@@ -592,6 +598,7 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   .md\:space-x-8 > * + * { margin-left: 8 * $spacer; }
   .md\:space-y-0 > * + * { margin-top: 0; }
 
+  .md\:w-180px { width: 180px; }
   .md\:w-360px { width: 360px; }
 
   .md\:mx-auto { margin-left: auto; margin-right: auto; }
@@ -607,6 +614,11 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
 
   .sm\:order-1 { order: 1; }
   .sm\:order-2 { order: 2; }
+
+  .sm\:mx-2 { margin-left: 2 * $spacer; margin-right: 2 * $spacer; }
+  .sm\:mt-2 { margin-top: 2 * $spacer; }
+
+  .sm\:p-2 { padding: 2 * $spacer; }
 
   .\!sm\:w-full { width: 100% !important; }
 }

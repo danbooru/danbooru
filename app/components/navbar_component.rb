@@ -1,29 +1,28 @@
 # frozen_string_literal: true
 
 class NavbarComponent < ApplicationComponent
-  attr_reader :current_user, :params
+  attr_reader :current_user
 
   delegate :li_link_to, :unread_dmail_indicator, :close_icon, :menu_icon, :main_app, to: :helpers
 
-  def initialize(current_user:, params:)
+  def initialize(current_user:)
     super
     @current_user = current_user
-    @params = params
   end
 
   def nav_link_to(*args, **options, &block)
     klass = options.delete(:class)
     url = args.last
 
-    if nav_link_match(params[:controller], url)
-      klass = "#{klass} current"
+    if nav_link_match(url)
+      klass = "#{klass} current font-bold"
     end
 
     li_link_to(*args, id_prefix: "nav-", class: klass, **options, &block)
   end
 
-  def nav_link_match(controller, url)
-    url =~ case controller
+  def nav_link_match(url)
+    url =~ case controller_name
     when "sessions", "users", "admin/users"
       %r{^/(session|users)}
 
