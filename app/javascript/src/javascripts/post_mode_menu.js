@@ -137,6 +137,10 @@ PostModeMenu.open_edit = function(post_id) {
 }
 
 PostModeMenu.click = function(e) {
+  if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
+    return;
+  }
+
   var s = $("#mode-box select").val();
   var post_id = $(e.target).closest("article").data("id");
 
