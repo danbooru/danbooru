@@ -76,17 +76,6 @@ module ApplicationHelper
     url_for(request.query_parameters.merge(params))
   end
 
-  def nav_link_to(*args, **options, &block)
-    klass = options.delete(:class)
-    url = args.last
-
-    if nav_link_match(params[:controller], url)
-      klass = "#{klass} current"
-    end
-
-    li_link_to(*args, id_prefix: "nav-", class: klass, **options, &block)
-  end
-
   def subnav_link_to(*args, **options, &block)
     li_link_to(*args, id_prefix: "subnav-", **options, &block)
   end
@@ -455,44 +444,5 @@ module ApplicationHelper
 
   def atom_feed_tag(title, url = {})
     content_for(:html_header, auto_discovery_link_tag(:atom, url, title: title))
-  end
-
-  protected
-
-  def nav_link_match(controller, url)
-    url =~ case controller
-    when "sessions", "users", "admin/users"
-      %r{^/(session|users)}
-
-    when "comments"
-      %r{^/comments}
-
-    when "notes", "note_versions"
-      %r{^/notes}
-
-    when "posts", "uploads", "post_versions", "explore/posts", "moderator/post/dashboards", "favorites"
-      %r{^/post}
-
-    when "artists", "artist_versions"
-      %r{^/artist}
-
-    when "tags", "tag_aliases", "tag_implications"
-      %r{^/tags}
-
-    when "pools", "pool_versions"
-      %r{^/pools}
-
-    when "moderator/dashboards"
-      %r{^/moderator}
-
-    when "wiki_pages", "wiki_page_versions"
-      %r{^/wiki_pages}
-
-    when "forum_topics", "forum_posts"
-      %r{^/forum_topics}
-
-    else
-      %r{^/static}
-    end
   end
 end

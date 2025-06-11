@@ -62,3 +62,43 @@ header#top {
     }
   }
 }
+
+@media screen and (width <= 660px) {
+  header#top {
+    position: relative;
+    text-align: center;
+    margin-top: 0.25rem;
+
+    #maintoggle {
+      display: block;
+      font-weight: bold;
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      font-size: var(--text-xxl);
+    }
+
+    nav#nav {
+      line-height: 2em;
+      display: none;
+
+      menu#main-menu, menu#subnav-menu {
+        padding: 0.5rem;
+      }
+
+      menu#main-menu {
+        background-color: var(--responsive-menu-background-color);
+      }
+
+      form.quick-search-form {
+        display: block;
+        padding: 0.5em 0;
+
+        input {
+          width: 100%;
+          padding: 0;
+        }
+      }
+    }
+  }
+}
