@@ -17,8 +17,6 @@
       </li>
     </ul>
 
-    <% if policy(@user_feedback).update? %>
-      <p><%= link_to "Edit", edit_user_feedback_path(@user_feedback) %></p>
-    <% end %>
+    <%= render "application/update_notice", record: @user_feedback, interval: 0.minutes, current_user: CurrentUser.user %>
   </div>
 </div>
