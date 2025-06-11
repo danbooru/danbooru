@@ -8,8 +8,8 @@
     <p class="fineprint edit-notice my-2"><%= record.try(:is_deleted?) ? "Deleted" : "Updated" %> by <%= link_to_user record.updater %> <%= time_ago_in_words_tagged(record.updated_at) %></p>
   <% end %>
 <% elsif record.updated_at - record.created_at > (local_assigns[:interval] || 5.minutes) %>
-  <% if record.respond_to?(:creator_id) %>
-    <p class="fineprint edit-notice my-2"><%= record.try(:is_deleted?) ? "Deleted" : "Updated" %> by <%= link_to_user record.creator %> <%= time_ago_in_words_tagged(record.updated_at) %></p>
+  <% if record.respond_to?(:updater_id) %>
+    <p class="fineprint edit-notice my-2"><%= record.try(:is_deleted?) ? "Deleted" : "Updated" %> by <%= link_to_user record.updater %> <%= time_ago_in_words_tagged(record.updated_at) %></p>
   <% else %>
     <p class="fineprint edit-notice my-2"><%= record.try(:is_deleted?) ? "Deleted" : "Updated" %> <%= time_ago_in_words_tagged(record.updated_at) %></p>
   <% end %>
