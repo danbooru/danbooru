@@ -16,6 +16,12 @@ module Aggregatable
     subquery = select(date_trunc(period, date_column).as("date")).where(date_column => (from..to)).group("date").reorder(nil)
 
     group_fields.each do |name|
+      if name.include?(".")
+        association = name.split(".").first.to_sym
+        subquery = subquery.joins(association)
+        subquery = subquery.where.associated(association) # XXX hack to force table alias to be used (e.g "INNER JOIN users AS uploader ...")
+      end
+
       # SELECT date_trunc('day', posts.created_at) AS date, uploader_id FROM posts WHERE created_at BETWEEN from AND to GROUP BY date, uploader_id
       subquery = subquery.select(name).group(name)
     end
@@ -34,16 +40,22 @@ module Aggregatable
     group_fields.each do |field|
       # CROSS JOIN (SELECT uploader_id FROM posts WHERE created_at BETWEEN from AND to AND uploader_id IS NOT NULL GROUP BY uploader_id ORDER BY COUNT(*) DESC LIMIT 10) AS uploader_ids.uploader_id
       join = select(field).where(date_column => (from..to)).where.not(field => nil).group(field).reorder(Arel.sql("COUNT(*) DESC")).limit(group_limit)
+      join = join.joins(field.split(".").first.to_sym) if field.include?(".")
 
       # SELECT dates.date, uploader_ids.uploader_id
       # FROM (SELECT date_trunc('day', dates) AS date FROM generate_series('2022-01-01', '2022-02-15', '1 day'::interval) AS dates) AS dates
       # CROSS JOIN (SELECT uploader_id FROM posts WHERE created_at BETWEEN from AND to GROUP BY uploader_ids ORDER BY COUNT(*) DESC LIMIT 10) AS uploader_ids.uploader_id
-      query = query.select("#{connection.quote_table_name(field.to_s.pluralize)}.#{connection.quote_column_name(field)}")
-      query = query.joins("CROSS JOIN (#{join.to_sql}) AS #{connection.quote_column_name(field.to_s.pluralize)}")
+      column_name = field.to_s.split(".").second || field.to_s
+      query = query.select("#{connection.quote_table_name(column_name.pluralize)}.#{connection.quote_column_name(column_name)}")
+      query = query.joins("CROSS JOIN (#{join.to_sql}) AS #{connection.quote_column_name(column_name.pluralize)}")
     end
 
     # on_clause = "subquery.date = dates.date AND subquery.uploader_id = uploader_ids.uploader_id"
-    on_clause = ["date", *group_fields].map { |group| "subquery.#{connection.quote_column_name(group)} = #{connection.quote_table_name(group.to_s.pluralize)}.#{connection.quote_column_name(group)}" }.join(" AND ")
+    on_clause = ["date", *group_fields].map do |group|
+      column_name = group.to_s.split(".").second || group.to_s
+      "subquery.#{connection.quote_column_name(column_name)} = #{connection.quote_table_name(column_name.pluralize)}.#{connection.quote_column_name(column_name)}"
+    end.join(" AND ")
+
     query = query.joins("LEFT OUTER JOIN (#{subquery.to_sql}) AS subquery ON #{on_clause}")
     query = query.reorder("date DESC")
 
@@ -83,6 +95,7 @@ module Aggregatable
     query = where(date_column => (from..to)).reorder(order).limit(limit)
 
     group_fields.each do |name|
+      query = query.joins(name.split(".").first.to_sym) if name.include?(".")
       query = query.select(name).group(name).where.not(name => nil)
     end
 
@@ -122,7 +135,11 @@ module Aggregatable
   def build_dataframe(query, groups)
     results = query.select_all
     types = results.columns.map { |column| [column, :object] }.to_h
-    associations = groups.map { |name| reflections[name.to_s] }.compact_blank
+
+    associations = groups.map do |name|
+      name = name.split(".").first if name.include?(".")
+      reflections[name.to_s]
+    end.compact_blank
 
     dataframe = Danbooru::DataFrame.new(results.to_a, types: types)
     dataframe = dataframe.preload_associations(associations)

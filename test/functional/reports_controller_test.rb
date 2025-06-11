@@ -43,6 +43,18 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
         end
+
+        should "work when grouping by an associated attribute" do
+          get report_path("posts", search: { group: "uploader.level" })
+
+          assert_response :success
+        end
+
+        should "work when grouping by an associated attribute over time" do
+          get report_path("posts", search: { group: "uploader.level", period: "month" })
+
+          assert_response :success
+        end
       end
 
       context "post approvals report" do

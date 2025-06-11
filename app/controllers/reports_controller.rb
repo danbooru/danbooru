@@ -23,7 +23,7 @@ class ReportsController < ApplicationController
       @model = Post
       @title = "Posts Report"
       @available_columns = { posts: "COUNT(*)", uploaders: "COUNT(distinct uploader_id)" }
-      @available_groups = %w[uploader approver rating is_deleted]
+      @available_groups = %w[uploader uploader.level approver rating is_deleted]
     when "post_approvals"
       @model = PostApproval
       @title = "Post Approvals Report"
@@ -136,6 +136,7 @@ class ReportsController < ApplicationController
 
     ApplicationRecord.set_timeout(@statement_timeout) do
       @group = nil unless @group&.in?(@available_groups)
+      @group_column = @group.to_s.split(".").second || @group
       @columns = @available_columns.slice(*@columns)
       @columns = [@available_columns.first].to_h if @columns.blank?
 
@@ -144,12 +145,13 @@ class ReportsController < ApplicationController
         @x_axis = "date"
       else
         @dataframe = @model.search(params[:search], CurrentUser.user).aggregate(from: @from, to: @to, groups: [@group].compact_blank, limit: @group_limit, columns: @columns)
-        @x_axis = @group
+        @x_axis = @group_column
       end
 
       @dataframe[@group] = @dataframe[@group].map(&:pretty_name) if @group.in?(%w[creator updater uploader banner approver user]) && @dataframe.names.include?(@group)
+      @dataframe["level"] = @dataframe["level"].map { |level| User.level_string(level) } if @dataframe["level"] # XXX hack
       @dataframe["date"] = @dataframe["date"].map(&:to_date) if @dataframe["date"]
-      @dataframe = @dataframe.crosstab("date", @group) if @group && @period.present?
+      @dataframe = @dataframe.crosstab("date", @group_column) if @group_column && @period.present?
     end
 
     respond_with(@dataframe)
