@@ -25,6 +25,9 @@ class ForumTopic < ApplicationRecord
   has_many :tag_implications
   has_many :mod_actions, as: :subject, dependent: :destroy
 
+  normalizes :category, with: ->(category) { category.to_s.titleize.presence }
+  normalizes :min_level, with: ->(min_level) { min_level.to_s.capitalize.presence }
+
   validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
 
   accepts_nested_attributes_for :original_post
@@ -71,7 +74,7 @@ class ForumTopic < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_sticky, :is_locked, :is_deleted, :category, :category_id, :title, :response_count, :creator, :updater, :forum_posts, :bulk_update_requests, :tag_aliases, :tag_implications], current_user: current_user)
+      q = search_attributes(params, %i[id created_at updated_at is_sticky is_locked is_deleted category min_level title response_count creator updater forum_posts bulk_update_requests tag_aliases tag_implications], current_user: current_user)
 
       if params[:is_private].to_s.truthy?
         q = q.private_only

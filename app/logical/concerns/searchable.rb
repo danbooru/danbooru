@@ -549,12 +549,12 @@ module Searchable
       relation = self.relation
 
       if params[name].present?
-        value = params[name].split(/[, ]+/).map(&:downcase)
+        value = params[name].split(/[, ]+/)
         relation = visible(relation, name).where(name => value)
       end
 
       if params[:"#{name}_not"].present?
-        value = params[:"#{name}_not"].split(/[, ]+/).map(&:downcase)
+        value = params[:"#{name}_not"].split(/[, ]+/)
         relation = visible(relation, name).where.not(name => value)
       end
 

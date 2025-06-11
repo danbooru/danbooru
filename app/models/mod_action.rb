@@ -74,6 +74,8 @@ class ModAction < ApplicationRecord
     mass_update: 1000, # XXX unused
   }
 
+  normalizes :category, with: ->(category) { category.to_s.parameterize.underscore.presence }
+
   def self.model_types
     %w[Artist Comment CommentVote ForumPost ForumTopic IpBan ModerationReport Pool Post PostVote Tag TagAlias TagImplication User]
   end

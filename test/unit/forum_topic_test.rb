@@ -89,9 +89,12 @@ class ForumTopicTest < ActiveSupport::TestCase
       should allow_value("General").for(:category)
       should allow_value("Tags").for(:category)
       should allow_value("Bugs & Features").for(:category)
-      should allow_value(0).for(:category_id)
-      should allow_value(1).for(:category_id)
-      should allow_value(2).for(:category_id)
+      should allow_value("general").for(:category)
+      should allow_value("tags").for(:category)
+      should allow_value("bugs & features").for(:category)
+      should allow_value(0).for(:category)
+      should allow_value(1).for(:category)
+      should allow_value(2).for(:category)
 
       should allow_value("None").for(:min_level)
       should allow_value("Member").for(:min_level)
@@ -100,9 +103,19 @@ class ForumTopicTest < ActiveSupport::TestCase
       should allow_value("Moderator").for(:min_level)
       should allow_value("Admin").for(:min_level)
 
+      should allow_value("none").for(:min_level)
+      should allow_value("member").for(:min_level)
+      should allow_value("gold").for(:min_level)
+      should allow_value("builder").for(:min_level)
+      should allow_value("moderator").for(:min_level)
+      should allow_value("admin").for(:min_level)
+
       should allow_value(0).for(:min_level)
       should allow_value(20).for(:min_level)
       should allow_value(30).for(:min_level)
+
+      should_not allow_value("unknown").for(:min_level)
+      should_not allow_value(123_456_789).for(:min_level)
 
       should_not allow_value("unknown").for(:category)
       should_not allow_value(123_456_789).for(:category)

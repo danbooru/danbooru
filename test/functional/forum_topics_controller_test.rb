@@ -164,6 +164,18 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(title_matches: "forum").with { @forum_topic }
           should respond_to_search(title_matches: "bababa").with { [] }
           should respond_to_search(is_sticky: "true").with { @sticky_topic }
+          should respond_to_search(category: "General").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should respond_to_search(category: "general").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should respond_to_search(category: "Tags").with { [] }
+          should respond_to_search(category_id: "0").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should respond_to_search(is_private: "true").with { [] }
+          should respond_to_search(is_private: "false").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should respond_to_search(min_level: "None").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should respond_to_search(min_level: "none").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should respond_to_search(min_level: "0").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should respond_to_search(min_level: "Member").with { [] }
+          should respond_to_search(min_level: "Moderator").with { [] }
+          should respond_to_search(min_level_id: "<10").with { [@forum_topic, @other_topic, @sticky_topic] }
 
           context "using includes" do
             should respond_to_search(forum_posts: {body_matches: "xxx"}).with { @forum_topic }
@@ -179,9 +191,17 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
           end
 
           should respond_to_search({}).with { default_search_order([@sticky_topic, @other_topic, @mod_topic, @forum_topic]) }
+          should respond_to_search(is_private: "false").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should respond_to_search(is_private: "true").with { [@mod_topic] }
+          should respond_to_search(min_level: "None").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should respond_to_search(min_level: "Member").with { [] }
+          should respond_to_search(min_level: "Moderator").with { [@mod_topic] }
+          should respond_to_search(min_level: "0").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should respond_to_search(min_level: User::Levels::MODERATOR.to_s).with { [@mod_topic] }
+          should respond_to_search(min_level_id: ">0").with { [@mod_topic] }
 
           context "using includes" do
-            should respond_to_search(creator_name: "okuu").with { @mod_topic }
+            should respond_to_search(creator_name: "okuu").with { [@mod_topic] }
           end
         end
       end
