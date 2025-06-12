@@ -123,7 +123,7 @@ Post.open_edit_dialog = function() {
   });
   dialog.dialog("widget").draggable("option", "containment", "none");
 
-  var pin_button = $("<button/>").button({icons: {primary: "ui-icon-pin-w"}, label: "pin", text: false});
+  var pin_button = $("<button/>").button({ icon: "ui-icon-pin-w", label: "pin", showLabel: false });
   pin_button.css({width: "20px", height: "20px", position: "absolute", right: "28.4px"});
   dialog.parent().children(".ui-dialog-titlebar").append(pin_button);
   pin_button.on("click.danbooru", function(e) {
