@@ -16,17 +16,8 @@ class DtextInput < SimpleForm::Inputs::Base
 
   def input(wrapper_options)
     t = template
-    merged_input_options = merge_wrapper_options(input_html_options, wrapper_options)
+    input_options = merge_wrapper_options(input_html_options, wrapper_options)
 
-    t.tag.div(class: ["dtext-previewable", ("dtext-inline" if options[:inline])], spellcheck: true) do
-      if options[:inline]
-        t.concat @builder.text_field(attribute_name, merged_input_options)
-      else
-        t.concat @builder.text_area(attribute_name, merged_input_options)
-      end
-
-      t.concat t.tag.div(id: "dtext-preview", class: "dtext-preview prose")
-      t.concat t.tag.span(t.link_to("Formatting help", t.dtext_help_path, remote: true, method: :get), class: "hint dtext-hint")
-    end
+    t.render(DtextEditorComponent.new(input_name: attribute_name, form: @builder, inline: options[:inline], input_options: input_options))
   end
 end

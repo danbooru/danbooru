@@ -1,0 +1,10 @@
+<%= tag.div class: ["dtext-previewable", ("dtext-inline" if inline)], spellcheck: true do %>
+  <% if inline %>
+    <%= form.text_field(input_name, input_options) %>
+  <% else %>
+    <%= form.text_area(input_name, input_options) %>
+  <% end %>
+
+  <div id="dtext-preview" class="dtext-preview prose"></div>
+  <span class="hint dtext-hint"><%= link_to "Formatting help", dtext_help_path, remote: true, method: :get %></span>
+<% end %>
