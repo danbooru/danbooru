@@ -1,3 +1,21 @@
-div.dtext-preview {
-  display: none;
+.dtext-editor {
+  .dtext-editor-menu {
+    border-color: var(--form-input-border-color);
+    background-color: var(--dtext-editor-menu-background-color)
+  }
+
+  textarea, .dtext-preview {
+    width: 60rem;
+    height: 25rem;
+    min-width: 15rem;
+    min-height: 10rem;
+    max-width: 100cqw;
+    outline: none;
+  }
+
+  .dtext-preview {
+    background-color: var(--form-input-background);
+    border-color: var(--form-input-border-color);
+    color: var(--form-input-text-color)
+  }
 }

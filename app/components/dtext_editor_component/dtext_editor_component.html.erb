@@ -1,10 +1,39 @@
-<%= tag.div class: ["dtext-previewable", ("dtext-inline" if inline)], spellcheck: true do %>
-  <% if inline %>
-    <%= form.text_field(input_name, input_options) %>
-  <% else %>
-    <%= form.text_area(input_name, input_options) %>
-  <% end %>
+<% if inline? %>
+  <%= form.text_field(input_name, input_options) %>
+<% else %>
+  <div class="dtext-editor relative w-fit focus-within:outline-auto" spellcheck="true" data-inline="<%= inline? %>" data-media-embeds="<%= media_embeds? %>" x-data="{ editor: new Danbooru.DTextEditor($root) }" x-init="editor.initialize()">
+    <div class="dtext-editor-menu flex justify-between border-t border-x rounded-t w-full">
+      <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.editMode" x-on:click="editor.toggleMode()" title="Preview (Ctrl+P)"><%= eye_icon(class: "text-sm") %> Preview</a>
+      <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.previewMode" x-on:click="editor.toggleMode()" data-shortcut="ctrl+p" title="Edit (Ctrl+P)" x-cloak><%= edit_icon(class: "text-sm") %> Edit</a>
 
-  <div id="dtext-preview" class="dtext-preview prose"></div>
-  <span class="hint dtext-hint"><%= link_to "Formatting help", dtext_help_path, remote: true, method: :get %></span>
+      <div class="flex items-center">
+        <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleBold()" title="Bold (Ctrl+B)"><%= bold_icon %></a>
+        <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleItalic()" title="Italics (Ctrl+I)"><%= italic_icon %></a>
+        <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleQuote()" title="Quote (Ctrl+Q)"><%= quote_icon %></a>
+        <%= render EmojiSelectorComponent.new %>
+
+        <%= render PopupMenuComponent.new do |menu| %>
+          <% menu.with_item do %>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleStrikethrough()" title="Strikethrough (Ctrl+S)"><%= strikethrough_icon %> Strikethrough</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleUnderline()" title="Underline (Ctrl+U)"><%= underline_icon %> Underline</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleNamedLink()" title="Link (Ctrl+L)">Link</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleWikiLink()" title="Wiki link (Ctrl+K)">Wiki link</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleSearchLink()" title="Search link (Ctrl+{)">Search link</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleSpoiler()" title="Spoiler (Ctrl+/)">Spoiler</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleExpand()" title="Expand (Ctrl+E)">Expand</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.insertRule()" title="Horizontal rule">Horizontal rule</a>
+          <% end %>
+        <% end %>
+
+        <%= link_to help_icon, dtext_help_path, class: "p-2 inactive-link focus:outline-0", remote: true, method: :get %>
+      </div>
+    </div>
+
+    <%= form.text_area(input_name, input_options.merge(class: [*input_options[:class], "m-0 thin-scrollbar"], "x-ref": "input", "x-show": "editor.editMode", "x-on:keydown": "editor.onKeyDown($event)")) %>
+
+    <div class="dtext-preview prose p-1 text-sm border overflow-auto thin-scrollbar" x-show="editor.previewMode" x-html="editor.html()" x-bind:class="{ 'opacity-50': editor.loading }" x-cloak></div>
+    <div class="dtext-preview-loading opacity-50 absolute inset-0 flex items-center justify-center" x-show="editor.loading" x-cloak>
+      <%= spinner_icon(class: "text-xxl") %>
+    </div>
+  </div>
 <% end %>

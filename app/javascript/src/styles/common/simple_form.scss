@@ -61,7 +61,7 @@ form.simple_form {
       }
     }
 
-    &.text, &.dtext {
+    &.text {
       .hint {
         padding-left: 0;
         display: block;
@@ -73,7 +73,6 @@ form.simple_form {
         max-height: 15rem;
 
         &.text  { height: 20vh; }
-        &.dtext { height: 40vh; }
       }
     }
 
@@ -254,10 +253,6 @@ div.ui-dialog {
     }
 
     div.input.hidden {
-      display: none;
-    }
-
-    div.dtext-inline span.dtext-hint {
       display: none;
     }
   }

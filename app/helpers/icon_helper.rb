@@ -292,6 +292,30 @@ module IconHelper
     svg_icon_tag("check", viewBox: "0 0 448 512", **options)
   end
 
+  def eye_icon(**options)
+    svg_icon_tag("eye", viewBox: "0 0 576 512", **options)
+  end
+
+  def bold_icon(**options)
+    svg_icon_tag("bold", viewBox: "0 0 384 512", **options)
+  end
+
+  def italic_icon(**options)
+    svg_icon_tag("italic", viewBox: "0 0 384 512", **options)
+  end
+
+  def strikethrough_icon(**options)
+    svg_icon_tag("strikethrough", viewBox: "0 0 512 512", **options)
+  end
+
+  def underline_icon(**options)
+    svg_icon_tag("underline", viewBox: "0 0 448 512", **options)
+  end
+
+  def quote_icon(**options)
+    svg_icon_tag("quote", viewBox: "0 0 448 512", **options)
+  end
+
   def discord_icon(**options)
     image_icon_tag("discord-logo.png", **options)
   end

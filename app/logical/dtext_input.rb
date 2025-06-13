@@ -5,7 +5,6 @@
 # Usage:
 #
 #   <%= f.input :body, as: :dtext %>
-#   <%= f.input :reason, as: :dtext, inline: true %>
 #
 # https://github.com/heartcombo/simple_form/wiki/Custom-inputs-examples
 # https://github.com/heartcombo/simple_form/blob/master/lib/simple_form/inputs/string_input.rb
@@ -14,10 +13,17 @@
 class DtextInput < SimpleForm::Inputs::Base
   enable :placeholder, :maxlength, :minlength
 
+  def initialize(...)
+    super
+    options[:label] = false unless object.send("dtext_#{attribute_name}").inline
+    options[:wrapper_html] ||= {}
+    options[:wrapper_html][:class] = "@container #{options[:wrapper_html][:class]}"
+  end
+
   def input(wrapper_options)
     t = template
     input_options = merge_wrapper_options(input_html_options, wrapper_options)
 
-    t.render(DtextEditorComponent.new(input_name: attribute_name, form: @builder, inline: options[:inline], input_options: input_options))
+    t.render(DtextEditorComponent.new(input_name: attribute_name, form: @builder, input_options: input_options))
   end
 end

@@ -264,11 +264,6 @@ module ApplicationHelper
     CaptchaService.new.captcha_tag(...)
   end
 
-  def dtext_preview_button(preview_field, media_embeds: false, class: nil)
-    klass = binding.local_variable_get(:class)
-    tag.input value: "Preview", type: "button", class: "dtext-preview-button #{klass}", "data-preview-field": preview_field, "data-media-embeds": media_embeds
-  end
-
   def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)
     search_form_for(url, classes: "quick-search-form one-line-form py-1.5 px-3 md:w-180px w-full") do |f|
       out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { id: nil, "data-autocomplete": autocomplete }
