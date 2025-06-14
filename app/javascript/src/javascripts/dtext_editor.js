@@ -34,6 +34,7 @@ export default class DTextEditor {
   root = null; // The root <div class="dtext-editor"> element.
   input = null; // The <input> or <textarea> element for DText input.
   mode = "edit"; // The current mode of the editor, either "edit" or "preview".
+  emojiSearch = ""; // The current search term for the emoji picker.
   domains = []; // The list of the current site's domains. Used for determining which links belong to the current site.
 
   // @param {HTMLElement} root - The root <div class="dtext-editor"> element of the DText editor.
@@ -189,6 +190,17 @@ export default class DTextEditor {
     if (selected) {
       this.input.setSelectionRange(start, start + text.length);
     }
+  }
+
+  // Insert the emoji at the current cursor position.
+  insertEmoji(emoji) {
+    this.insertText(`:${emoji}:`);
+    Danbooru.Shortcuts.hide_tooltips();
+  }
+
+  // @returns {Boolean} True if the given emoji matches the current search term in the emoji picker.
+  emojiMatches(emoji) {
+    return emoji.toLowerCase().includes(this.emojiSearch.toLowerCase().replace(/[^a-zA-Z0-9]/g, ''));
   }
 
   // @returns {String} The currently selected text in the <textarea> element.

@@ -10,7 +10,26 @@
         <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleBold()" title="Bold (Ctrl+B)"><%= bold_icon %></a>
         <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleItalic()" title="Italics (Ctrl+I)"><%= italic_icon %></a>
         <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleWikiLink()" title="Wiki link (Ctrl+K)"><%= double_brackets_icon %></a>
-        <%= render EmojiSelectorComponent.new %>
+
+        <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
+          <% menu.with_button do %>
+            <%= add_reaction_icon("x-on:click": "$nextTick(() => $refs?.emojiPicker?.focus())") %>
+          <% end %>
+
+          <% menu.with_item do %>
+            <div>
+              <input type="text" placeholder="Search emoji..." class="emoji-search w-full mb-2" x-ref="emojiPicker" x-model="editor.emojiSearch" x-on:keyup.escape="Danbooru.Shortcuts.hide_tooltips()">
+
+              <div class="h-225px w-320px thin-scrollbar prose">
+                <% DText::DEFAULT_EMOJI_MAP.each do |name, value| %>
+                  <%= tag.span class: "inline-flex items-center justify-center w-24px h-24px my-0.5 cursor-pointer hover:opacity-50", "x-on:click": "editor.insertEmoji('#{j name}')", "x-show": "editor.emojiMatches('#{j name}')" do %>
+                    <%= tag.emoji value.html_safe, "data-name": name.downcase, "data-mode": "inline", title: ":#{name}:" %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
 
         <span class="mx-2 py-2 border-l"></span>
 
