@@ -316,6 +316,22 @@ module IconHelper
     svg_icon_tag("quote", viewBox: "0 0 448 512", **options)
   end
 
+  def double_brackets_icon(**options)
+    svg_icon_tag("double-brackets", viewBox: "0 0 20 20", **options)
+  end
+
+  def no_double_brackets_icon(**options)
+    svg_icon_tag("no-double-brackets", viewBox: "0 0 20 20", **options)
+  end
+
+  def folder_open_icon(**options)
+    svg_icon_tag("folder-open", viewBox: "0 0 576 512", **options)
+  end
+
+  def horizontal_line_icon(**options)
+    svg_icon_tag("horizontal-line", viewBox: "0 0 24 24", **options)
+  end
+
   def discord_icon(**options)
     image_icon_tag("discord-logo.png", **options)
   end

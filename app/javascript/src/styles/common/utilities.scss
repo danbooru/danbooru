@@ -113,6 +113,7 @@ $spacer: 0.25rem; /* 4px */
 .border-b   { border-bottom-width: 1px; }
 .border-b-2 { border-bottom-width: 0.5 * $spacer; }
 .border-t   { border-top-width: 1px; }
+.border-l   { border-left-width: 1px; }
 .border-x   { border-left-width: 1px; border-right-width: 1px; }
 
 .border-current { border-color: currentcolor; }

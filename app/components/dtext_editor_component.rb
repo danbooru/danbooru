@@ -4,7 +4,7 @@
 class DtextEditorComponent < ApplicationComponent
   attr_reader :input_name, :form, :input_options
 
-  delegate :eye_icon, :bold_icon, :italic_icon, :strikethrough_icon, :underline_icon, :quote_icon, to: :helpers
+  delegate :eye_icon, :bold_icon, :italic_icon, :strikethrough_icon, :underline_icon, :exclamation_icon, :search_icon, :folder_open_icon, :quote_icon, :code_icon, :double_brackets_icon, :no_double_brackets_icon, :horizontal_line_icon, to: :helpers
 
   # @param input_name [String] The name attribute for the <input> or <textarea> element.
   # @param form [SimpleForm::FormBuilder] The form builder instance.

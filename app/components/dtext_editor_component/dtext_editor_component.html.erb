@@ -9,19 +9,23 @@
       <div class="flex items-center">
         <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleBold()" title="Bold (Ctrl+B)"><%= bold_icon %></a>
         <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleItalic()" title="Italics (Ctrl+I)"><%= italic_icon %></a>
-        <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleQuote()" title="Quote (Ctrl+Q)"><%= quote_icon %></a>
+        <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleWikiLink()" title="Wiki link (Ctrl+K)"><%= double_brackets_icon %></a>
         <%= render EmojiSelectorComponent.new %>
+
+        <span class="mx-2 py-2 border-l"></span>
 
         <%= render PopupMenuComponent.new do |menu| %>
           <% menu.with_item do %>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleStrikethrough()" title="Strikethrough (Ctrl+S)"><%= strikethrough_icon %> Strikethrough</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleUnderline()" title="Underline (Ctrl+U)"><%= underline_icon %> Underline</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleNamedLink()" title="Link (Ctrl+L)">Link</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleWikiLink()" title="Wiki link (Ctrl+K)">Wiki link</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleSearchLink()" title="Search link (Ctrl+{)">Search link</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleSpoiler()" title="Spoiler (Ctrl+/)">Spoiler</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleExpand()" title="Expand (Ctrl+E)">Expand</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.insertRule()" title="Horizontal rule">Horizontal rule</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleStrikethrough()" title="Strikethrough (Ctrl+S)"><%= strikethrough_icon %>Strikethrough</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleUnderline()" title="Underline (Ctrl+U)"><%= underline_icon %>Underline</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleNamedLink()" title="External link (Ctrl+L)"><%= link_icon %>External link</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleSearchLink()" title="Search link (Ctrl+{)"><%= search_icon %>Search link</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleSpoiler()" title="Spoiler (Ctrl+/)"><%= exclamation_icon %>Spoiler</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleExpand()" title="Expand (Ctrl+E)"><%= folder_open_icon %>Expand</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleQuote()" title="Quote (Ctrl+Q)"><%= quote_icon %>Quote</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleCode()" title="Code (Ctrl+M)"><%= code_icon %>Code</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.insertRule()" title="Horizontal rule"><%= horizontal_line_icon %>Horizontal rule</a>
+            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleNoDText()" title="No formatting"><%= no_double_brackets_icon %>No formatting</a>
           <% end %>
         <% end %>
 

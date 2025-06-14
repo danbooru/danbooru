@@ -13,6 +13,7 @@ export default class DTextEditor {
     "/": (editor) => editor.toggleSpoiler(),
     "q": (editor) => editor.toggleQuote(),
     "e": (editor) => editor.toggleExpand(),
+    "m": (editor) => editor.toggleCode(),
   }
 
   root = null; // The root <div class="dtext-editor"> element.
@@ -57,6 +58,8 @@ export default class DTextEditor {
   insertRule()          { this.insertMarkup("\n[hr]\n"); }
   toggleQuote()         { this.toggleBlock("[quote]", "[/quote]"); }
   toggleExpand()        { this.toggleBlock("[expand]", "[/expand]"); }
+  toggleCode()          { this.toggleBlock("[code]", "[/code]"); }
+  toggleNoDText()       { this.toggleBlock("[nodtext]", "[/nodtext]"); }
 
   // Toggle `startTag` and `endTag` around the currently selected text.
   toggleInline(startTag, endTag) {
