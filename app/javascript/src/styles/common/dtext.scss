@@ -32,7 +32,7 @@
     font-size: var(--text-md);
   }
 
-  > hr {
+  hr:not(.ugoira-container *) {
     // Same total height as <p> element: 0.75rem = <p> bottom margin, 1.25em = <p> line-height.
     height: 1px;
     margin: calc((0.75rem + 1.25em - 1px) / 2) auto;
@@ -61,7 +61,7 @@
     &[align="justify"] { text-align: justify !important; }
   }
 
-  > ul {
+  ul:not(.ugoira-container *) {
     margin-left: 1em;
 
     ul {
