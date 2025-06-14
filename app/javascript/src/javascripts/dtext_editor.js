@@ -16,19 +16,36 @@ export default class DTextEditor {
     "m": (editor) => editor.toggleCode(),
   }
 
+  // The list of URLs that will be converted to DText links when pasted into the editor.
+  static SHORTLINKS = new Map([
+    [/^\/artists\/(\d+)$/,              (id) => `artist #${id}`],
+    [/^\/bulk_update_requests\/(\d+)$/, (id) => `bur #${id}`],
+    [/^\/comments\/(\d+)$/,             (id) => `comment #${id}`],
+    [/^\/forum_posts\/(\d+)$/,          (id) => `forum #${id}`],
+    [/^\/forum_topics\/(\d+)$/,         (id) => `topic #${id}`],
+    [/^\/media_assets\/(\d+)$/,         (id) => `asset #${id}`],
+    [/^\/notes\/(\d+)$/,                (id) => `note #${id}`],
+    [/^\/pools\/(\d+)$/,                (id) => `pool #${id}`],
+    [/^\/posts\/(\d+)$/,                (id) => `post #${id}`],
+    [/^\/wiki_pages\/([^.]+)$/,         (title) => `[[${title.replace(/_/g, " ")}]]`],
+    [/^\/users\/(\d+)$/,                (id) => `user #${id}`],
+  ]);
+
   root = null; // The root <div class="dtext-editor"> element.
   input = null; // The <input> or <textarea> element for DText input.
   mode = "edit"; // The current mode of the editor, either "edit" or "preview".
-  _html = ""; // The cached HTML representation of the DText input.
+  domains = []; // The list of the current site's domains. Used for determining which links belong to the current site.
 
   // @param {HTMLElement} root - The root <div class="dtext-editor"> element of the DText editor.
   constructor(root) {
     this.root = root;
     this.input = root.querySelector("input.dtext, textarea.dtext");
+    this.dtext = this.input.value;
   }
 
-  initialize() {
+  initialize({ domains = [] } = {}) {
     this.root.editor = this;
+    this.domains = domains;
   }
 
   // Toggle between "edit" and "preview" modes.
@@ -138,6 +155,28 @@ export default class DTextEditor {
     }
   }
 
+  // Handle paste events. Convert links to DText format.
+  onPaste(event) {
+    let text = event.clipboardData.getData("text");
+
+    if (URL.canParse(text) && this.domains.includes(URL.parse(text).hostname)) {
+      let url = URL.parse(text);
+      let path = decodeURIComponent(url.pathname);
+      let [regex, formatter] = DTextEditor.SHORTLINKS.entries().find(([regex, _formatter]) => path.match(regex)) || [];
+      let dtext = formatter?.(path.match(regex)[1]);
+
+      if (dtext) {
+        this.insertText(dtext);
+        event.preventDefault();
+      }
+    }
+  }
+
+  // @param {String} text - The text to insert at the current cursor position.
+  insertText(text) {
+    document.execCommand("insertText", false, text);
+  }
+
   // @returns {String} The currently selected text in the <textarea> element.
   get selectedText() {
     return this.input.value.substring(this.input.selectionStart, this.input.selectionEnd);
@@ -183,13 +222,13 @@ export default class DTextEditor {
     return [prefix, suffix];
   }
 
-  // @returns {String} The cached HTML representation of the DText input.
+  // @returns {String} The HTML representation of the DText input.
   async html() {
     if (this.previewMode) {
-      this._html = await this.fetchHtml();
+      return await this.fetchHtml();
+    } else {
+      return "";
     }
-
-    return this._html;
   }
 
   // @returns {String} The HTML representation of the DText input.

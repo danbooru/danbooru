@@ -18,13 +18,23 @@ class DtextEditorComponent < ApplicationComponent
     @input_html = input_html.to_h
   end
 
+  # @return [DText] The DText object associated with the editor.
+  def dtext
+    form.object.send("dtext_#{input_name}")
+  end
+
+  # @return [Array<String>] The list of the current site's domain names. Used for determining which links belong to the current site.
+  def domains
+    [dtext.domain, *dtext.alternate_domains].compact_blank.uniq
+  end
+
   # @return [Boolean] Whether the DText field is a single-line <input> or a multi-line <textarea>.
   def inline?
-    form.object.send("dtext_#{input_name}").inline
+    dtext.inline
   end
 
   # @return [Boolean] Whether media embeds are enabled for the DText field.
   def media_embeds?
-    form.object.send("dtext_#{input_name}").media_embeds
+    dtext.media_embeds
   end
 end

@@ -16,8 +16,8 @@ class DText
 
   # post #1234, pixiv #1234, etc. The canonical list is in lib/dtext_rb/ext/dtext/dtext.cpp.rl.
   SHORTLINKS = %w[
-    alias appeal artist asset ban bur comment dmail dmail favgroup feedback flag forum implication mod action modreport
-    note pool post topic topic user wiki
+    alias appeal artist asset ban bur comment dmail favgroup feedback flag forum implication mod\ action modreport
+    note pool post topic user wiki
     issue pull commit
     artstation deviantart gelbooru nijie pawoo pixiv pixiv sankaku seiga twitter yandere
   ]
