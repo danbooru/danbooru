@@ -61,7 +61,6 @@ Rails.application.routes.draw do
     end
     collection do
       get :show_or_new
-      get :banned
     end
   end
   resources :artist_urls, only: [:index]

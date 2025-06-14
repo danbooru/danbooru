@@ -2,7 +2,8 @@ require "test_helper"
 
 class MediaAssetComponentTest < ViewComponent::TestCase
   def render_component(media_asset, **options)
-    render_inline(MediaAssetComponent.new(media_asset: media_asset, **options))
+    user = create(:user)
+    render_inline(MediaAssetComponent.new(media_asset: media_asset, current_user: user, **options))
   end
 
   context "The MediaAssetComponent" do
@@ -26,7 +27,7 @@ class MediaAssetComponentTest < ViewComponent::TestCase
 
     context "for a ugoira" do
       should "render the ugoira" do
-        media_asset = create(:media_asset, file_ext: "zip")
+        media_asset = create(:media_asset, file: MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip"))
         node = render_component(media_asset)
 
         assert_equal(media_asset.variant(:sample).file_url, node.css(".media-asset-component video").attr("src").value)

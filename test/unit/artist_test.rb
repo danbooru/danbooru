@@ -72,7 +72,6 @@ class ArtistTest < ActiveSupport::TestCase
         assert_equal(true, @artist.reload.is_banned?)
         assert_equal(true, @post.reload.is_banned?)
         assert_equal(true, @artist.versions.last.is_banned?)
-        assert_equal(true, TagImplication.active.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
 
         @artist.unban!(@admin)
 
@@ -80,8 +79,6 @@ class ArtistTest < ActiveSupport::TestCase
         assert_equal(false, @post.reload.is_banned?)
         assert_equal(false, @artist.versions.last.is_banned?)
         assert_equal("aaa", @post.tag_string)
-        assert_equal(false, TagImplication.active.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
-        assert_equal(true, TagImplication.deleted.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
         assert_equal(true, ModAction.artist_unban.exists?(subject: @artist))
       end
 
@@ -93,20 +90,6 @@ class ArtistTest < ActiveSupport::TestCase
         refute(@post.is_deleted?)
       end
 
-      should "create a new tag implication" do
-        assert_equal(1, TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").count)
-        assert_equal("aaa banned_artist", @post.reload.tag_string)
-      end
-
-      should "create the banned_artist tag if it doesn't already exist" do
-        assert_equal(true, Tag.exists?(name: "banned_artist", category: Tag.categories.artist))
-      end
-
-      should "set the approver of the banned_artist implication" do
-        ta = TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").first
-        assert_equal(@admin.id, ta.approver.id)
-      end
-
       should "update the artist history" do
         assert_equal(true, @artist.reload.is_banned?)
         assert_equal(true, @artist.versions.last.is_banned?)
@@ -114,7 +97,6 @@ class ArtistTest < ActiveSupport::TestCase
 
       should "tag the posts" do
         assert_equal(true, @post.reload.is_banned?)
-        assert_equal(true, @post.has_tag?("banned_artist"))
       end
 
       should "create a mod action" do

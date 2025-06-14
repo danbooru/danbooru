@@ -44,7 +44,7 @@ module TagRelationshipRetirementService
   end
 
   def inactive_implications
-    TagImplication.active.empty.where.not(consequent_name: "banned_artist")
+    TagImplication.active.empty
   end
 
   def inactive_gentag_aliases

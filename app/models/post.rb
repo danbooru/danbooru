@@ -299,7 +299,7 @@ class Post < ApplicationRecord
     end
 
     def autoban
-      if has_tag?("banned_artist") || has_tag?("paid_reward")
+      if has_tag?("paid_reward") || tags.any? { |tag| tag.artist? && tag.artist&.is_banned? }
         self.is_banned = true
       end
     end

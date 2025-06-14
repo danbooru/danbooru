@@ -195,10 +195,7 @@ class Artist < ApplicationRecord
   module BanMethods
     def unban!(current_user)
       with_lock do
-        ti = TagImplication.active.find_by(antecedent_name: name, consequent_name: "banned_artist")
-        ti&.update!(status: "deleted")
-
-        BulkUpdateRequestProcessor.mass_update(name, "-status:banned -banned_artist", user: current_user)
+        BulkUpdateRequestProcessor.mass_update(name, "-status:banned", user: current_user)
 
         CurrentUser.scoped(current_user) { update!(is_banned: false) }
         ModAction.log("unbanned artist ##{id}", :artist_unban, subject: self, user: current_user)
@@ -208,11 +205,6 @@ class Artist < ApplicationRecord
     def ban!(banner)
       with_lock do
         BulkUpdateRequestProcessor.mass_update(name, "status:banned", user: banner)
-
-        unless TagImplication.active.exists?(antecedent_name: name, consequent_name: "banned_artist")
-          Tag.find_or_create_by_name("banned_artist", category: "artist", current_user: banner)
-          TagImplication.approve!(antecedent_name: name, consequent_name: "banned_artist", approver: banner)
-        end
 
         CurrentUser.scoped(banner) { update!(is_banned: true) }
         ModAction.log("banned artist ##{id}", :artist_ban, subject: self, user: banner)

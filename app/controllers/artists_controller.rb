@@ -13,11 +13,6 @@ class ArtistsController < ApplicationController
     respond_with(@artist)
   end
 
-  def banned
-    authorize Artist
-    redirect_to artists_path(search: { is_banned: "true", order: "updated_at" }, format: request.format.symbol)
-  end
-
   def ban
     @artist = authorize Artist.find(params[:id])
     @artist.ban!(CurrentUser.user)

@@ -4,7 +4,6 @@
   <% if policy(Artist).create? %>
     <%= subnav_link_to "New", new_artist_path %>
   <% end %>
-  <%= subnav_link_to "Banned", artists_path(search: { is_banned: "true", order: "updated_at" }) %>
   <%= subnav_link_to "Changes", artist_versions_path %>
   <%= subnav_link_to "URLs", artist_urls_path %>
   <% if @artist && !@artist.new_record? && (!@artist.is_banned? || policy(@artist).can_view_banned?) %>

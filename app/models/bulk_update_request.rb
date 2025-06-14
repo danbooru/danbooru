@@ -4,6 +4,7 @@ class BulkUpdateRequest < ApplicationRecord
   STATUSES = %w[pending approved rejected processing failed]
 
   attr_accessor :title, :reason
+  dtext_attribute :reason # defines :dtext_reason
 
   belongs_to :user
   belongs_to :forum_topic, optional: true

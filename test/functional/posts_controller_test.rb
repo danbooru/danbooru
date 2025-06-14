@@ -750,8 +750,10 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("https://www.example.com", @post.source)
       end
 
-      should "autoban the post when it is tagged banned_artist" do
-        @post = create_post!(tag_string: "banned_artist")
+      should "autoban the post when it is from a banned artist" do
+        artist = create(:artist, is_banned: true)
+        @post = create_post!(tag_string: artist.name)
+
         assert_equal(true, @post.is_banned?)
       end
 

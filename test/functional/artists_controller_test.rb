@@ -119,13 +119,6 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "banned action" do
-      should "redirect to a banned search" do
-        get banned_artists_path
-        assert_response :redirect
-      end
-    end
-
     context "ban action" do
       should "ban an artist" do
         perform_enqueued_jobs do
@@ -134,7 +127,6 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to(@artist)
         assert_equal(true, @artist.reload.is_banned?)
-        assert_equal(true, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist", status: "active"))
       end
 
       should "not allow non-admins to ban artists" do
@@ -151,7 +143,6 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to(@artist)
         assert_equal(false, @artist.reload.is_banned?)
-        assert_equal(true, TagImplication.deleted.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
       end
     end
 

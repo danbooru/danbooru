@@ -35,7 +35,7 @@ class TagSetPresenter
     copyrights = copyrights.to_sentence
     copyrights = "(#{copyrights})" if characters.present? && copyrights.present?
 
-    artists = tags_for_category("artist").map(&:name).grep_v("banned_artist").to_sentence
+    artists = tags_for_category("artist").map(&:name).to_sentence
     artists = "drawn by #{artists}" if artists.present?
 
     "#{characters} #{copyrights} #{artists}".gsub(/\s+/, " ").strip

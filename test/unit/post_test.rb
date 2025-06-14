@@ -430,8 +430,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "with a banned artist" do
         should "ban the post" do
-          artist = create(:artist)
-          implication = create(:tag_implication, antecedent_name: artist.name, consequent_name: "banned_artist")
+          artist = create(:artist, is_banned: true)
           post = create(:post, tag_string: artist.name)
 
           assert_equal(true, post.is_banned?)
