@@ -130,8 +130,9 @@ export default class DTextEditor {
 
   // Handle keyboard shortcuts.
   onKeyDown(event) {
-    if (event.ctrlKey && DTextEditor.KEYS[event.key]) {
-      let handler = DTextEditor.KEYS[event.key];
+    let handler = DTextEditor.KEYS[event.key.toLowerCase()];
+
+    if (event.ctrlKey && !event.shiftKey && handler) {
       handler(this);
       event.preventDefault();
     }
