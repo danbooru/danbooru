@@ -88,22 +88,21 @@ export default class DTextEditor {
     // If no text is selected, but we're inside a tag, then remove the nearest surrounding tags.
     if (this.selectedText.length === 0 && prefix.length > 0 && suffix.length > 0) {
       selectedText = `${prefix}${selectedText}${suffix}`;
-      this.input.setRangeText(selectedText.substring(startTag.length, selectedText.length - endTag.length), start - prefix.length, end + suffix.length, "select");
+      this.insertText(selectedText.substring(startTag.length, selectedText.length - endTag.length), start - prefix.length, end + suffix.length);
 
-      // If the cursor was inside a single word, preserve the cursor position and leave the word unselected.
-      if (!selectedText.match(/\s/)) {
+      // If the tag contained multiple words, select all the text between the tags.
+      if (selectedText.match(/\s/)) {
+        this.input.setSelectionRange(start - prefix.length, end + suffix.length - endTag.length - startTag.length);
+      // If the tag contained a single word, preserve the cursor position and leave the word unselected.
+      } else {
         this.input.setSelectionRange(start - startTag.length, start - startTag.length);
       }
-
-      this.input.focus();
     // If the selected text includes the tags, remove them.
     } else if (selectedText.startsWith(startTag) && selectedText.endsWith(endTag)) {
-      this.input.setRangeText(selectedText.substring(startTag.length, selectedText.length - endTag.length), start, end, "select");
-      this.input.focus();
+      this.insertText(selectedText.substring(startTag.length, selectedText.length - endTag.length), start, end);
     // If the selected text is immediately surrounded by the tags, remove them.
     } else if (this.input.value.substring(start - startTag.length, end + endTag.length) === `${startTag}${selectedText}${endTag}`) {
-      this.input.setRangeText(selectedText, start - startTag.length, end + endTag.length, "select");
-      this.input.focus();
+      this.insertText(selectedText, start - startTag.length, end + endTag.length);
     // Otherwise, insert the tags around the selected text or the current word.
     } else {
       this.insertMarkup(startTag, endTag);
@@ -129,7 +128,7 @@ export default class DTextEditor {
       let caret = this.input.selectionStart + startTag.length;
 
       selectedText = `${prefix}${suffix}`;
-      this.input.setRangeText(`${startTag}${selectedText}${endTag}`, start, end);
+      this.insertText(`${startTag}${selectedText}${endTag}`, start, end);
       this.input.setSelectionRange(caret, caret);
 
     // If text is selected, insert the tags around the selected text, ignoring surrounding whitespace.
@@ -138,11 +137,9 @@ export default class DTextEditor {
       let end = this.input.selectionEnd - (selectedText.length - selectedText.trimEnd().length);
 
       selectedText = selectedText.trim();
-      this.input.setRangeText(`${startTag}${selectedText}${endTag}`, start, end);
+      this.insertText(`${startTag}${selectedText}${endTag}`, start, end);
       this.input.setSelectionRange(start + startTag.length, start + startTag.length + selectedText.length);
     }
-
-    this.input.focus();
   }
 
   // Handle keyboard shortcuts.
@@ -172,9 +169,26 @@ export default class DTextEditor {
     }
   }
 
-  // @param {String} text - The text to insert at the current cursor position.
-  insertText(text) {
-    document.execCommand("insertText", false, text);
+  // Insert the specified text, replacing the text between the `start` and `end` positions (by default, the currently selected text).
+  insertText(text, start = this.input.selectionStart, end = this.input.selectionEnd) {
+    let selected = this.input.selectionStart !== this.input.selectionEnd;
+
+    this.input.focus();
+
+    if (start !== this.input.selectionStart || end !== this.input.selectionEnd) {
+      this.input.setSelectionRange(start, end);
+    }
+
+    if (text.length > 0) {
+      // Use execCommand so that the undo history is updated.
+      document.execCommand("insertText", false, text);
+      // this.input.setRangeText(text, start, end, "select");
+    }
+
+    // Select the new text if the replaced text was previously selected.
+    if (selected) {
+      this.input.setSelectionRange(start, start + text.length);
+    }
   }
 
   // @returns {String} The currently selected text in the <textarea> element.
