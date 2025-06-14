@@ -63,13 +63,28 @@ export default class DTextEditor {
     let selectedText = this.selectedText;
     let start = this.input.selectionStart;
     let end = this.input.selectionEnd;
+    let [prefix, suffix] = this.expandedSelection(startTag, endTag);
 
-    if (selectedText.startsWith(startTag) && selectedText.endsWith(endTag)) {
+    // If no text is selected, but we're inside a tag, then remove the nearest surrounding tags.
+    if (this.selectedText.length === 0 && prefix.length > 0 && suffix.length > 0) {
+      selectedText = `${prefix}${selectedText}${suffix}`;
+      this.input.setRangeText(selectedText.substring(startTag.length, selectedText.length - endTag.length), start - prefix.length, end + suffix.length, "select");
+
+      // If the cursor was inside a single word, preserve the cursor position and leave the word unselected.
+      if (!selectedText.match(/\s/)) {
+        this.input.setSelectionRange(start - startTag.length, start - startTag.length);
+      }
+
+      this.input.focus();
+    // If the selected text includes the tags, remove them.
+    } else if (selectedText.startsWith(startTag) && selectedText.endsWith(endTag)) {
       this.input.setRangeText(selectedText.substring(startTag.length, selectedText.length - endTag.length), start, end, "select");
       this.input.focus();
+    // If the selected text is immediately surrounded by the tags, remove them.
     } else if (this.input.value.substring(start - startTag.length, end + endTag.length) === `${startTag}${selectedText}${endTag}`) {
       this.input.setRangeText(selectedText, start - startTag.length, end + endTag.length, "select");
       this.input.focus();
+    // Otherwise, insert the tags around the selected text or the current word.
     } else {
       this.insertMarkup(startTag, endTag);
     }
@@ -79,15 +94,34 @@ export default class DTextEditor {
     this.toggleInline(`\n${startTag}\n`, `\n${endTag}\n`);
   }
 
-  // Insert `startTag` and `endTag` around the currently selected text. Leading or trailing whitespace is not included in the selection.
+  // Insert `startTag` and `endTag` around the currently selected text, or around the current word if no text is
+  // selected. Surrounding whitespace is ignored.
   insertMarkup(startTag, endTag = "") {
     let selectedText = this.selectedText;
-    let start = this.input.selectionStart + (selectedText.length - selectedText.trimStart().length);
-    let end = this.input.selectionEnd - (selectedText.length - selectedText.trimEnd().length);
 
-    selectedText = selectedText.trim();
-    this.input.setRangeText(`${startTag}${selectedText}${endTag}`, start, end);
-    this.input.setSelectionRange(start + startTag.length, start + startTag.length + selectedText.length);
+    // If no text is selected, insert the tags around the current word.
+    if (selectedText.length === 0) {
+      let prefix = this.selectionPrefix.match(/[a-zA-Z0-9_]*$/)[0] || "";
+      let suffix = this.selectionSuffix.match(/^[a-zA-Z0-9_]*/)[0] || "";
+
+      let start = this.input.selectionStart - prefix.length;
+      let end = this.input.selectionEnd + suffix.length;
+      let caret = this.input.selectionStart + startTag.length;
+
+      selectedText = `${prefix}${suffix}`;
+      this.input.setRangeText(`${startTag}${selectedText}${endTag}`, start, end);
+      this.input.setSelectionRange(caret, caret);
+
+    // If text is selected, insert the tags around the selected text, ignoring surrounding whitespace.
+    } else {
+      let start = this.input.selectionStart + (selectedText.length - selectedText.trimStart().length);
+      let end = this.input.selectionEnd - (selectedText.length - selectedText.trimEnd().length);
+
+      selectedText = selectedText.trim();
+      this.input.setRangeText(`${startTag}${selectedText}${endTag}`, start, end);
+      this.input.setSelectionRange(start + startTag.length, start + startTag.length + selectedText.length);
+    }
+
     this.input.focus();
   }
 
@@ -103,6 +137,46 @@ export default class DTextEditor {
   // @returns {String} The currently selected text in the <textarea> element.
   get selectedText() {
     return this.input.value.substring(this.input.selectionStart, this.input.selectionEnd);
+  }
+
+  // @returns {String} The text before the current selection.
+  get selectionPrefix() {
+    return this.input.value.substring(0, this.input.selectionStart);
+  }
+
+  // @returns {String} The text after the current selection.
+  get selectionSuffix() {
+    return this.input.value.substring(this.input.selectionEnd);
+  }
+
+  // @returns {String} The line of text before the current selection.
+  get selectionPrefixLine() {
+    return this.selectionPrefix.split(/[\r\n]+/).at(-1) || "";
+  }
+
+  // @returns {String} The line of text after the current selection.
+  get selectionSuffixLine() {
+    return this.selectionSuffix.split(/[\r\n]+/).at(0) || "";
+  }
+
+  // @returns {Array} The current selection expanded outwards to include the nearest start and end tags on the current line (if present).
+  expandedSelection(startTag, endTag) {
+    let prefix = "";
+    let suffix = "";
+    let prefixLine = this.selectionPrefixLine;
+    let suffixLine = this.selectionSuffixLine;
+
+    let start = prefixLine.lastIndexOf(startTag);
+    if (start !== -1 && start > prefixLine.lastIndexOf(endTag)) {
+      prefix = prefixLine.substring(start);
+    }
+
+    let end = suffixLine.indexOf(endTag);
+    if (end !== -1 && (end < suffixLine.indexOf(startTag) || suffixLine.indexOf(startTag) === -1)) {
+      suffix = suffixLine.substring(0, end + endTag.length);
+    }
+
+    return [prefix, suffix];
   }
 
   // @returns {String} The cached HTML representation of the DText input.
