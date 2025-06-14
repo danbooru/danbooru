@@ -6,7 +6,7 @@
       <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.editMode" x-on:click="editor.toggleMode()" title="Preview (Ctrl+P)"><%= eye_icon(class: "text-sm") %> Preview</a>
       <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.previewMode" x-on:click="editor.toggleMode()" data-shortcut="ctrl+p" title="Edit (Ctrl+P)" x-cloak><%= edit_icon(class: "text-sm") %> Edit</a>
 
-      <div class="flex items-center">
+      <div class="flex items-center" x-show="editor.editMode">
         <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleBold()" title="Bold (Ctrl+B)"><%= bold_icon %></a>
         <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleItalic()" title="Italics (Ctrl+I)"><%= italic_icon %></a>
         <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleWikiLink()" title="Wiki link (Ctrl+K)"><%= double_brackets_icon %></a>
