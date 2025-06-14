@@ -4,7 +4,7 @@
     <%= f.input :category, collection: ForumTopic.categories.keys, selected: forum_topic.category %>
 
     <%= f.simple_fields_for :original_post do |pf| %>
-      <%= pf.input :body, as: :dtext %>
+      <%= pf.input :body, as: :dtext, editor_html: { class: "dtext-editor-large" } %>
     <% end %>
 
     <% if policy(forum_topic).moderate? %>

@@ -1,5 +1,5 @@
 <%= edit_form_for(forum_post, namespace: "forum_post_#{forum_post.id}") do |f| %>
-  <%= f.input :body, label: false, as: :dtext %>
+  <%= f.input :body, as: :dtext, editor_html: { class: "dtext-editor-large" } %>
 
   <%= f.button :submit, "Submit", class: "button-primary" %>
 <% end %>

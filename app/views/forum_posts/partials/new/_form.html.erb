@@ -5,7 +5,7 @@
     <%= f.input :topic_id, :label => "Topic ID" %>
   <% end %>
 
-  <%= f.input :body, label: false, as: :dtext %>
+  <%= f.input :body, as: :dtext, editor_html: { class: "dtext-editor-large" } %>
 
   <%= f.button :submit, "Submit", class: "button-primary" %>
 <% end %>

@@ -1,7 +1,7 @@
 <% if inline? %>
-  <%= form.text_field(input_name, input_options) %>
+  <%= form.text_field(input_name, input_html) %>
 <% else %>
-  <div class="dtext-editor relative w-fit focus-within:outline-auto" spellcheck="true" data-inline="<%= inline? %>" data-media-embeds="<%= media_embeds? %>" x-data="{ editor: new Danbooru.DTextEditor($root) }" x-init="editor.initialize()">
+  <div class="dtext-editor relative w-fit focus-within:outline-auto <%= editor_html[:class] %>" spellcheck="true" data-inline="<%= inline? %>" data-media-embeds="<%= media_embeds? %>" x-data="{ editor: new Danbooru.DTextEditor($root) }" x-init="editor.initialize()">
     <div class="dtext-editor-menu flex justify-between border-t border-x rounded-t w-full">
       <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.editMode" x-on:click="editor.toggleMode()" title="Preview (Ctrl+P)"><%= eye_icon(class: "text-sm") %> Preview</a>
       <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.previewMode" x-on:click="editor.toggleMode()" data-shortcut="ctrl+p" title="Edit (Ctrl+P)" x-cloak><%= edit_icon(class: "text-sm") %> Edit</a>
@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <%= form.text_area(input_name, input_options.merge(class: [*input_options[:class], "m-0 thin-scrollbar"], "x-ref": "input", "x-show": "editor.editMode", "x-on:keydown": "editor.onKeyDown($event)")) %>
+    <%= form.text_area(input_name, input_html.merge(class: [*input_html[:class], "m-0 p-1 thin-scrollbar"], "x-ref": "input", "x-show": "editor.editMode", "x-on:keydown": "editor.onKeyDown($event)")) %>
 
     <div class="dtext-preview prose p-1 text-sm border overflow-auto thin-scrollbar" x-show="editor.previewMode" x-html="editor.html()" x-bind:class="{ 'opacity-50': editor.loading }" x-cloak></div>
     <div class="dtext-preview-loading opacity-50 absolute inset-0 flex items-center justify-center" x-show="editor.loading" x-cloak>

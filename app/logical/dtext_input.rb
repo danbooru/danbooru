@@ -24,6 +24,6 @@ class DtextInput < SimpleForm::Inputs::Base
     t = template
     input_options = merge_wrapper_options(input_html_options, wrapper_options)
 
-    t.render(DtextEditorComponent.new(input_name: attribute_name, form: @builder, input_options: input_options))
+    t.render(DtextEditorComponent.new(input_name: attribute_name, form: @builder, editor_html: options[:editor_html], input_html: input_options))
   end
 end

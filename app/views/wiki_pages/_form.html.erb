@@ -6,7 +6,7 @@
       <%= f.input :other_names_string, as: :string, label: "Other names (#{link_to_wiki "help", "help:translated_tags"})".html_safe, hint: "Names used for this tag on other sites such as Pixiv. Separate with spaces." %>
     <% end %>
 
-    <%= f.input :body, as: :dtext %>
+    <%= f.input :body, as: :dtext, editor_html: { class: "dtext-editor-large" } %>
 
     <% if policy(@wiki_page).can_edit_locked? %>
       <%= f.input :is_locked, label: "Locked", hint: "Locked wikis can only be edited by Builders." %>

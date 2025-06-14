@@ -6,11 +6,19 @@
 
   textarea, .dtext-preview {
     width: 60rem;
-    height: 25rem;
-    min-width: 15rem;
-    min-height: 10rem;
+    height: 10rem;
+    min-width: 18rem;
+    min-height: 3rem;
+    max-height: 90vh;
     max-width: 100cqw;
+    line-height: 1.25em;
     outline: none;
+  }
+
+  &.dtext-editor-large {
+    textarea, .dtext-preview {
+      height: 25rem;
+    }
   }
 
   .dtext-preview {
