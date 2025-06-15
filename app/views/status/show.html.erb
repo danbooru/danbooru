@@ -3,6 +3,28 @@
     <h1>Status</h1>
 
     <h2 class="flex gap-2 items-center">
+      Version <span><span class="chip-green text-success text-sm">Ok</span></span>
+    </h2>
+
+    <details>
+      <summary>
+        Version:
+
+        <% if @status.danbooru_version.present? && Danbooru.config.source_code_url.present? %>
+          <%= external_link_to "#{Danbooru.config.source_code_url}/commits/#{@status.danbooru_version}", @status.danbooru_version.first(7) %>
+
+          <% if @status.docker_image_build_date.present? %>
+            (updated <%= time_ago_in_words_tagged(@status.docker_image_build_date) %>)
+          <% end %>
+        <% else %>
+          <i>Unknown</i>
+        <% end %>
+      </summary>
+
+      <%= render "list", hash: @status.serializable_hash[:version] %>
+    </details>
+
+    <h2 class="flex gap-2 items-center">
       Instance
 
       <span>
@@ -16,12 +38,7 @@
 
     <details>
       <summary>
-        Running
-        <% if @status.danbooru_version.present? && Danbooru.config.source_code_url.present? %>
-          <%= external_link_to "#{Danbooru.config.source_code_url}/commits/#{@status.danbooru_version}", @status.danbooru_version.first(7) %>
-        <% end %>
-        on <%= @status.instance_name %>
-        for <%= @status.instance_uptime %>
+        <%= @status.container_name || @status.node_name %>
       </summary>
 
       <%= render "list", hash: @status.serializable_hash[:instance] %>
@@ -33,7 +50,7 @@
 
     <details>
       <summary>
-        Server: <%= @status.node_name %>
+        Server: <%= @status.node_name.presence || "up #{@status.node_uptime}" %>
       </summary>
 
       <%= render "list", hash: @status.serializable_hash[:server] %>

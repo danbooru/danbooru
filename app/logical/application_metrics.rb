@@ -123,6 +123,7 @@ class ApplicationMetrics
       ffmpeg_version: status.ffmpeg_version,
       exiftool_version: status.exiftool_version,
       jemalloc_version: status.jemalloc_version,
+      docker_image_build_date: status.docker_image_build_date.utc.to_s,
     }
     metrics[:danbooru_info][versions].set(1)
 
