@@ -53,6 +53,7 @@ class Post < ApplicationRecord
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
   validate :uploader_is_not_limited, on: :create
+  validate :post_is_not_allowed, on: :create
   validate :validate_no_parent_cycles
   validate :validate_parent_depth
   validate :validate_child_count
