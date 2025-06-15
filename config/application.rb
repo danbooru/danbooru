@@ -97,6 +97,10 @@ module Danbooru
 
     config.action_controller.action_on_unpermitted_parameters = :raise
 
+    # https://guides.rubyonrails.org/configuring.html#config-active-record-async-query-executor
+    config.active_record.async_query_executor = :global_thread_pool
+    config.active_record.global_executor_concurrency = Danbooru.config.max_concurrency.to_i
+
     if ENV["DOCKER_IMAGE_REVISION"].present?
       config.x.git_hash = ENV["DOCKER_IMAGE_REVISION"]
     elsif system("type git > /dev/null && git rev-parse --show-toplevel > /dev/null")
