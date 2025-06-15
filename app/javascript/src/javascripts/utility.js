@@ -103,6 +103,60 @@ export function createTooltip(name, options = {}) {
   });
 }
 
+// Upload a list of files or a URL to the site.
+export async function uploadFilesOrURL(filesOrURL) {
+  if (typeof filesOrURL === "string") {
+    return uploadURL(filesOrURL);
+  } else {
+    return uploadFiles(filesOrURL);
+  }
+}
+
+// Upload a list of files to the site.
+// @param {File[]} files - The list of files to upload.
+export async function uploadFiles(files) {
+  let params = Object.fromEntries(Array.from(files).map((file, n) => [`upload[files][${n}]`, file]));
+
+  return createUpload(params);
+}
+
+// Upload a URL to the site.
+// @param {String} url - The URL to upload.
+export async function uploadURL(url) {
+  if (url.match(/^https?:\/\//)) {
+    return createUpload({ "upload[source]": url });
+  } else {
+    throw new Error(`Invalid URL`);
+  }
+}
+
+// Upload a list of files or a URL to the site.
+//
+// @param {Object} params - The parameters to pass to the upload endpoint.
+// @param {Number} [pollDelay=250] - The delay in milliseconds between checking the upload status.
+// @returns {Object} - The upload object containing the upload status and the list of uploaded media assets.
+export async function createUpload(params, pollDelay = 250) {
+  let formData = new FormData();
+
+  for (let [key, value] of Object.entries(params)) {
+    formData.append(key, value);
+  }
+
+  let response = await fetch("/uploads.json", {
+    method: "POST",
+    headers: { "X-CSRF-Token": document.querySelector("meta[name='csrf-token']").content },
+    body: formData
+  });
+
+  let upload = await response.json();
+  while (upload.status !== "completed" && upload.status !== "error") {
+    await delay(pollDelay);
+    upload = await $.get(`/uploads/${upload.id}.json`);
+  }
+
+  return upload;
+}
+
 $.fn.selectEnd = function() {
   return this.each(function() {
     this.focus();

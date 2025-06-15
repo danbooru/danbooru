@@ -11,6 +11,7 @@ $spacer: 0.25rem; /* 4px */
 .font-arial { font-family: var(--arial-font); }
 .font-monospace { font: var(--monospace-font); }
 .font-header { font-family: var(--header-font); }
+.font-normal { font-weight: normal; }
 .font-bold { font-weight: bold; }
 .font-italic { font-style: italic; }
 
@@ -323,6 +324,7 @@ $spacer: 0.25rem; /* 4px */
 .align-top { vertical-align: top; }
 .align-middle { vertical-align: middle; }
 .align-bottom { vertical-align: bottom; }
+.align-baseline { vertical-align: baseline; }
 
 .flex-0 { flex: 0 1 0%; }
 .flex-1 { flex: 1 1 0%; }
@@ -397,6 +399,13 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
 
 .transition-opacity {
   transition: opacity 0.15s ease;
+}
+
+[inert], .inert {
+  pointer-events: none;
+  user-select: none;
+  cursor: default;
+  opacity: 0.5;
 }
 
 .card, .card-elevated {

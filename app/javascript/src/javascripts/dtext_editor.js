@@ -1,3 +1,6 @@
+import Notice from "./notice";
+import { uploadFilesOrURL } from "./utility";
+
 // @see app/components/dtext_editor_component.rb
 export default class DTextEditor {
   // The key bindings for the DText editor.
@@ -34,6 +37,8 @@ export default class DTextEditor {
   root = null; // The root <div class="dtext-editor"> element.
   input = null; // The <input> or <textarea> element for DText input.
   mode = "edit"; // The current mode of the editor, either "edit" or "preview".
+  uploading = false; // True if the editor is currently uploading files.
+  previewLoading = false; // True if the editor is currently loading the preview HTML.
   emojiSearch = ""; // The current search term for the emoji picker.
   domains = []; // The list of the current site's domains. Used for determining which links belong to the current site.
 
@@ -153,20 +158,29 @@ export default class DTextEditor {
     }
   }
 
-  // Handle paste events. Convert links to DText format.
+  // Handle paste events. Convert links to DText format and inserts pasted images as embedded media assets.
   onPaste(event) {
     let text = event.clipboardData.getData("text");
 
-    if (URL.canParse(text) && this.domains.includes(URL.parse(text).hostname)) {
-      let url = URL.parse(text);
-      let path = decodeURIComponent(url.pathname);
-      let [regex, formatter] = DTextEditor.SHORTLINKS.entries().find(([regex, _formatter]) => path.match(regex)) || [];
-      let dtext = formatter?.(path.match(regex)[1]);
+    if (event.clipboardData.files.length > 0) {
+      this.insertImages(event.clipboardData.files);
+    } else if (URL.canParse(text) && this.domains.includes(URL.parse(text).hostname)) {
+      this.insertUrl(text);
+      event.preventDefault();
+    }
+  }
 
-      if (dtext) {
-        this.insertText(dtext);
-        event.preventDefault();
-      }
+  // Insert a URL. If the URL is a full link (e.g. "https://example.com/posts/123"), it will be converted to a shortlink (e.g. "post #123").
+  insertUrl(text) {
+    let url = URL.parse(text);
+    let path = decodeURIComponent(url.pathname);
+    let [regex, formatter] = DTextEditor.SHORTLINKS.entries().find(([regex, _formatter]) => path.match(regex)) || [];
+    let dtext = formatter?.(path.match(regex)[1]);
+
+    if (dtext) {
+      this.insertText(dtext);
+    } else {
+      this.insertText(text);
     }
   }
 
@@ -192,6 +206,56 @@ export default class DTextEditor {
     }
   }
 
+  // Insert text for a block-level element. Ensures the text is on its own line.
+  insertBlockText(text) {
+    // Prepend newlines if we're not at the start of a line.
+    if (!/(^|\n)\s*$/.test(this.selectionPrefix)) {
+      text = `\n${text}`;
+    }
+
+    // Append newlines if we're not at the end of a line.
+    if (!/^\s*(\n|$)/.test(this.selectionSuffix)) {
+      text = `${text}\n`;
+    }
+
+    this.insertText(text);
+  }
+
+  // Upload a list of files or a URL and insert the resulting images as embedded media assets (e.g. `* !asset #123`).
+  //
+  // @param {String|File[]} filesOrURL - The list of files or the URL to upload.
+  // @param {String} size - Whether to insert the images as a gallery of thumbnail images ("small") or as full-size images ("large").
+  // @param {String} caption - The caption to use for the images.
+  async insertImages(filesOrURL, size = "small", caption = "") {
+    try {
+      let prefix = size === "small" ? "* " : "";
+      let suffix = caption.length > 0 ? `: ${caption}` : "";
+
+      this.uploading = true;
+      Danbooru.Shortcuts.hide_tooltips(); // Hide the insert image menu.
+      let upload = await uploadFilesOrURL(filesOrURL);
+      this.uploading = false;
+
+      if (upload.success === false || upload.status === "error") {
+        throw new Error(upload.error);
+      }
+
+      let dtext = upload.upload_media_assets.map(uma => {
+        if (uma.media_asset.post) {
+          return `${prefix}!post #${uma.media_asset.post.id}${suffix}`;
+        } else {
+          return `${prefix}!asset #${uma.media_asset.id}${suffix}`;
+        }
+      }).join("\n");
+
+      this.insertBlockText(dtext);
+    } catch (error) {
+      Notice.error(error.message);
+    } finally {
+      this.uploading = false;
+    }
+  }
+
   // Insert the emoji at the current cursor position.
   insertEmoji(emoji) {
     this.insertText(`:${emoji}:`);
@@ -201,6 +265,11 @@ export default class DTextEditor {
   // @returns {Boolean} True if the given emoji matches the current search term in the emoji picker.
   emojiMatches(emoji) {
     return emoji.toLowerCase().includes(this.emojiSearch.toLowerCase().replace(/[^a-zA-Z0-9]/g, ''));
+  }
+
+  // @returns {Boolean} True if the editor is currently loading (either uploading files or loading the preview).
+  get loading() {
+    return this.uploading || this.previewLoading;
   }
 
   // @returns {String} The currently selected text in the <textarea> element.
@@ -259,7 +328,7 @@ export default class DTextEditor {
 
   // @returns {String} The HTML representation of the DText input.
   async fetchHtml() {
-    this.loading = true;
+    this.previewLoading = true;
 
     let html = await $.post("/dtext_preview", {
       body: this.input.value,
@@ -267,7 +336,7 @@ export default class DTextEditor {
       media_embeds: this.root.dataset.mediaEmbeds === "true",
     });
 
-    this.loading = false;
+    this.previewLoading = false;
     return html;
   }
 }

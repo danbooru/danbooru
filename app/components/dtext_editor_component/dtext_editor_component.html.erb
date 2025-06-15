@@ -1,7 +1,15 @@
 <% if inline? %>
   <%= form.text_field(input_name, input_html) %>
 <% else %>
-  <div class="dtext-editor relative w-fit focus-within:outline-auto <%= editor_html[:class] %>" spellcheck="true" data-inline="<%= inline? %>" data-media-embeds="<%= media_embeds? %>" x-data="{ editor: new Danbooru.DTextEditor($root) }" x-init="editor.initialize(<%= { domains: domains }.to_json %>)">
+  <div class="dtext-editor relative w-fit focus-within:outline-auto <%= editor_html[:class] %>"
+       spellcheck="true"
+       data-inline="<%= inline? %>"
+       data-media-embeds="<%= media_embeds? %>"
+       x-bind:class="{ 'dtext-editor-loading inert': editor.loading }"
+       x-data="{ editor: new Danbooru.DTextEditor($root) }"
+       x-init="editor.initialize(<%= { domains: domains }.to_json %>)"
+       x-on:dragover.prevent="true"
+       x-on:drop="editor.insertImages($event.dataTransfer.files)">
     <div class="dtext-editor-menu flex justify-between border-t border-x rounded-t w-full">
       <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.editMode" x-on:click="editor.toggleMode()" title="Preview (Ctrl+P)"><%= eye_icon(class: "text-sm") %> Preview</a>
       <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.previewMode" x-on:click="editor.toggleMode()" data-shortcut="ctrl+p" title="Edit (Ctrl+P)" x-cloak><%= edit_icon(class: "text-sm") %> Edit</a>
@@ -11,7 +19,43 @@
         <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleItalic()" title="Italics (Ctrl+I)"><%= italic_icon %></a>
         <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleWikiLink()" title="Wiki link (Ctrl+K)"><%= double_brackets_icon %></a>
 
-        <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
+        <span class="mx-2 py-2 border-l"></span>
+
+        <span x-data="{ imageCaption: '', imageSize: 'small' }">
+          <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert image"}) do |menu| %>
+            <% menu.with_button do %>
+              <%= image_icon("x-on:click": "$nextTick(() => $refs?.imageUrl?.focus())") %>
+            <% end %>
+
+            <% menu.with_item do %>
+              <div class="flex flex-col w-320px gap-2">
+                <input type="text" placeholder="Paste image URL" class="w-full" x-ref="imageUrl" x-on:paste.prevent="editor.insertImages($event.clipboardData.getData('text'), imageSize, imageCaption)">
+                <input type="file" id="file-picker-<%= object_id %>" class="hidden" x-on:change="editor.insertImages($event.target.files, imageSize, imageCaption)" accept="image/*,video/*" multiple>
+                <input type="text" placeholder="Enter image caption (optional)" class="w-full" x-model="imageCaption">
+
+                <div class="input radio_buttons radio-button-group flex items-center !m-0 hidden">
+                  <label class="text-sm mr-2">Size</label>
+
+                  <span class="radio text-xxs">
+                    <input type="radio" id="image-size-<%= object_id %>-small" name="image-size-<%= object_id %>" class="radio_buttons" value="small" x-model="imageSize" checked>
+                    <label for="image-size-<%= object_id %>-small">Small</label>
+                  </span>
+
+                  <span class="radio text-xxs">
+                    <input type="radio" id="image-size-<%= object_id %>-large" name="image-size-<%= object_id %>" class="radio_buttons" value="large" x-model="imageSize">
+                    <label for="image-size-<%= object_id %>-large">Large</label>
+                  </span>
+                </div>
+
+                <label class="fineprint" for="file-picker-<%= object_id %>">
+                  <a class="font-normal inactive-link cursor-pointer focus:outline-0"><%= folder_open_icon(class: "align-baseline") %>Click, paste, or drop to add images.</a>
+                </label>
+              </div>
+            <% end %>
+          <% end %>
+        </span>
+
+        <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert emoji" }) do |menu| %>
           <% menu.with_button do %>
             <%= add_reaction_icon("x-on:click": "$nextTick(() => $refs?.emojiPicker?.focus())") %>
           <% end %>
@@ -54,8 +98,8 @@
 
     <%= form.text_area(input_name, input_html.merge(class: [*input_html[:class], "m-0 p-1 thin-scrollbar"], "x-model": "editor.dtext", "x-show": "editor.editMode", "x-on:keydown": "editor.onKeyDown($event)", "x-on:paste": "editor.onPaste($event)")) %>
 
-    <div class="dtext-preview prose p-1 text-sm border overflow-auto thin-scrollbar" x-show="editor.previewMode" x-html="editor.html()" x-bind:class="{ 'opacity-50': editor.loading }" x-cloak></div>
-    <div class="dtext-preview-loading opacity-50 absolute inset-0 flex items-center justify-center" x-show="editor.loading" x-cloak>
+    <div class="dtext-preview prose p-1 text-sm border overflow-auto thin-scrollbar" x-show="editor.previewMode" x-html="editor.html()" x-cloak></div>
+    <div class="dtext-loading absolute inset-0 flex items-center justify-center" x-show="editor.loading" x-cloak>
       <%= spinner_icon(class: "text-xxl") %>
     </div>
   </div>
