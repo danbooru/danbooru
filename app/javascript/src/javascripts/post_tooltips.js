@@ -1,5 +1,5 @@
 import CurrentUser from './current_user';
-import Utility from './utility';
+import Notice from './notice';
 import { createTooltip } from './utility';
 import { hideAll } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
