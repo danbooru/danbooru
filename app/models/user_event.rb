@@ -80,7 +80,7 @@ class UserEvent < ApplicationRecord
       def shared_session_ids_for(user)
         authorized
           .where.not(user_id: user.id)
-          .where(session_id: where(user: user).select(:session_id))
+          .where(session_id: authorized.where(user: user).select(:session_id))
           .group([:session_id, :user_id])
           .select(:session_id, :user_id)
       end
@@ -91,7 +91,7 @@ class UserEvent < ApplicationRecord
 
         authorized
           .where.not(user_id: user.id)
-          .where("#{subnet} IN (?)", where(user: user).joins(:ip_geolocation).where(ip_geolocation: { is_proxy: false }).select(subnet))
+          .where("#{subnet} IN (?)", authorized.where(user: user).joins(:ip_geolocation).where(ip_geolocation: { is_proxy: false }).select(subnet))
           .group([subnet, :ip_addr, :user_id])
           .select(Arel.sql("#{subnet} AS subnet, ip_addr, user_id"))
       end
