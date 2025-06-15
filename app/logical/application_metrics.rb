@@ -59,6 +59,34 @@ class ApplicationMetrics
       danbooru_wiki_page_versions_total:            [:counter, "The total number of wiki page versions."],
     })
 
+    artists = Artist.group(:is_deleted).async_pluck(Arel.sql("is_deleted, COUNT(*)"))
+    artist_urls = ArtistURL.group(:is_active).async_pluck(Arel.sql("is_active, COUNT(*)"))
+    artist_versions = ArtistVersion.async_pluck(Arel.sql("COUNT(*)"))
+    background_job_queued_count = BackgroundJob.queued.async_count
+    background_job_running_count = BackgroundJob.running.async_count
+    background_job_finished_count = BackgroundJob.finished.async_count
+    background_job_discarded_count = BackgroundJob.discarded.async_count
+    bans = Ban.async_pluck(Arel.sql("COUNT(*)"))
+    bulk_update_requests = BulkUpdateRequest.group(:status).async_pluck(Arel.sql("status, COUNT(*)"))
+    comments = Comment.group(:is_deleted).async_pluck(Arel.sql("is_deleted, COUNT(*)"))
+    comment_votes = CommentVote.group(:score).active.async_pluck(Arel.sql("score, COUNT(*)"))
+    favorite_groups = FavoriteGroup.group(:is_public).async_pluck(Arel.sql("is_public, COUNT(*)"))
+    forum_posts = ForumPost.group(:is_deleted).async_pluck(Arel.sql("is_deleted, COUNT(*)"))
+    forum_topics = ForumTopic.group(:is_deleted).async_pluck(Arel.sql("is_deleted, COUNT(*)"))
+    media_assets = MediaAsset.active.group(:file_ext).async_pluck(Arel.sql("file_ext, COUNT(*), SUM(file_size), SUM(image_width*image_height), COALESCE(SUM(duration), 0)"))
+    posts = Post.async_pluck(Arel.sql("SUM(up_score), ABS(SUM(down_score)), SUM(fav_count), COUNT(*) FILTER (WHERE is_pending), COUNT(*) FILTER (WHERE is_flagged), COUNT(*) FILTER (WHERE is_deleted), COUNT(*)"))
+    post_appeals = PostAppeal.group(:status).async_pluck(Arel.sql("status, COUNT(*)"))
+    post_flags = PostFlag.group(:status).async_pluck(Arel.sql("status, COUNT(*)"))
+    notes = Note.group(:is_active).async_pluck(Arel.sql("is_active, COUNT(*)"))
+    note_versions = NoteVersion.async_pluck(Arel.sql("COUNT(*)"))
+    pools = Pool.group(:category).async_pluck(Arel.sql("category, COUNT(*), SUM(cardinality(post_ids))"))
+    tags = Tag.nonempty.group(:category).async_pluck(Arel.sql("category, COUNT(*), SUM(post_count)"))
+    uploads = Upload.group(:status).async_pluck(Arel.sql("status, COUNT(*)"))
+    users = User.async_pluck(Arel.sql("COUNT(*)"))
+    user_feedbacks = UserFeedback.active.group(:category).async_pluck(Arel.sql("category, COUNT(*)"))
+    wiki_pages = WikiPage.group(:is_deleted).async_pluck(Arel.sql("is_deleted, COUNT(*)"))
+    wiki_page_versions = WikiPageVersion.async_pluck(Arel.sql("COUNT(*)"))
+
     status = ServerStatus.new
     versions = {
       danbooru_version: status.danbooru_version,
@@ -73,59 +101,59 @@ class ApplicationMetrics
     }
     metrics[:danbooru_info][versions].set(1)
 
-    Artist.group(:is_deleted).pluck(Arel.sql("is_deleted, COUNT(*)")).each do |deleted, count|
+    artists.value.each do |deleted, count|
       metrics[:danbooru_artists_total][deleted: deleted].set(count)
     end
 
-    ArtistURL.group(:is_active).pluck(Arel.sql("is_active, COUNT(*)")).each do |active, count|
+    artist_urls.value.each do |active, count|
       metrics[:danbooru_artist_urls_total][active: active].set(count)
     end
 
-    ArtistVersion.pluck(Arel.sql("COUNT(*)")).each do |count|
+    artist_versions.value.each do |count|
       metrics[:danbooru_artist_versions_total].set(count)
     end
 
-    metrics[:danbooru_background_jobs_total][status: "queued"].set(BackgroundJob.queued.count)
-    metrics[:danbooru_background_jobs_total][status: "running"].set(BackgroundJob.running.count)
-    metrics[:danbooru_background_jobs_total][status: "finished"].set(BackgroundJob.finished.count)
-    metrics[:danbooru_background_jobs_total][status: "discarded"].set(BackgroundJob.discarded.count)
+    metrics[:danbooru_background_jobs_total][status: "queued"].set(background_job_queued_count.value)
+    metrics[:danbooru_background_jobs_total][status: "running"].set(background_job_running_count.value)
+    metrics[:danbooru_background_jobs_total][status: "finished"].set(background_job_finished_count.value)
+    metrics[:danbooru_background_jobs_total][status: "discarded"].set(background_job_discarded_count.value)
 
-    Ban.pluck(Arel.sql("COUNT(*)")).each do |count|
+    bans.value.each do |count|
       metrics[:danbooru_bans_total].set(count)
     end
 
-    BulkUpdateRequest.group(:status).pluck(Arel.sql("status, COUNT(*)")).each do |status, count|
+    bulk_update_requests.value.each do |status, count|
       metrics[:danbooru_bulk_update_requests_total][status: status].set(count)
     end
 
-    Comment.group(:is_deleted).pluck(Arel.sql("is_deleted, COUNT(*)")).each do |deleted, count|
+    comments.value.each do |deleted, count|
       metrics[:danbooru_comments_total][deleted: deleted].set(count)
     end
 
-    CommentVote.group(:score).active.pluck(Arel.sql("score, COUNT(*)")).each do |score, count, score_sum|
+    comment_votes.value.each do |score, count|
       metrics[:danbooru_comment_votes_total][type: score > 0 ? "up" : "down"].set(count)
     end
 
-    FavoriteGroup.group(:is_public).pluck(Arel.sql("is_public, COUNT(*)")).each do |is_public, count|
+    favorite_groups.value.each do |is_public, count|
       metrics[:danbooru_favorite_groups_total][public: is_public].set(count)
     end
 
-    ForumPost.group(:is_deleted).pluck(Arel.sql("is_deleted, COUNT(*)")).each do |deleted, count|
+    forum_posts.value.each do |deleted, count|
       metrics[:danbooru_forum_posts_total][deleted: deleted].set(count)
     end
 
-    ForumTopic.group(:is_deleted).pluck(Arel.sql("is_deleted, COUNT(*)")).each do |deleted, count|
+    forum_topics.value.each do |deleted, count|
       metrics[:danbooru_forum_topics_total][deleted: deleted].set(count)
     end
 
-    MediaAsset.active.group(:file_ext).pluck(Arel.sql("file_ext, COUNT(*), SUM(file_size), SUM(image_width*image_height), COALESCE(SUM(duration), 0)")).each do |file_ext, count, file_size, pixels, duration|
+    media_assets.value.each do |file_ext, count, file_size, pixels, duration|
       metrics[:danbooru_media_assets_total][file_ext: file_ext].set(count)
       metrics[:danbooru_media_assets_file_size_bytes_total][file_ext: file_ext].set(file_size)
       metrics[:danbooru_media_assets_pixels_total][file_ext: file_ext].set(pixels)
       metrics[:danbooru_media_assets_duration_seconds_total][file_ext: file_ext].set(duration.round(4))
     end
 
-    Post.pluck(Arel.sql("SUM(up_score), ABS(SUM(down_score)), SUM(fav_count), COUNT(*) FILTER (WHERE is_pending), COUNT(*) FILTER (WHERE is_flagged), COUNT(*) FILTER (WHERE is_deleted), COUNT(*)")).each do |upvote_count, downvote_count, favorite_count, pending_count, flagged_count, deleted_count, total_count|
+    posts.value.each do |upvote_count, downvote_count, favorite_count, pending_count, flagged_count, deleted_count, total_count|
       metrics[:danbooru_post_votes_total][type: "up"].set(upvote_count)
       metrics[:danbooru_post_votes_total][type: "down"].set(downvote_count)
       metrics[:danbooru_favorites_total].set(favorite_count)
@@ -136,50 +164,50 @@ class ApplicationMetrics
       metrics[:danbooru_posts_total][status: "active"].set(total_count - pending_count - deleted_count - flagged_count)
     end
 
-    PostAppeal.group(:status).pluck(Arel.sql("status, COUNT(*)")).each do |status, count|
+    post_appeals.value.each do |status, count|
       metrics[:danbooru_post_appeals_total][status: status].set(count)
       metrics[:danbooru_posts_total][status: "appealed"].set(count) if status == "pending"
     end
 
-    PostFlag.group(:status).pluck(Arel.sql("status, COUNT(*)")).each do |status, count|
+    post_flags.value.each do |status, count|
       metrics[:danbooru_post_flags_total][status: status].set(count)
     end
 
-    Note.group(:is_active).pluck(Arel.sql("is_active, COUNT(*)")).each do |active, count|
+    notes.value.each do |active, count|
       metrics[:danbooru_notes_total][deleted: !active].set(count)
     end
 
-    NoteVersion.pluck(Arel.sql("COUNT(*)")).each do |count|
+    note_versions.value.each do |count|
       metrics[:danbooru_note_versions_total].set(count)
     end
 
-    Pool.group(:category).pluck(Arel.sql("category, COUNT(*), SUM(cardinality(post_ids))")).each do |category, count, post_count|
+    pools.value.each do |category, count, post_count|
       metrics[:danbooru_pools_total][category: category].set(count)
       metrics[:danbooru_pools_post_count_total][category: category].set(post_count)
     end
 
-    Tag.nonempty.group(:category).pluck(Arel.sql("category, COUNT(*), SUM(post_count)")).each do |category, count, post_count|
+    tags.value.each do |category, count, post_count|
       metrics[:danbooru_tags_total][category: TagCategory.reverse_mapping[category]].set(count)
       metrics[:danbooru_tags_post_count_total][category: TagCategory.reverse_mapping[category]].set(post_count)
     end
 
-    Upload.group(:status).pluck(Arel.sql("status, COUNT(*)")).each do |status, count|
+    uploads.value.each do |status, count|
       metrics[:danbooru_uploads_total][status: status].set(count)
     end
 
-    User.pluck(Arel.sql("COUNT(*)")).each do |count|
+    users.value.each do |count|
       metrics[:danbooru_users_total].set(count)
     end
 
-    UserFeedback.active.group(:category).pluck(Arel.sql("category, COUNT(*)")).each do |category, count|
+    user_feedbacks.value.each do |category, count|
       metrics[:danbooru_user_feedbacks_total][category: category].set(count)
     end
 
-    WikiPage.group(:is_deleted).pluck(Arel.sql("is_deleted, COUNT(*)")).each do |deleted, count|
+    wiki_pages.value.each do |deleted, count|
       metrics[:danbooru_wiki_pages_total][deleted: deleted].set(count)
     end
 
-    WikiPageVersion.pluck(Arel.sql("COUNT(*)")).each do |count|
+    wiki_page_versions.value.each do |count|
       metrics[:danbooru_wiki_page_versions_total].set(count)
     end
 
@@ -509,6 +537,7 @@ class ApplicationMetrics
   # Resets the process metrics (by flushing the memoize cache).
   def reset_metrics
     flush_cache
+    process_metrics
     self
   end
 
