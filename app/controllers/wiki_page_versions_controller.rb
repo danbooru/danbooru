@@ -36,6 +36,8 @@ class WikiPageVersionsController < ApplicationController
       end
     end
 
+    @wiki_page_version = @thispage
+
     respond_with([@thispage, @otherpage])
   end
 end

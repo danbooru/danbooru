@@ -1,15 +1,27 @@
 <%= render "wiki_pages/sidebar" %>
 
 <% content_for(:content) do %>
-  <h1 id="wiki-page-title"><%= @wiki_page_version.pretty_title %></h1>
-  <p class="fineprint"><%= time_ago_in_words_tagged(@wiki_page_version.updated_at) %></p>
+  <div class="fixed-width-container">
+    <%= render "wiki_page_versions/navbar", wiki_page_version: @wiki_page_version %>
 
-  <div id="wiki-page-body" class="dtext prose">
-    <% if @wiki_page_version.other_names.present? %>
-      <%= wiki_page_other_names_list(@wiki_page_version) %>
-    <% end %>
+    <h1 id="wiki-page-title"><%= link_to_wiki @wiki_page_version.pretty_title, @wiki_page_version.title, class: "tag-type-#{@wiki_page_version.wiki_page.tag&.category.to_i}" %></h1>
 
-    <%= @wiki_page_version.dtext_body.format_text %>
+    <p class="fineprint">
+      <%= @wiki_page_version.previous ? "Edited" : "Created" %>
+      <%= link_to humanized_time(@wiki_page_version.updated_at), diff_wiki_page_versions_path(thispage: @wiki_page_version.id) %> by <%= link_to_user @wiki_page_version.updater %>.
+
+      <% if @wiki_page_version.previous %>
+        Previously edited <%= link_to humanized_time(@wiki_page_version.previous.updated_at), diff_wiki_page_versions_path(thispage: @wiki_page_version.previous.id) %> by <%= link_to_user @wiki_page_version.previous.updater %>.
+      <% end %>
+    </p>
+
+    <div id="wiki-page-body" class="dtext prose">
+      <% if @wiki_page_version.other_names.present? %>
+        <%= wiki_page_other_names_list(@wiki_page_version) %>
+      <% end %>
+
+      <%= @wiki_page_version.dtext_body.format_text %>
+    </div>
   </div>
 <% end %>
 

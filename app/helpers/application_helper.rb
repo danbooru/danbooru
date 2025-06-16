@@ -150,15 +150,15 @@ module ApplicationHelper
         human_time = time_ago_in_words(time).gsub(/about|over|less than|almost/, "")
         time_tag("#{human_time} ago", time)
       elsif time > Time.zone.today.beginning_of_year
-        time_tag(time.strftime("%b %e"), time)
+        time_tag(time.strftime("%B #{time.day.ordinalize}"), time)
       else
-        time_tag(time.strftime("%b %e, %Y"), time)
+        time_tag(time.strftime("%B #{time.day.ordinalize}, %Y"), time)
       end
     elsif time.future?
       if time < 1.day.from_now
         time_tag("in #{time_ago_in_words(time)}", time)
       else
-        time_tag(time.strftime("%b %e, %Y"), time)
+        time_tag(time.strftime("%B #{time.day.ordinalize}, %Y"), time)
       end
     end
   end
