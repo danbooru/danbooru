@@ -144,6 +144,7 @@ Rails.application.routes.draw do
   resources :media_metadata, only: [:index]
 
   resources :metrics, only: [:index], defaults: { format: :text } do
+    get "/statistics", on: :collection, to: "metrics#statistics", as: :statistics
     get "/instance", on: :collection, to: "metrics#instance", as: :instance
   end
 
@@ -353,6 +354,7 @@ Rails.application.routes.draw do
   get "/404" => "static#not_found", :as => "not_found"
   get "/2257" => "static#2257", :as => "usc_2257"
   get "/contact" => "static#contact", :as => "contact"
+  get "/statistics" => "metrics#statistics", as: "statistics"
   get "/.well-known/change-password", to: redirect("/password/edit", status: 302)
 
   get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"

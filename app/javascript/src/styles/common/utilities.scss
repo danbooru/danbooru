@@ -43,6 +43,7 @@ $spacer: 0.25rem; /* 4px */
 .text-center { text-align: center; }
 .text-right  { text-align: right; }
 .text-muted { color: var(--muted-text-color); }
+.\!text-right  { text-align: right !important; }
 
 .text-xxs { font-size: var(--text-xxs); }
 .text-xs  { font-size: var(--text-xs); }
@@ -614,6 +615,7 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   .md\:space-y-0 > * + * { margin-top: 0; }
 
   .md\:w-180px { width: 180px; }
+  .md\:w-320px { width: 320px; }
   .md\:w-360px { width: 360px; }
 
   .md\:mx-auto { margin-left: auto; margin-right: auto; }

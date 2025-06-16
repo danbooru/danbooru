@@ -90,6 +90,12 @@ module Danbooru
       str
     end
 
+    # @return [Danbooru::DataFrame] A DataFrame containing the metric's labels and values.
+    def to_dataframe
+      data = values.map { |metric_value| { **labels, **metric_value.labels, value: metric_value.value } }
+      Danbooru::DataFrame.new(data)
+    end
+
     # The default value for metrics without any labels. For example, `metrics[:http_requests_total].increment`
     # increments the `http_request_total` counter without giving it any labels.
     #
@@ -126,12 +132,12 @@ module Danbooru
 
       # Add a new group of metrics to the set.
       #
-      # @param definitions [Hash<Symbol, Array<Symbol, String>>] The hash of { name => [metric type, help] } metric definitions.
+      # @param definitions [Array<Hash>] The array of metric definitions.
       # @param labels [Hash<Symbol, String>] An optional set of labels to apply to each metric.
       # @return [Metric::Set] The metric set.
-      def register(definitions = {}, labels = {})
-        definitions.each do |name, (type, help)|
-          metrics[name] = Metric.new(name, type: type, help: help, labels: labels)
+      def register(definitions = [], labels: {})
+        definitions.each do |definition|
+          metrics[definition[:name]] = Metric.new(definition[:name], type: definition[:type], help: definition[:help], labels: labels)
         end
 
         self

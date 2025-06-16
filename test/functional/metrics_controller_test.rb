@@ -55,6 +55,12 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
       end
+
+      should "work for html format" do
+        get statistics_path
+
+        assert_response :success
+      end
     end
 
     context "#instance action" do
