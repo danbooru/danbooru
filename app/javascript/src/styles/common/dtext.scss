@@ -1,6 +1,7 @@
 .prose {
   --max-sticker-size: 64px;
   --max-emoji-size: 24px;
+  --paragraph-spacing: 0.75rem;
 
   word-break: break-word;
 
@@ -9,7 +10,7 @@
   }
 
   p, ul, pre, blockquote, details, div.spoiler, table, h1, h2, h3, h4, h5, h6, article, media-gallery, emoji[data-mode="block"] {
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--paragraph-spacing);
   }
 
   h1, h2, h3, h4, h5, h6 {

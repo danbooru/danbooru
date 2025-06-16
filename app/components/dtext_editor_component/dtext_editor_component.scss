@@ -4,19 +4,21 @@
     background-color: var(--dtext-editor-menu-background-color)
   }
 
-  textarea, .dtext-preview {
+  .dtext-editor-body {
     width: 60rem;
     height: 10rem;
     min-width: 20rem;
     min-height: 3rem;
     max-height: 90vh;
     max-width: 100cqw;
+  }
+
+  textarea {
     line-height: 1.25em;
-    outline: none;
   }
 
   &.dtext-editor-large {
-    textarea, .dtext-preview {
+    .dtext-editor-body {
       height: 25rem;
     }
   }
@@ -24,6 +26,7 @@
   .dtext-preview {
     background-color: var(--form-input-background);
     border-color: var(--form-input-border-color);
-    color: var(--form-input-text-color)
+    color: var(--form-input-text-color);
+    --paragraph-spacing: 1lh;
   }
 }
