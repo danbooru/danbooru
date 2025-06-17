@@ -83,7 +83,7 @@ module Danbooru
 
     # @return [String] The metric's name, in a human-readable format (e.g. danbooru_posts_total becomes "Posts").
     def pretty_name
-      name.to_s.delete_prefix("danbooru_").gsub(/_(bytes|seconds|total)$/, "").humanize
+      name.to_s.delete_prefix("danbooru_").gsub(/_(bytes|seconds|total)/, "").humanize
     end
 
     # @return [String] The metric in Prometheus format.

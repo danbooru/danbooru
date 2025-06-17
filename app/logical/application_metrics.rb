@@ -66,7 +66,7 @@ class ApplicationMetrics
       { name: :danbooru_tag_versions_total,                  type: :counter, help: "The total number of tag versions." },
       { name: :danbooru_uploads_total,                       type: :gauge,   help: "The total number of uploads." },
       { name: :danbooru_users_total,                         type: :counter, help: "The total number of user accounts." },
-      { name: :danbooru_users_active_total,                  type: :gauge,   help: "The total number of logged-in users who have visited the site in the last hour/day/week/month/year." },
+      { name: :danbooru_active_users_total,                  type: :gauge,   help: "The total number of logged-in users who have visited the site in the last hour/day/week/month/year." },
       { name: :danbooru_user_feedbacks_total,                type: :gauge,   help: "The total number of user feedbacks (excluding deleted feedbacks)." },
       { name: :danbooru_wiki_pages_total,                    type: :gauge,   help: "The total number of wiki pages." },
       { name: :danbooru_wiki_page_versions_total,            type: :counter, help: "The total number of wiki page versions." },
@@ -81,7 +81,7 @@ class ApplicationMetrics
     background_job_running_count = BackgroundJob.running.async_count
     background_job_finished_count = BackgroundJob.finished.async_count
     background_job_discarded_count = BackgroundJob.discarded.async_count
-    bans = Ban.async_pluck(Arel.sql("COUNT(*), COUNT(*) FILTER (WHERE created_at + duration <= now())"))
+    bans = Ban.async_pluck(Arel.sql("COUNT(*) FILTER (WHERE duration <= '1 year' AND created_at + duration > now()), COUNT(*) FILTER (WHERE duration > '1 year' AND created_at + duration > now()), COUNT(*) FILTER (WHERE created_at + duration <= now())"))
     bulk_update_requests = BulkUpdateRequest.group(:status).async_pluck(Arel.sql("status, COUNT(*)"))
     comments = Comment.group(:is_deleted).async_pluck(Arel.sql("is_deleted, COUNT(*)"))
     comment_votes = CommentVote.group(:score).active.async_pluck(Arel.sql("score, COUNT(*)"))
@@ -95,7 +95,7 @@ class ApplicationMetrics
     posts = Post.async_pluck(Arel.sql("SUM(up_score), ABS(SUM(down_score)), SUM(fav_count), COUNT(*) FILTER (WHERE is_pending), COUNT(*) FILTER (WHERE is_flagged), COUNT(*) FILTER (WHERE is_deleted), COUNT(*)"))
     post_approvals = PostApproval.async_pluck(Arel.sql("COUNT(*)"))
     post_appeals = PostAppeal.group(:status).async_pluck(Arel.sql("status, COUNT(*)"))
-    post_flags = PostFlag.group(:status).async_pluck(Arel.sql("status, COUNT(*)"))
+    post_flags = PostFlag.category_matches("normal").group(:status).async_pluck(Arel.sql("status, COUNT(*)"))
     post_replacements = PostReplacement.async_pluck(Arel.sql("COUNT(*)"))
     notes = Note.group(:is_active).async_pluck(Arel.sql("is_active, COUNT(*)"))
     note_versions = NoteVersion.async_pluck(Arel.sql("COUNT(*)"))
@@ -128,7 +128,8 @@ class ApplicationMetrics
     metrics[:danbooru_info][versions].set(1)
 
     artists.value.each do |deleted, count|
-      metrics[:danbooru_artists_total][deleted: deleted].set(count)
+      status = deleted ? "deleted" : "active"
+      metrics[:danbooru_artists_total][status: status].set(count)
     end
 
     artist_commentaries.value.each do |count, translated|
@@ -141,7 +142,8 @@ class ApplicationMetrics
     end
 
     artist_urls.value.each do |active, count|
-      metrics[:danbooru_artist_urls_total][active: active].set(count)
+      status = active ? "active" : "dead"
+      metrics[:danbooru_artist_urls_total][status: status].set(count)
     end
 
     artist_versions.value.each do |count|
@@ -153,9 +155,10 @@ class ApplicationMetrics
     metrics[:danbooru_background_jobs_total][status: "finished"].set(background_job_finished_count.value)
     metrics[:danbooru_background_jobs_total][status: "discarded"].set(background_job_discarded_count.value)
 
-    bans.value.each do |count, expired|
+    bans.value.each do |active, permanent, expired|
+      metrics[:danbooru_bans_total][status: "active"].set(active)
+      metrics[:danbooru_bans_total][status: "permanent"].set(permanent)
       metrics[:danbooru_bans_total][status: "expired"].set(expired)
-      metrics[:danbooru_bans_total][status: "active"].set(count - expired)
     end
 
     bulk_update_requests.value.each do |status, count|
@@ -163,11 +166,13 @@ class ApplicationMetrics
     end
 
     comments.value.each do |deleted, count|
-      metrics[:danbooru_comments_total][deleted: deleted].set(count)
+      status = deleted ? "deleted" : "active"
+      metrics[:danbooru_comments_total][status: status].set(count)
     end
 
     comment_votes.value.each do |score, count|
-      metrics[:danbooru_comment_votes_total][type: score > 0 ? "up" : "down"].set(count)
+      type = (score > 0) ? "up" : "down"
+      metrics[:danbooru_comment_votes_total][type: type].set(count)
     end
 
     dtext_links.value.each do |link_type, count|
@@ -175,26 +180,30 @@ class ApplicationMetrics
     end
 
     favorite_groups.value.each do |is_public, count|
-      metrics[:danbooru_favorite_groups_total][public: is_public].set(count)
+      status = is_public ? "public" : "private"
+      metrics[:danbooru_favorite_groups_total][status: status].set(count)
     end
 
     forum_posts.value.each do |deleted, count|
-      metrics[:danbooru_forum_posts_total][deleted: deleted].set(count)
+      status = deleted ? "deleted" : "active"
+      metrics[:danbooru_forum_posts_total][status: status].set(count)
     end
 
     forum_post_votes.value.each do |score, count|
-      metrics[:danbooru_forum_post_votes_total][score: score].set(count)
+      type = { 1 => "up", 0 => "meh", -1 => "down" }.fetch(score)
+      metrics[:danbooru_forum_post_votes_total][type: type].set(count)
     end
 
     forum_topics.value.each do |deleted, count|
-      metrics[:danbooru_forum_topics_total][deleted: deleted].set(count)
+      status = deleted ? "deleted" : "active"
+      metrics[:danbooru_forum_topics_total][status: status].set(count)
     end
 
     media_assets.value.each do |file_ext, count, file_size, pixels, duration|
       metrics[:danbooru_media_assets_total][file_ext: file_ext].set(count)
       metrics[:danbooru_media_assets_file_size_bytes_total][file_ext: file_ext].set(file_size)
       metrics[:danbooru_media_assets_pixels_total][file_ext: file_ext].set(pixels)
-      metrics[:danbooru_media_assets_duration_seconds_total][file_ext: file_ext].set(duration.round(4))
+      metrics[:danbooru_media_assets_duration_seconds_total][file_ext: file_ext].set(duration.round(4)) if duration > 0
     end
 
     mod_actions.value.each do |category, count|
@@ -230,7 +239,8 @@ class ApplicationMetrics
     end
 
     notes.value.each do |active, count|
-      metrics[:danbooru_notes_total][deleted: !active].set(count)
+      status = active ? "active" : "deleted"
+      metrics[:danbooru_notes_total][status: status].set(count)
     end
 
     note_versions.value.each do |count|
@@ -238,8 +248,9 @@ class ApplicationMetrics
     end
 
     pools.value.each do |is_deleted, category, count, post_count|
-      metrics[:danbooru_pools_total][deleted: is_deleted, category: category].set(count)
-      metrics[:danbooru_pools_post_count_total][deleted: is_deleted, category: category].set(post_count)
+      status = is_deleted ? "deleted" : "active"
+      metrics[:danbooru_pools_total][status: status, category: category].set(count)
+      metrics[:danbooru_pools_post_count_total][status: status, category: category].set(post_count)
     end
 
     pool_versions.value.each do |count|
@@ -273,11 +284,11 @@ class ApplicationMetrics
 
     users.value.each do |count, hourly_count, daily_count, weekly_count, monthly_count, yearly_count|
       metrics[:danbooru_users_total].set(count)
-      metrics[:danbooru_users_active_total][last: "hour"].set(hourly_count)
-      metrics[:danbooru_users_active_total][last: "day"].set(daily_count)
-      metrics[:danbooru_users_active_total][last: "week"].set(weekly_count)
-      metrics[:danbooru_users_active_total][last: "month"].set(monthly_count)
-      metrics[:danbooru_users_active_total][last: "year"].set(yearly_count)
+      metrics[:danbooru_active_users_total][last: "hour"].set(hourly_count)
+      metrics[:danbooru_active_users_total][last: "day"].set(daily_count)
+      metrics[:danbooru_active_users_total][last: "week"].set(weekly_count)
+      metrics[:danbooru_active_users_total][last: "month"].set(monthly_count)
+      metrics[:danbooru_active_users_total][last: "year"].set(yearly_count)
     end
 
     user_feedbacks.value.each do |category, count|
@@ -285,7 +296,8 @@ class ApplicationMetrics
     end
 
     wiki_pages.value.each do |deleted, count|
-      metrics[:danbooru_wiki_pages_total][deleted: deleted].set(count)
+      status = deleted ? "deleted" : "active"
+      metrics[:danbooru_wiki_pages_total][status: status].set(count)
     end
 
     wiki_page_versions.value.each do |count|
