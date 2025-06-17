@@ -81,6 +81,11 @@ module Danbooru
       new_metric
     end
 
+    # @return [String] The metric's name, in a human-readable format (e.g. danbooru_posts_total becomes "Posts").
+    def pretty_name
+      name.to_s.delete_prefix("danbooru_").gsub(/_(bytes|seconds|total)$/, "").humanize
+    end
+
     # @return [String] The metric in Prometheus format.
     def to_prom
       str = +""
@@ -119,7 +124,12 @@ module Danbooru
   # A Metric::Set represents a collection of related metrics.
   class Metric
     class Set
+      # @return metrics [Hash<Symbol, Metric>] The metrics in the set, keyed by metric name.
       attr_reader :metrics
+
+      # @return [Time] The time when the metrics were last updated. Manually updated by the caller.
+      attr_accessor :updated_at
+
       protected attr_writer :metrics
 
       delegate :[], to: :metrics
@@ -127,6 +137,7 @@ module Danbooru
       # Create a new metric set, optionally registering a set of metrics at the same time.
       def initialize(...)
         @metrics = {}
+        @updated_at = nil
         register(...)
       end
 

@@ -292,7 +292,14 @@ class ApplicationMetrics
       metrics[:danbooru_wiki_page_versions_total].set(count)
     end
 
+    metrics.updated_at = Time.zone.now.utc
     metrics
+  end
+
+  def cached_application_metrics(expires_in = 1.minute)
+    Cache.get("application-metrics", expires_in, race_condition_ttl: 1.minute) do
+      application_metrics
+    end
   end
 
   # Returns metrics related to the current Ruby process. A Danbooru instance normally consists of a Puma server running

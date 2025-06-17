@@ -1,13 +1,14 @@
 <div id="c-metrics">
   <div id="a-statistics">
-    <h1 class="mb-4">Statistics</h1>
+    <h1 class="mb-2">Statistics</h1>
+    <p class="fineprint mb-4">Last updated <%= time_ago_in_words_tagged(@metrics.updated_at) %>.</p>
 
     <div class="flex flex-wrap gap-4">
       <% @metrics.metrics.values.each do |metric| %>
         <% next if metric.name == :danbooru_info %>
 
         <div class="card p-2 w-full md:w-320px max-h-360px thin-scrollbar">
-          <h2 class="mb-2"><%= metric.name.to_s.delete_prefix("danbooru_").delete_suffix("_total").humanize %></h2>
+          <h2 class="mb-2"><%= metric.pretty_name %></h2>
           <p class="fineprint"><%= metric.help %></p>
 
           <% df = metric.to_dataframe.df %>
@@ -19,11 +20,11 @@
                 <% if row[name].is_a?(String) %>
                   <%= row[name].humanize %>
                 <% elsif metric.name.to_s.include?("bytes") %>
-                  <%= number_to_human_size(row[name]) %>
+                  <span title="<%= row[name] %>"><%= number_to_human_size(row[name]) %></span>
                 <% elsif metric.name.to_s.include?("seconds") %>
                   <%= duration_to_hhmmss(row[name]) %>
                 <% else %>
-                  <%= humanized_number(row[name]) %>
+                  <span title="<%= row[name] %>"><%= humanized_number(row[name]) %></span>
                 <% end %>
               <% end %>
             <% end %>
