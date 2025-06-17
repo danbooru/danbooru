@@ -322,14 +322,6 @@ module Danbooru
       # "smtps://username:password@example.com?openssl_verify_mode=none"
     end
 
-    # Deprecated. Use `mail_delivery_url` instead.
-    def mail_delivery_method
-    end
-
-    # Deprecated. Use `mail_delivery_url` instead.
-    def mail_settings
-    end
-
     # The path to where uploaded files are stored. You can change this to change where files are
     # stored. By default, files are stored like this:
     #

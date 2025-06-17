@@ -2,22 +2,7 @@
 
 # Configures mail delivery settings.
 
-if Danbooru.config.mail_delivery_method.present? || Danbooru.config.mail_settings.present?
-  settings = Danbooru.config.mail_settings.dup
-
-  mail_delivery_url = Addressable::URI.new(
-    scheme: "smtp",
-    host: settings.delete(:address),
-    port: settings.delete(:port),
-    user: settings.delete(:user_name),
-    password: settings.delete(:password),
-    query_values: settings
-  ).to_s
-
-  warn "Warning: Danbooru.config.mail_settings is deprecated. Use DANBOORU_MAIL_DELIVERY_URL=#{mail_delivery_url} instead."
-else
-  mail_delivery_url = Danbooru.config.mail_delivery_url
-end
+mail_delivery_url = Danbooru.config.mail_delivery_url
 
 if mail_delivery_url.present?
   url = Danbooru::URL.parse!(mail_delivery_url, schemes: %w[smtp smtps])
