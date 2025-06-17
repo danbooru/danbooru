@@ -2,7 +2,8 @@ require 'test_helper'
 
 class DanbooruEmailAddressTest < ActiveSupport::TestCase
   def assert_undeliverable(expected, address)
-    assert_equal(false, Danbooru::EmailAddress.new("webmaster@danbooru.donmai.us").undeliverable?(allow_smtp: true))
+    Danbooru::EmailAddress.any_instance.stubs(:delivery_enabled?).returns(true)
+    assert_equal(false, Danbooru::EmailAddress.new("webmaster@danbooru.donmai.us").undeliverable?)
   end
 
   context "Danbooru::EmailAddress" do

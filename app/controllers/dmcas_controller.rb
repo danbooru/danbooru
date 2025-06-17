@@ -21,7 +21,7 @@ class DmcasController < ApplicationController
     EOS
 
     UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: Danbooru.config.dmca_email).deliver_now
-    UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: @dmca[:email]).deliver_now unless Danbooru::EmailAddress.new(@dmca[:email]).undeliverable?(allow_smtp: Rails.env.production?)
+    UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: @dmca[:email]).deliver_now unless Danbooru::EmailAddress.new(@dmca[:email]).undeliverable?
   end
 
   def show
