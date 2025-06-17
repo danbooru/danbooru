@@ -2,14 +2,14 @@
   <%= form.text_field(input_name, input_html) %>
 <% else %>
   <div class="dtext-editor relative w-fit focus-within:outline-auto <%= editor_html[:class] %>"
-       spellcheck="true"
-       data-inline="<%= inline? %>"
-       data-media-embeds="<%= media_embeds? %>"
        x-bind:class="{ 'dtext-editor-loading inert': editor.loading }"
        x-data="{ editor: new Danbooru.DTextEditor($root) }"
-       x-init="editor.initialize(<%= { domains: domains }.to_json %>)"
-       x-on:dragover.prevent="true"
-       x-on:drop="editor.insertImages($event.dataTransfer.files)">
+       x-init="editor.initialize(<%= { inline: inline?, mediaEmbeds: media_embeds?, domains: domains }.to_json %>)"
+       <% if media_embeds? %>
+        x-on:dragover.prevent="true"
+        x-on:drop="editor.insertImages($event.dataTransfer.files)"
+       <% end %>
+       spellcheck="true">
     <div class="dtext-editor-menu flex justify-between border-t border-x rounded-t w-full">
       <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.editMode" x-on:click="editor.toggleMode()" title="Preview (Ctrl+P)"><%= eye_icon(class: "text-sm") %> Preview</a>
       <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.previewMode" x-on:click="editor.toggleMode()" data-shortcut="ctrl+p" title="Edit (Ctrl+P)" x-cloak><%= edit_icon(class: "text-sm") %> Edit</a>
@@ -21,39 +21,41 @@
 
         <span class="mx-2 py-2 border-l"></span>
 
-        <span x-data="{ imageCaption: '', imageSize: 'small' }">
-          <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert image"}) do |menu| %>
-            <% menu.with_button do %>
-              <%= image_icon("x-on:click": "$nextTick(() => $refs?.imageUrl?.focus())") %>
-            <% end %>
+        <% if media_embeds? %>
+          <span x-data="{ imageCaption: '', imageSize: 'small' }">
+            <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert image"}) do |menu| %>
+              <% menu.with_button do %>
+                <%= image_icon("x-on:click": "$nextTick(() => $refs?.imageUrl?.focus())") %>
+              <% end %>
 
-            <% menu.with_item do %>
-              <div class="flex flex-col w-320px gap-2">
-                <input type="text" placeholder="Paste image URL" class="w-full" x-ref="imageUrl" x-on:paste.prevent="editor.insertImages($event.clipboardData.getData('text'), imageSize, imageCaption)">
-                <input type="file" id="file-picker-<%= object_id %>" class="hidden" x-on:change="editor.insertImages($event.target.files, imageSize, imageCaption)" accept="image/*,video/*" multiple>
-                <input type="text" placeholder="Enter image caption (optional)" class="w-full" x-model="imageCaption">
+              <% menu.with_item do %>
+                <div class="flex flex-col w-320px gap-2">
+                  <input type="text" placeholder="Paste image URL" class="w-full" x-ref="imageUrl" x-on:paste.prevent="editor.insertImages($event.clipboardData.getData('text'), imageSize, imageCaption)">
+                  <input type="file" id="file-picker-<%= object_id %>" class="hidden" x-on:change="editor.insertImages($event.target.files, imageSize, imageCaption)" accept="image/*,video/*" multiple>
+                  <input type="text" placeholder="Enter image caption (optional)" class="w-full" x-model="imageCaption">
 
-                <div class="input radio_buttons radio-button-group flex items-center !m-0 hidden">
-                  <label class="text-sm mr-2">Size</label>
+                  <div class="input radio_buttons radio-button-group flex items-center !m-0 hidden">
+                    <label class="text-sm mr-2">Size</label>
 
-                  <span class="radio text-xxs">
-                    <input type="radio" id="image-size-<%= object_id %>-small" name="image-size-<%= object_id %>" class="radio_buttons" value="small" x-model="imageSize" checked>
-                    <label for="image-size-<%= object_id %>-small">Small</label>
-                  </span>
+                    <span class="radio text-xxs">
+                      <input type="radio" id="image-size-<%= object_id %>-small" name="image-size-<%= object_id %>" class="radio_buttons" value="small" x-model="imageSize" checked>
+                      <label for="image-size-<%= object_id %>-small">Small</label>
+                    </span>
 
-                  <span class="radio text-xxs">
-                    <input type="radio" id="image-size-<%= object_id %>-large" name="image-size-<%= object_id %>" class="radio_buttons" value="large" x-model="imageSize">
-                    <label for="image-size-<%= object_id %>-large">Large</label>
-                  </span>
+                    <span class="radio text-xxs">
+                      <input type="radio" id="image-size-<%= object_id %>-large" name="image-size-<%= object_id %>" class="radio_buttons" value="large" x-model="imageSize">
+                      <label for="image-size-<%= object_id %>-large">Large</label>
+                    </span>
+                  </div>
+
+                  <label class="fineprint" for="file-picker-<%= object_id %>">
+                    <a class="font-normal inactive-link cursor-pointer focus:outline-0"><%= folder_open_icon(class: "align-baseline") %>Click, paste, or drop to add images.</a>
+                  </label>
                 </div>
-
-                <label class="fineprint" for="file-picker-<%= object_id %>">
-                  <a class="font-normal inactive-link cursor-pointer focus:outline-0"><%= folder_open_icon(class: "align-baseline") %>Click, paste, or drop to add images.</a>
-                </label>
-              </div>
+              <% end %>
             <% end %>
-          <% end %>
-        </span>
+          </span>
+        <% end %>
 
         <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert emoji" }) do |menu| %>
           <% menu.with_button do %>

@@ -40,7 +40,10 @@ export default class DTextEditor {
   uploading = false; // True if the editor is currently uploading files.
   previewLoading = false; // True if the editor is currently loading the preview HTML.
   emojiSearch = ""; // The current search term for the emoji picker.
-  domains = []; // The list of the current site's domains. Used for determining which links belong to the current site.
+
+  inline = false; // If true, the editor is in inline mode (only uses a single line <input> field instead of a <textarea>).
+  mediaEmbeds = false; // Whether to enable media embeds in the preview.
+  domains = []; // The list of the domains for the current site. Used for determining which links belong to the current site.
 
   // @param {HTMLElement} root - The root <div class="dtext-editor"> element of the DText editor.
   constructor(root) {
@@ -49,8 +52,13 @@ export default class DTextEditor {
     this.dtext = this.input.value;
   }
 
-  initialize({ domains = [] } = {}) {
+  // @param {Boolean} inline - Whether the editor is in inline mode.
+  // @param {Boolean} mediaEmbeds - Whether to enable media embeds in the preview.
+  // @param {String[]} domains - The list of the domains for the current site.
+  initialize({ inline = false, mediaEmbeds = false, domains = [] } = {}) {
     this.root.editor = this;
+    this.inline = inline;
+    this.mediaEmbeds = mediaEmbeds;
     this.domains = domains;
   }
 
@@ -227,6 +235,10 @@ export default class DTextEditor {
   // @param {String} size - Whether to insert the images as a gallery of thumbnail images ("small") or as full-size images ("large").
   // @param {String} caption - The caption to use for the images.
   async insertImages(filesOrURL, size = "small", caption = "") {
+    if (!this.mediaEmbeds) {
+      return;
+    }
+
     try {
       let prefix = size === "small" ? "* " : "";
       let suffix = caption.length > 0 ? `: ${caption}` : "";
@@ -332,8 +344,8 @@ export default class DTextEditor {
 
     let html = await $.post("/dtext_preview", {
       body: this.input.value,
-      inline: this.root.dataset.inline === "true",
-      media_embeds: this.root.dataset.mediaEmbeds === "true",
+      inline: this.inline,
+      media_embeds: this.mediaEmbeds,
     });
 
     this.previewLoading = false;
