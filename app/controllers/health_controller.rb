@@ -6,7 +6,7 @@ class HealthController < ApplicationController
   # Don't load current user in order to avoid making any database calls during health checks.
   anonymous_only
 
-  skip_after_action :verify_authorized, if: -> { !Rails.env.production? }
+  after_action :skip_authorization
 
   # /up
   def show

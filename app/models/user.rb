@@ -608,7 +608,7 @@ class User < ApplicationRecord
   concerning :LimitMethods do
     class_methods do
       def statement_timeout(level)
-        if Rails.env.development?
+        if Rails.env.local?
           60_000
         elsif level >= User::Levels::PLATINUM
           9_000

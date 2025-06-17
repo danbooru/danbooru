@@ -22,7 +22,7 @@
 #   postgresql://danbooru@localhost/danbooru
 #
 # @see https://guides.rubyonrails.org/configuring.html#configuring-a-database
-# @see https://www.postgresql.org/docs/current/libpq-connect.html#id-1.7.3.8.3.6
+# @see https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING-URIS
 
 default: &default
   adapter: postgresql
@@ -31,6 +31,10 @@ default: &default
   url: <%= ENV["DATABASE_URL"] %>
 
 production:
+  <<: *default
+  database: danbooru
+
+betabooru:
   <<: *default
   database: danbooru
 

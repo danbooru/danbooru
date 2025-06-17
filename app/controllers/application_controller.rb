@@ -19,7 +19,7 @@ class ApplicationController < ActionController::Base
   before_action :add_headers
   before_action :cause_error
   before_action :redirect_if_name_invalid?
-  after_action :verify_authorized, if: -> { !Rails.env.production? }
+  after_action :verify_authorized, if: -> { Rails.env.local? }
   after_action :skip_session_if_publicly_cached
   after_action :reset_current_user
   layout "default"

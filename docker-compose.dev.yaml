@@ -57,7 +57,7 @@ x-base-template: &base-template
     # because giving others access is insecure anyway.
     DANBOORU_SECRET_KEY_BASE: "insecure"
 
-    RAILS_ENV: development
+    RAILS_ENV: ${RAILS_ENV:-development}
     DATABASE_URL: postgresql://postgres?pool=100
     DANBOORU_REDIS_URL: redis://redis:6379
     DANBOORU_IQDB_URL: http://iqdb:5588

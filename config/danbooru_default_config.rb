@@ -175,7 +175,7 @@ module Danbooru
         ENV["RAILS_LOG_LEVEL"]
       elsif debug_mode
         :debug
-      elsif Rails.env.production?
+      elsif !Rails.env.local?
         :error
       elsif Rails.env.development?
         :info

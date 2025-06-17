@@ -5,7 +5,7 @@ class MockServicesController < ApplicationController
   respond_to :json
 
   before_action do
-    raise User::PrivilegeError if Rails.env.production?
+    raise User::PrivilegeError if !Rails.env.local?
     skip_authorization
   end
 
