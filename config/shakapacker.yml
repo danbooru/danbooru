@@ -119,7 +119,7 @@ test:
   # Compile test packs to a separate directory
   public_output_path: packs-test
 
-production:
+production: &production
   <<: *default
 
   # Production depends on precompilation of packs prior to booting for performance.
@@ -130,3 +130,6 @@ production:
 
   # Cache manifest.json for performance
   cache_manifest: true
+
+betabooru:
+  <<: *production
