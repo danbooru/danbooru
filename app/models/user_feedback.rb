@@ -16,6 +16,8 @@ class UserFeedback < ApplicationRecord
 
   deletable
 
+  scope :ban,      -> { where("body ~ '^Banned'") }
+  scope :not_ban,  -> { where("body !~ '^Banned'") }
   scope :positive, -> { where(category: "positive") }
   scope :neutral,  -> { where(category: "neutral") }
   scope :negative, -> { where(category: "negative") }

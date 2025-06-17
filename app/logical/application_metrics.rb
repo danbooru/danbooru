@@ -67,7 +67,7 @@ class ApplicationMetrics
       { name: :danbooru_uploads_total,                       type: :gauge,   help: "The total number of uploads." },
       { name: :danbooru_users_total,                         type: :counter, help: "The total number of user accounts." },
       { name: :danbooru_active_users_total,                  type: :gauge,   help: "The total number of logged-in users who have visited the site in the last hour/day/week/month/year." },
-      { name: :danbooru_user_feedbacks_total,                type: :gauge,   help: "The total number of user feedbacks (excluding deleted feedbacks)." },
+      { name: :danbooru_user_feedbacks_total,                type: :gauge,   help: "The total number of user feedbacks (excluding deleted feedbacks and ban messages)." },
       { name: :danbooru_wiki_pages_total,                    type: :gauge,   help: "The total number of wiki pages." },
       { name: :danbooru_wiki_page_versions_total,            type: :counter, help: "The total number of wiki page versions." },
     ])
@@ -108,7 +108,7 @@ class ApplicationMetrics
     tag_versions = TagVersion.async_pluck(Arel.sql("COUNT(*)"))
     uploads = Upload.group(:status).async_pluck(Arel.sql("status, COUNT(*)"))
     users = User.async_pluck(Arel.sql("COUNT(*), COUNT(*) FILTER (WHERE last_logged_in_at > now() - interval '1 hour'), COUNT(*) FILTER (WHERE last_logged_in_at > now() - interval '1 day'), COUNT(*) FILTER (WHERE last_logged_in_at > now() - interval '1 week'), COUNT(*) FILTER (WHERE last_logged_in_at > now() - interval '1 month'), COUNT(*) FILTER (WHERE last_logged_in_at > now() - interval '1 year')"))
-    user_feedbacks = UserFeedback.active.group(:category).async_pluck(Arel.sql("category, COUNT(*)"))
+    user_feedbacks = UserFeedback.undeleted.not_ban.group(:category).async_pluck(Arel.sql("category, COUNT(*)"))
     wiki_pages = WikiPage.group(:is_deleted).async_pluck(Arel.sql("is_deleted, COUNT(*)"))
     wiki_page_versions = WikiPageVersion.async_pluck(Arel.sql("COUNT(*)"))
 
