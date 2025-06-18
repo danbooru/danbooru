@@ -20,7 +20,7 @@ module Source
       end
 
       def extract_image_url(element)
-        url = element.attr("src")
+        url = element.attr("data-originalurl") || element.attr("src")
         url = "https:#{url}" if url.starts_with?("//")
         url = Source::URL.parse(url)
 
@@ -87,6 +87,10 @@ module Source
 
       def http
         super.headers("User-Agent": "net.umanle.arca.android.playstore/0.9.75")
+      end
+
+      def http_downloader
+        super.disable_feature(:spoof_referrer)
       end
 
       memoize def api_response
