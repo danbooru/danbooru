@@ -35,6 +35,7 @@ export default class DTextEditor {
   ]);
 
   root = null; // The root <div class="dtext-editor"> element.
+  dtext = ""; // The text currently in the editor. This is the raw DText input, not the HTML preview.
   input = null; // The <input> or <textarea> element for DText input.
   mode = "edit"; // The current mode of the editor, either "edit" or "preview".
   uploading = false; // True if the editor is currently uploading files.
@@ -49,7 +50,6 @@ export default class DTextEditor {
   constructor(root) {
     this.root = root;
     this.input = root.querySelector("input.dtext, textarea.dtext");
-    this.dtext = this.input.value;
   }
 
   // @param {Boolean} inline - Whether the editor is in inline mode.
@@ -95,8 +95,8 @@ export default class DTextEditor {
   // Toggle `startTag` and `endTag` around the currently selected text.
   toggleInline(startTag, endTag) {
     let selectedText = this.selectedText;
-    let start = this.input.selectionStart;
-    let end = this.input.selectionEnd;
+    let start = this.selectionStart;
+    let end = this.selectionEnd;
     let [prefix, suffix] = this.expandedSelection(startTag, endTag);
 
     // If no text is selected, but we're inside a tag, then remove the nearest surrounding tags.
@@ -106,16 +106,16 @@ export default class DTextEditor {
 
       // If the tag contained multiple words, select all the text between the tags.
       if (selectedText.match(/\s/)) {
-        this.input.setSelectionRange(start - prefix.length, end + suffix.length - endTag.length - startTag.length);
+        this.setSelectionRange(start - prefix.length, end + suffix.length - endTag.length - startTag.length);
       // If the tag contained a single word, preserve the cursor position and leave the word unselected.
       } else {
-        this.input.setSelectionRange(start - startTag.length, start - startTag.length);
+        this.setCursorPosition(start - startTag.length);
       }
     // If the selected text includes the tags, remove them.
     } else if (selectedText.startsWith(startTag) && selectedText.endsWith(endTag)) {
       this.insertText(selectedText.substring(startTag.length, selectedText.length - endTag.length), start, end);
     // If the selected text is immediately surrounded by the tags, remove them.
-    } else if (this.input.value.substring(start - startTag.length, end + endTag.length) === `${startTag}${selectedText}${endTag}`) {
+    } else if (this.dtext.substring(start - startTag.length, end + endTag.length) === `${startTag}${selectedText}${endTag}`) {
       this.insertText(selectedText, start - startTag.length, end + endTag.length);
     // Otherwise, insert the tags around the selected text or the current word.
     } else {
@@ -137,22 +137,22 @@ export default class DTextEditor {
       let prefix = this.selectionPrefix.match(/[a-zA-Z0-9_]*$/)[0] || "";
       let suffix = this.selectionSuffix.match(/^[a-zA-Z0-9_]*/)[0] || "";
 
-      let start = this.input.selectionStart - prefix.length;
-      let end = this.input.selectionEnd + suffix.length;
-      let caret = this.input.selectionStart + startTag.length;
+      let start = this.selectionStart - prefix.length;
+      let end = this.selectionEnd + suffix.length;
+      let caret = this.selectionStart + startTag.length;
 
       selectedText = `${prefix}${suffix}`;
       this.insertText(`${startTag}${selectedText}${endTag}`, start, end);
-      this.input.setSelectionRange(caret, caret);
+      this.setCursorPosition(caret);
 
     // If text is selected, insert the tags around the selected text, ignoring surrounding whitespace.
     } else {
-      let start = this.input.selectionStart + (selectedText.length - selectedText.trimStart().length);
-      let end = this.input.selectionEnd - (selectedText.length - selectedText.trimEnd().length);
+      let start = this.selectionStart + (selectedText.length - selectedText.trimStart().length);
+      let end = this.selectionEnd - (selectedText.length - selectedText.trimEnd().length);
 
       selectedText = selectedText.trim();
       this.insertText(`${startTag}${selectedText}${endTag}`, start, end);
-      this.input.setSelectionRange(start + startTag.length, start + startTag.length + selectedText.length);
+      this.setSelectionRange(start + startTag.length, start + startTag.length + selectedText.length);
     }
   }
 
@@ -193,13 +193,13 @@ export default class DTextEditor {
   }
 
   // Insert the specified text, replacing the text between the `start` and `end` positions (by default, the currently selected text).
-  insertText(text, start = this.input.selectionStart, end = this.input.selectionEnd) {
-    let selected = this.input.selectionStart !== this.input.selectionEnd;
+  insertText(text, start = this.selectionStart, end = this.selectionEnd) {
+    let selected = this.selectionStart !== this.selectionEnd;
 
-    this.input.focus();
+    this.focus();
 
-    if (start !== this.input.selectionStart || end !== this.input.selectionEnd) {
-      this.input.setSelectionRange(start, end);
+    if (start !== this.selectionStart || end !== this.selectionEnd) {
+      this.setSelectionRange(start, end);
     }
 
     if (text.length > 0) {
@@ -210,7 +210,7 @@ export default class DTextEditor {
 
     // Select the new text if the replaced text was previously selected.
     if (selected) {
-      this.input.setSelectionRange(start, start + text.length);
+      this.setSelectionRange(start, start + text.length);
     }
   }
 
@@ -284,19 +284,45 @@ export default class DTextEditor {
     return this.uploading || this.previewLoading;
   }
 
+  // Set the focus to the input element.
+  focus() {
+    this.input.focus();
+  }
+
+  // @returns {Number} The start position of the currently selected text. If no text is selected, this is the position of the cursor.
+  get selectionStart() {
+    return this.input.selectionStart;
+  }
+
+  // @returns {Number} The end position of the currently selected text. If no text is selected, this is the position of the cursor.
+  get selectionEnd() {
+    return this.input.selectionEnd;
+  }
+
+  // @param {Number} start - The start position of the selected text.
+  // @param {Number} end - The end position of the selected text.
+  setSelectionRange(start, end) {
+    this.input.setSelectionRange(start, end);
+  }
+
+  // @param {Number} position - The position to set the cursor to in the text.
+  setCursorPosition(position) {
+    this.setSelectionRange(position, position);
+  }
+
   // @returns {String} The currently selected text in the <textarea> element.
   get selectedText() {
-    return this.input.value.substring(this.input.selectionStart, this.input.selectionEnd);
+    return this.dtext.substring(this.selectionStart, this.selectionEnd);
   }
 
   // @returns {String} The text before the current selection.
   get selectionPrefix() {
-    return this.input.value.substring(0, this.input.selectionStart);
+    return this.dtext.substring(0, this.selectionStart);
   }
 
   // @returns {String} The text after the current selection.
   get selectionSuffix() {
-    return this.input.value.substring(this.input.selectionEnd);
+    return this.dtext.substring(this.selectionEnd);
   }
 
   // @returns {String} The line of text before the current selection.
@@ -343,7 +369,7 @@ export default class DTextEditor {
     this.previewLoading = true;
 
     let html = await $.post("/dtext_preview", {
-      body: this.input.value,
+      body: this.dtext,
       inline: this.inline,
       media_embeds: this.mediaEmbeds,
     });
