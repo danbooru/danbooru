@@ -558,7 +558,7 @@ class MediaAsset < ApplicationRecord
 
     # @return [Array<String, Integer>] The highest confidence AI rating, along with its score.
     def ai_rating
-      ai_ratings.max_by(&:second)
+      ai_ratings.max_by(&:second) || [Post::RATINGS.keys.first, 0]
     end
 
     # g => 0, s => 1, q => 2, e => 3
