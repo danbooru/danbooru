@@ -183,7 +183,7 @@
     .media-embed-image {
       img, video, canvas {
         border-radius: 0.25rem;
-        max-width: var(--media-embed-size);
+        max-width: 100%;
         max-height: var(--media-embed-size);
         width: auto;
         height: auto;
@@ -270,7 +270,7 @@
 }
 
 .new-comment, .edit_comment, .new_forum_post, article.comment, article.forum-post {
-  article.dtext-media-embed {
+  article.dtext-media-embed:not(media-gallery *) {
     --media-embed-size: 225px;
   }
 }
