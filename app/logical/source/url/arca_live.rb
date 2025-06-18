@@ -21,10 +21,11 @@ class Source::URL::ArcaLive < Source::URL
     # https://ac-o.namu.la/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9.gif?type=orig
     # https://ac.namu.la/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9.mp4 (.gif sample)
     in _, "namu.la", date, /\A\h{64}/
+      candidate_url = with_params(type: "orig")
       if file_ext == "mp4"
-        @candidate_full_image_urls = %w[gif webp mp4].map { |ext| "#{site}/#{date}/#{filename}.#{ext}?type=orig" }
+        @candidate_full_image_urls = %w[gif webp mp4].map { |ext| candidate_url.with(file_ext: ext).to_s }
       else
-        @full_image_url = "#{site}/#{date}/#{filename}.#{file_ext}?type=orig"
+        @full_image_url = candidate_url.to_s
       end
 
     # https://arca.live/b/arknights/66031722

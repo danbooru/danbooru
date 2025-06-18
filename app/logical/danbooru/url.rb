@@ -184,6 +184,14 @@ module Danbooru
       self.class.new(url.merge(components))
     end
 
+    # Return a new URL with the given query params appended.
+    #
+    # @param params [Hash] The query params to append.
+    # @return [Danbooru::URL] The new URL.
+    def with_params(**params)
+      with(params: self.params.merge(params))
+    end
+
     # Return a new URL with the given components removed. For example, return a new URL with the path or query params removed.
     #
     # @param components [Array<String, Symbol>] The URL components to override (scheme, authority, userinfo, user,
