@@ -24,7 +24,7 @@ module PostVersionsHelper
       obsolete_added_tags = added_tags - other_tags
       obsolete_removed_tags = removed_tags & other_tags
     end
-    html = '<span class="diff-list">'.dup
+    html = '<span class="diff-list break-words">'.dup
 
     added_tags.each do |tag|
       obsolete_class = (obsolete_added_tags.include?(tag) ? "diff-obsolete" : "")
