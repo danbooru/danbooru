@@ -632,6 +632,7 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   .sm\:order-1 { order: 1; }
   .sm\:order-2 { order: 2; }
 
+  .sm\:mx-auto { margin-left: auto; margin-right: auto; }
   .sm\:mx-2 { margin-left: 2 * $spacer; margin-right: 2 * $spacer; }
   .sm\:mt-2 { margin-top: 2 * $spacer; }
 

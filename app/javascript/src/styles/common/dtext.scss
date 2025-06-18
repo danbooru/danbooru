@@ -173,12 +173,7 @@
   }
 
   article {
-    --media-embed-size: 720px;
-
-    @media (width <= 660px) {
-      margin-left: auto;
-      margin-right: auto;
-    }
+    --media-embed-size: 270px;
 
     .media-embed-image {
       img, video, canvas {
@@ -191,11 +186,7 @@
     }
 
     .media-embed-caption {
-      text-align: center;
-      font-size: 0.8em;
-      padding: 0.5rem;
       line-height: 1.4;
-      color: var(--muted-text-color);
     }
   }
 
@@ -266,11 +257,5 @@
     > div {
       padding: 1rem;
     }
-  }
-}
-
-.new-comment, .edit_comment, .new_forum_post, article.comment, article.forum-post {
-  article.dtext-media-embed:not(media-gallery *) {
-    --media-embed-size: 225px;
   }
 }

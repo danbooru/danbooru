@@ -180,7 +180,7 @@ class DText
     end
 
     node.name = "article"
-    node["class"] = "dtext-media-embed w-fit h-fit"
+    node["class"] = "dtext-media-embed w-fit h-fit sm:mx-auto"
     node["data-type"] = type
     node["data-id"] = id
 
@@ -190,7 +190,7 @@ class DText
       caption ||= "This #{type} is unavailable."
     elsif asset.is_image?
       variant = asset.variant(:"720x720")
-      asset_html = %{<a href="#{href}"><img src="#{variant.file_url}" width="#{variant.width}" height="#{variant.height}"></a>}
+      asset_html = %{<a class="inline-block" href="#{href}"><img src="#{variant.file_url}" width="#{variant.width}" height="#{variant.height}"></a>}
     elsif asset.is_ugoira?
       asset_html = ApplicationController.new.view_context.render(UgoiraComponent.new(asset, default_quality: :sample))
     elsif asset.is_video?
@@ -199,7 +199,7 @@ class DText
     end
 
     node.inner_html  = %{<div class="media-embed-image">#{asset_html}</div>}
-    node.inner_html += %{<div class="media-embed-caption">#{caption}</div>} if caption.present?
+    node.inner_html += %{<div class="media-embed-caption p-2 text-xs text-center text-muted">#{caption}</div>} if caption.present?
   end
 
   # Replace a <tag-request-embed> node with the contents of the alias, implication, or bulk update request.
