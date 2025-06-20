@@ -37,6 +37,8 @@ export default class DTextEditor {
   root = null; // The root <div class="dtext-editor"> element.
   dtext = ""; // The text currently in the editor. This is the raw DText input, not the HTML preview.
   input = null; // The <input> or <textarea> element for DText input.
+  mirror = null; // The mirror <div> element, used for tracking the current cursor position.
+  mirrorRange = null; // The current selection range in the mirror element.
   mode = "edit"; // The current mode of the editor, either "edit" or "preview".
   uploading = false; // True if the editor is currently uploading files.
   previewLoading = false; // True if the editor is currently loading the preview HTML.
@@ -50,6 +52,8 @@ export default class DTextEditor {
   constructor(root) {
     this.root = root;
     this.input = root.querySelector("input.dtext, textarea.dtext");
+    this.mirror = root.querySelector(".dtext-mirror");
+    this.mirrorRange = document.createRange();
   }
 
   // @param {Boolean} inline - Whether the editor is in inline mode.
@@ -353,6 +357,28 @@ export default class DTextEditor {
     }
 
     return [prefix, suffix];
+  }
+
+  // Get the coordinates of the current cursor position.
+  //
+  // @param {Number} offset - The offset (in number of characters) to apply to the cursor position.
+  // @returns {DOMRect} The current cursor position, relative to the window.
+  cursorCoordinates(offset = 0) {
+    let start = this.selectionStart + offset;
+    return this.boundingRect(start, start);
+  }
+
+  // Get the bounding box around a range of text. If the range spans multiple lines, this is the bounding box of the first line.
+  //
+  // @param {Number} start - The start position of the range (in characters from the start of the text).
+  // @param {Number} end - The end position of the range (in characters from the start of the text).
+  // @returns {DOMRect} The bounding box of the text, relative to the window.
+  boundingRect(start = this.selectionStart, end = this.selectionEnd) {
+    this.mirror.scrollTop = this.input.scrollTop;
+    this.mirrorRange.setStart(this.mirror.childNodes[0], start);
+    this.mirrorRange.setEnd(this.mirror.childNodes[0], end);
+
+    return this.mirrorRange.getClientRects()[0];
   }
 
   // @returns {String} The HTML representation of the DText input.

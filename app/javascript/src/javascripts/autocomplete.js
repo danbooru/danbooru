@@ -1,3 +1,5 @@
+import { autoUpdate, computePosition, shift } from "@floating-ui/dom";
+
 let Autocomplete = {};
 
 Autocomplete.VERSION = 1; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
@@ -60,8 +62,25 @@ Autocomplete.initialize_dtext_autocomplete = function($fields) {
       return false;
     },
     position: {
-      at: "left top",
-      my: "left bottom"
+      // Position the autocomplete menu below the cursor in the DText editor.
+      using: (_position, data) => {
+        let menu = data.element.element.get(0);
+        let editor = data.target.element.parents(".dtext-editor").get(0).editor;
+        let term = Autocomplete.current_term($(editor.input));
+
+        let cursorAnchor = {
+          getBoundingClientRect: () => editor.cursorCoordinates(-(term.length - 1)),
+          contextElement: editor.input,
+        }
+
+        computePosition(cursorAnchor, menu, {
+          placement: "bottom-start",
+          middleware: [shift()]
+        }).then(({ x, y }) => {
+          menu.style.top = y + "px";
+          menu.style.left = x + "px";
+        });
+      },
     },
     source: async function(req, resp) {
       let caret = this.element.get(0).selectionStart;

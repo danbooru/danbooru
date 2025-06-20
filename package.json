@@ -7,6 +7,7 @@
     "@babel/plugin-transform-runtime": "^7.24.7",
     "@babel/preset-env": "^7.24.7",
     "@babel/runtime": "^7.24.7",
+    "@floating-ui/dom": "^1.7.1",
     "@fontsource/anton": "^5.2.5",
     "@fontsource/archivo-narrow": "^5.2.5",
     "@fontsource/ibm-plex-mono": "^5.2.5",
