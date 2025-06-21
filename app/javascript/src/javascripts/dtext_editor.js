@@ -1,5 +1,7 @@
+import Autocomplete from "./autocomplete";
 import Notice from "./notice";
 import { uploadFilesOrURL } from "./utility";
+import { computePosition, shift } from "@floating-ui/dom";
 
 // @see app/components/dtext_editor_component.rb
 export default class DTextEditor {
@@ -64,6 +66,22 @@ export default class DTextEditor {
     this.inline = inline;
     this.mediaEmbeds = mediaEmbeds;
     this.domains = domains;
+
+    this.initializeAutocomplete();
+  }
+
+  // Autocomplete @-mentions and :emoji: references.
+  initializeAutocomplete() {
+    $(this.input).autocomplete({
+      select: (event, ui) => this.insertAutocompletion(event, ui.item.value + " "),
+      source: async (_req, respond) => respond(await this.autocompletions()),
+      position: {
+        using: (_position, data) => {
+          let menu = data.element.element.get(0);
+          this.positionAutocompleteMenu(menu);
+        },
+      },
+    });
   }
 
   // Toggle between "edit" and "preview" modes.
@@ -357,6 +375,63 @@ export default class DTextEditor {
     }
 
     return [prefix, suffix];
+  }
+
+  // @returns {Object} - The current word the user is typing for autocomplete, or nothing if the word can't be autocompleted.
+  get autocompletionQuery() {
+    let match;
+    let suffix = this.selectionSuffix.match(/\S*/)[0] || "";
+
+    if (match = this.selectionPrefix.match(/([ \r\n/\\()[\]{}<>]|^):([a-zA-Z0-9_]*)$/)) {
+      let prefix = match[2];
+      return { type: "emoji", term: `${prefix}${suffix}`, fullTerm: `:${prefix}${suffix}`, prefix: prefix, fullPrefix: `:${prefix}` };
+    } else if (match = this.selectionPrefix.match(/([ \r\n/\\()[\]{}<>]|^)@([a-zA-Z0-9_]+)$/)) {
+      let prefix = match[2];
+      return { type: "mention", term: `${prefix}${suffix}`, fullTerm: `@${prefix}${suffix}`, prefix: prefix, fullPrefix: `@${prefix}` };
+    } else {
+      return {};
+    }
+  }
+
+  // @return {Array} - The autocompletions for the currently typed word, or nothing if the word can't be autocompleted.
+  async autocompletions() {
+    let query = this.autocompletionQuery;
+
+    if (query.type === "mention") {
+      return await Autocomplete.autocomplete_source(query.term, "mention");
+    } else if (query.type === "emoji") {
+      return await Autocomplete.autocomplete_source(query.term, "emoji", { limit: 50, allowEmpty: true });
+    } else {
+      return [];
+    }
+  }
+
+  // Insert the selected autocompletion at the current cursor position.
+  insertAutocompletion(event, completion) {
+    let query = this.autocompletionQuery;
+    let start = this.selectionStart - query.fullPrefix.length;
+    let end = start + query.fullTerm.length;
+
+    this.insertText(completion, start, end);
+    event.preventDefault();
+  }
+
+  // Position the autocompletion menu below the cursor.
+  positionAutocompleteMenu(menu) {
+    let term = this.autocompletionQuery.prefix || "";
+
+    let cursorAnchor = {
+      getBoundingClientRect: () => this.cursorCoordinates(-term.length),
+      contextElement: this.input,
+    }
+
+    computePosition(cursorAnchor, menu, {
+      placement: "bottom-start",
+      middleware: [shift()]
+    }).then(({ x, y }) => {
+      menu.style.top = y + "px";
+      menu.style.left = x + "px";
+    });
   }
 
   // Get the coordinates of the current cursor position.

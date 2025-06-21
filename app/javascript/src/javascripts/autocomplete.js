@@ -1,5 +1,3 @@
-import { autoUpdate, computePosition, shift } from "@floating-ui/dom";
-
 let Autocomplete = {};
 
 Autocomplete.VERSION = 1; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
@@ -31,7 +29,6 @@ Autocomplete.initialize_all = function() {
   });
 
   this.initialize_tag_autocomplete();
-  this.initialize_dtext_autocomplete($("form div.input.dtext textarea"));
   this.initialize_fields($('[data-autocomplete="tag"]'), "tag");
   this.initialize_fields($('[data-autocomplete="artist"]'), "artist");
   this.initialize_fields($('[data-autocomplete="pool"]'), "pool");
@@ -53,57 +50,6 @@ Autocomplete.initialize_fields = function($fields, type) {
     },
   });
 };
-
-// Autocomplete @-mentions and :emoji: references in DText.
-Autocomplete.initialize_dtext_autocomplete = function($fields) {
-  $fields.autocomplete({
-    select: function(event, ui) {
-      Autocomplete.insert_completion(this, ui.item.value);
-      return false;
-    },
-    position: {
-      // Position the autocomplete menu below the cursor in the DText editor.
-      using: (_position, data) => {
-        let menu = data.element.element.get(0);
-        let editor = data.target.element.parents(".dtext-editor").get(0).editor;
-        let term = Autocomplete.current_term($(editor.input));
-
-        let cursorAnchor = {
-          getBoundingClientRect: () => editor.cursorCoordinates(-(term.length - 1)),
-          contextElement: editor.input,
-        }
-
-        computePosition(cursorAnchor, menu, {
-          placement: "bottom-start",
-          middleware: [shift()]
-        }).then(({ x, y }) => {
-          menu.style.top = y + "px";
-          menu.style.left = x + "px";
-        });
-      },
-    },
-    source: async function(req, resp) {
-      let caret = this.element.get(0).selectionStart;
-      let term_after_caret = req.term.substring(caret).match(/\S*/)[0];
-      caret += term_after_caret.length;
-      let match = req.term.substring(0, caret).match(/([ \r\n/\\()[\]{}<>]|^)([@:])([a-zA-Z0-9_]*)$/);
-
-      let prefix = match?.[1];
-      let type = match?.[2];
-      let name = match?.[3];
-
-      if (type === "@") {
-        let results = await Autocomplete.autocomplete_source(name, "mention");
-        resp(results);
-      } else if (type === ":") {
-        let results = await Autocomplete.autocomplete_source(name, "emoji", { limit: 50, allowEmpty: true });
-        resp(results);
-      } else {
-        resp([]);
-      }
-    }
-  });
-}
 
 Autocomplete.initialize_tag_autocomplete = function() {
   var $fields_multiple = $('[data-autocomplete="tag-query"], [data-autocomplete="tag-edit"]');
@@ -167,10 +113,9 @@ Autocomplete.on_tab = function(event) {
   }
 
   if ($autocomplete_menu.has(".ui-state-active").length === 0) {
-    var $first_item = $autocomplete_menu.find(".ui-menu-item").first();
-    var completion = $first_item.data().uiAutocompleteItem.value;
-
-    Autocomplete.insert_completion(input, completion);
+    autocomplete.menu.next();
+    autocomplete.menu.select();
+    autocomplete.close();
   }
 
   // Prevent the tab key from moving focus to the next element.
