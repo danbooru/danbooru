@@ -73,7 +73,7 @@ export default class DTextEditor {
   // Autocomplete @-mentions and :emoji: references.
   initializeAutocomplete() {
     $(this.input).autocomplete({
-      select: (event, ui) => this.insertAutocompletion(event, ui.item.value + " "),
+      select: (event, ui) => this.insertAutocompletion(event, ui.item.value),
       source: async (_req, respond) => respond(await this.autocompletions()),
       position: {
         using: (_position, data) => {
@@ -377,18 +377,59 @@ export default class DTextEditor {
     return [prefix, suffix];
   }
 
-  // @returns {Object} - The current word the user is typing for autocomplete, or nothing if the word can't be autocompleted.
+  // @returns {Object} - The autocompletion type and context for the current word, if it's autocompleteable, or nothing if the word can't be autocompleted.
   get autocompletionQuery() {
     let match;
-    let suffix = this.selectionSuffix.match(/\S*/)[0] || "";
+    let prefix = "";
+    let suffix = "";
+    let fullPrefix = "";
+    let fullSuffix = "";
+    let formatCompletion = word => word;
 
-    if (match = this.selectionPrefix.match(/([ \r\n/\\()[\]{}<>]|^):([a-zA-Z0-9_]*)$/)) {
-      let prefix = match[2];
-      return { type: "emoji", term: `${prefix}${suffix}`, fullTerm: `:${prefix}${suffix}`, prefix: prefix, fullPrefix: `:${prefix}` };
+    if (match = this.selectionPrefixLine.match(/(\[\[)([^\[\]\|]+?)$/)) {
+      let label = "";
+      prefix = match[2].toLowerCase();
+      fullPrefix = `${match[1]}${prefix}`;
+
+      if (match = this.selectionSuffixLine.match(/^([^\[\]\|]*?)(\|[^\]]*?)?\]\]/)) {
+        suffix = match[1];
+        fullSuffix = match[0];
+        label = match[2] || "";
+      } else if (match = this.selectionSuffixLine.match(/^\S*/)) {
+        suffix = match[0];
+        fullSuffix = suffix;
+      }
+
+      return { type: "tag", term: `${prefix}${suffix}`, fullTerm: `${fullPrefix}${fullSuffix}`, prefix, fullPrefix, formatCompletion: word => `[[${word.replace(/_/g, " ")}${label}]]` };
+    } else if (match = this.selectionPrefixLine.match(/(\{\{[^\{\}\|]*?)(\S*)$/)) {
+      let label = "";
+      let lhs = match[1];
+      prefix = match[2].toLowerCase();
+      fullPrefix = `${lhs}${prefix}`;
+
+      if (match = this.selectionSuffixLine.match(/^([^\{\}\|]*?)(\|[^\}]*?)?\}\}/)) {
+        suffix = match[1];
+        fullSuffix = match[0];
+        label = match[2] || "";
+      } else if (match = this.selectionSuffixLine.match(/^\S*/)) {
+        suffix = match[0];
+        fullSuffix = suffix;
+      }
+
+      return { type: "tag_query", term: `${prefix}${suffix}`, fullTerm: `${fullPrefix}${fullSuffix}`, prefix, fullPrefix, formatCompletion: word => `${lhs}${word}${label}}}` };
+    } else if (match = this.selectionPrefixLine.match(/([ \r\n/\\()[\]{}<>]|^):([a-zA-Z0-9_]*)$/)) {
+      prefix = match[2];
+      suffix = this.selectionSuffixLine.match(/^\S*/)[0];
+      fullPrefix = `:${prefix}`;
+
+      return { type: "emoji", term: `${prefix}${suffix}`, fullTerm: `${fullPrefix}${suffix}`, prefix, fullPrefix, formatCompletion };
     // See user_name_validator.rb for the username rules.
-    } else if (match = this.selectionPrefix.match(/([^a-zA-Z0-9\[\{]|^)@([a-zA-Z0-9_.\-\p{Script=Han}\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]+)$/u)) {
-      let prefix = match[2];
-      return { type: "mention", term: `${prefix}${suffix}`, fullTerm: `@${prefix}${suffix}`, prefix: prefix, fullPrefix: `@${prefix}` };
+    } else if (match = this.selectionPrefixLine.match(/([^a-zA-Z0-9\[\{]|^)@([a-zA-Z0-9_.\-\p{Script=Han}\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]+)$/u)) {
+      prefix = match[2];
+      suffix = this.selectionSuffixLine.match(/^\S*/)[0];
+      fullPrefix = `@${prefix}`;
+
+      return { type: "mention", term: `${prefix}${suffix}`, fullTerm: `${fullPrefix}${suffix}`, prefix, fullPrefix, formatCompletion };
     } else {
       return {};
     }
@@ -398,7 +439,11 @@ export default class DTextEditor {
   async autocompletions() {
     let query = this.autocompletionQuery;
 
-    if (query.type === "mention") {
+    if (query.type === "tag") {
+      return await Autocomplete.autocomplete_source(query.term, "tag");
+    } else if (query.type === "tag_query") {
+      return await Autocomplete.autocomplete_source(query.term, "tag_query");
+    } else if (query.type === "mention") {
       return await Autocomplete.autocomplete_source(query.term, "mention");
     } else if (query.type === "emoji") {
       return await Autocomplete.autocomplete_source(query.term, "emoji", { limit: 50, allowEmpty: true });
@@ -412,6 +457,13 @@ export default class DTextEditor {
     let query = this.autocompletionQuery;
     let start = this.selectionStart - query.fullPrefix.length;
     let end = start + query.fullTerm.length;
+    completion = query.formatCompletion(completion);
+
+    // Add a space after the completion. If there's already a space, move the cursor past it instead.
+    completion += " ";
+    if (this.dtext[end] === " ") {
+      end += 1;
+    }
 
     this.insertText(completion, start, end);
     event.preventDefault();
