@@ -385,7 +385,8 @@ export default class DTextEditor {
     if (match = this.selectionPrefix.match(/([ \r\n/\\()[\]{}<>]|^):([a-zA-Z0-9_]*)$/)) {
       let prefix = match[2];
       return { type: "emoji", term: `${prefix}${suffix}`, fullTerm: `:${prefix}${suffix}`, prefix: prefix, fullPrefix: `:${prefix}` };
-    } else if (match = this.selectionPrefix.match(/([ \r\n/\\()[\]{}<>]|^)@([a-zA-Z0-9_]+)$/)) {
+    // See user_name_validator.rb for the username rules.
+    } else if (match = this.selectionPrefix.match(/([^a-zA-Z0-9\[\{]|^)@([a-zA-Z0-9_.\-\p{Script=Han}\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]+)$/u)) {
       let prefix = match[2];
       return { type: "mention", term: `${prefix}${suffix}`, fullTerm: `@${prefix}${suffix}`, prefix: prefix, fullPrefix: `@${prefix}` };
     } else {
