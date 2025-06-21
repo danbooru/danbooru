@@ -1,6 +1,7 @@
 <%= search_form_for(artist_versions_path) do |f| %>
   <%= f.input :updater_name, label: "Updater", input_html: { value: params.dig(:search, :updater_name), "data-autocomplete": "user" } %>
   <%= f.input :name, label: "Artist", input_html: { value: params.dig(:search, :name), "data-autocomplete": "artist" } %>
+  <%= f.input :order, collection: [["ID", "id"], ["Created", "created_at"], ["Updated", "updated_at"], ["Name", "name"]], selected: params.dig(:search, :order) %>
   <%= f.submit "Search" %>
 <% end %>
 
