@@ -95,7 +95,7 @@ Autocomplete.insert_completion = function(input, completion) {
     after_caret_text = " " + after_caret_text;
   }
 
-  input.value = before_caret_text + after_caret_text;
+  $(input).replaceFieldText(before_caret_text + after_caret_text);
   input.selectionStart = input.selectionEnd = before_caret_text.length;
 
   $(input).trigger("input"); // Manually trigger an input event because programmatically editing the field won't trigger one.

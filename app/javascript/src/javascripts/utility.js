@@ -157,6 +157,19 @@ export async function createUpload(params, pollDelay = 250) {
   return upload;
 }
 
+$.fn.replaceFieldText = function(new_value) {
+  return this.each(function() {
+    this.focus();
+    this.setSelectionRange(0, this.value.length);
+    let success = document.execCommand("insertText", false, new_value);
+    if (!success) {
+      // insertText is not supported by the browser.
+      // Fall back to assigning to value.
+      this.value = new_value;
+    }
+  })
+}
+
 $.fn.selectEnd = function() {
   return this.each(function() {
     this.focus();
