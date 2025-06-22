@@ -294,7 +294,7 @@
   <% if has_uploads? %>
     <div class="user-uploads recent-posts">
       <h2 class="recent-posts-header">
-        <%= link_to "Uploads", posts_path(tags: "user:#{user.name}") %>
+        <%= link_to "Posts", posts_path(tags: "user:#{user.name}") %>
       </h2>
       <%= render_post_gallery(uploads, tags: "user:#{user.name}", show_deleted: true, show_votes: true) %>
     </div>
