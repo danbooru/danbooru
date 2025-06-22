@@ -39,8 +39,10 @@ export default class DTextEditor {
   root = null; // The root <div class="dtext-editor"> element.
   dtext = ""; // The text currently in the editor. This is the raw DText input, not the HTML preview.
   input = null; // The <input> or <textarea> element for DText input.
+  autocomplete = null; // The jQuery UI autocomplete instance for the input element.
   mirror = null; // The mirror <div> element, used for tracking the current cursor position.
   mirrorRange = null; // The current selection range in the mirror element.
+
   mode = "edit"; // The current mode of the editor, either "edit" or "preview".
   uploading = false; // True if the editor is currently uploading files.
   previewLoading = false; // True if the editor is currently loading the preview HTML.
@@ -75,13 +77,10 @@ export default class DTextEditor {
     $(this.input).autocomplete({
       select: (event, ui) => this.insertAutocompletion(event, ui.item.value, ui.item.html.get(0)),
       source: async (_req, respond) => respond(await this.autocompletions()),
-      position: {
-        using: (_position, data) => {
-          let menu = data.element.element.get(0);
-          this.positionAutocompleteMenu(menu);
-        },
-      },
+      position: { using: () => this.positionAutocompleteMenu() },
     });
+
+    this.autocomplete = $(this.input).autocomplete("instance");
   }
 
   // Toggle between "edit" and "preview" modes.
@@ -481,8 +480,9 @@ export default class DTextEditor {
   }
 
   // Position the autocompletion menu below the cursor.
-  positionAutocompleteMenu(menu) {
+  positionAutocompleteMenu() {
     let term = this.autocompletionQuery.prefix || "";
+    let menu = this.autocomplete.menu.element.get(0);
 
     let cursorAnchor = {
       getBoundingClientRect: () => this.cursorCoordinates(-term.length),
