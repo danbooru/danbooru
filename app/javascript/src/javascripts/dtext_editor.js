@@ -184,6 +184,9 @@ export default class DTextEditor {
     if (event.ctrlKey && !event.shiftKey && handler) {
       handler(this);
       event.preventDefault();
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      // XXX Hack to prevent the autocomplete menu from popping up when the user is navigating with the arrow keys.
+      event.stopPropagation();
     }
   }
 

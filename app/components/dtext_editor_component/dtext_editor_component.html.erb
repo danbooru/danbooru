@@ -105,7 +105,7 @@
         "x-model": "editor.dtext",
         "x-init": "editor.dtext = $el.value",
         "x-show": "editor.editMode",
-        "x-on:keydown": "editor.onKeyDown($event)",
+        "x-on:keydown.capture": "editor.onKeyDown($event)",
         "x-on:scroll": "editor.autocomplete.close()",
         "x-on:paste": "editor.onPaste($event)")
       ) %>
