@@ -73,7 +73,7 @@ export default class DTextEditor {
   // Autocomplete @-mentions and :emoji: references.
   initializeAutocomplete() {
     $(this.input).autocomplete({
-      select: (event, ui) => this.insertAutocompletion(event, ui.item.value),
+      select: (event, ui) => this.insertAutocompletion(event, ui.item.value, ui.item.html.get(0)),
       source: async (_req, respond) => respond(await this.autocompletions()),
       position: {
         using: (_position, data) => {
@@ -388,7 +388,7 @@ export default class DTextEditor {
 
     if (match = this.selectionPrefixLine.match(/(\[\[)([^\[\]\|]+?)$/)) {
       let label = "";
-      prefix = match[2].toLowerCase();
+      prefix = match[2];
       fullPrefix = `${match[1]}${prefix}`;
 
       if (match = this.selectionSuffixLine.match(/^([^\[\]\|]*?)(\|[^\]]*?)?\]\]/)) {
@@ -400,11 +400,11 @@ export default class DTextEditor {
         fullSuffix = suffix;
       }
 
-      return { type: "tag", term: `${prefix}${suffix}`, fullTerm: `${fullPrefix}${fullSuffix}`, prefix, fullPrefix, formatCompletion: word => `[[${word.replace(/_/g, " ")}${label}]]` };
+      return { type: "tag", term: `${prefix}${suffix}`.toLowerCase(), fullTerm: `${fullPrefix}${fullSuffix}`, prefix, fullPrefix, formatCompletion: (_word, properName) => `[[${properName}${label}]]` };
     } else if (match = this.selectionPrefixLine.match(/(\{\{[^\{\}\|]*?)(\S*)$/)) {
       let label = "";
       let lhs = match[1];
-      prefix = match[2].toLowerCase();
+      prefix = match[2];
       fullPrefix = `${lhs}${prefix}`;
 
       if (match = this.selectionSuffixLine.match(/^([^\{\}\|]*?)(\|[^\}]*?)?\}\}/)) {
@@ -416,7 +416,7 @@ export default class DTextEditor {
         fullSuffix = suffix;
       }
 
-      return { type: "tag_query", term: `${prefix}${suffix}`, fullTerm: `${fullPrefix}${fullSuffix}`, prefix, fullPrefix, formatCompletion: word => `${lhs}${word}${label}}}` };
+      return { type: "tag_query", term: `${prefix}${suffix}`.toLowerCase(), fullTerm: `${fullPrefix}${fullSuffix}`, prefix, fullPrefix, formatCompletion: word => `${lhs}${word}${label}}}` };
     } else if (match = this.selectionPrefixLine.match(/([ \r\n/\\()[\]{}<>]|^):([a-zA-Z0-9_]*)$/)) {
       prefix = match[2];
       suffix = this.selectionSuffixLine.match(/^\S*/)[0];
@@ -453,19 +453,30 @@ export default class DTextEditor {
   }
 
   // Insert the selected autocompletion at the current cursor position.
-  insertAutocompletion(event, completion) {
+  insertAutocompletion(event, completion, item) {
     let query = this.autocompletionQuery;
-    let start = this.selectionStart - query.fullPrefix.length;
-    let end = start + query.fullTerm.length;
-    completion = query.formatCompletion(completion);
+    let properName = item.getAttribute("data-autocomplete-proper-name");
+    let formattedCompletion = query.formatCompletion(completion, properName);
+    let start = 0;
+    let end = 0;
+
+    // If the user typed capitals, keep what they typed to preserve their capitalization. Otherwise, replace the whole query.
+    if (query.prefix.match(/[A-Z]/) && completion.startsWith(query.prefix.toLowerCase().replace(/ /g, "_"))) {
+      start = this.selectionStart;
+      end = start + (query.fullTerm.length - query.fullPrefix.length);
+      formattedCompletion = formattedCompletion.substring(query.fullPrefix.length);
+    } else {
+      start = this.selectionStart - query.fullPrefix.length;
+      end = start + query.fullTerm.length;
+    }
 
     // Add a space after the completion. If there's already a space, move the cursor past it instead.
-    completion += " ";
+    formattedCompletion += " ";
     if (this.dtext[end] === " ") {
       end += 1;
     }
 
-    this.insertText(completion, start, end);
+    this.insertText(formattedCompletion, start, end);
     event.preventDefault();
   }
 

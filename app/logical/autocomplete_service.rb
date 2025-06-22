@@ -33,7 +33,7 @@ class AutocompleteService
 
   # A Result represents a single autocomplete entry. `label` is the pretty name to
   # display in the autocomplete menu and `value` is the actual string to insert.
-  class Result < Struct.new(:type, :label, :value, :category, :post_count, :id, :level, :antecedent, keyword_init: true)
+  class Result < Struct.new(:type, :label, :value, :category, :post_count, :id, :level, :antecedent, :tag, keyword_init: true)
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
 
@@ -148,7 +148,7 @@ class AutocompleteService
 
     results = tags.map do |tag|
       antecedent = tag.tag_alias_for_word_pattern(string)&.antecedent_name
-      { type: "tag-word", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
+      { type: "tag-word", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent, tag: tag }
     end
 
     results = results.sort_by do |result|
@@ -193,7 +193,7 @@ class AutocompleteService
     tags.map do |tag|
       antecedent = tag.tag_alias_for_pattern(string)&.antecedent_name
       type = antecedent.present? ? "tag-alias" : "tag"
-      { type: type, label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
+      { type: type, label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent, tag: tag }
     end
   end
 
@@ -210,7 +210,7 @@ class AutocompleteService
     tags = Tag.nonempty.abbreviation_matches(string).order(post_count: :desc).limit(limit)
 
     results = tags.map do |tag|
-      { type: "tag-abbreviation", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: "/" + tag.abbreviation }
+      { type: "tag-abbreviation", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: "/" + tag.abbreviation, tag: tag }
     end.sort_by do |r|
       [r[:antecedent].to_s.size, -r[:post_count]]
     end
@@ -230,7 +230,7 @@ class AutocompleteService
     tags = Tag.nonempty.autocorrect_matches(string).limit(limit)
 
     tags.map do |tag|
-      { type: "tag-autocorrect", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: string }
+      { type: "tag-autocorrect", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: string, tag: tag }
     end
   end
 
@@ -249,7 +249,7 @@ class AutocompleteService
     tags.map do |tag|
       other_names = tag.artist&.other_names.to_a + tag.wiki_page&.other_names.to_a
       antecedent = other_names.find { |other_name| other_name.ilike?(string + "*") }
-      { type: "tag-other-name", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
+      { type: "tag-other-name", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent, tag: tag }
     end
   end
 

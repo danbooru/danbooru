@@ -213,6 +213,15 @@ class Tag < ApplicationRecord
       name.tr("_", " ")
     end
 
+    # @return [String] The tag name with proper capitalization.
+    def proper_name
+      if category.in?([Tag.categories.character, Tag.categories.copyright])
+        pretty_name.titleize(keep_id_suffix: true)
+      else
+        pretty_name
+      end
+    end
+
     def unqualified_name
       name.gsub(/_\(.*\)\z/, "").tr("_", " ")
     end
