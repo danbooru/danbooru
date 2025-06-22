@@ -107,6 +107,7 @@
         "x-show": "editor.editMode",
         "x-on:keydown.capture": "editor.onKeyDown($event)",
         "x-on:scroll": "editor.autocomplete.close()",
+        "x-on:pointerdown": "editor.autocomplete.close()",
         "x-on:paste": "editor.onPaste($event)")
       ) %>
       <div class="dtext-mirror absolute top-0 w-full h-full p-1 text-sm border overflow-auto thin-scrollbar whitespace-pre-wrap border pointer-events-none select-none invisible" x-text="editor.dtext"></div>
