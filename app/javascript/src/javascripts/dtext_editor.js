@@ -229,8 +229,15 @@ export default class DTextEditor {
 
     if (text.length > 0) {
       // Use execCommand so that the undo history is updated.
-      document.execCommand("insertText", false, text);
-      // this.input.setRangeText(text, start, end, "select");
+      let success = document.execCommand("insertText", false, text);
+      if (!success) {
+        // insertText is not supported by the browser.
+        // Fall back to setRangeText.
+        this.input.setRangeText(text, start, end, "select");
+        if (!selected) {
+          this.setSelectionRange(start + text.length, start + text.length);
+        }
+      }
     }
 
     // Select the new text if the replaced text was previously selected.
