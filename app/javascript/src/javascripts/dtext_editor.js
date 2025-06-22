@@ -1,7 +1,7 @@
 import Autocomplete from "./autocomplete";
 import Notice from "./notice";
 import { uploadFilesOrURL } from "./utility";
-import { computePosition, shift } from "@floating-ui/dom";
+import { computePosition, autoPlacement, inline, shift } from "@floating-ui/dom";
 
 // @see app/components/dtext_editor_component.rb
 export default class DTextEditor {
@@ -78,6 +78,7 @@ export default class DTextEditor {
       select: (event, ui) => this.insertAutocompletion(event, ui.item.value, ui.item.html.get(0)),
       source: async (_req, respond) => respond(await this.autocompletions()),
       position: { using: () => this.positionAutocompleteMenu() },
+      appendTo: $("#page"),
     });
 
     this.autocomplete = $(this.input).autocomplete("instance");
@@ -484,43 +485,46 @@ export default class DTextEditor {
 
   // Position the autocompletion menu below the cursor.
   positionAutocompleteMenu() {
-    let term = this.autocompletionQuery.prefix || "";
     let menu = this.autocomplete.menu.element.get(0);
 
-    let cursorAnchor = {
-      getBoundingClientRect: () => this.cursorCoordinates(-term.length),
-      contextElement: this.input,
-    }
-
-    computePosition(cursorAnchor, menu, {
+    computePosition(this.queryRange, menu, {
       placement: "bottom-start",
-      middleware: [shift()]
+      middleware: [
+        inline(),
+        autoPlacement({
+          allowedPlacements: ["bottom-start", "top-start"],
+        }),
+        shift({
+          boundary: $("#page").get(0),
+        }),
+      ]
     }).then(({ x, y }) => {
       menu.style.top = y + "px";
       menu.style.left = x + "px";
     });
   }
 
-  // Get the coordinates of the current cursor position.
-  //
-  // @param {Number} offset - The offset (in number of characters) to apply to the cursor position.
-  // @returns {DOMRect} The current cursor position, relative to the window.
-  cursorCoordinates(offset = 0) {
-    let start = this.selectionStart + offset;
-    return this.boundingRect(start, start);
+  // @returns {Range} The range of text that corresponds to the current autocompletion query.
+  get queryRange() {
+    let query = this.autocompletionQuery;
+    let queryLength = query.prefix?.length || 0;
+    let start = this.selectionStart - queryLength;
+    let end = start + queryLength;
+
+    return this.textRange(start, end);
   }
 
-  // Get the bounding box around a range of text. If the range spans multiple lines, this is the bounding box of the first line.
+  // Get a range of text from the editor, used for computing the screen position of the selected text.
   //
   // @param {Number} start - The start position of the range (in characters from the start of the text).
   // @param {Number} end - The end position of the range (in characters from the start of the text).
-  // @returns {DOMRect} The bounding box of the text, relative to the window.
-  boundingRect(start = this.selectionStart, end = this.selectionEnd) {
+  // @returns {Range} The range of text.
+  textRange(start = this.selectionStart, end = this.selectionEnd) {
     this.mirror.scrollTop = this.input.scrollTop;
     this.mirrorRange.setStart(this.mirror.childNodes[0], start);
     this.mirrorRange.setEnd(this.mirror.childNodes[0], end);
 
-    return this.mirrorRange.getClientRects()[0];
+    return this.mirrorRange;
   }
 
   // @returns {String} The HTML representation of the DText input.
