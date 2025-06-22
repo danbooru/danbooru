@@ -94,6 +94,13 @@ class Artist < ApplicationRecord
     def pretty_name
       name.tr("_", " ")
     end
+    
+    def other_names=(names)
+      super(names)
+      if name.present? && other_names.present?
+        self[:other_names] = other_names - [name]
+      end
+    end
   end
 
   module VersionMethods
