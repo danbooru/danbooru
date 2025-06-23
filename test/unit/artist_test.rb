@@ -650,5 +650,24 @@ class ArtistTest < ActiveSupport::TestCase
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
     end
+
+    context "when setting other_names" do
+      should "remove elements that match the artist name exactly" do
+        artist = create(:artist, name: "test_artist")
+        
+        artist.other_names_string = "test_artist another_name"
+        assert_equal(["another_name"], artist.other_names)
+        assert_equal("another_name", artist.other_names_string)
+        
+        artist.other_names = ["test_artist", "another_name", "third_name"]
+        assert_equal(["another_name", "third_name"], artist.other_names)
+        
+        artist.other_names = ["Test_Artist", "another_name"]
+        assert_equal(["Test_Artist", "another_name"], artist.other_names)
+        
+        artist.update(other_names_string: "test_artist different_name")
+        assert_equal(["different_name"], artist.reload.other_names)
+      end
+    end
   end
 end
