@@ -87,7 +87,11 @@ Autocomplete.initialize_tag_autocomplete = function() {
         } else if (event.inputType == "deleteWordForward") {
           after_caret_text = after_caret_text.replace(/^[ \t]*\S+/, "");
         }
-        target.value = before_caret_text + after_caret_text;
+        if (after_caret_text.match(/^\S/)) {
+          // There's a tag after the caret, so add a space between them so it doesn't interfere with autocomplete.
+          after_caret_text = " " + after_caret_text;
+        }
+        $(target).replaceFieldText(before_caret_text + after_caret_text);
         target.selectionStart = target.selectionEnd = before_caret_text.length;
         e.preventDefault();
       }
