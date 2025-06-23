@@ -20,7 +20,7 @@ Autocomplete.initialize_all = function() {
     },
     _renderItem: Autocomplete.render_item,
     search: function(value, event) {
-      if (!event.originalEvent || event.originalEvent.inputType === "") {
+      if (event && (!event.originalEvent || event.originalEvent.inputType === "")) {
         // Ignore. Not a real input event triggered by the user.
         return;
       }
@@ -97,6 +97,17 @@ Autocomplete.initialize_tag_autocomplete = function() {
       }
     });
   }
+
+  $fields_multiple.on("selectionchange", function(e) {
+    // Update the autocomplete results if the user moves their caret while the autocomplete menu is already open.
+    var input = this;
+    var autocomplete = $(input).autocomplete("instance");
+    var $autocomplete_menu = autocomplete.menu.element;
+    if (!$autocomplete_menu.is(":visible")) {
+      return;
+    }
+    $(input).autocomplete("search");
+  });
 }
 
 Autocomplete.current_term = function($input) {
