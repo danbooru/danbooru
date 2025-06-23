@@ -149,9 +149,9 @@
                 <%= f.submit "Post", class: "button-primary button-sm" %>
 
                 <% if CurrentUser.is_contributor? %>
-                  <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block !m-0" }, input_html: { checked: post.is_pending? } %>
+                  <%= f.input :is_pending, as: :boolean, label: "Post for approval", wrapper_html: { class: "inline-block !m-0" }, input_html: { checked: post.is_pending? } %>
                 <% else %>
-                  <span id="upload-limit" class="fineprint">Upload limit: <%= render "users/upload_limit", user: CurrentUser.user %></span>
+                  <span id="upload-limit" class="fineprint">Post limit: <%= render "users/upload_limit", user: CurrentUser.user %></span>
                 <% end %>
 
                 <% if CurrentUser.post_upload_count < 10 %>
