@@ -1,92 +1,144 @@
 @use "./utilities";
 
-.ui-widget {
-  font-family: var(--body-font);
-
-  input, select, textarea, button {
-    font-family: var(--body-font);
-  }
-}
-
 .ui-widget-content {
   background: var(--jquery-ui-widget-content-background);
-  color: var(--jquery-ui-widget-content-text-color);
-}
-
-.ui-widget-content a {
-  color: var(--link-color);
-}
-
-.ui-widget-content a:hover {
-  color: var(--link-hover-color);
 }
 
 div.ui-dialog {
+  position: absolute;
   height: auto !important;
   overflow: visible;
-  font-size: 1em;
   z-index: 999 !important;
   box-shadow: var(--shadow-lg);
-  padding: 0;
+  border-radius: 0.25rem;
+  border-width: 1px;
+  border-color: var(--dialog-titlebar-background-color);
+
+  button {
+    font-size: 1em;
+  }
 
   .ui-dialog-titlebar {
-    border-radius: 0;
-    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.375rem 0.375rem 0.75rem;
+
+    background-color: var(--dialog-titlebar-background-color);
+    color: var(--dialog-titlebar-color);
+    font-weight: bold;
+  }
+
+  &.ui-draggable .ui-dialog-titlebar {
+    cursor: move;
+  }
+
+  .ui-dialog-title {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .ui-dialog-content {
     @extend %thin-scrollbar;
-  }
-}
-
-.ui-state-highlight {
-  border: var(--jquery-ui-state-highlight-border);
-  background: var(--jquery-ui-state-highlight-background);
-  color: var(--jquery-ui-state-highlight-text-color);
-
-  a, a:active, a:visited {
-    color: var(--link-color);
+    padding: 0.5rem 0.75rem;
   }
 
-  a:hover {
-    color: var(--link-hover-color);
-  }
-}
-
-.ui-state-error {
-  border: var(--jquery-ui-state-error-border);
-  background: var(--jquery-ui-state-error-background);
-  color: var(--jquery-ui-state-error-text-color);
-}
-
-.ui-button {
-  margin: 0;
-  padding: 0.25em 1em;
-  border: 1px solid var(--form-button-border-color);
-  background: var(--form-button-background);
-  color: var(--form-button-text-color);
-
-  &.sub {
-    font-size: 90%;
+  .ui-dialog-buttonpane {
+    border-top-width: 1px;
+    padding: 1rem 0.75rem;
   }
 
-  &.tiny {
-    font-size: 90%;
-    padding: 0.25em 0.5em;
+  .ui-dialog-buttonset {
+    display: flex;
+    justify-content: end;
+    flex-wrap: wrap;
+    gap: 6px; /* 6px for the buttons in the note edit dialog. */
   }
 
-  &:hover {
-    box-shadow: 0 0 2px var(--form-button-hover-box-shadow-color);
-    background: var(--form-button-hover-background);
+  .ui-button-icon-only {
+    position: relative;
+    height: 1.25rem;
+    text-indent: -9999px;
   }
 
-  &:active {
-    box-shadow: 0 0 2px var(--form-button-hover-box-shadow-color);
-    background: var(--form-button-active-background);
-    color: var(--form-button-text-color);
+  .ui-resizable-n {
+    height: 2px;
+    top: 0;
+  }
+
+  .ui-resizable-e {
+    width: 2px;
+    right: 0;
+  }
+
+  .ui-resizable-s {
+    height: 2px;
+    bottom: 0;
+  }
+
+  .ui-resizable-w {
+    width: 2px;
+    left: 0;
+  }
+
+  .ui-resizable-se, .ui-resizable-sw, .ui-resizable-ne, .ui-resizable-nw {
+    width: 7px;
+    height: 7px;
+  }
+
+  .ui-resizable-se {
+    right: 0;
+    bottom: 0;
+  }
+
+  .ui-resizable-sw {
+    left: 0;
+    bottom: 0;
+  }
+
+  .ui-resizable-ne {
+    right: 0;
+    top: 0;
+  }
+
+  .ui-resizable-nw {
+    left: 0;
+    top: 0;
   }
 }
 
 .ui-front {
   z-index: 1000;
 }
+
+.ui-widget-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--white);
+  opacity: 0.5;
+}
+
+.ui-button-icon-only .ui-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -8px;
+  margin-left: -8px;
+}
+
+.ui-icon {
+  width: 16px;
+  height: 16px;
+  background-image: url("~/public/images/ui-icons_777777_256x240.png");
+}
+
+.ui-icon-closethick { background-position: -96px -128px; }
+.ui-icon-pin-w { background-position: -128px -144px; }
+.ui-icon-pin-s { background-position: -144px -144px; }
+.ui-icon-gripsmall-diagonal-se { background-position: -64px -224px; }

@@ -62,14 +62,6 @@ div.post_rating > label {
 }
 
 div#c-posts {
-  .fav-buttons {
-    font-size: var(--text-lg);
-
-    button.ui-button {
-      padding: 0.25em 0.75em;
-    }
-  }
-
   form#remove-fav-button button:not([disabled]) .icon {
     color: var(--remove-favorite-button);
   }

@@ -577,7 +577,7 @@ class Note {
 
       $dialog.dialog({
         width: 360,
-        height: 240,
+        height: 250,
         position: {
           my: "right",
           at: "right-20",

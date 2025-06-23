@@ -10,6 +10,7 @@ Autocomplete.initialize_all = function() {
       minLength: 1,
       autoFocus: false,
       focus: function() { return false; },
+      classes: { "ui-autocomplete": "absolute cursor-pointer max-w-480px max-h-480px text-sm border shadow-lg thin-scrollbar", }
     },
     _create: function() {
       this.element.on("keydown.Autocomplete.tab", null, "tab", Autocomplete.on_tab);

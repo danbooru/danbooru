@@ -124,8 +124,7 @@ Post.open_edit_dialog = function() {
   dialog.dialog("widget").draggable("option", "containment", "none");
 
   var pin_button = $("<button/>").button({ icon: "ui-icon-pin-w", label: "pin", showLabel: false });
-  pin_button.css({width: "20px", height: "20px", position: "absolute", right: "28.4px"});
-  dialog.parent().children(".ui-dialog-titlebar").append(pin_button);
+  dialog.parent().find(".ui-dialog-titlebar-close").before(pin_button);
   pin_button.on("click.danbooru", function(e) {
     var dialog_widget = $('.ui-dialog:has(#edit-dialog)');
     var pos = dialog_widget.offset();
@@ -136,14 +135,14 @@ Post.open_edit_dialog = function() {
       dialog_widget.offset(pos).css({ position: "fixed" });
       dialog.dialog("option", "resize", function() { dialog_widget.css({ position: "fixed" }); });
 
-      pin_button.button("option", "icons", {primary: "ui-icon-pin-s"});
+      pin_button.button("option", "icon", "ui-icon-pin-s");
     } else {
       pos.left += $(window).scrollLeft();
       pos.top += $(window).scrollTop();
       dialog_widget.offset(pos).css({ position: "absolute" });
       dialog.dialog("option", "resize", function() { /* do nothing */ });
 
-      pin_button.button("option", "icons", {primary: "ui-icon-pin-w"});
+      pin_button.button("option", "icon", "ui-icon-pin-w");
     }
   });
 

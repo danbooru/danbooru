@@ -19,11 +19,6 @@ import jQuery from 'jquery';
 require("jquery-ui/ui/widgets/autocomplete");
 require("jquery-ui/ui/widgets/button");
 require("jquery-ui/ui/widgets/dialog");
-require("jquery-ui/themes/base/core.css");
-require("jquery-ui/themes/base/autocomplete.css");
-require("jquery-ui/themes/base/button.css");
-require("jquery-ui/themes/base/dialog.css");
-require("jquery-ui/themes/base/theme.css");
 
 import Rails from '@rails/ujs';
 Rails.start();

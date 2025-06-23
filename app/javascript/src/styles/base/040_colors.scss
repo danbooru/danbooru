@@ -301,7 +301,9 @@ html, body[data-current-user-theme="light"] {
   --divider-border-hover-color: var(--grey-3);
 
   --jquery-ui-widget-content-background: var(--body-background-color);
-  --jquery-ui-widget-content-text-color: var(--text-color);
+  --dialog-titlebar-background-color: var(--grey-1);
+  --dialog-titlebar-color: var(--text-color);
+  --dialog-border-color: var(--dialog-titlebar-background-color);
 
   --notice-error-background: var(--red-1);
   --notice-error-border-color: var(--red-2);
@@ -542,8 +544,10 @@ html, body[data-current-user-theme="light"] {
   --divider-border-color: var(--grey-7);
   --divider-border-hover-color: var(--grey-6);
 
-  --jquery-ui-widget-content-text-color: var(--text-color);
   --jquery-ui-widget-content-background: var(--grey-8);
+  --dialog-titlebar-background-color: var(--grey-1);
+  --dialog-titlebar-color: var(--grey-9);
+  --dialog-border-color: var(--dialog-titlebar-background-color);
 
   --notice-error-background: var(--red-8);
   --notice-error-border-color: var(--red-7);
