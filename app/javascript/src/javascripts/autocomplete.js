@@ -1,3 +1,5 @@
+import { isBeforeInputEventAvailable }  from './utility'
+
 let Autocomplete = {};
 
 Autocomplete.VERSION = 2; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
@@ -66,6 +68,31 @@ Autocomplete.initialize_tag_autocomplete = function() {
       resp(results);
     }
   });
+
+  if (isBeforeInputEventAvailable()) {
+    $fields_multiple.on("beforeinput", function(e) {
+      if (!e || !e.originalEvent) {
+        return;
+      }
+      let target = e.target;
+      let event = e.originalEvent;
+
+      if (event.inputType == "deleteWordBackward" || event.inputType == "deleteWordForward") {
+        // Ctrl+Backspace or Ctrl+Delete were pressed. Delete an entire tag before/after the caret.
+        let caret = target.selectionStart;
+        var before_caret_text = target.value.substring(0, caret);
+        var after_caret_text = target.value.substring(caret);
+        if (event.inputType == "deleteWordBackward") {
+          before_caret_text = before_caret_text.replace(/\S+[ \t]*$/, "");
+        } else if (event.inputType == "deleteWordForward") {
+          after_caret_text = after_caret_text.replace(/^[ \t]*\S+/, "");
+        }
+        target.value = before_caret_text + after_caret_text;
+        target.selectionStart = target.selectionEnd = before_caret_text.length;
+        e.preventDefault();
+      }
+    });
+  }
 }
 
 Autocomplete.current_term = function($input) {
