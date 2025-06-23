@@ -56,6 +56,21 @@ class ArtistTest < ActiveSupport::TestCase
       should_not allow_value("-blah").for(:name)
       should_not allow_value("_").for(:name)
       should_not allow_value("").for(:name)
+      should_not allow_value("-foo").for(:name)
+      should_not allow_value("user:foo").for(:name)
+      should_not allow_value("foo,bar").for(:name)
+      should_not allow_value("foo*bar").for(:name)
+      should_not allow_value("foo(bar").for(:name)
+
+      should "allow editing an artist with an invalid name when the name isn't changed" do
+        artist = build(:artist, name: "foo(bar")
+        artist.save!(validate: false)
+
+        artist.update!(other_names: ["foo"])
+        assert_equal(true, artist.valid?)
+        assert_equal("foo(bar", artist.name)
+        assert_equal(["foo"], artist.other_names)
+      end
     end
 
     context "that has been banned" do

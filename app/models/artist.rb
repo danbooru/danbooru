@@ -14,7 +14,7 @@ class Artist < ApplicationRecord
   array_attribute :other_names # XXX must come after `normalize :other_names`
 
   validate :validate_artist_name
-  validates :name, tag_name: true, uniqueness: true
+  validates :name, tag_name: true, uniqueness: true, if: :name_changed?
   after_validation :add_url_warnings
 
   before_save :update_tag_category
