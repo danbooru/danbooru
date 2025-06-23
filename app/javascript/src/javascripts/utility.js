@@ -169,13 +169,20 @@ export async function createUpload(params, pollDelay = 250) {
 
 $.fn.replaceFieldText = function(new_value) {
   return this.each(function() {
-    this.focus();
-    this.setSelectionRange(0, this.value.length);
-    let success = document.execCommand("insertText", false, new_value);
-    if (!success) {
-      // insertText is not supported by the browser.
-      // Fall back to assigning to value.
+    if (this.undoStack) {
+      // If the element is using the custom undo stack implementation, simply assign directly to the input's value.
+      this.undoStack.save(true);
       this.value = new_value;
+    } else {
+      // Otherwise, try using execCommand to preserve the browser's native undo stack.
+      this.focus();
+      this.setSelectionRange(0, this.value.length);
+      let success = document.execCommand("insertText", false, new_value);
+      if (!success) {
+        // insertText is not supported by the browser.
+        // Fall back to assigning to value.
+        this.value = new_value;
+      }
     }
   })
 }

@@ -1,4 +1,5 @@
 import { isBeforeInputEventAvailable }  from './utility'
+import UndoStack from './undo_stack';
 
 let Autocomplete = {};
 
@@ -68,6 +69,8 @@ Autocomplete.initialize_tag_autocomplete = function() {
       resp(results);
     }
   });
+
+  UndoStack.initialize_fields($fields_multiple);
 
   if (isBeforeInputEventAvailable()) {
     $fields_multiple.on("beforeinput", function(e) {
