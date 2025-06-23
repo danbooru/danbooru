@@ -16,8 +16,14 @@ class UserFeedback < ApplicationRecord
 
   deletable
 
-  scope :ban,      -> { where("body ~ '^Banned'") }
-  scope :not_ban,  -> { where("body !~ '^Banned'") }
+  # Feedback generation from bans has changed several times over the years. However they all start like one of the following:
+  # "Blocked: "
+  # "Banned: "
+  # "Banned forever: "
+  # "Banned for <duration>: "
+  # "Banned <duration>: "
+  scope :ban,      -> { where("body ~ '^Banned(:| for| [0-9])|Blocked:'") }
+  scope :not_ban,  -> { where("body !~ '^Banned(:| for| [0-9])|Blocked:'") }
   scope :positive, -> { where(category: "positive") }
   scope :neutral,  -> { where(category: "neutral") }
   scope :negative, -> { where(category: "negative") }
@@ -35,13 +41,7 @@ class UserFeedback < ApplicationRecord
       q = search_attributes(params, [:id, :created_at, :updated_at, :category, :body, :is_deleted, :creator, :user], current_user: current_user)
 
       if params[:hide_bans].to_s.truthy?
-        # Feedback generation from bans has changed several times over the years. However they all start like one of the following:
-        # "Blocked: "
-        # "Banned: "
-        # "Banned forever: "
-        # "Banned for <duration>: "
-        # "Banned <duration>: "
-        q = q.where("body ~ '^(?!Banned(:| for| [0-9])|Blocked:)'")
+        q = q.not_ban
       end
 
       q.apply_default_order(params)
