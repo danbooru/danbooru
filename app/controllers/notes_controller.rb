@@ -60,4 +60,10 @@ class NotesController < ApplicationController
     @note.revert_to!(@version)
     respond_with(@note)
   end
+
+  def preview
+    @note = authorize Note.new(body: params[:body])
+
+    respond_with(@note, methods: [:sanitized_body])
+  end
 end

@@ -9,6 +9,10 @@ class NotePolicy < ApplicationPolicy
     update?
   end
 
+  def rate_limit_for_preview(**_options)
+    {}
+  end
+
   def rate_limit_for_write(**_options)
     if record.invalid?
       { action: "notes:write:invalid", rate: 5.0 / 1.second, burst: 5 }

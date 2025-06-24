@@ -107,5 +107,28 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
         assert_response :missing
       end
     end
+
+    context "preview action" do
+      should "work for a POST method" do
+        post preview_notes_path, params: { body: '<p>test</p> <script>alert("owned")</script>', format: "json" }
+
+        assert_response :success
+        assert_equal("<p>test</p> ", response.parsed_body["sanitized_body"])
+      end
+
+      should "work for a GET method" do
+        get preview_notes_path, params: { body: '<p>test</p> <script>alert("owned")</script>', format: "json" }
+
+        assert_response :success
+        assert_equal("<p>test</p> ", response.parsed_body["sanitized_body"])
+      end
+
+      should "work for a missing body argument" do
+        post preview_notes_path, params: { format: "json" }
+        assert_response :success
+
+        assert_equal("", response.parsed_body["sanitized_body"])
+      end
+    end
   end
 end

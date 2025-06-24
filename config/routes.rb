@@ -157,12 +157,11 @@ Rails.application.routes.draw do
   resources :modqueue, only: [:index]
   resources :news_updates
   resources :notes do
-    member do
-      put :revert
-    end
+    put :revert, on: :member
+    get :preview, on: :collection
+    post :preview, on: :collection
   end
   resources :note_versions, :only => [:index, :show]
-  resource :note_previews, only: [:create, :show]
   resource :password_reset, only: [:create, :show, :edit, :update]
   resource :password, only: [:edit, :update]
   resources :pools do

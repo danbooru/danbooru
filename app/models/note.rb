@@ -132,6 +132,10 @@ class Note < ApplicationRecord
     new_note.save
   end
 
+  def sanitized_body
+    NoteSanitizer.sanitize(body)
+  end
+
   def self.available_includes
     [:post]
   end
