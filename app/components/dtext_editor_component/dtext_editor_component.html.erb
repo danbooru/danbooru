@@ -23,7 +23,7 @@
 
         <% if media_embeds? %>
           <span x-data="{ imageCaption: '', imageSize: 'small' }">
-            <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert image"}) do |menu| %>
+            <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert image", tabindex: -1 }) do |menu| %>
               <% menu.with_button do %>
                 <%= image_icon("x-on:click": "$nextTick(() => $refs?.imageUrl?.focus())") %>
               <% end %>
@@ -57,7 +57,7 @@
           </span>
         <% end %>
 
-        <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert emoji" }) do |menu| %>
+        <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert emoji", tabindex: -1 }) do |menu| %>
           <% menu.with_button do %>
             <%= add_reaction_icon("x-on:click": "$nextTick(() => $refs?.emojiPicker?.focus())") %>
           <% end %>
@@ -79,7 +79,7 @@
 
         <span class="mx-2 py-2 border-l"></span>
 
-        <%= render PopupMenuComponent.new do |menu| %>
+        <%= render PopupMenuComponent.new(button_html: { tabindex: -1 }) do |menu| %>
           <% menu.with_item do %>
             <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleStrikethrough()" title="Strikethrough (Ctrl+S)"><%= strikethrough_icon %>Strikethrough</a>
             <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleUnderline()" title="Underline (Ctrl+U)"><%= underline_icon %>Underline</a>
@@ -94,7 +94,7 @@
           <% end %>
         <% end %>
 
-        <%= link_to help_icon, dtext_help_path, class: "p-2 inactive-link", remote: true, method: :get %>
+        <%= link_to help_icon, dtext_help_path, class: "p-2 inactive-link", remote: true, method: :get, tabindex: -1 %>
       </div>
     </div>
 
