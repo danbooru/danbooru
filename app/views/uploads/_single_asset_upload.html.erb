@@ -170,10 +170,12 @@
 
             <%= f.input :source, as: :string, input_html: { value: post.source } %>
 
-            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: post&.artist_commentary&.original_title } %>
-            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: post&.artist_commentary&.original_description } %>
-            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: post&.artist_commentary&.translated_title } %>
-            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: post&.artist_commentary&.translated_description } %>
+            <%= f.simple_fields_for :artist_commentary, post.artist_commentary do |fa| %>
+              <%= fa.input :original_title, as: :string %>
+              <%= fa.input :original_description, as: :dtext, label: "Original description" %>
+              <%= fa.input :translated_title, as: :string %>
+              <%= fa.input :translated_description, as: :dtext, label: "Translated description" %>
+            <% end %>
           <% end %>
 
           <% t.panel("Similar") do %>

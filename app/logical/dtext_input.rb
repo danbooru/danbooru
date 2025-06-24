@@ -15,7 +15,7 @@ class DtextInput < SimpleForm::Inputs::Base
 
   def initialize(...)
     super
-    options[:label] = false unless object.send("dtext_#{attribute_name}").inline
+    options[:label] = false unless options[:label].present? || object.send("dtext_#{attribute_name}").inline
     options[:wrapper_html] ||= {}
     options[:wrapper_html][:class] = "@container #{options[:wrapper_html][:class]}"
   end

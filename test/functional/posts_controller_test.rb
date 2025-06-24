@@ -797,10 +797,12 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_difference("ArtistCommentary.count", 1) do
           @post = create_post!(
             user: @user,
-            artist_commentary_title: "original title",
-            artist_commentary_desc: "original desc",
-            translated_commentary_title: "translated title",
-            translated_commentary_desc: "translated desc",
+            artist_commentary: {
+              original_title: "original title",
+              original_description: "original desc",
+              translated_title: "translated title",
+              translated_description: "translated desc",
+            },
           )
         end
 
@@ -815,7 +817,9 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_difference("ArtistCommentary.count", 1) do
           @post = create_post!(
             user: @user,
-            artist_commentary_title: "title",
+            artist_commentary: {
+              original_title: "title",
+            },
           )
         end
 
@@ -830,10 +834,12 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_no_difference("ArtistCommentary.count") do
           @post = create_post!(
             user: @user,
-            artist_commentary_title: "",
-            artist_commentary_desc: "",
-            translated_commentary_title: "",
-            translated_commentary_desc: "",
+            artist_commentary: {
+              original_title: "",
+              original_description: "",
+              translated_title: "",
+              translated_description: "",
+            },
           )
         end
 
