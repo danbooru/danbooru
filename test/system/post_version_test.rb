@@ -23,7 +23,7 @@ class PostVersionSystemTest < ApplicationSystemTestCase
         check id: "post-version-select-all-checkbox"
         assert all("td .post-version-select-checkbox:not(:disabled)").all?(&:checked?)
 
-        click_link "subnav-undo-selected-link"
+        click_link "subnav-undo-selected"
         assert_selector "#notice span.prose", text: "2/2 changes undone."
 
         assert_equal("tagme", @post.reload.tag_string)
