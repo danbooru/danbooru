@@ -37,8 +37,8 @@ class ForumPostsController < ApplicationController
   end
 
   def create
-    @forum_post = authorize ForumPost.new(creator: CurrentUser.user, creator_ip_addr: request.remote_ip, topic_id: params.dig(:forum_post, :topic_id))
-    @forum_post.update(permitted_attributes(@forum_post))
+    @forum_post = authorize ForumPost.new(creator: CurrentUser.user, updater: CurrentUser.user, creator_ip_addr: request.remote_ip, **permitted_attributes(ForumPost))
+    @forum_post.save
 
     page = @forum_post.topic.last_page if @forum_post.topic.last_page > 1
     respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => page))

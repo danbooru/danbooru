@@ -34,7 +34,13 @@ class ForumTopicPolicy < ApplicationPolicy
   end
 
   def rate_limit_for_create(**_options)
-    { rate: 1.0 / 2.minutes, burst: 3 }
+    if record.invalid?
+      { action: "forum_topics:create:invalid", rate: 1.0 / 1.second, burst: 1 }
+    elsif user.forum_topics.exists?(created_at: ..24.hours.ago)
+      { rate: 1.0 / 1.minute, burst: 2 }
+    else
+      { rate: 1.0 / 3.minutes, burst: 1 }
+    end
   end
 
   def permitted_attributes

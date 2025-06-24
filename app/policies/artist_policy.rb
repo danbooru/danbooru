@@ -18,10 +18,8 @@ class ArtistPolicy < ApplicationPolicy
   end
 
   def rate_limit_for_write(**_options)
-    if user.is_moderator?
-      { action: "artists:write", rate: 8.0 / 1.minute, burst: 120 } # 480 per hour, 600 in first hour
-    elsif user.is_builder?
-      { action: "artists:write", rate: 4.0 / 1.minute, burst: 60 } # 240 per hour, 300 in first hour
+    if user.is_builder?
+      { action: "artists:write", rate: 12.0 / 1.minute, burst: 80 } # 720 per hour, 800 in first hour
     elsif user.artist_versions.exists?(created_at: ..24.hours.ago)
       { action: "artists:write", rate: 2.0 / 1.minute, burst: 30 } # 120 per hour, 150 in first hour
     else

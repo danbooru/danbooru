@@ -34,7 +34,13 @@ class CommentPolicy < ApplicationPolicy
   end
 
   def rate_limit_for_create(**_options)
-    { rate: 1.0 / 2.minutes, burst: 5 }
+    if record.invalid?
+      { action: "comments:create:invalid", rate: 1.0 / 1.second, burst: 1 }
+    elsif user.comments.exists?(created_at: ..24.hours.ago)
+      { rate: 1.0 / 1.minute, burst: 3 }
+    else
+      { rate: 1.0 / 2.minutes, burst: 2 }
+    end
   end
 
   def permitted_attributes_for_create

@@ -33,8 +33,10 @@ class NotesController < ApplicationController
   end
 
   def update
-    @note = authorize Note.find(params[:id])
-    @note.update(permitted_attributes(@note))
+    @note = Note.find(params[:id])
+    @note.attributes = permitted_attributes(@note)
+    authorize(@note).save
+
     respond_with(@note) do |format|
       format.json do
         if @note.errors.any?
