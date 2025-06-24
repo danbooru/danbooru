@@ -35,9 +35,15 @@ en:
     attributes:
       artist_url:
         url: ""
+      comment:
+        body: "Comment"
+      dmail:
+        body: "Message"
       favorite:
         user: "You"
         user_id: "You"
+      forum_post:
+        body: "Post"
       forum_post_vote:
         creator_id: "Your vote"
       media_asset:

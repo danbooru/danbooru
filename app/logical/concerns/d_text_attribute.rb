@@ -18,18 +18,29 @@ module DTextAttribute
     # Declare an attribute as being a DText attribute.
     #
     # @param name [Symbol] The name of the attribute to define as a DText attribute.
+    # @param media_embeds [Hash] Options for MediaEmbedValidator, including `max_embeds`, `max_large_emojis`,
+    #   `max_small_emojis`, `max_video_size`, and `sfw_only`. If blank, media embeds will be disabled.
     # @param options [Hash] Options to pass to DText.new.
-    def dtext_attribute(name, **options)
+    def dtext_attribute(name, media_embeds: {}, **options)
       mod = Module.new do
         extend Memoist
+        extend ActiveSupport::Concern
 
-        define_method "dtext_#{name}" do             # def dtext_body
-          DText.new(send(name), **options)           #   DText.new(body, **options)
-        end                                          # end
+        dtext_options = { media_embeds: media_embeds.present?, **options }
 
-        define_method "dtext_#{name}_was" do         # def dtext_body_was
-          DText.new(send("#{name}_was"), **options)  #   DText.new(body_was, **options)
-        end                                          # end
+        # def dtext_body
+        #   DText.new(body, **dtext_options)
+        # end
+        define_method "dtext_#{name}" do
+          DText.new(send(name), **dtext_options)
+        end
+
+        # def dtext_body_was
+        #   DText.new(body_was, **dtext_options)
+        # end
+        define_method "dtext_#{name}_was" do
+          DText.new(send("#{name}_was"), **dtext_options)
+        end
 
         define_method "#{name}=" do |value|          # def body=(value)
           super(value)                               #   super(value)
@@ -44,6 +55,13 @@ module DTextAttribute
 
         memoize "dtext_#{name}"                      # memoize :dtext_body
         memoize "dtext_#{name}_was"                  # memoize :dtext_body_was
+
+        prepended do
+          # validates :body, media_embed: { ... }, if: :body_changed?
+          if media_embeds.present?
+            validates name, media_embed: media_embeds, if: :"#{name}_changed?"
+          end
+        end
       end
 
       prepend mod

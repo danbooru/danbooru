@@ -207,6 +207,14 @@ class CommentTest < ActiveSupport::TestCase
       should_not allow_value("").for(:body)
       should_not allow_value(" ").for(:body)
       should_not allow_value("\u200B").for(:body)
+      should_not allow_value((["!post #1"] * 10).join("\n")).for(:body)
+
+      should "not allow NSFW media embeds" do
+        post = create(:post, rating: "e")
+        comment = build(:comment, post: build(:post, rating: "g"), body: "!post ##{post.id}").tap(&:validate)
+
+        assert_includes(comment.errors[:body], "can't include a explicit image on a general post")
+      end
     end
   end
 end

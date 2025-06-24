@@ -158,6 +158,14 @@ class DmailTest < ActiveSupport::TestCase
       should_not allow_value(nil).for(:to)
       should_not allow_value(nil).for(:from)
       should_not allow_value(nil).for(:owner)
+      should_not allow_value((["!post #1"] * 10).join("\n")).for(:body)
+
+      should "not allow NSFW media embeds" do
+        post = create(:post, rating: "e")
+        dmail = build(:dmail, body: "!post ##{post.id}").tap(&:validate)
+
+        assert_includes(dmail.errors[:body], "can't include NSFW images")
+      end
     end
   end
 end

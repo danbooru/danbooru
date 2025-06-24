@@ -172,6 +172,14 @@ class ForumPostTest < ActiveSupport::TestCase
       should_not allow_value("").for(:body)
       should_not allow_value(" ").for(:body)
       should_not allow_value("\u200B").for(:body)
+      should_not allow_value((["!post #1"] * 10).join("\n")).for(:body)
+
+      should "not allow NSFW media embeds" do
+        post = create(:post, rating: "e")
+        forum_post = build(:forum_post, body: "!post ##{post.id}").tap(&:validate)
+
+        assert_includes(forum_post.errors[:body], "can't include NSFW images")
+      end
     end
   end
 end

@@ -3,7 +3,8 @@
 class Dmail < ApplicationRecord
   attr_accessor :creator_ip_addr, :disable_email_notifications
 
-  dtext_attribute :body # defines :dtext_body
+  # defines :dtext_body
+  dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emoji: 1, max_small_emoji: 100, max_video_size: 1.megabyte, sfw_only: true }
 
   validate :validate_sender_is_not_limited, on: :create
   validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
