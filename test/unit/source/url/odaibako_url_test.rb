@@ -18,5 +18,9 @@ module Source::Tests::URL
         ],
       )
     end
+
+    context "when extracting attributes" do
+      url_parser_should_work("https://odaibako.net/u/aaaaaariko", profile_url: "https://odaibako.net/u/aaaaaariko")
+    end
   end
 end
