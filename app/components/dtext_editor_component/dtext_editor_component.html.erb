@@ -11,13 +11,13 @@
        <% end %>
        spellcheck="true">
     <div class="dtext-editor-menu flex justify-between border-t border-x rounded-t w-full">
-      <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.editMode" x-on:click="editor.toggleMode()" title="Preview (Ctrl+P)"><%= eye_icon(class: "text-sm") %> Preview</a>
-      <a class="p-2 inactive-link cursor-pointer focus:outline-0 select-none flex items-center gap-1" x-show="editor.previewMode" x-on:click="editor.toggleMode()" data-shortcut="ctrl+p" title="Edit (Ctrl+P)" x-cloak><%= edit_icon(class: "text-sm") %> Edit</a>
+      <a class="p-2 inactive-link cursor-pointer select-none flex items-center gap-1" x-show="editor.editMode" x-on:click="editor.toggleMode()" title="Preview (Ctrl+P)"><%= eye_icon(class: "text-sm") %> Preview</a>
+      <a class="p-2 inactive-link cursor-pointer select-none flex items-center gap-1" x-show="editor.previewMode" x-on:click="editor.toggleMode()" data-shortcut="ctrl+p" title="Edit (Ctrl+P)" x-cloak><%= edit_icon(class: "text-sm") %> Edit</a>
 
       <div class="flex items-center" x-show="editor.editMode">
-        <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleBold()" title="Bold (Ctrl+B)"><%= bold_icon %></a>
-        <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleItalic()" title="Italics (Ctrl+I)"><%= italic_icon %></a>
-        <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleWikiLink()" title="Wiki link (Ctrl+K)"><%= double_brackets_icon %></a>
+        <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleBold()" title="Bold (Ctrl+B)"><%= bold_icon %></a>
+        <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleItalic()" title="Italics (Ctrl+I)"><%= italic_icon %></a>
+        <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleWikiLink()" title="Wiki link (Ctrl+K)"><%= double_brackets_icon %></a>
 
         <span class="mx-2 py-2 border-l"></span>
 
@@ -49,7 +49,7 @@
                   </div>
 
                   <label class="fineprint" for="file-picker-<%= object_id %>">
-                    <a class="font-normal inactive-link cursor-pointer focus:outline-0"><%= folder_open_icon(class: "align-baseline") %>Click, paste, or drop to add images.</a>
+                    <a class="font-normal inactive-link cursor-pointer"><%= folder_open_icon(class: "align-baseline") %>Click, paste, or drop to add images.</a>
                   </label>
                 </div>
               <% end %>
@@ -81,20 +81,20 @@
 
         <%= render PopupMenuComponent.new do |menu| %>
           <% menu.with_item do %>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleStrikethrough()" title="Strikethrough (Ctrl+S)"><%= strikethrough_icon %>Strikethrough</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleUnderline()" title="Underline (Ctrl+U)"><%= underline_icon %>Underline</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleNamedLink()" title="External link (Ctrl+L)"><%= link_icon %>External link</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleSearchLink()" title="Search link (Ctrl+{)"><%= search_icon %>Search link</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleSpoiler()" title="Spoiler (Ctrl+/)"><%= exclamation_icon %>Spoiler</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleExpand()" title="Expand (Ctrl+E)"><%= folder_open_icon %>Expand</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleQuote()" title="Quote (Ctrl+Q)"><%= quote_icon %>Quote</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleCode()" title="Code (Ctrl+M)"><%= code_icon %>Code</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.insertRule()" title="Horizontal rule"><%= horizontal_line_icon %>Horizontal rule</a>
-            <a class="p-2 inactive-link cursor-pointer focus:outline-0" x-on:click.prevent="editor.toggleNoDText()" title="No formatting"><%= no_double_brackets_icon %>No formatting</a>
+            <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleStrikethrough()" title="Strikethrough (Ctrl+S)"><%= strikethrough_icon %>Strikethrough</a>
+            <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleUnderline()" title="Underline (Ctrl+U)"><%= underline_icon %>Underline</a>
+            <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleNamedLink()" title="External link (Ctrl+L)"><%= link_icon %>External link</a>
+            <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleSearchLink()" title="Search link (Ctrl+{)"><%= search_icon %>Search link</a>
+            <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleSpoiler()" title="Spoiler (Ctrl+/)"><%= exclamation_icon %>Spoiler</a>
+            <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleExpand()" title="Expand (Ctrl+E)"><%= folder_open_icon %>Expand</a>
+            <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleQuote()" title="Quote (Ctrl+Q)"><%= quote_icon %>Quote</a>
+            <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleCode()" title="Code (Ctrl+M)"><%= code_icon %>Code</a>
+            <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.insertRule()" title="Horizontal rule"><%= horizontal_line_icon %>Horizontal rule</a>
+            <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleNoDText()" title="No formatting"><%= no_double_brackets_icon %>No formatting</a>
           <% end %>
         <% end %>
 
-        <%= link_to help_icon, dtext_help_path, class: "p-2 inactive-link focus:outline-0", remote: true, method: :get %>
+        <%= link_to help_icon, dtext_help_path, class: "p-2 inactive-link", remote: true, method: :get %>
       </div>
     </div>
 

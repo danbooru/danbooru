@@ -124,7 +124,6 @@ $spacer: 0.25rem; /* 4px */
 
 .border-current { border-color: currentcolor; }
 
-.focus\:outline-0:focus { outline-width: 0; }
 .focus-within\:outline-auto:focus-within { outline: auto; }
 
 .rounded-sm, %rounded-sm { border-radius: 0.5 * $spacer; }

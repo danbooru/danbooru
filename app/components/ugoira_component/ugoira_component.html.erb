@@ -8,14 +8,14 @@
     <%= play_icon class: "flex-none w-6 h-full py-2 cursor-pointer @max-120px:hidden", "x-show": "player.paused", "x-on:click": "player.play()" %>
     <%= pause_icon class: "flex-none w-6 h-full py-2 cursor-pointer @max-120px:hidden", "x-show": "!player.paused", "x-on:click": "player.pause()" %>
 
-    <%= tag.input type: "range", class: "ugoira-slider h-full w-full appearance-none border-0 focus:outline-0 bg-transparent p-0 cursor-pointer", tabindex: -1, value: 0, step: "any", min: 0, max: media_asset.duration, "x-bind:max": "player.duration", "x-bind:style": '{ "--playback-progress": player.playbackProgress, "--load-progress": player.loadProgress }', "x-model": "player.currentTime" %>
+    <%= tag.input type: "range", class: "ugoira-slider h-full w-full appearance-none border-0 bg-transparent p-0 cursor-pointer", tabindex: -1, value: 0, step: "any", min: 0, max: media_asset.duration, "x-bind:max": "player.duration", "x-bind:style": '{ "--playback-progress": player.playbackProgress, "--load-progress": player.loadProgress }', "x-model": "player.currentTime" %>
 
     <span class="flex gap-1 text-sm select-none whitespace-nowrap @max-270px:hidden">
       <span x-text="player.formatTime(player.currentTime)">0:00</span> /
       <span x-text="player.formatTime(Math.max(player.duration, 1))">0:01</span>
     </span>
 
-    <%= render PopupMenuComponent.new(classes: "h-full", button_classes: "h-full focus:outline-0", button_html: { "data-tippy-placement": "top", "data-tippy-arrow": "false" }) do |menu| %>
+    <%= render PopupMenuComponent.new(classes: "h-full", button_classes: "h-full", button_html: { "data-tippy-placement": "top", "data-tippy-arrow": "false" }) do |menu| %>
       <% menu.with_button do %>
         <%= gear_icon(class: "w-6 h-full py-2 cursor-pointer") %>
       <% end %>
@@ -30,12 +30,12 @@
 
       <% menu.with_item class: "px-3 py-1 flex gap-2 cursor-pointer", "x-on:click": "player.setQuality('sample')" do %>
         <%= check_icon "x-bind:class": "{ invisible: player.quality !== 'sample' }" %>
-        <%= link_to "WebM", "javascript:void(0)", class: "text-sm whitespace-nowrap focus:outline-0" %>
+        <%= link_to "WebM", "javascript:void(0)", class: "text-sm whitespace-nowrap" %>
       <% end %>
 
       <% menu.with_item class: "px-3 py-1 flex gap-2 cursor-pointer", "x-on:click": "player.setQuality('original')" do %>
         <%= check_icon "x-bind:class": "{ invisible: player.quality !== 'original' }" %>
-        <%= link_to "Original", "javascript:void(0)", class: "text-sm whitespace-nowrap focus:outline-0" %>
+        <%= link_to "Original", "javascript:void(0)", class: "text-sm whitespace-nowrap" %>
       <% end %>
     <% end %>
 

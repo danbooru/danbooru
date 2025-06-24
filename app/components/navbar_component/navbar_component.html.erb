@@ -5,7 +5,7 @@
       <%= link_to Danbooru.config.app_name, main_app.root_path, id: "app-name", class: "font-header font-bold" %>
     </div>
 
-    <a href="javascript:void(0)" class="mobile-only focus:outline-0" x-on:click="menuOpen = !menuOpen">
+    <a class="mobile-only cursor-pointer" x-on:click="menuOpen = !menuOpen">
       <%= menu_icon(class: "block w-6", "x-show": "!menuOpen") %>
       <%= close_icon(class: "block w-6", "x-show": "menuOpen", "x-cloak": true) %>
     </a>
