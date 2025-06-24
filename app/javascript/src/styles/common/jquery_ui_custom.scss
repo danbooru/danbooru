@@ -114,6 +114,10 @@ div.ui-dialog {
   z-index: 1000;
 }
 
+.ui-helper-hidden-accessible {
+  display: none;
+}
+
 .ui-widget-overlay {
   position: fixed;
   top: 0;
