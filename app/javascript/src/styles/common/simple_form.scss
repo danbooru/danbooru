@@ -8,28 +8,6 @@ form.simple_form {
     font-weight: bold;
   }
 
-  fieldset.inline-fieldset {
-    > label {
-      display: block;
-    }
-
-    div.input {
-      display: inline;
-      margin-right: 2em;
-    }
-  }
-
-  div.input.boolean {
-    label {
-      display: inline;
-      font-weight: normal;
-    }
-
-    input {
-      margin-right: 0.25em;
-    }
-  }
-
   div.input {
     margin-bottom: 1em;
 
@@ -255,5 +233,55 @@ div.ui-dialog {
     div.input.hidden {
       display: none;
     }
+  }
+}
+
+div.inline-toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+
+  .toggle-switch { order: -1; }
+  .hint { order: 1; }
+}
+
+input.toggle-switch {
+  appearance: none;
+  background-color: var(--toggle-switch-unselected-color);
+  border-color: transparent;
+  border-radius: 1rem;
+  border-width: 0.125rem;
+  height: 1rem;
+  width: 2rem;
+  transition: background-color 0.15s;
+  vertical-align: text-bottom;
+  cursor: pointer;
+  padding: 0;
+
+  &:checked {
+    background-color: var(--toggle-switch-selected-color);
+  }
+
+  &:checked::before {
+    margin-left: 1rem;
+  }
+
+  &::before {
+    display: block;
+    content: "";
+    background-color: var(--toggle-switch-handle-color);
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 1rem;
+    transition: margin 0.15s;
+  }
+
+  &:focus-visible {
+    outline: 0.125rem solid var(--toggle-switch-focus-ring-color);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 }

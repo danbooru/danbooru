@@ -308,12 +308,8 @@
   <section id="mark-as-translated-section">
     <%= edit_form_for(@post, url: mark_as_translated_post_path(@post), method: :put) do |f| %>
       <%= f.input :q, as: :hidden, input_html: { id: nil, name: "q", value: params[:q] } %>
-
-      <fieldset class="inline-fieldset">
-        <%= f.input :check_translation, as: :boolean, input_html: { checked: @post.has_tag?("check_translation") } %>
-        <%= f.input :partially_translated, as: :boolean, input_html: { checked: @post.has_tag?("partially_translated") } %>
-      </fieldset>
-
+      <%= f.input :check_translation, as: :boolean, wrapper: "inline-toggle-switch", input_html: { checked: @post.has_tag?("check_translation") } %>
+      <%= f.input :partially_translated, as: :boolean, wrapper: "inline-toggle-switch", input_html: { checked: @post.has_tag?("partially_translated") } %>
       <%= f.submit "Mark as translated" %>
     <% end %>
   </section>

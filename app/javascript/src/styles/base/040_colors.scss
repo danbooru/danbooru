@@ -160,6 +160,11 @@ html, body[data-current-user-theme="light"] {
   --form-button-hover-box-shadow-color: var(--grey-5);
   --form-button-active-background: var(--grey-2);
 
+  --toggle-switch-unselected-color: var(--grey-3);
+  --toggle-switch-selected-color: var(--link-color);
+  --toggle-switch-handle-color: var(--inverse-text-color);
+  --toggle-switch-focus-ring-color: var(--link-color);
+
   --dtext-editor-menu-background-color: var(--blue-0);
 
   --button-text-color: var(--white);
@@ -416,6 +421,8 @@ html, body[data-current-user-theme="light"] {
   --form-button-hover-background: var(--grey-0);
   --form-button-hover-box-shadow-color: var(--grey-5);
   --form-button-active-background: var(--grey-3);
+
+  --toggle-switch-unselected-color: var(--grey-5);
 
   --dtext-editor-menu-background-color: var(--grey-8);
 
