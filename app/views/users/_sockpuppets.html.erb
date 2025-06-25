@@ -8,7 +8,7 @@
       <% sockpuppet_accounts[:session_ids].each do |session_id, users| %>
         <span class="chip-primary-bg rounded border flex flex-col items-stretch">
           <span class="m-1 text-sm leading-normal">
-            <%= users.sort_by(&:id).map { |user| link_to_user(user, classes: ("!user-banned-color" if user.is_banned?)) }.join(", ").html_safe %>
+            <%= users.sort_by(&:id).map { |user| link_to_user(user, classes: ("user-banned-color" if user.is_banned?)) }.join(", ").html_safe %>
           </span>
 
           <span class="chip-secondary-bg px-1 font-monospace text-muted">
@@ -24,7 +24,7 @@
 
         <span class="chip-primary-bg rounded border flex flex-col items-stretch">
           <span class="m-1 text-sm leading-normal">
-            <%= users.sort_by(&:id).map { |user| link_to_user(user, classes: ("!user-banned-color" if user.is_banned?)) }.join(", ").html_safe %>
+            <%= users.sort_by(&:id).map { |user| link_to_user(user, classes: ("user-banned-color" if user.is_banned?)) }.join(", ").html_safe %>
           </span>
 
           <span class="chip-secondary-bg px-1 font-monospace text-muted">

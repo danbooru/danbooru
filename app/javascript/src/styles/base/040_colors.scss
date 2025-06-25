@@ -344,6 +344,7 @@ html, body[data-current-user-theme="light"] {
   --meta-tag-color: var(--orange-3);
   --meta-tag-hover-color: var(--orange-2);
 
+  --user-owner-color: var(--user-admin-color);
   --user-admin-color: var(--red-5);
   --user-moderator-color: var(--character-tag-color);
   --user-builder-color: var(--copyright-tag-color);
@@ -352,6 +353,16 @@ html, body[data-current-user-theme="light"] {
   --user-member-color: var(--general-tag-color);
   --user-restricted-color: var(--general-tag-color);
   --user-banned-color: var(--grey-7);
+
+  --user-owner-hover-color: var(--user-admin-hover-color);
+  --user-admin-hover-color: var(--red-4);
+  --user-moderator-hover-color: var(--character-tag-hover-color);
+  --user-builder-hover-color: var(--copyright-tag-hover-color);
+  --user-platinum-hover-color: var(--grey-4);
+  --user-gold-hover-color: var(--meta-tag-hover-color);
+  --user-member-hover-color: var(--general-tag-hover-color);
+  --user-restricted-hover-color: var(--general-tag-hover-color);
+  --user-banned-hover-color: var(--grey-6);
 
   --user-verified-email-color: var(--green-4);
   --user-unverified-email-color: var(--yellow-2);
@@ -590,6 +601,7 @@ html, body[data-current-user-theme="light"] {
   --meta-tag-color: var(--yellow-2);
   --meta-tag-hover-color: var(--yellow-1);
 
+  --user-owner-color: var(--user-admin-color);
   --user-admin-color: var(--artist-tag-color);
   --user-moderator-color: var(--character-tag-color);
   --user-builder-color: var(--copyright-tag-color);
@@ -598,6 +610,16 @@ html, body[data-current-user-theme="light"] {
   --user-member-color: var(--general-tag-color);
   --user-restricted-color: var(--general-tag-color);
   --user-banned-color: var(--grey-5);
+
+  --user-owner-hover-color: var(--user-admin-hover-color);
+  --user-admin-hover-color: var(--artist-tag-hover-color);
+  --user-moderator-hover-color: var(--character-tag-hover-color);
+  --user-builder-hover-color: var(--copyright-tag-hover-color);
+  --user-platinum-hover-color: var(--grey-2);
+  --user-gold-hover-color: var(--meta-tag-hover-color);
+  --user-member-hover-color: var(--general-tag-hover-color);
+  --user-restricted-hover-color: var(--general-tag-hover-color);
+  --user-banned-hover-color: var(--grey-4);
 
   --user-verified-email-color: var(--green-3);
   --user-unverified-email-color: var(--yellow-2);
