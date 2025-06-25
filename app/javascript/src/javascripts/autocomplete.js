@@ -7,6 +7,11 @@ let Autocomplete = {};
 Autocomplete.VERSION = 2; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
 Autocomplete.MAX_RESULTS = 20;
 
+Autocomplete.WHITESPACE = ' \\t';
+Autocomplete.WORD_SEPARATORS = Autocomplete.WHITESPACE + '_()\\[\\]{}<>`\'"-/;:,.?!';
+Autocomplete.PREV_WORD_REGEXP = new RegExp(`[^${Autocomplete.WORD_SEPARATORS}]+[${Autocomplete.WORD_SEPARATORS}]*$`);
+Autocomplete.NEXT_WORD_REGEXP = new RegExp(`^[${Autocomplete.WORD_SEPARATORS}]*[^${Autocomplete.WORD_SEPARATORS}]+`);
+
 Autocomplete.initialize_all = function() {
   $.widget("ui.autocomplete", $.ui.autocomplete, {
     options: {
@@ -87,9 +92,9 @@ Autocomplete.initialize_tag_autocomplete = function() {
         var before_caret_text = target.value.substring(0, caret);
         var after_caret_text = target.value.substring(caret);
         if (event.inputType == "deleteWordBackward") {
-          before_caret_text = before_caret_text.replace(/\S+[ \t]*$/, "");
+          before_caret_text = before_caret_text.replace(Autocomplete.PREV_WORD_REGEXP, "");
         } else if (event.inputType == "deleteWordForward") {
-          after_caret_text = after_caret_text.replace(/^[ \t]*\S+/, "");
+          after_caret_text = after_caret_text.replace(Autocomplete.NEXT_WORD_REGEXP, "");
         }
         if (after_caret_text.match(/^\S/)) {
           // There's a tag after the caret, so add a space between them so it doesn't interfere with autocomplete.
@@ -112,7 +117,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
     }
     let caret = target.selectionStart;
     var before_caret_text = target.value.substring(0, caret);
-    let match = before_caret_text.match(/\S+[ \t]*$/);
+    let match = before_caret_text.match(Autocomplete.PREV_WORD_REGEXP);
     if (match) {
       target.selectionStart = target.selectionEnd = match.index;
     }
@@ -130,7 +135,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
     let caret = target.selectionStart;
     var before_caret_text = target.value.substring(0, caret);
     var after_caret_text = target.value.substring(caret);
-    let match = after_caret_text.match(/^[ \t]*\S+/);
+    let match = after_caret_text.match(Autocomplete.NEXT_WORD_REGEXP);
     if (match) {
       target.selectionStart = target.selectionEnd = before_caret_text.length + match[0].length;
     }
