@@ -9,8 +9,8 @@ a:visited {
   color: var(--link-color);
 }
 
-// When the link is being hovered, actively being clicked, or focused after being clicked (but not when it was focused by the keyboard).
-a:hover, a:active, a:focus:not(:focus-visible) {
+// When the link is being hovered or actively being clicked.
+a:hover, a:active {
   color: var(--link-hover-color);
 }
 
