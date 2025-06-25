@@ -171,7 +171,7 @@ $.fn.replaceFieldText = function(new_value) {
   return this.each(function() {
     if (this.undoStack) {
       // If the element is using the custom undo stack implementation, simply assign directly to the input's value.
-      this.undoStack.save(true);
+      this.undoStack.save("danbooru.replaceFieldText");
       this.value = new_value;
     } else {
       // Otherwise, try using execCommand to preserve the browser's native undo stack.

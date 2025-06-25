@@ -2,10 +2,11 @@ import Utility from './utility';
 import { isBeforeInputEventAvailable }  from './utility'
 
 class UndoItem {
-  constructor(element) {
+  constructor(element, action) {
     this.value = element.value;
     this.selectionStart = element.selectionStart;
     this.selectionEnd = element.selectionEnd;
+    this.action = action;
   };
 
   apply(element) {
@@ -21,9 +22,7 @@ class UndoStack {
     element.undoStack = this;
     this.undoItems = [];
     this.redoItems = [];
-    this.currentItem = new UndoItem(this.element);
-    this.mergeWindow = 1000; // Max milliseconds between edits to consider the same
-    this.prevSaveTime = 0;
+    this.currentItem = new UndoItem(this.element, null);
   };
 
   undo() {
@@ -50,24 +49,21 @@ class UndoStack {
   }
 
   updateCurrent() {
-    this.currentItem = new UndoItem(this.element);
+    this.currentItem = new UndoItem(this.element, null);
   }
 
-  save(force = false) {
-    let currTime = Date.now();
+  save(action, force = false) {
     if (!force) {
-      if (currTime - this.prevSaveTime < this.mergeWindow) {
-        return;
-      }
       if (this.undoItems.length > 0) {
         let last_item = this.undoItems[this.undoItems.length - 1];
         if (this.element.value === last_item.value) {
           return;
+        } else if (action === last_item.action) {
+          return;
         }
       }
     }
-    this.prevSaveTime = currTime;
-    let item = new UndoItem(this.element);
+    let item = new UndoItem(this.element, action);
     this.undoItems.push(item);
     this.redoItems = [];
   }
@@ -97,7 +93,7 @@ class UndoStack {
         target.undoStack.redo();
         e.preventDefault();
       } else {
-        target.undoStack.save();
+        target.undoStack.save(event.inputType);
       }
     });
 
