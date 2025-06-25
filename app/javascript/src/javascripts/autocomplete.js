@@ -1,5 +1,6 @@
 import { isBeforeInputEventAvailable }  from './utility'
 import UndoStack from './undo_stack';
+import Utility from './utility';
 
 let Autocomplete = {};
 
@@ -100,6 +101,41 @@ Autocomplete.initialize_tag_autocomplete = function() {
       }
     });
   }
+
+  Utility.keydown("ctrl+left", "cursor_word_left", e => {
+    let target = e.target;
+    let selected = target.selectionStart !== target.selectionEnd;
+    if (selected) {
+      target.selectionEnd = target.selectionStart;
+      e.preventDefault();
+      return;
+    }
+    let caret = target.selectionStart;
+    var before_caret_text = target.value.substring(0, caret);
+    let match = before_caret_text.match(/\S+[ \t]*$/);
+    if (match) {
+      target.selectionStart = target.selectionEnd = match.index;
+    }
+    e.preventDefault();
+  }, $fields_multiple);
+
+  Utility.keydown("ctrl+right", "cursor_word_right", e => {
+    let target = e.target;
+    let selected = target.selectionStart !== target.selectionEnd;
+    if (selected) {
+      target.selectionStart = target.selectionEnd;
+      e.preventDefault();
+      return;
+    }
+    let caret = target.selectionStart;
+    var before_caret_text = target.value.substring(0, caret);
+    var after_caret_text = target.value.substring(caret);
+    let match = after_caret_text.match(/^[ \t]*\S+/);
+    if (match) {
+      target.selectionStart = target.selectionEnd = before_caret_text.length + match[0].length;
+    }
+    e.preventDefault();
+  }, $fields_multiple);
 
   $fields_multiple.on("selectionchange", function(e) {
     // Update the autocomplete results if the user moves their caret while the autocomplete menu is already open.
