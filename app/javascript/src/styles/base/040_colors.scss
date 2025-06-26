@@ -128,6 +128,8 @@ html, body[data-current-user-theme="light"] {
   --error-background-color: var(--red-1);
   --success-background-color: var(--green-0);
   --target-background: var(--yellow-0);
+  --selection-background-color: var(--link-color);
+  --target-text-background-color: var(--magenta-5);
 
   --subnav-menu-background-color: var(--blue-0);
   --responsive-menu-background-color: var(--blue-1);
@@ -401,6 +403,8 @@ html, body[data-current-user-theme="light"] {
   --error-background-color: var(--red-9);
   --success-background-color: var(--green-9);
   --target-background: var(--azure-8);
+  --selection-background-color: var(--blue-5);
+  --target-text-background-color: var(--magenta-5);
 
   --subnav-menu-background-color: var(--grey-8);
   --responsive-menu-background-color: var(--grey-8);

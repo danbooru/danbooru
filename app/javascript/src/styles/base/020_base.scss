@@ -90,10 +90,22 @@ input, select, textarea, button {
   padding-left: 0.5em;
 }
 
-/* Highlight link anchor targets (e.g. /forum_topics/123#forum_post_456). Use
- * !important to override even table row backgrounds. */
-:target {
-  background: var(--target-background) !important;
+// Text selected by mouse or keyboard.
+::selection {
+  color: var(--inverse-text-color);
+  background-color: var(--selection-background-color);
+}
+
+// Text selected by text fragment links (e.g. https: //example.com#:~:text=blah)
+::target-text {
+  color: var(--inverse-text-color);
+  background-color: var(--target-text-background-color);
+}
+
+// Text selected by link anchor targets (e.g. /forum_topics/123#forum_post_456).
+// Use !important to override even table row backgrounds.
+:target:not(h1, h2, h3, h4, h5, h6, ::target-text) {
+  background-color: var(--target-background) !important;
 }
 
 // Add a focus ring around links and <input> elements when they are focused by the keyboard.
