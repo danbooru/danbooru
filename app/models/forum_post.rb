@@ -5,7 +5,7 @@ class ForumPost < ApplicationRecord
   attr_accessor :creator_ip_addr
 
   # defines :dtext_body
-  dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emoji: 1, max_small_emoji: 100, max_video_size: 1.megabyte, sfw_only: true }
+  dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emojis: 1, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
 
   belongs_to :creator, class_name: "User"
   belongs_to_updater
