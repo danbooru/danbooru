@@ -11,10 +11,10 @@
 
     <%= render(PostGalleryComponent.new) do |gallery| %>
       <% @pools.each do |pool| %>
-        <% gallery.with_post(post: pool.cover_post, link_target: pool, show_deleted: true) do |preview| %>
+        <% gallery.with_post(post: pool.cover_post, link_target: pool, show_deleted: true, classes: "card-outlined p-2") do |preview| %>
           <% preview.with_footer do %>
-            <div class="text-center">
-              <%= link_to pool.pretty_name, pool, class: "text-sm pool-category-#{pool.category}" %>
+            <div class="mt-2 text-center text-balance text-xs leading-none">
+              <%= link_to pool.pretty_name, pool, class: "pool-category-#{pool.category}" %>
             </div>
           <% end %>
         <% end %>
