@@ -28,6 +28,12 @@ $(function() {
     e.preventDefault();
   });
 
+  $.widget("ui.dialog", $.ui.dialog, {
+    options: {
+      classes: { "ui-dialog-content": "thin-scrollbar", }
+    }
+  });
+
   if (location.hostname.endsWith("danbooru.me")) {
     location.hostname = "danbooru.donmai.us";
   }

@@ -54,7 +54,7 @@ SimpleForm.setup do |config|
     ## Inputs
     # b.use :input, class: 'input', error_class: 'is-invalid', valid_class: 'is-valid'
     b.use :label_input
-    b.use :hint, wrap_with: { tag: :span, class: :hint }
+    b.use :hint, wrap_with: { tag: :span, class: "hint fineprint" }
     # b.use :error, wrap_with: { tag: :span, class: :error }
 
     ## full_messages_for
@@ -69,7 +69,7 @@ SimpleForm.setup do |config|
     b.use :html5
     b.use :label
     b.use :input, class: "toggle-switch"
-    b.use :hint, wrap_with: { tag: "span", class: "hint" }
+    b.use :hint, wrap_with: { tag: "span", class: "hint fineprint" }
     b.use :full_error, wrap_with: { tag: "span", class: "error" }
   end
 
@@ -78,7 +78,7 @@ SimpleForm.setup do |config|
     b.use :html5
     b.use :label
     b.use :input, class: "toggle-switch"
-    b.use :hint, wrap_with: { tag: "span", class: "hint" }
+    b.use :hint, wrap_with: { tag: "span", class: "hint fineprint" }
     b.use :full_error, wrap_with: { tag: "span", class: "error" }
   end
 

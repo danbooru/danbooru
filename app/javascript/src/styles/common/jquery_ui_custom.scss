@@ -1,5 +1,3 @@
-@use "./utilities";
-
 .ui-widget-content {
   background: var(--jquery-ui-widget-content-background);
 }
@@ -42,7 +40,6 @@ div.ui-dialog {
   }
 
   .ui-dialog-content {
-    @extend %thin-scrollbar;
     padding: 0.5rem 0.75rem;
   }
 

@@ -1,0 +1,16 @@
+@mixin active-link {
+  color: var(--link-color);
+
+  &:hover, &:focus {
+    background-color: var(--subnav-menu-background-color);
+    outline: none;
+  }
+}
+
+@mixin inactive-link {
+  color: var(--muted-text-color);
+
+  &:hover {
+    color: var(--link-hover-color);
+  }
+}

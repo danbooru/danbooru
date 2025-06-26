@@ -1,6 +1,3 @@
-@use "../base/020_base" as *;
-@use "../common/utilities";
-
 form.simple_form {
   margin: 0 0 1em 0;
 
@@ -17,7 +14,6 @@ form.simple_form {
     }
 
     .hint {
-      @extend %fineprint;
       padding-left: 1em;
 
       @media (width <= 660px) {
@@ -84,12 +80,13 @@ form.simple_form {
 
       // Show radio buttons as a rounded button group.
       &.radio-button-group {
-        @extend %thin-x-scrollbar;
-
         white-space: nowrap;
 
         input {
-          @extend %sr-only; // Visually hide <input> without using `display: none`, since that would prevent focusing it.
+          // XXX .sr-only; Visually hide <input> without using `display: none`, since that would prevent focusing it.
+          position: absolute;
+          pointer-events: none;
+          opacity: 0;
         }
 
         .radio label {

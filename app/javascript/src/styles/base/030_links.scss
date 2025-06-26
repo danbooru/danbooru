@@ -1,4 +1,4 @@
-@use "./000_vars" as *;
+@use "./mixins" as *;
 
 a {
   color: var(--link-color);

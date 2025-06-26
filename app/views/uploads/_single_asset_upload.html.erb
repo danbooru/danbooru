@@ -128,7 +128,7 @@
           <% t.panel("Tags", active: true) do %>
             <%= f.input :rating,
                         label: "Rating #{help_tooltip embed_wiki("help:rating_notice", classes: "text-xs"), link_class: "inactive-link" }".html_safe,
-                        wrapper_html: { class: "radio-button-group text-xs", "x-on:input": "$el.classList.remove('field_with_errors')" },
+                        wrapper_html: { class: "radio-button-group thin-x-scrollbar text-xs", "x-on:input": "$el.classList.remove('field_with_errors')" },
                         collection: Post::RATINGS.invert.reverse_each.to_h,
                         as: :radio_buttons,
                         selected: post.rating,

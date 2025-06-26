@@ -34,7 +34,7 @@
                   <input type="file" id="file-picker-<%= object_id %>" class="hidden" x-on:change="editor.insertImages($event.target.files, imageSize, imageCaption)" accept="image/*,video/*" multiple>
                   <input type="text" placeholder="Enter image caption (optional)" class="w-full" x-model="imageCaption">
 
-                  <div class="input radio_buttons radio-button-group flex items-center !m-0 hidden">
+                  <div class="input radio_buttons radio-button-group thin-x-scrollbar flex items-center !m-0 hidden">
                     <label class="text-sm mr-2">Size</label>
 
                     <span class="radio text-xxs">

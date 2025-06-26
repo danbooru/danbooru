@@ -1,4 +1,4 @@
-@use "../../javascript/src/styles/base/000_vars" as *;
+@use "../../javascript/src/styles/base/mixins" as *;
 
 article.post-preview, .post-tooltip-header {
   .post-score a {
