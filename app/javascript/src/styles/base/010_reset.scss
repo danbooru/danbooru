@@ -42,3 +42,8 @@ input, select, textarea, button {
   font-weight: inherit;
   line-height: inherit;
 }
+
+img, svg, video, canvas, iframe {
+  display: block;
+  vertical-align: middle; // Used for `display: inline` images
+}

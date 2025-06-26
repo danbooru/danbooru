@@ -20,7 +20,7 @@ module IconHelper
 
   def image_icon_tag(filename, class: nil, **options)
     klass = binding.local_variable_get(:class)
-    image_pack_tag("static/#{filename}", class: "icon #{klass}", **options)
+    image_pack_tag("static/#{filename}", class: "icon inline-block #{klass}", **options)
   end
 
   def upvote_icon(**options)

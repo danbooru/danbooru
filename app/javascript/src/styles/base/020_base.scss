@@ -61,11 +61,6 @@ h3, h4, h5, h6 {
   font-size: var(--text-md);
 }
 
-img {
-  border: none;
-  vertical-align: middle;
-}
-
 input, select, textarea, button {
   background-color: var(--form-input-background);
   border-color: var(--form-input-border-color);
@@ -173,7 +168,6 @@ ul.list-inline {
 
 .svg-icon {
   display: inline-block;
-  vertical-align: middle;
   height: 1em;
 }
 

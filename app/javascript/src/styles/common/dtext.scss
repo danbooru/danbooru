@@ -197,6 +197,11 @@
     line-height: 1.25;
   }
 
+  emoji[data-mode="inline"] {
+    display: inline-block;
+    vertical-align: text-bottom;
+  }
+
   emoji[data-mode="inline"] img {
     max-height: var(--max-emoji-size);
     max-width: var(--max-emoji-size);

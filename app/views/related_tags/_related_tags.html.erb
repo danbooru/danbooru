@@ -1,7 +1,7 @@
 <%= tag.div class: "card p-2 h-fit space-y-1 general-related-tags-column hidden", "x-data": { collapsed: collapsed }.to_json do %>
   <div class="related-tags-header flex items-center justify-between gap-2 pr-2 cursor-pointer select-none" x-on:click="collapsed = !collapsed; !collapsed && Danbooru.RelatedTag.update_related_tags($event)">
     <h6 class="inline-flex gap-1 items-center ">
-      <%= spinner_icon(class: "text-muted align-middle invisible", "x-cloak": true, "x-bind:class": '{ invisible: !$store.relatedTags.loading }') %>
+      <%= spinner_icon(class: "text-muted invisible", "x-cloak": true, "x-bind:class": '{ invisible: !$store.relatedTags.loading }') %>
 
       Related:
       <%= link_to "", "javascript:void(0)", class: "related-tags-current-tag", "x-on:click.stop": "Danbooru.RelatedTag.update_related_tags($event)" %>
