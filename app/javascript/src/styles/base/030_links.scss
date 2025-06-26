@@ -14,11 +14,6 @@ a:hover, a:active {
   color: var(--link-hover-color);
 }
 
-// When the link is focused by the keyboard instead of by clicking.
-a:focus-visible {
-  outline: thin dotted;
-}
-
 a.active {
   font-weight: bold;
 }

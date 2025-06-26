@@ -1,7 +1,7 @@
 <% if inline? %>
   <%= form.text_field(input_name, input_html) %>
 <% else %>
-  <div class="dtext-editor relative w-fit focus-within:outline-auto <%= editor_html[:class] %>"
+  <div class="dtext-editor relative w-fit <%= editor_html[:class] %>"
        x-bind:class="{ 'dtext-editor-loading inert': editor.loading }"
        x-data="{ editor: new Danbooru.DTextEditor($root) }"
        x-init="editor.initialize(<%= { inline: inline?, mediaEmbeds: media_embeds?, domains: domains }.to_json %>)"

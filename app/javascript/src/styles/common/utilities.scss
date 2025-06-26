@@ -118,8 +118,6 @@ $spacer: 0.25rem; /* 4px */
 
 .border-current { border-color: currentcolor; }
 
-.focus-within\:outline-auto:focus-within { outline: auto; }
-
 .rounded-sm, %rounded-sm { border-radius: 0.5 * $spacer; }
 .rounded,    %rounded    { border-radius: 1   * $spacer; }
 .rounded-lg, %rounded-lg { border-radius: 2   * $spacer; }

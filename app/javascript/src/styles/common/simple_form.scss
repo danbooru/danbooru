@@ -273,10 +273,6 @@ input.toggle-switch {
     transition: margin 0.15s;
   }
 
-  &:focus-visible {
-    outline: 0.125rem solid var(--toggle-switch-focus-ring-color);
-  }
-
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;

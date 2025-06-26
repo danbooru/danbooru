@@ -97,6 +97,13 @@ button {
   background: var(--target-background) !important;
 }
 
+// Add a focus ring around links and <input> elements when they are focused by the keyboard.
+:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: -2px; // Make sure the outline isn't clipped by overflow:hidden parents.
+  border-color: transparent;
+}
+
 menu {
   padding: 0;
 
