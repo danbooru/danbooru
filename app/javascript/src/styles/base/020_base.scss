@@ -72,16 +72,15 @@ img {
   vertical-align: middle;
 }
 
-input, select, textarea {
-  background: var(--form-input-background);
-  border: 1px solid var(--form-input-border-color);
-  color: var(--form-input-text-color);
-  padding-left: 0.25em;
-  font: var(--body-font);
+input, select, textarea, button {
+  background-color: var(--form-input-background);
+  border-color: var(--form-input-border-color);
+  border-width: 1px;
+  padding: 0.125rem 0.25rem;
 }
 
-button {
-  font-family: var(--body-font);
+:where(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--checkbox-selected-color);
 }
 
 /* placeholder text in <input type="text"> elements */

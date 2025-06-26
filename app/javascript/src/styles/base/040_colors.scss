@@ -146,7 +146,6 @@ html, body[data-current-user-theme="light"] {
 
   --badge-blue-background-color: var(--blue-5);
 
-  --form-input-text-color: var(--text-color);
   --form-input-background: var(--body-background-color);
   --form-input-border-color: var(--grey-2);
   --form-input-placeholder-text-color: var(--grey-4);
@@ -161,8 +160,9 @@ html, body[data-current-user-theme="light"] {
   --form-button-hover-box-shadow-color: var(--grey-5);
   --form-button-active-background: var(--grey-2);
 
+  --checkbox-selected-color: var(--link-color);
   --toggle-switch-unselected-color: var(--grey-3);
-  --toggle-switch-selected-color: var(--link-color);
+  --toggle-switch-selected-color: var(--checkbox-selected-color);
   --toggle-switch-handle-color: var(--inverse-text-color);
 
   --dtext-editor-menu-background-color: var(--blue-0);
@@ -419,7 +419,6 @@ html, body[data-current-user-theme="light"] {
 
   --badge-blue-background-color: var(--blue-5);
 
-  --form-input-text-color: var(--grey-2);
   --form-input-background: var(--grey-7);
   --form-input-border-color: var(--grey-5);
   --form-input-placeholder-text-color: var(--grey-3);
@@ -434,7 +433,10 @@ html, body[data-current-user-theme="light"] {
   --form-button-hover-box-shadow-color: var(--grey-5);
   --form-button-active-background: var(--grey-3);
 
+  --checkbox-selected-color: var(--blue-5);
   --toggle-switch-unselected-color: var(--grey-5);
+  --toggle-switch-selected-color: var(--checkbox-selected-color);
+  --toggle-switch-handle-color: var(--inverse-text-color);
 
   --dtext-editor-menu-background-color: var(--grey-8);
 
