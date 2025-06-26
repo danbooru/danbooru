@@ -143,7 +143,7 @@
                 </span>
               </div>
 
-              <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
+              <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { class: "text-sm", "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
 
               <div class="mb-4 flex items-center gap-2">
                 <%= f.submit "Post", class: "button-primary button-sm" %>

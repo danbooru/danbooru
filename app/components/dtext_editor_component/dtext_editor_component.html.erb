@@ -110,9 +110,9 @@
         "x-on:pointerdown": "editor.autocomplete.close()",
         "x-on:paste": "editor.onPaste($event)")
       ) %>
-      <div class="dtext-mirror absolute top-0 w-full h-full p-1 text-sm border overflow-auto thin-scrollbar whitespace-pre-wrap border pointer-events-none select-none invisible" x-text="editor.dtext"></div>
+      <div class="dtext-mirror absolute top-0 w-full h-full p-1 border overflow-auto thin-scrollbar whitespace-pre-wrap border pointer-events-none select-none invisible" x-text="editor.dtext"></div>
 
-      <div class="dtext-preview prose w-full h-full p-1 text-sm border overflow-auto thin-scrollbar" x-show="editor.previewMode" x-html="editor.html()" x-cloak></div>
+      <div class="dtext-preview prose w-full h-full p-1 border overflow-auto thin-scrollbar" x-show="editor.previewMode" x-html="editor.html()" x-cloak></div>
       <div class="dtext-loading absolute inset-0 flex items-center justify-center" x-show="editor.loading" x-cloak>
         <%= spinner_icon(class: "text-xxl") %>
       </div>
