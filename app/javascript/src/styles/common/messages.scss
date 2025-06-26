@@ -26,13 +26,6 @@ div.list-of-messages {
 
     div.content {
       flex: 1;
-
-      menu {
-        > li {
-          padding: 0;
-          margin-right: 1.5em;
-        }
-      }
     }
 
     @media (width <= 660px) {

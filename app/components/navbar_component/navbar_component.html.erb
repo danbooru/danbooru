@@ -12,7 +12,7 @@
   </div>
 
   <nav id="nav" class="desktop-only mt-2" x-bind:class="{ 'desktop-only': !menuOpen }">
-    <menu id="main-menu" class="flex flex-wrap items-center px-5 sm:p-2">
+    <div id="main-menu" class="flex flex-wrap items-center px-5 sm:p-2">
       <% if current_user.is_anonymous? %>
         <%= nav_link_to("Login", main_app.login_path(url: request.fullpath), class: "font-bold", rel: "nofollow") %>
       <% else %>
@@ -39,12 +39,12 @@
       <% end %>
 
       <%= nav_link_to("More »", main_app.site_map_path) %>
-    </menu>
+    </div>
 
     <% if content_for?(:secondary_links) %>
-      <menu id="subnav-menu" class="flex flex-wrap items-center px-5 sm:p-2">
+      <div id="subnav-menu" class="flex flex-wrap items-center px-5 sm:p-2">
         <%= content_for :secondary_links %>
-      </menu>
+      </div>
     <% end %>
   </nav>
 </header>

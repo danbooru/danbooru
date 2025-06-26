@@ -43,9 +43,9 @@
 
     <%= render "application/update_notice", record: comment, current_user: current_user %>
 
-    <menu class="mt-2">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
       <% if votable? %>
-        <li class="comment-votes">
+        <span class="comment-votes">
           <% if current_user.is_anonymous? %>
             <%= link_to upvote_icon, login_path(url: request.fullpath), class: "comment-upvote-link inactive-link" %>
           <% elsif upvoted? %>
@@ -69,11 +69,11 @@
           <% else %>
             <%= link_to downvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "-1"), class: "comment-downvote-link inactive-link", method: :post, remote: true, "data-params": component_state.to_param %>
           <% end %>
-        </li>
+        </span>
       <% end %>
 
       <% if policy(comment).reply? %>
-        <li class="comment-reply">
+        <span class="comment-reply">
           <% if current_user.is_anonymous? %>
             <%= link_to "Reply", login_path(url: request.fullpath) %>
           <% elsif context == :index_by_comment %>
@@ -81,13 +81,13 @@
           <% else %>
             <%= link_to "Reply", new_comment_path(id: comment, comment: { post_id: comment.post_id }), remote: true %>
           <% end %>
-        </li>
+        </span>
       <% end %>
 
       <% if reported? %>
-        <li class="moderation-report-notice font-bold">
+        <span class="moderation-report-notice font-bold">
           Reported (<%= link_to pluralize(comment.pending_moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "Comment", model_id: comment.id, status: "pending" }) %>)
-        </li>
+        </span>
       <% end %>
 
       <% unless redact_deleted? %>
@@ -155,6 +155,6 @@
           <% end %>
         <% end %>
       <% end %>
-    </menu>
+    </div>
   </div>
 </article>
