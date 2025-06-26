@@ -199,7 +199,7 @@ class DText
     end
 
     node.inner_html  = %{<div class="media-embed-image">#{asset_html}</div>}
-    node.inner_html += %{<div class="media-embed-caption p-2 text-xs text-center text-muted">#{caption}</div>} if caption.present?
+    node.inner_html += %{<div class="media-embed-caption p-2 text-xs text-center text-muted text-balance">#{caption}</div>} if caption.present?
   end
 
   # Replace a <tag-request-embed> node with the contents of the alias, implication, or bulk update request.
