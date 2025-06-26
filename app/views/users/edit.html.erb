@@ -8,7 +8,7 @@
     <%= render(TabPanelComponent.new(classes: "horizontal-tab-panel fixed-width-container") do |t| %>
       <% t.panel("Basic", active: true) do %>
         <%= edit_form_for @user do |f| %>
-          <fieldset id="basic-settings-section">
+          <div id="basic-settings-section">
             <div class="input">
               <label>Name</label>
               <p><%= link_to "Change your name", change_name_user_path(@user) %></p>
@@ -39,7 +39,7 @@
             <%= f.input :time_zone, include_blank: false, hint: "The timezone to use for timestamps." %>
             <%= f.input :comment_threshold, hint: "Comments at or below this score will be hidden by default.", input_html: { min: -100, max: 5 } %>
             <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => { :data => {:autocomplete => "tag-query"}} %>
-          </fieldset>
+          </div>
 
           <%= f.button :submit, "Submit" %>
         <% end %>
@@ -47,7 +47,7 @@
 
       <% t.panel("Advanced") do %>
         <%= edit_form_for @user do |f| %>
-          <fieldset id="advanced-settings-section">
+          <div id="advanced-settings-section">
             <div class="input">
               <label>Account</label>
               <p>
@@ -74,7 +74,7 @@
 
             <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :data => { :autocomplete => "tag-query" } } %>
             <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site." %>
-          </fieldset>
+          </div>
           <%= f.button :submit, "Submit" %>
         <% end %>
       <% end %>
