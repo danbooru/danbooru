@@ -7,7 +7,7 @@
   <% end %>
 
   <% if @user && !@user.new_record? && !CurrentUser.user.is_anonymous? %>
-    <li>|</li>
+    <%= subnav_divider %>
     <% if @user.id == CurrentUser.user.id %>
       <%= subnav_link_to "Profile", profile_path %>
       <%= subnav_link_to "Settings", settings_path %>
@@ -40,7 +40,7 @@
       <% end %>
     <% end %>
 
-    <li>|</li>
+    <%= subnav_divider %>
     <%= subnav_link_to "Log out", session_path, method: "delete" %>
   <% end %>
 <% end %>

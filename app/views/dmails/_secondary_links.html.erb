@@ -5,9 +5,9 @@
   <%= subnav_link_to "Unread", dmails_path(search: { folder: "unread" }) %>
   <%= subnav_link_to "Sent", dmails_path(search: { folder: "sent" }) %>
   <%= subnav_link_to "Deleted", dmails_path(search: { folder: "deleted" }) %>
-  <li>|</li>
+  <%= subnav_divider %>
   <%= subnav_link_to "New", new_dmail_path %>
   <%= subnav_link_to "Mark all as read", {:controller => "dmails", :action => "mark_all_as_read"}, :method => :post, :remote => true %></li>
-  <li>|</li>
+  <%= subnav_divider %>
   <%= subnav_link_to "Help", wiki_page_path("help:dmail") %>
 <% end %>

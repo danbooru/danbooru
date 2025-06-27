@@ -7,7 +7,7 @@
   <%= subnav_link_to "Changes", artist_versions_path %>
   <%= subnav_link_to "URLs", artist_urls_path %>
   <% if @artist && !@artist.new_record? && (!@artist.is_banned? || policy(@artist).can_view_banned?) %>
-    <li>|</li>
+    <%= subnav_divider %>
     <%= subnav_link_to "Posts (#{@artist.tag.try(:post_count).to_i})", posts_path(:tags => @artist.name) %>
     <% if policy(@artist).update? %>
       <%= subnav_link_to "Edit", edit_artist_path(@artist), :"data-shortcut" => "e" %>

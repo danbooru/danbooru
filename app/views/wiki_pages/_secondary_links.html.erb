@@ -7,10 +7,10 @@
   <%= subnav_link_to "Changes", wiki_page_versions_path %>
   <%= subnav_link_to "Help", wiki_page_path("help:wiki") %>
   <% if @wiki_page && @wiki_page.new_record? && @wiki_page.try(:tag).present? %>
-    <li>|</li>
+    <%= subnav_divider %>
     <%= subnav_link_to "Posts (#{@wiki_page.tag.post_count})", posts_path(:tags => @wiki_page.title) %>
   <% elsif @wiki_page && !@wiki_page.new_record? && !@wiki_page_version %>
-    <li>|</li>
+    <%= subnav_divider %>
     <%= subnav_link_to "Posts (#{@wiki_page.tag.try(:post_count) || 0})", posts_path(:tags => @wiki_page.title) %>
     <%= subnav_link_to "History", wiki_page_versions_path(:search => {:wiki_page_id => @wiki_page.id}) %>
     <% if policy(@wiki_page).edit? %>
@@ -25,7 +25,7 @@
       <% end %>
     <% end %>
   <% elsif @wiki_page_version %>
-    <li>|</li>
+    <%= subnav_divider %>
     <%= subnav_link_to "Posts (#{@wiki_page_version.wiki_page.tag.try(:post_count) || 0})", posts_path(tags: @wiki_page_version.title) %>
     <%= subnav_link_to "History", wiki_page_versions_path(search: { wiki_page_id: @wiki_page_version.wiki_page_id }) %>
 

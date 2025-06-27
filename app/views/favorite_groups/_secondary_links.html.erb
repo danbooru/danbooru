@@ -6,7 +6,7 @@
   <%= subnav_link_to "Help", wiki_page_path("help:favorite_groups") %>
 
   <% if @favorite_group && !@favorite_group.new_record? %>
-    <li>|</li>
+    <%= subnav_divider %>
     <%= subnav_link_to "Show", favorite_group_path(@favorite_group) %>
     <%= subnav_link_to "Posts", posts_path(:tags => "favgroup:#{@favorite_group.id} status:any") %>
     <% if policy(@favorite_group).update? %>

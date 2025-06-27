@@ -89,6 +89,10 @@ module ApplicationHelper
     link_to(*args, id: id, class: "py-1.5 px-3 #{klass}", **options, &block)
   end
 
+  def subnav_divider
+    tag.span("|", class: "text-muted select-none")
+  end
+
   def format_text(text, references: DText.preprocess([text]), **options)
     DText.new(text, **options).format_text(references:)
   end

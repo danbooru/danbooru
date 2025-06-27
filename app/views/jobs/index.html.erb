@@ -46,9 +46,12 @@
 
       <% t.column column: "control" do |job| %>
         <% if policy(job).update? %>
-          <%= link_to "Run", run_job_path(job), method: :put, remote: true %> |
-          <%= link_to "Retry", retry_job_path(job), method: :put, remote: true %> |
-          <%= link_to "Cancel", cancel_job_path(job), method: :put, remote: true %> |
+          <%= link_to "Run", run_job_path(job), method: :put, remote: true %>
+          <%= subnav_divider %>
+          <%= link_to "Retry", retry_job_path(job), method: :put, remote: true %>
+          <%= subnav_divider %>
+          <%= link_to "Cancel", cancel_job_path(job), method: :put, remote: true %>
+          <%= subnav_divider %>
           <%= link_to "Delete", job_path(job), method: :delete, remote: true %>
         <% end %>
       <% end %>

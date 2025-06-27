@@ -1,5 +1,5 @@
 <% content_for(:secondary_links) do %>
   <%= subnav_link_to "Listing", site_credentials_path %>
-  <li>|</li>
+  <%= subnav_divider %>
   <%= subnav_link_to "New", new_site_credential_path %>
 <% end %>
