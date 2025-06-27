@@ -17,6 +17,10 @@ class Blacklist {
     this.posts = $(".post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview").toArray().map(post => new Post(post, this));
     this.apply();
     this.cleanupStorage();
+
+    this.showAll = JSON.parse(localStorage.getItem(`blacklist.showAll`)) ?? false;
+    this.autocollapse = JSON.parse(localStorage.getItem(`blacklist.autocollapse`)) ?? true;
+    this.collapsed = JSON.parse(localStorage.getItem(`blacklist.collapsed`)) ?? this.enabled; // This comes last because it depends on blacklists being applied first.
   }
 
   // Apply all blacklist rules to all posts.
@@ -25,17 +29,58 @@ class Blacklist {
   }
 
   get enabled() {
-    return this.activeRules.every(rule => rule.enabled);
+    return this.visibleRules.every(rule => rule.enabled);
   }
 
   set enabled(value) {
-    this.activeRules.forEach(rule => rule.enabled = Boolean(value));
+    if (this.autocollapse) {
+      this.collapsed = value;
+    }
+
+    this.visibleRules.forEach(rule => rule.enabled = Boolean(value));
     this.posts.forEach(post => post.update());
   }
 
-  // @returns {Array<Rule>} - The set of rules that match at least one post (whether the rule is enabled or not).
-  get activeRules() {
-    return this.rules.filter(rule => rule.active);
+  get showAll() {
+    return this._showAll;
+  }
+
+  set showAll(value) {
+    this._showAll = Boolean(value);
+    localStorage.setItem(`blacklist.showAll`, JSON.stringify(value));
+  }
+
+  get collapsed() {
+    return this._collapsed;
+  }
+
+  set collapsed(value) {
+    this._collapsed = Boolean(value);
+    localStorage.setItem(`blacklist.collapsed`, JSON.stringify(value));
+  }
+
+  get autocollapse() {
+    return this._autocollapse;
+  }
+
+  set autocollapse(value) {
+    this._autocollapse = Boolean(value);
+    localStorage.setItem(`blacklist.autocollapse`, JSON.stringify(value));
+  }
+
+  // @returns {Boolean} - True if the blacklist box should be visible, i.e. if there are any visible rules.
+  get visible() {
+    return this.visibleRules.length > 0;
+  }
+
+  // @returns {Array<Rule>} - The set of rules that are currently visible (all rules if showAll is enabled, or only rules matching a post if not).
+  get visibleRules() {
+    return this.rules.filter(rule => rule.visible);
+  }
+
+  // @returns {Array<Post>} - The set of posts that are currently blacklisted by at least one rule.
+  get blacklistedPosts() {
+    return this.posts.filter(post => post.blacklisted);
   }
 
   // Remove from storage any rules that have been removed from the blacklist.
@@ -140,9 +185,9 @@ class Rule {
     });
   }
 
-  // A rule is active if it matches at least one post, regardless of whether the rule is enabled or not.
-  get active() {
-    return this.posts.size > 0;
+  // A rule is visible if all rules are visible or if it matches at least one post, regardless of whether the rule is enabled or not.
+  get visible() {
+    return this.blacklist.showAll || this.posts.size > 0;
   }
 
   get enabled() {
@@ -151,11 +196,11 @@ class Rule {
 
   set enabled(value) {
     localStorage.setItem(`blacklist.enabled:${this.string}`, JSON.stringify(value));
+    this.posts.forEach(post => post.update());
   }
 
   toggle() {
     this.enabled = !this.enabled;
-    this.posts.forEach(post => post.update());
   }
 
   // @param {Post} post - The post to check against this rule.

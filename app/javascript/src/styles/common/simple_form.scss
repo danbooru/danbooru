@@ -248,8 +248,8 @@ input.toggle-switch {
   border-color: transparent;
   border-radius: 1rem;
   border-width: 0.125rem;
-  height: 1rem;
-  width: 2rem;
+  height: 1em;
+  min-width: 2em;
   transition: background-color 0.15s;
   vertical-align: text-bottom;
   cursor: pointer;
@@ -260,7 +260,7 @@ input.toggle-switch {
   }
 
   &:checked::before {
-    margin-left: 1rem;
+    margin-left: 1em;
   }
 
   &::before {
@@ -276,5 +276,9 @@ input.toggle-switch {
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+  }
+
+  &:focus-visible {
+    outline-offset: 2px;
   }
 }
