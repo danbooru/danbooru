@@ -1,4 +1,4 @@
-<%= tag.div class: "popup-menu inline-block #{classes}".strip, "data-hide-on-click": hide_on_click do %>
+<%= tag.div class: "popup-menu inline-flex items-center h-full #{classes}".strip, "data-hide-on-click": hide_on_click do %>
   <%= link_to "javascript:void(0)", class: ["popup-menu-button", button_classes], "x-on:mousedown.prevent": true, **button_html do %>
     <% if button.present? %>
       <%= button %>

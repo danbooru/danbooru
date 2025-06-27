@@ -2,7 +2,9 @@
 
 div.popup-menu {
   a.default-popup-menu-button {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    height: 100%;
     border-radius: 0.25rem;
     padding: 0.25rem;
     color: var(--muted-text-color);
