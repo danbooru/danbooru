@@ -1,6 +1,7 @@
 import Rails from '@rails/ujs';
 import { delegate, hideAll } from 'tippy.js';
 import Notice from './notice';
+import capitalize from "lodash/capitalize";
 
 let Utility = {};
 
@@ -140,7 +141,7 @@ export async function uploadURL(url) {
   }
 }
 
-// Upload a list of files or a URL to the site.
+// Upload a list of files or a URL to the site. Throws an error if the upload fails.
 //
 // @param {Object} params - The parameters to pass to the upload endpoint.
 // @param {Number} [pollDelay=250] - The delay in milliseconds between checking the upload status.
@@ -159,12 +160,47 @@ export async function createUpload(params, pollDelay = 250) {
   });
 
   let upload = await response.json();
-  while (upload.status !== "completed" && upload.status !== "error") {
+  while (upload.status !== "completed" && !uploadError(upload)) {
     await delay(pollDelay);
     upload = await $.get(`/uploads/${upload.id}.json`);
   }
 
+  let error = uploadError(upload);
+  if (error) {
+    throw new Error(error);
+  }
+
   return upload;
+}
+
+// Return the error message for a failed upload.
+export function uploadError(upload) {
+  // The upload failed during processing (normally because the URL didn't contain any images)
+  if (upload.status === "error") {
+    return upload.error;
+  // The upload failed with a 4xx or 5xx error (normally rate limiting)
+  } else if (upload.success === false && upload.message) {
+    return upload.message;
+  // The upload failed with a validation error (normally an invalid URL or too many queued assets)
+  } else if (upload.errors) {
+    return errorFromResponse(upload);
+  }
+}
+
+// Get the validation errors returned by an API call as a single string.
+// Equivalent to `@model.errors.full_messages.join('; ')`.
+export function errorFromResponse(apiResponse, separator = "; ") {
+  let errors = apiResponse.errors ?? {};
+
+  return Object.keys(errors).map(attribute => {
+    return errors[attribute].map(error => {
+      if (attribute === "base") {
+        return `${error}`;
+      } else {
+        return `${capitalize(attribute)} ${error}`;
+      }
+    });
+  }).join(separator);
 }
 
 $.fn.replaceFieldText = function(new_value) {

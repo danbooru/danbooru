@@ -1,7 +1,6 @@
 import Dropzone from 'dropzone';
-import { delay } from "./utility";
+import { delay, uploadError } from "./utility";
 import Notice from "./notice";
-import capitalize from "lodash/capitalize";
 
 export default class FileUploadComponent {
   static POLL_DELAY = 250;
@@ -135,20 +134,12 @@ export default class FileUploadComponent {
     }
   }
 
-  // Called when creating the upload failed because of a validation error (normally, because the source URL was not a real URL).
+  // Called when creating the upload failed because of a non-2xx response (usually a rate limiting error or a validation error).
   async onError(e) {
-    let errors = e.originalEvent.detail[0].errors;
-    let message = Object.keys(errors).map(attribute => {
-      return errors[attribute].map(error => {
-        if (attribute === "base") {
-          return `${error}`;
-        } else {
-          return `${capitalize(attribute)} ${error}`;
-        }
-      });
-    }).join("; ");
+    let upload = e.originalEvent?.detail?.[0];
+    let message = uploadError(upload);
 
-    Notice.error(message);
+    Notice.error(`Upload failed: ${message}`);
   }
 
   get $dropzone() {

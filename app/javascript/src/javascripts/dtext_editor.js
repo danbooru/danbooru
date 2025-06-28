@@ -280,10 +280,6 @@ export default class DTextEditor {
       let upload = await uploadFilesOrURL(filesOrURL);
       this.uploading = false;
 
-      if (upload.success === false || upload.status === "error") {
-        throw new Error(upload.error);
-      }
-
       let dtext = upload.upload_media_assets.map(uma => {
         if (uma.media_asset.post) {
           return `${prefix}!post #${uma.media_asset.post.id}${suffix}`;
