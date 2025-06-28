@@ -50,9 +50,8 @@ class WikiPagesController < ApplicationController
 
   def update
     @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
-    authorize @wiki_page
-
-    @wiki_page.update(permitted_attributes(@wiki_page))
+    @wiki_page.attributes = permitted_attributes(@wiki_page)
+    authorize(@wiki_page).save
 
     notice = @wiki_page.warnings.full_messages.join(".\n \n") if @wiki_page.warnings.any?
     respond_with(@wiki_page, notice: notice)
