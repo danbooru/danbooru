@@ -3,7 +3,8 @@
   padding-right: 0 !important; // Overrides .thin-scrollbar
 
   div.ui-menu-item-wrapper {
-    padding: 0.25em 0.4em;
+    padding: 0.25rem;
+    line-height: 1;
 
     &.ui-state-active {
       background-color: var(--autocomplete-selected-background-color);

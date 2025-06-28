@@ -22,13 +22,11 @@
 
   <% preview.with_footer do %>
     <div class="text-center text-muted text-xs h-4">
-      <div class="leading-none">
-        <% if upload.media_asset_count == 1 && upload.posts.first&.present? %>
-          <%= link_to "post ##{upload.posts.first.id}", upload.posts.first, class: "leading-none" %>
-        <% elsif upload.media_asset_count > 1 && upload.posts.length > 0 %>
-          <%= link_to "#{upload.posts.length}/#{upload.media_asset_count} posted", posts_path(tags: "id:#{upload.posts.map(&:id).join(",")}"), class: "leading-none" %>
-        <% end %>
-      </div>
+      <% if upload.media_asset_count == 1 && upload.posts.first&.present? %>
+        <%= link_to "post ##{upload.posts.first.id}", upload.posts.first %>
+      <% elsif upload.media_asset_count > 1 && upload.posts.length > 0 %>
+        <%= link_to "#{upload.posts.length}/#{upload.media_asset_count} posted", posts_path(tags: "id:#{upload.posts.map(&:id).join(",")}") %>
+      <% end %>
     </div>
   <% end %>
 <% end %>

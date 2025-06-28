@@ -109,7 +109,7 @@
 
             <div>
               <% if @user.totp.present? %>
-                <%= link_to "Disable", edit_user_totp_path(user_id: @user.id), class: "button-outline-danger button-sm leading-none" %>
+                <%= link_to "Disable", edit_user_totp_path(user_id: @user.id), class: "button-outline-danger button-sm" %>
               <% else %>
                 <%= link_to "Enable", edit_user_totp_path(user_id: @user.id), class: "button-primary button-sm" %>
               <% end %>

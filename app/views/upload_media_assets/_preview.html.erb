@@ -12,9 +12,7 @@
   <% preview.with_footer do %>
     <div class="text-center text-xs h-8">
       <% if upload_media_asset.post.present? %>
-        <div class="leading-none">
-          <%= link_to "post ##{upload_media_asset.post.id}", upload_media_asset.post, class: "leading-none" %>
-        </div>
+        <%= link_to "post ##{upload_media_asset.post.id}", upload_media_asset.post %>
       <% end %>
     </div>
   <% end %>
