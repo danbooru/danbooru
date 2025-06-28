@@ -41,6 +41,11 @@ class Blacklist {
     this.posts.forEach(post => post.update());
   }
 
+  // @returns {Boolean} - True if some but not all rules are enabled.
+  get partiallyEnabled() {
+    return this.visibleRules.some(rule => rule.enabled) && !this.visibleRules.every(rule => rule.enabled);
+  }
+
   get showAll() {
     return this._showAll;
   }

@@ -165,6 +165,7 @@ html, body[data-current-user-theme="light"] {
   --checkbox-selected-color: var(--link-color);
   --toggle-switch-unselected-color: var(--grey-3);
   --toggle-switch-selected-color: var(--checkbox-selected-color);
+  --toggle-switch-indeterminate-color: var(--link-hover-color);
   --toggle-switch-handle-color: var(--inverse-text-color);
 
   --dtext-editor-menu-background-color: var(--blue-0);
@@ -440,6 +441,7 @@ html, body[data-current-user-theme="light"] {
   --checkbox-selected-color: var(--blue-5);
   --toggle-switch-unselected-color: var(--grey-5);
   --toggle-switch-selected-color: var(--checkbox-selected-color);
+  --toggle-switch-indeterminate-color: var(--link-color);
   --toggle-switch-handle-color: var(--inverse-text-color);
 
   --dtext-editor-menu-background-color: var(--grey-8);

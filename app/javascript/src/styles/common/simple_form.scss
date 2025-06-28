@@ -263,6 +263,14 @@ input.toggle-switch {
     margin-left: 1em;
   }
 
+  &:indeterminate {
+    background-color: var(--toggle-switch-indeterminate-color);
+  }
+
+  &:indeterminate::before {
+    margin-left: 0.5em;
+  }
+
   &::before {
     display: block;
     content: "";
