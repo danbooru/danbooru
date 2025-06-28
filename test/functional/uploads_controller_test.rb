@@ -334,7 +334,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           create_upload!("test/files/test.jpg", user: @user)
 
           upload = Upload.last
-          assert_match("Upload failed, try again", upload.reload.error)
+          assert_match("Timed out while waiting for file to be processed", upload.reload.error)
           assert_equal("failed", asset.reload.status)
         end
       end

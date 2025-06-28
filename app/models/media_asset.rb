@@ -326,7 +326,7 @@ class MediaAsset < ApplicationRecord
         # failed state, then mark the asset as failed so the user can try the upload again later.
         if !media_asset.active?
           media_asset.update!(status: :failed)
-          raise Error, "Upload failed, try again (timed out while waiting for file to be processed)"
+          raise Error, "Timed out while waiting for file to be processed"
         end
 
         media_asset
