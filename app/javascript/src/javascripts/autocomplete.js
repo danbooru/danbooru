@@ -1,7 +1,16 @@
+import { isBeforeInputEventAvailable }  from './utility'
+import UndoStack from './undo_stack';
+import Utility from './utility';
+
 let Autocomplete = {};
 
 Autocomplete.VERSION = 2; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
 Autocomplete.MAX_RESULTS = 20;
+
+Autocomplete.WHITESPACE = ' \\t';
+Autocomplete.WORD_SEPARATORS = Autocomplete.WHITESPACE + '_()\\[\\]{}<>`\'"-/;:,.?!';
+Autocomplete.PREV_WORD_REGEXP = new RegExp(`[^${Autocomplete.WORD_SEPARATORS}]+[${Autocomplete.WORD_SEPARATORS}]*$`);
+Autocomplete.NEXT_WORD_REGEXP = new RegExp(`^[${Autocomplete.WORD_SEPARATORS}]*[^${Autocomplete.WORD_SEPARATORS}]+`);
 
 Autocomplete.initialize_all = function() {
   $.widget("ui.autocomplete", $.ui.autocomplete, {
@@ -18,7 +27,7 @@ Autocomplete.initialize_all = function() {
     },
     _renderItem: Autocomplete.render_item,
     search: function(value, event) {
-      if (!event.originalEvent || event.originalEvent.inputType === "") {
+      if (event && (!event.originalEvent || event.originalEvent.inputType === "")) {
         // Ignore. Not a real input event triggered by the user.
         return;
       }
@@ -66,6 +75,83 @@ Autocomplete.initialize_tag_autocomplete = function() {
       resp(results);
     }
   });
+
+  UndoStack.initialize_fields($fields_multiple);
+
+  if (isBeforeInputEventAvailable()) {
+    $fields_multiple.on("beforeinput", function(e) {
+      if (!e || !e.originalEvent) {
+        return;
+      }
+      let target = e.target;
+      let event = e.originalEvent;
+
+      if (event.inputType == "deleteWordBackward" || event.inputType == "deleteWordForward") {
+        // Ctrl+Backspace or Ctrl+Delete were pressed. Delete an entire tag before/after the caret.
+        let caret = target.selectionStart;
+        var before_caret_text = target.value.substring(0, caret);
+        var after_caret_text = target.value.substring(caret);
+        if (event.inputType == "deleteWordBackward") {
+          before_caret_text = before_caret_text.replace(Autocomplete.PREV_WORD_REGEXP, "");
+        } else if (event.inputType == "deleteWordForward") {
+          after_caret_text = after_caret_text.replace(Autocomplete.NEXT_WORD_REGEXP, "");
+        }
+        if (after_caret_text.match(/^\S/)) {
+          // There's a tag after the caret, so add a space between them so it doesn't interfere with autocomplete.
+          after_caret_text = " " + after_caret_text;
+        }
+        $(target).replaceFieldText(before_caret_text + after_caret_text);
+        target.selectionStart = target.selectionEnd = before_caret_text.length;
+        e.preventDefault();
+      }
+    });
+  }
+
+  Utility.keydown("ctrl+left", "cursor_word_left", e => {
+    let target = e.target;
+    let selected = target.selectionStart !== target.selectionEnd;
+    if (selected) {
+      target.selectionEnd = target.selectionStart;
+      e.preventDefault();
+      return;
+    }
+    let caret = target.selectionStart;
+    var before_caret_text = target.value.substring(0, caret);
+    let match = before_caret_text.match(Autocomplete.PREV_WORD_REGEXP);
+    if (match) {
+      target.selectionStart = target.selectionEnd = match.index;
+    }
+    e.preventDefault();
+  }, $fields_multiple);
+
+  Utility.keydown("ctrl+right", "cursor_word_right", e => {
+    let target = e.target;
+    let selected = target.selectionStart !== target.selectionEnd;
+    if (selected) {
+      target.selectionStart = target.selectionEnd;
+      e.preventDefault();
+      return;
+    }
+    let caret = target.selectionStart;
+    var before_caret_text = target.value.substring(0, caret);
+    var after_caret_text = target.value.substring(caret);
+    let match = after_caret_text.match(Autocomplete.NEXT_WORD_REGEXP);
+    if (match) {
+      target.selectionStart = target.selectionEnd = before_caret_text.length + match[0].length;
+    }
+    e.preventDefault();
+  }, $fields_multiple);
+
+  $fields_multiple.on("selectionchange", function(e) {
+    // Update the autocomplete results if the user moves their caret while the autocomplete menu is already open.
+    var input = this;
+    var autocomplete = $(input).autocomplete("instance");
+    var $autocomplete_menu = autocomplete.menu.element;
+    if (!$autocomplete_menu.is(":visible")) {
+      return;
+    }
+    $(input).autocomplete("search");
+  });
 }
 
 Autocomplete.current_term = function($input) {
@@ -95,7 +181,7 @@ Autocomplete.insert_completion = function(input, completion) {
     after_caret_text = " " + after_caret_text;
   }
 
-  input.value = before_caret_text + after_caret_text;
+  $(input).replaceFieldText(before_caret_text + after_caret_text);
   input.selectionStart = input.selectionEnd = before_caret_text.length;
 
   $(input).trigger("input"); // Manually trigger an input event because programmatically editing the field won't trigger one.

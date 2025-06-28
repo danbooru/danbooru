@@ -24,6 +24,16 @@ export function isMobile() {
   return window.matchMedia("(max-width: 660px)").matches;
 }
 
+// The following function returns true if beforeinput, and thus getTargetRanges, is supported.
+//
+// https://developer.mozilla.org/en-US/docs/Web/API/Element/beforeinput_event#feature_detection
+export function isBeforeInputEventAvailable() {
+  return (
+    window.InputEvent &&
+    typeof InputEvent.prototype.getTargetRanges === "function"
+  );
+}
+
 Utility.dialog = function(title, html) {
   const $dialog = $(html).dialog({
     title: title,
@@ -155,6 +165,26 @@ export async function createUpload(params, pollDelay = 250) {
   }
 
   return upload;
+}
+
+$.fn.replaceFieldText = function(new_value) {
+  return this.each(function() {
+    if (this.undoStack) {
+      // If the element is using the custom undo stack implementation, simply assign directly to the input's value.
+      this.undoStack.save("danbooru.replaceFieldText");
+      this.value = new_value;
+    } else {
+      // Otherwise, try using execCommand to preserve the browser's native undo stack.
+      this.focus();
+      this.setSelectionRange(0, this.value.length);
+      let success = document.execCommand("insertText", false, new_value);
+      if (!success) {
+        // insertText is not supported by the browser.
+        // Fall back to assigning to value.
+        this.value = new_value;
+      }
+    }
+  })
 }
 
 $.fn.selectEnd = function() {
