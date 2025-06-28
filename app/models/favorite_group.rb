@@ -5,8 +5,7 @@ class FavoriteGroup < ApplicationRecord
 
   before_validation :normalize_name
 
-  validates :name, visible_string: true
-  validates :name, uniqueness: { case_sensitive: false, scope: :creator_id }
+  validates :name, visible_string: true, uniqueness: { case_sensitive: false, scope: :creator_id }, length: { maximum: 170 }, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts

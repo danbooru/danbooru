@@ -87,5 +87,6 @@ class FavoriteGroupTest < ActiveSupport::TestCase
     should_not allow_value("").for(:name)
     should_not allow_value("   ").for(:name)
     should_not allow_value("\u200B").for(:name)
+    should_not allow_value("x" * 171).for(:name)
   end
 end
