@@ -27,7 +27,13 @@ class DmailPolicy < ApplicationPolicy
   end
 
   def rate_limit_for_create(**_options)
-    { rate: 1.0 / 2.minutes, burst: 5 }
+    if user.is_builder?
+      { action: "dmails:create", rate: 4.0 / 1.minute, burst: 60 } # 240 per hour, 300 in first hour
+    elsif user.dmails.sent.exists?(created_at: ..24.hours.ago)
+      { action: "dmails:create", rate: 1.0 / 1.minute, burst: 5 } # 60 per hour, 65 in first hour
+    else
+      { action: "dmails:create", rate: 1.0 / 2.minutes, burst: 5 } # 30 per hour, 35 in first hour
+    end
   end
 
   def permitted_attributes_for_create

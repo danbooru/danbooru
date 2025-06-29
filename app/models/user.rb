@@ -115,6 +115,7 @@ class User < ApplicationRecord
 
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
+  has_many :bulk_update_requests
   has_many :comments, foreign_key: :creator_id
   has_many :comment_votes, dependent: :destroy
   has_many :wiki_page_versions, foreign_key: :updater_id

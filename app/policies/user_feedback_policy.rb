@@ -21,6 +21,10 @@ class UserFeedbackPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def rate_limit_for_write(**_options)
+    { action: "user_feedbacks:write", rate: 1.0 / 1.minute, burst: 5 } # 60 per hour, 65 in first hour
+  end
+
   def permitted_attributes_for_create
     [:body, :category, :user_id, :user_name]
   end

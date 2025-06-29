@@ -14,6 +14,10 @@ class FavoritePolicy < ApplicationPolicy
   end
 
   def rate_limit_for_write(**_options)
-    { rate: 1.0 / 1.second, burst: 200 }
+    if user.post_votes.exists?(created_at: ..24.hours.ago)
+      { action: "favorites:write", rate: 60.0 / 1.minute, burst: 100 } # 3600 per hour, 3700 in first hour
+    else
+      { action: "favorites:write", rate: 8.0 / 1.minute, burst: 60 } # 480 per hour, 540 in first hour
+    end
   end
 end

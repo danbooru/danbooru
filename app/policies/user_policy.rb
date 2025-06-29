@@ -50,7 +50,11 @@ class UserPolicy < ApplicationPolicy
   end
 
   def rate_limit_for_create(**_options)
-    { rate: 1.0 / 5.minutes, burst: 5 }
+    if record.invalid?
+      { action: "users:create:invalid", rate: 1.0 / 1.second, burst: 10 }
+    else
+      { action: "users:create", rate: 1.0 / 5.minutes, burst: 3 }
+    end
   end
 
   def permitted_attributes_for_create
