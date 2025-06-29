@@ -117,8 +117,6 @@ class FavoriteGroup < ApplicationRecord
       errors.add(:name, "cannot contain consecutive underscores")
     when /[^[:graph:]]/
       errors.add(:name, "cannot contain non-printable characters")
-    when ""
-      errors.add(:name, "cannot be blank")
     when /\A[0-9]+\z/
       errors.add(:name, "cannot contain only digits")
     end
