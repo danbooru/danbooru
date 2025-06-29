@@ -54,12 +54,6 @@ module ApplicationHelper
     end
   end
 
-  def wordbreakify(string)
-    lines = string.scan(/.{1,10}/)
-    wordbreaked_string = lines.map {|str| h(str)}.join("<wbr>")
-    raw(wordbreaked_string)
-  end
-
   def version_type_links(params)
     html = []
     %w[previous current].each do |type|
