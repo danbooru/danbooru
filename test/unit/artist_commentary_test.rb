@@ -53,26 +53,25 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
 
     context "when updated" do
       setup do
-        @post = FactoryBot.create(:post)
-        @artcomm = FactoryBot.create(:artist_commentary, post_id: @post.id)
+        @artcomm = create(:artist_commentary)
         @artcomm.reload
       end
 
       should "add tags if requested" do
         @artcomm.update(translated_title: "bar", add_commentary_tag: "1")
-        assert_equal(true, @post.reload.has_tag?("commentary"))
+        assert_equal(true, @artcomm.post.reload.has_tag?("commentary"))
       end
 
       should "not create new version if nothing changed" do
         @artcomm.save
-        assert_equal(1, @post.artist_commentary.versions.size)
+        assert_equal(1, @artcomm.versions.size)
       end
 
       should "create a new version if outside merge window" do
         travel(2.hours) do
           @artcomm.update(original_title: "bar")
 
-          assert_equal(2, @post.artist_commentary.versions.size)
+          assert_equal(2, @artcomm.versions.size)
           assert_equal("bar", @artcomm.versions.last.original_title)
         end
       end
@@ -81,7 +80,7 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
         @artcomm.update(original_title: "bar")
         @artcomm.reload
 
-        assert_equal(1, @post.artist_commentary.versions.size)
+        assert_equal(1, @artcomm.versions.size)
         assert_equal("bar", @artcomm.versions.last.original_title)
       end
 
@@ -99,6 +98,15 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
         assert_equal("foo", @artcomm.translated_title)
         assert_equal("foo", @artcomm.translated_description)
       end
+    end
+
+    context "during validation" do
+      subject { create(:artist_commentary, post: create(:post)) }
+
+      should_not allow_value("x" * 700).for(:original_title)
+      should_not allow_value("x" * 700).for(:translated_title)
+      should_not allow_value("x" * 60_000).for(:original_description)
+      should_not allow_value("x" * 60_000).for(:translated_description)
     end
   end
 end

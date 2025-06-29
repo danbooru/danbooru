@@ -17,6 +17,10 @@ class ArtistCommentary < ApplicationRecord
 
   before_validation :trim_whitespace
   validates :post_id, uniqueness: true
+  validates :original_title, length: { maximum: 600 }, if: :original_title_changed?
+  validates :translated_title, length: { maximum: 300 }, if: :translated_title_changed?
+  validates :original_description, length: { maximum: 55_000 }, if: :original_description_changed?
+  validates :translated_description, length: { maximum: 55_000 }, if: :translated_description_changed?
   belongs_to :post
   has_many :versions, -> {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
   has_one :previous_version, -> {order(id: :desc)}, :class_name => "ArtistCommentaryVersion", :foreign_key => :post_id, :primary_key => :post_id
