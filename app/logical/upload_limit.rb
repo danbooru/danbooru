@@ -65,10 +65,9 @@ class UploadLimit
 
   # @return [Integer] The user's total number of upload slots. Ranges from 5 to 40.
   def upload_slots
-    # If the user doesn't have any posts approved yet, then restrict them to 1 post per minute until they get a post approved.
-    return 0 if !user.posts.approved.exists? && user.posts.exists?(["created_at > ?", 1.minute.ago])
-
-    upload_level + Danbooru.config.extra_upload_slots.to_i
+    slots = upload_level + Danbooru.config.extra_upload_slots.to_i
+    slots = slots.clamp(0..5) if !user.posts.exists?(created_at: ..1.hour.ago)
+    slots
   end
 
   # @return [Integer] The user's current upload level. Ranges from 0 to 35.

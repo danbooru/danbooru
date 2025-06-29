@@ -30,6 +30,7 @@ class PostAppealTest < ActiveSupport::TestCase
       context "appeal limits" do
         context "for members" do
           should "not be able to appeal more than their upload limit" do
+            create(:post, uploader: @user, created_at: 1.day.ago)
             create_list(:post_appeal, 5, creator: @user)
 
             assert_equal(15, @user.upload_limit.upload_slots)
@@ -44,6 +45,7 @@ class PostAppealTest < ActiveSupport::TestCase
         context "for users with unrestricted uploads" do
           should "should not have an appeal limit" do
             @user = create(:contributor)
+            create(:post, uploader: @user, created_at: 1.day.ago)
             create_list(:post_appeal, 10, creator: @user)
 
             assert_equal(15, @user.upload_limit.upload_slots)

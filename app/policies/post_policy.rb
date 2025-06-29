@@ -73,6 +73,20 @@ class PostPolicy < ApplicationPolicy
     { action: "posts:index:atom", rate: 1.0 / 2.seconds, burst: 50 } if request.format.atom?
   end
 
+  def rate_limit_for_create(**_options)
+    if record.invalid?
+      { action: "posts:create:invalid", rate: 1.0 / 1.second, burst: 1 }
+    elsif user.is_contributor?
+      { action: "posts:create", rate: 6.0 / 1.minute, burst: 40 } # 360 per hour, 400 in first hour
+    elsif user.posts.active.exists?(created_at: ..1.hour.ago)
+      { action: "posts:create", rate: 2.0 / 1.minute, burst: 30 } # 120 per hour, 150 in first hour
+    elsif user.posts.exists?(created_at: ..1.hour.ago)
+      { action: "posts:create", rate: 1.0 / 1.minute, burst: 15 } # 60 per hour, 75 in first hour
+    else
+      { action: "posts:create", rate: 1.0 / 2.0.minutes, burst: 2 } # 30 per hour, 32 in first hour
+    end
+  end
+
   def permitted_attributes_for_create
     [:upload_id, :media_asset_id, :upload_media_asset_id, :tag_string, :rating, :parent_id, :source, :is_pending,
      { artist_commentary: %i[original_title original_description translated_title translated_description] }]

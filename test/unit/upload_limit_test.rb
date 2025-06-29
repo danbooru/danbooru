@@ -100,5 +100,14 @@ class UploadLimitTest < ActiveSupport::TestCase
         assert_equal(967, @user.reload.upload_points)
       end
     end
+
+    context "a user who hasn't uploaded before" do
+      should "be limited to 5 upload slots in the first hour" do
+        assert_equal(5, @user.upload_limit.upload_slots)
+
+        create(:post, uploader: @user, created_at: 2.hours.ago)
+        assert_equal(15, @user.upload_limit.upload_slots)
+      end
+    end
   end
 end
