@@ -106,21 +106,6 @@ class DmailTest < ActiveSupport::TestCase
       end
     end
 
-    context "sending a dmail" do
-      should "fail if the user has sent too many dmails recently" do
-        10.times do
-          Dmail.create_split(from: @user, to: create(:user), title: "blah", body: "blah")
-        end
-
-        assert_no_difference("Dmail.count") do
-          @dmail = Dmail.create_split(from: @user, to: create(:user), title: "blah", body: "blah")
-
-          assert_equal(false, @dmail.valid?)
-          assert_equal(["You can't send dmails to more than 10 users per hour"], @dmail.errors[:base])
-        end
-      end
-    end
-
     context "destroying a dmail" do
       setup do
         @recipient = create(:user)

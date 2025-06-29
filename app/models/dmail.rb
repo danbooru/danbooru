@@ -6,7 +6,6 @@ class Dmail < ApplicationRecord
   # defines :dtext_body
   dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emojis: 1, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
 
-  validate :validate_sender_is_not_limited, on: :create
   validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
   validates :body, visible_string: true, length: { maximum: 50_000 }, if: :body_changed?
 
@@ -164,14 +163,6 @@ class Dmail < ApplicationRecord
 
   def is_recipient?
     owner == to
-  end
-
-  def validate_sender_is_not_limited
-    return if from.blank? || from.is_gold?
-
-    if from.dmails.where("created_at > ?", 1.hour.ago).group(:to).reorder(nil).count.size >= 10
-      errors.add(:base, "You can't send dmails to more than 10 users per hour")
-    end
   end
 
   def autoreport_spam
