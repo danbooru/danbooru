@@ -19,6 +19,7 @@ module Source::Tests::URL
         profile_urls: [
           "https://space.bilibili.com/355143",
           "https://space.bilibili.com/476725595/video",
+          "https://m.bilibili.com/space/355143",
         ],
       )
 
@@ -47,6 +48,16 @@ module Source::Tests::URL
       url_parser_should_work(
         "https://t.bilibili.com/612214375070704555",
         page_url: "https://www.bilibili.com/opus/612214375070704555",
+      )
+
+      url_parser_should_work(
+        "https://space.bilibili.com/476725595/video",
+        profile_url: "https://space.bilibili.com/476725595",
+      )
+
+      url_parser_should_work(
+        "https://m.bilibili.com/space/355143",
+        profile_url: "https://space.bilibili.com/355143",
       )
 
       url_parser_should_work(

@@ -70,6 +70,10 @@ module Source
         in "space", "bilibili.com", /^\d+$/ => artist_id, *rest
           @artist_id = artist_id
 
+        # https://m.bilibili.com/space/355143
+        in "m", "bilibili.com", "space", /^\d+$/ => artist_id, *rest
+          @artist_id = artist_id
+
         # https://www.bilibili.com/video/av598699440/
         # https://www.bilibili.com/video/BV1dY4y1u7Vi/
         # http://www.bilibili.tv/video/av439451/
