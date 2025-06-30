@@ -597,6 +597,6 @@ class MediaAsset < ApplicationRecord
   end
 
   def self.available_includes
-    %i[post media_metadata ai_tags dtext_links embedding_wiki_pages]
+    %i[post media_metadata dtext_links embedding_wiki_pages]
   end
 end

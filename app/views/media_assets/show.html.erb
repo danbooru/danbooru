@@ -117,29 +117,6 @@
       </div>
 
       <div class="media-asset-sidebar flex-none md:w-360px">
-        <% if @media_asset.ai_tags.present? %>
-          <div>
-            <h3>Tags</h3>
-
-            <ul class="tag-list categorized-tag-list">
-              <% @media_asset.ai_tags.undeprecated.sort_by { |tag| [TagCategory.split_header_list.index(tag.category_name.downcase), tag.name.starts_with?("rating:") ? 0 : 1, tag.name] }.each do |ai_tag| %>
-                <%= tag.li class: "tag-type-#{ai_tag.category} space-x-1 text-sm", "data-tag-name": ai_tag.name do %>
-                  <% if ai_tag.tag.artist? %>
-                    <%= link_to "?", show_or_new_artists_path(name: ai_tag.name) %>
-                  <% elsif ai_tag.name =~ /\A\d+\z/ %>
-                    <%= link_to "?", wiki_page_path("~#{ai_tag.name}") %>
-                  <% else %>
-                    <%= link_to "?", wiki_page_path(ai_tag.name) %>
-                  <% end %>
-
-                  <%= link_to ai_tag.pretty_name, media_assets_path(search: { ai_tags_match: ai_tag.name }), class: "break-word", rel: "nofollow" %>
-                  <%= tag.span "#{ai_tag.score}%", class: ["text-muted text-xs"] %>
-                <% end %>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
         <div>
           <table class="striped text-xs w-full">
             <tr>

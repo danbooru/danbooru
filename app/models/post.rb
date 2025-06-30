@@ -2177,7 +2177,7 @@ class Post < ApplicationRecord
     %i[
       uploader approver flags appeals events parent children notes
       comments approvals disapprovals replacements ai_metadata
-      artist_commentary media_asset media_metadata ai_tags dtext_links
+      artist_commentary media_asset media_metadata dtext_links
       embedding_wiki_pages
     ]
   end

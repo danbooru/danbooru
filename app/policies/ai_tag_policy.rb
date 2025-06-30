@@ -2,10 +2,10 @@
 
 class AITagPolicy < ApplicationPolicy
   def index?
-    true
+    user.is_moderator?
   end
 
   def tag?
-    unbanned? && record.post.present? && policy(record.post).update?
+    user.is_moderator? && record.post.present?
   end
 end
