@@ -9,8 +9,8 @@ Autocomplete.MAX_RESULTS = 20;
 
 Autocomplete.WHITESPACE = ' \\t';
 Autocomplete.WORD_SEPARATORS = Autocomplete.WHITESPACE + '_()\\[\\]{}<>`\'"-/;:,.?!';
-Autocomplete.PREV_WORD_REGEXP = new RegExp(`[^${Autocomplete.WORD_SEPARATORS}]+[${Autocomplete.WORD_SEPARATORS}]*$`);
-Autocomplete.NEXT_WORD_REGEXP = new RegExp(`^[${Autocomplete.WORD_SEPARATORS}]*[^${Autocomplete.WORD_SEPARATORS}]+`);
+Autocomplete.PREV_WORD_REGEXP = new RegExp(`[^${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*$`);
+Autocomplete.NEXT_WORD_REGEXP = new RegExp(`^[${Autocomplete.WORD_SEPARATORS}]*[^${Autocomplete.WORD_SEPARATORS}]*`);
 
 Autocomplete.initialize_all = function() {
   $.widget("ui.autocomplete", $.ui.autocomplete, {
