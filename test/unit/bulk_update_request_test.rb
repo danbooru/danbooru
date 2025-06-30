@@ -860,6 +860,51 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
     end
 
+    context "that doesn't belong to a forum post" do
+      should "not fail to be rejected" do
+        bur = create(:bulk_update_request)
+        bur.update!(forum_post: nil)
+
+        assert_nil(bur.forum_post)
+        bur.reject!
+
+        assert_equal("rejected", bur.status)
+      end
+
+      should "not fail to be approved" do
+        bur = create(:bulk_update_request)
+        bur.update!(forum_post: nil)
+
+        assert_nil(bur.forum_post)
+        bur.approve!(create(:admin_user))
+
+        assert_equal("processing", bur.status)
+      end
+    end
+
+    context "when validating a new bulk update request" do
+      subject { build(:bulk_update_request) }
+
+      should allow_value("test").for(:title)
+      should_not allow_value("").for(:title)
+      should_not allow_value(" ").for(:title)
+      should_not allow_value("x" * 201).for(:title)
+
+      should allow_value("test").for(:reason)
+      should allow_value((["!post #1"] * 5).join("\n")).for(:reason)
+      should_not allow_value("").for(:reason)
+      should_not allow_value(" ").for(:reason)
+      should_not allow_value("x" * 20_001).for(:reason)
+      should_not allow_value((["!post #1"] * 10).join("\n")).for(:reason)
+
+      should_not allow_value(0).for(:status)
+      should_not allow_value("unknown").for(:status)
+
+      should allow_value("nuke fumimi").for(:reason)
+      should_not allow_value("").for(:script)
+      should_not allow_value("x" * 20_001).for(:script)
+    end
+
     context "when searching" do
       setup do
         @bur1 = create(:bulk_update_request, title: "foo", script: "create alias aaa -> bbb", user: @admin, approver: @admin, status: "approved")

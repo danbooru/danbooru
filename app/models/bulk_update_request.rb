@@ -4,19 +4,27 @@ class BulkUpdateRequest < ApplicationRecord
   STATUSES = %w[pending approved rejected processing failed]
 
   attr_accessor :title, :reason
-  dtext_attribute :reason # defines :dtext_reason
+
+  # defines :dtext_reason
+  # XXX media embed validations must match forum post validations
+  dtext_attribute :reason, media_embeds: { max_embeds: 5, max_large_emojis: 1, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
 
   belongs_to :user
   belongs_to :forum_topic, optional: true
   belongs_to :forum_post, optional: true
   belongs_to :approver, optional: true, class_name: "User"
 
-  validates :reason, visible_string: true, on: :create
-  validates :script, visible_string: true
-  validates :title, visible_string: true, if: ->(rec) { rec.forum_topic_id.blank? }
-  validates :forum_topic, presence: true, if: ->(rec) { rec.forum_topic_id.present? }
+  # XXX these validations must match the forum post validations
+  validates :reason, visible_string: true, length: { maximum: 20_000 }, on: :create
+  validates :title, visible_string: true, length: { maximum: 200 }, on: :create, if: ->(bur) { bur.forum_topic_id.blank? }
+
+  validates :script, visible_string: true, length: { maximum: 20_000 }, if: :script_changed?
+  validates :forum_topic, presence: true, if: ->(bur) { bur.forum_topic_id.present? }
+  validates :forum_post, presence: true, if: ->(bur) { bur.forum_post_id.present? }
   validates :status, inclusion: { in: STATUSES }
   validate :validate_script, if: :script_changed?
+  validates_associated :forum_topic, if: :forum_topic_changed?
+  validates_associated :forum_post, if: :forum_post_changed?
 
   before_save :update_tags, if: :script_changed?
   after_create :create_forum_topic
@@ -66,7 +74,7 @@ class BulkUpdateRequest < ApplicationRecord
           processor.validate!(:approval)
           update!(status: "processing", approver: approver)
           processor.process_later!
-          forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.")
+          forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.") if forum_post.present?
         end
       end
     end
@@ -74,16 +82,18 @@ class BulkUpdateRequest < ApplicationRecord
     def create_forum_topic
       CurrentUser.scoped(user) do
         body = "[bur:#{id}]\n\n#{reason}"
-        self.forum_topic = ForumTopic.create(title: title, category_id: 1, creator: user) unless forum_topic.present?
-        self.forum_post = forum_topic.forum_posts.create(body: body, creator: user) unless forum_post.present?
-        save
+
+        self.forum_topic = ForumTopic.new(title: title, category: "Tags", creator: user) unless forum_topic.present?
+        self.forum_post = forum_topic.forum_posts.build(body: body, creator: user) unless forum_post.present?
+
+        save!
       end
     end
 
     def reject!(rejector = User.system)
       transaction do
         update!(status: "rejected")
-        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been rejected by @#{rejector.name}.")
+        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been rejected by @#{rejector.name}.") if forum_post.present?
       end
     end
 

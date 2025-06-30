@@ -57,9 +57,12 @@ module DTextAttribute
         memoize "dtext_#{name}_was"                  # memoize :dtext_body_was
 
         prepended do
-          # validates :body, media_embed: { ... }, if: :body_changed?
-          if media_embeds.present?
+          if media_embeds.present? && method_defined?(:"#{name}_changed?")
+            # validates :body, media_embed: { ... }, if: :body_changed?
             validates name, media_embed: media_embeds, if: :"#{name}_changed?"
+          elsif media_embeds.present?
+            # validates :body, media_embed: { ... }, if: ->(model) { model.dtext_body.present? }
+            validates name, media_embed: media_embeds, if: ->(model) { model.send("dtext_#{name}").present? }
           end
         end
       end
