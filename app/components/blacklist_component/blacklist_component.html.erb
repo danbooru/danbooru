@@ -7,7 +7,7 @@
   x-cloak>
   <%= tag.div class: "flex items-center gap-1 p-2", "x-bind:class": (inline ? "{ 'sm:border-b': !blacklist.collapsed }" : "{ 'border-b': !blacklist.collapsed }") do %>
     <label class="flex items-center gap-1 font-header font-bold cursor-pointer select-none">
-      <input type="checkbox" class="toggle-switch" x-model="blacklist.enabled" x-effect="$el.indeterminate = blacklist.partiallyEnabled">
+      <input type="checkbox" class="toggle-switch" x-model="blacklist.enabled" x-effect="$el.indeterminate = blacklist.partiallyEnabled" data-shortcut="b">
       Blacklisted
     </label>
 

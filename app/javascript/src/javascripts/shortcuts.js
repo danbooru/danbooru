@@ -34,7 +34,7 @@ Shortcuts.initialize_data_shortcuts = function() {
       const condition = $(e).attr("data-shortcut-when") || "*";
 
       if ($(e).is(condition)) {
-        if ($(e).is("input, textarea")) {
+        if ($(e).is('input[type="text"], textarea')) {
           $(e).focus().selectEnd();
         } else {
           e.click();
