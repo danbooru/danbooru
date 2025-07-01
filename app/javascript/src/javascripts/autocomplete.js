@@ -143,20 +143,24 @@ Autocomplete.initialize_tag_autocomplete = function() {
   }, $fields_multiple);
 
   $fields_multiple.on("selectionchange", function(e) {
-    // Update the autocomplete results if the user moves their caret while the autocomplete menu is already open.
-    var input = this;
-    var autocomplete = $(input).autocomplete("instance");
+    var $input = $(this);
+    var autocomplete = $input.autocomplete("instance");
     var $autocomplete_menu = autocomplete.menu.element;
     if (!$autocomplete_menu.is(":visible")) {
       return;
     }
-    $(input).autocomplete("search");
+
+    // Close the autocomplete menu if the cursor is moved to a different tag.
+    if (Autocomplete.current_term($input) !== Autocomplete.current_term($input, autocomplete.previousCaretPosition)) {
+      autocomplete.close();
+    }
+
+    autocomplete.previousCaretPosition = $input.get(0).selectionStart;
   });
 }
 
-Autocomplete.current_term = function($input) {
+Autocomplete.current_term = function($input, caret = $input.get(0).selectionStart) {
   let query = $input.get(0).value;
-  let caret = $input.get(0).selectionStart;
   let term_after_caret = query.substring(caret).match(/\S*/)[0];
   caret += term_after_caret.length;
   let regexp = new RegExp(`^[-~(]*(${Autocomplete.tag_prefixes().join("|")})?`);
