@@ -6,12 +6,17 @@
   word-break: break-word;
   text-wrap: pretty;
 
-  *:last-child {
-    margin-bottom: 0;
+  p, ul, pre, blockquote, details, div:where(.spoiler), table, h1, h2, h3, h4, h5, h6, article, media-gallery {
+    margin-bottom: var(--paragraph-spacing);
   }
 
-  p, ul, pre, blockquote, details, div.spoiler, table, h1, h2, h3, h4, h5, h6, article, media-gallery, emoji[data-mode="block"] {
+  // XXX Don't give emojis bottom margins when the comment ends in a run of block emojis.
+  emoji[data-mode="block"]:has(~ :not(emoji[data-mode="block"])) {
     margin-bottom: var(--paragraph-spacing);
+  }
+
+  *:last-child {
+    margin-bottom: 0;
   }
 
   h1, h2, h3, h4, h5, h6 {
