@@ -2,15 +2,6 @@ require 'test_helper'
 
 class CommentTest < ActiveSupport::TestCase
   context "A comment" do
-    setup do
-      user = FactoryBot.create(:user)
-      CurrentUser.user = user
-    end
-
-    teardown do
-      CurrentUser.user = nil
-    end
-
     context "that mentions a user" do
       setup do
         @post = FactoryBot.create(:post)
@@ -151,25 +142,15 @@ class CommentTest < ActiveSupport::TestCase
       end
 
       context "that is edited by a moderator" do
-        setup do
-          @post = FactoryBot.create(:post)
-          @comment = FactoryBot.create(:comment, :post_id => @post.id)
-          @mod = FactoryBot.create(:moderator_user)
-          CurrentUser.user = @mod
-        end
-
         should "create a mod action" do
-          @comment.update(body: "nope")
+          @mod = create(:moderator_user)
+          @comment = create(:comment)
+          @comment.update(body: "nope", updater: @mod)
 
           assert_equal(1, ModAction.count)
           assert_equal("comment_update", ModAction.last.category)
           assert_equal(@comment, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
-        end
-
-        should "credit the moderator as the updater" do
-          @comment.update(body: "test")
-          assert_equal(@mod.id, @comment.updater_id)
         end
       end
 

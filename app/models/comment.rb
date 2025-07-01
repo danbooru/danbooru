@@ -5,7 +5,7 @@ class Comment < ApplicationRecord
 
   belongs_to :post
   belongs_to :creator, class_name: "User"
-  belongs_to_updater
+  belongs_to :updater, class_name: "User", default: -> { creator }
 
   has_many :moderation_reports, as: :model, dependent: :destroy
   has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
@@ -20,11 +20,12 @@ class Comment < ApplicationRecord
   before_create :autoreport_spam
   before_save :handle_reports_on_deletion
   after_create :update_last_commented_at_on_create
-  after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |comment|
+  after_update(if: ->(comment) { (!comment.is_deleted? || !comment.saved_change_to_is_deleted?) && comment.updater != comment.creator }) do |comment|
     ModAction.log("updated #{comment.dtext_shortlink}", :comment_update, subject: self, user: comment.updater)
   end
+
   after_save :update_last_commented_at_on_destroy, :if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted?}
-  after_save(:if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |comment|
+  after_save(if: ->(comment) { comment.is_deleted? && comment.saved_change_to_is_deleted? && comment.updater != comment.creator }) do |comment|
     ModAction.log("deleted #{comment.dtext_shortlink}", :comment_delete, subject: self, user: comment.updater)
   end
 
