@@ -27,10 +27,11 @@ Autocomplete.initialize_all = function() {
     },
     _renderItem: Autocomplete.render_item,
     search: function(value, event) {
-      if (event && (!event.originalEvent || event.originalEvent.inputType === "")) {
-        // Ignore. Not a real input event triggered by the user.
+      if (event && (event.type !== "input" || !event.originalEvent || event.originalEvent.inputType === "")) {
+        // Ignore keydown events such as arrows keys, shift, ctrl, etc, and fake input events not triggered by the user.
         return;
       }
+
       if ($(this).data("ui-autocomplete")) {
         $(this).data("ui-autocomplete").menu.bindings = $();
       }
@@ -102,6 +103,8 @@ Autocomplete.initialize_tag_autocomplete = function() {
         }
         $(target).replaceFieldText(before_caret_text + after_caret_text);
         target.selectionStart = target.selectionEnd = before_caret_text.length;
+
+        $(target).autocomplete("search"); // Manually trigger autocomplete because programmatically editing the field won't trigger it.
         e.preventDefault();
       }
     });
@@ -131,16 +134,14 @@ Autocomplete.initialize_tag_autocomplete = function() {
     var $input = $(this);
     var autocomplete = $input.autocomplete("instance");
     var $autocomplete_menu = autocomplete.menu.element;
-    if (!$autocomplete_menu.is(":visible")) {
-      return;
-    }
 
-    // Close the autocomplete menu if the cursor is moved to a different tag.
-    if (Autocomplete.current_term($input) !== Autocomplete.current_term($input, autocomplete.previousCaretPosition)) {
+    // Close the autocomplete menu if the cursor is moved to a different tag (from the Nth term to the Mth term).
+    let currentTerm = this.value.substring(0, this.selectionStart).split(/\s+/).length;
+    if ($autocomplete_menu.is(":visible") && currentTerm !== autocomplete.previousTerm) {
       autocomplete.close();
     }
 
-    autocomplete.previousCaretPosition = $input.get(0).selectionStart;
+    autocomplete.previousTerm = currentTerm;
   });
 }
 
