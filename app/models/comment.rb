@@ -30,7 +30,7 @@ class Comment < ApplicationRecord
   end
 
   deletable
-  dtext_attribute :body, media_embeds: { max_embeds: 1, max_large_emojis: 1, max_small_emojis: 100, max_video_size: 1.megabyte } # defines :dtext_body
+  dtext_attribute :body, media_embeds: { max_embeds: 1, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte } # defines :dtext_body
 
   mentionable(
     message_field: :body,
