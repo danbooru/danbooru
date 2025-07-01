@@ -7,10 +7,10 @@ let Autocomplete = {};
 Autocomplete.VERSION = 3; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
 Autocomplete.MAX_RESULTS = 20;
 
-Autocomplete.WHITESPACE = ' \\t';
+Autocomplete.WHITESPACE = ' \\t\\r\\n';
 Autocomplete.WORD_SEPARATORS = Autocomplete.WHITESPACE + '_()\\[\\]{}<>`\'"-/;:,.?!';
 Autocomplete.PREV_WORD_REGEXP = new RegExp(`[^${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*$`);
-Autocomplete.NEXT_WORD_REGEXP = new RegExp(`^[${Autocomplete.WORD_SEPARATORS}]*[^${Autocomplete.WORD_SEPARATORS}]*`);
+Autocomplete.NEXT_WORD_REGEXP = new RegExp(`^[${Autocomplete.WORD_SEPARATORS}]*[^${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*`);
 
 Autocomplete.initialize_all = function() {
   $.widget("ui.autocomplete", $.ui.autocomplete, {
