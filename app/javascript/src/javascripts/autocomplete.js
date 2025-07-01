@@ -1,4 +1,4 @@
-import { isBeforeInputEventAvailable }  from './utility'
+import { clamp, isBeforeInputEventAvailable }  from './utility'
 import UndoStack from './undo_stack';
 import Utility from './utility';
 
@@ -108,37 +108,22 @@ Autocomplete.initialize_tag_autocomplete = function() {
   }
 
   Utility.keydown("ctrl+left", "cursor_word_left", e => {
-    let target = e.target;
-    let selected = target.selectionStart !== target.selectionEnd;
-    if (selected) {
-      target.selectionEnd = target.selectionStart;
-      e.preventDefault();
-      return;
-    }
-    let caret = target.selectionStart;
-    var before_caret_text = target.value.substring(0, caret);
-    let match = before_caret_text.match(Autocomplete.PREV_WORD_REGEXP);
-    if (match) {
-      target.selectionStart = target.selectionEnd = match.index;
-    }
+    Autocomplete.moveCursorWordLeft(e.target);
     e.preventDefault();
   }, $fields_multiple);
 
   Utility.keydown("ctrl+right", "cursor_word_right", e => {
-    let target = e.target;
-    let selected = target.selectionStart !== target.selectionEnd;
-    if (selected) {
-      target.selectionStart = target.selectionEnd;
-      e.preventDefault();
-      return;
-    }
-    let caret = target.selectionStart;
-    var before_caret_text = target.value.substring(0, caret);
-    var after_caret_text = target.value.substring(caret);
-    let match = after_caret_text.match(Autocomplete.NEXT_WORD_REGEXP);
-    if (match) {
-      target.selectionStart = target.selectionEnd = before_caret_text.length + match[0].length;
-    }
+    Autocomplete.moveCursorWordRight(e.target);
+    e.preventDefault();
+  }, $fields_multiple);
+
+  Utility.keydown("ctrl+shift+left", "selection_word_left", e => {
+    Autocomplete.moveSelectionWordLeft(e.target);
+    e.preventDefault();
+  }, $fields_multiple);
+
+  Utility.keydown("ctrl+shift+right", "selection_word_right", e => {
+    Autocomplete.moveSelectionWordRight(e.target);
     e.preventDefault();
   }, $fields_multiple);
 
@@ -191,6 +176,73 @@ Autocomplete.insert_completion = function(input, completion) {
   $(input).trigger("input"); // Manually trigger an input event because programmatically editing the field won't trigger one.
   $(() => $(input).autocomplete("instance").close()); // XXX Hack to close the autocomplete menu after the input event above retriggers it
 };
+
+Autocomplete.moveCursorWordLeft = function (target) {
+  let selected = target.selectionStart !== target.selectionEnd;
+  if (selected) {
+    target.selectionEnd = target.selectionStart;
+    return;
+  }
+
+  let caret = target.selectionStart;
+  var before_caret_text = target.value.substring(0, caret);
+  let match = before_caret_text.match(Autocomplete.PREV_WORD_REGEXP);
+
+  if (match) {
+    target.selectionStart = target.selectionEnd = match.index;
+  }
+}
+
+Autocomplete.moveCursorWordRight = function (target) {
+  let selected = target.selectionStart !== target.selectionEnd;
+  if (selected) {
+    target.selectionStart = target.selectionEnd;
+    return;
+  }
+
+  let caret = target.selectionStart;
+  var before_caret_text = target.value.substring(0, caret);
+  var after_caret_text = target.value.substring(caret);
+  let match = after_caret_text.match(Autocomplete.NEXT_WORD_REGEXP);
+
+  if (match) {
+    target.selectionStart = target.selectionEnd = before_caret_text.length + match[0].length;
+  }
+}
+
+Autocomplete.moveSelectionWordLeft = function (target) {
+  let direction = (target.selectionStart === target.selectionEnd) ? "backward" : target.selectionDirection;
+  let caret = (direction === "backward") ? target.selectionStart : target.selectionEnd;
+  let match = target.value.substring(0, caret).match(Autocomplete.PREV_WORD_REGEXP);
+  let selectionLength = match?.[0]?.length ?? 0;
+
+  if (direction === "backward") {
+    target.selectionStart -= selectionLength;
+  } else {
+    direction = (caret - selectionLength < target.selectionStart) ? "backward" : direction;
+    target.selectionEnd = clamp(caret - selectionLength, target.selectionStart, target.value.length);
+    target.selectionStart = clamp(caret - selectionLength, 0, target.selectionStart);
+  }
+
+  target.selectionDirection = direction;
+}
+
+Autocomplete.moveSelectionWordRight = function (target) {
+  let direction = (target.selectionStart === target.selectionEnd) ? "forward" : target.selectionDirection;
+  let caret = (direction === "backward") ? target.selectionStart : target.selectionEnd;
+  let match = target.value.substring(caret).match(Autocomplete.NEXT_WORD_REGEXP);
+  let selectionLength = match?.[0]?.length ?? 0;
+
+  if (direction === "forward") {
+    target.selectionEnd += selectionLength;
+  } else {
+    direction = (caret + selectionLength > target.selectionEnd) ? "forward" : direction;
+    target.selectionStart = clamp(caret + selectionLength, 0, target.selectionEnd);
+    target.selectionEnd = clamp(caret + selectionLength, target.selectionEnd, target.value.length);
+  }
+
+  target.selectionDirection = direction;
+}
 
 // If we press tab while the autocomplete menu is open but nothing is
 // focused, complete the first item and close the menu.
