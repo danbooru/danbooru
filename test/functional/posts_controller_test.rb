@@ -193,8 +193,8 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "show a notice for a single tag search with multiple pending BURs in multiple topics" do
-          topic1 = as(@user) { create(:forum_topic) }
-          topic2 = as(@user) { create(:forum_topic) }
+          topic1 = create(:forum_topic)
+          topic2 = create(:forum_topic)
           create(:post, tag_string: "foo")
           create(:bulk_update_request, script: "create alias foo -> bar", forum_topic: topic1)
           create(:bulk_update_request, script: "create alias foo -> baz", forum_topic: topic1)

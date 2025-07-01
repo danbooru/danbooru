@@ -822,18 +822,23 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     end
 
     should "create a forum topic" do
-      bur = create(:bulk_update_request, reason: "zzz", script: "create alias aaa -> bbb")
+      user = create(:user)
+      bur = create(:bulk_update_request, user: user, reason: "zzz", script: "create alias aaa -> bbb")
 
       assert_equal(true, bur.forum_post.present?)
       assert_match(/\[bur:#{bur.id}\]/, bur.forum_post.body)
       assert_match(/zzz/, bur.forum_post.body)
+      assert_equal(user, bur.forum_topic.creator)
+      assert_equal(user, bur.forum_topic.updater)
+      assert_equal(user, bur.forum_post.creator)
+      assert_equal(user, bur.forum_post.updater)
     end
 
     context "with an associated forum topic" do
       setup do
         @topic = create(:forum_topic, title: "[bulk] hoge", creator: @admin)
         @post = create(:forum_post, topic: @topic, creator: @admin)
-        @req = FactoryBot.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic_id => @topic.id, :forum_post_id => @post.id, :title => "[bulk] hoge")
+        @req = create(:bulk_update_request, script: "create alias AAA -> BBB", forum_topic: @topic, forum_post: @post)
       end
 
       should "leave the BUR pending if there is a validation error during approval" do
@@ -851,6 +856,15 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         @req = BulkUpdateRequest.find(@req.id)
         assert_equal("pending", @req.status)
+      end
+
+      should "create a forum post on approval" do
+        @req.approve!(@admin)
+
+        assert_equal("processing", @req.status)
+        assert_equal(%{The "bulk update request ##{@req.id}":/bulk_update_requests?search%5Bid%5D=#{@req.id} (forum ##{@post.id}) has been approved by @#{@admin.name}.}, @topic.forum_posts.last.body)
+        assert_equal(User.system, @topic.forum_posts.last.creator)
+        assert_equal(User.system, @topic.forum_posts.last.updater)
       end
 
       should "not send @mention dmails to the approver" do

@@ -55,16 +55,23 @@ class BanTest < ActiveSupport::TestCase
       end
 
       should "delete the user's forum posts" do
-        @forum_topic = create(:forum_topic, creator: @bannee, original_post: create(:forum_post, creator: @bannee))
-        @other_forum_topic = create(:forum_topic, original_post: create(:forum_post))
+        @forum_topic = create(:forum_topic, creator: @bannee, original_post: build(:forum_post, creator: @bannee))
+        @other_forum_topic = create(:forum_topic, original_post: build(:forum_post))
         @other_forum_post = create(:forum_post, creator: @bannee, topic: @other_forum_topic)
         create(:ban, user: @bannee, banner: @banner, delete_forum_posts: true)
 
         assert_equal(true, @forum_topic.reload.is_deleted)
+        assert_equal(@banner, @forum_topic.updater)
+
         assert_equal(true, @forum_topic.original_post.is_deleted)
+        assert_equal(@banner, @forum_topic.original_post.updater)
+
         assert_equal(false, @other_forum_topic.is_deleted)
         assert_equal(false, @other_forum_topic.original_post.is_deleted)
+
         assert_equal(true, @other_forum_post.reload.is_deleted)
+        assert_equal(@banner, @other_forum_post.updater)
+
         assert(ModAction.exists?(category: "forum_topic_delete", subject: @forum_topic, creator: @banner))
         assert(ModAction.exists?(category: "forum_post_delete", subject: @other_forum_post, creator: @banner))
       end

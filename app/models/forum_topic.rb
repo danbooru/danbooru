@@ -15,7 +15,7 @@ class ForumTopic < ApplicationRecord
   }, scopes: false, instance_methods: false, validate: true, default: "None"
 
   belongs_to :creator, class_name: "User"
-  belongs_to_updater
+  belongs_to :updater, class_name: "User", default: -> { creator }
   has_many :forum_posts, foreign_key: "topic_id", dependent: :destroy, inverse_of: :topic
   has_many :forum_topic_visits
   has_one :forum_topic_visit_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "ForumTopicVisit"
@@ -36,7 +36,7 @@ class ForumTopic < ApplicationRecord
   after_update :update_posts_on_deletion_or_undeletion
   after_update :update_original_post
   after_save(:if => ->(rec) {rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
-    ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock, subject: self, user: CurrentUser.user)
+    ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock, subject: self, user: updater)
   end
 
   deletable
@@ -158,9 +158,9 @@ class ForumTopic < ApplicationRecord
 
   def create_mod_action
     if is_deleted && !is_deleted_was
-      ModAction.log("deleted forum topic ##{id} (title: #{title})", :forum_topic_delete, subject: self, user: CurrentUser.user)
+      ModAction.log("deleted forum topic ##{id} (title: #{title})", :forum_topic_delete, subject: self, user: updater)
     elsif !is_deleted && is_deleted_was
-      ModAction.log("undeleted forum topic ##{id} (title: #{title})", :forum_topic_undelete, subject: self, user: CurrentUser.user)
+      ModAction.log("undeleted forum topic ##{id} (title: #{title})", :forum_topic_undelete, subject: self, user: updater)
     end
   end
 
@@ -175,7 +175,7 @@ class ForumTopic < ApplicationRecord
   # Delete all posts when the topic is deleted. Undelete all posts when the topic is undeleted.
   def update_posts_on_deletion_or_undeletion
     if saved_change_to_is_deleted?
-      forum_posts.update!(is_deleted: is_deleted) # XXX depends on current user
+      forum_posts.update!(is_deleted: is_deleted, updater: updater)
     end
   end
 

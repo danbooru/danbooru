@@ -8,7 +8,7 @@ class ForumPost < ApplicationRecord
   dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emojis: 1, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
 
   belongs_to :creator, class_name: "User"
-  belongs_to_updater
+  belongs_to :updater, class_name: "User", default: -> { creator }
   belongs_to :topic, class_name: "ForumTopic", inverse_of: :forum_posts
 
   has_many :moderation_reports, as: :model
@@ -116,13 +116,13 @@ class ForumPost < ApplicationRecord
     end
   end
 
-  def delete!
-    update(is_deleted: true)
+  def delete!(updater = CurrentUser.user)
+    update(is_deleted: true, updater: updater)
     update_topic_updated_at_on_delete
   end
 
-  def undelete!
-    update(is_deleted: false)
+  def undelete!(updater = CurrentUser.user)
+    update(is_deleted: false, updater: updater)
     update_topic_updated_at_on_undelete
   end
 

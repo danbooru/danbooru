@@ -4,7 +4,7 @@ class NewsUpdate < ApplicationRecord
   attr_accessor :duration_in_days
 
   belongs_to :creator, class_name: "User"
-  belongs_to_updater
+  belongs_to :updater, class_name: "User", default: -> { creator }
 
   deletable
   scope :active, -> { undeleted.where("created_at + duration >= ?", Time.zone.now) }

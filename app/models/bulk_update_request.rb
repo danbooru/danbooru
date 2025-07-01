@@ -80,14 +80,12 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def create_forum_topic
-      CurrentUser.scoped(user) do
-        body = "[bur:#{id}]\n\n#{reason}"
+      body = "[bur:#{id}]\n\n#{reason}"
 
-        self.forum_topic = ForumTopic.new(title: title, category: "Tags", creator: user) unless forum_topic.present?
-        self.forum_post = forum_topic.forum_posts.build(body: body, creator: user) unless forum_post.present?
+      self.forum_topic = ForumTopic.new(title: title, category: "Tags", creator: user) unless forum_topic.present?
+      self.forum_post = forum_topic.forum_posts.build(body: body, creator: user) unless forum_post.present?
 
-        save!
-      end
+      save!
     end
 
     def reject!(rejector = User.system)

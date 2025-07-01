@@ -27,13 +27,15 @@ class NewsUpdatesController < ApplicationController
 
   def update
     @news_update = authorize NewsUpdate.find(params[:id])
-    @news_update.update(permitted_attributes(@news_update))
+    @news_update.update(updater: CurrentUser.user, **permitted_attributes(@news_update))
+
     respond_with(@news_update, location: news_updates_path)
   end
 
   def destroy
     @news_update = authorize NewsUpdate.find(params[:id])
-    @news_update.soft_delete!
+    @news_update.soft_delete!(updater: CurrentUser.user)
+
     respond_with(@news_update, location: news_updates_path)
   end
 end

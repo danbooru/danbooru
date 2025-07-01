@@ -142,13 +142,25 @@ class Ban < ApplicationRecord
   def delete_user_data(since: MAX_DELETION_AGE.ago)
     if delete_posts
       user.posts.pending.where(created_at: since..).find_each do |post|
-        post.delete!(post_deletion_reason)
+        post.delete!(post_deletion_reason, user: banner)
       end
     end
 
-    user.forum_topics.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_forum_posts
-    user.forum_posts.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_forum_posts
-    user.comments.undeleted.where(created_at: since..).find_each(&:soft_delete!) if delete_comments
+    if delete_forum_posts
+      user.forum_topics.undeleted.where(created_at: since..).find_each do |topic|
+        topic.soft_delete!(updater: banner)
+      end
+
+      user.forum_posts.undeleted.where(created_at: since..).find_each do |post|
+        post.soft_delete!(updater: banner)
+      end
+    end
+
+    if delete_comments
+      user.comments.undeleted.where(created_at: since..).find_each do |comment|
+        comment.soft_delete!(updater: banner)
+      end
+    end
 
     if delete_post_votes
       user.post_votes.undeleted.where(created_at: since..).find_each do |vote|

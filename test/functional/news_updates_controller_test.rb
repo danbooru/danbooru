@@ -4,12 +4,9 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
   context "the news updates controller" do
     setup do
       @admin = create(:admin_user)
-      as(@admin) do
-        @news_update = create(:news_update, creator: @admin, message: "test news", duration_in_days: 10)
-        travel_to(1.month.ago) do
-          @old_news_update = create(:news_update, creator: @admin, message: "old news", duration_in_days: 7)
-        end
-      end
+      @other_admin = create(:admin_user)
+      @news_update = create(:news_update, creator: @admin, message: "test news", duration_in_days: 10)
+      @old_news_update = create(:news_update, creator: @admin, message: "old news", duration_in_days: 7, created_at: 1.month.ago)
     end
 
     context "index action" do
@@ -35,8 +32,11 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "work" do
-        put_auth news_update_path(@news_update), @admin, params: {:news_update => {:message => "zzz"}}
+        put_auth news_update_path(@news_update), @other_admin, params: { news_update: { message: "zzz" }}
+
         assert_redirected_to(news_updates_path)
+        assert_equal(@admin, @news_update.reload.creator)
+        assert_equal(@other_admin, @news_update.updater)
 
         get_auth posts_path, @admin
         assert_select "#news-updates > div > div", count: 1, text: "zzz"
@@ -48,7 +48,10 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_difference("NewsUpdate.active.count") do
           post_auth news_updates_path, @admin, params: {:news_update => {:message => "zzz"}}
         end
+
         assert_redirected_to(news_updates_path)
+        assert_equal(@admin, @news_update.reload.creator)
+        assert_equal(@admin, @news_update.updater)
 
         get_auth posts_path, @admin
         assert_select "#news-updates > div > div", count: 2
@@ -60,9 +63,13 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
     context "delete action" do
       should "work" do
         assert_difference("NewsUpdate.active.count", -1) do
-          delete_auth news_update_path(@news_update), @admin
+          delete_auth news_update_path(@news_update), @other_admin
         end
+
         assert_redirected_to(news_updates_path)
+        assert_equal(@admin, @news_update.reload.creator)
+        assert_equal(@other_admin, @news_update.updater)
+
         get_auth posts_path, @admin
         assert_select "#news-updates > div > div", count: 0
       end
@@ -70,8 +77,11 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
 
     context "undelete action" do
       should "work" do
-        put_auth news_update_path(@news_update), @admin, params: { news_update: { is_deleted: false } }
+        put_auth news_update_path(@news_update), @other_admin, params: { news_update: { is_deleted: false } }
+
         assert_redirected_to(news_updates_path)
+        assert_equal(@admin, @news_update.reload.creator)
+        assert_equal(@other_admin, @news_update.updater)
 
         get_auth posts_path, @admin
         assert_select "#news-updates > div > div", count: 1, text: @news_update.message

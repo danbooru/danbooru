@@ -6,8 +6,8 @@ class RetireTagRelationshipsJobTest < ActiveJob::TestCase
       create(:tag_alias, created_at: 3.years.ago, antecedent_name: "0", consequent_name: "1")
       RetireTagRelationshipsJob.perform_now
 
-      assert_equal(true, ForumTopic.exists?(title: TagRelationshipRetirementService::FORUM_TOPIC_TITLE))
-      assert_equal(true, ForumPost.exists?(body: TagRelationshipRetirementService::FORUM_TOPIC_BODY))
+      assert_equal(true, ForumTopic.exists?(title: TagRelationshipRetirementService::FORUM_TOPIC_TITLE, category: "Tags", creator: User.system, updater: User.system))
+      assert_equal(true, ForumPost.exists?(body: TagRelationshipRetirementService::FORUM_TOPIC_BODY, creator: User.system, updater: User.system))
     end
 
     should "retire inactive gentag and artist aliases" do

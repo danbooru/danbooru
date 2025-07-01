@@ -4,12 +4,7 @@ class ForumPostTest < ActiveSupport::TestCase
   context "A forum post" do
     setup do
       @user = FactoryBot.create(:user)
-      CurrentUser.user = @user
       @topic = FactoryBot.create(:forum_topic)
-    end
-
-    teardown do
-      CurrentUser.user = nil
     end
 
     context "that mentions a user" do
@@ -61,13 +56,13 @@ class ForumPostTest < ActiveSupport::TestCase
 
       should "not send a mention to yourself" do
         assert_no_difference("Dmail.count") do
-          @forum_post = as(@user) { create(:forum_post, body: "hi from @#{@user.name}") }
+          as(@user) { create(:forum_post, creator: @user, body: "hi from @#{@user.name}") }
         end
       end
 
       should "not fail when mentioning a nonexistent user" do
         assert_no_difference("Dmail.count") do
-          @forum_post = as(@user) { create(:forum_post, body: "hi from @nonamethanks") }
+          as(@user) { create(:forum_post, creator: @user, body: "hi from @nonamethanks") }
         end
       end
     end
@@ -85,16 +80,13 @@ class ForumPostTest < ActiveSupport::TestCase
       end
 
       context "that is deleted" do
-        setup do
-          CurrentUser.user = FactoryBot.create(:moderator_user)
-        end
-
         should "update the topic's updated_at timestamp" do
-          @topic.reload
-          assert_equal(@posts[-1].updated_at.to_i, @topic.updated_at.to_i)
-          @posts[-1].delete!
-          @topic.reload
-          assert_equal(@posts[-2].updated_at.to_i, @topic.updated_at.to_i)
+          @mod = create(:moderator_user)
+
+          assert_equal(@posts[-1].updated_at.to_i, @topic.reload.updated_at.to_i)
+          @posts[-1].delete!(@mod)
+
+          assert_equal(@posts[-2].updated_at.to_i, @topic.reload.updated_at.to_i)
         end
       end
 
@@ -148,21 +140,18 @@ class ForumPostTest < ActiveSupport::TestCase
       assert_search_equals([], body_matches: "aaa")
     end
 
-    should "initialize its creator" do
+    should "initialize its updater" do
       post = create(:forum_post, topic: @topic, creator: @user)
-      assert_equal(@user.id, post.creator_id)
+      assert_equal(@user, post.updater)
     end
 
     context "updated by a second user" do
-      setup do
-        @post = FactoryBot.create(:forum_post, :topic_id => @topic.id)
-        @second_user = FactoryBot.create(:user)
-        CurrentUser.user = @second_user
-      end
-
       should "record its updater" do
-        @post.update(body: "abc")
-        assert_equal(@second_user.id, @post.updater_id)
+        @post = create(:forum_post)
+        @second_user = create(:user)
+
+        @post.update(body: "abc", updater: @second_user)
+        assert_equal(@second_user, @post.updater)
       end
     end
 
