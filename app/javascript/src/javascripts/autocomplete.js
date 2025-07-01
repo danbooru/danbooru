@@ -4,7 +4,7 @@ import Utility from './utility';
 
 let Autocomplete = {};
 
-Autocomplete.VERSION = 2; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
+Autocomplete.VERSION = 3; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
 Autocomplete.MAX_RESULTS = 20;
 
 Autocomplete.WHITESPACE = ' \\t';

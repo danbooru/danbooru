@@ -216,7 +216,7 @@ class Tag < ApplicationRecord
     # @return [String] The tag name with proper capitalization.
     def proper_name
       if category.in?([Tag.categories.character, Tag.categories.copyright])
-        pretty_name.titleize(keep_id_suffix: true)
+        pretty_name.startcase
       else
         pretty_name
       end
