@@ -3,6 +3,6 @@
 
   <%= edit_form_for(post_flag, format: :js, remote: true) do |f| %>
     <%= f.hidden_field :post_id %>
-    <%= f.input :reason, as: :dtext, inline: true %>
+    <%= f.input :reason, as: :dtext, inline: true, input_html: { autofocus: true } %>
   <% end %>
 </div>

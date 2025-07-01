@@ -4,6 +4,6 @@
   <%= edit_form_for(moderation_report, format: :js, remote: true) do |f| %>
     <%= f.hidden_field :model_type %>
     <%= f.hidden_field :model_id %>
-    <%= f.input :reason, as: :dtext, inline: true %>
+    <%= f.input :reason, as: :dtext, inline: true, input_html: { autofocus: true } %>
   <% end %>
 </div>
