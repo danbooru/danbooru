@@ -232,6 +232,8 @@ class BulkUpdateRequestProcessor
   # Process the bulk update request immediately.
   def process!
     CurrentUser.scoped(User.system) do
+      bulk_update_request.update!(status: "processing")
+
       commands.map do |command, *args|
         case command
         when :create_alias
