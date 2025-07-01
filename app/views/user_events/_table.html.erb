@@ -129,7 +129,7 @@
     <% end %>
 
     <% t.column "IP Address" do |user_event| %>
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-1 leading-none">
         <% ip_addr = user_event.ip_addr %>
 
         <% if IpAddressPolicy.new(CurrentUser.user, ip_addr).show? && (user_event.ip_geolocation&.is_proxy? || ip_addr.is_tor?) %>
