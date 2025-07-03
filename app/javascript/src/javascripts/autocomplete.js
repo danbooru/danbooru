@@ -10,7 +10,7 @@ Autocomplete.MAX_RESULTS = 20;
 Autocomplete.WHITESPACE = ' \\t\\r\\n';
 Autocomplete.WORD_SEPARATORS = Autocomplete.WHITESPACE + '_()\\[\\]{}<>`\'"-/;:,.?!';
 Autocomplete.PREV_WORD_REGEXP = new RegExp(`[^${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*$`);
-Autocomplete.NEXT_WORD_REGEXP = new RegExp(`^[${Autocomplete.WORD_SEPARATORS}]*[^${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*`);
+Autocomplete.NEXT_WORD_REGEXP = new RegExp(`^[^${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*`);
 
 Autocomplete.initialize_all = function() {
   $.widget("ui.autocomplete", $.ui.autocomplete, {
@@ -92,12 +92,13 @@ Autocomplete.initialize_tag_autocomplete = function() {
         let caret = target.selectionStart;
         var before_caret_text = target.value.substring(0, caret);
         var after_caret_text = target.value.substring(caret);
+        let orig_after_caret_text = after_caret_text;
         if (event.inputType == "deleteWordBackward") {
           before_caret_text = before_caret_text.replace(Autocomplete.PREV_WORD_REGEXP, "");
         } else if (event.inputType == "deleteWordForward") {
           after_caret_text = after_caret_text.replace(Autocomplete.NEXT_WORD_REGEXP, "");
         }
-        if (after_caret_text.match(/^\S/)) {
+        if (after_caret_text.match(/^\S/) && orig_after_caret_text.match(/^\S/)) {
           // There's a tag after the caret, so add a space between them so it doesn't interfere with autocomplete.
           after_caret_text = " " + after_caret_text;
         }
