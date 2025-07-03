@@ -181,8 +181,8 @@ module Danbooru
       end
     end
 
-    def cache(expires_in)
-      use(cache: { expires_in: expires_in })
+    def cache(expires_in, key: nil)
+      use(cache: { expires_in: expires_in, key: key })
     end
 
     def proxy(url: Danbooru.config.http_proxy)

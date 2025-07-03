@@ -3,10 +3,12 @@
 module Danbooru
   class Http
     class Cache < HTTP::Feature
-      attr_reader :expires_in
+      attr_reader :expires_in, :key
 
-      def initialize(expires_in:)
+      def initialize(expires_in:, key: nil)
+        super
         @expires_in = expires_in
+        @key = key
       end
 
       def self.register
@@ -30,7 +32,13 @@ module Danbooru
       end
 
       def cache_key(request)
-        "http:" + ::Cache.hash({ method: request.verb, url: request.uri.to_s, headers: request.headers.sort }.to_json)
+        if key.present? && key.is_a?(Proc)
+          "http:#{key.call(request)}"
+        elsif key.present?
+          "http:#{key}"
+        else
+          "http:#{::Cache.hash({ method: request.verb, url: request.uri.to_s, headers: request.headers.sort }.to_json)}"
+        end
       end
     end
   end
