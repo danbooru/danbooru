@@ -102,8 +102,7 @@
       <%= form.text_area(
         input_name,
         input_html.merge(class: [*input_html[:class], "w-full h-full m-0 p-1 resize-none thin-scrollbar"],
-        "x-model": "editor.dtext",
-        "x-init": "editor.dtext = $el.value",
+        "x-model.fill": "editor.dtext",
         "x-show": "editor.editMode",
         "x-on:keydown.capture": "editor.onKeyDown($event)",
         "x-on:scroll": "editor.autocomplete.close()",

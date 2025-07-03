@@ -2,6 +2,7 @@ import Rails from '@rails/ujs';
 import { delegate, hideAll } from 'tippy.js';
 import Notice from './notice';
 import capitalize from "lodash/capitalize";
+import Alpine from 'alpinejs';
 
 let Utility = {};
 
@@ -203,6 +204,16 @@ export function errorFromResponse(apiResponse, separator = "; ") {
   }).join(separator);
 }
 
+// Call a function after all Alpine.js components on the page have been initialized.
+// Like jQuery's `$(document).ready()`, but for Alpine.js.
+export function alpineReady(callback) {
+  if (Alpine._initialized) {
+    callback();
+  } else {
+    $(document).on("alpine:initialized", callback);
+  }
+}
+
 $.fn.replaceFieldText = function(new_value) {
   return this.each(function() {
     if (this.undoStack) {
@@ -232,5 +243,6 @@ $.fn.selectEnd = function() {
 
 Utility.copyToClipboard = copyToClipboard;
 Utility.printPage = printPage;
+Utility.alpineReady = alpineReady;
 
 export default Utility
