@@ -227,7 +227,7 @@ class Source::Extractor
     def parsed_get(path, cache: 1.minute, **params)
       headers = { "x-client-transaction-id": tid_generator.transaction_id(path) }
       cache_key = "x.com#{path}?#{params.to_query}"
-      response = http.cache(cache, key: cache_key).headers(headers).get("https://x.com#{path}", params: params)
+      response = http.cache(cache, key: cache_key, if: ->(response) { response.status != 429 }).headers(headers).get("https://x.com#{path}", params: params)
 
       # puts ({ status: response.status, **headers, time: tid_generator.time, xor_key: tid_generator.xor_key, key: tid_generator.twitter_site_verification_key, rate_limit: response.headers["x-rate-limit-remaining"] }).to_json
       update_credentials!(response)

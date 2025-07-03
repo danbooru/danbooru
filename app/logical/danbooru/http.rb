@@ -181,8 +181,13 @@ module Danbooru
       end
     end
 
-    def cache(expires_in, key: nil)
-      use(cache: { expires_in: expires_in, key: key })
+    # @param expires_in [Integer] The number of seconds to cache the response for.
+    # @param key [String, Proc] The cache key to use. If a Proc, it will be called with the request as an argument.
+    # @param if [Proc] A condition to check before caching the response. If it returns false, the response won't be
+    #   cached. By default, everything but 5xx responses is cached.
+    # @return [Danbooru::Http] A new HTTP client with caching enabled.
+    def cache(expires_in, key: nil, if: nil)
+      use(cache: { expires_in: expires_in, key: key, if: binding.local_variable_get(:if) })
     end
 
     def proxy(url: Danbooru.config.http_proxy)

@@ -3,12 +3,13 @@
 module Danbooru
   class Http
     class Cache < HTTP::Feature
-      attr_reader :expires_in, :key
+      attr_reader :expires_in, :key, :cache_if
 
-      def initialize(expires_in:, key: nil)
+      def initialize(expires_in:, key: nil, if: nil)
         super
         @expires_in = expires_in
         @key = key
+        @cache_if = binding.local_variable_get(:if)
       end
 
       def self.register
@@ -19,6 +20,8 @@ module Danbooru
         ::Cache.get(cache_key(request), expires_in) do
           response = yield request
 
+          return response if !cacheable?(response)
+
           # XXX hack to remove connection state from response body so we can serialize it for caching.
           response.flush
           response.body.instance_variable_set(:@connection, nil)
@@ -28,6 +31,14 @@ module Danbooru
           response.request.body.instance_exec { @source = nil }
 
           response
+        end
+      end
+
+      def cacheable?(response)
+        if cache_if.present?
+          cache_if.call(response)
+        else
+          !response.status.server_error?
         end
       end
 
