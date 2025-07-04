@@ -43,7 +43,7 @@
 <div class="post-tooltip-body thin-scrollbar text-xs flex <%= "has-preview gap-1" if params[:preview].truthy? %>">
   <div class="flex-none">
     <% if params[:preview].truthy? %>
-      <%= post_preview(@post, show_deleted: true, compact: true) %>
+      <%= post_preview(@post, show_deleted: true, compact: true, classes: "blacklist-initialized") %>
     <% end %>
   </div>
 
