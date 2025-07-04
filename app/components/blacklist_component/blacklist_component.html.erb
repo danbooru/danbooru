@@ -26,6 +26,12 @@
           </label>
         <% end %>
 
+        <% menu.with_item do %>
+          <label class="flex items-center link-color cursor-pointer select-none" x-bind:class="blacklist.blurImages && 'font-bold'" x-on:click.stop title="Blur images instead of hiding them">
+            <input type="checkbox" x-model="blacklist.blurImages" class="w-4 h-full mr-1"><span>Blur images</span>
+          </label>
+        <% end %>
+
         <% unless user.is_anonymous? %>
           <% menu.with_item do %>
             <%= link_to settings_path(anchor: "user_blacklisted_tags"), class: "flex items-center", target: "_blank" do %>
