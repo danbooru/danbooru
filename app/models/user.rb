@@ -672,11 +672,6 @@ class User < ApplicationRecord
       User.max_saved_searches(level)
     end
 
-    def is_appeal_limited?
-      return false if is_contributor?
-      upload_limit.free_upload_slots < UploadLimit::APPEAL_COST
-    end
-
     def is_flag_limited?
       return false if has_unlimited_flags?
       post_flags.active.count >= 5

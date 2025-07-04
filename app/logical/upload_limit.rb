@@ -42,6 +42,11 @@ class UploadLimit
     !user.is_contributor? && used_upload_slots >= upload_slots
   end
 
+  # @return [Boolean] true if the user can't appeal any more posts because they're out of upload slots.
+  def appeal_limited?
+    free_upload_slots < UploadLimit::APPEAL_COST
+  end
+
   # @return [Boolean] true if the user is at max level.
   def maxed?
     user.upload_points >= MAXIMUM_POINTS
