@@ -12,6 +12,6 @@
   }
 }
 
-.post-preview:not(.blacklisted), .image-container:not(.blacklisted) {
+.post-preview:not(.blacklist-initialized), .image-container:not(.blacklist-initialized) {
   visibility: hidden;
 }

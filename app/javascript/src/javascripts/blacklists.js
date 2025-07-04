@@ -116,7 +116,7 @@ class Post {
     this.blacklist = blacklist;
     this.rules = new Set();
 
-    this.post.classList.add("blacklisted");
+    this.post.classList.add("blacklist-initialized");
     this.post.post = this; // Attach the post object to the DOM element for access with `$("#post_123").get(0).post`
   }
 
@@ -154,7 +154,7 @@ class Post {
   // Hide the post when it's blacklisted.
   hide() {
     this.post.classList.remove("blacklisted-hidden", "blacklisted-blurred");
-    this.post.classList.add("blacklisted-active", this.blacklistClass);
+    this.post.classList.add("blacklist-initialized", "blacklisted-active", this.blacklistClass);
 
     let video = this.post.querySelector("video#image");
     if (video) {
@@ -166,6 +166,7 @@ class Post {
   // Unhide the post when it's not blacklisted.
   show() {
     this.post.classList.remove("blacklisted-active", "blacklisted-hidden", "blacklisted-blurred");
+    this.post.classList.add("blacklist-initialized");
 
     let video = this.post.querySelector("video#image");
     if (video) {
