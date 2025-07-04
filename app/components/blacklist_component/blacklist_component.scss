@@ -11,3 +11,7 @@
     filter: blur(var(--blacklist-blur-amount, 40px)) !important;
   }
 }
+
+.post-preview:not(.blacklisted), .image-container:not(.blacklisted) {
+  visibility: hidden;
+}
