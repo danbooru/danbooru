@@ -74,16 +74,18 @@ class PostPolicy < ApplicationPolicy
   end
 
   def rate_limit_for_create(**_options)
-    if record.invalid?
-      { action: "posts:create:invalid", rate: 1.0 / 1.second, burst: 1 }
-    elsif user.is_contributor?
+    # if record.invalid?
+    #   { action: "posts:create:invalid", rate: 1.0 / 1.second, burst: 1 }
+    # elsif user.is_contributor?
+    if user.is_contributor?
       { action: "posts:create", rate: 6.0 / 1.minute, burst: 40 } # 360 per hour, 400 in first hour
     elsif user.posts.active.exists?(created_at: ..1.hour.ago)
       { action: "posts:create", rate: 2.0 / 1.minute, burst: 30 } # 120 per hour, 150 in first hour
     elsif user.posts.exists?(created_at: ..1.hour.ago)
       { action: "posts:create", rate: 1.0 / 1.minute, burst: 15 } # 60 per hour, 75 in first hour
     else
-      { action: "posts:create", rate: 1.0 / 2.0.minutes, burst: 2 } # 30 per hour, 32 in first hour
+      # { action: "posts:create", rate: 1.0 / 2.0.minutes, burst: 2 } # 30 per hour, 32 in first hour
+      { action: "posts:create", rate: 1.0 / 2.0.minutes, burst: 15 } # 30 per hour, 45 in first hour
     end
   end
 

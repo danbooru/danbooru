@@ -743,6 +743,15 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("tagme", @post.tag_string)
       end
 
+      should "apply the upvote:self metatag" do
+        @user = create(:user)
+        @post = create_post!(user: @user, tag_string: "test upvote:self")
+
+        assert_redirected_to @post
+        assert_equal("test", @post.reload.tag_string)
+        assert_equal(true, @post.votes.positive.exists?(user: @user))
+      end
+
       should "set the source" do
         @post = create_post!(source: "https://www.example.com")
 
