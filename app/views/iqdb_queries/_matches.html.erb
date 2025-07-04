@@ -12,6 +12,8 @@
       <%= link_to "Show #{pluralize(@low_similarity_matches.length, "low similarity match")}", "#", class: "toggle-iqdb-posts-low-similarity" %>
       <%= link_to "Hide #{pluralize(@low_similarity_matches.length, "low similarity match")}", "#", class: "toggle-iqdb-posts-low-similarity", style: "display: none" %>
     <% end %>
+
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
   </p>
 
   <%= render(PostGalleryComponent.new(size: "180")) do |gallery| %>
