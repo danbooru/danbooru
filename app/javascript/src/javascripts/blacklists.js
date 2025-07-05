@@ -3,16 +3,18 @@ import Cookie from './cookie';
 
 // A blacklist represents a set of blacklist rules that match against a set of posts.
 class Blacklist {
-  // @param {HTMLElement} element - The DOM element that contains the blacklist controls.
-  constructor(element) {
-    // Attach the blacklist instance to the DOM element for access with `$("#blacklist-box").get(0).blacklist`
-    element.blacklist = this;
+  // @param {HTMLElement} root - The root DOM element that contains the blacklist controls.
+  constructor(root) {
+    this.root = root;
     this.rules = [];
     this.posts = [];
   }
 
   // @param {Array<String>} rules - The list of blacklist rules.
   initialize(rules) {
+    // Attach the blacklist instance to the root DOM element for access with `$("#blacklist-box").get(0).blacklist`
+    this.root.blacklist = this;
+
     this.rules = rules.map(rule => new Rule(this, rule));
     this.posts = $(".post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview").toArray().map(post => new Post(post, this));
     this.apply();
@@ -117,7 +119,7 @@ class Post {
     this.rules = new Set();
 
     this.post.classList.add("blacklist-initialized");
-    this.post.post = this; // Attach the post object to the DOM element for access with `$("#post_123").get(0).post`
+    this.post.post = Alpine.reactive(this); // Attach the post object to the DOM element for access with `$("#post_123").get(0).post`
   }
 
   // Re-apply all blacklist rules on the post when a rule or the post changes.
