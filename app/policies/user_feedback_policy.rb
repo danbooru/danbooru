@@ -22,7 +22,7 @@ class UserFeedbackPolicy < ApplicationPolicy
   end
 
   def rate_limit_for_write(**_options)
-    if user.is_admin?
+    if user.is_moderator?
       { action: "user_feedbacks:write", rate: 1.0 / 1.minute, burst: 60 } # 60 per hour, 120 in first hour
     else
       { action: "user_feedbacks:write", rate: 1.0 / 1.minute, burst: 5 } # 60 per hour, 65 in first hour
