@@ -76,5 +76,10 @@ class UploadTest < ActiveSupport::TestCase
         assert_tag_match([@upload1], "exif:File:FileType=JPEG")
       end
     end
+
+    context "during validation" do
+      should normalize_attribute(:source).from("https://example.com/foo bar.jpg").to("https://example.com/foo%20bar.jpg")
+      should normalize_attribute(:source).from("https://bond-live.com/en/wp-content/uploads/2024/12/Vライバー-アイキャッチ-23.png").to("https://bond-live.com/en/wp-content/uploads/2024/12/Vライバー-アイキャッチ-23.png")
+    end
   end
 end

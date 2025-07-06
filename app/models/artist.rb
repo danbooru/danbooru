@@ -8,10 +8,10 @@ class Artist < ApplicationRecord
 
   deletable
 
-  normalize :name, :normalize_name
-  normalize :group_name, :normalize_other_name
-  normalize :other_names, :normalize_other_names
-  array_attribute :other_names # XXX must come after `normalize :other_names`
+  normalizes :name, with: ->(name) { Artist.normalize_name(name) }
+  normalizes :group_name, with: ->(name) { Artist.normalize_other_name(name) }
+  normalizes :other_names, with: ->(names) { Artist.normalize_other_names(names) }
+  array_attribute :other_names # XXX must come after `normalizes :other_names`
 
   validate :validate_artist_name
   validates :name, tag_name: true, uniqueness: true, if: :name_changed?

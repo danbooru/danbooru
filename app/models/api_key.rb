@@ -7,8 +7,8 @@ class ApiKey < ApplicationRecord
   array_attribute :permissions
   array_attribute :permitted_ip_addresses
 
-  normalize :permissions, :normalize_permissions
-  normalize :name, :normalize_text
+  normalizes :permissions, with: ->(permissions) { permissions.compact_blank }
+  normalizes :name, with: ->(name) { name.unicode_normalize(:nfc).normalize_whitespace.strip }
 
   belongs_to :user
   validate :validate_permissions, if: :permissions_changed?
@@ -55,10 +55,6 @@ class ApiKey < ApplicationRecord
     end
 
     class_methods do
-      def normalize_permissions(permissions)
-        permissions.compact_blank
-      end
-
       def permissions_list
         routes = Rails.application.routes.routes.select do |route|
           route.defaults[:controller].present? && !route.internal

@@ -9,13 +9,14 @@ class Pool < ApplicationRecord
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
   dtext_attribute :description # defines :dtext_description
 
+  normalizes :name, with: ->(name) { name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "") }
+  normalizes :post_ids, with: ->(post_ids) { post_ids.uniq }
+
   validates :name, visible_string: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 170 }, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validates :description, length: { maximum: 20_000 }, if: :description_changed?
   validates :category, inclusion: { in: %w[series collection] }
   validate :updater_can_edit_deleted
-  before_validation :normalize_post_ids
-  before_validation :normalize_name
   after_save :create_version
 
   has_many :mod_actions, as: :subject, dependent: :destroy
@@ -87,12 +88,8 @@ class Pool < ApplicationRecord
 
   extend SearchMethods
 
-  def self.normalize_name(name)
-    name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "")
-  end
-
   def self.normalize_name_for_search(name)
-    normalize_name(name).downcase
+    normalize_value_for(:name, name).downcase
   end
 
   def self.named(name)
@@ -122,20 +119,12 @@ class Pool < ApplicationRecord
     category == "collection"
   end
 
-  def normalize_name
-    self.name = Pool.normalize_name(name)
-  end
-
   def pretty_name
     name.tr("_", " ")
   end
 
   def pretty_category
     category.titleize
-  end
-
-  def normalize_post_ids
-    self.post_ids = post_ids.uniq
   end
 
   def revert_to!(version)

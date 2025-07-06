@@ -8,8 +8,8 @@ class SavedSearch < ApplicationRecord
 
   belongs_to :user
 
-  normalize :query, :normalize_query
-  normalize :labels, :normalize_labels
+  normalizes :query, with: ->(query) { SavedSearch.normalize_query(query) }
+  normalizes :labels, with: ->(labels) { SavedSearch.normalize_labels(labels) }
 
   validates :query, visible_string: true
   validate :validate_count, on: :create

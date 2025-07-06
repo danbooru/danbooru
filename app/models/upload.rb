@@ -20,7 +20,8 @@ class Upload < ApplicationRecord
   has_many :media_assets, through: :upload_media_assets
   has_many :posts, through: :media_assets
 
-  normalize :source, :normalize_source
+  # Decode percent-encoded Unicode characters in the URL
+  normalizes :source, with: ->(url) { Danbooru::URL.parse(url)&.to_normalized_s.presence || url }
 
   validates :source, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { source.present? }
   validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { referer_url.present? }
@@ -112,15 +113,6 @@ class Upload < ApplicationRecord
       total_files = archive_files.map(&:first).sum(&:file_count) + (files.size - archive_files.size)
       if total_files > MAX_FILES_PER_UPLOAD
         errors.add(:base, "Can't upload more than #{MAX_FILES_PER_UPLOAD} files at a time (total: #{total_files})")
-      end
-    end
-  end
-
-  concerning :SourceMethods do
-    class_methods do
-      # Decode percent-encoded Unicode characters in the URL
-      def normalize_source(url)
-        Danbooru::URL.parse(url)&.to_normalized_s.presence || url
       end
     end
   end

@@ -15,7 +15,8 @@ class ArtistCommentary < ApplicationRecord
   dtext_attribute :original_description, disable_mentions: true
   dtext_attribute :translated_description, disable_mentions: true
 
-  before_validation :trim_whitespace
+  normalizes :original_title, :translated_title, :original_description, :translated_description, with: ->(string) { string.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "") }
+
   validates :post_id, uniqueness: true
   validates :original_title, length: { maximum: 600 }, if: :original_title_changed?
   validates :translated_title, length: { maximum: 300 }, if: :translated_title_changed?
@@ -81,13 +82,6 @@ class ArtistCommentary < ApplicationRecord
         q = q.apply_default_order(params)
       end
     end
-  end
-
-  def trim_whitespace
-    self.original_title = original_title.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
-    self.translated_title = translated_title.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
-    self.original_description = original_description.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
-    self.translated_description = translated_description.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
   end
 
   def original_present?

@@ -248,6 +248,8 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     context "when validating names" do
+      should normalize_attribute(:name).from(" _A\t_\nB_ ").to("A_B")
+
       should_not allow_value("foo,bar").for(:name)
       should_not allow_value("foo*bar").for(:name)
       should_not allow_value("123").for(:name)

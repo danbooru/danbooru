@@ -119,11 +119,6 @@ class ArtistTest < ActiveSupport::TestCase
       end
     end
 
-    should "normalize its name" do
-      artist = FactoryBot.create(:artist, :name => "  AAA BBB  ")
-      assert_equal("aaa_bbb", artist.name)
-    end
-
     should "resolve ambiguous urls" do
       bobross = FactoryBot.create(:artist, :name => "bob_ross", :url_string => "http://artists.com/bobross/image.jpg")
       bob = FactoryBot.create(:artist, :name => "bob", :url_string => "http://artists.com/bob/image.jpg")

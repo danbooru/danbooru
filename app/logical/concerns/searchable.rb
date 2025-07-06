@@ -59,37 +59,37 @@ module Searchable
 
   def where_like(attr, value)
     value = value.escape_wildcards if value.exclude?("*")
-    where_operator(attr, :matches, value.to_escaped_for_sql_like, nil, true)
+    where_operator(attr, :matches, sql_value(value.to_escaped_for_sql_like), nil, true)
   end
 
   def where_not_like(attr, value)
     value = value.escape_wildcards if value.exclude?("*")
-    where_operator(attr, :does_not_match, value.to_escaped_for_sql_like, nil, true)
+    where_operator(attr, :does_not_match, sql_value(value.to_escaped_for_sql_like), nil, true)
   end
 
   def where_ilike(attr, value)
     value = value.escape_wildcards if value.exclude?("*")
-    where_operator(attr, :matches, value.to_escaped_for_sql_like, nil, false)
+    where_operator(attr, :matches, sql_value(value.to_escaped_for_sql_like), nil, false)
   end
 
   def where_not_ilike(attr, value)
     value = value.escape_wildcards if value.exclude?("*")
-    where_operator(attr, :does_not_match, value.to_escaped_for_sql_like, nil, false)
+    where_operator(attr, :does_not_match, sql_value(value.to_escaped_for_sql_like), nil, false)
   end
 
   def where_iequals(attr, value)
     value = value.escape_wildcards
-    where_operator(attr, :matches, value.to_escaped_for_sql_like, nil, false)
+    where_operator(attr, :matches, sql_value(value.to_escaped_for_sql_like), nil, false)
   end
 
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-REGEXP
   # "(?e)" means force use of ERE syntax; see sections 9.7.3.1 and 9.7.3.4.
   def where_regex(attr, value, flags: "e")
-    where_operator(attr, :matches_regexp, "(?#{flags})" + value)
+    where_operator(attr, :matches_regexp, sql_value("(?#{flags})" + value))
   end
 
   def where_not_regex(attr, value, flags: "e")
-    where_operator(attr, :does_not_match_regexp, "(?#{flags})" + value)
+    where_operator(attr, :does_not_match_regexp, sql_value("(?#{flags})" + value))
   end
 
   def where_inet_matches(attr, value)

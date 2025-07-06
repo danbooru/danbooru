@@ -27,18 +27,14 @@ class TagRelationship < ApplicationRecord
     scope category, -> { joins(:consequent_tag).where(consequent_tag: { category: TagCategory.mapping[category] }) }
   end
 
-  before_validation :normalize_names
+  normalizes :antecedent_name, :consequent_name, with: ->(name) { Tag.normalize_name(name) }
+
   validates :status, inclusion: { in: STATUSES }
   validates :antecedent_name, presence: true, tag_name: true, if: :antecedent_name_changed?
   validates :consequent_name, presence: true, tag_name: true, if: :consequent_name_changed?
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }
   validates :forum_topic, presence: { message: "must exist" }, if: -> { forum_topic_id.present? }
   validate :antecedent_and_consequent_are_different
-
-  def normalize_names
-    self.antecedent_name = antecedent_name.downcase.tr(" ", "_")
-    self.consequent_name = consequent_name.downcase.tr(" ", "_")
-  end
 
   def is_rejected?
     status.in?(%w[retired deleted])
@@ -74,11 +70,11 @@ class TagRelationship < ApplicationRecord
     end
 
     def consequent_name_matches(name)
-      where_like(:consequent_name, Tag.normalize_name(name))
+      where_like(:consequent_name, normalize_value_for(:consequent_name, name))
     end
 
     def antecedent_name_matches(name)
-      where_like(:antecedent_name, Tag.normalize_name(name))
+      where_like(:antecedent_name, normalize_value_for(:antecedent_name, name))
     end
 
     def status_matches(status)

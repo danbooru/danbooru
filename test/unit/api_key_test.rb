@@ -11,6 +11,8 @@ class ApiKeyTest < ActiveSupport::TestCase
       subject { build(:api_key) }
 
       context "of permissions" do
+        should normalize_attribute(:permissions).from(["posts:index", " "]).to(["posts:index"])
+
         should allow_value([]).for(:permissions)
         should allow_value(["posts:index"]).for(:permissions)
         should allow_value(["posts:index", "posts:show"]).for(:permissions)
@@ -30,6 +32,10 @@ class ApiKeyTest < ActiveSupport::TestCase
         #should allow_value(["1.2.3.4/24 4.5.6.7/24"]).for(:permitted_ip_addresses)
         #should_not allow_value(["blah"]).for(:permitted_ip_addresses)
         #should_not allow_value(["1.2.3.4/64"]).for(:permitted_ip_addresses)
+      end
+
+      context "of name" do
+        should normalize_attribute(:name).from(" foo\tbar ").to("foo bar")
       end
     end
 

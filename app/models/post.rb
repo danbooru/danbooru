@@ -45,7 +45,7 @@ class Post < ApplicationRecord
   deletable
   has_bit_flags %w[has_embedded_notes _unused_has_cropped is_taken_down]
 
-  normalize :source, :normalize_source
+  normalizes :source, with: ->(source) { Post.normalize_source(source) }, apply_to_nil: true
   before_validation :merge_old_changes
   before_validation :apply_pre_metatags
   before_validation :validate_new_tags

@@ -102,6 +102,23 @@ class SearchableTest < ActiveSupport::TestCase
           assert_search_equals([], title_like: "foo\\\\bar")
         end
       end
+
+      context "with a normalization" do
+        subject { WikiPage }
+
+        should "not normalize the attribute when searching using operators" do
+          wp = create(:wiki_page, title: "foo_bar")
+
+          assert_search_equals([], title_like: "FOO_BAR")
+          assert_search_equals([], title_ilike: "foo bar")
+
+          assert_search_equals([wp], title_not_like: "* *")
+          assert_search_equals([wp], title_not_ilike: "* *")
+
+          assert_search_equals([], title_regex: "FOO_BAR")
+          assert_search_equals([wp], title_not_regex: ".* .*")
+        end
+      end
     end
 
     context "for a boolean attribute" do
@@ -201,6 +218,15 @@ class SearchableTest < ActiveSupport::TestCase
       should "support multiple operators on the same attribute" do
         assert_search_equals(@wp1, other_names_include_any: "a1", other_name_count: 2)
         assert_search_equals(@wp2, other_names_include_any: "c3", other_name_count: 2)
+      end
+
+      context "with a normalization" do
+        should "not normalize the attribute when searching using operators" do
+          create(:wiki_page, other_names: ["foo_bar"])
+
+          assert_search_equals([], other_names_include_any: "foo bar")
+          assert_search_equals([], other_names_include_all: "foo bar")
+        end
       end
     end
 

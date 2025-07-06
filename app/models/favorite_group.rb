@@ -3,7 +3,7 @@
 class FavoriteGroup < ApplicationRecord
   belongs_to :creator, class_name: "User"
 
-  before_validation :normalize_name
+  normalizes :name, with: ->(name) { name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "") }
 
   validates :name, visible_string: true, uniqueness: { case_sensitive: false, scope: :creator_id }, length: { maximum: 170 }, if: :name_changed?
   validate :validate_name, if: :name_changed?
@@ -23,7 +23,7 @@ class FavoriteGroup < ApplicationRecord
     end
 
     def name_contains(name)
-      name = normalize_name(name)
+      name = normalize_value_for(:name, name)
       name = "*#{name.escape_wildcards}*" unless name.include?("*")
       where_ilike(:name, name)
     end
@@ -122,19 +122,11 @@ class FavoriteGroup < ApplicationRecord
     end
   end
 
-  def self.normalize_name(name)
-    name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "")
-  end
-
-  def normalize_name
-    self.name = FavoriteGroup.normalize_name(name)
-  end
-
   def self.name_or_id_matches(name, user)
     if name =~ /\A\d+\z/
       where(id: name)
     else
-      where(creator: user).where_iequals(:name, normalize_name(name))
+      where(creator: user).where_iequals(:name, normalize_value_for(:name, name))
     end
   end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ArtistURL < ApplicationRecord
-  normalize :url, :normalize_url
+  normalizes :url, with: ->(url) { ArtistURL.normalize_url(url) }
 
   validates :url, presence: true, uniqueness: { scope: :artist_id }
   validate :validate_url_format

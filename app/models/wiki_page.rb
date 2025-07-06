@@ -7,9 +7,9 @@ class WikiPage < ApplicationRecord
 
   after_save :create_version
 
-  normalize :title, :normalize_title
-  normalize :body, :normalize_text
-  normalize :other_names, :normalize_other_names
+  normalizes :title, with: ->(title) { WikiPage.normalize_title(title) }
+  normalizes :body, with: ->(body) { body.unicode_normalize(:nfc).normalize_whitespace.strip }
+  normalizes :other_names, with: ->(other_names) { WikiPage.normalize_other_names(other_names) }
 
   array_attribute :other_names # XXX must come after `normalize :other_names`
   dtext_attribute :body, media_embeds: true # defines :dtext_body

@@ -333,5 +333,11 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(true, user.valid?)
       end
     end
+
+    context "normalizing blacklisted tags" do
+      subject { build(:user) }
+
+      should normalize_attribute(:blacklisted_tags).from(" foo\n bar \n baz ").to("foo\nbar\nbaz")
+    end
   end
 end
