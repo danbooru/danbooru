@@ -36,6 +36,9 @@ class ApiKeyTest < ActiveSupport::TestCase
 
       context "of name" do
         should normalize_attribute(:name).from(" foo\tbar ").to("foo bar")
+
+        should allow_value("").for(:name)
+        should_not allow_value("x" * 101).for(:name)
       end
     end
 

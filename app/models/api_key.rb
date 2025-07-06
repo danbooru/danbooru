@@ -13,6 +13,7 @@ class ApiKey < ApplicationRecord
   belongs_to :user
   validate :validate_permissions, if: :permissions_changed?
   validates :key, uniqueness: true, if: :key_changed?
+  validates :name, length: { maximum: 100 }, if: :name_changed?
   has_secure_token :key
 
   def self.visible(user)
