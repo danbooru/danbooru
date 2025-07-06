@@ -4,8 +4,8 @@
   x-data="{ seen: $persist(0).as('news-ticker').using(Danbooru.Cookie), id: <%= news_update.id %> }"
   x-show="seen != id">
 
-  <div class="flex-grow-1">
-    <%= news_update.message.html_safe %>
+  <div class="flex-grow-1 prose">
+    <%= news_update.dtext_message.format_text %>
   </div>
 
   <a href="javascript:void(0)" class="px-2 py-1" x-on:click="seen = id">

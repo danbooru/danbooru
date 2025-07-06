@@ -6,7 +6,9 @@
       <% t.column "Creator" do |news_update| %>
         <%= link_to_user news_update.creator %>
       <% end %>
-      <% t.column :message, td: { class: "col-expand" }  %>
+      <% t.column :message, td: { class: "col-expand" } do |news_update| %>
+        <div class="prose"><%= news_update.dtext_message.format_text %></div>
+      <% end %>
       <% t.column :duration do |news_update| %>
         <%= news_update.duration.in_days.round.days.inspect %>
       <% end %>
