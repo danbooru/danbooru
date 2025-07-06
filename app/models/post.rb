@@ -50,7 +50,6 @@ class Post < ApplicationRecord
   before_validation :apply_pre_metatags
   before_validation :validate_new_tags
   before_validation :normalize_tags
-  before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
   validate :uploader_is_not_limited, on: :create
   validate :post_is_not_allowed, on: :create
@@ -63,6 +62,7 @@ class Post < ApplicationRecord
   validates :rating, presence: { message: "not selected" }
   validates :rating, inclusion: { in: RATINGS.keys, message: "must be #{RATINGS.keys.map(&:upcase).to_sentence(last_word_connector: ", or ")}" }, if: -> { rating.present? }
   validates :source, length: { maximum: 1200 }
+  validates :parent, presence: { message: "post does not exist" }, if: -> { parent_id.present? && parent_id_changed? }
   before_save :parse_pixiv_id
   before_save :added_tags_are_valid
   before_save :removed_tags_are_valid
@@ -616,11 +616,9 @@ class Post < ApplicationRecord
             self.parent_id = nil
           end
 
-        in "parent", /^\d+$/ => new_parent_id
-          if new_parent_id.to_i != id && Post.exists?(new_parent_id)
-            self.parent_id = new_parent_id.to_i
-            remove_parent_loops
-          end
+        in "parent", new_parent_id
+          self.parent_id = new_parent_id
+          remove_parent_loops
 
         in "rating", /\A([#{RATINGS.keys.join}])/i
           self.rating = $1.downcase
@@ -763,12 +761,6 @@ class Post < ApplicationRecord
 
     def update_has_children_flag
       update(has_children: children.exists?, has_active_children: children.undeleted.exists?)
-    end
-
-    def blank_out_nonexistent_parents
-      if parent_id.present? && parent.nil?
-        self.parent_id = nil
-      end
     end
 
     def remove_parent_loops

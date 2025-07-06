@@ -725,6 +725,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("Rating not selected", flash[:notice])
       end
 
+      should "re-render the upload page if the parent ID is invalid" do
+        @post = create_post!(tag_string: "test parent:999999999")
+        assert_response :success
+      end
+
       should "merge the tags and redirect to the original post if the upload is a duplicate of an existing post" do
         media_asset = create(:media_asset)
         post1 = create_post!(rating: "s", tag_string: "post1", media_asset: media_asset)

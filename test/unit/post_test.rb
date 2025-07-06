@@ -198,6 +198,13 @@ class PostTest < ActiveSupport::TestCase
 
   context "Parenting:" do
     context "Assigning a parent to a post" do
+      should "not allow parent IDs that don't exist" do
+        post = create(:post)
+        post.update(parent_id: 999_999_999)
+
+        assert_equal(["post does not exist"], post.errors[:parent])
+      end
+
       should "not allow a post to be its own parent" do
         post = create(:post)
         post.update(parent_id: post.id)
@@ -752,7 +759,17 @@ class PostTest < ActiveSupport::TestCase
 
           should "not allow self-parenting" do
             @post.update(:tag_string => "parent:#{@post.id}")
-            assert_nil(@post.parent_id)
+            assert_equal(["Post cannot have itself as a parent"], @post.errors[:base])
+          end
+
+          should "not allow parent IDs that don't exist" do
+            @post.update(parent: @parent)
+            assert_equal(@parent.id, @post.parent_id)
+
+            @post.update(tag_string: "test parent:999999999")
+            assert_equal(["post does not exist"], @post.errors[:parent])
+            assert_equal("tag1 tag2", @post.reload.tag_string)
+            assert_equal(@parent.id, @post.parent_id)
           end
 
           should "clear the parent with parent:none" do
