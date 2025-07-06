@@ -203,9 +203,9 @@ class Artist < ApplicationRecord
         errors.add(:name, "cannot be a number. Use a descriptive name instead")
       end
 
-      # Reject user_ prefix (auto-generated username pattern)
+      # Warn about `user_` prefix (auto-generated username pattern)
       if name.match?(/\Auser_/i)
-        errors.add(:name, "cannot start with 'user_'. Use the artist's actual name")
+        warnings.add(:name, "starts with 'user_' which seems like an auto-generated username. Consider using more meaningful name")
       end
 
       # Check for existing similar name patterns (name_*)
