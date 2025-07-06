@@ -108,6 +108,20 @@ class UserTest < ActiveSupport::TestCase
         assert(@user.dmails.exists?(from: bot, to: @user, title: "Your account has been updated"))
         refute(@user.dmails.exists?(from: bot, to: @user, title: "Your user record has been updated"))
       end
+
+      should "max out the user's upload points when promoting to contributor or higher" do
+        assert_equal(UploadLimit::INITIAL_POINTS, @user.upload_points)
+
+        @user.promote_to!(User::Levels::CONTRIBUTOR, @admin)
+        assert_equal(UploadLimit::MAXIMUM_POINTS, @user.reload.upload_points)
+      end
+
+      should "recalculate the user's upload points when demoting them to below a contributor" do
+        assert_equal(UploadLimit::MAXIMUM_POINTS, @mod.upload_points)
+
+        @mod.promote_to!(User::Levels::MEMBER, @admin)
+        assert_equal(UploadLimit::INITIAL_POINTS, @mod.reload.upload_points)
+      end
     end
 
     should "authenticate password" do

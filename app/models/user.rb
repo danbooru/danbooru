@@ -112,6 +112,7 @@ class User < ApplicationRecord
   validates :comment_threshold, inclusion: { in: (-100..5) }
   validate  :validate_enable_private_favorites, on: :update
   validate  :validate_custom_css, if: :custom_style_changed?
+  before_save :recalculate_upload_points, if: :level_changed?
   before_create :promote_to_owner_if_first_user
 
   has_many :artist_versions, foreign_key: :updater_id
@@ -542,6 +543,20 @@ class User < ApplicationRecord
 
     def is_owner?
       level >= Levels::OWNER
+    end
+  end
+
+  concerning :UploadMethods do
+    def recalculate_upload_points
+      if new_record? && level >= Levels::CONTRIBUTOR
+        self.upload_points = Danbooru.config.maximum_upload_points.to_i
+      elsif new_record? && level < Levels::CONTRIBUTOR
+        self.upload_points = Danbooru.config.initial_upload_points.to_i
+      elsif level >= Levels::CONTRIBUTOR && level_was < Levels::CONTRIBUTOR
+        self.upload_points = upload_limit.recalculated_upload_points
+      elsif level < Levels::CONTRIBUTOR && level_was >= Levels::CONTRIBUTOR
+        self.upload_points = upload_limit.recalculated_upload_points
+      end
     end
   end
 

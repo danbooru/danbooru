@@ -112,7 +112,7 @@ class UploadLimit
       # or active post, then we have to replay the user's entire upload
       # history to recalculate their upload points.
       else
-        user.update!(upload_points: UploadLimit.points_for_user(user))
+        user.update!(upload_points: recalculated_upload_points)
       end
     end
   end
@@ -120,12 +120,14 @@ class UploadLimit
   # Recalculate the user's upload points based on replaying their entire upload history.
   # @param user [User] the user
   # @return [Integer] the user's upload points
-  def self.points_for_user(user)
+  memoize def recalculated_upload_points
+    return MAXIMUM_POINTS if user.is_contributor?
+
     points = INITIAL_POINTS
 
     uploads = user.posts.where(is_pending: false).order(id: :asc).pluck(:is_deleted)
     uploads.each do |is_deleted|
-      points += upload_value(points, is_deleted)
+      points += UploadLimit.upload_value(points, is_deleted)
       points = points.clamp(0, MAXIMUM_POINTS)
 
       # warn "slots: %2d, points: %3d, value: %2d" % [UploadLimit.points_to_level(points) + Danbooru.config.extra_upload_slots.to_i, points, UploadLimit.upload_value(level, is_deleted)]
