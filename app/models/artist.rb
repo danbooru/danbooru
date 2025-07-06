@@ -191,6 +191,36 @@ class Artist < ApplicationRecord
       if tag_alias.present?
         errors.add(:name, "'#{name}' is aliased to '#{tag_alias.consequent_name}'")
       end
+
+      validate_name_format
+    end
+
+    def validate_name_format
+      return unless name.present?
+
+      # Reject numeric-only names
+      if name.match?(/\A\d+\z/)
+        errors.add(:name, "cannot be a number. Use a descriptive name instead")
+      end
+
+      # Reject user_ prefix (auto-generated username pattern)
+      if name.match?(/\Auser_/i)
+        errors.add(:name, "cannot start with 'user_'. Use the artist's actual name")
+      end
+
+      # Check for existing similar name patterns (name_*)
+      escaped_name = ActiveRecord::Base.sanitize_sql_like(name)
+      similar_artists = Artist.where("name ILIKE ?", "#{escaped_name}\\_%")
+
+      # Exclude current artist during updates
+      similar_artists = similar_artists.where.not(id: self.id) if persisted?
+
+      similar_artists = similar_artists.limit(3)
+
+      if similar_artists.any?
+        similar_names = similar_artists.pluck(:name).join(", ")
+        errors.add(:name, "may conflict with existing artists: #{similar_names}. Use a more specific name")
+      end
     end
 
     def update_tag_category
