@@ -54,10 +54,13 @@ class ForumTopicsController < ApplicationController
   end
 
   def create
-    @forum_topic = authorize ForumTopic.new(creator: CurrentUser.user, updater: CurrentUser.user, **permitted_attributes(ForumTopic))
-    @forum_topic.original_post.creator = CurrentUser.user
-    @forum_topic.original_post.updater = CurrentUser.user
-    @forum_topic.original_post.creator_ip_addr = request.remote_ip
+    @forum_topic = authorize ForumTopic.new(permitted_attributes(ForumTopic).deep_merge(
+      creator: CurrentUser.user,
+      original_post_attributes: {
+        creator: CurrentUser.user,
+        creator_ip_addr: request.remote_ip,
+      },
+    ))
     @forum_topic.save
 
     respond_with(@forum_topic)

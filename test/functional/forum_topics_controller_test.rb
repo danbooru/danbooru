@@ -272,6 +272,20 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@user, forum_topic.original_post.creator)
         assert_equal(@user, forum_topic.original_post.updater)
       end
+
+      should "rate limit the creation of new forum topics" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+
+        assert_difference(["ForumPost.count", "ForumTopic.count"], 1) do
+          post_auth forum_topics_path, @user, params: { forum_topic: { title: "test", original_post_attributes: { body: "test" }}}
+          assert_redirected_to forum_topic_path(ForumTopic.last)
+        end
+
+        assert_no_difference(["ForumPost.count", "ForumTopic.count"]) do
+          post_auth forum_topics_path, @user, params: { forum_topic: { title: "test", original_post_attributes: { body: "test" }}}
+          assert_response 429
+        end
+      end
     end
 
     context "update action" do

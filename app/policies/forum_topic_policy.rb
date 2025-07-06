@@ -35,7 +35,7 @@ class ForumTopicPolicy < ApplicationPolicy
 
   def rate_limit_for_create(**_options)
     if record.invalid?
-      { action: "forum_topics:create:invalid", rate: 1.0 / 1.second, burst: 1 }
+      { action: "forum_topics:create:invalid", rate: 1.0 / 1.second, burst: 5 }
     elsif user.forum_topics.exists?(created_at: ..24.hours.ago)
       { rate: 1.0 / 1.minute, burst: 2 }
     else
