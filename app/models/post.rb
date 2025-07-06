@@ -50,7 +50,6 @@ class Post < ApplicationRecord
   before_validation :apply_pre_metatags
   before_validation :validate_new_tags
   before_validation :normalize_tags
-  before_validation :remove_parent_loops
   validate :uploader_is_not_limited, on: :create
   validate :post_is_not_allowed, on: :create
   validate :validate_no_parent_cycles
@@ -80,7 +79,7 @@ class Post < ApplicationRecord
 
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
-  belongs_to :parent, class_name: "Post", optional: true
+  belongs_to :parent, class_name: "Post", optional: true, autosave: true
   has_one :media_asset, -> { active }, foreign_key: :md5, primary_key: :md5, inverse_of: :post
   has_one :media_metadata, through: :media_asset
   has_one :artist_commentary, :dependent => :destroy
@@ -618,7 +617,6 @@ class Post < ApplicationRecord
 
         in "parent", new_parent_id
           self.parent_id = new_parent_id
-          remove_parent_loops
 
         in "rating", /\A([#{RATINGS.keys.join}])/i
           self.rating = $1.downcase
@@ -729,6 +727,19 @@ class Post < ApplicationRecord
   end
 
   concerning :ParentMethods do
+    def parent=(new_parent)
+      self.parent_id = new_parent&.id
+    end
+
+    def parent_id=(new_parent_id)
+      super
+
+      # Allow reversing a parent-child relationship by making the child into the parent without creating a loop.
+      if parent != self && parent&.parent == self
+        parent.parent_id = nil
+      end
+    end
+
     # @return [Array<Post>] The list of this post's ancestors (its parent, grandparent, great-grandparent, etc).
     def ancestors
       ancestors = []
@@ -761,13 +772,6 @@ class Post < ApplicationRecord
 
     def update_has_children_flag
       update(has_children: children.exists?, has_active_children: children.undeleted.exists?)
-    end
-
-    def remove_parent_loops
-      if parent.present? && parent.parent_id.present? && parent.parent_id == id
-        parent.parent_id = nil
-        parent.save
-      end
     end
 
     def update_parent_on_destroy

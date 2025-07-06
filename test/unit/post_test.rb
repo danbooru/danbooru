@@ -265,6 +265,17 @@ class PostTest < ActiveSupport::TestCase
         assert(!p1.has_children?, "Old parent should not have a child")
         assert(p2.has_children?, "New parent should have a child")
       end
+
+      should "swap the parent and child when setting the parent to the child" do
+        parent = create(:post)
+        child = create(:post, parent: parent)
+        parent.update!(parent: child)
+
+        assert_equal(child.reload.id, parent.reload.parent_id)
+        assert_nil(child.parent_id)
+        assert_equal(false, parent.has_children?)
+        assert_equal(true, child.has_children?)
+      end
     end
 
     context "Expunging a post with" do
@@ -794,6 +805,27 @@ class PostTest < ActiveSupport::TestCase
 
             @post.update(:tag_string => "-parent:#{@parent.id}")
             assert_nil(@post.parent_id)
+          end
+
+          should "swap the parent and child when setting the parent to the child" do
+            parent = create(:post)
+            child = create(:post, parent: parent)
+            parent.update!(tag_string: "parent:#{child.id}")
+
+            assert_equal(child.reload.id, parent.reload.parent_id)
+            assert_nil(child.parent_id)
+            assert_equal(false, parent.has_children?)
+            assert_equal(true, child.has_children?)
+          end
+
+          should "not update the child if updating the parent fails" do
+            parent = create(:post)
+            child = create(:post, parent: parent)
+            parent.update(rating: "does_not_exist", tag_string: "parent:#{child.id}")
+
+            assert_equal(true, parent.errors.present?)
+            assert_nil(parent.reload.parent_id)
+            assert_equal(parent.id, child.parent_id)
           end
         end
 
