@@ -198,9 +198,9 @@ class Artist < ApplicationRecord
     def validate_name_format
       return unless name.present?
 
-      # Reject numeric-only names
+      # Warn about numeric-only names
       if name.match?(/\A\d+\z/)
-        errors.add(:name, "cannot be a number. Use a descriptive name instead")
+        warnings.add(:name, "is a number. Consider using a descriptive name instead")
       end
 
       # Warn about `user_` prefix (auto-generated username pattern)
