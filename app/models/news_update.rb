@@ -8,6 +8,7 @@ class NewsUpdate < ApplicationRecord
   scope :active, -> { undeleted.where("created_at + duration >= ?", Time.zone.now) }
 
   validate :validate_duration, if: :duration_changed?
+  validate :validate_active, on: :create
   validates :message, presence: true, if: :message_changed?
 
   def self.visible(user)
@@ -25,6 +26,10 @@ class NewsUpdate < ApplicationRecord
 
   def duration_in_days=(days)
     self.duration = days.to_i.days
+  end
+
+  def validate_active
+    errors.add(:base, "Can't have more than one active news update at a time") if NewsUpdate.active.exists?
   end
 
   def validate_duration

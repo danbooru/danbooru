@@ -58,19 +58,7 @@
 </head>
 
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item, @exception) do %>
-  <% @visible_news_updates = NewsUpdate.active.order(created_at: :desc).to_a %>
-
-  <% if @visible_news_updates.present? %>
-    <div id="news-updates" data-id="<%= @visible_news_updates.first.try(:id) %>" class="flex gap-1 p-1 items-center text-center text-xs <%= ("hidden" if cookies["news-ticker"].to_i == @visible_news_updates.first.try(:id)) %>">
-      <div class="flex-grow-1">
-        <%  @visible_news_updates.each do |news_update| %>
-          <div><%= news_update.message.html_safe %></div>
-        <% end %>
-      </div>
-
-      <a href="#" id="close-news-ticker-link" class="px-2 py-1"><%= close_icon %></a>
-    </div>
-  <% end %>
+  <%= render NewsUpdateComponent.new(cookies: cookies) %>
 
   <%= render NavbarComponent.new(current_user: CurrentUser.user) %>
 

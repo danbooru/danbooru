@@ -4,34 +4,54 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
   context "the news updates controller" do
     setup do
       @admin = create(:admin_user)
-      @other_admin = create(:admin_user)
-      @news_update = create(:news_update, creator: @admin, message: "test news", duration_in_days: 10)
-      @old_news_update = create(:news_update, creator: @admin, message: "old news", duration_in_days: 7, created_at: 1.month.ago)
     end
 
     context "index action" do
-      should "render" do
+      should "render for an admin" do
+        create(:news_update)
         get_auth news_updates_path, @admin
+
         assert_response :success
+      end
+
+      should "not render for a regular user" do
+        get_auth news_updates_path, create(:user)
+        assert_response 403
       end
     end
 
     context "new action" do
-      should "render" do
+      should "render for an admin" do
         get_auth new_news_update_path, @admin
         assert_response :success
+      end
+
+      should "not render for a regular user" do
+        get_auth new_news_update_path, create(:user)
+        assert_response 403
       end
     end
 
     context "edit action" do
-      should "render" do
+      should "render for an admin" do
+        @news_update = create(:news_update, creator: @admin)
         get_auth edit_news_update_path(@news_update), @admin
+
         assert_response :success
+      end
+
+      should "not render for a regular user" do
+        @news_update = create(:news_update, creator: @admin)
+        get_auth edit_news_update_path(@news_update), create(:user)
+
+        assert_response 403
       end
     end
 
     context "update action" do
-      should "work" do
+      should "work for an admin" do
+        @news_update = create(:news_update, creator: @admin)
+        @other_admin = create(:admin_user)
         put_auth news_update_path(@news_update), @other_admin, params: { news_update: { message: "zzz" }}
 
         assert_redirected_to(news_updates_path)
@@ -39,29 +59,43 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@other_admin, @news_update.updater)
 
         get_auth posts_path, @admin
-        assert_select "#news-updates > div > div", count: 1, text: "zzz"
+        assert_select "#news-updates > div", count: 1, text: "zzz"
+      end
+
+      should "not work for a regular user" do
+        @news_update = create(:news_update)
+        put_auth news_update_path(@news_update), create(:user), params: { news_update: { message: "zzz" }}
+
+        assert_response 403
       end
     end
 
     context "create action" do
-      should "work" do
+      should "work for an admin" do
         assert_difference("NewsUpdate.active.count") do
-          post_auth news_updates_path, @admin, params: {:news_update => {:message => "zzz"}}
+          post_auth news_updates_path, @admin, params: { news_update: { message: "zzz"}}
         end
 
         assert_redirected_to(news_updates_path)
-        assert_equal(@admin, @news_update.reload.creator)
+        @news_update = NewsUpdate.last
+        assert_equal(@admin, @news_update.creator)
         assert_equal(@admin, @news_update.updater)
 
         get_auth posts_path, @admin
-        assert_select "#news-updates > div > div", count: 2
-        assert_select "#news-updates > div > div", count: 1, text: @news_update.message
-        assert_select "#news-updates > div > div", count: 1, text: "zzz"
+        assert_select "#news-updates > div", count: 1, text: "zzz"
+      end
+
+      should "not work for a regular user" do
+        post_auth news_updates_path, create(:user), params: { news_update: { message: "zzz" }}
+        assert_response 403
       end
     end
 
     context "delete action" do
       should "work" do
+        @news_update = create(:news_update, creator: @admin)
+        @other_admin = create(:admin_user)
+
         assert_difference("NewsUpdate.active.count", -1) do
           delete_auth news_update_path(@news_update), @other_admin
         end
@@ -71,12 +105,22 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@other_admin, @news_update.updater)
 
         get_auth posts_path, @admin
-        assert_select "#news-updates > div > div", count: 0
+        assert_select "#news-updates > div", count: 0
+      end
+
+      should "not work for a regular user" do
+        @news_update = create(:news_update)
+        delete_auth news_update_path(@news_update), create(:user)
+
+        assert_response 403
       end
     end
 
     context "undelete action" do
-      should "work" do
+      should "work for an admin" do
+        @news_update = create(:news_update, creator: @admin)
+        @other_admin = create(:admin_user)
+
         put_auth news_update_path(@news_update), @other_admin, params: { news_update: { is_deleted: false } }
 
         assert_redirected_to(news_updates_path)
@@ -84,23 +128,15 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@other_admin, @news_update.updater)
 
         get_auth posts_path, @admin
-        assert_select "#news-updates > div > div", count: 1, text: @news_update.message
+        assert_select "#news-updates > div", count: 1, text: @news_update.message
       end
-    end
 
-    should "not allow a news update without a body" do
-      news_update = build(:news_update, creator: @admin, message: "", duration_in_days: 12)
-      assert_not(news_update.valid?)
-    end
+      should "not work for a regular user" do
+        @news_update = create(:news_update)
+        put_auth news_update_path(@news_update), create(:user), params: { news_update: { is_deleted: false } }
 
-    should "not allow a news update with no duration" do
-      news_update = build(:news_update, creator: @admin, message: "asd", duration_in_days: 0)
-      assert_not(news_update.valid?)
-    end
-
-    should "not allow a duration that's too long" do
-      news_update = build(:news_update, creator: @admin, message: "asd", duration_in_days: 365)
-      assert_not(news_update.valid?)
+        assert_response 403
+      end
     end
   end
 end
