@@ -17,6 +17,7 @@ class Artist < ApplicationRecord
   validates :name, tag_name: true, uniqueness: true, if: :name_changed?
   after_validation :add_url_warnings
 
+  before_save :remove_redundant_other_names
   before_save :update_tag_category
   after_save :create_version
   after_save :clear_url_string_changed
@@ -95,14 +96,8 @@ class Artist < ApplicationRecord
       name.tr("_", " ")
     end
 
-    def name=(name)
-      super
-      self[:other_names] -= [name]
-    end
-
-    def other_names=(names)
-      super
-      self[:other_names] -= [name]
+    def remove_redundant_other_names
+      self.other_names -= [name] if name_changed? || other_names_changed?
     end
   end
 

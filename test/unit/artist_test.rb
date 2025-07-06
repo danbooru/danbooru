@@ -592,12 +592,10 @@ class ArtistTest < ActiveSupport::TestCase
       should "remove the new name from the other names" do
         artist = create(:artist)
 
-        artist.other_names = ["artist1", "artist2"]
-        artist.name = "artist1"
+        artist.update!(name: "artist1", other_names: ["artist1", "artist2"])
         assert_equal(["artist2"], artist.other_names)
 
-        artist.other_names = ["test_artist", "artist2"]
-        artist.name = "Test Artist"
+        artist.update!(name: "Test Artist", other_names: ["test_artist", "artist2"])
         assert_equal(["artist2"], artist.other_names)
       end
     end
@@ -663,7 +661,7 @@ class ArtistTest < ActiveSupport::TestCase
         artist = Artist.new_with_defaults(source: source)
 
         assert_equal("niceandcool", artist.name)
-        assert_equal("Nice_and_Cool", artist.other_names_string)
+        assert_equal("Nice_and_Cool niceandcool", artist.other_names_string)
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/users/906442")
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
@@ -674,28 +672,31 @@ class ArtistTest < ActiveSupport::TestCase
         artist = Artist.new_with_defaults(name: "test_artist")
 
         assert_equal("test_artist", artist.name)
-        assert_equal("Nice_and_Cool", artist.other_names_string)
+        assert_equal("Nice_and_Cool niceandcool", artist.other_names_string)
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/users/906442")
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
     end
 
     context "when setting other_names" do
-      should "remove elements that match the artist name exactly" do
+      should "remove names that match the artist name exactly" do
         artist = create(:artist, name: "test_artist")
 
-        artist.other_names_string = "test_artist another_name"
+        artist.update!(other_names_string: "test_artist another_name")
         assert_equal(["another_name"], artist.other_names)
         assert_equal("another_name", artist.other_names_string)
 
-        artist.other_names = ["test_artist", "another_name", "third_name"]
+        artist.update!(other_names: ["test_artist", "another_name", "third_name"])
         assert_equal(["another_name", "third_name"], artist.other_names)
 
-        artist.other_names = ["Test_Artist", "another_name"]
+        artist.update!(other_names: ["Test_Artist", "another_name"])
         assert_equal(["Test_Artist", "another_name"], artist.other_names)
 
-        artist.update(other_names_string: "test_artist different_name")
+        artist.update!(other_names_string: "test_artist different_name")
         assert_equal(["different_name"], artist.reload.other_names)
+
+        artist.update!(other_names: %w[name name])
+        assert_equal(["name"], artist.reload.other_names)
       end
     end
   end
