@@ -40,6 +40,15 @@ class ApiKeyTest < ActiveSupport::TestCase
         should allow_value("").for(:name)
         should_not allow_value("x" * 101).for(:name)
       end
+
+      should "not allow more than 20 API keys per user" do
+        user = create(:user)
+        create_list(:api_key, 20, user: user)
+        api_key = build(:api_key, user: user)
+
+        assert_equal(false, api_key.valid?)
+        assert_includes(api_key.errors[:base], "You can't have more than 20 API keys.")
+      end
     end
 
     should "generate a unique key" do

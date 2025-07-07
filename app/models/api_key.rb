@@ -11,9 +11,12 @@ class ApiKey < ApplicationRecord
   normalizes :name, with: ->(name) { name.unicode_normalize(:nfc).normalize_whitespace.strip }
 
   belongs_to :user
+
+  validate :validate_max_api_keys, on: :create
   validate :validate_permissions, if: :permissions_changed?
   validates :key, uniqueness: true, if: :key_changed?
   validates :name, length: { maximum: 100 }, if: :name_changed?
+
   has_secure_token :key
 
   def self.visible(user)
@@ -27,6 +30,12 @@ class ApiKey < ApplicationRecord
   def self.search(params, current_user)
     q = search_attributes(params, [:id, :created_at, :updated_at, :key, :user], current_user: current_user)
     q.apply_default_order(params)
+  end
+
+  def validate_max_api_keys
+    if user.api_keys.count >= 20
+      errors.add(:base, "You can't have more than 20 API keys.")
+    end
   end
 
   concerning :PermissionMethods do
