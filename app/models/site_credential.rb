@@ -183,7 +183,7 @@ class SiteCredential < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, %i[id created_at updated_at creator is_enabled is_public status usage_count error_count last_used_at last_error_at credential metadata], current_user: current_user)
+    q = search_attributes(params, %i[id created_at updated_at creator site is_enabled is_public status usage_count error_count last_used_at last_error_at credential metadata], current_user: current_user)
     q.apply_default_order(params)
   end
 

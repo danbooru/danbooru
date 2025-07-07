@@ -6,7 +6,7 @@
 
     <%= table_for @site_credentials, class: "striped autofit" do |t| %>
       <% t.column :site do |site_credential| %>
-        <%= site_credential.site %>
+        <%= link_to site_credential.site, site_credentials_path(search: { site: site_credential.site }) %>
 
         <span class="inline-flex flex-row gap-1">
           <% if site_credential.is_enabled? %>
