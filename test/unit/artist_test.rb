@@ -417,7 +417,7 @@ class ArtistTest < ActiveSupport::TestCase
       end
     end
 
-    context "the #normalize_other_names method" do
+    context "validating other names" do
       subject { build(:artist) }
 
       should normalize_attribute(:other_names).from(["   foo"]).to(["foo"])
@@ -439,9 +439,17 @@ class ArtistTest < ActiveSupport::TestCase
       should normalize_attribute(:other_names).from("foo foo").to(["foo"])
       should normalize_attribute(:other_names).from("foo bar").to(["foo", "bar"])
       should normalize_attribute(:other_names).from("_foo_ Bar").to(["_foo_", "Bar"])
+
+      should_not allow_value(51.times.to_a.map(&:to_s)).for(:other_names)
+      should allow_value(50.times.to_a.map(&:to_s)).for(:other_names)
+
+      should_not allow_value(["x" * 81]).for(:other_names)
+      should allow_value(["x" * 80]).for(:other_names)
     end
 
-    context "group name" do
+    context "validating the group name" do
+      subject { build(:artist) }
+
       should normalize_attribute(:group_name).from("   ").to("")
       should normalize_attribute(:group_name).from("   foo").to("foo")
       should normalize_attribute(:group_name).from("foo   ").to("foo")
@@ -455,13 +463,32 @@ class ArtistTest < ActiveSupport::TestCase
       should normalize_attribute(:group_name).from("_foo_ Bar").to("_foo__Bar")
       should normalize_attribute(:group_name).from("pokémon".unicode_normalize(:nfd)).to("pokémon".unicode_normalize(:nfkc))
       should normalize_attribute(:group_name).from("🏳️‍🌈").to("🏳️‍🌈")
+
+      should_not allow_value("x" * 81).for(:group_name)
+      should allow_value("x" * 80).for(:group_name)
     end
 
     context "normalizing the name" do
+      subject { build(:artist) }
+
       should normalize_attribute(:name).from("   foo").to("foo")
       should normalize_attribute(:name).from("foo   ").to("foo")
       should normalize_attribute(:name).from("foo\n").to("foo")
       should normalize_attribute(:name).from("Foo Bar").to("foo_bar")
+    end
+
+    context "validating the URLs" do
+      should "allow valid URLs" do
+        assert_equal(true, build(:artist, url_string: "https://example.com").valid?)
+        assert_equal(true, build(:artist, url_string: "http://example.com/#{"x" * 280}").valid?)
+        assert_equal(true, build(:artist, url_string: 150.times.map { |n| "https://example.com/#{n}" }.join(" ")).valid?)
+      end
+
+      should "not allow invalid URLs" do
+        assert_equal(false, build(:artist, url_string: "invalid").valid?)
+        assert_equal(false, build(:artist, url_string: "http://example.com/#{"x" * 300}").valid?)
+        assert_equal(false, build(:artist, url_string: 151.times.map { |n| "https://example.com/#{n}" }.join(" ")).valid?)
+      end
     end
 
     should "search on its name should return results" do

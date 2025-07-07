@@ -14,7 +14,11 @@ class Artist < ApplicationRecord
   array_attribute :other_names # XXX must come after `normalizes :other_names`
 
   validate :validate_artist_name
+  validate :validate_other_names, if: :other_names_changed?
+  validate :validate_urls
   validates :name, tag_name: true, uniqueness: true, if: :name_changed?
+  validates :group_name, length: { maximum: 80 }, if: :group_name_changed?
+  validates :other_names, length: { maximum: 50, too_long: "can't have more than 50 names" }, if: :other_names_changed?
   after_validation :add_url_warnings
 
   before_save :remove_redundant_other_names
@@ -63,6 +67,12 @@ class Artist < ApplicationRecord
 
     def clear_url_string_changed
       self.url_string_changed = false
+    end
+
+    def validate_urls
+      if urls.any?(&:new_record?) && urls.size > 150
+        errors.add(:urls, "can't have more than 150 URLs")
+      end
     end
 
     class_methods do
@@ -185,6 +195,12 @@ class Artist < ApplicationRecord
 
       if tag_alias.present?
         errors.add(:name, "'#{name}' is aliased to '#{tag_alias.consequent_name}'")
+      end
+    end
+
+    def validate_other_names
+      if other_names.any? { |name| name.length > 80 }
+        errors.add(:other_names, "can't have names more than 80 characters long")
       end
     end
 
