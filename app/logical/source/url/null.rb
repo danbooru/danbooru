@@ -472,10 +472,6 @@ class Source::URL::Null < Source::URL
     in _, "mangaupdates.com", *rest
       nil
 
-    # https://marshmallow-qa.com/nlo74593630
-    in _, "marshmallow-qa.com", *rest
-      nil
-
     # http://mblg.tv/ikusanin01/
     in _, "mblg.tv", *rest
       nil
