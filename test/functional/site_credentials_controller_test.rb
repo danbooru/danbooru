@@ -70,5 +70,57 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
       end
     end
+
+    context "show action" do
+      should "be viewable by admins" do
+        @site_credential = create(:site_credential)
+        get_auth site_credential_path(@site_credential), @admin
+
+        assert_redirected_to site_credentials_path(search: { id: @site_credential.id })
+      end
+
+      should "not be viewable by non-admins" do
+        @site_credential = create(:site_credential)
+        get_auth site_credential_path(@site_credential), @member
+
+        assert_response 403
+      end
+    end
+
+    context "update action" do
+      should "allow admins to disable credentials" do
+        @site_credential = create(:site_credential)
+        put_auth site_credential_path(@site_credential), @admin, params: { site_credential: { is_enabled: false }}
+
+        assert_redirected_to site_credentials_path
+        assert_equal(false, @site_credential.reload.is_enabled?)
+      end
+
+      should "not allow non-admins to update credentials" do
+        @site_credential = create(:site_credential)
+        put_auth site_credential_path(@site_credential), @member, params: { site_credential: { is_enabled: false }}
+
+        assert_response 403
+        assert_equal(true, @site_credential.reload.is_enabled?)
+      end
+    end
+
+    context "destroy action" do
+      should "allow admins to delete credentials" do
+        @site_credential = create(:site_credential)
+        delete_auth site_credential_path(@site_credential), @admin
+
+        assert_redirected_to site_credentials_path
+        assert_equal(0, SiteCredential.count)
+      end
+
+      should "not allow non-admins to delete credentials" do
+        @site_credential = create(:site_credential)
+        delete_auth site_credential_path(@site_credential), @member
+
+        assert_response 403
+        assert_equal(1, SiteCredential.count)
+      end
+    end
   end
 end

@@ -10,16 +10,13 @@ class SiteCredentialsController < ApplicationController
 
   def show
     @site_credential = authorize SiteCredential.find(params[:id])
-    respond_with(@site_credential)
+    respond_with(@site_credential) do |format|
+      format.html { redirect_to site_credentials_path(search: { id: @site_credential.id }) }
+    end
   end
 
   def new
     @site_credential = authorize SiteCredential.new(permitted_attributes(SiteCredential))
-    respond_with(@site_credential)
-  end
-
-  def edit
-    @site_credential = authorize SiteCredential.find(params[:id])
     respond_with(@site_credential)
   end
 
