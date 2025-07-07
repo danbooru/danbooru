@@ -48,6 +48,11 @@ class SiteCredential < ApplicationRecord
       default_credential: { cookie_a: Danbooru.config.furaffinity_cookie_a, cookie_b: Danbooru.config.furaffinity_cookie_b },
       help: %{Your "Furaffinity":https://www.furaffinity.net 'cookie_a' and 'cookie_b' cookies. Warning: logging out of Furaffinity will invalidate these cookies.},
     }, {
+      id: 1050,
+      name: "Gelbooru",
+      default_credential: { user_id: Danbooru.config.gelbooru_user_id, api_key: Danbooru.config.gelbooru_api_key },
+      help: %{Your "Gelbooru":https://gelbooru.com user ID and API key. Go to https://gelbooru.com/index.php?page=account&s=options to find your API key.},
+    }, {
       id: 1100,
       name: "Inkbunny",
       default_credential: { username: Danbooru.config.inkbunny_username, password: Danbooru.config.inkbunny_password },

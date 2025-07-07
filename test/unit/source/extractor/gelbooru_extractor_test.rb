@@ -111,7 +111,7 @@ module Source::Tests::Extractor
         strategy_should_work(
           # source: "https://www.pixiv.net/artworks/99176572 [Direct link in description]"
           "https://gelbooru.com/index.php?page=post&s=view&id=7868427",
-          image_urls: ["https://video-cdn1.gelbooru.com/images/e7/88/e788470bf83be1e8eba72ca9cca8f738.mp4"],
+          image_urls: ["https://video-cdn3.gelbooru.com/images/e7/88/e788470bf83be1e8eba72ca9cca8f738.mp4"],
           artist_name: nil,
           artist_commentary_title: nil,
           artist_commentary_desc: nil,

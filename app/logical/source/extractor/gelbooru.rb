@@ -62,7 +62,13 @@ module Source
       def api_url
         # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=md5:338078144fe77c9e5f35dbb585e749ec
         # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=id:7903922
-        parsed_url.api_url || parsed_referer&.api_url
+        url = parsed_url.api_url || parsed_referer&.api_url
+
+        if site_name == "Gelbooru"
+          url = Danbooru::URL.parse(url).with_params(api_key: credentials[:api_key], user_id: credentials[:user_id])
+        end
+
+        url
       end
 
       memoize def api_response

@@ -603,6 +603,14 @@ module Danbooru
     def xiaohongshu_web_session_cookie
     end
 
+    # Your Gelbooru user ID.
+    def gelbooru_user_id
+    end
+
+    # Your Gelbooru API key. Found at https://gelbooru.com/index.php?page=account&s=options
+    def gelbooru_api_key
+    end
+
     # Your Google Blogger API key. Go to https://developers.google.com/blogger/docs/3.0/using#APIKey to create an API key.
     # You can also use gallery-dl's API key, but you might get rate-limited if others are using it.
     # https://github.com/mikf/gallery-dl/blob/07d962d60aed598f0ee8578df914c38e5fc939aa/gallery_dl/extractor/blogger.py#L162
