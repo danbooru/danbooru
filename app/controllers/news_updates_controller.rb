@@ -9,6 +9,14 @@ class NewsUpdatesController < ApplicationController
     respond_with(@news_updates)
   end
 
+  def show
+    @news_update = authorize NewsUpdate.find(params[:id])
+
+    respond_with(@news_update) do |format|
+      format.html { redirect_to news_updates_path(search: { id: @news_update.id }) }
+    end
+  end
+
   def new
     @news_update = authorize NewsUpdate.new(permitted_attributes(NewsUpdate))
     respond_with(@news_update)

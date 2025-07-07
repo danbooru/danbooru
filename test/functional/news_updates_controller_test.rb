@@ -20,6 +20,22 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action" do
+      should "render for an admin" do
+        @news_update = create(:news_update)
+        get_auth news_update_path(@news_update), @admin
+
+        assert_redirected_to news_updates_path(search: { id: @news_update.id })
+      end
+
+      should "not render for a regular user" do
+        @news_update = create(:news_update)
+        get_auth news_update_path(@news_update), create(:user)
+
+        assert_response 403
+      end
+    end
+
     context "new action" do
       should "render for an admin" do
         get_auth new_news_update_path, @admin
@@ -57,6 +73,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(news_updates_path)
         assert_equal(@admin, @news_update.reload.creator)
         assert_equal(@other_admin, @news_update.updater)
+        assert_equal(true, @news_update.mod_actions.news_update_update.exists?)
 
         get_auth posts_path, @admin
         assert_select "#news-updates > div", count: 1, text: "zzz"
@@ -80,6 +97,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         @news_update = NewsUpdate.last
         assert_equal(@admin, @news_update.creator)
         assert_equal(@admin, @news_update.updater)
+        assert_equal(true, @news_update.mod_actions.news_update_create.exists?)
 
         get_auth posts_path, @admin
         assert_select "#news-updates > div", count: 1, text: "zzz"
@@ -103,6 +121,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(news_updates_path)
         assert_equal(@admin, @news_update.reload.creator)
         assert_equal(@other_admin, @news_update.updater)
+        assert_equal(true, @news_update.mod_actions.news_update_delete.exists?)
 
         get_auth posts_path, @admin
         assert_select "#news-updates > div", count: 0
@@ -118,7 +137,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
 
     context "undelete action" do
       should "work for an admin" do
-        @news_update = create(:news_update, creator: @admin)
+        @news_update = create(:news_update, creator: @admin, is_deleted: true)
         @other_admin = create(:admin_user)
 
         put_auth news_update_path(@news_update), @other_admin, params: { news_update: { is_deleted: false } }
@@ -126,6 +145,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(news_updates_path)
         assert_equal(@admin, @news_update.reload.creator)
         assert_equal(@other_admin, @news_update.updater)
+        assert_equal(true, @news_update.mod_actions.news_update_undelete.exists?)
 
         get_auth posts_path, @admin
         assert_select "#news-updates > div", count: 1, text: @news_update.message

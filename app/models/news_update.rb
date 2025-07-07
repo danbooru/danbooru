@@ -3,6 +3,7 @@
 class NewsUpdate < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to :updater, class_name: "User", default: -> { creator }
+  has_many :mod_actions, as: :subject, dependent: :destroy
 
   deletable
   dtext_attribute :message, inline: true
@@ -13,6 +14,8 @@ class NewsUpdate < ApplicationRecord
   validate :validate_duration, if: :duration_changed?
   validate :validate_active, on: :create
   validates :message, presence: true, length: { maximum: 280 }, if: :message_changed?
+
+  after_save :create_mod_action
 
   def self.visible(user)
     if user.is_admin?
@@ -37,6 +40,18 @@ class NewsUpdate < ApplicationRecord
 
   def validate_duration
     errors.add(:duration, "must be between 1 and 30 days") unless Array(1..30).map(&:days).include?(duration)
+  end
+
+  def create_mod_action
+    if previously_new_record?
+      ModAction.log("created news update ##{id}", :news_update_create, subject: self, user: updater)
+    elsif saved_change_to_message?
+      ModAction.log("updated news update ##{id}", :news_update_update, subject: self, user: updater)
+    elsif is_deleted? == true && is_deleted_before_last_save == false
+      ModAction.log("deleted news update ##{id}", :news_update_delete, subject: self, user: updater)
+    elsif is_deleted? == false && is_deleted_before_last_save == true
+      ModAction.log("undeleted news update ##{id}", :news_update_undelete, subject: self, user: updater)
+    end
   end
 
   def status
