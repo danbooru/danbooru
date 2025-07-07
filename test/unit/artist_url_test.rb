@@ -16,16 +16,33 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("-http://monet.com", url.to_s)
     end
 
-    should "disallow invalid urls" do
-      urls = [
-        build(:artist_url, url: ":www.example.com"),
-        build(:artist_url, url: "http://http://www.example.com"),
-      ]
+    context "when validating URLs" do
+      subject { build(:artist_url) }
 
-      assert_equal(false, urls[0].valid?)
-      assert_match(/is malformed/, urls[0].errors.full_messages.join)
-      assert_equal(false, urls[1].valid?)
-      assert_match(/that does not contain a dot/, urls[1].errors.full_messages.join)
+      should allow_value("http://example.com").for(:url)
+      should allow_value("http://user:pass@example.com:80/image.jpg?foo=bar#blah").for(:url)
+      should allow_value("http://127.0.0.1:3000").for(:url)
+      # should allow_value("http://[::1]:3000").for(:url)
+      should allow_value("♨️.com").for(:url)
+      should allow_value("https://cafeptthumb-phinf.pstatic.net/20140924_45/dnflgmldus_1411489948549jC2ma_PNG/%BD%C3%C1%EE%C7%C3%B7%B9%BE%EE.png?type=w1600").for(:url) # invalid UTF-8
+
+      should_not allow_value("example").for(:url)
+      should_not allow_value(":example.com").for(:url)
+      should_not allow_value("ftp://example.com").for(:url)
+      should_not allow_value("file://example.jpg").for(:url)
+      should_not allow_value("mailto://user@gmail.com").for(:url)
+      should_not allow_value("user@gmail.com").for(:url)
+      should_not allow_value("javascript:alert(0)").for(:url)
+
+      should_not allow_value("http://localhost").for(:url)
+      should_not allow_value("https://.example.com").for(:url)
+      should_not allow_value("http://http://:example.com").for(:url)
+      should_not allow_value("https://").for(:url)
+      should_not allow_value("https://./").for(:url)
+      should_not allow_value("https://!!!.com").for(:url)
+      should_not allow_value("https://[]").for(:url)
+      should_not allow_value("https://[]:3000").for(:url)
+      # should_not allow_value("https://foo@gmail.com").for(:url)
     end
 
     context "when normalizing URLs" do
@@ -33,6 +50,7 @@ class ArtistURLTest < ActiveSupport::TestCase
       should normalize_attribute(:url).from("http://example.com").to("http://example.com")
       should normalize_attribute(:url).from("https://example.com").to("https://example.com")
       should normalize_attribute(:url).from("http://example.com/").to("http://example.com")
+      should normalize_attribute(:url).from("http://example.com./").to("http://example.com")
       should normalize_attribute(:url).from("https://ArtistName.example.com").to("https://artistname.example.com")
       should normalize_attribute(:url).from("https://arca.live/u/@%EC%9C%BE%ED%8C%8C").to("https://arca.live/u/@윾파")
       should normalize_attribute(:url).from("http://dic.nicovideo.jp/a/tetla pot").to("http://dic.nicovideo.jp/a/tetla%20pot")

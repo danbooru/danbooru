@@ -139,20 +139,15 @@ class ArtistURL < ApplicationRecord
     ArtistFinder.find_artists(url).without(artist)
   end
 
-  def validate_scheme(uri)
-    errors.add(:url, "'#{uri}' must begin with http:// or https:// ") unless uri.scheme.in?(%w[http https])
-  end
-
-  def validate_hostname(uri)
-    errors.add(:url, "'#{uri}' has a hostname '#{uri.host}' that does not contain a dot") unless uri.host&.include?(".")
-  end
-
   def validate_url_format
     uri = Addressable::URI.parse(url)
-    validate_scheme(uri)
-    validate_hostname(uri)
-  rescue Addressable::URI::InvalidURIError => e
-    errors.add(:url, "'#{uri}' is malformed: #{e}")
+    Source::URL.parse!(url)
+
+    if !uri.host&.include?(".")
+      errors.add(:url, "'#{url}' is not a valid URL")
+    end
+  rescue StandardError
+    errors.add(:url, "'#{url}' is not a valid URL")
   end
 
   def self.available_includes

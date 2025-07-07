@@ -33,6 +33,8 @@ en:
   hello: "Hello world"
   activerecord:
     attributes:
+      artist/urls:
+        url: "URL"
       artist_url:
         url: ""
       comment:

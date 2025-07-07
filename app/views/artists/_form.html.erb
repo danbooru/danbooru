@@ -1,4 +1,4 @@
-<%= edit_form_for(@artist) do |f| %>
+<%= edit_form_for(@artist, formatted_errors: true) do |f| %>
   <%= f.input :name, as: :string, input_html: { "data-autocomplete": "tag" } %>
 
   <%= f.input :other_names_string, label: "Other names", as: :string, hint: "Separate names with spaces, not commas. Use underscores for spaces inside names." %>
