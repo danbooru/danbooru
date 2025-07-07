@@ -326,8 +326,11 @@ class Artist < ApplicationRecord
   end
 
   def add_url_warnings
-    urls.each do |url|
-      warnings.add(:base, url.warnings.full_messages.join("; ")) if url.warnings.any?
+    duplicate_artists = urls.select(&:new_record?).flat_map(&:duplicate_artists).sort.uniq.without(self)
+
+    if duplicate_artists.present?
+      names = duplicate_artists.map { |artist| "[[#{artist.name}]]" }
+      warnings.add(:base, "Potential duplicate of #{names.to_sentence}")
     end
   end
 

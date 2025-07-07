@@ -5,7 +5,6 @@ class ArtistURL < ApplicationRecord
 
   validates :url, presence: true, length: { maximum: 300, message: "'%{value}' is too long (maximum is 300 characters)" }, uniqueness: { scope: :artist_id }
   validate :validate_url_format
-  validate :validate_url_is_not_duplicate
   belongs_to :artist, :touch => true
 
   scope :active, -> { where(is_active: true) }
@@ -135,6 +134,11 @@ class ArtistURL < ApplicationRecord
     end
   end
 
+  # @return [Array<Artist>] The list of other artists that also contain this URL.
+  def duplicate_artists
+    ArtistFinder.find_artists(url).without(artist)
+  end
+
   def validate_scheme(uri)
     errors.add(:url, "'#{uri}' must begin with http:// or https:// ") unless uri.scheme.in?(%w[http https])
   end
@@ -149,14 +153,6 @@ class ArtistURL < ApplicationRecord
     validate_hostname(uri)
   rescue Addressable::URI::InvalidURIError => e
     errors.add(:url, "'#{uri}' is malformed: #{e}")
-  end
-
-  def validate_url_is_not_duplicate
-    artists = ArtistFinder.find_artists(url).without(artist)
-
-    artists.each do |a|
-      warnings.add(:base, "Duplicate of [[#{a.name}]]")
-    end
   end
 
   def self.available_includes

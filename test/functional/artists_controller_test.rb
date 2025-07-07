@@ -209,7 +209,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :redirect
         assert_equal("artist2", Artist.last.name)
-        assert_equal("Duplicate of [[artist1]]", flash[:notice])
+        assert_equal("Potential duplicate of [[artist1]]", flash[:notice])
       end
     end
 
@@ -234,7 +234,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         put_auth artist_path(@artist2), @user, params: { artist: { url_string: "https://www.pixiv.net/users/1234" }}
 
         assert_redirected_to @artist2
-        assert_equal("Duplicate of [[artist1]]", flash[:notice])
+        assert_equal("Potential duplicate of [[artist1]]", flash[:notice])
       end
     end
 
