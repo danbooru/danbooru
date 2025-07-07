@@ -137,6 +137,8 @@ class SiteCredential < ApplicationRecord
     [site[:name], site[:default_credential]]
   end.to_h.with_indifferent_access
 
+  attr_accessor :updater
+
   enum :site, SITES.to_h { |site| [site[:name], site[:id]] }, scopes: false, instance_methods: false, validate: true
 
   enum :status, {
@@ -149,9 +151,14 @@ class SiteCredential < ApplicationRecord
   }, prefix: "is", validate: true
 
   belongs_to :creator, class_name: "User"
+  has_many :mod_actions, as: :subject, dependent: :destroy
+
   validates :site, presence: true, inclusion: { in: sites.keys, allow_nil: true }
   validates :credential, presence: true
   validate :validate_credential, if: :credential_changed?
+
+  after_destroy :create_mod_action
+  after_save :create_mod_action
 
   scope :enabled, -> { where(is_enabled: true) }
   scope :disabled, -> { where(is_enabled: false) }
@@ -230,6 +237,20 @@ class SiteCredential < ApplicationRecord
 
     credential.each_key do |name|
       errors.add(:credential, "contains unrecognized field '#{name}'") if !name.to_s.in?(credential_names)
+    end
+  end
+
+  def create_mod_action
+    return if !is_public?
+
+    if previously_new_record?
+      ModAction.log("created a site credential for #{site}", :site_credential_create, subject: self, user: creator)
+    elsif destroyed?
+      ModAction.log("deleted a site credential for #{site}", :site_credential_delete, subject: nil, user: updater)
+    elsif is_enabled? == true && is_enabled_before_last_save == false
+      ModAction.log("enabled a site credential for #{site}", :site_credential_enable, subject: self, user: updater)
+    elsif is_enabled? == false && is_enabled_before_last_save == true
+      ModAction.log("disabled a site credential for #{site}", :site_credential_disable, subject: self, user: updater)
     end
   end
 end

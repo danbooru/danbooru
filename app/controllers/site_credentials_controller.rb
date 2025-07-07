@@ -29,13 +29,14 @@ class SiteCredentialsController < ApplicationController
 
   def update
     @site_credential = authorize SiteCredential.find(params[:id])
-    @site_credential.update(permitted_attributes(@site_credential))
+    @site_credential.update(updater: CurrentUser.user, **permitted_attributes(@site_credential))
 
     respond_with(@site_credential, location: site_credentials_path)
   end
 
   def destroy
     @site_credential = authorize SiteCredential.find(params[:id])
+    @site_credential.updater = CurrentUser.user
     @site_credential.destroy
 
     respond_with(@site_credential, notice: "Credential deleted")

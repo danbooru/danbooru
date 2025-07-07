@@ -26,6 +26,11 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
 
         assert_equal("Pixiv", SiteCredential.last.site)
         assert_equal("foo", SiteCredential.last.credential["phpsessid"])
+
+        assert_equal(SiteCredential.last, ModAction.last.subject)
+        assert_equal("site_credential_create", ModAction.last.category)
+        assert_match(/created a site credential for/, ModAction.last.description)
+        assert_equal(@admin, ModAction.last.creator)
       end
 
       should "not allow invalid sites" do
@@ -94,6 +99,24 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to site_credentials_path
         assert_equal(false, @site_credential.reload.is_enabled?)
+
+        assert_equal(@site_credential, ModAction.last.subject)
+        assert_equal("site_credential_disable", ModAction.last.category)
+        assert_match(/disabled a site credential for/, ModAction.last.description)
+        assert_equal(@admin, ModAction.last.creator)
+      end
+
+      should "allow admins to enable credentials" do
+        @site_credential = create(:site_credential, is_enabled: false)
+        put_auth site_credential_path(@site_credential), @admin, params: { site_credential: { is_enabled: true }}
+
+        assert_redirected_to site_credentials_path
+        assert_equal(true, @site_credential.reload.is_enabled?)
+
+        assert_equal(@site_credential, ModAction.last.subject)
+        assert_equal("site_credential_enable", ModAction.last.category)
+        assert_match(/enabled a site credential for/, ModAction.last.description)
+        assert_equal(@admin, ModAction.last.creator)
       end
 
       should "not allow non-admins to update credentials" do
@@ -112,6 +135,11 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to site_credentials_path
         assert_equal(0, SiteCredential.count)
+
+        assert_nil(ModAction.last.subject)
+        assert_equal("site_credential_delete", ModAction.last.category)
+        assert_match(/deleted a site credential for/, ModAction.last.description)
+        assert_equal(@admin, ModAction.last.creator)
       end
 
       should "not allow non-admins to delete credentials" do

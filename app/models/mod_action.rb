@@ -75,13 +75,17 @@ class ModAction < ApplicationRecord
     news_update_update: 301,
     news_update_delete: 302,
     news_update_undelete: 303,
+    site_credential_create: 400,
+    site_credential_delete: 402,
+    site_credential_enable: 406,
+    site_credential_disable: 407,
     mass_update: 1000, # XXX unused
   }
 
   normalizes :category, with: ->(category) { category.to_s.parameterize.underscore.presence }
 
   def self.model_types
-    %w[Artist Comment CommentVote ForumPost ForumTopic IpBan ModerationReport NewsUpdate Pool Post PostVote Tag TagAlias TagImplication User]
+    %w[Artist Comment CommentVote ForumPost ForumTopic IpBan ModerationReport NewsUpdate Pool Post PostVote SiteCredential Tag TagAlias TagImplication User]
   end
 
   def self.visible(user)
