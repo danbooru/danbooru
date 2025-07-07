@@ -6,7 +6,11 @@ class SiteCredentialPolicy < ApplicationPolicy
   end
 
   def show?
-    user.is_admin? || record.creator_id == user.id
+    if record.is_public?
+      user.is_admin?
+    else
+      record.creator_id == user.id
+    end
   end
 
   def create?
@@ -14,11 +18,19 @@ class SiteCredentialPolicy < ApplicationPolicy
   end
 
   def update?
-    user.is_admin? || record.creator_id == user.id
+    if record.is_public?
+      user.is_admin?
+    else
+      record.creator_id == user.id
+    end
   end
 
   def destroy?
-    user.is_admin? || record.creator_id == user.id
+    if record.is_public?
+      user.is_owner?
+    else
+      record.creator_id == user.id
+    end
   end
 
   def permitted_attributes_for_create

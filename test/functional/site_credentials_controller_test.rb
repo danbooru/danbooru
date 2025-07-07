@@ -129,9 +129,12 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "destroy action" do
-      should "allow admins to delete credentials" do
+      should "allow the owner to delete credentials" do
+        @user = create(:owner_user)
         @site_credential = create(:site_credential)
-        delete_auth site_credential_path(@site_credential), @admin
+        assert_equal(true, ModAction.exists?(category: "site_credential_create"))
+
+        delete_auth site_credential_path(@site_credential), @user
 
         assert_redirected_to site_credentials_path
         assert_equal(0, SiteCredential.count)
@@ -139,12 +142,13 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(ModAction.last.subject)
         assert_equal("site_credential_delete", ModAction.last.category)
         assert_match(/deleted a site credential for/, ModAction.last.description)
-        assert_equal(@admin, ModAction.last.creator)
+        assert_equal(@user, ModAction.last.creator)
+        assert_equal(false, ModAction.exists?(category: "site_credential_create"))
       end
 
-      should "not allow non-admins to delete credentials" do
+      should "not allow non-owners to delete credentials" do
         @site_credential = create(:site_credential)
-        delete_auth site_credential_path(@site_credential), @member
+        delete_auth site_credential_path(@site_credential), @admin
 
         assert_response 403
         assert_equal(1, SiteCredential.count)

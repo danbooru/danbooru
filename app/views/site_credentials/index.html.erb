@@ -73,12 +73,14 @@
       <% t.column column: "control" do |site_credential| %>
         <div class="flex flex-col gap-2">
           <% if site_credential.is_enabled? %>
-            <%= link_to "Disable", site_credential_path(site_credential), class: "button-primary button-sm", method: :put, remote: true, "data-params": "site_credential[is_enabled]=false" %>
+            <%= link_to "Disable", site_credential_path(site_credential), class: "button-outline-danger button-sm", method: :put, remote: true, "data-params": "site_credential[is_enabled]=false", "data-confirm": "Are you sure you want to disable this credential?" %>
           <% else %>
             <%= link_to "Enable", site_credential_path(site_credential), class: "button-primary button-sm", method: :put, remote: true, "data-params": "site_credential[is_enabled]=true" %>
           <% end %>
 
-          <%= link_to "Delete", site_credential_path(site_credential), class: "button-outline-danger button-sm", method: :delete, remote: true %>
+          <% if policy(site_credential).destroy? %>
+            <%= link_to "Delete", site_credential_path(site_credential), class: "button-danger button-sm", method: :delete, remote: true, "data-confirm": "Are you sure you want to permanently delete this credential?" %>
+          <% end %>
         </div>
       <% end %>
     <% end %>
