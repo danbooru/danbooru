@@ -19,9 +19,12 @@ class UserFeedbackTest < ActiveSupport::TestCase
     end
 
     context "on validation" do
+      should allow_value("x" * 1500).for(:body)
+
       should_not allow_value("").for(:body)
       should_not allow_value("   ").for(:body)
       should_not allow_value("\u200B").for(:body)
+      should_not allow_value("x" * 1501).for(:body)
     end
   end
 end
