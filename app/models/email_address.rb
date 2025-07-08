@@ -6,7 +6,7 @@ class EmailAddress < ApplicationRecord
   attribute :address
   attribute :normalized_address
 
-  validates :address, presence: true, format: { message: "is invalid", with: Danbooru::EmailAddress::EMAIL_REGEX, multiline: true }
+  validates :address, presence: true, format: { message: "is invalid", with: Danbooru::EmailAddress::EMAIL_REGEX, multiline: true }, length: { maximum: 100 }, if: :address_changed?
   validates :normalized_address, presence: true, uniqueness: true
   validates :user_id, uniqueness: true
   validate :validate_deliverable, on: :deliverable

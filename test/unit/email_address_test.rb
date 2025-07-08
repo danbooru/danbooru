@@ -21,6 +21,7 @@ class EmailAddressTest < ActiveSupport::TestCase
       should_not allow_value("foo@foo.-bar.com").for(:address)
       should_not allow_value("foo@127.0.0.1").for(:address)
       should_not allow_value("foo@localhost").for(:address)
+      should_not allow_value("#{"x" * 100}@example.com").for(:address)
     end
 
     context "normalization" do
