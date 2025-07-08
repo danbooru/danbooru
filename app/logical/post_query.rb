@@ -326,6 +326,11 @@ class PostQuery
     def term_count
       tag_names.size + wildcards.size + metatags.count { !_1.name.in?(UNLIMITED_METATAGS) }
     end
+
+    # @return [Integer] The total number of terms in the query, including free metatags.
+    def total_term_count
+      tag_names.size + wildcards.size + metatags.size
+    end
   end
 
   memoize :tags, :replace_aliases, :with_implicit_metatags, :to_cnf, :aliases, :implicit_metatags, :term_count

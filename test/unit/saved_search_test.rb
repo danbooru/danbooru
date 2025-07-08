@@ -127,6 +127,22 @@ class SavedSearchTest < ActiveSupport::TestCase
     should normalize_attribute(:labels).from([nil, "", " "]).to([])
   end
 
+  context "during validation" do
+    subject { build(:saved_search) }
+
+    should allow_value("x" * 3000).for(:query)
+    should allow_value((["x"] * 150).join(" ")).for(:query)
+
+    should_not allow_value("x" * 3001).for(:query)
+    should_not allow_value((["x"] * 151).join(" ")).for(:query)
+
+    should allow_value(["x" * 100]).for(:labels)
+    should allow_value(["x"] * 20).for(:labels)
+
+    should_not allow_value(["x" * 101]).for(:labels)
+    should_not allow_value(["x"] * 21).for(:labels)
+  end
+
   context "Populating a saved search" do
     setup do
       @saved_search = create(:saved_search, query: "bkub", user: @user)
