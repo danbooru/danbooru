@@ -11,8 +11,8 @@ class Note < ApplicationRecord
   validates :y, presence: true
   validates :width, presence: true
   validates :height, presence: true
-  validates :body, visible_string: true
-  validate :note_within_image
+  validates :body, visible_string: true, length: { maximum: 5000 }, if: :body_changed?
+  validate :validate_note_within_image
   validate :validate_post_can_have_notes, on: :create
   after_save :update_post
   after_save :create_version
@@ -29,7 +29,7 @@ class Note < ApplicationRecord
 
   extend SearchMethods
 
-  def note_within_image
+  def validate_note_within_image
     return false unless post.present?
     if x < 0 || y < 0 || (x > post.image_width) || (y > post.image_height) || width < 0 || height < 0 || (x + width > post.image_width) || (y + height > post.image_height)
       errors.add(:note, "must be inside the image")

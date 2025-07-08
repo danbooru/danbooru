@@ -154,9 +154,12 @@ class NoteTest < ActiveSupport::TestCase
     end
 
     context "when validating notes" do
+      should allow_value("a" * 5000).for(:body)
+
       should_not allow_value("").for(:body)
       should_not allow_value("   ").for(:body)
       should_not allow_value("\u200B").for(:body)
+      should_not allow_value("a" * 5001).for(:body)
     end
   end
 end
