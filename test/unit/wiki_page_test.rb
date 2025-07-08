@@ -90,7 +90,7 @@ class WikiPageTest < ActiveSupport::TestCase
       end
     end
 
-    context "the #normalize_other_names method" do
+    context "during other names validation" do
       subject { build(:wiki_page) }
 
       should normalize_attribute(:other_names).from(["   foo"]).to(["foo"])
@@ -113,6 +113,12 @@ class WikiPageTest < ActiveSupport::TestCase
       should normalize_attribute(:other_names).from("foo foo").to(["foo"])
       should normalize_attribute(:other_names).from("foo bar").to(["foo", "bar"])
       should normalize_attribute(:other_names).from("_foo_ Bar").to(["foo", "Bar"])
+
+      should allow_value(80.times.to_a.map(&:to_s)).for(:other_names)
+      should allow_value(["x" * 100]).for(:other_names)
+
+      should_not allow_value(81.times.to_a.map(&:to_s)).for(:other_names)
+      should_not allow_value(["x" * 101]).for(:other_names)
     end
 
     context "during title validation" do

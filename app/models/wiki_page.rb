@@ -16,8 +16,10 @@ class WikiPage < ApplicationRecord
 
   validates :title, tag_name: true, presence: true, uniqueness: true, if: :title_changed?
   validates :body, visible_string: true, unless: -> { is_deleted? || other_names.present? }
+  validates :body, length: { maximum: 80_000 }, if: :body_changed?
+  validates :other_names, length: { maximum: 80, too_long: "can't have more than 80 names" }, if: :other_names_changed?
   validate :validate_rename
-  validate :validate_other_names
+  validate :validate_other_names, if: :other_names_changed?
 
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, -> { active }, foreign_key: "name", primary_key: "title"
@@ -151,6 +153,10 @@ class WikiPage < ApplicationRecord
   def validate_other_names
     if other_names.present? && tag&.artist?
       errors.add(:base, "An artist wiki can't have other names")
+    end
+
+    if other_names.any? { |name| name.length > 100 }
+      errors.add(:other_names, "can't have names more than 100 characters long")
     end
   end
 
