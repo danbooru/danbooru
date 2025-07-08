@@ -684,13 +684,15 @@ class User < ApplicationRecord
     end
 
     def is_flag_limited?
-      return false if has_unlimited_flags?
-      post_flags.active.count >= 5
+      post_flags.active.count >= flag_limit
     end
 
-    # Flags are unlimited if you're an approver.
-    def has_unlimited_flags?
-      return true if is_approver?
+    def flag_limit
+      if is_approver?
+        Float::INFINITY
+      else
+        5
+      end
     end
 
     def upload_limit

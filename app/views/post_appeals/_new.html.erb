@@ -1,8 +1,12 @@
 <div class="appeal-dialog-body">
-  <%= embed_wiki("help:appeal_notice") %>
+  <%= embed_wiki("help:appeal_notice", classes: "mb-4") %>
+
+  <% if CurrentUser.user.post_appeals.pending.count > 0 %>
+    <p><b>Remaining appeals</b>: <%= CurrentUser.user.upload_limit.remaining_appeals %></p>
+  <% end %>
 
   <%= edit_form_for(post_appeal, format: :js, remote: true) do |f| %>
     <%= f.hidden_field :post_id %>
-    <%= f.input :reason, as: :dtext, inline: true, placeholder: "Optional", input_html: { autofocus: true } %>
+    <%= f.input :reason, as: :dtext, inline: true, placeholder: "Briefly explain why the post should be undeleted (optional)", input_html: { autofocus: true } %>
   <% end %>
 </div>

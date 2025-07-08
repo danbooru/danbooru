@@ -52,6 +52,11 @@ class UploadLimit
     user.upload_points >= MAXIMUM_POINTS
   end
 
+  # @return [Integer] The number of appeals the user can make before they run out of upload slots.
+  def remaining_appeals
+    free_upload_slots / UploadLimit::APPEAL_COST
+  end
+
   # @return [Integer] The number of upload slots in use. Pending posts take 1
   #   slot, appeals take 3, and early deletions take 5.
   def used_upload_slots

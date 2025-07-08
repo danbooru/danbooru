@@ -1,1 +1,5 @@
-location.reload();
+<% if @post_appeal.errors.any? %>
+  Danbooru.Utility.error("<%= j @post_appeal.errors.full_messages.join('; ') %>");
+<% else %>
+  location.reload();
+<% end %>
