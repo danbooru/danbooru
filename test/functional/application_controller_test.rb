@@ -222,13 +222,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
       context "for an API key with restrictions" do
         should "restrict requests to the permitted IP addresses" do
-          @api_key = create(:api_key, permitted_ip_addresses: ["192.168.0.1", "10.0.0.1/24", "2600::1/64"])
+          @api_key = create(:api_key, permitted_ip_addresses: ["1.2.3.4", "2.0.0.1/24", "2600::1/64"])
 
-          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("192.168.0.1")
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.2.3.4")
           get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
           assert_response :success
 
-          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("10.0.0.42")
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("2.0.0.42")
           get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
           assert_response :success
 
@@ -240,7 +240,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
           assert_response 403
 
-          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("10.0.1.0")
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("2.0.1.0")
           get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
           assert_response 403
 

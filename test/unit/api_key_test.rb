@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class ApiKeyTest < ActiveSupport::TestCase
+  def self.to_ips(ips)
+    ips.map { |ip| Danbooru::IpAddress.parse(ip) }
+  end
+
   context "ApiKey:" do
     setup do
       @user = create(:user)
@@ -23,19 +27,34 @@ class ApiKeyTest < ActiveSupport::TestCase
       end
 
       context "of IP addresses" do
+        should normalize_attribute(:permitted_ip_addresses).from(%w[1.2.3.4 1.2.3.4/32]).to(to_ips(["1.2.3.4"]))
+        should normalize_attribute(:permitted_ip_addresses).from(%w[5.6.7.8 1.2.3.4]).to(to_ips(["1.2.3.4", "5.6.7.8"]))
+        should normalize_attribute(:permitted_ip_addresses).from(%w[1.2.3.4/16 5.6.7.8/24]).to(to_ips(["5.6.7.8/24", "1.2.3.4/16"]))
+        should normalize_attribute(:permitted_ip_addresses).from(%w[1.2.3.4/24 1.2.3.4/24]).to(to_ips(["1.2.3.4/24"]))
+        should normalize_attribute(:permitted_ip_addresses).from([nil, "", " "]).to(to_ips([]))
+
         should allow_value([]).for(:permitted_ip_addresses)
         should allow_value(["1.2.3.4"]).for(:permitted_ip_addresses)
         should allow_value(["1.2.3.4/24"]).for(:permitted_ip_addresses)
         should allow_value(["0.0.0.0/0"]).for(:permitted_ip_addresses)
         should allow_value(["2600::1/64"]).for(:permitted_ip_addresses)
+        should allow_value(["1.2.3.4/24 5.6.7.8/24"]).for(:permitted_ip_addresses)
+        should allow_value(20.times.map { |n| "1.2.3.#{n}" }).for(:permitted_ip_addresses)
 
-        #should allow_value(["1.2.3.4/24 4.5.6.7/24"]).for(:permitted_ip_addresses)
-        #should_not allow_value(["blah"]).for(:permitted_ip_addresses)
-        #should_not allow_value(["1.2.3.4/64"]).for(:permitted_ip_addresses)
+        should_not allow_value(["127.0.0.1"]).for(:permitted_ip_addresses)
+        should_not allow_value(["192.168.0.0/16"]).for(:permitted_ip_addresses)
+        should_not allow_value(["10.0.0.0/8"]).for(:permitted_ip_addresses)
+        should_not allow_value(["1.2.0.0/16", "1.2.3.0/24"]).for(:permitted_ip_addresses)
+        should_not allow_value(21.times.map { |n| "1.2.3.#{n}" }).for(:permitted_ip_addresses)
+
+        # should_not allow_value(["blah"]).for(:permitted_ip_addresses)
+        # should_not allow_value(["1.2.3.4/64"]).for(:permitted_ip_addresses)
       end
 
       context "of name" do
         should normalize_attribute(:name).from(" foo\tbar ").to("foo bar")
+        should normalize_attribute(:name).from(" ").to("")
+        should normalize_attribute(:name).from("\t\n\u200B").to("")
 
         should allow_value("").for(:name)
         should_not allow_value("x" * 101).for(:name)

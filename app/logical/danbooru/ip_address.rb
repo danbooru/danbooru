@@ -86,6 +86,12 @@ module Danbooru
       self.class == other.class && to_s == other.to_s
     end
 
+    def <=>(other)
+      return nil unless other.is_a?(IpAddress)
+
+      [-prefix.to_i, network.to_s] <=> [-other.prefix.to_i, other.network.to_s]
+    end
+
     # This is needed to be able to correctly treat IpAddresses as hash keys,
     # which Rails does internally when preloading associations.
     def hash
