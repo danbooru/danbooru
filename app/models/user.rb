@@ -101,17 +101,24 @@ class User < ApplicationRecord
 
   attr_reader :password
 
-  normalizes :blacklisted_tags, with: ->(string) { string.to_s.lines.map(&:strip).join("\n") }
+  normalizes :blacklisted_tags, with: ->(string) { string.to_s.lines.map(&:strip).join("\n").strip }
+  normalizes :favorite_tags, with: ->(string) { string.normalize_whitespace.strip }
+  normalizes :custom_style, with: ->(string) { string.normalize_whitespace.strip }
 
   after_initialize :initialize_attributes, if: :new_record?
+  validates :blacklisted_tags, visible_string: { allow_empty: true }, length: { maximum: 100_000 }, if: :blacklisted_tags_changed?
+  validates :favorite_tags, visible_string: { allow_empty: true }, length: { maximum: 10_000 }, if: :favorite_tags_changed?
+  validates :custom_style, visible_string: { allow_empty: true }, length: { maximum: 40_000 }, if: :custom_style_changed?
   validates :name, user_name: true, on: :create
   validates :password, length: { minimum: 5 }, if: ->(rec) { rec.new_record? || rec.password.present? }
   validates :default_image_size, inclusion: { in: %w[large original] }
   validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE) }
   validates :password, confirmation: { message: "Passwords don't match" }
   validates :comment_threshold, inclusion: { in: (-100..5) }
-  validate  :validate_enable_private_favorites, on: :update
-  validate  :validate_custom_css, if: :custom_style_changed?
+  validate :validate_enable_private_favorites, on: :update
+  validate :validate_blacklisted_tags, if: :blacklisted_tags_changed?
+  validate :validate_favorite_tags, if: :favorite_tags_changed?
+  validate :validate_custom_css, if: :custom_style_changed?
   before_save :recalculate_upload_points, if: :level_changed?
   before_create :promote_to_owner_if_first_user
 
@@ -237,6 +244,22 @@ class User < ApplicationRecord
     def validate_enable_private_favorites
       if enable_private_favorites_was == false && enable_private_favorites == true && !Pundit.policy!(self, self).can_enable_private_favorites?
         errors.add(:base, "Can't enable privacy mode without a Gold account")
+      end
+    end
+
+    def validate_blacklisted_tags
+      if blacklisted_tags.to_s.lines.size > 5000
+        errors.add(:blacklisted_tags, "can't have more than 5000 blacklist rules")
+      end
+
+      if blacklisted_tags.to_s.split.size > 5000
+        errors.add(:blacklisted_tags, "can't have more than 5000 blacklisted tags")
+      end
+    end
+
+    def validate_favorite_tags
+      if favorite_tags.to_s.split.size > 1000
+        errors.add(:favorite_tags, "can't have more than 1000 favorite tags")
       end
     end
 
@@ -801,7 +824,7 @@ class User < ApplicationRecord
 
     def validate_custom_css
       if !custom_css.valid?
-        errors.add(:base, "Custom CSS contains a syntax error. Validate it with https://codebeautify.org/cssvalidate")
+        errors.add(:custom_style, "contains a syntax error. Validate it with https://codebeautify.org/cssvalidate")
       end
     end
   end
