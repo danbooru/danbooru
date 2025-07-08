@@ -78,8 +78,13 @@ class UploadTest < ActiveSupport::TestCase
     end
 
     context "during validation" do
+      subject { build(:upload) }
+
       should normalize_attribute(:source).from("https://example.com/foo bar.jpg").to("https://example.com/foo%20bar.jpg")
       should normalize_attribute(:source).from("https://bond-live.com/en/wp-content/uploads/2024/12/Vライバー-アイキャッチ-23.png").to("https://bond-live.com/en/wp-content/uploads/2024/12/Vライバー-アイキャッチ-23.png")
+
+      should_not allow_value("https://example.com/#{"x" * 2000}.jpg").for(:source)
+      should_not allow_value("https://example.com/#{"x" * 2000}.jpg").for(:referer_url)
     end
   end
 end

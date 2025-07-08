@@ -23,8 +23,8 @@ class Upload < ApplicationRecord
   # Decode percent-encoded Unicode characters in the URL
   normalizes :source, with: ->(url) { Danbooru::URL.parse(url)&.to_normalized_s.presence || url }
 
-  validates :source, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { source.present? }
-  validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { referer_url.present? }
+  validates :source, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, length: { maximum: 2000 }, if: -> { source.present? && source_changed? }
+  validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, length: { maximum: 2000 }, if: -> { referer_url.present? && referer_url_changed? }
   validates :status, inclusion: { in: %w[pending processing completed error] }
   validate :validate_file_and_source, on: :create
   validate :validate_archive_files, on: :create
