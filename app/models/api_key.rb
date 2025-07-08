@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class ApiKey < ApplicationRecord
+  # Set to the current HTTP request when creating, updating, or destroying the API key.
+  attr_accessor :request
+
   attribute :permitted_ip_addresses, :ip_address, array: true
   attribute :last_ip_address, :ip_address
 
@@ -20,6 +23,9 @@ class ApiKey < ApplicationRecord
   validates :name, length: { maximum: 100 }, if: :name_changed?
   validates :name, visible_string: { allow_empty: true }, if: :name_changed?
   validates :permitted_ip_addresses, length: { maximum: 20 }, if: :permitted_ip_addresses_changed?
+
+  after_destroy :create_user_event
+  after_save :create_user_event
 
   has_secure_token :key
 
@@ -54,6 +60,19 @@ class ApiKey < ApplicationRecord
           break
         end
       end
+    end
+  end
+
+  def create_user_event
+    # The request will be nil when the user deactivates their account, which destroys all their API keys without logging events for each one.
+    return if request.nil?
+
+    if previously_new_record?
+      UserEvent.create_from_request!(user, :api_key_create, request)
+    elsif destroyed?
+      UserEvent.create_from_request!(user, :api_key_delete, request)
+    elsif saved_change_to_permissions? || saved_change_to_permitted_ip_addresses?
+      UserEvent.create_from_request!(user, :api_key_update, request)
     end
   end
 

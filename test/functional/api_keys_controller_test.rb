@@ -64,6 +64,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to user_api_keys_path(@user.id)
         assert_equal("blah", @user.api_keys.last.name)
+        assert_equal(true, @user.user_events.api_key_create.exists?)
       end
     end
 
@@ -81,10 +82,12 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
     context "#update action" do
       should "render for the API key owner" do
-        put_auth api_key_path(@api_key.id), @user, params: { api_key: { name: "blah" }}
+        put_auth api_key_path(@api_key.id), @user, params: { api_key: { name: "blah", permitted_ip_addresses: "1.2.3.4" }}
 
         assert_redirected_to user_api_keys_path(@user.id)
         assert_equal("blah", @api_key.reload.name)
+        assert_equal(["1.2.3.4"], @api_key.permitted_ip_addresses.map(&:to_s))
+        assert_equal(true, @user.user_events.api_key_update.exists?)
       end
 
       should "fail for someone else" do
@@ -99,6 +102,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to user_api_keys_path(@user.id)
         assert_raise(ActiveRecord::RecordNotFound) { @api_key.reload }
+        assert_equal(true, @user.user_events.api_key_delete.exists?)
       end
 
       should "not allow deleting another user's API key" do

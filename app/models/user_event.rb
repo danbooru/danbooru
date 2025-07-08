@@ -58,6 +58,9 @@ class UserEvent < ApplicationRecord
     backup_code_generate: 800,            # The user generated new backup codes.
     backup_code_login: 840,               # The user successfully entered their password and backup code on the login page.
     backup_code_reauthenticate: 845,      # The user successfully entered their password and backup code on the confirm password page.
+    api_key_create: 900,                  # The user created a new API key.
+    api_key_update: 910,                  # The user changed the permissions of an API key.
+    api_key_delete: 920,                  # The user deleted an API key.
   }
 
   delegate :country, :city, :is_proxy?, to: :ip_geolocation, allow_nil: true

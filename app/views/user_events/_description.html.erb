@@ -51,4 +51,10 @@
   <%= link_to_user user_event.user %> logged in with a backup code.
 <% when "backup_code_reauthenticate" %>
   <%= link_to_user user_event.user %> reauthenticated with a backup code.
+<% when "api_key_create" %>
+  <%= link_to_user user_event.user %> created a new API key.
+<% when "api_key_update" %>
+  <%= link_to_user user_event.user %> updated an API key.
+<% when "api_key_delete" %>
+  <%= link_to_user user_event.user %> deleted an API key.
 <% end %>

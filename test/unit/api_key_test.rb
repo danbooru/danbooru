@@ -6,11 +6,6 @@ class ApiKeyTest < ActiveSupport::TestCase
   end
 
   context "ApiKey:" do
-    setup do
-      @user = create(:user)
-      @api_key = create(:api_key, user: @user)
-    end
-
     context "During validation" do
       subject { build(:api_key) }
 
@@ -70,20 +65,43 @@ class ApiKeyTest < ActiveSupport::TestCase
       end
     end
 
-    should "generate a unique key" do
-      assert_not_nil(@api_key.key)
-    end
+    context "when creating an API key" do
+      setup do
+        @user = create(:user)
+        @api_key = create(:api_key, user: @user)
+      end
 
-    should "authenticate via api key" do
-      assert_equal([@user, @api_key], @user.authenticate_api_key(@api_key.key))
-    end
+      should "record a user event" do
+        assert_equal(true, @user.user_events.api_key_create.exists?)
+      end
 
-    should "not authenticate with the wrong api key" do
-      assert_equal(false, @user.authenticate_api_key("xxx"))
-    end
+      should "record a user event when updating the key" do
+        @api_key.update!(permitted_ip_addresses: ["1.2.3.4"])
 
-    should "not authenticate with the wrong name" do
-      assert_equal(false, create(:user).authenticate_api_key(@api_key.key))
+        assert_equal(true, @user.user_events.api_key_update.exists?)
+      end
+
+      should "record a user event when destroying the key" do
+        @api_key.destroy!
+
+        assert_equal(true, @user.user_events.api_key_delete.exists?)
+      end
+
+      should "generate a unique key" do
+        assert_not_nil(@api_key.key)
+      end
+
+      should "authenticate via api key" do
+        assert_equal([@user, @api_key], @user.authenticate_api_key(@api_key.key))
+      end
+
+      should "not authenticate with the wrong api key" do
+        assert_equal(false, @user.authenticate_api_key("xxx"))
+      end
+
+      should "not authenticate with the wrong name" do
+        assert_equal(false, create(:user).authenticate_api_key(@api_key.key))
+      end
     end
   end
 end

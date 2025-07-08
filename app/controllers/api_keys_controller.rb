@@ -10,8 +10,9 @@ class ApiKeysController < ApplicationController
   end
 
   def create
-    @api_key = authorize ApiKey.new(user: CurrentUser.user, **permitted_attributes(ApiKey))
+    @api_key = authorize ApiKey.new(user: CurrentUser.user, request: request, **permitted_attributes(ApiKey))
     @api_key.save
+
     respond_with(@api_key, location: user_api_keys_path(CurrentUser.user.id))
   end
 
@@ -22,7 +23,8 @@ class ApiKeysController < ApplicationController
 
   def update
     @api_key = authorize ApiKey.find(params[:id])
-    @api_key.update(permitted_attributes(@api_key))
+    @api_key.update(request: request, **permitted_attributes(@api_key))
+
     respond_with(@api_key, location: user_api_keys_path(CurrentUser.user.id))
   end
 
@@ -34,7 +36,9 @@ class ApiKeysController < ApplicationController
 
   def destroy
     @api_key = authorize ApiKey.find(params[:id])
+    @api_key.request = request
     @api_key.destroy
+
     respond_with(@api_key, location: user_api_keys_path(CurrentUser.user.id))
   end
 end
