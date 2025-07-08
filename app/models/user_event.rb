@@ -63,6 +63,8 @@ class UserEvent < ApplicationRecord
     api_key_delete: 920,                  # The user deleted an API key.
   }
 
+  normalizes :user_agent, with: ->(user_agent) { user_agent.to_s.truncate(800, separator: " ", omission: " ...") }
+
   delegate :country, :city, :is_proxy?, to: :ip_geolocation, allow_nil: true
 
   scope :authorized, -> { where(category: AUTHORIZED_EVENTS) }
