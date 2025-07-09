@@ -11,7 +11,7 @@
       Blacklisted
     </label>
 
-    <span class="post-count" x-text="blacklist.blacklistedPosts.length"></span>
+    <span class="whitespace-nowrap post-count" x-text="blacklist.blacklistedPosts.length"></span>
     <span class="flex items-center flex-grow-1 justify-end gap-1">
       <%= render PopupMenuComponent.new do |menu| %>
         <% menu.with_item do %>
@@ -62,7 +62,7 @@
            x-show="rule.visible">
         <input type="checkbox" class="toggle-switch" x-model="rule.enabled">
         <%= link_to rule, posts_path(tags: rule), title: rule, class: "truncate", tabindex: "-1", "x-bind:class": "{ 'inactive-link': !rule.enabled }", "x-on:click.prevent": "rule.toggle()" %>
-        <span class="post-count" x-text="rule.posts.size"></span>
+        <span class="whitespace-nowrap post-count" x-text="rule.posts.size"></span>
       </div>
     <% end %>
   <% end %>
