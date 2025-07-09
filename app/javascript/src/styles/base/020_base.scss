@@ -91,9 +91,10 @@ input, select, textarea, button {
   background-color: var(--target-text-background-color);
 }
 
-// Text selected by link anchor targets (e.g. /forum_topics/123#forum_post_456).
+// Highlight elements selected by link anchor targets (e.g. /forum_topics/123#forum_post_456), but not headings or
+// random text selected by ::target-text.
 // Use !important to override even table row backgrounds.
-:target:not(h1, h2, h3, h4, h5, h6, ::target-text) {
+:target[id]:not(h1, h2, h3, h4, h5, h6) {
   background-color: var(--target-background) !important;
 }
 
