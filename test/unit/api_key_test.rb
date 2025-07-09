@@ -26,6 +26,7 @@ class ApiKeyTest < ActiveSupport::TestCase
         should normalize_attribute(:permitted_ip_addresses).from(%w[5.6.7.8 1.2.3.4]).to(to_ips(["1.2.3.4", "5.6.7.8"]))
         should normalize_attribute(:permitted_ip_addresses).from(%w[1.2.3.4/16 5.6.7.8/24]).to(to_ips(["5.6.7.8/24", "1.2.3.4/16"]))
         should normalize_attribute(:permitted_ip_addresses).from(%w[1.2.3.4/24 1.2.3.4/24]).to(to_ips(["1.2.3.4/24"]))
+        should normalize_attribute(:permitted_ip_addresses).from([nil, "1.2.3.4/16", "5.6.7.8/24"]).to(to_ips(["5.6.7.8/24", "1.2.3.4/16"]))
         should normalize_attribute(:permitted_ip_addresses).from([nil, "", " "]).to(to_ips([]))
 
         should allow_value([]).for(:permitted_ip_addresses)

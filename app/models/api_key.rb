@@ -11,7 +11,7 @@ class ApiKey < ApplicationRecord
   array_attribute :permitted_ip_addresses
 
   normalizes :permissions, with: ->(permissions) { permissions.compact_blank }
-  normalizes :permitted_ip_addresses, with: ->(ips) { ips.sort.uniq.compact_blank }
+  normalizes :permitted_ip_addresses, with: ->(ips) { ips.compact_blank.sort.uniq }
   normalizes :name, with: ->(name) { name.unicode_normalize(:nfc).normalize_whitespace.strip }
 
   belongs_to :user
