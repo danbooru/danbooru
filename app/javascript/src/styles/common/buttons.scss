@@ -2,9 +2,11 @@
   display: inline-flex;
   gap: 0.25rem;
   align-items: center;
+  justify-content: center;
   white-space: nowrap;
-  border-radius: 4px;
-  padding: 0.5em 1em;
+  border-radius: 0.25rem;
+  border-width: 1px;
+  padding: 0.375rem 0.875rem;
   line-height: 1;
   user-select: none;
 
@@ -48,8 +50,6 @@ a, button, input[type="submit"], input[type="button"] {
     @extend %button;
 
     color: var(--button-text-color);
-
-    border: none;
     transition:
       background-color 125ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
       box-shadow 125ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
@@ -68,6 +68,7 @@ a, button, input[type="submit"], input[type="button"] {
   /* A solid blue button. */
   &.button-primary {
     background-color: var(--button-primary-background-color);
+    border-color: transparent;
 
     &:hover:not([disabled]) {
       background-color: var(--button-primary-hover-background-color);
@@ -77,6 +78,7 @@ a, button, input[type="submit"], input[type="button"] {
   /* A solid red button. */
   &.button-danger {
     background-color: var(--button-danger-background-color);
+    border-color: transparent;
 
     &:hover:not([disabled]) {
       background-color: var(--button-danger-hover-background-color);
@@ -89,7 +91,7 @@ a, button, input[type="submit"], input[type="button"] {
 
     color: var(--button-outline-primary-color);
     background-color: transparent;
-    border: 1px solid var(--button-outline-primary-color);
+    border-color: var(--button-outline-primary-color);
 
     transition: background-color 125ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border 125ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
@@ -100,7 +102,7 @@ a, button, input[type="submit"], input[type="button"] {
 
     &[disabled] {
       color: var(--button-disabled-color);
-      border: 1px solid var(--button-disabled-color);
+      border-color: var(--button-disabled-color);
     }
   }
 
@@ -110,7 +112,7 @@ a, button, input[type="submit"], input[type="button"] {
 
     color: var(--button-outline-danger-color);
     background-color: transparent;
-    border: 1px solid var(--button-outline-danger-color);
+    border-color: var(--button-outline-danger-color);
 
     transition: background-color 125ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border 125ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
@@ -120,36 +122,36 @@ a, button, input[type="submit"], input[type="button"] {
     }
 
     &[disabled] {
-      color: var(--button-primary-disabled-color);
-      border: 1px solid var(--button-primary-disabled-color);
+      color: var(--button-disabled-color);
+      border-color: var(--button-disabled-color);
     }
   }
 
   /* An extra extra small button. */
   &.button-xxs {
-    padding: 0 0.5rem;
-    font-size: var(--text-xs);
+    padding: 0.125rem 0.375rem;
+    font-size: var(--text-xxs);
   }
 
   /* An extra small button. */
   &.button-xs {
-    padding: 0.125rem 0.5rem;
+    padding: 0.1875rem 0.5rem;
     font-size: var(--text-xs);
   }
 
   /* A small button. */
   &.button-sm {
-    padding: 0.25em 1em;
-    height: 24px;
+    padding: 0.25rem 0.625rem;
+    font-size: var(--text-sm);
   }
 
   /* A medium button. */
   &.button-md {
-    padding: 0.5em 1em;
+    padding: 0.375rem 0.875rem;
   }
 
   /* A large button. */
   &.button-lg {
-    padding: 0.75em 1em;
+    padding: 0.5rem 1.25rem;
   }
 }

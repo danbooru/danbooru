@@ -21,20 +21,20 @@
 
         <p>
           <% @user.backup_codes.to_a.each do |code| %>
-            <code class="block !text-xxl text-center"><%= code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0") %></code>
+            <pre class="block !text-xxl text-center"><%= code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0") %></pre>
           <% end %>
         </p>
 
         <div class="flex justify-center gap-4">
-          <%= link_to user_backup_codes_path(@user, format: :txt), class: "button-outline-primary button-sm", download: "danbooru-backup-codes.txt" do %>
+          <%= link_to user_backup_codes_path(@user, format: :txt), class: "button-outline-primary", download: "danbooru-backup-codes.txt" do %>
             <%= download_icon %> Download
           <% end %>
 
-          <%= tag.button class: "button-outline-primary button-sm", onclick: "Danbooru.Utility.printPage('#{j user_backup_codes_path(@user, format: :txt)}')" do %>
+          <%= tag.button class: "button-outline-primary", onclick: "Danbooru.Utility.printPage('#{j user_backup_codes_path(@user, format: :txt)}')" do %>
             <%= print_icon %> Print
           <% end %>
 
-          <%= tag.button class: "button-outline-primary button-sm", onclick: "Danbooru.Utility.copyToClipboard('#{j @user.backup_codes.to_a.join("\n")}')" do %>
+          <%= tag.button class: "button-outline-primary", onclick: "Danbooru.Utility.copyToClipboard('#{j @user.backup_codes.to_a.join("\n")}')" do %>
             <%= copy_icon %> Copy
           <% end %>
         </div>

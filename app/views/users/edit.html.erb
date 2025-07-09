@@ -88,7 +88,7 @@
             </div>
 
             <div>
-              <%= link_to "Change password", edit_user_password_path(user_id: @user.id), class: "button-primary button-sm" %>
+              <%= link_to "Change password", edit_user_password_path(user_id: @user.id), class: "button-primary" %>
             </div>
           </div>
 
@@ -109,9 +109,9 @@
 
             <div>
               <% if @user.totp.present? %>
-                <%= link_to "Disable", edit_user_totp_path(user_id: @user.id), class: "button-outline-danger button-sm" %>
+                <%= link_to "Disable", edit_user_totp_path(user_id: @user.id), class: "button-outline-danger" %>
               <% else %>
-                <%= link_to "Enable", edit_user_totp_path(user_id: @user.id), class: "button-primary button-sm" %>
+                <%= link_to "Enable", edit_user_totp_path(user_id: @user.id), class: "button-primary" %>
               <% end %>
             </div>
           </div>
@@ -124,7 +124,7 @@
               </div>
 
               <div>
-                <%= link_to "View", user_backup_codes_path(@user), class: "button-primary button-sm" %>
+                <%= link_to "View", user_backup_codes_path(@user), class: "button-primary" %>
               </div>
             </div>
           <% end %>
@@ -145,7 +145,7 @@
             </div>
 
             <div>
-              <%= link_to "View", user_user_events_path(@user), class: "button-primary button-sm" %>
+              <%= link_to "View", user_user_events_path(@user), class: "button-primary" %>
             </div>
           </div>
         </div>
