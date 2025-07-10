@@ -106,6 +106,15 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_equal("bbb 456", @ss4.reload.query)
         assert_equal("123 bbb", @ss5.reload.query)
       end
+
+      should "not fail if user has a saved search that is too long" do
+        ss = build(:saved_search, query: SavedSearch::MAX_TAGS.succ.times.map { |n| "tag#{n}" }.join(" "))
+        ss.save!(validate: false)
+
+        TagAlias.approve!(antecedent_name: "tag0", consequent_name: "new_tag", approver: @admin)
+
+        assert_equal(true, ss.reload.query.split.include?("new_tag"))
+      end
     end
 
     context "blacklists" do
@@ -127,6 +136,15 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_equal("111 aaa", @u5.reload.blacklisted_tags)
         assert_equal("111 222\n\naaa 333", @u6.reload.blacklisted_tags)
         assert_equal("111 aaa\n222 333", @u7.reload.blacklisted_tags)
+      end
+
+      should "not fail if the user has too many blacklisted tags" do
+        user = build(:user, blacklisted_tags: User::MAX_BLACKLIST_TAGS.succ.times.map { |n| "tag#{n}" }.join("\n"))
+        user.save!(validate: false)
+
+        TagAlias.approve!(antecedent_name: "tag0", consequent_name: "new_tag", approver: @admin)
+
+        assert_equal(true, user.reload.blacklisted_tags.split.include?("new_tag"))
       end
     end
 
@@ -209,12 +227,30 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_equal("foo [[bbb]] bar", @wiki.reload.body)
       end
 
+      should "not fail to rewrite wikis if the wiki page is too long" do
+        @wiki = build(:wiki_page, body: "foo [[aaa]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}")
+        @wiki.save!(validate: false)
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+
+        assert_equal("foo [[bbb]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}", @wiki.reload.body)
+      end
+
       should "rewrite links in pool descriptions to use the new tag" do
         @pool = create(:pool, description: "foo [[aaa]] bar")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
 
         assert_equal("foo [[bbb]] bar", @pool.reload.description)
+      end
+
+      should "not fail to rewrite pool descriptions if the pool description is too long" do
+        @pool = build(:pool, description: "foo [[aaa]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}")
+        @pool.save!(validate: false)
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+
+        assert_equal("foo [[bbb]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}", @pool.reload.description)
       end
     end
 

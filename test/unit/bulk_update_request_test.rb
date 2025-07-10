@@ -196,6 +196,81 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(true, @alias.present?)
           assert_equal(true, @alias.is_active?)
         end
+
+        context "when rewriting wiki pages" do
+          should "rewrite wiki pages to use the new tag" do
+            @wiki = create(:wiki_page, body: "[[aaa]] bar")
+
+            create_bur!("alias aaa -> bbb", @admin)
+
+            assert_equal("[[bbb]] bar", @wiki.reload.body)
+          end
+
+          should "not fail to rewrite wiki pages if the body is too long" do
+            @wiki = build(:wiki_page, title: "foo", body: "[[aaa]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}")
+            @wiki.save!(validate: false)
+
+            create_bur!("alias aaa -> bbb", @admin)
+
+            assert_equal("[[bbb]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}", @wiki.reload.body)
+          end
+        end
+
+        context "when rewriting pool descriptions" do
+          should "rewrite pool descriptions to use the new tag" do
+            @pool = create(:pool, description: "foo [[aaa]] bar")
+
+            create_bur!("alias aaa -> bbb", @admin)
+
+            assert_equal("foo [[bbb]] bar", @pool.reload.description)
+          end
+
+          should "not fail to rewrite pool descriptions if the pool description is too long" do
+            @pool = build(:pool, description: "foo [[aaa]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}")
+            @pool.save!(validate: false)
+
+            create_bur!("alias aaa -> bbb", @admin)
+
+            assert_equal("foo [[bbb]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}", @pool.reload.description)
+          end
+        end
+
+        context "when moving blacklisted tags" do
+          should "move blacklisted tags" do
+            user = create(:user, blacklisted_tags: "old_tag")
+            create_bur!("alias old_tag -> new_tag", @admin)
+
+            assert_equal(true, user.reload.blacklisted_tags.split.include?("new_tag"))
+          end
+
+          should "not fail if the user has too many blacklisted tags" do
+            user = build(:user, blacklisted_tags: User::MAX_BLACKLIST_TAGS.succ.times.map { |n| "tag#{n}" }.join("\n"))
+            user.save!(validate: false)
+
+            create_bur!("alias tag0 -> new_tag", @admin)
+
+            assert_equal(true, user.reload.blacklisted_tags.split.include?("new_tag"))
+          end
+        end
+
+        context "when moving saved searches" do
+          should "move saved searches" do
+            create(:tag, name: "old_tag")
+            ss = create(:saved_search, query: "old_tag")
+            create_bur!("alias old_tag -> new_tag", @admin)
+
+            assert_equal(true, ss.reload.query.split.include?("new_tag"))
+          end
+
+          should "not fail if the saved search has too many tags" do
+            ss = build(:saved_search, query: SavedSearch::MAX_TAGS.succ.times.map { |n| create(:tag, name: "tag#{n}").name }.join(" "))
+            ss.save!(validate: false)
+
+            create_bur!("alias tag0 -> new_tag", @admin)
+
+            assert_equal(true, ss.reload.query.split.include?("new_tag"))
+          end
+        end
       end
 
       context "the create implication command" do
@@ -518,6 +593,86 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
             assert_equal("tony_taka_(style)", @post.reload.tag_string)
             assert_equal("tony_taka_(style)", @wiki.reload.title)
+          end
+        end
+
+        context "when rewriting wiki pages" do
+          should "rewrite wiki pages to use the new tag" do
+            create(:tag, name: "aaa")
+            @wiki = create(:wiki_page, body: "[[aaa]] bar")
+
+            create_bur!("rename aaa -> bbb", @admin)
+
+            assert_equal("[[bbb]] bar", @wiki.reload.body)
+          end
+
+          should "not fail to rewrite wiki pages if the body is too long" do
+            create(:tag, name: "aaa")
+            @wiki = build(:wiki_page, title: "foo", body: "[[aaa]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}")
+            @wiki.save!(validate: false)
+
+            create_bur!("rename aaa -> bbb", @admin)
+
+            assert_equal("[[bbb]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}", @wiki.reload.body)
+          end
+        end
+
+        context "when rewriting pool descriptions" do
+          should "rewrite pool descriptions to use the new tag" do
+            create(:tag, name: "aaa")
+            @pool = create(:pool, description: "foo [[aaa]] bar")
+
+            create_bur!("rename aaa -> bbb", @admin)
+
+            assert_equal("foo [[bbb]] bar", @pool.reload.description)
+          end
+
+          should "not fail to rewrite pool descriptions if the pool description is too long" do
+            create(:tag, name: "aaa")
+            @pool = build(:pool, description: "foo [[aaa]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}")
+            @pool.save!(validate: false)
+
+            create_bur!("rename aaa -> bbb", @admin)
+
+            assert_equal("foo [[bbb]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}", @pool.reload.description)
+          end
+        end
+
+        context "when moving blacklisted tags" do
+          should "move blacklisted tags" do
+            create(:tag, name: "old_tag")
+            user = create(:user, blacklisted_tags: "old_tag")
+            create_bur!("rename old_tag -> new_tag", @admin)
+
+            assert_equal(true, user.reload.blacklisted_tags.split.include?("new_tag"))
+          end
+
+          should "not fail if the user has too many blacklisted tags" do
+            user = build(:user, blacklisted_tags: User::MAX_BLACKLIST_TAGS.succ.times.map { |n| create(:tag, name: "tag#{n}").name }.join("\n"))
+            user.save!(validate: false)
+
+            create_bur!("rename tag0 -> new_tag", @admin)
+
+            assert_equal(true, user.reload.blacklisted_tags.split.include?("new_tag"))
+          end
+        end
+
+        context "when moving saved searches" do
+          should "move saved searches" do
+            create(:tag, name: "old_tag")
+            ss = create(:saved_search, query: "old_tag")
+            create_bur!("rename old_tag -> new_tag", @admin)
+
+            assert_equal(true, ss.reload.query.split.include?("new_tag"))
+          end
+
+          should "not fail if the saved search has too many tags" do
+            ss = build(:saved_search, query: SavedSearch::MAX_TAGS.succ.times.map { |n| create(:tag, name: "tag#{n}").name }.join(" "))
+            ss.save!(validate: false)
+
+            create_bur!("rename tag0 -> new_tag", @admin)
+
+            assert_equal(true, ss.reload.query.split.include?("new_tag"))
           end
         end
       end

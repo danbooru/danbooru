@@ -5,6 +5,9 @@ class User < ApplicationRecord
 
   class PrivilegeError < StandardError; end
 
+  MAX_BLACKLIST_TAGS = 5_000
+  MAX_BLACKLIST_RULES = 5_000
+
   module Levels
     ANONYMOUS = 0
     RESTRICTED = 10
@@ -248,12 +251,12 @@ class User < ApplicationRecord
     end
 
     def validate_blacklisted_tags
-      if blacklisted_tags.to_s.lines.size > 5000
-        errors.add(:blacklisted_tags, "can't have more than 5000 blacklist rules")
+      if blacklisted_tags.to_s.lines.size > MAX_BLACKLIST_RULES
+        errors.add(:blacklisted_tags, "can't have more than #{MAX_BLACKLIST_RULES} blacklist rules")
       end
 
-      if blacklisted_tags.to_s.split.size > 5000
-        errors.add(:blacklisted_tags, "can't have more than 5000 blacklisted tags")
+      if blacklisted_tags.to_s.split.size > MAX_BLACKLIST_TAGS
+        errors.add(:blacklisted_tags, "can't have more than #{MAX_BLACKLIST_TAGS} blacklisted tags")
       end
     end
 
@@ -614,7 +617,7 @@ class User < ApplicationRecord
         has_blacklisted_tag(old_name).find_each do |user|
           user.with_lock do
             user.rewrite_blacklist(old_name, new_name)
-            user.save!
+            user.save!(validate: false)
           end
         end
       end

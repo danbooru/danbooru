@@ -4,6 +4,7 @@ class WikiPage < ApplicationRecord
   class RevertError < StandardError; end
 
   META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:","api:"]
+  MAX_WIKI_LENGTH = 80_000
 
   after_save :create_version
 
@@ -16,7 +17,7 @@ class WikiPage < ApplicationRecord
 
   validates :title, tag_name: true, presence: true, uniqueness: true, if: :title_changed?
   validates :body, visible_string: true, unless: -> { is_deleted? || other_names.present? }
-  validates :body, length: { maximum: 80_000 }, if: :body_changed?
+  validates :body, length: { maximum: MAX_WIKI_LENGTH }, if: :body_changed?
   validates :other_names, length: { maximum: 80, too_long: "can't have more than 80 names" }, if: :other_names_changed?
   validate :validate_rename
   validate :validate_other_names, if: :other_names_changed?
@@ -243,7 +244,8 @@ class WikiPage < ApplicationRecord
   def self.rewrite_wiki_links!(old_name, new_name)
     WikiPage.linked_to(old_name).each do |wiki|
       wiki.with_lock do
-        wiki.update!(body: DText.new(wiki.body).rewrite_wiki_links(old_name, new_name).to_s)
+        wiki.body = DText.new(wiki.body).rewrite_wiki_links(old_name, new_name).to_s
+        wiki.save!(validate: false)
       end
     end
   end

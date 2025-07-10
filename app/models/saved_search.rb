@@ -3,6 +3,7 @@
 class SavedSearch < ApplicationRecord
   REDIS_EXPIRY = 1.hour
   QUERY_LIMIT = 1000
+  MAX_TAGS = 150
 
   attr_reader :disable_labels
 
@@ -169,7 +170,7 @@ class SavedSearch < ApplicationRecord
         has_tag(old_name).find_each do |ss|
           ss.with_lock do
             ss.rewrite_query(old_name, new_name)
-            ss.save!
+            ss.save!(validate: false)
           end
         end
       end
@@ -196,8 +197,8 @@ class SavedSearch < ApplicationRecord
   end
 
   def validate_query
-    if post_query.total_term_count > 150
-      errors.add(:query, "can't have more than 150 tags")
+    if post_query.total_term_count > MAX_TAGS
+      errors.add(:query, "can't have more than #{MAX_TAGS} tags")
     end
   end
 

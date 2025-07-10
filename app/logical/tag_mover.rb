@@ -51,7 +51,7 @@ class TagMover
     if new_artist.nil?
       old_artist.name = new_tag.name
       old_artist.other_names += [old_tag.name]
-      old_artist.save!
+      old_artist.save!(validate: false)
     else
       merge_artists!
     end
@@ -76,7 +76,7 @@ class TagMover
       post.with_lock do
         post.remove_tag(old_tag.name)
         post.add_tag(new_tag.name)
-        post.save!
+        post.save! # XXX should do `validate: false`, but validations are currently need to parse the tags
       end
     end
   end
@@ -160,14 +160,14 @@ class TagMover
       new_artist.url_string += "\n" + old_artist.url_string
       new_artist.is_deleted = false
       new_artist.is_banned = old_artist.is_banned || new_artist.is_banned
-      new_artist.save!
+      new_artist.save!(validate: false)
 
       old_artist.other_names = [new_artist.name]
       old_artist.group_name = ""
       old_artist.url_string = ""
       old_artist.is_deleted = true
       old_artist.is_banned = false
-      old_artist.save!
+      old_artist.save!(validate: false)
     end
   end
 
@@ -181,12 +181,12 @@ class TagMover
       new_wiki.other_names += old_wiki.other_names
       new_wiki.is_deleted = false
       new_wiki.body = old_wiki.body if new_wiki.body.blank? && old_wiki.body.present?
-      new_wiki.save!
+      new_wiki.save!(validate: false)
 
       old_wiki.body = "This tag has been moved to [[#{new_wiki.title}]]."
       old_wiki.other_names = []
       old_wiki.is_deleted = true
-      old_wiki.save!
+      old_wiki.save!(validate: false)
     end
   end
 
