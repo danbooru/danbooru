@@ -457,15 +457,28 @@ class User < ApplicationRecord
     # @param request [ActionDispatch::Request] The HTTP request.
     # @param max_codes [Integer] The number of backup codes to generate.
     # @param length [Integer] The number of digits in each backup code.
-    def generate_backup_codes!(request, max_codes: MAX_BACKUP_CODES, length: BACKUP_CODE_LENGTH)
+    def generate_backup_codes!(request = nil, max_codes: MAX_BACKUP_CODES, length: BACKUP_CODE_LENGTH)
       with_lock do
         update!(backup_codes: max_codes.times.map { generate_backup_code(length) })
-        UserEvent.create_from_request!(self, :backup_code_generate, request)
+        UserEvent.create_from_request!(self, :backup_code_generate, request) if request.present?
       end
     end
 
     def generate_backup_code(length = BACKUP_CODE_LENGTH)
       SecureRandom.rand(10**length)
+    end
+
+    def send_backup_code!(current_user)
+      with_lock do
+        if backup_codes.blank?
+          errors.add(:base, "doesn't have backup codes")
+        elsif email_address.blank?
+          errors.add(:base, "doesn't have an email address")
+        else
+          UserMailer.send_backup_code(self).deliver_later
+          ModAction.log("sent backup code to user ##{id}", :backup_code_send, subject: self, user: current_user)
+        end
+      end
     end
   end
 

@@ -87,6 +87,15 @@ class UserMailerTest < ActionMailer::TestCase
       end
     end
 
+    context "send_backup_code method" do
+      should "work" do
+        @user.generate_backup_codes!
+        mail = UserMailer.send_backup_code(@user)
+
+        assert_emails(1) { mail.deliver_now }
+      end
+    end
+
     context "dmail_complaint method" do
       should "work" do
         dmca = {

@@ -1,30 +1,30 @@
 class UserMailerPreview < ActionMailer::Preview
   def dmail_notice
-    user = params[:id].present? ? User.find(params[:id]) : User.owner
-    dmail = Dmail.received.order(id: :desc).offset(279).first
+    dmail = user.dmails.received.last
+
     UserMailer.dmail_notice(dmail)
   end
 
   def password_reset
-    user = params[:id].present? ? User.find(params[:id]) : User.owner
     UserMailer.password_reset(user)
   end
 
   def email_change_confirmation
-    user = params[:id].present? ? User.find(params[:id]) : User.owner
     UserMailer.email_change_confirmation(user)
   end
 
   def welcome_user
-    user = params[:id].present? ? User.find(params[:id]) : User.owner
     UserMailer.welcome_user(user)
   end
 
   def login_verification
-    user = params[:id].present? ? User.find(params[:id]) : User.owner
     user_event = user.user_events.login_pending_verification.last
 
     UserMailer.login_verification(user_event)
+  end
+
+  def send_backup_code
+    UserMailer.send_backup_code(user)
   end
 
   def dmca_complaint
@@ -39,5 +39,11 @@ class UserMailerPreview < ActionMailer::Preview
     }
 
     UserMailer.with(dmca: dmca).dmca_complaint(to: dmca[:email])
+  end
+
+  private
+
+  def user
+    params[:id].present? ? User.find(params[:id]) : User.owner
   end
 end

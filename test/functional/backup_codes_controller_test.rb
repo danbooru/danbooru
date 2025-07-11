@@ -104,5 +104,132 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
         end
       end
     end
+
+    context "confirm recover action" do
+      context "for an admin recovering a member account" do
+        should "show the confirm recover page" do
+          @user = create(:user, :with_2fa, :with_email)
+          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user)
+
+          assert_response :success
+        end
+
+        should "show the confirm recover page for a user without backup codes" do
+          @user = create(:user, :with_email)
+          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user)
+
+          assert_response :success
+        end
+
+        should "show the confirm recover page for a user without an email" do
+          @user = create(:user, :with_2fa)
+          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user)
+
+          assert_response :success
+        end
+      end
+
+      context "for an admin recovering a moderator account" do
+        should "not show the confirm recover page" do
+          @user = create(:moderator_user, :with_2fa, :with_email)
+          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user)
+
+          assert_response 403
+        end
+      end
+
+      context "for a member recovering someone else's account" do
+        should "not show the confirm recover page" do
+          @user = create(:user, :with_2fa, :with_email)
+          get_auth confirm_recover_user_backup_codes_path(@user), create(:user)
+
+          assert_response 403
+        end
+      end
+
+      context "for an admin who hasn't authenticated recently" do
+        should "redirect to the confirm password page" do
+          @user = create(:user, :with_2fa, :with_email)
+
+          travel_to(1.day.ago) { login_as(create(:admin_user)) }
+          get confirm_recover_user_backup_codes_path(@user)
+
+          assert_redirected_to confirm_password_session_path(url: confirm_recover_user_backup_codes_path(@user))
+        end
+      end
+    end
+
+    context "recover action" do
+      context "for an admin recovering a member account" do
+        should "send the recovery email" do
+          @admin = create(:admin_user)
+          @user = create(:user, :with_2fa, :with_email)
+          post_auth recover_user_backup_codes_path(@user), @admin
+
+          assert_redirected_to edit_admin_user_path(@user)
+          assert_equal("backup_code_send", ModAction.last.category)
+          assert_equal(@admin, ModAction.last.creator)
+          assert_equal(@user, ModAction.last.subject)
+          assert_equal("sent backup code to user ##{@user.id}", ModAction.last.description)
+
+          assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer send_backup_code] })
+          perform_enqueued_jobs
+          assert_performed_jobs(1, only: MailDeliveryJob)
+        end
+
+        should "fail for a user without backup codes" do
+          @user = create(:user, :with_email)
+          post_auth recover_user_backup_codes_path(@user), create(:admin_user)
+
+          assert_response 406
+          assert_equal(false, ModAction.backup_code_send.exists?)
+          assert_no_enqueued_jobs
+        end
+
+        should "fail for a user without an email" do
+          @user = create(:user, :with_2fa)
+          post_auth recover_user_backup_codes_path(@user), create(:admin_user)
+
+          assert_response 406
+          assert_equal(false, ModAction.backup_code_send.exists?)
+          assert_no_enqueued_jobs
+        end
+      end
+
+      context "for an admin recovering a moderator account" do
+        should "fail" do
+          @user = create(:moderator_user, :with_2fa, :with_email)
+          post_auth recover_user_backup_codes_path(@user), create(:admin_user)
+
+          assert_response 403
+          assert_equal(false, ModAction.backup_code_send.exists?)
+          assert_no_enqueued_jobs
+        end
+      end
+
+      context "for a member recovering someone else's account" do
+        should "fail" do
+          @user = create(:user, :with_2fa, :with_email)
+          post_auth recover_user_backup_codes_path(@user), create(:user)
+
+          assert_response 403
+          assert_equal(false, ModAction.backup_code_send.exists?)
+          assert_no_enqueued_jobs
+        end
+      end
+
+      context "for an admin who hasn't authenticated recently" do
+        should "redirect to the confirm password page" do
+          @user = create(:user, :with_2fa, :with_email)
+
+          travel_to(1.day.ago) { login_as(create(:admin_user)) }
+          post recover_user_backup_codes_path(@user)
+
+          assert_redirected_to confirm_password_session_path(url: recover_user_backup_codes_path(@user))
+          assert_equal(false, ModAction.backup_code_send.exists?)
+          assert_no_enqueued_jobs
+        end
+      end
+    end
   end
 end

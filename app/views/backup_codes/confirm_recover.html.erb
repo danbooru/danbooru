@@ -1,0 +1,21 @@
+<% page_title "Send backup code" %>
+<%= render "users/secondary_links" %>
+
+<div id="c-totp">
+  <div id="a-confirm-recover">
+    <div class="card mt-4 p-4 max-w-540px mx-auto flex flex-col items-center gap-2">
+      <h1 class="text-center">Send backup code: <%= link_to_user @user %></h1>
+
+      <div class="prose">
+        <p>Sending someone their backup code will let them bypass 2FA to login to their account and change their 2FA settings.</p>
+
+        <p>If they don't have access to their email, you can change their email address first.</p>
+
+        <p>Don't send someone their backup code unless you've verified from their <%= link_to "login history", user_user_events_path(@user) %>
+        that they are the real account owner.</p>
+      </div>
+
+      <%= button_to "Send backup code", recover_user_backup_codes_path(user_id: @user.id), class: "button-primary h-fit", disabled: @user.backup_codes.blank? || @user.email_address.blank? %>
+    </div>
+  </div>
+</div>

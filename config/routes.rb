@@ -270,7 +270,10 @@ Rails.application.routes.draw do
     end
     resource :password, only: [:edit, :update]
     resource :totp, only: [:edit, :update, :destroy]
-    resources :backup_codes, only: [:index, :create]
+    resources :backup_codes, only: [:index, :create] do
+      get :confirm_recover, on: :collection
+      post :recover, on: :collection
+    end
     resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
     resources :uploads, only: [:index]
     resources :user_events, only: [:index], path: "events"

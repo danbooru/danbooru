@@ -61,6 +61,19 @@ class UserMailer < ApplicationMailer
     )
   end
 
+  # The email sent when an admin sends a user their 2FA backup code.
+  def send_backup_code(user)
+    @user = user
+    @backup_code = user.backup_codes.first
+
+    mail_user(
+      @user,
+      from: "#{Danbooru.config.canonical_app_name} <#{Danbooru.config.account_security_email}>",
+      subject: "Your account recovery code",
+      require_verified_email: false,
+    )
+  end
+
   def dmca_complaint(to:)
     @dmca = params[:dmca]
     mail(

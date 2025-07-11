@@ -94,6 +94,28 @@
 
           <%= link_to "Change email", edit_user_email_path(@user), class: "button-primary h-fit", disabled: !policy(EmailAddress.new(user: @user)).update? %>
         </div>
+
+        <div class="card-outlined p-2 flex items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex sm:flex-col md:items-center gap-2 leading-none">
+              <span class="font-bold">Recover 2FA</span>
+              <% if @user.backup_codes.blank? %>
+                <span class="chip-red w-fit text-error text-xs">2FA Disabled</span>
+              <% elsif @user.email_address.blank? %>
+                <span class="chip-red w-fit text-error text-xs">No email</span>
+              <% else %>
+                <span class="chip-green w-fit text-success text-xs">Enabled</span>
+              <% end %>
+            </div>
+
+            <div class="fineprint max-w-360px">
+              If the user can't login with 2FA, you can send a backup code to their email so they can recover their
+              account.
+            </div>
+          </div>
+
+          <%= link_to "Send backup code", confirm_recover_user_backup_codes_path(user_id: @user.id), class: "button-primary h-fit", disabled: @user.backup_codes.blank? || @user.email_address.blank? %>
+        </div>
       </div>
     <% end %>
   </div>
