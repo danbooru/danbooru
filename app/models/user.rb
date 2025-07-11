@@ -598,17 +598,6 @@ class User < ApplicationRecord
     def can_receive_email?(require_verified_email: true)
       email_address.present? && email_address.is_deliverable? && (email_address.is_verified? || !require_verified_email)
     end
-
-    def change_email(new_email, request)
-      transaction do
-        update(email_address_attributes: { address: new_email })
-
-        if errors.none?
-          UserEvent.create_from_request!(self, :email_change, request)
-          UserMailer.with_request(request).email_change_confirmation(self).deliver_later
-        end
-      end
-    end
   end
 
   concerning :BlacklistMethods do

@@ -49,6 +49,10 @@ class UserPolicy < ApplicationPolicy
     user.is_gold?
   end
 
+  def can_recover_account?
+    user.is_admin? && record.level < user.level && record.level < User::Levels::MODERATOR
+  end
+
   def rate_limit_for_create(**_options)
     if record.invalid?
       { action: "users:create:invalid", rate: 1.0 / 1.second, burst: 10 }
@@ -58,7 +62,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def permitted_attributes_for_create
-    [:name, :password, :password_confirmation, { email_address_attributes: [:address] }]
+    [:name, :password, :password_confirmation]
   end
 
   def permitted_attributes_for_update

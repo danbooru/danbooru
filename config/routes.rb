@@ -264,7 +264,7 @@ Rails.application.routes.draw do
     resources :actions, only: [:index], controller: "user_actions", as: "user_actions"
     resources :favorites, only: [:index, :create, :destroy]
     resources :favorite_groups, controller: "favorite_groups", only: [:index], as: "favorite_groups"
-    resource :email, only: [:show, :edit, :update] do
+    resource :email, only: [:show, :edit, :update, :destroy] do
       get :verify
       post :send_confirmation
     end

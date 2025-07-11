@@ -79,6 +79,7 @@ class ModAction < ApplicationRecord
     site_credential_delete: 402,
     site_credential_enable: 406,
     site_credential_disable: 407,
+    email_address_update: 501,
     mass_update: 1000, # XXX unused
   }
 
@@ -92,7 +93,7 @@ class ModAction < ApplicationRecord
     if user.is_moderator?
       all
     else
-      where.not(category: [:ip_ban_create, :ip_ban_delete, :ip_ban_undelete, :moderation_report_handled, :moderation_report_rejected])
+      where.not(category: %i[ip_ban_create ip_ban_delete ip_ban_undelete moderation_report_handled moderation_report_rejected email_address_update])
     end
   end
 

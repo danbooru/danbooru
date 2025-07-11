@@ -436,7 +436,10 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("xxx", User.last.name)
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_equal("webmaster@danbooru.donmai.us", User.last.email_address.address)
+        assert_equal(false, User.last.email_address.is_verified?)
         assert_equal(true, User.last.user_events.user_creation.exists?)
+        assert_equal(false, User.last.user_events.email_change.exists?)
+        assert_equal(false, ModAction.email_address_update.exists?)
 
         perform_enqueued_jobs
         assert_performed_jobs(1, only: MailDeliveryJob)

@@ -2,22 +2,41 @@
 
 <div id="c-emails">
   <div id="a-edit">
-    <div class="card mt-8 p-4 max-w-480px mx-auto flex flex-col items-center">
-      <h1 class="pb-4">Change Email</h1>
-
-      <% if @user.is_restricted? %>
-        <p>Your account is restricted because you signed up from a proxy or VPN.</p>
-
-        <p>You can still use the site, but you won't be able to leave comments, edit
-        tags, or upload posts until you add a verified email address to your
-        account.</p>
-
-        <p>Disposable or throwaway email addresses can't be used to verify your account.</p>
+    <div class="card mt-4 p-4 max-w-540px mx-auto flex flex-col items-center gap-2">
+      <% if CurrentUser.user == @user %>
+        <h1 class="text-center">Change Email</h1>
+      <% else %>
+        <h1 class="text-center">Change Email: <%= link_to_user @user %></h1>
       <% end %>
 
-      <%= edit_form_for(@user, url: user_email_path(@user), html: { class: "w-full stacked-form" }) do |f| %>
-        <%= f.input :email, as: :email, input_html: { value: @user&.email_address&.address } %>
-        <%= f.submit "Save", class: "button-primary" %>
+      <div class="prose">
+        <% if CurrentUser.user != @user %>
+          <p>Don't change someone's email address unless they've lost access to their account and you've verified from
+          their <%= link_to "login history", user_user_events_path(@user) %> that they are the real account owner.</p>
+        <% elsif @user.is_restricted? %>
+          <p>Your account is restricted because you signed up from a proxy or VPN.</p>
+
+          <p>You can still use the site, but you won't be able to leave comments, edit
+          tags, or upload posts until you add a verified email address to your
+          account.</p>
+
+          <p>Disposable or throwaway email addresses can't be used to verify your account.</p>
+        <% end %>
+      </div>
+
+      <%= edit_form_for(@email_address, url: user_email_path(@user), method: "put", html: { class: "w-full stacked-form" }) do |f| %>
+        <%= f.input :address, as: :email %>
+
+        <div>
+          <%= f.submit "Save", class: "button-primary" %>
+
+          <% if policy(@email_address).destroy? && @email_address.persisted? %>
+            <%= f.submit "Delete", class: "button-outline-danger", form: "delete-form", "data-confirm": "Are you sure you want to delete your email address?" %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= edit_form_for(@email_address, url: user_email_path(@user), method: "delete", html: { id: "delete-form", class: "hidden" }) do |f| %>
       <% end %>
     </div>
   </div>

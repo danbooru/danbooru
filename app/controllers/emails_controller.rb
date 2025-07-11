@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class EmailsController < ApplicationController
-  before_action :requires_reauthentication, only: [:edit, :update]
+  before_action :requires_reauthentication, only: [:edit, :update, :destroy]
   respond_to :html, :xml, :json
 
   def index
@@ -21,18 +21,31 @@ class EmailsController < ApplicationController
   end
 
   def edit
-    @user = authorize User.find(params[:user_id]), policy_class: EmailAddressPolicy
-    respond_with(@user)
+    @email_address = authorize email_address
+    @user = @email_address.user
+
+    respond_with(@email_address)
   end
 
   def update
-    @user = authorize User.find(params[:user_id]), policy_class: EmailAddressPolicy
-    @user.change_email(params[:user][:email], request)
+    @email_address = authorize email_address
+    @email_address.update(request: request, updater: CurrentUser.user, **permitted_attributes(@email_address))
+    @user = @email_address.user
 
-    if @user.errors.none?
-      respond_with(@user, notice: "Email updated. Check your email to confirm your new address", location: settings_url)
+    if @email_address.user == CurrentUser.user
+      respond_with(@email_address, notice: "Check your email to confirm your new address", location: settings_path)
     else
-      respond_with(@user)
+      respond_with(@email_address, notice: "Updated email address", location: edit_admin_user_path(@email_address.user))
+    end
+  end
+
+  def destroy
+    @email_address = authorize email_address
+    @email_address.attributes = { request: request, updater: CurrentUser.user }
+    @email_address.destroy
+
+    respond_with(@email_address, notice: "Email address removed") do |format|
+      format.html { redirect_to settings_path, status: 303 }
     end
   end
 
@@ -60,5 +73,15 @@ class EmailsController < ApplicationController
 
     flash[:notice] = "Confirmation email sent to #{@user.email_address.address}. Check your email to confirm your address"
     redirect_to @user
+  end
+
+  private
+
+  def email_address
+    if params[:user_id]
+      EmailAddress.find_or_initialize_by(user_id: params[:user_id])
+    else
+      EmailAddress.find(params[:id])
+    end
   end
 end

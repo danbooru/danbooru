@@ -43,6 +43,8 @@ en:
         body: "Comment"
       dmail:
         body: "Message"
+      email_address:
+        normalized_address: "Email address"
       favorite:
         user: "You"
         user_id: "You"
