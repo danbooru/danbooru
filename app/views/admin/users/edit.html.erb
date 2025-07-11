@@ -2,12 +2,75 @@
 <%= render "users/secondary_links" %>
 
 <div id="c-admin-users">
-  <div id="a-edit">
-    <h1>Edit User: <%= @user.name %></h1>
+  <div id="a-edit" class="max-w-720px">
+    <h1 class="mb-4">Edit User: <%= link_to_user @user %></h1>
 
-    <%= edit_form_for(@user, url: admin_user_path(@user)) do |f| %>
-      <%= f.input :level, collection: User.level_hash.to_a, selected: @user.level %>
-      <%= f.submit "Update" %>
-    <% end %>
+    <div class="space-y-2">
+      <% if policy(@user).promote? %>
+        <div class="card-outlined p-2 flex items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="font-bold">Promote user</div>
+            <div class="fineprint max-w-360px">Promote a user to a higher level.</div>
+          </div>
+
+          <%= link_to "Promote", promote_user_path(@user), class: "button-primary h-fit" %>
+        </div>
+
+        <% if @user.level > User::Levels::MEMBER %>
+          <div class="card-outlined p-2 flex items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="font-bold">Demote user</div>
+              <div class="fineprint max-w-360px">Demote a user to a lower level.</div>
+            </div>
+
+            <%= link_to "Demote", demote_user_path(@user), class: "button-primary h-fit" %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% if policy(UserNameChangeRequest.new(user: @user)).can_rename_user? %>
+        <div class="card-outlined p-2 flex items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="font-bold">Change username</div>
+            <div class="fineprint max-w-360px">Change the user's name.</div>
+          </div>
+
+          <%= link_to "Rename", change_name_user_path(@user), class: "button-primary h-fit" %>
+        </div>
+      <% end %>
+
+      <% if policy(Ban.new(user: @user)).create? %>
+        <% if @user.is_banned? %>
+          <div class="card-outlined p-2 flex items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="font-bold">Unban user</div>
+              <div class="fineprint max-w-360px">Unban the user's account.</div>
+            </div>
+
+            <%= link_to "Unban", ban_path(@user.active_ban), class: "button-danger h-fit" %>
+          </div>
+        <% else %>
+          <div class="card-outlined p-2 flex items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="font-bold">Ban user</div>
+              <div class="fineprint max-w-360px">Ban the user's account.</div>
+            </div>
+
+            <%= link_to "Ban", new_ban_path(ban: { user_id: @user.id }), class: "button-danger h-fit", disabled: @user.is_banned? %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% if policy(@user).deactivate? %>
+        <div class="card-outlined p-2 flex items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="font-bold">Deactivate account</div>
+            <div class="fineprint max-w-360px">Permanently deactivate the user's account (requires confirmation).</div>
+          </div>
+
+          <%= link_to "Deactivate", deactivate_user_path(@user), class: "button-outline-danger h-fit", disabled: @user.is_deleted? %>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>

@@ -1,0 +1,20 @@
+<% page_title "Promote User" %>
+<%= render "secondary_links" %>
+
+<div id="c-users">
+  <div id="a-promote">
+    <div class="card mt-4 p-4 max-w-540px mx-auto flex flex-col gap-2">
+      <h1 class="text-center">Promote User: <%= link_to_user @user %></h1>
+
+      <p class="prose">
+        You are promoting user <%= link_to_user @user %> to a higher level. See <%= link_to_wiki "help:users" %> for a
+        description of what each level can do.
+      </p>
+
+      <%= edit_form_for(@user, url: admin_user_path(@user)) do |f| %>
+        <%= f.input :level, collection: User.level_hash.select { |name, level| level > @user.level && level < CurrentUser.user.level }.to_a, include_blank: false %>
+        <%= f.submit "Promote", class: "button-primary", "data-confirm": "Are you sure you want to promote #{@user.name}?" %>
+      <% end %>
+    </div>
+  </div>
+</div>

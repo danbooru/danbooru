@@ -9,9 +9,19 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#edit" do
-      should "render" do
+      should "render for a mod" do
         get_auth edit_admin_user_path(@user), @mod
         assert_response :success
+      end
+
+      should "render for the owner" do
+        get_auth edit_admin_user_path(create(:builder_user)), create(:owner_user)
+        assert_response :success
+      end
+
+      should "not render for a regular user" do
+        get_auth edit_admin_user_path(@user), @user
+        assert_response 403
       end
     end
 

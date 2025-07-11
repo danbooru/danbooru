@@ -13,11 +13,28 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for the current user" do
+        get_auth new_user_name_change_request_path, @user
+        assert_response :success
+      end
+
       should "render when the current user's name is invalid" do
         @user.update_columns(name: "foo__bar") # rubocop:disable Rails/SkipsModelValidations
         get_auth change_name_user_path(@user), @user
 
         assert_response :success
+      end
+
+      should "render for a moderator changing another user's name" do
+        get_auth change_name_user_path(@user), create(:moderator_user)
+
+        assert_response :success
+      end
+
+      should "not render for a regular user changing another user's name" do
+        get_auth change_name_user_path(@user), create(:user)
+
+        assert_response 403
       end
     end
 

@@ -682,5 +682,33 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
       end
     end
+
+    context "promote action" do
+      should "work for a moderator" do
+        get_auth promote_user_path(@user), create(:moderator_user)
+
+        assert_response :success
+      end
+
+      should "not work for a regular user" do
+        get_auth promote_user_path(@user), @user
+
+        assert_response 403
+      end
+    end
+
+    context "demote action" do
+      should "work for a moderator" do
+        get_auth demote_user_path(@user), create(:moderator_user)
+
+        assert_response :success
+      end
+
+      should "not work for a regular user" do
+        get_auth demote_user_path(@user), @user
+
+        assert_response 403
+      end
+    end
   end
 end

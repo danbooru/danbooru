@@ -1,10 +1,20 @@
+<% page_title "Change Name" %>
+<%= render "users/secondary_links" %>
+
 <div id="c-user-name-change-requests">
   <div id="a-new">
-    <div class="card mt-8 p-4 max-w-540px mx-auto flex flex-col items-center">
+    <div class="card mt-4 p-4 max-w-540px mx-auto flex flex-col gap-2">
       <% if CurrentUser.user != @change_request.user %>
-        <h1>Change Name: <%= link_to_user @change_request.user %></h1>
+        <h1 class="text-center">Change Name: <%= link_to_user @change_request.user %></h1>
       <% else %>
-        <h1>Change Name</h1>
+        <h1 class="text-center">Change Name</h1>
+      <% end %>
+
+      <% if CurrentUser.user != @change_request.user %>
+        <p>You are changing <%= link_to_user @change_request.user %>'s name. If they don't know their new name and don't
+        have a valid email address, they will be unable to login.</p>
+
+        <p>Don't change a user's name unless it breaks the site rules.</p>
       <% end %>
 
       <% if @change_request.user.name_invalid? %>
@@ -17,7 +27,7 @@
         </p>
       <% end %>
 
-      <div class="prose mt-4 mb-4">
+      <div class="prose">
         <h6>Rules</h6>
         <ul>
           <li>Names can contain only letters, numbers, underscores ('_'), periods ('.'), and dashes ('-').</li>
@@ -33,7 +43,7 @@
       <%= edit_form_for(@change_request, html: { class: "w-full stacked-form" }) do |f| %>
         <%= f.input :user_id, as: :hidden, input_html: { value: @change_request.user_id } %>
         <%= f.input :desired_name, label: "New name" %>
-        <%= f.submit "Save", class: "button-primary" %>
+        <%= f.submit "Save", class: "button-primary", "data-confirm": "Are you sure you want to change your name?" %>
       <% end %>
     </div>
   </div>

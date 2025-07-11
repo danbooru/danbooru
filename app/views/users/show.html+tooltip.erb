@@ -63,7 +63,7 @@
       <% if policy(CurrentUser.user).promote? %>
         <% menu.with_item do %>
           <%= link_to edit_admin_user_path(@user.id) do %>
-            <%= promotion_icon %> Promote User
+            <%= edit_icon %> Edit User
           <% end %>
         <% end %>
       <% end %>
@@ -72,14 +72,6 @@
         <% menu.with_item do %>
           <%= link_to new_ban_path(ban: { user_id: @user.id }) do %>
             <%= ban_icon %> Ban User
-          <% end %>
-        <% end %>
-      <% end %>
-
-      <% if policy(UserNameChangeRequest.new(user: @user)).can_rename_user? %>
-        <% menu.with_item do %>
-          <%= link_to change_name_user_path(@user) do %>
-            <%= feedback_icon %> Rename User
           <% end %>
         <% end %>
       <% end %>

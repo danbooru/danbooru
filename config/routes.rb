@@ -279,6 +279,8 @@ Rails.application.routes.draw do
     get :custom_style, on: :collection
     get :deactivate, on: :member     # /users/:id/deactivate
     get :deactivate, on: :collection # /users/deactivate
+    get :promote, on: :member # /users/:id/promote
+    get :demote, on: :member # /users/:id/demote
   end
   get "/upgrade", to: "user_upgrades#new", as: "new_user_upgrade"
   get "/user_upgrades/new", to: redirect("/upgrade")
