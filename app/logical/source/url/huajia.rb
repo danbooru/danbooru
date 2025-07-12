@@ -15,7 +15,7 @@ module Source
         # https://huajia.fp.ps.netease.com/file/664ae65bd56ea97215dc3e25JM5jBQGB05
         # https://huajia.fp.ps.netease.com/file/664ae65bd56ea97215dc3e25JM5jBQGB05?fop=imageView/2/w/300/f/webp
         # https://huajia.fp.ps.netease.com/file/67e8b79b9406b3d7123faab0q5C21Hoz06?fop=watermark/2/text/55S75Yqg77ya5LuE6KiATGltZQ==/font/5b6u6L2v6ZuF6buR/fontsize/25/fill/I0MzQzNDMw==/dissolve/20/repeat/fill/rotate/45
-        in "huajia.fp.ps", "netease.com", "files", file
+        in "huajia.fp.ps", "netease.com", "file", file
           @full_image_url = without(:query).to_s
 
         # https://huajia.163.com/main/works/8z4GdKoE
