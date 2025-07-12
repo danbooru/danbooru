@@ -122,6 +122,6 @@ class Source::Extractor::NaverCafe < Source::Extractor
 
   memoize def api_article
     api_url = "https://apis.naver.com/cafe-web/cafe-articleapi/v3/cafes/#{club_id}/articles/#{article_id}" if club_id.present? && article_id.present?
-    http.cache(1.minute).parsed_get(api_url)&.dig(:result) || {}
+    http.cache(1.minute).headers("X-Cafe-Product": "pc").parsed_get(api_url)&.dig(:result) || {}
   end
 end
