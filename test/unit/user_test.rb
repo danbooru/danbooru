@@ -32,10 +32,12 @@ class UserTest < ActiveSupport::TestCase
         @owner = create(:owner_user)
       end
 
-      should "allow moderators to promote users up to builder level" do
+      should "allow moderators to promote users up to approver level" do
         assert_promoted_to(User::Levels::GOLD, @user, @mod)
         assert_promoted_to(User::Levels::PLATINUM, @user, @mod)
         assert_promoted_to(User::Levels::BUILDER, @user, @mod)
+        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @mod)
+        assert_promoted_to(User::Levels::APPROVER, @user, @mod)
 
         assert_not_promoted_to(User::Levels::MODERATOR, @user, @mod)
         assert_not_promoted_to(User::Levels::ADMIN, @user, @mod)
@@ -46,6 +48,8 @@ class UserTest < ActiveSupport::TestCase
         assert_promoted_to(User::Levels::GOLD, @user, @admin)
         assert_promoted_to(User::Levels::PLATINUM, @user, @admin)
         assert_promoted_to(User::Levels::BUILDER, @user, @admin)
+        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @mod)
+        assert_promoted_to(User::Levels::APPROVER, @user, @admin)
         assert_promoted_to(User::Levels::MODERATOR, @user, @admin)
 
         assert_not_promoted_to(User::Levels::ADMIN, @user, @admin)
@@ -90,6 +94,12 @@ class UserTest < ActiveSupport::TestCase
         assert_not_promoted_to(User::Levels::MEMBER, @mod, @mod)
         assert_not_promoted_to(User::Levels::MEMBER, @admin, @admin)
         assert_not_promoted_to(User::Levels::MEMBER, @owner, @owner)
+      end
+
+      should "not allow users to be promoted to an invalid level" do
+        assert_not_promoted_to(User::Levels::ANONYMOUS, @user, @mod)
+        assert_not_promoted_to(-1, @user, @mod)
+        assert_not_promoted_to(1, @user, @mod)
       end
 
       should "create a neutral feedback" do
@@ -350,6 +360,23 @@ class UserTest < ActiveSupport::TestCase
 
     context "during validation" do
       subject { build(:user) }
+
+      context "of level" do
+        should allow_value(User::Levels::RESTRICTED).for(:level)
+        should allow_value(User::Levels::MEMBER).for(:level)
+        should allow_value(User::Levels::GOLD).for(:level)
+        should allow_value(User::Levels::PLATINUM).for(:level)
+        should allow_value(User::Levels::BUILDER).for(:level)
+        should allow_value(User::Levels::CONTRIBUTOR).for(:level)
+        should allow_value(User::Levels::APPROVER).for(:level)
+        should allow_value(User::Levels::MODERATOR).for(:level)
+        should allow_value(User::Levels::ADMIN).for(:level)
+        should allow_value(User::Levels::OWNER).for(:level)
+
+        should_not allow_value(User::Levels::ANONYMOUS).for(:level)
+        should_not allow_value(-1).for(:level)
+        should_not allow_value(1).for(:level)
+      end
 
       context "of blacklisted tags" do
         should normalize_attribute(:blacklisted_tags).from(" foo\n bar \n baz ").to("foo\nbar\nbaz")

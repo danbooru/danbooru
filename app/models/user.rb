@@ -118,6 +118,8 @@ class User < ApplicationRecord
   validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE) }
   validates :password, confirmation: { message: "Passwords don't match" }
   validates :comment_threshold, inclusion: { in: (-100..5) }
+  validates :level, inclusion: { in: User::Levels.constants.map { |c| User::Levels.const_get(c) } }, if: :level_changed?
+  validates :level, exclusion: { in: [User::Levels::ANONYMOUS] }, if: :level_changed?
   validate :validate_enable_private_favorites, on: :update
   validate :validate_blacklisted_tags, if: :blacklisted_tags_changed?
   validate :validate_favorite_tags, if: :favorite_tags_changed?
