@@ -53,6 +53,11 @@ class SiteCredential < ApplicationRecord
       default_credential: { user_id: Danbooru.config.gelbooru_user_id, api_key: Danbooru.config.gelbooru_api_key },
       help: %{Your "Gelbooru":https://gelbooru.com user ID and API key. Go to https://gelbooru.com/index.php?page=account&s=options to find your API key.},
     }, {
+      id: 1060,
+      name: "Huashijie",
+      default_credential: { user_id: Danbooru.config.huashijie_user_id, session_cookie: Danbooru.config.huashijie_session_cookie },
+      help: %{Your "Huashijie":https://www.huashijie.art 'userId' and 'token' cookies.},
+    }, {
       id: 1100,
       name: "Inkbunny",
       default_credential: { username: Danbooru.config.inkbunny_username, password: Danbooru.config.inkbunny_password },
@@ -132,11 +137,6 @@ class SiteCredential < ApplicationRecord
       name: "Zerochan",
       default_credential: { user_id: Danbooru.config.zerochan_user_id, session_cookie: Danbooru.config.zerochan_session_cookie },
       help: %{Your "Zerochan":https://www.zerochan.net 'z_id' and 'z_hash' cookies.},
-    }, {
-      id: 2600,
-      name: "Huashijie",
-      default_credential: { user_id: Danbooru.config.huashijie_user_id, session_cookie: Danbooru.config.huashijie_session_cookie },
-      help: %{Your "Huashijie":https://www.huashijie.art 'userId' and 'token' cookies.},
     },
   ]
 
