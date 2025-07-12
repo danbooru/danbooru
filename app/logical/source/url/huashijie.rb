@@ -19,7 +19,7 @@ module Source
         # https://bsyimgv2.pandapaint.net/v2/avatar/user/17873127/1733919514805.jpg?x-oss-process=style/work_cover_med&image_process=format,WEBP
         # https://bsyimg.pandapaint.net/v2/background/user/17873127/1734188851723.jpg
         # https://bsyimg.pandapaint.net/v2/video/user/13236644/1751972885632.mp4
-        in ("bsyimg" | "bsyimgv2"), "pandapaint.net", "v2", _, "user", user_id, *rest
+        in ("bsyimg" | "bsyimgv2"), "pandapaint.net", "v2", _, "user", user_id, file
           @user_id = user_id
           @full_image_url = without(:query).to_s
 
