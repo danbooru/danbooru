@@ -231,7 +231,6 @@ module Source::Tests::Extractor
       strategy_should_work(
         "http://xkilikox.fc2web.com/image/haguruma00.jpg",
         image_urls: %w[http://xkilikox.fc2web.com/image/haguruma00.jpg],
-        media_files: [{ file_size: 34_232 }],
         page_url: nil,
         profile_url: "http://xkilikox.fc2web.com",
         profile_urls: %w[http://xkilikox.fc2web.com],

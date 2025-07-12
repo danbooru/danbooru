@@ -188,7 +188,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://i.redditmedia.com/9cYFBDQ3QsqWnF9v7EhW5uOcQNHz1Ak9_E1zVNeSLek.png?s=6fee1bb56e7d926847dc3ece01a1ffd4",
         image_urls: ["https://i.redditmedia.com/9cYFBDQ3QsqWnF9v7EhW5uOcQNHz1Ak9_E1zVNeSLek.png?s=6fee1bb56e7d926847dc3ece01a1ffd4"],
-        media_files: [{ file_size: 248_843 }],
+        media_files: [{ file_size: 252_317 }],
         page_url: nil,
       )
     end

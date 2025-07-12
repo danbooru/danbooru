@@ -485,6 +485,11 @@ module Source::Tests::Extractor
           https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/d93da214214883177591385839.png
           https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/e0495910488976549975147777.png
           https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/95d9e88921357639619368656.png
+          https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/12/15/00/38fb5b8972115121705918853.png
+          https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/28/01/39/3e98433563532317057209358.png
+          https://d2ufj6gm1gtdrc.cloudfront.net/2025/06/05/00/01/52d1ec13725900644314259440.png
+          https://d2ufj6gm1gtdrc.cloudfront.net/2025/07/07/23/57/12ed6a275744369663735498.png
+          https://d2ufj6gm1gtdrc.cloudfront.net/2025/07/07/23/57/de8cb66353441080547094378.png
         ],
         media_files: [
           { file_size: 8_537 },
@@ -508,6 +513,11 @@ module Source::Tests::Extractor
           { file_size: 2_502_081 },
           { file_size: 1_737_186 },
           { file_size: 1_056_481 },
+          { file_size: 1_284_638 },
+          { file_size: 1_461_479 },
+          { file_size: 1_138_476 },
+          { file_size: 717_037 },
+          { file_size: 777_858 },
         ],
         page_url: "https://www.postype.com/@rottenmustard/post/15534076",
         profile_urls: %w[https://www.postype.com/@rottenmustard https://www.postype.com/profile/@46axcn],
@@ -611,6 +621,16 @@ module Source::Tests::Extractor
           "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/e0495910488976549975147777.png?w=1000&q=90]
 
           "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/95d9e88921357639619368656.png?w=1000&q=90]
+
+          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/12/15/00/38fb5b8972115121705918853.png?w=1000&q=90]
+
+          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/28/01/39/3e98433563532317057209358.png?w=1000&q=90]
+
+          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/06/05/00/01/52d1ec13725900644314259440.png?w=1000&q=90]
+
+          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/07/07/23/57/12ed6a275744369663735498.png?w=1000&q=90]
+
+          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/07/07/23/57/de8cb66353441080547094378.png?w=1000&q=90]
         EOS
       )
     end
