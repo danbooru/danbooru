@@ -8,6 +8,7 @@ module Source::Tests::URL
           "https://galleria-img.emotionflow.com/user_img9/40775/i660870_869.jpeg",
           "http://img01.emotionflow.com/galleria/user_img6/14169/141693874499122908405.png",
           "http://galleria.emotionflow.com/user_img6/12915/1291531674451216.png_480.jpg",
+          "https://galleria.emotionflow.com/user_img9/136703/i701021_553.png",
         ],
         page_urls: [
           "https://galleria.emotionflow.com/40775/660870.html",
