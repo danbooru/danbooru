@@ -101,6 +101,15 @@ class BanTest < ActiveSupport::TestCase
       assert_equal(true, ban.user.reload.is_banned?)
     end
 
+    should "not allow the user to be banned twice" do
+      user = create(:user)
+      ban1 = create(:ban, user: user)
+      ban2 = build(:ban, user: user)
+
+      assert_equal(false, ban2.save)
+      assert_equal(["User is already banned"], ban2.errors.full_messages)
+    end
+
     should "initialize the expiration date" do
       ban = create(:ban)
       assert_not_nil(ban.expires_at)
@@ -162,6 +171,18 @@ class BanTest < ActiveSupport::TestCase
         assert_equal(@mod, ModAction.last.creator)
       end
 
+      should "not unban the user if they have another active ban" do
+        @user = create(:user)
+        @ban1 = create(:ban, user: @user, created_at: 1.week.ago, duration: 1.month)
+        @ban2 = build(:ban, user: @user, created_at: 1.week.ago, duration: 3.months).tap { |ban| ban.save!(validate: false) }
+
+        @ban1.update!(duration: 1.day)
+        assert_equal(true, @user.reload.is_banned?)
+
+        @ban2.update!(duration: 1.day)
+        assert_equal(false, @user.reload.is_banned?)
+      end
+
       should "fail if the ban is expired" do
         @mod = create(:moderator_user)
         @ban = create(:ban, created_at: 6.months.ago, duration: 1.day)
@@ -186,6 +207,18 @@ class BanTest < ActiveSupport::TestCase
         assert_match(/unbanned <@#{@ban.user.name}>/, ModAction.last.description)
         assert_equal(@ban.user, ModAction.last.subject)
         assert_equal(@banner, ModAction.last.creator)
+      end
+
+      should "not unban the user if they have another active ban" do
+        @user = create(:user)
+        @ban1 = create(:ban, user: @user, duration: 1.week)
+        @ban2 = build(:ban, user: @user, duration: 1.month).tap { |ban| ban.save!(validate: false) }
+
+        @ban1.destroy!
+        assert_equal(true, @user.reload.is_banned?)
+
+        @ban2.destroy!
+        assert_equal(false, @user.reload.is_banned?)
       end
 
       should "fail if the ban is expired" do

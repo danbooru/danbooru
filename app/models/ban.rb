@@ -24,7 +24,7 @@ class Ban < ApplicationRecord
   after_create :delete_user_data
   before_destroy -> { throw :abort if invalid? } # Validations don't run on destroy normally, so we have to do it manually
   after_destroy :create_unban_mod_action
-  after_destroy :update_user_on_destroy
+  after_destroy :update_user_on_save
   after_save :create_mod_action
   after_save :update_user_on_save, if: :saved_change_to_duration?
 
@@ -74,7 +74,7 @@ class Ban < ApplicationRecord
   end
 
   def validate_user_is_bannable
-    errors.add(:user, "is already banned") if user&.is_banned?
+    errors.add(:user, "is already banned") if user&.is_banned? || user&.bans&.active&.exists?
   end
 
   def validate_deletions
@@ -92,11 +92,7 @@ class Ban < ApplicationRecord
   end
 
   def update_user_on_save
-    user.update!(is_banned: !expired?)
-  end
-
-  def update_user_on_destroy
-    user.update!(is_banned: false)
+    user.update!(is_banned: user.bans.active.exists?)
   end
 
   def user_name
