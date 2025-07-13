@@ -44,7 +44,7 @@
         </div>
 
         <%= edit_form_for(:user, url: user_path(@user), method: :delete) do |f| %>
-          <%= f.input :password, as: :password, input_html: { autocomplete: "current-password" }, hint: link_to("Forgot password?", password_reset_path).html_safe %>
+          <%= f.input :password, as: :password, input_html: { autofocus: true, autocomplete: "current-password" }, hint: link_to("Forgot password?", password_reset_path).html_safe %>
           <%= f.submit "Deactivate account", class: "button-danger", "data-confirm": "Are you sure you want to deactivate your account? This cannot be undone" %>
         <% end %>
       <% else %>
