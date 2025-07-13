@@ -18,6 +18,7 @@ module Source::Tests::URL
           "https://www.huashijie.art/work/detail/237016516",
           "https://huashijie.art/work/detail/237016516",
           "https://static.huashijie.art/w_d/235129335",
+          "https://static.pandapaint.net/w_d/235129335",
           "https://static.huashijie.art/hsj/wap/#/detail?workId=235129335",
           "https://www.huashijie.art/market/detail/325593",
           "https://static.huashijie.art/s_pd/325923",
@@ -28,6 +29,7 @@ module Source::Tests::URL
         profile_urls: [
           "https://www.huashijie.art/user/index/13649297",
           "https://static.huashijie.art/hsj/wap/#/usercenter?userId=13649297",
+          "https://static.pandapaint.net/pagesart/wap/#/usercenter?userId=13649297",
           "https://www.huashijie.art/user/shop/2381713",
           "https://static.huashijie.art/newmarket/#/usercenter/9780156",
           "https://static.huashijie.art/newmarket/?navbar=0&swapeback=0#/usercenter/9780156?share=1",

@@ -41,11 +41,12 @@ module Source
           @work_id = work_id
 
         # https://static.huashijie.art/w_d/235129335
-        in "static", "huashijie.art", "w_d", work_id
+        # https://static.pandapaint.net/w_d/235129335
+        in "static", _, "w_d", work_id
           @work_id = work_id
 
         # https://static.huashijie.art/hsj/wap/#/detail?workId=235129335
-        in "static", "huashijie.art", "hsj", "wap" if fragment&.starts_with?("/detail")
+        in "static", _, _, "wap" if fragment&.starts_with?("/detail")
           @work_id = fragment&.slice(%r{^/detail\?workId=(\d+)}, 1)
 
         # https://www.huashijie.art/market/detail/325347
@@ -53,13 +54,13 @@ module Source
           @product_id = product_id
 
         # https://static.huashijie.art/s_pd/325923
-        in "static", "huashijie.art", "s_pd", product_id
+        in "static", _, "s_pd", product_id
           @product_id = product_id
 
         # https://static.huashijie.art/newmarket/#/product/detail/325923
         # https://static.huashijie.art/newmarket/?share=1&navbar=0#/product/detail/325923
         # https://static.huashijie.art/newmarket/?share=1&navbar=0#/product/ratedetail/325987
-        in "static", "huashijie.art", "newmarket" if fragment&.starts_with?("/product/")
+        in "static", _, "newmarket" if fragment&.starts_with?("/product/")
           @product_id = fragment&.slice(%r{^/product/\w+/(\d+)}, 1)
 
         # https://www.huashijie.art/user/index/13649297
@@ -68,12 +69,13 @@ module Source
           @user_id = user_id
 
         # https://static.huashijie.art/hsj/wap/#/usercenter?userId=13649297
-        in "static", "huashijie.art", "hsj", "wap" if fragment&.starts_with?("/usercenter")
+        # https://static.pandapaint.net/pagesart/wap/#/usercenter?userId=13649297
+        in "static", _, _, "wap" if fragment&.starts_with?("/usercenter")
           @user_id = fragment&.slice(%r{^/usercenter\?userId=(\d+)}, 1)
 
         # https://static.huashijie.art/newmarket/#/usercenter/9780156
         # https://static.huashijie.art/newmarket/?navbar=0&swapeback=0#/usercenter/9780156?share=1
-        in "static", "huashijie.art", "newmarket" if fragment&.starts_with?("/usercenter")
+        in "static", _, "newmarket" if fragment&.starts_with?("/usercenter")
           @user_id = fragment&.slice(%r{^/usercenter/(\d+)}, 1)
 
         # https://www.huashijie.art/album/2514902
