@@ -1,14 +1,16 @@
 <div class="c-bans">
   <div class="a-new">
-    <% if @ban.user.present? %>
-      <h1 class="mb-2">Ban: <%= link_to_user @ban.user %></h1>
-    <% else %>
-      <h1 class="mb-2">New Ban</h1>
-    <% end %>
+    <div class="card mt-4 p-4 max-w-540px mx-auto flex flex-col gap-2">
+      <% if @ban.user.present? %>
+        <h1 class="text-center">Ban: <%= link_to_user @ban.user %></h1>
+      <% else %>
+        <h1 class="text-center">New Ban</h1>
+      <% end %>
 
-    <%= render "users/sockpuppets", user: @ban.user %>
+      <%= render "users/sockpuppets", user: @ban.user %>
 
-    <%= render "form", :ban => @ban %>
+      <%= render "form", ban: @ban %>
+    </div>
   </div>
 </div>
 

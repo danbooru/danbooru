@@ -43,11 +43,19 @@
         <% if @user.is_banned? %>
           <div class="card-outlined p-2 flex items-center justify-between gap-4">
             <div class="space-y-1">
-              <div class="font-bold">Unban user</div>
-              <div class="fineprint max-w-360px">Unban the user's account.</div>
+              <div class="flex sm:flex-col md:items-center gap-2 leading-none">
+                <span class="font-bold">Unban user</span>
+
+                <% if @user.active_ban.forever? %>
+                  <span class="chip-red w-fit text-error text-xs">Permabanned</span>
+                <% else %>
+                  <span class="chip-red w-fit text-error text-xs">Expires: <%= time_ago_in_words_tagged(@user.active_ban.expires_at, compact: true) %></span>
+                <% end %>
+              </div>
+              <div class="fineprint max-w-360px">Change the ban length or unban their account.</div>
             </div>
 
-            <%= link_to "Unban", ban_path(@user.active_ban), class: "button-danger h-fit" %>
+            <%= link_to "Edit Ban", edit_ban_path(@user.active_ban), class: "button-primary h-fit" %>
           </div>
         <% else %>
           <div class="card-outlined p-2 flex items-center justify-between gap-4">

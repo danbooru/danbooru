@@ -24,8 +24,7 @@
       <% end %>
       <% t.column column: "control" do |ban| %>
         <% if policy(ban).update? %>
-          <%= link_to "Edit", edit_ban_path(ban) %>
-          | <%= link_to "Delete", ban_path(ban), :method => :delete, :remote => true %>
+          <%= link_to "Edit", edit_ban_path(ban), class: "button-primary button-sm" %>
         <% end %>
       <% end %>
     <% end %>
