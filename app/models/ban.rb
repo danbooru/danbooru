@@ -19,11 +19,12 @@ class Ban < ApplicationRecord
 
   after_create :create_feedback
   after_create :create_dmail
-  after_create :update_user_on_create
   after_create :create_ban_mod_action
   after_create :delete_user_data
-  after_destroy :update_user_on_destroy
   after_destroy :create_unban_mod_action
+  after_destroy :update_user_on_destroy
+  after_save :update_user_on_save, if: :saved_change_to_duration?
+
   belongs_to :user
   belongs_to :banner, :class_name => "User"
 
@@ -77,8 +78,8 @@ class Ban < ApplicationRecord
     end
   end
 
-  def update_user_on_create
-    user.update!(is_banned: true)
+  def update_user_on_save
+    user.update!(is_banned: !expired?)
   end
 
   def update_user_on_destroy

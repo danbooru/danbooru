@@ -69,6 +69,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @user
           assert_equal(true, @user.reload.is_banned?)
+          assert_equal(1.day, @user.active_ban.duration)
           assert_match(/banned <@#{@user.name}> 1 day: xxx/, ModAction.last.description)
           assert_equal(@user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
@@ -126,13 +127,37 @@ class BansControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "update action" do
-      should "allow mods to update a ban" do
+      should "allow mods to change the ban reason" do
         @ban = create(:ban)
-        @mod = create(:mod_user)
-        put_auth ban_path(@ban.id), @mod, params: {ban: {reason: "xxx", duration: 1.day.iso8601}}
+        put_auth ban_path(@ban.id), create(:moderator_user), params: { ban: { reason: "xxx" }}
 
         assert_redirected_to @ban.user
         assert_equal("xxx", @ban.reload.reason)
+        assert_equal(true, @ban.user.is_banned?)
+      end
+
+      should "unban the user if the ban duration is reduced" do
+        @user = create(:user)
+        @ban = create(:ban, user: @user, created_at: 6.months.ago, duration: 1.year)
+        assert_equal(true, @user.reload.is_banned?)
+
+        put_auth ban_path(@ban.id), create(:moderator_user), params: { ban: { duration: 1.day.iso8601 }}
+
+        assert_redirected_to @user
+        assert_equal(1.day, @ban.reload.duration)
+        assert_equal(false, @user.reload.is_banned?)
+      end
+
+      should "ban the user if the ban duration is extended" do
+        @user = create(:user)
+        @ban = create(:ban, user: @user, created_at: 6.months.ago, duration: 1.day)
+        assert_equal(false, @user.reload.is_banned?)
+
+        put_auth ban_path(@ban.id), create(:moderator_user), params: { ban: { duration: 1.year.iso8601 }}
+
+        assert_redirected_to @user
+        assert_equal(1.year, @ban.reload.duration)
+        assert_equal(true, @user.reload.is_banned?)
       end
 
       should "not allow regular users to update a ban" do
@@ -153,6 +178,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
           delete_auth ban_path(@ban.id), @mod
 
           assert_redirected_to @ban.user
+          assert_equal(false, @ban.user.reload.is_banned?)
           assert_match(/unbanned <@#{@ban.user.name}>/, ModAction.last.description)
           assert_equal(@ban.user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
@@ -164,6 +190,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         delete_auth ban_path(@ban.id), create(:user)
 
         assert_response 403
+        assert_equal(true, @ban.user.reload.is_banned?)
         assert_equal(true, @ban.reload.persisted?)
       end
     end
