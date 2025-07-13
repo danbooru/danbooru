@@ -160,7 +160,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@mod, ModAction.last.creator)
       end
 
-      should "ban the user if the ban duration is extended" do
+      should "not allow expired bans to be updated" do
         @user = create(:user)
         @mod = create(:moderator_user)
         @ban = create(:ban, user: @user, created_at: 6.months.ago, duration: 1.day)
@@ -168,14 +168,10 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
         put_auth ban_path(@ban.id), @mod, params: { ban: { reason: "xxx", duration: 1.year.iso8601 }}
 
-        assert_redirected_to @user
-        assert_equal(1.year, @ban.reload.duration)
-        assert_equal(true, @user.reload.is_banned?)
-
-        assert_equal("updated ban reason and duration for <@#{@ban.user.name}>", ModAction.last.description)
-        assert_equal("user_ban_update", ModAction.last.category)
-        assert_equal(@ban.user, ModAction.last.subject)
-        assert_equal(@mod, ModAction.last.creator)
+        assert_response :success
+        assert_equal(1.day, @ban.reload.duration)
+        assert_equal(false, @user.reload.is_banned?)
+        assert_equal(false, ModAction.user_ban_update.exists?)
       end
 
       should "not allow regular users to update a ban" do
@@ -201,6 +197,17 @@ class BansControllerTest < ActionDispatch::IntegrationTest
           assert_equal(@ban.user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
         end
+      end
+
+      should "not allow mods to destroy an expired ban" do
+        @ban = create(:ban, created_at: 6.months.ago, duration: 1.day)
+        @mod = create(:mod_user)
+
+        assert_no_difference("Ban.count") do
+          delete_auth ban_path(@ban.id), @mod
+        end
+
+        assert_redirected_to @ban.user
       end
 
       should "not allow regular users to destroy a ban" do

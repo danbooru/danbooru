@@ -24,7 +24,7 @@
       <% end %>
       <% t.column column: "control" do |ban| %>
         <% if policy(ban).update? %>
-          <%= link_to "Edit", edit_ban_path(ban), class: "button-primary button-sm" %>
+          <%= link_to "Edit", edit_ban_path(ban), class: "button-primary button-sm", disabled: ban.expired? %>
         <% end %>
       <% end %>
     <% end %>

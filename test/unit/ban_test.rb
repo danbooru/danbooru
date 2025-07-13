@@ -148,10 +148,10 @@ class BanTest < ActiveSupport::TestCase
         assert_equal(@mod, ModAction.last.creator)
       end
 
-      should "ban the user if the ban is extended" do
+      should "keep the user banned if an active ban is extended" do
         @mod = create(:moderator_user)
-        @ban = create(:ban, created_at: 6.months.ago, duration: 1.day)
-        assert_equal(false, @ban.user.reload.is_banned?)
+        @ban = create(:ban, created_at: 1.month.ago, duration: 3.months)
+        assert_equal(true, @ban.user.reload.is_banned?)
 
         @ban.update!(duration: 1.year, updater: @mod)
         assert_equal(true, @ban.user.reload.is_banned?)
@@ -160,6 +160,16 @@ class BanTest < ActiveSupport::TestCase
         assert_equal("user_ban_update", ModAction.last.category)
         assert_equal(@ban.user, ModAction.last.subject)
         assert_equal(@mod, ModAction.last.creator)
+      end
+
+      should "fail if the ban is expired" do
+        @mod = create(:moderator_user)
+        @ban = create(:ban, created_at: 6.months.ago, duration: 1.day)
+
+        @ban.update(duration: 1.year, updater: @mod)
+
+        assert_equal("You can't update an expired ban", @ban.errors.full_messages.first)
+        assert_equal(1.day, @ban.reload.duration)
       end
     end
 
@@ -176,6 +186,17 @@ class BanTest < ActiveSupport::TestCase
         assert_match(/unbanned <@#{@ban.user.name}>/, ModAction.last.description)
         assert_equal(@ban.user, ModAction.last.subject)
         assert_equal(@banner, ModAction.last.creator)
+      end
+
+      should "fail if the ban is expired" do
+        @ban = create(:ban, created_at: 6.months.ago, duration: 1.day)
+        @banner = create(:moderator_user)
+
+        @ban.updater = @banner
+        @ban.destroy
+
+        assert_equal(false, @ban.destroyed?)
+        assert_equal("You can't update an expired ban", @ban.errors.full_messages.first)
       end
     end
   end

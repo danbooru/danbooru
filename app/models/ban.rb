@@ -22,6 +22,7 @@ class Ban < ApplicationRecord
   after_create :create_feedback
   after_create :create_dmail
   after_create :delete_user_data
+  before_destroy -> { throw :abort if invalid? } # Validations don't run on destroy normally, so we have to do it manually
   after_destroy :create_unban_mod_action
   after_destroy :update_user_on_destroy
   after_save :create_mod_action
@@ -34,7 +35,8 @@ class Ban < ApplicationRecord
   validates :duration, presence: true
   validates :duration, inclusion: { in: DURATIONS, message: "%{value} is not a valid ban duration" }, if: :duration_changed?
   validates :reason, visible_string: true
-  validate :user, :validate_user_is_bannable, on: :create
+  validate :validate_ban_is_editable, on: :update
+  validate :validate_user_is_bannable, on: :create
   validate :validate_deletions, on: :create
 
   scope :unexpired, -> { where("bans.created_at + bans.duration > ?", Time.zone.now) }
@@ -60,6 +62,12 @@ class Ban < ApplicationRecord
   def self.prune!
     expired.includes(:user).find_each do |ban|
       ban.user.unban! if ban.user.ban_expired?
+    end
+  end
+
+  def validate_ban_is_editable
+    if created_at + duration_was < Time.zone.now
+      errors.add(:base, "You can't update an expired ban")
     end
   end
 
