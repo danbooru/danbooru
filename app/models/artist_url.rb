@@ -96,6 +96,8 @@ class ArtistURL < ApplicationRecord
       true
     when %r{lofter\.com/mentionredirect.do}i
       true
+    when %r{mihuashi\.com/profiles}i
+      true
     else
       false
     end
