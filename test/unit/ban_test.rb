@@ -142,6 +142,22 @@ class BanTest < ActiveSupport::TestCase
         assert_equal(true, @ban.user.reload.is_banned?)
       end
     end
+
+    context "Destroying a ban" do
+      should "create an unban mod action" do
+        @ban = create(:ban)
+        @banner = create(:moderator_user)
+        assert_equal(true, @ban.user.is_banned?)
+
+        @ban.updater = @banner
+        @ban.destroy!
+
+        assert_equal(false, @ban.user.reload.is_banned?)
+        assert_match(/unbanned <@#{@ban.user.name}>/, ModAction.last.description)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@banner, ModAction.last.creator)
+      end
+    end
   end
 
   context "Searching for a ban" do

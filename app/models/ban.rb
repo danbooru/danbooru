@@ -7,6 +7,8 @@ class Ban < ApplicationRecord
   # How far back to delete user data when a ban is created.
   MAX_DELETION_AGE = 3.days
 
+  attr_accessor :updater
+
   attribute :duration, :interval
   attribute :delete_posts, :boolean
   attribute :post_deletion_reason, :string
@@ -137,7 +139,7 @@ class Ban < ApplicationRecord
   end
 
   def create_unban_mod_action
-    ModAction.log(%{unbanned <@#{user_name}>}, :user_unban, subject: user, user: CurrentUser.user)
+    ModAction.log(%{unbanned <@#{user_name}>}, :user_unban, subject: user, user: updater) if updater.present?
   end
 
   def delete_user_data(since: MAX_DELETION_AGE.ago)

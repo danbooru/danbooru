@@ -41,6 +41,7 @@ class BansController < ApplicationController
 
   def destroy
     @ban = authorize Ban.find(params[:id])
+    @ban.updater = CurrentUser.user
     @ban.destroy
     respond_with(@ban, noticed: "Ban removed", location: @ban.user)
   end
