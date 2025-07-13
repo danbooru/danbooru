@@ -129,35 +129,53 @@ class BansControllerTest < ActionDispatch::IntegrationTest
     context "update action" do
       should "allow mods to change the ban reason" do
         @ban = create(:ban)
-        put_auth ban_path(@ban.id), create(:moderator_user), params: { ban: { reason: "xxx" }}
+        @mod = create(:moderator_user)
+        put_auth ban_path(@ban.id), @mod, params: { ban: { reason: "xxx" }}
 
         assert_redirected_to @ban.user
         assert_equal("xxx", @ban.reload.reason)
         assert_equal(true, @ban.user.is_banned?)
+
+        assert_equal("updated ban reason for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("user_ban_update", ModAction.last.category)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
 
       should "unban the user if the ban duration is reduced" do
         @user = create(:user)
+        @mod = create(:moderator_user)
         @ban = create(:ban, user: @user, created_at: 6.months.ago, duration: 1.year)
         assert_equal(true, @user.reload.is_banned?)
 
-        put_auth ban_path(@ban.id), create(:moderator_user), params: { ban: { duration: 1.day.iso8601 }}
+        put_auth ban_path(@ban.id), @mod, params: { ban: { duration: 1.day.iso8601 }}
 
         assert_redirected_to @user
         assert_equal(1.day, @ban.reload.duration)
         assert_equal(false, @user.reload.is_banned?)
+
+        assert_equal("updated ban duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("user_ban_update", ModAction.last.category)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
 
       should "ban the user if the ban duration is extended" do
         @user = create(:user)
+        @mod = create(:moderator_user)
         @ban = create(:ban, user: @user, created_at: 6.months.ago, duration: 1.day)
         assert_equal(false, @user.reload.is_banned?)
 
-        put_auth ban_path(@ban.id), create(:moderator_user), params: { ban: { duration: 1.year.iso8601 }}
+        put_auth ban_path(@ban.id), @mod, params: { ban: { reason: "xxx", duration: 1.year.iso8601 }}
 
         assert_redirected_to @user
         assert_equal(1.year, @ban.reload.duration)
         assert_equal(true, @user.reload.is_banned?)
+
+        assert_equal("updated ban reason and duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("user_ban_update", ModAction.last.category)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
 
       should "not allow regular users to update a ban" do

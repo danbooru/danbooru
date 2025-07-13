@@ -2,13 +2,6 @@ require 'test_helper'
 
 class BanTest < ActiveSupport::TestCase
   context "A ban" do
-    context "created by an admin" do
-      should "set the is_banned flag on the user" do
-        ban = create(:ban)
-        assert_equal(true, ban.user.reload.is_banned?)
-      end
-    end
-
     context "deleting user data" do
       setup do
         @banner = create(:moderator_user)
@@ -103,9 +96,24 @@ class BanTest < ActiveSupport::TestCase
       end
     end
 
+    should "set the is_banned flag on the user" do
+      ban = create(:ban)
+      assert_equal(true, ban.user.reload.is_banned?)
+    end
+
     should "initialize the expiration date" do
       ban = create(:ban)
       assert_not_nil(ban.expires_at)
+    end
+
+    should "create a mod action" do
+      user = create(:user)
+      ban = create(:ban, user: user, duration: 100.years, reason: "lol")
+
+      assert_equal("banned <@#{user.name}> forever: lol", ModAction.last.description)
+      assert_equal("user_ban", ModAction.last.category)
+      assert_equal(user, ModAction.last.subject)
+      assert_equal(ban.banner, ModAction.last.creator)
     end
 
     should "update the user's feedback" do
@@ -127,19 +135,31 @@ class BanTest < ActiveSupport::TestCase
 
     context "Updating a ban" do
       should "unban the user if the ban is reduced" do
+        @mod = create(:moderator_user)
         @ban = create(:ban, created_at: 6.months.ago, duration: 1.year)
         assert_equal(true, @ban.user.reload.is_banned?)
 
-        @ban.update!(duration: 1.day)
+        @ban.update!(duration: 1.day, updater: @mod)
         assert_equal(false, @ban.user.reload.is_banned?)
+
+        assert_equal("updated ban duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("user_ban_update", ModAction.last.category)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
 
       should "ban the user if the ban is extended" do
+        @mod = create(:moderator_user)
         @ban = create(:ban, created_at: 6.months.ago, duration: 1.day)
         assert_equal(false, @ban.user.reload.is_banned?)
 
-        @ban.update!(duration: 1.year)
+        @ban.update!(duration: 1.year, updater: @mod)
         assert_equal(true, @ban.user.reload.is_banned?)
+
+        assert_equal("updated ban duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("user_ban_update", ModAction.last.category)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
       end
     end
 

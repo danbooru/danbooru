@@ -21,10 +21,10 @@ class Ban < ApplicationRecord
 
   after_create :create_feedback
   after_create :create_dmail
-  after_create :create_ban_mod_action
   after_create :delete_user_data
   after_destroy :create_unban_mod_action
   after_destroy :update_user_on_destroy
+  after_save :create_mod_action
   after_save :update_user_on_save, if: :saved_change_to_duration?
 
   belongs_to :user
@@ -134,8 +134,12 @@ class Ban < ApplicationRecord
     Dmail.create_automated(to: user, title: "You have been banned", body: "You have been banned #{forever? ? "forever" : "for #{humanized_duration}"}: #{reason}")
   end
 
-  def create_ban_mod_action
-    ModAction.log(%{banned <@#{user_name}> #{humanized_duration}: #{reason}}, :user_ban, subject: user, user: banner)
+  def create_mod_action
+    if previously_new_record?
+      ModAction.log(%{banned <@#{user_name}> #{humanized_duration}: #{reason}}, :user_ban, subject: user, user: banner)
+    elsif saved_changes? && updater.present?
+      ModAction.log(%{updated ban #{saved_changes.keys.without("updated_at").to_sentence} for <@#{user_name}>}, :user_ban_update, subject: user, user: updater)
+    end
   end
 
   def create_unban_mod_action

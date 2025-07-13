@@ -26,6 +26,7 @@ class ModAction < ApplicationRecord
     user_level_change: 7,
     user_approval_privilege: 8,
     user_upload_privilege: 9,
+    user_ban_update: 10,
     user_account_upgrade: 19, # XXX unused
     user_feedback_update: 21,
     user_feedback_delete: 22,

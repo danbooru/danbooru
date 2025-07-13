@@ -35,7 +35,7 @@ class BansController < ApplicationController
 
   def update
     @ban = authorize Ban.find(params[:id])
-    @ban.update(permitted_attributes(@ban))
+    @ban.update(updater: CurrentUser.user, **permitted_attributes(@ban))
     respond_with(@ban, notice: "Ban updated", location: @ban.user)
   end
 
