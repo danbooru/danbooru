@@ -31,10 +31,12 @@ class Ban < ApplicationRecord
   belongs_to :user
   belongs_to :banner, :class_name => "User"
 
+  normalizes :reason, with: ->(reason) { reason.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
   before_validation { user&.lock! }
   validates :duration, presence: true
   validates :duration, inclusion: { in: DURATIONS, message: "%{value} is not a valid ban duration" }, if: :duration_changed?
-  validates :reason, visible_string: true
+  validates :reason, visible_string: true, length: { maximum: 600 }, if: :reason_changed?
   validate :validate_ban_is_editable, on: :update
   validate :validate_user_is_bannable, on: :create
   validate :validate_deletions, on: :create

@@ -199,6 +199,26 @@ class BanTest < ActiveSupport::TestCase
         assert_equal("You can't update an expired ban", @ban.errors.full_messages.first)
       end
     end
+
+    context "when validating a ban" do
+      subject { build(:ban) }
+
+      should normalize_attribute(:reason).from(" \nfoo\tbar \n").to("foo bar")
+
+      should allow_value(1.day.iso8601).for(:duration)
+      should allow_value(3.days.iso8601).for(:duration)
+      should allow_value(7.days.iso8601).for(:duration)
+      should allow_value(1.month.iso8601).for(:duration)
+      should allow_value(3.months.iso8601).for(:duration)
+      should allow_value(6.months.iso8601).for(:duration)
+      should allow_value(1.year.iso8601).for(:duration)
+      should allow_value(100.years.iso8601).for(:duration)
+      should_not allow_value(2.days.iso8601).for(:duration)
+
+      should allow_value("x" * 600).for(:reason)
+      should_not allow_value("x" * 601).for(:reason)
+      should_not allow_value(" ").for(:reason)
+    end
   end
 
   context "Searching for a ban" do
