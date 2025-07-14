@@ -72,7 +72,7 @@ module Source
 
       def profile_url
         if username.present?
-          "https://www.mihuashi.com/users/#{username}?role=painter"
+          "https://www.mihuashi.com/users/#{Danbooru::URL.escape(username)}?role=painter"
         elsif user_id.present?
           "https://www.mihuashi.com/profiles/#{user_id}?role=painter"
         end
