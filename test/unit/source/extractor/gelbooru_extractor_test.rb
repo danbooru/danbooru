@@ -117,6 +117,21 @@ module Source::Tests::Extractor
           artist_commentary_desc: nil,
         )
       end
+
+      context "A Gelbooru post without credentials configured" do
+        strategy_should_work(
+          "https://gelbooru.com/index.php?page=post&s=view&id=7798121",
+          options: { credentials: { blah: "" } },
+          image_urls: [],
+          page_url: "https://gelbooru.com/index.php?page=post&s=view&id=7798121",
+          profile_urls: [],
+          display_name: nil,
+          username: nil,
+          tags: [],
+          dtext_artist_commentary_title: nil,
+          dtext_artist_commentary_desc: nil,
+        )
+      end
     end
 
     context "Safebooru:" do

@@ -92,7 +92,7 @@ module Danbooru
     #
     # @return [String] The escaped string
     def self.escape(string)
-      Addressable::URI.encode_component(string, /[\/?#&+%]/).force_encoding("UTF-8")
+      Addressable::URI.encode_component(string.to_s, /[\/?#&+%]/).force_encoding("UTF-8")
     end
 
     # Unescape URL-encoded characters in a string.
@@ -151,6 +151,7 @@ module Danbooru
 
       if components.key?(:params)
         components[:query] = components.delete(:params).to_h.map do |key, value|
+          next if value.nil?
           "#{Danbooru::URL.escape(key)}=#{Danbooru::URL.escape(value)}"
         end.join("&").presence
       end
