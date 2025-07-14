@@ -27,6 +27,7 @@ module Source
           @full_image_url = to_s.split("!").first.gsub("pfop/", "")
 
         # https://www.mihuashi.com/artworks/15092919
+        # https://www.mihuashi.com/artworks/13693110
         in _, "mihuashi.com", "artworks", work_id
           @work_id = work_id
 
@@ -36,11 +37,13 @@ module Source
 
         # https://www.mihuashi.com/projects/6380467
         # https://www.mihuashi.com/projects/6380753
+        # https://www.mihuashi.com/projects/6401121 (login required)
         in _, "mihuashi.com", "projects", project_id
           @project_id = project_id
 
         # https://www.mihuashi.com/character-card/13373e0997be5d906df9ce292da8ddf6552a340a
         # https://www.mihuashi.com/character-card/4dc65278776db4741a897d7445f48a6b57ce251c/project
+        # https://www.mihuashi.com/character-card/af3843d93dd2754d8f8ab75bf82ee9f02843131a/wardrobes/300790
         in _, "mihuashi.com", "character-card", character_id, *rest
           @character_id = character_id
 
