@@ -22,6 +22,10 @@ module Source
         in "image-assets", "mihuashi.com", "permanent", /^\d+\|-\d{4}$/, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
           @full_image_url = to_s.split("!").first
 
+        # https://image-assets.mihuashi.com/pfop/permanent/4329541|-2024/07/12/18/Fu2oKtHkplA-waTASBzUpF6EozkB.jpg
+        in "image-assets", "mihuashi.com", "pfop", "permanent", /^\d+\|-\d{4}$/, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
+          @full_image_url = to_s.split("!").first.gsub("pfop/", "")
+
         # https://www.mihuashi.com/artworks/15092919
         in _, "mihuashi.com", "artworks", work_id
           @work_id = work_id
