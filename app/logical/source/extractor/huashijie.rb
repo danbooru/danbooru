@@ -13,7 +13,7 @@ module Source
           work[:multiImages].to_a.map do |map|
             image_url = map[:orgPath]
             if map[:videoPath] != ""
-              image_url = map[:videoPath]&.split(",")&.first
+              image_url = map[:videoPath].split(",").first
             end
             Source::URL.parse(image_url).try(:full_image_url) || image_url
           end
@@ -95,13 +95,13 @@ module Source
       memoize def work
         return {} unless work_id.present?
 
-        http.cache(1.minute).parsed_get(work_api_url)[:data] || {}
+        http.cache(1.minute).parsed_get(work_api_url)&.dig(:data) || {}
       end
 
       memoize def product
         return {} unless product_id.present?
 
-        http.cache(1.minute).parsed_get(product_api_url)[:data] || {}
+        http.cache(1.minute).parsed_get(product_api_url)&.dig(:data) || {}
       end
     end
   end
