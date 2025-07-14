@@ -32,8 +32,8 @@ module Source::Tests::URL
         )
 
         url_parser_should_work(
-          "https://www.mihuashi.com/profiles/29105?role=painter",
-          profile_url: "https://www.mihuashi.com/profiles/29105",
+          "https://www.mihuashi.com/profiles/29105",
+          profile_url: "https://www.mihuashi.com/profiles/29105?role=painter",
         )
 
         url_parser_should_work(
