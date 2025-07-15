@@ -70,7 +70,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://seiga.nicovideo.jp/watch/mg470189?track=ct_episode",
         image_urls: image_urls,
-        page_url: "https://seiga.nicovideo.jp/watch/mg470189",
+        page_url: "https://manga.nicovideo.jp/watch/mg470189",
         artist_name: "風呂",
         profile_url: "https://seiga.nicovideo.jp/user/illust/20797022",
         artist_commentary_title: "ハコ女子 1ハコ目",
@@ -90,7 +90,7 @@ module Source::Tests::Extractor
           https://deliver.cdn.nicomanga.jp/thumb/12773055p?1655391688
           https://deliver.cdn.nicomanga.jp/thumb/12773056p?1655391688
         ],
-        page_url: "https://seiga.nicovideo.jp/watch/mg658198",
+        page_url: "https://manga.nicovideo.jp/watch/mg658198",
         artist_name: "あろめみ",
         profile_url: "https://seiga.nicovideo.jp/user/illust/123720050",
         tags: %w[DIY 日常],
@@ -114,7 +114,7 @@ module Source::Tests::Extractor
           { file_size: 218_180 },
           { file_size: 113_071 },
         ],
-        page_url: "https://seiga.nicovideo.jp/watch/mg485611",
+        page_url: "https://manga.nicovideo.jp/watch/mg485611",
         profile_urls: %w[https://seiga.nicovideo.jp/user/illust/1116797],
         display_name: "まいまい",
         username: nil,
@@ -154,7 +154,7 @@ module Source::Tests::Extractor
         "https://seiga.nicovideo.jp/image/source/9146749",
         referer: "https://seiga.nicovideo.jp/watch/mg389884",
         image_urls: [%r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/9146749}],
-        page_url: "https://seiga.nicovideo.jp/watch/mg389884",
+        page_url: "https://manga.nicovideo.jp/watch/mg389884",
       )
     end
 
@@ -237,7 +237,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://seiga.nicovideo.jp/watch/mg302561",
         image_urls: image_urls,
-        page_url: "https://seiga.nicovideo.jp/watch/mg302561",
+        page_url: "https://manga.nicovideo.jp/watch/mg302561",
         tags: [["ロリ", "https://seiga.nicovideo.jp/manga/tag/ロリ"]],
         artist_name: "とろてい",
         other_names: ["とろてい"],

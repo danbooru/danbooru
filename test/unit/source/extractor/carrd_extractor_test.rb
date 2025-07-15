@@ -137,27 +137,30 @@ module Source::Tests::Extractor
           https://badkrol.carrd.co/assets/images/gallery01/1f27675c.jpg
           https://badkrol.carrd.co/assets/images/gallery01/5cb6a551.jpg
           https://badkrol.carrd.co/assets/images/gallery01/33dfc438.jpg
-          https://badkrol.carrd.co/assets/images/gallery01/4105a942.jpg
           https://badkrol.carrd.co/assets/images/gallery01/6c23bf4e.jpg
           https://badkrol.carrd.co/assets/images/gallery01/91533ed2.jpg
           https://badkrol.carrd.co/assets/images/gallery01/914faf8b.jpg
           https://badkrol.carrd.co/assets/images/gallery01/64209a6e.jpg
+          https://badkrol.carrd.co/assets/images/gallery01/b602a964.jpg
+          https://badkrol.carrd.co/assets/images/gallery01/734f23b0.jpg
+          https://badkrol.carrd.co/assets/images/gallery01/588d532b.jpg
+          https://badkrol.carrd.co/assets/images/gallery01/37768253.jpg
+          https://badkrol.carrd.co/assets/images/gallery01/670bc67a.jpg
           https://badkrol.carrd.co/assets/images/gallery02/e9db9481.jpg
-          https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg
           https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg
           https://badkrol.carrd.co/assets/images/gallery02/84339c57.jpg
           https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg
           https://badkrol.carrd.co/assets/images/gallery02/0db4767e.jpg
           https://badkrol.carrd.co/assets/images/gallery02/8b01a93d.jpg
           https://badkrol.carrd.co/assets/images/gallery02/4451caa0.jpg
-          https://badkrol.carrd.co/assets/images/gallery02/2b66ac8f.jpg
           https://badkrol.carrd.co/assets/images/gallery02/2ee5d457.jpg
-          https://badkrol.carrd.co/assets/images/gallery02/7438d70f.jpg
-          https://badkrol.carrd.co/assets/images/gallery02/2803a091.jpg
           https://badkrol.carrd.co/assets/images/gallery02/5599d4f0.jpg
           https://badkrol.carrd.co/assets/images/gallery02/d8c12b40.jpg
           https://badkrol.carrd.co/assets/images/gallery02/79557ece.jpg
+          https://badkrol.carrd.co/assets/images/gallery02/5318021e.jpg
+          https://badkrol.carrd.co/assets/images/gallery02/ef61cded.jpg
           https://badkrol.carrd.co/assets/images/gallery03/79cda577.jpg
+          https://badkrol.carrd.co/assets/images/gallery03/2bc634dc.jpg
         ],
         media_files: [
           { file_size: 7_608 },
@@ -176,27 +179,30 @@ module Source::Tests::Extractor
           { file_size: 10_785 },
           { file_size: 9_375 },
           { file_size: 16_611 },
-          { file_size: 10_317 },
           { file_size: 12_118 },
           { file_size: 8_038 },
           { file_size: 8_608 },
           { file_size: 9_687 },
+          { file_size: 10_984 },
+          { file_size: 9_228 },
+          { file_size: 12_161 },
+          { file_size: 8_181 },
+          { file_size: 24_784 },
           { file_size: 9_222 },
-          { file_size: 19_498 },
           { file_size: 8_746 },
           { file_size: 18_136 },
           { file_size: 17_550 },
           { file_size: 11_945 },
           { file_size: 22_405 },
           { file_size: 7_488 },
-          { file_size: 8_433 },
           { file_size: 16_564 },
-          { file_size: 6_787 },
-          { file_size: 7_166 },
           { file_size: 18_659 },
           { file_size: 9_956 },
           { file_size: 11_345 },
+          { file_size: 10_792 },
+          { file_size: 11_225 },
           { file_size: 43_359 },
+          { file_size: 31_406 }
         ],
         page_url: "https://badkrol.carrd.co/#commission",
         profile_urls: %w[https://badkrol.carrd.co],
@@ -230,35 +236,38 @@ module Source::Tests::Extractor
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/1f27675c.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/5cb6a551.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/33dfc438.jpg]
-          * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/4105a942.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/6c23bf4e.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/91533ed2.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/914faf8b.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/64209a6e.jpg]
+          * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/b602a964.jpg]
+          * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/734f23b0.jpg]
+          * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/588d532b.jpg]
+          * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/37768253.jpg]
+          * "[image]":[https://badkrol.carrd.co/assets/images/gallery01/670bc67a.jpg]
 
           🎈Note:for additional difficulty of a character or artwork as a whole, additional fees may be added.🎈
 
           Illustration
 
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/e9db9481.jpg]
-          * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/5738474b.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/3ac7eb98.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/84339c57.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/0214174e.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/0db4767e.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/8b01a93d.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/4451caa0.jpg]
-          * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/2b66ac8f.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/2ee5d457.jpg]
-          * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/7438d70f.jpg]
-          * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/2803a091.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/5599d4f0.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/d8c12b40.jpg]
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/79557ece.jpg]
+          * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/5318021e.jpg]
+          * "[image]":[https://badkrol.carrd.co/assets/images/gallery02/ef61cded.jpg]
 
           Character Sheet ( Anime and Semi-r)
 
           * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/79cda577.jpg]
+          * "[image]":[https://badkrol.carrd.co/assets/images/gallery03/2bc634dc.jpg]
 
           Backgrounds
         EOS
@@ -331,41 +340,40 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://silvivtuber.carrd.co/#ref",
         image_urls: %w[
-          https://silvivtuber.carrd.co/assets/images/image06.jpg
+          https://silvivtuber.carrd.co/assets/images/image16.jpg
           https://silvivtuber.carrd.co/assets/images/image14.png
         ],
         media_files: [
-          { file_size: 399_974 },
-          { file_size: 2_441_132 },
+          { file_size: 470_226 },
+          { file_size: 3_362_739 },
         ],
         page_url: "https://silvivtuber.carrd.co/#ref",
-        profile_url: "https://silvivtuber.carrd.co",
         profile_urls: %w[https://silvivtuber.carrd.co],
+        display_name: nil,
         username: "silvivtuber",
-        other_names: ["silvivtuber"],
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          "[image]":[https://silvivtuber.carrd.co/assets/images/image06.jpg]
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          "[image]":[https://silvivtuber.carrd.co/assets/images/image16.jpg]
 
           "[image]":[https://silvivtuber.carrd.co/assets/images/image14.png]
 
-          h2. ・BLOOD SILVI ・ REFERENCE
+          h2. ・ANGEL SILVI ・ REFERENCE
 
           [b]Species:[/b] Owl
           [b]Gender:[/b] Female
           [b]Height:[/b] 5 Feet and a half inch tall (154 cm)
           [b]Birthday:[/b] March 3rd
           [b]Body Type:[/b] Slender
-          [b]Eye Color:[/b] Red Orange glow with purple undertone
-          [b]Hair Color:[/b] Black with red under hair and a red streak on their bangs
+          [b]Eye Color:[/b] Light Blue
+          [b]Hair Color:[/b] Blonde, almost creamy white
 
           [b][ Notes][/b]
           ✧ Flat chested
-          ✧ Tattoo on front of right thigh
-          ✧ Elf ears with earrings along the top
-          ✧ Bandages on her right arm, usually wields scythe with this arm[b][Personality][/b]
-          Haughty, evil and domineering! She will demand the world of you and more! You will submit to her or you will be punished! She is also messy and lazy, will not do chores on her own! Always covered in blood for some reason! Chuunibyou tendencies.
+          ✧ Big Hairbuns
+          ✧ Elf ears
+          ✧ Halo and Wings with Armorplates[b][Personality][/b]
+          Like a Cute Angel, she will sing you a song!
         EOS
       )
     end

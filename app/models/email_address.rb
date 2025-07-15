@@ -88,9 +88,9 @@ class EmailAddress < ApplicationRecord
 
     if user == updater
       UserEvent.create_from_request!(user, :email_change, request)
-    elsif address_before_last_save.present?
+    elsif address_before_last_save.present? && updater.present?
       ModAction.log("changed user ##{user.id}'s email from #{address_before_last_save} to #{address}", :email_address_update, subject: user, user: updater)
-    else
+    elsif updater.present?
       ModAction.log("changed user ##{user.id}'s email to #{address}", :email_address_update, subject: user, user: updater)
     end
   end

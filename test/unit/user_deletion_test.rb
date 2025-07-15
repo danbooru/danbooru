@@ -22,6 +22,16 @@ class UserDeletionTest < ActiveSupport::TestCase
       end
     end
 
+    context "for a moderator" do
+      should "fail" do
+        @user = create(:moderator_user)
+        @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
+        @deletion.delete!
+        assert_includes(@deletion.errors[:base], "Moderators cannot delete their account")
+        assert_equal(false, @user.reload.is_deleted)
+      end
+    end
+
     context "for an admin" do
       should "fail" do
         @user = create(:admin_user)
@@ -45,7 +55,7 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "a valid user deletion" do
     setup do
-      @user = create(:gold_user, name: "foo", email_address: build(:email_address), totp_secret: TOTP.generate_secret, backup_codes: [1, 2, 3])
+      @user = create(:gold_user, :with_email, :with_2fa, name: "foo")
       @api_key = create(:api_key, user: @user)
       @favorite = create(:favorite, user: @user)
       @forum_topic_visit = as(@user) { create(:forum_topic_visit, user: @user) }
@@ -60,6 +70,7 @@ class UserDeletionTest < ActiveSupport::TestCase
     should "blank out the email" do
       perform_enqueued_jobs { @deletion.delete! }
       assert_nil(@user.reload.email_address)
+      assert_equal(false, ModAction.email_address_update.exists?)
     end
 
     should "rename the user" do

@@ -350,9 +350,9 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://tooco.com.ar/6-of-diamonds-paradise-bird",
         image_urls: %w[
-          https://pro2-bar-s3-cdn-cf3.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/4e578de7400d3ffa7566376b.jpg?h=d4175c45d88c67e51c1cbfce49decc3b
-          https://pro2-bar-s3-cdn-cf6.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/af57cb30368b3d3b3576fe81.jpg?h=d656289b0092beab1297ad678ef12647
-          https://pro2-bar-s3-cdn-cf3.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/42e3fff0107e417fde1053a5.jpg?h=a1ea27ce8ed8ca8c19d6fc9a8f761815
+          https://cdn.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/4e578de7400d3ffa7566376b.jpg?h=d4175c45d88c67e51c1cbfce49decc3b
+          https://cdn.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/af57cb30368b3d3b3576fe81.jpg?h=d656289b0092beab1297ad678ef12647
+          https://cdn.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/42e3fff0107e417fde1053a5.jpg?h=a1ea27ce8ed8ca8c19d6fc9a8f761815
         ],
         media_files: [
           { file_size: 1_073_457 },
@@ -371,11 +371,11 @@ module Source::Tests::Extractor
         dtext_artist_commentary_desc: <<~EOS.chomp,
           Illustration and card design for Playing Arts Cards, Edition 3.
 
-          "[image]":[https://pro2-bar-s3-cdn-cf3.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/4e578de7400d3ffa7566376b_rw_1920.jpg?h=70c316859053e0140e6102f60ecfb13c]
+          "[image]":[https://cdn.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/4e578de7400d3ffa7566376b_rw_1920.jpg?h=70c316859053e0140e6102f60ecfb13c]
 
-          "[image]":[https://pro2-bar-s3-cdn-cf6.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/af57cb30368b3d3b3576fe81_rw_1920.jpg?h=7a34fa585a387d6fe534680114fd77f4]
+          "[image]":[https://cdn.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/af57cb30368b3d3b3576fe81_rw_1920.jpg?h=7a34fa585a387d6fe534680114fd77f4]
 
-          "[image]":[https://pro2-bar-s3-cdn-cf3.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/42e3fff0107e417fde1053a5_rw_1920.jpg?h=599fb064e15bd811b81745569dc5c7e3]
+          "[image]":[https://cdn.myportfolio.com/ea94248a8ad87a031cf807d40eb5ac83/42e3fff0107e417fde1053a5_rw_1920.jpg?h=599fb064e15bd811b81745569dc5c7e3]
 
           ◊ - ◊ - ◊
         EOS

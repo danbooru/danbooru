@@ -42,7 +42,7 @@
 
       <%= edit_form_for(@change_request, html: { class: "w-full stacked-form" }) do |f| %>
         <%= f.input :user_id, as: :hidden, input_html: { value: @change_request.user_id } %>
-        <%= f.input :desired_name, label: "New name" %>
+        <%= f.input :desired_name, label: "New name", input_html: { autofocus: true } %>
         <%= f.submit "Save", class: "button-primary", "data-confirm": "Are you sure you want to change your name?" %>
       <% end %>
     </div>

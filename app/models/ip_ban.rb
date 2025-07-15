@@ -7,8 +7,10 @@ class IpBan < ApplicationRecord
   belongs_to :creator, class_name: "User"
   has_many :mod_actions, as: :subject, dependent: :destroy
 
+  normalizes :reason, with: ->(reason) { reason.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
   validate :validate_ip_addr
-  validates :reason, visible_string: true
+  validates :reason, visible_string: true, length: { maximum: 140 }, if: :reason_changed?
 
   after_save :create_mod_action
 

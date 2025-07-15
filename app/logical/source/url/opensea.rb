@@ -29,7 +29,9 @@ class Source::URL::Opensea < Source::URL
 
     # https://opensea.io/assets/matic/0x2953399124f0cbb46d2cbacd8a89cf0599974963/73367181727578658379392940909024713110943326450271164125938382654208802291713
     # https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/47707087614834185592401815072389651465878170492683018350293856127512379129861
-    in _, "opensea.io", "assets", chain, contract_id, token_id
+    # https://opensea.io/item/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/25498143383868488060407396481663496375452486694447065582311815598428410347521
+    # https://opensea.io/item/ethereum/0xe07b8409130c8ca1548c16cf43d612c3a099e1f7/8
+    in _, "opensea.io", ("assets" | "item"), chain, contract_id, token_id
       @chain = chain
       @contract_id = contract_id
       @token_id = token_id
@@ -63,7 +65,7 @@ class Source::URL::Opensea < Source::URL
   end
 
   def page_url
-    "https://opensea.io/assets/#{chain}/#{contract_id}/#{token_id}" if chain.present? && contract_id.present? && token_id.present?
+    "https://opensea.io/item/#{chain}/#{contract_id}/#{token_id}" if chain.present? && contract_id.present? && token_id.present?
   end
 
   def profile_url

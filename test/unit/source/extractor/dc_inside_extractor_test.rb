@@ -165,8 +165,8 @@ module Source::Tests::Extractor
     context "A post with lowres static image" do
       strategy_should_work(
         "https://gall.dcinside.com/mgallery/board/view/?id=wutheringwaves&no=1048846",
-        image_urls: %w[https://dcimg8.dcinside.co.kr/viewimage.php?no=24b0d769e1d32ca73de882fa1bd62531b6b898211a669f8109c0200b5f38eee53cbc0166b03709dfe09883156a5b650175adb480faac5778fa1858b1221531f2e4f250522e52de0ab12ca7],
-        media_files: [{ file_size: 0 }],
+        image_urls: %w[https://dcimg4.dcinside.co.kr/viewimage.php?no=24b0d769e1d32ca73de882fa1bd62531b6b898211a669f8109c0200b5f38eee53cbc0166b03709dfe09883156a5b650175adb480faac5778fa1858b1221531f2e4f250522e52de0ab12ca7],
+        media_files: [{ file_size: 68_996 }],
         page_url: "https://gall.dcinside.com/mgallery/board/view/?id=wutheringwaves&no=1048846",
         profile_urls: %w[https://gallog.dcinside.com/mission7804],
         display_name: "요로로롱",
@@ -174,7 +174,7 @@ module Source::Tests::Extractor
         tags: [],
         dtext_artist_commentary_title: "[창작🎨] 카르띳띠 그렸음다",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          "0ebcc232e0c630bf67be9bb619dc6a373d1058f1942ff49dbfce9ab3f7bf":[https://dcimg8.dcinside.co.kr/viewimage.php?id=3aa8c42ee0c031a869a8d7a313c2&no=24b0d769e1d32ca73de882fa1bd62531b6b898211a669f8109c0200b5f38eee53cbc0166b03709dfe09883156a5b650175adb480faac5778fa1858b1221531f2e4f250522e52de0ab12ca7]
+          "0ebcc232e0c630bf67be9bb619dc6a373d1058f1942ff49dbfce9ab3f7bf":[https://dcimg4.dcinside.co.kr/viewimage.php?id=3aa8c42ee0c031a869a8d7a313c2&no=24b0d769e1d32ca73de882fa1bd62531b6b898211a669f8109c0200b5f38eee53cbc0166b03709dfe09883156a5b650175adb480faac5778fa1858b1221531f2e4f250522e52de0ab12ca7]
           개미는 오늘도 열심히 ...!!!
         EOS
       )

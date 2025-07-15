@@ -13,6 +13,10 @@ class IpBanPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def rate_limit_for_write(**_options)
+    { action: "ip_bans:write", rate: 1.0 / 1.minute, burst: 60 } # 60 per hour, 120 in first hour
+  end
+
   def permitted_attributes
     [:ip_addr, :reason, :is_deleted, :category]
   end

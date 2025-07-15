@@ -185,7 +185,7 @@ module Source::Tests::Extractor
         image_urls: [],
         page_url: "https://poipiku.com/16109/8284794.html",
         profile_url: "https://poipiku.com/16109/",
-        profile_urls: %w[https://poipiku.com/16109/ https://www.pixiv.net/users/46937590 https://skeb.jp/@kmbkshbnlss],
+        profile_urls: %w[https://marshmallow-qa.com/_otsubo_ https://odaibako.net/u/kmbkshbnlss https://poipiku.com/16109/ https://www.pixiv.net/users/46937590],
         display_name: "緊縛師ボンレス（ル×ガの民）",
         tag_name: "poipiku_16109",
         other_names: ["緊縛師ボンレス（ル×ガの民）"],

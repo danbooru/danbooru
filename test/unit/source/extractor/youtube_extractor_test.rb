@@ -116,7 +116,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 1_379_490 }],
         page_url: "https://www.youtube.com/post/UgkxPM838FMMDlZd0fooRblYR4zysjfbgYhv",
         profile_urls: %w[https://www.youtube.com/@RitaKamishiro https://www.youtube.com/channel/UCBJFsaCvgBa1a9BnEaxu97Q],
-        display_name: "Rita Kamishiro / 神代りた【NOA】",
+        display_name: "Rita Kamishiro / 神代りた",
         username: "RitaKamishiro",
         tags: [
           ["kamiscribble", "https://www.youtube.com/hashtag/kamiscribble"],

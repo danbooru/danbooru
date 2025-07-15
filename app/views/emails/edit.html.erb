@@ -26,7 +26,7 @@
       </div>
 
       <%= edit_form_for(@email_address, url: user_email_path(@user), method: "put", html: { class: "w-full stacked-form" }) do |f| %>
-        <%= f.input :address, as: :email %>
+        <%= f.input :address, as: :email, input_html: { autofocus: true } %>
 
         <div>
           <%= f.submit "Save", class: "button-primary" %>

@@ -9,13 +9,13 @@ module DanbooruMaintenance
     queue RegeneratePostCountsJob
     queue PruneUploadsJob
     queue PruneJobsJob
+    queue PruneBansJob
     #queue AmcheckDatabaseJob
   end
 
   def daily
     queue PrunePostDisapprovalsJob
     queue PruneBulkUpdateRequestsJob
-    queue PruneBansJob
     queue BigqueryExportAllJob
     queue VacuumDatabaseJob
   end

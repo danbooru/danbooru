@@ -24,8 +24,6 @@ class ApplicationMailer < ActionMailer::Base
     headers["X-Danbooru-User"] = "#{user.name} <#{user_url(user)}>"
     if params.to_h[:request]
       headers["X-Danbooru-URL"] = params[:request][:url]
-      headers["X-Danbooru-IP"] = params[:request][:remote_ip]
-      headers["X-Danbooru-Session"] = params[:request][:session_id]
       headers["X-Request-Id"] = params[:request][:request_id]
     end
 
@@ -40,9 +38,7 @@ class ApplicationMailer < ActionMailer::Base
     with(
       request: {
         url: "#{request.method} #{request.url}",
-        remote_ip: request.remote_ip.to_s,
         request_id: request.request_id.to_s,
-        session_id: request.session.id.to_s,
       },
       **params
     )
