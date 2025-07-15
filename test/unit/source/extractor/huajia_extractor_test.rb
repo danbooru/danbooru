@@ -90,8 +90,8 @@ module Source::Tests::Extractor
           "https://huajia.163.com/main/projects/details/1rxjP93B",
           image_urls: [],
           media_files: [],
-          profile_url: "https://huajia.163.com/main/profile/WEXnWy58",
-          display_name: "艺浅浅浅浅",
+          profile_url: nil,
+          display_name: nil,
           dtext_artist_commentary_title: "想吃平价小零食😋🤲🏻（拖家带口版）",
           dtext_artist_commentary_desc: "想要出图快的😭🫳🏻🫳🏻 🥬的😭 预算10~80其实是",
         )
@@ -102,8 +102,8 @@ module Source::Tests::Extractor
           "https://huajia.163.com/main/projects/details/LBpxo0wB",
           image_urls: [],
           media_files: [],
-          profile_url: "https://huajia.163.com/main/profile/brOng2ME",
-          display_name: "就爱吃炙烤三文鱼",
+          profile_url: nil,
+          display_name: nil,
           dtext_artist_commentary_title: "［文手老师来］我想要建设一个梦女角色",
           dtext_artist_commentary_desc: "是1999中阿莱夫的梦女\n想要约文设，要求尽量贴合我现实中的性格\n外貌可以随意设计\n预算无上限，价格合理就好，必须有一定文字与设计功底，拒绝坐地起价\n希望可以有一点耐心，我打字慢\n过程流畅，作品高质￼我会狠狠打奶茶钱",
         )
@@ -114,8 +114,8 @@ module Source::Tests::Extractor
           "https://huajia.163.com/main/projects/details/K85e1RO8",
           image_urls: %w[https://huajia.fp.ps.netease.com/file/687273cd28649e056788f746SCrk3M6r06],
           media_files: [{ file_size: 215_082 }],
-          profile_url: "https://huajia.163.com/main/profile/GBDYoDqE",
-          display_name: "大鹅aaa",
+          profile_url: nil,
+          display_name: nil,
           dtext_artist_commentary_title: "我想约古早插",
           dtext_artist_commentary_desc: "看对眼我就约（不要模版）🥴",
         )

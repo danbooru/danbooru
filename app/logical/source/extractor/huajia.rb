@@ -51,7 +51,7 @@ module Source
       end
 
       def user_id
-        user["uid"] || parsed_url.user_id || parsed_referer&.user_id
+        user["uid"] || parsed_url.user_id || parsed_referer&.user_id unless commission.present?
       end
 
       def user
@@ -59,8 +59,6 @@ module Source
           work["author"]
         elsif goods.present?
           goods["user"]
-        elsif commission.present?
-          commission["user"]
         else
           {}
         end
