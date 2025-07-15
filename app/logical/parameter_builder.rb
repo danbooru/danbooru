@@ -23,9 +23,13 @@ class ParameterBuilder
       if match && available_includes.include?(item_sym) && (!was_seen || is_root)
         item_object = object.send(item_sym)
         next if item_object.nil?
-        item_object = item_object[0] if item_object.is_a?(ActiveRecord::Relation)
         item_array = split_only_string(match[2])
-        item_hash = get_only_hash(item_array, item_object, seen_objects.clone)
+        item_objects = item_object.is_a?(ActiveRecord::Relation) ? item_object : [item_object]
+        item_hash = item_objects.map do |item_object|
+          get_only_hash(item_array, item_object, seen_objects.clone)
+        end.reduce do |memo, item_hash|
+          merge_only_hash(memo, item_hash)
+        end
         only_hash[:include] << Hash[item_sym, item_hash]
       elsif available_includes.include?(item_sym) && (!was_seen || is_root)
         only_hash[:include] << item_sym
@@ -104,5 +108,17 @@ class ParameterBuilder
       position += end_pos
     end
     only_array << only_string[Range.new(offset, -1)]
+  end
+
+  def self.merge_only_hash(h1, h2)
+    h1.merge(h2) do |key, v1, v2|
+      if v1.is_a?(Hash) && v2.is_a?(Hash)
+        merge_only_hash(v1, v2)
+      elsif v1.is_a?(Array) && v2.is_a?(Array)
+        v1 | v2
+      else
+        v2
+      end
+    end
   end
 end
