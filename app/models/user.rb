@@ -419,6 +419,11 @@ class User < ApplicationRecord
         end
       end
     end
+
+    # @return [Boolean] True if the user has 2FA enabled.
+    def has_2fa?
+      totp_secret.present?
+    end
   end
 
   concerning :BackupCodeMethods do
