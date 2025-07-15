@@ -311,11 +311,8 @@ class User < ApplicationRecord
       end
     end
 
-    def change_password(current_user:, current_password:, new_password:, password_confirmation:, verification_code:, request:)
-      if self != current_user && PasswordPolicy.new(current_user, self).can_change_user_passwords?
-        UserEvent.build_from_request(self, :password_change, request)
-        update(password: new_password, password_confirmation: password_confirmation)
-      elsif !authenticate_password(current_password)
+    def change_password(current_password:, new_password:, password_confirmation:, verification_code:, request:)
+      if !authenticate_password(current_password)
         UserEvent.create_from_request!(self, :failed_reauthenticate, request)
         errors.add(:current_password, "is incorrect")
         false

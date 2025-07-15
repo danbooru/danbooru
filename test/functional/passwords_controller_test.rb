@@ -12,13 +12,8 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "work for the owner viewing another users's change password page" do
-        get_auth edit_user_password_path(@user), create(:owner_user)
-        assert_response :success
-      end
-
       should "not work for a user viewing another users's change password page" do
-        get_auth edit_user_password_path(@user), create(:user)
+        get_auth edit_user_password_path(@user), create(:owner_user)
         assert_response 403
       end
 
@@ -45,19 +40,9 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @user.user_events.password_change.exists?)
       end
 
-      should "allow the site owner to change the password of other users" do
+      should "not allow users to change the password of other users" do
         @owner = create(:owner_user)
-        put_auth user_password_path(@user), @owner, params: { user: { password: "abcde", password_confirmation: "abcde" } }
-
-        assert_redirected_to @user
-        assert_equal(false, @user.reload.authenticate_password("12345"))
-        assert_equal(@user, @user.authenticate_password("abcde"))
-        assert_equal(true, @user.user_events.password_change.exists?)
-      end
-
-      should "not allow non-owners to change the password of other users" do
-        @admin = create(:admin_user)
-        put_auth user_password_path(@user), @admin, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde" } }
+        put_auth user_password_path(@user), @owner, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde" } }
 
         assert_response 403
         assert_equal(@user, @user.reload.authenticate_password("12345"))
