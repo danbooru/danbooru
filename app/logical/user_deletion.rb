@@ -111,8 +111,8 @@ class UserDeletion
         errors.add(:base, "Password is incorrect")
       end
 
-      if user.is_admin?
-        errors.add(:base, "Admins cannot delete their account")
+      if user.is_moderator?
+        errors.add(:base, "#{user.level_string.pluralize} cannot delete their account")
       end
 
       if user.is_banned?

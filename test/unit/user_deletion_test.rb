@@ -22,6 +22,16 @@ class UserDeletionTest < ActiveSupport::TestCase
       end
     end
 
+    context "for a moderator" do
+      should "fail" do
+        @user = create(:moderator_user)
+        @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
+        @deletion.delete!
+        assert_includes(@deletion.errors[:base], "Moderators cannot delete their account")
+        assert_equal(false, @user.reload.is_deleted)
+      end
+    end
+
     context "for an admin" do
       should "fail" do
         @user = create(:admin_user)
