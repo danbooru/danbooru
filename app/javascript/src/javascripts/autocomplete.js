@@ -92,15 +92,22 @@ Autocomplete.initialize_tag_autocomplete = function() {
         let caret = target.selectionStart;
         var before_caret_text = target.value.substring(0, caret);
         var after_caret_text = target.value.substring(caret);
-        let orig_after_caret_text = after_caret_text;
         if (event.inputType == "deleteWordBackward") {
-          before_caret_text = before_caret_text.replace(Autocomplete.PREV_WORD_REGEXP, "");
+          before_caret_text = before_caret_text.replace(Autocomplete.PREV_WORD_REGEXP, function(match) {
+            if (!match.startsWith(" ") && match.endsWith(" ")) {
+              // Add an extra space after the caret when deleting the final word in a tag.
+              after_caret_text = " " + after_caret_text;
+            }
+            return "";
+          });
         } else if (event.inputType == "deleteWordForward") {
-          after_caret_text = after_caret_text.replace(Autocomplete.NEXT_WORD_REGEXP, "");
-        }
-        if (after_caret_text.match(/^\S/) && orig_after_caret_text.match(/^\S/)) {
-          // There's a tag after the caret, so add a space between them so it doesn't interfere with autocomplete.
-          after_caret_text = " " + after_caret_text;
+          after_caret_text = after_caret_text.replace(Autocomplete.NEXT_WORD_REGEXP, function(match) {
+            if (!match.startsWith(" ") && match.endsWith(" ")) {
+              // Add an extra space after the caret when deleting the final word in a tag.
+              return " ";
+            }
+            return "";
+          });
         }
         $(target).replaceFieldText(before_caret_text + after_caret_text);
         target.selectionStart = target.selectionEnd = before_caret_text.length;
@@ -148,10 +155,20 @@ Autocomplete.initialize_tag_autocomplete = function() {
 
 Autocomplete.current_term = function($input, caret = $input.get(0).selectionStart) {
   let query = $input.get(0).value;
+  let term_before_caret = query.substring(0, caret);
   let term_after_caret = query.substring(caret).match(/\S*/)[0];
-  caret += term_after_caret.length;
+  let term = term_before_caret;
+  if (term_after_caret) {
+    // If the caret is in the middle of tag, treat it as a wildcard asterisk.
+    // This allows the user to get useful autocomplete results by only typing the first few characters of a word between two other words.
+    term += "*" + term_after_caret;
+    if (!term_before_caret.includes("*") && !term_after_caret.includes("*")) {
+      // If the user did not manually type an asterisk then we need to add one at the end to simulate the normal prefix search behavior.
+      term += "*";
+    }
+  }
   let regexp = new RegExp(`^[-~(]*(${Autocomplete.tag_prefixes().join("|")})?`);
-  let match = query.substring(0, caret).match(/\S*$/)[0].replace(regexp, "").toLowerCase();
+  let match = term.match(/\S*$/)[0].replace(regexp, "").toLowerCase();
   return match;
 };
 
