@@ -47,10 +47,6 @@ module Source
         [profile_url, account_url].compact
       end
 
-      def display_name
-        username&.strip
-      end
-
       def tags
         if work.present?
           work[:tags].to_a.map do |tag|
@@ -84,11 +80,11 @@ module Source
       end
 
       def user_id
-        user[:id] || parsed_url.user_id || parsed_referer&.user_id unless project.present? || character_id.present?
+        user[:id] || parsed_url.user_id || parsed_referer&.user_id unless project.present? || character_card.present?
       end
 
       def username
-        user[:name] || parsed_url.username || parsed_referer&.username unless project.present? || character_id.present?
+        user[:name] || parsed_url.username || parsed_referer&.username unless project.present? || character_card.present?
       end
 
       def user
