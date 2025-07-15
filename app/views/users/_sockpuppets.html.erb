@@ -4,7 +4,7 @@
   <% if sockpuppet_accounts[:session_ids].present? || sockpuppet_accounts[:ip_addresses].present? %>
     <strong>Other Accounts</strong>
 
-    <div class="flex flex-wrap sm:flex-col gap-2 my-2 fixed-width-container">
+    <div class="flex flex-wrap sm:flex-col gap-2 mb-2 fixed-width-container">
       <% sockpuppet_accounts[:session_ids].each do |session_id, users| %>
         <span class="chip-primary-bg rounded border flex flex-col items-stretch">
           <span class="m-1 text-sm leading-normal">

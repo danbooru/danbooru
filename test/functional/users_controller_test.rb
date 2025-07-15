@@ -615,6 +615,16 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth edit_user_path(@user), @user
         assert_response :success
       end
+
+      should "allow the owner to view another user's settings" do
+        get_auth edit_user_path(@user), create(:owner_user)
+        assert_response :success
+      end
+
+      should "not allow a user to view another user's settings" do
+        get_auth edit_user_path(@user), create(:admin_user)
+        assert_response 403
+      end
     end
 
     context "settings action" do
@@ -634,8 +644,16 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     context "update action" do
       should "update a user" do
         put_auth user_path(@user), @user, params: {:user => {:favorite_tags => "xyz"}}
-        @user.reload
-        assert_equal("xyz", @user.favorite_tags)
+
+        assert_redirected_to edit_user_path(@user)
+        assert_equal("xyz", @user.reload.favorite_tags)
+      end
+
+      should "not allow a user to update another user's settings" do
+        put_auth user_path(@user), create(:owner_user), params: { user: { per_page: 123 }}
+
+        assert_response 403
+        assert_equal(20, @user.reload.per_page)
       end
 
       context "for a Member-level user" do

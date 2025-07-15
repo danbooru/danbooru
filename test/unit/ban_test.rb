@@ -2,37 +2,15 @@ require 'test_helper'
 
 class BanTest < ActiveSupport::TestCase
   context "A ban" do
-    context "created by an admin" do
-      setup do
-        @banner = FactoryBot.create(:admin_user)
-        CurrentUser.user = @banner
-      end
-
-      teardown do
-        @banner = nil
-        CurrentUser.user = nil
-      end
-
-      should "set the is_banned flag on the user" do
-        user = FactoryBot.create(:user)
-        ban = FactoryBot.build(:ban, :user => user, :banner => @banner)
-        ban.save
-        user.reload
-        assert(user.is_banned?)
-      end
-
-      should "be valid" do
-        user = FactoryBot.create(:user)
-        ban = FactoryBot.create(:ban, :user => user, :banner => @banner)
-        assert(ban.errors.empty?)
-      end
-    end
-
     context "deleting user data" do
       setup do
         @banner = create(:moderator_user)
         CurrentUser.user = @banner
         @bannee = create(:user)
+      end
+
+      teardown do
+        CurrentUser.user = nil
       end
 
       should "delete the user's pending posts" do
@@ -118,13 +96,33 @@ class BanTest < ActiveSupport::TestCase
       end
     end
 
+    should "set the is_banned flag on the user" do
+      ban = create(:ban)
+      assert_equal(true, ban.user.reload.is_banned?)
+    end
+
+    should "not allow the user to be banned twice" do
+      user = create(:user)
+      ban1 = create(:ban, user: user)
+      ban2 = build(:ban, user: user)
+
+      assert_equal(false, ban2.save)
+      assert_equal(["User is already banned"], ban2.errors.full_messages)
+    end
+
     should "initialize the expiration date" do
-      user = FactoryBot.create(:user)
-      admin = FactoryBot.create(:admin_user)
-      CurrentUser.scoped(admin) do
-        ban = FactoryBot.create(:ban, :user => user, :banner => admin)
-        assert_not_nil(ban.expires_at)
-      end
+      ban = create(:ban)
+      assert_not_nil(ban.expires_at)
+    end
+
+    should "create a mod action" do
+      user = create(:user)
+      ban = create(:ban, user: user, duration: 100.years, reason: "lol")
+
+      assert_equal("banned <@#{user.name}> forever: lol", ModAction.last.description)
+      assert_equal("user_ban", ModAction.last.category)
+      assert_equal(user, ModAction.last.subject)
+      assert_equal(ban.banner, ModAction.last.creator)
     end
 
     should "update the user's feedback" do
@@ -143,6 +141,117 @@ class BanTest < ActiveSupport::TestCase
       assert_equal("You have been banned", user.dmails.last.title)
       assert_equal("You have been banned forever: lol", user.dmails.last.body)
     end
+
+    context "Updating a ban" do
+      should "unban the user if the ban is reduced" do
+        @mod = create(:moderator_user)
+        @ban = create(:ban, created_at: 6.months.ago, duration: 1.year)
+        assert_equal(true, @ban.user.reload.is_banned?)
+
+        @ban.update!(duration: 1.day, updater: @mod)
+        assert_equal(false, @ban.user.reload.is_banned?)
+
+        assert_equal("updated ban duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("user_ban_update", ModAction.last.category)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
+      end
+
+      should "keep the user banned if an active ban is extended" do
+        @mod = create(:moderator_user)
+        @ban = create(:ban, created_at: 1.month.ago, duration: 3.months)
+        assert_equal(true, @ban.user.reload.is_banned?)
+
+        @ban.update!(duration: 1.year, updater: @mod)
+        assert_equal(true, @ban.user.reload.is_banned?)
+
+        assert_equal("updated ban duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("user_ban_update", ModAction.last.category)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
+      end
+
+      should "not unban the user if they have another active ban" do
+        @user = create(:user)
+        @ban1 = create(:ban, user: @user, created_at: 1.week.ago, duration: 1.month)
+        @ban2 = build(:ban, user: @user, created_at: 1.week.ago, duration: 3.months).tap { |ban| ban.save!(validate: false) }
+
+        @ban1.update!(duration: 1.day)
+        assert_equal(true, @user.reload.is_banned?)
+
+        @ban2.update!(duration: 1.day)
+        assert_equal(false, @user.reload.is_banned?)
+      end
+
+      should "fail if the ban is expired" do
+        @mod = create(:moderator_user)
+        @ban = create(:ban, created_at: 6.months.ago, duration: 1.day)
+
+        @ban.update(duration: 1.year, updater: @mod)
+
+        assert_equal("You can't update an expired ban", @ban.errors.full_messages.first)
+        assert_equal(1.day, @ban.reload.duration)
+      end
+    end
+
+    context "Destroying a ban" do
+      should "create an unban mod action" do
+        @ban = create(:ban)
+        @banner = create(:moderator_user)
+        assert_equal(true, @ban.user.is_banned?)
+
+        @ban.updater = @banner
+        @ban.destroy!
+
+        assert_equal(false, @ban.user.reload.is_banned?)
+        assert_match(/unbanned <@#{@ban.user.name}>/, ModAction.last.description)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@banner, ModAction.last.creator)
+      end
+
+      should "not unban the user if they have another active ban" do
+        @user = create(:user)
+        @ban1 = create(:ban, user: @user, duration: 1.week)
+        @ban2 = build(:ban, user: @user, duration: 1.month).tap { |ban| ban.save!(validate: false) }
+
+        @ban1.destroy!
+        assert_equal(true, @user.reload.is_banned?)
+
+        @ban2.destroy!
+        assert_equal(false, @user.reload.is_banned?)
+      end
+
+      should "fail if the ban is expired" do
+        @ban = create(:ban, created_at: 6.months.ago, duration: 1.day)
+        @banner = create(:moderator_user)
+
+        @ban.updater = @banner
+        @ban.destroy
+
+        assert_equal(false, @ban.destroyed?)
+        assert_equal("You can't update an expired ban", @ban.errors.full_messages.first)
+      end
+    end
+
+    context "when validating a ban" do
+      subject { build(:ban) }
+
+      should normalize_attribute(:reason).from(" \nfoo\tbar \n").to("foo bar")
+
+      should allow_value(1.day.iso8601).for(:duration)
+      should allow_value(3.days.iso8601).for(:duration)
+      should allow_value(7.days.iso8601).for(:duration)
+      should allow_value(1.month.iso8601).for(:duration)
+      should allow_value(3.months.iso8601).for(:duration)
+      should allow_value(6.months.iso8601).for(:duration)
+      should allow_value(1.year.iso8601).for(:duration)
+      should allow_value(100.years.iso8601).for(:duration)
+      should_not allow_value(2.days.iso8601).for(:duration)
+
+      should allow_value("x" * 600).for(:reason)
+      should_not allow_value("x" * 601).for(:reason)
+      should_not allow_value(" ").for(:reason)
+    end
   end
 
   context "Searching for a ban" do
@@ -150,18 +259,6 @@ class BanTest < ActiveSupport::TestCase
       ban = create(:ban)
 
       assert_search_equals(ban, user_name: ban.user.name, banner_name: ban.banner.name, reason: ban.reason, expired: false, order: :id_desc)
-    end
-
-    context "by user id" do
-      setup do
-        @admin = FactoryBot.create(:admin_user)
-        CurrentUser.user = @admin
-        @user = FactoryBot.create(:user)
-      end
-
-      teardown do
-        CurrentUser.user = nil
-      end
     end
   end
 end

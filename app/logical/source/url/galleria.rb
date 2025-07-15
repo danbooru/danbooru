@@ -24,7 +24,7 @@ class Source::URL::Galleria < Source::URL
     in _, "emotionflow.com", *subdirs, /^user_img\d+$/, /^\d+$/ => user_id, _
       @user_id = user_id
       @post_id = filename[/\A[ci](\d{1,7})/, 1]
-      @full_image_url = without(:query).to_s.gsub(/\.(jpeg|jpg|png|gif)_\d+\.jpg\z/, '.\1') # ".png_480.jpg" => ".png"
+      @full_image_url = with(site: "https://galleria.emotionflow.com").without(:query).to_s.gsub(/\.(jpeg|jpg|png|gif)_\d+\.jpg\z/, '.\1') # ".png_480.jpg" => ".png"
 
     # https://galleria.emotionflow.com/40775/660870.html
     # https://galleria.emotionflow.com/s/40775/660870.html

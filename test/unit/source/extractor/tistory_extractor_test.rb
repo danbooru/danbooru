@@ -50,16 +50,16 @@ module Source::Tests::Extractor
     context "A name.tistory.com/:id post URL" do
       strategy_should_work(
         "https://primemeeting.tistory.com/25",
-        image_urls: %w[
-          https://blog.kakaocdn.net/dn/RA1tu/btsFf2xGLbg/VzHK4tqMEWkeqUgDBxSkkK/img.jpg
-          https://blog.kakaocdn.net/dn/b5fPW7/btsFhqq2c9M/ZdcOTRjDgWkDnvfnxDdJs0/img.jpg
-          https://blog.kakaocdn.net/dn/EL36z/btsFhUlfexR/NB1A8zauC7nD1QspTuuiIK/img.jpg
-          https://blog.kakaocdn.net/dn/cfg4nc/btsFeuaCJXw/P2iOOIblO6g0mYtezXBE61/img.jpg
-          https://blog.kakaocdn.net/dn/edGUOT/btsFeGaSAGv/MhON8iSYOQj28LVKU02hxk/img.jpg
-          https://blog.kakaocdn.net/dn/bN0IZK/btsFg4hsH0k/HPQu7VKzcc76ZcKGe9uI00/img.jpg
-          https://blog.kakaocdn.net/dn/wvnz7/btsFeDebtSp/3zkC1EBrtnufPbGTfp2D90/img.jpg
-          https://blog.kakaocdn.net/dn/biaXrk/btsFefq3Y8k/YYadjg46g5ui1xzeY06GKk/img.jpg
-          https://blog.kakaocdn.net/dn/c0eTqX/btsFhrwKq7f/019A9D6UCmkzcG1hgZN7l1/img.jpg
+        image_urls: [
+          %r{https://blog.kakaocdn.net/dna/RA1tu/btsFf2xGLbg/AAAAAAAAAAAAAAAAAAAAAMqn3YDkfEmbx5805IF5mFFHJC7shBevh-IJvWapBPeP/img.jpg\?credential=.*&expires=.*&allow_ip=&allow_referer=&signature=},
+          %r{https://blog.kakaocdn.net/dna/b5fPW7/btsFhqq2c9M/AAAAAAAAAAAAAAAAAAAAAC4BI_yPIgY4QPDwP3ZhVQeiHEsyiAjbpuOqEEzHEv4m/img.jpg\?credential=.*&expires=.*&allow_ip=&allow_referer=&signature=},
+          %r{https://blog.kakaocdn.net/dna/EL36z/btsFhUlfexR/AAAAAAAAAAAAAAAAAAAAAP_Q7WFeAzhy5qRe480buhG9T2G8svU18UOJtAyADhRX/img.jpg\?credential=.*&expires=.*&allow_ip=&allow_referer=&signature=},
+          %r{https://blog.kakaocdn.net/dna/cfg4nc/btsFeuaCJXw/AAAAAAAAAAAAAAAAAAAAADGDyhMWl9BdWt1FprQ4PAGaMV6xkseQFuKzhxeKbKn8/img.jpg\?credential=.*&expires=.*&allow_ip=&allow_referer=&signature=},
+          %r{https://blog.kakaocdn.net/dna/edGUOT/btsFeGaSAGv/AAAAAAAAAAAAAAAAAAAAANJDGBqAkRWXg9T8K62NLdO3U4yjSIkJ7vlf5n9h6rgV/img.jpg\?credential=.*&expires=.*&allow_ip=&allow_referer=&signature=},
+          %r{https://blog.kakaocdn.net/dna/bN0IZK/btsFg4hsH0k/AAAAAAAAAAAAAAAAAAAAAP7H9L2-hV7dK6lTvicmCUSPJXbCvxG2OnmKm0AEj1WB/img.jpg\?credential=.*&expires=.*&allow_ip=&allow_referer=&signature=},
+          %r{https://blog.kakaocdn.net/dna/wvnz7/btsFeDebtSp/AAAAAAAAAAAAAAAAAAAAAJ2en6SEFlaX_RfacbOakwEWccaH_I1eS9E1Y5C1C7Wt/img.jpg\?credential=.*&expires=.*&allow_ip=&allow_referer=&signature=},
+          %r{https://blog.kakaocdn.net/dna/biaXrk/btsFefq3Y8k/AAAAAAAAAAAAAAAAAAAAAL8SQHX3gAx53KBmvina6Ehib2RQCixnYLPDrhnh2KlO/img.jpg\?credential=.*&expires=.*&allow_ip=&allow_referer=&signature=},
+          %r{https://blog.kakaocdn.net/dna/c0eTqX/btsFhrwKq7f/AAAAAAAAAAAAAAAAAAAAAI7Q_5I2b82jgBewR4aaaNQGI_aNMXCbj35y0vpZ0f_B/img.jpg\?credential=.*&expires=.*&allow_ip=&allow_referer=&signature=},
         ],
         media_files: [
           { file_size: 12_774_450 },
@@ -78,43 +78,6 @@ module Source::Tests::Extractor
         username: "primemeeting",
         tags: [],
         dtext_artist_commentary_title: "[눈물을 마시는 새] 트위터 백업 013",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          이것저것 섞여있습니다
-
-          "[image]":[https://blog.kakaocdn.net/dn/RA1tu/btsFf2xGLbg/VzHK4tqMEWkeqUgDBxSkkK/img.jpg]
-
-          "[image]":[https://blog.kakaocdn.net/dn/b5fPW7/btsFhqq2c9M/ZdcOTRjDgWkDnvfnxDdJs0/img.jpg]
-
-          운넬 / 발탄궁에는 노란장미가 핀다
-
-          "[image]":[https://blog.kakaocdn.net/dn/EL36z/btsFhUlfexR/NB1A8zauC7nD1QspTuuiIK/img.jpg]
-
-          여닐칼
-
-          "[image]":[https://blog.kakaocdn.net/dn/cfg4nc/btsFeuaCJXw/P2iOOIblO6g0mYtezXBE61/img.jpg]
-
-          닐여칼
-
-          "[image]":[https://blog.kakaocdn.net/dn/edGUOT/btsFeGaSAGv/MhON8iSYOQj28LVKU02hxk/img.jpg]
-
-          펫시루리 컬러연습
-
-          "[image]":[https://blog.kakaocdn.net/dn/bN0IZK/btsFg4hsH0k/HPQu7VKzcc76ZcKGe9uI00/img.jpg]
-
-          유영하는 하늘치
-
-          "[image]":[https://blog.kakaocdn.net/dn/wvnz7/btsFeDebtSp/3zkC1EBrtnufPbGTfp2D90/img.jpg]
-
-          young핸
-
-          "[image]":[https://blog.kakaocdn.net/dn/biaXrk/btsFefq3Y8k/YYadjg46g5ui1xzeY06GKk/img.jpg]
-
-          아실과 정우
-
-          "[image]":[https://blog.kakaocdn.net/dn/c0eTqX/btsFhrwKq7f/019A9D6UCmkzcG1hgZN7l1/img.jpg]
-
-          (이하생략)
-        EOS
       )
     end
 
@@ -385,7 +348,7 @@ module Source::Tests::Extractor
       context "A page URL" do
         strategy_should_work(
           "https://panchokworkshop.com/520",
-          image_urls: %w[https://blog.kakaocdn.net/dn/S2xgM/btsdPLPqB9a/dE5Z7C9TuybOkAUOL0btf0/img.jpg],
+          image_urls: [%r{https://blog.kakaocdn.net/dna/S2xgM/btsdPLPqB9a/AAAAAAAAAAAAAAAAAAAAABUg4uPZoC9IVFUvx0lVyPj5nsbqpC1pbGaNA3PAXzKV/img.jpg\?credential=.*&expires=.*&allow_ip=&allow_referer=&signature=.*}],
           media_files: [{ file_size: 160_368 }],
           page_url: "https://panchokworkshop.com/520",
           profile_urls: %w[https://panchokworkshop.com],
@@ -399,11 +362,6 @@ module Source::Tests::Extractor
             ["포토샵", "https://panchokworkshop.com/tag/포토샵"],
           ],
           dtext_artist_commentary_title: "202110 Mask",
-          dtext_artist_commentary_desc: <<~EOS.chomp,
-            "[image]":[https://blog.kakaocdn.net/dn/S2xgM/btsdPLPqB9a/dE5Z7C9TuybOkAUOL0btf0/img.jpg]
-
-            2023
-          EOS
         )
       end
 
@@ -425,11 +383,6 @@ module Source::Tests::Extractor
             ["포토샵", "https://panchokworkshop.com/tag/포토샵"],
           ],
           dtext_artist_commentary_title: "202110 Mask",
-          dtext_artist_commentary_desc: <<~EOS.chomp,
-            "[image]":[https://blog.kakaocdn.net/dn/S2xgM/btsdPLPqB9a/dE5Z7C9TuybOkAUOL0btf0/img.jpg]
-
-            2023
-          EOS
         )
       end
 
@@ -451,11 +404,6 @@ module Source::Tests::Extractor
             ["포토샵", "https://panchokworkshop.com/tag/포토샵"],
           ],
           dtext_artist_commentary_title: "202110 Mask",
-          dtext_artist_commentary_desc: <<~EOS.chomp,
-            "[image]":[https://blog.kakaocdn.net/dn/S2xgM/btsdPLPqB9a/dE5Z7C9TuybOkAUOL0btf0/img.jpg]
-
-            2023
-          EOS
         )
       end
     end

@@ -17,7 +17,6 @@ class PasswordsController < ApplicationController
     @user = authorize user, policy_class: PasswordPolicy
 
     success = @user.change_password(
-      current_user: CurrentUser.user,
       current_password: params.dig(:user, :current_password),
       new_password: params.dig(:user, :password),
       password_confirmation: params.dig(:user, :password_confirmation),

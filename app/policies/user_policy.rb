@@ -13,8 +13,12 @@ class UserPolicy < ApplicationPolicy
     record == user
   end
 
+  def edit?
+    record.id == user.id || user.is_owner?
+  end
+
   def update?
-    record.id == user.id || user.is_admin?
+    record.id == user.id
   end
 
   def deactivate?

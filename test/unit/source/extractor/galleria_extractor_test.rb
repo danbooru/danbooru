@@ -2,10 +2,31 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class GalleriaExtractorTest < ActiveSupport::TestCase
+    context "An old galleria-img.emotionflow.com sample image URL" do
+      strategy_should_work(
+        "http://galleria-img.emotionflow.com/user_img9/38279/i679579_387.jpeg_360.jpg?0716161312",
+        image_urls: %w[https://galleria.emotionflow.com/user_img9/38279/i679579_387.jpeg],
+        media_files: [{ file_size: 290_444 }],
+        page_url: "https://galleria.emotionflow.com/38279/679579.html",
+        profile_urls: %w[https://galleria.emotionflow.com/38279/],
+        display_name: "めおどら",
+        username: nil,
+        tags: [
+          ["ホロライブ", "https://galleria.emotionflow.com/SearchIllustByTagV.jsp?KWD=ホロライブ"],
+          ["クレイジー・オリー", "https://galleria.emotionflow.com/SearchIllustByTagV.jsp?KWD=クレイジー・オリー"],
+          ["hololive", "https://galleria.emotionflow.com/SearchIllustByTagV.jsp?KWD=hololive"],
+          ["hololiveID", "https://galleria.emotionflow.com/SearchIllustByTagV.jsp?KWD=hololiveID"],
+          ["ゾンビ", "https://galleria.emotionflow.com/SearchIllustByTagV.jsp?KWD=ゾンビ"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
     context "A Galleria sample image URL" do
       strategy_should_work(
-        "https://galleria-img.emotionflow.com/user_img9/38279/i679579_387.jpeg_360.jpg?0716161312",
-        image_urls: %w[https://galleria-img.emotionflow.com/user_img9/38279/i679579_387.jpeg],
+        "https://galleria.emotionflow.com/user_img9/38279/i679579_387.jpeg_360.jpg?0716161312",
+        image_urls: %w[https://galleria.emotionflow.com/user_img9/38279/i679579_387.jpeg],
         media_files: [{ file_size: 290_444 }],
         page_url: "https://galleria.emotionflow.com/38279/679579.html",
         profile_urls: %w[https://galleria.emotionflow.com/38279/],
@@ -25,8 +46,8 @@ module Source::Tests::Extractor
 
     context "A Galleria full image URL" do
       strategy_should_work(
-        "https://galleria-img.emotionflow.com/user_img9/38279/i679579_387.jpeg",
-        image_urls: %w[https://galleria-img.emotionflow.com/user_img9/38279/i679579_387.jpeg],
+        "https://galleria.emotionflow.com/user_img9/38279/i679579_387.jpeg",
+        image_urls: %w[https://galleria.emotionflow.com/user_img9/38279/i679579_387.jpeg],
         media_files: [{ file_size: 290_444 }],
         page_url: "https://galleria.emotionflow.com/38279/679579.html",
         profile_urls: %w[https://galleria.emotionflow.com/38279/],
@@ -46,8 +67,8 @@ module Source::Tests::Extractor
 
     context "A Galleria image URL without a post ID" do
       strategy_should_work(
-        "https://galleria-img.emotionflow.com/user_img9/75596/i1549553512126_164.jpeg",
-        image_urls: %w[https://galleria-img.emotionflow.com/user_img9/75596/i1549553512126_164.jpeg],
+        "https://galleria.emotionflow.com/user_img9/75596/i1549553512126_164.jpeg",
+        image_urls: %w[https://galleria.emotionflow.com/user_img9/75596/i1549553512126_164.jpeg],
         media_files: [{ file_size: 281_662 }],
         page_url: "https://galleria.emotionflow.com/75596/1549553.html",
         profile_urls: %w[https://galleria.emotionflow.com/75596/],
@@ -62,7 +83,7 @@ module Source::Tests::Extractor
     context "A Galleria post with a single image" do
       strategy_should_work(
         "https://galleria.emotionflow.com/74186/478037.html",
-        image_urls: %w[https://galleria-img.emotionflow.com/user_img9/74186/i478037_188.jpeg],
+        image_urls: %w[https://galleria.emotionflow.com/user_img9/74186/i478037_188.jpeg],
         media_files: [{ file_size: 169_857 }],
         page_url: "https://galleria.emotionflow.com/74186/478037.html",
         profile_urls: %w[https://galleria.emotionflow.com/74186/],
@@ -86,70 +107,70 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://galleria.emotionflow.com/75596/483362.html",
         image_urls: %w[
-          https://galleria-img.emotionflow.com/user_img9/75596/i1661081253247_941.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_573.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_727.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_647.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_56.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_987.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_176.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_441.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_756.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_600.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_544.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_721.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_843.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_650.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_822.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_713.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_37.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_484.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_48.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_263.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_596.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_438.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_512.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_256.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_245.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_863.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_803.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_154.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_943.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_182.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_838.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_519.png
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_11.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/c483362_735.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553512126_164.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553493813_865.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553524311_664.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553550783_267.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553575501_51.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553584282_356.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1661007423319_687.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553597795_332.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553619267_415.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553610821_825.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553630457_589.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553638785_837.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553649515_960.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553682426_294.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553701363_843.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553721914_718.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553739757_272.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553750750_205.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553773549_56.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553782201_916.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553798378_334.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553833199_318.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553847169_957.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553862522_112.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/i1549553876254_74.jpeg
-          https://galleria-img.emotionflow.com/user_img9/75596/i1555815522114_797.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1559307861330_517.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1562558326490_829.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1567915023340_216.png
-          https://galleria-img.emotionflow.com/user_img9/75596/i1602000246056_673.png
+          https://galleria.emotionflow.com/user_img9/75596/i1661081253247_941.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_573.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_727.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_647.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_56.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_987.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_176.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_441.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_756.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_600.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_544.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_721.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_843.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_650.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_822.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_713.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_37.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_484.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_48.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_263.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_596.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_438.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_512.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_256.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_245.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_863.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_803.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_154.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_943.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_182.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_838.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_519.png
+          https://galleria.emotionflow.com/user_img9/75596/c483362_11.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/c483362_735.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553512126_164.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/i1549553493813_865.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/i1549553524311_664.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553550783_267.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553575501_51.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553584282_356.png
+          https://galleria.emotionflow.com/user_img9/75596/i1661007423319_687.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553597795_332.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553619267_415.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553610821_825.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553630457_589.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553638785_837.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553649515_960.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553682426_294.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553701363_843.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553721914_718.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553739757_272.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553750750_205.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553773549_56.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553782201_916.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553798378_334.png
+          https://galleria.emotionflow.com/user_img9/75596/i1549553833199_318.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/i1549553847169_957.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/i1549553862522_112.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/i1549553876254_74.jpeg
+          https://galleria.emotionflow.com/user_img9/75596/i1555815522114_797.png
+          https://galleria.emotionflow.com/user_img9/75596/i1559307861330_517.png
+          https://galleria.emotionflow.com/user_img9/75596/i1562558326490_829.png
+          https://galleria.emotionflow.com/user_img9/75596/i1567915023340_216.png
+          https://galleria.emotionflow.com/user_img9/75596/i1602000246056_673.png
         ],
         media_files: [
           { file_size: 97_629 },
@@ -235,7 +256,7 @@ module Source::Tests::Extractor
     context "A R18 Galleria post" do
       strategy_should_work(
         "https://galleria.emotionflow.com/92495/555463.html",
-        image_urls: %w[https://galleria-img.emotionflow.com/user_img9/92495/i555463_68.jpeg],
+        image_urls: %w[https://galleria.emotionflow.com/user_img9/92495/i555463_68.jpeg],
         media_files: [{ file_size: 302_958 }],
         page_url: "https://galleria.emotionflow.com/92495/555463.html",
         profile_urls: %w[https://galleria.emotionflow.com/92495/],

@@ -107,11 +107,24 @@ module Source::Tests::Extractor
         image_urls: %w[https://static1.e621.net/data/8f/89/8f892998f59d7f74ab93abd551acd77d.png],
         media_files: [{ file_size: 2_676_305 }],
         page_url: "https://e621.net/posts/3381431",
-        profile_urls: %w[],
+        profile_urls: %w[https://inkbunny.net/TobyBaggins https://inkbunny.net/user.php?user_id=539625],
         display_name: nil,
-        username: nil,
-        dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "",
+        username: "TobyBaggins",
+        dtext_artist_commentary_title: "Before We Start",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          Fiadh was so nervous about the upcoming photoshoot that she couldn’t settle down. She kept pacing back and forth so much that Rosine thought the poor doe would collapse. So being the good friend she is, she took Fiadh's hand and told the photographer they would be back soon and led the girl to a private side room. "I am going to show you a relaxing technic before we start the photoshoot. Now take off those clothes, we don't want to get them wrinkled or dirty."
+
+          "Take off my clothes," Fiadh gasp as she went wide eyed!
+
+          A few minutes later, as the photographer was checking the equipment over, he smirked as he heard a loud shuttering moan from the other room. He knew just how well Rosine's "relaxing technic" worked and expected the young model would be glowing when she came out for her set.
+
+          Rosine belongs to "BChalk":[https://inkbunny.net/BChalk]
+          Fiadh belongs to me    "TobyBaggins":[https://inkbunny.net/TobyBaggins]
+          This stunning work of art is by the wonderful "FoxInShadow":[https://inkbunny.net/FoxInShadow]who also designed both girls.
+
+          --
+          I can't wait to get more pictures of Fiadh and write more about her. hehe I hope you enjoy her as much as I do. 💖
+        EOS
       )
     end
 

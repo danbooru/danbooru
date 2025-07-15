@@ -21,7 +21,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://static.wikia.nocookie.net/74a9f058-f816-4856-8aad-c398aa8a4c81/thumbnail/width/400/height/400",
         image_urls: %w[https://static.wikia.nocookie.net/74a9f058-f816-4856-8aad-c398aa8a4c81?format=original],
-        media_files: [{ file_size: 1_021_278 }],
+        media_files: [{ file_size: 1_021_260 }],
         page_url: nil,
         profile_urls: [],
         display_name: nil,

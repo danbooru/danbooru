@@ -119,6 +119,7 @@ module Source
       Source::URL::Facebook,
       Source::URL::DcInside,
       Source::URL::Marshmallow,
+      Source::URL::Huashijie,
       Source::URL::Mihuashi,
     ]
 

@@ -1,12 +1,12 @@
-<%= edit_form_for(ban) do |f| %>
+<%= edit_form_for(ban, html: { class: "w-full stacked-form" }) do |f| %>
   <% if ban.user.blank? %>
     <%= f.input :user_name, as: :string, input_html: { "data-autocomplete": "user" } %>
   <% elsif ban.new_record? %>
     <%= f.input :user_id, as: :hidden, input_html: { value: ban.user.id } %>
   <% end %>
 
+  <%= f.input :reason, as: :dtext, input_html: { autofocus: true } %>
   <%= f.input :duration, collection: Ban::DURATIONS.map { |duration| [duration == Ban::FOREVER ? "forever" : duration.inspect, duration.iso8601] }, selected: ban.duration&.iso8601 %>
-  <%= f.input :reason, as: :dtext %>
 
   <% if ban.new_record? && ban.user.present? %>
     <% post_count = ban.user.posts.pending.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
@@ -56,5 +56,17 @@
     <% end %>
   <% end %>
 
-  <%= f.button :submit %>
+  <div>
+    <% if @ban.new_record? %>
+      <%= f.submit "Ban", class: "button-danger", disabled: @ban.user&.is_banned? %>
+    <% else %>
+      <%= f.submit "Update", class: "button-primary", disabled: @ban.expired? %>
+    <% end %>
+
+    <% if @ban.persisted? %>
+      <%= f.submit "Unban", form: "delete-ban", class: "button-outline-danger", disabled: @ban.expired?, "data-confirm": "Are you sure you want to unban this user?" %>
+    <% end %>
+  </div>
 <% end %>
+
+<%= edit_form_for(ban, method: :delete, html: { id: "delete-ban", class: "hidden" }) {} %>
