@@ -2,7 +2,7 @@
 
 <p>Here is your backup code:</p>
 
-<p style="font-size: 28px; text-align: center;"><%= @backup_code %></p>
+<p style="font-size: 28px; text-align: center;"><%= @backup_code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0") %></p>
 
 <p>
   You can use this code to login to your account and change your two-factor authentication settings. You can only use
