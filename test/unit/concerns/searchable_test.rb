@@ -136,11 +136,11 @@ class SearchableTest < ActiveSupport::TestCase
     end
 
     context "for an inet attribute" do
-      subject { UserSession }
+      subject { UserEvent }
 
       should "work" do
-        @us1 = create(:user_session, ip_addr: "10.0.0.1")
-        @us2 = create(:user_session, ip_addr: "11.0.0.1")
+        @us1 = create(:user_event, ip_addr: "10.0.0.1")
+        @us2 = create(:user_event, ip_addr: "11.0.0.1")
 
         assert_search_equals(@us1, ip_addr: "10.0.0.1")
         assert_search_equals(@us1, ip_addr: "10.0.0.1/24")

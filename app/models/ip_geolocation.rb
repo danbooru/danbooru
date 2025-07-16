@@ -6,8 +6,6 @@ class IpGeolocation < ApplicationRecord
   attribute :ip_addr, :ip_address
   attribute :network, :ip_address
 
-  has_many :user_sessions, foreign_key: :ip_addr, primary_key: :ip_addr
-
   def self.visible(user)
     all
   end
