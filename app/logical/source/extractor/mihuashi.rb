@@ -36,11 +36,11 @@ module Source
       end
 
       def profile_url
-        "https://www.mihuashi.com/users/#{Danbooru::URL.escape(username)}" if username.present?
+        "https://www.mihuashi.com/profiles/#{user_id}" if user_id.present?
       end
 
       def account_url
-        "https://www.mihuashi.com/profiles/#{user_id}" if user_id.present?
+        "https://www.mihuashi.com/users/#{Danbooru::URL.escape(username)}" if username.present?
       end
 
       def profile_urls

@@ -22,10 +22,10 @@ module Source::Tests::Extractor
         image_urls: %w[https://image-assets.mihuashi.com/permanent/29105|-2024/05/29/16/FuE-9jWo-aPKXOq2KP2ZsR5Nxnqa.jpg],
         media_files: [{ file_size: 597_376 }],
         page_url: "https://www.mihuashi.com/artworks/15092919",
-        profile_url: "https://www.mihuashi.com/users/spirtie",
+        profile_url: "https://www.mihuashi.com/profiles/29105",
         profile_urls: [
-          "https://www.mihuashi.com/users/spirtie",
           "https://www.mihuashi.com/profiles/29105",
+          "https://www.mihuashi.com/users/spirtie",
         ],
         username: "spirtie",
         tags: [
@@ -43,7 +43,7 @@ module Source::Tests::Extractor
         "https://www.mihuashi.com/artworks/13693110",
         image_urls: %w[https://image-assets.mihuashi.com/permanent/321972|-2024/03/10/10/FuMarkKYoykuY3yCrPA7d8lrF3U6.gif],
         media_files: [{ file_size: 1_145_184 }],
-        profile_url: "https://www.mihuashi.com/users/yuyuco",
+        profile_url: "https://www.mihuashi.com/profiles/321972",
         username: "yuyuco",
         tags: [
           ["日系", "https://www.mihuashi.com/search?tab=artwork&q=日系"],
@@ -73,10 +73,10 @@ module Source::Tests::Extractor
           { file_size: 3_586_679 },
         ],
         page_url: "https://www.mihuashi.com/stalls/71664",
-        profile_url: "https://www.mihuashi.com/users/黑石肆维",
+        profile_url: "https://www.mihuashi.com/profiles/532464",
         profile_urls: [
-          "https://www.mihuashi.com/users/黑石肆维",
           "https://www.mihuashi.com/profiles/532464",
+          "https://www.mihuashi.com/users/黑石肆维",
         ],
         username: "黑石肆维",
         tags: [],
