@@ -118,6 +118,10 @@ class PostQueryBuilder
       in :wildcard
         tag_names = Tag.wildcard_matches(node.name).limit(MAX_WILDCARD_TAGS).pluck(:name)
         relation.where_array_includes_any("string_to_array(posts.tag_string, ' ')", tag_names)
+      in :search_param
+        # no-op
+      in :search
+        relation.search(node.search_hash, current_user)
       in :not
         children.first.negate_relation
       in :and

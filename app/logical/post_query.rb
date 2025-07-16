@@ -22,7 +22,7 @@ class PostQuery
   attr_reader :current_user
   private attr_reader :tag_limit, :safe_mode, :builder
 
-  delegate :tag?, :metatag?, :wildcard?, :metatags, :wildcards, :tag_names, :to_infix, :to_pretty_string, to: :ast
+  delegate :tag?, :metatag?, :wildcard?, :search?, :metatags, :wildcards, :tag_names, :search_params, :searches, :to_infix, :to_pretty_string, to: :ast
   alias_method :safe_mode?, :safe_mode
   alias_method :to_s, :to_infix
 
@@ -36,7 +36,7 @@ class PostQuery
     elsif search.match?(%r{\A[a-zA-Z0-9][a-zA-Z0-9();/+!?&'._~-]*\z}) && !search.downcase.in?(["and", "or"])
       PostQuery.new(AST.tag(search), ...).replace_aliases
     else
-      PostQuery.new(search, ...).replace_aliases.rewrite_opts.trim
+      PostQuery.new(search, ...).replace_aliases.rewrite_partials.trim
     end
   end
 
@@ -132,9 +132,9 @@ class PostQuery
     end
   end
 
-  # True if the search consists of a single tag, metatag, or wildcard.
+  # True if the search consists of a single tag, metatag, wildcard, or search tag.
   def is_single_term?
-    tag_names.size + metatags.size + wildcards.size == 1
+    tag_names.size + metatags.size + wildcards.size + search_params.size == 1
   end
 
   # True if this search consists only of a single non-negated tag, with no other metatags or operators.
@@ -154,7 +154,7 @@ class PostQuery
       metatag.name.in?(%w[date upvoter upvote downvoter downvote commenter comm search flagger fav ordfav favgroup ordfavgroup]) ||
       metatag.name == "status" && metatag.value == "unmoderated" ||
       metatag.name == "disapproved" && !metatag.value.downcase.in?(PostDisapproval::REASONS)
-    end
+    end || search_params.present?
   end
 
   def select_metatags(*names)
@@ -175,8 +175,8 @@ class PostQuery
   end
 
   # Return a new PostQuery with the '~' operator replaced with OR clauses.
-  def rewrite_opts
-    build(ast.rewrite_opts)
+  def rewrite_partials
+    build(ast.rewrite_partials)
   end
 
   # Return a new PostQuery with aliases replaced.
@@ -324,7 +324,16 @@ class PostQuery
 
     # The number of unique tags, wildcards, and metatags in the search, excluding metatags that don't count against the user's tag limit.
     def term_count
-      tag_names.size + wildcards.size + metatags.count { !_1.name.in?(UNLIMITED_METATAGS) }
+      tag_names.size +
+        wildcards.size +
+        metatags.count { !_1.name.in?(UNLIMITED_METATAGS) } +
+        search_params.sum do |param|
+          if param.path.last == "tags" || param.path.last.ends_with?("_tags_match")
+            build(param.value).term_count
+          else
+            1
+          end
+        end
     end
 
     # @return [Integer] The total number of terms in the query, including free metatags.

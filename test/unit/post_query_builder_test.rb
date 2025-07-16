@@ -1306,6 +1306,34 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "random:1 filetype:png")
     end
 
+    should "return posts for [] search syntax" do
+      post = create(:post)
+
+      assert_tag_match([post], "[uploader_id]:#{post.uploader.id}")
+      assert_tag_match([post], "[uploader][id]:#{post.uploader.id}")
+      assert_tag_match([post], "[uploader][id_gteq]:#{post.uploader.id}")
+      assert_tag_match([], "[uploader][id_gt]:#{post.uploader.id}")
+      assert_tag_match([post], "[uploader_name]:#{post.uploader.name}")
+      assert_tag_match([post], "[uploader][name]:#{post.uploader.name}")
+      assert_tag_match([], "[uploader_name]:nobody")
+      # Match ?search[] behavior
+      assert_tag_match([post], "[invalid]:nobody")
+    end
+
+    should "return posts for [] array search syntax" do
+      posts1 = create_list(:post, 3)
+      posts2 = create_list(:post, 2)
+      posts3 = [posts1.first, posts1.last, posts2.last]
+      pool1 = create(:pool, post_ids: posts1.pluck(:id), category: "collection")
+      pool2 = create(:pool, post_ids: posts2.pluck(:id), category: "collection")
+      pool3 = create(:pool, post_ids: posts3.pluck(:id), category: "collection")
+
+      assert_tag_match(posts2.reverse, "[pools][post_ids_include_any_array][]:#{posts2.first.id}")
+      assert_tag_match((posts1 + posts2).reverse, "[pools][post_ids_include_any_array][]:#{posts1.first.id} [pools][post_ids_include_any_array][]:#{posts2.first.id}")
+      assert_tag_match([], "[pools][post_ids_include_all_array][]:#{posts1.first.id} [pools][post_ids_include_all_array][]:#{posts2.first.id}")
+      assert_tag_match(posts3.reverse, "[pools][post_ids_include_all_array][]:#{posts1.first.id} [pools][post_ids_include_all_array][]:#{posts2.last.id}")
+    end
+
     should "return posts ordered by a particular attribute" do
       posts = (1..2).map do |n|
         tags = ["tagme", "gentag1 gentag2 artist:arttag char:chartag copy:copytag"]
@@ -1493,6 +1521,39 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "aaa bbb status:active")
       assert_tag_match([post1], "aaa bbb limit:20")
       assert_tag_match([post1], "aaa bbb filesize:<100mb width:<10000 height:<10000 limit:20")
+    end
+
+    should "account for user's search limit in nested search params" do
+      post1 = create(:post, rating: "s", tag_string: "aaa bbb zzz")
+      post2 = create(:post, parent: post1, rating: "q", tag_string: "ccc ddd zzz")
+
+      assert_tag_match([post2], %{zzz [parent][tags]:"aaa"}, tag_limit: 2)
+      assert_tag_match([post2], %{[parent][tags]:"zzz" [parent][tags]:"aaa"}, tag_limit: 2)
+      assert_tag_match([post2], %{[parent][tags]:"aaa zzz"}, tag_limit: 2)
+      assert_tag_match([post2], %{zzz [parent][tags]:"user:#{post1.uploader.name}"}, tag_limit: 2)
+      assert_tag_match([post2], %{zzz rating:q [parent][tags]:"aaa"}, tag_limit: 2)
+      assert_tag_match([post2], %{zzz [parent][tags]:"aaa rating:s"}, tag_limit: 2)
+      assert_tag_match([post2], %{zzz rating:q [parent][tags]:"aaa rating:s"}, tag_limit: 2)
+      assert_tag_match([post2], %{[parent][id]:#{post1.id} [parent][tags]:"aaa"}, tag_limit: 2)
+
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{zzz ccc [parent][tags]:"aaa"}, tag_limit: 2)
+      end
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{zzz ([parent][tags]:"bbb") ([parent][tags]:"aaa")}, tag_limit: 2)
+      end
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{([parent][tags]:"zzz") ([parent][tags]:"bbb") ([parent][tags]:"aaa")}, tag_limit: 2)
+      end
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{[parent][tags]:"aaa bbb zzz"}, tag_limit: 2)
+      end
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{zzz [parent][tags]:"user:#{post1.uploader.name} fav:#{post1.uploader.name}"}, tag_limit: 2)
+      end
+      assert_raise(PostQuery::TagLimitError) do
+        PostQuery.search(%{zzz [parent][id]:#{post1.id} [parent][tags]:"aaa"}, tag_limit: 2)
+      end
     end
 
     should "succeed for exclusive tag searches with no other tag" do
@@ -1729,6 +1790,19 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
         assert_equal(1, PostQuery.new("comm:#{@user.name}", current_user: @user).fast_count)
         assert_equal(0, PostQuery.new("comm:#{@user.name}").fast_count)
+      end
+    end
+
+    context "for a user-dependent []-search query" do
+      should "cache the count separately for different users" do
+        user = create(:user)
+        post = create(:post, uploader: user)
+        flagger = create(:user)
+        flag = create(:post_flag, post: post, creator: flagger)
+
+        assert_equal(1, PostQuery.new("[flags][creator_name]:#{flagger.name}", current_user: flagger).fast_count)
+        assert_equal(0, PostQuery.new("[flags][creator_name]:#{flagger.name}", current_user: user).fast_count)
+        assert_equal(0, PostQuery.new("[flags][creator_name]:#{flagger.name}").fast_count)
       end
     end
   end
