@@ -1,4 +1,4 @@
-<%= edit_form_for(ban, html: { class: "w-full stacked-form" }) do |f| %>
+<%= edit_form_for(ban) do |f| %>
   <% if ban.user.blank? %>
     <%= f.input :user_name, as: :string, input_html: { "data-autocomplete": "user" } %>
   <% elsif ban.new_record? %>
@@ -19,7 +19,7 @@
     <% if post_count.value > 0 %>
       <%= tag.div "x-data": { showReason: ban.delete_posts }.to_json do %>
         <div class="flex gap-2">
-          <%= f.input :delete_posts, as: :boolean, label: "Delete #{post_count.value} pending posts", input_html: { "x-model": "showReason" } %>
+          <%= f.input :delete_posts, as: :boolean, wrapper: "inline-checkbox", label: "Delete #{post_count.value} pending posts", input_html: { "x-model": "showReason" } %>
           <span class="leading-normal">(<%= link_to "list", posts_path(tags: "user:#{ban.user.name} status:pending") %>)</span>
         </div>
 
@@ -29,28 +29,28 @@
 
     <% if comment_count.value > 0 %>
       <div class="flex gap-2">
-        <%= f.input :delete_comments, as: :boolean, label: "Delete #{comment_count.value} comments" %>
+        <%= f.input :delete_comments, as: :boolean, wrapper: "inline-checkbox", label: "Delete #{comment_count.value} comments" %>
         <span class="leading-normal">(<%= link_to "list", comments_path(search: { creator_id: ban.user.id }) %>)</span>
       </div>
     <% end %>
 
     <% if forum_post_count.value > 0 || forum_topic_count.value > 0 %>
       <div class="flex gap-2">
-        <%= f.input :delete_forum_posts, as: :boolean, label: tag.span("Delete #{forum_post_count.value} forum posts #{"and #{forum_topic_count.value} forum topics" if forum_topic_count.value > 0}".squeeze) %>
+        <%= f.input :delete_forum_posts, as: :boolean, wrapper: "inline-checkbox", label: tag.span("Delete #{forum_post_count.value} forum posts #{"and #{forum_topic_count.value} forum topics" if forum_topic_count.value > 0}".squeeze) %>
         <span class="leading-normal">(<%= link_to "list", forum_posts_path(search: { creator_id: ban.user.id }) %>)</span>
       </div>
     <% end %>
 
     <% if post_vote_count.value > 0 && policy(PostVote.new).destroy? %>
       <div class="flex gap-2">
-        <%= f.input :delete_post_votes, as: :boolean, label: "Delete #{post_vote_count.value} post votes" if post_vote_count.value > 0 %>
+        <%= f.input :delete_post_votes, as: :boolean, wrapper: "inline-checkbox", label: "Delete #{post_vote_count.value} post votes" %>
         <span class="leading-normal">(<%= link_to "list", post_votes_path(search: { user_id: ban.user.id }) %>)</span>
       </div>
     <% end %>
 
     <% if comment_vote_count.value > 0 && policy(CommentVote.new).destroy? %>
       <div class="flex gap-2">
-        <%= f.input :delete_comment_votes, as: :boolean, label: "Delete #{comment_vote_count.value} comment votes" if comment_vote_count.value > 0 %>
+        <%= f.input :delete_comment_votes, as: :boolean, wrapper: "inline-checkbox", label: "Delete #{comment_vote_count.value} comment votes" %>
         <span class="leading-normal">(<%= link_to "list", comment_votes_path(search: { user_id: ban.user.id }) %>)</span>
       </div>
     <% end %>

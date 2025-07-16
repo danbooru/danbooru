@@ -233,10 +233,19 @@ div.ui-dialog {
   }
 }
 
+div.inline-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .checkbox { order: -1; }
+  .hint { order: 1; }
+}
+
 div.inline-toggle-switch {
   display: flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.5rem;
 
   .toggle-switch { order: -1; }
   .hint { order: 1; }
