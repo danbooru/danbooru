@@ -102,9 +102,11 @@ class ServerStatus
         ENV["K8S_POD_NAME"]
       elsif docker?
         # Do a reverse DNS lookup on the container IP address to get the container name.
-        docker_ip = Socket.ip_address_list.find(&:ipv4_private?).ip_address
+        docker_ip = Socket.ip_address_list.find(&:ipv4_private?)&.ip_address
         Resolv::DNS.new.getname(docker_ip).to_a[0..-2].map(&:to_s).join(".")
       end
+    rescue Resolv::ResolvError
+      nil
     end
 
     def node_name

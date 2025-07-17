@@ -74,6 +74,16 @@
       </div>
     <% end %>
 
+    <% if CurrentUser.user.is_approver? && !CurrentUser.user.has_2fa? && controller_name != "totp" %>
+      <div class="notice notice-error notice-large">
+        <h2>2FA Required</h2>
+        <p>
+          Because you have a privileged account, you must enable two-factor authentication to ensure your account is secure.
+        </p>
+        <div><%= link_to "Enable two-factor authentication", main_app.edit_user_totp_path(CurrentUser.user) %></div>
+      </div>
+    <% end %>
+
     <% if Danbooru.config.is_promotion? && cookies[:hide_winter_sale_notice].blank? %>
       <div class="notice notice-info notice-small flex text-center items-center justify-center gap-2" id="promotion-notice">
         <% file = %w[provgift.png kemogift.png padoru.gif ablobgift.gif].sample %>

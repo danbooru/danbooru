@@ -120,6 +120,7 @@ module Source
       Source::URL::DcInside,
       Source::URL::Marshmallow,
       Source::URL::Huashijie,
+      Source::URL::Mihuashi,
       Source::URL::Huajia,
     ]
 

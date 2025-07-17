@@ -65,6 +65,6 @@
     "stylelint-all": "npx stylelint --cache --cache-strategy content --cache-location tmp/ 'app/javascript/src/styles/**/*'"
   },
   "browserslist": [
-    "since 2019"
+    "since 2021"
   ]
 }

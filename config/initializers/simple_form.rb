@@ -82,6 +82,15 @@ SimpleForm.setup do |config|
     b.use :full_error, wrap_with: { tag: "span", class: "error" }
   end
 
+  # Places the checkbox, label, and hint all on a single line.
+  config.wrappers "inline-checkbox", class: "input inline-input inline-checkbox", hint_class: "field_with_hint", error_class: "field_with_errors" do |b|
+    b.use :html5
+    b.use :label
+    b.use :input, class: "checkbox"
+    b.use :hint, wrap_with: { tag: "span", class: "hint fineprint" }
+    b.use :full_error, wrap_with: { tag: "span", class: "error" }
+  end
+
   # The default wrapper to be used by the FormBuilder.
   config.default_wrapper = "stacked-input"
 

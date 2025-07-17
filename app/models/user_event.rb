@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-# A UserEvent is used to track important events related to a user's account,
-# such as signups, logins, password changes, etc. A UserEvent is associated
-# with a UserSession, which contains the IP and browser information associated
-# with the event.
+# A UserEvent is used to track important events related to a user's account, such as signups, logins, password changes, etc.
+# An event tracks the user's IP address, session ID, and user agent at the time of the event.
 
 class UserEvent < ApplicationRecord
   extend Memoist
+
+  self.ignored_columns += [:user_session_id]
 
   # Events that were performed by the user while logged in, for tracking the user's authorized IP addresses. This does not
   # include failed login attempts, password reset requests, or other events that may not have been performed by the user.
@@ -20,7 +20,6 @@ class UserEvent < ApplicationRecord
   attribute :created_at
   attribute :updated_at
   attribute :user_id
-  attribute :user_session_id
   attribute :category
   attribute :ip_addr, :ip_address
   attribute :session_id, :md5
@@ -28,7 +27,6 @@ class UserEvent < ApplicationRecord
   attribute :metadata
 
   belongs_to :user
-  belongs_to :user_session
   belongs_to :ip_geolocation, foreign_key: :ip_addr, primary_key: :ip_addr, optional: true
 
   enum :category, {
@@ -104,12 +102,12 @@ class UserEvent < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :category, :user, :user_session, :ip_addr, :session_id, :user_agent, :metadata, :ip_geolocation], current_user: current_user)
+    q = search_attributes(params, [:id, :created_at, :updated_at, :category, :user, :ip_addr, :session_id, :user_agent, :metadata, :ip_geolocation], current_user: current_user)
     q.apply_default_order(params)
   end
 
   def self.available_includes
-    [:user, :user_session]
+    [:user]
   end
 
   concerning :ConstructorMethods do
@@ -118,9 +116,8 @@ class UserEvent < ApplicationRecord
       def build_from_request(user, category, request)
         ip_addr = request.remote_ip
         IpGeolocation.create_or_update!(ip_addr)
-        user_session = UserSession.new(session_id: request.session[:session_id], ip_addr: ip_addr, user_agent: request.user_agent)
 
-        user.user_events.build(user: user, category: category, user_session: user_session, ip_addr: ip_addr, session_id: request.session[:session_id], user_agent: request.user_agent)
+        user.user_events.build(user: user, category: category, ip_addr: ip_addr, session_id: request.session[:session_id], user_agent: request.user_agent)
       end
 
       def create_from_request!(...)
