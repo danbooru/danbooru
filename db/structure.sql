@@ -1003,6 +1003,41 @@ ALTER SEQUENCE public.ip_geolocations_id_seq OWNED BY public.ip_geolocations.id;
 
 
 --
+-- Name: login_sessions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.login_sessions (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    user_id bigint NOT NULL,
+    login_id uuid NOT NULL,
+    session_id uuid NOT NULL,
+    status integer NOT NULL,
+    last_seen_at timestamp(6) without time zone
+);
+
+
+--
+-- Name: login_sessions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.login_sessions_id_seq
+    START WITH 10000000
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: login_sessions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.login_sessions_id_seq OWNED BY public.login_sessions.id;
+
+
+--
 -- Name: media_assets; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2834,6 +2869,13 @@ ALTER TABLE ONLY public.ip_geolocations ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
+-- Name: login_sessions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.login_sessions ALTER COLUMN id SET DEFAULT nextval('public.login_sessions_id_seq'::regclass);
+
+
+--
 -- Name: media_assets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3299,6 +3341,15 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
+
+
+
+--
+-- Name: login_sessions login_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.login_sessions
+    ADD CONSTRAINT login_sessions_pkey PRIMARY KEY (id);
 
 
 --
@@ -4645,6 +4696,55 @@ CREATE INDEX index_ip_geolocations_on_time_zone ON public.ip_geolocations USING 
 --
 
 CREATE INDEX index_ip_geolocations_on_updated_at ON public.ip_geolocations USING btree (updated_at);
+
+
+--
+-- Name: index_login_sessions_on_created_at_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_login_sessions_on_created_at_and_id ON public.login_sessions USING btree (created_at, id);
+
+
+--
+-- Name: index_login_sessions_on_last_seen_at_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_login_sessions_on_last_seen_at_and_id ON public.login_sessions USING btree (last_seen_at, id);
+
+
+--
+-- Name: index_login_sessions_on_login_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_login_sessions_on_login_id ON public.login_sessions USING btree (login_id);
+
+
+--
+-- Name: index_login_sessions_on_session_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_login_sessions_on_session_id ON public.login_sessions USING btree (session_id);
+
+
+--
+-- Name: index_login_sessions_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_login_sessions_on_status ON public.login_sessions USING btree (status);
+
+
+--
+-- Name: index_login_sessions_on_updated_at_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_login_sessions_on_updated_at_and_id ON public.login_sessions USING btree (updated_at, id);
+
+
+--
+-- Name: index_login_sessions_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_login_sessions_on_user_id ON public.login_sessions USING btree (user_id);
 
 
 --
@@ -6719,6 +6819,14 @@ ALTER TABLE ONLY public.bulk_update_requests
 
 
 --
+-- Name: login_sessions fk_rails_8c949dd2cd; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.login_sessions
+    ADD CONSTRAINT fk_rails_8c949dd2cd FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: tag_aliases fk_rails_90fd158a45; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6989,6 +7097,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250716202530'),
 ('20250716150524'),
 ('20250603085358'),
 ('20250601164359'),
