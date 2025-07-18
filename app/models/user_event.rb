@@ -6,7 +6,7 @@
 class UserEvent < ApplicationRecord
   extend Memoist
 
-  self.ignored_columns += [:user_session_id]
+  self.ignored_columns += [:user_session_id, :login_session_id]
 
   # Events that were performed by the user while logged in, for tracking the user's authorized IP addresses. This does not
   # include failed login attempts, password reset requests, or other events that may not have been performed by the user.
