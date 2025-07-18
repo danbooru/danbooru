@@ -34,9 +34,13 @@ class UserDeletion
       rename
       reset_password
       async_delete_user
-      ModAction.log("deleted user ##{user.id}", :user_delete, subject: user, user: deleter) if user != deleter
-      UserEvent.create_from_request!(user, :user_deletion, request) if request.present?
-      SessionLoader.new(request).logout(user) if user == deleter
+
+      if user == deleter
+        UserEvent.create_from_request!(user, :user_deletion, request)
+        SessionLoader.new(request).logout(user)
+      else
+        ModAction.log("deleted user ##{user.id}", :user_delete, subject: user, user: deleter)
+      end
     end
 
     true
@@ -119,7 +123,7 @@ class UserDeletion
         errors.add(:base, "You cannot delete your account if you are banned")
       end
     else
-      if !deleter.is_owner?
+      if !user.policy(deleter).deactivate?
         errors.add(:base, "You cannot delete an account belonging to another user")
       end
 

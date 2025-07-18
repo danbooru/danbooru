@@ -200,9 +200,10 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to posts_path
         assert_equal(true, @user.reload.is_deleted?)
-        assert_equal("Your account has been deactivated", flash[:notice])
+        assert_equal("Account deactivated", flash[:notice])
         assert_nil(session[:user_id])
         assert_equal(true, @user.user_events.user_deletion.exists?)
+        assert_equal(false, @user.mod_actions.user_delete.exists?)
       end
 
       should "not delete the user when given an incorrect password" do
@@ -220,8 +221,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to posts_path
         assert_equal(true, @user.reload.is_deleted?)
-        assert_equal("Your account has been deactivated", flash[:notice])
-        assert_equal(true, @user.user_events.user_deletion.exists?)
+        assert_equal("Account deactivated", flash[:notice])
+        assert_equal(false, @user.user_events.user_deletion.exists?)
+        assert_equal(true, @user.mod_actions.user_delete.exists?)
       end
 
       should "not allow users to delete other users" do

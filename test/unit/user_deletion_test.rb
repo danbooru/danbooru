@@ -177,10 +177,12 @@ class UserDeletionTest < ActiveSupport::TestCase
       @deletion.delete!
       assert_equal("user_#{@user.id}", @user.reload.name)
       assert_equal(true, @user.is_deleted)
+      assert_equal(false, UserEvent.user_deletion.exists?)
       assert_equal("deleted user ##{@user.id}", ModAction.last.description)
       assert_equal(@deletion.deleter, ModAction.last.creator)
       assert_equal(@user, ModAction.last.subject)
       assert_equal(false, ModAction.user_name_change.exists?)
+      assert_equal(true, ModAction.user_delete.exists?)
       assert_equal(1, ModAction.count)
     end
 
