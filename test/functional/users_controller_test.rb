@@ -400,9 +400,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "render for a logged in user" do
+      should "fail for a logged in user" do
         get_auth new_user_path, @user
-        assert_response :success
+        assert_response 403
       end
 
       should "render when captchas are enabled" do
@@ -463,6 +463,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_no_enqueued_emails
+        end
+      end
+
+      should "not allow logged-in users to create new accounts" do
+        assert_no_difference("User.count") do
+          post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_response 403
         end
       end
 
@@ -529,18 +537,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, User.last.is_member?)
           assert_equal(false, User.last.is_restricted?)
           assert_equal(false, User.last.requires_verification)
-          assert_equal(true, User.last.user_events.user_creation.exists?)
-        end
-
-        should "mark accounts created by already logged in users as restricted" do
-          self.remote_addr = @valid_ip
-
-          post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
-
-          assert_redirected_to User.last
-          assert_equal(false, User.last.is_member?)
-          assert_equal(true, User.last.is_restricted?)
-          assert_equal(true, User.last.requires_verification)
           assert_equal(true, User.last.user_events.user_creation.exists?)
         end
 

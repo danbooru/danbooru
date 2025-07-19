@@ -7,9 +7,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "new action" do
-      should "render" do
+      should "render if the user is not logged in" do
         get new_session_path
         assert_response :success
+      end
+
+      should "fail if the user is already logged in" do
+        get_auth new_session_path, @user
+        assert_response 403
       end
 
       should "authorize a valid login event" do
@@ -53,6 +58,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "fail if the user is already logged in" do
+        post_auth session_path, @user, params: { session: { name: @user.name, password: "password" } }
+
+        assert_response 403
+      end
+
       should "log the user in when given the correct password" do
         post session_path, params: { session: { name: @user.name, password: "password" } }
 

@@ -23,7 +23,7 @@ class UserVerifier
     return false if ip_address.is_local?
 
     # we check for IP bans first to make sure we bump the IP ban hit count
-    is_ip_banned? || is_logged_in? || is_recent_signup? || is_proxy?
+    is_ip_banned? || is_recent_signup? || is_proxy?
   end
 
   # @return [Integer] Returns whether the new account should be Restricted or a Member
@@ -35,18 +35,10 @@ class UserVerifier
     end
   end
 
-  def log!
-    DanbooruLogger.add_attributes("user_verifier", to_h)
-  end
-
   private
 
   def ip_address
     @ip_address ||= Danbooru::IpAddress.new(request.remote_ip)
-  end
-
-  def is_logged_in?
-    !current_user.is_anonymous?
   end
 
   def is_recent_signup?(age: 24.hours)
@@ -65,7 +57,7 @@ class UserVerifier
   end
 
   def to_h
-    { is_ip_banned: is_ip_banned?, is_logged_in: is_logged_in?, is_recent_signup: is_recent_signup?, is_proxy: is_proxy? }
+    { is_ip_banned: is_ip_banned?, is_recent_signup: is_recent_signup?, is_proxy: is_proxy? }
   end
 
   memoize :is_ip_banned?, :is_proxy?, :is_recent_signup?

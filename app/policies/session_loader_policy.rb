@@ -3,7 +3,7 @@
 class SessionLoaderPolicy < ApplicationPolicy
   # Login action
   def create?
-    true
+    user.is_anonymous?
   end
 
   # Logout action

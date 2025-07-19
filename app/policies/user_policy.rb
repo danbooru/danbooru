@@ -2,11 +2,11 @@
 
 class UserPolicy < ApplicationPolicy
   def create?
-    true
+    user.is_anonymous?
   end
 
   def new?
-    true
+    user.is_anonymous?
   end
 
   def custom_style?
