@@ -7,7 +7,6 @@ class UsersController < ApplicationController
 
   def new
     @user = authorize User.new
-    @user.email_address = EmailAddress.new
     respond_with(@user)
   end
 
@@ -72,20 +71,15 @@ class UsersController < ApplicationController
       level: user_verifier.initial_level,
       name: params[:user][:name],
       password: params[:user][:password],
-      password_confirmation: params[:user][:password_confirmation]
+      password_confirmation: params[:user][:password_confirmation],
+      email_address_attributes: { address: params.dig(:user, :email_address, :address) },
     )
 
     UserEvent.build_from_request(@user, :user_creation, request)
 
-    if params[:user][:email_address].present?
-      @user.email_address = EmailAddress.new(address: params[:user][:email_address])
-    end
-
     if !CaptchaService.new.verify_request(request)
       @user.errors.add(:base, "Invalid captcha, try again.")
-    elsif @user.email_address&.valid? && @user.email_address&.invalid?(:deliverable)
-      @user.errors.add(:email_address, "is invalid or can't receive mail")
-    elsif @user.save
+    elsif @user.save(context: [:create, :deliverable])
       session[:user_id] = @user.id
       UserMailer.with_request(request).welcome_user(@user).deliver_later
       set_current_user

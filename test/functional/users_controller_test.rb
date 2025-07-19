@@ -426,13 +426,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_nil(User.last.email_address)
         assert_equal(true, User.last.user_events.user_creation.exists?)
 
+        assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer welcome_user] })
         perform_enqueued_jobs
         assert_performed_jobs(1, only: MailDeliveryJob)
-        # assert_enqueued_email_with UserMailer.with_request(request), :welcome_user, args: [User.last], queue: "default"
       end
 
       should "create a user with a valid email" do
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: "webmaster@danbooru.donmai.us" }}
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "webmaster@danbooru.donmai.us" }}}
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
@@ -443,26 +443,53 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, User.last.user_events.email_change.exists?)
         assert_equal(false, ModAction.email_address_update.exists?)
 
+        assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer welcome_user] })
         perform_enqueued_jobs
         assert_performed_jobs(1, only: MailDeliveryJob)
-        # assert_enqueued_email_with UserMailer.with_request(request), :welcome_user, args: [User.last], queue: "default"
+      end
+
+      should "not create a user with an invalid name" do
+        assert_no_difference("User.count") do
+          post users_path, params: { user: { name: "x" * 100, password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_response :success
+          assert_no_enqueued_jobs
+        end
+      end
+
+      should "not create a user with an invalid password" do
+        assert_no_difference("User.count") do
+          post users_path, params: { user: { name: "xxx", password: "x", password_confirmation: "x" }}
+
+          assert_response :success
+          assert_no_enqueued_jobs
+        end
+      end
+
+      should "not create a user with a mismatched password" do
+        assert_no_difference("User.count") do
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx2" }}
+
+          assert_response :success
+          assert_no_enqueued_jobs
+        end
       end
 
       should "not create a user with an invalid email" do
         assert_no_difference(["User.count", "EmailAddress.count"]) do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: "test" }}
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "test" }}}
 
           assert_response :success
-          assert_no_enqueued_emails
+          assert_no_enqueued_jobs
         end
       end
 
       should "not create a user with an undeliverable email address" do
         assert_no_difference(["User.count", "EmailAddress.count"]) do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: "nobody@nothing.donmai.us" } }
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "nobody@nothing.donmai.us" } } }
 
           assert_response :success
-          assert_no_enqueued_emails
+          assert_no_enqueued_jobs
         end
       end
 
