@@ -581,9 +581,37 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, User.last.user_events.user_creation.exists?)
         end
 
-        should "mark accounts registered from an IPv4 address recently used for another account as restricted" do
-          @user.update!(last_ip_addr: @valid_ip)
+        should "mark accounts registered from an IPv4 address recently used by another login as restricted" do
           self.remote_addr = @valid_ip
+
+          create(:user_event, created_at: 1.hour.ago, category: :login, ip_addr: @valid_ip)
+          post users_path, params: { user: { name: "dupe", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(false, User.last.is_member?)
+          assert_equal(true, User.last.is_restricted?)
+          assert_equal(true, User.last.requires_verification)
+          assert_equal(true, User.last.user_events.user_creation.exists?)
+        end
+
+        should "mark accounts registered from an IPv4 address recently used by another account as restricted" do
+          self.remote_addr = @valid_ip
+
+          create(:user, last_logged_in_at: 1.hour.ago, last_ip_addr: @valid_ip)
+          post users_path, params: { user: { name: "dupe", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(false, User.last.is_member?)
+          assert_equal(true, User.last.is_restricted?)
+          assert_equal(true, User.last.requires_verification)
+          assert_equal(true, User.last.user_events.user_creation.exists?)
+        end
+
+        should "mark accounts registered using a session ID previously used by another account as restricted" do
+          self.remote_addr = @valid_ip
+
+          get new_user_path # create a session
+          create(:user_event, category: :login, session_id: session[:session_id])
 
           post users_path, params: { user: { name: "dupe", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 

@@ -23,7 +23,7 @@ class UserVerifier
     return false if ip_address.is_local?
 
     # we check for IP bans first to make sure we bump the IP ban hit count
-    is_ip_banned? || is_recent_signup? || is_proxy?
+    is_ip_banned? || is_sockpuppet? || is_recently_used_ip? || is_proxy?
   end
 
   # @return [Integer] Returns whether the new account should be Restricted or a Member
@@ -41,24 +41,20 @@ class UserVerifier
     @ip_address ||= Danbooru::IpAddress.new(request.remote_ip)
   end
 
-  def is_recent_signup?(age: 24.hours)
-    subnet_len = ip_address.ipv4? ? 24 : 64
-    subnet = "#{ip_address}/#{subnet_len}"
-
-    User.where("last_ip_addr <<= ?", subnet).where("created_at > ?", age.ago).exists?
+  memoize def is_recently_used_ip?
+    User.where(last_logged_in_at: 24.hours.ago..).exists?(["last_ip_addr <<= ?", ip_address.subnet.to_s]) ||
+      UserEvent.authorized.where(created_at: 24.hours.ago..).exists?(["ip_addr <<= ?", ip_address.subnet.to_s])
   end
 
-  def is_ip_banned?
+  memoize def is_sockpuppet?
+    UserEvent.authorized.exists?(session_id: request.session[:session_id])
+  end
+
+  memoize def is_ip_banned?
     IpBan.hit!(:partial, ip_address.to_s)
   end
 
-  def is_proxy?
+  memoize def is_proxy?
     ip_address.is_proxy?
   end
-
-  def to_h
-    { is_ip_banned: is_ip_banned?, is_recent_signup: is_recent_signup?, is_proxy: is_proxy? }
-  end
-
-  memoize :is_ip_banned?, :is_proxy?, :is_recent_signup?
 end
