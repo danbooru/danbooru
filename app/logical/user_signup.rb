@@ -1,18 +1,31 @@
 # frozen_string_literal: true
 
-# Checks whether a new account requires verification. An account requires
-# verification if the IP is a proxy, or the IP is under a partial (signup) IP
-# ban, or it was used to create another account recently.
-class UserVerifier
+# This class handles the creation of new accounts. It checks whether the account should be restricted because the signup
+# was from a proxy or a sockpuppet account.
+class UserSignup
   extend Memoist
 
-  attr_reader :current_user, :request
+  attr_reader :request, :params
 
-  # Create a user verifier.
-  # @param current_user [User] the user creating the new account, not the new account itself.
   # @param request the HTTP request
-  def initialize(current_user, request)
-    @current_user, @request = current_user, request
+  def initialize(request)
+    @request = request
+    @params = request.params
+  end
+
+  # @return [User] The user that will be created.
+  memoize def user
+    User.new(
+      request: request,
+      last_ip_addr: request.remote_ip,
+      last_logged_in_at: Time.zone.now,
+      requires_verification: requires_verification?,
+      level: initial_level,
+      name: params[:user][:name],
+      password: params[:user][:password],
+      password_confirmation: params[:user][:password_confirmation],
+      email_address_attributes: { address: params.dig(:user, :email_address, :address) },
+    )
   end
 
   # Returns true if the new account should be restricted. Signups from local

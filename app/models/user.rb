@@ -103,6 +103,7 @@ class User < ApplicationRecord
   enum :theme, { auto: 0, light: 50, dark: 100 }, suffix: true
 
   attr_reader :password
+  attr_accessor :request # The HTTP request, used during signup.
 
   normalizes :blacklisted_tags, with: ->(string) { string.to_s.lines.map(&:strip).join("\n").strip }
   normalizes :favorite_tags, with: ->(string) { string.normalize_whitespace.strip }
@@ -124,8 +125,11 @@ class User < ApplicationRecord
   validate :validate_blacklisted_tags, if: :blacklisted_tags_changed?
   validate :validate_favorite_tags, if: :favorite_tags_changed?
   validate :validate_custom_css, if: :custom_style_changed?
+
   before_save :recalculate_upload_points, if: :level_changed?
   before_create :promote_to_owner_if_first_user
+  after_create :send_welcome_email
+  after_create_commit :login_new_user
 
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
@@ -833,6 +837,20 @@ class User < ApplicationRecord
     def validate_custom_css
       if !custom_css.valid?
         errors.add(:custom_style, "contains a syntax error. Validate it with https://codebeautify.org/cssvalidate")
+      end
+    end
+  end
+
+  concerning :SignupMethods do
+    def send_welcome_email
+      if request.present? && can_receive_email?(require_verified_email: false)
+        UserMailer.with_request(request).welcome_user(self).deliver_later
+      end
+    end
+
+    def login_new_user
+      if request.present?
+        SessionLoader.new(request).login_user(self, :user_creation)
       end
     end
   end

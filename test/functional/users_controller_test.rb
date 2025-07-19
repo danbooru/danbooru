@@ -417,6 +417,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "create a user" do
+        freeze_time
         post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
         assert_redirected_to User.last
@@ -425,13 +426,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_nil(User.last.email_address)
         assert_equal(true, User.last.user_events.user_creation.exists?)
+        assert_no_enqueued_jobs
 
-        assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer welcome_user] })
-        perform_enqueued_jobs
-        assert_performed_jobs(1, only: MailDeliveryJob)
+        assert_equal(User.last.id, session[:user_id])
+        assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
       end
 
       should "create a user with a valid email" do
+        freeze_time
         post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "webmaster@danbooru.donmai.us" }}}
 
         assert_redirected_to User.last
@@ -446,6 +448,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer welcome_user] })
         perform_enqueued_jobs
         assert_performed_jobs(1, only: MailDeliveryJob)
+
+        assert_equal(User.last.id, session[:user_id])
+        assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
       end
 
       should "not create a user with an invalid name" do
@@ -453,6 +458,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           post users_path, params: { user: { name: "x" * 100, password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_response :success
+          assert_nil(session[:user_id])
+          assert_nil(session[:last_authenticated_at])
           assert_no_enqueued_jobs
         end
       end
@@ -462,6 +469,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           post users_path, params: { user: { name: "xxx", password: "x", password_confirmation: "x" }}
 
           assert_response :success
+          assert_nil(session[:user_id])
+          assert_nil(session[:last_authenticated_at])
           assert_no_enqueued_jobs
         end
       end
@@ -471,6 +480,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx2" }}
 
           assert_response :success
+          assert_nil(session[:user_id])
+          assert_nil(session[:last_authenticated_at])
           assert_no_enqueued_jobs
         end
       end
@@ -480,6 +491,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "test" }}}
 
           assert_response :success
+          assert_nil(session[:user_id])
+          assert_nil(session[:last_authenticated_at])
           assert_no_enqueued_jobs
         end
       end
@@ -489,6 +502,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "nobody@nothing.donmai.us" } } }
 
           assert_response :success
+          assert_nil(session[:user_id])
+          assert_nil(session[:last_authenticated_at])
           assert_no_enqueued_jobs
         end
       end
@@ -510,7 +525,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_no_difference(["User.count"]) do
             post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
 
-            assert_response :success
+            assert_response 401
           end
         end
 
@@ -519,8 +534,10 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           Danbooru.config.stubs(:captcha_secret_key).returns("1x0000000000000000000000000000000AA") # always passes
 
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+
           assert_redirected_to User.last
           assert_equal("xxx", User.last.name)
+          assert_equal(User.last.id, session[:user_id])
         end
       end
 
@@ -534,7 +551,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_no_difference(["User.count"]) do
             post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" } }
 
-            assert_response :success
+            assert_response 401
           end
         end
 
@@ -542,7 +559,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_no_difference(["User.count"]) do
             post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
 
-            assert_response :success
+            assert_response 401
           end
         end
       end
