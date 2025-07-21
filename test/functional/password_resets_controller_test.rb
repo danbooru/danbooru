@@ -3,13 +3,27 @@ require 'test_helper'
 class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
   context "The passwords resets controller" do
     context "show action" do
-      should "work" do
+      should "work for a logged-out user" do
         get password_reset_path
         assert_response :success
+      end
+
+      should "redirect to the profile page for a logged-in user" do
+        get_auth password_reset_path, create(:user)
+
+        assert_redirected_to profile_path
+        assert_equal("Already logged in", flash[:notice])
       end
     end
 
     context "create action" do
+      should "redirect to the profile page for a logged-in user" do
+        post_auth password_reset_path, create(:user), params: { user: { name: "foobar@gmail.com" } }
+
+        assert_redirected_to profile_path
+        assert_equal("Already logged in", flash[:notice])
+      end
+
       context "for an account identified by an email address" do
         should "send a password reset email if the account exists and has a verified email address" do
           @user = create(:user, email_address: create(:email_address, address: "Foo.Bar+nospam@Googlemail.com", is_verified: true))
