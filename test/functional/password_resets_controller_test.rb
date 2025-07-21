@@ -147,7 +147,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal(@user.id, session[:user_id])
           assert_equal(@user.login_sessions.last.login_id, session[:login_id])
-          assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
+          assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
         end
 
         should "not change the user's password when the passwords don't match" do
@@ -243,7 +243,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal(@user.id, session[:user_id])
           assert_equal(@user.login_sessions.last.login_id, session[:login_id])
-          assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
+          assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
         end
 
         should "change the user's password when the backup code is correct" do
@@ -261,7 +261,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal(@user.id, session[:user_id])
           assert_equal(@user.login_sessions.last.login_id, session[:login_id])
-          assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
+          assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
         end
 
         should "not change the user's password when the verification code is incorrect" do

@@ -71,8 +71,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
         assert_equal(@user.login_sessions.last.login_id, session[:login_id])
-        assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
-        assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
+        assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+        assert_equal(Time.now.utc.inspect, @user.reload.last_logged_in_at.utc.inspect)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
         assert_equal(true, @user.user_events.login.exists?(login_session_id: session[:login_id]))
       end
@@ -84,8 +84,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
         assert_equal(@user.login_sessions.last.login_id, session[:login_id])
-        assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
-        assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
+        assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+        assert_equal(Time.now.utc.inspect, @user.reload.last_logged_in_at.utc.inspect)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
         assert_equal(true, @user.user_events.login.exists?(login_session_id: session[:login_id]))
       end
@@ -97,8 +97,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
         assert_equal(@user.login_sessions.last.login_id, session[:login_id])
-        assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
-        assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
+        assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+        assert_equal(Time.now.utc.inspect, @user.reload.last_logged_in_at.utc.inspect)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
         assert_equal(true, @user.user_events.login.exists?(login_session_id: session[:login_id]))
       end
@@ -110,8 +110,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
         assert_equal(@user.login_sessions.last.login_id, session[:login_id])
-        assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
-        assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
+        assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+        assert_equal(Time.now.utc.inspect, @user.reload.last_logged_in_at.utc.inspect)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
         assert_equal(true, @user.user_events.login.exists?(login_session_id: session[:login_id]))
       end
@@ -220,8 +220,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to users_path
         assert_equal(@user.id, session[:user_id])
         assert_equal(@user.login_sessions.last.login_id, session[:login_id])
-        assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
-        assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
+        assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+        assert_equal(Time.now.utc.inspect, @user.reload.last_logged_in_at.utc.inspect)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
         assert_equal(true, @user.user_events.login.exists?(login_session_id: session[:login_id]))
       end
@@ -330,8 +330,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
             assert_redirected_to root_path
             assert_equal(user.id, session[:user_id])
             assert_equal(user.login_sessions.last.login_id, session[:login_id])
-            assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
-            assert_equal(Time.now.utc.to_s, user.reload.last_logged_in_at.utc.to_s)
+            assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+            assert_equal(Time.now.utc.inspect, user.reload.last_logged_in_at.utc.inspect)
             assert_equal("1.2.3.4", user.reload.last_ip_addr.to_s)
             assert_equal(true, user.user_events.login.exists?(login_session_id: session[:login_id]))
             assert_no_enqueued_jobs
@@ -365,8 +365,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
             assert_redirected_to root_path
             assert_equal(user.id, session[:user_id])
             assert_equal(user.login_sessions.last.login_id, session[:login_id])
-            assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
-            assert_equal(Time.now.utc.to_s, user.reload.last_logged_in_at.utc.to_s)
+            assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+            assert_equal(Time.now.utc.inspect, user.reload.last_logged_in_at.utc.inspect)
             assert_equal("1.2.3.4", user.reload.last_ip_addr.to_s)
             assert_equal(true, user.user_events.login.exists?(login_session_id: session[:login_id]))
             assert_no_enqueued_jobs
@@ -469,8 +469,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to users_path
         assert_equal(@user.id, session[:user_id])
         assert_equal(@user.login_sessions.last.login_id, session[:login_id])
-        assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
-        assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
+        assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+        assert_equal(Time.now.utc.inspect, @user.reload.last_logged_in_at.utc.inspect)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
         assert_equal(true, @user.user_events.totp_login.exists?(login_session_id: session[:login_id]))
       end
@@ -547,13 +547,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user_with_2fa)
           backup_code = @user.backup_codes.first
 
+          freeze_time
           post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path } }
 
           assert_redirected_to users_path
           assert_equal(@user.id, session[:user_id])
           assert_equal(@user.login_sessions.last.login_id, session[:login_id])
-          assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
-          assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
+          assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+          assert_equal(Time.now.utc.inspect, @user.reload.last_logged_in_at.utc.inspect)
           assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
 
           assert_equal(false, @user.reload.backup_codes.include?(backup_code))
@@ -718,7 +719,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
         assert_equal("logged_out", @user.login_sessions.last.status)
-        assert_equal(Time.now.utc.to_s, @user.login_sessions.last.last_seen_at.utc.to_s)
+        assert_equal(Time.now.utc.inspect, @user.login_sessions.last.last_seen_at.utc.inspect)
         assert_equal("logout", @user.user_events.last.category)
         assert_equal(@user.login_sessions.last.login_id, @user.user_events.last.login_session_id)
       end
