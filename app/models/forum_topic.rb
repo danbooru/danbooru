@@ -53,7 +53,7 @@ class ForumTopic < ApplicationRecord
     end
 
     def read_by_user(user)
-      last_forum_read_at = user.last_forum_read_at || "2000-01-01".to_time
+      last_forum_read_at = user.last_forum_read_at || Time.zone.parse("2000-01-01")
 
       read_topics = user.visited_forum_topics.where("forum_topic_visits.last_read_at >= forum_topics.updated_at")
       old_topics = where("? >= forum_topics.updated_at", last_forum_read_at)
@@ -146,8 +146,8 @@ class ForumTopic < ApplicationRecord
     return true if CurrentUser.is_anonymous?
     return true if new_record?
 
-    topic_last_read_at = forum_topic_visit_by_current_user&.last_read_at || "2000-01-01".to_time
-    forum_last_read_at = CurrentUser.last_forum_read_at || "2000-01-01".to_time
+    topic_last_read_at = forum_topic_visit_by_current_user&.last_read_at || Time.zone.parse("2000-01-01")
+    forum_last_read_at = CurrentUser.last_forum_read_at || Time.zone.parse("2000-01-01")
 
     (topic_last_read_at >= updated_at) || (forum_last_read_at >= updated_at)
   end

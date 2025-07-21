@@ -29,7 +29,7 @@ class ApplicationJob < ActiveJob::Base
     if background_job?
       # We have to use wall time here rather than a monotonic clock because the job could come from a different machine.
       # This could be inaccurate due to clocks moving forward or backwards, or machines having unsynchronized clocks.
-      queue_duration = Time.zone.now - enqueued_at.to_time
+      queue_duration = Time.zone.now - enqueued_at
       ApplicationMetrics[:rails_jobs_queue_duration_seconds][job_labels].increment(queue_duration)
     end
 
