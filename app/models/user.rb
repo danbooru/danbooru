@@ -307,8 +307,8 @@ class User < ApplicationRecord
         false
       else
         with_lock do
-          UserEvent.build_from_request(self, :password_reset, request)
           success = update(password: new_password, password_confirmation: password_confirmation)
+          UserEvent.create_from_request!(self, :password_reset, request) if success
           verify_backup_code!(verification_code) if success
           success
         end
@@ -325,8 +325,10 @@ class User < ApplicationRecord
         errors.add(:verification_code, "is incorrect")
         false
       else
-        UserEvent.build_from_request(self, :password_change, request)
-        update(password: new_password, password_confirmation: password_confirmation)
+        with_lock do
+          success = update(password: new_password, password_confirmation: password_confirmation)
+          UserEvent.create_from_request!(self, :password_change, request) if success
+        end
       end
     end
   end
