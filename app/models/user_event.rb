@@ -14,6 +14,7 @@ class UserEvent < ApplicationRecord
     login login_verification reauthenticate logout user_creation user_deletion user_undeletion
     password_reset password_change email_change totp_enable totp_update totp_disable
     totp_login totp_reauthenticate backup_code_generate backup_code_login backup_code_reauthenticate
+    api_key_create api_key_update api_key_delete
   ]
 
   attribute :id
