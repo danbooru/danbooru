@@ -119,6 +119,14 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@admin, ModAction.last.creator)
       end
 
+      should "not allow admins to modify credentials" do
+        @site_credential = create(:site_credential, credential: { phpsessid: "old" })
+        put_auth site_credential_path(@site_credential), @admin, params: { site_credential: { credential: { phpsessid: "new" } }}
+
+        assert_response 403
+        assert_equal({ phpsessid: "old" }, @site_credential.reload.credential.symbolize_keys)
+      end
+
       should "not allow non-admins to update credentials" do
         @site_credential = create(:site_credential)
         put_auth site_credential_path(@site_credential), @member, params: { site_credential: { is_enabled: false }}
