@@ -202,6 +202,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @user.reload.is_deleted?)
         assert_equal("Account deactivated", flash[:notice])
         assert_nil(session[:user_id])
+        assert_nil(session[:login_id])
+        assert_nil(session[:last_authenticated_at])
         assert_equal(true, @user.user_events.user_deletion.exists?)
         assert_equal(false, @user.mod_actions.user_delete.exists?)
       end
@@ -213,6 +215,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, @user.reload.is_deleted?)
         assert_equal("Password is incorrect", flash[:notice])
         assert_equal(@user.id, session[:user_id])
+        assert_equal(@user.login_sessions.last.login_id, session[:login_id])
         assert_equal(false, @user.user_events.user_deletion.exists?)
       end
 
@@ -222,6 +225,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to posts_path
         assert_equal(true, @user.reload.is_deleted?)
         assert_equal("Account deactivated", flash[:notice])
+        assert_not_nil(session[:user_id])
+        assert_not_nil(session[:login_id])
+        assert_not_nil(session[:last_authenticated_at])
         assert_equal(false, @user.user_events.user_deletion.exists?)
         assert_equal(true, @user.mod_actions.user_delete.exists?)
       end
@@ -430,6 +436,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_equal(User.last.id, session[:user_id])
         assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
+        assert_equal(User.last.login_sessions.last.login_id, session[:login_id])
+        assert_equal(Time.now.utc.to_s, User.last.last_logged_in_at.utc.to_s)
+        assert_equal("127.0.0.1", User.last.last_ip_addr.to_s)
       end
 
       should "create a user with a valid email" do
@@ -451,6 +460,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_equal(User.last.id, session[:user_id])
         assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
+        assert_equal(User.last.login_sessions.last.login_id, session[:login_id])
+        assert_equal(Time.now.utc.to_s, User.last.last_logged_in_at.utc.to_s)
+        assert_equal("127.0.0.1", User.last.last_ip_addr.to_s)
       end
 
       should "not create a user with an invalid name" do
@@ -459,6 +471,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
           assert_nil(session[:last_authenticated_at])
           assert_no_enqueued_jobs
         end
@@ -470,6 +483,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
           assert_nil(session[:last_authenticated_at])
           assert_no_enqueued_jobs
         end
@@ -481,6 +495,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
           assert_nil(session[:last_authenticated_at])
           assert_no_enqueued_jobs
         end
@@ -492,6 +507,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
           assert_nil(session[:last_authenticated_at])
           assert_no_enqueued_jobs
         end
@@ -503,6 +519,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
           assert_nil(session[:last_authenticated_at])
           assert_no_enqueued_jobs
         end
@@ -538,6 +555,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to User.last
           assert_equal("xxx", User.last.name)
           assert_equal(User.last.id, session[:user_id])
+          assert_equal(User.last.login_sessions.last.login_id, session[:login_id])
         end
       end
 

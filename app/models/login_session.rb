@@ -27,6 +27,10 @@ class LoginSession < ApplicationRecord
 
   belongs_to :user
 
+  def revoke!
+    update!(status: :revoked)
+  end
+
   def self.visible(user)
     if user.is_owner?
       all

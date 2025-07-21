@@ -135,6 +135,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "change the user's password when given a valid new password" do
+          freeze_time
           put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password" })
 
           assert_redirected_to @user
@@ -142,6 +143,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, @user.reload.authenticate_password("password").present?)
           assert_equal(true, @user.user_events.login.exists?)
           assert_equal(true, @user.user_events.password_reset.exists?)
+          assert_equal(true, @user.login_sessions.exists?)
+
+          assert_equal(@user.id, session[:user_id])
+          assert_equal(@user.login_sessions.last.login_id, session[:login_id])
+          assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
         end
 
         should "not change the user's password when the passwords don't match" do
@@ -152,6 +158,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
+          assert_equal(false, @user.login_sessions.exists?)
+
+          assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
+          assert_nil(session[:last_authenticated_at])
         end
 
         should "not change the user's password when not given a signed_id" do
@@ -162,6 +173,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
+          assert_equal(false, @user.login_sessions.exists?)
+
+          assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
+          assert_nil(session[:last_authenticated_at])
         end
 
         should "not change the user's password when given an expired signed_id" do
@@ -172,6 +188,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
+          assert_equal(false, @user.login_sessions.exists?)
+
+          assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
+          assert_nil(session[:last_authenticated_at])
         end
 
         should "not change the user's password when given an invalid signed_id" do
@@ -182,6 +203,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
+          assert_equal(false, @user.login_sessions.exists?)
+
+          assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
+          assert_nil(session[:last_authenticated_at])
         end
 
         should "not change the user's password when the user is already logged in as another user" do
@@ -193,6 +219,10 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
+          assert_equal(false, @user.login_sessions.exists?)
+
+          assert_equal(@user2.id, session[:user_id])
+          assert_equal(@user2.login_sessions.last.login_id, session[:login_id])
         end
       end
 
@@ -202,6 +232,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "change the user's password when the verification code is correct" do
+          freeze_time
           put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: @user.totp.code })
 
           assert_redirected_to @user
@@ -209,10 +240,17 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, @user.reload.authenticate_password("password").present?)
           assert_equal(true, @user.user_events.login.exists?)
           assert_equal(true, @user.user_events.password_reset.exists?)
+          assert_equal(true, @user.login_sessions.exists?)
+
+          assert_equal(@user.id, session[:user_id])
+          assert_equal(@user.login_sessions.last.login_id, session[:login_id])
+          assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
         end
 
         should "change the user's password when the backup code is correct" do
           backup_code = @user.backup_codes.first
+
+          freeze_time
           put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: backup_code })
 
           assert_redirected_to @user
@@ -220,7 +258,12 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, @user.reload.authenticate_password("password").present?)
           assert_equal(true, @user.user_events.login.exists?)
           assert_equal(true, @user.user_events.password_reset.exists?)
+          assert_equal(true, @user.login_sessions.exists?)
           assert_equal(false, @user.backup_codes.include?(backup_code))
+
+          assert_equal(@user.id, session[:user_id])
+          assert_equal(@user.login_sessions.last.login_id, session[:login_id])
+          assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
         end
 
         should "not change the user's password when the verification code is incorrect" do
@@ -231,6 +274,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.reload.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
+          assert_equal(false, @user.login_sessions.exists?)
+
+          assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
+          assert_nil(session[:last_authenticated_at])
         end
 
         should "not spend a backup code when the new password is invalid" do
@@ -242,7 +290,12 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.reload.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
+          assert_equal(false, @user.login_sessions.exists?)
           assert_equal(true, @user.backup_codes.include?(backup_code))
+
+          assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
+          assert_nil(session[:last_authenticated_at])
         end
       end
 
@@ -256,6 +309,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.reload.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
+          assert_equal(false, @user.login_sessions.exists?)
+
+          assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
+          assert_nil(session[:last_authenticated_at])
         end
       end
     end

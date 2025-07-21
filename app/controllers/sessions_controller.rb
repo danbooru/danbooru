@@ -66,7 +66,7 @@ class SessionsController < ApplicationController
 
   def destroy
     @session = authorize SessionLoader.new(request)
-    @session.logout
+    @session.logout(CurrentUser.user)
     redirect_to root_path, notice: "You are now logged out", status: 303
   end
 
