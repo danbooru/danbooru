@@ -4,7 +4,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
   context "An api keys controller" do
     setup do
       @user = create(:user)
-      @api_key = create(:api_key, user: @user)
+      @api_key = create(:api_key, user: @user, request: nil)
     end
 
     context "#index action" do
@@ -64,7 +64,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to user_api_keys_path(@user.id)
         assert_equal("blah", @user.api_keys.last.name)
-        assert_equal(true, @user.user_events.api_key_create.exists?)
+        assert_equal(true, @user.user_events.api_key_create.exists?(login_session_id: @user.login_sessions.last.login_id))
       end
     end
 
@@ -87,7 +87,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to user_api_keys_path(@user.id)
         assert_equal("blah", @api_key.reload.name)
         assert_equal(["1.2.3.4"], @api_key.permitted_ip_addresses.map(&:to_s))
-        assert_equal(true, @user.user_events.api_key_update.exists?)
+        assert_equal(true, @user.user_events.api_key_update.exists?(login_session_id: @user.login_sessions.last.login_id))
       end
 
       should "fail for someone else" do
@@ -102,7 +102,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to user_api_keys_path(@user.id)
         assert_raise(ActiveRecord::RecordNotFound) { @api_key.reload }
-        assert_equal(true, @user.user_events.api_key_delete.exists?)
+        assert_equal(true, @user.user_events.api_key_delete.exists?(login_session_id: @user.login_sessions.last.login_id))
       end
 
       should "not allow deleting another user's API key" do

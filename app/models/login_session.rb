@@ -26,6 +26,7 @@ class LoginSession < ApplicationRecord
   scope :inactive, -> { where.not(status: :active) }
 
   belongs_to :user
+  has_many :user_events, primary_key: :login_id, inverse_of: :login_session, dependent: :destroy
 
   def revoke!
     update!(status: :revoked)

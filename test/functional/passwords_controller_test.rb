@@ -37,7 +37,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to @user
         assert_equal(false, @user.reload.authenticate_password("12345"))
         assert_equal(@user, @user.authenticate_password("abcde"))
-        assert_equal(true, @user.user_events.password_change.exists?)
+        assert_equal(true, @user.user_events.password_change.exists?(login_session_id: @user.login_sessions.last.login_id))
       end
 
       should "not allow users to change the password of other users" do
@@ -57,6 +57,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@user, @user.reload.authenticate_password("12345"))
         assert_equal(false, @user.authenticate_password("abcde"))
         assert_equal(false, @user.user_events.password_change.exists?)
+        assert_equal(true, @user.user_events.failed_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
       end
 
       should "not update the password when password confirmation fails for the new password" do
@@ -78,7 +79,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @user
           assert_equal(true, @user.reload.authenticate_password("abcde").present?)
-          assert_equal(true, @user.user_events.password_change.exists?)
+          assert_equal(true, @user.user_events.password_change.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
         should "not change the user's password when given a backup code" do
@@ -89,6 +90,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, @user.reload.authenticate_password("12345").present?)
           assert_equal(false, @user.user_events.password_change.exists?)
           assert_equal(true, @user.backup_codes.include?(backup_code))
+          assert_equal(true, @user.user_events.totp_failed_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
         should "not change the user's password when the verification code is incorrect" do
@@ -97,6 +99,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_equal(true, @user.reload.authenticate_password("12345").present?)
           assert_equal(false, @user.user_events.password_change.exists?)
+          assert_equal(true, @user.user_events.totp_failed_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
       end
     end

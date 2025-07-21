@@ -106,7 +106,7 @@ class SessionLoader
       time = Time.now.utc.to_s
 
       login_session = LoginSession.create!(user: user, session_id: session[:session_id], last_seen_at: time)
-      UserEvent.create_from_request!(user, event_category, request)
+      UserEvent.create_from_request!(user, event_category, request, login_session: login_session)
       user.update!(last_logged_in_at: time, last_ip_addr: request.remote_ip)
 
       session[:user_id] = user.id

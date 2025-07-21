@@ -16,7 +16,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           post password_reset_path, params: { user: { name: "foobar@gmail.com" } }
 
           assert_redirected_to password_reset_path
-          assert_equal(true, @user.user_events.password_reset_request.exists?)
+          assert_equal(true, @user.user_events.password_reset_request.exists?(login_session_id: nil))
           assert_enqueued_email_with UserMailer.with_request(request), :password_reset, args: [@user], queue: "default"
           perform_enqueued_jobs
           assert_performed_jobs(1, only: MailDeliveryJob)
@@ -27,7 +27,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           post password_reset_path, params: { user: { name: "foobar@gmail.com" } }
 
           assert_redirected_to password_reset_path
-          assert_equal(true, @user.user_events.password_reset_request.exists?)
+          assert_equal(true, @user.user_events.password_reset_request.exists?(login_session_id: nil))
           assert_enqueued_email_with UserMailer.with_request(request), :password_reset, args: [@user], queue: "default"
           perform_enqueued_jobs
           assert_performed_jobs(1, only: MailDeliveryJob)
@@ -48,7 +48,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           post password_reset_path, params: { user: { name: @user.name } }
 
           assert_redirected_to password_reset_path
-          assert_equal(true, @user.user_events.password_reset_request.exists?)
+          assert_equal(true, @user.user_events.password_reset_request.exists?(login_session_id: nil))
           assert_enqueued_email_with UserMailer.with_request(request), :password_reset, args: [@user], queue: "default"
           perform_enqueued_jobs
           assert_performed_jobs(1, only: MailDeliveryJob)
@@ -59,7 +59,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           post password_reset_path, params: { user: { name: @user.name } }
 
           assert_redirected_to password_reset_path
-          assert_equal(true, @user.user_events.password_reset_request.exists?)
+          assert_equal(true, @user.user_events.password_reset_request.exists?(login_session_id: nil))
           assert_enqueued_email_with UserMailer.with_request(request), :password_reset, args: [@user], queue: "default"
           perform_enqueued_jobs
           assert_performed_jobs(1, only: MailDeliveryJob)
@@ -71,7 +71,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to password_reset_path
           assert_no_enqueued_emails
-          assert_equal(true, @user.user_events.password_reset_request.exists?)
+          assert_equal(true, @user.user_events.password_reset_request.exists?(login_session_id: nil))
         end
 
         should "not send an email if the user does not exist" do
@@ -141,8 +141,8 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to @user
           assert_equal(@user.id, session[:user_id])
           assert_equal(true, @user.reload.authenticate_password("password").present?)
-          assert_equal(true, @user.user_events.login.exists?)
-          assert_equal(true, @user.user_events.password_reset.exists?)
+          assert_equal(true, @user.user_events.login.exists?(login_session_id: @user.login_sessions.last.login_id))
+          assert_equal(true, @user.user_events.password_reset.exists?(login_session_id: nil))
           assert_equal(true, @user.login_sessions.exists?)
 
           assert_equal(@user.id, session[:user_id])
@@ -236,10 +236,9 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: @user.totp.code })
 
           assert_redirected_to @user
-          assert_equal(@user.id, session[:user_id])
           assert_equal(true, @user.reload.authenticate_password("password").present?)
-          assert_equal(true, @user.user_events.login.exists?)
-          assert_equal(true, @user.user_events.password_reset.exists?)
+          assert_equal(true, @user.user_events.login.exists?(login_session_id: @user.login_sessions.last.login_id))
+          assert_equal(true, @user.user_events.password_reset.exists?(login_session_id: nil))
           assert_equal(true, @user.login_sessions.exists?)
 
           assert_equal(@user.id, session[:user_id])
@@ -254,10 +253,9 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: backup_code })
 
           assert_redirected_to @user
-          assert_equal(@user.id, session[:user_id])
           assert_equal(true, @user.reload.authenticate_password("password").present?)
-          assert_equal(true, @user.user_events.login.exists?)
-          assert_equal(true, @user.user_events.password_reset.exists?)
+          assert_equal(true, @user.user_events.login.exists?(login_session_id: @user.login_sessions.last.login_id))
+          assert_equal(true, @user.user_events.password_reset.exists?(login_session_id: nil))
           assert_equal(true, @user.login_sessions.exists?)
           assert_equal(false, @user.backup_codes.include?(backup_code))
 
@@ -270,11 +268,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: "wrong" })
 
           assert_response :success
-          assert_nil(session[:user_id])
           assert_equal(false, @user.reload.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
           assert_equal(false, @user.login_sessions.exists?)
+          assert_equal(true, @user.user_events.totp_failed_reauthenticate.exists?(login_session_id: nil))
 
           assert_nil(session[:user_id])
           assert_nil(session[:login_id])
@@ -286,7 +284,6 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "12345", verification_code: backup_code })
 
           assert_response :success
-          assert_nil(session[:user_id])
           assert_equal(false, @user.reload.authenticate_password("password").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)

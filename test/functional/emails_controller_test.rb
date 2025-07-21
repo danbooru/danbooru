@@ -217,7 +217,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to(settings_path)
           assert_equal("new@danbooru.donmai.us", @user.reload.email_address.address)
           assert_equal(false, @user.email_address.is_verified)
-          assert_equal(true, @user.user_events.email_change.exists?)
+          assert_equal(true, @user.user_events.email_change.exists?(login_session_id: @user.login_sessions.last.login_id))
 
           assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer email_change_confirmation] })
           perform_enqueued_jobs
@@ -234,7 +234,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to(settings_path)
           assert_equal("new@danbooru.donmai.us", @user.reload.email_address.address)
           assert_equal(false, @user.reload.email_address.is_verified)
-          assert_equal(true, @user.user_events.email_change.exists?)
+          assert_equal(true, @user.user_events.email_change.exists?(login_session_id: @user.login_sessions.last.login_id))
 
           assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer email_change_confirmation] })
           perform_enqueued_jobs

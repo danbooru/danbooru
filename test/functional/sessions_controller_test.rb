@@ -26,7 +26,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         end
 
         assert_response :success
-        assert_equal("login_verification", @user.user_events.last.category)
+        assert_equal(true, @user.user_events.login_verification.exists?(login_session_id: nil))
         assert_equal("New location verified. Login again to continue", flash[:notice])
       end
 
@@ -39,7 +39,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         end
 
         assert_response :success
-        assert_equal("login_pending_verification", @user.user_events.last.category)
+        assert_equal(false, @user.user_events.login_verification.exists?)
         assert_equal("Expired link. Please login again", flash[:notice])
       end
 
@@ -52,7 +52,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         end
 
         assert_response :success
-        assert_equal("login_pending_verification", @user.user_events.last.category)
+        assert_equal(false, @user.user_events.login_verification.exists?)
         assert_equal("Expired link. Please login again", flash[:notice])
       end
     end
@@ -74,7 +74,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
         assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
-        assert_equal(true, @user.user_events.login.exists?)
+        assert_equal(true, @user.user_events.login.exists?(login_session_id: session[:login_id]))
       end
 
       should "log the user in when given their email address" do
@@ -87,7 +87,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
         assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
-        assert_equal(true, @user.user_events.login.exists?)
+        assert_equal(true, @user.user_events.login.exists?(login_session_id: session[:login_id]))
       end
 
       should "normalize the user's email address when logging in" do
@@ -100,7 +100,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
         assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
-        assert_equal(true, @user.user_events.login.exists?)
+        assert_equal(true, @user.user_events.login.exists?(login_session_id: session[:login_id]))
       end
 
       should "be case-insensitive towards the user's name when logging in" do
@@ -113,7 +113,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
         assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
-        assert_equal(true, @user.user_events.login.exists?)
+        assert_equal(true, @user.user_events.login.exists?(login_session_id: session[:login_id]))
       end
 
       should "not log the user in when given an incorrect username + password combination" do
@@ -123,7 +123,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:user_id])
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
-        assert_equal(true, @user.user_events.failed_login.exists?)
+        assert_equal(true, @user.user_events.failed_login.exists?(login_session_id: nil))
       end
 
       should "not log the user in when given an incorrect email" do
@@ -179,7 +179,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
         assert_equal(false, user.login_sessions.exists?)
-        assert_equal(true, user.user_events.totp_login_pending_verification.exists?)
+        assert_equal(true, user.user_events.totp_login_pending_verification.exists?(login_session_id: nil))
       end
 
       should "not log the user in yet if they have 2FA enabled" do
@@ -192,7 +192,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
         assert_equal(false, user.login_sessions.exists?)
-        assert_equal(true, user.user_events.totp_login_pending_verification.exists?)
+        assert_equal(true, user.user_events.totp_login_pending_verification.exists?(login_session_id: nil))
       end
 
       should "not log the user in if the captcha is invalid" do
@@ -207,7 +207,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
         assert_equal(false, @user.login_sessions.exists?)
-        assert_equal(false, @user.user_events.failed_login.exists?)
+        assert_equal(false, @user.user_events.failed_login.exists?(login_session_id: nil))
       end
 
       should "log the user in if the captcha is valid" do
@@ -223,7 +223,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
         assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
-        assert_equal(true, @user.user_events.login.exists?)
+        assert_equal(true, @user.user_events.login.exists?(login_session_id: session[:login_id]))
       end
 
       should "redirect the user when given an url param" do
@@ -245,7 +245,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
         assert_equal(false, @user.login_sessions.exists?)
-        assert_equal(true, @user.user_events.failed_login.exists?)
+        assert_equal(true, @user.user_events.failed_login.exists?(login_session_id: nil))
       end
 
       should "not allow IP banned users to login" do
@@ -257,7 +257,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
         assert_equal(false, @user.login_sessions.exists?)
-        assert_equal(false, @user.user_events.failed_login.exists?) # XXX request is blocked before we get to the login process
+        assert_equal(false, @user.user_events.failed_login.exists?(login_session_id: nil)) # XXX request is blocked before we get to the login process
 
         assert_equal(1, @ip_ban.reload.hit_count)
         assert(@ip_ban.last_hit_at > 1.minute.ago)
@@ -297,7 +297,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
             assert_nil(session[:login_id])
             assert_nil(session[:last_authenticated_at])
             assert_equal(false, user.login_sessions.exists?)
-            assert_equal(true, user.user_events.totp_login_pending_verification.exists?)
+            assert_equal(true, user.user_events.totp_login_pending_verification.exists?(login_session_id: nil))
             assert_no_enqueued_jobs
           end
         end
@@ -313,7 +313,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
             assert_nil(session[:login_id])
             assert_nil(session[:last_authenticated_at])
             assert_equal(false, user.login_sessions.exists?)
-            assert_equal(true, user.user_events.login_pending_verification.exists?)
+            assert_equal(true, user.user_events.login_pending_verification.exists?(login_session_id: nil))
 
             assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer login_verification] })
             perform_enqueued_jobs
@@ -333,7 +333,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
             assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
             assert_equal(Time.now.utc.to_s, user.reload.last_logged_in_at.utc.to_s)
             assert_equal("1.2.3.4", user.reload.last_ip_addr.to_s)
-            assert_equal(true, user.user_events.login.exists?)
+            assert_equal(true, user.user_events.login.exists?(login_session_id: session[:login_id]))
             assert_no_enqueued_jobs
           end
 
@@ -347,8 +347,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
             assert_nil(session[:user_id])
             assert_nil(session[:login_id])
             assert_nil(session[:last_authenticated_at])
-            assert_equal(false, user.login_sessions.exists?)
-            assert_equal(true, user.user_events.login_pending_verification.exists?)
+            assert_equal(true, user.user_events.login_pending_verification.exists?(login_session_id: nil))
 
             assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer login_verification] })
             perform_enqueued_jobs
@@ -369,7 +368,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
             assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
             assert_equal(Time.now.utc.to_s, user.reload.last_logged_in_at.utc.to_s)
             assert_equal("1.2.3.4", user.reload.last_ip_addr.to_s)
-            assert_equal(true, user.user_events.login.exists?)
+            assert_equal(true, user.user_events.login.exists?(login_session_id: session[:login_id]))
             assert_no_enqueued_jobs
           end
         end
@@ -473,7 +472,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(Time.now.utc.to_s, session[:last_authenticated_at])
         assert_equal(Time.now.utc.to_s, @user.reload.last_logged_in_at.utc.to_s)
         assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
-        assert_equal(true, @user.user_events.totp_login.exists?)
+        assert_equal(true, @user.user_events.totp_login.exists?(login_session_id: session[:login_id]))
       end
 
       should "log the user in if they enter a 2FA code that was generated less than 30 seconds ago" do
@@ -486,7 +485,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@user.id, session[:user_id])
         assert_equal(@user.login_sessions.last.login_id, session[:login_id])
         assert_equal("127.0.0.1", @user.reload.last_ip_addr.to_s)
-        assert_equal(true, @user.user_events.totp_login.exists?)
+        assert_equal(true, @user.user_events.totp_login.exists?(login_session_id: session[:login_id]))
       end
 
       should "log the user in if they enter a 2FA code that was generated less than 30 seconds in the future" do
@@ -499,7 +498,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@user.id, session[:user_id])
         assert_equal(@user.login_sessions.last.login_id, session[:login_id])
         assert_equal("127.0.0.1", @user.reload.last_ip_addr.to_s)
-        assert_equal(true, @user.user_events.totp_login.exists?)
+        assert_equal(true, @user.user_events.totp_login.exists?(login_session_id: session[:login_id]))
       end
 
       should "not log the user in if they enter an incorrect 2FA code" do
@@ -512,7 +511,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
         assert_equal(false, @user.login_sessions.exists?)
-        assert_equal(true, @user.user_events.totp_failed_login.exists?)
+        assert_equal(true, @user.user_events.totp_failed_login.exists?(login_session_id: nil))
       end
 
       should "not log the user in if they enter a 2FA code that was generated more than a minute ago" do
@@ -526,7 +525,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
         assert_equal(false, @user.login_sessions.exists?)
-        assert_equal(true, @user.user_events.totp_failed_login.exists?)
+        assert_equal(true, @user.user_events.totp_failed_login.exists?(login_session_id: nil))
       end
 
       should "not log the user in if they enter a 2FA code that was generated more than a minute in the future" do
@@ -540,7 +539,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
         assert_equal(false, @user.login_sessions.exists?)
-        assert_equal(true, @user.user_events.totp_failed_login.exists?)
+        assert_equal(true, @user.user_events.totp_failed_login.exists?(login_session_id: nil))
       end
 
       context "when given a backup code" do
@@ -558,7 +557,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("127.0.0.1", @user.last_ip_addr.to_s)
 
           assert_equal(false, @user.reload.backup_codes.include?(backup_code))
-          assert_equal("backup_code_login", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.backup_code_login.exists?(login_session_id: session[:login_id]))
         end
 
         should "not log the user in if they enter an incorrect backup code" do
@@ -572,7 +571,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           assert_nil(session[:login_id])
           assert_nil(session[:last_authenticated_at])
           assert_equal(false, @user.login_sessions.exists?)
-          assert_equal("totp_failed_login", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.totp_failed_login.exists?(login_session_id: nil))
         end
 
         should "not log the user in if they enter a used backup code" do
@@ -589,8 +588,10 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path } }
 
           assert_response :success
-          assert_nil(nil, session[:user_id])
-          assert_equal("totp_failed_login", @user.user_events.last.category)
+          assert_nil(session[:user_id])
+          assert_nil(session[:login_id])
+          assert_nil(session[:last_authenticated_at])
+          assert_equal(true, @user.user_events.totp_failed_login.exists?(login_session_id: nil))
         end
       end
     end
@@ -620,7 +621,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to users_path
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) > 1.second.ago)
-          assert_equal("totp_reauthenticate", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.totp_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
         should "succeed if the user enters the right password and backup code" do
@@ -632,7 +633,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to users_path
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) > 1.second.ago)
           assert_equal(false, @user.reload.backup_codes.include?(backup_code))
-          assert_equal("backup_code_reauthenticate", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.backup_code_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
         should "fail if the user enters the right password but the wrong 2FA code" do
@@ -641,7 +642,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
-          assert_equal("totp_failed_reauthenticate", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.totp_failed_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
         should "fail if the user enters the wrong password and the right 2FA code" do
@@ -650,7 +651,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
-          assert_equal("failed_reauthenticate", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.failed_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
         should "fail if the user enters the right password and the wrong backup code" do
@@ -661,7 +662,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
-          assert_equal("totp_failed_reauthenticate", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.totp_failed_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
         should "fail if the user enters the wrong password and the right backup code" do
@@ -672,7 +673,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
-          assert_equal("failed_reauthenticate", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.failed_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
       end
 
@@ -683,7 +684,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to users_path
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) > 1.second.ago)
-          assert_equal("reauthenticate", @user.user_events.last.category)
+          assert_equal(@user.login_sessions.last.login_id, session[:login_id])
+          assert_equal(true, @user.user_events.reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
         should "fail if the user enters the wrong password" do
@@ -692,7 +694,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
-          assert_equal("failed_reauthenticate", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.failed_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
       end
 
@@ -718,6 +720,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("logged_out", @user.login_sessions.last.status)
         assert_equal(Time.now.utc.to_s, @user.login_sessions.last.last_seen_at.utc.to_s)
         assert_equal("logout", @user.user_events.last.category)
+        assert_equal(@user.login_sessions.last.login_id, @user.user_events.last.login_session_id)
       end
 
       should "not fail if the user is already logged out" do

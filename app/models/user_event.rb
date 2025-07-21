@@ -6,7 +6,7 @@
 class UserEvent < ApplicationRecord
   extend Memoist
 
-  self.ignored_columns += [:user_session_id, :login_session_id]
+  self.ignored_columns += [:user_session_id]
 
   # Events that were performed by the user while logged in, for tracking the user's authorized IP addresses. This does not
   # include failed login attempts, password reset requests, or other events that may not have been performed by the user.
@@ -22,12 +22,14 @@ class UserEvent < ApplicationRecord
   attribute :user_id
   attribute :category
   attribute :ip_addr, :ip_address
+  attribute :login_session_id, :md5
   attribute :session_id, :md5
   attribute :user_agent
   attribute :metadata
 
   belongs_to :user
   belongs_to :ip_geolocation, foreign_key: :ip_addr, primary_key: :ip_addr, optional: true
+  belongs_to :login_session, primary_key: :login_id, inverse_of: :user_events, optional: true
 
   enum :category, {
     login: 0,                             # The user successfully logged in. Only used for users without 2FA enabled.
@@ -115,11 +117,13 @@ class UserEvent < ApplicationRecord
       # @param user [User] The user who performed the event, or the user whose account was affected by the event.
       # @param category [Symbol] The event category, e.g. :login, :logout, :user_creation, etc.
       # @param request [ActionDispatch::Request] The HTTP request that triggered the event.
-      def create_from_request!(user, category, request)
+      # @param login_session [LoginSession, nil] The login session associated with the event. If not provided, it will be taken from the `login_id` session cookie.
+      def create_from_request!(user, category, request, login_session: nil)
+        login_session_id = login_session&.login_id || request.session[:login_id]
         ip_addr = request.remote_ip
         IpGeolocation.create_or_update!(ip_addr)
 
-        create!(user: user, category: category, ip_addr: ip_addr, session_id: request.session[:session_id], user_agent: request.user_agent)
+        create!(user: user, category: category, ip_addr: ip_addr, login_session_id: login_session_id, session_id: request.session[:session_id], user_agent: request.user_agent)
       end
     end
   end

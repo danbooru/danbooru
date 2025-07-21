@@ -204,7 +204,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:user_id])
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
-        assert_equal(true, @user.user_events.user_deletion.exists?)
+        assert_equal(true, @user.user_events.user_deletion.exists?(login_session_id: @user.login_sessions.last.login_id))
         assert_equal(false, @user.mod_actions.user_delete.exists?)
       end
 
@@ -276,7 +276,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not show secret attributes to the user themselves" do
-        @user.update!(totp_secret: TOTP.generate_secret, backup_codes: [1, 2, 3])
+        @user = create(:user, :with_2fa)
         get_auth user_path(@user), @user, as: :json
 
         assert_response :success
@@ -431,7 +431,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User::Levels::MEMBER, User.last.level)
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_nil(User.last.email_address)
-        assert_equal(true, User.last.user_events.user_creation.exists?)
+        assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         assert_no_enqueued_jobs
 
         assert_equal(User.last.id, session[:user_id])
@@ -450,7 +450,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_equal("webmaster@danbooru.donmai.us", User.last.email_address.address)
         assert_equal(false, User.last.email_address.is_verified?)
-        assert_equal(true, User.last.user_events.user_creation.exists?)
+        assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         assert_equal(false, User.last.user_events.email_change.exists?)
         assert_equal(false, ModAction.email_address_update.exists?)
 
@@ -599,7 +599,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, User.last.is_member?)
           assert_equal(false, User.last.is_restricted?)
           assert_equal(false, User.last.requires_verification)
-          assert_equal(true, User.last.user_events.user_creation.exists?)
+          assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         end
 
         should "mark users signing up from proxies as restricted" do
@@ -612,7 +612,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, User.last.is_member?)
           assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
-          assert_equal(true, User.last.user_events.user_creation.exists?)
+          assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         end
 
         should "mark users signing up from a partial banned IP as restricted" do
@@ -627,7 +627,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, User.last.requires_verification)
           assert_equal(1, @ip_ban.reload.hit_count)
           assert(@ip_ban.last_hit_at > 1.minute.ago)
-          assert_equal(true, User.last.user_events.user_creation.exists?)
+          assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         end
 
         should "not mark users signing up from non-proxies as restricted" do
@@ -640,7 +640,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, User.last.is_member?)
           assert_equal(false, User.last.is_restricted?)
           assert_equal(false, User.last.requires_verification)
-          assert_equal(true, User.last.user_events.user_creation.exists?)
+          assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         end
 
         should "mark accounts registered from an IPv4 address recently used by another login as restricted" do
@@ -653,7 +653,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, User.last.is_member?)
           assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
-          assert_equal(true, User.last.user_events.user_creation.exists?)
+          assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         end
 
         should "mark accounts registered from an IPv4 address recently used by another account as restricted" do
@@ -666,7 +666,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, User.last.is_member?)
           assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
-          assert_equal(true, User.last.user_events.user_creation.exists?)
+          assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         end
 
         should "mark accounts registered using a session ID previously used by another account as restricted" do
@@ -681,7 +681,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, User.last.is_member?)
           assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
-          assert_equal(true, User.last.user_events.user_creation.exists?)
+          assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         end
 
         should "not mark users signing up from localhost as restricted" do
@@ -693,7 +693,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, User.last.is_member?)
           assert_equal(false, User.last.is_restricted?)
           assert_equal(false, User.last.requires_verification)
-          assert_equal(true, User.last.user_events.user_creation.exists?)
+          assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         end
       end
     end
