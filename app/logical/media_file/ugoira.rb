@@ -329,13 +329,18 @@ class MediaFile::Ugoira < MediaFile
         output_file = Danbooru::Tempfile.new(["danbooru-ugoira-conversion-", "-#{File.basename(file&.path.to_s)}"], binmode: true)
         tmpdir_path = tmpdir.path
 
-        # Duplicate last frame to avoid it being displayed only for a very short amount of time.
-        last_file_name = File.basename(frames.last.path)
-        last_index, file_ext = last_file_name.split(".")
-        new_last_filename = "#{"%06d" % (last_index.to_i + 1)}.#{file_ext}"
-        path_from = File.join(tmpdir_path, last_file_name)
-        path_to = File.join(tmpdir_path, new_last_filename)
-        FileUtils.cp(path_from, path_to)
+        _, frame_ext = File.basename(frames.last.path).split(".")
+
+        if frame_ext == "gif"
+          # ffmpeg treats GIFs as videos, so we need to convert them to images first.
+          frames.each do |frame|
+            frame_index, _ = File.basename(frame.path).split(".")
+            image = Vips::Image.new_from_file(frame.path)
+            new_frame_path = File.join(tmpdir_path, "#{frame_index}.png")
+            image.pngsave(new_frame_path, compression: 0, strip: true)
+          end
+          frame_ext = "png"
+        end
 
         delay_sum = 0
         timecodes_path = File.join(tmpdir_path, "timecodes.tc")
@@ -346,13 +351,14 @@ class MediaFile::Ugoira < MediaFile
             delay_sum += delay
           end
           f.write("#{delay_sum}\n")
-          f.write("#{delay_sum}\n")
         end
 
-        ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir_path}/%06d.#{file_ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 1 -passlogfile #{tmpdir_path}/ffmpeg2pass -f null /dev/null")
+        ffmpeg_args = "-i #{tmpdir_path}/%06d.#{frame_ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pix_fmt yuv420p"
+
+        ffmpeg_out, status = Open3.capture2e("ffmpeg #{ffmpeg_args} -pass 1 -passlogfile #{tmpdir_path}/ffmpeg2pass -f null /dev/null")
         raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
-        ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir_path}/%06d.#{file_ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 2 -passlogfile #{tmpdir_path}/ffmpeg2pass #{tmpdir_path}/tmp.webm")
+        ffmpeg_out, status = Open3.capture2e("ffmpeg #{ffmpeg_args} -pass 2 -passlogfile #{tmpdir_path}/ffmpeg2pass #{tmpdir_path}/tmp.webm")
         raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
         mkvmerge_out, status = Open3.capture2e("mkvmerge -o #{output_file.path} --webm --timecodes 0:#{tmpdir_path}/timecodes.tc #{tmpdir_path}/tmp.webm")
