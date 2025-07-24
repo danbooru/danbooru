@@ -90,7 +90,7 @@ class PostQuery
         a = and_clause
 
         space
-        if accept(/or +/i)
+        if accept(/or[[:space:]]+/i)
           b = or_clause
           AST.new(:or, [a, b])
         else
@@ -103,7 +103,7 @@ class PostQuery
         a = factor_list
 
         space
-        if accept(/and +/i)
+        if accept(/and[[:space:]]+/i)
           b = and_clause
           AST.new(:and, [a, b])
         else
@@ -173,13 +173,14 @@ class PostQuery
           expect("'")
           [true, a]
         else
-          [false, string(/[^ ]*/)]
+          a = string(/(\\[[:space:]]|[^[:space:]])*/).gsub(/\\[[:space:]]/, " ") # handle backslash escaped spaces
+          [false, a]
         end
       end
 
       # A wildcard is a string that contains a '*' character and that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
       def wildcard
-        t = string(/(?=[^ ]*\*)[^ \)~-][^ ]*/, skip_balanced_parens: true)
+        t = string(/(?=[^[:space:]]*\*)[^[:space:]\)~-][^[:space:]]*/, skip_balanced_parens: true)
         error("Invalid tag name: #{t}") if t.match?(/\A#{metatag_regex}/)
         space
         AST.wildcard(t)
@@ -187,7 +188,7 @@ class PostQuery
 
       # A tag is a string that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
       def tag
-        t = string(/[^ \)~-][^ ]*/, skip_balanced_parens: true)
+        t = string(/[^[:space:]\)~-][^[:space:]]*/, skip_balanced_parens: true)
         error("Invalid tag name: #{t}") if t.downcase.in?(%w[and or]) || t.include?("*") || t.match?(/\A#{metatag_regex}/)
         space
         AST.tag(t)
@@ -209,7 +210,7 @@ class PostQuery
       end
 
       def space
-        expect(/ */)
+        expect(/[[:space:]]*/)
       end
     end
 

@@ -1213,6 +1213,12 @@ class PostTest < ActiveSupport::TestCase
             assert_equal("foo bar baz", @post.source)
           end
 
+          should 'set the source with source:foo\u3000bar' do
+            @post.update(:tag_string => "source:foo\u3000bar")
+            assert_equal("foo", @post.source)
+            assert_equal("bar non-web_source", @post.tag_string)
+          end
+
           should "clear the source with source:none" do
             @post.update(:source => "foobar")
             @post.update(:tag_string => "source:none")
