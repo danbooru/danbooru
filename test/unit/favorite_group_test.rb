@@ -78,7 +78,10 @@ class FavoriteGroupTest < ActiveSupport::TestCase
   context "when validating names" do
     subject { build(:favorite_group) }
 
-    should normalize_attribute(:name).from(" _A\t_\nB_ ").to("A_B")
+    should normalize_attribute(:name).from("  A  B  ").to("A_B")
+    should normalize_attribute(:name).from("__A__B__").to("A_B")
+    should normalize_attribute(:name).from(" _A\t\r\n\u3000_\nB_ ").to("A_B")
+    should normalize_attribute(:name).from("pokémon".unicode_normalize(:nfd)).to("pokémon".unicode_normalize(:nfc))
 
     should_not allow_value("foo,bar").for(:name)
     should_not allow_value("foo*bar").for(:name)
