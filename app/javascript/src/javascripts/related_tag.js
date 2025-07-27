@@ -20,6 +20,7 @@ RelatedTag.initialize_all = function() {
 
   // Initialize the recent/favorite/translated/artist tag columns once, the first time the related tags are shown.
   $(document).one("danbooru:show-related-tags", RelatedTag.initialize_recent_and_favorite_tags);
+  $(document).one("danbooru:show-related-tags", RelatedTag.initialize_ai_tags);
   $(document).one("danbooru:show-related-tags", SourceDataComponent.fetchData);
 
   // Show the related tags automatically when the "Edit" tab is opened, or by default on the uploads page.
@@ -30,8 +31,14 @@ RelatedTag.initialize_all = function() {
 }
 
 RelatedTag.initialize_recent_and_favorite_tags = function(event) {
+  $.get("/related_tag.js", { user_tags: true });
+}
+
+RelatedTag.initialize_ai_tags = function(event) {
   let media_asset_id = $("#related-tags-container").attr("data-media-asset-id");
-  $.get("/related_tag.js", { user_tags: true, media_asset_id: media_asset_id });
+  if (media_asset_id) {
+    $.get("/related_tag.js", { ai_tags: true, media_asset_id: media_asset_id });
+  }
 }
 
 RelatedTag.update_related_tags = async function(event) {
