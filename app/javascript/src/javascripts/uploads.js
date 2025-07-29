@@ -1,5 +1,7 @@
 import Cookie from "./cookie";
 import Draggable from "./draggable";
+import Notice from "./notice";
+import RelatedTag from "./related_tag";
 import { clamp, delay } from "./utility";
 
 let Upload = {};
@@ -7,14 +9,51 @@ let Upload = {};
 Upload.IQDB_LIMIT = 5;
 Upload.IQDB_MIN_SIMILARITY = 50;
 Upload.IQDB_HIGH_SIMILARITY = 70;
+Upload.POLL_DELAY = 250;
 
 Upload.initialize_all = function() {
   if ($("#c-uploads #a-show #p-single-asset-upload").length) {
-    this.initialize_similar();
+    this.initialize_media_asset();
     this.initialize_draggable_divider();
   }
 
   Upload.loadAssets();
+}
+
+Upload.initialize_media_asset = async function() {
+  const $upload_container = $(".upload-container");
+  const upload_media_asset_id = $("input[name='upload_media_asset_id']").val();
+
+  let status = $upload_container.attr("data-status");
+  if (status !== "active" && status !== "failed") {
+    const upload_media_asset = await this.pollUploadMediaAsset(upload_media_asset_id);
+    status = upload_media_asset.status;
+    $upload_container.attr("data-status", status);
+
+    if (status === "failed") {
+      Notice.error(`Upload failed: ${upload_media_asset.error}.`);
+    } else if (status === "active") {
+      $("#related-tags-container").attr("data-media-asset-id", upload_media_asset.media_asset_id);
+      $("input[name='media_asset_id']").val(upload_media_asset.media_asset_id);
+      $.get(`/upload_media_assets/${upload_media_asset_id}.js`);
+      RelatedTag.initialize_ai_tags();
+    }
+  }
+
+  if (status === "active") {
+    $("input[type='submit']").removeAttr("disabled");
+    this.initialize_similar();
+  }
+}
+
+Upload.pollUploadMediaAsset = async function(upload_media_asset_id) {
+  while (true) {
+    const upload_media_asset = await $.get(`/upload_media_assets/${upload_media_asset_id}.json`);
+    if (upload_media_asset.status === "active" || upload_media_asset.status === "failed") {
+      return upload_media_asset;
+    }
+    await delay(this.POLL_DELAY);
+  }
 }
 
 Upload.loadAssets = async function() {
@@ -22,7 +61,7 @@ Upload.loadAssets = async function() {
     let ids = $(".upload-media-asset-loading").map((i, el) => $(el).attr("data-id")).toArray().join(",");
     let size = $(".upload-media-asset-gallery").attr("data-size");
     $.get("/upload_media_assets.js", { search: { status: "active failed", id: ids }, size: size });
-    await delay(250);
+    await delay(this.POLL_DELAY);
   }
 }
 
