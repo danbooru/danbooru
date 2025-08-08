@@ -255,6 +255,8 @@ WORKDIR /danbooru
 RUN apt-get install -y --no-install-recommends libpq-dev ragel=6.10-4
 
 COPY --chown=danbooru:danbooru lib/dtext_rb/ lib/dtext_rb/
+COPY --chown=danbooru:danbooru lib/danbooru_http/ lib/danbooru_http/
+
 USER danbooru
 
 RUN <<EOS

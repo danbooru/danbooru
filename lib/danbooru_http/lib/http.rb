@@ -16,9 +16,18 @@
 #   http = Danbooru::Http.new
 #   response = http.get("https://danbooru.donmai.us/posts.json")
 #   json = response.parse
-#
+
+require "http"
+
+require "active_support/core_ext/module/delegation"
+require "active_support/core_ext/module/concerning"
+
+Dir[File.join(__dir__, "http", "*.rb")].sort.each { |file| require file }
+
 module Danbooru
   class Http
+    VERSION = "1.0.0"
+
     class Error < StandardError; end
     class DownloadError < Error; end
     class FileTooLargeError < Error; end
