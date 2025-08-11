@@ -19,8 +19,8 @@
 
 require "http"
 
-require "active_support/core_ext/module/delegation"
-require "active_support/core_ext/module/concerning"
+require "active_support"
+require "active_support/core_ext"
 
 Dir[File.join(__dir__, "http", "*.rb")].sort.each { |file| require file }
 
