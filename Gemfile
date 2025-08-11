@@ -14,7 +14,7 @@ gem 'bcrypt', :require => "bcrypt"
 gem 'stripe'
 gem 'aws-sdk-sqs', '~> 1'
 gem 'responders'
-gem 'danbooru_http', path: "lib/danbooru_http", require: "http"
+gem 'danbooru_http', path: 'lib/danbooru_http', require: 'danbooru_http'
 gem 'dtext_rb', require: "dtext"
 # gem 'dtext_rb', path: "lib/dtext_rb", require: "dtext"
 gem 'memoist'
