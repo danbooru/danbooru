@@ -73,6 +73,8 @@
   <p>
     <% if artist.wiki_page.present? %>
       <%= link_to "Edit wiki", edit_wiki_page_path(artist.wiki_page), id: "view-wiki-link" %> |
+    <% else %>
+      <%= link_to "Create wiki", new_wiki_page_path(wiki_page: { title: artist.name }), id: "create-wiki-link" %> |
     <% end %>
 
     <%= link_to "Edit artist", edit_artist_path(artist), id: "view-artist-link" %>
