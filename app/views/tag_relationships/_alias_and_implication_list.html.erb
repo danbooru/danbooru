@@ -9,7 +9,7 @@
   <% if tag.consequent_aliases.present? %>
     <p class="fineprint">
       The following tags are aliased to this tag:
-      <%= to_sentence(tag.consequent_aliases.sort_by(&:antecedent_name).map { |ta| link_to_wiki ta.antecedent_name }) %>
+      <%= to_sentence(tag.consequent_aliases.sort_by(&:antecedent_name).map { |ta| link_to_bulk_update_requests ta.antecedent_name }) %>
       (<%= link_to_wiki "learn more", "help:tag_aliases" %>).
     </p>
   <% end %>
