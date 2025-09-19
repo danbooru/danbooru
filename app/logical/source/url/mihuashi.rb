@@ -11,7 +11,7 @@ module Source
 
       def parse
         case [subdomain, domain, *path_segments]
-        
+
         # https://image-assets.mihuashi.com/permanent/29105|-2024/05/29/16/FuE-9jWo-aPKXOq2KP2ZsR5Nxnqa.jpg
         # https://image-assets.mihuashi.com/permanent/2521440|-2025/07/12/18/lmmkwWRHf4RwLdm3mRanVRNUk2Oy_1123.png
         # https://image-assets.mihuashi.com/permanent/29105|-2025/05/30/15/Flz917NRVbHcZeG9xW1KklVM_s3y_1046.jpg!artwork.detail
@@ -24,7 +24,7 @@ module Source
         in "image-assets", "mihuashi.com", *, /^(\d+)\|-\d{4}$/ => dir, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
           @full_image_url = to_s.split("!").first.gsub("pfop/", "")
           @user_id = dir.match(/^(\d+)\|-\d{4}$/)[1]
-        
+
         # https://image-assets.mihuashi.com/2016/12/08/13/gx77j3j5vdtseg9xqmmgovzxj4yhtwpm/红白_.jpg
         in "image-assets", "mihuashi.com", /^\d{4}$/ => year, /^\d{2}$/ => month, /^\d{2}$/ => day, /^\d{2}$/ => hour, dir, /^([^!]+)(?:!.+)?$/ => file
           @full_image_url = "https://image-assets.mihuashi.com/#{year}/#{month}/#{day}/#{hour}/#{dir}/#{$1}"
