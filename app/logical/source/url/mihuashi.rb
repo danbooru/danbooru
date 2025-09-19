@@ -20,9 +20,14 @@ module Source
         # https://image-assets.mihuashi.com/permanent/3684329|-2025/05/17/17/liJ2bnv1jJYdC5AihIPXobAmpeue_3326.jpg!w600.1x
         # https://image-assets.mihuashi.com/permanent/3684329|-2025/05/18/12/Fk7FRRsUA6QW80rthbEJULPuA5nQ_5546.jpg!sq300.2x
         # https://image-assets.mihuashi.com/pfop/permanent/4329541|-2024/07/12/18/Fu2oKtHkplA-waTASBzUpF6EozkB.jpg
-        in "image-assets", "mihuashi.com", *, "permanent", /^(\d+)\|-\d{4}$/ => dir, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
+        # https://image-assets.mihuashi.com/44571|-2021/09/16/18/FvNAijlnNYfJtaVQdZNoDYHj9mPP.png!artwork.detail
+        in "image-assets", "mihuashi.com", *, /^(\d+)\|-\d{4}$/ => dir, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
           @full_image_url = to_s.split("!").first.gsub("pfop/", "")
           @user_id = dir.match(/^(\d+)\|-\d{4}$/)[1]
+        
+        # https://image-assets.mihuashi.com/2016/12/08/13/gx77j3j5vdtseg9xqmmgovzxj4yhtwpm/红白_.jpg
+        in "image-assets", "mihuashi.com", /^\d{4}$/ => year, /^\d{2}$/ => month, /^\d{2}$/ => day, /^\d{2}$/ => hour, dir, /^([^!]+)(?:!.+)?$/ => file
+          @full_image_url = "https://image-assets.mihuashi.com/#{year}/#{month}/#{day}/#{hour}/#{dir}/#{$1}"
 
         # https://www.mihuashi.com/artworks/15092919
         # https://www.mihuashi.com/artworks/13693110
