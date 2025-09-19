@@ -40,6 +40,7 @@ module Source::Tests::URL
         url_parser_should_work(
           "https://image-assets.mihuashi.com/permanent/29105|-2024/05/29/16/FuE-9jWo-aPKXOq2KP2ZsR5Nxnqa.jpg",
           full_image_url: "https://image-assets.mihuashi.com/permanent/29105|-2024/05/29/16/FuE-9jWo-aPKXOq2KP2ZsR5Nxnqa.jpg",
+          profile_url: "https://www.mihuashi.com/profiles/29105",
         )
         url_parser_should_work(
           "https://image-assets.mihuashi.com/permanent/2521440|-2025/07/12/18/lmmkwWRHf4RwLdm3mRanVRNUk2Oy_1123.png",
@@ -56,6 +57,7 @@ module Source::Tests::URL
         url_parser_should_work(
           "https://image-assets.mihuashi.com/pfop/permanent/4329541|-2024/07/12/18/Fu2oKtHkplA-waTASBzUpF6EozkB.jpg",
           full_image_url: "https://image-assets.mihuashi.com/permanent/4329541|-2024/07/12/18/Fu2oKtHkplA-waTASBzUpF6EozkB.jpg",
+          profile_url: "https://www.mihuashi.com/profiles/4329541",
         )
       end
     end

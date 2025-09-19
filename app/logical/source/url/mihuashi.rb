@@ -11,7 +11,7 @@ module Source
 
       def parse
         case [subdomain, domain, *path_segments]
-
+        
         # https://image-assets.mihuashi.com/permanent/29105|-2024/05/29/16/FuE-9jWo-aPKXOq2KP2ZsR5Nxnqa.jpg
         # https://image-assets.mihuashi.com/permanent/2521440|-2025/07/12/18/lmmkwWRHf4RwLdm3mRanVRNUk2Oy_1123.png
         # https://image-assets.mihuashi.com/permanent/29105|-2025/05/30/15/Flz917NRVbHcZeG9xW1KklVM_s3y_1046.jpg!artwork.detail
@@ -19,12 +19,10 @@ module Source
         # https://image-assets.mihuashi.com/permanent/5716548|-2025/07/11/20/lrItT-MRSxSjnXvyD5CNze8JucPI_2129.png!mobile.square.large
         # https://image-assets.mihuashi.com/permanent/3684329|-2025/05/17/17/liJ2bnv1jJYdC5AihIPXobAmpeue_3326.jpg!w600.1x
         # https://image-assets.mihuashi.com/permanent/3684329|-2025/05/18/12/Fk7FRRsUA6QW80rthbEJULPuA5nQ_5546.jpg!sq300.2x
-        in "image-assets", "mihuashi.com", "permanent", /^\d+\|-\d{4}$/, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
-          @full_image_url = to_s.split("!").first
-
         # https://image-assets.mihuashi.com/pfop/permanent/4329541|-2024/07/12/18/Fu2oKtHkplA-waTASBzUpF6EozkB.jpg
-        in "image-assets", "mihuashi.com", "pfop", "permanent", /^\d+\|-\d{4}$/, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
+        in "image-assets", "mihuashi.com", *, "permanent", /^(\d+)\|-\d{4}$/ => dir, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
           @full_image_url = to_s.split("!").first.gsub("pfop/", "")
+          @user_id = dir.match(/^(\d+)\|-\d{4}$/)[1]
 
         # https://www.mihuashi.com/artworks/15092919
         # https://www.mihuashi.com/artworks/13693110
