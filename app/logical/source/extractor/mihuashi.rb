@@ -63,11 +63,11 @@ module Source
 
       def artist_commentary_title
         if stall.present?
-          stall["name"]
+          stall[:name]
         elsif project.present?
-          project["name"]
+          project[:name]
         elsif character_card.present?
-          character_card["name"]
+          character_card[:name]
         elsif activity_work.present?
           activity_work[:title]
         end
