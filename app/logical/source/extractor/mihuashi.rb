@@ -30,6 +30,10 @@ module Source
           ].uniq.map do |url|
             Source::URL.parse(url).try(:full_image_url) || url
           end
+        elsif activity_work.present?
+          activity_work[:images].to_a.pluck(:url).map do |url|
+            Source::URL.parse(url).try(:full_image_url) || url
+          end
         else
           []
         end
@@ -64,6 +68,8 @@ module Source
           project["name"]
         elsif character_card.present?
           character_card["name"]
+        elsif activity_work.present?
+          activity_work[:title]
         end
       end
 
@@ -76,6 +82,8 @@ module Source
           project.dig(:template, :summary)
         elsif character_card.present?
           character_card[:summary]
+        elsif activity_work.present?
+          activity_work[:description]
         end
       end
 
@@ -92,6 +100,8 @@ module Source
           work[:author]
         elsif stall.present?
           stall[:owner]
+        elsif activity_work.present?
+          activity_work[:owner]
         else
           {}
         end
@@ -111,6 +121,14 @@ module Source
 
       def character_id
         parsed_url.character_id || parsed_referer&.character_id
+      end
+
+      def a_work_id
+        parsed_url.a_work_id || parsed_referer&.a_work_id
+      end
+
+      def a_work_activity
+        parsed_url.a_work_activity || parsed_referer&.a_work_activity
       end
 
       memoize def work
@@ -135,6 +153,12 @@ module Source
         return {} unless character_id.present?
 
         http.cache(1.minute).parsed_get("https://www.mihuashi.com/api/v1/character_cards/#{character_id}/")&.dig(:character_card) || {}
+      end
+
+      memoize def activity_work
+        return {} unless a_work_id.present?
+
+        http.cache(1.minute).parsed_get("https://www.mihuashi.com/api/activity/v1/activities/#{a_work_activity}/artworks/#{a_work_id}/")&.dig(:artwork) || {}
       end
 
       memoize def cookies

@@ -3,7 +3,7 @@
 module Source
   class URL
     class Mihuashi < Source::URL
-      attr_reader :username, :user_id, :work_id, :stall_id, :project_id, :character_id, :full_image_url
+      attr_reader :username, :user_id, :work_id, :stall_id, :project_id, :character_id, :a_work_id, :a_work_activity, :a_work_type, :full_image_url
 
       def self.match?(url)
         url.domain == "mihuashi.com"
@@ -51,6 +51,13 @@ module Source
         in _, "mihuashi.com", "character-card", character_id, *rest
           @character_id = character_id
 
+        # https://www.mihuashi.com/activities/houkai3-stigmata/artworks/8523
+        # https://www.mihuashi.com/activities/jw3-exterior-12/artworks/10515?type=zjjh
+        in _, "mihuashi.com", "activities", a_work_activity, "artworks", a_work_id
+          @a_work_id = a_work_id
+          @a_work_activity = a_work_activity
+          @a_work_type = params[:type]
+
         # https://www.mihuashi.com/profiles/29105
         # https://www.mihuashi.com/profiles/29105?role=painter
         in _, "mihuashi.com", "profiles", user_id
@@ -78,6 +85,12 @@ module Source
           "https://www.mihuashi.com/projects/#{project_id}"
         elsif character_id.present?
           "https://www.mihuashi.com/character-card/#{character_id}"
+        elsif a_work_id.present?
+          if a_work_type.present?
+            "https://www.mihuashi.com/activities/#{a_work_activity}/artworks/#{a_work_id}?type=#{a_work_type}"
+          else
+            "https://www.mihuashi.com/activities/#{a_work_activity}/artworks/#{a_work_id}"
+          end
         end
       end
 

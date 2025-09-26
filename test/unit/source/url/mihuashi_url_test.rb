@@ -21,6 +21,8 @@ module Source::Tests::URL
           "https://www.mihuashi.com/projects/6380467",
           "https://www.mihuashi.com/character-card/13373e0997be5d906df9ce292da8ddf6552a340a",
           "https://www.mihuashi.com/character-card/4dc65278776db4741a897d7445f48a6b57ce251c/project",
+          "https://www.mihuashi.com/activities/houkai3-stigmata/artworks/8523",
+          "https://www.mihuashi.com/activities/jw3-exterior-12/artworks/10515?type=zjjh",
         ],
         profile_urls: [
           "https://www.mihuashi.com/profiles/29105",
@@ -33,6 +35,15 @@ module Source::Tests::URL
         url_parser_should_work(
           "https://www.mihuashi.com/character-card/4dc65278776db4741a897d7445f48a6b57ce251c/project",
           page_url: "https://www.mihuashi.com/character-card/4dc65278776db4741a897d7445f48a6b57ce251c",
+        )
+
+        url_parser_should_work(
+          "https://www.mihuashi.com/activities/houkai3-stigmata/artworks/8523",
+          page_url: "https://www.mihuashi.com/activities/houkai3-stigmata/artworks/8523",
+        )
+        url_parser_should_work(
+          "https://www.mihuashi.com/activities/jw3-exterior-12/artworks/10515?type=zjjh",
+          page_url: "https://www.mihuashi.com/activities/jw3-exterior-12/artworks/10515?type=zjjh",
         )
 
         url_parser_should_work(
