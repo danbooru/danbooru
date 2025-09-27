@@ -92,7 +92,7 @@ class PostPolicy < ApplicationPolicy
   end
 
   def imminent_get?
-    post_id = Post.maximum(:id)
+    post_id = Post.maximum(:id).to_i
     post_id > 1_000_000 && (post_id.ceil(-6) - post_id) <= 100
   end
 
