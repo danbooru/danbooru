@@ -30,6 +30,10 @@ module Source
         in ("image-assets" | "activity-assets"), "mihuashi.com", /^\d{4}$/ => year, /^\d{2}$/ => month, /^\d{2}$/ => day, /^\d{2}$/ => hour, dir, /^([^!]+)(?:!.+)?$/ => file
           @full_image_url = "https://#{subdomain}.mihuashi.com/#{year}/#{month}/#{day}/#{hour}/#{dir}/#{$1}"
 
+        # https://images.mihuashi.com/2016/06/17/23/thpe8pgsekfzw23ammqnmdmtpdj6me22/Q板天子.png
+        in "images", "mihuashi.com", /^\d{4}$/ => year, /^\d{2}$/ => month, /^\d{2}$/ => day, /^\d{2}$/ => hour, dir, /^([^!]+)(?:!.+)?$/ => file
+          @full_image_url = "https://image-assets.mihuashi.com/#{year}/#{month}/#{day}/#{hour}/#{dir}/#{$1}"
+
         # https://www.mihuashi.com/artworks/15092919
         # https://www.mihuashi.com/artworks/13693110
         in _, "mihuashi.com", "artworks", work_id
@@ -73,7 +77,7 @@ module Source
       end
 
       def image_url?
-        ["image-assets", "activity-assets"].include?(subdomain)
+        ["image-assets", "activity-assets", "images"].include?(subdomain)
       end
 
       def page_url

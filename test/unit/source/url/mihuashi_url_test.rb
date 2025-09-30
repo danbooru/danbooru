@@ -82,6 +82,10 @@ module Source::Tests::URL
           "https://image-assets.mihuashi.com/2016/12/08/13/gx77j3j5vdtseg9xqmmgovzxj4yhtwpm/红白_.jpg!artwork.detail",
           full_image_url: "https://image-assets.mihuashi.com/2016/12/08/13/gx77j3j5vdtseg9xqmmgovzxj4yhtwpm/红白_.jpg",
         )
+        url_parser_should_work(
+          "https://images.mihuashi.com/2016/06/17/23/thpe8pgsekfzw23ammqnmdmtpdj6me22/Q板天子.png",
+          full_image_url: "https://image-assets.mihuashi.com/2016/06/17/23/thpe8pgsekfzw23ammqnmdmtpdj6me22/Q板天子.png",
+        )
       end
     end
   end
