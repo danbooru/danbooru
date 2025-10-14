@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Poipiku < Source::URL
-  attr_reader :user_id, :post_id, :image_dir, :image_id, :image_hash, :original_file_ext
+  attr_reader :user_id, :post_id, :image_dir, :image_id, :image_hash, :original_file_ext, :expires, :signature, :key_pair_id
 
   def self.match?(url)
     url.domain == "poipiku.com"
@@ -9,6 +9,31 @@ class Source::URL::Poipiku < Source::URL
 
   def parse
     case [subdomain, domain, *path_segments]
+
+    # 2nd or later image
+    # https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg?Expires=XXX&Signature=XXX&Key-Pair-Id=XXX (original)
+    # https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg_640.jpg (sample)
+    in "cdn", "poipiku.com", user_id, /^(\d+)_(\d+)_(\w+)\.([a-z]+)/
+      @user_id = user_id.to_i
+      @post_id = $1.to_i
+      @image_id = $2.to_i
+      @image_hash = $3
+      @original_file_ext = $4
+      @expires = params["Expires"]
+      @signature = params["Signature"]
+      @key_pair_id = params["Key-Pair-Id"]
+
+    # First image
+    # https://cdn.poipiku.com/009416896/010718302_W0EFku4aW.jpeg?Expires=XXX&Signature=XXX&Key-Pair-Id=XXX (original)
+    # https://cdn.poipiku.com/009416896/010718302_W0EFku4aW.jpeg_640.jpg (sample)
+    in "cdn", "poipiku.com", user_id, /^(\d+)_(\w+)\.([a-z]+)/
+      @user_id = user_id.to_i
+      @post_id = $1.to_i
+      @image_hash = $2
+      @original_file_ext = $3
+      @expires = params["Expires"]
+      @signature = params["Signature"]
+      @key_pair_id = params["Key-Pair-Id"]
 
     # https://img.poipiku.com/user_img02/006849873/008271386_016865825_S968sAh7Y.jpeg_640.jpg (sample)
     # https://img-org.poipiku.com/user_img02/006849873/008271386_016865825_S968sAh7Y.jpeg (original)
@@ -61,22 +86,31 @@ class Source::URL::Poipiku < Source::URL
   end
 
   def image_url?
-    subdomain.in?(%w[img img-org])
+    subdomain.in?(%w[img img-org cdn])
   end
 
   def full_image_url
-    # https://img-org.poipiku.com/user_img02/006849873/008271386_016865825_S968sAh7Y.jpeg
-    if image_dir && user_id && post_id && image_id && image_hash && original_file_ext
-      "https://img-org.poipiku.com/#{image_dir}/#{"%.9d" % user_id}/#{"%.9d" % post_id}_#{"%.9d" % image_id}_#{image_hash}.#{original_file_ext}"
+    # 2nd or later image
+    # https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg?Expires=XXX&Signature=XXX&Key-Pair-Id=XXX
+    if user_id && post_id && image_id && image_hash && original_file_ext
+      "https://cdn.poipiku.com/#{"%.9d" % user_id}/#{"%.9d" % post_id}_#{"%.9d" % image_id}_#{image_hash}.#{original_file_ext}#{url_signature}"
 
-    # https://img-org.poipiku.com/user_img03/000013318/007865949_WuckPeoQk.png
-    elsif image_dir && user_id && post_id && image_hash && original_file_ext
-      "https://img-org.poipiku.com/#{image_dir}/#{"%.9d" % user_id}/#{"%.9d" % post_id}_#{image_hash}.#{original_file_ext}"
+    # First image
+    # https://cdn.poipiku.com/009416896/010718302_W0EFku4aW.jpeg?Expires=XXX&Signature=XXX&Key-Pair-Id=XXX
+    elsif user_id && post_id && image_hash && original_file_ext
+      "https://cdn.poipiku.com/#{"%.9d" % user_id}/#{"%.9d" % post_id}_#{image_hash}.#{original_file_ext}#{url_signature}"
 
-    # https://img-org.poipiku.com/user_img02/000003310/000007036.jpeg
-    elsif image_dir && user_id && post_id && original_file_ext
-      "https://img-org.poipiku.com/#{image_dir}/#{"%.9d" % user_id}/#{"%.9d" % post_id}.#{original_file_ext}"
+    # https://cdn.poipiku.com/000003310/000007036.jpeg?Expires=XXX&Signature=XXX&Key-Pair-Id=XXX
+    elsif user_id && post_id && original_file_ext
+      "https://cdn.poipiku.com/#{"%.9d" % user_id}/#{"%.9d" % post_id}.#{original_file_ext}#{url_signature}"
+    end
+  end
 
+  def url_signature
+    if expires && signature && key_pair_id
+      "?Expires=#{expires}&Signature=#{signature}&Key-Pair-Id=#{key_pair_id}"
+    else
+      ""
     end
   end
 

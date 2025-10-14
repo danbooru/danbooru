@@ -6,8 +6,8 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://poipiku.com/583/2867587.html",
         page_url: "https://poipiku.com/583/2867587.html",
-        image_urls: %w[
-          https://img-org.poipiku.com/user_img03/000000583/002867587_M1EY9rofF.jpeg
+        image_urls: [
+          %r{https://cdn.poipiku.com/000000583/002867587_M1EY9rofF.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
         media_files: [{ file_size: 209_902 }],
         profile_url: "https://poipiku.com/583/",
@@ -25,10 +25,10 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://poipiku.com/6849873/8271386.html",
         page_url: "https://poipiku.com/6849873/8271386.html",
-        image_urls: %w[
-          https://img-org.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg
-          https://img-org.poipiku.com/user_img02/006849873/008271386_016865825_S968sAh7Y.jpeg
-          https://img-org.poipiku.com/user_img03/006849873/008271386_016865826_GBFF3dyRt.jpeg
+        image_urls: [
+          %r{https://cdn.poipiku.com/006849873/008271096_016820933_INusR6FhI.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/006849873/008271386_016865825_S968sAh7Y.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/006849873/008271386_016865826_GBFF3dyRt.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
         profile_url: "https://poipiku.com/6849873/",
         profile_urls: %w[https://poipiku.com/6849873/],
@@ -45,14 +45,21 @@ module Source::Tests::Extractor
       )
     end
 
+    # Expands to the full post URL
     context "A https://img.poipiku.com/:dir/:user_id/:post_id_:image_id_:hash.jpeg full image URL" do
       strategy_should_work(
         "https://img-org.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg",
         page_url: "https://poipiku.com/6849873/8271386.html",
-        image_urls: %w[
-          https://img-org.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg
+        image_urls: [
+          %r{https://cdn.poipiku.com/006849873/008271096_016820933_INusR6FhI.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/006849873/008271386_016865825_S968sAh7Y.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/006849873/008271386_016865826_GBFF3dyRt.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
-        media_files: [{ file_size: 343_562 }],
+        media_files: [
+          { file_size: 343_562 },
+          { file_size: 805_259 },
+          { file_size: 703_879 }
+        ],
         profile_url: "https://poipiku.com/6849873/",
         profile_urls: %w[https://poipiku.com/6849873/],
         display_name: "omo_chi2",
@@ -72,10 +79,16 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://img.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg_640.jpg",
         page_url: "https://poipiku.com/6849873/8271386.html",
-        image_urls: %w[
-          https://img-org.poipiku.com/user_img03/006849873/008271096_016820933_INusR6FhI.jpeg
+        image_urls: [
+          %r{https://cdn.poipiku.com/006849873/008271096_016820933_INusR6FhI.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/006849873/008271386_016865825_S968sAh7Y.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/006849873/008271386_016865826_GBFF3dyRt.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
-        media_files: [{ file_size: 343_562 }],
+        media_files: [
+          { file_size: 343_562 },
+          { file_size: 805_259 },
+          { file_size: 703_879 }
+        ],
         profile_url: "https://poipiku.com/6849873/",
         profile_urls: %w[https://poipiku.com/6849873/],
         display_name: "omo_chi2",
@@ -95,14 +108,14 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://poipiku.com/8566613/9625938.html",
         page_url: "https://poipiku.com/8566613/11413167.html",
-        image_urls: %w[
-          https://img-org.poipiku.com/user_img03/008566613/009625669_020612310_toCYdeSNu.jpeg
-          https://img-org.poipiku.com/user_img02/008566613/009625669_020612311_woW7C76Mm.jpeg
-          https://img-org.poipiku.com/user_img02/008566613/009625669_020612314_f7gKnobZf.jpeg
-          https://img-org.poipiku.com/user_img03/008566613/009625669_020612315_PruYge0kI.jpeg
-          https://img-org.poipiku.com/user_img03/008566613/009625669_020612316_BzYCPGlTs.jpeg
-          https://img-org.poipiku.com/user_img02/008566613/009625669_020612317_MLJKcyPlU.jpeg
-          https://img-org.poipiku.com/user_img03/008566613/009625938_020619084_HBrdSJ8V3.jpeg
+        image_urls: [
+          %r{https://cdn.poipiku.com/008566613/009625669_020612310_toCYdeSNu.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/008566613/009625669_020612311_woW7C76Mm.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/008566613/009625669_020612314_f7gKnobZf.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/008566613/009625669_020612315_PruYge0kI.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/008566613/009625669_020612316_BzYCPGlTs.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/008566613/009625669_020612317_MLJKcyPlU.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/008566613/009625938_020619084_HBrdSJ8V3.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
         profile_url: "https://poipiku.com/8566613/",
         profile_urls: %w[https://poipiku.com/8566613/],
@@ -124,8 +137,8 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://poipiku.com/6849873/8143439.html",
         page_url: "https://poipiku.com/6849873/8143439.html",
-        image_urls: %w[
-          https://img-org.poipiku.com/user_img03/006849873/008143439_016477493_W51KQXsLM.jpeg
+        image_urls: [
+          %r{https://cdn.poipiku.com/006849873/008143439_016477493_W51KQXsLM.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
         profile_url: "https://poipiku.com/6849873/",
         profile_urls: %w[https://poipiku.com/6849873/],
@@ -144,9 +157,9 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://poipiku.com/927572/6228370.html",
         page_url: "https://poipiku.com/927572/6228370.html",
-        image_urls: %w[
-          https://img-org.poipiku.com/user_img02/000927572/006228370_gIBoTWg2u.jpeg
-          https://img-org.poipiku.com/user_img02/000927572/006228370_011556210_GU43fGlEx.jpeg
+        image_urls: [
+          %r{https://cdn.poipiku.com/000927572/006228370_gIBoTWg2u.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/000927572/006228370_011556210_GU43fGlEx.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
         profile_url: "https://poipiku.com/927572/",
         profile_urls: %w[https://poipiku.com/927572/],
@@ -157,12 +170,11 @@ module Source::Tests::Extractor
       )
     end
 
-    # Doesn't get the images
-    context "A password-protected page url" do
+    context "A simple password-protected page url" do
       strategy_should_work(
         "https://poipiku.com/6849873/8141991.html",
         page_url: "https://poipiku.com/6849873/8141991.html",
-        image_urls: [],
+        image_urls: [%r{https://cdn.poipiku.com/006849873/008140534_016466597_y4Z3HEJH1.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},],
         profile_url: "https://poipiku.com/6849873/",
         display_name: "omo_chi2",
         tag_name: "omo_chi2",
@@ -174,6 +186,51 @@ module Source::Tests::Extractor
           ファンのモブ女にクスリ盛られてモブ男と性行為させられるcrちゃんです
 
           18↑？(y/n)
+        EOS
+      )
+    end
+
+    context "Another password-protected page url" do 
+      strategy_should_work(
+        "https://poipiku.com/11804030/12317737.html",
+        image_urls: [
+          %r{https://cdn.poipiku.com/011804030/012317737_4a3RvCcyZ.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/011804030/012317737_027849420_6G6hq62J3.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/011804030/012317737_027849421_DexCiPGDj.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/011804030/012317737_027849422_n9dnvyfsF.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+        ],
+        media_files: [
+          { file_size: 847_898 },
+          { file_size: 1_102_184 },
+          { file_size: 908_031 },
+          { file_size: 954_805 }
+        ],
+        page_url: "https://poipiku.com/11804030/12317737.html",
+        profile_urls: %w[https://poipiku.com/11804030/],
+        display_name: "ナナミ",
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          umtkのR18練習まとめ
+          password🔑→18歳以上ですか？(yes/no)
+        EOS
+      )
+    end
+
+    context "An unknown password-protected page url" do
+      strategy_should_work(
+        "https://poipiku.com/8696274/11543760.html",
+        image_urls: [],
+        page_url: "https://poipiku.com/8696274/11543760.html",
+        profile_urls: %w[https://poipiku.com/8696274/],
+        display_name: "nono",
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          富入さんとかあの人たち
+          パスはクリア後なら名前が分かるあの人
         EOS
       )
     end
@@ -218,6 +275,21 @@ module Source::Tests::Extractor
       )
     end
 
+    # No images
+    context "A page url that is list-only" do
+      strategy_should_work(
+        "https://poipiku.com/2418562/5254068.html",
+        image_urls: [],
+        page_url: "https://poipiku.com/2418562/5254068.html",
+        profile_urls: %w[https://poipiku.com/2418562/],
+        display_name: "sauuomateng",
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "🇮🇩 x 🇳🇱"
+      )
+    end
+
     context "A page url without images" do
       strategy_should_work(
         "https://poipiku.com/302292/6598662.html",
@@ -249,6 +321,64 @@ module Source::Tests::Extractor
         tag_name: "poipiku_1727580",
         tags: [],
         dtext_artist_commentary_desc: "",
+      )
+    end
+
+    context "A signed full image URL" do
+      strategy_should_work(
+        "https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg?Expires=1760463554&Signature=Hcz8PJ458Bb5yYgGmSeQnBxsPN3FFSgbeTI1gkUZvLFGcdSS-EcCSN0Pq8N~84FVI5~cWKNlqgrrMopOd53UI1Xb5NoGxZRiT6WibOvRKwB2RmLvfMbwtPGTqi1u9GoQaVrSW3L7Q1zN3OdLTHjzV0IyGcTOmvtSdPgnauyiXtJ9LJAC9PRCj~-eU6xhrA5AHfHibZ0VA4ziNKOUhJc-gU31HJ81jv9SoUrKBjPQEewDtS6KOQhFOnGvXkF7k3hWVq8y6s7wLVofq4M16jNbFxZolAQEWLF6IsUlP0-xheyasX6N2fVteey8haz4uIHpXSuOUpo9ERhyNmbda7g8bQ__&Key-Pair-Id=KJUZTJCQICGXU",
+        image_urls: [
+          %r{https://cdn.poipiku.com/009416896/010718302_W0EFku4aW.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/009416896/010718302_023702507_F4A4ZHzF8.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/009416896/010718302_023702508_ShgkirOUS.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/009416896/010718302_023702509_WhaFUJNqD.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/009416896/010718302_023702511_nAdPEqifb.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+        ],
+        media_files: [
+          { file_size: 1_454_893 },
+          { file_size: 1_504_925 },
+          { file_size: 384_799 },
+          { file_size: 56_656 },
+          { file_size: 828_595 },
+          { file_size: 365_291 }
+        ],
+        page_url: "https://poipiku.com/9416896/10718302.html",
+        profile_urls: %w[https://poipiku.com/9416896/],
+        display_name: "46_UnknownLor",
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "箸にも棒にも掛からない"
+      )
+    end
+
+    context "A new style sample URL" do
+      strategy_should_work(
+        "https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg_640.jpg",
+        image_urls: [
+          %r{https://cdn.poipiku.com/009416896/010718302_W0EFku4aW.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/009416896/010718302_023702507_F4A4ZHzF8.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/009416896/010718302_023702508_ShgkirOUS.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/009416896/010718302_023702509_WhaFUJNqD.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+          %r{https://cdn.poipiku.com/009416896/010718302_023702511_nAdPEqifb.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
+        ],
+        media_files: [
+          { file_size: 1_454_893 },
+          { file_size: 1_504_925 },
+          { file_size: 384_799 },
+          { file_size: 56_656 },
+          { file_size: 828_595 },
+          { file_size: 365_291 }
+        ],
+        page_url: "https://poipiku.com/9416896/10718302.html",
+        profile_urls: %w[https://poipiku.com/9416896/],
+        display_name: "46_UnknownLor",
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "箸にも棒にも掛からない"
       )
     end
   end
