@@ -10,7 +10,7 @@ class PostQuery
   UNLIMITED_METATAGS = %w[
     status rating limit is id date age filesize filetype parent child md5 width
     height duration mpixels ratio score upvote downvotes favcount embedded
-    tagcount pixiv_id pixiv
+    tagcount pixiv_id pixiv twitter_id twitter
   ]
 
   # Metatags that define the order of search results. These metatags can't be used more than once per query.

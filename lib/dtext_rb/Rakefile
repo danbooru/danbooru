@@ -3,6 +3,8 @@
 require "bundler/gem_tasks"
 require "rake/testtask"
 
+SO_EXT = RbConfig::CONFIG["DLEXT"]
+
 CLEAN.include FileList["**/*.{so,o}", "ext/dtext/Makefile", "pkg"]
 
 Rake::TestTask.new(:test) do |t|
@@ -13,11 +15,11 @@ task bench: :compile do
   require_relative "test/bench_dtext"
 end
 
-file "lib/dtext/dtext.so" => FileList["ext/dtext/*.{cpp,rl,h}"] do
-  system "cd ext/dtext && ruby extconf.rb && make && mv dtext.so ../../lib/dtext"
+file "lib/dtext/dtext.#{SO_EXT}" => FileList["ext/dtext/*.{cpp,rl,h}"] do
+  system "cd ext/dtext && ruby extconf.rb && make && mv dtext.#{SO_EXT} ../../lib/dtext"
 end
 
-task compile: "lib/dtext/dtext.so"
+task compile: "lib/dtext/dtext.#{SO_EXT}"
 task build: :compile
 task test: :compile
 task default: :test

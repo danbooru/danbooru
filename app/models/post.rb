@@ -1166,6 +1166,8 @@ class Post < ApplicationRecord
           attribute_matches(value, :created_at, :age)
         when "pixiv", "pixiv_id"
           attribute_matches(value, :pixiv_id)
+        when "twitter", "twitter_id"
+          twitter_matches(value)
         when "tagcount"
           attribute_matches(value, :tag_count)
         when "duration"
@@ -1366,6 +1368,15 @@ class Post < ApplicationRecord
           where(source: "")
         else
           where_ilike(:source, source + "*")
+        end
+      end
+
+      def twitter_matches(twitter_id)
+        if twitter_id.empty?
+          none
+        else
+          where_ilike(:source, "*twitter.com*status/#{twitter_id}*")
+            .or(where_ilike(:source, "*x.com*status/#{twitter_id}*"))
         end
       end
 
@@ -1739,9 +1750,9 @@ class Post < ApplicationRecord
       def search(params, current_user)
         q = search_attributes(
           params,
-          [:id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
-          :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
-          :image_height, :tag_count, :has_children, :has_active_children,
+          [:id, :created_at, :updated_at, :rating, :source, :pixiv_id, :twitter_id, 
+          :fav_count, :score, :up_score, :down_score, :md5, :file_ext, :file_size, 
+          :image_width, :image_height, :tag_count, :has_children, :has_active_children,
           :is_pending, :is_flagged, :is_deleted, :is_banned,
           :last_comment_bumped_at, :last_commented_at, :last_noted_at,
           :uploader, :approver, :parent,
