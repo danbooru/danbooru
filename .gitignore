@@ -12,6 +12,3 @@
 lib/dtext_rb/ext/dtext/Makefile
 lib/dtext_rb/ext/dtext/dtext.cpp
 .history
-.DS_Store
-*.plist
-dtext.bundle.yml

@@ -2,8 +2,6 @@
 
 require_relative "lib/dtext/version"
 
-SO_EXT = RbConfig::CONFIG["DLEXT"]
-
 Gem::Specification.new do |spec|
   spec.name = "dtext_rb"
   spec.version = DText::VERSION
@@ -19,9 +17,9 @@ Gem::Specification.new do |spec|
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
 
-  spec.files = %W[
+  spec.files = %w[
     lib/dtext.rb
-    lib/dtext/dtext.#{SO_EXT}
+    lib/dtext/dtext.so
     lib/dtext/ruby.rb
     lib/dtext/version.rb
   ]

@@ -7117,8 +7117,6 @@ ALTER TABLE ONLY public.user_upgrades
 -- PostgreSQL database dump complete
 --
 
-\unrestrict eCR5gg4kQeDlhxxwA1PweX4euEHHriLKBteVj7A8PZtEwcwLBrv4fqyir3naK8h
-
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
