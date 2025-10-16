@@ -1129,6 +1129,62 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post2], "-pixiv_id:<40,>50")
     end
 
+    should "return posts for a twitter id search (type 1)" do
+      url = "https://twitter.com/yrn_c2o/status/1975856465845039140"
+      post = create(:post, source: url)
+      assert_tag_match([post], "twitter_id:1975856465845039140")
+    end
+
+    should "return posts for a twitter id search (type 2)" do
+      url = "https://twitter.com/dairyo3/status/1975927101418320243/photo/1"
+      post = create(:post, source: url)
+      assert_tag_match([post], "twitter_id:1975927101418320243")
+    end
+
+    should "return posts for a twitter id search (type 3)" do
+      url = "https://x.com/akabane22/status/1298636392294014980"
+      post = create(:post, source: url)
+      assert_tag_match([post], "twitter_id:1298636392294014980")
+    end
+
+    should "return posts for a twitter id search (type 4)" do
+      url = "https://x.com/Ap04Astral/status/1977902176174264742/photo/1"
+      post = create(:post, source: url)
+      assert_tag_match([post], "twitter_id:1977902176174264742")
+    end
+
+    should "return posts for a twitter_id:any search" do
+      url = "https://twitter.com/Ap04Astral/status/1977902176174264742"
+      post = create(:post, source: url)
+      assert_tag_match([post], "twitter_id:any")
+    end 
+
+    should "return posts for a twitter_id: search" do
+      post1 = create(:post, twitter_id: nil)
+      post2 = create(:post, twitter_id: 1298636392294014980, source: "https://twitter.com/akabane22/status/1298636392294014980")
+
+      assert_tag_match([post2], "twitter_id:1298636392294014980")
+      assert_tag_match([post1], "-twitter_id:1298636392294014980")
+
+      assert_tag_match([post2], "twitter_id:>=1298636392294014980")
+      assert_tag_match([],      "twitter_id:<1298636392294014980")
+
+      assert_tag_match([],      "-twitter_id:>=1298636392294014980")
+      assert_tag_match([post2], "-twitter_id:<1298636392294014980")
+
+      assert_tag_match([post1], "twitter_id:none")
+      assert_tag_match([post2], "twitter_id:any")
+
+      assert_tag_match([post2], "-twitter_id:none")
+      assert_tag_match([post1], "-twitter_id:any")
+
+      assert_tag_match([post1], "twitter:none")
+      assert_tag_match([post2], "twitter:any")
+
+      assert_tag_match([], "-twitter_id:>1298636392294014979,<1298636392294014981")
+      assert_tag_match([post2], "-twitter_id:<1298636392294014979,>1298636392294014981")
+    end
+
     should "return posts for the search: metatag" do
       @post1 = create(:post, tag_string: "aaa")
       @post2 = create(:post, tag_string: "bbb")

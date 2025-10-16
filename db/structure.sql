@@ -1562,7 +1562,8 @@ CREATE TABLE public.posts (
     last_commented_at timestamp without time zone,
     has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL
+    tag_count_meta integer DEFAULT 0 NOT NULL,
+    twitter_id bigint
 );
 
 
@@ -3342,7 +3343,6 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
-
 
 
 --
@@ -5513,6 +5513,13 @@ ALTER INDEX public.index_posts_on_string_to_array_tag_string ALTER COLUMN 1 SET 
 
 
 --
+-- Name: index_posts_on_twitter_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_twitter_id ON public.posts USING btree (twitter_id) WHERE (twitter_id IS NOT NULL);
+
+
+--
 -- Name: index_posts_on_uploader_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7110,9 +7117,12 @@ ALTER TABLE ONLY public.user_upgrades
 -- PostgreSQL database dump complete
 --
 
+\unrestrict eCR5gg4kQeDlhxxwA1PweX4euEHHriLKBteVj7A8PZtEwcwLBrv4fqyir3naK8h
+
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251016010829'),
 ('20250720155738'),
 ('20250718142035'),
 ('20250716202530'),

@@ -1882,6 +1882,26 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
+        context "that is not from twitter" do
+          should "clear the twitter id" do
+            @post.twitter_id = 1234
+            @post.update(source: "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg")
+            assert_nil(@post.twitter_id)
+
+            @post.twitter_id = 1234
+            @post.update(source: "http://pictures.hentai-foundry.com//a/AnimeFlux/219123.jpg")
+            assert_nil(@post.twitter_id)
+          end
+        end
+
+        context "that is from twitter" do
+          should "save the twitter id" do
+            @post.update(source: "https://twitter.com/yrn_c2o/status/1975856465845039140")
+            assert_equal(1975856465845039140, @post.twitter_id)
+            @post.twitter_id = nil
+          end
+        end
+
         context "like 'Blog.'" do
           should "not raise an exception" do
             @post.update!(source: "Blog.")

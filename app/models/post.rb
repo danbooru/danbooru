@@ -63,6 +63,7 @@ class Post < ApplicationRecord
   validates :source, length: { maximum: 1200 }
   validates :parent, presence: { message: "post does not exist" }, if: -> { parent_id.present? && parent_id_changed? }
   before_save :parse_pixiv_id
+  before_save :parse_twitter_id
   before_save :added_tags_are_valid
   before_save :removed_tags_are_valid
   before_save :has_artist_tag
@@ -1167,7 +1168,7 @@ class Post < ApplicationRecord
         when "pixiv", "pixiv_id"
           attribute_matches(value, :pixiv_id)
         when "twitter", "twitter_id"
-          twitter_matches(value)
+          attribute_matches(value, :twitter_id)
         when "tagcount"
           attribute_matches(value, :tag_count)
         when "duration"
@@ -1368,15 +1369,6 @@ class Post < ApplicationRecord
           where(source: "")
         else
           where_ilike(:source, source + "*")
-        end
-      end
-
-      def twitter_matches(twitter_id)
-        if twitter_id.empty?
-          none
-        else
-          where_ilike(:source, "*twitter.com*status/#{twitter_id}*")
-            .or(where_ilike(:source, "*x.com*status/#{twitter_id}*"))
         end
       end
 
@@ -1780,6 +1772,13 @@ class Post < ApplicationRecord
     def parse_pixiv_id
       self.pixiv_id = nil
       self.pixiv_id = parsed_source.work_id if parsed_source.is_a?(Source::URL::Pixiv)
+    end
+  end
+
+  concerning :TwitterMethods do
+    def parse_twitter_id
+      self.twitter_id = nil
+      self.twitter_id = parsed_source.status_id if parsed_source.is_a?(Source::URL::Twitter)
     end
   end
 
