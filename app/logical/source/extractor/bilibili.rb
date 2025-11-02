@@ -38,7 +38,11 @@ module Source
         if article_json["id"].present?
           "https://www.bilibili.com/opus/#{article_json["id"]}"
         elsif post_json["id_str"].present?
-          "https://t.bilibili.com/#{post_json["id_str"]}"
+          if post_json.dig("basic", "jump_url").present?
+            "https:#{post_json.dig("basic", "jump_url")}"
+          else
+            "https://t.bilibili.com/#{post_json["id_str"]}"
+          end
         end
       end
 
