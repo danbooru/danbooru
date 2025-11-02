@@ -39,7 +39,7 @@ module Source
           "https://www.bilibili.com/opus/#{article_json["id"]}"
         elsif post_json["id_str"].present?
           if post_json.dig("basic", "jump_url").present?
-            "https:#{post_json.dig("basic", "jump_url")}"
+            URI.join("https://", post_json.dig("basic", "jump_url")).to_s
           else
             "https://t.bilibili.com/#{post_json["id_str"]}"
           end
