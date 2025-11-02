@@ -18,7 +18,7 @@ module Source::Tests::Extractor
         ],
         media_files: [
           { file_size: 1_536_450 },
-          { file_size: 1_553_055 },
+          { file_size: 1_553_059 },
           { file_size: 5_015_957 },
           { file_size: 4_726_511 },
           { file_size: 3_554_557 },
@@ -80,7 +80,7 @@ module Source::Tests::Extractor
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "【百日绘day44】 玲纱",
-        dtext_artist_commentary_desc: "甜点部乐队之后肯定就是玲纱啦～最近看\"@Kieed \":[https://space.bilibili.com/25589919/dynamic]老师的直播学到了很多，非常喜欢老师的图，太好看了！！\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]"
+        dtext_artist_commentary_desc: "甜点部乐队之后肯定就是玲纱啦～最近看\"@Kieed \":[https://space.bilibili.com/25589919/dynamic]老师的直播学到了很多，非常喜欢老师的图，太好看了！！\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]",
       )
     end
 
