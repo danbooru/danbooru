@@ -43,7 +43,7 @@ module Source
       end
 
       def artist_commentary_title
-        article_json.dig("detail", "modules", "module_title", "text") || post_json.dig("modules", "module_dynamic", "title")
+        article_json.dig("detail", "modules", "module_title", "text") || post_json.dig("modules", "module_dynamic", "major", "opus", "title")
       end
 
       def artist_commentary_desc
@@ -90,7 +90,8 @@ module Source
       end
 
       def post_commentary_desc
-        post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.map do |text_node|
+        rich_text_nodes = post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes") || post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes")
+        rich_text_nodes.to_a.map do |text_node|
           case text_node["type"]
           when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB"
             %{<a href="#{URI.join("https://", text_node["jump_url"])}">#{text_node["text"]}</a>}
@@ -140,11 +141,16 @@ module Source
       end
 
       def post_tags
-        post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.select do |n|
+        rich_text_nodes = post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes") || post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes")
+        rich_text_nodes.to_a.select do |n|
           n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
         end.map do |tag|
           tag_name = tag["text"].gsub(/(^#|#$)/, "")
-          [tag_name, "https://t.bilibili.com/topic/name/#{Danbooru::URL.escape(tag_name)}"]
+          if tag["jump_url"]&.include?("search.bilibili.com")
+            [tag_name, "https://search.bilibili.com/all?keyword=#{Danbooru::URL.escape(tag_name)}"]
+          else
+            [tag_name, "https://t.bilibili.com/topic/name/#{Danbooru::URL.escape(tag_name)}"]
+          end
         end
       end
 
