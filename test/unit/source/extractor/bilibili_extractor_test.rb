@@ -18,14 +18,14 @@ module Source::Tests::Extractor
         ],
         media_files: [
           { file_size: 1_536_450 },
-          { file_size: 1_553_055 },
-          { file_size: 5_015_957 },
-          { file_size: 4_726_511 },
-          { file_size: 3_554_557 },
-          { file_size: 4_697_116 },
-          { file_size: 4_359_527 },
-          { file_size: 3_641_366 },
-          { file_size: 6_552_286 },
+          { file_size: 1_553_059 },
+          { file_size: 5_015_961 },
+          { file_size: 4_726_515 },
+          { file_size: 3_554_561 },
+          { file_size: 4_697_120 },
+          { file_size: 4_359_531 },
+          { file_size: 3_641_370 },
+          { file_size: 6_552_290 },
         ],
         page_url: "https://www.bilibili.com/opus/686082748803186697",
         profile_url: "https://space.bilibili.com/11742550",
@@ -80,7 +80,7 @@ module Source::Tests::Extractor
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "【百日绘day44】 玲纱",
-        dtext_artist_commentary_desc: "甜点部乐队之后肯定就是玲纱啦～最近看\"@Kieed \":[https://space.bilibili.com/25589919/dynamic]老师的直播学到了很多，非常喜欢老师的图，太好看了！！\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]"
+        dtext_artist_commentary_desc: "甜点部乐队之后肯定就是玲纱啦～最近看\"@Kieed \":[https://space.bilibili.com/25589919/dynamic]老师的直播学到了很多，非常喜欢老师的图，太好看了！！\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]",
       )
     end
 
@@ -147,16 +147,16 @@ module Source::Tests::Extractor
           https://i0.hdslb.com/bfs/article/e19cb5691afbe77c003b535759cda619b2d813cb.jpg
         ],
         media_files: [
-          { file_size: 493_930 },
+          { file_size: 493_934 },
           { file_size: 282_419 },
           { file_size: 673_160 },
           { file_size: 1_152_435 },
-          { file_size: 342_964 },
+          { file_size: 342_968 },
           { file_size: 1_151_382 },
           { file_size: 987_229 },
           { file_size: 695_666 },
-          { file_size: 189_218 },
-          { file_size: 5_434_169 },
+          { file_size: 189_222 },
+          { file_size: 5_434_173 },
         ],
         page_url: "https://www.bilibili.com/opus/428178320677065986",
         profile_url: "https://space.bilibili.com/285452636",
