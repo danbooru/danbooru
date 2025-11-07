@@ -355,5 +355,29 @@ module Source::Tests::Extractor
         EOS
       )
     end
+
+    context "A t.bilibili.com/:id quote-post with images" do
+      strategy_should_work(
+        "https://t.bilibili.com/914119403116691463",
+        image_urls: %w[
+          http://i0.hdslb.com/bfs/new_dyn/09fff9c0e6e17d8d03c3f34454f121c4880227.gif
+          http://i0.hdslb.com/bfs/new_dyn/5ff62932401e4943e0813e40b7411157880227.gif
+          http://i0.hdslb.com/bfs/new_dyn/39eddb1325f86188a886ae708fdefa43880227.jpg
+        ],
+        media_files: [
+          { file_size: 1_604_415 },
+          { file_size: 1_686_471 },
+          { file_size: 621_792 },
+        ],
+        page_url: "https://t.bilibili.com/914119403116691463",
+        profile_urls: %w[https://space.bilibili.com/880227],
+        display_name: "绅士老鱼",
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          同人图+表情包我就放在这里啦"[脱单doge]":[https://i0.hdslb.com/bfs/emote/bf7e00ecab02171f8461ee8cf439c73db9797748.png] 5000赞咱就更新下一期佩佩的绘画视频！ 感谢大家的支持！！查看图片(3)
+        EOS
+      )
+    end
   end
 end

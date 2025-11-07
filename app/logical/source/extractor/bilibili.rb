@@ -12,8 +12,7 @@ module Source
         elsif article_json.present?
           article_image_urls
         elsif post_json.present?
-          image_urls = post_json.dig("modules", "module_dynamic", "major", "opus", "pics").to_a.pluck(:url)
-          image_urls.to_a.compact.map { |u| Source::URL.parse(u).full_image_url || u }
+          post_image_urls
         else
           []
         end
@@ -25,9 +24,20 @@ module Source
         urls += article_json.dig("modules", "module_top", "display", "album", "pics").to_a.pluck("url")
         urls += article_json.dig("modules", "module_content", "paragraphs").to_a.select do |paragraph|
           paragraph["para_type"] == 2
-        end.pluck(:pic).pluck(:pics).flatten.pluck(:url)
+        end.pluck("pic").pluck("pics").flatten.pluck("url")
 
-        urls
+        urls.compact.map { |u| Source::URL.parse(u).full_image_url || u }
+      end
+
+      memoize def post_image_urls
+        urls = []
+
+        urls += post_json.dig("modules", "module_dynamic", "major", "opus", "pics").to_a.pluck("url")
+        urls += post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.select do |node|
+          node["type"] == "RICH_TEXT_NODE_TYPE_VIEW_PICTURE"
+        end.pluck("pics").flatten.pluck("src")
+
+        urls.compact.map { |u| Source::URL.parse(u).full_image_url || u }
       end
 
       def page_url
