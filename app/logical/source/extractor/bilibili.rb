@@ -38,12 +38,17 @@ module Source
         if article_json["id_str"].present?
           "https://www.bilibili.com/opus/#{article_json["id_str"]}"
         elsif post_json["id_str"].present?
-          "https://t.bilibili.com/#{post_json["id_str"]}"
+          if post_json.dig("basic", "jump_url").present?
+            URI.join("https://", post_json.dig("basic", "jump_url")).to_s
+          else
+            "https://t.bilibili.com/#{post_json["id_str"]}"
+          end
         end
       end
 
       def artist_commentary_title
-        article_json.dig("modules", "module_title", "text") || post_json.dig("modules", "module_dynamic", "title")
+        # Is modules.module_dynamic.title supported in t.bilibili.com/:id works?
+        article_json.dig("modules", "module_title", "text") || post_json.dig("modules", "module_dynamic", "title") || post_json.dig("modules", "module_dynamic", "major", "opus", "title")
       end
 
       def artist_commentary_desc
@@ -90,7 +95,8 @@ module Source
       end
 
       def post_commentary_desc
-        post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.map do |text_node|
+        rich_text_nodes = post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes") || post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes")
+        rich_text_nodes.to_a.map do |text_node|
           case text_node["type"]
           when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB"
             %{<a href="#{URI.join("https://", text_node["jump_url"])}">#{text_node["text"]}</a>}
@@ -140,11 +146,17 @@ module Source
       end
 
       def post_tags
-        post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.select do |n|
+        rich_text_nodes = post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes") || post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes")
+        rich_text_nodes.to_a.select do |n|
           n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
         end.map do |tag|
           tag_name = tag["text"].gsub(/(^#|#$)/, "")
-          [tag_name, "https://t.bilibili.com/topic/name/#{Danbooru::URL.escape(tag_name)}"]
+          if tag["jump_url"].present?
+            # Chinese characters are escaped in `jump_url`.
+            [tag_name, URI.join("https://", tag["jump_url"]).to_s]
+          else
+            [tag_name, "https://t.bilibili.com/topic/name/#{Danbooru::URL.escape(tag_name)}"]
+          end
         end
       end
 
