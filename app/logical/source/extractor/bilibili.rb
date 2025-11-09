@@ -204,6 +204,11 @@ module Source
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:#{firefox_version}) Gecko/20100101 Firefox/#{firefox_version}"
       end
 
+      def buvid
+        data = http.cache(5.minutes).parsed_get("https://api.bilibili.com/x/web-frontend/getbuvid")
+        data.dig("data", "buvid")
+      end
+
       memoize def post_json
         return {} if t_work_id.blank?
 
@@ -219,7 +224,7 @@ module Source
         end
         return {} if opus_id.blank?
 
-        data = http.headers("User-Agent": user_agent).cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/opus/detail?id=#{opus_id}&features=htmlNewStyle") || {}
+        data = http.headers("User-Agent": user_agent).cookies(buvid3: buvid).cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/opus/detail?id=#{opus_id}&features=htmlNewStyle") || {}
         data = data.dig("data", "item").to_h
 
         modules = data["modules"]
