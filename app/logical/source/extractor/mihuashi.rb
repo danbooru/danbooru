@@ -39,16 +39,16 @@ module Source
         end
       end
 
-      def profile_url
+      def account_url
         "https://www.mihuashi.com/users/#{Danbooru::URL.escape(username)}" if username.present?
       end
 
-      def account_url
+      def profile_url
         "https://www.mihuashi.com/profiles/#{user_id}" if user_id.present?
       end
 
       def profile_urls
-        [profile_url, account_url].compact
+        [profile_url, account_url].compact_blank.uniq
       end
 
       def tags
@@ -93,6 +93,10 @@ module Source
 
       def username
         user[:name] || parsed_url.username || parsed_referer&.username unless project.present? || character_card.present?
+      end
+
+      def other_names
+        [username, *name_changelogs].compact_blank.uniq
       end
 
       def user
@@ -159,6 +163,12 @@ module Source
         return {} unless a_work_id.present?
 
         http.cache(1.minute).parsed_get("https://www.mihuashi.com/api/activity/v1/activities/#{a_work_activity}/artworks/#{a_work_id}/")&.dig(:artwork) || {}
+      end
+
+      memoize def name_changelogs
+        return {} unless user_id.present?
+
+        http.cache(1.minute).parsed_get("https://www.mihuashi.com/api/v1/users/#{user_id}/name_changelogs")&.dig(:name_changelogs).to_a.pluck(:from_name)
       end
 
       memoize def cookies
