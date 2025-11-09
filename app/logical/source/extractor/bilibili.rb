@@ -44,6 +44,10 @@ module Source
         work_page || parsed_url.page_url || parsed_referer&.page_url
       end
 
+      def id_str
+        article_json["id_str"] || post_json["id_str"]
+      end
+
       def work_page
         if article_json["id_str"].present?
           "https://www.bilibili.com/opus/#{article_json["id_str"]}"
@@ -65,59 +69,136 @@ module Source
         article_commentary_desc.presence || post_commentary_desc.presence
       end
 
+      # https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/opus/rich_text_nodes.md
+      def rich_text(rich)
+        case rich["type"]
+        when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_CV", "RICH_TEXT_NODE_TYPE_AV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB", "RICH_TEXT_NODE_TYPE_GOODS"
+          %{<a href="#{URI.join("https://", rich["jump_url"])}">#{rich["text"]}</a>}
+        when "RICH_TEXT_NODE_TYPE_EMOJI"
+          %{<a href="#{rich.dig("emoji", "icon_url")}">#{rich["text"]}</a>}
+        when "RICH_TEXT_NODE_TYPE_AT"
+          %{<a href="https://space.bilibili.com/#{rich["rid"]}/dynamic">#{rich["text"]}</a>}
+        when "RICH_TEXT_NODE_TYPE_LOTTERY"
+          %{<a href="https://www.bilibili.com/h5/lottery/result?business_type=1&business_id=#{id_str}&isWeb=1">#{rich["text"]}</a>}
+        when "RICH_TEXT_NODE_TYPE_VOTE"
+          %{<a href="https://t.bilibili.com/vote/h5/index/#/result?vote_id=#{rich["rid"]}">#{rich["text"]}</a>}
+        else # RICH_TEXT_NODE_TYPE_TEXT (text), RICH_TEXT_NODE_TYPE_VIEW_PICTURE, unrecognized nodes, etc.
+          rich["text"].gsub("\n", "<br>")
+        end
+      end
+
+      # https://github.com/SocialSisterYi/bilibili-API-collect/blob/18bd4b22c552dc468e47949e449ddc298420c9e6/docs/opus/features.md#module_type_content
+      def article_text_node(node)
+        case node["type"]
+        when "TEXT_NODE_TYPE_WORD"
+          # Unsupported in Danbooru Dtext: `bg_style`, `color`
+          text = node.dig("word", "words").gsub("\n", "<br>")
+          case node.dig("word", "font_level")
+          when "xxLarge"
+            text = "<h4>#{text}</h4>"
+          when "xLarge"
+            text = "<h5>#{text}</h5>"
+          else # regular
+            text = "<b>#{text}</b>" if node.dig("word", "style", "bold")
+          end
+          text = "<s>#{text}</s>" if node.dig("word", "style", "strikethrough")
+          text = "<i>#{text}</i>" if node.dig("word", "style", "italic")
+          text
+        when "TEXT_NODE_TYPE_RICH"
+          rich_text(node["rich"])
+        else # TEXT_NODE_TYPE_FORMULA
+          ""
+        end
+      end
+
+      def link_card(card, type)
+        case type
+        when "goods"
+          text = card["items"].map do |item|
+            %{<a href="#{item["jump_url"]}">#{item["name"]}</a>}
+          end.join("<br>")
+        when "vote"
+          text = %{<a href="https://t.bilibili.com/vote/h5/index/#/result?vote_id=#{card["vote_id"]}">#{card["desc"]}</a>}
+        else
+          text = card["title"].to_s
+          if card["jump_url"].present?
+            jump_url = URI.join("https://", card["jump_url"])
+            if text.blank?
+              text = jump_url.to_s
+            end
+            text = %{<a href="#{jump_url}">#{text}</a>}
+          end
+        end
+
+        if card["head_text"].present?
+          text = "<small>#{card["head_text"]}</small><br>#{text}"
+        end
+        text
+      end
+
       def article_commentary_desc
         article_json.dig("modules", "module_content", "paragraphs").to_a.map do |paragraph|
+          # Unsupported in Danbooru Dtext: `align`
           case paragraph["para_type"]
-          when 1
-            nodes = paragraph.dig("text", "nodes")
-          when 5
-            nodes = paragraph.dig("list", "items").pluck("nodes").flatten
-          else
-            nodes = []
-          end
-
-          nodes.map do |text_node|
-            case text_node["type"]
-            when "TEXT_NODE_TYPE_WORD"
-              text = text_node.dig("word", "words").gsub("\n", "<br>")
-              text = "<strong>#{text}</strong>" if text_node.dig("word", "style", "bold")
-              text
-            when "TEXT_NODE_TYPE_RICH"
-              rich = text_node["rich"]
-              case rich["type"]
-              when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB"
-                text = "<a href='#{URI.join("https://", rich["jump_url"])}'>#{rich["text"]}</a>"
-              when "RICH_TEXT_NODE_TYPE_EMOJI"
-                text = "<a href='#{rich.dig("emoji", "icon_url")}'>#{rich["text"]}</a>"
-              when "RICH_TEXT_NODE_TYPE_AT"
-                text = "<a href='https://space.bilibili.com/#{rich["rid"]}/dynamic'>#{rich["text"]}</a>"
-              else
-                text = rich["text"]
-              end
-            else
-              text = ""
-            end
-
-            text = "<li>#{text}</li>" if paragraph["para_type"] == 5
+          when 1, 4
+            text = paragraph.dig("text", "nodes").map do |node|
+              article_text_node(node)
+            end.join
+            text = "<blockquote>#{text}</blockquote>" if paragraph["para_type"] == 4
             text
-          end.join
+          when 2
+            paragraph.dig("pic", "pics").map do |pic|
+              %{<a href="#{pic["url"]}">[Image]</a>}
+            end.join
+          when 3
+            "<hr>"
+          when 5
+            last_level = 0
+            text = paragraph.dig("list", "items").map do |item|
+              text = item["nodes"].map do |node|
+                article_text_node(node)
+              end.join
+              text = "#{item["order"]}. #{text}" if paragraph.dig("list", "style") == 1
+              text = "<li>#{text}</li>" # XXX This should not generate double line breaks in Dtext.
+
+              if item["level"] > last_level
+                text = "#{"<ul>" * (item["level"] - last_level)}#{text}"
+              elsif item["level"] < last_level
+                text = "#{text}#{"</ul>" * (last_level - item["level"])}"
+              end
+              last_level = item["level"]
+
+              text
+            end.join
+            "#{text}#{"</ul>" * last_level}"
+          when 6
+            case paragraph.dig("link_card", "card", "type")
+            when "LINK_CARD_TYPE_ITEM_NULL"
+              paragraph.dig("link_card", "card", "item_null", "text")
+            when "LINK_CARD_TYPE_UPOWER_LOTTERY" # paywalled?
+              ""
+            else
+              type = paragraph.dig("link_card", "card", "type").gsub("LINK_CARD_TYPE_", "").downcase
+              link_card(paragraph.dig("link_card", "card", type), type)
+            end
+          when 7
+            # `lang`?
+            "<pre>#{paragraph.dig("code", "content")}</pre>"
+          when 8
+            paragraph.dig("heading", "nodes").map do |node|
+              article_text_node(node)
+            end.join
+          else
+            ""
+          end
         end.join("<br><br>")
       end
 
       def post_commentary_desc
         rich_text_nodes = post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes") || post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes")
         rich_text_nodes.to_a.map do |text_node|
-          case text_node["type"]
-          when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB"
-            %{<a href="#{URI.join("https://", text_node["jump_url"])}">#{text_node["text"]}</a>}
-          when "RICH_TEXT_NODE_TYPE_EMOJI"
-            %{<a href="#{text_node.dig("emoji", "icon_url")}">#{text_node["text"]}</a>}
-          when "RICH_TEXT_NODE_TYPE_AT"
-            %{<a href="https://space.bilibili.com/#{text_node["rid"]}/dynamic">#{text_node["text"]}</a>}
-          else # RICH_TEXT_NODE_TYPE_TEXT (text), unrecognized nodes, etc.
-            text_node["text"]
-          end
-        end.join("")
+          rich_text(text_node)
+        end.join
       end
 
       def dtext_artist_commentary_desc
