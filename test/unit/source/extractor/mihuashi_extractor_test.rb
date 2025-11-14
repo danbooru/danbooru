@@ -191,6 +191,7 @@ module Source::Tests::Extractor
         "https://www.mihuashi.com/activities/houkai3-stigmata/artworks/8523",
         image_urls: %w[https://activity-assets.mihuashi.com/2019/06/16/07/1icxr2tlafwxdwry4puu55zi6v9d1u0t/1icxr2tlafwxdwry4puu55zi6v9d1u0t.png],
         media_files: [{ file_size: 8_296_841 }],
+        page_url: "https://www.mihuashi.com/activities/houkai3-stigmata/artworks/8523?type=lsly",
         profile_url: "https://www.mihuashi.com/profiles/16150",
         profile_urls: [
           "https://www.mihuashi.com/users/悪の箱",
@@ -220,6 +221,7 @@ module Source::Tests::Extractor
           { file_size: 758_627 },
           { file_size: 1_336_968 },
         ],
+        page_url: "https://www.mihuashi.com/activities/jw3-exterior-12/artworks/10515?type=zjjh",
         profile_url: "https://www.mihuashi.com/profiles/492",
         profile_urls: [
           "https://www.mihuashi.com/users/CR",

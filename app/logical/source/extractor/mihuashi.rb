@@ -39,6 +39,20 @@ module Source
         end
       end
 
+      def page_url
+        if work.present?
+          "https://www.mihuashi.com/artworks/#{work[:id]}"
+        elsif activity_work.present?
+          if activity_work[:artwork_type].present?
+            "https://www.mihuashi.com/activities/#{a_work_activity}/artworks/#{activity_work[:id]}?type=#{activity_work[:artwork_type]}"
+          else
+            "https://www.mihuashi.com/activities/#{a_work_activity}/artworks/#{activity_work[:id]}"
+          end
+        else
+          parsed_url.page_url || parsed_referer&.page_url
+        end
+      end
+
       def account_url
         "https://www.mihuashi.com/users/#{Danbooru::URL.escape(username)}" if username.present?
       end
