@@ -44,7 +44,7 @@ module Source
         work_page || parsed_url.page_url || parsed_referer&.page_url
       end
 
-      def id_str
+      def work_id_from_data
         article_json["id_str"] || post_json["id_str"]
       end
 
@@ -70,7 +70,7 @@ module Source
       end
 
       # https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/opus/rich_text_nodes.md
-      def rich_text(rich)
+      def rich_text_node(rich)
         case rich["type"]
         when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_CV", "RICH_TEXT_NODE_TYPE_AV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB", "RICH_TEXT_NODE_TYPE_GOODS"
           %{<a href="#{URI.join("https://", rich["jump_url"])}">#{rich["text"]}</a>}
@@ -79,10 +79,12 @@ module Source
         when "RICH_TEXT_NODE_TYPE_AT"
           %{<a href="https://space.bilibili.com/#{rich["rid"]}/dynamic">#{rich["text"]}</a>}
         when "RICH_TEXT_NODE_TYPE_LOTTERY"
-          %{<a href="https://www.bilibili.com/h5/lottery/result?business_type=1&business_id=#{id_str}&isWeb=1">#{rich["text"]}</a>}
+          %{<a href="https://www.bilibili.com/h5/lottery/result?business_type=1&business_id=#{work_id_from_data}&isWeb=1">#{rich["text"]}</a>}
         when "RICH_TEXT_NODE_TYPE_VOTE"
           %{<a href="https://t.bilibili.com/vote/h5/index/#/result?vote_id=#{rich["rid"]}">#{rich["text"]}</a>}
-        else # RICH_TEXT_NODE_TYPE_TEXT (text), RICH_TEXT_NODE_TYPE_VIEW_PICTURE, unrecognized nodes, etc.
+        when "RICH_TEXT_NODE_TYPE_VIEW_PICTURE"
+          ""
+        else # RICH_TEXT_NODE_TYPE_TEXT (text), unrecognized nodes, etc.
           rich["text"].gsub("\n", "<br>")
         end
       end
@@ -105,7 +107,7 @@ module Source
           text = "<i>#{text}</i>" if node.dig("word", "style", "italic")
           text
         when "TEXT_NODE_TYPE_RICH"
-          rich_text(node["rich"])
+          rich_text_node(node["rich"])
         else # TEXT_NODE_TYPE_FORMULA
           ""
         end
@@ -147,9 +149,11 @@ module Source
             text = "<blockquote>#{text}</blockquote>" if paragraph["para_type"] == 4
             text
           when 2
-            paragraph.dig("pic", "pics").map do |pic|
-              %{<a href="#{pic["url"]}">[Image]</a>}
-            end.join
+            if paragraph.dig("pic", "style") != 1 # isAlbum
+              paragraph.dig("pic", "pics").map do |pic|
+                %{<a href="#{pic["url"]}">[Image]</a>}
+              end.join
+            end
           when 3
             "<hr>"
           when 5
@@ -197,7 +201,7 @@ module Source
       def post_commentary_desc
         rich_text_nodes = post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes") || post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes")
         rich_text_nodes.to_a.map do |text_node|
-          rich_text(text_node)
+          rich_text_node(text_node)
         end.join
       end
 
@@ -285,7 +289,7 @@ module Source
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:#{firefox_version}) Gecko/20100101 Firefox/#{firefox_version}"
       end
 
-      def buvid
+      def buvid3
         data = http.cache(5.minutes).parsed_get("https://api.bilibili.com/x/web-frontend/getbuvid")
         data.dig("data", "buvid")
       end
@@ -305,7 +309,7 @@ module Source
         end
         return {} if opus_id.blank?
 
-        data = http.headers("User-Agent": user_agent).cookies(buvid3: buvid).cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/opus/detail?id=#{opus_id}&features=htmlNewStyle") || {}
+        data = http.headers("User-Agent": user_agent).cookies(buvid3: buvid3).cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/opus/detail?id=#{opus_id}&features=htmlNewStyle") || {}
         data = data.dig("data", "item").to_h
 
         modules = data["modules"]
