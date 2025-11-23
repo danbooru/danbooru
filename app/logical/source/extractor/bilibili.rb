@@ -71,21 +71,22 @@ module Source
 
       # https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/opus/rich_text_nodes.md
       def rich_text_node(rich)
+        text = CGI.escapeHTML(rich["text"])
         case rich["type"]
         when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_CV", "RICH_TEXT_NODE_TYPE_AV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB", "RICH_TEXT_NODE_TYPE_GOODS"
-          %{<a href="#{URI.join("https://", rich["jump_url"])}">#{rich["text"]}</a>}
+          %{<a href="#{CGI.escapeHTML(URI.join("https://", rich["jump_url"]))}">#{text}</a>}
         when "RICH_TEXT_NODE_TYPE_EMOJI"
-          %{<a href="#{rich.dig("emoji", "icon_url")}">#{rich["text"]}</a>}
+          %{<a href="#{rich.dig("emoji", "icon_url")}">#{text}</a>}
         when "RICH_TEXT_NODE_TYPE_AT"
-          %{<a href="https://space.bilibili.com/#{rich["rid"]}/dynamic">#{rich["text"]}</a>}
+          %{<a href="https://space.bilibili.com/#{rich["rid"]}/dynamic">#{text}</a>}
         when "RICH_TEXT_NODE_TYPE_LOTTERY"
-          %{<a href="https://www.bilibili.com/h5/lottery/result?business_type=1&business_id=#{work_id_from_data}&isWeb=1">#{rich["text"]}</a>}
+          %{<a href="https://www.bilibili.com/h5/lottery/result?business_type=1&business_id=#{work_id_from_data}&isWeb=1">#{text}</a>}
         when "RICH_TEXT_NODE_TYPE_VOTE"
-          %{<a href="https://t.bilibili.com/vote/h5/index/#/result?vote_id=#{rich["rid"]}">#{rich["text"]}</a>}
+          %{<a href="https://t.bilibili.com/vote/h5/index/#/result?vote_id=#{rich["rid"]}">#{text}</a>}
         when "RICH_TEXT_NODE_TYPE_VIEW_PICTURE"
           ""
         else # RICH_TEXT_NODE_TYPE_TEXT (text), unrecognized nodes, etc.
-          rich["text"].gsub("\n", "<br>")
+          text.gsub("\n", "<br>")
         end
       end
 
@@ -94,7 +95,7 @@ module Source
         case node["type"]
         when "TEXT_NODE_TYPE_WORD"
           # Unsupported in Danbooru Dtext: `bg_style`, `color`
-          text = node.dig("word", "words").gsub("\n", "<br>")
+          text = CGI.escapeHTML(node.dig("word", "words")).gsub("\n", "<br>")
           case node.dig("word", "font_level")
           when "xxLarge"
             text = "<h4>#{text}</h4>"
@@ -117,14 +118,14 @@ module Source
         case type
         when "goods"
           text = card["items"].map do |item|
-            %{<a href="#{item["jump_url"]}">#{item["name"]}</a>}
+            %{<a href="#{CGI.escapeHTML(item["jump_url"])}">#{CGI.escapeHTML(item["name"])}</a>}
           end.join("<br>")
         when "vote"
           text = %{<a href="https://t.bilibili.com/vote/h5/index/#/result?vote_id=#{card["vote_id"]}">#{card["desc"]}</a>}
         else
           text = card["title"].to_s
           if card["jump_url"].present?
-            jump_url = URI.join("https://", card["jump_url"])
+            jump_url = CGI.escapeHTML(URI.join("https://", card["jump_url"]))
             if text.blank?
               text = jump_url.to_s
             end
@@ -163,18 +164,19 @@ module Source
                 article_text_node(node)
               end.join
               text = "#{item["order"]}. #{text}" if paragraph.dig("list", "style") == 1
-              text = "<li>#{text}</li>" # XXX This should not generate double line breaks in Dtext.
 
               if item["level"] > last_level
-                text = "#{"<ul>" * (item["level"] - last_level)}#{text}"
+                text = "#{"<ul><li>" * (item["level"] - last_level)}#{text}"
               elsif item["level"] < last_level
-                text = "#{text}#{"</ul>" * (last_level - item["level"])}"
+                text = "#{"</li></ul>" * (last_level - item["level"])}<li>#{text}"
+              else
+                text = "</li><li>#{text}"
               end
               last_level = item["level"]
 
               text
             end.join
-            "#{text}#{"</ul>" * last_level}"
+            "#{text}#{"</li></ul>" * last_level}"
           when 6
             case paragraph.dig("link_card", "card", "type")
             when "LINK_CARD_TYPE_ITEM_NULL"
@@ -187,7 +189,7 @@ module Source
             end
           when 7
             # `lang`?
-            "<pre>#{paragraph.dig("code", "content")}</pre>"
+            "<pre>#{CGI.escapeHTML(paragraph.dig("code", "content"))}</pre>"
           when 8
             paragraph.dig("heading", "nodes").map do |node|
               article_text_node(node)
@@ -291,7 +293,7 @@ module Source
 
       def buvid3
         data = http.cache(5.minutes).parsed_get("https://api.bilibili.com/x/web-frontend/getbuvid")
-        data.dig("data", "buvid")
+        data&.dig("data", "buvid")
       end
 
       memoize def post_json
