@@ -732,6 +732,11 @@ class Post < ApplicationRecord
     end
 
     def parent_id=(new_parent_id)
+      if new_parent_id.is_a?(String)
+        post = Post.find_by_url(new_parent_id)
+        new_parent_id = post.id if post
+      end
+
       super
 
       # Allow reversing a parent-child relationship by making the child into the parent without creating a loop.
@@ -1004,6 +1009,67 @@ class Post < ApplicationRecord
 
   concerning :SearchMethods do
     class_methods do
+      def find_by_url!(url)
+        if url.to_s.match?(%r{\Ahttps?://}i)
+          url = Danbooru::URL.parse(url) or raise ArgumentError
+
+          canonical = Danbooru::URL.parse!(Danbooru.config.canonical_url)
+          allowed_hosts = [canonical.host, *Danbooru.config.alternate_domains]
+
+          raise ArgumentError unless
+            allowed_hosts.include?(url.host) &&
+            url.scheme == canonical.scheme &&
+            url.url.inferred_port == canonical.url.inferred_port
+
+          path_segments = url.path_segments.drop(canonical.path_segments.size)
+        else
+          url = url.sub(%r{\A//+}, "/")
+          url = Addressable::URI.parse(url)
+          raise ArgumentError unless url.present? && url.host.nil?
+          path_segments = url.path.to_s.split("/").compact_blank
+        end
+
+        path = path_segments.join("/")
+        params = Rails.application.routes.recognize_path(path, method: :get)
+
+        posts = visible(CurrentUser.user)
+        uploads = Upload.visible(CurrentUser.user)
+        media_assets = MediaAsset.visible(CurrentUser.user)
+        upload_media_assets = UploadMediaAsset.visible(CurrentUser.user)
+
+        case params
+        in { controller: "posts", action: "show", id: id }
+          posts.find_by!(id:)
+        in { controller: "media_assets", action: "show", id: id }
+          posts.joins(:media_asset)
+            .merge(media_assets)
+            .find_by!(media_assets: { id: })
+        in { controller: "upload_media_assets", action: "show", upload_id: upload_id, id: id }
+          posts.joins(media_asset: { upload_media_assets: :upload })
+            .merge(media_assets)
+            .merge(uploads)
+            .find_by!(upload_media_assets: { upload_id:, id: })
+        in { controller: "upload_media_assets", action: "show", id: id }
+          posts.joins(media_asset: { upload_media_assets: :upload })
+            .merge(media_assets)
+            .merge(uploads)
+            .find_by!(upload_media_assets: { id: })
+        in { controller: "uploads", action: "show", id: id }
+          posts.joins(media_asset: { upload_media_assets: :upload })
+            .merge(media_assets)
+            .merge(uploads)
+            .find_by!(uploads: { id:, media_asset_count: 1 })
+        else
+          raise ArgumentError
+        end
+      end
+
+      def find_by_url(url)
+        find_by_url!(url)
+      rescue ArgumentError, ActiveRecord::RecordNotFound
+        nil
+      end
+
       # Return a set of up to N random posts. May return less if it can't find enough posts.
       #
       # Works by generating N random MD5s and picking the closest post below each MD5 (or above it if there aren't any
@@ -1337,8 +1403,10 @@ class Post < ApplicationRecord
         when /\A\d+\z/
           # XXX must use `attribute_matches(parent, :parent_id)` instead of `where(parent_id: parent)` so that `-parent:1` works
           where(id: parent).or(attribute_matches(parent, :parent_id))
-        else
+        when ""
           none
+        else
+          parent_matches(find_by_url(parent)&.id.to_s)
         end
       end
 
