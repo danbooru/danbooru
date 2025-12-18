@@ -1,4 +1,5 @@
 import UgoiraRenderer from './ugoira_renderer.js';
+import VideoRenderer from './video_renderer.js';
 
 export default class Ugoira {
   constructor(ugoiraContainer) {
@@ -14,7 +15,7 @@ export default class Ugoira {
 
     this._currentTime = 0;
     this._ugoira = new UgoiraRenderer(fileUrl, $canvas.get(0), frameDelays, { frameOffsets, fileSize });
-    this._sample = this.$ugoiraContainer.find("video").get(0);
+    this._sample = new VideoRenderer(this.$ugoiraContainer.find("video").get(0));
   }
 
   initialize() {
@@ -127,16 +128,20 @@ export default class Ugoira {
     this.pause();
     this.quality = quality;
 
+    const prevVideo = this.video;
     if (quality === "original") {
       this.video = this._ugoira;
-      this.duration = this._ugoira.duration || 0;
-      this.currentTime = this._sample.currentTime || 0;
-      this.video.load();
     } else if (quality === "sample") {
       this.video = this._sample;
-      this.duration = this._sample.duration || 0;
-      this.currentTime = this._ugoira.currentTime || 0;
+    }
+
+    if (this.video !== prevVideo) {
       this.video.load();
+      this.duration = this.video.duration || 0;
+
+      if (prevVideo) {
+        this.currentTime = prevVideo.currentTime;
+      }
     }
 
     this.resume();
