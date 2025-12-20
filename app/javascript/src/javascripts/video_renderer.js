@@ -5,10 +5,16 @@ export default class VideoRenderer {
     this._animationId = null;
     this._lastVideoTime = null;
     this._lastWallTime = null;
+
+    this.video.addEventListener("play", () => this.onPlay());
+    this.video.addEventListener("pause", () => this.onPause());
   }
 
-  play() {
-    this.video.play();
+  async play() {
+    await this.video.play();
+  }
+
+  onPlay() {
     this._lastVideoTime = null;
     this._lastWallTime = null;
     this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
@@ -16,6 +22,9 @@ export default class VideoRenderer {
 
   pause() {
     this.video.pause();
+  }
+
+  onPause() {
     cancelAnimationFrame(this._animationId);
   }
 
@@ -49,6 +58,26 @@ export default class VideoRenderer {
 
   get playbackRate() {
     return this.video.playbackRate;
+  }
+
+  get volume() {
+    return this.video.volume;
+  }
+
+  set volume(value) {
+    this.video.volume = value;
+  }
+
+  get muted() {
+    return this.video.muted;
+  }
+
+  set muted(value) {
+    this.video.muted = value;
+  }
+
+  get paused() {
+    return this.video.paused;
   }
 
   onAnimationFrame() {
