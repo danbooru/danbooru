@@ -3,11 +3,12 @@ export default class VideoRenderer {
     this.video = videoElement;
     this._currentTime = 0;
     this._animationId = null;
-    this._lastVideoTime = null;
-    this._lastWallTime = null;
+    this._previousTime = null;
 
-    this.video.addEventListener("play", () => this.onPlay());
+    this.video.addEventListener("playing", () => this.onPlay());
     this.video.addEventListener("pause", () => this.onPause());
+    this.video.addEventListener("waiting", () => this.onPause());
+    this.video.addEventListener("timeupdate", event => event.isTrusted && this.onTimeUpdate());
   }
 
   async play() {
@@ -15,8 +16,7 @@ export default class VideoRenderer {
   }
 
   onPlay() {
-    this._lastVideoTime = null;
-    this._lastWallTime = null;
+    this._previousTime = null;
     this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
   }
 
@@ -42,10 +42,12 @@ export default class VideoRenderer {
 
   set currentTime(time) {
     this.video.currentTime = time;
-    this._currentTime = time;
-    this._lastVideoTime = null;
-    this._lastWallTime = null;
-    this.triggerEvent("timeupdate");
+    this.onTimeUpdate();
+  }
+
+  onTimeUpdate() {
+    this._currentTime = this.video.currentTime;
+    this._previousTime = null;
   }
 
   get buffered() {
@@ -81,20 +83,12 @@ export default class VideoRenderer {
   }
 
   onAnimationFrame() {
-    const currentTime = this.video.currentTime;
     const now = performance.now() / 1000;
-
-    if (currentTime !== this._lastVideoTime || this._lastWallTime === null) {
-      this._lastVideoTime = currentTime;
-      this._lastWallTime = now;
-    }
-
-    const elapsedTime = (now - this._lastWallTime) * this.playbackRate;
-    const duration = this.duration || 0; // Might be NaN if video metadata isn't loaded yet.
-    this._currentTime = Math.min(currentTime + elapsedTime, duration);
-
+    const elapsedTime = (now - (this._previousTime ?? now)) * this.playbackRate;
+    this._currentTime = (this._currentTime + elapsedTime) % this.duration;
     this.triggerEvent("timeupdate");
 
+    this._previousTime = now;
     this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
   }
 
