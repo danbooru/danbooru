@@ -14,7 +14,8 @@ class VideoComponent < ApplicationComponent
     super
     @media_asset = media_asset
     @variants = [:sample, :full, :original].select { |q| media_asset.has_variant?(q) }
-    @default_quality = :original unless @variants.include?(default_quality)
+    @default_quality = default_quality.to_sym
+    @default_quality = :original unless @variants.include?(@default_quality)
     @html_options = html
   end
 
