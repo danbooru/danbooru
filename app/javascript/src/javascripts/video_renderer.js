@@ -2,8 +2,9 @@ export default class VideoRenderer {
   constructor(videoElement) {
     this.video = videoElement;
     this._currentTime = 0;
+    this._lastVideoTime = null;
+    this._lastWallTime = null;
     this._animationId = null;
-    this._previousTime = null;
 
     this.video.addEventListener("playing", () => this.onPlay());
     this.video.addEventListener("pause", () => this.onPause());
@@ -16,7 +17,7 @@ export default class VideoRenderer {
   }
 
   onPlay() {
-    this._previousTime = null;
+    this._lastWallTime = null;
     this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
   }
 
@@ -46,8 +47,12 @@ export default class VideoRenderer {
   }
 
   onTimeUpdate() {
-    this._currentTime = this.video.currentTime;
-    this._previousTime = null;
+    const videoTime = this.video.currentTime;
+    if (videoTime !== this._lastVideoTime) {
+      this._lastWallTime = null;
+      this._lastVideoTime = videoTime;
+      this._currentTime = videoTime;
+    }
   }
 
   get buffered() {
@@ -84,11 +89,16 @@ export default class VideoRenderer {
 
   onAnimationFrame() {
     const now = performance.now() / 1000;
-    const elapsedTime = (now - (this._previousTime ?? now)) * this.playbackRate;
-    this._currentTime = (this._currentTime + elapsedTime) % this.duration;
-    this.triggerEvent("timeupdate");
 
-    this._previousTime = now;
+    this.onTimeUpdate();
+    this._currentTime += (now - (this._lastWallTime ?? now)) * this.playbackRate;
+    this._lastWallTime = now;
+
+    if (isFinite(this.duration)) {
+      this._currentTime = Math.min(this._currentTime, this.duration);
+    }
+
+    this.triggerEvent("timeupdate");
     this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
   }
 
