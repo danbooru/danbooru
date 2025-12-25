@@ -1,6 +1,5 @@
 .tag-type-0 a, a.tag-type-0 {
   color: var(--general-tag-color);
-  color: var(--general-tag-hover-color);
 
   &:link, &:visited {
     color: var(--general-tag-color);
@@ -13,7 +12,6 @@
 
 .tag-type-1 a, a.tag-type-1 {
   color: var(--artist-tag-color);
-  color: var(--artist-tag-hover-color);
 
   &:link, &:visited {
     color: var(--artist-tag-color);
@@ -26,7 +24,6 @@
 
 .tag-type-3 a, a.tag-type-3 {
   color: var(--copyright-tag-color);
-  color: var(--copyright-tag-hover-color);
 
   &:link, &:visited {
     color: var(--copyright-tag-color);
@@ -39,7 +36,6 @@
 
 .tag-type-4 a, a.tag-type-4 {
   color: var(--character-tag-color);
-  color: var(--character-tag-hover-color);
 
   &:link, &:visited {
     color: var(--character-tag-color);
@@ -52,7 +48,6 @@
 
 .tag-type-5 a, a.tag-type-5 {
   color: var(--meta-tag-color);
-  color: var(--meta-tag-hover-color);
 
   &:link, &:visited {
     color: var(--meta-tag-color);

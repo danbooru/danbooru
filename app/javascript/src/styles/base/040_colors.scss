@@ -113,6 +113,7 @@ html, body[data-current-user-theme="light"] {
   --header-color: var(--grey-9);
   --link-color: var(--blue-5);
   --link-hover-color: var(--blue-3);
+  --focus-ring-color: var(--link-color);
 
   --default-border-color: var(--grey-1);
 
@@ -127,12 +128,15 @@ html, body[data-current-user-theme="light"] {
   --error-background-color: var(--red-1);
   --success-background-color: var(--green-0);
   --target-background: var(--yellow-0);
+  --selection-background-color: var(--link-color);
+  --target-text-background-color: var(--magenta-5);
 
   --subnav-menu-background-color: var(--blue-0);
   --responsive-menu-background-color: var(--blue-1);
   --card-background-color: var(--body-background-color);
 
   --chip-primary-background-color: var(--blue-0);
+  --chip-secondary-background-color: var(--white);
   --chip-red-background-color: var(--red-0);
   --chip-green-background-color: var(--green-0);
   --chip-blue-background-color: var(--blue-0);
@@ -142,7 +146,8 @@ html, body[data-current-user-theme="light"] {
   --chip-blue-border-color: var(--blue-2);
   --chip-yellow-border-color: var(--yellow-2);
 
-  --form-input-text-color: var(--text-color);
+  --badge-blue-background-color: var(--blue-5);
+
   --form-input-background: var(--body-background-color);
   --form-input-border-color: var(--grey-2);
   --form-input-placeholder-text-color: var(--grey-4);
@@ -156,6 +161,14 @@ html, body[data-current-user-theme="light"] {
   --form-button-hover-background: var(--grey-0);
   --form-button-hover-box-shadow-color: var(--grey-5);
   --form-button-active-background: var(--grey-2);
+
+  --checkbox-selected-color: var(--link-color);
+  --toggle-switch-unselected-color: var(--grey-3);
+  --toggle-switch-selected-color: var(--checkbox-selected-color);
+  --toggle-switch-indeterminate-color: var(--link-hover-color);
+  --toggle-switch-handle-color: var(--inverse-text-color);
+
+  --dtext-editor-menu-background-color: var(--blue-0);
 
   --button-text-color: var(--white);
   --button-disabled-color: var(--grey-5);
@@ -278,8 +291,15 @@ html, body[data-current-user-theme="light"] {
 
   --remove-favorite-button: var(--red-4);
 
-  --ugoira-seek-slider-background: var(--grey-0);
-  --ugoira-seek-slider-progressbar-background: var(--white);
+  --ugoira-background-color: var(--black);
+  --ugoira-controls-icon-color: var(--white);
+  --ugoira-controls-icon-hover-color: var(--azure-3);
+  --ugoira-controls-background-color: var(--grey-9);
+  --ugoira-controls-popup-hover-background-color: var(--grey-6);
+  --ugoira-controls-divider-color: var(--grey-6);
+  --ugoira-slider-playback-color: var(--azure-3);
+  --ugoira-slider-loading-color: var(--grey-3);
+  --ugoira-slider-unloaded-color: var(--grey-5);
 
   --keyboard-shortcut-color: var(--inverse-text-color);
   --keyboard-shortcut-background-color: var(--grey-6);
@@ -289,7 +309,9 @@ html, body[data-current-user-theme="light"] {
   --divider-border-hover-color: var(--grey-3);
 
   --jquery-ui-widget-content-background: var(--body-background-color);
-  --jquery-ui-widget-content-text-color: var(--text-color);
+  --dialog-titlebar-background-color: var(--grey-1);
+  --dialog-titlebar-color: var(--text-color);
+  --dialog-border-color: var(--dialog-titlebar-background-color);
 
   --notice-error-background: var(--red-1);
   --notice-error-border-color: var(--red-2);
@@ -325,6 +347,7 @@ html, body[data-current-user-theme="light"] {
   --meta-tag-color: var(--orange-3);
   --meta-tag-hover-color: var(--orange-2);
 
+  --user-owner-color: var(--user-admin-color);
   --user-admin-color: var(--red-5);
   --user-moderator-color: var(--character-tag-color);
   --user-builder-color: var(--copyright-tag-color);
@@ -332,7 +355,17 @@ html, body[data-current-user-theme="light"] {
   --user-gold-color: var(--meta-tag-color);
   --user-member-color: var(--general-tag-color);
   --user-restricted-color: var(--general-tag-color);
-  --user-banned-color: var(--grey-8);
+  --user-banned-color: var(--grey-7);
+
+  --user-owner-hover-color: var(--user-admin-hover-color);
+  --user-admin-hover-color: var(--red-4);
+  --user-moderator-hover-color: var(--character-tag-hover-color);
+  --user-builder-hover-color: var(--copyright-tag-hover-color);
+  --user-platinum-hover-color: var(--grey-4);
+  --user-gold-hover-color: var(--meta-tag-hover-color);
+  --user-member-hover-color: var(--general-tag-hover-color);
+  --user-restricted-hover-color: var(--general-tag-hover-color);
+  --user-banned-hover-color: var(--grey-6);
 
   --user-verified-email-color: var(--green-4);
   --user-unverified-email-color: var(--yellow-2);
@@ -356,6 +389,7 @@ html, body[data-current-user-theme="light"] {
   --header-color: var(--grey-1);
   --link-color: var(--azure-4);
   --link-hover-color: var(--azure-3);
+  --focus-ring-color: var(--link-color);
 
   --success-color: var(--green-4);
   --warning-color: var(--yellow-3);
@@ -370,12 +404,15 @@ html, body[data-current-user-theme="light"] {
   --error-background-color: var(--red-9);
   --success-background-color: var(--green-9);
   --target-background: var(--azure-8);
+  --selection-background-color: var(--blue-5);
+  --target-text-background-color: var(--magenta-5);
 
   --subnav-menu-background-color: var(--grey-8);
   --responsive-menu-background-color: var(--grey-8);
   --card-background-color: var(--grey-8);
 
   --chip-primary-background-color: var(--grey-8);
+  --chip-secondary-background-color: var(--grey-7);
   --chip-red-background-color: var(--red-8);
   --chip-green-background-color: var(--green-8);
   --chip-blue-background-color: var(--blue-8);
@@ -385,7 +422,8 @@ html, body[data-current-user-theme="light"] {
   --chip-blue-border-color: var(--blue-6);
   --chip-yellow-border-color: var(--yellow-6);
 
-  --form-input-text-color: var(--grey-2);
+  --badge-blue-background-color: var(--blue-5);
+
   --form-input-background: var(--grey-7);
   --form-input-border-color: var(--grey-5);
   --form-input-placeholder-text-color: var(--grey-3);
@@ -399,6 +437,14 @@ html, body[data-current-user-theme="light"] {
   --form-button-hover-background: var(--grey-0);
   --form-button-hover-box-shadow-color: var(--grey-5);
   --form-button-active-background: var(--grey-3);
+
+  --checkbox-selected-color: var(--blue-5);
+  --toggle-switch-unselected-color: var(--grey-5);
+  --toggle-switch-selected-color: var(--checkbox-selected-color);
+  --toggle-switch-indeterminate-color: var(--link-color);
+  --toggle-switch-handle-color: var(--inverse-text-color);
+
+  --dtext-editor-menu-background-color: var(--grey-8);
 
   --button-text-color: var(--white);
   --button-disabled-color: var(--grey-4);
@@ -508,8 +554,15 @@ html, body[data-current-user-theme="light"] {
 
   --remove-favorite-button: var(--red-4);
 
-  --ugoira-seek-slider-background: var(--grey-2);
-  --ugoira-seek-slider-progressbar-background: var(--grey-0);
+  --ugoira-background-color: var(--black);
+  --ugoira-controls-icon-color: var(--white);
+  --ugoira-controls-icon-hover-color: var(--azure-4);
+  --ugoira-controls-background-color: var(--grey-9);
+  --ugoira-controls-popup-hover-background-color: var(--grey-6);
+  --ugoira-controls-divider-color: var(--grey-6);
+  --ugoira-slider-playback-color: var(--azure-4);
+  --ugoira-slider-loading-color: var(--grey-3);
+  --ugoira-slider-unloaded-color: var(--grey-5);
 
   --keyboard-shortcut-color: var(--grey-0);
   --keyboard-shortcut-background-color: var(--grey-7);
@@ -518,8 +571,10 @@ html, body[data-current-user-theme="light"] {
   --divider-border-color: var(--grey-7);
   --divider-border-hover-color: var(--grey-6);
 
-  --jquery-ui-widget-content-text-color: var(--text-color);
   --jquery-ui-widget-content-background: var(--grey-8);
+  --dialog-titlebar-background-color: var(--grey-1);
+  --dialog-titlebar-color: var(--grey-9);
+  --dialog-border-color: var(--dialog-titlebar-background-color);
 
   --notice-error-background: var(--red-8);
   --notice-error-border-color: var(--red-7);
@@ -555,6 +610,7 @@ html, body[data-current-user-theme="light"] {
   --meta-tag-color: var(--yellow-2);
   --meta-tag-hover-color: var(--yellow-1);
 
+  --user-owner-color: var(--user-admin-color);
   --user-admin-color: var(--artist-tag-color);
   --user-moderator-color: var(--character-tag-color);
   --user-builder-color: var(--copyright-tag-color);
@@ -562,7 +618,17 @@ html, body[data-current-user-theme="light"] {
   --user-gold-color: var(--meta-tag-color);
   --user-member-color: var(--general-tag-color);
   --user-restricted-color: var(--general-tag-color);
-  --user-banned-color: var(--grey-6);
+  --user-banned-color: var(--grey-5);
+
+  --user-owner-hover-color: var(--user-admin-hover-color);
+  --user-admin-hover-color: var(--artist-tag-hover-color);
+  --user-moderator-hover-color: var(--character-tag-hover-color);
+  --user-builder-hover-color: var(--copyright-tag-hover-color);
+  --user-platinum-hover-color: var(--grey-2);
+  --user-gold-hover-color: var(--meta-tag-hover-color);
+  --user-member-hover-color: var(--general-tag-hover-color);
+  --user-restricted-hover-color: var(--general-tag-hover-color);
+  --user-banned-hover-color: var(--grey-4);
 
   --user-verified-email-color: var(--green-3);
   --user-unverified-email-color: var(--yellow-2);

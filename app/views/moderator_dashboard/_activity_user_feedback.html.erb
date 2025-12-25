@@ -14,7 +14,7 @@
         <td><%= link_to_user(record.user) %></td>
         <td>
           <div class="prose">
-            <%= format_text(record.body) %>
+            <%= record.dtext_body.format_text %>
           </div>
         </td>
         <td><%= time_ago_in_words_tagged(record.created_at) %></td>

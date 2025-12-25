@@ -9,8 +9,6 @@ class ForumUpdater
   end
 
   def update(message)
-    CurrentUser.scoped(User.system) do
-      forum_topic.forum_posts.create(body: message, skip_mention_notifications: true, creator: User.system)
-    end
+    forum_topic.forum_posts.create(body: message, skip_mention_notifications: true, creator: User.system)
   end
 end

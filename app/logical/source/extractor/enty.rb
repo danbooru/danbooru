@@ -5,10 +5,6 @@
 module Source
   class Extractor
     class Enty < Source::Extractor
-      def match?
-        Source::URL::Enty === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [parsed_url.to_s]
@@ -27,12 +23,8 @@ module Source
         urls.select { |url| Source::URL.parse(url)&.image_url? }
       end
 
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
-      end
-
       def profile_url
-        "https://enty.jp/#{tag_name}" if tag_name.present?
+        "https://enty.jp/#{username}" if username.present?
       end
 
       def profile_urls
@@ -40,11 +32,11 @@ module Source
         urls.filter_map { |url| Source::URL.parse(url).profile_url }.sort.uniq
       end
 
-      def tag_name
+      def username
         page&.css("#breadcrumbs-one > li:nth-child(1) > a")&.attr("href")&.to_s&.delete_prefix("/")
       end
 
-      def artist_name
+      def display_name
         page&.css("#breadcrumbs-one > li:nth-child(1) > a")&.text&.normalize_whitespace&.strip
       end
 
@@ -57,7 +49,7 @@ module Source
       end
 
       memoize def page
-        response = http.cache(1.minute).parsed_get(page_url)
+        http.cache(1.minute).parsed_get(page_url)
       end
 
       memoize def profile_page

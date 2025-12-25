@@ -33,11 +33,11 @@
       <% t.column :status %>
 
       <% t.column "Duration" do |job| %>
-        <%= duration_to_hhmmssms(job.job_duration) if job.job_duration %>
+        <%= duration_to_hhmmssms(job.runtime_latency) if job.runtime_latency %>
       <% end %>
 
       <% t.column "Queue Delay" do |job| %>
-        <%= duration_to_hhmmssms(job.queue_delay) if job.queue_delay %>
+        <%= duration_to_hhmmssms(job.queue_latency) if job.queue_latency %>
       <% end %>
 
       <% t.column "Created" do |job| %>
@@ -46,9 +46,12 @@
 
       <% t.column column: "control" do |job| %>
         <% if policy(job).update? %>
-          <%= link_to "Run", run_job_path(job), method: :put, remote: true %> |
-          <%= link_to "Retry", retry_job_path(job), method: :put, remote: true %> |
-          <%= link_to "Cancel", cancel_job_path(job), method: :put, remote: true %> |
+          <%= link_to "Run", run_job_path(job), method: :put, remote: true %>
+          <%= subnav_divider %>
+          <%= link_to "Retry", retry_job_path(job), method: :put, remote: true %>
+          <%= subnav_divider %>
+          <%= link_to "Cancel", cancel_job_path(job), method: :put, remote: true %>
+          <%= subnav_divider %>
           <%= link_to "Delete", job_path(job), method: :delete, remote: true %>
         <% end %>
       <% end %>
@@ -57,3 +60,11 @@
     <%= numbered_paginator(@jobs) %>
   </div>
 </div>
+
+<% content_for(:secondary_links) do %>
+  <%= subnav_link_to "Listing", jobs_path %>
+
+  <% if policy(BackgroundJob).can_view_good_job_dashboard? %>
+    <%= subnav_link_to "Good Jobs", good_job_path %>
+  <% end %>
+<% end %>

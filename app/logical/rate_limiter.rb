@@ -13,15 +13,16 @@
 class RateLimiter
   class RateLimitError < StandardError; end
 
-  attr_reader :action, :keys, :cost, :rate, :burst, :enabled
+  attr_reader :action, :keys, :cost, :rate, :burst, :minimum_points, :enabled
   alias_method :enabled?, :enabled
 
-  def initialize(action, keys = ["*"], cost: 1, rate: 1, burst: 1, enabled: Danbooru.config.rate_limits_enabled?.to_s.truthy?)
+  def initialize(action, keys = ["*"], cost: 1, rate: 1, burst: 1, minimum_points: -30, enabled: Danbooru.config.rate_limits_enabled?.to_s.truthy?)
     @action = action
     @keys = keys
     @cost = cost
     @rate = rate
     @burst = burst
+    @minimum_points = minimum_points
     @enabled = enabled
   end
 
@@ -34,11 +35,21 @@ class RateLimiter
   # @param burst [Float] The burst limit (the maximum number of actions you can
   #   perform in one burst before being rate limited).
   # @param user [User] The current user.
-  # @param ip_addr [String] The user's IP address.
+  # @param request [ActionDispatch::Request] The HTTP request.
   # @return [RateLimit] The rate limit for the action.
-  def self.build(action:, rate:, burst:, user:, ip_addr:)
-    keys = [(user.cache_key unless user.is_anonymous?), "ip/#{ip_addr.to_s}"].compact
-    RateLimiter.new(action, keys, rate: rate, burst: burst)
+  def self.build(action:, user:, request: nil, **options)
+    ip_addr = Danbooru::IpAddress.parse(request.remote_ip) if request&.remote_ip.present?
+
+    keys = []
+    keys << user.cache_key unless user.is_anonymous?
+    keys << "ip/#{ip_addr.subnet.to_s}" if ip_addr.present?
+    keys << "session/#{request.session.id}" if request&.session.present?
+
+    RateLimiter.new(action, keys, **options)
+  end
+
+  def self.limited?(...)
+    build(...).limited?
   end
 
   # @raise [RateLimitError] if the action is limited
@@ -58,6 +69,6 @@ class RateLimiter
 
   # Update or create the rate limits associated with this action.
   def rate_limits
-    @rate_limits ||= RateLimit.create_or_update!(action: action, keys: keys, cost: cost, rate: rate, burst: burst)
+    @rate_limits ||= RateLimit.create_or_update!(action: action, keys: keys, cost: cost, rate: rate, burst: burst, minimum_points: minimum_points)
   end
 end

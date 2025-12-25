@@ -1,10 +1,10 @@
 source 'https://rubygems.org/'
 
-ruby "~> 3.2.1"
+ruby "~> 3.4.5"
 
-gem 'dotenv-rails', :require => "dotenv/rails-now"
+gem 'dotenv-rails', require: "dotenv/load"
 
-gem "rails", "~> 7.0"
+gem "rails", "~> 8.0"
 gem "pg"
 gem "simple_form"
 gem "sanitize"
@@ -14,16 +14,16 @@ gem 'bcrypt', :require => "bcrypt"
 gem 'stripe'
 gem 'aws-sdk-sqs', '~> 1'
 gem 'responders'
-gem 'dtext_rb', git: "https://github.com/danbooru/dtext_rb.git", require: "dtext"
+gem 'dtext_rb', require: "dtext"
+# gem 'dtext_rb', path: "lib/dtext_rb", require: "dtext"
 gem 'memoist'
 gem 'daemons'
 gem 'oauth2'
-gem 'bootsnap'
+gem 'bootsnap', require: false
 gem 'addressable'
 gem 'rakismet'
-gem 'recaptcha', require: "recaptcha/rails"
 gem 'activemodel-serializers-xml'
-gem 'shakapacker', "< 6.5.6"
+gem 'shakapacker'
 gem 'rake'
 gem 'redis'
 gem 'builder'
@@ -32,8 +32,6 @@ gem 'puma'
 gem 'scenic'
 gem 'ipaddress_2'
 gem 'http'
-gem 'activerecord-hierarchical_query'
-gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
 gem 'mail'
 gem 'nokogiri'
@@ -42,31 +40,40 @@ gem 'tzinfo-data'
 gem 'hsluv'
 gem 'google-cloud-bigquery', require: "google/cloud/bigquery"
 gem 'google-cloud-storage', require: "google/cloud/storage"
-gem 'ed25519'
-gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
 gem 'clockwork'
 gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
-gem "parallel"
+gem "rackup"
 gem "ffi"
 gem "rbtrace"
 gem "good_job"
 gem "crass"
 gem "public_suffix"
-gem "elastic-apm"
 gem "debug"
-gem "ffaker"
-gem "composite_primary_keys"
+gem "faker"
 gem "resolv"
 gem "rover-df"
 gem "ffi-libarchive"
 gem "pry-rails"
 gem "drb"
+gem "net-sftp"
+gem "rbnacl"
+gem "x25519"
+gem "ed25519"
+gem "bcrypt_pbkdf"
+gem "connection_pool"
+gem "rotp"
+gem "rqrcode"
+gem "kramdown"
+gem "abbrev"
+gem "rubyzip", require: "zip"
+gem "webrick"
+gem "useragent"
 
 group :development do
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
-  gem 'meta_request'
+  #gem 'meta_request'
   gem 'rack-mini-profiler'
   gem 'stackprof'
   gem 'flamegraph'
@@ -75,8 +82,8 @@ group :development do
   gem 'binding_of_caller'
   gem 'benchmark-ips', require: "benchmark/ips"
   gem 'listen'
-  gem 'solargraph'
   gem 'derailed_benchmarks'
+  gem 'ruby-lsp-shoulda-context', require: false
 end
 
 group :test do

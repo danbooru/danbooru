@@ -3,9 +3,6 @@
 class FavoritesController < ApplicationController
   respond_to :js, :json, :html, :xml
 
-  rate_limit :create,  rate: 1.0/1.second, burst: 200
-  rate_limit :destroy, rate: 1.0/1.second, burst: 200
-
   def index
     post_id = params[:post_id] || params[:search][:post_id]
     user_id = params[:user_id] || params[:search][:user_id]
@@ -23,8 +20,7 @@ class FavoritesController < ApplicationController
     @favorite.save
     @post = @favorite.post.reload
 
-    flash.now[:notice] = "You have favorited this post"
-    respond_with(@post)
+    respond_with(@post, notice: "You have favorited this post")
   end
 
   def destroy
@@ -32,7 +28,6 @@ class FavoritesController < ApplicationController
     @favorite.destroy
     @post = @favorite.post.reload
 
-    flash.now[:notice] = "You have unfavorited this post"
-    respond_with(@post)
+    respond_with(@post, notice: "You have unfavorited this post")
   end
 end

@@ -12,12 +12,8 @@ class PostReplacementsController < ApplicationController
     @post_replacement = authorize PostReplacement.new(creator: CurrentUser.user, post_id: params[:post_id], **permitted_attributes(PostReplacement))
     @post_replacement.save
 
-    if request.format.html? && @post_replacement.errors.any?
-      flash[:notice] = @post_replacement.errors.full_messages.join("; ")
-      redirect_to @post_replacement.post
-    else
-      flash[:notice] = "Post replaced"
-      respond_with(@post_replacement, location: @post_replacement.post)
+    respond_with(@post_replacement, notice: "Post replaced") do |format|
+      format.html { redirect_to @post_replacement.post }
     end
   end
 

@@ -198,6 +198,54 @@ class PostTest < ActiveSupport::TestCase
 
   context "Parenting:" do
     context "Assigning a parent to a post" do
+      should "not allow parent IDs that don't exist" do
+        post = create(:post)
+        post.update(parent_id: 999_999_999)
+
+        assert_equal(["post does not exist"], post.errors[:parent])
+      end
+
+      should "not allow a post to be its own parent" do
+        post = create(:post)
+        post.update(parent_id: post.id)
+
+        assert_equal(["Post cannot have itself as a parent"], post.errors[:base])
+      end
+
+      should "not allow a post to be its own great-grandparent" do
+        p1 = create(:post)
+        p2 = create(:post)
+        p3 = create(:post)
+
+        p1.update(parent: p2)
+        p2.update(parent: p3)
+        p3.update(parent: p1)
+
+        assert_equal(["Post cannot have itself as a parent"], p3.errors[:base])
+      end
+
+      should "not allow parent-child relationships more than 4 levels deep" do
+        p1 = create(:post, parent: nil)
+        p2 = create(:post, parent: p1)
+        p3 = create(:post, parent: nil)
+        p4 = create(:post, parent: p3)
+        p5 = create(:post, parent: p4)
+
+        p3.update(parent: p2)
+
+        assert_equal(["Post cannot have a parent-child chain more than 4 levels deep"], p3.errors[:base])
+      end
+
+      should "not allow a post to have too many children" do
+        p1 = create(:post)
+        p2 = create(:post)
+        create_list(:post, Post::MAX_CHILD_POSTS, parent: p1)
+
+        p2.update(parent: p1)
+
+        assert_equal(["post ##{p1.id} cannot have more than 30 child posts"], p2.errors[:base])
+      end
+
       should "update the has_children flag on the parent" do
         p1 = FactoryBot.create(:post)
         assert(!p1.has_children?, "Parent should not have any children")
@@ -216,6 +264,17 @@ class PostTest < ActiveSupport::TestCase
         p2.reload
         assert(!p1.has_children?, "Old parent should not have a child")
         assert(p2.has_children?, "New parent should have a child")
+      end
+
+      should "swap the parent and child when setting the parent to the child" do
+        parent = create(:post)
+        child = create(:post, parent: parent)
+        parent.update!(parent: child)
+
+        assert_equal(child.reload.id, parent.reload.parent_id)
+        assert_nil(child.parent_id)
+        assert_equal(false, parent.has_children?)
+        assert_equal(true, child.has_children?)
       end
     end
 
@@ -371,8 +430,11 @@ class PostTest < ActiveSupport::TestCase
       context "with a new tag" do
         should "create the new tag" do
           tag1 = create(:tag, name: "foo", post_count: 100, category: Tag.categories.character)
-          create(:post, tag_string: "foo bar")
+          post = create(:post, tag_string: "foo bar")
           tag2 = Tag.find_by_name("bar")
+
+          assert_equal(1, post.tag_count_general)
+          assert_equal(1, post.tag_count_character)
 
           assert_equal(101, tag1.reload.post_count)
           assert_equal(Tag.categories.character, tag1.category)
@@ -386,8 +448,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "with a banned artist" do
         should "ban the post" do
-          artist = create(:artist)
-          implication = create(:tag_implication, antecedent_name: artist.name, consequent_name: "banned_artist")
+          artist = create(:artist, is_banned: true)
           post = create(:post, tag_string: artist.name)
 
           assert_equal(true, post.is_banned?)
@@ -547,6 +608,8 @@ class PostTest < ActiveSupport::TestCase
           @post.update!(tag_string: "asd char:a_bad_tag")
 
           assert_equal("asd", @post.reload.tag_string)
+          assert_equal(0, @post.tag_count_character)
+          assert_equal(1, @post.tag_count_general)
           assert_match(/The following tags are deprecated and could not be added: \[\[a_bad_tag\]\]/, @post.warnings.full_messages.join)
         end
 
@@ -562,11 +625,13 @@ class PostTest < ActiveSupport::TestCase
       context "tagged with a metatag" do
         context "for a tag category prefix" do
           should "set the category of a new tag" do
-            create(:post, tag_string: "char:chen")
+            post = create(:post, tag_string: "char:chen")
             tag = Tag.find_by_name("chen")
 
             assert_equal(Tag.categories.character, tag.category)
             assert_equal(0, tag.versions.count)
+            assert_equal(1, post.tag_count_character)
+            assert_equal(0, post.tag_count_general)
           end
 
           should "change the category of an existing tag" do
@@ -575,6 +640,8 @@ class PostTest < ActiveSupport::TestCase
             post = as(user) { create(:post, tag_string: "char:hoge") }
 
             assert_equal(Tag.categories.character, tag.reload.category)
+            assert_equal(1, post.tag_count_character)
+            assert_equal(0, post.tag_count_general)
 
             assert_equal(2, tag.versions.count)
             assert_equal(1, tag.first_version.version)
@@ -588,6 +655,26 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(Tag.categories.character, tag.last_version.category)
           end
 
+          should "update the tag category counts for all posts with the tag" do
+            post1 = create(:post, tag_string: "chen")
+            post2 = create(:post, tag_string: "chen")
+
+            assert_equal(1, post1.tag_count_general)
+            assert_equal(0, post1.tag_count_character)
+            assert_equal(1, post2.tag_count_general)
+            assert_equal(0, post2.tag_count_character)
+
+            post1.update!(tag_string: "char:chen")
+            perform_enqueued_jobs(only: UpdateTagCategoryPostCountsJob)
+            post1.reload
+            post2.reload
+
+            assert_equal(0, post1.tag_count_general)
+            assert_equal(1, post1.tag_count_character)
+            assert_equal(0, post2.tag_count_general)
+            assert_equal(1, post2.tag_count_character)
+          end
+
           should "not change the category for an aliased tag" do
             create(:tag_alias, antecedent_name: "hoge", consequent_name: "moge")
             post = create(:post, tag_string: "char:hoge")
@@ -595,6 +682,8 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(["moge"], post.tag_array)
             assert_equal(Tag.categories.general, Tag.find_by_name("moge").category)
             assert_equal(Tag.categories.general, Tag.find_by_name("hoge").category)
+            assert_equal(0, post.tag_count_character)
+            assert_equal(1, post.tag_count_general)
           end
 
           should "not raise an exception for an invalid tag name" do
@@ -603,6 +692,9 @@ class PostTest < ActiveSupport::TestCase
             assert_match(/Couldn't add tag: 'copy:blah' cannot begin with 'copy:'/, post.warnings[:base].join("\n"))
             assert_equal(["tagme"], post.tag_array)
             assert_equal(false, Tag.exists?(name: "copy:blah"))
+            assert_equal(0, post.tag_count_character)
+            assert_equal(0, post.tag_count_copyright)
+            assert_equal(1, post.tag_count_general)
           end
 
           should "not raise an exception for char:newpool:blah" do
@@ -611,6 +703,8 @@ class PostTest < ActiveSupport::TestCase
             assert_match(/Couldn't add tag: 'newpool:blah' cannot begin with 'newpool:'/, post.warnings[:base].join("\n"))
             assert_equal(["tagme"], post.tag_array)
             assert_equal(false, Tag.exists?(name: "newpool:blah"))
+            assert_equal(0, post.tag_count_character)
+            assert_equal(1, post.tag_count_general)
           end
         end
 
@@ -676,7 +770,17 @@ class PostTest < ActiveSupport::TestCase
 
           should "not allow self-parenting" do
             @post.update(:tag_string => "parent:#{@post.id}")
-            assert_nil(@post.parent_id)
+            assert_equal(["Post cannot have itself as a parent"], @post.errors[:base])
+          end
+
+          should "not allow parent IDs that don't exist" do
+            @post.update(parent: @parent)
+            assert_equal(@parent.id, @post.parent_id)
+
+            @post.update(tag_string: "test parent:999999999")
+            assert_equal(["post does not exist"], @post.errors[:parent])
+            assert_equal("tag1 tag2", @post.reload.tag_string)
+            assert_equal(@parent.id, @post.parent_id)
           end
 
           should "clear the parent with parent:none" do
@@ -701,6 +805,27 @@ class PostTest < ActiveSupport::TestCase
 
             @post.update(:tag_string => "-parent:#{@parent.id}")
             assert_nil(@post.parent_id)
+          end
+
+          should "swap the parent and child when setting the parent to the child" do
+            parent = create(:post)
+            child = create(:post, parent: parent)
+            parent.update!(tag_string: "parent:#{child.id}")
+
+            assert_equal(child.reload.id, parent.reload.parent_id)
+            assert_nil(child.parent_id)
+            assert_equal(false, parent.has_children?)
+            assert_equal(true, child.has_children?)
+          end
+
+          should "not update the child if updating the parent fails" do
+            parent = create(:post)
+            child = create(:post, parent: parent)
+            parent.update(rating: "does_not_exist", tag_string: "parent:#{child.id}")
+
+            assert_equal(true, parent.errors.present?)
+            assert_nil(parent.reload.parent_id)
+            assert_equal(parent.id, child.parent_id)
           end
         end
 
@@ -798,25 +923,25 @@ class PostTest < ActiveSupport::TestCase
             @post.update!(tag_string: " a b c ")
             assert_equal("a b c", @post.tag_string)
 
-            @post.update!(tag_string: 'newpool:b\  a')
+            @post.update!(tag_string: 'newpool:b123\  a')
             assert_equal("a", @post.tag_string)
-            assert_equal("b", Pool.last.name)
+            assert_equal("b123", Pool.last.name)
 
-            @post.update!(tag_string: 'a newpool:c\ ')
+            @post.update!(tag_string: 'a newpool:c123\ ')
             assert_equal("a", @post.tag_string)
-            assert_equal("c", Pool.last.name)
+            assert_equal("c123", Pool.last.name)
 
-            @post.update!(tag_string: 'a newpool:d\  ')
+            @post.update!(tag_string: 'a newpool:d123\  ')
             assert_equal("a", @post.tag_string)
-            assert_equal("d", Pool.last.name)
+            assert_equal("d123", Pool.last.name)
 
             @post.update!(tag_string: 'newpool:e\ a')
             assert_equal("tagme", @post.tag_string)
             assert_equal("e_a", Pool.last.name)
 
-            @post.update!(tag_string: 'a newpool:f\\')
+            @post.update!(tag_string: 'a newpool:f123\\')
             assert_equal("a", @post.tag_string)
-            assert_equal("f\\", Pool.last.name)
+            assert_equal("f123\\", Pool.last.name)
           end
         end
 
@@ -1088,6 +1213,12 @@ class PostTest < ActiveSupport::TestCase
             assert_equal("foo bar baz", @post.source)
           end
 
+          should 'set the source with source:foo\u3000bar' do
+            @post.update(:tag_string => "source:foo\u3000bar")
+            assert_equal("foo", @post.source)
+            assert_equal("bar non-web_source", @post.tag_string)
+          end
+
           should "clear the source with source:none" do
             @post.update(:source => "foobar")
             @post.update(:tag_string => "source:none")
@@ -1346,6 +1477,16 @@ class PostTest < ActiveSupport::TestCase
           assert_equal("bad_link tag1 tag2", @post.tag_string)
         end
 
+        should "not add the bad_link tag for recognized but unhandled sources" do
+          @post.update!(tag_string: "tag1 tag2", source: "https://i.etsystatic.com/isbl/ef769d/65460303/isbl_3360x840.65460303_idqpnurw.jpg")
+          assert_equal("tag1 tag2", @post.tag_string)
+        end
+
+        should "not remove bad_link tag for recognized but unhandled sources" do
+          @post.update!(tag_string: "bad_link tag1 tag2", source: "https://i.etsystatic.com/isbl/ef769d/65460303/isbl_3360x840.65460303_idqpnurw.jpg")
+          assert_equal("bad_link tag1 tag2", @post.tag_string)
+        end
+
         should "remove the bad_link tag when using the source: metatag" do
           @post.update!(tag_string: "aaa source:https://pbs.twimg.com/media/FQjQA1mVgAMcHLv.jpg:orig")
           assert_equal("aaa bad_link", @post.tag_string)
@@ -1380,6 +1521,16 @@ class PostTest < ActiveSupport::TestCase
           assert_equal("bad_source tag1 tag2", @post.tag_string)
         end
 
+        should "not add the bad_source tag for recognized but unhandled sources" do
+          @post.update!(tag_string: "tag1 tag2", source: "https://www.etsy.com/shop/yeurei")
+          assert_equal("tag1 tag2", @post.tag_string)
+        end
+
+        should "not remove the bad_source tag for recognized but unhandled sources" do
+          @post.update!(tag_string: "bad_source tag1 tag2", source: "https://www.etsy.com/shop/yeurei")
+          assert_equal("bad_source tag1 tag2", @post.tag_string)
+        end
+
         should "remove the bad_source tag when using the source: metatag" do
           @post.update!(tag_string: "aaa source:https://twitter.com/danboorubot/")
           assert_equal("aaa bad_source", @post.tag_string)
@@ -1399,7 +1550,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a post with a https:// source" do
         should "remove the non-web_source tag" do
-          @post.update!(source: "https://www.google.com", tag_string: "non-web_source")
+          @post.update!(source: "https://www.example.com", tag_string: "non-web_source")
           @post.save!
           assert_equal("tagme", @post.tag_string)
         end
@@ -1708,14 +1859,8 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "with a source" do
-        context "that contains unicode characters" do
-          should "normalize the source to NFC form" do
-            source1 = "poke\u0301mon" # pokémon (nfd form)
-            source2 = "pok\u00e9mon"  # pokémon (nfc form)
-            @post.update!(source: source1)
-            assert_equal(source2, @post.source)
-          end
-        end
+        should normalize_attribute(:source).from("pokémon".unicode_normalize(:nfd)).to("pokémon".unicode_normalize(:nfc))
+        should normalize_attribute(:source).from(nil).to("")
 
         context "that is not from pixiv" do
           should "clear the pixiv id" do
@@ -1741,6 +1886,13 @@ class PostTest < ActiveSupport::TestCase
           should "not raise an exception" do
             @post.update!(source: "Blog.")
             assert_equal("Blog.", @post.source)
+          end
+        end
+
+        context "that is an IP address" do
+          should "not raise an exception" do
+            @post.update!(source: "http://127.0.0.1/image.jpg")
+            assert_equal("http://127.0.0.1/image.jpg", @post.source)
           end
         end
       end
@@ -1912,12 +2064,6 @@ class PostTest < ActiveSupport::TestCase
         assert(@parent.votes.where(user: @user1).exists?)
         assert_equal(2, @parent.score)
       end
-    end
-  end
-
-  context "Pools:" do
-    setup do
-      SqsService.any_instance.stubs(:send_message)
     end
   end
 

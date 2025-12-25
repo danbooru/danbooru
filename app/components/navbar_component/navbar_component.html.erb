@@ -1,0 +1,50 @@
+<header id="top" class="md:space-y-0 mt-2" x-data="{ menuOpen: false }">
+  <div class="flex items-center justify-between mx-8 sm:mx-2 text-xxl">
+    <div id="app-name-header" class="inline-flex items-center gap-2">
+      <%= link_to image_pack_tag("static/danbooru-logo-128x128.png", class: "h-9 hover:brightness-125"), main_app.root_path, id: "app-logo" %>
+      <%= link_to Danbooru.config.app_name, main_app.root_path, id: "app-name", class: "font-header font-bold leading-none" %>
+    </div>
+
+    <a class="mobile-only cursor-pointer" x-on:click="menuOpen = !menuOpen">
+      <%= menu_icon(class: "block w-6", "x-show": "!menuOpen") %>
+      <%= close_icon(class: "block w-6", "x-show": "menuOpen", "x-cloak": true) %>
+    </a>
+  </div>
+
+  <nav id="nav" class="desktop-only mt-2" x-bind:class="{ 'desktop-only': !menuOpen }">
+    <div id="main-menu" class="flex flex-wrap items-center px-5 sm:p-2">
+      <% if current_user.is_anonymous? %>
+        <%= nav_link_to("Login", main_app.login_path(url: request.fullpath), class: "font-bold", rel: "nofollow") %>
+      <% else %>
+        <%= nav_link_to("My Account #{unread_dmail_indicator(current_user)}", main_app.profile_path) %>
+      <% end %>
+
+      <%= nav_link_to("Posts", main_app.posts_path) %>
+      <%= nav_link_to("Comments", main_app.comments_path) if Danbooru.config.comments_enabled?.to_s.truthy? %>
+      <%= nav_link_to("Notes", main_app.notes_path) %>
+      <%= nav_link_to("Artists", main_app.artists_path) %>
+      <%= nav_link_to("Tags", main_app.tags_path) %>
+      <%= nav_link_to("Pools", main_app.gallery_pools_path) %>
+      <%= nav_link_to("Wiki", main_app.wiki_page_path("help:home")) %>
+      <%= nav_link_to("Forum", main_app.forum_topics_path, class: ("forum-updated font-italic" if current_user.has_forum_been_updated?)) if Danbooru.config.forum_enabled?.to_s.truthy? %>
+
+      <% if current_user.is_moderator? %>
+        <% if ModerationReport.pending.count > 0 %>
+          <%= nav_link_to("Reports #{tag.span(ModerationReport.pending.count, class: "badge-blue")}".html_safe, main_app.moderation_reports_path(search: { status: "pending" }), id: "reports") %>
+        <% else %>
+          <%= nav_link_to("Reports", main_app.moderation_reports_path) %>
+        <% end %>
+
+        <%= nav_link_to("Dashboard", main_app.moderator_dashboard_path) %>
+      <% end %>
+
+      <%= nav_link_to("More »", main_app.site_map_path) %>
+    </div>
+
+    <% if content_for?(:secondary_links) %>
+      <div id="subnav-menu" class="flex flex-wrap items-center px-5 sm:p-2">
+        <%= content_for :secondary_links %>
+      </div>
+    <% end %>
+  </nav>
+</header>

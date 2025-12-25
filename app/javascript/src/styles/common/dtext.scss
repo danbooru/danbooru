@@ -1,12 +1,22 @@
-div.prose {
+.prose {
+  --max-sticker-size: 64px;
+  --max-emoji-size: 24px;
+  --paragraph-spacing: 0.75rem;
+
   word-break: break-word;
+  text-wrap: pretty;
+
+  p, ul, pre, blockquote, details, div:where(.spoiler), table, h1, h2, h3, h4, h5, h6, article, media-gallery {
+    margin-bottom: var(--paragraph-spacing);
+  }
+
+  // XXX Don't give emojis bottom margins when the comment ends in a run of block emojis.
+  emoji[data-mode="block"]:has(~ :not(emoji[data-mode="block"])) {
+    margin-bottom: var(--paragraph-spacing);
+  }
 
   *:last-child {
     margin-bottom: 0;
-  }
-
-  p, ul, pre, blockquote, details, div.spoiler, table, h1, h2, h3, h4, h5, h6 {
-    margin-bottom: 0.75rem;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -29,7 +39,7 @@ div.prose {
     font-size: var(--text-md);
   }
 
-  hr {
+  hr:not(.ugoira-container *) {
     // Same total height as <p> element: 0.75rem = <p> bottom margin, 1.25em = <p> line-height.
     height: 1px;
     margin: calc((0.75rem + 1.25em - 1px) / 2) auto;
@@ -58,20 +68,21 @@ div.prose {
     &[align="justify"] { text-align: justify !important; }
   }
 
-  ul {
+  ul:not(.ugoira-container *) {
     margin-left: 1em;
 
     ul {
+      margin-left: 1em;
       margin-bottom: 0;
+    }
+
+    li {
+      list-style-type: disc;
     }
   }
 
-  li {
-    list-style-type: disc;
-  }
-
   code, pre {
-    font: var(--monospace-font);
+    font-family: var(--monospace-font);
     background: var(--dtext-code-background);
   }
 
@@ -111,6 +122,9 @@ div.prose {
     text-decoration: dotted underline;
   }
 
+  /* Make the underline color match the text color in underlined links. */
+  u a { text-decoration: underline; }
+
   .spoiler:not(:hover), .spoiler:not(:hover) * {
     color: transparent !important;
   }
@@ -132,6 +146,78 @@ div.prose {
 
   .spoiler {
     background: var(--dtext-spoiler-background-color);
+  }
+
+  .spoiler:not(:hover) > * {
+    visibility: hidden;
+  }
+
+  media-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--media-gallery-size), 1fr));
+    gap: 0.5rem;
+
+    --media-gallery-size: 180px;
+
+    @media (width <= 660px) {
+      --media-gallery-size: 160px;
+    }
+
+    article {
+      --media-embed-size: var(--media-gallery-size);
+
+      width: 100%;
+      margin: 0;
+
+      .media-embed-image {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: var(--media-embed-size);
+      }
+    }
+  }
+
+  article {
+    --media-embed-size: 270px;
+
+    .media-embed-image {
+      img, video, canvas {
+        border-radius: 0.25rem;
+        max-width: 100%;
+        max-height: var(--media-embed-size);
+        width: auto;
+        height: auto;
+      }
+    }
+
+    .media-embed-caption {
+      line-height: 1.4;
+    }
+  }
+
+  emoji[data-mode="block"] {
+    display: inline-block;
+    font-size: var(--max-sticker-size);
+    vertical-align: middle;
+    line-height: 1;
+  }
+
+  emoji[data-mode="inline"] {
+    display: inline-block;
+    font-size: var(--max-emoji-size);
+    vertical-align: text-bottom;
+    line-height: 1;
+  }
+
+  emoji[data-mode="inline"] img {
+    max-height: var(--max-emoji-size);
+    max-width: var(--max-emoji-size);
+  }
+
+  emoji[data-mode="block"] img {
+    max-height: var(--max-sticker-size);
+    max-width: var(--max-sticker-size);
   }
 
   details {
@@ -185,29 +271,5 @@ div.prose {
     > div {
       padding: 1rem;
     }
-  }
-}
-
-div.dtext-preview {
-  display: none;
-
-  ul {
-    margin-left: 1em;
-  }
-}
-
-div#dtext-help {
-  td {
-    > *, div.spoiler p {
-      margin: 0;
-    }
-
-    h1, h6 {
-      padding: 0;
-    }
-  }
-
-  #dtext-help-footnote {
-    margin: 1em 0 0 0;
   }
 }

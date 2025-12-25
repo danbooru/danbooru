@@ -32,18 +32,18 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "list all versions for search[changed_tags]" do
-        get post_versions_path, as: :json, params: { search: { changed_tags: "1" }}
+        get post_versions_path(search: { changed_tags: "1" }), as: :json
         assert_response :success
         assert_equal @post.versions[1].id, response.parsed_body[1]["id"].to_i
         assert_equal @post.versions[2].id, response.parsed_body[0]["id"].to_i
 
-        get post_versions_path, as: :json, params: { search: { changed_tags: "1 2" }}
+        get post_versions_path(search: { changed_tags: "1 2" }), as: :json
         assert_response :success
         assert_equal @post.versions[1].id, response.parsed_body[0]["id"].to_i
       end
 
       should "list all versions for search[tag_matches]" do
-        get post_versions_path, as: :json, params: { search: { tag_matches: "tagme" }}
+        get post_versions_path(search: { tag_matches: "tagme" }), as: :json
         assert_response :success
         assert_equal @post.versions[0].id, response.parsed_body[0]["id"].to_i
         assert_equal 1, response.parsed_body.length

@@ -42,6 +42,9 @@ Layout/SpaceInsideBlockBraces:
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 
+Lint/DuplicateBranch:
+  Enabled: false
+
 Metrics/AbcSize:
   Enabled: false
 
@@ -98,6 +101,9 @@ Rails/HasManyOrHasOneDependent:
 Rails/HttpStatus:
   EnforcedStyle: numeric
 
+Rails/I18nLocaleTexts:
+  Enabled: false
+
 Rails/InverseOf:
   Enabled: false
 
@@ -105,6 +111,9 @@ Style/Alias:
   EnforcedStyle: prefer_alias_method
 
 Style/AsciiComments:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
   Enabled: false
 
 Style/CommentAnnotation:
@@ -122,6 +131,9 @@ Style/EmptyElse:
 
 Style/EmptyMethod:
   EnforcedStyle: expanded
+
+Style/FormatString:
+  Enabled: false
 
 Style/FormatStringToken:
   Enabled: false
@@ -187,6 +199,9 @@ Style/SymbolProc:
 
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: consistent_comma
 
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: consistent_comma

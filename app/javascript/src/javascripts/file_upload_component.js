@@ -1,6 +1,6 @@
 import Dropzone from 'dropzone';
-import Utility from "./utility";
-import capitalize from "lodash/capitalize";
+import { delay, uploadError } from "./utility";
+import Notice from "./notice";
 
 export default class FileUploadComponent {
   static POLL_DELAY = 250;
@@ -68,7 +68,7 @@ export default class FileUploadComponent {
     dropzone.on("error", (file, msg) => {
       this.$dropzone.find(".dropzone-hint").show();
       dropzone.removeFile(file);
-      Utility.error(msg);
+      Notice.error(msg);
     });
 
     return dropzone;
@@ -108,7 +108,7 @@ export default class FileUploadComponent {
     this.loadingStart();
 
     while (upload.media_asset_count <= 1 && upload.status !== "completed" && upload.status !== "error") {
-      await Utility.delay(FileUploadComponent.POLL_DELAY);
+      await delay(FileUploadComponent.POLL_DELAY);
       upload = await $.get(`/uploads/${upload.id}.json`);
     }
 
@@ -116,7 +116,7 @@ export default class FileUploadComponent {
       this.$dropzone.removeClass("success");
       this.loadingStop();
 
-      Utility.error(`Upload failed: ${upload.error}.`);
+      Notice.error(`Upload failed: ${upload.error}.`);
     } else {
       let params = new URLSearchParams(window.location.search);
       let isBookmarklet = params.has("url");
@@ -134,20 +134,12 @@ export default class FileUploadComponent {
     }
   }
 
-  // Called when creating the upload failed because of a validation error (normally, because the source URL was not a real URL).
+  // Called when creating the upload failed because of a non-2xx response (usually a rate limiting error or a validation error).
   async onError(e) {
-    let errors = e.originalEvent.detail[0].errors;
-    let message = Object.keys(errors).map(attribute => {
-      return errors[attribute].map(error => {
-        if (attribute === "base") {
-          return `${error}`;
-        } else {
-          return `${capitalize(attribute)} ${error}`;
-        }
-      });
-    }).join("; ");
+    let upload = e.originalEvent?.detail?.[0];
+    let message = uploadError(upload);
 
-    Utility.error(message);
+    Notice.error(`Upload failed: ${message}`);
   }
 
   get $dropzone() {

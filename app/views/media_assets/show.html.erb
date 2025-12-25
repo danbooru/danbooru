@@ -23,20 +23,19 @@
                   <% end %>
                 </span>
 
-                <%= link_to @media_asset.original.file_url do %>
-                  <%= number_to_human_size(@media_asset.file_size) %> .<%= @media_asset.file_ext %>,
-                  <%= @media_asset.image_width %>x<%= @media_asset.image_height %>
-
-                  <% if @media_asset.duration.present? %>
-                    (<%= duration_to_hhmmss(@media_asset.duration) %>)
-                  <% end %>
-                <% end %>
+                <%= link_to_media_asset @media_asset, url: @media_asset.original.file_url %>
 
                 <span>
                   <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
                     <% menu.with_item(hide_on_click: true) do %>
                       <%= link_to "#{@media_asset.original.file_url}?download=1", download: @media_asset.original.file_name do %>
                         <%= download_icon %> Download
+                      <% end %>
+                    <% end %>
+
+                    <% menu.with_item(hide_on_click: true) do %>
+                      <%= link_to "javascript:void(0)", class: "media-asset-copy-id", "x-on:click": "Danbooru.Utility.copyToClipboard('asset ##{j @media_asset.id}')" do %>
+                        <%= hashtag_icon %> Copy ID
                       <% end %>
                     <% end %>
 
@@ -136,6 +135,15 @@
               </tr>
             <% end %>
 
+            <% @media_asset.uploads.sort_by(&:created_at).each do |upload| %>
+              <% if policy(upload).show? %>
+                <tr>
+                  <th class="text-left">Upload</th>
+                  <td class="break-all"><%= link_to "##{upload.id}", upload %> (<%= link_to "@#{upload.uploader.name}", upload.uploader %>)</td>
+                </tr>
+              <% end %>
+            <% end %>
+
             <% if policy(@media_asset).can_see_image? %>
               <tr>
                 <th class="text-left">MD5</th>
@@ -166,7 +174,7 @@
             <% if @media_asset.duration.present? %>
               <tr>
                 <th class="text-left">Duration</th>
-                <td class="break-all"><%= duration_to_hhmmss(@media_asset.duration) %></td>
+                <td class="break-all"><%= duration_to_hhmmssms(@media_asset.duration) %></td>
               </tr>
             <% end %>
 
@@ -187,7 +195,7 @@
               <% pairs.sort.each do |key, value| %>
                 <tr>
                   <th class="text-left w-1/4"><%= key.split(":").second.scan(/(?:[A-Z][a-z]+|[A-Z]+(?![a-z]))/).join(" ") %></th>
-                  <td class="break-words"><%= link_to value, media_assets_path(search: { metadata: { key => value }}), rel: "nofollow" %></td>
+                  <td class="break-words"><%= link_to value.to_s, media_assets_path(search: { metadata: { key => value }}), rel: "nofollow" %></td>
                 </tr>
               <% end %>
             <% end %>

@@ -126,6 +126,9 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals('source:"\'"', "source:'\\''")
       assert_parse_equals(%q{source:"don't say \"lazy\" okay"}, %q{source:'don\'t say "lazy" okay'})
       assert_parse_equals(%q{(and source:"foo)bar" a)}, %q{(a (source:'foo)bar'))})
+
+      assert_parse_equals('(and source:"foo bar" baz)', %q{source:foo\ bar baz})
+      assert_parse_equals(%q{(and source:"don't say \"lazy\"" blah)}, %q{source:don't\ say\ "lazy" blah})
     end
 
     should "parse metatag synonyms correctly" do
@@ -207,6 +210,22 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("a", "((a))")
       assert_parse_equals("a", "( ( a ) )")
       assert_parse_equals("a", " ( ( a ) ) ")
+    end
+
+    should "parse spaces correctly" do
+      assert_parse_equals("(and a b c d e)", "a\tb\nc\u0085d\u3000e")
+      assert_parse_equals("(and (wildcard a*) (wildcard b*) (wildcard c*) (wildcard d*) (wildcard e*))", "a*\tb*\nc*\u0085d*\u3000e*")
+      assert_parse_equals("(and a b c)", "a\tand\nb\u0085and\u3000c")
+      assert_parse_equals("(or a b c)", "a\tor\nb\u0085or\u3000c")
+      assert_parse_equals("(and source:a b)", "source:a\u3000b")
+
+      ["skirt\u0009tail", "skirt\u000atail", "skirt\u000btail", "skirt\u000ctail", "skirt\u000dtail", "skirt\u0020tail",
+       "skirt\u0085tail", "skirt\u00a0tail", "skirt\u1680tail", "skirt\u2000tail", "skirt\u2001tail", "skirt\u2002tail",
+       "skirt\u2003tail", "skirt\u2004tail", "skirt\u2005tail", "skirt\u2006tail", "skirt\u2007tail", "skirt\u2008tail",
+       "skirt\u2009tail", "skirt\u200atail", "skirt\u2028tail", "skirt\u2029tail", "skirt\u202ftail", "skirt\u205ftail",
+       "skirt\u3000tail",].each do |search|
+        assert_parse_equals("(and skirt tail)", search)
+      end
     end
 
     should "parse nested AND queries correctly" do

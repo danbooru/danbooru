@@ -24,7 +24,7 @@
 
       <% t.column "Reason", td: { class: "col-expand" } do |report| %>
         <span class="prose">
-          <%= format_text report.reason, inline: true %>
+          <%= report.dtext_reason.format_text %>
         </span>
       <% end %>
 

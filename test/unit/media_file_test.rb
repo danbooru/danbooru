@@ -41,8 +41,8 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "determine the correct dimensions for a ugoira file" do
       skip unless MediaFile.videos_enabled?
-      frame_delays = JSON.parse(File.read("test/files/ugoira.json")).pluck("delay")
-      assert_equal([60, 60], MediaFile.open("test/files/ugoira.zip", frame_delays: frame_delays).dimensions)
+      frame_delays = JSON.parse(File.read("test/files/ugoira/animation.json")).pluck("delay")
+      assert_equal([60, 60], MediaFile.open("test/files/ugoira/ugoira.zip", frame_delays: frame_delays).dimensions)
     end
 
     should "determine the correct dimensions for a flash file" do
@@ -66,8 +66,8 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([512, 512], mf.dimensions)
       assert_equal([512, 512], mf.dimensions)
 
-      frame_delays = JSON.parse(File.read("test/files/ugoira.json")).pluck("delay")
-      mf = MediaFile.open("test/files/ugoira.zip", frame_delays: frame_delays)
+      frame_delays = JSON.parse(File.read("test/files/ugoira/animation.json")).pluck("delay")
+      mf = MediaFile.open("test/files/ugoira/ugoira.zip", frame_delays: frame_delays)
       assert_equal([60, 60], mf.dimensions)
       assert_equal([60, 60], mf.dimensions)
     end
@@ -122,7 +122,7 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     should "determine the correct extension for a ugoira file" do
-      assert_equal(:zip, MediaFile.open("test/files/ugoira.zip").file_ext)
+      assert_equal(:zip, MediaFile.open("test/files/ugoira/ugoira.zip").file_ext)
     end
 
     should "determine the correct extension for a flash file" do
@@ -181,6 +181,46 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
+  context "#duration" do
+    should "get the correct duration for animated files" do
+      assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").duration)
+      assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").duration)
+      assert_equal(0.75, MediaFile.open("test/files/test-animated-256x256.png").duration)
+      assert_equal(3.35, MediaFile.open("test/files/gif/test-animated-3.35s.gif").duration)
+      assert_equal(1.2,  MediaFile.open("test/files/gif/test-animated-1.2s.gif").duration)
+      assert_equal(5.0,  MediaFile.open("test/files/apng/normal_apng.png").duration)
+      assert_equal(0.84, MediaFile.open("test/files/webp/nyancat.webp").duration)
+      assert_equal(1.92, MediaFile.open("test/files/avif/sequence-with-pitm.avif").duration)
+      assert_equal(3.962292, MediaFile.open("test/files/avif/sequence-without-pitm.avif").duration)
+      assert_equal(0.5,  MediaFile.open("test/files/avif/star-8bpc.avif").duration)
+      assert_equal(1.92, MediaFile.open("test/files/avif/alpha_video.avif").duration)
+
+      assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").vips_duration)
+      assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").vips_duration)
+      assert_nil(MediaFile.open("test/files/test-animated-256x256.png").vips_duration)
+      assert_equal(3.35, MediaFile.open("test/files/gif/test-animated-3.35s.gif").vips_duration)
+      assert_equal(1.2,  MediaFile.open("test/files/gif/test-animated-1.2s.gif").vips_duration)
+      assert_nil(MediaFile.open("test/files/apng/normal_apng.png").vips_duration)
+      assert_equal(0.84, MediaFile.open("test/files/webp/nyancat.webp").vips_duration)
+      assert_nil(MediaFile.open("test/files/avif/sequence-with-pitm.avif").vips_duration)
+      assert_nil(MediaFile.open("test/files/avif/sequence-without-pitm.avif").vips_duration)
+      assert_nil(MediaFile.open("test/files/avif/star-8bpc.avif").vips_duration)
+      assert_nil(MediaFile.open("test/files/avif/alpha_video.avif").vips_duration)
+
+      assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").ffmpeg_duration)
+      assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").ffmpeg_duration)
+      assert_equal(0.75, MediaFile.open("test/files/test-animated-256x256.png").ffmpeg_duration)
+      assert_equal(1.37, MediaFile.open("test/files/gif/test-animated-3.35s.gif").ffmpeg_duration) # XXX wrong in ffmpeg 7.1
+      assert_equal(0.12, MediaFile.open("test/files/gif/test-animated-1.2s.gif").ffmpeg_duration) # XXX wrong in ffmpeg 7.1
+      assert_equal(5.0,  MediaFile.open("test/files/apng/normal_apng.png").ffmpeg_duration)
+      assert_equal(0.04, MediaFile.open("test/files/webp/nyancat.webp").ffmpeg_duration) # XXX wrong in ffmpeg 7.1
+      assert_equal(1.92, MediaFile.open("test/files/avif/sequence-with-pitm.avif").ffmpeg_duration)
+      assert_equal(3.962292,  MediaFile.open("test/files/avif/sequence-without-pitm.avif").ffmpeg_duration)
+      assert_equal(0.5,  MediaFile.open("test/files/avif/star-8bpc.avif").ffmpeg_duration)
+      assert_equal(1.92, MediaFile.open("test/files/avif/alpha_video.avif").ffmpeg_duration)
+    end
+  end
+
   context "#pixel_hash" do
     should "return the file's md5 for corrupted files" do
       assert_equal(MediaFile.md5("test/files/test-blank.jpg"), MediaFile.pixel_hash("test/files/test-blank.jpg"))
@@ -202,12 +242,6 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "return the file's md5 for Flash files" do
       assert_equal("1f9a43dbebb2195a8f7d9e0eede51e4b", MediaFile.pixel_hash("test/files/compressed.swf"))
-    end
-
-    should "return the file's md5 for Ugoira files" do
-      frame_delays = JSON.parse(File.read("test/files/ugoira.json")).pluck("delay")
-      ugoira = MediaFile.open("test/files/ugoira.zip", frame_delays: frame_delays)
-      assert_equal("0d94800c4b520bf3d8adda08f95d31e2", ugoira.pixel_hash)
     end
 
     should "return the file's md5 for video files" do
@@ -302,27 +336,193 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
-  context "for a ugoira" do
-    setup do
-      skip unless MediaFile::Ugoira.videos_enabled?
-      frame_delays = JSON.parse(File.read("test/files/ugoira.json")).pluck("delay")
-      @ugoira = MediaFile.open("test/files/ugoira.zip", frame_delays: frame_delays)
+  context "A ugoira:" do
+    context "a .zip file without an animation.json file or separate frame delays" do
+      should "not be recognized as a ugoira" do
+        file = MediaFile.open("test/files/ugoira/ugoira.zip")
+
+        assert_equal(MediaFile, file.class)
+        assert_equal(:zip, file.file_ext)
+        assert_equal("application/zip", file.mime_type.to_s)
+      end
     end
 
-    should "generate a preview" do
-      assert_equal([60, 60], @ugoira.preview(150, 150).dimensions)
+    context "a ugoira .zip file without an animation.json file but with separate frame delays" do
+      setup do
+        frame_delays = JSON.parse(File.read("test/files/ugoira/animation.json")).pluck("delay")
+        @ugoira = MediaFile.open("test/files/ugoira/ugoira.zip", frame_delays: frame_delays)
+      end
+
+      should "generate a preview" do
+        assert_equal([60, 60], @ugoira.preview(150, 150).dimensions)
+      end
+
+      should "get the metadata" do
+        assert_equal(:zip, @ugoira.file_ext)
+        assert_equal("video/x-ugoira", @ugoira.mime_type.to_s)
+        assert_equal(1.05, @ugoira.duration)
+        assert_equal(4.76, @ugoira.frame_rate.round(2))
+        assert_equal(5, @ugoira.files.size)
+        assert_equal(5, @ugoira.frame_count)
+        assert_equal("af38ac9842a0afe344a66d377d91c842", @ugoira.pixel_hash)
+        assert_equal("0d94800c4b520bf3d8adda08f95d31e2", @ugoira.md5)
+
+        assert_equal([200, 200, 200, 200, 250], @ugoira.metadata["Ugoira:FrameDelays"])
+        assert_equal([0, 1679, 3588, 5189, 5989], @ugoira.metadata["Ugoira:FrameOffsets"])
+        assert_equal(5, @ugoira.metadata["Ugoira:FrameCount"])
+        assert_equal(4.76, @ugoira.metadata["Ugoira:FrameRate"].round(2))
+        assert_equal("image/jpeg", @ugoira.metadata["Ugoira:FrameMimeType"])
+        assert_equal("none", @ugoira.metadata["Ugoira:AnimationJsonFormat"])
+
+        assert_nil(@ugoira.animation_json)
+        assert_nil(@ugoira.error)
+      end
+
+      should "convert to a webm" do
+        skip unless MediaFile::Ugoira.videos_enabled?
+
+        webm = @ugoira.convert
+        assert_equal(:webm, webm.file_ext)
+        assert_equal([60, 60], webm.dimensions)
+      end
+
+      should "clean up the extracted files" do
+        paths = @ugoira.files.map(&:path)
+        tmpdir = @ugoira.tmpdir.path
+
+        assert(paths.all? { |path| File.exist?(path) })
+        assert(File.exist?(tmpdir))
+
+        @ugoira.close
+
+        assert(paths.none? { |path| File.exist?(path) })
+        assert_not(File.exist?(tmpdir))
+      end
+
+      should "be able to create a new ugoira with an animation.json file" do
+        new_ugoira = MediaFile::Ugoira.create(@ugoira.frames, frame_delays: @ugoira.frame_delays)
+
+        assert_equal(6, new_ugoira.files.size)
+        assert_equal(5, new_ugoira.frame_count)
+        assert_equal(60, new_ugoira.animation_json[:width])
+        assert_equal(60, new_ugoira.animation_json[:height])
+        assert_equal(7_202, new_ugoira.size)
+        assert_equal("af38ac9842a0afe344a66d377d91c842", new_ugoira.pixel_hash)
+        assert_equal("e0bd8afa96e30605e4bc4a3f9585afd6", new_ugoira.md5)
+
+        assert_equal(60, new_ugoira.animation_json[:width])
+        assert_equal(60, new_ugoira.animation_json[:height])
+        assert_equal("image/jpeg", new_ugoira.animation_json[:mime_type])
+        assert_equal([200, 200, 200, 200, 250], new_ugoira.animation_json[:frames].pluck("delay"))
+        assert_equal(%w[000000.jpg 000001.jpg 000002.jpg 000003.jpg 000004.jpg], new_ugoira.animation_json[:frames].pluck("file"))
+        assert_equal(@ugoira.frames.map(&:md5), new_ugoira.animation_json[:frames].pluck("md5"))
+        assert_equal([0, 1679, 3588, 5189, 5989], new_ugoira.metadata["Ugoira:FrameOffsets"])
+        assert_equal("image/jpeg", new_ugoira.metadata["Ugoira:FrameMimeType"])
+        assert_equal("Danbooru", new_ugoira.metadata["Ugoira:AnimationJsonFormat"])
+
+        assert_nil(new_ugoira.error)
+      end
     end
 
-    should "get the duration" do
-      assert_equal(1.05, @ugoira.duration)
-      assert_equal(4.76, @ugoira.frame_rate.round(2))
-      assert_equal(5, @ugoira.frame_count)
+    context "A ugoira .zip file with an animation.json in gallery-dl format" do
+      should "find the files and frame delays" do
+        MediaFile.open("test/files/ugoira/ugoira-95239241-gallery-dl.zip") do |ugoira|
+          assert_equal(79_276, ugoira.size)
+          assert_equal("68007e305a081faae3be65d3edbd4eb1", ugoira.pixel_hash)
+          assert_equal("7fe767b4e202415a2b2dec2a82be3b69", ugoira.md5)
+          assert_equal(11, ugoira.files.size)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(10, ugoira.animation_json.size)
+          assert_equal("gallery-dl", ugoira.animation_json_format)
+          assert_equal([0, 7817, 15_616, 23_444, 31_274, 39_087, 46_931, 54_807, 62_599, 70_394], ugoira.frame_offsets)
+          assert_equal(1.7, ugoira.duration)
+          assert_nil(ugoira.error)
+        end
+      end
     end
 
-    should "convert to a webm" do
-      webm = @ugoira.convert
-      assert_equal(:webm, webm.file_ext)
-      assert_equal([60, 60], webm.dimensions)
+    context "A ugoira .zip file with an animation.json in PixivUtil2 format" do
+      should "find the files and frame delays" do
+        MediaFile.open("test/files/ugoira/ugoira-95239241-pixivutil2.zip") do |ugoira|
+          assert_equal(41_745, ugoira.size)
+          assert_equal("68007e305a081faae3be65d3edbd4eb1", ugoira.pixel_hash)
+          assert_equal("dbfe1d5764eb24f3d55224f85ef3383c", ugoira.md5)
+          assert_equal(11, ugoira.files.size)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(10, ugoira.animation_json[:frames].size)
+          assert_equal("PixivUtil2", ugoira.animation_json_format)
+          assert_equal([0, 4046, 8074, 12_123, 16_169, 20_204, 24_262, 28_337, 32_372, 36_405], ugoira.frame_offsets)
+          assert_equal(1.7, ugoira.duration)
+          assert_nil(ugoira.error)
+        end
+      end
+    end
+
+    context "A ugoira .zip file with an animation.json in PixivToolkit format" do
+      should "find the files and frame delays" do
+        MediaFile.open("test/files/ugoira/ugoira-95239241-pixivtoolkit.zip") do |ugoira|
+          assert_equal(41_747, ugoira.size)
+          assert_equal("68007e305a081faae3be65d3edbd4eb1", ugoira.pixel_hash)
+          assert_equal("8d03702cc61e625b03cca3d556a163a1", ugoira.md5)
+          assert_equal(11, ugoira.files.size)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(10, ugoira.animation_json.dig(:ugokuIllustData, :frames).size)
+          assert_equal("PixivToolkit", ugoira.animation_json_format)
+          assert_equal([639, 4685, 8713, 12_762, 16_808, 20_843, 24_901, 28_976, 33_011, 37_044], ugoira.frame_offsets)
+          assert_equal(1.7, ugoira.duration)
+          assert_nil(ugoira.error)
+        end
+      end
+    end
+
+    context "A ugoira .zip file with an animation.json in Danbooru format" do
+      should "find the files and frame delays" do
+        MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip") do |ugoira|
+          assert_equal(79_865, ugoira.size)
+          assert_equal("68007e305a081faae3be65d3edbd4eb1", ugoira.pixel_hash)
+          assert_equal("72e8c2f6c6783efaeb4830d26ddfd17d", ugoira.md5)
+          assert_equal(11, ugoira.files.size)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(10, ugoira.animation_json[:frames].size)
+          assert_equal("Danbooru", ugoira.animation_json_format)
+          assert_equal([0, 7817, 15_616, 23_444, 31_274, 39_087, 46_931, 54_807, 62_599, 70_394], ugoira.frame_offsets)
+          assert_equal(1.7, ugoira.duration)
+          assert_nil(ugoira.error)
+        end
+      end
+    end
+
+    context "An unpacked ugoira without an animation.json file" do
+      should "find the files and frame delays" do
+        Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip") do |tmpdir|
+          frame_delays = File.read("test/files/ugoira/animation.json").parse_json.pluck("delay")
+          files = Pathname.new(tmpdir).glob("*")
+          ugoira = MediaFile::Ugoira.new(files, frame_delays: frame_delays)
+
+          assert_equal(5, ugoira.files.size)
+          assert_equal(5, ugoira.frame_count)
+          assert_equal(1.05, ugoira.duration)
+          assert_equal("none", ugoira.animation_json_format)
+
+          ugoira.close
+        end
+      end
+    end
+
+    context "An unpacked ugoira with an animation.json file in gallery-dl format" do
+      should "find the files and frame delays" do
+        Danbooru::Archive.extract!("test/files/ugoira/ugoira-95239241-gallery-dl.zip") do |tmpdir|
+          files = Pathname.new(tmpdir).glob("*")
+          ugoira = MediaFile::Ugoira.new(files)
+
+          assert_equal(11, ugoira.files.size)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(1.7, ugoira.duration)
+          assert_equal("gallery-dl", ugoira.animation_json_format)
+
+          ugoira.close
+        end
+      end
     end
   end
 
@@ -414,7 +614,9 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "handle all supported video types" do
       Dir.glob("test/files/mp4/*.{mp4,m4v}").grep_v(/corrupt/).each do |file|
-        assert_equal(false, MediaFile.open(file).is_corrupt?)
+        media = MediaFile.open(file) do |media|
+          assert_equal(false, media.is_corrupt?, "#{file} #{media.error}")
+        end
       end
     end
 
@@ -427,11 +629,12 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(true, MediaFile.open("test/files/mp4/test-audio.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-audio-mp3.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-audio-opus.mp4").is_supported?)
-      assert_equal(true, MediaFile.open("test/files/mp4/test-audio-vorbis.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-invalid-utf8-metadata.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-h265.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-av1.mp4").is_supported?)
 
-      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-h265.mp4").is_supported?)
-      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-av1.mp4").is_supported?)
+      #assert_equal(true, MediaFile.open("test/files/mp4/test-audio-flac.mp4").is_supported?)
+
       assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-yuv444p-h264.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-av1.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-h264.mp4").is_supported?)
@@ -439,6 +642,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(false, MediaFile.open("test/files/mp4/test-audio-ac3.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-audio-mp2.mp4").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/mp4/test-audio-vorbis.mp4").is_supported?)
     end
 
     should "not fail during decoding if the video contains invalid UTF-8 characters in the file metadata" do
@@ -502,9 +706,12 @@ class MediaFileTest < ActiveSupport::TestCase
     should "detect supported files" do
       assert_equal(true, MediaFile.open("test/files/webm/test-512x512.webm").is_supported?)
       assert_equal(true, MediaFile.open("test/files/webm/test-gbrp-vp9.webm").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/webm/test-av1.webm").is_supported?)
 
       assert_equal(false, MediaFile.open("test/files/webm/test-512x512.mkv").is_supported?)
       assert_equal(false, MediaFile.open("test/files/webm/test-yuv420p10le-vp9.webm").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/webm/test-hevc.webm").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/webm/test-aac.webm").is_supported?)
     end
 
     should "handle all supported video types" do
@@ -528,6 +735,8 @@ class MediaFileTest < ActiveSupport::TestCase
     should "determine the duration of the animation" do
       file = MediaFile.open("test/files/test-animated-86x52.gif")
       assert_equal(0.4, file.duration)
+      assert_equal(0.4, file.vips_duration)
+      assert_equal(0.4, file.ffmpeg_duration)
       assert_equal(10, file.frame_rate)
       assert_equal(4, file.frame_count)
     end
@@ -552,8 +761,10 @@ class MediaFileTest < ActiveSupport::TestCase
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
-        assert_equal(2.0, file.duration)
-        assert_equal(1.5, file.frame_rate)
+        assert_equal(5.0, file.duration)
+        assert_nil(file.vips_duration)
+        assert_equal(5.0, file.ffmpeg_duration)
+        assert_equal(0.6, file.frame_rate)
         assert_equal(3, file.frame_count)
       end
     end
@@ -576,9 +787,11 @@ class MediaFileTest < ActiveSupport::TestCase
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
-        assert_equal(0.3, file.duration)
+        assert_equal(0.6, file.duration)
+        assert_nil(file.vips_duration)
+        assert_equal(0.6, file.ffmpeg_duration)
         assert_equal(2, file.frame_count)
-        assert_equal(2/0.3, file.frame_rate)
+        assert_equal(2 / 0.6, file.frame_rate)
       end
     end
 
@@ -666,10 +879,14 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(false, MediaFile.open("test/files/avif/sequence-without-pitm.avif").is_supported?)
       assert_equal(false, MediaFile.open("test/files/avif/star-8bpc.avif").is_supported?)
 
-      # XXX These should be unsupported, but aren't.
-      # assert_equal(false, MediaFile.open("test/files/avif/alpha_video.avif").is_supported?)
-      # assert_equal(false, MediaFile.open("test/files/avif/plum-blossom-small-profile0.8bpc.yuv420.alpha-full.avif").is_supported?)
-      # assert_equal(false, MediaFile.open("test/files/avif/kimono.mirror-horizontal.avif").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/avif/alpha_video.avif").is_supported?)
+    end
+
+    should "detect unsupported AVIF files" do
+      skip "These should be unsupported, but aren't."
+
+      assert_equal(false, MediaFile.open("test/files/avif/plum-blossom-small.profile0.8bpc.yuv420.alpha-full.avif").is_supported?)
+      assert_equal(false, MediaFile.open("test/files/avif/kimono.mirror-horizontal.avif").is_supported?)
     end
 
     should "detect animated files" do
@@ -686,8 +903,8 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "detect static images with an auxiliary image sequence" do
       assert_equal(true, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").metadata.is_animated_avif?)
-      assert_equal(false, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").is_animated?)
-      assert_equal(1, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").frame_count)
+      assert_equal(true, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").is_animated?)
+      assert_equal(48, MediaFile.open("test/files/avif/sequence-with-pitm-avif-major.avif").frame_count)
     end
 
     should "detect rotated images" do

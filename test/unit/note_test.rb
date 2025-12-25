@@ -63,6 +63,13 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(["Body can't be blank"], @note.errors.full_messages)
       end
 
+      should "not validate if the post is a video" do
+        @note = build(:note, post: create(:post, file_ext: "webm"))
+
+        assert_equal(false, @note.valid?)
+        assert_equal(["Post cannot have notes"], @note.errors.full_messages)
+      end
+
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
           travel(1.day) do
@@ -147,9 +154,12 @@ class NoteTest < ActiveSupport::TestCase
     end
 
     context "when validating notes" do
+      should allow_value("a" * 5000).for(:body)
+
       should_not allow_value("").for(:body)
       should_not allow_value("   ").for(:body)
       should_not allow_value("\u200B").for(:body)
+      should_not allow_value("a" * 5001).for(:body)
     end
   end
 end

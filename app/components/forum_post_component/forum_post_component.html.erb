@@ -1,4 +1,4 @@
-<%= tag.article class: "forum-post message", id: "forum_post_#{forum_post.id}", data: { "is-reported": reported?, **data_attributes_for(forum_post, "", forum_post.html_data_attributes) } do %>
+<%= tag.article class: "forum-post message", id: "forum_post_#{forum_post.id}", data: { "is-reported": reported?, **data_attributes_for(forum_post, "", forum_post.html_data_attributes) }, "x-data": "{}" do %>
   <div class="author">
     <div class="author-name">
       <%= link_to_user forum_post.creator %>
@@ -11,9 +11,9 @@
 
   <div class="content">
     <div class="prose">
-      <%= format_text(forum_post.body, data: dtext_data) %>
+      <%= forum_post.dtext_body.format_text(references: dtext_references) %>
     </div>
-    <%= render "application/update_notice", record: forum_post %>
+    <%= render "application/update_notice", record: forum_post, current_user: current_user %>
 
     <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
       <% if policy(forum_post).reply? %>
@@ -69,14 +69,22 @@
           <% end %>
         <% end %>
 
+        <% if !forum_post.creator.is_banned? && policy(Ban.new(user: forum_post.creator)).create? %>
+          <% menu.with_item do %>
+            <%= link_to new_ban_path(ban: { user_id: forum_post.creator.id }) do %>
+              <%= ban_icon %> Ban User
+            <% end %>
+          <% end %>
+        <% end %>
+
         <% menu.with_item do %>
-          <%= link_to forum_post_path(forum_post.id), class: "forum-post-copy-id" do %>
+          <%= link_to "javascript:void(0)", class: "forum-post-copy-id", "x-on:click": "Danbooru.Utility.copyToClipboard('forum ##{j forum_post.id}')" do %>
             <%= hashtag_icon %> Copy ID
           <% end %>
         <% end %>
 
         <% menu.with_item do %>
-          <%= link_to forum_post_path(forum_post.id), class: "forum-post-copy-link" do %>
+          <%= link_to "javascript:void(0)", class: "forum-post-copy-link", "x-on:click": "Danbooru.Utility.copyToClipboard('#{j forum_post_url(forum_post)}')" do %>
             <%= link_icon %> Copy Link
           <% end %>
         <% end %>

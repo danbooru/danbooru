@@ -21,6 +21,21 @@ class RelatedTagsControllerTest < ActionDispatch::IntegrationTest
         get related_tag_path(format: :js), params: { query: "touhou" }, xhr: true
         assert_response :success
       end
+
+      should "work for .js responses for character tags without a wiki" do
+        create(:tag, name: "chen", category: TagCategory::CHARACTER)
+
+        get related_tag_path(format: :js), params: { query: "chen" }, xhr: true
+        assert_response :success
+      end
+
+      should "work for .js responses for character tags with a wiki" do
+        create(:tag, name: "chen", category: TagCategory::CHARACTER)
+        create(:wiki_page, title: "chen", body: "[[touhou]]")
+
+        get related_tag_path(format: :js), params: { query: "chen" }, xhr: true
+        assert_response :success
+      end
     end
   end
 end

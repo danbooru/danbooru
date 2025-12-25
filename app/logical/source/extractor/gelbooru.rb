@@ -12,11 +12,7 @@
 module Source
   class Extractor
     class Gelbooru < Source::Extractor
-      delegate :artist_name, :profile_url, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
-
-      def match?
-        Source::URL::Gelbooru === parsed_url
-      end
+      delegate :artist_name, :profile_url, :display_name, :username, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
 
       def image_urls
         if parsed_url.full_image_url.present?
@@ -66,7 +62,13 @@ module Source
       def api_url
         # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=md5:338078144fe77c9e5f35dbb585e749ec
         # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=id:7903922
-        parsed_url.api_url || parsed_referer&.api_url
+        url = parsed_url.api_url || parsed_referer&.api_url
+
+        if site_name == "Gelbooru"
+          url = Danbooru::URL.parse(url).with_params(api_key: credentials[:api_key], user_id: credentials[:user_id])
+        end
+
+        url
       end
 
       memoize def api_response
@@ -74,8 +76,9 @@ module Source
       end
 
       def sub_extractor
-        return nil if !api_response[:source].to_s.match?(%r{\Ahttps?://}i)
-        @sub_extractor ||= Source::Extractor.find(api_response[:source], default: nil)
+        return nil if parent_extractor.present? || !api_response[:source].to_s.match?(%r{\Ahttps?://}i)
+
+        @sub_extractor ||= Source::Extractor.find(api_response[:source], default_extractor: nil, parent_extractor: self)
       end
     end
   end

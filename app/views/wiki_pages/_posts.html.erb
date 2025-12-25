@@ -4,6 +4,6 @@
       <%= link_to "Posts", posts_path(tags: wiki_page.title) %>
     </h2>
 
-    <%= render_post_gallery(PostQuery.new(wiki_page.tag.name, current_user: CurrentUser.user).posts_with_timeout(8), tags: wiki_page.title) %>
+    <%= render_post_gallery(PostQuery.normalize(wiki_page.tag.name, current_user: CurrentUser.user).posts_with_timeout(8), tags: wiki_page.title) %>
   </div>
 <% end %>

@@ -10,7 +10,7 @@ FactoryBot.define do
     image_height {1000}
     file_size {2000}
     rating {"q"}
-    source { FFaker::Internet.http_url }
+    source { Faker::Internet.url }
     media_asset { build(:media_asset) }
 
     factory(:post_with_file) do

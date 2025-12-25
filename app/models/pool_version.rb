@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PoolVersion < ApplicationRecord
+  dtext_attribute :description # defines :dtext_description
+
   belongs_to :updater, :class_name => "User"
   belongs_to :pool
 
@@ -29,7 +31,7 @@ class PoolVersion < ApplicationRecord
 
     def name_contains(name)
       name = normalize_name_for_search(name)
-      name = "*#{name}*" unless name =~ /\*/
+      name = "*#{name.escape_wildcards}*" unless name.include?("*")
       where_ilike(:name, name)
     end
 

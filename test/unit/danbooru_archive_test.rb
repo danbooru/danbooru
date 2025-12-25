@@ -4,18 +4,18 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
   context "Danbooru::Archive" do
     context ".open! method" do
       should "work without a block" do
-        archive = Danbooru::Archive.open!("test/files/ugoira.zip")
+        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
         assert_equal(5, archive.entries.count)
       end
 
       should "work with a block" do
-        Danbooru::Archive.open!("test/files/ugoira.zip") do |archive|
+        Danbooru::Archive.open!("test/files/ugoira/ugoira.zip") do |archive|
           assert_equal(5, archive.entries.count)
         end
       end
 
       should "raise an error if the block raises an error" do
-        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open!("test/files/ugoira.zip") { raise "failed" } }
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open!("test/files/ugoira/ugoira.zip") { raise "failed" } }
       end
 
       should "raise an error if the file doesn't exist" do
@@ -25,18 +25,18 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context ".open method" do
       should "work without a block" do
-        archive = Danbooru::Archive.open("test/files/ugoira.zip")
+        archive = Danbooru::Archive.open("test/files/ugoira/ugoira.zip")
         assert_equal(5, archive.entries.count)
       end
 
       should "work with a block" do
-        Danbooru::Archive.open("test/files/ugoira.zip") do |archive|
+        Danbooru::Archive.open("test/files/ugoira/ugoira.zip") do |archive|
           assert_equal(5, archive.entries.count)
         end
       end
 
       should "return nil if the block raises an error" do
-        assert_nil(Danbooru::Archive.open("test/files/ugoira.zip") { raise "failed" })
+        assert_nil(Danbooru::Archive.open("test/files/ugoira/ugoira.zip") { raise "failed" })
       end
 
       should "return nil if the file doesn't exist" do
@@ -46,7 +46,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context ".extract! method" do
       should "extract to temp directory if not given a block or directory" do
-        dir, filenames = Danbooru::Archive.extract!("test/files/ugoira.zip")
+        dir, filenames = Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip")
 
         assert_equal(true, File.directory?(dir))
         assert_equal(5, filenames.size)
@@ -56,7 +56,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
 
       should "extract to a temp directory and delete it afterwards if given a block" do
-        Danbooru::Archive.extract!("test/files/ugoira.zip") do |dir, filenames|
+        Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip") do |dir, filenames|
           @tmpdir = dir
           assert_equal(true, File.directory?(dir))
           assert_equal(5, filenames.size)
@@ -69,7 +69,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
       should "extract to given directory if given a directory" do
         Dir.mktmpdir do |tmpdir|
-          dir, filenames = Danbooru::Archive.extract!("test/files/ugoira.zip", tmpdir)
+          dir, filenames = Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip", tmpdir)
           assert_equal(dir, tmpdir)
           assert_equal(5, filenames.size)
           filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
@@ -100,14 +100,14 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context "#uncompressed_size method" do
       should "work" do
-        archive = Danbooru::Archive.open!("test/files/ugoira.zip")
+        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
         assert_equal(6161, archive.uncompressed_size)
       end
     end
 
     context "#exists? method" do
       should "work" do
-        archive = Danbooru::Archive.open!("test/files/ugoira.zip")
+        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
         assert_equal(true, archive.exists? { |entry, count| count > 4 })
       end
     end
@@ -134,7 +134,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context "#ls method" do
       should "work" do
-        archive = Danbooru::Archive.open!("test/files/ugoira.zip")
+        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
         output = StringIO.new
 
         archive.ls(output)
@@ -175,6 +175,45 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
       assert_equal(1, archive.file_count)
       assert_equal(1_048_576_000, archive.uncompressed_size)
+    end
+
+    context ".create! method" do
+      should "work" do
+        archive = Dir.mktmpdir do |tmpdir|
+          # Test normal files work
+          FileUtils.cp "test/files/test.gif", tmpdir
+
+          # Test utf8 filenames work
+          FileUtils.cp "test/files/test.jpg", File.join(tmpdir, "テスト.jpg")
+
+          # Test subdirectories work
+          FileUtils.mkdir_p File.join(tmpdir, "subdir")
+          FileUtils.cp "test/files/test.png", File.join(tmpdir, "subdir")
+
+          Danbooru::Archive.create!(tmpdir)
+        end
+        media_file = MediaFile.open(archive.file)
+
+        assert_equal(3, archive.file_count)
+        assert_equal(
+          ["subdir/test.png", "test.gif", "テスト.jpg"],
+          archive.entries.map(&:pathname).map { _1.force_encoding("UTF-8") }
+        )
+
+        archive.extract! do |dir, filenames|
+          # Archived files md5 should match
+          assert_equal(
+            ["081a5c3b92d8980d1aadbd215bfac5b9", "1e2edf6bdbd971d8c3cc4da0f98f38ab", "ecef68c44edb8a0d6a3070b5f8e8ee76"],
+            filenames.map { MediaFile.md5 _1 }
+          )
+        end
+
+        # archive should have no compression
+        assert_equal("None", media_file.metadata["ZIP:ZipCompression"])
+
+        # md5 of the archive should always be the same
+        assert_equal("19875680007d7f56b9c2b39a2c3c62b8", media_file.md5)
+      end
     end
   end
 end

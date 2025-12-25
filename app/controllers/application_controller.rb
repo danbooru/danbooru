@@ -14,12 +14,12 @@ class ApplicationController < ActionController::Base
   before_action :reset_current_user
   before_action :set_current_user
   before_action :normalize_search
-  before_action :check_default_rate_limit
   before_action :ip_ban_check
   before_action :set_variant
   before_action :add_headers
   before_action :cause_error
   before_action :redirect_if_name_invalid?
+  after_action :verify_authorized, if: -> { Rails.env.local? }
   after_action :skip_session_if_publicly_cached
   after_action :reset_current_user
   layout "default"
@@ -32,23 +32,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # Define a rate limit for the given controller action.
-  #
-  # @example
-  #   rate_limit :index, 1.0/1.minute, 50, if: -> { request.format.atom? }
-  def self.rate_limit(action, rate:, burst:, key: "#{controller_name}:#{action}", if: nil)
-    if_proc = binding.local_variable_get(:if)
-
-    before_action(only: action, if: if_proc) do
-      key = "#{controller_name}:#{action}"
-      rate_limiter = RateLimiter.build(action: key, rate: rate, burst: burst, user: CurrentUser.user, ip_addr: request.remote_ip)
-      headers["X-Rate-Limit"] = rate_limiter.to_json
-      rate_limiter.limit!
-    end
-
-    skip_before_action :check_default_rate_limit, only: action, if: if_proc
-  end
-
   # Mark an action as for anonymous users only. The current user won't be loaded, instead the user will be set to the anonymous user.
   def self.anonymous_only(*actions, **options)
     skip_before_action :set_current_user, **options
@@ -56,12 +39,23 @@ class ApplicationController < ActionController::Base
     before_action -> { CurrentUser.user = User.anonymous }, **options
   end
 
+  def self.verify_captcha(**options)
+    before_action -> { CaptchaService.new.verify_request!(request) }, **options
+  end
+
   private
 
-  def respond_with(subject, *args, model: model_name, **options, &block)
-    if params[:action] == "index" && is_redirect?(subject)
-      redirect_to_show(subject)
-      return
+  # Responds to a request and returns either an HTML, JS, JSON, or XML response, depending on the requested response format.
+  #
+  # If the model has errors, an error notice will be shown for HTML or JS responses.
+  #
+  # @param subject [ActiveRecord::Base, ActiveRecord::Relation>] The model or collection to return in response.
+  # @param notice [String, nil] An optional notice message to display for HTML or JS responses. The notice should be in DText.
+  #
+  # @see https://github.com/heartcombo/responders
+  def respond_with(subject, *args, model: model_name, notice: nil, **options, &block)
+    if params[:redirect].to_s.present? && params[:action] == "index" && action_methods.include?("show")
+      redirect_to_show(subject) and return
     end
 
     if subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
@@ -69,8 +63,35 @@ class ApplicationController < ActionController::Base
       subject = subject.includes(associations)
     end
 
+    if subject.respond_to?(:errors) && subject.errors.present?
+      notice = subject.errors.full_messages.first
+    end
+
+    if notice.present? && (request.format.html? || request.format.js?)
+      if request.format.html? && !request.get?
+        flash[:notice] = notice.truncate(500)
+      elsif request.format.js?
+        flash.now[:notice] = DText.new(notice.truncate(500), inline: true).format_text
+      else
+        flash.now[:notice] = notice.truncate(500)
+      end
+    end
+
     @current_item = subject
+
     super
+  end
+
+  # Used to redirect a search directly to the result page when a search returns only one result.
+  # Example: /wiki_pages?search[title]=touhou&redirect=true.
+  def redirect_to_show(items)
+    if params[:redirect].to_s.truthy? && items.one? && item_matches_params(items.sole)
+      format = request.format.symbol unless request.format.html?
+      redirect_to send("#{controller_path.singularize}_path", items.sole, variant: params[:variant], format: format)
+      true
+    else
+      false
+    end
   end
 
   def set_version_comparison(default_type = "previous")
@@ -79,18 +100,6 @@ class ApplicationController < ActionController::Base
 
   def model_name
     controller_name.classify
-  end
-
-  def redirect_to_show(items)
-    if request.format.html?
-      redirect_to send("#{controller_path.singularize}_path", items.first)
-    else
-      redirect_to send("#{controller_path.singularize}_path", items.first, format: request.format.symbol)
-    end
-  end
-
-  def is_redirect?(items)
-    action_methods.include?("show") && params[:redirect].to_s.truthy? && items.one? && item_matches_params(items.first)
   end
 
   def item_matches_params(*)
@@ -104,106 +113,135 @@ class ApplicationController < ActionController::Base
     response.headers["X-Git-Hash"] = Rails.application.config.x.git_hash
   end
 
-  # Apply the default rate limit to all update actions (POST, PUT, or DELETE), unless the
-  # endpoint already declared a more specific rate limit using the `rate_limit` macro above.
-  def check_default_rate_limit
-    return if request.get? || request.head?
+  concerning :ExceptionHandlingMethods do
+    def rescue_exception(exception)
+      case exception
+      when ActionView::Template::Error
+        rescue_exception(exception.cause)
+      when ActiveRecord::QueryCanceled
+        render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
+      when ActionController::BadRequest
+        render_error_page(400, exception, message: exception.message)
+      when RequestBodyNotAllowedError
+        render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")
+      when SessionLoader::AuthenticationFailure, CaptchaService::Error
+        render_error_page(401, exception, message: exception.message)
+      when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest, ActionController::Redirecting::UnsafeRedirectError
+        render_error_page(403, exception, message: exception.message)
+      when ActiveSupport::MessageVerifier::InvalidSignature, # raised by `find_signed!`
+          User::PrivilegeError,
+          Pundit::NotAuthorizedError
+        render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
+      when ActiveRecord::RecordNotFound
+        render_error_page(404, exception, message: "That record was not found.")
+      when ActionController::RoutingError
+        render_error_page(405, exception, message: exception.message)
+      when ActionController::UnknownFormat, ActionView::MissingTemplate
+        render_error_page(406, exception, message: "#{request.format} is not a supported format for this page")
+      when PaginationExtension::PaginationError
+        render_error_page(410, exception, template: "static/pagination_error", message: exception.message)
+      when PostQuery::TagLimitError
+        render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
+      when PostQuery::Error
+        render_error_page(422, exception, message: exception.message)
+      when UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
+        render_error_page(422, exception, message: exception.message)
+      when RateLimiter::RateLimitError
+        render_error_page(429, exception, message: "You're doing that too fast. Wait a minute and try again.")
+      when PageRemovedError
+        render_error_page(451, exception, template: "static/page_removed_error", message: "This page has been removed because of a takedown request")
+      when Rack::Timeout::RequestTimeoutException
+        render_error_page(500, exception, message: "Your request took too long to complete and was canceled.")
+      when NotImplementedError
+        render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
+      when ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad
+        render_error_page(503, exception, message: "The database is unavailable. Try again later.", layout: "blank")
+      else
+        raise exception if Rails.env.development? || Danbooru.config.debug_mode
+        render_error_page(500, exception)
+      end
+    end
 
-    rate_limiter = RateLimiter.build(
-      action: "#{controller_name}:#{action_name}",
-      rate: CurrentUser.user.api_regen_multiplier,
-      burst: 200,
-      user: CurrentUser.user,
-      ip_addr: request.remote_ip,
-    )
+    def render_error_page(status, exception = nil, message: "", template: "static/error", format: request.format.symbol, layout: "default")
+      @exception = exception
+      @expected = status < 500
+      @message = message.to_s.encode("utf-8", invalid: :replace, undef: :replace)
+      @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace) if @exception
+      format = :html unless format.in?(%i[html json xml js atom])
 
-    headers["X-Rate-Limit"] = rate_limiter.to_json
-    rate_limiter.limit!
-  end
+      @api_response = { success: false, error: @exception.class.to_s, message: @message, backtrace: @backtrace }
 
-  def rescue_exception(exception)
-    case exception
-    when ActionView::Template::Error
-      rescue_exception(exception.cause)
-    when ActiveRecord::QueryCanceled
-      render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
-    when ActionController::BadRequest
-      render_error_page(400, exception, message: exception.message)
-    when RequestBodyNotAllowedError
-      render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")
-    when SessionLoader::AuthenticationFailure
-      render_error_page(401, exception, message: exception.message, template: "sessions/new")
-    when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest, ActionController::Redirecting::UnsafeRedirectError
-      render_error_page(403, exception, message: exception.message)
-    when ActiveSupport::MessageVerifier::InvalidSignature, # raised by `find_signed!`
-         User::PrivilegeError,
-         Pundit::NotAuthorizedError
-      render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
-    when ActiveRecord::RecordNotFound
-      render_error_page(404, exception, message: "That record was not found.")
-    when ActionController::RoutingError
-      render_error_page(405, exception, message: exception.message)
-    when ActionController::UnknownFormat, ActionView::MissingTemplate
-      render_error_page(406, exception, message: "#{request.format} is not a supported format for this page")
-    when PaginationExtension::PaginationError
-      render_error_page(410, exception, template: "static/pagination_error", message: exception.message)
-    when PostQuery::TagLimitError
-      render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
-    when PostQuery::Error
-      render_error_page(422, exception, message: exception.message)
-    when UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
-      render_error_page(422, exception, message: exception.message)
-    when RateLimiter::RateLimitError
-      render_error_page(429, exception, message: "Rate limit exceeded. You're doing that too fast")
-    when PageRemovedError
-      render_error_page(451, exception, template: "static/page_removed_error", message: "This page has been removed because of a takedown request")
-    when Rack::Timeout::RequestTimeoutException
-      render_error_page(500, exception, message: "Your request took too long to complete and was canceled.")
-    when NotImplementedError
-      render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
-    when ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad
-      render_error_page(503, exception, message: "The database is unavailable. Try again later.", layout: "blank")
-    else
-      raise exception if Rails.env.development? || Danbooru.config.debug_mode
-      render_error_page(500, exception)
+      # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
+      layout = "blank" if CurrentUser.user.nil?
+
+      if @exception
+        DanbooruLogger.log(@exception, expected: @expected)
+
+        ApplicationMetrics[:rails_exceptions_total][
+          exception: @exception.class.name,
+          controller: controller_name,
+          action: action_name,
+          expected: @expected.to_s,
+        ].increment
+      end
+
+      render template, layout: layout, status: status, formats: format
+    rescue ActionView::MissingTemplate
+      render "static/error", layout: layout, status: status, formats: format
     end
   end
 
-  def render_error_page(status, exception = nil, message: "", template: "static/error", format: request.format.symbol, layout: "default")
-    @exception = exception
-    @expected = status < 500
-    @message = message.to_s.encode("utf-8", invalid: :replace, undef: :replace)
-    @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace) if @exception
-    format = :html unless format.in?(%i[html json xml js atom])
-
-    @api_response = { success: false, error: @exception.class.to_s, message: @message, backtrace: @backtrace }
-
-    # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
-    layout = "blank" if CurrentUser.user.nil?
-
-    if @exception
-      DanbooruLogger.log(@exception, expected: @expected)
-
-      ApplicationMetrics[:rails_exceptions_total][
-        exception: @exception.class.name,
-        controller: controller_name,
-        action: action_name,
-        expected: @expected.to_s,
-      ].increment
+  concerning :AuthenticationMethods do
+    def set_current_user
+      CurrentUser.request = request
+      SessionLoader.new(request).load
     end
 
-    render template, layout: layout, status: status, formats: format
-  rescue ActionView::MissingTemplate
-    render "static/error", layout: layout, status: status, formats: format
+    def reset_current_user
+      CurrentUser.user = nil
+      CurrentUser.safe_mode = false
+      CurrentUser.request = nil
+    end
   end
 
-  def set_current_user
-    SessionLoader.new(request).load
-  end
+  concerning :AuthorizationMethods do
+    # Checks whether the current user is authorized to perform the current action. Also checks the rate limit for the action.
+    #
+    # @param record [ActiveRecord::Base, ActiveRecord::Relation] The record to authorize.
+    # @param action [String, nil] The name of the action to authorize. Defaults to the controller action name.
+    # @param policy_class [Class, nil] The policy class to use. If nil, the policy class will be determined by the record.
+    # @return [ActiveRecord::Base, ActiveRecord::Relation] The authorized record.
+    # @raise [Pundit::NotAuthorizedError] If the user is not authorized to perform the action.
+    # @see https://github.com/varvet/pundit
+    def authorize(record, action = nil, policy_class: nil)
+      super
+      check_rate_limit(record, policy_class: policy_class)
+      record
+    end
 
-  def reset_current_user
-    CurrentUser.user = nil
-    CurrentUser.safe_mode = false
+    # Checks the rate limit for the current controller action. Looks up the corresponding policy class and calls
+    # `rate_limit_for_<action>` if it exists, or `rate_limit_for_read` or `rate_limit_for_write` if not.
+    #
+    # @raise [RateLimiter::RateLimitError] If the rate limit is exceeded.
+    def check_rate_limit(record, policy_class: nil)
+      policy = find_policy(record, policy_class: policy_class)
+      rate_limit = policy.rate_limit(action_name, request)
+      return if rate_limit.blank?
+
+      key = "#{controller_name}:#{action_name}"
+      rate_limiter = RateLimiter.build(action: key, **rate_limit.to_h, user: CurrentUser.user, request: request)
+
+      headers["X-Rate-Limit"] = rate_limiter.to_json
+      rate_limiter.limit!
+    end
+
+    def find_policy(record, policy_class: nil)
+      if policy_class
+        policy_class.new(pundit_user, record)
+      else
+        pundit.policy!(record)
+      end
+    end
   end
 
   # Skip setting the session cookie if the response is being publicly cached to
@@ -219,7 +257,9 @@ class ApplicationController < ActionController::Base
   end
 
   def check_get_body
-    raise RequestBodyNotAllowedError if request.method.in?(%w[GET HEAD OPTIONS]) && request.body.size > 0
+    if request.body&.size.to_i > 0 && (request.get? || request.head? || request.options?) && request.method == request.request_method
+      raise RequestBodyNotAllowedError
+    end
   end
 
   # allow api clients to force errors for testing purposes.

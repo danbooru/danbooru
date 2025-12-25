@@ -1,24 +1,25 @@
 <% page_title "Login" %>
 <% meta_description "Login to #{Danbooru.config.app_name}" %>
-<% canonical_url login_url %>
+<% seo_canonical_url login_path %>
 
 <%= render "sessions/secondary_links" %>
 
 <div id="c-sessions">
   <div id="a-new">
-    <section>
-      <h1>Login</h1>
+    <div class="card mt-8 p-4 max-w-360px mx-auto flex flex-col items-center">
+      <h1 class="pb-4">Login</h1>
 
-      <%= simple_form_for(:session, url: session_path) do |f| %>
+      <%= edit_form_for(@session, as: :session, url: session_path, html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
         <%= f.input :url, as: :hidden, input_html: { value: params[:url] } %>
-        <%= f.input :name, input_html: { autocapitalize: "none" } %>
-        <%= f.input :password, hint: link_to("Forgot password?", password_reset_path), input_html: { autocomplete: "password" } %>
-        <%= f.submit "Login" %>
+        <%= f.input :name, label: "Name or Email", input_html: { autofocus: true, autocapitalize: "none", value: params.dig(:session, :name) } %>
+        <%= f.input :password, hint: link_to("Forgot password?", password_reset_path), input_html: { autocomplete: "current-password" } %>
+        <%= captcha_tag class: "mb-4", action: :login %>
+        <%= f.submit "Login", class: "button-primary" %>
       <% end %>
 
       <p class="fineprint">
-        New to <%= Danbooru.config.app_name %>? <%= link_to "Create a new account", new_user_path %>.
+        Don't have an account? <%= link_to "Create a new account", new_user_path %>.
       </p>
-    </section>
+    </div>
   </div>
 </div>

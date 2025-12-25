@@ -6,7 +6,12 @@
       <table class="aligned-vertical table-xs">
         <tr>
           <th>Forum</th>
-          <td><%= link_to @bulk_update_request.forum_topic.title, @bulk_update_request.forum_post || @bulk_update_rqeuest.forum_topic %></td>
+
+          <% if @bulk_update_request.forum_post.present? %>
+            <td><%= link_to @bulk_update_request.forum_topic.title, @bulk_update_request.forum_post || @bulk_update_rqeuest.forum_topic %></td>
+          <% else %>
+            <td><em>None</em></td>
+          <% end %>
         </tr>
         <tr>
           <th>Creator</th>
@@ -43,15 +48,15 @@
 
     <div class="flex flex-wrap gap-2 items-center">
       <% if policy(@bulk_update_request).approve? %>
-        <%= link_to "Approve", approve_bulk_update_request_path(@bulk_update_request), class: "button-primary button-sm leading-none", remote: true, method: :post, "data-confirm": "Are you sure you want to approve this bulk update request?" %>
+        <%= link_to "Approve", approve_bulk_update_request_path(@bulk_update_request), class: "button-primary", remote: true, method: :post, "data-shortcut": "a", "data-confirm": "Are you sure you want to approve this bulk update request?" %>
       <% end %>
 
       <% if policy(@bulk_update_request).destroy? %>
-        <%= link_to "Reject", @bulk_update_request, class: "button-outline-danger button-sm leading-none", remote: true, method: :delete, "data-confirm": "Are you sure you want to reject this bulk update request?" %>
+        <%= link_to "Reject", @bulk_update_request, class: "button-outline-danger", remote: true, method: :delete, "data-shortcut": "r", "data-confirm": "Are you sure you want to reject this bulk update request?" %>
       <% end %>
 
       <% if policy(@bulk_update_request).update? %>
-        <%= link_to "Edit", edit_bulk_update_request_path(@bulk_update_request), class: "button-outline-primary button-sm leading-none", "data-shortcut": "e" %>
+        <%= link_to "Edit", edit_bulk_update_request_path(@bulk_update_request), class: "button-outline-primary", "data-shortcut": "e" %>
       <% end %>
     </div>
   </div>

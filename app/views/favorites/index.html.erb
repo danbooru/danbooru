@@ -12,6 +12,8 @@
 
     <%= render "search" %>
 
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
+
     <%= table_for @favorites.includes(:user, post: [:uploader, :media_asset]), class: "striped autofit" do |t| %>
       <% if @post.nil? %>
         <% t.column "Post" do |favorite| %>

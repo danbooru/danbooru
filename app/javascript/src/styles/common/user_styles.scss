@@ -1,41 +1,24 @@
-body {
-  a.user-owner {
-    color: var(--user-admin-color);
-  }
+a.user-owner { color: var(--user-owner-color); }
+a.user-admin { color: var(--user-admin-color); }
+a.user-moderator { color: var(--user-moderator-color); }
+a.user-approver { color: var(--user-builder-color); }
+a.user-contributor { color: var(--user-builder-color); }
+a.user-builder { color: var(--user-builder-color); }
+a.user-platinum { color: var(--user-platinum-color); }
+a.user-gold { color: var(--user-gold-color); }
+a.user-member { color: var(--user-member-color); }
+a.user-restricted { color: var(--user-restricted-color); }
 
-  a.user-admin {
-    color: var(--user-admin-color);
-  }
+a.user-owner:hover { color: var(--user-owner-hover-color); }
+a.user-admin:hover { color: var(--user-admin-hover-color); }
+a.user-moderator:hover { color: var(--user-moderator-hover-color); }
+a.user-approver:hover { color: var(--user-builder-hover-color); }
+a.user-contributor:hover { color: var(--user-builder-hover-color); }
+a.user-builder:hover { color: var(--user-builder-hover-color); }
+a.user-platinum:hover { color: var(--user-platinum-hover-color); }
+a.user-gold:hover { color: var(--user-gold-hover-color); }
+a.user-member:hover { color: var(--user-member-hover-color); }
+a.user-restricted:hover { color: var(--user-restricted-hover-color); }
 
-  a.user-moderator {
-    color: var(--user-moderator-color);
-  }
-
-  a.user-approver {
-    color: var(--user-builder-color);
-  }
-
-  a.user-contributor {
-    color: var(--user-builder-color);
-  }
-
-  a.user-builder {
-    color: var(--user-builder-color);
-  }
-
-  a.user-platinum {
-    color: var(--user-platinum-color);
-  }
-
-  a.user-gold {
-    color: var(--user-gold-color);
-  }
-
-  a.user-member {
-    color: var(--user-member-color);
-  }
-
-  a.user-restricted {
-    color: var(--user-restricted-color);
-  }
-}
+a.user-banned-color { color: var(--user-banned-color); }
+a.user-banned-color:hover { color: var(--user-banned-hover-color); }

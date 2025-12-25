@@ -1,0 +1,17 @@
+.blacklisted-hidden.blacklisted-hidden {
+  display: none;
+}
+
+.blacklisted-blurred {
+  .post-preview-link, &.image-container {
+    overflow: hidden;
+  }
+
+  .post-preview-image, #image {
+    filter: blur(var(--blacklist-blur-amount, 40px)) !important;
+  }
+}
+
+.post-preview:not(.blacklist-initialized), .image-container:not(.blacklist-initialized) {
+  visibility: hidden;
+}

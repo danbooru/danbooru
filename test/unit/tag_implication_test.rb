@@ -18,6 +18,9 @@ class TagImplicationTest < ActiveSupport::TestCase
         FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       end
 
+      should normalize_attribute(:antecedent_name).from(" FOO BAR ").to("foo_bar")
+      should normalize_attribute(:consequent_name).from(" FOO BAR ").to("foo_bar")
+
       should allow_value('active').for(:status)
       should allow_value('deleted').for(:status)
 
@@ -118,7 +121,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       p2 = create(:post, tag_string: "sword weapon")
 
       TagImplication.approve!(antecedent_name: "sword", consequent_name: "weapon", approver: @admin)
-      perform_enqueued_jobs
 
       assert_equal("sword weapon", p1.reload.tag_string)
       assert_equal("sword weapon", p2.reload.tag_string)

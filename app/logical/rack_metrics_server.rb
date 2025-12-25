@@ -15,9 +15,10 @@ class RackMetricsServer
   end
 
   def start
-    @server = Rack::Handler.get("webrick")
+    @server = Rackup::Handler.get("webrick")
     @thread = Thread.new do
-      @server.run(self, Host: host, Port: port, **options)
+      logger = DanbooruLogger.new(default_level: Logger::DEBUG)
+      @server.run(self, Host: host, Port: port, AccessLog: [[logger, WEBrick::AccessLog::COMBINED_LOG_FORMAT]], **options)
     end
 
     self
@@ -27,7 +28,7 @@ class RackMetricsServer
     request = Rack::Request.new(env)
 
     case request.path_info
-    when "/health"
+    when "/health", "/healthz", "/up"
       [200, {}, []]
     when "/metrics", "/metrics/instance"
       metrics = ApplicationMetrics.update_process_metrics.to_prom

@@ -1,14 +1,14 @@
-require 'test_helper'
+require "test_helper"
 
 class BulkUpdateRequestTest < ActiveSupport::TestCase
   def create_bur!(script, approver)
     bur = create(:bulk_update_request, script: script)
     bur.approve!(approver)
-    perform_enqueued_jobs
+    perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
     bur
   end
 
-  context "a bulk update request" do
+  context "for a bulk update request" do
     setup do
       @admin = FactoryBot.create(:admin_user)
       CurrentUser.user = @admin
@@ -34,11 +34,30 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal("approved", @bur.reload.status)
         end
 
+        should "update the tag category counts for all posts with the tag" do
+          post1 = create(:post, tag_string: "chen")
+          post2 = create(:post, tag_string: "chen")
+
+          assert_equal(1, post1.tag_count_general)
+          assert_equal(0, post1.tag_count_character)
+          assert_equal(1, post2.tag_count_general)
+          assert_equal(0, post2.tag_count_character)
+
+          create_bur!("category chen -> character", @admin)
+          post1.reload
+          post2.reload
+
+          assert_equal(0, post1.tag_count_general)
+          assert_equal(1, post1.tag_count_character)
+          assert_equal(0, post2.tag_count_general)
+          assert_equal(1, post2.tag_count_character)
+        end
+
         should "fail if the tag doesn't already exist" do
           @bur = build(:bulk_update_request, script: "category hello -> artist")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't change category hello -> artist (the 'hello' tag doesn't exist)"], @bur.errors[:base])
+          assert_equal(["Can't change category of [[hello]] to artist ([[hello]] doesn't exist)"], @bur.errors[:base])
         end
       end
 
@@ -146,28 +165,28 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "create alias aaa -> bbb")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create alias aaa -> bbb (bbb is already aliased to ccc)"], @bur.errors.full_messages)
+          assert_equal(["Can't create alias [[aaa]] -> [[bbb]] (bbb is already aliased to ccc)"], @bur.errors.full_messages)
         end
 
         should "fail if the antecedent name is invalid" do
           @bur = build(:bulk_update_request, script: "create alias tag_ -> tag")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create alias tag_ -> tag ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+          assert_equal(["Can't create alias [[tag_]] -> [[tag]] ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
         end
 
         should "fail if the consequent name is invalid" do
           @bur = build(:bulk_update_request, script: "create alias tag -> tag_")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create alias tag -> tag_ ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+          assert_equal(["Can't create alias [[tag]] -> [[tag_]] ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
         end
 
         should "fail if the consequent name contains a tag type prefix" do
           @bur = build(:bulk_update_request, script: "alias blah -> char:bar")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create alias blah -> char:bar ('char:bar' cannot begin with 'char:')"], @bur.errors.full_messages)
+          assert_equal(["Can't create alias [[blah]] -> [[char:bar]] ('char:bar' cannot begin with 'char:')"], @bur.errors.full_messages)
         end
 
         should "be case-insensitive" do
@@ -176,6 +195,81 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @alias = TagAlias.find_by(antecedent_name: "aaa", consequent_name: "bbb")
           assert_equal(true, @alias.present?)
           assert_equal(true, @alias.is_active?)
+        end
+
+        context "when rewriting wiki pages" do
+          should "rewrite wiki pages to use the new tag" do
+            @wiki = create(:wiki_page, body: "[[aaa]] bar")
+
+            create_bur!("alias aaa -> bbb", @admin)
+
+            assert_equal("[[bbb]] bar", @wiki.reload.body)
+          end
+
+          should "not fail to rewrite wiki pages if the body is too long" do
+            @wiki = build(:wiki_page, title: "foo", body: "[[aaa]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}")
+            @wiki.save!(validate: false)
+
+            create_bur!("alias aaa -> bbb", @admin)
+
+            assert_equal("[[bbb]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}", @wiki.reload.body)
+          end
+        end
+
+        context "when rewriting pool descriptions" do
+          should "rewrite pool descriptions to use the new tag" do
+            @pool = create(:pool, description: "foo [[aaa]] bar")
+
+            create_bur!("alias aaa -> bbb", @admin)
+
+            assert_equal("foo [[bbb]] bar", @pool.reload.description)
+          end
+
+          should "not fail to rewrite pool descriptions if the pool description is too long" do
+            @pool = build(:pool, description: "foo [[aaa]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}")
+            @pool.save!(validate: false)
+
+            create_bur!("alias aaa -> bbb", @admin)
+
+            assert_equal("foo [[bbb]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}", @pool.reload.description)
+          end
+        end
+
+        context "when moving blacklisted tags" do
+          should "move blacklisted tags" do
+            user = create(:user, blacklisted_tags: "old_tag")
+            create_bur!("alias old_tag -> new_tag", @admin)
+
+            assert_equal(true, user.reload.blacklisted_tags.split.include?("new_tag"))
+          end
+
+          should "not fail if the user has too many blacklisted tags" do
+            user = build(:user, blacklisted_tags: User::MAX_BLACKLIST_TAGS.succ.times.map { |n| "tag#{n}" }.join("\n"))
+            user.save!(validate: false)
+
+            create_bur!("alias tag0 -> new_tag", @admin)
+
+            assert_equal(true, user.reload.blacklisted_tags.split.include?("new_tag"))
+          end
+        end
+
+        context "when moving saved searches" do
+          should "move saved searches" do
+            create(:tag, name: "old_tag")
+            ss = create(:saved_search, query: "old_tag")
+            create_bur!("alias old_tag -> new_tag", @admin)
+
+            assert_equal(true, ss.reload.query.split.include?("new_tag"))
+          end
+
+          should "not fail if the saved search has too many tags" do
+            ss = build(:saved_search, query: SavedSearch::MAX_TAGS.succ.times.map { |n| create(:tag, name: "tag#{n}").name }.join(" "))
+            ss.save!(validate: false)
+
+            create_bur!("alias tag0 -> new_tag", @admin)
+
+            assert_equal(true, ss.reload.query.split.include?("new_tag"))
+          end
         end
       end
 
@@ -195,7 +289,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "imply a -> c")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create implication a -> c (a already implies c through another implication)"], @bur.errors.full_messages)
+          assert_equal(["Can't create implication [[a]] -> [[c]] (a already implies c through another implication)"], @bur.errors.full_messages)
         end
 
         should "fail for an implication that is a duplicate of an existing implication" do
@@ -203,7 +297,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "imply a -> b")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create implication a -> b (Implication already exists)"], @bur.errors.full_messages)
+          assert_equal(["Can't create implication [[a]] -> [[b]] (Implication already exists)"], @bur.errors.full_messages)
         end
 
         should "fail for an implication that is redundant with another implication in the same BUR" do
@@ -211,7 +305,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "imply a -> b\nimply a -> c")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create implication a -> c (a already implies c through another implication)"], @bur.errors.full_messages)
+          assert_equal(["Can't create implication [[a]] -> [[c]] (a already implies c through another implication)"], @bur.errors.full_messages)
         end
 
         should "fail for an implication between tags of different categories" do
@@ -223,36 +317,49 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "imply hatsune_miku -> vocaloid")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create implication hatsune_miku -> vocaloid (Can't imply a character tag to a copyright tag)"], @bur.errors.full_messages)
+          assert_equal(["Can't create implication [[hatsune_miku]] -> [[vocaloid]] (Can't imply a character tag to a copyright tag)"], @bur.errors.full_messages)
         end
 
         should "fail for a child tag that is too small" do
           @t1 = create(:tag, name: "white_shirt", post_count: 9)
-          @t2 = create(:tag, name: "shirt", post_count: 1000000)
+          @t2 = create(:tag, name: "shirt", post_count: 1_000_000)
           create(:wiki_page, title: "white_shirt")
           create(:wiki_page, title: "shirt")
           @bur = build(:bulk_update_request, script: "imply white_shirt -> shirt")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create implication white_shirt -> shirt ('white_shirt' must have at least 10 posts)"], @bur.errors.full_messages)
+          assert_equal(["Can't create implication [[white_shirt]] -> [[shirt]] ([[white_shirt]] must have at least 10 posts)"], @bur.errors.full_messages)
 
           @t1.update!(post_count: 99)
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create implication white_shirt -> shirt ('white_shirt' must have at least 100 posts)"], @bur.errors.full_messages)
+          assert_equal(["Can't create implication [[white_shirt]] -> [[shirt]] ([[white_shirt]] must have at least 100 posts)"], @bur.errors.full_messages)
+        end
+
+        should "display the correct amount of required posts" do
+          create(:tag, name: "speech_bubble_censor", post_count: 20)
+          create(:wiki_page, title: "speech_bubble_censor")
+
+          create(:tag, name: "speech_bubble", post_count: 202_174)
+          create(:wiki_page, title: "speech_bubble")
+
+          @bur = build(:bulk_update_request, script: "imply speech_bubble_censor -> speech_bubble")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create implication [[speech_bubble_censor]] -> [[speech_bubble]] ([[speech_bubble_censor]] must have at least 21 posts)"], @bur.errors.full_messages)
         end
 
         should "fail if the antecedent name is invalid" do
           @bur = build(:bulk_update_request, script: "imply tag_ -> tag")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create implication tag_ -> tag ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+          assert_equal(["Can't create implication [[tag_]] -> [[tag]] ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
         end
 
         should "fail if the consequent name is invalid" do
           @bur = build(:bulk_update_request, script: "imply tag -> tag_")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create implication tag -> tag_ ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+          assert_equal(["Can't create implication [[tag]] -> [[tag_]] ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
         end
       end
 
@@ -272,14 +379,14 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "remove alias foo -> bar")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't remove alias foo -> bar (alias doesn't exist)"], @bur.errors[:base])
+          assert_equal(["Can't remove alias [[foo]] -> [[bar]] (alias doesn't exist)"], @bur.errors[:base])
         end
 
         should "fail to validate if the alias doesn't already exist" do
           @bur = build(:bulk_update_request, script: "remove alias foo -> bar")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't remove alias foo -> bar (alias doesn't exist)"], @bur.errors[:base])
+          assert_equal(["Can't remove alias [[foo]] -> [[bar]] (alias doesn't exist)"], @bur.errors[:base])
         end
 
         should "allow reapproving a failed BUR when the alias has already been removed" do
@@ -320,14 +427,14 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "remove implication foo -> bar")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't remove implication foo -> bar (implication doesn't exist)"], @bur.errors[:base])
+          assert_equal(["Can't remove implication [[foo]] -> [[bar]] (implication doesn't exist)"], @bur.errors[:base])
         end
 
         should "fail to validate if the implication doesn't already exist" do
           @bur = build(:bulk_update_request, script: "remove implication foo -> bar")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't remove implication foo -> bar (implication doesn't exist)"], @bur.errors[:base])
+          assert_equal(["Can't remove implication [[foo]] -> [[bar]] (implication doesn't exist)"], @bur.errors[:base])
         end
 
         should "allow reapproving a failed BUR when the implication has already been removed" do
@@ -349,6 +456,29 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(true, @ti.present?)
           assert_equal(true, @ti.is_deleted?)
           assert_equal("approved", @bur.reload.status)
+        end
+
+        should "allow the flattening of an implication tree, ie (a -> b -> c) to (a -> c)" do
+          @ti1 = create(:tag_implication, antecedent_name: "character_(costume)_(swimsuit)_(fate)", consequent_name: "character_(costume)_(fate)")
+          @ti2 = create(:tag_implication, antecedent_name: "character_(costume)_(fate)", consequent_name: "character_(fate)")
+
+          @script = <<~EOS
+            unimply character_(costume)_(swimsuit)_(fate) -> character_(costume)_(fate)
+            imply character_(costume)_(swimsuit)_(fate) -> character_(fate)
+          EOS
+          @bur = build(:bulk_update_request, script: @script)
+
+          assert_equal(true, @bur.valid?)
+          @bur.approve!(@admin)
+          assert_equal("processing", @bur.reload.status)
+
+          perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
+          assert_equal("approved", @bur.reload.status)
+
+          assert_equal(true, @ti1.reload.is_deleted?)
+
+          @ti = TagImplication.find_by(antecedent_name: "character_(costume)_(swimsuit)_(fate)", consequent_name: "character_(fate)")
+          assert_equal(true, @ti.is_active?)
         end
       end
 
@@ -376,7 +506,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "mass update (foo -> bar")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't mass update (foo -> bar (the search `(foo` has a syntax error)"], @bur.errors.full_messages)
+          assert_equal(["Can't mass update {{(foo}} -> {{bar}} (the search {{(foo}} has a syntax error)"], @bur.errors.full_messages)
         end
       end
 
@@ -404,7 +534,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "rename aaa -> bbb")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't rename aaa -> bbb (the 'aaa' tag doesn't exist)"], @bur.errors.full_messages)
+          assert_equal(["Can't rename [[aaa]] -> [[bbb]] ([[aaa]] doesn't exist)"], @bur.errors.full_messages)
         end
 
         should "fail if the old tag has more than 200 posts" do
@@ -412,7 +542,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "rename aaa -> bbb")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't rename aaa -> bbb ('aaa' has more than 200 posts, use an alias instead)"], @bur.errors.full_messages)
+          assert_equal(["Can't rename [[aaa]] -> [[bbb]] ([[aaa]] has more than 200 posts, use an alias instead)"], @bur.errors.full_messages)
         end
 
         should "fail if the consequent name is invalid" do
@@ -420,7 +550,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "rename tag -> tag_")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't rename tag -> tag_ ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+          assert_equal(["Can't rename [[tag]] -> [[tag_]] ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
         end
 
         context "when moving an artist" do
@@ -465,6 +595,86 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
             assert_equal("tony_taka_(style)", @wiki.reload.title)
           end
         end
+
+        context "when rewriting wiki pages" do
+          should "rewrite wiki pages to use the new tag" do
+            create(:tag, name: "aaa")
+            @wiki = create(:wiki_page, body: "[[aaa]] bar")
+
+            create_bur!("rename aaa -> bbb", @admin)
+
+            assert_equal("[[bbb]] bar", @wiki.reload.body)
+          end
+
+          should "not fail to rewrite wiki pages if the body is too long" do
+            create(:tag, name: "aaa")
+            @wiki = build(:wiki_page, title: "foo", body: "[[aaa]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}")
+            @wiki.save!(validate: false)
+
+            create_bur!("rename aaa -> bbb", @admin)
+
+            assert_equal("[[bbb]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}", @wiki.reload.body)
+          end
+        end
+
+        context "when rewriting pool descriptions" do
+          should "rewrite pool descriptions to use the new tag" do
+            create(:tag, name: "aaa")
+            @pool = create(:pool, description: "foo [[aaa]] bar")
+
+            create_bur!("rename aaa -> bbb", @admin)
+
+            assert_equal("foo [[bbb]] bar", @pool.reload.description)
+          end
+
+          should "not fail to rewrite pool descriptions if the pool description is too long" do
+            create(:tag, name: "aaa")
+            @pool = build(:pool, description: "foo [[aaa]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}")
+            @pool.save!(validate: false)
+
+            create_bur!("rename aaa -> bbb", @admin)
+
+            assert_equal("foo [[bbb]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}", @pool.reload.description)
+          end
+        end
+
+        context "when moving blacklisted tags" do
+          should "move blacklisted tags" do
+            create(:tag, name: "old_tag")
+            user = create(:user, blacklisted_tags: "old_tag")
+            create_bur!("rename old_tag -> new_tag", @admin)
+
+            assert_equal(true, user.reload.blacklisted_tags.split.include?("new_tag"))
+          end
+
+          should "not fail if the user has too many blacklisted tags" do
+            user = build(:user, blacklisted_tags: User::MAX_BLACKLIST_TAGS.succ.times.map { |n| create(:tag, name: "tag#{n}").name }.join("\n"))
+            user.save!(validate: false)
+
+            create_bur!("rename tag0 -> new_tag", @admin)
+
+            assert_equal(true, user.reload.blacklisted_tags.split.include?("new_tag"))
+          end
+        end
+
+        context "when moving saved searches" do
+          should "move saved searches" do
+            create(:tag, name: "old_tag")
+            ss = create(:saved_search, query: "old_tag")
+            create_bur!("rename old_tag -> new_tag", @admin)
+
+            assert_equal(true, ss.reload.query.split.include?("new_tag"))
+          end
+
+          should "not fail if the saved search has too many tags" do
+            ss = build(:saved_search, query: SavedSearch::MAX_TAGS.succ.times.map { |n| create(:tag, name: "tag#{n}").name }.join(" "))
+            ss.save!(validate: false)
+
+            create_bur!("rename tag0 -> new_tag", @admin)
+
+            assert_equal(true, ss.reload.query.split.include?("new_tag"))
+          end
+        end
       end
 
       context "the nuke command" do
@@ -487,14 +697,44 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal("approved", @bur.reload.status)
         end
 
-        should "remove pools" do
-          @pool = create(:pool)
-          @post = create(:post, tag_string: "bar pool:#{@pool.id}")
-          @bur = create_bur!("nuke pool:#{@pool.id}", @admin)
+        should "remove pools by id" do
+          @pool = create(:pool, id: 123)
+          @post = create(:post, tag_string: "bar pool:123")
+          @bur = create_bur!("nuke pool:123", @admin)
 
           assert_equal([], @pool.post_ids)
           assert_equal("approved", @bur.reload.status)
           assert_equal(User.system, @pool.versions.last.updater)
+        end
+
+        should "remove pools by name" do
+          @pool = create(:pool, name: "asd")
+          @post = create(:post, tag_string: "bar pool:asd")
+          @bur = create_bur!("nuke pool:asd", @admin)
+
+          assert_equal([], @pool.post_ids)
+          assert_equal("approved", @bur.reload.status)
+          assert_equal(User.system, @pool.versions.last.updater)
+        end
+
+        should "raise an error when trying to nuke a pool that doesn't exist (by name)" do
+          @bur = build(:bulk_update_request, script: "nuke pool:mario_quest")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't nuke {{pool:mario_quest}} (pool doesn't exist)"], @bur.errors.full_messages)
+        end
+
+        should "raise an error when trying to nuke a pool that doesn't exist (by ID)" do
+          @bur = build(:bulk_update_request, script: "nuke pool:12345678")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't nuke {{pool:12345678}} (pool doesn't exist)"], @bur.errors.full_messages)
+        end
+
+        should "not raise a validation error for updates containing nonexisting pools" do
+          @bur = create_bur!("update pool:123 -> test", @admin)
+
+          assert_equal("approved", @bur.reload.status)
         end
       end
 
@@ -565,7 +805,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "imply a -> b")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create implication a -> b ('a' must have a wiki page; 'b' must have a wiki page)"], @bur.errors.full_messages)
+          assert_equal(["Can't create implication [[a]] -> [[b]] ([[a]] must have a wiki page; [[b]] must have a wiki page)"], @bur.errors.full_messages)
         end
       end
 
@@ -598,7 +838,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_equal(%w[aaa bbb], @bur.tags)
 
         @bur.update!(script: @script)
-        assert_equal(%w(000 111 222 333 444 555 aaa bbb ccc ddd eee fff ggg iii), @bur.tags)
+        assert_equal(%w[000 111 222 333 444 555 aaa bbb ccc ddd eee fff ggg iii], @bur.tags)
       end
     end
 
@@ -629,7 +869,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @bur = build(:bulk_update_request, script: "deprecate no_wiki")
 
         assert_equal(false, @bur.valid?)
-        assert_equal(["Can't deprecate no_wiki (tag must have a wiki page)"], @bur.errors[:base])
+        assert_equal(["Can't deprecate [[no_wiki]] (tag must have a wiki page)"], @bur.errors[:base])
       end
     end
 
@@ -691,7 +931,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @bur.approve!(@admin)
         assert_equal("processing", @bur.status)
 
-        assert_raises(RuntimeError) { perform_enqueued_jobs }
+        assert_raises(RuntimeError) { perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob) }
         assert_equal("failed", @bur.reload.status)
 
         assert_equal("active", TagAlias.find_by!(antecedent_name: "one", consequent_name: "two").status)
@@ -707,7 +947,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         TagAlias.any_instance.stubs(:process!).raises(RuntimeError.new("oh no"))
         @bur.approve!(@admin)
-        assert_raises(RuntimeError) { perform_enqueued_jobs }
+        assert_raises(RuntimeError) { perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob) }
 
         assert_equal("aaa foo", @post.reload.tag_string)
 
@@ -722,7 +962,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         TagAlias.any_instance.unstub(:process!)
         @bur.approve!(@admin)
-        perform_enqueued_jobs
+        perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
 
         assert_equal("aaa bar", @post.reload.tag_string)
 
@@ -737,18 +977,23 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     end
 
     should "create a forum topic" do
-      bur = create(:bulk_update_request, reason: "zzz", script: "create alias aaa -> bbb")
+      user = create(:user)
+      bur = create(:bulk_update_request, user: user, reason: "zzz", script: "create alias aaa -> bbb")
 
       assert_equal(true, bur.forum_post.present?)
       assert_match(/\[bur:#{bur.id}\]/, bur.forum_post.body)
       assert_match(/zzz/, bur.forum_post.body)
+      assert_equal(user, bur.forum_topic.creator)
+      assert_equal(user, bur.forum_topic.updater)
+      assert_equal(user, bur.forum_post.creator)
+      assert_equal(user, bur.forum_post.updater)
     end
 
     context "with an associated forum topic" do
       setup do
         @topic = create(:forum_topic, title: "[bulk] hoge", creator: @admin)
         @post = create(:forum_post, topic: @topic, creator: @admin)
-        @req = FactoryBot.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic_id => @topic.id, :forum_post_id => @post.id, :title => "[bulk] hoge")
+        @req = create(:bulk_update_request, script: "create alias AAA -> BBB", forum_topic: @topic, forum_post: @post)
       end
 
       should "leave the BUR pending if there is a validation error during approval" do
@@ -768,11 +1013,65 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_equal("pending", @req.status)
       end
 
+      should "create a forum post on approval" do
+        @req.approve!(@admin)
+
+        assert_equal("processing", @req.status)
+        assert_equal(%{The "bulk update request ##{@req.id}":/bulk_update_requests?search%5Bid%5D=#{@req.id} (forum ##{@post.id}) has been approved by @#{@admin.name}.}, @topic.forum_posts.last.body)
+        assert_equal(User.system, @topic.forum_posts.last.creator)
+        assert_equal(User.system, @topic.forum_posts.last.updater)
+      end
+
       should "not send @mention dmails to the approver" do
         assert_no_difference("Dmail.count") do
           @req.approve!(@admin)
         end
       end
+    end
+
+    context "that doesn't belong to a forum post" do
+      should "not fail to be rejected" do
+        bur = create(:bulk_update_request)
+        bur.update!(forum_post: nil)
+
+        assert_nil(bur.forum_post)
+        bur.reject!
+
+        assert_equal("rejected", bur.status)
+      end
+
+      should "not fail to be approved" do
+        bur = create(:bulk_update_request)
+        bur.update!(forum_post: nil)
+
+        assert_nil(bur.forum_post)
+        bur.approve!(create(:admin_user))
+
+        assert_equal("processing", bur.status)
+      end
+    end
+
+    context "when validating a new bulk update request" do
+      subject { build(:bulk_update_request) }
+
+      should allow_value("test").for(:title)
+      should_not allow_value("").for(:title)
+      should_not allow_value(" ").for(:title)
+      should_not allow_value("x" * 201).for(:title)
+
+      should allow_value("test").for(:reason)
+      should allow_value((["!post #1"] * 5).join("\n")).for(:reason)
+      should_not allow_value("").for(:reason)
+      should_not allow_value(" ").for(:reason)
+      should_not allow_value("x" * 20_001).for(:reason)
+      should_not allow_value((["!post #1"] * 10).join("\n")).for(:reason)
+
+      should_not allow_value(0).for(:status)
+      should_not allow_value("unknown").for(:status)
+
+      should allow_value("nuke fumimi").for(:reason)
+      should_not allow_value("").for(:script)
+      should_not allow_value("x" * 20_001).for(:script)
     end
 
     context "when searching" do

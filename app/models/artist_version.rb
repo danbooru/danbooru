@@ -19,8 +19,10 @@ class ArtistVersion < ApplicationRecord
     def search(params, current_user)
       q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :urls, :other_names, :updater, :artist], current_user: current_user)
 
-      if params[:order] == "name"
-        q = q.order("artist_versions.name").default_order
+      case params[:order]
+      when /\A(id|created_at|updated_at|name)(?:_(asc|desc))?\z/i
+        dir = $2 || :desc
+        q = q.order($1 => dir).order(id: :desc)
       else
         q = q.apply_default_order(params)
       end

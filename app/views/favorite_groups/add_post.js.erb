@@ -1,7 +1,7 @@
 <% if @favorite_group.errors.any? %>
-  Danbooru.notice("<%= j @favorite_group.errors.full_messages.join("; ") %>");
+  Danbooru.Notice.error("<%= j @favorite_group.errors.full_messages.join("; ") %>");
 <% else %>
-  Danbooru.notice("Added post to favorite group <%= j @favorite_group.pretty_name %>");
+  Danbooru.Notice.info("Added post to favorite group <%= j @favorite_group.pretty_name %>");
 <% end %>
 
 $("#add-to-favgroup-dialog").dialog("close");

@@ -7,9 +7,8 @@
     </p>
 
     <%= edit_form_for(@post_appeal) do |f| %>
-      <%= f.input :reason, as: :dtext %>
+      <%= f.input :reason, as: :dtext, input_html: { autofocus: true } %>
       <%= f.button :submit, "Submit" %>
-      <%= dtext_preview_button "post_appeal_reason" %>
     <% end %>
   </div>
 </div>

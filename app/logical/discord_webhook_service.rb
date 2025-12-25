@@ -52,7 +52,7 @@ class DiscordWebhookService
   end
 
   def convert_dtext(dtext)
-    DText.to_markdown(dtext).truncate(2000)
+    DText.new(dtext).to_markdown.truncate(2000)
   end
 
   def webhook_url

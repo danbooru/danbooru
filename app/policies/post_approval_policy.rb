@@ -5,7 +5,11 @@ class PostApprovalPolicy < ApplicationPolicy
     user.is_approver?
   end
 
-  def can_bypass_approval_limits?
+  def can_approve_own_uploads?
+    user.is_admin?
+  end
+
+  def can_approve_same_post_twice?
     user.is_admin?
   end
 end

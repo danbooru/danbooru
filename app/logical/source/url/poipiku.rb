@@ -41,6 +41,7 @@ class Source::URL::Poipiku < Source::URL
       @original_file_ext = $2
 
     # https://poipiku.com/6849873/8271386.html
+    # https://poipiku.com/8566613/9625938.html (redirects to https://poipiku.com/8566613/11413167.html)
     in _, "poipiku.com", user_id, /(\d+)\.html$/i
       @user_id = user_id
       @post_id = $1.to_i
@@ -68,7 +69,7 @@ class Source::URL::Poipiku < Source::URL
     if image_dir && user_id && post_id && image_id && image_hash && original_file_ext
       "https://img-org.poipiku.com/#{image_dir}/#{"%.9d" % user_id}/#{"%.9d" % post_id}_#{"%.9d" % image_id}_#{image_hash}.#{original_file_ext}"
 
-   # https://img-org.poipiku.com/user_img03/000013318/007865949_WuckPeoQk.png
+    # https://img-org.poipiku.com/user_img03/000013318/007865949_WuckPeoQk.png
     elsif image_dir && user_id && post_id && image_hash && original_file_ext
       "https://img-org.poipiku.com/#{image_dir}/#{"%.9d" % user_id}/#{"%.9d" % post_id}_#{image_hash}.#{original_file_ext}"
 

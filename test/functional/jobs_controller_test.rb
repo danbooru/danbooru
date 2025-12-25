@@ -4,7 +4,7 @@ class JobsControllerTest < ActionDispatch::IntegrationTest
   context "The jobs controller" do
     setup do
       @user = create(:admin_user)
-      @job = create(:good_job)
+      @job = create(:good_job, scheduled_at: 1.minute.ago)
     end
 
     context "index action" do
@@ -30,7 +30,7 @@ class JobsControllerTest < ActionDispatch::IntegrationTest
     context "retry action" do
       should "work" do
         @job.discard_job("Canceled")
-        @job.head_execution.active_job.class.stubs(:queue_adapter).returns(GoodJob::Adapter.new)
+        @job.active_job.class.stubs(:queue_adapter).returns(GoodJob::Adapter.new)
         put_auth retry_job_path(@job), @user, xhr: true
         assert_response :success
       end

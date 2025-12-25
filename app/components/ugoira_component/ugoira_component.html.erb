@@ -1,0 +1,45 @@
+<%= tag.div style: "aspect-ratio: #{media_asset.image_width} / #{media_asset.image_height}", class: ["ugoira-container relative flex items-center justify-center", html_options[:class]], tabindex: 0, "data-quality": default_quality, "x-bind:data-paused": "String(player.paused)", "x-data": "{ player: new Danbooru.Ugoira($el) }", "x-init": "player.initialize()", **html_options.except(:class) do %>
+  <%= tag.canvas "data-src": media_asset.variant(:original).file_url, class: "max-w-full h-full object-contain", width: media_asset.image_width, height: media_asset.image_height, "data-frame-delays": frame_delays.to_json, "data-frame-offsets": frame_offsets&.to_json, "data-file-size": media_asset.file_size, "x-show": "player.quality === 'original'", "x-cloak": default_quality.sample?.presence %>
+  <%= tag.video src: media_asset.variant(:sample).file_url, class: "max-w-full h-full", width: media_asset.image_width, height: media_asset.image_height, muted: true, loop: true, preload: "none", type: "video/webm", "x-show": "player.quality === 'sample'", "x-cloak": default_quality.original?.presence %>
+
+  <%= spinner_icon class: "absolute h-16 max-h-1/4 text-inverse", "x-show": "player.loadProgress === '0%'", "x-cloak": true %>
+
+  <div class="ugoira-controls @container flex items-center absolute bottom-0 w-full h-8 px-2 gap-2 opacity-0 transition-opacity" x-cloak>
+    <%= play_icon class: "flex-none w-6 h-full py-2 cursor-pointer @max-120px:hidden", "x-show": "player.paused", "x-on:click": "player.play()" %>
+    <%= pause_icon class: "flex-none w-6 h-full py-2 cursor-pointer @max-120px:hidden", "x-show": "!player.paused", "x-on:click": "player.pause()" %>
+
+    <%= tag.input type: "range", class: "ugoira-slider h-full w-full appearance-none border-0 bg-transparent p-0 cursor-pointer", tabindex: -1, value: 0, step: "any", min: 0, max: media_asset.duration, "x-bind:max": "player.duration", "x-bind:style": '{ "--playback-progress": player.playbackProgress, "--load-progress": player.loadProgress }', "x-model": "player.currentTime" %>
+
+    <span class="flex gap-1 text-sm select-none whitespace-nowrap @max-270px:hidden">
+      <span x-text="player.formatTime(player.currentTime)">0:00</span> /
+      <span x-text="player.formatTime(Math.max(player.duration, 1))">0:01</span>
+    </span>
+
+    <%= render PopupMenuComponent.new(classes: "h-full", button_classes: "h-full", button_html: { "data-tippy-placement": "top", "data-tippy-arrow": "false" }) do |menu| %>
+      <% menu.with_button do %>
+        <%= gear_icon(class: "w-6 h-full py-2 cursor-pointer") %>
+      <% end %>
+
+      <% menu.with_item class: "px-3 py-1 text-center" do %>
+        <span class="text-sm whitespace-nowrap select-none">Quality</span>
+      <% end %>
+
+      <% menu.with_item class: "p-0" do %>
+        <hr class="border-t">
+      <% end %>
+
+      <% menu.with_item class: "px-3 py-1 flex gap-2 cursor-pointer", "x-on:click": "player.setQuality('sample')" do %>
+        <%= check_icon "x-bind:class": "{ invisible: player.quality !== 'sample' }" %>
+        <%= link_to "WebM", "javascript:void(0)", class: "text-sm whitespace-nowrap" %>
+      <% end %>
+
+      <% menu.with_item class: "px-3 py-1 flex gap-2 cursor-pointer", "x-on:click": "player.setQuality('original')" do %>
+        <%= check_icon "x-bind:class": "{ invisible: player.quality !== 'original' }" %>
+        <%= link_to "Original", "javascript:void(0)", class: "text-sm whitespace-nowrap" %>
+      <% end %>
+    <% end %>
+
+    <%= expand_icon class: "flex-none w-6 h-full py-2 cursor-pointer @max-270px:hidden", "x-show": "!player.fullscreen", "x-on:click": "player.toggleFullscreen()" %>
+    <%= minimize_icon class: "flex-none w-6 h-full py-2 cursor-pointer @max-270px:hidden", "x-show": "player.fullscreen", "x-on:click": "player.toggleFullscreen()" %>
+  </div>
+<% end %>

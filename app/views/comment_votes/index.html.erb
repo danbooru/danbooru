@@ -4,7 +4,7 @@
   <div id="a-index">
     <h1>Comment Votes</h1>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
     <%= render "search" %>
 
     <%= table_for @comment_votes, class: "striped autofit" do |t| %>
@@ -14,7 +14,7 @@
 
       <% t.column "Comment", td: {class: "col-expand"} do |vote| %>
         <div class="prose">
-          <%= format_text(vote.comment.body) %>
+          <%= vote.comment.dtext_body.format_text %>
         </div>
       <% end %>
 

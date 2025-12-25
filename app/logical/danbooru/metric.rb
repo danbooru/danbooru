@@ -81,6 +81,11 @@ module Danbooru
       new_metric
     end
 
+    # @return [String] The metric's name, in a human-readable format (e.g. danbooru_posts_total becomes "Posts").
+    def pretty_name
+      name.to_s.delete_prefix("danbooru_").gsub(/_(bytes|seconds|total)/, "").humanize
+    end
+
     # @return [String] The metric in Prometheus format.
     def to_prom
       str = +""
@@ -88,6 +93,12 @@ module Danbooru
       str << "# TYPE #{name} #{type}\n"
       str << (values.sort.map(&:to_prom).join("\n").presence || Value.new(self, labels: labels).to_prom)
       str
+    end
+
+    # @return [Danbooru::DataFrame] A DataFrame containing the metric's labels and values.
+    def to_dataframe
+      data = values.map { |metric_value| { **labels, **metric_value.labels, value: metric_value.value } }
+      Danbooru::DataFrame.new(data)
     end
 
     # The default value for metrics without any labels. For example, `metrics[:http_requests_total].increment`
@@ -113,7 +124,12 @@ module Danbooru
   # A Metric::Set represents a collection of related metrics.
   class Metric
     class Set
+      # @return metrics [Hash<Symbol, Metric>] The metrics in the set, keyed by metric name.
       attr_reader :metrics
+
+      # @return [Time] The time when the metrics were last updated. Manually updated by the caller.
+      attr_accessor :updated_at
+
       protected attr_writer :metrics
 
       delegate :[], to: :metrics
@@ -121,17 +137,18 @@ module Danbooru
       # Create a new metric set, optionally registering a set of metrics at the same time.
       def initialize(...)
         @metrics = {}
+        @updated_at = nil
         register(...)
       end
 
       # Add a new group of metrics to the set.
       #
-      # @param definitions [Hash<Symbol, Array<Symbol, String>>] The hash of { name => [metric type, help] } metric definitions.
+      # @param definitions [Array<Hash>] The array of metric definitions.
       # @param labels [Hash<Symbol, String>] An optional set of labels to apply to each metric.
       # @return [Metric::Set] The metric set.
-      def register(definitions = {}, labels = {})
-        definitions.each do |name, (type, help)|
-          metrics[name] = Metric.new(name, type: type, help: help, labels: labels)
+      def register(definitions = [], labels: {})
+        definitions.each do |definition|
+          metrics[definition[:name]] = Metric.new(definition[:name], type: definition[:type], help: definition[:help], labels: labels)
         end
 
         self

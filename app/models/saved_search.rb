@@ -3,15 +3,19 @@
 class SavedSearch < ApplicationRecord
   REDIS_EXPIRY = 1.hour
   QUERY_LIMIT = 1000
+  MAX_TAGS = 150
 
   attr_reader :disable_labels
 
   belongs_to :user
 
-  normalize :query, :normalize_query
-  normalize :labels, :normalize_labels
+  normalizes :query, with: ->(query) { SavedSearch.normalize_query(query) }
+  normalizes :labels, with: ->(labels) { SavedSearch.normalize_labels(labels) }
 
-  validates :query, visible_string: true
+  validates :query, visible_string: true, length: { maximum: 3000 }, if: :query_changed?
+  validates :labels, length: { maximum: 20, too_long: "can't have more than 20 labels" }, if: :labels_changed?
+  validate :validate_query, if: :query_changed?
+  validate :validate_labels, if: :labels_changed?
   validate :validate_count, on: :create
 
   scope :labeled, ->(label) { where_array_includes_any_lower(:labels, [normalize_label(label)]) }
@@ -148,6 +152,8 @@ class SavedSearch < ApplicationRecord
   end
 
   concerning :Queries do
+    extend Memoist
+
     class_methods do
       def normalize_query(query)
         PostQuery.new(query.to_s).replace_aliases.to_infix
@@ -162,20 +168,43 @@ class SavedSearch < ApplicationRecord
 
       def rewrite_queries!(old_name, new_name)
         has_tag(old_name).find_each do |ss|
-          ss.lock!
-          ss.rewrite_query(old_name, new_name)
-          ss.save!
+          ss.with_lock do
+            ss.rewrite_query(old_name, new_name)
+            ss.save!(validate: false)
+          end
         end
       end
     end
 
-    def normalized_query
-      @normalized_query ||= PostQuery.normalize(query).sort.to_s
+    def query=(query)
+      super
+      flush_cache(:post_query)
+      flush_cache(:normalized_query)
+    end
+
+    memoize def post_query
+      PostQuery.new(query)
+    end
+
+    memoize def normalized_query
+      PostQuery.normalize(query).sort.to_s
     end
 
     def rewrite_query(old_name, new_name)
       query.gsub!(/(?:\A| )([-~])?#{Regexp.escape(old_name)}(?: |\z)/i) { " #{$1}#{new_name} " }
       query.strip!
+    end
+  end
+
+  def validate_query
+    if post_query.total_term_count > MAX_TAGS
+      errors.add(:query, "can't have more than #{MAX_TAGS} tags")
+    end
+  end
+
+  def validate_labels
+    if labels.any? { |label| label.length > 100 }
+      errors.add(:labels, "can't have labels more than 100 characters long")
     end
   end
 

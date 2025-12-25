@@ -10,7 +10,7 @@ class PostPreviewComponent < ApplicationComponent
   with_collection_parameter :post
   renders_one :footer
 
-  attr_reader :post, :tags, :size, :classes, :show_deleted, :link_target, :pool, :recommended, :show_votes, :fit, :save_data, :current_user, :options
+  attr_reader :post, :tags, :size, :classes, :show_deleted, :link_target, :recommended, :show_votes, :fit, :save_data, :current_user, :options
 
   delegate :external_link_to, :time_ago_in_words_tagged, :duration_to_hhmmss, :render_post_votes, :empty_heart_icon, :sound_icon, to: :helpers
   delegate :image_width, :image_height, :file_ext, :file_size, :duration, :is_animated?, to: :media_asset
@@ -31,7 +31,7 @@ class PostPreviewComponent < ApplicationComponent
   # @param fit [Symbol] If `:fixed`, make the thumbnail container a fixed size
   #   (e.g. 180x180), even if the thumbnail image is smaller than that. If `:compact`,
   #   make the thumbnail container shrink to the same size as the thumbnail image.
-  def initialize(post:, tags: "", size: DEFAULT_SIZE, classes: nil, show_deleted: false, show_votes: false, link_target: post, pool: nil, recommended: nil, save_data: CurrentUser.save_data, fit: :compact, current_user: CurrentUser.user, **options)
+  def initialize(post:, tags: "", size: DEFAULT_SIZE, classes: nil, show_deleted: false, show_votes: false, link_target: post, recommended: nil, save_data: CurrentUser.save_data, fit: :compact, current_user: CurrentUser.user, **options)
     super
     @post = post
     @tags = tags.presence
@@ -40,7 +40,6 @@ class PostPreviewComponent < ApplicationComponent
     @show_deleted = show_deleted
     @show_votes = show_votes
     @link_target = link_target
-    @pool = pool
     @recommended = recommended
     @fit = fit
     @save_data = save_data
@@ -79,7 +78,7 @@ class PostPreviewComponent < ApplicationComponent
 
   def preview_class
     klass = ["post-preview"]
-    klass << "captioned" if pool || recommended
+    klass << "captioned" if recommended
     klass << "post-status-pending" if post.is_pending?
     klass << "post-status-flagged" if post.is_flagged?
     klass << "post-status-deleted" if post.is_deleted?

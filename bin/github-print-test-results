@@ -38,7 +38,7 @@ def print_annotations(testcases)
   end
 end
 
-def print_table(testcases, output = StringIO.new)
+def print_table(testcases, output = StringIO.new, repo: ENV["GITHUB_REPOSITORY"], commit: ENV["GITHUB_SHA"])
   output.puts "### Failed"
   output.puts
   output.puts "<table>"
@@ -47,6 +47,7 @@ def print_table(testcases, output = StringIO.new)
     if tc.at_css("failure, error").present?
       title = ":anger: #{tc[:classname]}: #{tc[:name].delete_prefix("test_:").strip.delete_suffix(".").upcase_first} (#{tc[:time].to_f.round(2)}s)"
       message = tc.text.to_s.strip.remove(/^Failure:|^test_: |\(Minitest::Result\) \[.*\]:/)
+      link = "[#{ERB::Util.h(File.basename(tc[:file]))}:#{tc[:lineno]}](https://github.com/#{repo}/blob/#{commit}/#{ERB::Util.h(tc[:file])}#L#{tc[:lineno]})"
 
       output.puts <<~EOS
         <tr>
@@ -58,7 +59,7 @@ def print_table(testcases, output = StringIO.new)
           </td>
           <td>
 
-          [#{ERB::Util.h(File.basename(tc[:file]))}:#{tc[:lineno]}](#{ERB::Util.h(tc[:file])}#L#{tc[:lineno]})
+          #{link}
 
           </td>
         </tr>
@@ -75,13 +76,14 @@ def print_table(testcases, output = StringIO.new)
   testcases.each do |tc|
     if tc.at_css("skipped").present?
       title = "#{tc[:classname]}: #{tc[:name].delete_prefix("test_:").strip.delete_suffix(".").upcase_first}"
+      link = "[#{ERB::Util.h(File.basename(tc[:file]))}:#{tc[:lineno]}](https://github.com/#{repo}/blob/#{commit}/#{ERB::Util.h(tc[:file])}#L#{tc[:lineno]})"
 
       output.puts <<~EOS
         <tr>
           <td>#{ERB::Util.h(title)}</td>
           <td>
 
-          [#{ERB::Util.h(File.basename(tc[:file]))}:#{tc[:lineno]}](#{ERB::Util.h(tc[:file])}#L#{tc[:lineno]})
+          #{link}
 
           </td>
         </tr>

@@ -182,7 +182,7 @@ class DiscordSlashCommand
         verify_key = Ed25519::VerifyKey.new(public_key_bytes)
 
         verify_key.verify(signature_bytes, message)
-        JSON.parse(body).with_indifferent_access
+        body.parse_json || {}
       rescue Ed25519::VerifyError
         raise WebhookVerificationError
       end

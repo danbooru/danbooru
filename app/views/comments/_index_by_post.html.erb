@@ -1,4 +1,4 @@
-<%= render "posts/partials/common/inline_blacklist" %>
+<%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
 <div id="p-index-by-post" class="space-y-12">
   <% if @posts.blank? %>

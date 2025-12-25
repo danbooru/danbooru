@@ -6,6 +6,7 @@ FactoryBot.define do
 
     id { SecureRandom.uuid }
     active_job_id { job.job_id }
+    job_class { job.class.name }
     queue_name { job.queue_name }
     priority { job.priority }
     serialized_params do

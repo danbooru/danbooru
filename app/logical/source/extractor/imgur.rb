@@ -10,10 +10,6 @@ module Source
       # 2019, so hardcoding it should be fine.
       IMGUR_CLIENT_ID = "546c25a59c58ad7"
 
-      def match?
-        Source::URL::Imgur === parsed_url
-      end
-
       def image_urls
         # For .mp4 files (e.g. https://i.imgur.com/Kp9TdlX.mp4), we have to use the API to tell whether the original image is a .gif or not.
         if parsed_url.image_url? && parsed_url.file_ext == "mp4"
@@ -26,7 +22,7 @@ module Source
       end
 
       def image_urls_from_api
-        api_response.dig(:media).to_a.pluck(:url)
+        v1_api_response[:media].to_a.pluck(:url).presence || v3_api_response[:images].to_a.pluck(:link)
       end
 
       def page_url
@@ -38,11 +34,12 @@ module Source
       end
 
       def profile_url
-        "https://imgur.com/user/#{artist_name}" if artist_name
+        "https://imgur.com/user/#{username}" if username
       end
 
-      def artist_name
-        api_response.dig(:account, :username)
+      def username
+        # v3_api_response[:account_url] is actually just the username
+        v1_api_response.dig(:account, :username).presence || v3_api_response[:account_url] || parsed_url.username || parsed_referer&.username
       end
 
       # XXX Each image in an album can have a separate title, tags, and description.
@@ -68,17 +65,34 @@ module Source
         parsed_url.album_id || parsed_referer&.album_id
       end
 
-      def api_url
+      memoize def api_response
+        # The v1 API contains some things not present in the v3 API (namely tags), but some posts are only available in the v3 API.
+        v1_api_response.presence || v3_api_response
+      end
+
+      memoize def v1_api_response
         if album_id.present?
-          "https://api.imgur.com/post/v1/posts/#{album_id}?include=media,tags,account&client_id=#{IMGUR_CLIENT_ID}"
+          api_url = "https://api.imgur.com/post/v1/posts/#{album_id}?include=media,tags,account&client_id=#{IMGUR_CLIENT_ID}"
+          http.cache(1.minute).parsed_get(api_url, format: :json) || {}
         elsif image_id.present?
-          "https://api.imgur.com/post/v1/media/#{image_id}?include=media,tags,account&client_id=#{IMGUR_CLIENT_ID}"
+          api_url = "https://api.imgur.com/post/v1/media/#{image_id}?include=media,tags,account&client_id=#{IMGUR_CLIENT_ID}"
+          http.cache(1.minute).parsed_get(api_url, format: :json) || {}
+        else
+          {}
         end
       end
 
-      memoize def api_response
-        # Imgur uses a custom 'application/vnd.imgur.v1+json' content type that isn't recognized by `response.parse`
-        http.cache(1.minute).parsed_get(api_url, format: :json) || {}
+      memoize def v3_api_response
+        if album_id.present?
+          # The client ID is supposed to be passed in a header, not a param, but that doesn't work for old albums.
+          api_url = "https://api.imgur.com/3/album/#{album_id}?client_id=#{IMGUR_CLIENT_ID}"
+          http.cache(1.minute).headers("Client-ID": IMGUR_CLIENT_ID).parsed_get(api_url)&.dig(:data) || {}
+        elsif image_id.present?
+          api_url = "https://api.imgur.com/3/image/#{image_id}?client_id=#{IMGUR_CLIENT_ID}"
+          http.cache(1.minute).headers("Client-ID": IMGUR_CLIENT_ID).parsed_get(api_url)&.dig(:data) || {}
+        else
+          {}
+        end
       end
     end
   end

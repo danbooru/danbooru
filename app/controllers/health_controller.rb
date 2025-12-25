@@ -6,6 +6,8 @@ class HealthController < ApplicationController
   # Don't load current user in order to avoid making any database calls during health checks.
   anonymous_only
 
+  after_action :skip_authorization
+
   # /up
   def show
     head 204

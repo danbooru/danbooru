@@ -1,4 +1,3 @@
-<% meta_description "Search thousands of anime & hentai artists on #{Danbooru.config.app_name}." %>
 <% noindex if params[:search].present? %>
 
 <div id="c-artists">
@@ -27,7 +26,7 @@
           <%= link_to "Deleted", artists_path(search: { is_deleted: true }) %>
         <% end %>
 
-        <% if artist.is_banned? %>
+        <% if artist.is_banned? && policy(artist).can_view_banned? %>
           <%= link_to "Banned", artists_path(search: { is_banned: true }) %>
         <% end %>
       <% end %>

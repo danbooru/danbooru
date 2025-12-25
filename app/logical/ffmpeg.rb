@@ -47,8 +47,7 @@ class FFmpeg
   # @return [Hash] A hash of the file's metadata. Will be empty if reading the file failed for any reason.
   def metadata
     output = shell!("ffprobe -v quiet -print_format json -show_format -show_streams -show_packets #{file.path.shellescape}")
-    json = JSON.parse(output)
-    json.with_indifferent_access
+    output.parse_json || {}
   rescue Error => e
     { error: e.message.strip }.with_indifferent_access
   end
@@ -74,11 +73,13 @@ class FFmpeg
     end
   end
 
-  # @return [Integer, nil] The number of frames in the video or animation, or nil if unknown.
+  # @return [Integer, nil] The number of frames in the video or animation, or nil if unknown. If the video has multiple
+  #   streams, this will be the frame count of the longest stream. Note that a static AVIF image can contain up to four
+  #   streams: one for the static image, one for an auxiliary video, and an optional alpha channel stream for each.
   def frame_count
-    if video_stream.has_key?(:nb_frames)
-      video_stream[:nb_frames].to_i
-    elsif playback_info.has_key?(:frame)
+    if video_streams.pluck(:nb_frames).compact.present?
+      video_streams.pluck(:nb_frames).map(&:to_i).max
+    elsif playback_info.key?(:frame)
       playback_info[:frame].to_i
     else
       nil
@@ -95,6 +96,9 @@ class FFmpeg
     metadata.dig(:format, :tags, :major_brand)
   end
 
+  # @return [String, nil] The pixel format of the video stream, or nil if unknown. Common values include yuv420p,
+  #   yuv422p, yuv444p, rgb24, bgr24, gray, etc.
+  # @see https://github.com/FFmpeg/FFmpeg/blob/master/libavutil/pixfmt.h
   def pix_fmt
     video_stream[:pix_fmt]
   end
@@ -267,9 +271,9 @@ class FFmpeg
     time_line = lines.grep(/\Aframe=/).last.strip
     time_info = time_line.scan(/\S+=\s*\S+/).map { |pair| pair.split(/=\s*/) }.to_h
 
-    # size_line = "video:36kBkB audio:16kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown"
+    # size_line = "[out#0/null @ 0x7f0b1ba2f300] video:36kBkB audio:16kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown"
     # size_info = { "video" => 36000, "audio" => 16000, "subtitle" => 0, "other streams" => 0, "global headers" => 0, "muxing overhead" => 0 }
-    size_line = lines.grep(/\Avideo:/).last.strip
+    size_line = lines.grep(/\[.*\] video:/).last.to_s.gsub(/\A\[.*\]/, "").strip
     size_info = size_line.scan(/[a-z ]+: *[a-z0-9]+/i).map do |pair|
       key, value = pair.split(/: */)
       [key.strip, value.to_i * 1000] # [" audio", "16kB"] => ["audio", 16000]

@@ -16,176 +16,72 @@ class ArtistURLTest < ActiveSupport::TestCase
       assert_equal("-http://monet.com", url.to_s)
     end
 
-    should "disallow invalid urls" do
-      urls = [
-        build(:artist_url, url: ":www.example.com"),
-        build(:artist_url, url: "http://http://www.example.com"),
-      ]
+    context "when validating URLs" do
+      subject { build(:artist_url) }
 
-      assert_equal(false, urls[0].valid?)
-      assert_match(/is malformed/, urls[0].errors.full_messages.join)
-      assert_equal(false, urls[1].valid?)
-      assert_match(/that does not contain a dot/, urls[1].errors.full_messages.join)
+      should allow_value("http://example.com").for(:url)
+      should allow_value("http://user:pass@example.com:80/image.jpg?foo=bar#blah").for(:url)
+      should allow_value("http://127.0.0.1:3000").for(:url)
+      # should allow_value("http://[::1]:3000").for(:url)
+      should allow_value("♨️.com").for(:url)
+      should allow_value("https://cafeptthumb-phinf.pstatic.net/20140924_45/dnflgmldus_1411489948549jC2ma_PNG/%BD%C3%C1%EE%C7%C3%B7%B9%BE%EE.png?type=w1600").for(:url) # invalid UTF-8
+
+      should_not allow_value("example").for(:url)
+      should_not allow_value(":example.com").for(:url)
+      should_not allow_value("ftp://example.com").for(:url)
+      should_not allow_value("file://example.jpg").for(:url)
+      should_not allow_value("mailto://user@gmail.com").for(:url)
+      should_not allow_value("user@gmail.com").for(:url)
+      should_not allow_value("javascript:alert(0)").for(:url)
+
+      should_not allow_value("http://localhost").for(:url)
+      should_not allow_value("https://.example.com").for(:url)
+      should_not allow_value("http://http://:example.com").for(:url)
+      should_not allow_value("https://").for(:url)
+      should_not allow_value("https://./").for(:url)
+      should_not allow_value("https://!!!.com").for(:url)
+      should_not allow_value("https://[]").for(:url)
+      should_not allow_value("https://[]:3000").for(:url)
+      # should_not allow_value("https://foo@gmail.com").for(:url)
     end
 
-    should "automatically add http:// if missing" do
-      url = create(:artist_url, url: "example.com")
-      assert_equal("http://example.com", url.url)
-    end
-
-    should "normalize trailing slashes" do
-      url = create(:artist_url, url: "http://monet.com")
-      assert_equal("http://monet.com", url.url)
-
-      url = create(:artist_url, url: "http://monet.com/")
-      assert_equal("http://monet.com", url.url)
-    end
-
-    should "normalise https" do
-      url = create(:artist_url, url: "https://google.com")
-      assert_equal("https://google.com", url.url)
-    end
-
-    should "normalise domains to lowercase" do
-      url = create(:artist_url, url: "https://ArtistName.example.com")
-      assert_equal("https://artistname.example.com", url.url)
-    end
-
-    should "decode encoded URLs" do
-      url = create(:artist_url, url: "https://arca.live/u/@%EC%9C%BE%ED%8C%8C")
-      assert_equal("https://arca.live/u/@윾파", url.url)
-    end
-
-    should "percent-encode spaces" do
-      url = create(:artist_url, url: "http://dic.nicovideo.jp/a/tetla pot")
-      assert_equal("http://dic.nicovideo.jp/a/tetla%20pot", url.url)
-    end
-
-    should "not fail when decoding percent-encoded Shift JIS URLs" do
-      url = create(:artist_url, url: "https://www.digiket.com/abooks/result/_data/staff=%8F%BC%94C%92m%8A%EE")
-      assert_equal("https://www.digiket.com/abooks/result/_data/staff=%8F%BC%94C%92m%8A%EE", url.url)
-    end
-
-    should "not apply NFKC normalization to URLs" do
-      url = create(:artist_url, url: "https://arca.live/u/@ㅇㅇ/43979125")
-      assert_equal("https://arca.live/u/@ㅇㅇ/43979125", url.url)
-    end
-
-    should "normalize ArtStation urls" do
-      url = create(:artist_url, url: "https://artstation.com/koyorin")
-      assert_equal("https://www.artstation.com/koyorin", url.url)
-
-      url = create(:artist_url, url: "https://koyorin.artstation.com")
-      assert_equal("https://www.artstation.com/koyorin", url.url)
-
-      url = create(:artist_url, url: "https://www.artstation.com/artist/koyorin/albums/all/")
-      assert_equal("https://www.artstation.com/koyorin", url.url)
-    end
-
-    should "normalize fc2 urls" do
-      url = create(:artist_url, url: "http://silencexs.blog106.fc2.com/")
-
-      assert_equal("http://silencexs.blog.fc2.com", url.url)
-    end
-
-    should "normalize deviant art artist urls" do
-      url = create(:artist_url, url: "https://noizave.deviantart.com")
-
-      assert_equal("https://www.deviantart.com/noizave", url.url)
-    end
-
-    should "normalize nico seiga artist urls" do
-      url = create(:artist_url, url: "http://seiga.nicovideo.jp/user/illust/7017777")
-      assert_equal("https://seiga.nicovideo.jp/user/illust/7017777", url.url)
-
-      url = create(:artist_url, url: "http://seiga.nicovideo.jp/manga/list?user_id=23839737")
-      assert_equal("https://seiga.nicovideo.jp/manga/list?user_id=23839737", url.url)
-
-      url = create(:artist_url, url: "https://www.nicovideo.jp/user/20446930/mylist/28674289")
-      assert_equal("https://www.nicovideo.jp/user/20446930", url.url)
-    end
-
-    should "normalize hentai foundry artist urls" do
-      url = create(:artist_url, url: "http://www.hentai-foundry.com/user/kajinman/profile")
-
-      assert_equal("https://www.hentai-foundry.com/user/kajinman", url.url)
-    end
-
-    should "normalize pixiv stacc urls" do
-      url = create(:artist_url, url: "http://www.pixiv.net/stacc/evazion/")
-
-      assert_equal("https://www.pixiv.net/stacc/evazion", url.url)
-    end
-
-    should "normalize pixiv fanbox account urls" do
-      url = create(:artist_url, url: "http://www.pixiv.net/fanbox/creator/3113804/post")
-
-      assert_equal("https://www.pixiv.net/fanbox/creator/3113804", url.url)
-
-      url = create(:artist_url, url: "http://omu001.fanbox.cc/posts/39714")
-      assert_equal("https://omu001.fanbox.cc", url.url)
-    end
-
-    should "normalize pixiv.net/user/123 urls" do
-      url = create(:artist_url, url: "http://www.pixiv.net/en/users/123")
-
-      assert_equal("https://www.pixiv.net/users/123", url.url)
-    end
-
-    should "normalize twitter urls" do
-      url = create(:artist_url, url: "https://twitter.com/aoimanabu/status/892370963630743552")
-      assert_equal("https://twitter.com/aoimanabu", url.url)
-
-      url = create(:artist_url, url: "https://twitter.com/BLAH")
-      assert_equal("https://twitter.com/BLAH", url.url)
-    end
-
-    should "normalize https://twitter.com/intent/user?user_id=* urls" do
-      url = create(:artist_url, url: "https://twitter.com/intent/user?user_id=2784590030")
-
-      assert_equal("https://twitter.com/intent/user?user_id=2784590030", url.url)
-    end
-
-    should "normalize twitpic urls" do
-      url = create(:artist_url, url: "http://twitpic.com/photos/mirakichi")
-      assert_equal("http://twitpic.com/photos/mirakichi", url.url)
-    end
-
-    should "normalize nijie urls" do
-      url = create(:artist_url, url: "https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png")
-      assert_equal("https://nijie.info/members.php?id=236014", url.url)
-
-      url = create(:artist_url, url: "http://nijie.info/members.php?id=161703")
-      assert_equal("https://nijie.info/members.php?id=161703", url.url)
-
-      url = create(:artist_url, url: "http://www.nijie.info/members_illust.php?id=161703")
-      assert_equal("https://nijie.info/members.php?id=161703", url.url)
-
-      url = create(:artist_url, url: "http://nijie.info/invalid.php")
-      assert_equal("http://nijie.info/invalid.php", url.url)
-    end
-
-    should "normalize pawoo.net urls" do
-      url = create(:artist_url, url: "http://www.pawoo.net/@evazion/19451018")
-      assert_equal("https://pawoo.net/@evazion", url.url)
-
-      url = create(:artist_url, url: "http://www.pawoo.net/users/evazion/media")
-      assert_equal("https://pawoo.net/@evazion", url.url)
-    end
-
-    should "normalize baraag.net urls" do
-      url = create(:artist_url, url: "http://baraag.net/@curator/102270656480174153")
-      assert_equal("https://baraag.net/@curator", url.url)
-    end
-
-    should "normalize Instagram urls" do
-      url = create(:artist_url, url: "http://instagram.com/itomugi")
-      assert_equal("https://www.instagram.com/itomugi/", url.url)
-    end
-
-    should "normalize Booth.pm urls" do
-      url = create(:artist_url, url: "http://mesh-mesh.booth.pm/items/746971")
-      assert_equal("https://mesh-mesh.booth.pm", url.url)
+    context "when normalizing URLs" do
+      should normalize_attribute(:url).from("example.com").to("http://example.com")
+      should normalize_attribute(:url).from("http://example.com").to("http://example.com")
+      should normalize_attribute(:url).from("https://example.com").to("https://example.com")
+      should normalize_attribute(:url).from("http://example.com/").to("http://example.com")
+      should normalize_attribute(:url).from("http://example.com./").to("http://example.com")
+      should normalize_attribute(:url).from("https://ArtistName.example.com").to("https://artistname.example.com")
+      should normalize_attribute(:url).from("https://arca.live/u/@%EC%9C%BE%ED%8C%8C").to("https://arca.live/u/@윾파")
+      should normalize_attribute(:url).from("http://dic.nicovideo.jp/a/tetla pot").to("http://dic.nicovideo.jp/a/tetla%20pot")
+      should normalize_attribute(:url).from("https://www.digiket.com/abooks/result/_data/staff=%8F%BC%94C%92m%8A%EE").to("https://www.digiket.com/abooks/result/_data/staff=%8F%BC%94C%92m%8A%EE")
+      should normalize_attribute(:url).from("https://arca.live/u/@ㅇㅇ/43979125").to("https://arca.live/u/@ㅇㅇ/43979125")
+      should normalize_attribute(:url).from("https://artstation.com/koyorin").to("https://www.artstation.com/koyorin")
+      should normalize_attribute(:url).from("https://koyorin.artstation.com").to("https://www.artstation.com/koyorin")
+      should normalize_attribute(:url).from("https://www.artstation.com/artist/koyorin/albums/all/").to("https://www.artstation.com/koyorin")
+      should normalize_attribute(:url).from("http://silencexs.blog106.fc2.com/").to("http://silencexs.blog.fc2.com")
+      should normalize_attribute(:url).from("https://noizave.deviantart.com").to("https://www.deviantart.com/noizave")
+      should normalize_attribute(:url).from("http://seiga.nicovideo.jp/user/illust/7017777").to("https://seiga.nicovideo.jp/user/illust/7017777")
+      should normalize_attribute(:url).from("http://seiga.nicovideo.jp/manga/list?user_id=23839737").to("https://seiga.nicovideo.jp/manga/list?user_id=23839737")
+      should normalize_attribute(:url).from("https://www.nicovideo.jp/user/20446930/mylist/28674289").to("https://www.nicovideo.jp/user/20446930")
+      should normalize_attribute(:url).from("http://www.hentai-foundry.com/user/kajinman/profile").to("https://www.hentai-foundry.com/user/kajinman")
+      should normalize_attribute(:url).from("http://www.pixiv.net/stacc/evazion/").to("https://www.pixiv.net/stacc/evazion")
+      should normalize_attribute(:url).from("http://www.pixiv.net/fanbox/creator/3113804/post").to("https://www.pixiv.net/fanbox/creator/3113804")
+      should normalize_attribute(:url).from("http://omu001.fanbox.cc/posts/39714").to("https://omu001.fanbox.cc")
+      should normalize_attribute(:url).from("http://www.pixiv.net/en/users/123").to("https://www.pixiv.net/users/123")
+      should normalize_attribute(:url).from("https://twitter.com/aoimanabu/status/892370963630743552").to("https://twitter.com/aoimanabu")
+      should normalize_attribute(:url).from("https://twitter.com/BLAH").to("https://twitter.com/BLAH")
+      should normalize_attribute(:url).from("https://twitter.com/intent/user?user_id=2784590030").to("https://twitter.com/intent/user?user_id=2784590030")
+      should normalize_attribute(:url).from("http://twitpic.com/photos/mirakichi").to("http://twitpic.com/photos/mirakichi")
+      should normalize_attribute(:url).from("https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png").to("https://nijie.info/members.php?id=236014")
+      should normalize_attribute(:url).from("http://nijie.info/members.php?id=161703").to("https://nijie.info/members.php?id=161703")
+      should normalize_attribute(:url).from("http://www.nijie.info/members_illust.php?id=161703").to("https://nijie.info/members.php?id=161703")
+      should normalize_attribute(:url).from("http://nijie.info/invalid.php").to("http://nijie.info/invalid.php")
+      should normalize_attribute(:url).from("http://www.pawoo.net/@evazion/19451018").to("https://pawoo.net/@evazion")
+      should normalize_attribute(:url).from("http://www.pawoo.net/users/evazion/media").to("https://pawoo.net/@evazion")
+      should normalize_attribute(:url).from("http://baraag.net/@curator/102270656480174153").to("https://baraag.net/@curator")
+      should normalize_attribute(:url).from("http://instagram.com/itomugi").to("https://www.instagram.com/itomugi/")
+      should normalize_attribute(:url).from("http://mesh-mesh.booth.pm/items/746971").to("https://mesh-mesh.booth.pm")
     end
 
     context "#search method" do
@@ -216,6 +112,12 @@ class ArtistURLTest < ActiveSupport::TestCase
         assert_search_equals([@bkub_url], url_not_ilike: "*MASAO*")
         assert_search_equals([@bkub_url], url_regex: "bkub")
         assert_search_equals([@bkub_url], url_not_regex: "masao")
+      end
+
+      should "work when searching for URLs containing backslashes" do
+        @url = create(:artist_url, url: "https://twitter.com/foo\\\\bar")
+
+        assert_search_equals([@url], url_matches: "foo\\\\bar")
       end
     end
   end

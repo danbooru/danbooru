@@ -156,7 +156,7 @@ class PostEdit
         expect("'")
         string
       else
-        expect(/(\\ |[^ ])*/).gsub(/\\ /, " ") # handle backslash escaped spaces
+        expect(/(\\[[:space:]]|[^[:space:]])*/).gsub(/\\[[:space:]]/, " ") # handle backslash escaped spaces
       end
     end
   end

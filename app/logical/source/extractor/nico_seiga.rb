@@ -5,11 +5,7 @@ module Source
   class Extractor
     class NicoSeiga < Source::Extractor
       def self.enabled?
-        Danbooru.config.nico_seiga_user_session.present?
-      end
-
-      def match?
-        Source::URL::NicoSeiga === parsed_url
+        SiteCredential.for_site("Nico Seiga").present?
       end
 
       def image_urls
@@ -18,9 +14,8 @@ module Source
         elsif illust_id.present?
           [image_url_for("https://seiga.nicovideo.jp/image/source/#{illust_id}") || url]
         elsif manga_id.present?
-          api_client.manga_api_response.pluck("meta").pluck("source_url").map do |url|
-            image_id = Source::URL.parse(url).image_id
-            image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}") || url
+          manga_api_response.pluck("meta").pluck("source_url").map do |url|
+            manga_image_url_for(url)
           end
         else
           [image_url_for(url) || url]
@@ -28,13 +23,38 @@ module Source
       end
 
       def image_url_for(url)
-        return nil if api_client.blank?
-
-        resp = api_client.head(url)
-        if resp.uri.to_s =~ %r{https?://.+/(\w+/\d+/\d+)\z}i
+        if http.redirect_url(url).to_s =~ %r{https?://.+/(\w+/\d+/\d+)\z}i
           "https://lohas.nicoseiga.jp/priv/#{$1}"
         else
           nil
+        end
+      end
+
+      # Try to convert a https://deliver.cdn.nicomanga.jp/thumb/:id URL to the full size image. Not always possible.
+      #
+      # Doesn't work (redirects to a totally different image):
+      #
+      #   https://deliver.cdn.nicomanga.jp/thumb/10543313p?1592370039
+      #   => https://seiga.nicovideo.jp/image/source/10543313
+      #   => https://lohas.nicoseiga.jp/o/a6aaf607d27e9377a62a4353f73671c2138a6190/1704167420/10543313
+      #   => https://lohas.nicoseiga.jp/priv/a6aaf607d27e9377a62a4353f73671c2138a6190/1704167420/10543313
+      #
+      # Works (redirects to the right image):
+      #
+      #   https://deliver.cdn.nicomanga.jp/thumb/10315315p?1586768900
+      #   => https://seiga.nicovideo.jp/image/source/10315315
+      #   => https://lohas.nicoseiga.jp/priv/a9969a0177a30d21aa57720b9afa6b3f0a59dd7e/1704167121/10315315
+      def manga_image_url_for(manga_sample_url)
+        image_id = Source::URL.parse(manga_sample_url).image_id
+        return manga_sample_url if image_id.nil?
+
+        candidate_url = "https://seiga.nicovideo.jp/image/source/#{image_id}"
+        redirected_url = Source::URL.parse(http.redirect_url(candidate_url))
+
+        if redirected_url.to_s.match?("/priv/")
+          redirected_url.to_s
+        else
+          manga_sample_url
         end
       end
 
@@ -46,25 +66,22 @@ module Source
         "https://seiga.nicovideo.jp/user/illust/#{artist_id}" if artist_id.present?
       end
 
-      def artist_name
-        return if api_client.blank?
-        api_client.user_name
+      def display_name
+        api_response["nickname"] || user_api_response["nickname"]
       end
 
       def artist_commentary_title
-        return if api_client.blank?
-        api_client.title
+        api_response[:title]
       end
 
       def artist_commentary_desc
-        return if api_client.blank?
-        api_client.description
+        api_response[:description]
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc) do |element|
+        DText.from_html(artist_commentary_desc, base_url: "https://seiga.nicovideo.jp") do |element|
           if element.name == "font" && element["color"] == "white"
-            element.content = "[spoiler]#{element.content}[/spoiler]"
+            element.name = "block-spoiler"
           end
         end.gsub(/[^\w]im(\d+)/, ' seiga #\1 ').chomp
       end
@@ -73,14 +90,12 @@ module Source
         "nicoseiga_#{artist_id}" if artist_id.present?
       end
 
-      def other_names
-        [artist_name].compact
-      end
-
       def tags
-        return [] if api_client.blank?
+        tags = api_response.dig("tag_list", "tag")
 
-        api_client.tags.map do |name|
+        # We Array.wrap the tags because when a manga post has a single tag, the XML parser returns a hash instead of an array of hashes.
+        # Example: https://seiga.nicovideo.jp/watch/mg302561
+        Array.wrap(tags).pluck("name").map do |name|
           [name, "https://seiga.nicovideo.jp/#{"manga/" if manga_id}tag/#{Danbooru::URL.escape(name)}"]
         end
       end
@@ -98,28 +113,53 @@ module Source
       end
 
       def artist_id
-        api_client&.user_id
+        # anonymous users have a user_id of 0: https://nico.ms/mg310193
+        api_response["user_id"] unless api_response["user_id"].to_i == 0
       end
 
       def http
+        http = super
+
         if parsed_url.oekaki_id.present?
-          super.with_legacy_ssl
+          http = super.with_legacy_ssl
+        end
+
+        http.cookies(
+          skip_fetish_warning: "1",
+          user_session: credentials[:user_session]
+        ).headers(
+          "User-Agent": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/W.X.Y.Z Safari/537.36",
+        )
+      end
+
+      memoize def api_response
+        if illust_id.present? || image_id.present?
+          # curl "https://sp.seiga.nicovideo.jp/ajax/seiga/im4937663" | jq
+          work_id = illust_id || image_id
+          parsed_get("https://sp.seiga.nicovideo.jp/ajax/seiga/im#{work_id}")&.dig("target_image") || {}
+        elsif manga_id.present?
+          # curl "https://seiga.nicovideo.jp/api/theme/info?id=470189"
+          parsed_get("https://seiga.nicovideo.jp/api/theme/info?id=#{manga_id}")&.dig("response", "theme") || {}
         else
-          super
+          {}
         end
       end
 
-      def api_client
-        if illust_id.present?
-          NicoSeigaApiClient.new(work_id: illust_id, type: "illust", http: http)
-        elsif manga_id.present?
-          NicoSeigaApiClient.new(work_id: manga_id, type: "manga", http: http)
-        elsif image_id.present?
-          # We default to illust to attempt getting the api anyway
-          NicoSeigaApiClient.new(work_id: image_id, type: "illust", http: http)
-        end
+      memoize def manga_api_response
+        return {} unless manga_id.present?
+
+        # curl "https://api.nicomanga.jp/api/v1/app/manga/episodes/470189/frames?enable_webp=false" | jq
+        json = parsed_get("https://api.nicomanga.jp/api/v1/app/manga/episodes/#{manga_id}/frames?enable_webp=false") || {}
+        json.dig("data", "result") || {}
       end
-      memoize :api_client
+
+      memoize def user_api_response
+        return {} unless artist_id.present?
+
+        # curl "https://seiga.nicovideo.jp/api/user/info?id=123720050"
+        xml = parsed_get("https://seiga.nicovideo.jp/api/user/info?id=#{artist_id}") || {}
+        xml.dig("response", "user") || {}
+      end
     end
   end
 end

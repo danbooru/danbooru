@@ -1,0 +1,27 @@
+<p class="flex justify-center gap-2 chip-primary text-sm">
+  <% if wiki_page_version != wiki_page_version.current %>
+    <%= link_to "«", wiki_page_version_path(wiki_page_version.current), class: "px-2" %>
+  <% else %>
+    <span class="px-2 text-muted">«</span>
+  <% end %>
+
+  <% if wiki_page_version.next %>
+    <%= link_to "‹ Newer", wiki_page_version_path(wiki_page_version.next.id), "data-shortcut": "a left" %>
+  <% else %>
+    <span class="text-muted">‹ Newer</span>
+  <% end %>
+
+  <%= link_to humanized_time(wiki_page_version.updated_at), wiki_page_version_path(wiki_page_version.id), class: "mx-2" %>
+
+  <% if wiki_page_version.previous %>
+    <%= link_to "Older ›", wiki_page_version_path(wiki_page_version.previous.id), "data-shortcut": "d right" %>
+  <% else %>
+    <span class="text-muted">Older ›</span>
+  <% end %>
+
+  <% if wiki_page_version != wiki_page_version.wiki_page.versions.first %>
+    <%= link_to "»", wiki_page_version_path(wiki_page_version.wiki_page.versions.first), class: "px-2" %>
+  <% else %>
+    <span class="px-2 text-muted">»</span>
+  <% end %>
+</p>

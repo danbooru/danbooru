@@ -1,0 +1,23 @@
+<li class="flex tag-type-<%= t.category %> <%= "tag-nesting-level-#{level}" if level > 0 %>" data-tag-name="<%= t.name %>" data-is-deprecated="<%= t.is_deprecated? %>">
+  <span class="mr-2">
+    <% if t.artist? %>
+      <%= link_to "?", show_or_new_artists_path(name: t.name, z: 1), class: "wiki-link" %>
+    <% elsif t.name =~ /\A\d+\z/ %>
+      <%= link_to "?", wiki_page_path("~#{t.name}", z: 1), class: "wiki-link" %>
+    <% else %>
+      <%= link_to "?", wiki_page_path(t.name, z: 1), class: "wiki-link" %>
+    <% end %>
+  </span>
+
+  <% if level > 0 %>
+    <span class="nested-tag-icon text-muted select-none mr-1" style="margin-left: <%= 0.75 * (level - 1) %>rem">↳</span>
+  <% end %>
+
+  <span>
+    <%= link_to t.pretty_name, posts_path(tags: t.name, z: 1), class: "search-tag" %>&nbsp;<%= tag.span humanized_number(t.post_count), class: ["post-count", ("low-post-count" if is_underused_tag?)], title: t.post_count %>
+  </span>
+</li>
+
+<% subtags.each do |subtag, subtags| %>
+  <%= render CategorizedTagListEntryComponent.new(subtag, subtags, level: level + 1) %>
+<% end %>

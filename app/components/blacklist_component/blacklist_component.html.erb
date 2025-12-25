@@ -1,0 +1,69 @@
+<div
+  id="blacklist-box"
+  class="mb-4 card-outlined max-w-full <%= inline ? "inline-flex sm:flex-col sm:w-full thin-x-scrollbar inline-blacklist" : "sidebar-blacklist" %>"
+  x-data="{ blacklist: new Danbooru.Blacklist($root) }"
+  x-init="blacklist.initialize(<%= rules.to_json %>)"
+  x-show="blacklist.visible"
+  x-cloak>
+  <%= tag.div class: "flex items-center gap-1 p-2", "x-bind:class": (inline ? "{ 'sm:border-b': !blacklist.collapsed }" : "{ 'border-b': !blacklist.collapsed }") do %>
+    <label class="flex items-center gap-1 font-header font-bold cursor-pointer select-none">
+      <input type="checkbox" class="toggle-switch" x-model="blacklist.enabled" x-effect="$el.indeterminate = blacklist.partiallyEnabled" data-shortcut="b">
+      Blacklisted
+    </label>
+
+    <span class="whitespace-nowrap post-count" x-text="blacklist.blacklistedPosts.length"></span>
+    <span class="flex items-center flex-grow-1 justify-end gap-1">
+      <%= render PopupMenuComponent.new do |menu| %>
+        <% menu.with_item do %>
+          <label class="flex items-center link-color cursor-pointer select-none" x-bind:class="blacklist.autocollapse && 'font-bold'" x-on:click.stop title="Whether enabling blacklists automatically closes the blacklist box">
+            <input type="checkbox" x-model="blacklist.autocollapse" class="w-4 h-full mr-1"><span>Autoclose</span>
+          </label>
+        <% end %>
+
+        <% menu.with_item do %>
+          <label class="flex items-center link-color cursor-pointer select-none" x-bind:class="blacklist.showAll && 'font-bold'" x-on:click.stop title="Show all rules, even those that don't match any posts">
+            <input type="checkbox" x-model="blacklist.showAll" class="w-4 h-full mr-1"><span>Show all</span>
+          </label>
+        <% end %>
+
+        <% menu.with_item do %>
+          <label class="flex items-center link-color cursor-pointer select-none" x-bind:class="blacklist.blurImages && 'font-bold'" x-on:click.stop title="Blur images instead of hiding them">
+            <input type="checkbox" x-model="blacklist.blurImages" class="w-4 h-full mr-1"><span>Blur images</span>
+          </label>
+        <% end %>
+
+        <% unless user.is_anonymous? %>
+          <% menu.with_item do %>
+            <%= link_to settings_path(anchor: "user_blacklisted_tags"), class: "flex items-center", target: "_blank" do %>
+              <%= edit_icon %><span>Edit</span>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <% menu.with_item do %>
+          <%= link_to wiki_page_path("help:blacklists"), class: "wiki-link flex items-center", target: "_blank" do %>
+            <%= help_icon %><span>Help</span>
+          <% end %>
+        <% end %>
+      <% end %>
+      <%= link_to "javascript:void(0)", class: "inactive-link contents", "x-on:click.prevent": "blacklist.collapsed = !blacklist.collapsed" do %>
+        <%= inline ? chevron_down_icon(class: "transition-transform md:-rotate-90", "x-bind:class": "{ 'rotate-180 md:rotate-90' : blacklist.collapsed }")
+              : chevron_down_icon(class: "transition-transform", "x-bind:class": "{ 'rotate-180' : blacklist.collapsed }") %>
+      <% end %>
+    </span>
+  </div>
+
+  <div class="<%= inline ? "flex items-start sm:flex-col sm:w-full sm:p-2" : "thin-scrollbar max-h-360px p-2" %>" x-show="!blacklist.collapsed" x-cloak>
+    <% rules.each_with_index do |rule, i| %>
+      <div class="flex items-center gap-1 h-full overflow-hidden <%= "md:border-l md:p-2" if inline %>"
+           x-data="{ rule: blacklist.rules[<%= i %>] }"
+           x-bind:data-visible="rule.visible.toString()"
+           x-bind:data-enabled="rule.enabled.toString()"
+           x-show="rule.visible">
+        <input type="checkbox" class="toggle-switch" x-model="rule.enabled">
+        <%= link_to rule, posts_path(tags: rule), title: rule, class: "truncate", tabindex: "-1", "x-bind:class": "{ 'inactive-link': !rule.enabled }", "x-on:click.prevent": "rule.toggle()" %>
+        <span class="whitespace-nowrap post-count" x-text="rule.posts.size"></span>
+      </div>
+    <% end %>
+  <% end %>
+</div>

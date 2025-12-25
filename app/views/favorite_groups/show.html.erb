@@ -13,7 +13,7 @@
     <br>
     <br>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <%= render_post_gallery(@posts, tags: "favgroup:#{@favorite_group.id}", show_deleted: true) do |gallery| %>
       <% gallery.with_footer do %>

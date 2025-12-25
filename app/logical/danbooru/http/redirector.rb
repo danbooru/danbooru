@@ -6,12 +6,14 @@
 module Danbooru
   class Http
     class Redirector < HTTP::Feature
-      HTTP::Options.register_feature :redirector, self
-
       attr_reader :max_redirects
 
       def initialize(max_redirects: 5)
         @max_redirects = max_redirects
+      end
+
+      def self.register
+        HTTP::Options.register_feature :redirector, self
       end
 
       def perform(request, &block)

@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 class ForumPost < ApplicationRecord
-  attr_readonly :topic_id
+  # attr_readonly :topic_id # XXX broken by accepts_nested_attributes_for in ForumTopic
   attr_accessor :creator_ip_addr
 
+  # defines :dtext_body
+  dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
+
   belongs_to :creator, class_name: "User"
-  belongs_to_updater
+  belongs_to :updater, class_name: "User", default: -> { creator }
   belongs_to :topic, class_name: "ForumTopic", inverse_of: :forum_posts
 
   has_many :moderation_reports, as: :model
@@ -34,7 +37,7 @@ class ForumPost < ApplicationRecord
   mentionable(
     message_field: :body,
     title: ->(_user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    body: ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]):\n\n[quote]\n#{DText.extract_mention(body, "@#{user_name}")}\n[/quote]\n}}
+    body: ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]):\n\n[quote]\n#{DText.new(body).extract_mention("@#{user_name}")}\n[/quote]\n}}
   )
 
   module SearchMethods
@@ -113,13 +116,13 @@ class ForumPost < ApplicationRecord
     end
   end
 
-  def delete!
-    update(is_deleted: true)
+  def delete!(updater = CurrentUser.user)
+    update(is_deleted: true, updater: updater)
     update_topic_updated_at_on_delete
   end
 
-  def undelete!
-    update(is_deleted: false)
+  def undelete!(updater = CurrentUser.user)
+    update(is_deleted: false, updater: updater)
     update_topic_updated_at_on_undelete
   end
 
@@ -156,7 +159,7 @@ class ForumPost < ApplicationRecord
   end
 
   def quoted_response
-    DText.quote(body, creator.name)
+    DText.new(body).quote(creator.name)
   end
 
   def forum_topic_page

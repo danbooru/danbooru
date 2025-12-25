@@ -25,7 +25,7 @@ module NoteSanitizer
     border-bottom border-bottom-color border-bottom-left-radius border-bottom-right-radius border-bottom-style border-bottom-width
     border-left border-left-color border-left-style border-left-width
     border-right border-right-color border-right-style border-right-width
-    border-top border-top-color border-top-left-radious border-top-right-radius border-top-style border-top-width
+    border-top border-top-color border-top-left-radius border-top-right-radius border-top-style border-top-width
     bottom left right top
     box-shadow
     color
@@ -57,6 +57,12 @@ module NoteSanitizer
     vertical-align
   ]
 
+  # The list of values allowed for each CSS property. For properties not on this list, any value is allowed.
+  ALLOWED_PROPERTY_VALUES = {
+    position: %w[absolute relative],
+    display: %w[inline block inline-block flex inline-flex grid inline-grid table table-cell table-row],
+  }.with_indifferent_access
+
   # Sanitize a string of HTML.
   # @param text [String] the HTML to sanitize
   # @return [String] the sanitized HTML
@@ -80,22 +86,51 @@ module NoteSanitizer
         protocols: [],
         properties: ALLOWED_PROPERTIES
       },
-      :transformers => method(:relativize_links)
+      :transformers => [
+        method(:sanitize_css!)
+      ]
     )
   end
 
-  # Convert absolute Danbooru links inside notes to relative links.
-  # https://danbooru.donmai.us/posts/1 is converted to /posts/1.
-  def self.relativize_links(node:, **env)
-    return unless node.name == "a" && node["href"].present?
+  # Remove disallowed CSS properties from the HTML element's style attribute.
+  # @param node [Nokogiri::HTML5::DocumentFragment] The HTML element to sanitize.
+  def self.sanitize_css!(node:, **env)
+    node["style"] = sanitize_style(node["style"])
+  end
 
-    url = Addressable::URI.heuristic_parse(node["href"]).normalize
+  # @param style [String] The CSS style attribute.
+  # @return [String] The sanitized CSS style attribute.
+  def self.sanitize_style(style)
+    return nil if style.blank?
 
-    if url.authority == Danbooru.config.hostname
-      url.site = nil
-      node["href"] = url.to_s
+    nodes = Crass.parse_properties(style)
+    omit_next_semicolon = false
+
+    nodes.map! do |node|
+      case node[:node]
+      in :property if !allowed_css_property?(node[:name], node[:value])
+        omit_next_semicolon = true
+        nil
+
+      in :semicolon if omit_next_semicolon
+        nil
+
+      in :whitespace
+        nil
+
+      else
+        omit_next_semicolon = false
+        node
+      end
     end
-  rescue Addressable::URI::InvalidURIError
-    # do nothing for invalid urls
+
+    Crass::Parser.stringify(nodes).strip
+  end
+
+  # @param name [String] The CSS property name.
+  # @param value [String] The CSS property value.
+  def self.allowed_css_property?(name, value)
+    allowed_values = ALLOWED_PROPERTY_VALUES[name]
+    allowed_values.blank? || value.downcase.in?(allowed_values)
   end
 end

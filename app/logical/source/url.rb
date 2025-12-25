@@ -72,6 +72,55 @@ module Source
       Source::URL::ArtStreet,
       Source::URL::Gumroad,
       Source::URL::Misskey,
+      Source::URL::Xfolio,
+      Source::URL::CiEn,
+      Source::URL::Inkbunny,
+      Source::URL::E621,
+      Source::URL::Bluesky,
+      Source::URL::Danbooru2,
+      Source::URL::Pinterest,
+      Source::URL::Foriio,
+      Source::URL::Itaku,
+      Source::URL::Postype,
+      Source::URL::Artistree,
+      Source::URL::Galleria,
+      Source::URL::Dotpict,
+      Source::URL::Discord,
+      Source::URL::Opensea,
+      Source::URL::Behance,
+      Source::URL::Cohost,
+      Source::URL::Piapro,
+      Source::URL::MyPortfolio,
+      Source::URL::Note,
+      Source::URL::PixivComic,
+      Source::URL::NaverBlog,
+      Source::URL::NaverCafe,
+      Source::URL::NaverPost,
+      Source::URL::Xiaohongshu,
+      Source::URL::Patreon,
+      Source::URL::Blogger,
+      Source::URL::Vk,
+      Source::URL::Google,
+      Source::URL::Youtube,
+      Source::URL::Bcy,
+      Source::URL::URLShortener,
+      Source::URL::Redgifs,
+      Source::URL::Carrd,
+      Source::URL::Toyhouse,
+      Source::URL::Skland,
+      Source::URL::Miyoushe,
+      Source::URL::Grafolio,
+      Source::URL::Kakao,
+      Source::URL::Tistory,
+      Source::URL::Kofi,
+      Source::URL::PixivFactory,
+      Source::URL::Pixellent,
+      Source::URL::Odaibako,
+      Source::URL::Facebook,
+      Source::URL::DcInside,
+      Source::URL::Marshmallow,
+      Source::URL::Huashijie,
+      Source::URL::Mihuashi,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
@@ -79,7 +128,9 @@ module Source
     # @param url [String, Danbooru::URL]
     # @return [Source::URL]
     def self.parse!(url)
-      url = Danbooru::URL.new(url)
+      return url if url.is_a?(Source::URL)
+
+      url = Danbooru::URL.parse!(url)
       subclass = SUBCLASSES.find { |c| c.match?(url) } || Source::URL::Null
       subclass.new(url)
     end
@@ -99,6 +150,20 @@ module Source
     # @param url [Danbooru::URL] The source URL.
     def self.match?(url)
       raise NotImplementedError
+    end
+
+    # Return the extractor class to use for this URL. By default, it's the Source::Extractor subclass with the same name
+    # as this Source::URL subclass. Subclasses can override this to provide a different extractor.
+    def extractor_class
+      "Source::Extractor::#{self.class.name.demodulize}".safe_constantize
+    end
+
+    # Return the extractor corresponding to this URL.
+    #
+    # @param options [Hash] The options to pass to the extractor.
+    # @return [Source::Extractor, nil] The extractor for this URL, or nil if one doesn't exist.
+    def extractor(**)
+      extractor_class&.new(self, **)
     end
 
     # The name of the site this URL belongs to.
@@ -126,7 +191,7 @@ module Source
     #
     # @return [Boolean]
     def image_url?
-      file_ext.in?(%w[jpg jpeg png gif webp webm mp4 swf])
+      file_ext.to_s.downcase.in?(%w[jpg jpeg png gif webp webm avif mp4 swf flac mp3 ogg wav])
     end
 
     # True if the URL is a work page URL.
@@ -199,6 +264,41 @@ module Source
       nil
     end
 
+    # Determine if the URL is considered a "bad source". A bad source is an URL that should never be used as the source of a
+    # post because it's never a valid source. For example, a profile URL or some other random URL that isn't a page URL
+    # or an image URL.
+    #
+    # Posts will be tagged "bad_source" if this returns true for the post's source URL. If this returns false, then the
+    # bad_source tag will be removed. If this returns nil, then the bad_source tag will not be added or removed.
+    #
+    # @return [Boolean, nil] True if the URL is a bad source, false if it's not a bad source, or nil if we don't know
+    #   whether it's a bad source or not.
+    def bad_source?
+      recognized? && !image_url? && !page_url?
+    end
+
+    # Determine if the URL is considered a "bad link". A bad link is an image URL that shouldn't be used as the source of a
+    # post. For example, Twitter image URLs are bad links because it's not possible to convert Twitter image URLs to the
+    # actual Twitter post. A Pixiv image URL is a good link because it is possible to convert Pixiv image URLs to the
+    # actual Pixiv post.
+    #
+    # Posts will be tagged "bad_link" if this returns true for the post's source URL. If this returns false, then the
+    # bad_link tag will be removed. If this returns nil, then the bad_link tag will not be added or removed.
+    #
+    # @return [Boolean, nil] True if the URL is a bad link, false if it's not a bad link, or nil if we don't know
+    #   whether it's a bad link or not.
+    def bad_link?
+      recognized? && image_url? && page_url.nil?
+    end
+
+    # Determine if the URL is considered an "image sample".
+    #
+    # @return [Boolean, nil] True if the URL is an image sample, false if it's not an image sample, or nil if we don't know
+    #   whether it's an image sample or not.
+    def image_sample?
+      nil
+    end
+
     def self.site_name(url)
       Source::URL.parse(url)&.site_name
     end
@@ -207,12 +307,24 @@ module Source
       Source::URL.parse(url)&.image_url?
     end
 
+    def self.image_sample?(url)
+      Source::URL.parse(url)&.image_sample?
+    end
+
     def self.page_url?(url)
       Source::URL.parse(url)&.page_url?
     end
 
     def self.profile_url?(url)
       Source::URL.parse(url)&.profile_url?
+    end
+
+    def self.bad_link?(url)
+      Source::URL.parse(url)&.bad_link?
+    end
+
+    def self.bad_source?(url)
+      Source::URL.parse(url)&.bad_source?
     end
 
     def self.page_url(url)
@@ -224,13 +336,19 @@ module Source
     end
 
     protected def initialize(...)
-      super(...)
+      super
       parse
     end
 
     # Subclasses should implement this to parse and extract any useful information from
     # the URL. This is called when the URL is initialized.
     protected def parse
+    end
+
+    def inspect
+      variables = instance_values.without("url").reject { |key, _| key.starts_with?("_memoized") }.compact_blank
+      state = variables.map { |name, value| "@#{name}=#{value.inspect}" }.join(" ")
+      "#<#{self.class.name} #{state}>"
     end
   end
 end

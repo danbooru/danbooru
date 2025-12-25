@@ -1,15 +1,14 @@
 # frozen_string_literal: true
 
 class TagListComponent < ApplicationComponent
-  attr_reader :tags, :current_query, :show_extra_links, :search_params
+  attr_reader :tags, :current_query, :search_params
 
   delegate :humanized_number, to: :helpers
 
-  def initialize(tags: [], current_query: nil, show_extra_links: false, search_params: {})
+  def initialize(tags: [], current_query: nil, search_params: {})
     super
     @tags = tags
     @current_query = current_query
-    @show_extra_links = show_extra_links
     @search_params = search_params
   end
 

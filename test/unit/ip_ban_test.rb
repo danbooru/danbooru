@@ -41,5 +41,11 @@ class IpBanTest < ActiveSupport::TestCase
     should_not allow_value("1.2.3.4/16").for(:ip_addr)
     should_not allow_value("ABCD::1234/32").for(:ip_addr)
     should_not allow_value("ABCD::1234/47").for(:ip_addr)
+
+    should normalize_attribute(:reason).from(" \nfoo\tbar \n").to("foo bar")
+
+    should allow_value("x" * 140).for(:reason)
+    should_not allow_value("x" * 141).for(:reason)
+    should_not allow_value(" ").for(:reason)
   end
 end

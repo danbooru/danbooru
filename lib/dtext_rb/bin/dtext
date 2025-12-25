@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'dtext'
+
+puts DText.parse(ARGF.read)

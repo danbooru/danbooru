@@ -5,7 +5,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   include Deletable
   include Mentionable
-  include Normalizable
+  include DTextAttribute
   include ArrayAttribute
   include HasDtextLinks
   extend HasBitFlags
@@ -94,8 +94,9 @@ class ApplicationRecord < ActiveRecord::Base
       policy.html_data_attributes
     end
 
-    def serializable_hash(options = {})
-      options ||= {}
+    def serializable_hash(opts = {})
+      options = opts.dup || {}
+
       if options[:only].is_a?(String)
         options.delete(:methods)
         options.delete(:include)
@@ -186,6 +187,13 @@ class ApplicationRecord < ActiveRecord::Base
       end
     end
 
+    # Like `update`, but locks the record before updating it.
+    def locked_update(**args)
+      with_lock do
+        update(**args)
+      end
+    end
+
     # Save the record, but convert RecordNotUnique exceptions thrown by the database into
     # Rails validation errors. This way duplicate records only return one type of error.
     # This assumes the table only has one uniqueness constraint in the database.
@@ -218,23 +226,15 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :ConcurrencyMethods do
     class_methods do
-      def parallel_find_each(batch_size: 1000, in_processes: Danbooru.config.max_concurrency.to_i, in_threads: nil, &block)
+      def parallel_find_each(**options, &block)
         # XXX We may deadlock if a transaction is open; do a non-parallel each.
         return find_each(&block) if connection.transaction_open?
 
-        # XXX Use threads in testing because processes can't see each other's
-        # database transactions.
-        if Rails.env.test?
-          in_processes = nil
-          in_threads = 2
-        end
-
         current_user = CurrentUser.user
 
-        find_in_batches(batch_size: batch_size, error_on_ignore: true) do |batch|
-          Parallel.each(batch, in_processes: in_processes, in_threads: in_threads) do |record|
-            # XXX In threaded mode, the current user isn't inherited from the
-            # parent thread because the current user is a thread-local
+        find_in_batches(error_on_ignore: true, **options) do |batch|
+          batch.parallel_each do |record|
+            # XXX The current user isn't inherited from the parent thread because the current user is a thread-local
             # variable. Hence, we have to set it explicitly in the child thread.
             CurrentUser.scoped(current_user) do
               yield record

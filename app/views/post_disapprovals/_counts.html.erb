@@ -10,12 +10,11 @@
       <%= disapprovals.map(&:reason).grep("poor_quality").count %> believe it has poor quality.
     <% end %>
 
-    <% if disapprovals.map(&:reason).grep(/disinterest|legacy/).count > 0 %>
-      <%= disapprovals.map(&:reason).grep(/disinterest|legacy/).count %> did not like the post enough to approve it.
-    <% end %>
-
     <% if disapprovals.map(&:message).any?(&:present?) %>
-      Messages: <%= disapprovals.map(&:message).select(&:present?).map { |msg| "\"#{format_text(msg, inline: true)}\"" }.to_sentence.html_safe %>.
+      Messages:
+      <span class="prose">
+        <%= disapprovals.select { _1.message.present? }.map { |disapproval| %{"#{disapproval.dtext_message.format_text}"} }.to_sentence.html_safe %>.
+      </span>
     <% end %>
   </p>
 <% end %>

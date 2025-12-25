@@ -1,9 +1,10 @@
 import CurrentUser from './current_user'
 import Utility from './utility'
+import { delay, isMobile, isTouchscreen }  from './utility'
+import Notice from './notice'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'
 import Note from './notes'
-import Ugoira from './ugoira'
 import Rails from '@rails/ujs'
 
 let Post = {};
@@ -36,7 +37,6 @@ Post.initialize_all = function() {
     this.initialize_post_sections();
     this.initialize_post_image_resize_links();
     this.initialize_recommended();
-    this.initialize_ugoira_player();
   }
 
   if ($("#c-posts #a-show, #c-uploads #a-show").length) {
@@ -51,14 +51,11 @@ Post.initialize_all = function() {
 }
 
 Post.initialize_gestures = function() {
-  if (CurrentUser.data("disable-mobile-gestures")) {
+  if (!isMobile() || CurrentUser.data("disable-mobile-gestures")) {
     return;
   }
   var $body = $("body");
   if ($body.data("hammer")) {
-    return;
-  }
-  if (!Utility.test_max_width(660)) {
     return;
   }
   $(".image-container").css({overflow: "visible"});
@@ -71,7 +68,7 @@ Post.initialize_gestures = function() {
   if (hasPrev) {
     hammer.on("swiperight", async function(e) {
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(150%)"});
-      await Utility.delay(200);
+      await delay(200);
       Post.swipe_prev(e);
     });
   }
@@ -79,7 +76,7 @@ Post.initialize_gestures = function() {
   if (hasNext) {
     hammer.on("swipeleft", async function(e) {
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(-150%)"});
-      await Utility.delay(200);
+      await delay(200);
       Post.swipe_next(e);
     });
   }
@@ -106,7 +103,7 @@ Post.open_edit_dialog = function() {
   $(".upload-container").css("display", "block");
 
   var $tag_string = $("#post_tag_string");
-  $("body.c-uploads .docking-menu-tab").hide();
+  $("body.c-uploads .docking-menu-tab, body.c-upload-media-assets .docking-menu-tab").hide();
 
   var dialog = $("<div/>").attr("id", "edit-dialog");
   $("#form").appendTo(dialog);
@@ -126,9 +123,8 @@ Post.open_edit_dialog = function() {
   });
   dialog.dialog("widget").draggable("option", "containment", "none");
 
-  var pin_button = $("<button/>").button({icons: {primary: "ui-icon-pin-w"}, label: "pin", text: false});
-  pin_button.css({width: "20px", height: "20px", position: "absolute", right: "28.4px"});
-  dialog.parent().children(".ui-dialog-titlebar").append(pin_button);
+  var pin_button = $("<button/>").button({ icon: "ui-icon-pin-w", label: "pin", showLabel: false });
+  dialog.parent().find(".ui-dialog-titlebar-close").before(pin_button);
   pin_button.on("click.danbooru", function(e) {
     var dialog_widget = $('.ui-dialog:has(#edit-dialog)');
     var pos = dialog_widget.offset();
@@ -139,14 +135,14 @@ Post.open_edit_dialog = function() {
       dialog_widget.offset(pos).css({ position: "fixed" });
       dialog.dialog("option", "resize", function() { dialog_widget.css({ position: "fixed" }); });
 
-      pin_button.button("option", "icons", {primary: "ui-icon-pin-s"});
+      pin_button.button("option", "icon", "ui-icon-pin-s");
     } else {
       pos.left += $(window).scrollLeft();
       pos.top += $(window).scrollTop();
       dialog_widget.offset(pos).css({ position: "absolute" });
       dialog.dialog("option", "resize", function() { /* do nothing */ });
 
-      pin_button.button("option", "icons", {primary: "ui-icon-pin-w"});
+      pin_button.button("option", "icon", "ui-icon-pin-w");
     }
   });
 
@@ -166,7 +162,7 @@ Post.close_edit_dialog = function(e, ui) {
   $("#edit-dialog").remove();
   var $tag_string = $("#post_tag_string");
   $("div.input").has($tag_string).prevAll().show();
-  $("body.c-uploads .docking-menu-tab").show();
+  $("body.c-uploads .docking-menu-tab, body.c-upload-media-assets .docking-menu-tab").show();
   $tag_string.css({"resize": "", "width": ""});
   $(document).trigger("danbooru:close-post-edit-dialog");
 }
@@ -199,15 +195,15 @@ Post.initialize_links = function() {
           other_post_id: other_post_id
         },
         success: function(data) {
-          Utility.notice("Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+          Notice.info("Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
         },
         error: function(data) {
           if (data.status === 404) {
-            Utility.error("Error: Invalid destination post");
+            Notice.error("Error: Invalid destination post");
           } else if (data.responseJSON && data.responseJSON.reason) {
-            Utility.error("Error: " + data.responseJSON.reason);
+            Notice.error("Error: " + data.responseJSON.reason);
           } else {
-            Utility.error("There was an error copying notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+            Notice.error("There was an error copying notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
           }
         }
       });
@@ -276,7 +272,7 @@ Post.initialize_post_preview_options_menu = function() {
 }
 
 Post.view_original = function(e = null) {
-  if (Utility.test_max_width(660)) {
+  if (isMobile()) {
     // Do the default behavior (navigate to image)
     return;
   }
@@ -296,7 +292,7 @@ Post.view_original = function(e = null) {
 }
 
 Post.view_large = function(e = null) {
-  if (Utility.test_max_width(660)) {
+  if (isMobile()) {
     // Do the default behavior (navigate to image)
     return;
   }
@@ -318,7 +314,6 @@ Post.view_large = function(e = null) {
 Post.toggle_fit_window = function(e) {
   $("#image").toggleClass("fit-width");
   Note.Box.scale_all();
-  Post.resize_ugoira_controls();
   e.preventDefault();
 };
 
@@ -394,16 +389,6 @@ Post.initialize_post_sections = function() {
   });
 }
 
-Post.initialize_ugoira_player = function() {
-  if ($("#ugoira-controls").length) {
-    let frame_delays = $("#image").data("ugoira-frame-delays");
-    let file_url = $(".image-container").data("file-url");
-
-    Ugoira.create_player(frame_delays, file_url);
-    $(window).on("resize.danbooru.ugoira_scale", Post.resize_ugoira_controls);
-  }
-};
-
 Post.initialize_ruffle_player = function() {
   let $container = $(".ruffle-container[data-swf]");
 
@@ -416,18 +401,11 @@ Post.initialize_ruffle_player = function() {
   }
 };
 
-Post.resize_ugoira_controls = function() {
-  var $img = $("#image");
-  var width = Math.max($img.width(), 350);
-  $("#ugoira-control-panel").css("width", width);
-  $("#seek-slider").css("width", width - 81);
-}
-
 Post.show_pending_update_notice = function() {
   if (Post.pending_update_count === 0) {
-    Utility.notice("Posts updated");
+    Notice.info("Posts updated");
   } else {
-    Utility.notice(`Updating posts (${Post.pending_update_count} pending)...`, true);
+    Notice.info(`Updating posts (${Post.pending_update_count} pending)...`, false);
   }
 }
 

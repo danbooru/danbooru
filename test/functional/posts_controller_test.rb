@@ -1,7 +1,7 @@
 require "test_helper"
 
 class PostsControllerTest < ActionDispatch::IntegrationTest
-  def assert_canonical_url_equals(expected)
+  def assert_seo_canonical_url_equals(expected)
     assert_equal(expected, response.parsed_body.css("link[rel=canonical]").attribute("href").value)
   end
 
@@ -26,6 +26,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = travel_to(1.month.ago) {create(:user)}
       @post = as(@user) { create(:post, tag_string: "aaaa") }
+      Danbooru.config.stubs(:canonical_url).returns("http://www.example.com")
     end
 
     context "index action" do
@@ -72,21 +73,21 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         should "render the first page" do
           get root_path
           assert_response :success
-          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+          assert_seo_canonical_url_equals(root_url)
 
           get posts_path
           assert_response :success
-          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+          assert_seo_canonical_url_equals(root_url)
 
           get posts_path(page: 1)
           assert_response :success
-          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+          assert_seo_canonical_url_equals(root_url)
         end
 
         should "render the second page" do
           get posts_path(page: 2, limit: 1)
           assert_response :success
-          assert_canonical_url_equals(posts_url(page: 2, limit: 1, host: Danbooru.config.hostname))
+          assert_seo_canonical_url_equals(posts_url(page: 2, limit: 1))
         end
       end
 
@@ -95,7 +96,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "does_not_exist" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 0
-          assert_canonical_url_equals(posts_url(tags: "does_not_exist", host: Danbooru.config.hostname))
+          assert_seo_canonical_url_equals(posts_url(tags: "does_not_exist"))
         end
 
         should "render for an artist tag" do
@@ -187,6 +188,19 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         should "show a notice for a single tag search with a pending BUR" do
           create(:post, tag_string: "foo")
           create(:bulk_update_request, script: "create alias foo -> bar")
+          get_auth posts_path(tags: "foo"), @user
+          assert_select ".tag-change-notice"
+        end
+
+        should "show a notice for a single tag search with multiple pending BURs in multiple topics" do
+          topic1 = create(:forum_topic)
+          topic2 = create(:forum_topic)
+          create(:post, tag_string: "foo")
+          create(:bulk_update_request, script: "create alias foo -> bar", forum_topic: topic1)
+          create(:bulk_update_request, script: "create alias foo -> baz", forum_topic: topic1)
+          create(:bulk_update_request, script: "create alias foo -> qux", forum_topic: topic2)
+          create(:bulk_update_request, script: "create alias foo -> blah", forum_topic: topic2)
+
           get_auth posts_path(tags: "foo"), @user
           assert_select ".tag-change-notice"
         end
@@ -464,6 +478,8 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       context "in safe mode" do
         should "not include the rating:s tag in the page title" do
+          Danbooru.config.stubs(:app_name).returns("Safebooru")
+
           get posts_path(tags: "fate/grand_order", safe_mode: true)
           assert_select "title", text: "Fate/Grand Order | Safebooru"
         end
@@ -560,34 +576,49 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         should "render for an anonymous user" do
           get post_path(@post)
+
           assert_response :success
+          assert_select "img#image"
+          assert_not_select "#translate"
         end
 
         should "render for a member" do
           get_auth post_path(@post), @user
+
           assert_response :success
+          assert_select "img#image"
+          assert_select "#translate"
         end
 
         should "render for a builder" do
           get_auth post_path(@post), @approver
+
           assert_response :success
+          assert_select "img#image"
+          assert_select "#translate"
         end
 
         should "render for an admin" do
           get_auth post_path(@post), @admin
+
           assert_response :success
+          assert_select "img#image"
+          assert_select "#translate"
         end
 
         should "render for a builder with a search query" do
           get_auth post_path(@post, q: "tagme"), @approver
+
           assert_response :success
+          assert_select "img#image"
+          assert_select "#translate"
         end
 
         should "render the flag edit link for the flagger" do
           get_auth post_path(@post), @user
 
           assert_response :success
-          assert_select ".post-flag-reason a:first", true, text: "edit"
+          assert_select ".post-flag-reason a:first", "edit"
         end
       end
 
@@ -605,6 +636,17 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get post_path(id: 9_999_999)
 
           assert_response 404
+        end
+      end
+
+      context "for a video post" do
+        should "render" do
+          post = create(:post, file_ext: "mp4", media_asset: build(:media_asset, file_ext: "mp4", duration: 1.0))
+          get_auth post_path(post), @user
+
+          assert_response :success
+          assert_select "video#image"
+          assert_not_select "#translate"
         end
       end
 
@@ -683,6 +725,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("Rating not selected", flash[:notice])
       end
 
+      should "re-render the upload page if the parent ID is invalid" do
+        @post = create_post!(tag_string: "test parent:999999999")
+        assert_response :success
+      end
+
       should "merge the tags and redirect to the original post if the upload is a duplicate of an existing post" do
         media_asset = create(:media_asset)
         post1 = create_post!(rating: "s", tag_string: "post1", media_asset: media_asset)
@@ -701,6 +748,15 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("tagme", @post.tag_string)
       end
 
+      should "apply the upvote:self metatag" do
+        @user = create(:user)
+        @post = create_post!(user: @user, tag_string: "test upvote:self")
+
+        assert_redirected_to @post
+        assert_equal("test", @post.reload.tag_string)
+        assert_equal(true, @post.votes.positive.exists?(user: @user))
+      end
+
       should "set the source" do
         @post = create_post!(source: "https://www.example.com")
 
@@ -708,8 +764,10 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("https://www.example.com", @post.source)
       end
 
-      should "autoban the post when it is tagged banned_artist" do
-        @post = create_post!(tag_string: "banned_artist")
+      should "autoban the post when it is from a banned artist" do
+        artist = create(:artist, is_banned: true)
+        @post = create_post!(tag_string: artist.name)
+
         assert_equal(true, @post.is_banned?)
       end
 
@@ -721,9 +779,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       should "not create a post when the uploader is upload-limited" do
         @user = create(:user, upload_points: 0)
 
-        @user.upload_limit.upload_slots.times do
+        @user.upload_limit.upload_slots.times do |n|
           assert_difference("Post.count", 1) do
-            create_post!(user: @user)
+            travel(n.hour) do
+              create_post!(user: @user)
+            end
           end
         end
 
@@ -751,10 +811,12 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_difference("ArtistCommentary.count", 1) do
           @post = create_post!(
             user: @user,
-            artist_commentary_title: "original title",
-            artist_commentary_desc: "original desc",
-            translated_commentary_title: "translated title",
-            translated_commentary_desc: "translated desc",
+            artist_commentary: {
+              original_title: "original title",
+              original_description: "original desc",
+              translated_title: "translated title",
+              translated_description: "translated desc",
+            },
           )
         end
 
@@ -769,7 +831,9 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_difference("ArtistCommentary.count", 1) do
           @post = create_post!(
             user: @user,
-            artist_commentary_title: "title",
+            artist_commentary: {
+              original_title: "title",
+            },
           )
         end
 
@@ -784,10 +848,12 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_no_difference("ArtistCommentary.count") do
           @post = create_post!(
             user: @user,
-            artist_commentary_title: "",
-            artist_commentary_desc: "",
-            translated_commentary_title: "",
-            translated_commentary_desc: "",
+            artist_commentary: {
+              original_title: "",
+              original_description: "",
+              translated_title: "",
+              translated_description: "",
+            },
           )
         end
 
@@ -821,10 +887,40 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_post_source_equals("https://h.bilibili.com/83341894", "https://i0.hdslb.com/bfs/album/669c0974a2a7508cbbb60b185eddaa0ccf8c5b7a.jpg", "https://h.bilibili.com/83341894")
 
         assert_post_source_equals("https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg", "https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg")
-        assert_post_source_equals("https://t.bilibili.com/686082748803186697", "https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg", "https://t.bilibili.com/686082748803186697")
+        assert_post_source_equals("https://www.bilibili.com/opus/686082748803186697", "https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg", "https://t.bilibili.com/686082748803186697")
 
-        assert_post_source_equals("https://i.4cdn.org/vt/1611919211191.jpg", "https://i.4cdn.org/vt/1611919211191.jpg")
-        assert_post_source_equals("https://boards.4channel.org/vt/thread/1#p1", "https://i.4cdn.org/vt/1611919211191.jpg", "https://boards.4channel.org/vt/thread/1")
+        assert_post_source_equals("https://i.4cdn.org/vt/1745613423284732.jpg", "https://i.4cdn.org/vt/1745613423284732.jpg")
+        assert_post_source_equals("https://boards.4chan.org/vt/thread/99394683#p99394683", "https://i.4cdn.org/vt/1745613423284732.jpg", "https://boards.4chan.org/vt/thread/99394683")
+      end
+
+      should "not normalize source URLs to NFC form" do
+        # ブ = U+30D5 U+3099 ('KATAKANA LETTER HU', 'COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK')
+        source = "https://tuyu-official.jp/wp/wp-content/uploads/2022/09/雨模様［サブスクジャケット］.jpeg"
+        assert_post_source_equals(source, source)
+      end
+
+      context "when Danbooru.config.new_uploader_blocked_ai_tags is set" do
+        setup do
+          @user = create(:user)
+          @media_asset = create(:media_asset)
+          @media_asset.ai_tags.create!(tag: create(:tag, name: "touhou"), score: 90)
+        end
+
+        should "not create a post when the post is blocked" do
+          Danbooru.config.stubs(:new_uploader_blocked_ai_tags).returns("touhou,>80%")
+
+          assert_no_difference("Post.count") do
+            create_post!(user: @user, media_asset: @media_asset)
+          end
+        end
+
+        should "create a post when the post is not blocked" do
+          Danbooru.config.stubs(:new_uploader_blocked_ai_tags).returns("touhou,>95%")
+
+          assert_difference("Post.count", 1) do
+            create_post!(user: @user, media_asset: @media_asset)
+          end
+        end
       end
     end
 

@@ -74,10 +74,12 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render for an invalid url" do
-        artist = create(:artist, url_string: "https://.auone-net.jp/~hakueki/")
+        artist = build(:artist, url_string: "https://.auone-net.jp/~hakueki/")
+        artist.save(validate: false)
         get artist_path(artist.id)
 
         assert_response :success
+        assert_equal("https://.auone-net.jp/~hakueki/", artist.urls.last.url)
       end
     end
 
@@ -112,17 +114,12 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render for an invalid url" do
-        artist = create(:artist, url_string: "https://.auone-net.jp/~hakueki/")
+        artist = build(:artist, url_string: "https://.auone-net.jp/~hakueki/")
+        artist.save(validate: false)
         get_auth edit_artist_path(artist.id), @user
 
         assert_response :success
-      end
-    end
-
-    context "banned action" do
-      should "redirect to a banned search" do
-        get banned_artists_path
-        assert_response :redirect
+        assert_equal("https://.auone-net.jp/~hakueki/", artist.urls.last.url)
       end
     end
 
@@ -134,7 +131,6 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to(@artist)
         assert_equal(true, @artist.reload.is_banned?)
-        assert_equal(true, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist", status: "active"))
       end
 
       should "not allow non-admins to ban artists" do
@@ -151,7 +147,6 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to(@artist)
         assert_equal(false, @artist.reload.is_banned?)
-        assert_equal(true, TagImplication.deleted.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
       end
     end
 
@@ -185,6 +180,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(any_name_matches: "masao", order: "post_count").with { @masao }
         should respond_to_search(url_matches: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg").with { @masao }
         should respond_to_search(url_matches: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939").with { @masao }
+        should respond_to_search(url_matches: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939 https://example.com/1234").with { @masao }
 
         context "ignoring whitespace" do
           should respond_to_search(url_matches: " http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939 ").with { @masao }
@@ -217,7 +213,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :redirect
         assert_equal("artist2", Artist.last.name)
-        assert_equal("Duplicate of [[artist1]]", flash[:notice])
+        assert_equal("Potential duplicate of [[artist1]]", flash[:notice])
       end
     end
 
@@ -242,7 +238,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         put_auth artist_path(@artist2), @user, params: { artist: { url_string: "https://www.pixiv.net/users/1234" }}
 
         assert_redirected_to @artist2
-        assert_equal("Duplicate of [[artist1]]", flash[:notice])
+        assert_equal("Potential duplicate of [[artist1]]", flash[:notice])
       end
     end
 
@@ -250,10 +246,13 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       should "work" do
         as(@user) do
           @artist.update(name: "xyz")
-          @artist.update(name: "abc")
+          travel(2.hours) { @artist.update(name: "abc") }
         end
         version = @artist.versions.first
         put_auth revert_artist_path(@artist.id), @user, params: {version_id: version.id}
+
+        assert_redirected_to @artist
+        assert_equal("xyz", @artist.reload.name)
       end
 
       should "not allow reverting to a previous version of another artist" do
@@ -299,6 +298,17 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
       should "not fail for Pixiv bad IDs" do
         assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=0")
+      end
+
+      should "find an artist with an inactive artist URL" do
+        @artist = create(:artist, url_string: "-https://www.pixiv.net/users/1843825")
+        assert_artist_found(@artist.name, "https://www.pixiv.net/users/1843825")
+      end
+
+      should "find the artist when given a profile URL" do
+        assert_artist_found(create(:artist, url_string: "http://www.tinami.com/creator/profile/10262").name, "http://www.tinami.com/creator/profile/10262")
+        assert_artist_found(create(:artist, url_string: "https://seiga.nicovideo.jp/user/illust/14767435").name, "https://seiga.nicovideo.jp/user/illust/14767435")
+        assert_artist_found(create(:artist, url_string: "https://fantia.jp/fanclubs/15340").name, "https://fantia.jp/fanclubs/15340")
       end
     end
   end

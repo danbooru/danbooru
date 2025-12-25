@@ -1,0 +1,104 @@
+<div id="c-sources">
+  <div id="a-show">
+    <div class="card mt-8 p-4 max-w-1080px mx-auto flex flex-col items-center">
+      <h1 class="pb-4">Source Info</h1>
+
+      <%= search_form_for(source_path, attribute: "", classes: "flex w-full gap-4") do |f| %>
+        <%= f.input :url, label: false, wrapper_html: { class: "w-full !m-0" }, input_html: { value: params[:url], class: "h-full !max-w-full", placeholder: "Paste link here" } %>
+        <%= f.input :mode, as: :hidden, input_html: { value: params[:mode] } %>
+        <%= f.submit "View", class: "button-primary" %>
+      <% end %>
+    </div>
+
+    <% if @source.present? %>
+      <div class="card mt-4 p-4 max-w-1080px mx-auto relative">
+        <div class="flex gap-2 text-xs absolute top-4 right-4">
+          <%= link_to multiple_images_icon, current_page_path(mode: "card"), class: [("inactive-link" if @mode != "card")] %>
+          <%= link_to code_icon, current_page_path(mode: "json"), class: [("inactive-link" if @mode != "json")] %>
+
+          <% if Rails.env.local? %>
+            <%= link_to file_lines_icon, current_page_path(mode: "test"), class: [("inactive-link" if @mode != "test")] %>
+          <% end %>
+        </div>
+
+        <% if @mode == "json" %>
+          <div class="whitespace-pre font-monospace text-sm overflow-auto"><%= JSON.pretty_generate(@source.to_json.parse_json) %></div>
+        <% elsif @mode == "test" && Rails.env.local? %>
+          <div class="whitespace-pre font-monospace text-sm overflow-auto"><%= @source.test_case %></div>
+        <% else %>
+          <div class="flex flex-col gap-2">
+            <% if @source.display_name.present? || @source.username.present? || @source.profile_urls.present? %>
+              <div class="flex sm:flex-col gap-1">
+                <% if @source.display_name.present? && @source.profile_urls.present? %>
+                  <%= external_link_to @source.profile_urls.first, @source.display_name, class: "inline-block max-w-1/2 truncate" %>
+                <% elsif @source.display_name.present? %>
+                  <strong><%= @source.display_name %></strong>
+                <% end %>
+
+                <div>
+                  <% if @source.username.present? && @source.profile_urls.present? %>
+                    <%= external_link_to @source.profile_urls.first, "@#{@source.username}", class: "text-xs inactive-link" %>
+                  <% elsif @source.username.present? %>
+                    <span class="text-xs text-muted">@<%= @source.username %></span>
+                  <% end %>
+
+                  <% if @source.profile_urls.present? %>
+                    <ul class="list-inline">
+                      <% @source.profile_urls.each do |profile_url| %>
+                        <%= external_link_to profile_url, external_site_icon(Source::URL.site_name(profile_url), class: "h-4"), title: profile_url %>
+                      <% end %>
+                    </ul>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+
+            <% if @source.dtext_artist_commentary_title.present? || @source.dtext_artist_commentary_desc.present? %>
+              <div class="prose">
+                <% if @source.dtext_artist_commentary_title.present? %>
+                  <h6><%= format_text(@source.dtext_artist_commentary_title, inline: true) %></h6>
+                <% end %>
+
+                <% if @source.dtext_artist_commentary_desc.present? %>
+                  <%= format_text(@source.dtext_artist_commentary_desc) %>
+                <% end %>
+              </div>
+            <% end %>
+
+            <% if @source.tags.present? %>
+              <div class="flex flex-wrap gap-1">
+                <% @source.tags.each do |tag, href| %>
+                  <%= external_link_to href, tag, class: "chip-primary border-current text-xs truncate" %>
+                <% end %>
+              </div>
+            <% end %>
+
+            <% if @source.image_urls.present? %>
+              <div class="grid grid-cols-<%= @source.image_urls.size.clamp(1..4) %> gap-2">
+                <% @source.image_urls.each do |url| %>
+                  <% if Source::URL.parse(url)&.file_ext.in?(%w[mp4 webm]) %>
+                    <%= tag.video src: url, referrerpolicy: "no-referrer", class: "max-w-full max-h-screen rounded object-cover", loop: true, controls: true %>
+                  <% else %>
+                    <%= external_link_to url, class: "w-fit h-fit" do %>
+                      <%= tag.img src: url, referrerpolicy: "no-referrer", class: "max-w-full max-h-screen rounded object-cover #{"w-full aspect-square" if @source.image_urls.size > 1}" %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+
+            <% if @source.page_url.present? %>
+              <div class="prose text-xs text-muted">
+                <hr>
+
+                Source: <%= external_link_to @source.page_url, class: "inactive-link" %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<%= render "uploads/secondary_links" %>

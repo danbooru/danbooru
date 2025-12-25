@@ -2,10 +2,14 @@
   <% if comment.new_record? %>
     <%= f.hidden_field :post_id %>
   <% end %>
-  <%= f.input :body, as: :dtext %>
-  <%= f.button :submit, "Submit" %>
-  <%= dtext_preview_button "comment_body" %>
-  <% if comment.new_record? %>
-    <%= f.input :do_not_bump_post, label: "No bump", wrapper_html: { class: "inline-block" } %>
-  <% end %>
+
+  <%= f.input :body, label: false, as: :dtext, placeholder: "Post a comment" %>
+
+  <span class="flex gap-2 items-center">
+    <%= f.button :submit, "Comment", class: "button-primary" %>
+
+    <% if comment.new_record? %>
+      <%= f.input :do_not_bump_post, label: "No bump", wrapper_html: { class: "!m-0" } %>
+    <% end %>
+  </span>
 <% end %>

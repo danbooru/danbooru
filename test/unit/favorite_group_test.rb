@@ -20,6 +20,22 @@ class FavoriteGroupTest < ActiveSupport::TestCase
     end
   end
 
+  context "Searching favgroups" do
+    should "find favgroups by name" do
+      @f1 = create(:favorite_group, name: "Test Group")
+      @f2 = create(:favorite_group, name: "Yuru_Yuri_-_\\\\Akarin!!//")
+
+      assert_search_equals(@f1, name_contains: "test group")
+      assert_search_equals(@f1, name_contains: "tes")
+      assert_search_equals(@f1, name_matches: "test group")
+      assert_search_equals(@f1, name_matches: "testing group")
+      assert_search_equals([],  name_matches: "tes")
+
+      assert_search_equals(@f2, name_contains: "Yuru_Yuri_-_\\\\Akarin!!//")
+      assert_search_equals(@f2, name_matches: "Yuru_Yuri_-_\\\\Akarin!!//")
+    end
+  end
+
   context "expunging a post" do
     should "remove it from all favorite groups" do
       @post = create(:post_with_file, filename: "test.jpg")
@@ -62,6 +78,11 @@ class FavoriteGroupTest < ActiveSupport::TestCase
   context "when validating names" do
     subject { build(:favorite_group) }
 
+    should normalize_attribute(:name).from("  A  B  ").to("A_B")
+    should normalize_attribute(:name).from("__A__B__").to("A_B")
+    should normalize_attribute(:name).from(" _A\t\r\n\u3000_\nB_ ").to("A_B")
+    should normalize_attribute(:name).from("pokémon".unicode_normalize(:nfd)).to("pokémon".unicode_normalize(:nfc))
+
     should_not allow_value("foo,bar").for(:name)
     should_not allow_value("foo*bar").for(:name)
     should_not allow_value("123").for(:name)
@@ -71,5 +92,6 @@ class FavoriteGroupTest < ActiveSupport::TestCase
     should_not allow_value("").for(:name)
     should_not allow_value("   ").for(:name)
     should_not allow_value("\u200B").for(:name)
+    should_not allow_value("x" * 171).for(:name)
   end
 end

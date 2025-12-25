@@ -15,6 +15,7 @@ class PoolTest < ActiveSupport::TestCase
   context "Searching pools" do
     should "find pools by name" do
       @pool = FactoryBot.create(:pool, name: "Test Pool")
+      @pool2 = create(:pool, name: "Yuru_Yuri_-_\\\\Akarin!!//")
 
       assert_equal(@pool.id, Pool.find_by_name("test pool").id)
 
@@ -23,6 +24,9 @@ class PoolTest < ActiveSupport::TestCase
       assert_search_equals(@pool, name_matches: "test pool")
       assert_search_equals(@pool, name_matches: "testing pool")
       assert_search_equals([], name_matches: "tes")
+
+      assert_search_equals(@pool2, name_contains: "Yuru_Yuri_-_\\\\Akarin!!//")
+      assert_search_equals(@pool2, name_matches: "Yuru_Yuri_-_\\\\Akarin!!//")
     end
 
     should "find pools by post id" do
@@ -227,14 +231,6 @@ class PoolTest < ActiveSupport::TestCase
       assert_equal([], @pool.post_ids_was)
     end
 
-    should "normalize its name" do
-      @pool.update(:name => "  A  B  ")
-      assert_equal("A_B", @pool.name)
-
-      @pool.update(:name => "__A__B__")
-      assert_equal("A_B", @pool.name)
-    end
-
     should "not allow duplicate posts" do
       @pool.update(category: "collection", post_ids: [1, 2, 2, 3, 1])
       assert_equal([1, 2, 3], @pool.post_ids)
@@ -244,6 +240,11 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     context "when validating names" do
+      should normalize_attribute(:name).from("  A  B  ").to("A_B")
+      should normalize_attribute(:name).from("__A__B__").to("A_B")
+      should normalize_attribute(:name).from(" _A\t\r\n\u3000_\nB_ ").to("A_B")
+      should normalize_attribute(:name).from("pokémon".unicode_normalize(:nfd)).to("pokémon".unicode_normalize(:nfc))
+
       should_not allow_value("foo,bar").for(:name)
       should_not allow_value("foo*bar").for(:name)
       should_not allow_value("123").for(:name)
@@ -255,6 +256,9 @@ class PoolTest < ActiveSupport::TestCase
       should_not allow_value("   ").for(:name)
       should_not allow_value("\u200B").for(:name)
       should_not allow_value("").for(:name)
+      should_not allow_value("x").for(:name)
+      should_not allow_value("xx").for(:name)
+      should_not allow_value("x" * 171).for(:name)
     end
   end
 

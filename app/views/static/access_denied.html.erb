@@ -5,9 +5,9 @@
 <p>
   You do not have permission to visit this page.
 
-  <% if CurrentUser.is_anonymous? %>
-    Try <%= link_to "logging in", login_path(url: request.fullpath) %> or
-    <%= link_to "signing up", new_user_path %>.
+  <% if CurrentUser.user.is_anonymous? %>
+    Try <%= link_to "logging in", main_app.login_path(url: request.fullpath) %> or
+    <%= link_to "signing up", main_app.new_user_path %>.
   <% end %>
 </p>
 

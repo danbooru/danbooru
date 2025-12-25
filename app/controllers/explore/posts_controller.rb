@@ -4,13 +4,12 @@ module Explore
   class PostsController < ApplicationController
     respond_to :html, :xml, :json
 
-    rate_limit :popular, rate: 1.0/1.minute, burst: 50, if: -> { request.format.json? }, key: "explore:popular.json"
-
     def popular
       @date, @scale, @min_date, @max_date = parse_date(params)
 
       limit = params.fetch(:limit, CurrentUser.user.per_page)
       @posts = popular_posts(@min_date, @max_date).paginate(params[:page], limit: limit, search_count: false)
+      authorize @posts, policy_class: ExplorePostPolicy
 
       respond_with(@posts)
     end
@@ -18,17 +17,23 @@ module Explore
     def viewed
       @date, @scale, @min_date, @max_date = parse_date(params)
       @posts = ReportbooruService.new.popular_posts(@date)
+      authorize @posts, policy_class: ExplorePostPolicy
+
       respond_with(@posts)
     end
 
     def searches
       @date, @scale, @min_date, @max_date = parse_date(params)
       @searches = ReportbooruService.new.post_search_rankings(@date)
+      authorize @searches, policy_class: ExplorePostPolicy
+
       respond_with(@searches)
     end
 
     def missed_searches
       @missed_searches = ReportbooruService.new.missed_search_rankings
+      authorize @missed_searches, policy_class: ExplorePostPolicy
+
       respond_with(@missed_searches)
     end
 

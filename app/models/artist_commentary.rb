@@ -10,8 +10,18 @@ class ArtistCommentary < ApplicationRecord
     :add_partial_commentary_tag
   )
 
-  before_validation :trim_whitespace
+  dtext_attribute :original_title, disable_mentions: true, inline: true
+  dtext_attribute :translated_title, disable_mentions: true, inline: true
+  dtext_attribute :original_description, disable_mentions: true
+  dtext_attribute :translated_description, disable_mentions: true
+
+  normalizes :original_title, :translated_title, :original_description, :translated_description, with: ->(string) { string.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "") }
+
   validates :post_id, uniqueness: true
+  validates :original_title, length: { maximum: 600 }, if: :original_title_changed?
+  validates :translated_title, length: { maximum: 300 }, if: :translated_title_changed?
+  validates :original_description, length: { maximum: 55_000 }, if: :original_description_changed?
+  validates :translated_description, length: { maximum: 55_000 }, if: :translated_description_changed?
   belongs_to :post
   has_many :versions, -> {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
   has_one :previous_version, -> {order(id: :desc)}, :class_name => "ArtistCommentaryVersion", :foreign_key => :post_id, :primary_key => :post_id
@@ -72,13 +82,6 @@ class ArtistCommentary < ApplicationRecord
         q = q.apply_default_order(params)
       end
     end
-  end
-
-  def trim_whitespace
-    self.original_title = original_title.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
-    self.translated_title = translated_title.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
-    self.original_description = original_description.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
-    self.translated_description = translated_description.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
   end
 
   def original_present?

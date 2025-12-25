@@ -50,7 +50,7 @@ Disallow: <%= user_actions_path %>
 Disallow: <%= user_events_path %>
 Disallow: <%= user_feedbacks_path %>
 Disallow: <%= user_name_change_requests_path %>
-Disallow: <%= new_wiki_page_path %>
+Disallow: <%= new_wiki_page_path %>$
 Disallow: <%= wiki_page_versions_path %>
 
 Allow: <%= artists_path %>
@@ -67,7 +67,6 @@ Allow: <%= notes_path %>
 Allow: <%= pools_path %>
 Allow: <%= posts_path %>
 Allow: <%= new_session_path %>
-Allow: <%= sign_out_session_path %>
 Allow: <%= tags_path %>
 Allow: <%= uploads_path %>
 Allow: <%= user_upgrades_path %>

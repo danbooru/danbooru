@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Appeals</h1>
     <%= render "search" %>
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <%= table_for @post_appeals, width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |post_appeal| %>
@@ -10,7 +10,7 @@
       <% end %>
       <% t.column "Reason" do |post_appeal| %>
         <span class="prose">
-          <%= format_text post_appeal.reason, inline: true %>
+          <%= post_appeal.dtext_reason.format_text %>
         </span>
       <% end %>
       <% t.column "Appeals", width: "1%" do |post_appeal| %>

@@ -10,12 +10,12 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "URLs"
   inflect.acronym "AST"
   inflect.acronym "AI"
+  inflect.acronym "SFTP"
+  inflect.acronym "TOTP"
+  inflect.acronym "JSON"
+  inflect.uncountable ["totp"]
 #   inflect.plural /^(ox)$/i, '\1en'
 #   inflect.singular /^(ox)en/i, '\1'
 #   inflect.irregular 'person', 'people'
 #   inflect.uncountable %w( fish sheep )
 end
-
-#ActiveSupport::Inflector.inflections(:en) do |inflect|
-#  inflect.acronym "IP" # IPAddress
-#end

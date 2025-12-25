@@ -1,0 +1,83 @@
+/* Show the controls only when the video is hovered, paused, or when the options menu is open */
+.ugoira-container:hover, .ugoira-container[data-paused="true"], .ugoira-container:has(a.popup-menu-button[aria-expanded="true"]) {
+  .ugoira-controls {
+    opacity: 100%;
+  }
+}
+
+/* Stretch the video to fit the screen in fullscreen mode */
+.ugoira-container:fullscreen video {
+  width: 100%;
+}
+
+.ugoira-container {
+  background-color: var(--ugoira-background-color);
+}
+
+.ugoira-controls {
+  &, .tippy-box {
+    background-color: #1f202cc0; // fallback
+    background-color: rgb(from var(--ugoira-controls-background-color) r g b / 80%);
+    border: 0;
+  }
+
+  /* XXX Fix corners not being rounded when hovering over last item in options menu */
+  .popup-menu:has(a.popup-menu-button[aria-expanded="true"]) .tippy-box {
+    overflow: hidden;
+  }
+
+  &, a.popup-menu-button, .tippy-content li, .tippy-content a {
+    color: var(--ugoira-controls-icon-color);
+  }
+
+  .icon:hover {
+    color: var(--ugoira-controls-icon-hover-color);
+  }
+
+  .tippy-content {
+    padding: 0;
+
+    li:has(a):hover {
+      background-color: #3f4058cc; // fallback
+      background-color: rgb(from var(--ugoira-controls-popup-hover-background-color) r g b / 80%);
+    }
+
+    hr {
+      border-color: var(--ugoira-controls-divider-color);
+    }
+  }
+
+  .ugoira-slider {
+    --playback-progress: 0%;
+    --load-progress: 0%;
+
+    &::-moz-range-track {
+      height: 0.375rem;
+      border-radius: 1rem;
+      background: linear-gradient(to right, var(--ugoira-slider-playback-color) 0% var(--playback-progress), var(--ugoira-slider-loading-color) var(--playback-progress) var(--load-progress), var(--ugoira-slider-unloaded-color) var(--playback-progress) 100%);
+    }
+
+    &::-webkit-slider-runnable-track {
+      height: 0.375rem;
+      border-radius: 1rem;
+      background: linear-gradient(to right, var(--ugoira-slider-playback-color) 0% var(--playback-progress), var(--ugoira-slider-loading-color) var(--playback-progress) var(--load-progress), var(--ugoira-slider-unloaded-color) var(--playback-progress) 100%);
+    }
+
+    &::-moz-range-thumb {
+      background-color: var(--ugoira-controls-icon-color);
+      border-color: var(--ugoira-controls-icon-color);
+      height: 0.75rem;
+      width: 0.75rem;
+    }
+
+    &::-webkit-slider-thumb {
+      appearance: none;
+      background-color: var(--ugoira-controls-icon-color);
+      border-radius: 1rem;
+      height: 0.75rem;
+      width: 0.75rem;
+      position: relative;
+      top: -50%;
+    }
+  }
+}

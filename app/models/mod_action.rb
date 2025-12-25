@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ModAction < ApplicationRecord
+  dtext_attribute :description, inline: true # defines :dtext_description
+
   belongs_to :creator, :class_name => "User"
   belongs_to :subject, polymorphic: true, optional: true
 
@@ -15,7 +17,7 @@ class ModAction < ApplicationRecord
   # Ban:      4
   # Unban:    5
   # Misc:     6-19
-  enum category: {
+  enum :category, {
     user_delete: 2,
     user_undelete: 3,
     user_ban: 4,
@@ -24,6 +26,7 @@ class ModAction < ApplicationRecord
     user_level_change: 7,
     user_approval_privilege: 8,
     user_upload_privilege: 9,
+    user_ban_update: 10,
     user_account_upgrade: 19, # XXX unused
     user_feedback_update: 21,
     user_feedback_delete: 22,
@@ -69,18 +72,30 @@ class ModAction < ApplicationRecord
     ip_ban_create: 160,
     ip_ban_delete: 162,
     ip_ban_undelete: 163,
+    news_update_create: 300,
+    news_update_update: 301,
+    news_update_delete: 302,
+    news_update_undelete: 303,
+    site_credential_create: 400,
+    site_credential_delete: 402,
+    site_credential_enable: 406,
+    site_credential_disable: 407,
+    email_address_update: 501,
+    backup_code_send: 606,
     mass_update: 1000, # XXX unused
   }
 
+  normalizes :category, with: ->(category) { category.to_s.parameterize.underscore.presence }
+
   def self.model_types
-    %w[Artist Comment CommentVote ForumPost ForumTopic IpBan ModerationReport Pool Post PostVote Tag TagAlias TagImplication User]
+    %w[Artist Comment CommentVote ForumPost ForumTopic IpBan ModerationReport NewsUpdate Pool Post PostVote SiteCredential Tag TagAlias TagImplication User]
   end
 
   def self.visible(user)
     if user.is_moderator?
       all
     else
-      where.not(category: [:ip_ban_create, :ip_ban_delete, :ip_ban_undelete, :moderation_report_handled, :moderation_report_rejected])
+      where.not(category: %i[ip_ban_create ip_ban_delete ip_ban_undelete moderation_report_handled moderation_report_rejected email_address_update backup_code_send])
     end
   end
 

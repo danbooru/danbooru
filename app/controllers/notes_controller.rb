@@ -33,8 +33,10 @@ class NotesController < ApplicationController
   end
 
   def update
-    @note = authorize Note.find(params[:id])
-    @note.update(permitted_attributes(@note))
+    @note = Note.find(params[:id])
+    @note.attributes = permitted_attributes(@note)
+    authorize(@note).save
+
     respond_with(@note) do |format|
       format.json do
         if @note.errors.any?
@@ -57,5 +59,11 @@ class NotesController < ApplicationController
     @version = @note.versions.find(params[:version_id])
     @note.revert_to!(@version)
     respond_with(@note)
+  end
+
+  def preview
+    @note = authorize Note.new(body: params[:body])
+
+    respond_with(@note, methods: [:sanitized_body])
   end
 end

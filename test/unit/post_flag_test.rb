@@ -16,7 +16,7 @@ class PostFlagTest < ActiveSupport::TestCase
       should "be able to flag an unlimited number of posts" do
         @user = create(:approver)
 
-        assert_equal(true, @user.has_unlimited_flags?)
+        assert_equal(Float::INFINITY, @user.flag_limit)
         assert_equal(false, @user.is_flag_limited?)
 
         assert_nothing_raised do

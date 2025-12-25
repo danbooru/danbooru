@@ -1,0 +1,27 @@
+<%= render "secondary_links" %>
+
+<div id="c-site-credentials">
+  <div id="a-new">
+    <h1>New Credential</h1>
+
+    <%= edit_form_for(@site_credential, html: { "x-data": '{ site: "", valid: false }', "x-on:input": "$nextTick(() => valid = $root.checkValidity())" }) do |f| %>
+      <%= f.input :site, as: :select, collection: SiteCredential.sites.keys, include_blank: true, selected: params.dig(:site_credential, :site), input_html: { "x-model": "site" } %>
+
+      <% SiteCredential::SITES.each do |site| %>
+        <%= f.simple_fields_for :credential do |fa| %>
+          <div x-cloak x-show="site === <%= site[:name].to_json %>">
+            <% site[:default_credential].keys.each do |credential_name| %>
+              <%= fa.input credential_name, label: credential_name.to_s.humanize(keep_id_suffix: true), as: :string, required: false, input_html: { "x-bind:disabled": "site !== '#{site[:name]}'", "x-bind:required": "site === '#{site[:name]}'", value: params.dig(:credential, credential_name) } %>
+            <% end %>
+
+            <div class="prose fineprint mb-4">
+              <%= format_text(site[:help]) %>
+            </div>
+          <% end %>
+          </div>
+        <% end %>
+
+      <%= f.submit "Create", class: "button-primary", disabled: true, "x-bind:disabled": "!valid" %>
+    <% end %>
+  </div>
+</div>

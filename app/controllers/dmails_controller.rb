@@ -3,8 +3,6 @@
 class DmailsController < ApplicationController
   respond_to :html, :xml, :js, :json
 
-  rate_limit :create, rate: 1.0/1.minute, burst: 50
-
   def new
     if params[:respond_to_id]
       parent = authorize Dmail.find(params[:respond_to_id]), :show?
@@ -26,6 +24,7 @@ class DmailsController < ApplicationController
   def show
     if params[:key].present?
       @dmail = Dmail.find_signed!(params[:key], purpose: "dmail_link")
+      skip_authorization
     else
       @dmail = authorize Dmail.find(params[:id])
     end
@@ -45,9 +44,8 @@ class DmailsController < ApplicationController
   def update
     @dmail = authorize Dmail.find(params[:id])
     @dmail.update(permitted_attributes(@dmail))
-    flash[:notice] = "Dmail updated"
 
-    respond_with(@dmail)
+    respond_with(@dmail, notice: "Dmail updated")
   end
 
   def mark_all_as_read

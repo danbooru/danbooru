@@ -1,11 +1,6 @@
-const { webpackConfig: baseWebpackConfig, merge } = require("shakapacker");
-const ESLintPlugin = require("eslint-webpack-plugin");
-const StylelintPlugin = require("stylelint-webpack-plugin");
-const path = require("path");
+const { generateWebpackConfig } = require("shakapacker");
 
-const isDevelopment = process.env.NODE_ENV === "development";
-
-module.exports = merge({}, baseWebpackConfig, {
+module.exports = generateWebpackConfig({
 //  output: {
 //    library: "Danbooru",
 //  },
@@ -14,17 +9,6 @@ module.exports = merge({}, baseWebpackConfig, {
       "jquery": "jquery/src/jquery.js",
     }
   },
-  plugins: [
-    isDevelopment && new ESLintPlugin({
-      cache: true,
-      threads: true,
-      emitWarning: true
-    }),
-    isDevelopment && new StylelintPlugin({
-      context: "app/javascript/src/styles",
-      threads: true,
-    }),
-  ].filter(Boolean),
   module: {
     rules: [{
       test: /\.wasm$/,
@@ -36,12 +20,8 @@ module.exports = merge({}, baseWebpackConfig, {
   },
 });
 
-// XXX Transpile @alpinejs/morph with Babel to fix an issue with it not working in iOS <14.
-// XXX Transpile alpinejs to fix an issue with it not working in Firefox <72 (use of nullish coalescing operator).
-let babelRule = module.exports.module.rules.find(rule => rule.exclude?.source === "node_modules");
-babelRule.exclude = /node_modules\/(?!(@alpinejs\/morph|alpinejs)\/).*/;
-babelRule.include.push(path.resolve(__dirname, "../../node_modules/@alpinejs/morph"));
-babelRule.include.push(path.resolve(__dirname, "../../node_modules/alpinejs"));
-
-//RegExp.prototype.toJSON = RegExp.prototype.toString;
-//console.log(JSON.stringify(module.exports, undefined, 2));
+// XXX Hack to force sass-loader to use the modern API to avoid deprecation warnings.
+// https://sass-lang.com/documentation/breaking-changes/legacy-js-api/
+let sassRule = module.exports.module.rules.find(rule => /sass/.test(rule.test));
+let sassLoader = sassRule.use.find(loader => /sass-loader/.test(loader.loader));
+sassLoader.options.api = "modern";

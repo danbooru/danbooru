@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 # @see https://picdig.net/
-# @see Source::Extractor::Picdig
 class Source::URL::Picdig < Source::URL
   RESERVED_NAMES = %w[api articles images my privacy-policy projects terms]
 

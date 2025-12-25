@@ -6,8 +6,6 @@
 # more about custom components.
 # Dir[Rails.root.join('lib/components/**/*.rb')].each { |f| require f }
 
-require "dtext_input"
-
 #
 # Use this setup block to configure all options available in SimpleForm.
 SimpleForm.setup do |config|
@@ -16,7 +14,7 @@ SimpleForm.setup do |config|
   # wrapper, change the order or even add your own to the
   # stack. The options given below are used to wrap the
   # whole input.
-  config.wrappers :default, class: :input, hint_class: :field_with_hint, error_class: :field_with_errors do |b|
+  config.wrappers "stacked-input", class: "input stacked-input", hint_class: "field_with_hint", error_class: "field_with_errors" do |b|
     ## Extensions enabled by default
     # Any of these extensions can be disabled for a
     # given input by passing: `f.input EXTENSION_NAME => false`.
@@ -56,7 +54,7 @@ SimpleForm.setup do |config|
     ## Inputs
     # b.use :input, class: 'input', error_class: 'is-invalid', valid_class: 'is-valid'
     b.use :label_input
-    b.use :hint,  wrap_with: { tag: :span, class: :hint }
+    b.use :hint, wrap_with: { tag: :span, class: "hint fineprint" }
     # b.use :error, wrap_with: { tag: :span, class: :error }
 
     ## full_messages_for
@@ -66,8 +64,35 @@ SimpleForm.setup do |config|
     b.use :full_error, wrap_with: { tag: :span, class: :error }
   end
 
+  # Places the label above the toggle switch and hint.
+  config.wrappers "stacked-toggle-switch", class: "input stacked-input stacked-toggle-switch", hint_class: "field_with_hint", error_class: "field_with_errors" do |b|
+    b.use :html5
+    b.use :label
+    b.use :input, class: "toggle-switch"
+    b.use :hint, wrap_with: { tag: "span", class: "hint fineprint" }
+    b.use :full_error, wrap_with: { tag: "span", class: "error" }
+  end
+
+  # Places the toggle switch, label, and hint all on a single line.
+  config.wrappers "inline-toggle-switch", class: "input inline-input inline-toggle-switch", hint_class: "field_with_hint", error_class: "field_with_errors" do |b|
+    b.use :html5
+    b.use :label
+    b.use :input, class: "toggle-switch"
+    b.use :hint, wrap_with: { tag: "span", class: "hint fineprint" }
+    b.use :full_error, wrap_with: { tag: "span", class: "error" }
+  end
+
+  # Places the checkbox, label, and hint all on a single line.
+  config.wrappers "inline-checkbox", class: "input inline-input inline-checkbox", hint_class: "field_with_hint", error_class: "field_with_errors" do |b|
+    b.use :html5
+    b.use :label
+    b.use :input, class: "checkbox"
+    b.use :hint, wrap_with: { tag: "span", class: "hint fineprint" }
+    b.use :full_error, wrap_with: { tag: "span", class: "error" }
+  end
+
   # The default wrapper to be used by the FormBuilder.
-  config.default_wrapper = :default
+  config.default_wrapper = "stacked-input"
 
   # Define the way to render check boxes / radio buttons with labels.
   # Defaults to :nested for bootstrap config.
@@ -144,7 +169,9 @@ SimpleForm.setup do |config|
 
   # Custom wrappers for input types. This should be a hash containing an input
   # type as key and the wrapper that will be used for all inputs with specified type.
-  # config.wrapper_mappings = { string: :prepend }
+  config.wrapper_mappings = {
+    boolean: "inline-toggle-switch",
+  }
 
   # Namespaces where SimpleForm should look for custom input classes that
   # override default inputs.
@@ -160,10 +187,10 @@ SimpleForm.setup do |config|
   # config.translate_labels = true
 
   # Automatically discover new inputs in Rails' autoload path.
-  # config.inputs_discovery = true
+  config.inputs_discovery = true
 
   # Cache SimpleForm inputs discovery
-  # config.cache_discovery = !Rails.env.development?
+  config.cache_discovery = !Rails.env.development?
 
   # Default class for inputs
   # config.input_class = nil

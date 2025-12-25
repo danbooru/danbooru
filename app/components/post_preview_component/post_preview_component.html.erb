@@ -32,11 +32,7 @@
       </picture>
     <% end -%>
   </div>
-  <% if pool -%>
-    <p class="desc">
-      <%= link_to pool.pretty_name.truncate(80), pool %>
-    </p>
-  <% elsif recommended -%>
+  <% if recommended -%>
     <p class="desc recommended">
       <%= link_to recommended_posts_path(search: { post_id: post.id }), class: "more-recommended-posts", "data-post-id": post.id do %>
         <%= post.fav_count %>

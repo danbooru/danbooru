@@ -6,7 +6,7 @@ class ForumPostPolicy < ApplicationPolicy
   end
 
   def show?
-    user.level >= record.topic.min_level
+    policy(record.topic).show?
   end
 
   def create?
@@ -39,6 +39,22 @@ class ForumPostPolicy < ApplicationPolicy
 
   def show_deleted?
     !record.is_deleted? || user.is_moderator?
+  end
+
+  def can_see_updater_notice?
+    user.is_moderator?
+  end
+
+  def rate_limit_for_create(**_options)
+    if record.invalid?
+      { action: "forum_posts:create:invalid", rate: 1.0 / 1.second, burst: 1 }
+    elsif user.is_builder?
+      { rate: 1.0 / 1.minute, burst: 10 }
+    elsif user.forum_posts.exists?(created_at: ..24.hours.ago)
+      { rate: 1.0 / 1.minute, burst: 3 }
+    else
+      { rate: 1.0 / 2.minutes, burst: 2 }
+    end
   end
 
   def permitted_attributes_for_create

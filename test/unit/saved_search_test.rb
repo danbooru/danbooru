@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SavedSearchTest < ActiveSupport::TestCase
   def setup
@@ -21,7 +21,7 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
 
     should "fetch the labels used by a user" do
-      assert_equal(%w(blah zah), SavedSearch.labels_for(@user.id))
+      assert_equal(%w[blah zah], SavedSearch.labels_for(@user.id))
     end
   end
 
@@ -34,11 +34,11 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
 
     should "fetch the queries used by a user for a label" do
-      assert_equal(%w(aaa), SavedSearch.queries_for(@user.id, label: "blah"))
+      assert_equal(%w[aaa], SavedSearch.queries_for(@user.id, label: "blah"))
     end
 
     should "fetch the queries used by a user without a label" do
-      assert_equal(["aaa", "aaa ccc"], SavedSearch.queries_for(@user.id))
+      assert_equal(["aaa", "aaa ccc ccc"], SavedSearch.queries_for(@user.id))
     end
   end
 
@@ -125,6 +125,22 @@ class SavedSearchTest < ActiveSupport::TestCase
     should normalize_attribute(:labels).from(["foo 1", "bar 2"]).to(["foo_1", "bar_2"])
     should normalize_attribute(:labels).from(["foo", nil, "", " ", "bar"]).to(["foo", "bar"])
     should normalize_attribute(:labels).from([nil, "", " "]).to([])
+  end
+
+  context "during validation" do
+    subject { build(:saved_search) }
+
+    should allow_value("x" * 3000).for(:query)
+    should allow_value((["x"] * 150).join(" ")).for(:query)
+
+    should_not allow_value("x" * 3001).for(:query)
+    should_not allow_value((["x"] * 151).join(" ")).for(:query)
+
+    should allow_value(["x" * 100]).for(:labels)
+    should allow_value(["x"] * 20).for(:labels)
+
+    should_not allow_value(["x" * 101]).for(:labels)
+    should_not allow_value(["x"] * 21).for(:labels)
   end
 
   context "Populating a saved search" do

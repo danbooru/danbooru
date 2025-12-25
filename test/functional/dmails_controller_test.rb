@@ -225,7 +225,7 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_select "#dmail-notice", 1
-        assert_select "#nav-my-account-link", text: "My Account (1)"
+        assert_select "#nav-my-account", text: "My Account (1)"
       end
 
       should "not show the unread dmail notice after closing it" do
@@ -234,7 +234,7 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_select "#dmail-notice", 0
-        assert_select "#nav-my-account-link", text: "My Account (1)"
+        assert_select "#nav-my-account", text: "My Account (1)"
       end
     end
   end

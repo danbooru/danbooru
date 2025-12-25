@@ -3,10 +3,6 @@
 # @see Source::URL::ArtStation
 class Source::Extractor
   class ArtStation < Source::Extractor
-    def match?
-      Source::URL::ArtStation === parsed_url
-    end
-
     def image_urls
       if parsed_url.image_url?
         [asset_url(url)]
@@ -16,22 +12,22 @@ class Source::Extractor
     end
 
     def page_url
-      if tag_name.present? && project_id.present?
-        "https://#{tag_name}.artstation.com/projects/#{project_id}"
+      if username.present? && project_id.present?
+        "https://#{username}.artstation.com/projects/#{project_id}"
       elsif project_id.present?
         "https://www.artstation.com/artwork/#{project_id}"
       end
     end
 
     def profile_url
-      "https://www.artstation.com/#{tag_name}" if tag_name.present?
+      "https://www.artstation.com/#{username}" if username.present?
     end
 
-    def artist_name
+    def display_name
       api_response.dig(:user, :full_name)
     end
 
-    def tag_name
+    def username
       api_response.dig(:user, :username) || parsed_url.username || parsed_referer&.username
     end
 
@@ -44,7 +40,7 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      DText.from_html(artist_commentary_desc)&.strip
+      DText.from_html(artist_commentary_desc, base_url: "https://www.artstation.com")&.strip
     end
 
     def tags
@@ -58,7 +54,7 @@ class Source::Extractor
         if asset[:asset_type] == "image"
           asset_url(asset[:image_url])
         elsif asset[:asset_type] == "video_clip"
-          url = Nokogiri::HTML5.parse(asset[:player_embedded]).at("iframe").attr("src")
+          url = asset[:player_embedded].to_s.parse_html.at("iframe")&.attr("src")
           page = http.cache(1.minute).parsed_get(url)
           page&.at("video source")&.attr("src")
         end

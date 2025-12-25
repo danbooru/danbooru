@@ -3,10 +3,9 @@ require 'test_helper'
 class PoolsControllerTest < ActionDispatch::IntegrationTest
   context "The pools controller" do
     setup do
-      travel_to(1.month.ago) do
-        @user = create(:user)
-        @mod = create(:moderator_user)
-      end
+      @user = create(:user, created_at: 1.month.ago)
+      @mod = create(:moderator_user, created_at: 1.month.ago)
+
       as(@user) do
         @post = create(:post)
         @pool = create(:pool, name: "Beautiful Smile", description: "[[touhou]]")
@@ -21,6 +20,7 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
 
       should "render for a sitemap" do
         get pools_path(format: :sitemap)
+
         assert_response :success
         assert_equal(Pool.count, response.parsed_body.css("urlset url loc").size)
       end
@@ -58,9 +58,11 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "create a pool" do
-        assert_difference("Pool.count", 1) do
-          post_auth pools_path, @user, params: {:pool => {:name => "xxx", :description => "abc"}}
-        end
+        post_auth pools_path, @user, params: { pool: { name: "xxx", description: "abc"}}
+
+        assert_redirected_to Pool.last
+        assert_equal(true, Pool.exists?(name: "xxx", description: "abc"))
+        assert_equal("Pool created", flash[:notice])
       end
     end
 
@@ -74,37 +76,40 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
     context "update action" do
       should "update a pool" do
         put_auth pool_path(@pool), @user, params: { pool: { name: "xyz", post_ids: [@post.id] }}
+
+        assert_redirected_to @pool
         assert_equal("xyz", @pool.reload.name)
         assert_equal([@post.id], @pool.post_ids)
+        assert_equal("Pool updated", flash[:notice])
       end
 
       should "not allow updating unpermitted attributes" do
         put_auth pool_path(@pool), @user, params: { pool: { is_deleted: true, post_count: -42 }}
+
+        assert_response 403
         assert_equal(false, @pool.reload.is_deleted?)
         assert_equal(0, @pool.post_count)
       end
     end
 
     context "destroy action" do
-      should "destroy a pool" do
+      should "soft delete a pool" do
         delete_auth pool_path(@pool), @mod
-        @pool.reload
-        assert_equal(true, @pool.is_deleted?)
+
+        assert_redirected_to @pool
+        assert_equal(true, @pool.reload.is_deleted?)
+        assert_equal("Pool deleted", flash[:notice])
       end
     end
 
     context "undelete action" do
-      setup do
-        as(@mod) do
-          @pool.is_deleted = true
-          @pool.save
-        end
-      end
-
       should "restore a pool" do
+        @pool = as(@mod) { create(:pool, is_deleted: true) }
         post_auth undelete_pool_path(@pool), @mod
-        @pool.reload
-        assert_equal(false, @pool.is_deleted?)
+
+        assert_redirected_to @pool
+        assert_equal(false, @pool.reload.is_deleted?)
+        assert_equal("Pool undeleted", flash[:notice])
       end
     end
 
@@ -117,16 +122,19 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
 
       should "revert to a previous version" do
         put_auth revert_pool_path(@pool), @mod, params: { version_id: @pool.versions.first.id }
+
         assert_redirected_to @pool
         assert_equal([@post.id], @pool.reload.post_ids)
+        assert_equal("Pool reverted", flash[:notice])
       end
 
       should "not allow reverting to a previous version of another pool" do
         @pool2 = as(@user) { create(:pool) }
         put_auth revert_pool_path(@pool), @user, params: {:version_id => @pool2.versions.first.id }
-        @pool.reload
-        assert_not_equal(@pool.name, @pool2.name)
-        assert_response :missing
+
+        assert_response 404
+        assert_not_equal(@pool.reload.name, @pool2.name)
+        assert_nil(flash[:notice])
       end
     end
   end

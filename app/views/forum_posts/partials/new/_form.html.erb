@@ -4,8 +4,8 @@
   <% else %>
     <%= f.input :topic_id, :label => "Topic ID" %>
   <% end %>
-  <%= f.input :body, as: :dtext %>
 
-  <%= f.button :submit, "Submit" %>
-  <%= dtext_preview_button "forum_post_body" %>
+  <%= f.input :body, as: :dtext, editor_html: { class: "dtext-editor-large" } %>
+
+  <%= f.button :submit, "Submit", class: "button-primary" %>
 <% end %>

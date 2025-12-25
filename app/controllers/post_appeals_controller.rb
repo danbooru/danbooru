@@ -23,8 +23,8 @@ class PostAppealsController < ApplicationController
   def create
     @post_appeal = authorize PostAppeal.new(creator: CurrentUser.user, **permitted_attributes(PostAppeal))
     @post_appeal.save
-    flash[:notice] = @post_appeal.errors.none? ? "Post appealed" : @post_appeal.errors.full_messages.join("; ")
-    respond_with(@post_appeal)
+
+    respond_with(@post_appeal, notice: "Post appealed")
   end
 
   def show

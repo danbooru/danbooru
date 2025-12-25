@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory(:email_address) do
-    address { FFaker::Internet.email }
+    address { Faker::Internet.unique.email }
     is_verified { true }
     user
   end

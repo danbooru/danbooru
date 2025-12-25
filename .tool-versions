@@ -1,0 +1,9 @@
+# This lists major dependencies required by the current version of Danbooru.
+# The Dockerfile must be updated too when these are updated.
+
+ruby 3.4.5
+mozjpeg 4.1.5
+vips 8.14.2
+ffmpeg 7.1.1
+exiftool 13.30
+node 22.16.0

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PostAppeal < ApplicationRecord
+  dtext_attribute :reason, inline: true # defines :dtext_reason
+
   belongs_to :creator, :class_name => "User"
   belongs_to :post
 
@@ -10,7 +12,7 @@ class PostAppeal < ApplicationRecord
   validates :creator, uniqueness: { scope: :post, message: "have already appealed this post" }, on: :create
   after_create :prune_disapprovals
 
-  enum status: {
+  enum :status, {
     pending: 0,
     succeeded: 1,
     rejected: 2,
@@ -33,7 +35,7 @@ class PostAppeal < ApplicationRecord
   extend SearchMethods
 
   def validate_creator_is_not_limited
-    errors.add(:creator, "have reached your appeal limit") if creator.is_appeal_limited?
+    errors.add(:creator, "have reached your appeal limit") if creator.upload_limit.appeal_limited?
   end
 
   def validate_post_is_appealable

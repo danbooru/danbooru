@@ -13,7 +13,7 @@
         <td><%= link_to_user mod_action.creator %></td>
         <td>
           <div class="prose">
-            <%= format_text(mod_action.description) %>
+            <%= mod_action.dtext_description.format_text %>
           </div>
         </td>
       </tr>

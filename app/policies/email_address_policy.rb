@@ -6,12 +6,25 @@ class EmailAddressPolicy < ApplicationPolicy
   end
 
   def show?
-    record.user_id == user.id || (user.is_moderator? && record.user.level < user.level)
+    if record.user_id == user.id
+      true
+    elsif user.is_moderator?
+      record.user.level < user.level
+    else
+      false
+    end
   end
 
   def update?
-    # XXX here record is a user, not the email address.
-    record.id == user.id && !user.is_banned?
+    if record.user_id == user.id
+      !user.is_banned?
+    else
+      policy(record.user).can_recover_account?
+    end
+  end
+
+  def destroy?
+    record.user_id == user.id
   end
 
   def verify?
@@ -21,5 +34,17 @@ class EmailAddressPolicy < ApplicationPolicy
   def send_confirmation?
     # XXX record is a user, not the email address.
     record.id == user.id
+  end
+
+  def rate_limit_for_update(**_options)
+    if record.invalid?
+      { action: "email_addresses:write:invalid", rate: 1.0 / 1.second, burst: 5 }
+    else
+      { rate: 1.0 / 10.minutes, burst: 3 }
+    end
+  end
+
+  def permitted_attributes_for_update
+    [:address]
   end
 end

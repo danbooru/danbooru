@@ -10,6 +10,6 @@ options = {
 Rack::Timeout::Logger.logger = Rails.logger.dup
 Rack::Timeout::Logger.logger.level = :error
 
-if Rails.env.production?
+if !Rails.env.local?
   Rails.application.config.middleware.insert_before Rack::Runtime, Rack::Timeout, **options
 end

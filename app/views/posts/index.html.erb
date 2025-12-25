@@ -18,18 +18,18 @@
       </section>
     <% end %>
 
-    <%= render "posts/partials/index/blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user) %>
 
     <section id="tag-box">
       <h2>Tags</h2>
-      <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?, search_params: { show_votes: params[:show_votes], size: params[:size] }) %>
+      <%= render SearchTagListComponent.new(tags: @post_set.sidebar_tags, current_query: params[:tags], search_params: { show_votes: params[:show_votes], size: params[:size] }) %>
     </section>
 
     <section id="options-box">
       <h2>Options</h2>
       <ul>
         <% if policy(SavedSearch).create? %>
-          <li><%= button_tag(bookmark_icon + " Save search", id: "save-search", class: "ui-button ui-widget ui-corner-all sub") %></li>
+          <li><%= button_tag(bookmark_icon + " Save search", id: "save-search") %></li>
         <% end %>
       </ul>
     </section>
@@ -59,7 +59,7 @@
 <% end %>
 
 <% content_for(:content) do %>
-  <menu id="post-sections" class="flex">
+  <menu id="post-sections" class="flex items-center mb-2">
     <li class="flex-grow-1 space-x-2">
       <a href="#" id="show-posts-link" class="active">Posts</a>
 
@@ -101,7 +101,7 @@
     <h2>Edit</h2>
 
     <%= edit_form_for(:post, html: { id: "quick-edit-form" }) do |f| %>
-      <%= f.input :tag_string, label: "Tags", as: :text, input_html: { "data-autocomplete": "tag-edit" } %>
+      <%= f.input :tag_string, label: "Tags", as: :text, input_html: { class: "text-sm", "data-autocomplete": "tag-edit" } %>
       <%= f.submit "Submit", data: { disable_with: false } %>
       <%= f.button :button, "Cancel", name: :cancel, type: :button %>
     <% end %>
@@ -123,12 +123,14 @@
             <%= wiki_page_other_names_list(wiki_page) %>
           <% end %>
 
-          <%= format_text(wiki_page.body) %>
+          <%= wiki_page.dtext_body.format_text %>
           <%= render "tag_relationships/alias_and_implication_list", tag: wiki_page.tag %>
 
           <% if wiki_page.tag&.is_deprecated? %>
             <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</p>
           <% end %>
+
+          <%= render_tag_change_notice(tag: wiki_page.tag, current_user: CurrentUser.user) %>
 
           <p class="mt-4">
             <%= link_to_wiki "View wiki", wiki_page.title, id: "view-wiki-link" %>
@@ -146,7 +148,7 @@
         </h2>
 
         <div id="description" class="prose">
-          <%= format_text(@post_set.pool.description) %>
+          <%= @post_set.pool.dtext_description.format_text %>
         </div>
 
         <p class="mt-4">
@@ -167,6 +169,8 @@
       <% if @post_set.tag&.is_deprecated? %>
         <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</p>
       <% end %>
+
+      <%= render_tag_change_notice(tag: @post_set.tag, current_user: CurrentUser.user) %>
     <% end %>
   </div>
 
@@ -189,17 +193,8 @@
           </div>
         <% end %>
 
-        <% if !CurrentUser.user.is_anonymous? && @post_set.tag.present? && @post_set.current_page == 1 %>
-          <% cache("tag-change-notice:#{@post_set.tag.name}", expires_in: 4.hours) do %>
-            <% if @post_set.pending_bulk_update_requests.present? %>
-              <div class="fineprint tag-change-notice">
-                <p>
-                  This tag is being discussed in
-                  <%= to_sentence @post_set.pending_bulk_update_requests.map { |bur| link_to "Topic ##{bur.forum_topic_id}: #{bur.forum_topic.title}", bur.forum_post } %>.
-                </p>
-              </div>
-            <% end %>
-          <% end %>
+        <% if @post_set.current_page == 1 %>
+          <%= render_tag_change_notice(tag: @post_set.tag, current_user: CurrentUser.user) %>
         <% end %>
 
         <%= numbered_paginator(posts) %>
@@ -228,13 +223,15 @@
 
 <% content_for(:html_header) do %>
   <% if @post_set.post_query.is_empty_search? %>
-    <% page_title("#{Danbooru.config.app_name}: Anime Image Board", suffix: nil) %>
-    <% meta_description site_description %>
+    <% if Danbooru.config.site_tagline.present? %>
+      <% page_title "#{Danbooru.config.app_name}: #{Danbooru.config.site_tagline}", suffix: nil %>
+    <% else %>
+      <% page_title Danbooru.config.app_name, suffix: nil %>
+    <% end %>
 
     <% atom_feed_tag "Posts", posts_url(format: :atom) %>
   <% else %>
     <% page_title(@post_set.page_title) %>
-    <% meta_description @post_set.meta_description %>
     <% atom_feed_tag "Posts: #{@post_set.page_title}", posts_url(tags: @post_set.tag_string, format: :atom) %>
 
     <% if @post_set.best_post.present? %>
@@ -242,12 +239,14 @@
     <% end %>
   <% end %>
 
+  <% meta_description @post_set.meta_description %>
+
   <% if params[:tags].blank? && @post_set.current_page == 1 %>
-    <% canonical_url root_url(host: Danbooru.config.hostname) %>
+    <% seo_canonical_url root_path %>
   <% elsif @post_set.current_page == 1 %>
-    <% canonical_url posts_url(host: Danbooru.config.hostname, tags: @post_set.post_query.search, limit: params[:limit]) %>
+    <% seo_canonical_url posts_path(tags: @post_set.post_query.search, limit: params[:limit]) %>
   <% else %>
-    <% canonical_url posts_url(host: Danbooru.config.hostname, tags: @post_set.post_query.search.presence, page: params[:page], limit: params[:limit]) %>
+    <% seo_canonical_url posts_path(tags: @post_set.post_query.search.presence, page: params[:page], limit: params[:limit]) %>
   <% end %>
 
   <% noindex if @post_set.hide_from_crawler? %>

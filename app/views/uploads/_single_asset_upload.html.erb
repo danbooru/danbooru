@@ -16,7 +16,7 @@
               "x-bind:data-dock": "dock",
               "data-dock": JSON.parse(cookies.fetch(:upload_edit_panel_dock, "auto".to_json)),
               style: ("--edit-container-width: #{cookies[:upload_edit_container_width]};" if cookies[:upload_edit_container_width].present?) do %>
-    <div class="upload-image-container">
+    <div class="upload-image-container z-10">
       <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user, outer_classes: "h-full top-0", inner_classes: "mx-auto", dynamic_height: false, scroll_on_zoom: true) do |component| %>
         <% component.with_footer do %>
           <% if policy(media_asset).can_see_image? %>
@@ -29,20 +29,19 @@
                 </span>
               <% end %>
 
-              <%= link_to media_asset do %>
-                <%= number_to_human_size(media_asset.file_size) %> .<%= media_asset.file_ext %>,
-                <%= media_asset.image_width %>x<%= media_asset.image_height %>
-
-                <% if media_asset.duration.present? %>
-                  (<%= duration_to_hhmmss(media_asset.duration) %>)
-                <% end %>
-              <% end %>
+              <%= link_to_media_asset post.media_asset %>
 
               <span>
                 <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
                   <% menu.with_item(hide_on_click: true) do %>
                     <%= link_to "#{media_asset.original.file_url}?download=1", download: media_asset.original.file_name do %>
                       <%= download_icon %> Download
+                    <% end %>
+                  <% end %>
+
+                  <% menu.with_item(hide_on_click: true) do %>
+                    <%= link_to "javascript:void(0)", class: "media-asset-copy-id", "x-on:click": "Danbooru.Utility.copyToClipboard('asset ##{j media_asset.id}')" do %>
+                      <%= hashtag_icon %> Copy ID
                     <% end %>
                   <% end %>
 
@@ -91,8 +90,12 @@
               <div class="inline-block">
                 <% if upload_media_asset.file_upload? %>
                   <%= external_link_to "https://saucenao.com/search.php?url=#{Danbooru::URL.escape(media_asset.original.file_url)}", "No Source", target: "_blank", class: "upload-no-source-warning button-danger button-xs" %>
-                <% elsif upload_media_asset.bad_source? %>
+                <% elsif upload_media_asset.bad_link? %>
                   <%= link_to "Bad Source", wiki_page_path("bad_link"), class: "upload-source-warning button-danger button-xs" %>
+                <% end %>
+
+                <% if upload_media_asset.image_sample? %>
+                  <%= link_to "Image Sample", wiki_page_path("image_sample"), class: "upload-sample-warning button-danger button-xs" %>
                 <% end %>
 
                 <% if media_asset.is_ai_generated? %>
@@ -125,7 +128,7 @@
           <% t.panel("Tags", active: true) do %>
             <%= f.input :rating,
                         label: "Rating #{help_tooltip embed_wiki("help:rating_notice", classes: "text-xs"), link_class: "inactive-link" }".html_safe,
-                        wrapper_html: { class: "radio-button-group text-xs", "x-on:input": "$el.classList.remove('field_with_errors')" },
+                        wrapper_html: { class: "radio-button-group thin-x-scrollbar text-xs", "x-on:input": "$el.classList.remove('field_with_errors')" },
                         collection: Post::RATINGS.invert.reverse_each.to_h,
                         as: :radio_buttons,
                         selected: post.rating,
@@ -140,13 +143,13 @@
                 </span>
               </div>
 
-              <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
+              <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { class: "text-sm", "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
 
-              <div class="mb-4">
-                <%= f.submit "Post", class: "button-primary button-sm" %>
+              <div class="mb-4 flex items-center gap-2">
+                <%= f.submit "Post", class: "button-primary" %>
 
                 <% if CurrentUser.is_contributor? %>
-                  <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block !m-0" }, input_html: { checked: post.is_pending? } %>
+                  <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "!m-0" }, input_html: { checked: post.is_pending? } %>
                 <% else %>
                   <span id="upload-limit" class="fineprint">Upload limit: <%= render "users/upload_limit", user: CurrentUser.user %></span>
                 <% end %>
@@ -167,10 +170,12 @@
 
             <%= f.input :source, as: :string, input_html: { value: post.source } %>
 
-            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: post&.artist_commentary&.original_title } %>
-            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: post&.artist_commentary&.original_description } %>
-            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: post&.artist_commentary&.translated_title } %>
-            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: post&.artist_commentary&.translated_description } %>
+            <%= f.simple_fields_for :artist_commentary, post.artist_commentary do |fa| %>
+              <%= fa.input :original_title, as: :string %>
+              <%= fa.input :original_description, as: :dtext, label: "Original description" %>
+              <%= fa.input :translated_title, as: :string %>
+              <%= fa.input :translated_description, as: :dtext, label: "Translated description" %>
+            <% end %>
           <% end %>
 
           <% t.panel("Similar") do %>
@@ -209,7 +214,7 @@
           <% help_icon = exclamation_icon(class: "text-warning") if help_updated %>
           <% t.panel("#{help_icon} Help".strip.html_safe, id: "help-tab") do %>
             <%= embed_wiki("help:upload_notice") %>
-            <%= render "application/update_notice", record: WikiPage.find_by_title("help:upload_notice") %>
+            <%= render "application/update_notice", record: WikiPage.find_by_title("help:upload_notice"), current_user: CurrentUser.user %>
           <% end %>
 
           <% t.menu_item(id: "docking-menu-tab") do %>

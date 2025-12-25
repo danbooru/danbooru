@@ -1,0 +1,312 @@
+<div>
+  <h1><%= link_to_user user %></h1>
+
+  <div>
+    <h2>Statistics</h2>
+    <table width="100%" class="user-statistics table-sm">
+      <tbody>
+        <tr>
+          <th>User ID</th>
+          <td><%= user.id %></td>
+        </tr>
+        <tr>
+          <th>Join Date</th>
+          <td><%= user.created_at.strftime("%Y-%m-%d") %></td>
+        </tr>
+
+        <% if policy(User).can_see_last_logged_in_at? %>
+          <tr>
+            <th>Last Seen</th>
+            <td><%= time_ago_in_words_tagged(user.last_logged_in_at) %></td>
+          </tr>
+        <% end %>
+
+        <% if policy(:ip_address).show? %>
+          <tr>
+            <th>Last IP</th>
+            <td>
+              <% if user.last_ip_addr.present? %>
+                <%= link_to user.last_ip_addr, ip_address_path(user.last_ip_addr) %>
+              <% else %>
+                <em>unknown</em>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if policy(UserEvent).can_see_events_by_others? %>
+          <tr>
+            <th>User Activity</th>
+            <td>
+              <%= link_to "Account", user_user_events_path(user.id, mode: "table") %>,
+
+              <% if user.last_ip_addr.present? %>
+                <%= link_to "IP", user_events_path(search: { ip_addr: user.last_ip_addr.subnet }) %>,
+              <% end %>
+
+              <%= link_to "All", user_user_actions_path(user) %>
+            <td>
+          </tr>
+        <% end %>
+
+        <% if policy(user.email_address).show? %>
+          <tr class="user-email-address">
+            <th>Email Address</th>
+            <td>
+              <% if user.email_address.present? %>
+                <%= user.email_address.address %>
+
+                <% if user == current_user %>
+                  (<%= link_to "edit", edit_user_email_path(user) %>)
+                <% end %>
+
+                <% if user.email_address.is_verified? %>
+                  <%= checkmark_icon(class: "user-verified-email-icon", title: "Verified email") %>
+                <% elsif user == current_user %>
+                  <%= link_to verify_user_email_path(user) do %>
+                    <%= exclamation_icon(class: "user-unverified-email-icon", title: "Unverified email. Click here to verify your email.") %>
+                  <% end %>
+                <% else %>
+                  <%= exclamation_icon(class: "user-unverified-email-icon", title: "Unverified email") %>
+                <% end %>
+              <% else %>
+                <em>none</em>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if user.inviter %>
+          <tr>
+            <th>Promoter</th>
+            <td><%= link_to_user user.inviter %> <%= link_to "»", users_path(search: { inviter: { name: user.inviter.name }}) %></td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <th>Level</th>
+          <td>
+            <%= user.level_string %>
+
+            <% if !user.is_gold? %>
+              <% if user == current_user %>
+                (<%= link_to "Upgrade account", new_user_upgrade_path %>)
+              <% else %>
+                (<%= link_to "Gift upgrade", new_user_upgrade_path(user_id: user.id) %>)
+              <% end %>
+            <% end %>
+          </td>
+        </tr>
+
+        <% if user.is_banned? && user.active_ban.present? %>
+          <tr>
+            <th>Ban reason</th>
+            <td>
+              <span class="prose">
+                <%= user.active_ban.dtext_reason.format_text %>
+                (banned <%= user.active_ban.humanized_duration %>)
+              </span>
+            </td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <th>Post Limit</th>
+          <td>
+            <%= render "users/upload_limit", user: user %>
+          </td>
+        </tr>
+
+        <tr>
+          <th>Posts</th>
+          <td>
+            <%= link_to user.post_upload_count, posts_path(tags: "user:#{user.name}"), rel: "nofollow" %>
+
+            <% if has_uploads? %>
+              (<%= link_to "tag changes report", post_versions_path(search: { updater_name: user.name, version: 1 }, type: "current") %>)
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <th>Deleted Posts</th>
+          <td>
+            <%= link_to user.posts.deleted.count, posts_path(tags: "status:deleted user:#{user.name}"), rel: "nofollow" %>
+          </td>
+        </tr>
+
+        <tr>
+          <th>Favorites</th>
+          <td>
+            <%= link_to user.favorite_count, posts_path(tags: "ordfav:#{user.name}"), rel: "nofollow" %>
+          </td>
+        </tr>
+
+        <% if user == current_user || current_user.is_admin? %>
+          <tr>
+            <th>Votes</th>
+            <td>
+              <%= link_to user.post_votes.active.count, post_votes_path(search: { user_name: user.name }) %> posts,
+              <%= link_to user.comment_votes.active.count, comment_votes_path(search: { user_name: user.name }) %> comments,
+              <%= link_to user.forum_post_votes.count, forum_post_votes_path(search: { creator_name: user.name }) %> forum posts
+            </td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <th>Favorite Groups</th>
+          <td><%= link_to user.favorite_group_count, favorite_groups_path(search: { creator_name: user.name }) %></td>
+        </tr>
+
+        <tr>
+          <th>Post Changes</th>
+          <td>
+            <%= link_to user.post_update_count, post_versions_path(search: { updater_name: user.name }) %>
+
+            <% if user == current_user %>
+              (<%= link_to "refresh", new_maintenance_user_count_fixes_path %>)
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <th>Note Changes</th>
+          <td>
+            <%= link_to user.note_update_count, note_versions_path(search: { updater_id: user.id }) %>
+            in <%= link_to noted_posts_count, posts_path(tags: "noteupdater:#{user.name} order:note"), rel: "nofollow" %> posts
+
+            (<%= link_to "note changes report", note_versions_path(search: { updater_id: user.id, version: 1 }, type: "current") %>)
+          </td>
+        </tr>
+
+        <tr>
+          <th>Wiki Page Changes</th>
+          <td><%= link_to user.wiki_page_version_count, wiki_page_versions_path(search: { updater_id: user.id }) %></td>
+        </tr>
+
+        <tr>
+          <th>Artist Changes</th>
+          <td><%= link_to user.artist_version_count, artist_versions_path(search: { updater_id: user.id }) %></td>
+        </tr>
+
+        <tr>
+          <th>Commentary Changes</th>
+          <td><%= link_to user.artist_commentary_version_count, artist_commentary_versions_path(search: { updater_id: user.id }) %></td>
+        </tr>
+
+        <% if PoolVersion.enabled? %>
+          <tr>
+            <th>Pool Changes</th>
+            <td><%= link_to user.pool_version_count, pool_versions_path(search: { updater_id: user.id }) %></td>
+          </tr>
+        <% end %>
+
+        <% if Danbooru.config.forum_enabled?.to_s.truthy? %>
+          <tr>
+            <th>Forum Posts</th>
+            <td><%= link_to user.forum_post_count, forum_posts_path(search: { creator_id: user.id }), rel: "nofollow" %></td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <th>Approvals</th>
+          <td><%= link_to Post.where(approver: user).count, posts_path(tags: "approver:#{user.name}"), rel: "nofollow" %></td>
+        </tr>
+
+        <% if Danbooru.config.comments_enabled?.to_s.truthy? %>
+          <tr>
+            <th>Comments</th>
+            <td>
+              <%= link_to user.comment_count, comments_path(search: { creator_id: user.id }, group_by: "comment") %>
+              in <%= link_to commented_posts_count, posts_path(tags: "commenter:#{user.name} order:comment_bumped"), rel: "nofollow" %> posts
+            </td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <th>Appeals</th>
+          <td><%= link_to user.appeal_count, post_appeals_path(search: { creator_name: user.name }) %></td>
+        </tr>
+
+        <% if user == current_user || current_user.is_moderator? %>
+          <tr>
+            <th>Flags</th>
+            <td><%= link_to user.flag_count, post_flags_path(search: { creator_name: user.name }) %></td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <th>Feedback</th>
+          <td><%= link_to "positive:#{positive_feedback_count} neutral:#{neutral_feedback_count} negative:#{negative_feedback_count}", user_feedbacks_path(search: { user_id: user.id }) %></td>
+        </tr>
+
+        <% if policy(ModerationReport).can_see_moderation_reports? %>
+          <tr>
+            <th>Mod Reports</th>
+            <td>
+              <%= link_to "received:#{ModerationReport.received_by(user).count}", moderation_reports_path(search: { recipient_name: user.name }) %>
+              <%= link_to "submitted:#{ModerationReport.where(creator: user).count}", moderation_reports_path(search: { creator_name: user.name }) %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if policy(UserNameChangeRequest.new(user: user)).show? %>
+          <% user.user_name_change_requests.visible(current_user).tap do |changes| %>
+            <% if changes.present? %>
+              <tr>
+                <th>Previous Names</th>
+                <td>
+                  <%= changes.map do |change| %>
+                    <% link_to change.original_name, change %>
+                  <% end.join(", ").html_safe %>
+                </td>
+              </tr>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <% if user == current_user %>
+          <% if saved_search_labels.present? %>
+            <tr>
+              <th>Saved Searches</th>
+              <td>
+                <% saved_search_labels.each do |label| %>
+                  <%= link_to label, posts_path(tags: "search:#{label}") %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+
+          <tr>
+            <th>API Key</th>
+            <td>
+              <%= link_to "View", user_api_keys_path(current_user) %>
+              (<%= link_to_wiki "help", "help:api" %>)
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%= render BlacklistComponent.new(user: current_user, inline: true) %>
+
+  <% if has_uploads? %>
+    <div class="user-uploads recent-posts">
+      <h2 class="recent-posts-header">
+        <%= link_to "Posts", posts_path(tags: "user:#{user.name}") %>
+      </h2>
+      <%= render_post_gallery(uploads, tags: "user:#{user.name}", show_deleted: true, show_votes: true) %>
+    </div>
+  <% end %>
+
+  <% if has_favorites? && policy(user).can_see_favorites? %>
+    <div class="user-favorites recent-posts">
+      <h2 class="recent-posts-header">
+        <%= link_to "Favorites", posts_path(tags: "ordfav:#{user.name}") %>
+      </h2>
+
+      <%= render_post_gallery(favorites, tags: "ordfav:#{user.name}", show_deleted: true, show_votes: true) %>
+    </div>
+  <% end %>
+</div>

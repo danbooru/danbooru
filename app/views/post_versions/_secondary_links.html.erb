@@ -3,6 +3,7 @@
   <%= subnav_link_to "Listing", post_versions_path %>
   <%= subnav_link_to "Search", search_post_versions_path %>
   <% if params[:action] == "index" %>
-    | <%= subnav_link_to "Undo selected", "" %>
+    <%= subnav_divider %>
+    <%= subnav_link_to "Undo selected", "" %>
   <% end %>
 <% end %>

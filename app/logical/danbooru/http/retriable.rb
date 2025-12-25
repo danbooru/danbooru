@@ -11,13 +11,15 @@
 module Danbooru
   class Http
     class Retriable < HTTP::Feature
-      HTTP::Options.register_feature :retriable, self
-
       attr_reader :max_retries, :max_delay
 
       def initialize(max_retries: 2, max_delay: 5.seconds)
         @max_retries = max_retries
         @max_delay = max_delay
+      end
+
+      def self.register
+        HTTP::Options.register_feature :retriable, self
       end
 
       def perform(request, &block)
@@ -36,13 +38,16 @@ module Danbooru
       end
 
       def retriable?(response)
-        response.status == 429 || response.headers["Retry-After"].present?
+        # >=597 errors are fake errors returned by us in app/logical/danbooru/http.rb when the HTTP connection fails.
+        response.status == 429 || response.status >= 597
       end
 
       def retry_delay(response, current_time: Time.zone.now)
         retry_after = response.headers["Retry-After"]
 
-        if retry_after.blank?
+        if retry_after.blank? && response.status == 429
+          max_delay
+        elsif retry_after.blank?
           0.seconds
         elsif retry_after =~ /\A\d+\z/
           retry_after.to_i.seconds

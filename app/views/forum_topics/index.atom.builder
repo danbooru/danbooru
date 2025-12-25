@@ -1,11 +1,11 @@
-atom_feed(root_url: forum_topics_url(host: Danbooru.config.hostname)) do |feed|
+atom_feed(root_url: forum_topics_url) do |feed|
   feed.title("Forum Topics")
   feed.updated(@forum_topics.first.try(:updated_at))
 
   @forum_topics.each do |topic|
     feed.entry(topic, published: topic.created_at, updated: topic.updated_at) do |entry|
-      entry.title("[#{topic.category_name}] #{topic.title}")
-      entry.content(format_text(topic.original_post.body), type: "html")
+      entry.title("[#{topic.category}] #{topic.title}")
+      entry.content(topic.original_post.dtext_body.format_text, type: "html")
 
       entry.author do |author|
         author.name(topic.creator.name)

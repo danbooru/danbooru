@@ -58,6 +58,20 @@ class WikiPageTest < ActiveSupport::TestCase
         assert_equal("external_link", @wiki_page.dtext_links.first.link_type)
         assert_equal("http://www.google.com", @wiki_page.dtext_links.first.link_target)
 
+        @wiki_page.update!(body: "!post #1\n!asset #2")
+        assert_equal(2, @wiki_page.dtext_links.size)
+        assert_equal("embedded_post", @wiki_page.dtext_links.embedded_post.first.link_type)
+        assert_equal("1", @wiki_page.dtext_links.embedded_post.first.link_target)
+        assert_equal("embedded_media_asset", @wiki_page.dtext_links.embedded_media_asset.first.link_type)
+        assert_equal("2", @wiki_page.dtext_links.embedded_media_asset.first.link_target)
+
+        @wiki_page.update!(body: "* !post #3\n* !asset #4")
+        assert_equal(2, @wiki_page.dtext_links.size)
+        assert_equal("embedded_post", @wiki_page.dtext_links.embedded_post.first.link_type)
+        assert_equal("3", @wiki_page.dtext_links.embedded_post.first.link_target)
+        assert_equal("embedded_media_asset", @wiki_page.dtext_links.embedded_media_asset.first.link_type)
+        assert_equal("4", @wiki_page.dtext_links.embedded_media_asset.first.link_target)
+
         @wiki_page.update!(body: "nothing")
         assert_equal(0, @wiki_page.dtext_links.size)
       end
@@ -76,7 +90,7 @@ class WikiPageTest < ActiveSupport::TestCase
       end
     end
 
-    context "the #normalize_other_names method" do
+    context "during other names validation" do
       subject { build(:wiki_page) }
 
       should normalize_attribute(:other_names).from(["   foo"]).to(["foo"])
@@ -99,6 +113,12 @@ class WikiPageTest < ActiveSupport::TestCase
       should normalize_attribute(:other_names).from("foo foo").to(["foo"])
       should normalize_attribute(:other_names).from("foo bar").to(["foo", "bar"])
       should normalize_attribute(:other_names).from("_foo_ Bar").to(["foo", "Bar"])
+
+      should allow_value(80.times.to_a.map(&:to_s)).for(:other_names)
+      should allow_value(["x" * 100]).for(:other_names)
+
+      should_not allow_value(81.times.to_a.map(&:to_s)).for(:other_names)
+      should_not allow_value(["x" * 101]).for(:other_names)
     end
 
     context "during title validation" do
@@ -129,6 +149,10 @@ class WikiPageTest < ActiveSupport::TestCase
     end
 
     context "during body validation" do
+      should normalize_attribute(:body).from(" foo ").to("foo")
+      should normalize_attribute(:body).from("foo\tbar").to("foo bar")
+      should normalize_attribute(:body).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
+
       should_not allow_value("").for(:body)
       should_not allow_value(" ").for(:body)
       should_not allow_value("\u200B").for(:body)

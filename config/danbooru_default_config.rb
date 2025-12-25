@@ -22,7 +22,9 @@
 #
 # You can also set these environment variables in an envfile instead of the
 # command line. See the .env file in the root project directory for details.
-#
+
+require_relative "../app/logical/current_user"
+
 module Danbooru
   class Configuration
     # A secret key used to encrypt session cookies, among other things.
@@ -37,7 +39,7 @@ module Danbooru
     # generated every time the server starts, which will log out all users on
     # every restart.
     #
-    # Use `rake secret` to generate a random secret key.
+    # Use `rails secret` to generate a random secret key.
     def secret_key_base
       SecureRandom.uuid
     end
@@ -55,17 +57,6 @@ module Danbooru
       "Danbooru"
     end
 
-    # The public domain name of your site, e.g. "danbooru.donmai.us". If your
-    # site were called `www.mybooru.com`, then you would set this to "www.mybooru.com"
-    #
-    # By default, this is set to the machine hostname. You can use `hostnamectl`
-    # to change the machine hostname.
-    #
-    # You can set this to "localhost" if your site doesn't have a public domain name.
-    def hostname
-      Socket.gethostname
-    end
-
     # A list of alternate domains for your site, if your site is accessible under multiple domains. For example,
     # Danbooru is accessible under danbooru.donmai.us, betabooru.donmai.us, safebooru.donmai.us, etc.
     #
@@ -81,44 +72,57 @@ module Danbooru
       ["safebooru.donmai.us"]
     end
 
-    # The URL of your site, e.g. https://danbooru.donmai.us.
+    # The URL for your site, if you have a custom domain name for your site.
     #
-    # If you support HTTPS, change this to "https://www.mybooru.com". If you set
-    # this to https://, then you *must* use https:// to access your site. You can't
-    # use http:// because in HTTPS mode session cookies won't be sent over HTTP.
+    # For example, if your domain name is `booru.example.com`, then you would set this to "http://booru.example.com".
     #
-    # Images will be served from this URL by default. See the `base_url` option
-    # for the `storage_manager` below if you want to serve images from a
-    # different domain.
+    # If your site supports HTTPS, then set this to `https://`. If you set this to https://, then you must use https://
+    # to access your site, because in HTTPS mode session cookies aren't sent for http:// URLs.
     #
-    # Protip: use ngrok.com for easy HTTPS support during development.
+    # If your site is accessible under multiple domain names, then this should be the primary URL for your site. For
+    # example, Danbooru is available at both https://danbooru.donmai.us and https://betabooru.donmai.us. The canonical
+    # URL for Danbooru is https://danbooru.donmai.us because that's the main version of the site.
+    #
+    # This is used in various places when we need to know the URL of the site, such as when generating emails or when
+    # generating links to images.
+    #
+    # The default is to determine the URL based on the current HTTP request. This means we use the same URL you see in
+    # the browser address bar. We fall back to `http:/localhost:3000` in various situations when we're outside of a HTTP
+    # request and we can't determine the URL (for example, when generating emails inside background jobs).
+    #
+    # If you're not running a public site, then you don't need to change this.
     def canonical_url
-      "http://#{Danbooru.config.hostname}"
+      CurrentUser.request&.base_url.presence || "http://localhost:#{ENV["DANBOORU_PORT"] || 3000}"
+    end
+
+    # The domain name to use for email addresses.
+    def email_domain
+      Danbooru::URL.parse!(Danbooru.config.canonical_url).host
     end
 
     # The email address of the admin user. This email will be publicly displayed on the contact page.
     def contact_email
-      "webmaster@#{Danbooru.config.hostname}"
+      "webmaster@#{email_domain}"
     end
 
     # The email address where DMCA complaints should be sent.
     def dmca_email
-      "dmca@#{Danbooru.config.hostname}"
+      "dmca@#{email_domain}"
     end
 
     # The email address to use for Dmail notifications.
     def notification_email
-      "notifications@#{Danbooru.config.hostname}"
+      "notifications@#{email_domain}"
     end
 
     # The email address to use for password reset and email verification emails.
     def account_security_email
-      "security@#{Danbooru.config.hostname}"
+      "security@#{email_domain}"
     end
 
     # The email address to use for new user signup emails.
     def welcome_user_email
-      "welcome@#{Danbooru.config.hostname}"
+      "welcome@#{email_domain}"
     end
 
     # System actions, such as sending automated dmails, will be performed with
@@ -130,9 +134,26 @@ module Danbooru
     end
 
     # The name of the cookie that stores the current user's login session.
+    #
     # Changing this will force all users to login again.
+    #
+    # Normally the only reason to change this is if you're running multiple Danbooru instances on different subdomains,
+    # for example booru.example.com and test.example.com, and you don't want them to share login cookies because they
+    # don't share users.
     def session_cookie_name
       "_danbooru2_session"
+    end
+
+    # The domain of the cookie that stores the current user's login session.
+    #
+    # If you're running Danbooru on multiple subdomains, and you want to share cookies across subdomains so that users
+    # stay logged in when they visit a different subdomain, then you can set this to the base domain.
+    #
+    # For example, if you have booru.example.com, beta.example.com, and test.example.com, then you can set this to
+    # example.com so that cookies are shared between subdomains and users stay logged in if they switch subdomains.
+    #
+    # The default is to not share cookies across subdomains. Normally this should not be changed.
+    def session_cookie_domain
     end
 
     # Debug mode does some things to make testing easier. It outputs more verbose logs, it disables parallel testing,
@@ -154,7 +175,7 @@ module Danbooru
         ENV["RAILS_LOG_LEVEL"]
       elsif debug_mode
         :debug
-      elsif Rails.env.production?
+      elsif !Rails.env.local?
         :error
       elsif Rails.env.development?
         :info
@@ -178,7 +199,7 @@ module Danbooru
     #
     # Set this to 0 to disable multithreading. This may save memory at the cost of reduced performance.
     def max_concurrency
-      Etc.nprocessors
+      Concurrent.available_processor_count.to_i.clamp(1..)
     end
 
     # If true, allow web crawlers such as Google to crawl your site.
@@ -206,6 +227,11 @@ module Danbooru
 
     # An array of regexes containing disallowed usernames.
     def user_name_blacklist
+      []
+    end
+
+    # An array of regexes containing disallowed words in comments and forum posts.
+    def comment_blacklist
       []
     end
 
@@ -266,20 +292,34 @@ module Danbooru
       5
     end
 
+    # Set mail_delivery_url to configure how emails are sent. The format is "smtp://username:password@example.com:587".
+    #
+    # If this is not set, then sending emails will be disabled. Emails are used for sending password resets, verifying
+    # accounts that sign up from a proxy, and for sending notifications when a user receives a private message (Dmail).
+    #
+    # If emails aren't being sent, check the /jobs page for errors.
+    #
+    # For local email testing, you can use MailHog: https://github.com/mailhog/MailHog.
+    #
     # https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
     # https://guides.rubyonrails.org/configuring.html#configuring-action-mailer
-    def mail_delivery_method
-      # :smtp
-      :sendmail
-    end
+    # https://github.com/mikel/mail/blob/master/lib/mail/network/delivery_methods/smtp.rb
+    def mail_delivery_url
+      # For Gmail. Replace `username@gmail.com` with your Gmail address.
+      # You'll need to enable 2FA and use an app password: https://myaccount.google.com/apppasswords.
+      # "smtps://username@gmail.com:password@smtp.gmail.com:587"
 
-    def mail_settings
-      {
-        # address: "example.com",
-        # user_name: "user",
-        # password: "pass",
-        # authentication: :login
-      }
+      # For Amazon SES. https://docs.aws.amazon.com/ses/latest/dg/send-email-smtp.html
+      # "smtps://username:password@email.us-east-1.amazonaws.com"
+
+      # You can set `authentication` to login, plain, or cram_md5 if your server requires LOGIN, PLAIN, or CRAM-MD5 authentication.
+      # "smtp://username:password@example.com:587?authentication=login"
+
+      # You can set `enable_starttls` if your server requires STARTTLS.
+      # "smtp://username:password@example.com:587?enable_starttls=true&authentication=login"
+
+      # You can set `openssl_verify_mode` to `none` to disable verification of the server's SSL certificate if you have a self-signed certificate.
+      # "smtps://username:password@example.com?openssl_verify_mode=none"
     end
 
     # The path to where uploaded files are stored. You can change this to change where files are
@@ -334,12 +374,17 @@ module Danbooru
       # "/#{variant.type}/#{variant.md5[0..1]}/#{variant.md5[2..3]}/#{custom_filename}#{file_prefix}#{variant.md5}.#{variant.file_ext}"
     end
 
-    # The method to use for storing uploaded files. By default, uploads are stored under `public/data`.
+    # The location where images should be stored. By default, images are stored under `public/data`.
+    def image_storage_path
+      Rails.root.join("public/data")
+    end
+
+    # The method to use for storing uploaded files.
     def storage_manager
       # Store files on the local filesystem.
       # base_dir - where to store files (default: under public/data)
-      # base_url - where to serve files from (default: https://#{hostname}/data)
-      StorageManager::Local.new(base_url: "#{Danbooru.config.canonical_url}/data", base_dir: Rails.root.join("public/data"))
+      # base_url - where to serve files from (default: #{canonical_url}/data)
+      StorageManager::Local.new(base_url: "#{Danbooru.config.canonical_url}/data", base_dir: Danbooru.config.image_storage_path)
     end
 
     # The method to use for backing up image files.
@@ -349,6 +394,17 @@ module Danbooru
 
       # Backup files to /mnt/backup on the local filesystem.
       # StorageManager::Local.new(base_dir: "/mnt/backup")
+    end
+
+    # A short description of your site that goes in the <meta name="description"> tag. Used by search engines.
+    #
+    # https://developers.google.com/search/docs/crawling-indexing/special-tags#meta-tags
+    # https://developers.google.com/search/docs/appearance/snippet
+    def site_description
+    end
+
+    # A short tagline for your site that goes in the page title on the front page. Used by search engines.
+    def site_tagline
     end
 
     # Any custom code you want to insert into the default layout without
@@ -369,6 +425,12 @@ module Danbooru
     # Tags that are not visible in safe mode.
     def safe_mode_restricted_tags
       []
+    end
+
+    # If a new user uploads a post with any of these AI tags, the post will be blocked.
+    def new_uploader_blocked_ai_tags
+      # "tag1,>50% or tag2,>75% or tag3,>90%"
+      nil
     end
 
     # If present, the 404 page will show a random post from this pool.
@@ -477,6 +539,90 @@ module Danbooru
     #
     # Login to Twitter, open the devtools, open a tweet, then use the devtools to find the /TweetDetail request and look for the ct0 cookie or the x-csrf-request header.
     def twitter_csrf_token
+    end
+
+    # Your Xfolio "xfolio_session" cookie. Login to Xfolio then use the
+    # devtools to find the "xfolio_session" cookie.
+    def xfolio_session
+    end
+
+    # Your Ci-En "ci_en_session" cookie. Login to Ci-En then use the
+    # devtools to find the "ci_en_session" cookie.
+    def ci_en_session_cookie
+    end
+
+    # Your Poipiku "POIPIKU_LK" cookie. Login to Poipiku then use the
+    # devtools to find the "POIPIKU_LK" cookie.
+    def poipiku_session_cookie
+    end
+
+    # Your Zerochan user ID. Login to Zerochan then use the devtools to find the "z_id" cookie.
+    def zerochan_user_id
+    end
+
+    # Your Zerochan "z_hash" cookie. Login to Zerochan then use the devtools to find the "z_hash" cookie.
+    def zerochan_session_cookie
+    end
+
+    # Your Inkbunny username and password. After creating your account, go to https://inkbunny.net/account.php and
+    # enable the "Enable API access" option, then go to https://inkbunny.net/userrate.php and enable all ratings to see
+    # all content.
+    def inkbunny_username
+    end
+
+    def inkbunny_password
+    end
+
+    # Your Postype "PSE3" cookie. Login to Postype then use the devtools to find the "PSE3" cookie.
+    # After creating your account, go to https://www.postype.com/account/settings and enable the "Viewing adult content
+    # by foreigners" setting to see all content.
+    def postype_session_cookie
+    end
+
+    # Your Behance "iat0" cookie. Login to Behance then use the devtools to find the "iat0" cookie.
+    def behance_session_cookie
+    end
+
+    # Your Piapro.jp "piapro_s" cookie. Login to Piapro then use the devtools to find the "piapro_s" cookie.
+    def piapro_session_cookie
+    end
+
+    # Your Plurk "plurktokena" cookie. Login to Plurk then use the devtools to find the "plurktokena" cookie.
+    def plurk_session_cookie
+    end
+
+    # Your Xiaohongshu "gid" cookie. Login to Xiaohongshu then use the devtools to find the "gid" cookie.
+    def xiaohongshu_session_cookie
+    end
+
+    # Your Xiaohongshu "webId" cookie
+    def xiaohongshu_webid_cookie
+    end
+
+    # Your Xiaohongshu "webId" cookie
+    def xiaohongshu_web_session_cookie
+    end
+
+    # Your Huashijie "userId" cookie.
+    def huashijie_user_id
+    end
+
+    # Your Huashijie "token" cookie.
+    def huashijie_session_cookie
+    end
+
+    # Your Gelbooru user ID.
+    def gelbooru_user_id
+    end
+
+    # Your Gelbooru API key. Found at https://gelbooru.com/index.php?page=account&s=options
+    def gelbooru_api_key
+    end
+
+    # Your Google Blogger API key. Go to https://developers.google.com/blogger/docs/3.0/using#APIKey to create an API key.
+    # You can also use gallery-dl's API key, but you might get rate-limited if others are using it.
+    # https://github.com/mikf/gallery-dl/blob/07d962d60aed598f0ee8578df914c38e5fc939aa/gallery_dl/extractor/blogger.py#L162
+    def blogger_api_key
     end
 
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
@@ -679,16 +825,20 @@ module Danbooru
     def aws_sqs_archives_url
     end
 
-    # Use a recaptcha on the signup page to protect against spambots creating new accounts.
-    # https://developers.google.com/recaptcha/intro
-    def enable_recaptcha?
-      Rails.env.production? && Danbooru.config.recaptcha_site_key.present? && Danbooru.config.recaptcha_secret_key.present?
+    # If `captcha_site_key` and `captcha_secret_key` are set, then captchas will be enabled on the signup page to
+    # protect the site against spambots. This uses the free Cloudflare Turnstile service.
+    #
+    # By default in development mode, we use a dummy captcha that always passes.
+    #
+    # https://developers.cloudflare.com/turnstile/get-started/#get-a-sitekey-and-secret-key
+    def captcha_site_key
+      # https://developers.cloudflare.com/turnstile/reference/testing/#dummy-sitekeys-and-secret-keys
+      "3x00000000000000000000FF" if Rails.env.development? # A dummy key that always forces an interactive challenge
     end
 
-    def recaptcha_site_key
-    end
-
-    def recaptcha_secret_key
+    def captcha_secret_key
+      # https://developers.cloudflare.com/turnstile/reference/testing/#dummy-sitekeys-and-secret-keys
+      "1x0000000000000000000000000000000AA" if Rails.env.development? # A dummy key that always passes
     end
 
     # Akismet API key. Used for Dmail spam detection. http://akismet.com/signup/
@@ -696,7 +846,7 @@ module Danbooru
     end
 
     def rakismet_url
-      "https://#{hostname}"
+      Danbooru.config.canonical_url
     end
 
     # API key for https://ipregistry.co. Used for looking up IP address
@@ -741,13 +891,6 @@ module Danbooru
       # "redis://localhost:6379"
     end
 
-    # Optional. The URL of the Elastic APM server. Used for application performance monitoring.
-    #
-    # https://www.elastic.co/observability/application-performance-monitoring
-    def elastic_apm_server_url
-      # "http://localhost:8200"
-    end
-
     # True if the Winter Sale is active.
     def is_promotion?
       false
@@ -759,6 +902,14 @@ module Danbooru
 
     # The forum topic linked to in the Winter Sale notice.
     def winter_sale_forum_topic_id
+    end
+
+    # A list of emojis supported in DText.
+    def dtext_emojis
+      @dtext_emojis ||= {
+        # This defines an emoji called :smile: that is replaced with 😄.
+        "smile" => "😄",
+      }
     end
 
     def reactions

@@ -22,21 +22,19 @@ class AITagsController < ApplicationController
 
     if params[:tag].present?
       @post.add_tag(params[:tag])
-      flash.now[:notice] = DText.format_text("Post ##{@post.id}: Reverted to [[#{params[:tag]}]].", inline: true).html_safe
+      notice = "Post ##{@post.id}: Reverted to [[#{params[:tag]}]]."
     elsif params[:mode] == "remove"
       @post.remove_tag(@ai_tag.tag.name)
-      flash.now[:notice] = DText.format_text("Post ##{@post.id}: Removed [[#{@ai_tag.tag.pretty_name}]].", inline: true).html_safe
+      notice = "Post ##{@post.id}: Removed [[#{@ai_tag.tag.pretty_name}]]."
     else
       @post.add_tag(@ai_tag.tag.name)
-      flash.now[:notice] = DText.format_text("Post ##{@post.id}: Added [[#{@ai_tag.tag.pretty_name}]].", inline: true).html_safe
+      notice = "Post ##{@post.id}: Added [[#{@ai_tag.tag.pretty_name}]]."
     end
 
     @post.save
-    if @post.invalid?
-      flash.now[:notice] = DText.format_text("Couldn't update post ##{@post.id}: #{@post.errors.full_messages.join("; ")}", inline: true).html_safe
-    end
+    @ai_tag.errors.add(:base, "Couldn't update post ##{@post.id}: #{@post.errors.full_messages.join("; ")}") if @post.invalid?
 
     @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
-    respond_with(@ai_tag)
+    respond_with(@ai_tag, notice: notice)
   end
 end

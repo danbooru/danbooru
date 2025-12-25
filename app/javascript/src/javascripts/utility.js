@@ -1,6 +1,8 @@
 import Rails from '@rails/ujs';
 import { delegate, hideAll } from 'tippy.js';
-import words from "lodash/words";
+import Notice from './notice';
+import capitalize from "lodash/capitalize";
+import Alpine from 'alpinejs';
 
 let Utility = {};
 
@@ -8,7 +10,7 @@ export function clamp(value, low, high) {
   return Math.max(low, Math.min(value, high));
 }
 
-Utility.delay = function(milliseconds) {
+export function delay(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
@@ -16,36 +18,22 @@ Utility.meta = function(key) {
   return $("meta[name=" + key + "]").attr("content");
 }
 
-Utility.test_max_width = function(width) {
-  if (!window.matchMedia) {
-    return false;
-  }
-  var mq = window.matchMedia('(max-width: ' + width + 'px)');
-  return mq.matches;
+export function isTouchscreen() {
+  return window.matchMedia("(pointer: coarse)").matches;
 }
 
-Utility.notice_timeout_id = undefined;
-
-Utility.notice = function(msg, permanent) {
-  $('#notice').addClass("notice-info").removeClass("notice-error").fadeIn("fast").children("span").html(msg);
-
-  if (Utility.notice_timeout_id !== undefined) {
-    clearTimeout(Utility.notice_timeout_id)
-  }
-  if (!permanent) {
-    Utility.notice_timeout_id = setTimeout(function() {
-      $("#close-notice-link").click();
-      Utility.notice_timeout_id = undefined;
-    }, 6000);
-  }
+export function isMobile() {
+  return window.matchMedia("(max-width: 660px)").matches;
 }
 
-Utility.error = function(msg) {
-  $('#notice').removeClass("notice-info").addClass("notice-error").fadeIn("fast").children("span").html(msg);
-
-  if (Utility.notice_timeout_id !== undefined) {
-    clearTimeout(Utility.notice_timeout_id)
-  }
+// The following function returns true if beforeinput, and thus getTargetRanges, is supported.
+//
+// https://developer.mozilla.org/en-US/docs/Web/API/Element/beforeinput_event#feature_detection
+export function isBeforeInputEventAvailable() {
+  return (
+    window.InputEvent &&
+    typeof InputEvent.prototype.getTargetRanges === "function"
+  );
 }
 
 Utility.dialog = function(title, html) {
@@ -87,50 +75,25 @@ Utility.keydown = function(keys, namespace, handler, selector = document) {
   $(selector).on("keydown.danbooru." + namespace, null, keys, handler);
 };
 
-Utility.is_subset = function(array, subarray) {
-  var all = true;
-
-  $.each(subarray, function(i, val) {
-    if ($.inArray(val, array) === -1) {
-      all = false;
-    }
-  });
-
-  return all;
+export function splitWords(string) {
+  return string?.match(/\S+/g) || [];
 }
 
-Utility.intersect = function(a, b) {
-  a = a.slice(0).sort();
-  b = b.slice(0).sort();
-  var result = [];
-  while (a.length > 0 && b.length > 0) {
-    if (a[0] < b[0]) {
-      a.shift();
-    } else if (a[0] > b[0]) {
-      b.shift();
-    } else {
-      result.push(a.shift());
-      b.shift();
-    }
-  }
-  return result;
-}
-
-Utility.regexp_escape = function(string) {
-  return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
-}
-
-Utility.splitWords = function(string) {
-  return words(string, /\S+/g);
-}
-
-Utility.copyToClipboard = async function(text, message = "Copied!") {
+export async function copyToClipboard(text, message = "Copied!") {
   try {
     await navigator.clipboard.writeText(text);
-    Utility.notice(message);
+    Notice.info(message);
   } catch (error) {
-    Utility.error("Couldn't copy to clipboard");
+    Notice.error("Couldn't copy to clipboard");
   }
+}
+
+export function printPage(url) {
+  let iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  iframe.onload = () => iframe.contentWindow.print();
+  document.body.appendChild(iframe);
 }
 
 export function createTooltip(name, options = {}) {
@@ -152,11 +115,134 @@ export function createTooltip(name, options = {}) {
   });
 }
 
+// Upload a list of files or a URL to the site.
+export async function uploadFilesOrURL(filesOrURL) {
+  if (typeof filesOrURL === "string") {
+    return uploadURL(filesOrURL);
+  } else {
+    return uploadFiles(filesOrURL);
+  }
+}
+
+// Upload a list of files to the site.
+// @param {File[]} files - The list of files to upload.
+export async function uploadFiles(files) {
+  let params = Object.fromEntries(Array.from(files).map((file, n) => [`upload[files][${n}]`, file]));
+
+  return createUpload(params);
+}
+
+// Upload a URL to the site.
+// @param {String} url - The URL to upload.
+export async function uploadURL(url) {
+  if (url.match(/^https?:\/\//)) {
+    return createUpload({ "upload[source]": url });
+  } else {
+    throw new Error(`Invalid URL`);
+  }
+}
+
+// Upload a list of files or a URL to the site. Throws an error if the upload fails.
+//
+// @param {Object} params - The parameters to pass to the upload endpoint.
+// @param {Number} [pollDelay=250] - The delay in milliseconds between checking the upload status.
+// @returns {Object} - The upload object containing the upload status and the list of uploaded media assets.
+export async function createUpload(params, pollDelay = 250) {
+  let formData = new FormData();
+
+  for (let [key, value] of Object.entries(params)) {
+    formData.append(key, value);
+  }
+
+  let response = await fetch("/uploads.json", {
+    method: "POST",
+    headers: { "X-CSRF-Token": document.querySelector("meta[name='csrf-token']").content },
+    body: formData
+  });
+
+  let upload = await response.json();
+  while (upload.status !== "completed" && !uploadError(upload)) {
+    await delay(pollDelay);
+    upload = await $.get(`/uploads/${upload.id}.json`);
+  }
+
+  let error = uploadError(upload);
+  if (error) {
+    throw new Error(error);
+  }
+
+  return upload;
+}
+
+// Return the error message for a failed upload.
+export function uploadError(upload) {
+  // The upload failed during processing (normally because the URL didn't contain any images)
+  if (upload.status === "error") {
+    return upload.error;
+  // The upload failed with a 4xx or 5xx error (normally rate limiting)
+  } else if (upload.success === false && upload.message) {
+    return upload.message;
+  // The upload failed with a validation error (normally an invalid URL or too many queued assets)
+  } else if (upload.errors) {
+    return errorFromResponse(upload);
+  }
+}
+
+// Get the validation errors returned by an API call as a single string.
+// Equivalent to `@model.errors.full_messages.join('; ')`.
+export function errorFromResponse(apiResponse, separator = "; ") {
+  let errors = apiResponse.errors ?? {};
+
+  return Object.keys(errors).map(attribute => {
+    return errors[attribute].map(error => {
+      if (attribute === "base") {
+        return `${error}`;
+      } else {
+        return `${capitalize(attribute)} ${error}`;
+      }
+    });
+  }).join(separator);
+}
+
+// Call a function after all Alpine.js components on the page have been initialized.
+// Like jQuery's `$(document).ready()`, but for Alpine.js.
+export function alpineReady(callback) {
+  if (Alpine._initialized) {
+    callback();
+  } else {
+    $(document).on("alpine:initialized", callback);
+  }
+}
+
+$.fn.replaceFieldText = function(new_value) {
+  return this.each(function() {
+    if (this.undoStack) {
+      // If the element is using the custom undo stack implementation, simply assign directly to the input's value.
+      this.undoStack.save("danbooru.replaceFieldText");
+      this.value = new_value;
+    } else {
+      // Otherwise, try using execCommand to preserve the browser's native undo stack.
+      this.focus();
+      this.setSelectionRange(0, this.value.length);
+      let success = document.execCommand("insertText", false, new_value);
+      if (!success) {
+        // insertText is not supported by the browser.
+        // Fall back to assigning to value.
+        this.value = new_value;
+      }
+    }
+  })
+}
+
 $.fn.selectEnd = function() {
   return this.each(function() {
     this.focus();
     this.setSelectionRange(this.value.length, this.value.length);
   })
 }
+
+Utility.copyToClipboard = copyToClipboard;
+Utility.printPage = printPage;
+Utility.alpineReady = alpineReady;
 
 export default Utility

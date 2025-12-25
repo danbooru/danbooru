@@ -3,10 +3,9 @@
 class FavoriteGroup < ApplicationRecord
   belongs_to :creator, class_name: "User"
 
-  before_validation :normalize_name
+  normalizes :name, with: ->(name) { name.unicode_normalize(:nfc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "") }
 
-  validates :name, visible_string: true
-  validates :name, uniqueness: { case_sensitive: false, scope: :creator_id }
+  validates :name, visible_string: true, uniqueness: { case_sensitive: false, scope: :creator_id }, length: { maximum: 170 }, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
@@ -24,8 +23,8 @@ class FavoriteGroup < ApplicationRecord
     end
 
     def name_contains(name)
-      name = normalize_name(name)
-      name = "*#{name}*" unless name =~ /\*/
+      name = normalize_value_for(:name, name)
+      name = "*#{name.escape_wildcards}*" unless name.include?("*")
       where_ilike(:name, name)
     end
 
@@ -52,7 +51,7 @@ class FavoriteGroup < ApplicationRecord
       when "created_at"
         q = q.order(id: :desc)
       when "updated_at"
-        q = q.order(updated_at: :desc)
+        q = q.order(updated_at: :desc, id: :desc)
       when "post_count"
         q = q.order(Arel.sql("cardinality(post_ids) desc")).order(id: :desc)
       else
@@ -118,26 +117,16 @@ class FavoriteGroup < ApplicationRecord
       errors.add(:name, "cannot contain consecutive underscores")
     when /[^[:graph:]]/
       errors.add(:name, "cannot contain non-printable characters")
-    when ""
-      errors.add(:name, "cannot be blank")
     when /\A[0-9]+\z/
       errors.add(:name, "cannot contain only digits")
     end
-  end
-
-  def self.normalize_name(name)
-    name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "")
-  end
-
-  def normalize_name
-    self.name = FavoriteGroup.normalize_name(name)
   end
 
   def self.name_or_id_matches(name, user)
     if name =~ /\A\d+\z/
       where(id: name)
     else
-      where(creator: user).where_iequals(:name, normalize_name(name))
+      where(creator: user).where_iequals(:name, normalize_value_for(:name, name))
     end
   end
 

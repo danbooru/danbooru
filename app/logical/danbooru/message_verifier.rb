@@ -7,7 +7,7 @@ module Danbooru
     def initialize(purpose)
       @purpose = purpose
       @secret = Rails.application.key_generator.generate_key(purpose.to_s)
-      @verifier = ActiveSupport::MessageVerifier.new(secret, serializer: JSON, digest: "SHA256")
+      @verifier = ActiveSupport::MessageVerifier.new(secret, serializer: ::JSON, digest: "SHA256")
     end
 
     def generate(*args, **options)

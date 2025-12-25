@@ -26,7 +26,7 @@ div#c-uploads {
 
         #dock-auto-link { font-weight: bold; }
 
-        @media (min-aspect-ratio: 4/3) {
+        @media (aspect-ratio >= 4/3) {
           grid-template-columns: 1fr max-content calc(var(--edit-container-width) * 1px);
 
           .upload-divider {

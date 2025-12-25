@@ -17,7 +17,7 @@ class ModeratorDashboard
       .order(Arel.sql("count(*) desc"))
       .limit(10)
       .count
-      .map { |user, count| OpenStruct.new(user: user, count: count) }
+      .to_h
   end
 
   def comments
@@ -31,7 +31,7 @@ class ModeratorDashboard
       .order(Arel.sql("count(*) desc"))
       .limit(10)
       .count
-      .map { |comment, count| OpenStruct.new(comment: comment, count: count) }
+      .to_h
   end
 
   def mod_actions
@@ -47,7 +47,7 @@ class ModeratorDashboard
       .order(Arel.sql("count(*) desc"))
       .limit(10)
       .count
-      .map { |user, count| OpenStruct.new(user: user, count: count) }
+      .to_h
   end
 
   def posts
@@ -59,7 +59,7 @@ class ModeratorDashboard
       .order(Arel.sql("count(*) desc"))
       .limit(10)
       .count
-      .map { |user, count| OpenStruct.new(user: user, count: count) }
+      .to_h
   end
 
   def user_feedbacks
@@ -75,6 +75,6 @@ class ModeratorDashboard
       .order(Arel.sql("count(*) desc"))
       .limit(10)
       .count
-      .map { |user, count| OpenStruct.new(user: user, count: count) }
+      .to_h
   end
 end

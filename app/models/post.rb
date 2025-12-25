@@ -7,6 +7,22 @@ class Post < ApplicationRecord
   # The maximum number of tags a post can have.
   MAX_TAG_COUNT = 1250
 
+  # The maximum number of new tags that can be created by a single user. Default is 20 tags per minute.
+  MAX_NEW_TAGS = 20
+  MAX_NEW_TAGS_INTERVAL = 1.minute
+
+  # The maximum number of tags that can be added or removed by a user per minute. Default is 100 tags per minute.
+  # Builders and the uploader aren't subject to this restriction.
+  MAX_CHANGED_TAGS = 100
+  MAX_CHANGED_TAGS_INTERVAL = 1.minute
+
+  # The maximum number of levels in a parent-child hierarchy. By default, a parent-child hierarchy can be no more than 4
+  # levels deep. That is, a post can have children, grandchildren, and great-grandchildren, but no great-great-grandchildren.
+  MAX_PARENT_DEPTH = 4
+
+  # The maximum number of child posts that a parent post may have.
+  MAX_CHILD_POSTS = 30
+
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
                       annotated partially_annotated check_annotation annotation_request]
@@ -29,19 +45,23 @@ class Post < ApplicationRecord
   deletable
   has_bit_flags %w[has_embedded_notes _unused_has_cropped is_taken_down]
 
-  normalize :source, :normalize_source
+  normalizes :source, with: ->(source) { Post.normalize_source(source) }, apply_to_nil: true
   before_validation :merge_old_changes
   before_validation :apply_pre_metatags
+  before_validation :validate_new_tags
   before_validation :normalize_tags
-  before_validation :blank_out_nonexistent_parents
-  before_validation :remove_parent_loops
   validate :uploader_is_not_limited, on: :create
-  validate :post_is_not_its_own_parent
+  validate :post_is_not_allowed, on: :create
+  validate :validate_no_parent_cycles
+  validate :validate_parent_depth
+  validate :validate_child_count
+  validate :validate_changed_tags
   validate :validate_tag_count
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
   validates :rating, presence: { message: "not selected" }
   validates :rating, inclusion: { in: RATINGS.keys, message: "must be #{RATINGS.keys.map(&:upcase).to_sentence(last_word_connector: ", or ")}" }, if: -> { rating.present? }
   validates :source, length: { maximum: 1200 }
+  validates :parent, presence: { message: "post does not exist" }, if: -> { parent_id.present? && parent_id_changed? }
   before_save :parse_pixiv_id
   before_save :added_tags_are_valid
   before_save :removed_tags_are_valid
@@ -50,6 +70,7 @@ class Post < ApplicationRecord
   before_save :has_enough_tags
   before_save :update_tag_post_counts
   before_save :update_tag_category_counts
+  before_create :remove_blank_artist_commentary
   before_create :autoban
   after_save :create_version
   after_save :update_parent_on_save
@@ -58,7 +79,7 @@ class Post < ApplicationRecord
 
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
-  belongs_to :parent, class_name: "Post", optional: true
+  belongs_to :parent, class_name: "Post", optional: true, autosave: true
   has_one :media_asset, -> { active }, foreign_key: :md5, primary_key: :md5, inverse_of: :post
   has_one :media_metadata, through: :media_asset
   has_one :artist_commentary, :dependent => :destroy
@@ -77,16 +98,19 @@ class Post < ApplicationRecord
   has_many :events, class_name: "PostEvent"
   has_many :mod_actions, as: :subject, dependent: :destroy
   has_many :reactions, as: :model, dependent: :destroy, class_name: "Reaction"
+  has_many :dtext_links, -> { embedded_post }, foreign_key: :link_target
+  has_many :embedding_wiki_pages, through: :dtext_links, source: :model, source_type: "WikiPage"
 
-  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :post_edit
+  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :post_edit
 
   scope :pending, -> { where(is_pending: true) }
   scope :flagged, -> { where(is_flagged: true) }
   scope :banned, -> { where(is_banned: true) }
   # XXX conflict with deletable
   scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false) }
+  scope :approved, -> { where(is_pending: false, is_deleted: false) }
   scope :appealed, -> { where(id: PostAppeal.pending.select(:post_id)) }
-  scope :in_modqueue, -> { where_union(pending, flagged, appealed) }
+  scope :in_modqueue, -> { where_union_all(pending, flagged, appealed) }
   scope :expired, -> { pending.where("posts.created_at < ?", Danbooru.config.moderation_period.ago) }
 
   scope :unflagged, -> { where(is_flagged: false) }
@@ -97,24 +121,19 @@ class Post < ApplicationRecord
     has_many :versions, -> { Rails.env.test? ? order("post_versions.updated_at ASC, post_versions.id ASC") : order("post_versions.updated_at ASC") }, class_name: "PostVersion", dependent: :destroy
   end
 
-  def self.new_from_upload(upload_media_asset, tag_string: nil, rating: nil, parent_id: nil, source: nil, artist_commentary_title: nil, artist_commentary_desc: nil, translated_commentary_title: nil, translated_commentary_desc: nil, is_pending: nil, add_artist_tag: false)
+  def self.new_from_upload(upload_media_asset, tag_string: nil, rating: nil, parent_id: nil, source: nil, artist_commentary: {}, is_pending: nil, add_artist_tag: false)
     upload = upload_media_asset.upload
     media_asset = upload_media_asset.media_asset
 
     # XXX depends on CurrentUser
-    commentary = ArtistCommentary.new(
-      original_title: artist_commentary_title,
-      original_description: artist_commentary_desc,
-      translated_title: translated_commentary_title,
-      translated_description: translated_commentary_desc,
-    )
+    commentary = ArtistCommentary.new(**artist_commentary)
 
     if add_artist_tag
       tag_string = "#{tag_string} #{upload_media_asset.source_extractor&.artists.to_a.map(&:tag).map(&:name).join(" ")}".strip
       tag_string += " " if tag_string.present?
     end
 
-    post = Post.new(
+    Post.new(
       uploader: upload.uploader,
       md5: media_asset&.md5,
       file_ext: media_asset&.file_ext,
@@ -126,7 +145,7 @@ class Post < ApplicationRecord
       rating: rating,
       parent_id: parent_id,
       is_pending: !upload.uploader.is_contributor? || is_pending.to_s.truthy?,
-      artist_commentary: (commentary if commentary.any_field_present?),
+      artist_commentary: commentary,
     )
   end
 
@@ -276,7 +295,7 @@ class Post < ApplicationRecord
     end
 
     def autoban
-      if has_tag?("banned_artist") || has_tag?("paid_reward")
+      if has_tag?("paid_reward") || tags.any? { |tag| tag.artist? && tag.artist&.is_banned? }
         self.is_banned = true
       end
     end
@@ -303,6 +322,10 @@ class Post < ApplicationRecord
 
     def pretty_rating
       RATINGS.fetch(rating)
+    end
+
+    def is_nsfw?
+      rating.in?(%w[q e])
     end
 
     def parsed_source
@@ -337,6 +360,10 @@ class Post < ApplicationRecord
 
     def added_tags
       tags - tags_was
+    end
+
+    def removed_tags
+      tags_was - tags
     end
 
     def update_tag_post_counts
@@ -380,6 +407,18 @@ class Post < ApplicationRecord
       end
 
       @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
+    end
+
+    # XXX should be a `validate` hook instead of `before_validation` hook
+    def validate_new_tags
+      return if CurrentUser.user.nil? || CurrentUser.user.is_builder?
+
+      new_tags = post_edit.effective_added_tag_names.select { |name| !Tag.exists?(name: name) }
+
+      if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f/MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
+        errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
+        throw :abort # XXX This causes a transaction rollback which means the rate limit doesn't get properly updated.
+      end
     end
 
     def normalize_tags
@@ -430,21 +469,24 @@ class Post < ApplicationRecord
         tags << "non-web_source"
       end
 
-      source_url = parsed_source
-      if source_url.present? && source_url.recognized?
-        # A bad_link is an image URL from a recognized site that can't be converted to a page URL.
-        if source_url.image_url? && source_url.page_url.nil?
-          tags << "bad_link"
-        else
-          tags -= ["bad_link"]
-        end
+      # A bad_link is an image URL from a recognized site that can't be converted to a page URL.
+      case parsed_source&.bad_link?
+      when true
+        tags << "bad_link"
+      when false
+        tags -= ["bad_link"]
+      when nil
+        # it's unknown whether it's a bad link or not; don't add or remove the tag
+      end
 
-        # A bad_source is a source from a recognized site that isn't an image url or a page url.
-        if !source_url.image_url? && !source_url.page_url?
-          tags << "bad_source"
-        else
-          tags -= ["bad_source"]
-        end
+      # A bad_source is a source from a recognized site that isn't an image url or a page url.
+      case parsed_source&.bad_source?
+      when true
+        tags << "bad_source"
+      when false
+        tags -= ["bad_source"]
+      when nil
+        # it's unknown whether it's a bad source or not; don't add or remove the tag
       end
 
       # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, videos, and ugoiras are automatically tagged.
@@ -573,11 +615,8 @@ class Post < ApplicationRecord
             self.parent_id = nil
           end
 
-        in "parent", /^\d+$/ => new_parent_id
-          if new_parent_id.to_i != id && Post.exists?(new_parent_id)
-            self.parent_id = new_parent_id.to_i
-            remove_parent_loops
-          end
+        in "parent", new_parent_id
+          self.parent_id = new_parent_id
 
         in "rating", /\A([#{RATINGS.keys.join}])/i
           self.rating = $1.downcase
@@ -661,7 +700,7 @@ class Post < ApplicationRecord
 
   concerning :PoolMethods do
     def pools
-      Pool.where("pools.post_ids && array[?]", id)
+      Pool.where_array_includes_all(:post_ids, [id])
     end
 
     def has_active_pools?
@@ -688,34 +727,51 @@ class Post < ApplicationRecord
   end
 
   concerning :ParentMethods do
-    # A parent has many children. A child belongs to a parent.
-    # A parent cannot have a parent.
-    #
-    # After expunging a child:
-    # - Move favorites to parent.
-    # - Does the parent have any children?
-    #   - Yes: Done.
-    #   - No: Update parent's has_children flag to false.
-    #
-    # After expunging a parent:
-    # - Move favorites to the first child.
-    # - Reparent all children to the first child.
+    def parent=(new_parent)
+      self.parent_id = new_parent&.id
+    end
+
+    def parent_id=(new_parent_id)
+      super
+
+      # Allow reversing a parent-child relationship by making the child into the parent without creating a loop.
+      if parent != self && parent&.parent == self
+        parent.parent_id = nil
+      end
+    end
+
+    # @return [Array<Post>] The list of this post's ancestors (its parent, grandparent, great-grandparent, etc).
+    def ancestors
+      ancestors = []
+      parent = self.parent
+
+      while parent.present? && !self.in?(ancestors)
+        ancestors << parent
+        parent = parent.parent
+      end
+
+      ancestors
+    end
+
+    # @return [Integer] The total number of levels in the entire parent-child tree. A post with no parent or
+    # children has depth 1; a post with a parent but no children has depth 2; a post with a parent and one level of
+    # children has depth 3; etc.
+    def parent_hierarchy_depth
+      ancestors.size + child_height + 1
+    end
+
+    # @return [Integer] The number of levels of child posts this post has. A post with no children has height 0; a post
+    # with children but no grandchildren has height 1; a post with grandchildren but no great-grandchildren has height 2; etc.
+    def child_height
+      if children.present?
+        children.map(&:child_height).max + 1
+      else
+        0
+      end
+    end
 
     def update_has_children_flag
       update(has_children: children.exists?, has_active_children: children.undeleted.exists?)
-    end
-
-    def blank_out_nonexistent_parents
-      if parent_id.present? && parent.nil?
-        self.parent_id = nil
-      end
-    end
-
-    def remove_parent_loops
-      if parent.present? && parent.parent_id.present? && parent.parent_id == id
-        parent.parent_id = nil
-        parent.save
-      end
     end
 
     def update_parent_on_destroy
@@ -858,6 +914,10 @@ class Post < ApplicationRecord
   end
 
   concerning :NoteMethods do
+    def can_have_notes?
+      is_image?
+    end
+
     def has_notes?
       last_noted_at.present?
     end
@@ -1199,6 +1259,8 @@ class Post < ApplicationRecord
           where(has_children: true)
         when "child"
           where.not(parent: nil)
+        when "wiki_image"
+          where(id: DtextLink.wiki_page.embedded_post.select("link_target::integer"))
         when *AutocompleteService::POST_STATUSES
           status_matches(value, current_user)
         when *MediaAsset::FILE_TYPES
@@ -1706,12 +1768,7 @@ class Post < ApplicationRecord
   concerning :PixivMethods do
     def parse_pixiv_id
       self.pixiv_id = nil
-      return unless web_source?
-
-      site = Source::Extractor::Pixiv.new(source)
-      if site.match?
-        self.pixiv_id = site.illust_id
-      end
+      self.pixiv_id = parsed_source.work_id if parsed_source.is_a?(Source::URL::Pixiv)
     end
   end
 
@@ -1746,9 +1803,28 @@ class Post < ApplicationRecord
   end
 
   concerning :ValidationMethods do
-    def post_is_not_its_own_parent
-      if !new_record? && id == parent_id
+    def validate_no_parent_cycles
+      return unless parent_id_changed?
+
+      if self.in?(ancestors)
         errors.add(:base, "Post cannot have itself as a parent")
+        throw :abort # Abort to avoid additional error about parent-child chain being more than 4 levels deep
+      end
+    end
+
+    def validate_parent_depth
+      return unless parent_id_changed?
+
+      if parent_hierarchy_depth > MAX_PARENT_DEPTH
+        errors.add(:base, "Post cannot have a parent-child chain more than #{MAX_PARENT_DEPTH} levels deep")
+      end
+    end
+
+    def validate_child_count
+      return unless parent_id_changed? && parent.present?
+
+      if parent.children.count >= MAX_CHILD_POSTS
+        errors.add(:base, "post ##{parent_id} cannot have more than #{MAX_CHILD_POSTS} child posts")
       end
     end
 
@@ -1756,6 +1832,27 @@ class Post < ApplicationRecord
       if uploader.upload_limit.limited?
         errors.add(:uploader, "have reached your upload limit. Please wait for your pending uploads to be approved before uploading more")
         throw :abort # Don't bother returning other validation errors if we're upload-limited.
+      end
+    end
+
+    def post_is_not_allowed
+      return if uploader.posts.active.exists?
+
+      blocked_tags = Danbooru.config.new_uploader_blocked_ai_tags
+      if blocked_tags.present? && ai_tags_match?(blocked_tags)
+        errors.add(:base, "Post failed, try again later")
+        throw :abort # Don't bother returning other validation errors
+      end
+    end
+
+    def validate_changed_tags
+      return if CurrentUser.user.nil? || uploader == CurrentUser.user || CurrentUser.user.is_builder?
+
+      changed_tags = added_tags + removed_tags
+
+      if RateLimiter.limited?(action: "post:validate_changed_tags", user: CurrentUser.user, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f/MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
+        errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS.to_i} tags per #{MAX_CHANGED_TAGS_INTERVAL.inspect}. Wait a while and try again")
+        throw :abort
       end
     end
 
@@ -1832,6 +1929,17 @@ class Post < ApplicationRecord
     end
   end
 
+  concerning :ArtistCommentaryMethods do
+    def remove_blank_artist_commentary
+      self.artist_commentary = nil if !artist_commentary&.any_field_present?
+    end
+  end
+
+  # @param tags [String] The AI tag query.
+  def ai_tags_match?(tags)
+    media_asset.ai_tags_match?(tags)
+  end
+
   def safeblocked?
     CurrentUser.safe_mode? && (rating != "g" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
   end
@@ -1861,7 +1969,11 @@ class Post < ApplicationRecord
   end
 
   def self.normalize_source(source)
-    source.to_s.strip.unicode_normalize(:nfc)
+    if source&.match?(%r{\Ahttps?://}i)
+      source.to_s
+    else
+      source.to_s.strip.unicode_normalize(:nfc)
+    end
   end
 
   def mark_as_translated(params)
@@ -1891,7 +2003,8 @@ class Post < ApplicationRecord
     %i[
       uploader approver flags appeals events parent children notes
       comments approvals disapprovals replacements
-      artist_commentary media_asset media_metadata ai_tags
+      artist_commentary media_asset media_metadata ai_tags dtext_links
+      embedding_wiki_pages
     ]
   end
 end

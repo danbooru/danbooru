@@ -1,0 +1,17 @@
+#main-menu {
+  .current {
+    background: var(--subnav-menu-background-color);
+  }
+
+  #nav-login {
+    color: var(--login-link-color);
+  }
+
+  @media screen and (width <= 660px) {
+    background-color: var(--responsive-menu-background-color);
+  }
+}
+
+#subnav-menu {
+  background: var(--subnav-menu-background-color);
+}

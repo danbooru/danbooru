@@ -1,5 +1,6 @@
 import Post from './posts.js'
 import Utility from './utility'
+import Notice from './notice'
 
 let PostModeMenu = {};
 
@@ -20,13 +21,13 @@ PostModeMenu.initialize_shortcuts = function() {
 
 PostModeMenu.show_notice = function(mode, tag_script_index = 0) {
   if (mode === "add-fav") {
-    Utility.notice("Switched to favorite mode. Click a post to favorite it.");
+    Notice.info("Switched to favorite mode. Click a post to favorite it.");
   } else if (mode === "remove-fav") {
-    Utility.notice("Switched to unfavorite mode. Click a post to unfavorite it.");
+    Notice.info("Switched to unfavorite mode. Click a post to unfavorite it.");
   } else if (mode === "edit") {
-    Utility.notice("Switched to edit mode. Click a post to edit it.");
+    Notice.info("Switched to edit mode. Click a post to edit it.");
   } else if (mode === "tag-script") {
-    Utility.notice(`Switched to tag script #${tag_script_index}. To switch tag scripts, use the number keys.`);
+    Notice.info(`Switched to tag script #${tag_script_index}. To switch tag scripts, use the number keys.`);
   }
 }
 
@@ -136,6 +137,10 @@ PostModeMenu.open_edit = function(post_id) {
 }
 
 PostModeMenu.click = function(e) {
+  if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
+    return;
+  }
+
   var s = $("#mode-box select").val();
   var post_id = $(e.target).closest("article").data("id");
 

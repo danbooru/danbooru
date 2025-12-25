@@ -6,8 +6,8 @@ class RetireTagRelationshipsJobTest < ActiveJob::TestCase
       create(:tag_alias, created_at: 3.years.ago, antecedent_name: "0", consequent_name: "1")
       RetireTagRelationshipsJob.perform_now
 
-      assert_equal(true, ForumTopic.exists?(title: TagRelationshipRetirementService::FORUM_TOPIC_TITLE))
-      assert_equal(true, ForumPost.exists?(body: TagRelationshipRetirementService::FORUM_TOPIC_BODY))
+      assert_equal(true, ForumTopic.exists?(title: TagRelationshipRetirementService::FORUM_TOPIC_TITLE, category: "Tags", creator: User.system, updater: User.system))
+      assert_equal(true, ForumPost.exists?(body: TagRelationshipRetirementService::FORUM_TOPIC_BODY, creator: User.system, updater: User.system))
     end
 
     should "retire inactive gentag and artist aliases" do
@@ -100,17 +100,6 @@ class RetireTagRelationshipsJobTest < ActiveJob::TestCase
       assert_equal(true, ta2.reload.is_retired?)
       assert_equal(true, ta3.reload.is_retired?)
       assert_equal(true, ta4.reload.is_retired?)
-    end
-
-    should "not retire empty banned_artist implications" do
-      bkub = create(:tag, name: "bkub", post_count: 0, category: Tag.categories.artist)
-      banned_artist = create(:tag, name: "banned_artist", post_count: 0, category: Tag.categories.artist)
-      ti = create(:tag_implication, antecedent_name: "bkub", consequent_name: "banned_artist")
-
-      RetireTagRelationshipsJob.perform_now
-
-      assert_equal(false, ti.reload.is_retired?)
-      assert_equal(true, bkub.implies?("banned_artist"))
     end
   end
 end

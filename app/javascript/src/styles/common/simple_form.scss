@@ -1,33 +1,8 @@
-@import "../base/020_base";
-@import "../common/utilities";
-
 form.simple_form {
   margin: 0 0 1em 0;
 
   label {
     font-weight: bold;
-  }
-
-  fieldset.inline-fieldset {
-    > label {
-      display: block;
-    }
-
-    div.input {
-      display: inline;
-      margin-right: 2em;
-    }
-  }
-
-  div.input.boolean {
-    label {
-      display: inline;
-      font-weight: normal;
-    }
-
-    input {
-      margin-right: 0.25em;
-    }
   }
 
   div.input {
@@ -39,10 +14,9 @@ form.simple_form {
     }
 
     .hint {
-      @extend %fineprint;
       padding-left: 1em;
 
-      @media (max-width: 660px) {
+      @media (width <= 660px) {
         padding-left: 0;
         display: block;
       }
@@ -61,7 +35,7 @@ form.simple_form {
       }
     }
 
-    &.text, &.dtext {
+    &.text {
       .hint {
         padding-left: 0;
         display: block;
@@ -73,7 +47,6 @@ form.simple_form {
         max-height: 15rem;
 
         &.text  { height: 20vh; }
-        &.dtext { height: 40vh; }
       }
     }
 
@@ -107,12 +80,13 @@ form.simple_form {
 
       // Show radio buttons as a rounded button group.
       &.radio-button-group {
-        @extend %thin-x-scrollbar;
-
         white-space: nowrap;
 
         input {
-          @extend %sr-only; // Visually hide <input> without using `display: none`, since that would prevent focusing it.
+          // XXX .sr-only; Visually hide <input> without using `display: none`, since that would prevent focusing it.
+          position: absolute;
+          pointer-events: none;
+          opacity: 0;
         }
 
         .radio label {
@@ -217,6 +191,24 @@ form.one-line-form {
   }
 }
 
+form.stacked-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  div.input {
+    width: 100%;
+
+    input[type] {
+      max-width: unset;
+    }
+  }
+
+  div.notice {
+    width: 100%;
+  }
+}
+
 div.ui-dialog {
   textarea, input[type="text"] {
     width: 100%;
@@ -238,19 +230,72 @@ div.ui-dialog {
     div.input.hidden {
       display: none;
     }
+  }
+}
 
-    div.dtext-inline span.dtext-hint {
-      display: none;
-    }
+div.inline-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .checkbox { order: -1; }
+  .hint { order: 1; }
+}
+
+div.inline-toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .toggle-switch { order: -1; }
+  .hint { order: 1; }
+}
+
+input.toggle-switch {
+  appearance: none;
+  background-color: var(--toggle-switch-unselected-color);
+  border-color: transparent;
+  border-radius: 1rem;
+  border-width: 0.125rem;
+  height: 1em;
+  min-width: 2em;
+  transition: background-color 0.15s;
+  vertical-align: text-bottom;
+  cursor: pointer;
+  padding: 0;
+
+  &:checked {
+    background-color: var(--toggle-switch-selected-color);
   }
 
-  /* the submit and close buttons */
-  .ui-dialog-buttonpane {
-    margin-top: 0;
-    padding: 1em 1em 1em 0;
+  &:checked::before {
+    margin-left: 1em;
+  }
 
-    .ui-button {
-      margin: 0 0.25em;
-    }
+  &:indeterminate {
+    background-color: var(--toggle-switch-indeterminate-color);
+  }
+
+  &:indeterminate::before {
+    margin-left: 0.5em;
+  }
+
+  &::before {
+    display: block;
+    content: "";
+    background-color: var(--toggle-switch-handle-color);
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 1rem;
+    transition: margin 0.15s;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &:focus-visible {
+    outline-offset: 2px;
   }
 }

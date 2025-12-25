@@ -13,7 +13,7 @@ class AutocompleteService
   POST_STATUSES = %w[active deleted pending flagged appealed banned modqueue unmoderated]
 
   STATIC_METATAGS = {
-    is: %w[parent child sfw nsfw] + POST_STATUSES + MediaAsset::FILE_TYPES + Post::RATINGS.values.map(&:downcase),
+    is: %w[parent child sfw nsfw wiki_image] + POST_STATUSES + MediaAsset::FILE_TYPES + Post::RATINGS.values.map(&:downcase),
     has: %w[parent children source appeals flags replacements comments commentary notes pools],
     status: %w[any] + POST_STATUSES,
     child: %w[any none] + POST_STATUSES,
@@ -33,7 +33,7 @@ class AutocompleteService
 
   # A Result represents a single autocomplete entry. `label` is the pretty name to
   # display in the autocomplete menu and `value` is the actual string to insert.
-  class Result < Struct.new(:type, :label, :value, :category, :post_count, :id, :level, :antecedent, keyword_init: true)
+  class Result < Struct.new(:type, :label, :value, :category, :post_count, :id, :level, :antecedent, :tag, keyword_init: true)
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
 
@@ -74,6 +74,8 @@ class AutocompleteService
       autocomplete_user(query)
     when :mention
       autocomplete_mention(query)
+    when :emoji
+      autocomplete_emoji(query)
     when :pool
       autocomplete_pool(query)
     when :favorite_group
@@ -146,7 +148,7 @@ class AutocompleteService
 
     results = tags.map do |tag|
       antecedent = tag.tag_alias_for_word_pattern(string)&.antecedent_name
-      { type: "tag-word", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
+      { type: "tag-word", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent, tag: tag }
     end
 
     results = results.sort_by do |result|
@@ -175,7 +177,7 @@ class AutocompleteService
   # @param string [String] the string to complete
   # @return [Array<Hash>] the autocomplete results
   def tag_prefix_matches(string)
-    tag_wildcard_matches(string + "*")
+    tag_wildcard_matches(string.escape_wildcards + "*")
   end
 
   # Find tags or tag aliases matching a wildcard search.
@@ -191,7 +193,7 @@ class AutocompleteService
     tags.map do |tag|
       antecedent = tag.tag_alias_for_pattern(string)&.antecedent_name
       type = antecedent.present? ? "tag-alias" : "tag"
-      { type: type, label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
+      { type: type, label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent, tag: tag }
     end
   end
 
@@ -208,7 +210,7 @@ class AutocompleteService
     tags = Tag.nonempty.abbreviation_matches(string).order(post_count: :desc).limit(limit)
 
     results = tags.map do |tag|
-      { type: "tag-abbreviation", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: "/" + tag.abbreviation }
+      { type: "tag-abbreviation", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: "/" + tag.abbreviation, tag: tag }
     end.sort_by do |r|
       [r[:antecedent].to_s.size, -r[:post_count]]
     end
@@ -228,7 +230,7 @@ class AutocompleteService
     tags = Tag.nonempty.autocorrect_matches(string).limit(limit)
 
     tags.map do |tag|
-      { type: "tag-autocorrect", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: string }
+      { type: "tag-autocorrect", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: string, tag: tag }
     end
   end
 
@@ -247,7 +249,7 @@ class AutocompleteService
     tags.map do |tag|
       other_names = tag.artist&.other_names.to_a + tag.wiki_page&.other_names.to_a
       antecedent = other_names.find { |other_name| other_name.ilike?(string + "*") }
-      { type: "tag-other-name", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
+      { type: "tag-other-name", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent, tag: tag }
     end
   end
 
@@ -371,6 +373,27 @@ class AutocompleteService
     end
   end
 
+  # Complete an emoji reference (e.g. `:smile:`).
+
+  # @param string [String] The name of the emoji (e.g. `smile`, not `:smile:`)
+  # @return [Array<Hash>] the autocomplete results
+  def autocomplete_emoji(emoji)
+    normalized_emoji = emoji.downcase.chomp(":")
+    emojis = Danbooru.config.dtext_emojis.keys
+
+    results = emojis.grep(/#{normalized_emoji}/i).sort_by do |match|
+      exact = match.casecmp?(normalized_emoji) ? 1 : 0
+      prefix = match.downcase.starts_with?(normalized_emoji) ? 1 : 0
+
+      # Sort exact name matches first, then prefix matches, then sort by name.
+      [-exact, -prefix, match]
+    end.take(limit)
+
+    results.map do |v|
+      { type: "emoji", label: ":#{v}:", value: ":#{v}:" }
+    end
+  end
+
   # Complete a search typed in the browser address bar.
   # @param string [String] the name of the tag
   # @return [Array<(String, [Array<String>])>] the autocomplete results
@@ -381,14 +404,14 @@ class AutocompleteService
     [query, results]
   end
 
-  # How long autocomplete results can be cached. Cache short result lists (<10
-  # results) for less time because they're more likely to change.
+  # How long autocomplete results can be cached by the browser. Stale results will be refreshed in the background.
   def cache_duration
-    if autocomplete_results.size == limit
-      24.hours
-    else
-      1.hour
-    end
+    10.minutes
+  end
+
+  # How long stale results can be used while they're refreshed in the background.
+  def stale_while_revalidate_duration
+    1.day
   end
 
   # Whether the results can be safely cached with `Cache-Control: public`.
@@ -396,7 +419,7 @@ class AutocompleteService
   def cache_publicly?
     if type == :tag_query && parsed_query.tag_names.one?
       true
-    elsif type.in?(%i[tag artist wiki_page pool opensearch])
+    elsif type.in?(%i[tag artist wiki_page pool emoji opensearch])
       true
     else
       false

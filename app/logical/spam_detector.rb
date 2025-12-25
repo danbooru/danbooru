@@ -98,13 +98,7 @@ class SpamDetector
     return false if user.is_gold?
     return false if user.created_at < 1.month.ago
 
-    is_spam = super
-
-    if is_spam
-      DanbooruLogger.info("Spam detected: user_name=#{user.name} comment_type=#{comment_type} content=#{content.dump}", record.as_json)
-    end
-
-    is_spam
+    super
   rescue StandardError => e
     DanbooruLogger.log(e)
     false

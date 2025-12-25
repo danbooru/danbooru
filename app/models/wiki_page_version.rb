@@ -2,6 +2,8 @@
 
 class WikiPageVersion < ApplicationRecord
   array_attribute :other_names
+  dtext_attribute :body, media_embeds: true # defines :dtext_body
+
   belongs_to :wiki_page
   belongs_to_updater
   belongs_to :tag, primary_key: :name, foreign_key: :title, optional: true
@@ -20,14 +22,16 @@ class WikiPageVersion < ApplicationRecord
     title.tr("_", " ")
   end
 
+  def next
+    @next ||= wiki_page.versions.where("id > ?", id).first
+  end
+
   def previous
-    @previous ||= WikiPageVersion.where("wiki_page_id = ? and id < ?", wiki_page_id, id).order("id desc").limit(1).to_a
-    @previous.first
+    @previous ||= wiki_page.versions.where(id: ...id).last
   end
 
   def current
-    @current ||= WikiPageVersion.where(wiki_page_id: wiki_page_id).order("id desc").limit(1).to_a
-    @current.first
+    @current ||= wiki_page.versions.last
   end
 
   def self.status_fields

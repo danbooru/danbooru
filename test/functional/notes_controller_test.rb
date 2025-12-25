@@ -40,10 +40,20 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a note" do
         assert_difference("Note.count", 1) do
-          @post = create(:post)
-          post_auth notes_path, @user, params: {:note => {:x => 0, :y => 0, :width => 10, :height => 10, :body => "abc", :post_id => @post.id}, :format => :json}
+          post = create(:post)
+          post_auth notes_path, @user, params: { note: { x: 0, y: 0, width: 10, height: 10, body: "abc", post_id: post.id }, format: :json }
+
           assert_response :success
+          assert_equal(1, post.notes.count)
         end
+      end
+
+      should "not create a note on a post that cannot have notes" do
+        post = create(:post, file_ext: "webm")
+        post_auth notes_path, @user, params: { note: { x: 0, y: 0, width: 10, height: 10, body: "abc", post_id: post.id }, format: :json }
+
+        assert_response 422
+        assert_equal(0, post.notes.count)
       end
     end
 
@@ -95,6 +105,29 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
         put_auth revert_note_path(@note), @user, params: { :version_id => @note2.versions.first.id }
         assert_not_equal(@note.reload.body, @note2.body)
         assert_response :missing
+      end
+    end
+
+    context "preview action" do
+      should "work for a POST method" do
+        post preview_notes_path, params: { body: '<p>test</p> <script>alert("owned")</script>', format: "json" }
+
+        assert_response :success
+        assert_equal("<p>test</p> ", response.parsed_body["sanitized_body"])
+      end
+
+      should "work for a GET method" do
+        get preview_notes_path, params: { body: '<p>test</p> <script>alert("owned")</script>', format: "json" }
+
+        assert_response :success
+        assert_equal("<p>test</p> ", response.parsed_body["sanitized_body"])
+      end
+
+      should "work for a missing body argument" do
+        post preview_notes_path, params: { format: "json" }
+        assert_response :success
+
+        assert_equal("", response.parsed_body["sanitized_body"])
       end
     end
   end

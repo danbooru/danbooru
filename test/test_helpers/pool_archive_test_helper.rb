@@ -2,12 +2,6 @@ module PoolArchiveTestHelper
   def mock_pool_version_service!
     setup do
       PoolVersion.stubs(:sqs_service).returns(MockPoolSqsService.new)
-      PoolVersion.establish_connection(PoolVersion.database_url)
-      PoolVersion.connection.begin_transaction joinable: false
-    end
-
-    teardown do
-      PoolVersion.connection.rollback_transaction
     end
   end
 

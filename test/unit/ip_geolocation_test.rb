@@ -52,12 +52,12 @@ class IpGeolocationTest < ActiveSupport::TestCase
 
       should "work for a mobile IP" do
         @ip = IpGeolocation.create_or_update!("37.173.153.166")
-        assert_match(/Free Mobile/, @ip.carrier)
+        assert_match(/Free/, @ip.carrier)
       end
 
       should "work for a proxy IP" do
-        @ip = IpGeolocation.create_or_update!("31.214.184.59")
-        assert_match(/Soluciones Corporativas IP, SL/i, @ip.organization.downcase)
+        @ip = IpGeolocation.create_or_update!("202.40.177.186")
+        assert_match(/Ranks Itt/i, @ip.organization)
         assert_equal(true, @ip.is_proxy?)
       end
 

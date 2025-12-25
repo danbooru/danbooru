@@ -1,5 +1,5 @@
 <% content_for(:sidebar) do %>
-  <%= render "posts/partials/index/blacklist" %>
+  <%= render BlacklistComponent.new(user: CurrentUser.user) %>
   <%= render "wiki_pages/recent_changes" %>
 
   <% if @wiki_page.present? && @wiki_page.title.present? %>

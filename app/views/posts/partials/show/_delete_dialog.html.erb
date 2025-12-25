@@ -3,7 +3,7 @@
 
   <%= edit_form_for(post, method: :delete, remote: true) do |f| %>
     <input type="hidden" name="commit" value="Delete">
-    <%= f.input :reason, as: :dtext, inline: true, input_html: { value: "" } %>
+    <%= f.input :reason, as: :string, input_html: { value: "", autofocus: true } %>
     <% if post.parent_id.present? %>
       <%= f.input :move_favorites, label: "Move favorites to parent", as: :boolean, input_html: { checked: false } %>
     <% end %>

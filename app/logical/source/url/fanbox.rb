@@ -81,11 +81,18 @@ class Source::URL::Fanbox < Source::URL
   end
 
   def full_image_url
-    # https://downloads.fanbox.cc/images/post/39714/w/1200/JvjJal8v1yLgc5DPyEI05YpT.jpeg (full: https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png)
+    # https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png
+    return to_s if image_url? && !to_s.match?(%r{/[cw]/\w+/})
+  end
+
+  def candidate_full_image_urls
+    # https://downloads.fanbox.cc/images/post/39714/w/1200/JvjJal8v1yLgc5DPyEI05YpT.jpeg
     # https://downloads.fanbox.cc/images/post/39714/c/1200x630/JvjJal8v1yLgc5DPyEI05YpT.jpeg
     # https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg
     # https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/BtxSp9MImFhnEZtjEZs2RPqL.jpeg
-    to_s.gsub(%r{/[cw]/\w+/}, "/") if image_url?
+    return [] unless image_url?
+    candidate_url = to_s.gsub(%r{/[cw]/\w+/}, "/")
+    %w[jpg jpeg png gif].map { |ext| candidate_url.sub(/(\.\w+)\z/, ".#{ext}") }
   end
 
   def page_url

@@ -17,23 +17,29 @@ html, body {
   border-color: var(--default-border-color);
 }
 
-body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote, dl, dd, menu, input {
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote, pre, dl, dd, menu, input {
   margin: 0;
-}
-
-p, a, li {
-  line-height: 1.25em;
 }
 
 table {
   border-collapse: collapse;
 }
 
-ol, ul {
+ol, ul, menu {
   padding: 0;
   list-style: none;
 }
 
-a:focus {
-  outline: thin dotted;
+input, select, textarea, button {
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+img, svg, video, canvas, iframe {
+  display: block;
+  vertical-align: middle; // Used for `display: inline` images
 }

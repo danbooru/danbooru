@@ -3,10 +3,6 @@
 # @see Source::URL::Anifty
 class Source::Extractor
   class Anifty < Source::Extractor
-    def match?
-      Source::URL::Anifty === parsed_url
-    end
-
     def image_urls
       if parsed_url.image_url?
         [parsed_url.full_image_url].compact
@@ -16,7 +12,7 @@ class Source::Extractor
     end
 
     def profile_url
-      if artist_name.present?
+      if username.present?
         "https://anifty.jp/@#{username}"
       else
         parsed_url.profile_url || parsed_referer&.profile_url
@@ -24,21 +20,15 @@ class Source::Extractor
     end
 
     def username
-      api_response.dig("creator", "userName") || artist_api_response["userName"]
+      api_response.dig("creator", "userName") || artist_api_response["userName"] || parsed_url.username || parsed_referer&.username
     end
 
-    def artist_name
-      api_response.dig("creator", "displayName") || artist_api_response.dig("createdTokens", 0, "creatorProfile", "displayNameEN")
+    def display_name
+      api_response.dig("creator", "displayName") || artist_api_response.dig("creatorProfile", "nameEN")
     end
 
     def other_names
-      other_names = [username]
-      if api_response.present?
-        other_names << api_response.dig("creator", "displayNameJA")
-      elsif artist_api_response
-        other_names << artist_api_response.dig("createdTokens", 0, "creatorProfile", "displayNameJP")
-      end
-      other_names.compact.uniq
+      [display_name, username, api_response.dig("creator", "displayNameJA"), artist_api_response.dig("creatorProfile", "nameJA")].compact_blank.uniq(&:downcase)
     end
 
     def artist_commentary_title
@@ -69,18 +59,7 @@ class Source::Extractor
     end
 
     def work_id
-      parsed_url.work_id || parsed_referer&.work_id || work_id_from_artist_api
-    end
-
-    def work_id_from_artist_api
-      # Try to get the work ID from the artist's list of tokens
-      return nil unless parsed_url.file.present? && parsed_url.work_type == "creation"
-      artist_api_response["createdTokens"].to_a.map do |token|
-        if Source::URL.parse(token["imageURL"])&.file == parsed_url.file
-          return token["creationID"]
-        end
-      end
-      nil
+      parsed_url.work_id || parsed_referer&.work_id
     end
 
     def artist_hash

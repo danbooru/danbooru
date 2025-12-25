@@ -1,7 +1,6 @@
 import Cookie from "./cookie";
 import Draggable from "./draggable";
-import Utility from "./utility";
-import clamp from "lodash/clamp";
+import { clamp, delay } from "./utility";
 
 let Upload = {};
 
@@ -23,7 +22,7 @@ Upload.loadAssets = async function() {
     let ids = $(".upload-media-asset-loading").map((i, el) => $(el).attr("data-id")).toArray().join(",");
     let size = $(".upload-media-asset-gallery").attr("data-size");
     $.get("/upload_media_assets.js", { search: { status: "active failed", id: ids }, size: size });
-    await Utility.delay(250);
+    await delay(250);
   }
 }
 

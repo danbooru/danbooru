@@ -12,7 +12,7 @@ module Source
       attr_reader :file, :t_work_id, :h_work_id, :video_id, :article_id, :artist_id
 
       def self.match?(url)
-        url.domain.in?(["bilibili.com", "hdslb.com"])
+        url.domain.in?(%w[bilibili.com biliimg.com hdslb.com]) && url.host != "live.bilibili.com"
       end
 
       def parse
@@ -20,18 +20,23 @@ module Source
 
         # https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg@1036w.webp
         # https://i0.hdslb.com/bfs/new_dyn/716a9733fc804d11d823cfacb7a3c78b11742550.jpg@208w_208h_1e_1c.webp
-        in _, "hdslb.com", "bfs", "new_dyn", /^(\w{32}(\d{8,})\.\w+)(?:@\w+\.\w+)?$/ => file
+        # https://album.biliimg.com/bfs/new_dyn/4cf244d3fb706a5726b6383143960931504164361.jpg
+        in _, ("hdslb.com" | "biliimg.com"), "bfs", "new_dyn", /^(\w{32}(\d{8,})\.\w+)(?:@\w+\.\w+)?$/ => file
           @file = $1
           @artist_id = $2
 
         # https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif@1036w.webp
         # https://i0.hdslb.com/bfs/album/37f77871d417c76a08a9467527e9670810c4c442.gif
         # https://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp
-        in  _, "hdslb.com", "bfs", subsite, /^(\w{40}\.\w+)(?:@\w+\.\w+)?$/ => file
+        # https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png
+        # https://i0.hdslb.com/bfs/article/card/f33ebbfe66a0f8ac4868f48b5b6f3ce478d0234c.png
+        # https://album.biliimg.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp
+        in  _, ("hdslb.com" | "biliimg.com"), "bfs", *subdirs, /^(\w{40}\.\w+)(?:@\w+\.\w+)?$/ => file
           @file = $1
 
         # https://i0.hdslb.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png
-        in  _, "hdslb.com", "bfs", subsite, "static", subpath, /^\w+\.\w+$/ => file
+        # https://album.biliimg.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png
+        in  _, ("hdslb.com" | "biliimg.com"), "bfs", subsite, "static", subpath, /^\w+\.\w+$/ => file
         # pass
 
         # https://t.bilibili.com/686082748803186697
@@ -65,6 +70,11 @@ module Source
         in "space", "bilibili.com", /^\d+$/ => artist_id, *rest
           @artist_id = artist_id
 
+        # https://m.bilibili.com/space/355143
+        in "m", "bilibili.com", "space", /^\d+$/ => artist_id, *rest
+          @artist_id = artist_id
+
+        # https://www.bilibili.com/video/av598699440/
         # https://www.bilibili.com/video/BV1dY4y1u7Vi/
         # http://www.bilibili.tv/video/av439451/
         in ("www" | "m" | ""), ("bilibili.com" | "bilibili.tv"), "video", video_id
@@ -74,13 +84,18 @@ module Source
         in ("www" | "m" | ""), ("bilibili.com" | "bilibili.tv"), "s", "video", video_id
           @video_id = video_id
 
+        # https://live.bilibili.com/10049889?from=search&seid=8525275464641122982
+        # https://live.bilibili.com/blackboard/era/VSuE0f27CnXe3VSY.html
+        # https://live.bilibili.com/blackboard/activity-lAFdFMqMOQ.html
+        # https://live.bilibili.com/activity/qixi-festival-2020-pc/index.html#/battle
+        # https://i0.hdslb.com/bfs/article/card/1-1card416202622_web.png
         else
           nil
         end
       end
 
       def image_url?
-        domain == "hdslb.com"
+        url.domain.in?(%w[biliimg.com hdslb.com])
       end
 
       def full_image_url
@@ -91,13 +106,13 @@ module Source
 
       def page_url
         if t_work_id.present?
-          "https://t.bilibili.com/#{t_work_id}"
+          "https://www.bilibili.com/opus/#{t_work_id}"
         elsif h_work_id.present?
           "https://h.bilibili.com/#{h_work_id}"
         elsif article_id.present?
-          "https://www.bilibili.com/read/cv#{article_id}"
+          "https://www.bilibili.com/read/cv#{article_id}/"
         elsif video_id.present?
-          "https://www.bilibili.com/video/#{video_id}"
+          "https://www.bilibili.com/video/#{video_id}/"
         end
       end
 

@@ -10,7 +10,7 @@
   <%= subnav_link_to "Help", wiki_page_path("help:tags") %>
 
   <% if @tag %>
-    <li>|</li>
+    <%= subnav_divider %>
     <%= subnav_link_to "Posts (#{@tag.post_count})", posts_path(:tags => @tag.name) %>
     <%= subnav_link_to "Edit", edit_tag_path(@tag) %>
     <%= subnav_link_to "History", tag_versions_path(search: { tag_id: @tag.id }) %>

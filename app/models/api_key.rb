@@ -1,18 +1,32 @@
 # frozen_string_literal: true
 
 class ApiKey < ApplicationRecord
+  # Set to the current HTTP request when creating, updating, or destroying the API key.
+  attr_accessor :request
+
   attribute :permitted_ip_addresses, :ip_address, array: true
   attribute :last_ip_address, :ip_address
 
   array_attribute :permissions
   array_attribute :permitted_ip_addresses
 
-  normalize :permissions, :normalize_permissions
-  normalize :name, :normalize_text
+  normalizes :permissions, with: ->(permissions) { permissions.compact_blank }
+  normalizes :permitted_ip_addresses, with: ->(ips) { ips.compact_blank.sort.uniq }
+  normalizes :name, with: ->(name) { name.unicode_normalize(:nfc).normalize_whitespace.strip }
 
   belongs_to :user
+
+  validate :validate_max_api_keys, on: :create
   validate :validate_permissions, if: :permissions_changed?
+  validate :validate_ip_addresses, if: :permitted_ip_addresses_changed?
   validates :key, uniqueness: true, if: :key_changed?
+  validates :name, length: { maximum: 100 }, if: :name_changed?
+  validates :name, visible_string: { allow_empty: true }, if: :name_changed?
+  validates :permitted_ip_addresses, length: { maximum: 20 }, if: :permitted_ip_addresses_changed?
+
+  after_destroy :create_user_event
+  after_save :create_user_event
+
   has_secure_token :key
 
   def self.visible(user)
@@ -26,6 +40,40 @@ class ApiKey < ApplicationRecord
   def self.search(params, current_user)
     q = search_attributes(params, [:id, :created_at, :updated_at, :key, :user], current_user: current_user)
     q.apply_default_order(params)
+  end
+
+  def validate_max_api_keys
+    if user.api_keys.count >= 20
+      errors.add(:base, "You can't have more than 20 API keys.")
+    end
+  end
+
+  def validate_ip_addresses
+    permitted_ip_addresses.each do |ip_addr|
+      if ip_addr.is_local?
+        errors.add(:permitted_ip_addresses, "can't include private IP address '#{ip_addr}'")
+      end
+
+      permitted_ip_addresses.without(ip_addr).each do |other_ip|
+        if other_ip.in?(ip_addr)
+          errors.add(:permitted_ip_addresses, "can't include overlapping IP address ranges (#{other_ip} is a subnet of #{ip_addr})")
+          break
+        end
+      end
+    end
+  end
+
+  def create_user_event
+    # The request will be nil when the user deactivates their account, which destroys all their API keys without logging events for each one.
+    return if request.nil?
+
+    if previously_new_record?
+      UserEvent.create_from_request!(user, :api_key_create, request)
+    elsif destroyed?
+      UserEvent.create_from_request!(user, :api_key_delete, request)
+    elsif saved_change_to_permissions? || saved_change_to_permitted_ip_addresses?
+      UserEvent.create_from_request!(user, :api_key_update, request)
+    end
   end
 
   concerning :PermissionMethods do
@@ -55,10 +103,6 @@ class ApiKey < ApplicationRecord
     end
 
     class_methods do
-      def normalize_permissions(permissions)
-        permissions.compact_blank
-      end
-
       def permissions_list
         routes = Rails.application.routes.routes.select do |route|
           route.defaults[:controller].present? && !route.internal

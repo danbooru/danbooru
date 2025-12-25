@@ -9,10 +9,6 @@
 module Source
   class Extractor
     class Rule34DotUs < Source::Extractor
-      def match?
-        Source::URL::Rule34DotUs === parsed_url
-      end
-
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]
@@ -27,7 +23,7 @@ module Source
       end
 
       def tags
-        page&.css("meta[name='keywords']")&.attr("content")&.value.to_s.split(/, /).compact.map do |tag|
+        page&.css("meta[name='keywords']")&.attr("content")&.value.to_s.split(", ").compact.map do |tag|
           [tag.tr(" ", "_"), "https://rule34.us/index.php?r=posts/index&q=#{Danbooru::URL.escape(tag)}"]
         end
       end

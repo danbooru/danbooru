@@ -28,16 +28,13 @@ $(function() {
     e.preventDefault();
   });
 
-  $("#close-notice-link").on("click.danbooru", function(e) {
-    $('#notice').fadeOut("fast");
-    e.preventDefault();
+  $.widget("ui.dialog", $.ui.dialog, {
+    options: {
+      classes: { "ui-dialog-content": "thin-scrollbar", }
+    }
   });
 
   if (location.hostname.endsWith("danbooru.me")) {
     location.hostname = "danbooru.donmai.us";
   }
 });
-
-window.submitInvisibleRecaptchaForm = function () {
-  document.getElementById("signup-form").submit();
-}

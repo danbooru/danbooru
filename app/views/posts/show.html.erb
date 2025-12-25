@@ -1,6 +1,6 @@
 <% page_title @post.presenter.humanized_essential_tag_string %>
 <% meta_description "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
-<% canonical_url post_url(@post, host: Danbooru.config.hostname) %>
+<% seo_canonical_url post_path(@post) %>
 <% if Danbooru.config.comments_enabled?.to_s.truthy? %>
   <% atom_feed_tag "Comments for post ##{@post.id}", comments_url(:atom, search: { post_id: @post.id }) %>
 <% end %>
@@ -10,10 +10,10 @@
 <% content_for(:sidebar) do %>
   <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:q], :tags_dom_id => "tags" %>
 
-  <%= render "posts/partials/index/blacklist" %>
+  <%= render BlacklistComponent.new(user: CurrentUser.user) %>
 
   <section id="tag-list">
-    <%= render_categorized_tag_list(@post, current_query: params[:q], show_extra_links: policy(@post).show_extra_links?) %>
+    <%= render_categorized_tag_list(@post, current_query: params[:q]) %>
   </section>
 
   <section id="post-information">
@@ -123,9 +123,11 @@
         <li id="post-option-edit"><%= link_to "Edit", "#edit", id: "side-edit-link" %></li>
         <li id="post-option-add-to-pool"><%= link_to "Add to pool", "#", id: "pool" %></li>
 
-        <li id="post-option-add-note">
-          <%= link_to "Add note", "#", id: "translate", "data-shortcut": "n" %>
-        </li>
+        <% if @post.can_have_notes? %>
+          <li id="post-option-add-note">
+            <%= link_to "Add note", "javascript:void(0)", id: "translate", "data-shortcut": "n" %>
+          </li>
+        <% end %>
 
         <% if @post.has_notes? %>
           <li id="post-option-copy-notes"><%= link_to "Copy notes", "#", id: "copy-notes" %></li>
@@ -224,8 +226,8 @@
       <%= render "post_disapprovals/counts", disapprovals: @post.disapprovals.order(id: :asc), post: @post %>
 
       <% if CurrentUser.user.is_approver? %>
-        <div>
-          <%= render "modqueue/quick_mod", post: @post %>
+        <div class="mt-1">
+          <%= render "modqueue/approval_buttons", post: @post %>
           <%= render "post_disapprovals/detailed_rejection_dialog" %>
         </div>
       <% end %>
@@ -278,23 +280,7 @@
     <% elsif @post.is_video? -%>
       <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_file_url) %>
     <% elsif @post.is_ugoira? -%>
-      <% if params[:size] == "original" || (CurrentUser.user.default_image_size == "original" && params[:size].blank?) %>
-        <%= tag.canvas(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, "data-ugoira-frame-delays": @post.media_metadata.metadata["Ugoira:FrameDelays"].to_json) %>
-
-        <div id="ugoira-controls">
-          <div id="ugoira-control-panel" class="mb-2 flex items-center" style="width: <%= [@post.image_width, 350].max %>px;">
-            <button id="ugoira-play" style="display: none;">Play</button>
-            <button id="ugoira-pause">Pause</button>
-            <div id="seek-slider" class="ml-4" style="width: <%= [@post.image_width, 350].max - 81 %>px;"></div>
-          </div>
-
-          <p><%= link_to "View WebM", current_page_path(size: "webm") %></p>
-        </div>
-      <% else %>
-        <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_large_file_url) %>
-
-        <p><%= link_to "View original", current_page_path(size: "original") %></p>
-      <% end %>
+      <%= render UgoiraComponent.new(@post.media_asset, default_quality: (params.fetch(:size, CurrentUser.user.default_image_size) == "original" ? "original" : "sample"), html: { id: "image" }) %>
     <% elsif @post.is_image? -%>
       <picture>
         <%= tag.source media: "(max-width: 660px)", srcset: @post.tagged_large_file_url %>
@@ -309,11 +295,11 @@
     <div class="fav-buttons-container">
       <%= content_tag(:div, class: "mb-2 fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
         <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
-          <%= button_tag empty_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
+          <%= button_tag empty_heart_icon, class: "text-lg py-1 px-3", "data-disable-with": spinner_icon %>
         <% end %>
 
         <%= form_tag(favorite_path(@post.id), method: "delete", id: "remove-fav-button", "data-remote": true) do %>
-          <%= button_tag solid_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
+          <%= button_tag solid_heart_icon, class: "text-lg py-1 px-3", "data-disable-with": spinner_icon %>
         <% end %>
       <% end %>
     </div>
@@ -322,12 +308,8 @@
   <section id="mark-as-translated-section">
     <%= edit_form_for(@post, url: mark_as_translated_post_path(@post), method: :put) do |f| %>
       <%= f.input :q, as: :hidden, input_html: { id: nil, name: "q", value: params[:q] } %>
-
-      <fieldset class="inline-fieldset">
-        <%= f.input :check_translation, as: :boolean, input_html: { checked: @post.has_tag?("check_translation") } %>
-        <%= f.input :partially_translated, as: :boolean, input_html: { checked: @post.has_tag?("partially_translated") } %>
-      </fieldset>
-
+      <%= f.input :check_translation, as: :boolean, wrapper: "inline-toggle-switch", input_html: { checked: @post.has_tag?("check_translation") } %>
+      <%= f.input :partially_translated, as: :boolean, wrapper: "inline-toggle-switch", input_html: { checked: @post.has_tag?("partially_translated") } %>
       <%= f.submit "Mark as translated" %>
     <% end %>
   </section>

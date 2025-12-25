@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 class ArtistURL < ApplicationRecord
-  normalize :url, :normalize_url
+  normalizes :url, with: ->(url) { ArtistURL.normalize_url(url) }
 
-  validates :url, presence: true, uniqueness: { scope: :artist_id }
+  validates :url, presence: true, length: { maximum: 300, message: "'%{value}' is too long (maximum is 300 characters)" }, uniqueness: { scope: :artist_id }
   validate :validate_url_format
-  validate :validate_url_is_not_duplicate
   belongs_to :artist, :touch => true
 
   scope :active, -> { where(is_active: true) }
@@ -52,7 +51,7 @@ class ArtistURL < ApplicationRecord
       profile_url = Source::URL.profile_url(url) || Source::Extractor.find(url).profile_url || normalize_url(url)
       normalized_url_like(profile_url)
     else
-      where_ilike(:url, "*#{url}*")
+      where_ilike(:url, "*#{url.escape_wildcards}*")
     end
   end
 
@@ -60,6 +59,11 @@ class ArtistURL < ApplicationRecord
     url = url.downcase.gsub(%r{\Ahttps?://|/\z}i, "") # "https://example.com/A/B/C/" => "example.com/a/b/c"
     url = url + "/" unless url.include?("*")
     where_like("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'", url) # this is indexed
+  end
+
+  def self.normalized_url_equals_any(urls)
+    urls = urls.map { |url| url.to_s.downcase.gsub(%r{\Ahttps?://|/\z}i, "") + "/" } # "https://example.com/A/B/C" => "example.com/a/b/c/"
+    where(["regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/' IN (:urls)", { urls: }]) # this is indexed
   end
 
   def domain
@@ -86,6 +90,14 @@ class ArtistURL < ApplicationRecord
       true
     when %r{misskey\.(?:io|art|design)/users}i
       true
+    when %r{inkbunny\.net/user\.php}i
+      true
+    when %r{bsky\.app/profile/did:}i
+      true
+    when %r{lofter\.com/mentionredirect.do}i
+      true
+    when %r{mihuashi\.com/users/}i
+      true
     else
       false
     end
@@ -95,7 +107,7 @@ class ArtistURL < ApplicationRecord
   def priority
     sites = %w[
       Pixiv Twitter
-      Anifty ArtStation Baraag Bilibili BCY Booth Deviant\ Art Fantia Foundation Furaffinity Hentai\ Foundry Lofter Newgrounds Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Reddit Skeb Tinami Tumblr Weibo Misskey.io Misskey.art Misskey.design
+      Anifty ArtStation Baraag Bilibili BCY Booth Deviant\ Art Fantia Foundation Furaffinity Hentai\ Foundry Huashijie Lofter Newgrounds Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Reddit Arca.live DC\ Inside Skeb Tinami Tumblr Weibo Misskey.io Misskey.art Misskey.design Xfolio
       Ask.fm Facebook FC2 Gumroad Instagram Ko-fi Livedoor Mihuashi Mixi.jp Patreon Piapro.jp Picarto Privatter Sakura.ne.jp Stickam Twitch Youtube
       Amazon Circle.ms DLSite Doujinshi.org Erogamescape Mangaupdates Melonbooks Toranoana Wikipedia
     ]
@@ -124,28 +136,20 @@ class ArtistURL < ApplicationRecord
     end
   end
 
-  def validate_scheme(uri)
-    errors.add(:url, "'#{uri}' must begin with http:// or https:// ") unless uri.scheme.in?(%w[http https])
-  end
-
-  def validate_hostname(uri)
-    errors.add(:url, "'#{uri}' has a hostname '#{uri.host}' that does not contain a dot") unless uri.host&.include?(".")
+  # @return [Array<Artist>] The list of other artists that also contain this URL.
+  def duplicate_artists
+    ArtistFinder.find_artists(url).without(artist)
   end
 
   def validate_url_format
     uri = Addressable::URI.parse(url)
-    validate_scheme(uri)
-    validate_hostname(uri)
-  rescue Addressable::URI::InvalidURIError => e
-    errors.add(:url, "'#{uri}' is malformed: #{e}")
-  end
+    Source::URL.parse!(url)
 
-  def validate_url_is_not_duplicate
-    artists = ArtistFinder.find_artists(url).without(artist)
-
-    artists.each do |a|
-      warnings.add(:base, "Duplicate of [[#{a.name}]]")
+    if !uri.host&.include?(".")
+      errors.add(:url, "'#{url}' is not a valid URL")
     end
+  rescue StandardError
+    errors.add(:url, "'#{url}' is not a valid URL")
   end
 
   def self.available_includes

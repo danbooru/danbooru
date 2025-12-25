@@ -442,8 +442,8 @@ class PostQuery
       def quoted_value
         return nil unless metatag?
 
-        if quoted?
-          %Q{"#{value.gsub(/"/, '\\"')}"}
+        if quoted? || value.match?(/[[:space:]]/)
+          %{"#{value.gsub('"', '\\"')}"}
         else
           value
         end

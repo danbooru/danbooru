@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class PostVersion < ApplicationRecord
+  # The maximum number of tags to display in a tag edit. If an edit has more than this many tags, then they will be
+  # collapsed instead of showing the full list on the post versions page.
+  MAX_DISPLAY_TAGS = 300
+
   class RevertError < StandardError; end
   extend Memoist
 

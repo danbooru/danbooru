@@ -1,6 +1,6 @@
 <% page_title "#{@wiki_page.pretty_title.startcase} Wiki" %>
-<% meta_description DText.excerpt(@wiki_page.body) %>
-<% canonical_url wiki_page_url(@wiki_page) %>
+<% meta_description DText.new(@wiki_page.body).excerpt %>
+<% seo_canonical_url wiki_page_path(@wiki_page) %>
 
 <% if @wiki_page.artist.present? && @wiki_page.artist.is_banned? %>
   <% noindex %>
@@ -34,7 +34,7 @@
         <% end %>
       </p>
     <% else %>
-      <%= format_text(@wiki_page.body) %>
+      <%= @wiki_page.dtext_body.format_text %>
     <% end %>
 
     <% if @wiki_page.artist.present? && !@wiki_page.artist.is_deleted? %>
@@ -46,6 +46,8 @@
     <% if @wiki_page.tag&.is_deprecated? %>
       <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</p>
     <% end %>
+
+    <%= render_tag_change_notice(tag: @wiki_page.tag, current_user: CurrentUser.user) %>
   </div>
 
   <%= render "wiki_pages/posts", wiki_page: @wiki_page %>

@@ -5,7 +5,7 @@ class Comment < ApplicationRecord
 
   belongs_to :post
   belongs_to :creator, class_name: "User"
-  belongs_to_updater
+  belongs_to :updater, class_name: "User", default: -> { creator }
 
   has_many :moderation_reports, as: :model, dependent: :destroy
   has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
@@ -15,23 +15,27 @@ class Comment < ApplicationRecord
   has_many :mod_actions, as: :subject, dependent: :destroy
 
   validates :body, visible_string: true, length: { maximum: 15_000 }, if: :body_changed?
+  validate :validate_body, if: :body_changed?
 
   before_create :autoreport_spam
   before_save :handle_reports_on_deletion
   after_create :update_last_commented_at_on_create
-  after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |comment|
+  after_update(if: ->(comment) { (!comment.is_deleted? || !comment.saved_change_to_is_deleted?) && comment.updater != comment.creator }) do |comment|
     ModAction.log("updated #{comment.dtext_shortlink}", :comment_update, subject: self, user: comment.updater)
   end
+
   after_save :update_last_commented_at_on_destroy, :if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted?}
-  after_save(:if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |comment|
+  after_save(if: ->(comment) { comment.is_deleted? && comment.saved_change_to_is_deleted? && comment.updater != comment.creator }) do |comment|
     ModAction.log("deleted #{comment.dtext_shortlink}", :comment_delete, subject: self, user: comment.updater)
   end
 
   deletable
+  dtext_attribute :body, media_embeds: { max_embeds: 1, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte } # defines :dtext_body
+
   mentionable(
     message_field: :body,
     title: ->(_user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},
-    body: ->(user_name) {"@#{creator.name} mentioned you in comment ##{id} on post ##{post_id}:\n\n[quote]\n#{DText.extract_mention(body, "@#{user_name}")}\n[/quote]\n"}
+    body: ->(user_name) {"@#{creator.name} mentioned you in comment ##{id} on post ##{post_id}:\n\n[quote]\n#{DText.new(body).extract_mention("@#{user_name}")}\n[/quote]\n"}
   )
 
   module SearchMethods
@@ -71,6 +75,16 @@ class Comment < ApplicationRecord
 
   extend SearchMethods
 
+  def validate_body
+    if (embedded_post = dtext_body.embedded_posts.find { |embedded_post| embedded_post.rating_id > post.rating_id })
+      errors.add(:body, "can't include a #{embedded_post.pretty_rating.downcase} image on a #{post.pretty_rating.downcase} post")
+    end
+
+    if (embedded_asset = dtext_body.embedded_media_assets.find { |embedded_asset| embedded_asset.ai_rating_id > post.rating_id && embedded_asset.is_ai_nsfw? })
+      errors.add(:body, "can't include a #{embedded_asset.pretty_ai_rating.downcase} image on a #{post.pretty_rating.downcase} post")
+    end
+  end
+
   def autoreport_spam
     if SpamDetector.new(self, user_ip: creator_ip_addr).spam?
       moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
@@ -108,7 +122,7 @@ class Comment < ApplicationRecord
   end
 
   def quoted_response
-    DText.quote(body, creator.name)
+    DText.new(body).quote(creator.name)
   end
 
   def self.available_includes

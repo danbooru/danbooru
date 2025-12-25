@@ -7,7 +7,9 @@
 module Danbooru
   class Http
     class UnpolishCloudflare < HTTP::Feature
-      HTTP::Options.register_feature :unpolish_cloudflare, self
+      def self.register
+        HTTP::Options.register_feature :unpolish_cloudflare, self
+      end
 
       def perform(request, &block)
         response = yield request

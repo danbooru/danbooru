@@ -13,13 +13,8 @@
   <%= f.input :old_source, as: :hidden, input_html: { value: post.source } %>
   <%= f.input :old_rating, as: :hidden, input_html: { value: post.rating } %>
 
-  <%= f.input :rating, label: "Rating #{link_to_wiki help_icon, "howto:rate", classes: "inactive-link", target: "_blank"}".html_safe, wrapper_html: { class: "radio-button-group text-xs" }, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, boolean_style: :inline %>
-
-  <fieldset class="inline-fieldset post_has_embedded_notes_fieldset">
-    <label>Notes</label>
-    <%= f.input :has_embedded_notes, label: "Embed notes", as: :boolean, boolean_style: :inline %>
-  </fieldset>
-
+  <%= f.input :rating, label: "Rating #{link_to_wiki help_icon, "howto:rate", classes: "inactive-link", target: "_blank"}".html_safe, wrapper_html: { class: "radio-button-group thin-x-scrollbar text-xs" }, collection: Post::RATINGS.invert.reverse_each.to_h, as: :radio_buttons, boolean_style: :inline %>
+  <%= f.input :has_embedded_notes, label: "Embed notes", as: :boolean, wrapper: "inline-toggle-switch" %>
   <%= f.input :parent_id, label: "Parent", as: :string %>
   <%= f.input :source %>
 
@@ -35,11 +30,11 @@
       </span>
     </div>
 
-    <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
+    <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { class: "text-sm", "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
   </div>
 
   <div class="input">
-    <%= f.submit "Submit", class: "button-primary button-sm" %>
+    <%= f.submit "Submit", class: "button-primary" %>
   </div>
 
   <%= render "related_tags/container", media_asset: post.media_asset %>

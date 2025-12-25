@@ -24,21 +24,21 @@ class TagSetPresenter
   end
 
   def humanized_essential_tag_string
-    chartags = tags_for_category("character")
+    chartags = tags_for_category("character").uniq(&:unqualified_name)
     characters = chartags.max_by(5, &:post_count).map(&:unqualified_name)
     characters += ["#{chartags.size - 5} more"] if chartags.size > 5
     characters = characters.to_sentence
 
-    copytags = tags_for_category("copyright")
+    copytags = tags_for_category("copyright").uniq(&:unqualified_name)
     copyrights = copytags.max_by(1, &:post_count).map(&:unqualified_name)
     copyrights += ["#{copytags.size - 1} more"] if copytags.size > 1
     copyrights = copyrights.to_sentence
     copyrights = "(#{copyrights})" if characters.present? && copyrights.present?
 
-    artists = tags_for_category("artist").map(&:name).grep_v("banned_artist").to_sentence
+    artists = tags_for_category("artist").map(&:name).to_sentence
     artists = "drawn by #{artists}" if artists.present?
 
-    "#{characters} #{copyrights} #{artists}".strip
+    "#{characters} #{copyrights} #{artists}".gsub(/\s+/, " ").strip
   end
 
   private

@@ -3,12 +3,14 @@
 module Danbooru
   class Http
     class Session < HTTP::Feature
-      HTTP::Options.register_feature :session, self
-
       attr_reader :cookie_jar
 
       def initialize(cookie_jar: HTTP::CookieJar.new)
         @cookie_jar = cookie_jar
+      end
+
+      def self.register
+        HTTP::Options.register_feature :session, self
       end
 
       def perform(request)

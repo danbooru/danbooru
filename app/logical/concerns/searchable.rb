@@ -19,6 +19,7 @@ module Searchable
     q = q.select(q.select_values + relation.select_values) if !relation.select_values.empty?
     q = q.from(relation.from_clause.value) if !relation.from_clause.empty?
     q = q.joins(relation.joins_values + q.joins_values) if relation.joins_values.present?
+    q = q.left_outer_joins(relation.left_outer_joins_values + q.left_outer_joins_values) if relation.left_outer_joins_values.present?
     q = q.where(relation.where_clause.ast) if relation.where_clause.present?
     q = q.group(relation.group_values) if relation.group_values.present?
     q = q.order(relation.order_values) if relation.order_values.present? && !relation.reordering_value
@@ -57,33 +58,38 @@ module Searchable
   end
 
   def where_like(attr, value)
-    where_operator(attr, :matches, value.to_escaped_for_sql_like, nil, true)
+    value = value.escape_wildcards if value.exclude?("*")
+    where_operator(attr, :matches, sql_value(value.to_escaped_for_sql_like), nil, true)
   end
 
   def where_not_like(attr, value)
-    where_operator(attr, :does_not_match, value.to_escaped_for_sql_like, nil, true)
+    value = value.escape_wildcards if value.exclude?("*")
+    where_operator(attr, :does_not_match, sql_value(value.to_escaped_for_sql_like), nil, true)
   end
 
   def where_ilike(attr, value)
-    where_operator(attr, :matches, value.to_escaped_for_sql_like, nil, false)
+    value = value.escape_wildcards if value.exclude?("*")
+    where_operator(attr, :matches, sql_value(value.to_escaped_for_sql_like), nil, false)
   end
 
   def where_not_ilike(attr, value)
-    where_operator(attr, :does_not_match, value.to_escaped_for_sql_like, nil, false)
+    value = value.escape_wildcards if value.exclude?("*")
+    where_operator(attr, :does_not_match, sql_value(value.to_escaped_for_sql_like), nil, false)
   end
 
   def where_iequals(attr, value)
-    where_ilike(attr, value.escape_wildcards)
+    value = value.escape_wildcards
+    where_operator(attr, :matches, sql_value(value.to_escaped_for_sql_like), nil, false)
   end
 
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-REGEXP
   # "(?e)" means force use of ERE syntax; see sections 9.7.3.1 and 9.7.3.4.
   def where_regex(attr, value, flags: "e")
-    where_operator(attr, :matches_regexp, "(?#{flags})" + value)
+    where_operator(attr, :matches_regexp, sql_value("(?#{flags})" + value))
   end
 
   def where_not_regex(attr, value, flags: "e")
-    where_operator(attr, :does_not_match_regexp, "(?#{flags})" + value)
+    where_operator(attr, :does_not_match_regexp, sql_value("(?#{flags})" + value))
   end
 
   def where_inet_matches(attr, value)
@@ -158,12 +164,17 @@ module Searchable
     where_numeric_matches(qualified_column, value)
   end
 
-  # where_union(A, B, C) is like `WHERE A OR B OR C`, except it may be faster if the conditions are disjoint.
-  # where_union(A, B) does `SELECT * FROM table WHERE id IN (SELECT id FROM table WHERE A UNION ALL SELECT id FROM table WHERE B)`
-  def where_union(*relations, primary_key: :id, foreign_key: :id)
+  # where_union_all(A, B, C) is like `WHERE A OR B OR C`, except it may be faster if the conditions are disjoint.
+  # where_union_all(A, B) does `SELECT * FROM table WHERE id IN (SELECT id FROM table WHERE A UNION ALL SELECT id FROM table WHERE B)`
+  def where_union_all(*, **)
+    where_union(*, **, union_type: Arel::Nodes::UnionAll)
+  end
+
+  # where_union removes duplicate rows, where_union_all does not.
+  def where_union(*relations, primary_key: :id, foreign_key: :id, union_type: Arel::Nodes::Union)
     arels = relations.map { |relation| relation.select(foreign_key).arel }
     union = arels.reduce do |left, right|
-      Arel::Nodes::UnionAll.new(left, right)
+      union_type.new(left, right)
     end
 
     where(arel_table[primary_key].in(union))
@@ -538,12 +549,12 @@ module Searchable
       relation = self.relation
 
       if params[name].present?
-        value = params[name].split(/[, ]+/).map(&:downcase)
+        value = params[name].split(/[, ]+/)
         relation = visible(relation, name).where(name => value)
       end
 
       if params[:"#{name}_not"].present?
-        value = params[:"#{name}_not"].split(/[, ]+/).map(&:downcase)
+        value = params[:"#{name}_not"].split(/[, ]+/)
         relation = visible(relation, name).where.not(name => value)
       end
 
@@ -653,7 +664,7 @@ module Searchable
           through_association = association.through_reflection
 
           source_subquery = source_association.klass.visible(current_user).search(params[attr], current_user).reorder(nil)
-          through_subquery = through_association.klass.visible(current_user).where(attr => source_subquery)
+          through_subquery = through_association.klass.visible(current_user).where(source_association.name => source_subquery)
           relation = visible(relation, attr).where(through_association.name => through_subquery)
         else
           relation = visible(relation, attr).where(attr => model.visible(current_user).search(params[attr], current_user).reorder(nil))

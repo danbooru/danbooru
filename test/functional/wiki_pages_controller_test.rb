@@ -10,10 +10,11 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         as(@user) do
+          @post = create(:post)
           @tagme = create(:wiki_page, title: "tagme")
           @deleted = create(:wiki_page, title: "deleted", is_deleted: true)
           @vocaloid = create(:wiki_page, title: "vocaloid")
-          @miku = create(:wiki_page, title: "hatsune_miku", other_names: ["初音ミク"], body: "miku is a [[vocaloid]]")
+          @miku = create(:wiki_page, title: "hatsune_miku", other_names: ["初音ミク"], body: "miku is a [[vocaloid]]\n* !post ##{@post.id}")
           @picasso = create(:wiki_page, title: "picasso")
           create(:artist, name: "picasso", is_banned: true)
           create(:character_tag, name: "hatsune_miku")
@@ -56,6 +57,9 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(other_names_match: "初*").with { @miku }
       should respond_to_search(other_names_present: "true").with { @miku }
       should respond_to_search(other_names_present: "false").with { [@picasso, @vocaloid, @deleted, @tagme] }
+
+      should respond_to_search(has_embedded_media: "true").with { [@miku] }
+      should respond_to_search(has_embedded_media: "false").with { [@picasso, @vocaloid, @deleted, @tagme] }
 
       context "using includes" do
         should respond_to_search(has_tag: "true").with { @miku }

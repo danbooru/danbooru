@@ -29,6 +29,15 @@ class ModActionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(0, response.parsed_body.count)
       end
 
+      should "hide email address update actions from non-moderators" do
+        create(:mod_action, category: "email_address_update")
+
+        get mod_actions_path, as: :json
+
+        assert_response :success
+        assert_equal(0, response.parsed_body.count)
+      end
+
       context "searching" do
         setup do
           @mod_action = create(:mod_action, description: "blah")

@@ -2,12 +2,6 @@ module PostArchiveTestHelper
   def mock_post_version_service!
     setup do
       PostVersion.stubs(:sqs_service).returns(MockPostSqsService.new)
-      PostVersion.establish_connection(PostVersion.database_url)
-      PostVersion.connection.begin_transaction joinable: false
-    end
-
-    teardown do
-      PostVersion.connection.rollback_transaction
     end
   end
 

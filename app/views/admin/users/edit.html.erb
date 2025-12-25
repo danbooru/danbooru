@@ -2,12 +2,129 @@
 <%= render "users/secondary_links" %>
 
 <div id="c-admin-users">
-  <div id="a-edit">
-    <h1>Edit User: <%= @user.name %></h1>
+  <div id="a-edit" class="max-w-720px">
+    <h1 class="mb-4">Edit User: <%= link_to_user @user %></h1>
 
-    <%= edit_form_for(@user, url: admin_user_path(@user)) do |f| %>
-      <%= f.input :level, collection: User.level_hash.to_a, selected: @user.level %>
-      <%= f.submit "Update" %>
+    <div class="space-y-2">
+      <% if policy(@user).promote? %>
+        <div class="card-outlined p-2 flex items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="font-bold">Promote user</div>
+            <div class="fineprint max-w-360px">Promote a user to a higher level.</div>
+          </div>
+
+          <%= link_to "Promote", promote_user_path(@user), class: "button-primary h-fit" %>
+        </div>
+
+        <% if @user.level > User::Levels::MEMBER %>
+          <div class="card-outlined p-2 flex items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="font-bold">Demote user</div>
+              <div class="fineprint max-w-360px">Demote a user to a lower level.</div>
+            </div>
+
+            <%= link_to "Demote", demote_user_path(@user), class: "button-primary h-fit" %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% if policy(UserNameChangeRequest.new(user: @user)).can_rename_user? %>
+        <div class="card-outlined p-2 flex items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="font-bold">Change username</div>
+            <div class="fineprint max-w-360px">Change the user's name.</div>
+          </div>
+
+          <%= link_to "Rename", change_name_user_path(@user), class: "button-primary h-fit" %>
+        </div>
+      <% end %>
+
+      <% if policy(Ban.new(user: @user)).create? %>
+        <% if @user.is_banned? %>
+          <div class="card-outlined p-2 flex items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex sm:flex-col md:items-center gap-2 leading-none">
+                <span class="font-bold">Unban user</span>
+
+                <% if @user.active_ban.forever? %>
+                  <span class="chip-red w-fit text-error text-xs">Permabanned</span>
+                <% else %>
+                  <span class="chip-red w-fit text-error text-xs">Expires: <%= time_ago_in_words_tagged(@user.active_ban.expires_at, compact: true) %></span>
+                <% end %>
+              </div>
+              <div class="fineprint max-w-360px">Change the ban length or unban their account.</div>
+            </div>
+
+            <%= link_to "Edit Ban", edit_ban_path(@user.active_ban), class: "button-primary h-fit" %>
+          </div>
+        <% else %>
+          <div class="card-outlined p-2 flex items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="font-bold">Ban user</div>
+              <div class="fineprint max-w-360px">Ban the user's account.</div>
+            </div>
+
+            <%= link_to "Ban", new_ban_path(ban: { user_id: @user.id }), class: "button-danger h-fit", disabled: @user.is_banned? %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% if policy(@user).deactivate? %>
+        <div class="card-outlined p-2 flex items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="font-bold">Deactivate account</div>
+            <div class="fineprint max-w-360px">Permanently deactivate the user's account (requires confirmation).</div>
+          </div>
+
+          <%= link_to "Deactivate", deactivate_user_path(@user), class: "button-outline-danger h-fit", disabled: @user.is_deleted? %>
+        </div>
+      <% end %>
+    </div>
+
+    <% if policy(@user).can_recover_account? %>
+      <h2 class="my-4">Account recovery</h2>
+
+      <p>These options can be used to recover a user's account in case they lose access to it. They should only be used if
+      the user can't recover their account on their own.</p>
+
+      <p>Don't do this unless you've verified the user's identity. Check their <%= link_to "login history", user_user_events_path(@user) %>
+      to make sure they haven't been hacked and that it's not someone else trying to steal their account.</p>
+
+      <div class="space-y-2">
+        <div class="card-outlined p-2 flex items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="font-bold">Change email address</div>
+            <div class="fineprint max-w-360px">
+              If the user forgot their password and can't access their email, you can change their email so they can reset
+              their password.
+            </div>
+          </div>
+
+          <%= link_to "Change email", edit_user_email_path(@user), class: "button-primary h-fit", disabled: !policy(EmailAddress.new(user: @user)).update? %>
+        </div>
+
+        <div class="card-outlined p-2 flex items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex sm:flex-col md:items-center gap-2 leading-none">
+              <span class="font-bold">Recover 2FA</span>
+              <% if @user.backup_codes.blank? %>
+                <span class="chip-red w-fit text-error text-xs">2FA Disabled</span>
+              <% elsif @user.email_address.blank? %>
+                <span class="chip-red w-fit text-error text-xs">No email</span>
+              <% else %>
+                <span class="chip-green w-fit text-success text-xs">Enabled</span>
+              <% end %>
+            </div>
+
+            <div class="fineprint max-w-360px">
+              If the user can't login with 2FA, you can send a backup code to their email so they can recover their
+              account.
+            </div>
+          </div>
+
+          <%= link_to "Send backup code", confirm_recover_user_backup_codes_path(user_id: @user.id), class: "button-primary h-fit", disabled: @user.backup_codes.blank? || @user.email_address.blank? %>
+        </div>
+      </div>
     <% end %>
   </div>
 </div>

@@ -10,3 +10,4 @@ Mime::Type.register "image/avif", :avif
 
 Mime::Type.register "application/x-shockwave-flash", :swf
 Mime::Type.register "application/vnd.microsoft.portable-executable", :exe
+Mime::Type.register "video/x-ugoira", :ugoira

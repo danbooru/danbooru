@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -eux
+
+bundle install
+bin/rake build
+gem install pkg/*.gem

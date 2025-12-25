@@ -1,227 +1,263 @@
-import Utility from './utility'
-import Cookie from './cookie'
+import { splitWords } from './utility';
+import Cookie from './cookie';
 
-let Blacklist = {};
+// A blacklist represents a set of blacklist rules that match against a set of posts.
+class Blacklist {
+  // @param {HTMLElement} root - The root DOM element that contains the blacklist controls.
+  constructor(root) {
+    this.root = root;
+    this.rules = [];
+    this.posts = [];
+  }
 
-Blacklist.entries = [];
+  // @param {Array<String>} rules - The list of blacklist rules.
+  initialize(rules) {
+    // Attach the blacklist instance to the root DOM element for access with `$("#blacklist-box").get(0).blacklist`
+    this.root.blacklist = this;
 
-Blacklist.parse_entry = function(string) {
-  var entry = {
-    "tags": string,
-    "require": [],
-    "exclude": [],
-    "optional": [],
-    "disabled": false,
-    "hits": 0,
-    "min_score": null
-  };
+    this.rules = rules.map(rule => new Rule(this, rule));
+    this.posts = $(".post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview").toArray().map(post => new Post(post, this));
+    this.apply();
+    this.cleanupStorage();
 
-  let tags = Utility.splitWords(string);
-  tags.forEach(function(tag) {
-    if (tag.charAt(0) === '-') {
-      entry.exclude.push(tag.slice(1));
-    } else if (tag.charAt(0) === '~') {
-      entry.optional.push(tag.slice(1));
-    } else if (tag.match(/^score:<.+/)) {
-      var score = tag.match(/^score:<(.+)/)[1];
-      entry.min_score = parseInt(score);
+    this.showAll = JSON.parse(localStorage.getItem(`blacklist.showAll`)) ?? false;
+    this.autocollapse = JSON.parse(localStorage.getItem(`blacklist.autocollapse`)) ?? true;
+    this.collapsed = JSON.parse(localStorage.getItem(`blacklist.collapsed`)) ?? this.enabled; // This comes last because it depends on blacklists being applied first.
+  }
+
+  // Apply all blacklist rules to all posts.
+  apply() {
+    this.posts.forEach(post => post.applyRules());
+  }
+
+  get enabled() {
+    return this.visibleRules.every(rule => rule.enabled);
+  }
+
+  set enabled(value) {
+    if (this.autocollapse) {
+      this.collapsed = value;
+    }
+
+    this.visibleRules.forEach(rule => rule.enabled = Boolean(value));
+    this.posts.forEach(post => post.update());
+  }
+
+  // @returns {Boolean} - True if some but not all rules are enabled.
+  get partiallyEnabled() {
+    return this.visibleRules.some(rule => rule.enabled) && !this.visibleRules.every(rule => rule.enabled);
+  }
+
+  get showAll() {
+    return this._showAll;
+  }
+
+  set showAll(value) {
+    this._showAll = Boolean(value);
+    localStorage.setItem(`blacklist.showAll`, JSON.stringify(value));
+  }
+
+  get blurImages() {
+    return this.rules.some(rule => rule.hideMethod === "blur");
+  }
+
+  set blurImages(value) {
+    this.rules.forEach(rule => rule.hideMethod = Boolean(value) ? "blur" : "hide");
+  }
+
+  get collapsed() {
+    return this._collapsed;
+  }
+
+  set collapsed(value) {
+    this._collapsed = Boolean(value);
+    localStorage.setItem(`blacklist.collapsed`, JSON.stringify(value));
+  }
+
+  get autocollapse() {
+    return this._autocollapse;
+  }
+
+  set autocollapse(value) {
+    this._autocollapse = Boolean(value);
+    localStorage.setItem(`blacklist.autocollapse`, JSON.stringify(value));
+  }
+
+  // @returns {Boolean} - True if the blacklist box should be visible, i.e. if there are any visible rules.
+  get visible() {
+    return this.visibleRules.length > 0;
+  }
+
+  // @returns {Array<Rule>} - The set of rules that are currently visible (all rules if showAll is enabled, or only rules matching a post if not).
+  get visibleRules() {
+    return this.rules.filter(rule => rule.visible);
+  }
+
+  // @returns {Array<Post>} - The set of posts that are currently blacklisted by at least one rule.
+  get blacklistedPosts() {
+    return this.posts.filter(post => post.blacklisted);
+  }
+
+  // Remove from storage any rules that have been removed from the blacklist.
+  cleanupStorage() {
+    Cookie.remove("dab");
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith("blacklist.enabled:") && !this.rules.some(rule => key === `blacklist.enabled:${rule.string}`)) {
+        localStorage.removeItem(key);
+      }
+    });
+  }
+}
+
+// A post holds the set of blacklist rules that match the post. The post is blacklisted if any of the matching rules are enabled.
+class Post {
+  // @param {HTMLElement} post - The DOM element representing the post.
+  // @param {Blacklist} blacklist - The blacklist that this post belongs to.
+  constructor(post, blacklist) {
+    this.post = post;
+    this.blacklist = blacklist;
+    this.rules = new Set();
+
+    this.post.classList.add("blacklist-initialized");
+    this.post.post = Alpine.reactive(this); // Attach the post object to the DOM element for access with `$("#post_123").get(0).post`
+  }
+
+  // Re-apply all blacklist rules on the post when a rule or the post changes.
+  applyRules() {
+    this.score = parseInt(this.post.getAttribute("data-score"));
+    this.tags = new Set([
+      ...splitWords(this.post.getAttribute("data-tags")),
+      ...splitWords(this.post.getAttribute("data-flags")).map(s => `status:${s}`),
+      `rating:${this.post.getAttribute("data-rating")}`,
+      `uploaderid:${this.post.getAttribute("data-uploader-id")}`,
+    ]);
+
+    this.blacklist.rules.forEach(rule => rule.apply(this));
+  }
+
+  // @returns {Boolean} - True if the post is blacklisted, i.e. at least one rule matches the post and is enabled.
+  get blacklisted() {
+    return [...this.rules].some(rule => rule.enabled);
+  }
+
+  // Update the post when a blacklist rule is matched or toggled.
+  update() {
+    if (this.blacklisted) {
+      this.hide();
     } else {
-      entry.require.push(tag);
+      this.show();
     }
-  });
-  return entry;
+  }
+
+  get blacklistClass() {
+    return Array.from(this.rules).some(rule => rule.hideMethod === "hide") ? "blacklisted-hidden" : "blacklisted-blurred";
+  }
+
+  // Hide the post when it's blacklisted.
+  hide() {
+    this.post.classList.remove("blacklisted-hidden", "blacklisted-blurred");
+    this.post.classList.add("blacklist-initialized", "blacklisted-active", this.blacklistClass);
+
+    let video = this.post.querySelector("video#image");
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
+    }
+  }
+
+  // Unhide the post when it's not blacklisted.
+  show() {
+    this.post.classList.remove("blacklisted-active", "blacklisted-hidden", "blacklisted-blurred");
+    this.post.classList.add("blacklist-initialized");
+
+    let video = this.post.querySelector("video#image");
+    if (video) {
+      video.play();
+    }
+  }
 }
 
-Blacklist.parse_entries = function() {
-  var entries = (Utility.meta("blacklisted-tags") || "nozomiisthebestlovelive").replace(/(rating:\w)\w+/ig, "$1").toLowerCase().split(/,/);
-  entries = entries.filter(e => e.trim() !== "");
+// A rule represents a single line in a user's blacklist. It contains the set of posts that match the rule, and the tags
+// that the rule requires, excludes, or optionally matches.
+class Rule {
+  // @param {Blacklist} blacklist - The blacklist that this rule belongs to.
+  // @param {String} string - The rule string.
+  constructor(blacklist, string) {
+    this.blacklist = blacklist;
+    this.string = string;
+    this.tags = splitWords(string);
+    this.require = [];
+    this.exclude = [];
+    this.optional = [];
+    this.posts = new Set();
+    this.min_score = null;
 
-  entries.forEach(function(tags) {
-    var entry = Blacklist.parse_entry(tags);
-    Blacklist.entries.push(entry);
-  });
-}
+    this.tags.forEach(tag => {
+      if (tag.charAt(0) === '-') {
+        this.exclude.push(tag.slice(1));
+      } else if (tag.charAt(0) === '~') {
+        this.optional.push(tag.slice(1));
+      } else if (tag.match(/^score:<.+/)) {
+        var score = tag.match(/^score:<(.+)/)[1];
+        this.min_score = parseInt(score);
+      } else {
+        this.require.push(tag);
+      }
+    });
+  }
 
-Blacklist.toggle_entry = function(e) {
-  var $link = $(e.target);
-  var tags = $link.text();
-  var match = $.grep(Blacklist.entries, function(entry, i) {
-    return entry.tags === tags;
-  })[0];
-  if (match) {
-    match.disabled = !match.disabled;
-    if (match.disabled) {
-      $link.addClass("blacklisted-inactive");
+  // A rule is visible if all rules are visible or if it matches at least one post, regardless of whether the rule is enabled or not.
+  get visible() {
+    return this.blacklist.showAll || this.posts.size > 0;
+  }
+
+  get enabled() {
+    return JSON.parse(localStorage.getItem(`blacklist.enabled:${this.string}`)) ?? true;
+  }
+
+  set enabled(value) {
+    localStorage.setItem(`blacklist.enabled:${this.string}`, JSON.stringify(value));
+    this.posts.forEach(post => post.update());
+  }
+
+  get hideMethod() {
+    return JSON.parse(localStorage.getItem(`blacklist.hideMethod:${this.string}`)) ?? "hide";
+  }
+
+  set hideMethod(value) {
+    localStorage.setItem(`blacklist.hideMethod:${this.string}`, JSON.stringify(value));
+    this.posts.forEach(post => post.update());
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+  }
+
+  // @param {Post} post - The post to check against this rule.
+  // @returns {Boolean} - True if the rule matches the post.
+  match(post) {
+    let score_test = this.min_score === null || post.score < this.min_score;
+
+    return (this.require.every(tag => post.tags.has(tag)) && score_test)
+      && (this.optional.length === 0 || this.optional.some(tag => post.tags.has(tag)))
+      && !this.exclude.some(tag => post.tags.has(tag));
+  }
+
+  // Apply this rule to a single post.
+  apply(post) {
+    if (this.match(post)) {
+      this.posts.add(post);
+      post.rules.add(this);
     } else {
-      $link.removeClass("blacklisted-inactive");
-    }
-  }
-  Blacklist.apply();
-  e.preventDefault();
-}
-
-Blacklist.update_sidebar = function() {
-  Blacklist.entries.forEach(function(entry) {
-    if (entry.hits.length === 0) {
-      return;
+      this.posts.delete(post);
+      post.rules.delete(this);
     }
 
-    var item = $("<li/>");
-    var link = $("<a/>");
-    var count = $("<span/>");
-
-    link.text(entry.tags);
-    link.attr("href", `/posts?tags=${encodeURIComponent(entry.tags)}`);
-    link.attr("title", entry.tags);
-    link.on("click.danbooru", Blacklist.toggle_entry);
-    let unique_hits = new Set(entry.hits).size;
-    count.html(unique_hits);
-    count.addClass("count");
-    item.append(link);
-    item.append(" ");
-    item.append(count);
-
-    $("#blacklist-list").append(item);
-  });
-
-  $("#blacklist-box").show();
-}
-
-Blacklist.disable_all = function() {
-  Blacklist.entries.forEach(function(entry) {
-    entry.disabled = true;
-  });
-  // There is no need to process the blacklist when disabling
-  Blacklist.posts().removeClass("blacklisted-active");
-  $("#disable-all-blacklists").hide();
-  $("#re-enable-all-blacklists").show();
-  $("#blacklist-list a").addClass("blacklisted-inactive");
-}
-
-Blacklist.enable_all = function() {
-  Blacklist.entries.forEach(function(entry) {
-    entry.disabled = false;
-  });
-  Blacklist.apply();
-  $("#disable-all-blacklists").show();
-  $("#re-enable-all-blacklists").hide();
-  $("#blacklist-list a").removeClass("blacklisted-inactive");
-}
-
-Blacklist.initialize_disable_all_blacklists = function() {
-  if (Cookie.get("dab") === "1") {
-    Blacklist.disable_all();
-  } else {
-    // The blacklist has already been processed by this point
-    $("#disable-all-blacklists").show()
-  }
-
-  $("#disable-all-blacklists").on("click.danbooru", function(e) {
-    Cookie.put("dab", "1");
-    Blacklist.disable_all();
-    e.preventDefault();
-  });
-
-  $("#re-enable-all-blacklists").on("click.danbooru", function(e) {
-    Cookie.put("dab", "0");
-    Blacklist.enable_all();
-    e.preventDefault();
-  });
-}
-
-Blacklist.apply = function() {
-  Blacklist.entries.forEach(function(entry) {
-    entry.hits = [];
-  });
-
-  var count = 0
-
-  Blacklist.posts().each(function(i, post) {
-    count += Blacklist.apply_post(post);
-  });
-
-  return count;
-}
-
-Blacklist.apply_post = function(post) {
-  var post_count = 0;
-  Blacklist.entries.forEach(function(entry) {
-    if (Blacklist.post_match(post, entry)) {
-      let post_id = $(post).data('id');
-      entry.hits.push(post_id);
-      post_count += 1;
-    }
-  });
-  if (post_count > 0) {
-    Blacklist.post_hide(post);
-  } else {
-    Blacklist.post_unhide(post);
-  }
-  return post_count;
-};
-
-Blacklist.posts = function() {
-  return $(".post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview");
-}
-
-Blacklist.post_match = function(post, entry) {
-  if (entry.disabled) {
-    return false;
-  }
-
-  var $post = $(post);
-  var score = parseInt($post.attr("data-score"));
-  var score_test = entry.min_score === null || score < entry.min_score;
-
-  var tags = Utility.splitWords($post.attr("data-tags"));
-  tags.push(...Utility.splitWords($post.attr("data-pools")));
-  tags.push("rating:" + $post.data("rating"));
-  tags.push("uploaderid:" + $post.attr("data-uploader-id"));
-  Utility.splitWords($post.data("flags")).forEach(function(v) {
-    tags.push("status:" + v);
-  });
-
-  return (Utility.is_subset(tags, entry.require) && score_test)
-    && (!entry.optional.length || Utility.intersect(tags, entry.optional).length)
-    && !Utility.intersect(tags, entry.exclude).length;
-}
-
-Blacklist.post_hide = function(post) {
-  var $post = $(post);
-  $post.addClass("blacklisted blacklisted-active");
-
-  var $video = $post.find("video").get(0);
-  if ($video) {
-    $video.pause();
-    $video.currentTime = 0;
+    post.update();
   }
 }
 
-Blacklist.post_unhide = function(post) {
-  var $post = $(post);
-  $post.addClass("blacklisted").removeClass("blacklisted-active");
+Blacklist.Post = Post;
+Blacklist.Rule = Rule;
 
-  var $video = $post.find("video").get(0);
-  if ($video) {
-    $video.play();
-  }
-}
-
-Blacklist.initialize_all = function() {
-  Blacklist.parse_entries();
-
-  if (Blacklist.apply() > 0) {
-    Blacklist.update_sidebar();
-    Blacklist.initialize_disable_all_blacklists();
-  }
-}
-
-$(document).ready(function() {
-  if ($("#blacklist-box").length === 0) {
-    return;
-  }
-
-  Blacklist.initialize_all();
-});
-
-export default Blacklist
+export default Blacklist;

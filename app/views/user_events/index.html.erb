@@ -1,66 +1,11 @@
+<%= render "users/secondary_links" %>
+
 <div id="c-user-events">
   <div id="a-index">
-    <%= search_form_for(user_events_path) do |f| %>
-      <%= f.input :user_name, label: "User", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
-      <%= f.simple_fields_for :user_session do |f1| %>
-        <%= f1.input :ip_addr, label: "IP Address", input_html: { value: params.dig(:search, :user_session, :ip_addr) } %>
-        <%= f1.input :session_id, label: "Session", input_html: { value: params.dig(:search, :user_session, :session_id) } %>
-        <%= f1.simple_fields_for :ip_geolocation do |f2| %>
-          <%= f2.input :country, as: :string, input_html: { value: params.dig(:search, :user_session, :ip_geolocation, :country) } %>
-          <%= f2.input :city, input_html: { value: params.dig(:search, :user_session, :ip_geolocation, :city) } %>
-          <%= f2.input :is_proxy, label: "Proxy?", as: :select, include_blank: true, selected: params.dig(:search, :user_session, :ip_geolocation, :is_proxy) %>
-        <% end %>
-      <% end %>
-      <%= f.input :category, collection: UserEvent.categories.transform_keys(&:humanize), include_blank: true, selected: params[:search][:category] %>
-      <%= f.submit "Search" %>
+    <% if @mode == "list" %>
+      <%= render "user_events/list" %>
+    <% else %>
+      <%= render "user_events/table" %>
     <% end %>
-
-    <%= table_for @user_events, class: "striped autofit" do |t| %>
-      <% t.column "User" do |user_event| %>
-        <%= link_to_user user_event.user %>
-        <%= link_to "»", user_events_path(search: { user_name: user_event.user.name }) %>
-      <% end %>
-
-      <% t.column :category do |user_event| %>
-        <%= link_to user_event.category.humanize, user_events_path(search: { category: UserEvent.categories[user_event.category] }) %>
-      <% end %>
-
-      <% t.column "Session" do |user_event| %>
-        <%= link_to user_event.session_id, user_events_path(search: { user_session: { session_id: user_event.session_id }}) %>
-      <% end %>
-
-      <% t.column "IP Address" do |user_event| %>
-        <%= link_to user_event.ip_addr, user_events_path(search: { user_session: { ip_addr: user_event.ip_addr }}) %>
-        <%= link_to "»", ip_geolocations_path(search: { ip_addr: user_event.ip_addr }) %>
-      <% end %>
-
-      <% t.column "Country" do |user_event| %>
-        <% if user_event.country.present? %>
-          <%= link_to user_event.country, user_events_path(search: { user_session: { ip_geolocation: { country: user_event.country }}}) %>
-        <% end %>
-      <% end %>
-
-      <% t.column "City" do |user_event| %>
-        <% if user_event.city.present? %>
-          <%= link_to user_event.city, user_events_path(search: { user_session: { ip_geolocation: { city: user_event.city }}}) %>
-        <% end %>
-      <% end %>
-
-      <% t.column "Proxy?" do |user_event| %>
-        <% if user_event.is_proxy?.present? %>
-          <%= link_to user_event.is_proxy? ? "Yes" : "No", user_events_path(search: { user_session: { ip_geolocation: { is_proxy: user_event.is_proxy? }}}) %>
-        <% end %>
-      <% end %>
-
-      <% t.column "Created" do |user_event| %>
-        <%= time_ago_in_words_tagged(user_event.created_at) %>
-      <% end %>
-
-      <% t.column column: "control" do |user_event| %>
-        <%= external_link_to "https://ipinfo.io/#{user_event.ip_addr}", "IP Info" %>
-      <% end %>
-    <% end %>
-
-    <%= numbered_paginator(@user_events) %>
   </div>
 </div>

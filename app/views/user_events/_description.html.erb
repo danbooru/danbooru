@@ -1,0 +1,60 @@
+<%# user_event %>
+
+<% case user_event.category %>
+<% when "login" %>
+  <%= link_to_user user_event.user %> logged in.
+<% when "login_pending_verification" %>
+  <%= link_to_user user_event.user %> tried to login from a new location. Awaiting verification.
+<% when "login_verification" %>
+  <%= link_to_user user_event.user %> verified a new login location.
+<% when "reauthenticate" %>
+  <%= link_to_user user_event.user %> reauthenticated.
+<% when "failed_login" %>
+  <%= link_to_user user_event.user %> had a failed login attempt.
+<% when "failed_reauthenticate" %>
+  <%= link_to_user user_event.user %> entered an incorrect password.
+<% when "logout" %>
+  <%= link_to_user user_event.user %> logged out.
+<% when "user_creation" %>
+  <%= link_to_user user_event.user %> created their account.
+<% when "user_deletion" %>
+  <%= link_to_user user_event.user %> deleted their account.
+<% when "user_undeletion" %>
+  <%= link_to_user user_event.user %> had their account undeleted.
+<% when "password_reset_request" %>
+  Someone requested a password reset for <%= link_to_user user_event.user %>.
+<% when "password_reset" %>
+  <%= link_to_user user_event.user %> reset their password.
+<% when "password_change" %>
+  <%= link_to_user user_event.user %> changed their password.
+<% when "email_change" %>
+  <%= link_to_user user_event.user %> changed their email address.
+<% when "totp_enable" %>
+  <%= link_to_user user_event.user %> enabled 2FA.
+<% when "totp_disable" %>
+  <%= link_to_user user_event.user %> disabled 2FA.
+<% when "totp_update" %>
+  <%= link_to_user user_event.user %> changed their 2FA secret.
+<% when "totp_login_pending_verification" %>
+  <%= link_to_user user_event.user %> entered their password. Awaiting 2FA verification.
+<% when "totp_login" %>
+  <%= link_to_user user_event.user %> logged in with 2FA.
+<% when "totp_reauthenticate" %>
+  <%= link_to_user user_event.user %> reauthenticated with 2FA.
+<% when "totp_failed_login" %>
+  <%= link_to_user user_event.user %> entered an incorrect 2FA code.
+<% when "totp_failed_reauthenticate" %>
+  <%= link_to_user user_event.user %> entered an incorrect 2FA code.
+<% when "backup_code_generate" %>
+  <%= link_to_user user_event.user %> generated new backup codes.
+<% when "backup_code_login" %>
+  <%= link_to_user user_event.user %> logged in with a backup code.
+<% when "backup_code_reauthenticate" %>
+  <%= link_to_user user_event.user %> reauthenticated with a backup code.
+<% when "api_key_create" %>
+  <%= link_to_user user_event.user %> created a new API key.
+<% when "api_key_update" %>
+  <%= link_to_user user_event.user %> updated an API key.
+<% when "api_key_delete" %>
+  <%= link_to_user user_event.user %> deleted an API key.
+<% end %>

@@ -2,25 +2,23 @@
 
 <div id="c-static">
   <div id="a-not-found">
-    <div style="text-align: center">
+    <div class="flex flex-col gap-4 items-center">
       <h1>Page not found</h1>
 
       <% if @post.present? && @artist.present? %>
-        <p>
-          <%= link_to @post do %>
-            <%= tag.img src: @post.large_file_url %>
-          <% end %>
+        <%= link_to @post do %>
+          <%= tag.img src: @post.large_file_url, class: "max-w-full max-h-720px" %>
+        <% end %>
 
-          <p class="fineprint">
-            <%= link_to "post ##{@post.id}", @post %>
-            by <%= link_to @artist.name, posts_path(tags: @artist.name), class: tag_class(@artist) %>
-          </p>
+        <p class="fineprint">
+          <%= link_to "post ##{@post.id}", @post %>
+          by <%= link_to @artist.name, posts_path(tags: @artist.name), class: tag_class(@artist) %>
         </p>
       <% else %>
         <p>Nobody here but us chickens!</p>
       <% end %>
 
-      <p><%= link_to "Return to previous page", :back %></p>
+      <%= link_to "Return to previous page", :back %>
     </div>
   </div>
 </div>

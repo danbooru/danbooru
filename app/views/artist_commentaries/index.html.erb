@@ -12,19 +12,19 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <%= table_for @commentaries, width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |commentary| %>
         <%= post_preview(commentary.post, show_deleted: true) %>
       <% end %>
       <% t.column "Original", td: { class: "break-words" }, width: "50%" do |commentary| %>
-          <%= format_commentary_title(commentary.original_title) %>
-          <%= format_commentary_description(commentary.original_description) %>
+        <h3><span class="prose"><%= commentary.dtext_original_title.format_text %></span></h3>
+        <div class="prose"><%= commentary.dtext_original_description.format_text %></div>
       <% end %>
       <% t.column "Translated", td: { class: "break-words" }, width: "50%" do |commentary| %>
-        <%= format_commentary_title(commentary.translated_title) %>
-        <%= format_commentary_description(commentary.translated_description) %>
+        <h3><span class="prose"><%= commentary.dtext_translated_title.format_text %></span></h3>
+        <div class="prose"><%= commentary.dtext_translated_description.format_text %></div>
       <% end %>
     <% end %>
 

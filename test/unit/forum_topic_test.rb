@@ -5,12 +5,7 @@ class ForumTopicTest < ActiveSupport::TestCase
     setup do
       travel_to Time.now
       @user = FactoryBot.create(:user)
-      CurrentUser.user = @user
       @topic = create(:forum_topic, title: "xxx", creator: @user)
-    end
-
-    teardown do
-      CurrentUser.user = nil
     end
 
     context "#mark_as_read!" do
@@ -38,7 +33,12 @@ class ForumTopicTest < ActiveSupport::TestCase
     context "constructed with nested attributes for its original post" do
       should "create a matching forum post" do
         assert_difference(["ForumTopic.count", "ForumPost.count"], 1) do
-          @topic = create(:forum_topic, title: "abc", original_post_attributes: { body: "abc", creator: @user })
+          @topic = create(:forum_topic, creator: @user, title: "abc", original_post_attributes: { body: "abc", creator: @user })
+
+          assert_equal(@user, @topic.creator)
+          assert_equal(@user, @topic.updater)
+          assert_equal(@user, @topic.original_post.creator)
+          assert_equal(@user, @topic.original_post.updater)
         end
       end
     end
@@ -53,38 +53,67 @@ class ForumTopicTest < ActiveSupport::TestCase
       assert_search_equals([], category_id: 1)
     end
 
-    should "initialize its creator" do
-      assert_equal(@user.id, @topic.creator_id)
+    should "initialize its updater" do
+      assert_equal(@user, @topic.updater)
     end
 
-    context "updated by a second user" do
-      setup do
-        @second_user = FactoryBot.create(:user)
-        CurrentUser.user = @second_user
+    context "with multiple posts" do
+      should "delete all forum posts when the topic is deleted" do
+        create_list(:forum_post, 5, topic: @topic)
+
+        @topic.soft_delete!(updater: @user)
+
+        assert_equal(true, @topic.forum_posts.all?(&:is_deleted?))
+        assert_equal(true, @topic.forum_posts.all? { |post| post.updater == @user })
       end
 
-      should "record its updater" do
-        @topic.update(title: "abc")
-        assert_equal(@second_user.id, @topic.updater_id)
-      end
-    end
+      should "undelete all forum posts when the topic is undeleted" do
+        create_list(:forum_post, 5, topic: @topic)
 
-    context "with multiple posts that has been deleted" do
-      setup do
-        5.times do
-          FactoryBot.create(:forum_post, :topic_id => @topic.id)
-        end
-      end
+        @topic.soft_delete!(updater: @user)
+        @topic.undelete!(updater: @user)
 
-      should "delete any associated posts" do
-        assert_difference("ForumPost.count", -5) do
-          @topic.destroy
-        end
+        assert_equal(true, @topic.forum_posts.none?(&:is_deleted?))
+        assert_equal(true, @topic.forum_posts.all? { |post| post.updater == @user })
       end
     end
 
     context "during validation" do
       subject { build(:forum_topic) }
+
+      should allow_value("General").for(:category)
+      should allow_value("Tags").for(:category)
+      should allow_value("Bugs & Features").for(:category)
+      should allow_value("general").for(:category)
+      should allow_value("tags").for(:category)
+      should allow_value("bugs & features").for(:category)
+      should allow_value(0).for(:category)
+      should allow_value(1).for(:category)
+      should allow_value(2).for(:category)
+
+      should allow_value("None").for(:min_level)
+      should allow_value("Member").for(:min_level)
+      should allow_value("Gold").for(:min_level)
+      should allow_value("Builder").for(:min_level)
+      should allow_value("Moderator").for(:min_level)
+      should allow_value("Admin").for(:min_level)
+
+      should allow_value("none").for(:min_level)
+      should allow_value("member").for(:min_level)
+      should allow_value("gold").for(:min_level)
+      should allow_value("builder").for(:min_level)
+      should allow_value("moderator").for(:min_level)
+      should allow_value("admin").for(:min_level)
+
+      should allow_value(0).for(:min_level)
+      should allow_value(20).for(:min_level)
+      should allow_value(30).for(:min_level)
+
+      should_not allow_value("unknown").for(:min_level)
+      should_not allow_value(123_456_789).for(:min_level)
+
+      should_not allow_value("unknown").for(:category)
+      should_not allow_value(123_456_789).for(:category)
 
       should_not allow_value("").for(:title)
       should_not allow_value(" ").for(:title)

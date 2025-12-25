@@ -1,0 +1,28 @@
+.dtext-editor {
+  .dtext-editor-menu {
+    border-color: var(--form-input-border-color);
+    background-color: var(--dtext-editor-menu-background-color)
+  }
+
+  .dtext-editor-body {
+    width: 60rem;
+    height: 10rem;
+    min-width: 20rem;
+    min-height: 3rem;
+    max-height: 90vh;
+    max-width: 100cqw;
+  }
+
+  &.dtext-editor-large {
+    .dtext-editor-body {
+      height: 25rem;
+    }
+  }
+
+  .dtext-preview {
+    background-color: var(--form-input-background);
+    border-color: var(--form-input-border-color);
+    color: var(--form-input-text-color);
+    --paragraph-spacing: 1lh;
+  }
+}

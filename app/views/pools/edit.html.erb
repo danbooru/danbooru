@@ -4,11 +4,10 @@
       <h1>Edit Pool: <%= @pool.pretty_name %></h1>
 
       <%= f.input :name, :as => :string, :input_html => { :value => @pool.pretty_name } %>
-      <%= f.input :description, as: :dtext %>
+      <%= f.input :description, as: :dtext, input_html: { autofocus: true } %>
       <%= f.input :post_ids_string, as: :text, label: "Posts" %>
       <%= f.input :category, :collection => ["series", "collection"], :include_blank => false %>
       <%= f.button :submit %>
-      <%= dtext_preview_button "pool_description" %>
     <% end %>
   </div>
 </div>

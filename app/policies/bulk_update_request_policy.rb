@@ -21,6 +21,20 @@ class BulkUpdateRequestPolicy < ApplicationPolicy
     user.is_admin?
   end
 
+  def rate_limit_for_write(**_options)
+    if record.invalid?
+      { action: "bulk_update_requests:write:invalid", rate: 1.0 / 1.second, burst: 1 }
+    elsif user.is_admin?
+      { action: "bulk_update_requests:write", rate: 1.0 / 1.second, burst: 50 }
+    elsif user.is_builder?
+      { action: "bulk_update_requests:write", rate: 1.0 / 1.minute, burst: 20 }
+    elsif user.bulk_update_requests.exists?(created_at: ..4.hours.ago)
+      { action: "bulk_update_requests:write", rate: 1.0 / 1.minute, burst: 20 }
+    else
+      { action: "bulk_update_requests:write", rate: 1.0 / 1.minute, burst: 5 }
+    end
+  end
+
   def permitted_attributes_for_create
     [:script, :title, :reason, :forum_topic_id]
   end

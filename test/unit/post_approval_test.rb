@@ -48,6 +48,25 @@ class PostApprovalTest < ActiveSupport::TestCase
           assert_equal(true, @post.reload.is_active?)
           assert_equal("rejected", flag.reload.status)
         end
+
+        should "not allow an approver to undelete their own post" do
+          @post = create(:post, uploader: @approver, is_deleted: true)
+          approval = build(:post_approval, post: @post, user: @approver)
+
+          assert_equal(false, approval.valid?)
+          assert_equal(["You cannot approve a post you uploaded"], approval.errors[:base])
+          assert_equal(true, @post.reload.is_deleted?)
+        end
+
+        should "allow an admin to undelete their own post" do
+          @admin = create(:admin_user)
+          @post = create(:post, uploader: @admin, is_deleted: true)
+
+          create(:post_approval, post: @post, user: @admin)
+
+          assert_equal(@admin, @post.reload.approver)
+          assert_equal(false, @post.is_deleted?)
+        end
       end
     end
 

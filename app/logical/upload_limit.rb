@@ -42,9 +42,19 @@ class UploadLimit
     !user.is_contributor? && used_upload_slots >= upload_slots
   end
 
+  # @return [Boolean] true if the user can't appeal any more posts because they're out of upload slots.
+  def appeal_limited?
+    free_upload_slots < UploadLimit::APPEAL_COST
+  end
+
   # @return [Boolean] true if the user is at max level.
   def maxed?
     user.upload_points >= MAXIMUM_POINTS
+  end
+
+  # @return [Integer] The number of appeals the user can make before they run out of upload slots.
+  def remaining_appeals
+    free_upload_slots / UploadLimit::APPEAL_COST
   end
 
   # @return [Integer] The number of upload slots in use. Pending posts take 1
@@ -60,12 +70,14 @@ class UploadLimit
   # @return [Integer] The number of unused upload slots, that is, the number of
   #   posts the user can upload.
   def free_upload_slots
-    upload_slots - used_upload_slots
+    (upload_slots - used_upload_slots).clamp(0..)
   end
 
   # @return [Integer] The user's total number of upload slots. Ranges from 5 to 40.
   def upload_slots
-    upload_level + Danbooru.config.extra_upload_slots.to_i
+    slots = upload_level + Danbooru.config.extra_upload_slots.to_i
+    slots = slots.clamp(0..5) if !user.posts.exists?(created_at: ..1.hour.ago)
+    slots
   end
 
   # @return [Integer] The user's current upload level. Ranges from 0 to 35.
@@ -105,7 +117,7 @@ class UploadLimit
       # or active post, then we have to replay the user's entire upload
       # history to recalculate their upload points.
       else
-        user.update!(upload_points: UploadLimit.points_for_user(user))
+        user.update!(upload_points: recalculated_upload_points)
       end
     end
   end
@@ -113,12 +125,14 @@ class UploadLimit
   # Recalculate the user's upload points based on replaying their entire upload history.
   # @param user [User] the user
   # @return [Integer] the user's upload points
-  def self.points_for_user(user)
+  memoize def recalculated_upload_points
+    return MAXIMUM_POINTS if user.is_contributor?
+
     points = INITIAL_POINTS
 
     uploads = user.posts.where(is_pending: false).order(id: :asc).pluck(:is_deleted)
     uploads.each do |is_deleted|
-      points += upload_value(points, is_deleted)
+      points += UploadLimit.upload_value(points, is_deleted)
       points = points.clamp(0, MAXIMUM_POINTS)
 
       # warn "slots: %2d, points: %3d, value: %2d" % [UploadLimit.points_to_level(points) + Danbooru.config.extra_upload_slots.to_i, points, UploadLimit.upload_value(level, is_deleted)]

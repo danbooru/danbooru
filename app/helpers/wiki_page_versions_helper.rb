@@ -6,10 +6,6 @@ module WikiPageVersionsHelper
     other.present? && ((wiki_page_version.body != other.body) || wiki_page_version.other_names_changed(type))
   end
 
-  def wiki_version_show_other_names(this_version, other_version)
-    ((this_version.other_names - other_version.other_names) | (other_version.other_names - this_version.other_names)).length.positive?
-  end
-
   def wiki_version_other_names_diff(this_version, other_version)
     this_names = this_version.other_names
     other_names = other_version.other_names

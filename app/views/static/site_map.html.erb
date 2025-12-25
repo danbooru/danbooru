@@ -113,7 +113,8 @@
 
       <ul>
         <li><h2>Site</h2></li>
-        <li><%= link_to("Server Status", status_path) %></li>
+        <li><%= link_to("Site Status", status_path) %></li>
+        <li><%= link_to("Site Statistics", statistics_path) %></li>
         <li><%= link_to("Source Code", Danbooru.config.source_code_url) %></li>
         <li><%= link_to_wiki "User Scripts", "about:userscripts" %></li>
         <li><%= link_to("Keyboard Shortcuts", keyboard_shortcuts_path) %></li>
@@ -174,7 +175,7 @@
           <li><%= link_to("User Actions", user_actions_path) %></li>
         <% end %>
 
-        <% if policy(UserEvent).index? %>
+        <% if policy(UserEvent).can_see_events_by_others? %>
           <li><%= link_to("User Events", user_events_path) %></li>
         <% end %>
 
@@ -184,6 +185,10 @@
 
         <% if policy(NewsUpdate).index? %>
           <li><%= link_to("News Updates", news_updates_path) %></li>
+        <% end %>
+
+        <% if policy(SiteCredential).create? %>
+          <li><%= link_to("Site Credentials", site_credentials_path) %></li>
         <% end %>
       </ul>
 

@@ -13,12 +13,23 @@
   <% else %>
     <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path %>
   <% end %>
-  
-  <%= subnav_link_to "Bulk Update Requests", bulk_update_requests_path %>
+
+  <% if @forum_topic && @forum_topic.bulk_update_requests.pending.count > 0 %>
+    <%= subnav_link_to bulk_update_requests_path(search: { forum_topic_id: @forum_topic.id, status: "pending" }), id: "burs" do %>
+      BURs <span class="badge-blue"><%= @forum_topic.bulk_update_requests.pending.count %></span>
+    <% end %>
+  <% elsif @forum_topic.nil? && BulkUpdateRequest.pending.count > 0 %>
+    <%= subnav_link_to bulk_update_requests_path(search: { status: "pending" }), id: "burs" do %>
+      BURs <span class="badge-blue"><%= BulkUpdateRequest.pending.count %></span>
+    <% end %>
+  <% else %>
+    <%= subnav_link_to "BURs", bulk_update_requests_path %>
+  <% end %>
+
   <%= subnav_link_to "Search", search_forum_posts_path %>
   <%= subnav_link_to "Help", wiki_page_path("help:forum") %>
   <% if !CurrentUser.user.is_anonymous? && @forum_topic && !@forum_topic.new_record? %>
-    <li>|</li>
+    <%= subnav_divider %>
     <%= subnav_link_to "Reply", new_forum_post_path(:topic_id => @forum_topic.id) %>
     <% if !@forum_topic.new_record? && policy(@forum_topic).update? %>
       <%= subnav_link_to "Edit", edit_forum_topic_path(@forum_topic), "data-shortcut": "e" %>

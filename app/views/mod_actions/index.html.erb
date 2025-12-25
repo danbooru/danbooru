@@ -7,7 +7,7 @@
     <%= table_for @mod_actions, class: "striped autofit" do |t| %>
       <% t.column "Description", td: { class: "col-expand" } do |mod_action| %>
         <div class="prose">
-          <%= link_to_user mod_action.creator %> <%= format_text(mod_action.description.chomp(".").strip, inline: true, data: @dtext_data) %>.
+          <%= link_to_user mod_action.creator %> <%= format_text(mod_action.description.chomp(".").strip, inline: true, references: @dtext_references) %>.
         </div>
       <% end %>
 

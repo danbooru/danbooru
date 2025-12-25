@@ -1,0 +1,231 @@
+# This is a Docker Compose file that will launch a Danbooru instance in development mode. Use this
+# if you want to work on the site or make any changes to the code.
+#
+# The difference from a normal instance is that in development mode you can edit the code
+# from outside the container and changes will be picked up immediately, without having to restart the
+# container or rebuild the Docker image. There are also additional tools to make debugging easier.
+#
+# Do not put your development instance on the open internet or let anyone else have access to it.
+# Anyone with access to your development instance will be able to run arbitrary code, for example by
+# triggering an exception and using the Ruby console on the error page.
+#
+# ## Usage
+#
+#   # Check out the code first.
+#   $ git clone https://github.com/danbooru/danbooru
+#   $ cd danbooru
+#
+#   # Start a Devbooru instance on http://localhost:3000.
+#   $ docker compose -f docker-compose.dev.yaml up
+#
+#   # You can use `bin/dev` as a shortcut for `docker compose -f docker-compose.dev.yaml`.
+#   $ bin/dev up
+
+name: devbooru
+
+x-sqs-env: &sqs-env
+  # Required to have working post and pool versions
+  DANBOORU_AWS_SQS_REGION: us-east-1
+  DANBOORU_AWS_ACCESS_KEY_ID: dummy
+  DANBOORU_AWS_SECRET_ACCESS_KEY: dummy
+  DANBOORU_AWS_SQS_ARCHIVES_URL: http://sqs:9324/000000000000/danbooru.fifo
+  DANBOORU_AWS_SQS_HOST: http://sqs:9324
+
+x-base-template: &base-template
+  # Use the latest development image from master, instead of the production image. The development
+  # image contains files needed to rebuild the JS/CSS files.
+  #
+  # If you set DANBOORU_IMAGE to something else, you have to use a development image because
+  # production images don't contain the tools necessary to rebuild the JS/CSS files.
+  image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:development}
+
+  restart: unless-stopped
+  stdin_open: true
+  tty: true
+
+  entrypoint: ["tini", "-g", "bin/danbooru-dev-entrypoint", "--"]
+
+  environment:
+    <<: *sqs-env
+
+    DANBOORU_APP_NAME: "Devbooru"
+
+    # The public URL of your site. You can set this if you have a domain name for your site.
+    DANBOORU_CANONICAL_URL: ${DANBOORU_CANONICAL_URL:-}
+
+    # This is insecure because it lets anyone login to your development instance. This is okay
+    # because giving others access is insecure anyway.
+    DANBOORU_SECRET_KEY_BASE: "insecure"
+
+    RAILS_ENV: ${RAILS_ENV:-development}
+    DATABASE_URL: postgresql://postgres?pool=100
+    DANBOORU_REDIS_URL: redis://redis:6379
+    DANBOORU_IQDB_URL: http://iqdb:5588
+    DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
+    DANBOORU_IMAGE_STORAGE_PATH: /images
+    SHAKAPACKER_DEV_SERVER_HOST: webpack
+
+    DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-true}
+
+  tmpfs:
+    - "/danbooru/tmp:uid=1000,gid=1000"
+
+  volumes:
+    - danbooru-images:/images
+    - webpack-data:/danbooru/public/packs-dev
+    - /danbooru/node_modules
+    - /danbooru/public/packs
+    - ${DANBOORU_DIR:-./}:/danbooru
+
+services:
+  migrations:
+    <<: *base-template
+    restart: no
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["bin/rails", "db:prepare", "db:test:prepare"]
+
+  danbooru:
+    <<: *base-template
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    command: ["bin/rails", "server", "-b", "0.0.0.0"]
+
+  cron:
+    <<: *base-template
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    command: ["bin/rails", "danbooru:cron"]
+
+  jobs:
+    <<: *base-template
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    command: ["bin/good_job", "start"]
+
+  devcontainer:
+    <<: *base-template
+    entrypoint: ["tini", "-g", "bin/devcontainer-entrypoint", "--"]
+    command: ["sleep", "infinity"]
+    volumes:
+      - ${DANBOORU_DIR:-./}:/danbooru
+      - danbooru-images:/images
+      - webpack-data:/danbooru/public/packs-dev
+      - /danbooru/node_modules
+      - /danbooru/public/packs
+
+      - /var/run/docker.sock:/var/run/docker-host.sock
+      - /usr/bin/docker:/usr/bin/docker:ro
+      - /usr/libexec/docker/cli-plugins/docker-compose:/usr/libexec/docker/cli-plugins/docker-compose:ro
+      - /usr/libexec/docker/cli-plugins/docker-buildx:/usr/libexec/docker/cli-plugins/docker-buildx:ro
+
+  # https://github.com/danbooru/iqdb
+  # https://hub.docker.com/repository/docker/evazion/iqdb
+  iqdb:
+    image: evazion/iqdb
+    volumes:
+      - "iqdb-data:/iqdb/data"
+    command: ["http", "0.0.0.0", "5588", "/iqdb/data/iqdb.sqlite"]
+
+  redis:
+    image: redis
+
+  postgres:
+    image: ghcr.io/danbooru/postgres:16.1
+    shm_size: 1gb
+    environment:
+      POSTGRES_USER: danbooru
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "danbooru"]
+      start_period: 30s
+      interval: 1s
+      retries: 1
+    volumes:
+      - "danbooru-data:/var/lib/postgresql/data"
+
+  nginx:
+    image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:development}
+    command: ["openresty", "-e", "/dev/stderr"]
+    environment:
+      # The external port to listen on. You can set this to 80 if you have nothing else listening on port 80.
+      DANBOORU_PORT: "${DANBOORU_PORT:-3000}"
+
+      # If true (the default), assume we may be running behind a reverse proxy (such as Cloudflare, Ngrok, etc), and
+      # trust the X-Forwarded-* headers sent by the client. This assumes untrusted users won't have access to your
+      # dev instance, because they could spoof these headers to spoof their IP or the server hostname.
+      DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-true}
+
+      # Used by Nginx to determine the root directory if we're running in a subdirectory (e.g. http://example.com/danbooru).
+      DANBOORU_CANONICAL_URL: ${DANBOORU_CANONICAL_URL:-}
+    ports:
+      - "${DANBOORU_PORT:-3000}:3000"
+    depends_on:
+      danbooru:
+        condition: service_started
+    configs:
+      - source: nginx
+        target: /usr/local/nginx/conf/nginx.conf
+    volumes:
+      - "danbooru-images:/images"
+
+  autotagger:
+    image: ghcr.io/danbooru/autotagger:latest
+
+  webpack:
+    <<: *base-template
+    ports:
+      - 3035:3035
+    environment:
+      SHAKAPACKER_DEV_SERVER_HOST: 0.0.0.0
+    command: ["bin/shakapacker-dev-server"]
+
+  sqs:
+    image: softwaremill/elasticmq-native
+    expose:
+    - 9324
+    volumes:
+      - sqs-data:/data"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+  archives-service:
+    depends_on:
+      sqs:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    image: ghcr.io/danbooru/archives:latest
+    environment:
+      <<: *sqs-env
+      RUN: 1
+      #db config
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: danbooru
+      POSTGRES_USER: danbooru
+      # POSTGRES_PASSWORD=
+    command: ["scripts/docker-bootstrap.sh"]
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+configs:
+  nginx:
+    file: config/nginx.conf
+
+volumes:
+  danbooru-images:
+    name: ${COMPOSE_PROJECT_NAME}-images
+  danbooru-data:
+    name: ${COMPOSE_PROJECT_NAME}-data
+  iqdb-data:
+    name: ${COMPOSE_PROJECT_NAME}-iqdb-data
+  webpack-data:
+    name: ${COMPOSE_PROJECT_NAME}-webpack-data
+  sqs-data:
+    name: ${COMPOSE_PROJECT_NAME}-sqs-data

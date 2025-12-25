@@ -4,18 +4,15 @@
   <meta charset="utf-8">
   <title><%= page_title %></title>
 
-  <link rel="icon" href="/favicon.ico" sizes="16x16" type="image/x-icon">
-  <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml">
+  <%= tag.link href: "#{main_app.root_path}favicon.ico", rel: "icon", sizes: "16x16", type: "image/x-icon" %>
+  <%= tag.link href: "#{main_app.root_path}favicon.svg", rel: "icon", sizes: "any", type: "image/svg+xml" %>
   <%= render_meta_links @current_item if @current_item.respond_to?(:paginate) %>
-  <%= tag.link rel: "canonical", href: canonical_url %>
-  <%= tag.link rel: "search", type: "application/opensearchdescription+xml", href: opensearch_url(format: :xml, version: 2), title: "Search posts" %>
+  <%= tag.link rel: "canonical", href: seo_canonical_url %>
+  <%= tag.link rel: "search", type: "application/opensearchdescription+xml", href: main_app.opensearch_url(format: :xml, version: 2), title: "Search posts" %>
 
   <%= csrf_meta_tag %>
   <% unless CurrentUser.enable_desktop_mode? %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-  <% end %>
-  <% if CurrentUser.user.blacklisted_tags.present? %>
-    <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
 
   <%= tag.meta name: "autocomplete-tag-prefixes", content: AutocompleteService::TAG_PREFIXES.to_json %>
@@ -31,18 +28,19 @@
 
   <%= stylesheet_pack_tag "application" %>
   <% if CurrentUser.user.custom_style.present? && params.fetch(:css, "true").truthy?  %>
-    <%= stylesheet_link_tag custom_style_users_path(md5: Digest::MD5.hexdigest(CurrentUser.user.custom_style)) %>
+    <%= stylesheet_link_tag main_app.custom_style_users_path(md5: Digest::MD5.hexdigest(CurrentUser.user.custom_style)) %>
   <% end %>
 
-  <% if current_page?(root_url) %>
+  <% if current_page?(main_app.root_url) %>
     <%= json_ld_website_data %>
   <% end %>
 
-  <%= tag.meta name: "description", content: meta_description %>
+  <% page_description = meta_description %>
+  <%= tag.meta name: "description", content: page_description if page_description %>
   <%= tag.meta property: "og:type", content: "website" %>
   <%= tag.meta property: "og:site_name", content: Danbooru.config.app_name %>
   <%= tag.meta property: "og:title", content: page_title %>
-  <%= tag.meta property: "og:description", content: meta_description %>
+  <%= tag.meta property: "og:description", content: page_description if page_description %>
   <%= tag.meta property: "og:url", content: request.original_url %>
 
   <% if Danbooru.config.twitter_username.present? %>
@@ -50,7 +48,7 @@
   <% end %>
 
   <%= tag.meta name: "twitter:title", content: page_title %>
-  <%= tag.meta name: "twitter:description", content: meta_description %>
+  <%= tag.meta name: "twitter:description", content: page_description if page_description %>
 
   <%= tag.meta name: "git-hash", content: Rails.application.config.x.git_hash %>
   <%= tag.meta name: "theme-color", content: "hsl(213, 100%, 50%)" %>
@@ -60,71 +58,29 @@
 </head>
 
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item, @exception) do %>
-  <% if NewsUpdate.recent.present? %>
-    <div id="news-updates" data-id="<%= NewsUpdate.recent.first.try(:id) %>" style="display: none;">
-      <ul>
-        <% NewsUpdate.recent.each do |news_update| %>
-          <li><%= news_update.message.html_safe %></li>
-        <% end %>
-      </ul>
+  <%= render NewsUpdateComponent.new(cookies: cookies) %>
 
-      <a href="#" id="close-news-ticker-link"><%= close_icon %></a>
-    </div>
-  <% end %>
+  <%= render NavbarComponent.new(current_user: CurrentUser.user) %>
 
-  <header id="top">
-    <div id="app-name-header" class="font-bold font-header leading-normal inline-flex items-end gap-2">
-      <%= link_to image_pack_tag("static/images/danbooru-logo-128x128.png"), root_path, id: "app-logo" %>
-      <%= link_to Danbooru.config.app_name, root_path, id: "app-name", class: "m-auto" %>
-    </div>
-
-    <div id="maintoggle" class="mobile-only">
-      <a href="#"><%= menu_icon(id: "maintoggle-on") %></a>
-      <a href="#"><%= close_icon(id: "maintoggle-off", style: "display: none;") %></a>
-    </div>
-
-    <nav id="nav">
-      <menu id="main-menu" class="main">
-        <% if CurrentUser.is_anonymous? %>
-          <%= nav_link_to("Login", login_path(url: request.fullpath), rel: "nofollow") %>
-        <% else %>
-          <%= nav_link_to("My Account #{unread_dmail_indicator(CurrentUser.user)}", profile_path) %>
-        <% end %>
-
-        <%= nav_link_to("Posts", posts_path) %>
-        <%= nav_link_to("Comments", comments_path) if Danbooru.config.comments_enabled?.to_s.truthy? %>
-        <%= nav_link_to("Notes", notes_path) %>
-        <%= nav_link_to("Artists", artists_path) %>
-        <%= nav_link_to("Tags", tags_path) %>
-        <%= nav_link_to("Pools", gallery_pools_path) %>
-        <%= nav_link_to("Wiki", wiki_page_path("help:home")) %>
-        <%= nav_link_to("Forum", forum_topics_path, class: ("forum-updated" if CurrentUser.has_forum_been_updated?)) if Danbooru.config.forum_enabled?.to_s.truthy? %>
-
-        <% if CurrentUser.is_moderator? %>
-          <%= nav_link_to("Reports", moderation_reports_path, :class => (ModerationReport.where(status: "pending").present? ? "reports-pending" : nil)) %>
-          <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
-        <% end %>
-
-        <%= nav_link_to("More »", site_map_path) %>
-      </menu>
-
-      <% if content_for(:secondary_links).present? %>
-        <menu id="subnav-menu">
-          <%= yield :secondary_links %>
-        </menu>
-      <% end %>
-    </nav>
-  </header>
-
-  <div id="page" class="flex-1 mt-4">
+  <div id="page" class="relative flex-1 mx-8 mt-4 sm:mx-2 sm:mt-2">
     <% if CurrentUser.user.is_restricted? && (params[:controller] == "users" || cookies[:hide_verify_account_notice].blank?) %>
       <div class="notice notice-info notice-large" id="verify-account-notice">
         <h2>Your account is restricted.</h2>
         <div>
           You must verify your account because you signed up from a proxy or a VPN.
-          <%= link_to "Verify your account now", verify_user_email_path(CurrentUser.user) %>.
+          <%= link_to "Verify your account now", main_app.verify_user_email_path(CurrentUser.user) %>.
         </div>
         <div><%= link_to "Close this", "#", id: "hide-verify-account-notice" %></div>
+      </div>
+    <% end %>
+
+    <% if CurrentUser.user.is_approver? && !CurrentUser.user.has_2fa? && controller_name != "totp" %>
+      <div class="notice notice-error notice-large">
+        <h2>2FA Required</h2>
+        <p>
+          Because you have a privileged account, you must enable two-factor authentication to ensure your account is secure.
+        </p>
+        <div><%= link_to "Enable two-factor authentication", main_app.edit_user_totp_path(CurrentUser.user) %></div>
       </div>
     <% end %>
 
@@ -134,9 +90,9 @@
         <%= tag.img src: "/images/#{file}", width: 32, height: 32 %>
 
         <span>
-          <%= link_to "Danbooru Winter Sale", forum_topic_path(Danbooru.config.winter_sale_forum_topic_id) %> ends <%= time_ago_in_words_tagged(Danbooru.config.winter_sale_end_date) %>!
+          <%= link_to "Danbooru Winter Sale", main_app.forum_topic_path(Danbooru.config.winter_sale_forum_topic_id) %> ends <%= time_ago_in_words_tagged(Danbooru.config.winter_sale_end_date) %>!
           <br>
-          <%= link_to "Get 25% off Gold", new_user_upgrade_path %>
+          <%= link_to "Get 25% off Gold", main_app.new_user_upgrade_path %>
         </span>
 
         <span>(<%= link_to "hide", "#", id: "hide-promotion-notice" %>)</span>
@@ -147,10 +103,10 @@
 
     <% if CurrentUser.user.is_banned? %>
       <div class="notice notice-error notice-large" id="ban-notice">
-        <h2>You have been banned <%= humanized_duration CurrentUser.user.active_ban.duration %></h2>
+        <h2>You have been banned <%= CurrentUser.user.active_ban.humanized_duration %></h2>
 
         <div>
-          Reason: <span class="prose"><%= format_text CurrentUser.user.active_ban.reason, inline: true %></span>
+          Reason: <span class="prose"><%= CurrentUser.user.active_ban.dtext_reason.format_text %></span>
         </div>
       </div>
     <% end %>
@@ -162,25 +118,22 @@
     <% if !CurrentUser.user.is_anonymous? && CurrentUser.user.name_invalid? %>
       <div class="notice notice-error notice-large" id="invalid-name-notice">
         <h2>Action required </h2>
-        <div>You must <%= link_to "change your username", change_name_user_path(CurrentUser.user) %> to continue using <%= Danbooru.config.canonical_app_name %>.</div>
+        <div>You must <%= link_to "change your username", main_app.change_name_user_path(CurrentUser.user) %> to continue using <%= Danbooru.config.canonical_app_name %>.</div>
       </div>
     <% end %>
 
-    <div id="notice" class="notice notice-info flex fixed top-2 left-2 right-2 p-2 mx-auto max-w-720px max-h-150px thin-scrollbar z-9999 sm:text-sm" style="<%= "display: none;" unless flash[:notice] %>">
-      <span class="prose flex-1"><%= format_text(flash[:notice], inline: true) %>.</span>
-      <a href="#" id="close-notice-link" class="flex self-center text-lg" data-shortcut="esc"><%= close_icon %></a>
-    </div>
+    <%= render NoticeComponent.new(flash[:notice]) %>
 
     <%= yield :layout %>
   </div>
 
   <div id="tooltips"></div>
 
-  <footer id="page-footer" class="text-sm text-center flex-initial mt-4 py-3 w-full border-t flex flex-wrap items-center justify-center gap-1">
-    <%= link_to "Terms", terms_of_service_path %>
-    / <%= link_to "Privacy", privacy_policy_path %>
-    / <%= link_to "Upgrade", new_user_upgrade_path %>
-    / <%= link_to "Contact", contact_path %>
+  <footer id="page-footer" class="text-sm text-center flex-initial mt-4 py-3 w-full border-t flex flex-wrap items-center justify-center gap-1 leading-none">
+    <%= link_to "Terms", main_app.terms_of_service_path %>
+    / <%= link_to "Privacy", main_app.privacy_policy_path %>
+    / <%= link_to "Upgrade", main_app.new_user_upgrade_path %>
+    / <%= link_to "Contact", main_app.contact_path %>
     /
     <% if Danbooru.config.source_code_url.present? %>
       <%= link_to Danbooru.config.source_code_url, title: "Running commit: #{Rails.application.config.x.git_hash&.first(9)}", class: "social-icon" do %>

@@ -24,15 +24,15 @@ module PostVersionsHelper
       obsolete_added_tags = added_tags - other_tags
       obsolete_removed_tags = removed_tags & other_tags
     end
-    html = '<span class="diff-list">'.dup
+    html = '<span class="diff-list break-words">'.dup
 
     added_tags.each do |tag|
       obsolete_class = (obsolete_added_tags.include?(tag) ? "diff-obsolete" : "")
-      html << %{<ins class="#{obsolete_class}">#{link_to(wordbreakify(tag), posts_path(:tags => tag))}</ins> }
+      html << %{<ins class="#{obsolete_class}">#{link_to tag, posts_path(tags: tag)}</ins> }
     end
     removed_tags.each do |tag|
       obsolete_class = (obsolete_removed_tags.include?(tag) ? "diff-obsolete" : "")
-      html << %{<del class="#{obsolete_class}">#{link_to(wordbreakify(tag), posts_path(:tags => tag))}</del> }
+      html << %{<del class="#{obsolete_class}">#{link_to tag, posts_path(tags: tag)}</del> }
     end
 
     html << "</span>"

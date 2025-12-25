@@ -25,6 +25,8 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
         should "regenerate IQDB" do
           post_auth post_regenerations_path, @mod, params: { post_id: @post.id, category: "iqdb" }
           perform_enqueued_jobs
+
+          assert_redirected_to @post
         end
 
         should "log a mod action" do

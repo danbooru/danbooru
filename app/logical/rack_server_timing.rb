@@ -8,6 +8,7 @@ class RackServerTiming
   end
 
   def call(env)
+    current_time = Process.clock_gettime(Process::CLOCK_REALTIME)
     total_time_before = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
     cpu_time_before = Process.clock_gettime(Process::CLOCK_THREAD_CPUTIME_ID, :float_millisecond)
     gc_count_before = GC.count
@@ -22,6 +23,22 @@ class RackServerTiming
     metrics[:"request.gc_count"] = GC.count - gc_count_before
     metrics[:"request.cpu_time"] = Process.clock_gettime(Process::CLOCK_THREAD_CPUTIME_ID, :float_millisecond) - cpu_time_before
     metrics[:"request.total_time"] = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - total_time_before
+
+    if env["HTTP_X_REQUEST_START"].present?
+      # X-Request-Start: 1707872257.625, 1707872257.658
+      # => request.queue_time_0: 33.0
+      # => request.queue_time_1: 9.0
+      start_times = env["HTTP_X_REQUEST_START"].split(/, /).map(&:to_f)
+      queue_times = start_times.reverse.map do |start_time|
+        queue_time = current_time - start_time
+        current_time = start_time
+        queue_time
+      end
+
+      queue_times.each_with_index do |queue_time, i|
+        metrics[:"request.queue_time_#{i}"] = (queue_time * 1000.0).round(4)
+      end
+    end
 
     headers["Server-Timing"] = build_header
     headers["X-Runtime"] = metrics[:"request.total_time"] / 1000.0

@@ -46,7 +46,6 @@ class BigqueryExportService
       GoodJob::BaseRecord,
       GoodJob::Process,
       GoodJob::Execution,
-      GoodJob::BaseExecution,
       GoodJob::DiscreteExecution,
       GoodJob::BatchRecord,
       GoodJob::Job,

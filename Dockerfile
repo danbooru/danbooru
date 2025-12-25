@@ -16,23 +16,55 @@
 #
 # See https://github.com/danbooru/danbooru/wiki/Docker-Guide for more details.
 
-ARG MOZJPEG_URL="https://github.com/mozilla/mozjpeg/archive/refs/tags/v4.1.1.tar.gz"
-ARG VIPS_URL="https://github.com/libvips/libvips/releases/download/v8.14.2/vips-8.14.2.tar.xz"
-ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.0.tar.gz"
-ARG EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/12.56.tar.gz"
-ARG OPENRESTY_URL="https://openresty.org/download/openresty-1.21.4.1.tar.gz"
-ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.1.tar.gz"
-ARG POSTGRESQL_CLIENT_VERSION="14"
-ARG NODE_VERSION="18.x"
+# You must also update .ruby-version and the Gemfile when updating the Ruby version.
+ARG RUBY_VERSION="3.4.5"
+ARG RUBY_MAJOR_VERSION="3.4"
+
+# Update .tool-versions too when updating these.
+ARG MOZJPEG_VERSION="4.1.5"
+ARG VIPS_VERSION="8.14.2"
+ARG FFMPEG_VERSION="7.1.1"
+ARG EXIFTOOL_VERSION="13.30"
+ARG OPENRESTY_VERSION="1.27.1.2"
+ARG NODE_VERSION="22.16.0"
+ARG UBUNTU_VERSION="24.04"
 
 
 # The base layer for everything.
-FROM ubuntu:22.10 AS base
+FROM ubuntu:$UBUNTU_VERSION AS base
 SHELL ["/bin/bash", "-xeuo", "pipefail", "-O", "globstar", "-O", "dotglob", "-c"]
+
+ARG RUBY_MAJOR_VERSION
 ENV DEBIAN_FRONTEND="noninteractive"
+ENV LANG=C.UTF-8
+ENV GEM_HOME=/home/danbooru/bundle
+ENV GEM_PATH=/home/danbooru/bundle/ruby/${RUBY_MAJOR_VERSION}.0:/usr/local/lib/ruby/gems/${RUBY_MAJOR_VERSION}.0
+ENV PATH=$GEM_HOME/bin:$PATH
+
 RUN <<EOS
+  userdel ubuntu
+  useradd --user-group danbooru --create-home --shell /bin/bash
+
+  cat > /etc/apt/apt.conf.d/local <<EOF
+    Dpkg::Options {
+      "--force-confnew";
+      "--force-confdef";
+    }
+EOF
+
   apt-get update
-  rm -rf /usr/local/*
+  apt-get install -y --no-install-recommends \
+    postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre3 libsodium23 \
+    libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0t64 liblcms2-2 libpng16-16 libexpat1 \
+    libglib2.0-0 libgif7 libexif12 libheif1 libvpx9 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
+    libreadline8t64 libarchive-zip-perl tini busybox less ncdu curl
+
+  apt-get purge -y --allow-remove-essential pkg-config e2fsprogs mount procps python3 tzdata
+  apt-get autoremove -y
+  rm -rf /etc/gnutls/config /var/{lib,cache,log} /usr/share/{doc,info}/* /usr/local/*
+  mkdir -p /var/{lib,cache,log}/apt /var/lib/dpkg
+
+  busybox --install -s
 EOS
 
 
@@ -40,18 +72,22 @@ EOS
 # The base layer for building dependencies. All builds take place inside /build.
 FROM base AS build-base
 WORKDIR /build
-ARG COMMON_BUILD_DEPS="curl ca-certificates build-essential pkg-config git"
-RUN apt-get install -y --no-install-recommends $COMMON_BUILD_DEPS
+
+RUN <<EOS
+  apt-get update
+  apt-get install -y --no-install-recommends ca-certificates g++ make pkg-config git
+EOS
 
 
 
 # Build Ruby. Output is in /usr/local.
 FROM build-base AS build-ruby
+ARG RUBY_VERSION
+ARG RUBY_MAJOR_VERSION
 ARG RUBY_BUILD_DEPS="rustc libssl-dev libgmp-dev libyaml-dev libffi-dev libreadline-dev zlib1g-dev"
-ARG RUBY_URL
 RUN <<EOS
   apt-get install -y --no-install-recommends $RUBY_BUILD_DEPS
-  curl -L $RUBY_URL | tar --strip-components=1 -xzvf -
+  curl -L "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR_VERSION}/ruby-${RUBY_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
   ./configure --enable-yjit --enable-shared --disable-install-doc
   make -j install
@@ -66,11 +102,11 @@ EOS
 
 # Build MozJPEG. Output is in /usr/local.
 FROM build-base AS build-mozjpeg
+ARG MOZJPEG_VERSION
 ARG MOZJPEG_BUILD_DEPS="cmake nasm libpng-dev zlib1g-dev"
-ARG MOZJPEG_URL
 RUN <<EOS
   apt-get install -y --no-install-recommends $MOZJPEG_BUILD_DEPS
-  curl -L $MOZJPEG_URL | tar --strip-components=1 -xzvf -
+  curl -L "https://github.com/mozilla/mozjpeg/archive/refs/tags/v${MOZJPEG_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
   cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_STATIC=0 -DWITH_ARITH_ENC=1 -DWITH_ARITH_DEC=1 .
   make -j install/strip
@@ -84,11 +120,11 @@ EOS
 
 # Build libvips. Output is in /usr/local.
 FROM build-mozjpeg AS build-vips
+ARG VIPS_VERSION
 ARG VIPS_BUILD_DEPS="meson libgirepository1.0-dev libfftw3-dev libwebp-dev liborc-dev liblcms2-dev libpng-dev libexpat1-dev libglib2.0-dev libgif-dev libexif-dev libheif-dev"
-ARG VIPS_URL
 RUN <<EOS
   apt-get install -y --no-install-recommends $VIPS_BUILD_DEPS
-  curl -L $VIPS_URL | tar --strip-components=1 -xJvf -
+  curl -L "https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz" | tar --strip-components=1 -xJvf -
 
   meson build --prefix /usr/local --buildtype release --strip -Dcplusplus=false
   meson compile -C build
@@ -104,7 +140,7 @@ EOS
 
 # Build FFmpeg. Output is in /usr/local.
 FROM build-base AS build-ffmpeg
-ARG FFMPEG_URL
+ARG FFMPEG_VERSION
 ARG FFMPEG_BUILD_DEPS="nasm libvpx-dev libdav1d-dev zlib1g-dev"
 ARG FFMPEG_BUILD_OPTIONS="\
   --disable-ffplay --disable-network --disable-doc --disable-static --enable-shared \
@@ -132,7 +168,7 @@ ARG FFMPEG_BUILD_OPTIONS="\
 
 RUN <<EOS
   apt-get install -y --no-install-recommends $FFMPEG_BUILD_DEPS
-  curl -L $FFMPEG_URL | tar --strip-components=1 -xzvf -
+  curl -L "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${FFMPEG_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
   ./configure $FFMPEG_BUILD_OPTIONS
   make -j install
@@ -148,11 +184,11 @@ EOS
 
 # Build ExifTool. Output is in /usr/local.
 FROM build-base AS build-exiftool
-ARG EXIFTOOL_BUILD_DEPS="perl perl-modules libarchive-zip-perl"
-ARG EXIFTOOL_URL
+ARG EXIFTOOL_VERSION
+ARG EXIFTOOL_BUILD_DEPS="perl perl-modules-5.38 libarchive-zip-perl"
 RUN <<EOS
   apt-get install -y --no-install-recommends $EXIFTOOL_BUILD_DEPS
-  curl -L $EXIFTOOL_URL | tar --strip-components=1 -xzvf -
+  curl -L "https://github.com/exiftool/exiftool/archive/refs/tags/${EXIFTOOL_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
   perl Makefile.PL
   make -j install
@@ -169,8 +205,8 @@ EOS
 
 # Build OpenResty. Output is in /usr/local.
 FROM build-base AS build-openresty
-ARG OPENRESTY_URL
-ARG OPENRESTY_BUILD_DEPS="libssl-dev libpcre++-dev zlib1g-dev"
+ARG OPENRESTY_VERSION
+ARG OPENRESTY_BUILD_DEPS="libssl-dev libpcre3-dev zlib1g-dev"
 ARG OPENRESTY_BUILD_OPTIONS="\
  --with-threads --with-compat --with-pcre-jit --with-file-aio \
  --with-http_gunzip_module --with-http_gzip_static_module \
@@ -180,7 +216,7 @@ ARG OPENRESTY_BUILD_OPTIONS="\
 
 RUN <<EOS
   apt-get install -y --no-install-recommends $OPENRESTY_BUILD_DEPS
-  curl -L $OPENRESTY_URL | tar --strip-components=1 -xzvf -
+  curl -L "https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
   ./configure -j$(nproc) --prefix=/usr/local $OPENRESTY_BUILD_OPTIONS
   make -j install
@@ -197,102 +233,87 @@ EOS
 FROM build-base AS build-node
 ARG NODE_VERSION
 RUN <<EOS
-  apt-get install -y --no-install-recommends gnupg
+  apt-get install -y --no-install-recommends xz-utils
 
-  . /etc/lsb-release
-  curl https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor > /usr/share/keyrings/nodesource.gpg
-  echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION $DISTRIB_CODENAME main" > /etc/apt/sources.list.d/nodesource.list
+  curl -L https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | tar --strip-components=1 -xJvf -
 
-  apt-get update
-  apt-get download nodejs
-  dpkg --instdir=/build --force-all --install ./nodejs*.deb
-  mv -i usr/bin usr/lib /usr/local
-
+  cp -rdv ./bin /usr/local
+  cp -rdv ./lib /usr/local
   find /usr/local -type f -executable -exec strip --strip-unneeded {} \;
-  rm -rf *
+  rm -rf ./*
 
   node --version
+  npm --version
 EOS
 
 
 
-# Build Ruby gems. Output is in /usr/local.
+# Build Ruby gems. Output is in /home/danbooru/bundle.
 FROM build-ruby AS build-gems
+WORKDIR /danbooru
 
-RUN apt-get install -y --no-install-recommends libpq-dev libglib2.0-dev
+RUN apt-get install -y --no-install-recommends libpq-dev ragel=6.10-4
+
+COPY --chown=danbooru:danbooru lib/dtext_rb/ lib/dtext_rb/
+USER danbooru
+
+RUN <<EOS
+  cd lib/dtext_rb
+  bin/install
+EOS
+
 COPY --link Gemfile Gemfile.lock ./
 RUN <<EOS
-  bundle install --system --no-cache --jobs $(nproc)
+  BUNDLE_FROZEN=1 bundle install --no-cache --jobs $(nproc)
 
-  find /usr/local/lib/ruby/gems -regextype egrep -regex '.*\.(o|a|c|h|hh|hpp|exe|java|md|po|log|out|gem)$' -delete
-  find /usr/local/lib/ruby/gems -regextype egrep -regex '^.*/(Change|CHANGE|NEWS|LICENSE|COPYING|LEGAL|AUTHORS|CONTRIBUTORS|THANK|README|INSTALL|NOTICE|TODO).*$' -delete
-  find /usr/local/lib/ruby/gems -type f -executable -exec strip --strip-unneeded {} \;
-
-  rm -rf *
+  cd $GEM_HOME
+  find . -regextype egrep -regex '.*\.(o|a|c|h|hh|hpp|exe|java|md|po|log|out|gem|rdoc)$' -delete
+  find . -regextype egrep -regex '^.*/(Change|CHANGE|NEWS|LICENSE|COPYING|LEGAL|AUTHORS|CONTRIBUTORS|THANK|README|INSTALL|NOTICE|TODO|.github).*$' -delete
+  find . -type f -executable -exec strip --strip-unneeded {} \;
 EOS
 
 
-# Build the base Danbooru image. Pull in dependencies from previous layers and install runtime dependencies from apt-get.
-FROM base AS danbooru-base
-WORKDIR /danbooru
-ARG POSTGRESQL_CLIENT_VERSION
-ARG NODE_VERSION
 
-COPY --link --from=build-vips /usr/local /usr/local
-COPY --link --from=build-ruby /usr/local /usr/local
-COPY --link --from=build-node /usr/local /usr/local
+# Build Javascript and CSS assets. Output is in /danbooru/public/packs and /danbooru/node_modules.
+FROM build-node AS build-assets
+WORKDIR /danbooru
+
+COPY --link package.json package-lock.json ./
 
 RUN <<EOS
-  apt-get install -y --no-install-recommends \
-    postgresql-client-${POSTGRESQL_CLIENT_VERSION} ca-certificates mkvtoolnix rclone openssl perl perl-modules libpq5 \
-    libgmpxx4ldbl zlib1g libfftw3-3 libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2 libpng16-16 libexpat1 \
-    libglib2.0 libgif7 libexif12 libheif1 libvpx7 libdav1d6 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
-    libreadline8 libarchive-zip-perl tini busybox less ncdu curl
-
-  npm install -g yarn
-  gem install --no-document foreman
-
-  apt-get purge -y --allow-remove-essential pkg-config e2fsprogs libglib2.0-bin libglib2.0-doc mount procps python3 tzdata
-  apt-get autoremove -y
-  rm -rf /var/{lib,cache,log} /usr/share/{doc,info}/* /build
-
-  busybox --install -s
+  mkdir -p node_modules public/packs
+  chown danbooru:danbooru /danbooru node_modules public/packs
 EOS
 
+USER danbooru
+RUN npm ci
 
-
-# Build Javascript and CSS assets. Output is in /danbooru/public/packs.
-FROM danbooru-base AS build-assets
-
-COPY --link .yarnrc.yml package.json yarn.lock ./
-COPY --link .yarn/ ./.yarn/
-RUN yarn install
-
-COPY --link postcss.config.js babel.config.json Rakefile ./
-COPY --link bin/rails bin/webpacker ./bin/
-COPY --link config/application.rb config/boot.rb config/danbooru_default_config.rb config/webpacker.yml ./config/
+COPY --link postcss.config.js babel.config.json ./
+COPY --link config/shakapacker.yml ./config/
 COPY --link config/webpack/ ./config/webpack/
 COPY --link public/images ./public/images
 COPY --link public/fonts ./public/fonts
-COPY --link app/components/ ./app/components/
-COPY --link app/javascript/ ./app/javascript/
+COPY --link app/components/ ./app/components
+COPY --link app/javascript/ ./app/javascript
 
-COPY --link Gemfile Gemfile.lock ./
-COPY --link --from=build-gems /usr/local /usr/local
-RUN bin/rails assets:precompile
+RUN <<EOS
+  npx webpack --mode production -c config/webpack/webpack.config.js
+  rm -f public/packs/**/*.{gz,br}
+EOS
 
 
 
-# Build the final layer. Pull in the compiled assets and gems on top of the base Danbooru layer.
-FROM danbooru-base AS production
+# The base layer for the production and development layers. Contains everything but the /danbooru directory.
+FROM base AS danbooru-base
+WORKDIR /danbooru
 
 COPY --link --from=build-ffmpeg /usr/local /usr/local
 COPY --link --from=build-exiftool /usr/local /usr/local
 COPY --link --from=build-openresty /usr/local /usr/local
-
+COPY --link --from=build-vips /usr/local /usr/local
+COPY --link --from=build-ruby /usr/local /usr/local
+COPY --link --from=build-gems $GEM_HOME $GEM_HOME
 COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
-COPY --link --from=build-gems /usr/local /usr/local
-COPY --link . /danbooru
 
 # http://jemalloc.net/jemalloc.3.html#tuning
 ENV LD_PRELOAD=libjemalloc.so.2
@@ -304,18 +325,100 @@ ENV RUBY_YJIT_ENABLE=1
 # Disable libvips warning messages
 ENV VIPS_WARNING=0
 
-ARG SOURCE_COMMIT=""
+# https://github.com/shopify/bootsnap#environment-variables
+ENV BOOTSNAP_CACHE_DIR=/home/danbooru/bootsnap
+ENV BOOTSNAP_READONLY=true
+
+ENV DOCKER=true
+
 RUN <<EOS
-  echo $SOURCE_COMMIT > REVISION
-  ln -s /tmp tmp
-  ln -s packs public/packs-test
-  useradd --create-home --user-group danbooru
   ldconfig
+
+  mkdir -p /images
+  chown danbooru:danbooru /danbooru /images /home/danbooru public/packs $GEM_HOME
 EOS
 
-USER danbooru
-ENTRYPOINT ["tini", "--"]
+ENTRYPOINT ["tini", "-g", "--"]
 CMD ["bin/rails", "server"]
 
-# https://github.com/opencontainers/image-spec/blob/main/annotations.md
-LABEL org.opencontainers.image.source https://github.com/danbooru/danbooru
+
+
+# The production layer. Contains the final /danbooru directory on top of the base Danbooru layer.
+FROM danbooru-base AS production
+USER danbooru
+
+COPY --chown=danbooru:danbooru . /danbooru
+
+RUN <<EOS
+  mkdir -p public/data public/packs-dev
+  ln -s packs public/packs-test
+  ln -s /tmp tmp
+
+  bundle exec bootsnap precompile --gemfile app test
+
+  # Test that everything works
+  vips --version
+  ruby --version
+  cjpeg -version
+  ffmpeg -version
+  ffprobe -version
+  exiftool -ver
+  openresty -version
+  bin/good_job --help > /dev/null
+  bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
+EOS
+
+ARG DOCKER_IMAGE_REVISION=""
+ARG DOCKER_IMAGE_BUILD_DATE=""
+ENV DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION
+ENV DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE
+
+
+
+# The development layer. Contains the production layer, plus enables passwordless sudo, includes nodejs and node_modules
+# for building JS/CSS files, and includes tools and libraries needed for building certain Ruby gems.
+FROM danbooru-base AS development
+
+RUN <<EOS
+  apt-get update
+  apt-get install -y --no-install-recommends g++ make ragel=6.10-4 git sudo gpg socat libyaml-dev libpq-dev
+
+  groupadd admin -U danbooru
+  passwd -d danbooru
+
+  touch /home/danbooru/.sudo_as_admin_successful
+EOS
+
+COPY --link --from=build-node /usr/local /usr/local
+COPY --link --from=build-assets /danbooru/node_modules /node_modules
+COPY --link --from=production /home/danbooru/bootsnap /home/danbooru/bootsnap
+COPY --link --from=production /danbooru /danbooru
+
+RUN chown danbooru:danbooru /danbooru /node_modules /home/danbooru /home/danbooru/bootsnap /home/danbooru/.sudo_as_admin_successful
+
+ARG DOCKER_IMAGE_REVISION=""
+ARG DOCKER_IMAGE_BUILD_DATE=""
+ENV DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION
+ENV DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE
+
+ARG RUBY_VERSION
+ARG RUBY_MAJOR_VERSION
+ARG MOZJPEG_VERSION
+ARG VIPS_VERSION
+ARG FFMPEG_VERSION
+ARG EXIFTOOL_VERSION
+ARG OPENRESTY_VERSION
+ARG NODE_VERSION
+ARG UBUNTU_VERSION
+
+ENV RUBY_VERSION=$RUBY_VERSION
+ENV RUBY_MAJOR_VERSION=$RUBY_MAJOR_VERSION
+ENV MOZJPEG_VERSION=$MOZJPEG_VERSION
+ENV VIPS_VERSION=$VIPS_VERSION
+ENV FFMPEG_VERSION=$FFMPEG_VERSION
+ENV EXIFTOOL_VERSION=$EXIFTOOL_VERSION
+ENV OPENRESTY_VERSION=$OPENRESTY_VERSION
+ENV NODE_VERSION=$NODE_VERSION
+ENV UBUNTU_VERSION=$UBUNTU_VERSION
+
+USER danbooru

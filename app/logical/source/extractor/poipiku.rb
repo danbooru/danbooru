@@ -3,11 +3,7 @@
 # @see Source::URL::Poipiku
 class Source::Extractor
   class Poipiku < Source::Extractor
-    delegate :page_url, :profile_url, :user_id, :post_id, to: :parsed_url
-
-    def match?
-      Source::URL::Poipiku === parsed_url
-    end
+    delegate :profile_url, :user_id, to: :parsed_url
 
     def image_urls
       if parsed_url.image_url?
@@ -23,7 +19,7 @@ class Source::Extractor
 
       [first_image, *additional_images].map do |url|
         # url = "//img.poipiku.com/user_img03/000013318/007865949_015701153_EcvKNO8Dt.png_640.jpg"
-        url = "https:" + url if url.starts_with?("//")
+        url = "https:#{url}" if url.starts_with?("//")
         Source::URL.parse(url)&.full_image_url
       end.compact
     end
@@ -44,7 +40,7 @@ class Source::Extractor
       end
     end
 
-    def artist_name
+    def display_name
       page&.css(".UserInfoUserName")&.first&.text
     end
 
@@ -53,7 +49,7 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      DText.from_html(artist_commentary_desc)
+      DText.from_html(artist_commentary_desc, base_url: "https://poipiku.com")
     end
 
     def tags
@@ -63,26 +59,24 @@ class Source::Extractor
       end
     end
 
+    def page_url
+      # The original parsed_url.page_url may redirect to a different page with a different post ID; get the final page.
+      page&.at_css('link[rel="canonical"]')&.attr(:href) || parsed_url.page_url
+    end
+
+    def post_id
+      Source::URL.parse(page_url).try(:post_id)
+    end
+
     memoize def page
-      return nil if page_url.blank?
-
-      response = http.cache(1.minute).get(page_url)
-      return nil unless response.status == 200
-
-      response.parse
+      parsed_get(parsed_url.page_url)
     end
 
     memoize def additional_images_html
       return nil if user_id.blank? || post_id.blank?
 
-      response = http.use(:spoof_referrer).cache(1.minute).post("https://poipiku.com/f/ShowAppendFileF.jsp", form: { UID: user_id, IID: post_id })
-      return nil unless response.status == 200
-
-      json = JSON.parse(response.to_s)
-      html = Nokogiri::HTML5.fragment(json["html"])
-      html
-    rescue JSON::ParserError
-      nil
+      html = http.cookies(POIPIKU_LK: credentials[:session_cookie]).use(:spoof_referrer).cache(1.minute).parsed_post("https://poipiku.com/f/ShowAppendFileF.jsp", form: { UID: user_id, IID: post_id })
+      html&.text&.parse_json&.dig("html")&.parse_html
     end
   end
 end

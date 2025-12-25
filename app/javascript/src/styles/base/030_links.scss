@@ -1,4 +1,4 @@
-@import "./000_vars";
+@use "./mixins" as *;
 
 a {
   color: var(--link-color);
@@ -9,12 +9,9 @@ a:visited {
   color: var(--link-color);
 }
 
-a:hover {
+// When the link is being hovered or actively being clicked.
+a:hover, a:active {
   color: var(--link-hover-color);
-}
-
-a:active {
-  color: var(--link-color);
 }
 
 a.active {

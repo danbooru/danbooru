@@ -1,0 +1,38 @@
+<div id="c-metrics">
+  <div id="a-statistics">
+    <h1 class="mb-2">Statistics</h1>
+    <p class="fineprint mb-4">Updated <%= time_ago_in_words_tagged(@metrics.updated_at) %>.</p>
+
+    <div class="flex flex-wrap gap-4">
+      <% @metrics.metrics.values.each do |metric| %>
+        <% next if metric.name == :danbooru_info %>
+
+        <div class="card p-2 w-full md:w-320px max-h-360px thin-scrollbar">
+          <h2 class="mb-2"><%= metric.pretty_name %></h2>
+          <p class="fineprint"><%= metric.help %></p>
+
+          <% df = metric.to_dataframe.df %>
+          <%= table_for df.to_a, class: "striped autofit w-full" do |t| %>
+            <% df.keys.each_with_index do |name, i| %>
+              <% column = name == :value ? :total : name %>
+
+              <% t.column column.to_s.humanize, th: { class: ("!text-right" if name == df.keys.last) }, td: { class: [("text-right" if name == df.keys.last), ("col-expand" if name == df.keys[-2])].join(" ") } do |row| %>
+                <% if row[name].is_a?(String) %>
+                  <%= row[name].humanize %>
+                <% elsif metric.name.to_s.include?("bytes") %>
+                  <span title="<%= row[name] %>"><%= number_to_human_size(row[name]) %></span>
+                <% elsif metric.name.to_s.include?("seconds") %>
+                  <%= duration_to_hhmmss(row[name]) %>
+                <% else %>
+                  <span title="<%= row[name] %>"><%= humanized_number(row[name]) %></span>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%= render "status/secondary_links" %>

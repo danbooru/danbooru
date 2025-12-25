@@ -6,20 +6,20 @@ class UserUpgrade < ApplicationRecord
 
   delegate :payment_url, :receipt_url, to: :transaction
 
-  enum upgrade_type: {
+  enum :upgrade_type, {
     gold: 0,
     platinum: 10,
     gold_to_platinum: 20,
-  }, _suffix: "upgrade"
+  }, suffix: "upgrade"
 
-  enum status: {
+  enum :status, {
     pending: 0,
     processing: 10,
     complete: 20,
     refunded: 30,
   }
 
-  enum payment_processor: {
+  enum :payment_processor, {
     stripe: 0,
     authorize_net: 100,
     shopify: 200,

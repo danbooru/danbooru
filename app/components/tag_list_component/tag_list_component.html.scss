@@ -1,10 +1,6 @@
 .tag-list {
-  a.wiki-link {
-    margin-right: 0.25rem;
-  }
-
   a.search-tag {
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
   }
 
   &.inline-tag-list {

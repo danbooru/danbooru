@@ -94,6 +94,17 @@ module TagCategory
     }
   end
 
+  # Which tag categories to show in the sidebar tag list when searching for a tag.
+  def search_sidebar_tag_categories
+    @search_sidebar_tag_categories ||= {
+      GENERAL   => [COPYRIGHT, CHARACTER, GENERAL, META],
+      ARTIST    => [COPYRIGHT, CHARACTER, GENERAL, META],
+      CHARACTER => [COPYRIGHT, CHARACTER, GENERAL, META],
+      COPYRIGHT => [COPYRIGHT, CHARACTER, GENERAL, META],
+      META      => [COPYRIGHT, CHARACTER, META, GENERAL],
+    }
+  end
+
   def category_ids_regex
     "[#{category_ids.join}]"
   end

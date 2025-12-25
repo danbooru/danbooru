@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DanbooruHttpTest < ActiveSupport::TestCase
   def httpbin_url(path = "")
-    "https://nghttp2.org/httpbin/#{path}"
+    "https://httpbin.org/#{path}"
   end
 
   context "Danbooru::Http" do
@@ -81,16 +81,47 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal({ abc: "1", def: "3", ghi: "4" }, resp4.parse["cookies"].symbolize_keys)
       end
 
-      should "work for a URL containing spaces" do
-        resp = Danbooru::Http.get(httpbin_url("anything/foo bar"))
+      should "work for a URL containing special characters" do
+        resp = Danbooru::Http.get(httpbin_url("anything/foo 😃`~!@$%^&*()_-+={}[]|\\:;\"'<>,./?bar=baz 😃`~!@$^&*()_-+={}[]|\\:;\"'<>,./&blah😃#hash"))
+
         assert_equal(200, resp.status)
-        assert_equal(httpbin_url("anything/foo%20bar"), resp.parse["url"])
+        assert_equal(httpbin_url("anything/foo%20%F0%9F%98%83%60~!@$%25%5E&*()_-+=%7B%7D%5B%5D%7C%5C:;%22'%3C%3E,./?bar=baz%20%F0%9F%98%83`~!@$^&*()_-+={}[]|\\:;\"'<>,./&blah%F0%9F%98%83#hash"), resp.request.uri.to_s)
+        assert_equal(httpbin_url("anything/foo 😃`~!@$%25^&*()_-+={}[]|\\:%3B\"'<>,./?bar=baz 😃`~!%40$^&*()_-+={}[]|\\:%3B\"'<>,.%2F&blah😃"), resp.parse["url"])
+      end
+
+      should "work for a URL containing percent-encoded characters" do
+        resp = Danbooru::Http.get(httpbin_url("anything/foo%20bar%2Fbaz"))
+
+        assert_equal(200, resp.status)
+        assert_equal(httpbin_url("anything/foo%20bar%2Fbaz"), resp.request.uri.to_s)
+        assert_equal(httpbin_url("anything/foo bar/baz"), resp.parse["url"]) # httpbin decodes encoded URLs
       end
 
       should "work for a URL containing Unicode characters" do
         resp = Danbooru::Http.get(httpbin_url("anything/東方"))
         assert_equal(200, resp.status)
         assert_equal(httpbin_url("anything/東方"), resp.parse["url"])
+      end
+
+      should "not normalize Unicode characters to NFC form" do
+        resp = Danbooru::Http.head(httpbin_url("anything/\u30D5\u3099")) # U+30D5 U+3099 = ブ ('KATAKANA LETTER HU', 'COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK')
+        assert_equal(httpbin_url("anything/%E3%83%95%E3%82%99"), resp.request.uri.to_s)
+
+        resp = Danbooru::Http.with_legacy_ssl.head("https://tuyu-official.jp/wp/wp-content/uploads/2022/09/雨模様［サブスクジャケット］.jpeg")
+        assert_equal(404, resp.status)
+        assert_equal("%E9%9B%A8%E6%A8%A1%E6%A7%98%EF%BC%BB%E3%82%B5%E3%83%95%E3%82%99%E3%82%B9%E3%82%AF%E3%82%B7%E3%82%99%E3%83%A3%E3%82%B1%E3%83%83%E3%83%88%EF%BC%BD.jpeg", resp.request.uri.path.split("/").last)
+      end
+
+      should "work for a Source::URL" do
+        resp = Danbooru::Http.get(Source::URL.parse("https://www.google.com"))
+
+        assert_equal(200, resp.status)
+      end
+
+      should "work for a Source::URL that returns an error" do
+        resp = Danbooru::Http.get(Source::URL.parse("https://www.google.dne"))
+
+        assert_equal(598, resp.status)
       end
     end
 
@@ -103,6 +134,15 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       should "work for POST requests with JSON encoded bodies" do
         response = Danbooru::Http.post(httpbin_url("/post"), json: { foo: "bar" })
         assert_equal(200, response.status)
+      end
+    end
+
+    context "#redirect_url method" do
+      should "follow redirects to the final URL" do
+        assert_equal("http://www.google.com/", Danbooru::Http.redirect_url("http://google.com").to_s)
+        assert_equal("https://www.google.com/", Danbooru::Http.redirect_url("https://google.com").to_s)
+
+        assert_nil(Danbooru::Http.redirect_url("https://google.dne"))
       end
     end
 
@@ -139,8 +179,38 @@ class DanbooruHttpTest < ActiveSupport::TestCase
     end
 
     context "retriable feature" do
-      should "retry immediately if no Retry-After header is sent" do
+      should "not retry if the Retry-After header is sent with a 2xx or 3xx response" do
+        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", headers: { "Retry-After": "0" }, body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(1).returns(response_200)
+
+        response = Danbooru::Http.use(:retriable).get(httpbin_url("status/200"))
+        assert_equal(200, response.status)
+      end
+
+      should "retry after the max_delay if the server returns a 429 error with no Retry-After header" do
         response_429 = ::HTTP::Response.new(status: 429, version: "1.1", body: "", request: nil)
+        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
+
+        duration = Benchmark.realtime do
+          response = Danbooru::Http.use(retriable: { max_delay: 1.second }).get(httpbin_url("status/429"))
+          assert_equal(200, response.status)
+        end
+
+        assert_includes(1.0..1.1, duration)
+      end
+
+      should "retry immediately if the request returns a >=597 error" do
+        response_597 = ::HTTP::Response.new(status: 597, version: "1.1", body: "", request: nil)
+        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_597, response_200)
+
+        response = Danbooru::Http.use(:retriable).get(httpbin_url("status/597"))
+        assert_equal(200, response.status)
+      end
+
+      should "retry if the Retry-After header is an integer" do
+        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", headers: { "Retry-After": "1" }, body: "", request: nil)
         response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
         HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
 
@@ -148,21 +218,12 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal(200, response.status)
       end
 
-      should "retry if the Retry-After header is an integer" do
-        response_503 = ::HTTP::Response.new(status: 503, version: "1.1", headers: { "Retry-After": "1" }, body: "", request: nil)
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_503, response_200)
-
-        response = Danbooru::Http.use(:retriable).get(httpbin_url("status/503"))
-        assert_equal(200, response.status)
-      end
-
       should "retry if the Retry-After header is a date" do
-        response_503 = ::HTTP::Response.new(status: 503, version: "1.1", headers: { "Retry-After": 2.seconds.from_now.httpdate }, body: "", request: nil)
+        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", headers: { "Retry-After": 2.seconds.from_now.httpdate }, body: "", request: nil)
         response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_503, response_200)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
 
-        response = Danbooru::Http.use(:retriable).get(httpbin_url("status/503"))
+        response = Danbooru::Http.use(:retriable).get(httpbin_url("status/429"))
         assert_equal(200, response.status)
       end
     end
@@ -185,6 +246,20 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
         assert_equal(200, response.status.to_i)
         assert_equal(622_784, response.content_length)
+      end
+    end
+
+    context "public_only feature" do
+      should "disallow connections to non-public IPs" do
+        response = Danbooru::Http.public_only.get("http://127.0.0.1/foo.txt")
+
+        assert_equal(591, response.status)
+      end
+
+      should "not raise an exception if the domain doesnt't exist" do
+        response = Danbooru::Http.public_only.get("http://google.dne")
+
+        assert_equal(598, response.status)
       end
     end
 

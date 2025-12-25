@@ -34,7 +34,7 @@ module PostsHelper
   end
 
   def is_danbirthday?(post)
-    post.id == 1 && post.created_at.strftime("%m-%d") == Time.zone.today.strftime("%m-%d")
+    post.id == 1 && post.created_at.strftime("%m-%d") == Time.zone.today.strftime("%m-%d") && !post.created_at.today?
   end
 
   def image_container_data_attributes(post, current_user)
@@ -51,6 +51,7 @@ module PostsHelper
       "data-uploader-id" => post.uploader_id,
       "data-source" => post.source,
       "data-normalized-source" => post.normalized_source,
+      "data-can-have-notes" => post.can_have_notes?,
     }
 
     if post.visible?(current_user)

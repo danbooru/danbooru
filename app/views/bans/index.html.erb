@@ -11,11 +11,11 @@
       <% end %>
       <% t.column "Reason", td: {class: "col-expand"} do |ban| %>
         <div class="prose">
-          <%= format_text ban.reason %>
+          <%= ban.dtext_reason.format_text %>
         </div>
       <% end %>
       <% t.column "Duration" do |ban| %>
-        <%= humanized_duration(ban.duration) %>
+        <%= ban.humanized_duration %>
       <% end %>
       <% t.column "Banner" do |ban| %>
         <%= link_to_user ban.banner %>
@@ -24,8 +24,7 @@
       <% end %>
       <% t.column column: "control" do |ban| %>
         <% if policy(ban).update? %>
-          <%= link_to "Edit", edit_ban_path(ban) %>
-          | <%= link_to "Delete", ban_path(ban), :method => :delete, :remote => true %>
+          <%= link_to "Edit", edit_ban_path(ban), class: "button-primary button-sm", disabled: ban.expired? %>
         <% end %>
       <% end %>
     <% end %>

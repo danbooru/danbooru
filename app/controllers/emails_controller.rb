@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 class EmailsController < ApplicationController
-  before_action :requires_reauthentication, only: [:edit, :update]
+  before_action :requires_reauthentication, only: [:edit, :update, :destroy]
   respond_to :html, :xml, :json
-
-  rate_limit :update, rate: 1.0/1.minute, burst: 10
 
   def index
     @email_addresses = authorize EmailAddress.visible(CurrentUser.user).paginated_search(params, count_pages: true)
@@ -23,20 +21,32 @@ class EmailsController < ApplicationController
   end
 
   def edit
-    @user = authorize User.find(params[:user_id]), policy_class: EmailAddressPolicy
-    respond_with(@user)
+    @email_address = authorize email_address
+    @user = @email_address.user
+
+    respond_with(@email_address)
   end
 
   def update
-    @user = authorize User.find(params[:user_id]), policy_class: EmailAddressPolicy
-    @user.change_email(params[:user][:email], request)
+    @email_address = authorize email_address
+    @email_address.assign_attributes(request: request, updater: CurrentUser.user, **permitted_attributes(@email_address))
+    @email_address.save(context: :deliverable)
+    @user = @email_address.user
 
-    if @user.errors.none?
-      flash[:notice] = "Email updated. Check your email to confirm your new address"
-      respond_with(@user, location: settings_url)
+    if @email_address.user == CurrentUser.user
+      respond_with(@email_address, notice: "Check your email to confirm your new address", location: settings_path)
     else
-      flash[:notice] = @user.errors.full_messages.join("; ")
-      respond_with(@user)
+      respond_with(@email_address, notice: "Updated email address", location: edit_admin_user_path(@email_address.user))
+    end
+  end
+
+  def destroy
+    @email_address = authorize email_address
+    @email_address.attributes = { request: request, updater: CurrentUser.user }
+    @email_address.destroy
+
+    respond_with(@email_address, notice: "Email address removed") do |format|
+      format.html { redirect_to settings_path, status: 303 }
     end
   end
 
@@ -45,8 +55,10 @@ class EmailsController < ApplicationController
     @email_address = @user.email_address
 
     if @email_address.blank?
+      skip_authorization
       redirect_to edit_user_email_path(@user)
     elsif params[:email_verification_key].present? && @email_address == EmailAddress.find_signed!(params[:email_verification_key], purpose: "verify")
+      skip_authorization
       @email_address.verify!
       flash[:notice] = "Email address verified"
       redirect_to @email_address.user
@@ -62,5 +74,15 @@ class EmailsController < ApplicationController
 
     flash[:notice] = "Confirmation email sent to #{@user.email_address.address}. Check your email to confirm your address"
     redirect_to @user
+  end
+
+  private
+
+  def email_address
+    if params[:user_id]
+      EmailAddress.find_or_initialize_by(user_id: params[:user_id])
+    else
+      EmailAddress.find(params[:id])
+    end
   end
 end

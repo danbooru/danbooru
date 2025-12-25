@@ -1,0 +1,19 @@
+# This config file is used by `bin/build-docker-image` to prevent `docker
+# buildx build` from building all the Docker stages in parallel, which can lead
+# to excessive CPU usage or out-of-memory errors.
+#
+# Usage:
+#
+#    # Create a new builder:
+#    $ docker buildx create --use --name nonparallel-builder --config buildkitd.toml
+#
+#    # Switch back to the default builder:
+#    $ docker buildx use default
+#
+#    # Remove this builder:
+#    $ docker buildx rm nonparallel-builder
+#
+# https://docs.docker.com/build/buildkit/configure/#max-parallelism
+
+[worker.oci]
+  max-parallelism = 1

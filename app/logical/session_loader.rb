@@ -7,6 +7,8 @@
 # @see ApplicationController#set_current_user
 # @see CurrentUser
 class SessionLoader
+  include ActiveModel::API
+
   class AuthenticationFailure < StandardError; end
 
   attr_reader :session, :request, :ip_address, :params
@@ -22,42 +24,141 @@ class SessionLoader
 
   # Attempt to log a user in with the given username and password. Records a
   # login attempt event and returns the user if successful.
-  # @param name [String] the username
+  # @param name_or_email [String] The user's username or email address.
   # @param password [String] the user's password
   # @return [User, nil] the user if the password was correct, otherwise nil
-  def login(name, password)
-    user = User.find_by_name(name)
+  def login(name_or_email, password)
+    user = User.find_by_name_or_email(name_or_email)
 
     if user.present? && user.authenticate_password(password)
-      # Don't allow logins to privileged or inactive accounts from proxies, even if the password is correct
-      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy?
+      # Don't allow approvers or inactive accounts to login from proxies, unless the user has 2FA enabled.
+      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy? && user.totp.nil?
         UserEvent.create_from_request!(user, :failed_login, request)
+        errors.add(:base, "You cannot login from a proxy unless you have 2FA enabled")
+
         return nil
+      elsif user.totp.present?
+        UserEvent.create_from_request!(user, :totp_login_pending_verification, request)
+
+        return user
+      # Require email verification for builders without 2FA enabled who are logging in from a new location.
+      elsif user.is_builder? && user.can_receive_email?(require_verified_email: false) && !user.authorized_ip?(ip_address)
+        user_event = UserEvent.create_from_request!(user, :login_pending_verification, request)
+        user.send_login_verification_email!(request, user_event)
+        errors.add(:base, "New login location detected. Check your email to continue")
+
+        return nil
+      else
+        login_user(user, :login)
+        user
       end
-
-      session[:user_id] = user.id
-      session[:last_authenticated_at] = Time.now.utc.to_s
-
-      UserEvent.build_from_request(user, :login, request)
-      user.last_logged_in_at = Time.now
-      user.last_ip_addr = request.remote_ip
-      user.save!
-
-      user
     elsif user.nil?
-      nil # username incorrect
+      errors.add(:base, "Incorrect username or password")
+      nil
     else
       UserEvent.create_from_request!(user, :failed_login, request)
-      nil # password incorrect
+      errors.add(:base, "Incorrect username or password")
+      nil
     end
   end
 
-  # Logs the current user out. Deletes their session cookie and records a logout event.
-  def logout(user = CurrentUser.user)
-    session.delete(:user_id)
-    session.delete(:last_authenticated_at)
+  # Authorize a new login location for a user who was sent a login verification email.
+  #
+  # @param signed_login_event [String] The signed login event from the login verification email.
+  # @return [Boolean] True if the location was authorized, false otherwise.
+  def authorize_login_event!(signed_login_event)
+    user_event = UserEvent.find_signed(signed_login_event, purpose: :login_verification)
+
+    if user_event.present?
+      UserEvent.create_from_request!(user_event.user, :login_verification, request)
+      true
+    else
+      errors.add(:base, "Expired link. Please login again")
+      false
+    end
+  end
+
+  # Verify whether a user's 2FA code is correct after they have logged in with their password.
+  #
+  # @param user [User] The user to authenticate.
+  # @param code [String] The user's 6-digit 2FA code, or their 8-digit backup code.
+  # @return [Boolean] True if the 2FA code is correct, or false if it's incorrect.
+  def verify_totp!(user, code)
+    if user.totp.verify(code)
+      login_user(user, :totp_login)
+      true
+    elsif user.verify_backup_code!(code)
+      login_user(user, :backup_code_login)
+      true
+    else
+      UserEvent.create_from_request!(user, :totp_failed_login, request)
+      false
+    end
+  end
+
+  # Log a user in and create a new login session.
+  #
+  # @param user [User] The user to log in.
+  # @param event_category [Symbol] The login event (:user_creation, :login, :totp_login, :backup_code_login).
+  # @return [LoginSession] The new login session.
+  def login_user(user, event_category)
+    user.with_lock do
+      time = Time.now.utc.inspect
+
+      login_session = LoginSession.create!(user: user, session_id: session[:session_id], last_seen_at: time)
+      UserEvent.create_from_request!(user, event_category, request, login_session: login_session)
+      user.update!(last_logged_in_at: time, last_ip_addr: request.remote_ip)
+
+      session[:user_id] = user.id
+      session[:login_id] = login_session.login_id
+      session[:last_authenticated_at] = time
+
+      login_session
+    end
+  end
+
+  # Verify a user's password and 2FA code. Used to confirm a user's password before sensitive actions like adding API
+  # keys or changing the user's email.
+  #
+  # @param user [User] The user to reauthenticate.
+  # @param password [String] The user's password.
+  # @param verification_code [String] The user's 6-digit 2FA code, or their 8-digit backup code (if they have 2FA enabled).
+  def reauthenticate(user, password, verification_code = nil)
+    if !user.authenticate_password(password) # wrong password
+      UserEvent.create_from_request!(user, :failed_reauthenticate, request)
+      errors.add(:password, "is incorrect")
+      false
+    elsif !user.totp.present? # right password and user doesn't have 2FA
+      UserEvent.create_from_request!(user, :reauthenticate, request)
+      session[:last_authenticated_at] = Time.now.utc.inspect
+      true
+    elsif user.totp.verify(verification_code) # right password and right 2FA code
+      UserEvent.create_from_request!(user, :totp_reauthenticate, request)
+      session[:last_authenticated_at] = Time.now.utc.inspect
+      true
+    elsif user.verify_backup_code!(verification_code) # right password and right backup code
+      UserEvent.create_from_request!(user, :backup_code_reauthenticate, request)
+      session[:last_authenticated_at] = Time.now.utc.inspect
+      true
+    else # right password and wrong 2FA code or wrong backup code
+      UserEvent.create_from_request!(user, :totp_failed_reauthenticate, request)
+      errors.add(:verification_code, "is incorrect")
+      false
+    end
+  end
+
+  # Log the current user out. Deletes their session cookie, invalidates their login session, and records a logout event.
+  def logout(user)
     return if user.is_anonymous?
-    UserEvent.create_from_request!(user, :logout, request)
+
+    user.with_lock do
+      LoginSession.where(login_id: session[:login_id]).update_all(status: :logged_out, last_seen_at: Time.now.utc.inspect) if session[:login_id].present?
+      UserEvent.create_from_request!(user, :logout, request)
+
+      session.delete(:user_id)
+      session.delete(:login_id)
+      session.delete(:last_authenticated_at)
+    end
   end
 
   # Sets the current user. Runs on each HTTP request. The user is set based on
@@ -76,8 +177,6 @@ class SessionLoader
 
     if has_api_authentication?
       load_session_for_api
-    elsif params[:signed_user_id]
-      load_param_user(params[:signed_user_id])
     elsif session[:user_id]
       load_session_user
     end
@@ -140,13 +239,6 @@ class SessionLoader
     CurrentUser.user = user
   end
 
-  # Set the current user based on the `signed_user_id` URL param. This param is used by the reset password email.
-  # XXX use rails 6.1 signed ids (https://github.com/rails/rails/blob/6-1-stable/activerecord/CHANGELOG.md)
-  def load_param_user(signed_user_id)
-    session[:user_id] = Danbooru::MessageVerifier.new(:login).verify(signed_user_id)
-    load_session_user
-  end
-
   # Set the current user based on the `user_id` session cookie.
   def load_session_user
     user = User.find_by_id(session[:user_id])
@@ -194,6 +286,6 @@ class SessionLoader
 
   def initialize_session_cookies
     session.options[:expire_after] = 20.years
-    session[:started_at] ||= Time.now.utc.to_s
+    session[:started_at] ||= Time.now.utc.inspect
   end
 end

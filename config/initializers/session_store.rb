@@ -4,8 +4,8 @@
 Rails.application.config.session_store(
   :cookie_store,
   key: Danbooru.config.session_cookie_name,
-  domain: :all,
-  tld_length: 2,
+  domain: Danbooru.config.session_cookie_domain,
   same_site: :lax,
-  secure: Rails.env.production? && Danbooru.config.canonical_url.match?(%r!\Ahttps://!)
+  secure: !Rails.env.local? && Danbooru.config.canonical_url.starts_with?("https://"),
+  path: Rails.application.config.relative_url_root,
 )

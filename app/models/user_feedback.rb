@@ -3,17 +3,27 @@
 class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
 
+  dtext_attribute :body # defines :dtext_body
+
   attr_accessor :disable_dmail_notification, :updater
 
   belongs_to :user
   belongs_to :creator, class_name: "User"
-  validates :body, visible_string: true
+  validates :body, visible_string: true, length: { maximum: 1500 }, if: :body_changed?
   validates :category, presence: true, inclusion: { in: %w[positive negative neutral] }
   after_create :create_dmail, unless: :disable_dmail_notification
   after_update :create_mod_action
 
   deletable
 
+  # Feedback generation from bans has changed several times over the years. However they all start like one of the following:
+  # "Blocked: "
+  # "Banned: "
+  # "Banned forever: "
+  # "Banned for <duration>: "
+  # "Banned <duration>: "
+  scope :ban,      -> { where("body ~ '^Banned(:| for| [0-9])|Blocked:'") }
+  scope :not_ban,  -> { where("body !~ '^Banned(:| for| [0-9])|Blocked:'") }
   scope :positive, -> { where(category: "positive") }
   scope :neutral,  -> { where(category: "neutral") }
   scope :negative, -> { where(category: "negative") }
@@ -29,6 +39,10 @@ class UserFeedback < ApplicationRecord
 
     def search(params, current_user)
       q = search_attributes(params, [:id, :created_at, :updated_at, :category, :body, :is_deleted, :creator, :user], current_user: current_user)
+
+      if params[:hide_bans].to_s.truthy?
+        q = q.not_ban
+      end
 
       q.apply_default_order(params)
     end

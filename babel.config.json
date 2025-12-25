@@ -3,8 +3,8 @@
     [
       "@babel/preset-env", {
         "useBuiltIns": "entry",
-        "corejs": "3.27",
-        "debug": true,
+        "corejs": "3.42",
+        "debug": false,
         "modules": "auto",
         "bugfixes": true,
         "exclude": ["transform-typeof-symbol"]

@@ -7,13 +7,12 @@
 #
 # To add a new site, create a subclass of Source::Extractor and implement the following methods:
 #
-# * match? - True if the extractor should be used for this URL.
 # * image_urls - The list of images or videos at this URL. Used during uploads.
 # * page_url - The page containing the images. Used for post sources.
 # * profile_url - The URL of the artist's profile page. Used for artist finding.
 # * profile_urls - Extra profile URLs to add to the artist entry.
-# * tag_name - The artist's login name. Used as the default name for new artist tags.
-# * artist_name - The artist's display name. Used as an other name in new artist entries.
+# * display_name - The artist's display name, if they have one.
+# * username - The artist's username, if they have one.
 # * other_names - Extra names used in new artist entries.
 # * tags - The artist's tags for the work. Used by translated tags.
 # * artist_commentary_title - The artist's title of the work. Used for artist commentaries.
@@ -26,49 +25,9 @@ module Source
     # The http timeout to download a file.
     DOWNLOAD_TIMEOUT = 60
 
-    attr_reader :url, :referer_url, :parsed_url, :parsed_referer
+    attr_reader :url, :referer_url, :parsed_url, :parsed_referer, :parent_extractor, :default_credentials, :options
 
     delegate :site_name, to: :parsed_url
-
-    SUBCLASSES = [
-      Source::Extractor::Pixiv,
-      Source::Extractor::Twitter,
-      Source::Extractor::Tumblr,
-      Source::Extractor::NicoSeiga,
-      Source::Extractor::DeviantArt,
-      Source::Extractor::Moebooru,
-      Source::Extractor::Nijie,
-      Source::Extractor::ArtStation,
-      Source::Extractor::Gelbooru,
-      Source::Extractor::HentaiFoundry,
-      Source::Extractor::Fanbox,
-      Source::Extractor::Mastodon,
-      Source::Extractor::PixivSketch,
-      Source::Extractor::Weibo,
-      Source::Extractor::Newgrounds,
-      Source::Extractor::Skeb,
-      Source::Extractor::Lofter,
-      Source::Extractor::Foundation,
-      Source::Extractor::Plurk,
-      Source::Extractor::Tinami,
-      Source::Extractor::Fantia,
-      Source::Extractor::Booth,
-      Source::Extractor::Anifty,
-      Source::Extractor::Furaffinity,
-      Source::Extractor::Reddit,
-      Source::Extractor::Bilibili,
-      Source::Extractor::Rule34DotUs,
-      Source::Extractor::FourChan,
-      Source::Extractor::Picdig,
-      Source::Extractor::Enty,
-      Source::Extractor::ArcaLive,
-      Source::Extractor::Imgur,
-      Source::Extractor::Zerochan,
-      Source::Extractor::Poipiku,
-      Source::Extractor::ArtStreet,
-      Source::Extractor::Gumroad,
-      Source::Extractor::Misskey,
-    ]
 
     # Should return true if the extractor is configured correctly. Return false
     # if the extractor requires api keys that have not been configured.
@@ -86,32 +45,45 @@ module Source
     #
     # @param url [String] The URL to extract information from.
     # @param referer_url [String, nil] The page URL if `url` is an image URL.
-    # @return [Source::Extractor]
-    def self.find(url, referer_url = nil, default: Extractor::Null)
-      extractor = SUBCLASSES.lazy.map { |extractor| extractor.new(url, referer_url) }.find(&:match?)
-      extractor || default&.new(url, referer_url)
+    # @param default_extractor [Source::Extractor, nil] The extractor to use if no other extractor is found for this URL.
+    # @return [Source::Extractor, nil] The extractor, or nil if the URL couldn't be parsed and the default extractor is nil.
+    def self.find(url, referer_url = nil, default_extractor: Extractor::Null, **options)
+      parsed_url = Source::URL.parse(url)
+      parsed_referer = Source::URL.parse(referer_url)
+      parsed_url&.extractor(referer_url: parsed_referer, **options) || default_extractor&.new(url, referer_url: referer_url, **options)
     end
 
     # Initialize an extractor. Normally one should call `Source::Extractor.find`
     # instead of instantiating an extractor directly.
     #
-    # @param url [String] The URL to extract information form.
-    # @param referer_url [String, nil] The page URL if `url` is an image URL.
-    def initialize(url, referer_url = nil)
+    # @param url [Source::URL, String] The URL to extract information form.
+    # @param referer_url [Source::URL, String, nil] The page URL if `url` is an image URL.
+    # @param parent_extractor [Source::Extractor, nil] The parent of this extractor, if this is a sub extractor.
+    # @param credentials [Hash<String, String>] The credentials to use for this site (optional). If present, overrides any credentials from the database or config.
+    # @param options [Hash] Additional extractor-specific options to pass to the extractor.
+    def initialize(url, referer_url: nil, parent_extractor: nil, credentials: {}, **options)
       @url = url.to_s
       @referer_url = referer_url&.to_s
+      @parent_extractor = parent_extractor
+      @default_credentials = credentials
+      @options = options
 
       @parsed_url = Source::URL.parse(url)
       @parsed_referer = Source::URL.parse(referer_url) if referer_url.present?
-      @parsed_referer = nil if parsed_url&.site_name != parsed_referer&.site_name
+      @parsed_referer = nil if !allow_referer?
     end
 
-    # Should return true if this extractor should be used for this URL.
-    # Normally, this should check if the URL is from the right site.
-    #
-    # @return [Boolean]
-    def match?
-      false
+    # Normally if the main URL and the referer URL are from two different sites, then we ignore the referer URL. For
+    # example, a Twitter image URL with a Pixiv referer URL will ignore the Pixiv referer, because the Twitter image
+    # doesn't belong to a Pixiv post. This allows this behavior to be overidden for extractors that allow referers from
+    # other sites (see Source::Extractor::Google).
+    def allow_referer?
+      parsed_url&.image_url? && parsed_referer&.extractor_class == self.class
+    end
+
+    # The list of input URLs. Includes both the primary URL and the secondary referer URL, if it exists.
+    def parsed_urls
+      [parsed_url, parsed_referer].compact
     end
 
     # The list of image (or video) URLs extracted from the target URL.
@@ -138,25 +110,56 @@ module Source
     #
     # @return [String, nil]
     def page_url
-      nil
+      parsed_url.page_url || parsed_referer&.page_url
     end
 
-    # A name to suggest as the artist's tag name when creating a new artist.
-    # This should usually be the artist's login name. It should be plain ASCII,
-    # hopefully unique, and it should follow the rules for tag names (see
-    # TagNameValidator).
+    # A name to suggest as the artist's tag name when creating a new artist. It should follow the rules for tag names
+    # (see TagNameValidator) and hopefully be unique.
+    #
+    # By default, it's based on the artist's username, if they have one and it can be converted to a valid tag name,
+    # otherwise on their display name.
+    #
+    # This is only used for suggesting tag names for new artists, and nothing else.
     #
     # @return [String, nil]
     def tag_name
-      Tag.normalize_name(artist_name) if artist_name.present? && artist_name.match?(/\A[a-zA-Z0-9._-]+\z/)
+      self.class.normalize_tag_name(username) || self.class.normalize_tag_name(display_name)
     end
 
-    # The artists's primary name. If an artist has both a display name and a
-    # login name, this should be the display name. This will be used as an
-    # other name for new artist entries.
+    # The artists's primary name on the site. If the site has both display names and usernames, this should be their
+    # display name. If the site only has usernames, this should be their username.
     #
     # @return [String, nil]
     def artist_name
+      display_name || username
+    end
+
+    # The artists's display name, if the site has display names.
+    #
+    # On most sites, the display name has fewer character restrictions than usernames, can be changed at will, and is
+    # not unique to the user. Often it can contain CJK characters or emojis, so it can be difficult to convert to a tag
+    # name.
+    #
+    # This will be listed as an other name in the artist's artist entry, and will be the second choice to suggest as
+    # their tag name, after their username.
+    #
+    # @return [String, nil]
+    def display_name
+      nil
+    end
+
+    # The artist's username, if the site has usernames. This might also be called their login name, screen name, account
+    # name, or handle.
+    #
+    # On most sites, the username is restricted to letters, numbers, and a few punctuation characters (usually "-", "_",
+    # and "."). Usernames are usually unique for the site, but usually they can be changed by the user, so two different
+    # users could have the same username at different points in time.
+    #
+    # This will be listed as an other name in the artist's artist entry, and will be the first choice to suggest as
+    # their tag name.
+    #
+    # @return [String, nil]
+    def username
       nil
     end
 
@@ -165,7 +168,15 @@ module Source
     #
     # @return [Array<String>]
     def other_names
-      [artist_name, tag_name].compact.uniq
+      [artist_name, display_name, username].compact_blank.uniq(&:downcase)
+    end
+
+    # Convert a string to a tag name, or return nil if it can't be converted to a valid tag name.
+    #
+    # @param name [String, nil] An artist name to convert to a tag name.
+    # @return [String, nil] The tag name, or nil if it can't be converted to a valid tag name.
+    def self.normalize_tag_name(name)
+      name.to_s.downcase.gsub(/[^a-z0-9._-]/, "_").squeeze("_").gsub(/^[^a-z0-9]|[^a-z0-9]$/, "").presence
     end
 
     # A link to the artist's profile page on the site. This will be used for
@@ -207,18 +218,85 @@ module Source
       file
     end
 
-    # A http client for API requests.
-    def http
+    # @return [Danbooru::Http] The HTTP client to use for API or HTML requests. Extractors can override this to add custom headers or cookies.
+    memoize def http
       Danbooru::Http.external
     end
 
-    # A http client for downloading files.
-    def http_downloader
+    # @return [Danbooru::Http] The HTTP client to use for downloading files. Extractors can override this to add custom headers or cookies.
+    memoize def http_downloader
       http.timeout(DOWNLOAD_TIMEOUT).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
     end
 
+    # Fetch the given URL and return the parsed response, or nil on a non-2xx response. Also tracks whether the
+    # credentials succeeded or failed if the site uses credentials.
+    #
+    # @param url [String] The URL to fetch.
+    # @param cache [ActiveSupport::Duration] The duration to cache the response for. Defaults to 1 minute.
+    # @param params [Hash] The query params for the URL.
+    # @return [Object, nil] The parsed response. For HTML requests this will be a Nokogiri document; for JSON or XML
+    #   requests it will be a hash or array. If the request fails, returns nil.
+    def parsed_get(url, cache: 1.minute, params: {})
+      return nil if url.blank?
+
+      response = http.cache(cache).get(url, params: params)
+      update_credentials!(response)
+
+      response.parse if response.status.success?
+    end
+
+    # Called after each HTTP request to track whether the credentials succeeded or failed. Extractors can override this
+    # to customize how errors are handled.
+    #
+    # @param response [HTTP::Response] The response from the HTTP request.
+    def update_credentials!(response)
+      return if site_credential.nil?
+
+      if response.status == 429
+        site_credential.error!(:rate_limited)
+      else
+        site_credential.success!
+      end
+    end
+
+    # @return [Array<SiteCredential>] All credentials available for this site. May be empty if none are configured or working.
+    #   May be overriden by extractors to filter out rate-limited credentials. Credentials are taken from the constructor,
+    #   the environment, the config file, or the database, in that order.
+    memoize def site_credentials
+      if default_credentials.present?
+        SiteCredential.for_site(site_name, default_credentials: default_credentials)
+      else
+        SiteCredential.for_site(site_name)
+      end
+    end
+
+    # @return [SiteCredential, nil] Which credential to use for this site. May be nil if none are configured or working.
+    #   Extractors can override this to pick the best credential if multiple are available. The default is to choose the
+    #   least recently used credential.
+    memoize def site_credential
+      site_credentials.min_by { |c| c.last_used_at.to_i }
+    end
+
+    # @return [Hash<String, String>] A hash containing the credentials to use for this site. The format of this hash is
+    #   different for each site; see models/site_credential.rb to see what it contains.
+    memoize def credentials
+      site_credential&.credential&.with_indifferent_access || {}
+    end
+
+    # Find the artist(s) associated with this source URL. For known sites (e.g., art platforms shared by many artists),
+    # we extract the profile URL(s) and look for artist entries with a matching profile URL. For URLs from unknown sites
+    # (e.g., personal artist websites), we look for a prefix match of the URL (that is, we look for artist URLs that are
+    # from the same site and that have the same subfolders).
+    #
+    # @return [ActiveRecord::Relation<Artist>]
     def artists
-      ArtistFinder.find_artists(profile_url)
+      if parsed_url&.profile_url?
+        Artist.active.has_normalized_url([parsed_url.profile_url])
+      elsif parsed_url&.recognized?
+        Artist.active.has_normalized_url(profile_urls)
+      else
+        ArtistFinder.find_artists(url)
+      end
     end
 
     # A new artist entry with suggested defaults for when the artist doesn't
@@ -294,26 +372,21 @@ module Source
 
     def to_h
       {
-        :artist => {
-          :name => artist_name,
-          :tag_name => tag_name,
-          :other_names => other_names,
-          :profile_url => profile_url,
-          :profile_urls => profile_urls
+        page_url: page_url,
+        image_urls: image_urls,
+        artist: {
+          display_name: display_name,
+          username: username,
+          profile_urls: profile_urls,
+          artists: artists.as_json(only: %i[id name]),
         },
-        :artists => artists.as_json(include: :sorted_urls),
-        :image_urls => image_urls,
-        :page_url => page_url,
-        :tags => tags,
-        :normalized_tags => normalized_tags,
-        :translated_tags => translated_tags,
-        :artist_commentary => {
-          :title => artist_commentary_title,
-          :description => artist_commentary_desc,
-          :dtext_title => dtext_artist_commentary_title,
-          :dtext_description => dtext_artist_commentary_desc
+        tags: tags,
+        artist_commentary: {
+          title: artist_commentary_title,
+          description: artist_commentary_desc,
+          dtext_title: dtext_artist_commentary_title,
+          dtext_description: dtext_artist_commentary_desc,
         },
-        :api_response => api_response
       }
     end
 
@@ -322,7 +395,75 @@ module Source
     end
 
     def http_exists?(url)
+      return false if url.blank?
       http_downloader.head(url).status.success?
+    end
+
+    # @return [Enumerator] An enumerator that lets you iterate across the chain of parent extractors.
+    def each_parent
+      return enum_for(:each_parent) unless block_given?
+
+      parent = parent_extractor
+      while parent.present?
+        yield parent
+        parent = parent.parent_extractor
+      end
+    end
+
+    # @return [Array<Source::Extractor>] Return the list of parent extractors.
+    def parent_extractors
+      each_parent.to_a
+    end
+
+    memoize def test_case
+      file_sizes = image_urls.filter_map do |url|
+        response = http_downloader.head(url)
+        file_size = response["Content-Length"] || "0"
+        file_size = "0" if !response.status.in?(200..299)
+
+        pretty_file_size = file_size.reverse.chars.each_slice(3).map(&:join).join("_").reverse # "1234567" -> "1_234_567"
+        "{ file_size: #{pretty_file_size} }"
+      end
+
+      template = Erubi::Engine.new <<~TEST.chomp
+        strategy_should_work(
+          <%= url.inspect %>,
+        <% if image_urls.empty? -%>
+          image_urls: [],
+        <% elsif image_urls.one? %>
+          image_urls: %w[<%= image_urls.first %>],
+          media_files: [<%= file_sizes.first %>],
+        <% else %>
+          image_urls: %w[
+            <%= image_urls.join("\n    ") %>
+          ],
+          media_files: [
+            <%= file_sizes.join(",\n    ") %>
+          ],
+        <% end %>
+          page_url: <%= page_url.inspect %>,
+          profile_urls: %w[<%= profile_urls.join(" ") %>],
+          display_name: <%= display_name.inspect %>,
+          username: <%= username.inspect %>,
+        <% if tags.empty? %>
+          tags: [],
+        <% else %>
+          tags: [
+            <%= tags.map(&:inspect).join(",\n    ") %>,
+          ],
+        <% end %>
+          dtext_artist_commentary_title: <%= dtext_artist_commentary_title.inspect %>,
+        <% if dtext_artist_commentary_desc.lines.size <= 1 %>
+          dtext_artist_commentary_desc: <%= dtext_artist_commentary_desc.inspect %>
+        <% else %>
+          dtext_artist_commentary_desc: <<~EOS.chomp
+        <%= dtext_artist_commentary_desc.to_s.gsub(/^/, "    ") %>
+          EOS
+        <% end %>
+        )
+      TEST
+
+      eval(template.src)
     end
 
     # Convert commentary to dtext by stripping html tags. Sites can override
@@ -334,6 +475,12 @@ module Source
       text.strip
     end
 
-    memoize :http, :http_downloader, :related_posts
+    def inspect
+      variables = instance_values.reject { |key, _| key.starts_with?("_memoized") }.compact_blank
+      state = variables.map { |name, value| "@#{name}=#{value.inspect}" }.join(" ")
+      "#<#{self.class.name} #{state}>"
+    end
+
+    memoize :related_posts
   end
 end

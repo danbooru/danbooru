@@ -14,11 +14,11 @@ class PostApproval < ApplicationRecord
       errors.add(:post, "is already active and cannot be approved")
     end
 
-    if post.uploader == user
+    if post.uploader == user && !policy(user).can_approve_own_uploads?
       errors.add(:base, "You cannot approve a post you uploaded")
     end
 
-    if (post.approver == user || post.approvals.exists?(user: user)) && !policy(user).can_bypass_approval_limits?
+    if (post.approver == user || post.approvals.exists?(user: user)) && !policy(user).can_approve_same_post_twice?
       errors.add(:base, "You have previously approved this post and cannot approve it again")
     end
   end

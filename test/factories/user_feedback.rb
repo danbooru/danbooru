@@ -3,6 +3,6 @@ FactoryBot.define do
     creator factory: :builder_user
     user
     category { "positive" }
-    body { FFaker::Lorem.words.join(" ") }
+    body { Faker::Lorem.paragraph }
   end
 end

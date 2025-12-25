@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-#
+
 # Page URLs:
 #
 # * https://twitpic.com/dvitq3 (live)

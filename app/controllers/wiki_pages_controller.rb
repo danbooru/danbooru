@@ -17,6 +17,7 @@ class WikiPagesController < ApplicationController
 
   def index
     if params[:title].present?
+      authorize WikiPage
       redirect_to wiki_pages_path(search: { title_normalize: params[:title] }, redirect: true)
     else
       @wiki_pages = authorize WikiPage.paginated_search(params)
@@ -26,6 +27,7 @@ class WikiPagesController < ApplicationController
 
   def show
     @wiki_page, found_by = WikiPage.find_by_id_or_title(params[:id])
+    authorize @wiki_page, policy_class: WikiPagePolicy
     raise PageRemovedError if request.format.html? && @wiki_page&.artist.present? && @wiki_page.artist.is_banned? && !policy(@wiki_page.artist).can_view_banned?
 
     if request.format.html? && @wiki_page.blank? && found_by == :title
@@ -48,12 +50,11 @@ class WikiPagesController < ApplicationController
 
   def update
     @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
-    authorize @wiki_page
+    @wiki_page.attributes = permitted_attributes(@wiki_page)
+    authorize(@wiki_page).save
 
-    @wiki_page.update(permitted_attributes(@wiki_page))
-    flash[:notice] = @wiki_page.warnings.full_messages.join(".\n \n") if @wiki_page.warnings.any?
-
-    respond_with(@wiki_page)
+    notice = @wiki_page.warnings.full_messages.join(".\n \n") if @wiki_page.warnings.any?
+    respond_with(@wiki_page, notice: notice)
   end
 
   def destroy
@@ -70,11 +71,13 @@ class WikiPagesController < ApplicationController
 
     @version = @wiki_page.versions.find(params[:version_id])
     @wiki_page.revert_to!(@version)
-    flash[:notice] = "Page was reverted"
-    respond_with(@wiki_page)
+
+    respond_with(@wiki_page, notice: "Page was reverted")
   end
 
   def show_or_new
+    authorize WikiPage
+
     if params[:title].blank?
       redirect_to new_wiki_page_path(permitted_attributes(WikiPage))
     else

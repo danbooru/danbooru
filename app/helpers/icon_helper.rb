@@ -1,246 +1,26 @@
 # frozen_string_literal: true
 
 module IconHelper
-  # Names of sites we have a icon for. The logo for e.g. Pixiv is at public/images/pixiv-logo.png.
+  # The list of sites we have a icon for. The logo for e.g. Pixiv is stored at public/images/pixiv-logo.png. This is a
+  # hash mapping the site name to the logo filename.
   #
-  # To add a new site, add the site name here, add the logo in public/images, and update app/logical/source/url/null.rb
-  # if the site name is irregular.
-  SITE_ICON_NAMES = %w[
-    4chan
-    Adobe\ Portfolio
-    AllMyLinks
-    ArtStreet
-    Amazon
-    Ameblo
-    Amino
-    AniList
-    Anifty
-    Anime\ News\ Network
-    Animexx
-    Apple\ Music
-    Arca.live
-    Archive\ of\ Our\ Own
-    ArtStation
-    Art\ Fight
-    Artists&Clients
-    Aryion
-    Ask.fm
-    BCY
-    Bandcamp
-    Baraag
-    Beacons
-    Behance
-    Big\ Cartel
-    Biglobe
-    Bilibili
-    Blogger
-    Boosty
-    Booth
-    Buy\ Me\ a\ Coffee
-    Cafe24
-    Carrd
-    Catbox
-    Circle.ms
-    Class101
-    Clip\ Studio
-    Coconala
-    Colors\ Live
-    Commishes
-    Creatorlink
-    Curious\ Cat
-    DLSite
-    Danbooru
-    Deviant\ Art
-    Discord
-    Doujinshi.org
-    Douyin
-    Drawcrowd
-    E-Hentai
-    Enty
-    Erogamescape
-    Etsy
-    Excite\ Blog
-    FC2
-    Facebook
-    FanFiction.Net
-    Fanbox
-    Fandom
-    Fantia
-    Fiverr
-    Flavors
-    Flickr
-    Foriio
-    Foundation
-    Furaffinity
-    Fusetter
-    Gelbooru
-    Geocities
-    Giftee
-    GitHub
-    Google
-    Gumroad
-    Gunsta
-    Hatena
-    Hatena\ Blog
-    Hentai\ Foundry
-    Hitomi
-    HoYoLAB
-    Imagis
-    Imgur
-    Infoseek
-    Inkbunny
-    Inprnt
-    Instagram
-    Itch.io
-    Jimdo
-    Joyreactor
-    Kakao
-    Kemono\ Party
-    Kickstarter
-    Kirby's\ Comic\ Art
-    Kiru\ Made
-    Ko-fi
-    Konachan
-    Last.fm
-    Letterboxd
-    Line
-    LinkedIn
-    Linktree
-    Listography
-    Lit.link
-    Livedoor
-    Lofter
-    Luscious
-    Mangaupdates
-    Marshmallow\ Qa
-    Mastodon
-    Mblg
-    Mega
-    Melonbooks
-    Mihoyo
-    Mihuashi
-    Misskey.art
-    Misskey.design
-    Misskey.io
-    Mixi.jp
-    Monappy
-    Mottohomete
-    MyAnimeList
-    MyFigureCollection
-    Naver
-    Newgrounds
-    Nico\ Seiga
-    Nijie
-    Note
-    OCN
-    Objkt
-    Odaibako
-    Ofuse
-    OnlyFans
-    OpenSea
-    Overdoll
-    Partme
-    Patreon
-    Pawoo
-    PayPal
-    Peing
-    Photozou
-    Piapro.jp
-    Picarto
-    Picdig
-    Picrew
-    Piczel
-    Pillowfort
-    Pinterest
-    Pixel\ Joint
-    Pixiv
-    Pixiv\ Sketch
-    Plurk
-    Poipiku
-    Pornhub
-    Portfoliobox
-    Postype
-    Potofu
-    Privatter
-    Profcard
-    Recomet
-    RedGIFs
-    Redbubble
-    Reddit
-    Rule34.us
-    Rule34.xxx
-    Safebooru
-    Sakura.ne.jp
-    Sankaku\ Complex
-    Shopee
-    Skeb
-    Sketchfab
-    Sketchmob
-    Skima
-    Society6
-    SoundCloud
-    Spotify
-    Steam
-    Stickam
-    Storenvy
-    Streamlabs
-    SubscribeStar
-    SuperRare
-    Suzuri
-    TBIB
-    Taobao
-    Tapas
-    TeePublic
-    Telegram
-    The\ Interviews
-    Tictail
-    Tiktok
-    Tinami
-    Tistory
-    Togetter
-    Toranoana
-    Toyhouse
-    Trakteer
-    Trello
-    Tumblr
-    Twipple
-    TwitPic
-    Twitcasting
-    Twitch
-    Twitter
-    Twpf
-    Ustream
-    Vimeo
-    Vk
-    Wavebox
-    Weasyl
-    Webmshare
-    Webtoons
-    Weebly
-    Weibo
-    Wikipedia
-    Willow
-    Wix
-    WordPress
-    Yahoo
-    Yande.re
-    Yfrog
-    Youtube
-    Zerochan
-    html.co.jp
-    tsunagu.cloud
-  ]
+  # To add a new logo, just add the file to public/images. If the site name is irregular, update `site_name` inside
+  # app/logical/source/url/null.rb to make the site name match the logo filename.
+  SITE_ICONS = Rails.root.glob("public/images/*-logo.png").sort.to_h do |path|
+    # ["pixiv", "pixiv-logo.png"]
+    [path.basename.to_s.delete_suffix("-logo.png"), path.basename.to_s]
+  end
 
   def svg_icon_tag(name, id = name, class: nil, **options)
     klass = binding.local_variable_get(:class)
     tag.svg(class: "icon svg-icon #{name}-icon #{klass}".strip, **options) do
-      tag.use(fill: "currentColor", href: asset_pack_path("static/images/icons.svg") + "##{id}")
+      tag.use(fill: "currentColor", href: asset_pack_path("static/icons.svg") + "##{id}")
     end
   end
 
   def image_icon_tag(filename, class: nil, **options)
     klass = binding.local_variable_get(:class)
-    image_pack_tag("static/images/#{filename}", class: "icon #{klass}", **options)
+    image_pack_tag("static/#{filename}", class: "icon inline-block #{klass}", **options)
   end
 
   def upvote_icon(**options)
@@ -420,6 +200,14 @@ module IconHelper
     svg_icon_tag("download", viewBox: "0 0 512 512", **options)
   end
 
+  def print_icon(**options)
+    svg_icon_tag("print", viewBox: "0 0 512 512", **options)
+  end
+
+  def copy_icon(**options)
+    svg_icon_tag("copy", viewBox: "0 0 448 512", **options)
+  end
+
   def image_icon(**options)
     svg_icon_tag("image", viewBox: "0 0 512 512", **options)
   end
@@ -476,6 +264,74 @@ module IconHelper
     svg_icon_tag("add-reaction", viewBox: "0 0 24 24", **options)
   end
 
+  def code_icon(**options)
+    svg_icon_tag("code", viewBox: "0 0 640 512", **options)
+  end
+
+  def play_icon(**options)
+    svg_icon_tag("play", viewBox: "0 0 384 512", **options)
+  end
+
+  def pause_icon(**options)
+    svg_icon_tag("pause", viewBox: "0 0 320 512", **options)
+  end
+
+  def expand_icon(**options)
+    svg_icon_tag("expand", viewBox: "0 0 448 512", **options)
+  end
+
+  def minimize_icon(**options)
+    svg_icon_tag("minimize", viewBox: "0 0 512 512", **options)
+  end
+
+  def gear_icon(**options)
+    svg_icon_tag("gear", viewBox: "0 0 512 512", **options)
+  end
+
+  def check_icon(**options)
+    svg_icon_tag("check", viewBox: "0 0 448 512", **options)
+  end
+
+  def eye_icon(**options)
+    svg_icon_tag("eye", viewBox: "0 0 576 512", **options)
+  end
+
+  def bold_icon(**options)
+    svg_icon_tag("bold", viewBox: "0 0 384 512", **options)
+  end
+
+  def italic_icon(**options)
+    svg_icon_tag("italic", viewBox: "0 0 384 512", **options)
+  end
+
+  def strikethrough_icon(**options)
+    svg_icon_tag("strikethrough", viewBox: "0 0 512 512", **options)
+  end
+
+  def underline_icon(**options)
+    svg_icon_tag("underline", viewBox: "0 0 448 512", **options)
+  end
+
+  def quote_icon(**options)
+    svg_icon_tag("quote", viewBox: "0 0 448 512", **options)
+  end
+
+  def double_brackets_icon(**options)
+    svg_icon_tag("double-brackets", viewBox: "0 0 20 20", **options)
+  end
+
+  def no_double_brackets_icon(**options)
+    svg_icon_tag("no-double-brackets", viewBox: "0 0 20 20", **options)
+  end
+
+  def folder_open_icon(**options)
+    svg_icon_tag("folder-open", viewBox: "0 0 576 512", **options)
+  end
+
+  def horizontal_line_icon(**options)
+    svg_icon_tag("horizontal-line", viewBox: "0 0 24 24", **options)
+  end
+
   def discord_icon(**options)
     image_icon_tag("discord-logo.png", **options)
   end
@@ -489,8 +345,11 @@ module IconHelper
   end
 
   def external_site_icon(site_name, **options)
-    if site_name.in?(SITE_ICON_NAMES)
-      image_icon_tag("#{site_name.downcase.gsub(/[^a-z0-9.]/, "-")}-logo.png", **options)
+    name = site_name.downcase.gsub(/[^a-z0-9.]/, "-")
+    filename = SITE_ICONS[name]
+
+    if filename
+      image_icon_tag(filename, **options)
     else
       globe_icon(**options)
     end

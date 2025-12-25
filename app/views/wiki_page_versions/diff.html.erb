@@ -4,33 +4,37 @@
 <%= render "wiki_pages/sidebar" %>
 
 <% content_for(:content) do %>
-  <h1>Wiki Page Version Comparison: <%= link_to @thispage.title, wiki_page_versions_path(search: { wiki_page_id: @thispage.wiki_page_id }, type: params[:type], anchor: "wiki-page-version-#{@thispage.id}"), class: "tag-type-#{@thispage.wiki_page.tag&.category.to_i}" %></h1>
+  <div class="fixed-width-container">
+    <%= render "wiki_page_versions/navbar", wiki_page_version: @wiki_page_version %>
 
-  <% if params[:type].present? %>
-    <%= render "versions/types" %>
-  <% end %>
+    <h1><%= link_to_wiki @thispage.pretty_title, @thispage.title, class: "tag-type-#{@thispage.wiki_page.tag&.category.to_i}" %></h1>
 
-  <% if @otherpage.present? %>
-    <% if @thispage.id != @otherpage.id %>
-      <p>Showing differences between <%= compact_time @thispage.updated_at %> (<%= link_to_user @thispage.updater %>) and <%= compact_time @otherpage.updated_at %> (<%= link_to_user @otherpage.updater %>)</p>
+    <% if @otherpage.present? %>
+      <% if @thispage.id != @otherpage.id %>
+        <p class="fineprint">
+          Changes between
 
-      <% if wiki_version_show_other_names(@thispage, @otherpage) %>
-        <p><%= wiki_version_other_names_diff(@thispage, @otherpage) %></p>
+          <%= link_to_if @thispage.next, humanized_time(@thispage.updated_at), diff_wiki_page_versions_path(thispage: @thispage.next&.id, otherpage: @thispage.id) %> (<%= link_to_user @thispage.updater %>)
+          and
+          <%= link_to_if @otherpage.previous, humanized_time(@otherpage.updated_at), diff_wiki_page_versions_path(thispage: @otherpage.id, otherpage: @otherpage.previous&.id) %> (<%= link_to_user @otherpage.updater %>)
+        </p>
+
+        <% if @thispage.other_names.present? %>
+          <p><%= wiki_version_other_names_diff(@thispage, @otherpage) %></p>
+        <% end %>
+
+        <% if @thispage.body != @otherpage.body %>
+          <div class="diff-body">
+            <%= diff_body_html(@thispage, @otherpage, :body) %>
+          </div>
+        <% else %>
+          <p><em>No changes to body.</em></p>
+        <% end %>
       <% else %>
-        <p><em>No changes to other names.</em></p>
-      <% end %>
-
-      <% if @thispage.body != @otherpage.body %>
-        <div class="diff-body">
-          <%= diff_body_html(@thispage, @otherpage, :body) %>
-        </div>
-      <% else %>
-        <p><em>No changes to body.</em></p>
+        <p><em>Version is latest!</em></p>
       <% end %>
     <% else %>
-      <p><em>Version is latest!</em></p>
+      <p><em>No versions to compare!</em></p>
     <% end %>
-  <% else %>
-    <p><em>No versions to compare!</em></p>
-  <% end %>
+  </div>
 <% end %>

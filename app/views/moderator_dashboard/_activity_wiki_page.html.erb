@@ -8,10 +8,10 @@
     </tr>
   </thead>
   <tbody>
-    <% @dashboard.wiki_pages.each do |activity| %>
+    <% @dashboard.wiki_pages.each do |user, count| %>
       <tr>
-        <td><%= link_to_user(activity.user) %></td>
-        <td><%= link_to activity.count, wiki_page_versions_path(:search => {:updater_id => activity.user.id}) %></td>
+        <td><%= link_to_user(user) %></td>
+        <td><%= link_to count, wiki_page_versions_path(search: { updater_id: user.id }) %></td>
       </tr>
     <% end %>
   </tbody>

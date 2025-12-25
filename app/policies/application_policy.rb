@@ -68,6 +68,36 @@ class ApplicationPolicy
     permitted_attributes_for_update
   end
 
+  # Returns the rate limit for a given action. Calls `rate_limit_for_<action>` if it exists, or `rate_limit_for_read` or
+  # `rate_limit_for_write` if not.
+  #
+  # @param action [String] The action being performed, e.g. "index", "show", "create", etc.
+  # @param request [ActionDispatch::Request] The HTTP request object.
+  # @return [Hash] The rate limit for the action. A hash with `rate` and `burst` keys. Should return an empty hash if there is no rate limit.
+  def rate_limit(action, request)
+    method = :"rate_limit_for_#{action}"
+
+    if respond_to?(method)
+      send(method, request:)
+    elsif respond_to?(:rate_limit_for_read) && (request.get? || request.head?)
+      send(:rate_limit_for_read, request:)
+    elsif respond_to?(:rate_limit_for_write)
+      send(:rate_limit_for_write, request:)
+    else
+      raise NotImplementedError, "No rate limit defined for '#{action}' in #{self.class.name}"
+    end
+  end
+
+  # The default rate limit for read actions if no more specific limit is defined. By default, there is no limit.
+  def rate_limit_for_read(request: nil)
+    {}
+  end
+
+  # The default rate limit for write actions if no more specific rate limit is defined.
+  def rate_limit_for_write(request: nil)
+    { rate: user.api_regen_multiplier, burst: 200 }
+  end
+
   # When a user performs a search, this method is used to filter out results
   # that are hidden from the user based on what they're searching for. For
   # example, if a user searches for post flags by flagger name, they can see

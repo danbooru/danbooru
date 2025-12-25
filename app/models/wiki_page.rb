@@ -4,19 +4,23 @@ class WikiPage < ApplicationRecord
   class RevertError < StandardError; end
 
   META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:","api:"]
+  MAX_WIKI_LENGTH = 80_000
 
   after_save :create_version
 
-  normalize :title, :normalize_title
-  normalize :body, :normalize_text
-  normalize :other_names, :normalize_other_names
+  normalizes :title, with: ->(title) { WikiPage.normalize_title(title) }
+  normalizes :body, with: ->(body) { body.unicode_normalize(:nfc).normalize_whitespace.strip }
+  normalizes :other_names, with: ->(other_names) { WikiPage.normalize_other_names(other_names) }
 
   array_attribute :other_names # XXX must come after `normalize :other_names`
+  dtext_attribute :body, media_embeds: true # defines :dtext_body
 
   validates :title, tag_name: true, presence: true, uniqueness: true, if: :title_changed?
   validates :body, visible_string: true, unless: -> { is_deleted? || other_names.present? }
+  validates :body, length: { maximum: MAX_WIKI_LENGTH }, if: :body_changed?
+  validates :other_names, length: { maximum: 80, too_long: "can't have more than 80 names" }, if: :other_names_changed?
   validate :validate_rename
-  validate :validate_other_names
+  validate :validate_other_names, if: :other_names_changed?
 
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, -> { active }, foreign_key: "name", primary_key: "title"
@@ -24,6 +28,12 @@ class WikiPage < ApplicationRecord
 
   deletable
   has_dtext_links :body
+
+  # XXX doesn't work; need to cast link_target from string to integer
+  # has_many :embedded_posts, through: :dtext_links, source: :embedded_post
+
+  scope :has_embedded_media, -> { where(id: DtextLink.wiki_page.embedded_media.select(:model_id)) }
+  scope :no_embedded_media,  -> { where.not(id: DtextLink.wiki_page.embedded_media.select(:model_id)) }
 
   module SearchMethods
     def find_by_id_or_title(id)
@@ -40,6 +50,14 @@ class WikiPage < ApplicationRecord
 
     def title_matches(title)
       where_like(:title, normalize_title(title))
+    end
+
+    def embedded_post_id_matches(post_id)
+      where(id: DtextLink.wiki_page.embedded_media.where(link_target: post_id).select(:model_id))
+    end
+
+    def embedded_media_asset_id_matches(media_asset_id)
+      where(id: DtextLink.wiki_page.embedded_media.where(link_target: media_asset_id).select(:model_id))
     end
 
     def other_names_include(name)
@@ -79,6 +97,14 @@ class WikiPage < ApplicationRecord
         q = q.not_linked_to(params[:not_linked_to])
       end
 
+      if params[:embedded_post_id].present?
+        q = q.embedded_post_id_matches(params[:embedded_post_id])
+      end
+
+      if params[:embedded_media_asset_id].present?
+        q = q.embedded_media_asset_id_matches(params[:embedded_media_asset_id])
+      end
+
       if params[:hide_deleted].to_s.truthy?
         q = q.where("is_deleted = false")
       end
@@ -87,6 +113,12 @@ class WikiPage < ApplicationRecord
         q = q.where("other_names is not null and other_names != '{}'")
       elsif params[:other_names_present].to_s.falsy?
         q = q.where("other_names is null or other_names = '{}'")
+      end
+
+      if params[:has_embedded_media].to_s.truthy?
+        q = q.has_embedded_media
+      elsif params[:has_embedded_media].to_s.falsy?
+        q = q.no_embedded_media
       end
 
       case params[:order]
@@ -122,6 +154,10 @@ class WikiPage < ApplicationRecord
   def validate_other_names
     if other_names.present? && tag&.artist?
       errors.add(:base, "An artist wiki can't have other names")
+    end
+
+    if other_names.any? { |name| name.length > 100 }
+      errors.add(:other_names, "can't have names more than 100 characters long")
     end
   end
 
@@ -201,13 +237,16 @@ class WikiPage < ApplicationRecord
   end
 
   def tags
-    titles = DText.parse_wiki_titles(body).uniq
+    titles = DText.new(body).wiki_titles
     Tag.nonempty.undeprecated.named_or_aliased_in_order(titles)
   end
 
   def self.rewrite_wiki_links!(old_name, new_name)
     WikiPage.linked_to(old_name).each do |wiki|
-      wiki.lock!.update!(body: DText.rewrite_wiki_links(wiki.body, old_name, new_name))
+      wiki.with_lock do
+        wiki.body = DText.new(wiki.body).rewrite_wiki_links(old_name, new_name).to_s
+        wiki.save!(validate: false)
+      end
     end
   end
 

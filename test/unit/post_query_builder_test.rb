@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PostQueryBuilderTest < ActiveSupport::TestCase
   def assert_tag_match(posts, query, relation: Post.all, current_user: CurrentUser.user, tag_limit: nil, **options)
-    assert_equal(posts.map(&:id), relation.user_tag_match(query, current_user, tag_limit: tag_limit, **options).pluck("posts.id"))
+    assert_equal(posts.map(&:id), relation.user_tag_match(query, current_user, tag_limit: tag_limit, **options).map(&:id))
   end
 
   def assert_search_error(query, current_user: CurrentUser.user, **options)
@@ -868,6 +868,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "is:blah")
     end
 
+    should "return posts for the is:wiki_image metatag" do
+      post1 = create(:post)
+      post2 = create(:post)
+      create(:wiki_page, body: "!post ##{post1.id}")
+
+      assert_tag_match([post1], "is:wiki_image")
+      assert_tag_match([post2], "-is:wiki_image")
+    end
+
     should "return posts for the has:<value> metatag" do
       parent = create(:post)
       child = create(:post, parent: parent)
@@ -1415,6 +1424,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "order:random")
     end
 
+    should "return posts for order:modqueue" do
+      post = create(:post)
+
+      assert_tag_match([post], "order:modqueue")
+      assert_tag_match([post], "order:modqueue random:1")
+    end
+
     should "return posts for a filesize search" do
       post = create(:post, file_size: 1.megabyte, media_asset: build(:media_asset, file_size: 1.megabyte))
 
@@ -1575,6 +1591,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_search_error("a or ordpool:a")
       assert_search_error("a or limit:20")
       assert_search_error("a or random:20")
+    end
+
+    should "allow duplicated one-use-only metatags" do
+      post = create(:post)
+
+      assert_tag_match([post], "order:score order:score")
+      assert_tag_match([post], "order:score ORDER:SCORE")
+      assert_tag_match([post], "limit:1 limit:1")
+      assert_tag_match([post], "random:1 random:1")
     end
   end
 

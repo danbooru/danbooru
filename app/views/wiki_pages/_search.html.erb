@@ -8,6 +8,7 @@
   <% end %>
   <%= f.input :is_locked, label: "Locked?", as: :select, include_blank: true, selected: params[:search][:is_locked] %>
   <%= f.input :is_deleted, label: "Deleted?", as: :select, include_blank: true, selected: params[:search][:is_deleted] %>
+  <%= f.input :has_embedded_media, label: "Has Images?", as: :select, include_blank: true, selected: params[:search][:has_embedded_media] %>
   <%= f.input :order, collection: [%w[Newest created_at], %w[Title title], %w[Posts post_count]], include_blank: true, selected: params[:search][:order] %>
   <%= f.submit "Search" %>
 <% end %>

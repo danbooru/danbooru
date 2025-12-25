@@ -33,11 +33,23 @@ en:
   hello: "Hello world"
   activerecord:
     attributes:
+      api_key:
+        permitted_ip_addresses: "IP addresses"
+      artist/urls:
+        url: "URL"
       artist_url:
         url: ""
+      comment:
+        body: "Comment"
+      dmail:
+        body: "Message"
+      email_address:
+        normalized_address: "Email address"
       favorite:
         user: "You"
         user_id: "You"
+      forum_post:
+        body: "Post"
       forum_post_vote:
         creator_id: "Your vote"
       media_asset:
@@ -70,6 +82,8 @@ en:
       upload:
         uploader: "You"
         uploader_id: "You"
+      user:
+        password_confirmation: ""
       user/email_address:
         address: "Email address"
         normalized_address: "Email address"

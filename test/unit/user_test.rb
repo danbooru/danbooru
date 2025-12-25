@@ -32,10 +32,12 @@ class UserTest < ActiveSupport::TestCase
         @owner = create(:owner_user)
       end
 
-      should "allow moderators to promote users up to builder level" do
+      should "allow moderators to promote users up to approver level" do
         assert_promoted_to(User::Levels::GOLD, @user, @mod)
         assert_promoted_to(User::Levels::PLATINUM, @user, @mod)
         assert_promoted_to(User::Levels::BUILDER, @user, @mod)
+        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @mod)
+        assert_promoted_to(User::Levels::APPROVER, @user, @mod)
 
         assert_not_promoted_to(User::Levels::MODERATOR, @user, @mod)
         assert_not_promoted_to(User::Levels::ADMIN, @user, @mod)
@@ -46,6 +48,8 @@ class UserTest < ActiveSupport::TestCase
         assert_promoted_to(User::Levels::GOLD, @user, @admin)
         assert_promoted_to(User::Levels::PLATINUM, @user, @admin)
         assert_promoted_to(User::Levels::BUILDER, @user, @admin)
+        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @mod)
+        assert_promoted_to(User::Levels::APPROVER, @user, @admin)
         assert_promoted_to(User::Levels::MODERATOR, @user, @admin)
 
         assert_not_promoted_to(User::Levels::ADMIN, @user, @admin)
@@ -92,6 +96,12 @@ class UserTest < ActiveSupport::TestCase
         assert_not_promoted_to(User::Levels::MEMBER, @owner, @owner)
       end
 
+      should "not allow users to be promoted to an invalid level" do
+        assert_not_promoted_to(User::Levels::ANONYMOUS, @user, @mod)
+        assert_not_promoted_to(-1, @user, @mod)
+        assert_not_promoted_to(1, @user, @mod)
+      end
+
       should "create a neutral feedback" do
         @user.promote_to!(User::Levels::GOLD, @mod)
         assert_equal("You have been promoted to a Gold level account from Member.", @user.feedback.last.body)
@@ -107,6 +117,20 @@ class UserTest < ActiveSupport::TestCase
 
         assert(@user.dmails.exists?(from: bot, to: @user, title: "Your account has been updated"))
         refute(@user.dmails.exists?(from: bot, to: @user, title: "Your user record has been updated"))
+      end
+
+      should "max out the user's upload points when promoting to contributor or higher" do
+        assert_equal(UploadLimit::INITIAL_POINTS, @user.upload_points)
+
+        @user.promote_to!(User::Levels::CONTRIBUTOR, @admin)
+        assert_equal(UploadLimit::MAXIMUM_POINTS, @user.reload.upload_points)
+      end
+
+      should "recalculate the user's upload points when demoting them to below a contributor" do
+        assert_equal(UploadLimit::MAXIMUM_POINTS, @mod.upload_points)
+
+        @mod.promote_to!(User::Levels::MEMBER, @admin)
+        assert_equal(UploadLimit::INITIAL_POINTS, @mod.reload.upload_points)
       end
     end
 
@@ -324,13 +348,71 @@ class UserTest < ActiveSupport::TestCase
         user = build(:user, custom_style: "}}}")
 
         assert_equal(true, user.invalid?)
-        assert_match(/Custom CSS contains a syntax error/, user.errors[:base].first)
+        assert_match(/contains a syntax error/, user.errors[:custom_style].first)
       end
 
       should "allow blank CSS" do
         user = build(:user, custom_style: " ")
 
         assert_equal(true, user.valid?)
+      end
+    end
+
+    context "during validation" do
+      subject { build(:user) }
+
+      context "of level" do
+        should allow_value(User::Levels::RESTRICTED).for(:level)
+        should allow_value(User::Levels::MEMBER).for(:level)
+        should allow_value(User::Levels::GOLD).for(:level)
+        should allow_value(User::Levels::PLATINUM).for(:level)
+        should allow_value(User::Levels::BUILDER).for(:level)
+        should allow_value(User::Levels::CONTRIBUTOR).for(:level)
+        should allow_value(User::Levels::APPROVER).for(:level)
+        should allow_value(User::Levels::MODERATOR).for(:level)
+        should allow_value(User::Levels::ADMIN).for(:level)
+        should allow_value(User::Levels::OWNER).for(:level)
+
+        should_not allow_value(User::Levels::ANONYMOUS).for(:level)
+        should_not allow_value(-1).for(:level)
+        should_not allow_value(1).for(:level)
+      end
+
+      context "of blacklisted tags" do
+        should normalize_attribute(:blacklisted_tags).from(" foo\n bar \n baz ").to("foo\nbar\nbaz")
+        should normalize_attribute(:blacklisted_tags).from(" \t\n ").to("")
+
+        should allow_value("").for(:blacklisted_tags)
+        should allow_value("x" * 100_000).for(:blacklisted_tags)
+        should allow_value((["x"] * 5_000).join("\n")).for(:blacklisted_tags)
+        should allow_value((["x"] * 5_000).join(" ")).for(:blacklisted_tags)
+
+        should_not allow_value("x" * 100_001).for(:blacklisted_tags)
+        should_not allow_value((["x"] * 5_001).join("\n")).for(:blacklisted_tags)
+        should_not allow_value((["x"] * 5_001).join(" ")).for(:blacklisted_tags)
+      end
+
+      context "of favorite tags" do
+        should normalize_attribute(:favorite_tags).from(" foo bar ").to("foo bar")
+        should normalize_attribute(:favorite_tags).from(" \t\n ").to("")
+
+        should allow_value("").for(:favorite_tags)
+        should allow_value("x" * 10_000).for(:favorite_tags)
+        should allow_value((["x"] * 1_000).join(" ")).for(:favorite_tags)
+
+        should_not allow_value((["x"] * 1_001).join(" ")).for(:favorite_tags)
+        should_not allow_value("x" * 10_001).for(:favorite_tags)
+      end
+
+      context "of custom style" do
+        should normalize_attribute(:custom_style).from(" foo bar ").to("foo bar")
+        should normalize_attribute(:custom_style).from(" \t\n ").to("")
+
+        should allow_value("").for(:custom_style)
+        should allow_value("p { color: blue; }").for(:custom_style)
+        should allow_value(".#{"x" * 39_900} { color: blue; }").for(:custom_style)
+
+        should_not allow_value(".#{"x" * 40_001} { color: blue; }").for(:custom_style)
       end
     end
   end

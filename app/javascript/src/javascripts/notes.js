@@ -4,7 +4,8 @@ import "jquery-ui/themes/base/draggable.css";
 import "jquery-ui/themes/base/resizable.css";
 
 import CurrentUser from './current_user';
-import Utility, { clamp } from './utility';
+import Utility, { clamp, isTouchscreen } from './utility';
+import Notice from "./notice";
 
 class Note {
   static HIDE_DELAY = 250;
@@ -69,7 +70,7 @@ class Note {
     }
 
     on_click() {
-      if (!Utility.test_max_width(660)) {
+      if (!isTouchscreen()) {
         this.note.toggle_selected();
       } else if (this.$note_box.hasClass("viewing")) {
         this.note.body.hide();
@@ -266,7 +267,7 @@ class Note {
         current_top = Math.min(Math.max(current_top, -box_data.min_y, 0), image_height - box_data.max_y - 2, image_height - box_data.min_y - box_data.max_y - 2, image_height);
         current_left = Math.min(Math.max(current_left, -box_data.min_x, 0), image_width - box_data.max_x - 2, image_width - box_data.min_x - box_data.max_x - 2, image_width);
       } else {
-        Utility.error("Box too large to be rotated!");
+        Notice.error("Box too large to be rotated!");
         $note_box.css('transform', 'none');
       }
 
@@ -358,7 +359,7 @@ class Note {
       let ratio = $container.width() / large_width;
       let font_percentage = ratio * 100;
 
-      $container.css('font-size', font_percentage + '%');
+      $container.css('--note-font-size', font_percentage + '%');
     }
 
     static toggle_all() {
@@ -526,9 +527,9 @@ class Note {
 
     async preview_text(text) {
       this.display_text("Loading...");
-      let response = await $.post("/note_previews", { body: text });
+      let response = await $.post("/notes/preview.json", { body: text });
 
-      this.display_text(response.body);
+      this.display_text(response.sanitized_body);
       this.initialize();
       this.$note_body.show();
     }
@@ -548,7 +549,7 @@ class Note {
       }
 
       if (CurrentUser.data("is-anonymous")) {
-        Utility.notice("You must be logged in to edit notes");
+        Notice.error("You must be logged in to edit notes");
       } else {
         Note.Edit.show(this.note);
       }
@@ -576,7 +577,7 @@ class Note {
 
       $dialog.dialog({
         width: 360,
-        height: 240,
+        height: 250,
         position: {
           my: "right",
           at: "right-20",
@@ -636,7 +637,7 @@ class Note {
         $dialog.dialog("close");
         $note_box.removeClass("unsaved");
       } catch (xhr) {
-        Utility.error("Error: " + (xhr.responseJSON.reason || xhr.responseJSON.reasons.join("; ")));
+        Notice.error("Error: " + (xhr.responseJSON.reason || xhr.responseJSON.reasons.join("; ")));
       }
     }
 
@@ -688,8 +689,8 @@ class Note {
       $("#image").off("click.danbooru", Note.Box.toggle_all);
       $("#image").on("mousedown.danbooru.note", Note.TranslationMode.Drag.start);
 
-      Utility.notice('Translation mode is on. Drag on the image to create notes. <a href="#">Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
-      $("#notice a:contains(Turn translation mode off)").on("click.danbooru", Note.TranslationMode.stop);
+      Notice.info('Translation mode is on. Drag on the image to create notes. <a href="javascript:void(0)" class="translation-mode-off">Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
+      $(document).on("click.danbooru", "a.translation-mode-off", Note.TranslationMode.stop);
     }
 
     static stop() {
@@ -699,7 +700,7 @@ class Note {
       $(document).off("mouseup.danbooru", Note.TranslationMode.Drag.stop);
       $(document).off("mousemove.danbooru", Note.TranslationMode.Drag.drag);
       $(document.body).removeClass("mode-translation");
-      $("#close-notice-link").click();
+      Notice.notice.close();
     }
 
     static Drag = class {
@@ -890,7 +891,7 @@ class Note {
   }
 
   static initialize_all() {
-    if ($("#c-posts #a-show #image").length === 0 || $("video#image").length || $("canvas#image").length) {
+    if ($(".image-container").length && !$(".image-container").data("can-have-notes")) {
       return;
     }
 
@@ -929,4 +930,3 @@ $(function() {
 });
 
 export default Note
-

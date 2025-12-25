@@ -8,15 +8,20 @@ class Artist < ApplicationRecord
 
   deletable
 
-  normalize :name, :normalize_name
-  normalize :group_name, :normalize_other_name
-  normalize :other_names, :normalize_other_names
-  array_attribute :other_names # XXX must come after `normalize :other_names`
+  normalizes :name, with: ->(name) { Artist.normalize_name(name) }
+  normalizes :group_name, with: ->(name) { Artist.normalize_other_name(name) }
+  normalizes :other_names, with: ->(names) { Artist.normalize_other_names(names) }
+  array_attribute :other_names # XXX must come after `normalizes :other_names`
 
   validate :validate_artist_name
-  validates :name, tag_name: true, uniqueness: true
+  validate :validate_other_names, if: :other_names_changed?
+  validate :validate_urls
+  validates :name, tag_name: true, uniqueness: true, if: :name_changed?
+  validates :group_name, length: { maximum: 80 }, if: :group_name_changed?
+  validates :other_names, length: { maximum: 50, too_long: "can't have more than 50 names" }, if: :other_names_changed?
   after_validation :add_url_warnings
 
+  before_save :remove_redundant_other_names
   before_save :update_tag_category
   after_save :create_version
   after_save :clear_url_string_changed
@@ -36,8 +41,8 @@ class Artist < ApplicationRecord
     extend ActiveSupport::Concern
 
     def sorted_urls
-      urls.sort_by do |url|
-        [url.is_active? ? 0 : 1, url.priority, url.domain, url.secondary_url? ? 1 : 0, url.url]
+      Danbooru.natural_sort_by(urls, &:url).sort_by.with_index do |url, i|
+        [url.is_active? ? 0 : 1, url.priority, url.domain, url.secondary_url? ? 1 : 0, i]
       end
     end
 
@@ -62,6 +67,12 @@ class Artist < ApplicationRecord
 
     def clear_url_string_changed
       self.url_string_changed = false
+    end
+
+    def validate_urls
+      if urls.any?(&:new_record?) && urls.size > 150
+        errors.add(:urls, "can't have more than 150 URLs")
+      end
     end
 
     class_methods do
@@ -93,6 +104,10 @@ class Artist < ApplicationRecord
 
     def pretty_name
       name.tr("_", " ")
+    end
+
+    def remove_redundant_other_names
+      self.other_names -= [name] if name_changed? || other_names_changed?
     end
   end
 
@@ -183,6 +198,12 @@ class Artist < ApplicationRecord
       end
     end
 
+    def validate_other_names
+      if other_names.any? { |name| name.length > 80 }
+        errors.add(:other_names, "can't have names more than 80 characters long")
+      end
+    end
+
     def update_tag_category
       return unless !is_deleted? && name_changed? && tag.present?
 
@@ -195,10 +216,7 @@ class Artist < ApplicationRecord
   module BanMethods
     def unban!(current_user)
       with_lock do
-        ti = TagImplication.active.find_by(antecedent_name: name, consequent_name: "banned_artist")
-        ti&.update!(status: "deleted")
-
-        BulkUpdateRequestProcessor.mass_update(name, "-status:banned -banned_artist", user: current_user)
+        BulkUpdateRequestProcessor.mass_update(name, "-status:banned", user: current_user)
 
         CurrentUser.scoped(current_user) { update!(is_banned: false) }
         ModAction.log("unbanned artist ##{id}", :artist_unban, subject: self, user: current_user)
@@ -208,11 +226,6 @@ class Artist < ApplicationRecord
     def ban!(banner)
       with_lock do
         BulkUpdateRequestProcessor.mass_update(name, "status:banned", user: banner)
-
-        unless TagImplication.active.exists?(antecedent_name: name, consequent_name: "banned_artist")
-          Tag.find_or_create_by_name("banned_artist", category: "artist", current_user: banner)
-          TagImplication.approve!(antecedent_name: name, consequent_name: "banned_artist", approver: banner)
-        end
 
         CurrentUser.scoped(banner) { update!(is_banned: true) }
         ModAction.log("banned artist ##{id}", :artist_ban, subject: self, user: banner)
@@ -258,11 +271,14 @@ class Artist < ApplicationRecord
       query = query.strip
 
       if query =~ %r{\Ahttps?://}i
-        url = Source::Extractor.find(query).profile_url || query
-        ArtistFinder.find_artists(url)
+        Source::Extractor.find(query).artists
       else
         where(id: ArtistURL.url_matches(query).select(:artist_id))
       end
+    end
+
+    def has_normalized_url(urls)
+      where(id: ArtistURL.normalized_url_equals_any(urls).select(:artist_id))
     end
 
     def any_name_or_url_matches(query)
@@ -310,8 +326,11 @@ class Artist < ApplicationRecord
   end
 
   def add_url_warnings
-    urls.each do |url|
-      warnings.add(:base, url.warnings.full_messages.join("; ")) if url.warnings.any?
+    duplicate_artists = urls.select(&:new_record?).flat_map(&:duplicate_artists).sort.uniq.without(self)
+
+    if duplicate_artists.present?
+      names = duplicate_artists.map { |artist| "[[#{artist.name}]]" }
+      warnings.add(:base, "Potential duplicate of #{names.to_sentence}")
     end
   end
 

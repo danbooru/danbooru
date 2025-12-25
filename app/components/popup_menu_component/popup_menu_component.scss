@@ -1,8 +1,10 @@
-@import "../../javascript/src/styles/base/000_vars";
+@use "../../javascript/src/styles/base/mixins" as *;
 
 div.popup-menu {
   a.default-popup-menu-button {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    height: 100%;
     border-radius: 0.25rem;
     padding: 0.25rem;
     color: var(--muted-text-color);

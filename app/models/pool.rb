@@ -5,15 +5,19 @@ class Pool < ApplicationRecord
 
   RESERVED_NAMES = %w[none any series collection]
   POOL_ORDER_LIMIT = 1000
+  MAX_DESCRIPTION_LENGTH = 20_000
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
+  dtext_attribute :description # defines :dtext_description
 
-  validates :name, visible_string: true, uniqueness: { case_sensitive: false }, if: :name_changed?
+  normalizes :name, with: ->(name) { name.unicode_normalize(:nfc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "") }
+  normalizes :post_ids, with: ->(post_ids) { post_ids.uniq }
+
+  validates :name, visible_string: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 170 }, if: :name_changed?
   validate :validate_name, if: :name_changed?
+  validates :description, length: { maximum: MAX_DESCRIPTION_LENGTH }, if: :description_changed?
   validates :category, inclusion: { in: %w[series collection] }
   validate :updater_can_edit_deleted
-  before_validation :normalize_post_ids
-  before_validation :normalize_name
   after_save :create_version
 
   has_many :mod_actions, as: :subject, dependent: :destroy
@@ -28,7 +32,7 @@ class Pool < ApplicationRecord
   module SearchMethods
     def name_contains(name)
       name = normalize_name_for_search(name)
-      name = "*#{name}*" unless name =~ /\*/
+      name = "*#{name.escape_wildcards}*" unless name.include?("*")
       where_ilike(:name, name)
     end
 
@@ -85,12 +89,8 @@ class Pool < ApplicationRecord
 
   extend SearchMethods
 
-  def self.normalize_name(name)
-    name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "")
-  end
-
   def self.normalize_name_for_search(name)
-    normalize_name(name).downcase
+    normalize_value_for(:name, name).downcase
   end
 
   def self.named(name)
@@ -120,20 +120,12 @@ class Pool < ApplicationRecord
     category == "collection"
   end
 
-  def normalize_name
-    self.name = Pool.normalize_name(name)
-  end
-
   def pretty_name
     name.tr("_", " ")
   end
 
   def pretty_category
     category.titleize
-  end
-
-  def normalize_post_ids
-    self.post_ids = post_ids.uniq
   end
 
   def revert_to!(version)
@@ -261,7 +253,10 @@ class Pool < ApplicationRecord
 
   def self.rewrite_wiki_links!(old_name, new_name)
     Pool.linked_to(old_name).each do |pool|
-      pool.lock!.update!(description: DText.rewrite_wiki_links(pool.description, old_name, new_name))
+      pool.with_lock do
+        pool.description = DText.new(pool.description).rewrite_wiki_links(old_name, new_name).to_s
+        pool.save!(validate: false)
+      end
     end
   end
 end

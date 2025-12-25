@@ -1,4 +1,4 @@
-import Utility from './utility';
+import Notice from './notice';
 
 let PostVersion = {};
 
@@ -20,10 +20,10 @@ PostVersion.initialize_undo = function() {
 
   $(".post-version-select-checkbox").on("change.danbooru", function(event) {
     let checked = $("td .post-version-select-checkbox:checked");
-    $("#subnav-undo-selected-link").text(`Undo selected (${checked.length})`).toggle(checked.length > 0);
+    $("#subnav-undo-selected").text(`Undo selected (${checked.length})`).toggle(checked.length > 0);
   });
 
-  $("#subnav-undo-selected-link").on("click.danbooru", PostVersion.undo_selected);
+  $("#subnav-undo-selected").on("click.danbooru", PostVersion.undo_selected);
 };
 
 PostVersion.undo_selected = async function () {
@@ -37,7 +37,7 @@ PostVersion.undo_selected = async function () {
     await $.ajax(`/post_versions/${id}/undo.json`, { method: "PUT" });
 
     updated++;
-    Utility.notice(`${updated}/${selected_rows.length} changes undone.`);
+    Notice.info(`${updated}/${selected_rows.length} changes undone.`);
   }
 };
 

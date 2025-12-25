@@ -1,3 +1,18 @@
+html {
+  --text-xxs: 0.5625rem; // 9px
+  --text-xs: 0.6875rem;  // 11px
+  --text-sm: 0.75rem;    // 12px
+  --text-md: 0.875rem;   // 14px
+  --text-lg: 1rem;       // 16px
+  --text-xl: 1.3125rem;  // 21px
+  --text-xxl: 1.75rem;   // 28px
+  --emoji-font: "Twemoji";
+  --header-font: "Tahoma", "Verdana", "Helvetica", var(--emoji-font), sans-serif;
+  --body-font: "Verdana", "Helvetica", var(--emoji-font), sans-serif;
+  --monospace-font: monospace;
+  --arial-font: "Arial", "Helvetica", sans-serif;
+}
+
 /*
  * Make sure elements with the HTML5 [hidden] attribute (e.g. <span hidden>blah</span>)
  * really are hidden. Otherwise the `display` property can override the [hidden] attribute.
@@ -6,7 +21,8 @@
   display: none !important;
 }
 
-html {
+/* Reserve space for the scrollbar so the layout doesn't shift when the scrollbar appears/disappears, except in fullscreen mode. */
+html:not(:has(:fullscreen)) {
   scrollbar-gutter: stable;
 }
 
@@ -14,7 +30,7 @@ body {
   color: var(--text-color);
   background-color: var(--body-background-color);
   font-family: var(--body-font);
-  font-size: 87.5%;
+  font-size: var(--text-md);
   line-height: 1.25em;
 }
 
@@ -45,27 +61,15 @@ h3, h4, h5, h6 {
   font-size: var(--text-md);
 }
 
-fieldset {
-  border: 0;
-  padding: 0;
-  margin-bottom: 1em;
+input, select, textarea, button {
+  background-color: var(--form-input-background);
+  border-color: var(--form-input-border-color);
+  border-width: 1px;
+  padding: 0.125rem 0.25rem;
 }
 
-img {
-  border: none;
-  vertical-align: middle;
-}
-
-input, select, textarea {
-  background: var(--form-input-background);
-  border: 1px solid var(--form-input-border-color);
-  color: var(--form-input-text-color);
-  padding-left: 0.25em;
-  font: var(--body-font);
-}
-
-textarea {
-  font-size: var(--text-sm);
+:where(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--checkbox-selected-color);
 }
 
 /* placeholder text in <input type="text"> elements */
@@ -75,19 +79,33 @@ textarea {
   padding-left: 0.5em;
 }
 
-/* Highlight link anchor targets (e.g. /forum_topics/123#forum_post_456). Use
- * !important to override even table row backgrounds. */
-:target {
-  background: var(--target-background) !important;
+// Text selected by mouse or keyboard.
+::selection {
+  color: var(--inverse-text-color);
+  background-color: var(--selection-background-color);
+}
+
+// Text selected by text fragment links (e.g. https: //example.com#:~:text=blah)
+::target-text {
+  color: var(--inverse-text-color);
+  background-color: var(--target-text-background-color);
+}
+
+// Highlight elements selected by link anchor targets (e.g. /forum_topics/123#forum_post_456), but not headings or
+// random text selected by ::target-text.
+// Use !important to override even table row backgrounds.
+:target[id]:not(h1, h2, h3, h4, h5, h6) {
+  background-color: var(--target-background) !important;
+}
+
+// Add a focus ring around links and <input> elements when they are focused by the keyboard.
+:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: -2px; // Make sure the outline isn't clipped by overflow:hidden parents.
+  border-color: transparent;
 }
 
 menu {
-  padding: 0;
-
-  ul {
-    padding: 0;
-  }
-
   > li {
     display: inline;
   }
@@ -145,16 +163,15 @@ ul.list-inline {
 
 .svg-icon {
   display: inline-block;
-  vertical-align: middle;
   height: 1em;
 }
 
 .mobile-only {
   display: none !important;
 
-  @media (max-width: 660px) { display: initial !important; }
+  @media (width <= 660px) { display: initial !important; }
 }
 
 .desktop-only {
-  @media (max-width: 660px) { display: none !important; }
+  @media (width <= 660px) { display: none !important; }
 }

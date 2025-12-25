@@ -20,7 +20,13 @@
   <% end %>
   <%= subnav_link_to "Changes", post_versions_path %>
   <% if policy(PostApproval).create? %>
-    <%= subnav_link_to "Modqueue", modqueue_index_path %>
+    <%= subnav_link_to modqueue_index_path, id: "modqueue" do %>
+      Modqueue
+
+      <% if Post.available_for_moderation(CurrentUser.user, "unseen").count > 0 %>
+        <span class="badge-blue"><%= Post.available_for_moderation(CurrentUser.user, "unseen").count %></span>
+      <% end %>
+    <% end %>
   <% end %>
   <%= subnav_link_to "Help", wiki_page_path("help:posts") %>
 <% end %>

@@ -95,6 +95,15 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(1, @comment.reload.score)
       end
 
+      should "work for a comment that contains a media embed" do
+        @comment.update!(body: "!post ##{@comment.post.id}")
+
+        post_auth comment_comment_votes_path(comment_id: @comment.id), @user, params: { score: 1 }, xhr: true
+
+        assert_response :success
+        assert_equal(1, @comment.reload.score)
+      end
+
       should "not allow anonymous users to vote" do
         post comment_comment_votes_path(comment_id: @comment.id, score: "1"), xhr: true
         assert_response 403

@@ -3,30 +3,39 @@ require 'test_helper'
 class BansControllerTest < ActionDispatch::IntegrationTest
   context "A bans controller" do
     context "new action" do
-      should "render" do
-        @mod = create(:mod_user)
+      should "render for a mod" do
+        get_auth new_ban_path, create(:moderator_user)
 
-        get_auth new_ban_path, @mod
         assert_response :success
+      end
+
+      should "not render for a regular user" do
+        get_auth new_ban_path, create(:user)
+
+        assert_response 403
       end
     end
 
     context "edit action" do
-      should "render" do
-        @mod = create(:mod_user)
-        @ban = create(:ban)
+      should "render for a mod" do
+        get_auth edit_ban_path(create(:ban)), create(:moderator_user)
 
-        get_auth edit_ban_path(@ban.id), @mod
         assert_response :success
+      end
+
+      should "not render for a regular user" do
+        get_auth edit_ban_path(create(:ban)), create(:user)
+
+        assert_response 403
       end
     end
 
     context "show action" do
       should "render" do
         @ban = create(:ban)
-
         get ban_path(@ban)
-        assert_response :success
+
+        assert_redirected_to bans_path(search: { id: @ban.id })
       end
     end
 
@@ -58,8 +67,9 @@ class BansControllerTest < ActionDispatch::IntegrationTest
           @mod = create(:mod_user)
           post_auth bans_path, @mod, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @user.id }}
 
-          assert_redirected_to bans_path
+          assert_redirected_to @user
           assert_equal(true, @user.reload.is_banned?)
+          assert_equal(1.day, @user.active_ban.duration)
           assert_match(/banned <@#{@user.name}> 1 day: xxx/, ModAction.last.description)
           assert_equal(@user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
@@ -117,29 +127,96 @@ class BansControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "update action" do
-      should "update a ban" do
+      should "allow mods to change the ban reason" do
         @ban = create(:ban)
-        @mod = create(:mod_user)
-        put_auth ban_path(@ban.id), @mod, params: {ban: {reason: "xxx", duration: 1.day.iso8601}}
+        @mod = create(:moderator_user)
+        put_auth ban_path(@ban.id), @mod, params: { ban: { reason: "xxx" }}
 
+        assert_redirected_to @ban.user
         assert_equal("xxx", @ban.reload.reason)
-        assert_redirected_to(ban_path(@ban))
+        assert_equal(true, @ban.user.is_banned?)
+
+        assert_equal("updated ban reason for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("user_ban_update", ModAction.last.category)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
+      end
+
+      should "unban the user if the ban duration is reduced" do
+        @user = create(:user)
+        @mod = create(:moderator_user)
+        @ban = create(:ban, user: @user, created_at: 6.months.ago, duration: 1.year)
+        assert_equal(true, @user.reload.is_banned?)
+
+        put_auth ban_path(@ban.id), @mod, params: { ban: { duration: 1.day.iso8601 }}
+
+        assert_redirected_to @user
+        assert_equal(1.day, @ban.reload.duration)
+        assert_equal(false, @user.reload.is_banned?)
+
+        assert_equal("updated ban duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("user_ban_update", ModAction.last.category)
+        assert_equal(@ban.user, ModAction.last.subject)
+        assert_equal(@mod, ModAction.last.creator)
+      end
+
+      should "not allow expired bans to be updated" do
+        @user = create(:user)
+        @mod = create(:moderator_user)
+        @ban = create(:ban, user: @user, created_at: 6.months.ago, duration: 1.day)
+        assert_equal(false, @user.reload.is_banned?)
+
+        put_auth ban_path(@ban.id), @mod, params: { ban: { reason: "xxx", duration: 1.year.iso8601 }}
+
+        assert_response :success
+        assert_equal(1.day, @ban.reload.duration)
+        assert_equal(false, @user.reload.is_banned?)
+        assert_equal(false, ModAction.user_ban_update.exists?)
+      end
+
+      should "not allow regular users to update a ban" do
+        @ban = create(:ban)
+        put_auth ban_path(@ban.id), create(:user), params: { ban: { reason: "xxx", duration: 1.day.iso8601 }}
+
+        assert_response 403
+        assert_not_equal("xxx", @ban.reload.reason)
       end
     end
 
     context "destroy action" do
-      should "destroy a ban" do
+      should "allow mods to destroy a ban" do
         @ban = create(:ban)
         @mod = create(:mod_user)
 
         assert_difference("Ban.count", -1) do
           delete_auth ban_path(@ban.id), @mod
 
-          assert_redirected_to bans_path
+          assert_redirected_to @ban.user
+          assert_equal(false, @ban.user.reload.is_banned?)
           assert_match(/unbanned <@#{@ban.user.name}>/, ModAction.last.description)
           assert_equal(@ban.user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
         end
+      end
+
+      should "not allow mods to destroy an expired ban" do
+        @ban = create(:ban, created_at: 6.months.ago, duration: 1.day)
+        @mod = create(:mod_user)
+
+        assert_no_difference("Ban.count") do
+          delete_auth ban_path(@ban.id), @mod
+        end
+
+        assert_redirected_to @ban.user
+      end
+
+      should "not allow regular users to destroy a ban" do
+        @ban = create(:ban)
+        delete_auth ban_path(@ban.id), create(:user)
+
+        assert_response 403
+        assert_equal(true, @ban.user.reload.is_banned?)
+        assert_equal(true, @ban.reload.persisted?)
       end
     end
   end

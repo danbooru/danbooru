@@ -106,21 +106,6 @@ class DmailTest < ActiveSupport::TestCase
       end
     end
 
-    context "sending a dmail" do
-      should "fail if the user has sent too many dmails recently" do
-        10.times do
-          Dmail.create_split(from: @user, to: create(:user), title: "blah", body: "blah")
-        end
-
-        assert_no_difference("Dmail.count") do
-          @dmail = Dmail.create_split(from: @user, to: create(:user), title: "blah", body: "blah")
-
-          assert_equal(false, @dmail.valid?)
-          assert_equal(["You can't send dmails to more than 10 users per hour"], @dmail.errors[:base])
-        end
-      end
-    end
-
     context "destroying a dmail" do
       setup do
         @recipient = create(:user)
@@ -158,6 +143,14 @@ class DmailTest < ActiveSupport::TestCase
       should_not allow_value(nil).for(:to)
       should_not allow_value(nil).for(:from)
       should_not allow_value(nil).for(:owner)
+      should_not allow_value((["!post #1"] * 10).join("\n")).for(:body)
+
+      should "not allow NSFW media embeds" do
+        post = create(:post, rating: "e")
+        dmail = build(:dmail, body: "!post ##{post.id}").tap(&:validate)
+
+        assert_includes(dmail.errors[:body], "can't include NSFW images")
+      end
     end
   end
 end

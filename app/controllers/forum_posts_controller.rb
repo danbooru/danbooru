@@ -3,8 +3,6 @@
 class ForumPostsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  rate_limit :create, rate: 1.0/1.minute, burst: 50
-
   def new
     @forum_post = authorize ForumPost.new_reply(params)
     respond_with(@forum_post)
@@ -23,6 +21,7 @@ class ForumPostsController < ApplicationController
   end
 
   def search
+    authorize ForumPost
   end
 
   def show
@@ -38,8 +37,8 @@ class ForumPostsController < ApplicationController
   end
 
   def create
-    @forum_post = authorize ForumPost.new(creator: CurrentUser.user, creator_ip_addr: request.remote_ip, topic_id: params.dig(:forum_post, :topic_id))
-    @forum_post.update(permitted_attributes(@forum_post))
+    @forum_post = authorize ForumPost.new(creator: CurrentUser.user, updater: CurrentUser.user, creator_ip_addr: request.remote_ip, **permitted_attributes(ForumPost))
+    @forum_post.save
 
     page = @forum_post.topic.last_page if @forum_post.topic.last_page > 1
     respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => page))
@@ -47,24 +46,23 @@ class ForumPostsController < ApplicationController
 
   def update
     @forum_post = authorize ForumPost.find(params[:id])
-    @forum_post.update(permitted_attributes(@forum_post))
+    @forum_post.update(updater: CurrentUser.user, **permitted_attributes(@forum_post))
+
     page = @forum_post.forum_topic_page if @forum_post.forum_topic_page > 1
     respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => page, :anchor => "forum_post_#{@forum_post.id}"))
   end
 
   def destroy
     @forum_post = authorize ForumPost.find(params[:id])
-    @forum_post.delete!
+    @forum_post.delete!(CurrentUser.user)
 
-    flash[:notice] = @forum_post.errors.none? ? "Post deleted" : @forum_post.errors.full_messages.join("; ")
-    respond_with(@forum_post)
+    respond_with(@forum_post, notice: "Post deleted")
   end
 
   def undelete
     @forum_post = authorize ForumPost.find(params[:id])
-    @forum_post.undelete!
+    @forum_post.undelete!(CurrentUser.user)
 
-    flash[:notice] = @forum_post.errors.none? ? "Post undeleted" : @forum_post.errors.full_messages.join("; ")
-    respond_with(@forum_post)
+    respond_with(@forum_post, notice: "Post undeleted")
   end
 end

@@ -20,8 +20,8 @@ module VersionFor
   class_methods do
     # Declare a class as the version model belonging to a `versionable` model.
     def version_for(versioned_model_name)
-      raise "#{name} must have a `previous_version_id` attribute" if !has_attribute?(:previous_version_id)
-      raise "#{name} must have a `version` attribute" if !has_attribute?(:version)
+      #raise "#{name} must have a `previous_version_id` attribute" if !has_attribute?(:previous_version_id)
+      #raise "#{name} must have a `version` attribute" if !has_attribute?(:version)
 
       @versioned_model_name = versioned_model_name                      # "tag"
       @versioned_model_id_column = "#{versioned_model_name}_id"         # "tag_id"

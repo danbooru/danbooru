@@ -7,10 +7,9 @@
 
     <%= edit_form_for(@user_feedback) do |f| %>
       <%= f.input :category, :collection => ["positive", "neutral", "negative"], :include_blank => false %>
-      <%= f.input :body, as: :dtext %>
+      <%= f.input :body, as: :dtext, input_html: { autofocus: true } %>
       <%= f.input :is_deleted, label: "Deleted" %>
       <%= f.button :submit, "Submit" %>
-      <%= dtext_preview_button "user_feedback_body" %>
     <% end %>
   </div>
 </div>

@@ -9,7 +9,7 @@
     <% end %>
   <% end %>
 
-  <%= render "posts/partials/index/blacklist" %>
+  <%= render BlacklistComponent.new(user: CurrentUser.user) %>
 
   <p id="modqueue-sidebar-status" class="sidebar-section">
     <h2>Status</h2>

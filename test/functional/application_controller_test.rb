@@ -53,13 +53,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     context "on a PaginationError" do
       should "return 410 Gone even with a bad file extension" do
-        get posts_path, params: { page: 999999999 }, as: :json
+        get posts_path(page: 999_999_999), as: :json
         assert_response 410
 
-        get posts_path, params: { page: 999999999 }, as: :jpg
+        get posts_path(page: 999_999_999), as: :jpg
         assert_response 410
 
-        get posts_path, params: { page: 999999999 }, as: :blah
+        get posts_path(page: 999_999_999), as: :blah
         assert_response 410
       end
     end
@@ -222,13 +222,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
       context "for an API key with restrictions" do
         should "restrict requests to the permitted IP addresses" do
-          @api_key = create(:api_key, permitted_ip_addresses: ["192.168.0.1", "10.0.0.1/24", "2600::1/64"])
+          @api_key = create(:api_key, permitted_ip_addresses: ["1.2.3.4", "2.0.0.1/24", "2600::1/64"])
 
-          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("192.168.0.1")
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.2.3.4")
           get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
           assert_response :success
 
-          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("10.0.0.42")
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("2.0.0.42")
           get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
           assert_response :success
 
@@ -240,7 +240,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
           assert_response 403
 
-          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("10.0.1.0")
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("2.0.1.0")
           get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
           assert_response 403
 
@@ -283,8 +283,8 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           token = css_select("form input[name=authenticity_token]").first["value"]
 
           # login
-          post session_path, params: { authenticity_token: token, name: @user.name, password: "password" }
-          assert_redirected_to posts_path
+          post session_path, params: { authenticity_token: token, session: { name: @user.name, password: "password" } }
+          assert_redirected_to root_path
 
           # try to submit a form with cookies but without the csrf token
           put user_path(@user), headers: { HTTP_COOKIE: headers["Set-Cookie"] }, params: { user: { enable_safe_mode: "true" } }
@@ -298,7 +298,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     context "on session cookie authentication" do
       setup do
         @user = create(:user, password: "password")
-        post session_path, params: { name: @user.name, password: "password" }
+        login_as(@user)
       end
 
       should "succeed" do
@@ -339,7 +339,8 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       should "fail with a 429 error" do
         user = create(:user)
         post = create(:post, rating: "s")
-        RateLimit.any_instance.stubs(:limited?).returns(true)
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        create(:rate_limit, action: "posts:update", key: user.cache_key, limited: true)
 
         put_auth post_path(post), user, params: { post: { rating: "e" } }
 
@@ -352,7 +353,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
   context "all index methods" do
     should "support searching by the id attribute" do
       tags = create_list(:tag, 2, post_count: 42)
-      get tags_path(format: :json), params: { search: { id: tags.first.id } }
+      get tags_path(format: :json, search: { id: tags.first.id })
 
       assert_response :success
       assert_equal(1, response.parsed_body.size)
@@ -361,7 +362,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "support ordering by search[order]=custom" do
       tags = create_list(:tag, 2, post_count: 42)
-      get tags_path, params: { search: { id: "#{tags[0].id},#{tags[1].id}", order: "custom" } }, as: :json
+      get tags_path(search: { id: "#{tags[0].id},#{tags[1].id}", order: "custom" }), as: :json
 
       assert_response :success
       assert_equal(tags.pluck(:id), response.parsed_body.pluck("id"))
@@ -369,7 +370,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "return nothing if the search[order]=custom param isn't accompanied by search[id]" do
       tags = create_list(:tag, 2, post_count: 42)
-      get tags_path, params: { search: { order: "custom" } }, as: :json
+      get tags_path(search: { order: "custom" }), as: :json
 
       assert_response :success
       assert_equal(0, response.parsed_body.size)
@@ -377,7 +378,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "return nothing if the search[order]=custom param isn't accompanied by a valid search[id]" do
       tags = create_list(:tag, 2, post_count: 42)
-      get tags_path, params: { search: { id: ">1", order: "custom" } }, as: :json
+      get tags_path(search: { id: ">1", order: "custom" }), as: :json
 
       assert_response :success
       assert_equal(0, response.parsed_body.size)
@@ -385,7 +386,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "work if the search[order]=custom param is used with a single id" do
       tags = create_list(:tag, 2, post_count: 42)
-      get tags_path, params: { search: { id: tags[0].id, order: "custom" } }, as: :json
+      get tags_path(search: { id: tags[0].id, order: "custom" }), as: :json
 
       assert_response :success
       assert_equal([tags[0].id], response.parsed_body.pluck("id"))
@@ -406,14 +407,14 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     end
 
     should "support the expiry parameter" do
-      get posts_path, as: :json, params: { expiry: "1" }
+      get posts_path(expiry: "1"), as: :json
 
       assert_response :success
       assert_equal("max-age=#{1.day}, private", response.headers["Cache-Control"])
     end
 
     should "support the expires_in parameter" do
-      get posts_path, as: :json, params: { expires_in: "5min" }
+      get posts_path(expires_in: "5min"), as: :json
 
       assert_response :success
       assert_equal("max-age=#{5.minutes}, private", response.headers["Cache-Control"])
@@ -421,7 +422,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "support the only parameter" do
       create(:post)
-      get posts_path, as: :json, params: { only: "id,rating,score" }
+      get posts_path(only: "id,rating,score"), as: :json
 
       assert_response :success
       assert_equal(%w[id rating score].sort, response.parsed_body.first.keys.sort)

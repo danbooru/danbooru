@@ -17,24 +17,24 @@ class FileTypeDetector
     header = file.pread(16, 0)
 
     case header
-    when /\A\xff\xd8/n
+    in /\A\xff\xd8/n
       :jpg
-    when /\AGIF87a/, /\AGIF89a/
+    in /\AGIF8[79]a/
       :gif
-    when /\A\x89PNG\r\n\x1a\n/n
+    in /\A\x89PNG\r\n\x1a\n/n
       :png
-    when /\ACWS/, /\AFWS/, /\AZWS/
+    in /\A[CFZ]WS/
       :swf
 
     # This detects the Matroska (.mkv) header. WebM files have a DocType of "webm", which is checked later in `MediaFile::Video#is_supported?`.
     #
     # https://www.rfc-editor.org/rfc/rfc8794.html#section-8.1
     # https://www.webmproject.org/docs/container/
-    when /\A\x1a\x45\xdf\xa3/n
+    in /\A\x1a\x45\xdf\xa3/n
       :webm
 
     # https://developers.google.com/speed/webp/docs/riff_container
-    when /\ARIFF....WEBP/nm
+    in /\ARIFF....WEBP/nm
       :webp
 
     # https://www.ftyps.com
@@ -49,17 +49,20 @@ class FileTypeDetector
     # 3gp5 (rare) - 3GPP Media (.3GP) Release 5 (XXX technically this should be .3gp, not .mp4. Supported by Chrome but not Firefox)
     # avc1 (rare) - MP4 Base w/ AVC ext [ISO 14496-12:2005]
     # M4V (rare) - Apple iTunes Video (https://en.wikipedia.org/wiki/M4V)
-    when /\A....ftyp(?:mp4|avc|iso|3gp5|M4V)/nm
+    in /\A....ftyp(?:mp4|avc|iso|3gp5|M4V)/nm
       :mp4
 
     # https://aomediacodec.github.io/av1-avif/#brands-overview
-    when /\A....ftyp(?:avif|avis)/nm
+    in /\A....ftyp(?:avif|avis)/nm
       :avif
+
+    in /\APK\x03\x04/ if is_ugoira?
+      :ugoira
 
     # https://www.loc.gov/preservation/digital/formats/fdd/fdd000354.shtml#sign
     # https://en.wikipedia.org/wiki/ZIP_(file_format)
     # XXX Does not detect self-extracting archives
-    when /\APK\x03\x04/
+    in /\APK\x03\x04/
       :zip
 
     # https://docs.fileformat.com/compression/7z/#file-signature
@@ -67,7 +70,7 @@ class FileTypeDetector
     # https://www.loc.gov/preservation/digital/formats/fdd/fdd000539.shtml#sign
     # https://en.wikipedia.org/wiki/7z
     # XXX Does not detect self-extracting archives
-    when /\A7z\xbc\xaf\x27\x1c/n
+    in /\A7z\xbc\xaf\x27\x1c/n
       :"7z"
 
     # Rar 1.5 to 4.0
@@ -75,11 +78,11 @@ class FileTypeDetector
     # https://www.loc.gov/preservation/digital/formats/fdd/fdd000450.shtml#sign
     # https://en.wikipedia.org/wiki/RAR_(file_format)
     # XXX Does not detect self-extracting archives
-    when /\ARar!\x1a\x07\x00/n
+    in /\ARar!\x1a\x07\x00/n
       :rar
 
     # Rar 5.0+
-    when /\ARar!\x1a\x07\x01\x00/n
+    in /\ARar!\x1a\x07\x01\x00/n
       :rar
 
     else
@@ -87,6 +90,12 @@ class FileTypeDetector
     end
   rescue EOFError
     :bin
+  end
+
+  # @return [Boolean] True if animation.json is the first or last file of the .zip. MediaFile::Ugoira#is_corrupted? will validate this further later.
+  def is_ugoira?
+    # 14 bytes for "animation.json", 22 bytes for the end of central directory record, 30 bytes for the file header.
+    file.pread(14, file.size - 22 - 14) == "animation.json" || file.pread(14, 30) == "animation.json"
   end
 
   # @return [String] The file's MIME type, or "application/octet-stream" if unknown.

@@ -22,6 +22,16 @@ class UserDeletionTest < ActiveSupport::TestCase
       end
     end
 
+    context "for a moderator" do
+      should "fail" do
+        @user = create(:moderator_user)
+        @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
+        @deletion.delete!
+        assert_includes(@deletion.errors[:base], "Moderators cannot delete their account")
+        assert_equal(false, @user.reload.is_deleted)
+      end
+    end
+
     context "for an admin" do
       should "fail" do
         @user = create(:admin_user)
@@ -45,7 +55,8 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "a valid user deletion" do
     setup do
-      @user = create(:gold_user, name: "foo", email_address: build(:email_address))
+      @user = create(:gold_user, :with_email, :with_2fa, name: "foo")
+      @login_session = create(:login_session, user: @user)
       @api_key = create(:api_key, user: @user)
       @favorite = create(:favorite, user: @user)
       @forum_topic_visit = as(@user) { create(:forum_topic_visit, user: @user) }
@@ -54,12 +65,16 @@ class UserDeletionTest < ActiveSupport::TestCase
       @private_favgroup = create(:favorite_group, creator: @user, is_public: false)
       @post_downvote = create(:post_vote, score: -1)
       @post_upvote = create(:post_vote, score: 1)
+      @active_login_session = create(:login_session, user: @user, status: :active)
+      @inactive_login_session = create(:login_session, user: @user, status: :logged_out)
+      @request.session[:login_id] = @login_session.login_id
       @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
     end
 
     should "blank out the email" do
       perform_enqueued_jobs { @deletion.delete! }
       assert_nil(@user.reload.email_address)
+      assert_equal(false, ModAction.email_address_update.exists?)
     end
 
     should "rename the user" do
@@ -82,6 +97,16 @@ class UserDeletionTest < ActiveSupport::TestCase
     should "reset the password" do
       @deletion.delete!
       assert_equal(false, @user.authenticate_password("password"))
+    end
+
+    should "destroy the 2FA secret and backup codes" do
+      assert_equal(true, @user.totp_secret.present?)
+      assert_equal(true, @user.backup_codes.present?)
+
+      perform_enqueued_jobs { @deletion.delete! }
+
+      assert_nil(@user.reload.totp_secret)
+      assert_nil(@user.backup_codes)
     end
 
     should "not generate a modaction" do
@@ -109,6 +134,7 @@ class UserDeletionTest < ActiveSupport::TestCase
       perform_enqueued_jobs { @deletion.delete! }
 
       assert_equal(0, @user.api_keys.count)
+      assert_equal(0, @user.user_events.api_key_delete.count)
     end
 
     should "remove the user's forum topic visits" do
@@ -145,6 +171,21 @@ class UserDeletionTest < ActiveSupport::TestCase
       assert_equal(0, @user.post_votes.active.negative.count)
       assert_equal(0, @user.post_votes.active.positive.count)
     end
+
+    should "log the user out of their current login session" do
+      perform_enqueued_jobs { @deletion.delete! }
+
+      assert_equal("logged_out", @login_session.reload.status)
+      assert_equal(true, @user.user_events.logout.exists?(login_session_id: @login_session.login_id))
+      assert_equal(true, @user.user_events.user_deletion.exists?(login_session_id: @login_session.login_id))
+    end
+
+    should "revoke all other active login sessions" do
+      perform_enqueued_jobs { @deletion.delete! }
+
+      assert_equal("revoked", @active_login_session.reload.status)
+      assert_equal("logged_out", @inactive_login_session.reload.status)
+    end
   end
 
   context "deleting another user's account" do
@@ -155,10 +196,13 @@ class UserDeletionTest < ActiveSupport::TestCase
       @deletion.delete!
       assert_equal("user_#{@user.id}", @user.reload.name)
       assert_equal(true, @user.is_deleted)
+      assert_equal(false, UserEvent.user_deletion.exists?)
+      assert_equal(false, UserEvent.logout.exists?)
       assert_equal("deleted user ##{@user.id}", ModAction.last.description)
       assert_equal(@deletion.deleter, ModAction.last.creator)
       assert_equal(@user, ModAction.last.subject)
       assert_equal(false, ModAction.user_name_change.exists?)
+      assert_equal(true, ModAction.user_delete.exists?)
       assert_equal(1, ModAction.count)
     end
 

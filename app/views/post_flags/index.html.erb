@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Flags</h1>
     <%= render "search" %>
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <%= table_for @post_flags, width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |post_flag| %>
@@ -10,7 +10,7 @@
       <% end %>
       <% t.column "Reason" do |post_flag| %>
         <span class="prose">
-          <%= format_text post_flag.reason, inline: true %>
+          <%= post_flag.dtext_reason.format_text %>
         </span>
       <% end %>
       <% t.column "Flags", width: "1%" do |post_flag| %>

@@ -13,11 +13,13 @@ class AutocompleteComponent < ApplicationComponent
   def link_to_result(result, &block)
     case result.type
     when "user", "mention"
-      link_to user_path(result.id), class: "user-#{result.level}", "@click.prevent": "", &block
+      link_to user_path(result.id), class: "user-#{result.level} flex-grow-1", "@click.prevent": "", &block
     when "pool"
-      link_to pool_path(result.id), class: "pool-category-#{result.category}", "@click.prevent": "", &block
+      link_to pool_path(result.id), class: "pool-category-#{result.category} flex-grow-1", "@click.prevent": "", &block
+    when "emoji"
+      link_to "javascript:void(0)", class: "tag-type-#{Tag.categories.general} flex-grow-1", "@click.prevent": "", &block
     else
-      link_to posts_path(tags: result.value), class: "tag-type-#{result.category}", "@click.prevent": "", &block
+      link_to posts_path(tags: result.value), class: "tag-type-#{result.category} flex-grow-1", "@click.prevent": "", &block
     end
   end
 
@@ -44,6 +46,8 @@ class AutocompleteComponent < ApplicationComponent
       highlight_matching_words(result.value, query)
     elsif result.type == "mention"
       highlight_wildcard_match(result.label, query + "*")
+    elsif result.type == "emoji"
+      highlight_wildcard_match(result.label, "*" + query + "*")
     elsif query.include?("*")
       highlight_wildcard_match(result.value, query)
     else
@@ -72,7 +76,7 @@ class AutocompleteComponent < ApplicationComponent
     return tag.span(target.tr("_", " ")) if !target.ilike?(pattern.to_s)
 
     words = pattern.split(/(\*)/).compact_blank # "*black*" => ["*", "black", "*"]
-    regexp = words.map { |w| w == "*" ? "(.*)" : "(#{Regexp.escape(w)})" }.join # "*black*" => "(.*)(black)(.*)"
+    regexp = words.map { |w| (w == "*") ? "(.*)" : "(#{Regexp.escape(w.gsub("\\\\", "\\"))})" }.join # "*black*" => "(.*)(black)(.*)"
     regexp = Regexp.new(regexp, "i")
     captures = target.match(regexp).captures # "black_thighhighs" =~ /(.*)(black)(.*)/ => ["", "black", "_thighhighs"]
 

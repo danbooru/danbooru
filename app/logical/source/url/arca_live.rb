@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::ArcaLive < Source::URL
-  attr_reader :full_image_url, :channel, :post_id, :username, :user_id
+  attr_reader :candidate_full_image_urls, :full_image_url, :channel, :post_id, :username, :user_id
 
   def self.match?(url)
     url.domain.in?(%w[arca.live namu.la])
@@ -21,16 +21,17 @@ class Source::URL::ArcaLive < Source::URL
     # https://ac-o.namu.la/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9.gif?type=orig
     # https://ac.namu.la/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9.mp4 (.gif sample)
     in _, "namu.la", date, /\A\h{64}/
+      candidate_url = with_params(type: "orig")
       if file_ext == "mp4"
-        @full_image_url = "#{site}/#{date}/#{filename}.gif?type=orig"
+        @candidate_full_image_urls = %w[gif webp mp4].map { |ext| candidate_url.with(file_ext: ext).to_s }
       else
-        @full_image_url = "#{site}/#{date}/#{filename}.#{file_ext}?type=orig"
+        @full_image_url = candidate_url.to_s
       end
 
     # https://arca.live/b/arknights/66031722
     in _, "arca.live", "b", channel, post_id
-     @channel = channel
-     @post_id = post_id
+      @channel = channel
+      @post_id = post_id
 
     # https://arca.live/u/@Nauju/45320365
     in _, "arca.live", "u", /\A@/ => username, /\A\d+\z/ => user_id

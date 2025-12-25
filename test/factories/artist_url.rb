@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory(:artist_url) do
     artist
-    url {FFaker::Internet.domain_name}
+    url { Faker::Internet.unique.url }
   end
 end

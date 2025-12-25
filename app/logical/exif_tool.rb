@@ -28,7 +28,7 @@ class ExifTool
   # @return [ExifTool::Metadata] the file's metadata
   def metadata(options: DEFAULT_OPTIONS)
     output = %x(exiftool #{options} -json #{file.path.shellescape})
-    json = JSON.parse(output).first
+    json = output.parse_json.first
     json = json.except("SourceFile")
     ExifTool::Metadata.new(json.with_indifferent_access)
   end
@@ -47,8 +47,12 @@ class ExifTool
       @metadata = metadata
     end
 
-    def merge(hash)
-      Metadata.new(metadata.merge(hash))
+    def merge(...)
+      Metadata.new(metadata.merge(...))
+    end
+
+    def reject(...)
+      Metadata.new(metadata.reject(...))
     end
 
     def is_animated?

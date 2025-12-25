@@ -32,7 +32,7 @@ class BackgroundJob < GoodJob::Job
       end
 
       def search(params, current_user)
-        q = search_attributes(params, [:id, :created_at, :updated_at, :queue_name, :priority, :serialized_params, :scheduled_at, :performed_at, :finished_at, :error, :active_job_id, :concurrency_key, :cron_key, :retried_good_job_id, :cron_at], current_user: current_user)
+        q = search_attributes(params, [:id, :created_at, :updated_at, :queue_name, :priority, :serialized_params, :scheduled_at, :performed_at, :finished_at, :error, :active_job_id, :concurrency_key, :cron_key, :cron_at, :executions_count, :job_class, :labels, :locked_at], current_user: current_user)
 
         if params[:name].present?
           q = q.name_matches(params[:name])
@@ -61,14 +61,6 @@ class BackgroundJob < GoodJob::Job
 
     def pretty_name
       job_class.titleize.delete_suffix(" Job")
-    end
-
-    def job_duration
-      finished_at - performed_at if finished_at
-    end
-
-    def queue_delay
-      performed_at - created_at if performed_at
     end
   end
 end

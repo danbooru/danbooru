@@ -5,11 +5,11 @@
     <h1>Bookmarklet</h1>
 
     <p>
-      <%= link_to "Post to #{Danbooru.config.app_name}", "javascript:location.href='#{request.protocol + request.host_with_port}/uploads/new?url='+encodeURIComponent(location.href)+'&ref='+encodeURIComponent(document.referrer)" %>
+      <%= link_to "Post to #{Danbooru.config.app_name}", "javascript:void(location.href='#{request.protocol + request.host_with_port}/uploads/new?url='+encodeURIComponent(location.href)+'&ref='+encodeURIComponent(document.referrer))" %>
     </p>
 
     <div class="prose">
-      <%= format_text(WikiPage.find_by_title("help:bookmarklet_notice")&.body) %>
+      <%= WikiPage.find_by_title("help:bookmarklet_notice")&.dtext_body&.format_text %>
     </div>
   </div>
 </div>

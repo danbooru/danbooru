@@ -1,9 +1,72 @@
 <%= edit_form_for(ban) do |f| %>
-  <% if ban.new_record? %>
+  <% if ban.user.blank? %>
     <%= f.input :user_name, as: :string, input_html: { "data-autocomplete": "user" } %>
+  <% elsif ban.new_record? %>
+    <%= f.input :user_id, as: :hidden, input_html: { value: ban.user.id } %>
   <% end %>
 
-  <%= f.input :duration, collection: [["1 day", 1.day.iso8601], ["3 days", 3.days.iso8601], ["1 week", 1.week.iso8601], ["1 month", 1.month.iso8601], ["3 months", 3.months.iso8601], ["6 months", 6.months.iso8601], ["1 year", 1.year.iso8601], ["forever", 100.years.iso8601]], selected: ban.duration&.iso8601 %>
-  <%= f.input :reason %>
-  <%= f.button :submit %>
+  <%= f.input :reason, as: :dtext, input_html: { autofocus: true } %>
+  <%= f.input :duration, collection: Ban::DURATIONS.map { |duration| [duration == Ban::FOREVER ? "forever" : duration.inspect, duration.iso8601] }, selected: ban.duration&.iso8601 %>
+
+  <% if ban.new_record? && ban.user.present? %>
+    <% post_count = ban.user.posts.pending.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+    <% forum_topic_count = ban.user.forum_topics.undeleted.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+    <% forum_post_count = ban.user.forum_posts.undeleted.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+    <% comment_count = ban.user.comments.undeleted.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+    <% post_vote_count = ban.user.post_votes.undeleted.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+    <% comment_vote_count = ban.user.comment_votes.undeleted.where(created_at: Ban::MAX_DELETION_AGE.ago..).async_count %>
+
+    <% if post_count.value > 0 %>
+      <%= tag.div "x-data": { showReason: ban.delete_posts }.to_json do %>
+        <div class="flex gap-2">
+          <%= f.input :delete_posts, as: :boolean, wrapper: "inline-checkbox", label: "Delete #{post_count.value} pending posts", input_html: { "x-model": "showReason" } %>
+          <span class="leading-normal">(<%= link_to "list", posts_path(tags: "user:#{ban.user.name} status:pending") %>)</span>
+        </div>
+
+        <%= f.input :post_deletion_reason, as: :string, label: "With reason", wrapper_html: { "x-show": "showReason", "x-cloak": true } %>
+      <% end %>
+    <% end %>
+
+    <% if comment_count.value > 0 %>
+      <div class="flex gap-2">
+        <%= f.input :delete_comments, as: :boolean, wrapper: "inline-checkbox", label: "Delete #{comment_count.value} comments" %>
+        <span class="leading-normal">(<%= link_to "list", comments_path(search: { creator_id: ban.user.id }) %>)</span>
+      </div>
+    <% end %>
+
+    <% if forum_post_count.value > 0 || forum_topic_count.value > 0 %>
+      <div class="flex gap-2">
+        <%= f.input :delete_forum_posts, as: :boolean, wrapper: "inline-checkbox", label: tag.span("Delete #{forum_post_count.value} forum posts #{"and #{forum_topic_count.value} forum topics" if forum_topic_count.value > 0}".squeeze) %>
+        <span class="leading-normal">(<%= link_to "list", forum_posts_path(search: { creator_id: ban.user.id }) %>)</span>
+      </div>
+    <% end %>
+
+    <% if post_vote_count.value > 0 && policy(PostVote.new).destroy? %>
+      <div class="flex gap-2">
+        <%= f.input :delete_post_votes, as: :boolean, wrapper: "inline-checkbox", label: "Delete #{post_vote_count.value} post votes" %>
+        <span class="leading-normal">(<%= link_to "list", post_votes_path(search: { user_id: ban.user.id }) %>)</span>
+      </div>
+    <% end %>
+
+    <% if comment_vote_count.value > 0 && policy(CommentVote.new).destroy? %>
+      <div class="flex gap-2">
+        <%= f.input :delete_comment_votes, as: :boolean, wrapper: "inline-checkbox", label: "Delete #{comment_vote_count.value} comment votes" %>
+        <span class="leading-normal">(<%= link_to "list", comment_votes_path(search: { user_id: ban.user.id }) %>)</span>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div>
+    <% if @ban.new_record? %>
+      <%= f.submit "Ban", class: "button-danger", disabled: @ban.user&.is_banned? %>
+    <% else %>
+      <%= f.submit "Update", class: "button-primary", disabled: @ban.expired? %>
+    <% end %>
+
+    <% if @ban.persisted? %>
+      <%= f.submit "Unban", form: "delete-ban", class: "button-outline-danger", disabled: @ban.expired?, "data-confirm": "Are you sure you want to unban this user?" %>
+    <% end %>
+  </div>
 <% end %>
+
+<%= edit_form_for(ban, method: :delete, html: { id: "delete-ban", class: "hidden" }) {} %>

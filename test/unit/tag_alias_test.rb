@@ -22,6 +22,9 @@ class TagAliasTest < ActiveSupport::TestCase
         FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "active")
       end
 
+      should normalize_attribute(:antecedent_name).from(" FOO BAR ").to("foo_bar")
+      should normalize_attribute(:consequent_name).from(" FOO BAR ").to("foo_bar")
+
       should allow_value('active').for(:status)
       should allow_value('deleted').for(:status)
 
@@ -96,13 +99,21 @@ class TagAliasTest < ActiveSupport::TestCase
         @ss5 = create(:saved_search, query: "123 ...", user: CurrentUser.user)
 
         TagAlias.approve!(antecedent_name: "...", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("123 bbb 456", @ss1.reload.query)
         assert_equal("123 -bbb 456", @ss2.reload.query)
         assert_equal("123 ~bbb 456", @ss3.reload.query)
         assert_equal("bbb 456", @ss4.reload.query)
         assert_equal("123 bbb", @ss5.reload.query)
+      end
+
+      should "not fail if user has a saved search that is too long" do
+        ss = build(:saved_search, query: SavedSearch::MAX_TAGS.succ.times.map { |n| "tag#{n}" }.join(" "))
+        ss.save!(validate: false)
+
+        TagAlias.approve!(antecedent_name: "tag0", consequent_name: "new_tag", approver: @admin)
+
+        assert_equal(true, ss.reload.query.split.include?("new_tag"))
       end
     end
 
@@ -117,7 +128,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @u7 = create(:user, blacklisted_tags: "111 ...\r\n222 333\n")
 
         TagAlias.approve!(antecedent_name: "...", consequent_name: "aaa", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("111 aaa 222", @u1.reload.blacklisted_tags)
         assert_equal("111 -aaa -222", @u2.reload.blacklisted_tags)
@@ -127,6 +137,15 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_equal("111 222\n\naaa 333", @u6.reload.blacklisted_tags)
         assert_equal("111 aaa\n222 333", @u7.reload.blacklisted_tags)
       end
+
+      should "not fail if the user has too many blacklisted tags" do
+        user = build(:user, blacklisted_tags: User::MAX_BLACKLIST_TAGS.succ.times.map { |n| "tag#{n}" }.join("\n"))
+        user.save!(validate: false)
+
+        TagAlias.approve!(antecedent_name: "tag0", consequent_name: "new_tag", approver: @admin)
+
+        assert_equal(true, user.reload.blacklisted_tags.split.include?("new_tag"))
+      end
     end
 
     should "update any affected posts when saved" do
@@ -134,7 +153,6 @@ class TagAliasTest < ActiveSupport::TestCase
       post2 = FactoryBot.create(:post, :tag_string => "ccc ddd")
 
       TagAlias.approve!(antecedent_name: "aaa", consequent_name: "ccc", approver: @admin)
-      perform_enqueued_jobs
 
       assert_equal("bbb ccc", post1.reload.tag_string)
       assert_equal("ccc ddd", post2.reload.tag_string)
@@ -157,7 +175,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki = create(:wiki_page, title: "aaa")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("bbb", @wiki.reload.title)
       end
@@ -167,7 +184,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal(true, @wiki1.reload.is_deleted)
         assert_equal([], @wiki1.other_names)
@@ -183,7 +199,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("This tag has been moved to [[#{@wiki2.title}]].", @wiki1.reload.body)
         assert_equal("first", @wiki2.reload.body)
@@ -194,7 +209,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal(true, @wiki1.reload.is_deleted)
         assert_equal(%w[111 222], @wiki1.other_names)
@@ -209,18 +223,34 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki = create(:wiki_page, body: "foo [[aaa]] bar")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("foo [[bbb]] bar", @wiki.reload.body)
+      end
+
+      should "not fail to rewrite wikis if the wiki page is too long" do
+        @wiki = build(:wiki_page, body: "foo [[aaa]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}")
+        @wiki.save!(validate: false)
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+
+        assert_equal("foo [[bbb]] bar #{"x" * WikiPage::MAX_WIKI_LENGTH}", @wiki.reload.body)
       end
 
       should "rewrite links in pool descriptions to use the new tag" do
         @pool = create(:pool, description: "foo [[aaa]] bar")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("foo [[bbb]] bar", @pool.reload.description)
+      end
+
+      should "not fail to rewrite pool descriptions if the pool description is too long" do
+        @pool = build(:pool, description: "foo [[aaa]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}")
+        @pool.save!(validate: false)
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+
+        assert_equal("foo [[bbb]] bar #{"x" * Pool::MAX_DESCRIPTION_LENGTH}", @pool.reload.description)
       end
     end
 
@@ -229,7 +259,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @artist = create(:artist, name: "aaa")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal("bbb", @artist.reload.name)
       end
@@ -240,7 +269,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal(true, @artist1.reload.is_deleted)
         assert_equal([@artist2.name], @artist1.other_names)
@@ -258,7 +286,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @new_artist = create(:artist, name: "new_artist", is_banned: false)
 
         TagAlias.approve!(antecedent_name: "old_artist", consequent_name: "new_artist", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal(true, @new_artist.reload.is_banned)
         assert_equal(false, @old_artist.reload.is_banned)
@@ -269,7 +296,6 @@ class TagAliasTest < ActiveSupport::TestCase
         @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
-        perform_enqueued_jobs
 
         assert_equal(true, @artist1.reload.is_deleted)
         assert_equal(%w[111 222], @artist1.other_names)
@@ -288,7 +314,6 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "artist", category: 1)
 
       TagAlias.approve!(antecedent_name: "general", consequent_name: "artist", approver: @admin)
-      perform_enqueued_jobs
 
       assert_equal(1, tag1.reload.category)
       assert_equal(1, tag2.reload.category)
@@ -299,7 +324,6 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "general", category: 0)
 
       TagAlias.approve!(antecedent_name: "artist", consequent_name: "general", approver: @admin)
-      perform_enqueued_jobs
 
       assert_equal(1, tag1.reload.category)
       assert_equal(1, tag2.reload.category)
@@ -310,7 +334,6 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "copyright", category: 3)
 
       TagAlias.approve!(antecedent_name: "character", consequent_name: "copyright", approver: @admin)
-      perform_enqueued_jobs
 
       assert_equal(4, tag1.reload.category)
       assert_equal(3, tag2.reload.category)

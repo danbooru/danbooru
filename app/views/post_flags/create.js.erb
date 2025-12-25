@@ -1,1 +1,5 @@
-location.reload();
+<% if @post_flag.errors.any? %>
+  Danbooru.Utility.error("<%= j @post_flag.errors.full_messages.join('; ') %>");
+<% else %>
+  location.reload();
+<% end %>

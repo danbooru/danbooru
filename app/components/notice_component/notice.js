@@ -1,0 +1,1 @@
+../../javascript/src/javascripts/notice.js

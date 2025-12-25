@@ -22,15 +22,17 @@ class TagImplication < TagRelationship
   concerning :HierarchyMethods do
     class_methods do
       def ancestors_of(names)
-        join_recursive do |query|
-          query.start_with(antecedent_name: names).connect_by(consequent_name: :antecedent_name)
-        end
+        with_recursive(recursive: [
+          where(antecedent_name: names),
+          joins("INNER JOIN recursive ON recursive.consequent_name = tag_implications.antecedent_name"),
+        ]).joins("INNER JOIN recursive ON recursive.id = tag_implications.id")
       end
 
       def descendants_of(names)
-        join_recursive do |query|
-          query.start_with(consequent_name: names).connect_by(antecedent_name: :consequent_name)
-        end
+        with_recursive(recursive: [
+          where(consequent_name: names),
+          joins("INNER JOIN recursive ON recursive.antecedent_name = tag_implications.consequent_name"),
+        ]).joins("INNER JOIN recursive ON recursive.id = tag_implications.id")
       end
 
       def tags_implied_by(names)
@@ -121,24 +123,24 @@ class TagImplication < TagRelationship
       return if antecedent_tag.empty? || consequent_tag.empty?
 
       if antecedent_tag.post_count < MINIMUM_TAG_COUNT
-        errors.add(:base, "'#{antecedent_name}' must have at least #{MINIMUM_TAG_COUNT} posts")
+        errors.add(:base, "[[#{antecedent_name}]] must have at least #{MINIMUM_TAG_COUNT} posts")
       elsif antecedent_tag.post_count < (MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count)
-        errors.add(:base, "'#{antecedent_name}' must have at least #{(MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count).to_i} posts")
+        errors.add(:base, "[[#{antecedent_name}]] must have at least #{(MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count).ceil.to_i} posts")
       end
 
       max_count = MAXIMUM_TAG_PERCENTAGE * PostQuery.new("~#{antecedent_name} ~#{consequent_name}").fast_count(timeout: 0).to_i
       if antecedent_tag.post_count > max_count && max_count > 0
-        errors.add(:base, "'#{antecedent_name}' can't make up more than #{(MAXIMUM_TAG_PERCENTAGE * 100).to_i}% of '#{consequent_name}'")
+        errors.add(:base, "[[#{antecedent_name}]] can't make up more than #{(MAXIMUM_TAG_PERCENTAGE * 100).to_i}% of [[#{consequent_name}]]")
       end
     end
 
     def has_wiki_page
       if !antecedent_tag.empty? && antecedent_wiki.blank?
-        errors.add(:base, "'#{antecedent_name}' must have a wiki page")
+        errors.add(:base, "[[#{antecedent_name}]] must have a wiki page")
       end
 
       if !consequent_tag.empty? && consequent_wiki.blank?
-        errors.add(:base, "'#{consequent_name}' must have a wiki page")
+        errors.add(:base, "[[#{consequent_name}]] must have a wiki page")
       end
     end
   end
@@ -151,8 +153,10 @@ class TagImplication < TagRelationship
     def update_posts!
       CurrentUser.scoped(User.system) do
         Post.system_tag_match("#{antecedent_name} -#{consequent_name}").reorder(nil).parallel_find_each do |post|
-          post.lock!
-          post.save!
+          DanbooruLogger.info("post ##{post.id}: implying #{antecedent_name} -> #{consequent_name}")
+          post.with_lock do
+            post.save!
+          end
         end
       end
     end

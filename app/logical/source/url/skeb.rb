@@ -3,7 +3,7 @@
 class Source::URL::Skeb < Source::URL
   RESERVED_USERNAMES = %w[works users about terms creator client company]
 
-  attr_reader :username, :work_id, :image_id, :image_uuid
+  attr_reader :username, :illust_id, :work_id, :image_id, :image_uuid
 
   def self.match?(url)
     url.host.in?(%w[www.skeb.jp fcdn.skeb.jp cdn.skeb.jp skeb.jp skeb.imgix.net si.imgix.net skeb-production.s3.ap-northeast-1.amazonaws.com])
@@ -17,8 +17,12 @@ class Source::URL::Skeb < Source::URL
     # https://skeb.jp/@asanagi/works/16 (age-restricted, watermarked)
     # https://skeb.jp/@asanagi/works/6 (private, returns 404)
     # https://skeb.jp/@nasuno42/works/30 (multi-image post)
-    in _, "skeb.jp", /^@/ => username, "works", work_id
+    in _, "skeb.jp", /^@/ => username, "works", illust_id
       @username = username.delete_prefix("@")
+      @illust_id = illust_id
+
+    # https://skeb.jp/works/133404
+    in _, "skeb.jp", "works", work_id
       @work_id = work_id
 
     # https://skeb.jp/@asanagi
@@ -44,6 +48,10 @@ class Source::URL::Skeb < Source::URL
     in "si", "imgix.net", /^\h{8}$/, "uploads", "origins", /^\h{8}-\h{4}-\h{4}-\h{4}-\h{12}$/ => image_uuid
       @image_uuid = image_uuid
 
+    # https://si.imgix.net/a5dd8523/requests/191942_0?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=80e19a49375f63973ffe3674553a230c
+    in "si", "imgix.net", /^\h{8}$/, "requests", image_id
+      @image_id = image_id
+
     # Page: https://skeb.jp/@kaisouafuro/works/112
     # https://skeb-production.s3.ap-northeast-1.amazonaws.com/uploads/outputs/20f9d68f-50ec-44ae-8630-173fc38a2d6a?response-content-disposition=attachment%3B%20filename%3D%22458093-1.output.mp4%22%3B%20filename%2A%3DUTF-8%27%27458093-1.output.mp4&response-content-type=video%2Fmp4&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIVPUTFQBBL7UDSUA%2F20220221%2Fap-northeast-1%2Fs3%2Faws4_request&X-Amz-Date=20220221T200057Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=7f028cfd9a56344cf1d42410063fad3ef30a1e47b83cef047247e0c37df01df0
     # https://fcdn.skeb.jp/uploads/outputs/20f9d68f-50ec-44ae-8630-173fc38a2d6a?response-content-disposition=inline&Expires=1676373664&Signature=BNFCR248Xkvk4E8Th-a1~zopTL1NvP9rhu78n7YSSPt9K2PGM5GgmLLiXltj~5FteosdONepKLVeENVxTFBXRj~FgOGYQV7AehfBF2eMYB6V3v9at1cxFsqOFXjiPHohmqRzvzKHlVe-GlA6U4~ClYKsw0Ur9QSIlZ79iJlsTIbz~wzIzp463h~8KuAi81oBSLvdOJkm1qpEY2Em0PjUtNfx36Gk5jjCPRq5oVvITkdc~VrLLR~GNPjWAedkEhct~aVMAU56PQH6Few0LNoqjmCJZeY2d8mz0lugICGq2S9JPMmPQVR7HOFD0x3JBpX3-WWSmhC3F8f8lkErVNAv~A__&Key-Pair-Id=K1GS3H53SEO647
@@ -57,7 +65,19 @@ class Source::URL::Skeb < Source::URL
   end
 
   def page_url
-    "https://skeb.jp/@#{username}/works/#{work_id}" if username.present? && work_id.present?
+    if username.present? && illust_id.present?
+      "https://skeb.jp/@#{username}/works/#{illust_id}"
+    elsif work_id.present?
+      "https://skeb.jp/works/#{work_id}"
+    end
+  end
+
+  def api_url
+    if username.present? && illust_id.present?
+      "https://skeb.jp/api/users/#{username}/works/#{illust_id}"
+    elsif work_id.present?
+      "https://skeb.jp/api/works/#{work_id}"
+    end
   end
 
   def profile_url

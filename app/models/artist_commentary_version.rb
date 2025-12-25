@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class ArtistCommentaryVersion < ApplicationRecord
+  dtext_attribute :original_title, disable_mentions: true, inline: true
+  dtext_attribute :translated_title, disable_mentions: true, inline: true
+  dtext_attribute :original_description, disable_mentions: true
+  dtext_attribute :translated_description, disable_mentions: true
+
   belongs_to :post
   belongs_to_updater
 

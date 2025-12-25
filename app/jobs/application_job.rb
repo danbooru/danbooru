@@ -9,7 +9,11 @@ class ApplicationJob < ActiveJob::Base
 
   queue_as :default
 
-  # Jobs with higher priority are processed first. Higher number = higher priority.
+  # Jobs with lower numbers are processed first. Lower number = higher priority.
+  # ProcessUploadJob:           priority -20
+  # ProcessUploadMediaAssetJob: priority -10
+  # Other jobs:                 priority 0
+  # PopulateSavedSearchJob:     priority 10
   queue_with_priority 0
 
   # Called for background jobs enqueued with `perform_later`. Not called for foreground jobs performed with `perform_now`.
@@ -25,7 +29,7 @@ class ApplicationJob < ActiveJob::Base
     if background_job?
       # We have to use wall time here rather than a monotonic clock because the job could come from a different machine.
       # This could be inaccurate due to clocks moving forward or backwards, or machines having unsynchronized clocks.
-      queue_duration = Time.zone.now - enqueued_at.to_time
+      queue_duration = Time.zone.now - enqueued_at
       ApplicationMetrics[:rails_jobs_queue_duration_seconds][job_labels].increment(queue_duration)
     end
 

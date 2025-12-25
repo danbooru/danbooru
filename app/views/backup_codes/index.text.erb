@@ -1,0 +1,12 @@
+These are your backup codes for your Danbooru account. If you lose your phone or
+your two-factor authentication app, you can use these codes to login to your account.
+
+<% @user.backup_codes.to_a.each do |code| %>
+<%= code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0") %>
+<% end %>
+
+Keep these codes in a safe place. If you lose both your authenticator app and
+your backup codes, then you will be locked out of your account permanently.
+
+Each code is one-use only. After you use a code, be sure to cross it out and go
+to your account settings and get a new code.

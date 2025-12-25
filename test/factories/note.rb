@@ -6,6 +6,6 @@ FactoryBot.define do
     width { 1 }
     height { 1 }
     is_active { true }
-    body { FFaker::Lorem.sentences.join(" ") }
+    body { Faker::Lorem.paragraph }
   end
 end

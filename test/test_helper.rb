@@ -1,8 +1,8 @@
 ENV["RAILS_ENV"] = "test"
 
-require 'simplecov'
+require "simplecov"
 require_relative "../config/environment"
-require 'rails/test_help'
+require "rails/test_help"
 
 Dir["#{Rails.root}/test/factories/*.rb"].sort.each { |file| require file }
 Dir["#{Rails.root}/test/test_helpers/*.rb"].sort.each { |file| require file }
@@ -10,7 +10,7 @@ Dir["#{Rails.root}/test/test_helpers/*.rb"].sort.each { |file| require file }
 Minitest::Reporters.use!([
   Minitest::Reporters::ProgressReporter.new,
   Minitest::Reporters::HtmlReporter.new(reports_dir: "tmp/html-test-results"),
-  Minitest::Reporters::JUnitReporter.new("tmp/junit-test-results")
+  Minitest::Reporters::JUnitReporter.new("tmp/junit-test-results"),
 ])
 
 Shoulda::Matchers.configure do |config|
@@ -30,10 +30,10 @@ class ActiveSupport::TestCase
   include ReportbooruHelper
   include AutotaggerHelper
   include DatabaseTestHelper
-  include DownloadTestHelper
   include IqdbTestHelper
   include UploadTestHelper
-  include SourceTestHelper
+  include ExtractorTestHelper
+  include UrlTestHelper
   extend StripeTestHelper
   extend NormalizeAttributeHelper
 
@@ -60,6 +60,11 @@ class ActiveSupport::TestCase
     storage_manager = StorageManager::Local.new(base_url: "https://www.example.com/data", base_dir: @temp_dir)
     Danbooru.config.stubs(:storage_manager).returns(storage_manager)
     Danbooru.config.stubs(:backup_storage_manager).returns(StorageManager::Null.new)
+    Danbooru.config.stubs(:rate_limits_enabled?).returns(false)
+    Danbooru.config.stubs(:autotagger_url).returns(nil)
+    Danbooru.config.stubs(:iqdb_url).returns(nil)
+    Danbooru.config.stubs(:captcha_site_key).returns(nil)
+    Danbooru.config.stubs(:captcha_site_key).returns(nil)
 
     at_exit { FileUtils.rm_rf(@temp_dir) }
   end
@@ -88,8 +93,24 @@ class ActionDispatch::IntegrationTest
   register_encoder :atom, response_parser: ->(body) { Nokogiri.XML(body) }
   register_encoder :html, response_parser: ->(body) { Nokogiri.HTML5(body) }
 
+  def login_as(user)
+    current_user_id = request&.session&.dig(:user_id)
+
+    if current_user_id == user.id
+      return
+    elsif current_user_id.present? && current_user_id != user.id
+      delete session_path # logout
+    end
+
+    post session_path, params: { session: { name: user.name, password: user.password } }
+
+    if user.totp.present?
+      post verify_totp_session_path, params: { totp: { user_id: user.signed_id(purpose: :verify_totp), code: user.totp.code } }
+    end
+  end
+
   def method_authenticated(method_name, url, user, **options)
-    post session_path, params: { name: user.name, password: user.password }
+    login_as(user)
     send(method_name, url, **options)
   end
 
@@ -109,3 +130,5 @@ class ActionDispatch::IntegrationTest
     method_authenticated(:delete, url, user, **options)
   end
 end
+
+module Source::Tests; end

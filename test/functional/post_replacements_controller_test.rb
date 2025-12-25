@@ -9,7 +9,6 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             @post = create(:post, tag_string: "image_sample")
 
             post_auth post_replacements_path, create(:moderator_user), params: {
-              format: :json,
               post_id: @post.id,
               post_replacement: {
                 replacement_url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg",
@@ -17,7 +16,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
               }
             }
 
-            assert_response :success
+            assert_redirected_to @post
+            assert_equal("Post replaced", flash[:notice])
           end
 
           @replacement = PostReplacement.last
@@ -51,7 +51,6 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           @post = create(:post)
 
           post_auth post_replacements_path, create(:moderator_user), params: {
-            format: :json,
             post_id: @post.id,
             post_replacement: {
               replacement_file: Rack::Test::UploadedFile.new("test/files/test.png"),
@@ -59,7 +58,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             }
           }
 
-          assert_response :success
+          assert_redirected_to @post
+          assert_equal("Post replaced", flash[:notice])
           assert_equal("blah", @post.reload.source)
         end
       end
@@ -70,14 +70,14 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           @post2 = create(:post, file_size: 789)
 
           post_auth post_replacements_path, create(:moderator_user), params: {
-            format: :json,
             post_id: @post2.id,
             post_replacement: {
               replacement_file: Rack::Test::UploadedFile.new("test/files/test.jpg"),
             }
           }
 
-          assert_response 422
+          assert_redirected_to @post2
+          assert_equal("Duplicate of post ##{@post1.id}", flash[:notice])
           assert_equal(789, @post2.reload.file_size)
         end
       end
@@ -87,14 +87,15 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           @post = create(:post)
 
           post_auth post_replacements_path, create(:moderator_user), params: {
-            format: :json,
             post_id: @post.id,
             post_replacement: {
               replacement_url: "https://www.pixiv.net/en/artworks/62247350",
             }
           }
 
-          assert_response :success
+          assert_redirected_to @post
+          assert_equal("Post replaced", flash[:notice])
+
           assert_equal(80, @post.reload.image_width)
           assert_equal(82, @post.image_height)
           assert_equal(16_275, @post.file_size)
@@ -112,22 +113,23 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
           @post = create(:post)
           post_auth post_replacements_path, create(:moderator_user), params: {
-            format: :json,
             post_id: @post.id,
             post_replacement: {
               replacement_url: "https://www.pixiv.net/en/artworks/62247364",
             }
           }
 
-          assert_response :success
+          assert_redirected_to @post
+          assert_equal("Post replaced", flash[:notice])
+
           assert_equal(80, @post.reload.image_width)
           assert_equal(82, @post.image_height)
-          assert_equal(2804, @post.file_size)
+          assert_equal(33_197, @post.file_size)
           assert_equal("zip", @post.file_ext)
-          assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.md5)
-          assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post.media_asset.variant(:original).open_file.md5)
+          assert_equal("87ddf73e2c6fccef8dd6870cdfc0f245", @post.md5)
+          assert_equal("87ddf73e2c6fccef8dd6870cdfc0f245", @post.media_asset.variant(:original).open_file.md5)
 
-          assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
+          assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip?original", @post.source)
           assert_equal([125, 125], @post.media_asset.frame_delays)
         end
       end
@@ -142,18 +144,17 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           end
 
           post_auth post_replacements_path, create(:moderator_user), params: {
-            format: :json,
             post_id: @post.id,
             post_replacement: {
               replacement_url: "https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png",
             }
           }
 
-          assert_response :success
-          @note.reload
+          assert_redirected_to @post
+          assert_equal("Post replaced", flash[:notice])
 
           # replacement image is 80x82, so we're downscaling by 50% (160x164 -> 80x82).
-          assert_equal([40, 41, 40, 41], [@note.x, @note.y, @note.width, @note.height])
+          assert_equal([40, 41, 40, 41], [@note.reload.x, @note.y, @note.width, @note.height])
         end
       end
 
@@ -162,15 +163,14 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           @post = create(:post)
 
           post_auth post_replacements_path, create(:moderator_user), params: {
-            format: :json,
             post_id: @post.id,
             post_replacement: {
               replacement_url: "https://twitter.com/catwheezie/status/1604604864809799680",
             }
           }
 
-          assert_response 422
-          assert_match(/has multiple images/, response.parsed_body.dig("errors", "base", 0))
+          assert_redirected_to @post
+          assert_match(/has multiple images/, flash[:notice])
         end
       end
 
@@ -179,15 +179,14 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           @post = create(:post)
 
           post_auth post_replacements_path, create(:moderator_user), params: {
-            format: :json,
             post_id: @post.id,
             post_replacement: {
               replacement_url: "https://twitter.com/dril/status/384408932061417472",
             }
           }
 
-          assert_response 422
-          assert_match(/has no images/, response.parsed_body.dig("errors", "base", 0))
+          assert_redirected_to @post
+          assert_match(/has no images/, flash[:notice])
         end
       end
 
@@ -199,11 +198,12 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             post_auth post_replacements_path, create(:moderator_user), params: {
               post_id: @post.id,
               post_replacement: {
-                replacement_file: Rack::Test::UploadedFile.new("test/files/ugoira.json"),
+                replacement_file: Rack::Test::UploadedFile.new("test/files/ugoira/animation.json"),
               }
             }
 
             assert_redirected_to @post
+            assert_equal("File is not an image or video", flash[:notice])
           end
         end
       end

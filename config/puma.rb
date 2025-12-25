@@ -21,6 +21,9 @@
 # @see https://github.com/puma/puma/blob/319f84db13ee59f7b24885cec686d5c714998a4c/lib/puma/configuration.rb#L188 (default options)
 # @see https://devcenter.heroku.com/articles/deploying-rails-applications-with-the-puma-web-server
 
+# The Rails environment the app will run in. Defaults to development.
+rails_env = ENV.fetch("RAILS_ENV", "development")
+
 # The server port or listening address. Default is http://0.0.0.0:3000.
 if ENV.has_key?("PUMA_PORT")
   port ENV["PUMA_PORT"]
@@ -40,11 +43,13 @@ end
 # connection limit may need to be raised for high `thread` * `worker` counts.
 if ENV.has_key?("PUMA_WORKERS")
   workers ENV["PUMA_WORKERS"]
-elsif ENV["RAILS_ENV"] == "production"
-  workers ENV.fetch("PUMA_WORKERS", Etc.nprocessors)
-else
+elsif rails_env == "development"
   # Use single worker mode in development for easier debugging
   workers 0
+else
+  # Default to one worker process per CPU core in production
+  require "concurrent-ruby"
+  workers Concurrent.available_processor_count.to_i.clamp(1..)
 end
 
 # The number of threads per worker to use. The `threads` method
@@ -73,7 +78,7 @@ persistent_timeout 20
 first_data_timeout 30
 
 # The `environment` that Puma will run in.
-environment ENV.fetch("RAILS_ENV", "development")
+environment rails_env
 
 # The `pidfile` that Puma will use.
 pidfile ENV.fetch("PUMA_PIDFILE", "tmp/pids/server.pid")
@@ -82,7 +87,7 @@ pidfile ENV.fetch("PUMA_PIDFILE", "tmp/pids/server.pid")
 # This directive tells Puma to first boot the application and load code
 # before forking the application. This takes advantage of Copy On Write
 # process behavior so workers use less memory.
-if ENV["RAILS_ENV"] == "production"
+if rails_env != "development"
   preload_app!
 end
 

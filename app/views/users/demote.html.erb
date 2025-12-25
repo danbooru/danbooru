@@ -1,0 +1,20 @@
+<% page_title "Demote User" %>
+<%= render "secondary_links" %>
+
+<div id="c-users">
+  <div id="a-promote">
+    <div class="card mt-4 p-4 max-w-540px mx-auto flex flex-col gap-2">
+      <h1 class="text-center">Demote User: <%= link_to_user @user %></h1>
+
+      <p class="prose">
+        You are demoting <%= link_to_user @user %> to a lower level. See <%= link_to_wiki "help:users" %> for a
+        description of what each level can do.
+      </p>
+
+      <%= edit_form_for(@user, url: admin_user_path(@user)) do |f| %>
+        <%= f.input :level, collection: User.level_hash.select { |name, level| level < @user.level }.to_a, include_blank: false %>
+        <%= f.submit "Demote", class: "button-primary", "data-confirm": "Are you sure you want to demote #{@user.name}?" %>
+      <% end %>
+    </div>
+  </div>
+</div>

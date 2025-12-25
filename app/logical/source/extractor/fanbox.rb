@@ -4,13 +4,11 @@
 module Source
   class Extractor
     class Fanbox < Source::Extractor
-      def match?
-        Source::URL::Fanbox === parsed_url
-      end
-
       def image_urls
-        if parsed_url.image_url?
+        if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]
+        elsif parsed_url.candidate_full_image_urls.present?
+          [parsed_url.candidate_full_image_urls.find { |url| http_exists?(url) } || url.to_s]
         elsif api_response.present?
           file_list
         else
@@ -38,32 +36,30 @@ module Source
       end
 
       def page_url
-        if artist_name.present? && illust_id.present?
-          "https://#{artist_name}.fanbox.cc/posts/#{illust_id}"
-        elsif parsed_url.image_url? && artist_name.present?
+        if username.present? && illust_id.present?
+          "https://#{username}.fanbox.cc/posts/#{illust_id}"
+        elsif illust_id.present?
+          "https://www.fanbox.cc/manage/posts/#{illust_id}"
+        elsif parsed_url.image_url? && username.present?
           # Cover images
-          "https://#{artist_name}.fanbox.cc"
+          "https://#{username}.fanbox.cc"
         end
       end
 
       def profile_url
-        if artist_name.present?
-          "https://#{artist_name}.fanbox.cc"
+        if username.present?
+          "https://#{username}.fanbox.cc"
         elsif artist_id_from_url.present?
           "https://www.pixiv.net/fanbox/creator/#{artist_id_from_url}"
         end
-      end
-
-      def artist_name
-        artist_name_from_url || api_response["creatorId"] || artist_api_response.dig("body", "creatorId")
       end
 
       def display_name
         api_response.dig("user", "name") || artist_api_response.dig("body", "user", "name")
       end
 
-      def other_names
-        [artist_name, display_name].compact.uniq
+      def username
+        parsed_url.username || parsed_referer&.username || api_response["creatorId"] || artist_api_response.dig("body", "creatorId")
       end
 
       def tags
@@ -103,24 +99,20 @@ module Source
         parsed_url.user_id || parsed_referer&.user_id
       end
 
-      def artist_name_from_url
-        parsed_url.username || parsed_referer&.username
-      end
-
-      def post_api_url
-        "https://api.fanbox.cc/post.info?postId=#{illust_id}" if illust_id.present?
-      end
-
-      def artist_api_url
-        "https://api.fanbox.cc/creator.get?userId=#{artist_id_from_url}" if artist_id_from_url.present?
+      memoize def username_from_artist_id
+        url = http.cache(1.minute).redirect_url("https://www.pixiv.net/fanbox/creator/#{artist_id_from_url}") if artist_id_from_url.present?
+        Source::URL.parse(url).try(:username)
       end
 
       memoize def api_response
-        http.cache(1.minute).parsed_get(post_api_url)&.dig(:body) || {}
+        url = "https://api.fanbox.cc/post.info?postId=#{illust_id}" if illust_id.present?
+        parsed_get(url)&.dig(:body) || {}
       end
 
       memoize def artist_api_response
-        http.cache(1.minute).parsed_get(artist_api_url) || {}
+        creator_id = parsed_url.username || parsed_referer&.username || api_response["creatorId"] || username_from_artist_id
+        url = "https://api.fanbox.cc/creator.get?creatorId=#{creator_id}"
+        parsed_get(url) || {}
       end
 
       def http

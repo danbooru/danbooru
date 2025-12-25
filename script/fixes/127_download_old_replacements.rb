@@ -4,7 +4,6 @@ require_relative "base"
 
 FIX = ENV.fetch("FIX", "false").truthy?
 COND = ENV.fetch("COND", "TRUE")
-WORKERS = ENV.fetch("WORKERS", 5).to_i
 
 def download(replacement, md5)
   # url = "https://b2.donmai.us/file/danbooru/original/#{md5[0..1]}/#{md5[2..3}/#{md5}.jpg"
@@ -21,7 +20,7 @@ rescue Timeout::Error
   puts ({ error: "upload timed out", replacement: replacement.id, upload: upload&.id, image_url:, }).to_json
 end
 
-PostReplacement.where(COND).parallel_find_each(in_processes: WORKERS) do |replacement|
+PostReplacement.where(COND).parallel_find_each do |replacement|
   old_media_asset = MediaAsset.active.find_by(md5: replacement.old_md5)
   new_media_asset = MediaAsset.active.find_by(md5: replacement.md5)
 

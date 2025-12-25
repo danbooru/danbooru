@@ -6,7 +6,7 @@ class ForumTopicPolicy < ApplicationPolicy
   end
 
   def show?
-    user.level >= record.min_level
+    user.level >= record.min_level_id
   end
 
   def update?
@@ -33,9 +33,19 @@ class ForumTopicPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def rate_limit_for_create(**_options)
+    if record.invalid?
+      { action: "forum_topics:create:invalid", rate: 1.0 / 1.second, burst: 5 }
+    elsif user.forum_topics.exists?(created_at: ..24.hours.ago)
+      { rate: 1.0 / 1.minute, burst: 2 }
+    else
+      { rate: 1.0 / 3.minutes, burst: 1 }
+    end
+  end
+
   def permitted_attributes
     [
-      :title, :category_id, { original_post_attributes: [:id, :body] },
+      :title, :category, :category_id, { original_post_attributes: [:id, :body] },
       ([:is_sticky, :is_locked, :min_level] if moderate?),
     ].compact.flatten
   end

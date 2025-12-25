@@ -3,8 +3,10 @@
 module Danbooru
   class Http
     class HtmlAdapter < HTTP::MimeType::Adapter
-      HTTP::MimeType.register_adapter "text/html", self
-      HTTP::MimeType.register_alias "text/html", :html
+      def self.register
+        HTTP::MimeType.register_adapter "text/html", self
+        HTTP::MimeType.register_alias "text/html", :html
+      end
 
       def decode(str)
         # XXX technically should use the charset from the http headers.
