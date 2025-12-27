@@ -118,7 +118,7 @@ module Source
       end
 
       memoize def page_json
-        html = http.cache(1.minute).parsed_get(mobile_page_url)
+        html = http.cookies(SUB: sub_cookie).cache(1.minute).parsed_get(mobile_page_url)
         html.to_s[/var \$render_data = \[(.*)\]\[0\]/m, 1]&.parse_json&.dig("status") || {}
       end
 
@@ -126,7 +126,7 @@ module Source
       # videos, since the mobile page doesn't return 1080p videos.
       memoize def post
         url = "https://www.weibo.com/ajax/statuses/show?id=#{illust_id}" if illust_id.present?
-        http.no_follow.cookies(SUB: sub_cookie).cache(1.minute).parsed_get(url) || {}
+        http.no_follow.cookies(SUB: sub_cookie).headers(Referer: "https://weibo.com/").cache(1.minute).parsed_get(url) || {}
       end
 
       # This `tid` value is tied to your IP and user agent.
