@@ -10,6 +10,7 @@ class Source::URL::URLShortener < Source::URL
     # https://b23.tv/h5v55co
     # https://bit.ly/4aAVa4y
     # https://bit.ly/4aAVa4y+ (trick: you can add '+' to the end to see where the link goes)
+    # https://bili2233.cn/h5v55co
     # https://cutt.ly/GfQ2szk
     # https://dlvr.it/SWKqJ0
     # https://eepurl.com/j5st
@@ -36,7 +37,7 @@ class Source::URL::URLShortener < Source::URL
     # https://xhslink.com/WNd9gI
     # https://hoyo.link/80GCFBAL?q=25tufAgwB8N
     # https://hoyo.link/aifgFBAL
-    url.domain.in?(%w[amzn.asia amzn.to b23.tv bit.ly j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl hoyo.link is.gd naver.me pin.it posty.pe pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.cn t.co wp.me x.gd xhslink.com]) ||
+    url.domain.in?(%w[amzn.asia amzn.to b23.tv bit.ly bili2233.cn j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl hoyo.link is.gd naver.me pin.it posty.pe pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.cn t.co wp.me x.gd xhslink.com]) ||
 
     # https://pic.twitter.com/Dxn7CuVErW
     # https://pic.x.com/Dxn7CuVErW
@@ -52,7 +53,7 @@ class Source::URL::URLShortener < Source::URL
     case [subdomain, domain]
     in _, "amzn.asia" | "amzn.to"
       "Amazon"
-    in _, "b23.tv"
+    in _, "b23.tv" | "bili2233.cn"
       "Bilibili"
     in _, "bit.ly" | "j.mp"
       "Bitly"
