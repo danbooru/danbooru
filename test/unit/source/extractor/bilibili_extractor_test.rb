@@ -73,7 +73,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.bilibili.com/opus/1067620623766781959",
         image_urls: %w[http://i0.hdslb.com/bfs/new_dyn/1a93adf45c9b7854f49e841f1f0ec82e2300677.jpg],
-        media_files: [{ file_size: 20_107_957 }],
+        media_files: [{ file_size: 20_108_077 }],
         page_url: "https://www.bilibili.com/opus/1067620623766781959",
         profile_urls: %w[https://space.bilibili.com/2300677],
         display_name: "SA小飒",
