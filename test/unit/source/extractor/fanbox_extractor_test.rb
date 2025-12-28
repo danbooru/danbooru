@@ -112,11 +112,11 @@ module Source::Tests::Extractor
 
     context "A cover image" do
       strategy_should_work(
-        "https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/pYOm2wWFyzffzZaty7fbHiJ1.jpeg",
-        media_files: [{ file_size: 562_582 }],
-        profile_url: "https://omu001.fanbox.cc",
-        display_name: "むっしゅ",
-        username: "omu001",
+        "https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/23800170/cover/bT4hCcuzXuoh2JWQbBXINlVV.jpeg",
+        media_files: [{ file_size: 747_660 }],
+        profile_url: "https://hisha.fanbox.cc",
+        display_name: "飛者",
+        username: "hisha",
       )
     end
 
@@ -184,8 +184,7 @@ module Source::Tests::Extractor
         page_url: "https://wakura081.fanbox.cc/posts/4923490",
         profile_url: "https://wakura081.fanbox.cc",
         image_urls: [],
-        # display_name: "わくら", # XXX should get this from the profile page
-        display_name: nil,
+        display_name: "わくら",
         username: "wakura081",
         artist_commentary_title: nil,
         artist_commentary_desc: nil,
