@@ -567,7 +567,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
             create(:note, post: @post)
             create(:artist_commentary, post: @post)
             create(:post_flag, post: @post, creator: @user)
-            #create(:post_appeal, post: @post, creator: @user)
+            # create(:post_appeal, post: @post, creator: @user)
             create(:post_vote, post: @post, user: @user)
             create(:favorite, post: @post, user: @user)
             create(:moderation_report, model: @comment, creator: @approver)
@@ -802,9 +802,19 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, @post.is_pending?)
       end
 
-      should "mark the post as pending for users with unrestricted uploads who upload for approval" do
+      should "mark the post as pending for unres users who upload for approval via button" do
         @post = create_post!(user: create(:contributor_user), is_pending: true)
         assert_equal(true, @post.is_pending?)
+      end
+
+      should "mark the post as pending for unres users who upload for approval with status:pending metatag" do
+        @post = create_post!(user: create(:contributor_user), tag_string: "status:pending")
+        assert_equal(true, @post.is_pending?)
+      end
+
+      should "not mark the post as pending if status:pending is contained in a source" do
+        @post = create_post!(user: create(:contributor_user), tag_string: 'source:"status:pending"')
+        assert_equal(false, @post.is_pending?)
       end
 
       should "create a commentary record if the commentary is present" do
@@ -871,13 +881,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         assert_post_source_equals(
           "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg",
-          "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg"
+          "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg",
         )
 
         assert_post_source_equals(
           "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg",
           "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg",
-          "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896"
+          "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896",
         )
 
         assert_post_source_equals("https://cdna.artstation.com/p/assets/images/images/000/705/368/large/jey-rain-one1.jpg?1443931773", "https://cdna.artstation.com/p/assets/images/images/000/705/368/large/jey-rain-one1.jpg?1443931773")

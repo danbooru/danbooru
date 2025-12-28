@@ -14,7 +14,7 @@ class PostEdit
   CATEGORIZATION_METATAGS = TagCategory.mapping.keys
 
   # Pre-metatags affect the post itself, so they must be applied before the post is saved.
-  PRE_METATAGS = %w[parent -parent rating source] + CATEGORIZATION_METATAGS
+  PRE_METATAGS = %w[parent -parent rating source status] + CATEGORIZATION_METATAGS
 
   # Post-metatags rely on the post's ID, so they must be applied after the post is saved to ensure the ID has been created.
   POST_METATAGS = %w[newpool pool -pool favgroup -favgroup fav -fav child -child upvote downvote disapproved status -status]

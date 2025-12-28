@@ -144,7 +144,7 @@ class Post < ApplicationRecord
       tag_string: tag_string,
       rating: rating,
       parent_id: parent_id,
-      is_pending: !upload.uploader.is_contributor? || is_pending.to_s.truthy? || /\bstatus:pending\b/i === tag_string,
+      is_pending: !upload.uploader.is_contributor? || is_pending.to_s.truthy?,
       artist_commentary: commentary,
     )
   end
@@ -626,6 +626,9 @@ class Post < ApplicationRecord
 
         in "source", value
           self.source = value
+
+        in "status", "pending"
+          self.is_pending = true if new_record?
 
         in category, name if category.in?(PostEdit::CATEGORIZATION_METATAGS)
           Tag.find_or_create_by_name(name, category: category, current_user: CurrentUser.user)

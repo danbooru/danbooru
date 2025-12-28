@@ -1129,6 +1129,14 @@ class PostTest < ActiveSupport::TestCase
 
             assert_equal(false, @post.reload.is_banned?)
           end
+
+          should "not ban the post if status:banned is contained in a source string" do
+            as(create(:approver)) do
+              @post.update(tag_string: 'aaa source:"status:banned"')
+            end
+
+            assert_equal(false, @post.reload.is_banned?)
+          end
         end
 
         context "for -status:banned" do
