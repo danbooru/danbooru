@@ -10,6 +10,8 @@ class BackupCodesController < ApplicationController
     @user.generate_backup_codes!(request) if @user.backup_codes.blank?
     @url = params[:url]
 
+    @backup_codes = @user.backup_codes.to_a.map { |code| code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0") }
+
     respond_with(@user)
   end
 
