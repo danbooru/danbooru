@@ -5,23 +5,14 @@ class Source::Extractor
   class Poipiku < Source::Extractor
     delegate :profile_url, :user_id, to: :parsed_url
 
+    # Paswords to check.
+    # Password parameter is ignored when it's not needed, so no need for an explicit empty password
+    PASSWORDS = %w[y yes]
+
     def image_urls
-      if parsed_url.image_url?
-        [parsed_url.full_image_url]
-      else
-        image_urls_from_html
-      end
-    end
-
-    def image_urls_from_html
-      first_image = page&.at("img.IllustItemThumbImg")&.attr(:src).to_s
-      additional_images = additional_images_html&.css("img").to_a.pluck(:src)
-
-      [first_image, *additional_images].map do |url|
-        # url = "//img.poipiku.com/user_img03/000013318/007865949_015701153_EcvKNO8Dt.png_640.jpg"
-        url = "https:#{url}" if url.starts_with?("//")
+      api_html&.css("img.DetailIllustItemImage").to_a.pluck(:src).map do |url|
         Source::URL.parse(url)&.full_image_url
-      end.compact
+      end&.compact
     end
 
     def profile_urls
@@ -72,11 +63,21 @@ class Source::Extractor
       parsed_get(parsed_url.page_url)
     end
 
-    memoize def additional_images_html
+    memoize def api_html
       return nil if user_id.blank? || post_id.blank?
 
-      html = http.cookies(POIPIKU_LK: credentials[:session_cookie]).use(:spoof_referrer).cache(1.minute).parsed_post("https://poipiku.com/f/ShowAppendFileF.jsp", form: { UID: user_id, IID: post_id })
-      html&.text&.parse_json&.dig("html")&.parse_html
+      PASSWORDS.each do |pw|
+        res = http.cookies(POIPIKU_LK: credentials[:session_cookie], POIPIKU_CONTENTS_VIEW_MODE: 1)
+                  .headers(Referer: "https://poipiku.com")
+                  .parsed_post(
+                    "https://poipiku.com/f/ShowIllustDetailF.jsp",
+                    form: { ID: user_id, TD: post_id, PAS: pw },
+                  )&.text&.parse_json
+
+        return res[:html].parse_html if res[:result] == 1
+      end
+
+      nil
     end
   end
 end
