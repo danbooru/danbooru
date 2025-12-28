@@ -144,7 +144,7 @@ class Post < ApplicationRecord
       tag_string: tag_string,
       rating: rating,
       parent_id: parent_id,
-      is_pending: !upload.uploader.is_contributor? || is_pending.to_s.truthy?,
+      is_pending: !upload.uploader.is_contributor? || is_pending.to_s.truthy? || /\bstatus:pending\b/i === tag_string,
       artist_commentary: commentary,
     )
   end
