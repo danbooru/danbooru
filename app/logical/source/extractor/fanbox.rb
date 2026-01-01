@@ -116,7 +116,7 @@ module Source
       end
 
       def http
-        super.headers(Origin: "https://fanbox.cc")
+        super.with_legacy_ssl.headers(Origin: "https://fanbox.cc")
       end
     end
   end
