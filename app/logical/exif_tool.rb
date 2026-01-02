@@ -4,8 +4,6 @@ require "shellwords"
 
 # A wrapper for the exiftool command.
 class ExifTool
-  extend Memoist
-
   # @see https://exiftool.org/exiftool_pod.html#OPTIONS
   DEFAULT_OPTIONS = %q(
     -G1 -duplicates -unknown -struct --binary
@@ -27,12 +25,14 @@ class ExifTool
   # @param options [String] the options to pass to exiftool
   # @return [ExifTool::Metadata] the file's metadata
   def metadata(options: DEFAULT_OPTIONS)
-    output = %x(exiftool #{options} -json #{file.path.shellescape})
-    json = output.parse_json.first
-    json = json.except("SourceFile")
-    ExifTool::Metadata.new(json.with_indifferent_access)
+    @metadata ||= {}
+    @metadata[options] ||= begin
+      output = %x(exiftool #{options} -json #{file.path.shellescape})
+      json = output.parse_json.first
+      json = json.except("SourceFile")
+      ExifTool::Metadata.new(json.with_indifferent_access)
+    end
   end
-  memoize :metadata
 
   # A class representing the set of metadata returned by ExifTool for a file.
   # Behaves like a Hash, but with extra helper methods for interpreting the metadata.
