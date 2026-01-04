@@ -384,9 +384,6 @@ class BulkUpdateRequestProcessor
     else
       convert_pool_to_tag(tag_or_pool1, tag_or_pool2)
     end
-
-    # at the end so that the pool can be created first
-    mass_update(tag_or_pool1, "#{tag_or_pool2} -#{tag_or_pool1}")
   end
 
   def self.convert_tag_to_pool(tag_input, pool_input)
@@ -403,6 +400,9 @@ class BulkUpdateRequestProcessor
 
     wiki_page.body = "This tag has been moved to {{#{pool_input}}}."
     wiki_page.save
+
+    # at the end so that the pool can be created first
+    mass_update("#{tag_input} order:id", "#{pool_input} -#{tag_input}")
   end
 
   def self.convert_pool_to_tag(pool_input, tag_input)
@@ -417,7 +417,9 @@ class BulkUpdateRequestProcessor
     wiki_page.body = pool.description if wiki_page.body.blank?
     wiki_page.save
 
-    pool.update(is_deleted: true, description: "This pool has been moved to [[#{tag_input}]].")
+    mass_update(pool_input, tag_input)
+
+    pool.update(is_deleted: true, description: "This pool has been moved to [[#{tag_input}]].", post_ids: [])
   end
 
   def self.nuke(tag_or_pool)
