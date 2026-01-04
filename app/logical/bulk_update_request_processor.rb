@@ -48,6 +48,8 @@ class BulkUpdateRequestProcessor
         [:mass_update, $1, $2]
       when /\Acategory (\S+) -> (#{Tag.categories.regexp})\z/i
         [:change_category, Tag.normalize_name($1), $2.downcase]
+      when /\Aconvert (.+?) -> (.*)\z/i
+        [:convert, $1, $2]
       when /\Anuke (\S+)\z/i
         [:nuke, $1]
       when /\Adeprecate (\S+)\z/i
@@ -83,6 +85,9 @@ class BulkUpdateRequestProcessor
 
         when :change_category
           validate_change_category(args[0], args[1])
+
+        when :convert
+          validate_convert(args[0], args[1])
 
         when :rename
           validate_rename(args[0], args[1])
@@ -155,6 +160,25 @@ class BulkUpdateRequestProcessor
     tag = Tag.find_by_name(tag_name)
     if tag.nil?
       errors.add(:base, "Can't change category of [[#{tag_name}]] to #{category} ([[#{tag_name}]] doesn't exist)")
+    end
+  end
+
+  def validate_convert(raw_query1, raw_query2)
+    arg1 = PostQuery.normalize(raw_query1)
+    arg2 = PostQuery.normalize(raw_query2)
+
+    if arg1.is_simple_tag? && arg2.is_single_pool?
+      if arg1.tag.nil?
+        errors.add(:base, "Can't convert [[#{raw_query1}]] -> {{#{raw_query2}}} (tag [[#{raw_query1}]] doesn't exist)")
+      elsif arg1.tag&.wiki_page&.body.blank? && arg2.pool&.description.blank?
+        errors.add(:base, "Can't convert [[#{raw_query1}]] -> {{#{raw_query2}}} (either the tag or the pool must have a description)")
+      end
+    elsif arg1.is_single_pool? && arg2.is_simple_tag?
+      if arg1.pool.nil?
+        errors.add(:base, "Can't convert {{#{raw_query1}}} -> [[#{raw_query2}]] ({{#{raw_query1}}} does not exist)")
+      end
+    else
+      errors.add(:base, "Can't convert {{#{raw_query1}}} -> {{#{raw_query2}}} (convert takes exactly one pool and one tag)")
     end
   end
 
@@ -259,6 +283,9 @@ class BulkUpdateRequestProcessor
         when :rename
           TagMover.new(args[0], args[1], user: User.system).move!
 
+        when :convert
+          BulkUpdateRequestProcessor.convert(args[0], args[1])
+
         when :change_category
           tag = Tag.find_or_create_by_name(args[0])
           tag.update!(category: Tag.categories.value_for(args[1]), updater: User.system, is_bulk_update_request: true)
@@ -292,7 +319,7 @@ class BulkUpdateRequestProcessor
   def affected_tags
     commands.flat_map do |command, *args|
       case command
-      when :create_alias, :remove_alias, :create_implication, :remove_implication, :rename
+      when :create_alias, :remove_alias, :create_implication, :remove_implication, :rename, :convert
         [args[0], args[1]]
       when :mass_update
         PostQuery.new(args[0]).tag_names + PostQuery.new(args[1]).tag_names
@@ -336,11 +363,63 @@ class BulkUpdateRequestProcessor
         "#{command} [[#{args[0]}]]"
       when :change_category
         "category [[#{args[0]}]] -> #{args[1]}"
+      when :convert
+        if PostQuery.normalize(args[0]).is_simple_tag?
+          "convert [[#{args[0]}]] -> {{#{args[1]}}}"
+        else
+          "convert {{#{args[0]}}} -> [[#{args[1]}]]"
+        end
       else
         # should never happen
         raise Error, "Unknown command: #{command}"
       end
     end.join("\n")
+  end
+
+  def self.convert(tag_or_pool1, tag_or_pool2)
+    # Move posts from a tag/pool to a pool/tag, and edit the description of both.
+
+    if PostQuery.normalize(tag_or_pool1).is_simple_tag?
+      convert_tag_to_pool(tag_or_pool1, tag_or_pool2)
+    else
+      convert_pool_to_tag(tag_or_pool1, tag_or_pool2)
+    end
+  end
+
+  def self.convert_tag_to_pool(tag_input, pool_input)
+    tag_query = PostQuery.normalize(tag_input)
+    pool_query = PostQuery.normalize(pool_input)
+
+    pool = pool_query.pool || Pool.new(name: pool_query.find_metatag(:pool))
+    pool.is_deleted = false
+
+    wiki_page = WikiPage.find_by_title(tag_input) || WikiPage.new(title: tag_query.tag_name)
+
+    pool.description = wiki_page.body if pool.description.blank? && wiki_page.body.present?
+    pool.save
+
+    wiki_page.body = "This tag has been moved to {{#{pool_input}}}."
+    wiki_page.save
+
+    # at the end so that the pool can be created first
+    mass_update("#{tag_input} order:id", "#{pool_input} -#{tag_input}")
+  end
+
+  def self.convert_pool_to_tag(pool_input, tag_input)
+    pool_query = PostQuery.normalize(pool_input)
+    tag_query = PostQuery.normalize(tag_input)
+
+    pool = pool_query.pool
+    wiki_page = WikiPage.find_by_title(tag_input) || WikiPage.new(title: tag_query.tag_name)
+
+    wiki_page.is_deleted = false
+
+    wiki_page.body = pool.description if wiki_page.body.blank?
+    wiki_page.save
+
+    mass_update(pool_input, tag_input)
+
+    pool.update(is_deleted: true, description: "This pool has been moved to [[#{tag_input}]].", post_ids: [])
   end
 
   def self.nuke(tag_or_pool)
