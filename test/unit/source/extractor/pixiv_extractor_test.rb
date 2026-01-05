@@ -692,5 +692,14 @@ module Source::Tests::Extractor
         profile_url: "https://www.pixiv.net/users/66091066",
       )
     end
+
+    context "An imgaz url" do
+      strategy_should_work(
+        "https://i.pximg.net/imgaz/upload/20240417/163474511.jpg",
+        image_urls: %w[https://i.pximg.net/imgaz/upload/20240417/163474511.jpg],
+        media_files: [{ file_size: 3_049_892 }],
+        page_url: nil,
+      )
+    end
   end
 end

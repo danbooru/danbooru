@@ -57,6 +57,10 @@ module Source::Tests::URL
       should "not misparse broken image urls" do
         assert_illust_id(nil, "http://img25.pixiv.net/img/master4th/16024681")
       end
+
+      should "not misparse imgaz urls" do
+        assert_illust_id(nil, "https://i.pximg.net/imgaz/upload/20240417/163474511.jpg")
+      end
     end
 
     context "when parsing" do
@@ -70,6 +74,7 @@ module Source::Tests::URL
           "http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg",
           "http://img18.pixiv.net/img/evazion/14901720.png",
           "http://i2.pixiv.net/img18/img/evazion/14901720.png",
+          "https://i.pximg.net/imgaz/upload/20240417/163474511.jpg",
         ],
         image_samples: [
           "https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg",
@@ -110,6 +115,7 @@ module Source::Tests::URL
           "https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip?original",
           "https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png",
           "https://www.pixiv.net/artworks/46324488",
+          "https://i.pximg.net/imgaz/upload/20240417/163474511.jpg",
         ],
       )
     end
