@@ -20,7 +20,7 @@ module Source::Tests::Extractor
           ],
           page_url: "https://privatter.net/i/7184521",
           profile_urls: ["https://privatter.net/u/GLK_Sier"],
-          display_name: "GLKS🐌",
+          display_name: "GLKS🥐",
           username: "GLK_Sier",
           tags: [],
           dtext_artist_commentary_title: "【斥罪 Penance】Saturday Night",
@@ -147,7 +147,7 @@ module Source::Tests::Extractor
           image_urls: [],
           page_url: "https://privatter.net/i/7308463",
           profile_urls: ["https://privatter.net/u/GLK_Sier"],
-          display_name: "GLKS🐌",
+          display_name: "GLKS🥐",
           username: "GLK_Sier",
         )
       end
