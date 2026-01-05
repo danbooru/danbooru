@@ -110,6 +110,9 @@ Rails/InverseOf:
 Style/Alias:
   EnforcedStyle: prefer_alias_method
 
+Style/ArgumentsForwarding:
+  Enabled: false
+
 Style/AsciiComments:
   Enabled: false
 
@@ -177,9 +180,18 @@ Style/ParallelAssignment:
 Style/PerlBackrefs:
   Enabled: false
 
+Style/RedundantAssignment:
+  Enabled: false
+
+Style/RedundantReturn:
+  Enabled: false
+
 Style/RegexpLiteral:
   EnforcedStyle: mixed
   AllowInnerSlashes: false
+
+Style/SafeNavigationChainLength:
+  Enabled: false
 
 Style/SpecialGlobalVars:
   Enabled: false
