@@ -82,12 +82,12 @@ module Source
           # I've left out parsing external embeds because each supported site has its own id mapped to the domain
           commentary = body["blocks"].map do |node|
             if node["type"] == "image"
-              body["imageMap"][node["imageId"]]["originalUrl"]
+              body["imageMap"].dig(node["imageId"], "originalUrl")
             else
               node["text"] || "\n"
             end
           end
-          commentary.join("\n")
+          commentary.join("\n").gsub(/\n{3,}/, "\n\n")
         end
       end
 

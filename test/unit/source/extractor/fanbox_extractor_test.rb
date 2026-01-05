@@ -144,7 +144,7 @@ module Source::Tests::Extractor
     context "A dead profile picture in the old pixiv format" do
       strategy_should_work(
         "https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/29999491/profile/Ew6fOhLGPvmUcwU6FyH8JAMX.jpeg",
-        image_urls: %w[https://pixiv.pximg.net/fanbox/public/images/creator/29999491/profile/Ew6fOhLGPvmUcwU6FyH8JAMX.jpeg], # 404
+        image_urls: %w[https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/29999491/profile/Ew6fOhLGPvmUcwU6FyH8JAMX.jpeg], # 404
         page_url: "https://verdey1104.fanbox.cc",
         profile_urls: %w[https://verdey1104.fanbox.cc],
         display_name: "Verdey",
@@ -175,6 +175,38 @@ module Source::Tests::Extractor
           旅パ会社の期待の新人。享年20歳(推定)のアンデッド。生前の記憶が殆ど無く彷徨っていた所をスカウトされ就職。霊符で式神的なモノを呼び出して戦う。お人好しで頼まれ事は断れないタイプ。
         EOS
         tags: [],
+      )
+    end
+
+    context "A Fanbox post with missing imageIds" do
+      strategy_should_work(
+        "https://www.fanbox.cc/@asdkd123/posts/10274875",
+        image_urls: %w[
+          https://downloads.fanbox.cc/images/post/10274875/N7wxp4ikGcGKavDI2WFAvR5D.png
+          https://downloads.fanbox.cc/images/post/10274875/jIIOsS079oyxTpmESgQNX3Rf.png
+          https://downloads.fanbox.cc/images/post/10274875/xDqYK8sBjY2VIWCsyQMCTvxJ.png
+        ],
+        media_files: [
+          { file_size: 8_804_311 },
+          { file_size: 8_845_871 },
+          { file_size: 8_921_414 },
+        ],
+        page_url: "https://asdkd123.fanbox.cc/posts/10274875",
+        profile_urls: %w[https://asdkd123.fanbox.cc],
+        display_name: "asdkd123",
+        username: "asdkd123",
+        tags: [
+          ["Uma", "https://fanbox.cc/tags/Uma"],
+          ["全体公開", "https://fanbox.cc/tags/全体公開"],
+        ],
+        dtext_artist_commentary_title: "ファル子〇ー2025.7.24",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          https://downloads.fanbox.cc/images/post/10274875/N7wxp4ikGcGKavDI2WFAvR5D.png
+
+          https://downloads.fanbox.cc/images/post/10274875/jIIOsS079oyxTpmESgQNX3Rf.png
+
+          https://downloads.fanbox.cc/images/post/10274875/xDqYK8sBjY2VIWCsyQMCTvxJ.png
+        EOS
       )
     end
 
