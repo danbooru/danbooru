@@ -7,6 +7,9 @@ class ArtistURL < ApplicationRecord
   validate :validate_url_format
   belongs_to :artist, :touch => true
 
+  after_save :create_artist_version
+  after_destroy :create_artist_version
+
   scope :active, -> { where(is_active: true) }
 
   def self.parse_prefix(url)
@@ -150,6 +153,13 @@ class ArtistURL < ApplicationRecord
     end
   rescue StandardError
     errors.add(:url, "'#{url}' is not a valid URL")
+  end
+
+  def create_artist_version
+    if destroyed? || saved_changes?
+      artist&.url_string_changed = true
+      artist&.save!
+    end
   end
 
   def self.available_includes
