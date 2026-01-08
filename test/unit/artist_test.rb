@@ -131,6 +131,57 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(["http://aaa.com", "http://rembrandt.com/test.jpg"], artist.urls.map(&:to_s).sort)
     end
 
+    should "sort urls" do
+      url_string = <<~EOS.chomp
+        https://www.pixiv.net/users/111
+        +https://www.pixiv.net/stacc/bab
+        +-https://www.pixiv.net/stacc/abb
+        +-https://www.pixiv.net/stacc/bba
+        +-https://www.pixiv.net/stacc/aba
+        https://www.pixiv.net/users/110
+        +-https://www.pixiv.net/stacc/bba
+        +https://www.pixiv.net/stacc/bbb
+        +https://www.pixiv.net/stacc/aba
+        https://twitter.com/aaa
+        +-https://twitter.com/aba
+        +https://twitter.com/intent/user?user_id=111
+        +-https://twitter.com/aab
+        https://twitter.com/bab
+        http://rembrandt.com/test.jpg
+        https://www.pixiv.net/users/2
+        https://twitter.com/intent/user?user_id=133
+        https://www.pixiv.net/users/211
+        https://twitter.com/intent/user?user_id=2
+        https://twitter.com/bab
+        https://twitter.com/aaa
+        https://twitter.com/aab
+        https://twitter.com/baa
+      EOS
+      url_string_sorted = <<~EOS.chomp
+        https://www.pixiv.net/users/2
+        https://www.pixiv.net/users/110
+        +https://www.pixiv.net/stacc/bbb
+        https://www.pixiv.net/users/111
+        +https://www.pixiv.net/stacc/bab
+        +-https://www.pixiv.net/stacc/aba
+        +-https://www.pixiv.net/stacc/abb
+        +-https://www.pixiv.net/stacc/bba
+        https://www.pixiv.net/users/211
+        https://twitter.com/aaa
+        +https://twitter.com/intent/user?user_id=111
+        +-https://twitter.com/aab
+        +-https://twitter.com/aba
+        https://twitter.com/baa
+        https://twitter.com/bab
+        https://twitter.com/intent/user?user_id=2
+        https://twitter.com/intent/user?user_id=133
+        http://rembrandt.com/test.jpg
+      EOS
+      artist = FactoryBot.create(:artist, :name => "rembrandt", :url_string => url_string)
+      artist.reload
+      assert_equal(url_string_sorted, artist.url_string)
+    end
+
     should "not allow invalid urls" do
       artist = FactoryBot.build(:artist, :url_string => "blah")
       assert_equal(false, artist.valid?)
@@ -157,10 +208,18 @@ class ArtistTest < ActiveSupport::TestCase
 
     should "not delete urls that have not changed" do
       artist = FactoryBot.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
-      old_url_ids = ArtistURL.order("id").pluck(&:id)
+      old_url_ids = ArtistURL.order("id").pluck(:id)
       artist.url_string = "http://rembrandt.com/test.jpg"
       artist.save
-      assert_equal(old_url_ids, ArtistURL.order("id").pluck(&:id))
+      assert_equal(old_url_ids, ArtistURL.order("id").pluck(:id))
+    end
+
+    should "not delete urls that was deactivated" do
+      artist = FactoryBot.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/test.jpg")
+      old_url_ids = ArtistURL.order("id").pluck(:id)
+      artist.url_string = "-http://rembrandt.com/test.jpg"
+      artist.save
+      assert_equal(old_url_ids, ArtistURL.order("id").pluck(:id))
     end
 
     should "normalize urls before removing duplicates" do
@@ -359,12 +418,12 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding nijie artists" do
       setup do
+        skip "Nijie credentials not configured" unless Source::Extractor::Nijie.enabled?
         FactoryBot.create(:artist, :name => "evazion", :url_string => "http://nijie.info/members.php?id=236014")
         FactoryBot.create(:artist, :name => "728995",  :url_string => "http://nijie.info/members.php?id=728995")
       end
 
       should "find the artist" do
-        skip "Nijie credentials not configured" unless Source::Extractor::Nijie.enabled?
         assert_artist_found("evazion", "http://nijie.info/view.php?id=218944")
         assert_artist_found("728995",  "http://nijie.info/view.php?id=213043")
       end

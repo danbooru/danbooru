@@ -256,7 +256,8 @@ CREATE TABLE public.artist_urls (
     url character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    is_active boolean DEFAULT true NOT NULL
+    is_active boolean DEFAULT true NOT NULL,
+    parent_id integer
 );
 
 
@@ -3342,7 +3343,6 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
-
 
 
 --
@@ -7083,6 +7083,14 @@ ALTER TABLE ONLY public.artist_versions
 
 
 --
+-- Name: artist_urls fk_rails_f3be4457e9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.artist_urls
+    ADD CONSTRAINT fk_rails_f3be4457e9 FOREIGN KEY (parent_id) REFERENCES public.artist_urls(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: post_votes fk_rails_f3edc07390; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -7113,6 +7121,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251212190901'),
 ('20250720155738'),
 ('20250718142035'),
 ('20250716202530'),

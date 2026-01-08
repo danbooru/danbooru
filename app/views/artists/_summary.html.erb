@@ -57,8 +57,11 @@
 
       <ul>
         <% artist.sorted_urls.each do |url| %>
-          <li>
-            <%= external_link_to url.url, external_site_icon(url.site_name, class: "h-4") %>
+          <li class="flex items-center">
+            <%= external_link_to url.url, external_site_icon(url.site_name, class: "h-4"), class: "mr-2" %>
+            <% if url.parent_id.present? -%>
+              <span class="nested-artist-icon text-muted select-none mr-1">↳</span>
+            <% end %>
             <% if url.is_active? %>
               <%= external_link_to url.url %>
             <% else %>

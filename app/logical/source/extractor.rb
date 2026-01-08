@@ -305,7 +305,7 @@ module Source
       Artist.new(
         name: tag_name,
         other_names: other_names,
-        url_string: profile_urls.join("\n")
+        url_string: profile_urls.join("\n+")
       )
     end
 
