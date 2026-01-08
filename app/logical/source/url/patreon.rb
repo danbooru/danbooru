@@ -41,7 +41,7 @@ class Source::URL::Patreon < Source::URL
     # https://www.patreon.com/m/1041uuu/about
     # https://www.patreon.com/c/yaisirdrawz
     # https://www.patreon.com/cw/iwanokenta
-    in _, "patreon.com", ("checkout" | "join" | "m" | "c", "cw"), username, *rest unless username.in?(RESERVED_USERNAMES)
+    in _, "patreon.com", ("checkout" | "join" | "m" | "c" | "cw"), username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username
 
     # https://www.patreon.com/bePatron?u=4045578
