@@ -1,0 +1,310 @@
+import { clamp, round } from "./utility";
+import UgoiraRenderer from './ugoira_renderer.js';
+import VideoRenderer from './video_renderer.js';
+
+export default class VideoPlayer {
+  constructor(container) {
+    this.$container = $(container);
+    this.paused = true;
+    this.duration = 0;
+    this._currentTime = 0;
+    this._volume = parseFloat(localStorage.getItem("volume")) || 1.0;
+    this._muted = !this.$container.data("has-sound");
+
+    this._variants = {};
+    this.$container.find(".video-variant").each((index, element) => {
+      let $element = $(element);
+      let variant = $element.data("variant");
+      
+      if ($element.is("canvas")) {
+        const fileUrl = $element.data("src");
+        const fileSize = $element.data("file-size");
+        const frameDelays = $element.data("frame-delays");
+        const frameOffsets = $element.data("frame-offsets");
+        this._variants[variant] = new UgoiraRenderer(fileUrl, element, frameDelays, { frameOffsets, fileSize });
+      } else {
+        this._variants[variant] = new VideoRenderer(element);
+      }
+    });
+  }
+
+  initialize() {
+    this.$container.data("video-player", this);
+    this.$container.get(0).videoPlayer = this;
+
+    $(document).on("visibilitychange", event => this.onVisibilityChange(event));
+    this.$container.on("keydown", event => this.onKeypress(event));
+    this.$container.on("fullscreenchange", event => this.fullscreen = document.fullscreenElement !== null);
+    this.$container.find("canvas, video").on("click", event => this.togglePlaying());
+    this.$container.find("canvas, video").on("dblclick", event => this.toggleFullscreen(event));
+    this.$container.find("canvas, video").on("seeking", event => this.currentTime = this.video.currentTime);
+    this.$container.find("canvas, video").on("progress", event => this.currentTime = this.video.currentTime);
+    this.$container.find("canvas, video").on("timeupdate", event => this.currentTime = this.video.currentTime);
+    this.$container.find("canvas, video").on("durationchange", event => this.duration = this.video.duration);
+    this.$container.find("canvas, video").on("play", event => this.onPlay());
+    this.$container.find("canvas, video").on("pause", event => this.onPause());
+    this.$container.find("canvas, video").on("volumechange", event => this.onVolumeChange());
+    this.$container.find(".video-slider").on("pointerdown", event => this.onDragStart(event));
+    this.$container.find(".video-slider").on("pointerup", event => this.onDragEnd(event));
+    this.$container.find(".video-slider").on("input", event => this.onDrag(event));
+    this.$container.find(".volume-slider").on("pointerdown", event => this.onVolumeDragStart(event));
+    this.$container.find(".volume-slider").on("pointerup", event => this.onVolumeDragEnd(event));
+    this.$container.find(".volume-slider").on("input", event => this.onVolumeDrag(event));
+
+    let quality = this.$container.data("quality");
+    this.setQuality(quality);
+
+    // Ignore autoplay errors due to browser restrictions.
+    this.play().catch(() => {});
+  }
+
+  async play() {
+    await this.video?.play();
+  }
+
+  onPlay() {
+    this.paused = false;
+  }
+
+  pause() {
+    this.resumePlayback = !this.paused;
+    this.video?.pause();
+  }
+
+  onPause() {
+    this.paused = true;
+  }
+
+  // Resumes playing if it was previously playing before it was last paused.
+  resume() {
+    if (this.resumePlayback) {
+      this.play();
+    }
+  }
+
+  togglePlaying() {
+    if (this.paused) {
+      this.play();
+    } else {
+      this.pause();
+    }
+  }
+
+  // Called when the playback slider starts being dragged. Pauses while the user drags the playback slider.
+  onDragStart(event) {
+    // Ignore right clicks.
+    if (event.pointerType !== "mouse" || event.button === 0) {
+      this.scrubbing = true;
+      this.pause();
+    }
+  }
+
+  // Called as the playback slider is being dragged. Updates the current time based on the playback slider position.
+  onDrag(event) {
+    if (this.scrubbing) {
+      this.currentTime = parseFloat(event.target.value);
+    }
+  }
+
+  // Called when the playback slider stops being dragged. Resumes if it was playing before the user started dragging the slider.
+  onDragEnd(event) {
+    if (this.scrubbing) {
+      this.resume();
+      this.scrubbing = false;
+    }
+  }
+
+  onVolumeDragStart(event) {
+    if (event.pointerType !== "mouse" || event.button === 0) {
+      this.scrubbingVolume = true;
+
+      if (this.volume > 0) {
+        this._previousVolume = this.volume;
+      }
+    }
+  }
+
+  onVolumeDrag(event) {
+    if (this.scrubbingVolume) {
+      this.volume = parseFloat(event.target.value);
+    }
+  }
+
+  onVolumeDragEnd(event) {
+    if (this.scrubbingVolume) {
+      if (this.volume === 0) {
+        this.volume = this._previousVolume;
+        this.muted = true;
+      }
+      this.scrubbingVolume = false;
+    }
+  }
+
+  // Called when a key is pressed while the player has focus. Ignores keypresses while the playback slider is being dragged.
+  onKeypress(event) {
+    if (this.scrubbing) {
+      return;
+    }
+
+    if (event.key === " ") {
+      this.togglePlaying();
+    } else if (event.key === "ArrowLeft") {
+      this.currentTime -= this.duration * 0.01;
+    } else if (event.key === "ArrowRight") {
+      this.currentTime += this.duration * 0.01;
+    } else if (event.key === "ArrowDown") {
+      this.volume -= 0.1;
+    } else if (event.key === "ArrowUp") {
+      this.volume += 0.1;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+  }
+
+  // Pauses the video while the user is tabbed out.
+  onVisibilityChange(event) {
+    if (this.muted || this.volume === 0) {
+      if (document.hidden) {
+        this.pause();
+      } else {
+        this.resume();
+      }
+    }
+  }
+
+  // Sets the video to either the original or the sample. Playback will continue from the
+  // current time when the video is switched.
+  setQuality(quality) {
+    if (quality === this.quality) {
+      return;
+    }
+
+    this.pause();
+    this.quality = quality;
+    this.video = this._variants[quality];
+
+    this.video.load();
+    this.duration = this.video.duration || 0;
+
+    this.video.currentTime = this.currentTime;
+    this.video.volume = this.volume;
+    this.video.muted = this.muted;
+
+    this.resume();
+  }
+
+  // Toggle fullscreen mode.
+  toggleFullscreen(event) {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else if (document.fullscreenEnabled) {
+      this.$container.get(0).requestFullscreen();
+    }
+  }
+
+  get inferredVolume() {
+    return this.muted ? 0 : this.volume;
+  }
+
+  get volume() {
+    return this._volume;
+  }
+
+  set volume(value) {
+    value = round(value, 0.01);
+    value = clamp(value, 0.0, 1.0);
+
+    if (this.video.volume !== value) {
+      this.video.volume = value;
+    }
+
+    if (value > 0) {
+      this.muted = false;
+    }
+  }
+
+  get muted() {
+    return this._muted;
+  }
+
+  set muted(value) {
+    if (this.video.muted !== value) {
+      this.video.muted = value;
+    }
+  }
+
+  onVolumeChange(event) {
+    this._volume = this.video.volume;
+    this._muted = this.video.muted;
+    localStorage.setItem("volume", this._volume);
+  }
+
+  toggleMute() {
+    if (this.muted) {
+      this.muted = false;
+    } else {
+      this.muted = true;
+    }
+  }
+
+  get currentTime() {
+    return this._currentTime;
+  }
+
+  set currentTime(time) {
+    this._currentTime = time;
+
+    if (this.video.currentTime !== time) {
+      this.video.currentTime = time;
+    }
+  }
+
+  // The percentage of the video that has been played.
+  get playbackProgress() {
+    return this.formatPercentage(this.currentTime, this.duration);
+  }
+
+  // The percentage of the video that has been downloaded.
+  get loadProgress() {
+    // XXX Hack to force Alpine to update the progress bar every time the time is updated, because browsers don't always
+    // send the final progress event when the video finishes loading, which causes the loading bar to get stuck below 100%.
+    this.currentTime;
+
+    let buffered = this.video.buffered;
+    let bufferedDuration = buffered.length > 0 ? buffered.end(buffered.length - 1) : 0;
+
+    // Sometimes the browser has buffered part of the video and started playback, but it hasn't finished downloading
+    // the metadata and so doesn't know the duration yet. Just say we've loaded something in that case.
+    if (bufferedDuration > 0 && this.duration === 0) {
+      return "1%";
+    // Sometimes the browser says it hasn't buffered anything yet, but it says the video is ready and has already
+    // started playback, so it's at least downloaded something.
+    } else if (bufferedDuration === 0 && this.video.readyState > 1) {
+      return "1%"
+    } else {
+      // XXX Some webm samples have an incorrect duration, which causes the load progress to be wrong.
+      // Ex: https://danbooru.donmai.us/posts/3448662
+      return this.formatPercentage(bufferedDuration, this.duration);
+    }
+  }
+
+  // Format a time in seconds as "0:00".
+  formatTime(seconds) {
+    const mm = Math.floor(seconds / 60).toString().padStart(1, '0');
+    const ss = Math.floor(seconds % 60).toString().padStart(2, '0');
+
+    return `${mm}:${ss}`;
+  }
+
+  // Format a ratio as "12.3%"
+  formatPercentage(numerator, denominator, precision = 1) {
+    if (denominator) {
+      let roundedRatio = Math.round(Math.pow(10, precision) * 100 * (numerator / denominator)) / Math.pow(10, precision);
+      return `${roundedRatio}%`;
+    } else {
+      return "0%";
+    }
+  }
+}
