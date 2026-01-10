@@ -25,6 +25,7 @@ module Source::Tests::URL
           "https://www.patreon.com/user/posts?u=84592583",
           "https://www.patreon.com/api/user/4045578",
           "https://www.patreon.com/profile/creators?u=7422057",
+          "https://www.patreon.com/cw/iwanokenta",
         ],
       )
     end
@@ -35,6 +36,9 @@ module Source::Tests::URL
 
       url_parser_should_work("https://www.patreon.com/c/yaisirdrawz",
                              profile_url: "https://www.patreon.com/yaisirdrawz",)
+
+      url_parser_should_work("https://www.patreon.com/cw/iwanokenta",
+                             profile_url: "https://www.patreon.com/iwanokenta",)
     end
   end
 end
