@@ -187,6 +187,13 @@ class ApplicationRecord < ActiveRecord::Base
       end
     end
 
+    # Like `update`, but locks the record before updating it.
+    def locked_update(**args)
+      with_lock do
+        update(**args)
+      end
+    end
+
     # Save the record, but convert RecordNotUnique exceptions thrown by the database into
     # Rails validation errors. This way duplicate records only return one type of error.
     # This assumes the table only has one uniqueness constraint in the database.

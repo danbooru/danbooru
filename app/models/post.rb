@@ -627,6 +627,9 @@ class Post < ApplicationRecord
         in "source", value
           self.source = value
 
+        in "status", "pending"
+          self.is_pending = true if new_record?
+
         in category, name if category.in?(PostEdit::CATEGORIZATION_METATAGS)
           Tag.find_or_create_by_name(name, category: category, current_user: CurrentUser.user)
 

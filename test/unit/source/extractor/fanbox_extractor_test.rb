@@ -112,11 +112,11 @@ module Source::Tests::Extractor
 
     context "A cover image" do
       strategy_should_work(
-        "https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/pYOm2wWFyzffzZaty7fbHiJ1.jpeg",
-        media_files: [{ file_size: 562_582 }],
-        profile_url: "https://omu001.fanbox.cc",
-        display_name: "むっしゅ",
-        username: "omu001",
+        "https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/23800170/cover/bT4hCcuzXuoh2JWQbBXINlVV.jpeg",
+        media_files: [{ file_size: 747_660 }],
+        profile_url: "https://hisha.fanbox.cc",
+        display_name: "飛者",
+        username: "hisha",
       )
     end
 
@@ -144,7 +144,7 @@ module Source::Tests::Extractor
     context "A dead profile picture in the old pixiv format" do
       strategy_should_work(
         "https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/29999491/profile/Ew6fOhLGPvmUcwU6FyH8JAMX.jpeg",
-        image_urls: %w[https://pixiv.pximg.net/fanbox/public/images/creator/29999491/profile/Ew6fOhLGPvmUcwU6FyH8JAMX.jpeg], # 404
+        image_urls: %w[https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/29999491/profile/Ew6fOhLGPvmUcwU6FyH8JAMX.jpeg], # 404
         page_url: "https://verdey1104.fanbox.cc",
         profile_urls: %w[https://verdey1104.fanbox.cc],
         display_name: "Verdey",
@@ -178,14 +178,45 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A Fanbox post with missing imageIds" do
+      strategy_should_work(
+        "https://www.fanbox.cc/@asdkd123/posts/10274875",
+        image_urls: %w[
+          https://downloads.fanbox.cc/images/post/10274875/N7wxp4ikGcGKavDI2WFAvR5D.png
+          https://downloads.fanbox.cc/images/post/10274875/jIIOsS079oyxTpmESgQNX3Rf.png
+          https://downloads.fanbox.cc/images/post/10274875/xDqYK8sBjY2VIWCsyQMCTvxJ.png
+        ],
+        media_files: [
+          { file_size: 8_804_311 },
+          { file_size: 8_845_871 },
+          { file_size: 8_921_414 },
+        ],
+        page_url: "https://asdkd123.fanbox.cc/posts/10274875",
+        profile_urls: %w[https://asdkd123.fanbox.cc],
+        display_name: "asdkd123",
+        username: "asdkd123",
+        tags: [
+          ["Uma", "https://fanbox.cc/tags/Uma"],
+          ["全体公開", "https://fanbox.cc/tags/全体公開"],
+        ],
+        dtext_artist_commentary_title: "ファル子〇ー2025.7.24",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          https://downloads.fanbox.cc/images/post/10274875/N7wxp4ikGcGKavDI2WFAvR5D.png
+
+          https://downloads.fanbox.cc/images/post/10274875/jIIOsS079oyxTpmESgQNX3Rf.png
+
+          https://downloads.fanbox.cc/images/post/10274875/xDqYK8sBjY2VIWCsyQMCTvxJ.png
+        EOS
+      )
+    end
+
     context "A deleted Fanbox post" do
       strategy_should_work(
         "https://wakura081.fanbox.cc/posts/4923490",
         page_url: "https://wakura081.fanbox.cc/posts/4923490",
         profile_url: "https://wakura081.fanbox.cc",
         image_urls: [],
-        # display_name: "わくら", # XXX should get this from the profile page
-        display_name: nil,
+        display_name: "わくら",
         username: "wakura081",
         artist_commentary_title: nil,
         artist_commentary_desc: nil,

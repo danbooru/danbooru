@@ -127,8 +127,12 @@ module Source::Tests::Extractor
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          猜猜看誰被偷拍了？[嘻嘻][嘻嘻] "sandymandy的秒拍视频":[https://video.weibo.com/show?fid=1034:067e5f60923993c936abe48f1b0a11e2]
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          猜猜看誰被偷拍了？"[嘻嘻]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8e/201810_xixi_mobile.png]
+          
+          "[嘻嘻]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8e/201810_xixi_mobile.png]
+          
+          "sandymandy的秒拍视频":[https://video.weibo.com/show?fid=1034:067e5f60923993c936abe48f1b0a11e2]
         EOS
       )
     end
@@ -165,8 +169,30 @@ module Source::Tests::Extractor
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          诚邀首页欣赏艺术，美到要我命🆘🤯[舔屏][舔屏][舔屏][awsl][awsl][awsl][awsl][awsl][awsl][awsl][awsl][awsl]
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          诚邀首页欣赏艺术，美到要我命🆘🤯"[舔屏]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/da/201810_tian_mobile.png]
+          
+          "[舔屏]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/da/201810_tian_mobile.png]
+          
+          "[舔屏]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/da/201810_tian_mobile.png]
+          
+          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
+          
+          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
+          
+          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
+          
+          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
+          
+          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
+          
+          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
+          
+          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
+          
+          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
+          
+          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
         EOS
       )
     end

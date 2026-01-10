@@ -14,6 +14,7 @@ class UserEvent < ApplicationRecord
     login login_verification reauthenticate logout user_creation user_deletion user_undeletion
     password_reset password_change email_change totp_enable totp_update totp_disable
     totp_login totp_reauthenticate backup_code_generate backup_code_login backup_code_reauthenticate
+    api_key_create api_key_update api_key_delete
   ]
 
   attribute :id
@@ -22,12 +23,14 @@ class UserEvent < ApplicationRecord
   attribute :user_id
   attribute :category
   attribute :ip_addr, :ip_address
+  attribute :login_session_id, :md5
   attribute :session_id, :md5
   attribute :user_agent
   attribute :metadata
 
   belongs_to :user
   belongs_to :ip_geolocation, foreign_key: :ip_addr, primary_key: :ip_addr, optional: true
+  belongs_to :login_session, primary_key: :login_id, inverse_of: :user_events, optional: true
 
   enum :category, {
     login: 0,                             # The user successfully logged in. Only used for users without 2FA enabled.
@@ -112,18 +115,16 @@ class UserEvent < ApplicationRecord
 
   concerning :ConstructorMethods do
     class_methods do
-      # Build an event but don't save it yet. The caller is expected to update the user, which will save the event.
-      def build_from_request(user, category, request)
+      # @param user [User] The user who performed the event, or the user whose account was affected by the event.
+      # @param category [Symbol] The event category, e.g. :login, :logout, :user_creation, etc.
+      # @param request [ActionDispatch::Request] The HTTP request that triggered the event.
+      # @param login_session [LoginSession, nil] The login session associated with the event. If not provided, it will be taken from the `login_id` session cookie.
+      def create_from_request!(user, category, request, login_session: nil)
+        login_session_id = login_session&.login_id || request.session[:login_id]
         ip_addr = request.remote_ip
         IpGeolocation.create_or_update!(ip_addr)
 
-        user.user_events.build(user: user, category: category, ip_addr: ip_addr, session_id: request.session[:session_id], user_agent: request.user_agent)
-      end
-
-      def create_from_request!(...)
-        event = build_from_request(...)
-        event.save!
-        event
+        create!(user: user, category: category, ip_addr: ip_addr, login_session_id: login_session_id, session_id: request.session[:session_id], user_agent: request.user_agent)
       end
     end
   end

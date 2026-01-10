@@ -20,8 +20,8 @@
         <hr>
 
         <p>
-          <% @user.backup_codes.to_a.each do |code| %>
-            <pre class="block !text-xxl text-center"><%= code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0") %></pre>
+          <% @backup_codes.each do |code| %>
+            <pre class="block !text-xxl text-center"><%= code %></pre>
           <% end %>
         </p>
 
@@ -34,7 +34,7 @@
             <%= print_icon %> Print
           <% end %>
 
-          <%= tag.button class: "button-outline-primary", onclick: "Danbooru.Utility.copyToClipboard('#{j @user.backup_codes.to_a.join("\n")}')" do %>
+          <%= tag.button class: "button-outline-primary", onclick: "Danbooru.Utility.copyToClipboard('#{j @backup_codes.join("\n")}')" do %>
             <%= copy_icon %> Copy
           <% end %>
         </div>

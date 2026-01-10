@@ -1129,6 +1129,14 @@ class PostTest < ActiveSupport::TestCase
 
             assert_equal(false, @post.reload.is_banned?)
           end
+
+          should "not ban the post if status:banned is contained in a source string" do
+            as(create(:approver)) do
+              @post.update(tag_string: 'aaa source:"status:banned"')
+            end
+
+            assert_equal(false, @post.reload.is_banned?)
+          end
         end
 
         context "for -status:banned" do
@@ -1211,6 +1219,12 @@ class PostTest < ActiveSupport::TestCase
           should 'strip the source with source:"  foo bar baz  "' do
             @post.update(:tag_string => 'source:"  foo bar baz  "')
             assert_equal("foo bar baz", @post.source)
+          end
+
+          should 'set the source with source:foo\u3000bar' do
+            @post.update(:tag_string => "source:foo\u3000bar")
+            assert_equal("foo", @post.source)
+            assert_equal("bar non-web_source", @post.tag_string)
           end
 
           should "clear the source with source:none" do

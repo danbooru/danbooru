@@ -231,14 +231,6 @@ class PoolTest < ActiveSupport::TestCase
       assert_equal([], @pool.post_ids_was)
     end
 
-    should "normalize its name" do
-      @pool.update(:name => "  A  B  ")
-      assert_equal("A_B", @pool.name)
-
-      @pool.update(:name => "__A__B__")
-      assert_equal("A_B", @pool.name)
-    end
-
     should "not allow duplicate posts" do
       @pool.update(category: "collection", post_ids: [1, 2, 2, 3, 1])
       assert_equal([1, 2, 3], @pool.post_ids)
@@ -248,7 +240,10 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     context "when validating names" do
-      should normalize_attribute(:name).from(" _A\t_\nB_ ").to("A_B")
+      should normalize_attribute(:name).from("  A  B  ").to("A_B")
+      should normalize_attribute(:name).from("__A__B__").to("A_B")
+      should normalize_attribute(:name).from(" _A\t\r\n\u3000_\nB_ ").to("A_B")
+      should normalize_attribute(:name).from("pokémon".unicode_normalize(:nfd)).to("pokémon".unicode_normalize(:nfc))
 
       should_not allow_value("foo,bar").for(:name)
       should_not allow_value("foo*bar").for(:name)

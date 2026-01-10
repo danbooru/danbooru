@@ -258,7 +258,7 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "allow users to remove their own votes" do
-        delete_auth post_post_votes_path(post_id: @vote.post_id), @user, xhr: true
+        delete_auth post_vote_path(@vote), @user, xhr: true
 
         assert_response :success
         assert_equal(0, @post.reload.score)
@@ -293,7 +293,7 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
 
       should "not fail when attempting to remove an already removed vote" do
         @vote.soft_delete!
-        delete_auth post_post_votes_path(post_id: @vote.post_id), @user, xhr: true
+        delete_auth post_vote_path(@vote), @user, xhr: true
 
         assert_response :success
         assert_equal(0, @post.reload.score)

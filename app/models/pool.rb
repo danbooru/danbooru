@@ -10,7 +10,7 @@ class Pool < ApplicationRecord
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
   dtext_attribute :description # defines :dtext_description
 
-  normalizes :name, with: ->(name) { name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "") }
+  normalizes :name, with: ->(name) { name.unicode_normalize(:nfc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "") }
   normalizes :post_ids, with: ->(post_ids) { post_ids.uniq }
 
   validates :name, visible_string: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 170 }, if: :name_changed?

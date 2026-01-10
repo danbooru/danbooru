@@ -22,7 +22,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://image-assets.mihuashi.com/permanent/29105|-2024/05/29/16/FuE-9jWo-aPKXOq2KP2ZsR5Nxnqa.jpg],
         media_files: [{ file_size: 597_376 }],
         page_url: "https://www.mihuashi.com/artworks/15092919",
-        profile_url: "https://www.mihuashi.com/users/spirtie",
+        profile_url: "https://www.mihuashi.com/profiles/29105",
         profile_urls: [
           "https://www.mihuashi.com/users/spirtie",
           "https://www.mihuashi.com/profiles/29105",
@@ -43,7 +43,7 @@ module Source::Tests::Extractor
         "https://www.mihuashi.com/artworks/13693110",
         image_urls: %w[https://image-assets.mihuashi.com/permanent/321972|-2024/03/10/10/FuMarkKYoykuY3yCrPA7d8lrF3U6.gif],
         media_files: [{ file_size: 1_145_184 }],
-        profile_url: "https://www.mihuashi.com/users/yuyuco",
+        profile_url: "https://www.mihuashi.com/profiles/321972",
         username: "yuyuco",
         tags: [
           ["日系", "https://www.mihuashi.com/search?tab=artwork&q=日系"],
@@ -73,7 +73,7 @@ module Source::Tests::Extractor
           { file_size: 3_586_679 },
         ],
         page_url: "https://www.mihuashi.com/stalls/71664",
-        profile_url: "https://www.mihuashi.com/users/黑石肆维",
+        profile_url: "https://www.mihuashi.com/profiles/532464",
         profile_urls: [
           "https://www.mihuashi.com/users/黑石肆维",
           "https://www.mihuashi.com/profiles/532464",
@@ -183,6 +183,75 @@ module Source::Tests::Extractor
         tags: [],
         dtext_artist_commentary_title: "一些可以使用的元素",
         dtext_artist_commentary_desc: "生命之流是图1绿色的流动的线，菲拉是图二的黑色斗篷",
+      )
+    end
+
+    context "A Mihuashi activity work" do
+      strategy_should_work(
+        "https://www.mihuashi.com/activities/houkai3-stigmata/artworks/8523",
+        image_urls: %w[https://activity-assets.mihuashi.com/2019/06/16/07/1icxr2tlafwxdwry4puu55zi6v9d1u0t/1icxr2tlafwxdwry4puu55zi6v9d1u0t.png],
+        media_files: [{ file_size: 8_296_841 }],
+        page_url: "https://www.mihuashi.com/activities/houkai3-stigmata/artworks/8523?type=lsly",
+        profile_url: "https://www.mihuashi.com/profiles/16150",
+        profile_urls: [
+          "https://www.mihuashi.com/users/悪の箱",
+          "https://www.mihuashi.com/profiles/16150",
+        ],
+        username: "悪の箱",
+        tags: [],
+        dtext_artist_commentary_title: "粉蓝夏日泳装",
+        dtext_artist_commentary_desc: "成年人也想吹泡泡~(´-ω-`)【粉蓝萝莉的设计真的很棒！！",
+      )
+    end
+
+    context "A Mihuashi activity work with multiple images" do
+      strategy_should_work(
+        "https://www.mihuashi.com/activities/jw3-exterior-12/artworks/10515?type=zjjh",
+        image_urls: [
+          "https://activity-assets.mihuashi.com/2021/07/04/01/FvJ4MjqshV3u2etTc_8-gD4vFfy-.jpg",
+          "https://activity-assets.mihuashi.com/2021/07/04/01/FgPagYyKnA-DDGpqVr8lgda0dx-h.jpg",
+          "https://activity-assets.mihuashi.com/2021/07/04/01/FiShox3Y97DikJuPKelQF-VldEYI.jpg",
+          "https://activity-assets.mihuashi.com/2021/07/04/01/FomTWNvkUblg28rJANmTyeRwL8k4.jpg",
+          "https://activity-assets.mihuashi.com/2021/07/04/01/lkbHCi8Lb_A2Us-ifVqB4Shnjai_.jpg",
+        ],
+        media_files: [
+          { file_size: 838_313 },
+          { file_size: 693_836 },
+          { file_size: 903_642 },
+          { file_size: 758_627 },
+          { file_size: 1_336_968 },
+        ],
+        page_url: "https://www.mihuashi.com/activities/jw3-exterior-12/artworks/10515?type=zjjh",
+        profile_url: "https://www.mihuashi.com/profiles/492",
+        profile_urls: [
+          "https://www.mihuashi.com/users/CR",
+          "https://www.mihuashi.com/profiles/492",
+        ],
+        username: "CR",
+        tags: [],
+        dtext_artist_commentary_title: "纸仙云鹤",
+        dtext_artist_commentary_desc: "这套时装灵感来自于中国传统剪纸文化，结合了仙鹤和祥云的元素。\n红色的宣纸上剪裁出仙鹤在祥云中飞翔的图案，希望给大家带来温暖的感觉。",
+      )
+    end
+
+    context "A Mihuashi work by a user with name changes" do
+      strategy_should_work(
+        "https://www.mihuashi.com/artworks/13982141",
+        image_urls: %w[https://image-assets.mihuashi.com/permanent/109517|-2024/03/26/16/FtXN5dkc5qiWjatvcUBCNsq2yAzM.jpg],
+        media_files: [{ file_size: 510_468 }],
+        page_url: "https://www.mihuashi.com/artworks/13982141",
+        profile_urls: %w[https://www.mihuashi.com/profiles/109517 https://www.mihuashi.com/users/破嗝嗝],
+        display_name: nil,
+        username: "破嗝嗝",
+        other_names: %w[破嗝嗝 Og-pogg],
+        tags: [
+          ["日系", "https://www.mihuashi.com/search?tab=artwork&q=日系"],
+          ["平涂", "https://www.mihuashi.com/search?tab=artwork&q=平涂"],
+          ["Q版", "https://www.mihuashi.com/search?tab=artwork&q=Q版"],
+          ["插图", "https://www.mihuashi.com/search?tab=artwork&q=插图"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "蔚蓝档案小桃",
       )
     end
   end

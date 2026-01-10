@@ -2,11 +2,11 @@
 
 class UserPolicy < ApplicationPolicy
   def create?
-    true
+    user.is_anonymous?
   end
 
   def new?
-    true
+    user.is_anonymous?
   end
 
   def custom_style?
@@ -58,7 +58,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def rate_limit_for_create(**_options)
-    if record.invalid?
+    if record.invalid?([:create, :deliverable])
       { action: "users:create:invalid", rate: 1.0 / 1.second, burst: 10 }
     else
       { action: "users:create", rate: 1.0 / 5.minutes, burst: 3 }

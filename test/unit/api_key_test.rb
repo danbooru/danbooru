@@ -69,7 +69,9 @@ class ApiKeyTest < ActiveSupport::TestCase
     context "when creating an API key" do
       setup do
         @user = create(:user)
-        @api_key = create(:api_key, user: @user)
+        @request = ActionDispatch::TestRequest.create("REMOTE_ADDR" => Faker::Internet.public_ip_v4_address, "HTTP_USER_AGENT" => Faker::Internet.user_agent)
+        @request.session = { session_id: SecureRandom.hex(16), login_id: create(:login_session).id }
+        @api_key = create(:api_key, user: @user, request: @request)
       end
 
       should "record a user event" do

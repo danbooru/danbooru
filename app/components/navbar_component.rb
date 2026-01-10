@@ -3,7 +3,7 @@
 class NavbarComponent < ApplicationComponent
   attr_reader :current_user
 
-  delegate :li_link_to, :unread_dmail_indicator, :close_icon, :menu_icon, :main_app, to: :helpers
+  delegate :li_link_to, :unread_dmail_indicator, :close_icon, :menu_icon, :main_app, :image_pack_tag, to: :helpers
 
   def initialize(current_user:)
     super

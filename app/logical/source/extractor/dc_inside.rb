@@ -18,7 +18,7 @@ class Source::Extractor::DcInside < Source::Extractor
       if el.name == "video"
         src = el.attr("data-src")
       else
-        src = el.attr("src")
+        src = el.attr("data-original") || el.attr("src")
       end
 
       next unless src.match %r{\Ahttps?://dcimg\d+\.dcinside\.(?:com|co\.kr)/viewimage\.php}
@@ -48,7 +48,12 @@ class Source::Extractor::DcInside < Source::Extractor
   end
 
   def artist_commentary_desc
-    page&.css(".writing_view_box")&.to_s
+    page&.dup&.css(".writing_view_box")&.tap do |commentary|
+      commentary.css(".writing_view_box .write_div img").each do |img|
+        new_src = img.attr("data-original") || img.attr("src")
+        img.set_attribute("src", new_src) if new_src.present? && img.classes.exclude?("written_dccon")
+      end
+    end&.to_html
   end
 
   def dtext_artist_commentary_desc
@@ -57,5 +62,10 @@ class Source::Extractor::DcInside < Source::Extractor
 
   memoize def page
     http.cache(1.minute).parsed_get(page_url)
+  end
+
+  def http_downloader
+    # downloads are prone to being interrupted, especially for large files
+    super.use(retriable: { max_retries: 10 })
   end
 end

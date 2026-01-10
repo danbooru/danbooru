@@ -94,6 +94,14 @@ class ActionDispatch::IntegrationTest
   register_encoder :html, response_parser: ->(body) { Nokogiri.HTML5(body) }
 
   def login_as(user)
+    current_user_id = request&.session&.dig(:user_id)
+
+    if current_user_id == user.id
+      return
+    elsif current_user_id.present? && current_user_id != user.id
+      delete session_path # logout
+    end
+
     post session_path, params: { session: { name: user.name, password: user.password } }
 
     if user.totp.present?

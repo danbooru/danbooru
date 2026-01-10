@@ -29,7 +29,8 @@ class EmailsController < ApplicationController
 
   def update
     @email_address = authorize email_address
-    @email_address.update(request: request, updater: CurrentUser.user, **permitted_attributes(@email_address))
+    @email_address.assign_attributes(request: request, updater: CurrentUser.user, **permitted_attributes(@email_address))
+    @email_address.save(context: :deliverable)
     @user = @email_address.user
 
     if @email_address.user == CurrentUser.user

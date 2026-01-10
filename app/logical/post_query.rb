@@ -113,6 +113,11 @@ class PostQuery
     Tag.where(name: tag_names)
   end
 
+  # The only pool in the query, if the query contains a single pool.
+  def pool
+    Pool.find_by_name(find_metatag(:pool)) if is_single_pool?
+  end
+
   # True if this search would return all posts (normally because the search is the empty string).
   def is_empty_search?
     ast.all?
@@ -145,6 +150,10 @@ class PostQuery
   # True if the search contains a single tag. It may have other metatags or wildcards, and the tag may be negated.
   def has_single_tag?
     tag_names.one?
+  end
+
+  def is_single_pool?
+    is_metatag?(:pool)
   end
 
   # True if the search depends on the current user because of permissions or privacy settings.

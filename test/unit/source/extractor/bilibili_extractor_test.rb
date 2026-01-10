@@ -18,14 +18,14 @@ module Source::Tests::Extractor
         ],
         media_files: [
           { file_size: 1_536_450 },
-          { file_size: 1_553_055 },
-          { file_size: 5_015_957 },
-          { file_size: 4_726_511 },
-          { file_size: 3_554_557 },
-          { file_size: 4_697_116 },
-          { file_size: 4_359_527 },
-          { file_size: 3_641_366 },
-          { file_size: 6_552_286 },
+          { file_size: 1_553_059 },
+          { file_size: 5_015_961 },
+          { file_size: 4_726_515 },
+          { file_size: 3_554_561 },
+          { file_size: 4_697_120 },
+          { file_size: 4_359_531 },
+          { file_size: 3_641_370 },
+          { file_size: 6_552_290 },
         ],
         page_url: "https://www.bilibili.com/opus/686082748803186697",
         profile_url: "https://space.bilibili.com/11742550",
@@ -73,14 +73,14 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.bilibili.com/opus/1067620623766781959",
         image_urls: %w[http://i0.hdslb.com/bfs/new_dyn/1a93adf45c9b7854f49e841f1f0ec82e2300677.jpg],
-        media_files: [{ file_size: 20_107_957 }],
+        media_files: [{ file_size: 20_108_077 }],
         page_url: "https://www.bilibili.com/opus/1067620623766781959",
         profile_urls: %w[https://space.bilibili.com/2300677],
         display_name: "SA小飒",
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "【百日绘day44】 玲纱",
-        dtext_artist_commentary_desc: "甜点部乐队之后肯定就是玲纱啦～最近看\"@Kieed \":[https://space.bilibili.com/25589919/dynamic]老师的直播学到了很多，非常喜欢老师的图，太好看了！！\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]"
+        dtext_artist_commentary_desc: "甜点部乐队之后肯定就是玲纱啦～最近看\"@Kieed \":[https://space.bilibili.com/25589919/dynamic]老师的直播学到了很多，非常喜欢老师的图，太好看了！！\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]",
       )
     end
 
@@ -147,16 +147,16 @@ module Source::Tests::Extractor
           https://i0.hdslb.com/bfs/article/e19cb5691afbe77c003b535759cda619b2d813cb.jpg
         ],
         media_files: [
-          { file_size: 493_930 },
+          { file_size: 493_934 },
           { file_size: 282_419 },
           { file_size: 673_160 },
           { file_size: 1_152_435 },
-          { file_size: 342_964 },
+          { file_size: 342_968 },
           { file_size: 1_151_382 },
           { file_size: 987_229 },
           { file_size: 695_666 },
-          { file_size: 189_218 },
-          { file_size: 5_434_169 },
+          { file_size: 189_222 },
+          { file_size: 5_434_173 },
         ],
         page_url: "https://www.bilibili.com/opus/428178320677065986",
         profile_url: "https://space.bilibili.com/285452636",
@@ -167,23 +167,43 @@ module Source::Tests::Extractor
         tags: [],
         dtext_artist_commentary_title: "斗罗大陆 4，觉醒后的古月娜（第一期）",
         dtext_artist_commentary_desc: <<~EOS.chomp,
+          "[Image]":[https://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg]
+
           超喜欢
+
+          "[Image]":[https://i0.hdslb.com/bfs/article/72de3b6de4465fcb14c719354d8aeb55e93aa022.jpg]
 
           2
 
+          "[Image]":[https://i0.hdslb.com/bfs/article/f6f56a387517ecf3a721228f8da6b21ffbf92210.jpg]
+
           3
+
+          "[Image]":[https://i0.hdslb.com/bfs/article/7ac6fd23295eab8d3f62254187c34ae4867ea889.jpg]
 
           4
 
+          "[Image]":[https://i0.hdslb.com/bfs/article/f90d0110964e3794aca245b1a4b5d934156d231f.jpg]
+
           5
+
+          "[Image]":[https://i0.hdslb.com/bfs/article/b5a85177d15f3c53d06fae45ba53af3e64f7af14.jpg]
 
           6
 
+          "[Image]":[https://i0.hdslb.com/bfs/article/3ca6ec1056eb8dfb6e9fde732146b8244fd605ad.jpg]
+
           7
+
+          "[Image]":[https://i0.hdslb.com/bfs/article/1e860b392bef10f07e5abb7866e82998419f586a.jpg]
 
           8
 
+          "[Image]":[https://i0.hdslb.com/bfs/article/2d392a5ab0676e153355d850c13a93f16d5eb7a0.jpg]
+
           9
+
+          "[Image]":[https://i0.hdslb.com/bfs/article/e19cb5691afbe77c003b535759cda619b2d813cb.jpg]
 
           10
 
@@ -230,6 +250,8 @@ module Source::Tests::Extractor
 
           * 勾檀Mayumi
 
+          "[Image]":[https://i0.hdslb.com/bfs/article/watermark/7e52215ee182b02bda3d9f6b6aac4007a5d65171.png]
+
           勾檀Mayumi
 
           对于勾檀她究竟是“原本就是金毛的小狗狗”还是“她只是被装上了这样的配件吧你这个lsp！”到底哪边才对的讨论，已经在我们内部进行很久了。我们对她的身体很感兴趣，但出于各种各样的原因最终还是放弃了解剖她的计划。
@@ -243,6 +265,8 @@ module Source::Tests::Extractor
           //space.bilibili.com/690608693的个人空间："网页链接":[https://space.bilibili.com/690608693]
 
           * 犬童Kendou
+
+          "[Image]":[https://i0.hdslb.com/bfs/article/watermark/ad00dbd28f53723a0f833a301969a31b5ac0ba06.png]
 
           犬童Kendou
 
@@ -258,6 +282,8 @@ module Source::Tests::Extractor
 
           * 九十九Tsukumo
 
+          "[Image]":[https://i0.hdslb.com/bfs/article/watermark/25427e45717c371cc77b2235e4c20151435e5305.png]
+
           九十九Tsukumo
 
           这位来自于隐秘黑手党的继承者完全没有一点大小姐脾气，甚至在她和我们的对话中，我们的某位黑道片爱好者同僚因为幻想破灭而流下了泪水。毕竟一心想要用自个儿的钱买地种田的人切实是庞大黑手党的千金这件事也太让人难以相信了。
@@ -270,6 +296,8 @@ module Source::Tests::Extractor
 
           * 蕾米Remi
 
+          "[Image]":[https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png]
+
           蕾米Remi
 
           我们对于这只自行从水族馆逃命而出的海兔小姐十分的敬佩，在如今这个兽娘被逮住就基本就宣告一生完蛋的奇特时代，如果不是出于责任心就算是我们大概也忍不住把她监禁起来吧。
@@ -279,6 +307,8 @@ module Source::Tests::Extractor
           在我们的各方面思量下，最终我们为她架设起了最好的设备，想来这位海兔小姐的声音一定能让她直播间里的少年少女们为之愉悦吧。
 
           "蕾米Remi":[https://space.bilibili.com/690608687]的个人空间："网页链接":[https://space.bilibili.com/690608687]
+
+          [hr]
 
           VirtuaReal Project [b]长期开启招募中[/b]！只需要你轻轻扫描以下链接上传答题卡和短视频， 就有机会加入VirtuaReal Project，来经历这场“宛如魔法般的体验“！
 
@@ -294,6 +324,8 @@ module Source::Tests::Extractor
           报名方法
 
           * 请在 vup.link/join 填写答题卡
+
+          "[Image]":[https://i0.hdslb.com/bfs/article/875d230b773b7f4810fdecdd2acc75f2b55f2724.png]
 
           招募方式
 
@@ -352,6 +384,32 @@ module Source::Tests::Extractor
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           "#吉诺儿kino#":[https://search.bilibili.com/all?keyword=%E5%90%89%E8%AF%BA%E5%84%BFkino] "#唐九夏#":[https://search.bilibili.com/all?keyword=%E5%94%90%E4%B9%9D%E5%A4%8F] 今天是大雪！！今天也好冷啊"[冷]":[https://i0.hdslb.com/bfs/emote/cb0ebbd0668640f07ebfc0e03f7a18a8cd00b4ed.png] 之前在直播的时候说的，"@唐九夏还想再躺一下 ":[https://space.bilibili.com/1219196749/dynamic]的原创新曲《檐下雪》就快来啦！！歌肯定是很好听的，但最厉害的是这首曲子可是九夏作词的！！大家记得要来听啊啊啊！！！
+        EOS
+      )
+    end
+
+    context "A t.bilibili.com/:id quote-post with images" do
+      strategy_should_work(
+        "https://t.bilibili.com/914119403116691463",
+        image_urls: %w[
+          http://i0.hdslb.com/bfs/new_dyn/09fff9c0e6e17d8d03c3f34454f121c4880227.gif
+          http://i0.hdslb.com/bfs/new_dyn/5ff62932401e4943e0813e40b7411157880227.gif
+          http://i0.hdslb.com/bfs/new_dyn/39eddb1325f86188a886ae708fdefa43880227.jpg
+        ],
+        media_files: [
+          { file_size: 1_604_415 },
+          { file_size: 1_686_471 },
+          { file_size: 621_792 },
+        ],
+        page_url: "https://t.bilibili.com/914119403116691463",
+        profile_urls: %w[https://space.bilibili.com/880227],
+        display_name: "绅士老鱼",
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          同人图+表情包我就放在这里啦"[脱单doge]":[https://i0.hdslb.com/bfs/emote/bf7e00ecab02171f8461ee8cf439c73db9797748.png]
+          5000赞咱就更新下一期佩佩的绘画视频！
+          感谢大家的支持！！
         EOS
       )
     end

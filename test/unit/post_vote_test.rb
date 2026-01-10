@@ -98,6 +98,21 @@ class PostVoteTest < ActiveSupport::TestCase
           assert_equal(1, @post.votes.deleted.count)
         end
       end
+
+      context "the same vote more than once" do
+        should "not increment the score more than once" do
+          vote1 = create(:post_vote, score: 1)
+          vote2 = PostVote.find(vote1.id)
+          post = vote1.post
+
+          assert_equal(1, post.reload.score)
+
+          vote1.locked_update(is_deleted: true, updater: vote1.user)
+          vote2.locked_update(is_deleted: true, updater: vote2.user)
+
+          assert_equal(0, post.reload.score)
+        end
+      end
     end
 
     context "deleting a vote by another user" do

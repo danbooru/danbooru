@@ -10,7 +10,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_equal(3, @user.reload.backup_codes.size)
-          assert_equal(true, @user.user_events.backup_code_generate.exists?)
+          assert_equal(true, @user.user_events.backup_code_generate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
         should "not allow a user to view a different user's backup codes" do
@@ -64,7 +64,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to user_backup_codes_path(@user)
           assert_equal(3, @user.reload.backup_codes.size)
-          assert_equal("backup_code_generate", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.backup_code_generate.exists?(login_session_id: @user.login_sessions.last.login_id))
           assert_equal("Backup codes regenerated", flash[:notice])
         end
       end
@@ -78,7 +78,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
           assert_equal(3, @user.reload.backup_codes.size)
           assert_equal(true, @user.backup_codes.all? { |code| code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0").match?(/\A\d{8}\z/) })
           assert_not_equal([11111111, 22222222, 33333333], @user.backup_codes)
-          assert_equal("backup_code_generate", @user.user_events.last.category)
+          assert_equal(true, @user.user_events.backup_code_generate.exists?(login_session_id: @user.login_sessions.last.login_id))
           assert_equal("Backup codes regenerated", flash[:notice])
         end
 

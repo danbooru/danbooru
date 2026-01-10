@@ -2,11 +2,11 @@
 
 class PasswordResetPolicy < ApplicationPolicy
   def show?
-    true
+    user.is_anonymous?
   end
 
   def create?
-    true
+    user.is_anonymous?
   end
 
   def update?

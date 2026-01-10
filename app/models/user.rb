@@ -103,6 +103,7 @@ class User < ApplicationRecord
   enum :theme, { auto: 0, light: 50, dark: 100 }, suffix: true
 
   attr_reader :password
+  attr_accessor :request # The HTTP request, used during signup.
 
   normalizes :blacklisted_tags, with: ->(string) { string.to_s.lines.map(&:strip).join("\n").strip }
   normalizes :favorite_tags, with: ->(string) { string.normalize_whitespace.strip }
@@ -124,8 +125,11 @@ class User < ApplicationRecord
   validate :validate_blacklisted_tags, if: :blacklisted_tags_changed?
   validate :validate_favorite_tags, if: :favorite_tags_changed?
   validate :validate_custom_css, if: :custom_style_changed?
+
   before_save :recalculate_upload_points, if: :level_changed?
   before_create :promote_to_owner_if_first_user
+  after_create :send_welcome_email
+  after_create_commit :login_new_user
 
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
@@ -171,6 +175,7 @@ class User < ApplicationRecord
   has_many :mod_actions, as: :subject, dependent: :destroy
   has_many :reactions, as: :model, dependent: :destroy
   has_many :site_credentials, foreign_key: :creator_id, dependent: :destroy
+  has_many :login_sessions, dependent: :destroy
   belongs_to :inviter, class_name: "User", optional: true
 
   accepts_nested_attributes_for :email_address, reject_if: :all_blank, allow_destroy: true
@@ -303,8 +308,8 @@ class User < ApplicationRecord
         false
       else
         with_lock do
-          UserEvent.build_from_request(self, :password_reset, request)
           success = update(password: new_password, password_confirmation: password_confirmation)
+          UserEvent.create_from_request!(self, :password_reset, request) if success
           verify_backup_code!(verification_code) if success
           success
         end
@@ -321,8 +326,10 @@ class User < ApplicationRecord
         errors.add(:verification_code, "is incorrect")
         false
       else
-        UserEvent.build_from_request(self, :password_change, request)
-        update(password: new_password, password_confirmation: password_confirmation)
+        with_lock do
+          success = update(password: new_password, password_confirmation: password_confirmation)
+          UserEvent.create_from_request!(self, :password_change, request) if success
+        end
       end
     end
   end
@@ -833,6 +840,20 @@ class User < ApplicationRecord
     def validate_custom_css
       if !custom_css.valid?
         errors.add(:custom_style, "contains a syntax error. Validate it with https://codebeautify.org/cssvalidate")
+      end
+    end
+  end
+
+  concerning :SignupMethods do
+    def send_welcome_email
+      if request.present? && can_receive_email?(require_verified_email: false)
+        UserMailer.with_request(request).welcome_user(self).deliver_later
+      end
+    end
+
+    def login_new_user
+      if request.present?
+        SessionLoader.new(request).login_user(self, :user_creation)
       end
     end
   end

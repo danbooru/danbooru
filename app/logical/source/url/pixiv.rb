@@ -54,6 +54,11 @@ module Source
         parse_filename
         @username = username
 
+      # https://i.pximg.net/imgaz/upload/20240417/163474511.jpg
+      # contest images?
+      in _, _, "imgaz", "upload", _year_month_day, _ if image_url?
+        @image_type = "imgaz"
+
       # https://www.pixiv.net/en/artworks/46324488
       # https://www.pixiv.net/artworks/46324488
       in _, "pixiv.net", *, "artworks", work_id
@@ -262,8 +267,8 @@ module Source
 
     def image_sample?
       image_url? && !(
-        image_type.in?(%w[img-original novel-cover-original]) ||
-        ugoira_zip_url? && to_s == ugoira_zip_url
+        image_type.in?(%w[img-original novel-cover-original imgaz]) ||
+        (ugoira_zip_url? && to_s == ugoira_zip_url)
       )
     end
 

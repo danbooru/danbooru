@@ -121,6 +121,7 @@ module Source
       Source::URL::Marshmallow,
       Source::URL::Huashijie,
       Source::URL::Mihuashi,
+      Source::URL::Privatter,
       Source::URL::Huajia,
     ]
 

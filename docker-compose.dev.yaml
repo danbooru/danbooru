@@ -61,11 +61,14 @@ x-base-template: &base-template
     DATABASE_URL: postgresql://postgres?pool=100
     DANBOORU_REDIS_URL: redis://redis:6379
     DANBOORU_IQDB_URL: http://iqdb:5588
-    DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
     DANBOORU_IMAGE_STORAGE_PATH: /images
     SHAKAPACKER_DEV_SERVER_HOST: webpack
 
     DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-true}
+
+    # To enable the autotagger service, uncomment this line AND the autotagger service further below.
+    # It is disabled by default because it significantly slows down the creation of codespaces.
+    # DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
 
   tmpfs:
     - "/danbooru/tmp:uid=1000,gid=1000"
@@ -173,8 +176,9 @@ services:
     volumes:
       - "danbooru-images:/images"
 
-  autotagger:
-    image: ghcr.io/danbooru/autotagger:latest
+  # autotagger:
+  #   image: ghcr.io/danbooru/autotagger:latest
+  # This services requires the DANBOORU_AUTOTAGGER_URL env var to be uncommented further above.
 
   webpack:
     <<: *base-template

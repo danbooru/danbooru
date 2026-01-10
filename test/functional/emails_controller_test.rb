@@ -121,21 +121,21 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       context "for an admin updating another user's email address" do
         should "allow changing a user's existing email address" do
           @admin = create(:admin_user)
-          @user = create(:user, email_address: build(:email_address, { address: "old@example.com", is_verified: true }))
+          @user = create(:user, email_address: build(:email_address, { address: "old@danbooru.donmai.us", is_verified: true }))
 
           assert_no_difference("EmailAddress.count") do
-            put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@example.com" }}
+            put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@danbooru.donmai.us" }}
           end
 
           assert_redirected_to(edit_admin_user_path(@user))
-          assert_equal("new@example.com", @user.reload.email_address.address)
+          assert_equal("new@danbooru.donmai.us", @user.reload.email_address.address)
           assert_equal(false, @user.reload.email_address.is_verified?)
           assert_equal(false, @user.user_events.email_change.exists?)
 
           assert_equal("email_address_update", ModAction.last.category)
           assert_equal(@admin, ModAction.last.creator)
           assert_equal(@user, ModAction.last.subject)
-          assert_equal("changed user ##{@user.id}'s email from old@example.com to new@example.com", ModAction.last.description)
+          assert_equal("changed user ##{@user.id}'s email from old@danbooru.donmai.us to new@danbooru.donmai.us", ModAction.last.description)
 
           assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer email_change_confirmation] })
           perform_enqueued_jobs
@@ -147,18 +147,18 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user)
 
           assert_difference("EmailAddress.count", 1) do
-            put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@example.com" }}
+            put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@danbooru.donmai.us" }}
           end
 
           assert_redirected_to(edit_admin_user_path(@user))
-          assert_equal("new@example.com", @user.reload.email_address.address)
+          assert_equal("new@danbooru.donmai.us", @user.reload.email_address.address)
           assert_equal(false, @user.reload.email_address.is_verified?)
           assert_equal(false, @user.user_events.email_change.exists?)
 
           assert_equal("email_address_update", ModAction.last.category)
           assert_equal(@admin, ModAction.last.creator)
           assert_equal(@user, ModAction.last.subject)
-          assert_equal("changed user ##{@user.id}'s email to new@example.com", ModAction.last.description)
+          assert_equal("changed user ##{@user.id}'s email to new@danbooru.donmai.us", ModAction.last.description)
 
           assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer email_change_confirmation] })
           perform_enqueued_jobs
@@ -167,12 +167,26 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
         should "fail if the email address is invalid" do
           @admin = create(:admin_user)
-          @user = create(:user, email_address: build(:email_address, { address: "old@example.com", is_verified: true }))
+          @user = create(:user, email_address: build(:email_address, { address: "old@danbooru.donmai.us", is_verified: true }))
 
           put_auth user_email_path(@user), @admin, params: { email_address: { address: "invalid" }}
 
           assert_response :success
-          assert_equal("old@example.com", @user.reload.email_address.address)
+          assert_equal("old@danbooru.donmai.us", @user.reload.email_address.address)
+          assert_equal(true, @user.reload.email_address.is_verified?)
+          assert_equal(false, @user.user_events.email_change.exists?)
+          assert_equal(false, ModAction.email_address_update.exists?)
+          assert_no_enqueued_jobs
+        end
+
+        should "fail if the email address is undeliverable" do
+          @admin = create(:admin_user)
+          @user = create(:user, email_address: build(:email_address, { address: "old@danbooru.donmai.us", is_verified: true }))
+
+          put_auth user_email_path(@user), @admin, params: { email_address: { address: "nobody@invalid.donmai.us" }}
+
+          assert_response :success
+          assert_equal("old@danbooru.donmai.us", @user.reload.email_address.address)
           assert_equal(true, @user.reload.email_address.is_verified?)
           assert_equal(false, @user.user_events.email_change.exists?)
           assert_equal(false, ModAction.email_address_update.exists?)
@@ -181,12 +195,12 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
         should "not allow updating a moderator's email address" do
           @admin = create(:admin_user)
-          @user = create(:moderator_user, email_address: build(:email_address, { address: "old@example.com", is_verified: true }))
+          @user = create(:moderator_user, email_address: build(:email_address, { address: "old@danbooru.donmai.us", is_verified: true }))
 
-          put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@example.com" }}
+          put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@danbooru.donmai.us" }}
 
           assert_response 403
-          assert_equal("old@example.com", @user.reload.email_address.address)
+          assert_equal("old@danbooru.donmai.us", @user.reload.email_address.address)
           assert_equal(true, @user.reload.email_address.is_verified?)
           assert_equal(false, @user.user_events.email_change.exists?)
           assert_equal(false, ModAction.email_address_update.exists?)
@@ -197,13 +211,13 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       context "for a user updating their own email address" do
         should "update an existing address" do
           assert_difference("EmailAddress.count", 0) do
-            put_auth user_email_path(@user), @user, params: { email_address: { address: "abc@ogres.net" }}
+            put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}
           end
 
           assert_redirected_to(settings_path)
-          assert_equal("abc@ogres.net", @user.reload.email_address.address)
+          assert_equal("new@danbooru.donmai.us", @user.reload.email_address.address)
           assert_equal(false, @user.email_address.is_verified)
-          assert_equal(true, @user.user_events.email_change.exists?)
+          assert_equal(true, @user.user_events.email_change.exists?(login_session_id: @user.login_sessions.last.login_id))
 
           assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer email_change_confirmation] })
           perform_enqueued_jobs
@@ -214,13 +228,13 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           @user.email_address.destroy
 
           assert_difference("EmailAddress.count", 1) do
-            put_auth user_email_path(@user), @user, params: { email_address: { address: "abc@ogres.net" }}
+            put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}
           end
 
           assert_redirected_to(settings_path)
-          assert_equal("abc@ogres.net", @user.reload.email_address.address)
+          assert_equal("new@danbooru.donmai.us", @user.reload.email_address.address)
           assert_equal(false, @user.reload.email_address.is_verified)
-          assert_equal(true, @user.user_events.email_change.exists?)
+          assert_equal(true, @user.user_events.email_change.exists?(login_session_id: @user.login_sessions.last.login_id))
 
           assert_enqueued_with(job: MailDeliveryJob, args: ->(args) { args[0..1] == %w[UserMailer email_change_confirmation] })
           perform_enqueued_jobs
@@ -229,12 +243,34 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
         should "not allow banned users to change their email address" do
           create(:ban, user: @user, duration: 1.week)
-          put_auth user_email_path(@user), @user, params: { email_address: { address: "abc@ogres.net" }}
+          put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}
 
           assert_response 403
           assert_equal("bob@ogres.net", @user.reload.email_address.address)
-          assert_no_emails
           assert_equal(false, @user.user_events.email_change.exists?)
+          assert_no_enqueued_jobs
+        end
+
+        should "fail if the email address is invalid" do
+          put_auth user_email_path(@user), @user, params: { email_address: { address: "invalid" }}
+
+          assert_response :success
+          assert_equal("bob@ogres.net", @user.reload.email_address.address)
+          assert_equal(false, @user.reload.email_address.is_verified?)
+          assert_equal(false, @user.user_events.email_change.exists?)
+          assert_equal(false, ModAction.email_address_update.exists?)
+          assert_no_enqueued_jobs
+        end
+
+        should "fail if the email address is undeliverable" do
+          put_auth user_email_path(@user), @user, params: { email_address: { address: "nobody@invalid.donmai.us" }}
+
+          assert_response :success
+          assert_equal("bob@ogres.net", @user.reload.email_address.address)
+          assert_equal(false, @user.reload.email_address.is_verified?)
+          assert_equal(false, @user.user_events.email_change.exists?)
+          assert_equal(false, ModAction.email_address_update.exists?)
+          assert_no_enqueued_jobs
         end
       end
     end

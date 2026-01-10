@@ -3,6 +3,9 @@
   "dockerComposeFile": [
     "../docker-compose.dev.yaml"
   ],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
   "service": "devcontainer",
   "workspaceFolder": "/danbooru",
   "forwardPorts": [

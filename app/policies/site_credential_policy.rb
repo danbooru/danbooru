@@ -38,6 +38,6 @@ class SiteCredentialPolicy < ApplicationPolicy
   end
 
   def permitted_attributes_for_update
-    [:is_enabled, { credential: {} }]
+    [:is_enabled]
   end
 end

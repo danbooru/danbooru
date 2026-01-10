@@ -479,7 +479,7 @@ class ApplicationMetrics
       puma_stats = resp.code == 200 ? resp.parse.with_indifferent_access : {}
 
       metrics.set({
-        puma_started_at: puma_stats[:started_at].to_s.to_time.to_i,
+        puma_started_at: Time.zone.parse(puma_stats[:started_at].to_s).to_i,
         puma_workers:    puma_stats[:workers],
       }, { worker: "master" })
 

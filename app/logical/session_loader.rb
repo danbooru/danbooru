@@ -50,6 +50,7 @@ class SessionLoader
         return nil
       else
         login_user(user, :login)
+        user
       end
     elsif user.nil?
       errors.add(:base, "Incorrect username or password")
@@ -95,16 +96,25 @@ class SessionLoader
     end
   end
 
+  # Log a user in and create a new login session.
+  #
+  # @param user [User] The user to log in.
+  # @param event_category [Symbol] The login event (:user_creation, :login, :totp_login, :backup_code_login).
+  # @return [LoginSession] The new login session.
   def login_user(user, event_category)
-    session[:user_id] = user.id
-    session[:last_authenticated_at] = Time.now.utc.to_s
+    user.with_lock do
+      time = Time.now.utc.inspect
 
-    UserEvent.build_from_request(user, event_category, request)
-    user.last_logged_in_at = Time.now
-    user.last_ip_addr = request.remote_ip
-    user.save!
+      login_session = LoginSession.create!(user: user, session_id: session[:session_id], last_seen_at: time)
+      UserEvent.create_from_request!(user, event_category, request, login_session: login_session)
+      user.update!(last_logged_in_at: time, last_ip_addr: request.remote_ip)
 
-    user
+      session[:user_id] = user.id
+      session[:login_id] = login_session.login_id
+      session[:last_authenticated_at] = time
+
+      login_session
+    end
   end
 
   # Verify a user's password and 2FA code. Used to confirm a user's password before sensitive actions like adding API
@@ -120,15 +130,15 @@ class SessionLoader
       false
     elsif !user.totp.present? # right password and user doesn't have 2FA
       UserEvent.create_from_request!(user, :reauthenticate, request)
-      session[:last_authenticated_at] = Time.now.utc.to_s
+      session[:last_authenticated_at] = Time.now.utc.inspect
       true
     elsif user.totp.verify(verification_code) # right password and right 2FA code
       UserEvent.create_from_request!(user, :totp_reauthenticate, request)
-      session[:last_authenticated_at] = Time.now.utc.to_s
+      session[:last_authenticated_at] = Time.now.utc.inspect
       true
     elsif user.verify_backup_code!(verification_code) # right password and right backup code
       UserEvent.create_from_request!(user, :backup_code_reauthenticate, request)
-      session[:last_authenticated_at] = Time.now.utc.to_s
+      session[:last_authenticated_at] = Time.now.utc.inspect
       true
     else # right password and wrong 2FA code or wrong backup code
       UserEvent.create_from_request!(user, :totp_failed_reauthenticate, request)
@@ -137,12 +147,18 @@ class SessionLoader
     end
   end
 
-  # Logs the current user out. Deletes their session cookie and records a logout event.
-  def logout(user = CurrentUser.user)
-    session.delete(:user_id)
-    session.delete(:last_authenticated_at)
+  # Log the current user out. Deletes their session cookie, invalidates their login session, and records a logout event.
+  def logout(user)
     return if user.is_anonymous?
-    UserEvent.create_from_request!(user, :logout, request)
+
+    user.with_lock do
+      LoginSession.where(login_id: session[:login_id]).update_all(status: :logged_out, last_seen_at: Time.now.utc.inspect) if session[:login_id].present?
+      UserEvent.create_from_request!(user, :logout, request)
+
+      session.delete(:user_id)
+      session.delete(:login_id)
+      session.delete(:last_authenticated_at)
+    end
   end
 
   # Sets the current user. Runs on each HTTP request. The user is set based on
@@ -270,6 +286,6 @@ class SessionLoader
 
   def initialize_session_cookies
     session.options[:expire_after] = 20.years
-    session[:started_at] ||= Time.now.utc.to_s
+    session[:started_at] ||= Time.now.utc.inspect
   end
 end
