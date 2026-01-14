@@ -119,6 +119,15 @@ module Source::Tests::URL
 
       url_parser_should_work("https://fxtwitter.com/BOW999/status/1261877313349640194.jpg",
                              page_url: "https://twitter.com/BOW999/status/1261877313349640194",)
+
+      url_parser_should_work("https://nitter.net/BOW999/status/1261877313349640194",
+                             page_url: "https://twitter.com/BOW999/status/1261877313349640194",)
+
+      url_parser_should_work("https://nitter.poast.org/BOW999/status/1261877313349640194",
+                             page_url: "https://twitter.com/BOW999/status/1261877313349640194",)
+
+      url_parser_should_work("https://xcancel.com/BOW999/status/1261877313349640194",
+                             page_url: "https://twitter.com/BOW999/status/1261877313349640194",)
     end
   end
 end

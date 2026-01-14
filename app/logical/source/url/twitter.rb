@@ -9,13 +9,21 @@ class Source::URL::Twitter < Source::URL
   # https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration
   RESERVED_USERNAMES = %w[home explore i intent messages notifications privacy search tos]
 
+  # fxtwitter.com, etc are from https://github.com/FixTweet/FxTwitter, a proxy for better embedding
+  # nitter.net, xcancel etc are from https://github.com/zedeus/nitter, a privacy-focused frontend
+  TWITTER_PROXY_DOMAINS = %w[fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com nitter.net xcancel.com]
+  TWITTER_PROXY_HOSTS = %w[nitter.poast.org]
+
   attr_reader :status_id, :username, :user_id, :full_image_url
 
   def self.match?(url)
     # https://o.twimg.com URLs are handled by Source::URL::TwitPic.
     # https://pic.twitter.com and https://t.co URLs are handled by Source::URL::URLShortener.
-    # fxtwitter.com, etc are from https://github.com/FixTweet/FxTwitter.
-    url.domain.in?(%w[twitter.com fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com twimg.com x.com]) && !url.host.in?(%w[o.twimg.com pic.twitter.com pic.x.com])
+    (url.domain.in?(%w[twitter.com twimg.com x.com]) && !url.host.in?(%w[o.twimg.com pic.twitter.com pic.x.com])) || is_twitter_proxy?(url)
+  end
+
+  def self.is_twitter_proxy?(url)
+    url.domain.in?(TWITTER_PROXY_DOMAINS) || url.host.in?(TWITTER_PROXY_HOSTS)
   end
 
   def parse
