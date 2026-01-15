@@ -992,6 +992,15 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_equal(false, @bur.valid?)
         assert_equal(["Can't deprecate [[no_wiki]] (tag must have a wiki page)"], @bur.errors[:base])
       end
+
+      should "not work for tags with a deleted wiki page" do
+        create(:tag, name: "deleted_wiki")
+        create(:wiki_page, title: "deleted_wiki", is_deleted: true)
+        @bur = build(:bulk_update_request, script: "deprecate deleted_wiki")
+
+        assert_equal(false, @bur.valid?)
+        assert_equal(["Can't deprecate [[deleted_wiki]] (wiki page is deleted)"], @bur.errors[:base])
+      end
     end
 
     context "using the undeprecate command" do

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class TagsControllerTest < ActionDispatch::IntegrationTest
   context "The tags controller" do
@@ -49,33 +49,33 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
             create(:wiki_page, title: "hatsune_miku", body: "[[vocaloid]]")
             create(:artist, name: "wokada")
           end
-        end
 
-      should "render" do
-        get tags_path
-        assert_response :success
-      end
+          should "render" do
+            get tags_path
+            assert_response :success
+          end
 
-        should respond_to_search({}).with { [@empty, @axe, @weapon, @vocaloid, @wokada, @hatsune_miku, @miku, @tag] }
-        should respond_to_search(name_matches: "hatsune_miku").with { @hatsune_miku }
-        should respond_to_search(name_normalize: "HATSUNE_MIKU  ").with { @hatsune_miku }
-        should respond_to_search(name_or_alias_matches: "miku").with { [@hatsune_miku, @miku] }
-        should respond_to_search(fuzzy_name_matches: "hatsune_mika", order: "similarity").with { @hatsune_miku }
-        should respond_to_search(name: "empty", hide_empty: "true").with { [] }
-        should respond_to_search(name: "empty", hide_empty: "false").with { [@empty] }
-        should respond_to_search(name: "empty", is_empty: "true").with { [@empty] }
-        should respond_to_search(name: "empty", is_empty: "false").with { [] }
+          should respond_to_search({}).with { [@empty, @axe, @weapon, @vocaloid, @wokada, @hatsune_miku, @miku, @tag] }
+          should respond_to_search(name_matches: "hatsune_miku").with { @hatsune_miku }
+          should respond_to_search(name_normalize: "HATSUNE_MIKU  ").with { @hatsune_miku }
+          should respond_to_search(name_or_alias_matches: "miku").with { [@hatsune_miku, @miku] }
+          should respond_to_search(fuzzy_name_matches: "hatsune_mika", order: "similarity").with { @hatsune_miku }
+          should respond_to_search(name: "empty", hide_empty: "true").with { [] }
+          should respond_to_search(name: "empty", hide_empty: "false").with { [@empty] }
+          should respond_to_search(name: "empty", is_empty: "true").with { [@empty] }
+          should respond_to_search(name: "empty", is_empty: "false").with { [] }
 
-        context "using includes" do
-          should respond_to_search(name: "wokada", has_artist: "true").with { @wokada }
-          should respond_to_search(name: "hatsune_miku", has_artist: "false").with { @hatsune_miku }
-          should respond_to_search(name: "hatsune_miku", has_wiki_page: "true").with { @hatsune_miku }
-          should respond_to_search(name: "vocaloid", has_wiki_page: "false").with { @vocaloid }
-          should respond_to_search(consequent_aliases: {antecedent_name: "miku"}).with { @hatsune_miku }
-          should respond_to_search(consequent_implications: {antecedent_name: "axe"}).with { @weapon }
-          should respond_to_search(wiki_page: {body_matches: "*vocaloid*"}).with { @hatsune_miku }
-          should respond_to_search(artist: {is_banned: "false"}).with { @wokada }
-          should respond_to_search(has_dtext_links: "true").with { @vocaloid }
+          context "using includes" do
+            should respond_to_search(name: "wokada", has_artist: "true").with { @wokada }
+            should respond_to_search(name: "hatsune_miku", has_artist: "false").with { @hatsune_miku }
+            should respond_to_search(name: "hatsune_miku", has_wiki_page: "true").with { @hatsune_miku }
+            should respond_to_search(name: "vocaloid", has_wiki_page: "false").with { @vocaloid }
+            should respond_to_search(consequent_aliases: {antecedent_name: "miku"}).with { @hatsune_miku }
+            should respond_to_search(consequent_implications: {antecedent_name: "axe"}).with { @weapon }
+            should respond_to_search(wiki_page: {body_matches: "*vocaloid*"}).with { @hatsune_miku }
+            should respond_to_search(artist: {is_banned: "false"}).with { @wokada }
+            should respond_to_search(has_dtext_links: "true").with { @vocaloid }
+          end
         end
       end
 
@@ -162,8 +162,6 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           create(:wiki_page, title: "log", body: "[[log]]")
           create(:wiki_page, title: "random", body: "[[random]]")
 
-          @tag_without_wiki = create(:tag, name: "no_wiki", category: Tag.categories.general, post_count: 0)
-
           @normal_user = create(:member_user)
           @admin = create(:admin_user)
         end
@@ -224,11 +222,23 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not allow deprecation of a tag with no wiki" do
+          @tag_without_wiki = create(:tag, name: "no_wiki", category: Tag.categories.general, post_count: 0)
           put_auth tag_path(@tag_without_wiki), @user, params: {tag: { is_deprecated: true }}
 
           assert_response 403
           assert_equal(false, @tag_without_wiki.reload.is_deprecated?)
           assert_equal(0, @tag_without_wiki.versions.count)
+        end
+
+        should "not allow deprecation of a tag with a deleted wiki" do
+          @tag_with_deleted_wiki = create(:tag, name: "deleted_wiki", category: Tag.categories.general, post_count: 0)
+          create(:wiki_page, title: "no_wiki", body: "[[no_wiki]]", is_deleted: true)
+
+          put_auth tag_path(@tag_with_deleted_wiki), @user, params: {tag: { is_deprecated: true }}
+
+          assert_response 403
+          assert_equal(false, @tag_with_deleted_wiki.reload.is_deprecated?)
+          assert_equal(0, @tag_with_deleted_wiki.versions.count)
         end
       end
 
@@ -236,7 +246,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         @tag = create(:tag, category: Tag.categories.general, post_count: 1001)
         put_auth tag_path(@tag), @user, params: {:tag => {:category => Tag.categories.artist}}
 
-        assert_response :forbidden
+        assert_response 403
         assert_equal(Tag.categories.general, @tag.reload.category)
         assert_equal(0, @tag.versions.count)
       end

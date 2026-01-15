@@ -225,6 +225,8 @@ class BulkUpdateRequestProcessor
       errors.add(:base, "Can't deprecate [[#{tag_name}]] (tag is already deprecated)")
     elsif tag.wiki_page.blank?
       errors.add(:base, "Can't deprecate [[#{tag_name}]] (tag must have a wiki page)")
+    elsif tag.wiki_page.is_deleted?
+      errors.add(:base, "Can't deprecate [[#{tag_name}]] (wiki page is deleted)")
     end
   end
 
