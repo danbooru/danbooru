@@ -20,6 +20,7 @@ class BulkUpdateRequestProcessor
 
   delegate :script, :forum_topic, :approver, to: :bulk_update_request
   validate :validate_script_length
+  validate :validate_duplicate_lines
   validate :validate_script
 
   # @param bulk_update_request [BulkUpdateRequest] the BUR
@@ -250,6 +251,13 @@ class BulkUpdateRequestProcessor
     end
   end
 
+  def validate_duplicate_lines
+    commands.tally.filter { |_line, count| count > 1 }.each_key do |dupe|
+      errors.add(:base, "Duplicate line found: #{command_to_dtext(*dupe)}")
+    end
+    throw :abort if errors.present?
+  end
+
   # Schedule the bulk update request to be processed later, in the background.
   def process_later!
     ProcessBulkUpdateRequestJob.perform_later(bulk_update_request)
@@ -348,34 +356,44 @@ class BulkUpdateRequestProcessor
   # Convert the BUR to DText format.
   # @return [String]
   def to_dtext
-    commands.map do |command, *args|
-      case command
-      when :create_alias, :create_implication, :remove_alias, :remove_implication, :rename
-        "#{command.to_s.tr("_", " ")} [[#{args[0]}]] -> [[#{args[1]}]]"
-      when :mass_update
-        "mass update {{#{args[0]}}} -> {{#{args[1]}}}"
-      when :nuke
+    commands.map { |command, *args| command_to_dtext(command, *args) }.join("\n")
+  end
 
-        if PostQuery.normalize(args[0]).is_simple_tag?
-          "nuke [[#{args[0]}]]"
-        else
-          "nuke {{#{args[0]}}}"
-        end
-      when :deprecate, :undeprecate
-        "#{command} [[#{args[0]}]]"
-      when :change_category
-        "category [[#{args[0]}]] -> #{args[1]}"
-      when :convert
-        if PostQuery.normalize(args[0]).is_simple_tag?
-          "convert [[#{args[0]}]] -> {{#{args[1]}}}"
-        else
-          "convert {{#{args[0]}}} -> [[#{args[1]}]]"
-        end
+  # Convert a single command to DText format.
+  # @return [String]
+  def command_to_dtext(command, *args)
+    case command
+
+    when :create_alias, :create_implication, :remove_alias, :remove_implication, :rename
+      "#{command.to_s.tr("_", " ")} [[#{args[0]}]] -> [[#{args[1]}]]"
+
+    when :mass_update
+      "mass update {{#{args[0]}}} -> {{#{args[1]}}}"
+
+    when :nuke
+      if PostQuery.normalize(args[0]).is_simple_tag?
+        "nuke [[#{args[0]}]]"
       else
-        # should never happen
-        raise Error, "Unknown command: #{command}"
+        "nuke {{#{args[0]}}}"
       end
-    end.join("\n")
+
+    when :deprecate, :undeprecate
+      "#{command} [[#{args[0]}]]"
+
+    when :change_category
+      "category [[#{args[0]}]] -> #{args[1]}"
+
+    when :convert
+      if PostQuery.normalize(args[0]).is_simple_tag?
+        "convert [[#{args[0]}]] -> {{#{args[1]}}}"
+      else
+        "convert {{#{args[0]}}} -> [[#{args[1]}]]"
+      end
+
+    else
+      # should never happen
+      raise Error, "Unknown command: #{command}"
+    end
   end
 
   def self.convert(tag_or_pool1, tag_or_pool2)

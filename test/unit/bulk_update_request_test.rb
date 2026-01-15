@@ -938,6 +938,15 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(["Bulk update request is too long (maximum size: 100 lines). Split your request into smaller chunks and try again."], @bur.errors.full_messages)
         end
       end
+
+      context "a bulk update request with duplicate lines" do
+        should "fail" do
+          @bur = build(:bulk_update_request, script: "imply a -> b\nimply b -> a\n" * 2)
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Duplicate line found: create implication [[a]] -> [[b]]", "Duplicate line found: create implication [[b]] -> [[a]]"], @bur.errors.full_messages)
+        end
+      end
     end
 
     context "when the script is updated" do
