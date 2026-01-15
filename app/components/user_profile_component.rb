@@ -31,10 +31,6 @@ class UserProfileComponent < ApplicationComponent
     user.favorite_count > 0
   end
 
-  def commented_posts_count
-    user.comments.distinct.count(:post_id)
-  end
-
   def noted_posts_count
     user.note_versions.distinct.count(:post_id)
   end

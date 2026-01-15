@@ -797,6 +797,10 @@ class User < ApplicationRecord
       comments.visible_for_search(:creator, CurrentUser.user).count
     end
 
+    def commented_posts_count
+      comments.visible_for_search(:creator, CurrentUser.user).distinct.count(:post_id)
+    end
+
     def favorite_group_count
       favorite_groups.visible(CurrentUser.user).count
     end
@@ -826,7 +830,7 @@ class User < ApplicationRecord
         User.where(id: id).update_all(
           post_upload_count: posts.count,
           post_update_count: post_versions.count,
-          note_update_count: note_versions.count
+          note_update_count: note_versions.count,
         )
       end
     end

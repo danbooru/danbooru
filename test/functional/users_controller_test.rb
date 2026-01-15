@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UsersControllerTest < ActionDispatch::IntegrationTest
   context "The users controller" do
@@ -259,7 +259,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         @user = create(:approver, created_at: 2.weeks.ago)
         as(@user) do
           create(:saved_search, user: @user)
-          create(:post, uploader: @user, tag_string: "fav:#{@user.name}")
+          post = create(:post, uploader: @user, tag_string: "fav:#{@user.name}")
+          post2 = create(:post)
+
+          create(:comment, creator: @user, post: post)
+          create(:comment, creator: @user, post: post)
+          create(:comment, creator: @user, post: post2, is_deleted: true)
         end
       end
 
@@ -302,6 +307,22 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_nil(response.parsed_body["last_logged_in_at"])
         assert_nil(response.parsed_body["last_ip_addr"])
         assert_nil(response.parsed_body["totp_secret"])
+      end
+
+      should "show only the amount of visible commented posts to a normal user" do
+        get user_path(@user)
+
+        assert_response :success
+        assert_select "#comment-count", count: 1, text: "2"
+        assert_select "#commented-posts-count", count: 1, text: "1"
+      end
+
+      should "show the full amount of commented posts to an admin" do
+        get_auth user_path(@user), create(:admin)
+
+        assert_response :success
+        assert_select "#comment-count", count: 1, text: "3"
+        assert_select "#commented-posts-count", count: 1, text: "2"
       end
 
       should "strip '?' from attributes" do

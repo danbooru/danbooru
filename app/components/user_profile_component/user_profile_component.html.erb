@@ -217,8 +217,8 @@
           <tr>
             <th>Comments</th>
             <td>
-              <%= link_to user.comment_count, comments_path(search: { creator_id: user.id }, group_by: "comment") %>
-              in <%= link_to commented_posts_count, posts_path(tags: "commenter:#{user.name} order:comment_bumped"), rel: "nofollow" %> posts
+              <%= link_to user.comment_count, comments_path(search: { creator_id: user.id }, group_by: "comment"), id: "comment-count" %>
+              in <%= link_to user.commented_posts_count, posts_path(tags: "commenter:#{user.name} order:comment_bumped"), id: "commented-posts-count", rel: "nofollow" %> posts
             </td>
           </tr>
         <% end %>
