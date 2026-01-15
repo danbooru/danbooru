@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ForumPostTest < ActiveSupport::TestCase
   context "A forum post" do
@@ -44,8 +44,8 @@ class ForumPostTest < ActiveSupport::TestCase
           end
 
           dmail = Dmail.last
-          assert_equal(<<-EOS.strip_heredoc, dmail.body)
-            @#{@user.name} mentioned you in topic ##{@topic.id} (\"#{@topic.title}\":[/forum_topics/#{@topic.id}?page=1]):
+          assert_equal(<<~EOS, dmail.body)
+            @#{@user.name} mentioned you in forum ##{@post.id} ("#{@topic.title}":[/forum_topics/#{@topic.id}?page=1]):
 
             [quote]
             Hey @#{@user2.name} check this out!
