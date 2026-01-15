@@ -36,13 +36,13 @@ class ForumPost < ApplicationRecord
   has_dtext_links :body
   mentionable(
     message_field: :body,
-    title: ->(_user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    body: lambda { |user_name|
+    title: -> { "#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}" },
+    body: lambda {
       <<~EOF
         @#{creator.name} mentioned you in forum ##{id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]):
 
         [quote]
-        #{DText.new(body).extract_mention("@#{user_name}")}
+        #{body}
         [/quote]
       EOF
     },

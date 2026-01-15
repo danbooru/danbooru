@@ -27,7 +27,7 @@ module Mentionable
   def queue_mention_messages
     message_field = self.class.mentionable_option(:message_field)
     return if !send(:saved_change_to_attribute?, message_field)
-    return if self.skip_mention_notifications
+    return if skip_mention_notifications
 
     text = send(message_field)
     text_was = send(:attribute_before_last_save, message_field)
@@ -37,8 +37,8 @@ module Mentionable
     users = users.without(CurrentUser.user)
 
     users.each do |user|
-      body  = self.instance_exec(user.name, &self.class.mentionable_option(:body))
-      title = self.instance_exec(user.name, &self.class.mentionable_option(:title))
+      body  = instance_exec(&self.class.mentionable_option(:body))
+      title = instance_exec(&self.class.mentionable_option(:title))
 
       Dmail.create_automated(to: user, title: title, body: body)
     end

@@ -719,14 +719,6 @@ class DText
     text.gsub(/(#{Regexp.union(SHORTLINKS - allowed_shortlinks)}) #(\d+)/i, '\1 &num;\2') # post #1234 -> post &num;1234
   end
 
-  # Return the first paragraph the search string `needle` occurs in.
-  #
-  # @param needle [String] the string to search for
-  # @return [String] the first paragraph mentioning the search string
-  def extract_mention(needle)
-    ActionController::Base.helpers.excerpt(dtext.gsub(/\r\n|\r|\n/, "\n"), needle, separator: "\n\n", radius: 1, omission: "")
-  end
-
   # Generate a short plain text excerpt from a DText string.
   #
   # @param length [Integer] the max length of the output
