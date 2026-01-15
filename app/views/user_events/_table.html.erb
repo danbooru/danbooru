@@ -109,17 +109,18 @@
       <% end %>
 
       <% t.column "Browser" do |user_event| %>
-        <% if user_event.parsed_user_agent.product_version.present? %>
-          <div>
-            <%= link_to user_event.parsed_user_agent.product_version, current_page_path(search: search_params.deep_merge(user_agent_ilike: "*#{user_event.parsed_user_agent.full_product_version}*"), page: nil), title: user_event.user_agent %>
-          </div>
-        <% end %>
+        <div>
+          <% if user_event.parsed_user_agent.product_version.present? %>
+            <%= link_to user_event.parsed_user_agent.product_version, current_page_path(search: search_params.deep_merge(user_agent_ilike: "*#{user_event.parsed_user_agent.full_product_version}*", user_agent: nil), page: nil), title: user_event.user_agent %>
+          <% end %>
+          <%= link_to "»", current_page_path(search: { user_agent: user_event.user_agent, user_agent_ilike: nil }, page: nil) %>
+        </div>
       <% end %>
 
       <% t.column "OS" do |user_event| %>
         <% if user_event.parsed_user_agent.os.present? %>
           <div>
-            <%= link_to user_event.parsed_user_agent.os, current_page_path(search: search_params.deep_merge(user_agent_ilike: "*#{user_event.parsed_user_agent.platform}*"), page: nil), title: user_event.user_agent %>
+            <%= link_to user_event.parsed_user_agent.os, current_page_path(search: search_params.deep_merge(user_agent_ilike: "*#{user_event.parsed_user_agent.platform}*", user_agent: nil), page: nil), title: user_event.user_agent %>
           </div>
         <% end %>
       <% end %>
