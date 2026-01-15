@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class CommentTest < ActiveSupport::TestCase
   context "A comment" do
@@ -58,7 +58,7 @@ class CommentTest < ActiveSupport::TestCase
           end
 
           dmail = Dmail.last
-          assert_equal(<<-EOS.strip_heredoc, dmail.body)
+          assert_equal(<<~EOS, dmail.body)
             @#{@comment.creator.name} mentioned you in comment ##{@comment.id} on post ##{@comment.post_id}:
 
             [quote]
@@ -156,7 +156,7 @@ class CommentTest < ActiveSupport::TestCase
 
       context "that is quoted" do
         should "strip [quote] tags correctly" do
-          comment = FactoryBot.create(:comment, body: <<-EOS.strip_heredoc)
+          comment = FactoryBot.create(:comment, body: <<~EOS)
             paragraph one
 
             [quote]
@@ -168,9 +168,9 @@ class CommentTest < ActiveSupport::TestCase
             paragraph two
           EOS
 
-          assert_equal(<<-EOS.strip_heredoc, comment.quoted_response)
+          assert_equal(<<~EOS, comment.quoted_response)
             [quote]
-            #{comment.creator.name} said:
+            #{comment.creator.name} said in comment ##{comment.id}:
 
             paragraph one
 
