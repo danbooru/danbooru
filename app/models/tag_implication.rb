@@ -147,6 +147,10 @@ class TagImplication < TagRelationship
 
   concerning :ApprovalMethods do
     def process!
+      if consequent_tag.empty? && antecedent_tag.category != consequent_tag.category
+        # new umbrella tags should inherit the category of the children
+        consequent_tag.update!(category: antecedent_tag.category, updater: User.system, is_bulk_update_request: true)
+      end
       update_posts!
     end
 

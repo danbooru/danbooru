@@ -283,6 +283,19 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal("approved", @bur.reload.status)
         end
 
+        should "assign the right category to a new umbrella tag" do
+          create(:tag, name: "daniel_booru_(bald)", category: Tag.categories.character)
+          create(:wiki_page, title: "daniel_booru_(bald)")
+          create(:wiki_page, title: "daniel_booru")
+          @bur = create_bur!("create implication daniel_booru_(bald) -> daniel_booru", @admin)
+
+          @implication = TagImplication.find_by(antecedent_name: "daniel_booru_(bald)", consequent_name: "daniel_booru")
+          assert_equal(true, @implication.present?)
+          assert_equal(true, @implication.is_active?)
+          assert_equal("approved", @bur.reload.status)
+          assert_equal(Tag.categories.character, Tag.find_by_name("daniel_booru").category)
+        end
+
         should "fail for an implication that is redundant with an existing implication" do
           create(:tag_implication, antecedent_name: "a", consequent_name: "b")
           create(:tag_implication, antecedent_name: "b", consequent_name: "c")
