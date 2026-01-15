@@ -24,12 +24,15 @@
 
       <% if CurrentUser.user == @dmail.owner %>
         <div class="mt-4">
-          <%= link_to "Respond", new_dmail_path(:respond_to_id => @dmail) %>
-          | <%= link_to "Forward", new_dmail_path(:respond_to_id => @dmail, :forward => true) %>
-          | <%= link_to "Share", dmail_path(@dmail, key: @dmail.key), title: "Anyone with this link will be able to view this dmail." %>
-          <% if policy(@dmail).reportable? %>
-            | <%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Dmail", model_id: @dmail.id }), remote: true, title: "Report this dmail to the moderators" %>
-          <% end %>
+        <% if !@dmail.is_automated? %>
+          <%= link_to "Respond", new_dmail_path(:respond_to_id => @dmail), id: "dmail-respond" %>
+          |
+        <% end %>
+            <%= link_to "Forward", new_dmail_path(:respond_to_id => @dmail, :forward => true), id: "dmail-forward" %>
+          | <%= link_to "Share", dmail_path(@dmail, key: @dmail.key), title: "Anyone with this link will be able to view this dmail.", id: "dmail-share" %>
+        <% if policy(@dmail).reportable? %>
+          | <%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Dmail", model_id: @dmail.id }), remote: true, title: "Report this dmail to the moderators", id: "dmail-report" %>
+        <% end %>
         </div>
       <% end %>
     </div>
