@@ -59,7 +59,7 @@ class CommentTest < ActiveSupport::TestCase
 
           dmail = Dmail.last
           assert_equal(<<~EOS, dmail.body)
-            @#{@comment.creator.name} mentioned you in comment ##{@comment.id} on post ##{@comment.post_id}:
+            @#{@comment.creator.name} mentioned you in comment ##{@comment.id} on post ##{@comment.post_id}. This is an excerpt from the message:
 
             [quote]
             Hey @#{@user2.name} check this out!

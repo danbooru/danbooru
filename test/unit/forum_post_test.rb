@@ -35,20 +35,55 @@ class ForumPostTest < ActiveSupport::TestCase
       context "outside a quote block" do
         setup do
           @user2 = FactoryBot.create(:user)
-          @post = build(:forum_post, creator: @user, topic: @topic, body: "Hey @#{@user2.name} check this out!")
+          @post = build(:forum_post, creator: @user, topic: @topic, body: <<~EOF)
+            [quote]
+              someone said:
+              hello!
+            [/quote]
+
+            Hey @#{@user2.name} check this out!
+          EOF
         end
 
-        should "create a dmail" do
+        should "create a dmail and strip quote blocks" do
           assert_difference("Dmail.count", 1) do
             @post.save
           end
 
           dmail = Dmail.last
           assert_equal(<<~EOS, dmail.body)
-            @#{@user.name} mentioned you in forum ##{@post.id} ("#{@topic.title}":[/forum_topics/#{@topic.id}?page=1]):
+            @#{@user.name} mentioned you in forum ##{@post.id} ("#{@topic.title}":[/forum_topics/#{@topic.id}?page=1]). This is an excerpt from the message:
 
             [quote]
             Hey @#{@user2.name} check this out!
+            [/quote]
+          EOS
+        end
+      end
+
+      context "with a long message" do
+        setup do
+          @user2 = FactoryBot.create(:user)
+          @post = build(:forum_post, creator: @user, topic: @topic, body: ("hello this is a long message\n\n" * 10) + "Hey @#{@user2.name} check this out!" + ("\n\nhello this is a long message" * 10))
+        end
+
+        should "split paragraphs and only send an excerpt" do
+          assert_difference("Dmail.count", 1) do
+            @post.save
+          end
+
+          dmail = Dmail.last
+          assert_equal(<<~EOS, dmail.body)
+            @#{@user.name} mentioned you in forum ##{@post.id} ("#{@topic.title}":[/forum_topics/#{@topic.id}?page=1]). This is an excerpt from the message:
+
+            [quote]
+            [...]
+            hello this is a long message
+
+            Hey @#{@user2.name} check this out!
+
+            hello this is a long message
+            [...]
             [/quote]
           EOS
         end

@@ -35,7 +35,15 @@ class Comment < ApplicationRecord
   mentionable(
     message_field: :body,
     title: ->(_user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},
-    body: ->(user_name) {"@#{creator.name} mentioned you in comment ##{id} on post ##{post_id}:\n\n[quote]\n#{DText.new(body).extract_mention("@#{user_name}")}\n[/quote]\n"}
+    body: lambda { |user_name|
+      <<~EOF
+        @#{creator.name} mentioned you in comment ##{id} on post ##{post_id}. This is an excerpt from the message:
+
+        [quote]
+        #{DText.new(body).extract_mention("@#{user_name}")}
+        [/quote]
+      EOF
+    },
   )
 
   module SearchMethods

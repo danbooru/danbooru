@@ -724,7 +724,7 @@ class DText
   # @param needle [String] the string to search for
   # @return [String] the first paragraph mentioning the search string
   def extract_mention(needle)
-    ActionController::Base.helpers.excerpt(dtext.gsub(/\r\n|\r|\n/, "\n"), needle, separator: "\n\n", radius: 1, omission: "")
+    ActionController::Base.helpers.excerpt(strip_blocks("quote").gsub(/\r\n|\r|\n/, "\n"), needle, separator: "\n\n", radius: 1, omission: "\n[...]\n").strip
   end
 
   # Generate a short plain text excerpt from a DText string.
