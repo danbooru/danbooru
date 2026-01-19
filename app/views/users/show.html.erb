@@ -3,7 +3,7 @@
 
 <div id="c-users">
   <div id="a-show">
-    <%= render UserProfileComponent.new(user: @user, current_user: CurrentUser.user) %>
+    <%= render UserProfileComponent.new(user: @user, current_user: CurrentUser.user, show_votes: (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?) %>
   </div>
 </div>
 
