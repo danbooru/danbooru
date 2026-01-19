@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ForumPostComponent < ApplicationComponent
-  attr_reader :forum_post, :original_forum_post_id, :dtext_references, :current_user
+  attr_reader :forum_post, :original_forum_post_id, :dtext_references, :current_user, :bur
 
   delegate :link_to_user, :time_ago_in_words_tagged, :data_attributes_for, to: :helpers
 
@@ -23,6 +23,8 @@ class ForumPostComponent < ApplicationComponent
     @original_forum_post_id = original_forum_post_id
     @dtext_references = dtext_references
     @current_user = current_user
+
+    @bur = @forum_post.bulk_update_request
   end
 
   def render?

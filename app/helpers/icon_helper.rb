@@ -292,6 +292,10 @@ module IconHelper
     svg_icon_tag("check", viewBox: "0 0 448 512", **options)
   end
 
+  def check_square_icon(**options)
+    svg_icon_tag("check-square", viewBox: "0 0 448 512", **options)
+  end
+
   def eye_icon(**options)
     svg_icon_tag("eye", viewBox: "0 0 576 512", **options)
   end
