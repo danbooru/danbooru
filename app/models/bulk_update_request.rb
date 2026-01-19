@@ -121,6 +121,10 @@ class BulkUpdateRequest < ApplicationRecord
     processor.is_tag_move_allowed?
   end
 
+  def has_too_many_votes_to_edit?
+    (forum_post&.votes&.count.presence || 0) >= 5
+  end
+
   def is_pending?
     status == "pending"
   end

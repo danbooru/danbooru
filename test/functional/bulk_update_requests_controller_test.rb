@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
   context "BulkUpdateRequestsController" do
@@ -64,6 +64,27 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
         put_auth bulk_update_request_path(@bulk_update_request.id), create(:user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
         assert_response 403
         assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
+      end
+
+      should "allow users to update their own request when it has <5 votes" do
+        4.times { create(:forum_post_vote, forum_post: @bulk_update_request.forum_post, creator: build(:user), score: 1) }
+        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        assert_response :redirect
+        assert_equal("create alias zzz -> 222", @bulk_update_request.reload.script)
+      end
+
+      should "not allow users to update their own request when it has 5 votes or more" do
+        5.times { create(:forum_post_vote, forum_post: @bulk_update_request.forum_post, creator: build(:user), score: 1) }
+        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        assert_response 403
+        assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
+      end
+
+      should "allow users to reject their own request when it has 5 votes or more" do
+        5.times { create(:forum_post_vote, forum_post: @bulk_update_request.forum_post, creator: build(:user), score: 1) }
+        delete_auth bulk_update_request_path(@bulk_update_request.id), @user
+        assert_response :redirect
+        assert_equal("rejected", @bulk_update_request.reload.status)
       end
 
       should "fail for an invalid script" do
