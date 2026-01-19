@@ -5,8 +5,8 @@ class Source::Extractor::KofiGalleryItem < Source::Extractor::Kofi
   def image_urls
     if super.present?
       super
-    elsif gallery_page&.at("#gallery-item-view .label-hires a").present?
-      [gallery_page&.at("#gallery-item-view .label-hires a")&.attr(:href)].compact
+    elsif (download_buttons = gallery_page&.css("#gallery-item-view .label-hires a, #gallery-item-view a.label-hires")).present?
+      download_buttons.to_a.pluck(:href).compact
     else
       gallery_page&.css('.gallery-item-main img[id^="hires"]').to_a.pluck(:src)
     end
@@ -37,7 +37,7 @@ class Source::Extractor::KofiGalleryItem < Source::Extractor::Kofi
   end
 
   memoize def gallery_page
-    url = "https://ko-fi.com/Gallery/LoadGalleryItem?galleryItemId=#{gallery_item_id}" if gallery_item_id.present?
-    http.cache(1.minute).parsed_get(url)
+    url = "https://104.45.231.79/Gallery/LoadGalleryItem?galleryItemId=#{gallery_item_id}" if gallery_item_id.present?
+    http.with_legacy_ssl.headers(Host: "ko-fi.com").cache(1.minute).parsed_get(url)
   end
 end
