@@ -8,7 +8,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs.jpeg],
         media_files: [{ file_size: 203_927, width: 1252, height: 1252 }],
         page_url: nil,
-        profile_urls: %w[https://twitter.com/intent/user?user_id=417182061145780225],
+        profile_urls: %w[https://twitter.com/i/user/417182061145780225],
       )
     end
 
@@ -27,7 +27,8 @@ module Source::Tests::Extractor
           { file_size: 188_553 },
         ],
         profile_url: "https://twitter.com/motty08111213",
-        display_name: "丸茂(元えのぐマネージャー)",
+        profile_urls: %w[https://twitter.com/motty08111213 https://twitter.com/i/user/895634201898176513],
+        display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
         dtext_artist_commentary_desc: <<~EOS.chomp,
@@ -51,7 +52,7 @@ module Source::Tests::Extractor
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        display_name: "丸茂(元えのぐマネージャー)",
+        display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
       )
@@ -67,7 +68,7 @@ module Source::Tests::Extractor
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        display_name: "丸茂(元えのぐマネージャー)",
+        display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
       )
@@ -83,7 +84,7 @@ module Source::Tests::Extractor
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        display_name: "丸茂(元えのぐマネージャー)",
+        display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
       )
@@ -169,7 +170,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 280_150 }],
         page_url: "https://twitter.com/Strangestone/status/556440271961858051",
         profile_url: "https://twitter.com/Strangestone",
-        profile_urls: ["https://twitter.com/Strangestone", "https://twitter.com/intent/user?user_id=93332575"],
+        profile_urls: ["https://twitter.com/Strangestone", "https://twitter.com/i/user/93332575"],
         display_name: "比村奇石",
         username: "Strangestone",
         dtext_artist_commentary_desc: "ブレザーが描きたかったのでJK鈴谷",
@@ -182,7 +183,7 @@ module Source::Tests::Extractor
         image_urls: ["https://pbs.twimg.com/media/FtHbwvuaQAAxQ8v.jpg:orig"],
         page_url: "https://twitter.com/shoka_bg/status/1644344692107268097",
         profile_url: "https://twitter.com/shoka_bg",
-        profile_urls: ["https://twitter.com/shoka_bg", "https://twitter.com/intent/user?user_id=1109709388049051649"],
+        profile_urls: ["https://twitter.com/shoka_bg", "https://twitter.com/i/user/1109709388049051649"],
         display_name: "ショカ",
         username: "shoka_bg",
         tags: %w[ブルアカ],
@@ -199,7 +200,7 @@ module Source::Tests::Extractor
         image_urls: ["https://pbs.twimg.com/media/FroXbmIaIAEuC1B.jpg:orig"],
         page_url: "https://twitter.com/loveremi_razoku/status/1637647185969041408",
         profile_url: "https://twitter.com/loveremi_razoku",
-        profile_urls: ["https://twitter.com/loveremi_razoku", "https://twitter.com/intent/user?user_id=293443351"],
+        profile_urls: ["https://twitter.com/loveremi_razoku", "https://twitter.com/i/user/293443351"],
         display_name: "ラブレミ@うぉるやふぁんくらぶ",
         username: "loveremi_razoku",
         tags: [],
@@ -238,7 +239,7 @@ module Source::Tests::Extractor
         image_urls: ["https://pbs.twimg.com/media/DKsikYaU8AEEMKU.jpg:orig"],
         page_url: "https://twitter.com/emurin/status/912861472916508672",
         profile_url: "https://twitter.com/emurin",
-        profile_urls: ["https://twitter.com/emurin", "https://twitter.com/intent/user?user_id=30642502"],
+        profile_urls: ["https://twitter.com/emurin", "https://twitter.com/i/user/30642502"],
         display_name: "えむりん",
         username: "emurin",
         tags: %w[odaibako],
@@ -272,7 +273,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 9800 }],
         page_url: "https://twitter.com/nounproject/status/540944400767922176",
         profile_url: "https://twitter.com/nounproject",
-        profile_urls: ["https://twitter.com/nounproject", "https://twitter.com/intent/user?user_id=88996186"],
+        profile_urls: ["https://twitter.com/nounproject", "https://twitter.com/i/user/88996186"],
         display_name: "Noun Project",
         username: "nounproject",
         tags: [],
@@ -371,7 +372,7 @@ module Source::Tests::Extractor
         image_urls: ["https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500"],
         media_files: [{ file_size: 108_605 }],
         profile_url: nil,
-        # profile_url: "https://twitter.com/intent/user?user_id=780804311529906176"
+        # profile_url: "https://twitter.com/i/user/780804311529906176"
         # XXX we COULD fully support these by setting the page_url to https://twitter.com/Kekeflipnote/header_photo, but it's a lot of work for a niche case
       )
     end
@@ -499,7 +500,7 @@ module Source::Tests::Extractor
           { file_size: 128_702 },
         ],
         page_url: "https://twitter.com/maruyo_/status/1521844593804906496",
-        profile_urls: %w[https://twitter.com/maruyo_ https://twitter.com/intent/user?user_id=115694863],
+        profile_urls: %w[https://twitter.com/maruyo_ https://twitter.com/i/user/115694863],
         display_name: "まるよ",
         username: "maruyo_",
         tags: [
@@ -543,7 +544,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://pbs.twimg.com/media/FsjUfK9aYAYjmvP.jpg:orig],
         media_files: [{ file_size: 1_656_293 }],
         page_url: "https://twitter.com/yamada999_anime/status/1642195121319071748",
-        profile_urls: %w[https://twitter.com/yamada999_anime https://twitter.com/intent/user?user_id=1559447246646935552],
+        profile_urls: %w[https://twitter.com/yamada999_anime https://twitter.com/i/user/1559447246646935552],
         display_name: "TVアニメ「山田くんとLv999の恋をする」公式",
         username: "yamada999_anime",
         tags: [
@@ -595,7 +596,7 @@ module Source::Tests::Extractor
 
     context "A Twitter artist with only an intent URL in the artist profile" do
       should "find the artist" do
-        @artist = create(:artist, url_string: "https://twitter.com/intent/user?user_id=940159421677690880")
+        @artist = create(:artist, url_string: "https://twitter.com/i/user/940159421677690880")
         assert_equal([@artist], Source::Extractor.find("https://twitter.com/ebihurya332/status/1759409576095711667").artists)
       end
     end

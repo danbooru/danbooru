@@ -213,7 +213,7 @@ module Source
     # Examples:
     #
     # * https://www.pixiv.net/users/9948
-    # * https://twitter.com/intent/user?user_id=889592953
+    # * https://twitter.com/i/user/889592953
     #
     # @return [Boolean]
     def profile_url?
@@ -259,7 +259,7 @@ module Source
     # * https://www.pixiv.net/member.php?id=9948
     # * https://www.pixiv.net/stacc/bkubb
     # * https://twitter.com/bkub_comic
-    # * https://twitter.com/intent/user?user_id=889592953
+    # * https://twitter.com/i/user/889592953
     #
     # @return [String, nil]
     def profile_url

@@ -166,8 +166,7 @@ class Source::URL::Twitter < Source::URL
     if username.present?
       "https://twitter.com/#{username}"
     elsif user_id.present?
-      # "https://twitter.com/i/user/#{user_id}
-      "https://twitter.com/intent/user?user_id=#{user_id}"
+      "https://twitter.com/i/user/#{user_id}"
     end
   end
 end

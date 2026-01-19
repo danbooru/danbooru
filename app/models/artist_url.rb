@@ -84,6 +84,8 @@ class ArtistURL < ApplicationRecord
       true
     when %r{twitter\.com/intent}i
       true
+    when %r{twitter\.com/i/user}i
+      true
     when %r{(?:www|com|dic)\.nicovideo\.jp}i
       true
     when %r{pawoo\.net/web/accounts}i
