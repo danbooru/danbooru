@@ -48,8 +48,7 @@ class Source::Extractor
     end
 
     def intent_url
-      return nil if user_id.blank?
-      "https://twitter.com/intent/user?user_id=#{user_id}"
+      "https://twitter.com/i/user/#{user_id}" if user_id.present?
     end
 
     def profile_urls
