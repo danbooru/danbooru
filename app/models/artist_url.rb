@@ -5,15 +5,19 @@ class ArtistURL < ApplicationRecord
 
   validates :url, presence: true, length: { maximum: 300, message: "'%{value}' is too long (maximum is 300 characters)" }, uniqueness: { scope: :artist_id }
   validate :validate_url_format
+  validate :validate_hierarchy
   belongs_to :artist, :touch => true
+  belongs_to :parent, class_name: "ArtistURL", optional: true
 
   scope :active, -> { where(is_active: true) }
 
   def self.parse_prefix(url)
-    prefix, url = url.match(/\A(-)?(.*)/)[1, 2]
-    is_active = prefix.nil?
+    match = url.match(/\A(\+)?(-)?(.*)/)
+    is_child = match[1].present?
+    is_active = match[2].nil?
+    url = match[3]
 
-    [is_active, url]
+    [is_child, is_active, url]
   end
 
   def self.search(params, current_user)
@@ -129,16 +133,31 @@ class ArtistURL < ApplicationRecord
   end
 
   def to_s
-    if is_active?
-      url
-    else
-      "-#{url}"
-    end
+    prefix = ""
+    prefix += "+" if (persisted? ? parent_id.present? : parent.present?)
+    prefix += "-" unless is_active?
+    "#{prefix}#{url}"
   end
 
   # @return [Array<Artist>] The list of other artists that also contain this URL.
   def duplicate_artists
     ArtistFinder.find_artists(url).without(artist)
+  end
+
+  def validate_hierarchy
+    if parent.present?
+      if parent.parent_id.present?
+        errors.add(:parent, "cannot be a child URL")
+      end
+
+      if Source::URL.site_name(url) != Source::URL.site_name(parent.url)
+        errors.add(:parent, "must belong to the same site")
+      end
+
+      if artist_id != parent.artist_id
+        errors.add(:parent, "must belong to the same artist")
+      end
+    end
   end
 
   def validate_url_format

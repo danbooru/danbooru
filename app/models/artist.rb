@@ -40,14 +40,22 @@ class Artist < ApplicationRecord
   module UrlMethods
     extend ActiveSupport::Concern
 
-    def sorted_urls
+    def sort_urls(urls)
       Danbooru.natural_sort_by(urls, &:url).sort_by.with_index do |url, i|
         [url.is_active? ? 0 : 1, url.priority, url.domain, url.secondary_url? ? 1 : 0, i]
       end
     end
 
+    def sorted_urls
+      parents = urls.select { |u| persisted? ? u.parent_id.nil? : u.parent.nil? }
+      sort_urls(parents).flat_map do |url|
+        children = urls.select { |u| persisted? ? u.parent_id == url.id : u.parent == url }
+        [url, *sort_urls(children)]
+      end
+    end
+
     def url_array
-      urls.map(&:to_s).sort
+      sorted_urls.map(&:to_s)
     end
 
     def url_string
@@ -57,9 +65,21 @@ class Artist < ApplicationRecord
     def url_string=(string)
       url_string_was = url_string
 
-      self.urls = string.to_s.scan(/[^[:space:]]+/).map do |url|
-        is_active, url = ArtistURL.parse_prefix(url)
-        self.urls.find_or_initialize_by(url: url, is_active: is_active)
+      current_parent = nil
+      urls_by_value = self.urls.index_by(&:url)
+      self.urls = string.to_s.scan(/[^[:space:]]+/).map do |line|
+        is_child, is_active, url = ArtistURL.parse_prefix(line)
+        artist_url = urls_by_value[url].clone || self.urls.build(url: url)
+
+        artist_url.is_active = is_active
+        if is_child
+          artist_url.parent = current_parent
+        else
+          artist_url.parent = nil
+          current_parent = artist_url
+        end
+
+        artist_url
       end.uniq(&:url)
 
       self.url_string_changed = (url_string_was != url_string)
