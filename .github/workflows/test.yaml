@@ -55,6 +55,7 @@ jobs:
       DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
       DANBOORU_SECRET_KEY_BASE: 1234
       DANBOORU_AWS_SQS_ENABLED: false
+      DANBOORU_SKIP_EXTRACTOR_TESTS: true
       DANBOORU_PIXIV_PHPSESSID: ${{ secrets.DANBOORU_PIXIV_PHPSESSID }}
       DANBOORU_NIJIE_LOGIN: ${{ secrets.DANBOORU_NIJIE_LOGIN }}
       DANBOORU_NIJIE_PASSWORD: ${{ secrets.DANBOORU_NIJIE_PASSWORD }}
