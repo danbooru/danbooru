@@ -12,7 +12,7 @@ class BulkUpdateRequestsController < ApplicationController
     @bulk_update_request = authorize BulkUpdateRequest.new(user: CurrentUser.user, **permitted_attributes(BulkUpdateRequest))
     @bulk_update_request.save
     if request.format.html?
-      respond_with(@bulk_update_request.forum_post || @bulk_update_request.forum_topic)
+      respond_with(@bulk_update_request.forum_post || @bulk_update_request.forum_topic || @bulk_update_request)
     else
       respond_with(@bulk_update_request)
     end
