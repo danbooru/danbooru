@@ -113,6 +113,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
         $(target).replaceFieldText(before_caret_text + after_caret_text);
         target.selectionStart = target.selectionEnd = before_caret_text.length;
 
+        $(target).trigger("input"); // Manually trigger an input event because programmatically editing the field won't trigger one.
         $(target).autocomplete("search"); // Manually trigger autocomplete because programmatically editing the field won't trigger it.
         e.preventDefault();
       }

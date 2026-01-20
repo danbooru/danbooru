@@ -13,6 +13,7 @@ class UndoItem {
     element.value = this.value;
     element.selectionStart = this.selectionStart;
     element.selectionEnd = this.selectionEnd;
+    $(element).trigger("input"); // Manually trigger an input event because programmatically editing the field won't trigger one.
   }
 };
 
