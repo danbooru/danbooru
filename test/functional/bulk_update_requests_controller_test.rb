@@ -50,7 +50,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     context "#update" do
       should "allow admins to update other people's requests" do
         put_auth bulk_update_request_path(@bulk_update_request.id), create(:admin_user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
-        assert_response :redirect
+        assert_redirected_to bulk_update_request_path(@bulk_update_request)
         assert_equal("create alias zzz -> 222", @bulk_update_request.reload.script)
       end
 
@@ -69,7 +69,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
       should "allow users to update their own request when it has <5 votes" do
         4.times { create(:forum_post_vote, forum_post: @bulk_update_request.forum_post, creator: build(:user), score: 1) }
         put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: {bulk_update_request: {script: "create alias zzz -> 222" }}
-        assert_response :redirect
+        assert_redirected_to bulk_update_request_path(@bulk_update_request)
         assert_equal("create alias zzz -> 222", @bulk_update_request.reload.script)
       end
 
@@ -83,7 +83,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
       should "allow users to reject their own request when it has 5 votes or more" do
         5.times { create(:forum_post_vote, forum_post: @bulk_update_request.forum_post, creator: build(:user), score: 1) }
         delete_auth bulk_update_request_path(@bulk_update_request.id), @user
-        assert_response :redirect
+        assert_redirected_to bulk_update_request_path(@bulk_update_request)
         assert_equal("rejected", @bulk_update_request.reload.status)
       end
 
@@ -198,7 +198,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
             post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
           end
 
-          assert_redirected_to(bulk_update_requests_path)
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
           assert_equal("approved", @bulk_update_request.reload.status)
           assert_equal(@builder, @bulk_update_request.approver)
           assert_equal(true, TagAlias.exists?(antecedent_name: "artist2a", consequent_name: "artist2b", status: "active"))
