@@ -8,14 +8,14 @@ module Source::Tests::Extractor
         image_urls: %w[https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs.jpeg],
         media_files: [{ file_size: 203_927, width: 1252, height: 1252 }],
         page_url: nil,
-        profile_urls: %w[https://twitter.com/i/user/417182061145780225],
+        profile_urls: %w[https://x.com/i/user/417182061145780225],
       )
     end
 
     context "A https://twitter.com/:username/status/:id url" do
       strategy_should_work(
         "https://twitter.com/motty08111213/status/943446161586733056",
-        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://x.com/motty08111213/status/943446161586733056",
         image_urls: [
           "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
@@ -26,8 +26,8 @@ module Source::Tests::Extractor
           { file_size: 207_248 },
           { file_size: 188_553 },
         ],
-        profile_url: "https://twitter.com/motty08111213",
-        profile_urls: %w[https://twitter.com/motty08111213 https://twitter.com/i/user/895634201898176513],
+        profile_url: "https://x.com/motty08111213",
+        profile_urls: %w[https://x.com/motty08111213 https://x.com/i/user/895634201898176513],
         display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
@@ -37,7 +37,7 @@ module Source::Tests::Extractor
           あんずと環 同様、応援していただけると嬉しいです…！
           詳細はこちらから↓
           <http://rbc-geino.com/profile_2/>
-          "#岩本町芸能社":[https://twitter.com/hashtag/岩本町芸能社] "#女優部":[https://twitter.com/hashtag/女優部]
+          "#岩本町芸能社":[https://x.com/hashtag/岩本町芸能社] "#女優部":[https://x.com/hashtag/女優部]
         EOS
       )
     end
@@ -45,13 +45,13 @@ module Source::Tests::Extractor
     context "A https://twitter.com/i/web/status/:id url" do
       strategy_should_work(
         "https://twitter.com/i/web/status/943446161586733056",
-        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://x.com/motty08111213/status/943446161586733056",
         image_urls: [
           "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        profile_url: "https://twitter.com/motty08111213",
+        profile_url: "https://x.com/motty08111213",
         display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
@@ -61,13 +61,13 @@ module Source::Tests::Extractor
     context "A https://twitter.com/i/status/:id url" do
       strategy_should_work(
         "https://twitter.com/i/status/943446161586733056",
-        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://x.com/motty08111213/status/943446161586733056",
         image_urls: [
           "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        profile_url: "https://twitter.com/motty08111213",
+        profile_url: "https://x.com/motty08111213",
         display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
@@ -77,13 +77,13 @@ module Source::Tests::Extractor
     context "A https://x.com/i/status/:id url" do
       strategy_should_work(
         "https://x.com/i/status/943446161586733056",
-        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://x.com/motty08111213/status/943446161586733056",
         image_urls: [
           "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        profile_url: "https://twitter.com/motty08111213",
+        profile_url: "https://x.com/motty08111213",
         display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
@@ -94,10 +94,10 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/CincinnatiZoo/status/859073537713328129",
         image_urls: ["https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4"],
-        page_url: "https://twitter.com/CincinnatiZoo/status/859073537713328129",
+        page_url: "https://x.com/CincinnatiZoo/status/859073537713328129",
         media_files: [{ file_size: 8_603_100 }],
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          Fiona loves playing in the hose water just like her parents! 💦 "#TeamFiona":[https://twitter.com/hashtag/TeamFiona] "#fionafix":[https://twitter.com/hashtag/fionafix]
+          Fiona loves playing in the hose water just like her parents! 💦 "#TeamFiona":[https://x.com/hashtag/TeamFiona] "#fionafix":[https://x.com/hashtag/fionafix]
         EOS
       )
     end
@@ -154,10 +154,10 @@ module Source::Tests::Extractor
           https://pbs.twimg.com/media/FeWVcf2VUAATTey.jpg:orig
           https://video.twimg.com/tweet_video/FeWVcf4VQAAIPTe.mp4
         ],
-        page_url: "https://twitter.com/twotenky/status/1577831592227000320",
+        page_url: "https://x.com/twotenky/status/1577831592227000320",
         display_name: "通天機",
         username: "twotenky",
-        profile_url: "https://twitter.com/twotenky",
+        profile_url: "https://x.com/twotenky",
         artist_commentary_desc: "動画と静止画がセットでお得と聞いて https://t.co/hWvKoHLN7y",
         dtext_artist_commentary_desc: "動画と静止画がセットでお得と聞いて",
       )
@@ -168,9 +168,9 @@ module Source::Tests::Extractor
         "https://mobile.twitter.com/Strangestone/status/556440271961858051",
         image_urls: ["https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:orig"],
         media_files: [{ file_size: 280_150 }],
-        page_url: "https://twitter.com/Strangestone/status/556440271961858051",
-        profile_url: "https://twitter.com/Strangestone",
-        profile_urls: ["https://twitter.com/Strangestone", "https://twitter.com/i/user/93332575"],
+        page_url: "https://x.com/Strangestone/status/556440271961858051",
+        profile_url: "https://x.com/Strangestone",
+        profile_urls: ["https://x.com/Strangestone", "https://x.com/i/user/93332575"],
         display_name: "比村奇石",
         username: "Strangestone",
         dtext_artist_commentary_desc: "ブレザーが描きたかったのでJK鈴谷",
@@ -181,15 +181,15 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/shoka_bg/status/1644344692107268097",
         image_urls: ["https://pbs.twimg.com/media/FtHbwvuaQAAxQ8v.jpg:orig"],
-        page_url: "https://twitter.com/shoka_bg/status/1644344692107268097",
-        profile_url: "https://twitter.com/shoka_bg",
-        profile_urls: ["https://twitter.com/shoka_bg", "https://twitter.com/i/user/1109709388049051649"],
+        page_url: "https://x.com/shoka_bg/status/1644344692107268097",
+        profile_url: "https://x.com/shoka_bg",
+        profile_urls: ["https://x.com/shoka_bg", "https://x.com/i/user/1109709388049051649"],
         display_name: "ショカ",
         username: "shoka_bg",
         tags: %w[ブルアカ],
         dtext_artist_commentary_desc: <<~EOS.chomp,
           風紀委員の実態
-          "#ブルアカ":[https://twitter.com/hashtag/ブルアカ]
+          "#ブルアカ":[https://x.com/hashtag/ブルアカ]
         EOS
       )
     end
@@ -198,15 +198,15 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/loveremi_razoku/status/1637647185969041408",
         image_urls: ["https://pbs.twimg.com/media/FroXbmIaIAEuC1B.jpg:orig"],
-        page_url: "https://twitter.com/loveremi_razoku/status/1637647185969041408",
-        profile_url: "https://twitter.com/loveremi_razoku",
-        profile_urls: ["https://twitter.com/loveremi_razoku", "https://twitter.com/i/user/293443351"],
+        page_url: "https://x.com/loveremi_razoku/status/1637647185969041408",
+        profile_url: "https://x.com/loveremi_razoku",
+        profile_urls: ["https://x.com/loveremi_razoku", "https://x.com/i/user/293443351"],
         display_name: "ラブレミ@うぉるやふぁんくらぶ",
         username: "loveremi_razoku",
         tags: [],
         dtext_artist_commentary_desc: <<~EOS.chomp,
           「ラリアッ党の野望チョコ」
-          commission ラリアット さん"@rariatoo":[https://twitter.com/rariatoo]
+          commission ラリアット さん"@rariatoo":[https://x.com/rariatoo]
 
           シゲ「カッパ、お前何やった?」
 
@@ -237,14 +237,14 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/emurin/status/912861472916508672",
         image_urls: ["https://pbs.twimg.com/media/DKsikYaU8AEEMKU.jpg:orig"],
-        page_url: "https://twitter.com/emurin/status/912861472916508672",
-        profile_url: "https://twitter.com/emurin",
-        profile_urls: ["https://twitter.com/emurin", "https://twitter.com/i/user/30642502"],
+        page_url: "https://x.com/emurin/status/912861472916508672",
+        profile_url: "https://x.com/emurin",
+        profile_urls: ["https://x.com/emurin", "https://x.com/i/user/30642502"],
         display_name: "えむりん",
         username: "emurin",
         tags: %w[odaibako],
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          > ほわほわ系クーデレギロチンおねがいします <https://odaibako.net/detail/request/277bac5ea1b34b1abc7ac21dd1031690> "#odaibako":[https://twitter.com/hashtag/odaibako]
+          > ほわほわ系クーデレギロチンおねがいします <https://odaibako.net/detail/request/277bac5ea1b34b1abc7ac21dd1031690> "#odaibako":[https://x.com/hashtag/odaibako]
 
           セカコスにしたらギロクロ感がなくなった…
         EOS
@@ -255,8 +255,8 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/star_ukmgr/status/1917596971143160173",
         image_urls: [],
-        page_url: "https://twitter.com/star_ukmgr/status/1917596971143160173",
-        profile_urls: %w[https://twitter.com/star_ukmgr],
+        page_url: "https://x.com/star_ukmgr/status/1917596971143160173",
+        profile_urls: %w[https://x.com/star_ukmgr],
         display_name: nil,
         username: "star_ukmgr",
         tags: [],
@@ -271,9 +271,9 @@ module Source::Tests::Extractor
         referer: "https://twitter.com/nounproject/status/540944400767922176",
         image_urls: ["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"],
         media_files: [{ file_size: 9800 }],
-        page_url: "https://twitter.com/nounproject/status/540944400767922176",
-        profile_url: "https://twitter.com/nounproject",
-        profile_urls: ["https://twitter.com/nounproject", "https://twitter.com/i/user/88996186"],
+        page_url: "https://x.com/nounproject/status/540944400767922176",
+        profile_url: "https://x.com/nounproject",
+        profile_urls: ["https://x.com/nounproject", "https://x.com/i/user/88996186"],
         display_name: "Noun Project",
         username: "nounproject",
         tags: [],
@@ -286,7 +286,7 @@ module Source::Tests::Extractor
     context "A tweet without any images" do
       strategy_should_work(
         "https://twitter.com/teruyo/status/1058452066060853248",
-        profile_url: "https://twitter.com/teruyo",
+        profile_url: "https://x.com/teruyo",
         image_urls: [],
         dtext_artist_commentary_desc: "all the women washizutan2 draws look like roast chicken",
       )
@@ -325,7 +325,7 @@ module Source::Tests::Extractor
         "https://twitter.com/masayasuf/status/870734961778630656",
         deleted: true,
         username: "masayasuf",
-        profile_url: "https://twitter.com/masayasuf",
+        profile_url: "https://x.com/masayasuf",
         dtext_artist_commentary_desc: "",
       )
     end
@@ -334,7 +334,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/tanso_panz/status/1192429800717029377",
         username: "tanso_panz",
-        profile_url: "https://twitter.com/tanso_panz",
+        profile_url: "https://x.com/tanso_panz",
         image_urls: [],
         dtext_artist_commentary_desc: "",
       )
@@ -343,26 +343,26 @@ module Source::Tests::Extractor
     context "A https://fxtwitter.com/:username/status/:id url" do
       strategy_should_work(
         "https://fxtwitter.com/motty08111213/status/943446161586733056",
-        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://x.com/motty08111213/status/943446161586733056",
         image_urls: [
           "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        profile_url: "https://twitter.com/motty08111213",
+        profile_url: "https://x.com/motty08111213",
       )
     end
 
     context "A https://vxtwitter.com/:username/status/:id url" do
       strategy_should_work(
         "https://vxtwitter.com/motty08111213/status/943446161586733056",
-        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://x.com/motty08111213/status/943446161586733056",
         image_urls: [
           "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        profile_url: "https://twitter.com/motty08111213",
+        profile_url: "https://x.com/motty08111213",
       )
     end
 
@@ -372,8 +372,8 @@ module Source::Tests::Extractor
         image_urls: ["https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500"],
         media_files: [{ file_size: 108_605 }],
         profile_url: nil,
-        # profile_url: "https://twitter.com/i/user/780804311529906176"
-        # XXX we COULD fully support these by setting the page_url to https://twitter.com/Kekeflipnote/header_photo, but it's a lot of work for a niche case
+        # profile_url: "https://x.com/i/user/780804311529906176"
+        # XXX we COULD fully support these by setting the page_url to https://x.com/Kekeflipnote/header_photo, but it's a lot of work for a niche case
       )
     end
 
@@ -405,7 +405,7 @@ module Source::Tests::Extractor
         dtext_artist_commentary_desc: <<~EOS.chomp,
           みぽりん誕生日おめでとうございます！！🎂
           ボコボコ探検隊🙌✨
-          "#西住みほ生誕祭2019":[https://twitter.com/hashtag/西住みほ生誕祭2019]
+          "#西住みほ生誕祭2019":[https://x.com/hashtag/西住みほ生誕祭2019]
         EOS
       )
     end
@@ -413,7 +413,7 @@ module Source::Tests::Extractor
     context "A tweet with mentions that can be converted to dtext" do
       strategy_should_work(
         "https://twitter.com/noizave/status/875768175136317440",
-        dtext_artist_commentary_desc: 'test "#foo":[https://twitter.com/hashtag/foo] "#ホワイトデー":[https://twitter.com/hashtag/ホワイトデー] "@noizave":[https://twitter.com/noizave]\'s blah <http://www.example.com> <>& 😀',
+        dtext_artist_commentary_desc: 'test "#foo":[https://x.com/hashtag/foo] "#ホワイトデー":[https://x.com/hashtag/ホワイトデー] "@noizave":[https://x.com/noizave]\'s blah <http://www.example.com> <>& 😀',
       )
     end
 
@@ -429,7 +429,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/corpsmanWelt/status/1037724260075069441",
         artist_commentary_desc: %{新しいおともだち\n＃けものフレンズ https://t.co/sEAuu16yAQ},
-        dtext_artist_commentary_desc: %{新しいおともだち\n"#けものフレンズ":[https://twitter.com/hashtag/けものフレンズ]},
+        dtext_artist_commentary_desc: %{新しいおともだち\n"#けものフレンズ":[https://x.com/hashtag/けものフレンズ]},
       )
     end
 
@@ -437,7 +437,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/VG_Worklog/status/1587457941418160128",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          Sound by: "@RealAudiodude":[https://twitter.com/RealAudiodude]
+          Sound by: "@RealAudiodude":[https://x.com/RealAudiodude]
           Download: <https://mega.nz/folder/i80gVL7L#111g2XX7bIJ-2KnAHxMt0w>
           Support: <https://www.patreon.com/vgerotica>
         EOS
@@ -458,7 +458,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/CFRJacobsson/status/1608788299665276931",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          "$GOOG":[https://twitter.com/search?q=$GOOG] is the next "$IBM":[https://twitter.com/search?q=$IBM] 🧵
+          "$GOOG":[https://x.com/search?q=$GOOG] is the next "$IBM":[https://x.com/search?q=$IBM] 🧵
 
           1/7
         EOS
@@ -470,7 +470,7 @@ module Source::Tests::Extractor
         "https://twitter.com/takobe_t/status/1777662729890730410",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           ロザリンデ&エルトリンデ
-          "#ユニコーンオーバーロード":[https://twitter.com/hashtag/ユニコーンオーバーロード]
+          "#ユニコーンオーバーロード":[https://x.com/hashtag/ユニコーンオーバーロード]
         EOS
       )
     end
@@ -479,7 +479,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/Persona_Central/status/1750173292588097879",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          The new Shigenori Soejima illustration for Persona 3 Reload in Weekly Famitsu magazine issue &num;1834. "#P3R":[https://twitter.com/hashtag/P3R]
+          The new Shigenori Soejima illustration for Persona 3 Reload in Weekly Famitsu magazine issue &num;1834. "#P3R":[https://x.com/hashtag/P3R]
         EOS
       )
     end
@@ -499,17 +499,17 @@ module Source::Tests::Extractor
           { file_size: 151_909 },
           { file_size: 128_702 },
         ],
-        page_url: "https://twitter.com/maruyo_/status/1521844593804906496",
-        profile_urls: %w[https://twitter.com/maruyo_ https://twitter.com/i/user/115694863],
+        page_url: "https://x.com/maruyo_/status/1521844593804906496",
+        profile_urls: %w[https://x.com/maruyo_ https://x.com/i/user/115694863],
         display_name: "まるよ",
         username: "maruyo_",
         tags: [
-          ["スーパーカブ", "https://twitter.com/hashtag/スーパーカブ"],
+          ["スーパーカブ", "https://x.com/hashtag/スーパーカブ"],
         ],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           GWなので再放送です☺
-          "#スーパーカブ":[https://twitter.com/hashtag/スーパーカブ]
+          "#スーパーカブ":[https://x.com/hashtag/スーパーカブ]
 
           [quote]
           h6. Image Description
@@ -543,12 +543,12 @@ module Source::Tests::Extractor
         "https://x.com/yamada999_anime/status/1642195121319071748",
         image_urls: %w[https://pbs.twimg.com/media/FsjUfK9aYAYjmvP.jpg:orig],
         media_files: [{ file_size: 1_656_293 }],
-        page_url: "https://twitter.com/yamada999_anime/status/1642195121319071748",
-        profile_urls: %w[https://twitter.com/yamada999_anime https://twitter.com/i/user/1559447246646935552],
+        page_url: "https://x.com/yamada999_anime/status/1642195121319071748",
+        profile_urls: %w[https://x.com/yamada999_anime https://x.com/i/user/1559447246646935552],
         display_name: "TVアニメ「山田くんとLv999の恋をする」公式",
         username: "yamada999_anime",
         tags: [
-          ["山田999", "https://twitter.com/hashtag/山田999"],
+          ["山田999", "https://x.com/hashtag/山田999"],
         ],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
@@ -567,7 +567,7 @@ module Source::Tests::Extractor
           ▼CMはこちら
           <https://youtu.be/ZNbTEIawZN4>
 
-          "#山田999":[https://twitter.com/hashtag/山田999]
+          "#山田999":[https://x.com/hashtag/山田999]
 
           [quote]
           h6. Image Description
@@ -596,8 +596,8 @@ module Source::Tests::Extractor
 
     context "A Twitter artist with only an intent URL in the artist profile" do
       should "find the artist" do
-        @artist = create(:artist, url_string: "https://twitter.com/i/user/940159421677690880")
-        assert_equal([@artist], Source::Extractor.find("https://twitter.com/ebihurya332/status/1759409576095711667").artists)
+        @artist = create(:artist, url_string: "https://x.com/i/user/940159421677690880")
+        assert_equal([@artist], Source::Extractor.find("https://x.com/ebihurya332/status/1759409576095711667").artists)
       end
     end
   end
