@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gemspec
+
+gem "http"
+gem "activesupport"
+
+group :development do
+  gem "cgi"
+  gem "minitest"
+  gem "rake"
+end

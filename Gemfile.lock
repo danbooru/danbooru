@@ -1,3 +1,8 @@
+PATH
+  remote: lib/danbooru_http
+  specs:
+    danbooru_http (1.0.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -584,6 +589,7 @@ DEPENDENCIES
   connection_pool
   crass
   daemons
+  danbooru_http!
   debug
   derailed_benchmarks
   diff-lcs
