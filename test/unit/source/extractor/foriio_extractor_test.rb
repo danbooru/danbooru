@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class ForiioExtractorTest < ActiveSupport::TestCase
+  class ForiioExtractorTest < ActiveSupport::ExtractorTestCase
     context "A Foriio post with a single image" do
       strategy_should_work(
         "https://www.foriio.com/works/364622",

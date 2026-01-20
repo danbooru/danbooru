@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PostypeExtractorTest < ActiveSupport::TestCase
+  class PostypeExtractorTest < ActiveSupport::ExtractorTestCase
     context "A https://www.postype.com/_next/image URL" do
       strategy_should_work(
         "https://www.postype.com/_next/image?url=https%3A%2F%2Fd3mcojo3jv0dbr.cloudfront.net%2F2024%2F04%2F03%2F12%2F46%2F1ffb36f1881b16a5c5881fc6eaa06179.jpeg%3Fw%3D1000%26h%3D700%26q%3D65&w=3840&q=75",

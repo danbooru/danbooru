@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class ZerochanExtractorTest < ActiveSupport::TestCase
+  class ZerochanExtractorTest < ActiveSupport::ExtractorTestCase
     context "A SFW post url" do
       strategy_should_work(
         "https://www.zerochan.net/4090352",

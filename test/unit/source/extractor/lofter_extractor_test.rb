@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class LofterExtractorTest < ActiveSupport::TestCase
+  class LofterExtractorTest < ActiveSupport::ExtractorTestCase
     context "A lofter sample image url" do
       strategy_should_work(
         "https://imglf4.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJUFczb2RKSVlpMHJkNy9kc3BSQVQvQm5DNzB4eVhxay9nPT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0",

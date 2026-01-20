@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class BoothExtractorTest < ActiveSupport::TestCase
+  class BoothExtractorTest < ActiveSupport::ExtractorTestCase
     context "A booth post" do
       strategy_should_work(
         "https://booth.pm/en/items/3240411",

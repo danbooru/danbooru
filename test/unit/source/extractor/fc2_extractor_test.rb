@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class Fc2ExtractorTest < ActiveSupport::TestCase
+  class Fc2ExtractorTest < ActiveSupport::ExtractorTestCase
     context "A blog sample image URL" do
       strategy_should_work(
         "https://blog-imgs-119.fc2.com/n/i/y/niyamalog/bokuomapops.jpg",

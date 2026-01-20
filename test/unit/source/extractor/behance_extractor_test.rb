@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class BehanceExtractorTest < ActiveSupport::TestCase
+  class BehanceExtractorTest < ActiveSupport::ExtractorTestCase
     setup do
       skip "Behance cookie not configured" unless Source::Extractor::Behance.enabled?
     end

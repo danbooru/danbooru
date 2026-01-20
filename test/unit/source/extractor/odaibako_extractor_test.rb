@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class OdaibakoExtractorTest < ActiveSupport::TestCase
+  class OdaibakoExtractorTest < ActiveSupport::ExtractorTestCase
     context "a post URL" do
       strategy_should_work(
         "https://odaibako.net/posts/01923bc559bc0fd9ac983610d654ea2d",

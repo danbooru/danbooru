@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PixivExtractorTest < ActiveSupport::TestCase
+  class PixivExtractorTest < ActiveSupport::ExtractorTestCase
     setup do
       skip "Pixiv credentials not configured" unless Source::Extractor::Pixiv.enabled?
     end

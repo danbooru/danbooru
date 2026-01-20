@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class GrafolioExtractorTest < ActiveSupport::TestCase
+  class GrafolioExtractorTest < ActiveSupport::ExtractorTestCase
     context "A thumbnail URL" do
       strategy_should_work(
         "https://files.grafolio.ogq.me/preview/v1/content/real/8b0d026e01fc4affa9a2f232388b0edf/IMAGE/e0180515-9d3a-412e-a09b-8a55e78b282e.png?type=THUMBNAIL",

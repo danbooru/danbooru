@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class TinamiExtractorTest < ActiveSupport::TestCase
+  class TinamiExtractorTest < ActiveSupport::ExtractorTestCase
     context "A 'http://www.tinami.com/view/:id' post with one image" do
       strategy_should_work(
         "http://www.tinami.com/view/1087268",

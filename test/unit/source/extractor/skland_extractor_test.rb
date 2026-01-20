@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class SklandExtractorTest < ActiveSupport::TestCase
+  class SklandExtractorTest < ActiveSupport::ExtractorTestCase
     context "A sample image URL" do
       strategy_should_work(
         "https://bbs.hycdn.cn/image/2024/04/29/576904/1dc98f0a6780ddcbc107d77bfdba673f.webp?x-oss-process=style/item_style",

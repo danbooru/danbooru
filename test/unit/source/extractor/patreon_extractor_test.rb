@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PatreonExtractorTest < ActiveSupport::TestCase
+  class PatreonExtractorTest < ActiveSupport::ExtractorTestCase
     context "An expired sample image URL" do
       strategy_should_work(
         "https://c10.patreonusercontent.com/4/patreon-media/p/post/71057815/d48874de48aa49f7878d32144de631fc/eyJ3Ijo2MjB9/1.jpg?token-time=1668384000&token-hash=9ORWv7LJBzmvzmHTi_xGFQ47Uis9fNzTPp2WweThDj4%3D",

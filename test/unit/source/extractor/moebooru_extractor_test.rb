@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class MoebooruExtractorTest < ActiveSupport::TestCase
+  class MoebooruExtractorTest < ActiveSupport::ExtractorTestCase
     context "For Yande.re," do
       context "a post" do
         strategy_should_work(

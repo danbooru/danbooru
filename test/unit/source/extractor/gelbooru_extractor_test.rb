@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class GelbooruExtractorTest < ActiveSupport::TestCase
+  class GelbooruExtractorTest < ActiveSupport::ExtractorTestCase
     context "Gelbooru:" do
       context "A Gelbooru direct image url without a referer" do
         strategy_should_work(

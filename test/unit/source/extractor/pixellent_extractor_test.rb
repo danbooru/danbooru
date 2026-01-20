@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PixellentExtractorTest < ActiveSupport::TestCase
+  class PixellentExtractorTest < ActiveSupport::ExtractorTestCase
     context "A sample image URL" do
       strategy_should_work(
         "https://firebasestorage.googleapis.com/v0/b/pixellent.appspot.com/o/users%2FDdO7LioRiUNuEoh7Z3wbJwuFqY53%2Fposts%2F4St7seQpouY8bm5z9MJJ%2Fimages%2Fthumbnail-d1280.jpg?alt=media&v1705580498316",

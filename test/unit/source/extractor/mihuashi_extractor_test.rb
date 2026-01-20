@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class MihuashiExtractorTest < ActiveSupport::TestCase
+  class MihuashiExtractorTest < ActiveSupport::ExtractorTestCase
     context "A Mihuashi sample image url" do
       strategy_should_work(
         "https://image-assets.mihuashi.com/pfop/permanent/4329541|-2024/07/12/18/Fu2oKtHkplA-waTASBzUpF6EozkB.jpg!artwork.detail",

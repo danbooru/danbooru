@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class TwitterExtractorTest < ActiveSupport::TestCase
+  class TwitterExtractorTest < ActiveSupport::ExtractorTestCase
     context "A Twitter profile picture sample image" do
       strategy_should_work(
         "https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs_400x400.jpeg",

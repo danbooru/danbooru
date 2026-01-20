@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class GumroadExtractorTest < ActiveSupport::TestCase
+  class GumroadExtractorTest < ActiveSupport::ExtractorTestCase
     context "A Gumroad product page url" do
       strategy_should_work(
         "https://movw2000.gumroad.com/l/zbslv",

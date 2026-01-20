@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class E621ExtractorTest < ActiveSupport::TestCase
+  class E621ExtractorTest < ActiveSupport::ExtractorTestCase
     context "A normal post URL" do
       strategy_should_work(
         "https://e621.net/posts/3728701",

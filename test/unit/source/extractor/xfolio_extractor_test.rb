@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class XfolioExtractorTest < ActiveSupport::TestCase
+  class XfolioExtractorTest < ActiveSupport::ExtractorTestCase
     context "A https://xfolio.jp/portfolio/:artist_name/works/:work_id url" do
       strategy_should_work(
         "https://xfolio.jp/portfolio/ben1shoga/works/237599",

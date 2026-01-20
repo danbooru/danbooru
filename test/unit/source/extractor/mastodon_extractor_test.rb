@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class MastodonExtractorTest < ActiveSupport::TestCase
+  class MastodonExtractorTest < ActiveSupport::ExtractorTestCase
     context "For Pawoo," do
       setup do
         skip "Pawoo keys not set" unless SiteCredential.for_site("Pawoo").present?

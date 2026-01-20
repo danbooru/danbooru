@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PixivFactoryExtractorTest < ActiveSupport::TestCase
+  class PixivFactoryExtractorTest < ActiveSupport::ExtractorTestCase
     context "A factory.pixiv.net/files/* sample image URL" do
       strategy_should_work(
         "https://factory.pixiv.net/files/uploads/i/conceptual_drawing/3a6f3742-03b6-4968-9599-20dc2c0e1172/lightweight_f2605b12ed.png ",

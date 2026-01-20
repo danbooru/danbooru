@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class DotpictExtractorTest < ActiveSupport::TestCase
+  class DotpictExtractorTest < ActiveSupport::ExtractorTestCase
     context "A Dotpict sample image URL" do
       strategy_should_work(
         "https://img.dotpicko.net/thumbnail_work/2023/06/09/20/57/thumb_e45a20d18dbca13bb52ae7f01eaf2de4db1054886d358bea0f36acfb7c1ce667.png",

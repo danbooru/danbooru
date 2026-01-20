@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class MiyousheExtractorTest < ActiveSupport::TestCase
+  class MiyousheExtractorTest < ActiveSupport::ExtractorTestCase
     context "Hoyolab:" do
       context "A sample image URL" do
         strategy_should_work(

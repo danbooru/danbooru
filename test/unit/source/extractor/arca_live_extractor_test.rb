@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class ArcaLiveExtractorTest < ActiveSupport::TestCase
+  class ArcaLiveExtractorTest < ActiveSupport::ExtractorTestCase
     context "An Arca.live page URL" do
       strategy_should_work(
         "https://arca.live/b/arknights/66031722?p=1",
@@ -21,7 +21,7 @@ module Source::Tests::Extractor
 
     context "An Arca.live image URL with a referer" do
       strategy_should_work(
-        "https://ac.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg\?expires=1750243516&key=mQiH3KTgkEkAEDjO4GfTlA",
+        "https://ac.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg?expires=1750243516&key=mQiH3KTgkEkAEDjO4GfTlA",
         referer: "https://arca.live/b/arknights/66031722?p=1",
         image_urls: [
           %r{https://ac\.namu\.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5\.jpg\?expires=\d+&key=[\w_-]+&type=orig},
@@ -39,7 +39,7 @@ module Source::Tests::Extractor
 
     context "An Arca.live image URL without a referer" do
       strategy_should_work(
-        "https://ac.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg\?expires=1750243516&key=mQiH3KTgkEkAEDjO4GfTlA",
+        "https://ac.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg?expires=1750243516&key=mQiH3KTgkEkAEDjO4GfTlA",
         image_urls: [
           %r{https://ac\.namu\.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5\.jpg\?expires=\d+&key=[\w_-]+&type=orig},
         ],
