@@ -119,6 +119,7 @@ class AutocompleteService
       results = tag_abbreviation_matches(string)
     elsif string.include?("*")
       results = tag_wildcard_matches(string)
+      results = tag_autocorrect_matches(string.remove(/\*/)) if results.blank?
     elsif Tag.parsable_into_words?(string) # do a word match if the search contains at least 2 contiguous letters or numbers
       results = tag_word_matches(string)
       results = tag_autocorrect_matches(string) if results.blank?
