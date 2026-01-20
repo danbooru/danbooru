@@ -35,6 +35,10 @@ class Source::Extractor::E621 < Source::Extractor
     end
   end
 
+  def profile_url
+    profile_urls.first
+  end
+
   def profile_urls
     linked_urls = uploader_linked_artists.flat_map do |artist|
       user_url = "https://e621.net/users/#{artist[:linked_user_id]}"
@@ -57,16 +61,15 @@ class Source::Extractor::E621 < Source::Extractor
   end
 
   def username
-    sub_extractor&.username || uploader_linked_artists.pluck(:name).first || super
+    sub_extractor&.username || uploader_linked_artists.pick(:name) || super
   end
 
   # https://github.com/e621ng/e621ng/blob/59f5fda98f0877190bb5816f766c17bd6b9affb9/app/models/post.rb#L1710
   memoize def uploader_linked_artists
-    api_response.dig(:tags, :artist).map do |artist_name|
+    api_response.dig(:tags, :artist).filter_map do |artist_name|
       url = "https://e621.net/artists.json?search[name]=#{Danbooru::URL.escape(artist_name)}"
-      request(url)&.first.to_h.with_indifferent_access
-    end.select do |artist|
-      artist[:linked_user_id] == api_response[:uploader_id]
+      artist = request(url)&.first.to_h.with_indifferent_access
+      artist if artist[:linked_user_id] == api_response[:uploader_id]
     end
   end
 
@@ -76,7 +79,7 @@ class Source::Extractor::E621 < Source::Extractor
     request(page_url)&.dig(:post) || {}
   end
 
-  def request(url, **params)
+  def request(url, **)
     http.cache(1.minute).headers(accept: "application/json").parsed_get(url)
   end
 
@@ -84,9 +87,8 @@ class Source::Extractor::E621 < Source::Extractor
     return nil if parent_extractor.present?
 
     url = api_response[:sources].filter_map do |url|
-      Source::URL.parse url
-    end.select do |url|
-      url.page_url.present?
+      url = Source::URL.parse(url)
+      url if url.page_url.present?
     end.first
 
     @sub_extractor ||= Source::Extractor.find(url, default_extractor: nil, parent_extractor: self)

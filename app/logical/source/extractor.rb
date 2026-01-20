@@ -131,7 +131,7 @@ module Source
     #
     # @return [String, nil]
     def artist_name
-      display_name || username
+      display_name.presence || username
     end
 
     # The artists's display name, if the site has display names.
@@ -305,7 +305,7 @@ module Source
       Artist.new(
         name: tag_name,
         other_names: other_names,
-        url_string: profile_urls.join("\n")
+        url_string: profile_urls.join("\n"),
       )
     end
 
@@ -416,7 +416,7 @@ module Source
     end
 
     memoize def test_case
-      file_sizes = image_urls.filter_map do |url|
+      file_sizes = image_urls.filter_map do |url| # rubocop:disable Lint/UselessAssignment
         response = http_downloader.head(url)
         file_size = response["Content-Length"] || "0"
         file_size = "0" if !response.status.in?(200..299)
@@ -476,7 +476,7 @@ module Source
     end
 
     def inspect
-      variables = instance_values.reject { |key, _| key.starts_with?("_memoized") }.compact_blank
+      variables = instance_values.reject { |key, _| key.starts_with?("_memoized") || key == "sub_extractor" }.compact_blank
       state = variables.map { |name, value| "@#{name}=#{value.inspect}" }.join(" ")
       "#<#{self.class.name} #{state}>"
     end
