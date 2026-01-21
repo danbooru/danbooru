@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class OpenseaExtractorTest < ActiveSupport::TestCase
+  class OpenseaExtractorTest < ActiveSupport::ExtractorTestCase
     context "An Opensea /raw/ sample image URL" do
       strategy_should_work(
         "https://i.seadn.io/s/raw/files/473d8a4978c86ede320b8372dfe2a8b3.png?auto=format&dpr=1&w=384",

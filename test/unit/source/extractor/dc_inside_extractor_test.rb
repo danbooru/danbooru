@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class DcInsideExtractorTest < ActiveSupport::TestCase
+  class DcInsideExtractorTest < ActiveSupport::ExtractorTestCase
     context "A page URL" do
       strategy_should_work(
         "https://gall.dcinside.com/mgallery/board/view?id=projectmx&no=14994409",

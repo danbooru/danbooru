@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class KofiExtractorTest < ActiveSupport::TestCase
+  class KofiExtractorTest < ActiveSupport::ExtractorTestCase
     context "A sample image URL" do
       strategy_should_work(
         "https://storage.ko-fi.com/cdn/useruploads/post/2c42fc4c-6ebb-4b09-9da0-d14b19a105b1_d69ed1ef-bb4c-4c9f-96ed-4cac35ab8c0d.png",

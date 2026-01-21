@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class RedditExtractorTest < ActiveSupport::TestCase
+  class RedditExtractorTest < ActiveSupport::ExtractorTestCase
     context "A reddit gallery post" do
       strategy_should_work(
         "https://www.reddit.com/gallery/ttyccp",

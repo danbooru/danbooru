@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class MisskeyExtractorTest < ActiveSupport::TestCase
+  class MisskeyExtractorTest < ActiveSupport::ExtractorTestCase
     context "A https://misskey.io/notes/:note_id url" do
       strategy_should_work(
         "https://misskey.io/notes/9bxaf592x6",

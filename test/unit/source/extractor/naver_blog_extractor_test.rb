@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class NaverBlogExtractorTest < ActiveSupport::TestCase
+  class NaverBlogExtractorTest < ActiveSupport::ExtractorTestCase
     context "A blogthumb.pstatic.net sample image URL" do
       strategy_should_work(
         "https://blogthumb.pstatic.net/MjAyMzA3MTFfMjkz/MDAxNjg5MDQ2NTMwMTkw.2bAkaa4r8P5vcbpyyNH3X5ysDig6q_sJ2llYrNHQ_3Ag.7b3Pxl-DcaqTAM69oiYsGHGWKOlgwWXp5BbOpVDZ98Ag.PNG.kkid9624/230623%C6%F7%B5%F0%BE%C6%B4%D4.PNG?type=w2",

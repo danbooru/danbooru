@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class ItakuExtractorTest < ActiveSupport::TestCase
+  class ItakuExtractorTest < ActiveSupport::ExtractorTestCase
     context "A Itaku sample image URL" do
       strategy_should_work(
         "https://itaku.ee/api/media/gallery_imgs/IMG_2679_3GtFUgB/xl.jpg",

@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class XiaohongshuExtractorTest < ActiveSupport::TestCase
+  class XiaohongshuExtractorTest < ActiveSupport::ExtractorTestCase
     context "A xhscdn.com sample image URL" do
       strategy_should_work(
         "http://sns-webpic-qc.xhscdn.com/202405050857/60985d4963cfb500a9b0838667eb3adc/1000g00828idf6nofk05g5ohki5uk137o8beqcv8!nd_dft_wgth_webp_3",

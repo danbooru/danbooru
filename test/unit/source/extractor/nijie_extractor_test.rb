@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class NijieExtractorTest < ActiveSupport::TestCase
+  class NijieExtractorTest < ActiveSupport::ExtractorTestCase
     setup do
       skip "Nijie credentials not configured" unless Source::Extractor::Nijie.enabled?
     end

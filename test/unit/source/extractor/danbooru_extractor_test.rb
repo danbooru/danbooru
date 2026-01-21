@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class DanbooruExtractorTest < ActiveSupport::TestCase
+  class DanbooruExtractorTest < ActiveSupport::ExtractorTestCase
     context "a post" do
       strategy_should_work(
         "https://danbooru.donmai.us/posts/7000000",

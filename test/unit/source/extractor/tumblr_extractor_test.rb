@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class TumblrExtractorTest < ActiveSupport::TestCase
+  class TumblrExtractorTest < ActiveSupport::ExtractorTestCase
     def setup
       skip "Tumblr key is not configured" unless Source::Extractor::Tumblr.enabled?
     end

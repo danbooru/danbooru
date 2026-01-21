@@ -3,7 +3,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PrivatterExtractorTest < ActiveSupport::TestCase
+  class PrivatterExtractorTest < ActiveSupport::ExtractorTestCase
     context "Privatter:" do
       context "A Privatter post URL" do
         strategy_should_work(

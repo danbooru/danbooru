@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class NewgroundsExtractorTest < ActiveSupport::TestCase
+  class NewgroundsExtractorTest < ActiveSupport::ExtractorTestCase
     context "A newgrounds post url" do
       strategy_should_work(
         "https://www.newgrounds.com/art/view/hcnone/sephiroth",

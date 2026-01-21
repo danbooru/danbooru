@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class HuajiaExtractorTest < ActiveSupport::TestCase
+  class HuajiaExtractorTest < ActiveSupport::ExtractorTestCase
     context "A Huajia sample image url" do
       strategy_should_work(
         "https://huajia.fp.ps.netease.com/file/66438c2ecacb41c36cbdd2efaN19wMFy05?fop=imageView/2/w/300/f/webp",

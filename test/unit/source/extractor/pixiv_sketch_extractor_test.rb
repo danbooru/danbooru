@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PixivSketchExtractorTest < ActiveSupport::TestCase
+  class PixivSketchExtractorTest < ActiveSupport::ExtractorTestCase
     context "A Pixiv Sketch post" do
       strategy_should_work(
         "https://sketch.pixiv.net/items/1086346113447960710",

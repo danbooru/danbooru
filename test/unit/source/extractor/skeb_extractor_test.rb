@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class SkebExtractorTest < ActiveSupport::TestCase
+  class SkebExtractorTest < ActiveSupport::ExtractorTestCase
     context "The source for a skeb picture" do
       strategy_should_work(
         "https://skeb.jp/@kokuzou593/works/45",

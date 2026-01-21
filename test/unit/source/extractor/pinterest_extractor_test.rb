@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PinterestExtractorTest < ActiveSupport::TestCase
+  class PinterestExtractorTest < ActiveSupport::ExtractorTestCase
     context "A pinimg.com sample image" do
       strategy_should_work(
         "https://i.pinimg.com/736x/a7/7c/67/a77c67f95a4fec64de7969e98f29cf3b.jpg",

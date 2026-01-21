@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class VkExtractorTest < ActiveSupport::TestCase
+  class VkExtractorTest < ActiveSupport::ExtractorTestCase
     context "An /impg/ sample image URL" do
       strategy_should_work(
         "https://sun9-69.userapi.com/impg/VJBWV0vYZJLRhFBkQxaVtVo9_givXP6BycJJow/RBoOQ0nHMNc.jpg?size=1200x1600&quality=96&sign=73e562b2f74629cba714f7a348d0e815&type=album",

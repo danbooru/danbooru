@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class NoteExtractorTest < ActiveSupport::TestCase
+  class NoteExtractorTest < ActiveSupport::ExtractorTestCase
     context "A sample image URL" do
       strategy_should_work(
         "https://assets.st-note.com/img/1623726537463-B8LOZ1JZUS.png?width=800&dpr=2",

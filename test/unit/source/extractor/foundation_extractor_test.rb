@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class FoundationExtractorTest < ActiveSupport::TestCase
+  class FoundationExtractorTest < ActiveSupport::ExtractorTestCase
     context "A foundation post" do
       strategy_should_work(
         "https://foundation.app/@dadachyo/~/103724",
