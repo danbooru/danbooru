@@ -57,7 +57,7 @@ class ArtistURL < ApplicationRecord
 
   def self.normalized_url_like(url)
     url = url.downcase.gsub(%r{\Ahttps?://|/\z}i, "") # "https://example.com/A/B/C/" => "example.com/a/b/c"
-    url = url + "/" unless url.include?("*")
+    url += "/" unless url.include?("*")
     where_like("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'", url) # this is indexed
   end
 
@@ -82,7 +82,9 @@ class ArtistURL < ApplicationRecord
       true
     when %r{pixiv\.net/fanbox}i
       true
-    when %r{twitter\.com/intent}i
+    when %r{https://x\.com/intent}i
+      true
+    when %r{https://x\.com/i/user}i
       true
     when %r{(?:www|com|dic)\.nicovideo\.jp}i
       true
