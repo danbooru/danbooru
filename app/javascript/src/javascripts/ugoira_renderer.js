@@ -259,7 +259,7 @@ export default class UgoiraRenderer {
   }
 
   // Plays the ugoira. Starts the callback that renders the ugoira frames.
-  play() {
+  async play() {
     this.paused = false;
 
     this._previousTime = null;
@@ -332,5 +332,19 @@ export default class UgoiraRenderer {
   // Returns the current time in seconds.
   now() {
     return performance.now() / 1000;
+  }
+
+  get volume() {
+    return 0;
+  }
+
+  set volume(value) {
+  }
+
+  get muted() {
+    return true;
+  }
+
+  set muted(value) {
   }
 }
