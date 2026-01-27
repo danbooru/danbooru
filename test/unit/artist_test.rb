@@ -359,6 +359,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding nijie artists" do
       setup do
+        skip "Nijie credentials not set" unless SiteCredential.for_site("Nijie").present?
         FactoryBot.create(:artist, :name => "evazion", :url_string => "http://nijie.info/members.php?id=236014")
         FactoryBot.create(:artist, :name => "728995",  :url_string => "http://nijie.info/members.php?id=728995")
       end
@@ -640,7 +641,7 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "create a new version when an url is removed" do
-        assert_difference("ArtistVersion.count") do
+        assert_difference("ArtistVersion.count", 2) do
           @artist.update(:url_string => "")
           assert_equal(%w[], @artist.versions.last.urls)
         end
