@@ -1,11 +1,9 @@
 var $div = $('div.comments-for-post[data-post-id="<%= @comment.post_id %>"] div.new-comment');
 $div.find(".expand-comment-response").click();
-
-var $textarea = $div.find("textarea");
+var $editor = $div.find(".dtext-editor").get(0).editor;
 var msg = <%= raw @comment.body.to_json %>;
-if ($textarea.val().length > 0) {
-  msg = $textarea.val() + "\n\n" + msg;
+if ($editor.dtext.length > 0) {
+  msg = $editor.dtext + "\n\n" + msg;
 }
 
-$textarea.val(msg);
-$textarea.selectEnd();
+$editor.dtext = msg;
