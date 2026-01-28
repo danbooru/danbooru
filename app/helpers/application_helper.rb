@@ -372,7 +372,9 @@ module ApplicationHelper
         value = record[attr]
       end
 
-      if value.nil?
+      if value.is_a?(Time)
+        value = value.strftime("%Y-%m-%dT%H:%M:%S.%6N%:z")
+      elsif value.nil?
         value = "null"
       end
 
