@@ -643,6 +643,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "a deleted post uploaded by an admin" do
+        should "be approvable by the same admin" do
+          admin = create(:admin_user)
+          post = create(:post, uploader: admin, is_deleted: true)
+
+          get_auth post_path(post), admin
+
+          assert_response :success
+          assert_select "#post-option-undelete", "Undelete"
+        end
+      end
+
       context "a nonexistent post id" do
         should "return 404" do
           get post_path(id: 9_999_999)
