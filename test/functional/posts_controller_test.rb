@@ -620,6 +620,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select ".post-flag-reason a:first", "edit"
         end
+
+        should "render html attributes correctly" do
+          get_auth post_path(@post), @user
+
+          assert_response :success
+          assert_select "body[data-post-id=#{@post.id}]" do |element|
+            assert_match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{6}[+-]\d{2}:\d{2}$/, element.attribute("data-post-created-at").value)
+            assert_equal "true", element.attribute("data-current-user-is-member").value
+            assert_equal "false", element.attribute("data-current-user-is-anonymous").value
+            assert_equal @user.level.to_s, element.attribute("data-current-user-level").value
+          end
+        end
       end
 
       context "a deleted post" do
