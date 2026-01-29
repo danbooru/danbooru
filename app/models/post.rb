@@ -291,7 +291,7 @@ class Post < ApplicationRecord
     end
 
     def is_approvable?(user = CurrentUser.user)
-      !is_active? && uploader != user
+      !is_active? && (uploader != user || Pundit.policy!(user, PostApproval).can_approve_own_uploads?)
     end
 
     def autoban
