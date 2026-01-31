@@ -181,10 +181,6 @@ module Source
         tags
       end
 
-      def normalize_tag(tag)
-        tag.gsub(/\d+users入り\z/i, "")
-      end
-
       def download_file!(url)
         url = Source::URL.parse(url)
 

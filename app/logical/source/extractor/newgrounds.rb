@@ -62,9 +62,8 @@ module Source
         end
       end
 
-      def normalize_tag(tag)
-        tag = tag.tr("-", "_")
-        super(tag)
+      def normalized_tags
+        super.map { [it, it.tr("-", "_")] }.flatten.uniq
       end
 
       def display_name

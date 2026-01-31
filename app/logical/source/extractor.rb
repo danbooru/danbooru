@@ -324,11 +324,7 @@ module Source
     end
 
     def normalized_tags
-      tags.map { |tag, _url| normalize_tag(tag) }.sort.uniq
-    end
-
-    def normalize_tag(tag)
-      WikiPage.normalize_other_name(tag).downcase
+      tags.flat_map { |tag, _url| TagNormalizer.normalize(tag) }.sort.uniq
     end
 
     def translated_tags

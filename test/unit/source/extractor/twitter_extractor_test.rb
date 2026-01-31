@@ -506,7 +506,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://twitter.com/kasaishin100/status/1186658635226607616",
         tags: ["西住みほ生誕祭2019"],
-        normalized_tags: ["西住みほ"],
+        normalized_tags: ["生誕祭", "西住みほ", "西住みほ生誕祭2019"],
         dtext_artist_commentary_desc: <<~EOS.chomp,
           みぽりん誕生日おめでとうございます！！🎂
           ボコボコ探検隊🙌✨
