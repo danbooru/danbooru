@@ -2,11 +2,6 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class WeiboExtractorTest < ActiveSupport::ExtractorTestCase
-    setup do
-      # Skip in CI to work around test failures due to rate limiting by Weibo.
-      skip if ENV["CI"].present?
-    end
-
     context "A Weibo post with multiple pictures" do
       strategy_should_work(
         "https://www.weibo.com/5501756072/J2UNKfbqV?type=comment#_rnd1590548401855",
