@@ -5,7 +5,7 @@
         <%= link_to_if pool_version_show_diff(pool_version, params[:type]), "diff", diff_pool_version_path(pool_version.id) %>
       <% end %>
       <% t.column "Pool", td: {class: "diff-body"} do |pool_version| %>
-        <%= link_to pool_version.pretty_name, pool_path(pool_version.pool_id), class: "pool-category-#{pool_version.pool.category}" %>
+        <%= link_to pool_version.pretty_name, pool_path(pool_version.pool_id), class: "pool-category-#{pool_version.category}" %>
         <%= link_to "»", pool_versions_path(search: { pool_id: pool_version.pool_id }, anchor: "pool-version-#{pool_version.id}"), class: "pool-category-#{pool_version.pool.category}" %>
         <%= pool_version_name_diff(pool_version, params[:type]) %>
       <% end %>
